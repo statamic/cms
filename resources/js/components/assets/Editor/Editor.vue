@@ -1,5 +1,5 @@
 <template>
-    <stack name="asset-editor" :before-close="shouldClose" :full="true" @closed="close">
+    <stack name="asset-editor" :before-close="shouldClose" :full="true" @closed="$emit('closed')" v-slot="{ close }">
         <div
             class="asset-editor relative flex h-full flex-col rounded-sm bg-gray-100 dark:bg-dark-800"
             :class="isImage ? 'is-image' : 'is-file'"
@@ -22,7 +22,7 @@
                             {{ asset.path }}
                         </span>
                     </button>
-                    <ui-button variant="ghost" icon="x" class="absolute top-1.5 end-1.5" round @click="close" :aria-label="__('Close Editor')" />
+                    <ui-button variant="ghost" icon="x" class="absolute top-1.5 end-1.5" round @click="confirmClose(close)" :aria-label="__('Close Editor')" />
                 </header>
 
                 <div class="flex flex-1 grow flex-col overflow-scroll md:flex-row md:justify-between">
@@ -154,6 +154,16 @@
                 @selected="selectFocalPoint"
                 @closed="closeFocalPointEditor"
             />
+
+        <confirmation-modal
+            v-if="closingWithChanges"
+            :title="__('Unsaved Changes')"
+            :body-text="__('Are you sure? Unsaved changes will be lost.')"
+            :button-text="__('Discard Changes')"
+            :danger="true"
+            @confirm="confirmCloseWithChanges"
+            @cancel="closingWithChanges = false"
+        />
         </div>
     </stack>
 </template>
@@ -213,6 +223,7 @@ export default {
             error: null,
             errors: {},
             actions: [],
+            closingWithChanges: false,
         };
     },
 
@@ -389,18 +400,22 @@ export default {
             this.errors = {};
         },
 
-        close() {
-            this.$emit('closed');
-        },
-
         shouldClose() {
             if (this.$dirty.has(this.publishContainer)) {
-                if (!confirm(__('Are you sure? Unsaved changes will be lost.'))) {
-                    return false;
-                }
+                this.closingWithChanges = true;
+                return false;
             }
 
             return true;
+        },
+
+        confirmClose(close) {
+            if (this.shouldClose()) close();
+        },
+
+        confirmCloseWithChanges() {
+            this.closingWithChanges = false;
+            this.$emit('closed');
         },
 
         open() {

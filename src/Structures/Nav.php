@@ -165,4 +165,12 @@ class Nav extends Structure implements Contract
             ->fluentlyGetOrSet('canSelectAcrossSites')
             ->args(func_get_args());
     }
+
+    public function commandPaletteLinkForBlueprint()
+    {
+        return $this->blueprint()?->commandPaletteLink(
+            type: 'Navigation',
+            url: cp_route('navigation.blueprint.edit', $this->handle()),
+        );
+    }
 }

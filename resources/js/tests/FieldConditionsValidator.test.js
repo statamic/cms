@@ -5,15 +5,19 @@ import { createPinia } from 'pinia';
 import ValidatesFieldConditions from '../components/field-conditions/ValidatorMixin.js';
 import { data_get } from '../bootstrap/globals';
 import FieldConditions from '@statamic/components/FieldConditions';
-import PublishContainer from '@statamic/components/publish/Container.vue';
+import PublishContainer from '@statamic/components/ui/Publish/Container.vue';
 
 let Store;
 let Fields;
 
 const Statamic = {
     $conditions: new FieldConditions(),
+    $dirty: {
+        add: () => {},
+    },
 };
 window.Statamic = Statamic;
+window.__ = (msg) => msg;
 
 const setValues = function (values, nestedKey) {
     Fields.values = values;
@@ -82,14 +86,6 @@ beforeEach(() => {
     const publishContainer = mount(PublishContainer, {
         global: {
             plugins: [createPinia()],
-            mocks: {
-                $events: {
-                    $emit: () => {},
-                },
-                $dirty: {
-                    add: () => {},
-                },
-            },
         },
         slots: {
             default: TestComponent,

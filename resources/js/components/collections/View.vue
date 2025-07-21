@@ -130,12 +130,13 @@
 
             <template #branch-options="{ branch, removeBranch, depth }">
                 <template v-if="depth < structureMaxDepth">
-                    <h6 class="px-2" v-text="__('Create Child Entry')" v-if="blueprints.length > 1" />
+                    <DropdownLabel :text="__('Create Child Entry')" v-if="blueprints.length > 1" />
                     <DropdownSeparator v-if="blueprints.length > 1" />
                     <DropdownItem
                         v-for="blueprint in blueprints"
-                        :key="blueprint.handle"
                         @click="createEntry(blueprint.handle, branch.id)"
+                        :icon="blueprint.icon || 'add-entry'"
+                        :key="blueprint.handle"
                         :text="blueprints.length > 1 ? __(blueprint.title) : __('Create Child Entry')"
                     />
                 </template>
@@ -143,6 +144,7 @@
                     <DropdownSeparator />
                     <DropdownItem
                         :text="__('Delete')"
+                        icon="trash"
                         variant="destructive"
                         @click="deleteTreeBranch(branch, removeBranch)"
                     />
@@ -173,14 +175,11 @@
 import DeleteEntryConfirmation from './DeleteEntryConfirmation.vue';
 import DeleteLocalizationConfirmation from './DeleteLocalizationConfirmation.vue';
 import SiteSelector from '../SiteSelector.vue';
-import HasActions from '../publish/HasActions';
 import { defineAsyncComponent } from 'vue';
 import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator, Header, Button, ToggleGroup, ToggleItem } from '@statamic/ui';
 import ItemActions from '@statamic/components/actions/ItemActions.vue';
 
 export default {
-    mixins: [HasActions],
-
     components: {
         DropdownSeparator,
         DropdownItem,

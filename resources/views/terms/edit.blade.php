@@ -29,7 +29,6 @@
         :initial-is-working-copy="{{ $str::bool($hasWorkingCopy) }}"
         :revisions-enabled="{{ $str::bool($revisionsEnabled) }}"
         :initial-read-only="{{ $str::bool($readOnly) }}"
-        :preloaded-assets="{{ json_encode($preloadedAssets) }}"
         :can-edit-blueprint="{{ $str::bool($user->can('configure fields')) }}"
         create-another-url="{{ cp_route('taxonomies.terms.create', [$taxonomy, $locale]) }}"
         listing-url="{{ cp_route('taxonomies.show', $taxonomy) }}"

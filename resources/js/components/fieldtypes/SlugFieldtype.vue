@@ -79,7 +79,7 @@ export default {
                 key = dottedPrefix + '.' + field;
             }
 
-            return this.store?.values[key] || null;
+            return data_get(this.store?.values, key);
         },
 
         language() {

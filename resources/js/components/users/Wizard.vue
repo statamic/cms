@@ -21,23 +21,18 @@
                 <p class="text-gray dark:text-dark-150" v-text="__('messages.user_wizard_intro')" />
             </div>
 
-            <publish-container
-                ref="container"
-                name="userwizard"
+            <ui-publish-container
                 :blueprint="blueprint"
-                :values="values"
+                v-model="values"
                 :meta="meta"
                 :track-dirty-state="false"
-                class="mx-auto -mt-6 max-w-md px-4 py-0 pb-20"
-                @updated="values = $event"
-                v-slot="{ setFieldValue, setFieldMeta }"
             >
-                <div>
-                    <div class="-mx-6">
-                        <publish-fields :fields="fields" @updated="setFieldValue" @meta-updated="setFieldMeta" />
-                    </div>
+                <div class="mx-auto -mt-6 max-w-md px-4 py-0 pb-20">
+                    <ui-publish-fields-provider :fields="fields">
+                        <ui-publish-fields />
+                    </ui-publish-fields-provider>
                 </div>
-            </publish-container>
+            </ui-publish-container>
         </div>
 
         <!-- Step: Roles & Groups -->

@@ -4,10 +4,7 @@ namespace Statamic\CP\Navigation;
 
 use Exception;
 use Illuminate\Support\Facades\Cache;
-use Statamic\CommandPalette\Category;
-use Statamic\CommandPalette\Link;
 use Statamic\Facades\Blink;
-use Statamic\Facades\CommandPalette;
 use Statamic\Facades\Preference;
 use Statamic\Facades\User;
 use Statamic\Support\Arr;
@@ -21,7 +18,6 @@ class NavBuilder
     protected $items = [];
     protected $pendingItems = [];
     protected $withHidden = false;
-    protected $withCommandPalette = false;
     protected $itemsWithChildrenClosures = [];
     protected $sections = [];
     protected $sectionsOriginalItemIds = [];
@@ -56,19 +52,6 @@ class NavBuilder
     }
 
     /**
-     * Build with command palette.
-     *
-     * @param  bool  $withHidden
-     * @return $this
-     */
-    public function withCommandPalette(bool $withCommandPalette = false): self
-    {
-        $this->withCommandPalette = $withCommandPalette;
-
-        return $this;
-    }
-
-    /**
      * Build navigation.
      *
      * @param  mixed  $preferences
@@ -94,7 +77,6 @@ class NavBuilder
             ->authorizeChildren()
             ->buildSections()
             ->blinkUrls()
-            ->addToCommandPalette()
             ->get();
     }
 
@@ -1081,60 +1063,6 @@ class NavBuilder
         Blink::forget(static::UNRESOLVED_CHILDREN_URLS_CACHE_KEY);
         Cache::forget(static::ALL_URLS_CACHE_KEY);
         Blink::forget(static::ALL_URLS_CACHE_KEY);
-    }
-
-    /**
-     * Add built items to command palette.
-     */
-    protected function addToCommandPalette(): self
-    {
-        if (! $this->withCommandPalette) {
-            return $this;
-        }
-
-        $this->built
-            ->flatMap(fn ($section) => $section['items'])
-            ->filter(fn ($item) => $item->url())
-            ->each(fn ($item) => $this->addItemToCommandPalette($item));
-
-        return $this;
-    }
-
-    /**
-     * Add nav item and its children to command palette.
-     */
-    public function addItemToCommandPalette(NavItem $item)
-    {
-        CommandPalette::addCommand(static::transformToLink($item));
-
-        if ($children = $item->resolveChildren()->children()) {
-            $children->each(fn ($child) => CommandPalette::addCommand(static::transformToLink($child, $item)));
-        }
-    }
-
-    /**
-     * Transform nav item to valid command palette `Link` instance.
-     */
-    protected static function transformToLink(NavItem $item, ?NavItem $parentItem = null): Link
-    {
-        $displayItem = $parentItem ?? $item;
-
-        $text = $displayItem->section() !== 'Top Level'
-            ? __($displayItem->section()).' » '.__($displayItem->display())
-            : __($displayItem->display());
-
-        if ($parentItem) {
-            $text .= ' » '.__($item->display());
-        }
-
-        $link = new Link(
-            text: $text,
-            category: Category::Navigation,
-        );
-
-        return $link
-            ->url($item->url())
-            ->icon($item->icon());
     }
 
     /**

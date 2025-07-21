@@ -58,14 +58,12 @@
 </template>
 
 <script>
-import PublishField from '../publish/Field.vue';
 import { FieldConditionsBuilder, FIELD_CONDITIONS_KEYS } from '../field-conditions/FieldConditions.js';
 import FieldValidationBuilder from '../field-validation/Builder.vue';
 import { Heading, Button, Tabs, TabList, TabTrigger, TabContent, CardPanel } from '@statamic/ui';
 
 export default {
     components: {
-        PublishField,
         FieldConditionsBuilder,
         FieldValidationBuilder,
         Heading,

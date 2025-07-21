@@ -1,5 +1,5 @@
 <template>
-    <table class="grid-table" v-if="rows.length > 0">
+    <table class="grid-table" :class="{ 'mb-4': rows.length > 0 }" v-if="rows.length > 0">
         <thead>
             <tr>
                 <th class="w-3" v-if="grid.isReorderable"></th>

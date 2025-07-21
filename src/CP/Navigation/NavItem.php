@@ -3,6 +3,8 @@
 namespace Statamic\CP\Navigation;
 
 use Illuminate\Support\Collection;
+use Statamic\CommandPalette\Category;
+use Statamic\CommandPalette\Link;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\URL;
 use Statamic\Statamic;
@@ -564,6 +566,34 @@ class NavItem
     public function name(...$arguments)
     {
         return $this->display(...$arguments);
+    }
+
+    /**
+     * Transform nav item and associated children to valid command palette `Link` instances.
+     */
+    public function commandPaletteLinks(?NavItem $parentItem = null): array
+    {
+        $displayItem = $parentItem ?? $this;
+
+        $text = $displayItem->section() !== 'Top Level'
+            ? __($displayItem->section()).' » '.__($displayItem->display())
+            : __($displayItem->display());
+
+        if ($parentItem) {
+            $text .= ' » '.__($this->display());
+        }
+
+        $link = (new Link(text: $text, category: Category::Navigation))
+            ->url($this->url())
+            ->icon($this->icon());
+
+        if ($children = $this->resolveChildren()->children()) {
+            $childLinks = $children->flatMap(fn ($child) => $child->commandPaletteLinks($this));
+        }
+
+        return collect([$link])
+            ->merge($childLinks ?? [])
+            ->all();
     }
 
     /**

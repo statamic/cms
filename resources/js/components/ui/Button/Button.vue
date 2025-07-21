@@ -5,6 +5,7 @@ import { twMerge } from 'tailwind-merge';
 import { Icon } from '@statamic/ui';
 
 const props = defineProps({
+    as: { type: String, default: 'button' },
     href: { type: String, default: null },
     icon: { type: String, default: null },
     iconAppend: { type: String, default: null },
@@ -20,7 +21,7 @@ const props = defineProps({
 
 const slots = useSlots();
 const hasDefaultSlot = !!slots.default;
-const tag = computed(() => (props.href ? 'a' : 'button'));
+const tag = computed(() => (props.href ? 'a' : props.as));
 const iconOnly = computed(() => (props.icon && !hasDefaultSlot && !props.text) || props.iconOnly);
 
 const buttonClasses = computed(() => {

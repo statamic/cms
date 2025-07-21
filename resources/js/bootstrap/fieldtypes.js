@@ -60,7 +60,6 @@ import ToggleIndexFieldtype from '../components/fieldtypes/ToggleIndexFieldtype.
 import WidthFieldtype from '../components/fieldtypes/WidthFieldtype.vue';
 import VideoFieldtype from '../components/fieldtypes/VideoFieldtype.vue';
 import SetPicker from '../components/fieldtypes/replicator/SetPicker.vue';
-import SetField from '../components/fieldtypes/replicator/Field.vue';
 import TimeFieldtype from '../components/fieldtypes/TimeFieldtype.vue';
 
 export default function registerFieldtypes(app) {
@@ -145,7 +144,6 @@ export default function registerFieldtypes(app) {
         defineAsyncComponent(() => import('../components/fieldtypes/YamlFieldtype.vue')),
     );
     app.component('set-picker', SetPicker);
-    app.component('set-field', SetField);
     app.component('revealer-fieldtype', RevealerFieldtype);
     app.component('template-fieldtype', TemplateFieldtype);
 }
