@@ -1,7 +1,6 @@
 <script setup>
 import { TooltipArrow, TooltipContent, TooltipPortal, TooltipProvider, TooltipRoot, TooltipTrigger } from 'reka-ui';
 import { computed } from 'vue';
-import markdown from '@statamic/util/markdown.js';
 
 const props = defineProps({
     text: { type: String, default: null },
