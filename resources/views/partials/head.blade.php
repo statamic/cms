@@ -29,8 +29,8 @@
         
         let contrast = {!! ($userContrast = $user?->preferences()['contrast'] ?? null) ? "'" . $userContrast . "'" : 'null' !!};
         if (!contrast) contrast = localStorage.getItem('statamic.contrast') ?? 'default';
-        if (contrast === 'auto' && window.matchMedia('(prefers-contrast: more)').matches) contrast = 'more';
-        if (contrast === 'more') document.documentElement.classList.add('contrast-more');
+        if (contrast === 'auto' && window.matchMedia('(prefers-contrast: more)').matches) contrast = 'increased';
+        if (contrast === 'increased') document.documentElement.classList.add('contrast-increased');
     })();
 </script>
 

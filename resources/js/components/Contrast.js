@@ -34,22 +34,22 @@ export default class Contrast {
         watch(
             this.#contrast,
             (contrast) => {
-                document.documentElement.classList.toggle('contrast-more', contrast === 'more');
+                document.documentElement.classList.toggle('contrast-increased', contrast === 'increased');
             },
             { immediate: true },
         );
     }
 
     #setContrast(preference) {
-        this.#contrast.value = preference === 'more' ||
+        this.#contrast.value = preference === 'increased' ||
             (preference === 'auto' && window.matchMedia('(prefers-contrast: more)').matches)
-                ? 'more'
+                ? 'increased'
                 : 'default';
     }
 
     #listenForColorSchemeChange() {
         window.matchMedia('(prefers-contrast: more)').addEventListener('change', (e) => {
-            if (this.#preference.value === 'auto') this.#contrast.value = e.matches ? 'more' : 'default';
+            if (this.#preference.value === 'auto') this.#contrast.value = e.matches ? 'increased' : 'default';
         });
     }
 

@@ -28,10 +28,10 @@ class CorePreferences
         Preference::register('contrast', [
             'type' => 'select',
             'display' => __('Contrast'),
-            'instructions' => __('Choose your preferred contrast level'),
+            'instructions' => __('statamic::messages.preference_contrast'),
             'options' => [
                 'default' => __('Default'),
-                'more' => __('More Contrast'),
+                'increased' => __('Increased Contrast'),
                 'auto' => __('System'),
             ],
         ]);
