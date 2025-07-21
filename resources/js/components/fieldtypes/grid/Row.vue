@@ -29,14 +29,11 @@
 
 <script>
 import GridCell from './Cell.vue';
-import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
 import FieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
 import { Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
 
 export default {
     components: { Dropdown, DropdownMenu, DropdownItem, FieldsProvider, GridCell },
-
-    mixins: [ValidatesFieldConditions],
 
     props: {
         index: {

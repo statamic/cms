@@ -8,7 +8,7 @@ import ElementContainer from '@statamic/components/ElementContainer.vue';
 import ShowField from '@statamic/components/field-conditions/ShowField.js';
 
 const slots = useSlots();
-const { blueprint, values, extraValues, errors, hiddenFields, revealerFields, setHiddenField } = injectContainerContext();
+const { blueprint, visibleValues, extraValues, errors, hiddenFields, revealerFields, setHiddenField } = injectContainerContext();
 const tabs = ref(blueprint.value.tabs);
 const width = ref(null);
 const sidebarTab = computed(() => tabs.value.find((tab) => tab.handle === 'sidebar'));
@@ -20,9 +20,9 @@ const visibleMainTabs = computed(() => {
         return tab.sections.some((section) => {
             return section.fields.some((field) => {
                 return new ShowField(
-                    values.value,
+                    visibleValues.value,
                     extraValues.value,
-                    values.value,
+                    visibleValues.value,
                     hiddenFields.value,
                     revealerFields.value,
                     setHiddenField

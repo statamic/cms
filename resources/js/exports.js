@@ -6,7 +6,6 @@ export { default as BardToolbarButton } from './components/fieldtypes/bard/Toolb
 export { default as ItemActions } from './components/actions/ItemActions.vue';
 export { default as BulkActions } from './components/actions/BulkActions.vue';
 export * as FieldConditions from './components/field-conditions/FieldConditions';
-export { default as ValidatesFieldConditions } from './components/field-conditions/ValidatorMixin';
 export * from './components/ui/index.js';
 export * from './components/elevated-sessions';
 export * as SavePipeline from './components/ui/Publish/SavePipeline.js';

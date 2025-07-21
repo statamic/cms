@@ -16,11 +16,11 @@ const visibleSections = computed(() => {
     return sections.filter((section) => {
         return section.fields.some((field) => {
             return new ShowField(
-                visibleValues,
-                extraValues,
-                visibleValues,
-                hiddenFields,
-                revealerFields,
+                visibleValues.value,
+                extraValues.value,
+                visibleValues.value,
+                hiddenFields.value,
+                revealerFields.value,
                 setHiddenField
             ).showField(field, field.handle);
         });

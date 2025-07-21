@@ -39,13 +39,12 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import { ValidatesFieldConditions } from '../field-conditions/FieldConditions.js';
 import ManagesPreviewText from './replicator/ManagesPreviewText';
 import Fields from '@statamic/components/ui/Publish/Fields.vue';
 import FieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
 
 export default {
-    mixins: [Fieldtype, ValidatesFieldConditions, ManagesPreviewText],
+    mixins: [Fieldtype, ManagesPreviewText],
     components: { Fields, FieldsProvider },
     data() {
         return {

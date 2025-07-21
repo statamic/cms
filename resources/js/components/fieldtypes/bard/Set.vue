@@ -110,7 +110,6 @@
 <script>
 import { NodeViewWrapper } from '@tiptap/vue-3';
 import ManagesPreviewText from '../replicator/ManagesPreviewText';
-import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
 import HasFieldActions from '../../field-actions/HasFieldActions.js';
 import { Badge, Button, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, Icon, Subheading, Switch, Tooltip } from '@statamic/ui';
 import { Motion } from 'motion-v';
@@ -149,7 +148,7 @@ export default {
         Motion,
     },
 
-    mixins: [ValidatesFieldConditions, ManagesPreviewText, HasFieldActions],
+    mixins: [ManagesPreviewText, HasFieldActions],
 
     inject: {
         bard: {},
