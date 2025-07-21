@@ -22,6 +22,7 @@
         "league/glide": "^3.0",
         "maennchen/zipstream-php": "^3.1",
         "michelf/php-smartypants": "^1.8.1",
+        "mpratt/embera": "~2.0",
         "nesbot/carbon": "^3.0",
         "pixelfear/composer-dist-plugin": "^0.1.4",
         "pragmarx/google2fa": "^8.0",
