@@ -219,7 +219,7 @@ watch(
     <portal name="code-fullscreen" :disabled="!fullScreenMode" target-class="code-fieldtype">
         <div
             :class="[
-                '@container/markdown block w-full overflow-hidden rounded-lg bg-white dark:bg-gray-900',
+                '@container/markdown border [.contrast-increased_&]:border-gray-500 block w-full overflow-hidden rounded-lg bg-white dark:bg-gray-900',
                 'text-gray-900 dark:text-gray-300',
                 'shadow-ui-sm not-prose appearance-none antialiased disabled:shadow-none',
                 themeClass,
