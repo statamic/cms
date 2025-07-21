@@ -49,6 +49,10 @@ class ComparatorTest extends TestCase
     #[Test]
     public function it_compares_values()
     {
+        $this->assertSecond(Compare::values(null, 'a'));
+        $this->assertFirst(Compare::values('a', null));
+        $this->assertEqual(Compare::values(null, null));
+
         $this->assertSecond(Compare::values('a', 'b'));
         $this->assertFirst(Compare::values('b', 'a'));
         $this->assertEqual(Compare::values('a', 'a'));
