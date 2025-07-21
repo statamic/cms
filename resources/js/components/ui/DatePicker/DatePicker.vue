@@ -64,6 +64,27 @@ const isInvalid = computed(() => {
     // Check if the component has invalid state from form validation
     return props.modelValue === null && props.required;
 });
+
+const getInputLabel = (part) => {
+    switch (part) {
+        case 'day':
+            return __('Day');
+        case 'month':
+            return __('Month');
+        case 'year':
+            return __('Year');
+        case 'hour':
+            return __('Hour');
+        case 'minute':
+            return __('Minute');
+        case 'second':
+            return __('Second');
+        case 'dayPeriod':
+            return __('AM/PM');
+        default:
+            return '';
+    }
+};
 </script>
 
 <template>
@@ -116,6 +137,7 @@ const isInvalid = computed(() => {
                             :class="{
                                 'px-0.5!': item.part === 'month' || item.part === 'year' || item.part === 'day',
                             }"
+                            :aria-label="getInputLabel(item.part)"
                         >
                             {{ item.value }}
                         </DatePickerInput>
