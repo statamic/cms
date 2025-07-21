@@ -1,6 +1,7 @@
 <script setup>
 import { TooltipArrow, TooltipContent, TooltipPortal, TooltipProvider, TooltipRoot, TooltipTrigger } from 'reka-ui';
 import { computed } from 'vue';
+import markdown from '@statamic/util/markdown.js';
 
 const props = defineProps({
     text: { type: String, default: null },
@@ -12,7 +13,7 @@ const tooltipText = computed(() => (props.markdown ? markdown(props.markdown) : 
 </script>
 
 <template>
-    <TooltipProvider :ariaLabel="text" :delay-duration="delay">
+    <TooltipProvider :ariaLabel="tooltipText" :delay-duration="delay">
         <TooltipRoot>
             <TooltipTrigger as-child>
                 <slot />
@@ -30,6 +31,8 @@ const tooltipText = computed(() => (props.markdown ? markdown(props.markdown) : 
                         'will-change-[transform,opacity]',
                     ]"
                     :side-offset="5"
+                    role="tooltip"
+                    :aria-label="tooltipText"
                 >
                     <span v-html="tooltipText" />
                     <TooltipArrow class="fill-white stroke-gray-300" :width="12" :height="6" />
