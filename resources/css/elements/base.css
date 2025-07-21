@@ -46,6 +46,15 @@
     a {
         cursor: pointer;
     }
+
+    ::placeholder {
+        @apply text-gray-400;
+    }
+
+    [type="checkbox"] {
+        /* To effectively hide border radius clash with focus state */
+        --focus-outline-offset: -1.85px;
+    }
 }
 
 @layer utilities {
@@ -63,5 +72,10 @@
                 left: 0.6rem;
             }
         }
-    }   
+    }
+    /* e.g. >> /cp/collections, when you tab to the title */
+    .main-content table a {
+        --focus-outline-offset: 4px;
+        @apply rounded-xs;
+    }
 }
