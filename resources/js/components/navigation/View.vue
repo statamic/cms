@@ -111,13 +111,13 @@
 
             <template #branch-icon="{ branch }">
                 <ui-tooltip v-if="isEntryBranch(branch)" :text="__('Entry link')">
-                    <ui-icon class="size-3.5! text-gray-500" name="link" />
+                    <ui-icon class="size-3.5! text-gray-500" name="link" tabindex="-1" />
                 </ui-tooltip>
                 <ui-tooltip v-if="isLinkBranch(branch)" :text="__('External link')">
-                    <ui-icon class="size-3.5! text-gray-500" name="external-link" />
+                    <ui-icon class="size-3.5! text-gray-500" name="external-link" tabindex="-1" />
                 </ui-tooltip>
                 <ui-tooltip v-if="isTextBranch(branch)" :text="__('Text')">
-                    <ui-icon class="size-3.5! text-gray-500" name="page" />
+                    <ui-icon class="size-3.5! text-gray-500" name="page" tabindex="-1" />
                 </ui-tooltip>
             </template>
 
