@@ -69,7 +69,7 @@ function valueUpdated(value) {
     const existingValue = data_get(containerValues.value, fullPath.value);
     if (value === existingValue) return;
     setFieldValue(fullPath.value, value);
-    if (isSyncable.value) desync();
+    desync();
 }
 
 function metaUpdated(value) {

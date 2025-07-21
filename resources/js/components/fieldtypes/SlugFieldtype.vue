@@ -77,7 +77,7 @@ export default {
                 key = dottedPrefix + '.' + field;
             }
 
-            return this.publishContainer?.values[key] || null;
+            return data_get(this.publishContainer?.values, key);
         },
 
         language() {

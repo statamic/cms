@@ -44,6 +44,16 @@
                 </section>
             </div>
         </element-container>
+
+        <confirmation-modal
+            v-if="deletingRow"
+            :title="__('Delete Row')"
+            :body-text="__('Are you sure?')"
+            :button-text="__('Delete')"
+            :danger="true"
+            @confirm="confirmDelete"
+            @cancel="deletingRow = null"
+        />
     </portal>
 </template>
 
@@ -67,6 +77,7 @@ export default {
             containerWidth: null,
             focused: false,
             fullScreenMode: false,
+            deletingRow: null,
             provide: {
                 grid: this.makeGridProvide(),
             },
@@ -193,10 +204,16 @@ export default {
             const hasChanges = this.fields.some(field => row[field.handle] !== emptyRow[field.handle]);
 
             if (hasChanges) {
-                if (!confirm(__('Are you sure?'))) return;
+                this.deletingRow = index;
+                return;
             }
 
             this.update([...this.value.slice(0, index), ...this.value.slice(index + 1)]);
+        },
+
+        confirmDelete() {
+            this.update([...this.value.slice(0, this.deletingRow), ...this.value.slice(this.deletingRow + 1)]);
+            this.deletingRow = null;
         },
 
         duplicate(index) {

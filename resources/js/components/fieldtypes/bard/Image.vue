@@ -191,16 +191,6 @@ export default {
         },
 
         loadAsset(id) {
-            let preloaded = this.publishContainer.preloadedAssets.value.find((asset) => asset.id === id);
-
-            if (preloaded) {
-                // TODO
-                // Disabling preloading temporarily. It's causing an infinite loop.
-                // It wasn't working on 3.2 anyway. It wasn't preloading, the AJAX request was always happening.
-                // this.setAsset(preloaded);
-                // return;
-            }
-
             this.$axios
                 .post(cp_url('assets-fieldtype'), {
                     assets: [id],

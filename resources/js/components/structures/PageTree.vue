@@ -74,6 +74,16 @@
                 </Draggable>
             </div>
         </ui-panel>
+
+        <confirmation-modal
+            v-if="discardingChanges"
+            :title="__('Discard Changes')"
+            :body-text="__('Are you sure?')"
+            :button-text="__('Discard Changes')"
+            :danger="true"
+            @confirm="confirmDiscard"
+            @cancel="discardingChanges = false"
+        />
     </div>
 </template>
 
@@ -112,6 +122,7 @@ export default {
             pages: [],
             treeData: [],
             collapsedState: [],
+            discardingChanges: false,
         };
     },
 
@@ -274,11 +285,14 @@ export default {
         },
 
         cancel() {
-            if (!confirm(__('Are you sure?'))) return;
+            this.discardingChanges = true;
+        },
 
+        confirmDiscard() {
             this.pages = this.initialPages;
             this.updateTreeData();
             this.$emit('canceled');
+            this.discardingChanges = false;
         },
 
         rootDroppable() {

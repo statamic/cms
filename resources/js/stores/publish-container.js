@@ -19,7 +19,6 @@ export const usePublishContainerStore = function (name, initial) {
             fieldLocks: {},
             errors: {},
             isRoot: initial.isRoot,
-            preloadedAssets: [],
             autosaveInterval: null,
             reference: initial.reference,
             readOnly: initial.readOnly,
@@ -123,9 +122,6 @@ export const usePublishContainerStore = function (name, initial) {
                 this.values = payload.values;
                 this.meta = payload.meta;
                 this.site = payload.site;
-            },
-            setPreloadedAssets(assets) {
-                this.preloadedAssets = assets;
             },
             setAutosaveInterval(interval) {
                 if (this.autosaveInterval) {

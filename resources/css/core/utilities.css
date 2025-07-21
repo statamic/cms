@@ -176,6 +176,7 @@
 
 */
 @utility bg-architectural-lines {
+    overflow: hidden;
     &::before {
         content: '';
         pointer-events: none;

@@ -59,6 +59,16 @@
                 </div>
             </div>
         </div>
+
+        <confirmation-modal
+            v-if="closingWithChanges"
+            :title="__('Unsaved Changes')"
+            :body-text="__('Are you sure? Unsaved changes will be lost.')"
+            :button-text="__('Discard Changes')"
+            :danger="true"
+            @confirm="confirmCloseWithChanges"
+            @cancel="closingWithChanges = false"
+        />
     </stack>
 </template>
 
@@ -108,10 +118,10 @@ export default {
             originMeta: null,
             extraValues: null,
             localizedFields: null,
-            syncableFields: null,
             loading: true,
             saveKeyBinding: null,
             publishContainer: 'tree-page',
+            closingWithChanges: false,
         };
     },
 
@@ -214,9 +224,8 @@ export default {
 
         shouldClose() {
             if (this.$dirty.has(this.publishContainer)) {
-                if (!confirm(__('Are you sure? Unsaved changes will be lost.'))) {
-                    return false;
-                }
+                this.closingWithChanges = true;
+                return false;
             }
 
             return true;
@@ -224,6 +233,11 @@ export default {
 
         confirmClose(close) {
             if (this.shouldClose()) close();
+        },
+
+        confirmCloseWithChanges() {
+            this.closingWithChanges = false;
+            this.$emit('closed');
         },
 
         getPageValues() {
@@ -262,7 +276,6 @@ export default {
             this.originMeta = info.originMeta;
             this.extraValues = info.extraValues;
             this.localizedFields = info.localizedFields;
-            this.syncableFields = info.syncableFields;
         },
 
         emitPublishInfoUpdated(isNew) {
@@ -273,7 +286,6 @@ export default {
                 originMeta: this.originMeta,
                 extraValues: this.extraValues,
                 localizedFields: this.localizedFields,
-                syncableFields: this.syncableFields,
                 entry: this.entry,
                 new: isNew,
             });

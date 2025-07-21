@@ -5,7 +5,6 @@ namespace Statamic\Http\Controllers\CP\Taxonomies;
 use Illuminate\Http\Request;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Facades\Action;
-use Statamic\Facades\Asset;
 use Statamic\Facades\Site;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
@@ -137,7 +136,6 @@ class TermsController extends CpController
                 ];
             })->all(),
             'hasWorkingCopy' => $term->hasWorkingCopy(),
-            'preloadedAssets' => $this->extractAssetsFromValues($values),
             'revisionsEnabled' => $term->revisionsEnabled(),
             'previewTargets' => $taxonomy->previewTargets()->all(),
             'itemActions' => Action::for($term, ['taxonomy' => $taxonomy->handle(), 'view' => 'form']),
@@ -320,26 +318,6 @@ class TermsController extends CpController
 
         return (new TermResource($term))
             ->additional(['saved' => $saved]);
-    }
-
-    protected function extractAssetsFromValues($values)
-    {
-        return collect($values)
-            ->filter(function ($value) {
-                return is_string($value);
-            })
-            ->map(function ($value) {
-                preg_match_all('/"asset::([^"]+)"/', $value, $matches);
-
-                return str_replace('\/', '/', $matches[1]) ?? null;
-            })
-            ->flatten(2)
-            ->unique()
-            ->map(function ($id) {
-                return Asset::find($id);
-            })
-            ->filter()
-            ->values();
     }
 
     protected function getAuthorizedSitesForTaxonomy($taxonomy)
