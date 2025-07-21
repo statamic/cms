@@ -32,6 +32,7 @@ class CorePreferences
             'options' => [
                 'default' => __('Default'),
                 'more' => __('More Contrast'),
+                'auto' => __('System'),
             ],
         ]);
     }

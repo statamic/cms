@@ -64,9 +64,5 @@
             <ui-toggle-item icon="moon" class="[&_svg]:size-4.5" value="dark" :label="__('Dark')" />
             <ui-toggle-item icon="monitor" class="[&_svg]:size-4.5" value="auto" :label="__('System')" />
         </ui-toggle-group>
-        <ui-toggle-group variant="ghost" size="xs" class="justify-between" v-model="$contrast.preference">
-            <ui-toggle-item icon="eye" class="[&_svg]:size-4.5" value="default" :label="__('Default')" />
-            <ui-toggle-item icon="eye-off" class="[&_svg]:size-4.5" value="more" :label="__('More Contrast')" />
-        </ui-toggle-group>
     </ui-dropdown-footer>
 </ui-dropdown>

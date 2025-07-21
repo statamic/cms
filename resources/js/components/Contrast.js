@@ -9,6 +9,7 @@ export default class Contrast {
         this.#preference = ref(preference ?? 'default');
         this.#watchPreferences();
         this.#watchContrast();
+        this.#listenForColorSchemeChange();
     }
 
     get preference() {
@@ -41,7 +42,16 @@ export default class Contrast {
     }
 
     #setContrast(preference) {
-        this.#contrast.value = preference ?? 'default';
+        this.#contrast.value = preference === 'more' ||
+            (preference === 'auto' && window.matchMedia('(prefers-contrast: more)').matches)
+                ? 'more'
+                : 'default';
+    }
+
+    #listenForColorSchemeChange() {
+        window.matchMedia('(prefers-contrast: more)').addEventListener('change', (e) => {
+            if (this.#preference.value === 'auto') this.#contrast.value = e.matches ? 'more' : 'default';
+        });
     }
 
     #savePreference(preference) {
