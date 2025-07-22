@@ -30,7 +30,7 @@
                             :text="__('Edit Blueprint')"
                             icon="blueprint-edit"
                             v-if="canEditBlueprint"
-                            :redirect="actions.editBlueprint"
+                            :href="actions.editBlueprint"
                         />
                         <DropdownSeparator v-if="canEditBlueprint && itemActions.length" />
                         <DropdownItem
