@@ -4,7 +4,10 @@ namespace Statamic\Http\Controllers\CP\Taxonomies;
 
 use Illuminate\Http\Request;
 use Statamic\Contracts\Taxonomies\Taxonomy as TaxonomyContract;
+use Statamic\CP\Breadcrumbs\Breadcrumb;
+use Statamic\CP\Breadcrumbs\Breadcrumbs;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Taxonomy;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\Fields\ManagesBlueprints;
 
@@ -19,6 +22,8 @@ class TaxonomyBlueprintsController extends CpController
 
     public function index(TaxonomyContract $taxonomy)
     {
+        $this->pushTaxonomyBreadcrumbs($taxonomy);
+
         $blueprints = $this->indexItems($taxonomy->termBlueprints(), $taxonomy);
 
         return view('statamic::taxonomies.blueprints.index', compact('taxonomy', 'blueprints'));
@@ -37,6 +42,26 @@ class TaxonomyBlueprintsController extends CpController
     public function edit($taxonomy, $blueprint)
     {
         $blueprint = $taxonomy->termBlueprint($blueprint);
+
+        $this->pushTaxonomyBreadcrumbs($taxonomy);
+
+        Breadcrumbs::push(new Breadcrumb(
+            text: $blueprint->title(),
+            url: request()->url(),
+            icon: 'blueprints',
+            links: $taxonomy
+                ->termBlueprints()
+                ->reject(fn ($b) => $b->handle() === $blueprint->handle())
+                ->map(fn ($b) => [
+                    'text' => $b->title(),
+                    'icon' => 'blueprints',
+                    'url' => cp_route('blueprints.taxonomies.edit', [$taxonomy, $b]),
+                ])
+                ->values()
+                ->all(),
+            createLabel: 'Create Blueprint',
+            createUrl: cp_route('blueprints.taxonomies.create', $taxonomy),
+        ));
 
         return view('statamic::taxonomies.blueprints.edit', [
             'taxonomy' => $taxonomy,
@@ -57,6 +82,8 @@ class TaxonomyBlueprintsController extends CpController
 
     public function create($taxonomy)
     {
+        $this->pushTaxonomyBreadcrumbs($taxonomy);
+
         return view('statamic::taxonomies.blueprints.create', [
             'action' => cp_route('blueprints.taxonomies.store', $taxonomy),
         ]);
@@ -85,5 +112,28 @@ class TaxonomyBlueprintsController extends CpController
         $this->authorize('delete', $blueprint);
 
         $blueprint->delete();
+    }
+
+    private function pushTaxonomyBreadcrumbs(TaxonomyContract $taxonomy)
+    {
+        Breadcrumbs::push(new Breadcrumb(
+            text: 'Taxonomies',
+            icon: 'taxonomies',
+        ));
+
+        Breadcrumbs::push(new Breadcrumb(
+            text: $taxonomy->title(),
+            url: request()->url(),
+            icon: 'taxonomies',
+            links: Taxonomy::all()
+                ->reject(fn ($t) => $t->handle() === $taxonomy->handle())
+                ->map(fn ($t) => [
+                    'text' => $t->title(),
+                    'icon' => 'taxonomies',
+                    'url' => cp_route('blueprints.taxonomies.index', $t),
+                ])
+                ->values()
+                ->all(),
+        ));
     }
 }
