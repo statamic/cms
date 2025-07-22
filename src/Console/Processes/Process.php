@@ -457,6 +457,11 @@ class Process
 
     protected function isWindows()
     {
-        return DIRECTORY_SEPARATOR === '\\';
+        return PHP_OS_FAMILY === 'Windows';
+    }
+
+    protected function isMac()
+    {
+        return PHP_OS_FAMILY === 'Darwin';
     }
 }

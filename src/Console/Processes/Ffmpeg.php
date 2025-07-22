@@ -54,6 +54,11 @@ class Ffmpeg extends Process
 
         $output = $this->run($this->isWindows() ? 'where ffmpeg' : 'which ffmpeg');
 
+        // Laravel Herd doesn't inherit the user's PATH, so we need to check the Homebrew path manually
+        if ($this->isMac() && ! $output) {
+            $output = $this->run('command -v /opt/homebrew/bin/ffmpeg');
+        }
+
         if (str($output)->lower()->contains('could not find files for the given')) {
             return null;
         }
