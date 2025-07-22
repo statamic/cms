@@ -16,6 +16,14 @@ class BreadcrumbsTest extends TestCase
 
     protected $shouldPreventNavBeingBuilt = false;
 
+    public function tearDown(): void
+    {
+        // Reset property cache between tests.
+        Breadcrumbs::$pushed = [];
+
+        parent::tearDown();
+    }
+
     #[Test]
     public function it_builds_breadcrumbs_correctly_for_top_level_page()
     {
