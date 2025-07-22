@@ -23,7 +23,7 @@ class CreateBlueprintTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->get(cp_route('taxonomies.blueprints.create', 'test'))
+            ->get(cp_route('blueprints.taxonomies.create', 'test'))
             ->assertOk()
             ->assertViewIs('statamic::taxonomies.blueprints.create');
     }
@@ -38,7 +38,7 @@ class CreateBlueprintTest extends TestCase
         $this
             ->from('/original')
             ->actingAs($user)
-            ->get(cp_route('taxonomies.blueprints.create', 'test'))
+            ->get(cp_route('blueprints.taxonomies.create', 'test'))
             ->assertRedirect('/original')
             ->assertSessionHas('error');
     }
