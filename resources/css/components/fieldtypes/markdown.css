@@ -47,6 +47,18 @@
     @apply bg-transparent;
 }
 
+
+/* Sticker Headers
+========================================================================== */
+
+.markdown-fieldtype [data-markdown-toolbar] {
+    @apply sticky -top-2 z-5;
+}
+
+.markdown-fieldtype.grid-cell [data-markdown-toolbar] {
+    @apply top-8;
+}
+
 /* Preview Mode Typography
   ========================================================================== */
 

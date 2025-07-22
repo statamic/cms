@@ -1,7 +1,5 @@
 <template>
-    <div
-        class="flex items-center justify-between rounded-t-xl border-b border-gray-300 bg-gray-50 px-2 py-1 dark:border-white/15 dark:bg-gray-950 overflow-x-scroll"
-    >
+    <div class="flex items-center justify-between rounded-t-xl bg-gray-50 px-2 py-1 overflow-x-scroll" data-markdown-toolbar>
         <div class="flex items-center" v-if="!isReadOnly">
             <Button
                 size="sm"
