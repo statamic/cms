@@ -169,4 +169,25 @@ class BreadcrumbsTest extends TestCase
         $this->assertEquals('http://localhost/cp/custom/two', $breadcrumbs[2]->url());
         $this->assertEquals('icon-two', $breadcrumbs[2]->icon());
     }
+
+    #[Test]
+    public function it_can_push_additional_breadcrumb_without_url()
+    {
+        $this->actingAs(User::make()->makeSuper())->get(cp_route('dashboard'));
+
+        Breadcrumbs::push(new Breadcrumb(
+            text: 'Custom',
+            icon: 'custom-icon',
+        ));
+
+        $breadcrumbs = Breadcrumbs::build();
+
+        $this->assertCount(2, $breadcrumbs);
+
+        $this->assertEquals('Dashboard', $breadcrumbs[0]->text());
+
+        $this->assertEquals('Custom', $breadcrumbs[1]->text());
+        $this->assertNull($breadcrumbs[1]->url());
+        $this->assertEquals('custom-icon', $breadcrumbs[1]->icon());
+    }
 }
