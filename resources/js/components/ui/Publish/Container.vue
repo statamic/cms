@@ -227,11 +227,6 @@ defineExpose({
     visibleValues,
     setValues,
     setExtraValues,
-
-    // Temporary while ShowField.js/Validator.js are still referencing the store.
-    hiddenFields,
-    setHiddenField,
-    revealerFields,
 });
 
 // Backwards compatibility.
