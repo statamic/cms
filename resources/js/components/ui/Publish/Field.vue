@@ -104,7 +104,7 @@ const shouldShowField = computed(() => {
     return new ShowField(
         visibleValues.value,
         extraValues.value,
-        visibleValues.value,
+        containerVisibleValues.value,
         hiddenFields.value,
         revealerFields.value,
         setHiddenField
