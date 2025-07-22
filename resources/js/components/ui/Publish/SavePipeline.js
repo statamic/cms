@@ -75,7 +75,7 @@ export class Request extends Step {
                 .then((response) => {
                     if (container && response.data.data?.hasOwnProperty('values')) {
                         container.value.setValues(
-                            resetValuesFromResponse(response.data.data.values, container),
+                            resetValuesFromResponse(response.data.data.values, container.value),
                         );
                         container.value.setExtraValues(response.data.data.extraValues);
                     }

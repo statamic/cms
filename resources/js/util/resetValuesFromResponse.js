@@ -5,7 +5,7 @@ export default function resetValuesFromResponse(responseValues, container) {
 
     if (!responseValues) return existingValues;
 
-    let preserveFields = ['id'].concat(container.value.revealerFields);
+    let preserveFields = ['id'].concat(container.revealerFields);
     let originalValues = new Values(existingValues);
     let newValues = new Values(responseValues);
 
