@@ -77,10 +77,15 @@
     .main-content a,
     /* e.g. >> /cp/collections/pages, tabbing through the home icon */
     .v-popper--has-tooltip {
-        &:focus {
+        &:focus-visible {
             --focus-outline-offset: 4px;
             @apply rounded-xs;
         }
+    }
+
+    /* Fix "flicker" the transition causes when tabbing to disclosure e.g. >> /cp/collections/pages */
+    button:focus-visible {
+        transition: unset;
     }
 
     .group\/button button:focus {
