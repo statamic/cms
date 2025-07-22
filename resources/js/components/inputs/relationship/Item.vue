@@ -45,7 +45,7 @@
                 <div class="flex items-center" v-if="!readOnly">
                     <Dropdown>
                         <template #trigger>
-                            <Button icon="ui/dots" variant="ghost" size="xs" v-bind="$attrs" />
+                            <Button icon="ui/dots" variant="ghost" size="xs" v-bind="$attrs" :aria-label="__('Open dropdown menu')" />
                         </template>
                         <DropdownMenu>
                             <DropdownItem

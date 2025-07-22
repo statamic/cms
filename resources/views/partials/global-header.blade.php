@@ -24,7 +24,7 @@
                 {{ $customLogoText ?? config('app.name') }}
             </a>
             @if (Statamic::pro())
-                <ui-badge size="sm" variant="flat" text="Pro" />
+                <ui-badge size="sm" variant="flat" text="Pro" class="select-none" />
             @endif
         </div>
         @endif

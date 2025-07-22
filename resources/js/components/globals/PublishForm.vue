@@ -3,7 +3,7 @@
         <Header :title="__(title)" icon="globals">
             <Dropdown v-if="canConfigure || canEditBlueprint">
                 <template #trigger>
-                    <Button icon="ui/dots" variant="ghost" />
+                    <Button icon="ui/dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
                 </template>
                 <DropdownMenu>
                     <DropdownItem :text="__('Configure')" icon="cog" v-if="canConfigure" :href="configureUrl" />
