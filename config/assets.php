@@ -132,6 +132,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Control Panel Video Thumbnails
+    |--------------------------------------------------------------------------
+    |
+    | When enabled, Statamic will generate thumbnails for videos.
+    | Generated thumbnails are displayed in the Control Panel.
+    |
+    */
+
+    'video_thumbnails' => true,
+
+    /*
+    |--------------------------------------------------------------------------
     | File Previews with Google Docs
     |--------------------------------------------------------------------------
     |
@@ -210,24 +222,11 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Generate Video Thumbnails
-    |--------------------------------------------------------------------------
-    |
-    | When enabled, Statamic will generate thumbnails for videos.
-    | Generated thumbnails are displayed in the Control Panel.
-    |
-    */
-
-    'video_thumbnails' => true,
-
-    /*
-    |--------------------------------------------------------------------------
     | FFmpeg
     |--------------------------------------------------------------------------
     |
-    | FFMpeg is used to extract thumbnails for video assets
-    | to be displayed within the Control Panel. You may
-    | adjust the binary location and cache path here.
+    | Statamic uses FFmpeg to extract thumbnails from videos to be shown in the
+    | Control Panel. You may adjust the binary location and cache path here.
     |
     */
 
