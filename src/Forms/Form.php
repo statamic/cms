@@ -91,6 +91,14 @@ class Form implements Arrayable, Augmentable, FormContract
         return $blueprint;
     }
 
+    public function blueprintCommandPaletteLink()
+    {
+        return $this->blueprint()?->commandPaletteLink(
+            type: 'Forms',
+            url: $this->editBlueprintUrl(),
+        );
+    }
+
     /**
      * Get or set the honeypot field.
      *
@@ -388,6 +396,11 @@ class Form implements Arrayable, Augmentable, FormContract
     public function deleteUrl()
     {
         return cp_route('forms.destroy', $this->handle());
+    }
+
+    public function editBlueprintUrl()
+    {
+        return cp_route('blueprints.forms.edit', $this->handle());
     }
 
     public function hasFiles()

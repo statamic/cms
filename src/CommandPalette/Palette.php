@@ -72,6 +72,10 @@ class Palette
             ->map(fn ($container) => $container->blueprintCommandPaletteLink())
             ->each(fn (Link $link) => $this->addCommand($link));
 
+        Facades\Form::all()
+            ->map(fn ($form) => $form->blueprintCommandPaletteLink())
+            ->each(fn (Link $link) => $this->addCommand($link));
+
         // TODO: Womp, got to end of this and realized they don't have `editUrl()` methods, so we'll refactor this to what's above ^
         // collect()
         //     ->merge(Facades\Collection::all()->flatMap(fn ($collection) => $collection->entryBlueprints()))
