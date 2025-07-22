@@ -79,10 +79,7 @@ class FolderAsset extends JsonResource
             default => ['thumbnail' => null],
         };
 
-        return array_merge(
-            $data,
-            $this->runAssetHook() ?? []
-        );
+        return array_merge($data, $this->runAssetHook() ?? []);
     }
 
     private function getImageThumbnail(): array

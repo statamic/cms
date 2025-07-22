@@ -8,11 +8,8 @@ use Statamic\Facades\Path;
 
 class ThumbnailExtractor
 {
-    private Ffmpeg $ffmpeg;
-
-    public function __construct(Ffmpeg $ffmpeg)
+    public function __construct(private Ffmpeg $ffmpeg)
     {
-        $this->ffmpeg = $ffmpeg;
     }
 
     public static function enabled()
