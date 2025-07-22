@@ -9,7 +9,7 @@
 @elseif ($licenses->requestFailed())
     <div class="fixed bottom-0 z-20 w-full p-2">
         <div
-            class="w-full rounded-md border border-yellow-dark bg-yellow px-4 py-3 text-sm dark:border-none dark:bg-dark-blue-100"
+            class="w-full rounded-lg bg-yellow-200 border border-yellow-400 px-4 py-2 text-sm dark:border-none dark:bg-blue-500"
         >
             @if ($licenses->usingLicenseKeyFile())
                 {{ __('statamic::messages.outpost_license_key_error') }}
@@ -26,14 +26,18 @@
     </div>
 @else
     @if ($licenses->invalid())
-        <div class="fixed bottom-0 z-2 w-full px-2" v-cloak v-show="showBanner">
+        <div class="fixed bottom-0 z-20 w-full p-2" v-cloak v-show="showBanner">
             <div
-                class="@if ($licenses->isOnTestDomain()) bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-200 @endif @if ($licenses->isOnPublicDomain()) bg-red-500 text-white @endif w-full rounded-t-xl px-4 py-3 text-sm"
+                @class([
+                    'w-full rounded-lg px-4 py-2 text-sm',
+                    'bg-blue-100 dark:bg-blue-800 text-blue-700 dark:text-blue-200' => $licenses->isOnTestDomain(),
+                    'bg-red-500 text-white' => $licenses->isOnPublicDomain(),
+                ])
             >
                 @if ($licenses->isOnTestDomain())
                     <div class="flex items-center justify-between">
                         <span>
-                            <b class="ltr:mr-2 rtl:ml-2">{{ __('Trial Mode') }}:</b>
+                            <b class="me-2">{{ __('Trial Mode') }}:</b>
                             @if ($licenses->onlyAddonsAreInvalid())
                                 {{ __('statamic::messages.licensing_trial_mode_alert_addons') }}
                             @elseif ($licenses->onlyStatamicIsInvalid())
@@ -42,19 +46,23 @@
                                 {{ __('statamic::messages.licensing_trial_mode_alert') }}
                             @endif
                         </span>
-                        <div class="flex">
-                            <button @click="hideBanner" class="text-2xs opacity-60 hover:opacity-75 ltr:mr-4 rtl:ml-4">
-                                {{ __('Dismiss') }}
-                            </button>
+                        <div class="flex gap-1">
+                            <ui-button @click="hideBanner"
+                                variant="ghost"
+                                :text="__('Dismiss')"
+                                size="sm"
+                                inset
+                                class="text-blue-700! dark:text-blue-200!"
+                            />
                             @can('access licensing utility')
-                                <a
+                                <ui-button
                                     href="{{ cp_route('utilities.licensing') }}"
-                                    class="flex items-center text-2xs underline-offset-1 hover:underline"
-                                    aria-label="{{ __('Manage Licenses') }}"
-                                >
-                                    {{ __('Manage Licenses') }}
-                                    @rarr
-                                </a>
+                                    variant="ghost"
+                                    :text="__('Manage Licenses')"
+                                    size="sm"
+                                    inset
+                                    class="text-blue-700! dark:text-blue-200!"
+                                />
                             @endcan
                         </div>
                     </div>
@@ -71,19 +79,23 @@
                         @else
                             {{ __('statamic::messages.licensing_production_alert') }}
                         @endif
-                        <div class="flex">
-                            <button @click="hideBanner" class="text-2xs opacity-50 hover:opacity-75 ltr:mr-4 rtl:ml-4">
-                                {{ __('Dismiss') }}
-                            </button>
+                        <div class="flex gap-1">
+                            <ui-button @click="hideBanner"
+                                variant="ghost"
+                                :text="__('Dismiss')"
+                                size="sm"
+                                inset
+                                class="text-blue-700! dark:text-blue-200!"
+                            />
                             @can('access licensing utility')
-                                <a
+                               <ui-button
                                     href="{{ cp_route('utilities.licensing') }}"
-                                    class="flex items-center text-2xs text-white hover:text-yellow"
-                                    aria-label="{{ __('Manage Licenses') }}"
-                                >
-                                    {{ __('Manage Licenses') }}
-                                    @rarr
-                                </a>
+                                    variant="ghost"
+                                    :text="__('Manage Licenses')"
+                                    size="sm"
+                                    inset
+                                    class="text-blue-700! dark:text-blue-200!"
+                                />
                             @endcan
                         </div>
                     </div>
