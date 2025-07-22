@@ -24,10 +24,10 @@ const tag = computed(() => (props.href ? 'a' : props.as));
 
 const badgeClasses = computed(() => {
     const classes = cva({
-        base: 'inline-flex items-center gap-1 font-normal antialiased whitespace-nowrap no-underline not-prose [button]:cursor-pointer group [&_svg]:opacity-60 [&_svg]:group-hover:opacity-100',
+        base: 'inline-flex items-center justify-center gap-1 font-normal antialiased whitespace-nowrap no-underline not-prose [button]:cursor-pointer group [&_svg]:opacity-60 [&_svg]:group-hover:opacity-100',
         variants: {
             size: {
-                sm: 'text-2xs leading-normal px-1 rounded-[0.1875rem] [&_svg]:size-2.5',
+                sm: 'text-2xs leading-normal px-1.25 rounded-[0.1875rem] [&_svg]:size-2.5',
                 default: 'text-xs leading-5.5 px-2.25 rounded-sm [&_svg]:size-3.5 gap-2',
                 lg: 'font-medium text-sm leading-7 px-2.5 rounded-lg [&_svg]:size-4 gap-2',
             },
@@ -37,7 +37,7 @@ const badgeClasses = computed(() => {
                 blue: 'bg-blue-100/80 border-blue-300 text-blue-700 [a]:hover:bg-blue-200/60 [button]:hover:bg-blue-200/60',
                 cyan: 'bg-cyan-100/80 border-cyan-400 text-cyan-700 [a]:hover:bg-cyan-200/60 [button]:hover:bg-cyan-200/60',
                 default:
-                    'bg-gray-100/80 border-gray-300 dark:bg-gray-700 dark:text-gray-100 text-gray-700 [a]:hover:bg-gray-200/50 [button]:hover:bg-gray-200/50',
+                    'bg-gray-100/80 border-gray-300 dark:bg-gray-800 dark:text-gray-100 text-gray-700 [a]:hover:bg-gray-200/50 [button]:hover:bg-gray-200/50',
                 emerald:
                     'bg-emerald-100/80 border-emerald-400 text-emerald-700 [a]:hover:bg-emerald-200/60 [button]:hover:bg-emerald-200/60',
                 fuchsia:

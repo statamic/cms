@@ -148,3 +148,9 @@ const calendarEvents = computed(() => ({
         </DateRangePickerRoot>
     </div>
 </template>
+
+<style>
+[data-reka-popper-content-wrapper] {
+    @apply z-100!;
+}
+</style>

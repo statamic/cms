@@ -140,15 +140,21 @@
 @utility mask-bg {
     z-index: var(--z-index-above);
     &::before {
+        --cover: 3rem;
+        --height-offset: 0.3rem;
         content: '';
+        opacity: 75%;
         position: absolute;
         z-index: var(--z-index-below);
-        inset: -0.2rem -1.5rem;
-        background: radial-gradient(circle at center, white 50%,transparent 100%);
-        border-radius: 1.5rem;
+        width: calc(150% + var(--cover));
+        height: calc(100% + var(--height-offset) * 2);
+        left: calc(0.5rem - var(--cover));
+        top: calc(0% - var(--height-offset));
+        background: radial-gradient(circle at center, hsl(0deg 0% 100%) 0%,transparent 80%);
+        border-radius: 1.5rem 0 0 1.5rem;
     }
     .dark &::before {
-        background: radial-gradient(circle at center, var(--color-gray-900) 50%,transparent 100%);
+        background: radial-gradient(circle at center, hsl(240deg 6% 10%) 0%, transparent 80%);
     }
 }
 

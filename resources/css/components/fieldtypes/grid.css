@@ -10,8 +10,7 @@
 }
 
 .grid-table thead th {
-    @apply sticky table-cell z-10 border-b bg-gray-50 p-2 text-sm font-medium text-gray-900 dark:border-dark-900 dark:bg-gray-800 dark:text-gray-100;
-    top: -1px;
+    @apply sticky -top-2 table-cell z-10 border-b bg-gray-50 p-2 text-sm font-medium text-gray-900 dark:border-dark-900 dark:bg-gray-800 dark:text-gray-100;
 
     &:first-child {
         @apply rounded-ss-lg ps-3;

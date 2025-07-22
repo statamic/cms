@@ -4,6 +4,7 @@ import {
     Widget,
     StatusIndicator,
     Listing,
+    ListingTableHead as TableHead,
     ListingTableBody as TableBody,
     ListingPagination as Pagination,
     Icon,
@@ -60,6 +61,7 @@ function columnShowing(column) {
                 </ui-description>
                 <div class="px-4 py-3">
                     <table class="w-full [&_td]:p-0.5 [&_td]:text-sm " :class="{ 'opacity-50': loading }">
+                        <TableHead sr-only />
                         <TableBody>
                             <template #cell-title="{ row: entry }">
                                 <div class="flex items-center gap-2">

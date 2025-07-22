@@ -80,12 +80,9 @@ export default {
             deletingRow: null,
             provide: {
                 grid: this.makeGridProvide(),
-                storeName: this.storeName,
             },
         };
     },
-
-    inject: ['storeName'],
 
     provide: {
         isInGridField: true,

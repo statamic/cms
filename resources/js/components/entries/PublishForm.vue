@@ -18,7 +18,7 @@
             >
                 <Dropdown v-if="canEditBlueprint || hasItemActions">
                     <template #trigger>
-                        <Button icon="ui/dots" variant="ghost" />
+                        <Button icon="ui/dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
                     </template>
                     <DropdownMenu>
                         <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :href="actions.editBlueprint" />
@@ -293,6 +293,7 @@ import PublishTabs from '@statamic/components/ui/Publish/Tabs.vue';
 import PublishComponents from '@statamic/components/ui/Publish/Components.vue';
 import LocalizationsCard from '@statamic/components/ui/Publish/Localizations.vue';
 import LivePreview from '@statamic/components/ui/LivePreview/LivePreview.vue';
+import resetValuesFromResponse from '@statamic/util/resetValuesFromResponse.js';
 import { SavePipeline } from '@statamic/exports.js';
 import { computed, ref } from 'vue';
 const { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } = SavePipeline;
@@ -406,6 +407,7 @@ export default {
             quickSaveKeyBinding: null,
             quickSave: false,
             isAutosave: false,
+            autosaveIntervalInstance: null,
             syncFieldConfirmationText: __('messages.sync_entry_field_confirmation_text'),
             pendingLocalization: null,
             syncingField: null,
@@ -419,10 +421,6 @@ export default {
 
         errors() {
             return errors.value;
-        },
-
-        store() {
-            return this.$refs.container.store;
         },
 
         formattedTitle() {
@@ -556,8 +554,6 @@ export default {
                     new BeforeSaveHooks('entry', {
                         collection: this.collectionHandle,
                         values: this.values,
-                        container: this.$refs.container,
-                        storeName: this.publishContainer,
                     }),
                     new Request(this.actions.save, this.method, {
                         _blueprint: this.fieldset.handle,
@@ -574,7 +570,7 @@ export default {
                     if (this.revisionsEnabled) {
                         clearTimeout(this.trackDirtyStateTimeout);
                         this.trackDirtyState = false;
-                        this.values = this.resetValuesFromResponse(response.data.data.values);
+                        this.values = resetValuesFromResponse(response.data.data.values, this.$refs.container);
                         this.extraValues = response.data.data.extraValues;
                         this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
                         this.$nextTick(() => this.$emit('saved', response));
@@ -707,7 +703,7 @@ export default {
             const url = originLocalization.url + '/localize';
             this.$axios.post(url, { site: localization.handle }).then((response) => {
                 this.editLocalization(response.data).then(() => {
-                    this.$events.$emit('localization.created', { store: this.publishContainer });
+                    this.$events.$emit('localization.created', { container: this.$refs.container });
 
                     if (this.originValues.published) {
                         this.setFieldValue('published', true);
@@ -773,7 +769,7 @@ export default {
                 this.title = response.data.data.title;
                 clearTimeout(this.trackDirtyStateTimeout);
                 this.trackDirtyState = false;
-                this.values = this.resetValuesFromResponse(response.data.data.values);
+                this.values = resetValuesFromResponse(response.data.data.values, this.$refs.container);
                 this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
                 this.activeLocalization.title = response.data.data.title;
                 this.activeLocalization.published = response.data.data.published;
@@ -816,14 +812,12 @@ export default {
         },
 
         setAutosaveInterval() {
-            const interval = setInterval(() => {
+            this.autosaveIntervalInstance = setInterval(() => {
                 if (!this.isDirty) return;
 
                 this.isAutosave = true;
                 this.save();
             }, this.autosaveInterval);
-
-            this.$refs.container.setAutosaveInterval(interval);
         },
 
         afterActionSuccessfullyCompleted(response) {
@@ -832,7 +826,7 @@ export default {
                 if (!this.revisionsEnabled) this.permalink = response.data.permalink;
                 clearTimeout(this.trackDirtyStateTimeout);
                 this.trackDirtyState = false;
-                this.values = this.resetValuesFromResponse(response.data.values);
+                this.values = resetValuesFromResponse(response.data.values, this.$refs.container);
                 this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
                 this.initialPublished = response.data.published;
                 this.activeLocalization.published = response.data.published;
@@ -877,7 +871,7 @@ export default {
     },
 
     beforeUnmount() {
-        this.$refs.container.store.clearAutosaveInterval();
+        if (this.autosaveIntervalInstance) clearInterval(this.autosaveIntervalInstance);
     },
 
     unmounted() {

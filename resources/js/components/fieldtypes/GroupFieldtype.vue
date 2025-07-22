@@ -39,13 +39,12 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import { ValidatesFieldConditions } from '../field-conditions/FieldConditions.js';
 import ManagesPreviewText from './replicator/ManagesPreviewText';
 import Fields from '@statamic/components/ui/Publish/Fields.vue';
 import FieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
 
 export default {
-    mixins: [Fieldtype, ValidatesFieldConditions, ManagesPreviewText],
+    mixins: [Fieldtype, ManagesPreviewText],
     components: { Fields, FieldsProvider },
     data() {
         return {
@@ -57,7 +56,6 @@ export default {
             },
         };
     },
-    inject: ['store'],
     computed: {
         values() {
             return this.value;
@@ -69,7 +67,7 @@ export default {
             return this.config.fields;
         },
         previews() {
-            return data_get(this.store.previews, this.fieldPathPrefix || this.handle) || {};
+            return data_get(this.publishContainer.previews, this.fieldPathPrefix || this.handle) || {};
         },
         replicatorPreview() {
             if (!this.showFieldPreviews || !this.config.replicator_preview) return;
@@ -140,12 +138,6 @@ export default {
 
         fieldPath(handle) {
             return (this.fieldPathPrefix || this.handle) + '.' + handle;
-        },
-
-        errors(handle) {
-            const state = this.store;
-            if (!state) return [];
-            return state.errors[this.fieldPath(handle)] || [];
         },
 
         toggleFullscreen() {

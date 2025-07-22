@@ -1,14 +1,25 @@
 import { test, expect, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { nextTick } from 'vue';
-import { createPinia } from 'pinia';
-import ValidatesFieldConditions from '../components/field-conditions/ValidatorMixin.js';
 import { data_get } from '../bootstrap/globals';
 import FieldConditions from '@statamic/components/FieldConditions';
 import PublishContainer from '@statamic/components/ui/Publish/Container.vue';
+import ShowField from '@statamic/components/field-conditions/ShowField.js';
 
+// Even though there's no Store anymore, this variable is named Store so that all the
+// assertions don't need to be changed. This is now a reference to the PublishContainer component.
 let Store;
-let Fields;
+
+let fieldLevelValues;
+let fieldLevelExtraValues;
+
+// This object exists purely so that tests could be refactored without needing to touch assertions.
+// All the Fields.showField(...) could be changed to just showField(...)
+let Fields = {
+    showField: (condition, dottedFieldPath) => {
+        return showField(condition, dottedFieldPath);
+    }
+}
 
 const Statamic = {
     $conditions: new FieldConditions(),
@@ -20,7 +31,7 @@ window.Statamic = Statamic;
 window.__ = (msg) => msg;
 
 const setValues = function (values, nestedKey) {
-    Fields.values = values;
+    fieldLevelValues = values;
 
     let storeValues = {};
     if (nestedKey) {
@@ -33,7 +44,7 @@ const setValues = function (values, nestedKey) {
 };
 
 const setExtraValues = function (values) {
-    Fields.extraValues = values;
+    fieldLevelExtraValues = values;
 };
 
 const setStoreValues = function (values) {
@@ -64,41 +75,31 @@ let showFieldIf = function (conditions = null, dottedFieldPath = null) {
     return Fields.showField(conditions ? { if: conditions } : {}, dottedFieldPath);
 };
 
+let showField = function(config, dottedFieldPath = null) {
+    return new ShowField(
+        fieldLevelValues ?? Store.values,
+        fieldLevelExtraValues ?? Store.extraValues,
+        Store.values,
+        Store.hiddenFields,
+        Store.revealerFields,
+        Store.setHiddenField
+    ).showField(config, dottedFieldPath);
+}
+
 beforeEach(() => {
-    // The mixin is intended to be used on a component that is a descendant of a PublishContainer.
-    // The component itself should track its own values which will be used for validating conditions.
-    // It does *not* use the store's values directly, but it does have access to the store's values.
-    // This is so that the component can either be the root of a form (like the entry publish
-    // form itself) or a nested component (like a replicator set). A replicator set should
-    // be able to validate its own conditions based on its own values, but also have access to
-    // the entire store's values for conditions that need to be evaluated against $root or $parent.
+    // Put a dummy component in the slot of the container so it doesn't render all the default stuff.
     const TestComponent = {
-        mixins: [ValidatesFieldConditions],
         template: '<div></div>',
-        data() {
-            return {
-                values: {},
-            };
-        },
     };
 
     // The PublishContainer is what will be set up for the test, and the test component will be used for the slot content.
     const publishContainer = mount(PublishContainer, {
-        global: {
-            plugins: [createPinia()],
-        },
         slots: {
             default: TestComponent,
         },
-        props: {
-            name: 'test',
-        },
     });
 
-    // Get an instance of the test component's instance so we can call the mixin methods on it.
-    Fields = publishContainer.findComponent(TestComponent).vm;
-
-    Store = publishContainer.vm.store;
+    Store = publishContainer.vm;
 });
 
 test('it shows field by default', () => {
@@ -462,10 +463,9 @@ test('it can call a custom function', () => {
         favorite_animals: ['cats', 'dogs'],
     });
 
-    Statamic.$conditions.add('reallyLovesAnimals', function ({ target, params, store, values }) {
+    Statamic.$conditions.add('reallyLovesAnimals', function ({ target, params, values }) {
         expect(target).toBe(null);
         expect(params).toEqual([]);
-        expect(store).toBe(Store);
         return values.favorite_animals.length > 3;
     });
 
@@ -480,10 +480,9 @@ test('it can call a custom function that uses `fieldPath` param to evaluate nest
         nested: [{ favorite_animals: ['cats', 'dogs'] }, { favorite_animals: ['cats', 'dogs', 'giraffes', 'lions'] }],
     });
 
-    Statamic.$conditions.add('reallyLovesAnimals', function ({ target, params, store, root, fieldPath }) {
+    Statamic.$conditions.add('reallyLovesAnimals', function ({ target, params, root, fieldPath }) {
         expect(target).toBe(null);
         expect(params).toEqual([]);
-        expect(store).toBe(Store);
 
         return data_get(root, fieldPath).length > 3;
     });
@@ -497,9 +496,8 @@ test('it can call a custom function using params against root values', () => {
         favorite_foods: ['pizza', 'lasagna', 'asparagus', 'quinoa', 'peppers'],
     });
 
-    Statamic.$conditions.add('reallyLoves', function ({ target, params, store, root }) {
+    Statamic.$conditions.add('reallyLoves', function ({ target, params, root }) {
         expect(target).toBe(null);
-        expect(store).toBe(Store);
         return params.filter((food) => !root.favorite_foods.includes(food)).length === 0;
     });
 
@@ -512,11 +510,10 @@ test('it can call a custom function on a specific field', () => {
         favorite_animals: ['cats', 'dogs', 'rats', 'bats'],
     });
 
-    Statamic.$conditions.add('lovesAnimals', function ({ target, params, store, values, fieldPath }) {
+    Statamic.$conditions.add('lovesAnimals', function ({ target, params, values, fieldPath }) {
         expect(target).toEqual(['cats', 'dogs', 'rats', 'bats']);
         expect(values.favorite_animals).toEqual(['cats', 'dogs', 'rats', 'bats']);
         expect(params).toEqual([]);
-        expect(store).toBe(Store);
         expect(fieldPath).toBe('favorite_animals');
         return values.favorite_animals.length > 3;
     });
@@ -529,10 +526,9 @@ test('it can call a custom function on a specific field using params against a r
         favorite_animals: ['cats', 'dogs', 'rats', 'bats'],
     });
 
-    Statamic.$conditions.add('lovesAnimals', function ({ target, params, store, root, fieldPath }) {
+    Statamic.$conditions.add('lovesAnimals', function ({ target, params, root, fieldPath }) {
         expect(target).toEqual(['cats', 'dogs', 'rats', 'bats']);
         expect(root.favorite_animals).toEqual(['cats', 'dogs', 'rats', 'bats']);
-        expect(store).toBe(Store);
         expect(fieldPath).toBe('favorite_animals');
         return target.length > (params[0] || 3);
     });
@@ -547,10 +543,9 @@ test('it can call a custom function on a specific field using params against a r
         favorite_animals: ['cats', 'dogs', 'rats', 'bats'],
     });
 
-    Statamic.$conditions.add('lovesAnimals', function ({ target, params, store, root, fieldPath }) {
+    Statamic.$conditions.add('lovesAnimals', function ({ target, params, root, fieldPath }) {
         expect(target).toEqual(['cats', 'dogs', 'rats', 'bats']);
         expect(root.favorite_animals).toEqual(['cats', 'dogs', 'rats', 'bats']);
-        expect(store).toBe(Store);
         expect(fieldPath).toBe('favorite_animals');
         return target.length > (params[0] || 3);
     });

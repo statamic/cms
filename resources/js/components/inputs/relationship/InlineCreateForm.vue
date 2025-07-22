@@ -18,8 +18,6 @@ export default {
         };
     },
 
-    inject: ['storeName'],
-
     methods: {
         saved(response) {
             this.$emit('created', response.data.data);

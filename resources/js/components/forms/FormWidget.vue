@@ -1,7 +1,14 @@
 <script setup>
 import DateFormatter from '@statamic/components/DateFormatter.js';
 import { computed } from 'vue';
-import { Widget, Icon, Listing, ListingTableBody as TableBody, ListingPagination as Pagination } from '@statamic/ui';
+import {
+    Widget,
+    Icon,
+    Listing,
+    ListingTableHead as TableHead,
+    ListingTableBody as TableBody,
+    ListingPagination as Pagination,
+} from '@statamic/ui';
 
 const props = defineProps({
     form: { type: String, required: true },
@@ -46,6 +53,7 @@ function formatDate(value) {
                 </ui-description>
                 <div class="px-4 py-3">
                     <table class="w-full [&_td]:p-0.5 [&_td]:text-sm">
+                        <TableHead sr-only />
                         <TableBody>
                             <template v-for="field in fields" #[`cell-${field}`]="{ row: submission }">
                                 <a

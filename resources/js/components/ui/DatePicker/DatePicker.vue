@@ -59,6 +59,32 @@ const calendarBindings = computed(() => ({
 const calendarEvents = computed(() => ({
     'update:model-value': (event) => emit('update:modelValue', event),
 }));
+
+const isInvalid = computed(() => {
+    // Check if the component has invalid state from form validation
+    return props.modelValue === null && props.required;
+});
+
+const getInputLabel = (part) => {
+    switch (part) {
+        case 'day':
+            return __('Day');
+        case 'month':
+            return __('Month');
+        case 'year':
+            return __('Year');
+        case 'hour':
+            return __('Hour');
+        case 'minute':
+            return __('Minute');
+        case 'second':
+            return __('Second');
+        case 'dayPeriod':
+            return __('AM/PM');
+        default:
+            return '';
+    }
+};
 </script>
 
 <template>
@@ -72,6 +98,9 @@ const calendarEvents = computed(() => ({
             v-bind="$attrs"
             prevent-deselect
             hide-time-zone
+            role="group"
+            :aria-label="__('Date picker')"
+            :aria-required="required"
         >
             <DatePickerField v-slot="{ segments }" class="w-full">
                 <div
@@ -82,10 +111,14 @@ const calendarEvents = computed(() => ({
                         'shadow-ui-sm not-prose h-10 rounded-lg px-10 py-2 disabled:shadow-none',
                         'data-invalid:border-red-500',
                     ]"
+                    :aria-invalid="isInvalid"
+                    role="textbox"
+                    :aria-label="__('Select date')"
                 >
                     <DatePickerTrigger
                         v-if="!inline"
                         class="absolute start-1 top-1 bottom-1 flex items-center justify-center rounded-lg px-2 text-gray-400 outline-hidden hover:bg-gray-100 focus:bg-gray-100 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
+                        :aria-label="__('Open calendar')"
                     >
                         <Icon name="calendar" class="size-4" />
                     </DatePickerTrigger>
@@ -104,6 +137,7 @@ const calendarEvents = computed(() => ({
                             :class="{
                                 'px-0.5!': item.part === 'month' || item.part === 'year' || item.part === 'day',
                             }"
+                            :aria-label="getInputLabel(item.part)"
                         >
                             {{ item.value }}
                         </DatePickerInput>
@@ -115,6 +149,7 @@ const calendarEvents = computed(() => ({
                     :disabled="disabled"
                     type="button"
                     class="absolute end-1 top-1 bottom-1 flex items-center justify-center rounded-lg px-2 text-gray-300 outline-hidden hover:bg-gray-100 focus:bg-gray-100 active:text-gray-400 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
+                    :aria-label="__('Clear date')"
                 >
                     <Icon name="x" class="size-3" />
                 </button>

@@ -37,9 +37,11 @@ defineEmits(['selected']);
                     {{ __(option.name) }}
                     <loading-graphic :size="14" text="" class="ms-2" v-if="localizing === option.handle" />
                 </div>
-                <Badge size="sm" color="orange" v-if="option.origin" :text="__('Origin')" />
-                <Badge size="sm" color="blue" v-if="option.active" :text="__('Active')" />
-                <Badge size="sm" color="purple" v-if="option.root && !option.origin && !option.active" :text="__('Root')" />
+                <div class="flex items-center gap-1.5">
+                    <Badge size="sm" color="orange" v-if="option.origin" :text="__('Origin')" />
+                    <Badge size="sm" color="blue" v-if="option.active" :text="__('Active')" />
+                    <Badge size="sm" color="purple" v-if="option.root && !option.origin && !option.active" :text="__('Root')" />
+                </div>
             </button>
         </Card>
     </Panel>

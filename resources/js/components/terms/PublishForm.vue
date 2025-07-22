@@ -30,7 +30,7 @@
                             :text="__('Edit Blueprint')"
                             icon="blueprint-edit"
                             v-if="canEditBlueprint"
-                            :redirect="actions.editBlueprint"
+                            :href="actions.editBlueprint"
                         />
                         <DropdownSeparator v-if="canEditBlueprint && itemActions.length" />
                         <DropdownItem
@@ -151,6 +151,7 @@ import PublishTabs from '@statamic/components/ui/Publish/Tabs.vue';
 import PublishComponents from '@statamic/components/ui/Publish/Components.vue';
 import LivePreview from '@statamic/components/ui/LivePreview/LivePreview.vue';
 import { SavePipeline } from '@statamic/exports.js';
+import resetValuesFromResponse from '@statamic/util/resetValuesFromResponse.js';
 import { ref, computed } from 'vue';
 const { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } = SavePipeline;
 import LocalizationsCard from '@statamic/components/ui/Publish/Localizations.vue';
@@ -247,10 +248,6 @@ export default {
             return errors.value;
         },
 
-        store() {
-            return this.$refs.container.store;
-        },
-
         formattedTitle() {
             return striptags(__(this.title));
         },
@@ -340,8 +337,6 @@ export default {
                     new BeforeSaveHooks('entry', {
                         taxonomy: this.taxonomyHandle,
                         values: this.values,
-                        container: this.$refs.container,
-                        storeName: this.publishContainer,
                     }),
                     new Request(this.actions.save, this.method, {
                         _blueprint: this.fieldset.handle,
@@ -456,7 +451,7 @@ export default {
             if (response.data) {
                 this.title = response.data.title;
                 this.permalink = response.data.permalink;
-                this.values = this.resetValuesFromResponse(response.data.values);
+                this.values = resetValuesFromResponse(response.data.values, this.$refs.container);
             }
         },
     },
