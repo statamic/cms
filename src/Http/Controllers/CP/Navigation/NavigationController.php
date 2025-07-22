@@ -202,7 +202,7 @@ class NavigationController extends CpController
                         'instructions' => __('statamic::messages.navigation_configure_blueprint_instructions'),
                         'html' => ''.
                             '<div class="text-xs">'.
-                            '   <a href="'.cp_route('navigation.blueprint.edit', $nav->handle()).'" class="text-blue">'.__('Edit').'</a>'.
+                            '   <a href="'.cp_route('blueprints.navigation.edit', $nav->handle()).'" class="text-blue">'.__('Edit').'</a>'.
                             '</div>',
                     ],
                     'collections' => [

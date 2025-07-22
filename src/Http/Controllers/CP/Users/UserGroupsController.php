@@ -94,7 +94,7 @@ class UserGroupsController extends CpController
             'reference' => $group->handle(),
             'actions' => [
                 'save' => $group->updateUrl(),
-                'editBlueprint' => cp_route('user-groups.blueprint.edit'),
+                'editBlueprint' => cp_route('blueprints.user-groups.edit'),
             ],
         ];
 

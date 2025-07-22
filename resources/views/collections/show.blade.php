@@ -19,7 +19,7 @@
         entries-action-url="{{ cp_route("collections.entries.actions.run", $collection->handle()) }}"
         reorder-url="{{ cp_route("collections.entries.reorder", $collection->handle()) }}"
         edit-url="{{ $collection->editUrl() }}"
-        blueprints-url="{{ cp_route("collections.blueprints.index", $collection) }}"
+        blueprints-url="{{ cp_route("blueprints.collections.index", $collection) }}"
         scaffold-url="{{ cp_route("collections.scaffold", $collection->handle()) }}"
         :can-edit="{{ Statamic\Support\Str::bool($user->can("edit", $collection)) }}"
         :can-edit-blueprints="{{ Statamic\Support\Str::bool($user->can("configure fields")) }}"

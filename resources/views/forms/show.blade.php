@@ -18,7 +18,7 @@
                         <ui-dropdown-item
                             :text="__('Edit Blueprint')"
                             icon="blueprint-edit"
-                            href="{{ cp_route('forms.blueprint.edit', $form->handle()) }}"
+                            href="{{ cp_route('blueprints.forms.edit', $form->handle()) }}"
                         ></ui-dropdown-item>
                     @endcan
 

@@ -33,7 +33,7 @@ class AssetContainersController extends CpController
                 'create_folders' => $container->createFolders(),
                 'edit_url' => $container->editUrl(),
                 'delete_url' => $container->deleteUrl(),
-                'blueprint_url' => cp_route('asset-containers.blueprint.edit', $container->handle()),
+                'blueprint_url' => cp_route('blueprints.asset-containers.edit', $container->handle()),
                 'can_edit' => User::current()->can('edit', $container),
                 'can_delete' => User::current()->can('delete', $container),
             ];
@@ -205,7 +205,7 @@ class AssetContainersController extends CpController
                         'instructions' => __('statamic::messages.asset_container_blueprint_instructions'),
                         'html' => $container ? ''.
                             '<div class="text-xs">'.
-                            '   <a href="'.cp_route('asset-containers.blueprint.edit', $container->handle()).'" class="text-blue">'.__('Edit').'</a>'.
+                            '   <a href="'.cp_route('blueprints.asset-containers.edit', $container->handle()).'" class="text-blue">'.__('Edit').'</a>'.
                             '</div>' : '<div class="text-xs text-gray">'.__('Editable once created').'</div>',
                     ],
                 ],
