@@ -73,8 +73,10 @@
             }
         }
     }
-    /* e.g. >> /cp/collections, when you tab to the title */
-    .main-content table a {
+    /* e.g. >> /cp/collections, when you tab to the title, and /cp/collections/pages when tabbing through the tree text */
+    .main-content a,
+    /* e.g. >> /cp/collections/pages, tabbing through the home icon */
+    .v-popper--has-tooltip {
         --focus-outline-offset: 4px;
         @apply rounded-xs;
     }
