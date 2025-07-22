@@ -70,13 +70,6 @@ function getRowTitle(row) {
     >
         <tbody>
             <slot name="tbody-start" />
-            <thead class="sr-only">
-                <tr>
-                    <th v-for="column in visibleColumns" :key="column.field" scope="col">
-                        {{ __(column.label || column.field) }}
-                    </th>
-                </tr>
-            </thead>
             <tr
                 v-for="(row, index) in items"
                 :key="row.id"
