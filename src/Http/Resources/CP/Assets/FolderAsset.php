@@ -29,49 +29,6 @@ class FolderAsset extends JsonResource
         return $this;
     }
 
-    private function getImageThumbnail()
-    {
-        return [
-            'is_image' => true,
-            'thumbnail' => $this->thumbnailUrl('small'),
-            'can_be_transparent' => $this->isSvg() || $this->extensionIsOneOf(['svg', 'png', 'webp', 'avif']),
-            'alt' => $this->alt,
-            'orientation' => $this->orientation(),
-        ];
-    }
-
-    private function getVideoThumbnail()
-    {
-        return [
-            'thumbnail' => $this->thumbnailUrl('small'),
-        ];
-    }
-
-    private function thumbnails()
-    {
-        $data = ['thumbnail' => null];
-
-        if ($this->isImage() || $this->isSvg()) {
-            $data = $this->getImageThumbnail();
-        } elseif (config('statamic.assets.video_thumbnails', true) && $this->isVideo()) {
-            $data = $this->getVideoThumbnail();
-        }
-
-        return array_merge(
-            $data,
-            $this->runAssetHook() ?? []
-        );
-    }
-
-    private function runAssetHook()
-    {
-        $payload = $this->runHooksWith('asset', [
-            'data' => new Fluent,
-        ]);
-
-        return $payload->data->toArray();
-    }
-
     public function toArray($request)
     {
         return [
@@ -112,5 +69,48 @@ class FolderAsset extends JsonResource
 
             return [$key => $value];
         });
+    }
+
+    private function thumbnails(): array
+    {
+        $data = ['thumbnail' => null];
+
+        if ($this->isImage() || $this->isSvg()) {
+            $data = $this->getImageThumbnail();
+        } elseif ($this->isVideo() && config('statamic.assets.video_thumbnails', true)) {
+            $data = $this->getVideoThumbnail();
+        }
+
+        return array_merge(
+            $data,
+            $this->runAssetHook() ?? []
+        );
+    }
+
+    private function getImageThumbnail(): array
+    {
+        return [
+            'is_image' => true,
+            'thumbnail' => $this->thumbnailUrl('small'),
+            'can_be_transparent' => $this->isSvg() || $this->extensionIsOneOf(['svg', 'png', 'webp', 'avif']),
+            'alt' => $this->alt,
+            'orientation' => $this->orientation(),
+        ];
+    }
+
+    private function getVideoThumbnail(): array
+    {
+        return [
+            'thumbnail' => $this->thumbnailUrl('small'),
+        ];
+    }
+
+    private function runAssetHook(): array
+    {
+        $payload = $this->runHooksWith('asset', [
+            'data' => new Fluent,
+        ]);
+
+        return $payload->data->toArray();
     }
 }
