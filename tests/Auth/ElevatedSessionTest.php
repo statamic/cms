@@ -25,6 +25,8 @@ class ElevatedSessionTest extends TestCase
     {
         parent::setUp();
 
+        $this->freezeTime();
+
         $this->user = User::make()->email('foo@bar.com')->makeSuper()->password('secret');
         $this->user->save();
     }
@@ -49,8 +51,6 @@ class ElevatedSessionTest extends TestCase
     public function it_can_get_status_of_elevated_session()
     {
         config(['statamic.users.elevated_session_duration' => 15]);
-
-        $this->freezeTime();
 
         $this
             ->withElevatedSession(now()->subMinutes(5))
@@ -98,8 +98,6 @@ class ElevatedSessionTest extends TestCase
     #[Test]
     public function it_can_get_status_of_elevated_session_when_session_has_expired_and_user_doesnt_have_a_password()
     {
-        $this->freezeTime();
-
         Notification::fake();
         Str::createRandomStringsUsing(fn () => 'abc');
         $user = tap(User::make()->email('foo@bar.com')->makeSuper())->save();
@@ -128,7 +126,6 @@ class ElevatedSessionTest extends TestCase
     #[Test]
     public function when_getting_status_for_user_without_password_it_only_sends_notification_once()
     {
-        $this->freezeTime();
         Notification::fake();
         Str::createRandomStringsUsing(fn () => 'abc');
         $user = tap(User::make()->email('foo@bar.com')->makeSuper())->save();
@@ -154,8 +151,6 @@ class ElevatedSessionTest extends TestCase
     #[Test]
     public function it_can_start_elevated_session()
     {
-        $this->freezeTime();
-
         redirect()->setIntendedUrl('/cp/target-url');
 
         $this
@@ -168,8 +163,6 @@ class ElevatedSessionTest extends TestCase
     #[Test]
     public function it_can_start_elevated_session_via_json()
     {
-        $this->freezeTime();
-
         $this
             ->actingAs($this->user)
             ->postJson('/cp/elevated-session', ['password' => 'secret'])
@@ -247,7 +240,6 @@ class ElevatedSessionTest extends TestCase
     #[Test]
     public function the_verification_code_will_be_sent_for_passwordless_user_when_loading_the_form()
     {
-        $this->freezeTime();
         Notification::fake();
         Str::createRandomStringsUsing(fn () => 'abc');
 
@@ -267,7 +259,6 @@ class ElevatedSessionTest extends TestCase
     #[Test]
     public function the_verification_code_will_be_sent_for_passwordless_user_when_loading_the_form_once()
     {
-        $this->freezeTime();
         Notification::fake();
         Str::createRandomStringsUsing(fn () => 'abc');
         $user = tap(User::make()->email('foo@bar.com')->makeSuper())->save();
@@ -291,7 +282,6 @@ class ElevatedSessionTest extends TestCase
     #[Test]
     public function the_verification_code_can_be_resent()
     {
-        $this->freezeTime();
         Notification::fake();
         Str::createRandomStringsUsing(fn () => 'abc');
 
@@ -314,7 +304,6 @@ class ElevatedSessionTest extends TestCase
     #[Test]
     public function resending_code_is_rate_limited()
     {
-        $this->freezeTime();
         Notification::fake();
         $user = User::make()->email('foo@bar.com')->makeSuper();
 
@@ -338,7 +327,6 @@ class ElevatedSessionTest extends TestCase
     #[Test]
     public function the_verification_code_will_not_be_sent_if_the_user_has_a_password()
     {
-        $this->freezeTime();
         Notification::fake();
         Str::createRandomStringsUsing(fn () => 'abc');
 
