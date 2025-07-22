@@ -49,15 +49,12 @@ class ThumbnailExtractor
             return $cachePath;
         }
 
-        $ffmpegInput = null;
+        $ffmpegInput = match (true) {
+            file_exists($asset->resolvedPath()) => $asset->resolvedPath(),
+            $asset->container()->accessible() => $asset->absoluteUrl(),
+            default => null,
+        };
 
-        if (file_exists($asset->resolvedPath())) {
-            $ffmpegInput = $asset->resolvedPath();
-        } elseif ($asset->container()->accessible()) {
-            $ffmpegInput = $asset->absoluteUrl();
-        } else {
-            return null;
-        }
 
         return $this->ffmpeg->extractThumbnail(
             $asset->absoluteUrl(),
