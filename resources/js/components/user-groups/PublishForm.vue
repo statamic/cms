@@ -1,9 +1,49 @@
+<script setup>
+import { SavePipeline } from 'statamic';
+import { Header, Button, Dropdown, DropdownMenu, DropdownItem, PublishContainer } from '@statamic/ui';
+import { ref, useTemplateRef } from 'vue';
+const { Pipeline, Request } = SavePipeline;
+
+let saving = ref(false);
+let errors = ref({});
+let container = useTemplateRef('container');
+
+const props = defineProps({
+    publishContainer: String,
+    initialFieldset: Object,
+    initialValues: Object,
+    initialMeta: Object,
+    initialReference: String,
+    initialTitle: String,
+    actions: Object,
+    method: String,
+    canEditBlueprint: Boolean,
+    isCreating: Boolean,
+});
+
+const fieldset = ref(props.initialFieldset);
+const values = ref(props.initialValues);
+const meta = ref(props.initialMeta);
+const title = ref(props.initialTitle);
+
+function save() {
+    new Pipeline()
+        .provide({ container, errors, saving })
+        .through([new Request(props.actions.save, props.method)])
+        .then((response) => {
+            if (props.isCreating) window.location = response.data.redirect;
+            Statamic.$toast.success('Saved');
+            title.value = response.data.title;
+        });
+}
+</script>
+
 <template>
     <div class="max-w-5xl mx-auto">
         <Header :title="__(title)" icon="groups">
             <Dropdown v-if="canEditBlueprint" class="me-2">
                 <template #trigger>
-                    <Button icon="ui/dots" variant="ghost" />
+                    <Button icon="ui/dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
                 </template>
                 <DropdownMenu>
                     <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" :href="actions.editBlueprint" />
@@ -28,94 +68,3 @@
         />
     </div>
 </template>
-
-<script>
-import HasHiddenFields from '../publish/HasHiddenFields';
-import clone from '@statamic/util/clone.js';
-import { Header, Button, Dropdown, DropdownMenu, DropdownItem, PublishContainer, PublishTabs } from '@statamic/ui';
-
-export default {
-    mixins: [HasHiddenFields],
-
-    components: {
-        Header,
-        Button,
-        Dropdown,
-        DropdownMenu,
-        DropdownItem,
-        PublishContainer,
-        PublishTabs
-    },
-
-    props: {
-        publishContainer: String,
-        initialFieldset: Object,
-        initialValues: Object,
-        initialMeta: Object,
-        initialReference: String,
-        initialTitle: String,
-        actions: Object,
-        method: String,
-        canEditBlueprint: Boolean,
-        isCreating: Boolean,
-    },
-
-    data() {
-        return {
-            fieldset: clone(this.initialFieldset),
-            values: clone(this.initialValues),
-            meta: clone(this.initialMeta),
-            error: null,
-            errors: {},
-            title: this.initialTitle,
-        };
-    },
-
-    computed: {
-        store() {
-            return this.$refs.container.store;
-        },
-
-        hasErrors() {
-            return this.error || Object.keys(this.errors).length;
-        },
-    },
-
-    methods: {
-        clearErrors() {
-            this.error = null;
-            this.errors = {};
-        },
-
-        save() {
-            this.clearErrors();
-
-            this.$axios[this.method](this.actions.save, this.visibleValues)
-                .then((response) => {
-                    this.title = response.data.title;
-                    this.$refs.container.saved();
-                    if (this.isCreating) window.location = response.data.redirect;
-                    this.$toast.success(__('Saved'));
-                    this.$nextTick(() => this.$emit('saved', response));
-                })
-                .catch((e) => {
-                    if (e.response && e.response.status === 422) {
-                        const { message, errors } = e.response.data;
-                        this.error = message;
-                        this.errors = errors;
-                        this.$toast.error(message);
-                    } else {
-                        this.$toast.error(__('Something went wrong'));
-                    }
-                });
-        },
-    },
-
-    mounted() {
-        this.$keys.bindGlobal(['mod+s'], (e) => {
-            e.preventDefault();
-            this.save();
-        });
-    },
-};
-</script>

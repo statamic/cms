@@ -2,15 +2,20 @@
     --focus-outline-width: 2px;
     /* Here we typically need a negative outline-offset because of the inner shadow on inputs */
     --focus-outline-offset: -1px;
-    --focus-within-outline-offset: 0;
+    --focus-within-outline-offset: 0px;
     --focus-outline-color: var(--color-blue-400);
     --focus-outline-style: solid;
+
+    /* The outline-offset value used for buttons */
+    --outline-offset-button: 0.35rem;
+
     :is(.dark)& {
         --focus-outline-color: var(--color-blue-500);
         --focus-shadow-color: var(--color-blue-500);
     }
 
     /* =Jay. @Jack I figured to stick these in variables since we use them in class names in Bard. I thought technically layout variables maybe shouldn't be theme/should be persistent, so I put them here instead. */
+    --z-index-below: -1;
     --z-index-base: 1;
     --z-index-above: 2;
     --z-index-header: 3;
@@ -37,12 +42,45 @@
             border-radius: inherit;
         }
     }
-    /* e.g. When we have .focus-within:focus-outline on the global Site selector (which uses the Reka combobox), we don't want to see further focus states like on the dropdown arrow */
-    [class*='focus-within'] * {
-        outline: none;
-    }
 
     a {
         cursor: pointer;
+    }
+
+    ::placeholder {
+        @apply text-gray-400;
+    }
+
+    [type="checkbox"] {
+        /* To effectively hide border radius clash with focus state */
+        --focus-outline-offset: -1.85px;
+    }
+}
+
+@layer utilities {
+    /* Based on the global site picker */
+    [data-ui-combobox-anchor] {
+        /* Decrease */
+        --focus-outline-offset: var(--outline-offset-button);
+        /* Target the button inside the combobox */
+        & :focus-visible {
+            /* Decrease */
+            @apply rounded-xs;
+            + * svg {
+                /* Since the SVG is outside the focus state let's hide it on focus because otherwise the focus state outline rests on top of it */
+                position: relative;
+                left: 0.6rem;
+            }
+        }
+    }
+    /* e.g. >> /cp/collections, when you tab to the title */
+    .main-content table a {
+        --focus-outline-offset: 4px;
+        @apply rounded-xs;
+    }
+
+    .group\/button button:focus {
+        /* Pull the focus state above any adjacent buttons e.g. >> /cp/collections/articles/entries - save button alongside the dropdown arrow */
+        z-index: var(--z-index-above);
     }
 }

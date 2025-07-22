@@ -1,7 +1,7 @@
 <script setup>
 import Fields from '@statamic/components/ui/Publish/Fields.vue';
 import FieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
-import { computed, inject } from 'vue';
+import { computed, inject, ref } from 'vue';
 import {
     Icon,
     Switch,
@@ -109,8 +109,11 @@ function toggleCollapsedState() {
     props.collapsed ? emit('expanded') : emit('collapsed');
 }
 
+const deletingSet = ref(false);
+
 function destroy() {
-    if (confirm(__('Are you sure?'))) emit('removed');
+    deletingSet.value = false;
+    emit('removed');
 }
 </script>
 
@@ -164,7 +167,7 @@ function destroy() {
 
                     <Dropdown>
                         <template #trigger>
-                            <Button icon="ui/dots" variant="ghost" size="xs" />
+                            <Button icon="ui/dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
                         </template>
                         <DropdownMenu>
                             <DropdownItem
@@ -183,7 +186,7 @@ function destroy() {
                             <DropdownItem
                                 :text="__('Delete Set')"
                                 variant="destructive"
-                                @click="destroy"
+                                @click="deletingSet = true"
                             />
                         </DropdownMenu>
                     </Dropdown>
@@ -206,5 +209,15 @@ function destroy() {
                 </FieldsProvider>
             </Motion>
         </div>
+
+        <confirmation-modal
+            v-if="deletingSet"
+            :title="__('Delete Set')"
+            :body-text="__('Are you sure?')"
+            :button-text="__('Delete')"
+            :danger="true"
+            @confirm="destroy"
+            @cancel="deletingSet = false"
+        />
     </div>
 </template>

@@ -40,7 +40,6 @@
 
 <script>
 import Row from './Row.vue';
-import SetField from '../replicator/Field.vue';
 import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
 import { default as PublishFields } from '@statamic/components/ui/Publish/Fields.vue';
 import FieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
@@ -48,6 +47,6 @@ import FieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
 export default {
     mixins: [Row, ValidatesFieldConditions],
 
-    components: { SetField, PublishFields, FieldsProvider },
+    components: { PublishFields, FieldsProvider },
 };
 </script>

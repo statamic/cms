@@ -572,4 +572,14 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
     {
         return $this->termTemplate !== null;
     }
+
+    public function commandPaletteLinksForBlueprints()
+    {
+        return $this
+            ->termBlueprints()
+            ->map(fn ($blueprint) => $blueprint->commandPaletteLink(
+                type: 'Taxonomies',
+                url: cp_route('taxonomies.blueprints.edit', [$this, $blueprint]),
+            ));
+    }
 }

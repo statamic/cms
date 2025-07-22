@@ -25,6 +25,7 @@ import Hooks from '../components/Hooks';
 import Bard from '../components/Bard';
 import Components from '../components/Components';
 import Theme from '../components/Theme.js';
+import Contrast from '../components/Contrast.js';
 import FieldConditions from '../components/FieldConditions';
 import Reveal from '../components/Reveal';
 import Echo from '../components/Echo';
@@ -112,6 +113,10 @@ export default {
         return this.$app.config.globalProperties.$theme;
     },
 
+    get $contrast() {
+        return this.$app.config.globalProperties.$contrast;
+    },
+
     get $fieldActions() {
         return this.$app.config.globalProperties.$fieldActions;
     },
@@ -180,6 +185,7 @@ export default {
 
         Object.assign(this.$app.config.globalProperties, {
             $theme: new Theme(this.initialConfig.user?.theme),
+            $contrast: new Contrast(this.initialConfig.user?.preferences?.contrast),
         });
 
         Object.assign(this.$app.config.globalProperties, {

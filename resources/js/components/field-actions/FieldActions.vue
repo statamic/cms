@@ -1,5 +1,5 @@
 <template>
-    <div class="field-dropdown">
+    <div class="field-dropdown relative -top-0.5">
         <div class="quick-list">
             <div class="quick-list-content">
                 <Button
@@ -10,19 +10,22 @@
                     :icon-only="true"
                     size="xs"
                     variant="ghost"
+                    :aria-label="action.title"
                 >
                     <svg-icon :name="action.icon" class="size-3" />
                 </Button>
             </div>
             <Dropdown>
                 <template #trigger>
-                    <Button icon="ui/dots" variant="ghost" size="xs" />
+                    <Button icon="ui/dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
                 </template>
                 <DropdownMenu>
                     <DropdownItem
                         v-for="action in actions"
+                        :key="action.handle || action.title"
                         :text="action.title"
                         :variant="action.dangerous ? 'destructive' : 'default'"
+                        :aria-label="action.title"
                         @click="action.run(action)"
                     />
                 </DropdownMenu>

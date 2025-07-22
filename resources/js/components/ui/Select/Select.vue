@@ -5,16 +5,17 @@ import { Combobox } from '@statamic/ui';
 const emit = defineEmits(['update:modelValue']);
 
 const props = defineProps({
-    modelValue: { type: [Object, String, Number], default: null },
-    size: { type: String, default: 'base' },
-    placeholder: { type: String, default: 'Select...' },
+    buttonAppearance: { type: Boolean, default: true },
     clearable: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
-    optionLabel: { type: String, default: 'label' },
-    optionValue: { type: String, default: 'value' },
-    options: { type: Array, default: null },
     flat: { type: Boolean, default: false },
-    buttonAppearance: { type: Boolean, default: true },
+    modelValue: { type: [Object, String, Number], default: null },
+    optionLabel: { type: String, default: 'label' },
+    options: { type: Array, default: null },
+    optionValue: { type: String, default: 'value' },
+    placeholder: { type: String, default: 'Select...' },
+    readOnly: { type: Boolean, default: false },
+    size: { type: String, default: 'base' },
 });
 
 defineOptions({
@@ -32,17 +33,18 @@ const usingOptionSlot = !!slots['option'];
 <template>
     <Combobox
         v-bind="attrs"
-        :size
-        :placeholder
+        :button-appearance
         :clearable
         :disabled
+        :flat
+        :model-value="modelValue"
         :option-label
         :option-value
         :options
-        :flat
-        :button-appearance
+        :placeholder
+        :read-only
         :searchable="false"
-        :model-value="modelValue"
+        :size
         @update:modelValue="emit('update:modelValue', $event)"
     >
         <template #selected-option="{ option }" v-if="usingSelectedOptionSlot">

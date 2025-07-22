@@ -15,7 +15,7 @@ const isCurrentSortColumn = computed(() => props.column.field === sortColumn.val
 </script>
 
 <template>
-    <th>
+    <th scope="col">
         <span v-if="!column.sortable" v-text="__(column.label)" />
         <Button
             v-else
@@ -23,7 +23,7 @@ const isCurrentSortColumn = computed(() => props.column.field === sortColumn.val
             :icon-append="isCurrentSortColumn ? 'up-down' : null"
             size="sm"
             variant="ghost"
-            class="-mt-2 -mb-1 -ml-3 text-sm! font-medium! text-gray-800! dark:text-gray-400!"
+            class="-mt-2 -mb-1 -ml-3 text-sm! font-medium! text-gray-900! dark:text-gray-400!"
             @click.prevent="setSortColumn(column.field)"
         />
     </th>

@@ -25,6 +25,38 @@ const {
 function isSelected(id) {
     return selections.value.includes(id);
 }
+
+function getCheckboxLabel(row) {
+    const rowTitle = getRowTitle(row);
+    return isSelected(row.id) 
+        ? __('deselect_title', { title: rowTitle })
+        : __('select_title', { title: rowTitle });
+}
+
+function getCheckboxAriaLabel(row) {
+    const rowTitle = getRowTitle(row);
+    return isSelected(row.id) 
+        ? __('deselect_title', { title: rowTitle })
+        : __('select_title', { title: rowTitle });
+}
+
+function getCheckboxDescription(row) {
+    const rowTitle = getRowTitle(row);
+    const isDisabled = hasReachedSelectionLimit.value && allowsMultipleSelections.value && !isSelected(row.id);
+    
+    if (isDisabled) {
+        return __('selection_limit_reached', { title: rowTitle });
+    }
+    
+    return isSelected(row.id)
+        ? __('item_selected_description', { title: rowTitle })
+        : __('item_not_selected_description', { title: rowTitle });
+}
+
+function getRowTitle(row) {
+    // Try to get a meaningful title from common fields
+    return row.title || row.name || row.label || row.id || __('item');
+}
 </script>
 
 <template>
@@ -46,6 +78,9 @@ function isSelected(id) {
             >
                 <td class="table-drag-handle" v-if="reorderable"></td>
                 <td class="checkbox-column" v-if="allowsSelections && !reorderable">
+                    <label :for="`checkbox-${row.id}`" class="sr-only">
+                        {{ getCheckboxLabel(row) }}
+                    </label>
                     <input
                         v-if="!reorderable"
                         type="checkbox"
@@ -53,8 +88,13 @@ function isSelected(id) {
                         :checked="isSelected(row.id)"
                         :disabled="hasReachedSelectionLimit && allowsMultipleSelections && !isSelected(row.id)"
                         :id="`checkbox-${row.id}`"
+                        :aria-label="getCheckboxAriaLabel(row)"
+                        :aria-describedby="`checkbox-description-${row.id}`"
                         @click="selectionClicked(index, $event)"
                     />
+                    <span :id="`checkbox-description-${row.id}`" class="sr-only">
+                        {{ getCheckboxDescription(row) }}
+                    </span>
                 </td>
                 <td
                     v-for="column in visibleColumns"

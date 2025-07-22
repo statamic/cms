@@ -24,10 +24,10 @@ const tag = computed(() => (props.href ? 'a' : props.as));
 
 const badgeClasses = computed(() => {
     const classes = cva({
-        base: 'inline-flex items-center gap-1 font-normal antialiased whitespace-nowrap no-underline not-prose [button]:cursor-pointer group [&_svg]:opacity-60 [&_svg]:group-hover:opacity-100',
+        base: 'inline-flex items-center justify-center gap-1 font-normal antialiased whitespace-nowrap no-underline not-prose [button]:cursor-pointer group [&_svg]:opacity-60 [&_svg]:group-hover:opacity-100',
         variants: {
             size: {
-                sm: 'text-2xs leading-normal px-1 rounded-[0.1875rem] [&_svg]:size-2.5',
+                sm: 'text-2xs leading-normal px-1.25 rounded-[0.1875rem] [&_svg]:size-2.5',
                 default: 'text-xs leading-5.5 px-2.25 rounded-sm [&_svg]:size-3.5 gap-2',
                 lg: 'font-medium text-sm leading-7 px-2.5 rounded-lg [&_svg]:size-4 gap-2',
             },

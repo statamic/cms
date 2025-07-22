@@ -90,7 +90,7 @@ class ViewCollectionListingTest extends TestCase
                     'icon' => 'collections',
                 ],
             ]))
-            ->assertDontSee('no-results');
+            ->assertDontSee('ui-empty-state-menu');
     }
 
     #[Test]
@@ -103,7 +103,7 @@ class ViewCollectionListingTest extends TestCase
             ->get(cp_route('collections.index'))
             ->assertSuccessful()
             ->assertViewHas('collections', collect([]))
-            ->assertSee('no-results');
+            ->assertSee('ui-empty-state-menu');
     }
 
     #[Test]
@@ -121,7 +121,7 @@ class ViewCollectionListingTest extends TestCase
             ->assertViewHas('collections', function ($collections) {
                 return count($collections) === 1 && $collections[0]['id'] === 'bar';
             })
-            ->assertDontSee('no-results');
+            ->assertDontSee('ui-empty-state-menu');
     }
 
     #[Test]
@@ -139,7 +139,7 @@ class ViewCollectionListingTest extends TestCase
             ->assertViewHas('collections', function ($collections) {
                 return $collections->map->id->all() === ['bar', 'foo'];
             })
-            ->assertDontSee('no-results');
+            ->assertDontSee('ui-empty-state-menu');
     }
 
     #[Test]

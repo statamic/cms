@@ -13,7 +13,7 @@
     .inline-label {
         @apply font-normal text-gray-700 dark:text-dark-175 ltr:ml-2 rtl:mr-2;
         a {
-            @apply text-gray-800 underline dark:text-dark-150;
+            @apply text-gray-900 underline dark:text-dark-150;
             &:hover {
                 @apply text-blue;
             }

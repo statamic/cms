@@ -52,7 +52,7 @@
                     <thead>
                         <tr>
                             <th>{{ __('Blueprint') }}</th>
-                            <th class="text-end!">{{ __('Collection') }}</th>
+                            <th class="text-end!" scope="col">{{ __('Collection') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -249,7 +249,7 @@
                 <thead>
                     <tr>
                         <th class="text-start!">{{ __('Blueprint') }}</th>
-                        <th class="actions-column"></th>
+                        <th scope="col" class="actions-column"></th>
                     </tr>
                 </thead>
                 <tbody>

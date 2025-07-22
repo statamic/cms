@@ -84,11 +84,11 @@ function errorFor(field) {
 
                 <ui-button type="submit" variant="primary" :disabled="busy" :loading="busy" class="w-full">{{ __('Continue') }}</ui-button>
 
-                <button v-if="mode === 'code'" class="cursor-pointer text-xs text-gray-500 hover:text-gray-800" type="button" @click="mode = 'recovery_code'">
+                <button v-if="mode === 'code'" class="cursor-pointer text-xs text-gray-500 hover:text-gray-900" type="button" @click="mode = 'recovery_code'">
                     {{ __('Use recovery code') }}
                 </button>
 
-                <button v-if="mode === 'recovery_code'" class="cursor-pointer text-xs text-gray-500 hover:text-gray-800" type="button" @click="mode = 'code'">
+                <button v-if="mode === 'recovery_code'" class="cursor-pointer text-xs text-gray-500 hover:text-gray-900" type="button" @click="mode = 'code'">
                     {{ __('Use one-time code') }}
                 </button>
             </form>

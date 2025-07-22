@@ -103,7 +103,7 @@
                         </ui-table-row>
                     </ui-table>
                 </ui-card>
-            </ui-card-panel>
+            </ui-panel>
 
             @if (! $addons->isEmpty())
                 <ui-panel heading="{{ __('Addons') }}">

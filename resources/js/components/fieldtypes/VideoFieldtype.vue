@@ -6,6 +6,7 @@
                 :model-value="value"
                 :isReadOnly="isReadOnly"
                 :placeholder="__(config.placeholder) || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'"
+                :aria-label="__('Video URL')"
                 @update:model-value="update"
                 @focus="$emit('focus')"
                 @blur="$emit('blur')"

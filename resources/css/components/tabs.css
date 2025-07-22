@@ -34,7 +34,7 @@
 .tab-button {
     @apply flex shrink-0 select-none items-center whitespace-nowrap border-b-2 border-transparent px-2 py-2 text-gray-700 dark:text-dark-150;
     &:hover {
-        @apply text-gray-800 dark:text-dark-100;
+        @apply text-gray-900 dark:text-dark-100;
     }
     &:focus-visible {
         @apply rounded-t outline-hidden ring-2 ring-inset ring-blue-500 dark:ring-dark-blue-100;

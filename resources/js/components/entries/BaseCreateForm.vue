@@ -13,7 +13,6 @@
         :initial-meta="meta"
         :initial-localizations="localizations"
         :initial-has-origin="false"
-        :initial-is-root="true"
         :initial-origin-values="{}"
         :revisions-enabled="revisions"
         :initial-site="site"

@@ -1,52 +1,6 @@
 <template>
-    <div class="min-h-screen" ref="browser" @keydown.shift="shiftDown" @keyup="clearShift">
-        <Header :title="__(container.title)" icon="assets">
-            <Dropdown v-if="container.can_edit || container.can_delete || container.can_create">
-                <DropdownMenu>
-                    <DropdownItem
-                        icon="container-add"
-                        v-if="canCreateContainers"
-                        :text="__('Create Container')"
-                        :href="createContainerUrl"
-                    />
-                    <DropdownItem
-                        icon="cog"
-                        v-if="container.can_edit"
-                        :text="__('Configure Container')"
-                        :href="container.edit_url"
-                    />
-                    <DropdownItem
-                        icon="blueprint-edit"
-                        :text="__('Edit Blueprint')"
-                        :href="container.blueprint_url"
-                    />
-                    <DropdownSeparator v-if="container.can_delete" />
-                    <DropdownItem
-                        icon="trash"
-                        variant="destructive"
-                        v-if="container.can_delete"
-                        :text="__('Delete Container')"
-                        @click="$event.preventDefault(); $refs.deleter.confirm()"
-                    />
-                </DropdownMenu>
-            </Dropdown>
-
-            <resource-deleter
-                ref="deleter"
-                :resource-title="__(container.title)"
-                :route="container.delete_url"
-            />
-
-            <Button v-if="canUpload" :text="__('Upload')" icon="upload" @click="openFileBrowser" />
-            <Button v-if="canCreateFolders" :text="__('Create Folder')" icon="folder-add" @click="creatingFolder = true" />
-
-            <ui-toggle-group v-model="mode">
-                <ui-toggle-item icon="layout-grid" value="grid" />
-                <ui-toggle-item icon="layout-list" value="table" />
-            </ui-toggle-group>
-        </Header>
-
-        <uploader
+    <div ref="browser" @keydown.shift="shiftDown" @keyup="clearShift">
+        <Uploader
             ref="uploader"
             :container="container.id"
             :path="path"
@@ -56,9 +10,9 @@
             @error="uploadError"
             v-slot="{ dragging }"
         >
-            <div class="min-h-screen">
+            <div>
                 <div class="drag-notification" v-show="dragging">
-                    <svg-icon name="upload" class="m-4 size-12" />
+                    <Icon name="upload" class="m-4 size-12" />
                     <span>{{ __('Drop File to Upload') }}</span>
                 </div>
 
@@ -68,23 +22,72 @@
                     :columns="columns"
                     :action-url="actionUrl"
                     :action-context="actionContext"
+                    :allow-bulk-actions="allowBulkActions"
                     :selections="selectedAssets"
                     :preferences-prefix="preferencesPrefix"
                     v-model:search-query="searchQuery"
                     @request-completed="listingRequestCompleted"
                 >
                     <template #initializing>
-                        <div class="loading">
-                            <loading-graphic />
-                        </div>
+                        <slot name="initializing">
+                            <Icon name="loading" />
+                        </slot>
                     </template>
                     <template #default="{ items }">
-                        <div class="flex items-center gap-3 py-3">
-                            <div class="flex flex-1 items-center gap-3">
-                                <ListingSearch />
+                        <slot name="header" v-bind="{ canUpload, openFileBrowser, canCreateFolders, startCreatingFolder, mode, modeChanged }">
+                            <Header :title="__(container.title)" icon="assets">
+                                <Dropdown v-if="container.can_edit || container.can_delete || container.can_create">
+                                    <DropdownMenu>
+                                        <DropdownItem
+                                            icon="container-add"
+                                            v-if="canCreateContainers"
+                                            :text="__('Create Container')"
+                                            :href="createContainerUrl"
+                                        />
+                                        <DropdownItem
+                                            icon="cog"
+                                            v-if="container.can_edit"
+                                            :text="__('Configure Container')"
+                                            :href="container.edit_url"
+                                        />
+                                        <DropdownItem
+                                            icon="blueprint-edit"
+                                            :text="__('Edit Blueprint')"
+                                            :href="container.blueprint_url"
+                                        />
+                                        <DropdownSeparator v-if="container.can_delete" />
+                                        <DropdownItem
+                                            icon="trash"
+                                            variant="destructive"
+                                            v-if="container.can_delete"
+                                            :text="__('Delete Container')"
+                                            @click="$event.preventDefault(); $refs.deleter.confirm()"
+                                        />
+                                    </DropdownMenu>
+                                </Dropdown>
+
+                                <resource-deleter
+                                    ref="deleter"
+                                    :resource-title="__(container.title)"
+                                    :route="container.delete_url"
+                                />
+
+                                <Button v-if="canUpload" :text="__('Upload')" icon="upload" @click="openFileBrowser" />
+                                <Button v-if="canCreateFolders" :text="__('Create Folder')" icon="folder-add" @click="startCreatingFolder" />
+
+                                <ToggleGroup :model-value="mode" @update:model-value="modeChanged">
+                                    <ToggleItem icon="layout-grid" value="grid" />
+                                    <ToggleItem icon="layout-list" value="table" />
+                                </ToggleGroup>
+                            </Header>
+
+                            <div class="flex items-center gap-3 py-3 relative">
+                                <div class="flex flex-1 items-center gap-3">
+                                    <ListingSearch />
+                                </div>
+                                <ListingCustomizeColumns />
                             </div>
-                            <ListingCustomizeColumns />
-                        </div>
+                        </slot>
 
                         <div
                             v-if="containerIsEmpty"
@@ -92,14 +95,14 @@
                             v-text="__('No results')"
                         />
 
-                        <Panel
-                            v-else
-                            :class="{
-                                'relative overflow-x-auto overscroll-x-contain': mode === 'table',
-                            }"
-                        >
+                        <Panel v-else :class="{ 'relative overflow-x-auto overscroll-x-contain': mode === 'table' }">
                             <PanelHeader class="flex items-center justify-between p-1!">
-                                <Breadcrumbs v-if="!restrictFolderNavigation" :path="path" @navigated="selectFolder" />
+                                <Breadcrumbs
+                                    v-if="!restrictFolderNavigation"
+                                    :path="path"
+                                    @navigated="selectFolder"
+                                />
+
                                 <Slider
                                     v-if="mode === 'grid'"
                                     size="sm"
@@ -112,13 +115,14 @@
                                 />
                             </PanelHeader>
 
-                            <uploads
+                            <Uploads
                                 v-if="uploads.length"
                                 :uploads="uploads"
                                 :allow-selecting-existing="allowSelectingExistingUpload"
                                 class="mb-3 rounded-lg"
                                 @existing-selected="existingUploadSelected"
                             />
+
                             <Table
                                 v-if="mode === 'table'"
                                 :assets="items"
@@ -127,8 +131,8 @@
                                 :visible-columns="visibleColumns"
                                 v-bind="sharedAssetProps"
                                 v-on="sharedAssetEvents"
-                            >
-                            </Table>
+                            />
+
                             <Grid
                                 v-if="mode === 'grid'"
                                 :assets="items"
@@ -138,6 +142,7 @@
                                 v-bind="sharedAssetProps"
                                 v-on="sharedAssetEvents"
                             />
+
                             <PanelFooter>
                                 <ListingPagination />
                             </PanelFooter>
@@ -145,9 +150,9 @@
                     </template>
                 </Listing>
             </div>
-        </uploader>
+        </Uploader>
 
-        <asset-editor
+        <AssetEditor
             v-if="showAssetEditor"
             :id="editedAssetId"
             :read-only="!canEdit"
@@ -155,6 +160,8 @@
             @next="editNextAsset"
             @closed="closeAssetEditor"
             @saved="assetSaved"
+            @action-started="actionStarted"
+            @action-completed="actionCompleted"
         />
     </div>
 </template>
@@ -164,11 +171,9 @@ import AssetThumbnail from './Thumbnail.vue';
 import AssetEditor from '../Editor/Editor.vue';
 import Grid from './Grid.vue';
 import Table from './Table.vue';
-import HasPagination from '../../data-list/HasPagination';
 import HasPreferences from '../../data-list/HasPreferences';
 import Uploader from '../Uploader.vue';
 import Uploads from '../Uploads.vue';
-import HasActions from '../../data-list/HasActions';
 import { debounce, sortBy } from 'lodash-es';
 import {
     Header,
@@ -184,13 +189,15 @@ import {
     ListingSearch,
     ListingCustomizeColumns,
     Slider,
+    Icon,
+    ToggleGroup,
+    ToggleItem,
 } from '@statamic/ui';
-import BulkActions from '@statamic/components/data-list/BulkActions.vue';
 import { Listing, ListingTable, ListingPagination } from '@statamic/ui';
 import Breadcrumbs from './Breadcrumbs.vue';
 
 export default {
-    mixins: [HasActions, HasPagination, HasPreferences],
+    mixins: [HasPreferences],
 
     components: {
         PanelFooter,
@@ -209,7 +216,6 @@ export default {
         Header,
         Button,
         ButtonGroup,
-        BulkActions,
         Listing,
         ListingTable,
         ListingPagination,
@@ -217,11 +223,17 @@ export default {
         ListingCustomizeColumns,
         Breadcrumbs,
         Slider,
+        Icon,
+        ToggleGroup,
+        ToggleItem,
     },
 
     props: {
+        allowBulkActions: {
+            type: Boolean,
+            default: true,
+        },
         allowSelectingExistingUpload: Boolean,
-        autofocusSearch: Boolean,
         autoselectUploads: Boolean,
         canCreateContainers: Boolean,
         createContainerUrl: String,
@@ -320,10 +332,6 @@ export default {
             return this.selectedAssets.length > 0;
         },
 
-        modeClass() {
-            return 'mode-' + this.mode;
-        },
-
         parameters() {
             return {
                 page: this.page,
@@ -347,10 +355,6 @@ export default {
             set(value) {
                 this.visibleColumns = value.split(',').map(field => this.columns.find(column => column.field === field));
             },
-        },
-
-        columnShowing(column) {
-            return this.visibleColumns.find(c => c.field === column);
         },
 
         reachedSelectionLimit() {
@@ -389,23 +393,19 @@ export default {
         },
     },
 
-    created() {
-        this.$events.$on('editor-action-started', this.actionStarted);
-        this.$events.$on('editor-action-completed', this.actionCompleted);
-    },
-
     mounted() {
         this.mode = this.getPreference('mode') || 'table';
-    },
-
-    unmounted() {
-        this.$events.$off('editor-action-started', this.actionStarted);
-        this.$events.$off('editor-action-completed', this.actionCompleted);
     },
 
     watch: {
         mode(mode) {
             this.setPreference('mode', mode == 'table' ? null : mode);
+        },
+
+        initializing(initializing) {
+              if (initializing === false) {
+                  this.$emit('initialized');
+              }
         },
 
         editedAssetId(editedAssetId) {
@@ -414,12 +414,6 @@ export default {
                 : this.path;
 
             this.$emit('navigated', path);
-        },
-
-        initializing(isInitializing, wasInitializing) {
-            if (wasInitializing && this.autofocusSearch) {
-                this.$nextTick(() => this.$refs.search.focus());
-            }
         },
 
         loading(loading) {
@@ -456,6 +450,14 @@ export default {
     },
 
     methods: {
+        modeChanged(mode) {
+            this.mode = mode;
+        },
+
+        startCreatingFolder() {
+            this.creatingFolder = true;
+        },
+
         listingRequestCompleted({ response }) {
             this.assets = response.data.data;
 
@@ -474,7 +476,15 @@ export default {
             this.loading = false;
         },
 
-        afterActionSuccessfullyCompleted() {
+        actionStarted() {
+            this.loading = true;
+        },
+
+        actionCompleted() {
+            // Intentionally not completing the loading state here since
+            // the listing will refresh and immediately restart it.
+            // this.loading = false;
+
             this.$refs.listing.refresh();
         },
 
@@ -593,10 +603,6 @@ export default {
 
         folderActions(folder) {
             return folder.actions || this.folder.actions || [];
-        },
-
-        isSelected(id) {
-            return this.selectedAssets.includes(id);
         },
 
         loadAssets() {

@@ -21,7 +21,7 @@ const { $slug, $axios, $toast, $keys } = instance.appContext.config.globalProper
 // Common data
 const title = ref(null);
 const handle = ref(null);
-const slug = $slug.async().separatedBy('_');
+const slug = $slug.separatedBy('_');
 
 // Common computed
 const canSubmit = computed(() => title.value && handle.value);
@@ -29,7 +29,7 @@ const canSubmit = computed(() => title.value && handle.value);
 // Common watch
 watch(title, (newTitle) => {
     if (newTitle) {
-        slug.create(newTitle).then((slugValue) => (handle.value = slugValue));
+        handle.value = slug.create(newTitle);
     }
 });
 
@@ -47,7 +47,9 @@ const submit = () => {
 
 // Common mounted
 onMounted(() => {
-    $keys.bindGlobal(['return'], (e) => {
+    $keys.bindGlobal(['return', 'mod+s'], (e) => {
+        e.preventDefault();
+
         if (canSubmit.value) {
             submit();
         }
@@ -85,7 +87,7 @@ onMounted(() => {
         </slot>
 
         <slot name="footer">
-            <footer class="flex justify-center">
+            <footer class="flex justify-center py-3">
                 <ui-button
                     variant="primary"
                     size="lg"

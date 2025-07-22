@@ -58,7 +58,7 @@
         />
     </ui-dropdown-menu>
 
-    <ui-dropdown-footer class="px-1.75!">
+    <ui-dropdown-footer class="px-1.75! space-y-2">
         <ui-toggle-group variant="ghost" size="xs" class="justify-between" v-model="$theme.preference">
             <ui-toggle-item icon="sun" class="[&_svg]:size-4.5" value="light" :label="__('Light')" />
             <ui-toggle-item icon="moon" class="[&_svg]:size-4.5" value="dark" :label="__('Dark')" />

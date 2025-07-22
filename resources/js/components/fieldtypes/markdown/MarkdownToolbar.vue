@@ -1,6 +1,6 @@
 <template>
     <div
-        class="flex items-center justify-between rounded-t-xl border-b border-gray-300 bg-gray-50 px-2 py-1 dark:border-white/15 dark:bg-gray-950"
+        class="flex items-center justify-between rounded-t-xl border-b border-gray-300 bg-gray-50 px-2 py-1 dark:border-white/15 dark:bg-gray-950 overflow-x-scroll"
     >
         <div class="flex items-center" v-if="!isReadOnly">
             <Button
@@ -27,64 +27,44 @@
                 <svg-icon name="dark-mode" class="size-4" />
             </Button>
         </div>
-        <div class="flex items-center">
-            <Button
-                size="sm"
-                variant="ghost"
-                class="px-2! [&_svg]:size-3.5"
-                @click="$emit('toggle-mode', 'write')"
-                :class="mode === 'write' ? 'text-gray-800! dark:text-white!' : 'text-gray-400!'"
-                v-text="__('Write')"
-                :aria-pressed="mode === 'write' ? 'true' : 'false'"
-            />
-            <Button
-                size="sm"
-                variant="ghost"
-                class="px-2! [&_svg]:size-3.5"
-                @click="$emit('toggle-mode', 'preview')"
-                :class="mode === 'preview' ? 'text-gray-800! dark:text-white!' : 'text-gray-400!'"
-                v-text="__('Preview')"
-                :aria-pressed="mode === 'preview' ? 'true' : 'false'"
-            />
-        </div>
+        <ToggleGroup v-model="mode" size="sm" class="-me-1">
+            <ToggleItem icon="pencil" value="write" v-tooltip="__('Writing Mode')" />
+            <ToggleItem icon="eye" value="preview" v-tooltip="__('Preview Mode')" />
+        </ToggleGroup>
     </div>
 </template>
 
 <script>
-import { Button } from '@statamic/ui';
+import { Button, ToggleGroup, ToggleItem } from '@statamic/ui';
 
 export default {
     components: {
         Button,
+        ToggleGroup,
+        ToggleItem,
     },
+
     props: {
-        mode: {
-            type: String,
-            required: true,
-        },
-        buttons: {
-            type: Array,
-            required: true,
-        },
-        isReadOnly: {
-            type: Boolean,
-            default: false,
-        },
-        showDarkMode: {
-            type: Boolean,
-            default: false,
-        },
-        darkMode: {
-            type: Boolean,
-            default: false,
-        },
-        isFullscreen: {
-            type: Boolean,
-            default: false,
+        buttons: { type: Array, required: true },
+        isReadOnly: { type: Boolean, default: false },
+        showDarkMode: { type: Boolean, default: false },
+        darkMode: { type: Boolean, default: false },
+        isFullscreen: { type: Boolean, default: false },
+    },
+
+    data() {
+        return {
+            mode: 'write',
+        };
+    },
+
+    watch: {
+        mode(newVal) {
+            this.$emit('update:mode', newVal);
         },
     },
 
-    emits: ['toggle-mode', 'toggle-dark-mode', 'button-click'],
+    emits: ['update:mode', 'toggle-dark-mode', 'button-click'],
 
     methods: {
         handleButtonClick(button) {

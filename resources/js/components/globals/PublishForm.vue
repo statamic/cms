@@ -3,7 +3,7 @@
         <Header :title="__(title)" icon="globals">
             <Dropdown v-if="canConfigure || canEditBlueprint">
                 <template #trigger>
-                    <Button icon="ui/dots" variant="ghost" />
+                    <Button icon="ui/dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
                 </template>
                 <DropdownMenu>
                     <DropdownItem :text="__('Configure')" icon="cog" v-if="canConfigure" :href="configureUrl" />
@@ -54,8 +54,17 @@
             :errors="errors"
             :site="site"
             :localized-fields="localizedFields"
-            :is-root="isRoot"
             :sync-field-confirmation-text="syncFieldConfirmationText"
+        />
+
+        <confirmation-modal
+            v-if="pendingLocalization"
+            :title="__('Unsaved Changes')"
+            :body-text="__('Are you sure? Unsaved changes will be lost.')"
+            :button-text="__('Continue')"
+            :danger="true"
+            @confirm="confirmSwitchLocalization"
+            @cancel="pendingLocalization = null"
         />
     </div>
 </template>
@@ -108,7 +117,6 @@ export default {
         method: String,
         isCreating: Boolean,
         initialReadOnly: Boolean,
-        initialIsRoot: Boolean,
         canEdit: Boolean,
         canConfigure: Boolean,
         configureUrl: String,
@@ -130,9 +138,9 @@ export default {
             originValues: this.initialOriginValues || {},
             originMeta: this.initialOriginMeta || {},
             site: this.initialSite,
-            isRoot: this.initialIsRoot,
             readOnly: this.initialReadOnly,
             syncFieldConfirmationText: __('messages.sync_entry_field_confirmation_text'),
+            pendingLocalization: null,
         };
     },
 
@@ -225,11 +233,19 @@ export default {
             if (localization.active) return;
 
             if (this.isDirty) {
-                if (!confirm(__('Are you sure? Unsaved changes will be lost.'))) {
-                    return;
-                }
+                this.pendingLocalization = localization;
+                return;
             }
 
+            this.switchToLocalization(localization);
+        },
+
+        confirmSwitchLocalization() {
+            this.switchToLocalization(this.pendingLocalization);
+            this.pendingLocalization = null;
+        },
+
+        switchToLocalization(localization) {
             this.localizing = localization.handle;
 
             if (this.publishContainer === 'base') {
@@ -246,7 +262,6 @@ export default {
                 this.hasOrigin = data.hasOrigin;
                 this.actions = data.actions;
                 this.fieldset = data.blueprint;
-                this.isRoot = data.isRoot;
                 this.site = localization.handle;
                 this.localizing = false;
                 this.$nextTick(() => this.$refs.container.clearDirtyState());

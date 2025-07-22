@@ -3,26 +3,8 @@ import { ref, computed, watch } from 'vue';
 import CommandPaletteItem from './Item.vue';
 import axios from 'axios';
 import debounce from '@statamic/util/debounce';
-import {
-    DialogContent,
-    DialogOverlay,
-    DialogPortal,
-    DialogRoot,
-    DialogTitle,
-    DialogTrigger,
-    DialogDescription,
-    VisuallyHidden,
-} from 'reka-ui';
-import {
-    ComboboxContent,
-    ComboboxEmpty,
-    ComboboxGroup,
-    ComboboxLabel,
-    ComboboxInput,
-    ComboboxItem,
-    ComboboxRoot,
-    ComboboxViewport,
-} from 'reka-ui';
+import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, DialogTrigger, DialogDescription, VisuallyHidden } from 'reka-ui';
+import { ComboboxContent, ComboboxEmpty, ComboboxGroup, ComboboxLabel, ComboboxInput, ComboboxItem, ComboboxRoot, ComboboxViewport } from 'reka-ui';
 import fuzzysort from 'fuzzysort';
 import { each, groupBy, sortBy, find } from 'lodash-es';
 import { motion } from 'motion-v';
@@ -35,29 +17,31 @@ let categories = ref([]);
 let items = ref(getItems());
 let searchResults = ref([]);
 let selected = ref(null);
+let recentItems = ref(getRecentItems());
 
 Statamic.$keys.bindGlobal(['mod+k'], (e) => {
     e.preventDefault();
     open.value = true;
 });
 
-each(
-    {
-        esc: () => (open.value = false),
-        'ctrl+n': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' })),
-        'ctrl+p': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp' })),
-    },
-    (callback, binding) => {
-        Statamic.$keys.bindGlobal([binding], (e) => {
-            if (open.value) {
-                e.preventDefault();
-                callback();
-            }
-        });
-    },
-);
+each({
+    esc: () => open.value = false,
+    'ctrl+n': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' })),
+    'ctrl+p': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp' })),
+}, (callback, binding) => {
+    Statamic.$keys.bindGlobal([binding], (e) => {
+        if (open.value) {
+            e.preventDefault();
+            callback();
+        }
+    });
+});
 
-const aggregatedItems = computed(() => [...(items.value || []), ...(searchResults.value || [])]);
+const aggregatedItems = computed(() => [
+    ...(recentItems.value || []),
+    ...(items.value || []),
+    ...(searchResults.value || []),
+]);
 
 const results = computed(() => {
     let filtered = fuzzysort
@@ -65,7 +49,7 @@ const results = computed(() => {
             all: true,
             key: 'text',
         })
-        .map((result) => {
+        .map(result => {
             return {
                 score: result._score,
                 html: result.highlight('<span class="text-blue-600 dark:text-blue-400">', '</span>'),
@@ -76,13 +60,13 @@ const results = computed(() => {
     let groups = groupBy(filtered, 'category');
 
     return categories.value
-        .map((category) => {
+        .map(category => {
             return {
                 text: __(category),
                 items: groups[category],
             };
         })
-        .filter((category) => category.items);
+        .filter(category => category.items);
 });
 
 watch(selected, (item) => {
@@ -91,12 +75,9 @@ watch(selected, (item) => {
     reset();
 });
 
-watch(
-    query,
-    debounce(() => {
-        searchContent();
-    }, 300),
-);
+watch(query, debounce(() => {
+    searchContent();
+}, 300));
 
 watch(open, (isOpen) => {
     if (isOpen) return;
@@ -119,6 +100,12 @@ function searchContent() {
 function select(selected) {
     let item = findSelectedItem(selected);
 
+    switch (item.type) {
+        case 'link':
+        case 'content_search_result':
+            addToRecentItems(item);
+    }
+
     if (item.href) {
         return;
     }
@@ -131,6 +118,23 @@ function select(selected) {
 
 function findSelectedItem(selected) {
     return find(aggregatedItems.value, (result) => result.text === selected);
+}
+
+function getRecentItems() {
+    const stored = localStorage.getItem('statamic.command-palette.recent');
+
+    return stored ? JSON.parse(stored) : [];
+}
+
+function addToRecentItems(item) {
+    item.category = __('Recent');
+
+    const filtered = getRecentItems().filter(recentItem => recentItem.text !== item.text);
+    const updated = [item, ...filtered].slice(0, 5);
+
+    localStorage.setItem('statamic.command-palette.recent', JSON.stringify(updated));
+
+    recentItems.value = updated;
 }
 
 function reset() {
@@ -245,16 +249,16 @@ const modalClasses = cva({
                                 </ComboboxGroup>
                             </ComboboxViewport>
                             <footer
-                                class="flex items-center gap-4 rounded-b-xl border-t border-gray-200/80 bg-gray-50 px-6 py-3 dark:border-gray-950 dark:bg-gray-900"
+                                class="flex items-center gap-4 rounded-b-xl border-t border-gray-200/80 bg-gray-50 px-6 py-3 dark:border-gray-950 dark:bg-gray-800/20"
                             >
                                 <div class="flex items-center gap-1.5">
                                     <Icon name="up-square" class="size-4 text-gray-500" />
                                     <Icon name="down-square" class="size-4 text-gray-500" />
-                                    <span class="text-sm text-gray-600">Navigate</span>
+                                    <span class="text-sm text-gray-600 dark:text-gray-500">Navigate</span>
                                 </div>
                                 <div class="flex items-center gap-1.5">
                                     <Icon name="return-square" class="size-4 text-gray-500" />
-                                    <span class="text-sm text-gray-600">Select</span>
+                                    <span class="text-sm text-gray-600 dark:text-gray-500">Select</span>
                                 </div>
                             </footer>
                         </ComboboxContent>

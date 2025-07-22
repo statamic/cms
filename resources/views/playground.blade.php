@@ -124,13 +124,29 @@
 
     <section class="space-y-4">
         <ui-heading size="lg">Input</ui-heading>
-        <div class="flex">
+        <div class="flex gap-2">
             <ui-input
                 name="email"
                 type="email"
                 required
                 label="Email"
-                description="We need it so we can sell your info to spammers."
+                value="Edit me"
+            />
+            <ui-input
+                name="email"
+                type="email"
+                required
+                label="Email"
+                read-only
+                value="Read only. Tab, select, but not edit."
+            />
+            <ui-input
+                name="email"
+                type="email"
+                required
+                label="Email"
+                disabled
+                value="Disabled. Cant touch me."
             />
         </div>
     </section>

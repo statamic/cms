@@ -4,11 +4,15 @@
             <div
                 class="
                     @container/markdown w-full block bg-white dark:bg-gray-900 rounded-lg
-                    border border-gray-300 dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:inset-shadow-2xs dark:inset-shadow-black
-                    text-gray-800 dark:text-gray-300
-                    appearance-none antialiased shadow-ui-sm disabled:shadow-none not-prose
+                    border border-gray-300 with-contrast:border-gray-500 dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:inset-shadow-2xs dark:inset-shadow-black
+                    text-gray-900 dark:text-gray-300
+                    appearance-none antialiased shadow-ui-sm disabled:shadow-none
                 "
-                :class="{ 'markdown-fullscreen': fullScreenMode, 'markdown-dark-mode': darkMode }"
+                :class="{
+                    'markdown-fullscreen': fullScreenMode,
+                    'markdown-dark-mode': darkMode,
+                    'border-dashed': isReadOnly,
+                }"
             >
                 <uploader
                     ref="uploader"
@@ -27,13 +31,13 @@
                             @close="toggleFullscreen"
                         >
                             <markdown-toolbar
-                                :mode="mode"
+                                v-if="fullScreenMode"
+                                v-model:mode="mode"
                                 :buttons="buttons"
                                 :is-read-only="isReadOnly"
                                 :show-dark-mode="fullScreenMode"
                                 :dark-mode="darkMode"
                                 :is-fullscreen="true"
-                                @toggle-mode="mode = $event"
                                 @toggle-dark-mode="toggleDarkMode"
                                 @button-click="handleButtonClick"
                             />
@@ -41,13 +45,12 @@
 
                         <markdown-toolbar
                             v-if="!fullScreenMode"
-                            :mode="mode"
+                            v-model:mode="mode"
                             :buttons="buttons"
                             :is-read-only="isReadOnly"
                             :show-dark-mode="false"
                             :dark-mode="darkMode"
                             :is-fullscreen="false"
-                            @toggle-mode="mode = $event"
                             @toggle-dark-mode="toggleDarkMode"
                             @button-click="handleButtonClick"
                         />
@@ -77,7 +80,7 @@
                                             <Button
                                                 icon="markdown"
                                                 size="sm"
-                                                variant="ghost"
+                                                variant="subtle"
                                                 @click="showCheatsheet = true"
                                                 :aria-label="__('Show Markdown Cheatsheet')"
                                                 :text="__('Markdown Cheatsheet')"
@@ -148,7 +151,7 @@
 import Fieldtype from '../Fieldtype.vue';
 import { marked } from 'marked';
 import { markRaw } from 'vue';
-import PlainTextRenderer from 'marked-plaintext';
+import { TextRenderer as PlainTextRenderer } from '@davidenke/marked-text-renderer';
 import throttle from '@statamic/util/throttle.js';
 import { Button } from '@statamic/ui';
 

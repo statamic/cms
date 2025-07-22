@@ -23,14 +23,14 @@
             >
                 <Dropdown class="ltr:mr-4 rtl:ml-4" v-if="canEditBlueprint || hasItemActions">
                     <template #trigger>
-                        <Button icon="ui/dots" variant="ghost" />
+                        <Button icon="ui/dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
                     </template>
                     <DropdownMenu>
                         <DropdownItem
                             :text="__('Edit Blueprint')"
                             icon="blueprint-edit"
                             v-if="canEditBlueprint"
-                            :redirect="actions.editBlueprint"
+                            :href="actions.editBlueprint"
                         />
                         <DropdownSeparator v-if="canEditBlueprint && itemActions.length" />
                         <DropdownItem
@@ -69,7 +69,6 @@
             :origin-values="originValues"
             :origin-meta="originMeta"
             :errors="errors"
-            :is-root="isRoot"
             :site="site"
             :localized-fields="localizedFields"
             :sync-field-confirmation-text="syncFieldConfirmationText"
@@ -118,6 +117,16 @@
                 </PublishTabs>
             </LivePreview>
         </PublishContainer>
+
+        <confirmation-modal
+            v-if="pendingLocalization"
+            :title="__('Unsaved Changes')"
+            :body-text="__('Are you sure? Unsaved changes will be lost.')"
+            :button-text="__('Continue')"
+            :danger="true"
+            @confirm="confirmSwitchLocalization"
+            @cancel="pendingLocalization = null"
+        />
     </div>
 </template>
 
@@ -192,9 +201,7 @@ export default {
         isCreating: Boolean,
         isInline: Boolean,
         initialReadOnly: Boolean,
-        initialIsRoot: Boolean,
         initialPermalink: String,
-        preloadedAssets: Array,
         canEditBlueprint: Boolean,
         createAnotherUrl: String,
         listingUrl: String,
@@ -221,13 +228,13 @@ export default {
             state: 'new',
             published: this.initialPublished,
             readOnly: this.initialReadOnly,
-            isRoot: this.initialIsRoot,
             permalink: this.initialPermalink,
             preferencesPrefix: `taxonomies.${this.taxonomyHandle}`,
             saveKeyBinding: null,
             quickSaveKeyBinding: null,
             quickSave: false,
             syncFieldConfirmationText: __('messages.sync_term_field_confirmation_text'),
+            pendingLocalization: null,
         };
     },
 
@@ -253,7 +260,7 @@ export default {
         },
 
         canSave() {
-            return !this.readOnly && this.isDirty && !this.somethingIsLoading;
+            return !this.readOnly && !this.somethingIsLoading;
         },
 
         livePreviewUrl() {
@@ -384,11 +391,19 @@ export default {
             if (localization.active) return;
 
             if (this.isDirty) {
-                if (!confirm(__('Are you sure? Unsaved changes will be lost.'))) {
-                    return;
-                }
+                this.pendingLocalization = localization;
+                return;
             }
 
+            this.switchToLocalization(localization);
+        },
+
+        confirmSwitchLocalization() {
+            this.switchToLocalization(this.pendingLocalization);
+            this.pendingLocalization = null;
+        },
+
+        switchToLocalization(localization) {
             this.localizing = localization.handle;
 
             if (localization.exists) {
@@ -416,7 +431,6 @@ export default {
                 this.title = data.editing ? data.values.title : this.title;
                 this.actions = data.actions;
                 this.fieldset = data.blueprint;
-                this.isRoot = data.isRoot;
                 this.site = localization.handle;
                 this.localizing = false;
                 this.$nextTick(() => this.$refs.container.clearDirtyState());
@@ -458,8 +472,6 @@ export default {
             this.quickSave = true;
             this.save();
         });
-
-        this.$refs.container.store.setPreloadedAssets(this.preloadedAssets);
     },
 
     created() {

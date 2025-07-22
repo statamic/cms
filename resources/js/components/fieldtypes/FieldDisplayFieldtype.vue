@@ -4,15 +4,14 @@
             :id="fieldId"
             :name="name"
             :value="value"
-            @update:modelValue="updateDebounced"
-            @keydown="$emit('keydown', $event)"
+            @update:model-value="updateDebounced"
             @focus="$emit('focus')"
             @blur="$emit('blur')"
         >
             <template #append>
                 <Button
                     size="sm"
-                    :icon="hidden ? 'eye' : 'eye-closed'"
+                    :icon="hidden ? 'eye-closed' : 'eye'"
                     variant="ghost"
                     @click="toggleHidden"
                 />

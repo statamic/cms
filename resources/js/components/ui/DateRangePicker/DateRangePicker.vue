@@ -87,10 +87,13 @@ const calendarEvents = computed(() => ({
                         'flex w-full bg-white dark:bg-gray-900',
                         'border border-gray-300 dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:inset-shadow-2xs dark:inset-shadow-black',
                         'leading-[1.375rem] text-gray-600 dark:text-gray-300',
-                        'shadow-ui-sm not-prose h-10 rounded-lg py-2 ps-3 pe-10 disabled:shadow-none',
+                        'shadow-ui-sm not-prose h-10 rounded-lg py-2 px-3 disabled:shadow-none',
                         'data-invalid:border-red-500',
                     ]"
                 >
+                    <DateRangePickerTrigger v-if="!inline">
+                        <Button as="div" variant="ghost" size="sm" icon="calendar" class="-my-1.25 -ms-2" />
+                    </DateRangePickerTrigger>
                     <template v-for="item in segments.start" :key="item.part">
                         <DateRangePickerInput v-if="item.part === 'literal'" :part="item.part" type="start">
                             {{ item.value }}
@@ -107,7 +110,7 @@ const calendarEvents = computed(() => ({
                             {{ item.value }}
                         </DateRangePickerInput>
                     </template>
-                    <span class="mx-2"> - </span>
+                    <span class="mx-1.5 text-gray-400 dark:text-gray-600">&ndash;</span>
                     <template v-for="item in segments.end" :key="item.part">
                         <DateRangePickerInput v-if="item.part === 'literal'" :part="item.part" type="end">
                             {{ item.value }}
@@ -124,13 +127,9 @@ const calendarEvents = computed(() => ({
                             {{ item.value }}
                         </DateRangePickerInput>
                     </template>
+                    <div class="flex-1" />
+                    <Button @click="emit('update:modelValue', null)" variant="ghost" size="sm" icon="x" class="-my-1.25 -me-2" />
                 </div>
-                <DateRangePickerTrigger
-                    v-if="!inline"
-                    class="absolute end-1 top-1 bottom-1 flex items-center justify-center rounded-lg px-2 text-gray-400 outline-hidden hover:bg-gray-50 focus:bg-gray-50 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
-                >
-                    <Icon name="calendar" class="h-4 w-4" />
-                </DateRangePickerTrigger>
             </DateRangePickerField>
 
             <DateRangePickerContent
@@ -148,5 +147,10 @@ const calendarEvents = computed(() => ({
             </Card>
         </DateRangePickerRoot>
     </div>
-    <Button @click="emit('update:modelValue', null)" type="button" class="" text="Clear" size="xs" />
 </template>
+
+<style>
+[data-reka-popper-content-wrapper] {
+    @apply z-100!;
+}
+</style>

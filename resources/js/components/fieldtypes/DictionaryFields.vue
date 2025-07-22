@@ -1,22 +1,31 @@
 <template>
-    <publish-container
+    <PublishContainer
         name="dictionary-fields"
         :blueprint="blueprint"
-        :values="value"
+        :model-value="value"
         :meta="publishMeta"
         :errors="errors"
-        @updated="update"
-        v-slot="{ setFieldValue, setFieldMeta }"
+        as-config
+        @update:model-value="update"
     >
-        <publish-fields :fields="fields" @updated="setFieldValue" @meta-updated="setFieldMeta" />
-    </publish-container>
+        <FieldsProvider :fields="fields">
+            <Fields />
+        </FieldsProvider>
+    </PublishContainer>
 </template>
 
 <script>
 import Fieldtype from './Fieldtype.vue';
+import { PublishContainer, FieldsProvider, PublishFields as Fields } from '@statamic/ui';
 
 export default {
     mixins: [Fieldtype],
+
+    components: {
+        PublishContainer,
+        FieldsProvider,
+        Fields,
+    },
 
     inject: ['store'],
 
@@ -42,7 +51,7 @@ export default {
         publishMeta() {
             return {
                 ...this.meta.type.meta,
-                ...this.meta.dictionaries[this.dictionary]?.meta,
+                ...this.meta.dictionaries[this.dictionary]?.meta, // todo: some fieldtypes aren't getting their meta
             };
         },
 

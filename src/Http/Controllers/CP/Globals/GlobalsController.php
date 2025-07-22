@@ -193,7 +193,6 @@ class GlobalsController extends CpController
                 'fields' => [
                     'sites' => [
                         'type' => 'global_set_sites',
-                        'mode' => 'select',
                         'required' => true,
                     ],
                 ],

@@ -33,6 +33,13 @@
     text-box: cap alphabetic;
 }
 
+@utility placeholder-xs {
+    /* =Jay. The default of 1em on field inputs feels a bit clumsy/big */
+    &::placeholder {
+        font-size: 0.975em;
+    }
+}
+
 /* UTILITIES / STATES
 =================================================== */
 /* Here we typically need a negative outline-offset because of the inner shadow on inputs */
@@ -109,6 +116,42 @@
     @apply bg-white/85 backdrop-blur-sm;
 }
 
+/* UTILITIES / STATES / DECORATION / MASK BACKGROUND
+=================================================== */
+/* Notes...
+
+    URL example
+    -----------
+    /cp/taxonomies/something
+
+    What does it do?
+    ----------------
+    - Adds a pseudo element below to mask anything that flows below it
+    - This was created to add to the "customize column" button, so that filters flowing below it would be half-masked/flow under smoothly
+
+*/
+/* HTML Example...
+
+    <div class="absolute right-0 mask-bg"> <-- needs to be position:absolute or position:relative
+
+    </div>
+
+*/
+@utility mask-bg {
+    z-index: var(--z-index-above);
+    &::before {
+        content: '';
+        position: absolute;
+        z-index: var(--z-index-below);
+        inset: -0.2rem -1.5rem;
+        background: radial-gradient(circle at center, white 50%,transparent 100%);
+        border-radius: 1.5rem;
+    }
+    .dark &::before {
+        background: radial-gradient(circle at center, var(--color-gray-900) 50%,transparent 100%);
+    }
+}
+
 /* UTILITIES / STATES / DECORATION / ARCHIECTURAL LINES
 =================================================== */
 /* Notes...
@@ -125,14 +168,15 @@
 */
 /* HTML Example...
 
-<div class="content-card bg-architectural-lines"> <-- background lines added to this element
-    <footer>
-        <button>Create Collection</button> <--- circular line effect added to this descendended button in the footer
-    </footer>
-</div>
+    <div class="content-card bg-architectural-lines"> <-- background lines added to this element
+        <footer>
+            <button>Create Collection</button> <--- circular line effect added to this descendended button in the footer
+        </footer>
+    </div>
 
 */
 @utility bg-architectural-lines {
+    overflow: hidden;
     &::before {
         content: '';
         pointer-events: none;

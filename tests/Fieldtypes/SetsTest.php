@@ -223,10 +223,11 @@ class SetsTest extends TestCase
                                 'instructions' => null,
                                 'instructions_position' => 'above',
                                 'listable' => 'hidden',
-                                'sortable' => true,
                                 'visibility' => 'visible',
+                                'sortable' => true,
                                 'replicator_preview' => true,
                                 'duplicate' => true,
+                                'actions' => true,
                                 'type' => 'text',
                                 'input_type' => 'text',
                                 'placeholder' => null,
@@ -260,10 +261,11 @@ class SetsTest extends TestCase
                                 'instructions' => null,
                                 'instructions_position' => 'above',
                                 'listable' => 'hidden',
-                                'sortable' => true,
                                 'visibility' => 'visible',
+                                'sortable' => true,
                                 'replicator_preview' => true,
                                 'duplicate' => true,
+                                'actions' => true,
                                 'type' => 'text',
                                 'input_type' => 'text',
                                 'placeholder' => null,
@@ -320,10 +322,11 @@ class SetsTest extends TestCase
                                 'instructions' => null,
                                 'instructions_position' => 'above',
                                 'listable' => 'hidden',
-                                'sortable' => true,
                                 'visibility' => 'visible',
+                                'sortable' => true,
                                 'replicator_preview' => true,
                                 'duplicate' => true,
+                                'actions' => true,
                                 'type' => 'text',
                                 'input_type' => 'text',
                                 'placeholder' => null,
@@ -416,15 +419,6 @@ class SetsTest extends TestCase
                 ],
             ],
         ], $field->process()->value());
-    }
-
-    #[Test]
-    public function it_provides_statamic_plump_icons_to_script_by_default()
-    {
-        $jsonVariables = Statamic::jsonVariables(request());
-
-        $this->assertNull($jsonVariables['setIconsDirectory']);
-        $this->assertEquals('plump', $jsonVariables['setIconsFolder']);
     }
 
     #[Test]

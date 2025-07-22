@@ -22,24 +22,18 @@
                 </TabList>
 
                 <div v-if="!loading">
-                    <publish-container
-                        :name="`field-settings-${$.uid}`"
-                        :blueprint="blueprint"
-                        :values="values"
-                        :meta="meta"
-                        :errors="errors"
-                        :is-root="true"
-                        @updated="values = $event"
-                        v-slot="{ setFieldValue, setFieldMeta }"
-                    >
-                        <TabContent name="settings">
-                            <publish-sections
-                                :sections="blueprint.tabs[0].sections"
-                                @updated="(handle, value) => updateField(handle, value, setFieldValue)"
-                                @meta-updated="setFieldMeta"
-                            />
-                        </TabContent>
-                    </publish-container>
+                    <TabContent name="settings">
+                        <ui-publish-container
+                            :blueprint="adjustedBlueprint"
+                            :meta="meta"
+                            :errors="errors"
+                            v-model="values"
+                            v-model:modified-fields="editedFields"
+                            :origin-values="originValues"
+                            :origin-meta="originMeta"
+                            as-config
+                        />
+                    </TabContent>
 
                     <TabContent name="conditions">
                         <CardPanel :heading="__('Conditions')">
@@ -64,14 +58,12 @@
 </template>
 
 <script>
-import PublishField from '../publish/Field.vue';
 import { FieldConditionsBuilder, FIELD_CONDITIONS_KEYS } from '../field-conditions/FieldConditions.js';
 import FieldValidationBuilder from '../field-validation/Builder.vue';
 import { Heading, Button, Tabs, TabList, TabTrigger, TabContent, CardPanel } from '@statamic/ui';
 
 export default {
     components: {
-        PublishField,
         FieldConditionsBuilder,
         FieldValidationBuilder,
         Heading,
@@ -118,6 +110,8 @@ export default {
         return {
             values: null,
             meta: null,
+            originValues: null,
+            originMeta: null,
             error: null,
             errors: {},
             editedFields: clone(this.overrides),
@@ -129,6 +123,22 @@ export default {
     },
 
     computed: {
+        adjustedBlueprint() {
+            let blueprint = this.blueprint;
+
+            blueprint.tabs = [blueprint.tabs[0]]; // Only the first tab is supported/necessary.
+
+            // Make all fields localizable so they can be edited.
+            // Fields are non-localizable by default, but this UI requires all fields to be editable.
+            blueprint.tabs[0].sections.forEach((section, sectionIndex) => {
+                section.fields.forEach((field, fieldIndex) => {
+                    blueprint.tabs[0].sections[sectionIndex].fields[fieldIndex].localizable = true;
+                });
+            });
+
+            return blueprint;
+        },
+
         selectedWidth: function () {
             var width = this.config.width || 100;
             var found = this.widths.find((w) => w.value === width);
@@ -175,10 +185,6 @@ export default {
     },
 
     methods: {
-        configFieldClasses(field) {
-            return [`form-group p-4 m-0 ${field.type}-fieldtype`, field_width_class(field.width)];
-        },
-
         getFieldValue(handle) {
             return this.values[handle];
         },
@@ -263,9 +269,12 @@ export default {
         },
 
         load() {
+            const field = this.fields.find(f => f.handle === this.config.handle);
+
             this.$axios
                 .post(cp_url('fields/edit'), {
                     type: this.type,
+                    reference: field?.type === 'reference' ? field.field_reference : false,
                     values: this.config,
                 })
                 .then((response) => {
@@ -274,6 +283,8 @@ export default {
                     this.blueprint = response.data.blueprint;
                     this.values = response.data.values;
                     this.meta = { ...response.data.meta };
+                    this.originValues = response.data.originValues;
+                    this.originMeta = response.data.originMeta;
                 });
         },
     },

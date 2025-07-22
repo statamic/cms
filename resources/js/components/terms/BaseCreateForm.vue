@@ -12,7 +12,6 @@
         :initial-published="published"
         :initial-localizations="localizations"
         :initial-has-origin="false"
-        :initial-is-root="true"
         :initial-origin-values="{}"
         :initial-site="site"
         :can-edit-blueprint="canEditBlueprint"

@@ -69,70 +69,55 @@ function reset() {
 </script>
 
 <template>
-    <div>
+    <div data-ui-column-customizer>
         <Tooltip :text="__('Customize Columns')">
-            <Button icon="sliders-vertical" :disabled="reorderable" @click="open = true" />
+            <Button icon="sliders-vertical" :disabled="reorderable" @click="open = true" :aria-label="__('Customize Columns')" />
         </Tooltip>
         <Modal :title="__('Customize Columns')" v-model:open="open">
-            <div class="flex h-full flex-col">
-                <div class="dark:bg-dark-600 flex min-h-0 grow rounded-t-md bg-gray-100">
+            <div class="border rounded-lg dark:border-gray-900">
+                <div class="flex">
                     <!-- Available Columns -->
-                    <div
-                        class="dark:border-dark-900 flex w-1/2 flex-col outline-hidden ltr:border-r ltr:text-left rtl:border-l rtl:text-right"
-                    >
-                        <header
-                            v-text="__('Available Columns')"
-                            class="dark:border-dark-900 dark:bg-dark-700 border-b bg-white px-3 py-2 text-sm font-medium"
-                        />
-                        <div
-                            class="flex flex-1 flex-col space-y-1 overflow-y-scroll px-3 py-2 shadow-inner select-none"
-                        >
-                            <div
-                                class="column-picker-item"
+                    <div class="flex w-1/2 flex-col text-start">
+                        <ui-heading :text="__('Available Columns')" class="py-2 px-3 border-b dark:border-gray-900" />
+                        <div class="flex flex-1 flex-col space-y-1 overflow-y-scroll px-3 py-2 select-none bg-gray-100 dark:bg-gray-900 rounded-bs-lg">
+                            <ui-checkbox-item
+                                v-model="column.visible"
+                                :label="column.label"
                                 v-for="column in sortedHiddenColumns"
                                 :key="column.field"
-                                v-if="hiddenColumns.length"
-                            >
-                                <label class="flex cursor-pointer items-center">
-                                    <input type="checkbox" class="ltr:mr-2 rtl:ml-2" v-model="column.visible" />
-                                    {{ __(column.label) }}
-                                </label>
-                            </div>
+                                class="column-picker-item"
+                            />
                         </div>
                     </div>
 
                     <!-- Displayed Columns -->
-                    <div class="flex w-1/2 flex-col">
-                        <header
-                            v-text="__('Displayed Columns')"
-                            class="dark:border-dark-900 dark:bg-dark-700 flex-none border-b bg-white px-3 py-2 text-sm font-medium"
-                        />
-                        <div class="grow overflow-y-scroll shadow-inner">
+                    <div class="flex w-1/2 flex-col text-start border-l dark:border-gray-700">
+                        <ui-heading :text="__('Displayed Columns')" class="py-2 px-3 border-b dark:border-gray-900" />
+                        <div class="overflow-y-scroll bg-gray-100 dark:bg-gray-900 rounded-be-lg">
                             <sortable-list
                                 v-model="selectedColumns"
-                                :vertical="true"
                                 :distance="5"
+                                :mirror="false"
+                                :vertical="true"
                                 item-class="item"
                                 handle-class="item"
-                                append-to=".modal-body"
-                                constrain-dimensions
+                                append-to="[data-ui-modal-content]"
+                                :constrain-dimensions="true"
                             >
-                                <div class="space-y-1 p-3 px-3 select-none">
+                                <div class="space-y-1.5 p-3 select-none">
                                     <div
-                                        class="item sortable cursor-grab"
+                                        class="item sortable cursor-grab py-2 px-2.5 gap-3 relative rounded-lg bg-white dark:bg-gray-700 flex items-center justify-between text-xs shadow"
                                         v-for="column in selectedColumns"
                                         :key="column.field"
                                         tabindex="-1"
                                     >
-                                        <div class="item-move py-1">&nbsp;</div>
-                                        <div class="flex flex-1 items-center p-0 ltr:ml-2 rtl:mr-2">
-                                            <input
-                                                type="checkbox"
-                                                class="ltr:mr-2 rtl:ml-2"
+                                        <ui-drag-handle class="item-move" />
+                                        <div class="flex flex-1 items-center">
+                                            <ui-checkbox-item
                                                 v-model="column.visible"
+                                                :label="column.label"
                                                 :disabled="selectedColumns.length === 1 || column.required"
                                             />
-                                            {{ __(column.label) }}
                                         </div>
                                     </div>
                                 </div>
