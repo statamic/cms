@@ -3,6 +3,9 @@
 namespace Statamic\Http\Controllers\CP\Assets;
 
 use Illuminate\Http\Request;
+use Statamic\CP\Breadcrumbs\Breadcrumb;
+use Statamic\CP\Breadcrumbs\Breadcrumbs;
+use Statamic\Facades\AssetContainer;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\Fields\ManagesBlueprints;
 
@@ -18,6 +21,25 @@ class AssetContainerBlueprintController extends CpController
     public function edit($container)
     {
         $blueprint = $container->blueprint();
+
+        Breadcrumbs::push(new Breadcrumb(
+            text: 'Asset Containers',
+        ));
+
+        Breadcrumbs::push(new Breadcrumb(
+            text: $container->title(),
+            url: request()->url(),
+            icon: 'assets',
+            links: AssetContainer::all()
+                ->reject(fn ($c) => $c->handle() === $container->handle())
+                ->map(fn ($c) => [
+                    'text' => $c->title(),
+                    'icon' => 'assets',
+                    'url' => cp_route('blueprints.asset-containers.edit', $c->handle()),
+                ])
+                ->values()
+                ->all(),
+        ));
 
         return view('statamic::assets.containers.blueprints.edit', [
             'container' => $container,
