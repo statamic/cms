@@ -74,7 +74,7 @@
             }
 
             &:hover {
-                @apply bg-gray-50 dark:bg-white/10;
+                @apply bg-gray-50 dark:bg-white/2.5;
             }
 
             th {
@@ -191,10 +191,10 @@
 }
 
 .status-index-field {
-    @apply inline-block shrink justify-center rounded-full bg-gray-300 px-2 py-0.5 text-center text-xs text-gray-900 dark:bg-gray-200 dark:text-dark-150;
+    @apply inline-block shrink justify-center rounded-full bg-gray-300 px-2 py-0.5 text-center text-xs text-gray-900 dark:bg-gray-300/5 dark:text-dark-150;
 
     &.status-published:not(.status-private) {
-        @apply bg-green-200 text-green-900 dark:bg-green-300 dark:text-green-950;
+        @apply bg-green-200 text-green-900 dark:bg-green-300/5 dark:text-green-300;
     }
 
     &.status-scheduled {
