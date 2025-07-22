@@ -74,7 +74,7 @@
                             >
                                 <div class="editor relative focus-within:focus-outline-within" ref="codemirror"></div>
 
-                                    <footer class="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gray-50 dark:bg-gray-950 rounded-b-xl border-t border-gray-200 dark:border-white/15 p-1 text-sm w-full">
+                                    <footer class="flex items-center justify-between bg-gray-50 dark:bg-gray-950 rounded-b-xl border-t border-gray-200 dark:border-white/15 p-1 text-sm w-full" :class="{ 'absolute inset-x-0 bottom-0': fullScreenMode }">
                                         <div class="markdown-cheatsheet-helper">
                                             <Button
                                                 icon="markdown"
