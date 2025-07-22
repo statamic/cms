@@ -53,15 +53,15 @@ class Palette
         }
 
         Facades\Collection::all()
-            ->flatMap(fn ($collection) => $collection->commandPaletteLinksForBlueprints())
+            ->flatMap(fn ($collection) => $collection->entryBlueprintCommandPaletteLinks())
             ->each(fn (Link $link) => $this->addCommand($link));
 
         Facades\Taxonomy::all()
-            ->flatMap(fn ($taxonomy) => $taxonomy->commandPaletteLinksForBlueprints())
+            ->flatMap(fn ($taxonomy) => $taxonomy->termBlueprintCommandPaletteLinks())
             ->each(fn (Link $link) => $this->addCommand($link));
 
         Facades\Nav::all()
-            ->map(fn ($nav) => $nav->commandPaletteLinkForBlueprint())
+            ->map(fn ($nav) => $nav->blueprintCommandPaletteLink())
             ->each(fn (Link $link) => $this->addCommand($link));
 
         // TODO: Womp, got to end of this and realized they don't have `editUrl()` methods, so we'll refactor this to what's above ^
