@@ -26,12 +26,12 @@ class TaxonomyBlueprintsController extends CpController
 
     private function editUrl($taxonomy, $blueprint)
     {
-        return cp_route('taxonomies.blueprints.edit', [$taxonomy, $blueprint]);
+        return cp_route('blueprints.taxonomies.edit', [$taxonomy, $blueprint]);
     }
 
     private function deleteUrl($taxonomy, $blueprint)
     {
-        return cp_route('taxonomies.blueprints.destroy', [$taxonomy, $blueprint]);
+        return cp_route('blueprints.taxonomies.destroy', [$taxonomy, $blueprint]);
     }
 
     public function edit($taxonomy, $blueprint)
@@ -58,7 +58,7 @@ class TaxonomyBlueprintsController extends CpController
     public function create($taxonomy)
     {
         return view('statamic::taxonomies.blueprints.create', [
-            'action' => cp_route('taxonomies.blueprints.store', $taxonomy),
+            'action' => cp_route('blueprints.taxonomies.store', $taxonomy),
         ]);
     }
 
@@ -75,7 +75,7 @@ class TaxonomyBlueprintsController extends CpController
 
         $blueprint = $this->storeBlueprint($request, 'taxonomies.'.$taxonomy->handle());
 
-        return ['redirect' => cp_route('taxonomies.blueprints.edit', [$taxonomy, $blueprint])];
+        return ['redirect' => cp_route('blueprints.taxonomies.edit', [$taxonomy, $blueprint])];
     }
 
     public function destroy($taxonomy, $blueprint)

@@ -26,12 +26,12 @@ class CollectionBlueprintsController extends CpController
 
     private function editUrl($collection, $blueprint)
     {
-        return cp_route('collections.blueprints.edit', [$collection, $blueprint]);
+        return cp_route('blueprints.collections.edit', [$collection, $blueprint]);
     }
 
     private function deleteUrl($collection, $blueprint)
     {
-        return cp_route('collections.blueprints.destroy', [$collection, $blueprint]);
+        return cp_route('blueprints.collections.destroy', [$collection, $blueprint]);
     }
 
     public function edit($collection, $blueprint)
@@ -58,7 +58,7 @@ class CollectionBlueprintsController extends CpController
     public function create($collection)
     {
         return view('statamic::collections.blueprints.create', [
-            'action' => cp_route('collections.blueprints.store', $collection),
+            'action' => cp_route('blueprints.collections.store', $collection),
         ]);
     }
 
@@ -75,7 +75,7 @@ class CollectionBlueprintsController extends CpController
 
         $blueprint = $this->storeBlueprint($request, 'collections.'.$collection->handle());
 
-        return ['redirect' => cp_route('collections.blueprints.edit', [$collection, $blueprint])];
+        return ['redirect' => cp_route('blueprints.collections.edit', [$collection, $blueprint])];
     }
 
     public function destroy($collection, $blueprint)
