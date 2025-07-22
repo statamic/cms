@@ -73,13 +73,11 @@ class FolderAsset extends JsonResource
 
     private function thumbnails(): array
     {
-        $data = ['thumbnail' => null];
-
-        if ($this->isImage() || $this->isSvg()) {
-            $data = $this->getImageThumbnail();
-        } elseif ($this->isVideo() && config('statamic.assets.video_thumbnails', true)) {
-            $data = $this->getVideoThumbnail();
-        }
+        $data = match (true) {
+            $this->isImage() || $this->isSvg() => $this->getImageThumbnail(),
+            $this->isVideo() && config('statamic.assets.video_thumbnails', true) => $this->getVideoThumbnail(),
+            default => ['thumbnail' => null],
+        };
 
         return array_merge(
             $data,
