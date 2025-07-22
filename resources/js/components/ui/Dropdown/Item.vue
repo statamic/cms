@@ -16,7 +16,7 @@ const slots = useSlots();
 const hasDefaultSlot = !!slots.default;
 
 const classes = cva({
-    base: 'col-span-2 grid grid-cols-subgrid items-center rounded-lg px-1 py-1.5 text-sm antialiased text-gray-700 dark:text-gray-300 not-data-disabled:cursor-pointer data-disabled:opacity-50 hover:not-data-disabled:bg-gray-50 dark:hover:not-data-disabled:bg-gray-950 outline-hidden focus-visible:bg-gray-100 dark:focus-visible:bg-gray-950',
+    base: 'col-span-2 grid grid-cols-subgrid items-center rounded-lg px-1 py-1.5 text-sm antialiased text-gray-700 dark:text-gray-300 not-data-disabled:cursor-pointer data-disabled:opacity-50 hover:not-data-disabled:bg-gray-50 dark:hover:not-data-disabled:bg-gray-950 outline-hidden',
     variants: {
         variant: {
             default: 'text-gray-700 dark:text-gray-300',
