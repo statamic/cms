@@ -175,7 +175,8 @@ async function updateIframeContents(url, target, payload) {
         const updatedDocument = new DOMParser().parseFromString(updatedHtml, 'text/html');
 
         if (typeof iframeWindow.Alpine !== 'undefined' && typeof iframeWindow.Alpine.morph !== 'undefined') {
-            iframeWindow.Alpine.morph(iframeDocument.body, updatedDocument.body);
+            iframeWindow.Alpine.morph(iframeDocument.head, iframeDocument.head);
+            iframeWindow.Alpine.morph(iframeDocument.body, iframeDocument.body);
             return;
         }
 
@@ -184,8 +185,8 @@ async function updateIframeContents(url, target, payload) {
             return;
         }
 
-        const body = iframeDocument.body;
-        body.innerHTML = updatedDocument.body.innerHTML;
+        iframeDocument.head.innerHTML = updatedDocument.head.innerHTML;
+        iframeDocument.body.innerHTML = updatedDocument.body.innerHTML;
 
         return;
     }
