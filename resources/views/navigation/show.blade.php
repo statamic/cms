@@ -9,7 +9,7 @@
         pages-url="{{ cp_route('navigation.tree.index', $nav->handle()) }}"
         submit-url="{{ cp_route('navigation.tree.update', $nav->handle()) }}"
         edit-url="{{ $nav->editUrl() }}"
-        blueprint-url="{{ cp_route('navigation.blueprint.edit', $nav->handle()) }}"
+        blueprint-url="{{ cp_route('blueprints.navigation.edit', $nav->handle()) }}"
         site="{{ $site }}"
         :sites="{{ json_encode($sites) }}"
         :collections="{{ json_encode($collections) }}"

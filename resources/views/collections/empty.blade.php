@@ -49,7 +49,7 @@
 
         @can('configure fields')
             <ui-empty-state-item
-                href="{{ cp_route('collections.blueprints.index', [$collection->handle()]) }}"
+                href="{{ cp_route('blueprints.collections.index', [$collection->handle()]) }}"
                 icon="blueprints"
                 heading="{{ __('Configure Blueprints') }}"
                 description="{{ __('statamic::messages.collection_next_steps_blueprints_description') }}"

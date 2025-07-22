@@ -11,7 +11,7 @@
         @can('configure fields')
             <ui-button
                 :text="__('Edit User Blueprint')"
-                href="{{ cp_route('users.blueprint.edit') }}"
+                href="{{ cp_route('blueprints.users.edit') }}"
             ></ui-button>
         @endcan
 
