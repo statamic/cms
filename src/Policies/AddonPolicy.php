@@ -24,6 +24,6 @@ class AddonPolicy
     {
         $user = User::fromUser($user);
 
-        return $user->hasPermission("edit {$addon->slug()} settings");
+        return $user->hasPermission("edit {$addon->package()} settings");
     }
 }
