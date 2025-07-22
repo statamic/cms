@@ -48,13 +48,13 @@ class CollectionBlueprintsController extends CpController
         Breadcrumbs::push(new Breadcrumb(
             text: $blueprint->title(),
             url: request()->url(),
-            icon: 'blueprints',
+            icon: 'collections',
             links: $collection
                 ->entryBlueprints()
                 ->reject(fn ($b) => $b->handle() === $blueprint->handle())
                 ->map(fn ($b) => [
                     'text' => $b->title(),
-                    'icon' => 'blueprints',
+                    'icon' => 'collections',
                     'url' => cp_route('blueprints.collections.edit', [$collection, $b]),
                 ])
                 ->values()
