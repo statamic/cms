@@ -498,6 +498,7 @@ export default {
          * Open the asset selector
          */
         addAsset () {
+            if (!this.assetsEnabled) return;
             this.showAssetSelector = true;
         },
 
@@ -507,6 +508,13 @@ export default {
         shortcut(e) {
             const mod = e.metaKey || e.ctrlKey;
             if (!mod) return;
+
+            // Handle Cmd+Shift+A for asset insertion
+            if (this.assetsEnabled && e.shiftKey && e.keyCode === 65) {
+                e.preventDefault();
+                this.addAsset();
+                return;
+            }
 
             const shortcuts = {
                 66: () => this.toggleInline('bold'), // cmd+b
