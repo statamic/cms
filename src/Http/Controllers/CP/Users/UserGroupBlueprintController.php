@@ -3,6 +3,8 @@
 namespace Statamic\Http\Controllers\CP\Users;
 
 use Illuminate\Http\Request;
+use Statamic\CP\Breadcrumbs\Breadcrumb;
+use Statamic\CP\Breadcrumbs\Breadcrumbs;
 use Statamic\Facades\UserGroup;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\Fields\ManagesBlueprints;
@@ -19,6 +21,10 @@ class UserGroupBlueprintController extends CpController
     public function edit()
     {
         $blueprint = UserGroup::make()->blueprint();
+
+        Breadcrumbs::push(new Breadcrumb(
+            text: 'User Group',
+        ));
 
         return view('statamic::usergroups.blueprints.edit', [
             'blueprint' => $blueprint,
