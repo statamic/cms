@@ -84,8 +84,8 @@
             }
         }
     }
-    /* e.g. >> /cp/collections, when you tab to the title, and /cp/collections/pages when tabbing through the tree text */
-    .main-content a,
+    /* e.g. >> /cp/collections, when you tab to the title, and /cp/collections/pages when tabbing through the tree text. Avoid elements where border-radius has already been set, e.g. "Create Entry" button */
+    .main-content a:not([class*="rounded"]),
     /* e.g. >> /cp/collections/pages, tabbing through the home icon. Be careful not to carpet bomb this e.g. don't want to affect Bard buttons. */
     .page-tree .v-popper--has-tooltip {
         &:focus-visible {
