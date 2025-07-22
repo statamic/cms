@@ -8,7 +8,7 @@ export default function createContext(name) {
     };
 
     const injectContext = () => {
-        return inject(injectionKey);
+        return inject(injectionKey, null);
     };
 
     return [injectContext, provideContext, injectionKey];
