@@ -76,17 +76,11 @@ class Palette
             ->map(fn ($form) => $form->blueprintCommandPaletteLink())
             ->each(fn (Link $link) => $this->addCommand($link));
 
-        // TODO: Womp, got to end of this and realized they don't have `editUrl()` methods, so we'll refactor this to what's above ^
-        // collect()
-        //     ->merge(Facades\Collection::all()->flatMap(fn ($collection) => $collection->entryBlueprints()))
-        //     ->merge(Facades\Taxonomy::all()->flatMap(fn ($taxonomy) => $taxonomy->termBlueprints()))
-        //     ->merge(Facades\Nav::all()->map->blueprint())
-        //     ->merge(Facades\GlobalSet::all()->map->blueprint())
-        //     ->merge(Facades\AssetContainer::all()->map->blueprint())
-        //     ->merge(Blueprint::getAdditionalNamespaces()->keys()->flatMap(fn (string $key) => Blueprint::in($key)->sortBy(fn (Blueprint $blueprint) => $blueprint->title())))
-        //     ->flatten()
-        //     ->map(fn (Blueprint $blueprint) => $blueprint->generateCommandPaletteLink())
-        //     ->each(fn (Link $link) => $this->addCommand($link));
+        $this->addCommand(Facades\User::blueprintCommandPaletteLink());
+        $this->addCommand(Facades\UserGroup::blueprintCommandPaletteLink());
+
+        // TODO: Handle additional blueprint namespaces
+        // Blueprint::getAdditionalNamespaces()->keys()->flatMap(fn (string $key) => Blueprint::in($key)->sortBy(fn (Blueprint $blueprint) => $blueprint->title()))
 
         Facades\Fieldset::all()
             ->map(fn (Fieldset $fieldset) => $fieldset->commandPaletteLink())
