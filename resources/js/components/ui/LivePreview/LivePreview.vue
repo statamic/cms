@@ -141,7 +141,7 @@ const postMessageToIframe = (container, url, payload) => {
 };
 
 // This was in a mixin. Probably should go into a composable.
-function updateIframeContents(url, target, payload) {
+async function updateIframeContents(url, target, payload) {
     const iframe = document.createElement('iframe');
     iframe.setAttribute('frameborder', '0');
     iframe.setAttribute('src', url);
@@ -167,6 +167,26 @@ function updateIframeContents(url, target, payload) {
 
     if (!shouldRefresh) {
         postMessageToIframe(container, url, payload);
+
+        const iframeWindow = container.firstChild.contentWindow;
+        const iframeDocument = container.firstChild.contentDocument;
+
+        const updatedHtml = await fetch(url).then((response) => response.text());
+        const updatedDocument = new DOMParser().parseFromString(updatedHtml, 'text/html');
+
+        if (typeof iframeWindow.Alpine !== 'undefined' && typeof iframeWindow.Alpine.morph !== 'undefined') {
+            iframeWindow.Alpine.morph(iframeDocument.body, updatedDocument.body);
+            return;
+        }
+
+        if (typeof iframeWindow.Livewire !== 'undefined') {
+            iframeWindow.Livewire.components.components().forEach(component => component.call('$refresh'));
+            return;
+        }
+
+        const body = iframeDocument.body;
+        body.innerHTML = updatedDocument.body.innerHTML;
+
         return;
     }
 
