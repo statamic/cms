@@ -24,6 +24,25 @@ class CorePreferences
             'display' => __('Start Page'),
             'instructions' => __('statamic::messages.preference_start_page_instructions'),
         ]);
+
+        Preference::tab('accessibility', __('Accessibility'), function () {
+            Preference::register('wcag_conformity', [
+                'type' => 'toggle',
+                'display' => __('Strict WCAG 2.2 Conformity'),
+                'instructions' => __('statamic::messages.preference_wcag'),
+            ]);
+            Preference::register('contrast', [
+                'type' => 'button_group',
+                'display' => __('Increase Contrast'),
+                'instructions' => __('statamic::messages.preference_contrast'),
+                'default' => 'default',
+                'options' => [
+                    'default' => __('Default'),
+                    'increased' => __('Increased'),
+                    'auto' => __('System'),
+                ],
+            ]);
+        });
     }
 
     private function localeOptions(): array

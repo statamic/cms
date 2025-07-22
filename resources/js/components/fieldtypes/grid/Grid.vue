@@ -40,10 +40,20 @@
                         @blur="blurred"
                     />
 
-                    <button class="btn" v-if="canAddRows" v-text="__(addRowButtonLabel)" @click.prevent="addRow" />
+                    <ui-button size="sm" v-if="canAddRows" v-text="__(addRowButtonLabel)" @click.prevent="addRow" />
                 </section>
             </div>
         </element-container>
+
+        <confirmation-modal
+            v-if="deletingRow"
+            :title="__('Delete Row')"
+            :body-text="__('Are you sure?')"
+            :button-text="__('Delete')"
+            :danger="true"
+            @confirm="confirmDelete"
+            @cancel="deletingRow = null"
+        />
     </portal>
 </template>
 
@@ -67,14 +77,12 @@ export default {
             containerWidth: null,
             focused: false,
             fullScreenMode: false,
+            deletingRow: null,
             provide: {
                 grid: this.makeGridProvide(),
-                storeName: this.storeName,
             },
         };
     },
-
-    inject: ['storeName'],
 
     provide: {
         isInGridField: true,
@@ -186,9 +194,26 @@ export default {
         },
 
         removed(index) {
-            if (!confirm(__('Are you sure?'))) return;
+            // if the row is empty, don't show the confirmation. this.value[index] is an object with the row data
+            const row = this.value[index];
+            const emptyRow = Object.fromEntries(
+                this.fields.map((field) => [field.handle, this.meta.defaults[field.handle]]),
+            );
+
+            // Check if the row has been modified from its default state
+            const hasChanges = this.fields.some(field => row[field.handle] !== emptyRow[field.handle]);
+
+            if (hasChanges) {
+                this.deletingRow = index;
+                return;
+            }
 
             this.update([...this.value.slice(0, index), ...this.value.slice(index + 1)]);
+        },
+
+        confirmDelete() {
+            this.update([...this.value.slice(0, this.deletingRow), ...this.value.slice(this.deletingRow + 1)]);
+            this.deletingRow = null;
         },
 
         duplicate(index) {

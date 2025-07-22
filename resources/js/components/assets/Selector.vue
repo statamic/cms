@@ -1,51 +1,110 @@
 <template>
-    <div class="flex h-full flex-col justify-end bg-white dark:bg-dark-800">
-        <div class="flex-1 overflow-scroll">
-            <asset-browser
-                :container="container"
-                :initial-per-page="$config.get('paginationSize')"
-                :initial-columns="columns"
-                :selected-path="folder"
-                :selected-assets="browserSelections"
-                :restrict-folder-navigation="restrictFolderNavigation"
-                :max-files="maxFiles"
-                :query-scopes="queryScopes"
-                :autoselect-uploads="true"
-                :autofocus-search="true"
-                allow-selecting-existing-upload
-                @selections-updated="selectionsUpdated"
-                @asset-doubleclicked="select"
-            >
-                <template slot="contextual-actions" v-if="browserSelections.length">
-                    <button class="btn action mb-6" @click="browserSelections = []">{{ __('Uncheck All') }}</button>
-                </template>
-            </asset-browser>
-        </div>
+    <div class="dark:bg-dark-800 h-full bg-white">
+        <div class="flex h-full min-h-0 flex-col">
+            <div class="flex flex-1 flex-col gap-4 overflow-scroll p-4">
+                <AssetBrowser
+                    :container="container"
+                    :initial-per-page="$config.get('paginationSize')"
+                    :initial-columns="columns"
+                    :selected-path="folder"
+                    :selected-assets="browserSelections"
+                    :restrict-folder-navigation="restrictFolderNavigation"
+                    :max-files="maxFiles"
+                    :query-scopes="queryScopes"
+                    :autoselect-uploads="true"
+                    allow-selecting-existing-upload
+                    :allow-bulk-actions="false"
+                    @selections-updated="selectionsUpdated"
+                    @asset-doubleclicked="select"
+                    @initialized="focusSearchInput"
+                >
+                    <template #initializing>
+                        <div class="flex flex-1">
+                            <div class="absolute inset-0 z-200 flex items-center justify-center text-center">
+                                <loading-graphic />
+                            </div>
+                        </div>
+                    </template>
 
-        <div class="flex items-center justify-between border-t bg-gray-200 p-4 dark:border-dark-200 dark:bg-dark-500">
-            <div
-                class="text-sm text-gray-700"
-                v-text="
-                    hasMaxFiles
-                        ? __n(':count/:max selected', browserSelections, { max: maxFiles })
-                        : __n(':count selected|:count selected', browserSelections)
-                "
-            ></div>
-            <div>
-                <button type="button" class="btn" @click="close">
-                    {{ __('Cancel') }}
-                </button>
+                    <template #header="{ canUpload, openFileBrowser, canCreateFolders, startCreatingFolder, mode, modeChanged }">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="flex flex-1 items-center gap-3">
+                                <Search ref="search" />
+                            </div>
 
-                <button type="button" class="btn-primary ltr:ml-2 rtl:mr-2" @click="select">
-                    {{ __('Select') }}
-                </button>
+                            <Button v-if="canUpload" :text="__('Upload')" icon="upload" @click="openFileBrowser" />
+                            <Button v-if="canCreateFolders" :text="__('Create Folder')" icon="folder-add" @click="startCreatingFolder" />
+
+                            <ToggleGroup :model-value="mode" @update:model-value="modeChanged">
+                                <ToggleItem icon="layout-grid" value="grid" />
+                                <ToggleItem icon="layout-list" value="table" />
+                            </ToggleGroup>
+                        </div>
+                    </template>
+                </AssetBrowser>
+            </div>
+
+            <div class="flex items-center justify-between border-t bg-gray-100 p-4">
+                <div
+                    class="dark:text-dark-150 text-sm text-gray-700"
+                    v-text="
+                        hasMaxFiles
+                            ? __n(':count/:max selected', browserSelections, { max: maxFiles })
+                            : __n(':count asset selected|:count assets selected', browserSelections)
+                    "
+                />
+
+                <div class="flex items-center space-x-3">
+                    <Button variant="ghost" @click="close">
+                        {{ __('Cancel') }}
+                    </Button>
+
+                    <Button variant="primary" @click="select">
+                        {{ __('Select') }}
+                    </Button>
+                </div>
             </div>
         </div>
     </div>
 </template>
 
 <script>
+import AssetBrowser from './Browser/Browser.vue'
+import {
+    Button,
+    ToggleGroup,
+    ToggleItem,
+    ListingTable as Table,
+    ListingSearch as Search,
+    ListingPagination as Pagination,
+    Panel,
+    PanelFooter,
+    ListingPagination, Slider, PanelHeader,
+} from '@statamic/ui';
+import HasPreferences from '@statamic/components/data-list/HasPreferences.js';
+import Breadcrumbs from '@statamic/components/assets/Browser/Breadcrumbs.vue';
+import Grid from '@statamic/components/assets/Browser/Grid.vue';
+import Uploads from '@statamic/components/assets/Uploads.vue';
+
 export default {
+    mixins: [HasPreferences],
+
+    components: {
+        Uploads,
+        PanelHeader, Grid,
+        Slider,
+        ListingPagination, Breadcrumbs,
+        AssetBrowser,
+        Button,
+        ToggleGroup,
+        ToggleItem,
+        Table,
+        Search,
+        Pagination,
+        Panel,
+        PanelFooter,
+    },
+
     props: {
         container: Object,
         folder: String,
@@ -105,6 +164,10 @@ export default {
          */
         selectionsUpdated(selections) {
             this.browserSelections = selections;
+        },
+
+        focusSearchInput() {
+            this.$nextTick(() => this.$refs.search.focus());
         },
     },
 };

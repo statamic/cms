@@ -42,6 +42,10 @@ class RolesController extends CpController
             return $roles;
         }
 
+        if ($roles->count() === 0) {
+            return view('statamic::roles.empty');
+        }
+
         return view('statamic::roles.index', [
             'roles' => $roles,
             'columns' => [

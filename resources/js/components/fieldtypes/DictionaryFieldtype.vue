@@ -3,12 +3,13 @@
         class="w-full"
         searchable
         ignore-filter
-        :disabled="config.disabled || isReadOnly"
+        :disabled="config.disabled"
         :max-selections="config.max_items"
+        :model-value="value"
+        :multiple
         :options="normalizedOptions"
         :placeholder="__(config.placeholder)"
-        :multiple
-        :model-value="value"
+        :read-only="isReadOnly"
         @update:modelValue="comboboxUpdated"
         @search="search"
     >
@@ -27,11 +28,11 @@
                 :model-value="value"
                 @update:modelValue="comboboxUpdated"
             >
-                <div class="vs__selected-options-outside flex flex-wrap gap-2 pt-3">
+                <div class="flex flex-wrap gap-2 pt-3">
                     <div
                         v-for="option in selectedOptions"
                         :key="getOptionValue(option)"
-                        class="vs__selected sortable-item cursor-grab"
+                        class="sortable-item cursor-grab"
                     >
                         <Badge size="lg" color="white">
                             <div v-if="labelHtml" v-html="getOptionLabel(option)"></div>

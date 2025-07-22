@@ -17,7 +17,7 @@
                     <ui-dropdown-item
                         :text="__('Edit Blueprints')"
                         icon="blueprint-edit"
-                        href="{{ cp_route('taxonomies.blueprints.index', $taxonomy) }}"
+                        href="{{ cp_route('blueprints.taxonomies.index', $taxonomy) }}"
                     ></ui-dropdown-item>
                 @endcan
 

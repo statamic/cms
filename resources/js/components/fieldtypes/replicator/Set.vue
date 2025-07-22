@@ -1,7 +1,7 @@
 <script setup>
 import Fields from '@statamic/components/ui/Publish/Fields.vue';
 import FieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
-import { computed, inject } from 'vue';
+import { computed, inject, ref } from 'vue';
 import {
     Icon,
     Switch,
@@ -41,7 +41,11 @@ const props = defineProps({
     showFieldPreviews: Boolean,
 });
 
-const { store } = injectContainerContext();
+const {
+    setFieldValue,
+    setFieldMeta,
+    previews
+} = injectContainerContext();
 const fieldPathPrefix = computed(() => `${props.fieldPath}.${props.index}`);
 const metaPathPrefix = computed(() => `${props.metaPath}.existing.${props.id}`);
 const isInvalid = computed(() => Object.keys(props.config).length === 0);
@@ -66,11 +70,9 @@ const fieldActionPayload = computed(() => ({
     values: props.values,
     config: props.config,
     // meta: this.meta,
-    update: (handle, value) => store.setDottedFieldValue({ path: `${fieldPathPrefix.value}.${handle}`, value }),
-    updateMeta: (handle, value) => store.setDottedFieldMeta({ path: `${metaPathPrefix.value}.${handle}`, value }),
+    update: (handle, value) => setFieldValue(`${fieldPathPrefix.value}.${handle}`, value),
+    updateMeta: (handle, value) => setFieldMeta(`${metaPathPrefix.value}.${handle}`, value),
     isReadOnly: props.readOnly,
-    // store: this.store,
-    // storeName: this.storeName,
 }));
 
 const fieldActions = computed(() => {
@@ -78,7 +80,7 @@ const fieldActions = computed(() => {
 });
 
 const previewText = computed(() => {
-    return Object.entries(data_get(store.previews, fieldPathPrefix.value) || {})
+    return Object.entries(data_get(previews.value, fieldPathPrefix.value) || {})
         .filter(([handle, value]) => {
             if (!handle.endsWith('_')) return false;
             handle = handle.substr(0, handle.length - 1); // Remove the trailing underscore.
@@ -102,15 +104,18 @@ const previewText = computed(() => {
 });
 
 function toggleEnabledState() {
-    store.setDottedFieldValue({ path: `${fieldPathPrefix.value}.enabled`, value: !props.enabled });
+    setFieldValue(`${fieldPathPrefix.value}.enabled`, !props.enabled);
 }
 
 function toggleCollapsedState() {
     props.collapsed ? emit('expanded') : emit('collapsed');
 }
 
+const deletingSet = ref(false);
+
 function destroy() {
-    if (confirm(__('Are you sure?'))) emit('removed');
+    deletingSet.value = false;
+    emit('removed');
 }
 </script>
 
@@ -164,7 +169,7 @@ function destroy() {
 
                     <Dropdown>
                         <template #trigger>
-                            <Button icon="ui/dots" variant="ghost" size="xs" />
+                            <Button icon="ui/dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
                         </template>
                         <DropdownMenu>
                             <DropdownItem
@@ -183,7 +188,7 @@ function destroy() {
                             <DropdownItem
                                 :text="__('Delete Set')"
                                 variant="destructive"
-                                @click="destroy"
+                                @click="deletingSet = true"
                             />
                         </DropdownMenu>
                     </Dropdown>
@@ -206,5 +211,15 @@ function destroy() {
                 </FieldsProvider>
             </Motion>
         </div>
+
+        <confirmation-modal
+            v-if="deletingSet"
+            :title="__('Delete Set')"
+            :body-text="__('Are you sure?')"
+            :button-text="__('Delete')"
+            :danger="true"
+            @confirm="destroy"
+            @cancel="deletingSet = false"
+        />
     </div>
 </template>

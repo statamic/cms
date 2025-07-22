@@ -78,19 +78,6 @@ class ApiController extends Controller
     }
 
     /**
-     * Filter, sort, and paginate query for API resource output.
-     *
-     * @param  \Statamic\Query\Builder  $query
-     * @return \Statamic\Extensions\Pagination\LengthAwarePaginator
-     *
-     * @deprecated
-     */
-    protected function filterSortAndPaginate($query)
-    {
-        return $this->updateAndPaginate($query);
-    }
-
-    /**
      * Filter, sort, scope, and paginate query for API resource output.
      *
      * @param  \Statamic\Query\Builder  $query

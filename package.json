@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "rm -rf resources/dist/build && vite",
     "build": "vite build",
+    "build-dev": "vite build --mode development",
     "svgo": "svgo -f ./resources/svg/  -r",
     "test": "vitest run",
     "test-watch": "npm run test -- --watch --notify",
@@ -13,6 +14,7 @@
     "knip": "knip"
   },
   "dependencies": {
+    "@davidenke/marked-text-renderer": "^3.0.0",
     "@floating-ui/dom": "^1.2.5",
     "@he-tree/vue": "^2.8.2",
     "@hoppscotch/vue-toasted": "^0.1.0",
@@ -65,8 +67,7 @@
     "laravel-echo": "^1.16.0",
     "lodash-es": "^4.17.21",
     "lowlight": "^3.1.0",
-    "marked": "^13.0.0",
-    "marked-plaintext": "0.0.2",
+    "marked": "^15.0.0",
     "motion-v": "^1.0.0-beta.0",
     "mousetrap": "~1.6.5",
     "nprogress": "^0.2.0",
@@ -98,15 +99,15 @@
     "@rollup/plugin-inject": "^5.0.3",
     "@tailwindcss/typography": "^0.5.10",
     "@tailwindcss/vite": "^4.1.8",
-    "@vitejs/plugin-vue": "^5.2.1",
+    "@vitejs/plugin-vue": "^6.0.0",
     "@vue/test-utils": "^2.4.6",
     "jsdom": "^26.0.0",
     "knip": "^5.43.6",
-    "laravel-vite-plugin": "^1.2.0",
+    "laravel-vite-plugin": "^2.0.0",
     "rollup-plugin-visualizer": "^5.14.0",
     "tailwindcss": "^4.1.8",
-    "vite": "^6.3.5",
-    "vitest": "^3.0.5",
+    "vite": "^7.0.4",
+    "vitest": "^3.2.0",
     "vue-component-debug": "^0.1.0"
   }
 }

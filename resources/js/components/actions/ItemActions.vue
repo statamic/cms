@@ -26,11 +26,11 @@ let preparedActions = computed(() => {
 
 let errors = ref({});
 
-function runAction(action, values, done) {
+function runAction(action, values, onSuccess, onError) {
     errors.value = {};
     emit('started');
 
-    runServerAction({ action, values, done, url: props.url, selections: [props.item] })
+    runServerAction({ action, values, onSuccess, onError, url: props.url, selections: [props.item] })
         .then((data) => emit('completed', true, data))
         .catch((data) => {
             errors.value = data.errors;

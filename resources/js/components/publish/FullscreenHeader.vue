@@ -7,7 +7,7 @@
         <div class="flex items-center justify-end py-2.5">
             <Dropdown class="mr-2">
                 <template #trigger>
-                    <Button icon="ui/dots" variant="ghost" size="xs" />
+                    <Button icon="ui/dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
                 </template>
                 <DropdownMenu>
                     <DropdownItem

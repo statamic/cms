@@ -338,10 +338,11 @@ class FieldTest extends TestCase
             'instructions' => 'Test instructions',
             'instructions_position' => 'below',
             'listable' => 'hidden',
-            'sortable' => true,
             'visibility' => 'visible',
+            'sortable' => true,
             'replicator_preview' => true,
             'duplicate' => true,
+            'actions' => true,
             'type' => 'example',
             'validate' => 'required',
             'foo' => 'bar',
@@ -603,6 +604,31 @@ class FieldTest extends TestCase
         $this->assertIsArray($type);
         $this->assertInstanceOf(\GraphQL\Type\Definition\NonNull::class, $type['type']);
         $this->assertInstanceOf(\GraphQL\Type\Definition\FloatType::class, $type['type']->getWrappedType());
+    }
+
+    #[Test]
+    #[Group('graphql')]
+    public function it_keeps_the_graphql_type_nullable_if_its_sometimes_required()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            public function toGqlType()
+            {
+                return new \GraphQL\Type\Definition\FloatType;
+            }
+        };
+
+        FieldtypeRepository::shouldReceive('find')
+            ->with('fieldtype')
+            ->andReturn($fieldtype);
+
+        $field = new Field('test', ['type' => 'fieldtype', 'validate' => 'required|sometimes']);
+
+        $type = $field->toGql();
+
+        $this->assertIsArray($type);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\NullableType::class, $type['type']);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\FloatType::class, $type['type']);
     }
 
     #[Test]

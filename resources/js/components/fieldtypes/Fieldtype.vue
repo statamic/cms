@@ -3,6 +3,8 @@ import HasFieldActions from '../field-actions/HasFieldActions';
 import debounce from '@statamic/util/debounce.js';
 import props from './props.js';
 import emits from './emits.js';
+import { publishContextKey } from '@statamic/ui';
+import { isRef } from 'vue';
 
 export default {
     emits,
@@ -10,13 +12,8 @@ export default {
     mixins: [HasFieldActions],
 
     inject: {
-        fieldActionStore: {
-            from: 'store',
-            default: null,
-        },
-        fieldActionStoreName: {
-            from: 'storeName',
-            default: null,
+        injectedPublishContainer: {
+            from: publishContextKey
         },
     },
 
@@ -32,11 +29,25 @@ export default {
         }, 150),
 
         updateMeta(value) {
-            this.$emit('meta-updated', value);
+            this.$emit('update:meta', value);
         },
     },
 
     computed: {
+        publishContainer() {
+            // The injectedPublishContainer contains refs. We'll unwrap everything so that we can do
+            // this.publishContainer.someValue instead of this.publishContainer.someValue.value
+            // When using the Options API, this feels more natural. However since this is a
+            // computed, it won't be avaialble within data(). In those cases you will
+            // need to use this.injectedPublishContainer.someValue.value directly.
+            return Object.fromEntries(
+               Object.entries(this.injectedPublishContainer).map(([key, value]) => [
+                   key,
+                   isRef(value) ? value.value : value,
+               ])
+           );
+        },
+
         name() {
             if (this.namePrefix) {
                 return `${this.namePrefix}[${this.handle}]`;
@@ -82,8 +93,6 @@ export default {
                 update: this.update,
                 updateMeta: this.updateMeta,
                 isReadOnly: this.isReadOnly,
-                store: this.fieldActionStore,
-                storeName: this.fieldActionStoreName,
             };
         },
     },

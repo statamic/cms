@@ -39,20 +39,21 @@ import 'codemirror/mode/yaml-frontmatter/yaml-frontmatter';
 const emit = defineEmits(['update:mode', 'update:model-value', 'focus', 'blur']);
 
 const props = defineProps({
-    theme: { type: String, default: 'material' },
-    rulers: { type: Object, default: () => {} },
+    allowModeSelection: { type: Boolean, default: true },
     disabled: { type: Boolean, default: false },
-    keyMap: { type: String, default: 'sublime' },
-    tabSize: { type: Number, required: false },
+    fieldActions: { type: Array, default: () => [] },
     indentType: { type: String, default: 'tabs' },
+    keyMap: { type: String, default: 'sublime' },
     lineNumbers: { type: Boolean, default: true },
     lineWrapping: { type: Boolean, default: true },
-    allowModeSelection: { type: Boolean, default: true },
-    showModeLabel: { type: Boolean, default: true },
     mode: { type: String, default: 'javascript' },
     modelValue: { type: String, default: '' },
+    readOnly: { type: Boolean, default: false },
+    rulers: { type: Object, default: () => {} },
+    showModeLabel: { type: Boolean, default: true },
+    tabSize: { type: Number, required: false },
+    theme: { type: String, default: 'material' },
     title: { type: String, default: () => __('Code Editor') },
-    fieldActions: { type: Array, default: () => [] },
 });
 
 const modes = ref([
@@ -114,7 +115,7 @@ function initCodeMirror() {
             lineNumbers: props.lineNumbers,
             lineWrapping: props.lineWrapping,
             matchBrackets: true,
-            readOnly: props.disabled ? 'nocursor' : false,
+            readOnly: props.readOnly || props.disabled ? 'nocursor' : false,
             theme: exactTheme.value,
             inputStyle: 'contenteditable',
             rulers: rulers,
@@ -218,9 +219,8 @@ watch(
     <portal name="code-fullscreen" :disabled="!fullScreenMode" target-class="code-fieldtype">
         <div
             :class="[
-                '@container/markdown block w-full overflow-hidden rounded-lg bg-white dark:bg-gray-900',
-                // 'border border-gray-300 dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:inset-shadow-2xs dark:inset-shadow-black',
-                'text-gray-800 dark:text-gray-300',
+                '@container/markdown border border-transparent with-contrast:border-gray-500 block w-full overflow-hidden rounded-lg bg-white dark:bg-gray-900',
+                'text-gray-900 dark:text-gray-300',
                 'shadow-ui-sm not-prose appearance-none antialiased disabled:shadow-none',
                 themeClass,
                 { 'code-fullscreen': fullScreenMode },
@@ -245,6 +245,7 @@ watch(
             </publish-field-fullscreen-header>
             <div
                 class="flex items-center justify-between rounded-t-lg bg-gray-50 px-2 py-1 dark:bg-gray-950 border border-b-0 border-gray-300 dark:border-none"
+                :class="{ 'border-dashed': readOnly }"
                 v-if="showToolbar"
             >
                 <div>

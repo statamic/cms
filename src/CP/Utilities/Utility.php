@@ -33,7 +33,7 @@ class Utility
         return $this
             ->fluentlyGetOrSet('icon')
             ->setter(function ($value) {
-                return Str::startsWith($value, '<svg') ? $value : Statamic::svg('icons/light/'.$value);
+                return Str::startsWith($value, '<svg') ? $value : Statamic::svg('icons/'.$value);
             })
             ->value($icon);
     }

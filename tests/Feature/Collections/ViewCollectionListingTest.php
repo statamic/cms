@@ -50,7 +50,7 @@ class ViewCollectionListingTest extends TestCase
                     'entries_url' => 'http://localhost/cp/collections/bar',
                     'create_entry_url' => 'http://localhost/cp/collections/bar/entries/create/en',
                     'url' => null,
-                    'blueprints_url' => 'http://localhost/cp/collections/bar/blueprints',
+                    'blueprints_url' => 'http://localhost/cp/fields/blueprints/collections/bar',
                     'scaffold_url' => 'http://localhost/cp/collections/bar/scaffold',
                     'deleteable' => true,
                     'editable' => true,
@@ -79,7 +79,7 @@ class ViewCollectionListingTest extends TestCase
                     'entries_url' => 'http://localhost/cp/collections/foo',
                     'create_entry_url' => 'http://localhost/cp/collections/foo/entries/create/en',
                     'url' => null,
-                    'blueprints_url' => 'http://localhost/cp/collections/foo/blueprints',
+                    'blueprints_url' => 'http://localhost/cp/fields/blueprints/collections/foo',
                     'scaffold_url' => 'http://localhost/cp/collections/foo/scaffold',
                     'deleteable' => true,
                     'editable' => true,
@@ -90,7 +90,7 @@ class ViewCollectionListingTest extends TestCase
                     'icon' => 'collections',
                 ],
             ]))
-            ->assertDontSee('no-results');
+            ->assertDontSee('ui-empty-state-menu');
     }
 
     #[Test]
@@ -103,7 +103,7 @@ class ViewCollectionListingTest extends TestCase
             ->get(cp_route('collections.index'))
             ->assertSuccessful()
             ->assertViewHas('collections', collect([]))
-            ->assertSee('no-results');
+            ->assertSee('ui-empty-state-menu');
     }
 
     #[Test]
@@ -121,7 +121,7 @@ class ViewCollectionListingTest extends TestCase
             ->assertViewHas('collections', function ($collections) {
                 return count($collections) === 1 && $collections[0]['id'] === 'bar';
             })
-            ->assertDontSee('no-results');
+            ->assertDontSee('ui-empty-state-menu');
     }
 
     #[Test]
@@ -139,7 +139,7 @@ class ViewCollectionListingTest extends TestCase
             ->assertViewHas('collections', function ($collections) {
                 return $collections->map->id->all() === ['bar', 'foo'];
             })
-            ->assertDontSee('no-results');
+            ->assertDontSee('ui-empty-state-menu');
     }
 
     #[Test]

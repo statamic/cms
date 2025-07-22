@@ -9,7 +9,7 @@
                 <ui-icon v-if="isRoot" name="home" class="size-4" v-tooltip="__('This is the root page')" />
                 <a
                     @click.prevent="$emit('edit', $event)"
-                    :class="{ 'text-sm font-medium': isTopLevel }"
+                    :class="{ 'text-sm font-medium is-top-level-branch': isTopLevelBranch }"
                     :href="page.edit_url"
                     v-text="title"
                 />
@@ -26,8 +26,11 @@
                     class="transition duration-100 [&_svg]:size-4! -mx-1.5"
                     icon="ui/chevron-down"
                     size="xs"
+                    round
                     variant="ghost"
-                    :class="{ '-rotate-90': !isOpen }"
+                    :class="{ '-rotate-90 is-closed': !isOpen, 'is-open': isOpen }"
+                    :aria-label="isOpen ? __('Collapse') : __('Expand')"
+                    :aria-expanded="isOpen"
                     @click.stop="$emit('toggle-open')"
                 />
 
@@ -92,7 +95,7 @@ export default {
     },
 
     computed: {
-        isTopLevel() {
+        isTopLevelBranch() {
             return this.depth === 1;
         },
 
@@ -122,17 +125,6 @@ export default {
     },
 
     methods: {
-        getStatusClass() {
-            switch (this.page.status) {
-                case 'published':
-                    return 'bg-green-400';
-                case 'draft':
-                    return 'bg-gray-400 dark:bg-dark-200';
-                default:
-                    return 'bg-transparent border border-gray-600';
-            }
-        },
-
         getStatusTooltip() {
             let label = __(this.page.status) || __('Text item');
 

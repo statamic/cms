@@ -915,6 +915,16 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         File::delete(dirname($this->path()).'/'.$this->handle);
     }
 
+    public function commandPaletteLinksForBlueprints()
+    {
+        return $this
+            ->entryBlueprints()
+            ->map(fn ($blueprint) => $blueprint->commandPaletteLink(
+                type: 'Collections',
+                url: cp_route('blueprints.collections.edit', [$this, $blueprint]),
+            ));
+    }
+
     public static function __callStatic($method, $parameters)
     {
         return Facades\Collection::{$method}(...$parameters);

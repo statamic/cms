@@ -15,8 +15,8 @@ const props = defineProps({
 
 <template>
     <CardPanel :heading="heading" class="max-w-md m-auto">
-        <div class="flex flex-wrap [:has(>&)]:p-1.5">
+        <ul class="flex flex-wrap [:has(>&)]:p-1.5">
             <slot />
-        </div>
+        </ul>
     </CardPanel>
 </template>

@@ -56,6 +56,8 @@ class ExtensionServiceProvider extends ServiceProvider
         Dictionaries\Countries::class,
         Dictionaries\Currencies::class,
         Dictionaries\File::class,
+        Dictionaries\Languages::class,
+        Dictionaries\Locales::class,
         Dictionaries\Timezones::class,
     ];
 

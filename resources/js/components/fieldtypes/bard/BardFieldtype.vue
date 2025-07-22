@@ -6,7 +6,7 @@
         <div :class="{ 'publish-fields': fullScreenMode }">
             <div :class="fullScreenMode && wrapperClasses">
                 <div
-                    class="bard-fieldtype"
+                    class="bard-fieldtype with-contrast:border-gray-500"
                     :class="{ 'bard-fullscreen': fullScreenMode }"
                     ref="container"
                     @dragstart.stop="ignorePageHeader(true)"
@@ -90,7 +90,6 @@
                                 :sets="groupConfigs"
                                 class="bard-set-selector"
                                 @added="addSet"
-                                @clicked-away="clickedAwayFromSetPicker"
                             >
                                 <template #trigger>
                                     <button
@@ -99,11 +98,10 @@
                                         :style="{ transform: `translateY(${y}px)` }"
                                         :aria-label="__('Add Set')"
                                         v-tooltip="__('Add Set')"
-                                        @click="addSetButtonClicked"
                                     >
                                         <svg-icon
                                             name="micro/plus"
-                                            class="dark:group-hover:dark-text-100 dark:text-dark-175 h-3 w-3 text-gray-800 group-hover:text-black"
+                                            class="dark:group-hover:dark-text-100 dark:text-dark-175 h-3 w-3 text-gray-900 group-hover:text-black"
                                         />
                                     </button>
                                 </template>
@@ -192,8 +190,6 @@ export default {
         LinkToolbarButton,
     },
 
-    inject: ['store', 'storeName'],
-
     provide: {
         isInBardField: true,
     },
@@ -214,7 +210,6 @@ export default {
             showAddSetButton: false,
             provide: {
                 bard: this.makeBardProvide(),
-                storeName: this.storeName,
                 bardSets: this.config.sets,
             },
         };
@@ -278,23 +273,17 @@ export default {
             return indexes;
         },
 
-        storeState() {
-            if (!this.store) return undefined;
-
-            return this.store;
-        },
-
         site() {
-            return this.storeState ? this.storeState.site : this.$config.get('selectedSite');
+            return this.publishContainer.site ?? this.$config.get('selectedSite');
         },
 
         setsWithErrors() {
-            if (!this.storeState) return [];
+            if (!this.publishContainer) return [];
 
             return Object.values(this.setIndexes).filter((setIndex) => {
                 const prefix = `${this.fieldPathPrefix || this.handle}.${setIndex}.`;
 
-                return Object.keys(this.storeState.errors).some((key) => key.startsWith(prefix));
+                return Object.keys(this.publishContainer.errors).some((key) => key.startsWith(prefix));
             });
         },
 
@@ -882,17 +871,6 @@ export default {
                 isReadOnly: { get: () => this.readOnly },
             });
             return bard;
-        },
-
-        addSetButtonClicked() {
-            if (this.setConfigs.length === 1) {
-                this.addSet(this.setConfigs[0].handle);
-            }
-        },
-
-        clickedAwayFromSetPicker($event) {
-            if (this.$el.contains($event.target)) return;
-            this.showAddSetButton = false;
         },
     },
 };

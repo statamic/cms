@@ -16,9 +16,9 @@
         <Input
             v-model="slug"
             :id="fieldId"
-            :isReadOnly="isReadOnly"
+            :read-only="isReadOnly"
             :name="slug"
-            :disabled="isReadOnly"
+            :disabled="config.disabled"
             @focus="$emit('focus')"
             @blur="$emit('blur')"
         >
@@ -53,8 +53,6 @@ export default {
         Button,
     },
 
-    inject: ['store'],
-
     data() {
         return {
             slug: this.value,
@@ -79,12 +77,12 @@ export default {
                 key = dottedPrefix + '.' + field;
             }
 
-            return this.store?.values[key] || null;
+            return data_get(this.publishContainer?.values, key);
         },
 
         language() {
-            if (!this.store) return;
-            const targetSite = this.store.site;
+            if (!this.publishContainer) return;
+            const targetSite = this.publishContainer.site;
             return targetSite ? Statamic.$config.get('sites').find((site) => site.handle === targetSite).lang : null;
         },
     },
@@ -112,10 +110,10 @@ export default {
     },
 
     methods: {
-        handleLocalizationCreated({ store }) {
-            // Only reset for the "slug" field in the matching store.
+        handleLocalizationCreated({ container }) {
+            // Only reset for the "slug" field in the matching container.
             // Other slug fields that aren't named "slug" should be left alone.
-            if (this.handle === 'slug' && store === this.store) {
+            if (this.handle === 'slug' && container.name === this.publishContainer.name) {
                 this.$refs.slugify.reset();
             }
         },

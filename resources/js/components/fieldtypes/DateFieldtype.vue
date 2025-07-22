@@ -5,10 +5,13 @@
         <Component
             :is="pickerComponent"
             v-if="hasDate || isInline"
-            :model-value="datePickerValue"
+            :disabled="config.disabled"
             :granularity="datePickerGranularity"
             :inline="isInline"
-            :disabled="isReadOnly"
+            :min="config.earliest_date"
+            :max="config.latest_date"
+            :model-value="datePickerValue"
+            :read-only="isReadOnly"
             @update:model-value="datePickerUpdated"
         />
     </div>
@@ -28,8 +31,6 @@ export default {
     },
 
     mixins: [Fieldtype],
-
-    inject: ['store'],
 
     data() {
         return {
@@ -98,11 +99,11 @@ export default {
     },
 
     created() {
-        this.$events.$on(`container.${this.storeName}.saving`, this.triggerChangeOnFocusedField);
+        this.$events.$on(`container.${this.publishContainer.name}.saving`, this.triggerChangeOnFocusedField);
     },
 
     unmounted() {
-        this.$events.$off(`container.${this.storeName}.saving`, this.triggerChangeOnFocusedField);
+        this.$events.$off(`container.${this.publishContainer.name}.saving`, this.triggerChangeOnFocusedField);
     },
 
     methods: {

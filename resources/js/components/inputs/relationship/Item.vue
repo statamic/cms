@@ -45,7 +45,7 @@
                 <div class="flex items-center" v-if="!readOnly">
                     <Dropdown>
                         <template #trigger>
-                            <Button icon="ui/dots" variant="ghost" size="xs" v-bind="attrs" />
+                            <Button icon="ui/dots" variant="ghost" size="xs" v-bind="$attrs" :aria-label="__('Open dropdown menu')" />
                         </template>
                         <DropdownMenu>
                             <DropdownItem
@@ -70,6 +70,7 @@
 import { getActivePinia } from 'pinia';
 import InlineEditForm from './InlineEditForm.vue';
 import { Button, Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
+import { containerContextKey } from '@statamic/components/ui/Publish/Container.vue';
 
 export default {
     components: {
@@ -81,8 +82,8 @@ export default {
     },
 
     inject: {
-        storeName: {
-            default: null,
+        publishContainer: {
+            from: containerContextKey,
         },
     },
 
@@ -110,12 +111,13 @@ export default {
             if (this.item.invalid) return;
 
             if (this.item.reference) {
-                const storeRefs = getActivePinia()
-                    ._s.values()
-                    .map((store) => store.reference);
-                if (Array.from(storeRefs).includes(this.item.reference)) {
-                    this.$toast.error(__("You're already editing this item."));
-                    return;
+                let parentContainer = this.publishContainer.parentContainer;
+                while (parentContainer) {
+                    if (parentContainer.reference.value === this.item.reference) {
+                        this.$toast.error(__("You're already editing this item."));
+                        return;
+                    }
+                    parentContainer = parentContainer.parentContainer;
                 }
             }
 
@@ -128,7 +130,7 @@ export default {
             this.item.private = responseData.private;
             this.item.status = responseData.status;
 
-            this.$events.$emit(`live-preview.${this.storeName}.refresh`);
+            this.$events.$emit(`live-preview.${this.publishContainer.name.value}.refresh`);
         },
     },
 };

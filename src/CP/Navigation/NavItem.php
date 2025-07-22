@@ -3,6 +3,8 @@
 namespace Statamic\CP\Navigation;
 
 use Illuminate\Support\Collection;
+use Statamic\CommandPalette\Category;
+use Statamic\CommandPalette\Link;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\URL;
 use Statamic\Statamic;
@@ -312,6 +314,14 @@ class NavItem
     }
 
     /**
+     * Check if we should assume nested URL conventions for active state on children.
+     */
+    protected function doesntHaveExplicitChildren(): bool
+    {
+        return (bool) ! $this->children;
+    }
+
+    /**
      * Check if this nav item was ever a child before user preferences were applied.
      */
     protected function wasOriginallyChild(): bool
@@ -396,6 +406,7 @@ class NavItem
         if ($this->currentUrlIsNotExplicitlyReferencedInNav()) {
             switch (true) {
                 case $this->currentUrlIsRestfulDescendant():
+                case $this->doesntHaveExplicitChildren():
                 case $this->wasOriginallyChild():
                     return $this->isActiveByPattern($this->active);
             }
@@ -555,6 +566,34 @@ class NavItem
     public function name(...$arguments)
     {
         return $this->display(...$arguments);
+    }
+
+    /**
+     * Transform nav item and associated children to valid command palette `Link` instances.
+     */
+    public function commandPaletteLinks(?NavItem $parentItem = null): array
+    {
+        $displayItem = $parentItem ?? $this;
+
+        $text = $displayItem->section() !== 'Top Level'
+            ? __($displayItem->section()).' » '.__($displayItem->display())
+            : __($displayItem->display());
+
+        if ($parentItem) {
+            $text .= ' » '.__($this->display());
+        }
+
+        $link = (new Link(text: $text, category: Category::Navigation))
+            ->url($this->url())
+            ->icon($this->icon());
+
+        if ($children = $this->resolveChildren()->children()) {
+            $childLinks = $children->flatMap(fn ($child) => $child->commandPaletteLinks($this));
+        }
+
+        return collect([$link])
+            ->merge($childLinks ?? [])
+            ->all();
     }
 
     /**

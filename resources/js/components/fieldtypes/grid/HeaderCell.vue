@@ -1,5 +1,5 @@
 <template>
-    <th v-show="field.type !== 'hidden'">
+    <th v-show="field.type !== 'hidden'" scope="col">
         <div class="flex items-center justify-between">
             <div>
                 <template v-if="!field.hide_display">{{ __(field.display || field.handle) }}</template>

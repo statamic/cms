@@ -32,14 +32,14 @@ class CoreUtilities
         Utility::register('phpinfo')
             ->action(PhpInfoController::class)
             ->title(__('PHP Info'))
-            ->icon('php')
+            ->icon('info')
             ->description(__('statamic::messages.phpinfo_utility_description'))
             ->docsUrl(Statamic::docsUrl('utilities/phpinfo'));
 
         Utility::register('search')
             ->view('statamic::utilities.search')
             ->title(__('Search'))
-            ->icon('search-utility')
+            ->icon('magnifying-glass')
             ->description(__('statamic::messages.search_utility_description'))
             ->routes(function ($router) {
                 $router->post('/', [UpdateSearchController::class, 'update'])->name('update');
@@ -48,7 +48,7 @@ class CoreUtilities
         Utility::register('email')
             ->view('statamic::utilities.email')
             ->title(__('Email'))
-            ->icon('email-utility')
+            ->icon('mail')
             ->description(__('statamic::messages.email_utility_description'))
             ->docsUrl(Statamic::docsUrl('utilities/email'))
             ->routes(function ($router) {
@@ -58,7 +58,7 @@ class CoreUtilities
         Utility::register('licensing')
             ->action([LicensingController::class, 'show'])
             ->title(__('Licensing'))
-            ->icon('licensing')
+            ->icon('license')
             ->description(__('statamic::messages.licensing_utility_description'))
             ->docsUrl(Statamic::docsUrl('licensing'))
             ->routes(function ($router) {

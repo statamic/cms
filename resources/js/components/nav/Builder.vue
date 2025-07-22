@@ -1,168 +1,138 @@
 <template>
     <div>
-        <header class="mb-6">
-            <div class="flex items-center">
-                <h1 class="flex-1">{{ __(title) }}</h1>
+        <Header :title="title" icon="preferences">
+            <Dropdown placement="left-start">
+                <DropdownMenu>
+                    <DropdownItem :text="__('Reset Nav Customizations')" variant="destructive" icon="history" @click="confirmingReset = true" />
+                </DropdownMenu>
+            </Dropdown>
 
-                <Dropdown placement="left-start" class="me-2">
-                    <DropdownMenu>
-                        <DropdownItem :text="__('Reset Nav Customizations')" variant="destructive" @click="confirmingReset = true" />
-                    </DropdownMenu>
-                </Dropdown>
+            <Button
+                v-if="isDirty"
+                variant="filled"
+                :text="__('Discard changes')"
+                @click="$refs.tree.cancel"
+            />
 
-                <a
-                    @click="discardChanges"
-                    class="text-2xs text-blue-600 underline ltr:mr-4 rtl:ml-4"
-                    v-if="isDirty"
-                    v-text="__('Discard changes')"
-                />
+            <Dropdown placement="left-start">
+                <template #trigger>
+                    <Button :text="__('Add')" icon-append="ui/chevron-down" />
+                </template>
+                <DropdownMenu>
+                    <DropdownItem :text="__('Add Nav Item')" @click="addItem($refs.tree.rootChildren[0])" icon="plus" />
+                    <DropdownItem :text="__('Add Section')" @click="addSection" icon="add-section" />
+                </DropdownMenu>
+            </Dropdown>
 
-                <Dropdown placement="left-start" class="me-2">
+            <ButtonGroup>
+                <Button type="submit" variant="primary" :disabled="!changed" :text="__('Save')" @click="save" />
+
+                <Dropdown align="end" v-if="hasSaveAsOptions">
                     <template #trigger>
-                        <Button icon-append="ui/chevron-down" :text="__('Add Item')" />
+                        <Button icon="ui/chevron-down" variant="primary" />
                     </template>
                     <DropdownMenu>
-                        <DropdownItem :text="__('Add Nav Item')" @click="addItem($refs.tree.rootChildren[0])" />
-                        <DropdownItem :text="__('Add Section')" @click="addSection" />
+                        <DropdownLabel>{{ __('Save to') }}...</DropdownLabel>
+                        <DropdownItem
+                            v-for="option in saveAsOptions"
+                            :key="option.url"
+                            :text="option.label"
+                            @click="saveAs(option.url)"
+                        />
                     </DropdownMenu>
                 </Dropdown>
+            </ButtonGroup>
+        </Header>
 
-<!--                <div class="ms-4">-->
-<!--                    <Button-->
-<!--                        v-if="!hasSaveAsOptions"-->
-<!--                        :text="__('Save Changes')"-->
-<!--                        :disabled="!changed"-->
-<!--                        @click="save"-->
-<!--                    />-->
-<!--                    <Dropdown v-else>-->
-<!--                        <template #trigger>-->
-<!--                            <Button-->
-<!--                                :text="__('Save Changes')"-->
-<!--                                icon-append="ui/chevron-down"-->
-<!--                                :disabled="!changed"-->
-<!--                                @click="save"-->
-<!--                            />-->
-<!--                        </template>-->
-<!--                        <DropdownMenu>-->
-<!--                            <DropdownLabel v-text="__('Save to')" />-->
-<!--                            <DropdownItem-->
-<!--                                v-for="option in saveAsOptions"-->
-<!--                                :text="option.label"-->
-<!--                                @click="saveAs(option.url)"-->
-<!--                            />-->
-<!--                        </DropdownMenu>-->
-<!--                    </Dropdown>-->
-<!--                </div>-->
-
-
-                <div class="ltr:ml-4 ltr:text-left rtl:mr-4 rtl:text-right" :class="{ 'btn-group': hasSaveAsOptions }">
-                    <button
-                        class="btn-primary rtl:pr-4 ltr:pl-4"
-                        :class="{ 'disabled': !changed }"
-                        :disabled="!changed"
-                        @click="save"
-                        v-text="__('Save Changes')" />
-
-                    <Dropdown v-if="hasSaveAsOptions" placement="left-start" class="me-2">
-                        <template #trigger>
-                            <button class="btn-primary flex items-center ltr:rounded-l-none rtl:rounded-r-none">
-                                <svg-icon name="micro/chevron-down-xs" class="w-2" />
-                            </button>
-                        </template>
-                        <DropdownMenu>
-                            <DropdownLabel v-text="__('Save to')" />
-                            <DropdownItem
-                                v-for="option in saveAsOptions"
-                                :text="option.label"
-                                @click="saveAs(option.url)"
-                            />
-                        </DropdownMenu>
-                    </Dropdown>
-                </div>
+        <Panel class="nav-builder">
+            <div class="loading card" v-if="loading">
+                <loading-graphic />
             </div>
-        </header>
 
-        <div class="mb-3 flex justify-end">
-            <a class="text-2xs text-blue-600 underline ltr:mr-4 rtl:ml-4 cursor-pointer" v-text="__('Expand All')" @click="expandAll" />
-            <a
-                class="text-2xs text-blue-600 underline ltr:mr-2 rtl:ml-2"
-                v-text="__('Collapse All')"
-                @click="collapseAll"
-            />
-        </div>
-
-        <div v-if="!loading" class="page-tree w-full">
-            <Draggable
-                ref="tree"
-                v-model="treeData"
-                :node-key="(stat) => stat.data.id"
-                :space="1"
-                :indent="24"
-                :dir="direction"
-                :stat-handler="statHandler"
-                keep-placeholder
-                trigger-class="page-move"
-                :drag-open="false"
-                :each-draggable="eachDraggable"
-                :each-droppable="eachDroppable"
-                :root-droppable="rootDroppable"
-                @change="changed = true"
-                @before-drag-start="beforeDragStart"
-                @after-drop="afterDrop"
-            >
-                <template #placeholder>
-                    <div
-                        class="w-full rounded-sm border border-dashed border-blue-400 bg-blue-500/10 p-2"
-                        :class="{
-                            'mt-8': isSectionNode(draggingStat),
-                            'ml-[-24px]': isDraggingIntoTopLevel,
-                        }"
-                    >
-                        &nbsp;
+            <PanelHeader>
+                <div class="page-tree-header font-medium text-sm items-center flex justify-between">
+                    <div v-text="__('Navigation')" />
+                    <div class="flex gap-2 -me-3">
+                        <ui-button size="sm" icon="tree-collapse" :text="__('Collapse')" @click="collapseAll" />
+                        <ui-button size="sm" icon="tree-expand" :text="__('Expand')" @click="expandAll" />
                     </div>
-                </template>
-                <template #default="{ node, stat }">
-                    <top-level-tree-branch v-if="stat.level === 1 && stat.data?.text === 'Top Level'" :stat="stat" />
-                    <tree-branch
-                        v-else
-                        :item="node"
-                        :parent-section="getParentSectionNode(stat)"
-                        :depth="stat.level"
-                        :stat="stat"
-                        :is-open="stat.open"
-                        :is-child="isChildItemNode(stat)"
-                        :has-children="stat.children.length > 0"
-                        class="mb-px"
-                        :class="{ 'mt-8': isSectionNode(stat) }"
-                        @edit="editItem(stat)"
-                        @toggle-open="stat.open = !stat.open"
-                    >
-                        <template #branch-options="{ isTopLevel }">
-                            <DropdownItem v-if="stat.level < 3" :text="__('Add Item')" @click="addItem(stat)" />
-                            <DropdownItem :text="__('Edit')" @click="editItem(stat)" />
-                            <DropdownItem
-                                v-if="!isSectionNode(stat) && !isTopLevel"
-                                :text="__('Pin to Top Level')"
-                                @click="pinItem(stat)"
-                            />
-                            <DropdownItem
-                                v-if="!isSectionNode(stat)"
-                                :text="__('Duplicate')"
-                                @click="aliasItem(stat)"
-                            />
-                            <DropdownSeparator />
-                            <DropdownItem
-                                v-if="itemIsVisible(stat)"
-                                :text="isHideable(stat) ? __('Hide') : __('Remove')"
-                                variant="destructive"
-                                @click="isHideable(stat) ? hideItem(stat) : removeItem(stat)"
-                            />
-                            <DropdownItem v-else :text="__('Show')" @click="showItem(stat)" />
-                        </template>
-                    </tree-branch>
-                </template>
-            </Draggable>
-        </div>
+                </div>
+            </PanelHeader>
+            <div v-if="!loading" class="page-tree w-full">
+                <Draggable
+                    ref="tree"
+                    v-model="treeData"
+                    :node-key="(stat) => stat.data.id"
+                    :space="1"
+                    :indent="24"
+                    :dir="direction"
+                    :stat-handler="statHandler"
+                    keep-placeholder
+                    trigger-class="page-move"
+                    :each-droppable="eachDroppable"
+                    :root-droppable="rootDroppable"
+                    @change="changed = true"
+                    @before-drag-start="beforeDragStart"
+                    @after-drop="afterDrop"
+                >
+                    <template #placeholder>
+                        <div
+                            class="rounded-lg border border-dashed border-blue-400 bg-blue-500/10 p-2"
+                            :class="{
+                                'mt-6 is-section-placeholder': isSectionNode(draggingStat),
+                                'ml-[-24px]': isDraggingIntoTopLevelSection,
+                            }"
+                        >
+                            &nbsp;
+                        </div>
+                    </template>
+
+                    <template #default="{ node, stat }">
+                        <top-level-section-branch v-if="stat.level === 1 && stat.data?.text === 'Top Level'" :stat="stat" />
+                        <tree-branch
+                            v-else
+                            :item="node"
+                            :parent-section="getParentSectionNode(stat)"
+                            :depth="stat.level"
+                            :stat="stat"
+                            :is-open="stat.open"
+                            :is-child="isChildItemNode(stat)"
+                            :has-children="stat.children.length > 0"
+                            class="mb-px"
+                            :class="{ 'mt-6': isSectionNode(stat) }"
+                            @edit="editItem(stat)"
+                            @toggle-open="stat.open = !stat.open"
+                        >
+                            <template #branch-options="{ inTopLevelSection }">
+                                <DropdownItem v-if="stat.level < 3" :text="__('Add Item')" @click="addItem(stat)" icon="plus" />
+                                <DropdownItem :text="__('Edit')" @click="editItem(stat)" icon="edit" />
+                                <DropdownItem
+                                    v-if="!isSectionNode(stat) && !inTopLevelSection"
+                                    :text="__('Pin to Top Level')"
+                                    icon="pin"
+                                    @click="pinItem(stat)"
+                                />
+                                <DropdownItem
+                                    v-if="!isSectionNode(stat)"
+                                    :text="__('Duplicate')"
+                                    icon="duplicate"
+                                    @click="aliasItem(stat)"
+                                />
+                                <DropdownSeparator />
+                                <DropdownItem
+                                    v-if="itemIsVisible(stat)"
+                                    :text="isHideable(stat) ? __('Hide') : __('Remove')"
+                                    :icon="isHideable(stat) ? 'eye-closed' : 'trash'"
+                                    variant="destructive"
+                                    @click="isHideable(stat) ? hideItem(stat) : removeItem(stat)"
+                                />
+                                <DropdownItem v-else :text="__('Show')" @click="showItem(stat)" />
+                            </template>
+                        </tree-branch>
+                    </template>
+                </Draggable>
+            </div>
+        </Panel>
 
         <item-editor
             v-if="creatingItem"
@@ -214,16 +184,18 @@
 <script>
 import { dragContext, Draggable, walkTreeData } from '@he-tree/vue';
 import TreeBranch from './Branch.vue';
-import TopLevelTreeBranch from './TopLevelBranch.vue';
+import TopLevelSectionBranch from './TopLevelSectionBranch.vue';
 import ItemEditor from './ItemEditor.vue';
 import SectionEditor from './SectionEditor.vue';
 import { data_get } from '../../bootstrap/globals.js';
-import { Button, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, DropdownLabel } from '@statamic/ui';
+import { Header, Button, ButtonGroup, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, DropdownLabel, Panel, PanelHeader } from '@statamic/ui';
 
 export default {
     components: {
+        Header,
         DropdownLabel,
         Button,
+        ButtonGroup,
         Dropdown,
         DropdownMenu,
         DropdownItem,
@@ -232,7 +204,9 @@ export default {
         TreeBranch,
         ItemEditor,
         SectionEditor,
-        TopLevelTreeBranch,
+        TopLevelSectionBranch,
+        Panel,
+        PanelHeader,
     },
 
     props: {
@@ -277,7 +251,7 @@ export default {
             confirmingReset: false,
             confirmingRemoval: false,
             draggingStat: false,
-            isDraggingIntoTopLevel: false,
+            isDraggingIntoTopLevelSection: false,
         };
     },
 
@@ -358,22 +332,15 @@ export default {
             return item;
         },
 
-        eachDraggable(stat) {
-            // Prevent the top level item being dragged. It should always stay at the top.
-            if (stat.data.text === 'Top Level') return false;
-
-            return true;
-        },
-
         // This method is called when an item is being dragged into a position that isn't the root level.
         // For root level behavior, see rootDroppable. (Why the package separated it into two methods is beyond me.)
         eachDroppable(targetStat) {
             // If the item being dragged is a section, we don't want it being dragged anywhere except the root level.
             if (this.isSectionNode(dragContext.dragNode)) return false;
 
-            // We want to keep track of whether the item is being dragged into the top level.
+            // We want to keep track of whether the item is being dragged into the top level section.
             // This was the most appropriate place to hook into.
-            this.isDraggingIntoTopLevel = this.checkIfDraggingIntoTopLevel();
+            this.isDraggingIntoTopLevelSection = this.checkIfDraggingIntoTopLevelSection();
 
             // We want to prevent creating a tree with too many levels.
             if (dragContext.dragNode.children.length && targetStat.level >= 2) return false;
@@ -382,17 +349,15 @@ export default {
             return true;
         },
 
-        checkIfDraggingIntoTopLevel() {
-            let stat = dragContext.closestNode;
-            while (stat.level > 1) stat = stat.parent;
-            return stat.data.text === 'Top Level';
+        checkIfDraggingIntoTopLevelSection() {
+            return this.getParentSectionNode(dragContext.closestNode)?.data?.text === 'Top Level';
         },
 
         // This method is called when an item is being dragged into a position at the root level.
         // For non-root level behavior, see eachDroppable. (Why the package separated it into two methods is beyond me.)
         rootDroppable() {
             // If there's no closest node, it means that we're dragging to the very top of the tree.
-            // We don't want to allow dropping before the "top level" node.
+            // We don't want to allow dropping before the "top level" section node.
             if (dragContext.closestNode === null) return false;
 
             // Only allow dropping sections at the root level.
@@ -759,6 +724,7 @@ export default {
         },
 
         beforeDragStart(stat) {
+            this.isDraggingIntoTopLevelSection = false;
             this.draggingStat = stat;
         },
 

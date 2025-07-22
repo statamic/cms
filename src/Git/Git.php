@@ -3,6 +3,7 @@
 namespace Statamic\Git;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
 use Statamic\Console\Processes\Git as GitProcess;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Facades\Antlers;
@@ -255,7 +256,7 @@ class Git
     {
         return [
             'git' => config('statamic.git.binary'),
-            'paths' => collect($paths)->implode(' '),
+            'paths' => $this->shellQuotePaths($paths),
             'message' => $this->shellEscape($message),
             'name' => $this->shellEscape($this->gitUserName()),
             'email' => $this->shellEscape($this->gitUserEmail()),
@@ -281,5 +282,15 @@ class Git
         $string = str_replace("'", '', $string);
 
         return escapeshellcmd($string);
+    }
+
+    /**
+     * Shell quote paths to a string for use in git commands.
+     */
+    protected function shellQuotePaths(Collection $paths): string
+    {
+        return collect($paths)
+            ->map(fn ($path) => '"'.$path.'"')
+            ->implode(' ');
     }
 }

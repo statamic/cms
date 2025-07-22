@@ -8,7 +8,7 @@
 @section('content')
     <blueprint-builder
         show-title
-        action="{{ cp_route('taxonomies.blueprints.update', [$taxonomy, $blueprint]) }}"
+        action="{{ cp_route('blueprints.taxonomies.update', [$taxonomy, $blueprint]) }}"
         :initial-blueprint="{{ json_encode($blueprintVueObject) }}"
     ></blueprint-builder>
 

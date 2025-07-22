@@ -14,7 +14,8 @@ class Sets extends Fieldtype
     protected $selectable = false;
 
     protected static $iconsDirectory = null;
-    protected static $iconsFolder = 'plump';
+
+    protected static $iconsFolder = null;
 
     /**
      * Converts the "sets" array of a Replicator (or Bard) field into what the

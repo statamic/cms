@@ -18,7 +18,7 @@
             >
                 <Dropdown v-if="canEditBlueprint || hasItemActions">
                     <template #trigger>
-                        <Button icon="ui/dots" variant="ghost" />
+                        <Button icon="ui/dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
                     </template>
                     <DropdownMenu>
                         <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :href="actions.editBlueprint" />
@@ -82,9 +82,8 @@
             :origin-values="originValues"
             :origin-meta="originMeta"
             :errors="errors"
-            :is-root="isRoot"
             :site="site"
-            :localized-fields="localizedFields"
+            v-model:modified-fields="localizedFields"
             :track-dirty-state="trackDirtyState"
             :sync-field-confirmation-text="syncFieldConfirmationText"
         >
@@ -239,6 +238,26 @@
                 </div>
             </div>
         </confirmation-modal>
+
+        <confirmation-modal
+            v-if="pendingLocalization"
+            :title="__('Unsaved Changes')"
+            :body-text="__('Are you sure? Unsaved changes will be lost.')"
+            :button-text="__('Continue')"
+            :danger="true"
+            @confirm="confirmSwitchLocalization"
+            @cancel="pendingLocalization = null"
+        />
+
+        <confirmation-modal
+            v-if="syncingField"
+            :title="__('Sync Field')"
+            :body-text="__('Are you sure? This field\'s value will be replaced by the value in the original entry.')"
+            :button-text="__('Sync Field')"
+            :danger="true"
+            @confirm="confirmSyncField"
+            @cancel="syncingField = null"
+        />
     </div>
 </template>
 
@@ -274,6 +293,7 @@ import PublishTabs from '@statamic/components/ui/Publish/Tabs.vue';
 import PublishComponents from '@statamic/components/ui/Publish/Components.vue';
 import LocalizationsCard from '@statamic/components/ui/Publish/Localizations.vue';
 import LivePreview from '@statamic/components/ui/LivePreview/LivePreview.vue';
+import resetValuesFromResponse from '@statamic/util/resetValuesFromResponse.js';
 import { SavePipeline } from '@statamic/exports.js';
 import { computed, ref } from 'vue';
 const { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } = SavePipeline;
@@ -335,10 +355,8 @@ export default {
         isCreating: Boolean,
         isInline: Boolean,
         initialReadOnly: Boolean,
-        initialIsRoot: Boolean,
         initialPermalink: String,
         revisionsEnabled: Boolean,
-        preloadedAssets: Array,
         canEditBlueprint: Boolean,
         canManagePublishState: Boolean,
         createAnotherUrl: String,
@@ -363,8 +381,8 @@ export default {
             localizations: clone(this.initialLocalizations),
             localizedFields: this.initialLocalizedFields,
             hasOrigin: this.initialHasOrigin,
-            originValues: this.initialOriginValues || {},
-            originMeta: this.initialOriginMeta || {},
+            originValues: this.initialOriginValues,
+            originMeta: this.initialOriginMeta,
             site: this.initialSite,
             selectingOrigin: false,
             selectedOrigin: null,
@@ -383,14 +401,16 @@ export default {
 
             confirmingPublish: false,
             readOnly: this.initialReadOnly,
-            isRoot: this.initialIsRoot,
             permalink: this.initialPermalink,
 
             saveKeyBinding: null,
             quickSaveKeyBinding: null,
             quickSave: false,
             isAutosave: false,
+            autosaveIntervalInstance: null,
             syncFieldConfirmationText: __('messages.sync_entry_field_confirmation_text'),
+            pendingLocalization: null,
+            syncingField: null,
         };
     },
 
@@ -401,10 +421,6 @@ export default {
 
         errors() {
             return errors.value;
-        },
-
-        store() {
-            return this.$refs.container.store;
         },
 
         formattedTitle() {
@@ -538,8 +554,6 @@ export default {
                     new BeforeSaveHooks('entry', {
                         collection: this.collectionHandle,
                         values: this.values,
-                        container: this.$refs.container,
-                        storeName: this.publishContainer,
                     }),
                     new Request(this.actions.save, this.method, {
                         _blueprint: this.fieldset.handle,
@@ -556,7 +570,7 @@ export default {
                     if (this.revisionsEnabled) {
                         clearTimeout(this.trackDirtyStateTimeout);
                         this.trackDirtyState = false;
-                        this.values = this.resetValuesFromResponse(response.data.data.values);
+                        this.values = resetValuesFromResponse(response.data.data.values, this.$refs.container);
                         this.extraValues = response.data.data.extraValues;
                         this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
                         this.$nextTick(() => this.$emit('saved', response));
@@ -619,11 +633,19 @@ export default {
             if (localization.active) return;
 
             if (this.isDirty) {
-                if (!confirm(__('Are you sure? Unsaved changes will be lost.'))) {
-                    return;
-                }
+                this.pendingLocalization = localization;
+                return;
             }
 
+            this.switchToLocalization(localization);
+        },
+
+        confirmSwitchLocalization() {
+            this.switchToLocalization(this.pendingLocalization);
+            this.pendingLocalization = null;
+        },
+
+        switchToLocalization(localization) {
             this.$dirty.remove(this.publishContainer);
 
             this.localizing = localization;
@@ -659,7 +681,6 @@ export default {
                 this.title = data.editing ? data.values.title : this.title;
                 this.actions = data.actions;
                 this.fieldset = data.blueprint;
-                this.isRoot = data.isRoot;
                 this.permalink = data.permalink;
                 this.site = localization.handle;
                 this.localizing = false;
@@ -682,7 +703,7 @@ export default {
             const url = originLocalization.url + '/localize';
             this.$axios.post(url, { site: localization.handle }).then((response) => {
                 this.editLocalization(response.data).then(() => {
-                    this.$events.$emit('localization.created', { store: this.publishContainer });
+                    this.$events.$emit('localization.created', { container: this.$refs.container });
 
                     if (this.originValues.published) {
                         this.setFieldValue('published', true);
@@ -748,7 +769,7 @@ export default {
                 this.title = response.data.data.title;
                 clearTimeout(this.trackDirtyStateTimeout);
                 this.trackDirtyState = false;
-                this.values = this.resetValuesFromResponse(response.data.data.values);
+                this.values = resetValuesFromResponse(response.data.data.values, this.$refs.container);
                 this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
                 this.activeLocalization.title = response.data.data.title;
                 this.activeLocalization.published = response.data.data.published;
@@ -770,15 +791,18 @@ export default {
         },
 
         syncField(handle) {
-            if (!confirm("Are you sure? This field's value will be replaced by the value in the original entry."))
-                return;
+            this.syncingField = handle;
+        },
 
+        confirmSyncField() {
+            const handle = this.syncingField;
             this.localizedFields = this.localizedFields.filter((field) => field !== handle);
             this.$refs.container.setFieldValue(handle, this.originValues[handle]);
 
             // Update the meta for this field. For instance, a relationship field would have its data preloaded into it.
             // If you sync the field, the preloaded data would be outdated and an ID would show instead of the titles.
             this.meta[handle] = this.originMeta[handle];
+            this.syncingField = null;
         },
 
         desyncField(handle) {
@@ -788,14 +812,12 @@ export default {
         },
 
         setAutosaveInterval() {
-            const interval = setInterval(() => {
+            this.autosaveIntervalInstance = setInterval(() => {
                 if (!this.isDirty) return;
 
                 this.isAutosave = true;
                 this.save();
             }, this.autosaveInterval);
-
-            this.$refs.container.setAutosaveInterval(interval);
         },
 
         afterActionSuccessfullyCompleted(response) {
@@ -804,7 +826,7 @@ export default {
                 if (!this.revisionsEnabled) this.permalink = response.data.permalink;
                 clearTimeout(this.trackDirtyStateTimeout);
                 this.trackDirtyState = false;
-                this.values = this.resetValuesFromResponse(response.data.values);
+                this.values = resetValuesFromResponse(response.data.values, this.$refs.container);
                 this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
                 this.initialPublished = response.data.published;
                 this.activeLocalization.published = response.data.published;
@@ -828,8 +850,6 @@ export default {
             this.save();
         });
 
-        this.$refs.container.store.setPreloadedAssets(this.preloadedAssets);
-
         if (typeof this.autosaveInterval === 'number') {
             this.setAutosaveInterval();
         }
@@ -851,7 +871,7 @@ export default {
     },
 
     beforeUnmount() {
-        this.$refs.container.store.clearAutosaveInterval();
+        if (this.autosaveIntervalInstance) clearInterval(this.autosaveIntervalInstance);
     },
 
     unmounted() {

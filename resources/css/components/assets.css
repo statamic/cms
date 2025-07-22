@@ -185,6 +185,11 @@
     .loading {
         @apply absolute inset-0 z-10 flex items-center justify-center rounded-sm bg-white/70;
     }
+
+    .publish-fields {
+        @apply grid grid-cols-none!;
+        --grid-columns: none !important;
+    }
 }
 
 /* Lazyloading

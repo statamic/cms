@@ -821,14 +821,6 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         return $this->in($locale) !== null;
     }
 
-    /** @deprecated */
-    public function addLocalization($entry)
-    {
-        $entry->origin($this);
-
-        return $this;
-    }
-
     public function makeLocalization($site)
     {
         $localization = Facades\Entry::make()

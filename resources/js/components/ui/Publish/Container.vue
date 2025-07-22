@@ -1,18 +1,17 @@
 <script>
 import createContext from '@statamic/util/createContext.js';
 
-export const [injectContainerContext, provideContainerContext] = createContext('PublishContainer');
+export const [injectContainerContext, provideContainerContext, containerContextKey] = createContext('PublishContainer');
 </script>
 
 <script setup>
 import uniqid from 'uniqid';
-import { usePublishContainerStore } from '@statamic/stores/publish-container.js';
-import { watch, provide, getCurrentInstance, ref, onBeforeUnmount, toRef } from 'vue';
+import { watch, provide, getCurrentInstance, ref, computed, toRef } from 'vue';
 import Component from '@statamic/components/Component.js';
-import { getActivePinia } from 'pinia';
 import Tabs from './Tabs.vue';
+import Values from '@statamic/components/publish/Values.js';
 
-const emit = defineEmits(['updated', 'update:visibleValues']);
+const emit = defineEmits(['update:modelValue', 'update:visibleValues', 'update:modifiedFields']);
 
 const container = getCurrentInstance();
 
@@ -41,11 +40,9 @@ const props = defineProps({
     },
     originValues: {
         type: Object,
-        default: () => ({}),
     },
     originMeta: {
         type: Object,
-        default: () => ({}),
     },
     errors: {
         type: Object,
@@ -54,12 +51,8 @@ const props = defineProps({
     site: {
         type: String,
     },
-    localizedFields: {
+    modifiedFields: {
         type: Array,
-    },
-    isRoot: {
-        type: [Boolean, undefined],
-        default: undefined,
     },
     trackDirtyState: {
         type: Boolean,
@@ -79,58 +72,70 @@ const props = defineProps({
     }
 });
 
-const store = usePublishContainerStore(props.name, {
-    values: props.modelValue,
-    extraValues: props.extraValues,
-    meta: props.meta,
-    originValues: props.originValues,
-    originMeta: props.originMeta,
-    errors: props.errors,
-    isRoot: props.isRoot,
-    localizedFields: props.localizedFields,
-    site: props.site,
-    reference: props.reference,
-    readOnly: props.readOnly,
+const parentContainer = injectContainerContext(containerContextKey);
+const values = ref(props.modelValue);
+const extraValues = ref(props.extraValues);
+const hiddenFields = ref({});
+const revealerFields = ref([]);
+const meta = ref(props.meta);
+const previews = ref({});
+const localizedFields = ref(props.modifiedFields || []);
+const components = ref([]);
+
+const visibleValues = computed(() => {
+    const omittable = Object.keys(hiddenFields.value).filter(
+        (field) => hiddenFields.value[field].omitValue,
+    );
+    return new Values(values.value).except(omittable);
 });
 
-const components = ref([]);
+const setHiddenField = (field) => {
+    hiddenFields.value[field.dottedKey] = {
+        hidden: field.hidden,
+        omitValue: field.omitValue,
+    };
+};
+
+const setRevealerField = (path) => {
+    if (!revealerFields.value.includes(path)) {
+        revealerFields.value.push(path);
+    }
+};
+
+const unsetRevealerField = (path) => {
+    const index = revealerFields.value.indexOf(path);
+    if (index !== -1) {
+        revealerFields.value.splice(index, 1);
+    }
+};
+const setFieldPreviewValue = (path, value) => {
+    data_set(previews.value, path + '_', value);
+};
 
 watch(
     () => props.modelValue,
-    (values) => store.setValues(values),
-    { deep: true },
+    (newValues) => values.value = newValues,
 );
 
 watch(
-    () => store.values,
+    values,
     (values) => {
-        if (values === props.values) return;
         if (props.trackDirtyState) dirty();
-        emit('updated', values);
+        emit('update:modelValue', values);
     },
     { deep: true },
 );
 
 watch(
-    () => store.visibleValues,
+    visibleValues,
     (values) => emit('update:visibleValues', values),
     { deep: true },
 );
 
 watch(
-    () => props.errors,
-    (errors) => store.setErrors(errors),
+    localizedFields,
+    (values) => emit('update:modifiedFields', values),
     { deep: true },
-);
-
-watch(
-    () => props.isRoot,
-    (isRoot) => store.setIsRoot(isRoot),
-);
-
-watch(
-    () => props.site,
-    (site) => store.setSite(site),
 );
 
 function dirty() {
@@ -141,21 +146,42 @@ function clearDirtyState() {
     Statamic.$dirty.remove(props.name);
 }
 
-function setFieldValue(handle, value) {
-    store.setDottedFieldValue({ path: handle, value });
+function setValues(newValues) {
+    values.value = newValues;
 }
 
-function syncField(handle) {
+function setExtraValues(newValues) {
+    extraValues.value = newValues;
+}
+
+function setFieldValue(path, value) {
+    data_set(values.value, path, value);
+}
+
+function setFieldMeta(path, value) {
+    data_set(meta.value, path, value);
+}
+
+function syncField(path) {
     if (!confirm(props.syncFieldConfirmationText)) return;
 
-    store.removeLocalizedField(handle);
-    store.setDottedFieldValue({ path: handle, value: store.originValues[handle] });
-    store.setDottedFieldMeta({ path: handle, value: store.originMeta[handle] });
+    removeLocalizedField(path);
+    setFieldValue(path, props.originValues[path]);
+    setFieldMeta(path, props.originMeta[path]);
 }
 
-function desyncField(handle) {
-    store.addLocalizedField(handle);
+function desyncField(path) {
+    addLocalizedField(path);
     dirty();
+}
+
+function addLocalizedField(path) {
+    if (!localizedFields.value.includes(path)) localizedFields.value.push(path);
+}
+
+function removeLocalizedField(path) {
+    const index = localizedFields.value.indexOf(path);
+    if (index !== -1) localizedFields.value.splice(index, 1);
 }
 
 function pushComponent(name, { props }) {
@@ -165,35 +191,53 @@ function pushComponent(name, { props }) {
 }
 
 provideContainerContext({
-    name: props.name,
-    store,
-    blueprint: props.blueprint,
-    reference: props.reference,
+    name: toRef(() => props.name),
+    parentContainer,
+    blueprint: toRef(() => props.blueprint),
+    reference: toRef(() => props.reference),
+    values,
+    extraValues,
+    visibleValues,
+    originValues: toRef(() => props.originValues),
+    hiddenFields,
+    revealerFields,
+    localizedFields,
+    meta,
+    site: toRef(() => props.site),
+    errors: toRef(() => props.errors),
+    readOnly: toRef(() => props.readOnly),
+    previews,
     syncField,
     desyncField,
     container,
     components,
     asConfig: toRef(() => props.asConfig),
+    isTrackingOriginValues: computed(() => !!props.originValues),
+    setValues,
+    setFieldValue,
+    setFieldMeta,
+    setFieldPreviewValue,
+    setRevealerField,
+    unsetRevealerField,
+    setHiddenField,
 });
 
 defineExpose({
-    store,
+    name: props.name,
+    values,
     saving,
     saved,
+    revealerFields,
     setFieldValue,
     clearDirtyState,
     pushComponent,
-});
-
-onBeforeUnmount(() => {
-    store.$dispose();
-    delete getActivePinia().state.value[store.$id];
+    visibleValues,
+    setValues,
+    setExtraValues,
 });
 
 // Backwards compatibility.
-provide('store', store);
-provide('storeName', props.name);
-provide('publishContainer', getCurrentInstance());
+provide('publishContainer', getCurrentInstance()); // temporarily used by ShowField.js
 
 // The following are shims to make things temporarily work.
 function saving() {}

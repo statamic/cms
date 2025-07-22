@@ -37,7 +37,7 @@
                 :text="__('Set Alt')"
                 @click="editOrOpen"
             />
-            <div v-text="asset.size" class="asset-filesize hidden px-2 text-sm text-gray-500 dark:text-gray-400 @xs:inline" />
+            <div v-text="asset.size" class="asset-filesize hidden px-2 text-sm text-gray-600 dark:text-gray-400 @xs:inline" />
         </td>
         <td class="p-3 align-middle text-end" v-if="!readOnly">
             <ui-button

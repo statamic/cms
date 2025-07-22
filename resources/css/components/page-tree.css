@@ -1,3 +1,5 @@
+/* GROUP PAGE TREE
+=================================================== */
 .page-tree {
     .tree-node {
         @apply dark:mb-1;
@@ -30,8 +32,54 @@
         @apply flex w-6 items-center dark:border-dark-900 ltr:rounded-l ltr:border-r rtl:rounded-r rtl:border-l;
     }
 
-    /* Nice progressive enhancement to visually connect tree node children by removing the top left border radius */
-    .tree-node:has(.page-tree-branch--has-children) + .tree-node .page-tree-branch {
+    /* Nice progressive enhancement to visually connect tree node children by removing the top left border radius.. */
+    /* 2nd level down */
+    .tree-node:has(.is-section) + .tree-node .page-tree-branch,
+    /* 3rd level down */
+    .tree-node:has(.page-tree-branch--has-children):has(.is-open) + .tree-node .page-tree-branch {
         border-top-left-radius: 0;
+    }
+}
+
+/* GROUP PAGE TREE / NAV BUILDER
+=================================================== */
+/* e.g. cp/nav/edit */
+.nav-builder {
+    background: none;
+    .tree-node {
+        @apply bg-gray-100;
+        .tree-node-inner {
+            @apply px-1;
+        }
+        &:has(.is-section) {
+            @apply mt-8 pt-1 bg-gray-100 rounded-t-2xl;
+        }
+        &:has(+ .tree-node .is-section),
+        &:last-child {
+            @apply pb-1 rounded-b-2xl;
+        }
+        &:has(.is-top-level-section-placeholder) {
+            background: none;
+            @apply mt-1;
+        }
+        /* When we're dragging a section tree node, remove the background otherwise it bleeds into the node we're moving it to */
+        &.drag-placeholder-wrapper:has(.is-section-placeholder) {
+            background: none;
+            @apply -mx-1 mt-2;
+        }
+        /* When we're dragging a section tree node, make sure the preceding node is rounded. Check for a suceeding .is-section-placeholder to ensure we don't affect dragging _inside_ sections */
+        &:has(+ .drag-placeholder-wrapper):has(+ * .is-section-placeholder) {
+            @apply pb-1 rounded-b-2xl;
+        }
+        /* When we're dragging a section tree node, make sure the succeeding node is rounded */
+        .drag-placeholder-wrapper:has(.is-section-placeholder) + & {
+            @apply rounded-t-2xl;
+        }
+    }
+    .page-tree-branch {
+        margin-top: 0;
+    }
+    .tree-node:has(.first-branch) + .tree-node {
+        @apply pt-1 rounded-t-2xl;
     }
 }

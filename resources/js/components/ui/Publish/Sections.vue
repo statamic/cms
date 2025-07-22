@@ -9,13 +9,20 @@ import markdown from '@statamic/util/markdown.js';
 import { computed } from 'vue';
 import { Primitive } from 'reka-ui';
 
-const { blueprint, store, asConfig } = injectContainerContext();
+const { blueprint, container, visibleValues, extraValues, asConfig, hiddenFields, revealerFields, setHiddenField } = injectContainerContext();
 const tab = injectTabContext();
 const sections = tab.sections;
 const visibleSections = computed(() => {
     return sections.filter((section) => {
         return section.fields.some((field) => {
-            return new ShowField(store, store.visibleValues, store.extraValues).showField(field, field.handle);
+            return new ShowField(
+                visibleValues.value,
+                extraValues.value,
+                visibleValues.value,
+                hiddenFields.value,
+                revealerFields.value,
+                setHiddenField
+            ).showField(field, field.handle);
         });
     });
 });

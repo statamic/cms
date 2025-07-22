@@ -7,7 +7,7 @@
 
     button,
     a {
-        @apply block w-full rounded-xs px-2 py-1 text-xs font-normal text-gray-800 dark:text-dark-100 ltr:text-left rtl:text-right;
+        @apply block w-full rounded-xs px-2 py-1 text-xs font-normal text-gray-900 dark:text-dark-100 ltr:text-left rtl:text-right;
         line-height: 1.4;
         white-space: nowrap;
         @apply rounded-sm;
@@ -85,7 +85,7 @@
         }
         button,
         a {
-            @apply flex shrink-0 rounded-full text-gray-800 dark:text-dark-100;
+            @apply flex shrink-0 rounded-full text-gray-900 dark:text-dark-100;
             &:hover {
                 @apply text-white;
             }

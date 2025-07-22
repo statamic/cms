@@ -52,11 +52,10 @@
 @import './components/fieldtypes/bard.css';
 @import './components/fieldtypes/button-group.css';
 @import './components/fieldtypes/checkboxes.css';
-@import './components/fieldtypes/dictionary-fields.css';
 @import './components/fieldtypes/environment.css';
 @import './components/fieldtypes/grid.css';
 @import './components/fieldtypes/hidden.css';
-/* @import './components/fieldtypes/markdown.css'; */
+@import './components/fieldtypes/markdown.css';
 @import './components/fieldtypes/partial.css';
 @import './components/fieldtypes/radio.css';
 @import './components/fieldtypes/relationship.css';

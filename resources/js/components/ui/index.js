@@ -22,6 +22,7 @@ import { default as CreateForm } from "./CreateForm.vue";
 import { default as DatePicker } from "./DatePicker/DatePicker.vue";
 import { default as DateRangePicker } from "./DateRangePicker/DateRangePicker.vue";
 import { default as Description } from "./Description.vue";
+import { default as DragHandle } from "./DragHandle.vue";
 import { default as Dropdown } from "./Dropdown/Dropdown.vue";
 import { default as DropdownItem } from "./Dropdown/Item.vue";
 import { default as DropdownLabel } from "./Dropdown/Label.vue";
@@ -60,7 +61,11 @@ import { default as PanelFooter } from "./Panel/Footer.vue";
 import { default as PanelHeader } from "./Panel/Header.vue";
 import { default as Popover } from "./Popover.vue";
 import { default as PublishComponents } from "./Publish/Components.vue";
-import { default as PublishContainer } from "./Publish/Container.vue";
+import {
+    default as PublishContainer,
+    containerContextKey as publishContextKey,
+    injectContainerContext as injectPublishContext
+} from "./Publish/Container.vue";
 import { default as PublishField } from "./Publish/Field.vue";
 import { default as PublishFields } from "./Publish/Fields.vue";
 import { default as PublishForm } from "./Publish/Form.vue";
@@ -121,6 +126,7 @@ export {
     DatePicker,
     DateRangePicker,
     Description,
+    DragHandle,
     Dropdown,
     DropdownItem,
     DropdownLabel,
@@ -160,6 +166,8 @@ export {
     Popover,
     PublishComponents,
     PublishContainer,
+    publishContextKey,
+    injectPublishContext,
     PublishField,
     PublishFields,
     PublishForm,

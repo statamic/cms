@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div :class="{ 'mb-4': rows.length > 0 }">
         <sortable-list
             :model-value="rows"
             :vertical="true"
@@ -13,11 +13,10 @@
             v-slot="{}"
         >
             <div
-                class="grid-stacked"
+                class="grid-stacked space-y-8"
                 :class="{
-                    'mt-0': !allowFullscreen && hideDisplay,
-                    'mt-4': !hideDisplay,
-                    'mt-10': allowFullscreen,
+                    // 'mt-0': !allowFullscreen && hideDisplay,
+                    // 'mt-4': !hideDisplay,
                 }"
             >
                 <stacked-row

@@ -1,5 +1,5 @@
 <template>
-    <div class="assets-fieldtype">
+    <div class="@container relative">
         <uploader
             ref="uploader"
             :url="meta.uploadUrl"
@@ -10,49 +10,59 @@
             @error="uploadError"
             v-slot="{ dragging }"
         >
-            <div class="assets-fieldtype-drag-container">
-                <div class="drag-notification" v-show="dragging">
-                    <svg-icon name="upload" class="h-8 w-8 ltr:mr-6 rtl:ml-6" />
-                    <span>{{ __('Drop File to Upload') }}</span>
+            <div>
+                <div
+                    v-show="dragging"
+                    class="absolute inset-0 flex flex-col gap-2 items-center justify-center bg-white/80 backdrop-blur-sm border border-gray-400 border-dashed rounded-lg"
+                >
+                    <ui-icon name="upload-cloud" class="size-5 text-gray-500" />
+                    <ui-heading size="lg">{{ __('Drop to Upload') }}</ui-heading>
                 </div>
 
-                <div class="assets-fieldtype-picker py-4" :class="{ 'is-expanded': value.length }">
-                    <p class="asset-upload-control text-xs text-gray-600 ltr:ml-0 rtl:mr-0">
-                        <button type="button" class="upload-text-button" @click.prevent="uploadFile">
-                            {{ __('Upload file') }}
+                <div class="border border-gray-400 dark:border-gray-700 border-dashed rounded-xl p-4 flex flex-col @2xs:flex-row items-center gap-4" :class="{ 'rounded-b-none': value.length }">
+                    <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center flex-1">
+                        <ui-icon name="upload-cloud" class="size-5 text-gray-500 me-2" />
+                        <span v-text="__('Drag & drop here or&nbsp;')" />
+                        <button type="button" class="underline underline-offset-2 cursor-pointer hover:text-black dark:hover:text-gray-200" @click.prevent="uploadFile">
+                            {{ __('choose a file') }}
                         </button>
-                        <span class="drag-drop-text" v-text="__('or drag & drop here.')"></span>
-                    </p>
+                        <span>.</span>
+                    </div>
                 </div>
 
-                <uploads v-if="uploads.length" :uploads="uploads" />
+                <div v-if="uploads.length" class="border-gray-300 border-l border-r">
+                    <uploads :uploads="uploads" />
+                </div>
 
-                <div v-if="value.length" class="asset-table-listing">
-                    <table class="table-fixed">
+                <div v-if="value.length" class="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700 border-t-0! rounded-t-none">
+                    <table class="w-full">
                         <tbody>
                             <tr
                                 v-for="(file, i) in value"
                                 :key="file"
-                                class="asset-row bg-white hover:bg-gray-100 dark:bg-dark-600"
+                                class="asset-row bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-900"
                             >
-                                <td class="flex items-center">
+                                <td class="flex gap-3 h-full items-center p-3">
                                     <div
-                                        class="flex h-7 w-7 cursor-pointer items-center justify-center whitespace-nowrap"
+                                        class="flex size-7 cursor-pointer items-center justify-center whitespace-nowrap"
                                     >
-                                        <file-icon :extension="getExtension(file)" />
+                                        <file-icon :extension="getExtension(file)" class="size-7" />
                                     </div>
                                     <div
-                                        class="flex flex-1 items-center truncate text-xs ltr:ml-2 ltr:text-left rtl:mr-2 rtl:text-right"
+                                        class="flex w-full flex-1 items-center truncate text-sm text-gray-600 dark:text-gray-400 text-start"
                                         v-text="file"
                                     />
                                 </td>
-                                <td class="w-8 p-0 align-middle ltr:text-right rtl:text-left">
-                                    <button
+                                <td class="p-3 align-middle text-end">
+                                    <ui-button
                                         @click="remove(i)"
-                                        class="flex h-full w-full items-center p-2 text-gray-600 hover:text-gray-950 dark:text-dark-150 dark:hover:text-dark-100"
-                                    >
-                                        <svg-icon name="micro/trash" class="h-6 w-6" />
-                                    </button>
+                                        icon="x"
+                                        round
+                                        size="xs"
+                                        variant="ghost"
+                                        :aria-label="__('Remove Asset')"
+                                        :title="__('Remove')"
+                                    />
                                 </td>
                             </tr>
                         </tbody>
@@ -67,11 +77,13 @@
 import Fieldtype from './Fieldtype.vue';
 import Uploader from '../assets/Uploader.vue';
 import Uploads from '../assets/Uploads.vue';
+import { Button } from 'statamic';
 
 export default {
     mixins: [Fieldtype],
 
     components: {
+        Button,
         Uploader,
         Uploads,
     },

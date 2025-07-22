@@ -16,6 +16,14 @@ class BreadcrumbsTest extends TestCase
 
     protected $shouldPreventNavBeingBuilt = false;
 
+    public function tearDown(): void
+    {
+        // Reset property cache between tests.
+        Breadcrumbs::$pushed = [];
+
+        parent::tearDown();
+    }
+
     #[Test]
     public function it_builds_breadcrumbs_correctly_for_top_level_page()
     {
@@ -136,5 +144,58 @@ class BreadcrumbsTest extends TestCase
         $breadcrumbs = Breadcrumbs::build();
 
         $this->assertEquals([], $breadcrumbs);
+    }
+
+    #[Test]
+    public function it_can_push_additional_breadcrumbs()
+    {
+        $this->actingAs(User::make()->makeSuper())->get(cp_route('dashboard'));
+
+        Breadcrumbs::push(new Breadcrumb(
+            text: 'Custom One',
+            url: 'http://localhost/cp/custom/one',
+            icon: 'icon-one',
+        ));
+
+        Breadcrumbs::push(new Breadcrumb(
+            text: 'Custom Two',
+            url: 'http://localhost/cp/custom/two',
+            icon: 'icon-two',
+        ));
+
+        $breadcrumbs = Breadcrumbs::build();
+
+        $this->assertCount(3, $breadcrumbs);
+
+        $this->assertEquals('Dashboard', $breadcrumbs[0]->text());
+
+        $this->assertEquals('Custom One', $breadcrumbs[1]->text());
+        $this->assertEquals('http://localhost/cp/custom/one', $breadcrumbs[1]->url());
+        $this->assertEquals('icon-one', $breadcrumbs[1]->icon());
+
+        $this->assertEquals('Custom Two', $breadcrumbs[2]->text());
+        $this->assertEquals('http://localhost/cp/custom/two', $breadcrumbs[2]->url());
+        $this->assertEquals('icon-two', $breadcrumbs[2]->icon());
+    }
+
+    #[Test]
+    public function it_can_push_additional_breadcrumb_without_url()
+    {
+        $this->actingAs(User::make()->makeSuper())->get(cp_route('dashboard'));
+
+        Breadcrumbs::push(new Breadcrumb(
+            text: 'Custom',
+            icon: 'custom-icon',
+        ));
+
+        $breadcrumbs = Breadcrumbs::build();
+
+        $this->assertCount(2, $breadcrumbs);
+
+        $this->assertEquals('Dashboard', $breadcrumbs[0]->text());
+
+        $this->assertEquals('Custom', $breadcrumbs[1]->text());
+        $this->assertNull($breadcrumbs[1]->url());
+        $this->assertEquals('custom-icon', $breadcrumbs[1]->icon());
     }
 }
