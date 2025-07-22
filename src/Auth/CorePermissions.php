@@ -228,8 +228,7 @@ class CorePermissions
             ->each(function ($addon) {
                 Permission::register("edit {$addon->slug()} settings", function ($permission) use ($addon) {
                     return $permission
-                        ->label(__('statamic::permissions.edit_addon_settings', ['addon' => __($addon->name())]))
-                        ->description(__('statamic::permissions.edit_addon_settings_desc', ['addon' => __($addon->name())]));
+                        ->label(__('statamic::permissions.edit_addon_settings', ['addon' => __($addon->name())]));
                 });
             });
     }

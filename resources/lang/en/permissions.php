@@ -88,10 +88,9 @@ return [
     'view_updates' => 'View updates',
 
     'group_addons' => 'Addons',
-    'configure_addons' => 'Configure Addons',
-    'configure_addons_desc' => 'Grants ability to see installed addons and their settings.',
-    'edit_addon_settings' => 'Edit :addon Settings',
-    'edit_addon_settings_desc' => 'Grants ability to edit the settings of the :addon addon.',
+    'configure_addons' => 'Configure addons',
+    'configure_addons_desc' => 'Grants access to all addon related permissions',
+    'edit_addon_settings' => ':addon settings',
 
     'group_utilities' => 'Utilities',
     'access_utility' => ':title',
