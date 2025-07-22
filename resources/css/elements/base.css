@@ -86,8 +86,8 @@
     }
     /* e.g. >> /cp/collections, when you tab to the title, and /cp/collections/pages when tabbing through the tree text */
     .main-content a,
-    /* e.g. >> /cp/collections/pages, tabbing through the home icon */
-    .v-popper--has-tooltip {
+    /* e.g. >> /cp/collections/pages, tabbing through the home icon. Be careful not to carpet bomb this e.g. don't want to affect Bard buttons. */
+    .page-tree .v-popper--has-tooltip {
         &:focus-visible {
             --focus-outline-offset: 4px;
             @apply rounded-xs;
