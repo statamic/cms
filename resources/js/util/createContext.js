@@ -1,7 +1,7 @@
 import { inject, provide } from 'vue';
 
 export default function createContext(name) {
-    const injectionKey = Symbol(`${name}Context`);
+    const injectionKey = `${name}Context`;
 
     const provideContext = (context) => {
         provide(injectionKey, context);
