@@ -3,7 +3,7 @@ import HasFieldActions from '../field-actions/HasFieldActions';
 import debounce from '@statamic/util/debounce.js';
 import props from './props.js';
 import emits from './emits.js';
-import { containerContextKey } from '@statamic/components/ui/Publish/Container.vue';
+import { publishContextKey } from '@statamic/ui';
 import { isRef } from 'vue';
 
 export default {
@@ -13,7 +13,7 @@ export default {
 
     inject: {
         injectedPublishContainer: {
-            from: containerContextKey
+            from: publishContextKey
         },
     },
 
