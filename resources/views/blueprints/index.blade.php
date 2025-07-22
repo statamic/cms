@@ -79,31 +79,6 @@
         </ui-panel>
     @endif
 
-    @if (Statamic\Facades\Nav::all()->count() > 0)
-        <ui-subheading size="lg" class="mb-2">{{ __('Navigation') }}</ui-subheading>
-        <ui-panel>
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th class="text-start!">{{ __('Blueprint') }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (Statamic\Facades\Nav::all() as $nav)
-                        <tr>
-                            <td>
-                                <div class="flex items-center gap-2">
-                                    <ui-icon name="navigation" class="text-gray-500 me-1" />
-                                    <a href="{{ cp_route('blueprints.navigation.edit', $nav->handle()) }}" v-pre>{{ __($nav->title()) }}</a>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </ui-panel>
-    @endif
-
     @if (Statamic\Facades\Taxonomy::all()->count() > 0)
         <ui-subheading size="lg" class="mb-2">{{ __('Taxonomies') }}</ui-subheading>
         <ui-panel>
@@ -132,6 +107,31 @@
                                 </td>
                             </tr>
                         @endforeach
+                    @endforeach
+                </tbody>
+            </table>
+        </ui-panel>
+    @endif
+
+    @if (Statamic\Facades\Nav::all()->count() > 0)
+        <ui-subheading size="lg" class="mb-2">{{ __('Navigation') }}</ui-subheading>
+        <ui-panel>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th class="text-start!">{{ __('Blueprint') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (Statamic\Facades\Nav::all() as $nav)
+                        <tr>
+                            <td>
+                                <div class="flex items-center gap-2">
+                                    <ui-icon name="navigation" class="text-gray-500 me-1" />
+                                    <a href="{{ cp_route('blueprints.navigation.edit', $nav->handle()) }}" v-pre>{{ __($nav->title()) }}</a>
+                                </div>
+                            </td>
+                        </tr>
                     @endforeach
                 </tbody>
             </table>
