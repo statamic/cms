@@ -37,13 +37,13 @@ function removeFieldFilter(handle) {
     <div class="flex flex-1 items-center gap-3 overflow-x-auto py-3">
         <Modal :title="__('Apply Filters')">
             <template #trigger>
-                <Button icon="filter-2" class="relative [&_svg]:size-3.5" :disabled="reorderable">
-                    {{ __('Filter') }}
+                <Button icon="sliders-horizontal" class="relative [&_svg]:size-3.5" :disabled="reorderable">
+                    {{ __('Filters') }}
                     <Badge
                         v-if="badgeCount"
                         :text="badgeCount"
+                        size="sm"
                         pill
-                        variant="filled"
                         class="absolute -top-1.5 -right-1.5"
                     />
                 </Button>

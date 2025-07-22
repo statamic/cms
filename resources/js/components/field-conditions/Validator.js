@@ -15,12 +15,12 @@ const isEmpty = (value) => {
 const isString = (str) => str != null && typeof str.valueOf() === 'string';
 
 export default class {
-    constructor(field, values, currentFieldPath, store) {
+    constructor(field, values, rootValues, currentFieldPath, revealerFields) {
         this.field = field;
         this.values = values;
         this.currentFieldPath = currentFieldPath;
-        this.store = store;
-        this.rootValues = store ? store.values : false;
+        this.revealerFields = revealerFields;
+        this.rootValues = rootValues || false;
         this.passOnAny = false;
         this.showOnPass = true;
         this.converter = new Converter();
@@ -262,7 +262,6 @@ export default class {
             targetHandle: condition.targetHandle,
             values: this.values,
             root: this.rootValues,
-            store: this.store,
             fieldPath: this.currentFieldPath,
         });
 
@@ -276,7 +275,7 @@ export default class {
             return this.passesConditions(conditions);
         }
 
-        let revealerFields = this.store.revealerFields || [];
+        let revealerFields = this.revealerFields || [];
 
         let nonRevealerConditions = (this.getConditions() ?? []).filter(
             (condition) => !revealerFields.includes(this.relativeLhsToAbsoluteFieldPath(condition.field, dottedPrefix)),

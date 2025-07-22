@@ -75,7 +75,7 @@ class CollectionsController extends CpController
                 'entries_url' => cp_route('collections.show', $collection->handle()),
                 'create_entry_url' => $collection->createEntryUrl(Site::selected()),
                 'url' => $collection->absoluteUrl(Site::selected()->handle()),
-                'blueprints_url' => cp_route('collections.blueprints.index', $collection->handle()),
+                'blueprints_url' => cp_route('blueprints.collections.index', $collection->handle()),
                 'scaffold_url' => cp_route('collections.scaffold', $collection->handle()),
                 'deleteable' => User::current()->can('delete', $collection),
                 'editable' => User::current()->can('edit', $collection),
@@ -466,9 +466,9 @@ class CollectionsController extends CpController
                         'options' => $collection->entryBlueprints()->map(fn ($bp) => [
                             'handle' => $bp->handle(),
                             'title' => __($bp->title()),
-                            'edit_url' => cp_route('collections.blueprints.edit', [$collection->handle(), $bp->handle()]),
+                            'edit_url' => cp_route('blueprints.collections.edit', [$collection->handle(), $bp->handle()]),
                         ])->values()->all(),
-                        'all_blueprints_url' => cp_route('collections.blueprints.index', $collection->handle()),
+                        'all_blueprints_url' => cp_route('blueprints.collections.index', $collection->handle()),
                     ],
                     'default_publish_state' => [
                         'display' => __('Publish by Default'),

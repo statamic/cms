@@ -170,7 +170,7 @@ class Nav extends Structure implements Contract
     {
         return $this->blueprint()?->commandPaletteLink(
             type: 'Navigation',
-            url: cp_route('navigation.blueprint.edit', $this->handle()),
+            url: cp_route('blueprints.navigation.edit', $this->handle()),
         );
     }
 }

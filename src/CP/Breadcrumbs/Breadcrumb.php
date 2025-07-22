@@ -8,7 +8,7 @@ class Breadcrumb
 {
     public function __construct(
         protected string $text,
-        protected string $url,
+        protected ?string $url = null,
         protected ?string $icon = null,
         protected ?array $links = null,
         protected ?string $createLabel = null,
@@ -22,7 +22,7 @@ class Breadcrumb
         return $this->text;
     }
 
-    public function url(): string
+    public function url(): ?string
     {
         return $this->url;
     }

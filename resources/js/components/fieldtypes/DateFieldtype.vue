@@ -32,8 +32,6 @@ export default {
 
     mixins: [Fieldtype],
 
-    inject: ['store'],
-
     data() {
         return {
             containerWidth: null,
@@ -101,11 +99,11 @@ export default {
     },
 
     created() {
-        this.$events.$on(`container.${this.storeName}.saving`, this.triggerChangeOnFocusedField);
+        this.$events.$on(`container.${this.publishContainer.name}.saving`, this.triggerChangeOnFocusedField);
     },
 
     unmounted() {
-        this.$events.$off(`container.${this.storeName}.saving`, this.triggerChangeOnFocusedField);
+        this.$events.$off(`container.${this.publishContainer.name}.saving`, this.triggerChangeOnFocusedField);
     },
 
     methods: {

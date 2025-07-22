@@ -33,7 +33,7 @@
 
         @can('configure fields')
             <ui-empty-state-item
-                href="{{ cp_route('taxonomies.blueprints.index', [$taxonomy->handle()]) }}"
+                href="{{ cp_route('blueprints.taxonomies.index', [$taxonomy->handle()]) }}"
                 icon="blueprints"
                 heading="{{ __('Configure Blueprints') }}"
                 description="{{ __('statamic::messages.taxonomy_next_steps_blueprints_description') }}"

@@ -8,7 +8,7 @@
 @section('content')
     <blueprint-builder
         show-title
-        action="{{ cp_route('collections.blueprints.update', [$collection, $blueprint]) }}"
+        action="{{ cp_route('blueprints.collections.update', [$collection, $blueprint]) }}"
         :initial-blueprint="{{ json_encode($blueprintVueObject) }}"
     ></blueprint-builder>
 

@@ -39,7 +39,7 @@ class TaxonomiesController extends CpController
                 'edit_url' => $taxonomy->editUrl(),
                 'delete_url' => $taxonomy->deleteUrl(),
                 'terms_url' => cp_route('taxonomies.show', $taxonomy->handle()),
-                'blueprints_url' => cp_route('taxonomies.blueprints.index', $taxonomy->handle()),
+                'blueprints_url' => cp_route('blueprints.taxonomies.index', $taxonomy->handle()),
                 'deleteable' => User::current()->can('delete', $taxonomy),
             ];
         })->values();
@@ -258,7 +258,7 @@ class TaxonomiesController extends CpController
                         'html' => ''.
                             '<div class="text-xs">'.
                             '   <span class="rtl:ml-4 ltr:mr-4">'.$taxonomy->termBlueprints()->map(fn ($bp) => __($bp->title()))->join(', ').'</span>'.
-                            '   <a href="'.cp_route('taxonomies.blueprints.index', $taxonomy).'" class="text-blue">'.__('Edit').'</a>'.
+                            '   <a href="'.cp_route('blueprints.taxonomies.index', $taxonomy).'" class="text-blue">'.__('Edit').'</a>'.
                             '</div>',
                     ],
                     'collections' => [

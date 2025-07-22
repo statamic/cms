@@ -27,7 +27,8 @@ class NavigationPagesController extends CpController
         [$values, $meta] = $this->extractValuesAndMeta($page, $blueprint);
 
         if ($entry = $page->entry()) {
-            [$originValues, $originMeta] = $this->extractOnlyOriginValuesAndMeta($entry, $blueprint);
+            [$originValues, $originMeta] = $this->extractValuesAndMeta($entry, $entry->blueprint());
+            $values = collect($originValues)->merge($values)->all();
         }
 
         return [
@@ -36,7 +37,6 @@ class NavigationPagesController extends CpController
             'originValues' => $originValues ?? null,
             'originMeta' => $originMeta ?? null,
             'localizedFields' => $this->getLocalizedFields($page),
-            'syncableFields' => $this->getSyncableFields($nav, $entry),
         ];
     }
 
@@ -55,7 +55,8 @@ class NavigationPagesController extends CpController
         [$values, $meta, $extraValues] = $this->extractValuesAndMeta($page, $blueprint);
 
         if ($entry = $page->entry()) {
-            [$originValues, $originMeta] = $this->extractOnlyOriginValuesAndMeta($entry, $blueprint);
+            [$originValues, $originMeta] = $this->extractValuesAndMeta($entry, $entry->blueprint());
+            $values = collect($originValues)->merge($values)->all();
         }
 
         return [
@@ -65,7 +66,6 @@ class NavigationPagesController extends CpController
             'originMeta' => $originMeta ?? null,
             'extraValues' => $extraValues,
             'localizedFields' => $this->getLocalizedFields($page),
-            'syncableFields' => $this->getSyncableFields($nav, $entry),
         ];
     }
 
@@ -82,37 +82,6 @@ class NavigationPagesController extends CpController
         }
 
         return $fields;
-    }
-
-    private function getSyncableFields($nav, $entry)
-    {
-        $navFields = $nav->blueprint()->fields()->all()->keys();
-
-        if (! $entry) {
-            return $navFields;
-        }
-
-        return $entry->blueprint()
-            ->fields()->all()->keys()
-            ->intersect($navFields)->values()
-            ->flip()->forget('url')
-            ->flip()->all();
-    }
-
-    private function extractOnlyOriginValuesAndMeta($entry, $blueprint)
-    {
-        [$originValues, $originMeta] = $this->extractValuesAndMeta($entry, $blueprint);
-
-        // The Publish components will only consider fields in originValues syncable.
-        // Fields that exist only in the nav blueprint will have nothing in the
-        // entry to sync back to so we will filter those out.
-        $blueprintKeys = $blueprint->fields()->all()->keys()->all();
-        $entryKeys = array_keys($this->getEntryValues($entry));
-        $uniqueKeys = collect($entryKeys)->diff($blueprintKeys)->push('title')->values()->all();
-        $originValues = collect($originValues)->only($uniqueKeys)->all();
-        $originMeta = collect($originMeta)->only($uniqueKeys)->all();
-
-        return [$originValues, $originMeta];
     }
 
     private function extractValuesAndMeta($page, $blueprint)

@@ -3,8 +3,8 @@
         <element-container @resized="refresh">
             <div
                 class="
-                    @container/markdown w-full block bg-white dark:bg-gray-900 rounded-lg
-                    border border-gray-300 dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:inset-shadow-2xs dark:inset-shadow-black
+                    @container/markdown w-full block bg-white dark:bg-gray-900 rounded-lg relative
+                    border border-gray-300 with-contrast:border-gray-500 dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:inset-shadow-2xs dark:inset-shadow-black
                     text-gray-900 dark:text-gray-300
                     appearance-none antialiased shadow-ui-sm disabled:shadow-none
                 "
@@ -31,13 +31,13 @@
                             @close="toggleFullscreen"
                         >
                             <markdown-toolbar
-                                :mode="mode"
+                                v-if="fullScreenMode"
+                                v-model:mode="mode"
                                 :buttons="buttons"
                                 :is-read-only="isReadOnly"
                                 :show-dark-mode="fullScreenMode"
                                 :dark-mode="darkMode"
                                 :is-fullscreen="true"
-                                @toggle-mode="mode = $event"
                                 @toggle-dark-mode="toggleDarkMode"
                                 @button-click="handleButtonClick"
                             />
@@ -45,13 +45,13 @@
 
                         <markdown-toolbar
                             v-if="!fullScreenMode"
-                            :mode="mode"
+                            v-model:mode="mode"
+                            class="border-b border-gray-300 dark:border-white/15 dark:bg-gray-950"
                             :buttons="buttons"
                             :is-read-only="isReadOnly"
                             :show-dark-mode="false"
                             :dark-mode="darkMode"
                             :is-fullscreen="false"
-                            @toggle-mode="mode = $event"
                             @toggle-dark-mode="toggleDarkMode"
                             @button-click="handleButtonClick"
                         />
@@ -75,8 +75,7 @@
                             >
                                 <div class="editor relative focus-within:focus-outline-within" ref="codemirror"></div>
 
-                                <div class="helpers">
-                                    <div class="bg-gray-50 dark:bg-gray-950 rounded-b-xl border-t border-gray-200 dark:border-white/15 flex p-1 text-sm w-full">
+                                    <footer class="flex items-center justify-between bg-gray-50 dark:bg-gray-950 rounded-b-xl border-t border-gray-200 dark:border-white/15 p-1 text-sm w-full" :class="{ 'absolute inset-x-0 bottom-0': fullScreenMode }">
                                         <div class="markdown-cheatsheet-helper">
                                             <Button
                                                 icon="markdown"
@@ -87,16 +86,15 @@
                                                 :text="__('Markdown Cheatsheet')"
                                             />
                                         </div>
-                                    </div>
-                                    <div v-if="fullScreenMode" class="flex items-center pe-2">
-                                        <div class="whitespace-nowrap me-2">
-                                            <span v-text="count.words" /> {{ __('Words') }}
+                                        <div v-if="fullScreenMode" class="flex items-center pe-2 gap-3 text-xs">
+                                            <div class="whitespace-nowrap">
+                                                <span v-text="count.words" /> {{ __('Words') }}
+                                            </div>
+                                            <div class="whitespace-nowrap">
+                                                <span v-text="count.characters" /> {{ __('Characters') }}
+                                            </div>
                                         </div>
-                                        <div class="whitespace-nowrap">
-                                            <span v-text="count.characters" /> {{ __('Characters') }}
-                                        </div>
-                                    </div>
-                                </div>
+                                    </footer>
 
                                 <div class="drag-notification" v-if="assetsEnabled && draggingFile">
                                     <svg-icon name="upload" class="mb-4 size-12" />
@@ -501,6 +499,7 @@ export default {
          * Open the asset selector
          */
         addAsset () {
+            if (!this.assetsEnabled) return;
             this.showAssetSelector = true;
         },
 
@@ -510,6 +509,13 @@ export default {
         shortcut(e) {
             const mod = e.metaKey || e.ctrlKey;
             if (!mod) return;
+
+            // Handle Cmd+Shift+A for asset insertion
+            if (this.assetsEnabled && e.shiftKey && e.keyCode === 65) {
+                e.preventDefault();
+                this.addAsset();
+                return;
+            }
 
             const shortcuts = {
                 66: () => this.toggleInline('bold'), // cmd+b

@@ -22,6 +22,7 @@
                     class="transition duration-100 [&_svg]:size-4! -mx-1.5"
                     icon="ui/chevron-down"
                     size="xs"
+                    round
                     variant="ghost"
                     :class="{ '-rotate-90 is-closed': !isOpen, 'is-open': isOpen }"
                     @click="$emit('toggle-open')"

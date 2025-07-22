@@ -58,7 +58,7 @@ const triggerClasses = cva({
             false: 'bg-linear-to-b from-white to-gray-50 hover:to-gray-100 dark:from-gray-800/30 dark:to-gray-800 dark:hover:to-gray-850 shadow-ui-sm',
         },
         buttonAppearance: {
-            true: 'border border-gray-300 dark:border-b-0 dark:ring-3 dark:ring-gray-900 dark:border-white/15 shadow-ui-sm dark:shadow-md',
+            true: 'border border-gray-300 with-contrast:border-gray-500 dark:border-b-0 dark:ring-3 dark:ring-gray-900 dark:border-white/15 shadow-ui-sm dark:shadow-md',
             false: '',
         },
         // disabled: {
@@ -246,129 +246,131 @@ defineExpose({
 </script>
 
 <template>
-    <div class="flex">
-        <ComboboxRoot
-            class="cursor-pointer"
-            v-bind="attrs"
-            ignore-filter
-            :multiple
-            :reset-search-term-on-blur="false"
-            :reset-search-term-on-select="false"
-            :disabled="disabled || (multiple && limitReached) || readOnly"
-            :open="dropdownOpen"
-            :model-value="modelValue"
-            @update:open="updateDropdownOpen"
-            @update:model-value="updateModelValue"
-        >
-            <ComboboxAnchor :class="['w-full flex items-center justify-between gap-2 text-gray-900 dark:text-gray-300 antialiased appearance-none', $attrs.class]" data-ui-combobox-anchor>
-                <ComboboxTrigger as="div" :class="triggerClasses">
-                    <ComboboxInput
-                        v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"
-                        ref="search"
-                        class="w-full text-gray-700 opacity-100 focus:outline-none placeholder-xs"
-                        v-model="searchQuery"
-                        :placeholder
-                        @paste.prevent="onPaste"
-                        @keydown.enter.prevent="pushTaggableOption"
-                        @blur="pushTaggableOption"
-                    />
+    <div>
+        <div class="flex">
+            <ComboboxRoot
+                class="cursor-pointer"
+                v-bind="attrs"
+                ignore-filter
+                :multiple
+                :reset-search-term-on-blur="false"
+                :reset-search-term-on-select="false"
+                :disabled="disabled || (multiple && limitReached) || readOnly"
+                :open="dropdownOpen"
+                :model-value="modelValue"
+                @update:open="updateDropdownOpen"
+                @update:model-value="updateModelValue"
+            >
+                <ComboboxAnchor :class="['w-full flex items-center justify-between gap-2 text-gray-900 dark:text-gray-300 antialiased appearance-none', $attrs.class]" data-ui-combobox-anchor>
+                    <ComboboxTrigger as="div" :class="triggerClasses">
+                        <ComboboxInput
+                            v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"
+                            ref="search"
+                            class="w-full text-gray-700 opacity-100 focus:outline-none placeholder-xs"
+                            v-model="searchQuery"
+                            :placeholder
+                            @paste.prevent="onPaste"
+                            @keydown.enter.prevent="pushTaggableOption"
+                            @blur="pushTaggableOption"
+                        />
 
-                    <button type="button" class="flex-1 text-start" v-else-if="!searchable && (dropdownOpen || !modelValue)">
-                        <span class="text-gray-400 dark:text-gray-500 text-[0.8125rem]" v-text="placeholder" />
-                    </button>
-
-                    <button type="button" v-else class="flex-1 text-start cursor-pointer">
-                        <slot name="selected-option" v-bind="{ option: selectedOption }">
-                            <span v-if="labelHtml" v-html="getOptionLabel(selectedOption)" />
-                            <span v-else v-text="getOptionLabel(selectedOption)" />
-                        </slot>
-                    </button>
-
-                    <div class="flex gap-1 items-center">
-                        <Button icon="x" variant="ghost" size="xs" round v-if="clearable && modelValue" @click="clear" />
-                        <Icon name="ui/chevron-down" />
-                    </div>
-                </ComboboxTrigger>
-            </ComboboxAnchor>
-
-            <ComboboxPortal>
-                <ComboboxContent
-                    position="popper"
-                    :side-offset="5"
-                    :class="[
-                        'shadow-ui-sm z-100 rounded-lg border border-gray-200 bg-white p-2 dark:border-white/10 dark:bg-gray-800',
-                        'max-h-[var(--reka-combobox-content-available-height)] w-[var(--reka-combobox-trigger-width)] min-w-fit',
-                    ]"
-                >
-                    <ComboboxViewport>
-                        <ComboboxEmpty class="py-2 text-sm">
-                            <slot name="no-options" v-bind="{ searchQuery }">
-                                {{ __('No options to choose from.') }}
-                            </slot>
-                        </ComboboxEmpty>
-
-                        <ComboboxItem
-                            v-if="filteredOptions"
-                            v-for="(option, index) in filteredOptions"
-                            :key="index"
-                            :value="getOptionValue(option)"
-                            :text-value="getOptionLabel(option)"
-                            :class="itemClasses({ size: size, selected: isSelected(option) })"
-                            as="button"
-                            @select="dropdownOpen = !closeOnSelect"
-                        >
-                            <slot name="option" v-bind="option">
-                                <img v-if="option.image" :src="option.image" class="size-5 rounded-full" />
-                                <span v-if="labelHtml" v-html="getOptionLabel(option)" />
-                                <span v-else>{{ __(getOptionLabel(option)) }}</span>
-                            </slot>
-                        </ComboboxItem>
-                    </ComboboxViewport>
-                </ComboboxContent>
-            </ComboboxPortal>
-        </ComboboxRoot>
-
-        <div v-if="maxSelections && maxSelections !== Infinity && multiple" class="ms-2 mt-3 text-xs" :class="limitIndicatorColor">
-            <span v-text="selectedOptions.length"></span>/<span v-text="maxSelections"></span>
-        </div>
-    </div>
-
-    <slot name="selected-options" v-bind="{ disabled, readOnly, getOptionLabel, getOptionValue, labelHtml, deselect }">
-        <sortable-list
-            v-if="multiple"
-            item-class="sortable-item"
-            handle-class="sortable-item"
-            :distance="5"
-            :mirror="false"
-            :disabled
-            :model-value="modelValue"
-            @update:modelValue="updateModelValue"
-        >
-            <div class="flex flex-wrap gap-2">
-                <div
-                    v-for="option in selectedOptions"
-                    :key="getOptionValue(option)"
-                    class="sortable-item mt-2"
-                >
-                    <Badge pill size="lg">
-                        <div v-if="labelHtml" v-html="getOptionLabel(option)"></div>
-                        <div v-else>{{ __(getOptionLabel(option)) }}</div>
-
-                        <button
-                            v-if="!disabled"
-                            type="button"
-                            class="opacity-75 hover:opacity-100 cursor-pointer"
-                            :aria-label="__('Deselect option')"
-                            @click="deselect(option.value)"
-                        >
-                            &times;
+                        <button type="button" class="flex-1 text-start" v-else-if="!searchable && (dropdownOpen || !modelValue)">
+                            <span class="text-gray-400 dark:text-gray-500 text-[0.8125rem]" v-text="placeholder" />
                         </button>
-                        <button v-else type="button" class="opacity-75">
-                            &times;
+
+                        <button type="button" v-else class="flex-1 text-start cursor-pointer">
+                            <slot name="selected-option" v-bind="{ option: selectedOption }">
+                                <span v-if="labelHtml" v-html="getOptionLabel(selectedOption)" />
+                                <span v-else v-text="getOptionLabel(selectedOption)" />
+                            </slot>
                         </button>
-                    </Badge>
-                </div>
+
+                        <div class="flex gap-1 items-center">
+                            <Button icon="x" variant="ghost" size="xs" round v-if="clearable && modelValue" @click="clear" />
+                            <Icon name="ui/chevron-down" />
+                        </div>
+                    </ComboboxTrigger>
+                </ComboboxAnchor>
+
+                <ComboboxPortal>
+                    <ComboboxContent
+                        position="popper"
+                        :side-offset="5"
+                        :class="[
+                            'shadow-ui-sm z-100 rounded-lg border border-gray-200 bg-white p-2 dark:border-white/10 dark:bg-gray-800',
+                            'max-h-[var(--reka-combobox-content-available-height)] w-[var(--reka-combobox-trigger-width)] min-w-fit',
+                        ]"
+                    >
+                        <ComboboxViewport>
+                            <ComboboxEmpty class="py-2 text-sm">
+                                <slot name="no-options" v-bind="{ searchQuery }">
+                                    {{ __('No options to choose from.') }}
+                                </slot>
+                            </ComboboxEmpty>
+
+                            <ComboboxItem
+                                v-if="filteredOptions"
+                                v-for="(option, index) in filteredOptions"
+                                :key="index"
+                                :value="getOptionValue(option)"
+                                :text-value="getOptionLabel(option)"
+                                :class="itemClasses({ size: size, selected: isSelected(option) })"
+                                as="button"
+                                @select="dropdownOpen = !closeOnSelect"
+                            >
+                                <slot name="option" v-bind="option">
+                                    <img v-if="option.image" :src="option.image" class="size-5 rounded-full" />
+                                    <span v-if="labelHtml" v-html="getOptionLabel(option)" />
+                                    <span v-else>{{ __(getOptionLabel(option)) }}</span>
+                                </slot>
+                            </ComboboxItem>
+                        </ComboboxViewport>
+                    </ComboboxContent>
+                </ComboboxPortal>
+            </ComboboxRoot>
+
+            <div v-if="maxSelections && maxSelections !== Infinity && multiple" class="ms-2 mt-3 text-xs" :class="limitIndicatorColor">
+                <span v-text="selectedOptions.length"></span>/<span v-text="maxSelections"></span>
             </div>
-        </sortable-list>
-    </slot>
+        </div>
+
+        <slot name="selected-options" v-bind="{ disabled, readOnly, getOptionLabel, getOptionValue, labelHtml, deselect }">
+            <sortable-list
+                v-if="multiple"
+                item-class="sortable-item"
+                handle-class="sortable-item"
+                :distance="5"
+                :mirror="false"
+                :disabled
+                :model-value="modelValue"
+                @update:modelValue="updateModelValue"
+            >
+                <div class="flex flex-wrap gap-2">
+                    <div
+                        v-for="option in selectedOptions"
+                        :key="getOptionValue(option)"
+                        class="sortable-item mt-2"
+                    >
+                        <Badge pill size="lg">
+                            <div v-if="labelHtml" v-html="getOptionLabel(option)"></div>
+                            <div v-else>{{ __(getOptionLabel(option)) }}</div>
+
+                            <button
+                                v-if="!disabled"
+                                type="button"
+                                class="opacity-75 hover:opacity-100 cursor-pointer"
+                                :aria-label="__('Deselect option')"
+                                @click="deselect(option.value)"
+                            >
+                                &times;
+                            </button>
+                            <button v-else type="button" class="opacity-75">
+                                &times;
+                            </button>
+                        </Badge>
+                    </div>
+                </div>
+            </sortable-list>
+        </slot>
+    </div>
 </template>

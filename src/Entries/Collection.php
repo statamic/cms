@@ -921,7 +921,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             ->entryBlueprints()
             ->map(fn ($blueprint) => $blueprint->commandPaletteLink(
                 type: 'Collections',
-                url: cp_route('collections.blueprints.edit', [$this, $blueprint]),
+                url: cp_route('blueprints.collections.edit', [$this, $blueprint]),
             ));
     }
 

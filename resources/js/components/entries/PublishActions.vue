@@ -125,7 +125,6 @@ export default {
                 .run('entry.publishing', {
                     collection: this.collection,
                     message: this.revisionMessage,
-                    storeName: this.publishContainer,
                 })
                 .then(this.performPublishRequest)
                 .catch((error) => {

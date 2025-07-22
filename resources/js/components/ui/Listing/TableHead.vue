@@ -2,12 +2,25 @@
 import HeaderCell from '@statamic/components/ui/Listing/HeaderCell.vue';
 import ToggleAll from '@statamic/components/ui/Listing/ToggleAll.vue';
 import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
+import { computed } from 'vue';
 
 const { allowsSelections, reorderable, hasActions, visibleColumns, allowsMultipleSelections } = injectListingContext();
+
+const props = defineProps({
+    srOnly: {
+        type: Boolean,
+        default: false,
+    },
+});
+
+const hasVisibleHeader = computed(() => {
+    if (props.srOnly) return false;
+    return allowsSelections.value || visibleColumns.value.length > 1;
+})
 </script>
 
 <template>
-    <thead v-if="allowsSelections || visibleColumns.length > 1">
+    <thead v-if="hasVisibleHeader">
         <tr>
             <th
                 v-if="allowsSelections || reorderable"
@@ -22,6 +35,12 @@ const { allowsSelections, reorderable, hasActions, visibleColumns, allowsMultipl
             <!--                        <template v-if="type === 'terms'">{{ __('Taxonomy') }}</template>-->
             <!--                    </th>-->
             <th scope="col" class="actions-column" v-if="hasActions" />
+        </tr>
+    </thead>
+
+    <thead v-else class="sr-only">
+        <tr>
+            <th v-for="column in visibleColumns" :key="column.field" scope="col" v-text="__(column.label || column.field)" />
         </tr>
     </thead>
 </template>

@@ -8,8 +8,8 @@
 @section('content')
     <collection-blueprint-listing
         :initial-rows="{{ json_encode($blueprints) }}"
-        reorder-url="{{ cp_route('collections.blueprints.reorder', $collection) }}"
-        create-url="{{ cp_route('collections.blueprints.create', $collection) }}"
+        reorder-url="{{ cp_route('blueprints.collections.reorder', $collection) }}"
+        create-url="{{ cp_route('blueprints.collections.create', $collection) }}"
     ></collection-blueprint-listing>
 
     <x-statamic::docs-callout

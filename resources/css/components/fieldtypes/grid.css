@@ -3,15 +3,14 @@
    ========================================================================== */
 
 .grid-table {
-    @apply relative w-full rounded-lg border text-gray shadow-ui-sm outline-hidden dark:border-dark-900 dark:text-dark-150 text-start;
+    @apply bg-white dark:bg-gray-800 relative w-full rounded-lg border text-gray shadow-ui-sm outline-hidden dark:border-gray-900 dark:text-dark-150 text-start;
     border-collapse: separate;
     border-spacing: 0;
     table-layout: auto;
 }
 
 .grid-table thead th {
-    @apply sticky table-cell z-10 border-b bg-gray-50 p-2 text-sm font-medium text-gray-900 dark:border-dark-900 dark:bg-gray-800 dark:text-gray-100;
-    top: -1px;
+    @apply sticky -top-2 table-cell z-10 border-b bg-gray-50 p-2 text-sm font-medium text-gray-900 dark:border-gray-900 dark:bg-gray-800 dark:text-gray-100;
 
     &:first-child {
         @apply rounded-ss-lg ps-3;
@@ -34,7 +33,7 @@
     }
 
     > tr > td {
-        @apply border-b px-2 py-3 align-top dark:border-dark-900;
+        @apply border-b px-2 py-3 align-top dark:border-gray-900;
 
         &:first-child.grid-cell {
             @apply ltr:pl-3 rtl:pr-3;

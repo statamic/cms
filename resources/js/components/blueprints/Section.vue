@@ -8,7 +8,7 @@
                     <!-- <svg-icon :name="iconName(section.icon)" :directory="iconBaseDirectory" /> -->
                     <ui-heading v-text="__(section.display ?? 'Section')" />
                 </div>
-                <ui-button icon="pencil" size="sm" variant="ghost" @click="edit" />
+                <ui-button icon="pencil-line" size="sm" variant="ghost" @click="edit" />
                 <ui-button icon="trash" size="sm" variant="ghost" @click.prevent="$emit('deleted')" />
             </ui-panel-header>
 

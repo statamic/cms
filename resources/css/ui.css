@@ -126,3 +126,5 @@
     }
 }
 
+@custom-variant with-contrast (&:where([data-contrast="increased"] *));
+

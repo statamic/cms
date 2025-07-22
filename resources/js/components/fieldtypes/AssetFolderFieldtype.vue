@@ -17,11 +17,9 @@ import Fieldtype from './Fieldtype.vue';
 export default {
     mixins: [Fieldtype],
 
-    inject: ['store'],
-
     computed: {
         container() {
-            return this.store.values?.container[0] ?? this.config.container;
+            return this.publishContainer.values?.container[0] ?? this.config.container;
         },
 
         relationshipMeta() {

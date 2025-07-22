@@ -6,7 +6,7 @@
             </template>
         </ui-header>
 
-        <ui-panel :heading="__('Settings')">
+        <ui-panel v-if="showTitle" :heading="__('Settings')">
             <ui-card>
                 <ui-field :label="__('Title')" :instructions="__('messages.blueprints_title_instructions')" :errors="errors.title">
                     <ui-input v-model="blueprint.title" />
