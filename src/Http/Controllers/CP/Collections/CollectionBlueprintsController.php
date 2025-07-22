@@ -4,7 +4,10 @@ namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
+use Statamic\CP\Breadcrumbs\Breadcrumb;
+use Statamic\CP\Breadcrumbs\Breadcrumbs;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\Fields\ManagesBlueprints;
 
@@ -19,6 +22,8 @@ class CollectionBlueprintsController extends CpController
 
     public function index(CollectionContract $collection)
     {
+        $this->pushCollectionBreadcrumbs($collection);
+
         $blueprints = $this->indexItems($collection->entryBlueprints(), $collection);
 
         return view('statamic::collections.blueprints.index', compact('collection', 'blueprints'));
@@ -37,6 +42,26 @@ class CollectionBlueprintsController extends CpController
     public function edit($collection, $blueprint)
     {
         $blueprint = $collection->entryBlueprint($blueprint);
+
+        $this->pushCollectionBreadcrumbs($collection);
+
+        Breadcrumbs::push(new Breadcrumb(
+            text: $blueprint->title(),
+            url: request()->url(),
+            icon: 'blueprints',
+            links: $collection
+                ->entryBlueprints()
+                ->reject(fn ($b) => $b->handle() === $blueprint->handle())
+                ->map(fn ($b) => [
+                    'text' => $b->title(),
+                    'icon' => 'blueprints',
+                    'url' => cp_route('blueprints.collections.edit', [$collection, $b]),
+                ])
+                ->values()
+                ->all(),
+            createLabel: 'Create Blueprint',
+            createUrl: cp_route('blueprints.collections.create', $collection),
+        ));
 
         return view('statamic::collections.blueprints.edit', [
             'collection' => $collection,
@@ -57,6 +82,8 @@ class CollectionBlueprintsController extends CpController
 
     public function create($collection)
     {
+        $this->pushCollectionBreadcrumbs($collection);
+
         return view('statamic::collections.blueprints.create', [
             'action' => cp_route('blueprints.collections.store', $collection),
         ]);
@@ -85,5 +112,28 @@ class CollectionBlueprintsController extends CpController
         $this->authorize('delete', $blueprint);
 
         $blueprint->delete();
+    }
+
+    private function pushCollectionBreadcrumbs(CollectionContract $collection)
+    {
+        Breadcrumbs::push(new Breadcrumb(
+            text: 'Collections',
+            icon: 'collections',
+        ));
+
+        Breadcrumbs::push(new Breadcrumb(
+            text: $collection->title(),
+            url: request()->url(),
+            icon: 'collections',
+            links: Collection::all()
+                ->reject(fn ($c) => $c->handle() === $collection->handle())
+                ->map(fn ($c) => [
+                    'text' => $c->title(),
+                    'icon' => 'collections',
+                    'url' => cp_route('blueprints.collections.index', $c),
+                ])
+                ->values()
+                ->all(),
+        ));
     }
 }
