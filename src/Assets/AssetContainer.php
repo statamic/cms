@@ -462,13 +462,25 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
      */
     public function asset($path)
     {
-        $asset = $this->makeAsset($path);
+        $asset = $this->exists()
+            ? $this->queryAssets()->where('path', $path)->first()
+            : $this->makeAsset($path);
 
-        if (! $asset->exists()) {
+        if (! $asset || ! $asset->exists()) {
             return null;
         }
 
         return $asset->hydrate()->syncOriginal();
+    }
+
+    /**
+     * Check if the asset container exists.
+     *
+     * @return bool
+     */
+    public function exists()
+    {
+        return Facades\AssetContainer::find($this->handle()) !== null;
     }
 
     /**
