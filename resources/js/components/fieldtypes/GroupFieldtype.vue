@@ -1,7 +1,7 @@
 <template>
     <portal name="group-fullscreen" :disabled="!fullScreenMode" :provide="provide">
         <element-container @resized="containerWidth = $event.width">
-            <div class="group-fieldtype-container" :class="{ 'grid-fullscreen bg-white': fullScreenMode }">
+            <div :class="{ '@apply fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-100 z-998': fullScreenMode }">
                 <publish-field-fullscreen-header
                     v-if="fullScreenMode"
                     :title="config.display"
@@ -10,7 +10,7 @@
                 >
                 </publish-field-fullscreen-header>
                 <section :class="{ 'mt-14 p-4': fullScreenMode }">
-                    <div :class="{ 'replicator-set dark:border-dark-900 rounded-sm border shadow-sm': config.border }">
+                    <div :class="{ 'bg-white dark:bg-gray-800 dark:border-dark-900 rounded-lg border': config.border }">
                         <FieldsProvider
                             :fields="fields"
                             :field-path-prefix="fieldPathPrefix || handle"
@@ -24,18 +24,6 @@
         </element-container>
     </portal>
 </template>
-
-<style>
-.group-fieldtype-button-wrapper {
-    /* TODO: Remove @apply */
-    /* @apply absolute top-5 flex sm:top-7 ltr:right-6 rtl:left-6; */
-}
-
-.replicator-set .group-fieldtype-button-wrapper {
-    /* TODO: Remove @apply */
-    /* @apply top-5 ltr:right-4 rtl:left-4; */
-}
-</style>
 
 <script>
 import Fieldtype from './Fieldtype.vue';
