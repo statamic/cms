@@ -15,7 +15,7 @@ class Ffmpeg extends Process
         return $this;
     }
 
-    public function extractThumbnail(string $path, string $outputFilePath)
+    public function extractThumbnail(string $path, string $outputFilePath): ?string
     {
         $ffmpegBinary = $this->ffmpegBinary();
 
@@ -32,7 +32,7 @@ class Ffmpeg extends Process
         return $outputFilePath;
     }
 
-    private function buildCommand(string $ffmpegBinary, string $path, string $output)
+    private function buildCommand(string $ffmpegBinary, string $path, string $output): string
     {
         return collect([
             escapeshellarg($ffmpegBinary),
@@ -46,7 +46,7 @@ class Ffmpeg extends Process
         ])->join(' ');
     }
 
-    public function ffmpegBinary()
+    public function ffmpegBinary(): ?string
     {
         if ($binary = config('statamic.assets.ffmpeg.binary')) {
             return $binary;
