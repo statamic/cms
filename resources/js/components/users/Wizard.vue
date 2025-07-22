@@ -22,10 +22,12 @@
             </div>
 
             <ui-publish-container
+                ref="container"
                 :blueprint="blueprint"
                 v-model="values"
                 :meta="meta"
                 :track-dirty-state="false"
+                :errors="errors"
             >
                 <div class="mx-auto -mt-6 max-w-md px-4 py-0 pb-20">
                     <ui-publish-fields-provider :fields="fields">
@@ -395,10 +397,6 @@ export default {
                 emailErrors = emailErrors.filter((error) => error !== error);
             }
             this.errors = { ...this.errors, email: [...new Set(emailErrors)] };
-        },
-
-        errors: function (errors) {
-            if (this.onUserInfoStep) this.$refs.container.store.setErrors(errors);
         },
     },
 

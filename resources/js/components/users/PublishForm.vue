@@ -155,7 +155,7 @@ export default {
         afterActionSuccessfullyCompleted(response) {
             if (response.data) {
                 this.title = response.data.title;
-                this.values = resetValuesFromResponse(response.data.values, this.$refs.container.store);
+                this.values = resetValuesFromResponse(response.data.values, this.$refs.container);
             }
         },
     },
