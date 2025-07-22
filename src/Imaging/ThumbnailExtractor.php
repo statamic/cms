@@ -55,7 +55,6 @@ class ThumbnailExtractor
             default => null,
         };
 
-
         return $this->ffmpeg->extractThumbnail(
             $asset->absoluteUrl(),
             static::getCachePath($asset)
