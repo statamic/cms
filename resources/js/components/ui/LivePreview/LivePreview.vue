@@ -183,9 +183,8 @@ async function updateIframeContents(url, target, payload) {
             iframeWindow.Livewire.components.components().forEach(component => component.call('$refresh'));
             return;
         }
-
-        const body = iframeDocument.body;
-        body.innerHTML = updatedDocument.body.innerHTML;
+        
+        iframeDocument.body.innerHTML = updatedDocument.body.innerHTML;
 
         return;
     }
