@@ -168,23 +168,25 @@ async function updateIframeContents(url, target, payload) {
     if (!shouldRefresh) {
         postMessageToIframe(container, url, payload);
 
-        const iframeWindow = container.firstChild.contentWindow;
-        const iframeDocument = container.firstChild.contentDocument;
+        if (Statamic.$config.get('livePreview.hot_reload_contents', false)) {
+            const iframeWindow = container.firstChild.contentWindow;
+            const iframeDocument = container.firstChild.contentDocument;
 
-        const updatedHtml = await fetch(url).then((response) => response.text());
-        const updatedDocument = new DOMParser().parseFromString(updatedHtml, 'text/html');
+            const updatedHtml = await fetch(url).then((response) => response.text());
+            const updatedDocument = new DOMParser().parseFromString(updatedHtml, 'text/html');
 
-        if (typeof iframeWindow.Alpine !== 'undefined' && typeof iframeWindow.Alpine.morph !== 'undefined') {
-            iframeWindow.Alpine.morph(iframeDocument.body, updatedDocument.body);
-            return;
+            if (typeof iframeWindow.Alpine !== 'undefined' && typeof iframeWindow.Alpine.morph !== 'undefined') {
+                iframeWindow.Alpine.morph(iframeDocument.body, updatedDocument.body);
+                return;
+            }
+
+            if (typeof iframeWindow.Livewire !== 'undefined') {
+                iframeWindow.Livewire.components.components().forEach(component => component.call('$refresh'));
+                return;
+            }
+
+            iframeDocument.body.innerHTML = updatedDocument.body.innerHTML;
         }
-
-        if (typeof iframeWindow.Livewire !== 'undefined') {
-            iframeWindow.Livewire.components.components().forEach(component => component.call('$refresh'));
-            return;
-        }
-        
-        iframeDocument.body.innerHTML = updatedDocument.body.innerHTML;
 
         return;
     }
