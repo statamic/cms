@@ -28,6 +28,8 @@
                     size="xs"
                     variant="ghost"
                     :class="{ '-rotate-90 is-closed': !isOpen, 'is-open': isOpen }"
+                    :aria-label="isOpen ? __('Collapse') : __('Expand')"
+                    :aria-expanded="isOpen"
                     @click.stop="$emit('toggle-open')"
                 />
 
