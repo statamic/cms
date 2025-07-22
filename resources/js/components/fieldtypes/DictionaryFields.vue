@@ -27,8 +27,6 @@ export default {
         Fields,
     },
 
-    inject: ['store'],
-
     computed: {
         dictionary() {
             return this.value?.type;
@@ -56,7 +54,7 @@ export default {
         },
 
         errors() {
-            const state = this.store;
+            const state = this.publishContainer;
 
             if (!state) {
                 return {};

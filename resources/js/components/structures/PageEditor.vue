@@ -126,10 +126,6 @@ export default {
     },
 
     computed: {
-        store() {
-            return this.$refs.container.store;
-        },
-
         headerText() {
             return this.entry ? __('Link to Entry') : __('Nav Item');
         },
@@ -211,7 +207,7 @@ export default {
     methods: {
         submit() {
             const postUrl = cp_url(`navigation/${this.handle}/pages`);
-            const values = container.value.store.visibleValues;
+            const values = container.value.visibleValues;
 
             new Pipeline()
                 .provide({ container, errors, saving })

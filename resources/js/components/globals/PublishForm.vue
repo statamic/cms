@@ -153,10 +153,6 @@ export default {
             return errors.value;
         },
 
-        store() {
-            return this.$refs.container.store;
-        },
-
         somethingIsLoading() {
             return !this.$progress.isComplete();
         },
