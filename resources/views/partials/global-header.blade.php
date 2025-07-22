@@ -34,7 +34,7 @@
             @if($breadcrumb->hasLinks() || $breadcrumb->createUrl())
                 <ui-dropdown v-cloak>
                     <template #trigger>
-                        <ui-button text="{{ __($breadcrumb->text()) }}" size="sm" variant="ghost" icon-append="ui/chevron-vertical" class="[&_svg]:size-2" />
+                        <ui-button text="{{ __($breadcrumb->text()) }}" size="sm" variant="ghost" icon-append="ui/chevron-vertical" class="[&_svg]:size-2"></ui-button>
                     </template>
                     <ui-dropdown-header
                         class="grid grid-cols-[auto_1fr_auto] items-center"
@@ -60,11 +60,11 @@
                         </ui-dropdown-menu>
                     @endif
                     @if($breadcrumb->createUrl())
-                        <ui-dropdown-footer icon="plus" text="{{ __($breadcrumb->createLabel()) }}" href="{{ $breadcrumb->createUrl() }}" />
+                        <ui-dropdown-footer icon="plus" text="{{ __($breadcrumb->createLabel()) }}" href="{{ $breadcrumb->createUrl() }}"></ui-button>
                     @endif
                 </ui-dropdown>
             @else
-                <ui-button text="{{ __($breadcrumb->text()) }}" size="sm" variant="ghost" class="[&_svg]:size-2" />
+                <ui-button text="{{ __($breadcrumb->text()) }}" size="sm" variant="ghost" class="[&_svg]:size-2"></ui-button>
             @endif
         @endforeach
     </div>
