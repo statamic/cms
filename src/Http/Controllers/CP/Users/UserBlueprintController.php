@@ -26,6 +26,19 @@ class UserBlueprintController extends CpController
             text: 'User',
         ));
 
+        Breadcrumbs::push(new Breadcrumb(
+            text: 'User',
+            icon: 'users',
+            url: cp_route('blueprints.users.edit'),
+            links: [
+                [
+                    'text' => 'Group',
+                    'icon' => 'groups',
+                    'url' => cp_route('blueprints.user-groups.edit'),
+                ],
+            ],
+        ));
+
         return view('statamic::users.blueprints.edit', [
             'blueprint' => $blueprint,
             'blueprintVueObject' => $this->toVueObject($blueprint),

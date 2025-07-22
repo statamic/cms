@@ -300,11 +300,11 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
             Route::get('navigation/{navigation}/edit', [NavigationBlueprintController::class, 'edit'])->name('navigation.edit');
             Route::patch('navigation/{navigation}', [NavigationBlueprintController::class, 'update'])->name('navigation.update');
 
-            Route::get('user-groups/edit', [UserGroupBlueprintController::class, 'edit'])->name('user-groups.edit');
-            Route::patch('user-groups', [UserGroupBlueprintController::class, 'update'])->name('user-groups.update');
-
             Route::get('users/edit', [UserBlueprintController::class, 'edit'])->name('users.edit');
             Route::patch('users', [UserBlueprintController::class, 'update'])->name('users.update');
+
+            Route::get('user-groups/edit', [UserGroupBlueprintController::class, 'edit'])->name('user-groups.edit');
+            Route::patch('user-groups', [UserGroupBlueprintController::class, 'update'])->name('user-groups.update');
 
             Route::get('{namespace}/{handle}/edit', [BlueprintController::class, 'edit'])->name('edit');
             Route::patch('{namespace}/{handle}', [BlueprintController::class, 'update'])->name('update');

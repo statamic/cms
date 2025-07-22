@@ -23,7 +23,20 @@ class UserGroupBlueprintController extends CpController
         $blueprint = UserGroup::make()->blueprint();
 
         Breadcrumbs::push(new Breadcrumb(
-            text: 'User Group',
+            text: 'User',
+        ));
+
+        Breadcrumbs::push(new Breadcrumb(
+            text: 'Group',
+            icon: 'groups',
+            url: cp_route('blueprints.user-groups.edit'),
+            links: [
+                [
+                    'text' => 'User',
+                    'icon' => 'users',
+                    'url' => cp_route('blueprints.users.edit'),
+                ],
+            ],
         ));
 
         return view('statamic::usergroups.blueprints.edit', [
