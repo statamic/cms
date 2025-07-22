@@ -706,7 +706,7 @@ export default {
             const url = originLocalization.url + '/localize';
             this.$axios.post(url, { site: localization.handle }).then((response) => {
                 this.editLocalization(response.data).then(() => {
-                    this.$events.$emit('localization.created', { store: this.publishContainer });
+                    this.$events.$emit('localization.created', { container: this.$refs.container });
 
                     if (this.originValues.published) {
                         this.setFieldValue('published', true);
