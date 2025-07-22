@@ -29,7 +29,7 @@ class Palette
     public function build(): Collection
     {
         return $this
-            // ->buildNav()
+            ->buildNav()
             ->buildFields()
             ->buildActions()
             ->get();
