@@ -218,6 +218,7 @@ provideContainerContext({
 });
 
 defineExpose({
+    name: props.name,
     saving,
     saved,
     setFieldValue,
