@@ -56,20 +56,20 @@ class Palette
             ->flatMap(fn ($collection) => $collection->entryBlueprintCommandPaletteLinks())
             ->each(fn (Link $link) => $this->addCommand($link));
 
-        Facades\Taxonomy::all()
-            ->flatMap(fn ($taxonomy) => $taxonomy->termBlueprintCommandPaletteLinks())
-            ->each(fn (Link $link) => $this->addCommand($link));
-
         Facades\Nav::all()
             ->map(fn ($nav) => $nav->blueprintCommandPaletteLink())
             ->each(fn (Link $link) => $this->addCommand($link));
 
-        Facades\GlobalSet::all()
-            ->map(fn ($set) => $set->blueprintCommandPaletteLink())
+        Facades\Taxonomy::all()
+            ->flatMap(fn ($taxonomy) => $taxonomy->termBlueprintCommandPaletteLinks())
             ->each(fn (Link $link) => $this->addCommand($link));
 
         Facades\AssetContainer::all()
             ->map(fn ($container) => $container->blueprintCommandPaletteLink())
+            ->each(fn (Link $link) => $this->addCommand($link));
+
+        Facades\GlobalSet::all()
+            ->map(fn ($set) => $set->blueprintCommandPaletteLink())
             ->each(fn (Link $link) => $this->addCommand($link));
 
         Facades\Form::all()

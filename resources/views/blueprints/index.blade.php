@@ -79,6 +79,31 @@
         </ui-panel>
     @endif
 
+    @if (Statamic\Facades\Nav::all()->count() > 0)
+        <ui-subheading size="lg" class="mb-2">{{ __('Navigation') }}</ui-subheading>
+        <ui-panel>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th class="text-start!">{{ __('Blueprint') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (Statamic\Facades\Nav::all() as $nav)
+                        <tr>
+                            <td>
+                                <div class="flex items-center gap-2">
+                                    <ui-icon name="navigation" class="text-gray-500 me-1" />
+                                    <a href="{{ cp_route('blueprints.navigation.edit', $nav->handle()) }}" v-pre>{{ __($nav->title()) }}</a>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </ui-panel>
+    @endif
+
     @if (Statamic\Facades\Taxonomy::all()->count() > 0)
         <ui-subheading size="lg" class="mb-2">{{ __('Taxonomies') }}</ui-subheading>
         <ui-panel>
@@ -113,8 +138,8 @@
         </ui-panel>
     @endif
 
-    @if (Statamic\Facades\Nav::all()->count() > 0)
-        <ui-subheading size="lg" class="mb-2">{{ __('Navigation') }}</ui-subheading>
+    @if (Statamic\Facades\AssetContainer::all()->count() > 0)
+        <ui-subheading size="lg" class="mb-2">{{ __('Asset Containers') }}</ui-subheading>
         <ui-panel>
             <table class="data-table">
                 <thead>
@@ -123,12 +148,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (Statamic\Facades\Nav::all() as $nav)
+                    @foreach (Statamic\Facades\AssetContainer::all() as $container)
                         <tr>
                             <td>
                                 <div class="flex items-center gap-2">
-                                    <ui-icon name="navigation" class="text-gray-500 me-1" />
-                                    <a href="{{ cp_route('blueprints.navigation.edit', $nav->handle()) }}" v-pre>{{ __($nav->title()) }}</a>
+                                    <ui-icon name="assets" class="text-gray-500 me-1" />
+                                    <a href="{{ cp_route('blueprints.asset-containers.edit', $container->handle()) }}" v-pre>{{ __($container->title()) }}</a>
                                 </div>
                             </td>
                         </tr>
@@ -154,31 +179,6 @@
                                 <div class="flex items-center gap-2">
                                     <ui-icon name="globals" class="text-gray-500 me-1" />
                                     <a href="{{ cp_route('blueprints.globals.edit', $set->handle()) }}" v-pre>{{ __($set->title()) }}</a>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </ui-panel>
-    @endif
-
-    @if (Statamic\Facades\AssetContainer::all()->count() > 0)
-        <ui-subheading size="lg" class="mb-2">{{ __('Asset Containers') }}</ui-subheading>
-        <ui-panel>
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th class="text-start!">{{ __('Blueprint') }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (Statamic\Facades\AssetContainer::all() as $container)
-                        <tr>
-                            <td>
-                                <div class="flex items-center gap-2">
-                                    <ui-icon name="assets" class="text-gray-500 me-1" />
-                                    <a href="{{ cp_route('blueprints.asset-containers.edit', $container->handle()) }}" v-pre>{{ __($container->title()) }}</a>
                                 </div>
                             </td>
                         </tr>
