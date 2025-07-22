@@ -41,7 +41,11 @@ const props = defineProps({
     showFieldPreviews: Boolean,
 });
 
-const { store } = injectContainerContext();
+const {
+    setFieldValue,
+    setFieldMeta,
+    previews
+} = injectContainerContext();
 const fieldPathPrefix = computed(() => `${props.fieldPath}.${props.index}`);
 const metaPathPrefix = computed(() => `${props.metaPath}.existing.${props.id}`);
 const isInvalid = computed(() => Object.keys(props.config).length === 0);
@@ -66,11 +70,9 @@ const fieldActionPayload = computed(() => ({
     values: props.values,
     config: props.config,
     // meta: this.meta,
-    update: (handle, value) => store.setDottedFieldValue({ path: `${fieldPathPrefix.value}.${handle}`, value }),
-    updateMeta: (handle, value) => store.setDottedFieldMeta({ path: `${metaPathPrefix.value}.${handle}`, value }),
+    update: (handle, value) => setFieldValue(`${fieldPathPrefix.value}.${handle}`, value),
+    updateMeta: (handle, value) => setFieldMeta(`${metaPathPrefix.value}.${handle}`, value),
     isReadOnly: props.readOnly,
-    // store: this.store,
-    // storeName: this.storeName,
 }));
 
 const fieldActions = computed(() => {
@@ -78,7 +80,7 @@ const fieldActions = computed(() => {
 });
 
 const previewText = computed(() => {
-    return Object.entries(data_get(store.previews, fieldPathPrefix.value) || {})
+    return Object.entries(data_get(previews.value, fieldPathPrefix.value) || {})
         .filter(([handle, value]) => {
             if (!handle.endsWith('_')) return false;
             handle = handle.substr(0, handle.length - 1); // Remove the trailing underscore.
@@ -102,7 +104,7 @@ const previewText = computed(() => {
 });
 
 function toggleEnabledState() {
-    store.setDottedFieldValue({ path: `${fieldPathPrefix.value}.enabled`, value: !props.enabled });
+    setFieldValue(`${fieldPathPrefix.value}.enabled`, !props.enabled);
 }
 
 function toggleCollapsedState() {

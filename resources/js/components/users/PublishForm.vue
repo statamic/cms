@@ -127,10 +127,6 @@ export default {
     },
 
     computed: {
-        store() {
-            return this.$refs.container.store;
-        },
-
         isDirty() {
             return this.$dirty.has(this.publishContainer);
         },
@@ -143,8 +139,6 @@ export default {
                 .through([
                     new BeforeSaveHooks('user', {
                         values: this.values,
-                        container: this.$refs.container,
-                        storeName: this.publishContainer,
                     }),
                     new Request(this.actions.save, this.method),
                     new AfterSaveHooks('user', {
@@ -161,7 +155,7 @@ export default {
         afterActionSuccessfullyCompleted(response) {
             if (response.data) {
                 this.title = response.data.title;
-                this.values = resetValuesFromResponse(response.data.values, this.$refs.container.store);
+                this.values = resetValuesFromResponse(response.data.values, this.$refs.container);
             }
         },
     },

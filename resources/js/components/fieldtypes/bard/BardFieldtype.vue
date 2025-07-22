@@ -190,8 +190,6 @@ export default {
         LinkToolbarButton,
     },
 
-    inject: ['store', 'storeName'],
-
     provide: {
         isInBardField: true,
     },
@@ -212,7 +210,6 @@ export default {
             showAddSetButton: false,
             provide: {
                 bard: this.makeBardProvide(),
-                storeName: this.storeName,
                 bardSets: this.config.sets,
             },
         };
@@ -276,23 +273,17 @@ export default {
             return indexes;
         },
 
-        storeState() {
-            if (!this.store) return undefined;
-
-            return this.store;
-        },
-
         site() {
-            return this.storeState ? this.storeState.site : this.$config.get('selectedSite');
+            return this.publishContainer.site ?? this.$config.get('selectedSite');
         },
 
         setsWithErrors() {
-            if (!this.storeState) return [];
+            if (!this.publishContainer) return [];
 
             return Object.values(this.setIndexes).filter((setIndex) => {
                 const prefix = `${this.fieldPathPrefix || this.handle}.${setIndex}.`;
 
-                return Object.keys(this.storeState.errors).some((key) => key.startsWith(prefix));
+                return Object.keys(this.publishContainer.errors).some((key) => key.startsWith(prefix));
             });
         },
 

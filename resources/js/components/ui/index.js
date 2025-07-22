@@ -61,7 +61,11 @@ import { default as PanelFooter } from "./Panel/Footer.vue";
 import { default as PanelHeader } from "./Panel/Header.vue";
 import { default as Popover } from "./Popover.vue";
 import { default as PublishComponents } from "./Publish/Components.vue";
-import { default as PublishContainer } from "./Publish/Container.vue";
+import {
+    default as PublishContainer,
+    containerContextKey as publishContextKey,
+    injectContainerContext as injectPublishContext
+} from "./Publish/Container.vue";
 import { default as PublishField } from "./Publish/Field.vue";
 import { default as PublishFields } from "./Publish/Fields.vue";
 import { default as PublishForm } from "./Publish/Form.vue";
@@ -162,6 +166,8 @@ export {
     Popover,
     PublishComponents,
     PublishContainer,
+    publishContextKey,
+    injectPublishContext,
     PublishField,
     PublishFields,
     PublishForm,

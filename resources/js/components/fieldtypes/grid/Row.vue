@@ -29,14 +29,11 @@
 
 <script>
 import GridCell from './Cell.vue';
-import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
 import FieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
 import { Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
 
 export default {
     components: { Dropdown, DropdownMenu, DropdownItem, FieldsProvider, GridCell },
-
-    mixins: [ValidatesFieldConditions],
 
     props: {
         index: {
@@ -75,7 +72,7 @@ export default {
         },
     },
 
-    inject: ['grid', 'sortableItemClass', 'sortableHandleClass', 'store'],
+    inject: ['grid', 'sortableItemClass', 'sortableHandleClass'],
 
     data() {
         return {
@@ -106,12 +103,6 @@ export default {
 
         fieldPath(handle) {
             return `${this.fieldPathPrefix}.${this.index}.${handle}`;
-        },
-
-        errors(handle) {
-            const state = this.store;
-            if (!state) return [];
-            return state.errors[this.fieldPath(handle)] || [];
         },
     },
 };

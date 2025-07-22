@@ -153,10 +153,6 @@ export default {
             return errors.value;
         },
 
-        store() {
-            return this.$refs.container.store;
-        },
-
         somethingIsLoading() {
             return !this.$progress.isComplete();
         },
@@ -202,8 +198,6 @@ export default {
                     new BeforeSaveHooks('global-set', {
                         globalSet: this.initialHandle,
                         values: this.values,
-                        container: this.$refs.container,
-                        storeName: this.publishContainer,
                     }),
                     new Request(this.actions.save, this.method, {
                         _blueprint: this.fieldset.handle,

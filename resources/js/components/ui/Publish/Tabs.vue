@@ -8,8 +8,8 @@ import ElementContainer from '@statamic/components/ElementContainer.vue';
 import ShowField from '@statamic/components/field-conditions/ShowField.js';
 
 const slots = useSlots();
-const { blueprint, store } = injectContainerContext();
-const tabs = ref(blueprint.tabs);
+const { blueprint, visibleValues, extraValues, errors, hiddenFields, revealerFields, setHiddenField } = injectContainerContext();
+const tabs = ref(blueprint.value.tabs);
 const width = ref(null);
 const sidebarTab = computed(() => tabs.value.find((tab) => tab.handle === 'sidebar'));
 const mainTabs = computed(() =>
@@ -19,7 +19,14 @@ const visibleMainTabs = computed(() => {
     return mainTabs.value.filter((tab) => {
         return tab.sections.some((section) => {
             return section.fields.some((field) => {
-                return new ShowField(store, store.values, store.extraValues).showField(field, field.handle);
+                return new ShowField(
+                    visibleValues.value,
+                    extraValues.value,
+                    visibleValues.value,
+                    hiddenFields.value,
+                    revealerFields.value,
+                    setHiddenField
+                ).showField(field, field.handle);
             });
         });
     });
@@ -63,7 +70,7 @@ const fieldTabMap = computed(() => {
 const tabsWithErrors = computed(() => {
     return [
         ...new Set(
-            Object.keys(store.errors)
+            Object.keys(errors.value)
                 .map((handle) => handle.split('.')[0])
                 .filter((handle) => fieldTabMap.value[handle])
                 .map((handle) => fieldTabMap.value[handle]),
