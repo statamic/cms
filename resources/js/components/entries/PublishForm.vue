@@ -293,6 +293,7 @@ import PublishTabs from '@statamic/components/ui/Publish/Tabs.vue';
 import PublishComponents from '@statamic/components/ui/Publish/Components.vue';
 import LocalizationsCard from '@statamic/components/ui/Publish/Localizations.vue';
 import LivePreview from '@statamic/components/ui/LivePreview/LivePreview.vue';
+import resetValuesFromResponse from '@statamic/util/resetValuesFromResponse.js';
 import { SavePipeline } from '@statamic/exports.js';
 import { computed, ref } from 'vue';
 const { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } = SavePipeline;
@@ -569,7 +570,7 @@ export default {
                     if (this.revisionsEnabled) {
                         clearTimeout(this.trackDirtyStateTimeout);
                         this.trackDirtyState = false;
-                        this.values = this.resetValuesFromResponse(response.data.data.values);
+                        this.values = resetValuesFromResponse(response.data.data.values, this.$refs.container);
                         this.extraValues = response.data.data.extraValues;
                         this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
                         this.$nextTick(() => this.$emit('saved', response));
@@ -768,7 +769,7 @@ export default {
                 this.title = response.data.data.title;
                 clearTimeout(this.trackDirtyStateTimeout);
                 this.trackDirtyState = false;
-                this.values = this.resetValuesFromResponse(response.data.data.values);
+                this.values = resetValuesFromResponse(response.data.data.values, this.$refs.container);
                 this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
                 this.activeLocalization.title = response.data.data.title;
                 this.activeLocalization.published = response.data.data.published;
@@ -825,7 +826,7 @@ export default {
                 if (!this.revisionsEnabled) this.permalink = response.data.permalink;
                 clearTimeout(this.trackDirtyStateTimeout);
                 this.trackDirtyState = false;
-                this.values = this.resetValuesFromResponse(response.data.values);
+                this.values = resetValuesFromResponse(response.data.values, this.$refs.container);
                 this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
                 this.initialPublished = response.data.published;
                 this.activeLocalization.published = response.data.published;

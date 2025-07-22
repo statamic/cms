@@ -224,8 +224,10 @@ provideContainerContext({
 
 defineExpose({
     name: props.name,
+    values,
     saving,
     saved,
+    revealerFields,
     setFieldValue,
     clearDirtyState,
     pushComponent,
