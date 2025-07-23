@@ -2,54 +2,35 @@
 
 namespace Statamic\Fieldtypes\Assets;
 
-use Illuminate\Contracts\Validation\Rule;
-use Statamic\Contracts\GraphQL\CastableToValidationString;
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Statamic\Facades\Asset;
 use Statamic\Statamic;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class MimetypesRule implements CastableToValidationString, Rule
+class MimetypesRule implements ValidationRule
 {
-    protected $parameters;
-
-    public function __construct($parameters)
+    public function __construct(protected $parameters)
     {
-        $this->parameters = $parameters;
     }
 
-    /**
-     * Determine if the validation rule passes.
-     *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @return bool
-     */
-    public function passes($attribute, $value)
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        return collect($value)->every(function ($id) {
-            if ($id instanceof UploadedFile) {
-                $mimeType = $id->getMimeType();
-            } elseif (! ($mimeType = optional(Asset::find($id))->mimeType())) {
-                return false;
-            }
+        $mime_type = '';
 
-            return in_array($mimeType, $this->parameters) ||
-                in_array(explode('/', $mimeType)[0].'/*', $this->parameters);
-        });
+        if ($value instanceof UploadedFile) {
+            $mime_type = $value->getMimeType();
+        } elseif ($asset = Asset::find($value)) {
+            $mime_type = $asset->mimeType();
+        }
+
+        if (! in_array($mime_type, $this->parameters) && ! in_array(explode('/', $mime_type)[0].'/*', $this->parameters)) {
+            $fail($this->message());
+        }
     }
 
-    /**
-     * Get the validation error message.
-     *
-     * @return string
-     */
     public function message()
     {
-        return str_replace(':values', implode(', ', $this->parameters), __((Statamic::isCpRoute() ? 'statamic::' : '').'validation.mimetypes'));
-    }
-
-    public function toGqlValidationString(): string
-    {
-        return 'mimetypes:'.implode(',', $this->parameters);
+        return __((Statamic::isCpRoute() ? 'statamic::' : '').'validation.mimetypes', ['values' => implode(', ', $this->parameters)]);
     }
 }

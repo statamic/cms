@@ -23,11 +23,14 @@
             <button
                 v-if="showFilename"
                 @click="editOrOpen"
-                class="flex w-full flex-1 items-center truncate text-sm text-gray-600 dark:text-gray-400 text-start"
+                class="flex flex-col w-full flex-1 justify-center gap-1 truncate text-sm text-gray-600 dark:text-gray-400 text-start"
                 :title="__('Edit')"
                 :aria-label="__('Edit Asset')"
             >
-                {{ asset.basename }}
+                <div>{{ asset.basename }}</div>
+                <template v-if="errors.length">
+                    <small class="text-xs text-red-500" v-for="(error, i) in errors" :key="i" v-text="error" />
+                </template>
             </button>
             <ui-badge
                 v-if="showSetAlt && needsAlt"

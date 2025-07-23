@@ -2,28 +2,35 @@
 
 namespace Statamic\Fieldtypes\Assets;
 
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
+use Statamic\Facades\Asset;
 use Statamic\Statamic;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class MaxRule extends SizeBasedRule
+class MaxRule implements ValidationRule
 {
-    /**
-     * Determine if the the rule passes for the given size.
-     *
-     * @param  int  $size
-     * @return bool
-     */
-    public function sizePasses($size)
+    public function __construct(protected $parameters)
     {
-        return $size <= $this->parameters[0];
     }
 
-    /**
-     * Get the validation error message.
-     *
-     * @return string
-     */
-    public function message()
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        return str_replace(':max', $this->parameters[0], __((Statamic::isCpRoute() ? 'statamic::' : '').'validation.max.file'));
+        $size = 0;
+
+        if ($value instanceof UploadedFile) {
+            $size = $value->getSize() / 1024;
+        } elseif ($asset = Asset::find($value)) {
+            $size = $asset->size() / 1024;
+        }
+
+        if ($size > $this->parameters[0]) {
+            $fail($this->message());
+        }
+    }
+
+    public function message(): string
+    {
+        return __((Statamic::isCpRoute() ? 'statamic::' : '').'validation.max.file', ['max' => $this->parameters[0]]);
     }
 }
