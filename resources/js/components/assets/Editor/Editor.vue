@@ -228,10 +228,6 @@ export default {
     },
 
     computed: {
-        store() {
-            return this.$refs.container.store;
-        },
-
         isImage() {
             if (!this.asset) return false;
 
@@ -366,7 +362,7 @@ export default {
             const url = cp_url(`assets/${utf8btoa(this.id)}`);
 
             return this.$axios
-                .patch(url, this.$refs.container.store.visibleValues)
+                .patch(url, this.$refs.container.visibleValues)
                 .then((response) => {
                     this.$emit('saved', response.data.asset);
                     this.$toast.success(__('Saved'));

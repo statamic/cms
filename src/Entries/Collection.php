@@ -295,6 +295,11 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         return cp_route('collections.entries.create', [$this->handle(), $site]);
     }
 
+    public function editBlueprintUrl($blueprint)
+    {
+        return cp_route('blueprints.collections.edit', [$this, $blueprint]);
+    }
+
     public function queryEntries()
     {
         return Facades\Entry::query()->where('collection', $this->handle());
@@ -915,13 +920,15 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         File::delete(dirname($this->path()).'/'.$this->handle);
     }
 
-    public function commandPaletteLinksForBlueprints()
+    public function entryBlueprintCommandPaletteLinks()
     {
+        $text = __('Collections').' » '.__($this->title());
+
         return $this
             ->entryBlueprints()
             ->map(fn ($blueprint) => $blueprint->commandPaletteLink(
-                type: 'Collections',
-                url: cp_route('collections.blueprints.edit', [$this, $blueprint]),
+                type: $text,
+                url: $this->editBlueprintUrl($blueprint),
             ));
     }
 

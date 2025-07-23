@@ -110,13 +110,13 @@
 <script>
 import { NodeViewWrapper } from '@tiptap/vue-3';
 import ManagesPreviewText from '../replicator/ManagesPreviewText';
-import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
 import HasFieldActions from '../../field-actions/HasFieldActions.js';
 import { Badge, Button, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, Icon, Subheading, Switch, Tooltip } from '@statamic/ui';
 import { Motion } from 'motion-v';
 import FieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
 import Fields from '@statamic/components/ui/Publish/Fields.vue';
 import { within } from '@popperjs/core/lib/utils/within.js';
+import { containerContextKey } from '@statamic/components/ui/Publish/Container.vue';
 
 export default {
     props: {
@@ -148,9 +148,13 @@ export default {
         Motion,
     },
 
-    mixins: [ValidatesFieldConditions, ManagesPreviewText, HasFieldActions],
+    mixins: [ManagesPreviewText, HasFieldActions],
 
-    inject: ['bard', 'bardSets', 'store', 'storeName'],
+    inject: {
+        bard: {},
+        bardSets: {},
+        publishContainer: { from: containerContextKey },
+    },
 
     computed: {
         fields() {
@@ -174,7 +178,7 @@ export default {
         },
 
         previews() {
-            return data_get(this.store.previews, this.fieldPathPrefix) || {};
+            return data_get(this.publishContainer.previews.value, this.fieldPathPrefix) || {};
         },
 
         collapsed() {
@@ -276,12 +280,10 @@ export default {
                 config: this.config,
                 // meta: this.meta,
                 update: (handle, value) =>
-                    this.store.setDottedFieldValue({ path: `${this.fieldPathPrefix}.${handle}`, value }),
+                    this.publishContainer.setFieldValue(`${this.fieldPathPrefix}.${handle}`, value),
                 updateMeta: (handle, value) =>
-                    this.store.setDottedFieldMeta({ path: `${this.metaPathPrefix}.${handle}`, value }),
+                    this.publishContainer.setFieldMeta(`${this.metaPathPrefix}.${handle}`, value),
                 isReadOnly: this.isReadOnly,
-                // store: this.store,
-                // storeName: this.storeName,
             };
         },
 

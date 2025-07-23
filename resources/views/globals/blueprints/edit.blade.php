@@ -7,7 +7,7 @@
 
 @section('content')
     <blueprint-builder
-        action="{{ cp_route('globals.blueprint.update', $set->handle()) }}"
+        action="{{ cp_route('blueprints.globals.update', $set->handle()) }}"
         :initial-blueprint="{{ json_encode($blueprintVueObject) }}"
     ></blueprint-builder>
 

@@ -180,7 +180,7 @@ class GlobalsController extends CpController
                         'instructions' => __('statamic::messages.globals_blueprint_instructions'),
                         'html' => ''.
                             '<div class="text-xs">'.
-                            '   <a href="'.cp_route('globals.blueprint.edit', $set->handle()).'" class="text-blue">'.__('Edit').'</a>'.
+                            '   <a href="'.cp_route('blueprints.globals.edit', $set->handle()).'" class="text-blue">'.__('Edit').'</a>'.
                             '</div>',
                     ],
                 ],

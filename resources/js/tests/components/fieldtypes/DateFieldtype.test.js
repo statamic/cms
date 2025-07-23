@@ -1,8 +1,8 @@
 import { mount } from '@vue/test-utils';
 import { test, expect } from 'vitest';
 import DateFieldtype from '@/components/fieldtypes/DateFieldtype.vue';
-import { createPinia } from 'pinia';
 import DateFormatter from '@statamic/components/DateFormatter.js';
+import { containerContextKey } from '@statamic/components/ui/Publish/Container.vue';
 
 window.__ = (key) => key;
 
@@ -27,10 +27,9 @@ const makeDateField = (props = {}) => {
             },
             ...props,
         },
-        plugins: [createPinia()],
         global: {
             provide: {
-                store: '',
+                [containerContextKey]: {}
             },
             mocks: {
                 $config: {

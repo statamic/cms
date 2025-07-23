@@ -120,7 +120,7 @@ class EntriesController extends CpController
                 'revisions' => $entry->revisionsUrl(),
                 'restore' => $entry->restoreRevisionUrl(),
                 'createRevision' => $entry->createRevisionUrl(),
-                'editBlueprint' => cp_route('collections.blueprints.edit', [$collection, $blueprint]),
+                'editBlueprint' => cp_route('blueprints.collections.edit', [$collection, $blueprint]),
             ],
             'values' => array_merge($values, ['id' => $entry->id()]),
             'extraValues' => $extraValues,
@@ -296,7 +296,7 @@ class EntriesController extends CpController
             'title' => $collection->createLabel(),
             'actions' => [
                 'save' => cp_route('collections.entries.store', [$collection->handle(), $site->handle()]),
-                'editBlueprint' => cp_route('collections.blueprints.edit', [$collection, $blueprint]),
+                'editBlueprint' => cp_route('blueprints.collections.edit', [$collection, $blueprint]),
             ],
             'values' => $values->all(),
             'extraValues' => [

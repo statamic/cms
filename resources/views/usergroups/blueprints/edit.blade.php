@@ -7,7 +7,7 @@
 
 @section('content')
     <blueprint-builder
-        action="{{ cp_route('user-groups.blueprint.update') }}"
+        action="{{ cp_route('blueprints.user-groups.update') }}"
         :initial-blueprint="{{ json_encode($blueprintVueObject) }}"
         :can-define-localizable="false"
     ></blueprint-builder>

@@ -149,8 +149,6 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::get('select-site/{handle}', [SelectSiteController::class, 'select']);
 
     Route::resource('navigation', NavigationController::class);
-    Route::get('navigation/{navigation}/blueprint', [NavigationBlueprintController::class, 'edit'])->name('navigation.blueprint.edit');
-    Route::patch('navigation/{navigation}/blueprint', [NavigationBlueprintController::class, 'update'])->name('navigation.blueprint.update');
     Route::get('navigation/{navigation}/tree', [NavigationTreeController::class, 'index'])->name('navigation.tree.index');
     Route::patch('navigation/{navigation}/tree', [NavigationTreeController::class, 'update'])->name('navigation.tree.update');
     Route::post('navigation/{navigation}/pages', [NavigationPagesController::class, 'update'])->name('navigation.pages.update');
@@ -162,8 +160,6 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::post('collections/actions/list', [CollectionActionController::class, 'bulkActions'])->name('collections.actions.bulk');
     Route::get('collections/{collection}/scaffold', [ScaffoldCollectionController::class, 'index'])->name('collections.scaffold');
     Route::post('collections/{collection}/scaffold', [ScaffoldCollectionController::class, 'create'])->name('collections.scaffold.create');
-    Route::resource('collections.blueprints', CollectionBlueprintsController::class);
-    Route::post('collections/{collection}/blueprints/reorder', ReorderCollectionBlueprintsController::class)->name('collections.blueprints.reorder');
 
     Route::get('collections/{collection}/tree', [CollectionTreeController::class, 'index'])->name('collections.tree.index');
     Route::patch('collections/{collection}/tree', [CollectionTreeController::class, 'update'])->name('collections.tree.update');
@@ -201,8 +197,6 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     });
 
     Route::resource('taxonomies', TaxonomiesController::class);
-    Route::resource('taxonomies.blueprints', TaxonomyBlueprintsController::class);
-    Route::post('taxonomies/{taxonomy}/blueprints/reorder', ReorderTaxonomyBlueprintsController::class)->name('taxonomies.blueprints.reorder');
 
     Route::group(['prefix' => 'taxonomies/{taxonomy}/terms'], function () {
         Route::get('/', [TermsController::class, 'index'])->name('taxonomies.terms.index');
@@ -239,14 +233,9 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::get('globals/{global_set}', [GlobalVariablesController::class, 'edit'])->name('globals.variables.edit');
     Route::patch('globals/{global_set}/variables', [GlobalVariablesController::class, 'update'])->name('globals.variables.update');
 
-    Route::get('globals/{global_set}/blueprint', [GlobalsBlueprintController::class, 'edit'])->name('globals.blueprint.edit');
-    Route::patch('globals/{global_set}/blueprint', [GlobalsBlueprintController::class, 'update'])->name('globals.blueprint.update');
-
     Route::resource('asset-containers', AssetContainersController::class);
     Route::post('asset-containers/{asset_container}/folders', [FoldersController::class, 'store']);
     Route::patch('asset-containers/{asset_container}/folders/{path}', [FoldersController::class, 'update'])->where('path', '.*');
-    Route::get('asset-containers/{asset_container}/blueprint', [AssetContainerBlueprintController::class, 'edit'])->name('asset-containers.blueprint.edit');
-    Route::patch('asset-containers/{asset_container}/blueprint', [AssetContainerBlueprintController::class, 'update'])->name('asset-containers.blueprint.update');
     Route::post('assets/actions', [AssetActionController::class, 'run'])->name('assets.actions.run');
     Route::post('assets/actions/list', [AssetActionController::class, 'bulkActions'])->name('assets.actions.bulk');
     Route::get('assets/browse', [BrowserController::class, 'index'])->name('assets.browse.index');
@@ -272,11 +261,55 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('field-meta', [MetaController::class, 'show']);
         Route::delete('fieldsets/{fieldset}/reset', [FieldsetController::class, 'reset'])->name('fieldsets.reset');
         Route::resource('fieldsets', FieldsetController::class)->except(['show']);
-        Route::get('blueprints', [BlueprintController::class, 'index'])->name('blueprints.index');
-        Route::get('blueprints/{namespace}/{handle}', [BlueprintController::class, 'edit'])->name('blueprints.edit');
-        Route::patch('blueprints/{namespace}/{handle}', [BlueprintController::class, 'update'])->name('blueprints.update');
-        Route::delete('blueprints/{namespace}/{handle}/reset', [BlueprintController::class, 'reset'])->name('blueprints.reset');
         Route::get('fieldtypes', [FieldtypesController::class, 'index']);
+
+        Route::group(['prefix' => 'blueprints', 'as' => 'blueprints.'], function () {
+            Route::get('/', [BlueprintController::class, 'index'])->name('index');
+
+            Route::group(['prefix' => 'collections/{collection}'], function () {
+                Route::get('/', [CollectionBlueprintsController::class, 'index'])->name('collections.index');
+                Route::get('create', [CollectionBlueprintsController::class, 'create'])->name('collections.create');
+                Route::post('/', [CollectionBlueprintsController::class, 'store'])->name('collections.store');
+                Route::get('{blueprint}', [CollectionBlueprintsController::class, 'show'])->name('collections.show');
+                Route::get('{blueprint}/edit', [CollectionBlueprintsController::class, 'edit'])->name('collections.edit');
+                Route::patch('{blueprint}', [CollectionBlueprintsController::class, 'update'])->name('collections.update');
+                Route::delete('{blueprint}', [CollectionBlueprintsController::class, 'destroy'])->name('collections.destroy');
+                Route::post('reorder', ReorderCollectionBlueprintsController::class)->name('collections.reorder');
+            });
+
+            Route::group(['prefix' => 'taxonomies/{taxonomy}'], function () {
+                Route::get('/', [TaxonomyBlueprintsController::class, 'index'])->name('taxonomies.index');
+                Route::get('create', [TaxonomyBlueprintsController::class, 'create'])->name('taxonomies.create');
+                Route::post('/', [TaxonomyBlueprintsController::class, 'store'])->name('taxonomies.store');
+                Route::get('{blueprint}', [TaxonomyBlueprintsController::class, 'show'])->name('taxonomies.show');
+                Route::get('{blueprint}/edit', [TaxonomyBlueprintsController::class, 'edit'])->name('taxonomies.edit');
+                Route::patch('{blueprint}', [TaxonomyBlueprintsController::class, 'update'])->name('taxonomies.update');
+                Route::delete('{blueprint}', [TaxonomyBlueprintsController::class, 'destroy'])->name('taxonomies.destroy');
+                Route::post('reorder', ReorderTaxonomyBlueprintsController::class)->name('taxonomies.reorder');
+            });
+
+            Route::get('asset-containers/{asset_container}/edit', [AssetContainerBlueprintController::class, 'edit'])->name('asset-containers.edit');
+            Route::patch('asset-containers/{asset_container}', [AssetContainerBlueprintController::class, 'update'])->name('asset-containers.update');
+
+            Route::get('forms/{form}/edit', [FormBlueprintController::class, 'edit'])->name('forms.edit');
+            Route::patch('forms/{form}', [FormBlueprintController::class, 'update'])->name('forms.update');
+
+            Route::get('globals/{global_set}/edit', [GlobalsBlueprintController::class, 'edit'])->name('globals.edit');
+            Route::patch('globals/{global_set}', [GlobalsBlueprintController::class, 'update'])->name('globals.update');
+
+            Route::get('navigation/{navigation}/edit', [NavigationBlueprintController::class, 'edit'])->name('navigation.edit');
+            Route::patch('navigation/{navigation}', [NavigationBlueprintController::class, 'update'])->name('navigation.update');
+
+            Route::get('users/edit', [UserBlueprintController::class, 'edit'])->name('users.edit');
+            Route::patch('users', [UserBlueprintController::class, 'update'])->name('users.update');
+
+            Route::get('user-groups/edit', [UserGroupBlueprintController::class, 'edit'])->name('user-groups.edit');
+            Route::patch('user-groups', [UserGroupBlueprintController::class, 'update'])->name('user-groups.update');
+
+            Route::get('{namespace}/{handle}/edit', [BlueprintController::class, 'edit'])->name('edit');
+            Route::patch('{namespace}/{handle}', [BlueprintController::class, 'update'])->name('update');
+            Route::delete('{namespace}/{handle}/reset', [BlueprintController::class, 'reset'])->name('reset');
+        });
     });
 
     Route::get('updater', [UpdaterController::class, 'index'])->name('updater');
@@ -299,13 +332,9 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::resource('forms', FormsController::class);
     Route::resource('forms.submissions', FormSubmissionsController::class);
     Route::get('forms/{form}/export/{type}', [FormExportController::class, 'export'])->name('forms.export');
-    Route::get('forms/{form}/blueprint', [FormBlueprintController::class, 'edit'])->name('forms.blueprint.edit');
-    Route::patch('forms/{form}/blueprint', [FormBlueprintController::class, 'update'])->name('forms.blueprint.update');
 
     Route::post('users/actions', [UserActionController::class, 'run'])->name('users.actions.run');
     Route::post('users/actions/list', [UserActionController::class, 'bulkActions'])->name('users.actions.bulk');
-    Route::get('users/blueprint', [UserBlueprintController::class, 'edit'])->name('users.blueprint.edit');
-    Route::patch('users/blueprint', [UserBlueprintController::class, 'update'])->name('users.blueprint.update');
     Route::resource('users', UsersController::class)->except('destroy');
     Route::patch('users/{user}/password', [PasswordController::class, 'update'])->name('users.password.update');
     Route::withoutMiddleware(RedirectIfTwoFactorSetupIncomplete::class)->middleware(RequireElevatedSession::class)->group(function () {
@@ -317,8 +346,6 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::get('two-factor/recovery-codes/download', [TwoFactorRecoveryCodesController::class, 'download'])->name('users.two-factor.recovery-codes.download');
     });
     Route::get('account', AccountController::class)->name('account');
-    Route::get('user-groups/blueprint', [UserGroupBlueprintController::class, 'edit'])->name('user-groups.blueprint.edit');
-    Route::patch('user-groups/blueprint', [UserGroupBlueprintController::class, 'update'])->name('user-groups.blueprint.update');
     Route::resource('user-groups', UserGroupsController::class);
     Route::resource('roles', RolesController::class);
 

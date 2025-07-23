@@ -64,6 +64,7 @@
                 <ui-card class="h-40">
                     <ui-listing :items="collection.entries" :columns="collection.columns">
                         <table class="w-full [&_td]:p-0.5 [&_td]:text-sm">
+                            <ui-listing-table-head sr-only />
                             <ui-listing-table-body>
                                 <template #cell-title="{ row: entry }" class="w-full">
                                     <div class="flex items-center gap-2">

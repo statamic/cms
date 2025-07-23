@@ -185,7 +185,7 @@ export default {
 
         Object.assign(this.$app.config.globalProperties, {
             $theme: new Theme(this.initialConfig.user?.theme),
-            $contrast: new Contrast(this.initialConfig.user?.preferences?.contrast),
+            $contrast: new Contrast(this.initialConfig.user?.preferences?.strict_accessibility),
         });
 
         Object.assign(this.$app.config.globalProperties, {
