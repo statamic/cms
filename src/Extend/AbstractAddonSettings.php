@@ -6,7 +6,7 @@ use Statamic\Contracts\Extend\AddonSettings as Contract;
 use Statamic\Contracts\Extend\AddonSettingsRepository;
 use Statamic\Events\AddonSettingsSaved;
 use Statamic\Events\AddonSettingsSaving;
-use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
+use Statamic\Facades\Antlers;
 
 abstract class AbstractAddonSettings implements Contract
 {
@@ -102,6 +102,6 @@ abstract class AbstractAddonSettings implements Contract
                 ->all();
         }
 
-        return (string) app(RuntimeParser::class)->parse($value, ['config' => config()->all()]);
+        return (string) Antlers::parse($value, ['config' => config()->all()]);
     }
 }
