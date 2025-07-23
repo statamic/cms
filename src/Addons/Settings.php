@@ -38,7 +38,7 @@ abstract class Settings implements Contract
         return $this;
     }
 
-    public function rawValues(): array
+    public function raw(): array
     {
         return $this->rawSettings;
     }

@@ -10,7 +10,7 @@ interface Settings
 
     public function values($values = null): array|self;
 
-    public function rawValues(): array;
+    public function raw(): array;
 
     public function get(string $key, $default = null);
 

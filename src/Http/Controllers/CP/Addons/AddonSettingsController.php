@@ -25,7 +25,7 @@ class AddonSettingsController extends CpController
             ->asConfig()
             ->icon('cog')
             ->title($addon->name())
-            ->values($addon->settings()->rawValues())
+            ->values($addon->settings()->raw())
             ->submittingTo(cp_route('addons.settings.update', $addon->slug()));
     }
 

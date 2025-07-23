@@ -16,6 +16,6 @@ class FileSettings extends AbstractSettings
 
     public function fileData()
     {
-        return $this->rawValues();
+        return $this->raw();
     }
 }

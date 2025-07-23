@@ -59,14 +59,14 @@ class SettingsTest extends TestCase
             ],
         ]);
 
-        $this->assertIsArray($settings->rawValues());
+        $this->assertIsArray($settings->raw());
         $this->assertSame([
             'website_name' => '{{ config:app:url }}',
             'foo' => 'bar',
             'baz' => [
                 'qux' => '{{ config:app:name }}',
             ],
-        ], $settings->rawValues());
+        ], $settings->raw());
     }
 
     #[Test]
@@ -99,7 +99,7 @@ class SettingsTest extends TestCase
         $settings->set('baz', 'qux');
 
         $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $settings->values());
-        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $settings->rawValues());
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $settings->raw());
     }
 
     #[Test]
