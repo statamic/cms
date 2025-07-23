@@ -175,6 +175,7 @@
 /* HTML Example...
 
     <div class="content-card bg-architectural-lines"> <-- background lines added to this element
+        [data-ui-panel] <-- a central horizontal line is created here
         <footer>
             <button>Create Collection</button> <--- circular line effect added to this descendended button in the footer
         </footer>
@@ -193,6 +194,31 @@
         /* Reduce the chances of the background circles overlapping the button */
         @media (width < 1300px) {
             background-position-y: 130%;
+        }
+    }
+    .dark &::before {
+        filter: invert(100%);
+    }
+    /* Central horizontal line */
+    [data-ui-panel] {
+        > * {
+            position: relative;
+            z-index: 1;
+        }
+    
+        &::after {
+            --height: 1px;
+            --line-color: hsl(0deg 0% 95%);
+            content: '';
+            pointer-events: none;
+            position: absolute;
+            inset: 0;
+            height: var(--height);
+            border-image: conic-gradient(var(--line-color) 0 0) fill 0//0 100vw;
+            top: calc(50% - var(--height));
+        }
+        .dark &::after {
+            --line-color: hsl(240deg 2.56% 15%);
         }
     }
     footer {
