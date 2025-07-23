@@ -14,7 +14,7 @@
                     :errors="errors.title"
                     id="role-title"
                 >
-                    <Input v-model="title" id="role-title" />
+                    <Input v-model="title" id="role-title" autocomplete="off" />
                 </Field>
 
                 <Field
@@ -25,7 +25,7 @@
                     :errors="handleErrors"
                     id="role-handle"
                 >
-                    <Input v-model="handle" id="role-handle" />
+                    <Input v-model="handle" id="role-handle" autocomplete="off" />
                 </Field>
 
                 <Field
