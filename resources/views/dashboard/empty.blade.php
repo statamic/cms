@@ -12,7 +12,7 @@
         </h1>
     </header>
 
-    <ui-empty-state-menu 
+    <ui-empty-state-menu
         heading="{{ __('statamic::messages.getting_started_widget_header') }}"
         subheading="{{ __('statamic::messages.getting_started_widget_intro') }}"
     >
@@ -51,7 +51,7 @@
     </ui-empty-state-menu>
 
     <x-statamic::docs-callout
-        :topic="__('Navigation')"
-        :url="Statamic::docsUrl('navigation')"
+        :topic="__('Widgets')"
+        :url="Statamic::docsUrl('widgets')"
     />
 @endsection
