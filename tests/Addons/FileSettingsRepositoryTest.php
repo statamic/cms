@@ -38,7 +38,7 @@ class FileSettingsRepositoryTest extends TestCase
 
         $this->assertInstanceOf(FileSettings::class, $settings);
         $this->assertEquals($addon, $settings->addon());
-        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $settings->values());
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $settings->all());
     }
 
     #[Test]
@@ -58,7 +58,7 @@ YAML);
 
         $this->assertInstanceOf(FileSettings::class, $settings);
         $this->assertEquals($addon, $settings->addon());
-        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $settings->values());
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $settings->all());
     }
 
     #[Test]

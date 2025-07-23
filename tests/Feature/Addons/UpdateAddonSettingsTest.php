@@ -49,7 +49,7 @@ class UpdateAddonSettingsTest extends TestCase
     #[Test]
     public function can_update_addon_settings()
     {
-        $this->addon->settings()->values(['api_key' => 'original-api-key'])->save();
+        $this->addon->settings()->set(['api_key' => 'original-api-key'])->save();
 
         $this
             ->actingAs(User::make()->makeSuper()->save())
@@ -65,7 +65,7 @@ class UpdateAddonSettingsTest extends TestCase
     #[Test]
     public function can_update_addon_settings_with_configure_addons_permission()
     {
-        $this->addon->settings()->values(['api_key' => 'original-api-key'])->save();
+        $this->addon->settings()->set(['api_key' => 'original-api-key'])->save();
 
         $this->setTestRoles(['test' => ['access cp', 'configure addons']]);
 
@@ -83,7 +83,7 @@ class UpdateAddonSettingsTest extends TestCase
     #[Test]
     public function can_update_addon_settings_with_edit_addon_settings_permission()
     {
-        $this->addon->settings()->values(['api_key' => 'original-api-key'])->save();
+        $this->addon->settings()->set(['api_key' => 'original-api-key'])->save();
 
         $this->setTestRoles(['test' => ['access cp', 'edit vendor/test-addon settings']]);
 
@@ -101,7 +101,7 @@ class UpdateAddonSettingsTest extends TestCase
     #[Test]
     public function cant_update_addon_settings_without_permission()
     {
-        $this->addon->settings()->values(['api_key' => 'original-api-key'])->save();
+        $this->addon->settings()->set(['api_key' => 'original-api-key'])->save();
 
         $this->setTestRoles(['test' => ['access cp']]);
 
@@ -129,7 +129,7 @@ class UpdateAddonSettingsTest extends TestCase
     #[Test]
     public function cant_update_addon_settings_when_addon_doesnt_have_any_settings()
     {
-        $this->addon->settings()->values(['api_key' => 'original-api-key'])->save();
+        $this->addon->settings()->set(['api_key' => 'original-api-key'])->save();
 
         // Forget the settings blueprint from the container.
         $this->app->offsetUnset('statamic.addons.test-addon.settings_blueprint');

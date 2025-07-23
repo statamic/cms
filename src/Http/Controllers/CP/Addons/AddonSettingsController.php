@@ -42,7 +42,7 @@ class AddonSettingsController extends CpController
 
         $values = PublishForm::make($addon->settingsBlueprint())->submit($request->all());
 
-        $saved = $addon->settings()->values($values)->save();
+        $saved = $addon->settings()->set($values)->save();
 
         return ['saved' => $saved];
     }

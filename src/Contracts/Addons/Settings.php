@@ -8,7 +8,7 @@ interface Settings
 {
     public function addon(): Addon;
 
-    public function values($values = null): array|self;
+    public function all(): array;
 
     public function raw(): array;
 

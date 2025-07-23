@@ -37,14 +37,14 @@ class SettingsTest extends TestCase
             ],
         ]);
 
-        $this->assertIsArray($settings->values());
+        $this->assertIsArray($settings->all());
         $this->assertSame([
             'website_name' => 'http://localhost',
             'foo' => 'bar',
             'baz' => [
                 'qux' => 'Laravel',
             ],
-        ], $settings->values());
+        ], $settings->all());
     }
 
     #[Test]
@@ -83,13 +83,59 @@ class SettingsTest extends TestCase
     #[Test]
     public function it_sets_a_value()
     {
+        config(['test' => ['a' => 'A', 'b' => 'B']]);
         $addon = $this->makeFromPackage();
         $settings = new Settings($addon, ['foo' => 'bar']);
 
-        $settings->set('baz', 'qux');
+        $settings->set('baz', '{{ config:app:name }}');
 
-        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $settings->values());
-        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $settings->raw());
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'Laravel'], $settings->all());
+        $this->assertEquals(['foo' => 'bar', 'baz' => '{{ config:app:name }}'], $settings->raw());
+
+        $settings->set('qux', $raw = [
+            'alfa' => 'bravo',
+            'charlie' => '{{ config:test:a }}',
+            'delta' => [
+                'echo' => '{{ config:test:b }}',
+            ],
+        ]);
+        $this->assertEquals([
+            'foo' => 'bar',
+            'baz' => 'Laravel',
+            'qux' => [
+                'alfa' => 'bravo',
+                'charlie' => 'A',
+                'delta' => ['echo' => 'B'],
+            ],
+        ], $settings->all());
+        $this->assertEquals([
+            'foo' => 'bar',
+            'baz' => '{{ config:app:name }}',
+            'qux' => $raw,
+        ], $settings->raw());
+    }
+
+    #[Test]
+    public function it_sets_all_values()
+    {
+        config(['test' => ['a' => 'A', 'b' => 'B']]);
+        $addon = $this->makeFromPackage();
+        $settings = new Settings($addon, ['foo' => 'bar']);
+
+        $settings->set($raw = [
+            'alfa' => 'bravo',
+            'charlie' => '{{ config:test:a }}',
+            'delta' => [
+                'echo' => '{{ config:test:b }}',
+            ],
+        ]);
+
+        $this->assertEquals([
+            'alfa' => 'bravo',
+            'charlie' => 'A',
+            'delta' => ['echo' => 'B'],
+        ], $settings->all());
+        $this->assertEquals($raw, $settings->raw());
     }
 
     #[Test]

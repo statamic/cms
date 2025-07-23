@@ -26,16 +26,9 @@ abstract class Settings implements Contract
         return $this->addon;
     }
 
-    public function values($values = null): array|self
+    public function all(): array
     {
-        if (func_num_args() === 0) {
-            return $this->settings;
-        }
-
-        $this->rawSettings = $values;
-        $this->settings = $this->resolveAntlers($values);
-
-        return $this;
+        return $this->settings;
     }
 
     public function raw(): array
@@ -48,10 +41,23 @@ abstract class Settings implements Contract
         return $this->settings[$key] ?? $default;
     }
 
-    public function set(string $key, $value): self
+    public function set(string|array $key, mixed $value = null): self
+    {
+        return is_array($key) ? $this->setValues($key) : $this->setValue($key, $value);
+    }
+
+    private function setValue(string $key, mixed $value): self
     {
         $this->settings[$key] = $this->resolveAntlersValue($value);
         $this->rawSettings[$key] = $value;
+
+        return $this;
+    }
+
+    private function setValues(array $values): self
+    {
+        $this->rawSettings = $values;
+        $this->settings = $this->resolveAntlers($values);
 
         return $this;
     }
