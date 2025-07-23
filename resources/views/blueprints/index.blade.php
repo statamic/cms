@@ -138,31 +138,6 @@
         </ui-panel>
     @endif
 
-    @if (Statamic\Facades\GlobalSet::all()->count() > 0)
-        <ui-subheading size="lg" class="mb-2">{{ __('Globals') }}</ui-subheading>
-        <ui-panel>
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th class="text-start!">{{ __('Blueprint') }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (Statamic\Facades\GlobalSet::all() as $set)
-                        <tr>
-                            <td>
-                                <div class="flex items-center gap-2">
-                                    <ui-icon name="globals" class="text-gray-500 me-1" />
-                                    <a href="{{ cp_route('blueprints.globals.edit', $set->handle()) }}" v-pre>{{ __($set->title()) }}</a>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </ui-panel>
-    @endif
-
     @if (Statamic\Facades\AssetContainer::all()->count() > 0)
         <ui-subheading size="lg" class="mb-2">{{ __('Asset Containers') }}</ui-subheading>
         <ui-panel>
@@ -179,6 +154,31 @@
                                 <div class="flex items-center gap-2">
                                     <ui-icon name="assets" class="text-gray-500 me-1" />
                                     <a href="{{ cp_route('blueprints.asset-containers.edit', $container->handle()) }}" v-pre>{{ __($container->title()) }}</a>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </ui-panel>
+    @endif
+
+    @if (Statamic\Facades\GlobalSet::all()->count() > 0)
+        <ui-subheading size="lg" class="mb-2">{{ __('Globals') }}</ui-subheading>
+        <ui-panel>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th class="text-start!">{{ __('Blueprint') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (Statamic\Facades\GlobalSet::all() as $set)
+                        <tr>
+                            <td>
+                                <div class="flex items-center gap-2">
+                                    <ui-icon name="globals" class="text-gray-500 me-1" />
+                                    <a href="{{ cp_route('blueprints.globals.edit', $set->handle()) }}" v-pre>{{ __($set->title()) }}</a>
                                 </div>
                             </td>
                         </tr>

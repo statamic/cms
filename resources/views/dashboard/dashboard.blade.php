@@ -17,9 +17,9 @@
     @endforeach
 </div>
 
-    <x-statamic::docs-callout
-        :topic="__('Widgets')"
-        :url="Statamic::docsUrl('widgets')"
-    />
+<x-statamic::docs-callout
+    :topic="__('Widgets')"
+    :url="Statamic::docsUrl('widgets')"
+/>
 
 @stop

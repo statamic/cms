@@ -3,6 +3,8 @@
 namespace Statamic\Http\Controllers\CP\Fields;
 
 use Illuminate\Http\Request;
+use Statamic\CP\Breadcrumbs\Breadcrumb;
+use Statamic\CP\Breadcrumbs\Breadcrumbs;
 use Statamic\Facades;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Fieldset;
@@ -81,6 +83,21 @@ class FieldsetController extends CpController
     public function edit($fieldset)
     {
         $fieldset = Facades\Fieldset::find($fieldset);
+
+        Breadcrumbs::push(new Breadcrumb(
+            text: $fieldset->title(),
+            url: request()->url(),
+            icon: 'fieldsets',
+            links: Facades\Fieldset::all()
+                ->reject(fn ($f) => $f->handle() === $fieldset->handle())
+                ->map(fn ($f) => [
+                    'text' => $f->title(),
+                    'icon' => 'fieldsets',
+                    'url' => $f->editUrl(),
+                ])
+                ->values()
+                ->all(),
+        ));
 
         $fieldset->validateRecursion();
 

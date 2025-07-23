@@ -93,6 +93,11 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
         return cp_route('taxonomies.destroy', $this->handle());
     }
 
+    public function editBlueprintUrl($blueprint)
+    {
+        return cp_route('blueprints.taxonomies.edit', [$this, $blueprint]);
+    }
+
     public function path()
     {
         return vsprintf('%s/%s.yaml', [
@@ -573,13 +578,15 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
         return $this->termTemplate !== null;
     }
 
-    public function commandPaletteLinksForBlueprints()
+    public function termBlueprintCommandPaletteLinks()
     {
+        $text = __('Taxonomies').' » '.__($this->title());
+
         return $this
             ->termBlueprints()
             ->map(fn ($blueprint) => $blueprint->commandPaletteLink(
-                type: 'Taxonomies',
-                url: cp_route('blueprints.taxonomies.edit', [$this, $blueprint]),
+                type: $text,
+                url: $this->editBlueprintUrl($blueprint),
             ));
     }
 }
