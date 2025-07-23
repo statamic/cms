@@ -10,4 +10,5 @@ class Section extends Fieldtype
     protected $localizable = false;
     protected $validatable = false;
     protected $defaultable = false;
+    protected $selectable = false;
 }
