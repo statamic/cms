@@ -12,7 +12,7 @@ class AddonSettingsController extends CpController
 {
     public function edit(Request $request, $addon)
     {
-        /** @var \Statamic\Extend\Addon $addon */
+        /** @var \Statamic\Addons\Addon $addon */
         $addon = Addon::all()->first(fn ($a) => $a->slug() === $addon);
 
         if (! $addon || ! $addon->hasSettingsBlueprint()) {
@@ -31,7 +31,7 @@ class AddonSettingsController extends CpController
 
     public function update(Request $request, $addon)
     {
-        /** @var \Statamic\Extend\Addon $addon */
+        /** @var \Statamic\Addons\Addon $addon */
         $addon = Addon::all()->first(fn ($a) => $a->slug() === $addon);
 
         if (! $addon || ! $addon->hasSettingsBlueprint()) {

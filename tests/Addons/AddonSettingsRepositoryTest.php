@@ -1,14 +1,14 @@
 <?php
 
-namespace Extend;
+namespace Addons;
 
 use Foo\Bar\TestAddonServiceProvider;
 use Illuminate\Support\Facades\File;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Extend\Addon;
-use Statamic\Extend\AddonSettings;
-use Statamic\Extend\AddonSettingsRepository;
+use Statamic\Addons\Addon;
+use Statamic\Addons\AddonSettings;
+use Statamic\Addons\AddonSettingsRepository;
 use Statamic\Facades;
 use Tests\TestCase;
 

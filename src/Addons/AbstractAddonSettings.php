@@ -1,9 +1,9 @@
 <?php
 
-namespace Statamic\Extend;
+namespace Statamic\Addons;
 
-use Statamic\Contracts\Extend\AddonSettings as Contract;
-use Statamic\Contracts\Extend\AddonSettingsRepository;
+use Statamic\Contracts\Addons\AddonSettings as Contract;
+use Statamic\Contracts\Addons\AddonSettingsRepository;
 use Statamic\Events\AddonSettingsSaved;
 use Statamic\Events\AddonSettingsSaving;
 use Statamic\Facades\Antlers;

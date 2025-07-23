@@ -1,12 +1,12 @@
 <?php
 
-namespace Statamic\Extend;
+namespace Statamic\Addons;
 
 use Composer\Semver\VersionParser;
 use Facades\Statamic\Licensing\LicenseManager;
 use ReflectionClass;
-use Statamic\Contracts\Extend\AddonSettings;
-use Statamic\Contracts\Extend\AddonSettingsRepository;
+use Statamic\Contracts\Addons\AddonSettings;
+use Statamic\Contracts\Addons\AddonSettingsRepository;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;

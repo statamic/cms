@@ -1,8 +1,8 @@
 <?php
 
-namespace Statamic\Contracts\Extend;
+namespace Statamic\Contracts\Addons;
 
-use Statamic\Extend\Addon;
+use Statamic\Addons\Addon;
 
 interface AddonSettings
 {

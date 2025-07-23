@@ -1,16 +1,16 @@
 <?php
 
-namespace Extend;
+namespace Addons;
 
 use Foo\Bar\TestAddonServiceProvider;
 use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Contracts\Extend\AddonSettingsRepository;
+use Statamic\Addons\Addon;
+use Statamic\Addons\AddonSettings as AddonSettings;
+use Statamic\Contracts\Addons\AddonSettingsRepository;
 use Statamic\Events\AddonSettingsSaved;
 use Statamic\Events\AddonSettingsSaving;
-use Statamic\Extend\Addon;
-use Statamic\Extend\AddonSettings as AddonSettings;
 use Tests\TestCase;
 
 #[Group('addons')]

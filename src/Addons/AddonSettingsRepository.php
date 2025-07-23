@@ -1,11 +1,11 @@
 <?php
 
-namespace Statamic\Extend;
+namespace Statamic\Addons;
 
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
-use Statamic\Contracts\Extend\AddonSettings as AddonSettingsContract;
-use Statamic\Contracts\Extend\AddonSettingsRepository as Contract;
+use Statamic\Contracts\Addons\AddonSettings as AddonSettingsContract;
+use Statamic\Contracts\Addons\AddonSettingsRepository as Contract;
 use Statamic\Facades;
 use Statamic\Facades\YAML;
 

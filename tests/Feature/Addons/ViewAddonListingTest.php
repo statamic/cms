@@ -5,7 +5,7 @@ namespace Feature\Addons;
 use Foo\Bar\TestAddonServiceProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Extend\Addon;
+use Statamic\Addons\Addon;
 use Statamic\Facades;
 use Statamic\Facades\User;
 use Tests\FakesRoles;

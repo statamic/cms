@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Extend;
+namespace Addons;
 
 use Facades\Statamic\Licensing\LicenseManager;
 use Foo\Bar\TestAddonServiceProvider;
@@ -8,9 +8,9 @@ use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Contracts\Extend\AddonSettings;
-use Statamic\Contracts\Extend\AddonSettingsRepository;
-use Statamic\Extend\Addon;
+use Statamic\Addons\Addon;
+use Statamic\Contracts\Addons\AddonSettings;
+use Statamic\Contracts\Addons\AddonSettingsRepository;
 use Statamic\Facades;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;

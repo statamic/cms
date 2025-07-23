@@ -2,8 +2,8 @@
 
 namespace Statamic\Http\Controllers\CP\Addons;
 
+use Statamic\Addons\Addon;
 use Statamic\CP\Column;
-use Statamic\Extend\Addon;
 use Statamic\Facades;
 use Statamic\Http\Controllers\CP\CpController;
 
