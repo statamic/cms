@@ -4,7 +4,7 @@ namespace Statamic\Contracts\Addons;
 
 use Statamic\Addons\Addon;
 
-interface AddonSettings
+interface Settings
 {
     public function addon(): Addon;
 

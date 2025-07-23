@@ -2,13 +2,13 @@
 
 namespace Statamic\Addons;
 
-use Statamic\Contracts\Addons\AddonSettings as Contract;
-use Statamic\Contracts\Addons\AddonSettingsRepository;
+use Statamic\Contracts\Addons\Settings as Contract;
+use Statamic\Contracts\Addons\SettingsRepository;
 use Statamic\Events\AddonSettingsSaved;
 use Statamic\Events\AddonSettingsSaving;
 use Statamic\Facades\Antlers;
 
-abstract class AbstractAddonSettings implements Contract
+abstract class Settings implements Contract
 {
     protected Addon $addon;
     protected array $settings;
@@ -75,7 +75,7 @@ abstract class AbstractAddonSettings implements Contract
             return false;
         }
 
-        app(AddonSettingsRepository::class)->save($this);
+        app(SettingsRepository::class)->save($this);
 
         AddonSettingsSaved::dispatch($this);
 
@@ -84,7 +84,7 @@ abstract class AbstractAddonSettings implements Contract
 
     public function delete(): bool
     {
-        return app(AddonSettingsRepository::class)->delete($this);
+        return app(SettingsRepository::class)->delete($this);
     }
 
     public function resolveAntlers($config)

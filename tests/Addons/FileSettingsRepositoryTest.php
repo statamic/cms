@@ -7,13 +7,13 @@ use Illuminate\Support\Facades\File;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Addons\Addon;
-use Statamic\Addons\AddonSettings;
-use Statamic\Addons\AddonSettingsRepository;
+use Statamic\Addons\FileSettings;
+use Statamic\Addons\FileSettingsRepository;
 use Statamic\Facades;
 use Tests\TestCase;
 
 #[Group('addons')]
-class AddonSettingsRepositoryTest extends TestCase
+class FileSettingsRepositoryTest extends TestCase
 {
     private $repository;
 
@@ -21,7 +21,7 @@ class AddonSettingsRepositoryTest extends TestCase
     {
         parent::setUp();
 
-        $this->repository = new AddonSettingsRepository;
+        $this->repository = new FileSettingsRepository;
 
         $this->app['files']->ensureDirectoryExists(resource_path('addons'));
     }
@@ -36,7 +36,7 @@ class AddonSettingsRepositoryTest extends TestCase
             'baz' => 'qux',
         ]);
 
-        $this->assertInstanceOf(AddonSettings::class, $settings);
+        $this->assertInstanceOf(FileSettings::class, $settings);
         $this->assertEquals($addon, $settings->addon());
         $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $settings->values());
     }
@@ -56,7 +56,7 @@ YAML);
 
         $settings = $this->repository->find($addon->id());
 
-        $this->assertInstanceOf(AddonSettings::class, $settings);
+        $this->assertInstanceOf(FileSettings::class, $settings);
         $this->assertEquals($addon, $settings->addon());
         $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $settings->values());
     }

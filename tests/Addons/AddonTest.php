@@ -9,8 +9,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Addons\Addon;
-use Statamic\Contracts\Addons\AddonSettings;
-use Statamic\Contracts\Addons\AddonSettingsRepository;
+use Statamic\Contracts\Addons\Settings;
+use Statamic\Contracts\Addons\SettingsRepository;
 use Statamic\Facades;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
@@ -259,14 +259,14 @@ class AddonTest extends TestCase
         Facades\Addon::shouldReceive('all')->andReturn(collect([$addon]));
         Facades\Addon::shouldReceive('get')->with('vendor/test-addon')->andReturn($addon);
 
-        app(AddonSettingsRepository::class)->make($addon, [
+        app(SettingsRepository::class)->make($addon, [
             'api_key' => '12345',
             'another_setting' => 'value',
         ])->save();
 
         $settings = $addon->settings();
 
-        $this->assertInstanceOf(AddonSettings::class, $settings);
+        $this->assertInstanceOf(Settings::class, $settings);
         $this->assertEquals($addon, $settings->addon());
         $this->assertEquals([
             'api_key' => '12345',
@@ -282,7 +282,7 @@ class AddonTest extends TestCase
 
         $settings = $addon->settings();
 
-        $this->assertInstanceOf(AddonSettings::class, $settings);
+        $this->assertInstanceOf(Settings::class, $settings);
         $this->assertEquals($addon, $settings->addon());
         $this->assertEquals([], $settings->values());
     }

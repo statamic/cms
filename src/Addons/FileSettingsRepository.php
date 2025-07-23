@@ -4,18 +4,13 @@ namespace Statamic\Addons;
 
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
-use Statamic\Contracts\Addons\AddonSettings as AddonSettingsContract;
-use Statamic\Contracts\Addons\AddonSettingsRepository as Contract;
+use Statamic\Addons\SettingsRepository as AbstractSettingsRepository;
+use Statamic\Contracts\Addons\Settings as AddonSettingsContract;
 use Statamic\Facades;
 use Statamic\Facades\YAML;
 
-class AddonSettingsRepository implements Contract
+class FileSettingsRepository extends AbstractSettingsRepository
 {
-    public function make(Addon $addon, array $settings = []): AddonSettingsContract
-    {
-        return app()->makeWith(AddonSettingsContract::class, compact('addon', 'settings'));
-    }
-
     public function find(string $addon): ?AddonSettingsContract
     {
         $slug = Str::after($addon, '/');
@@ -57,7 +52,7 @@ class AddonSettingsRepository implements Contract
     public static function bindings(): array
     {
         return [
-            AddonSettingsContract::class => AddonSettings::class,
+            AddonSettingsContract::class => FileSettings::class,
         ];
     }
 }

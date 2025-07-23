@@ -7,20 +7,20 @@ use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Addons\Addon;
-use Statamic\Addons\AddonSettings as AddonSettings;
-use Statamic\Contracts\Addons\AddonSettingsRepository;
+use Statamic\Addons\Settings as AbstractSettings;
+use Statamic\Contracts\Addons\SettingsRepository;
 use Statamic\Events\AddonSettingsSaved;
 use Statamic\Events\AddonSettingsSaving;
 use Tests\TestCase;
 
 #[Group('addons')]
-class AddonSettingsTest extends TestCase
+class SettingsTest extends TestCase
 {
     #[Test]
     public function it_returns_the_addon()
     {
         $addon = $this->makeFromPackage();
-        $settings = new AddonSettings($addon, ['foo' => 'bar']);
+        $settings = new Settings($addon, ['foo' => 'bar']);
 
         $this->assertEquals($addon, $settings->addon());
     }
@@ -29,7 +29,7 @@ class AddonSettingsTest extends TestCase
     public function it_returns_the_values()
     {
         $addon = $this->makeFromPackage();
-        $settings = new AddonSettings($addon, [
+        $settings = new Settings($addon, [
             'website_name' => '{{ config:app:url }}',
             'foo' => 'bar',
             'baz' => [
@@ -51,7 +51,7 @@ class AddonSettingsTest extends TestCase
     public function it_returns_the_raw_values()
     {
         $addon = $this->makeFromPackage();
-        $settings = new AddonSettings($addon, [
+        $settings = new Settings($addon, [
             'website_name' => '{{ config:app:url }}',
             'foo' => 'bar',
             'baz' => [
@@ -73,7 +73,7 @@ class AddonSettingsTest extends TestCase
     public function it_gets_a_value()
     {
         $addon = $this->makeFromPackage();
-        $settings = new AddonSettings($addon, ['foo' => 'bar']);
+        $settings = new Settings($addon, ['foo' => 'bar']);
 
         $this->assertEquals('bar', $settings->get('foo'));
         $this->assertNull($settings->get('nonexistent'));
@@ -84,7 +84,7 @@ class AddonSettingsTest extends TestCase
     public function it_checks_if_a_value_exists()
     {
         $addon = $this->makeFromPackage();
-        $settings = new AddonSettings($addon, ['foo' => 'bar']);
+        $settings = new Settings($addon, ['foo' => 'bar']);
 
         $this->assertTrue($settings->has('foo'));
         $this->assertFalse($settings->has('nonexistent'));
@@ -94,7 +94,7 @@ class AddonSettingsTest extends TestCase
     public function it_sets_a_value()
     {
         $addon = $this->makeFromPackage();
-        $settings = new AddonSettings($addon, ['foo' => 'bar']);
+        $settings = new Settings($addon, ['foo' => 'bar']);
 
         $settings->set('baz', 'qux');
 
@@ -106,7 +106,7 @@ class AddonSettingsTest extends TestCase
     public function it_merges_settings()
     {
         $addon = $this->makeFromPackage();
-        $settings = new AddonSettings($addon, ['foo' => 'bar']);
+        $settings = new Settings($addon, ['foo' => 'bar']);
 
         $settings->merge(['baz' => 'qux']);
 
@@ -120,9 +120,9 @@ class AddonSettingsTest extends TestCase
         Event::fake();
 
         $addon = $this->makeFromPackage();
-        $settings = new AddonSettings($addon, ['website_name' => '{{ config:app:url }}', 'foo' => 'bar']);
+        $settings = new Settings($addon, ['website_name' => '{{ config:app:url }}', 'foo' => 'bar']);
 
-        $this->mock(AddonSettingsRepository::class, function ($mock) use ($settings) {
+        $this->mock(SettingsRepository::class, function ($mock) use ($settings) {
             $mock->shouldReceive('save')->with($settings)->andReturn(true)->once();
         });
 
@@ -144,9 +144,9 @@ class AddonSettingsTest extends TestCase
         });
 
         $addon = $this->makeFromPackage();
-        $settings = new AddonSettings($addon, ['website_name' => '{{ config:app:url }}', 'foo' => 'bar']);
+        $settings = new Settings($addon, ['website_name' => '{{ config:app:url }}', 'foo' => 'bar']);
 
-        $this->mock(AddonSettingsRepository::class, function ($mock) use ($settings) {
+        $this->mock(SettingsRepository::class, function ($mock) use ($settings) {
             $mock->shouldReceive('save')->with($settings)->andReturn(true)->never();
         });
 
@@ -161,9 +161,9 @@ class AddonSettingsTest extends TestCase
     public function it_deletes_settings()
     {
         $addon = $this->makeFromPackage();
-        $settings = new AddonSettings($addon, ['website_name' => '{{ config:app:url }}', 'foo' => 'bar']);
+        $settings = new Settings($addon, ['website_name' => '{{ config:app:url }}', 'foo' => 'bar']);
 
-        $this->mock(AddonSettingsRepository::class, function ($mock) use ($settings) {
+        $this->mock(SettingsRepository::class, function ($mock) use ($settings) {
             $mock->shouldReceive('delete')->with($settings)->andReturn(true)->once();
         });
 
@@ -188,4 +188,8 @@ class AddonSettingsTest extends TestCase
             'editions' => ['foo', 'bar'],
         ], $attributes));
     }
+}
+
+class Settings extends AbstractSettings
+{
 }

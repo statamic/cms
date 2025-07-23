@@ -2,9 +2,10 @@
 
 namespace Statamic\Addons;
 
+use Statamic\Addons\Settings as AbstractSettings;
 use Statamic\Data\ExistsAsFile;
 
-class AddonSettings extends AbstractAddonSettings
+class FileSettings extends AbstractSettings
 {
     use ExistsAsFile;
 
