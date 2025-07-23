@@ -7,7 +7,10 @@ const props = defineProps({
     icon: { type: String, default: null },
     text: { type: String, default: null },
     badge: { type: String, default: null },
+    removable: { type: Boolean, default: false },
 });
+
+defineEmits(['remove']);
 
 const slots = useSlots();
 const hasDefaultSlot = !!slots.default;
@@ -52,5 +55,11 @@ function click(event) {
             <template v-else>{{ text }}</template>
         </div>
         <Badge v-if="badge" :text="badge" variant="flat" />
+        <Icon
+            v-if="removable"
+            name="x"
+            class="size-4 opacity-30 hover:opacity-70"
+            @click.prevent.stop="$emit('remove', href)"
+        />
     </a>
 </template>
