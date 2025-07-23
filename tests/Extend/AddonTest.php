@@ -6,6 +6,7 @@ use Facades\Statamic\Licensing\LicenseManager;
 use Foo\Bar\TestAddonServiceProvider;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Extend\AddonSettings;
 use Statamic\Contracts\Extend\AddonSettingsRepository;
@@ -16,6 +17,7 @@ use Statamic\Facades\Path;
 use Statamic\Fields\Blueprint;
 use Tests\TestCase;
 
+#[Group('addons')]
 class AddonTest extends TestCase
 {
     protected $addonFixtureDir;

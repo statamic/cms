@@ -4,6 +4,7 @@ namespace Extend;
 
 use Foo\Bar\TestAddonServiceProvider;
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Extend\AddonSettingsRepository;
 use Statamic\Events\AddonSettingsSaved;
@@ -12,6 +13,7 @@ use Statamic\Extend\Addon;
 use Statamic\Extend\AddonSettings as AddonSettings;
 use Tests\TestCase;
 
+#[Group('addons')]
 class AddonSettingsTest extends TestCase
 {
     #[Test]

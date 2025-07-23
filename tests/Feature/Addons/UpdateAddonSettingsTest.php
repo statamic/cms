@@ -3,6 +3,7 @@
 namespace Feature\Addons;
 
 use Foo\Bar\TestAddonServiceProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Extend\Addon;
 use Statamic\Facades;
@@ -11,6 +12,7 @@ use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
+#[Group('addons')]
 class UpdateAddonSettingsTest extends TestCase
 {
     use FakesRoles, PreventSavingStacheItemsToDisk;

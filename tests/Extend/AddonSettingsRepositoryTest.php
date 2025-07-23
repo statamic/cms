@@ -4,6 +4,7 @@ namespace Extend;
 
 use Foo\Bar\TestAddonServiceProvider;
 use Illuminate\Support\Facades\File;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Extend\Addon;
 use Statamic\Extend\AddonSettings;
@@ -11,6 +12,7 @@ use Statamic\Extend\AddonSettingsRepository;
 use Statamic\Facades;
 use Tests\TestCase;
 
+#[Group('addons')]
 class AddonSettingsRepositoryTest extends TestCase
 {
     private $repository;
