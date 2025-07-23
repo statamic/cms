@@ -13,8 +13,7 @@ import { Icon, Subheading } from '@statamic/ui';
 
 let open = ref(false);
 let query = ref('');
-let categories = ref([]);
-let items = ref(getItems());
+let items = ref([]);
 let searchResults = ref([]);
 let selected = ref(null);
 let recentItems = ref(getRecentItems());
@@ -59,7 +58,7 @@ const results = computed(() => {
 
     let groups = groupBy(filtered, 'category');
 
-    return categories.value
+    return Statamic.$config.get('commandPaletteCategories')
         .map(category => {
             return {
                 text: __(category),
@@ -80,14 +79,18 @@ watch(query, debounce(() => {
 }, 300));
 
 watch(open, (isOpen) => {
-    if (isOpen) return;
+    if (isOpen) {
+        getItems();
+        return;
+    }
     reset();
 });
 
 function getItems() {
+    if (items.value.length) return;
+
     axios.get('/cp/command-palette').then((response) => {
-        categories.value = response.data.categories;
-        items.value = response.data.items;
+        items.value = response.data;
     });
 }
 
@@ -200,9 +203,7 @@ const modalClasses = cva({
                         v-model="selected"
                         @keydown.tab.prevent.stop="keydownTab"
                     >
-                        <header
-                            class="group/cmd-input flex h-14 items-center gap-2 border-b border-gray-200/80 px-5.5 dark:border-gray-950"
-                        >
+                        <header class="group/cmd-input flex h-14 items-center gap-2 border-b border-gray-200/80 px-5.5 dark:border-gray-950">
                             <Icon name="magnifying-glass" class="size-5 text-gray-400" />
                             <ComboboxInput
                                 :auto-focus="true"
@@ -212,10 +213,8 @@ const modalClasses = cva({
                             />
                         </header>
                         <ComboboxContent>
-                            <ComboboxViewport
-                                class="max-h-[360px] min-h-[360px] divide-y divide-gray-200/80 overflow-y-auto dark:divide-gray-950"
-                            >
-                                <ComboboxEmpty v-if="!results.length" class="px-3 py-2 opacity-50">
+                            <ComboboxViewport class="max-h-[360px] min-h-[360px] divide-y divide-gray-200/80 overflow-y-auto dark:divide-gray-950">
+                                <ComboboxEmpty v-if="query && !results.length" class="px-3 py-2 opacity-50">
                                     <CommandPaletteItem :text="__('No results found!')" icon="entry" disabled />
                                 </ComboboxEmpty>
                                 <ComboboxGroup
@@ -248,9 +247,7 @@ const modalClasses = cva({
                                     </ComboboxItem>
                                 </ComboboxGroup>
                             </ComboboxViewport>
-                            <footer
-                                class="flex items-center gap-4 rounded-b-xl border-t border-gray-200/80 bg-gray-50 px-6 py-3 dark:border-gray-950 dark:bg-gray-800/20"
-                            >
+                            <footer class="flex items-center gap-4 rounded-b-xl border-t border-gray-200/80 bg-gray-50 px-6 py-3 dark:border-gray-950 dark:bg-gray-800/20">
                                 <div class="flex items-center gap-1.5">
                                     <Icon name="up-square" class="size-4 text-gray-500" />
                                     <Icon name="down-square" class="size-4 text-gray-500" />

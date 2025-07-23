@@ -2,14 +2,15 @@
     <ButtonGroup ref="buttonGroup">
         <Button
             v-for="(option, $index) in options"
-            :key="$index"
             ref="button"
+            :disabled="config.disabled"
+            :key="$index"
             :name="name"
-            @click="updateSelectedOption(option.value)"
-            :value="option.value"
-            :disabled="isReadOnly"
-            :variant="value == option.value ? 'primary' : 'default'"
+            :read-only="isReadOnly"
             :text="option.label || option.value"
+            :value="option.value"
+            :variant="value == option.value ? 'primary' : 'default'"
+            @click="updateSelectedOption(option.value)"
         />
     </ButtonGroup>
 </template>

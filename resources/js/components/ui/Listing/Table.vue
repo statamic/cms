@@ -51,7 +51,6 @@ const forwardedTableCellSlots = computed(() => {
         }"
         data-table
         ref="table"
-        tabindex="0"
         :data-has-selections="hasSelections ? true : null"
         @keydown.shift="shifting = true"
         @keyup="shifting = false"

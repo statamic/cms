@@ -8,9 +8,10 @@
             v-else
             icon="eye-closed"
             @click="buttonReveal"
-            :disabled="isReadOnly"
-            :v-tooltip="__(config.instructions)"
+            :read-only="isReadOnly"
+            :disabled="config.disabled"
             :text="config.input_label || __('Show Fields')"
+            :v-tooltip="__(config.instructions)"
         />
     </div>
 </template>
