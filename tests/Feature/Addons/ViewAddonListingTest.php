@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Addons;
+namespace Feature\Addons;
 
 use Foo\Bar\TestAddonServiceProvider;
 use PHPUnit\Framework\Attributes\Test;
