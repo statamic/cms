@@ -14,10 +14,7 @@ class CommandPaletteController extends CpController
 {
     public function index()
     {
-        return [
-            'categories' => Category::order(),
-            'items' => CommandPalette::build(),
-        ];
+        return CommandPalette::build();
     }
 
     public function search(Request $request)

@@ -13,7 +13,6 @@ import { Icon, Subheading } from '@statamic/ui';
 
 let open = ref(false);
 let query = ref('');
-let categories = ref([]);
 let items = ref([]);
 let searchResults = ref([]);
 let selected = ref(null);
@@ -21,7 +20,6 @@ let recentItems = ref(getRecentItems());
 
 Statamic.$keys.bindGlobal(['mod+k'], (e) => {
     e.preventDefault();
-    getItems();
     open.value = true;
 });
 
@@ -60,7 +58,7 @@ const results = computed(() => {
 
     let groups = groupBy(filtered, 'category');
 
-    return categories.value
+    return Statamic.$config.get('commandPaletteCategories')
         .map(category => {
             return {
                 text: __(category),
@@ -81,14 +79,18 @@ watch(query, debounce(() => {
 }, 300));
 
 watch(open, (isOpen) => {
-    if (isOpen) return;
+    if (isOpen) {
+        getItems();
+        return;
+    }
     reset();
 });
 
 function getItems() {
+    if (items.value.length) return;
+
     axios.get('/cp/command-palette').then((response) => {
-        categories.value = response.data.categories;
-        items.value = response.data.items;
+        items.value = response.data;
     });
 }
 
