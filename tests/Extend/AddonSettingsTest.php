@@ -29,12 +29,21 @@ class AddonSettingsTest extends TestCase
     public function it_returns_the_values()
     {
         $addon = $this->makeFromPackage();
-        $settings = new AddonSettings($addon, ['website_name' => '{{ config:app:url }}', 'foo' => 'bar']);
+        $settings = new AddonSettings($addon, [
+            'website_name' => '{{ config:app:url }}',
+            'foo' => 'bar',
+            'baz' => [
+                'qux' => '{{ config:app:name }}',
+            ],
+        ]);
 
         $this->assertIsArray($settings->values());
-        $this->assertEquals([
+        $this->assertSame([
             'website_name' => 'http://localhost',
             'foo' => 'bar',
+            'baz' => [
+                'qux' => 'Laravel',
+            ],
         ], $settings->values());
     }
 
@@ -42,12 +51,21 @@ class AddonSettingsTest extends TestCase
     public function it_returns_the_raw_values()
     {
         $addon = $this->makeFromPackage();
-        $settings = new AddonSettings($addon, ['website_name' => '{{ config:app:url }}', 'foo' => 'bar']);
-
-        $this->assertIsArray($settings->rawValues());
-        $this->assertEquals([
+        $settings = new AddonSettings($addon, [
             'website_name' => '{{ config:app:url }}',
             'foo' => 'bar',
+            'baz' => [
+                'qux' => '{{ config:app:name }}',
+            ],
+        ]);
+
+        $this->assertIsArray($settings->rawValues());
+        $this->assertSame([
+            'website_name' => '{{ config:app:url }}',
+            'foo' => 'bar',
+            'baz' => [
+                'qux' => '{{ config:app:name }}',
+            ],
         ], $settings->rawValues());
     }
 
