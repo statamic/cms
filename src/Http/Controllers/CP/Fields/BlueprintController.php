@@ -37,6 +37,7 @@ class BlueprintController extends CpController
                         ->values(),
                 ];
             })
+            ->reject(fn ($additional) => $additional['blueprints']->isEmpty())
             ->sortBy('title');
 
         return view('statamic::blueprints.index', [
