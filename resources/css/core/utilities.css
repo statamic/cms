@@ -195,6 +195,10 @@
         @media (width < 1300px) {
             background-position-y: 130%;
         }
+        @media (width > 2000px) {
+            /* The lines become thicker because the svg gets stretched, so reduce opacity to compensate for this */
+            opacity: 0.7;
+        }
     }
     .dark &::before {
         filter: invert(100%);
