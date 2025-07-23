@@ -2,9 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use Statamic\Facades\Utility;
-use Statamic\Http\Controllers\CP\AddonEditionsController;
-use Statamic\Http\Controllers\CP\AddonsController;
-use Statamic\Http\Controllers\CP\API\AddonsController as AddonsApiController;
+use Statamic\Http\Controllers\CP\Addons\AddonsController;
+use Statamic\Http\Controllers\CP\Addons\AddonSettingsController;
 use Statamic\Http\Controllers\CP\API\TemplatesController;
 use Statamic\Http\Controllers\CP\Assets\ActionController as AssetActionController;
 use Statamic\Http\Controllers\CP\Assets\AssetContainerBlueprintController;
@@ -324,7 +323,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     });
 
     Route::get('addons', [AddonsController::class, 'index'])->name('addons.index');
-    Route::post('addons/editions', AddonEditionsController::class);
+    Route::get('addons/{addon}/settings', [AddonSettingsController::class, 'edit'])->name('addons.settings.edit');
+    Route::patch('addons/{addon}/settings', [AddonSettingsController::class, 'update'])->name('addons.settings.update');
 
     Route::post('forms/actions', [FormActionController::class, 'run'])->name('forms.actions.run');
     Route::post('forms/actions/list', [FormActionController::class, 'bulkActions'])->name('forms.actions.bulk');
@@ -379,7 +379,6 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     });
 
     Route::group(['prefix' => 'api', 'as' => 'api.'], function () {
-        Route::resource('addons', AddonsApiController::class)->only('index');
         Route::resource('templates', TemplatesController::class)->only('index');
     });
 
