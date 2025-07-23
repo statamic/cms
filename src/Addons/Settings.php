@@ -48,8 +48,8 @@ abstract class Settings implements Contract
 
     private function setValue(string $key, mixed $value): self
     {
-        $this->settings[$key] = $this->resolveAntlersValue($value);
         $this->rawSettings[$key] = $value;
+        $this->settings[$key] = $this->resolveAntlersValue($value);
 
         return $this;
     }
