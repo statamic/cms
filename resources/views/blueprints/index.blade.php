@@ -257,6 +257,7 @@
                         <tr>
                             <td>
                                 <div class="flex items-center gap-2">
+                                    <ui-icon name="blueprints" class="text-gray-500 me-1" />
                                     <a href="{{ cp_route('blueprints.edit', [$blueprint['namespace'], $blueprint['handle']]) }}">{{ $blueprint['title'] }}</a>
                                 </div>
                             </td>
