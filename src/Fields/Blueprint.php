@@ -75,6 +75,11 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         return $this->namespace;
     }
 
+    public function renderableNamespace(): string
+    {
+        return str_replace('.', ' ', Str::humanize($this->namespace));
+    }
+
     public function fullyQualifiedHandle(): string
     {
         $handle = $this->handle();

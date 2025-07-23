@@ -236,7 +236,7 @@ class BlueprintRepository
             ->keys()
             ->map(function ($namespace) {
                 return [
-                    'title' => $type = str_replace('.', ' ', Str::humanize($namespace)),
+                    'title' => $type = $blueprint->renderableNamespace(),
                     'blueprints' => Blueprint::in($namespace)
                         ->map(fn ($blueprint) => [
                             'handle' => $blueprint->handle(),
