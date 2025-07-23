@@ -4,6 +4,7 @@ namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
 
+/** @deprecated */
 class Section extends Fieldtype
 {
     protected $categories = ['special'];
