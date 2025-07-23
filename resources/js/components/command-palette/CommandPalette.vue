@@ -14,13 +14,14 @@ import { Icon, Subheading } from '@statamic/ui';
 let open = ref(false);
 let query = ref('');
 let categories = ref([]);
-let items = ref(getItems());
+let items = ref([]);
 let searchResults = ref([]);
 let selected = ref(null);
 let recentItems = ref(getRecentItems());
 
 Statamic.$keys.bindGlobal(['mod+k'], (e) => {
     e.preventDefault();
+    getItems();
     open.value = true;
 });
 
