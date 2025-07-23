@@ -817,11 +817,9 @@ abstract class AddonServiceProvider extends ServiceProvider
             return $this;
         }
 
-        if (! file_exists($path = "{$this->getAddon()->directory()}resources/blueprints/settings.yaml")) {
-            return $this;
+        if (file_exists($path = "{$this->getAddon()->directory()}resources/blueprints/settings.yaml")) {
+            $this->registerSettingsBlueprint(YAML::file($path)->parse());
         }
-
-        $this->registerSettingsBlueprint(YAML::file($path)->parse());
 
         return $this;
     }
