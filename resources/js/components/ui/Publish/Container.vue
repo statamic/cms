@@ -118,6 +118,11 @@ watch(
 );
 
 watch(
+    () => props.meta,
+    (newMeta) => meta.value = newMeta,
+);
+
+watch(
     values,
     (values) => {
         if (props.trackDirtyState) dirty();
