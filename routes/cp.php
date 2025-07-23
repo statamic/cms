@@ -47,6 +47,7 @@ use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\DashboardController;
 use Statamic\Http\Controllers\CP\DuplicatesController;
 use Statamic\Http\Controllers\CP\FieldActionModalController;
+use Statamic\Http\Controllers\CP\Fields\AdditionalBlueprintController;
 use Statamic\Http\Controllers\CP\Fields\BlueprintController;
 use Statamic\Http\Controllers\CP\Fields\FieldsController;
 use Statamic\Http\Controllers\CP\Fields\FieldsetController;
@@ -306,9 +307,9 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
             Route::get('user-groups/edit', [UserGroupBlueprintController::class, 'edit'])->name('user-groups.edit');
             Route::patch('user-groups', [UserGroupBlueprintController::class, 'update'])->name('user-groups.update');
 
-            Route::get('{namespace}/{handle}/edit', [BlueprintController::class, 'edit'])->name('additional.edit');
-            Route::patch('{namespace}/{handle}', [BlueprintController::class, 'update'])->name('additional.update');
-            Route::delete('{namespace}/{handle}/reset', [BlueprintController::class, 'reset'])->name('additional.reset');
+            Route::get('{namespace}/{handle}/edit', [AdditionalBlueprintController::class, 'edit'])->name('additional.edit');
+            Route::patch('{namespace}/{handle}', [AdditionalBlueprintController::class, 'update'])->name('additional.update');
+            Route::delete('{namespace}/{handle}/reset', [AdditionalBlueprintController::class, 'reset'])->name('additional.reset');
         });
     });
 
