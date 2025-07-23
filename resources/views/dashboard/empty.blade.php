@@ -1,7 +1,7 @@
 @php use function Statamic\trans as __; @endphp
 
 @extends('statamic::layout')
-@section('title', Statamic::crumb('Navigation'))
+@section('title', Statamic::crumb('Dashboard'))
 @section('content-card-modifiers', 'bg-architectural-lines')
 
 @section('content')
