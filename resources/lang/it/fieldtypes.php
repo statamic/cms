@@ -174,7 +174,7 @@ return [
     'taggable.config.placeholder' => 'Digita e premi ↩ Invio',
     'taggable.title' => 'Taggable',
     'taxonomies.title' => 'Tassonomie',
-    'template.config.blueprint' => 'Aggiunge l\'opzione "_map to blueprint_". Per saperne di più, consultare la [documentazione](https://statamic.dev/views#inferring-templates-from-entry-blueprints).',
+    'template.config.blueprint' => 'Aggiunge l\'opzione "_map to blueprint_". Per saperne di più, consultare la [documentazione](https://statamic.dev/views#map-templates-to-entry-blueprints).',
     'template.config.folder' => 'Mostra solo i template di questa cartella.',
     'template.config.hide_partials' => 'I parziali sono raramente utilizzati come template.',
     'template.title' => 'Template',
