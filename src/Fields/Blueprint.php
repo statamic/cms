@@ -782,6 +782,11 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         return $this->handle();
     }
 
+    public function editAdditionalBlueprintUrl()
+    {
+        return cp_route('blueprints.additional.edit', [$this->namespace(), $this->handle()]);
+    }
+
     public function resetAdditionalBlueprintUrl()
     {
         return cp_route('blueprints.additional.reset', [$this->namespace(), $this->handle()]);
