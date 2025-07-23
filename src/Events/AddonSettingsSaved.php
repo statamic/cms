@@ -6,7 +6,7 @@ use Statamic\Contracts\Git\ProvidesCommitMessage;
 
 class AddonSettingsSaved extends Event implements ProvidesCommitMessage
 {
-    public function __construct(public $addonSettings)
+    public function __construct(public $settings)
     {
     }
 

@@ -4,7 +4,7 @@ namespace Statamic\Events;
 
 class AddonSettingsSaving extends Event
 {
-    public function __construct(public $addonSettings)
+    public function __construct(public $settings)
     {
     }
 
