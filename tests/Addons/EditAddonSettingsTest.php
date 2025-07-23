@@ -67,7 +67,7 @@ class EditAddonSettingsTest extends TestCase
     #[Test]
     public function can_edit_addon_settings_with_edit_addon_settings_permission()
     {
-        $this->setTestRoles(['test' => ['access cp', 'edit test-addon settings']]);
+        $this->setTestRoles(['test' => ['access cp', 'edit vendor/test-addon settings']]);
 
         $this
             ->actingAs(User::make()->assignRole('test')->save())
