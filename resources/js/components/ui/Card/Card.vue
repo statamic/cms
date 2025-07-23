@@ -13,7 +13,7 @@ const classes = cva({
             default: 'shadow-ui-md',
             flat: 'shadow-none',
         },
-        inset: { false: 'px-4.5 py-5' },
+        inset: { false: 'px-4.5 py-5 space-y-2' },
     },
 })({ ...props });
 </script>

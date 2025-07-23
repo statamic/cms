@@ -34,10 +34,10 @@ function removeFieldFilter(handle) {
 </script>
 
 <template>
-    <div class="flex flex-1 items-center gap-3 overflow-x-auto py-3">
+    <div class="flex flex-1 items-center gap-3 overflow-x-auto py-3 rounded-r-4xl">
         <Modal :title="__('Apply Filters')">
             <template #trigger>
-                <Button icon="sliders-horizontal" class="relative [&_svg]:size-3.5" :disabled="reorderable">
+                <Button icon="sliders-horizontal" class="[&_svg]:size-3.5 sticky left-0" :disabled="reorderable">
                     {{ __('Filters') }}
                     <Badge
                         v-if="badgeCount"
@@ -80,19 +80,23 @@ function removeFieldFilter(handle) {
         </Modal>
 
         <Button
-            v-for="(badge, handle) in fieldFilterBadges"
+            v-for="(badge, handle, index) in fieldFilterBadges"
+            :key="handle"
             variant="filled"
             :icon-append="reorderable ? null : 'x'"
             :text="badge"
             :disabled="reorderable"
+            :class="{ 'me-12': index === Object.keys(fieldFilterBadges).length - 1 }"
             @click="removeFieldFilter(handle)"
         />
         <Button
-            v-for="(badge, handle) in standardBadges"
+            v-for="(badge, handle, index) in standardBadges"
+            :key="handle"
             variant="filled"
             :icon-append="reorderable ? null : 'x'"
             :text="badge"
             :disabled="reorderable"
+            :class="{ 'me-12': index === Object.keys(standardBadges).length - 1 }"
             @click="setFilter(handle, null)"
         />
     </div>

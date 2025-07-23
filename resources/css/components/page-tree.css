@@ -15,7 +15,7 @@
     }
 
     .page-move {
-        @apply w-6 dark:border-dark-900 dark:text-dark-175 ltr:rounded-l;
+        @apply w-6 dark:border-dark-900 dark:text-dark-175 ltr:rounded-xl;
         cursor: grab;
         background-image: url('../../svg/icons/light/drag-dots.svg');
         background-size: 7px 17px;

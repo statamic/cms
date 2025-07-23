@@ -7,65 +7,53 @@
 
 @section('content')
 
-<header class="mb-6">
-    <div class="flex items-center justify-between">
-        <h1>Git</h1>
+<form method="POST" action="{{ cp_route('utilities.git.commit') }}">
+    @csrf
+    <ui-header title="{{ __('Git') }}" icon="git">
+        <ui-button type="submit" variant="primary" {{ $statuses ? '' : 'disabled' }}>
+            {{ __('Commit Changes') }}
+        </ui-button>
+    </ui-header>
+</form>
 
-        <form method="POST" action="{{ cp_route('utilities.git.commit') }}">
-            @csrf
-
-            <div class="flex items-center">
-                <button type="submit" class="btn-primary" {{ $statuses ? '' : 'disabled' }}>
-                    {{ __('Commit') }}
-                </button>
-            </div>
-        </form>
-    </div>
-</header>
-
-<div class="card p-0">
-    @forelse ($statuses ?? [] as $path => $status)
-        <div class="{{ $loop->first ? '' : 'border-t dark:border-dark-900' }} p-4">
-            <h2>
-                {{ __('Repository path') }}:
-                <code class="font-normal">{{ $path }}</code>
-            </h2>
-            <pre
-                class="mt-4 rounded-sm bg-gray-300 p-4 font-mono text-sm text-gray-700 dark:bg-dark-800 dark:text-dark-150"
-                dir="ltr"
-            >
-{{ $status->status }}</pre
-            >
-            <div class="mt-4 flex text-sm text-gray dark:text-dark-150">
-                <div class="badge-pill-sm ltr:mr-4 rtl:ml-4">
-                    <span class="font-medium text-gray-900 dark:text-dark-150">{{ __('Affected files') }}:</span>
-                    {{ $status->totalCount }}
+@if ($statuses)
+    @foreach ($statuses as $path => $status)
+        <ui-card-panel heading="{{ __('Repository') }}" subheading="{{ $path }}">
+            <div class="space-y-4">
+                <div class="flex flex-wrap gap-2">
+                    <ui-badge :prepend="__('Affected files')">
+                        {{ $status->totalCount }}
+                    </ui-badge>
+                    @if ($status->addedCount)
+                        <ui-badge :prepend="__('Added')" color="green">
+                            {{ $status->addedCount }}
+                        </ui-badge>
+                    @endif
+                    @if ($status->modifiedCount)
+                        <ui-badge :prepend="__('Modified')" color="yellow">
+                            {{ $status->modifiedCount }}
+                        </ui-badge>
+                    @endif
+                    @if ($status->deletedCount)
+                        <ui-badge :prepend="__('Deleted')" color="red">
+                            {{ $status->deletedCount }}
+                        </ui-badge>
+                    @endif
                 </div>
-                @if ($status->addedCount)
-                    <div class="badge-pill-sm ltr:mr-4 rtl:ml-4">
-                        <span class="font-medium text-gray-900 dark:text-dark-150">{{ __('Added') }}:</span>
-                        {{ $status->addedCount }}
-                    </div>
-                @endif
 
-                @if ($status->modifiedCount)
-                    <div class="badge-pill-sm ltr:mr-4 rtl:ml-4">
-                        <span class="font-medium text-gray-900 dark:text-dark-150">{{ __('Modified') }}:</span>
-                        {{ $status->modifiedCount }}
-                    </div>
-                @endif
-
-                @if ($status->deletedCount)
-                    <div class="badge-pill-sm ltr:mr-4 rtl:ml-4">
-                        <span class="font-medium text-gray-900 dark:text-dark-150">{{ __('Deleted') }}:</span>
-                        {{ $status->deletedCount }}
-                    </div>
-                @endif
+                <pre class="rounded-md bg-gray-100 p-4 font-mono text-sm text-gray-700 dark:bg-gray-800 dark:text-gray-300">{{ $status->status }}</pre>
             </div>
-        </div>
-    @empty
-        <p class="p-6 italic text-gray-600 dark:text-dark-200">{{ __('statamic::messages.git_nothing_to_commit') }}</p>
-    @endforelse
-</div>
+        </ui-card-panel>
+    @endforeach
+@else
+    <ui-card-panel heading="{{ __('Repository') }}">
+        <ui-heading>{{ __('statamic::messages.git_nothing_to_commit') }}</ui-heading>
+    </ui-card-panel>
+@endif
+
+<x-statamic::docs-callout
+    topic='{{ __("the Git Integration") }}'
+    url="{{ Statamic::docsUrl('git-integration') }}"
+/>
 
 @stop

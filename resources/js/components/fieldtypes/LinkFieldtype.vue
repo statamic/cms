@@ -2,7 +2,7 @@
     <div class="flex gap-3">
         <!-- Link type selector -->
         <div class="w-fit">
-            <Select :options v-model="option" />
+            <Select :options v-model="option"  />
         </div>
 
         <div class="flex-1 flex">

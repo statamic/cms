@@ -49,7 +49,7 @@ export default {
         publishMeta() {
             return {
                 ...this.meta.type.meta,
-                ...this.meta.dictionaries[this.dictionary]?.meta, // todo: some fieldtypes aren't getting their meta
+                ...this.meta.dictionaries[this.dictionary]?.meta,
             };
         },
 

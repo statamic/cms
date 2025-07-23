@@ -3,6 +3,7 @@
 namespace Statamic\CommandPalette;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Statamic\CP\Navigation\NavItem;
 use Statamic\Facades;
 use Statamic\Fields\Fieldset;
@@ -28,11 +29,14 @@ class Palette
 
     public function build(): Collection
     {
+        // TODO: We need to bust this cache when content or nav changes
+        // TODO: Cache per user
+        // return Cache::rememberForever('statamic-command-palette', function () {
         return $this
             ->buildNav()
             ->buildFields()
-            ->buildActions()
             ->get();
+        // });
     }
 
     protected function buildNav(): self
@@ -80,18 +84,13 @@ class Palette
         $this->addCommand(Facades\UserGroup::blueprintCommandPaletteLink());
 
         // TODO: Handle additional blueprint namespaces
-        // Blueprint::getAdditionalNamespaces()->keys()->flatMap(fn (string $key) => Blueprint::in($key)->sortBy(fn (Blueprint $blueprint) => $blueprint->title()))
+        // Facades\Blueprint::getAdditionalNamespaces()->keys()
+        //     ->flatMap(fn (string $key) => Facades\Blueprint::in($key)->sortBy(fn ($blueprint) => $blueprint->title()))
+        //     ->each(fn ());
 
         Facades\Fieldset::all()
             ->map(fn (Fieldset $fieldset) => $fieldset->commandPaletteLink())
             ->each(fn (Link $link) => $this->addCommand($link));
-
-        return $this;
-    }
-
-    protected function buildActions(): self
-    {
-        // TODO: Addressing actions in separate PR.
 
         return $this;
     }

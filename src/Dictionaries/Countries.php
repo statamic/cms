@@ -65,6 +65,7 @@ class Countries extends BasicDictionary
                 'display' => __('Region'),
                 'instructions' => __('statamic::messages.dictionaries_countries_region_instructions'),
                 'type' => 'select',
+                'clearable' => true,
                 'options' => $this->regions,
                 'width' => 50,
             ],

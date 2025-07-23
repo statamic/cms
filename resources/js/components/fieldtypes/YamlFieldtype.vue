@@ -1,14 +1,15 @@
 <template>
     <CodeEditor
         ref="codeEditor"
-        :theme="config.theme"
-        :disabled="isReadOnly"
-        :tab-size="2"
-        :indent-type="'spaces'"
         :allow-mode-selection="false"
-        :show-mode-label="false"
+        :disabled="config.disabled"
+        :indent-type="'spaces'"
         :mode="'yaml'"
         :model-value="value"
+        :read-only="isReadOnly"
+        :show-mode-label="false"
+        :tab-size="2"
+        :theme="config.theme"
         @update:model-value="update"
     />
 </template>
