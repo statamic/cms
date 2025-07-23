@@ -366,13 +366,9 @@ final class Addon
 
     public function settings(): AddonSettings
     {
-        $settings = app(AddonSettingsRepository::class)->find($this->id());
+        $repo = app(AddonSettingsRepository::class);
 
-        if (! $settings) {
-            $settings = app(AddonSettingsRepository::class)->make($this);
-        }
-
-        return $settings;
+        return $repo->find($this->id()) ?? $repo->make($this);
     }
 
     public function settingsUrl()
