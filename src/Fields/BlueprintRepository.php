@@ -234,10 +234,12 @@ class BlueprintRepository
         return $this
             ->getAdditionalNamespaces()
             ->keys()
-            ->map(function ($namespace) {
+            ->map(fn ($namespace) => Blueprint::in($namespace))
+            ->reject(fn ($blueprints) => $blueprints->isEmpty())
+            ->map(function ($blueprints) {
                 return [
-                    'title' => $type = $blueprint->renderableNamespace(),
-                    'blueprints' => Blueprint::in($namespace)
+                    'title' => $type = $blueprints->first()->renderableNamespace(),
+                    'blueprints' => $blueprints
                         ->map(fn ($blueprint) => [
                             'handle' => $blueprint->handle(),
                             'namespace' => $blueprint->namespace(),
@@ -250,7 +252,6 @@ class BlueprintRepository
                         ->values(),
                 ];
             })
-            ->reject(fn ($additional) => $additional['blueprints']->isEmpty())
             ->sortBy('title');
     }
 
