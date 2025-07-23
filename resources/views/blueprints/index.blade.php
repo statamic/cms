@@ -53,6 +53,12 @@
         @endif
     @endforeach
 
+    @foreach($user as $use)
+
+    echo "hello";
+
+    @endforeach
+
     @foreach (Statamic\Facades\Taxonomy::all() as $taxonomy)
         @if ($loop->first)
         <h3 class="little-heading rtl:pr-0 ltr:pl-0 mb-2">{{ __('Taxonomies') }}</h3>
