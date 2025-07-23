@@ -51,7 +51,7 @@ const results = computed(() => {
         .map(result => {
             return {
                 score: result._score,
-                html: result.highlight('<span class="text-blue-600 dark:text-blue-400">', '</span>'),
+                html: result.highlight('<span class="text-blue-600 dark:text-blue-400 underline underline-offset-4 decoration-blue-200 dark:decoration-blue-600/45">', '</span>'),
                 ...result.obj,
             };
         });
