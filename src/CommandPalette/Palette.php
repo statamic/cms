@@ -31,7 +31,6 @@ class Palette
         return $this
             ->buildNav()
             ->buildFields()
-            ->buildActions()
             ->get();
     }
 
@@ -85,13 +84,6 @@ class Palette
         Facades\Fieldset::all()
             ->map(fn (Fieldset $fieldset) => $fieldset->commandPaletteLink())
             ->each(fn (Link $link) => $this->addCommand($link));
-
-        return $this;
-    }
-
-    protected function buildActions(): self
-    {
-        // TODO: Addressing actions in separate PR.
 
         return $this;
     }
