@@ -16,7 +16,7 @@ class ImageRule implements CastableToValidationString, Stringable, ValidationRul
 
     public function __construct(protected $parameters)
     {
-        if (! empty($this->parameters)) {
+        if ($this->parameters !== ['image']) {
             $this->extensions = array_map(strtolower(...), $this->parameters);
         }
     }

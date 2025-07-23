@@ -109,7 +109,7 @@
                                 v-for="asset in assets"
                                 :key="asset.id"
                                 :asset="asset"
-                                :errors="errorForAsset(asset)"
+                                :errors="errorsForAsset(asset.id)"
                                 :read-only="isReadOnly"
                                 :show-filename="config.show_filename"
                                 :show-set-alt="showSetAlt"
@@ -140,7 +140,7 @@
                                         v-for="asset in assets"
                                         :key="asset.id"
                                         :asset="asset"
-                                        :errors="errorForAsset(asset)"
+                                        :errors="errorsForAsset(asset.id)"
                                         :read-only="isReadOnly"
                                         :show-filename="config.show_filename"
                                         :show-set-alt="showSetAlt"
@@ -229,7 +229,7 @@ export default {
             innerDragging: false,
             displayMode: 'grid',
             lockedDynamicFolder: this.meta.dynamicFolder,
-            errors: {},
+            errorsById: {},
         };
     },
 
@@ -620,10 +620,12 @@ export default {
             }
         },
 
-        errorForAsset(asset) {
-            if (Object.keys(this.errors).length === 0) return [];
+        errorsForAsset(id) {
+            if (Object.keys(this.errorsById).length === 0 || !this.errorsById.hasOwnProperty(id)) {
+                return [];
+            }
 
-            return this.errors[asset.id] ?? [];
+            return this.errorsById[id];
         },
     },
 
@@ -647,9 +649,23 @@ export default {
         'publishContainer.errors': {
             immediate: true,
             handler(errors) {
-                this.errors = Object.entries(errors)
-                    .filter(([key, value]) => key.startsWith(this.fieldPathPrefix || this.handle))
-                    .reduce((errors, [key, value]) => ({ [this.assetIds.at(key.split('.').pop())]: value, ...errors }), {});
+                this.errorsById = Object.entries(errors).reduce((acc, [key, value]) => {
+                    const prefix = this.fieldPathKeys || this.handle;
+
+                    if (!key.startsWith(prefix)) {
+                        return acc;
+                    }
+
+                    const subKey = key.replace(`${prefix}.`, '');
+                    const assetIndex = subKey.split('.').shift();
+                    const assetId = this.assetIds[assetIndex];
+
+                    if (assetId) {
+                        acc[assetId] = value;
+                    }
+
+                    return acc;
+                }, {});
             },
         },
 
