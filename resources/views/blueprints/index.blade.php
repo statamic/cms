@@ -263,13 +263,15 @@
                             </td>
                             <td class="actions-column">
                                 @if ($blueprint['is_resettable'])
-                                    <ui-dropdown>
+                                    <ui-dropdown class="mr-3">
                                         <ui-dropdown-menu>
-                                            <ui-dropdown-item :text="__('Reset')" variant="destructive" @click="$refs[`resetter_{{ $blueprint['namespace'] }}_{{ $blueprint['handle'] }}`].confirm()">
-                                            </ui-dropdown-item>
+                                            <ui-dropdown-item
+                                                :text="__('Reset')"
+                                                variant="destructive"
+                                                @click="$refs[`resetter_{{ $blueprint['namespace'] }}_{{ $blueprint['handle'] }}`].confirm()"
+                                            ></ui-dropdown-item>
                                         </ui-dropdown-menu>
                                     </ui-dropdown>
-
                                     <blueprint-resetter
                                         ref="resetter_{{ $blueprint['namespace'] }}_{{ $blueprint['handle'] }}"
                                         :resource="{{ Js::from($blueprint) }}"
