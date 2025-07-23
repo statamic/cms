@@ -37,6 +37,7 @@ import StackTest from '../components/stacks/StackTest.vue';
 import CodeBlock from '../components/CodeBlock.vue';
 import BlueprintCreateForm from '../components/blueprints/BlueprintCreateForm.vue';
 import BlueprintResetter from '../components/blueprints/BlueprintResetter.vue';
+import GitStatus from '../components/GitStatus.vue';
 import { defineAsyncComponent } from 'vue';
 import DateTime from '../components/DateTime.vue';
 import UpdaterWidget from '../components/updater/UpdaterWidget.vue';
@@ -85,6 +86,7 @@ export default function registerGlobalComponents(app) {
     app.component('portal', Portal);
     app.component('code-block', CodeBlock);
     app.component('date-time', DateTime);
+    app.component('git-status', GitStatus);
 
     // Modals
     app.component(
