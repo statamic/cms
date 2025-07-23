@@ -18,8 +18,6 @@ interface Settings
 
     public function set(string $key, $value): self;
 
-    public function merge(array $settings): self;
-
     public function save(): bool;
 
     public function delete(): bool;

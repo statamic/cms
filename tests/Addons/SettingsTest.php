@@ -103,18 +103,6 @@ class SettingsTest extends TestCase
     }
 
     #[Test]
-    public function it_merges_settings()
-    {
-        $addon = $this->makeFromPackage();
-        $settings = new Settings($addon, ['foo' => 'bar']);
-
-        $settings->merge(['baz' => 'qux']);
-
-        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $settings->values());
-        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $settings->rawValues());
-    }
-
-    #[Test]
     public function it_saves_settings()
     {
         Event::fake();

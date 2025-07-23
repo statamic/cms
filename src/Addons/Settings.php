@@ -61,14 +61,6 @@ abstract class Settings implements Contract
         return $this;
     }
 
-    public function merge(array $settings): self
-    {
-        $this->rawSettings = array_merge($this->rawSettings, $settings);
-        $this->settings = $this->resolveAntlers($this->rawSettings);
-
-        return $this;
-    }
-
     public function save(): bool
     {
         if (AddonSettingsSaving::dispatch($this) === false) {
