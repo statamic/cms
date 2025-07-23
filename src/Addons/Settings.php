@@ -10,9 +10,9 @@ use Statamic\Facades\Antlers;
 
 abstract class Settings implements Contract
 {
-    protected Addon $addon;
-    protected array $settings;
-    protected array $rawSettings;
+    private Addon $addon;
+    private array $settings;
+    private array $rawSettings;
 
     public function __construct(Addon $addon, array $settings = [])
     {
