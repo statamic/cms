@@ -83,7 +83,7 @@ class UpdateAddonSettingsTest extends TestCase
     {
         $this->addon->settings()->values(['api_key' => 'original-api-key'])->save();
 
-        $this->setTestRoles(['test' => ['access cp', 'edit test-addon settings']]);
+        $this->setTestRoles(['test' => ['access cp', 'edit vendor/test-addon settings']]);
 
         $this
             ->actingAs(User::make()->assignRole('test')->save())
