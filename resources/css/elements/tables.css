@@ -194,7 +194,7 @@
     @apply inline-block shrink justify-center rounded-full bg-gray-200/60 px-2 py-0.5 text-center text-xs text-gray-900 dark:bg-gray-300/8 dark:text-dark-150;
 
     &.status-published:not(.status-private) {
-        @apply bg-green-200 text-green-900 dark:bg-green-300/5 dark:text-green-300;
+        @apply bg-green-200 text-green-900 dark:bg-green-300/6 dark:text-green-300;
     }
 
     &.status-scheduled {
