@@ -48,11 +48,6 @@ abstract class Settings implements Contract
         return $this->settings[$key] ?? $default;
     }
 
-    public function has(string $key): bool
-    {
-        return isset($this->settings[$key]);
-    }
-
     public function set(string $key, $value): self
     {
         $this->settings[$key] = $this->resolveAntlersValue($value);

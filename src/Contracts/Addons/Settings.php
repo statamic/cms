@@ -14,8 +14,6 @@ interface Settings
 
     public function get(string $key, $default = null);
 
-    public function has(string $key): bool;
-
     public function set(string $key, $value): self;
 
     public function save(): bool;

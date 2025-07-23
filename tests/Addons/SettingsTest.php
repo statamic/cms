@@ -81,16 +81,6 @@ class SettingsTest extends TestCase
     }
 
     #[Test]
-    public function it_checks_if_a_value_exists()
-    {
-        $addon = $this->makeFromPackage();
-        $settings = new Settings($addon, ['foo' => 'bar']);
-
-        $this->assertTrue($settings->has('foo'));
-        $this->assertFalse($settings->has('nonexistent'));
-    }
-
-    #[Test]
     public function it_sets_a_value()
     {
         $addon = $this->makeFromPackage();
