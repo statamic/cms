@@ -88,16 +88,17 @@
                 <template v-if="expanded">
                     <sortable-list
                         v-if="expanded && displayMode === 'grid'"
-                        v-model="assets"
-                        item-class="asset-tile"
-                        handle-class="asset-thumb-container"
-                        @dragstart="$emit('focus')"
-                        @dragend="$emit('blur')"
-                        :constrain-dimensions="true"
-                        :disabled="isReadOnly"
-                        :distance="5"
-                        :animate="false"
                         append-to="body"
+                        handle-class="asset-thumb-container"
+                        item-class="asset-tile"
+                        v-model="assets"
+                        :animate="false"
+                        :constrain-dimensions="true"
+                        :disabled="config.disabled"
+                        :distance="5"
+                        :read-only="isReadOnly"
+                        @dragend="$emit('blur')"
+                        @dragstart="$emit('focus')"
                     >
                         <div
                             class="relative grid gap-6 xl:gap-10 overflow-hidden rounded-xl border border-t-0 rounded-t-none dark:border-dark-700"
@@ -125,10 +126,11 @@
                                 v-model="assets"
                                 item-class="asset-row"
                                 handle-class="asset-row"
-                                :vertical="true"
-                                :disabled="isReadOnly"
+                                :disabled="config.disabled"
                                 :distance="5"
                                 :mirror="false"
+                                :read-only="isReadOnly"
+                                :vertical="true"
                             >
                                 <tbody ref="assets">
                                     <component
