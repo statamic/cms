@@ -4,11 +4,13 @@ namespace Statamic\Fieldtypes\Assets;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Statamic\Contracts\GraphQL\CastableToValidationString;
 use Statamic\Facades\Asset;
 use Statamic\Statamic;
+use Stringable;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class MimetypesRule implements ValidationRule
+class MimetypesRule implements CastableToValidationString, Stringable, ValidationRule
 {
     public function __construct(protected $parameters)
     {
@@ -32,5 +34,15 @@ class MimetypesRule implements ValidationRule
     public function message()
     {
         return __((Statamic::isCpRoute() ? 'statamic::' : '').'validation.mimetypes', ['values' => implode(', ', $this->parameters)]);
+    }
+
+    public function __toString()
+    {
+        return 'mimetypes:'.implode(',', $this->parameters);
+    }
+
+    public function toGqlValidationString(): string
+    {
+        return $this->__toString();
     }
 }

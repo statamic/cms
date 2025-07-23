@@ -146,8 +146,8 @@ class Field implements Arrayable
         $rules = [];
         if ($this->type() === 'assets') {
             $rules = [
-                $this->handle.'.*' => $temp_rules->reject(fn ($rule) => in_array($rule, ['array', 'required']))->all(),
-                $this->handle => $temp_rules->filter(fn ($rule) => in_array($rule, ['array', 'required']))->all(),
+                $this->handle.'.*' => $temp_rules->reject(fn ($rule) => in_array($rule, ['array', 'required', 'nullable']))->values()->all(),
+                $this->handle => $temp_rules->filter(fn ($rule) => in_array($rule, ['array', 'required', 'nullable']))->values()->all(),
             ];
         } else {
             $rules = [$this->handle => $temp_rules->all()];

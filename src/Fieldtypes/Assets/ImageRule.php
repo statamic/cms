@@ -4,16 +4,21 @@ namespace Statamic\Fieldtypes\Assets;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Statamic\Contracts\GraphQL\CastableToValidationString;
 use Statamic\Facades\Asset;
 use Statamic\Statamic;
+use Stringable;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class ImageRule implements ValidationRule
+class ImageRule implements CastableToValidationString, Stringable, ValidationRule
 {
     public $extensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'avif'];
 
     public function __construct(protected $parameters)
     {
+        if (! empty($this->parameters)) {
+            $this->extensions = array_map(strtolower(...), $this->parameters);
+        }
     }
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
@@ -34,5 +39,15 @@ class ImageRule implements ValidationRule
     public function message(): string
     {
         return __((Statamic::isCpRoute() ? 'statamic::' : '').'validation.image', ['extensions' => implode(', ', $this->extensions)]);
+    }
+
+    public function __toString()
+    {
+        return 'image:'.implode(',', $this->extensions);
+    }
+
+    public function toGqlValidationString(): string
+    {
+        return $this->__toString();
     }
 }

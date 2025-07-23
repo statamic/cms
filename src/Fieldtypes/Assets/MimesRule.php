@@ -4,15 +4,15 @@ namespace Statamic\Fieldtypes\Assets;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Statamic\Contracts\GraphQL\CastableToValidationString;
 use Statamic\Facades\Asset;
 use Statamic\Statamic;
+use Stringable;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class MimesRule implements ValidationRule
+class MimesRule implements CastableToValidationString, Stringable, ValidationRule
 {
-    protected $parameters;
-
-    public function __construct($parameters)
+    public function __construct(protected $parameters)
     {
         if (in_array('jpg', $parameters) || in_array('jpeg', $parameters)) {
             $parameters = array_unique(array_merge($parameters, ['jpg', 'jpeg']));
@@ -39,5 +39,15 @@ class MimesRule implements ValidationRule
     public function message(): string
     {
         return __((Statamic::isCpRoute() ? 'statamic::' : '').'validation.mimes', ['values' => implode(', ', $this->parameters)]);
+    }
+
+    public function __toString()
+    {
+        return 'mimes:'.implode(',', $this->parameters);
+    }
+
+    public function toGqlValidationString(): string
+    {
+        return $this->__toString();
     }
 }
