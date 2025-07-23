@@ -125,6 +125,7 @@ function destroy() {
         <div
             layout
             class="shadow-ui-sm relative z-2 w-full rounded-lg border border-gray-200 bg-white text-base dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
+            :class="{ 'border-red-500': hasError }"
             :data-collapsed="collapsed ?? undefined"
             :data-error="hasError ?? undefined"
             :data-invalid="isInvalid ?? undefined"

@@ -27,6 +27,7 @@
                     :values="row"
                     :meta="meta[row._id]"
                     :name="name"
+                    :has-error="rowHasError(row._id)"
                     :field-path-prefix="fieldPathPrefix"
                     :meta-path-prefix="metaPathPrefix"
                     :can-delete="canDeleteRows"
@@ -54,6 +55,50 @@ export default {
     components: {
         StackedRow,
         SortableList,
+    },
+
+    props: {
+        errors: Object,
+    },
+
+    data() {
+        return {
+            errorsById: {},
+        };
+    },
+
+    watch: {
+        errors: {
+            immediate: true,
+            handler(errors) {
+                this.errorsById = Object.entries(errors).reduce((acc, [key, value]) => {
+                    if (!key.startsWith(this.fieldPathPrefix)) {
+                        return acc;
+                    }
+
+                    const subKey = key.replace(`${this.fieldPathPrefix}.`, '');
+                    const rowIndex = subKey.split('.').shift();
+                    const rowId = this.rows[rowIndex]?._id;
+
+                    if (rowId) {
+                        acc[rowId] = value;
+                    }
+
+                    return acc;
+                }, {});
+            },
+        },
+    },
+
+
+    methods: {
+        rowHasError(id) {
+            if (Object.keys(this.errorsById).length === 0) {
+                return false;
+            }
+
+            return this.errorsById.hasOwnProperty(id) && this.errorsById[id].length > 0;
+        }
     },
 };
 </script>
