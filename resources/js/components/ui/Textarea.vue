@@ -7,6 +7,7 @@ defineEmits(['update:modelValue']);
 const props = defineProps({
     elastic: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
+    id: { type: String, default: null },
     readOnly: { type: Boolean, default: false },
     required: { type: Boolean, default: false },
     resize: { type: String, default: 'vertical' },
@@ -41,6 +42,7 @@ const classes = cva({
         <textarea
             :class="classes"
             :rows="rows"
+            :id="id"
             v-bind="$attrs"
             :value="modelValue"
             :disabled="disabled"
