@@ -247,7 +247,7 @@ export default {
         },
 
         hasError() {
-            return this.extension.options.bard.setsWithErrors.includes(this.index);
+            return this.extension.options.bard.setHasError(this.node.attrs.id);
         },
 
         showFieldPreviews() {

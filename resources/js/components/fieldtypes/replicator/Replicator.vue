@@ -45,7 +45,7 @@
                                     :enabled="set.enabled"
                                     :read-only
                                     :can-add-set="canAddSet"
-                                    :has-error="setHasError(index)"
+                                    :has-error="setHasError(set._id)"
                                     :show-field-previews="config.previews"
                                     @collapsed="collapseSet(set._id)"
                                     @expanded="expandSet(set._id)"
@@ -108,6 +108,7 @@ export default {
             provide: {
                 replicatorSets: this.config.sets,
             },
+            errorsById: {},
         };
     },
 
@@ -264,10 +265,12 @@ export default {
             }, 1);
         },
 
-        setHasError(index) {
-            const prefix = `${this.fieldPathPrefix || this.handle}.${index}.`;
+        setHasError(id) {
+            if (Object.keys(this.errorsById).length === 0) {
+                return false;
+            }
 
-            return Object.keys(this.publishContainer.errors ?? []).some((handle) => handle.startsWith(prefix));
+            return this.errorsById.hasOwnProperty(id) && this.errorsById[id].length > 0;
         },
     },
 
@@ -290,6 +293,27 @@ export default {
 
         collapsed(collapsed) {
             this.updateMeta({ ...this.meta, collapsed: clone(collapsed) });
+        },
+
+        'publishContainer.errors': {
+            immediate: true,
+            handler(errors) {
+                this.errorsById = Object.entries(errors).reduce((acc, [key, value]) => {
+                    if (!key.startsWith(this.setFieldPathPrefix)) {
+                        return acc;
+                    }
+
+                    const subKey = key.replace(`${this.setFieldPathPrefix}.`, '');
+                    const setIndex = subKey.split('.').shift();
+                    const setId = this.value[setIndex]?._id;
+
+                    if (setId) {
+                        acc[setId] = value;
+                    }
+
+                    return acc;
+                }, {});
+            },
         },
     },
 };

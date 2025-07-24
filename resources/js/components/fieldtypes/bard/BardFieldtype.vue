@@ -212,10 +212,15 @@ export default {
                 bard: this.makeBardProvide(),
                 bardSets: this.config.sets,
             },
+            errorsById: {},
         };
     },
 
     computed: {
+        setFieldPathPrefix() {
+            return this.fieldPathPrefix ? `${this.fieldPathPrefix}.${this.handle}` : this.handle;
+        },
+
         toolbarIsFixed() {
             return this.config.toolbar_mode === 'fixed';
         },
@@ -275,16 +280,6 @@ export default {
 
         site() {
             return this.publishContainer.site ?? this.$config.get('selectedSite');
-        },
-
-        setsWithErrors() {
-            if (!this.publishContainer) return [];
-
-            return Object.values(this.setIndexes).filter((setIndex) => {
-                const prefix = `${this.fieldPathPrefix || this.handle}.${setIndex}.`;
-
-                return Object.keys(this.publishContainer.errors).some((key) => key.startsWith(prefix));
-            });
         },
 
         replicatorPreview() {
@@ -422,6 +417,27 @@ export default {
 
         fullScreenMode() {
             this.initEditor();
+        },
+
+        'publishContainer.errors': {
+            immediate: true,
+            handler(errors) {
+                this.errorsById = Object.entries(errors).reduce((acc, [key, value]) => {
+                    if (!key.startsWith(this.setFieldPathPrefix)) {
+                        return acc;
+                    }
+
+                    const subKey = key.replace(`${this.setFieldPathPrefix}.`, '');
+                    const setIndex = subKey.split('.').shift();
+                    const setId = this.value[setIndex]?.attrs.id;
+
+                    if (setId) {
+                        acc[setId] = value;
+                    }
+
+                    return acc;
+                }, {});
+            },
         },
     },
 
@@ -748,6 +764,10 @@ export default {
                     return __('Invalid content, nodes and marks must have a type');
                 }
             }
+        },
+
+        setHasError(id) {
+            return this.errorsById.hasOwnProperty(id) && this.errorsById[id].length > 0;
         },
 
         valueToContent(value) {

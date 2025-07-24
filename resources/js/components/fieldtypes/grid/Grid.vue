@@ -28,6 +28,7 @@
                         :can-add-rows="canAddRows"
                         :allow-fullscreen="config.fullscreen"
                         :hide-display="config.hide_display"
+                        :errors="publishContainer.errors"
                         @updated="updated"
                         @meta-updated="updateRowMeta"
                         @removed="removed"

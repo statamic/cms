@@ -1,5 +1,5 @@
 <template>
-    <tr :class="[sortableItemClass, { 'opacity-50': isExcessive }]">
+    <tr :class="[sortableItemClass, { 'opacity-50': isExcessive, 'inset-ring-1 inset-ring-red': hasError }]">
         <td v-if="grid.isReorderable" class="drag-handle" :class="sortableHandleClass"></td>
 
         <FieldsProvider
@@ -69,6 +69,10 @@ export default {
         canAddRows: {
             type: Boolean,
             default: true,
+        },
+        hasError: {
+            type: Boolean,
+            default: false,
         },
     },
 
