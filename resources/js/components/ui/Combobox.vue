@@ -59,7 +59,7 @@ const triggerClasses = cva({
             false: 'bg-linear-to-b from-white to-gray-50 hover:to-gray-100 dark:from-gray-800 dark:to-gray-800 dark:hover:to-gray-850 shadow-ui-sm',
         },
         buttonAppearance: {
-            true: 'border border-gray-300 with-contrast:border-gray-500 dark:border-b-0 dark:ring-3 dark:ring-gray-900 dark:border-white/10 shadow-ui-sm dark:shadow-md',
+            true: 'border border-gray-300 with-contrast:border-gray-500 dark:border-b-0 dark:ring-3 dark:ring-gray-900 dark:border-white/10 shadow-ui-sm dark:shadow-md focus-within:focus-outline-within',
             false: '',
         },
         // disabled: {
