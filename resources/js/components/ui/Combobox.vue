@@ -277,7 +277,7 @@ defineExpose({
                         />
 
                         <button type="button" class="flex-1 text-start" v-else-if="!searchable && (dropdownOpen || !modelValue)">
-                            <span class="text-gray-400 dark:text-gray-500 text-[0.8125rem]" v-text="placeholder" />
+                            <span class="text-gray-400 dark:text-gray-500" v-text="placeholder" />
                         </button>
 
                         <button type="button" v-else class="flex-1 text-start cursor-pointer">
@@ -287,7 +287,7 @@ defineExpose({
                             </slot>
                         </button>
 
-                        <div class="flex gap-1 items-center">
+                        <div class="flex gap-1.5 items-center">
                             <Button icon="x" variant="ghost" size="xs" round v-if="clearable && modelValue" @click="clear" />
                             <Icon name="ui/chevron-down" />
                         </div>
@@ -306,7 +306,7 @@ defineExpose({
                         <ComboboxViewport>
                             <ComboboxEmpty class="py-2 text-sm">
                                 <slot name="no-options" v-bind="{ searchQuery }">
-                                    {{ __('No options to choose from.') }}
+                                    {{ __('No options available.') }}
                                 </slot>
                             </ComboboxEmpty>
 
