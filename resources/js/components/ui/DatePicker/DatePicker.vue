@@ -32,6 +32,7 @@ const props = defineProps({
     max: { type: [String, Object], default: null },
     granularity: { type: String, default: null },
     inline: { type: Boolean, default: false },
+    numberOfMonths: { type: Number, default: 1 },
     clearable: { type: Boolean, default: true },
     disabled: { type: Boolean, default: false },
 });
@@ -40,6 +41,8 @@ const calendarBindings = computed(() => ({
     modelValue: props.modelValue,
     min: props.min,
     max: props.max,
+    inline: props.inline,
+    numberOfMonths: props.numberOfMonths,
     components: {
         Root: DatePickerCalendar,
         Header: DatePickerHeader,
