@@ -13,7 +13,7 @@ import { Icon, Subheading } from '@statamic/ui';
 
 let open = ref(false);
 let query = ref('');
-let items = ref([]);
+let serverItems = ref([]);
 let searchResults = ref([]);
 let selected = ref(null);
 let recentItems = ref(getRecentItems());
@@ -38,7 +38,7 @@ each({
 
 const aggregatedItems = computed(() => [
     ...(recentItems.value || []),
-    ...(items.value || []),
+    ...(serverItems.value || []),
     ...(searchResults.value || []),
 ]);
 
@@ -98,17 +98,17 @@ watch(query, debounce(() => {
 
 watch(open, (isOpen) => {
     if (isOpen) {
-        getItems();
+        getServerItems();
         return;
     }
     reset();
 });
 
-function getItems() {
-    if (items.value.length) return;
+function getServerItems() {
+    if (serverItems.value.length) return;
 
     axios.get('/cp/command-palette').then((response) => {
-        items.value = response.data;
+        serverItems.value = response.data;
     });
 }
 
