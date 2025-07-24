@@ -23,6 +23,17 @@ let preparedActions = computed(() => {
     return prepareActions(actions.value, confirmableActions.value);
 });
 
+let commandPaletteActions = computed(() => {
+    return preparedActions.value.map(action => Statamic.$commandPalette.add({
+        text: action.title,
+        action: action.run,
+    }));
+});
+
+watch(commandPaletteActions, function (_, oldActions) {
+    oldActions.forEach(action => action.remove());
+})
+
 let hasSelections = computed(() => {
     return props.selections.length > 0;
 });
