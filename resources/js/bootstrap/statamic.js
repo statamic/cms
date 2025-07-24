@@ -35,6 +35,7 @@ import DateFormatter from '@statamic/components/DateFormatter.js';
 import wait from '@statamic/util/wait.js';
 import markdown from '@statamic/util/markdown.js';
 import VueComponentDebug from 'vue-component-debug';
+import CommandPalette from '../components/CommandPalette.js';
 
 let bootingCallbacks = [];
 let bootedCallbacks = [];
@@ -129,6 +130,10 @@ export default {
         return this.$app.config.globalProperties.$events;
     },
 
+    get $commandPalette() {
+        return this.$app.config.globalProperties.$commandPalette;
+    },
+
     get user() {
         return this.$config.get('user');
     },
@@ -181,6 +186,7 @@ export default {
             $echo: new Echo(),
             $permissions: new Permission(),
             $date: new DateFormatter(),
+            $commandPalette: new CommandPalette(),
         });
 
         Object.assign(this.$app.config.globalProperties, {
