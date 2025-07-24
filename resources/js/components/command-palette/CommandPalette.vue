@@ -70,6 +70,18 @@ const results = computed(() => {
         .filter(category => category.items);
 });
 
+function fuzzysortScoringAlgorithm(result) {
+    let multiplier = 1;
+
+    switch (result.obj.category) {
+        case 'Navigation':
+        case 'Fields':
+            multiplier += 0.5;
+    }
+
+    return result.score * multiplier;
+}
+
 watch(selected, (item) => {
     if (!item) return;
     select(item);
@@ -100,18 +112,6 @@ function searchContent() {
     axios.get('/cp/command-palette/search', { params: { q: query.value } }).then((response) => {
         searchResults.value = response.data;
     });
-}
-
-function fuzzysortScoringAlgorithm(result) {
-    let multiplier = 1;
-
-    switch (result.obj.category) {
-        case 'Navigation':
-        case 'Fields':
-            multiplier = 1.5;
-    }
-
-    return result.score * multiplier;
 }
 
 function select(selected) {
