@@ -12,18 +12,14 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class DimensionsRule implements CastableToValidationString, Stringable, ValidationRule
 {
-    protected $string_parameters;
-
     public function __construct(protected $parameters)
     {
-        $this->string_parameters = $parameters;
-        $this->parameters = array_reduce($parameters, function ($result, $item) {
+        $this->parameters = array_reduce($parameters, function ($acc, $item) {
             [$key, $value] = array_pad(explode('=', $item, 2), 2, null);
+            $acc[$key] = $value;
 
-            $result[$key] = $value;
-
-            return $result;
-        });
+            return $acc;
+        }, []);
     }
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
@@ -45,82 +41,52 @@ class DimensionsRule implements CastableToValidationString, Stringable, Validati
         }
 
         [$width, $height] = $size;
-        if (! is_int($width) || ! is_int($height)) {
-            $fail(__('statamic::validation.dimensions.unknown'));
 
-            return;
-        }
-
-        if ($message = $this->message($width, $height)) {
-            $fail($message);
+        if ($this->failsBasicDimensionChecks($this->parameters, $width, $height) ||
+            $this->failsRatioCheck($this->parameters, $width, $height)) {
+            $fail($this->message());
         }
     }
 
-    public function message(int $width, int $height): ?string
+    public function message(): string
     {
-        $invalid_ratio = $this->validateRatio($width, $height);
-        $invalid_width = $this->validateWidth($width);
-        $invalid_height = $this->validateHeight($height);
-        $key = match (true) {
-            $invalid_ratio => 'ratio',
-            $invalid_width && $invalid_height && $invalid_width === $invalid_height => 'same',
-            $invalid_width && $invalid_height && $invalid_width !== $invalid_height => 'different',
-            (bool) $invalid_width => 'width',
-            (bool) $invalid_height => 'height',
-            default => null,
-        };
-
-        if (! $key) {
-            return null;
-        }
-
-        $prefix = Statamic::isCpRoute() ? 'statamic::' : '';
-
-        $comparisons = [
-            'min' => __("{$prefix}validation.dimensions.min"),
-            'max' => __("{$prefix}validation.dimensions.max"),
-            'exact' => __("{$prefix}validation.dimensions.exact"),
-        ];
-
-        return __("{$prefix}validation.dimensions.{$key}", [
-            'width' => $this->parameters['width'] ?? $this->parameters['min_width'] ?? $this->parameters['max_width'] ?? null,
-            'height' => $this->parameters['height'] ?? $this->parameters['min_height'] ?? $this->parameters['max_height'] ?? null,
-            'ratio' => $this->parameters['ratio'] ?? null,
-            'comparison' => $comparisons[$invalid_width] ?? '',
-            'comparison_width' => $comparisons[$invalid_width] ?? '',
-            'comparison_height' => $comparisons[$invalid_height] ?? '',
-        ]);
+        return __((Statamic::isCpRoute() ? 'statamic::' : '').'validation.dimensions');
     }
 
-    public function validateWidth(int $width): ?string
+    /**
+     * Test if the given width and height fail any conditions.
+     *
+     * @param  array  $parameters
+     * @param  int  $width
+     * @param  int  $height
+     * @return bool
+     */
+    protected function failsBasicDimensionChecks($parameters, $width, $height)
     {
-        return match (true) {
-            isset($this->parameters['width']) && $this->parameters['width'] != $width => 'exact',
-            isset($this->parameters['min_width']) && $this->parameters['min_width'] > $width => 'min',
-            isset($this->parameters['max_width']) && $this->parameters['max_width'] < $width => 'max',
-            default => null,
-        };
+        return (isset($parameters['width']) && $parameters['width'] != $width) ||
+               (isset($parameters['min_width']) && $parameters['min_width'] > $width) ||
+               (isset($parameters['max_width']) && $parameters['max_width'] < $width) ||
+               (isset($parameters['height']) && $parameters['height'] != $height) ||
+               (isset($parameters['min_height']) && $parameters['min_height'] > $height) ||
+               (isset($parameters['max_height']) && $parameters['max_height'] < $height);
     }
 
-    public function validateHeight(int $height): ?string
+    /**
+     * Determine if the given parameters fail a dimension ratio check.
+     *
+     * @param  array  $parameters
+     * @param  int  $width
+     * @param  int  $height
+     * @return bool
+     */
+    protected function failsRatioCheck($parameters, $width, $height)
     {
-        return match (true) {
-            isset($this->parameters['height']) && $this->parameters['height'] != $height => 'exact',
-            isset($this->parameters['min_height']) && $this->parameters['min_height'] > $height => 'min',
-            isset($this->parameters['max_height']) && $this->parameters['max_height'] < $height => 'max',
-            default => null,
-        };
-    }
-
-    public function validateRatio(int $width, int $height): bool
-    {
-        if (! isset($this->parameters['ratio'])) {
+        if (! isset($parameters['ratio'])) {
             return false;
         }
 
         [$numerator, $denominator] = array_replace(
-            [1, 1],
-            array_filter(sscanf($this->parameters['ratio'], '%f/%d'))
+            [1, 1], array_filter(sscanf($parameters['ratio'], '%f/%d'))
         );
 
         $precision = 1 / (max($width, $height) + 1);
@@ -130,7 +96,9 @@ class DimensionsRule implements CastableToValidationString, Stringable, Validati
 
     public function __toString()
     {
-        return 'dimensions:'.implode(',', $this->string_parameters);
+        return 'dimensions:' . collect($this->parameters)
+            ->map(fn ($value, $key) => "{$key}={$value}")
+            ->implode(',');
     }
 
     public function toGqlValidationString(): string
