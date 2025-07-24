@@ -60,7 +60,7 @@ const results = computed(() => {
     let grouped = groupBy(filtered, 'category');
 
     return Object.keys(grouped)
-        .filter(category => Statamic.$config.get('commandPaletteCategories').includes(category))
+        .filter(category => Statamic.$commandPalette.categories().includes(category))
         .map(category => {
             return {
                 text: __(category),
