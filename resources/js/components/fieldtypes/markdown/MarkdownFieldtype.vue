@@ -73,7 +73,7 @@
                                 @drop="draggingFile = false"
                                 @keydown="shortcut"
                             >
-                                <div class="editor relative focus-within:focus-outline-within" ref="codemirror"></div>
+                                <div class="editor relative z-5 focus-within:focus-outline-within" ref="codemirror"></div>
 
                                     <footer class="flex items-center justify-between bg-gray-50 dark:bg-gray-950 rounded-b-xl border-t border-gray-200 dark:border-white/10 p-1 text-sm w-full" :class="{ 'absolute inset-x-0 bottom-0': fullScreenMode }">
                                         <div class="markdown-cheatsheet-helper">
