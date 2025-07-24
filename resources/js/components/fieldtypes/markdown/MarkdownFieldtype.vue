@@ -72,7 +72,7 @@
                                 @drop="draggingFile = false"
                                 @keydown="shortcut"
                             >
-                                <div class="editor relative z-5 focus-within:focus-outline-within" ref="codemirror"></div>
+                                <div class="editor relative z-5 focus-within:focus-outline-within focus-within:rounded-lg" ref="codemirror"></div>
                                 <!-- Hidden input for label association -->
                                 <input
                                     v-if="id"

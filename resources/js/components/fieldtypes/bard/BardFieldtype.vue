@@ -50,7 +50,7 @@
                     </div>
 
                     <div
-                        class="bard-editor @container/bard"
+                        class="bard-editor @container/bard focus-within:focus-outline-within focus-within:rounded-lg!"
                         :class="{
                             'mode:read-only': readOnly,
                             'mode:minimal': !showFixedToolbar,
