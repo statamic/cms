@@ -91,6 +91,8 @@ export default {
                 _id: uniqid(),
                 display: this.newSectionText,
                 instructions: null,
+                collapsible: false,
+                collapsed_by_default: false,
                 icon: null,
                 hide: null,
                 handle: snake_case(this.newSectionText),

@@ -60,6 +60,46 @@
                     <label v-text="__('Instructions')" />
                     <input type="text" class="input-text" v-model="editingSection.instructions" />
                 </div>
+                <div class="form-group w-full">
+                    <publish-field-meta
+                        :config="{
+                            handle: 'collapsible',
+                            type: 'toggle',
+                            default: false,
+                            inline_label: 'Collapsible',
+                        }"
+                        :initial-value="editingSection.collapsible"
+                        v-slot="{ meta, value, config }"
+                    >
+                        <toggle-fieldtype
+                            handle="collapsible"
+                            :config="config"
+                            :meta="meta"
+                            :value="value"
+                            @update:value="editingSection.collapsible = $event"
+                        />
+                    </publish-field-meta>
+                </div> 
+                <div class="form-group w-full" v-if="editingSection.collapsible">
+                    <publish-field-meta
+                        :config="{
+                            handle: 'collapsed_by_default',
+                            type: 'toggle',
+                            default: false,
+                            inline_label: 'Collapsed by Default',
+                        }"
+                        :initial-value="editingSection.collapsed_by_default"
+                        v-slot="{ meta, value, config }"
+                    >
+                        <toggle-fieldtype
+                            handle="collapsed_by_default"
+                            :config="config"
+                            :meta="meta"
+                            :value="value"
+                            @update:value="editingSection.collapsed_by_default = $event"
+                        />
+                    </publish-field-meta>
+                </div>
                 <div class="form-group w-full" v-if="showHandleField">
                     <label v-text="__('Icon')" />
                     <publish-field-meta
@@ -201,6 +241,8 @@ export default {
                 instructions: this.section.instructions,
                 icon: this.section.icon,
                 hide: this.section.hide,
+                collapsible: this.section.collapsible,
+                collapsed_by_default: this.section.collapsed_by_default,
             };
         },
 

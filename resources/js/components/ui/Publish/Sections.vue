@@ -1,13 +1,14 @@
 <script setup>
 import { injectTabContext } from './TabProvider.vue';
-import { Panel, PanelHeader, Heading, Subheading, Card } from '@statamic/ui';
+import { Panel, PanelHeader, Heading, Subheading, Card, Icon } from '@statamic/ui';
 import FieldsProvider from './FieldsProvider.vue';
 import Fields from './Fields.vue';
 import ShowField from '@statamic/components/field-conditions/ShowField.js';
 import { injectContainerContext } from './Container.vue';
 import markdown from '@statamic/util/markdown.js';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { Primitive } from 'reka-ui';
+import { Motion } from 'motion-v';
 
 const { blueprint, container, visibleValues, extraValues, asConfig, hiddenFields, revealerFields, setHiddenField } = injectContainerContext();
 const tab = injectTabContext();
@@ -26,9 +27,20 @@ const visibleSections = computed(() => {
         });
     });
 });
+const collapsedSections = ref(
+    sections.map(section => section.collapsible && section.collapsed_by_default),
+);
 
 function renderInstructions(instructions) {
     return instructions ? markdown(__(instructions), { openLinksInNewTabs: true }) : '';
+}
+
+function maybeToggleSection(id) {
+    if (!sections[id].collapsible) {
+        return;
+    }
+
+    collapsedSections.value[id] = !collapsedSections.value[id];
 }
 </script>
 
@@ -39,17 +51,33 @@ function renderInstructions(instructions) {
             :key="i"
             :class="asConfig ? 'mb-12' : 'mb-6'"
         >
-            <PanelHeader v-if="section.display">
+            <PanelHeader class="relative" v-if="section.display" @click="maybeToggleSection(i)">
                 <Heading :text="__(section.display)" />
                 <Subheading v-if="section.instructions" :text="renderInstructions(section.instructions)" />
+                <Icon
+                    v-if="section.collapsible"
+                    name="ui/chevron-right"
+                    class="absolute right-4.5 top-0 bottom-0 my-auto size-6 cursor-pointer transition-transform duration-[250ms]"
+                    :class="{
+                        'rotate-90': !collapsedSections[i]
+                    }"
+                />
             </PanelHeader>
-            <Primitive :as="asConfig ? 'div' : Card">
-                <FieldsProvider :fields="section.fields">
-                    <slot :section="section">
-                        <Fields />
-                    </slot>
-                </FieldsProvider>
-            </Primitive>
+            <Motion
+                layout
+                class="overflow-hidden"
+                :initial="{ height: collapsedSections[i] ? '0px' : 'auto' }"
+                :animate="{ height: collapsedSections[i] ? '0px' : 'auto' }"
+                :transition="{ duration: 0.25, type: 'tween' }"
+            >
+                <Primitive :as="asConfig ? 'div' : Card">
+                        <FieldsProvider :fields="section.fields">
+                            <slot :section="section">
+                                <Fields />
+                            </slot>
+                        </FieldsProvider>
+                </Primitive>
+            </Motion>
         </Panel>
     </div>
 </template>

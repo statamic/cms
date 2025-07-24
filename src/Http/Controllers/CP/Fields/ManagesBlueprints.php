@@ -102,6 +102,8 @@ trait ManagesBlueprints
             return Arr::removeNullValues([
                 'display' => $section['display'] ?? null,
                 'instructions' => $section['instructions'] ?? null,
+                'collapsible' => $section['collapsible'] ?? false,
+                'collapsed_by_default' => $section['collapsed_by_default'] ?? false,
                 'fields' => collect($section['fields'])
                     ->map(fn ($field) => FieldTransformer::fromVue($field))
                     ->all(),
@@ -137,6 +139,8 @@ trait ManagesBlueprints
         return Arr::removeNullValues([
             'display' => $section->display(),
             'instructions' => $section->instructions(),
+            'collapsible' => $section->collapsible(),
+            'collapsed_by_default' => $section->collapsedByDefault(),
         ]) + [
             'fields' => collect($section->contents()['fields'] ?? [])->map(function ($field, $i) use ($tab, $sectionIndex) {
                 return array_merge(FieldTransformer::toVue($field), ['_id' => $tab->handle().'-'.$sectionIndex.'-'.$i]);
