@@ -48,14 +48,15 @@
 }
 
 
-/* Sticker Headers
+/* Sticky Toolbar
 ========================================================================== */
 
-.markdown-fieldtype [data-markdown-toolbar] {
-    @apply sticky -top-2 z-5;
+[data-markdown-toolbar] {
+    @apply flex items-center justify-between rounded-t-lg bg-gray-50 px-2 py-1 overflow-x-scroll;
+    @apply sticky -top-2 z-6 border-b border-gray-300 dark:border-white/10 dark:bg-gray-950;
 }
 
-.markdown-fieldtype.grid-cell [data-markdown-toolbar] {
+.grid-cell [data-markdown-toolbar] {
     @apply top-8;
 }
 
@@ -63,10 +64,7 @@
   ========================================================================== */
 
 .markdown-preview {
-    @apply mx-auto px-3 py-2 @md/markdown:px-5 @md/markdown:py-4;
-
-    /* why? */
-    min-height: 167px;
+    @apply mx-auto px-3 py-2 @md/markdown:px-5 @md/markdown:py-4 min-h-16;
 
     ol {
         @apply list-decimal;
@@ -96,10 +94,6 @@
     @apply fixed inset-0 min-h-screen overflow-scroll rounded-none border-0 bg-gray-100 pt-14;
     will-change: transform;
 
-    .markdown-toolbar {
-        @apply border-0;
-    }
-
     .mode-wrap {
         height: calc(100vh - 88px); /*  sans toolbars */
         overflow-y: scroll;
@@ -107,6 +101,14 @@
         &.mode-preview {
             height: calc(100vh - 52px); /*  no footer toolbar */
         }
+    }
+
+    [data-markdown-toolbar] {
+        @apply relative top-0 border-b-0;
+    }
+
+    [data-markdown-mode-toggle] {
+        @apply ms-6;
     }
 
     .editor {

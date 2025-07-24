@@ -46,7 +46,6 @@
                         <markdown-toolbar
                             v-if="!fullScreenMode"
                             v-model:mode="mode"
-                            class="border-b border-gray-300 dark:border-white/10 dark:bg-gray-950"
                             :buttons="buttons"
                             :is-read-only="isReadOnly"
                             :show-dark-mode="false"
@@ -75,16 +74,16 @@
                             >
                                 <div class="editor relative z-5 focus-within:focus-outline-within" ref="codemirror"></div>
                                 <!-- Hidden input for label association -->
-                                <input 
-                                    v-if="id" 
-                                    :id="id" 
-                                    type="text" 
-                                    class="sr-only" 
+                                <input
+                                    v-if="id"
+                                    :id="id"
+                                    type="text"
+                                    class="sr-only"
                                     @focus="focusCodeMirror"
                                     tabindex="-1"
                                 />
 
-                                    <footer class="flex items-center justify-between bg-gray-50 dark:bg-gray-950 rounded-b-xl border-t border-gray-200 dark:border-white/10 p-1 text-sm w-full" :class="{ 'absolute inset-x-0 bottom-0': fullScreenMode }">
+                                    <footer class="flex items-center justify-between bg-gray-50 dark:bg-gray-950 rounded-b-lg border-t border-gray-200 dark:border-white/10 p-1 text-sm w-full" :class="{ 'absolute inset-x-0 bottom-0': fullScreenMode }">
                                         <div class="markdown-cheatsheet-helper">
                                             <Button
                                                 icon="markdown"
