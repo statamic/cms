@@ -293,7 +293,7 @@ class Entries extends Relationship
 
         $user = User::current();
 
-        return collect($collections)->flatMap(function ($collectionHandle) use ($collections, $user) {
+        return collect($collections)->flatMap(function ($collectionHandle) use ($user) {
             $collection = Collection::findByHandle($collectionHandle);
 
             throw_if(! $collection, new CollectionNotFoundException($collectionHandle));
@@ -306,26 +306,15 @@ class Entries extends Relationship
 
             return $blueprints
                 ->reject->hidden()
-                ->map(function ($blueprint) use ($collection, $collections, $blueprints) {
+                ->map(function ($blueprint) use ($collection) {
                     return [
-                        'title' => $this->getCreatableTitle($collection, $blueprint, count($collections), $blueprints->count()),
+                        'parent_title' => $collection->title(),
+                        'blueprint' => $blueprint->title(),
+                        'handle' => $blueprint->handle(),
                         'url' => $collection->createEntryUrl(Site::selected()->handle()).'?blueprint='.$blueprint->handle(),
                     ];
                 });
         })->all();
-    }
-
-    private function getCreatableTitle($collection, $blueprint, $collectionCount, $blueprintCount)
-    {
-        if ($collectionCount > 1 && $blueprintCount === 1) {
-            return $collection->title();
-        }
-
-        if ($collectionCount > 1 && $blueprintCount > 1) {
-            return $collection->title().': '.$blueprint->title();
-        }
-
-        return $blueprint->title();
     }
 
     protected function toItemArray($id)
