@@ -74,9 +74,13 @@ function fuzzysortScoringAlgorithm(result) {
     let multiplier = 1;
 
     switch (result.obj.category) {
+        case 'Recent':
+            multiplier += 0.6;
+            break;
         case 'Navigation':
         case 'Fields':
             multiplier += 0.5;
+            break;
     }
 
     return result.score * multiplier;
