@@ -70,7 +70,7 @@
     }
 
     /* Based on the global site picker. Only for buttons (i.e. don't affect select dropdowns on publish forms) */
-    [data-ui-combobox-anchor]:has(button) {
+    [data-ui-combobox-anchor]:has(button):not(.main-content *) {
         /* Decrease */
         --focus-outline-offset: var(--outline-offset-button);
         /* Target the button inside the combobox */
