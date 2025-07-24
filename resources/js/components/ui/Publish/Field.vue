@@ -52,7 +52,13 @@ const meta = computed(() => {
     return data_get(containerMeta.value, key);
 });
 
-const errors = computed(() => containerErrors.value[fullPath.value]);
+const errors = ref();
+watch(
+    () => containerErrors.value,
+    (newErrors) => errors.value = newErrors[fullPath.value] || [],
+    { immediate: true },
+);
+
 const fieldId = computed(() => `field_${fullPath.value.replaceAll('.', '_')}`);
 const namePrefix = '';
 const isRequired = computed(() => props.config.required);
