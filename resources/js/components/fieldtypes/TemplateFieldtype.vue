@@ -10,6 +10,7 @@
         :searchable="true"
         :multiple="false"
         :model-value="value"
+        :id="id"
         @update:modelValue="update"
     >
         <template #no-options>

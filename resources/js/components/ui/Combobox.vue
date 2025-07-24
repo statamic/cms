@@ -19,6 +19,7 @@ import { SortableList } from '@statamic/components/sortable/Sortable.js';
 const emit = defineEmits(['update:modelValue', 'search', 'selected', 'added']);
 
 const props = defineProps({
+    id: { type: String },
     buttonAppearance: { type: Boolean, default: true },
     clearable: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
@@ -267,6 +268,7 @@ defineExpose({
                             v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"
                             ref="search"
                             class="w-full text-gray-700 opacity-100 focus:outline-none placeholder-xs"
+                            :id="id"
                             v-model="searchQuery"
                             :placeholder
                             @paste.prevent="onPaste"
