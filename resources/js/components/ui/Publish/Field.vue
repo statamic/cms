@@ -51,14 +51,8 @@ const meta = computed(() => {
     const key = [metaPathPrefix.value, handle].filter(Boolean).join('.');
     return data_get(containerMeta.value, key);
 });
-const errors = ref();
-watch(
-    () => containerErrors.value,
-    (newErrors) => {
-        errors.value = newErrors[fullPath.value] || [];
-    },
-    { immediate: true },
-);
+
+const errors = computed(() => containerErrors.value[fullPath.value]);
 const fieldId = computed(() => `field_${fullPath.value.replaceAll('.', '_')}`);
 const namePrefix = '';
 const isRequired = computed(() => props.config.required);
