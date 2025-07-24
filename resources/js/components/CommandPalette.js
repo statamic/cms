@@ -1,26 +1,35 @@
+import { uniqueId } from 'lodash-es';
 import { ref } from 'vue';
+import uniqid from 'uniqid';
 
-const commands = ref([]);
+const commands = ref({});
 
-function validate(command) {
-    if (typeof command.text !== 'string') {
-        console.error('You must provide a `text:` string in your command object!');
+class Command {
+    constructor(command) {
+        this.key = uniqid();
+        this.category = command.category ?? 'Actions';
+        this.type = command.type ?? 'action';
+        this.icon = command.icon ?? 'want';
+        this.when = command.when ?? (() => true);
+        this.text = command.text;
+        this.action = command.action;
+
+        this.#validate();
     }
 
-    if (command.type === 'action' && typeof command.action !== 'function') {
-        console.error('You must provide an `action()` function to be run with your `'+command.text+'` command!');
+    remove() {
+        delete commands.value[this.key];
     }
 
-    return command;
-}
+    #validate() {
+        if (typeof this.text !== 'string') {
+            console.error('You must provide a `text:` string in your command object!');
+        }
 
-function normalize(command) {
-    if (command.category === undefined) command.category = 'Actions';
-    if (command.type === undefined) command.type = 'action';
-    if (command.icon === undefined) command.icon = 'wand';
-    if (command.when === undefined) command.when = () => true;
-
-    return validate(command);
+        if (this.type === 'action' && typeof this.action !== 'function') {
+            console.error('You must provide an `action()` function to be run with your `'+this.text+'` command!');
+        }
+    }
 }
 
 export default class CommandPalette {
@@ -29,14 +38,18 @@ export default class CommandPalette {
     }
 
     add(command) {
-        commands.value.push(normalize(command));
+        command = new Command(command);
+
+        commands.value[command.key] = command;
+
+        return command;
     }
 
     actions() {
-        return commands.value.filter(command => command.category === 'Actions');
+        return Object.values(commands.value).filter(command => command.category === 'Actions');
     }
 
     misc() {
-        return commands.value.filter(command => command.category !== 'Actions');
+        return Object.values(commands.value).filter(command => command.category !== 'Actions');
     }
 }
