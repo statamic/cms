@@ -106,7 +106,7 @@ const getInputLabel = (part) => {
                 <div
                     :class="[
                         'flex w-full items-center bg-white uppercase dark:bg-gray-900',
-                        'border border-gray-300 dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:inset-shadow-2xs dark:inset-shadow-black',
+                        'border border-gray-300 dark:border-x-0 dark:border-t-0 dark:border-white/10 dark:inset-shadow-2xs dark:inset-shadow-black',
                         'text-gray-600 dark:text-gray-300',
                         'shadow-ui-sm not-prose h-10 rounded-lg px-10 py-2 disabled:shadow-none',
                         'data-invalid:border-red-500',

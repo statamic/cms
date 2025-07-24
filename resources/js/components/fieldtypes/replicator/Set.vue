@@ -124,7 +124,7 @@ function destroy() {
         <slot name="picker" />
         <div
             layout
-            class="shadow-ui-sm relative z-2 w-full rounded-lg border border-gray-200 bg-white text-base dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
+            class="shadow-ui-sm relative z-2 w-full rounded-lg border border-gray-200 bg-white text-base dark:border-x-0 dark:border-t-0 dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
             :data-collapsed="collapsed ?? undefined"
             :data-error="hasError ?? undefined"
             :data-invalid="isInvalid ?? undefined"
@@ -133,7 +133,7 @@ function destroy() {
         >
             <header
                 class="group/header animate-border-color flex items-center rounded-lg border-b border-transparent px-1.5 antialiased duration-200 hover:bg-gray-50"
-                :class="{ 'rounded-b-none border-gray-200! dark:border-white/15': !collapsed }"
+                :class="{ 'rounded-b-none border-gray-200! dark:border-white/10': !collapsed }"
             >
                 <Icon
                     name="handles"
