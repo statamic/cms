@@ -10,7 +10,7 @@ const props = defineProps({
 <template>
     <div
         :class="[
-            'relative bg-gray-100 dark:bg-black/15 dark:inset-shadow-2xs dark:inset-shadow-black',
+            'relative bg-gray-100 dark:bg-gray-950 dark:inset-shadow-2xs dark:inset-shadow-black',
             'not-prose w-full rounded-2xl mb-5 px-1.25 py-1.75',
         ]"
         data-ui-panel
