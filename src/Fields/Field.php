@@ -266,7 +266,7 @@ class Field implements Arrayable
 
     public function toPublishArray()
     {
-        return array_merge($this->preProcessedConfig(), [
+        $arr = array_merge($this->preProcessedConfig(), [
             'handle' => $this->handle,
             'prefix' => $this->prefix,
             'type' => $this->type(),
@@ -277,6 +277,23 @@ class Field implements Arrayable
             'read_only' => $this->visibility() === 'read_only', // Deprecated: Addon fieldtypes should now reference new `visibility` state.
             'always_save' => $this->alwaysSave(),
         ]);
+
+        $defaults = [
+            ...self::commonFieldOptions()->all()->map->defaultValue()->all(),
+            ...[
+                'read_only' => false,
+                'always_save' => false,
+                'prefix' => null,
+            ],
+            ...$this->fieldtype()->configFields()->all()->map->defaultValue()->all(),
+        ];
+
+        // Return the array excluding keys where the value is the same as the default.
+        return collect($arr)
+            ->reject(fn ($value, $key) => array_key_exists($key, $defaults) && $value === $defaults[$key])
+            ->all();
+
+        return $arr;
     }
 
     public function setValue($value)
@@ -419,9 +436,6 @@ class Field implements Arrayable
             self::commonFieldOptions()->all()->map->defaultValue()->all(),
             $this->config,
             $fields->preProcess()->values()->all(),
-            [
-                'component' => $fieldtype->component(),
-            ]
         );
     }
 

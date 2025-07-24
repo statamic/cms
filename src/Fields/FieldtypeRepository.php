@@ -17,7 +17,7 @@ class FieldtypeRepository
     public function find($handle)
     {
         if (isset($this->fieldtypes[$handle])) {
-            return clone $this->fieldtypes[$handle];
+            return (clone $this->fieldtypes[$handle])->removeField();
         }
 
         if (! ($fieldtypes = $this->classes())->has($handle)) {
@@ -37,6 +37,11 @@ class FieldtypeRepository
         return $this->classes()->map(function ($class) {
             return $class::handle();
         });
+    }
+
+    public function all()
+    {
+        return $this->handles()->map(fn ($handle) => $this->find($handle));
     }
 
     public function makeSelectableInForms($handle)

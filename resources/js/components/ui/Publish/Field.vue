@@ -5,6 +5,7 @@ import { injectFieldsContext } from './FieldsProvider.vue';
 import { Field, Icon, Tooltip, Label } from '@statamic/ui';
 import FieldActions from '@statamic/components/field-actions/FieldActions.vue';
 import ShowField from '@statamic/components/field-conditions/ShowField.js';
+import withDefaultConfig from '@statamic/components/fieldtypes/withDefaultConfig.js';
 
 const props = defineProps({
     config: {
@@ -34,10 +35,11 @@ const {
     setHiddenField,
 } = injectContainerContext();
 const { fieldPathPrefix, metaPathPrefix } = injectFieldsContext();
-const handle = props.config.handle;
+const config = computed(() => withDefaultConfig(props.config.type, props.config));
+const handle = config.value.handle;
 
 const fieldtypeComponent = computed(() => {
-    return `${props.config.component || props.config.type}-fieldtype`;
+    return `${config.value.component || config.value.type}-fieldtype`;
 });
 
 const fieldtypeComponentExists = computed(() => {
@@ -54,7 +56,7 @@ const meta = computed(() => {
 const errors = computed(() => containerErrors.value[fullPath.value]);
 const fieldId = computed(() => `field_${fullPath.value.replaceAll('.', '_')}`);
 const namePrefix = '';
-const isRequired = computed(() => props.config.required);
+const isRequired = computed(() => config.value.required);
 const fieldtype = useTemplateRef('fieldtype');
 
 const fieldActions = computed(() => {
@@ -62,7 +64,7 @@ const fieldActions = computed(() => {
 });
 
 const shouldShowFieldActions = computed(() => {
-    return props.config.actions && fieldActions.value?.length > 0;
+    return config.value.actions && fieldActions.value?.length > 0;
 });
 
 function valueUpdated(value) {
@@ -108,10 +110,10 @@ const shouldShowField = computed(() => {
         hiddenFields.value,
         revealerFields.value,
         setHiddenField
-    ).showField(props.config, fullPath.value);
+    ).showField(config.value, fullPath.value);
 });
 
-const shouldShowLabelText = computed(() => !props.config.hide_display);
+const shouldShowLabelText = computed(() => !config.value.hide_display);
 
 const shouldShowLabel = computed(
     () =>
@@ -120,14 +122,14 @@ const shouldShowLabel = computed(
         isSyncable.value, // Need to see the icon
 );
 
-const isLocalizable = computed(() => props.config.localizable);
+const isLocalizable = computed(() => config.value.localizable);
 
 const isReadOnly = computed(() => {
     if (containerReadOnly.value) return true;
 
     if (isTrackingOriginValues.value && isSyncable.value && !isLocalizable.value) return true;
 
-    return isLocked.value || props.config.visibility === 'read_only' || false;
+    return isLocked.value || config.value.visibility === 'read_only' || false;
 });
 
 const isLocked = computed(() => false); // todo
@@ -144,7 +146,7 @@ const isSynced = computed(() => isSyncable.value && !localizedFields.value.inclu
 const isNested = computed(() => fullPath.value.includes('.'));
 const wrapperComponent = computed(() => {
     // Todo: Find a way to not need to hard code this.
-    if (props.config.type === 'dictionary_fields') return 'div';
+    if (config.value.type === 'dictionary_fields') return 'div';
 
     return asConfig.value && !isNested.value ? 'card' : 'div';
 });

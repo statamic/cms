@@ -10,6 +10,8 @@ use Statamic\Facades\CP\Toast;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Statamic\Fields\Field;
+use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes\Icon;
 use Statamic\Statamic;
 use Statamic\Support\Str;
@@ -74,6 +76,7 @@ class JavascriptComposer
             'hasLicenseBanner' => ! $licenses->outpostIsOffline() && ($licenses->invalid() || $licenses->requestFailed()),
             'customSvgIcons' => Icon::getCustomSvgIcons(),
             'commandPaletteCategories' => Category::order(),
+            'fieldtypeConfigs' => $this->fieldtypeConfigs(),
         ];
     }
 
@@ -114,5 +117,25 @@ class JavascriptComposer
         $fallbackTranslations = tap(app('translator'))->setLocale(app('translator')->getFallback())->toJson();
 
         return array_merge($fallbackTranslations, $translations);
+    }
+
+    private function fieldtypeConfigs(): array
+    {
+        // TODO: Cache this.
+        return [
+            'common' => [
+                ...Field::commonFieldOptions()->values()->all(),
+                ...[
+                    'read_only' => false,
+                    'always_save' => false,
+                    'prefix' => null,
+                ],
+            ],
+            'types' => FieldtypeRepository::all()
+                ->mapWithKeys(fn (Fieldtype $fieldtype) => [$fieldtype->handle() => [
+                    ...$fieldtype->config(),
+                    ...['component' => $fieldtype->component()],
+                ]])->all(),
+        ];
     }
 }
