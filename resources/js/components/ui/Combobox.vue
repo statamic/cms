@@ -19,6 +19,7 @@ import { SortableList } from '@statamic/components/sortable/Sortable.js';
 const emit = defineEmits(['update:modelValue', 'search', 'selected', 'added']);
 
 const props = defineProps({
+    id: { type: String },
     buttonAppearance: { type: Boolean, default: true },
     clearable: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
@@ -50,15 +51,15 @@ const triggerClasses = cva({
     variants: {
         size: {
             base: 'text-base rounded-lg ps-3 pe-2.5 py-2 h-10 leading-[1.375rem]',
-            sm: 'text-sm rounded-md ps-2.5 pe-2 py-1.5 h-7 leading-[1.125rem]',
+            sm: 'text-sm rounded-md ps-2.5 pe-2 py-1.5 h-8 leading-[1.125rem]',
             xs: 'text-xs rounded-sm ps-2 pe-1.5 py-1.5 h-6 leading-[1.125rem]',
         },
         flat: {
             true: 'shadow-none',
-            false: 'bg-linear-to-b from-white to-gray-50 hover:to-gray-100 dark:from-gray-800/30 dark:to-gray-800 dark:hover:to-gray-850 shadow-ui-sm',
+            false: 'bg-linear-to-b from-white to-gray-50 hover:to-gray-100 dark:from-gray-800 dark:to-gray-800 dark:hover:to-gray-850 shadow-ui-sm',
         },
         buttonAppearance: {
-            true: 'border border-gray-300 with-contrast:border-gray-500 dark:border-b-0 dark:ring-3 dark:ring-gray-900 dark:border-white/15 shadow-ui-sm dark:shadow-md',
+            true: 'border border-gray-300 with-contrast:border-gray-500 dark:border-b-0 dark:ring-3 dark:ring-gray-900 dark:border-white/10 shadow-ui-sm dark:shadow-md',
             false: '',
         },
         // disabled: {
@@ -267,6 +268,7 @@ defineExpose({
                             v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"
                             ref="search"
                             class="w-full text-gray-700 opacity-100 focus:outline-none placeholder-xs"
+                            :id="id"
                             v-model="searchQuery"
                             :placeholder
                             @paste.prevent="onPaste"
@@ -275,7 +277,7 @@ defineExpose({
                         />
 
                         <button type="button" class="flex-1 text-start" v-else-if="!searchable && (dropdownOpen || !modelValue)">
-                            <span class="text-gray-400 dark:text-gray-500 text-[0.8125rem]" v-text="placeholder" />
+                            <span class="text-gray-400 dark:text-gray-500" v-text="placeholder" />
                         </button>
 
                         <button type="button" v-else class="flex-1 text-start cursor-pointer">
@@ -285,7 +287,7 @@ defineExpose({
                             </slot>
                         </button>
 
-                        <div class="flex gap-1 items-center">
+                        <div class="flex gap-1.5 items-center">
                             <Button icon="x" variant="ghost" size="xs" round v-if="clearable && modelValue" @click="clear" />
                             <Icon name="ui/chevron-down" />
                         </div>
@@ -304,7 +306,7 @@ defineExpose({
                         <ComboboxViewport>
                             <ComboboxEmpty class="py-2 text-sm">
                                 <slot name="no-options" v-bind="{ searchQuery }">
-                                    {{ __('No options to choose from.') }}
+                                    {{ __('No options available.') }}
                                 </slot>
                             </ComboboxEmpty>
 

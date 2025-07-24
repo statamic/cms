@@ -74,6 +74,7 @@
 .dark {
     @theme inline {
         --color-success: var(--color-green-500);
+        --color-gray-950: hsl(240deg 7% 8%);
     }
 }
 

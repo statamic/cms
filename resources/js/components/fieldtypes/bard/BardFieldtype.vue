@@ -6,7 +6,7 @@
         <div :class="{ 'publish-fields': fullScreenMode }">
             <div :class="fullScreenMode && wrapperClasses">
                 <div
-                    class="bard-fieldtype with-contrast:border-gray-500"
+                    class="bard-fieldtype with-contrast:border-gray-500 shadow-ui-sm"
                     :class="{ 'bard-fullscreen': fullScreenMode }"
                     ref="container"
                     @dragstart.stop="ignorePageHeader(true)"
@@ -34,7 +34,7 @@
                         </div>
                     </publish-field-fullscreen-header>
 
-                    <div class="bard-fixed-toolbar flex items-center justify-between rounded-t-xl border-b border-gray-300 bg-gray-50 px-2 py-1 dark:border-white/15 dark:bg-gray-950" v-if="!readOnly && showFixedToolbar && !fullScreenMode">
+                    <div class="bard-fixed-toolbar flex items-center justify-between rounded-t-xl border-b border-gray-300 bg-gray-50 px-2 py-1 dark:border-white/10 dark:bg-gray-950" v-if="!readOnly && showFixedToolbar && !fullScreenMode">
                         <div class="no-select flex flex-1 flex-wrap items-center" v-if="toolbarIsFixed">
                             <component
                                 v-for="button in visibleButtons(buttons)"
@@ -212,10 +212,15 @@ export default {
                 bard: this.makeBardProvide(),
                 bardSets: this.config.sets,
             },
+            errorsById: {},
         };
     },
 
     computed: {
+        setFieldPathPrefix() {
+            return this.fieldPathPrefix ? `${this.fieldPathPrefix}.${this.handle}` : this.handle;
+        },
+
         toolbarIsFixed() {
             return this.config.toolbar_mode === 'fixed';
         },
@@ -275,16 +280,6 @@ export default {
 
         site() {
             return this.publishContainer.site ?? this.$config.get('selectedSite');
-        },
-
-        setsWithErrors() {
-            if (!this.publishContainer) return [];
-
-            return Object.values(this.setIndexes).filter((setIndex) => {
-                const prefix = `${this.fieldPathPrefix || this.handle}.${setIndex}.`;
-
-                return Object.keys(this.publishContainer.errors).some((key) => key.startsWith(prefix));
-            });
         },
 
         replicatorPreview() {
@@ -422,6 +417,27 @@ export default {
 
         fullScreenMode() {
             this.initEditor();
+        },
+
+        'publishContainer.errors': {
+            immediate: true,
+            handler(errors) {
+                this.errorsById = Object.entries(errors).reduce((acc, [key, value]) => {
+                    if (!key.startsWith(this.setFieldPathPrefix)) {
+                        return acc;
+                    }
+
+                    const subKey = key.replace(`${this.setFieldPathPrefix}.`, '');
+                    const setIndex = subKey.split('.').shift();
+                    const setId = this.value[setIndex]?.attrs.id;
+
+                    if (setId) {
+                        acc[setId] = value;
+                    }
+
+                    return acc;
+                }, {});
+            },
         },
     },
 
@@ -748,6 +764,10 @@ export default {
                     return __('Invalid content, nodes and marks must have a type');
                 }
             }
+        },
+
+        setHasError(id) {
+            return this.errorsById.hasOwnProperty(id) && this.errorsById[id].length > 0;
         },
 
         valueToContent(value) {

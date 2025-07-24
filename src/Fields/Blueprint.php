@@ -75,6 +75,11 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         return $this->namespace;
     }
 
+    public function renderableNamespace(): string
+    {
+        return str_replace('.', ' ', Str::humanize($this->namespace));
+    }
+
     public function fullyQualifiedHandle(): string
     {
         $handle = $this->handle();
@@ -782,9 +787,14 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         return $this->handle();
     }
 
-    public function resetUrl()
+    public function editAdditionalBlueprintUrl()
     {
-        return cp_route('blueprints.reset', [$this->namespace(), $this->handle()]);
+        return cp_route('blueprints.additional.edit', [$this->namespace(), $this->handle()]);
+    }
+
+    public function resetAdditionalBlueprintUrl()
+    {
+        return cp_route('blueprints.additional.reset', [$this->namespace(), $this->handle()]);
     }
 
     public function writeFile($path = null)

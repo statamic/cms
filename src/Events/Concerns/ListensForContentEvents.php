@@ -10,6 +10,7 @@ trait ListensForContentEvents
      * @var array
      */
     protected $events = [
+        \Statamic\Events\AddonSettingsSaved::class,
         \Statamic\Events\AssetContainerDeleted::class,
         \Statamic\Events\AssetContainerSaved::class,
         \Statamic\Events\AssetDeleted::class,

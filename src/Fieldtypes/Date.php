@@ -40,12 +40,14 @@ class Date extends Fieldtype
                             // 'multiple' => __('Multiple'), // @TODO hook up
                             'range' => __('Range'),
                         ],
+                        'width' => 50,
                     ],
                     'inline' => [
                         'display' => __('Inline'),
                         'instructions' => __('statamic::fieldtypes.date.config.inline'),
                         'type' => 'toggle',
                         'default' => false,
+                        'width' => 50,
                     ],
                     'full_width' => [
                         'display' => __('Full Width'),
@@ -55,18 +57,17 @@ class Date extends Fieldtype
                         'if' => [
                             'inline' => true,
                         ],
+                        'width' => 50,
                     ],
-                    'columns' => [
-                        'display' => __('Columns'),
-                        'instructions' => __('statamic::fieldtypes.date.config.columns'),
+                    'number_of_months' => [
+                        'display' => __('Number of Months'),
+                        'instructions' => __('statamic::fieldtypes.date.config.number_of_months'),
                         'type' => 'integer',
+                        'if' => [
+                            'inline' => true,
+                        ],
                         'default' => 1,
-                    ],
-                    'rows' => [
-                        'display' => __('Rows'),
-                        'instructions' => __('statamic::fieldtypes.date.config.rows'),
-                        'type' => 'integer',
-                        'default' => 1,
+                        'width' => 50,
                     ],
                 ],
             ],
@@ -78,12 +79,14 @@ class Date extends Fieldtype
                         'instructions' => __('statamic::fieldtypes.date.config.time_enabled'),
                         'type' => 'toggle',
                         'default' => false,
+                        'width' => 50,
                     ],
                     'time_seconds_enabled' => [
                         'display' => __('Show Seconds'),
                         'instructions' => __('statamic::fieldtypes.date.config.time_seconds_enabled'),
                         'type' => 'toggle',
                         'default' => false,
+                        'width' => 50,
                     ],
                 ],
             ],
@@ -94,11 +97,13 @@ class Date extends Fieldtype
                         'display' => __('Earliest Date'),
                         'instructions' => __('statamic::fieldtypes.date.config.earliest_date'),
                         'type' => 'date',
+                        'width' => 50,
                     ],
                     'latest_date' => [
                         'display' => __('Latest Date'),
                         'instructions' => __('statamic::fieldtypes.date.config.latest_date'),
                         'type' => 'date',
+                        'width' => 50,
                     ],
                 ],
             ],

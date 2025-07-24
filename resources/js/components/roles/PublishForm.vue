@@ -12,8 +12,9 @@
                     :label="__('Title')"
                     :instructions="__('messages.role_title_instructions')"
                     :errors="errors.title"
+                    id="role-title"
                 >
-                    <Input v-model="title" />
+                    <Input v-model="title" id="role-title" autocomplete="off" />
                 </Field>
 
                 <Field
@@ -22,8 +23,9 @@
                     :label="__('Handle')"
                     :instructions="__('messages.role_handle_instructions')"
                     :errors="handleErrors"
+                    id="role-handle"
                 >
-                    <Input v-model="handle" />
+                    <Input v-model="handle" id="role-handle" autocomplete="off" />
                 </Field>
 
                 <Field
@@ -31,8 +33,9 @@
                     v-if="canAssignSuper"
                     :label="__('permissions.super')"
                     :instructions="__('permissions.super_desc')"
+                    id="role-super"
                 >
-                    <Switch v-model="isSuper" />
+                    <Switch v-model="isSuper" id="role-super" />
                 </Field>
             </div>
         </Panel>

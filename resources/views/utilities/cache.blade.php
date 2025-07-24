@@ -130,4 +130,9 @@
             </ui-card>
         </ui-panel>
     </div>
+
+    <x-statamic::docs-callout
+        topic="{{ __('caching') }}"
+        url="{{ Statamic::docsUrl('caching') }}"
+    />
 @stop

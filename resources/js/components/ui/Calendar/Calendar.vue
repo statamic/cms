@@ -24,6 +24,8 @@ const props = defineProps({
     min: { type: [String, Object], default: null },
     max: { type: [String, Object], default: null },
     components: { type: Object, default: () => ({}) },
+    numberOfMonths: { type: Number, default: 1 },
+    inline: { type: Boolean, default: false },
 });
 
 const components = computed(() => ({
@@ -49,6 +51,24 @@ const minValue = computed(() =>
 const maxValue = computed(() =>
     props.max ? (typeof props.max === 'string' ? parseAbsolute(props.max) : props.max) : null,
 );
+
+const gridStyle = computed(() => {
+    const months = props.numberOfMonths;
+
+    // For 1-2 months: single row with fixed columns
+    if (months <= 2) {
+        return {
+            'grid-template-columns': `repeat(${months}, minmax(250px, 1fr))`,
+            'grid-template-rows': 'auto'
+        };
+    }
+
+    // For 3+ months: responsive grid with auto-fit
+    return {
+        'grid-template-columns': 'repeat(auto-fit, minmax(250px, 1fr))',
+        'grid-template-rows': 'auto'
+    };
+});
 </script>
 
 <template>
@@ -60,6 +80,7 @@ const maxValue = computed(() =>
         :maxValue="maxValue"
         :locale="$date.locale"
         fixed-weeks
+        :number-of-months="inline ? numberOfMonths : 1"
         @update:model-value="emit('update:modelValue', $event)"
     >
         <Component :is="components.CalendarHeader" class="flex items-center justify-between">
@@ -80,7 +101,7 @@ const maxValue = computed(() =>
             </div>
         </Component>
 
-        <div class="flex flex-col space-y-4 pt-4 sm:flex-row sm:space-y-0 sm:space-x-4">
+        <div class="grid gap-8" :style="gridStyle">
             <Component
                 :is="components.CalendarGrid"
                 v-for="month in grid"
@@ -88,6 +109,9 @@ const maxValue = computed(() =>
                 class="w-full border-collapse space-y-1 select-none"
             >
                 <Component :is="components.CalendarGridHead">
+                    <ui-badge variant="flat" class="mb-2" v-if="inline && numberOfMonths > 1">
+                        {{ new Date(month.value.toString()).toLocaleString($date.locale, { month: 'long' }) }}
+                    </ui-badge>
                     <Component :is="components.CalendarGridRow" class="mb-1 grid w-full grid-cols-7">
                         <Component
                             :is="components.CalendarHeadCell"

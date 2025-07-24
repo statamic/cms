@@ -132,7 +132,7 @@
 */
 /* HTML Example...
 
-    <div class="absolute right-0 mask-bg"> <-- needs to be position:absolute or position:relative
+    <div class="absolute right-0 mask-bg"> <-- needs to be position:absolute or position:relative. Use a modifier class to change the amount/direction, e.g. <div class="sticky left-0 mask-bg mask-bg--left mask-bg--left-small">
 
     </div>
 
@@ -148,13 +148,22 @@
         z-index: var(--z-index-below);
         width: calc(150% + var(--cover));
         height: calc(100% + var(--height-offset) * 2);
-        left: calc(0.5rem - var(--cover));
         top: calc(0% - var(--height-offset));
-        background: radial-gradient(circle at center, hsl(0deg 0% 100%) 0%,transparent 80%);
+        background: radial-gradient(circle at center, white 0%,transparent 80%);
         border-radius: 1.5rem 0 0 1.5rem;
     }
     .dark &::before {
         background: radial-gradient(circle at center, hsl(240deg 6% 10%) 0%, transparent 80%);
+    }
+}
+@utility mask-bg--left {
+    &::before {
+        left: calc(0.5rem - var(--cover));
+    }
+}
+@utility mask-bg--left-small {
+    &::before {
+        left: calc(-0.75rem - var(--cover));
     }
 }
 
@@ -175,6 +184,7 @@
 /* HTML Example...
 
     <div class="content-card bg-architectural-lines"> <-- background lines added to this element
+        [data-ui-panel] <-- a central horizontal line is created here
         <footer>
             <button>Create Collection</button> <--- circular line effect added to this descendended button in the footer
         </footer>
@@ -193,6 +203,35 @@
         /* Reduce the chances of the background circles overlapping the button */
         @media (width < 1300px) {
             background-position-y: 130%;
+        }
+        @media (width > 2000px) {
+            /* The lines become thicker because the svg gets stretched, so reduce opacity to compensate for this */
+            opacity: 0.7;
+        }
+    }
+    .dark &::before {
+        filter: invert(100%);
+    }
+    /* Central horizontal line */
+    [data-ui-panel] {
+        > * {
+            position: relative;
+            z-index: 1;
+        }
+    
+        &::after {
+            --height: 1px;
+            --line-color: hsl(0deg 0% 95%);
+            content: '';
+            pointer-events: none;
+            position: absolute;
+            inset: 0;
+            height: var(--height);
+            border-image: conic-gradient(var(--line-color) 0 0) fill 0//0 100vw;
+            top: calc(50% - var(--height));
+        }
+        .dark &::after {
+            --line-color: hsl(240deg 2.56% 15%);
         }
     }
     footer {

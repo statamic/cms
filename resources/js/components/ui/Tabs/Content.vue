@@ -7,7 +7,7 @@ defineProps({
 </script>
 
 <template>
-    <TabsContent :value="name">
+    <TabsContent :value="name" tabindex="-1">
         <slot />
     </TabsContent>
 </template>

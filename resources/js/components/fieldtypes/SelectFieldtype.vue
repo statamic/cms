@@ -12,6 +12,7 @@
         :read-only="isReadOnly"
         :searchable="config.searchable || config.taggable"
         :taggable="config.taggable"
+        :id="id"
         @update:modelValue="comboboxUpdated"
     />
 </template>

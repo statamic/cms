@@ -181,6 +181,11 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
         return cp_route('assets.browse.show', $this->handle());
     }
 
+    public function editBlueprintUrl()
+    {
+        return cp_route('blueprints.asset-containers.edit', $this->handle());
+    }
+
     public function apiUrl()
     {
         return null; // TODO
@@ -222,6 +227,14 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
                 ],
             ])->setHandle($this->handle())->setNamespace('assets');
         });
+    }
+
+    public function blueprintCommandPaletteLink()
+    {
+        return $this->blueprint()?->commandPaletteLink(
+            type: 'Asset Containers',
+            url: $this->editBlueprintUrl(),
+        );
     }
 
     public function afterSave($callback)

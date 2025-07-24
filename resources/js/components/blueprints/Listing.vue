@@ -44,7 +44,7 @@ function removeRow(row) {
     >
         <template #cell-title="{ row: blueprint }">
             <div class="flex items-center">
-                <div class="little-dot ltr:mr-2 rtl:ml-2" :class="[blueprint.hidden ? 'hollow' : 'bg-green-600']" />
+                <div class="little-dot me-2" :class="[blueprint.hidden ? 'hollow' : 'bg-green-600']" />
                 <a :href="blueprint.edit_url">{{ __(blueprint.title) }}</a>
 
                 <resource-deleter

@@ -1,15 +1,15 @@
-/* BARD 
+/* BARD
 =================================================== */
 @layer ui {
     .bard-fieldtype:not(.form-group) {
-        @apply relative rounded-xl border outline-hidden dark:border-dark-900;
+        @apply relative rounded-xl border outline-hidden dark:border-gray-800;
     }
 }
 /* BARD / EDITOR
 =================================================== */
 @layer ui {
     .bard-editor {
-        @apply relative rounded-sm p-0 text-gray-900 dark:bg-dark-650 dark:text-dark-150;
+        @apply relative rounded-sm p-0 text-gray-900 dark:bg-gray-900 dark:text-gray-300;
         /* The focus state inherits this */
         > * {
             @apply rounded-b-lg;
@@ -28,7 +28,7 @@
 =================================================== */
 @layer ui {
     .bard-editor.mode\:read-only .ProseMirror {
-        @apply bg-gray-300 text-gray-700 dark:bg-dark-600 dark:text-dark-175;
+        @apply bg-gray-300 text-gray-700 dark:bg-gray-700 dark:text-gray-300;
     }
 
     .bard-editor.mode\:minimal .ProseMirror {
@@ -47,21 +47,21 @@
 =================================================== */
 @layer ui {
     .bard-fixed-toolbar {
-        @apply top-0 z-5 flex items-start justify-between rounded-t-xl border-b border-gray-300 bg-gray-50 p-1 text-sm shadow-none px-2 py-1 dark:border-white/15 dark:bg-gray-950;
+        @apply top-0 z-5 flex items-start justify-between rounded-t-xl border-b border-gray-300 bg-gray-50 p-1 text-sm shadow-none px-2 py-1 dark:border-white/10 dark:bg-gray-950;
 
         .bard-toolbar-button {
-            @apply m-0 flex h-8 w-8 items-center justify-center rounded-sm px-1 text-center text-base text-gray-900 dark:text-dark-150;
+            @apply m-0 flex h-8 w-8 items-center justify-center rounded-sm px-1 text-center text-base text-gray-900 dark:text-gray-300;
             svg {
                 @apply h-4 w-auto;
             }
         }
 
         .bard-toolbar-button:hover {
-            @apply bg-gray-200 dark:bg-dark-650;
+            @apply bg-gray-200 dark:bg-gray-600;
         }
 
         .bard-toolbar-button.active {
-            @apply bg-gray-300 text-black dark:bg-dark-600 dark:text-white;
+            @apply bg-gray-300 text-black dark:bg-gray-700 dark:text-white;
         }
 
         .bard-toolbar-button:focus {
@@ -71,7 +71,7 @@
         .bard-toolbar-button:disabled {
             @apply opacity-50;
             &:hover {
-                @apply text-gray-900 dark:text-dark-100;
+                @apply text-gray-900 dark:text-gray-200;
             }
         }
 
@@ -196,11 +196,11 @@
     }
 
     .bard-add-set-button {
-        @apply absolute top-[-6px] z-1 flex items-center justify-center ltr:-left-4 rtl:-right-4;
+        @apply absolute top-[-6px] z-1 flex items-center justify-center -start-4;
     }
 
     .bard-footer-toolbar {
-        @apply flex items-center justify-between rounded-b border-t bg-white p-2 text-xs text-gray-700 shadow-none dark:border-dark-300 dark:bg-dark-550 dark:text-dark-175;
+        @apply flex items-center justify-between rounded-b border-t bg-white p-2 text-xs text-gray-700 shadow-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300;
         padding: 8px 12px;
 
         .bard-fullscreen & {
@@ -247,10 +247,10 @@
    ========================================================================== */
 @layer ui-states {
     .bard-fullscreen {
-        @apply fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-100 pt-14 dark:bg-dark-700;
+        @apply fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-100 pt-14 dark:bg-gray-800;
 
         & > .bard-editor {
-            @apply relative mx-auto my-6 max-w-5xl rounded-lg bg-white px-8 shadow-ui-md dark:bg-dark-800 dark:shadow-lg;
+            @apply relative mx-auto my-6 max-w-5xl rounded-lg bg-white px-8 shadow-ui-md dark:bg-gray-900 dark:shadow-lg;
         }
 
         .bard-fixed-toolbar {
@@ -277,25 +277,19 @@
         }
 
         .bard-set-selector {
-            @apply ltr:ml-6 rtl:mr-6;
+            @apply ms-6;
         }
 
         .bard-field-options {
             @apply fixed inset-x-0 top-0 w-full bg-gray-700 p-4;
-            @apply ltr:text-right rtl:text-left;
+            @apply text-end;
             z-index: 1; /*  to appear over the top of .bard-editor */
 
             .icon {
                 font-size: 24px;
             }
             a {
-                margin-left: 16px;
-                [dir='rtl'] & {
-                    margin-right: 16px;
-                    margin-left: 0;
-                }
-                color: #fff;
-                opacity: 1;
+                @apply me-4 text-white opacity-100;
             }
         }
     }
@@ -330,7 +324,7 @@
             }
 
             a {
-                @apply break-words text-blue-600 underline dark:text-dark-blue-100;
+                @apply break-words text-blue-600 underline dark:text-blue-400;
             }
 
             a:active,
@@ -358,7 +352,7 @@
         }
 
         hr {
-            @apply bg-gray-600 dark:bg-dark-300;
+            @apply bg-gray-600 dark:bg-gray-600;
             height: 4px;
             padding: 0;
             margin: 1.7em 0;
@@ -392,7 +386,7 @@
             }
 
             a {
-                @apply break-words text-blue-600 underline dark:text-dark-blue-100;
+                @apply break-words text-blue-600 underline dark:text-blue-400;
             }
 
             a:active,
@@ -503,7 +497,7 @@
         }
 
         blockquote {
-            @apply border-blue px-4 text-gray-900 dark:border-dark-blue-100 dark:text-dark-150 ltr:border-l-4 rtl:border-r-4;
+            @apply border-blue px-4 text-gray-900 dark:border-blue-400 dark:text-gray-300 border-s-4;
             margin: 0 0 0.85em;
         }
 
@@ -519,17 +513,17 @@
         blockquote > .tableWrapper table,
         ol li > .tableWrapper table,
         ul li > .tableWrapper table {
-            @apply m-0 mb-4 w-full overflow-hidden bg-white text-sm dark:bg-dark-500;
+            @apply m-0 mb-4 w-full overflow-hidden bg-white text-sm dark:bg-gray-700;
             border-collapse: collapse;
             table-layout: fixed;
 
             th {
-                @apply bg-gray-200 font-bold dark:bg-dark-575 ltr:text-left rtl:text-right;
+                @apply bg-gray-200 font-bold dark:bg-gray-600 text-start;
             }
 
             td,
             th {
-                @apply relative border px-2 py-1 align-top dark:border-dark-200;
+                @apply relative border px-2 py-1 align-top dark:border-gray-600;
                 min-width: 1em;
             }
 
@@ -537,13 +531,13 @@
                 @apply relative;
 
                 &:after {
-                    @apply pointer-events-none absolute inset-0 bg-gray-400 opacity-25 dark:bg-dark-200;
+                    @apply pointer-events-none absolute inset-0 bg-gray-400 opacity-25 dark:bg-gray-600;
                     content: '';
                 }
             }
 
             a {
-                @apply break-words text-blue-600 underline dark:text-dark-blue-100;
+                @apply break-words text-blue-600 underline dark:text-blue-400;
             }
 
             a:active,
@@ -555,7 +549,7 @@
         }
 
         p > code {
-            @apply rounded-xs bg-gray-400 font-mono text-xs dark:bg-dark-750;
+            @apply rounded-xs bg-gray-400 font-mono text-xs dark:bg-gray-800;
             padding: 2px 4px;
             top: -1px;
         }
@@ -565,7 +559,7 @@
         }
 
         pre code {
-            @apply block w-full rounded-sm bg-gray-400 p-4 font-mono text-xs dark:bg-dark-950 dark:text-dark-100;
+            @apply block w-full rounded-sm bg-gray-400 p-4 font-mono text-xs dark:bg-gray-950 dark:text-gray-200;
             line-height: 1.8;
         }
     }
@@ -575,14 +569,8 @@
 ========================================================================== */
 @layer ui {
     .bard-fieldtype .ProseMirror > p.is-editor-empty:first-child::before {
-        @apply text-gray-600 dark:text-dark-200;
+        @apply text-gray-600 dark:text-gray-400 float-start pointer-events-none h-0;
         content: attr(data-placeholder);
-        float: left;
-        [dir='rtl'] & {
-            float: right;
-        }
-        height: 0;
-        pointer-events: none;
     }
 }
 
@@ -591,9 +579,8 @@
 @layer ui {
     .bard-link-toolbar {
         .input {
-            @apply h-8 border-none bg-transparent p-0 text-xs shadow-none;
+            @apply h-8 border-none bg-transparent p-0 text-xs shadow-none outline-0;
             width: 240px;
-            outline: none;
         }
 
         .bard-toolbar-button {
@@ -607,7 +594,7 @@
     }
 
     .bard-inline-image-container {
-        @apply relative mb-6 whitespace-normal rounded-sm border bg-white dark:border-dark-900 dark:bg-dark-600;
+        @apply relative mb-6 whitespace-normal rounded-sm border bg-white dark:border-gray-800 dark:bg-gray-700;
         &:hover {
             cursor: grab;
         }
@@ -627,13 +614,8 @@
         }
 
         table .column-resize-handle {
-            @apply pointer-events-none absolute bottom-0 top-0 bg-blue-200;
+            @apply pointer-events-none absolute bottom-0 top-0 bg-blue-200 end-[2px];
             width: 3px;
-            right: -2px;
-            [dir='rtl'] & {
-                right: auto;
-                left: -2px;
-            }
         }
     }
 }

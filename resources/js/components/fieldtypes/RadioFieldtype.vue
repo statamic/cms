@@ -2,10 +2,11 @@
     <RadioGroup :inline="config.inline" :model-value="value" @update:model-value="update" ref="radio">
         <Radio
             v-for="(option, index) in options"
+            :disabled="config.disabled"
             :key="index"
             :label="option.label || option.value"
+            :read-only="isReadOnly"
             :value="option.value"
-            :disabled="isReadOnly"
         />
     </RadioGroup>
 </template>

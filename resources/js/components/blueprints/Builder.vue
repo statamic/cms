@@ -2,6 +2,7 @@
     <div>
         <ui-header :title="__('Edit Blueprint')" icon="blueprints">
             <template #actions>
+                <slot name="actions"></slot>
                 <ui-button type="submit" variant="primary" @click.prevent="save" v-text="__('Save')" />
             </template>
         </ui-header>

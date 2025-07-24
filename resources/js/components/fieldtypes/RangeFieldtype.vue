@@ -2,17 +2,17 @@
     <div class="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 rounded-lg p-2 @lg:px-4 @lg:py-3">
         <ui-subheading size="lg" v-if="config.prepend" :text="__(config.prepend)" class="whitespace-nowrap" />
         <input
+            class="min-w-0 flex-1 w-full"
             type="range"
             v-model="val"
-            :name="name"
-            :min="config.min"
+            :disabled="config.disabled"
+            :id="fieldId"
             :max="config.max"
+            :min="config.min"
+            :name="name"
+            :read-only="isReadOnly"
             :step="config.step"
             :width="config.width"
-            :readonly="isReadOnly"
-            :disabled="isReadOnly"
-            :id="fieldId"
-            class="min-w-0 flex-1 w-full"
         />
         <ui-badge :text="val"  />
         <ui-subheading size="lg" v-if="config.append" :text="__(config.append)" />
