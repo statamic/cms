@@ -96,7 +96,7 @@ class DimensionsRule implements CastableToValidationString, Stringable, Validati
 
     public function __toString()
     {
-        return 'dimensions:' . collect($this->parameters)
+        return 'dimensions:'.collect($this->parameters)
             ->map(fn ($value, $key) => "{$key}={$value}")
             ->implode(',');
     }
