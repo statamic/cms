@@ -102,8 +102,8 @@ trait ManagesBlueprints
             return Arr::removeNullValues([
                 'display' => $section['display'] ?? null,
                 'instructions' => $section['instructions'] ?? null,
-                'collapsible' => $section['collapsible'] ?? false,
-                'collapsed_by_default' => $section['collapsed_by_default'] ?? false,
+                'collapsible' => $section['collapsible'] ?? null,
+                'collapsed_by_default' => $section['collapsed_by_default'] ?? null,
                 'fields' => collect($section['fields'])
                     ->map(fn ($field) => FieldTransformer::fromVue($field))
                     ->all(),

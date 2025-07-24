@@ -23,14 +23,14 @@ class Section
         return $this->contents['instructions'] ?? null;
     }
 
-    public function collapsible(): bool
+    public function collapsible(): ?bool
     {
-        return $this->contents['collapsible'] ?? false;
+        return $this->contents['collapsible'] ?? null;
     }
 
-    public function collapsedByDefault(): bool
+    public function collapsedByDefault(): ?bool
     {
-        return $this->contents['collapsed_by_default'] ?? false;
+        return $this->contents['collapsed_by_default'] ?? null;
     }
 
     public function contents(): array
