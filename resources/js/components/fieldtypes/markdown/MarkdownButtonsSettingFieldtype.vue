@@ -17,7 +17,7 @@
 <script>
 import Fieldtype from '../Fieldtype.vue';
 import { Sortable, Plugins } from '@shopify/draggable';
-import { availableButtons } from './buttons';
+import { availableButtons } from './commands';
 
 export default {
     mixins: [Fieldtype],

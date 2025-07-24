@@ -2,6 +2,11 @@
    MARKDOWN FIELDTYPE
    ========================================================================== */
 
+/* Slash command trigger */
+.slash-command-trigger {
+    @apply absolute left-0 top-0 w-px h-px pointer-events-none;
+}
+
 
 /* Inside a Grid fieldtype
   ========================================================================== */
@@ -131,3 +136,5 @@
         @apply relative mx-auto max-w-5xl bg-transparent p-8 text-lg;
     }
 }
+
+

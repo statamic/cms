@@ -12,6 +12,7 @@ const attrs = useAttrs();
 
 const props = defineProps({
     align: { type: String, default: 'start' },
+    defaultOpen: { type: Boolean, default: false },
     offset: { type: Number, default: 5 },
     side: { type: String, default: 'bottom' },
 });
@@ -25,9 +26,9 @@ const dropdownContentClasses = cva({
 </script>
 
 <template>
-    <DropdownMenuRoot>
+    <DropdownMenuRoot :default-open="defaultOpen">
         <DropdownMenuTrigger as-child data-ui-dropdown-trigger>
-            <slot name="trigger">
+            <slot name="trigger" v-if="!defaultOpen">
                 <Button icon="ui/dots" variant="ghost" size="sm" v-bind="attrs" :aria-label="__('Open dropdown menu')" />
             </slot>
         </DropdownMenuTrigger>

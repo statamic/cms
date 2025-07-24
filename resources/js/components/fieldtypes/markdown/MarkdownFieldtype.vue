@@ -72,7 +72,32 @@
                                 @drop="draggingFile = false"
                                 @keydown="shortcut"
                             >
-                                <div class="editor relative z-5 focus-within:focus-outline-within" ref="codemirror"></div>
+                                <div class="editor relative z-5 /focus-within:focus-outline-within" ref="codemirror"></div>
+
+                                <!-- Slash Command Menu -->
+                                <ui-dropdown
+                                    v-if="showSlashMenu"
+                                    :default-open="showSlashMenu"
+                                    @update:open="showSlashMenu = $event"
+                                >
+                                    <template #trigger>
+                                        <div ref="slashTrigger" class="slash-command-trigger" />
+                                    </template>
+                                    <ui-dropdown-menu>
+                                        <ui-dropdown-label>{{ __('Markdown Commands') }}</ui-dropdown-label>
+                                        <ui-dropdown-item
+                                            v-for="(item, index) in slashMenuItems"
+                                            :key="item.id"
+                                            :class="{ 'bg-blue-50 dark:bg-blue-900/20': index === selectedSlashItem }"
+                                            @click="selectedSlashItem = index; executeSlashCommand()"
+                                        >
+                                            <div class="flex items-center text-xs">
+                                                {{ item.label }}
+                                            </div>
+                                        </ui-dropdown-item>
+                                    </ui-dropdown-menu>
+                                </ui-dropdown>
+
                                 <!-- Hidden input for label association -->
                                 <input
                                     v-if="id"
@@ -143,7 +168,7 @@
                         >
                             &times;
                         </button>
-                        <div class="prose mx-auto my-8 max-w-md">
+                        <div class="prose mx-auto my-8 max-w-3xl">
                             <h2 v-text="__('Markdown Cheatsheet')"></h2>
                             <div v-html="__('markdown.cheatsheet')"></div>
                         </div>
@@ -160,6 +185,7 @@ import { marked } from 'marked';
 import { markRaw } from 'vue';
 import { TextRenderer as PlainTextRenderer } from '@davidenke/marked-text-renderer';
 import throttle from '@statamic/util/throttle.js';
+import ucs2decode from '@statamic/util/ucs2decode.js';
 import { Button } from '@statamic/ui';
 
 import CodeMirror from 'codemirror/lib/codemirror';
@@ -177,54 +203,14 @@ import 'codemirror/mode/php/php';
 import 'codemirror/mode/yaml/yaml';
 import 'codemirror/addon/edit/continuelist';
 
-import { availableButtons } from './buttons';
+import { availableButtons, slashMenuItems } from './commands';
 import Selector from '../../assets/Selector.vue';
 import Uploader from '../../assets/Uploader.vue';
 import Uploads from '../../assets/Uploads.vue';
 import MarkdownToolbar from './MarkdownToolbar.vue';
+
 // Keymaps
 import 'codemirror/keymap/sublime';
-
-/**
- * `ucs2decode` function from the punycode.js library.
- *
- * Creates an array containing the decimal code points of each Unicode
- * character in the string. While JavaScript uses UCS-2 internally, this
- * function will convert a pair of surrogate halves (each of which UCS-2
- * exposes as separate characters) into a single code point, matching
- * UTF-16.
- *
- * @see     <http://goo.gl/8M09r>
- * @see     <http://goo.gl/u4UUC>
- *
- * @param   {String}  string   The Unicode input string (UCS-2).
- *
- * @return  {Array}   The new array of code points.
- */
-function ucs2decode(string) {
-    const output = [];
-    let counter = 0;
-    const length = string.length;
-    while (counter < length) {
-        const value = string.charCodeAt(counter++);
-        if (value >= 0xd800 && value <= 0xdbff && counter < length) {
-            // It's a high surrogate, and there is a next character.
-            const extra = string.charCodeAt(counter++);
-            if ((extra & 0xfc00) == 0xdc00) {
-                // Low surrogate.
-                output.push(((value & 0x3ff) << 10) + (extra & 0x3ff) + 0x10000);
-            } else {
-                // It's an unmatched surrogate; only append this code unit, in case the
-                // next code unit is the high surrogate of a surrogate pair.
-                output.push(value);
-                counter--;
-            }
-        } else {
-            output.push(value);
-        }
-    }
-    return output;
-}
 
 export default {
     mixins: [Fieldtype],
@@ -258,6 +244,10 @@ export default {
             },
             escBinding: null,
             markdownPreviewText: null,
+            showSlashMenu: false,
+            slashMenuPosition: { x: 0, y: 0 },
+            selectedSlashItem: 0,
+
         };
     },
 
@@ -295,6 +285,9 @@ export default {
         this.$events.$off('livepreview.opened', this.throttledResizeEvent);
         this.$events.$off('livepreview.closed', this.throttledResizeEvent);
         this.$events.$off('livepreview.resizing', this.throttledResizeEvent);
+
+        // Remove click outside handler
+        document.removeEventListener('click', this.handleClickOutside);
     },
 
     methods: {
@@ -355,6 +348,17 @@ export default {
             });
 
             this.codemirror.replaceSelections(replacements, 'around');
+            this.codemirror.focus();
+        },
+
+        insertCodeBlock() {
+            const cursor = this.codemirror.getCursor();
+            const codeBlock = '```\n\n```';
+
+            this.codemirror.replaceRange(codeBlock, cursor);
+
+            // Position cursor between the backticks
+            this.codemirror.setCursor(cursor.line + 1, 0);
             this.codemirror.focus();
         },
 
@@ -515,29 +519,32 @@ export default {
          */
         shortcut(e) {
             const mod = e.metaKey || e.ctrlKey;
-            if (!mod) return;
 
             // Handle Cmd+Shift+A for asset insertion
-            if (this.assetsEnabled && e.shiftKey && e.keyCode === 65) {
+            if (this.assetsEnabled && mod && e.shiftKey && e.keyCode === 65) {
                 e.preventDefault();
                 this.addAsset();
                 return;
             }
 
-            const shortcuts = {
-                66: () => this.toggleInline('bold'), // cmd+b
-                73: () => this.toggleInline('italic'), // cmd+i
-                190: () => this.toggleLine('quote'), // cmd+.
-                192: () => this.toggleInline('code'), // cmd+`
-                76: () => this.toggleLine('unordered-list'), // cmd+l
-                79: () => this.toggleLine('ordered-list'), // cmd+o
-                220: () => this.toggleBlock('code'), // cmd+\
-                75: () => this.insertLink(), // cmd+k
-            };
+            // Handle slash command - only at start of line or after whitespace
+            if (e.key === '/' && !mod) {
+                const cursor = this.codemirror.getCursor();
+                const line = this.codemirror.getLine(cursor.line);
+                const beforeCursor = line.substring(0, cursor.ch);
 
-            if (shortcuts[e.keyCode]) {
-                e.preventDefault();
-                shortcuts[e.keyCode]();
+                // Only trigger if we're at the start or after whitespace
+                if (beforeCursor === '' || /\s$/.test(beforeCursor)) {
+                    e.preventDefault();
+
+                                                                                // Show the slash menu
+                    this.showSlashMenu = true;
+                    this.selectedSlashItem = 0;
+
+                    this.showSlashMenu = true;
+                    this.selectedSlashItem = 0;
+                    return;
+                }
             }
         },
 
@@ -597,8 +604,6 @@ export default {
             }
         },
 
-
-
         trackHeightUpdates() {
             this.$events.$on('livepreview.opened', this.throttledResizeEvent);
             this.$events.$on('livepreview.closed', this.throttledResizeEvent);
@@ -642,7 +647,6 @@ export default {
 
             // Note: ID is set on a hidden input element for label association
             // The CodeMirror element doesn't need the ID attribute
-
             self.codemirror.on('change', function (cm) {
                 self.data = cm.doc.getValue();
             });
@@ -696,6 +700,39 @@ export default {
         handleButtonClick(command) {
             command(this);
         },
+
+
+
+        executeSlashCommand() {
+            if (this.selectedSlashItem >= 0 && this.selectedSlashItem < this.slashMenuItems.length) {
+                const item = this.slashMenuItems[this.selectedSlashItem];
+
+
+
+                item.action();
+                this.hideSlashMenu();
+
+                // Return focus to the editor
+                this.$nextTick(() => {
+                    if (this.codemirror) {
+                        this.codemirror.focus();
+                    }
+                });
+            }
+        },
+
+        hideSlashMenu() {
+            this.showSlashMenu = false;
+            this.selectedSlashItem = 0;
+
+
+        },
+
+        handleClickOutside(event) {
+            if (this.showSlashMenu && !this.$refs.writer?.contains(event.target)) {
+                this.hideSlashMenu();
+            }
+        },
     },
 
     computed: {
@@ -723,6 +760,13 @@ export default {
             if (!this.showFieldPreviews || !this.config.replicator_preview) return;
 
             return marked(this.data || '', { renderer: new PlainTextRenderer() }).replace(/<\/?[^>]+(>|$)/g, '');
+        },
+
+        slashMenuItems() {
+            return slashMenuItems().map(item => ({
+                ...item,
+                action: () => item.action(this)
+            }));
         },
 
         internalFieldActions() {

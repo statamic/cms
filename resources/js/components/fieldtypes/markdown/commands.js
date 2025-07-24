@@ -16,7 +16,7 @@ const availableButtons = () => [
 // Slash menu items - subset of buttons that make sense for slash commands
 const slashMenuItems = () => [
     { id: 'asset', label: __('Asset'), icon: 'asset', action: (editor) => editor.addAsset() },
-    { id: 'code', label: __('Code Block'), icon: 'code', action: (editor) => editor.insertCodeBlock() },
+    { id: 'codeblock', label: __('Code Block'), icon: 'code', action: (editor) => editor.insertCodeBlock() },
     { id: 'link', label: __('Link'), icon: 'link', action: (editor) => editor.insertLink() },
     { id: 'quote', label: __('Quote'), icon: 'quote', action: (editor) => editor.toggleLine('quote') },
     { id: 'unordered-list', label: __('Unordered List'), icon: 'list', action: (editor) => editor.toggleLine('unordered-list') },
