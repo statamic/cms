@@ -3,14 +3,15 @@
         <Button :text="__('Add Date')" icon="calendar" v-if="!isReadOnly && !isInline && !hasDate" @click="addDate" />
 
         <Component
-            :is="pickerComponent"
             v-if="hasDate || isInline"
             :disabled="config.disabled"
             :granularity="datePickerGranularity"
             :inline="isInline"
-            :min="config.earliest_date"
+            :is="pickerComponent"
             :max="config.latest_date"
+            :min="config.earliest_date"
             :model-value="datePickerValue"
+            :number-of-months="config.number_of_months"
             :read-only="isReadOnly"
             @update:model-value="datePickerUpdated"
         />

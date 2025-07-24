@@ -83,10 +83,9 @@ class Palette
         $this->addCommand(Facades\User::blueprintCommandPaletteLink());
         $this->addCommand(Facades\UserGroup::blueprintCommandPaletteLink());
 
-        // TODO: Handle additional blueprint namespaces
-        // Facades\Blueprint::getAdditionalNamespaces()->keys()
-        //     ->flatMap(fn (string $key) => Facades\Blueprint::in($key)->sortBy(fn ($blueprint) => $blueprint->title()))
-        //     ->each(fn ());
+        Facades\Blueprint::getRenderableAdditionalNamespaces()
+            ->flatMap(fn ($namespace) => $namespace['blueprints']->map(fn ($renderable) => $renderable['command_palette_link']))
+            ->each(fn (Link $link) => $this->addCommand($link));
 
         Facades\Fieldset::all()
             ->map(fn (Fieldset $fieldset) => $fieldset->commandPaletteLink())

@@ -16,7 +16,7 @@
             <Button v-if="enabled" round icon="plus" size="sm" class="-my-4 z-3 opacity-0 group-hover:opacity-100 transition-opacity delay-25 duration-75" />
         </Motion>
         <div
-            class="shadow-ui-sm relative z-2 w-full rounded-lg border border-gray-200 bg-white text-base dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
+            class="shadow-ui-sm relative z-2 w-full rounded-lg border border-gray-200 bg-white text-base dark:border-x-0 dark:border-t-0 dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
             :class="{
                 'dark:border-dark-blue-100 border-blue-400!': selected || withinSelection,
                 'border-red-500': hasError,
@@ -30,7 +30,7 @@
             <div ref="content" hidden />
             <header
                 class="group/header animate-border-color flex items-center rounded-lg border-b border-transparent px-1.5 antialiased duration-200 hover:bg-gray-50"
-                :class="{ 'rounded-b-none border-gray-200! dark:border-white/15': !collapsed, invalid: isInvalid }"
+                :class="{ 'rounded-b-none border-gray-200! dark:border-white/10': !collapsed, invalid: isInvalid }"
             >
                 <Icon data-drag-handle name="handles" class="size-4 cursor-grab text-gray-400" v-if="!isReadOnly" />
                 <button type="button" class="flex flex-1 items-center gap-4 p-2" @click="toggleCollapsedState">

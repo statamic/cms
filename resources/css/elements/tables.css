@@ -85,10 +85,6 @@
                 @apply pl-4.5 pr-2.5 py-3 border-t border-gray-200 dark:border-white/10;
                 @apply text-gray-900 dark:text-gray-200;
             }
-
-            td.table-drag-handle {
-                @apply h-full w-1 px-0 py-2 border-e;
-            }
         }
 
         .type-column {
@@ -137,19 +133,9 @@
 }
 
 .table-drag-handle {
-    @apply h-full w-3 p-2 dark:border-dark-900 border-e;
-    min-width: 16px;
-    cursor: grab;
-    background: var(--color-gray-200) url('../../svg/icons/light/drag-dots.svg') center center no-repeat;
+    @apply h-full cursor-grab hover:bg-gray-100 dark:hover:bg-gray-700;
+    background: url('../../svg/ui/drag-dots.svg') center center no-repeat;
     background-size: 7px 17px;
-
-    .dark & {
-        background-color: var(--color-dark-700);
-    }
-
-    &:hover {
-        @apply bg-gray-300 dark:bg-gray-700;
-    }
 }
 
 .column-sortable {

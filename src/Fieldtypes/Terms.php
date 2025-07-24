@@ -311,7 +311,7 @@ class Terms extends Relationship
 
         $user = User::current();
 
-        return collect($taxonomies)->flatMap(function ($taxonomyHandle) use ($taxonomies, $user) {
+        return collect($taxonomies)->flatMap(function ($taxonomyHandle) use ($user) {
             $taxonomy = Taxonomy::findByHandle($taxonomyHandle);
 
             throw_if(! $taxonomy, new TaxonomyNotFoundException($taxonomyHandle));
@@ -322,26 +322,14 @@ class Terms extends Relationship
 
             $blueprints = $taxonomy->termBlueprints();
 
-            return $blueprints->map(function ($blueprint) use ($taxonomy, $taxonomies, $blueprints) {
+            return $blueprints->map(function ($blueprint) use ($taxonomy) {
                 return [
-                    'title' => $this->getCreatableTitle($taxonomy, $blueprint, count($taxonomies), $blueprints->count()),
+                    'parent_title' => $taxonomy->title(),
+                    'blueprint' => $blueprint->title(),
                     'url' => cp_route('taxonomies.terms.create', [$taxonomy->handle(), Site::selected()->handle()]).'?blueprint='.$blueprint->handle(),
                 ];
             });
         })->all();
-    }
-
-    private function getCreatableTitle($taxonomy, $blueprint, $taxonomyCount, $blueprintCount)
-    {
-        if ($taxonomyCount > 1 && $blueprintCount === 1) {
-            return $taxonomy->title();
-        }
-
-        if ($taxonomyCount > 1 && $blueprintCount > 1) {
-            return $taxonomy->title().': '.$blueprint->title();
-        }
-
-        return $blueprint->title();
     }
 
     protected function toItemArray($id)

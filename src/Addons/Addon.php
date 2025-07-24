@@ -1,11 +1,14 @@
 <?php
 
-namespace Statamic\Extend;
+namespace Statamic\Addons;
 
 use Composer\Semver\VersionParser;
 use Facades\Statamic\Licensing\LicenseManager;
 use ReflectionClass;
+use Statamic\Contracts\Addons\Settings;
+use Statamic\Contracts\Addons\SettingsRepository;
 use Statamic\Facades;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Support\Arr;
@@ -343,6 +346,47 @@ final class Addon
     public function config()
     {
         return config($this->handle());
+    }
+
+    public function hasSettingsBlueprint(): bool
+    {
+        return $this->settingsBlueprint() !== null;
+    }
+
+    public function settingsBlueprint()
+    {
+        $binding = "statamic.addons.{$this->slug()}.settings_blueprint";
+
+        if (! app()->bound($binding)) {
+            return null;
+        }
+
+        return Blueprint::make()->setContents(app($binding));
+    }
+
+    public function settings(): Settings
+    {
+        $repo = app(SettingsRepository::class);
+
+        return $repo->find($this->id()) ?? $repo->make($this);
+    }
+
+    public function settingsUrl()
+    {
+        if (! $this->hasSettingsBlueprint()) {
+            return null;
+        }
+
+        return cp_route('addons.settings.edit', $this->slug());
+    }
+
+    public function updatesUrl()
+    {
+        if (! $this->existsOnMarketplace()) {
+            return null;
+        }
+
+        return cp_route('updater.product', $this->marketplaceSlug());
     }
 
     /**

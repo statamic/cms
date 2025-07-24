@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Extend;
+namespace Statamic\Addons;
 
 use Facades\Statamic\Marketplace\Marketplace;
 use Illuminate\Foundation\PackageManifest;

@@ -257,18 +257,21 @@
                         <tr>
                             <td>
                                 <div class="flex items-center gap-2">
-                                    <a href="{{ cp_route('blueprints.edit', [$blueprint['namespace'], $blueprint['handle']]) }}">{{ $blueprint['title'] }}</a>
+                                    <ui-icon name="blueprints" class="text-gray-500 me-1" />
+                                    <a href="{{ cp_route('blueprints.additional.edit', [$blueprint['namespace'], $blueprint['handle']]) }}">{{ $blueprint['title'] }}</a>
                                 </div>
                             </td>
                             <td class="actions-column">
                                 @if ($blueprint['is_resettable'])
-                                    <ui-dropdown>
+                                    <ui-dropdown class="mr-3">
                                         <ui-dropdown-menu>
-                                            <ui-dropdown-item :text="__('Reset')" variant="destructive" @click="$refs[`resetter_{{ $blueprint['namespace'] }}_{{ $blueprint['handle'] }}`].confirm()">
-                                            </ui-dropdown-item>
+                                            <ui-dropdown-item
+                                                :text="__('Reset')"
+                                                variant="destructive"
+                                                @click="$refs[`resetter_{{ $blueprint['namespace'] }}_{{ $blueprint['handle'] }}`].confirm()"
+                                            ></ui-dropdown-item>
                                         </ui-dropdown-menu>
                                     </ui-dropdown>
-
                                     <blueprint-resetter
                                         ref="resetter_{{ $blueprint['namespace'] }}_{{ $blueprint['handle'] }}"
                                         :resource="{{ Js::from($blueprint) }}"

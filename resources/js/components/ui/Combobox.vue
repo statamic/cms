@@ -19,6 +19,7 @@ import { SortableList } from '@statamic/components/sortable/Sortable.js';
 const emit = defineEmits(['update:modelValue', 'search', 'selected', 'added']);
 
 const props = defineProps({
+    id: { type: String },
     buttonAppearance: { type: Boolean, default: true },
     clearable: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
@@ -55,10 +56,10 @@ const triggerClasses = cva({
         },
         flat: {
             true: 'shadow-none',
-            false: 'bg-linear-to-b from-white to-gray-50 hover:to-gray-100 dark:from-gray-800/30 dark:to-gray-800 dark:hover:to-gray-850 shadow-ui-sm',
+            false: 'bg-linear-to-b from-white to-gray-50 hover:to-gray-100 dark:from-gray-800 dark:to-gray-800 dark:hover:to-gray-850 shadow-ui-sm',
         },
         buttonAppearance: {
-            true: 'border border-gray-300 with-contrast:border-gray-500 dark:border-b-0 dark:ring-3 dark:ring-gray-900 dark:border-white/15 shadow-ui-sm dark:shadow-md',
+            true: 'border border-gray-300 with-contrast:border-gray-500 dark:border-b-0 dark:ring-3 dark:ring-gray-900 dark:border-white/10 shadow-ui-sm dark:shadow-md',
             false: '',
         },
         // disabled: {
@@ -267,6 +268,7 @@ defineExpose({
                             v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"
                             ref="search"
                             class="w-full text-gray-700 opacity-100 focus:outline-none placeholder-xs"
+                            :id="id"
                             v-model="searchQuery"
                             :placeholder
                             @paste.prevent="onPaste"
