@@ -12,8 +12,11 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class DimensionsRule implements CastableToValidationString, Stringable, ValidationRule
 {
+    protected array $raw_parameters;
+
     public function __construct(protected $parameters)
     {
+        $this->raw_parameters = $parameters;
         $this->parameters = array_reduce($parameters, function ($acc, $item) {
             [$key, $value] = array_pad(explode('=', $item, 2), 2, null);
             $acc[$key] = $value;
@@ -96,9 +99,7 @@ class DimensionsRule implements CastableToValidationString, Stringable, Validati
 
     public function __toString()
     {
-        return 'dimensions:'.collect($this->parameters)
-            ->map(fn ($value, $key) => "{$key}={$value}")
-            ->implode(',');
+        return 'dimensions:'.implode(',', $this->raw_parameters);
     }
 
     public function toGqlValidationString(): string
