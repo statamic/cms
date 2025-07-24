@@ -36,9 +36,19 @@ each({
     });
 });
 
+const actionItems = computed(() => {
+    return Statamic.$commandPalette.actions().filter(item => item.when());
+});
+
+const miscItems = computed(() => {
+    return Statamic.$commandPalette.misc().filter(item => item.when());
+});
+
 const aggregatedItems = computed(() => [
+    ...(actionItems.value || []),
     ...(recentItems.value || []),
     ...(serverItems.value || []),
+    ...(miscItems.value || []),
     ...(searchResults.value || []),
 ]);
 
@@ -131,9 +141,8 @@ function select(selected) {
         return;
     }
 
-    switch (item.type) {
-        case 'action':
-        // TODO: Handle non <a> items
+    if (item.action) {
+        item.action();
     }
 }
 
