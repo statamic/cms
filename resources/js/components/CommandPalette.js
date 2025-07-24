@@ -9,7 +9,7 @@ class Command {
         this.key = uniqid();
         this.category = command.category ?? 'Actions';
         this.type = command.type ?? 'action';
-        this.icon = command.icon ?? 'want';
+        this.icon = command.icon ?? 'wand';
         this.when = command.when ?? (() => true);
         this.text = command.text;
         this.action = command.action;
