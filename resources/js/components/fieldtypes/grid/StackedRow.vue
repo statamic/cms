@@ -48,7 +48,5 @@ export default {
     mixins: [Row],
 
     components: { PublishFields, FieldsProvider },
-
-    props: { hasError: Boolean },
 };
 </script>
