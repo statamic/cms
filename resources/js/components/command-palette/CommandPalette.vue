@@ -46,12 +46,13 @@ const results = computed(() => {
     let filtered = fuzzysort
         .go(query.value, aggregatedItems.value, {
             all: true,
-            key: 'text',
+            keys: ['text'],
+            scoreFn: fuzzysortScoringAlgorithm,
         })
         .map(result => {
             return {
                 score: result._score,
-                html: result.highlight('<span class="text-blue-600 dark:text-blue-400 underline underline-offset-4 decoration-blue-200 dark:decoration-blue-600/45">', '</span>'),
+                html: result[0].highlight('<span class="text-blue-600 dark:text-blue-400 underline underline-offset-4 decoration-blue-200 dark:decoration-blue-600/45">', '</span>'),
                 ...result.obj,
             };
         });
@@ -99,6 +100,18 @@ function searchContent() {
     axios.get('/cp/command-palette/search', { params: { q: query.value } }).then((response) => {
         searchResults.value = response.data;
     });
+}
+
+function fuzzysortScoringAlgorithm(result) {
+    let multiplier = 1;
+
+    switch (result.obj.category) {
+        case 'Navigation':
+        case 'Fields':
+            multiplier = 1.5;
+    }
+
+    return result.score * multiplier;
 }
 
 function select(selected) {
