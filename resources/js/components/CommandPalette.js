@@ -14,6 +14,7 @@ class Command {
         this.text = command.text;
         this.url = command.url;
         this.action = command.action;
+        this.prioritize = command.prioritize ?? false;
 
         this.#validate();
     }

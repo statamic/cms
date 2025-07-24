@@ -6,7 +6,7 @@ import debounce from '@statamic/util/debounce';
 import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, DialogTrigger, DialogDescription, VisuallyHidden } from 'reka-ui';
 import { ComboboxContent, ComboboxEmpty, ComboboxGroup, ComboboxLabel, ComboboxInput, ComboboxItem, ComboboxRoot, ComboboxViewport } from 'reka-ui';
 import fuzzysort from 'fuzzysort';
-import { each, groupBy, sortBy, find } from 'lodash-es';
+import { each, groupBy, orderBy, find } from 'lodash-es';
 import { motion } from 'motion-v';
 import { cva } from 'cva';
 import { Icon, Subheading } from '@statamic/ui';
@@ -37,11 +37,11 @@ each({
 });
 
 const actionItems = computed(() => {
-    return Statamic.$commandPalette.actions().filter(item => item.when());
+    return sortJsInjectedItems(Statamic.$commandPalette.actions().filter(item => item.when()));
 });
 
 const miscItems = computed(() => {
-    return Statamic.$commandPalette.misc().filter(item => item.when());
+    return sortJsInjectedItems(Statamic.$commandPalette.misc().filter(item => item.when()));
 });
 
 const aggregatedItems = computed(() => [
@@ -148,6 +148,10 @@ function select(selected) {
 
 function findSelectedItem(selected) {
     return find(aggregatedItems.value, (result) => result.text === selected);
+}
+
+function sortJsInjectedItems(items) {
+    return orderBy(items, ['prioritize', 'text'], ['desc', 'asc']);
 }
 
 function getRecentItems() {
