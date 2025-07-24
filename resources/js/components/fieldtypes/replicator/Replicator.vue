@@ -299,7 +299,6 @@ export default {
             immediate: true,
             handler(errors) {
                 this.errorsById = Object.entries(errors).reduce((acc, [key, value]) => {
-                    console.log(this.setFieldPathPrefix, key);
                     if (!key.startsWith(this.setFieldPathPrefix)) {
                         return acc;
                     }
