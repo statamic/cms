@@ -12,6 +12,7 @@ class Command {
         this.icon = command.icon ?? 'wand';
         this.when = command.when ?? (() => true);
         this.text = command.text;
+        this.url = command.url;
         this.action = command.action;
 
         this.#validate();
