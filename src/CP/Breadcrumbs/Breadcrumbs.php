@@ -26,7 +26,7 @@ class Breadcrumbs
                 return null;
             }
 
-            if ($primaryNavItem->children()?->isNotEmpty()) {
+            if ($primaryNavItem->resolveChildren()->children()?->isNotEmpty()) {
                 $secondaryNavItem = $primaryNavItem->children()->first(function (NavItem $navItem) {
                     return $navItem->isActive();
                 });
