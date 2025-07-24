@@ -74,6 +74,15 @@
                                 @keydown="shortcut"
                             >
                                 <div class="editor relative z-5 focus-within:focus-outline-within" ref="codemirror"></div>
+                                <!-- Hidden input for label association -->
+                                <input 
+                                    v-if="id" 
+                                    :id="id" 
+                                    type="text" 
+                                    class="sr-only" 
+                                    @focus="focusCodeMirror"
+                                    tabindex="-1"
+                                />
 
                                     <footer class="flex items-center justify-between bg-gray-50 dark:bg-gray-950 rounded-b-xl border-t border-gray-200 dark:border-white/10 p-1 text-sm w-full" :class="{ 'absolute inset-x-0 bottom-0': fullScreenMode }">
                                         <div class="markdown-cheatsheet-helper">
@@ -274,14 +283,13 @@ export default {
 
     mounted() {
         this.initToolbarButtons();
-        this.$nextTick(() => this.initCodeMirror());
+        this.$nextTick(() => {
+            this.initCodeMirror();
+        });
 
         if (this.data) {
             this.updateCount(this.data);
         }
-
-        const label = document.querySelector(`label[for="${this.fieldId}"]`);
-        label?.addEventListener('click', () => this.codemirror.focus());
     },
 
     beforeUnmount() {
@@ -584,6 +592,14 @@ export default {
             this.codemirror.focus();
         },
 
+        focusCodeMirror() {
+            if (this.codemirror) {
+                this.codemirror.focus();
+            }
+        },
+
+
+
         trackHeightUpdates() {
             this.$events.$on('livepreview.opened', this.throttledResizeEvent);
             this.$events.$on('livepreview.closed', this.throttledResizeEvent);
@@ -624,6 +640,9 @@ export default {
                     },
                 }),
             );
+
+            // Note: ID is set on a hidden input element for label association
+            // The CodeMirror element doesn't need the ID attribute
 
             self.codemirror.on('change', function (cm) {
                 self.data = cm.doc.getValue();
