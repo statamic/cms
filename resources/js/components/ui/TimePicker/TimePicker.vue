@@ -7,7 +7,7 @@ const emit = defineEmits(['update:modelValue']);
 const props = defineProps({
     badge: { type: String, default: null },
     required: { type: Boolean, default: false },
-    modelValue: { type: String, default: null },
+    modelValue: { type: Object, default: null },
     granularity: { type: String, default: null },
     clearable: { type: Boolean, default: true },
 });
