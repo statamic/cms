@@ -56,13 +56,14 @@ const results = computed(() => {
             };
         });
 
-    let groups = groupBy(filtered, 'category');
+    let grouped = groupBy(filtered, 'category');
 
-    return Statamic.$config.get('commandPaletteCategories')
+    return Object.keys(grouped)
+        .filter(category => Statamic.$config.get('commandPaletteCategories').includes(category))
         .map(category => {
             return {
                 text: __(category),
-                items: groups[category],
+                items: grouped[category],
             };
         })
         .filter(category => category.items);
