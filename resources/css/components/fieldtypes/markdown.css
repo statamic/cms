@@ -52,7 +52,7 @@
 ========================================================================== */
 
 [data-markdown-toolbar] {
-    @apply flex items-center justify-between rounded-t-lg bg-gray-50 px-2 py-1 overflow-x-scroll;
+    @apply flex items-center justify-between rounded-t-lg bg-gray-50 px-2 py-1 overflow-x-auto;
     @apply sticky -top-2 z-6 border-b border-gray-300 dark:border-white/10 dark:bg-gray-950;
 }
 
