@@ -11,6 +11,7 @@
                     size="xs"
                     variant="ghost"
                     :aria-label="action.title"
+                    tabindex="-1"
                 >
                     <svg-icon :name="action.icon" class="size-3" />
                 </Button>
