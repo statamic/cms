@@ -22,9 +22,6 @@ const slug = $slug.separatedBy('_');
 
 const canSubmit = computed(() => {
     return title.value && (props.withoutHandle || handle.value);
-
-
-    // return Boolean(title.value && (!props.withoutHandle || handle.value));
 });
 
 watch(title, (newTitle) => {
