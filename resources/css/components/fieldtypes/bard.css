@@ -15,8 +15,8 @@
             @apply rounded-b-lg;
         }
         .ProseMirror {
-            @apply min-h-40 p-2 text-sm leading-tight;
-            @apply text-sm leading-normal @md/bard:p-2;
+            @apply min-h-40 p-2 leading-tight;
+            @apply leading-normal @md/bard:p-2;
             @apply @lg/bard:p-4;
         }
         .bard-error {
