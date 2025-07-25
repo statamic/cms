@@ -173,7 +173,7 @@ return [
     'taggable.config.placeholder' => '输入并按 ↩ Enter',
     'taggable.title' => '可标记',
     'taxonomies.title' => '分类',
-    'template.config.blueprint' => '添加“映射到蓝图”选项。更多信息请参阅[文档](https://statamic.dev/views#inferring-templates-from-entry-blueprints)。',
+    'template.config.blueprint' => '添加“映射到蓝图”选项。更多信息请参阅[文档](https://statamic.dev/views#map-templates-to-entry-blueprints)。',
     'template.config.folder' => '仅显示此文件夹中的模板。',
     'template.config.hide_partials' => '部分将很少用作模板。',
     'template.title' => '模板',

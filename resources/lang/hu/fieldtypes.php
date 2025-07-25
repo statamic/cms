@@ -173,7 +173,7 @@ return [
     'taggable.config.placeholder' => 'Írja be, és nyomja meg az ↩ Enter billentyűt',
     'taggable.title' => 'Címkézhető',
     'taxonomies.title' => 'Taxonómiák',
-    'template.config.blueprint' => 'Hozzáad egy "Blueprint térkép" opciót. Tudj meg többet a dokumentációból [documentation](https://statamic.dev/views#inferring-templates-from-entry-blueprints).',
+    'template.config.blueprint' => 'Hozzáad egy "Blueprint térkép" opciót. Tudj meg többet a dokumentációból [documentation](https://statamic.dev/views#map-templates-to-entry-blueprints).',
     'template.config.folder' => 'Csak a sablonok megjelenítése ebben a mappában.',
     'template.config.hide_partials' => 'A részsablonok (partials) ritkán alkalmasak sablonként való használatra.',
     'template.title' => 'Sablon',

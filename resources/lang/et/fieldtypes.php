@@ -177,7 +177,7 @@ return [
     'taggable.config.placeholder' => 'Sisesta ja vajuta ↩ Enter',
     'taggable.title' => 'Sildistatav',
     'taxonomies.title' => 'Taksonoomiad',
-    'template.config.blueprint' => 'Lisab valiku "Infer from Blueprint". Lisateavet leiad [dokumentatsioonist](https://statamic.dev/views#inferring-templates-from-entry-blueprints).',
+    'template.config.blueprint' => 'Lisab valiku "Infer from Blueprint". Lisateavet leiad [dokumentatsioonist](https://statamic.dev/views#map-templates-to-entry-blueprints).',
     'template.config.folder' => 'Kuva ainult selles kaustas olevad mallid.',
     'template.config.hide_partials' => 'Osalised vaated on harva mõeldud mallidena kasutamiseks.',
     'template.title' => 'Mall',

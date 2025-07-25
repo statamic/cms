@@ -173,7 +173,7 @@ return [
     'taggable.config.placeholder' => 'Wpisz i naciśnij ↩ Enter',
     'taggable.title' => 'Tagowalny',
     'taxonomies.title' => 'Taksonomie',
-    'template.config.blueprint' => 'Dodaje opcję „mapuj do blueprintu”. Dowiedz się więcej w [dokumentacji](https://statamic.dev/views#inferring-templates-from-entry-blueprints).',
+    'template.config.blueprint' => 'Dodaje opcję „mapuj do blueprintu”. Dowiedz się więcej w [dokumentacji](https://statamic.dev/views#map-templates-to-entry-blueprints).',
     'template.config.folder' => 'Pokaż tylko szablony w tym folderze.',
     'template.config.hide_partials' => 'Fragmenty są rzadko przeznaczone do użycia jako szablony.',
     'template.title' => 'Szablon',

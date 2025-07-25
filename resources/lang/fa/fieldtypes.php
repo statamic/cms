@@ -173,7 +173,7 @@ return [
     'taggable.config.placeholder' => 'متن خود را بنویسید و اینتر ↩ را بزنید',
     'taggable.title' => 'برچسب‌زن',
     'taxonomies.title' => 'تکسنومی‌ها',
-    'template.config.blueprint' => 'گزینه‌ای جهت "مپ کردن به بلوپرینت یا طرح" اضافه می‌شود. جهت اطلاعات بیشتر به [مستندات](https://statamic.dev/views#inferring-templates-from-entry-blueprints) رجوع شود.',
+    'template.config.blueprint' => 'گزینه‌ای جهت "مپ کردن به بلوپرینت یا طرح" اضافه می‌شود. جهت اطلاعات بیشتر به [مستندات](https://statamic.dev/views#map-templates-to-entry-blueprints) رجوع شود.',
     'template.config.folder' => 'تنها قالب‌های داخل این پوشه نمایان باشند.',
     'template.config.hide_partials' => 'پارشیال‌ها قابلیت استفاده بجای قالب‌ها را دارند اما با پیچیدگی خاص خود.',
     'template.title' => 'قالب',
