@@ -9,7 +9,7 @@
             <div class="flex items-center gap-3">
                 <Button variant="ghost" :text="__('Cancel')" @click.prevent="close" />
                 <Button variant="primary" @click.prevent="commit()" :text="__('Apply')" />
-                <Button v-if="isInsideSet" variant="primary" @click.prevent="commit(true)" :text="__('Apply & Close All')" />
+                <Button v-if="isInsideSet || isInsideConfigFields" variant="primary" @click.prevent="commit(true)" :text="__('Apply & Close All')" />
             </div>
         </header>
 
@@ -97,6 +97,9 @@ export default {
     },
 
     inject: {
+        isInsideConfigFields: {
+            default: false
+        },
         commitParentField: {
             default: () => {}
         }
