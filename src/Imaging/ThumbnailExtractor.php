@@ -41,8 +41,23 @@ class ThumbnailExtractor
         return $finalPath;
     }
 
+    public static function canGenerateThumbnail(Asset $asset)
+    {
+        $resolvedPath = $asset->resolvedPath();
+
+        if (file_exists($resolvedPath)) {
+            return true;
+        }
+
+        return $asset->container()->accessible();
+    }
+
     public function generateThumbnail(Asset $asset)
     {
+        if (! static::canGenerateThumbnail($asset)) {
+            return '';
+        }
+
         $cachePath = static::getCachePath($asset);
 
         if (file_exists($cachePath)) {
@@ -56,7 +71,7 @@ class ThumbnailExtractor
         };
 
         return $this->ffmpeg->extractThumbnail(
-            $asset->absoluteUrl(),
+            $ffmpegInput,
             static::getCachePath($asset)
         );
     }

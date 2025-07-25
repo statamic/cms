@@ -128,26 +128,11 @@ class ImageGenerator
         return $this->generate($parsed['path'].($qs ? '?'.$qs : ''));
     }
 
-    private function canGenerateThumbnail(Asset $asset)
-    {
-        $resolvedPath = $asset->resolvedPath();
-
-        if (file_exists($resolvedPath)) {
-            return true;
-        }
-
-        return $asset->container()->accessible();
-    }
-
     /**
      * @param  \Statamic\Contracts\Assets\Asset  $asset
      */
     public function generateVideoThumbnail($asset, array $params)
     {
-        if (! $this->canGenerateThumbnail($asset)) {
-            return '';
-        }
-
         if ($path = app(ThumbnailExtractor::class)->generateThumbnail($asset)) {
             $this->skip_validation = true;
 
@@ -169,7 +154,7 @@ class ImageGenerator
      */
     public function generateByAsset($asset, array $params)
     {
-        if (ThumbnailExtractor::enabled() && method_exists($asset, 'isVideo') && $asset->isVideo()) {
+        if (ThumbnailExtractor::enabled() && $asset->isVideo()) {
             return $this->generateVideoThumbnail($asset, $params);
         }
 
@@ -352,11 +337,6 @@ class ImageGenerator
         $root ??= public_path();
 
         return Storage::build(['driver' => 'local', 'root' => $root])->getDriver();
-    }
-
-    private function videoThumbnailFilesystem()
-    {
-        return Storage::build(['driver' => 'local', 'root' => ThumbnailExtractor::cachePath()])->getDriver();
     }
 
     private function guzzleSourceFilesystem($base)
