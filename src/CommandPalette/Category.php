@@ -9,6 +9,7 @@ enum Category: string
     case History = 'History';
     case Navigation = 'Navigation';
     case Fields = 'Fields';
+    case Miscellaneous = 'Miscellaneous';
     case Preferences = 'Preferences';
     case Search = 'Content Search';
 
