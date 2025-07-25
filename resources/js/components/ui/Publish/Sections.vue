@@ -60,11 +60,11 @@ function maybeToggleSection(id) {
                 :transition="{ duration: 0.25, type: 'tween' }"
             >
                 <Primitive :as="asConfig ? 'div' : Card">
-                        <FieldsProvider :fields="section.fields">
-                            <slot :section="section">
-                                <Fields />
-                            </slot>
-                        </FieldsProvider>
+                    <FieldsProvider :fields="section.fields">
+                        <slot :section="section">
+                            <Fields />
+                        </slot>
+                    </FieldsProvider>
                 </Primitive>
             </Motion>
         </Panel>
