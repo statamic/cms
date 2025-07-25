@@ -174,6 +174,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Metadata as Content
+    |--------------------------------------------------------------------------
+    |
+    | Asset metadata will be saved as content alongside the rest of the content.
+    | This is useful when wanting to track metadata changes in git while using
+    | another storage location for assets (ie. S3).
+    |
+    */
+    'meta_as_content' => false,
+
+    /*
+    |--------------------------------------------------------------------------
     | Focal Point Editor
     |--------------------------------------------------------------------------
     |
