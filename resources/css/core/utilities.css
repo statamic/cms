@@ -40,6 +40,13 @@
     }
 }
 
+@utility typography-content {
+    font-family: "inter", sans-serif;
+    letter-spacing: -0.02em;
+    font-optical-sizing: auto;
+    font-weight: 430;
+}
+
 /* UTILITIES / STATES
 =================================================== */
 /* Here we typically need a negative outline-offset because of the inner shadow on inputs */

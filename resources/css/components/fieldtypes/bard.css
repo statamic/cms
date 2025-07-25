@@ -9,7 +9,7 @@
 =================================================== */
 @layer ui {
     .bard-editor {
-        @apply relative rounded-sm p-0 text-gray-900 dark:bg-gray-900 dark:text-dark-150;
+        @apply relative rounded-sm p-0 text-gray-950 dark:bg-gray-900 dark:text-dark-150;
         /* The focus state inherits this */
         > * {
             @apply rounded-b-lg;
