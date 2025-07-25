@@ -27,9 +27,6 @@ const visibleSections = computed(() => {
         });
     });
 });
-const collapsedSections = ref(
-    sections.map(section => section.collapsible && section.collapsed)
-);
 
 function renderInstructions(instructions) {
     return instructions ? markdown(__(instructions), { openLinksInNewTabs: true }) : '';
@@ -40,7 +37,7 @@ function maybeToggleSection(id) {
         return;
     }
 
-    collapsedSections.value[id] = !collapsedSections.value[id];
+    sections[id].collapsed = !sections[id].collapsed;
 }
 </script>
 
@@ -58,8 +55,8 @@ function maybeToggleSection(id) {
             <Motion
                 layout
                 class="overflow-hidden"
-                :initial="{ height: collapsedSections[i] ? '0px' : 'auto' }"
-                :animate="{ height: collapsedSections[i] ? '0px' : 'auto' }"
+                :initial="{ height: section.collapsed ? '0px' : 'auto' }"
+                :animate="{ height: section.collapsed ? '0px' : 'auto' }"
                 :transition="{ duration: 0.25, type: 'tween' }"
             >
                 <Primitive :as="asConfig ? 'div' : Card">
