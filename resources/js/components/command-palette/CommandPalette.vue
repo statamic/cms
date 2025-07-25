@@ -6,7 +6,7 @@ import debounce from '@statamic/util/debounce';
 import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, DialogTrigger, DialogDescription, VisuallyHidden } from 'reka-ui';
 import { ComboboxContent, ComboboxEmpty, ComboboxGroup, ComboboxLabel, ComboboxInput, ComboboxItem, ComboboxRoot, ComboboxViewport } from 'reka-ui';
 import fuzzysort from 'fuzzysort';
-import { each, groupBy, orderBy, find } from 'lodash-es';
+import { each, groupBy, orderBy, find, uniq } from 'lodash-es';
 import { motion } from 'motion-v';
 import { cva } from 'cva';
 import { Icon, Subheading } from '@statamic/ui';
@@ -67,9 +67,13 @@ const results = computed(() => {
             };
         });
 
+    let categoryOrder = query.value
+        ? uniq(filtered.map(item => item.category))
+        : Statamic.$commandPalette.categories();
+
     let grouped = groupBy(filtered, 'category');
 
-    return Object.keys(grouped)
+    return categoryOrder
         .filter(category => Statamic.$commandPalette.categories().includes(category))
         .map(category => {
             return {
