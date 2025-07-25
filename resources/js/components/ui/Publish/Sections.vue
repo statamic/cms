@@ -32,12 +32,10 @@ function renderInstructions(instructions) {
     return instructions ? markdown(__(instructions), { openLinksInNewTabs: true }) : '';
 }
 
-function maybeToggleSection(id) {
-    if (!sections[id].collapsible) {
-        return;
+function toggleSection(id) {
+    if (sections[id].collapsible) {
+        sections[id].collapsed = !sections[id].collapsed;
     }
-
-    sections[id].collapsed = !sections[id].collapsed;
 }
 </script>
 
@@ -48,7 +46,7 @@ function maybeToggleSection(id) {
             :key="i"
             :class="asConfig ? 'mb-12' : 'mb-6'"
         >
-            <PanelHeader class="relative" v-if="section.display" @click="maybeToggleSection(i)">
+            <PanelHeader class="relative" v-if="section.display" @click="toggleSection(i)">
                 <Heading :text="__(section.display)" />
                 <Subheading v-if="section.instructions" :text="renderInstructions(section.instructions)" />
             </PanelHeader>
