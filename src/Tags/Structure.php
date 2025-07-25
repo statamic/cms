@@ -138,7 +138,7 @@ class Structure extends Tags
                 'first' => $index === 0,
                 'last' => $index === count($tree) - 1,
                 'is_current' => ! is_null($url) && $url === $this->currentUrl,
-                'is_parent' => ! is_null($url) && $this->siteAbsoluteUrl !== $url && URL::isAncestorOf($this->currentUrl, $url),
+                'is_parent' => ! is_null($url) && $this->siteAbsoluteUrl !== $absoluteUrl && URL::isAncestorOf($this->currentUrl, $url),
                 'is_external' => URL::isExternal((string) $absoluteUrl),
             ], $this->params->bool('include_parents', true) ? ['parent' => $parent] : []);
         })->filter()->values();
