@@ -1,8 +1,8 @@
 <template>
-    <div class="@container relative">
+    <div class="@container relative w-full">
         <div
             v-if="hasPendingDynamicFolder"
-            class="w-full rounded-md border border-dashed px-4 py-3 text-sm text-gray-700 dark:border-dark-200 dark:text-dark-175"
+            class="w-full rounded-md border border-dashed px-4 py-3 text-sm text-gray-700 dark:border-gray-300 dark:text-gray-200"
             v-html="pendingText"
         />
 

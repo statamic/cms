@@ -72,7 +72,7 @@
                                 @drop="draggingFile = false"
                                 @keydown="shortcut"
                             >
-                                <div class="editor relative z-5 focus-within:focus-outline-within" ref="codemirror"></div>
+                                <div class="editor relative z-6 typography-content focus-within:focus-outline focus-outline-discrete" ref="codemirror"></div>
                                 <!-- Hidden input for label association -->
                                 <input
                                     v-if="id"
@@ -527,12 +527,14 @@ export default {
             const shortcuts = {
                 66: () => this.toggleInline('bold'), // cmd+b
                 73: () => this.toggleInline('italic'), // cmd+i
-                190: () => this.toggleLine('quote'), // cmd+.
-                192: () => this.toggleInline('code'), // cmd+`
-                76: () => this.toggleLine('unordered-list'), // cmd+l
-                79: () => this.toggleLine('ordered-list'), // cmd+o
-                220: () => this.toggleBlock('code'), // cmd+\
-                75: () => this.insertLink(), // cmd+k
+
+                // TODO: Deprecate these hotkeys?
+                // 190: () => this.toggleLine('quote'), // cmd+.
+                // 192: () => this.toggleInline('code'), // cmd+`
+                // 76: () => this.toggleLine('unordered-list'), // cmd+l <-- This conflicts with most browsers re: cmd+l for location
+                // 79: () => this.toggleLine('ordered-list'), // cmd+o
+                // 220: () => this.toggleBlock('code'), // cmd+\
+                // 75: () => this.insertLink(), // cmd+k <-- This conflicts with Command Palette
             };
 
             if (shortcuts[e.keyCode]) {

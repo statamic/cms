@@ -2,6 +2,7 @@
     <div>
         <Header :title="__(title)" :icon="icon">
             <ItemActions
+                ref="actions"
                 :url="actionUrl"
                 :actions="actions"
                 :item="handle"
@@ -288,6 +289,8 @@ export default {
     mounted() {
         this.view = this.initialView();
         this.mounted = true;
+
+        this.addToCommandPalette();
     },
 
     methods: {
@@ -382,6 +385,32 @@ export default {
         afterActionSuccessfullyCompleted(response) {
             if (!response.redirect) window.location.reload();
         },
+
+        addToCommandPalette() {
+            Statamic.$commandPalette.add({
+                text: __('Collection') + ' » ' + __('Configure'),
+                icon: 'cog',
+                url: this.editUrl,
+            });
+
+            Statamic.$commandPalette.add({
+                text: __('Collection') + ' » ' + __('Edit Blueprints'),
+                icon: 'cog',
+                url: this.blueprintsUrl,
+            });
+
+            Statamic.$commandPalette.add({
+                text: __('Collection') + ' » ' + __('Scaffold Views'),
+                icon: 'scaffold',
+                url: this.scaffoldUrl,
+            });
+
+            this.$refs.actions.preparedActions.forEach(action => Statamic.$commandPalette.add({
+                text: __('Collection') + ' » ' + action.title,
+                icon: action.icon,
+                action: action.run,
+            }));
+        }
     },
 };
 </script>

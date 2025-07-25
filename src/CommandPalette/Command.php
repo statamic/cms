@@ -23,6 +23,8 @@ abstract class Command
 
     public function keys(string $keys): static
     {
+        // TODO: Wire up keys API to frontend?
+
         $this->keys = $keys;
 
         return $this;

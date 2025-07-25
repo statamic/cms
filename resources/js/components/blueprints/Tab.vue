@@ -37,15 +37,15 @@
         >
             <div class="publish-fields">
                 <Field :label="__('Title')" class="form-group field-w-100">
-                    <Input ref="title" autofocus :model-value="display" @update:model-value="fieldUpdated('display', $event.target.value)" />
+                    <Input ref="title" autofocus :model-value="display" @update:model-value="fieldUpdated('display', $event)" />
                 </Field>
 
                 <Field :label="__('Handle')" class="form-group field-w-100">
-                    <Input class="font-mono" :model-value="handle" @update:model-value="fieldUpdated('handle', $event.target.value)" />
+                    <Input class="font-mono" :model-value="handle" @update:model-value="fieldUpdated('handle', $event)" />
                 </Field>
 
                 <Field v-if="showInstructions" :label="__('Instructions')" class="form-group field-w-100">
-                    <Input :model-value="instructions" @update:model-value="fieldUpdated('instructions', $event.target.value)" />
+                    <Input :model-value="instructions" @update:model-value="fieldUpdated('instructions', $event)" />
                 </Field>
 
                 <Field v-if="showInstructions" :label="__('Icon')" class="form-group field-w-100">

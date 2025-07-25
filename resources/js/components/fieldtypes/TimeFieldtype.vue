@@ -39,7 +39,7 @@ export default {
 
             value = value.toString();
 
-            if (!this.secondsEnabled) {
+            if (!this.useSeconds) {
                 value = value.slice(0, 5);
             }
 

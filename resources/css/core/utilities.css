@@ -40,6 +40,13 @@
     }
 }
 
+@utility typography-content {
+    font-family: "inter", sans-serif;
+    letter-spacing: -0.02em;
+    font-optical-sizing: auto;
+    font-weight: 430;
+}
+
 /* UTILITIES / STATES
 =================================================== */
 /* Here we typically need a negative outline-offset because of the inner shadow on inputs */
@@ -49,12 +56,11 @@
     outline-color: var(--focus-outline-color, currentColor);
     outline-style: var(--focus-outline-style, solid);
 }
-/* Same as focus-outline, but without the outline-offset, e.g. a Markdown editor */
-@utility focus-outline-within {
-    outline-offset: 0;
-    outline-width: var(--focus-outline-width);
-    outline-color: var(--focus-outline-color, currentColor);
-    outline-style: var(--focus-outline-style, solid);
+/* Make the focus border more descrete for some fields such as Bard */
+@utility focus-outline-discrete {
+    &:focus-within {
+        --focus-outline-color: var(--color-blue-300);
+    }
 }
 
 @utility focus-none {

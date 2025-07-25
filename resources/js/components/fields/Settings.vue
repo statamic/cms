@@ -9,7 +9,7 @@
             <div class="flex items-center gap-3">
                 <Button variant="ghost" :text="__('Cancel')" @click.prevent="close" />
                 <Button variant="primary" @click.prevent="commit()" :text="__('Apply')" />
-                <Button v-if="isInsideSet" variant="primary" @click.prevent="commit(true)" :text="__('Apply & Close All')" />
+                <Button v-if="isInsideSet || isInsideConfigFields" variant="primary" @click.prevent="commit(true)" :text="__('Apply & Close All')" />
             </div>
         </header>
 
@@ -24,6 +24,7 @@
                 <div v-if="!loading">
                     <TabContent name="settings">
                         <ui-publish-container
+                            ref="container"
                             :blueprint="adjustedBlueprint"
                             :meta="meta"
                             :errors="errors"
@@ -96,6 +97,9 @@ export default {
     },
 
     inject: {
+        isInsideConfigFields: {
+            default: false
+        },
         commitParentField: {
             default: () => {}
         }
@@ -238,6 +242,7 @@ export default {
                     isInsideSet: this.isInsideSet,
                 })
                 .then((response) => {
+                    this.$refs.container?.clearDirtyState();
                     this.$emit('committed', response.data, this.editedFields);
                     this.close();
 

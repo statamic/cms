@@ -6,7 +6,7 @@
         <div :class="{ 'publish-fields': fullScreenMode }">
             <div :class="fullScreenMode && wrapperClasses">
                 <div
-                    class="bard-fieldtype with-contrast:border-gray-500 shadow-ui-sm"
+                    class="bard-fieldtype antialiased typography-content with-contrast:border-gray-500 shadow-ui-sm focus-outline-discrete"
                     :class="{ 'bard-fullscreen': fullScreenMode }"
                     ref="container"
                     @dragstart.stop="ignorePageHeader(true)"
@@ -50,7 +50,7 @@
                     </div>
 
                     <div
-                        class="bard-editor @container/bard"
+                        class="bard-editor @container/bard focus-within:focus-outline focus-within:rounded-b-lg! focus-within:rounded-t-none!"
                         :class="{
                             'mode:read-only': readOnly,
                             'mode:minimal': !showFixedToolbar,

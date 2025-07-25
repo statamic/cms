@@ -8,6 +8,7 @@ import { injectContainerContext } from './Container.vue';
 import markdown from '@statamic/util/markdown.js';
 import { computed } from 'vue';
 import { Primitive } from 'reka-ui';
+import { Motion } from 'motion-v';
 
 const { blueprint, container, visibleValues, extraValues, asConfig, hiddenFields, revealerFields, setHiddenField } = injectContainerContext();
 const tab = injectTabContext();
@@ -30,6 +31,12 @@ const visibleSections = computed(() => {
 function renderInstructions(instructions) {
     return instructions ? markdown(__(instructions), { openLinksInNewTabs: true }) : '';
 }
+
+function toggleSection(id) {
+    if (sections[id].collapsible) {
+        sections[id].collapsed = !sections[id].collapsed;
+    }
+}
 </script>
 
 <template>
@@ -39,17 +46,25 @@ function renderInstructions(instructions) {
             :key="i"
             :class="asConfig ? 'mb-12' : 'mb-6'"
         >
-            <PanelHeader v-if="section.display">
+            <PanelHeader v-if="section.display" @click="toggleSection(i)">
                 <Heading :text="__(section.display)" />
                 <Subheading v-if="section.instructions" :text="renderInstructions(section.instructions)" />
             </PanelHeader>
-            <Primitive :as="asConfig ? 'div' : Card">
-                <FieldsProvider :fields="section.fields">
-                    <slot :section="section">
-                        <Fields />
-                    </slot>
-                </FieldsProvider>
-            </Primitive>
+            <Motion
+                layout
+                class="overflow-hidden"
+                :initial="{ height: section.collapsed ? '0px' : 'auto' }"
+                :animate="{ height: section.collapsed ? '0px' : 'auto' }"
+                :transition="{ duration: 0.25, type: 'tween' }"
+            >
+                <Primitive :as="asConfig ? 'div' : Card">
+                    <FieldsProvider :fields="section.fields">
+                        <slot :section="section">
+                            <Fields />
+                        </slot>
+                    </FieldsProvider>
+                </Primitive>
+            </Motion>
         </Panel>
     </div>
 </template>

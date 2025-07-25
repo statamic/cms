@@ -17,8 +17,8 @@
                 :value="selectedEntries"
                 :config="meta.entry.config"
                 :meta="meta.entry.meta"
-                @input="entriesSelected"
-                @meta-updated="meta.entry.meta = $event"
+                @update:value="entriesSelected"
+                @update:meta="meta.entry.meta = $event"
             />
 
             <!-- Asset select -->
@@ -29,8 +29,8 @@
                 :value="selectedAssets"
                 :config="meta.asset.config"
                 :meta="meta.asset.meta"
-                @input="assetsSelected"
-                @meta-updated="meta.asset.meta = $event"
+                @update:value="assetsSelected"
+                @update:meta="meta.asset.meta = $event"
             />
         </div>
     </div>

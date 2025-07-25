@@ -6,14 +6,14 @@ import debounce from '@statamic/util/debounce';
 import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, DialogTrigger, DialogDescription, VisuallyHidden } from 'reka-ui';
 import { ComboboxContent, ComboboxEmpty, ComboboxGroup, ComboboxLabel, ComboboxInput, ComboboxItem, ComboboxRoot, ComboboxViewport } from 'reka-ui';
 import fuzzysort from 'fuzzysort';
-import { each, groupBy, sortBy, find } from 'lodash-es';
+import { each, groupBy, orderBy, find, uniq } from 'lodash-es';
 import { motion } from 'motion-v';
 import { cva } from 'cva';
 import { Icon, Subheading } from '@statamic/ui';
 
 let open = ref(false);
 let query = ref('');
-let items = ref([]);
+let serverItems = ref([]);
 let searchResults = ref([]);
 let selected = ref(null);
 let recentItems = ref(getRecentItems());
@@ -36,9 +36,19 @@ each({
     });
 });
 
+const actionItems = computed(() => {
+    return sortJsInjectedItems(Statamic.$commandPalette.actions().filter(item => item.when()));
+});
+
+const miscItems = computed(() => {
+    return sortJsInjectedItems(Statamic.$commandPalette.misc().filter(item => item.when()));
+});
+
 const aggregatedItems = computed(() => [
+    ...(actionItems.value || []),
     ...(recentItems.value || []),
-    ...(items.value || []),
+    ...(serverItems.value || []),
+    ...(miscItems.value || []),
     ...(searchResults.value || []),
 ]);
 
@@ -57,10 +67,14 @@ const results = computed(() => {
             };
         });
 
+    let categoryOrder = query.value
+        ? uniq(filtered.map(item => item.category))
+        : Statamic.$commandPalette.categories();
+
     let grouped = groupBy(filtered, 'category');
 
-    return Object.keys(grouped)
-        .filter(category => Statamic.$config.get('commandPaletteCategories').includes(category))
+    return categoryOrder
+        .filter(category => Statamic.$commandPalette.categories().includes(category))
         .map(category => {
             return {
                 text: __(category),
@@ -69,6 +83,22 @@ const results = computed(() => {
         })
         .filter(category => category.items);
 });
+
+function fuzzysortScoringAlgorithm(result) {
+    let multiplier = 1;
+
+    switch (result.obj.category) {
+        case 'Recent':
+            multiplier += 0.6;
+            break;
+        case 'Navigation':
+        case 'Fields':
+            multiplier += 0.5;
+            break;
+    }
+
+    return result.score * multiplier;
+}
 
 watch(selected, (item) => {
     if (!item) return;
@@ -82,17 +112,17 @@ watch(query, debounce(() => {
 
 watch(open, (isOpen) => {
     if (isOpen) {
-        getItems();
+        getServerItems();
         return;
     }
     reset();
 });
 
-function getItems() {
-    if (items.value.length) return;
+function getServerItems() {
+    if (serverItems.value.length) return;
 
     axios.get('/cp/command-palette').then((response) => {
-        items.value = response.data;
+        serverItems.value = response.data;
     });
 }
 
@@ -100,18 +130,6 @@ function searchContent() {
     axios.get('/cp/command-palette/search', { params: { q: query.value } }).then((response) => {
         searchResults.value = response.data;
     });
-}
-
-function fuzzysortScoringAlgorithm(result) {
-    let multiplier = 1;
-
-    switch (result.obj.category) {
-        case 'Navigation':
-        case 'Fields':
-            multiplier = 1.5;
-    }
-
-    return result.score * multiplier;
 }
 
 function select(selected) {
@@ -127,14 +145,17 @@ function select(selected) {
         return;
     }
 
-    switch (item.type) {
-        case 'action':
-        // TODO: Handle non <a> items
+    if (item.action) {
+        item.action();
     }
 }
 
 function findSelectedItem(selected) {
     return find(aggregatedItems.value, (result) => result.text === selected);
+}
+
+function sortJsInjectedItems(items) {
+    return orderBy(items, ['prioritize', 'text'], ['desc', 'asc']);
 }
 
 function getRecentItems() {
@@ -247,6 +268,7 @@ const modalClasses = cva({
                                 >
                                     <ComboboxLabel :as-child="true">
                                         <Subheading
+                                            v-if="category.text != 'Actions'"
                                             size="sm"
                                             class="border-0 px-3 py-1"
                                             v-text="category.text"
