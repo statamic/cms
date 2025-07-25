@@ -23,6 +23,16 @@ class Section
         return $this->contents['instructions'] ?? null;
     }
 
+    public function collapsible(): bool
+    {
+        return $this->contents['collapsible'] ?? false;
+    }
+
+    public function collapsed(): bool
+    {
+        return $this->collapsible() && $this->contents['collapsed'] ?? false;
+    }
+
     public function contents(): array
     {
         return $this->contents;
@@ -38,6 +48,8 @@ class Section
         return Arr::removeNullValues([
             'display' => $this->display(),
             'instructions' => $this->instructions(),
+            'collapsible' => $this->collapsible() ?: null,
+            'collapsed' => $this->collapsed() ?: null,
         ]) + [
             'fields' => $this->fields()->toPublishArray(),
         ];
