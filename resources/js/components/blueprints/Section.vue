@@ -60,45 +60,17 @@
                     <label v-text="__('Instructions')" />
                     <input type="text" class="input-text" v-model="editingSection.instructions" />
                 </div>
-                <div class="form-group w-full">
-                    <publish-field-meta
-                        :config="{
-                            handle: 'collapsible',
-                            type: 'toggle',
-                            default: false,
-                            inline_label: 'Collapsible',
-                        }"
-                        :initial-value="editingSection.collapsible"
-                        v-slot="{ meta, value, config }"
-                    >
-                        <toggle-fieldtype
-                            handle="collapsible"
-                            :config="config"
-                            :meta="meta"
-                            :value="value"
-                            @update:value="editingSection.collapsible = $event"
-                        />
-                    </publish-field-meta>
+                <div class="form-group field-w-50">
+                    <div class="flex items-center gap-2">
+                        <Switch v-model="editingSection.collapsible" />
+                        <Heading :text="__('Collapsible')" />
+                    </div>
                 </div>
-                <div class="form-group w-full" v-if="editingSection.collapsible">
-                    <publish-field-meta
-                        :config="{
-                            handle: 'collapsed',
-                            type: 'toggle',
-                            default: false,
-                            inline_label: 'Collapsed by Default',
-                        }"
-                        :initial-value="editingSection.collapsed"
-                        v-slot="{ meta, value, config }"
-                    >
-                        <toggle-fieldtype
-                            handle="collapsed"
-                            :config="config"
-                            :meta="meta"
-                            :value="value"
-                            @update:value="editingSection.collapsed = $event"
-                        />
-                    </publish-field-meta>
+                <div class="form-group field-w-50" v-if="editingSection.collapsible">
+                    <div class="flex items-center gap-2">
+                        <Switch v-model="editingSection.collapsed" />
+                        <Heading :text="__('Collapsed by default')" />
+                    </div>
                 </div>
                 <div class="form-group w-full" v-if="showHandleField">
                     <label v-text="__('Icon')" />
@@ -134,6 +106,7 @@
 <script>
 import Fields from './Fields.vue';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';
+import { Switch, Heading } from '@statamic/ui';
 
 export default {
     mixins: [CanDefineLocalizable],
@@ -144,6 +117,8 @@ export default {
 
     components: {
         Fields,
+        Switch,
+        Heading,
     },
 
     props: {
