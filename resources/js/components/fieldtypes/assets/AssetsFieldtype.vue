@@ -109,6 +109,7 @@
                                 v-for="asset in assets"
                                 :key="asset.id"
                                 :asset="asset"
+                                :errors="errorsForAsset(asset.id)"
                                 :read-only="isReadOnly"
                                 :show-filename="config.show_filename"
                                 :show-set-alt="showSetAlt"
@@ -139,6 +140,7 @@
                                         v-for="asset in assets"
                                         :key="asset.id"
                                         :asset="asset"
+                                        :errors="errorsForAsset(asset.id)"
                                         :read-only="isReadOnly"
                                         :show-filename="config.show_filename"
                                         :show-set-alt="showSetAlt"
@@ -227,6 +229,7 @@ export default {
             innerDragging: false,
             displayMode: 'grid',
             lockedDynamicFolder: this.meta.dynamicFolder,
+            errorsById: {},
         };
     },
 
@@ -616,6 +619,14 @@ export default {
                 this.loadAssets([...this.value, id]);
             }
         },
+
+        errorsForAsset(id) {
+            if (Object.keys(this.errorsById).length === 0 || !this.errorsById.hasOwnProperty(id)) {
+                return [];
+            }
+
+            return this.errorsById[id];
+        },
     },
 
     watch: {
@@ -633,6 +644,29 @@ export default {
                     data: [...assets],
                 });
             }
+        },
+
+        'publishContainer.errors': {
+            immediate: true,
+            handler(errors) {
+                this.errorsById = Object.entries(errors).reduce((acc, [key, value]) => {
+                    const prefix = this.fieldPathKeys || this.handle;
+
+                    if (!key.startsWith(prefix)) {
+                        return acc;
+                    }
+
+                    const subKey = key.replace(`${prefix}.`, '');
+                    const assetIndex = subKey.split('.').shift();
+                    const assetId = this.assetIds[assetIndex];
+
+                    if (assetId) {
+                        acc[assetId] = value;
+                    }
+
+                    return acc;
+                }, {});
+            },
         },
 
         loading(loading) {

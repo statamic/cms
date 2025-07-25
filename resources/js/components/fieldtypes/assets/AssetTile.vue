@@ -20,6 +20,15 @@
 
         <div class="asset-thumb-container">
             <div class="asset-thumb" :class="{ 'bg-checkerboard': canBeTransparent }">
+                <template v-if="errors.length">
+                    <div class="absolute z-10 inset-0 bg-white/75 dark:bg-dark-800/90 flex flex-col gap-2 items-center justify-center px-1 py-2">
+                        <small
+                            class="text-xs text-red-500 text-center"
+                            v-text="errors[0]"
+                        />
+                    </div>
+                </template>
+
                 <!-- Solo Bard -->
                 <template v-if="isImage && isInBardField && !isInAssetBrowser">
                     <img :src="asset.url" />
@@ -34,7 +43,7 @@
                     </template>
                 </template>
 
-                <div class="asset-controls">
+                <div class="asset-controls z-10">
                     <div class="flex items-center justify-center space-x-1 rtl:space-x-reverse">
                         <template v-if="!readOnly">
                             <button @click="edit" class="btn btn-icon" :title="__('Edit')">
