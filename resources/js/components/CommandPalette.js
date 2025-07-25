@@ -28,8 +28,8 @@ class Command {
             console.error('You must provide a `text:` string in your command object!');
         }
 
-        if (this.type === 'action' && typeof this.action !== 'function') {
-            console.error('You must provide an `action()` function to be run with your `'+this.text+'` command!');
+        if (typeof this.url !== 'string' && typeof this.action !== 'function') {
+            console.error('You must provide a `url` string or `action` function to be run with your `'+this.text+'` command!');
         }
     }
 }
