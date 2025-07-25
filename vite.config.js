@@ -25,9 +25,7 @@ export default defineConfig(({ mode, command }) => {
                 hotFile: 'resources/dist/hot',
             }),
             vue(),
-            svgLoader({
-                // defaultImport: 'url',
-            }),
+            svgLoader(),
             inject({ Vue: 'vue', include: 'resources/js/**' }),
         ],
         css: {
