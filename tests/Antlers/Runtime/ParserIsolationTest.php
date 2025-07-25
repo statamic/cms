@@ -69,7 +69,7 @@ EOT;
         EntryFactory::collection('blog')->id('4')->create();
 
         $template = <<<'EOT'
-{{ collection:blog paginate="1" as="posts" }}
+{{ collection:blog paginate="1" as="posts" sort="id:asc" }}
 {{ posts }}
 <{{ title }}>
 {{ if tags }}{{ tags }}<{{ url }}:{{ title }}>{{ /tags }}{{ /if }}
