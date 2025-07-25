@@ -28,9 +28,9 @@ class Section
         return $this->contents['collapsible'] ?? null;
     }
 
-    public function collapsedByDefault(): ?bool
+    public function collapsed(): ?bool
     {
-        return $this->contents['collapsed_by_default'] ?? null;
+        return $this->contents['collapsed'] ?? null;
     }
 
     public function contents(): array
@@ -49,7 +49,7 @@ class Section
             'display' => $this->display(),
             'instructions' => $this->instructions(),
             'collapsible' => $this->collapsible(),
-            'collapsed_by_default' => $this->collapsedByDefault(),
+            'collapsed' => $this->collapsed(),
         ]) + [
             'fields' => $this->fields()->toPublishArray(),
         ];

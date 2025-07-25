@@ -28,7 +28,7 @@ const visibleSections = computed(() => {
     });
 });
 const collapsedSections = ref(
-    sections.map(section => section.collapsible && section.collapsed_by_default),
+    sections.map(section => section.collapsible && section.collapsed)
 );
 
 function renderInstructions(instructions) {

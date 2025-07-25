@@ -79,24 +79,24 @@
                             @update:value="editingSection.collapsible = $event"
                         />
                     </publish-field-meta>
-                </div> 
+                </div>
                 <div class="form-group w-full" v-if="editingSection.collapsible">
                     <publish-field-meta
                         :config="{
-                            handle: 'collapsed_by_default',
+                            handle: 'collapsed',
                             type: 'toggle',
                             default: false,
                             inline_label: 'Collapsed by Default',
                         }"
-                        :initial-value="editingSection.collapsed_by_default"
+                        :initial-value="editingSection.collapsed"
                         v-slot="{ meta, value, config }"
                     >
                         <toggle-fieldtype
-                            handle="collapsed_by_default"
+                            handle="collapsed"
                             :config="config"
                             :meta="meta"
                             :value="value"
-                            @update:value="editingSection.collapsed_by_default = $event"
+                            @update:value="editingSection.collapsed = $event"
                         />
                     </publish-field-meta>
                 </div>
@@ -242,7 +242,7 @@ export default {
                 icon: this.section.icon,
                 hide: this.section.hide,
                 collapsible: this.section.collapsible,
-                collapsed_by_default: this.section.collapsed_by_default,
+                collapsed: this.section.collapsed,
             };
         },
 

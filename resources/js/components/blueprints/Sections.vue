@@ -92,7 +92,7 @@ export default {
                 display: this.newSectionText,
                 instructions: null,
                 collapsible: false,
-                collapsed_by_default: false,
+                collapsed: false,
                 icon: null,
                 hide: null,
                 handle: snake_case(this.newSectionText),
