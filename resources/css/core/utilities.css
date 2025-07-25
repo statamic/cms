@@ -49,6 +49,12 @@
     outline-color: var(--focus-outline-color, currentColor);
     outline-style: var(--focus-outline-style, solid);
 }
+/* Make the focus border more descrete for some fields such as Bard */
+@utility focus-outline-discrete {
+    &:focus-within {
+        --focus-outline-color: var(--color-blue-300);
+    }
+}
 
 @utility focus-none {
     outline: 0;

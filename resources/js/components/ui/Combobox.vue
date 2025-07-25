@@ -23,6 +23,7 @@ const props = defineProps({
     buttonAppearance: { type: Boolean, default: true },
     clearable: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
+    discreteFocusOutline: { type: Boolean, default: false },
     flat: { type: Boolean, default: false },
     ignoreFilter: { type: Boolean, default: false },
     labelHtml: { type: Boolean, default: false },
@@ -58,6 +59,9 @@ const triggerClasses = cva({
             true: 'shadow-none',
             false: 'bg-linear-to-b from-white to-gray-50 hover:to-gray-100 dark:from-gray-800 dark:to-gray-800 dark:hover:to-gray-850 shadow-ui-sm',
         },
+        'discrete-focus-outline': {
+            true: 'focus-outline-discrete',
+        },
         buttonAppearance: {
             true: 'border border-gray-300 with-contrast:border-gray-500 dark:border-b-0 dark:ring-3 dark:ring-gray-900 dark:border-white/10 shadow-ui-sm dark:shadow-md focus-within:focus-outline',
             false: '',
@@ -74,6 +78,7 @@ const triggerClasses = cva({
 })({
     size: props.size,
     flat: props.flat,
+    'discrete-focus-outline': props.discreteFocusOutline,
     buttonAppearance: props.buttonAppearance,
     disabled: props.disabled,
     readOnly: props.readOnly,
