@@ -18,6 +18,21 @@ class Palette
         $this->items = collect();
     }
 
+    public function add(string $text, string $url, ?Category $category = null, ?string $icon = null, ?string $keys = null): self
+    {
+        $link = (new Link($text, $category ?? Category::Miscellaneous))->url($url);
+
+        if ($icon) {
+            $link->icon($icon);
+        }
+
+        if ($keys) {
+            $link->keys($keys);
+        }
+
+        return $this->addCommand($link);
+    }
+
     public function addCommand(Command $command): self
     {
         $this->items->push(
