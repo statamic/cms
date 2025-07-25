@@ -1,6 +1,6 @@
 <script setup>
 import { injectTabContext } from './TabProvider.vue';
-import { Panel, PanelHeader, Heading, Subheading, Card, Icon } from '@statamic/ui';
+import { Panel, PanelHeader, Heading, Subheading, Card } from '@statamic/ui';
 import FieldsProvider from './FieldsProvider.vue';
 import Fields from './Fields.vue';
 import ShowField from '@statamic/components/field-conditions/ShowField.js';
@@ -54,14 +54,6 @@ function maybeToggleSection(id) {
             <PanelHeader class="relative" v-if="section.display" @click="maybeToggleSection(i)">
                 <Heading :text="__(section.display)" />
                 <Subheading v-if="section.instructions" :text="renderInstructions(section.instructions)" />
-                <Icon
-                    v-if="section.collapsible"
-                    name="ui/chevron-right"
-                    class="absolute right-4.5 top-0 bottom-0 my-auto size-6 cursor-pointer transition-transform duration-[250ms]"
-                    :class="{
-                        'rotate-90': !collapsedSections[i]
-                    }"
-                />
             </PanelHeader>
             <Motion
                 layout
