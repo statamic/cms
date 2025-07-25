@@ -26,7 +26,7 @@
                 </template>
 
                 <template v-else>
-                    <img :src="thumbnail" v-if="isImage" :title="label" />
+                    <img :src="thumbnail" v-if="thumbnail" :title="label" />
 
                     <template v-else>
                         <img v-if="canShowSvg" :src="asset.url" :title="label" class="p-4" />

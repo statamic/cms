@@ -3,14 +3,12 @@
 namespace Statamic\Http\Resources\CP\Assets;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Fluent;
 use Statamic\Facades\Action;
 use Statamic\Support\Str;
-use Statamic\Support\Traits\Hookable;
 
 class FolderAsset extends JsonResource
 {
-    use Hookable;
+    use HasThumbnails;
 
     protected $blueprint;
     protected $columns;
@@ -69,43 +67,5 @@ class FolderAsset extends JsonResource
 
             return [$key => $value];
         });
-    }
-
-    private function thumbnails(): array
-    {
-        $data = match (true) {
-            $this->isImage() || $this->isSvg() => $this->getImageThumbnail(),
-            $this->isVideo() && config('statamic.assets.video_thumbnails', true) => $this->getVideoThumbnail(),
-            default => ['thumbnail' => null],
-        };
-
-        return array_merge($data, $this->runAssetHook() ?? []);
-    }
-
-    private function getImageThumbnail(): array
-    {
-        return [
-            'is_image' => true,
-            'thumbnail' => $this->thumbnailUrl('small'),
-            'can_be_transparent' => $this->isSvg() || $this->extensionIsOneOf(['svg', 'png', 'webp', 'avif']),
-            'alt' => $this->alt,
-            'orientation' => $this->orientation(),
-        ];
-    }
-
-    private function getVideoThumbnail(): array
-    {
-        return [
-            'thumbnail' => $this->thumbnailUrl('small'),
-        ];
-    }
-
-    private function runAssetHook(): array
-    {
-        $payload = $this->runHooksWith('asset', [
-            'data' => new Fluent,
-        ]);
-
-        return $payload->data->toArray();
     }
 }
