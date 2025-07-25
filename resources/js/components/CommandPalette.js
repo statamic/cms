@@ -7,7 +7,7 @@ const commands = ref({});
 class Command {
     constructor(command) {
         this.key = uniqid();
-        this.category = command.category ?? 'Contextual Actions';
+        this.category = command.category ?? 'Actions';
         this.type = command.type ?? 'action';
         this.icon = command.icon ?? 'wand';
         this.when = command.when ?? (() => true);
@@ -48,10 +48,10 @@ export default class CommandPalette {
     }
 
     actions() {
-        return Object.values(commands.value).filter(command => command.category === 'Contextual Actions');
+        return Object.values(commands.value).filter(command => command.category === 'Actions');
     }
 
     misc() {
-        return Object.values(commands.value).filter(command => command.category !== 'Contextual Actions');
+        return Object.values(commands.value).filter(command => command.category !== 'Actions');
     }
 }

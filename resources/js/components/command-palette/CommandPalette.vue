@@ -268,6 +268,7 @@ const modalClasses = cva({
                                 >
                                     <ComboboxLabel :as-child="true">
                                         <Subheading
+                                            v-if="category.text != 'Actions'"
                                             size="sm"
                                             class="border-0 px-3 py-1"
                                             v-text="category.text"
