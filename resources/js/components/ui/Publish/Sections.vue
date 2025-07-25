@@ -46,7 +46,7 @@ function toggleSection(id) {
             :key="i"
             :class="asConfig ? 'mb-12' : 'mb-6'"
         >
-            <PanelHeader class="relative" v-if="section.display" @click="toggleSection(i)">
+            <PanelHeader v-if="section.display" @click="toggleSection(i)">
                 <Heading :text="__(section.display)" />
                 <Subheading v-if="section.instructions" :text="renderInstructions(section.instructions)" />
             </PanelHeader>
