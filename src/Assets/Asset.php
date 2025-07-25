@@ -35,8 +35,10 @@ use Statamic\Exceptions\FileExtensionMismatch;
 use Statamic\Facades;
 use Statamic\Facades\AssetContainer as AssetContainerAPI;
 use Statamic\Facades\Blink;
+use Statamic\Facades\File;
 use Statamic\Facades\Image;
 use Statamic\Facades\Path;
+use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
 use Statamic\GraphQL\ResolvesValues;
@@ -255,8 +257,13 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         }
 
         return $this->meta = $this->cacheStore()->rememberForever($this->metaCacheKey(), function () {
-            if ($contents = $this->disk()->get($path = $this->metaPath())) {
-                return YAML::file($path)->parse($contents);
+            $contents = match (config('statamic.assets.meta_as_content')) {
+                true => File::get($this->metaPath()),
+                false => $this->disk()->get($this->metaPath()),
+            };
+
+            if ($contents) {
+                return YAML::parse($contents);
             }
 
             $this->writeMeta($meta = $this->generateMeta());
@@ -302,13 +309,29 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
     public function metaPath()
     {
-        $path = dirname($this->path()).'/.meta/'.$this->basename().'.yaml';
+        $path = Path::resolve(match (config('statamic.assets.meta_as_content')) {
+            true => implode(DIRECTORY_SEPARATOR, [
+                Stache::store('assets')->directory(),
+                $this->container()->handle(),
+                dirname($this->path()),
+                $this->basename().'.yaml',
+            ]),
+            false => implode(DIRECTORY_SEPARATOR, [
+                dirname($this->path()),
+                '.meta',
+                $this->basename().'.yaml',
+            ]),
+        });
 
-        return (string) Str::of($path)->replaceFirst('./', '')->ltrim('/');
+        return Str::of($path)->replaceFirst('./', '')->ltrim('/')->value();
     }
 
     protected function metaExists()
     {
+        if (config('statamic.assets.meta_as_content')) {
+            return File::exists($this->metaPath());
+        }
+
         return $this->container()->metaFiles()->contains($this->metaPath());
     }
 
@@ -318,7 +341,12 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
         $contents = YAML::dump($meta);
 
-        $this->disk()->put($this->metaPath(), $contents);
+        if (config('statamic.assets.meta_as_content')) {
+            File::makeDirectory(dirname($this->metaPath()), 0755, true);
+            File::put($this->metaPath(), $contents);
+        } else {
+            $this->disk()->put($this->metaPath(), $contents);
+        }
     }
 
     public function metaCacheKey()
@@ -676,7 +704,12 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         }
 
         $this->disk()->delete($this->path());
-        $this->disk()->delete($this->metaPath());
+
+        if (config('statamic.assets.meta_as_content')) {
+            File::delete($this->metaPath());
+        } else {
+            $this->disk()->delete($this->metaPath());
+        }
 
         Facades\Asset::delete($this);
 
@@ -770,7 +803,11 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         $this->path($newPath);
         $this->save();
 
-        $this->disk()->rename($oldMetaPath, $this->metaPath());
+        if (config('statamic.assets.meta_as_content')) {
+            File::move($oldMetaPath, $this->metaPath());
+        } else {
+            $this->disk()->rename($oldMetaPath, $this->metaPath());
+        }
 
         return $this;
     }
