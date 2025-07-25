@@ -310,6 +310,7 @@ export default {
 
         this.$refs.actions.preparedActions.forEach(action => Statamic.$commandPalette.add({
             text: __('Collection') + ' » ' + action.title,
+            icon: action.icon,
             action: action.run,
         }));
     },
