@@ -13,6 +13,12 @@ class Lists extends Fieldtype
     protected function configFieldItems(): array
     {
         return [
+            'cast_integers' => [
+                'display' => __('Cast Integers'),
+                'instructions' => __('statamic::fieldtypes.list.config.cast_integers'),
+                'type' => 'toggle',
+                'default' => false,
+            ],
             'default' => [
                 'display' => __('Default Value'),
                 'instructions' => __('statamic::messages.fields_default_instructions'),
@@ -36,9 +42,13 @@ class Lists extends Fieldtype
             return $data;
         }
 
-        return collect($data)->reject(function ($item) {
-            return in_array($item, [null, ''], true);
-        })->values()->all();
+        return collect($data)
+            ->reject(fn ($value) => in_array($value, [null, ''], true))
+            ->when($this->config('cast_integers'), function ($collection) {
+                return $collection->map(fn ($value) => (int) $value);
+            })
+            ->values()
+            ->all();
     }
 
     public function toGqlType()
