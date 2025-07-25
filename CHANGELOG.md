@@ -1,5 +1,19 @@
 # Release Notes
 
+## 5.61.0 (2025-07-25)
+
+### What's new
+- Allow static warm to use insecure by default with config key [#11978](https://github.com/statamic/cms/issues/11978) by @macaws
+
+### What's fixed
+- Escape redirect in user tag [#11999](https://github.com/statamic/cms/issues/11999) by @jasonvarga
+- Fix AddonTestCase path for Windows [#11994](https://github.com/statamic/cms/issues/11994) by @godismyjudge95
+- Bump form-data from 4.0.0 to 4.0.4 [#11979](https://github.com/statamic/cms/issues/11979) by @dependabot
+- Loosen up assertions in `ViteTest` [#11985](https://github.com/statamic/cms/issues/11985) by @duncanmcclean
+- Update security contact info [#11996](https://github.com/statamic/cms/issues/11996) by @duncanmcclean
+
+
+
 ## 5.60.0 (2025-07-15)
 
 ### What's new
