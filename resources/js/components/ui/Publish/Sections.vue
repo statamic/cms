@@ -6,7 +6,7 @@ import Fields from './Fields.vue';
 import ShowField from '@statamic/components/field-conditions/ShowField.js';
 import { injectContainerContext } from './Container.vue';
 import markdown from '@statamic/util/markdown.js';
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import { Primitive } from 'reka-ui';
 import { Motion } from 'motion-v';
 
