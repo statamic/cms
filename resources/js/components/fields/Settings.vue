@@ -24,6 +24,7 @@
                 <div v-if="!loading">
                     <TabContent name="settings">
                         <ui-publish-container
+                            ref="container"
                             :blueprint="adjustedBlueprint"
                             :meta="meta"
                             :errors="errors"
@@ -238,6 +239,7 @@ export default {
                     isInsideSet: this.isInsideSet,
                 })
                 .then((response) => {
+                    this.$refs.container?.clearDirtyState();
                     this.$emit('committed', response.data, this.editedFields);
                     this.close();
 
