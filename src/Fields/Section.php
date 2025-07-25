@@ -48,8 +48,8 @@ class Section
         return Arr::removeNullValues([
             'display' => $this->display(),
             'instructions' => $this->instructions(),
-            'collapsible' => $this->collapsible(),
-            'collapsed' => $this->collapsed(),
+            'collapsible' => $this->collapsible() ?: null,
+            'collapsed' => $this->collapsed() ?: null,
         ]) + [
             'fields' => $this->fields()->toPublishArray(),
         ];
