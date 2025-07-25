@@ -309,19 +309,19 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
     public function metaPath()
     {
-        $path = Path::resolve(match (config('statamic.assets.meta_as_content')) {
-            true => implode(DIRECTORY_SEPARATOR, [
+        $path = match (config('statamic.assets.meta_as_content')) {
+            true => implode('/', [
                 Stache::store('assets')->directory(),
                 $this->container()->handle(),
                 dirname($this->path()),
                 $this->basename().'.yaml',
             ]),
-            false => implode(DIRECTORY_SEPARATOR, [
+            false => implode('/', [
                 dirname($this->path()),
                 '.meta',
                 $this->basename().'.yaml',
             ]),
-        });
+        };
 
         return Str::of($path)->replaceFirst('./', '')->ltrim('/')->value();
     }

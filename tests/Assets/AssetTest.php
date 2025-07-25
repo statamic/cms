@@ -33,7 +33,6 @@ use Statamic\Exceptions\FileExtensionMismatch;
 use Statamic\Facades;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\File;
-use Statamic\Facades\Path;
 use Statamic\Facades\Stache;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
@@ -715,7 +714,7 @@ class AssetTest extends TestCase
     {
         config()->set('statamic.assets.meta_as_content', true);
         $relativePath = 'foo/test.txt';
-        $metaFilePath = Path::resolve(Stache::store('assets')->directory()."/test/{$relativePath}.yaml");
+        $metaFilePath = Stache::store('assets')->directory()."/test/{$relativePath}.yaml";
 
         Storage::fake('test');
         Storage::disk('test')->put($relativePath, '');
