@@ -163,7 +163,7 @@
 }
 
 .title-index-field {
-    @apply text-sm font-medium line-clamp-2 flex items-center gap-2 hover:text-black dark:hover:text-white;
+    @apply text-sm line-clamp-2 flex items-center gap-2 hover:text-black dark:hover:text-white;
     min-width: 15vw;
     max-width: 30vw;
 }
