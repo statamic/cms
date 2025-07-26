@@ -6,7 +6,7 @@
         <div :class="{ 'publish-fields': fullScreenMode }">
             <div :class="fullScreenMode && wrapperClasses">
                 <div
-                    class="bard-fieldtype antialiased typography-content with-contrast:border-gray-500 shadow-ui-sm focus-outline-discrete"
+                    class="bard-fieldtype antialiased st-text-legibility with-contrast:border-gray-500 shadow-ui-sm focus-outline-discrete"
                     :class="{ 'bard-fullscreen': fullScreenMode }"
                     ref="container"
                     @dragstart.stop="ignorePageHeader(true)"

@@ -130,7 +130,7 @@ defineExpose({ focus });
 <template>
     <ui-input-group>
         <ui-input-group-prepend v-if="prepend" v-text="prepend" />
-        <div class="group/input relative block w-full typography-content focus-outline-discrete" data-ui-input>
+        <div class="group/input relative block w-full st-text-legibility focus-outline-discrete" data-ui-input>
             <div v-if="hasPrependedIcon" :class="iconClasses">
                 <slot name="prepend">
                     <Icon :name="iconPrepend || icon" />

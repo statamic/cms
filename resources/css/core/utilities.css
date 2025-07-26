@@ -15,7 +15,8 @@
 
 /* UTILITIES / TEXT
 =================================================== */
-@utility trim-text-start {
+/* Avoid prefixing things with text- because this is a Tailwind prefix */
+@utility st-text-trim-start {
     text-box: trim-start;
     /* =Jay. When we have an SVG we probably don't want to text trim, for example in a Markdown field with button controls like Bold, Italic, etc. */
     &:has(svg),
@@ -28,7 +29,7 @@
         text-box: unset;
     }
 }
-@utility trim-cap-alphabetic {
+@utility st-text-trim-cap {
     /* =Jay. Sometimes this is handy e.g. the text inside the command palette searchbox */
     text-box: cap alphabetic;
 }
@@ -40,7 +41,7 @@
     }
 }
 
-@utility typography-content {
+@utility st-text-legibility {
     font-family: "inter", sans-serif;
     letter-spacing: -0.02em;
     font-optical-sizing: auto;
