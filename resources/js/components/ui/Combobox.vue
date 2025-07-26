@@ -282,7 +282,7 @@ defineExpose({
                         />
 
                         <button type="button" class="flex-1 text-start" v-else-if="!searchable && (dropdownOpen || !modelValue)">
-                            <span class="text-gray-400 dark:text-gray-500" v-text="placeholder" />
+                            <span class="text-gray-400 dark:text-gray-500 placeholder-text-xs" v-text="placeholder" />
                         </button>
 
                         <button type="button" v-else class="flex-1 text-start cursor-pointer">

@@ -40,6 +40,10 @@
         font-size: 0.975em;
     }
 }
+@utility placeholder-text-xs {
+    /* =Jay. If it needs to be used directly on the element such as the link field i.e. pseudo ::placeholder */
+    font-size: 0.975em;
+}
 
 @utility st-text-legibility {
     font-family: "inter", sans-serif;
