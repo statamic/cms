@@ -149,6 +149,8 @@ export default {
                     Statamic.$toast.success('Saved');
 
                     this.title = response.data.title;
+
+                    this.$nextTick(() => this.$emit('saved', response));
                 });
         },
 
