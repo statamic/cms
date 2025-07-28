@@ -52,7 +52,6 @@ function toggleSection(id) {
             </PanelHeader>
             <Motion
                 layout
-                class="overflow-hidden"
                 :initial="{ height: section.collapsed ? '0px' : 'auto' }"
                 :animate="{ height: section.collapsed ? '0px' : 'auto' }"
                 :transition="{ duration: 0.25, type: 'tween' }"
