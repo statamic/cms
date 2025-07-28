@@ -176,6 +176,7 @@ function desync() {
         :errors="errors"
         :read-only="isReadOnly"
         :as="wrapperComponent"
+        :variant="config.variant"
     >
         <template #label v-if="shouldShowLabel">
             <Label :for="fieldId" :required="isRequired">
