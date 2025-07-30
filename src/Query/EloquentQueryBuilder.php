@@ -292,7 +292,7 @@ abstract class EloquentQueryBuilder implements Builder
 
     public function whereNotBetween($column, $values, $boolean = 'and')
     {
-        return $this->whereBetween($column, $values, 'or', true);
+        return $this->whereBetween($column, $values, $boolean, true);
     }
 
     public function orWhereNotBetween($column, $values)
