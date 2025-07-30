@@ -374,6 +374,12 @@ abstract class EloquentQueryBuilder implements Builder
             $value, $operator, func_num_args() === 2
         );
 
+        if (! ($value instanceof DateTimeInterface)) {
+            $value = Carbon::parse($value);
+        }
+
+        $value = $value->format('H:i:s'); // we only care about the time part
+
         $this->builder->whereTime($this->column($column), $operator, $value, $boolean);
 
         return $this;
