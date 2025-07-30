@@ -43,7 +43,7 @@
         "laravel/pint": "1.16.0",
         "mockery/mockery": "^1.6.10",
         "orchestra/testbench": "^8.14 || ^9.2 || ^10.0",
-        "pestphp/pest": "4.x-dev as 3.0",
+        "pestphp/pest": "4.x-dev",
         "spatie/laravel-ray": "^1.37"
     },
     "config": {
