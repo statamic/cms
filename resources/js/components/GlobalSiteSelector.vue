@@ -1,5 +1,5 @@
 <template>
-    <div class="site-selector flex h-full items-center dark:border-dark-900 ltr:mr-4 rtl:ml-4">
+    <div class="site-selector flex h-full items-center dark:border-dark-900">
         <Select
             :options="sites"
             option-label="name"
