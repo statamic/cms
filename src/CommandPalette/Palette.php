@@ -18,7 +18,7 @@ class Palette
         $this->items = collect();
     }
 
-    public function add(string $text, string $url, ?Category $category = null, ?string $icon = null, ?string $keys = null): self
+    public function add(string|array $text, string $url, ?Category $category = null, ?string $icon = null, ?string $keys = null): self
     {
         $link = (new Link($text, $category ?? Category::Miscellaneous))->url($url);
 
@@ -113,7 +113,9 @@ class Palette
     {
         throw_unless(is_string(Arr::get($command, 'type')), new \Exception('Must output command [type] string!'));
         throw_unless(is_string(Arr::get($command, 'category')), new \Exception('Must output command [category] string!'));
-        throw_unless(is_string(Arr::get($command, 'text')), new \Exception('Must output command [text] string!'));
+
+        $text = Arr::get($command, 'text');
+        throw_unless(is_string($text) || is_array($text), new \Exception('Must output command [text] string!'));
 
         return $command;
     }
