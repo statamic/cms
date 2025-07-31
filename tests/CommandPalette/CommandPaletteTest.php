@@ -3,6 +3,7 @@
 namespace Tests\CommandPalette;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\CommandPalette\Category;
 use Statamic\Facades;
 use Statamic\Facades\CommandPalette;
 use Statamic\Facades\User;
@@ -81,5 +82,49 @@ class CommandPaletteTest extends TestCase
         ];
 
         $this->assertEquals($expected, $navigationCommands);
+    }
+
+    #[Test]
+    public function it_can_build_custom_command_items()
+    {
+        CommandPalette::add('Ask Jeeves', 'https://ask.com');
+
+        CommandPalette::add(
+            text: 'Hotbot',
+            url: 'https://hotbot.com',
+            icon: 'sexy-robot',
+            category: Category::Actions,
+            // keys: ... // TODO: test custom hotkey config when we set that up
+        );
+
+        $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->get(cp_route('dashboard'))
+            ->assertStatus(200);
+
+        $miscCommands = collect(CommandPalette::build())
+            ->filter(fn ($item) => in_array($item['category'], ['Actions', 'Miscellaneous']))
+            ->all();
+
+        $expected = [
+            [
+                'category' => 'Miscellaneous',
+                'type' => 'link',
+                'text' => 'Ask Jeeves',
+                'url' => 'https://ask.com',
+                'icon' => 'entry',
+                'keys' => null,
+            ],
+            [
+                'category' => 'Actions',
+                'type' => 'link',
+                'text' => 'Hotbot',
+                'url' => 'https://hotbot.com',
+                'icon' => 'sexy-robot',
+                'keys' => null,
+            ],
+        ];
+
+        $this->assertEquals($expected, $miscCommands);
     }
 }
