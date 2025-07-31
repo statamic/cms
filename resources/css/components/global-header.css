@@ -27,8 +27,14 @@
     }
 }
 
-.site-selector [data-ui-combobox-anchor] {
-    font-size: 0.9rem;
+.site-selector {
+    /* The background of the header is already very dark, so it's distracting if you put a second dark color background on hover */
+    div:hover {
+        background: none;
+    }
+    [data-ui-combobox-anchor] {
+        font-size: 0.9rem;
+    }
 }
 
 .global-header .white-label-logo {
