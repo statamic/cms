@@ -16,6 +16,7 @@ use Statamic\Facades\Scope;
 use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Statamic\Http\Controllers\CP\Collections\QueriesAuthorEntries;
 use Statamic\Http\Resources\CP\Entries\EntriesFieldtypeEntries;
 use Statamic\Http\Resources\CP\Entries\EntriesFieldtypeEntry as EntryResource;
 use Statamic\Query\OrderedQueryBuilder;
@@ -31,7 +32,8 @@ use function Statamic\trans as __;
 
 class Entries extends Relationship
 {
-    use QueriesFilters;
+    use QueriesAuthorEntries,
+        QueriesFilters;
 
     protected $categories = ['relationship'];
     protected $keywords = ['entry'];
@@ -143,6 +145,11 @@ class Entries extends Relationship
         if ($blueprints = $this->config('blueprints')) {
             $query->whereIn('blueprint', $blueprints);
         }
+
+        collect($this->getConfiguredCollections())
+            ->map(fn ($handle) => Collection::findByHandle($handle))
+            ->filter(fn ($collection) => User::current()->cant('view-other-authors-entries', [EntryContract::class, $collection]))
+            ->each(fn ($collection) => $this->queryAuthorEntries($query, $collection));
 
         $this->activeFilterBadges = $this->queryFilters($query, $filters, $this->getSelectionFilterContext());
 
