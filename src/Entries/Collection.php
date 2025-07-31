@@ -922,7 +922,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
     public function entryBlueprintCommandPaletteLinks()
     {
-        $text = __('Collections').' » '.__($this->title());
+        $text = [__('Collections'), __($this->title())];
 
         return $this
             ->entryBlueprints()

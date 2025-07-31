@@ -388,25 +388,25 @@ export default {
 
         addToCommandPalette() {
             Statamic.$commandPalette.add({
-                text: __('Collection') + ' » ' + __('Configure'),
+                text: [__('Collection'), __('Configure')],
                 icon: 'cog',
                 url: this.editUrl,
             });
 
             Statamic.$commandPalette.add({
-                text: __('Collection') + ' » ' + __('Edit Blueprints'),
+                text: [__('Collection'), __('Edit Blueprints')],
                 icon: 'cog',
                 url: this.blueprintsUrl,
             });
 
             Statamic.$commandPalette.add({
-                text: __('Collection') + ' » ' + __('Scaffold Views'),
+                text: [__('Collection'), __('Scaffold Views')],
                 icon: 'scaffold',
                 url: this.scaffoldUrl,
             });
 
             this.$refs.actions.preparedActions.forEach(action => Statamic.$commandPalette.add({
-                text: __('Collection') + ' » ' + action.title,
+                text: [__('Collection'), action.title],
                 icon: action.icon,
                 action: action.run,
             }));

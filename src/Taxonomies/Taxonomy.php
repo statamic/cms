@@ -580,7 +580,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
 
     public function termBlueprintCommandPaletteLinks()
     {
-        $text = __('Taxonomies').' » '.__($this->title());
+        $text = [__('Taxonomies'), __($this->title())];
 
         return $this
             ->termBlueprints()

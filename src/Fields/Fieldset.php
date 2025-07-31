@@ -300,7 +300,7 @@ class Fieldset
 
     public function commandPaletteLink(): Link
     {
-        $text = __('Fieldsets').' » '.__($this->title());
+        $text = [__('Fieldsets'), __($this->title())];
 
         return (new Link($text, Category::Fields))
             ->url($this->editUrl())
