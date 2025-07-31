@@ -9,7 +9,7 @@ abstract class Command
     protected $icon = 'entry';
     protected $keys;
 
-    public function __construct(protected string $text, protected Category $category)
+    public function __construct(protected string|array $text, protected Category $category)
     {
         //
     }
