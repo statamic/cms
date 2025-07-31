@@ -33,9 +33,10 @@ class Comparator
     {
         // something is null
         if (is_null($one) || is_null($two)) {
-            if (is_null($one) && ! is_null($two)) {
+            // place nulls after non-nulls
+            if (! is_null($one) && is_null($two)) {
                 return 1;
-            } elseif (! is_null($one) && is_null($two)) {
+            } elseif (is_null($one) && ! is_null($two)) {
                 return -1;
             }
 
