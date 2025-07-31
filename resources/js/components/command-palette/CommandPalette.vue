@@ -53,8 +53,10 @@ const aggregatedItems = computed(() => [
 ]);
 
 const results = computed(() => {
+    let items = aggregatedItems.value.map(item => normalizeItem(item));
+
     let filtered = fuzzysort
-        .go(query.value, aggregatedItems.value, {
+        .go(query.value, items, {
             all: true,
             keys: ['text'],
             scoreFn: fuzzysortScoringAlgorithm,
@@ -98,6 +100,14 @@ function fuzzysortScoringAlgorithm(result) {
     }
 
     return result.score * multiplier;
+}
+
+function normalizeItem(item) {
+    if (Array.isArray(item.text)) {
+        item.text = item.text.join(' » ');
+    }
+
+    return item;
 }
 
 watch(selected, (item) => {

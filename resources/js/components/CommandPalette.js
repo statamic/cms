@@ -8,7 +8,7 @@ class Command {
     constructor(command) {
         this.key = uniqid();
         this.category = command.category ?? 'Actions';
-        this.type = command.type ?? 'action';
+        this.type = command.type ?? 'action'; // TODO: misc default?
         this.icon = command.icon ?? 'wand';
         this.when = command.when ?? (() => true);
         this.text = command.text;
@@ -24,7 +24,7 @@ class Command {
     }
 
     #validate() {
-        if (typeof this.text !== 'string') {
+        if (['string', 'array'].includes(typeof this.text)) {
             console.error('You must provide a `text:` string in your command object!');
         }
 
