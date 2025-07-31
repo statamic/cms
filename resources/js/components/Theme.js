@@ -9,6 +9,7 @@ export default class Theme {
         this.#watchPreferences();
         this.#watchTheme();
         this.#listenForColorSchemeChange();
+        this.#registerCommands();
     }
 
     get preference() {
@@ -62,5 +63,34 @@ export default class Theme {
             Statamic.$preferences.set('theme', preference);
             localStorage.setItem('statamic.theme', preference);
         }
+    }
+
+    #registerCommands() {
+        Statamic.$commandPalette.add({
+            text: [__('Toggle Theme'), __('Light')],
+            icon: 'sun',
+            action: () => {
+                this.preference = 'light';
+            },
+            category: 'Miscellaneous',
+        });
+
+        Statamic.$commandPalette.add({
+            text: [__('Toggle Theme'), __('Dark')],
+            icon: 'moon',
+            action: () => {
+                this.preference = 'dark';
+            },
+            category: 'Miscellaneous',
+        });
+
+        Statamic.$commandPalette.add({
+            text: [__('Toggle Theme'), __('System')],
+            icon: 'monitor',
+            action: () => {
+                this.preference = 'auto';
+            },
+            category: 'Miscellaneous',
+        });
     }
 }
