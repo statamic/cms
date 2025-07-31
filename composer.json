@@ -43,7 +43,7 @@
         "laravel/pint": "1.16.0",
         "mockery/mockery": "^1.6.10",
         "orchestra/testbench": "^8.14 || ^9.2 || ^10.0",
-        "phpunit/phpunit": "^10.5.35 || ^11.5.3",
+        "pestphp/pest": "4.x-dev",
         "spatie/laravel-ray": "^1.37"
     },
     "config": {
@@ -52,6 +52,7 @@
         "sort-packages": true,
         "allow-plugins": {
             "composer/package-versions-deprecated": true,
+            "pestphp/pest-plugin": true,
             "pixelfear/composer-dist-plugin": true
         }
     },
@@ -90,5 +91,7 @@
             "Tests\\": "tests",
             "Foo\\Bar\\": "tests/Fixtures/Addon"
         }
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
