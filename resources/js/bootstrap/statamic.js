@@ -5,6 +5,7 @@ import axios from 'axios';
 import Config from '../components/Config';
 import Preferences from '../components/Preference';
 import registerGlobalComponents from './components.js';
+import registerGlobalCommandPalette from './commands.js';
 import registerUiComponents from './ui.js';
 import registerFieldtypes from './fieldtypes.js';
 import useGlobalEventBus from '../composables/global-event-bus';
@@ -226,6 +227,7 @@ export default {
 
         await registerUiComponents(this.$app);
         registerGlobalComponents(this.$app);
+        registerGlobalCommandPalette();
         registerFieldtypes(this.$app);
 
         // Suppress the translation warnings
