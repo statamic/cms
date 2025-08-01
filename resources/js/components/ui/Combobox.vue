@@ -98,7 +98,7 @@ const itemClasses = cva({
         },
         selected: {
             false: 'text-gray-900 dark:text-gray-300 data-highlighted:bg-gray-100 data-highlighted:text-gray-900 dark:data-highlighted:bg-gray-700 dark:data-highlighted:text-gray-300',
-            true: 'bg-blue-50 dark:bg-blue-600 text-blue-500! dark:text-blue-50!',
+            true: 'bg-blue-50 dark:bg-blue-600 text-blue-600! dark:text-blue-50!',
         },
     },
 });
