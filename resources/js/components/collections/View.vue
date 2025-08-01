@@ -83,6 +83,7 @@
                 :url="createUrl"
                 :blueprints="blueprints"
                 :text="createLabel"
+                :command-palette="true"
             />
         </Header>
 
