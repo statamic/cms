@@ -121,6 +121,8 @@ export default {
             listingKey: 'submissions',
             preferencesPrefix: `forms.${this.form}`,
             requestUrl: cp_url(`forms/${this.form}/submissions`),
+            pushQuery: true,
+            previousFilters: null,
         }
     },
 

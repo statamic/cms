@@ -3,8 +3,8 @@
 namespace Statamic\Forms\Exporters;
 
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\File;
 use Statamic\Contracts\Forms\Form;
-use Statamic\Facades\File;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 use function Statamic\trans as __;
@@ -16,7 +16,7 @@ abstract class Exporter
     protected string $handle;
     protected Form $form;
 
-    abstract public function export(): string;
+    abstract public function export(string $path): void;
 
     public function setHandle(string $handle)
     {
@@ -75,11 +75,9 @@ abstract class Exporter
 
     public function download(): BinaryFileResponse
     {
-        $content = $this->export();
-
         $path = storage_path('statamic/tmp/forms/'.$this->form->handle().'-'.time().'.'.$this->extension());
-
-        File::put($path, $content);
+        File::put($path, ''); 
+        $this->export($path);
 
         return response()->download($path)->deleteFileAfterSend();
     }
