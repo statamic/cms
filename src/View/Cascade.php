@@ -195,7 +195,7 @@ class Cascade
             // Request
             'current_url' => $this->request->url(),
             'current_full_url' => $this->request->fullUrl(),
-            'current_uri' => URL::format($this->request->path()),
+            'current_uri' => URL::tidy($this->request->path()),
             'get_post' => Arr::sanitize($this->request->all()),
             'get' => Arr::sanitize($this->request->query->all()),
             'post' => $this->request->isMethod('post') ? Arr::sanitize($this->request->request->all()) : [],
