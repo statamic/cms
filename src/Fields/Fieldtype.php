@@ -61,6 +61,13 @@ abstract class Fieldtype implements Arrayable
         return $this;
     }
 
+    public function removeField()
+    {
+        $this->field = null;
+
+        return $this;
+    }
+
     public function field(): ?Field
     {
         return $this->field;
@@ -343,13 +350,9 @@ abstract class Fieldtype implements Arrayable
 
     public function config(?string $key = null, $fallback = null)
     {
-        if (! $this->field) {
-            return $fallback;
-        }
-
         $config = $this->configFields()->all()
             ->map->defaultValue()
-            ->merge($this->field->config());
+            ->merge($this->field?->config() ?? []);
 
         return $key
             ? ($config->get($key) ?? $fallback)
