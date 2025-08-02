@@ -3,7 +3,6 @@
 namespace Statamic\Forms\Exporters;
 
 use Illuminate\Support\Uri;
-use Statamic\Facades\File;
 use Statamic\Facades\Scope;
 use Statamic\Fields\Field;
 
@@ -14,26 +13,26 @@ class JsonExporter extends Exporter
     public function export(string $path): void
     {
         $file = fopen($path, 'w');
-        if (!$file) {
+        if (! $file) {
             return;
         }
 
-        fputs($file, '[');
+        fwrite($file, '[');
 
         $first = true;
         $this->query()
             ->lazy(10)
             ->each(function ($submission) use ($file, &$first) {
-                if (!$first) {
-                    fputs($file, ',');
+                if (! $first) {
+                    fwrite($file, ',');
                 }
 
-                fputs($file, json_encode($submission));
+                fwrite($file, json_encode($submission));
 
                 $first = false;
             });
 
-        fputs($file, ']');
+        fwrite($file, ']');
         fclose($file);
     }
 

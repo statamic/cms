@@ -76,7 +76,7 @@ abstract class Exporter
     public function download(): BinaryFileResponse
     {
         $path = storage_path('statamic/tmp/forms/'.$this->form->handle().'-'.time().'.'.$this->extension());
-        File::put($path, ''); 
+        File::put($path, '');
         $this->export($path);
 
         return response()->download($path)->deleteFileAfterSend();
