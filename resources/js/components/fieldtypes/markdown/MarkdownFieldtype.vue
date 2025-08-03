@@ -44,7 +44,7 @@
                         </publish-field-fullscreen-header>
 
                         <markdown-toolbar
-                            v-if="!fullScreenMode"
+                            v-if="!fullScreenMode && showFixedToolbar"
                             v-model:mode="mode"
                             :buttons="buttons"
                             :is-read-only="isReadOnly"
@@ -72,7 +72,27 @@
                                 @drop="draggingFile = false"
                                 @keydown="shortcut"
                             >
-                                <div class="editor relative z-6 st-text-legibility focus-within:focus-outline focus-outline-discrete" ref="codemirror"></div>
+                                <div class="editor relative z-6 st-text-legibility focus-within:focus-outline focus-outline-discrete" ref="codemirror">
+                                    <div
+                                        v-if="showFloatingToolbar && toolbarIsFloating && !isReadOnly"
+                                        class="markdown-floating-toolbar absolute z-50 flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-2 py-1 shadow-lg dark:border-white/10 dark:bg-gray-900"
+                                        :style="{ left: `${floatingToolbarX}px`, top: `${floatingToolbarY}px` }"
+                                        @mousedown.prevent
+                                    >
+                                        <Button
+                                            size="sm"
+                                            variant="ghost"
+                                            class="px-2! [&_svg]:size-3.5"
+                                            v-for="button in buttons"
+                                            :key="button.name"
+                                            v-tooltip="button.text"
+                                            :aria-label="button.text"
+                                            @click="handleButtonClick(button.command)"
+                                        >
+                                            <svg-icon :name="button.svg" class="size-4" />
+                                        </Button>
+                                    </div>
+                                </div>
                                 <!-- Hidden input for label association -->
                                 <input
                                     v-if="id"
@@ -258,6 +278,9 @@ export default {
             },
             escBinding: null,
             markdownPreviewText: null,
+            showFloatingToolbar: false,
+            floatingToolbarX: 0,
+            floatingToolbarY: 0,
         };
     },
 
@@ -295,6 +318,12 @@ export default {
         this.$events.$off('livepreview.opened', this.throttledResizeEvent);
         this.$events.$off('livepreview.closed', this.throttledResizeEvent);
         this.$events.$off('livepreview.resizing', this.throttledResizeEvent);
+
+        // Clean up CodeMirror event listeners
+        if (this.codemirror && this.toolbarIsFloating) {
+            this.codemirror.off('cursorActivity', this.handleCursorActivity);
+            this.codemirror.off('blur', this.hideFloatingToolbar);
+        }
     },
 
     methods: {
@@ -642,6 +671,12 @@ export default {
                 }),
             );
 
+                        // Set up floating toolbar event listeners if in floating mode
+            if (this.toolbarIsFloating) {
+                self.codemirror.on('cursorActivity', this.handleCursorActivity);
+                self.codemirror.on('blur', this.hideFloatingToolbar);
+            }
+
             // Note: ID is set on a hidden input element for label association
             // The CodeMirror element doesn't need the ID attribute
 
@@ -698,6 +733,43 @@ export default {
         handleButtonClick(command) {
             command(this);
         },
+
+        handleCursorActivity() {
+            if (!this.toolbarIsFloating) return;
+
+            const selection = this.codemirror.getSelection();
+
+            if (selection && selection.length > 0 && !this.isReadOnly) {
+                const doc = this.codemirror.getDoc();
+                this.selections = doc.listSelections();
+
+                this.showFloatingToolbar = true;
+                this.updateFloatingToolbarPosition();
+            } else {
+                this.showFloatingToolbar = false;
+            }
+        },
+
+        hideFloatingToolbar() {
+            this.showFloatingToolbar = false;
+        },
+
+        updateFloatingToolbarPosition() {
+            if (!this.codemirror || !this.showFloatingToolbar) return;
+
+            const from = this.codemirror.getCursor('from');
+            const to = this.codemirror.getCursor('to');
+
+            const fromCoords = this.codemirror.cursorCoords(from);
+            const toCoords = this.codemirror.cursorCoords(to);
+
+            const editorRect = this.codemirror.getWrapperElement().getBoundingClientRect();
+            const x = Math.round((fromCoords.left + toCoords.right) / 2 - editorRect.left);
+            const y = Math.round(fromCoords.top - editorRect.top - 50);
+
+            this.floatingToolbarX = x;
+            this.floatingToolbarY = y;
+        },
     },
 
     computed: {
@@ -719,6 +791,18 @@ export default {
 
         restrictAssetNavigation() {
             return this.config.restrict_assets || false;
+        },
+
+        toolbarIsFixed() {
+            return this.config.toolbar_mode === 'fixed';
+        },
+
+        toolbarIsFloating() {
+            return this.config.toolbar_mode === 'floating';
+        },
+
+        showFixedToolbar() {
+            return this.toolbarIsFixed && this.buttons.length > 0;
         },
 
         replicatorPreview() {
