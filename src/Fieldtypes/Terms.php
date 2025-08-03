@@ -62,14 +62,27 @@ class Terms extends Relationship
     {
         return [
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Input Behavior'),
                 'fields' => [
-                    'max_items' => [
-                        'display' => __('Max Items'),
-                        'instructions' => __('statamic::messages.max_items_instructions'),
-                        'min' => 1,
-                        'type' => 'integer',
+                    'taxonomies' => [
+                        'display' => __('Taxonomies'),
+                        'instructions' => __('statamic::fieldtypes.terms.config.taxonomies'),
+                        'type' => 'taxonomies',
+                        'mode' => 'select',
+                        'width' => '50',
                     ],
+                    'create' => [
+                        'display' => __('Allow Creating New Terms'),
+                        'instructions' => __('statamic::fieldtypes.terms.config.create'),
+                        'type' => 'toggle',
+                        'default' => true,
+                        'width' => '50',
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Appearance'),
+                'fields' => [
                     'mode' => [
                         'display' => __('UI Mode'),
                         'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
@@ -81,17 +94,29 @@ class Terms extends Relationship
                             'typeahead' => __('Typeahead Field'),
                         ],
                     ],
-                    'create' => [
-                        'display' => __('Allow Creating'),
-                        'instructions' => __('statamic::fieldtypes.terms.config.create'),
-                        'type' => 'toggle',
-                        'default' => true,
+                ],
+            ],
+            [
+                'display' => __('Boundaries & Limits'),
+                'fields' => [
+                    'max_items' => [
+                        'display' => __('Max Items'),
+                        'instructions' => __('statamic::messages.max_items_instructions'),
+                        'min' => 1,
+                        'type' => 'integer',
                     ],
-                    'taxonomies' => [
-                        'display' => __('Taxonomies'),
-                        'instructions' => __('statamic::fieldtypes.terms.config.taxonomies'),
-                        'type' => 'taxonomies',
-                        'mode' => 'select',
+                ],
+            ],
+            [
+                'display' => __('Advanced'),
+                'fields' => [
+                    'show_query_scopes' => [
+                        'display' => __('Query Scopes'),
+                        'instructions' => __('statamic::fieldtypes.terms.config.query_scopes'),
+                        'type' => 'revealer',
+                        'input_label' => __('Apply Query Scopes'),
+                        'default' => false,
+                        'width' => '50',
                     ],
                     'query_scopes' => [
                         'display' => __('Query Scopes'),
@@ -102,6 +127,10 @@ class Terms extends Relationship
                             ->map->handle()
                             ->values()
                             ->all(),
+                        'width' => '50',
+                        'if' => [
+                            'show_query_scopes' => 'true',
+                        ],
                     ],
                 ],
             ],

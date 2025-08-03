@@ -18,7 +18,7 @@ class Checkboxes extends Fieldtype
     {
         return [
             [
-                'display' => __('Checkbox Options'),
+                'display' => __('Selection & Options'),
                 'fields' => [
                     'options' => [
                         'display' => __('Options'),
@@ -32,13 +32,18 @@ class Checkboxes extends Fieldtype
                 ],
             ],
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Appearance'),
                 'fields' => [
                     'inline' => [
                         'display' => __('Inline'),
                         'instructions' => __('statamic::fieldtypes.checkboxes.config.inline'),
                         'type' => 'toggle',
                     ],
+                ],
+            ],
+            [
+                'display' => __('Data & Format'),
+                'fields' => [
                     'default' => [
                         'display' => __('Default Value'),
                         'instructions' => __('statamic::messages.fields_default_instructions'),

@@ -36,16 +36,10 @@
     </div>
 </template>
 
-<!-- This is a hack to...  -->
 <style scoped>
-    /* [1] Make the relationship input full height when it's in a link field. */
-    :deep(.relationship-input) > div:first-child {
+    /* :deep(.relationship-input) > div:first-child {
         @apply h-full;
-    }
-    /* [/2] Make the combobox text smaller when it's in a link field so it's not jarring when looking between the two. */
-    :deep([data-ui-combobox-anchor]) {
-        font-size: var(--text-sm)!important;
-    }
+    } */
 </style>
 
 <script>
@@ -155,7 +149,7 @@ export default {
 
                 { label: __('Entry'), value: 'entry' },
 
-                this.meta.showAssetOption ? { label: __('Asset'), value: 'asset' } : null,
+                this.meta.showAssetOption ? { label: __('Asset'), value: 'asset', maxFiles: 1 } : null,
             ].filter((option) => option);
         },
 

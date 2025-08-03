@@ -72,7 +72,7 @@ class Date extends Fieldtype
                 ],
             ],
             [
-                'display' => __('Timepicker'),
+                'display' => __('Date & Time'),
                 'fields' => [
                     'time_enabled' => [
                         'display' => __('Time Enabled'),
@@ -91,7 +91,7 @@ class Date extends Fieldtype
                 ],
             ],
             [
-                'display' => __('Boundaries'),
+                'display' => __('Boundaries & Limits'),
                 'fields' => [
                     'earliest_date' => [
                         'display' => __('Earliest Date'),
@@ -108,7 +108,7 @@ class Date extends Fieldtype
                 ],
             ],
             [
-                'display' => __('Data Format'),
+                'display' => __('Data & Format'),
                 'fields' => [
                     'format' => [
                         'display' => __('Format'),
