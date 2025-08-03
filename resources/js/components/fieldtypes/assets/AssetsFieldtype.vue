@@ -42,7 +42,7 @@
                         <svg-icon name="folder-image" class="w-4 h-4 text-gray-800 dark:text-dark-150"></svg-icon>
                         {{ __('Browse') }}
                     </button>
-                    <p class="flex-1 asset-upload-control" v-if="canUpload">
+                    <p class="flex-1 asset-upload-control flex flex-row gap-1" v-if="canUpload">
                         <button type="button" class="upload-text-button" @click.prevent="uploadFile">
                             {{ __('Upload file') }}
                         </button>
