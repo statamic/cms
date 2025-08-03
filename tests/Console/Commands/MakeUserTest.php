@@ -29,7 +29,7 @@ class MakeUserTest extends TestCase
 
         $this->assertEmpty(User::all());
 
-        $this->artisan('statamic:make:user', ['email' => 'jason@tellmewhatyouchasin.com']);
+        $this->artisan('statamic:make:user', ['--name' => 'Jason', 'email' => 'jason@tellmewhatyouchasin.com']);
 
         $user = User::all()->first();
 
@@ -82,13 +82,13 @@ class MakeUserTest extends TestCase
     {
         $this->assertEmpty(User::all());
 
-        $this->artisan('statamic:make:user', ['email' => 'jason'])
+        $this->artisan('statamic:make:user', ['--name' => 'Jason', 'email' => 'jason'])
             ->expectsOutputToContain(trans('validation.email', ['attribute' => 'input']));
 
-        $this->artisan('statamic:make:user', ['email' => 'jason@keeponrunnin.com'])
+        $this->artisan('statamic:make:user', ['--name' => 'Jason', 'email' => 'jason@keeponrunnin.com'])
             ->expectsOutputToContain('User created successfully.');
 
-        $this->artisan('statamic:make:user', ['email' => 'jason@keeponrunnin.com'])
+        $this->artisan('statamic:make:user', ['--name' => 'Jason', 'email' => 'jason@keeponrunnin.com'])
             ->expectsOutputToContain('A user with this email already exists.');
     }
 
@@ -97,8 +97,8 @@ class MakeUserTest extends TestCase
     {
         $this->assertEmpty(User::all());
 
-        $this->artisan('statamic:make:user', ['email' => 'jason@keeponrunnin.com', '--super' => true]);
-        $this->artisan('statamic:make:user', ['email' => 'jesses.girl@springfield.com']);
+        $this->artisan('statamic:make:user', ['--name' => 'Jason', 'email' => 'jason@keeponrunnin.com', '--super' => true]);
+        $this->artisan('statamic:make:user', ['--name' => 'Jason', 'email' => 'jesses.girl@springfield.com']);
 
         $jason = User::all()->first();
         $girl = User::all()->last();
@@ -114,7 +114,7 @@ class MakeUserTest extends TestCase
 
         $password = 'PacManMoonwalk#84';
 
-        $this->artisan('statamic:make:user', ['email' => 'duncan@likesteatime.com', '--password' => $password])
+        $this->artisan('statamic:make:user', ['--name' => 'Jason', 'email' => 'duncan@likesteatime.com', '--password' => $password])
             ->expectsOutputToContain('User created successfully.');
 
         $user = User::all()->first();
