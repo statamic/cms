@@ -84,8 +84,18 @@ class MakeUser extends Command
             $this->password = $password;
         }
 
-        // If email argument exists, non-interactively create user.
-        if ($this->email = $this->argument('email')) {
+        // If name and email arguments exist, non-interactively create user.
+        if (
+            (
+                $this->hasSeparateNameFields()
+                ? (
+                    $this->data['first_name'] = $this->option('first_name')
+                    && $this->data['last_name'] = $this->option('last_name')
+                )
+                : $this->data['name'] = $this->option('name')
+            )
+            && $this->email = $this->argument('email')
+        ) {
             return $this->createUser();
         }
 
@@ -187,7 +197,7 @@ class MakeUser extends Command
     protected function createUser()
     {
         // Also validate here for when creating non-interactively.
-        if ($this->emailValidationFails()) {
+        if ($this->nameValidationFails() || $this->emailValidationFails()) {
             return;
         }
 
@@ -203,6 +213,21 @@ class MakeUser extends Command
         $user->save();
 
         $this->components->info('User created successfully.');
+    }
+
+    /**
+     * Check if name validation fails.
+     *
+     * @return bool
+     */
+    protected function nameValidationFails()
+    {
+        if ($this->hasSeparateNameFields()) {
+            return $this->validationFails($this->data['first_name'], ['required'])
+                || $this->validationFails($this->data['last_name'], ['required']);
+        }
+
+        return $this->validationFails($this->data['name'], ['required']);
     }
 
     /**
@@ -250,7 +275,7 @@ class MakeUser extends Command
     protected function getArguments()
     {
         return [
-            ['email', InputArgument::OPTIONAL, 'Non-interactively create a user with only an email address'],
+            ['email', InputArgument::OPTIONAL, 'Non-interactively create a user with the given email address'],
         ];
     }
 
@@ -264,6 +289,9 @@ class MakeUser extends Command
         return array_merge(parent::getOptions(), [
             ['super', '', InputOption::VALUE_NONE, 'Generate a super user with permission to do everything'],
             ['password', '', InputOption::VALUE_OPTIONAL, 'Generate a user with given password'],
+            ['name', '', InputOption::VALUE_REQUIRED, 'Non-interactively create a user with the given name'],
+            ['first_name', '', InputOption::VALUE_REQUIRED, 'Non-interactively create a user with the given first name'],
+            ['last_name', '', InputOption::VALUE_REQUIRED, 'Non-interactively create a user with the given last name'],
         ]);
     }
 }
