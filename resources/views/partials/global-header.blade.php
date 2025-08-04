@@ -31,10 +31,11 @@
 
         @foreach($breadcrumbs as $breadcrumb)
             <span class="text-gray-500">/</span>
+            <ui-button href="{{ $breadcrumb->url() }}" text="{{ __($breadcrumb->text()) }}" size="sm" variant="ghost"></ui-button>
             @if($breadcrumb->hasLinks() || $breadcrumb->createUrl())
-                <ui-dropdown v-cloak>
+                <ui-dropdown v-cloak class="relative">
                     <template #trigger>
-                        <ui-button text="{{ __($breadcrumb->text()) }}" size="sm" variant="ghost" icon-append="ui/chevron-vertical" class="[&_svg]:size-2"></ui-button>
+                        <ui-button variant="ghost" icon="ui/chevron-vertical" class="[&_svg]:size-3! h-8! w-4! hover:bg-gray-300/5! -ml-3 mr-1"></ui-button>
                     </template>
                     <ui-dropdown-header
                         class="grid grid-cols-[auto_1fr_auto] items-center"
@@ -63,8 +64,6 @@
                         <ui-dropdown-footer icon="plus" text="{{ __($breadcrumb->createLabel()) }}" href="{{ $breadcrumb->createUrl() }}"></ui-button>
                     @endif
                 </ui-dropdown>
-            @else
-                <ui-button text="{{ __($breadcrumb->text()) }}" size="sm" variant="ghost" class="[&_svg]:size-2"></ui-button>
             @endif
         @endforeach
     </div>
