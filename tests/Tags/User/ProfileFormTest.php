@@ -71,7 +71,7 @@ class ProfileFormTest extends TestCase
 EOT
         ));
 
-        preg_match_all('/<label>.+<\/label><input.+>/U', $output, $actual);
+        preg_match_all($this->regex(), $output, $actual);
 
         $expected = [
             '<label>Name</label><input id="userprofile-form-name-field" type="text" name="name" value="Test User">',
@@ -106,7 +106,7 @@ EOT
 EOT
         ));
 
-        preg_match_all('/(?:<h[23].+>.+<\/h[23]>|<label>.+<\/label><input.+>|<label>.+<\/label><label><input.+><input.+><\/label>)+/U', $output, $actual);
+        preg_match_all($this->regex(), $output, $actual);
 
         $expected = [
             '<h2 class="tab">Main</h2>',
@@ -145,7 +145,7 @@ EOT
 EOT
         ));
 
-        preg_match_all('/(?:<h[23].+>.+<\/h[23]>|<label>.+<\/label><input.+>|<label>.+<\/label><label><input.+><input.+><\/label>)+/U', $output, $actual);
+        preg_match_all($this->regex(), $output, $actual);
 
         $expected = [
             '<h3 class="section">Account</h3>',
@@ -179,7 +179,7 @@ EOT
 EOT
         ));
 
-        preg_match_all('/(?:<h[23].+>.+<\/h[23]>|<label>.+<\/label><input.+>|<label>.+<\/label><label><input.+><input.+><\/label>)+/U', $output, $actual);
+        preg_match_all($this->regex(), $output, $actual);
 
         $expected = [
             '<label>Full Name</label><input id="userprofile-form-name-field" type="text" name="name" value="Test User">',
@@ -450,5 +450,10 @@ EOT
             ]);
 
         $response->assertStatus(422);
+    }
+
+    private function regex(): string
+    {
+        return '/(?:<h[23].+>.+<\/h[23]>|<label>.+<\/label><input.+>|<label>.+<\/label><label><input.+><input.+><\/label>)+/U';
     }
 }

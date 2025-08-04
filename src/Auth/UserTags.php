@@ -711,8 +711,7 @@ class UserTags extends Tags
     }
 
     /**
-     * Get tabs with fields filled with extra data for looping over and rendering, using tabs defined in blueprint.
-     * The result is unpacked into a sections array and a fields array for choosing what to loop over and render.
+     * Get tabs, sections, and fields with extra data for looping over and rendering.
      *
      * @return array
      */
@@ -749,6 +748,8 @@ class UserTags extends Tags
      * Get fields with extra data for looping over and rendering.
      *
      * @return array
+     *
+     * @deprecated
      */
     protected function getProfileFields()
     {
