@@ -528,6 +528,17 @@ class Field implements Arrayable
                     'instructions' => 'not null',
                 ],
             ],
+            'variant' => [
+                'display' => __('Field Layout'),
+                'instructions' => __('statamic::messages.fields_layout_instructions'),
+                'type' => 'select',
+                'options' => [
+                    'block' => __('Stacked'),
+                    'inline' => __('Side by Side'),
+                ],
+                'default' => 'block',
+                'width' => 33,
+            ],
             'listable' => [
                 'display' => __('Listable'),
                 'instructions' => __('statamic::messages.fields_listable_instructions'),
@@ -542,7 +553,7 @@ class Field implements Arrayable
                 'unless' => [
                     'type' => 'section',
                 ],
-                'width' => 50,
+                'width' => 33,
             ],
             'visibility' => [
                 'display' => __('Visibility'),
@@ -555,7 +566,7 @@ class Field implements Arrayable
                 ],
                 'default' => 'visible',
                 'type' => 'select',
-                'width' => 50,
+                'width' => 33,
             ],
             'sortable' => [
                 'display' => __('Sortable'),
