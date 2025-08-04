@@ -139,7 +139,7 @@ class ResolveRedirectTest extends TestCase
         $parent->shouldReceive('pages')->andReturn($pages);
 
         $this->assertSame(404, $resolver('@child', $parent));
-        $this->assertSame(404, $resolver->item('@child', $parent));
+        $this->assertSame(null, $resolver->item('@child', $parent));
     }
 
     #[Test]
