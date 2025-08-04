@@ -28,14 +28,14 @@ function isSelected(id) {
 
 function getCheckboxLabel(row) {
     const rowTitle = getRowTitle(row);
-    return isSelected(row.id) 
+    return isSelected(row.id)
         ? __('deselect_title', { title: rowTitle })
         : __('select_title', { title: rowTitle });
 }
 
 function getCheckboxAriaLabel(row) {
     const rowTitle = getRowTitle(row);
-    return isSelected(row.id) 
+    return isSelected(row.id)
         ? __('deselect_title', { title: rowTitle })
         : __('select_title', { title: rowTitle });
 }
@@ -43,11 +43,11 @@ function getCheckboxAriaLabel(row) {
 function getCheckboxDescription(row) {
     const rowTitle = getRowTitle(row);
     const isDisabled = hasReachedSelectionLimit.value && allowsMultipleSelections.value && !isSelected(row.id);
-    
+
     if (isDisabled) {
         return __('selection_limit_reached', { title: rowTitle });
     }
-    
+
     return isSelected(row.id)
         ? __('item_selected_description', { title: rowTitle })
         : __('item_not_selected_description', { title: rowTitle });
@@ -56,6 +56,17 @@ function getCheckboxDescription(row) {
 function getRowTitle(row) {
     // Try to get a meaningful title from common fields
     return row.title || row.name || row.label || row.id || __('item');
+}
+
+function handleRowClick(event, index) {
+    // Check if the click target is an interactive element
+    const target = event.target;
+    const isInteractive = target.closest('button, a, input, select, textarea, [role="button"], [role="menuitem"], [role="option"], [data-interactive]');
+
+    // If it's not an interactive element, fire the selection handler
+    if (!isInteractive) {
+        selectionClicked(index, event);
+    }
 }
 </script>
 
@@ -75,6 +86,7 @@ function getRowTitle(row) {
                 :key="row.id"
                 class="sortable-row outline-hidden"
                 :data-row="isSelected(row.id) ? 'selected' : 'unselected'"
+                @click="handleRowClick($event, index)"
             >
                 <td class="table-drag-handle" v-if="reorderable"></td>
                 <td class="checkbox-column" v-if="allowsSelections && !reorderable">
