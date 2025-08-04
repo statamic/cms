@@ -173,7 +173,7 @@
 }
 
 .slug-index-field {
-    @apply line-clamp-2 font-mono text-xs;
+    @apply line-clamp-2 font-mono text-[.75rem];
 }
 
 .status-index-field {
