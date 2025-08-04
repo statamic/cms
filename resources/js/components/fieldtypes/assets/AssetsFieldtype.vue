@@ -20,10 +20,10 @@
                 <div
                     v-if="config.allow_uploads"
                     v-show="dragging && !showSelector"
-                    class="absolute inset-0 flex flex-col gap-2 items-center justify-center bg-white/80 backdrop-blur-sm border border-gray-400 border-dashed rounded-lg"
+                    class="absolute inset-0 flex gap-2 items-center justify-center bg-white/80 backdrop-blur-sm border border-gray-400 border-dashed rounded-lg text-gray-700"
                 >
-                    <ui-icon name="upload-cloud" class="size-5 text-gray-500" />
-                    <ui-heading size="lg">{{ __('Drop to Upload') }}</ui-heading>
+                    <ui-icon name="upload-cloud" class="size-5" />
+                    <span class="text-sm">{{ __('Drop to Upload') }}</span>
                 </div>
 
                 <div
@@ -77,7 +77,7 @@
                     </div>
                 </div>
 
-                <div v-if="uploads.length" class="border-gray-300 border-l border-r">
+                <div v-if="uploads.length" class="divide-y">
                     <uploads
                         :uploads="uploads"
                         allow-selecting-existing
