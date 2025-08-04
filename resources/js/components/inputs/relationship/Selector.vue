@@ -1,5 +1,5 @@
 <template>
-    <div class="dark:bg-dark-800 h-full bg-white">
+    <div class="dark:bg-dark-800 h-full bg-white rounded-s-xl">
         <div class="flex h-full min-h-0 flex-col">
             <Listing
                 v-if="filters != null && view === 'list'"
@@ -90,7 +90,7 @@
                 </div>
             </template>
 
-            <div class="flex items-center justify-between border-t bg-gray-100 p-4">
+            <div class="flex items-center justify-between border-t bg-gray-100 p-4 rounded-es-xl">
                 <div
                     class="dark:text-dark-150 text-sm text-gray-700"
                     v-text="
