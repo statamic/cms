@@ -5,6 +5,7 @@ import SortableList from '@statamic/components/sortable/SortableList.vue';
 import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
 import { computed, ref, watch } from 'vue';
 import Table from '@statamic/components/ui/Listing/Table.vue';
+import { Checkbox } from '@statamic/ui';
 
 const {
     items,
@@ -90,23 +91,16 @@ function handleRowClick(event, index) {
             >
                 <td class="table-drag-handle" v-if="reorderable"></td>
                 <td class="checkbox-column" v-if="allowsSelections && !reorderable">
-                    <label :for="`checkbox-${row.id}`" class="sr-only">
-                        {{ getCheckboxLabel(row) }}
-                    </label>
-                    <input
-                        v-if="!reorderable"
-                        type="checkbox"
+                    <Checkbox
                         :value="row.id"
-                        :checked="isSelected(row.id)"
+                        :model-value="isSelected(row.id)"
                         :disabled="hasReachedSelectionLimit && allowsMultipleSelections && !isSelected(row.id)"
-                        :id="`checkbox-${row.id}`"
-                        :aria-label="getCheckboxAriaLabel(row)"
-                        :aria-describedby="`checkbox-description-${row.id}`"
-                        @click="selectionClicked(index, $event)"
+                        :label="getCheckboxLabel(row)"
+                        :description="getCheckboxDescription(row)"
+                        size="sm"
+                        solo
+                        @update:model-value="selectionClicked(index, $event)"
                     />
-                    <span :id="`checkbox-description-${row.id}`" class="sr-only">
-                        {{ getCheckboxDescription(row) }}
-                    </span>
                 </td>
                 <td
                     v-for="column in visibleColumns"
@@ -129,13 +123,13 @@ function handleRowClick(event, index) {
                         />
                     </slot>
                 </td>
-                <!--                    <td class="type-column" v-if="type">-->
-                <!--                        <Badge-->
-                <!--                            size="sm"-->
-                <!--                            v-if="type === 'entries' || type === 'terms'"-->
-                <!--                            :label="type === 'entries' ? __(row.collection.title) : __(row.taxonomy.title)"-->
-                <!--                        />-->
-                <!--                    </td>-->
+            <!-- <td class="type-column" v-if="type">
+                <Badge
+                    size="sm"
+                    v-if="type === 'entries' || type === 'terms'"
+                    :label="type === 'entries' ? __(row.collection.title) : __(row.taxonomy.title)"
+                />
+            </td> -->
                 <td class="actions-column" v-if="hasActions || $slots['prepended-row-actions']">
                     <RowActions :row="row">
                         <template v-if="$slots['prepended-row-actions']" #prepended-actions="{ row }">
