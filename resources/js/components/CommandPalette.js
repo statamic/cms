@@ -25,11 +25,11 @@ class Command {
 
     #validate() {
         if (['string', 'array'].includes(typeof this.text)) {
-            console.error('You must provide a `text:` string in your command object!');
+            console.error('You must provide a `text:` string in your command object');
         }
 
         if (typeof this.url !== 'string' && typeof this.action !== 'function') {
-            console.error('You must provide a `url` string or `action` function to be run with your `'+this.text+'` command!');
+            console.error('You must provide a `url` string or `action` function to be run with your `'+this.text+'` command');
         }
     }
 }
