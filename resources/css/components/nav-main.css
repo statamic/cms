@@ -18,7 +18,7 @@
         @apply list-none p-0 mt-0;
     }
 
-    ul:last-child {
+    .nav-main-inner > ul:last-child {
         @apply pb-8;
     }
 
