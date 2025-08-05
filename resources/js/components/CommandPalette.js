@@ -25,7 +25,7 @@ class Command {
     }
 
     #validate() {
-        if (['string', 'array'].includes(typeof this.text)) {
+        if (! (typeof this.text === 'string' || Array.isArray(this.text))) {
             console.error('You must provide a `text:` string in your command object');
         }
 
