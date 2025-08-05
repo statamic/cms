@@ -3,6 +3,7 @@
 namespace Statamic\Tags;
 
 use Illuminate\Support\HtmlString;
+use Statamic\StaticCaching\NoCache\Session;
 
 class Partial extends Tags
 {
@@ -25,6 +26,12 @@ class Partial extends Tags
             '__frontmatter' => $this->params->all(),
             'slot' => $this->isPair ? $this->getSlotContent() : null,
         ]);
+
+        if ($this->params->get('nocache', false)) {
+            $nocache = app(Session::class);
+
+            return $nocache->pushView($this->viewName($partial), $variables)->placeholder();
+        }
 
         return view($this->viewName($partial), $variables)
             ->withoutExtractions()

@@ -4,6 +4,7 @@ namespace Tests\Tags;
 
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Parse;
+use Statamic\StaticCaching\NoCache\Session;
 use Tests\FakesViews;
 use Tests\TestCase;
 
@@ -144,6 +145,24 @@ class PartialTagsTest extends TestCase
         $this->assertEquals(
             'the partial content with baz',
             $this->partialTag('mypartial', 'foo="baz" unless="false"')
+        );
+    }
+
+    #[Test]
+    public function it_supports_rendering_with_nocache()
+    {
+        $this->viewShouldReturnRaw('test', 'This is a partial');
+
+        $partial = $this->partialTag('test', 'nocache="true"');
+        $region = app(Session::class)->regions()->first();
+
+        $this->assertNotEquals('This is a partial', $partial);
+        $this->assertEquals(
+            vsprintf('<span class="nocache" data-nocache="%s">%s</span>', [
+                $region->key(),
+                'NOCACHE_PLACEHOLDER',
+            ]),
+            $partial,
         );
     }
 }
