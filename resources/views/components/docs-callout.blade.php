@@ -4,12 +4,21 @@
 
 @if (config('statamic.cp.link_to_docs'))
     <div class="mt-12 flex justify-center text-center">
-        <ui-badge
-            href="{{ $url }}"
-            target="_blank"
-            pill
-            icon-append="external-link"
-            text="{{ $text ?? __("Learn about $topic") }}"
-        />
+        <ui-command-palette-item
+            :text="[__('Statamic Documentation'), '{{ $topic }}']"
+    category="Miscellaneous"
+            icon="book-next-page"
+            url="{{ $url }}"
+            open-new-tab
+            v-slot="{ url, icon }"
+        >
+            <ui-badge
+                text="{{ __("Learn about $topic") }}"
+                icon-append="external-link"
+                :href="url"
+                target="_blank"
+                pill
+            />
+        </ui-command-palette-item>
     </div>
 @endif
