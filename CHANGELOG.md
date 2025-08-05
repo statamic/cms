@@ -1,5 +1,23 @@
 # Release Notes
 
+## 5.62.0 (2025-08-04)
+
+### What's new
+- Pass form_config to email view [#11417](https://github.com/statamic/cms/issues/11417) by @andjsch
+- Add user profile form tabs and sections [#11836](https://github.com/statamic/cms/issues/11836) by @AtmoFX
+- Ability to explicitly disable text fieldtype focus [#12011](https://github.com/statamic/cms/issues/12011) by @jasonvarga
+
+### What's fixed
+- Fix entry redirect to @child fails if no child exists [#11953](https://github.com/statamic/cms/issues/11953) by @MartinSpicka
+- Cast toggle fieldtype queryable value to boolean [#12019](https://github.com/statamic/cms/issues/12019) by @jasonvarga
+- Fix docs link in template fieldtype [#11990](https://github.com/statamic/cms/issues/11990) by @duncanmcclean
+- Fix incorrect boolean in eloquent whereNotBetween [#12005](https://github.com/statamic/cms/issues/12005) by @ryanmitchell
+- Fix assets:generate-presets command stdout [#12015](https://github.com/statamic/cms/issues/12015) by @0kyn
+- Fix asset styling in link fieldtype [#12016](https://github.com/statamic/cms/issues/12016) by @Jamesking56
+- Apply bottom padding to main nav [#12012](https://github.com/statamic/cms/issues/12012) by @daun
+
+
+
 ## 5.61.0 (2025-07-25)
 
 ### What's new
