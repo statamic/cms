@@ -25,6 +25,7 @@
                     :placeholder="__('Search Sets')"
                     v-show="showSearch"
                     v-model="search"
+                    data-set-picker-search-input
                 />
                 <div v-if="showGroupBreadcrumb" class="flex items-center font-medium text-gray-700 dark:text-gray-600">
                     <button
@@ -303,6 +304,10 @@ export default {
             if (!name) return 'plus';
 
             return this.iconSubFolder ? this.iconSubFolder + '/' + name : name;
+        },
+
+        open() {
+            this.isOpen = true;
         },
     },
 };

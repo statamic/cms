@@ -86,6 +86,7 @@
                             @hidden="showAddSetButton = false"
                         >
                             <set-picker
+                                ref="setPicker"
                                 v-if="showAddSetButton"
                                 :sets="groupConfigs"
                                 class="bard-set-selector"
@@ -174,6 +175,7 @@ import readTimeEstimate from 'read-time-estimate';
 import { common, createLowlight } from 'lowlight';
 import 'highlight.js/styles/github.css';
 import importTiptap from '@statamic/util/tiptap.js';
+import { computed } from 'vue';
 
 const lowlight = createLowlight(common);
 let tiptap = null;
@@ -712,8 +714,11 @@ export default {
                     // Since clicking into a field inside a set would also trigger a blur, we can't just emit the
                     // blur event immediately. We need to make sure that the newly focused element is outside
                     // of Bard. We use a timeout because activeElement only exists after the blur event.
+                    // Additionally, check that the focused element isn't the set picker's search input.
                     setTimeout(() => {
-                        if (!this.$refs.container.contains(document.activeElement)) {
+                        const isInsideBard = this.$refs.container.contains(document.activeElement);
+                        const isSetPickerSearch = document.activeElement.hasAttribute('data-set-picker-search-input');
+                        if (!isInsideBard && !isSetPickerSearch) {
                             this.$emit('blur');
                             this.showAddSetButton = false;
                         }
@@ -796,6 +801,7 @@ export default {
 
             // Allow passthrough of Ctrl/Cmd + Enter to submit the form
             const DisableCtrlEnter = Extension.create({
+                name: 'disableCtrlEnter',
                 addKeyboardShortcuts() {
                     return {
                         'Ctrl-Enter': () => true,
@@ -804,10 +810,31 @@ export default {
                 },
             });
 
+            // Handle forward slash to open set picker
+            const SlashSetPicker = Extension.create({
+                name: 'slashSetPicker',
+                addKeyboardShortcuts() {
+                    return {
+                        '/': () => {
+                            if (this.options.shown.value) {
+                                this.options.openSetPicker();
+                                return true; // Prevent inserting a slash.
+                            }
+
+                            return false; // Allow default behavior (insert slash)
+                        },
+                    };
+                },
+            });
+
             let exts = [
                 CharacterCount.configure({ limit: this.config.character_limit }),
                 ...modeExts,
                 DisableCtrlEnter,
+                SlashSetPicker.configure({
+                    shown: computed(() => this.showAddSetButton),
+                    openSetPicker: this.openSetPicker,
+                }),
                 Dropcursor,
                 Gapcursor,
                 History,
@@ -892,6 +919,10 @@ export default {
             });
             return bard;
         },
+
+        openSetPicker() {
+            this.$refs.setPicker.open();
+        }
     },
 };
 </script>
