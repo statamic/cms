@@ -74,15 +74,24 @@
             </global-site-selector>
         @endif
         <div><command-palette /></div>
-        <ui-button
+        <ui-command-palette-item
+            text="{{ __('View Site') }}"
             icon="visit-website"
-            class="[&_svg]:size-4 -me-3"
-            variant="ghost"
-            href="{{ Statamic\Facades\Site::selected()->url() }}"
-            target="_blank"
-            v-tooltip="'{{ __('View Site') }}'"
-            aria-label="{{ __('View Site') }}"
-        ></ui-button>
+            category="Miscellaneous"
+            url="{{ Statamic\Facades\Site::selected()->url() }}"
+            open-new-tab
+            v-slot="{ text, url, icon }"
+        >
+            <ui-button
+                :icon="icon"
+                class="[&_svg]:size-4 -me-3"
+                variant="ghost"
+                :href="url"
+                target="_blank"
+                v-tooltip="text"
+                :aria-label="text"
+            ></ui-button>
+        </ui-command-palette-item>
         <x-statamic::user-dropdown />
     </div>
 </header>
