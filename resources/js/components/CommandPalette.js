@@ -7,15 +7,15 @@ const commands = ref({});
 class Command {
     constructor(command) {
         this.key = uniqid();
-        this.type = command.type ?? 'action'; // TODO: misc default?
         this.category = command.category ?? 'Miscellaneous';
         this.icon = command.icon ?? 'wand';
         this.when = command.when ?? (() => true);
         this.text = command.text;
         this.url = command.url;
+        this.openNewTab = command.openNewTab ?? false;
         this.action = command.action;
         this.prioritize = command.prioritize ?? false;
-        this.openNewTab = command.openNewTab ?? false;
+        this.type = command.type ?? (command.action ? 'action' : 'link');
 
         this.#validate();
     }
