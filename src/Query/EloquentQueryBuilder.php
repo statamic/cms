@@ -447,6 +447,13 @@ abstract class EloquentQueryBuilder implements Builder
         return $this;
     }
 
+    public function orderByDesc($column)
+    {
+        $this->builder->orderBy($this->column($column), 'desc');
+
+        return $this;
+    }
+
     public function reorder($column = null, $direction = 'asc')
     {
         if ($column) {
