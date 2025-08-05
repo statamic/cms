@@ -38,7 +38,11 @@ class Taggable extends Fieldtype
 
     public function preProcess($data)
     {
-        return ($data) ? $data : [];
+        if (is_string($data)) {
+            $data = [$data];
+        }
+
+        return $data ?: [];
     }
 
     public function toGqlType()
