@@ -1,8 +1,9 @@
 <template>
-    <div class="card mx-auto max-w-5xl">
+    <div class="mx-auto mt-4 space-y-3 lg:space-y-6 max-w-3xl">
+        <!-- Wizard Steps (left as-is per user request) -->
         <div v-if="steps.length > 1" class="relative mx-auto max-w-2xl pt-16">
             <div class="wizard-steps">
-                <a
+                <button
                     class="step"
                     :class="{ complete: currentStep >= index }"
                     v-for="(step, index) in steps"
@@ -10,210 +11,226 @@
                 >
                     <div class="ball">{{ index + 1 }}</div>
                     <div class="label">{{ step }}</div>
-                </a>
+                </button>
             </div>
         </div>
 
         <!-- Step: User Info -->
         <div v-if="!completed && onUserInfoStep">
-            <div class="mx-auto max-w-md px-4 py-16 text-center">
-                <h1 class="mb-6">{{ __('Create User') }}</h1>
-                <p class="text-gray dark:text-dark-150" v-text="__('messages.user_wizard_intro')" />
-            </div>
+            <header class="text-center max-w-xl mx-auto py-6 lg:pt-12 xl:pt-16">
+                <ui-heading size="2xl" :level="1" icon="users" :text="__('Create User')" class="justify-center" />
+                <ui-subheading class="mt-6" size="lg" :text="__('messages.user_wizard_intro')" />
+            </header>
 
-            <ui-publish-container
-                ref="container"
-                :blueprint="blueprint"
-                v-model="values"
-                :meta="meta"
-                :track-dirty-state="false"
-                :errors="errors"
-            >
-                <div class="mx-auto -mt-6 max-w-md px-4 py-0 pb-20">
+            <ui-card-panel :heading="__('User Information')">
+                <ui-publish-container
+                    ref="container"
+                    :blueprint="blueprint"
+                    v-model="values"
+                    :meta="meta"
+                    :track-dirty-state="false"
+                    :errors="errors"
+                >
                     <ui-publish-fields-provider :fields="fields">
                         <ui-publish-fields />
                     </ui-publish-fields-provider>
-                </div>
-            </ui-publish-container>
+                </ui-publish-container>
+            </ui-card-panel>
         </div>
 
         <!-- Step: Roles & Groups -->
-        <div v-if="!completed && onPermissionStep" class="mx-auto max-w-md px-4 pb-4">
-            <div class="py-16 text-center">
-                <h1 class="mb-6">{{ __('Roles & Groups') }}</h1>
-                <p class="text-gray dark:text-dark-150" v-text="__('messages.user_wizard_roles_groups_intro')" />
-            </div>
+        <div v-if="!completed && onPermissionStep">
+            <header class="text-center max-w-xl mx-auto py-6 lg:pt-12 xl:pt-16">
+                <ui-heading size="2xl" :level="1" icon="users" :text="__('Roles & Groups')" class="justify-center" />
+                <ui-subheading class="mt-6" size="lg" :text="__('messages.user_wizard_roles_groups_intro')" />
+            </header>
 
-            <!-- Super Admin -->
-            <div class="pb-10" v-if="canCreateSupers">
-                <div class="flex items-center">
-                    <toggle-input v-model="user.super" id="super" />
-                    <label class="font-bold ltr:ml-2 rtl:mr-2" for="super">{{ __('Super Admin') }}</label>
-                </div>
-                <div
-                    class="mt-2 flex items-center space-x-1 text-2xs text-gray-600 dark:text-dark-150 rtl:space-x-reverse"
-                >
-                    <svg-icon name="info-circle" class="mb-px flex h-4 w-4 items-center"></svg-icon>
-                    <span>{{ __('messages.user_wizard_super_admin_instructions') }}</span>
-                </div>
-            </div>
-
-            <!-- Roles -->
-            <div class="pb-10" v-if="!user.super && canAssignRoles">
-                <label class="mb-1 text-base font-bold" for="role">{{ __('Roles') }}</label>
-                <publish-field-meta
-                    :config="{ handle: 'user.roles', type: 'user_roles' }"
-                    :initial-value="user.roles"
-                    v-slot="{ meta, value, loading, updateMeta }"
-                >
-                    <div>
-                        <relationship-fieldtype
-                            v-if="!loading"
-                            handle="user.roles"
-                            :config="{ type: 'user_roles', mode: 'select' }"
-                            :value="value"
-                            :meta="meta"
-                            @input="user.roles = $event"
-                            @meta-updated="updateMeta"
-                        />
+            <ui-card-panel :heading="__('Permissions')">
+                <div class="space-y-8">
+                    <!-- Super Admin -->
+                    <div v-if="canCreateSupers">
+                        <div class="flex items-center gap-2">
+                            <ui-switch v-model="user.super" id="super" />
+                            <label for="super" v-text="__('Super Admin')" />
+                        </div>
+                        <div
+                            class="mt-2 flex items-center space-x-1 text-2xs text-gray-600 dark:text-gray-400 rtl:space-x-reverse"
+                        >
+                            <svg-icon name="info-circle" class="mb-px flex h-4 w-4 items-center"></svg-icon>
+                            <span>{{ __('messages.user_wizard_super_admin_instructions') }}</span>
+                        </div>
                     </div>
-                </publish-field-meta>
-            </div>
 
-            <!-- Groups -->
-            <div class="pb-10" v-if="!user.super && canAssignGroups">
-                <label class="mb-1 text-base font-bold" for="group">{{ __('Groups') }}</label>
-                <publish-field-meta
-                    :config="{ handle: 'user.groups', type: 'user_groups' }"
-                    :initial-value="user.groups"
-                    v-slot="{ meta, value, loading, updateMeta }"
-                >
-                    <div>
-                        <relationship-fieldtype
-                            v-if="!loading"
-                            handle="user.groups"
-                            :config="{ type: 'user_groups', mode: 'select' }"
-                            :value="value"
-                            :meta="meta"
-                            @input="user.groups = $event"
-                            @meta-updated="updateMeta"
-                        />
+                    <!-- Roles -->
+                    <div v-if="!user.super && canAssignRoles">
+                        <ui-label for="role" :text="__('Roles')" />
+                        <publish-field-meta
+                            :config="{ handle: 'user.roles', type: 'user_roles' }"
+                            :initial-value="user.roles"
+                            v-slot="{ meta, value, loading, updateMeta }"
+                        >
+                            <div>
+                                <relationship-fieldtype
+                                    v-if="!loading"
+                                    handle="user.roles"
+                                    :config="{ type: 'user_roles', mode: 'select' }"
+                                    :value="value"
+                                    :meta="meta"
+                                    @input="user.roles = $event"
+                                    @meta-updated="updateMeta"
+                                />
+                            </div>
+                        </publish-field-meta>
                     </div>
-                </publish-field-meta>
-            </div>
+
+                    <!-- Groups -->
+                    <div v-if="!user.super && canAssignGroups">
+                        <ui-label for="group" :text="__('Groups')" />
+                        <publish-field-meta
+                            :config="{ handle: 'user.groups', type: 'user_groups' }"
+                            :initial-value="user.groups"
+                            v-slot="{ meta, value, loading, updateMeta }"
+                        >
+                            <div>
+                                <relationship-fieldtype
+                                    v-if="!loading"
+                                    handle="user.groups"
+                                    :config="{ type: 'user_groups', mode: 'select' }"
+                                    :value="value"
+                                    :meta="meta"
+                                    @input="user.groups = $event"
+                                    @meta-updated="updateMeta"
+                                />
+                            </div>
+                        </publish-field-meta>
+                    </div>
+                </div>
+            </ui-card-panel>
         </div>
 
         <!-- Step: Invitation -->
         <div v-if="!completed && onInvitationStep">
-            <div class="mx-auto max-w-md px-4 py-16 text-center">
-                <h1 class="mb-6">{{ __('Invitation') }}</h1>
-                <p class="text-gray dark:text-dark-150" v-text="__('messages.user_wizard_invitation_intro')" />
-            </div>
+            <header class="text-center max-w-xl mx-auto py-6 lg:pt-12 xl:pt-16">
+                <ui-heading size="2xl" :level="1" icon="mail" :text="__('Invitation')" class="justify-center" />
+                <ui-subheading class="mt-6" size="lg" :text="__('messages.user_wizard_invitation_intro')" />
+            </header>
 
-            <!-- Send Email? -->
-            <div class="mx-auto mb-6 flex max-w-md items-center px-4">
-                <toggle-input v-model="invitation.send" id="send_email_invitation" />
-                <label class="font-bold ltr:ml-2 rtl:mr-2" for="send_email_invitation">{{
-                    __('Send Email Invitation')
-                }}</label>
-            </div>
+            <ui-card-panel :heading="__('Invitation Settings')">
+                <div class="space-y-4">
+                    <!-- Send Email? -->
+                    <div class="flex items-center gap-2">
+                        <ui-switch v-model="invitation.send" id="send_email_invitation" />
+                        <label for="send_email_invitation" v-text="__('Send Email Invitation')" />
+                    </div>
 
-            <div
-                class="mx-auto mb-20 max-w-2xl rounded-lg border bg-gray-100 py-10 dark:border-dark-900 dark:bg-dark-650"
-                v-if="invitation.send"
-            >
-                <!-- Subject Line -->
-                <div class="mx-auto max-w-md px-4 pb-10">
-                    <label class="mb-1 text-base font-bold" for="invitation_subject">{{ __('Email Subject') }}</label>
-                    <input
-                        type="text"
-                        v-model="invitation.subject"
-                        class="input-text bg-white dark:bg-dark-700"
-                        id="invitation_subject"
-                    />
+                    <div
+                        class="rounded-lg border bg-gray-100 p-6 dark:border-gray-700 dark:bg-gray-800"
+                        v-if="invitation.send"
+                    >
+                        <!-- Subject Line -->
+                        <div class="pb-10">
+                            <ui-label for="invitation_subject" :text="__('Email Subject')" />
+                            <ui-input
+                                type="text"
+                                v-model="invitation.subject"
+                                id="invitation_subject"
+                            />
+                        </div>
+
+                        <!-- Email Content -->
+                        <div>
+                            <ui-label for="invitation_message" :text="__('Email Content')" />
+                            <ui-textarea
+                                min-h-40
+                                id="invitation_message"
+                                v-model="invitation.message"
+                                v-elastic
+                            />
+                        </div>
+                    </div>
+
+                    <!-- Copy Pasta -->
+                    <div v-else>
+                        <ui-description v-html="__('messages.user_wizard_invitation_share_before', { email: values.email })" />
+                    </div>
                 </div>
-
-                <!-- Email Content -->
-                <div class="mx-auto max-w-md px-4">
-                    <label class="mb-1 text-base font-bold" for="invitation_message">{{ __('Email Content') }}</label>
-                    <textarea
-                        class="input-text min-h-40 bg-white p-4 dark:bg-dark-700"
-                        id="invitation_message"
-                        v-model="invitation.message"
-                        v-elastic
-                    />
-                </div>
-            </div>
-
-            <!-- Copy Pasta -->
-            <div class="mx-auto max-w-md px-4 pb-20" v-else>
-                <p class="mb-2" v-html="__('messages.user_wizard_invitation_share_before', { email: values.email })" />
-            </div>
+            </ui-card-panel>
         </div>
 
         <!-- Post creation -->
         <div v-if="completed">
-            <div class="mx-auto max-w-md px-4 py-16 text-center">
-                <h1 class="mb-6">{{ __('User created') }}</h1>
-                <p class="text-gray" v-html="__('messages.user_wizard_account_created')" />
-            </div>
+            <header class="text-center max-w-xl mx-auto py-6 lg:pt-12 xl:pt-16">
+                <ui-heading size="2xl" :level="1" icon="users" :text="__('User created')" class="justify-center" />
+                <ui-subheading class="mt-6" size="lg" :text="__('messages.user_wizard_account_created')" />
+            </header>
 
-            <!-- Copy Pasta -->
-            <div class="mx-auto max-w-md px-4 pb-10">
-                <p class="mb-2" v-html="__('messages.user_wizard_invitation_share', { email: values.email })" />
-            </div>
-            <div class="mx-auto max-w-md px-4 pb-10">
-                <label class="mb-1 text-base font-bold" for="activation_url">{{ __('Activation URL') }}</label>
-                <input
-                    type="text"
-                    readonly
-                    class="input-text"
-                    onclick="this.select()"
-                    :value="activationUrl"
-                    id="activation_url"
-                />
-            </div>
-            <div class="mx-auto max-w-md px-4 pb-20">
-                <label class="mb-1 text-base font-bold" for="email">{{ __('Email Address') }}</label>
-                <input
-                    type="text"
-                    readonly
-                    class="input-text"
-                    onclick="this.select()"
-                    :value="values.email"
-                    id="email"
-                />
-            </div>
+            <ui-card-panel :heading="__('User Details')">
+                <div class="space-y-4">
+                    <ui-description v-html="__('messages.user_wizard_invitation_share', { email: values.email })" />
+                    <div>
+                        <ui-label for="activation_url" :text="__('Activation URL')" />
+                        <ui-input
+                            readonly
+                            copyable
+                            :value="activationUrl"
+                            id="activation_url"
+                        />
+                    </div>
+                    <div>
+                        <ui-label for="email" :text="__('Email Address')" />
+                        <ui-input
+                            readonly
+                            copyable
+                            :value="values.email"
+                            id="email"
+                        />
+                    </div>
+                </div>
+            </ui-card-panel>
         </div>
 
-        <div class="border-t p-4 dark:border-dark-900">
-            <div class="mx-auto flex max-w-md items-center justify-center">
-                <button tabindex="3" class="btn mx-4 w-32" @click="previous" v-if="!completed && !onFirstStep">
-                    <span v-html="direction === 'ltr' ? '&larr;' : '&rarr;'"></span> {{ __('Previous') }}
-                </button>
-                <button tabindex="4" class="btn mx-4 w-32" @click="nextStep" v-if="onUserInfoStep">
-                    {{ __('Next') }} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span>
-                </button>
-                <button
-                    tabindex="4"
-                    class="btn mx-4 w-32"
+        <!-- Footer -->
+        <footer class="flex justify-center py-3">
+            <div class="flex items-center space-x-4">
+                <ui-button
+                    v-if="!completed && !onFirstStep"
+                    variant="default"
+                    @click="previous"
+                    :text="__('Previous')"
+                />
+                <ui-button
+                    v-if="onUserInfoStep"
+                    variant="primary"
+                    @click="nextStep"
+                    :text="__('Next')"
+                />
+                <ui-button
+                    v-if="!onUserInfoStep && !completed && !onLastStep"
+                    variant="primary"
                     :disabled="!canContinue"
                     @click="nextStep"
-                    v-if="!onUserInfoStep && !completed && !onLastStep"
-                >
-                    {{ __('Next') }} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span>
-                </button>
-                <button tabindex="4" class="btn-primary mx-4" @click="submit" v-if="!completed && onLastStep">
-                    {{ finishButtonText }}
-                </button>
-                <a :href="usersIndexUrl" class="btn mx-4" v-if="completed">
-                    {{ __('Back to Users') }}
-                </a>
-                <a :href="usersCreateUrl" class="btn-primary mx-4" v-if="completed">
-                    {{ __('Create Another') }}
-                </a>
+                    :text="__('Next')"
+                />
+                <ui-button
+                    v-if="!completed && onLastStep"
+                    variant="primary"
+                    @click="submit"
+                    :text="finishButtonText"
+                />
+                <ui-button
+                    v-if="completed"
+                    variant="default"
+                    :href="usersIndexUrl"
+                    :text="__('Back to Users')"
+                />
+                <ui-button
+                    v-if="completed"
+                    variant="primary"
+                    :href="usersCreateUrl"
+                    :text="__('Create Another')"
+                />
             </div>
-        </div>
+        </footer>
     </div>
 </template>
 

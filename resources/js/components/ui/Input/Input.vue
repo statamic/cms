@@ -163,12 +163,12 @@ defineExpose({ focus });
                     />
                     <Button
                         size="sm"
-                        :icon="copied ? 'clipboard-check' : 'clipboard'"
+                        :icon="copied.value ? 'clipboard-check' : 'clipboard'"
                         variant="subtle"
                         v-else-if="copyable"
                         @click="copy"
                         class="animate"
-                        :class="copied ? 'animate-wiggle' : ''"
+                        :class="copied.value ? 'animate-wiggle' : ''"
                     />
                     <Icon v-else-if="iconAppend" :name="iconAppend" />
                     <loading-graphic v-if="loading" inline text=""/>
