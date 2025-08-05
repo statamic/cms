@@ -28,7 +28,7 @@ const modalClasses = cva({
 })({});
 
 const instance = getCurrentInstance();
-const isUsingOpenProp = instance && 'open' in instance.vnode.props;
+const isUsingOpenProp = instance && instance.vnode.props?.length > 0 && 'open' in instance.vnode.props;
 
 const open = ref(props.open);
 
@@ -39,7 +39,7 @@ watch(
 
 // When the parent component controls the open state, emit an update event
 // so it can update its state, which eventually gets passed down as a prop.
-// Otherwise, just update the local state.
+// Otherwise, update the local state.
 function updateOpen(value) {
     if (isUsingOpenProp) {
         emit('update:open', value);
@@ -51,7 +51,7 @@ function updateOpen(value) {
 </script>
 
 <template>
-    <DialogRoot :open @update:open="updateOpen">
+    <DialogRoot :open="open" @update:open="updateOpen">
         <DialogTrigger data-ui-modal-trigger as-child>
             <slot name="trigger" />
         </DialogTrigger>
