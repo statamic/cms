@@ -21,6 +21,7 @@
                     class="@yield('content-class') pt-14"
                     :class="{
                         'nav-closed': ! navOpen,
+                        'nav-open': navOpen,
                         'nav-mobile-open': mobileNavOpen,
                         'showing-license-banner': showBanner
                     }"
