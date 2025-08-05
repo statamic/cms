@@ -4,6 +4,7 @@ import { Icon, Badge } from '@statamic/ui';
 
 const props = defineProps({
     href: { type: String, default: null },
+    openNewTab: { type: Boolean, default: false },
     icon: { type: String, default: null },
     text: { type: String, default: null },
     badge: { type: String, default: null },
@@ -44,6 +45,7 @@ function click(event) {
         data-command-palette-item
         :as="href ? 'a' : 'div'"
         :href="href"
+        :target="openNewTab ? '_blank' : '_self'"
         @click="click"
     >
         <div v-if="icon" class="flex size-6 items-center justify-center p-1 text-gray-500">

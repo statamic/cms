@@ -294,6 +294,7 @@ const modalClasses = cva({
                                         <CommandPaletteItem
                                             :icon="item.icon"
                                             :href="item.url"
+                                            :open-new-tab="item.openNewTab"
                                             :badge="item.keys || item.badge"
                                             :removable="isRecentItem(item)"
                                             @remove="removeRecentItem"

@@ -15,6 +15,7 @@ class Command {
         this.url = command.url;
         this.action = command.action;
         this.prioritize = command.prioritize ?? false;
+        this.openNewTab = command.openNewTab ?? false;
 
         this.#validate();
     }
