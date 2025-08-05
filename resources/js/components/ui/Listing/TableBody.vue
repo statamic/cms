@@ -60,6 +60,8 @@ function getRowTitle(row) {
 }
 
 function handleRowClick(event, index) {
+    if (! allowsSelections.value) return;
+
     // Check if the click target is an interactive element
     const target = event.target;
     const isInteractive = target.closest('button, a, input, select, textarea, [role="button"], [role="menuitem"], [role="option"], [data-interactive]');
