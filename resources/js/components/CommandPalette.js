@@ -7,8 +7,8 @@ const commands = ref({});
 class Command {
     constructor(command) {
         this.key = uniqid();
-        this.category = command.category ?? 'Actions';
         this.type = command.type ?? 'action'; // TODO: misc default?
+        this.category = command.category ?? 'Miscellaneous';
         this.icon = command.icon ?? 'wand';
         this.when = command.when ?? (() => true);
         this.text = command.text;
@@ -53,6 +53,6 @@ export default class CommandPalette {
     }
 
     misc() {
-        return Object.values(commands.value).filter(command => command.category !== 'Actions');
+        return Object.values(commands.value).filter(command => command.category === 'Miscellaneous');
     }
 }
