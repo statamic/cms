@@ -173,7 +173,7 @@ return [
     'taggable.config.placeholder' => 'Введіть та натисніть ↩ Enter',
     'taggable.title' => 'Теги',
     'taxonomies.title' => 'Таксономії',
-    'template.config.blueprint' => 'Додає опцію "карта до блакитного друку". Дізнайтеся більше в [документації](https://statamic.dev/views#inferring-templates-from-entry-blueprints).',
+    'template.config.blueprint' => 'Додає опцію "карта до блакитного друку". Дізнайтеся більше в [документації](https://statamic.dev/views#map-templates-to-entry-blueprints).',
     'template.config.folder' => 'Показувати лише шаблони в цій папці.',
     'template.config.hide_partials' => 'Часткові рідко призначені для використання як шаблони.',
     'template.title' => 'Шаблон',

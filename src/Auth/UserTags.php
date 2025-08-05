@@ -196,7 +196,9 @@ class UserTags extends Tags
 
         $data = $this->getFormSession('user.profile');
 
-        $data['fields'] = $this->getProfileFields();
+        $data['tabs'] = $this->getProfileTabs();
+        $data['sections'] = collect($data['tabs'])->flatMap->sections->all();
+        $data['fields'] = collect($data['sections'])->flatMap->fields->all();
 
         $knownParams = ['redirect', 'error_redirect', 'allow_request_redirect'];
 
@@ -709,9 +711,45 @@ class UserTags extends Tags
     }
 
     /**
+     * Get tabs, sections, and fields with extra data for looping over and rendering.
+     *
+     * @return array
+     */
+    protected function getProfileTabs()
+    {
+        $user = User::current();
+
+        $values = $user
+            ? $user->data()->merge(['email' => $user->email()])->all()
+            : [];
+
+        return User::blueprint()->tabs()
+            ->map(fn ($tab) => [
+                'display' => $tab->display(),
+                'sections' => $tab->sections()
+                    ->map(fn ($section) => [
+                        'display' => $section->display(),
+                        'instructions' => $section->instructions(),
+                        'fields' => $section->fields()->addValues($values)->preProcess()->all()
+                            ->reject(fn ($field) => in_array($field->handle(), ['password', 'password_confirmation', 'roles', 'groups'])
+                                    || $field->fieldtype()->handle() === 'assets'
+                            )
+                            ->map(fn ($field) => $this->getRenderableField($field, 'user.profile'))
+                            ->values()
+                            ->all(),
+                    ])
+                    ->all(),
+            ])
+            ->values()
+            ->all();
+    }
+
+    /**
      * Get fields with extra data for looping over and rendering.
      *
      * @return array
+     *
+     * @deprecated
      */
     protected function getProfileFields()
     {
