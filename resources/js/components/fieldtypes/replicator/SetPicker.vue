@@ -262,6 +262,8 @@ export default {
                 this.$keys.bindGlobal('up', (e) => this.keypressUp(e)),
                 this.$keys.bindGlobal('down', (e) => this.keypressDown(e)),
                 this.$keys.bindGlobal('enter', (e) => this.keypressEnter(e)),
+                this.$keys.bindGlobal('right', (e) => this.keypressRight(e)),
+                this.$keys.bindGlobal('left', (e) => this.keypressLeft(e)),
             ];
         },
 
@@ -278,6 +280,17 @@ export default {
         keypressDown(e) {
             e.preventDefault();
             this.selectionIndex = this.selectionIndex === this.items.length - 1 ? 0 : this.selectionIndex + 1;
+        },
+
+        keypressRight(e) {
+            e.preventDefault();
+            if (this.selectedGroup || this.search) return; // Pressing right to select a set feels awkward.
+            this.keypressEnter(e);
+        },
+
+        keypressLeft(e) {
+            e.preventDefault();
+            this.unselectGroup();
         },
 
         keypressEnter(e) {
