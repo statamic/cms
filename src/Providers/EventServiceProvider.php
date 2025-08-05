@@ -22,6 +22,7 @@ class EventServiceProvider extends ServiceProvider
         ],
         \Statamic\Events\EntryBlueprintFound::class => [
             \Statamic\Entries\AddSiteColumnToBlueprint::class,
+            \Statamic\Entries\ChangeAuthorFieldVisibility::class,
         ],
         \Statamic\Events\ResponseCreated::class => [
             \Statamic\Listeners\ClearState::class,
