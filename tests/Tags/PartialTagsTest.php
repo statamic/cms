@@ -165,4 +165,16 @@ class PartialTagsTest extends TestCase
             $partial,
         );
     }
+
+    #[Test]
+    public function it_supports_not_rendering_with_nocache()
+    {
+        $this->viewShouldReturnRaw('test', 'This is a partial');
+
+        $partial = $this->partialTag('test', 'nocache="false"');
+        $region = app(Session::class)->regions()->first();
+
+        $this->assertEquals('This is a partial', $partial);
+        $this->assertNull($region);
+    }
 }
