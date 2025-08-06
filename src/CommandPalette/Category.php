@@ -6,7 +6,6 @@ enum Category: string
 {
     case Actions = 'Actions';
     case Recent = 'Recent';
-    case History = 'History';
     case Navigation = 'Navigation';
     case Fields = 'Fields';
     case Miscellaneous = 'Miscellaneous';
