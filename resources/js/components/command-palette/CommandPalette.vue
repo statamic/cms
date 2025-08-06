@@ -69,14 +69,16 @@ const results = computed(() => {
             };
         });
 
+    let serverCategories = Statamic.$config.get('commandPaletteCategories');
+
     let categoryOrder = query.value
         ? uniq(filtered.map(item => item.category))
-        : Statamic.$commandPalette.categories();
+        : serverCategories;
 
     let grouped = groupBy(filtered, 'category');
 
     return categoryOrder
-        .filter(category => Statamic.$commandPalette.categories().includes(category))
+        .filter(category => serverCategories.includes(category))
         .map(category => {
             return {
                 text: __(category),

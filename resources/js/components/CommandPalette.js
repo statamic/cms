@@ -1,6 +1,6 @@
-import { uniqueId } from 'lodash-es';
 import { ref } from 'vue';
 import uniqid from 'uniqid';
+import { CATEGORY } from './command-palette/Constants.js';
 
 const commands = ref({});
 
@@ -36,8 +36,8 @@ class Command {
 }
 
 export default class CommandPalette {
-    categories() {
-        return Statamic.$config.get('commandPaletteCategories');
+    get category() {
+        return CATEGORY;
     }
 
     add(command) {
