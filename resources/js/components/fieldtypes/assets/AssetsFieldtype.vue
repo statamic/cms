@@ -28,7 +28,7 @@
 
                 <div
                     v-if="!isReadOnly && showPicker"
-                    class="border border-gray-400 dark:border-gray-700 border-dashed rounded-xl p-2 flex flex-col @2xs:flex-row items-center gap-4"
+                    class="not-[.link-fieldtype_&]:p-2 not-[.link-fieldtype_&]:border border-gray-400 dark:border-gray-700 border-dashed rounded-xl flex flex-col @2xs:flex-row items-center gap-4"
                     :class="{
                         'rounded-b-none': expanded,
                         'bard-drag-handle': isInBardField,
@@ -120,7 +120,7 @@
                         </div>
                     </sortable-list>
 
-                    <div class="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700 border-t-0! rounded-t-none" v-if="displayMode === 'list'">
+                    <div class="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700 not-[.link-fieldtype_&]:border-t-0! not-[.link-fieldtype_&]:rounded-t-none" v-if="displayMode === 'list'">
                         <table class="w-full">
                             <sortable-list
                                 v-model="assets"
