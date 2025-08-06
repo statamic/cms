@@ -90,7 +90,7 @@
                             :config="config"
                             :meta="meta"
                             :value="value"
-                            @input="editingSection.icon = $event"
+                            @update:value="editingSection.icon = $event"
                         />
                     </publish-field-meta>
                 </div>
