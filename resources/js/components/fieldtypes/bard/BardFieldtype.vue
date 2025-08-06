@@ -528,6 +528,11 @@ export default {
         },
 
         shouldShowSetButton({ view, state }) {
+            const isActive = this.suitableToShowSetButton({ view, state });
+            return this.setConfigs.length && (this.config.always_show_set_button || isActive);
+        },
+
+        suitableToShowSetButton({ view, state }) {
             const { selection } = state;
             const { $anchor, empty } = selection;
             const isRootDepth = $anchor.depth === 1;
@@ -536,8 +541,7 @@ export default {
             const isAroundInlineImage =
                 state.selection.$to.nodeBefore?.type.name === 'image' ||
                 state.selection.$to.nodeAfter?.type.name === 'image';
-            const isActive = view.hasFocus() && empty && isRootDepth && isEmptyTextBlock && !isAroundInlineImage;
-            return this.setConfigs.length && (this.config.always_show_set_button || isActive);
+            return view.hasFocus() && empty && isRootDepth && isEmptyTextBlock && !isAroundInlineImage;
         },
 
         initToolbarButtons() {
@@ -816,7 +820,9 @@ export default {
                 addKeyboardShortcuts() {
                     return {
                         '/': () => {
-                            if (this.options.shown.value) {
+                            const { view, state } = this.editor;
+
+                            if (this.options.allowed({ view, state})) {
                                 this.options.openSetPicker();
                                 return true; // Prevent inserting a slash.
                             }
@@ -833,6 +839,7 @@ export default {
                 DisableCtrlEnter,
                 SlashSetPicker.configure({
                     shown: computed(() => this.showAddSetButton),
+                    allowed: this.suitableToShowSetButton,
                     openSetPicker: this.openSetPicker,
                 }),
                 Dropcursor,
