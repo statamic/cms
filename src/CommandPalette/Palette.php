@@ -18,9 +18,11 @@ class Palette
         $this->items = collect();
     }
 
-    public function add(string|array $text, string $url, ?Category $category = null, ?string $icon = null, ?string $keys = null): self
+    public function add(string|array $text, string $url, bool $openNewTab = false, ?Category $category = null, ?string $icon = null, ?string $keys = null): self
     {
-        $link = (new Link($text, $category ?? Category::Miscellaneous))->url($url);
+        $link = (new Link($text, $category ?? Category::Miscellaneous))
+            ->url($url)
+            ->openNewTab($openNewTab);
 
         if ($icon) {
             $link->icon($icon);

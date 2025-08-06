@@ -94,6 +94,7 @@ class CommandPaletteTest extends TestCase
         CommandPalette::add(
             text: 'Hotbot',
             url: 'https://hotbot.com',
+            openNewTab: true,
             icon: 'sexy-robot',
             category: Category::Actions,
             // keys: ... // TODO: test custom hotkey config when we set that up
@@ -114,6 +115,7 @@ class CommandPaletteTest extends TestCase
                 'type' => 'link',
                 'text' => 'Ask Jeeves',
                 'url' => 'https://ask.com',
+                'openNewTab' => false,
                 'icon' => 'entry',
                 'keys' => null,
             ],
@@ -122,6 +124,7 @@ class CommandPaletteTest extends TestCase
                 'type' => 'link',
                 'text' => 'Hotbot',
                 'url' => 'https://hotbot.com',
+                'openNewTab' => true,
                 'icon' => 'sexy-robot',
                 'keys' => null,
             ],

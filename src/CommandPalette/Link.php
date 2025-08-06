@@ -5,6 +5,7 @@ namespace Statamic\CommandPalette;
 class Link extends Command
 {
     protected $url;
+    protected $openNewTab;
 
     public function url(string $url): static
     {
@@ -13,10 +14,18 @@ class Link extends Command
         return $this;
     }
 
+    public function openNewTab(bool $openNewTab): static
+    {
+        $this->openNewTab = $openNewTab;
+
+        return $this;
+    }
+
     public function toArray(): array
     {
         return array_merge(parent::toArray(), [
             'url' => $this->url,
+            'openNewTab' => $this->openNewTab,
         ]);
     }
 }
