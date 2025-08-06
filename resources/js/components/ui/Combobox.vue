@@ -183,10 +183,6 @@ const filteredOptions = computed(() => {
 function clear() {
     searchQuery.value = '';
     emit('update:modelValue', null);
-
-    if (props.searchable) {
-        nextTick(() => searchInputRef.value.focus());
-    }
 }
 
 function deselect(option) {
