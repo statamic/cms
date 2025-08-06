@@ -6,7 +6,7 @@ const props = defineProps({
     type: { type: String },
     icon: { type: String },
     when: { type: Function },
-    text: { type: String },
+    text: { type: [String, Array] },
     url: { type: String },
     action: { type: Function },
     openNewTab: { type: Boolean },
