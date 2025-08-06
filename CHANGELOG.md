@@ -1,5 +1,16 @@
 # Release Notes
 
+## 5.63.0 (2025-08-06)
+
+### What's new
+- Support multiple defaults for checkboxes fieldtype [#12021](https://github.com/statamic/cms/issues/12021) by @godismyjudge95
+
+### What's fixed
+- Ensure orderByDesc uses column() function in eloquent query builder [#12022](https://github.com/statamic/cms/issues/12022) by @ryanmitchell
+- Fix nav padding, only apply to last ul [#12024](https://github.com/statamic/cms/issues/12024) by @jackmcdade
+
+
+
 ## 5.62.0 (2025-08-04)
 
 ### What's new
