@@ -4,8 +4,7 @@ export default function registerGlobalCommandPalette() {
     //
     // Statamic.$commandPalette.add({
     //     text: __('Example Link Command'),
-    //     icon: 'book-next-page',
-    //     openNewTab: true,
+    //     icon: 'wand',
     //     when: () => Statamic.$permissions.has('super'),
     //     action: () => { ... },
     // });
