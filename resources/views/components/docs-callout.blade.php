@@ -6,7 +6,6 @@
     <div class="mt-12 flex justify-center text-center">
         <ui-command-palette-item
             :text="[__('Statamic Documentation'), '{{ $topic }}']"
-    category="Miscellaneous"
             icon="book-next-page"
             url="{{ $url }}"
             open-new-tab

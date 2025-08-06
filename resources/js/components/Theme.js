@@ -72,7 +72,6 @@ export default class Theme {
             action: () => {
                 this.preference = 'light';
             },
-            category: 'Miscellaneous',
         });
 
         Statamic.$commandPalette.add({
@@ -81,7 +80,6 @@ export default class Theme {
             action: () => {
                 this.preference = 'dark';
             },
-            category: 'Miscellaneous',
         });
 
         Statamic.$commandPalette.add({
@@ -90,7 +88,6 @@ export default class Theme {
             action: () => {
                 this.preference = 'auto';
             },
-            category: 'Miscellaneous',
         });
     }
 }

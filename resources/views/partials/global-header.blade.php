@@ -77,7 +77,6 @@
         <ui-command-palette-item
             text="{{ __('View Site') }}"
             icon="visit-website"
-            category="Miscellaneous"
             url="{{ Statamic\Facades\Site::selected()->url() }}"
             open-new-tab
             v-slot="{ text, url, icon }"
