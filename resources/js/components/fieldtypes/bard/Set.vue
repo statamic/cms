@@ -100,7 +100,6 @@ import { Badge, Button, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator,
 import { Motion } from 'motion-v';
 import FieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
 import Fields from '@statamic/components/ui/Publish/Fields.vue';
-import { within } from '@popperjs/core/lib/utils/within.js';
 import { containerContextKey } from '@statamic/components/ui/Publish/Container.vue';
 
 export default {
@@ -277,9 +276,6 @@ export default {
     },
 
     methods: {
-        within() {
-            return within;
-        },
         focused() {
             this.extension.options.bard.$emit('focus');
         },
