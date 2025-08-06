@@ -75,10 +75,6 @@
             }
         }
 
-        button sup {
-            @apply font-sans;
-        }
-
         .active {
             @apply button-active;
             svg {
@@ -187,10 +183,6 @@
             &:hover {
                 @apply text-gray-200;
             }
-        }
-
-        button sup {
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         }
     }
 
@@ -302,6 +294,7 @@
     }
 
     .bard-fieldtype .bard-content {
+        @apply text-gray-600 dark:text-gray-300;
         blockquote,
         ol,
         p,
@@ -311,7 +304,7 @@
 
             b,
             strong {
-                font-weight: 700;
+                @apply font-bold text-gray-800;
             }
 
             em,
@@ -347,7 +340,7 @@
         }
 
         hr {
-            @apply bg-gray-900 dark:bg-gray-100 h-0.5 my-4;
+            @apply bg-gray-200 dark:bg-gray-500 h-0.75 border-0 my-8;
         }
 
         hr:after,
@@ -366,7 +359,7 @@
         h4,
         h5,
         h6 {
-            @apply mt-3.5 mb-2 font-medium;
+            @apply mt-3.5 mb-2 font-bold text-gray-900 dark:text-gray-100;
 
             b,
             strong {
@@ -385,30 +378,12 @@
             }
         }
 
-        h1 {
-            font-size: 2em;
-        }
-
-        h2 {
-            font-size: 1.75em;
-        }
-
-        h3 {
-            font-size: 1.5em;
-        }
-
-        h4 {
-            font-size: 1.25em;
-        }
-
-        h5 {
-            font-size: 1em;
-        }
-
-        h6 {
-            font-size: 1em;
-            @apply text-gray-700;
-        }
+        h1 { @apply text-3xl; }
+        h2 { @apply text-2xl; }
+        h3 { @apply text-xl; }
+        h4 { @apply text-base; }
+        h5 { @apply text-sm; }
+        h6 { @apply text-2xs uppercase text-gray-800 dark:text-gray-500 tracking-wider; }
 
         h1:first-child,
         h2:first-child,
