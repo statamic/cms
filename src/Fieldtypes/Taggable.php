@@ -4,6 +4,7 @@ namespace Statamic\Fieldtypes;
 
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
+use Statamic\Support\Arr;
 
 class Taggable extends Fieldtype
 {
@@ -38,11 +39,7 @@ class Taggable extends Fieldtype
 
     public function preProcess($data)
     {
-        if (is_string($data)) {
-            $data = [$data];
-        }
-
-        return $data ?: [];
+        return Arr::wrap($data);
     }
 
     public function toGqlType()
