@@ -7,7 +7,7 @@
 
 ### What's fixed
 - Ensure orderByDesc uses column() function in eloquent query builder [#12022](https://github.com/statamic/cms/issues/12022) by @ryanmitchell
-- Fix nav padding, only apply to last <ul> [#12024](https://github.com/statamic/cms/issues/12024) by @jackmcdade
+- Fix nav padding, only apply to last ul [#12024](https://github.com/statamic/cms/issues/12024) by @jackmcdade
 
 
 
