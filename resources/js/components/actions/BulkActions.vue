@@ -25,6 +25,7 @@ let preparedActions = computed(() => {
 
 let commandPaletteActions = computed(() => {
     return preparedActions.value.map(action => Statamic.$commandPalette.add({
+        category: Statamic.$commandPalette.category.Actions,
         text: action.title,
         icon: action.icon,
         action: action.run,

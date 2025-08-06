@@ -389,24 +389,28 @@ export default {
 
         addToCommandPalette() {
             Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
                 text: [__('Collection'), __('Configure')],
                 icon: 'cog',
                 url: this.editUrl,
             });
 
             Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
                 text: [__('Collection'), __('Edit Blueprints')],
                 icon: 'cog',
                 url: this.blueprintsUrl,
             });
 
             Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
                 text: [__('Collection'), __('Scaffold Views')],
                 icon: 'scaffold',
                 url: this.scaffoldUrl,
             });
 
             this.$refs.actions.preparedActions.forEach(action => Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
                 text: [__('Collection'), action.title],
                 icon: action.icon,
                 action: action.run,

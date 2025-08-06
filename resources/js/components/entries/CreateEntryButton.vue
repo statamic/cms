@@ -80,6 +80,7 @@ export default {
 
             this.blueprints.forEach(blueprint => {
                 Statamic.$commandPalette.add({
+                    category: Statamic.$commandPalette.category.Actions,
                     text: this.hasMultipleBlueprints ? [title, blueprint.title] : title,
                     icon: 'entry',
                     url: this.createUrl(blueprint.handle),

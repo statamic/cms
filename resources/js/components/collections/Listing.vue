@@ -246,6 +246,7 @@ export default {
 
         addToCommandPalette() {
             Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
                 text: __('Create Collection'),
                 icon: 'collections',
                 when: () => this.canCreateCollections,
@@ -253,12 +254,14 @@ export default {
             });
 
             Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
                 text: __('Toggle Grid Layout'),
                 when: () => this.mode === 'table',
                 action: () => this.mode = 'grid',
             });
 
             Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
                 text: __('Toggle List Layout'),
                 when: () => this.mode === 'grid',
                 action: () => this.mode = 'table',
