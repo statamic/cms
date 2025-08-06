@@ -52,6 +52,7 @@ class Palette
         return $this
             ->buildNav()
             ->buildFields()
+            ->buildMiscellaneous()
             ->get();
         // });
     }
@@ -107,6 +108,22 @@ class Palette
         Facades\Fieldset::all()
             ->map(fn (Fieldset $fieldset) => $fieldset->commandPaletteLink())
             ->each(fn (Link $link) => $this->addCommand($link));
+
+        return $this;
+    }
+
+    protected function buildMiscellaneous(): self
+    {
+        if (! Facades\User::current()->isSuper()) {
+            return $this;
+        }
+
+        $this->add(
+            text: __('Statamic Documentation'),
+            icon: 'book-next-page',
+            url: 'https://statamic.dev',
+            openNewTab: true,
+        );
 
         return $this;
     }

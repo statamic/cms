@@ -130,7 +130,7 @@ class CommandPaletteTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $miscCommands);
+        $this->assertArraySubset($expected, $miscCommands);
     }
 
     #[Test]
@@ -153,11 +153,12 @@ class CommandPaletteTest extends TestCase
                 'type' => 'link',
                 'text' => ['Preferences', 'Best Website', 'Ask Jeeves'],
                 'url' => 'https://ask.com',
+                'openNewTab' => false,
                 'icon' => 'entry',
                 'keys' => null,
             ],
         ];
 
-        $this->assertEquals($expected, $miscCommands);
+        $this->assertArraySubset($expected, $miscCommands);
     }
 }

@@ -1,10 +1,12 @@
 export default function registerGlobalCommandPalette() {
-    Statamic.$commandPalette.add({
-        text: __('Statamic Documentation'),
-        category: 'Miscellaneous',
-        icon: 'book-next-page',
-        url: 'https://statamic.dev',
-        openNewTab: true,
-        when: () => Statamic.$permissions.has('super'),
-    });
+    // Global command palette link items should be registered and cached on the PHP side,
+    // but we can register global JS-based command palette items here if need be...
+    //
+    // Statamic.$commandPalette.add({
+    //     text: __('Example Link Command'),
+    //     icon: 'book-next-page',
+    //     openNewTab: true,
+    //     when: () => Statamic.$permissions.has('super'),
+    //     action: () => { ... },
+    // });
 }
