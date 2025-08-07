@@ -64,15 +64,17 @@
                         >
                             <template #branch-action="{ branch, index }">
                                 <div>
-                                    <input
+                                    <Checkbox
                                         :ref="`tree-branch-${branch.id}`"
-                                        type="checkbox"
-                                        class="mt-3 ltr:ml-3 rtl:mr-3"
+                                        class="mt-3 mx-3"
                                         :value="branch.id"
-                                        :checked="isSelected(branch.id)"
+                                        :model-value="isSelected(branch.id)"
                                         :disabled="reachedSelectionLimit && !singleSelect && !isSelected(branch.id)"
-                                        :id="`checkbox-${branch.id}`"
-                                        @click="toggleSelection(branch.id)"
+                                        :label="getCheckboxLabel(branch)"
+                                        :description="getCheckboxDescription(branch)"
+                                        size="sm"
+                                        solo
+                                        @update:model-value="toggleSelection(branch.id)"
                                     />
                                 </div>
                             </template>
@@ -129,6 +131,7 @@ import {
     Panel,
     PanelFooter,
     Heading,
+    Checkbox,
 } from '@statamic/ui';
 
 export default {
@@ -145,6 +148,7 @@ export default {
         Panel,
         PanelFooter,
         Heading,
+        Checkbox,
     },
 
     // todo, when opening and closing the stack, you cant save?
@@ -270,6 +274,31 @@ export default {
             if (!this.reachedSelectionLimit) {
                 this.selections.push(id);
             }
+        },
+
+        getCheckboxLabel(row) {
+            const rowTitle = this.getRowTitle(row);
+            return this.isSelected(row.id)
+                ? __('deselect_title', { title: rowTitle })
+                : __('select_title', { title: rowTitle });
+        },
+
+        getCheckboxDescription(row) {
+            const rowTitle = this.getRowTitle(row);
+            const isDisabled = this.reachedSelectionLimit && !this.singleSelect && !this.isSelected(row.id);
+
+            if (isDisabled) {
+                return __('selection_limit_reached', { title: rowTitle });
+            }
+
+            return this.isSelected(row.id)
+                ? __('item_selected_description', { title: rowTitle })
+                : __('item_not_selected_description', { title: rowTitle });
+        },
+
+        getRowTitle(row) {
+            // Try to get a meaningful title from common fields
+            return row.title || row.name || row.label || row.id || __('item');
         },
     },
 };
