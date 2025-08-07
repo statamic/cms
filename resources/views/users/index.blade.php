@@ -24,11 +24,20 @@
         @endcan
 
         @if (Statamic::pro() && $user->can('create', 'Statamic\Contracts\Auth\User'))
-            <ui-button
-                href="{{ cp_route('users.create') }}"
-                variant="primary"
-                :text="__('Create User')"
-            ></ui-button>
+            <ui-command-palette-item
+                category="{{ Statamic\CommandPalette\Category::Actions }}"
+                prioritize
+                text="{{ __('Create User') }}"
+                url="{{ cp_route('users.create') }}"
+                icon="users"
+                v-slot="{ text, url }"
+            >
+                <ui-button
+                    :text="text"
+                    :href="url"
+                    variant="primary"
+                ></ui-button>
+            </ui-command-palette-item>
         @endif
     </ui-header>
 
