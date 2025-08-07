@@ -129,7 +129,7 @@
                                     <div class="flex items-center w-fit-content group">
                                         <asset-thumbnail :asset="asset" :square="true" class="w-8 h-8 rtl:ml-2 ltr:mr-2 cursor-pointer" @click.native.stop="$emit('edit-asset', asset)" />
                                         <label :for="checkboxId" class="cursor-pointer select-none group-hover:text-blue normal-nums" @click.stop="$emit('edit-asset', asset)">
-                                            {{ asset.basename }}
+                                            {{ searchQuery ? asset.path : asset.basename }}
                                         </label>
                                     </div>
                                 </template>
