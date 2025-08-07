@@ -113,7 +113,6 @@ return [
     'link.config.collections' => 'Entries from these collections will be available. Leaving this empty will make entries from routable collections available.',
     'link.config.container' => 'Choose which asset container to use for this field.',
     'link.title' => 'Link',
-    'list.config.cast_integers' => 'Cast numeric values to integers.',
     'list.title' => 'List',
     'markdown.config.automatic_line_breaks' => 'Enables automatic line breaks.',
     'markdown.config.automatic_links' => 'Enables automatic linking of any URLs.',

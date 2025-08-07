@@ -22,7 +22,6 @@ class Width extends Fieldtype
                         'instructions' => __('statamic::fieldtypes.width.config.options'),
                         'type' => 'list',
                         'default' => [25, 33, 50, 66, 75, 100],
-                        'cast_integers' => true,
                     ],
                     'default' => [
                         'display' => __('Default Value'),
