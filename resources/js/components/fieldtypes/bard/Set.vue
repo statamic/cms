@@ -40,7 +40,7 @@
                     />
                 </button>
                 <div class="flex items-center gap-2" v-if="!isReadOnly">
-                    <Tooltip :text="enabled ? __('Included in output') : __('Hidden from output')">
+                    <Tooltip :text="enabled ? __('Included in output') : __('Hidden from output')" as="span">
                         <Switch size="xs" v-model="enabled" />
                     </Tooltip>
 
