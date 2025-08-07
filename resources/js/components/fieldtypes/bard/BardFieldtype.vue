@@ -61,7 +61,7 @@
                         <bubble-menu
                             class="bard-floating-toolbar"
                             :editor="editor"
-                            :tippy-options="{ maxWidth: 'none', zIndex: 1000 }"
+                            :options="{ placement: 'top', offset: [0, 10] }"
                             v-if="editor && toolbarIsFloating && !readOnly"
                         >
                             <component
@@ -130,37 +130,31 @@
 import Fieldtype from '../Fieldtype.vue';
 import uniqid from 'uniqid';
 import Emitter from 'tiny-emitter';
-import { BubbleMenu, Editor, EditorContent } from '@tiptap/vue-3';
+import { Editor, EditorContent } from '@tiptap/vue-3';
+import { BubbleMenu } from '@tiptap/vue-3/menus';
 import { Extension } from '@tiptap/core';
 import { FloatingMenu } from './FloatingMenu';
 import Blockquote from '@tiptap/extension-blockquote';
 import Bold from '@tiptap/extension-bold';
-import BulletList from '@tiptap/extension-bullet-list';
+import { BulletList, OrderedList, ListItem } from '@tiptap/extension-list';
 import CharacterCount from '@tiptap/extension-character-count';
 import Code from '@tiptap/extension-code';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
-import Dropcursor from '@tiptap/extension-dropcursor';
-import Gapcursor from '@tiptap/extension-gapcursor';
 import HardBreak from '@tiptap/extension-hard-break';
 import Heading from '@tiptap/extension-heading';
 import History from '@tiptap/extension-history';
 import HorizontalRule from '@tiptap/extension-horizontal-rule';
 import Italic from '@tiptap/extension-italic';
-import ListItem from '@tiptap/extension-list-item';
-import OrderedList from '@tiptap/extension-ordered-list';
 import Paragraph from '@tiptap/extension-paragraph';
-import Placeholder from '@tiptap/extension-placeholder';
 import Strike from '@tiptap/extension-strike';
 import Subscript from '@tiptap/extension-subscript';
 import Superscript from '@tiptap/extension-superscript';
-import Table from '@tiptap/extension-table';
-import TableRow from '@tiptap/extension-table-row';
-import TableCell from '@tiptap/extension-table-cell';
-import TableHeader from '@tiptap/extension-table-header';
+import { Table, TableRow, TableCell, TableHeader } from '@tiptap/extension-table';
 import Text from '@tiptap/extension-text';
 import TextAlign from '@tiptap/extension-text-align';
 import Typography from '@tiptap/extension-typography';
 import Underline from '@tiptap/extension-underline';
+import { Placeholder, Dropcursor, Gapcursor } from '@tiptap/extensions';
 import SetPicker from '../replicator/SetPicker.vue';
 import { DocumentBlock, DocumentInline } from './Document';
 import { Set } from './Set';
