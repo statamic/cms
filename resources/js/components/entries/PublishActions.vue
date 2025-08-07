@@ -83,7 +83,7 @@ export default {
                 }
             }
 
-            options.push({ value: 'schedule', label: __('Schedule') });
+            // options.push({ value: 'schedule', label: __('Schedule') });
 
             options.push({ value: 'revision', label: __('Create Revision') });
 
