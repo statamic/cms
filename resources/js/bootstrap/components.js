@@ -87,10 +87,6 @@ export default function registerGlobalComponents(app) {
     app.component('git-status', GitStatus);
 
     // Modals
-    app.component(
-        'modal',
-        defineAsyncComponent(() => import('../components/Modal.vue')),
-    );
     app.component('confirmation-modal', ConfirmationModal);
     app.component('keyboard-shortcuts-modal', KeyboardShortcutsModal);
     app.component('resource-deleter', ResourceDeleter);
