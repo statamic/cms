@@ -10,6 +10,7 @@ const props = defineProps({
     url: { type: String },
     action: { type: Function },
     openNewTab: { type: Boolean },
+    prioritize: { type: Boolean },
 });
 
 const command = Statamic.$commandPalette.add(props);
