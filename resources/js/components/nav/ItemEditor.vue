@@ -10,13 +10,12 @@
 
             <div class="flex-1 overflow-auto">
                 <div class="p-3 flex flex-col space-y-6">
-                    <!-- todo: pass in errors -->
                     <Field id="display" :label="__('Display')" required>
-                        <Input id="display" v-model="config.display" :focus="true" />
+                        <Input id="display" v-model="config.display" :focus="true" :error="validateDisplay ? __('statamic::validation.required') : null" />
                     </Field>
 
                     <Field id="url" :label="__('URL')" required>
-                        <Input id="url" v-model="config.url" />
+                        <Input id="url" v-model="config.url" :error="validateUrl ? __('statamic::validation.required') : null" />
                     </Field>
 
                     <Field v-if="!isChild" id="icon" :label="__('Icon')">
