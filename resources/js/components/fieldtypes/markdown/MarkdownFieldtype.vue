@@ -265,7 +265,6 @@ export default {
             selections: null,
             showAssetSelector: false,
             selectedAssets: [],
-            selectorViewMode: null,
             draggingFile: false,
             showCheatsheet: false,
             fullScreenMode: false,

@@ -160,7 +160,6 @@
                 :folder="folder"
                 :restrict-folder-navigation="restrictNavigation"
                 :selected="selectedAssets"
-                :view-mode="selectorViewMode"
                 :max-files="maxFiles"
                 :query-scopes="queryScopes"
                 :columns="columns"
@@ -221,7 +220,6 @@ export default {
             loading: true,
             initializing: true,
             showSelector: false,
-            selectorViewMode: null,
             draggingFile: false,
             uploads: [],
             innerDragging: false,
@@ -654,8 +652,6 @@ export default {
 
     mounted() {
         this.displayMode = this.isInsideGridField ? 'list' : this.config.mode || 'grid';
-
-        this.selectorViewMode = Cookies.get('statamic.assets.listing_view_mode') || 'grid';
 
         // We only have URLs in the field data, so we'll need to get the asset data.
         this.initializeAssets();
