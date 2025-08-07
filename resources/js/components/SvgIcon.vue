@@ -26,7 +26,9 @@ const customIcon = computed(() => {
         directory = directory + '/' + folder;
     }
 
-    return data_get(this.$config.get('customSvgIcons') || {}, `${directory}.${file}`);
+    let svgIcons = this.$config.get('customSvgIcons')[directory] ?? [];
+
+    return svgIcons[file] ?? null;
 });
 
 const evaluateIcon = () => {

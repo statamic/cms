@@ -130,6 +130,7 @@
                                 :folders="folders"
                                 :columns="columns"
                                 :visible-columns="visibleColumns"
+                                :is-searching="!!searchQuery"
                                 v-bind="sharedAssetProps"
                                 v-on="sharedAssetEvents"
                             />

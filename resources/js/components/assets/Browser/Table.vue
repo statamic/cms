@@ -102,7 +102,7 @@
                         class="cursor-pointer normal-nums select-none group-hover:text-blue-500"
                         @click="$emit('edit-asset', asset)"
                     >
-                        {{ asset.basename }}
+                        {{ isSearching ? asset.path : asset.basename }}
                     </button>
                 </div>
             </template>
@@ -156,6 +156,7 @@ export default {
         loading: Boolean,
         columns: Array,
         visibleColumns: Array,
+        isSearching: Boolean
     },
 
     watch: {
