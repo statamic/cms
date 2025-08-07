@@ -10,6 +10,7 @@ const props = defineProps({
     url: { type: String },
     action: { type: Function },
     openNewTab: { type: Boolean },
+    trackRecent: { type: Boolean },
     prioritize: { type: Boolean },
 });
 
