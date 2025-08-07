@@ -4,6 +4,8 @@ namespace Statamic\CommandPalette;
 
 class Link extends Command
 {
+    use Concerns\TracksRecent;
+
     protected $url;
     protected $openNewTab;
 
@@ -26,6 +28,7 @@ class Link extends Command
         return array_merge(parent::toArray(), [
             'url' => $this->url,
             'openNewTab' => $this->openNewTab,
+            'trackRecent' => $this->trackRecent,
         ]);
     }
 }
