@@ -9,10 +9,18 @@
     <ui-header title="{{ __('Users') }}" icon="users">
 
         @can('configure fields')
-            <ui-button
-                :text="__('Edit User Blueprint')"
-                href="{{ cp_route('blueprints.users.edit') }}"
-            ></ui-button>
+            <ui-command-palette-item
+                category="{{ Statamic\CommandPalette\Category::Actions }}"
+                text="{{ __('Edit User Blueprint') }}"
+                url="{{ cp_route('blueprints.users.edit') }}"
+                icon="blueprints"
+                v-slot="{ text, url }"
+            >
+                <ui-button
+                    :text="text"
+                    :href="url"
+                ></ui-button>
+            </ui-command-palette-item>
         @endcan
 
         @if (Statamic::pro() && $user->can('create', 'Statamic\Contracts\Auth\User'))
