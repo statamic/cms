@@ -4,6 +4,7 @@ namespace Tests\CommandPalette;
 
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\CommandPalette\Category;
+use Statamic\CommandPalette\ContentSearchResult;
 use Statamic\Facades;
 use Statamic\Facades\CommandPalette;
 use Statamic\Facades\User;
@@ -95,6 +96,7 @@ class CommandPaletteTest extends TestCase
             text: 'Hotbot',
             url: 'https://hotbot.com',
             openNewTab: true,
+            trackRecent: false,
             icon: 'sexy-robot',
             category: Category::Actions,
             // keys: ... // TODO: test custom hotkey config when we set that up
@@ -116,6 +118,7 @@ class CommandPaletteTest extends TestCase
                 'text' => 'Ask Jeeves',
                 'url' => 'https://ask.com',
                 'openNewTab' => false,
+                'trackRecent' => true,
                 'icon' => 'entry',
                 'keys' => null,
             ],
@@ -125,6 +128,7 @@ class CommandPaletteTest extends TestCase
                 'text' => 'Hotbot',
                 'url' => 'https://hotbot.com',
                 'openNewTab' => true,
+                'trackRecent' => false,
                 'icon' => 'sexy-robot',
                 'keys' => null,
             ],
@@ -160,5 +164,13 @@ class CommandPaletteTest extends TestCase
         ];
 
         $this->assertArraySubset($expected, $miscCommands);
+    }
+
+    #[Test]
+    public function it_tracks_recent_content_search_results_by_default()
+    {
+        $searchResult = new ContentSearchResult('Articles', Category::Search);
+
+        $this->assertTrue($searchResult->toArray()['trackRecent']);
     }
 }
