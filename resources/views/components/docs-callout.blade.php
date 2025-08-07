@@ -9,6 +9,7 @@
             icon="book-next-page"
             url="{{ $url }}"
             open-new-tab
+            track-recent
             v-slot="{ url, icon }"
         >
             <ui-badge
