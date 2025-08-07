@@ -16,6 +16,7 @@ class Command {
         this.action = command.action;
         this.prioritize = command.prioritize ?? false;
         this.type = command.type ?? (command.action ? 'action' : 'link');
+        this.trackRecent = command.trackRecent ?? false;
 
         this.#validate();
     }
