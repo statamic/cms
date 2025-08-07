@@ -14,12 +14,13 @@
                 class="line-clamp-1 text-sm text-gray-600 dark:text-gray-300"
             />
 
-            <button
+            <a
                 v-if="!item.invalid && editable"
                 @click.prevent="edit"
                 v-text="__(item.title)"
                 class="line-clamp-1 text-sm text-gray-600 dark:text-gray-300"
                 v-tooltip="item.title"
+                :href="item.edit_url"
             />
 
             <div v-if="!item.invalid && !editable" v-text="__(item.title)" />
