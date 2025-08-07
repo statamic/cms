@@ -147,10 +147,8 @@ function searchContent() {
 function select(selected) {
     let item = findSelectedItem(selected);
 
-    switch (item.type) {
-        case 'link':
-        case 'content_search_result':
-            addToRecentItems(item);
+    if (item.trackRecent) {
+        addToRecentItems(item);
     }
 
     if (item.href) {
