@@ -47,7 +47,7 @@
                 class="flex items-center rounded-b border-t p-2 dark:border-dark-900"
                 @paste.stop
             >
-                <text-input
+                <Input
                     name="alt"
                     :focus="showingAltEdit"
                     v-model="alt"
@@ -91,6 +91,7 @@ import Asset from '../assets/Asset';
 import { NodeViewWrapper } from '@tiptap/vue-3';
 import Selector from '../../assets/Selector.vue';
 import { containerContextKey } from '@statamic/components/ui/Publish/Container.vue';
+import { Input } from '@statamic/ui';
 
 export default {
     mixins: [Asset],
@@ -98,6 +99,7 @@ export default {
     components: {
         NodeViewWrapper,
         Selector,
+        Input,
     },
 
     inject: {
