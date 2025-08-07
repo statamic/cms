@@ -22,7 +22,7 @@
                     <div class="flex items-center gap-3">
                         <div class="flex flex-1 items-center gap-3">
                             <Search />
-                            <Filters />
+                            <Filters v-if="filters && filters.length" />
                         </div>
 
                         <ui-toggle-group v-model="view" v-if="canUseTree">
