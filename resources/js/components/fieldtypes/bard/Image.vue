@@ -59,12 +59,13 @@
 
             <stack v-if="showingSelector" name="asset-selector" @closed="closeSelector">
                 <selector
-                    :container="extension.options.bard.config.container"
+                    :container="extension.options.bard.meta.asset_container"
                     :folder="extension.options.bard.config.folder || '/'"
                     :restrict-folder-navigation="extension.options.bard.config.restrict_assets"
                     :selected="selections"
                     :view-mode="'grid'"
                     :max-files="1"
+                    :columns="extension.options.bard.meta.asset_columns"
                     @selected="assetsSelected"
                     @closed="closeSelector"
                 >

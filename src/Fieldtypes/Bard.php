@@ -9,6 +9,8 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Site;
+use Statamic\Facades\User;
+use Statamic\Fields\Field;
 use Statamic\Fields\Value;
 use Statamic\Fieldtypes\Bard\Augmentor;
 use Statamic\GraphQL\Types\BardSetsType;
@@ -629,6 +631,25 @@ class Bard extends Replicator
             'linkCollections' => $linkCollections,
             'linkData' => (object) $this->getLinkData($value),
         ];
+
+        if (
+            $this->config('container')
+            && $container = \Statamic\Facades\AssetContainer::find($this->config('container'))
+        ) {
+            $assetsField = new Field(
+                handle: 'assets',
+                config: [
+                    'type' => 'assets',
+                    'container' => $container->handle(),
+                    'folder' => $this->config('folder'),
+                ],
+            );
+
+            $assetsMeta = $assetsField->meta();
+
+            $data['asset_container'] = $assetsMeta['container'];
+            $data['asset_columns'] = $assetsMeta['columns'];
+        }
 
         return $this->runHooks('preload', $data);
     }
