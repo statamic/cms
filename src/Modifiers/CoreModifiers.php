@@ -969,7 +969,7 @@ class CoreModifiers extends Modifier
      * @param  array  $context
      * @return bool
      */
-    public function includes($haystack, $params, $context)
+    public function overlaps($haystack, $params, $context)
     {
         $needle = $this->getFromContext($context, $params);
 
@@ -1000,9 +1000,9 @@ class CoreModifiers extends Modifier
      * @param  array  $context
      * @return bool
      */
-    public function doesnt_include($haystack, $params, $context)
+    public function doesnt_overlap($haystack, $params, $context)
     {
-        return ! $this->includes($haystack, $params, $context);
+        return ! $this->overlaps($haystack, $params, $context);
     }
 
     private function renderAPStyleHeadline($value)

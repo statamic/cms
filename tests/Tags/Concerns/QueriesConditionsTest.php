@@ -586,27 +586,27 @@ class QueriesConditionsTest extends TestCase
     }
 
     #[Test]
-    public function it_filters_by_includes_condition()
+    public function it_filters_by_overlaps_condition()
     {
         $this->makeEntry('a')->set('ages', [22, 52, 72])->save();
         $this->makeEntry('b')->set('ages', [57, 72])->save();
         $this->makeEntry('c')->set('ages', [2, 31, 22])->save();
 
         $this->assertCount(3, $this->getEntries());
-        $this->assertCount(2, $this->getEntries(['ages:includes' => 72]));
-        $this->assertCount(1, $this->getEntries(['ages:includes' => 31]));
+        $this->assertCount(2, $this->getEntries(['ages:overlaps' => 72]));
+        $this->assertCount(1, $this->getEntries(['ages:overlaps' => 31]));
     }
 
     #[Test]
-    public function it_filters_by_doesnt_include_condition()
+    public function it_filters_by_doesnt_overlap_condition()
     {
         $this->makeEntry('a')->set('ages', [22, 52, 72])->save();
         $this->makeEntry('b')->set('ages', [57, 72])->save();
         $this->makeEntry('c')->set('ages', [2, 31, 22])->save();
 
         $this->assertCount(3, $this->getEntries());
-        $this->assertCount(1, $this->getEntries(['ages:doesnt_include' => 72]));
-        $this->assertCount(2, $this->getEntries(['ages:doesnt_include' => 31]));
+        $this->assertCount(1, $this->getEntries(['ages:doesnt_overlap' => 72]));
+        $this->assertCount(2, $this->getEntries(['ages:doesnt_overlap' => 31]));
     }
 
     #[Test]
