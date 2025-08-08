@@ -2,14 +2,22 @@
 
 namespace Tests\Support\Concerns;
 
+use ArrayIterator;
 use ArrayObject;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\ItemNotFoundException;
+use Illuminate\Support\MultipleItemsFoundException;
 use InvalidArgumentException;
-use PHPUnit\Framework\Attributes\Test;
+use IteratorAggregate;
+use JsonSerializable;
 use Statamic\Support\Arr;
 use stdClass;
+use Traversable;
+use WeakMap;
 
 /**
  * These tests are copied over from laravel/framework (v12.22.1), so that we can better detect
@@ -1851,4 +1859,73 @@ trait TestsIlluminateArr
 
         $this->assertEquals([[0 => 'John', 1 => 'Jane'], [2 => 'Greg']], $result);
     }
+}
+
+class TestArrayableObject implements Arrayable
+{
+    public function toArray()
+    {
+        return ['foo' => 'bar'];
+    }
+}
+
+class TestJsonableObject implements Jsonable
+{
+    public function toJson($options = 0)
+    {
+        return '{"foo":"bar"}';
+    }
+}
+
+class TestJsonSerializeObject implements JsonSerializable
+{
+    public function jsonSerialize(): array
+    {
+        return ['foo' => 'bar'];
+    }
+}
+
+class TestJsonSerializeWithScalarValueObject implements JsonSerializable
+{
+    public function jsonSerialize(): string
+    {
+        return 'foo';
+    }
+}
+
+class TestTraversableAndJsonSerializableObject implements IteratorAggregate, JsonSerializable
+{
+    public $items;
+
+    public function __construct($items = [])
+    {
+        $this->items = $items;
+    }
+
+    public function getIterator(): Traversable
+    {
+        return new ArrayIterator($this->items);
+    }
+
+    public function jsonSerialize(): array
+    {
+        return json_decode(json_encode($this->items), true);
+    }
+}
+
+enum TestEnum
+{
+    case A;
+}
+
+enum TestBackedEnum: int
+{
+    case A = 1;
+    case B = 2;
+}
+
+enum TestStringBackedEnum: string
+{
+    case A = 'A';
+    case B = 'B';
 }
