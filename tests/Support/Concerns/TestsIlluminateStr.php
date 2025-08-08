@@ -3,10 +3,10 @@
 namespace Tests\Support\Concerns;
 
 use Exception;
-use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Ramsey\Uuid\UuidInterface;
 use ReflectionClass;
+use Statamic\Support\Str;
 use ValueError;
 
 /**
