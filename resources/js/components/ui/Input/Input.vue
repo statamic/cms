@@ -110,7 +110,7 @@ const togglePassword = () => {
 const copied = ref(false);
 const copy = () => {
     if (!props.modelValue) return;
-    navigator.clipboard.writeText('props.modelValue');
+    navigator.clipboard.writeText(props.modelValue);
     copied.value = true;
     setTimeout(() => (copied.value = false), 1000);
 };
