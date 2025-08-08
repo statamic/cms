@@ -28,7 +28,6 @@ import ElevatedSessionModal from '../components/modals/ElevatedSessionModal.vue'
 import ResourceDeleter from '../components/ResourceDeleter.vue';
 import Stack from '../components/stacks/Stack.vue';
 import StackTest from '../components/stacks/StackTest.vue';
-import CodeBlock from '../components/CodeBlock.vue';
 import BlueprintCreateForm from '../components/blueprints/BlueprintCreateForm.vue';
 import BlueprintResetter from '../components/blueprints/BlueprintResetter.vue';
 import GitStatus from '../components/GitStatus.vue';
@@ -70,7 +69,6 @@ export default function registerGlobalComponents(app) {
     app.component('avatar', Avatar);
     app.component('create-entry-button', CreateEntryButton);
     app.component('portal', Portal);
-    app.component('code-block', CodeBlock);
     app.component('date-time', DateTime);
     app.component('git-status', GitStatus);
 
