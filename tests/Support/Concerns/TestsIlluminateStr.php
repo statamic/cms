@@ -10,7 +10,7 @@ use Statamic\Support\Str;
 use ValueError;
 
 /**
- * These tests are copied over from laravel/framework (v10.1.4), so that we can better detect
+ * These tests are copied over from laravel/framework (v12.22.1), so that we can better detect
  * via CI when there are changes to Illuminate\Support\Str which might affect our users.
  *
  * Note: We're testing this functionality through Statamic\Support\Str, which
@@ -192,6 +192,45 @@ trait TestsIlluminateStr
         $this->assertFalse(Str::startsWith('你好', 'a'));
     }
 
+    public function testDoesntStartWith()
+    {
+        if (version_compare(app()->version(), '12.20.0', '<')) {
+            $this->markTestSkipped('This test requires Laravel 12.20.0 or higher.');
+        }
+
+        $this->assertFalse(Str::doesntStartWith('jason', 'jas'));
+        $this->assertFalse(Str::doesntStartWith('jason', 'jason'));
+        $this->assertFalse(Str::doesntStartWith('jason', ['jas']));
+        $this->assertFalse(Str::doesntStartWith('jason', ['day', 'jas']));
+        $this->assertFalse(Str::doesntStartWith('jason', collect(['day', 'jas'])));
+        $this->assertTrue(Str::doesntStartWith('jason', 'day'));
+        $this->assertTrue(Str::doesntStartWith('jason', ['day']));
+        $this->assertTrue(Str::doesntStartWith('jason', null));
+        $this->assertTrue(Str::doesntStartWith('jason', [null]));
+        $this->assertTrue(Str::doesntStartWith('0123', [null]));
+        $this->assertFalse(Str::doesntStartWith('0123', 0));
+        $this->assertTrue(Str::doesntStartWith('jason', 'J'));
+        $this->assertTrue(Str::doesntStartWith('jason', ''));
+        $this->assertTrue(Str::doesntStartWith('', ''));
+        $this->assertTrue(Str::doesntStartWith('7', ' 7'));
+        $this->assertFalse(Str::doesntStartWith('7a', '7'));
+        $this->assertFalse(Str::doesntStartWith('7a', 7));
+        $this->assertFalse(Str::doesntStartWith('7.12a', 7.12));
+        $this->assertTrue(Str::doesntStartWith('7.12a', 7.13));
+        $this->assertFalse(Str::doesntStartWith(7.123, '7'));
+        $this->assertFalse(Str::doesntStartWith(7.123, '7.12'));
+        $this->assertTrue(Str::doesntStartWith(7.123, '7.13'));
+        $this->assertTrue(Str::doesntStartWith(null, 'Marc'));
+        // Test for multibyte string support
+        $this->assertFalse(Str::doesntStartWith('Jönköping', 'Jö'));
+        $this->assertFalse(Str::doesntStartWith('Malmö', 'Malmö'));
+        $this->assertTrue(Str::doesntStartWith('Jönköping', 'Jonko'));
+        $this->assertTrue(Str::doesntStartWith('Malmö', 'Malmo'));
+        $this->assertFalse(Str::doesntStartWith('你好', '你'));
+        $this->assertTrue(Str::doesntStartWith('你好', '好'));
+        $this->assertTrue(Str::doesntStartWith('你好', 'a'));
+    }
+
     public function testEndsWith()
     {
         $this->assertTrue(Str::endsWith('jason', 'on'));
@@ -223,6 +262,43 @@ trait TestsIlluminateStr
         $this->assertTrue(Str::endsWith('你好', '好'));
         $this->assertFalse(Str::endsWith('你好', '你'));
         $this->assertFalse(Str::endsWith('你好', 'a'));
+    }
+
+    public function testDoesntEndWith()
+    {
+        if (version_compare(app()->version(), '12.20.0', '<')) {
+            $this->markTestSkipped('This test requires Laravel 12.20.0 or higher.');
+        }
+
+        $this->assertFalse(Str::doesntEndWith('jason', 'on'));
+        $this->assertFalse(Str::doesntEndWith('jason', 'jason'));
+        $this->assertFalse(Str::doesntEndWith('jason', ['on']));
+        $this->assertFalse(Str::doesntEndWith('jason', ['no', 'on']));
+        $this->assertFalse(Str::doesntEndWith('jason', collect(['no', 'on'])));
+        $this->assertTrue(Str::doesntEndWith('jason', 'no'));
+        $this->assertTrue(Str::doesntEndWith('jason', ['no']));
+        $this->assertTrue(Str::doesntEndWith('jason', ''));
+        $this->assertTrue(Str::doesntEndWith('', ''));
+        $this->assertTrue(Str::doesntEndWith('jason', [null]));
+        $this->assertTrue(Str::doesntEndWith('jason', null));
+        $this->assertTrue(Str::doesntEndWith('jason', 'N'));
+        $this->assertTrue(Str::doesntEndWith('7', ' 7'));
+        $this->assertFalse(Str::doesntEndWith('a7', '7'));
+        $this->assertFalse(Str::doesntEndWith('a7', 7));
+        $this->assertFalse(Str::doesntEndWith('a7.12', 7.12));
+        $this->assertTrue(Str::doesntEndWith('a7.12', 7.13));
+        $this->assertFalse(Str::doesntEndWith(0.27, '7'));
+        $this->assertFalse(Str::doesntEndWith(0.27, '0.27'));
+        $this->assertTrue(Str::doesntEndWith(0.27, '8'));
+        $this->assertTrue(Str::doesntEndWith(null, 'Marc'));
+        // Test for multibyte string support
+        $this->assertFalse(Str::doesntEndWith('Jönköping', 'öping'));
+        $this->assertFalse(Str::doesntEndWith('Malmö', 'mö'));
+        $this->assertTrue(Str::doesntEndWith('Jönköping', 'oping'));
+        $this->assertTrue(Str::doesntEndWith('Malmö', 'mo'));
+        $this->assertFalse(Str::doesntEndWith('你好', '好'));
+        $this->assertTrue(Str::doesntEndWith('你好', '你'));
+        $this->assertTrue(Str::doesntEndWith('你好', 'a'));
     }
 
     public function testStrExcerpt()
@@ -420,6 +496,10 @@ trait TestsIlluminateStr
         $this->assertSame('what', Str::deduplicate('whaaat', 'a'));
         $this->assertSame('/some/odd/path/', Str::deduplicate('/some//odd//path/', '/'));
         $this->assertSame('ムだム', Str::deduplicate('ムだだム', 'だ'));
+
+        if (version_compare(app()->version(), '12.22.0', '>=')) {
+            $this->assertSame(' laravel forever ', Str::deduplicate(' laravell    foreverrr  ', [' ', 'l', 'r']));
+        }
     }
 
     public function testParseCallback()
@@ -469,20 +549,20 @@ trait TestsIlluminateStr
     /**
      * This tests protected property behavior, which is irrelevant to the purpose of this trait.
      */
-    // public function testFlushCache()
-    // {
-    //     $reflection = new ReflectionClass(Str::class);
-    //     $property = $reflection->getProperty('snakeCache');
+    //public function testFlushCache()
+    //{
+    //    $reflection = new ReflectionClass(Str::class);
+    //    $property = $reflection->getProperty('snakeCache');
 
-    //     Str::flushCache();
-    //     $this->assertEmpty($property->getValue());
+    //    Str::flushCache();
+    //    $this->assertEmpty($property->getValue());
 
-    //     Str::snake('Taylor Otwell');
-    //     $this->assertNotEmpty($property->getValue());
+    //    Str::snake('Taylor Otwell');
+    //    $this->assertNotEmpty($property->getValue());
 
-    //     Str::flushCache();
-    //     $this->assertEmpty($property->getValue());
-    // }
+    //    Str::flushCache();
+    //    $this->assertEmpty($property->getValue());
+    //}
 
     public function testFinish()
     {
@@ -559,6 +639,56 @@ trait TestsIlluminateStr
         $this->assertTrue(Str::is([null], null));
     }
 
+    public function testIsWithMultilineStrings()
+    {
+        if (version_compare(app()->version(), '12.0.0', '<')) {
+            $this->markTestSkipped('This test requires Laravel 12.0.0 or higher.');
+        }
+
+        $this->assertFalse(Str::is('/', "/\n"));
+        $this->assertTrue(Str::is('/*', "/\n"));
+        $this->assertTrue(Str::is('*/*', "/\n"));
+        $this->assertTrue(Str::is('*/*', "\n/\n"));
+
+        $this->assertTrue(Str::is('*', "\n"));
+        $this->assertTrue(Str::is('*', "\n\n"));
+        $this->assertFalse(Str::is('', "\n"));
+        $this->assertFalse(Str::is('', "\n\n"));
+
+        $multilineValue = <<<'VALUE'
+        <?php
+
+        namespace Illuminate\Tests\Support;
+
+        use Exception;
+        VALUE;
+
+        $this->assertTrue(Str::is($multilineValue, $multilineValue));
+        $this->assertTrue(Str::is('*', $multilineValue));
+        $this->assertTrue(Str::is("*namespace Illuminate\Tests\*", $multilineValue));
+        $this->assertFalse(Str::is("namespace Illuminate\Tests\*", $multilineValue));
+        $this->assertFalse(Str::is("*namespace Illuminate\Tests", $multilineValue));
+        $this->assertTrue(Str::is('<?php*', $multilineValue));
+        $this->assertTrue(Str::is("<?php*namespace Illuminate\Tests\*", $multilineValue));
+        $this->assertFalse(Str::is('use Exception;', $multilineValue));
+        $this->assertFalse(Str::is('use Exception;*', $multilineValue));
+        $this->assertTrue(Str::is('*use Exception;', $multilineValue));
+
+        $this->assertTrue(Str::is("<?php\n\nnamespace Illuminate\Tests\*", $multilineValue));
+
+        $this->assertTrue(Str::is(<<<'PATTERN'
+        <?php
+        *
+        namespace Illuminate\Tests\*
+        PATTERN, $multilineValue));
+
+        $this->assertTrue(Str::is(<<<'PATTERN'
+        <?php
+
+        namespace Illuminate\Tests\*
+        PATTERN, $multilineValue));
+    }
+
     public function testIsUrl()
     {
         $this->assertTrue(Str::isUrl('https://laravel.com'));
@@ -576,6 +706,16 @@ trait TestsIlluminateStr
     public function testIsUuidWithInvalidUuid($uuid)
     {
         $this->assertFalse(Str::isUuid($uuid));
+    }
+
+    #[DataProvider('uuidVersionList')]
+    public function testIsUuidWithVersion($uuid, $version, $passes)
+    {
+        if (version_compare(app()->version(), '12.0.0', '<')) {
+            $this->markTestSkipped('This test requires Laravel 12.0.0 or higher.');
+        }
+
+        $this->assertSame(Str::isUuid($uuid, $version), $passes);
     }
 
     public function testIsJson()
@@ -1006,7 +1146,7 @@ trait TestsIlluminateStr
     public function testPascal()
     {
         if (version_compare(app()->version(), '11.43.0', '<')) {
-            $this->markTestSkipped('Str::pascal() was added in Laravel 11.43.0');
+            $this->markTestSkipped('This test requires Laravel 11.43.0 or higher.');
         }
 
         $this->assertSame('LaravelPhpFramework', Str::pascal('laravel_php_framework'));
@@ -1303,6 +1443,60 @@ trait TestsIlluminateStr
             ['af6f8cb-c57d-11e1-9b21-0800200c9a66'],
             ['af6f8cb0c57d11e19b210800200c9a66'],
             ['ff6f8cb0-c57da-51e1-9b21-0800200c9a66'],
+        ];
+    }
+
+    public static function uuidVersionList()
+    {
+        return [
+            ['00000000-0000-0000-0000-000000000000', null, true],
+            ['00000000-0000-0000-0000-000000000000', 0, true],
+            ['00000000-0000-0000-0000-000000000000', 1, false],
+            ['00000000-0000-0000-0000-000000000000', 42, false],
+            ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1', null, true],
+            ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1', 1, true],
+            ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1', 4, false],
+            ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1', 42, false],
+            ['ff6f8cb0-c57d-21e1-9b21-0800200c9a66', null, true],
+            ['ff6f8cb0-c57d-21e1-9b21-0800200c9a66', 1, false],
+            ['ff6f8cb0-c57d-21e1-9b21-0800200c9a66', 2, true],
+            ['ff6f8cb0-c57d-21e1-9b21-0800200c9a66', 42, false],
+            ['76a4ba72-cc4e-3e1d-b52d-856382f408c3', null, true],
+            ['76a4ba72-cc4e-3e1d-b52d-856382f408c3', 1, false],
+            ['76a4ba72-cc4e-3e1d-b52d-856382f408c3', 3, true],
+            ['76a4ba72-cc4e-3e1d-b52d-856382f408c3', 42, false],
+            ['a0a2a2d2-0b87-4a18-83f2-2529882be2de', null, true],
+            ['a0a2a2d2-0b87-4a18-83f2-2529882be2de', 1, false],
+            ['a0a2a2d2-0b87-4a18-83f2-2529882be2de', 4, true],
+            ['a0a2a2d2-0b87-4a18-83f2-2529882be2de', 42, false],
+            ['d3b2b5a9-d433-5c58-b038-4fa13696e357', null, true],
+            ['d3b2b5a9-d433-5c58-b038-4fa13696e357', 1, false],
+            ['d3b2b5a9-d433-5c58-b038-4fa13696e357', 5, true],
+            ['d3b2b5a9-d433-5c58-b038-4fa13696e357', 42, false],
+            ['1ef97d97-b5ab-67d8-9f12-5600051f1387', null, true],
+            ['1ef97d97-b5ab-67d8-9f12-5600051f1387', 1, false],
+            ['1ef97d97-b5ab-67d8-9f12-5600051f1387', 6, true],
+            ['1ef97d97-b5ab-67d8-9f12-5600051f1387', 42, false],
+            ['0192e4b9-92eb-7aec-8707-1becfb1e3eb7', null, true],
+            ['0192e4b9-92eb-7aec-8707-1becfb1e3eb7', 1, false],
+            ['0192e4b9-92eb-7aec-8707-1becfb1e3eb7', 7, true],
+            ['0192e4b9-92eb-7aec-8707-1becfb1e3eb7', 42, false],
+            ['07e80a1f-1629-831f-811f-c595103c91b5', null, true],
+            ['07e80a1f-1629-831f-811f-c595103c91b5', 1, false],
+            ['07e80a1f-1629-831f-811f-c595103c91b5', 8, true],
+            ['07e80a1f-1629-831f-811f-c595103c91b5', 42, false],
+            ['FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF', null, true],
+            ['FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF', 1, false],
+            ['FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF', 42, false],
+            ['FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF', 'max', true],
+            ['a0a2a2d2-0b87-4a18-83f2-2529882be2de', null, true],
+            ['a0a2a2d2-0b87-4a18-83f2-2529882be2de', 1, false],
+            ['a0a2a2d2-0b87-4a18-83f2-2529882be2de', 4, true],
+            ['a0a2a2d2-0b87-4a18-83f2-2529882be2de', 42, false],
+            ['zf6f8cb0-c57d-11e1-9b21-0800200c9a66', null, false],
+            ['zf6f8cb0-c57d-11e1-9b21-0800200c9a66', 1, false],
+            ['zf6f8cb0-c57d-11e1-9b21-0800200c9a66', 4, false],
+            ['zf6f8cb0-c57d-11e1-9b21-0800200c9a66', 42, false],
         ];
     }
 
@@ -1671,6 +1865,66 @@ trait TestsIlluminateStr
 
             $this->assertSame($expected, Str::chopEnd($subject, $needle));
         }
+    }
+
+    public function testReplaceMatches()
+    {
+        // Test basic string replacement
+        $this->assertSame('foo bar bar', Str::replaceMatches('/baz/', 'bar', 'foo baz bar'));
+        $this->assertSame('foo baz baz', Str::replaceMatches('/404/', 'found', 'foo baz baz'));
+
+        // Test with array of patterns
+        $this->assertSame('foo XXX YYY', Str::replaceMatches(['/bar/', '/baz/'], ['XXX', 'YYY'], 'foo bar baz'));
+
+        // Test with callback
+        $result = Str::replaceMatches('/ba(.)/', function ($match) {
+            return 'ba'.strtoupper($match[1]);
+        }, 'foo baz bar');
+
+        $this->assertSame('foo baZ baR', $result);
+
+        $result = Str::replaceMatches('/(\d+)/', function ($match) {
+            return $match[1] * 2;
+        }, 'foo 123 bar 456');
+
+        $this->assertSame('foo 246 bar 912', $result);
+
+        // Test with limit parameter
+        $this->assertSame('foo baz baz', Str::replaceMatches('/ba(.)/', 'ba$1', 'foo baz baz', 1));
+
+        $result = Str::replaceMatches('/ba(.)/', function ($match) {
+            return 'ba'.strtoupper($match[1]);
+        }, 'foo baz baz bar', 1);
+
+        $this->assertSame('foo baZ baz bar', $result);
+    }
+
+    public function testPluralPascal(): void
+    {
+        if (version_compare(app()->version(), '11.43.0', '<')) {
+            $this->markTestSkipped('This test requires Laravel 11.43.0 or higher.');
+        }
+
+        // Test basic functionality with default count
+        $this->assertSame('UserGroups', Str::pluralPascal('UserGroup'));
+        $this->assertSame('ProductCategories', Str::pluralPascal('ProductCategory'));
+
+        // Test with different count values and array
+        $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', 0)); // plural
+        $this->assertSame('UserGroup', Str::pluralPascal('UserGroup', 1));  // singular
+        $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', 2)); // plural
+        $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', []));   // plural (empty array count is 0)
+
+        // Test with Countable
+        $countable = new class implements \Countable
+        {
+            public function count(): int
+            {
+                return 3;
+            }
+        };
+
+        $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', $countable));
     }
 }
 class StringableObjectStub
