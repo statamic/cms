@@ -9,7 +9,6 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Site;
-use Statamic\Facades\User;
 use Statamic\Fields\Field;
 use Statamic\Fields\Value;
 use Statamic\Fieldtypes\Bard\Augmentor;
