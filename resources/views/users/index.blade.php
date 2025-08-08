@@ -7,7 +7,6 @@
 
 @section('content')
     <ui-header title="{{ __('Users') }}" icon="users">
-
         @can('configure fields')
             <ui-command-palette-item
                 category="{{ Statamic\CommandPalette\Category::Actions }}"
