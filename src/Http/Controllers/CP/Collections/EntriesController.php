@@ -25,6 +25,7 @@ use Statamic\Support\Str;
 class EntriesController extends CpController
 {
     use ExtractsFromEntryFields,
+        QueriesAuthorEntries,
         QueriesFilters;
 
     public function index(FilteredRequest $request, $collection)
@@ -84,6 +85,10 @@ class EntriesController extends CpController
             $query->whereIn('site', Site::authorized()->map->handle()->all());
         }
 
+        if (User::current()->cant('view-other-authors-entries', [EntryContract::class, $collection])) {
+            $this->queryAuthorEntries($query, $collection);
+        }
+
         return $query;
     }
 
@@ -100,10 +105,6 @@ class EntriesController extends CpController
         }
 
         $blueprint->setParent($entry);
-
-        if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
-            $blueprint->ensureFieldHasConfig('author', ['visibility' => 'read_only']);
-        }
 
         [$values, $meta, $extraValues] = $this->extractFromFields($entry, $blueprint);
 
@@ -298,10 +299,6 @@ class EntriesController extends CpController
 
         if (! $blueprint) {
             throw new \Exception(__('A valid blueprint is required.'));
-        }
-
-        if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
-            $blueprint->ensureFieldHasConfig('author', ['visibility' => 'read_only']);
         }
 
         $values = Entry::make()->collection($collection)->values()->all();
