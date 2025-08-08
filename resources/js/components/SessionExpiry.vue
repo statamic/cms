@@ -25,7 +25,7 @@
                             v-model="password"
                             :viewable="true"
                             ref="password"
-                            tabindex="1"
+                            :tabindex="1"
                             autofocus
                             @keydown.enter.prevent="submit"
                         />
@@ -45,7 +45,7 @@
                             name="code"
                             v-model="twoFactorCode"
                             ref="twoFactorCode"
-                            tabindex="1"
+                            :tabindex="1"
                             pattern="[0-9]*"
                             maxlength="6"
                             inputmode="numeric"
@@ -68,7 +68,7 @@
                             name="recovery_code"
                             v-model="twoFactorRecoveryCode"
                             ref="twoFactorRecoveryCode"
-                            tabindex="1"
+                            :tabindex="1"
                             maxlength="21"
                             autofocus
                             autocomplete="off"

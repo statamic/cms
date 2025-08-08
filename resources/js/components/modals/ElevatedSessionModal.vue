@@ -13,7 +13,7 @@
                                 type="password"
                                 v-model="password"
                                 ref="password"
-                                tabindex="1"
+                                :tabindex="1"
                                 autofocus
                                 @keydown.enter.prevent="submit"
                             />
@@ -38,7 +38,7 @@
                                 type="text"
                                 v-model="verificationCode"
                                 ref="verificationCode"
-                                tabindex="1"
+                                :tabindex="1"
                                 autofocus
                                 @keydown.enter.prevent="submit"
                             />

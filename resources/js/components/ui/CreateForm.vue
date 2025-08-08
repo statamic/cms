@@ -74,7 +74,7 @@ onMounted(() => {
                         :instructions="titleInstructions"
                         :instructions-below="true"
                     >
-                        <ui-input v-model="title" autofocus tabindex="1" />
+                        <ui-input v-model="title" autofocus :tabindex="1" />
                     </ui-field>
                     <ui-field
                         v-if="!withoutHandle"
@@ -82,7 +82,7 @@ onMounted(() => {
                         :instructions="handleInstructions"
                         :instructions-below="true"
                     >
-                        <ui-input v-model="handle" tabindex="2" :loading="slug.busy" />
+                        <ui-input v-model="handle" :tabindex="2" :loading="slug.busy" />
                     </ui-field>
                 </div>
             </ui-card-panel>
