@@ -3,8 +3,6 @@ import Browser from '../components/assets/Browser/Browser.vue';
 import UpdatesBadge from '../components/UpdatesBadge.vue';
 import FullscreenHeader from '../components/publish/FullscreenHeader.vue';
 import FieldMeta from '../components/publish/FieldMeta.vue';
-import LivePreview from '../components/live-preview/LivePreview.vue';
-import Popout from '../components/live-preview/Popout.vue';
 import EntryPublishForm from '../components/entries/PublishForm.vue';
 import TermPublishForm from '../components/terms/PublishForm.vue';
 import UserPublishForm from '../components/users/PublishForm.vue';
@@ -50,9 +48,6 @@ export default function registerGlobalComponents(app) {
     // Publish
     app.component('publish-field-meta', FieldMeta);
     app.component('publish-field-fullscreen-header', FullscreenHeader);
-
-    app.component('live-preview', LivePreview);
-    app.component('live-preview-popout', Popout);
 
     app.component('EntryPublishForm', EntryPublishForm);
     app.component('TermPublishForm', TermPublishForm);
