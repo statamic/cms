@@ -516,13 +516,16 @@ trait TestsIlluminateStr
         $this->assertFalse(Str::is('A', 'a'));
 
         // is not case sensitive
-        $this->assertTrue(Str::is('A', 'a', true));
-        $this->assertTrue(Str::is('*BAZ*', 'foo/bar/baz', true));
-        $this->assertTrue(Str::is(['A*', 'B*'], 'a/', true));
-        $this->assertFalse(Str::is(['A*', 'B*'], 'f/', true));
-        $this->assertTrue(Str::is('FOO', 'foo', true));
-        $this->assertTrue(Str::is('*FOO*', 'foo/bar/baz', true));
-        $this->assertTrue(Str::is('foo/*', 'FOO/bar', true));
+        if (version_compare(app()->version(), '11.37.0', '>=')) {
+            // the ignoreCase param was added in Laravel 11.37.0
+            $this->assertTrue(Str::is('A', 'a', true));
+            $this->assertTrue(Str::is('*BAZ*', 'foo/bar/baz', true));
+            $this->assertTrue(Str::is(['A*', 'B*'], 'a/', true));
+            $this->assertFalse(Str::is(['A*', 'B*'], 'f/', true));
+            $this->assertTrue(Str::is('FOO', 'foo', true));
+            $this->assertTrue(Str::is('*FOO*', 'foo/bar/baz', true));
+            $this->assertTrue(Str::is('foo/*', 'FOO/bar', true));
+        }
 
         // Accepts array of patterns
         $this->assertTrue(Str::is(['a*', 'b*'], 'a/'));
@@ -995,6 +998,10 @@ trait TestsIlluminateStr
 
     public function testPascal()
     {
+        if (version_compare(app()->version(), '11.43.0', '<')) {
+            $this->markTestSkipped('Str::pascal() was added in Laravel 11.43.0');
+        }
+
         $this->assertSame('LaravelPhpFramework', Str::pascal('laravel_php_framework'));
         $this->assertSame('LaravelPhpFramework', Str::pascal('laravel-php-framework'));
         $this->assertSame('LaravelPhpFramework', Str::pascal('laravel  -_-  php   -_-   framework   '));
