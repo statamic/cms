@@ -1,6 +1,6 @@
 <template>
     <div>
-        <button class="btn" @click="confirming = true" v-text="__('Restore')" />
+        <Button @click="confirming = true" :text="__('Restore')" />
 
         <confirmation-modal
             v-if="confirming"
@@ -16,7 +16,13 @@
 </template>
 
 <script>
+import { Button } from '@statamic/ui';
+
 export default {
+    components: {
+        Button,
+    },
+
     props: {
         revision: Object,
         url: String,

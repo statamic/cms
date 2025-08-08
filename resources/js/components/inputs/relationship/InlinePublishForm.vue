@@ -24,9 +24,9 @@
                     :publish-container="publishContainer"
                     @saved="saved"
                 >
-                    <template slot="action-buttons-right">
+                    <template #action-buttons-right>
                         <slot name="action-buttons-right" />
-                        <button type="button" class="btn-close" @click="confirmClose" v-html="'&times'" />
+                        <Button icon="x" size="sm" variant="ghost" class="-me-2" @click="close" />
                     </template>
                 </component>
             </div>
@@ -45,10 +45,11 @@
 </template>
 
 <script>
-import { Icon } from '@statamic/ui';
+import { Button, Icon } from '@statamic/ui';
 
 export default {
     components: {
+        Button,
         Icon,
     },
     props: {
