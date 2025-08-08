@@ -1,51 +1,29 @@
 <template>
-    <data-list :visible-columns="columns" :columns="columns" :rows="items">
-        <div class="card overflow-hidden p-0 relative" slot-scope="{ filteredRows: rows }">
-            <data-list-bulk-actions
-                class="rounded"
-                :url="actionUrl"
-                @started="actionStarted"
-                @completed="actionCompleted"
+    <Listing :items="items" :columns="initialColumns" :action-url="actionUrl">
+        <template #cell-title="{ row: form }">
+            <a :href="form.show_url">{{ form.title }}</a>
+        </template>
+        <template #prepended-row-actions="{ row: form }">
+            <DropdownItem v-if="form.can_edit" :text="__('Configure')" :href="form.edit_url" icon="cog" />
+            <DropdownItem
+                v-if="form.can_edit_blueprint"
+                icon="blueprint-edit"
+                :text="__('Edit Blueprint')"
+                :href="form.blueprint_url"
             />
-
-            <data-list-table :allow-bulk-actions="true">
-                <template slot="cell-title" slot-scope="{ row: form }">
-                    <a :href="form.show_url">{{ form.title }}</a>
-                </template>
-                <template slot="actions" slot-scope="{ row: form, index }">
-                    <dropdown-list v-if="form.can_edit || form.can_edit_blueprint || form.actions.length">
-                        <dropdown-item v-if="form.can_edit" :text="__('Edit')" :redirect="form.edit_url" />
-                        <dropdown-item v-if="form.can_edit_blueprint" :text="__('Edit Blueprint')" :redirect="form.blueprint_url" />
-                        <div class="divider" v-if="form.actions.length" />
-                        <data-list-inline-actions
-                            :item="form.id"
-                            :url="actionUrl"
-                            :actions="form.actions"
-                            @started="actionStarted"
-                            @completed="actionCompleted"
-                        />
-                    </dropdown-list>
-                </template>
-            </data-list-table>
-        </div>
-    </data-list>
+        </template>
+    </Listing>
 </template>
 
 <script>
-import Listing from '../Listing.vue'
+import { Listing, DropdownItem } from '@statamic/ui';
 
 export default {
+    components: {
+        Listing,
+        DropdownItem,
+    },
 
-    mixins: [Listing],
-
-    props: ['initialColumns'],
-
-    data() {
-        return {
-            columns: this.initialColumns,
-            requestUrl: cp_url('forms'),
-        }
-    }
-
-}
+    props: ['items', 'initialColumns', 'actionUrl'],
+};
 </script>

@@ -1,32 +1,22 @@
 <template>
-
-    <v-select
-        class="text-sm"
-        :value="site"
-        :clearable="false"
-        :searchable="false"
-        :get-option-label="site => __(site.name)"
+    <Select
         :options="sites"
-        @input="$emit('input', $event)"
+        option-label="name"
+        option-value="handle"
+        :model-value="value"
+        @update:model-value="$emit('input', $event)"
     />
-
 </template>
 
 <script>
+import { Select } from '@statamic/ui';
+
 export default {
+    components: { Select },
 
     props: {
         sites: { type: Array, required: true },
         value: { type: String, required: true },
     },
-
-    computed: {
-
-        site() {
-            return _.findWhere(this.sites, { handle: this.value });
-        }
-
-    }
-
-}
+};
 </script>

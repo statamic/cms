@@ -1,38 +1,26 @@
+/* GROUP PAGE TREE
+=================================================== */
 .page-tree {
-
     .tree-node {
         @apply dark:mb-1;
     }
 
-    .tree-node-inner {
-        @apply relative text-xs bg-white shadow rounded;
-        @apply dark:bg-dark-600 dark:shadow-dark;
-
-        &:hover {
-            @apply bg-gray-100 dark:bg-dark-650;
-        }
+    .page-tree-branch {
+        @apply relative rounded-xl bg-white text-xs shadow;
+        @apply dark:bg-dark-600 dark:shadow-lg;
     }
 
     .tree-node-children {
         @apply dark:mt-1;
     }
 
-    .draggable-placeholder-inner {
-        border: 1px dashed #0088F8;
-        background: rgba(0, 136, 249, 0.09);
-
-        * { display: none; }
-    }
-
     .page-move {
-        @apply w-6 rtl:border-l ltr:border-r rtl:rounded-r ltr:rounded-l dark:text-dark-175 dark:border-dark-900;
+        @apply w-6 dark:border-dark-900 dark:text-dark-175 ltr:rounded-xl;
         cursor: grab;
-        background-color: hsla(210, 30%, 95%, .5);
         background-image: url('../../svg/icons/light/drag-dots.svg');
         background-size: 7px 17px;
         background-position: center center;
         background-repeat: no-repeat;
-        &:hover { @apply bg-gray-300 dark:bg-dark-700; }
 
         .dark & {
             background-color: hsla(180, 1%, 18%, 0.5);
@@ -40,20 +28,58 @@
     }
 
     .page-root {
-        background-color: hsla(210, 30%, 95%, .5);
-        @apply flex w-6 rtl:rounded-r ltr:rounded-l items-center rtl:border-l ltr:border-r dark:border-dark-900;
+        background-color: hsla(210, 30%, 95%, 0.5);
+        @apply flex w-6 items-center dark:border-dark-900 ltr:rounded-l ltr:border-r rtl:rounded-r rtl:border-l;
+    }
+
+    /* Nice progressive enhancement to visually connect tree node children by removing the top left border radius.. */
+    /* 2nd level down */
+    .tree-node:has(.is-section) + .tree-node .page-tree-branch,
+    /* 3rd level down */
+    .tree-node:has(.page-tree-branch--has-children):has(.is-open) + .tree-node .page-tree-branch {
+        border-top-left-radius: 0;
     }
 }
 
-.page-tree-with-sections {
-    > .tree-node > .tree-node-children > .tree-node {
-        @apply mb-8;
+/* GROUP PAGE TREE / NAV BUILDER
+=================================================== */
+/* e.g. cp/nav/edit */
+.nav-builder {
+    background: none;
+    .tree-node {
+        @apply bg-gray-100;
+        .tree-node-inner {
+            @apply px-1;
+        }
+        &:has(.is-section) {
+            @apply mt-8 pt-1 bg-gray-100 rounded-t-2xl;
+        }
+        &:has(+ .tree-node .is-section),
+        &:last-child {
+            @apply pb-1 rounded-b-2xl;
+        }
+        &:has(.is-top-level-section-placeholder) {
+            background: none;
+            @apply mt-1;
+        }
+        /* When we're dragging a section tree node, remove the background otherwise it bleeds into the node we're moving it to */
+        &.drag-placeholder-wrapper:has(.is-section-placeholder) {
+            background: none;
+            @apply -mx-1 mt-2;
+        }
+        /* When we're dragging a section tree node, make sure the preceding node is rounded. Check for a suceeding .is-section-placeholder to ensure we don't affect dragging _inside_ sections */
+        &:has(+ .drag-placeholder-wrapper):has(+ * .is-section-placeholder) {
+            @apply pb-1 rounded-b-2xl;
+        }
+        /* When we're dragging a section tree node, make sure the succeeding node is rounded */
+        .drag-placeholder-wrapper:has(.is-section-placeholder) + & {
+            @apply rounded-t-2xl;
+        }
     }
-
-    .section-placeholder-inner {
-        @apply rounded;
-        border: 1px dashed #0088F8;
-        background: rgba(0, 136, 249, 0.09);
-        min-height: 42px;
+    .page-tree-branch {
+        margin-top: 0;
+    }
+    .tree-node:has(.first-branch) + .tree-node {
+        @apply pt-1 rounded-t-2xl;
     }
 }

@@ -1,14 +1,13 @@
 <template>
-
-    <div class="relationship-input" :class="{ 'relationship-input-empty': items.length == 0 }">
-
-        <relationship-select-field
+    <div class="relationship-input @container w-full h-full" :class="{ 'relationship-input-empty': items.length == 0 }">
+        <RelationshipSelectField
             v-if="!initializing && usesSelectField"
             :config="config"
             :items="items"
             :multiple="maxItems > 1"
             :typeahead="mode === 'typeahead'"
             :taggable="taggable"
+            :max-selections="maxItems"
             :read-only="readOnly"
             :url="selectionsUrl"
             :site="site"
@@ -17,10 +16,14 @@
             @blur="$emit('blur')"
         />
 
-        <loading-graphic v-if="initializing" :inline="true" />
+        <Icon v-if="initializing" name="loading" />
 
         <template v-if="shouldShowSelectedItems">
-            <div ref="items" class="relationship-input-items space-y-1 outline-none" :class="{ 'mt-4': usesSelectField && items.length }">
+            <div
+                v-if="items.length"
+                ref="items"
+                :class="{ 'mt-2': usesSelectField && items.length }"
+            >
                 <component
                     :is="itemComponent"
                     v-for="(item, i) in items"
@@ -28,43 +31,50 @@
                     :item="item"
                     :config="config"
                     :status-icon="statusIcons"
-                    :editable="canEdit"
+                    :editable="canEdit && (item.editable || item.editable === undefined)"
                     :sortable="!readOnly && canReorder"
                     :read-only="readOnly"
                     :form-component="formComponent"
                     :form-component-props="formComponentProps"
-                    class="item outline-none"
+                    :form-stack-size="formStackSize"
+                    class="related-item"
                     @removed="remove(i)"
                 />
             </div>
 
-            <div class="py-2 text-xs text-gray" v-if="maxItemsReached && maxItems != 1">
-                <span>{{ __('Maximum items selected:')}}</span>
+            <div class="text-gray py-2 text-xs" v-if="maxItemsReached && maxItems != 1">
+                <span>{{ __('Maximum items selected:') }}</span>
                 <span>{{ maxItems }}/{{ maxItems }}</span>
             </div>
-            <div v-if="canSelectOrCreate" class="relationship-input-buttons relative @container" :class="{ 'mt-4': items.length > 0 }" >
-                <div class="flex flex-wrap items-center text-sm -mb-2">
-                    <div class="relative mb-2">
-                        <create-button
-                            v-if="canCreate && creatables.length"
-                            :creatables="creatables"
-                            :site="site"
-                            :component="formComponent"
-                            :component-props="formComponentProps"
-                            @created="itemCreated"
-                        />
-                    </div>
-                    <button ref="existing" class="text-blue dark:text-dark-blue-100 hover:text-gray-800 dark:hover:text-dark-100 flex items-center mb-2 outline-none" @click.prevent="isSelecting = true">
-                        <svg-icon name="light/hyperlink" class="rtl:ml-1 ltr:mr-1 h-4 w-4 flex items-center"></svg-icon>
-                        <span class="hidden @sm:block" v-text="__('Link Existing Item')" />
-                        <span class="@sm:hidden" v-text="__('Link')" />
-                    </button>
+            <div
+                v-if="canSelectOrCreate"
+                class="relationship-input-buttons @container relative"
+                :class="{ 'mt-4': items.length > 0 }"
+            >
+                <div class="flex flex-wrap items-center gap-2">
+                    <CreateButton
+                        v-if="canCreate && creatables.length"
+                        :creatables="creatables"
+                        :component="formComponent"
+                        :component-props="formComponentProps"
+                        :icon="icon"
+                        :text="createLabel"
+                        :site="site"
+                        :stack-size="formStackSize"
+                        @created="itemCreated"
+                    />
+                    <Button
+                        ref="existing"
+                        icon="link"
+                        variant="filled"
+                        :text="linkLabel"
+                        @click.prevent="isSelecting = true"
+                    />
                 </div>
             </div>
 
-            <stack name="item-selector" v-if="isSelecting" @closed="isSelecting = false">
-                <item-selector
-                    slot-scope="{ close }"
+            <stack name="item-selector" v-if="isSelecting" @closed="isSelecting = false" v-slot="{ close }">
+                <ItemSelector
                     :name="name"
                     :filters-url="filtersUrl"
                     :selections-url="selectionsUrl"
@@ -77,7 +87,7 @@
                     :search="search"
                     :exclusions="exclusions"
                     :type="config.type"
-                    :tree="tree"
+                    :tree="config.query_scopes?.length > 0 ? null : tree"
                     @selected="selectionsUpdated"
                     @closed="close"
                 />
@@ -86,18 +96,17 @@
             <input v-if="name" type="hidden" :name="name" :value="JSON.stringify(value)" />
         </template>
     </div>
-
 </template>
 
 <script>
 import RelatedItem from './Item.vue';
 import ItemSelector from './Selector.vue';
 import CreateButton from './CreateButton.vue';
-import {Sortable, Plugins} from '@shopify/draggable';
+import { Sortable, Plugins } from '@shopify/draggable';
 import RelationshipSelectField from './SelectField.vue';
+import { Button, Icon } from '@statamic/ui';
 
 export default {
-
     props: {
         name: String,
         value: { required: true },
@@ -122,6 +131,7 @@ export default {
         creatables: Array,
         formComponent: String,
         formComponentProps: Object,
+        formStackSize: String,
         mode: {
             type: String,
             default: 'default',
@@ -129,24 +139,28 @@ export default {
         taggable: Boolean,
         columns: {
             type: Array,
-            default: () => []
+            default: () => [],
         },
         tree: Object,
         initialSortColumn: {
             type: String,
-            default: 'title'
+            default: 'title',
         },
         initialSortDirection: {
             type: String,
-            default: 'asc'
-        }
+            default: 'asc',
+        },
     },
+
+    emits: ['input', 'focus', 'blur', 'item-data-updated', 'loading'],
 
     components: {
         ItemSelector,
         RelatedItem,
         CreateButton,
         RelationshipSelectField,
+        Button,
+        Icon,
     },
 
     data() {
@@ -158,18 +172,61 @@ export default {
             loading: true,
             inline: false,
             sortable: null,
-        }
+        };
     },
 
     computed: {
+        icon() {
+            if (this.config.type === 'taxonomies') {
+                return 'add-tag';
+            }
+
+            if (this.config.type === 'users') {
+                return 'add-user';
+            }
+
+            return 'add-entry';
+        },
+
+        createLabel() {
+            if (this.config.type === 'entries') {
+                return __('Create Entry');
+            }
+
+            if (this.config.type === 'taxonomies') {
+                return __('Create Taxonomy');
+            }
+
+            if (this.config.type === 'users') {
+                return __('Create User');
+            }
+
+            return __('Create Item');
+        },
+
+        linkLabel() {
+            if (this.config.type === 'entries') {
+                return __('Link Entry');
+            }
+
+            if (this.config.type === 'taxonomies') {
+                return __('Link Taxonomy');
+            }
+
+            if (this.config.type === 'users') {
+                return __('Link User');
+            }
+
+            return __('Link Item');
+        },
 
         items() {
             if (this.value === null) return [];
 
-            return this.value?.map(selection => {
-                const data = _.find(this.data, (item) => item.id == selection);
+            return this.value?.map((selection) => {
+                const data = this.data.find((item) => item.id == selection);
 
-                if (! data) return { id: selection, title: selection };
+                if (!data) return { id: selection, title: selection };
 
                 return data;
             });
@@ -193,8 +250,7 @@ export default {
             if (this.usesSelectField && this.maxItems === 1) return false;
 
             return true;
-        }
-
+        },
     },
 
     mounted() {
@@ -206,7 +262,7 @@ export default {
         });
     },
 
-    beforeDestroy() {
+    beforeUnmount() {
         if (this.sortable) {
             this.sortable.destroy();
             this.sortable = null;
@@ -215,13 +271,12 @@ export default {
     },
 
     watch: {
-
         loading: {
             immediate: true,
             handler(loading) {
                 this.$emit('loading', loading);
                 this.setLoadingProgress(loading);
-            }
+            },
         },
 
         isSelecting(selecting) {
@@ -231,22 +286,17 @@ export default {
         itemData(data, olddata) {
             if (this.initializing) return;
             this.$emit('item-data-updated', data);
-        }
-
+        },
     },
 
     methods: {
-
         update(selections) {
             if (JSON.stringify(selections) == JSON.stringify(this.value)) return;
             this.$emit('input', selections);
         },
 
         remove(index) {
-            this.update([
-                ...this.value.slice(0, index),
-                ...this.value.slice(index + 1),
-            ]);
+            this.update([...this.value.slice(0, index), ...this.value.slice(index + 1)]);
         },
 
         selectionsUpdated(selections) {
@@ -267,29 +317,35 @@ export default {
         getDataForSelections(selections) {
             this.loading = true;
 
-            return this.$axios.post(this.itemDataUrl, { site: this.site, selections }).then(response => {
-                this.$emit('item-data-updated', response.data.data);
-            }).finally(() => {
-                this.loading = false;
-            });
+            return this.$axios
+                .post(this.itemDataUrl, { site: this.site, selections })
+                .then((response) => {
+                    this.$emit('item-data-updated', response.data.data);
+                })
+                .finally(() => {
+                    this.loading = false;
+                });
         },
 
         makeSortable() {
             this.sortable = new Sortable(this.$refs.items, {
-                draggable: '.item',
+                draggable: '.related-item',
                 handle: '.item-move',
                 mirror: { constrainDimensions: true, xAxis: false, appendTo: 'body' },
                 swapAnimation: { vertical: true },
                 plugins: [Plugins.SwapAnimation],
-            }).on('drag:start', e => {
-                this.value.length === 1 ? e.cancel() : this.$emit('focus');
-            }).on('drag:stop', e => {
-                this.$emit('blur');
-            }).on('sortable:stop', e => {
-                const val = [...this.value];
-                val.splice(e.newIndex, 0, val.splice(e.oldIndex, 1)[0]);
-                this.update(val);
-            });
+            })
+                .on('drag:start', (e) => {
+                    this.value.length === 1 ? e.cancel() : this.$emit('focus');
+                })
+                .on('drag:stop', (e) => {
+                    this.$emit('blur');
+                })
+                .on('sortable:stop', (e) => {
+                    const val = [...this.value];
+                    val.splice(e.newIndex, 0, val.splice(e.oldIndex, 1)[0]);
+                    this.update(val);
+                });
         },
 
         itemCreated(item) {
@@ -299,14 +355,12 @@ export default {
 
         selectFieldSelected(selectedItemData) {
             this.$emit('item-data-updated', selectedItemData);
-            this.update(selectedItemData.map(item => item.id));
+            this.update(selectedItemData.map((item) => item.id));
         },
 
         setLoadingProgress(state) {
-            this.$progress.loading(`relationship-fieldtype-${this._uid}`, state);
-        }
-
-    }
-
-}
+            this.$progress.loading(`relationship-fieldtype-${this.$.uid}`, state);
+        },
+    },
+};
 </script>

@@ -88,6 +88,12 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         $this->supplements = collect();
     }
 
+    public function __clone()
+    {
+        $this->data = clone $this->data;
+        $this->supplements = clone $this->supplements;
+    }
+
     public function id($id = null)
     {
         return $this->fluentlyGetOrSet('id')->args(func_get_args());
@@ -430,8 +436,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         if ($isNew && ! $this->hasOrigin() && $this->collection()->propagate()) {
             $this->collection()->sites()
                 ->reject($this->site()->handle())
-                ->each(function ($siteHandle) {
-                    $this->makeLocalization($siteHandle)->save();
+                ->each(function ($siteHandle) use ($withEvents) {
+                    $this->makeLocalization($siteHandle)->{$withEvents ? 'save' : 'saveQuietly'}();
                 });
         }
 
@@ -480,11 +486,13 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
         if ($this->hasDate() && $this->date) {
             $format = 'Y-m-d';
+
             if ($this->hasTime()) {
                 $format .= '-Hi';
-                if ($this->hasSeconds()) {
-                    $format .= 's';
-                }
+            }
+
+            if ($this->hasSeconds()) {
+                $format .= 's';
             }
 
             $prefix = $this->date->format($format).'.';
@@ -561,17 +569,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
                     return null;
                 }
 
-                $date = $date ?? optional($this->origin())->date() ?? $this->lastModified();
-
-                if (! $this->hasTime()) {
-                    $date->startOfDay();
-                }
-
-                if (! $this->hasSeconds()) {
-                    $date->startOfMinute();
-                }
-
-                return $date;
+                return $date ?? optional($this->origin())->date() ?? $this->adjustDateTimeBasedOnSettings($this->lastModified());
             })
             ->setter(function ($date) {
                 if (! $this->collection()?->dated()) {
@@ -583,20 +581,40 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
                 }
 
                 if ($date instanceof \Carbon\CarbonInterface) {
-                    return $date;
+                    return $date->utc();
                 }
 
-                if (strlen($date) === 10) {
-                    return Carbon::createFromFormat('Y-m-d', $date)->startOfDay();
-                }
+                $date = $this->parseDateFromString($date);
 
-                if (strlen($date) === 15) {
-                    return Carbon::createFromFormat('Y-m-d-Hi', $date)->startOfMinute();
-                }
-
-                return Carbon::createFromFormat('Y-m-d-His', $date);
+                return $this->adjustDateTimeBasedOnSettings($date);
             })
             ->args(func_get_args());
+    }
+
+    private function parseDateFromString($date)
+    {
+        if (strlen($date) === 10) {
+            return Carbon::createFromFormat('Y-m-d', $date)->startOfDay();
+        }
+
+        if (strlen($date) === 15) {
+            return Carbon::createFromFormat('Y-m-d-Hi', $date)->startOfMinute();
+        }
+
+        return Carbon::createFromFormat('Y-m-d-His', $date);
+    }
+
+    private function adjustDateTimeBasedOnSettings($date)
+    {
+        if (! $this->hasTime()) {
+            $date->startOfDay();
+        }
+
+        if (! $this->hasSeconds()) {
+            $date->startOfMinute();
+        }
+
+        return $date;
     }
 
     public function hasDate()
@@ -610,7 +628,11 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             return false;
         }
 
-        return $this->blueprint()->field('date')->fieldtype()->timeEnabled();
+        if ($this->blueprint()->field('date')->fieldtype()->timeEnabled()) {
+            return true;
+        }
+
+        return $this->date && ! $this->date->isStartOfDay();
     }
 
     public function hasSeconds()
@@ -620,6 +642,11 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         }
 
         return $this->blueprint()->field('date')->fieldtype()->secondsEnabled();
+    }
+
+    public function hasExplicitDate(): bool
+    {
+        return $this->hasDate() && $this->date;
     }
 
     public function sites()
@@ -693,7 +720,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             ->slug($attrs['slug']);
 
         if ($this->collection()->dated() && ($date = Arr::get($attrs, 'date'))) {
-            $entry->date(Carbon::createFromTimestamp($date));
+            $entry->date(Carbon::createFromTimestamp($date, config('app.timezone')));
         }
 
         return $entry;
@@ -794,14 +821,6 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         return $this->in($locale) !== null;
     }
 
-    /** @deprecated */
-    public function addLocalization($entry)
-    {
-        $entry->origin($this);
-
-        return $this;
-    }
-
     public function makeLocalization($site)
     {
         $localization = Facades\Entry::make()
@@ -897,11 +916,13 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         ]);
 
         if ($this->hasDate()) {
+            $date = $this->date()->setTimezone(Statamic::displayTimezone());
+
             $data = $data->merge([
-                'date' => $this->date(),
-                'year' => $this->date()->format('Y'),
-                'month' => $this->date()->format('m'),
-                'day' => $this->date()->format('d'),
+                'date' => $date,
+                'year' => $date->format('Y'),
+                'month' => $date->format('m'),
+                'day' => $date->format('d'),
             ]);
         }
 
@@ -946,7 +967,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     protected function getOriginByString($origin)
     {
-        return Facades\Entry::find($origin);
+        return $this->collection()->queryEntries()->where('id', $origin)->first();
     }
 
     protected function getOriginFallbackValues()
@@ -1008,7 +1029,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
         // Since the slug is generated from the title, we'll avoid augmenting
         // the slug which could result in an infinite loop in some cases.
-        $title = $this->withLocale($this->site()->locale(), fn () => (string) Antlers::parse($format, $this->augmented()->except('slug')->all()));
+        $title = $this->withLocale($this->site()->lang(), fn () => (string) Antlers::parse($format, $this->augmented()->except('slug')->all()));
 
         return trim($title);
     }

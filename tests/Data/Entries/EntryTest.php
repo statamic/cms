@@ -17,6 +17,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use ReflectionClass;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Data\AugmentedCollection;
 use Statamic\Entries\AugmentedEntry;
 use Statamic\Entries\Collection;
@@ -391,6 +392,15 @@ class EntryTest extends TestCase
             return $entry->get('title').' AND MORE!';
         });
 
+        Facades\Collection::computed('articles', [
+            'tags' => function ($entry) {
+                return ['music', 'pop'];
+            },
+            'featured' => function ($entry) {
+                return true;
+            },
+        ]);
+
         $collection = tap(Collection::make('articles'))->save();
         $entry = (new Entry)->collection($collection)->data(['title' => 'Pop Rocks']);
 
@@ -400,6 +410,8 @@ class EntryTest extends TestCase
 
         $expectedComputedData = [
             'description' => 'Pop Rocks AND MORE!',
+            'tags' => ['music', 'pop'],
+            'featured' => true,
         ];
 
         $expectedValues = array_merge($expectedData, $expectedComputedData);
@@ -930,14 +942,6 @@ class EntryTest extends TestCase
     ) {
         Carbon::setTestNow(Carbon::parse('2015-09-24 13:45:23'));
 
-        $collection = tap(Facades\Collection::make('test')->dated(true))->save();
-
-        $entry = (new Entry)->collection($collection)->slug('foo');
-
-        if ($setDate) {
-            $entry->date($setDate);
-        }
-
         $fields = [];
 
         if ($enableTimeInBlueprint) {
@@ -948,6 +952,14 @@ class EntryTest extends TestCase
         BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
             'test' => $blueprint->setHandle('test'),
         ]));
+
+        $collection = tap(Facades\Collection::make('test')->dated(true))->save();
+
+        $entry = (new Entry)->collection($collection)->slug('foo');
+
+        if ($setDate) {
+            $entry->date($setDate);
+        }
 
         $this->assertTrue($entry->hasDate());
         $this->assertEquals($expectedDate, $entry->date()->format('Y-m-d H:i:s'));
@@ -983,6 +995,50 @@ class EntryTest extends TestCase
 
             'datetime with seconds set, time disabled' => ['2023-04-19-142512', false, null, '2023-04-19 00:00:00', false, false, '2023-04-19.foo'],
             'datetime with seconds set, time disabled, seconds enabled' => ['2023-04-19-142512', false, true, '2023-04-19 00:00:00', false, false, '2023-04-19.foo'], // Time is disabled, so seconds should be disabled too.
+
+            'date explicitly set in another timezone' => [Carbon::parse('2025-03-07 22:00', 'America/New_York'), false, false, '2025-03-08 03:00:00', true, false, '2025-03-08-0300.foo'], // Passing in a carbon instance will adjust from its timezone
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('dateCollectionEntriesAsStringProvider')]
+    public function it_gets_dates_for_dated_collection_entries_when_passed_as_string(
+        $appTimezone,
+        $date,
+        $expectedDate
+    ) {
+        config(['app.timezone' => $appTimezone]);
+
+        Carbon::setTestNow(Carbon::parse('2025-02-02 13:45:23'));
+
+        $blueprint = Blueprint::makeFromFields([
+            'date' => ['type' => 'date', 'time_enabled' => true, 'time_seconds_enabled' => true],
+        ]);
+        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
+            'test' => $blueprint->setHandle('test'),
+        ]));
+
+        $collection = tap(Facades\Collection::make('test')->dated(true))->save();
+
+        $entry = (new Entry)->collection($collection)->slug('foo')->date($date);
+
+        $this->assertEquals($expectedDate, $entry->date()->toIso8601String());
+    }
+
+    public static function dateCollectionEntriesAsStringProvider()
+    {
+        // The date is treated as UTC regardless of the timezone so no conversion should be done.
+        return [
+            'utc' => [
+                'UTC',
+                '2023-02-20-033513',
+                '2023-02-20T03:35:13+00:00',
+            ],
+            'not utc' => [
+                'America/New_York',
+                '2023-02-20-033513',
+                '2023-02-20T03:35:13+00:00',
+            ],
         ];
     }
 
@@ -1496,6 +1552,69 @@ class EntryTest extends TestCase
     }
 
     #[Test]
+    public function it_doesnt_fire_events_when_propagating_entry_and_saved_quietly()
+    {
+        Event::fake();
+
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'es' => ['name' => 'Spanish', 'locale' => 'es_ES', 'url' => 'http://test.com/es/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+        ]);
+
+        $collection = (new Collection)
+            ->handle('pages')
+            ->propagate(true)
+            ->sites(['en', 'fr', 'de'])
+            ->save();
+
+        $entry = (new Entry)
+            ->id('a')
+            ->locale('en')
+            ->collection($collection);
+
+        $return = $entry->saveQuietly();
+
+        $this->assertIsObject($fr = $entry->descendants()->get('fr'));
+        $this->assertIsObject($de = $entry->descendants()->get('de'));
+        $this->assertNull($entry->descendants()->get('es')); // collection not configured for this site
+
+        Event::assertDispatchedTimes(EntrySaving::class, 0);
+        Event::assertNotDispatched(EntrySaving::class, function ($event) use ($entry) {
+            return $event->entry === $entry;
+        });
+        Event::assertNotDispatched(EntrySaving::class, function ($event) use ($fr) {
+            return $event->entry === $fr;
+        });
+        Event::assertNotDispatched(EntrySaving::class, function ($event) use ($de) {
+            return $event->entry === $de;
+        });
+
+        Event::assertDispatchedTimes(EntryCreated::class, 0);
+        Event::assertNotDispatched(EntryCreated::class, function ($event) use ($entry) {
+            return $event->entry === $entry;
+        });
+        Event::assertNotDispatched(EntryCreated::class, function ($event) use ($fr) {
+            return $event->entry === $fr;
+        });
+        Event::assertNotDispatched(EntryCreated::class, function ($event) use ($de) {
+            return $event->entry === $de;
+        });
+
+        Event::assertDispatchedTimes(EntrySaved::class, 0);
+        Event::assertNotDispatched(EntrySaved::class, function ($event) use ($entry) {
+            return $event->entry === $entry;
+        });
+        Event::assertNotDispatched(EntrySaved::class, function ($event) use ($fr) {
+            return $event->entry === $fr;
+        });
+        Event::assertNotDispatched(EntrySaved::class, function ($event) use ($de) {
+            return $event->entry === $de;
+        });
+    }
+
+    #[Test]
     public function it_propagates_entry_from_non_default_site_if_configured()
     {
         Event::fake();
@@ -1727,7 +1846,12 @@ class EntryTest extends TestCase
         $originEntry = $this->mock(Entry::class);
         $originEntry->shouldReceive('id')->andReturn('123');
 
-        Facades\Entry::shouldReceive('find')->with('123')->andReturn($originEntry);
+        $builder = $this->mock(QueryBuilder::class);
+        $builder->shouldReceive('where')->with('collection', 'test')->andReturnSelf();
+        $builder->shouldReceive('where')->with('id', 123)->andReturnSelf();
+        $builder->shouldReceive('first')->andReturn($originEntry);
+        Facades\Entry::shouldReceive('query')->andReturn($builder);
+
         $originEntry->shouldReceive('values')->andReturn(collect([]));
         $originEntry->shouldReceive('blueprint')->andReturn(
             $this->mock(Blueprint::class)->shouldReceive('handle')->andReturn('test')->getMock()
@@ -1805,12 +1929,16 @@ class EntryTest extends TestCase
 
         $originEntry = $this->mock(Entry::class);
         $originEntry->shouldReceive('id')->andReturn('123');
-
-        Facades\Entry::shouldReceive('find')->with('123')->andReturn($originEntry);
         $originEntry->shouldReceive('values')->andReturn(collect([]));
         $originEntry->shouldReceive('blueprint')->andReturn(
             $this->mock(Blueprint::class)->shouldReceive('handle')->andReturn('another')->getMock()
         );
+
+        $builder = $this->mock(QueryBuilder::class);
+        $builder->shouldReceive('where')->with('collection', 'test')->andReturnSelf();
+        $builder->shouldReceive('where')->with('id', 123)->andReturnSelf();
+        $builder->shouldReceive('first')->andReturn($originEntry);
+        Facades\Entry::shouldReceive('query')->andReturn($builder);
 
         $entry = (new Entry)
             ->collection('test')
@@ -1831,12 +1959,16 @@ class EntryTest extends TestCase
 
         $originEntry = $this->mock(Entry::class);
         $originEntry->shouldReceive('id')->andReturn('123');
-
-        Facades\Entry::shouldReceive('find')->with('123')->andReturn($originEntry);
         $originEntry->shouldReceive('values')->andReturn(collect([]));
         $originEntry->shouldReceive('blueprint')->andReturn(
             $this->mock(Blueprint::class)->shouldReceive('handle')->andReturn('another')->getMock()
         );
+
+        $builder = $this->mock(QueryBuilder::class);
+        $builder->shouldReceive('where')->with('collection', 'test')->andReturnSelf();
+        $builder->shouldReceive('where')->with('id', 123)->andReturnSelf();
+        $builder->shouldReceive('first')->andReturn($originEntry);
+        Facades\Entry::shouldReceive('query')->andReturn($builder);
 
         $entry = (new Entry)
             ->collection('test')
@@ -2571,5 +2703,50 @@ class EntryTest extends TestCase
             ['2', '2'],
             ['7', '7'],
         ], $events->map(fn ($event) => [$event->entry->id(), $event->initiator->id()])->all());
+    }
+
+    #[Test]
+    public function it_clones_internal_collections()
+    {
+        $entry = EntryFactory::collection('test')->create();
+        $entry->set('foo', 'A');
+        $entry->setSupplement('bar', 'A');
+
+        $clone = clone $entry;
+        $clone->set('foo', 'B');
+        $clone->setSupplement('bar', 'B');
+
+        $this->assertEquals('A', $entry->get('foo'));
+        $this->assertEquals('B', $clone->get('foo'));
+
+        $this->assertEquals('A', $entry->getSupplement('bar'));
+        $this->assertEquals('B', $clone->getSupplement('bar'));
+    }
+
+    #[Test]
+    public function entries_can_be_serialized_after_resolving_values()
+    {
+        $entry = EntryFactory::id('entry-id')
+            ->collection('test')
+            ->slug('entry-slug')
+            ->create();
+
+        $customEntry = CustomEntry::fromEntry($entry);
+
+        $serialized = serialize($customEntry);
+        $unserialized = unserialize($serialized);
+
+        $this->assertSame('entry-slug', $unserialized->slug);
+    }
+}
+
+class CustomEntry extends Entry
+{
+    public static function fromEntry(Entry $entry)
+    {
+        return (new static)
+            ->slug($entry->slug)
+            ->collection($entry->collection)
+            ->data($entry->data);
     }
 }

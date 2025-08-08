@@ -92,7 +92,7 @@ class FeatureTest extends TestCase
         $this->assertEquals('Bar', $global->in('en')->get('foo'));
         $this->assertEquals($global, Data::find('global::global'));
         $this->assertEquals($global, Data::find('global'));
-        $this->assertEquals('555-1234', GlobalSet::find('contact')->in('en')->get('phone'));
+        $this->assertEquals('+1 555-1234', GlobalSet::find('contact')->in('en')->get('phone'));
     }
 
     #[Test]
@@ -256,19 +256,15 @@ class FeatureTest extends TestCase
     #[Test]
     public function saving_a_global_set_writes_it_to_file()
     {
-        $global = GlobalSet::make('new')->title('New Global Set');
-
-        $global->addLocalization(
-            $global->makeLocalization('en')->data(['foo' => 'bar'])
-        );
-
-        $global->save();
+        GlobalSet::make('new')->title('New Global Set')->save();
 
         $this->assertStringEqualsFile(
             $path = __DIR__.'/__fixtures__/content/globals/new.yaml',
-            "title: 'New Global Set'\ndata:\n  foo: bar\n"
+            "title: 'New Global Set'\n"
         );
+
         @unlink($path);
+        @unlink(__DIR__.'/__fixtures__/content/globals/en/new.yaml');
     }
 
     #[Test]

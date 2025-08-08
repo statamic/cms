@@ -1,79 +1,90 @@
 <template>
-
-    <stack narrow name="page-tree-linker" :before-close="shouldClose" @closed="$emit('closed')">
-        <div slot-scope="{ close }" class="bg-gray-100 dark:bg-dark-700 h-full flex flex-col">
-
-            <header class="bg-white dark:bg-dark-550 rtl:pr-6 ltr:pl-6 rtl:pl-3 ltr:pr-3 py-2 mb-4 border-b dark:border-dark-950 shadow-md text-lg font-medium flex items-center justify-between">
-                {{ headerText }}
-                <button
-                    type="button"
-                    class="btn-close"
-                    @click="confirmClose(close)"
-                    v-html="'&times'" />
+    <stack narrow name="page-tree-linker" :before-close="shouldClose" @closed="$emit('closed')" v-slot="{ close }">
+        <div class="flex h-full flex-col bg-gray-100 dark:bg-dark-700">
+            <header
+                class="mb-4 flex items-center justify-between border-b bg-white py-2 text-lg font-medium shadow-md dark:border-dark-950 dark:bg-dark-550 ltr:pl-6 ltr:pr-3 rtl:pl-3 rtl:pr-6"
+            >
+                <Heading size="lg">{{ headerText }}</Heading>
+                <Button icon="x" variant="ghost" @click="close" />
             </header>
 
-            <div v-if="loading" class="flex-1 overflow-auto relative">
-                <div class="absolute inset-0 z-10 bg-white dark:bg-dark-700 bg-opacity-75 flex items-center justify-center text-center">
-                    <loading-graphic />
+            <div v-if="loading" class="relative flex-1 overflow-auto">
+                <div
+                    class="absolute inset-0 z-10 flex items-center justify-center bg-white bg-opacity-75 text-center dark:bg-dark-700"
+                >
+                    <Icon name="loading" />
                 </div>
             </div>
 
             <div v-if="!loading" class="flex-1 overflow-auto px-1">
+                <div
+                    v-if="saving"
+                    class="absolute inset-0 z-10 flex items-center justify-center bg-white bg-opacity-75 dark:bg-dark-500"
+                >
+                    <Icon name="loading" />
+                </div>
 
-                <publish-container
+                <PublishContainer
                     ref="container"
                     :name="publishContainer"
                     :blueprint="adjustedBlueprint"
-                    :values="values"
                     :meta="meta"
                     :errors="errors"
-                    :localized-fields="localizedFields"
+                    :origin-values="originValues"
+                    :origin-meta="originMeta"
+                    :extra-values="extraValues"
                     :site="site"
-                    class="px-2"
-                    @updated="values = $event"
-                >
-                    <div slot-scope="{ container, setFieldMeta }">
-                        <div v-if="validating" class="absolute inset-0 z-10 bg-white dark:bg-dark-500 bg-opacity-75 flex items-center justify-center">
-                            <loading-graphic text="" />
-                        </div>
-
-                        <publish-sections
-                            :sections="adjustedBlueprint.tabs[0].sections"
-                            :syncable="type == 'entry'"
-                            :syncable-fields="syncableFields"
-                            :read-only="readOnly"
-                            @updated="setFieldValue"
-                            @meta-updated="setFieldMeta"
-                            @synced="syncField"
-                            @desynced="desyncField"
-                            @focus="container.$emit('focus', $event)"
-                            @blur="container.$emit('blur', $event)"
-                        />
-                    </div>
-                </publish-container>
-
+                    v-model="values"
+                    v-model:modified-fields="localizedFields"
+                />
             </div>
 
-            <div v-if="!loading && (!readOnly || type === 'entry')" class="bg-gray-200 dark:bg-dark-500 p-4 border-t dark:border-dark-900 flex items-center justify-between flex-row-reverse">
+            <div
+                v-if="!loading && (!readOnly || type === 'entry')"
+                class="flex flex-row-reverse items-center justify-between border-t bg-gray-200 p-4 dark:border-dark-900 dark:bg-dark-500"
+            >
                 <div v-if="!readOnly">
-                    <button @click="confirmClose(close)" class="btn rtl:ml-2 ltr:mr-2">{{ __('Cancel') }}</button>
-                    <button @click="submit" class="btn-primary">{{ __('Submit') }}</button>
+                    <Button variant="ghost" class="me-2" :text="__('Cancel')" @click="confirmClose(close)" />
+                    <Button variant="primary" :text="__('Submit')" @click="submit" />
                 </div>
                 <div v-if="type === 'entry'">
-                    <a :href="editEntryUrl" target="_blank" class="text-xs flex items-center justify-center text-blue hover:text-blue underline rtl:ml-4 ltr:mr-4">
-                        <svg-icon name="light/external-link" class="w-4 h-4 rtl:ml-2 ltr:mr-2" />
-                        {{ __('Edit Entry') }}
-                    </a>
+                    <Button icon="external-link" variant="ghost" :text="__('Edit Entry')" :href="editEntryUrl" target="_blank" />
                 </div>
             </div>
-
         </div>
-    </stack>
 
+        <confirmation-modal
+            v-if="closingWithChanges"
+            :title="__('Unsaved Changes')"
+            :body-text="__('Are you sure? Unsaved changes will be lost.')"
+            :button-text="__('Discard Changes')"
+            :danger="true"
+            @confirm="confirmCloseWithChanges"
+            @cancel="closingWithChanges = false"
+        />
+    </stack>
 </template>
 
 <script>
+import { Heading, Button, PublishContainer, Icon } from '@statamic/ui';
+import { SavePipeline } from 'statamic';
+import { flatten } from 'lodash-es';
+import { computed, ref } from 'vue';
+const { Pipeline, Request } = SavePipeline;
+
+let saving = ref(false);
+let errors = ref({});
+let container = null;
+
 export default {
+    emits: ['closed', 'submitted', 'publish-info-updated', 'localized-fields-updated'],
+
+    components: {
+        Heading,
+        Button,
+        PublishContainer,
+        Icon,
+    },
 
     props: {
         id: String,
@@ -87,6 +98,13 @@ export default {
         readOnly: Boolean,
     },
 
+    setup() {
+        return {
+            saving,
+            errors,
+        }
+    },
+
     data() {
         return {
             type: this.entry ? 'entry' : 'url',
@@ -94,15 +112,13 @@ export default {
             meta: null,
             originValues: null,
             originMeta: null,
+            extraValues: null,
             localizedFields: null,
-            syncableFields: null,
             loading: true,
-            error: null,
-            errors: {},
-            validating: false,
             saveKeyBinding: null,
-            publishContainer: 'tree-page'
-        }
+            publishContainer: 'tree-page',
+            closingWithChanges: false,
+        };
     },
 
     computed: {
@@ -112,16 +128,13 @@ export default {
 
         adjustedBlueprint() {
             function getFields(blueprint) {
-                return _.chain(blueprint.tabs[0].sections)
-                    .map(sections => sections.fields)
-                    .flatten(true)
-                    .value();
+                return flatten(blueprint.tabs[0].sections.map((sections) => sections.fields));
             }
             function isMissingField(blueprint, handle) {
-                return ! getFields(blueprint).some(field => field.handle === handle);
+                return !getFields(blueprint).some((field) => field.handle === handle);
             }
             function hasField(blueprint, handle) {
-                return ! isMissingField(blueprint, handle);
+                return !isMissingField(blueprint, handle);
             }
             function getField(handle) {
                 for (let sectionIndex = 0; sectionIndex < blueprint.tabs[0].sections.length; sectionIndex++) {
@@ -152,7 +165,7 @@ export default {
             // Remove the "url" field if it's been added to the blueprint by the user.
             // URL fields only make sense for URL type pages. Entries will have their own URLs.
             if (this.type == 'entry' && hasField(blueprint, 'url')) {
-                const {section, field} = getField('url');
+                const { section, field } = getField('url');
                 blueprint.tabs[0].sections[section].fields.splice(field, 1);
             }
 
@@ -160,53 +173,51 @@ export default {
                 blueprint.tabs[0].sections[0].fields.unshift({
                     handle: 'title',
                     type: 'text',
-                    display: __('Title')
+                    display: __('Title'),
                 });
             }
+
+            // Make all fields localizable so they can be edited.
+            // Fields are non-localizable by default, but this UI requires all fields to be editable.
+            blueprint.tabs[0].sections.forEach((section, sectionIndex) => {
+                section.fields.forEach((field, fieldIndex) => {
+                    blueprint.tabs[0].sections[sectionIndex].fields[fieldIndex].localizable = true;
+                });
+            });
 
             return blueprint;
         },
     },
 
     watch: {
-        localizedFields(fields) {
-            if (this.loading) return;
+        localizedFields: {
+            deep: true,
+            handler(fields) {
+                if (this.loading) return;
 
-            this.$emit('localized-fields-updated', fields);
-        }
+                this.$emit('localized-fields-updated', fields);
+            }
+        },
     },
 
     methods: {
         submit() {
-            this.validating = true;
-
             const postUrl = cp_url(`navigation/${this.handle}/pages`);
+            const values = container.value.visibleValues;
 
-            this.$axios.post(postUrl, {
-                type: this.type,
-                values: this.values
-            }).then(response => {
-                this.$emit('submitted', this.values);
-            }).catch(e => {
-                this.validating = false;
-                if (e.response && e.response.status === 422) {
-                    const { message, errors } = e.response.data;
-                    this.error = message;
-                    this.errors = errors;
-                    this.$toast.error(message);
-                } else if (e.response) {
-                    this.$toast.error(e.response.data.message);
-                } else {
-                    this.$toast.error(e || 'Something went wrong');
-                }
-            });
+            new Pipeline()
+                .provide({ container, errors, saving })
+                .through([new Request(postUrl, 'POST', {
+                    type: this.type,
+                    values,
+                })])
+                .then(() => this.$emit('submitted', values));
         },
 
         shouldClose() {
             if (this.$dirty.has(this.publishContainer)) {
-                if (! confirm(__('Are you sure? Unsaved changes will be lost.'))) {
-                    return false;
-                }
+                this.closingWithChanges = true;
+                return false;
             }
 
             return true;
@@ -216,29 +227,9 @@ export default {
             if (this.shouldClose()) close();
         },
 
-        syncField(handle) {
-            if (! confirm('Are you sure? This field\'s value will be replaced by the value in the original entry.'))
-                return;
-
-            this.localizedFields = this.localizedFields.filter(field => field !== handle);
-            this.$refs.container.setFieldValue(handle, this.originValues[handle]);
-
-            // Update the meta for this field. For instance, a relationship field would have its data preloaded into it.
-            // If you sync the field, the preloaded data would be outdated and an ID would show instead of the titles.
-            this.meta[handle] = this.originMeta[handle];
-        },
-
-        desyncField(handle) {
-            if (!this.localizedFields.includes(handle))
-                this.localizedFields.push(handle);
-
-            this.$refs.container.dirty();
-        },
-
-        setFieldValue(handle, value) {
-            this.desyncField(handle);
-
-            this.$refs.container.setFieldValue(handle, value);
+        confirmCloseWithChanges() {
+            this.closingWithChanges = false;
+            this.$emit('closed');
         },
 
         getPageValues() {
@@ -263,7 +254,7 @@ export default {
                 url += `&entry=${this.entry}`;
             }
 
-            this.$axios.get(url).then(response => {
+            this.$axios.get(url).then((response) => {
                 this.updatePublishInfo(response.data);
                 this.emitPublishInfoUpdated(hasPublishInfo && this.publishInfo.new);
                 this.loading = false;
@@ -275,8 +266,8 @@ export default {
             this.originValues = info.originValues;
             this.meta = info.meta;
             this.originMeta = info.originMeta;
+            this.extraValues = info.extraValues;
             this.localizedFields = info.localizedFields;
-            this.syncableFields = info.syncableFields;
         },
 
         emitPublishInfoUpdated(isNew) {
@@ -285,26 +276,27 @@ export default {
                 originValues: this.originValues,
                 meta: this.meta,
                 originMeta: this.originMeta,
+                extraValues: this.extraValues,
                 localizedFields: this.localizedFields,
-                syncableFields: this.syncableFields,
                 entry: this.entry,
-                new: isNew
+                new: isNew,
             });
-        }
+        },
     },
 
     created() {
-        this.saveKeyBinding = this.$keys.bindGlobal(['mod+enter', 'mod+s'], e => {
+        this.saveKeyBinding = this.$keys.bindGlobal(['mod+enter', 'mod+s'], (e) => {
             e.preventDefault();
             this.submit();
         });
 
         this.getPageValues();
+
+        container = computed(() => this.$refs.container);
     },
 
-    destroyed() {
+    unmounted() {
         this.saveKeyBinding.destroy();
-    }
-
-}
+    },
+};
 </script>

@@ -1,31 +1,24 @@
 <template>
-
     <div class="w-full">
+        <Field
+            :label="__('Conditions')"
+            :instructions="__('messages.field_conditions_instructions')"
+        >
+            <div class="mb-6 flex items-center gap-x-4">
+                <Select v-model="when" :options="whenOptions" />
 
-        <div class="form-group publish-field select-fieldtype field-w-full">
-            <label class="publish-field-label">{{ __('Conditions') }}</label>
-            <div class="help-block -mt-2"><p>{{ __('messages.field_conditions_instructions') }}</p></div>
-
-            <div class="flex items-center mb-6">
-                <select-input
-                    v-model="when"
-                    :options="whenOptions"
-                    :placeholder="false" />
-
-                <select-input
+                <Select
                     v-if="hasConditions"
                     v-model="type"
                     :options="typeOptions"
-                    :placeholder="false"
-                    class="rtl:mr-4 ltr:ml-4" />
+                />
 
-                <text-input
-                    v-if="hasConditions && isCustom"
-                    v-model="customMethod"
-                    class="rtl:mr-4 ltr:ml-4 flex-1" />
+                <Input v-if="hasConditions && isCustom" v-model="customMethod" class="flex-1" />
             </div>
+        </Field>
 
-            <condition
+        <div class="mb-6">
+            <Condition
                 v-if="hasConditions && isStandard"
                 v-for="(condition, index) in conditions"
                 :index="index"
@@ -38,27 +31,19 @@
                 @removed="remove(index)"
             />
 
-            <div class="border-t dark:border-dark-900 pt-6" v-if="hasConditions && isStandard">
-                <button
-                    v-text="__('Add Condition')"
-                    @click="add"
-                    class="btn-default" />
+            <div class="border-t pt-6 dark:border-dark-900" v-if="hasConditions && isStandard">
+                <Button :text="__('Add Condition')" @click="add" />
             </div>
-
         </div>
 
-        <div class="form-group publish-field select-fieldtype field-w-full">
-            <label class="publish-field-label">{{ __('Always Save') }}</label>
-            <div class="help-block -mt-2">
-                <p>{{ __('messages.field_conditions_always_save_instructions') }}</p>
-            </div>
-            <toggle-input v-model="alwaysSave" />
-        </div>
-
+        <Field
+            :label="__('Always Save')"
+            :instructions="__('messages.field_conditions_always_save_instructions')"
+        >
+            <Switch v-model="alwaysSave" />
+        </Field>
     </div>
-
 </template>
-
 
 <script>
 import uniqid from 'uniqid';
@@ -67,20 +52,29 @@ import Converter from '../field-conditions/Converter.js';
 import { KEYS, OPERATORS } from '../field-conditions/Constants.js';
 import Condition from './Condition.vue';
 import { __ } from '../../bootstrap/globals';
+import { Field, Input, Button } from '@statamic/ui';
+import Select from '@statamic/components/ui/Select/Select.vue';
+import Switch from '@statamic/components/ui/Switch.vue';
 
 export default {
-
     mixins: [HasInputOptions],
 
-    components: { Condition },
+    components: {
+        Field,
+        Input,
+        Button,
+        Select,
+        Switch,
+        Condition,
+    },
 
     props: {
         config: {
-            required: true
+            required: true,
         },
         suggestableFields: {
-            required: true
-        }
+            required: true,
+        },
     },
 
     data() {
@@ -90,16 +84,15 @@ export default {
             customMethod: null,
             conditions: [],
             alwaysSave: false,
-        }
+        };
     },
 
     computed: {
-
         whenOptions() {
             return this.normalizeInputOptions({
                 always: __('Always show'),
                 if: __('Show when'),
-                unless: __('Hide when')
+                unless: __('Hide when'),
             });
         },
 
@@ -107,7 +100,7 @@ export default {
             return this.normalizeInputOptions({
                 all: __('All of the following conditions pass'),
                 any: __('Any of the following conditions pass'),
-                custom: __('Custom method passes')
+                custom: __('Custom method passes'),
             });
         },
 
@@ -116,7 +109,7 @@ export default {
         },
 
         isStandard() {
-            return this.hasConditions && ! this.isCustom;
+            return this.hasConditions && !this.isCustom;
         },
 
         isCustom() {
@@ -128,30 +121,27 @@ export default {
             let key = this.type === 'any' ? `${this.when}_any` : this.when;
             let saveableConditions = this.prepareSaveableConditions(this.conditions);
 
-            if (this.isStandard && ! _.isEmpty(saveableConditions)) {
+            if (this.isStandard && Object.keys(saveableConditions).length) {
                 conditions[key] = saveableConditions;
             } else if (this.isCustom && this.customMethod) {
                 conditions[key] = this.customMethod;
             }
 
             return conditions;
-        }
-
+        },
     },
 
     watch: {
-
         saveableConditions: {
             deep: true,
             handler(conditions) {
                 this.$emit('updated', conditions);
-            }
+            },
         },
 
         alwaysSave(alwaysSave) {
             this.$emit('updated-always-save', alwaysSave);
         },
-
     },
 
     created() {
@@ -161,13 +151,12 @@ export default {
     },
 
     methods: {
-
         add() {
             this.conditions.push({
                 _id: uniqid(),
                 field: null,
                 operator: 'equals',
-                value: null
+                value: null,
             });
         },
 
@@ -180,24 +169,17 @@ export default {
         },
 
         getInitialConditions() {
-            let key = _.chain(KEYS)
-                .filter(key => this.config[key])
-                .first()
-                .value();
+            let key = KEYS.filter((key) => this.config[key])[0];
 
             let conditions = this.config[key];
 
-            if (! conditions) {
+            if (!conditions) {
                 return;
             }
 
-            this.when = key.startsWith('unless') || key.startsWith('hide_when')
-                ? 'unless'
-                : 'if';
+            this.when = key.startsWith('unless') || key.startsWith('hide_when') ? 'unless' : 'if';
 
-            this.type = key.endsWith('_any')
-                ? 'any'
-                : 'all';
+            this.type = key.endsWith('_any') ? 'any' : 'all';
 
             if (typeof conditions === 'string') {
                 this.type = 'custom';
@@ -213,7 +195,7 @@ export default {
         },
 
         prepareEditableConditions(conditions) {
-            return (new Converter).fromBlueprint(conditions).map(condition => {
+            return new Converter().fromBlueprint(conditions).map((condition) => {
                 condition._id = uniqid();
                 condition.operator = this.prepareEditableOperator(condition.operator);
                 return condition;
@@ -221,11 +203,11 @@ export default {
         },
 
         prepareSaveableConditions(conditions) {
-            conditions = _.reject(conditions, condition => {
-                return ! condition.field || ! condition.value;
+            conditions = conditions.filter((condition) => {
+                return !(!condition.field || !condition.value);
             });
 
-            return (new Converter).toBlueprint(conditions);
+            return new Converter().toBlueprint(conditions);
         },
 
         prepareEditableOperator(operator) {
@@ -240,7 +222,6 @@ export default {
 
             return operator;
         },
-
-    }
-}
+    },
+};
 </script>

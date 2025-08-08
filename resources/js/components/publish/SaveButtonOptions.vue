@@ -1,48 +1,38 @@
 <template>
-
-    <div :class="{ 'btn-group': showOptions }">
-
-        <!-- Save button -->
-        <slot></slot>
-
-        <!-- Save and continue options dropdown -->
-        <dropdown-list v-if="showOptions" class="rtl:text-right ltr:text-left">
-            <template v-slot:trigger>
-                <button :class="buttonClass" class="rtl:rounded-r-none ltr:rounded-l-none">
-                    <svg-icon v-if="buttonIcon" :name="buttonIcon.name" :class="buttonIcon.class" />
-                </button>
+    <component :is="wrapperComponent">
+        <slot />
+        <Dropdown v-if="showOptions" align="end">
+            <template #trigger>
+                <Button variant="primary" icon="ui/chevron-down" :aria-label="__('Save options')" />
             </template>
-            <h6 v-text="__('After Saving')" class="p-2" />
-            <div class="publish-fields px-2 py-1">
-                <div class="publish-field save-and-continue-options radio-fieldtype">
-                    <radio-fieldtype
-                        handle="save_and_continue_options"
-                        :config="options"
-                        v-model="currentOption"
-                    />
-                </div>
-            </div>
-        </dropdown-list>
-
-    </div>
-
+            <DropdownMenu>
+                <DropdownLabel id="after-saving-label" v-text="__('After Saving')" />
+                <RadioGroup v-model="currentOption" aria-labelledby="after-saving-label">
+                    <Radio :label="__('Go To Listing')" value="listing" />
+                    <Radio :label="__('Continue Editing')" value="continue_editing" />
+                    <Radio :label="__('Create Another')" value="create_another" />
+                </RadioGroup>
+            </DropdownMenu>
+        </Dropdown>
+    </component>
 </template>
 
 <script>
+import { Button, Dropdown, DropdownMenu, DropdownLabel, Radio, RadioGroup } from '@statamic/ui';
+
 export default {
+    components: {
+        Button,
+        Dropdown,
+        DropdownMenu,
+        DropdownLabel,
+        Radio,
+        RadioGroup,
+    },
 
     props: {
-        showOptions: {
-            type: Boolean,
-            default: true
-        },
-        buttonClass: {
-            default: 'btn-primary',
-        },
-        preferencesPrefix: {
-            type: String,
-            required: true,
-        },
+        showOptions: { type: Boolean, default: true },
+        preferencesPrefix: { type: String, required: true },
     },
 
     data() {
@@ -52,36 +42,19 @@ export default {
     },
 
     computed: {
-        options() {
-            return {
-                options: {
-                    listing: __('Go To Listing'),
-                    continue_editing: __('Continue Editing'),
-                    create_another: __('Create Another'),
-                },
-            };
-        },
-
-        buttonIcon() {
-            switch(true) {
-                case this.currentOption === 'listing':
-                    return {name: 'micro/arrow-go-back', class: 'w-3'};
-                case this.currentOption === 'continue_editing':
-                    return {name: 'micro/chevron-down-xs', class: 'w-2'};
-                case this.currentOption === 'create_another':
-                    return {name: 'micro/add-circle', class: 'w-3'};
-            }
-        },
-
         preferencesKey() {
             return `${this.preferencesPrefix}.after_save`;
+        },
+
+        wrapperComponent() {
+            return this.showOptions ? 'ui-button-group' : 'div';
         },
     },
 
     mounted() {
         this.setInitialValue();
 
-        this.$watch('currentOption', value => this.setPreference(value));
+        this.$watch('currentOption', (value) => this.setPreference(value));
     },
 
     methods: {
@@ -97,15 +70,5 @@ export default {
                 : this.$preferences.set(this.preferencesKey, value);
         },
     },
-
-}
+};
 </script>
-
-<style>
-    .save-and-continue-options input {
-        margin-bottom: 9px;
-    }
-    .save-and-continue-options input {
-        margin-right: 5px ; [dir="rtl"] & { margin-left: 5px ; margin-right: 0 ; }
-    }
-</style>

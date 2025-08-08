@@ -1,63 +1,18 @@
 <template>
-
-    <div class="blueprint-section @container">
-        <div class="blueprint-section-card card dark:bg-dark-800 p-0 h-full flex rounded-t flex-col">
-
-            <div class="bg-gray-200 dark:bg-dark-600 border-b dark:border-none text-sm flex rounded-t">
-                <div class="blueprint-drag-handle blueprint-section-drag-handle w-4 ltr:border-r rtl:border-l dark:border-dark-900"></div>
-                <div class="p-2 flex-1 flex items-center">
-                    <a class="flex items-center flex-1 group" @click="edit">
-                        <svg-icon :name="iconName(section.icon)" :directory="iconBaseDirectory" class="h-4 w-4 rtl:ml-2 ltr:mr-2 text-gray-700 dark:text-dark-150 group-hover:text-blue-500 dark:group-hover:text-dark-blue-100" />
-                        <div class="rtl:ml-2 ltr:mr-2" v-text="__(section.display)" />
-                    </a>
-                    <button class="flex items-center text-gray-700 dark:text-dark-175 hover:text-gray-950 dark:hover:text-dark-100 rtl:ml-3 ltr:mr-3" @click="edit">
-                        <svg-icon class="h-4 w-4" name="pencil" />
-                    </button>
-                    <button @click.prevent="$emit('deleted')" class="flex items-center text-gray-700 dark:text-dark-175 hover:text-gray-950 dark:hover:text-dark-100">
-                        <svg-icon class="h-4 w-4" name="micro/trash" />
-                    </button>
+    <div class="blueprint-section min-h-40 w-full outline-hidden @container">
+        <ui-panel>
+            <ui-panel-header class="flex items-center justify-between pb-0.75! pt-0! pl-2.75! pr-3.25! ">
+                <div class="flex items-center gap-2 flex-1">
+                    <ui-icon name="handles-sm" class="blueprint-section-drag-handle size-3! cursor-grab text-gray-400" />
+                    <!-- @TODO: Add backwards support for old icons -->
+                    <!-- <svg-icon :name="iconName(section.icon)" :directory="iconBaseDirectory" /> -->
+                    <ui-heading v-text="__(section.display ?? 'Section')" />
                 </div>
-            </div>
+                <ui-button icon="pencil-line" size="sm" variant="ghost" @click="edit" />
+                <ui-button icon="trash" size="sm" variant="ghost" @click.prevent="$emit('deleted')" />
+            </ui-panel-header>
 
-            <confirmation-modal
-                v-if="editingSection"
-                :title="editText"
-                @opened="$refs.displayInput.select()"
-                @confirm="editConfirmed"
-                @cancel="editCancelled"
-            >
-                <div class="publish-fields">
-                    <div class="form-group w-full">
-                        <label v-text="__('Display')" />
-                        <input ref="displayInput" type="text" class="input-text" v-model="editingSection.display" />
-                    </div>
-                    <div class="form-group w-full" v-if="showHandleField">
-                        <label v-text="__('Handle')" />
-                        <input type="text" class="input-text font-mono text-sm" v-model="editingSection.handle" @input="handleSyncedWithDisplay = false" />
-                    </div>
-                    <div class="form-group w-full">
-                        <label v-text="__('Instructions')" />
-                        <input type="text" class="input-text" v-model="editingSection.instructions" />
-                    </div>
-                    <div class="form-group w-full" v-if="showHandleField">
-                        <label v-text="__('Icon')" />
-                        <publish-field-meta
-                            :config="{ handle: 'icon', type: 'icon', directory: this.iconBaseDirectory, folder: this.iconSubFolder }"
-                            :initial-value="editingSection.icon"
-                            v-slot="{ meta, value, loading }"
-                        >
-                            <icon-fieldtype v-if="!loading" handle="icon" :meta="meta" :value="value" @input="editingSection.icon = $event" />
-                        </publish-field-meta>
-                    </div>
-                    <div class="form-group w-full" v-if="showHideField">
-                        <label v-text="__('Hidden')" />
-                        <toggle-input v-model="editingSection.hide" />
-                    </div>
-                </div>
-            </confirmation-modal>
-
-            <fields
-                class="p-4"
+            <Fields
                 :tab-id="tabId"
                 :section-id="section._id"
                 :fields="section.fields"
@@ -72,53 +27,121 @@
                 @editor-closed="editingField = null"
             >
                 <template v-slot:empty-state>
-                    <div
-                        v-text="__('Add or drag fields here')"
-                        class="text-2xs text-gray-600 dark:text-dark-150 text-center border dark:border-dark-200 border-dashed rounded mb-2 p-2"
+                    <ui-subheading
+                        v-text="__('Drag and drop fields below.')"
+                        class="rounded-xl min-h-16 flex items-center justify-center border border-dashed border-gray-300 p-3 text-center w-full"
                     />
                 </template>
-            </fields>
+            </Fields>
+        </ui-panel>
 
-        </div>
+        <confirmation-modal
+            v-if="editingSection"
+            :title="editText"
+            @opened="$refs.displayInput?.select()"
+            @confirm="editConfirmed"
+            @cancel="editCancelled"
+        >
+            <div class="publish-fields">
+                <div class="form-group w-full">
+                    <label v-text="__('Display')" />
+                    <input ref="displayInput" type="text" class="input-text" v-model="editingSection.display" />
+                </div>
+                <div class="form-group w-full" v-if="showHandleField">
+                    <label v-text="__('Handle')" />
+                    <input
+                        type="text"
+                        class="input-text font-mono text-sm"
+                        v-model="editingSection.handle"
+                        @input="handleSyncedWithDisplay = false"
+                    />
+                </div>
+                <div class="form-group w-full">
+                    <label v-text="__('Instructions')" />
+                    <input type="text" class="input-text" v-model="editingSection.instructions" />
+                </div>
+                <div class="form-group field-w-50">
+                    <div class="flex items-center gap-2">
+                        <Switch v-model="editingSection.collapsible" />
+                        <Heading :text="__('Collapsible')" />
+                    </div>
+                </div>
+                <div class="form-group field-w-50" v-if="editingSection.collapsible">
+                    <div class="flex items-center gap-2">
+                        <Switch v-model="editingSection.collapsed" />
+                        <Heading :text="__('Collapsed by default')" />
+                    </div>
+                </div>
+                <div class="form-group w-full" v-if="showHandleField">
+                    <label v-text="__('Icon')" />
+                    <publish-field-meta
+                        :config="{
+                            handle: 'icon',
+                            type: 'icon',
+                            directory: this.iconBaseDirectory,
+                            folder: this.iconSubFolder,
+                        }"
+                        :initial-value="editingSection.icon"
+                        v-slot="{ meta, value, loading, config }"
+                    >
+                        <icon-fieldtype
+                            v-if="!loading"
+                            handle="icon"
+                            :config="config"
+                            :meta="meta"
+                            :value="value"
+                            @update:value="editingSection.icon = $event"
+                        />
+                    </publish-field-meta>
+                </div>
+                <div class="form-group field-w-50" v-if="showHideField">
+                    <div class="flex items-center gap-2">
+                        <Switch v-model="editingSection.hide" />
+                        <Heading :text="__('Hidden')" />
+                    </div>
+                </div>
+            </div>
+        </confirmation-modal>
     </div>
-
 </template>
 
 <script>
 import Fields from './Fields.vue';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';
+import { Switch, Heading } from '@statamic/ui';
 
 export default {
-
     mixins: [CanDefineLocalizable],
 
     inject: {
-        suggestableConditionFieldsProvider: { default: null }
+        suggestableConditionFieldsProvider: { default: null },
     },
 
     components: {
         Fields,
+        Switch,
+        Heading,
     },
 
     props: {
         tabId: {
-            type: String
+            type: String,
         },
         section: {
             type: Object,
-            required: true
+            required: true,
         },
         showHandleField: {
             type: Boolean,
-            default: false
+            default: false,
         },
         showHideField: {
             type: Boolean,
-            default: false
+            default: false,
         },
         editText: {
             type: String,
-        }
+        },
     },
 
     data() {
@@ -126,11 +149,10 @@ export default {
             editingSection: false,
             editingField: null,
             handleSyncedWithDisplay: false,
-        }
+        };
     },
 
     computed: {
-
         suggestableConditionFields() {
             return this.suggestableConditionFieldsProvider?.suggestableFields(this) || [];
         },
@@ -142,24 +164,21 @@ export default {
         iconSubFolder() {
             return this.$config.get('setIconsFolder');
         },
-
     },
 
     watch: {
-
         section: {
             deep: true,
             handler(section) {
                 this.$emit('updated', section);
-            }
+            },
         },
 
-        'editingSection.display': function(display) {
+        'editingSection.display': function (display) {
             if (this.editingSection && this.handleSyncedWithDisplay) {
                 this.editingSection.handle = snake_case(display);
             }
-        }
-
+        },
     },
 
     created() {
@@ -171,13 +190,12 @@ export default {
     },
 
     methods: {
-
         fieldLinked(field) {
             this.section.fields.push(field);
             this.$toast.success(__('Field added'));
 
             if (field.type === 'reference') {
-                this.$nextTick(() => this.editingField = field._id);
+                this.$nextTick(() => (this.editingField = field._id));
             }
         },
 
@@ -200,15 +218,17 @@ export default {
                 instructions: this.section.instructions,
                 icon: this.section.icon,
                 hide: this.section.hide,
+                collapsible: this.section.collapsible,
+                collapsed: this.section.collapsed,
             };
         },
 
         editConfirmed() {
-            if (! this.editingSection.handle) {
-                this.editingSection.handle = snake_case(this.editingSection.display)
+            if (!this.editingSection.handle) {
+                this.editingSection.handle = snake_case(this.editingSection.display);
             }
 
-            this.$emit('updated', {...this.section, ...this.editingSection});
+            this.$emit('updated', { ...this.section, ...this.editingSection });
             this.editingSection = false;
         },
 
@@ -217,14 +237,10 @@ export default {
         },
 
         iconName(name) {
-            if (! name) return 'folder-generic';
+            if (!name) return 'folder-generic';
 
-            return this.iconSubFolder
-                ? this.iconSubFolder+'/'+name
-                : name;
+            return this.iconSubFolder ? this.iconSubFolder + '/' + name : name;
         },
-
-    }
-
-}
+    },
+};
 </script>

@@ -3,12 +3,13 @@
 namespace Statamic\Providers;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Env;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Actions;
 use Statamic\Actions\Action;
+use Statamic\Addons\Manifest;
 use Statamic\Dictionaries;
 use Statamic\Dictionaries\Dictionary;
-use Statamic\Extend\Manifest;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes;
 use Statamic\Forms\JsDrivers;
@@ -30,6 +31,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Actions\CopyPasswordResetLink::class,
         Actions\Delete::class,
         Actions\DeleteMultisiteEntry::class,
+        Actions\DisableTwoFactorAuthentication::class,
         Actions\DownloadAsset::class,
         Actions\DownloadAssetFolder::class,
         Actions\DuplicateAsset::class,
@@ -54,6 +56,8 @@ class ExtensionServiceProvider extends ServiceProvider
         Dictionaries\Countries::class,
         Dictionaries\Currencies::class,
         Dictionaries\File::class,
+        Dictionaries\Languages::class,
+        Dictionaries\Locales::class,
         Dictionaries\Timezones::class,
     ];
 
@@ -64,6 +68,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Assets\Assets::class,
         Fieldtypes\Bard::class,
         Fieldtypes\Bard\Buttons::class,
+        Fieldtypes\Blueprints::class,
         Fieldtypes\ButtonGroup::class,
         Fieldtypes\Checkboxes::class,
         Fieldtypes\Code::class,
@@ -194,7 +199,6 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Query::class,
         Tags\Range::class,
         Tags\Redirect::class,
-        Tags\Relate::class,
         Tags\Rotate::class,
         Tags\Route::class,
         Tags\Scope::class,
@@ -223,7 +227,6 @@ class ExtensionServiceProvider extends ServiceProvider
 
     protected $widgets = [
         Widgets\Collection::class,
-        Widgets\GettingStarted::class,
         Widgets\Header::class,
         Widgets\Template::class,
         Widgets\Updater::class,
@@ -245,6 +248,11 @@ class ExtensionServiceProvider extends ServiceProvider
         Updates\AddSitePermissions::class,
         Updates\UseClassBasedStatamicUniqueRules::class,
         Updates\MigrateSitesConfigToYaml::class,
+        Updates\AddTimezoneConfigOptions::class,
+        Updates\RemoveParentField::class,
+        Updates\UpdateGlobalVariables::class,
+        Updates\PublishMigrationForTwoFactorColumns::class,
+        Updates\AddAddonSettingsToGitConfig::class,
     ];
 
     public function register()
@@ -258,10 +266,16 @@ class ExtensionServiceProvider extends ServiceProvider
 
     protected function registerAddonManifest()
     {
+        $cachePath = $this->app->bootstrapPath().'/cache/addons.php';
+
+        if (! is_null($env = Env::get('STATAMIC_ADDONS_CACHE'))) {
+            $cachePath = Str::startsWith($env, ['/', '\\']) ? $env : $this->app->basePath($env);
+        }
+
         $this->app->instance(Manifest::class, new Manifest(
             new Filesystem,
             $this->app->basePath(),
-            $this->app->bootstrapPath().'/cache/addons.php'
+            $cachePath
         ));
     }
 
@@ -335,9 +349,12 @@ class ExtensionServiceProvider extends ServiceProvider
             return;
         }
 
-        foreach ($this->app['files']->files($path) as $file) {
+        foreach ($this->app['files']->allFiles($path) as $file) {
+            $relativePathOfFolder = str_replace(app_path(DIRECTORY_SEPARATOR), '', $file->getPath());
+            $namespace = str_replace('/', '\\', $relativePathOfFolder);
             $class = $file->getBasename('.php');
-            $fqcn = $this->app->getNamespace()."{$folder}\\{$class}";
+
+            $fqcn = $this->app->getNamespace()."{$namespace}\\{$class}";
             if (is_subclass_of($fqcn, $requiredClass)) {
                 $fqcn::register();
             }

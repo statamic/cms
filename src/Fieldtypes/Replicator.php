@@ -16,6 +16,8 @@ use Statamic\Support\Str;
 
 class Replicator extends Fieldtype
 {
+    use AddsEntryValidationReplacements;
+
     protected $categories = ['structured'];
     protected $keywords = ['builder', 'page builder', 'content'];
     protected $rules = ['array'];
@@ -24,7 +26,19 @@ class Replicator extends Fieldtype
     {
         return [
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Manage Sets'),
+                'instructions' => __('statamic::fieldtypes.replicator.config.sets'),
+                'fields' => [
+                    'sets' => [
+                        'display' => __('Sets'),
+                        'type' => 'sets',
+                        'hide_display' => true,
+                        'full_width_setting' => true,
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Appearance'),
                 'fields' => [
                     'collapse' => [
                         'display' => __('Collapse'),
@@ -37,41 +51,38 @@ class Replicator extends Fieldtype
                             'accordion' => __('statamic::fieldtypes.replicator.config.collapse.accordion'),
                         ],
                         'default' => false,
+                        'width' => 50,
                     ],
                     'previews' => [
                         'display' => __('Field Previews'),
                         'instructions' => __('statamic::fieldtypes.replicator.config.previews'),
                         'type' => 'toggle',
                         'default' => true,
-                    ],
-                    'max_sets' => [
-                        'display' => __('Max Sets'),
-                        'instructions' => __('statamic::fieldtypes.replicator.config.max_sets'),
-                        'type' => 'integer',
+                        'width' => 50,
                     ],
                     'fullscreen' => [
                         'display' => __('Allow Fullscreen Mode'),
                         'instructions' => __('statamic::fieldtypes.replicator.config.fullscreen'),
                         'type' => 'toggle',
                         'default' => true,
+                        'width' => 50,
                     ],
                     'button_label' => [
                         'display' => __('Add Set Label'),
                         'instructions' => __('statamic::fieldtypes.replicator.config.button_label'),
                         'type' => 'text',
                         'default' => '',
+                        'width' => 50,
                     ],
                 ],
             ],
             [
-                'display' => __('Manage Sets'),
-                'instructions' => __('statamic::fieldtypes.replicator.config.sets'),
+                'display' => __('Boundaries & Limits'),
                 'fields' => [
-                    'sets' => [
-                        'display' => __('Sets'),
-                        'type' => 'sets',
-                        'hide_display' => true,
-                        'full_width_setting' => true,
+                    'max_sets' => [
+                        'display' => __('Max Sets'),
+                        'instructions' => __('statamic::fieldtypes.replicator.config.max_sets'),
+                        'type' => 'integer',
                     ],
                 ],
             ],
@@ -150,7 +161,10 @@ class Replicator extends Fieldtype
             ->validator()
             ->withContext([
                 'prefix' => $this->field->validationContext('prefix').$this->setRuleFieldPrefix($index).'.',
-            ])
+            ]);
+
+        $rules = $this
+            ->addEntryValidationReplacements($this->field, $rules)
             ->rules();
 
         return collect($rules)->mapWithKeys(function ($rules, $handle) use ($index) {
@@ -230,18 +244,11 @@ class Replicator extends Fieldtype
             })->toArray();
         });
 
-        $previews = collect($existing)->map(function ($fields) {
-            return collect($fields)->map(function () {
-                return null;
-            })->all();
-        })->all();
-
         return [
             'existing' => $existing,
             'new' => $new,
             'defaults' => $defaults,
             'collapsed' => [],
-            'previews' => $previews,
         ];
     }
 

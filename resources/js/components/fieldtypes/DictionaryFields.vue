@@ -1,29 +1,31 @@
 <template>
-    <publish-container
+    <PublishContainer
         name="dictionary-fields"
         :blueprint="blueprint"
-        :values="value"
+        :model-value="value"
         :meta="publishMeta"
-        :is-config="true"
         :errors="errors"
-        @updated="update"
+        as-config
+        @update:model-value="update"
     >
-        <publish-fields
-            slot-scope="{ setFieldValue, setFieldMeta }"
-            :fields="fields"
-            @updated="setFieldValue"
-            @meta-updated="setFieldMeta"
-        />
-    </publish-container>
+        <FieldsProvider :fields="fields">
+            <Fields />
+        </FieldsProvider>
+    </PublishContainer>
 </template>
 
 <script>
-import Fieldtype from "./Fieldtype.vue";
+import Fieldtype from './Fieldtype.vue';
+import { PublishContainer, FieldsProvider, PublishFields as Fields } from '@statamic/ui';
 
 export default {
     mixins: [Fieldtype],
 
-    inject: ['storeName'],
+    components: {
+        PublishContainer,
+        FieldsProvider,
+        Fields,
+    },
 
     computed: {
         dictionary() {
@@ -31,42 +33,44 @@ export default {
         },
 
         fields() {
-            return this.meta.type.fields.concat(this.meta.dictionaries[this.dictionary]?.fields || [])
+            return this.meta.type.fields.concat(this.meta.dictionaries[this.dictionary]?.fields || []);
         },
 
         blueprint() {
             return {
-                tabs: [{
-                    fields: this.fields
-                }]
-            }
+                tabs: [
+                    {
+                        fields: this.fields,
+                    },
+                ],
+            };
         },
 
         publishMeta() {
             return {
                 ...this.meta.type.meta,
-                ...this.meta.dictionaries[this.dictionary]?.meta
-            }
+                ...this.meta.dictionaries[this.dictionary]?.meta,
+            };
         },
 
         errors() {
-            const state = this.$store.state.publish[this.storeName];
+            const state = this.publishContainer;
 
-            if (! state) {
+            if (!state) {
                 return {};
             }
 
-            let errors = {}
+            let errors = {};
 
             // Filter errors to only include those for this field, and remove the field path prefix
             // if there is one, then append it to the errors object.
             Object.entries(state.errors)
                 .filter(([key, value]) => key.startsWith(this.fieldPathPrefix || this.handle))
                 .forEach(([key, value]) => {
-                    errors[key.split('.').pop()] = value
-                })
+                    errors[key.split('.').pop()] = value;
+                });
 
-            return errors
+            return errors;
         },
     },
 
@@ -74,9 +78,9 @@ export default {
         dictionary(dictionary) {
             this.update({
                 type: dictionary,
-                ...this.meta.dictionaries[dictionary]?.defaults
-            })
+                ...this.meta.dictionaries[dictionary]?.defaults,
+            });
         },
     },
-}
+};
 </script>

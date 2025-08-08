@@ -35,26 +35,11 @@ return [
         |--------------------------------------------------------------------------
         |
         | The driver that will be used under the hood for image manipulation.
-        | Supported: "gd" or "imagick" (if installed on your server)
+        | Supported: "gd", "imagick" or a class name of a custom driver.
         |
         */
 
         'driver' => 'gd',
-
-        /*
-        |--------------------------------------------------------------------------
-        | Additional Image Extensions
-        |--------------------------------------------------------------------------
-        |
-        | Define any additional image file extensions you would like Statamic to
-        | process. You should ensure that both your server and the selected
-        | image manipulation driver properly supports these extensions.
-        |
-        */
-
-        'additional_extensions' => [
-            // 'heic',
-        ],
 
         /*
         |--------------------------------------------------------------------------
@@ -76,7 +61,7 @@ return [
         |--------------------------------------------------------------------------
         |
         | You may define global defaults for all manipulation parameters, such as
-        | quality, format, and sharpness. These can and will be be overwritten
+        | quality, format, and sharpness. These can and will be overwritten
         | on the tag parameter level as well as the preset level.
         |
         */
@@ -144,6 +129,18 @@ return [
         'max_width' => 10000,
         'max_height' => 10000,
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Control Panel Video Thumbnails
+    |--------------------------------------------------------------------------
+    |
+    | When enabled, Statamic will generate thumbnails for videos.
+    | Generated thumbnails are displayed in the Control Panel.
+    |
+    */
+
+    'video_thumbnails' => true,
 
     /*
     |--------------------------------------------------------------------------
@@ -222,5 +219,20 @@ return [
     */
 
     'svg_sanitization_on_upload' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | FFmpeg
+    |--------------------------------------------------------------------------
+    |
+    | Statamic uses FFmpeg to extract thumbnails from videos to be shown in the
+    | Control Panel. You may adjust the binary location and cache path here.
+    |
+    */
+
+    'ffmpeg' => [
+        'binary' => null,
+        'cache_path' => storage_path('statamic/glide/ffmpeg'),
+    ],
 
 ];

@@ -27,7 +27,8 @@ class NavigationPagesController extends CpController
         [$values, $meta] = $this->extractValuesAndMeta($page, $blueprint);
 
         if ($entry = $page->entry()) {
-            [$originValues, $originMeta] = $this->extractValuesAndMeta($entry, $blueprint);
+            [$originValues, $originMeta] = $this->extractValuesAndMeta($entry, $entry->blueprint());
+            $values = collect($originValues)->merge($values)->all();
         }
 
         return [
@@ -36,7 +37,6 @@ class NavigationPagesController extends CpController
             'originValues' => $originValues ?? null,
             'originMeta' => $originMeta ?? null,
             'localizedFields' => $this->getLocalizedFields($page),
-            'syncableFields' => $this->getSyncableFields($nav, $entry),
         ];
     }
 
@@ -52,10 +52,11 @@ class NavigationPagesController extends CpController
 
         $page = $nav->in($request->site)->find($page);
 
-        [$values, $meta] = $this->extractValuesAndMeta($page, $blueprint);
+        [$values, $meta, $extraValues] = $this->extractValuesAndMeta($page, $blueprint);
 
         if ($entry = $page->entry()) {
-            [$originValues, $originMeta] = $this->extractValuesAndMeta($entry, $blueprint);
+            [$originValues, $originMeta] = $this->extractValuesAndMeta($entry, $entry->blueprint());
+            $values = collect($originValues)->merge($values)->all();
         }
 
         return [
@@ -63,8 +64,8 @@ class NavigationPagesController extends CpController
             'meta' => $meta,
             'originValues' => $originValues ?? null,
             'originMeta' => $originMeta ?? null,
+            'extraValues' => $extraValues,
             'localizedFields' => $this->getLocalizedFields($page),
-            'syncableFields' => $this->getSyncableFields($nav, $entry),
         ];
     }
 
@@ -83,21 +84,6 @@ class NavigationPagesController extends CpController
         return $fields;
     }
 
-    private function getSyncableFields($nav, $entry)
-    {
-        $navFields = $nav->blueprint()->fields()->all()->keys();
-
-        if (! $entry) {
-            return $navFields;
-        }
-
-        return $entry->blueprint()
-            ->fields()->all()->keys()
-            ->intersect($navFields)->values()
-            ->flip()->forget('url')
-            ->flip()->all();
-    }
-
     private function extractValuesAndMeta($page, $blueprint)
     {
         $values = $page instanceof Page
@@ -113,7 +99,11 @@ class NavigationPagesController extends CpController
 
         $values = $fields->values();
 
-        return [$values->all(), $fields->meta()];
+        $extraValues = [
+            'depth' => $page instanceof Page ? $page->depth() : null,
+        ];
+
+        return [$values->all(), $fields->meta(), $extraValues];
     }
 
     private function getPageValues($page)

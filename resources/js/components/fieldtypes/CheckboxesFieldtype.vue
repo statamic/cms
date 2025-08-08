@@ -1,31 +1,35 @@
 <template>
-    <div class="checkboxes-fieldtype-wrapper"  :class="{'inline-mode': config.inline}">
-        <div class="option" v-for="(option, $index) in options" :key="$index">
-            <label>
-                <input type="checkbox"
-                       ref="checkbox"
-                       :name="name + '[]'"
-                       :value="option.value"
-                       :disabled="isReadOnly"
-                       v-model="values"
-                />
-                {{ option.label || option.value }}
-            </label>
-        </div>
+    <div>
+        <CheckboxGroup v-model="values" :inline="config.inline" ref="checkboxes">
+            <Checkbox
+                v-for="(option, index) in options"
+                :disabled="config.disabled"
+                :key="index"
+                :label="option.label || option.value"
+                :read-only="isReadOnly"
+                :value="option.value"
+            />
+        </CheckboxGroup>
     </div>
 </template>
 
 <script>
-import HasInputOptions from './HasInputOptions.js'
+import Fieldtype from './Fieldtype.vue';
+import HasInputOptions from './HasInputOptions.js';
+import { CheckboxGroup, Checkbox } from '@statamic/ui';
 
 export default {
-
     mixins: [Fieldtype, HasInputOptions],
+
+    components: {
+        CheckboxGroup,
+        Checkbox,
+    },
 
     data() {
         return {
-            values: this.value || []
-        }
+            values: this.value || [],
+        };
     },
 
     computed: {
@@ -34,17 +38,18 @@ export default {
         },
 
         replicatorPreview() {
-            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
 
-            return this.values.map(value => {
-                const option = _.findWhere(this.options, { value });
-                return option ? option.label : value;
-            }).join(', ');
+            return this.values
+                .map((value) => {
+                    const option = this.options.find((o) => o.value === value);
+                    return option ? option.label : value;
+                })
+                .join(', ');
         },
     },
 
     watch: {
-
         values(values, oldValues) {
             values = this.sortValues(values);
 
@@ -55,24 +60,19 @@ export default {
 
         value(value) {
             this.values = this.sortValues(value);
-        }
-
+        },
     },
 
     methods: {
-
         focus() {
-            this.$refs.checkbox[0].focus();
+            this.$refs.checkboxes.focus();
         },
 
         sortValues(values) {
             if (!values) return [];
 
-            return this.options
-                .filter(opt => values.includes(opt.value))
-                .map(opt => opt.value);
-        }
-
-    }
+            return this.options.filter((opt) => values.includes(opt.value)).map((opt) => opt.value);
+        },
+    },
 };
 </script>

@@ -3,111 +3,106 @@
         ref="slugify"
         :enabled="generate"
         :from="source"
+        :to="slug"
         :separator="separator"
         :language="language"
         :async="config.async"
         @slugifying="syncing = true"
-        @slugified="syncing = false"
-        v-model="slug"
+        @slugified="
+            syncing = false;
+            slug = $event;
+        "
     >
-        <div>
-            <text-input
-                v-model="slug"
-                classes="font-mono text-xs"
-                :isReadOnly="isReadOnly"
-                :append="config.show_regenerate"
-                :name="slug"
-                :id="fieldId"
-                @focus="$emit('focus')"
-                @blur="$emit('blur')"
-                direction="ltr"
-            >
-                <template v-slot:append v-if="config.show_regenerate">
-                    <button class="input-group-append items-center flex" @click="sync" v-tooltip="__('Regenerate from: :field', { 'field': config.from })">
-                        <svg-icon name="light/synchronize" class="w-5 h-5" v-show="!syncing" />
-                        <div class="w-5 h-5" v-show="syncing"><loading-graphic inline text="" class="mt-0.5 ml-0.5" /></div>
-                    </button>
-                </template>
-            </text-input>
-        </div>
+        <Input
+            v-model="slug"
+            :id="fieldId"
+            :read-only="isReadOnly"
+            :name="slug"
+            :disabled="config.disabled"
+            @focus="$emit('focus')"
+            @blur="$emit('blur')"
+        >
+            <template #append v-if="config.show_regenerate">
+                <Button
+                    size="sm"
+                    variant="ghost"
+                    :icon-only="true"
+                    @click="sync"
+                    v-tooltip="__('Regenerate from: :field', { field: config.from })"
+                >
+                    <svg-icon name="light/synchronize" class="h-5 w-5" v-show="!syncing" />
+                    <div class="h-5 w-5" v-show="syncing">
+                        <Icon name="loading" class="mt-0.5 ml-0.5" />
+                    </div>
+                </Button>
+            </template>
+        </Input>
     </slugify>
-
 </template>
 
 <script>
 import { data_get } from '../../bootstrap/globals';
 import Fieldtype from './Fieldtype.vue';
+import { Input, Button, Icon } from '@statamic/ui';
 
 export default {
-
     mixins: [Fieldtype],
+
+    components: {
+        Input,
+        Button,
+        Icon,
+    },
 
     data() {
         return {
             slug: this.value,
             generate: this.config.generate,
             syncing: false,
-        }
+        };
     },
 
     computed: {
-
         separator() {
             return this.config.separator || '-';
         },
 
-        store() {
-            let store;
-            let parent = this;
-
-            while (! parent.storeName) {
-                parent = parent.$parent;
-                store = parent.storeName;
-                if (parent === this.$root) return null;
-            }
-
-            return store;
-        },
-
         source() {
-            if (! this.generate) return;
+            if (!this.generate) return;
 
             const field = this.config.from || 'title';
             let key = field;
 
             if (this.fieldPathPrefix) {
-                let dottedPrefix = this.fieldPathPrefix.replace(new RegExp('\.'+this.handle+'$'), '');
+                let dottedPrefix = this.fieldPathPrefix.replace(new RegExp('\.' + this.handle + '$'), '');
                 key = dottedPrefix + '.' + field;
             }
 
-            return data_get(this.$store.state.publish[this.store].values, key);
+            return data_get(this.publishContainer?.values, key);
         },
 
         language() {
-            if (! this.store) return;
-            const targetSite = this.$store.state.publish[this.store].site;
-            return targetSite ? Statamic.$config.get('sites').find(site => site.handle === targetSite).lang : null;
-        }
-
+            if (!this.publishContainer) return;
+            const targetSite = this.publishContainer.site;
+            return targetSite ? Statamic.$config.get('sites').find((site) => site.handle === targetSite).lang : null;
+        },
     },
 
     watch: {
-
         value(value) {
             this.slug = value;
         },
 
         slug(slug) {
             this.updateDebounced(slug);
-        }
-
+        },
     },
 
     created() {
         this.$events.$on('localization.created', this.handleLocalizationCreated);
     },
 
-    destroyed() {
+    unmounted() {
         this.$events.$off('localization.created', this.handleLocalizationCreated);
     },
 
@@ -116,19 +111,17 @@ export default {
     },
 
     methods: {
-
-        handleLocalizationCreated({ store }) {
-            // Only reset for the "slug" field in the matching store.
+        handleLocalizationCreated({ container }) {
+            // Only reset for the "slug" field in the matching container.
             // Other slug fields that aren't named "slug" should be left alone.
-            if (this.handle === 'slug' && store === this.store) {
+            if (this.handle === 'slug' && container.name === this.publishContainer.name) {
                 this.$refs.slugify.reset();
             }
         },
 
         sync() {
             this.$refs.slugify.reset();
-        }
-    }
-
-}
+        },
+    },
+};
 </script>

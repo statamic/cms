@@ -1,42 +1,52 @@
 <template>
-    <text-input
+    <Input
         ref="input"
-        :value="value"
+        :model-value="value"
         :classes="config.classes"
-        :focus="config.focus || name === 'title' || name === 'alt'"
+        :focus="shouldFocus"
         :autocomplete="config.autocomplete"
         :autoselect="config.autoselect"
         :type="config.input_type"
-        :isReadOnly="isReadOnly"
+        :read-only="isReadOnly"
         :prepend="__(config.prepend)"
         :append="__(config.append)"
         :limit="config.character_limit"
         :placeholder="__(config.placeholder)"
         :name="name"
-        :id="fieldId"
+        :id="id"
         :direction="config.direction"
-        @input="inputUpdated"
+        @update:model-value="inputUpdated"
         @focus="$emit('focus')"
         @blur="$emit('blur')"
     />
 </template>
 
-<script>
-import Fieldtype from './Fieldtype.vue';
+<script setup>
+import { Fieldtype } from 'statamic';
+import { Input } from '@statamic/ui';
+import { computed } from 'vue';
 
-export default {
+const emit = defineEmits(Fieldtype.emits);
+const props = defineProps(Fieldtype.props);
+const {
+    name,
+    isReadOnly,
+    update,
+    updateDebounced,
+    expose
+} = Fieldtype.use(emit, props);
 
-    mixins: [Fieldtype],
-
-    methods: {
-        inputUpdated(value) {
-            if (! this.config.debounce) {
-                return this.update(value)
-            }
-
-            this.updateDebounced(value)
-        }
+const shouldFocus = computed(() => {
+    if (props.config.focus === false) {
+        return false;
     }
 
+    return props.config.focus || name.value === 'title' || name.value === 'alt';
+});
+
+function inputUpdated(value) {
+    return !props.config.debounce ? update(value) : updateDebounced(value);
 }
+
+defineExpose(expose);
 </script>

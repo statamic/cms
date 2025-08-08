@@ -140,6 +140,7 @@ class UsersController extends CpController
 
         $additional = $fields->all()
             ->reject(fn ($field) => in_array($field->handle(), ['roles', 'groups', 'super']))
+            ->reject(fn ($field) => in_array($field->visibility(), ['read_only', 'computed']))
             ->keys();
 
         $viewData = [
@@ -226,11 +227,11 @@ class UsersController extends CpController
         $blueprint = $user->blueprint();
 
         if (! User::current()->can('assign roles')) {
-            $blueprint->ensureField('roles', ['visibility' => 'read_only']);
+            $blueprint->ensureFieldHasConfig('roles', ['visibility' => 'hidden']);
         }
 
         if (! User::current()->can('assign user groups')) {
-            $blueprint->ensureField('groups', ['visibility' => 'read_only']);
+            $blueprint->ensureFieldHasConfig('groups', ['visibility' => 'hidden']);
         }
 
         if (User::current()->isSuper() && User::current()->id() !== $user->id()) {
@@ -248,11 +249,24 @@ class UsersController extends CpController
             'actions' => [
                 'save' => $user->updateUrl(),
                 'password' => cp_route('users.password.update', $user->id()),
-                'editBlueprint' => cp_route('users.blueprint.edit'),
+                'editBlueprint' => cp_route('blueprints.users.edit'),
             ],
             'canEditPassword' => User::fromUser($request->user())->can('editPassword', $user),
-            'requiresCurrentPassword' => $request->user()->id === $user->id(),
+            'requiresCurrentPassword' => $isCurrentUser = $request->user()->id === $user->id(),
             'itemActions' => Action::for($user, ['view' => 'form']),
+            'twoFactor' => $isCurrentUser ? [
+                'isEnforced' => $user->isTwoFactorAuthenticationRequired(),
+                'wasSetup' => $user->hasEnabledTwoFactorAuthentication(),
+                'routes' => [
+                    'enable' => cp_route('users.two-factor.enable'),
+                    'disable' => cp_route('users.two-factor.disable'),
+                    'recoveryCodes' => [
+                        'show' => cp_route('users.two-factor.recovery-codes.show'),
+                        'generate' => cp_route('users.two-factor.recovery-codes.generate'),
+                        'download' => cp_route('users.two-factor.recovery-codes.download'),
+                    ],
+                ],
+            ] : null,
         ];
 
         if ($request->wantsJson()) {

@@ -5,8 +5,10 @@ namespace Statamic\Http\Middleware;
 use Carbon\Carbon;
 use Closure;
 use Illuminate\Support\Facades\Date;
+use ReflectionClass;
 use Statamic\Facades\Site;
 use Statamic\Statamic;
+use Statamic\Support\Arr;
 
 class Localize
 {
@@ -29,11 +31,10 @@ class Localize
         app()->setLocale($site->lang());
 
         // Get original Carbon format so it can be restored later.
-        // There's no getter for it, so we'll use reflection.
-        $format = (new \ReflectionClass(Carbon::class))->getProperty('toStringFormat');
-        $format->setAccessible(true);
-        $originalToStringFormat = $format->getValue();
-        Date::setToStringFormat(Statamic::dateFormat());
+        $originalToStringFormat = $this->getToStringFormat();
+        Date::setToStringFormat(function (Carbon $date) {
+            return $date->setTimezone(Statamic::displayTimezone())->format(Statamic::dateFormat());
+        });
 
         $response = $next($request);
 
@@ -44,5 +45,21 @@ class Localize
         Date::setToStringFormat($originalToStringFormat);
 
         return $response;
+    }
+
+    /**
+     * This method is used to get the current toStringFormat for Carbon, in order for us
+     * to restore it later. There's no getter for it, so we need to use reflection.
+     *
+     * @throws \ReflectionException
+     */
+    private function getToStringFormat(): string|\Closure|null
+    {
+        $reflection = new ReflectionClass($date = Date::now());
+
+        $factory = $reflection->getMethod('getFactory');
+        $factory->setAccessible(true);
+
+        return Arr::get($factory->invoke($date)->getSettings(), 'toStringFormat');
     }
 }

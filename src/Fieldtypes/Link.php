@@ -22,13 +22,14 @@ class Link extends Fieldtype
     {
         return [
             [
-                'display' => __('Behavior'),
+                'display' => __('Input Behavior'),
                 'fields' => [
                     'collections' => [
                         'display' => __('Collections'),
                         'instructions' => __('statamic::fieldtypes.link.config.collections'),
                         'type' => 'collections',
                         'mode' => 'select',
+                        'width' => '33',
                     ],
                     'container' => [
                         'display' => __('Container'),
@@ -36,6 +37,13 @@ class Link extends Fieldtype
                         'type' => 'asset_container',
                         'mode' => 'select',
                         'max_items' => 1,
+                        'width' => '33',
+                    ],
+                    'select_across_sites' => [
+                        'display' => __('Select Across Sites'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.select_across_sites'),
+                        'type' => 'toggle',
+                        'width' => '33',
                     ],
                 ],
             ],
@@ -44,10 +52,13 @@ class Link extends Fieldtype
 
     public function augment($value)
     {
+        $localize = ! $this->canSelectAcrossSites();
+
         return new ArrayableLink(
             $value
-                ? ResolveRedirect::item($value, $this->field->parent(), true)
-                : null
+                ? ResolveRedirect::item($value, $this->field->parent(), $localize)
+                : null,
+            ['select_across_sites' => $this->canSelectAcrossSites()]
         );
     }
 
@@ -108,6 +119,7 @@ class Link extends Fieldtype
             'type' => 'entries',
             'max_items' => 1,
             'create' => false,
+            'select_across_sites' => $this->canSelectAcrossSites(),
         ]));
 
         $entryField->setValue($value);
@@ -189,5 +201,32 @@ class Link extends Fieldtype
                 return is_object($item) ? $item->url() : $item;
             },
         ];
+    }
+
+    protected function getConfiguredCollections()
+    {
+        return empty($collections = $this->config('collections'))
+            ? \Statamic\Facades\Collection::handles()->all()
+            : $collections;
+    }
+
+    private function canSelectAcrossSites(): bool
+    {
+        return $this->config('select_across_sites', false);
+    }
+
+    private function availableSites()
+    {
+        if (! Site::hasMultiple()) {
+            return [];
+        }
+
+        $configuredSites = collect($this->getConfiguredCollections())->flatMap(fn ($collection) => \Statamic\Facades\Collection::find($collection)->sites());
+
+        return Site::authorized()
+            ->when(isset($configuredSites), fn ($sites) => $sites->filter(fn ($site) => $configuredSites->contains($site->handle())))
+            ->map->handle()
+            ->values()
+            ->all();
     }
 }

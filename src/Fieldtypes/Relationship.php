@@ -26,19 +26,14 @@ abstract class Relationship extends Fieldtype
     protected $formComponentProps = [
         '_' => '_', // forces an object in js
     ];
+    protected $formStackSize;
 
     protected function configFieldItems(): array
     {
         return [
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Appearance'),
                 'fields' => [
-                    'max_items' => [
-                        'display' => __('Max Items'),
-                        'instructions' => __('statamic::messages.max_items_instructions'),
-                        'min' => 1,
-                        'type' => 'integer',
-                    ],
                     'mode' => [
                         'display' => __('UI Mode'),
                         'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
@@ -49,6 +44,17 @@ abstract class Relationship extends Fieldtype
                             'select' => __('Select Dropdown'),
                             'typeahead' => __('Typeahead Field'),
                         ],
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Boundaries & Limits'),
+                'fields' => [
+                    'max_items' => [
+                        'display' => __('Max Items'),
+                        'instructions' => __('statamic::messages.max_items_instructions'),
+                        'min' => 1,
+                        'type' => 'integer',
                     ],
                 ],
             ],
@@ -133,6 +139,7 @@ abstract class Relationship extends Fieldtype
             'creatables' => $this->canCreate() ? $this->getCreatables() : [],
             'formComponent' => $this->getFormComponent(),
             'formComponentProps' => $this->getFormComponentProps(),
+            'formStackSize' => $this->getFormStackSize(),
             'taggable' => $this->getTaggable(),
             'initialSortColumn' => $this->initialSortColumn(),
             'initialSortDirection' => $this->initialSortDirection(),
@@ -180,6 +187,11 @@ abstract class Relationship extends Fieldtype
     protected function getFormComponentProps()
     {
         return $this->formComponentProps;
+    }
+
+    protected function getFormStackSize()
+    {
+        return $this->formStackSize;
     }
 
     protected function getColumns()

@@ -1,31 +1,34 @@
 <template>
-
-    <div class="site-selector flex items-center rtl:ml-4 ltr:mr-4 h-full border-l border-r dark:border-dark-900">
-        <v-select
+    <div class="site-selector flex h-full items-center dark:border-dark-900">
+        <Select
             :options="sites"
-            label="name"
-            :get-option-key="(option) => option.handle"
-            :value="activeName"
-            :clearable="false"
+            option-label="name"
+            option-value="handle"
             :searchable="false"
-            @input="selected"
+            :model-value="active"
+            :button-appearance="false"
+            @update:model-value="selected"
         >
-            <template #selected-option="option">
-                <div class="flex items-center px-2 text-sm text-gray dark:text-dark-100 hover:text-gray-800 dark:hover:text-dark-175 anti">
-                    <svg-icon name="light/sites" class="rtl:ml-2 ltr:mr-2 h-4 w-4" />
+            <template #selected-option="{ option }">
+                <div
+                    class="anti flex items-center text-sm font-medium text-gray text-[0.8125rem] text-gray-900 dark:text-gray-300 dark:hover:text-gray-200"
+                >
+                    <svg-icon name="sites" class="h-4 w-4 ltr:mr-2 rtl:ml-2 text-gray-500" />
                     <div class="whitespace-nowrap">{{ __(option.name) }}</div>
                 </div>
             </template>
-            <template #option="{ name, handle }">
-                <div :class="{ 'text-gray-500': handle === active }">{{ __(name) }}</div>
+            <template #option="option">
+                <div :class="{ 'text-gray-500': handle === active }">{{ __(option.name) }}</div>
             </template>
-        </v-select>
+        </Select>
     </div>
-
 </template>
 
 <script>
+import { Select } from '@statamic/ui';
+
 export default {
+    components: { Select },
 
     computed: {
         sites() {
@@ -37,17 +40,16 @@ export default {
         },
 
         activeName() {
-            return _.findWhere(this.sites, { handle: this.active }).name;
-        }
+            return this.sites.find((s) => s.handle === this.active).name;
+        },
     },
 
     methods: {
-        selected(site) {
-            if (site.handle !== this.active) {
-                window.location = cp_url(`select-site/${site.handle}`);
+        selected(siteHandle) {
+            if (siteHandle !== this.active) {
+                window.location = cp_url(`select-site/${siteHandle}`);
             }
-        }
-    }
-
-}
+        },
+    },
+};
 </script>

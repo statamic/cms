@@ -1,51 +1,62 @@
 <template>
-
     <div>
+        <Header v-if="mounted" :title="title" icon="navigation">
+            <Dropdown placement="left-start">
+                <DropdownMenu>
+                    <DropdownItem v-if="canEdit" :text="__('Configure Navigation')" icon="cog" :href="editUrl" />
+                    <DropdownItem v-if="canEditBlueprint" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="blueprintUrl" />
+                </DropdownMenu>
+            </Dropdown>
 
-        <header class="mb-6" v-if="mounted">
-            <breadcrumb :url="breadcrumbUrl" :title="__('Navigation')" />
+            <ui-button
+                v-if="isDirty"
+                variant="filled"
+                :text="__('Discard changes')"
+                @click="$refs.tree.cancel"
+            />
 
-            <div class="flex items-center">
-                <h1 class="flex-1" v-text="__(title)" />
+            <site-selector
+                v-if="sites.length > 1"
+                :sites="sites"
+                :value="site"
+                @input="siteSelected"
+            />
 
-                <dropdown-list v-if="canEdit" class="rtl:ml-2 ltr:mr-2">
-                    <slot name="twirldown" />
-                </dropdown-list>
+            <Dropdown v-if="canEdit && hasCollections" placement="left-start" :disabled="!hasCollections">
+                <template #trigger>
+                    <Button
+                        :text="__('Add')"
+                        icon-append="ui/chevron-down"
+                    />
+                </template>
+                <DropdownMenu>
+                    <DropdownItem
+                        :text="__('Add Nav Item')"
+                        @click="linkPage()"
+                        icon="add-list"
+                    />
+                    <DropdownItem
+                        :text="__('Link to Entry')"
+                        @click="linkEntries()"
+                        icon="add-link"
+                    />
+                </DropdownMenu>
+            </Dropdown>
 
-                <a @click="$refs.tree.cancel" class="text-2xs text-blue rtl:ml-4 ltr:mr-4 underline" v-if="isDirty" v-text="__('Discard changes')" />
+            <Button
+                v-else-if="canEdit && !hasCollections"
+                :text="__('Add Nav Item')"
+                @click="addLink"
+            />
 
-                <site-selector
-                    v-if="sites.length > 1"
-                    class="rtl:ml-4 ltr:mr-4"
-                    :sites="sites"
-                    :value="site"
-                    @input="siteSelected"
-                />
-
-                <dropdown-list v-if="canEdit" :disabled="! hasCollections">
-                    <template #trigger>
-                        <button
-                            class="btn"
-                            :class="{ 'flex items-center rtl:pl-4 ltr:pr-4': hasCollections }"
-                            @click="addLink"
-                        >
-                            {{ __('Add Nav Item') }}
-                            <svg-icon name="micro/chevron-down-xs" class="w-2 rtl:mr-4 ltr:ml-4" v-if="hasCollections" />
-                        </button>
-                    </template>
-                    <dropdown-item :text="__('Add Nav Item')" @click="linkPage()" />
-                    <dropdown-item :text="__('Link to Entry')" @click="linkEntries()" />
-                </dropdown-list>
-
-                <button
-                    v-if="canEdit"
-                    class="btn-primary rtl:mr-4 ltr:ml-4"
-                    :class="{ 'disabled': !changed }"
-                    :disabled="!changed"
-                    @click="$refs.tree.save"
-                    v-text="__('Save Changes')" />
-            </div>
-        </header>
+            <Button
+                v-if="canEdit"
+                :disabled="!changed"
+                variant="primary"
+                :text="__('Save Changes')"
+                @click="$refs.tree?.save"
+            />
+        </Header>
 
         <page-tree
             ref="tree"
@@ -58,73 +69,94 @@
             :preferences-prefix="preferencesPrefix"
             :editable="canEdit"
             @edit-page="editPage"
-            @changed="changed = true; targetParent = null;"
+            @changed="
+                changed = true;
+                targetParent = null;
+            "
             @saved="treeSaved"
             @canceled="changed = false"
         >
             <template #empty>
-                <div class="card p-4 content w-full">
-                    <div class="flex flex-wrap w-full">
-                        <a :href="editUrl" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
-                            <svg-icon name="light/hammer-wrench" class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175" />
-                            <div class="flex-1 mb-4 md:mb-0 rtl:md:ml-6 ltr:md:mr-6">
-                                <h3 class="mb-2 text-blue dark:text-blue-600">{{ __('Configure Navigation') }} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span></h3>
-                                <p>{{ __('messages.navigation_configure_settings_intro') }}</p>
-                            </div>
-                        </a>
-                        <a @click="linkPage()" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
-                            <svg-icon name="paperclip" class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175" />
-                            <div class="flex-1 mb-4 md:mb-0 rtl:md:ml-6 ltr:md:mr-6">
-                                <h3 class="mb-2 text-blue dark:text-blue-600">{{ __('Link to URL') }} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span></h3>
-                                 <p>{{ __('messages.navigation_link_to_url_instructions') }}</p>
-                            </div>
-                        </a>
-                        <a @click="linkEntries()" v-if="hasCollections" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
-                            <svg-icon name="light/hierarchy-files" class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175" />
-                            <div class="flex-1 mb-4 md:mb-0 rtl:md:ml-6 ltr:md:mr-6">
-                                <h3 class="mb-2 text-blue dark:text-blue-600">{{ __('Link to Entry') }} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span></h3>
-                                 <p>{{ __('messages.navigation_link_to_entry_instructions') }}</p>
-                            </div>
-                        </a>
-                        <a :href="docs_url('navigation')" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
-                            <svg-icon name="light/book-pages" class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175" />
-                            <div class="flex-1 mb-4 md:mb-0 rtl:md:ml-6 ltr:md:mr-6">
-                                <h3 class="mb-2 text-blue dark:text-blue-600">{{ __('Read the Documentation') }} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span></h3>
-                                 <p>{{ __('messages.navigation_documentation_instructions') }}</p>
-                            </div>
-                        </a>
-                    </div>
-                </div>
+                <EmptyStateMenu :heading="__('Start designing your navigation with these steps')">
+                    <EmptyStateItem
+                        :href="editUrl"
+                        icon="configure"
+                        :heading="__('Configure Navigation')"
+                        :description="__('messages.navigation_configure_settings_intro')"
+                    />
+
+                    <EmptyStateItem
+                        icon="fieldtype-link"
+                        :heading="__('Link to URL')"
+                        :description="__('messages.navigation_link_to_url_instructions')"
+                        @click="linkPage"
+                    />
+
+                    <EmptyStateItem
+                        v-if="hasCollections"
+                        icon="navigation"
+                        :heading="__('Link to Entry')"
+                        :description="__('messages.navigation_link_to_entry_instructions')"
+                        @click="linkEntries()"
+                    />
+
+                    <EmptyStateItem
+                        :href="docs_url('navigation')"
+                        icon="support"
+                        :heading="__('Read the Documentation')"
+                        :description="__('messages.navigation_documentation_instructions')"
+                    />
+                </EmptyStateMenu>
             </template>
 
             <template #branch-icon="{ branch }">
-                <svg-icon v-if="isEntryBranch(branch)" class="inline-block w-4 h-4 text-gray-500" name="light/hyperlink" v-tooltip="__('Entry link')" />
-                <svg-icon v-if="isLinkBranch(branch)" class="inline-block w-4 h-4 text-gray-500" name="light/external-link" v-tooltip="__('External link')" />
-                <svg-icon v-if="isTextBranch(branch)" class="inline-block w-4 h-4 text-gray-500" name="light/file-text" v-tooltip="__('Text')" />
+                <ui-tooltip v-if="isEntryBranch(branch)" :text="__('Entry link')">
+                    <ui-icon class="size-3.5! text-gray-500" name="link" tabindex="-1" />
+                </ui-tooltip>
+                <ui-tooltip v-if="isLinkBranch(branch)" :text="__('External link')">
+                    <ui-icon class="size-3.5! text-gray-500" name="external-link" tabindex="-1" />
+                </ui-tooltip>
+                <ui-tooltip v-if="isTextBranch(branch)" :text="__('Text')">
+                    <ui-icon class="size-3.5! text-gray-500" name="page" tabindex="-1" />
+                </ui-tooltip>
             </template>
 
-            <template v-if="canEdit" #branch-options="{ branch, removeBranch, orphanChildren, vm, depth }">
-                <dropdown-item
-                    v-if="isEntryBranch(branch)"
+            <template v-if="canEdit" #branch-options="{ branch, removeBranch, stat, depth }">
+                <DropdownItem
+                    v-if="isEntryBranch(stat)"
                     :text="__('Edit Entry')"
-                    :redirect="branch.edit_url" />
-                <dropdown-item
+                    :href="branch.edit_url"
+                    icon="edit"
+                />
+                <DropdownItem
+                    :text="__('Edit Nav item')"
+                    @click="editPage(branch)"
+                    icon="edit"
+                />
+                <DropdownItem
                     v-if="depth < maxDepth"
                     :text="__('Add child nav item')"
-                    @click="linkPage(vm)" />
-                <dropdown-item
+                    @click="linkPage(stat)"
+                    icon="add-list"
+                />
+                <DropdownItem
                     v-if="depth < maxDepth && hasCollections"
                     :text="__('Add child link to entry')"
-                    @click="linkEntries(vm)" />
-                <dropdown-item
+                    @click="linkEntries(stat)"
+                    icon="add-link"
+                />
+                <DropdownSeparator />
+                <DropdownItem
                     :text="__('Remove')"
-                    class="warning"
-                    @click="deleteTreeBranch(branch, removeBranch, orphanChildren)" />
+                    variant="destructive"
+                    @click="deleteTreeBranch(branch, removeBranch)"
+                    icon="trash"
+                />
             </template>
         </page-tree>
 
         <page-selector
-            v-if="hasCollections && $refs.tree"
+            v-if="hasCollections"
             ref="selector"
             :site="site"
             :collections="collections"
@@ -166,46 +198,57 @@
             v-if="showPageDeletionConfirmation"
             :children="numberOfChildrenToBeDeleted"
             @confirm="pageDeletionConfirmCallback"
-            @cancel="showPageDeletionConfirmation = false; pageBeingDeleted = null;"
+            @cancel="
+                showPageDeletionConfirmation = false;
+                pageBeingDeleted = null;
+            "
         />
-
     </div>
-
 </template>
 
 <script>
-import PageTree from '../structures/PageTree.vue';
 import PageEditor from '../structures/PageEditor.vue';
 import PageSelector from '../structures/PageSelector.vue';
 import RemovePageConfirmation from './RemovePageConfirmation.vue';
 import SiteSelector from '../SiteSelector.vue';
 import uniqid from 'uniqid';
+import { defineAsyncComponent } from 'vue';
+import { mapValues, pick } from 'lodash-es';
+import { Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, Button, EmptyStateMenu, EmptyStateItem, Header } from '@statamic/ui';
 
 export default {
-
     components: {
-        PageTree,
+        Button,
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
+        DropdownSeparator,
+        PageTree: defineAsyncComponent(() => import('../structures/PageTree.vue')),
         PageEditor,
         PageSelector,
         RemovePageConfirmation,
-        SiteSelector
+        SiteSelector,
+        EmptyStateMenu,
+        EmptyStateItem,
+        Header,
     },
 
     props: {
         title: { type: String, required: true },
         handle: { type: String, required: true },
         collections: { type: Array, required: true },
-        breadcrumbUrl: { type: String, required: true },
         editUrl: { type: String, required: true },
+        blueprintUrl: { type: String, required: true },
         pagesUrl: { type: String, required: true },
         submitUrl: { type: String, required: true },
-        maxDepth: { type: Number, default: Infinity, },
+        maxDepth: { type: Number, default: Infinity },
         expectsRoot: { type: Boolean, required: true },
         site: { type: String, required: true },
         sites: { type: Array, required: true },
         blueprint: { type: Object, required: true },
         canEdit: { type: Boolean, required: true },
-        canSelectAcrossSites: { type: Boolean, required: true }
+        canSelectAcrossSites: { type: Boolean, required: true },
+        canEditBlueprint: { type: Boolean, required: true },
     },
 
     data() {
@@ -221,11 +264,10 @@ export default {
             removePageOnCancel: false,
             preferencesPrefix: `navs.${this.handle}`,
             publishInfo: {},
-        }
+        };
     },
 
     computed: {
-
         isDirty() {
             return this.$dirty.has('page-tree');
         },
@@ -233,11 +275,11 @@ export default {
         numberOfChildrenToBeDeleted() {
             let children = 0;
             const countChildren = (page) => {
-                page.children.forEach(child => {
+                page.children.forEach((child) => {
                     children++;
                     countChildren(child);
                 });
-            }
+            };
             countChildren(this.pageBeingDeleted);
             return children;
         },
@@ -247,8 +289,8 @@ export default {
         },
 
         submissionData() {
-            return _.mapObject(this.publishInfo, value => {
-                return _.pick(value, ['entry', 'values', 'localizedFields', 'new']);
+            return mapValues(this.publishInfo, (value) => {
+                return pick(value, ['entry', 'values', 'localizedFields', 'new']);
             });
         },
 
@@ -256,7 +298,7 @@ export default {
             return this.$config.get('direction', 'ltr');
         },
 
-        fields () {
+        fields() {
             return this.blueprint.tabs.reduce((fields, tab) => {
                 return tab.sections.reduce((fields, section) => {
                     return fields.concat(section.fields);
@@ -265,21 +307,18 @@ export default {
         },
 
         maxPagesSelection() {
-            if (this.fields.filter(field => field.validate?.includes('required')).length > 0) {
+            if (this.fields.filter((field) => field.validate?.includes('required')).length > 0) {
                 return 1;
             }
 
-            return
+            return;
         },
-
     },
 
     watch: {
-
         changed(changed) {
             this.$dirty.state('page-tree', changed);
-        }
-
+        },
     },
 
     mounted() {
@@ -287,7 +326,6 @@ export default {
     },
 
     methods: {
-
         addLink() {
             if (!this.hasCollections) this.linkPage();
         },
@@ -303,26 +341,29 @@ export default {
         },
 
         entriesSelected(pages) {
-            pages = pages.map(page => ({
+            pages = pages.map((page) => ({
                 ...page,
                 id: uniqid(),
                 entry: page.id,
                 entry_title: page.title,
-                title: null
+                title: null,
             }));
 
-            pages.forEach(page => {
-                this.publishInfo = {...this.publishInfo, [page.id]: {
-                    entry: page.entry,
-                    new: true,
-                }};
+            pages.forEach((page) => {
+                this.publishInfo = {
+                    ...this.publishInfo,
+                    [page.id]: {
+                        entry: page.entry,
+                        new: true,
+                    },
+                };
             });
 
             this.$refs.tree.addPages(pages, this.targetParent);
 
             if (this.maxPagesSelection === 1) {
                 this.removePageOnCancel = true;
-                this.editPage(pages[0], this.$refs.tree.$refs.tree, this.$refs.tree.$refs.tree.store);
+                this.$wait(300).then(() => this.editPage(pages[0]));
             }
         },
 
@@ -338,15 +379,15 @@ export default {
             return !this.isEntryBranch(branch) && !this.isLinkBranch(branch);
         },
 
-        editPage(page, vm, store) {
-            this.editingPage = { page, vm, store };
+        editPage(page) {
+            this.editingPage = { page };
         },
 
         updatePage(values) {
             this.editingPage.page.url = values.url;
             this.editingPage.page.title = values.title;
             this.editingPage.page.values = values;
-            this.$refs.tree.pageUpdated(this.editingPage.store);
+            this.$refs.tree.pageUpdated();
             this.publishInfo[this.editingPage.page.id].values = values;
 
             this.editingPage = false;
@@ -374,30 +415,28 @@ export default {
                 id: uniqid(),
                 title: values.title,
                 url: values.url,
-                children: []
             };
 
-            this.$set(this.publishInfo, page.id, {
+            this.publishInfo[page.id] = {
                 ...this.creatingPage.info,
                 values,
                 entry: null,
                 new: true,
-            });
+            };
 
             this.$refs.tree.addPages([page], this.targetParent);
 
             this.closePageCreator();
         },
 
-        deleteTreeBranch(branch, removeFromUi, orphanChildren) {
+        deleteTreeBranch(branch, removeFromUi) {
             this.showPageDeletionConfirmation = true;
             this.pageBeingDeleted = branch;
             this.pageDeletionConfirmCallback = (shouldDeleteChildren) => {
-                if (!shouldDeleteChildren) orphanChildren();
-                removeFromUi();
+                removeFromUi(shouldDeleteChildren);
                 this.showPageDeletionConfirmation = false;
                 this.pageBeingDeleted = branch;
-            }
+            };
         },
 
         siteSelected(site) {
@@ -421,8 +460,8 @@ export default {
         },
 
         treeSaved(response) {
-            if (! response.data.saved) {
-                return this.$toast.error(`Couldn't save tree`)
+            if (!response.data.saved) {
+                return this.$toast.error(`Couldn't save tree`);
             }
 
             this.replaceGeneratedIds(response.data.generatedIds);
@@ -434,18 +473,16 @@ export default {
             for (let [oldId, newId] of Object.entries(ids)) {
                 // Replace the ID in the publishInfo so if the tree is saved again, its
                 // data will be submitted using the real ID, and now the temp JS one.
-                this.$set(this.publishInfo, newId, { ...this.publishInfo[oldId], new: false });
-                this.$delete(this.publishInfo, oldId);
+                this.publishInfo[newId] = { ...this.publishInfo[oldId], new: false };
+                delete this.publishInfo[oldId];
 
                 // Replace the ID in the branch within the tree.
                 // Same as above, but in the tree itself.
                 let branch = this.$refs.tree.getNodeByBranchId(oldId);
                 branch.id = newId;
-                this.$refs.tree.pageUpdated(branch._vm.store);
+                this.$refs.tree.pageUpdated();
             }
-        }
-
-    }
-
-}
+        },
+    },
+};
 </script>

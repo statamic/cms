@@ -1,99 +1,100 @@
 <template>
-
     <div>
-        <header class="mb-6">
-            <breadcrumb :url="globalsUrl" :title="__('Globals')" />
+        <Header :title="__(title)" icon="globals">
+            <Dropdown v-if="canConfigure || canEditBlueprint">
+                <template #trigger>
+                    <Button icon="ui/dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
+                </template>
+                <DropdownMenu>
+                    <DropdownItem :text="__('Configure')" icon="cog" v-if="canConfigure" :href="configureUrl" />
+                    <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :href="actions.editBlueprint" />
+                </DropdownMenu>
+            </Dropdown>
 
-            <div class="flex items-center">
-                <h1 class="flex-1" v-text="__(title)" />
+            <div class="text-2xs me-4 flex pt-px text-gray-600" v-if="!canEdit">
+                <svg-icon name="light/lock" class="me-1 -mt-1 w-4" /> {{ __('Read Only') }}
+            </div>
 
-                <div class="pt-px text-2xs text-gray-600 dark:text-dark-200 rtl:mr-4 ltr:ml-4 flex" v-if="! canEdit">
-                    <svg-icon name="light/lock" class="w-4 rtl:ml-1 ltr:mr-1 -mt-1" /> {{ __('Read Only') }}
-                </div>
+            <SiteSelector
+                v-if="showLocalizationSelector"
+                class="ltr:mr-4 rtl:ml-4"
+                :sites="localizations"
+                :value="site"
+                @input="localizationSelected"
+            />
 
-                <dropdown-list v-if="canConfigure || canEditBlueprint" class="rtl:ml-2 ltr:mr-2">
-                    <dropdown-item v-if="canConfigure" v-text="__('Configure')" :redirect="configureUrl" />
-                    <dropdown-item v-if="canEditBlueprint" :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
-                </dropdown-list>
-
-                <site-selector
-                    v-if="localizations.length > 1"
-                    class="rtl:ml-4 ltr:mr-4"
-                    :sites="localizations"
-                    :value="site"
-                    @input="localizationSelected"
-                />
-
-                <button
+            <div class="hidden items-center gap-3 md:flex">
+                <Button
                     v-if="canEdit"
-                    class="btn-primary min-w-100"
-                    :class="{ 'opacity-25': !canSave }"
+                    variant="primary"
+                    :text="__('Save')"
                     :disabled="!canSave"
                     @click.prevent="save"
-                    v-text="__('Save')" />
-
-                <slot name="action-buttons-right" />
+                />
             </div>
-        </header>
 
-        <div v-if="fieldset.empty" class="text-center mt-10 border-2 dark:border-dark-300 border-dashed rounded-lg px-8 py-32">
-            <div class="max-w-md mx-auto opacity-50">
-                <h1 class="my-6" v-text="__('This Global Set has no fields.')" />
-                <p v-text="__('messages.global_set_no_fields_description')" />
-            </div>
+            <slot name="action-buttons-right" />
+        </Header>
+
+        <div
+            v-if="fieldset.empty"
+            class="px-8 py-16 border border-dashed border-gray-400 dark:border-gray-600 rounded-lg text-center"
+        >
+            <ui-heading class="mx-auto max-w-md" :text="__('messages.global_set_no_fields_description')" />
         </div>
 
-        <publish-container
+        <PublishContainer
             v-if="fieldset && !fieldset.empty"
             ref="container"
             :name="publishContainer"
-            :blueprint="fieldset"
-            :values="values"
             :reference="initialReference"
+            :blueprint="fieldset"
+            v-model="values"
             :meta="meta"
             :errors="errors"
             :site="site"
             :localized-fields="localizedFields"
-            :is-root="isRoot"
-            @updated="values = $event"
-        >
-            <div slot-scope="{ container, components, setFieldMeta }">
-                <component
-                    v-for="component in components"
-                    :key="component.name"
-                    :is="component.name"
-                    :container="container"
-                    v-bind="component.props"
-                />
-                <publish-tabs
-                    :read-only="! canEdit"
-                    :syncable="hasOrigin"
-                    :enable-sidebar="false"
-                    @updated="setFieldValue"
-                    @meta-updated="setFieldMeta"
-                    @synced="syncField"
-                    @desynced="desyncField"
-                    @focus="container.$emit('focus', $event)"
-                    @blur="container.$emit('blur', $event)"
-                />
-            </div>
-        </publish-container>
-    </div>
+            :sync-field-confirmation-text="syncFieldConfirmationText"
+        />
 
+        <confirmation-modal
+            v-if="pendingLocalization"
+            :title="__('Unsaved Changes')"
+            :body-text="__('Are you sure? Unsaved changes will be lost.')"
+            :button-text="__('Continue')"
+            :danger="true"
+            @confirm="confirmSwitchLocalization"
+            @cancel="pendingLocalization = null"
+        />
+    </div>
 </template>
 
 <script>
 import SiteSelector from '../SiteSelector.vue';
-import HasHiddenFields from '../publish/HasHiddenFields';
+import clone from '@statamic/util/clone.js';
+import { Button, Dropdown, DropdownItem, DropdownMenu, Header } from '@statamic/ui';
+import PublishContainer from '@statamic/components/ui/Publish/Container.vue';
+import PublishTabs from '@statamic/components/ui/Publish/Tabs.vue';
+import PublishComponents from '@statamic/components/ui/Publish/Components.vue';
+import { SavePipeline } from '@statamic/exports.js';
+import { computed, ref } from 'vue';
+const { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } = SavePipeline;
+
+let saving = ref(false);
+let errors = ref({});
+let container = null;
 
 export default {
-
-    mixins: [
-        HasHiddenFields,
-    ],
-
     components: {
-        SiteSelector
+        PublishComponents,
+        PublishContainer,
+        PublishTabs,
+        Dropdown,
+        DropdownItem,
+        Button,
+        DropdownMenu,
+        Header,
+        SiteSelector,
     },
 
     props: {
@@ -116,7 +117,6 @@ export default {
         method: String,
         isCreating: Boolean,
         initialReadOnly: Boolean,
-        initialIsRoot: Boolean,
         canEdit: Boolean,
         canConfigure: Boolean,
         configureUrl: String,
@@ -126,36 +126,43 @@ export default {
     data() {
         return {
             actions: this.initialActions,
-            saving: false,
             localizing: false,
             fieldset: this.initialFieldset,
             title: this.initialTitle,
-            values: _.clone(this.initialValues),
-            meta: _.clone(this.initialMeta),
-            localizations: _.clone(this.initialLocalizations),
+            values: clone(this.initialValues),
+            visibleValues: {},
+            meta: clone(this.initialMeta),
+            localizations: clone(this.initialLocalizations),
             localizedFields: this.initialLocalizedFields,
             hasOrigin: this.initialHasOrigin,
             originValues: this.initialOriginValues || {},
             originMeta: this.initialOriginMeta || {},
             site: this.initialSite,
-            error: null,
-            errors: {},
-            isRoot: this.initialIsRoot,
-        }
+            readOnly: this.initialReadOnly,
+            syncFieldConfirmationText: __('messages.sync_entry_field_confirmation_text'),
+            pendingLocalization: null,
+        };
     },
 
     computed: {
+        saving() {
+            return saving.value;
+        },
 
-        hasErrors() {
-            return this.error || Object.keys(this.errors).length;
+        errors() {
+            return errors.value;
         },
 
         somethingIsLoading() {
-            return ! this.$progress.isComplete();
+            return !this.$progress.isComplete();
         },
 
         canSave() {
-            return this.canEdit && this.isDirty && !this.somethingIsLoading;
+            return !this.readOnly && !this.somethingIsLoading;
+        },
+
+        showLocalizationSelector() {
+            return this.localizations.length > 1;
         },
 
         isBase() {
@@ -167,110 +174,79 @@ export default {
         },
 
         activeLocalization() {
-            return _.findWhere(this.localizations, { active: true });
+            return this.localizations.find((l) => l.active);
         },
 
         originLocalization() {
-            return _.findWhere(this.localizations, { origin: true });
-        }
-
+            return this.localizations.find((l) => l.origin);
+        },
     },
 
     watch: {
-
         saving(saving) {
             this.$progress.loading(`${this.publishContainer}-global-publish-form`, saving);
-        }
-
+        },
     },
 
     methods: {
-
-        clearErrors() {
-            this.error = null;
-            this.errors = {};
-        },
-
         save() {
             if (!this.canSave) return;
 
-            this.saving = true;
-            this.clearErrors();
+            new Pipeline()
+                .provide({ container, errors, saving })
+                .through([
+                    new BeforeSaveHooks('global-set', {
+                        globalSet: this.initialHandle,
+                        values: this.values,
+                    }),
+                    new Request(this.actions.save, this.method, {
+                        _blueprint: this.fieldset.handle,
+                        _localized: this.localizedFields,
+                    }),
+                    new AfterSaveHooks('global-set', {
+                        globalSet: this.initialHandle,
+                        reference: this.initialReference,
+                    })
+                ])
+                .then((response) => {
+                    if (!this.isCreating) this.$toast.success(__('Saved'));
 
-            this.runBeforeSaveHook();
-        },
-
-        runBeforeSaveHook() {
-            Statamic.$hooks.run('global-set.saving', {
-                globalSet: this.initialHandle,
-                values: this.values,
-                container: this.$refs.container,
-                storeName: this.publishContainer,
-            })
-            .then(this.performSaveRequest)
-            .catch(error => {
-                this.saving = false
-                this.$toast.error(error || 'Something went wrong');
-            })
-        },
-
-        performSaveRequest() {
-            const payload = { ...this.visibleValues, ...{
-                blueprint: this.fieldset.handle,
-                _localized: this.localizedFields,
-            }};
-
-            this.$axios[this.method](this.actions.save, payload).then(response => {
-                this.saving = false;
-                if (!response.data.saved) {
-                    return this.$toast.error(`Couldn't save global set`)
-                }
-                if (!this.isCreating) this.$toast.success(__('Saved'));
-                this.$refs.container.saved();
-                this.runAfterSaveHook(response);
-            }).catch(e => this.handleAxiosError(e));
-        },
-
-        runAfterSaveHook(response) {
-            Statamic.$hooks
-                .run('global-set.saved', {
-                    globalSet: this.initialHandle,
-                    reference: this.initialReference,
-                    response,
-                })
-                .then(() => {
                     this.$nextTick(() => this.$emit('saved', response));
-                }).catch(e => {})
+                })
+                .catch((e) => {
+                    if (!(e instanceof PipelineStopped)) {
+                        this.$toast.error(__('Something went wrong'));
+                        console.error(e);
+                    }
+                });
         },
 
-        handleAxiosError(e) {
-            this.saving = false;
-            if (e.response && e.response.status === 422) {
-                const { message, errors } = e.response.data;
-                this.error = message;
-                this.errors = errors;
-                this.$toast.error(message);
-            } else {
-                this.$toast.error(__('Something went wrong'));
-            }
-        },
+        localizationSelected(localizationHandle) {
+            let localization = this.localizations.find((localization) => localization.handle === localizationHandle);
 
-        localizationSelected(localization) {
             if (localization.active) return;
 
             if (this.isDirty) {
-                if (! confirm(__('Are you sure? Unsaved changes will be lost.'))) {
-                    return;
-                }
+                this.pendingLocalization = localization;
+                return;
             }
 
+            this.switchToLocalization(localization);
+        },
+
+        confirmSwitchLocalization() {
+            this.switchToLocalization(this.pendingLocalization);
+            this.pendingLocalization = null;
+        },
+
+        switchToLocalization(localization) {
             this.localizing = localization.handle;
 
             if (this.publishContainer === 'base') {
                 window.history.replaceState({}, '', localization.url);
             }
 
-            this.$axios.get(localization.url).then(response => {
+            this.$axios.get(localization.url).then((response) => {
                 const data = response.data;
                 this.values = data.values;
                 this.originValues = data.originValues;
@@ -280,11 +256,10 @@ export default {
                 this.hasOrigin = data.hasOrigin;
                 this.actions = data.actions;
                 this.fieldset = data.blueprint;
-                this.isRoot = data.isRoot;
                 this.site = localization.handle;
                 this.localizing = false;
                 this.$nextTick(() => this.$refs.container.clearDirtyState());
-            })
+            });
         },
 
         localizationStatusText(localization) {
@@ -292,36 +267,10 @@ export default {
                 ? 'This global set exists in this site.'
                 : 'This global set does not exist for this site.';
         },
-
-        setFieldValue(handle, value) {
-            if (this.hasOrigin) this.desyncField(handle);
-
-            this.$refs.container.setFieldValue(handle, value);
-        },
-
-        syncField(handle) {
-            if (! confirm(__('Are you sure? This field\'s value will be replaced by the value in the original entry.')))
-                return;
-
-            this.localizedFields = this.localizedFields.filter(field => field !== handle);
-            this.$refs.container.setFieldValue(handle, this.originValues[handle]);
-
-            // Update the meta for this field. For instance, a relationship field would have its data preloaded into it.
-            // If you sync the field, the preloaded data would be outdated and an ID would show instead of the titles.
-            this.meta[handle] = this.originMeta[handle];
-        },
-
-        desyncField(handle) {
-            if (!this.localizedFields.includes(handle))
-                this.localizedFields.push(handle);
-
-            this.$refs.container.dirty();
-        },
-
     },
 
     mounted() {
-        this.$keys.bindGlobal(['mod+s'], e => {
+        this.$keys.bindGlobal(['mod+s'], (e) => {
             e.preventDefault();
             this.save();
         });
@@ -329,7 +278,8 @@ export default {
 
     created() {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
-    }
 
-}
+        container = computed(() => this.$refs.container);
+    },
+};
 </script>

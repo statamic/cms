@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -26,11 +26,17 @@ jobs:
       - name: Compile assets
         run: npm run build
 
+      - name: Compile dev assets
+        run: npm run build-dev
+
       - name: Compile frontend assets
         run: npm run frontend-build
 
       - name: Create dist zip
         run: cd resources && tar -czvf dist.tar.gz dist
+
+      - name: Create dist-dev zip
+        run: cd resources && tar -czvf dist-dev.tar.gz dist-dev
 
       - name: Create dist-frontend zip
         run: cd resources && tar -czvf dist-frontend.tar.gz dist-frontend
@@ -59,6 +65,16 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./resources/dist.tar.gz
           asset_name: dist.tar.gz
+          asset_content_type: application/tar+gz
+
+      - name: Upload dist-dev zip to release
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./resources/dist-dev.tar.gz
+          asset_name: dist-dev.tar.gz
           asset_content_type: application/tar+gz
 
       - name: Upload dist-frontend zip to release

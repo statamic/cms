@@ -1,68 +1,76 @@
 <template>
     <div>
-        <div v-if="!singleTab && tabs.length > 0" class="tabs-container relative">
-            <div ref="tabs" class="tabs flex-1 flex space-x-3 rtl:space-x-reverse overflow-auto rtl:pl-6 ltr:pr-6" role="tablist">
-                <tab
-                    ref="tab"
+        <div>
+            <Tabs v-model="currentTab" :unmount-on-hide="false">
+                <div v-if="!singleTab && tabs.length > 0" class="flex items-center justify-between gap-x-2 mb-6">
+                    <TabList class="flex-1">
+                        <BlueprintTab
+                            ref="tab"
+                            v-for="tab in tabs"
+                            :key="tab._id"
+                            :tab="tab"
+                            :current-tab="currentTab"
+                            :show-instructions="showTabInstructionsField"
+                            :edit-text="editTabText"
+                            @removed="removeTab(tab._id)"
+                            @updated="updateTab(tab._id, $event)"
+                        />
+                    </TabList>
+
+                    <Button icon="plus" size="sm" round v-tooltip="addTabText" @click="addAndEditTab" />
+                </div>
+
+                <Button
+                    v-if="!singleTab && tabs.length === 0"
+                    :text="addTabText"
+                    @click="addAndEditTab"
+                />
+
+                <Description v-if="errors" v-for="(error, i) in errors" :key="i" :text="error" class="mt-2 text-red-500" />
+
+                <BlueprintTabContent
                     v-for="tab in tabs"
+                    ref="tabContent"
                     :key="tab._id"
                     :tab="tab"
-                    :current-tab="currentTab"
-                    :show-instructions="showTabInstructionsField"
-                    :edit-text="editTabText"
-                    @selected="selectTab(tab._id)"
-                    @removed="removeTab(tab._id)"
+                    v-show="currentTab === tab._id"
+                    :show-section-handle-field="showSectionHandleField"
+                    :show-section-hide-field="showSectionHideField"
+                    :new-section-text="newSectionText"
+                    :edit-section-text="editSectionText"
+                    :add-section-text="addSectionText"
+                    :can-define-localizable="canDefineLocalizable"
                     @updated="updateTab(tab._id, $event)"
-                    @mouseenter="mouseEnteredTab(tab._id)"
                 />
-                <div class="fade-left" v-if="canScrollLeft" />
-            </div>
-            <div class="fade-right rtl:left-10 ltr:right-10" />
-            <button class="btn-round rtl:mr-2 ltr:ml-2 flex items-center justify-center relative top-1" @click="addAndEditTab" v-tooltip="addTabText">
-                <svg-icon name="add" class="w-3 h-3" />
-            </button>
+            </Tabs>
         </div>
-        <button v-if="!singleTab && tabs.length === 0" class="btn" @click="addAndEditTab" v-text="addTabText" />
-        <div v-if="errors" class="-mt-2">
-            <small class="help-block text-red-500" v-for="(error, i) in errors" :key="i" v-text="error" />
-        </div>
-        <tab-content
-            v-for="tab in tabs"
-            ref="tabContent"
-            :key="tab._id"
-            :tab="tab"
-            v-show="currentTab === tab._id"
-            :show-section-handle-field="showSectionHandleField"
-            :show-section-hide-field="showSectionHideField"
-            :new-section-text="newSectionText"
-            :edit-section-text="editSectionText"
-            :add-section-text="addSectionText"
-            :can-define-localizable="canDefineLocalizable"
-            @updated="updateTab(tab._id, $event)"
-        />
     </div>
 </template>
 
 <script>
-import {Sortable, Plugins} from '@shopify/draggable';
+import { Sortable, Plugins } from '@shopify/draggable';
 import uniqid from 'uniqid';
-import Tab from './Tab.vue';
-import TabContent from './TabContent.vue';
-import CanDefineLocalizable from "../fields/CanDefineLocalizable";
+import BlueprintTab from './Tab.vue';
+import BlueprintTabContent from './TabContent.vue';
+import CanDefineLocalizable from '../fields/CanDefineLocalizable';
+import { Tabs, TabList, Button, Description } from '@statamic/ui';
 
 export default {
-
     mixins: [CanDefineLocalizable],
 
     components: {
-        Tab,
-        TabContent,
+        BlueprintTab,
+        BlueprintTabContent,
+        Tabs,
+        TabList,
+        Button,
+        Description,
     },
 
     props: {
         initialTabs: {
             type: Array,
-            required: true
+            required: true,
         },
         addSectionText: {
             type: String,
@@ -75,39 +83,39 @@ export default {
         },
         addTabText: {
             type: String,
-            default: () => __('Add Tab')
+            default: () => __('Add Tab'),
         },
         editTabText: {
             type: String,
-            default: () => __('Edit Tab')
+            default: () => __('Edit Tab'),
         },
         newTabText: {
             type: String,
-            default: () => __('New Tab')
+            default: () => __('New Tab'),
         },
         singleTab: {
             type: Boolean,
-            default: false
+            default: false,
         },
         requireSection: {
             type: Boolean,
-            default: true
+            default: true,
         },
         showTabInstructionsField: {
             type: Boolean,
-            default: false
+            default: false,
         },
         showSectionHandleField: {
             type: Boolean,
-            default: false
+            default: false,
         },
         showSectionHideField: {
             type: Boolean,
-            default: false
+            default: false,
         },
         errors: {
-            type: Array
-        }
+            type: Array,
+        },
     },
 
     data() {
@@ -122,16 +130,14 @@ export default {
             sortableTabs: null,
             sortableSections: null,
             sortableFields: null,
-        }
+        };
     },
 
     watch: {
-
         tabs(tabs) {
             this.$emit('updated', tabs);
             this.makeSortable();
-        }
-
+        },
     },
 
     mounted() {
@@ -139,14 +145,13 @@ export default {
         this.makeSortable();
     },
 
-    destroyed() {
+    unmounted() {
         if (this.sortableTabs) this.sortableTabs.destroy();
         if (this.sortableSections) this.sortableSections.destroy();
         if (this.sortableFields) this.sortableFields.destroy();
     },
 
     methods: {
-
         ensureTab() {
             if (this.requireSection && this.tabs.length === 0) {
                 this.addTab();
@@ -154,7 +159,7 @@ export default {
         },
 
         makeSortable() {
-            if (! this.singleTab) this.makeTabsSortable();
+            if (!this.singleTab) this.makeTabsSortable();
 
             this.makeSectionsSortable();
 
@@ -170,9 +175,11 @@ export default {
                 swapAnimation: { horizontal: true },
                 plugins: [Plugins.SwapAnimation],
                 distance: 10,
-            }).on('sortable:stop', e => {
-                this.tabs.splice(e.newIndex, 0, this.tabs.splice(e.oldIndex, 1)[0]);
-            }).on('mirror:create', (e) => e.cancel());
+            })
+                .on('sortable:stop', (e) => {
+                    this.tabs.splice(e.newIndex, 0, this.tabs.splice(e.oldIndex, 1)[0]);
+                })
+                .on('mirror:create', (e) => e.cancel());
         },
 
         makeSectionsSortable() {
@@ -183,12 +190,11 @@ export default {
                 handle: '.blueprint-section-drag-handle',
                 mirror: { constrainDimensions: true, appendTo: 'body' },
             })
-            .on('drag:start', e => this.lastInteractedTab = this.currentTab)
-            .on('drag:stop', e => this.lastInteractedTab = null)
-            .on('sortable:sort', e => this.lastInteractedTab = this.currentTab)
-            .on('sortable:stop', e => this.sectionHasBeenDropped(e));
+                .on('drag:start', (e) => (this.lastInteractedTab = this.currentTab))
+                .on('drag:stop', (e) => (this.lastInteractedTab = null))
+                .on('sortable:sort', (e) => (this.lastInteractedTab = this.currentTab))
+                .on('sortable:stop', (e) => this.sectionHasBeenDropped(e));
         },
-
 
         makeFieldsSortable() {
             if (this.sortableFields) this.sortableFields.destroy();
@@ -198,9 +204,9 @@ export default {
                 handle: '.blueprint-drag-handle',
                 mirror: { constrainDimensions: true, appendTo: 'body' },
             })
-            .on('drag:start', e => this.lastInteractedTab = this.currentTab)
-            .on('drag:stop', e => this.lastInteractedTab = null)
-            .on('sortable:stop', e => this.fieldHasBeenDropped(e));
+                .on('drag:start', (e) => (this.lastInteractedTab = this.currentTab))
+                .on('drag:stop', (e) => (this.lastInteractedTab = null))
+                .on('sortable:stop', (e) => this.fieldHasBeenDropped(e));
         },
 
         sectionHasBeenDropped(e) {
@@ -209,8 +215,7 @@ export default {
             let newTabId = e.newContainer.dataset.tab;
             let newIndex = e.newIndex;
 
-            if (this.lastInteractedTab !== this.currentTab
-            && this.currentTab !== newTabId) {
+            if (this.lastInteractedTab !== this.currentTab && this.currentTab !== newTabId) {
                 // Dragged over tab but haven't dragged into a droppable spot yet.
                 // In this case we'll assume they want to drop it at the top of the tab.
                 newTabId = this.currentTab;
@@ -221,15 +226,15 @@ export default {
 
             if (hasMovedTabs) {
                 // Rearrange sections within the tabs.
-                const oldTab = this.tabs.find(tab => tab._id === oldTabId);
-                const newTab = this.tabs.find(tab => tab._id === newTabId);
+                const oldTab = this.tabs.find((tab) => tab._id === oldTabId);
+                const newTab = this.tabs.find((tab) => tab._id === newTabId);
                 const section = oldTab.sections.splice(oldIndex, 1)[0];
                 newTab.sections.splice(newIndex, 0, section);
                 this.updateTab(oldTabId, oldTab);
                 this.updateTab(newTabId, newTab);
             } else {
                 // Update the section within the tab.
-                const tab = this.tabs.find(tab => tab._id === oldTabId);
+                const tab = this.tabs.find((tab) => tab._id === oldTabId);
                 tab.sections.splice(newIndex, 0, tab.sections.splice(oldIndex, 1)[0]);
                 this.updateTab(oldTabId, tab);
             }
@@ -238,28 +243,27 @@ export default {
         fieldHasBeenDropped(e) {
             const oldTabId = e.oldContainer.dataset.tab;
             let newTabId = e.newContainer.dataset.tab;
-            let newTab = this.tabs.find(tab => tab._id === newTabId);
-            let newIndex = e.newIndex
+            let newTab = this.tabs.find((tab) => tab._id === newTabId);
+            let newIndex = e.newIndex;
             let newSection;
 
             if (e.newContainer.parentElement.classList.contains('blueprint-add-section-button')) {
-                newSection = this.$refs.tabContent.find(vm => vm.tab._id === newTabId).addSection();
+                newSection = this.$refs.tabContent.find((vm) => vm.tab._id === newTabId).addSection();
             } else {
-                newSection = newTab.sections.find(section => section._id === e.newContainer.dataset.section);
+                newSection = newTab.sections.find((section) => section._id === e.newContainer.dataset.section);
             }
 
-            if (this.lastInteractedTab !== this.currentTab
-            && this.currentTab !== newTabId) {
+            if (this.lastInteractedTab !== this.currentTab && this.currentTab !== newTabId) {
                 // Dragged over tab but haven't dragged into a droppable spot yet.
                 // In this case we'll assume they want to dropped into the first section of that tab.
                 newTabId = this.currentTab;
-                newTab = this.tabs.find(tab => tab._id === newTabId);
+                newTab = this.tabs.find((tab) => tab._id === newTabId);
                 newSection = newTab.sections[0];
                 newIndex = 0;
             }
 
-            const oldTab = this.tabs.find(tab => tab._id === oldTabId);
-            const oldSection = oldTab.sections.find(section => section._id === e.oldContainer.dataset.section);
+            const oldTab = this.tabs.find((tab) => tab._id === oldTabId);
+            const oldSection = oldTab.sections.find((section) => section._id === e.oldContainer.dataset.section);
 
             const field = oldSection.fields.splice(e.oldIndex, 1)[0];
             newSection.fields.splice(newIndex, 0, field);
@@ -271,7 +275,7 @@ export default {
         },
 
         updateTab(tabId, tab) {
-            const index = this.tabs.findIndex(tab => tab._id === tabId);
+            const index = this.tabs.findIndex((tab) => tab._id === tabId);
             this.tabs.splice(index, 1, tab);
         },
 
@@ -292,28 +296,26 @@ export default {
                 handle: snake_case(this.newTabText),
                 instructions: null,
                 icon: null,
-                sections: []
+                sections: [],
             });
 
             this.selectTab(id);
 
-            this.$nextTick(() => this.$refs.tabContent.find(vm => vm.tab._id === id).addSection());
+            this.$nextTick(() => this.$refs.tabContent.find((vm) => vm.tab._id === id).addSection());
         },
 
         addAndEditTab() {
             this.addTab();
-            this.$nextTick(() => this.$refs.tab.find(vm => vm.tab._id === this.currentTab).edit());
+            this.$nextTick(() => this.$refs.tab.find((vm) => vm.tab._id === this.currentTab).edit());
         },
 
         removeTab(tabId) {
-            this.tabs = this.tabs.filter(tab => tab._id !== tabId);
+            this.tabs = this.tabs.filter((tab) => tab._id !== tabId);
 
             this.selectTab(this.tabs.length ? this.tabs[0]._id : null);
 
             this.ensureTab();
         },
-
-    }
-
-}
+    },
+};
 </script>

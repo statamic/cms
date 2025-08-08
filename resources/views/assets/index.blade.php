@@ -1,22 +1,30 @@
-@php use function Statamic\trans as __; @endphp
+@php
+    use function Statamic\trans as __;
+@endphp
 
 @extends('statamic::layout')
-@section('title', __('Assets'))
+@section('title', __('Asset Containers'))
+@section('content-card-modifiers', 'bg-architectural-lines')
 
 @section('content')
+    <header class="py-8 mt-8 text-center">
+        <h1 class="text-[25px] font-medium antialiased flex justify-center items-center gap-3">
+            <ui-icon name="assets" class="size-5 text-gray-500"></ui-icon>
+            {{ __('Asset Containers') }}
+        </h1>
+    </header>
 
-    @include('statamic::partials.empty-state', [
-        'title' => __('Asset Containers'),
-        'description' => __('statamic::messages.asset_container_intro'),
-        'svg' => 'empty/asset-container',
-        'button_text' => __('Create Asset Container'),
-        'button_url' => cp_route('asset-containers.create'),
-        'can' => $user->can('create', \Statamic\Contracts\Assets\AssetContainer::class)
-    ])
+    <ui-empty-state-menu heading="{{ __('statamic::messages.asset_container_intro') }}">
+        <ui-empty-state-item
+            href="{{ cp_route('asset-containers.create') }}"
+            icon="assets"
+            heading="{{ __('Create Asset Container') }}"
+            description="{{ __('Get started by creating your first asset container.') }}"
+        ></ui-empty-state-item>
+    </ui-empty-state-menu>
 
-    @include('statamic::partials.docs-callout', [
-        'topic' => __('Assets'),
-        'url' => Statamic::docsUrl('assets')
-    ])
-
+    <x-statamic::docs-callout
+        topic="{{ __('Assets') }}"
+        url="{{ Statamic::docsUrl('assets') }}"
+    />
 @endsection

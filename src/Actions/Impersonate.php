@@ -11,6 +11,8 @@ use Statamic\Facades\User;
 
 class Impersonate extends Action
 {
+    public $icon = 'mask';
+
     public static function title()
     {
         return __('Start Impersonating');
@@ -83,6 +85,11 @@ class Impersonate extends Action
     }
 
     public function bypassesDirtyWarning(): bool
+    {
+        return true;
+    }
+
+    public function requiresElevatedSession(): bool
     {
         return true;
     }

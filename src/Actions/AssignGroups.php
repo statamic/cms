@@ -7,6 +7,8 @@ use Statamic\Facades\UserGroup;
 
 class AssignGroups extends Action
 {
+    public $icon = 'add-group';
+
     public static function title()
     {
         return __('Assign Groups');

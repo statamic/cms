@@ -1,74 +1,76 @@
-@php use function Statamic\trans as __; @endphp
+@php
+    use function Statamic\trans as __;
+@endphp
 
 @extends('statamic::layout')
 @section('title', Statamic::crumb($taxonomy->title(), 'Taxonomies'))
-@section('wrapper_class', 'max-w-full')
 
 @section('content')
-
-    <header class="mb-6">
-        @include('statamic::partials.breadcrumb', [
-            'url' => cp_route('taxonomies.index'),
-            'title' => __('Taxonomies')
-        ])
-        <div class="flex items-center">
-            <h1 v-pre class="flex-1">{{ __($taxonomy->title()) }}</h1>
-
-            <dropdown-list class="rtl:ml-2 ltr:mr-2">
+    <ui-header title="{{ __($taxonomy->title()) }}">
+        <ui-dropdown>
+            <ui-dropdown-menu>
                 @can('edit', $taxonomy)
-                    <dropdown-item :text="__('Edit Taxonomy')" redirect="{{ $taxonomy->editUrl() }}"></dropdown-item>
+                    <ui-dropdown-item :text="__('Configure Taxonomy')" icon="cog" href="{{ $taxonomy->editUrl() }}"></ui-dropdown-item>
                 @endcan
-                @can('configure fields')
-                    <dropdown-item :text="__('Edit Blueprints')" redirect="{{ cp_route('taxonomies.blueprints.index', $taxonomy) }}"></dropdown-item>
-                @endcan
-                @can('delete', $taxonomy)
-                    <dropdown-item :text="__('Delete Taxonomy')" class="warning" @click="$refs.deleter.confirm()">
-                        <resource-deleter
-                            ref="deleter"
-                            resource-title="{{ $taxonomy->title() }}"
-                            route="{{ cp_route('taxonomies.destroy', $taxonomy->handle()) }}"
-                            redirect="{{ cp_route('taxonomies.index') }}"
-                        ></resource-deleter>
-                    </dropdown-item>
-                @endcan
-            </dropdown-list>
 
-            @if($canCreate)
-                <create-term-button
-                    url="{{ cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site]) }}"
-                    text="{{ $taxonomy->createLabel() }}"
-                    :blueprints="{{ $blueprints->toJson() }}">
-                </create-term-button>
-            @endif
-        </div>
-    </header>
+                @can('configure fields')
+                    <ui-dropdown-item
+                        :text="__('Edit Blueprints')"
+                        icon="blueprint-edit"
+                        href="{{ cp_route('blueprints.taxonomies.index', $taxonomy) }}"
+                    ></ui-dropdown-item>
+                @endcan
+
+                @can('delete', $taxonomy)
+                    <ui-dropdown-item :text="__('Delete Taxonomy')" icon="trash" variant="destructive" @click="$refs.deleter.confirm()"></ui-dropdown-item>
+                @endcan
+            </ui-dropdown-menu>
+        </ui-dropdown>
+
+        @if ($canCreate)
+            <create-term-button
+                url="{{ cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site]) }}"
+                text="{{ $taxonomy->createLabel() }}"
+                :blueprints="{{ $blueprints->toJson() }}"
+            ></create-term-button>
+        @endif
+    </ui-header>
+
+    @can('delete', $taxonomy)
+        <resource-deleter
+            ref="deleter"
+            resource-title="{{ $taxonomy->title() }}"
+            route="{{ cp_route('taxonomies.destroy', $taxonomy->handle()) }}"
+            redirect="{{ cp_route('taxonomies.index') }}"
+        ></resource-deleter>
+    @endcan
 
     @if ($hasTerms)
-
         <term-list
             taxonomy="{{ $taxonomy->handle() }}"
-            initial-sort-column="{{ $taxonomy->sortField() }}"
-            initial-sort-direction="{{ $taxonomy->sortDirection() }}"
-            :initial-columns="{{ $columns->toJson() }}"
+            sort-column="{{ $taxonomy->sortField() }}"
+            sort-direction="{{ $taxonomy->sortDirection() }}"
+            :columns="{{ $columns->toJson() }}"
             :filters="{{ $filters->toJson() }}"
             action-url="{{ cp_route('taxonomies.terms.actions.run', $taxonomy->handle()) }}"
         ></term-list>
-
     @else
-
-        @component('statamic::partials.create-first', [
-            'resource' => __("{$taxonomy->title()} term"),
-            'svg' => 'empty/taxonomy', // TODO: Do we want separate term SVG?
-            'can' => $user->can('create', ['Statamic\Contracts\Taxonomies\Term', $taxonomy])
-        ])
+        @component(
+            'statamic::partials.create-first',
+            [
+                'resource' => __("{$taxonomy->title()} term"),
+                'svg' => 'empty/taxonomy', // TODO: Do we want separate term SVG?
+                'can' => $user->can('create', ['Statamic\Contracts\Taxonomies\Term', $taxonomy]),
+            ]
+        )
             @slot('button')
-                {{-- <create-term-button
+                {{--
+                    <create-term-button
                     url="{{ cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site]) }}"
                     :blueprints="{{ $blueprints->toJson() }}">
-                </create-term-button> --}}
+                    </create-term-button>
+                --}}
             @endslot
         @endcomponent
-
     @endif
-
 @endsection

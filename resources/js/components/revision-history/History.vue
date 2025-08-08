@@ -1,35 +1,24 @@
 <template>
-
-    <div class="bg-white dark:bg-dark-800 h-full flex flex-col">
-
-        <div class="bg-gray-200 dark:bg-dark-600 px-4 py-2 border-b border-gray-300 dark:border-dark-900 text-lg font-medium flex items-center justify-between">
-            {{ __('Revision History') }}
-            <button
-                type="button"
-                class="btn-close"
-                @click="close"
-                v-html="'&times'" />
-        </div>
+    <div class="m-2 flex h-full flex-col rounded-xl bg-white dark:bg-gray-800">
+        <header
+            class="flex items-center justify-between rounded-t-xl border-b border-gray-300 bg-gray-50 px-4 py-2 dark:border-gray-950 dark:bg-gray-900"
+        >
+            <Heading size="lg">{{ __('Revision History') }}</Heading>
+            <Button icon="x" variant="ghost" class="-me-2" @click="close" />
+        </header>
 
         <div class="flex-1 overflow-auto">
-
-            <div class="flex h-full items-center justify-center loading" v-if="loading">
-                <loading-graphic />
+            <div class="loading flex h-full items-center justify-center" v-if="loading">
+                <Icon name="loading" />
             </div>
 
-            <div v-if="!loading && revisions.length === 0" class="p-4 text-gray dark:text-dark-150 text-sm">
+            <Heading size="sm" class="p-3" v-if="!loading && revisions.length === 0">
                 {{ __('No revisions') }}
-            </div>
+            </Heading>
 
-            <div
-                v-for="group in revisions"
-                :key="group.day"
-            >
-                <h6 class="revision-date" v-text="
-                    $moment.unix(group.day).isBefore($moment().startOf('day'))
-                        ? $moment.unix(group.day).toDate().toLocaleDateString($config.get('locale').replace('_', '-'), { month: 'long', day: 'numeric', year: 'numeric' })
-                        : __('Today')" />
-                <div class="revision-list">
+            <div v-for="group in revisions" :key="group.day">
+                <Heading size="sm" class="p-3" v-text="formatRelativeDate(group.day)" />
+                <div class="divide-y divide-gray-200 dark:divide-gray-900">
                     <revision
                         v-for="revision in group.revisions"
                         :key="revision.date"
@@ -41,20 +30,21 @@
                     />
                 </div>
             </div>
-
         </div>
-
     </div>
-
 </template>
 
 <script>
 import Revision from './Revision.vue';
+import DateFormatter from '@statamic/components/DateFormatter.js';
+import { Heading, Button, Icon } from '@statamic/ui';
 
 export default {
-
     components: {
         Revision,
+        Heading,
+        Button,
+        Icon,
     },
 
     props: {
@@ -69,30 +59,39 @@ export default {
             revisions: [],
             loading: true,
             escBinding: null,
-        }
+        };
     },
 
     mounted() {
-        this.$axios.get(this.indexUrl).then(response => {
+        this.$axios.get(this.indexUrl).then((response) => {
             this.loading = false;
             this.revisions = response.data.reverse();
         });
-        this.escBinding = this.$keys.bindGlobal(['esc'], e => {
+        this.escBinding = this.$keys.bindGlobal(['esc'], (e) => {
             this.close();
         });
     },
 
-    beforeDestroy() {
+    beforeUnmount() {
         this.escBinding.destroy();
     },
 
     methods: {
+        formatRelativeDate(value) {
+            const isToday = new Date(value * 1000) < new Date().setUTCHours(0, 0, 0, 0);
+
+            return !isToday
+                ? __('Today')
+                : DateFormatter.format(value * 1000, {
+                      month: 'long',
+                      day: 'numeric',
+                      year: 'numeric',
+                  });
+        },
 
         close() {
             this.$emit('closed');
-        }
-
-    }
-
-}
+        },
+    },
+};
 </script>

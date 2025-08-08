@@ -1,127 +1,70 @@
+<script setup>
+import { SavePipeline } from 'statamic';
+import { Header, Button, Dropdown, DropdownMenu, DropdownItem, PublishContainer } from '@statamic/ui';
+import { ref, useTemplateRef } from 'vue';
+const { Pipeline, Request } = SavePipeline;
+
+let saving = ref(false);
+let errors = ref({});
+let container = useTemplateRef('container');
+
+const props = defineProps({
+    publishContainer: String,
+    initialFieldset: Object,
+    initialValues: Object,
+    initialMeta: Object,
+    initialReference: String,
+    initialTitle: String,
+    actions: Object,
+    method: String,
+    canEditBlueprint: Boolean,
+    isCreating: Boolean,
+});
+
+const fieldset = ref(props.initialFieldset);
+const values = ref(props.initialValues);
+const meta = ref(props.initialMeta);
+const title = ref(props.initialTitle);
+
+function save() {
+    new Pipeline()
+        .provide({ container, errors, saving })
+        .through([new Request(props.actions.save, props.method)])
+        .then((response) => {
+            if (props.isCreating) window.location = response.data.redirect;
+            Statamic.$toast.success('Saved');
+            title.value = response.data.title;
+        });
+}
+</script>
+
 <template>
+    <div class="max-w-5xl mx-auto">
+        <Header :title="__(title)" icon="groups">
+            <Dropdown v-if="canEditBlueprint" class="me-2">
+                <template #trigger>
+                    <Button icon="ui/dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
+                </template>
+                <DropdownMenu>
+                    <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" :href="actions.editBlueprint" />
+                </DropdownMenu>
+            </Dropdown>
 
-    <div>
+            <Button variant="primary" @click.prevent="save" :text="__('Save')" />
 
-        <header class="mb-3">
-            <breadcrumb :url="cp_url('user-groups')" :title="__('User Groups')" />
-            <div class="flex items-center">
-                <h1 class="flex-1" v-text="__(title)" />
-                    <dropdown-list class="rtl:ml-2 ltr:mr-2" v-if="canEditBlueprint">
-                        <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
-                    </dropdown-list>
+            <slot name="action-buttons-right" />
+        </Header>
 
-                    <button
-                        class="btn-primary"
-                        @click.prevent="save"
-                        v-text="__('Save')" />
-
-                <slot name="action-buttons-right" />
-            </div>
-        </header>
-
-        <publish-container
+        <PublishContainer
             v-if="fieldset"
             ref="container"
             :name="publishContainer"
             :blueprint="fieldset"
-            :values="values"
+            v-model="values"
             :reference="initialReference"
             :meta="meta"
             :errors="errors"
-            @updated="values = $event"
-        >
-            <div slot-scope="{ container, setFieldValue, setFieldMeta }">
-                <publish-tabs
-                    :enable-sidebar="false"
-                    @updated="setFieldValue"
-                    @meta-updated="setFieldMeta"
-                    @focus="container.$emit('focus', $event)"
-                    @blur="container.$emit('blur', $event)"
-                ></publish-tabs>
-            </div>
-        </publish-container>
-
+            as-config
+        />
     </div>
 </template>
-
-
-<script>
-import HasHiddenFields from '../publish/HasHiddenFields';
-
-export default {
-
-    mixins: [
-        HasHiddenFields,
-    ],
-
-    props: {
-        publishContainer: String,
-        initialFieldset: Object,
-        initialValues: Object,
-        initialMeta: Object,
-        initialReference: String,
-        initialTitle: String,
-        actions: Object,
-        method: String,
-        canEditBlueprint: Boolean,
-        isCreating: Boolean,
-    },
-
-    data() {
-        return {
-            fieldset: _.clone(this.initialFieldset),
-            values: _.clone(this.initialValues),
-            meta: _.clone(this.initialMeta),
-            error: null,
-            errors: {},
-            title: this.initialTitle,
-        }
-    },
-
-    computed: {
-
-        hasErrors() {
-            return this.error || Object.keys(this.errors).length;
-        }
-
-    },
-
-    methods: {
-
-        clearErrors() {
-            this.error = null;
-            this.errors = {};
-        },
-
-        save() {
-            this.clearErrors();
-
-            this.$axios[this.method](this.actions.save, this.visibleValues).then(response => {
-                this.title = response.data.title;
-                this.$refs.container.saved();
-                if (this.isCreating) window.location = response.data.redirect;
-                this.$toast.success(__('Saved'));
-                this.$nextTick(() => this.$emit('saved', response));
-            }).catch(e => {
-                if (e.response && e.response.status === 422) {
-                    const { message, errors } = e.response.data;
-                    this.error = message;
-                    this.errors = errors;
-                    this.$toast.error(message);
-                } else {
-                    this.$toast.error(__('Something went wrong'));
-                }
-            });
-        }
-
-    },
-
-    mounted() {
-        this.$keys.bindGlobal(['mod+s'], e => {
-            e.preventDefault();
-            this.save();
-        });
-    }
-
-}
-</script>

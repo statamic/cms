@@ -1,10 +1,11 @@
-@php use function Statamic\trans as __; @endphp
+@php
+    use function Statamic\trans as __;
+@endphp
 
 @extends('statamic::layout')
 @section('title', __('Edit Global Set'))
 
 @section('content')
-
     <global-publish-form
         publish-container="base"
         :initial-actions="{{ json_encode($actions) }}"
@@ -20,7 +21,6 @@
         :initial-meta="{{ empty($meta) ? '{}' : json_encode($meta) }}"
         :initial-localizations="{{ json_encode($localizations) }}"
         :initial-has-origin="{{ Statamic\Support\Str::bool($hasOrigin) }}"
-        :initial-is-root="{{ Statamic\Support\Str::bool($isRoot) }}"
         :initial-origin-values="{{ json_encode($originValues) }}"
         initial-site="{{ $locale }}"
         :can-configure="{{ json_encode($canConfigure) }}"
@@ -28,5 +28,4 @@
         :can-edit="{{ json_encode($canEdit) }}"
         :can-edit-blueprint="{{ $actions['editBlueprint'] ? Statamic\Support\Str::bool($user->can('configure fields')) : 'false' }}"
     ></global-publish-form>
-
 @endsection

@@ -38,6 +38,10 @@ class UserGroupsController extends CpController
             return $groups;
         }
 
+        if ($groups->count() === 0) {
+            return view('statamic::usergroups.empty');
+        }
+
         return view('statamic::usergroups.index', [
             'groups' => $groups,
         ]);
@@ -90,7 +94,7 @@ class UserGroupsController extends CpController
             'reference' => $group->handle(),
             'actions' => [
                 'save' => $group->updateUrl(),
-                'editBlueprint' => cp_route('user-groups.blueprint.edit'),
+                'editBlueprint' => cp_route('blueprints.user-groups.edit'),
             ],
         ];
 

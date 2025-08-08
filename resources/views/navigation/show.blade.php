@@ -3,14 +3,13 @@
 @section('title', Statamic::crumb($nav->title(), 'Navigation'))
 
 @section('content')
-
     <navigation-view
         title="{{ $nav->title() }}"
         handle="{{ $nav->handle() }}"
-        breadcrumb-url="{{ cp_route('navigation.index') }}"
         pages-url="{{ cp_route('navigation.tree.index', $nav->handle()) }}"
         submit-url="{{ cp_route('navigation.tree.update', $nav->handle()) }}"
         edit-url="{{ $nav->editUrl() }}"
+        blueprint-url="{{ cp_route('blueprints.navigation.edit', $nav->handle()) }}"
         site="{{ $site }}"
         :sites="{{ json_encode($sites) }}"
         :collections="{{ json_encode($collections) }}"
@@ -19,15 +18,6 @@
         :blueprint="{{ json_encode($blueprint) }}"
         :can-edit="{{ Statamic\Support\Str::bool($user->can('edit', $nav)) }}"
         :can-select-across-sites="{{ Statamic\Support\Str::bool($nav->canSelectAcrossSites()) }}"
-    >
-        <template #twirldown>
-            @can('edit', $nav)
-                <dropdown-item :text="__('Edit Navigation')" redirect="{{ $nav->editUrl() }}"></dropdown-item>
-            @endcan
-            @can('configure fields')
-                <dropdown-item :text="__('Edit Blueprint')" redirect="{{ cp_route('navigation.blueprint.edit', $nav->handle()) }}"></dropdown-item>
-            @endcan
-        </template>
-    </navigation-view>
-
+        :can-edit-blueprint="{{ Statamic\Support\Str::bool($user->can('configure fields')) }}"
+    ></navigation-view>
 @endsection

@@ -38,6 +38,10 @@ class Lists extends Fieldtype
 
         return collect($data)->reject(function ($item) {
             return in_array($item, [null, ''], true);
+        })->map(function ($item) {
+            return is_numeric($item)
+                ? (str_contains($item, '.') ? (float) $item : (int) $item)
+                : $item;
         })->values()->all();
     }
 

@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Assets;
 
 use Illuminate\Http\Request;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
+use Statamic\CP\PublishForm;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\User;
@@ -32,21 +33,13 @@ class AssetContainersController extends CpController
                 'create_folders' => $container->createFolders(),
                 'edit_url' => $container->editUrl(),
                 'delete_url' => $container->deleteUrl(),
-                'blueprint_url' => cp_route('asset-containers.blueprint.edit', $container->handle()),
+                'blueprint_url' => cp_route('blueprints.asset-containers.edit', $container->handle()),
                 'can_edit' => User::current()->can('edit', $container),
                 'can_delete' => User::current()->can('delete', $container),
             ];
         })->values();
 
-        if ($request->wantsJson()) {
-            return $containers;
-        }
-
-        return view('statamic::assets.containers.index', [
-            'containers' => $containers->all(),
-            'columns' => ['title'],
-            'visibleColumns' => ['title'],
-        ]);
+        return $containers;
     }
 
     public function edit($container)
@@ -68,17 +61,11 @@ class AssetContainersController extends CpController
             'validation' => $container->validationRules(),
         ];
 
-        $fields = ($blueprint = $this->formBlueprint($container))
-            ->fields()
-            ->addValues($values)
-            ->preProcess();
-
-        return view('statamic::assets.containers.edit', [
-            'blueprint' => $blueprint->toPublishArray(),
-            'values' => $fields->values(),
-            'meta' => $fields->meta(),
-            'container' => $container,
-        ]);
+        return PublishForm::make($this->formBlueprint($container))
+            ->title(__('Configure Asset Container'))
+            ->values($values)
+            ->asConfig()
+            ->submittingTo(cp_route('asset-containers.update', $container->handle()));
     }
 
     public function update(Request $request, $container)
@@ -114,19 +101,11 @@ class AssetContainersController extends CpController
     {
         $this->authorize('create', AssetContainerContract::class, 'You are not authorized to create asset containers.');
 
-        $fields = ($blueprint = $this->formBlueprint())
-            ->fields()
-            ->preProcess();
-
-        $values = $fields->values()->merge([
-            'disk' => $this->disks()->first(),
-        ]);
-
-        return view('statamic::assets.containers.create', [
-            'blueprint' => $blueprint->toPublishArray(),
-            'values' => $values,
-            'meta' => $fields->meta(),
-        ]);
+        return PublishForm::make($this->formBlueprint())
+            ->title(__('Create Asset Container'))
+            ->values(['disk' => $this->disks()->first()])
+            ->asConfig()
+            ->submittingTo(cp_route('asset-containers.store'), 'POST');
     }
 
     public function store(Request $request)
@@ -226,7 +205,7 @@ class AssetContainersController extends CpController
                         'instructions' => __('statamic::messages.asset_container_blueprint_instructions'),
                         'html' => $container ? ''.
                             '<div class="text-xs">'.
-                            '   <a href="'.cp_route('asset-containers.blueprint.edit', $container->handle()).'" class="text-blue">'.__('Edit').'</a>'.
+                            '   <a href="'.cp_route('blueprints.asset-containers.edit', $container->handle()).'" class="text-blue">'.__('Edit').'</a>'.
                             '</div>' : '<div class="text-xs text-gray">'.__('Editable once created').'</div>',
                     ],
                 ],
@@ -309,7 +288,23 @@ class AssetContainersController extends CpController
             ],
         ]);
 
-        return Blueprint::makeFromTabs($fields);
+        return Blueprint::make()->setContents(collect([
+            'tabs' => [
+                'main' => [
+                    'sections' => collect($fields)->map(function ($section) {
+                        return [
+                            'display' => $section['display'],
+                            'fields' => collect($section['fields'])->map(function ($field, $handle) {
+                                return [
+                                    'handle' => $handle,
+                                    'field' => $field,
+                                ];
+                            })->values()->all(),
+                        ];
+                    })->values()->all(),
+                ],
+            ],
+        ])->all());
     }
 
     private function expandedGlidePresetOptions()

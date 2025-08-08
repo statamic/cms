@@ -5,7 +5,7 @@
 
 .toasted-container.bottom-left {
     bottom: 32px !important;
-    left: 32px !important;
+    left: 14px !important;
 }
 
 .toasted-container {
@@ -13,15 +13,15 @@
 }
 
 .toasted-container .toasted.statamic {
-    @apply bg-white dark:bg-dark-900 text-gray-800 dark:text-dark-100 mt-4 text-base rounded shadow p-0;
-    height: 48px;
+    @apply mt-4 rounded-xl bg-white p-0 text-base text-gray-900 shadow dark:bg-dark-900 dark:text-dark-100;
+    height: 45px;
 
     i {
-        @apply flex items-center rtl:rounded-r ltr:rounded-l rtl:ml-4 ltr:mr-4 h-full px-4 text-white;
+        @apply flex items-center justify-center h-3/4 aspect-square text-white ms-1.5 me-4 rounded-full;
     }
 
     &.success i {
-        @apply bg-green-400 dark:bg-green-600 text-green-700 dark:text-green-950;
+        @apply bg-green-400 text-green-900 dark:bg-green-400 dark:text-green-950;
     }
 
     &.error i {
@@ -33,9 +33,11 @@
     }
 
     .action {
-        @apply font-normal text-xl px-4 h-full text-gray-600 dark:text-dark-150 m-0 rtl:mr-2 ltr:ml-2 flex items-center;
+        @apply m-0 flex h-full items-center px-4 text-xl font-normal text-gray-600 dark:text-dark-150 ms-2 opacity-50;
+        /* Compensate for the "x" button being a slightly bigger font-size */
+        transform: translateY(-1.5px);
         &:hover {
-            @apply no-underline text-gray-900 dark:text-dark-100;
+            @apply text-gray-900 no-underline dark:text-dark-100;
         }
     }
 }

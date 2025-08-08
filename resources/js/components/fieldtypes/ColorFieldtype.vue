@@ -1,67 +1,57 @@
 <template>
-    <div class=" flex items-center">
-        <div class="input-group w-auto" :class="{ 'max-w-[130px]': config.allow_any }">
-            <popover name="swatches" class="color-picker" placement="bottom-start">
+    <div class="flex items-center">
+        <!-- <div class="input-group w-auto" :class="{ 'max-w-[130px]': config.allow_any }"> -->
+        <div class="flex items-center rounded-full relative border shadow-ui-sm">
+            <ui-popover ref="colorPopover" name="swatches" direction="bottom" class="md:w-[320px]" :open="popoverOpen" @update:open="popoverOpen = $event">
                 <template #trigger>
-                    <div
-                        class="input-group-prepend px-px"
-                        v-tooltip="__('Pick Color')"
-                    >
-                        <div class="relative flex items-center outline-none">
-                            <div class="inline-block cursor-pointer rounded m-0 p-[2px]">
-                                <div
-                                    class="rounded-sm w-8 h-8"
-                                    :class="{ 'border dark:border-dark-900': !value, 'cursor-not-allowed': isReadOnly }"
-                                    :style="{ 'background-color': value }"
-                                />
-                            </div>
-                        </div>
-                    </div>
+                    <button type="button" class="cursor-pointer size-9 border rounded-full flex items-center justify-center" :aria-label="__('Pick Color')">
+                        <div
+                            class="size-8 rounded-full"
+                            :class="{ 'cursor-not-allowed': isReadOnly }"
+                            :style="{ 'background-color': customColor || value }"
+                        />
+                    </button>
                 </template>
-                <template #default="{ close: closePopover }">
-                    <div class="p-4">
-                        <div v-if="config.swatches.length" class="grid grid-cols-4 gap-3">
-                            <div
+                <template #default="{ close }">
+                    <div class="">
+                        <div v-if="config.swatches.length" class="grid grid-cols-6 gap-2">
+                            <button
                                 v-for="swatch in config.swatches"
-                                class="w-10 h-10 inline-block cursor-pointer rounded flex border border-gray-400"
+                                type="button"
+                                class="flex size-9 rounded-full cursor-pointer"
                                 :style="{ 'background-color': swatch }"
-                                @click="() => { update(swatch); closePopover(); }"
+                                @click="update(swatch)"
                             >
-                                <div
-                                    v-if="swatch === value"
-                                    class="flex items-center justify-center h-full w-full"
-                                >
-                                    <div class="w-5 h-5 rounded-full bg-black/10 flex items-center justify-center">
-                                        <svg version="1.1" role="presentation" width="12" height="12" viewBox="0 0 1792 1792" class="text-white fill-current"><path d="M1671 566q0 40-28 68l-724 724-136 136q-28 28-68 28t-68-28l-136-136-362-362q-28-28-28-68t28-68l136-136q28-28 68-28t68 28l294 295 656-657q28-28 68-28t68 28l136 136q28 28 28 68z" ></path></svg>
+                                <div v-if="swatch === value" class="flex h-full w-full items-center justify-center">
+                                    <div class="flex size-5 items-center justify-center rounded-full bg-black/10">
+                                        <ui-icon name="checkmark" class="size-4 text-white" />
                                     </div>
                                 </div>
-                            </div>
+                            </button>
                         </div>
-
                         <div
                             v-if="config.allow_any"
-                            class="flex items-center"
-                            :class="{ 'mt-5': config.swatches.length }"
+                            class="flex items-center gap-2"
+                            :class="{ 'mt-4': config.swatches.length }"
                         >
-                            <input
-                                class="h-10 w-full cursor-pointer input-text w-full rounded p-[2px] rtl:ml-2 ltr:mr-2"
-                                type="color"
-                                :value="customColor"
-                                @input="customColorSelected"
-                            />
-                            <button
-                                class="btn btn-primary h-10 px-2"
-                                v-text="__('OK')"
-                                @click="() => { commitCustomColor(); closePopover() }"
-                            />
+                        <ui-input
+                            type="color"
+                            :value="customColor"
+                            @input="customColorSelected"
+                        />
+                        <ui-button
+                            :text="__('OK')"
+                            variant="primary"
+                            @click="handleOkClick"
+                        />
                         </div>
                     </div>
                 </template>
-            </popover>
+            </ui-popover>
 
             <input
                 v-if="config.allow_any"
-                class="input-text font-mono"
+                class="font-mono text-sm px-2 w-24 outline-none"
                 maxlength="7"
                 type="text"
                 :readonly="isReadOnly"
@@ -71,43 +61,39 @@
             />
         </div>
 
-        <button v-if="value" class="btn-close rtl:mr-1 ltr:ml-1" :aria-label="__('Reset')" @click="resetColor">&times;</button>
+        <ui-button v-if="value" icon="x" :aria-label="__('Reset')" @click="resetColor" round inset size="sm" variant="ghost" class="ms-1" />
     </div>
 </template>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
 export default {
-
     mixins: [Fieldtype],
 
-    data () {
+    data() {
         return {
-            customColor: this.value
-        }
+            customColor: this.value,
+            popoverOpen: false,
+        };
     },
 
     watch: {
-
         value(value) {
             this.customColor = value;
         },
-
     },
 
     computed: {
-
         replicatorPreview() {
-            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
 
             return this.value
                 ? replicatorPreviewHtml(`<span class="little-dot" style="background-color:${this.value}"></span>`)
                 : null;
-        }
-
+        },
     },
 
     methods: {
-
         customColorSelected(event) {
             this.customColor = event.target.value;
         },
@@ -119,6 +105,11 @@ export default {
 
         commitCustomColor() {
             this.update(this.customColor);
+        },
+
+        handleOkClick() {
+            this.commitCustomColor();
+            this.popoverOpen = false;
         },
 
         resetColor() {
@@ -133,8 +124,7 @@ export default {
                 }
                 return `#${color}`;
             }
-        }
-    }
-
+        },
+    },
 };
 </script>

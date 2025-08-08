@@ -10,32 +10,50 @@
     margin-bottom: 0;
 }
 
-
 /* Inside a Grid field
   ========================================================================== */
 
 .grid-table .array-fieldtype {
-
     .grid-table {
         margin-bottom: 0;
         tr:first-child {
-            td, th { border-top: 0; }
+            td,
+            th {
+                border-top: 0;
+            }
         }
         tr:last-child {
-            td, th { border-radius: 0; }
+            td,
+            th {
+                border-radius: 0;
+            }
         }
-        tr > :first-child { border-left: 0 ; [dir="rtl"] & { border-left: 0 ; border-right: 0 ; } }
-        tr > :last-child { border-right: 0 ; [dir="rtl"] & { border-right: 0 ; border-left: 0 ; } }
+        tr > :first-child {
+            border-left: 0;
+            [dir='rtl'] & {
+                border-left: 0;
+                border-right: 0;
+            }
+        }
+        tr > :last-child {
+            border-right: 0;
+            [dir='rtl'] & {
+                border-right: 0;
+                border-left: 0;
+            }
+        }
     }
 
     /*  Dynamic Mode */
     .array-dynamic .btn {
-        @apply text-blue block w-full h-auto border-0 rtl:text-right ltr:text-left shadow-none;
+        @apply block h-auto w-full border-0 text-blue-600 shadow-none ltr:text-left rtl:text-right;
         background: #f4f4f4;
         padding: 10px 10px 11px;
         margin: 15px 0 0;
 
-        &:hover, &:active, &:focus {
+        &:hover,
+        &:active,
+        &:focus {
             top: 0;
         }
     }

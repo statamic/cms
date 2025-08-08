@@ -10,6 +10,8 @@ use Statamic\Facades\User;
 
 class DuplicateEntry extends Action
 {
+    protected $icon = 'duplicate';
+
     private $newItems;
 
     public static function title()
@@ -88,7 +90,7 @@ class DuplicateEntry extends Action
             $entry->slug($slug);
         }
 
-        if ($original->hasDate()) {
+        if ($original->hasExplicitDate()) {
             $entry->date($original->date());
         }
 

@@ -1,29 +1,4 @@
-.item {
-    @apply text-sm outline-none bg-white flex w-full justify-between rounded border shadow-sm items-center;
-    @apply dark:border-dark-900 dark:bg-dark-550 dark:shadow-dark-sm;
-
-    .item-move {
-        @apply w-4 self-stretch bg-gray-200 rtl:border-l ltr:border-r rtl:rounded-r ltr:rounded-l p-2 cursor-grab;
-        @apply dark:border-dark-900 dark:bg-dark-550;
-        background-image: url('../../svg/icons/light/drag-dots.svg');
-        background-repeat: no-repeat;
-        background-position: center center;
-        background-size: 7px 17px;
-        &:hover { @apply bg-gray-300 dark:bg-dark-650; }
-    }
-
-    .item-inner {
-        @apply w-full flex items-center p-2;
-    }
-
-    &.invalid {
-        .item-inner {
-            @apply border-red-300 dark:border-dark-red bg-red-100 dark:bg-red-400 text-red-500 dark:text-red-950;
-        }
-    }
-
-    /*  Drag interaction */
-    &.draggable-source--is-dragging {
-        opacity: 0.5;
-    }
+/*  Drag interaction */
+.draggable-source--is-dragging {
+    opacity: 0.5;
 }

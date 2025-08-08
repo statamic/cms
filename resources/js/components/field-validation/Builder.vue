@@ -1,72 +1,56 @@
 <template>
+    <div class="w-full publish-fields">
+        <Field
+            class="form-group field-w-33"
+            :label="__('Required')"
+            :instructions="__('messages.field_validation_required_instructions')"
+        >
+            <Switch v-model="isRequired" />
+        </Field>
 
-    <div class="w-full">
+        <Field
+            class="form-group field-w-33"
+            :label="__('Sometimes')"
+            :instructions="__('messages.field_validation_sometimes_instructions')"
+        >
+            <Switch v-model="sometimesValidate" />
+        </Field>
 
-        <div class="flex">
+        <Field class="form-group field-w-100" :label="__('Rules')">
+            <Description class="mb-1.5">
+                {{ __('messages.field_validation_advanced_instructions') }}
+                <a :href="laravelDocsLink" target="_blank">{{ __('Learn more') }}</a>
+                <span v-if="helpBlock" class="italic text-gray-500 ltr:float-right rtl:float-left">
+                    {{ __('Example') }}:
+                    <span class="italic text-blue-400">{{ helpBlock }}</span>
+                </span>
+            </Description>
 
-            <div class="form-group publish-field select-fieldtype field-w-full">
-                <label class="publish-field-label">{{ __('Required') }}</label>
-                <div class="help-block -mt-2">
-                    <p>{{ __('messages.field_validation_required_instructions') }}</p>
-                </div>
-                <toggle-input v-model="isRequired" />
-            </div>
-
-            <div class="form-group publish-field select-fieldtype field-w-full">
-                <label class="publish-field-label">{{ __('Sometimes') }}</label>
-                <div class="help-block -mt-2">
-                    <p>{{ __('messages.field_validation_sometimes_instructions') }}</p>
-                </div>
-                <toggle-input v-model="sometimesValidate" />
-            </div>
-
-        </div>
-
-        <div class="form-group publish-field select-fieldtype field-w-full">
-            <label class="publish-field-label">{{ __('Rules') }}</label>
-            <div class="help-block -mt-2">
-                <p>
-                    {{ __('messages.field_validation_advanced_instructions') }}
-                    <a :href="laravelDocsLink" target="_blank">{{ __('Learn more') }}</a>
-                    <span v-if="helpBlock" class="italic text-gray-500 ltr:float-right rtl:float-left">
-                        {{ __('Example') }}:
-                        <span class="italic text-blue-400">{{ helpBlock }}</span>
-                    </span>
-                </p>
-            </div>
-
-            <v-select
+            <Combobox
                 v-if="!customRule"
-                ref="rulesSelect"
-                name="rules"
-                :options="allRules"
-                :reduce="rule => rule.value"
-                :placeholder="__('Add Rule')"
-                :multiple="false"
-                :searchable="true"
-                :value="selectedLaravelRule"
                 class="w-full"
-                @input="add"
+                ref="rulesSelect"
+                :options="allRules"
+                :placeholder="__('Add Rule')"
+                multiple
+                searchable
+                taggable
+                close-on-select
+                :model-value="rules"
+                @selected="add($event)"
+                @added="ifSearchNotFoundAddCustom"
             >
-                <template #search="{ attributes, events }">
-                    <input
-                        ref="searchInput"
-                        v-bind="attributes"
-                        v-on="events"
-                        class="vs__search"
-                        @keydown.enter="ifSearchNotFoundAddCustom"
-                        @blur="ifSearchNotFoundAddCustom"
-                    />
+                <template #option="option">
+                    {{ __(option.display) }} <code class="ms-2 text-sm">{{ valueWithoutTrailingColon(option.value) }}</code>
                 </template>
-                <template #option="{ value, display }">
-                    {{ __(display) }} <code class="rtl:mr-2 ltr:ml-2">{{ valueWithoutTrailingColon(value) }}</code>
-                </template>
-                <template #no-options="{ search }">
-                    <div class="vs__dropdown-option rtl:text-right ltr:text-left">{{ __('Add') }} <code class="rtl:mr-2 ltr:ml-2">{{ search }}</code></div>
-                </template>
-            </v-select>
 
-            <text-input
+                <template #selected-options>
+                    <!-- We're rendering these ourselves so they don't go away when we swap out the combobox for an input. -->
+                    <div></div>
+                </template>
+            </Combobox>
+
+            <Input
                 v-else
                 v-model="customRule"
                 ref="customRuleInput"
@@ -74,51 +58,64 @@
                 @blur="add(customRule)"
             />
 
-            <div class="v-select">
-                <sortable-list
-                    item-class="sortable-item"
-                    handle-class="sortable-item"
-                    :distance="5"
-                    :mirror="false"
-                    v-model="rules"
-                >
-                    <div class="vs__selected-options-outside flex flex-wrap outline-none">
-                        <span v-for="rule in rules" :key="rule" class="vs__selected mt-2 sortable-item">
+            <sortable-list
+                item-class="sortable-item"
+                handle-class="sortable-item"
+                :distance="5"
+                :mirror="false"
+                v-model="rules"
+            >
+                <div class="flex flex-wrap gap-2">
+                    <div
+                        v-for="rule in rules"
+                        :key="rule"
+                        class="sortable-item mt-2"
+                    >
+                        <Badge pill size="lg">
                             {{ rule }}
-                            <button @click="remove(rule)" type="button" :aria-label="__('Delete Rule')" class="vs__deselect">
-                                <span>×</span>
+
+                            <button
+                                type="button"
+                                class="opacity-75 hover:opacity-100 cursor-pointer"
+                                :aria-label="__('Deselect option')"
+                                @click="remove(rule)"
+                            >
+                                &times;
                             </button>
-                        </span>
+                        </Badge>
                     </div>
-                </sortable-list>
-            </div>
-
-        </div>
+                </div>
+            </sortable-list>
+        </Field>
     </div>
-
 </template>
-
-<style scoped>
-    .draggable-source--is-dragging {
-        @apply opacity-75 bg-transparent border-dashed
-    }
-</style>
 
 <script>
 import RULES from './Rules.js';
-import SemVer from 'semver'
-import { SortableList, SortableItem, SortableHelpers } from '../sortable/Sortable';
+import SemVer from 'semver';
+import { SortableList } from '../sortable/Sortable';
+import { sortBy } from 'lodash-es';
+import { Description, Field, Input, Badge, Button } from '@statamic/ui';
+import Switch from '@statamic/components/ui/Switch.vue'
+import { Combobox } from '@statamic/ui';
+import { ComboboxInput } from 'reka-ui';
 
 export default {
-
     components: {
+        Button,
+        ComboboxInput,
+        Combobox,
+        Description,
         SortableList,
-        SortableItem,
+        Field,
+        Switch,
+        Input,
+        Badge,
     },
 
     props: {
         config: {
-            required: true
+            required: true,
         },
     },
 
@@ -129,65 +126,52 @@ export default {
             rules: [],
             selectedLaravelRule: null,
             customRule: null,
-        }
+        };
     },
 
     computed: {
-
         laravelVersion() {
-            return this.$store.state.statamic.config.laravelVersion;
+            return this.$config.get('laravelVersion');
         },
 
         laravelDocsLink() {
             let version = new RegExp('([0-9]+\.[0-9]+)\.[0-9]+').exec(this.laravelVersion)[1];
             let majorVersion = Number(version.split('.', 1)[0]);
 
-            if (majorVersion >= 6) {
-                version = `${majorVersion}.x`;
-            }
-
-            return `https://laravel.com/docs/${version}/validation#available-validation-rules`;
+            return `https://laravel.com/docs/${majorVersion}.x/validation#available-validation-rules`;
         },
 
         laravelRules() {
-            return _.chain(clone(RULES))
-                .filter(rule => rule.minVersion ? SemVer.gte(this.laravelVersion, rule.minVersion) : true)
-                .filter(rule => rule.maxVersion ? SemVer.lte(this.laravelVersion, rule.maxVersion) : true)
-                .map(rule => {
+            return clone(RULES)
+                .filter((rule) => (rule.minVersion ? SemVer.gte(this.laravelVersion, rule.minVersion) : true))
+                .filter((rule) => (rule.maxVersion ? SemVer.lte(this.laravelVersion, rule.maxVersion) : true))
+                .map((rule) => {
                     return this.prepareRenderableRule(rule);
-                })
-                .value();
+                });
         },
 
         extensionRules() {
-            return _.chain(clone(Statamic.$config.get('extensionRules')))
-                .map(rule => {
-                    return this.prepareRenderableRule(rule);
-                })
-                .value();
+            return clone(Statamic.$config.get('extensionRules')).map((rule) => {
+                return this.prepareRenderableRule(rule);
+            });
         },
 
         allRules() {
-            return _.sortBy([...this.laravelRules, ...this.extensionRules], 'display');
+            return sortBy([...this.laravelRules, ...this.extensionRules], 'display');
         },
 
         helpBlock() {
-            if (! this.selectedLaravelRule) {
+            if (!this.selectedLaravelRule) {
                 return false;
             }
 
-            let rule = _.chain(this.allRules)
-                .filter(rule => rule.value === this.selectedLaravelRule)
-                .first()
-                .value();
+            let rule = this.allRules.find((rule) => rule.value === this.selectedLaravelRule);
 
             return rule.example || false;
         },
-
     },
 
     watch: {
-
         isRequired(value) {
             if (value === true) {
                 this.ensureToggleableRule('required');
@@ -209,7 +193,6 @@ export default {
 
             this.$emit('updated', value);
         },
-
     },
 
     created() {
@@ -217,11 +200,8 @@ export default {
     },
 
     methods: {
-
         getInitial() {
-            this.rules = this.config.validate
-                ? this.explodeRules(this.config.validate)
-                : [];
+            this.rules = this.config.validate ? this.explodeRules(this.config.validate) : [];
         },
 
         resetState() {
@@ -232,9 +212,7 @@ export default {
         },
 
         explodeRules(rules) {
-            return typeof rules === 'string'
-                ? rules.split('|').map(rule => rule.trim())
-                : rules;
+            return typeof rules === 'string' ? rules.split('|').map((rule) => rule.trim()) : rules;
         },
 
         prepareRenderableRule(rule) {
@@ -248,7 +226,7 @@ export default {
         },
 
         ensureToggleableRule(rule) {
-            if (! this.rules.includes(rule)) {
+            if (!this.rules.includes(rule)) {
                 this.rules.unshift(rule);
             }
         },
@@ -256,17 +234,19 @@ export default {
         ensure(rule) {
             this.resetState();
 
-            if (! this.rules.includes(rule)) {
+            if (!this.rules.includes(rule)) {
                 this.rules.push(rule);
             }
         },
 
         add(rule) {
+            if (! rule) return;
+
             if (this.hasUnfinishedParameters(rule)) {
                 this.resetState();
                 this.selectedLaravelRule = rule;
                 this.customRule = rule;
-                this.$nextTick(() => this.$refs.customRuleInput.$refs.input.focus());
+                this.$nextTick(() => this.$refs.customRuleInput.focus());
             } else {
                 this.ensure(rule);
             }
@@ -274,7 +254,7 @@ export default {
 
         ifSearchNotFoundAddCustom() {
             let rulesSelect = this.$refs.rulesSelect;
-            let rule = rulesSelect.search;
+            let rule = rulesSelect.searchQuery.value;
 
             if (this.searchNotFound(rulesSelect) || this.hasUnfinishedParameters(rule)) return;
 
@@ -284,7 +264,7 @@ export default {
         },
 
         remove(rule) {
-            this.rules = this.rules.filter(value => value !== rule);
+            this.rules = this.rules.filter((value) => value !== rule);
         },
 
         hasUnfinishedParameters(rule) {
@@ -292,7 +272,7 @@ export default {
         },
 
         searchNotFound(rulesSelect) {
-            return rulesSelect.search.length === 0 || rulesSelect.filteredOptions.length > 0;
+            return rulesSelect.searchQuery.value?.length === 0 || rulesSelect?.filteredOptions.length === 0;
         },
 
         updated(rules) {
@@ -301,8 +281,7 @@ export default {
 
         valueWithoutTrailingColon(value) {
             return this.hasUnfinishedParameters(value) ? value.replace(':', '') : value;
-        }
-
-    }
-}
+        },
+    },
+};
 </script>

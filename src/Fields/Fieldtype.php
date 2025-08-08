@@ -12,6 +12,8 @@ use Statamic\Query\Scopes\Filters\Fields\FieldtypeFilter;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 abstract class Fieldtype implements Arrayable
 {
     use HasHandle, RegistersItself {
@@ -101,12 +103,21 @@ abstract class Fieldtype implements Arrayable
 
     public function selectableInForms(): bool
     {
-        return $this->selectableInForms ?: FieldtypeRepository::hasBeenMadeSelectableInForms($this->handle());
+        if (FieldtypeRepository::selectableInFormIsOverriden($this->handle())) {
+            return FieldtypeRepository::hasBeenMadeSelectableInForms($this->handle());
+        }
+
+        return $this->selectableInForms;
     }
 
     public static function makeSelectableInForms()
     {
         FieldtypeRepository::makeSelectableInForms(self::handle());
+    }
+
+    public static function makeUnselectableInForms()
+    {
+        FieldtypeRepository::makeUnselectableInForms(self::handle());
     }
 
     public function categories(): array
@@ -147,6 +158,11 @@ abstract class Fieldtype implements Arrayable
     public function preProcessValidatable($value)
     {
         return $value;
+    }
+
+    public function preProcessTagRenderable($data, $recursiveCallback)
+    {
+        return $data;
     }
 
     public function defaultValue()
@@ -378,5 +394,15 @@ abstract class Fieldtype implements Arrayable
     public function extraRenderableFieldData(): array
     {
         return [];
+    }
+
+    public function hasJsDriverDataBinding(): bool
+    {
+        return true;
+    }
+
+    public function shouldParseAntlersFromRawString(): bool
+    {
+        return false;
     }
 }

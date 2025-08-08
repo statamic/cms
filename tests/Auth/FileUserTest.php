@@ -9,12 +9,15 @@ use Statamic\Auth\File\User;
 use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
 use Statamic\Facades\Role;
+use Statamic\Facades\Role as RoleAPI;
 use Statamic\Facades\UserGroup;
+use Statamic\Facades\UserGroup as UserGroupAPI;
 use Statamic\Support\Arr;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 #[Group('user')]
+#[Group('2fa')]
 class FileUserTest extends TestCase
 {
     use PermissibleContractTests, PreventSavingStacheItemsToDisk, UserContractTests;
@@ -122,5 +125,66 @@ class FileUserTest extends TestCase
 
         // Doing it a second time should give the same result but without multiple calls.
         $this->assertEquals($expectedPermissions, $user->permissions()->all());
+    }
+
+    #[Test]
+    public function it_prevents_saving_duplicate_roles()
+    {
+        $roleA = (new \Statamic\Auth\File\Role)->handle('a');
+        $roleB = (new \Statamic\Auth\File\Role)->handle('b');
+        $roleC = (new \Statamic\Auth\File\Role)->handle('c');
+
+        RoleAPI::shouldReceive('find')->with('a')->andReturn($roleA);
+        RoleAPI::shouldReceive('find')->with('b')->andReturn($roleB);
+        RoleAPI::shouldReceive('find')->with('c')->andReturn($roleC);
+        RoleAPI::shouldReceive('all')->andReturn(collect([$roleA, $roleB])); // the stache calls this when getting a user. unrelated to test.
+
+        $user = $this->createPermissible();
+        $user->assignRole('a');
+
+        $this->assertEquals(['a'], $user->get('roles'));
+
+        $user->assignRole(['a', 'b', 'c']);
+
+        $this->assertEquals(['a', 'b', 'c'], $user->get('roles'));
+    }
+
+    #[Test]
+    public function it_prevents_saving_duplicate_groups()
+    {
+        $groupA = (new \Statamic\Auth\File\UserGroup)->handle('a');
+        $groupB = (new \Statamic\Auth\File\UserGroup)->handle('b');
+        $groupC = (new \Statamic\Auth\File\UserGroup)->handle('c');
+
+        UserGroupAPI::shouldReceive('find')->with('a')->andReturn($groupA);
+        UserGroupAPI::shouldReceive('find')->with('b')->andReturn($groupB);
+        UserGroupAPI::shouldReceive('find')->with('c')->andReturn($groupC);
+
+        $user = $this->createPermissible();
+        $user->addToGroup('a');
+
+        $this->assertEquals(['a'], $user->get('groups'));
+
+        $user->addToGroup(['a', 'b', 'c']);
+
+        $this->assertEquals(['a', 'b', 'c'], $user->get('groups'));
+    }
+
+    #[Test]
+    public function it_clones_internal_collections()
+    {
+        $user = $this->user();
+        $user->set('foo', 'A');
+        $user->setSupplement('bar', 'A');
+
+        $clone = clone $user;
+        $clone->set('foo', 'B');
+        $clone->setSupplement('bar', 'B');
+
+        $this->assertEquals('A', $user->get('foo'));
+        $this->assertEquals('B', $clone->get('foo'));
+
+        $this->assertEquals('A', $user->getSupplement('bar'));
+        $this->assertEquals('B', $clone->getSupplement('bar'));
     }
 }

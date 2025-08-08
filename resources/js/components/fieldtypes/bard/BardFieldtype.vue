@@ -1,159 +1,184 @@
 <template>
-
-<portal name="bard-fullscreen" :disabled="!fullScreenMode" :provide="provide">
-<!-- These wrappers allow any css that expected the field to
+    <portal name="bard-fullscreen" :disabled="!fullScreenMode" :provide="provide">
+        <!-- These wrappers allow any css that expected the field to
      be within the context of a publish form to continue working
      once it has been portaled out. -->
-<div :class="{ 'publish-fields': fullScreenMode }">
-<div :class="fullScreenMode && wrapperClasses">
+        <div :class="{ 'publish-fields': fullScreenMode }">
+            <div :class="fullScreenMode && wrapperClasses">
+                <div
+                    class="bard-fieldtype antialiased st-text-legibility with-contrast:border-gray-500 shadow-ui-sm focus-outline-discrete"
+                    :class="{ 'bard-fullscreen': fullScreenMode }"
+                    ref="container"
+                    @dragstart.stop="ignorePageHeader(true)"
+                    @dragend="ignorePageHeader(false)"
+                >
+                    <publish-field-fullscreen-header
+                        v-if="fullScreenMode"
+                        :title="config.display"
+                        :field-actions="fieldActions"
+                        @close="toggleFullscreen"
+                    >
+                        <div class="bard-fixed-toolbar border-0" v-if="!readOnly && showFixedToolbar">
+                            <div class="no-select flex flex-1 flex-wrap items-center" v-if="toolbarIsFixed">
+                                <component
+                                    v-for="button in visibleButtons(buttons)"
+                                    :key="button.name"
+                                    :is="button.component || 'BardToolbarButton'"
+                                    :button="button"
+                                    :active="buttonIsActive(button)"
+                                    :config="config"
+                                    :bard="this"
+                                    :editor="editor"
+                                />
+                            </div>
+                        </div>
+                    </publish-field-fullscreen-header>
 
-    <div
-        class="bard-fieldtype-wrapper"
-        :class="{'bard-fullscreen': fullScreenMode }"
-        ref="container"
-        @dragstart.stop="ignorePageHeader(true)"
-        @dragend="ignorePageHeader(false)"
-    >
+                    <div class="bard-fixed-toolbar flex items-center justify-between rounded-t-xl border-b border-gray-300 bg-gray-50 px-2 py-1 dark:border-white/10 dark:bg-gray-950" v-if="!readOnly && showFixedToolbar && !fullScreenMode">
+                        <div class="no-select flex flex-1 flex-wrap items-center" v-if="toolbarIsFixed">
+                            <component
+                                v-for="button in visibleButtons(buttons)"
+                                :key="button.name"
+                                :is="button.component || 'BardToolbarButton'"
+                                :button="button"
+                                :active="buttonIsActive(button)"
+                                :config="config"
+                                :bard="this"
+                                :editor="editor"
+                            />
+                        </div>
+                    </div>
 
-        <div class="bard-fixed-toolbar" v-if="!readOnly && showFixedToolbar">
-            <div class="flex flex-wrap flex-1 items-center no-select" v-if="toolbarIsFixed" :class="{'justify-center': fullScreenMode}">
-                <component
-                    v-for="button in visibleButtons(buttons)"
-                    :key="button.name"
-                    :is="button.component || 'BardToolbarButton'"
-                    :button="button"
-                    :active="buttonIsActive(button)"
-                    :config="config"
-                    :bard="_self"
-                    :editor="editor" />
-                    <button class="bard-toolbar-button" @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')" :aria-label="__('Show HTML Source')">
-                        <svg-icon name="show-source" class="w-4 h-4 "/>
-                    </button>
-                    <button class="bard-toolbar-button" @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" :aria-label="__('Expand/Collapse Sets')" v-if="config.collapse !== 'accordion' && setConfigs.length > 0">
-                        <svg-icon name="expand-collapse-vertical-2" class="w-4 h-4" />
-                    </button>
-                    <button class="bard-toolbar-button" @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" :aria-label="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
-                        <svg-icon name="arrows-shrink" class="w-4 h-4" v-show="fullScreenMode" />
-                        <svg-icon name="expand-bold" class="w-4 h-4" v-show="!fullScreenMode" />
-                    </button>
+                    <div
+                        class="bard-editor @container/bard focus-within:focus-outline focus-within:rounded-b-lg! focus-within:rounded-t-none!"
+                        :class="{
+                            'mode:read-only': readOnly,
+                            'mode:minimal': !showFixedToolbar,
+                            'mode:inline': inputIsInline,
+                        }"
+                        tabindex="0"
+                    >
+                        <bubble-menu
+                            class="bard-floating-toolbar"
+                            :editor="editor"
+                            :options="{ placement: 'top', offset: [0, 10] }"
+                            v-if="editor && toolbarIsFloating && !readOnly"
+                        >
+                            <component
+                                v-for="button in visibleButtons(buttons)"
+                                :key="button.name"
+                                :is="button.component || 'BardToolbarButton'"
+                                :button="button"
+                                :active="buttonIsActive(button)"
+                                :bard="this"
+                                :config="config"
+                                :editor="editor"
+                            />
+                        </bubble-menu>
+
+                        <floating-menu
+                            :editor="editor"
+                            :should-show="shouldShowSetButton"
+                            :is-showing="showAddSetButton"
+                            v-if="editor"
+                            v-slot="{ y }"
+                            @shown="showAddSetButton = true"
+                            @hidden="showAddSetButton = false"
+                        >
+                            <set-picker
+                                ref="setPicker"
+                                v-if="showAddSetButton"
+                                :sets="groupConfigs"
+                                class="bard-set-selector"
+                                @added="addSet"
+                            >
+                                <template #trigger>
+                                    <button
+                                        type="button"
+                                        class="btn-round bard-add-set-button group"
+                                        :style="{ transform: `translateY(${y}px)` }"
+                                        :aria-label="__('Add Set')"
+                                        v-tooltip="__('Add Set')"
+                                    >
+                                        <svg-icon
+                                            name="micro/plus"
+                                            class="dark:group-hover:dark-text-100 dark:text-dark-175 h-3 w-3 text-gray-900 group-hover:text-black"
+                                        />
+                                    </button>
+                                </template>
+                            </set-picker>
+                        </floating-menu>
+
+                        <div class="bard-error" v-if="initError" v-html="initError"></div>
+                        <editor-content :editor="editor" :id="fieldId" />
+                    </div>
+                    <div
+                        class="bard-footer-toolbar"
+                        v-if="editor && (config.reading_time || config.character_limit || config.word_count)"
+                    >
+                        <div v-if="config.reading_time">{{ readingTime }} {{ __('Reading Time') }}</div>
+                        <div v-else />
+                        <div v-if="config.character_limit || config.word_count" v-text="characterAndWordCountText" />
+                    </div>
+                </div>
             </div>
         </div>
-
-        <div class="bard-editor @container/bard" :class="{ 'mode:read-only': readOnly, 'mode:minimal': ! showFixedToolbar, 'mode:inline': inputIsInline }" tabindex="0">
-            <bubble-menu class="bard-floating-toolbar" :editor="editor" :tippy-options="{ maxWidth: 'none', zIndex: 1000 }" v-if="editor && toolbarIsFloating && !readOnly">
-                <component
-                    v-for="button in visibleButtons(buttons)"
-                    :key="button.name"
-                    :is="button.component || 'BardToolbarButton'"
-                    :button="button"
-                    :active="buttonIsActive(button)"
-                    :bard="_self"
-                    :config="config"
-                    :editor="editor" />
-            </bubble-menu>
-
-            <floating-menu
-                class="bard-set-selector"
-                :editor="editor"
-                :should-show="shouldShowSetButton"
-                :is-showing="showAddSetButton"
-                v-if="editor"
-                v-slot="{ y }"
-                @shown="showAddSetButton = true"
-                @hidden="showAddSetButton = false"
-            >
-                <set-picker
-                    v-if="showAddSetButton"
-                    :sets="groupConfigs"
-                    @added="addSet"
-                    @clicked-away="clickedAwayFromSetPicker"
-                >
-                    <template #trigger>
-                        <button
-                            type="button"
-                            class="btn-round group bard-add-set-button"
-                            :style="{ transform: `translateY(${y}px)` }"
-                            :aria-label="__('Add Set')"
-                            v-tooltip="__('Add Set')"
-                            @click="addSetButtonClicked"
-                        >
-                            <svg-icon name="micro/plus" class="w-3 h-3 text-gray-800 dark:text-dark-175 group-hover:text-black dark:group-hover:dark-text-100" />
-                        </button>
-                    </template>
-                </set-picker>
-            </floating-menu>
-
-            <div class="bard-error" v-if="initError" v-html="initError"></div>
-            <editor-content :editor="editor" v-show="!showSource" :id="fieldId" />
-            <bard-source :html="htmlWithReplacedLinks" v-if="showSource" />
-        </div>
-        <div class="bard-footer-toolbar" v-if="editor && (config.reading_time || config.character_limit || config.word_count)">
-            <div v-if="config.reading_time">{{ readingTime }} {{ __('Reading Time') }}</div>
-            <div v-else />
-            <div v-if="config.character_limit || config.word_count" v-text="characterAndWordCountText" />
-        </div>
-    </div>
-</div>
-</div>
-</portal>
-
+    </portal>
 </template>
 
 <script>
+import Fieldtype from '../Fieldtype.vue';
 import uniqid from 'uniqid';
-import reduce from 'underscore/modules/reduce';
-import { BubbleMenu, Editor, EditorContent } from '@tiptap/vue-2';
+import Emitter from 'tiny-emitter';
+import { Editor, EditorContent } from '@tiptap/vue-3';
+import { BubbleMenu } from '@tiptap/vue-3/menus';
 import { Extension } from '@tiptap/core';
 import { FloatingMenu } from './FloatingMenu';
 import Blockquote from '@tiptap/extension-blockquote';
 import Bold from '@tiptap/extension-bold';
-import BulletList from '@tiptap/extension-bullet-list';
+import { BulletList, OrderedList, ListItem } from '@tiptap/extension-list';
 import CharacterCount from '@tiptap/extension-character-count';
 import Code from '@tiptap/extension-code';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
-import Dropcursor from '@tiptap/extension-dropcursor';
-import Gapcursor from '@tiptap/extension-gapcursor';
 import HardBreak from '@tiptap/extension-hard-break';
 import Heading from '@tiptap/extension-heading';
 import History from '@tiptap/extension-history';
 import HorizontalRule from '@tiptap/extension-horizontal-rule';
 import Italic from '@tiptap/extension-italic';
-import ListItem from '@tiptap/extension-list-item';
-import OrderedList from '@tiptap/extension-ordered-list';
 import Paragraph from '@tiptap/extension-paragraph';
-import Placeholder from '@tiptap/extension-placeholder';
 import Strike from '@tiptap/extension-strike';
 import Subscript from '@tiptap/extension-subscript';
 import Superscript from '@tiptap/extension-superscript';
-import Table from '@tiptap/extension-table';
-import TableRow from '@tiptap/extension-table-row';
-import TableCell from '@tiptap/extension-table-cell';
-import TableHeader from '@tiptap/extension-table-header';
+import { Table, TableRow, TableCell, TableHeader } from '@tiptap/extension-table';
 import Text from '@tiptap/extension-text';
 import TextAlign from '@tiptap/extension-text-align';
 import Typography from '@tiptap/extension-typography';
 import Underline from '@tiptap/extension-underline';
-import BardSource from './Source.vue';
+import { Placeholder, Dropcursor, Gapcursor } from '@tiptap/extensions';
 import SetPicker from '../replicator/SetPicker.vue';
 import { DocumentBlock, DocumentInline } from './Document';
-import { Set } from './Set'
+import { Set } from './Set';
 import { Small } from './Small';
 import { Image } from './Image';
 import { Link } from './Link';
 import LinkToolbarButton from './LinkToolbarButton.vue';
+import BardToolbarButton from './ToolbarButton.vue';
 import ManagesSetMeta from '../replicator/ManagesSetMeta';
 import { availableButtons, addButtonHtml } from '../bard/buttons';
 import readTimeEstimate from 'read-time-estimate';
-import { lowlight } from 'lowlight/lib/common.js';
+import { common, createLowlight } from 'lowlight';
 import 'highlight.js/styles/github.css';
+import importTiptap from '@statamic/util/tiptap.js';
+import { computed } from 'vue';
+
+const lowlight = createLowlight(common);
+let tiptap = null;
 
 export default {
-
     mixins: [Fieldtype, ManagesSetMeta],
 
     components: {
         BubbleMenu,
-        BardSource,
         BardToolbarButton,
         SetPicker,
         EditorContent,
@@ -161,18 +186,19 @@ export default {
         LinkToolbarButton,
     },
 
-    inject: ['storeName'],
+    provide: {
+        isInBardField: true,
+    },
 
     data() {
         return {
+            events: new Emitter(),
             editor: null,
             html: null,
             json: [],
-            showSource: false,
             fullScreenMode: false,
             buttons: [],
             collapsed: this.meta.collapsed,
-            previews: this.meta.previews,
             mounted: false,
             initError: null,
             pageHeader: null,
@@ -180,16 +206,15 @@ export default {
             showAddSetButton: false,
             provide: {
                 bard: this.makeBardProvide(),
-                storeName: this.storeName,
-                bardSets: this.config.sets
-            }
-        }
+                bardSets: this.config.sets,
+            },
+            errorsById: {},
+        };
     },
 
     computed: {
-
-        allowSource() {
-            return this.config.allow_source === undefined ? true : this.config.allow_source;
+        setFieldPathPrefix() {
+            return this.fieldPathPrefix ? `${this.fieldPathPrefix}.${this.handle}` : this.handle;
         },
 
         toolbarIsFixed() {
@@ -201,19 +226,21 @@ export default {
         },
 
         showFixedToolbar() {
-            return this.toolbarIsFixed && (this.visibleButtons.length > 0 || this.allowSource || this.hasExtraButtons)
+            return this.toolbarIsFixed && (this.visibleButtons.length > 0 || this.hasExtraButtons);
         },
 
         hasExtraButtons() {
-            return this.allowSource || this.setConfigs.length > 0 || this.config.fullscreen;
+            return this.setConfigs.length > 0 || this.config.fullscreen;
         },
 
         readingTime() {
             if (this.html) {
                 var stats = readTimeEstimate(this.html, 265, 12, 500, ['img', 'Image', 'bard-set']);
-                var duration = moment.duration(stats.duration, 'minutes');
+                var durationMs = stats.duration * 60 * 1000;
+                var minutes = Math.floor(durationMs / 60000);
+                var seconds = Math.floor((durationMs % 60000) / 1000);
 
-                return moment.utc(duration.asMilliseconds()).format("mm:ss");
+                return String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
             }
         },
 
@@ -235,16 +262,8 @@ export default {
             if (showWordCount) return wordCountText;
         },
 
-        isFirstCreation() {
-            return !this.$config.get('bard.meta').hasOwnProperty(this.id);
-        },
-
-        id() {
-            return `${this.storeName}.${this.name}`;
-        },
-
         setIndexes() {
-            let indexes = {}
+            let indexes = {};
 
             this.json.forEach((item, i) => {
                 if (item.type === 'set') {
@@ -255,40 +274,12 @@ export default {
             return indexes;
         },
 
-        storeState() {
-            if (! this.storeName) return undefined;
-
-            return this.$store.state.publish[this.storeName];
-        },
-
         site() {
-            return this.storeState ? this.storeState.site : this.$config.get('selectedSite');
-        },
-
-        htmlWithReplacedLinks() {
-            return this.html.replaceAll(/\"statamic:\/\/(.*?)\"/g, (match, ref) => {
-                const linkData = this.meta.linkData[ref];
-                if (! linkData) {
-                    this.$toast.error(`${__('No link data found for')} ${ref}`);
-                    return '""';
-                }
-
-                return `"${linkData.permalink}"`;
-            });
-        },
-
-        setsWithErrors() {
-            if (! this.storeState) return [];
-
-            return Object.values(this.setIndexes).filter((setIndex) => {
-                const prefix = `${this.fieldPathPrefix || this.handle}.${setIndex}.`;
-
-                return Object.keys(this.storeState.errors).some(key => key.startsWith(prefix));
-            })
+            return this.publishContainer.site ?? this.$config.get('selectedSite');
         },
 
         replicatorPreview() {
-            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
             const stack = [...this.value];
             let text = '';
             while (stack.length) {
@@ -297,7 +288,7 @@ export default {
                     text += ` ${node.text || ''}`;
                 } else if (node.type === 'set') {
                     const handle = node.attrs.values.type;
-                    const set = this.setConfigs.find(set => set.handle === handle);
+                    const set = this.setConfigs.find((set) => set.handle === handle);
                     text += ` [${__(set ? set.display : handle)}]`;
                 }
                 if (text.length > 150) {
@@ -319,7 +310,7 @@ export default {
         },
 
         setConfigs() {
-            return reduce(this.groupConfigs, (sets, group) => {
+            return this.groupConfigs.reduce((sets, group) => {
                 return sets.concat(group.sets);
             }, []);
         },
@@ -328,16 +319,46 @@ export default {
             return this.config.sets;
         },
 
+        internalFieldActions() {
+            return [
+                {
+                    title: __('Expand All Sets'),
+                    icon: 'expand-vertical-4',
+                    quick: true,
+                    visibleWhenReadOnly: true,
+                    run: this.expandAll,
+                    visible: this.setConfigs.length > 0,
+                },
+                {
+                    title: __('Collapse All Sets'),
+                    icon: 'shrink-vertical',
+                    quick: true,
+                    visibleWhenReadOnly: true,
+                    run: this.collapseAll,
+                    visible: this.setConfigs.length > 0,
+                },
+                {
+                    title: __('Toggle Fullscreen Mode'),
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'shrink-all' : 'expand'),
+                    quick: true,
+                    run: this.toggleFullscreen,
+                    visibleWhenReadOnly: true,
+                    visible: this.config.fullscreen,
+                },
+            ];
+        },
     },
 
-    mounted() {
+    async mounted() {
+        tiptap = await importTiptap();
+
         this.initToolbarButtons();
         this.initEditor();
 
         this.json = this.editor.getJSON().content;
         this.html = this.editor.getHTML();
 
-        this.escBinding = this.$keys.bind('esc', this.closeFullscreen)
+        this.escBinding = this.$keys.bind('esc', this.closeFullscreen);
 
         this.$nextTick(() => {
             this.mounted = true;
@@ -356,27 +377,26 @@ export default {
         });
     },
 
-    beforeDestroy() {
+    beforeUnmount() {
         this.editor.destroy();
         this.escBinding.destroy();
     },
 
     watch: {
-
         json(json, oldJson) {
             if (!this.mounted) return;
-                        
+
             if (json === oldJson) return;
 
             this.updateDebounced(json);
         },
 
-        value(value, oldValue) {    
+        value(value, oldValue) {
             const oldContent = this.editor.getJSON();
             const content = this.valueToContent(value);
 
             if (JSON.stringify(content) !== JSON.stringify(oldContent)) {
-                this.editor.commands.clearContent()
+                this.editor.commands.clearContent();
                 this.editor.commands.setContent(content, true);
             }
         },
@@ -391,32 +411,37 @@ export default {
             this.updateMeta(meta);
         },
 
-        previews: {
-            deep: true,
-            handler(value) {
-                if (JSON.stringify(this.meta.previews) === JSON.stringify(value)) {
-                    return
-                }
-                const meta = this.meta;
-                meta.previews = value;
-                this.updateMeta(meta);
-            }
-        },
-
         fullScreenMode() {
             this.initEditor();
-        }
+        },
 
+        'publishContainer.errors': {
+            immediate: true,
+            handler(errors) {
+                this.errorsById = Object.entries(errors).reduce((acc, [key, value]) => {
+                    if (!key.startsWith(this.setFieldPathPrefix)) {
+                        return acc;
+                    }
+
+                    const subKey = key.replace(`${this.setFieldPathPrefix}.`, '');
+                    const setIndex = subKey.split('.').shift();
+                    const setId = this.value[setIndex]?.attrs.id;
+
+                    if (setId) {
+                        acc[setId] = value;
+                    }
+
+                    return acc;
+                }, {});
+            },
+        },
     },
 
     methods: {
         addSet(handle) {
             const id = uniqid();
-            const values = Object.assign({}, { type: handle }, this.meta.defaults[handle]);
-
-            let previews = {};
-            Object.keys(this.meta.defaults[handle]).forEach(key => previews[key] = null);
-            this.previews = Object.assign({}, this.previews, { [id]: previews });
+            const deepCopy = JSON.parse(JSON.stringify(this.meta.defaults[handle]));
+            const values = Object.assign({}, { type: handle }, deepCopy);
 
             this.updateSetMeta(id, this.meta.new[handle]);
 
@@ -436,10 +461,8 @@ export default {
         duplicateSet(old_id, attrs, pos) {
             const id = uniqid();
             const enabled = attrs.enabled;
-            const values = Object.assign({}, attrs.values);
-
-            let previews = Object.assign({}, this.previews[old_id]);
-            this.previews = Object.assign({}, this.previews, { [id]: previews });
+            const deepCopy = JSON.parse(JSON.stringify(attrs.values));
+            const values = Object.assign({}, deepCopy);
 
             this.updateSetMeta(id, this.meta.existing[old_id]);
 
@@ -455,9 +478,6 @@ export default {
             const enabled = attrs.enabled;
             const values = Object.assign({}, attrs.values);
 
-            let previews = Object.assign({}, this.previews[old_id] || {});
-            this.previews = Object.assign({}, this.previews, { [id]: previews });
-
             this.updateSetMeta(id, this.meta.existing[old_id] || this.meta.defaults[values.type] || {});
 
             return { id, enabled, values };
@@ -465,13 +485,13 @@ export default {
 
         collapseSet(id) {
             if (!this.collapsed.includes(id)) {
-                this.collapsed.push(id)
+                this.collapsed.push(id);
             }
         },
 
         expandSet(id) {
             if (this.config.collapse === 'accordion') {
-                this.collapsed = Object.keys(this.meta.existing).filter(v => v !== id);
+                this.collapsed = Object.keys(this.meta.existing).filter((v) => v !== id);
                 return;
             }
 
@@ -490,7 +510,7 @@ export default {
         },
 
         toggleCollapseSets() {
-            (this.collapsed.length === 0) ? this.collapseAll() : this.expandAll();
+            this.collapsed.length === 0 ? this.collapseAll() : this.expandAll();
         },
 
         toggleFullscreen() {
@@ -502,18 +522,34 @@ export default {
         },
 
         shouldShowSetButton({ view, state }) {
+            const isActive = this.suitableToShowSetButton({ view, state });
+            return this.setConfigs.length && (this.config.always_show_set_button || isActive);
+        },
+
+        suitableToShowSetButton({ view, state }) {
             const { selection } = state;
             const { $anchor, empty } = selection;
             const isRootDepth = $anchor.depth === 1;
-            const isEmptyTextBlock = $anchor.parent.isTextblock && !$anchor.parent.type.spec.code && !$anchor.parent.textContent;
-            const isAroundInlineImage = state.selection.$to.nodeBefore?.type.name === 'image' || state.selection.$to.nodeAfter?.type.name === 'image'
-            const isActive = view.hasFocus() && empty && isRootDepth && isEmptyTextBlock && !isAroundInlineImage;
-            return this.setConfigs.length && (this.config.always_show_set_button || isActive);
+            const isEmptyTextBlock =
+                $anchor.parent.isTextblock && !$anchor.parent.type.spec.code && !$anchor.parent.textContent;
+            const isAroundInlineImage =
+                state.selection.$to.nodeBefore?.type.name === 'image' ||
+                state.selection.$to.nodeAfter?.type.name === 'image';
+            return view.hasFocus() && empty && isRootDepth && isEmptyTextBlock && !isAroundInlineImage;
         },
 
         initToolbarButtons() {
             const selectedButtons = this.config.buttons || [
-                'h2', 'h3', 'bold', 'italic', 'unorderedlist', 'orderedlist', 'removeformat', 'quote', 'anchor', 'table'
+                'h2',
+                'h3',
+                'bold',
+                'italic',
+                'unorderedlist',
+                'orderedlist',
+                'removeformat',
+                'quote',
+                'anchor',
+                'table',
             ];
 
             if (selectedButtons.includes('table')) {
@@ -526,61 +562,113 @@ export default {
                     'addrowafter',
                     'deleterow',
                     'togglecellmerge',
-                    'toggleheadercell'
+                    'toggleheadercell',
                 );
             }
 
             // Get the configured buttons and swap them with corresponding objects
-            let buttons = selectedButtons.map(button => {
-                return _.findWhere(availableButtons(), { name: button.toLowerCase() }) || button;
+            let buttons = selectedButtons.map((button) => {
+                return availableButtons().find((b) => b.name === button.toLowerCase()) || button;
             });
 
             // Let addons add, remove, or control the position of buttons.
-            this.$bard.buttonCallbacks.forEach(callback => {
+            this.$bard.buttonCallbacks.forEach((callback) => {
                 // Since the developer uses the same callback to add buttons to the field itself, and for the
                 // button configurator, we need to make the button conditional when on the Bard fieldtype
                 // but not in the button configurator. So here we'll filter it out if it's not selected.
-                const buttonFn = (button) => selectedButtons.includes(button.name) ? button : null;
+                const buttonFn = (button) => (selectedButtons.includes(button.name) ? button : null);
 
                 const addedButtons = callback(buttons, buttonFn);
 
                 // No return value means either they literally returned nothing, with the intention
                 // of manipulating the buttons object manually. Or, they used the button() and
                 // the button was not configured in the field so it was stripped out.
-                if (! addedButtons) return;
+                if (!addedButtons) return;
 
-                buttons = buttons.concat(
-                    Array.isArray(addedButtons) ? addedButtons : [addedButtons]
-                );
+                buttons = buttons.concat(Array.isArray(addedButtons) ? addedButtons : [addedButtons]);
             });
 
             // Remove any nulls. This could happen if a developer-added button was not specified in this field's buttons array.
-            buttons = buttons.filter(button => !!button);
+            buttons = buttons.filter((button) => !!button);
 
             // Remove any non-objects. This would happen if you configure a button name that doesn't exist.
-            buttons = buttons.filter(button => typeof button != 'string');
+            buttons = buttons.filter((button) => typeof button != 'string');
 
             // Generate fallback html for each button
             buttons = addButtonHtml(buttons);
 
             // Remove buttons that don't pass conditions.
             // eg. only the insert asset button can be shown if a container has been set.
-            buttons = buttons.filter(button => {
-                return (button.condition) ? button.condition.call(null, this.config) : true;
+            buttons = buttons.filter((button) => {
+                return button.condition ? button.condition.call(null, this.config) : true;
             });
 
-            if (_.findWhere(buttons, {name: 'table'})) {
+            if (buttons.find((b) => b.name === 'table')) {
                 buttons.push(
-                    { name: 'deletetable', text: __('Delete Table'), command: (editor) => editor.commands.deleteTable(), svg: 'delete-table', visibleWhenActive: 'table' },
-                    { name: 'addcolumnbefore', text: __('Add Column Before'), command: (editor) => editor.commands.addColumnBefore(), svg: 'add-col-before', visibleWhenActive: 'table' },
-                    { name: 'addcolumnafter', text: __('Add Column After'), command: (editor) => editor.commands.addColumnAfter(), svg: 'add-col-after', visibleWhenActive: 'table' },
-                    { name: 'deletecolumn', text: __('Delete Column'), command: (editor) => editor.commands.deleteColumn(), svg: 'delete-col', visibleWhenActive: 'table' },
-                    { name: 'addrowbefore', text: __('Add Row Before'), command: (editor) => editor.commands.addRowBefore(), svg: 'add-row-before', visibleWhenActive: 'table' },
-                    { name: 'addrowafter', text: __('Add Row After'), command: (editor) => editor.commands.addRowAfter(), svg: 'add-row-after', visibleWhenActive: 'table' },
-                    { name: 'deleterow', text: __('Delete Row'), command: (editor) => editor.commands.deleteRow(), svg: 'delete-row', visibleWhenActive: 'table' },
-                    { name: 'toggleheadercell', text: __('Toggle Header Cell'), command: (editor) => editor.commands.toggleHeaderCell(), svg: 'flip-vertical', visibleWhenActive: 'table' },
-                    { name: 'togglecellmerge', text: __('Merge Cells'), command: (editor) => editor.commands.mergeCells(), svg: 'combine-cells', visibleWhenActive: 'table' },
-                )
+                    {
+                        name: 'deletetable',
+                        text: __('Delete Table'),
+                        command: (editor) => editor.commands.deleteTable(),
+                        svg: 'delete-table',
+                        visibleWhenActive: 'table',
+                    },
+                    {
+                        name: 'addcolumnbefore',
+                        text: __('Add Column Before'),
+                        command: (editor) => editor.commands.addColumnBefore(),
+                        svg: 'add-col-before',
+                        visibleWhenActive: 'table',
+                    },
+                    {
+                        name: 'addcolumnafter',
+                        text: __('Add Column After'),
+                        command: (editor) => editor.commands.addColumnAfter(),
+                        svg: 'add-col-after',
+                        visibleWhenActive: 'table',
+                    },
+                    {
+                        name: 'deletecolumn',
+                        text: __('Delete Column'),
+                        command: (editor) => editor.commands.deleteColumn(),
+                        svg: 'delete-col',
+                        visibleWhenActive: 'table',
+                    },
+                    {
+                        name: 'addrowbefore',
+                        text: __('Add Row Before'),
+                        command: (editor) => editor.commands.addRowBefore(),
+                        svg: 'add-row-before',
+                        visibleWhenActive: 'table',
+                    },
+                    {
+                        name: 'addrowafter',
+                        text: __('Add Row After'),
+                        command: (editor) => editor.commands.addRowAfter(),
+                        svg: 'add-row-after',
+                        visibleWhenActive: 'table',
+                    },
+                    {
+                        name: 'deleterow',
+                        text: __('Delete Row'),
+                        command: (editor) => editor.commands.deleteRow(),
+                        svg: 'delete-row',
+                        visibleWhenActive: 'table',
+                    },
+                    {
+                        name: 'toggleheadercell',
+                        text: __('Toggle Header Cell'),
+                        command: (editor) => editor.commands.toggleHeaderCell(),
+                        svg: 'flip-vertical',
+                        visibleWhenActive: 'table',
+                    },
+                    {
+                        name: 'togglecellmerge',
+                        text: __('Merge Cells'),
+                        command: (editor) => editor.commands.mergeCells(),
+                        svg: 'combine-cells',
+                        visibleWhenActive: 'table',
+                    },
+                );
             }
 
             this.buttons = buttons;
@@ -599,12 +687,12 @@ export default {
             if (button.hasOwnProperty('visible')) {
                 return button.visible(this.editor, button.args);
             }
-            if (! button.hasOwnProperty('visibleWhenActive')) return true;
+            if (!button.hasOwnProperty('visibleWhenActive')) return true;
             return this.editor.isActive(button.visibleWhenActive, button.args);
         },
 
         visibleButtons(buttons) {
-            return buttons.filter(button => this.buttonIsVisible(button));
+            return buttons.filter((button) => this.buttonIsVisible(button));
         },
 
         initEditor() {
@@ -618,14 +706,17 @@ export default {
                 editable: !this.readOnly,
                 enableInputRules: this.config.enable_input_rules,
                 enablePasteRules: this.config.enable_paste_rules,
-                editorProps: { attributes: { class: 'bard-content' }},
+                editorProps: { attributes: { class: 'bard-content' } },
                 onFocus: () => this.$emit('focus'),
                 onBlur: () => {
                     // Since clicking into a field inside a set would also trigger a blur, we can't just emit the
                     // blur event immediately. We need to make sure that the newly focused element is outside
                     // of Bard. We use a timeout because activeElement only exists after the blur event.
+                    // Additionally, check that the focused element isn't the set picker's search input.
                     setTimeout(() => {
-                        if (!this.$refs.container.contains(document.activeElement)) {
+                        const isInsideBard = this.$refs.container.contains(document.activeElement);
+                        const isSetPickerSearch = document.activeElement.hasAttribute('data-set-picker-search-input');
+                        if (!isInsideBard && !isSetPickerSearch) {
                             this.$emit('blur');
                             this.showAddSetButton = false;
                         }
@@ -650,7 +741,7 @@ export default {
                             }
                         }
                     }
-                }
+                },
             });
         },
 
@@ -665,7 +756,11 @@ export default {
             }
 
             let match;
-            if (match = error.message.match(/^(?:There is no|Unknown) (?:node|mark) type:? (\w*)(?: in this schema)?$/)) {
+            if (
+                (match = error.message.match(
+                    /^(?:There is no|Unknown) (?:node|mark) type:? (\w*)(?: in this schema)?$/,
+                ))
+            ) {
                 if (match[1]) {
                     return __('Invalid content, :type button/extension is not enabled', { type: match[1] });
                 } else {
@@ -674,24 +769,28 @@ export default {
             }
         },
 
+        setHasError(id) {
+            return this.errorsById.hasOwnProperty(id) && this.errorsById[id].length > 0;
+        },
+
         valueToContent(value) {
-            return value.length
-                ? { type: 'doc', content: value }
-                : null;
+            return value.length ? { type: 'doc', content: value } : null;
         },
 
         getExtensions() {
             let modeExts = this.inputIsInline ? [DocumentInline] : [DocumentBlock, HardBreak];
 
             if (this.config.inline === 'break') {
-                modeExts.push(HardBreak.extend({
-                    addKeyboardShortcuts() {
-                        return {
-                            ...this.parent?.(),
-                            'Enter': () => this.editor.commands.setHardBreak(),
-                        }
-                    },
-                }));
+                modeExts.push(
+                    HardBreak.extend({
+                        addKeyboardShortcuts() {
+                            return {
+                                ...this.parent?.(),
+                                Enter: () => this.editor.commands.setHardBreak(),
+                            };
+                        },
+                    }),
+                );
             }
 
             if (this.config.placeholder) {
@@ -700,11 +799,31 @@ export default {
 
             // Allow passthrough of Ctrl/Cmd + Enter to submit the form
             const DisableCtrlEnter = Extension.create({
+                name: 'disableCtrlEnter',
                 addKeyboardShortcuts() {
                     return {
                         'Ctrl-Enter': () => true,
                         'Cmd-Enter': () => true,
-                    }
+                    };
+                },
+            });
+
+            // Handle forward slash to open set picker
+            const SlashSetPicker = Extension.create({
+                name: 'slashSetPicker',
+                addKeyboardShortcuts() {
+                    return {
+                        '/': () => {
+                            const { view, state } = this.editor;
+
+                            if (this.options.allowed({ view, state})) {
+                                this.options.openSetPicker();
+                                return true; // Prevent inserting a slash.
+                            }
+
+                            return false; // Allow default behavior (insert slash)
+                        },
+                    };
                 },
             });
 
@@ -712,19 +831,24 @@ export default {
                 CharacterCount.configure({ limit: this.config.character_limit }),
                 ...modeExts,
                 DisableCtrlEnter,
+                SlashSetPicker.configure({
+                    shown: computed(() => this.showAddSetButton),
+                    allowed: this.suitableToShowSetButton,
+                    openSetPicker: this.openSetPicker,
+                }),
                 Dropcursor,
                 Gapcursor,
                 History,
                 Paragraph,
-                Set.configure({ bard: this }),
-                Text
+                Set.configure({ bard: this, foo: 'bar' }),
+                Text,
             ];
 
             if (this.config.smart_typography) {
                 exts.push(Typography);
             }
 
-            let btns = this.buttons.map(button => button.name);
+            let btns = this.buttons.map((button) => button.name);
 
             if (btns.includes('anchor')) exts.push(Link.configure({ vm: this }));
             if (btns.includes('bold')) exts.push(Bold);
@@ -763,23 +887,16 @@ export default {
             if (alignments.length) exts.push(TextAlign.configure({ types: alignmentTypes, alignments }));
 
             if (btns.includes('table')) {
-                exts.push(
-                    Table.configure({ resizable: true }),
-                    TableHeader,
-                    TableCell,
-                    TableRow,
-                );
+                exts.push(Table.configure({ resizable: true }), TableHeader, TableCell, TableRow);
             }
 
             this.$bard.extensionCallbacks.forEach((callback) => {
-                let returned = callback({ bard: this});
-                exts = exts.concat(
-                    Array.isArray(returned) ? returned : [returned]
-                );
+                let returned = callback({ bard: this, tiptap });
+                exts = exts.concat(Array.isArray(returned) ? returned : [returned]);
             });
 
             this.$bard.extensionReplacementCallbacks.forEach(({ callback, name }) => {
-                let index = exts.findIndex(ext => ext.name === name);
+                let index = exts.findIndex((ext) => ext.name === name);
                 if (index === -1) return;
                 let extension = exts[index];
                 let newExtension = callback({ bard: this, extension });
@@ -787,10 +904,6 @@ export default {
             });
 
             return exts;
-        },
-
-        updateSetPreviews(set, previews) {
-            this.previews[set] = previews;
         },
 
         ignorePageHeader(ignore) {
@@ -808,17 +921,9 @@ export default {
             return bard;
         },
 
-        addSetButtonClicked() {
-            if (this.setConfigs.length === 1) {
-                this.addSet(this.setConfigs[0].handle);
-            }
-        },
-
-        clickedAwayFromSetPicker($event) {
-            if (this.$el.contains($event.target)) return;
-            this.showAddSetButton = false;
-        },
-
-    }
-}
+        openSetPicker() {
+            this.$refs.setPicker.open();
+        }
+    },
+};
 </script>

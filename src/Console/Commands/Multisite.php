@@ -11,14 +11,13 @@ use Statamic\Console\ValidatesInput;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Config;
 use Statamic\Facades\File;
-use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Nav;
 use Statamic\Facades\Role;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
-use Statamic\Facades\YAML;
 use Statamic\Rules\Handle;
 use Statamic\Statamic;
+use Statamic\Support\Traits\Hookable;
 use Wilderborn\Partyline\Facade as Partyline;
 
 use function Laravel\Prompts\confirm;
@@ -26,7 +25,7 @@ use function Laravel\Prompts\text;
 
 class Multisite extends Command
 {
-    use ConfirmableTrait, EnhancesCommands, RunsInPlease, ValidatesInput;
+    use ConfirmableTrait, EnhancesCommands, Hookable, RunsInPlease, ValidatesInput;
 
     protected $signature = 'statamic:multisite';
 
@@ -55,6 +54,8 @@ class Multisite extends Command
             ->convertNavs()
             ->addPermissions()
             ->clearCache();
+
+        $this->runHooks('after');
 
         $this->components->info('Successfully converted from single to multisite installation!');
 
@@ -93,21 +94,21 @@ class Multisite extends Command
             return false;
         }
 
-        $directory = Config::get('statamic.stache.stores.entries.directory').DIRECTORY_SEPARATOR.$collection->handle().DIRECTORY_SEPARATOR.$siteHandle;
+        $directory = Stache::store('entries')->directory().DIRECTORY_SEPARATOR.$collection->handle().DIRECTORY_SEPARATOR.$siteHandle;
 
         return File::isDirectory($directory);
     }
 
     private function globalsHaveBeenMoved(string $siteHandle): bool
     {
-        $directory = Config::get('statamic.stache.stores.globals.directory').DIRECTORY_SEPARATOR.$siteHandle;
-
-        return File::isDirectory($directory);
+        return File::exists(
+            Stache::store('globals')->directory().DIRECTORY_SEPARATOR.$siteHandle
+        );
     }
 
     private function navsHaveBeenMoved(string $siteHandle): bool
     {
-        $directory = Config::get('statamic.stache.stores.navigation.directory').DIRECTORY_SEPARATOR.$siteHandle;
+        $directory = Stache::store('navigation')->directory().DIRECTORY_SEPARATOR.$siteHandle;
 
         return File::isDirectory($directory);
     }
@@ -233,7 +234,7 @@ class Multisite extends Command
     {
         Config::set('statamic.system.multisite', false);
 
-        $base = Config::get('statamic.stache.stores.entries.directory').DIRECTORY_SEPARATOR.$collection->handle();
+        $base = Stache::store('entries')->directory().DIRECTORY_SEPARATOR.$collection->handle();
 
         File::makeDirectory("{$base}/{$this->siteHandle}");
 
@@ -261,29 +262,30 @@ class Multisite extends Command
 
     private function convertGlobalSets(): self
     {
-        Config::set('statamic.system.multisite', true);
+        if ($this->siteHandle === 'default') {
+            // If it's default, the variables are already in the right spot.
+            return $this;
+        }
 
-        GlobalSet::all()->each(function ($set) {
-            $this->components->task(
-                description: "Updating global [{$set->handle()}]...",
-                task: function () use ($set) {
-                    $this->moveGlobalSet($set);
-                }
-            );
-        });
+        $directory = Stache::store('globals')->directory();
+        $originalDirectory = $directory.DIRECTORY_SEPARATOR.'default';
+        $newDirectory = $directory.DIRECTORY_SEPARATOR.$this->siteHandle;
+
+        File::makeDirectory($newDirectory);
+
+        collect(File::getFiles($originalDirectory))
+            ->each(function ($path) use ($originalDirectory, $newDirectory) {
+                $basename = pathinfo($path, PATHINFO_BASENAME);
+
+                File::move(
+                    $originalDirectory.DIRECTORY_SEPARATOR.$basename,
+                    $newDirectory.DIRECTORY_SEPARATOR.$basename
+                );
+            });
+
+        File::delete($originalDirectory);
 
         return $this;
-    }
-
-    private function moveGlobalSet($set): void
-    {
-        $yaml = YAML::file($set->path())->parse();
-
-        $data = $yaml['data'] ?? [];
-
-        $set->addLocalization($set->makeLocalization($this->siteHandle)->data($data));
-
-        $set->save();
     }
 
     private function convertNavs(): self

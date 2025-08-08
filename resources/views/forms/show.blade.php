@@ -1,82 +1,85 @@
-@php use function Statamic\trans as __; @endphp
+@php
+    use function Statamic\trans as __;
+@endphp
 
 @extends('statamic::layout')
 @section('title', Statamic::crumb($form->title(), 'Forms'))
-@section('wrapper_class', 'max-w-full')
 
 @section('content')
-
-    <header class="mb-6">
-        @include('statamic::partials.breadcrumb', [
-            'url' => cp_route('forms.index'),
-            'title' => __('Forms')
-        ])
-        <div class="flex items-center">
-            <h1 v-pre class="flex-1">
-                {{ __($form->title()) }}
-            </h1>
-
-            @if(\Statamic\Facades\User::current()->can('edit', $form) || \Statamic\Facades\User::current()->can('delete', $form))
-                <dropdown-list class="rtl:ml-2 ltr:mr-2">
+    <ui-header title="{{ __($form->title()) }}" icon="forms">
+        @if (\Statamic\Facades\User::current()->can('edit', $form) || \Statamic\Facades\User::current()->can('delete', $form))
+            <ui-dropdown placement="left-start" class="me-2">
+                <ui-dropdown-menu>
                     @can('edit', $form)
-                        <dropdown-item :text="__('Edit Form')" redirect="{{ $form->editUrl() }}"></dropdown-item>
+                        <ui-dropdown-item :text="__('Configure Form')" icon="cog" href="{{ $form->editUrl() }}"></ui-dropdown-item>
                     @endcan
-                    @can('configure form fields')
-                        <dropdown-item :text="__('Edit Blueprint')" redirect="{{ cp_route('forms.blueprint.edit', $form->handle()) }}"></dropdown-item>
-                    @endcan
-                    @can('delete', $form)
-                        <dropdown-item :text="__('Delete Form')" class="warning" @click="$refs.deleter.confirm()">
-                            <resource-deleter
-                                ref="deleter"
-                                resource-title="{{ $form->title() }}"
-                                route="{{ $form->deleteUrl() }}"
-                                redirect="{{ cp_route('forms.index') }}"
-                            ></resource-deleter>
-                        </dropdown-item>
-                    @endcan
-                </dropdown-list>
-            @endif
 
-            @if (($exporters = $form->exporters()) && $exporters->isNotEmpty())
-            <dropdown-list>
-                <button class="btn" slot="trigger">{{ __('Export Submissions') }}</button>
-                @foreach ($exporters as $exporter)
-                    <dropdown-item
-                        text="{{ $exporter->title() }}"
-                        redirect="{{ $exporter->downloadUrl() }}"
-                    ></dropdown-item>
-                @endforeach
-            </dropdown-list>
-            @endif
-        </div>
-    </header>
+                    @can('configure form fields')
+                        <ui-dropdown-item
+                            :text="__('Edit Blueprint')"
+                            icon="blueprint-edit"
+                            href="{{ cp_route('blueprints.forms.edit', $form->handle()) }}"
+                        ></ui-dropdown-item>
+                    @endcan
+
+                    @can('delete', $form)
+                        <ui-dropdown-item :text="__('Delete Form')" icon="trash" variant="destructive" @click="$refs.deleter.confirm()"></ui-dropdown-item>
+                    @endcan
+                </ui-dropdown-menu>
+            </ui-dropdown>
+
+            @can('delete', $form)
+                <resource-deleter
+                    ref="deleter"
+                    resource-title="{{ $form->title() }}"
+                    route="{{ $form->deleteUrl() }}"
+                    redirect="{{ cp_route('forms.index') }}"
+                ></resource-deleter>
+            @endcan
+        @endif
+
+        @if (($exporters = $form->exporters()) && $exporters->isNotEmpty())
+            <ui-dropdown>
+                <template #trigger>
+                    <ui-button :text="__('Export Submissions')"></ui-button>
+                </template>
+                <ui-dropdown-menu>
+                    @foreach ($exporters as $exporter)
+                        <ui-dropdown-item
+                            text="{{ $exporter->title() }}"
+                            href="{{ $exporter->downloadUrl() }}"
+                        ></ui-dropdown-item>
+                    @endforeach
+                </ui-dropdown-menu>
+            </ui-dropdown>
+        @endif
+    </ui-header>
 
     @if (! empty($form->metrics()))
-    <div class="metrics mb-6">
-        @foreach($form->metrics() as $metric)
-            <div class="card px-6">
-                <h3 class="mb-4 font-bold text-gray dark:text-dark-175">{{ $metric->label() }}</h3>
-                <div class="text-4xl">{{ $metric->result() }}</div>
-            </div>
-        @endforeach
-    </div>
+        <div class="metrics mb-6">
+            @foreach ($form->metrics() as $metric)
+                <div class="card px-6">
+                    <h3 class="mb-4 font-bold text-gray dark:text-dark-175">{{ $metric->label() }}</h3>
+                    <div class="text-4xl">{{ $metric->result() }}</div>
+                </div>
+            @endforeach
+        </div>
     @endif
 
     <form-submission-listing
         form="{{ $form->handle() }}"
         action-url="{{ cp_route('forms.submissions.actions.run', $form->handle()) }}"
-        initial-sort-column="datestamp"
-        initial-sort-direction="desc"
-        :initial-columns="{{ $columns->toJson() }}"
+        sort-column="datestamp"
+        sort-direction="desc"
+        :columns="{{ $columns->toJson() }}"
         :filters="{{ $filters->toJson() }}"
         v-cloak
     >
-        <div slot="no-results" class="text-center border-2 dark:border-dark-400 border-dashed rounded-lg">
-            <div class="max-w-md mx-auto px-8 py-30">
+        <div slot="no-results" class="rounded-lg border-2 border-dashed text-center dark:border-dark-400">
+            <div class="mx-auto max-w-md px-8 py-30">
                 @cp_svg('empty/form')
                 <h1 class="my-6">{{ __('No submissions') }}</h1>
             </div>
         </div>
     </form-submission-listing>
-
 @endsection

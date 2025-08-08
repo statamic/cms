@@ -26,6 +26,7 @@ class Markdown extends Fieldtype
                         'type' => 'asset_container',
                         'mode' => 'select',
                         'max_items' => 1,
+                        'width' => 33,
                     ],
                     'folder' => [
                         'display' => __('Folder'),
@@ -35,6 +36,7 @@ class Markdown extends Fieldtype
                         'if' => [
                             'container' => 'not empty',
                         ],
+                        'width' => 33,
                     ],
                     'restrict' => [
                         'display' => __('Restrict'),
@@ -60,47 +62,60 @@ class Markdown extends Fieldtype
                             'image',
                             'table',
                         ],
+                        'width' => 66,
+                    ],
+                    'toolbar_mode' => [
+                        'display' => __('Toolbar Mode'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.toolbar_mode'),
+                        'type' => 'select',
+                        'default' => 'fixed',
+                        'options' => [
+                            'fixed' => __('Fixed'),
+                            'floating' => __('Floating'),
+                        ],
+                        'width' => 33,
                     ],
                     'automatic_line_breaks' => [
                         'display' => __('Automatic Line Breaks'),
                         'instructions' => __('statamic::fieldtypes.markdown.config.automatic_line_breaks'),
                         'type' => 'toggle',
                         'default' => true,
+                        'width' => 33,
                     ],
                     'automatic_links' => [
                         'display' => __('Automatic Links'),
                         'instructions' => __('statamic::fieldtypes.markdown.config.automatic_links'),
                         'type' => 'toggle',
                         'default' => false,
+                        'width' => 33,
                     ],
                     'escape_markup' => [
                         'display' => __('Escape Markup'),
                         'instructions' => __('statamic::fieldtypes.markdown.config.escape_markup'),
                         'type' => 'toggle',
                         'default' => false,
+                        'width' => 33,
                     ],
                     'heading_anchors' => [
                         'display' => __('Heading Anchors'),
                         'instructions' => __('statamic::fieldtypes.markdown.config.heading_anchors'),
                         'type' => 'toggle',
                         'default' => false,
+                        'width' => 33,
                     ],
                     'smartypants' => [
                         'display' => __('Smartypants'),
                         'instructions' => __('statamic::fieldtypes.markdown.config.smartypants'),
                         'type' => 'toggle',
                         'default' => false,
+                        'width' => 33,
                     ],
                     'table_of_contents' => [
                         'display' => __('Table of Contents'),
                         'instructions' => __('statamic::fieldtypes.markdown.config.table_of_contents'),
                         'type' => 'toggle',
                         'default' => false,
-                    ],
-                    'parser' => [
-                        'display' => __('Parser'),
-                        'instructions' => __('statamic::fieldtypes.markdown.config.parser'),
-                        'type' => 'text',
+                        'width' => 33,
                     ],
                     'default' => [
                         'display' => __('Default Value'),
@@ -110,12 +125,19 @@ class Markdown extends Fieldtype
                 ],
             ],
             [
-                'display' => 'Antlers',
+                'display' => 'Advanced',
                 'fields' => [
+                    'parser' => [
+                        'display' => __('Parser'),
+                        'instructions' => __('statamic::fieldtypes.markdown.config.parser'),
+                        'type' => 'text',
+                        'width' => 50,
+                    ],
                     'antlers' => [
                         'display' => __('Allow Antlers'),
                         'instructions' => __('statamic::fieldtypes.any.config.antlers'),
                         'type' => 'toggle',
+                        'width' => 50,
                     ],
                 ],
             ],
@@ -197,5 +219,10 @@ class Markdown extends Fieldtype
         return [
             'previewUrl' => cp_route('markdown.preview'),
         ];
+    }
+
+    public function shouldParseAntlersFromRawString(): bool
+    {
+        return $this->config('smartypants', false);
     }
 }

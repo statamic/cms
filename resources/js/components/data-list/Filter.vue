@@ -1,58 +1,37 @@
 <template>
+    <div class="no-label w-full">
 
-    <div class="w-full no-label">
-        <publish-container
-            class="p-3"
-            v-if="filter.fields.length"
-            :name="`filter-${filter.handle}`"
-            :meta="meta"
-            :values="containerValues"
+        <ui-publish-container
+            :model-value="containerValues"
+            @update:model-value="updateValues"
+            :meta="filter.meta"
             :track-dirty-state="false"
-            @updated="updateValues"
         >
-            <publish-fields
-                slot-scope="{ setFieldValue }"
-                :fields="filter.fields"
-                :name-prefix="`filter-${filter.handle}`"
-                @updated="setFieldValue"
-                @meta-updated="updateMeta"
-            />
-        </publish-container>
+            <ui-publish-fields-provider :fields="filter.fields">
+                <ui-publish-fields />
+            </ui-publish-fields-provider>
+        </ui-publish-container>
 
         <div class="flex border-t dark:border-dark-900">
             <button
-                class="p-2 hover:bg-gray-100 dark:hover:bg-dark-600 rtl:rounded-br ltr:rounded-bl text-xs flex-1"
+                class="flex-1 p-2 text-xs hover:bg-gray-100 dark:hover:bg-dark-600 ltr:rounded-bl rtl:rounded-br"
                 v-text="__('Clear')"
                 @click="resetAll"
             />
             <button
-                class="p-2 hover:bg-gray-100 dark:hover:bg-dark-600 flex-1 rtl:rounded-bl ltr:rounded-br rtl:border-r ltr:border-l dark:border-dark-900 text-xs"
+                class="flex-1 p-2 text-xs hover:bg-gray-100 dark:border-dark-900 dark:hover:bg-dark-600 ltr:rounded-br ltr:border-l rtl:rounded-bl rtl:border-r"
                 v-text="__('Close')"
                 @click="$emit('closed')"
             />
         </div>
     </div>
-
 </template>
 
 <script>
-import PublishFields from '../publish/Fields.vue';
-
 export default {
-
-    components: {
-        PublishFields,
-    },
-
     props: {
         filter: Object,
         values: Object,
-    },
-
-    data() {
-        return {
-            meta: {},
-        };
     },
 
     computed: {
@@ -69,7 +48,7 @@ export default {
         updateValues(values) {
             let filteredValues = clone(values);
 
-            Object.keys(values).forEach(key => {
+            Object.keys(values).forEach((key) => {
                 if (values[key] === null || values[key] === undefined) delete filteredValues[key];
             });
 
@@ -87,8 +66,7 @@ export default {
 
         close() {
             this.$emit('closed');
-        }
+        },
     },
-
-}
+};
 </script>

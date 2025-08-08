@@ -3,76 +3,79 @@
    ========================================================================== */
 
 .tabs-container {
-    @apply w-full border-b dark:border-dark-500 text-md relative flex mb-6;
+    @apply relative mb-6 flex w-full border-b text-sm dark:border-dark-500;
 
-   .fade-left, .fade-right {
-        @apply absolute w-4 inset-y-0 from-gray-300 dark:from-dark-800 pointer-events-none z-2;
+    .fade-left,
+    .fade-right {
+        @apply pointer-events-none absolute inset-y-0 z-2 w-4 from-gray-300 dark:from-dark-800;
     }
 
     .fade-left {
-        @apply rtl:right-0 ltr:left-0 rtl:bg-gradient-to-l ltr:bg-gradient-to-r;
+        @apply ltr:left-0 ltr:bg-linear-to-r rtl:right-0 rtl:bg-linear-to-l;
     }
 
     .fade-right {
-        @apply rtl:left-0 ltr:right-0 rtl:bg-gradient-to-r ltr:bg-gradient-to-l;
+        @apply ltr:right-0 ltr:bg-linear-to-l rtl:left-0 rtl:bg-linear-to-r;
     }
 }
 
-.card .tabs-container .fade-left, .card .tabs-container .fade-right {
+.card .tabs-container .fade-left,
+.card .tabs-container .fade-right {
     @apply from-white dark:from-dark-600;
 }
 
 .tabs {
-    @apply flex space-x-2 rtl:space-x-reverse overflow-hidden relative w-full max-w-full;
+    @apply relative flex w-full max-w-full space-x-2 overflow-hidden rtl:space-x-reverse;
     &-scrolled {
-        @apply rtl:pr-0 ltr:pl-0 rtl:mr-0 ltr:ml-0;
+        @apply ltr:ml-0 ltr:pl-0 rtl:mr-0 rtl:pr-0;
     }
 }
 
 .tab-button {
-    @apply flex items-center px-2 py-2 text-gray-700 dark:text-dark-150 select-none border-b-2 border-transparent whitespace-nowrap shrink-0;
+    @apply flex shrink-0 select-none items-center whitespace-nowrap border-b-2 border-transparent px-2 py-2 text-gray-700 dark:text-dark-150;
     &:hover {
-        @apply text-gray-800 dark:text-dark-100;
+        @apply text-gray-900 dark:text-dark-100;
     }
     &:focus-visible {
-        @apply ring-inset ring-2 ring-blue-500 dark:ring-dark-blue-100 outline-none rounded-t;
+        @apply rounded-t outline-hidden ring-2 ring-inset ring-blue-500 dark:ring-dark-blue-100;
     }
     &.active {
-        @apply text-blue-500 dark:text-blue-400 border-blue-500 dark:border-blue-400;
+        @apply border-blue-500 text-blue-500 dark:border-blue-400 dark:text-blue-400;
     }
     &.has-error {
         @apply text-red-500;
 
         &.active {
-            box-shadow: theme('colors.red.400') 0 3px inset, rgb(230, 235, 241) -1px 0 inset
+            box-shadow:
+                var(--color-red-400) 0 3px inset,
+                rgb(230, 235, 241) -1px 0 inset;
         }
     }
 }
-
 
 /* Responsive Wangjangling
   ========================================================================== */
 
 .pill-tab {
-    @apply text-gray-700 dark:text-dark-175 flex items-center focus:outline-none px-2 py-1 rounded;
+    @apply flex items-center rounded-sm px-2 py-1 text-gray-700 focus:outline-hidden dark:text-dark-175;
 
     &:hover {
         @apply text-gray-900 dark:text-dark-100;
     }
 
     &.active {
-        @apply bg-blue-100 dark:bg-dark-400 text-blue-900 dark:text-dark-150;
+        @apply bg-blue-100 text-blue-900 dark:bg-dark-400 dark:text-dark-150;
     }
 }
 
 .button-tab {
-    @apply text-gray-700 inline-block focus:outline-none px-2 py-1 rtl:ml-1 ltr:mr-1;
+    @apply inline-block px-2 py-1 text-gray-700 focus:outline-hidden ltr:mr-1 rtl:ml-1;
 
     &:hover {
         @apply text-blue;
     }
 
     &.active {
-        @apply bg-blue-100 text-blue-800 rounded;
+        @apply rounded-sm bg-blue-100 text-blue-800;
     }
 }

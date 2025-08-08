@@ -2,137 +2,95 @@
    TABLES
    ========================================================================== */
 
-.data-list-header {
-    @apply px-4 py-3 flex flex-wrap items-center;
-}
-
 .data-list-search-input {
-	/*  @apply text-sm px-4 py-2 flex-1 rounded border; */
-	@apply bg-white;
+    @apply bg-white;
 
-	&:focus {
-		@apply focus-outline;
-	}
-}
-
-.data-list-bulk-actions {
-	@apply bg-white dark:bg-dark-750 absolute w-full py-2 z-1;
-	padding-left: 56px ; [dir="rtl"] & { padding-right: 56px ; padding-left: 0 ; }
-}
-
-.mode-grid .data-list-bulk-actions {
-	@apply bg-white dark:bg-dark-800 w-full pt-3 pb-1 z-10 rtl:pr-4 ltr:pl-4 static;
-}
-
-.mode-grid .rotating-dots-button {
-    @apply bg-white dark:bg-dark-400;
-}
-
-.data-list-footer {
-    @apply py-3 rtl:pl-4 ltr:pr-4 flex items-center border-t;
+    &:focus {
+        @apply focus-outline;
+    }
 }
 
 .data-table {
-	@apply rtl:text-right ltr:text-left text-gray-700 dark:text-dark-150 outline-none max-w-full w-full;
-	overflow-x: auto;
+    @apply w-full max-w-full outline-hidden text-gray-500 antialiased border-separate border-spacing-y-0 min-w-full overflow-x-auto text-start;
+
+    &.contained {
+        @apply rounded-xl;
+    }
 
     thead {
-		@apply bg-gray-100 text-xs text-gray-900;
-        @apply dark:bg-dark-700 dark:text-dark-100;
-
-		tr {
-			@apply border-b dark:border-dark-900;
-		}
-
         th {
-            @apply font-medium px-4 py-3 whitespace-nowrap;
-            &:first-child { @apply rtl:rounded-tr-lg ltr:rounded-tl-lg; }
-			&:last-child { @apply rtl:rounded-tl-lg ltr:rounded-tr-lg; }
-			&:hover {
-				@apply text-gray-900 dark:text-dark-100;
-			}
-		}
-        th.handle-column {
-            @apply p-0 w-4;
+            @apply whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-300 text-start;
+            @apply px-4 py-2;
+
+            .contained & {
+                @apply py-2.5 border-b;
+            }
         }
-		.type-column {
-			@apply ltr:text-right rtl:text-left;
-		}
-	}
+
+        th.handle-column {
+            @apply w-4 p-0;
+        }
+
+        .type-column {
+            @apply text-end;
+        }
+    }
 
     tbody {
-		outline: none;
+        @apply text-sm bg-white dark:bg-gray-900 shadow-sm rounded-xl outline-none;
+        .contained & {
+            @apply shadow-none rounded-none;
+        }
+
         tr {
-			@apply border-b border-gray-400 dark:border-dark-900 text-sm;
+            &:first-child {
+                td:first-child,
+                th:first-child {
+                    @apply ltr:rounded-tl-xl rtl:rounded-tr-xl;
+                }
 
-			&.row-selected {
-				@apply bg-gray-200 dark:bg-dark-600;
-			}
+                td:last-child,
+                th:last-child {
+                    @apply ltr:rounded-tr-xl rtl:rounded-tl-xl;
+                }
 
-			&:first-child {
-				td:first-child, th:first-child {
-				    @apply rtl:rounded-tr-md ltr:rounded-tl-md;
-				}
+                td {
+                    @apply border-0;
+                }
+            }
 
-				td:last-child, th:last-child {
-				    @apply rtl:rounded-tl-md ltr:rounded-tr-md;
-				}
-			}
+            &:last-child {
+                @apply border-none;
 
-			&:last-child {
-				@apply border-none;
+                td:first-child,
+                th:first-child {
+                    @apply ltr:rounded-bl-xl rtl:rounded-br-xl;
+                }
 
-                td:first-child, th:first-child {
-				    @apply rtl:rounded-br-md ltr:rounded-bl-md;
-				}
-
-				td:last-child, th:last-child {
-				    @apply rtl:rounded-bl-md ltr:rounded-br-md;
-				}
-			}
+                td:last-child,
+                th:last-child {
+                    @apply ltr:rounded-br-xl rtl:rounded-bl-xl;
+                }
+            }
 
             &:hover {
-                @apply bg-gray-100 dark:bg-dark-575;
+                @apply bg-gray-50 dark:bg-white/2.5;
             }
 
             th {
-                @apply py-2 rtl:pl-4 ltr:pr-4;
+                @apply py-2 ltr:pr-4 rtl:pl-4;
             }
 
             td {
-                @apply py-2 px-4 break-words;
+                @apply pl-4.5 pr-2.5 py-3 border-t border-gray-200 dark:border-white/10;
+                @apply text-gray-900 dark:text-gray-200;
             }
-
-            td.table-drag-handle {
-                @apply w-1 rtl:border-l ltr:border-r h-full py-2 px-0;
-            }
-		}
+        }
 
         .type-column {
-			@apply ltr:text-right rtl:text-left;
-		}
+            @apply text-end;
+        }
     }
-
-
-    .sortable-column {
-        @apply cursor-pointer select-none;
-
-        &:hover {
-			@apply text-blue-500 dark:text-dark-blue-100;
-        }
-
-        &.current-column {
-            svg { opacity: 1; }
-        }
-
-        svg {
-            opacity: 0;
-        }
-
-        svg.asc {
-            transform: scaleY(-1);
-        }
-	}
 
     .date-index-field {
         @apply whitespace-nowrap;
@@ -142,225 +100,55 @@
 /* Sticky Meta Columns */
 .data-table {
     thead th.checkbox-column {
-        @apply p-0 rtl:pl-2 ltr:pr-2 sticky z-1 rtl:-right-px ltr:-left-px;
+        @apply sticky z-1 ps-3 w-8;
+        .contained & {
+            @apply sticky ps-4;
+        }
+    }
+
+    thead .actions-column {
+        @apply sticky p-0 -end-px ps-2 text-end;
         width: 45px;
         min-width: 45px;
-        &:after {
-            @apply absolute rtl:right-0 ltr:left-0 rtl:left-0 ltr:right-0 top-0 bottom-0 -z-1 ;
-            content: '';
-            background-image: linear-gradient(to right, theme(colors.gray.100) 70%, theme(colors.gray.100 / 0%) 100%);
+    }
 
-            .dark & {
-                background-image: linear-gradient(to right, theme(colors.dark.550) 70%, theme(colors.dark.550 / 0%) 100%);
-            }
-        }
-
-        &:has(input:checked) {
-            &:after {
-                .dark & {
-                    background-image: linear-gradient(to right, theme(colors.dark.750) 70%, theme(colors.dark.750 / 0%) 100%);
-                    @apply border-b border-dark-550;
-                }
-            }
+    tbody .checkbox-column {
+        @apply sticky px-3 -start-px;
+        .contained & {
+            @apply sticky ps-4;
         }
     }
 
-    thead th.actions-column {
-        @apply p-0 rtl:pr-2 ltr:pl-2 rtl:text-left ltr:text-right sticky rtl:-left-px ltr:-right-px;
-        width: 45px;
-        min-width: 45px;
-        &:after {
-            @apply absolute rtl:right-0 ltr:left-0 rtl:left-0 ltr:right-0 top-0 bottom-0 -z-1;
-            content: '';
-            background-image: linear-gradient(to left, theme(colors.gray.100) 70%, theme(colors.gray.100 / 0%) 100%);
-
-            .dark & {
-                background-image: linear-gradient(to left, theme(colors.dark.550) 70%, theme(colors.dark.550 / 0%) 100%);
-            }
-        }
-
-        &:has(input:checked) {
-            &:after {
-                .dark & {
-                    background-image: linear-gradient(to left, theme(colors.dark.750) 70%, theme(colors.dark.750 / 0%) 100%);
-                    @apply border-b border-dark-550;
-                }
-            }
-        }
-    }
-
-    tbody th.checkbox-column {
-        @apply px-3 sticky rtl:-right-px ltr:-left-px;
-        &:after {
-            @apply absolute rtl:right-0 ltr:left-0 rtl:left-0 ltr:right-0 top-0 bottom-0 -z-1;
-            content: '';
-            background-image: linear-gradient(to right, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%);
-
-            .dark & {
-                background-image: linear-gradient(to right, theme(colors.dark.600) 70%, theme(colors.dark.600 / 0%) 100%);
-            }
-        }
-    }
-
-    tbody th.actions-column {
-        @apply p-0 rtl:pr-2 ltr:pl-2 rtl:text-left ltr:text-right sticky rtl:-left-px ltr:-right-px;
-        min-width: 45px;
-        width: 45px;
-        &:after {
-            @apply absolute rtl:right-0 ltr:left-0 rtl:left-0 ltr:right-0 top-0 bottom-0 -z-1;
-            content: '';
-            background-image: linear-gradient(to left, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%);
-
-            .dark & {
-                background-image: linear-gradient(to left, theme(colors.dark.600) 70%, theme(colors.dark.600 / 0%) 100%);
-            }
-        }
-    }
-
-    tbody tr.row-selected .checkbox-column:after {
-        background-image: linear-gradient(to right, theme(colors.gray.200) 70%, theme(colors.gray.200 / 0%) 100%);
-
-        .dark & {
-            background-image: linear-gradient(to right, theme(colors.dark.600) 70%, theme(colors.dark.600 / 0%) 100%);
-        }
-    }
-
-    tbody tr.row-selected .actions-column:after {
-        background-image: linear-gradient(to left, theme(colors.gray.200) 70%, theme(colors.gray.200 / 0%) 100%);
-
-        .dark & {
-            background-image: linear-gradient(to left, theme(colors.dark.600) 70%, theme(colors.dark.600 / 0%) 100%);
-        }
-    }
-
-    tbody tr:hover .checkbox-column:after {
-        background-image: linear-gradient(to right, theme(colors.gray.100) 70%, theme(colors.gray.100 / 0%) 100%);
-
-        .dark & {
-            background-image: linear-gradient(to right, theme(colors.dark.500) 70%, theme(colors.dark.500 / 0%) 100%);
-        }
-    }
-
-    tbody tr:hover .actions-column:after {
-        background-image: linear-gradient(to left, theme(colors.gray.100) 70%, theme(colors.gray.100 / 0%) 100%);
-
-        .dark & {
-            background-image: linear-gradient(to left, theme(colors.dark.500) 70%, theme(colors.dark.500 / 0%) 100%);
-        }
+    tbody .actions-column {
+        @apply sticky p-0 ps-2 text-end w-12;
     }
 }
 
+/* Row Selection */
 
-.data-list-header ~ .data-table {
-    thead th {
-        border-radius: 0;
+.data-table[data-has-selections] {
+    tbody tr[data-row="unselected"] td {
+        @apply text-gray-500! dark:text-gray-400!;
     }
 }
 
-.data-list-filter-link {
-	@apply border-gray-400 dark:border-dark-900 text-gray-600 dark:text-dark-150 rtl:ml-2 ltr:mr-2 p-3 pb-2;
-
-	&:hover {
-		@apply border-b-3 dark:border-dark-900 text-gray-700 dark:text-dark-100;
-	}
-
-	&:focus {
-		@apply border-blue-300 dark:border-dark-blue-100;
-		outline: 0;
-		box-shadow: inset 0 0 0 0.2rem rgba(0,125,255,.25);
-	}
-
-	&.active {
-		@apply border-b-3 border-blue dark:border-dark-blue-100 text-gray-800 dark:text-dark-100;
-	}
-}
-
-td.table-drag-handle {
-	@apply w-3 rtl:border-l ltr:border-r dark:border-dark-900 h-full p-2;
-    min-width: 16px;
-	cursor: grab;
-	background: theme('colors.gray.200') url('../../svg/icons/light/drag-dots.svg') center center no-repeat;
+.table-drag-handle {
+    @apply h-full cursor-grab hover:bg-gray-100 dark:hover:bg-gray-700;
+    background: url('../../svg/ui/drag-dots.svg') center center no-repeat;
     background-size: 7px 17px;
-
-    .dark & {
-        background-color: theme(colors.dark.700);
-    }
-
-	&:hover { @apply bg-gray-300 dark:bg-dark-750; }
-}
-
-.table-row-placeholder {
-	background: hsla(210, 30%, 95%, 1);
-}
-
-.delete-column {
-	background: #fff;
-	border: 1px solid #ccc;
-	border-radius: 22px;
-	color: #777;
-	box-shadow: 0 1px 1px rgba(0,0,0,.05);
-	line-height: 1;
-	text-align: center;
-	height: 22px;
-	width: 22px;
-	float: right ; [dir="rtl"] & { float: left ; }
-	cursor: pointer;
-
-	&:hover {
-		box-shadow: none;
-		color: #555;
-	}
 }
 
 .column-sortable {
-	cursor: pointer;
-	position: relative;
-
-	&:before {
-		content: "";
-		position: absolute;
-		bottom: -1px;
-	 left: 0 ; [dir="rtl"] & { left: auto ; right: 0 ; }
-	 right: 0 ; [dir="rtl"] & { right: auto ; left: 0 ; }
-		height: 2px;
-	}
-
-	&:hover:before {
-        @apply bg-gray-300;
-	}
-	&.active:before {
-        @apply bg-blue;
-    }
-	.icon {
-        position: relative;
-        float: right ; [dir="rtl"] & { float: left ; }
-        top: 6px;
-        right: 5px ; [dir="rtl"] & { right: auto ; left: 5px ; }
-	}
-
-	.icon, .icon:before {
-		line-height: 0;
-	}
+    @apply cursor-pointer relative;
 }
 
 .column-status {
-	text-align: center;
-	width: 80px;
+    text-align: center;
+    width: 80px;
 }
 
 .column-actions {
-	@apply ltr:text-right rtl:text-left;
-	width: 30px;
-}
-
-table.control {
-    @apply select-none;
-}
-
-.flush table.control {
-    tr th:first-child {
-        padding-left: 30px ; [dir="rtl"] & { padding-right: 30px ; padding-left: 0 ; }
-    }
+    @apply text-end w-12;
 }
 
 
@@ -370,51 +158,42 @@ table.control {
 .bard-index-field,
 .code-index-field,
 .markdown-index-field,
-.text-index-field,
 .textarea-index-field {
     @apply line-clamp-2 text-xs;
 }
 
 .title-index-field {
-    @apply line-clamp-2;
-    min-width: 10vw;
-}
-
-.relationship-index-field {
-    min-width: 10vw;
-    .relationship-index-field-item {
-        @apply rounded bg-gray-100 dark:bg-dark-500 border dark:border-dark-400 px-1 flex items-center text-2xs rtl:ml-1 ltr:mr-1;
-        a {
-            @apply line-clamp-1;
-        }
-    }
+    @apply text-sm line-clamp-2 inline-flex items-center gap-2 hover:text-black dark:hover:text-white;
+    min-width: 15vw;
+    max-width: 30vw;
 }
 
 .date-index-field {
-    @apply whitespace-nowrap text-gray-800 dark:text-dark-150;
+    @apply whitespace-nowrap;
 }
 
 .slug-index-field {
-    @apply line-clamp-2 font-mono text-2xs;
+    @apply line-clamp-2 font-mono text-[.75rem];
 }
 
 .status-index-field {
-    @apply inline-block text-xs bg-gray-300 dark:bg-dark-200 text-gray-800 dark:text-dark-150 shrink rounded-full px-2 py-0.5 text-center justify-center;
+    @apply inline-block shrink justify-center rounded-full bg-gray-200/60 px-2 py-0.5 text-center text-xs text-gray-900 dark:bg-gray-300/8 dark:text-dark-150;
 
     &.status-published:not(.status-private) {
-        @apply text-green-900 dark:text-green-950 bg-green-200 dark:bg-green-300;
+        @apply bg-green-200 text-green-900 dark:bg-green-300/6 dark:text-green-300;
     }
 
     &.status-scheduled {
-        @apply text-amber-900 dark:text-amber-950 bg-amber-200 dark:bg-amber-300;
+        @apply bg-amber-200 text-amber-900 dark:bg-amber-300 dark:text-amber-950;
     }
 }
 
-.role-index-field, .groups-index-field {
-    @apply flex flex-wrap -mb-1.5;
+.role-index-field,
+.groups-index-field {
+    @apply -mb-1.5 flex flex-wrap;
 
     .role-index-field-item,
     .groups-index-field-item {
-        @apply rounded bg-gray-100 dark:bg-dark-700 border dark:border-dark-900 px-1 inline-block text-2xs line-clamp-1 mb-1;
+        @apply mb-1 line-clamp-1 inline-block rounded-sm border bg-gray-100 px-1 text-2xs dark:border-dark-900 dark:bg-gray-700;
     }
 }

@@ -3,48 +3,5 @@
    ========================================================================== */
 
 .section-fieldtype {
-    @apply border-t border-b bg-gray-200;
-    @apply dark:border-dark-900 dark:bg-dark-700 dark:shadow-inner-dark;
-    @apply -mt-px; /*  Avoid adjacent borders just in case they're stacked */
-
-    &.form-group {
-        position: relative;
-        &:first-child {
-            @apply mt-0 rounded-t-md border-t-0;
-        }
-
-        &:last-child {
-            @apply rounded-b-md;
-        }
-
-        .field-inner > label {
-            @apply uppercase text-sm font-bold;
-        }
-    }
-
-    .help-block {
-        @apply mb-0;
-
-        p { margin: 0; }
-    }
-
-    .read-only-overlay {
-        display: none;
-    }
-
-    label:last-child {
-        @apply mb-0 !important; /* Removes spacing under label when there are no instructions to display */
-    }
-}
-
-.bard-fieldtype .section-fieldtype {
-    @apply mt-0;
-}
-
-.publish-section-header + .publish-fields .section-fieldtype {
-    &.form-group {
-        &:first-child {
-            @apply rounded-t-none;
-        }
-    }
+    @apply border rounded-lg p-3;
 }

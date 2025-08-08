@@ -1,7 +1,13 @@
 <input
+    id="{{ id }}"
     type="file"
-    name="{{ handle }}{{ if max_files !== 1 }}[]{{ /if }}"
+    name="{{ name }}{{ if max_files !== 1 }}[]{{ /if }}"
     {{ if js_driver }}{{ js_attributes }}{{ /if }}
     {{ if max_files !== 1 }}multiple{{ /if }}
     {{ if validate|contains:required }}required{{ /if }}
+    {{ if error }}
+        aria-invalid="true" aria-describedby="{{ id }}-error"
+    {{ elseif instructions }}
+        aria-describedby="{{ id }}-instructions"
+    {{ /if }}
 >

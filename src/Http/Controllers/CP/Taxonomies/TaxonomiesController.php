@@ -7,6 +7,7 @@ use Statamic\Contracts\Taxonomies\Taxonomy as TaxonomyContract;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Contracts\Taxonomies\TermRepository;
 use Statamic\CP\Column;
+use Statamic\CP\PublishForm;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Scope;
@@ -20,6 +21,8 @@ use Statamic\Stache\Repositories\TermRepository as StacheTermRepository;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class TaxonomiesController extends CpController
 {
     public function index()
@@ -32,14 +35,18 @@ class TaxonomiesController extends CpController
             return [
                 'id' => $taxonomy->handle(),
                 'title' => $taxonomy->title(),
-                'terms' => $taxonomy->queryTerms()->count(),
+                'terms' => $taxonomy->queryTerms()->pluck('slug')->unique()->count(),
                 'edit_url' => $taxonomy->editUrl(),
                 'delete_url' => $taxonomy->deleteUrl(),
                 'terms_url' => cp_route('taxonomies.show', $taxonomy->handle()),
-                'blueprints_url' => cp_route('taxonomies.blueprints.index', $taxonomy->handle()),
+                'blueprints_url' => cp_route('blueprints.taxonomies.index', $taxonomy->handle()),
                 'deleteable' => User::current()->can('delete', $taxonomy),
             ];
         })->values();
+
+        if ($taxonomies->isEmpty()) {
+            return view('statamic::taxonomies.empty');
+        }
 
         return view('statamic::taxonomies.index', [
             'taxonomies' => $taxonomies,
@@ -85,7 +92,7 @@ class TaxonomiesController extends CpController
         ];
 
         if ($taxonomy->queryTerms()->count() === 0) {
-            return view('statamic::taxonomies.empty', $viewData);
+            return view('statamic::terms.empty', $viewData);
         }
 
         return view('statamic::taxonomies.show', $viewData);
@@ -143,17 +150,11 @@ class TaxonomiesController extends CpController
             'layout' => $taxonomy->layout(),
         ];
 
-        $fields = ($blueprint = $this->editFormBlueprint($taxonomy))
-            ->fields()
-            ->addValues($values)
-            ->preProcess();
-
-        return view('statamic::taxonomies.edit', [
-            'blueprint' => $blueprint->toPublishArray(),
-            'values' => $fields->values(),
-            'meta' => $fields->meta(),
-            'taxonomy' => $taxonomy,
-        ]);
+        return PublishForm::make($this->editFormBlueprint($taxonomy))
+            ->title(__('Configure Taxonomy'))
+            ->values($values)
+            ->asConfig()
+            ->submittingTo(cp_route('taxonomies.update', $taxonomy->handle()));
     }
 
     public function update(Request $request, $taxonomy)
@@ -257,7 +258,7 @@ class TaxonomiesController extends CpController
                         'html' => ''.
                             '<div class="text-xs">'.
                             '   <span class="rtl:ml-4 ltr:mr-4">'.$taxonomy->termBlueprints()->map(fn ($bp) => __($bp->title()))->join(', ').'</span>'.
-                            '   <a href="'.cp_route('taxonomies.blueprints.index', $taxonomy).'" class="text-blue">'.__('Edit').'</a>'.
+                            '   <a href="'.cp_route('blueprints.taxonomies.index', $taxonomy).'" class="text-blue">'.__('Edit').'</a>'.
                             '</div>',
                     ],
                     'collections' => [
@@ -343,6 +344,22 @@ class TaxonomiesController extends CpController
             ],
         ]);
 
-        return Blueprint::makeFromTabs($fields);
+        return Blueprint::make()->setContents(collect([
+            'tabs' => [
+                'main' => [
+                    'sections' => collect($fields)->map(function ($section) {
+                        return [
+                            'display' => $section['display'],
+                            'fields' => collect($section['fields'])->map(function ($field, $handle) {
+                                return [
+                                    'handle' => $handle,
+                                    'field' => $field,
+                                ];
+                            })->values()->all(),
+                        ];
+                    })->values()->all(),
+                ],
+            ],
+        ])->all());
     }
 }

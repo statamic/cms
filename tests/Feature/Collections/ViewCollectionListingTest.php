@@ -7,6 +7,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\User;
 use Statamic\Entries\Collection;
 use Statamic\Facades;
+use Statamic\Facades\Site;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -19,9 +20,9 @@ class ViewCollectionListingTest extends TestCase
     #[Test]
     public function it_shows_a_list_of_collections()
     {
-        $collectionA = $this->createCollection('foo');
-        $collectionB = $this->createCollection('bar');
-        EntryFactory::id('1')->collection($collectionB)->create();
+        $collectionA = $this->createCollection('bar');
+        $collectionB = $this->createCollection('foo');
+        EntryFactory::id('1')->collection($collectionA)->create();
 
         $user = tap(User::make()->makeSuper())->save();
 
@@ -31,41 +32,65 @@ class ViewCollectionListingTest extends TestCase
             ->assertSuccessful()
             ->assertViewHas('collections', collect([
                 [
-                    'id' => 'foo',
-                    'title' => 'Foo',
-                    'entries' => 0,
-                    'url' => null,
-                    'edit_url' => 'http://localhost/cp/collections/foo/edit',
-                    'delete_url' => 'http://localhost/cp/collections/foo',
-                    'entries_url' => 'http://localhost/cp/collections/foo',
-                    'blueprints_url' => 'http://localhost/cp/collections/foo/blueprints',
-                    'scaffold_url' => 'http://localhost/cp/collections/foo/scaffold',
-                    'deleteable' => true,
-                    'editable' => true,
-                    'blueprint_editable' => true,
-                    'available_in_selected_site' => true,
-                    'actions' => Facades\Action::for($collectionA, ['view' => 'list']),
-                    'actions_url' => 'http://localhost/cp/collections/foo/actions',
-                ],
-                [
                     'id' => 'bar',
                     'title' => 'Bar',
-                    'entries' => 1,
-                    'url' => null,
+                    'entries' => $collectionA->queryEntries()->where('site', Site::selected())->orderBy('date', 'desc')->limit(5)->get(),
+                    'entries_count' => 1,
+                    'published_entries_count' => 1,
+                    'draft_entries_count' => 0,
+                    'scheduled_entries_count' => 0,
+                    'blueprints' => $collectionA->entryBlueprints()->reject->hidden()->values(),
+                    'columns' => [
+                        ['label' => 'Title', 'field' => 'title', 'visible' => true],
+                        ['label' => 'Date', 'field' => 'date', 'visible' => true],
+                    ],
+                    'dated' => false,
                     'edit_url' => 'http://localhost/cp/collections/bar/edit',
                     'delete_url' => 'http://localhost/cp/collections/bar',
                     'entries_url' => 'http://localhost/cp/collections/bar',
-                    'blueprints_url' => 'http://localhost/cp/collections/bar/blueprints',
+                    'create_entry_url' => 'http://localhost/cp/collections/bar/entries/create/en',
+                    'url' => null,
+                    'blueprints_url' => 'http://localhost/cp/fields/blueprints/collections/bar',
                     'scaffold_url' => 'http://localhost/cp/collections/bar/scaffold',
                     'deleteable' => true,
                     'editable' => true,
                     'blueprint_editable' => true,
                     'available_in_selected_site' => true,
+                    'actions' => Facades\Action::for($collectionA, ['view' => 'list']),
+                    'actions_url' => 'http://localhost/cp/collections/actions',
+                    'icon' => 'collections',
+                ],
+                [
+                    'id' => 'foo',
+                    'title' => 'Foo',
+                    'entries' => $collectionB->queryEntries()->where('site', Site::selected())->orderBy('date', 'desc')->limit(5)->get(),
+                    'entries_count' => 0,
+                    'published_entries_count' => 0,
+                    'draft_entries_count' => 0,
+                    'scheduled_entries_count' => 0,
+                    'blueprints' => $collectionB->entryBlueprints()->reject->hidden()->values(),
+                    'columns' => [
+                        ['label' => 'Title', 'field' => 'title', 'visible' => true],
+                        ['label' => 'Date', 'field' => 'date', 'visible' => true],
+                    ],
+                    'dated' => false,
+                    'edit_url' => 'http://localhost/cp/collections/foo/edit',
+                    'delete_url' => 'http://localhost/cp/collections/foo',
+                    'entries_url' => 'http://localhost/cp/collections/foo',
+                    'create_entry_url' => 'http://localhost/cp/collections/foo/entries/create/en',
+                    'url' => null,
+                    'blueprints_url' => 'http://localhost/cp/fields/blueprints/collections/foo',
+                    'scaffold_url' => 'http://localhost/cp/collections/foo/scaffold',
+                    'deleteable' => true,
+                    'editable' => true,
+                    'blueprint_editable' => true,
+                    'available_in_selected_site' => true,
                     'actions' => Facades\Action::for($collectionB, ['view' => 'list']),
-                    'actions_url' => 'http://localhost/cp/collections/bar/actions',
+                    'actions_url' => 'http://localhost/cp/collections/actions',
+                    'icon' => 'collections',
                 ],
             ]))
-            ->assertDontSee('no-results');
+            ->assertDontSee('ui-empty-state-menu');
     }
 
     #[Test]
@@ -78,7 +103,7 @@ class ViewCollectionListingTest extends TestCase
             ->get(cp_route('collections.index'))
             ->assertSuccessful()
             ->assertViewHas('collections', collect([]))
-            ->assertSee('no-results');
+            ->assertSee('ui-empty-state-menu');
     }
 
     #[Test]
@@ -96,14 +121,14 @@ class ViewCollectionListingTest extends TestCase
             ->assertViewHas('collections', function ($collections) {
                 return count($collections) === 1 && $collections[0]['id'] === 'bar';
             })
-            ->assertDontSee('no-results');
+            ->assertDontSee('ui-empty-state-menu');
     }
 
     #[Test]
     public function it_doesnt_filter_out_collections_if_they_have_permission_to_configure()
     {
-        $collectionA = $this->createCollection('foo');
-        $collectionB = $this->createCollection('bar');
+        $collectionA = $this->createCollection('bar');
+        $collectionB = $this->createCollection('foo');
         $this->setTestRoles(['test' => ['access cp', 'configure collections', 'view bar entries']]);
         $user = tap(Facades\User::make()->assignRole('test'))->save();
 
@@ -112,9 +137,9 @@ class ViewCollectionListingTest extends TestCase
             ->get(cp_route('collections.index'))
             ->assertSuccessful()
             ->assertViewHas('collections', function ($collections) {
-                return $collections->map->id->all() === ['foo', 'bar'];
+                return $collections->map->id->all() === ['bar', 'foo'];
             })
-            ->assertDontSee('no-results');
+            ->assertDontSee('ui-empty-state-menu');
     }
 
     #[Test]
@@ -155,7 +180,7 @@ class ViewCollectionListingTest extends TestCase
             ->actingAs($user)
             ->get(cp_route('collections.index'))
             ->assertOk()
-            ->assertDontSee('Create Collection');
+            ->assertSee(':can-create-collections="false"', escape: false);
     }
 
     private function createCollection($handle)

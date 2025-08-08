@@ -5,23 +5,37 @@
 .dropdown-list .popover-content {
     @apply p-2;
 
-    button, a {
-        @apply block w-full rtl:text-right ltr:text-left rounded-sm text-xs font-normal px-2 py-1 text-gray-800 dark:text-dark-100;
+    button,
+    a {
+        @apply block w-full rounded-xs px-2 py-1 text-xs font-normal text-gray-900 dark:text-dark-100 ltr:text-left rtl:text-right;
         line-height: 1.4;
         white-space: nowrap;
+        @apply rounded-sm;
+        cursor: pointer;
 
         &:hover {
-            @apply bg-blue dark:bg-dark-600 text-white;
+            @apply bg-gray-100 dark:bg-dark-600;
         }
 
         .icon {
             color: #d0d4d7 !important;
-            margin-right: 6px ; [dir="rtl"] & { margin-left: 6px ; margin-right: 0 ; }
-            margin-left: -4px ; [dir="rtl"] & { margin-right: -4px ; margin-left: 0 ; }
+            margin-right: 6px;
+            [dir='rtl'] & {
+                margin-left: 6px;
+                margin-right: 0;
+            }
+            margin-left: -4px;
+            [dir='rtl'] & {
+                margin-right: -4px;
+                margin-left: 0;
+            }
             font-size: 12px;
             width: 20px;
             display: block;
-            float: left ; [dir="rtl"] & { float: right ; }
+            float: left;
+            [dir='rtl'] & {
+                float: right;
+            }
             position: relative;
             top: 2px;
             line-height: inherit;
@@ -29,16 +43,17 @@
         }
     }
 
-    button.warning, a.warning {
-        @apply text-red-500;
+    button.warning,
+    a.warning {
+        @apply text-red-600;
 
         &:hover {
-            @apply bg-red-500 text-white;
+            @apply bg-red-50;
         }
     }
 
     .divider {
-        @apply h-px bg-gray-400 dark:bg-dark-900 overflow-hidden;
+        @apply h-px overflow-hidden bg-gray-400 dark:bg-dark-900;
         margin: 6px -8px;
         /* Hide dividers that come first, last or immediately after another (due to v-if) */
         & + &,
@@ -49,6 +64,49 @@
     }
 
     .align-left & {
-        right: auto ; [dir="rtl"] & { right: auto ; left: auto ; }
+        right: auto;
+        [dir='rtl'] & {
+            right: auto;
+            left: auto;
+        }
+    }
+}
+
+.quick-list {
+    @apply relative;
+
+    .quick-list-content {
+        @apply absolute right-full top-1/2 mr-[8px] flex min-w-max origin-right -translate-y-1/2 rounded-full bg-white p-0.5 shadow-sm transition dark:bg-dark-550;
+        &::before {
+            content: '';
+            position: absolute;
+            inset: -8px -8px -8px -20px;
+            z-index: -1;
+        }
+        button,
+        a {
+            @apply flex shrink-0 rounded-full text-gray-900 dark:text-dark-100;
+            &:hover {
+                @apply text-white;
+            }
+        }
+        &:empty {
+            @apply hidden;
+        }
+    }
+
+    button.warning,
+    a.warning {
+        @apply text-red-500;
+
+        &:hover {
+            @apply bg-red-500 text-white;
+        }
+    }
+
+    &:not(:hover) {
+        .quick-list-content {
+            @apply pointer-events-none scale-[0.85] opacity-0;
+        }
     }
 }

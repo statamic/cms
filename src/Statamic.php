@@ -10,15 +10,14 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Vite;
 use Laravel\Nova\Nova;
 use Statamic\Facades\File;
-use Statamic\Facades\Preference;
 use Statamic\Facades\URL;
 use Statamic\Modifiers\Modify;
 use Statamic\Support\Arr;
 use Statamic\Support\DateFormat;
 use Statamic\Support\Str;
+use Statamic\Support\Svg;
 use Statamic\Support\TextDirection;
 use Statamic\Tags\FluentTag;
-use Stringy\StaticStringy;
 
 class Statamic
 {
@@ -242,17 +241,19 @@ class Statamic
         return new static;
     }
 
-    public static function svg($name, $attrs = null)
+    public static function svg($name, $attrs = null, $fallback = null)
     {
-        if ($attrs) {
-            $attrs = " class=\"{$attrs}\"";
+        $path = statamic_path("resources/svg/{$name}.svg");
+
+        if ($fallback && ! File::exists($path)) {
+            $path = statamic_path("resources/svg/{$fallback}.svg");
         }
 
-        $svg = StaticStringy::collapseWhitespace(
-            File::get(statamic_path("resources/svg/{$name}.svg"))
-        );
+        if (File::exists($path) && $attrs) {
+            return Svg::withClasses(File::get($path), $attrs);
+        }
 
-        return str_replace('<svg', sprintf('<svg%s', $attrs), $svg);
+        return File::get($path) ?? '';
     }
 
     public static function vendorAssetUrl($url = '/')
@@ -283,8 +284,8 @@ class Statamic
     public static function cpViteScripts()
     {
         return static::cpVite()->withEntryPoints([
-            'resources/js/app.js',
-            'resources/css/tailwind.css',
+            'resources/js/index.js',
+            'resources/css/app.css',
         ]);
     }
 
@@ -292,19 +293,11 @@ class Statamic
     {
         return Vite::getFacadeRoot()
             ->useHotFile('vendor/statamic/cp/hot')
-            ->useBuildDirectory('vendor/statamic/cp/build');
-    }
-
-    public static function cpDateFormat()
-    {
-        return Preference::get('date_format', config('statamic.cp.date_format'));
-    }
-
-    public static function cpDateTimeFormat()
-    {
-        $format = self::cpDateFormat();
-
-        return DateFormat::containsTime($format) ? $format : $format.' H:i';
+            ->useBuildDirectory(
+                config('app.debug') && is_dir(public_path('vendor/statamic/cp-dev'))
+                    ? 'vendor/statamic/cp-dev/build'
+                    : 'vendor/statamic/cp/build'
+            );
     }
 
     public static function dateFormat()
@@ -317,6 +310,11 @@ class Statamic
         $format = self::dateFormat();
 
         return DateFormat::containsTime($format) ? $format : $format.' H:i';
+    }
+
+    public static function displayTimezone(): string
+    {
+        return config('statamic.system.display_timezone') ?? config('app.timezone');
     }
 
     public static function flash()

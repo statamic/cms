@@ -51,7 +51,7 @@ class DictionaryFields extends Fieldtype
         }
 
         if (is_string($data)) {
-            return ['type' => $data];
+            $data = ['type' => $data];
         }
 
         $dictionary = Dictionary::find($data['type']);
@@ -71,7 +71,7 @@ class DictionaryFields extends Fieldtype
             return $dictionary->handle();
         }
 
-        return array_merge(['type' => $dictionary->handle()], $values->all());
+        return array_merge(['type' => $dictionary->handle()], $values->filter()->all());
     }
 
     public function extraRules(): array

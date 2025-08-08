@@ -1,34 +1,60 @@
 <template>
     <div>
-        <div class="flex flex-wrap">
-            <div
-                v-for="(item, i) in items"
-                :key="item.id"
-                class="relationship-index-field-item h-5"
-                :class="{ 'mb-1.5': i < items.length-1 }"
-            >
-                <div class="flex items-center shrink">
-                    <div v-if="item.hasOwnProperty('published') && item.published !== null"
-                        class="little-dot h-1 w-1 rtl:ml-1 ltr:mr-1" :class="[item.published ? 'bg-green-600' : 'bg-gray-400 dark:bg-dark-200']" />
-                    <a :href="item.edit_url" :title="item.title" v-text="item.title" />
-                </div>
-            </div>
+        <div class="flex flex-wrap gap-2">
+            <Badge size="sm" v-for="item in items" :key="item.id" :href="item.edit_url" :icon="item.icon">
+                <StatusIndicator
+                    v-if="item.hasOwnProperty('published') && item.published !== null"
+                    :status="item.published"
+                    class="h-1"
+                />
+                <span v-text="item.title" />
+            </Badge>
+            <Dropdown v-if="hasMore && !showingAll">
+                <template #trigger>
+                    <Badge
+                        size="sm"
+                        as="button"
+                        color="white"
+                        v-text="__('messages.plus_count_more', { count: value.length - 2 })"
+                    />
+                </template>
+                <DropdownMenu>
+                    <!-- TODO: Pass the proper title/label instead of the handle -->
+                    <DropdownLabel :text="handle" />
+                    <!-- TODO: Pass the proper icon instead of hard-coded taxonomies -->
+                    <DropdownItem
+                        v-for="item in value"
+                        icon="taxonomies"
+                        :key="item.id"
+                        :href="item.edit_url"
+                        :text="item.title"
+                    />
+                </DropdownMenu>
+            </Dropdown>
         </div>
-        <button v-if="hasMore && ! showingAll" @click.stop="showAll" class="mt-1 text-blue text-2xs" v-text="__('messages.view_more_count', {count: value.length - 2})" />
-        <button v-if="showingAll" @click.stop="hideExtra" class="mt-1 text-blue text-2xs" v-text="__('Hide')" />
     </div>
-
-
 </template>
 
 <script>
+import IndexFieldtype from '../IndexFieldtype.vue';
+import { Badge, StatusIndicator, Dropdown, DropdownMenu, DropdownLabel, DropdownItem } from '@statamic/ui';
+
 export default {
     mixins: [IndexFieldtype],
 
+    components: {
+        Badge,
+        StatusIndicator,
+        Dropdown,
+        DropdownMenu,
+        DropdownLabel,
+        DropdownItem,
+    },
+
     data() {
         return {
-            showingAll: false
-        }
+            showingAll: false,
+        };
     },
 
     computed: {
@@ -40,17 +66,5 @@ export default {
             return this.value?.length > 2;
         },
     },
-
-    methods: {
-        showAll() {
-            this.showingAll = true;
-        },
-
-        hideExtra() {
-            this.showingAll = false;
-        }
-    }
-
-
-}
+};
 </script>

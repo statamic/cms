@@ -1,6 +1,5 @@
 <template>
-
-    <publish-container
+    <PublishContainer
         ref="container"
         :name="name"
         :blueprint="blueprint"
@@ -8,51 +7,84 @@
         reference="collection"
         :meta="meta"
         :errors="errors"
-        v-slot="{ setFieldValue, setFieldMeta }"
+        :read-only="readOnly"
+        as-config
     >
         <div>
-            <breadcrumbs v-if="breadcrumbs" :crumbs="breadcrumbs" />
-
-            <div class="flex items-center mb-6">
-                <h1 class="flex-1">{{ title }}</h1>
-
-                <div class="rtl:mr-4 ltr:ml-4 rtl:text-right ltr:text-left" :class="{ 'btn-group': hasSaveAsOptions }">
-                    <button
-                        class="btn-primary rtl:pr-4 ltr:pl-4"
-                        :class="{ 'disabled': !isDirty }"
-                        :disabled="!isDirty"
+            <Header :title="title" icon="preferences">
+                <ButtonGroup role="group" aria-label="Save options">
+                    <Button 
+                        type="submit" 
+                        variant="primary" 
+                        :text="__('Save')" 
                         @click="save"
-                        v-text="__('Save')" />
+                        :aria-describedby="hasSaveAsOptions ? 'save-options-description' : undefined"
+                    />
 
-                    <dropdown-list v-if="hasSaveAsOptions" class="rtl:mr-0 ltr:ml-0">
+                    <Dropdown 
+                        align="end" 
+                        v-if="hasSaveAsOptions"
+                        :aria-label="__('Additional save options')"
+                        @open="onDropdownOpen"
+                        @close="onDropdownClose"
+                    >
                         <template #trigger>
-                            <button class="btn-primary rtl:rounded-r-none ltr:rounded-l-none flex items-center">
-                                <svg-icon name="micro/chevron-down-xs" class="w-2" />
-                            </button>
+                            <Button 
+                                icon="ui/chevron-down" 
+                                variant="primary"
+                                :aria-label="__('Open save options menu')"
+                                :aria-expanded="isDropdownOpen"
+                                :aria-haspopup="true"
+                                :aria-describedby="'save-options-description'"
+                                @click="toggleDropdown"
+                            />
                         </template>
-                        <h6 class="p-2">{{ __('Save to') }}...</h6>
-                        <dropdown-item v-for="option in saveAsOptions" :key="option.url" @click="saveAs(option.url)">
-                            <div class="flex items-start rtl:pl-4 ltr:pr-4">
-                                <svg-icon :name="option.icon" class="text-gray shrink-0 rtl:ml-2 ltr:mr-2 w-4 group-hover:text-white" />
-                                <span class="whitespace-normal">{{ option.label }}</span>
-                            </div>
-                        </dropdown-item>
-                    </dropdown-list>
+                        <DropdownMenu 
+                            role="menu"
+                            :aria-labelledby="'save-options-label'"
+                        >
+                            <DropdownLabel id="save-options-label">{{ __('Save to') }}...</DropdownLabel>
+                            <DropdownItem
+                                v-for="option in saveAsOptions"
+                                :key="option.url"
+                                :text="option.label"
+                                @click="saveAs(option.url)"
+                                role="menuitem"
+                                :aria-label="`${__('Save to')} ${option.label}`"
+                            />
+                        </DropdownMenu>
+                    </Dropdown>
+                </ButtonGroup>
+                
+                <div 
+                    v-if="hasSaveAsOptions" 
+                    id="save-options-description" 
+                    class="sr-only"
+                >
+                    {{ __('Press enter to access additional save options') }}
                 </div>
-            </div>
+            </Header>
 
-            <publish-tabs
-                @updated="setFieldValue"
-                @meta-updated="setFieldMeta"
-                :enable-sidebar="hasSidebar"
-                :read-only="readOnly" />
+            <PublishTabs />
         </div>
-    </publish-container>
-
+    </PublishContainer>
 </template>
 
 <script>
+import { Header, Button, ButtonGroup, Dropdown, DropdownMenu, DropdownItem, DropdownLabel, PublishContainer, PublishTabs } from '@statamic/ui';
+
 export default {
+    components: {
+        Header,
+        Button,
+        ButtonGroup,
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
+        DropdownLabel,
+        PublishContainer,
+        PublishTabs,
+    },
 
     props: {
         blueprint: { required: true, type: Object },
@@ -60,7 +92,6 @@ export default {
         values: { required: true, type: Object },
         title: { required: true, type: String },
         name: { type: String, default: 'base' },
-        breadcrumbs: Array,
         action: String,
         readOnly: { type: Boolean, default: false },
         reloadOnSave: { type: Boolean, default: false },
@@ -73,24 +104,22 @@ export default {
             currentValues: this.values,
             error: null,
             errors: {},
-            hasSidebar: this.blueprint.tabs.map(tab => tab.handle).includes('sidebar'),
-        }
+            hasSidebar: this.blueprint.tabs.map((tab) => tab.handle).includes('sidebar'),
+            isDropdownOpen: false,
+        };
     },
 
     computed: {
-
         hasSaveAsOptions() {
             return this.saveAsOptions.length;
         },
 
         isDirty() {
             return this.$dirty.has(this.name);
-        }
-
+        },
     },
 
     methods: {
-
         clearErrors() {
             this.error = null;
             this.errors = {};
@@ -103,14 +132,15 @@ export default {
         saveAs(url) {
             this.saving = true;
             this.clearErrors();
+            this.isDropdownOpen = false;
 
             this.$axios
                 .patch(url, this.currentValues)
                 .then(() => {
                     this.$refs.container.saved();
-                    location.reload();
+                    this.$nextTick(() => location.reload());
                 })
-                .catch(e => this.handleAxiosError(e));
+                .catch((e) => this.handleAxiosError(e));
         },
 
         handleAxiosError(e) {
@@ -127,22 +157,52 @@ export default {
             }
         },
 
+        toggleDropdown() {
+            this.isDropdownOpen = !this.isDropdownOpen;
+        },
+
+        onDropdownOpen() {
+            this.isDropdownOpen = true;
+        },
+
+        onDropdownClose() {
+            this.isDropdownOpen = false;
+        },
     },
 
     created() {
-        this.$keys.bindGlobal(['mod+s'], e => {
+        this.$keys.bindGlobal(['mod+s'], (e) => {
             e.preventDefault();
             this.save();
+        });
+
+        // Add keyboard navigation for dropdown
+        this.$keys.bindGlobal(['escape'], (e) => {
+            if (this.isDropdownOpen) {
+                e.preventDefault();
+                this.isDropdownOpen = false;
+            }
         });
     },
 
     watch: {
-
         saving(saving) {
             this.$progress.loading('preferences-edit-form', saving);
-        }
-
+        },
     },
-
-}
+};
 </script>
+
+<style scoped>
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+</style>

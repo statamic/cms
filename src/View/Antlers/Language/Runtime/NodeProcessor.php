@@ -1218,7 +1218,9 @@ class NodeProcessor
                                 'User content Antlers PHP tag.'
                             );
                         } else {
-                            Log::warning('PHP Node evaluated in user content: '.$node->name->name, [
+                            $logContent = $node->rawStart.$node->innerContent().$node->rawEnd;
+
+                            Log::warning('PHP Node evaluated in user content: '.$logContent, [
                                 'file' => GlobalRuntimeState::$currentExecutionFile,
                                 'trace' => GlobalRuntimeState::$templateFileStack,
                                 'content' => $node->innerContent(),
@@ -2454,51 +2456,53 @@ class NodeProcessor
         return ob_get_clean();
     }
 
-    protected function evaluateAntlersPhpNode(PhpExecutionNode $node)
+    protected function evaluateAntlersPhpNode(PhpExecutionNode $___node)
     {
-        if (! GlobalRuntimeState::$allowPhpInContent == false && GlobalRuntimeState::$isEvaluatingUserData) {
-            return StringUtilities::sanitizePhp($node->content);
+        if (! GlobalRuntimeState::$allowPhpInContent && GlobalRuntimeState::$isEvaluatingUserData) {
+            return StringUtilities::sanitizePhp($___node->content);
         }
 
-        $phpBuffer = '';
+        $___phpBuffer = '';
 
-        if ($node->isEchoNode == false) {
-            $phpBuffer = $node->content;
+        if ($___node->isEchoNode == false) {
+            $___phpBuffer = $___node->content;
 
-            if (! Str::contains($node->content, $this->validPhpOpenTags)) {
-                $phpBuffer = '<?php '.$node->content.' ?>';
+            if (! Str::contains($___node->content, $this->validPhpOpenTags)) {
+                $___phpBuffer = '<?php '.$___node->content.' ?>';
             }
         } else {
-            $phpBuffer = '<?php echo '.$node->content.'; ?>';
+            $___phpBuffer = '<?php echo '.$___node->content.'; ?>';
         }
 
-        $phpRuntimeAssignments = [];
+        $___phpRuntimeAssignments = [];
         ob_start();
 
         try {
             extract($this->getActiveData());
             $___antlersVarBefore = get_defined_vars();
-            eval('?>'.$phpBuffer.'<?php ');
+            eval('?>'.$___phpBuffer.'<?php ');
             $___antlersPhpExecutionResult = ob_get_clean();
 
-            if (! $node->isEchoNode) {
+            if (! $___node->isEchoNode) {
                 $___antlersVarAfter = get_defined_vars();
 
-                foreach ($___antlersVarAfter as $varKey => $varValue) {
-                    if (! array_key_exists($varKey, $___antlersVarBefore) || array_key_exists($varKey, $this->previousAssignments) || array_key_exists($varKey, $this->runtimeAssignments)) {
-                        $phpRuntimeAssignments[$varKey] = $varValue;
+                foreach ($___antlersVarAfter as $___varKey => $___varValue) {
+                    if (str_starts_with($___varKey, '___')) {
+                        continue;
                     }
+
+                    $___phpRuntimeAssignments[$___varKey] = $___varValue;
                 }
             }
         } catch (ParseError $e) {
-            throw new SyntaxError("{$e->getMessage()} on line {$e->getLine()} of:\n\n{$phpBuffer}");
+            throw new SyntaxError("{$e->getMessage()} on line {$e->getLine()} of:\n\n{$___phpBuffer}");
         }
 
-        if (! $node->isEchoNode && ! empty($phpRuntimeAssignments)) {
-            unset($phpRuntimeAssignments['___antlersVarBefore']);
-            unset($phpRuntimeAssignments['___antlersPhpExecutionResult']);
+        if (! $___node->isEchoNode && ! empty($___phpRuntimeAssignments)) {
+            unset($___phpRuntimeAssignments['___antlersVarBefore']);
+            unset($___phpRuntimeAssignments['___antlersPhpExecutionResult']);
 
-            $this->processAssignments($phpRuntimeAssignments);
+            $this->processAssignments($___phpRuntimeAssignments);
         }
 
         return $___antlersPhpExecutionResult;
@@ -2550,6 +2554,7 @@ class NodeProcessor
             $value['count'] = $index + 1;
             $value['index'] = $index;
             $value['total_results'] = $total;
+            $value['no_results'] = false;
             $value['first'] = $index === 0;
             $value['last'] = $index === $lastIndex;
 

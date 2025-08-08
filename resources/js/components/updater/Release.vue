@@ -1,62 +1,61 @@
 <template>
-
-    <div class="card update-release mb-10">
-        <div class="flex justify-between mb-6">
+    <ui-panel>
+        <ui-panel-header class="flex items-center justify-between">
             <div>
-                <h1>{{ release.version }}</h1>
-                <h5 class="date" v-text="__('Released on :date', { date: release.date })" />
+                <ui-heading :text="release.version" />
+                <ui-subheading :text="`${__('Released on :date', { date })}`" />
             </div>
-            <div v-if="showActions">
-                <button class="btn"
-                    :disabled="release.type === 'current'"
-                    v-text="installButtonText"
-                    @click="confirmationPrompt = release"
-                />
-            </div>
-        </div>
-        <div class="card-body">
-            <div v-html="body"></div>
-        </div>
-
-        <confirmation-modal
-             v-if="confirmationPrompt"
-             :buttonText="__('OK')"
-             :cancellable="false"
-             @confirm="confirmationPrompt = null"
-         >
-            <div class="prose">
-                <p v-text="confirmationText" />
-                <code-block copyable :text="command" />
-                <p v-html="link"></p>
-            </div>
-         </confirmation-modal>
-    </div>
-
+            <ui-modal :title="__('Update to :version', { version: release.version })">
+                <template #trigger>
+                    <ui-button
+                        v-if="showActions"
+                        icon="clipboard"
+                        size="sm"
+                        :disabled="release.type === 'current'"
+                        :text="__('Get Command')"
+                    />
+                </template>
+                <div class="prose space-y-3">
+                    <p v-text="confirmationText" />
+                    <ui-input v-model="command" readonly copyable class="font-mono text-sm dark" />
+                    <p v-html="link" />
+                </div>
+            </ui-modal>
+        </ui-panel-header>
+        <ui-card>
+            <div v-html="body" class="prose" />
+        </ui-card>
+    </ui-panel>
 </template>
 
 <script>
-export default {
+import DateFormatter from '@statamic/components/DateFormatter.js';
 
+export default {
     props: {
         release: { type: Object, required: true },
         package: { type: String, required: true },
         packageName: { type: String, required: true },
-        showActions: { type: Boolean }
+        showActions: { type: Boolean },
     },
 
     data() {
         return {
             confirmationPrompt: null,
-        }
+        };
     },
 
     computed: {
+        date() {
+            return DateFormatter.format(this.release.date, 'date');
+        },
+
         body() {
             return markdown(this.release.body)
                 .replaceAll('[new]', '<span class="label" style="background: #5bc0de;">NEW</span>')
                 .replaceAll('[fix]', '<span class="label" style="background: #5cb85c;">FIX</span>')
                 .replaceAll('[break]', '<span class="label" style="background: #d9534f;">BREAK</span>')
-                .replaceAll('[na]', '<span class="label" style="background: #e8e8e8;">N/A</span>')
+                .replaceAll('[na]', '<span class="label" style="background: #e8e8e8;">N/A</span>');
         },
 
         installButtonText() {
@@ -92,9 +91,12 @@ export default {
         },
 
         link() {
-            return __('Learn more about :link', { link: `<a href="https://statamic.dev/updating" target="_blank">${__('Updates')}</a>`}) + '.';
+            return (
+                __('Learn more about :link', {
+                    link: `<a href="https://statamic.dev/updating" target="_blank" class="font-medium underline text-blue-500 dark:text-blue-400">${__('updating Statamic')}</a>`,
+                }) + '.'
+            );
         },
-    }
-
-}
+    },
+};
 </script>

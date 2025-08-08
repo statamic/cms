@@ -1,69 +1,52 @@
 <template>
-
     <div
-        class="replicator-set shadow-sm mb-4 rounded border dark:border-dark-900"
-        :class="[sortableItemClass, { 'opacity-50': isExcessive }]"
+        class="bg-white dark:bg-gray-850 rounded-xl ring ring-gray-300 dark:ring-x-0 dark:ring-b-0 dark:ring-gray-700 shadow-ui-md"
+        :class="[sortableItemClass, { 'opacity-50': isExcessive, 'ring-red-500': hasError }]"
+        :data-error="hasError ?? undefined"
     >
-
-        <div class="replicator-set-header">
-            <div class="item-move cursor-grab sortable-handle" :class="{ [sortableHandleClass]: grid.isReorderable }" />
-            <div class="py-2 rtl:pr-2 ltr:pl-2 replicator-set-header-inner flex justify-end items-end w-full">
-                <button v-if="canAddRows" class="flex self-end group items-center rtl:ml-2 ltr:mr-2" @click="$emit('duplicate', index)" :aria-label="__('Duplicate Row')">
-                    <svg-icon name="light/duplicate" class="w-4 h-4 text-gray-600 group-hover:text-gray-900" />
-                </button>
-                <button v-if="canDelete" class="flex self-end group items-center" @click="$emit('removed', index)" :aria-label="__('Delete Row')">
-                    <svg-icon name="micro/trash" class="w-4 h-4 text-gray-600 group-hover:text-gray-900" />
-                </button>
+        <header class="bg-gray-50 dark:bg-gray-900 rounded-t-xl border-b border-gray-300 dark:border-gray-700 ps-4 pe-2 py-1.5 flex items-center justify-between">
+            <ui-drag-handle :class="{ [sortableHandleClass]: grid.isReorderable }" />
+            <div class="flex flex-1 items-end justify-end">
+                <ui-button
+                    v-if="canAddRows"
+                    @click="$emit('duplicate', index)"
+                    v-tooltip="__('Duplicate Row')"
+                    icon="duplicate"
+                    variant="ghost"
+                    inset
+                    size="sm"
+                />
+                <ui-button
+                    v-if="canDelete"
+                    @click="$emit('removed', index)"
+                    v-tooltip="__('Delete Row')"
+                    icon="trash"
+                    variant="ghost"
+                    inset
+                    size="sm"
+                />
             </div>
-        </div>
-
-        <div class="replicator-set-body publish-fields @container">
-            <set-field
-                v-for="field in fields"
-                v-show="showField(field, fieldPath(field.handle))"
-                :key="field.handle"
-                :field="field"
-                :meta="meta[field.handle]"
-                :value="values[field.handle]"
-                :parent-name="name"
-                :set-index="index"
-                :errors="errors(field.handle)"
-                :field-path="fieldPath(field.handle)"
-                class="p-4"
-                :read-only="grid.isReadOnly"
-                @updated="updated(field.handle, $event)"
-                @meta-updated="metaUpdated(field.handle, $event)"
-                @focus="$emit('focus')"
-                @blur="$emit('blur')"
-            />
+        </header>
+        <div class="px-4 py-3">
+            <FieldsProvider
+                :fields="fields"
+                :field-path-prefix="`${fieldPathPrefix}.${index}`"
+                :meta-path-prefix="`${metaPathPrefix}.existing.${values._id}`"
+            >
+                <PublishFields />
+            </FieldsProvider>
         </div>
     </div>
-
 </template>
-
-<style scoped>
-    .draggable-mirror {
-        position: relative;
-        z-index: 1000;
-    }
-    .draggable-source--is-dragging {
-        opacity: 0.5;
-    }
-</style>
 
 <script>
 import Row from './Row.vue';
-import SetField from '../replicator/Field.vue';
-import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
+import { default as PublishFields } from '@statamic/components/ui/Publish/Fields.vue';
+import FieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
 
 export default {
+    mixins: [Row],
 
-    mixins: [
-        Row,
-        ValidatesFieldConditions,
-    ],
-
-    components: { SetField },
-
-}
+    components: { PublishFields, FieldsProvider },
+};
 </script>

@@ -1,190 +1,246 @@
 <template>
-    <div class="max-w-xl mx-auto card">
-        <div v-if="steps.length > 1" class="max-w-lg mx-auto pt-16 relative">
+    <div class="mx-auto mt-4 space-y-3 lg:space-y-6 max-w-3xl">
+        <!-- Wizard Steps (left as-is per user request) -->
+        <div v-if="steps.length > 1" class="relative mx-auto max-w-2xl pt-16">
             <div class="wizard-steps">
-                <a class="step" :class="{'complete': currentStep >= index}" v-for="(step, index) in steps" @click="goToStep(index)">
-                    <div class="ball">{{ index+1 }}</div>
+                <button
+                    class="step"
+                    :class="{ complete: currentStep >= index }"
+                    v-for="(step, index) in steps"
+                    @click="goToStep(index)"
+                >
+                    <div class="ball">{{ index + 1 }}</div>
                     <div class="label">{{ step }}</div>
-                </a>
+                </button>
             </div>
         </div>
 
         <!-- Step: User Info -->
         <div v-if="!completed && onUserInfoStep">
-            <div class="max-w-md mx-auto px-4 py-16 text-center">
-                <h1 class="mb-6">{{ __('Create User') }}</h1>
-                <p class="text-gray dark:text-dark-150" v-text="__('messages.user_wizard_intro')" />
-            </div>
+            <header class="text-center max-w-xl mx-auto py-6 lg:pt-12 xl:pt-16">
+                <ui-heading size="2xl" :level="1" icon="users" :text="__('Create User')" class="justify-center" />
+                <ui-subheading class="mt-6" size="lg" :text="__('messages.user_wizard_intro')" />
+            </header>
 
-            <publish-container
-                :name="storeName"
-                :blueprint="blueprint"
-                :values="values"
-                :meta="meta"
-                :track-dirty-state="false"
-                class="max-w-md mx-auto -mt-6 py-0 px-4 pb-20"
-                @updated="values = $event"
-            >
-                <div slot-scope="{ setFieldValue, setFieldMeta }">
-                    <div class="-mx-6">
-                        <publish-fields
-                            :fields="fields"
-                            @updated="setFieldValue"
-                            @meta-updated="setFieldMeta"
-                        />
-                    </div>
-                </div>
-            </publish-container>
+            <ui-card-panel :heading="__('User Information')">
+                <ui-publish-container
+                    ref="container"
+                    :blueprint="blueprint"
+                    v-model="values"
+                    :meta="meta"
+                    :track-dirty-state="false"
+                    :errors="errors"
+                >
+                    <ui-publish-fields-provider :fields="fields">
+                        <ui-publish-fields />
+                    </ui-publish-fields-provider>
+                </ui-publish-container>
+            </ui-card-panel>
         </div>
 
         <!-- Step: Roles & Groups -->
-        <div v-if="!completed && onPermissionStep" class="max-w-md mx-auto px-4 pb-4">
-            <div class="py-16 text-center">
-                <h1 class="mb-6">{{ __('Roles & Groups') }}</h1>
-                <p class="text-gray dark:text-dark-150" v-text="__('messages.user_wizard_roles_groups_intro')" />
-            </div>
+        <div v-if="!completed && onPermissionStep">
+            <header class="text-center max-w-xl mx-auto py-6 lg:pt-12 xl:pt-16">
+                <ui-heading size="2xl" :level="1" icon="users" :text="__('Roles & Groups')" class="justify-center" />
+                <ui-subheading class="mt-6" size="lg" :text="__('messages.user_wizard_roles_groups_intro')" />
+            </header>
 
-            <!-- Super Admin -->
-             <div class="pb-10" v-if="canCreateSupers">
-                <div class="flex items-center">
-                    <toggle-input v-model="user.super" id="super" />
-                    <label class="font-bold rtl:mr-2 ltr:ml-2" for="super">{{ __('Super Admin') }}</label>
-                </div>
-                <div class="text-2xs text-gray-600 dark:text-dark-150 mt-2 flex items-center space-x-1 rtl:space-x-reverse">
-                    <svg-icon name="info-circle" class="h-4 w-4 flex items-center mb-px"></svg-icon>
-                    <span>{{ __('messages.user_wizard_super_admin_instructions') }}</span>
-                </div>
-            </div>
-
-            <!-- Roles -->
-            <div class="pb-10" v-if="! user.super && canAssignRoles">
-                <label class="font-bold text-base mb-1" for="role">{{ __('Roles') }}</label>
-                <publish-field-meta
-                    :config="{ handle: 'user.roles', type: 'user_roles' }"
-                    :initial-value="user.roles"
-                >
-                    <div slot-scope="{ meta, value, loading, updateMeta }">
-                        <relationship-fieldtype
-                            v-if="!loading"
-                            handle="user.roles"
-                            :config="{ type: 'user_roles', mode: 'select' }"
-                            :value="value"
-                            :meta="meta"
-                            @input="user.roles = $event"
-                            @meta-updated="updateMeta" />
+            <ui-card-panel :heading="__('Permissions')">
+                <div class="space-y-8">
+                    <!-- Super Admin -->
+                    <div v-if="canCreateSupers">
+                        <div class="flex items-center gap-2">
+                            <ui-switch v-model="user.super" id="super" />
+                            <label for="super" v-text="__('Super Admin')" />
+                        </div>
+                        <div
+                            class="mt-2 flex items-center space-x-1 text-2xs text-gray-600 dark:text-gray-400 rtl:space-x-reverse"
+                        >
+                            <svg-icon name="info-circle" class="mb-px flex h-4 w-4 items-center"></svg-icon>
+                            <span>{{ __('messages.user_wizard_super_admin_instructions') }}</span>
+                        </div>
                     </div>
-                </publish-field-meta>
-            </div>
 
-            <!-- Groups -->
-            <div class="pb-10" v-if="! user.super && canAssignGroups">
-                <label class="font-bold text-base mb-1" for="group">{{ __('Groups') }}</label>
-                <publish-field-meta
-                    :config="{ handle: 'user.groups', type: 'user_groups' }"
-                    :initial-value="user.groups"
-                >
-                    <div slot-scope="{ meta, value, loading, updateMeta }">
-                        <relationship-fieldtype
-                            v-if="!loading"
-                            handle="user.groups"
-                            :config="{ type: 'user_groups', mode: 'select' }"
-                            :value="value"
-                            :meta="meta"
-                            @input="user.groups = $event"
-                            @meta-updated="updateMeta"/>
+                    <!-- Roles -->
+                    <div v-if="!user.super && canAssignRoles">
+                        <ui-label for="role" :text="__('Roles')" />
+                        <publish-field-meta
+                            :config="{ handle: 'user.roles', type: 'user_roles' }"
+                            :initial-value="user.roles"
+                            v-slot="{ meta, value, loading, updateMeta }"
+                        >
+                            <div>
+                                <relationship-fieldtype
+                                    v-if="!loading"
+                                    handle="user.roles"
+                                    :config="{ type: 'user_roles', mode: 'select' }"
+                                    :value="value"
+                                    :meta="meta"
+                                    @input="user.roles = $event"
+                                    @meta-updated="updateMeta"
+                                />
+                            </div>
+                        </publish-field-meta>
                     </div>
-                </publish-field-meta>
-            </div>
+
+                    <!-- Groups -->
+                    <div v-if="!user.super && canAssignGroups">
+                        <ui-label for="group" :text="__('Groups')" />
+                        <publish-field-meta
+                            :config="{ handle: 'user.groups', type: 'user_groups' }"
+                            :initial-value="user.groups"
+                            v-slot="{ meta, value, loading, updateMeta }"
+                        >
+                            <div>
+                                <relationship-fieldtype
+                                    v-if="!loading"
+                                    handle="user.groups"
+                                    :config="{ type: 'user_groups', mode: 'select' }"
+                                    :value="value"
+                                    :meta="meta"
+                                    @input="user.groups = $event"
+                                    @meta-updated="updateMeta"
+                                />
+                            </div>
+                        </publish-field-meta>
+                    </div>
+                </div>
+            </ui-card-panel>
         </div>
 
         <!-- Step: Invitation -->
         <div v-if="!completed && onInvitationStep">
-            <div class="max-w-md mx-auto px-4 py-16 text-center">
-                <h1 class="mb-6">{{ __('Invitation') }}</h1>
-                <p class="text-gray dark:text-dark-150" v-text="__('messages.user_wizard_invitation_intro')" />
-            </div>
+            <header class="text-center max-w-xl mx-auto py-6 lg:pt-12 xl:pt-16">
+                <ui-heading size="2xl" :level="1" icon="mail" :text="__('Invitation')" class="justify-center" />
+                <ui-subheading class="mt-6" size="lg" :text="__('messages.user_wizard_invitation_intro')" />
+            </header>
 
-            <!-- Send Email? -->
-            <div class="max-w-md mx-auto px-4 mb-6 flex items-center">
-                <toggle-input v-model="invitation.send" id="send_email_invitation" />
-                <label class="font-bold rtl:mr-2 ltr:ml-2" for="send_email_invitation">{{ __('Send Email Invitation') }}</label>
-            </div>
+            <ui-card-panel :heading="__('Invitation Settings')">
+                <div class="space-y-4">
+                    <!-- Send Email? -->
+                    <div class="flex items-center gap-2">
+                        <ui-switch v-model="invitation.send" id="send_email_invitation" />
+                        <label for="send_email_invitation" v-text="__('Send Email Invitation')" />
+                    </div>
 
-            <div class="max-w-lg mx-auto bg-gray-100 dark:bg-dark-650 py-10 mb-20 border dark:border-dark-900 rounded-lg " v-if="invitation.send">
-                <!-- Subject Line -->
-                <div class="max-w-md mx-auto px-4 pb-10">
-                    <label class="font-bold text-base mb-1" for="invitation_subject">{{ __('Email Subject') }}</label>
-                    <input type="text" v-model="invitation.subject" class="input-text bg-white dark:bg-dark-700" id="invitation_subject">
+                    <div
+                        class="rounded-lg border bg-gray-100 p-6 dark:border-gray-700 dark:bg-gray-800"
+                        v-if="invitation.send"
+                    >
+                        <!-- Subject Line -->
+                        <div class="pb-10">
+                            <ui-label for="invitation_subject" :text="__('Email Subject')" />
+                            <ui-input
+                                type="text"
+                                v-model="invitation.subject"
+                                id="invitation_subject"
+                            />
+                        </div>
+
+                        <!-- Email Content -->
+                        <div>
+                            <ui-label for="invitation_message" :text="__('Email Content')" />
+                            <ui-textarea
+                                min-h-40
+                                id="invitation_message"
+                                v-model="invitation.message"
+                                v-elastic
+                            />
+                        </div>
+                    </div>
+
+                    <!-- Copy Pasta -->
+                    <div v-else>
+                        <ui-description v-html="__('messages.user_wizard_invitation_share_before', { email: values.email })" />
+                    </div>
                 </div>
-
-                <!-- Email Content -->
-                <div class="max-w-md mx-auto px-4">
-                    <label class="font-bold text-base mb-1" for="invitation_message">{{ __('Email Content') }}</label>
-                    <textarea
-                        class="input-text min-h-40 p-4 bg-white dark:bg-dark-700"
-                        id="invitation_message"
-                        v-model="invitation.message"
-                        v-elastic
-                    />
-                </div>
-            </div>
-
-            <!-- Copy Pasta -->
-            <div class="max-w-md mx-auto px-4 pb-20" v-else>
-                <p class="mb-2" v-html="__('messages.user_wizard_invitation_share_before', { email: values.email })" />
-            </div>
+            </ui-card-panel>
         </div>
 
         <!-- Post creation -->
         <div v-if="completed">
-            <div class="max-w-md mx-auto px-4 py-16 text-center">
-                <h1 class="mb-6">{{ __('User created') }}</h1>
-                <p class="text-gray" v-html="__('messages.user_wizard_account_created')" />
-            </div>
+            <header class="text-center max-w-xl mx-auto py-6 lg:pt-12 xl:pt-16">
+                <ui-heading size="2xl" :level="1" icon="users" :text="__('User created')" class="justify-center" />
+                <ui-subheading class="mt-6" size="lg" :text="__('messages.user_wizard_account_created')" />
+            </header>
 
-            <!-- Copy Pasta -->
-            <div class="max-w-md mx-auto px-4 pb-10">
-                <p class="mb-2" v-html="__('messages.user_wizard_invitation_share', { email: values.email })" />
-            </div>
-            <div class="max-w-md mx-auto px-4 pb-10">
-                <label class="font-bold text-base mb-1" for="activation_url">{{ __('Activation URL') }}</label>
-                <input type="text" readonly class="input-text" onclick="this.select()" :value="activationUrl" id="activation_url" />
-            </div>
-            <div class="max-w-md mx-auto px-4 pb-20">
-                <label class="font-bold text-base mb-1" for="email">{{ __('Email Address') }}</label>
-                <input type="text" readonly class="input-text" onclick="this.select()" :value="values.email" id="email" />
-            </div>
+            <ui-card-panel :heading="__('User Details')">
+                <div class="space-y-4">
+                    <ui-description v-html="__('messages.user_wizard_invitation_share', { email: values.email })" />
+                    <div>
+                        <ui-label for="activation_url" :text="__('Activation URL')" />
+                        <ui-input
+                            readonly
+                            copyable
+                            :value="activationUrl"
+                            id="activation_url"
+                        />
+                    </div>
+                    <div>
+                        <ui-label for="email" :text="__('Email Address')" />
+                        <ui-input
+                            readonly
+                            copyable
+                            :value="values.email"
+                            id="email"
+                        />
+                    </div>
+                </div>
+            </ui-card-panel>
         </div>
 
-        <div class="border-t dark:border-dark-900 p-4">
-            <div class="max-w-md mx-auto flex items-center justify-center">
-                <button tabindex="3" class="btn mx-4 w-32" @click="previous" v-if="! completed && ! onFirstStep">
-                    <span v-html="direction === 'ltr' ? '&larr;' : '&rarr;'"></span> {{ __('Previous')}}
-                </button>
-                <button tabindex="4" class="btn mx-4 w-32" @click="nextStep" v-if="onUserInfoStep">
-                    {{ __('Next')}} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span>
-                </button>
-                <button tabindex="4" class="btn mx-4 w-32" :disabled="! canContinue" @click="nextStep" v-if="!onUserInfoStep && ! completed && ! onLastStep">
-                    {{ __('Next')}} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span>
-                </button>
-                <button tabindex="4" class="btn-primary mx-4" @click="submit" v-if="! completed && onLastStep">
-                    {{ finishButtonText }}
-                </button>
-                <a :href="usersIndexUrl" class="btn mx-4" v-if="completed">
-                    {{ __('Back to Users') }}
-                </a>
-                <a :href="usersCreateUrl" class="btn-primary mx-4" v-if="completed">
-                    {{ __('Create Another') }}
-                </a>
+        <!-- Footer -->
+        <footer class="flex justify-center py-3">
+            <div class="flex items-center space-x-4">
+                <ui-button
+                    v-if="!completed && !onFirstStep"
+                    variant="default"
+                    @click="previous"
+                    :text="__('Previous')"
+                />
+                <ui-button
+                    v-if="onUserInfoStep"
+                    variant="primary"
+                    @click="nextStep"
+                    :text="__('Next')"
+                />
+                <ui-button
+                    v-if="!onUserInfoStep && !completed && !onLastStep"
+                    variant="primary"
+                    :disabled="!canContinue"
+                    @click="nextStep"
+                    :text="__('Next')"
+                />
+                <ui-button
+                    v-if="!completed && onLastStep"
+                    variant="primary"
+                    @click="submit"
+                    :text="finishButtonText"
+                />
+                <ui-button
+                    v-if="completed"
+                    variant="default"
+                    :href="usersIndexUrl"
+                    :text="__('Back to Users')"
+                />
+                <ui-button
+                    v-if="completed"
+                    variant="primary"
+                    :href="usersCreateUrl"
+                    :text="__('Create Another')"
+                />
             </div>
-        </div>
+        </footer>
     </div>
 </template>
 
 <style scoped>
->>> .publish-fields .form-group .field-inner > label {
-    @apply text-base font-bold mb-1;
-    & + .help-block { @apply -mt-1 !important; }
+:deep(.publish-fields .form-group .field-inner > label) {
+    /* TODO: Remove @apply */
+    /* @apply mb-1 text-base font-bold;
+    & + .help-block {
+        @apply -mt-1 !important;
+    } */
 }
 </style>
 
@@ -193,10 +249,8 @@
 
 import isEmail from 'validator/lib/isEmail';
 import HasWizardSteps from '../HasWizardSteps.js';
-import uniq from 'underscore/modules/uniq.js';
 
 export default {
-
     mixins: [HasWizardSteps],
 
     props: {
@@ -212,7 +266,7 @@ export default {
         blueprint: { type: Object },
         initialValues: { type: Object },
         fields: { type: Array },
-        meta: { type: Object }
+        meta: { type: Object },
     },
 
     data() {
@@ -220,12 +274,15 @@ export default {
             user: {
                 super: this.canCreateSupers,
                 roles: [],
-                groups: []
+                groups: [],
             },
             invitation: {
                 send: this.canSendInvitation,
                 subject: __('messages.user_wizard_invitation_subject', { site: window.location.hostname }),
-                message: __n('messages.user_wizard_invitation_body', this.activationExpiry, { site: window.location.hostname, expiry: this.activationExpiry }),
+                message: __n('messages.user_wizard_invitation_body', this.activationExpiry, {
+                    site: window.location.hostname,
+                    expiry: this.activationExpiry,
+                }),
             },
             userExists: false,
             completed: false,
@@ -233,9 +290,8 @@ export default {
             editUrl: null,
             errors: {},
             error: null,
-            storeName: 'userwizard',
             values: this.initialValues,
-        }
+        };
     },
 
     computed: {
@@ -278,21 +334,26 @@ export default {
             return this.valid;
         },
         checkIfUserExists(email) {
-            this.$axios.post(cp_url('user-exists'), { email }).then(response => {
-                this.userExists = response.data.exists
-            }).catch(error => {
-                this.$toast.error(error.response.data.message);
-            });
+            this.$axios
+                .post(cp_url('user-exists'), { email })
+                .then((response) => {
+                    this.userExists = response.data.exists;
+                })
+                .catch((error) => {
+                    this.$toast.error(error.response.data.message);
+                });
         },
         nextStep() {
             if (this.onUserInfoStep) {
-                return this.submit(true).then(this.next).catch(() => {})
+                return this.submit(true)
+                    .then(this.next)
+                    .catch(() => {});
             }
 
             this.next();
         },
         submit(validateOnly) {
-            let payload = {...this.user, ...this.values, invitation: this.invitation};
+            let payload = { ...this.user, ...this.values, invitation: this.invitation };
 
             if (validateOnly === true) {
                 payload._validate_only = true;
@@ -300,24 +361,27 @@ export default {
 
             this.clearErrors();
 
-            return this.$axios.post(this.route, payload).then(response => {
-                this.valid = true;
+            return this.$axios
+                .post(this.route, payload)
+                .then((response) => {
+                    this.valid = true;
 
-                if (payload._validate_only) {
-                    return;
-                }
+                    if (payload._validate_only) {
+                        return;
+                    }
 
-                if (this.invitation.send) {
-                    window.location = response.data.redirect;
-                } else {
-                    this.completed = true;
-                    this.editUrl = response.data.redirect;
-                    this.activationUrl = response.data.activationUrl;
-                }
-            }).catch(e => {
-                this.handleAxiosError(e);
-                throw e;
-            });
+                    if (this.invitation.send) {
+                        window.location = response.data.redirect;
+                    } else {
+                        this.completed = true;
+                        this.editUrl = response.data.redirect;
+                        this.activationUrl = response.data.activationUrl;
+                    }
+                })
+                .catch((e) => {
+                    this.handleAxiosError(e);
+                    throw e;
+                });
         },
         handleAxiosError(e) {
             if (e.response && e.response.status === 422) {
@@ -337,7 +401,7 @@ export default {
     },
 
     watch: {
-        'values.email': function(email) {
+        'values.email': function (email) {
             if (email && isEmail(email)) this.checkIfUserExists(email);
         },
 
@@ -347,25 +411,20 @@ export default {
             if (exists) {
                 emailErrors.push(error);
             } else {
-                emailErrors = emailErrors.filter(error => error !== error);
+                emailErrors = emailErrors.filter((error) => error !== error);
             }
-            this.errors = { ...this.errors, email: uniq(emailErrors) };
+            this.errors = { ...this.errors, email: [...new Set(emailErrors)] };
         },
-
-        'errors': function (errors) {
-            if (this.onUserInfoStep) this.$store.commit(`publish/${this.storeName}/setErrors`, errors);
-        }
     },
 
     mounted() {
-        this.$keys.bindGlobal(['command+return'], e => {
+        this.$keys.bindGlobal(['command+return'], (e) => {
             this.next();
         });
 
-        this.$keys.bindGlobal(['command+delete'], e => {
+        this.$keys.bindGlobal(['command+delete'], (e) => {
             this.previous();
         });
-    }
-
-}
+    },
+};
 </script>

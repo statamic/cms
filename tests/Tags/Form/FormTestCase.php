@@ -2,6 +2,7 @@
 
 namespace Tests\Tags\Form;
 
+use Illuminate\Support\Facades\Blade;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\Parse;
@@ -67,9 +68,14 @@ abstract class FormTestCase extends TestCase
         ], $headers));
     }
 
-    protected function tag($tag, $params = [])
+    protected function tag($string, $context = [])
     {
-        return Parse::template($tag, $params);
+        return Parse::template($string, $context);
+    }
+
+    protected function blade($string, $context = [])
+    {
+        return Blade::render($string, $context);
     }
 
     protected function createForm($blueprintContents = null, $handle = null)
@@ -93,9 +99,7 @@ abstract class FormTestCase extends TestCase
 
     protected function assertFieldRendersHtml($expectedHtmlParts, $fieldConfig, $oldData = [], $extraParams = [])
     {
-        $randomString = str_shuffle('nobodymesseswiththehoff');
-
-        $handle = $fieldConfig['handle'].'_'.$randomString;
+        $handle = str_shuffle('nobodymesseswiththehoff');
 
         $fields = $oldData
             ? array_merge([['handle' => 'failing_field', 'field' => ['type' => 'text', 'validate' => 'required']]], [$fieldConfig])
@@ -112,10 +116,12 @@ abstract class FormTestCase extends TestCase
         $extraParams = $extraParams ? Html::attributes($extraParams) : '';
 
         $output = $this->normalizeHtml(
-            $this->tag("{{ form:{$handle} {$extraParams}}}{{ fields }}{{ field}}{{ /fields }}{{ /form:{$handle} }}", $oldData)
+            $this->tag("{{ form:{$handle} {$extraParams}}}{{ form:fields }}{{ field }}{{ /form:fields }}{{ /form:{$handle} }}", $oldData)
         );
 
-        $expected = collect(Arr::wrap($expectedHtmlParts))->implode('');
+        $expected = collect(Arr::wrap($expectedHtmlParts))
+            ->map(fn ($html) => str_replace('[[form-handle]]', $handle, $html)) // allow testing against dynamic form handle
+            ->implode('');
 
         $this->assertStringContainsString($expected, $output);
     }

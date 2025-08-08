@@ -23,6 +23,7 @@ use Statamic\View\Antlers\Language\Lexer\AntlersLexer;
 use Statamic\View\Antlers\Language\Nodes\AbstractNode;
 use Statamic\View\Antlers\Language\Nodes\AntlersNode;
 use Statamic\View\Antlers\Language\Nodes\Position;
+use Statamic\View\Antlers\Language\Parser\ComponentCompiler;
 use Statamic\View\Antlers\Language\Parser\DocumentParser;
 use Statamic\View\Antlers\Language\Parser\LanguageKeywords;
 use Statamic\View\Antlers\Language\Parser\LanguageParser;
@@ -117,12 +118,16 @@ class RuntimeParser implements Parser
      */
     private $isolateRuntimes = false;
 
+    protected $componentCompiler;
+
     public function __construct(DocumentParser $documentParser, NodeProcessor $nodeProcessor, AntlersLexer $lexer, LanguageParser $antlersParser)
     {
         $this->documentParser = $documentParser;
         $this->nodeProcessor = $nodeProcessor;
         $this->antlersLexer = $lexer;
         $this->antlersParser = $antlersParser;
+
+        $this->componentCompiler = new ComponentCompiler();
     }
 
     /**
@@ -314,6 +319,11 @@ class RuntimeParser implements Parser
         return class_exists(ViewException::class) || class_exists('Spatie\LaravelIgnition\Exceptions\ViewException');
     }
 
+    protected function shouldCacheRenderNodes($text)
+    {
+        return ! str_contains($text, '/noparse');
+    }
+
     /**
      * Parses and renders the input text, with the provided runtime data.
      *
@@ -328,6 +338,8 @@ class RuntimeParser implements Parser
      */
     protected function renderText($text, $data = [])
     {
+        $text = $this->componentCompiler->compile($text);
+
         $this->parseStack += 1;
         $text = $this->runPreParserCallbacks($text);
 
@@ -350,7 +362,7 @@ class RuntimeParser implements Parser
             $parseText = $this->sanitizePhp($text);
             $cacheSlug = md5($parseText);
 
-            if (! array_key_exists($cacheSlug, self::$standardRenderNodeCache)) {
+            if (! array_key_exists($cacheSlug, self::$standardRenderNodeCache) || ! $this->shouldCacheRenderNodes($text)) {
                 $this->documentParser->setIsVirtual($this->view == '');
 
                 if (strlen($this->view) > 0) {
@@ -897,5 +909,13 @@ INFO;
     public function callback($callback)
     {
         return $this;
+    }
+
+    /**
+     * Clears the standard render node cache.
+     */
+    public static function clearRenderNodeCache()
+    {
+        self::$standardRenderNodeCache = [];
     }
 }

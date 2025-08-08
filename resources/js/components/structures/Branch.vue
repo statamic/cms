@@ -1,98 +1,106 @@
 <template>
-
-    <div class="flex">
+    <div class="page-tree-branch flex" :class="{ 'page-tree-branch--has-children': hasChildren }">
         <slot name="branch-action" :branch="page">
             <div v-if="editable" class="page-move w-6" />
         </slot>
-        <div class="flex items-center flex-1 p-2 rtl:mr-2 ltr:ml-2 text-xs leading-normal">
-            <div class="flex items-center grow" @click="$emit('branch-clicked', page)">
-                <div class="little-dot rtl:ml-2 ltr:mr-2" :class="getStatusClass()" v-tooltip="getStatusTooltip()" />
-                <svg-icon name="home-page" class="rtl:ml-2 ltr:mr-2 h-4 w-4 text-gray-800 dark:text-dark-150" v-if="isRoot" v-tooltip="__('This is the root page')" />
+        <div class="flex flex-1 items-center p-1.5 text-xs leading-normal">
+            <div class="flex gap-3 grow items-center" @click="$emit('branch-clicked', page)">
+                <ui-status-indicator :status="page.status" v-tooltip="getStatusTooltip()" />
+                <ui-icon v-if="isRoot" name="home" class="size-4" v-tooltip="__('This is the root page')" />
                 <a
                     @click.prevent="$emit('edit', $event)"
-                    :class="{ 'text-sm font-medium': isTopLevel }"
+                    :class="{ 'text-sm font-medium is-top-level-branch': isTopLevelBranch }"
                     :href="page.edit_url"
-                    v-text="title" />
+                    v-text="title"
+                />
 
-                <span v-if="showSlugs" class="rtl:mr-2 ltr:ml-2 font-mono text-gray-700 dark:text-dark-175 text-2xs pt-px">
-                    {{ isRoot ? '/' : page.slug }}
+                <span
+                    v-if="showSlugs"
+                    class="pt-[2px] font-mono text-2xs text-gray-700 dark:text-gray-500"
+                >
+                    {{ slugPath }}
                 </span>
 
-                <button
+                <ui-button
                     v-if="hasChildren"
-                    class="p-2 text-gray-600 dark:text-dark-175 hover:text-gray-700 dark:hover:text-dark-150 transition duration-100 outline-none flex"
-                    :class="{ '-rotate-90': !isOpen }"
+                    class="transition duration-100 [&_svg]:size-4! -mx-1.5"
+                    icon="ui/chevron-down"
+                    size="xs"
+                    round
+                    variant="ghost"
+                    :class="{ '-rotate-90 is-closed': !isOpen, 'is-open': isOpen }"
+                    :aria-label="isOpen ? __('Collapse') : __('Expand')"
+                    :aria-expanded="isOpen"
                     @click.stop="$emit('toggle-open')"
-                >
-                    <svg-icon name="micro/chevron-down-xs" class="h-1.5" />
-                </button>
+                />
 
-                <div v-if="page.collection && editable" class="rtl:mr-4 ltr:ml-4 flex items-center">
-                    <svg-icon name="light/content-writing" class="w-4 h-4" />
-                    <div class="rtl:mr-1 ltr:ml-1">
-                        <a :href="page.collection.create_url" v-text="__('Add')" />
-                        <span class="text-gray">/</span>
-                        <a :href="page.collection.edit_url" v-text="__('Edit')" />
+                <div v-if="page.collection && editable" class="flex items-center gap-2">
+                    <Icon name="navigation" class="size-3.5 text-gray-500" />
+                    <div>
+                        <a :href="page.collection.create_url" v-text="__('Add')" class="hover:text-blue-500" />
+                        <span class="mx-1 text-gray-400 dark:text-gray-500">/</span>
+                        <a :href="page.collection.edit_url" v-text="__('Edit')" class="hover:text-blue-500" />
                     </div>
                 </div>
             </div>
 
-            <div class="rtl:pl-2 ltr:pr-2 flex items-center">
-                <div v-if="showBlueprint && page.entry_blueprint" v-text="__(page.entry_blueprint.title)" class="shrink text-4xs text-gray-600 dark:text-dark-175 uppercase ml-4" />
+            <div class="flex items-center gap-3">
+                <ui-badge
+                    v-if="showBlueprint && page.entry_blueprint"
+                    :text="__(page.entry_blueprint.title)"
+                    size="sm"
+                    variant="filled"
+                    v-tooltip="__('Blueprint')"
+                />
 
                 <slot name="branch-icon" :branch="page" />
 
-                <dropdown-list class="rtl:mr-4 ltr:ml-4" :class="{'invisible': isRoot, 'hidden': !editable}">
-                    <slot name="branch-options"
-                        :branch="page"
-                        :depth="depth"
-                        :remove-branch="remove"
-                        :orphan-children="orphanChildren"
-                    />
-                </dropdown-list>
+                <Dropdown placement="left-start" :class="{ invisible: isRoot, hidden: !editable }">
+                    <DropdownMenu>
+                        <slot
+                            name="branch-options"
+                            :branch="page"
+                            :depth="depth"
+                            :remove-branch="remove"
+                        />
+                    </DropdownMenu>
+                </Dropdown>
             </div>
-
         </div>
     </div>
-
 </template>
 
 <script>
-import * as th from 'tree-helper';
+import { Dropdown, DropdownMenu, Icon } from '@statamic/ui';
 
 export default {
-
+    components: { Dropdown, DropdownMenu, Icon },
     props: {
         page: Object,
         depth: Number,
         root: Boolean,
-        vm: Object,
         firstPageIsRoot: Boolean,
         isOpen: Boolean,
         hasChildren: Boolean,
-        showSlugs: Boolean,
         showBlueprint: Boolean,
-        editable: Boolean,
+        showSlugs: Boolean,
+        editable: { type: Boolean, default: true },
+        stat: Object,
     },
 
     data() {
         return {
             editing: false,
-        }
+        };
     },
 
     computed: {
-
-        isTopLevel() {
+        isTopLevelBranch() {
             return this.depth === 1;
         },
 
         isRoot() {
-            if (!this.firstPageIsRoot) return false;
-            if (!this.isTopLevel) return false;
-
-            const firstNodeId = this.vm.data.parent.children[0].id;
-            return this.page.id === firstNodeId;
+            return this.root;
         },
 
         isEntry() {
@@ -109,46 +117,23 @@ export default {
 
         title() {
             return this.page.title || this.page.entry_title || this.page.url;
-        }
+        },
 
+        slugPath() {
+            return this.isRoot ? '/' : '/' + this.page.slug;
+        },
     },
 
     methods: {
-
-        getStatusClass() {
-            switch (this.page.status) {
-                case 'published':
-                    return 'bg-green-600';
-                case 'draft':
-                    return 'bg-gray-400 dark:bg-dark-200';
-                default:
-                    return 'bg-transparent border border-gray-600';
-            }
-        },
-
         getStatusTooltip() {
             let label = __(this.page.status) || __('Text item');
 
             return label[0].toUpperCase() + label.slice(1);
         },
 
-        remove() {
-            const store = this.page._vm.store;
-            store.deleteNode(this.page);
-            this.$emit('removed', store);
+        remove(deleteChildren) {
+            this.$emit('removed', this.stat, deleteChildren);
         },
-
-        orphanChildren() {
-            const store = this.page._vm.store;
-
-            this.vm.data.children.slice().forEach((child) =>
-                th.insertBefore(child, this.vm.data)
-            );
-
-            this.$emit('children-orphaned', store);
-        }
-
-    }
-
-}
+    },
+};
 </script>

@@ -1,82 +1,54 @@
 <template>
-
     <div>
-        <template v-if="isToggleMode">
-            <div class="toggle-fieldtype-wrapper">
-                <toggle-input :value="isRevealed" @input="update" :read-only="isReadOnly" />
-                <label v-if="config.input_label" class="rtl:mr-2 ltr:ml-2 font-normal">{{ __(config.input_label) }}</label>
-            </div>
-        </template>
-
-        <template v-else>
-            <button
-                @click="buttonReveal"
-                class="btn"
-                :disabled="isReadOnly"
-                :v-tooltip="__(config.instructions)"
-                v-text="config.input_label || __('Show Fields')" />
-        </template>
+        <div class="flex items-center gap-2" v-if="isToggleMode">
+            <Switch :model-value="isRevealed" @update:model-value="update" :read-only="isReadOnly" :id="id" />
+            <Heading v-if="config.input_label" v-html="$markdown(__(config.input_label), { openLinksInNewTabs: true })" />
+        </div>
+        <Button
+            v-else
+            icon="eye-closed"
+            @click="buttonReveal"
+            :read-only="isReadOnly"
+            :disabled="config.disabled"
+            :text="config.input_label || __('Show Fields')"
+            :v-tooltip="__(config.instructions)"
+        />
     </div>
-
 </template>
 
-<script>
-export default {
+<script setup>
+import { Fieldtype } from 'statamic';
+import { Switch, Heading, Button } from '@/components/ui';
+import { onMounted, onBeforeUnmount, watch, nextTick, computed } from 'vue';
+import { injectContainerContext } from '@statamic/components/ui/Publish/Container.vue';
 
-    mixins: [Fieldtype],
+const emit = defineEmits(Fieldtype.emits);
+const props = defineProps(Fieldtype.props);
+const { update, expose, isReadOnly } = Fieldtype.use(emit, props);
+defineExpose(expose);
 
-    computed: {
+const { setRevealerField, unsetRevealerField, setHiddenField } = injectContainerContext();
+const isRevealed = computed(() => props.value);
+const isToggleMode = computed(() => data_get(props.config, 'mode') === 'toggle');
+const fieldPath = computed(() => props.fieldPathPrefix ? `${props.fieldPathPrefix}.${props.handle}` : props.handle);
 
-        isRevealed() {
-            return this.value;
-        },
+onMounted(() => setRevealerField(fieldPath.value));
+onBeforeUnmount(() => unsetRevealerField(fieldPath.value));
 
-        isToggleMode() {
-            return data_get(this.config, 'mode') === 'toggle';
-        },
+watch(fieldPath, (fieldPath, oldFieldPath) => {
+    unsetRevealerField(oldFieldPath);
+    nextTick(() => setRevealerField(fieldPath));
+});
 
-        fieldPath() {
-            return this.fieldPathPrefix || this.handle;
-        },
+function buttonReveal() {
+    if (isReadOnly.value) return;
 
-    },
+    setHiddenField({
+        dottedKey: fieldPath.value,
+        hidden: 'force',
+        omitValue: true,
+    });
 
-    inject: ['storeName'],
-
-    mounted() {
-        this.$store.commit(`publish/${this.storeName}/setRevealerField`, this.fieldPath);
-    },
-
-    beforeDestroy() {
-        this.$store.commit(`publish/${this.storeName}/unsetRevealerField`, this.fieldPath);
-    },
-
-    watch: {
-        fieldPath(fieldPath, oldFieldPath) {
-            this.$store.commit(`publish/${this.storeName}/unsetRevealerField`, oldFieldPath);
-            this.$nextTick(() => {
-                this.$store.commit(`publish/${this.storeName}/setRevealerField`, fieldPath);
-            });
-        }
-    },
-
-    methods: {
-
-        buttonReveal() {
-            if (this.isReadOnly) {
-                return;
-            }
-
-            this.$store.commit(`publish/${this.storeName}/setHiddenField`, {
-                dottedKey: this.fieldPath,
-                hidden: 'force',
-                omitValue: true,
-            });
-
-            this.update(true)
-        }
-
-    }
-
+    update(true);
 }
 </script>

@@ -1,5 +1,5 @@
 .video-fieldtype-container {
-    @apply bg-gray-200 dark:bg-dark-700 p-4 border dark:border-dark-950 rounded;
+    @apply rounded-sm border bg-gray-200 p-4 dark:border-dark-950 dark:bg-dark-700;
 }
 
 .video-fieldtype .video-preview-wrapper {
@@ -10,21 +10,25 @@
 }
 
 .video-fieldtype .embed-video {
-    @apply w-full h-0 relative;
+    @apply relative h-0 w-full;
     padding-bottom: 56.25%;
 }
 
 .video-fieldtype .embed-video iframe {
-    @apply rounded;
+    @apply rounded-sm;
     position: absolute;
     top: 0;
-    left: 0 ; [dir="rtl"] & { left: auto ; right: 0 ; }
+    left: 0;
+    [dir='rtl'] & {
+        left: auto;
+        right: 0;
+    }
     width: 100%;
     height: 100%;
 }
 
 .video-fieldtype .native-video video {
-    @apply rounded;
+    @apply rounded-sm;
     width: 100% !important;
     height: auto !important;
 }

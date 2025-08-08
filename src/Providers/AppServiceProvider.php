@@ -2,16 +2,16 @@
 
 namespace Statamic\Providers;
 
+use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\ServiceProvider;
+use Statamic\CP\CarbonAsVueComponent;
 use Statamic\Facades;
 use Statamic\Facades\Addon;
-use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Token;
@@ -42,7 +42,6 @@ class AppServiceProvider extends ServiceProvider
             ->pushMiddleware(\Statamic\Http\Middleware\PoweredByHeader::class)
             ->pushMiddleware(\Statamic\Http\Middleware\CheckComposerJsonScripts::class)
             ->pushMiddleware(\Statamic\Http\Middleware\CheckMultisite::class)
-            ->pushMiddleware(\Statamic\Http\Middleware\DisableFloc::class)
             ->pushMiddleware(\Statamic\Http\Middleware\StopImpersonating::class);
 
         $this->loadViewsFrom("{$this->root}/resources/views", 'statamic');
@@ -58,6 +57,10 @@ class AppServiceProvider extends ServiceProvider
         $this->publishes([
             "{$this->root}/resources/dist" => public_path('vendor/statamic/cp'),
         ], 'statamic-cp');
+
+        $this->publishes([
+            "{$this->root}/resources/dist-dev" => public_path('vendor/statamic/cp-dev'),
+        ], 'statamic-cp-dev');
 
         $this->publishes([
             "{$this->root}/resources/dist-frontend" => public_path('vendor/statamic/frontend'),
@@ -80,10 +83,8 @@ class AppServiceProvider extends ServiceProvider
             return $this->to(cp_route($route, $parameters));
         });
 
-        Carbon::macro('inPreferredFormat', function () {
-            return $this->format(
-                Preference::get('date_format', config('statamic.cp.date_format'))
-            );
+        Carbon::macro('asVueComponent', static function (?array $options = null) {
+            return (new CarbonAsVueComponent)(self::this(), $options);
         });
 
         Request::macro('statamicToken', function () {
@@ -96,7 +97,11 @@ class AppServiceProvider extends ServiceProvider
             return optional($this->statamicToken())->handler() === LivePreview::class;
         });
 
-        TrimStrings::skipWhen(fn (Request $request) => $request->is(config('statamic.cp.route').'/*'));
+        TrimStrings::skipWhen(function (Request $request) {
+            $route = config('statamic.cp.route');
+
+            return ! $route || $request->is($route.'/*');
+        });
 
         $this->addAboutCommandInfo();
 
@@ -127,6 +132,7 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Contracts\Forms\FormRepository::class => \Statamic\Forms\FormRepository::class,
             \Statamic\Contracts\Forms\SubmissionRepository::class => \Statamic\Stache\Repositories\SubmissionRepository::class,
             \Statamic\Contracts\Tokens\TokenRepository::class => \Statamic\Tokens\FileTokenRepository::class,
+            \Statamic\Contracts\Addons\SettingsRepository::class => \Statamic\Addons\FileSettingsRepository::class,
         ])->each(function ($concrete, $abstract) {
             if (! $this->app->bound($abstract)) {
                 Statamic::repository($abstract, $concrete);
@@ -188,6 +194,7 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Http\Middleware\Localize::class,
             \Statamic\Http\Middleware\AddViewPaths::class,
             \Statamic\Http\Middleware\AuthGuard::class,
+            \Statamic\Http\Middleware\RedirectIfTwoFactorSetupIncomplete::class,
             \Statamic\StaticCaching\Middleware\Cache::class,
         ])->each(fn ($middleware) => $router->pushMiddlewareToGroup('statamic.web', $middleware));
     }

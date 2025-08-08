@@ -1,6 +1,6 @@
 <template>
-    <div class="table-field">
-        <table class="table-fieldtype-table" v-if="data.length > 0">
+    <div>
+        <table class="table-contained" v-if="data.length > 0">
             <sortable-list
                 v-model="data"
                 :vertical="true"
@@ -12,7 +12,11 @@
             >
                 <tbody>
                     <tr class="sortable-row" v-for="(element, index) in data" :key="element._id">
-                        <td class="sortable-handle table-drag-handle" v-if="!isReadOnly" :class="{'rounded-tl': index === 0 }"></td>
+                        <td
+                            class="sortable-handle table-drag-handle"
+                            v-if="!isReadOnly"
+                            :class="{ 'rounded-tl': index === 0 }"
+                        ></td>
                         <td>
                             <input
                                 type="text"
@@ -29,29 +33,35 @@
                             />
                         </td>
                         <td class="row-controls" v-if="!isReadOnly">
-                            <button @click="deleteValue(index)" class="inline text-lg antialiased text-gray-600 hover:text-gray-800 ">&times;</button>
+                            <button
+                                @click="deleteValue(index)"
+                                class="inline text-lg antialiased opacity-25 hover:opacity-75 cursor-pointer"
+                            >
+                                &times;
+                            </button>
                         </td>
                     </tr>
                 </tbody>
             </sortable-list>
         </table>
 
-        <button class="btn btn-sm" @click="addItem" v-if="!isReadOnly">
+        <Button @click="addItem" icon="plus" size="sm" v-if="!isReadOnly">
             {{ addButton }}
-        </button>
+        </Button>
     </div>
 </template>
 
 <script>
-import { SortableList, SortableItem, SortableHelpers } from '../sortable/Sortable';
+import Fieldtype from './Fieldtype.vue';
+import { SortableList, SortableHelpers } from '../sortable/Sortable';
+import { Button } from 'statamic';
 
 export default {
-
     mixins: [Fieldtype, SortableHelpers],
 
     components: {
         SortableList,
-        SortableItem
+        Button,
     },
 
     data() {
@@ -60,12 +70,12 @@ export default {
             editing: null,
             focused: false,
             mounted: false,
-            deleting: false
-        }
+            deleting: false,
+        };
     },
 
     mounted() {
-        this.$nextTick(() => this.mounted = true);
+        this.$nextTick(() => (this.mounted = true));
     },
 
     watch: {
@@ -74,16 +84,15 @@ export default {
             handler(data) {
                 if (!this.mounted) return;
                 this.updateDebounced(this.sortableToArray(data));
-            }
+            },
         },
-
 
         value: {
             immediate: true,
             handler(value) {
                 if (JSON.stringify(value) == JSON.stringify(this.sortableToArray(this.data))) return;
                 this.data = this.arrayToSortable(value);
-            }
+            },
         },
 
         focused(focused, oldFocused) {
@@ -97,7 +106,7 @@ export default {
                     this.editing = null;
                 }
             }, 1);
-        }
+        },
     },
 
     computed: {
@@ -127,13 +136,13 @@ export default {
 
         newItemInputPaste(event) {
             const value = event.clipboardData.getData('text');
-            if (!value.includes("\n")) {
+            if (!value.includes('\n')) {
                 return;
             }
 
-            this.deleteIfEmpty()
+            this.deleteIfEmpty();
 
-            value.split("\n").forEach((item) => {
+            value.split('\n').forEach((item) => {
                 this.data.push(this.newSortableValue(item));
             });
 
@@ -141,7 +150,6 @@ export default {
 
             event.preventDefault();
         },
-
 
         previousItem() {
             this.deleteIfEmpty();
@@ -157,7 +165,6 @@ export default {
             } else {
                 this.editItem(this.editing + 1 - deletedAdjustment);
             }
-
         },
 
         deleteIfEmpty() {
@@ -171,6 +178,6 @@ export default {
         deleteItem(index) {
             return this.data.splice(index, 1);
         },
-    }
+    },
 };
 </script>

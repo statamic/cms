@@ -15,11 +15,6 @@ class InvalidateTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    public function tearDown(): void
-    {
-        Mockery::close();
-    }
-
     #[Test]
     public function it_invalidates_a_form_when_its_blueprint_is_saved()
     {

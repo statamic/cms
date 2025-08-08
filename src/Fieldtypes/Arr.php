@@ -17,7 +17,7 @@ class Arr extends Fieldtype
     {
         return [
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Input Behavior'),
                 'fields' => [
                     'mode' => [
                         'display' => __('UI Mode'),
@@ -30,6 +30,21 @@ class Arr extends Fieldtype
                             'single' => __('Single'),
                         ],
                     ],
+                ],
+            ],
+            [
+                'display' => __('Appearance'),
+                'fields' => [
+                    'expand' => [
+                        'type' => 'toggle',
+                        'display' => __('Expand'),
+                        'instructions' => __('statamic::fieldtypes.array.config.expand'),
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Selection & Options'),
+                'fields' => [
                     'keys' => [
                         'display' => __('Keys'),
                         'instructions' => __('statamic::fieldtypes.array.config.keys'),
@@ -41,11 +56,6 @@ class Arr extends Fieldtype
                         'unless' => [
                             'mode' => 'dynamic',
                         ],
-                    ],
-                    'expand' => [
-                        'type' => 'toggle',
-                        'display' => __('Expand'),
-                        'instructions' => __('statamic::fieldtypes.array.config.expand'),
                     ],
                 ],
             ],
@@ -108,9 +118,14 @@ class Arr extends Fieldtype
 
         if ($this->config('expand')) {
             return collect($data)
+                ->when($this->isKeyed(), fn ($items) => $items->filter())
                 ->map(fn ($value, $key) => ['key' => $key, 'value' => $value])
                 ->values()
                 ->all();
+        }
+
+        if ($this->isKeyed()) {
+            return collect($data)->filter()->all();
         }
 
         return $data;

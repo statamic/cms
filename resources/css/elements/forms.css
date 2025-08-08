@@ -1,35 +1,15 @@
-/* ==========================================================================
-   BASE FORM ELEMENTS
-   ========================================================================== */
-
-label {
-    @apply text-gray-800 dark:text-dark-150 font-normal text-sm block leading-normal;
-}
-
-input {
-    @apply placeholder:text-gray-600 dark:placeholder:text-dark-175;
-}
-
-input[type="checkbox"],
-input[type="radio"] {
-    @apply text-lg;
-}
-
-select {
-    @apply text-base bg-gray-300 border-2 border-gray-300 cursor-pointer;
-}
-
-
-/* Text Fields
+/* Legacy Stuff to be removed
   ========================================================================== */
 
 .input-text {
-    @apply block appearance-none bg-gray-100 text-gray-800 border max-w-full w-full p-2 rounded shadow-inner placeholder:text-gray-600 text-md @lg:text-base;
-    @apply dark:bg-dark-650 dark:text-dark-150 dark:border-dark-900 dark:placeholder:text-dark-175 dark:shadow-inner-dark;
-    transition: border-color .15s ease-in-out,
-                box-shadow .15s ease-in-out;
-    &:focus, &:focus-within {
-        @apply ring-2 ring-blue-300 dark:ring-blue-600 outline-none;
+    @apply block w-full max-w-full appearance-none rounded-sm border bg-gray-100 p-2 text-sm text-gray-900 shadow-inner placeholder:text-gray-600 @lg:text-base;
+    @apply dark:border-dark-900 dark:bg-dark-650 dark:text-dark-150  dark:placeholder:text-dark-175;
+    transition:
+        border-color 0.15s ease-in-out,
+        box-shadow 0.15s ease-in-out;
+    &:focus,
+    &:focus-within {
+        @apply outline-hidden ring-2 ring-blue-300 dark:ring-blue-600;
     }
 
     &:not(textarea) {
@@ -37,71 +17,69 @@ select {
     }
 }
 
-/*  Used inside tables, grids, and so on */
-.input-text-minimal {
-    @apply appearance-none shadow-none bg-white dark:bg-dark-550 w-full p-2;
-
-    &:focus {
-        @apply outline-none bg-gray-200 dark:bg-dark-600;
-    }
-}
-
-
 /*  Needs an 'input' selector, otherwise when .input-text is used on a div, it's always considered read only. */
 input.input-text:read-only,
 textarea.input-text:read-only,
 input.input-text-minimal:read-only,
 .input-text.read-only {
-    @apply bg-gray-300 dark:bg-dark-600 text-gray-700 dark:text-dark-200;
+    @apply bg-gray-300 text-gray-700 dark:bg-dark-600 dark:text-dark-200;
 }
 
 /* Input Groups
   ========================================================================== */
 
 .input-group {
-    @apply appearance-none text-gray-800 w-full p-0 rounded flex items-center;
+    @apply flex w-full appearance-none items-center rounded-sm p-0 text-gray-900;
     @apply dark:text-dark-150;
     height: 2.375rem;
 
-    &:not(.focus-within-only):focus, &:not(.focus-within-only):focus-within {
+    &:not(.focus-within-only):focus,
+    &:not(.focus-within-only):focus-within {
         @apply ring-2 ring-blue-300;
         @apply dark:ring-blue-600;
 
-        .input-text:focus, .input-group-prepend:focus, .input-group-append:focus, .input-group-item:focus {
+        .input-text:focus,
+        .input-group-prepend:focus,
+        .input-group-append:focus,
+        .input-group-item:focus {
             outline: 0;
             box-shadow: none;
         }
     }
 
     .input-text {
-        @apply flex-1 border-gray-500 min-w-0;
+        @apply min-w-0 flex-1 border-gray-500;
         @apply dark:border-dark-900;
     }
 
     .input-text:not(:first-child) {
-        @apply rtl:rounded-r-none ltr:rounded-l-none rtl:border-r-0 ltr:border-l-0;
+        @apply ltr:rounded-l-none ltr:border-l-0 rtl:rounded-r-none rtl:border-r-0;
     }
 
     .input-text:not(:last-child) {
-        @apply rtl:rounded-l-none ltr:rounded-r-none rtl:border-l-0 ltr:border-r-0;
+        @apply ltr:rounded-r-none ltr:border-r-0 rtl:rounded-l-none rtl:border-l-0;
     }
 
     .input-text[dir='ltr']:not(:last-child) {
         @apply rtl:rounded-r rtl:border-r;
     }
 
-    .input-group-prepend, .input-group-append, .input-group-item {
-        @apply rtl:rounded-r ltr:rounded-l px-2 border dark:border-dark-900 text-sm text-gray-800 dark:text-dark-150 select-none;
+    .input-group-prepend,
+    .input-group-append,
+    .input-group-item {
+        @apply select-none border px-2 text-sm text-gray-900 dark:border-dark-900 dark:text-dark-150 ltr:rounded-l rtl:rounded-r;
         background: linear-gradient(180deg, #fff, #f9fafb);
+        background-clip: padding-box;
         border: 1px solid #c4cdd6;
-        box-shadow: 0 1px 0 0 rgba(25,30,35,.05);
+        box-shadow: 0 1px 0 0 rgba(25, 30, 35, 0.05);
         height: 2.375rem;
         line-height: 36px;
 
         .dark & {
-            background: linear-gradient(180deg, theme(colors.dark.500), theme(colors.dark.600));
-            border-color: theme(colors.dark.900);
-            box-shadow: 0 1px 0 0 rgba(0,0,0,.05);
+            background: linear-gradient(180deg, var(--color-dark-500), var(--color-dark-600));
+            background-clip: padding-box;
+            border-color: var(--color-dark-900);
+            box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.05);
         }
 
         &button {
@@ -110,20 +88,25 @@ input.input-text-minimal:read-only,
     }
 
     &:has(.input-text) {
-        .input-group-prepend, .input-group-append, .input-group-item {
+        .input-group-prepend,
+        .input-group-append,
+        .input-group-item {
             @apply dark:border-dark-900;
         }
     }
 
     &.focus-within-only {
-        .input-text:focus, .input-group-prepend:focus, .input-group-append:focus, .input-group-item:focus {
+        .input-text:focus,
+        .input-group-prepend:focus,
+        .input-group-append:focus,
+        .input-group-item:focus {
             @apply focus-outline;
             z-index: 1;
         }
     }
 
     .input-group-item {
-        @apply rtl:rounded-r-none ltr:rounded-l-none -mx-px;
+        @apply -mx-px ltr:rounded-l-none rtl:rounded-r-none;
     }
 
     button.input-group-item:hover:not(:disabled),
@@ -133,36 +116,40 @@ input.input-text-minimal:read-only,
     button.input-group-append:hover:not(:disabled),
     button.input-group-append:active:not(:disabled) {
         background: linear-gradient(180deg, #f9fafb, #f4f6f8);
+        background-clip: padding-box;
         border-color: #c4cdd5;
 
         .dark & {
-            background: linear-gradient(180deg, theme(colors.dark.550), theme(colors.dark.600));
-            border-color: theme(colors.dark.900);
+            background: linear-gradient(180deg, var(--color-dark-550), var(--color-dark-600));
+            background-clip: padding-box;
+            border-color: var(--color-dark-900);
         }
     }
 
     .input-group-append {
-        @apply rtl:rounded-r-none ltr:rounded-l-none rtl:border-l-0 ltr:border-r-0; /*  Rounded on the right side */
-        &:last-child { @apply rtl:rounded-l ltr:rounded-r rtl:border-l ltr:border-r; }
+        @apply ltr:rounded-l-none ltr:border-r-0 rtl:rounded-r-none rtl:border-l-0; /*  Rounded on the right side */
+        &:last-child {
+            @apply ltr:rounded-r ltr:border-r rtl:rounded-l rtl:border-l;
+        }
     }
 
-    > *:last-child[class*="input-group-"],
-    > *:last-child [class*="input-group-"] {
-        @apply rtl:rounded-l ltr:rounded-r;
+    > *:last-child[class*='input-group-'],
+    > *:last-child [class*='input-group-'] {
+        @apply ltr:rounded-r rtl:rounded-l;
     }
-
 }
 
 .input-group.input-group-sm {
     height: 1.625rem;
-    .input-group-prepend, .input-group-append, .input-group-item {
+    .input-group-prepend,
+    .input-group-append,
+    .input-group-item {
         @apply text-xs;
         height: 1.625rem;
         line-height: 25px;
         padding: 0 12px;
     }
 }
-
 
 /* Radio and Checkbox Fields
   ========================================================================== */
@@ -175,20 +162,20 @@ input.input-text-minimal:read-only,
     }
 
     input {
-        @apply leading-normal rtl:ml-1 ltr:mr-1;
+        @apply leading-normal ltr:mr-1 rtl:ml-1;
     }
 
     label {
-        @apply font-normal leading-none flex items-center;
+        @apply flex items-center font-normal leading-none;
     }
 }
 
 .radio-fieldtype .inline-mode,
 .checkboxes-fieldtype .inline-mode {
-    @apply flex items-center flex-wrap;
+    @apply flex flex-wrap items-center;
 
     .option {
-        @apply rtl:ml-4 ltr:mr-4 mb-3;
+        @apply mb-3 ltr:mr-4 rtl:ml-4;
         &:first-child {
             @apply mt-3;
         }
@@ -196,64 +183,74 @@ input.input-text-minimal:read-only,
 }
 
 .radio-box {
-    @apply border rounded cursor-pointer relative p-4 h-full;
+    @apply relative h-full cursor-pointer rounded-sm border p-4;
     &.selected {
-        @apply border-blue text-blue shadow;
+        @apply border-blue text-blue-600 shadow;
     }
 }
 
-
 /* Select Fields
   ========================================================================== */
-  .select-input-container {
-    @apply rounded relative;
+.select-input-container {
+    @apply relative rounded-sm;
 
     select {
-        @apply text-sm text-gray-800 dark:text-dark-150 shadow-button cursor-pointer block w-full h-full rtl:text-right ltr:text-left relative max-w-full;
-        @apply select-none rounded leading-normal align-middle whitespace-nowrap appearance-none subpixel-antialiased;
+        @apply relative block h-full w-full max-w-full cursor-pointer text-sm text-gray-900 shadow-sm dark:text-dark-150 ltr:text-left rtl:text-right;
+        @apply select-none appearance-none whitespace-nowrap rounded-sm align-middle leading-normal subpixel-antialiased;
 
         background: linear-gradient(180deg, #fff, #f9fafb);
+        background-clip: padding-box;
         border: 1px solid #c4cdd6;
         height: 2.375rem; /*  38px */
         letter-spacing: -0.01em;
-        padding: .475rem 1.75rem .475rem .75rem ; [dir="rtl"] & { padding: .475rem .75rem .475rem 1.75rem ; }
-
-        .dark & {
-            background: linear-gradient(180deg, theme(colors.dark.500), theme(colors.dark.600));
-            border-color: theme(colors.dark.800);
+        padding: 0.475rem 1.75rem 0.475rem 0.75rem;
+        [dir='rtl'] & {
+            padding: 0.475rem 0.75rem 0.475rem 1.75rem;
         }
 
-        &:hover:not(:disabled), &:active:not(:disabled) {
+        .dark & {
+            background: linear-gradient(180deg, var(--color-dark-500), var(--color-dark-600));
+            background-clip: padding-box;
+            border-color: var(--color-dark-800);
+        }
+
+        &:hover:not(:disabled),
+        &:active:not(:disabled) {
             background: linear-gradient(180deg, #f9fafb, #f4f6f8);
+            background-clip: padding-box;
             border-color: #c4cdd5;
 
             .dark & {
-                background: linear-gradient(180deg, theme(colors.dark.700), theme(colors.dark.750));
-                border-color: theme(colors.dark.900);
+                background: linear-gradient(180deg, var(--color-dark-700), var(--color-dark-750));
+                background-clip: padding-box;
+                border-color: var(--color-dark-900);
             }
         }
     }
 
     .select-input-toggle {
-        @apply pointer-events-none absolute inset-y-0 rtl:left-0 ltr:right-0 flex items-center px-2 text-gray-900 dark:text-dark-150;
+        @apply pointer-events-none absolute inset-y-0 flex items-center px-2 text-gray-900 dark:text-dark-150 ltr:right-0 rtl:left-0;
 
         svg {
-            @apply fill-current h-4 w-4;
+            @apply h-4 w-4 fill-current;
         }
     }
-  }
-
+}
 
 label .required {
     @apply text-red-500;
     font-style: normal;
 
     + .localizable-icon {
-        margin-left: 5px ; [dir="rtl"] & { margin-right: 5px ; margin-left: 0 ; }
+        margin-left: 5px;
+        [dir='rtl'] & {
+            margin-right: 5px;
+            margin-left: 0;
+        }
     }
 }
 
-input[type="file"] {
+input[type='file'] {
     padding: 16px;
     height: auto;
     line-height: 1;
@@ -261,25 +258,24 @@ input[type="file"] {
 
 .filter-control {
     background: #fff;
-    border: 1px solid rgba(0,0,0,.15);
+    border: 1px solid rgba(0, 0, 0, 0.15);
     font-size: 14px;
     line-height: 1.5;
     position: relative;
 
-    &.search { height: 34px !important; }
+    &.search {
+        height: 34px !important;
+    }
 }
 
-.help-block { width: 100%; }
-
+.help-block {
+    width: 100%;
+}
 
 /* Form groups
   ========================================================================== */
 .form-group {
-    @apply p-3 @sm:p-4 @lg:p-6 m-0;
-
-    label {
-        font-weight: 500;
-    }
+    /* @apply m-0 pb-3 last:pb-0; */
 
     .input-with-loader + .help-block {
         margin-top: 0;
@@ -301,17 +297,21 @@ input[type="file"] {
     padding: 0 !important;
     margin: 0 !important;
 
-    .form-group { flex-basis: auto; }
+    .form-group {
+        flex-basis: auto;
+    }
 
-    .major { flex: 1; }
+    .major {
+        flex: 1;
+    }
 }
 
 .help-block {
-    @apply block mb-2 text-gray-700 dark:text-dark-150/70 text-xs;
+    @apply mb-2 block text-xs text-gray-700 dark:text-dark-150/70;
     a {
-        @apply text-gray-800 dark:text-dark-175 underline;
+        @apply text-gray-900 underline dark:text-dark-175;
         &:hover {
-            @apply text-blue dark:text-dark-blue-100;
+            @apply text-blue-600 dark:text-dark-blue-100;
         }
     }
 }

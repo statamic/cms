@@ -1,71 +1,38 @@
 <template>
-
-    <div class="asset-manager">
-
-        <div class="flex items-center mb-6">
-            <h1 class="flex-1">{{ __(container.title) }}</h1>
-
-            <dropdown-list v-if="container.can_edit || container.can_delete" class="rtl:mr-4 ltr:ml-4">
-                <dropdown-item
-                    v-if="container.can_edit"
-                    v-text="__('Edit Container')"
-                    :redirect="container.edit_url">
-                </dropdown-item>
-                <dropdown-item
-                    v-text="__('Edit Blueprint')"
-                    :redirect="container.blueprint_url">
-                </dropdown-item>
-                <dropdown-item
-                    v-if="container.can_delete"
-                    v-text="__('Delete Container')"
-                    class="warning"
-                    @click="$refs.deleter.confirm()"
-                >
-                    <resource-deleter
-                        ref="deleter"
-                        :resource-title="__(container.title)"
-                        :route="container.delete_url">
-                    </resource-deleter>
-                </dropdown-item>
-            </dropdown-list>
-
-            <a :href="createContainerUrl" class="btn rtl:mr-4 ltr:ml-4" v-if="canCreateContainers">{{ __('Create Container') }}</a>
-        </div>
-
-        <asset-browser
-            ref="browser"
-            :initial-container="container"
-            :initial-per-page="$config.get('paginationSize')"
-            :initial-editing-asset-id="initialEditingAssetId"
-            :selected-path="path"
-            :selected-assets="selectedAssets"
-            @navigated="navigate"
-            @selections-updated="updateSelections"
-            @asset-doubleclicked="editAsset"
-            @edit-asset="editAsset" />
-
-    </div>
-
+    <asset-browser
+        ref="browser"
+        :can-create-containers="canCreateContainers"
+        :create-container-url="createContainerUrl"
+        :container="container"
+        :initial-per-page="$config.get('paginationSize')"
+        :initial-editing-asset-id="initialEditingAssetId"
+        :selected-path="path"
+        :selected-assets="selectedAssets"
+        :initial-columns="columns"
+        @navigated="navigate"
+        @selections-updated="updateSelections"
+        @asset-doubleclicked="editAsset"
+        @edit-asset="editAsset"
+    />
 </template>
 
 <script>
 export default {
-
     props: {
-        initialContainer: Object,
+        container: Object,
         initialPath: String,
         initialEditingAssetId: String,
         actions: Array,
         canCreateContainers: Boolean,
         createContainerUrl: String,
+        columns: Array,
     },
 
     data() {
         return {
-            container: this.initialContainer,
             path: this.initialPath,
             selectedAssets: [],
-        }
+        };
     },
 
     mounted() {
@@ -73,7 +40,6 @@ export default {
     },
 
     methods: {
-
         /**
          * Bind browser navigation features
          *
@@ -81,12 +47,29 @@ export default {
          * navigation back and forth through folders using browser buttons.
          */
         bindBrowserNavigation() {
-            window.history.replaceState({ container: this.container, path: this.path }, '');
+            window.history.replaceState({ container: { ...this.container }, path: this.path }, '');
 
             window.onpopstate = (e) => {
-                this.container = e.state.container;
                 this.path = e.state.path;
             };
+        },
+
+        editAsset(asset) {
+            event.preventDefault();
+            this.$refs.browser.edit(asset.id);
+        },
+
+        /**
+         * When a user has navigated to another folder.
+         */
+        navigate(path) {
+            this.path = path;
+            this.pushState();
+
+            // Clear out any selections. It would be confusing to navigate to a different
+            // folder and/or container, perform an action, and discover you performed
+            // it on an asset that was still selected, but no longer visible.
+            this.selectedAssets = [];
         },
 
         /**
@@ -99,23 +82,14 @@ export default {
                 url += '/' + this.path;
             }
 
-            window.history.pushState({
-                container: this.container, path: this.path
-            }, '', url);
-        },
-
-        /**
-         * When a user has navigated to another folder or container
-         */
-        navigate(container, path) {
-            this.container = container;
-            this.path = path;
-            this.pushState();
-
-            // Clear out any selections. It would be confusing to navigate to a different
-            // folder and/or container, perform an action, and discover you performed
-            // it on an asset that was still selected, but no longer visible.
-            this.selectedAssets = [];
+            window.history.pushState(
+                {
+                    container: { ...this.container },
+                    path: this.path,
+                },
+                '',
+                url,
+            );
         },
 
         /**
@@ -124,13 +98,6 @@ export default {
         updateSelections(selections) {
             this.selectedAssets = selections;
         },
-
-        editAsset(asset) {
-            event.preventDefault()
-            this.$refs.browser.edit(asset.id);
-        }
-
-    }
-
-}
+    },
+};
 </script>

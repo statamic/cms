@@ -32,7 +32,7 @@ class ViewBlueprintListingTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->get(cp_route('taxonomies.blueprints.index', 'test'))
+            ->get(cp_route('blueprints.taxonomies.index', 'test'))
             ->assertSuccessful()
             ->assertViewHas('blueprints', collect([
                 [
@@ -42,8 +42,8 @@ class ViewBlueprintListingTest extends TestCase
                     'tabs' => 2,
                     'fields' => 2,
                     'hidden' => false,
-                    'edit_url' => 'http://localhost/cp/taxonomies/test/blueprints/foo/edit',
-                    'delete_url' => 'http://localhost/cp/taxonomies/test/blueprints/foo',
+                    'edit_url' => 'http://localhost/cp/fields/blueprints/taxonomies/test/foo/edit',
+                    'delete_url' => 'http://localhost/cp/fields/blueprints/taxonomies/test/foo',
                 ],
                 [
                     'id' => 'bar',
@@ -52,8 +52,8 @@ class ViewBlueprintListingTest extends TestCase
                     'tabs' => 2,
                     'fields' => 2,
                     'hidden' => false,
-                    'edit_url' => 'http://localhost/cp/taxonomies/test/blueprints/bar/edit',
-                    'delete_url' => 'http://localhost/cp/taxonomies/test/blueprints/bar',
+                    'edit_url' => 'http://localhost/cp/fields/blueprints/taxonomies/test/bar/edit',
+                    'delete_url' => 'http://localhost/cp/fields/blueprints/taxonomies/test/bar',
                 ],
             ]))
             ->assertDontSee('no-results');
@@ -69,7 +69,7 @@ class ViewBlueprintListingTest extends TestCase
         $response = $this
             ->from('/cp/original')
             ->actingAs($user)
-            ->get(cp_route('taxonomies.blueprints.index', 'test'))
+            ->get(cp_route('blueprints.taxonomies.index', 'test'))
             ->assertRedirect('/cp/original');
     }
 

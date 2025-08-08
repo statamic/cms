@@ -1,104 +1,88 @@
 <template>
-
-    <stack narrow name="nav-item-editor" @closed="$emit('closed')">
-        <div slot-scope="{ close }" class="bg-white dark:bg-dark-800 h-full flex flex-col">
-
-            <div class="bg-gray-200 dark:bg-dark-600 px-6 py-2 border-b border-gray-300 dark:border-dark-900 text-lg font-medium flex items-center justify-between">
-                {{ creating ? __('Add Nav Item') : __('Edit Nav Item') }}
-                <button
-                    type="button"
-                    class="btn-close"
-                    @click="close"
-                    v-html="'&times'" />
+    <stack narrow name="nav-item-editor" @closed="$emit('closed')" v-slot="{ close }">
+        <div class="m-2 flex h-full flex-col rounded-xl bg-white dark:bg-gray-800">
+            <div
+                class="flex items-center justify-between rounded-t-xl border-b border-gray-300 bg-gray-50 px-4 py-2 dark:border-gray-950 dark:bg-gray-900"
+            >
+                <Heading size="lg">{{ creating ? __('Add Nav Item') : __('Edit Nav Item') }}</Heading>
+                <Button icon="x" variant="ghost" class="-me-2" @click="close" />
             </div>
 
             <div class="flex-1 overflow-auto">
-                <div class="px-2">
-                    <div class="publish-fields @container">
+                <div class="p-3 flex flex-col space-y-6">
+                    <Field id="display" :label="__('Display')" required>
+                        <Input id="display" v-model="config.display" :focus="true" :error="validateDisplay ? __('statamic::validation.required') : null" />
+                    </Field>
 
-                        <div class="form-group publish-field w-full" :class="{ 'has-error': validateDisplay }">
-                            <div class="field-inner">
-                                <label class="text-sm font-medium mb-2">{{ __('Display') }} <span class="text-red-500">*</span></label>
-                                <text-input v-model="config.display" :focus="true" />
-                                <div v-if="validateDisplay" class="help-block text-red-500 mt-2"><p>{{ __('statamic::validation.required') }}</p></div>
-                            </div>
-                        </div>
+                    <Field id="url" :label="__('URL')" required>
+                        <Input id="url" v-model="config.url" :error="validateUrl ? __('statamic::validation.required') : null" />
+                    </Field>
 
-                        <div class="form-group publish-field w-full" :class="{ 'has-error': validateUrl }">
-                            <div class="field-inner">
-                                <label class="text-sm font-medium mb-2">{{ __('URL') }} <span class="text-red-500">*</span></label>
-                                <div class="help-block -mt-2">
-                                    <p v-text="__('Enter any internal or external URL.')"></p>
-                                </div>
-                                <text-input v-model="config.url" />
-                                <div v-if="validateUrl" class="help-block text-red-500 mt-2"><p>{{ __('statamic::validation.required') }}</p></div>
-                            </div>
-                        </div>
+                    <Field v-if="!isChild" id="icon" :label="__('Icon')">
+                        <publish-field-meta
+                            :config="{ handle: 'icon', type: 'icon' }"
+                            :initial-value="config.icon"
+                            v-slot="{ meta, value, loading, config: fieldtypeConfig }"
+                        >
+                            <icon-fieldtype
+                                v-if="!loading"
+                                handle="icon"
+                                :config="fieldtypeConfig"
+                                :meta="meta"
+                                :value="value"
+                                @update:value="config.icon = $event"
+                            />
+                        </publish-field-meta>
+                    </Field>
 
-                        <div class="form-group publish-field w-full" v-if="! isChild">
-                            <div class="field-inner">
-                                <label class="text-sm font-medium mb-2">{{ __('Icon') }}</label>
-                                <publish-field-meta
-                                    :config="{ handle: 'icon', type: 'icon', folder: 'light' }"
-                                    :initial-value="config.icon"
-                                    v-slot="{ meta, value, loading }"
-                                >
-                                    <icon-fieldtype v-if="!loading" handle="icon" :meta="meta" :value="value" @input="config.icon = $event" />
-                                </publish-field-meta>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
-                <div class="p-6">
-                    <button
-                        class="btn-primary w-full"
-                        :class="{ 'opacity-50': false }"
-                        :disabled="false"
-                        @click="save"
-                        v-text="__('Save')" />
+                    <Button variant="primary" :text="__('Save')" @click="save" />
                 </div>
             </div>
-
         </div>
     </stack>
-
 </template>
 
 <script>
-import { data_get } from  '../../bootstrap/globals.js'
+import { Button, Heading, Field, Input } from '@statamic/ui';
+import { data_get } from '../../bootstrap/globals.js';
 
 export default {
+    components: {
+        Button,
+        Heading,
+        Field,
+        Input,
+    },
+
+    emits: ['closed', 'updated'],
 
     props: {
         creating: false,
-        item: {},
+        item: null,
         isChild: false,
     },
 
     data() {
         return {
-            config: clone(data_get(this.item, 'config', this.createNewItem())),
+            config: { ...(this.item?.data?.config || this.createNewItem()) },
             saveKeyBinding: null,
             validateDisplay: false,
             validateUrl: false,
-        }
+        };
     },
 
     created() {
-        this.saveKeyBinding = this.$keys.bindGlobal(['enter', 'mod+enter', 'mod+s'], e => {
+        this.saveKeyBinding = this.$keys.bindGlobal(['enter', 'mod+enter', 'mod+s'], (e) => {
             e.preventDefault();
             this.save();
         });
     },
 
-    destroyed() {
+    unmounted() {
         this.saveKeyBinding.destroy();
     },
 
     methods: {
-
         createNewItem() {
             return {
                 display: '',
@@ -111,11 +95,11 @@ export default {
             this.validateDisplay = false;
             this.validateUrl = false;
 
-            if (! this.config.display) {
+            if (!this.config.display) {
                 this.validateDisplay = true;
             }
 
-            if (! this.config.url) {
+            if (!this.config.url) {
                 this.validateUrl = true;
             }
 
@@ -127,14 +111,12 @@ export default {
 
             if (this.isChild) {
                 config.icon = null;
-            } else if (! config.icon) {
+            } else if (!config.icon) {
                 config.icon = data_get(this.item, 'original.icon');
             }
 
             this.$emit('updated', this.config, this.item);
         },
-
     },
-
-}
+};
 </script>

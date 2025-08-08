@@ -5,10 +5,8 @@ namespace Statamic\Http\Controllers\CP\Collections;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Entries\Entry as EntryContract;
-use Statamic\CP\Breadcrumbs;
 use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades\Action;
-use Statamic\Facades\Asset;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
@@ -70,7 +68,11 @@ class EntriesController extends CpController
 
         if ($search = request('search')) {
             if ($collection->hasSearchIndex()) {
-                return $collection->searchIndex()->ensureExists()->search($search);
+                return $collection
+                    ->searchIndex()
+                    ->ensureExists()
+                    ->search($search)
+                    ->where('collection', $collection->handle());
             }
 
             $query->where('title', 'like', '%'.$search.'%');
@@ -118,7 +120,7 @@ class EntriesController extends CpController
                 'revisions' => $entry->revisionsUrl(),
                 'restore' => $entry->restoreRevisionUrl(),
                 'createRevision' => $entry->createRevisionUrl(),
-                'editBlueprint' => cp_route('collections.blueprints.edit', [$collection, $blueprint]),
+                'editBlueprint' => cp_route('blueprints.collections.edit', [$collection, $blueprint]),
             ],
             'values' => array_merge($values, ['id' => $entry->id()]),
             'extraValues' => $extraValues,
@@ -130,7 +132,6 @@ class EntriesController extends CpController
             'locale' => $entry->locale(),
             'localizedFields' => $entry->data()->keys()->all(),
             'originBehavior' => $collection->originBehavior(),
-            'isRoot' => $entry->isRoot(),
             'hasOrigin' => $hasOrigin,
             'originValues' => $originValues ?? null,
             'originMeta' => $originMeta ?? null,
@@ -153,9 +154,7 @@ class EntriesController extends CpController
                 ];
             })->values()->all(),
             'hasWorkingCopy' => $entry->hasWorkingCopy(),
-            'preloadedAssets' => $this->extractAssetsFromValues($values),
             'revisionsEnabled' => $entry->revisionsEnabled(),
-            'breadcrumbs' => $this->breadcrumbs($collection),
             'canManagePublishState' => User::current()->can('publish', $entry),
             'previewTargets' => $collection->previewTargets()->all(),
             'autosaveInterval' => $collection->autosaveInterval(),
@@ -233,27 +232,7 @@ class EntriesController extends CpController
             $tree = $entry->structure()->in($entry->locale());
         }
 
-        $parent = $values->get('parent');
-
-        if ($structure && ! $collection->orderable()) {
-            $this->validateParent($entry, $tree, $parent);
-
-            if (! $entry->revisionsEnabled()) {
-                $entry->afterSave(function ($entry) use ($parent, $tree) {
-                    if ($parent && optional($tree->find($parent))->isRoot()) {
-                        $parent = null;
-                    }
-
-                    $tree
-                        ->move($entry->id(), $parent)
-                        ->save();
-                });
-
-                $entry->remove('parent');
-            }
-        }
-
-        $this->validateUniqueUri($entry, $tree ?? null, $parent ?? null);
+        $this->validateUniqueUri($entry, $tree ?? null, $entry->parent()?->id());
 
         if ($entry->revisionsEnabled() && $entry->published()) {
             $saved = $entry
@@ -302,10 +281,6 @@ class EntriesController extends CpController
 
         $values = Entry::make()->collection($collection)->values()->all();
 
-        if ($collection->hasStructure() && $request->parent) {
-            $values['parent'] = $request->parent;
-        }
-
         $fields = $blueprint
             ->fields()
             ->addValues($values)
@@ -321,6 +296,7 @@ class EntriesController extends CpController
             'title' => $collection->createLabel(),
             'actions' => [
                 'save' => cp_route('collections.entries.store', [$collection->handle(), $site->handle()]),
+                'editBlueprint' => cp_route('blueprints.collections.edit', [$collection, $blueprint]),
             ],
             'values' => $values->all(),
             'extraValues' => [
@@ -345,10 +321,10 @@ class EntriesController extends CpController
                 ];
             })->values()->all(),
             'revisionsEnabled' => $collection->revisionsEnabled(),
-            'breadcrumbs' => $this->breadcrumbs($collection),
             'canManagePublishState' => User::current()->can('publish '.$collection->handle().' entries'),
             'previewTargets' => $collection->previewTargets()->all(),
             'autosaveInterval' => $collection->autosaveInterval(),
+            'parent' => $collection->hasStructure() ? $request->parent : null,
         ];
 
         if ($request->wantsJson()) {
@@ -403,7 +379,7 @@ class EntriesController extends CpController
         }
 
         if ($structure && ! $collection->orderable()) {
-            $parent = $values['parent'] ?? null;
+            $parent = $request->_parent;
             $entry->afterSave(function ($entry) use ($parent, $tree) {
                 if ($parent && optional($tree->find($parent))->isRoot()) {
                     $parent = null;
@@ -443,54 +419,6 @@ class EntriesController extends CpController
 
             return null;
         };
-    }
-
-    protected function extractAssetsFromValues($values)
-    {
-        return collect($values)
-            ->filter(function ($value) {
-                return is_string($value);
-            })
-            ->map(function ($value) {
-                preg_match_all('/"asset::([^"]+)"/', $value, $matches);
-
-                return str_replace('\/', '/', $matches[1]) ?? null;
-            })
-            ->flatten(2)
-            ->unique()
-            ->map(function ($id) {
-                return Asset::find($id);
-            })
-            ->filter()
-            ->values();
-    }
-
-    private function validateParent($entry, $tree, $parent)
-    {
-        if ($entry->id() == $parent) {
-            throw ValidationException::withMessages(['parent' => __('statamic::validation.parent_cannot_be_itself')]);
-        }
-
-        // If there's no parent selected, the entry will be at end of the top level, which is fine.
-        // If the entry being edited is not the root, then we don't have anything to worry about.
-        // If the parent is the root, that's fine, and is handled during the tree update later.
-        if (! $parent || ! $entry->page()->isRoot()) {
-            $maxDepth = $entry->collection()->structure()->maxDepth();
-
-            // If a parent is selected, validate that it doesn't exceed the max depth of the structure.
-            if ($parent && $maxDepth && Entry::find($parent)->page()->depth() >= $maxDepth) {
-                throw ValidationException::withMessages(['parent' => __('statamic::validation.parent_exceeds_max_depth')]);
-            }
-
-            return;
-        }
-
-        // There will always be a next page since we couldn't have got this far with a single page.
-        $nextTopLevelPage = $tree->pages()->all()->skip(1)->first();
-
-        if ($nextTopLevelPage->id() === $parent || $nextTopLevelPage->pages()->all()->count() > 0) {
-            throw ValidationException::withMessages(['parent' => __('statamic::validation.parent_causes_root_children')]);
-        }
     }
 
     private function validateUniqueUri($entry, $tree, $parent)
@@ -534,20 +462,6 @@ class EntriesController extends CpController
                 'is_root' => false,
             ])
             ->build($entry->route());
-    }
-
-    protected function breadcrumbs($collection)
-    {
-        return new Breadcrumbs([
-            [
-                'text' => __('Collections'),
-                'url' => cp_route('collections.index'),
-            ],
-            [
-                'text' => $collection->title(),
-                'url' => $collection->showUrl(),
-            ],
-        ]);
     }
 
     protected function getAuthorizedSitesForCollection($collection)

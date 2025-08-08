@@ -1,89 +1,82 @@
-@php use function Statamic\trans as __; @endphp
+@php
+    use function Statamic\trans as __;
+@endphp
 
 @extends('statamic::layout')
-@section('title', __('Updater'))
+@section('title', __('Updates'))
 
 @section('content')
-
     @if ($requestError)
-
-        <div class="no-results md:pt-30 max-w-2xl mx-auto">
+        <div class="no-results mx-auto max-w-6xl md:pt-30">
             <div class="flex flex-wrap items-center">
                 <div class="w-full md:w-1/2">
                     <h1 class="mb-8">{{ __('Updates') }}</h1>
-                    <p class="text-gray-700 leading-normal mb-8 text-lg antialiased">
+                    <p class="mb-8 text-lg leading-normal text-gray-700 antialiased">
                         {{ __('statamic::messages.outpost_issue_try_later') }}
                     </p>
-                    <a href="{{ cp_route('updater') }}"
-                        class="btn-primary btn-lg">{{ __('Try again') }}</a>
+                    <a href="{{ cp_route('updater') }}" class="btn-primary btn-lg">{{ __('Try again') }}</a>
                 </div>
-                <div class="hidden md:block w-1/2 rtl:pr-16 ltr:pl-16">
+                <div class="hidden w-1/2 md:block ltr:pl-16 rtl:pr-16">
                     @cp_svg('empty/navigation')
                 </div>
             </div>
         </div>
-
     @else
+        <ui-header title="{{ __('Updates') }}" icon="updates"></ui-header>
 
-        <div class="flex mb-6">
-            <h1 class="flex-1">{{ __('Updates') }}</h1>
-        </div>
+        <section class="space-y-6">
+            <ui-panel heading="{{ __('Core') }}">
+                <ui-card class="py-0!">
+                    <ui-table class="w-full">
+                        <ui-table-row>
+                            <ui-table-cell class="w-64 font-bold">
+                                <a href="{{ route('statamic.cp.updater.product', 'statamic') }}">
+                                    {{ __('Statamic') }}
+                                </a>
+                            </ui-table-cell>
+                            <ui-table-cell>{{ $statamic->currentVersion() }}</ui-table-cell>
+                            @if ($count = $statamic->availableUpdatesCount())
+                                <ui-table-cell class="text-right">
+                                    <ui-badge size="sm" color="green">{{ trans_choice('1 update|:count updates', $count) }}</ui-badge>
+                                </ui-table-cell>
+                            @else
+                                <ui-table-cell class="text-right">{{ __('Up to date') }}</ui-table-cell>
+                            @endif
+                        </ui-table-row>
+                    </ui-table>
+                </ui-card>
+            </ui-panel>
 
-        <h6 class="mt-8">{{ __('Core') }}</h6>
-        <div class="card p-0 mt-2">
-            <table class="data-table">
-                <tr>
-                    <td class="w-64"><a href="{{ route('statamic.cp.updater.product', 'statamic') }}" class="text-blue font-bold">{{ __('Statamic') }}</a></td>
-                    <td>{{ $statamic->currentVersion() }}</td>
-                    @if ($count = $statamic->availableUpdatesCount())
-                        <td class="rtl:text-left ltr:text-right"><span class="badge-sm bg-green-600 btn-xs">{{ trans_choice('1 update|:count updates', $count) }}</span></td>
-                    @else
-                        <td class="rtl:text-left ltr:text-right">{{ __('Up to date') }}</td>
-                    @endif
-                </tr>
-            </table>
-        </div>
+            @if ($addons->count())
+                <ui-panel heading="{{ __('Addons') }}">
+                    <ui-card class="py-0!">
+                        <ui-table class="w-full">
+                            @foreach ($addons as $addon)
+                                <ui-table-row>
+                                    <ui-table-cell class="w-64 font-bold">
+                                        <a href="{{ route('statamic.cp.updater.product', $addon->slug()) }}">
+                                            {{ $addon->name() }}
+                                        </a>
+                                    </ui-table-cell>
+                                    <ui-table-cell>{{ $addon->version() }}</ui-table-cell>
+                                    @if ($count = $addon->changelog()->availableUpdatesCount())
+                                        <ui-table-cell class="text-right">
+                                            <ui-badge size="sm" color="green">{{ trans_choice('1 update|:count updates', $count) }}</ui-badge>
+                                        </ui-table-cell>
+                                    @else
+                                        <ui-table-cell class="text-right">{{ __('Up to date') }}</ui-table-cell>
+                                    @endif
+                                </ui-table-row>
+                            @endforeach
+                        </ui-table>
+                    </ui-card>
+                </ui-panel>
+            @endif
+        </section>
 
-        @if($addons->count())
-            <h6 class="mt-8">{{ __('Addons') }}</h6>
-            <div class="card p-0 mt-2">
-                <table class="data-table">
-                    @foreach ($addons as $addon)
-                    <tr>
-                        <td class="w-64"><a href="{{ route('statamic.cp.updater.product', $addon -> slug()) }}"
-                                class="text-blue font-bold rtl:ml-2 ltr:mr-2">{{ $addon -> name() }}</a>
-                        <td>{{ $addon -> version() }}</td>
-                        @if ($count = $addon->changelog()->availableUpdatesCount())
-                        <td class="rtl:text-left ltr:text-right"><span
-                                class="badge-sm bg-green-600 btn-xs">{{ trans_choice('1 update|:count updates', $count) }}</span></td>
-                        @else
-                        <td class="rtl:text-left ltr:text-right">{{ __('Up to date') }}</td>
-                        @endif
-                    </tr>
-                    @endforeach
-                </table>
-            </div>
-        @endif
-
-        @if($unlistedAddons->count())
-            <h6 class="mt-8">{{ __('Unlisted Addons') }}</h6>
-            <div class="card p-0 mt-2">
-                <table class="data-table">
-                    @foreach ($unlistedAddons as $addon)
-                        <tr>
-                            <td class="w-64">{{ $addon->name() }}</td>
-                            <td>{{ $addon->version() }}</td>
-                        </tr>
-                    @endforeach
-                </table>
-            </div>
-        @endif
-
-        @include('statamic::partials.docs-callout', [
-            'topic' => __('Updates'),
-            'url' => Statamic::docsUrl('updating')
-        ])
-
+        <x-statamic::docs-callout
+            :topic="__('Updates')"
+            :url="Statamic::docsUrl('updating')"
+        />
     @endif
-
 @endsection

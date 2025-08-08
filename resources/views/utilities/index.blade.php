@@ -1,33 +1,34 @@
-@php use function Statamic\trans as __; @endphp
+@php
+    use function Statamic\trans as __;
+@endphp
 
 @extends('statamic::layout')
 @section('title', __('Utilities'))
 
 @section('content')
+    <ui-header title="{{ __('Utilities') }}" icon="utilities" />
 
-    <header class="mb-6">
-        <h1>{{ __('Utilities') }}</h1>
-    </header>
-
-    <div class="card p-4 content">
+    <ui-card-panel>
         <div class="flex flex-wrap">
-        @foreach ($utilities as $utility)
-            <a href="{{ $utility->url() }}" class="w-full lg:w-1/2 p-4 md:flex items-start hover:bg-gray-200 dark:hover:bg-dark-575 border border-transparent dark:hover:border-dark-400 rounded-md group">
-                <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
-                    {!! $utility->icon() !!}
-                </div>
-                <div class="text-blue flex-1 mb-4 md:mb-0 rtl:md:ml-6 ltr:md:mr-6">
-                    <h3>{{ $utility->title() }}</h3>
-                    <p class="text-xs">{{ $utility->description() }}</p>
-                </div>
-            </a>
-        @endforeach
+            @foreach ($utilities as $utility)
+                <a
+                    href="{{ $utility->url() }}"
+                    class="group w-full items-start rounded-md border border-transparent p-4 hover:bg-gray-100 dark:hover:border-dark-400 dark:hover:bg-dark-575 md:flex lg:w-1/2"
+                >
+                    <div class="size-6 text-gray-400 mt-1 me-4">
+                        {!! $utility->icon() !!}
+                    </div>
+                    <div class="mb-4 flex-1 md:mb-0 md:me-6">
+                        <ui-heading size="lg">{{ $utility->title() }}</ui-heading>
+                        <ui-subheading>{{ $utility->description() }}</ui-subheading>
+                    </div>
+                </a>
+            @endforeach
         </div>
-    </div>
+    </ui-card-panel>
 
-    @include('statamic::partials.docs-callout', [
-        'topic' => __('Utilities'),
-        'url' => Statamic::docsUrl('extending/utilities')
-    ])
-
+    <x-statamic::docs-callout
+        topic="{{ __('Utilities') }}"
+        url="{{ Statamic::docsUrl('extending/utilities') }}"
+    />
 @endsection

@@ -3,6 +3,8 @@
 namespace Statamic\Http\Controllers\CP\Globals;
 
 use Illuminate\Http\Request;
+use Statamic\CP\Breadcrumbs\Breadcrumb;
+use Statamic\CP\Breadcrumbs\Breadcrumbs;
 use Statamic\Facades\GlobalSet;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\Fields\ManagesBlueprints;
@@ -23,6 +25,25 @@ class GlobalsBlueprintController extends CpController
         }
 
         $blueprint = $this->blueprint($set);
+
+        Breadcrumbs::push(new Breadcrumb(
+            text: 'Globals',
+        ));
+
+        Breadcrumbs::push(new Breadcrumb(
+            text: $set->title(),
+            url: request()->url(),
+            icon: 'globals',
+            links: GlobalSet::all()
+                ->reject(fn ($s) => $s->handle() === $set->handle())
+                ->map(fn ($s) => [
+                    'text' => $s->title(),
+                    'icon' => 'globals',
+                    'url' => cp_route('blueprints.globals.edit', $s->handle()),
+                ])
+                ->values()
+                ->all(),
+        ));
 
         return view('statamic::globals.blueprints.edit', [
             'set' => $set,
