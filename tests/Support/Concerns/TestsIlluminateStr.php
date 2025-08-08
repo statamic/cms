@@ -435,25 +435,29 @@ trait TestsIlluminateStr
         $this->assertEquals(["Class@anonymous\0/laravel/382.php:8$2ec", null], Str::parseCallback("Class@anonymous\0/laravel/382.php:8$2ec"));
     }
 
-    public function testSlug()
-    {
-        $this->assertSame('hello-world', Str::slug('hello world'));
-        $this->assertSame('hello-world', Str::slug('hello-world'));
-        $this->assertSame('hello-world', Str::slug('hello_world'));
-        $this->assertSame('hello_world', Str::slug('hello_world', '_'));
-        $this->assertSame('user-at-host', Str::slug('user@host'));
-        $this->assertSame('سلام-دنیا', Str::slug('سلام دنیا', '-', null));
-        $this->assertSame('sometext', Str::slug('some text', ''));
-        $this->assertSame('', Str::slug('', ''));
-        $this->assertSame('', Str::slug(''));
-        $this->assertSame('bsm-allah', Str::slug('بسم الله', '-', 'en', ['allh' => 'allah']));
-        $this->assertSame('500-dollar-bill', Str::slug('500$ bill', '-', 'en', ['$' => 'dollar']));
-        $this->assertSame('500-dollar-bill', Str::slug('500--$----bill', '-', 'en', ['$' => 'dollar']));
-        $this->assertSame('500-dollar-bill', Str::slug('500-$-bill', '-', 'en', ['$' => 'dollar']));
-        $this->assertSame('500-dollar-bill', Str::slug('500$--bill', '-', 'en', ['$' => 'dollar']));
-        $this->assertSame('500-dollar-bill', Str::slug('500-$--bill', '-', 'en', ['$' => 'dollar']));
-        $this->assertSame('أحمد-في-المدرسة', Str::slug('أحمد@المدرسة', '-', null, ['@' => 'في']));
-    }
+    /**
+     * We have overridden `slug()` in our implementation to allow for underscores,
+     * and to respect `config('statamic.system.ascii_replace_extra_symbols')`.
+     */
+    // public function testSlug()
+    // {
+    //     $this->assertSame('hello-world', Str::slug('hello world'));
+    //     $this->assertSame('hello-world', Str::slug('hello-world'));
+    //     $this->assertSame('hello-world', Str::slug('hello_world'));
+    //     $this->assertSame('hello_world', Str::slug('hello_world', '_'));
+    //     $this->assertSame('user-at-host', Str::slug('user@host'));
+    //     $this->assertSame('سلام-دنیا', Str::slug('سلام دنیا', '-', null));
+    //     $this->assertSame('sometext', Str::slug('some text', ''));
+    //     $this->assertSame('', Str::slug('', ''));
+    //     $this->assertSame('', Str::slug(''));
+    //     $this->assertSame('bsm-allah', Str::slug('بسم الله', '-', 'en', ['allh' => 'allah']));
+    //     $this->assertSame('500-dollar-bill', Str::slug('500$ bill', '-', 'en', ['$' => 'dollar']));
+    //     $this->assertSame('500-dollar-bill', Str::slug('500--$----bill', '-', 'en', ['$' => 'dollar']));
+    //     $this->assertSame('500-dollar-bill', Str::slug('500-$-bill', '-', 'en', ['$' => 'dollar']));
+    //     $this->assertSame('500-dollar-bill', Str::slug('500$--bill', '-', 'en', ['$' => 'dollar']));
+    //     $this->assertSame('500-dollar-bill', Str::slug('500-$--bill', '-', 'en', ['$' => 'dollar']));
+    //     $this->assertSame('أحمد-في-المدرسة', Str::slug('أحمد@المدرسة', '-', null, ['@' => 'في']));
+    // }
 
     public function testStrStart()
     {
@@ -462,20 +466,23 @@ trait TestsIlluminateStr
         $this->assertSame('/test/string', Str::start('//test/string', '/'));
     }
 
-    public function testFlushCache()
-    {
-        $reflection = new ReflectionClass(Str::class);
-        $property = $reflection->getProperty('snakeCache');
+    /**
+     * This tests protected property behavior, which is irrelevant to the purpose of this trait.
+     */
+    // public function testFlushCache()
+    // {
+    //     $reflection = new ReflectionClass(Str::class);
+    //     $property = $reflection->getProperty('snakeCache');
 
-        Str::flushCache();
-        $this->assertEmpty($property->getValue());
+    //     Str::flushCache();
+    //     $this->assertEmpty($property->getValue());
 
-        Str::snake('Taylor Otwell');
-        $this->assertNotEmpty($property->getValue());
+    //     Str::snake('Taylor Otwell');
+    //     $this->assertNotEmpty($property->getValue());
 
-        Str::flushCache();
-        $this->assertEmpty($property->getValue());
-    }
+    //     Str::flushCache();
+    //     $this->assertEmpty($property->getValue());
+    // }
 
     public function testFinish()
     {
