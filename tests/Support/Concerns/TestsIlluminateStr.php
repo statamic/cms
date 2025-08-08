@@ -1001,53 +1001,54 @@ trait TestsIlluminateStr
         $this->assertSame('żółtałódka', Str::snake('ŻółtaŁódka'));
     }
 
-    public function testTrim()
-    {
-        $this->markTestSkipped('Jason got frustrated with why this was failing and didnt have time to fix it. 🙃');
-
-        $this->assertSame('foo bar', Str::trim('   foo bar   '));
-        $this->assertSame('foo bar', Str::trim('foo bar   '));
-        $this->assertSame('foo bar', Str::trim('   foo bar'));
-        $this->assertSame('foo bar', Str::trim('foo bar'));
-        $this->assertSame(' foo bar ', Str::trim(' foo bar ', ''));
-        $this->assertSame('foo bar', Str::trim(' foo bar ', ' '));
-        $this->assertSame('foo  bar', Str::trim('-foo  bar_', '-_'));
-
-        $this->assertSame('foo    bar', Str::trim(' foo    bar '));
-
-        $this->assertSame('123', Str::trim('   123    '));
-        $this->assertSame('だ', Str::trim('だ'));
-        $this->assertSame('ム', Str::trim('ム'));
-        $this->assertSame('だ', Str::trim('   だ    '));
-        $this->assertSame('ム', Str::trim('   ム    '));
-
-        $this->assertSame(
-            'foo bar',
-            Str::trim('
-                foo bar
-            ')
-        );
-        $this->assertSame(
-            'foo
-                bar',
-            Str::trim('
-                foo
-                bar
-            ')
-        );
-
-        $this->assertSame("\xE9", Str::trim(" \xE9 "));
-
-        $trimDefaultChars = [' ', "\n", "\r", "\t", "\v", "\0"];
-
-        foreach ($trimDefaultChars as $char) {
-            $this->assertSame('', Str::trim(" {$char} "));
-            $this->assertSame(trim(" {$char} "), Str::trim(" {$char} "));
-
-            $this->assertSame('foo bar', Str::trim("{$char} foo bar {$char}"));
-            $this->assertSame(trim("{$char} foo bar {$char}"), Str::trim("{$char} foo bar {$char}"));
-        }
-    }
+    /**
+     * Our Str::trim() goes to Stringy.
+     */
+    //    public function testTrim()
+    //    {
+    //        $this->assertSame('foo bar', Str::trim('   foo bar   '));
+    //        $this->assertSame('foo bar', Str::trim('foo bar   '));
+    //        $this->assertSame('foo bar', Str::trim('   foo bar'));
+    //        $this->assertSame('foo bar', Str::trim('foo bar'));
+    //        $this->assertSame(' foo bar ', Str::trim(' foo bar ', ''));
+    //        $this->assertSame('foo bar', Str::trim(' foo bar ', ' '));
+    //        $this->assertSame('foo  bar', Str::trim('-foo  bar_', '-_'));
+    //
+    //        $this->assertSame('foo    bar', Str::trim(' foo    bar '));
+    //
+    //        $this->assertSame('123', Str::trim('   123    '));
+    //        $this->assertSame('だ', Str::trim('だ'));
+    //        $this->assertSame('ム', Str::trim('ム'));
+    //        $this->assertSame('だ', Str::trim('   だ    '));
+    //        $this->assertSame('ム', Str::trim('   ム    '));
+    //
+    //        $this->assertSame(
+    //            'foo bar',
+    //            Str::trim('
+    //                foo bar
+    //            ')
+    //        );
+    //        $this->assertSame(
+    //            'foo
+    //                bar',
+    //            Str::trim('
+    //                foo
+    //                bar
+    //            ')
+    //        );
+    //
+    //        $this->assertSame("\xE9", Str::trim(" \xE9 "));
+    //
+    //        $trimDefaultChars = [' ', "\n", "\r", "\t", "\v", "\0"];
+    //
+    //        foreach ($trimDefaultChars as $char) {
+    //            $this->assertSame('', Str::trim(" {$char} "));
+    //            $this->assertSame(trim(" {$char} "), Str::trim(" {$char} "));
+    //
+    //            $this->assertSame('foo bar', Str::trim("{$char} foo bar {$char}"));
+    //            $this->assertSame(trim("{$char} foo bar {$char}"), Str::trim("{$char} foo bar {$char}"));
+    //        }
+    //    }
 
     public function testLtrim()
     {
