@@ -45,6 +45,10 @@ export default class Theme {
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
             if (this.#preference.value === 'auto') this.#theme.value = e.matches ? 'dark' : 'light';
         });
+
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'statamic.theme') this.#theme.value = e.newValue;
+        });
     }
 
     #setTheme(preference) {
