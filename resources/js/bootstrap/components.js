@@ -20,7 +20,6 @@ import Slugify from '../components/slugs/Slugify.vue';
 import ElementContainer from '../components/ElementContainer.vue';
 import Avatar from '../components/Avatar.vue';
 import CreateEntryButton from '../components/entries/CreateEntryButton.vue';
-import Popover from '../components/Popover.vue';
 import Portal from '../components/portals/Portal.vue';
 import ConfirmationModal from '../components/modals/ConfirmationModal.vue';
 import KeyboardShortcutsModal from '../components/modals/KeyboardShortcutsModal.vue';
@@ -33,7 +32,6 @@ import CodeBlock from '../components/CodeBlock.vue';
 import BlueprintCreateForm from '../components/blueprints/BlueprintCreateForm.vue';
 import BlueprintResetter from '../components/blueprints/BlueprintResetter.vue';
 import GitStatus from '../components/GitStatus.vue';
-import { defineAsyncComponent } from 'vue';
 import DateTime from '../components/DateTime.vue';
 import UpdaterWidget from '../components/updater/UpdaterWidget.vue';
 
@@ -71,7 +69,6 @@ export default function registerGlobalComponents(app) {
     app.component('element-container', ElementContainer);
     app.component('avatar', Avatar);
     app.component('create-entry-button', CreateEntryButton);
-    app.component('popover', Popover);
     app.component('portal', Portal);
     app.component('code-block', CodeBlock);
     app.component('date-time', DateTime);
