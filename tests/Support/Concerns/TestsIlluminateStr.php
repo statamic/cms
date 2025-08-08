@@ -549,20 +549,20 @@ trait TestsIlluminateStr
     /**
      * This tests protected property behavior, which is irrelevant to the purpose of this trait.
      */
-    //public function testFlushCache()
-    //{
-    //    $reflection = new ReflectionClass(Str::class);
-    //    $property = $reflection->getProperty('snakeCache');
+    // public function testFlushCache()
+    // {
+    //     $reflection = new ReflectionClass(Str::class);
+    //     $property = $reflection->getProperty('snakeCache');
 
-    //    Str::flushCache();
-    //    $this->assertEmpty($property->getValue());
+    //     Str::flushCache();
+    //     $this->assertEmpty($property->getValue());
 
-    //    Str::snake('Taylor Otwell');
-    //    $this->assertNotEmpty($property->getValue());
+    //     Str::snake('Taylor Otwell');
+    //     $this->assertNotEmpty($property->getValue());
 
-    //    Str::flushCache();
-    //    $this->assertEmpty($property->getValue());
-    //}
+    //     Str::flushCache();
+    //     $this->assertEmpty($property->getValue());
+    // }
 
     public function testFinish()
     {
