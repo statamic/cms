@@ -27,7 +27,6 @@ import FieldActionModal from '../components/field-actions/FieldActionModal.vue';
 import ElevatedSessionModal from '../components/modals/ElevatedSessionModal.vue';
 import ResourceDeleter from '../components/ResourceDeleter.vue';
 import Stack from '../components/stacks/Stack.vue';
-import StackTest from '../components/stacks/StackTest.vue';
 import BlueprintCreateForm from '../components/blueprints/BlueprintCreateForm.vue';
 import BlueprintResetter from '../components/blueprints/BlueprintResetter.vue';
 import GitStatus from '../components/GitStatus.vue';
@@ -80,7 +79,6 @@ export default function registerGlobalComponents(app) {
     app.component('elevated-session-modal', ElevatedSessionModal);
 
     app.component('stack', Stack);
-    app.component('stack-test', StackTest);
 
     app.component('blueprint-create-form', BlueprintCreateForm);
     app.component('blueprint-resetter', BlueprintResetter);
