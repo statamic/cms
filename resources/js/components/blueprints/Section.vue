@@ -94,9 +94,11 @@
                         />
                     </publish-field-meta>
                 </div>
-                <div class="form-group w-full" v-if="showHideField">
-                    <label v-text="__('Hidden')" />
-                    <toggle-input v-model="editingSection.hide" />
+                <div class="form-group field-w-50" v-if="showHideField">
+                    <div class="flex items-center gap-2">
+                        <Switch v-model="editingSection.hide" />
+                        <Heading :text="__('Hidden')" />
+                    </div>
                 </div>
             </div>
         </confirmation-modal>
