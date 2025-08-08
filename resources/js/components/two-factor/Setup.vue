@@ -5,7 +5,7 @@ import TwoFactorRecoveryCodesModal from '@statamic/components/two-factor/Recover
 import axios from 'axios';
 import { Modal, Input, Button } from '@statamic/ui';
 
-const emit = defineEmits(['setup-complete', 'cancel', 'cancel']);
+const emit = defineEmits(['setup-complete', 'cancel', 'close']);
 
 const props = defineProps({
     enableUrl: String,
