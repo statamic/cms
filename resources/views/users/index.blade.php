@@ -12,7 +12,7 @@
                 category="{{ Statamic\CommandPalette\Category::Actions }}"
                 text="{{ __('Edit User Blueprint') }}"
                 url="{{ cp_route('blueprints.users.edit') }}"
-                icon="blueprints"
+                icon="blueprint-edit"
                 v-slot="{ text, url }"
             >
                 <ui-button

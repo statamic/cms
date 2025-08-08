@@ -398,7 +398,7 @@ export default {
             Statamic.$commandPalette.add({
                 category: Statamic.$commandPalette.category.Actions,
                 text: [__('Collection'), __('Edit Blueprints')],
-                icon: 'blueprints',
+                icon: 'blueprint-edit',
                 url: this.blueprintsUrl,
             });
 
