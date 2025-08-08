@@ -1,7 +1,6 @@
 import { defineAsyncComponent } from 'vue';
 import RevealerFieldtype from '../components/fieldtypes/RevealerFieldtype.vue';
 import TemplateFieldtype from '../components/fieldtypes/TemplateFieldtype.vue';
-import Toggle from '../components/inputs/Toggle.vue';
 import RelationshipInput from '../components/inputs/relationship/RelationshipInput.vue';
 import TextFieldtype from '../components/fieldtypes/TextFieldtype.vue';
 import TextareaFieldtype from '../components/fieldtypes/TextareaFieldtype.vue';
@@ -60,7 +59,6 @@ import SetPicker from '../components/fieldtypes/replicator/SetPicker.vue';
 import TimeFieldtype from '../components/fieldtypes/TimeFieldtype.vue';
 
 export default function registerFieldtypes(app) {
-    app.component('toggle-input', Toggle);
     app.component('relationship-input', RelationshipInput);
     app.component('text-fieldtype', TextFieldtype);
     app.component('textarea-fieldtype', TextareaFieldtype);
