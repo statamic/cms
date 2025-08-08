@@ -10,7 +10,7 @@
         >
             <div class="h-full overflow-scroll overflow-x-auto bg-white px-6 rounded-l-xl dark:bg-dark-800">
                 <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
-                    <loading-graphic />
+                    <Icon name="loading" />
                 </div>
 
                 <component
@@ -45,7 +45,12 @@
 </template>
 
 <script>
+import { Icon } from '@statamic/ui';
+
 export default {
+    components: {
+        Icon,
+    },
     props: {
         component: String,
         componentProps: Object,

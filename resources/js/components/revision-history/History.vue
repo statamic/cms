@@ -9,7 +9,7 @@
 
         <div class="flex-1 overflow-auto">
             <div class="loading flex h-full items-center justify-center" v-if="loading">
-                <loading-graphic />
+                <Icon name="loading" />
             </div>
 
             <Heading size="sm" class="p-3" v-if="!loading && revisions.length === 0">
@@ -37,13 +37,14 @@
 <script>
 import Revision from './Revision.vue';
 import DateFormatter from '@statamic/components/DateFormatter.js';
-import { Heading, Button } from '@statamic/ui';
+import { Heading, Button, Icon } from '@statamic/ui';
 
 export default {
     components: {
         Revision,
         Heading,
         Button,
+        Icon,
     },
 
     props: {

@@ -5,7 +5,7 @@
             :class="isImage ? 'is-image' : 'is-file'"
         >
             <div v-if="loading" class="loading">
-                <loading-graphic />
+                <Icon name="loading" />
             </div>
 
             <template v-if="!loading">
@@ -125,7 +125,7 @@
                     >
                         <div class="h-1/2 w-full overflow-scroll sm:p-4 md:h-full md:w-1/3 md:grow md:pt-px">
                             <div v-if="saving" class="loading">
-                                <loading-graphic text="Saving" />
+                                <Icon name="loading" />
                             </div>
 
                             <PublishTabs />
@@ -172,7 +172,7 @@
 import FocalPointEditor from './FocalPointEditor.vue';
 import PdfViewer from './PdfViewer.vue';
 import { pick, flatten } from 'lodash-es';
-import { Dropdown, DropdownMenu, DropdownItem, PublishContainer, PublishTabs } from '@statamic/ui';
+import { Dropdown, DropdownMenu, DropdownItem, PublishContainer, PublishTabs, Icon } from '@statamic/ui';
 import ItemActions from '@statamic/components/actions/ItemActions.vue';
 
 export default {
@@ -187,6 +187,7 @@ export default {
         PdfViewer,
         PublishContainer,
         PublishTabs,
+        Icon,
     },
 
     props: {

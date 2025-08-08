@@ -21,7 +21,7 @@
                     <template #initializing>
                         <div class="flex flex-1">
                             <div class="absolute inset-0 z-200 flex items-center justify-center text-center">
-                                <loading-graphic />
+                                <Icon name="loading" />
                             </div>
                         </div>
                     </template>
@@ -80,6 +80,7 @@ import {
     Panel,
     PanelFooter,
     ListingPagination, Slider, PanelHeader,
+    Icon,
 } from '@statamic/ui';
 import HasPreferences from '@statamic/components/data-list/HasPreferences.js';
 import Breadcrumbs from '@statamic/components/assets/Browser/Breadcrumbs.vue';
@@ -103,6 +104,7 @@ export default {
         Pagination,
         Panel,
         PanelFooter,
+        Icon,
     },
 
     props: {

@@ -13,7 +13,7 @@
                 <template #initializing>
                     <div class="flex flex-1">
                         <div class="absolute inset-0 z-200 flex items-center justify-center text-center">
-                            <loading-graphic />
+                            <Icon name="loading" />
                         </div>
                     </div>
                 </template>
@@ -132,6 +132,7 @@ import {
     PanelFooter,
     Heading,
     Checkbox,
+    Icon,
 } from '@statamic/ui';
 
 export default {
@@ -149,6 +150,7 @@ export default {
         PanelFooter,
         Heading,
         Checkbox,
+        Icon,
     },
 
     // todo, when opening and closing the stack, you cant save?

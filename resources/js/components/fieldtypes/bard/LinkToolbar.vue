@@ -51,7 +51,7 @@
                             class="flex w-full min-w-[240px] cursor-pointer items-center justify-between"
                             @click="openSelector"
                         >
-                            <loading-graphic v-if="isLoading" :inline="true" />
+                            <Icon v-if="isLoading" name="loading" />
 
                             <div v-else class="flex flex-1 items-center truncate me-2">
                                 <img
@@ -167,11 +167,13 @@
 import qs from 'qs';
 import AssetSelector from '../../assets/Selector.vue';
 import SvgIcon from '../../SvgIcon.vue';
+import { Icon } from '@statamic/ui';
 
 export default {
     components: {
         AssetSelector,
         SvgIcon,
+        Icon,
     },
 
     props: {

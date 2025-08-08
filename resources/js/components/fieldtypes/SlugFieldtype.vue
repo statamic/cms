@@ -32,7 +32,7 @@
                 >
                     <svg-icon name="light/synchronize" class="h-5 w-5" v-show="!syncing" />
                     <div class="h-5 w-5" v-show="syncing">
-                        <loading-graphic inline text="" class="mt-0.5 ml-0.5" />
+                        <Icon name="loading" class="mt-0.5 ml-0.5" />
                     </div>
                 </Button>
             </template>
@@ -43,7 +43,7 @@
 <script>
 import { data_get } from '../../bootstrap/globals';
 import Fieldtype from './Fieldtype.vue';
-import { Input, Button } from '@statamic/ui';
+import { Input, Button, Icon } from '@statamic/ui';
 
 export default {
     mixins: [Fieldtype],
@@ -51,6 +51,7 @@ export default {
     components: {
         Input,
         Button,
+        Icon,
     },
 
     data() {

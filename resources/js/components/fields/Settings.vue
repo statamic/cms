@@ -1,7 +1,7 @@
 <template>
     <div class="h-full overflow-auto bg-white dark:bg-gray-800 p-3 rounded-l-xl">
         <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
-            <loading-graphic />
+            <Icon name="loading" />
         </div>
 
         <header v-if="!loading" class="flex items-center justify-between pl-3">
@@ -61,7 +61,7 @@
 <script>
 import { FieldConditionsBuilder, FIELD_CONDITIONS_KEYS } from '../field-conditions/FieldConditions.js';
 import FieldValidationBuilder from '../field-validation/Builder.vue';
-import { Heading, Button, Tabs, TabList, TabTrigger, TabContent, CardPanel } from '@statamic/ui';
+import { Heading, Button, Tabs, TabList, TabTrigger, TabContent, CardPanel, Icon } from '@statamic/ui';
 
 export default {
     components: {
@@ -73,7 +73,8 @@ export default {
         TabList,
         TabTrigger,
         TabContent,
-        CardPanel
+        CardPanel,
+        Icon
     },
 
     props: {

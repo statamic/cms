@@ -3,7 +3,7 @@
         <div class="flex flex-1 items-center gap-3">
             <div class="size-7 flex items-center justify-center">
                 <ui-icon name="warning-diamond" class="size-5 text-red-500" v-tooltip="error" v-if="status === 'error'" />
-                <loading-graphic v-else :inline="true" text="" />
+                <Icon v-else name="loading" />
             </div>
 
             <div class="truncate">{{ basename }}</div>
@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import { Button, Dropdown, DropdownMenu, DropdownItem, Input } from '@statamic/ui';
+import { Button, Dropdown, DropdownMenu, DropdownItem, Input, Icon } from '@statamic/ui';
 
 export default {
     components: {
@@ -52,6 +52,7 @@ export default {
         DropdownMenu,
         DropdownItem,
         Input,
+        Icon,
     },
 
     props: {

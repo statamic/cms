@@ -6,7 +6,7 @@
         </header>
 
         <div v-if="!fieldtypesLoaded" class="absolute inset-0 z-200 flex items-center justify-center text-center">
-            <loading-graphic />
+            <Icon name="loading" />
         </div>
 
         <div class="flex p-3" v-if="fieldtypesLoaded">
@@ -56,10 +56,15 @@
 import fuzzysort from 'fuzzysort';
 import { ref } from 'vue';
 import { mapValues } from 'lodash-es';
+import { Icon } from '@statamic/ui';
 
 const loadedFieldtypes = ref(null);
 
 export default {
+    components: {
+        Icon,
+    },
+
     props: {
         allowTitle: {
             default: false,

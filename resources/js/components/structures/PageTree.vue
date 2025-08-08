@@ -6,7 +6,7 @@
 
         <ui-panel v-show="pages.length">
             <div class="loading card" v-if="loading">
-                <loading-graphic />
+                <Icon name="loading" />
             </div>
 
             <ui-panel-header>
@@ -90,7 +90,7 @@
 <script>
 import { dragContext, Draggable, walkTreeData } from '@he-tree/vue';
 import TreeBranch from './Branch.vue';
-import { PanelHeader, Panel } from '@statamic/ui';
+import { PanelHeader, Panel, Icon } from '@statamic/ui';
 
 export default {
     components: {
@@ -98,6 +98,7 @@ export default {
         TreeBranch,
         PanelHeader,
         Panel,
+        Icon,
     },
 
     props: {

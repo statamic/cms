@@ -8,7 +8,7 @@
         </ui-header>
 
         <ui-card v-if="gettingChangelog" class="text-center">
-            <loading-graphic />
+            <Icon name="loading" />
         </ui-card>
 
         <div
@@ -55,10 +55,12 @@
 
 <script>
 import Release from './Release.vue';
+import { Icon } from '@statamic/ui';
 
 export default {
     components: {
         Release,
+        Icon,
     },
 
     props: ['slug', 'package', 'name'],

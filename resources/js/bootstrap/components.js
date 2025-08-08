@@ -15,7 +15,7 @@ import CollectionWidget from '../components/entries/CollectionWidget.vue';
 import FormWidget from '../components/forms/FormWidget.vue';
 import SvgIcon from '../components/SvgIcon.vue';
 import FileIcon from '../components/FileIcon.vue';
-import LoadingGraphic from '../components/LoadingGraphic.vue';
+
 import Slugify from '../components/slugs/Slugify.vue';
 import ElementContainer from '../components/ElementContainer.vue';
 import Avatar from '../components/Avatar.vue';
@@ -64,7 +64,7 @@ export default function registerGlobalComponents(app) {
     // Reusable
     app.component('svg-icon', SvgIcon);
     app.component('file-icon', FileIcon);
-    app.component('loading-graphic', LoadingGraphic);
+
     app.component('slugify', Slugify);
     app.component('element-container', ElementContainer);
     app.component('avatar', Avatar);

@@ -12,7 +12,7 @@
                 <div
                     class="absolute inset-0 z-10 flex items-center justify-center bg-white bg-opacity-75 text-center dark:bg-dark-700"
                 >
-                    <loading-graphic />
+                    <Icon name="loading" />
                 </div>
             </div>
 
@@ -21,7 +21,7 @@
                     v-if="saving"
                     class="absolute inset-0 z-10 flex items-center justify-center bg-white bg-opacity-75 dark:bg-dark-500"
                 >
-                    <loading-graphic text="" />
+                    <Icon name="loading" />
                 </div>
 
                 <PublishContainer
@@ -66,7 +66,7 @@
 </template>
 
 <script>
-import { Heading, Button, PublishContainer } from '@statamic/ui';
+import { Heading, Button, PublishContainer, Icon } from '@statamic/ui';
 import { SavePipeline } from 'statamic';
 import { flatten } from 'lodash-es';
 import { computed, ref } from 'vue';
@@ -83,6 +83,7 @@ export default {
         Heading,
         Button,
         PublishContainer,
+        Icon,
     },
 
     props: {

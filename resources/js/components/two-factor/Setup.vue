@@ -1,9 +1,8 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import LoadingGraphic from '@statamic/components/LoadingGraphic.vue';
 import TwoFactorRecoveryCodesModal from '@statamic/components/two-factor/RecoveryCodesModal.vue';
 import axios from 'axios';
-import { Modal, Input, Button } from '@statamic/ui';
+import { Modal, Input, Button, Icon } from '@statamic/ui';
 
 const emit = defineEmits(['setup-complete', 'cancel', 'close']);
 
@@ -55,8 +54,8 @@ function complete() {
 <template>
     <Modal v-if="setupModalOpen" :title="__('Set up Two Factor Authentication')" :open="true" @update:model-value="$emit('cancel')">
         <div>
-            <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
-                <loading-graphic />
+            <div v-if="loading" class="flex items-center justify-center text-center">
+                <Icon name="loading" />
             </div>
 
             <template v-else>
