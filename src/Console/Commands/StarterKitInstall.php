@@ -32,7 +32,8 @@ class StarterKitInstall extends Command
         { --without-user : Install without creating user }
         { --force : Force install and allow dependency errors }
         { --cli-install : Installing from CLI Tool }
-        { --clear-site : Clear site before installing }';
+        { --clear-site : Clear site before installing }
+        { --update-search : Update search index(es) after installing }';
 
     /**
      * The console command description.
@@ -49,10 +50,10 @@ class StarterKitInstall extends Command
         [$package, $branch] = $this->getPackageAndBranch();
 
         if ($this->validationFails($package, new ComposerPackage)) {
-            return;
+            return 1;
         }
 
-        $licenseManager = StarterKitLicenseManager::validate($package, $this->option('license'), $this);
+        $licenseManager = StarterKitLicenseManager::validate($package, $this->option('license'), $this, $this->input->isInteractive());
 
         if (! $licenseManager->isValid()) {
             return;
@@ -75,9 +76,13 @@ class StarterKitInstall extends Command
         try {
             $installer->install();
         } catch (StarterKitException $exception) {
-            $this->error($exception->getMessage());
+            $this->components->error($exception->getMessage());
 
             return 1;
+        }
+
+        if ($this->shouldUpdateSearchIndex()) {
+            $this->updateSearchIndex();
         }
 
         // Temporary prompt to inform user of updated CLI tool. The newest version has better messaging
@@ -90,7 +95,11 @@ class StarterKitInstall extends Command
             $this->comment('composer global update statamic/cli'.PHP_EOL);
         }
 
-        $this->components->info("Starter kit [$package] was successfully installed.");
+        if (version_compare(app()->version(), '11', '<')) {
+            return $this->components->info("Starter kit [$package] was successfully installed.");
+        }
+
+        $this->components->success("Starter kit [$package] was successfully installed.");
     }
 
     /**
@@ -131,6 +140,35 @@ class StarterKitInstall extends Command
     protected function clearSite(): void
     {
         $this->call('statamic:site:clear', ['--no-interaction' => true]);
+
+        Prompt::interactive($this->input->isInteractive());
+    }
+
+    /**
+     * Check if should update search index.
+     */
+    protected function shouldUpdateSearchIndex(): bool
+    {
+        if ($this->option('update-search')) {
+            return true;
+        } elseif ($this->input->isInteractive()) {
+            return confirm('Would you like to update your search index(es) as well?', false);
+        }
+
+        return false;
+    }
+
+    /**
+     * Update search index, and re-set prompt interactivity for future prompts.
+     *
+     * See: https://github.com/statamic/cli/issues/62
+     */
+    protected function updateSearchIndex(): void
+    {
+        $this->call('statamic:search:update', [
+            '--all' => true,
+            '--no-interaction' => true,
+        ]);
 
         Prompt::interactive($this->input->isInteractive());
     }

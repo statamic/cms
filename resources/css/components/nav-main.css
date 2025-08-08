@@ -3,15 +3,23 @@
    ========================================================================== */
 
 .nav-main {
-    @apply hidden select-none bg-white shadow h-screen absolute rtl:right-0 ltr:left-0 overflow-scroll w-56;
+    @apply hidden select-none bg-white shadow absolute rtl:right-0 ltr:left-0 overflow-scroll w-56;
     @apply dark:bg-dark-800 dark:shadow-dark;
 
     transition: all .3s;
+    height: calc(100dvh - 52px);
+    .showing-license-banner & {
+        height: calc(100dvh - 105px);
+    }
 
     h6 { @apply mt-6; }
 
     ul {
         @apply list-none p-0 mt-0;
+    }
+
+    .nav-main-inner > ul:last-child {
+        @apply pb-8;
     }
 
     li {
@@ -70,10 +78,6 @@
 @screen md {
     .nav-main {
         @apply fixed flex bg-transparent shadow-none overflow-auto rtl:border-l ltr:border-r dark:border-dark-900;
-        height: calc(100% - 52px);
-        .showing-license-banner & {
-            height: calc(100% - 105px);
-        }
 
         .nav-closed & {
             @apply border-0 shadow-none;

@@ -19,6 +19,7 @@ use Statamic\Facades\Stache;
 use Statamic\Facades\YAML;
 use Statamic\Rules\Handle;
 use Statamic\Statamic;
+use Statamic\Support\Traits\Hookable;
 use Wilderborn\Partyline\Facade as Partyline;
 
 use function Laravel\Prompts\confirm;
@@ -26,7 +27,7 @@ use function Laravel\Prompts\text;
 
 class Multisite extends Command
 {
-    use ConfirmableTrait, EnhancesCommands, RunsInPlease, ValidatesInput;
+    use ConfirmableTrait, EnhancesCommands, Hookable, RunsInPlease, ValidatesInput;
 
     protected $signature = 'statamic:multisite';
 
@@ -55,6 +56,8 @@ class Multisite extends Command
             ->convertNavs()
             ->addPermissions()
             ->clearCache();
+
+        $this->runHooks('after');
 
         $this->components->info('Successfully converted from single to multisite installation!');
 
@@ -93,17 +96,23 @@ class Multisite extends Command
             return false;
         }
 
-        return File::isDirectory("content/collections/{$collection->handle()}/{$siteHandle}");
+        $directory = Stache::store('entries')->directory().DIRECTORY_SEPARATOR.$collection->handle().DIRECTORY_SEPARATOR.$siteHandle;
+
+        return File::isDirectory($directory);
     }
 
     private function globalsHaveBeenMoved(string $siteHandle): bool
     {
-        return File::isDirectory("content/globals/{$siteHandle}");
+        $directory = Stache::store('globals')->directory().DIRECTORY_SEPARATOR.$siteHandle;
+
+        return File::isDirectory($directory);
     }
 
     private function navsHaveBeenMoved(string $siteHandle): bool
     {
-        return File::isDirectory("content/navigation/{$siteHandle}");
+        $directory = Stache::store('navigation')->directory().DIRECTORY_SEPARATOR.$siteHandle;
+
+        return File::isDirectory($directory);
     }
 
     private function promptForSiteHandle(): bool
@@ -227,9 +236,7 @@ class Multisite extends Command
     {
         Config::set('statamic.system.multisite', false);
 
-        $handle = $collection->handle();
-
-        $base = "content/collections/{$handle}";
+        $base = Stache::store('entries')->directory().DIRECTORY_SEPARATOR.$collection->handle();
 
         File::makeDirectory("{$base}/{$this->siteHandle}");
 

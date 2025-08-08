@@ -2,6 +2,7 @@
 
 namespace Statamic\Query;
 
+use BadMethodCallException;
 use Closure;
 use DateTimeInterface;
 use Illuminate\Pagination\Paginator;
@@ -13,10 +14,13 @@ use Statamic\Contracts\Query\Builder as Contract;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Pattern;
 use Statamic\Query\Concerns\FakesQueries;
+use Statamic\Query\Exceptions\MultipleRecordsFoundException;
+use Statamic\Query\Exceptions\RecordsNotFoundException;
+use Statamic\Query\Scopes\AppliesScopes;
 
 abstract class Builder implements Contract
 {
-    use FakesQueries;
+    use AppliesScopes, FakesQueries;
 
     protected $columns;
     protected $limit;
@@ -37,6 +41,19 @@ abstract class Builder implements Contract
         '>=' => 'GreaterThanOrEqualTo',
         '<=' => 'LessThanOrEqualTo',
     ];
+
+    public function __call($method, $args)
+    {
+        if ($this->canApplyScope($method)) {
+            $this->applyScope($method, $args[0] ?? []);
+
+            return $this;
+        }
+
+        throw new BadMethodCallException(sprintf(
+            'Call to undefined method %s::%s()', static::class, $method
+        ));
+    }
 
     public function select($columns = ['*'])
     {
@@ -81,6 +98,17 @@ abstract class Builder implements Contract
     public function orderByDesc($column)
     {
         return $this->orderBy($column, 'desc');
+    }
+
+    public function reorder($column = null, $direction = 'asc')
+    {
+        $this->orderBys = [];
+
+        if ($column) {
+            return $this->orderBy($column, $direction);
+        }
+
+        return $this;
     }
 
     abstract public function inRandomOrder();
@@ -286,6 +314,48 @@ abstract class Builder implements Contract
     public function orWhereJsonLength($column, $operator, $value = null)
     {
         return $this->whereJsonLength($column, $operator, $value, 'or');
+    }
+
+    public function whereJsonOverlaps($column, $values, $boolean = 'and')
+    {
+        if (! is_array($values)) {
+            $values = [$values];
+        }
+
+        $this->wheres[] = [
+            'type' => 'JsonOverlaps',
+            'column' => $column,
+            'values' => $values,
+            'boolean' => $boolean,
+        ];
+
+        return $this;
+    }
+
+    public function orWhereJsonOverlaps($column, $values)
+    {
+        return $this->whereJsonOverlaps($column, $values, 'or');
+    }
+
+    public function whereJsonDoesntOverlap($column, $values, $boolean = 'and')
+    {
+        if (! is_array($values)) {
+            $values = [$values];
+        }
+
+        $this->wheres[] = [
+            'type' => 'JsonDoesntOverlap',
+            'column' => $column,
+            'values' => $values,
+            'boolean' => $boolean,
+        ];
+
+        return $this;
+    }
+
+    public function orWhereJsonDoesntOverlap($column, $values)
+    {
+        return $this->whereJsonDoesntOverlap($column, $values, 'or');
     }
 
     public function whereNull($column, $boolean = 'and', $not = false)
@@ -539,6 +609,52 @@ abstract class Builder implements Contract
         return $this->get()->first();
     }
 
+    public function firstOrFail($columns = ['*'])
+    {
+        if (! is_null($item = $this->select($columns)->first())) {
+            return $item;
+        }
+
+        throw new RecordsNotFoundException();
+    }
+
+    public function firstOr($columns = ['*'], ?Closure $callback = null)
+    {
+        if ($columns instanceof Closure) {
+            $callback = $columns;
+
+            $columns = ['*'];
+        }
+
+        if (! is_null($model = $this->select($columns)->first())) {
+            return $model;
+        }
+
+        return $callback();
+    }
+
+    public function sole($columns = ['*'])
+    {
+        $result = $this->get($columns);
+
+        $count = $result->count();
+
+        if ($count === 0) {
+            throw new RecordsNotFoundException();
+        }
+
+        if ($count > 1) {
+            throw new MultipleRecordsFoundException($count);
+        }
+
+        return $result->first();
+    }
+
+    public function exists()
+    {
+        return $this->count() >= 1;
+    }
+
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
@@ -673,7 +789,7 @@ abstract class Builder implements Contract
 
     protected function filterTestLikeRegex($item, $pattern)
     {
-        return preg_match("/{$pattern}/im", $item);
+        return preg_match("/{$pattern}/im", (string) $item);
     }
 
     protected function filterTestNotLikeRegex($item, $pattern)

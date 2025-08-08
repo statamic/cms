@@ -38,4 +38,18 @@ class TransTagTest extends TestCase
         $this->assertEquals('Bonjour, Bob', $this->parse('{{ trans key="package::messages.hello_name" name="Bob" locale="fr" }}'));
         $this->assertEquals('Bonjour, Bob', $this->parse('{{ trans key="package::messages.hello_name" name="Bob" site="fr" }}'));
     }
+
+    #[Test]
+    public function it_falls_back_to_fallback_for_missing_key()
+    {
+        $this->assertEquals('Fallback', $this->parse('{{ trans key="package::messages.does_not_exist" fallback="Fallback" }}'));
+        $this->assertEquals('Bonjour', $this->parse('{{ trans key="package::messages.does_not_exist" fallback="package::messages.hello" locale="fr" }}'));
+    }
+
+    #[Test]
+    public function it_applies_replacement_to_fallbacks()
+    {
+        $this->assertEquals('Fallback Bob', $this->parse('{{ trans key="package::messages.does_not_exist" name="Bob" fallback="Fallback :name" }}'));
+        $this->assertEquals('Bonjour, Bob', $this->parse('{{ trans key="package::messages.does_not_exist" name="Bob" fallback="package::messages.hello_name" locale="fr" }}'));
+    }
 }

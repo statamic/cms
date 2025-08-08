@@ -31,7 +31,7 @@ class AssetUploader extends Uploader
             $ext = strtolower($ext);
         }
 
-        $filename = self::getSafeFilename(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
+        $filename = self::getSafeFilename($this->asset->filename());
 
         $directory = $this->asset->folder();
         $directory = ($directory === '.') ? '/' : $directory;
@@ -89,11 +89,22 @@ class AssetUploader extends Uploader
             '?' => '-',
             '*' => '-',
             '%' => '-',
+            "'" => '-',
+            '--' => '-',
         ];
 
         return (string) Str::of(urldecode($string))
             ->replace(array_keys($replacements), array_values($replacements))
             ->when(config('statamic.assets.lowercase'), fn ($stringable) => $stringable->lower())
             ->ascii();
+    }
+
+    public static function getSafePath($path)
+    {
+        return Str::of($path)
+            ->split('/[\/\\\\]+/')
+            ->map(fn ($folder) => self::getSafeFilename($folder))
+            ->filter()
+            ->implode('/');
     }
 }

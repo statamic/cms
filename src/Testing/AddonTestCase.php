@@ -27,7 +27,7 @@ abstract class AddonTestCase extends OrchestraTestCase
 
         if (isset($uses[PreventsSavingStacheItemsToDisk::class])) {
             $reflection = new ReflectionClass($this);
-            $this->fakeStacheDirectory = Str::before(dirname($reflection->getFileName()), '/tests').'/tests/__fixtures__/dev-null';
+            $this->fakeStacheDirectory = Str::before(dirname($reflection->getFileName()), DIRECTORY_SEPARATOR.'tests').'/tests/__fixtures__/dev-null';
 
             $this->preventSavingStacheItemsToDisk();
         }

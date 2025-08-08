@@ -84,6 +84,7 @@ class DictionaryFieldsTest extends TestCase
 
         $this->assertEquals([
             'type' => 'fake_dictionary',
+            'category' => null,
         ], $preProcess);
     }
 
@@ -113,6 +114,23 @@ class DictionaryFieldsTest extends TestCase
         ]);
 
         $this->assertEquals('fake_dictionary', $process);
+    }
+
+    #[Test]
+    public function it_processes_dictionary_fields_and_filters_out_null_values()
+    {
+        $fieldtype = FieldtypeRepository::find('dictionary_fields');
+
+        $process = $fieldtype->process([
+            'type' => 'fake_dictionary',
+            'category' => 'foo',
+            'foo' => null,
+        ]);
+
+        $this->assertEquals([
+            'type' => 'fake_dictionary',
+            'category' => 'foo',
+        ], $process);
     }
 
     #[Test]

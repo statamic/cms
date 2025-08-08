@@ -13,12 +13,13 @@ use Statamic\Contracts\Forms\SubmissionRepository;
  * @method static Collection whereForm(string $handle)
  * @method static Collection whereInForm(array $handles)
  * @method static SubmissionContract find($id)
- * @method static SubmissionContract make()
+ * @method static void save(SubmissionContract $submission)
+ * @method static void delete(SubmissionContract $submission)
  * @method static SubmissionQueryBuilder query()
- * @method static save()
- * @method static delete()
+ * @method static SubmissionContract make()
  *
  * @see \Statamic\Contracts\Forms\SubmissionRepository
+ * @link \Statamic\Forms\Submission
  */
 class FormSubmission extends Facade
 {

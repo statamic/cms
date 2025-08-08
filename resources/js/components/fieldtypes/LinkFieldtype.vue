@@ -18,7 +18,7 @@
             </v-select>
         </div>
 
-        <div class="flex-1">
+        <div class="flex-1 truncate">
 
             <!-- URL text input -->
             <text-input v-if="option === 'url'" v-model="urlValue" />
@@ -36,20 +36,31 @@
             />
 
             <!-- Asset select -->
-            <assets-fieldtype
-                v-if="option === 'asset'"
-                ref="assets"
-                handle="asset"
-                :value="selectedAssets"
-                :config="meta.asset.config"
-                :meta="meta.asset.meta"
-                @input="assetsSelected"
-                @meta-updated="meta.asset.meta = $event"
-            />
+            <div class="assets-fieldtype" v-if="option === 'asset'">
+                <assets-fieldtype
+                    ref="assets"
+                    handle="asset"
+                    :value="selectedAssets"
+                    :config="meta.asset.config"
+                    :meta="meta.asset.meta"
+                    @input="assetsSelected"
+                    @meta-updated="meta.asset.meta = $event"
+                />
+            </div>
 
         </div>
     </div>
 </template>
+
+<style scoped>
+:deep(.assets-fieldtype) {
+    .assets-fieldtype-picker {
+        border: 0;
+        padding: 0;
+        background: none;
+    }
+}
+</style>
 
 <script>
 import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';

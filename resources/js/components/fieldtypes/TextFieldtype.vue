@@ -3,7 +3,7 @@
         ref="input"
         :value="value"
         :classes="config.classes"
-        :focus="config.focus || name === 'title' || name === 'alt'"
+        :focus="shouldFocus"
         :autocomplete="config.autocomplete"
         :autoselect="config.autoselect"
         :type="config.input_type"
@@ -27,6 +27,16 @@ import Fieldtype from './Fieldtype.vue';
 export default {
 
     mixins: [Fieldtype],
+
+    computed: {
+        shouldFocus() {
+            if (this.config.focus === false) {
+                return false;
+            }
+
+            return this.config.focus || this.name === 'title' || this.name === 'alt';
+        }
+    },
 
     methods: {
         inputUpdated(value) {
