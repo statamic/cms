@@ -57,7 +57,7 @@
                     @confirm="copyToClipboardModalUrl = null"
                 >
                     <div class="prose">
-                        <code-block :text="copyToClipboardModalUrl" />
+                        <ui-input :model-value="copyToClipboardModalUrl" readonly copyable class="font-mono text-sm dark" />
                     </div>
                 </confirmation-modal>
 
