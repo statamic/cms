@@ -80,7 +80,6 @@ class TaxonomiesController extends CpController
 
         $viewData = [
             'taxonomy' => $taxonomy,
-            'hasTerms' => true, // todo $taxonomy->queryTerms()->count(),
             'blueprints' => $blueprints,
             'site' => Site::selected()->handle(),
             'columns' => $columns,
