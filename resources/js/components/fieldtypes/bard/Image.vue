@@ -14,32 +14,12 @@
             <div
                 class="flex items-center justify-center space-x-1 border-t px-2 py-2 text-center text-2xs text-white @container/toolbar dark:border-dark-900 dark:text-dark-150 sm:space-x-3 rtl:space-x-reverse"
             >
-                <button v-if="!src" @click="openSelector" type="button" class="btn btn-sm flex px-3 py-1.5">
-                    <svg-icon name="folder-image" class="h-4" />
-                    <span class="hidden @md/toolbar:inline-block ltr:ml-2 rtl:mr-2">{{ __('Choose Image') }}</span>
-                </button>
-                <button v-if="src" @click="edit" type="button" class="btn btn-sm flex px-3 py-1.5">
-                    <svg-icon name="pencil" class="h-4" />
-                    <span class="hidden @md/toolbar:inline-block ltr:ml-2 rtl:mr-2">{{ __('Edit Image') }}</span>
-                </button>
-                <button
-                    v-if="src"
-                    @click="toggleAltEditor"
-                    type="button"
-                    class="btn btn-sm flex px-3 py-1.5"
-                    :class="{ active: showingAltEdit }"
-                >
-                    <svg-icon name="rename-file" class="h-4" />
-                    <span class="hidden @md/toolbar:inline-block ltr:ml-2 rtl:mr-2">{{ __('Override Alt') }}</span>
-                </button>
-                <button v-if="src" @click="openSelector" type="button" class="btn btn-sm flex px-3 py-1.5">
-                    <svg-icon name="swap" class="h-4" />
-                    <span class="hidden @md/toolbar:inline-block ltr:ml-2 rtl:mr-2">{{ __('Replace') }}</span>
-                </button>
-                <button @click="deleteNode" class="btn btn-sm flex px-3 py-1.5 text-red-500">
-                    <svg-icon name="trash" class="h-4" />
-                    <span class="hidden @md/toolbar:inline-block ltr:ml-2 rtl:mr-2">{{ __('Remove') }}</span>
-                </button>
+                <Button v-if="!src" size="sm" icon="folder-photos" :text="__('Choose Image')" @click="openSelector" />
+
+                <Button v-if="src" size="sm" icon="edit" :text="__('Edit Image')" @click="edit" />
+                <Button v-if="src" size="sm" icon="rename" :text="__('Override Alt')" :class="{ active: showingAltEdit }" @click="toggleAltEditor" />
+                <Button v-if="src" size="sm" icon="replace" :text="__('Replace')" @click="openSelector" />
+                <Button v-if="src" size="sm" icon="trash" :text="__('Remove')" @click="deleteNode" />
             </div>
 
             <div
@@ -91,7 +71,7 @@ import Asset from '../assets/Asset';
 import { NodeViewWrapper } from '@tiptap/vue-3';
 import Selector from '../../assets/Selector.vue';
 import { containerContextKey } from '@statamic/components/ui/Publish/Container.vue';
-import { Input } from '@statamic/ui';
+import { Input, Button } from '@statamic/ui';
 
 export default {
     mixins: [Asset],
@@ -100,6 +80,7 @@ export default {
         NodeViewWrapper,
         Selector,
         Input,
+        Button,
     },
 
     inject: {

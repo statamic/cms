@@ -42,14 +42,6 @@
             :package="package"
             :show-actions="showActions"
         />
-
-        <confirmation-modal v-if="modalOpen" :cancellable="false" :button-text="__('OK')" @confirm="modalOpen = false">
-            <div class="prose">
-                <p v-text="`${__('messages.updater_update_to_latest_command')}:`" />
-                <code-block copyable :text="`composer update ${package}`" />
-                <p v-html="link"></p>
-            </div>
-        </confirmation-modal>
     </div>
 </template>
 
@@ -70,7 +62,6 @@ export default {
             gettingChangelog: true,
             changelog: [],
             currentVersion: null,
-            modalOpen: false,
             latestRelease: null,
             showingUnlicensedReleases: false,
         };

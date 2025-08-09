@@ -156,13 +156,12 @@
 
                 <stack name="markdownCheatSheet" v-if="showCheatsheet" @closed="showCheatsheet = false">
                     <div class="relative h-full overflow-auto bg-white p-6 dark:bg-dark-600">
-                        <button
-                            class="btn-close absolute top-0 mt-4 ltr:right-0 ltr:mr-8 rtl:left-0 rtl:ml-8"
-                            @click="showCheatsheet = false"
-                            :aria-label="__('Close Markdown Cheatsheet')"
-                        >
-                            &times;
-                        </button>
+                        <Button
+                            icon="x"
+                            variant="ghost"
+                            class="absolute top-0 mt-4 ltr:right-0 ltr:mr-8 rtl:left-0 rtl:ml-8"
+                            @click="close"
+                        />
                         <div class="prose mx-auto my-8 max-w-md">
                             <h2 v-text="__('Markdown Cheatsheet')"></h2>
                             <div v-html="__('markdown.cheatsheet')"></div>

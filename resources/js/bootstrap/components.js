@@ -22,13 +22,10 @@ import Avatar from '../components/Avatar.vue';
 import CreateEntryButton from '../components/entries/CreateEntryButton.vue';
 import Portal from '../components/portals/Portal.vue';
 import ConfirmationModal from '../components/modals/ConfirmationModal.vue';
-import KeyboardShortcutsModal from '../components/modals/KeyboardShortcutsModal.vue';
 import FieldActionModal from '../components/field-actions/FieldActionModal.vue';
 import ElevatedSessionModal from '../components/modals/ElevatedSessionModal.vue';
 import ResourceDeleter from '../components/ResourceDeleter.vue';
 import Stack from '../components/stacks/Stack.vue';
-import StackTest from '../components/stacks/StackTest.vue';
-import CodeBlock from '../components/CodeBlock.vue';
 import BlueprintCreateForm from '../components/blueprints/BlueprintCreateForm.vue';
 import BlueprintResetter from '../components/blueprints/BlueprintResetter.vue';
 import GitStatus from '../components/GitStatus.vue';
@@ -70,19 +67,16 @@ export default function registerGlobalComponents(app) {
     app.component('avatar', Avatar);
     app.component('create-entry-button', CreateEntryButton);
     app.component('portal', Portal);
-    app.component('code-block', CodeBlock);
     app.component('date-time', DateTime);
     app.component('git-status', GitStatus);
 
     // Modals
     app.component('confirmation-modal', ConfirmationModal);
-    app.component('keyboard-shortcuts-modal', KeyboardShortcutsModal);
     app.component('resource-deleter', ResourceDeleter);
     app.component('field-action-modal', FieldActionModal);
     app.component('elevated-session-modal', ElevatedSessionModal);
 
     app.component('stack', Stack);
-    app.component('stack-test', StackTest);
 
     app.component('blueprint-create-form', BlueprintCreateForm);
     app.component('blueprint-resetter', BlueprintResetter);
