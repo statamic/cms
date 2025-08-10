@@ -51,7 +51,6 @@ function toggleSection(id) {
                 <Subheading v-if="section.instructions" :text="renderInstructions(section.instructions)" />
             </PanelHeader>
             <Motion
-                layout
                 :initial="{ height: section.collapsed ? '0px' : 'auto' }"
                 :animate="{ height: section.collapsed ? '0px' : 'auto' }"
                 :transition="{ duration: 0.25, type: 'tween' }"
