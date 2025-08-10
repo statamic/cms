@@ -45,11 +45,12 @@
                     class="cursor-pointer rounded-sm"
                     :class="{ 'bg-gray-100 dark:bg-dark-600': selectionIndex === i }"
                     @mouseover="selectionIndex = i"
+                    :title="__(item.instructions)"
                 >
                     <div
                         v-if="item.type === 'group'"
                         @click="selectGroup(item.handle)"
-                        class="group flex items-center rounded-md px-2 py-1.5"
+                        class="group flex rounded-md px-2 py-1.5"
                     >
                         <ui-icon
                             :name="groupIconName(item.icon)"
@@ -62,7 +63,7 @@
                             </div>
                             <div
                                 v-if="item.instructions"
-                                class="w-52 truncate text-2xs text-gray-700 dark:text-dark-175"
+                                class="w-52 line-clamp-2 text-2xs text-gray-700 dark:text-dark-175"
                             >
                                 {{ __(item.instructions) }}
                             </div>
@@ -75,7 +76,7 @@
                     <div
                         v-if="item.type === 'set'"
                         @click="addSet(item.handle)"
-                        class="group flex items-center rounded-md px-2 py-1.5"
+                        class="group flex rounded-md px-2 py-1.5"
                     >
                         <ui-icon
                             :name="setIconName(item.icon)"
@@ -88,7 +89,7 @@
                             </div>
                             <div
                                 v-if="item.instructions"
-                                class="w-52 truncate text-2xs text-gray-700 dark:text-dark-175"
+                                class="w-52 line-clamp-2 text-2xs text-gray-700 dark:text-dark-175"
                             >
                                 {{ __(item.instructions) }}
                             </div>
