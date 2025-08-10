@@ -3,6 +3,12 @@
 @endphp
 
 <header class="h-14 bg-gray-800 flex justify-between space-x-2 items-center text-white px-4 dark fixed top-0 inset-x-0 z-[3]">
+    <a class="c-skip-link z-(--z-index-header) px-4 py-2 bg-blue-800 text-sm top-2.5 left-2.25 fixed opacity-0 -translate-y-24 focus:translate-y-0 focus:opacity-100 motion-safe:transition-all motion-safe:ease-[var(--animation-timing-function-fast-out-slow-in)] rounded-md" href="#main">
+        Skip to sidebar
+    </a>
+    <a class="c-skip-link z-(--z-index-header) px-4 py-2 bg-blue-800 text-sm top-2.5 left-2.25 fixed opacity-0 -translate-y-24 focus:translate-y-0 focus:opacity-100 motion-safe:transition-all motion-safe:duration-200 motion-safe:ease-[var(--animation-timing-function-fast-out-slow-in)] rounded-md" href="#main-content">
+        Skip to content
+    </a>
     <div class="flex items-center gap-2 text-[0.8125rem] text-gray-300">
         {{-- Logo --}}
         @if ($customDarkLogo)
