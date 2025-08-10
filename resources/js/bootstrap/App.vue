@@ -85,7 +85,7 @@ export default {
             mobileNavOpen: false,
             showBanner: true,
             appendedComponents: Statamic.$components.components,
-            isLicensingBannerSnoozed: localStorage.getItem(`statamic.snooze_license_banner`) > new Date().valueOf(),
+            isLicensingBannerSnoozed: sessionStorage.getItem(`statamic.snooze_license_banner`),
             copyToClipboardModalUrl: null,
         };
     },
@@ -152,7 +152,7 @@ export default {
 
         hideBanner() {
             this.showBanner = false;
-            localStorage.setItem(`statamic.snooze_license_banner`, new Date(Date.now() + 5 * 60 * 1000).valueOf());
+            sessionStorage.setItem(`statamic.snooze_license_banner`, true);
         },
 
         fixAutofocus() {
