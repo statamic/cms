@@ -71,7 +71,7 @@
                             v-if="canAddSet"
                             :groups="groupConfigs"
                             :sets="setConfigs"
-                            :show-connector="false"
+                            :show-connector="value.length > 0"
                             :index="value.length"
                             :label="config.button_label"
                             @added="addSet"
