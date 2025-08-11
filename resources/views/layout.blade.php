@@ -61,8 +61,6 @@
                     </div>
                 </confirmation-modal>
 
-                <keyboard-shortcuts-modal></keyboard-shortcuts-modal>
-
                 <portal-targets></portal-targets>
             </div>
 
