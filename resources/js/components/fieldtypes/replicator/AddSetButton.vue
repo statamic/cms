@@ -46,7 +46,6 @@ export default {
         enabled: { type: Boolean, default: true },
         label: String,
         showConnector: { type: Boolean, default: true },
-        showButtonConnector: { type: Boolean, default: false },
         variant: { type: String, default: 'button' },
     },
 
