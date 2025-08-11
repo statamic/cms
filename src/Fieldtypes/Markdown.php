@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Facades\GraphQL;
+use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Query\Scopes\Filters\Fields\Markdown as MarkdownFilter;
 use Statamic\Support\Html;
@@ -216,9 +217,27 @@ class Markdown extends Fieldtype
 
     public function preload()
     {
-        return [
+        $data = [
             'previewUrl' => cp_route('markdown.preview'),
         ];
+
+        if (
+            $this->config('container')
+            && $container = \Statamic\Facades\AssetContainer::find($this->config('container'))
+        ) {
+            $assetField = (new Field('asset', [
+                'type' => 'assets',
+                'container' => $container->handle(),
+                'folder' => $this->config('folder'),
+            ]));
+
+            $data['assets'] = [
+                'container' => $assetField->meta()['container'],
+                'columns' => $assetField->meta()['columns'],
+            ];
+        }
+
+        return $data;
     }
 
     public function shouldParseAntlersFromRawString(): bool

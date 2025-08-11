@@ -144,11 +144,12 @@
                     name="markdown-asset-selector"
                     @closed="closeAssetSelector"
                 >
-                    <selector
+                    <asset-selector
                         :container="container"
                         :folder="folder"
                         :selected="selectedAssets"
                         :restrict-folder-navigation="restrictAssetNavigation"
+                        :columns="assetSelectorColumns"
                         @selected="assetsSelected"
                         @closed="closeAssetSelector"
                     />
@@ -197,7 +198,7 @@ import 'codemirror/mode/yaml/yaml';
 import 'codemirror/addon/edit/continuelist';
 
 import { availableButtons } from './buttons';
-import Selector from '../../assets/Selector.vue';
+import AssetSelector from '../../assets/Selector.vue';
 import Uploader from '../../assets/Uploader.vue';
 import Uploads from '../../assets/Uploads.vue';
 import MarkdownToolbar from './MarkdownToolbar.vue';
@@ -250,7 +251,7 @@ export default {
 
     components: {
         Button,
-        Selector,
+        AssetSelector,
         Uploader,
         Uploads,
         MarkdownToolbar,
@@ -776,7 +777,11 @@ export default {
         },
 
         container() {
-            return this.config.container;
+            return this.meta.assets.container;
+        },
+
+        assetSelectorColumns() {
+            return this.meta.assets.columns;
         },
 
         editor() {
