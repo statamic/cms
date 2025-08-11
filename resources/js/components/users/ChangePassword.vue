@@ -1,44 +1,33 @@
 <template>
-<!--    <Modal v-model:open="open" :title="__('Change Password')">-->
-<!--        <template #trigger>-->
-<!--            <Button v-text="__('Change Password')" />-->
-<!--        </template>-->
+    <div class="publish-fields">
+        <Field
+            v-if="requiresCurrentPassword"
+            class="form-group"
+            :label="__('Current Password')"
+            :errors="errors.current_password"
+        >
+            <Input v-model="currentPassword" type="password" viewable />
+        </Field>
 
-        <div class="publish-fields">
-            <Field
-                v-if="requiresCurrentPassword"
-                class="form-group"
-                :label="__('Current Password')"
-                :errors="errors.current_password"
-            >
-                <Input v-model="currentPassword" type="password" viewable />
-            </Field>
+        <Field
+            class="form-group"
+            :label="__('Password')"
+            :errors="errors.password"
+        >
+            <Input v-model="password" type="password" viewable />
+        </Field>
 
-            <Field
-                class="form-group"
-                :label="__('Password')"
-                :errors="errors.password"
-            >
-                <Input v-model="password" type="password" viewable />
-            </Field>
+        <Field
+            class="form-group"
+            :label="__('Password Confirmation')"
+        >
+            <Input v-model="confirmation" type="password" viewable />
+        </Field>
+    </div>
 
-            <Field
-                class="form-group"
-                :label="__('Password Confirmation')"
-            >
-                <Input v-model="confirmation" type="password" viewable />
-            </Field>
-        </div>
-
-<!--        <template #footer>-->
-            <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
-<!--                <ModalClose>-->
-<!--                    <Button text="Cancel" variant="ghost" />-->
-<!--                </ModalClose>-->
-                <Button :text="__('Change Password')" variant="primary" @click="save" :disabled="saving" />
-            </div>
-<!--        </template>-->
-<!--    </Modal>-->
+    <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
+        <Button :text="__('Change Password')" variant="primary" @click="save" :disabled="saving" />
+    </div>
 </template>
 
 <script>

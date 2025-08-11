@@ -69,36 +69,31 @@ function disable() {
 </script>
 
 <template>
-<!--    <Popover side="bottom" class="!w-lg" v-model:open="popoverOpen">-->
-<!--        <template #trigger>-->
-<!--            <Button v-text="__('Two Factor Authentication')" />-->
-<!--        </template>-->
-        <template v-if="!isSetup">
-            <div>
-                <p class="mb-4 text-sm text-gray">{{ __('statamic::messages.two_factor_enable_introduction') }}</p>
+    <template v-if="!isSetup">
+        <div>
+            <p class="mb-4 text-sm text-gray">{{ __('statamic::messages.two_factor_enable_introduction') }}</p>
 
-                <div class="flex space-x-2">
-                    <Button @click="openSetupModal">
-                        {{ __('Enable two factor authentication') }}
-                    </Button>
-                </div>
-            </div>
-        </template>
-
-        <template v-else>
-            <p class="mb-4 text-sm text-gray">{{ __('statamic::messages.two_factor_enabled') }}</p>
-
-            <div class="flex items-center space-x-4">
-                <Button @click="openRecoveryCodesModal">
-                    {{ __('Show recovery codes') }}
-                </Button>
-
-                <Button variant="danger" @click="openDisableModal">
-                    {{ __('Disable two factor authentication') }}
+            <div class="flex space-x-2">
+                <Button @click="openSetupModal">
+                    {{ __('Enable two factor authentication') }}
                 </Button>
             </div>
-        </template>
-<!--    </Popover>-->
+        </div>
+    </template>
+
+    <template v-else>
+        <p class="mb-4 text-sm text-gray">{{ __('statamic::messages.two_factor_enabled') }}</p>
+
+        <div class="flex items-center space-x-4">
+            <Button @click="openRecoveryCodesModal">
+                {{ __('Show recovery codes') }}
+            </Button>
+
+            <Button variant="danger" @click="openDisableModal">
+                {{ __('Disable two factor authentication') }}
+            </Button>
+        </div>
+    </template>
 
     <TwoFactorSetup
         v-if="setupModalOpen"
