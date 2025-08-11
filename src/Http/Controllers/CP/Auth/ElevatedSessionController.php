@@ -14,7 +14,7 @@ class ElevatedSessionController
         $user = User::current();
 
         $response = [
-            'elevated' => $hasElevatedSession = $request->hasElevatedSession(),
+            'elevated' => $hasElevatedSession = false,
             'expiry' => $request->getElevatedSessionExpiry(),
             'method' => $method = $user->getElevatedSessionMethod(),
         ];

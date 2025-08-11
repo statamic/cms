@@ -1,8 +1,8 @@
 <template>
-    <Modal v-model:open="open" :title="__('Change Password')">
-        <template #trigger>
-            <Button v-text="__('Change Password')" />
-        </template>
+<!--    <Modal v-model:open="open" :title="__('Change Password')">-->
+<!--        <template #trigger>-->
+<!--            <Button v-text="__('Change Password')" />-->
+<!--        </template>-->
 
         <div class="publish-fields">
             <Field
@@ -30,15 +30,15 @@
             </Field>
         </div>
 
-        <template #footer>
+<!--        <template #footer>-->
             <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
-                <ModalClose>
-                    <Button text="Cancel" variant="ghost" />
-                </ModalClose>
+<!--                <ModalClose>-->
+<!--                    <Button text="Cancel" variant="ghost" />-->
+<!--                </ModalClose>-->
                 <Button :text="__('Change Password')" variant="primary" @click="save" :disabled="saving" />
             </div>
-        </template>
-    </Modal>
+<!--        </template>-->
+<!--    </Modal>-->
 </template>
 
 <script>

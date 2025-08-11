@@ -30,14 +30,6 @@
                 </Dropdown>
             </ItemActions>
 
-            <TwoFactor v-if="twoFactor" v-bind="twoFactor" />
-
-            <change-password
-                v-if="canEditPassword"
-                :save-url="actions.password"
-                :requires-current-password="requiresCurrentPassword"
-            />
-
             <Button variant="primary" @click.prevent="save" v-text="__('Save')" />
 
             <slot name="action-buttons-right" />
@@ -53,7 +45,36 @@
             :meta="meta"
             :errors="errors"
         >
-            <PublishTabs />
+            <PublishTabs>
+                <template #settings="{ tab }">
+                    <div v-if="needsToConfirmPassword" class="py-24 text-center space-y-4">
+                        <p>Before doing anything, you need to confirm your password.</p>
+                        <Button @click="confirmPassword">Confirm your password</Button>
+                    </div>
+
+                    <template v-else>
+                        <PublishSections :tab="tab" />
+
+                        <Panel>
+                            <PanelHeader title="Two Factor Authentication" />
+                            <Card>
+                                <TwoFactor v-if="twoFactor" v-bind="twoFactor" />
+                            </Card>
+                        </Panel>
+
+                        <Panel>
+                            <PanelHeader title="Password" />
+                            <Card>
+                                <change-password
+                                    v-if="canEditPassword"
+                                    :save-url="actions.password"
+                                    :requires-current-password="requiresCurrentPassword"
+                                />
+                            </Card>
+                        </Panel>
+                    </template>
+                </template>
+            </PublishTabs>
         </PublishContainer>
     </div>
 </template>
@@ -73,10 +94,14 @@ import {
     PublishContainer,
     PublishTabs,
     Header,
+    Panel,
+    PanelHeader,
+    PublishSections,
 } from '@statamic/ui';
 import ItemActions from '@statamic/components/actions/ItemActions.vue';
-import { SavePipeline } from '@statamic/exports.js';
+import { requireElevatedSession, SavePipeline } from '@statamic/exports.js';
 import { computed, ref } from 'vue';
+import { Card } from 'statamic';
 const { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } = SavePipeline;
 
 let saving = ref(false);
@@ -87,6 +112,10 @@ export default {
     mixins: [HasActions],
 
     components: {
+        Card,
+        Panel,
+        PanelHeader,
+        PublishSections,
         ItemActions,
         Dropdown,
         DropdownMenu,
@@ -123,6 +152,8 @@ export default {
             error: null,
             errors: {},
             title: this.initialTitle,
+
+            needsToConfirmPassword: true,
         };
     },
 
@@ -152,6 +183,12 @@ export default {
 
                     this.$nextTick(() => this.$emit('saved', response));
                 });
+        },
+
+        confirmPassword() {
+            requireElevatedSession()
+                .then(() => this.needsToConfirmPassword = false)
+                .catch(() => {});
         },
 
         afterActionSuccessfullyCompleted(response) {

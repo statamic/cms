@@ -99,7 +99,7 @@ function tabHasError(tab) {
             <div :class="{ 'grid grid-cols-[1fr_320px] gap-8': shouldShowSidebar }">
                 <TabContent v-if="visibleMainTabs.length > 1" v-for="tab in mainTabs" :key="tab.handle" :name="tab.handle">
                     <TabProvider :tab="tab">
-                        <slot :tab="tab">
+                        <slot :name="tab.handle" v-bind="{ tab }" :tab="tab">
                             <Sections />
                         </slot>
                     </TabProvider>

@@ -69,10 +69,10 @@ function disable() {
 </script>
 
 <template>
-    <Popover side="bottom" class="!w-lg" v-model:open="popoverOpen">
-        <template #trigger>
-            <Button v-text="__('Two Factor Authentication')" />
-        </template>
+<!--    <Popover side="bottom" class="!w-lg" v-model:open="popoverOpen">-->
+<!--        <template #trigger>-->
+<!--            <Button v-text="__('Two Factor Authentication')" />-->
+<!--        </template>-->
         <template v-if="!isSetup">
             <div>
                 <p class="mb-4 text-sm text-gray">{{ __('statamic::messages.two_factor_enable_introduction') }}</p>
@@ -98,7 +98,7 @@ function disable() {
                 </Button>
             </div>
         </template>
-    </Popover>
+<!--    </Popover>-->
 
     <TwoFactorSetup
         v-if="setupModalOpen"
