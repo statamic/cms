@@ -154,7 +154,6 @@
                 :folder="config.folder || '/'"
                 :restrict-folder-navigation="config.restrict_assets"
                 :selected="[]"
-                :view-mode="'grid'"
                 :max-files="1"
                 @selected="assetSelected"
                 @closed="closeAssetSelector"

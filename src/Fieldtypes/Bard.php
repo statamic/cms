@@ -635,19 +635,16 @@ class Bard extends Replicator
             $this->config('container')
             && $container = \Statamic\Facades\AssetContainer::find($this->config('container'))
         ) {
-            $assetsField = new Field(
-                handle: 'assets',
-                config: [
-                    'type' => 'assets',
-                    'container' => $container->handle(),
-                    'folder' => $this->config('folder'),
-                ],
-            );
+            $assetField = (new Field('asset', [
+                'type' => 'assets',
+                'container' => $container->handle(),
+                'folder' => $this->config('folder'),
+            ]));
 
-            $assetsMeta = $assetsField->meta();
-
-            $data['asset_container'] = $assetsMeta['container'];
-            $data['asset_columns'] = $assetsMeta['columns'];
+            $data['assets'] = [
+                'container' => $assetField->meta()['container'],
+                'columns' => $assetField->meta()['columns'],
+            ];
         }
 
         return $this->runHooks('preload', $data);
