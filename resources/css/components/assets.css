@@ -131,18 +131,6 @@
             @apply absolute max-h-full max-w-full;
         }
     }
-
-    .asset-thumb-container:hover .asset-controls {
-        @apply block;
-    }
-
-    .asset-meta-btn {
-        @apply px-2 py-1 text-blue-600 hover:bg-gray-200 dark:border-dark-300 dark:hover:bg-dark-800 ltr:border-l rtl:border-r;
-    }
-
-    .asset-controls {
-        @apply absolute hidden;
-    }
 }
 
 .asset-filename {

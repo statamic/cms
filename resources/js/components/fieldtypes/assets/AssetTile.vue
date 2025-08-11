@@ -18,57 +18,42 @@
         >
         </asset-editor>
 
-        <div class="asset-thumb-container">
-            <div class="asset-thumb" :class="{ 'bg-checkerboard': canBeTransparent }">
+        <div class="flex h-full border-b rounded-b-md relative">
+            <div class="p-1 flex flex-col items-center justify-center h-full" :class="{ 'bg-checkerboard': canBeTransparent }">
                 <!-- Solo Bard -->
                 <template v-if="isImage && isInBardField && !isInAssetBrowser">
                     <img :src="asset.url" />
                 </template>
 
                 <template v-else>
-                    <img :src="thumbnail" v-if="thumbnail" :title="label" />
+                    <img :src="thumbnail" v-if="thumbnail" :title="label" class="rounded-md"  />
 
                     <template v-else>
                         <img v-if="canShowSvg" :src="asset.url" :title="label" class="p-4" />
                         <file-icon v-else :extension="asset.extension" class="h-full w-full p-4" />
                     </template>
                 </template>
+            </div>
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 duration-100">
+                <div class="flex items-center justify-center gap-2">
+                    <template v-if="!readOnly">
+                        <ui-button size="sm" @click="edit" icon="pencil" aria-label="__('Edit')" />
+                        <ui-button size="sm" @click="remove" icon="x" aria-label="__('Remove')" />
+                    </template>
 
-                <div class="asset-controls">
-                    <div class="flex items-center justify-center space-x-1 rtl:space-x-reverse">
-                        <template v-if="!readOnly">
-                            <Button @click="edit" icon="edit" :title="__('Edit')" />
-
-                            <Button @click="remove" icon="x" :title="__('Remove')" />
-                        </template>
-
-                        <template v-else>
-                            <Button
-                                v-if="asset.url && asset.isMedia && this.canDownload"
-                                @click="open"
-                                :title="__('Open in a new window')"
-                                icon="external-link"
-                            />
-
-                            <Button
-                                v-if="asset.allowDownloading && this.canDownload"
-                                @click="download"
-                                :title="__('Download file')"
-                                icon="download"
-                            />
-                        </template>
-                    </div>
+                    <template v-else>
+                        <ui-button icon="external-link" size="sm" v-if="asset.url && asset.isMedia && this.canDownload" @click="open" :aria-label="__('Open in a new window')" />
+                        <ui-button icon="download" size="sm" v-if="asset.allowDownloading && this.canDownload" @click="download" :aria-label="__('Download file')" />
+                    </template>
                 </div>
             </div>
         </div>
 
-        <div class="asset-meta flex items-center" v-if="showFilename">
-            <div class="asset-filename flex-1 px-2 py-1" :title="label" :class="{ 'text-center': !needsAlt }">
+        <div class="flex items-center justify-between w-full px-1" v-if="showFilename">
+            <div class="truncate w-18 text-xs text-gray-500 flex-1 px-2 py-1" v-tooltip="label" :class="{ 'text-center': !needsAlt }">
                 {{ label }}
             </div>
-            <button class="asset-meta-btn" type="button" @click="edit" v-if="showSetAlt && needsAlt">
-                {{ asset.values.alt ? '✅' : __('Set Alt') }}
-            </button>
+            <ui-badge as="button" size="sm" color="blue" variant="flat" @click="edit" v-if="showSetAlt && needsAlt" :text="asset.values.alt ? '✅' : __('Set Alt')" />
         </div>
     </div>
 </template>
