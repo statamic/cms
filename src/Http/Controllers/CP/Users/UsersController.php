@@ -147,7 +147,7 @@ class UsersController extends CpController
 
         $viewData = [
             'values' => (object) $fields->values()->only($additional)->all(),
-            'meta' => (object) $fields->meta()->only($additional)->all(),
+            'meta' => (object) $fields->meta()->all(),
             'fields' => collect($blueprint->fields()->toPublishArray())->filter(fn ($field) => $additional->contains($field['handle']))->values()->all(),
             'blueprint' => $blueprint->toPublishArray(),
             'expiry' => $expiry,
