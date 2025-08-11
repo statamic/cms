@@ -69,34 +69,8 @@ class Entries extends Relationship
     {
         return [
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Input Behavior'),
                 'fields' => [
-                    'max_items' => [
-                        'display' => __('Max Items'),
-                        'instructions' => __('statamic::messages.max_items_instructions'),
-                        'min' => 1,
-                        'type' => 'integer',
-                    ],
-                    'mode' => [
-                        'display' => __('UI Mode'),
-                        'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
-                        'type' => 'radio',
-                        'default' => 'default',
-                        'options' => [
-                            'default' => __('Stack Selector'),
-                            'select' => __('Select Dropdown'),
-                            'typeahead' => __('Typeahead Field'),
-                        ],
-                    ],
-                    'create' => [
-                        'display' => __('Allow Creating'),
-                        'instructions' => __('statamic::fieldtypes.entries.config.create'),
-                        'type' => 'toggle',
-                        'default' => true,
-                        'if' => [
-                            'mode' => 'default',
-                        ],
-                    ],
                     'collections' => [
                         'display' => __('Collections'),
                         'instructions' => __('statamic::fieldtypes.entries.config.collections'),
@@ -122,6 +96,42 @@ class Entries extends Relationship
                         'display' => __('Select Across Sites'),
                         'instructions' => __('statamic::fieldtypes.entries.config.select_across_sites'),
                         'type' => 'toggle',
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Appearance'),
+                'fields' => [
+                    'mode' => [
+                        'display' => __('UI Mode'),
+                        'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
+                        'type' => 'radio',
+                        'default' => 'default',
+                        'options' => [
+                            'default' => __('Stack Selector'),
+                            'select' => __('Select Dropdown'),
+                            'typeahead' => __('Typeahead Field'),
+                        ],
+                    ],
+                    'create' => [
+                        'display' => __('Allow Creating'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.create'),
+                        'type' => 'toggle',
+                        'default' => true,
+                        'if' => [
+                            'mode' => 'default',
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Boundaries & Limits'),
+                'fields' => [
+                    'max_items' => [
+                        'display' => __('Max Items'),
+                        'instructions' => __('statamic::messages.max_items_instructions'),
+                        'min' => 1,
+                        'type' => 'integer',
                     ],
                 ],
             ],
@@ -293,7 +303,7 @@ class Entries extends Relationship
 
         $user = User::current();
 
-        return collect($collections)->flatMap(function ($collectionHandle) use ($collections, $user) {
+        return collect($collections)->flatMap(function ($collectionHandle) use ($user) {
             $collection = Collection::findByHandle($collectionHandle);
 
             throw_if(! $collection, new CollectionNotFoundException($collectionHandle));
@@ -306,26 +316,15 @@ class Entries extends Relationship
 
             return $blueprints
                 ->reject->hidden()
-                ->map(function ($blueprint) use ($collection, $collections, $blueprints) {
+                ->map(function ($blueprint) use ($collection) {
                     return [
-                        'title' => $this->getCreatableTitle($collection, $blueprint, count($collections), $blueprints->count()),
+                        'parent_title' => $collection->title(),
+                        'blueprint' => $blueprint->title(),
+                        'handle' => $blueprint->handle(),
                         'url' => $collection->createEntryUrl(Site::selected()->handle()).'?blueprint='.$blueprint->handle(),
                     ];
                 });
         })->all();
-    }
-
-    private function getCreatableTitle($collection, $blueprint, $collectionCount, $blueprintCount)
-    {
-        if ($collectionCount > 1 && $blueprintCount === 1) {
-            return $collection->title();
-        }
-
-        if ($collectionCount > 1 && $blueprintCount > 1) {
-            return $collection->title().': '.$blueprint->title();
-        }
-
-        return $blueprint->title();
     }
 
     protected function toItemArray($id)

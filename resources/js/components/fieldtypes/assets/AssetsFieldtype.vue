@@ -1,8 +1,8 @@
 <template>
-    <div class="@container relative">
+    <div class="@container relative w-full">
         <div
             v-if="hasPendingDynamicFolder"
-            class="w-full rounded-md border border-dashed px-4 py-3 text-sm text-gray-700 dark:border-dark-200 dark:text-dark-175"
+            class="w-full rounded-md border border-dashed px-4 py-3 text-sm text-gray-700 dark:border-gray-300 dark:text-gray-200"
             v-html="pendingText"
         />
 
@@ -20,15 +20,15 @@
                 <div
                     v-if="config.allow_uploads"
                     v-show="dragging && !showSelector"
-                    class="absolute inset-0 flex flex-col gap-2 items-center justify-center bg-white/80 backdrop-blur-sm border border-gray-400 border-dashed rounded-lg"
+                    class="absolute inset-0 flex gap-2 items-center justify-center bg-white/80 backdrop-blur-sm border border-gray-400 border-dashed rounded-lg text-gray-700"
                 >
-                    <ui-icon name="upload-cloud" class="size-5 text-gray-500" />
-                    <ui-heading size="lg">{{ __('Drop to Upload') }}</ui-heading>
+                    <ui-icon name="upload-cloud" class="size-5" />
+                    <span class="text-sm">{{ __('Drop to Upload') }}</span>
                 </div>
 
                 <div
                     v-if="!isReadOnly && showPicker"
-                    class="border border-gray-400 dark:border-gray-700 border-dashed rounded-xl p-2 flex flex-col @2xs:flex-row items-center gap-4"
+                    class="not-[.link-fieldtype_&]:p-2 not-[.link-fieldtype_&]:border border-gray-400 dark:border-gray-700 border-dashed rounded-xl flex flex-col @2xs:flex-row items-center gap-4"
                     :class="{
                         'rounded-b-none': expanded,
                         'bard-drag-handle': isInBardField,
@@ -77,7 +77,7 @@
                     </div>
                 </div>
 
-                <div v-if="uploads.length" class="border-gray-300 border-l border-r">
+                <div v-if="uploads.length" class="divide-y">
                     <uploads
                         :uploads="uploads"
                         allow-selecting-existing
@@ -88,16 +88,17 @@
                 <template v-if="expanded">
                     <sortable-list
                         v-if="expanded && displayMode === 'grid'"
-                        v-model="assets"
-                        item-class="asset-tile"
-                        handle-class="asset-thumb-container"
-                        @dragstart="$emit('focus')"
-                        @dragend="$emit('blur')"
-                        :constrain-dimensions="true"
-                        :disabled="isReadOnly"
-                        :distance="5"
-                        :animate="false"
                         append-to="body"
+                        handle-class="asset-thumb-container"
+                        item-class="asset-tile"
+                        v-model="assets"
+                        :animate="false"
+                        :constrain-dimensions="true"
+                        :disabled="config.disabled"
+                        :distance="5"
+                        :read-only="isReadOnly"
+                        @dragend="$emit('blur')"
+                        @dragstart="$emit('focus')"
                     >
                         <div
                             class="relative grid gap-6 xl:gap-10 overflow-hidden rounded-xl border border-t-0 rounded-t-none dark:border-dark-700"
@@ -119,16 +120,17 @@
                         </div>
                     </sortable-list>
 
-                    <div class="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700 border-t-0! rounded-t-none" v-if="displayMode === 'list'">
+                    <div class="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700 not-[.link-fieldtype_&]:border-t-0! not-[.link-fieldtype_&]:rounded-t-none" v-if="displayMode === 'list'">
                         <table class="w-full">
                             <sortable-list
                                 v-model="assets"
                                 item-class="asset-row"
                                 handle-class="asset-row"
-                                :vertical="true"
-                                :disabled="isReadOnly"
+                                :disabled="config.disabled"
                                 :distance="5"
                                 :mirror="false"
+                                :read-only="isReadOnly"
+                                :vertical="true"
                             >
                                 <tbody ref="assets">
                                     <component
@@ -158,7 +160,6 @@
                 :folder="folder"
                 :restrict-folder-navigation="restrictNavigation"
                 :selected="selectedAssets"
-                :view-mode="selectorViewMode"
                 :max-files="maxFiles"
                 :query-scopes="queryScopes"
                 :columns="columns"
@@ -199,7 +200,6 @@ export default {
     mixins: [Fieldtype],
 
     inject: {
-        store: { default: null },
         isInBardField: {
             name: 'isInBardField',
             default: false,
@@ -220,7 +220,6 @@ export default {
             loading: true,
             initializing: true,
             showSelector: false,
-            selectorViewMode: null,
             draggingFile: false,
             uploads: [],
             innerDragging: false,
@@ -277,7 +276,7 @@ export default {
                 throw new Error(`Dynamic folder field [${field}] is invalid. Must be one of: id, slug, author`);
             }
 
-            const value = this.store.values[field];
+            const value = this.publishContainer.values[field];
 
             // If value is an array (e.g. a users fieldtype), get the first item.
             return Array.isArray(value) ? value[0] : value;
@@ -653,8 +652,6 @@ export default {
 
     mounted() {
         this.displayMode = this.isInsideGridField ? 'list' : this.config.mode || 'grid';
-
-        this.selectorViewMode = Cookies.get('statamic.assets.listing_view_mode') || 'grid';
 
         // We only have URLs in the field data, so we'll need to get the asset data.
         this.initializeAssets();

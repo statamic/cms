@@ -72,8 +72,6 @@ const use = function(emit, props) {
         update,
         updateMeta,
         isReadOnly: isReadOnly.value,
-        // store: this.fieldActionStore,
-        // storeName: this.fieldActionStoreName,
     }));
 
     const internalFieldActions = ref([]);

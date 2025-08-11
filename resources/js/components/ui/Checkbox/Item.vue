@@ -68,10 +68,10 @@ const conditionalProps = computed(() => {
             </CheckboxIndicator>
         </CheckboxRoot>
         <div class="flex flex-col" v-if="!solo">
-            <label class="text-sm font-normal text-gray-600 antialiased dark:text-gray-400" :for="id">
+            <label class="text-sm font-normal antialiased" :for="id">
                 <slot>{{ label || value }}</slot>
             </label>
-            <p v-if="description" class="mt-0.5 block text-xs leading-snug text-gray-500">{{ description }}</p>
+            <p v-if="description" class="mt-0.5 block text-xs leading-snug text-gray-500 dark:text-gray-400">{{ description }}</p>
         </div>
     </div>
 </template>

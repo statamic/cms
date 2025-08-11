@@ -4,6 +4,7 @@ import {
     Widget,
     StatusIndicator,
     Listing,
+    ListingTableHead as TableHead,
     ListingTableBody as TableBody,
     ListingPagination as Pagination,
     Icon,
@@ -33,10 +34,6 @@ const widgetProps = computed(() => ({
     title: props.title,
     icon: 'collections',
 }));
-
-function columnShowing(column) {
-    return cols.value.find((c) => c.field === column);
-}
 </script>
 
 <template>
@@ -60,10 +57,11 @@ function columnShowing(column) {
                 </ui-description>
                 <div class="px-4 py-3">
                     <table class="w-full [&_td]:p-0.5 [&_td]:text-sm " :class="{ 'opacity-50': loading }">
+                        <TableHead sr-only />
                         <TableBody>
-                            <template #cell-title="{ row: entry }">
+                            <template #cell-title="{ row: entry, isColumnVisible }">
                                 <div class="flex items-center gap-2">
-                                    <StatusIndicator v-if="!columnShowing('status')" :status="entry.status" />
+                                    <StatusIndicator v-if="!isColumnVisible('status')" :status="entry.status" />
                                     <a :href="entry.edit_url" class="line-clamp-1 overflow-hidden text-ellipsis">{{
                                         entry.title
                                     }}</a>

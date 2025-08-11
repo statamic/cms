@@ -34,19 +34,21 @@ function removeFieldFilter(handle) {
 </script>
 
 <template>
-    <div class="flex flex-1 items-center gap-3 overflow-x-auto py-3">
+    <div class="flex flex-1 items-center gap-3 overflow-x-auto py-3 rounded-r-4xl">
         <Modal :title="__('Apply Filters')">
             <template #trigger>
-                <Button icon="sliders-horizontal" class="relative [&_svg]:size-3.5" :disabled="reorderable">
-                    {{ __('Filters') }}
-                    <Badge
-                        v-if="badgeCount"
-                        :text="badgeCount"
-                        size="sm"
-                        pill
-                        class="absolute -top-1.5 -right-1.5"
-                    />
-                </Button>
+                <div class="sticky left-0 ps-[1px] rounded-r-lg bg-white dark:bg-gray-900 mask-bg mask-bg--left mask-bg--left-small">
+                    <Button icon="sliders-horizontal" class="[&_svg]:size-3.5" :disabled="reorderable">
+                        {{ __('Filters') }}
+                        <Badge
+                            v-if="badgeCount"
+                            :text="badgeCount"
+                            size="sm"
+                            pill
+                            class="absolute -top-1.5 -right-1.5"
+                        />
+                    </Button>
+                </div>
             </template>
             <div class="space-y-6 py-3">
                 <div class="bg-yellow p-2">
@@ -80,19 +82,23 @@ function removeFieldFilter(handle) {
         </Modal>
 
         <Button
-            v-for="(badge, handle) in fieldFilterBadges"
+            v-for="(badge, handle, index) in fieldFilterBadges"
+            :key="handle"
             variant="filled"
             :icon-append="reorderable ? null : 'x'"
             :text="badge"
             :disabled="reorderable"
+            :class="{ 'me-12': index === Object.keys(fieldFilterBadges).length - 1 }"
             @click="removeFieldFilter(handle)"
         />
         <Button
-            v-for="(badge, handle) in standardBadges"
+            v-for="(badge, handle, index) in standardBadges"
+            :key="handle"
             variant="filled"
             :icon-append="reorderable ? null : 'x'"
             :text="badge"
             :disabled="reorderable"
+            :class="{ 'me-12': index === Object.keys(standardBadges).length - 1 }"
             @click="setFilter(handle, null)"
         />
     </div>

@@ -7,13 +7,21 @@
 
 @section('content')
     <ui-header title="{{ __('Taxonomies') }}" icon="taxonomies">
-
         @can('create', 'Statamic\Contracts\Taxonomies\Taxonomy')
-            <ui-button
-                href="{{ cp_route('taxonomies.create') }}"
+            <ui-command-palette-item
+                category="{{ Statamic\CommandPalette\Category::Actions }}"
+                prioritize
                 text="{{ __('Create Taxonomy') }}"
-                variant="primary"
-            />
+                url="{{ cp_route('taxonomies.create') }}"
+                icon="taxonomies"
+                v-slot="{ text, url }"
+            >
+                <ui-button
+                    :text="text"
+                    :href="url"
+                    variant="primary"
+                ></ui-button>
+            </ui-command-palette-item>
         @endcan
     </ui-header>
 

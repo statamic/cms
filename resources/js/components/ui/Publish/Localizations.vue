@@ -1,5 +1,5 @@
 <script setup>
-import { Badge, Card, Panel } from '@statamic/ui';
+import { Badge, Card, Panel, Icon } from '@statamic/ui';
 
 defineProps({
     localizations: {
@@ -35,7 +35,7 @@ defineEmits(['selected']);
                         }"
                     />
                     {{ __(option.name) }}
-                    <loading-graphic :size="14" text="" class="ms-2" v-if="localizing === option.handle" />
+                    <Icon name="loading" class="ms-2" v-if="localizing === option.handle" />
                 </div>
                 <div class="flex items-center gap-1.5">
                     <Badge size="sm" color="orange" v-if="option.origin" :text="__('Origin')" />

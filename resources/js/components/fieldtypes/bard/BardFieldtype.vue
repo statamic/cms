@@ -6,7 +6,7 @@
         <div :class="{ 'publish-fields': fullScreenMode }">
             <div :class="fullScreenMode && wrapperClasses">
                 <div
-                    class="bard-fieldtype with-contrast:border-gray-500"
+                    class="bard-fieldtype antialiased st-text-legibility with-contrast:border-gray-500 shadow-ui-sm focus-outline-discrete"
                     :class="{ 'bard-fullscreen': fullScreenMode }"
                     ref="container"
                     @dragstart.stop="ignorePageHeader(true)"
@@ -34,7 +34,7 @@
                         </div>
                     </publish-field-fullscreen-header>
 
-                    <div class="bard-fixed-toolbar flex items-center justify-between rounded-t-xl border-b border-gray-300 bg-gray-50 px-2 py-1 dark:border-white/15 dark:bg-gray-950" v-if="!readOnly && showFixedToolbar && !fullScreenMode">
+                    <div class="bard-fixed-toolbar flex items-center justify-between rounded-t-xl border-b border-gray-300 bg-gray-50 px-2 py-1 dark:border-white/10 dark:bg-gray-950" v-if="!readOnly && showFixedToolbar && !fullScreenMode">
                         <div class="no-select flex flex-1 flex-wrap items-center" v-if="toolbarIsFixed">
                             <component
                                 v-for="button in visibleButtons(buttons)"
@@ -50,7 +50,7 @@
                     </div>
 
                     <div
-                        class="bard-editor @container/bard"
+                        class="bard-editor @container/bard focus-within:focus-outline focus-within:rounded-b-lg! focus-within:rounded-t-none!"
                         :class="{
                             'mode:read-only': readOnly,
                             'mode:minimal': !showFixedToolbar,
@@ -61,7 +61,7 @@
                         <bubble-menu
                             class="bard-floating-toolbar"
                             :editor="editor"
-                            :tippy-options="{ maxWidth: 'none', zIndex: 1000 }"
+                            :options="{ placement: 'top', offset: [0, 10] }"
                             v-if="editor && toolbarIsFloating && !readOnly"
                         >
                             <component
@@ -86,6 +86,7 @@
                             @hidden="showAddSetButton = false"
                         >
                             <set-picker
+                                ref="setPicker"
                                 v-if="showAddSetButton"
                                 :sets="groupConfigs"
                                 class="bard-set-selector"
@@ -129,37 +130,31 @@
 import Fieldtype from '../Fieldtype.vue';
 import uniqid from 'uniqid';
 import Emitter from 'tiny-emitter';
-import { BubbleMenu, Editor, EditorContent } from '@tiptap/vue-3';
+import { Editor, EditorContent } from '@tiptap/vue-3';
+import { BubbleMenu } from '@tiptap/vue-3/menus';
 import { Extension } from '@tiptap/core';
 import { FloatingMenu } from './FloatingMenu';
 import Blockquote from '@tiptap/extension-blockquote';
 import Bold from '@tiptap/extension-bold';
-import BulletList from '@tiptap/extension-bullet-list';
+import { BulletList, OrderedList, ListItem } from '@tiptap/extension-list';
 import CharacterCount from '@tiptap/extension-character-count';
 import Code from '@tiptap/extension-code';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
-import Dropcursor from '@tiptap/extension-dropcursor';
-import Gapcursor from '@tiptap/extension-gapcursor';
 import HardBreak from '@tiptap/extension-hard-break';
 import Heading from '@tiptap/extension-heading';
 import History from '@tiptap/extension-history';
 import HorizontalRule from '@tiptap/extension-horizontal-rule';
 import Italic from '@tiptap/extension-italic';
-import ListItem from '@tiptap/extension-list-item';
-import OrderedList from '@tiptap/extension-ordered-list';
 import Paragraph from '@tiptap/extension-paragraph';
-import Placeholder from '@tiptap/extension-placeholder';
 import Strike from '@tiptap/extension-strike';
 import Subscript from '@tiptap/extension-subscript';
 import Superscript from '@tiptap/extension-superscript';
-import Table from '@tiptap/extension-table';
-import TableRow from '@tiptap/extension-table-row';
-import TableCell from '@tiptap/extension-table-cell';
-import TableHeader from '@tiptap/extension-table-header';
+import { Table, TableRow, TableCell, TableHeader } from '@tiptap/extension-table';
 import Text from '@tiptap/extension-text';
 import TextAlign from '@tiptap/extension-text-align';
 import Typography from '@tiptap/extension-typography';
 import Underline from '@tiptap/extension-underline';
+import { Placeholder, Dropcursor, Gapcursor } from '@tiptap/extensions';
 import SetPicker from '../replicator/SetPicker.vue';
 import { DocumentBlock, DocumentInline } from './Document';
 import { Set } from './Set';
@@ -174,6 +169,7 @@ import readTimeEstimate from 'read-time-estimate';
 import { common, createLowlight } from 'lowlight';
 import 'highlight.js/styles/github.css';
 import importTiptap from '@statamic/util/tiptap.js';
+import { computed } from 'vue';
 
 const lowlight = createLowlight(common);
 let tiptap = null;
@@ -189,8 +185,6 @@ export default {
         FloatingMenu,
         LinkToolbarButton,
     },
-
-    inject: ['store', 'storeName'],
 
     provide: {
         isInBardField: true,
@@ -212,13 +206,17 @@ export default {
             showAddSetButton: false,
             provide: {
                 bard: this.makeBardProvide(),
-                storeName: this.storeName,
                 bardSets: this.config.sets,
             },
+            errorsById: {},
         };
     },
 
     computed: {
+        setFieldPathPrefix() {
+            return this.fieldPathPrefix ? `${this.fieldPathPrefix}.${this.handle}` : this.handle;
+        },
+
         toolbarIsFixed() {
             return this.config.toolbar_mode === 'fixed';
         },
@@ -276,24 +274,8 @@ export default {
             return indexes;
         },
 
-        storeState() {
-            if (!this.store) return undefined;
-
-            return this.store;
-        },
-
         site() {
-            return this.storeState ? this.storeState.site : this.$config.get('selectedSite');
-        },
-
-        setsWithErrors() {
-            if (!this.storeState) return [];
-
-            return Object.values(this.setIndexes).filter((setIndex) => {
-                const prefix = `${this.fieldPathPrefix || this.handle}.${setIndex}.`;
-
-                return Object.keys(this.storeState.errors).some((key) => key.startsWith(prefix));
-            });
+            return this.publishContainer.site ?? this.$config.get('selectedSite');
         },
 
         replicatorPreview() {
@@ -432,6 +414,27 @@ export default {
         fullScreenMode() {
             this.initEditor();
         },
+
+        'publishContainer.errors': {
+            immediate: true,
+            handler(errors) {
+                this.errorsById = Object.entries(errors).reduce((acc, [key, value]) => {
+                    if (!key.startsWith(this.setFieldPathPrefix)) {
+                        return acc;
+                    }
+
+                    const subKey = key.replace(`${this.setFieldPathPrefix}.`, '');
+                    const setIndex = subKey.split('.').shift();
+                    const setId = this.value[setIndex]?.attrs.id;
+
+                    if (setId) {
+                        acc[setId] = value;
+                    }
+
+                    return acc;
+                }, {});
+            },
+        },
     },
 
     methods: {
@@ -519,6 +522,11 @@ export default {
         },
 
         shouldShowSetButton({ view, state }) {
+            const isActive = this.suitableToShowSetButton({ view, state });
+            return this.setConfigs.length && (this.config.always_show_set_button || isActive);
+        },
+
+        suitableToShowSetButton({ view, state }) {
             const { selection } = state;
             const { $anchor, empty } = selection;
             const isRootDepth = $anchor.depth === 1;
@@ -527,8 +535,7 @@ export default {
             const isAroundInlineImage =
                 state.selection.$to.nodeBefore?.type.name === 'image' ||
                 state.selection.$to.nodeAfter?.type.name === 'image';
-            const isActive = view.hasFocus() && empty && isRootDepth && isEmptyTextBlock && !isAroundInlineImage;
-            return this.setConfigs.length && (this.config.always_show_set_button || isActive);
+            return view.hasFocus() && empty && isRootDepth && isEmptyTextBlock && !isAroundInlineImage;
         },
 
         initToolbarButtons() {
@@ -705,8 +712,11 @@ export default {
                     // Since clicking into a field inside a set would also trigger a blur, we can't just emit the
                     // blur event immediately. We need to make sure that the newly focused element is outside
                     // of Bard. We use a timeout because activeElement only exists after the blur event.
+                    // Additionally, check that the focused element isn't the set picker's search input.
                     setTimeout(() => {
-                        if (!this.$refs.container.contains(document.activeElement)) {
+                        const isInsideBard = this.$refs.container.contains(document.activeElement);
+                        const isSetPickerSearch = document.activeElement.hasAttribute('data-set-picker-search-input');
+                        if (!isInsideBard && !isSetPickerSearch) {
                             this.$emit('blur');
                             this.showAddSetButton = false;
                         }
@@ -759,6 +769,10 @@ export default {
             }
         },
 
+        setHasError(id) {
+            return this.errorsById.hasOwnProperty(id) && this.errorsById[id].length > 0;
+        },
+
         valueToContent(value) {
             return value.length ? { type: 'doc', content: value } : null;
         },
@@ -785,6 +799,7 @@ export default {
 
             // Allow passthrough of Ctrl/Cmd + Enter to submit the form
             const DisableCtrlEnter = Extension.create({
+                name: 'disableCtrlEnter',
                 addKeyboardShortcuts() {
                     return {
                         'Ctrl-Enter': () => true,
@@ -793,10 +808,34 @@ export default {
                 },
             });
 
+            // Handle forward slash to open set picker
+            const SlashSetPicker = Extension.create({
+                name: 'slashSetPicker',
+                addKeyboardShortcuts() {
+                    return {
+                        '/': () => {
+                            const { view, state } = this.editor;
+
+                            if (this.options.allowed({ view, state})) {
+                                this.options.openSetPicker();
+                                return true; // Prevent inserting a slash.
+                            }
+
+                            return false; // Allow default behavior (insert slash)
+                        },
+                    };
+                },
+            });
+
             let exts = [
                 CharacterCount.configure({ limit: this.config.character_limit }),
                 ...modeExts,
                 DisableCtrlEnter,
+                SlashSetPicker.configure({
+                    shown: computed(() => this.showAddSetButton),
+                    allowed: this.suitableToShowSetButton,
+                    openSetPicker: this.openSetPicker,
+                }),
                 Dropcursor,
                 Gapcursor,
                 History,
@@ -881,6 +920,10 @@ export default {
             });
             return bard;
         },
+
+        openSetPicker() {
+            this.$refs.setPicker.open();
+        }
     },
 };
 </script>

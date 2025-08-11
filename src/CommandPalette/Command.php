@@ -9,7 +9,7 @@ abstract class Command
     protected $icon = 'entry';
     protected $keys;
 
-    public function __construct(protected string $text, protected Category $category)
+    public function __construct(protected string|array $text, protected Category $category)
     {
         //
     }
@@ -23,6 +23,8 @@ abstract class Command
 
     public function keys(string $keys): static
     {
+        // TODO: Wire up keys API to frontend?
+
         $this->keys = $keys;
 
         return $this;

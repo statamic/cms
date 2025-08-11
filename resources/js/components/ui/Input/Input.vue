@@ -39,7 +39,7 @@ const inputClasses = computed(() => {
         base: [
             'w-full block bg-white dark:bg-gray-900',
             'border border-gray-300 with-contrast:border-gray-500 dark:border-x-0 dark:border-t-0 dark:border-white/7.5 dark:inset-shadow-2xs dark:inset-shadow-black',
-            'text-gray-900 dark:text-gray-300 placeholder:text-gray-500 dark:placeholder:text-gray-500',
+            'text-gray-950 dark:text-gray-300 placeholder:text-gray-500 dark:placeholder:text-gray-500',
             'appearance-none antialiased shadow-ui-sm disabled:shadow-none disabled:opacity-50 read-only:border-dashed not-prose',
         ],
         variants: {
@@ -110,7 +110,7 @@ const togglePassword = () => {
 const copied = ref(false);
 const copy = () => {
     if (!props.modelValue) return;
-    navigator.clipboard.writeText('props.modelValue');
+    navigator.clipboard.writeText(props.modelValue);
     copied.value = true;
     setTimeout(() => (copied.value = false), 1000);
 };
@@ -130,7 +130,7 @@ defineExpose({ focus });
 <template>
     <ui-input-group>
         <ui-input-group-prepend v-if="prepend" v-text="prepend" />
-        <div class="group/input relative block w-full" data-ui-input>
+        <div class="group/input relative block w-full st-text-legibility focus-outline-discrete" data-ui-input>
             <div v-if="hasPrependedIcon" :class="iconClasses">
                 <slot name="prepend">
                     <Icon :name="iconPrepend || icon" />
@@ -163,15 +163,15 @@ defineExpose({ focus });
                     />
                     <Button
                         size="sm"
-                        :icon="copied ? 'clipboard-check' : 'clipboard'"
+                        :icon="copied.value ? 'clipboard-check' : 'clipboard'"
                         variant="subtle"
                         v-else-if="copyable"
                         @click="copy"
                         class="animate"
-                        :class="copied ? 'animate-wiggle' : ''"
+                        :class="copied.value ? 'animate-wiggle' : ''"
                     />
                     <Icon v-else-if="iconAppend" :name="iconAppend" />
-                    <loading-graphic v-if="loading" inline text=""/>
+                    <Icon v-if="loading" name="loading" />
                 </slot>
             </div>
             <div v-if="limit" class="absolute inset-y-0 right-2 flex items-center">

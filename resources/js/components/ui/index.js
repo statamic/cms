@@ -29,6 +29,7 @@ import { default as DropdownLabel } from "./Dropdown/Label.vue";
 import { default as DropdownMenu } from "./Dropdown/Menu.vue";
 import { default as DropdownSeparator } from "./Dropdown/Separator.vue";
 import { default as Editable } from "./Editable.vue";
+import { default as ErrorMessage } from "./ErrorMessage.vue";
 import { default as EmptyStateItem } from "./EmptyState/Item.vue";
 import { default as EmptyStateMenu } from "./EmptyState/Menu.vue";
 import { default as Field } from "./Field.vue";
@@ -61,7 +62,11 @@ import { default as PanelFooter } from "./Panel/Footer.vue";
 import { default as PanelHeader } from "./Panel/Header.vue";
 import { default as Popover } from "./Popover.vue";
 import { default as PublishComponents } from "./Publish/Components.vue";
-import { default as PublishContainer } from "./Publish/Container.vue";
+import {
+    default as PublishContainer,
+    containerContextKey as publishContextKey,
+    injectContainerContext as injectPublishContext
+} from "./Publish/Container.vue";
 import { default as PublishField } from "./Publish/Field.vue";
 import { default as PublishFields } from "./Publish/Fields.vue";
 import { default as PublishForm } from "./Publish/Form.vue";
@@ -129,6 +134,7 @@ export {
     DropdownMenu,
     DropdownSeparator,
     Editable,
+    ErrorMessage,
     EmptyStateItem,
     EmptyStateMenu,
     Field,
@@ -162,6 +168,8 @@ export {
     Popover,
     PublishComponents,
     PublishContainer,
+    publishContextKey,
+    injectPublishContext,
     PublishField,
     PublishFields,
     PublishForm,

@@ -46,7 +46,7 @@
 
         <Panel class="nav-builder">
             <div class="loading card" v-if="loading">
-                <loading-graphic />
+                <Icon name="loading" />
             </div>
 
             <PanelHeader>
@@ -188,7 +188,7 @@ import TopLevelSectionBranch from './TopLevelSectionBranch.vue';
 import ItemEditor from './ItemEditor.vue';
 import SectionEditor from './SectionEditor.vue';
 import { data_get } from '../../bootstrap/globals.js';
-import { Header, Button, ButtonGroup, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, DropdownLabel, Panel, PanelHeader } from '@statamic/ui';
+import { Header, Button, ButtonGroup, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, DropdownLabel, Panel, PanelHeader, Icon } from '@statamic/ui';
 
 export default {
     components: {
@@ -207,6 +207,7 @@ export default {
         TopLevelSectionBranch,
         Panel,
         PanelHeader,
+        Icon,
     },
 
     props: {

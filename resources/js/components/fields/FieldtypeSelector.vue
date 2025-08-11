@@ -6,7 +6,7 @@
         </header>
 
         <div v-if="!fieldtypesLoaded" class="absolute inset-0 z-200 flex items-center justify-center text-center">
-            <loading-graphic />
+            <Icon name="loading" />
         </div>
 
         <div class="flex p-3" v-if="fieldtypesLoaded">
@@ -28,7 +28,8 @@
                 <h2 v-if="group.title" v-text="group.title" class="mb-2 px-2" />
                 <div class="fieldtype-selector">
                     <ui-panel>
-                        <ui-panel-header v-if="group.description" class="px-2! py-1.5!">
+                        <ui-panel-header v-if="group.description" class="px-2! py-1.7
+                        5!">
                             <ui-description :text="group.description" />
                         </ui-panel-header>
                         <div class="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-1.5">
@@ -55,10 +56,15 @@
 import fuzzysort from 'fuzzysort';
 import { ref } from 'vue';
 import { mapValues } from 'lodash-es';
+import { Icon } from '@statamic/ui';
 
 const loadedFieldtypes = ref(null);
 
 export default {
+    components: {
+        Icon,
+    },
+
     props: {
         allowTitle: {
             default: false,

@@ -41,7 +41,11 @@ const props = defineProps({
     showFieldPreviews: Boolean,
 });
 
-const { store } = injectContainerContext();
+const {
+    setFieldValue,
+    setFieldMeta,
+    previews
+} = injectContainerContext();
 const fieldPathPrefix = computed(() => `${props.fieldPath}.${props.index}`);
 const metaPathPrefix = computed(() => `${props.metaPath}.existing.${props.id}`);
 const isInvalid = computed(() => Object.keys(props.config).length === 0);
@@ -66,11 +70,9 @@ const fieldActionPayload = computed(() => ({
     values: props.values,
     config: props.config,
     // meta: this.meta,
-    update: (handle, value) => store.setDottedFieldValue({ path: `${fieldPathPrefix.value}.${handle}`, value }),
-    updateMeta: (handle, value) => store.setDottedFieldMeta({ path: `${metaPathPrefix.value}.${handle}`, value }),
+    update: (handle, value) => setFieldValue(`${fieldPathPrefix.value}.${handle}`, value),
+    updateMeta: (handle, value) => setFieldMeta(`${metaPathPrefix.value}.${handle}`, value),
     isReadOnly: props.readOnly,
-    // store: this.store,
-    // storeName: this.storeName,
 }));
 
 const fieldActions = computed(() => {
@@ -78,7 +80,7 @@ const fieldActions = computed(() => {
 });
 
 const previewText = computed(() => {
-    return Object.entries(data_get(store.previews, fieldPathPrefix.value) || {})
+    return Object.entries(data_get(previews.value, fieldPathPrefix.value) || {})
         .filter(([handle, value]) => {
             if (!handle.endsWith('_')) return false;
             handle = handle.substr(0, handle.length - 1); // Remove the trailing underscore.
@@ -102,7 +104,7 @@ const previewText = computed(() => {
 });
 
 function toggleEnabledState() {
-    store.setDottedFieldValue({ path: `${fieldPathPrefix.value}.enabled`, value: !props.enabled });
+    setFieldValue(`${fieldPathPrefix.value}.enabled`, !props.enabled);
 }
 
 function toggleCollapsedState() {
@@ -122,7 +124,8 @@ function destroy() {
         <slot name="picker" />
         <div
             layout
-            class="shadow-ui-sm relative z-2 w-full rounded-lg border border-gray-200 bg-white text-base dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
+            class="shadow-ui-sm relative z-2 w-full rounded-lg border border-gray-200 bg-white text-base dark:border-x-0 dark:border-t-0 dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
+            :class="{ 'border-red-500': hasError }"
             :data-collapsed="collapsed ?? undefined"
             :data-error="hasError ?? undefined"
             :data-invalid="isInvalid ?? undefined"
@@ -131,7 +134,7 @@ function destroy() {
         >
             <header
                 class="group/header animate-border-color flex items-center rounded-lg border-b border-transparent px-1.5 antialiased duration-200 hover:bg-gray-50"
-                :class="{ 'rounded-b-none border-gray-200! dark:border-white/15': !collapsed }"
+                :class="{ 'rounded-b-none border-gray-200! dark:border-white/10': !collapsed }"
             >
                 <Icon
                     name="handles"

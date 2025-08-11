@@ -15,7 +15,8 @@
 @if (Statamic::pro() && config('statamic.cp.custom_favicon_url'))
     @include('statamic::partials.favicon', ['favicon_url' => config('statamic.cp.custom_favicon_url')])
 @else
-    <link rel="icon" href="{{ Statamic::cpViteAsset('img/favicon.svg') }}" type="image/svg+xml">
+    <link rel="icon" type="image/png" href="{{ Statamic::cpViteAsset('img/favicon-32x32.png') }}" sizes="32x32" />
+    <link rel="icon" type="image/png" href="{{ Statamic::cpViteAsset('img/favicon-16x16.png') }}" sizes="16x16" />
     <link rel="apple-touch-icon" href="{{ Statamic::cpViteAsset('img/apple-touch-icon.png') }}">
     <link rel="shortcut icon" type="image/x-icon" href="{{ Statamic::cpViteAsset('img/favicon.ico') }}">
 @endif
@@ -27,8 +28,7 @@
         if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) theme = 'dark';
         if (theme === 'dark') document.documentElement.classList.add('dark');
 
-        let contrast = {!! ($userContrast = $user?->preferences()['contrast'] ?? null) ? "'" . $userContrast . "'" : 'null' !!};
-        if (!contrast) contrast = localStorage.getItem('statamic.contrast') ?? 'default';
+        let contrast = {!! $user?->getPreference('strict_accessibility') ? "'increased'" : "'auto'" !!};
         if (contrast === 'auto' && window.matchMedia('(prefers-contrast: more)').matches) contrast = 'increased';
         if (contrast === 'increased') document.documentElement.setAttribute('data-contrast', 'increased');
     })();

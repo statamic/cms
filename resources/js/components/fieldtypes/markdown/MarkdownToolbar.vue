@@ -1,7 +1,5 @@
 <template>
-    <div
-        class="flex items-center justify-between rounded-t-xl border-b border-gray-300 bg-gray-50 px-2 py-1 dark:border-white/15 dark:bg-gray-950 overflow-x-scroll"
-    >
+    <div data-markdown-toolbar>
         <div class="flex items-center" v-if="!isReadOnly">
             <Button
                 size="sm"
@@ -27,7 +25,7 @@
                 <svg-icon name="dark-mode" class="size-4" />
             </Button>
         </div>
-        <ToggleGroup v-model="mode" size="sm" class="-me-1">
+        <ToggleGroup v-model="mode" size="sm" class="-me-1" data-markdown-mode-toggle>
             <ToggleItem icon="pencil" value="write" v-tooltip="__('Writing Mode')" />
             <ToggleItem icon="eye" value="preview" v-tooltip="__('Preview Mode')" />
         </ToggleGroup>

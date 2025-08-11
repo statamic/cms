@@ -1,6 +1,6 @@
 <script setup>
 import { cva } from 'cva';
-import { PopoverArrow, PopoverContent, PopoverPortal, PopoverRoot, PopoverTrigger } from 'reka-ui';
+import { PopoverArrow, PopoverClose, PopoverContent, PopoverPortal, PopoverRoot, PopoverTrigger } from 'reka-ui';
 import { ref, watch } from 'vue';
 
 defineOptions({
@@ -21,7 +21,7 @@ const props = defineProps({
 const popoverContentClasses = cva({
     base: [
         'rounded-xl w-64 bg-white dark:bg-gray-800 outline-hidden overflow-hidden',
-        'border border-gray-200 dark:border-white/15 dark:border-b-0 shadow-lg',
+        'border border-gray-200 dark:border-white/10 dark:border-b-0 shadow-lg',
         'duration-100 will-change-[transform,opacity]',
         'data-[state=open]:animate-in data-[state=closed]:animate-out',
         'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
@@ -50,7 +50,7 @@ function updateOpen(value) {
 </script>
 
 <template>
-    <PopoverRoot :open @update:open="updateOpen">
+    <PopoverRoot :open @update:open="updateOpen" v-slot="slotProps">
         <PopoverTrigger data-ui-popover-trigger as-child>
             <slot name="trigger" />
         </PopoverTrigger>
@@ -62,7 +62,10 @@ function updateOpen(value) {
                 :sideOffset="offset"
                 :side
             >
-                <slot />
+                <slot v-bind="slotProps" />
+                <PopoverClose>
+                    <slot name="close" v-bind="slotProps" />
+                </PopoverClose>
                 <PopoverArrow v-if="arrow" class="fill-white stroke-gray-300" />
             </PopoverContent>
         </PopoverPortal>

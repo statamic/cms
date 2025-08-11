@@ -1,6 +1,6 @@
 <script setup>
-import { computed, nextTick, ref, watch, useTemplateRef, onBeforeUnmount, onUnmounted } from 'vue';
-import Resizer from '@statamic/components/live-preview/Resizer.vue';
+import { computed, nextTick, ref, watch, useTemplateRef, onBeforeUnmount, onUnmounted, onBeforeMount } from 'vue';
+import Resizer from './Resizer.vue';
 import { injectContainerContext } from '@statamic/components/ui/Publish/Container.vue';
 import debounce from '@statamic/util/debounce.js';
 import { Select, Button } from '@statamic/ui';
@@ -27,7 +27,7 @@ const props = defineProps({
 
 const emit = defineEmits(['opened', 'closed']);
 
-const { name, blueprint, store } = injectContainerContext();
+const { name, blueprint, values } = injectContainerContext();
 const portalEnabled = ref(false);
 const panesVisible = ref(false);
 const headerVisible = ref(false);
@@ -48,7 +48,7 @@ const iframeContentContainer = useTemplateRef('contents');
 let source;
 
 const livePreviewFieldsPortal = computed(() => {
-    return `live-preview-fields-${name}`;
+    return `live-preview-fields-${name.value}`;
 });
 
 watch(
@@ -78,8 +78,8 @@ const tokenizedUrl = computed(() => {
 });
 
 const payload = computed(() => ({
-    blueprint: blueprint.handle,
-    preview: store.values,
+    blueprint: blueprint.value.handle,
+    preview: values.value,
     extras: extras.value,
 }));
 
@@ -364,8 +364,8 @@ const keybinding = ref(
 
 onUnmounted(() => keybinding.value.destroy());
 
-Statamic.$events.$on(`live-preview.${props.name}.refresh`, () => {
-    update();
+Statamic.$events.$on(`live-preview.${name.value}.refresh`, () => {
+    if (props.enabled) update();
 });
 </script>
 
@@ -418,7 +418,7 @@ Statamic.$events.$on(`live-preview.${props.name}.refresh`, () => {
                             <portal-target :name="livePreviewFieldsPortal" />
                         </div>
 
-                        <resizer
+                        <Resizer
                             v-show="!poppedOut"
                             @resized="setEditorWidth"
                             @resize-start="editorResizing = true"

@@ -37,6 +37,7 @@ export default {
         text: { type: String, default: () => __('Create Entry') },
         size: { type: String, default: 'base' },
         buttonClass: { type: String, default: 'btn' },
+        commandPalette: { type: Boolean, default: false },
     },
 
     computed: {
@@ -45,19 +46,47 @@ export default {
         },
     },
 
+    mounted() {
+        this.addToCommandPalette();
+    },
+
     methods: {
         create($event) {
             if (this.blueprints.length === 1) this.select(null, $event);
         },
 
         select(blueprint, $event) {
+            let url = this.createUrl(blueprint);
+
+            $event.metaKey ? window.open(url) : (window.location = url);
+        },
+
+        createUrl(blueprint) {
             let url = this.url;
 
             if (blueprint) {
                 url = url += `?blueprint=${blueprint}`;
             }
 
-            $event.metaKey ? window.open(url) : (window.location = url);
+            return url;
+        },
+
+        addToCommandPalette() {
+            if (! this.commandPalette) {
+                return;
+            }
+
+            let title = __('Create Entry');
+
+            this.blueprints.forEach(blueprint => {
+                Statamic.$commandPalette.add({
+                    category: Statamic.$commandPalette.category.Actions,
+                    text: this.hasMultipleBlueprints ? [title, blueprint.title] : title,
+                    icon: 'entry',
+                    url: this.createUrl(blueprint.handle),
+                    prioritize: true,
+                });
+            });
         },
     },
 };

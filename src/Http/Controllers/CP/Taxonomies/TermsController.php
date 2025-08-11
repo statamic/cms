@@ -106,7 +106,7 @@ class TermsController extends CpController
                 'revisions' => $term->revisionsUrl(),
                 'restore' => $term->restoreRevisionUrl(),
                 'createRevision' => $term->createRevisionUrl(),
-                'editBlueprint' => cp_route('taxonomies.blueprints.edit', [$taxonomy, $blueprint]),
+                'editBlueprint' => cp_route('blueprints.taxonomies.edit', [$taxonomy, $blueprint]),
             ],
             'values' => array_merge($values, ['id' => $term->id()]),
             'meta' => $meta,
@@ -238,7 +238,7 @@ class TermsController extends CpController
             'title' => $taxonomy->createLabel(),
             'actions' => [
                 'save' => cp_route('taxonomies.terms.store', [$taxonomy->handle(), $site->handle()]),
-                'editBlueprint' => cp_route('taxonomies.blueprints.edit', [$taxonomy, $blueprint]),
+                'editBlueprint' => cp_route('blueprints.taxonomies.edit', [$taxonomy, $blueprint]),
             ],
             'values' => $values,
             'meta' => $fields->meta(),

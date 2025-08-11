@@ -6,7 +6,6 @@ use Statamic\Facades\GraphQL;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Types\CodeType;
-use Statamic\Rules\CodeFieldtypeRulers;
 
 class Code extends Fieldtype
 {
@@ -16,7 +15,7 @@ class Code extends Fieldtype
     {
         return [
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Appearance'),
                 'fields' => [
                     'theme' => [
                         'display' => __('Theme'),
@@ -27,6 +26,56 @@ class Code extends Fieldtype
                             'material' => __('Dark'),
                             'light' => __('Light'),
                         ],
+                        'width' => '33',
+                    ],
+                    'line_numbers' => [
+                        'display' => __('Show Line Numbers'),
+                        'instructions' => __('statamic::fieldtypes.code.config.line_numbers'),
+                        'type' => 'toggle',
+                        'default' => true,
+                        'width' => '33',
+                    ],
+                    'line_wrapping' => [
+                        'display' => __('Enable Line Wrapping'),
+                        'instructions' => __('statamic::fieldtypes.code.config.line_wrapping'),
+                        'type' => 'toggle',
+                        'default' => true,
+                        'width' => '33',
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Data & Format'),
+                'fields' => [
+                    'indent_type' => [
+                        'display' => __('Indent Type'),
+                        'instructions' => __('statamic::fieldtypes.code.config.indent_type'),
+                        'type' => 'select',
+                        'default' => 'tabs',
+                        'options' => [
+                            'tabs' => __('Tabs'),
+                            'spaces' => __('Spaces'),
+                        ],
+                        'width' => '33',
+                    ],
+                    'indent_size' => [
+                        'display' => __('Indent Size'),
+                        'instructions' => __('statamic::fieldtypes.code.config.indent_size'),
+                        'type' => 'integer',
+                        'default' => 4,
+                        'width' => '33',
+                    ],
+                    'key_map' => [
+                        'display' => __('Key Mappings'),
+                        'instructions' => __('statamic::fieldtypes.code.config.key_map'),
+                        'type' => 'select',
+                        'default' => 'default',
+                        'options' => [
+                            'default' => 'Default',
+                            'sublime' => 'Sublime',
+                            'vim' => 'Vim',
+                        ],
+                        'width' => '33',
                     ],
                     'mode' => [
                         'display' => __('Default Mode'),
@@ -60,49 +109,14 @@ class Code extends Fieldtype
                             'xml' => 'XML',
                             'yaml-frontmatter' => 'YAML',
                         ],
+                        'width' => '33',
                     ],
                     'mode_selectable' => [
                         'display' => __('Selectable Mode'),
                         'instructions' => __('statamic::fieldtypes.code.config.mode_selectable'),
                         'type' => 'toggle',
                         'default' => true,
-                    ],
-                    'indent_type' => [
-                        'display' => __('Indent Type'),
-                        'instructions' => __('statamic::fieldtypes.code.config.indent_type'),
-                        'type' => 'select',
-                        'default' => 'tabs',
-                        'options' => [
-                            'tabs' => __('Tabs'),
-                            'spaces' => __('Spaces'),
-                        ],
-                    ],
-                    'indent_size' => [
-                        'display' => __('Indent Size'),
-                        'instructions' => __('statamic::fieldtypes.code.config.indent_size'),
-                        'type' => 'integer',
-                        'default' => 4,
-                    ],
-                    'key_map' => [
-                        'display' => __('Key Mappings'),
-                        'instructions' => __('statamic::fieldtypes.code.config.key_map'),
-                        'type' => 'select',
-                        'default' => 'default',
-                        'options' => [
-                            'default' => 'Default',
-                            'sublime' => 'Sublime',
-                            'vim' => 'Vim',
-                        ],
-                    ],
-                    'line_numbers' => [
-                        'display' => __('Show Line Numbers'),
-                        'type' => 'toggle',
-                        'default' => true,
-                    ],
-                    'line_wrapping' => [
-                        'display' => __('Enable Line Wrapping'),
-                        'type' => 'toggle',
-                        'default' => true,
+                        'width' => '33',
                     ],
                     'rulers' => [
                         'display' => __('Rulers'),
@@ -111,17 +125,6 @@ class Code extends Fieldtype
                         'key_header' => __('Columns'),
                         'value_header' => __('Line Style (dashed or solid)'),
                         'add_button' => __('Add Ruler'),
-                        'validate' => [new CodeFieldtypeRulers],
-                    ],
-                ],
-            ],
-            [
-                'display' => __('Antlers'),
-                'fields' => [
-                    'antlers' => [
-                        'display' => __('Allow Antlers'),
-                        'instructions' => __('statamic::fieldtypes.any.config.antlers'),
-                        'type' => 'toggle',
                     ],
                 ],
             ],

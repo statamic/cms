@@ -1,22 +1,7 @@
 <template>
-    <node-view-wrapper>
-        <Motion
-            layout
-            class="flex justify-center py-3 relative group"
-            :initial="{ paddingTop: '0.75rem', paddingBottom: '0.75rem' }"
-            :hover="{ paddingTop: '1.25rem', paddingBottom: '1.25rem' }"
-            :transition="{ duration: 0.2 }"
-        >
-            <div v-if="showConnector" class="absolute group-hover:opacity-0 transition-opacity delay-25 duration-125 inset-y-0 h-full left-3.5 border-l-1 border-gray-400 dark:border-gray-600 border-dashed z-0 dark:bg-dark-700" />
-            <button class="w-full absolute inset-0 h-full opacity-0 group-hover:opacity-100 transition-opacity delay-25 duration-75 cursor-pointer">
-                <div class="h-full flex flex-col justify-center">
-                    <div class="rounded-full bg-gray-200 h-2" />
-                </div>
-            </button>
-            <Button v-if="enabled" round icon="plus" size="sm" class="-my-4 z-3 opacity-0 group-hover:opacity-100 transition-opacity delay-25 duration-75" />
-        </Motion>
+    <node-view-wrapper class="my-4">
         <div
-            class="shadow-ui-sm relative z-2 w-full rounded-lg border border-gray-200 bg-white text-base dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
+            class="shadow-ui-sm relative z-2 w-full rounded-lg border border-gray-200 bg-white text-base dark:border-x-0 dark:border-t-0 dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
             :class="{
                 'dark:border-dark-blue-100 border-blue-400!': selected || withinSelection,
                 'border-red-500': hasError,
@@ -30,7 +15,7 @@
             <div ref="content" hidden />
             <header
                 class="group/header animate-border-color flex items-center rounded-lg border-b border-transparent px-1.5 antialiased duration-200 hover:bg-gray-50"
-                :class="{ 'rounded-b-none border-gray-200! dark:border-white/15': !collapsed, invalid: isInvalid }"
+                :class="{ 'rounded-b-none border-gray-200! dark:border-white/10': !collapsed, invalid: isInvalid }"
             >
                 <Icon data-drag-handle name="handles" class="size-4 cursor-grab text-gray-400" v-if="!isReadOnly" />
                 <button type="button" class="flex flex-1 items-center gap-4 p-2" @click="toggleCollapsedState">
@@ -55,7 +40,7 @@
                     />
                 </button>
                 <div class="flex items-center gap-2" v-if="!isReadOnly">
-                    <Tooltip :text="enabled ? __('Included in output') : __('Hidden from output')">
+                    <Tooltip :text="enabled ? __('Included in output') : __('Hidden from output')" as="span">
                         <Switch size="xs" v-model="enabled" />
                     </Tooltip>
 
@@ -110,13 +95,12 @@
 <script>
 import { NodeViewWrapper } from '@tiptap/vue-3';
 import ManagesPreviewText from '../replicator/ManagesPreviewText';
-import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
 import HasFieldActions from '../../field-actions/HasFieldActions.js';
 import { Badge, Button, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, Icon, Subheading, Switch, Tooltip } from '@statamic/ui';
 import { Motion } from 'motion-v';
 import FieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
 import Fields from '@statamic/components/ui/Publish/Fields.vue';
-import { within } from '@popperjs/core/lib/utils/within.js';
+import { containerContextKey } from '@statamic/components/ui/Publish/Container.vue';
 
 export default {
     props: {
@@ -128,7 +112,6 @@ export default {
         getPos: { type: Function, required: true },
         updateAttributes: { type: Function, required: true },
         deleteNode: { type: Function, required: true },
-        showConnector: { type: Boolean, default: true },
     },
 
     components: {
@@ -148,9 +131,13 @@ export default {
         Motion,
     },
 
-    mixins: [ValidatesFieldConditions, ManagesPreviewText, HasFieldActions],
+    mixins: [ManagesPreviewText, HasFieldActions],
 
-    inject: ['bard', 'bardSets', 'store', 'storeName'],
+    inject: {
+        bard: {},
+        bardSets: {},
+        publishContainer: { from: containerContextKey },
+    },
 
     computed: {
         fields() {
@@ -174,7 +161,7 @@ export default {
         },
 
         previews() {
-            return data_get(this.store.previews, this.fieldPathPrefix) || {};
+            return data_get(this.publishContainer.previews.value, this.fieldPathPrefix) || {};
         },
 
         collapsed() {
@@ -243,7 +230,7 @@ export default {
         },
 
         hasError() {
-            return this.extension.options.bard.setsWithErrors.includes(this.index);
+            return this.extension.options.bard.setHasError(this.node.attrs.id);
         },
 
         showFieldPreviews() {
@@ -276,12 +263,10 @@ export default {
                 config: this.config,
                 // meta: this.meta,
                 update: (handle, value) =>
-                    this.store.setDottedFieldValue({ path: `${this.fieldPathPrefix}.${handle}`, value }),
+                    this.publishContainer.setFieldValue(`${this.fieldPathPrefix}.${handle}`, value),
                 updateMeta: (handle, value) =>
-                    this.store.setDottedFieldMeta({ path: `${this.metaPathPrefix}.${handle}`, value }),
+                    this.publishContainer.setFieldMeta(`${this.metaPathPrefix}.${handle}`, value),
                 isReadOnly: this.isReadOnly,
-                // store: this.store,
-                // storeName: this.storeName,
             };
         },
 
@@ -291,9 +276,6 @@ export default {
     },
 
     methods: {
-        within() {
-            return within;
-        },
         focused() {
             this.extension.options.bard.$emit('focus');
         },

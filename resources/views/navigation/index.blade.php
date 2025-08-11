@@ -8,11 +8,20 @@
 @section('content')
     <ui-header title="{{  __('Navigation') }}" icon="navigation">
         @can('create', 'Statamic\Contracts\Structures\Nav')
-            <ui-button
-                href="{{ cp_route('navigation.create') }}"
+            <ui-command-palette-item
+                category="{{ Statamic\CommandPalette\Category::Actions }}"
+                prioritize
                 text="{{ __('Create Navigation') }}"
-                variant="primary"
-            />
+                url="{{ cp_route('navigation.create') }}"
+                icon="navigation"
+                v-slot="{ text, url }"
+            >
+                <ui-button
+                    :text="text"
+                    :href="url"
+                    variant="primary"
+                />
+            </ui-command-palette-item>
         @endcan
     </ui-header>
 

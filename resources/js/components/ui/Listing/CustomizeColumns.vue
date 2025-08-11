@@ -69,7 +69,7 @@ function reset() {
 </script>
 
 <template>
-    <div data-ui-column-customizer>
+    <div data-ui-column-customizer class="absolute right-0 mask-bg mask-bg--left">
         <Tooltip :text="__('Customize Columns')">
             <Button icon="sliders-vertical" :disabled="reorderable" @click="open = true" :aria-label="__('Customize Columns')" />
         </Tooltip>

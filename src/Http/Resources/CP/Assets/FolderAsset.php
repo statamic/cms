@@ -8,6 +8,8 @@ use Statamic\Support\Str;
 
 class FolderAsset extends JsonResource
 {
+    use HasThumbnails;
+
     protected $blueprint;
     protected $columns;
 
@@ -30,20 +32,11 @@ class FolderAsset extends JsonResource
         return [
             'id' => $this->id(),
             'basename' => $this->basename(),
+            'path' => $this->path(),
             'extension' => $this->extension(),
             'url' => $this->absoluteUrl(),
             'size_formatted' => Str::fileSizeForHumans($this->size(), 0),
             'last_modified_relative' => $this->lastModified()->diffForHumans(),
-
-            $this->mergeWhen($this->isImage() || $this->isSvg(), function () {
-                return [
-                    'is_image' => true,
-                    'thumbnail' => $this->thumbnailUrl('small'),
-                    'can_be_transparent' => $this->isSvg() || $this->extensionIsOneOf(['svg', 'png', 'webp', 'avif']),
-                    'alt' => $this->alt,
-                    'orientation' => $this->orientation(),
-                ];
-            }),
 
             $this->merge($this->values()),
 
@@ -51,6 +44,8 @@ class FolderAsset extends JsonResource
                 'container' => $this->container()->handle(),
                 'folder' => $this->folder(),
             ]),
+
+            $this->merge($this->thumbnails()),
         ];
     }
 

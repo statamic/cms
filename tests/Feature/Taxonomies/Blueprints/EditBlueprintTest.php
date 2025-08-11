@@ -25,7 +25,7 @@ class EditBlueprintTest extends TestCase
         $this
             ->from('/original')
             ->actingAs($user)
-            ->get(cp_route('taxonomies.blueprints.edit', [$collection, $blueprint]))
+            ->get(cp_route('blueprints.taxonomies.edit', [$collection, $blueprint]))
             ->assertRedirect('/original')
             ->assertSessionHas('error');
     }
@@ -40,7 +40,7 @@ class EditBlueprintTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->get(cp_route('taxonomies.blueprints.edit', [$collection, $blueprint]))
+            ->get(cp_route('blueprints.taxonomies.edit', [$collection, $blueprint]))
             ->assertStatus(200)
             ->assertViewHas('blueprint', $blueprint);
     }

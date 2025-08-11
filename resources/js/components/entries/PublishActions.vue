@@ -10,7 +10,7 @@
 
             <div class="flex-1 overflow-auto">
                 <div class="loading flex h-full items-center justify-center" v-if="saving">
-                    <loading-graphic />
+                    <Icon name="loading" />
                 </div>
 
                 <div class="p-3 flex flex-col space-y-6" v-else>
@@ -83,7 +83,7 @@ export default {
                 }
             }
 
-            options.push({ value: 'schedule', label: __('Schedule') });
+            // options.push({ value: 'schedule', label: __('Schedule') });
 
             options.push({ value: 'revision', label: __('Create Revision') });
 
@@ -125,7 +125,6 @@ export default {
                 .run('entry.publishing', {
                     collection: this.collection,
                     message: this.revisionMessage,
-                    storeName: this.publishContainer,
                 })
                 .then(this.performPublishRequest)
                 .catch((error) => {

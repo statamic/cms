@@ -15,7 +15,8 @@
 
 /* UTILITIES / TEXT
 =================================================== */
-@utility trim-text-start {
+/* Avoid prefixing things with text- because this is a Tailwind prefix */
+@utility st-text-trim-start {
     text-box: trim-start;
     /* =Jay. When we have an SVG we probably don't want to text trim, for example in a Markdown field with button controls like Bold, Italic, etc. */
     &:has(svg),
@@ -28,7 +29,7 @@
         text-box: unset;
     }
 }
-@utility trim-cap-alphabetic {
+@utility st-text-trim-cap {
     /* =Jay. Sometimes this is handy e.g. the text inside the command palette searchbox */
     text-box: cap alphabetic;
 }
@@ -38,6 +39,17 @@
     &::placeholder {
         font-size: 0.975em;
     }
+}
+@utility placeholder-text-xs {
+    /* =Jay. If it needs to be used directly on the element such as the link field i.e. pseudo ::placeholder */
+    font-size: 0.975em;
+}
+
+@utility st-text-legibility {
+    font-family: "inter", sans-serif;
+    letter-spacing: -0.02em;
+    font-optical-sizing: auto;
+    font-weight: 425;
 }
 
 /* UTILITIES / STATES
@@ -49,12 +61,11 @@
     outline-color: var(--focus-outline-color, currentColor);
     outline-style: var(--focus-outline-style, solid);
 }
-/* Same as focus-outline, but without the outline-offset, e.g. a Markdown editor */
-@utility focus-outline-within {
-    outline-offset: 0;
-    outline-width: var(--focus-outline-width);
-    outline-color: var(--focus-outline-color, currentColor);
-    outline-style: var(--focus-outline-style, solid);
+/* Make the focus border more descrete for some fields such as Bard */
+@utility focus-outline-discrete {
+    &:focus-within {
+        --focus-outline-color: var(--color-blue-300);
+    }
 }
 
 @utility focus-none {
@@ -132,7 +143,7 @@
 */
 /* HTML Example...
 
-    <div class="absolute right-0 mask-bg"> <-- needs to be position:absolute or position:relative
+    <div class="absolute right-0 mask-bg"> <-- needs to be position:absolute or position:relative. Use a modifier class to change the amount/direction, e.g. <div class="sticky left-0 mask-bg mask-bg--left mask-bg--left-small">
 
     </div>
 
@@ -140,15 +151,30 @@
 @utility mask-bg {
     z-index: var(--z-index-above);
     &::before {
+        --cover: 3rem;
+        --height-offset: 0.3rem;
         content: '';
+        opacity: 75%;
         position: absolute;
         z-index: var(--z-index-below);
-        inset: -0.2rem -1.5rem;
-        background: radial-gradient(circle at center, white 50%,transparent 100%);
-        border-radius: 1.5rem;
+        width: calc(150% + var(--cover));
+        height: calc(100% + var(--height-offset) * 2);
+        top: calc(0% - var(--height-offset));
+        background: radial-gradient(circle at center, white 0%,transparent 80%);
+        border-radius: 1.5rem 0 0 1.5rem;
     }
     .dark &::before {
-        background: radial-gradient(circle at center, var(--color-gray-900) 50%,transparent 100%);
+        background: radial-gradient(circle at center, hsl(240deg 6% 10%) 0%, transparent 80%);
+    }
+}
+@utility mask-bg--left {
+    &::before {
+        left: calc(0.5rem - var(--cover));
+    }
+}
+@utility mask-bg--left-small {
+    &::before {
+        left: calc(-0.75rem - var(--cover));
     }
 }
 
@@ -169,6 +195,7 @@
 /* HTML Example...
 
     <div class="content-card bg-architectural-lines"> <-- background lines added to this element
+        [data-ui-panel] <-- a central horizontal line is created here
         <footer>
             <button>Create Collection</button> <--- circular line effect added to this descendended button in the footer
         </footer>
@@ -187,6 +214,35 @@
         /* Reduce the chances of the background circles overlapping the button */
         @media (width < 1300px) {
             background-position-y: 130%;
+        }
+        @media (width > 2000px) {
+            /* The lines become thicker because the svg gets stretched, so reduce opacity to compensate for this */
+            opacity: 0.7;
+        }
+    }
+    .dark &::before {
+        filter: invert(100%);
+    }
+    /* Central horizontal line */
+    [data-ui-panel] {
+        > * {
+            position: relative;
+            z-index: 1;
+        }
+    
+        &::after {
+            --height: 1px;
+            --line-color: hsl(0deg 0% 95%);
+            content: '';
+            pointer-events: none;
+            position: absolute;
+            inset: 0;
+            height: var(--height);
+            border-image: conic-gradient(var(--line-color) 0 0) fill 0//0 100vw;
+            top: calc(50% - var(--height));
+        }
+        .dark &::after {
+            --line-color: hsl(240deg 2.56% 15%);
         }
     }
     footer {

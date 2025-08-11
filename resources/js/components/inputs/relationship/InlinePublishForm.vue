@@ -8,9 +8,9 @@
             :full="stackSize === 'full'"
             @closed="close"
         >
-            <div class="h-full overflow-scroll overflow-x-auto bg-gray-300 p-6 dark:bg-dark-800">
+            <div class="h-full overflow-scroll overflow-x-auto bg-white px-6 rounded-l-xl dark:bg-dark-800">
                 <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
-                    <loading-graphic />
+                    <Icon name="loading" />
                 </div>
 
                 <component
@@ -24,9 +24,9 @@
                     :publish-container="publishContainer"
                     @saved="saved"
                 >
-                    <template slot="action-buttons-right">
+                    <template #action-buttons-right>
                         <slot name="action-buttons-right" />
-                        <button type="button" class="btn-close" @click="confirmClose" v-html="'&times'" />
+                        <Button icon="x" size="sm" variant="ghost" class="-me-2" @click="close" />
                     </template>
                 </component>
             </div>
@@ -45,7 +45,13 @@
 </template>
 
 <script>
+import { Button, Icon } from '@statamic/ui';
+
 export default {
+    components: {
+        Button,
+        Icon,
+    },
     props: {
         component: String,
         componentProps: Object,

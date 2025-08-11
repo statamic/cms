@@ -10,33 +10,35 @@ const props = defineProps({
     route: { type: String, required: true },
     titleInstructions: { type: String, default: null },
     handleInstructions: { type: String, default: null },
+    withoutHandle: { type: Boolean, default: false },
 });
 
-const emit = defineEmits(['submit']);
-
-// Get Vue instance to access global properties
 const instance = getCurrentInstance();
 const { $slug, $axios, $toast, $keys } = instance.appContext.config.globalProperties;
 
-// Common data
 const title = ref(null);
 const handle = ref(null);
 const slug = $slug.separatedBy('_');
 
-// Common computed
-const canSubmit = computed(() => title.value && handle.value);
+const canSubmit = computed(() => {
+    return title.value && (props.withoutHandle || handle.value);
+});
 
-// Common watch
 watch(title, (newTitle) => {
-    if (newTitle) {
+    if (newTitle && !props.withoutHandle) {
         handle.value = slug.create(newTitle);
     }
 });
 
-// Common methods
 const submit = () => {
+    let payload = { title: title.value };
+
+    if (!props.withoutHandle) {
+        payload.handle = handle.value;
+    }
+
     $axios
-        .post(props.route, { title: title.value, handle: handle.value })
+        .post(props.route, payload)
         .then((response) => {
             window.location = response.data.redirect;
         })
@@ -45,7 +47,6 @@ const submit = () => {
         });
 };
 
-// Common mounted
 onMounted(() => {
     $keys.bindGlobal(['return', 'mod+s'], (e) => {
         e.preventDefault();
@@ -59,9 +60,9 @@ onMounted(() => {
 
 <template>
     <div class="mx-auto mt-4 space-y-3 lg:space-y-6 max-w-3xl">
-        <header v-if="props.title || props.subtitle" class="text-center max-w-xl mx-auto py-6 lg:pt-12 xl:pt-16">
+        <header v-if="props.title || subtitle" class="text-center max-w-xl mx-auto py-6 lg:pt-12 xl:pt-16">
             <ui-heading v-if="props.title" size="2xl" :level="1" :icon="props.icon" :text="props.title" class="justify-center" />
-            <ui-subheading v-if="props.subtitle" class="mt-6" size="lg" :text="props.subtitle" />
+            <ui-subheading v-if="subtitle" class="mt-6" size="lg" :text="subtitle" />
         </header>
 
         <!-- Default form fields if no custom content -->
@@ -70,17 +71,18 @@ onMounted(() => {
                 <div class="space-y-8">
                     <ui-field
                         :label="__('Title')"
-                        :instructions="props.titleInstructions"
+                        :instructions="titleInstructions"
                         :instructions-below="true"
                     >
-                        <ui-input v-model="title" autofocus tabindex="1" />
+                        <ui-input v-model="title" autofocus :tabindex="1" />
                     </ui-field>
                     <ui-field
+                        v-if="!withoutHandle"
                         :label="__('Handle')"
-                        :instructions="props.handleInstructions"
+                        :instructions="handleInstructions"
                         :instructions-below="true"
                     >
-                        <ui-input v-model="handle" tabindex="2" :loading="slug.busy" />
+                        <ui-input v-model="handle" :tabindex="2" :loading="slug.busy" />
                     </ui-field>
                 </div>
             </ui-card-panel>

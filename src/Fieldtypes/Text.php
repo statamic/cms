@@ -35,21 +35,13 @@ class Text extends Fieldtype
                             'url',
                             'week',
                         ],
-                    ],
-                    'placeholder' => [
-                        'display' => __('Placeholder'),
-                        'instructions' => __('statamic::fieldtypes.text.config.placeholder'),
-                        'type' => 'text',
-                    ],
-                    'default' => [
-                        'display' => __('Default Value'),
-                        'instructions' => __('statamic::messages.fields_default_instructions'),
-                        'type' => 'text',
+                        'width' => '50',
                     ],
                     'character_limit' => [
                         'display' => __('Character Limit'),
                         'instructions' => __('statamic::fieldtypes.text.config.character_limit'),
                         'type' => 'integer',
+                        'width' => '50',
                     ],
                     'autocomplete' => [
                         'display' => __('Autocomplete'),
@@ -112,26 +104,46 @@ class Text extends Fieldtype
                             'url',
                             'username',
                         ],
+                        'width' => '50',
                     ],
                 ],
             ],
             [
                 'display' => __('Appearance'),
                 'fields' => [
+                    'placeholder' => [
+                        'display' => __('Placeholder'),
+                        'instructions' => __('statamic::fieldtypes.text.config.placeholder'),
+                        'type' => 'text',
+                        'width' => '33',
+                    ],
                     'prepend' => [
                         'display' => __('Prepend'),
                         'instructions' => __('statamic::fieldtypes.text.config.prepend'),
                         'type' => 'text',
+                        'width' => '33',
                     ],
                     'append' => [
                         'display' => __('Append'),
                         'instructions' => __('statamic::fieldtypes.text.config.append'),
                         'type' => 'text',
+                        'width' => '33',
                     ],
                 ],
             ],
             [
-                'display' => 'Antlers',
+                'display' => __('Data & Format'),
+                'fields' => [
+                    'default' => [
+                        'display' => __('Default Value'),
+                        'instructions' => __('statamic::messages.fields_default_instructions'),
+                        'type' => 'text',
+                        'width' => '50',
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Advanced'),
                 'fields' => [
                     'antlers' => [
                         'display' => __('Allow Antlers'),

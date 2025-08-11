@@ -3,6 +3,8 @@
 namespace Tests\CommandPalette;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\CommandPalette\Category;
+use Statamic\CommandPalette\ContentSearchResult;
 use Statamic\Facades;
 use Statamic\Facades\CommandPalette;
 use Statamic\Facades\User;
@@ -81,5 +83,94 @@ class CommandPaletteTest extends TestCase
         ];
 
         $this->assertEquals($expected, $navigationCommands);
+    }
+
+    #[Test]
+    public function it_can_build_custom_command_items()
+    {
+        // Simple default miscellaneous command example
+        CommandPalette::add('Ask Jeeves', 'https://ask.com');
+
+        // More advanced config example
+        CommandPalette::add(
+            text: 'Hotbot',
+            url: 'https://hotbot.com',
+            openNewTab: true,
+            trackRecent: false,
+            icon: 'sexy-robot',
+            category: Category::Actions,
+            // keys: ... // TODO: test custom hotkey config when we set that up
+        );
+
+        $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->get(cp_route('dashboard'))
+            ->assertStatus(200);
+
+        $miscCommands = collect(CommandPalette::build())
+            ->filter(fn ($item) => in_array($item['category'], ['Actions', 'Miscellaneous']))
+            ->all();
+
+        $expected = [
+            [
+                'category' => 'Miscellaneous',
+                'type' => 'link',
+                'text' => 'Ask Jeeves',
+                'url' => 'https://ask.com',
+                'openNewTab' => false,
+                'trackRecent' => true,
+                'icon' => 'entry',
+                'keys' => null,
+            ],
+            [
+                'category' => 'Actions',
+                'type' => 'link',
+                'text' => 'Hotbot',
+                'url' => 'https://hotbot.com',
+                'openNewTab' => true,
+                'trackRecent' => false,
+                'icon' => 'sexy-robot',
+                'keys' => null,
+            ],
+        ];
+
+        $this->assertArraySubset($expected, $miscCommands);
+    }
+
+    #[Test]
+    public function it_can_build_command_with_array_based_text_for_rendering_arrow_separators_in_js()
+    {
+        CommandPalette::add(['Preferences', 'Best Website', 'Ask Jeeves'], 'https://ask.com');
+
+        $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->get(cp_route('dashboard'))
+            ->assertStatus(200);
+
+        $miscCommands = collect(CommandPalette::build())
+            ->filter(fn ($item) => $item['category'] === 'Miscellaneous')
+            ->all();
+
+        $expected = [
+            [
+                'category' => 'Miscellaneous',
+                'type' => 'link',
+                'text' => ['Preferences', 'Best Website', 'Ask Jeeves'],
+                'url' => 'https://ask.com',
+                'openNewTab' => false,
+                'icon' => 'entry',
+                'keys' => null,
+            ],
+        ];
+
+        $this->assertArraySubset($expected, $miscCommands);
+    }
+
+    #[Test]
+    public function it_tracks_recent_content_search_results_by_default()
+    {
+        $searchResult = new ContentSearchResult('Articles', Category::Search);
+
+        $this->assertTrue($searchResult->toArray()['trackRecent']);
     }
 }

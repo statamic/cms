@@ -35,11 +35,11 @@ const buttonClasses = computed(() => {
                 ],
                 primary: [
                     'bg-linear-to-b from-primary/90 to-primary hover:bg-primary-hover text-white border border-primary-border shadow-ui-md inset-shadow-2xs inset-shadow-white/25 [&_svg]:text-gray-400',
-                    'dark:from-white dark:to-gray-200 dark:hover:from-gray-200 dark:text-gray-900 dark:border-0',
+                    'dark:from-gray-700 dark:to-gray-800 dark:hover:from-gray-600 dark:text-white dark:[&_svg]:text-white/50',
                 ],
                 danger: 'bg-linear-to-b from-red-500/90 to-red-500 hover:bg-red-500/90 text-white border border-red-600 inset-shadow-2xs inset-shadow-red-300 [&_svg]:text-red-200 disabled:text-red-200',
-                filled: 'bg-gray-100 hover:bg-gray-200 hover:text-gray-900 dark:bg-gray-700/80 dark:hover:bg-gray-700 [&_svg]:text-gray-700 dark:[&_svg]:text-gray-300',
-                ghost: 'bg-transparent hover:bg-gray-400/10 text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700/80 dark:hover:text-gray-200',
+                filled: 'bg-gray-100 hover:bg-gray-200 hover:text-gray-900 dark:hover:text-white dark:bg-gray-700/80 dark:hover:bg-gray-700 [&_svg]:text-gray-700 dark:[&_svg]:text-gray-300',
+                ghost: 'bg-transparent hover:bg-gray-400/10 text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800/50 dark:hover:text-gray-200',
                 subtle: 'bg-transparent hover:bg-gray-400/10 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-gray-700/80 dark:hover:text-gray-200 [&_svg]:text-gray-400',
             },
             size: {
@@ -63,7 +63,7 @@ const buttonClasses = computed(() => {
         compoundVariants: [
             { iconOnly: true, size: 'base', class: 'w-10 [&_svg]:size-4.5' },
             { iconOnly: true, size: 'sm', class: 'w-8 [&_svg]:size-3.5' },
-            { iconOnly: true, size: 'xs', class: 'w-6.5 [&_svg]:size-3' },
+            { iconOnly: true, size: 'xs', class: 'w-6.5 h-6.5 [&_svg]:size-3' },
             { iconOnly: false, iconAppend: true, class: '[&_svg]:-me-1' },
             { iconOnly: false, iconPrepend: true, class: '[&_svg]:-ms-0.5' },
             { inset: true, size: 'lg', class: '-m-1.5' },
@@ -95,8 +95,8 @@ const buttonClasses = computed(() => {
         <Icon v-if="icon" :name="icon" />
         <Icon v-if="loading" name="loading" :size />
 
-        <!-- =Jay. trim-text-start seems to make smaller buttons look worse such as the collections index "Create Entry" buttons -->
-        <div :class="{ 'trim-text-start': size !== 'xs' && size !== 'sm' }" class="flex content-center">
+        <!-- =Jay. st-text-trim-start seems to make smaller buttons look worse such as the collections index "Create Entry" buttons -->
+        <div :class="{ 'st-text-trim-start': size !== 'xs' && size !== 'sm' }" class="flex content-center">
             <slot v-if="hasDefaultSlot" />
             <template v-else>{{ text }}</template>
         </div>

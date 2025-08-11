@@ -17,7 +17,7 @@
                     <ui-dropdown-item
                         :text="__('Edit Blueprints')"
                         icon="blueprint-edit"
-                        href="{{ cp_route('taxonomies.blueprints.index', $taxonomy) }}"
+                        href="{{ cp_route('blueprints.taxonomies.index', $taxonomy) }}"
                     ></ui-dropdown-item>
                 @endcan
 
@@ -45,32 +45,12 @@
         ></resource-deleter>
     @endcan
 
-    @if ($hasTerms)
-        <term-list
-            taxonomy="{{ $taxonomy->handle() }}"
-            sort-column="{{ $taxonomy->sortField() }}"
-            sort-direction="{{ $taxonomy->sortDirection() }}"
-            :columns="{{ $columns->toJson() }}"
-            :filters="{{ $filters->toJson() }}"
-            action-url="{{ cp_route('taxonomies.terms.actions.run', $taxonomy->handle()) }}"
-        ></term-list>
-    @else
-        @component(
-            'statamic::partials.create-first',
-            [
-                'resource' => __("{$taxonomy->title()} term"),
-                'svg' => 'empty/taxonomy', // TODO: Do we want separate term SVG?
-                'can' => $user->can('create', ['Statamic\Contracts\Taxonomies\Term', $taxonomy]),
-            ]
-        )
-            @slot('button')
-                {{--
-                    <create-term-button
-                    url="{{ cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site]) }}"
-                    :blueprints="{{ $blueprints->toJson() }}">
-                    </create-term-button>
-                --}}
-            @endslot
-        @endcomponent
-    @endif
+    <term-list
+        taxonomy="{{ $taxonomy->handle() }}"
+        sort-column="{{ $taxonomy->sortField() }}"
+        sort-direction="{{ $taxonomy->sortDirection() }}"
+        :columns="{{ $columns->toJson() }}"
+        :filters="{{ $filters->toJson() }}"
+        action-url="{{ cp_route('taxonomies.terms.actions.run', $taxonomy->handle()) }}"
+    ></term-list>
 @endsection

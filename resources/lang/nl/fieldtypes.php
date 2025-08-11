@@ -174,7 +174,7 @@ return [
     'taggable.config.placeholder' => 'Type en druk op ↩ Enter',
     'taggable.title' => 'Taggable',
     'taxonomies.title' => 'Taxonomies',
-    'template.config.blueprint' => 'Voegt een "toekennen aan blueprint" optie toe. Lees meer in de [documentatie](https://statamic.dev/views#inferring-templates-from-entry-blueprints).',
+    'template.config.blueprint' => 'Voegt een "toekennen aan blueprint" optie toe. Lees meer in de [documentatie](https://statamic.dev/views#map-templates-to-entry-blueprints).',
     'template.config.folder' => 'Toon alleen templates in deze map.',
     'template.config.hide_partials' => 'Partials zijn zelden bedoeld om als templates te worden gebruikt.',
     'template.title' => 'Template',

@@ -32,7 +32,7 @@
                 >
                     <svg-icon name="light/synchronize" class="h-5 w-5" v-show="!syncing" />
                     <div class="h-5 w-5" v-show="syncing">
-                        <loading-graphic inline text="" class="mt-0.5 ml-0.5" />
+                        <Icon name="loading" class="mt-0.5 ml-0.5" />
                     </div>
                 </Button>
             </template>
@@ -43,7 +43,7 @@
 <script>
 import { data_get } from '../../bootstrap/globals';
 import Fieldtype from './Fieldtype.vue';
-import { Input, Button } from '@statamic/ui';
+import { Input, Button, Icon } from '@statamic/ui';
 
 export default {
     mixins: [Fieldtype],
@@ -51,9 +51,8 @@ export default {
     components: {
         Input,
         Button,
+        Icon,
     },
-
-    inject: ['store'],
 
     data() {
         return {
@@ -79,12 +78,12 @@ export default {
                 key = dottedPrefix + '.' + field;
             }
 
-            return data_get(this.store?.values, key);
+            return data_get(this.publishContainer?.values, key);
         },
 
         language() {
-            if (!this.store) return;
-            const targetSite = this.store.site;
+            if (!this.publishContainer) return;
+            const targetSite = this.publishContainer.site;
             return targetSite ? Statamic.$config.get('sites').find((site) => site.handle === targetSite).lang : null;
         },
     },
@@ -112,10 +111,10 @@ export default {
     },
 
     methods: {
-        handleLocalizationCreated({ store }) {
-            // Only reset for the "slug" field in the matching store.
+        handleLocalizationCreated({ container }) {
+            // Only reset for the "slug" field in the matching container.
             // Other slug fields that aren't named "slug" should be left alone.
-            if (this.handle === 'slug' && store === this.store) {
+            if (this.handle === 'slug' && container.name === this.publishContainer.name) {
                 this.$refs.slugify.reset();
             }
         },

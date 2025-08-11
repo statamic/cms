@@ -12,7 +12,7 @@ class Slug extends Text
     {
         return [
             [
-                'display' => __('Behavior'),
+                'display' => __('Input Behavior'),
                 'fields' => [
                     'from' => [
                         'display' => __('From'),

@@ -1,5 +1,5 @@
 <script setup>
-import { computed, useTemplateRef, watch } from 'vue';
+import { computed, useTemplateRef, watch, ref } from 'vue';
 import { injectContainerContext } from './Container.vue';
 import { injectFieldsContext } from './FieldsProvider.vue';
 import { Field, Icon, Tooltip, Label } from '@statamic/ui';
@@ -13,7 +13,26 @@ const props = defineProps({
     },
 });
 
-const { store, syncField, desyncField, isTrackingOriginValues, asConfig } = injectContainerContext();
+const {
+    values: containerValues,
+    extraValues: containerExtraValues,
+    visibleValues: containerVisibleValues,
+    meta: containerMeta,
+    syncField,
+    desyncField,
+    isTrackingOriginValues,
+    originValues: containerOriginValues,
+    asConfig,
+    errors: containerErrors,
+    readOnly: containerReadOnly,
+    setFieldPreviewValue,
+    localizedFields,
+    setFieldValue,
+    setFieldMeta,
+    hiddenFields,
+    revealerFields,
+    setHiddenField,
+} = injectContainerContext();
 const { fieldPathPrefix, metaPathPrefix } = injectFieldsContext();
 const handle = props.config.handle;
 
@@ -27,12 +46,19 @@ const fieldtypeComponentExists = computed(() => {
 
 const fullPath = computed(() => [fieldPathPrefix.value, handle].filter(Boolean).join('.'));
 const metaFullPath = computed(() => [metaPathPrefix.value, handle].filter(Boolean).join('.'));
-const value = computed(() => data_get(store.values, fullPath.value));
+const value = computed(() => data_get(containerValues.value, fullPath.value));
 const meta = computed(() => {
     const key = [metaPathPrefix.value, handle].filter(Boolean).join('.');
-    return data_get(store.meta, key);
+    return data_get(containerMeta.value, key);
 });
-const errors = computed(() => store.errors[fullPath.value]);
+
+const errors = ref();
+watch(
+    () => containerErrors.value,
+    (newErrors) => errors.value = newErrors[fullPath.value] || [],
+    { immediate: true },
+);
+
 const fieldId = computed(() => `field_${fullPath.value.replaceAll('.', '_')}`);
 const namePrefix = '';
 const isRequired = computed(() => props.config.required);
@@ -47,18 +73,18 @@ const shouldShowFieldActions = computed(() => {
 });
 
 function valueUpdated(value) {
-    const existingValue = data_get(store.values, fullPath.value);
+    const existingValue = data_get(containerValues.value, fullPath.value);
     if (value === existingValue) return;
-    store.setDottedFieldValue({ path: fullPath.value, value });
+    setFieldValue(fullPath.value, value);
     desync();
 }
 
 function metaUpdated(value) {
-    store.setDottedFieldMeta({ path: metaFullPath.value, value });
+    setFieldMeta(metaFullPath.value, value);
 }
 
 function replicatorPreviewUpdated(value) {
-    store.setDottedFieldReplicatorPreview({ path: fullPath.value, value });
+    setFieldPreviewValue(fullPath.value, value);
 }
 
 function focused() {
@@ -70,19 +96,26 @@ function blurred() {
 }
 
 const values = computed(() => {
-    return fieldPathPrefix.value ? data_get(store.values, fieldPathPrefix.value) : store.values;
+    return fieldPathPrefix.value ? data_get(containerValues.value, fieldPathPrefix.value) : containerValues.value;
 });
 
 const visibleValues = computed(() => {
-    return fieldPathPrefix.value ? data_get(store.visibleValues, fieldPathPrefix.value) : store.visibleValues;
+    return fieldPathPrefix.value ? data_get(containerVisibleValues.value, fieldPathPrefix.value) : containerVisibleValues.value;
 });
 
 const extraValues = computed(() => {
-    return fieldPathPrefix.value ? data_get(store.extraValues, fieldPathPrefix.value) : store.extraValues;
+    return fieldPathPrefix.value ? data_get(containerExtraValues.value, fieldPathPrefix.value) : containerExtraValues.value;
 });
 
 const shouldShowField = computed(() => {
-    return new ShowField(store, visibleValues.value, extraValues.value).showField(props.config, fullPath.value);
+    return new ShowField(
+        visibleValues.value,
+        extraValues.value,
+        containerVisibleValues.value,
+        hiddenFields.value,
+        revealerFields.value,
+        setHiddenField
+    ).showField(props.config, fullPath.value);
 });
 
 const shouldShowLabelText = computed(() => !props.config.hide_display);
@@ -97,7 +130,7 @@ const shouldShowLabel = computed(
 const isLocalizable = computed(() => props.config.localizable);
 
 const isReadOnly = computed(() => {
-    if (store.readOnly) return true;
+    if (containerReadOnly.value) return true;
 
     if (isTrackingOriginValues.value && isSyncable.value && !isLocalizable.value) return true;
 
@@ -111,10 +144,10 @@ const isSyncable = computed(() => {
     if (isNested.value) return false;
 
     // If origin values have been provided but the field is missing, there's nothing to sync.
-    return isTrackingOriginValues.value && store.originValues.hasOwnProperty(fullPath.value)
+    return isTrackingOriginValues.value && containerOriginValues.value.hasOwnProperty(fullPath.value)
 });
 
-const isSynced = computed(() => isSyncable.value && !store.localizedFields.includes(fullPath.value));
+const isSynced = computed(() => isSyncable.value && !localizedFields.value.includes(fullPath.value));
 const isNested = computed(() => fullPath.value.includes('.'));
 const wrapperComponent = computed(() => {
     // Todo: Find a way to not need to hard code this.
@@ -143,6 +176,7 @@ function desync() {
         :errors="errors"
         :read-only="isReadOnly"
         :as="wrapperComponent"
+        :variant="config.variant"
     >
         <template #label v-if="shouldShowLabel">
             <Label :for="fieldId" :required="isRequired">

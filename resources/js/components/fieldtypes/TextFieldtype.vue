@@ -3,7 +3,7 @@
         ref="input"
         :model-value="value"
         :classes="config.classes"
-        :focus="config.focus || name === 'title' || name === 'alt'"
+        :focus="shouldFocus"
         :autocomplete="config.autocomplete"
         :autoselect="config.autoselect"
         :type="config.input_type"
@@ -24,6 +24,7 @@
 <script setup>
 import { Fieldtype } from 'statamic';
 import { Input } from '@statamic/ui';
+import { computed } from 'vue';
 
 const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
@@ -34,6 +35,14 @@ const {
     updateDebounced,
     expose
 } = Fieldtype.use(emit, props);
+
+const shouldFocus = computed(() => {
+    if (props.config.focus === false) {
+        return false;
+    }
+
+    return props.config.focus || name.value === 'title' || name.value === 'alt';
+});
 
 function inputUpdated(value) {
     return !props.config.debounce ? update(value) : updateDebounced(value);

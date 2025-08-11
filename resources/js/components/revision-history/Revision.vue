@@ -56,7 +56,7 @@
                     :component-props="componentProps"
                     @closed="showDetails = false"
                 >
-                    <template slot="action-buttons-right">
+                    <template #action-buttons-right>
                         <restore-revision
                             v-if="canRestoreRevisions"
                             :revision="revision"

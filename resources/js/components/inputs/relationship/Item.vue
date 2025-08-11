@@ -1,6 +1,6 @@
 <template>
     <div
-        class="shadow-ui-sm relative z-2 flex w-full h-full items-center gap-2 rounded-lg border border-gray-200 bg-white px-1.5 py-1.5 mb-1.5 last:mb-0 text-base dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
+        class="shadow-ui-sm relative z-2 flex w-full h-full items-center gap-2 rounded-lg border border-gray-200 bg-white px-1.5 py-1.5 mb-1.5 last:mb-0 text-base dark:border-x-0 dark:border-t-0 dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
         :class="{ invalid: item.invalid }"
     >
         <ui-icon name="handles" class="item-move sortable-handle size-4 cursor-grab text-gray-300" v-if="sortable" />
@@ -70,6 +70,7 @@
 import { getActivePinia } from 'pinia';
 import InlineEditForm from './InlineEditForm.vue';
 import { Button, Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
+import { containerContextKey } from '@statamic/components/ui/Publish/Container.vue';
 
 export default {
     components: {
@@ -81,8 +82,8 @@ export default {
     },
 
     inject: {
-        storeName: {
-            default: null,
+        publishContainer: {
+            from: containerContextKey,
         },
     },
 
@@ -110,12 +111,13 @@ export default {
             if (this.item.invalid) return;
 
             if (this.item.reference) {
-                const storeRefs = getActivePinia()
-                    ._s.values()
-                    .map((store) => store.reference);
-                if (Array.from(storeRefs).includes(this.item.reference)) {
-                    this.$toast.error(__("You're already editing this item."));
-                    return;
+                let parentContainer = this.publishContainer.parentContainer;
+                while (parentContainer) {
+                    if (parentContainer.reference.value === this.item.reference) {
+                        this.$toast.error(__("You're already editing this item."));
+                        return;
+                    }
+                    parentContainer = parentContainer.parentContainer;
                 }
             }
 
@@ -128,7 +130,7 @@ export default {
             this.item.private = responseData.private;
             this.item.status = responseData.status;
 
-            this.$events.$emit(`live-preview.${this.storeName}.refresh`);
+            this.$events.$emit(`live-preview.${this.publishContainer.name.value}.refresh`);
         },
     },
 };

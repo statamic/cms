@@ -75,6 +75,11 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         return $this->namespace;
     }
 
+    public function renderableNamespace(): string
+    {
+        return str_replace('.', ' ', Str::humanize($this->namespace));
+    }
+
     public function fullyQualifiedHandle(): string
     {
         $handle = $this->handle();
@@ -782,9 +787,14 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         return $this->handle();
     }
 
-    public function resetUrl()
+    public function editAdditionalBlueprintUrl()
     {
-        return cp_route('blueprints.reset', [$this->namespace(), $this->handle()]);
+        return cp_route('blueprints.additional.edit', [$this->namespace(), $this->handle()]);
+    }
+
+    public function resetAdditionalBlueprintUrl()
+    {
+        return cp_route('blueprints.additional.reset', [$this->namespace(), $this->handle()]);
     }
 
     public function writeFile($path = null)
@@ -792,9 +802,11 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         File::put($path ?? $this->buildPath(), $this->fileContents());
     }
 
-    public function commandPaletteLink(string $type, string $url): Link
+    public function commandPaletteLink(string|array $type, string $url): Link
     {
-        $text = __('Blueprints').' » '.__($type).' » '.__($this->title());
+        $type = is_array($type) ? $type : __($type);
+
+        $text = [__('Blueprints'), $type, __($this->title())];
 
         return (new Link($text, Category::Fields))
             ->url($url)

@@ -19,9 +19,11 @@ import { SortableList } from '@statamic/components/sortable/Sortable.js';
 const emit = defineEmits(['update:modelValue', 'search', 'selected', 'added']);
 
 const props = defineProps({
+    id: { type: String },
     buttonAppearance: { type: Boolean, default: true },
     clearable: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
+    discreteFocusOutline: { type: Boolean, default: false },
     flat: { type: Boolean, default: false },
     ignoreFilter: { type: Boolean, default: false },
     labelHtml: { type: Boolean, default: false },
@@ -50,15 +52,18 @@ const triggerClasses = cva({
     variants: {
         size: {
             base: 'text-base rounded-lg ps-3 pe-2.5 py-2 h-10 leading-[1.375rem]',
-            sm: 'text-sm rounded-md ps-2.5 pe-2 py-1.5 h-7 leading-[1.125rem]',
+            sm: 'text-sm rounded-md ps-2.5 pe-2 py-1.5 h-8 leading-[1.125rem]',
             xs: 'text-xs rounded-sm ps-2 pe-1.5 py-1.5 h-6 leading-[1.125rem]',
         },
         flat: {
             true: 'shadow-none',
-            false: 'bg-linear-to-b from-white to-gray-50 hover:to-gray-100 dark:from-gray-800/30 dark:to-gray-800 dark:hover:to-gray-850 shadow-ui-sm',
+            false: 'bg-linear-to-b from-white to-gray-50 hover:to-gray-100 dark:from-gray-800 dark:to-gray-800 dark:hover:to-gray-850 shadow-ui-sm',
+        },
+        'discrete-focus-outline': {
+            true: 'focus-outline-discrete',
         },
         buttonAppearance: {
-            true: 'border border-gray-300 with-contrast:border-gray-500 dark:border-b-0 dark:ring-3 dark:ring-gray-900 dark:border-white/15 shadow-ui-sm dark:shadow-md',
+            true: 'border border-gray-300 with-contrast:border-gray-500 dark:border-b-0 dark:ring-3 dark:ring-gray-900 dark:border-white/10 shadow-ui-sm dark:shadow-md focus-within:focus-outline',
             false: '',
         },
         // disabled: {
@@ -73,6 +78,7 @@ const triggerClasses = cva({
 })({
     size: props.size,
     flat: props.flat,
+    'discrete-focus-outline': props.discreteFocusOutline,
     buttonAppearance: props.buttonAppearance,
     disabled: props.disabled,
     readOnly: props.readOnly,
@@ -92,7 +98,7 @@ const itemClasses = cva({
         },
         selected: {
             false: 'text-gray-900 dark:text-gray-300 data-highlighted:bg-gray-100 data-highlighted:text-gray-900 dark:data-highlighted:bg-gray-700 dark:data-highlighted:text-gray-300',
-            true: 'bg-blue-50 text-blue-600!',
+            true: 'bg-blue-50 dark:bg-blue-600 text-blue-600! dark:text-blue-50!',
         },
     },
 });
@@ -177,10 +183,6 @@ const filteredOptions = computed(() => {
 function clear() {
     searchQuery.value = '';
     emit('update:modelValue', null);
-
-    if (props.searchable) {
-        nextTick(() => searchInputRef.value.focus());
-    }
 }
 
 function deselect(option) {
@@ -267,6 +269,7 @@ defineExpose({
                             v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"
                             ref="search"
                             class="w-full text-gray-700 opacity-100 focus:outline-none placeholder-xs"
+                            :id="id"
                             v-model="searchQuery"
                             :placeholder
                             @paste.prevent="onPaste"
@@ -275,7 +278,7 @@ defineExpose({
                         />
 
                         <button type="button" class="flex-1 text-start" v-else-if="!searchable && (dropdownOpen || !modelValue)">
-                            <span class="text-gray-400 dark:text-gray-500 text-[0.8125rem]" v-text="placeholder" />
+                            <span class="text-gray-400 dark:text-gray-500 placeholder-text-xs" v-text="placeholder" />
                         </button>
 
                         <button type="button" v-else class="flex-1 text-start cursor-pointer">
@@ -285,7 +288,7 @@ defineExpose({
                             </slot>
                         </button>
 
-                        <div class="flex gap-1 items-center">
+                        <div class="flex gap-1.5 items-center">
                             <Button icon="x" variant="ghost" size="xs" round v-if="clearable && modelValue" @click="clear" />
                             <Icon name="ui/chevron-down" />
                         </div>
@@ -304,7 +307,7 @@ defineExpose({
                         <ComboboxViewport>
                             <ComboboxEmpty class="py-2 text-sm">
                                 <slot name="no-options" v-bind="{ searchQuery }">
-                                    {{ __('No options to choose from.') }}
+                                    {{ __('No options available.') }}
                                 </slot>
                             </ComboboxEmpty>
 

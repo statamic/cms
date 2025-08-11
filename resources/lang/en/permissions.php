@@ -12,8 +12,6 @@ return [
     'configure_sites_desc' => 'Ability to configure sites when multi-site is enabled.',
     'configure_fields' => 'Configure Fields',
     'configure_fields_desc' => 'Ability to edit blueprints, fieldsets, and their fields.',
-    'configure_addons' => 'Configure Addons',
-    'configure_addons_desc' => 'Ability to access the addon area to install and uninstall addons.',
     'manage_preferences' => 'Manage Preferences',
     'manage_preferences_desc' => 'Ability to customize global and role-specific preferences.',
 
@@ -88,6 +86,11 @@ return [
 
     'group_updates' => 'Updates',
     'view_updates' => 'View updates',
+
+    'group_addons' => 'Addons',
+    'configure_addons' => 'Configure addons',
+    'configure_addons_desc' => 'Grants access to all addon related permissions',
+    'edit_addon_settings' => ':addon settings',
 
     'group_utilities' => 'Utilities',
     'access_utility' => ':title',

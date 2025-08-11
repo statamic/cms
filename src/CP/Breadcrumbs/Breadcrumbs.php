@@ -8,6 +8,13 @@ use Statamic\Statamic;
 
 class Breadcrumbs
 {
+    public static $pushed = [];
+
+    public static function push(Breadcrumb $breadcrumb)
+    {
+        static::$pushed[] = $breadcrumb;
+    }
+
     public static function build(): array
     {
         $breadcrumbs = Nav::build(preferences: false)->map(function (array $section): ?array {
@@ -19,7 +26,7 @@ class Breadcrumbs
                 return null;
             }
 
-            if ($primaryNavItem->children()?->isNotEmpty()) {
+            if ($primaryNavItem->resolveChildren()->children()?->isNotEmpty()) {
                 $secondaryNavItem = $primaryNavItem->children()->first(function (NavItem $navItem) {
                     return $navItem->isActive();
                 });
@@ -61,13 +68,12 @@ class Breadcrumbs
                     configureUrl: $secondaryNavItem->extra()['breadcrumbs']['configure_url'] ?? null,
                 ) : null,
             ]);
-        })->filter()->first();
+        })->filter()->first() ?? [];
 
-        if (! $breadcrumbs) {
-            return [];
-        }
-
-        return $breadcrumbs;
+        return [
+            ...$breadcrumbs,
+            ...static::$pushed,
+        ];
     }
 
     public static function title(?string $title = null): string

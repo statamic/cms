@@ -24,6 +24,7 @@
                     :action-context="actionContext"
                     :allow-bulk-actions="allowBulkActions"
                     :selections="selectedAssets"
+                    :max-selections="maxFiles"
                     :preferences-prefix="preferencesPrefix"
                     v-model:search-query="searchQuery"
                     @request-completed="listingRequestCompleted"
@@ -129,6 +130,7 @@
                                 :folders="folders"
                                 :columns="columns"
                                 :visible-columns="visibleColumns"
+                                :is-searching="!!searchQuery"
                                 v-bind="sharedAssetProps"
                                 v-on="sharedAssetEvents"
                             />

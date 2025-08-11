@@ -79,6 +79,7 @@ class NestedFieldsTest extends TestCase
                 'handle' => 'image',
                 'instructions' => 'Some instructions',
                 'instructions_position' => 'above',
+                'variant' => 'block',
                 'listable' => 'hidden',
                 'visibility' => 'visible',
                 'sortable' => true,

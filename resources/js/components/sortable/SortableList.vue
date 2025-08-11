@@ -1,5 +1,5 @@
 <script>
-import { Sortable, Plugins } from '@shopify/draggable';
+import { Sortable, Plugins, Draggable } from '@shopify/draggable';
 
 function move(items, oldIndex, newIndex) {
     const itemRemovedArray = [...items.slice(0, oldIndex), ...items.slice(oldIndex + 1, items.length)];
@@ -81,6 +81,9 @@ export default {
                     mirror: {
                         constrainDimensions: this.constrainDimensions,
                     },
+                    exclude: {
+                        plugins: [Draggable.Plugins.Focusable]
+                    }
                 },
                 this.options,
             );

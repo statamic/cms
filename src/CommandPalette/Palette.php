@@ -3,6 +3,7 @@
 namespace Statamic\CommandPalette;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Statamic\CP\Navigation\NavItem;
 use Statamic\Facades;
 use Statamic\Fields\Fieldset;
@@ -17,6 +18,31 @@ class Palette
         $this->items = collect();
     }
 
+    public function add(
+        string|array $text,
+        string $url,
+        bool $openNewTab = false,
+        bool $trackRecent = true,
+        ?Category $category = null,
+        ?string $icon = null,
+        ?string $keys = null,
+    ): self {
+        $link = (new Link($text, $category ?? Category::Miscellaneous))
+            ->url($url)
+            ->openNewTab($openNewTab)
+            ->trackRecent($trackRecent);
+
+        if ($icon) {
+            $link->icon($icon);
+        }
+
+        if ($keys) {
+            $link->keys($keys);
+        }
+
+        return $this->addCommand($link);
+    }
+
     public function addCommand(Command $command): self
     {
         $this->items->push(
@@ -28,11 +54,15 @@ class Palette
 
     public function build(): Collection
     {
+        // TODO: We need to bust this cache when content or nav changes
+        // TODO: Cache per user
+        // return Cache::rememberForever('statamic-command-palette', function () {
         return $this
-            // ->buildNav()
+            ->buildNav()
             ->buildFields()
-            ->buildActions()
+            ->buildMiscellaneous()
             ->get();
+        // });
     }
 
     protected function buildNav(): self
@@ -53,28 +83,35 @@ class Palette
         }
 
         Facades\Collection::all()
-            ->flatMap(fn ($collection) => $collection->commandPaletteLinksForBlueprints())
+            ->flatMap(fn ($collection) => $collection->entryBlueprintCommandPaletteLinks())
             ->each(fn (Link $link) => $this->addCommand($link));
 
         Facades\Taxonomy::all()
-            ->flatMap(fn ($taxonomy) => $taxonomy->commandPaletteLinksForBlueprints())
+            ->flatMap(fn ($taxonomy) => $taxonomy->termBlueprintCommandPaletteLinks())
             ->each(fn (Link $link) => $this->addCommand($link));
 
         Facades\Nav::all()
-            ->map(fn ($nav) => $nav->commandPaletteLinkForBlueprint())
+            ->map(fn ($nav) => $nav->blueprintCommandPaletteLink())
             ->each(fn (Link $link) => $this->addCommand($link));
 
-        // TODO: Womp, got to end of this and realized they don't have `editUrl()` methods, so we'll refactor this to what's above ^
-        // collect()
-        //     ->merge(Facades\Collection::all()->flatMap(fn ($collection) => $collection->entryBlueprints()))
-        //     ->merge(Facades\Taxonomy::all()->flatMap(fn ($taxonomy) => $taxonomy->termBlueprints()))
-        //     ->merge(Facades\Nav::all()->map->blueprint())
-        //     ->merge(Facades\GlobalSet::all()->map->blueprint())
-        //     ->merge(Facades\AssetContainer::all()->map->blueprint())
-        //     ->merge(Blueprint::getAdditionalNamespaces()->keys()->flatMap(fn (string $key) => Blueprint::in($key)->sortBy(fn (Blueprint $blueprint) => $blueprint->title())))
-        //     ->flatten()
-        //     ->map(fn (Blueprint $blueprint) => $blueprint->generateCommandPaletteLink())
-        //     ->each(fn (Link $link) => $this->addCommand($link));
+        Facades\AssetContainer::all()
+            ->map(fn ($container) => $container->blueprintCommandPaletteLink())
+            ->each(fn (Link $link) => $this->addCommand($link));
+
+        Facades\GlobalSet::all()
+            ->map(fn ($set) => $set->blueprintCommandPaletteLink())
+            ->each(fn (Link $link) => $this->addCommand($link));
+
+        Facades\Form::all()
+            ->map(fn ($form) => $form->blueprintCommandPaletteLink())
+            ->each(fn (Link $link) => $this->addCommand($link));
+
+        $this->addCommand(Facades\User::blueprintCommandPaletteLink());
+        $this->addCommand(Facades\UserGroup::blueprintCommandPaletteLink());
+
+        Facades\Blueprint::getRenderableAdditionalNamespaces()
+            ->flatMap(fn ($namespace) => $namespace['blueprints']->map(fn ($renderable) => $renderable['command_palette_link']))
+            ->each(fn (Link $link) => $this->addCommand($link));
 
         Facades\Fieldset::all()
             ->map(fn (Fieldset $fieldset) => $fieldset->commandPaletteLink())
@@ -83,9 +120,18 @@ class Palette
         return $this;
     }
 
-    protected function buildActions(): self
+    protected function buildMiscellaneous(): self
     {
-        // TODO: Addressing actions in separate PR.
+        if (! Facades\User::current()->isSuper()) {
+            return $this;
+        }
+
+        $this->add(
+            text: __('Statamic Documentation'),
+            icon: 'book-next-page',
+            url: 'https://statamic.dev',
+            openNewTab: true,
+        );
 
         return $this;
     }
@@ -94,7 +140,9 @@ class Palette
     {
         throw_unless(is_string(Arr::get($command, 'type')), new \Exception('Must output command [type] string!'));
         throw_unless(is_string(Arr::get($command, 'category')), new \Exception('Must output command [category] string!'));
-        throw_unless(is_string(Arr::get($command, 'text')), new \Exception('Must output command [text] string!'));
+
+        $text = Arr::get($command, 'text');
+        throw_unless(is_string($text) || is_array($text), new \Exception('Must output command [text] string!'));
 
         return $command;
     }

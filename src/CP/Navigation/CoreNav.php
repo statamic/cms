@@ -9,6 +9,7 @@ use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Contracts\Structures\Nav as NavContract;
 use Statamic\Contracts\Taxonomies\Taxonomy;
+use Statamic\Facades\Addon;
 use Statamic\Facades\AssetContainer as AssetContainerAPI;
 use Statamic\Facades\Collection as CollectionAPI;
 use Statamic\Facades\CP\Nav;
@@ -259,10 +260,15 @@ class CoreNav
             ->view('statamic::nav.updates')
             ->can('view updates');
 
-        Nav::tools('Addons')
-            ->route('addons.index')
-            ->icon('addons')
-            ->can('configure addons');
+        if (User::current()->can('configure addons')) {
+            Nav::tools('Addons')
+                ->route('addons.index')
+                ->icon('addons')
+                ->can('configure addons')
+                ->children(fn () => $this->makeAddonSettingsItems());
+        } else {
+            $this->makeAddonSettingsItems();
+        }
 
         if (Stache::duplicates()->isNotEmpty()) {
             Nav::tools('Duplicate IDs')
@@ -283,6 +289,19 @@ class CoreNav
         }
 
         return $this;
+    }
+
+    protected function makeAddonSettingsItems()
+    {
+        return Addon::all()
+            ->sortBy->name()
+            ->filter->hasSettingsBlueprint()
+            ->map(function ($addon) {
+                return Nav::tools($addon->name())
+                    ->url($addon->settingsUrl())
+                    ->icon('cog')
+                    ->can('editSettings', $addon);
+            });
     }
 
     /**

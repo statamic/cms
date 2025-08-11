@@ -7,7 +7,10 @@
         @include('statamic::partials.head')
     </head>
 
-    <body class="bg-gray-800 font-sans leading-normal text-gray-900 dark:text-white">
+    <body
+        class="bg-gray-800 font-sans leading-normal text-gray-900 dark:text-white"
+        @if ($user->getPreference('strict_accessibility')) data-contrast="increased" @endif
+    >
         <config-provider>
             <div id="statamic" v-cloak>
                 @include('statamic::partials.session-expiry')
@@ -18,6 +21,7 @@
                     class="@yield('content-class') pt-14"
                     :class="{
                         'nav-closed': ! navOpen,
+                        'nav-open': navOpen,
                         'nav-mobile-open': mobileNavOpen,
                         'showing-license-banner': showBanner
                     }"
@@ -53,7 +57,7 @@
                     @confirm="copyToClipboardModalUrl = null"
                 >
                     <div class="prose">
-                        <code-block :text="copyToClipboardModalUrl" />
+                        <ui-input :model-value="copyToClipboardModalUrl" readonly copyable class="font-mono text-sm dark" />
                     </div>
                 </confirmation-modal>
 

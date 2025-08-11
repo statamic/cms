@@ -1,10 +1,7 @@
 <template>
     <portal name="grid-fullscreen" :disabled="!fullScreenMode" :provide="provide">
         <element-container @resized="containerWidth = $event.width">
-            <div
-                class="grid-fieldtype-container"
-                :class="{ 'grid-fullscreen dark:bg-dark-600 bg-white': fullScreenMode }"
-            >
+            <div :class="{ '@apply fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-100 dark:bg-gray-900 z-998': fullScreenMode }">
                 <publish-field-fullscreen-header
                     v-if="fullScreenMode"
                     :title="config.display"
@@ -31,6 +28,7 @@
                         :can-add-rows="canAddRows"
                         :allow-fullscreen="config.fullscreen"
                         :hide-display="config.hide_display"
+                        :errors="publishContainer.errors"
                         @updated="updated"
                         @meta-updated="updateRowMeta"
                         @removed="removed"
@@ -80,12 +78,9 @@ export default {
             deletingRow: null,
             provide: {
                 grid: this.makeGridProvide(),
-                storeName: this.storeName,
             },
         };
     },
-
-    inject: ['storeName'],
 
     provide: {
         isInGridField: true,

@@ -3,10 +3,11 @@
         <CheckboxGroup v-model="values" :inline="config.inline" ref="checkboxes">
             <Checkbox
                 v-for="(option, index) in options"
+                :disabled="config.disabled"
                 :key="index"
                 :label="option.label || option.value"
+                :read-only="isReadOnly"
                 :value="option.value"
-                :disabled="isReadOnly"
             />
         </CheckboxGroup>
     </div>

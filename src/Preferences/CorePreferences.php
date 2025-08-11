@@ -25,24 +25,12 @@ class CorePreferences
             'instructions' => __('statamic::messages.preference_start_page_instructions'),
         ]);
 
-        Preference::tab('accessibility', __('Accessibility'), function () {
-            Preference::register('wcag_conformity', [
-                'type' => 'toggle',
-                'display' => __('Strict WCAG 2.2 Conformity'),
-                'instructions' => __('statamic::messages.preference_wcag'),
-            ]);
-            Preference::register('contrast', [
-                'type' => 'button_group',
-                'display' => __('Increase Contrast'),
-                'instructions' => __('statamic::messages.preference_contrast'),
-                'default' => 'default',
-                'options' => [
-                    'default' => __('Default'),
-                    'increased' => __('Increased'),
-                    'auto' => __('System'),
-                ],
-            ]);
-        });
+        Preference::register('strict_accessibility', [
+            'type' => 'toggle',
+            'display' => __('Strict WCAG 2.2 Conformity'),
+            'instructions' => __('statamic::messages.preference_wcag').'<br><a href="https://www.w3.org/WAI/WCAG2AA-Conformance" title="Explanation of WCAG 2 Level AA conformance" class="inline-block mt-3"><img height="32" width="88" src="https://www.w3.org/WAI/WCAG22/wcag2.2AA" alt="Level AA conformance, W3C WAI Web Content Accessibility Guidelines 2.2"></a>',
+            'variant' => 'inline',
+        ]);
     }
 
     private function localeOptions(): array

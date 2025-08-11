@@ -1,5 +1,5 @@
 <template>
-    <div class="dark:bg-dark-800 h-full bg-white">
+    <div class="dark:bg-dark-800 h-full bg-white rounded-s-xl">
         <div class="flex h-full min-h-0 flex-col">
             <Listing
                 v-if="filters != null && view === 'list'"
@@ -13,7 +13,7 @@
                 <template #initializing>
                     <div class="flex flex-1">
                         <div class="absolute inset-0 z-200 flex items-center justify-center text-center">
-                            <loading-graphic />
+                            <Icon name="loading" />
                         </div>
                     </div>
                 </template>
@@ -22,7 +22,7 @@
                     <div class="flex items-center gap-3">
                         <div class="flex flex-1 items-center gap-3">
                             <Search />
-                            <Filters />
+                            <Filters v-if="filters && filters.length" />
                         </div>
 
                         <ui-toggle-group v-model="view" v-if="canUseTree">
@@ -64,15 +64,17 @@
                         >
                             <template #branch-action="{ branch, index }">
                                 <div>
-                                    <input
+                                    <Checkbox
                                         :ref="`tree-branch-${branch.id}`"
-                                        type="checkbox"
-                                        class="mt-3 ltr:ml-3 rtl:mr-3"
+                                        class="mt-3 mx-3"
                                         :value="branch.id"
-                                        :checked="isSelected(branch.id)"
+                                        :model-value="isSelected(branch.id)"
                                         :disabled="reachedSelectionLimit && !singleSelect && !isSelected(branch.id)"
-                                        :id="`checkbox-${branch.id}`"
-                                        @click="toggleSelection(branch.id)"
+                                        :label="getCheckboxLabel(branch)"
+                                        :description="getCheckboxDescription(branch)"
+                                        size="sm"
+                                        solo
+                                        @update:model-value="toggleSelection(branch.id)"
                                     />
                                 </div>
                             </template>
@@ -90,7 +92,7 @@
                 </div>
             </template>
 
-            <div class="flex items-center justify-between border-t bg-gray-100 p-4">
+            <div class="flex items-center justify-between border-t bg-gray-100 p-4 rounded-es-xl">
                 <div
                     class="dark:text-dark-150 text-sm text-gray-700"
                     v-text="
@@ -129,6 +131,8 @@ import {
     Panel,
     PanelFooter,
     Heading,
+    Checkbox,
+    Icon,
 } from '@statamic/ui';
 
 export default {
@@ -145,6 +149,8 @@ export default {
         Panel,
         PanelFooter,
         Heading,
+        Checkbox,
+        Icon,
     },
 
     // todo, when opening and closing the stack, you cant save?
@@ -270,6 +276,31 @@ export default {
             if (!this.reachedSelectionLimit) {
                 this.selections.push(id);
             }
+        },
+
+        getCheckboxLabel(row) {
+            const rowTitle = this.getRowTitle(row);
+            return this.isSelected(row.id)
+                ? __('deselect_title', { title: rowTitle })
+                : __('select_title', { title: rowTitle });
+        },
+
+        getCheckboxDescription(row) {
+            const rowTitle = this.getRowTitle(row);
+            const isDisabled = this.reachedSelectionLimit && !this.singleSelect && !this.isSelected(row.id);
+
+            if (isDisabled) {
+                return __('selection_limit_reached', { title: rowTitle });
+            }
+
+            return this.isSelected(row.id)
+                ? __('item_selected_description', { title: rowTitle })
+                : __('item_not_selected_description', { title: rowTitle });
+        },
+
+        getRowTitle(row) {
+            // Try to get a meaningful title from common fields
+            return row.title || row.name || row.label || row.id || __('item');
         },
     },
 };

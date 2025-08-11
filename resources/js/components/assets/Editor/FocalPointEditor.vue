@@ -3,8 +3,8 @@
         <div class="focal-point">
             <div class="focal-point-toolbox card p-0">
                 <div class="p-4">
-                    <label>{{ __('Focal Point') }}</label>
-                    <small class="help-block">{{ __('messages.focal_point_instructions') }}</small>
+                    <Heading size="xl">{{ __('Focal Point') }}</Heading>
+                    <Subheading>{{ __('messages.focal_point_instructions') }}</Subheading>
                     <div class="focal-point-image">
                         <img ref="image" :src="image" @click="define" @load="setImageDimensions" />
                         <div
@@ -37,15 +37,13 @@
                 </div>
                 <div class="px-4">
                     <input type="range" v-model="z" min="1" max="10" step="0.1" class="mb-4 w-full" />
-                    <div class="mb-2 flex flex-wrap items-center justify-center">
-                        <button type="button" class="btn mb-2" @click.prevent="close">{{ __('Cancel') }}</button>
-                        <button type="button" class="btn btn-default mx-2 mb-2" @click.prevent="reset">
-                            {{ __('Reset') }}
-                        </button>
-                        <button type="button" class="btn btn-primary mb-2" @click="select">{{ __('Finish') }}</button>
+                    <div class="mb-4 flex flex-wrap items-center justify-center space-x-2">
+                        <Button :text="__('Cancel')" @click="close" />
+                        <Button :text="__('Reset')" @click="reset" />
+                        <Button variant="primary" :text="__('Finish')" @click="select" />
                     </div>
                 </div>
-                <h6 class="rounded-b bg-gray-300 p-4 text-center dark:border-dark-200 dark:bg-dark-550">
+                <h6 class="rounded-b bg-gray-100  p-4 text-center  dark:bg-dark-800">
                     {{ __('messages.focal_point_previews_are_examples') }}
                 </h6>
             </div>
@@ -64,10 +62,14 @@
 </template>
 
 <script>
+import { Heading, Subheading, Button } from '@statamic/ui';
 import FocalPointPreviewFrame from './FocalPointPreviewFrame.vue';
 
 export default {
     components: {
+        Heading,
+        Subheading,
+        Button,
         FocalPointPreviewFrame,
     },
 

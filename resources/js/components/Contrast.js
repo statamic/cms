@@ -5,37 +5,16 @@ export default class Contrast {
     #contrast = ref(null);
 
     constructor(preference) {
-        this.#preference = ref(preference ?? 'default');
-        this.#watchPreferences();
+        this.#preference = ref(preference ? 'increased' : 'auto');
+        this.#setContrast(this.#preference.value);
         this.#watchContrast();
         this.#listenForColorSchemeChange();
-    }
-
-    get preference() {
-        return this.#preference;
-    }
-
-    set preference(value) {
-        this.#preference.value = value;
-    }
-
-    #watchPreferences() {
-        watch(
-            this.#preference,
-            (preference) => {
-                this.#setContrast(preference);
-                this.#savePreference(preference);
-            },
-            { immediate: true },
-        );
     }
 
     #watchContrast() {
         watch(
             this.#contrast,
-            (contrast) => {
-                document.documentElement.classList.toggle('contrast-increased', contrast === 'increased');
-            },
+            (contrast) => document.body.setAttribute('data-contrast', contrast),
             { immediate: true },
         );
     }
@@ -52,14 +31,4 @@ export default class Contrast {
             if (this.#preference.value === 'auto') this.#contrast.value = e.matches ? 'increased' : 'default';
         });
     }
-
-    #savePreference(preference) {
-        if (preference === 'default') {
-            Statamic.$preferences.remove('contrast');
-            localStorage.removeItem('statamic.contrast');
-        } else {
-            Statamic.$preferences.set('contrast', preference);
-            localStorage.setItem('statamic.contrast', preference);
-        }
-    }
-} 
+}

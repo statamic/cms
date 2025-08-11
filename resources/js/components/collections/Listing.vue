@@ -64,6 +64,7 @@
                 <ui-card class="h-40">
                     <ui-listing :items="collection.entries" :columns="collection.columns">
                         <table class="w-full [&_td]:p-0.5 [&_td]:text-sm">
+                            <ui-listing-table-head sr-only />
                             <ui-listing-table-body>
                                 <template #cell-title="{ row: entry }" class="w-full">
                                     <div class="flex items-center gap-2">
@@ -196,6 +197,10 @@ export default {
         },
     },
 
+    mounted() {
+        this.addToCommandPalette();
+    },
+
     methods: {
         request() {
             if (this.source) this.source.abort();
@@ -237,6 +242,34 @@ export default {
                 : this.$toast.error(response.message || __('Action failed'));
 
             this.request();
+        },
+
+        addToCommandPalette() {
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Create Collection'),
+                icon: 'collections',
+                when: () => this.canCreateCollections,
+                url: this.createUrl,
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Toggle Grid Layout'),
+                when: () => this.mode === 'table',
+                action: () => this.mode = 'grid',
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Toggle List Layout'),
+                when: () => this.mode === 'grid',
+                action: () => this.mode = 'table',
+            });
+
+            // TODO: We can add more two-step actions later.
+            // ie. With the 'Configure' / 'Edit Blueprints' / 'Scaffold Views' stuff in the twirldowns,
+            // the user should be able to select a collection in the palette?
         },
     },
 };

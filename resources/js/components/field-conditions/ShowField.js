@@ -3,10 +3,13 @@ import { data_get } from '@statamic/bootstrap/globals.js';
 import { nextTick } from 'vue';
 
 export default class {
-    constructor(store, values, extraValues) {
-        this.store = store;
+    constructor(values, extraValues, rootValues, hiddenFields, revealerFields, setHiddenField) {
         this.values = values;
         this.extraValues = extraValues;
+        this.rootValues = rootValues;
+        this.hiddenFields = hiddenFields;
+        this.revealerFields = revealerFields;
+        this.setHiddenField = setHiddenField;
     }
 
     showField(field, dottedKey) {
@@ -27,7 +30,7 @@ export default class {
         }
 
         // Use validation to determine whether field should be shown.
-        let validator = new Validator(field, { ...this.values, ...this.extraValues }, dottedFieldPath, this.store);
+        let validator = new Validator(field, { ...this.values, ...this.extraValues }, this.rootValues, dottedFieldPath, this.revealerFields);
         let passes = validator.passesConditions();
 
         // If the field is configured to always save, never omit value.
@@ -54,14 +57,14 @@ export default class {
     }
 
     setHiddenFieldState({ dottedKey, hidden, omitValue }) {
-        const currentValue = this.store.hiddenFields[dottedKey];
+        const currentValue = this.hiddenFields[dottedKey];
 
         // Prevent infinite loops
         if (currentValue && currentValue.hidden === hidden && currentValue.omitValue === omitValue) {
             return;
         }
 
-        this.store.setHiddenField({
+        this.setHiddenField({
             dottedKey,
             hidden,
             omitValue,
@@ -69,6 +72,6 @@ export default class {
     }
 
     shouldForceHiddenField(dottedFieldPath) {
-        return data_get(this.store.hiddenFields[dottedFieldPath], 'hidden') === 'force';
+        return data_get(this.hiddenFields[dottedFieldPath], 'hidden') === 'force';
     }
 }

@@ -27,8 +27,6 @@ export default {
         Fields,
     },
 
-    inject: ['store'],
-
     computed: {
         dictionary() {
             return this.value?.type;
@@ -51,12 +49,12 @@ export default {
         publishMeta() {
             return {
                 ...this.meta.type.meta,
-                ...this.meta.dictionaries[this.dictionary]?.meta, // todo: some fieldtypes aren't getting their meta
+                ...this.meta.dictionaries[this.dictionary]?.meta,
             };
         },
 
         errors() {
-            const state = this.store;
+            const state = this.publishContainer;
 
             if (!state) {
                 return {};

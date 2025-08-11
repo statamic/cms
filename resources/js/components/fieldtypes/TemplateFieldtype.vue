@@ -10,6 +10,8 @@
         :searchable="true"
         :multiple="false"
         :model-value="value"
+        :id="id"
+        :discrete-focus-outline="true"
         @update:modelValue="update"
     >
         <template #no-options>

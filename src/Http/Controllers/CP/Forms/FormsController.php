@@ -38,7 +38,7 @@ class FormsController extends CpController
                     'submissions' => $form->querySubmissions()->count(),
                     'show_url' => $form->showUrl(),
                     'edit_url' => $form->editUrl(),
-                    'blueprint_url' => cp_route('forms.blueprint.edit', $form->handle()),
+                    'blueprint_url' => cp_route('blueprints.forms.edit', $form->handle()),
                     'can_edit' => User::current()->can('edit', $form),
                     'can_edit_blueprint' => User::current()->can('configure form fields', $form),
                 ];
@@ -213,7 +213,7 @@ class FormsController extends CpController
                         'instructions' => __('statamic::messages.form_configure_blueprint_instructions'),
                         'html' => ''.
                             '<div class="text-xs">'.
-                            '   <a href="'.cp_route('forms.blueprint.edit', $form->handle()).'" class="text-blue">'.__('Edit').'</a>'.
+                            '   <a href="'.cp_route('blueprints.forms.edit', $form->handle()).'" class="text-blue">'.__('Edit').'</a>'.
                             '</div>',
                     ],
                     'honeypot' => [

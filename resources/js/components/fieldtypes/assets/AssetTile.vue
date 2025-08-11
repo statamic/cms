@@ -26,7 +26,7 @@
                 </template>
 
                 <template v-else>
-                    <img :src="thumbnail" v-if="isImage" :title="label" />
+                    <img :src="thumbnail" v-if="thumbnail" :title="label" />
 
                     <template v-else>
                         <img v-if="canShowSvg" :src="asset.url" :title="label" class="p-4" />
@@ -37,33 +37,25 @@
                 <div class="asset-controls">
                     <div class="flex items-center justify-center space-x-1 rtl:space-x-reverse">
                         <template v-if="!readOnly">
-                            <button @click="edit" class="btn btn-icon" :title="__('Edit')">
-                                <svg-icon name="micro/sharp-pencil" class="my-2 h-4" />
-                            </button>
+                            <Button @click="edit" icon="edit" :title="__('Edit')" />
 
-                            <button @click="remove" class="btn btn-icon" :title="__('Remove')">
-                                <span class="w-4 text-lg antialiased">×</span>
-                            </button>
+                            <Button @click="remove" icon="x" :title="__('Remove')" />
                         </template>
 
                         <template v-else>
-                            <button
+                            <Button
                                 v-if="asset.url && asset.isMedia && this.canDownload"
                                 @click="open"
-                                class="btn btn-icon"
                                 :title="__('Open in a new window')"
-                            >
-                                <svg-icon name="light/external-link" class="my-2 h-4" />
-                            </button>
+                                icon="external-link"
+                            />
 
-                            <button
+                            <Button
                                 v-if="asset.allowDownloading && this.canDownload"
                                 @click="download"
-                                class="btn btn-icon"
                                 :title="__('Download file')"
-                            >
-                                <svg-icon name="light/download" class="my-2 h-4" />
-                            </button>
+                                icon="download"
+                            />
                         </template>
                     </div>
                 </div>
@@ -83,8 +75,13 @@
 
 <script>
 import Asset from './Asset';
+import { Button } from '@statamic/ui';
 
 export default {
+    components: {
+        Button,
+    },
+
     mixins: [Asset],
 
     computed: {

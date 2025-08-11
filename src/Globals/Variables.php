@@ -225,6 +225,7 @@ class Variables implements Arrayable, ArrayAccess, Augmentable, Contract, Locali
             });
 
         return (new \Statamic\Fields\Blueprint)->setContents([
+            'title' => $this->globalSet()->title(),
             'tabs' => [
                 'main' => [
                     'fields' => array_values($fields->all()),

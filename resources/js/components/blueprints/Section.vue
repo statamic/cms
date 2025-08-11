@@ -60,6 +60,18 @@
                     <label v-text="__('Instructions')" />
                     <input type="text" class="input-text" v-model="editingSection.instructions" />
                 </div>
+                <div class="form-group field-w-50">
+                    <div class="flex items-center gap-2">
+                        <Switch v-model="editingSection.collapsible" />
+                        <Heading :text="__('Collapsible')" />
+                    </div>
+                </div>
+                <div class="form-group field-w-50" v-if="editingSection.collapsible">
+                    <div class="flex items-center gap-2">
+                        <Switch v-model="editingSection.collapsed" />
+                        <Heading :text="__('Collapsed by default')" />
+                    </div>
+                </div>
                 <div class="form-group w-full" v-if="showHandleField">
                     <label v-text="__('Icon')" />
                     <publish-field-meta
@@ -78,13 +90,15 @@
                             :config="config"
                             :meta="meta"
                             :value="value"
-                            @input="editingSection.icon = $event"
+                            @update:value="editingSection.icon = $event"
                         />
                     </publish-field-meta>
                 </div>
-                <div class="form-group w-full" v-if="showHideField">
-                    <label v-text="__('Hidden')" />
-                    <toggle-input v-model="editingSection.hide" />
+                <div class="form-group field-w-50" v-if="showHideField">
+                    <div class="flex items-center gap-2">
+                        <Switch v-model="editingSection.hide" />
+                        <Heading :text="__('Hidden')" />
+                    </div>
                 </div>
             </div>
         </confirmation-modal>
@@ -94,6 +108,7 @@
 <script>
 import Fields from './Fields.vue';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';
+import { Switch, Heading } from '@statamic/ui';
 
 export default {
     mixins: [CanDefineLocalizable],
@@ -104,6 +119,8 @@ export default {
 
     components: {
         Fields,
+        Switch,
+        Heading,
     },
 
     props: {
@@ -201,6 +218,8 @@ export default {
                 instructions: this.section.instructions,
                 icon: this.section.icon,
                 hide: this.section.hide,
+                collapsible: this.section.collapsible,
+                collapsed: this.section.collapsed,
             };
         },
 
