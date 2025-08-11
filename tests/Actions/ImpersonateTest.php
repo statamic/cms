@@ -2,16 +2,17 @@
 
 namespace Tests\Actions;
 
-use Carbon\Carbon;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
+use Tests\ElevatesSessions;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 #[Group('elevated-session')]
 class ImpersonateTest extends TestCase
 {
+    use ElevatesSessions;
     use PreventSavingStacheItemsToDisk;
 
     private function impersonate($user)
@@ -22,11 +23,6 @@ class ImpersonateTest extends TestCase
             'selections' => [$user->id()],
             'values' => [],
         ]);
-    }
-
-    private function withElevatedSession(?Carbon $time = null)
-    {
-        return $this->session(['statamic_elevated_session' => ($time ?? now())->timestamp]);
     }
 
     #[Test]
