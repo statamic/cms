@@ -175,6 +175,11 @@ async function updateIframeContents(url, target, payload) {
             const updatedHtml = await fetch(url).then((response) => response.text());
             const updatedDocument = new DOMParser().parseFromString(updatedHtml, 'text/html');
 
+            if (typeof iframeWindow.StatamicLivePreviewMorph !== 'undefined') {
+                iframeWindow.StatamicLivePreviewMorph(iframeDocument.body, updatedDocument.body);
+                return;
+            }
+
             if (typeof iframeWindow.Alpine !== 'undefined' && typeof iframeWindow.Alpine.morph !== 'undefined') {
                 iframeWindow.Alpine.morph(iframeDocument.body, updatedDocument.body);
                 return;
