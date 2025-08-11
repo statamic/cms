@@ -130,6 +130,8 @@ class UsersController extends CpController
         $this->authorizePro();
         $this->authorize('create', UserContract::class);
 
+        $this->requireElevatedSession();
+
         $blueprint = User::blueprint();
         $blueprint->ensureFieldHasConfig('email', ['validate' => 'required']);
 
@@ -164,6 +166,8 @@ class UsersController extends CpController
     {
         $this->authorizePro();
         $this->authorize('create', UserContract::class);
+
+        $this->requireElevatedSession();
 
         $blueprint = User::blueprint();
 
@@ -224,6 +228,8 @@ class UsersController extends CpController
 
         $this->authorize('edit', $user);
 
+        $this->requireElevatedSession();
+
         $blueprint = $user->blueprint();
 
         if (! User::current()->can('assign roles')) {
@@ -281,6 +287,8 @@ class UsersController extends CpController
         throw_unless($user = User::find($user), new NotFoundHttpException);
 
         $this->authorize('edit', $user);
+
+        $this->requireElevatedSession();
 
         $fields = $user->blueprint()->fields()->except(['password'])->addValues($request->except('id'));
 
