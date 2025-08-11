@@ -23,6 +23,10 @@ export default class Preference {
         return this.commitOnSuccessAndReturnPromise(axios.post(this.url, { key, value, append: true }));
     }
 
+    has(key) {
+        return this.all().hasOwnProperty(key);
+    }
+
     remove(key, value = null, cleanup = true) {
         return this.commitOnSuccessAndReturnPromise(axios.delete(`${this.url}/${key}`, { data: { value, cleanup } }));
     }
