@@ -167,6 +167,8 @@ class UsersController extends CpController
         $this->authorizePro();
         $this->authorize('create', UserContract::class);
 
+        $this->requireElevatedSession();
+
         $blueprint = User::blueprint();
 
         $fields = $blueprint->fields()->except(['roles', 'groups'])->addValues($request->all());
