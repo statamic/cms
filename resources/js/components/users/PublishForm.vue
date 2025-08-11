@@ -47,12 +47,6 @@
         >
             <PublishTabs>
                 <template #settings="{ tab }">
-                    <div v-if="needsToConfirmPassword" class="py-24 text-center space-y-4">
-                        <p>Before doing anything, you need to confirm your password.</p>
-                        <Button @click="confirmPassword">Confirm your password</Button>
-                    </div>
-
-                    <template v-else>
                         <PublishSections :tab="tab" />
 
                         <Panel>
@@ -72,7 +66,6 @@
                                 />
                             </Card>
                         </Panel>
-                    </template>
                 </template>
             </PublishTabs>
         </PublishContainer>
@@ -99,7 +92,7 @@ import {
     PublishSections,
 } from '@statamic/ui';
 import ItemActions from '@statamic/components/actions/ItemActions.vue';
-import { requireElevatedSession, SavePipeline } from '@statamic/exports.js';
+import { SavePipeline } from '@statamic/exports.js';
 import { computed, ref } from 'vue';
 import { Card } from 'statamic';
 const { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } = SavePipeline;
@@ -152,8 +145,6 @@ export default {
             error: null,
             errors: {},
             title: this.initialTitle,
-
-            needsToConfirmPassword: true,
         };
     },
 
@@ -183,12 +174,6 @@ export default {
 
                     this.$nextTick(() => this.$emit('saved', response));
                 });
-        },
-
-        confirmPassword() {
-            requireElevatedSession()
-                .then(() => this.needsToConfirmPassword = false)
-                .catch(() => {});
         },
 
         afterActionSuccessfullyCompleted(response) {
