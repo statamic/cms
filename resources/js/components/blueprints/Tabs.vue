@@ -14,6 +14,7 @@
                             :edit-text="editTabText"
                             @removed="removeTab(tab._id)"
                             @updated="updateTab(tab._id, $event)"
+                            @mouseenter="mouseEnteredTab(tab._id)"
                         />
                     </TabList>
 
