@@ -691,8 +691,9 @@ export default {
             });
         },
 
-        createLocalization(localization) {
+        createLocalization(localizationHandle) {
             this.selectingOrigin = false;
+            const localization = this.localizations.find((e) => e.handle === localizationHandle);
 
             if (this.isCreating) {
                 this.$nextTick(() => (window.location = localization.url));
