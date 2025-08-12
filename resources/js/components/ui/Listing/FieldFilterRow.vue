@@ -35,7 +35,14 @@ function valuesUpdated(newValues) {
                         v-for="field in fields"
                         :key="field.handle"
                         :config="field"
-                    />
+                        v-slot="{ fieldtypeComponent, fieldtypeComponentProps, fieldtypeComponentEvents }"
+                    >
+                        <Component
+                            :is="fieldtypeComponent"
+                            v-bind="fieldtypeComponentProps"
+                            v-on="fieldtypeComponentEvents"
+                        />
+                    </ui-publish-field>
                     <Button @click="$emit('removed')" icon="x" />
                 </div>
             </ui-publish-fields-provider>
