@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue';
-import { Button } from '@statamic/ui';
+import { Button, PublishContainer, PublishField } from '@statamic/ui';
+import PublishFieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
 
 const emit = defineEmits(['update:values', 'removed']);
 
@@ -20,18 +21,18 @@ function valuesUpdated(newValues) {
 
 <template>
     <div class="flex items-center justify-between">
-        <ui-publish-container
+        <PublishContainer
             :model-value="containerValues"
             @update:model-value="valuesUpdated"
             :meta="meta"
             :track-dirty-state="false"
         >
-            <ui-publish-fields-provider :fields="fields">
+            <PublishFieldsProvider :fields="fields">
                 <div class="flex items-center justify-between">
                     <div>
                         {{ display }}
                     </div>
-                    <ui-publish-field
+                    <PublishField
                         v-for="field in fields"
                         :key="field.handle"
                         :config="field"
@@ -42,10 +43,10 @@ function valuesUpdated(newValues) {
                             v-bind="fieldtypeComponentProps"
                             v-on="fieldtypeComponentEvents"
                         />
-                    </ui-publish-field>
+                    </PublishField>
                     <Button @click="$emit('removed')" icon="x" />
                 </div>
-            </ui-publish-fields-provider>
-        </ui-publish-container>
+            </PublishFieldsProvider>
+        </PublishContainer>
     </div>
 </template>
