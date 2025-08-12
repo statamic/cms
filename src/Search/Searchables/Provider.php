@@ -50,6 +50,11 @@ abstract class Provider implements ProvidesSearchables
         return $this;
     }
 
+    public function includedInAll(): bool
+    {
+        return true;
+    }
+
     protected function usesWildcard()
     {
         return in_array('*', $this->keys);

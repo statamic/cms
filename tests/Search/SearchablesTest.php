@@ -100,6 +100,39 @@ class SearchablesTest extends TestCase
     }
 
     #[Test]
+    public function all_searchables_doesnt_include_searchable_where_included_in_all_is_false()
+    {
+        app(Providers::class)->register($entries = Mockery::mock(Entries::class)->makePartial());
+        app(Providers::class)->register($terms = Mockery::mock(Terms::class)->makePartial());
+        app(Providers::class)->register($assets = Mockery::mock(Assets::class)->makePartial());
+        app(Providers::class)->register($users = Mockery::mock(Users::class)->makePartial());
+
+        $entries->shouldReceive('provide')->andReturn(collect([$entryA = Entry::make(), $entryB = Entry::make()]));
+        $terms->shouldReceive('provide')->andReturn(collect([$termA = Term::make(), $termB = Term::make()]));
+        $assets->shouldReceive('provide')->andReturn(collect([$assetA = Asset::make(), $assetB = Asset::make()]));
+
+        $users->shouldReceive('includedInAll')->andReturn(false);
+        $users->shouldReceive('provide')->andReturn(collect([$userA = User::make(), $userB = User::make()]));
+
+        $searchables = $this->makeSearchables(['searchables' => 'all']);
+
+        $everythingApartFromUsers = [
+            $entryA,
+            $entryB,
+            $termA,
+            $termB,
+            $assetA,
+            $assetB,
+        ];
+
+        $items = $searchables->all();
+        $this->assertInstanceOf(Collection::class, $items);
+        $this->assertEquals($everythingApartFromUsers, $items->all());
+        $this->assertFalse($searchables->contains($userA));
+        $this->assertFalse($searchables->contains($userB));
+    }
+
+    #[Test]
     public function it_gets_searchables_from_specific_providers()
     {
         app(Providers::class)->register($entries = Mockery::mock(Entries::class)->makePartial());

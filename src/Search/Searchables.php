@@ -30,7 +30,9 @@ class Searchables
         $providers = collect(Arr::wrap($this->index->config()['searchables'] ?? []));
 
         if ($providers->contains('all')) {
-            return $manager->providers()->map(fn ($_, $key) => $manager->make($key, $this->index, ['*']));
+            return $manager->providers()
+                ->filter->includedInAll()
+                ->map(fn ($_, $key) => $manager->make($key, $this->index, ['*']));
         }
 
         return $providers
