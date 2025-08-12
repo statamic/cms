@@ -95,7 +95,7 @@
                     <Context>
                         <template #trigger>
                             <div
-                                class="asset-tile group relative bg-white"
+                                class="asset-tile group relative bg-white dark:bg-gray-900"
                                 :class="{
                                     'bg-checkerboard!': asset.can_be_transparent,
                                     'opacity-50!': draggingAsset === asset.id,
