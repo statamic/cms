@@ -120,6 +120,10 @@
     }
 }
 
+td[data-column="size"] {
+    @apply whitespace-nowrap;
+}
+
 .table-fullscreen {
     @apply fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-200;
     z-index: 998; /*  to appear over the top of the rest of the stuff on the page. */
