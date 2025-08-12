@@ -170,19 +170,19 @@ const fieldtypeComponentProps = computed(() => ({
     value: value.value,
     meta: meta.value,
     handle: handle,
-    'name-prefix': namePrefix,
-    'field-path-prefix': fieldPathPrefix.value,
-    'meta-path-prefix': metaPathPrefix.value,
-    'read-only': isReadOnly.value,
-    'show-field-previews': true
+    namePrefix: namePrefix,
+    fieldPathPrefix: fieldPathPrefix.value,
+    metaPathPrefix: metaPathPrefix.value,
+    readOnly: isReadOnly.value,
+    showFieldPreviews: true
 }));
 
 const fieldtypeComponentEvents = computed(() => ({
     'update:value': valueUpdated,
     'update:meta': metaUpdated,
-    'focus': focused,
-    'blur': blurred,
-    'replicator-preview-updated': replicatorPreviewUpdated
+    focus: focused,
+    blur: blurred,
+    replicatorPreviewUpdated: replicatorPreviewUpdated
 }));
 </script>
 
