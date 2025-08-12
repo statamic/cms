@@ -70,13 +70,11 @@
         }
 
         &.table-drag-handle {
-            @apply h-full w-3 p-2 cursor-grab;
-            background: var(--color-white) url('../../../svg/icons/light/drag-dots.svg') center center no-repeat;
+            @apply h-full w-3 p-2 cursor-grab bg-white dark:bg-gray-800;
+            background-image: url('../../svg/ui/drag-dots.svg');
+            background-repeat: no-repeat;
+            background-position: center center;
             background-size: 7px 17px;
-
-            .dark & {
-                background-color: var(--color-gray-800);
-            }
 
             &:hover {
                 @apply bg-gray-100 dark:bg-gray-700;
@@ -120,6 +118,10 @@
             @apply outline-hidden ring-0;
         }
     }
+}
+
+td[data-column="size"] {
+    @apply whitespace-nowrap;
 }
 
 .table-fullscreen {

@@ -95,15 +95,12 @@
                                 <template #trigger>
                                     <button
                                         type="button"
-                                        class="btn-round bard-add-set-button group"
-                                        :style="{ transform: `translateY(${y}px)` }"
+                                        class="btn-round bard-add-set-button group size-7!"
+                                        :style="{ transform: `translateY(${y+2}px)` }"
                                         :aria-label="__('Add Set')"
                                         v-tooltip="__('Add Set')"
                                     >
-                                        <svg-icon
-                                            name="micro/plus"
-                                            class="dark:group-hover:dark-text-100 dark:text-dark-175 h-3 w-3 text-gray-900 group-hover:text-black"
-                                        />
+                                        <ui-icon name="plus" class="size-4" />
                                     </button>
                                 </template>
                             </set-picker>
@@ -323,7 +320,7 @@ export default {
             return [
                 {
                     title: __('Expand All Sets'),
-                    icon: 'expand-vertical-4',
+                    icon: 'ui/expand',
                     quick: true,
                     visibleWhenReadOnly: true,
                     run: this.expandAll,
@@ -331,7 +328,7 @@ export default {
                 },
                 {
                     title: __('Collapse All Sets'),
-                    icon: 'shrink-vertical',
+                    icon: 'ui/collapse',
                     quick: true,
                     visibleWhenReadOnly: true,
                     run: this.collapseAll,
@@ -339,7 +336,7 @@ export default {
                 },
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => (vm.fullScreenMode ? 'shrink-all' : 'expand'),
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'ui/collapse-all' : 'ui/expand-all'),
                     quick: true,
                     run: this.toggleFullscreen,
                     visibleWhenReadOnly: true,

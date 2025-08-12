@@ -7,7 +7,7 @@
             <div :class="{ wrapperClasses: fullScreenMode }">
                 <div
                     class="replicator-fieldtype-container"
-                    :class="{ 'replicator-fullscreen dark:bg-dark-700 bg-gray-200': fullScreenMode }"
+                    :class="{ 'replicator-fullscreen fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-200 dark:bg-gray-800': fullScreenMode }"
                 >
                     <publish-field-fullscreen-header
                         v-if="fullScreenMode"
@@ -71,7 +71,7 @@
                             v-if="canAddSet"
                             :groups="groupConfigs"
                             :sets="setConfigs"
-                            :show-connector="false"
+                            :show-connector="value.length > 0"
                             :index="value.length"
                             :label="config.button_label"
                             @added="addSet"
@@ -155,21 +155,21 @@ export default {
             return [
                 {
                     title: __('Expand All Sets'),
-                    icon: 'arrows-horizontal-expand',
+                    icon: 'ui/expand',
                     quick: true,
                     visibleWhenReadOnly: true,
                     run: this.expandAll,
                 },
                 {
                     title: __('Collapse All Sets'),
-                    icon: 'arrows-horizontal-collapse',
+                    icon: 'ui/collapse',
                     quick: true,
                     visibleWhenReadOnly: true,
                     run: this.collapseAll,
                 },
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => (vm.fullScreenMode ? 'shrink-all' : 'expand-bold'),
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'ui/collapse-all' : 'ui/expand-all'),
                     quick: true,
                     visibleWhenReadOnly: true,
                     run: this.toggleFullscreen,

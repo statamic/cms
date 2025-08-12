@@ -6,8 +6,6 @@
                 :url="actionUrl"
                 :actions="actions"
                 :item="handle"
-                @started="actionStarted"
-                @completed="actionCompleted"
                 v-slot="{ actions }"
             >
                 <Dropdown placement="left-start">

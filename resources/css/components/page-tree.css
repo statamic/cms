@@ -7,7 +7,7 @@
 
     .page-tree-branch {
         @apply relative rounded-xl bg-white text-xs shadow;
-        @apply dark:bg-dark-600 dark:shadow-lg;
+        @apply dark:bg-gray-800 dark:shadow-lg;
     }
 
     .tree-node-children {
@@ -15,21 +15,16 @@
     }
 
     .page-move {
-        @apply w-6 dark:border-dark-900 dark:text-dark-175 ltr:rounded-xl;
+        @apply w-6 dark:border-gray-900 dark:bg-gray-800 dark:text-gray-200 ltr:rounded-xl;
         cursor: grab;
-        background-image: url('../../svg/icons/light/drag-dots.svg');
+        background-image: url('../../svg/ui/drag-dots.svg');
         background-size: 7px 17px;
         background-position: center center;
         background-repeat: no-repeat;
-
-        .dark & {
-            background-color: hsla(180, 1%, 18%, 0.5);
-        }
     }
 
     .page-root {
-        background-color: hsla(210, 30%, 95%, 0.5);
-        @apply flex w-6 items-center dark:border-dark-900 ltr:rounded-l ltr:border-r rtl:rounded-r rtl:border-l;
+        @apply flex w-6 items-center dark:border-gray-900 rounded-s border-e;
     }
 
     /* Nice progressive enhancement to visually connect tree node children by removing the top left border radius.. */
@@ -47,12 +42,12 @@
 .nav-builder {
     background: none;
     .tree-node {
-        @apply bg-gray-100;
+        @apply bg-gray-100 dark:bg-gray-800;
         .tree-node-inner {
             @apply px-1;
         }
         &:has(.is-section) {
-            @apply mt-8 pt-1 bg-gray-100 rounded-t-2xl;
+            @apply mt-8 pt-1 bg-gray-100 dark:bg-gray-800 rounded-t-2xl;
         }
         &:has(+ .tree-node .is-section),
         &:last-child {

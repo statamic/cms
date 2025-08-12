@@ -68,8 +68,8 @@
                                 :aria-label="`${__('Browse')}...`"
                                 @click="openSelector"
                             >
-                                <svg-icon v-show="linkType === 'asset'" name="folder-image" class="size-4" />
-                                <svg-icon v-show="linkType !== 'asset'" name="folder-generic" class="size-4" />
+                                <ui-icon v-show="linkType === 'asset'" name="folder-image" class="size-4" />
+                                <ui-icon v-show="linkType !== 'asset'" name="folder-generic" class="size-4" />
                             </button>
                         </div>
                     </div>
@@ -165,13 +165,11 @@
 <script>
 import qs from 'qs';
 import AssetSelector from '../../assets/Selector.vue';
-import SvgIcon from '../../SvgIcon.vue';
 import { Icon } from '@statamic/ui';
 
 export default {
     components: {
         AssetSelector,
-        SvgIcon,
         Icon,
     },
 

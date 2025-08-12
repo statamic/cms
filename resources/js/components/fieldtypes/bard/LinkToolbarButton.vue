@@ -2,14 +2,14 @@
     <Popover ref="popover" class="!w-84" :inset="true" v-model:open="showingToolbar">
         <template #trigger>
             <Button
-                class="px-2! [&_svg]:size-3.5"
+                class="px-2!"
                 :class="{ active }"
                 variant="ghost"
                 size="sm"
                 :aria-label="button.text"
                 v-tooltip="button.text"
             >
-                <svg-icon :name="button.svg" v-if="button.svg" class="size-4" />
+                <ui-icon :name="button.svg" v-if="button.svg" class="size-4" />
                 <div class="flex items-center" v-html="button.html" v-if="button.html" />
             </Button>
         </template>

@@ -61,10 +61,16 @@ export default class Theme {
 
     #savePreference(preference) {
         if (preference === 'auto') {
-            Statamic.$preferences.remove('theme');
+            if (Statamic.$preferences.has('theme')) {
+                Statamic.$preferences.remove('theme');
+            }
+
             localStorage.removeItem('statamic.theme');
         } else {
-            Statamic.$preferences.set('theme', preference);
+            if (Statamic.$preferences.get('theme') !== preference) {
+                Statamic.$preferences.set('theme', preference);
+            }
+
             localStorage.setItem('statamic.theme', preference);
         }
     }
