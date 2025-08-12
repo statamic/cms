@@ -135,7 +135,7 @@ function initCodeMirror() {
 }
 
 function refresh() {
-    nextTick(() => codemirror.value.refresh());
+    nextTick(() => codemirror.value?.refresh());
 }
 
 watch(
