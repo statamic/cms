@@ -192,42 +192,42 @@ const fieldtypeComponentEvents = computed(() => ({
         :fieldtypeComponentProps="fieldtypeComponentProps"
         :fieldtypeComponentEvents="fieldtypeComponentEvents"
     >
-    <Field
-        v-show="shouldShowField"
-        :class="`${config.type}-fieldtype`"
-        :id="fieldId"
-        :instructions="config.instructions"
-        :instructions-below="config.instructions_position === 'below'"
-        :required="isRequired"
-        :errors="errors"
-        :read-only="isReadOnly"
-        :as="wrapperComponent"
-        :variant="config.variant"
-        v-bind="$attrs"
-    >
-        <template #label v-if="shouldShowLabel">
-            <Label :for="fieldId" :required="isRequired">
-                <template v-if="shouldShowLabelText">
-                    <Tooltip :text="config.handle" :delay="1000">
-                        {{ __(config.display) }}
-                    </Tooltip>
-                </template>
-                <ui-button size="xs" inset icon="synced" variant="ghost" v-tooltip="__('messages.field_synced_with_origin')" v-if="!isReadOnly && isSyncable" v-show="isSynced" @click="desync" />
-                <ui-button size="xs" inset icon="unsynced" variant="ghost" v-tooltip="__('messages.field_desynced_from_origin')" v-if="!isReadOnly && isSyncable" v-show="!isSynced" @click="sync" />
-            </Label>
-        </template>
-        <template #actions v-if="shouldShowFieldActions">
-            <FieldActions :actions="fieldActions" />
-        </template>
-        <div class="text-xs text-red-500" v-if="!fieldtypeComponentExists">
-            Component <code v-text="fieldtypeComponent"></code> does not exist.
-        </div>
-        <Component
-            ref="fieldtype"
-            :is="fieldtypeComponent"
-            v-bind="fieldtypeComponentProps"
-            v-on="fieldtypeComponentEvents"
-        />
-    </Field>
+        <Field
+            v-show="shouldShowField"
+            :class="`${config.type}-fieldtype`"
+            :id="fieldId"
+            :instructions="config.instructions"
+            :instructions-below="config.instructions_position === 'below'"
+            :required="isRequired"
+            :errors="errors"
+            :read-only="isReadOnly"
+            :as="wrapperComponent"
+            :variant="config.variant"
+            v-bind="$attrs"
+        >
+            <template #label v-if="shouldShowLabel">
+                <Label :for="fieldId" :required="isRequired">
+                    <template v-if="shouldShowLabelText">
+                        <Tooltip :text="config.handle" :delay="1000">
+                            {{ __(config.display) }}
+                        </Tooltip>
+                    </template>
+                    <ui-button size="xs" inset icon="synced" variant="ghost" v-tooltip="__('messages.field_synced_with_origin')" v-if="!isReadOnly && isSyncable" v-show="isSynced" @click="desync" />
+                    <ui-button size="xs" inset icon="unsynced" variant="ghost" v-tooltip="__('messages.field_desynced_from_origin')" v-if="!isReadOnly && isSyncable" v-show="!isSynced" @click="sync" />
+                </Label>
+            </template>
+            <template #actions v-if="shouldShowFieldActions">
+                <FieldActions :actions="fieldActions" />
+            </template>
+            <div class="text-xs text-red-500" v-if="!fieldtypeComponentExists">
+                Component <code v-text="fieldtypeComponent"></code> does not exist.
+            </div>
+            <Component
+                ref="fieldtype"
+                :is="fieldtypeComponent"
+                v-bind="fieldtypeComponentProps"
+                v-on="fieldtypeComponentEvents"
+            />
+        </Field>
     </slot>
 </template>
