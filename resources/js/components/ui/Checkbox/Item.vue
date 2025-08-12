@@ -25,7 +25,7 @@ const checkboxClasses = computed(() => {
         base: 'size-4',
     };
 
-    return `shadow-ui-xs mt-0.5 ${sizes[props.size]} cursor-default rounded-sm border border-gray-300 bg-white data-[state=checked]:border-gray-900 data-[state=checked]:bg-gray-900 dark:border-none dark:data-[state=checked]:bg-white data-[disabled]:bg-gray-100 data-[disabled]:border-gray-200 data-[disabled]:text-gray-400 data-[disabled]:cursor-not-allowed shrink-0`;
+    return `shadow-ui-xs mt-0.5 ${sizes[props.size]} cursor-default rounded-sm border border-gray-300 bg-white dark:bg-gray-600 dark:border-gray-900 data-[state=checked]:border-gray-900 data-[state=checked]:bg-gray-900 dark:border-none dark:data-[state=checked]:bg-gray-400 dark:data-[state=checked]:border-gray-700 dark:data-[disabled]:bg-gray-800 dark:data-[disabled]:border-gray-700 dark:data-[disabled]:text-gray-400 dark:data-[disabled]:cursor-not-allowed shrink-0`;
 });
 
 const containerClasses = computed(() => {
