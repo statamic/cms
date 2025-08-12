@@ -9,6 +9,7 @@ const props = defineProps({
     label: { type: String, default: null },
     modelValue: { type: [Boolean, null], default: null },
     name: { type: String, default: null },
+    readOnly: { type: Boolean, default: false },
     size: { type: String, default: 'base' },
     solo: { type: Boolean, default: false },
     value: { type: [String, Number, Boolean], required: true },
@@ -45,7 +46,7 @@ const conditionalProps = computed(() => {
 <template>
     <div :class="containerClasses">
         <CheckboxRoot
-            :disabled
+            :disabled="readOnly || disabled"
             :id
             :name="name"
             :value="value"
