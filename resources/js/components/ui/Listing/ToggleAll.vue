@@ -47,6 +47,7 @@ function getScreenReaderText() {
         :indeterminate="indeterminate"
         :label="getAriaLabel()"
         :description="getScreenReaderText()"
+        :value="'all'"
         size="sm"
         solo
         @update:model-value="toggle"
