@@ -43,30 +43,31 @@
                     class="cursor-pointer rounded-md"
                     :class="{ 'bg-gray-100 dark:bg-gray-900': selectionIndex === i }"
                     @mouseover="selectionIndex = i"
+                    :title="__(item.instructions)"
                 >
-                    <div v-if="item.type === 'group'" @click="selectGroup(item.handle)" class="group flex items-center rounded-md px-2 py-1.5 gap-3">
+                    <div v-if="item.type === 'group'" @click="selectGroup(item.handle)" class="group flex rounded-md px-2 py-1.5 gap-3">
                         <ui-icon
                             :name="groupIconName(item.icon)"
                             class="size-9 rounded-md border border-gray-300 bg-white dark:bg-gray-900/50 dark:border-gray-600 shadow-ui-xs p-2"
                         />
                         <div class="flex-1">
-                            <div class="w-50 truncate text-sm font-medium text-gray-900 dark:text-dark-175">
+                            <div class="w-50 line-clamp-2 text-sm font-medium text-gray-900 dark:text-dark-175">
                                 {{ __(item.display || item.handle) }}
                             </div>
-                            <div v-if="item.instructions" class="w-50 truncate text-2xs text-gray-700 dark:text-dark-175">
+                            <div v-if="item.instructions" class="w-50 line-clamp-2 text-2xs text-gray-700 dark:text-dark-175">
                                 {{ __(item.instructions) }}
                             </div>
                         </div>
                         <ui-icon name="ui/chevron-right" class="me-2" />
                     </div>
-                    <div v-if="item.type === 'set'" @click="addSet(item.handle)" class="group flex items-center rounded-md px-2 py-1.5 gap-3">
+                    <div v-if="item.type === 'set'" @click="addSet(item.handle)" class="group flex rounded-md px-2 py-1.5 gap-3">
                         <ui-icon
                             :name="setIconName(item.icon)"
                             :directory="iconBaseDirectory"
                             class="size-9 rounded-md border border-gray-300 bg-white dark:bg-gray-900/50 dark:border-gray-600 shadow-ui-xs p-2"
                         />
                         <div class="flex-1">
-                            <div class="w-52 truncate text-sm font-medium text-gray-900 dark:text-dark-175">
+                            <div class="w-52 line-clamp-2 text-sm font-medium text-gray-900 dark:text-dark-175">
                                 {{ __(item.display || item.handle) }}
                             </div>
                             <div v-if="item.instructions" class="w-52 truncate text-2xs text-gray-700 dark:text-dark-175">
