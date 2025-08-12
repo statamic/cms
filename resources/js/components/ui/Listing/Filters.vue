@@ -1,11 +1,14 @@
 <script setup>
-import { Badge, Button, Modal, ModalClose } from '@statamic/ui';
+import { Badge, Button, Panel, PanelHeader, Card, Heading } from '@statamic/ui';
 import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
 import { computed } from 'vue';
-import FieldFilter from '@statamic/components/data-list/FieldFilter.vue';
-import DataListFilter from '@statamic/components/data-list/Filter.vue';
+import FieldFilter from './FieldFilter.vue';
+import DataListFilter from './Filter.vue';
+import { ref } from 'vue';
 
 const { filters, activeFilters, activeFilterBadges, setFilter, reorderable } = injectListingContext();
+
+const open = ref(false);
 
 const badgeCount = computed(() => {
     let count = Object.keys(activeFilterBadges.value).length;
@@ -31,55 +34,65 @@ function removeFieldFilter(handle) {
     delete fields[handle];
     setFilter('fields', fields);
 }
+
+function isActive(filter) {
+    return activeFilters.value.hasOwnProperty(filter.handle);
+}
+
+function needsFinalFieldBadgeMargin(index) {
+    return standardBadges.value.length === 0
+        && index === Object.keys(fieldFilterBadges.value).length - 1;
+}
+
+function needsFinalStandardBadgeMargin(index) {
+    return index === Object.keys(standardBadges.value).length - 1;
+}
 </script>
 
 <template>
     <div class="flex flex-1 items-center gap-3 overflow-x-auto py-3 rounded-r-4xl">
-        <Modal :title="__('Apply Filters')">
-            <template #trigger>
-                <div class="sticky left-0 ps-[1px] rounded-r-lg bg-white dark:bg-gray-900 mask-bg mask-bg--left mask-bg--left-small">
-                    <Button icon="sliders-horizontal" class="[&_svg]:size-3.5" :disabled="reorderable">
-                        {{ __('Filters') }}
-                        <Badge
-                            v-if="badgeCount"
-                            :text="badgeCount"
-                            size="sm"
-                            pill
-                            class="absolute -top-1.5 -right-1.5"
-                        />
-                    </Button>
-                </div>
-            </template>
-            <div class="space-y-6 py-3">
-                <div class="bg-yellow p-2">
-                    This is ugly and broken because we haven't decided on a new design yet. It's shoehorning the
-                    existing components.
-                </div>
-                <FieldFilter
-                    ref="fieldFilter"
-                    :config="fieldFilter"
-                    :values="activeFilters.fields || {}"
-                    :badges="fieldFilterBadges"
-                    @changed="setFilter('fields', $event)"
-                />
 
-                <data-list-filter
-                    v-for="filter in standardFilters"
-                    :key="filter.handle"
-                    :filter="filter"
-                    :values="activeFilters[filter.handle]"
-                    @changed="setFilter(filter.handle, $event)"
+        <div class="sticky left-0 ps-[1px] rounded-r-lg bg-white dark:bg-gray-900 mask-bg mask-bg--left mask-bg--left-small">
+            <Button icon="sliders-horizontal" class="[&_svg]:size-3.5" :disabled="reorderable" @click="open = true">
+                {{ __('Filters') }}
+                <Badge
+                    v-if="badgeCount"
+                    :text="badgeCount"
+                    size="sm"
+                    pill
+                    class="absolute -top-1.5 -right-1.5"
                 />
-            </div>
-            <template #footer>
-                <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
-                    <ModalClose>
-                        <Button text="Cancel" variant="ghost" />
-                    </ModalClose>
-                    <Button text="Update Filter" variant="primary" />
+            </Button>
+        </div>
+
+        <stack narrow name="filters" v-if="open" @closed="open = false">
+            <div class="flex-1 p-3 bg-white h-full overflow-auto">
+                <div class="space-y-4">
+                    <FieldFilter
+                        :config="fieldFilter"
+                        :values="activeFilters.fields || {}"
+                        @changed="setFilter('fields', $event)"
+                    />
+
+                    <Panel
+                        v-for="filter in standardFilters"
+                        :key="filter.handle"
+                    >
+                        <PanelHeader class="flex items-center justify-between">
+                            <Heading :text="filter.title" />
+                            <Button v-if="isActive(filter)" size="sm" text="Clear" @click="setFilter(filter.handle, null)" />
+                        </PanelHeader>
+                        <Card>
+                            <data-list-filter
+                                :filter="filter"
+                                :values="activeFilters[filter.handle]"
+                                @changed="setFilter(filter.handle, $event)"
+                            />
+                        </Card>
+                    </Panel>
                 </div>
-            </template>
-        </Modal>
+            </div>
+        </stack>
 
         <Button
             v-for="(badge, handle, index) in fieldFilterBadges"
@@ -88,7 +101,7 @@ function removeFieldFilter(handle) {
             :icon-append="reorderable ? null : 'x'"
             :text="badge"
             :disabled="reorderable"
-            :class="{ 'me-12': index === Object.keys(fieldFilterBadges).length - 1 }"
+            :class="{ 'me-12': needsFinalFieldBadgeMargin(index) }"
             @click="removeFieldFilter(handle)"
         />
         <Button
@@ -98,7 +111,7 @@ function removeFieldFilter(handle) {
             :icon-append="reorderable ? null : 'x'"
             :text="badge"
             :disabled="reorderable"
-            :class="{ 'me-12': index === Object.keys(standardBadges).length - 1 }"
+            :class="{ 'me-12 ': needsFinalStandardBadgeMargin(index) }"
             @click="setFilter(handle, null)"
         />
     </div>
