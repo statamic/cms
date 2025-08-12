@@ -6,6 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 <meta name="viewport" content="width=device-width" />
 <meta name="robots" content="noindex,nofollow" />
+<meta name="color-scheme" content="{{ $user?->preferredTheme() ?? 'auto' }}">
 
 <title>
     @yield('title', $title ?? __('Here')) {{ Statamic::cpDirection() === 'ltr' ? '‹' : '›' }}
