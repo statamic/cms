@@ -765,11 +765,11 @@ export default {
         },
 
         container() {
-            return this.meta.assets.container;
+            return this.meta.assets?.container;
         },
 
         assetSelectorColumns() {
-            return this.meta.assets.columns;
+            return this.meta.assets?.columns;
         },
 
         editor() {
