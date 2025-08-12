@@ -13,7 +13,6 @@ import TermListing from '../components/terms/Listing.vue';
 import AddonListing from '../components/addons/Listing.vue';
 import CollectionWidget from '../components/entries/CollectionWidget.vue';
 import FormWidget from '../components/forms/FormWidget.vue';
-import SvgIcon from '../components/SvgIcon.vue';
 import FileIcon from '../components/FileIcon.vue';
 
 import Slugify from '../components/slugs/Slugify.vue';
@@ -59,7 +58,6 @@ export default function registerGlobalComponents(app) {
     app.component('updater-widget', UpdaterWidget);
 
     // Reusable
-    app.component('svg-icon', SvgIcon);
     app.component('file-icon', FileIcon);
 
     app.component('slugify', Slugify);

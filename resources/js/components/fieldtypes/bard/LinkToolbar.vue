@@ -165,13 +165,11 @@
 <script>
 import qs from 'qs';
 import AssetSelector from '../../assets/Selector.vue';
-import SvgIcon from '../../SvgIcon.vue';
 import { Icon } from '@statamic/ui';
 
 export default {
     components: {
         AssetSelector,
-        SvgIcon,
         Icon,
     },
 
