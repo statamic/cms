@@ -232,7 +232,7 @@
                 <div class="form-group publish-field field-w-full">
                     <label v-text="__('Origin')" />
                     <div class="help-block mt-2" v-text="__('messages.entry_origin_instructions')"></div>
-                    <Select class="w-full" v-model="selectedOrigin" :options="originOptions" :placeholder="false" />
+                    <Select class="w-full" v-model="selectedOrigin" :options="originOptions" placeholder="" />
                 </div>
             </div>
         </confirmation-modal>
