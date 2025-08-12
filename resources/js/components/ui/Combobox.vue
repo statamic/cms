@@ -277,11 +277,11 @@ defineExpose({
                             @blur="pushTaggableOption"
                         />
 
-                        <button type="button" class="flex-1 text-start" v-else-if="!searchable && (dropdownOpen || !modelValue)">
+                        <button type="button" class="flex-1 text-start truncate" v-else-if="!searchable && (dropdownOpen || !modelValue)">
                             <span class="text-gray-400 dark:text-gray-500 placeholder-text-xs" v-text="placeholder" />
                         </button>
 
-                        <button type="button" v-else class="flex-1 text-start cursor-pointer">
+                        <button type="button" v-else class="flex-1 text-start cursor-pointer truncate">
                             <slot name="selected-option" v-bind="{ option: selectedOption }">
                                 <span v-if="labelHtml" v-html="getOptionLabel(selectedOption)" />
                                 <span v-else v-text="getOptionLabel(selectedOption)" />
