@@ -371,7 +371,6 @@ class CollectionsController extends CpController
                         'display' => __('Icon'),
                         'instructions' => __('statamic::messages.collection_configure_icon_instructions'),
                         'type' => 'icon',
-                        'folder' => 'light',
                         'width' => '33',
                     ],
                 ],
