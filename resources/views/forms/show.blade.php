@@ -74,12 +74,5 @@
         :columns="{{ $columns->toJson() }}"
         :filters="{{ $filters->toJson() }}"
         v-cloak
-    >
-        <div slot="no-results" class="rounded-lg border-2 border-dashed text-center dark:border-dark-400">
-            <div class="mx-auto max-w-md px-8 py-30">
-                @cp_svg('empty/form')
-                <h1 class="my-6">{{ __('No submissions') }}</h1>
-            </div>
-        </div>
-    </form-submission-listing>
+    ></form-submission-listing>
 @endsection

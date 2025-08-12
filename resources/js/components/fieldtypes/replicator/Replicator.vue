@@ -7,7 +7,7 @@
             <div :class="{ wrapperClasses: fullScreenMode }">
                 <div
                     class="replicator-fieldtype-container"
-                    :class="{ 'replicator-fullscreen dark:bg-dark-700 bg-gray-200': fullScreenMode }"
+                    :class="{ 'replicator-fullscreen fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-200 dark:bg-gray-800': fullScreenMode }"
                 >
                     <publish-field-fullscreen-header
                         v-if="fullScreenMode"
