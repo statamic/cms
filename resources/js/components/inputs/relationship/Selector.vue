@@ -32,7 +32,17 @@
                     </div>
 
                     <Panel class="relative mb-0! overflow-x-auto overscroll-x-contain">
-                        <Table />
+                        <Table>
+                            <template #cell-title="{ row: entry, isColumnVisible }">
+                                <a class="title-index-field" :href="entry.edit_url" @click.stop>
+                                    <StatusIndicator v-if="!isColumnVisible('status')" :status="entry.status" />
+                                    <span v-text="entry.title" />
+                                </a>
+                            </template>
+                            <template #cell-status="{ row: entry }">
+                                <StatusIndicator :status="entry.status" show-label :show-dot="false" />
+                            </template>
+                        </Table>
                         <PanelFooter>
                             <Pagination />
                         </PanelFooter>
@@ -127,6 +137,7 @@ import {
     Heading,
     Checkbox,
     Icon,
+    StatusIndicator,
 } from '@statamic/ui';
 
 export default {
@@ -145,6 +156,7 @@ export default {
         Heading,
         Checkbox,
         Icon,
+        StatusIndicator,
     },
 
     // todo, when opening and closing the stack, you cant save?
