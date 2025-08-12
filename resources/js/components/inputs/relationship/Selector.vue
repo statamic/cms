@@ -18,7 +18,7 @@
                     </div>
                 </template>
 
-                <div class="flex flex-1 flex-col gap-4 overflow-scroll p-4">
+                <div class="flex flex-1 flex-col gap-4 overflow-auto p-4">
                     <div class="flex items-center gap-3">
                         <div class="flex flex-1 items-center gap-3">
                             <Search />
@@ -59,7 +59,7 @@
                     </ui-toggle-group>
                 </div>
 
-                <div class="mx-4 flex-1 overflow-scroll">
+                <div class="mx-4 flex-1 overflow-auto">
                     <Panel>
                         <page-tree
                             ref="tree"
