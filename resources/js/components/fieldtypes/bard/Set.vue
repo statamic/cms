@@ -15,7 +15,7 @@
             <div ref="content" hidden />
             <header
                 class="group/header animate-border-color flex items-center rounded-lg border-b border-transparent px-1.5 antialiased duration-200 hover:bg-gray-50"
-                :class="{ 'rounded-b-none border-gray-200! dark:border-white/10': !collapsed, invalid: isInvalid }"
+                :class="{ 'rounded-b-none border-gray-200! dark:border-white/10!': !collapsed, invalid: isInvalid }"
             >
                 <Icon data-drag-handle name="handles" class="size-4 cursor-grab text-gray-400" v-if="!isReadOnly" />
                 <button type="button" class="flex flex-1 items-center gap-4 p-2" @click="toggleCollapsedState">
