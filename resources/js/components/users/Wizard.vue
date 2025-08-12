@@ -53,12 +53,10 @@
                             <ui-switch v-model="user.super" id="super" />
                             <label for="super" v-text="__('Super Admin')" />
                         </div>
-                        <div
-                            class="mt-2 flex items-center space-x-1 text-2xs text-gray-600 dark:text-gray-400 rtl:space-x-reverse"
-                        >
-                            <svg-icon name="info-circle" class="mb-px flex h-4 w-4 items-center"></svg-icon>
+                        <ui-description class="mt-3 flex items-center gap-2">
+                            <ui-icon name="info-square" class="size-4" />
                             <span>{{ __('messages.user_wizard_super_admin_instructions') }}</span>
-                        </div>
+                        </ui-description>
                     </div>
 
                     <!-- Roles -->

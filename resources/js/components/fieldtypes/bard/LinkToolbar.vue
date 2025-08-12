@@ -68,8 +68,8 @@
                                 :aria-label="`${__('Browse')}...`"
                                 @click="openSelector"
                             >
-                                <svg-icon v-show="linkType === 'asset'" name="folder-image" class="size-4" />
-                                <svg-icon v-show="linkType !== 'asset'" name="folder-generic" class="size-4" />
+                                <ui-icon v-show="linkType === 'asset'" name="folder-image" class="size-4" />
+                                <ui-icon v-show="linkType !== 'asset'" name="folder-generic" class="size-4" />
                             </button>
                         </div>
                     </div>

@@ -31,47 +31,46 @@
 
             <div class="flex items-center gap-3">
                 <slot name="branch-icon" :branch="item" />
-
-                <svg-icon
+                <ui-icon
                     v-if="isRenamedSection"
-                    class="inline-block h-4 w-4 text-gray-500"
-                    name="light/content-writing"
+                    class="size-4 text-gray-400 dark:text-gray-600"
+                    name="fieldsets"
                     v-tooltip="__('Renamed Section')"
                 />
-                <svg-icon
+                <ui-icon
                     v-else-if="isHidden"
-                    class="inline-block h-4 w-4 text-gray-500"
-                    name="light/hidden"
+                    class="size-4 text-gray-400 dark:text-gray-600"
+                    name="eye-closed"
                     v-tooltip="isSection ? __('Hidden Section') : __('Hidden Item')"
                 />
-                <svg-icon
+                <ui-icon
                     v-else-if="isPinnedAlias"
-                    class="inline-block h-4 w-4 text-gray-500"
-                    name="light/pin"
+                    class="size-4 text-gray-400 dark:text-gray-600"
+                    name="pin"
                     v-tooltip="__('Pinned Item')"
                 />
-                <svg-icon
+                <ui-icon
                     v-else-if="isAlias"
-                    class="inline-block h-4 w-4 text-gray-500"
-                    name="light/duplicate-ids"
-                    v-tooltip="__('Alias Item')"
+                    class="size-4 text-gray-400 dark:text-gray-600"
+                    name="duplicate"
+                    v-tooltip="__('Aliased Item')"
                 />
-                <svg-icon
+                <ui-icon
                     v-else-if="isMoved"
-                    class="inline-block w-4 text-gray-500"
-                    name="regular/flip-vertical"
+                    class="size-4 text-gray-400 dark:text-gray-600"
+                    name="moved"
                     v-tooltip="__('Moved Item')"
                 />
-                <svg-icon
+                <ui-icon
                     v-else-if="isModified"
-                    class="inline-block h-4 w-4 text-gray-500"
-                    name="light/content-writing"
+                    class="size-4 text-gray-400 dark:text-gray-600"
+                    name="fieldsets"
                     v-tooltip="__('Modified Item')"
                 />
-                <svg-icon
+                <ui-icon
                     v-else-if="isCustom"
-                    class="inline-block w-4 text-gray-500"
-                    name="light/user-edit"
+                    class="size-4 text-gray-400 dark:text-gray-600"
+                    name="user-edit"
                     v-tooltip="isSection ? __('Custom Section') : __('Custom Item')"
                 />
 
