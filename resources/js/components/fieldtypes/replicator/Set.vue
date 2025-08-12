@@ -134,7 +134,7 @@ function destroy() {
         >
             <header
                 class="group/header animate-border-color flex items-center rounded-lg border-b border-transparent px-1.5 antialiased duration-200 hover:bg-gray-50 dark:hover:bg-gray-950"
-                :class="{ 'rounded-b-none border-gray-200! dark:border-white/10': !collapsed }"
+                :class="{ 'rounded-b-none border-gray-200 dark:border-white/10': !collapsed }"
             >
                 <Icon
                     name="handles"
