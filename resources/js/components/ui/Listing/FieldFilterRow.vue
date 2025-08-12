@@ -1,5 +1,4 @@
 <script setup>
-import { computed, ref } from 'vue';
 import { Button, PublishContainer, PublishField } from '@statamic/ui';
 import PublishFieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
 
@@ -11,19 +10,13 @@ const props = defineProps({
     meta: { type: Object, required: true },
     values: { type: Object, required: true },
 });
-
-const containerValues = ref(props.values);
-
-function valuesUpdated(newValues) {
-    emit('update:values', newValues);
-}
 </script>
 
 <template>
     <div class="flex items-center justify-between">
         <PublishContainer
-            :model-value="containerValues"
-            @update:model-value="valuesUpdated"
+            :model-value="values"
+            @update:model-value="$emit('update:values', $event)"
             :meta="meta"
             :track-dirty-state="false"
         >
