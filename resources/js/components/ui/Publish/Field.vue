@@ -163,9 +163,35 @@ function sync() {
 function desync() {
     desyncField(fullPath.value);
 }
+
+const fieldtypeComponentProps = computed(() => ({
+    id: fieldId.value,
+    config: props.config,
+    value: value.value,
+    meta: meta.value,
+    handle: handle,
+    'name-prefix': namePrefix,
+    'field-path-prefix': fieldPathPrefix.value,
+    'meta-path-prefix': metaPathPrefix.value,
+    'read-only': isReadOnly.value,
+    'show-field-previews': true
+}));
+
+const fieldtypeComponentEvents = computed(() => ({
+    'update:value': valueUpdated,
+    'update:meta': metaUpdated,
+    'focus': focused,
+    'blur': blurred,
+    'replicator-preview-updated': replicatorPreviewUpdated
+}));
 </script>
 
 <template>
+    <slot
+        :fieldtypeComponent="fieldtypeComponent"
+        :fieldtypeComponentProps="fieldtypeComponentProps"
+        :fieldtypeComponentEvents="fieldtypeComponentEvents"
+    >
     <Field
         v-show="shouldShowField"
         :class="`${config.type}-fieldtype`"
@@ -177,6 +203,7 @@ function desync() {
         :read-only="isReadOnly"
         :as="wrapperComponent"
         :variant="config.variant"
+        v-bind="$attrs"
     >
         <template #label v-if="shouldShowLabel">
             <Label :for="fieldId" :required="isRequired">
@@ -196,24 +223,11 @@ function desync() {
             Component <code v-text="fieldtypeComponent"></code> does not exist.
         </div>
         <Component
-            v-else
             ref="fieldtype"
             :is="fieldtypeComponent"
-            :id="fieldId"
-            :config="config"
-            :value="value"
-            :meta="meta"
-            :handle="handle"
-            :name-prefix="namePrefix"
-            :field-path-prefix="fieldPathPrefix"
-            :meta-path-prefix="metaPathPrefix"
-            :read-only="isReadOnly"
-            show-field-previews
-            @update:value="valueUpdated"
-            @update:meta="metaUpdated"
-            @focus="focused"
-            @blur="blurred"
-            @replicator-preview-updated="replicatorPreviewUpdated"
+            v-bind="fieldtypeComponentProps"
+            v-on="fieldtypeComponentEvents"
         />
     </Field>
+    </slot>
 </template>
