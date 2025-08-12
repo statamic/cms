@@ -45,9 +45,7 @@
                 </Dropdown>
             </ItemActions>
 
-            <div class="text-2xs flex pt-px text-gray-600 ltr:mr-4 rtl:ml-4" v-if="readOnly">
-                <svg-icon name="light/lock" class="-mt-1 w-4 ltr:mr-1 rtl:ml-1" /> {{ __('Read Only') }}
-            </div>
+            <ui-badge icon="padlock-locked" :text="__('Read Only')" variant="flat" v-if="readOnly" />
 
             <div class="hidden items-center md:flex">
                 <save-button-options v-if="!readOnly" :show-options="!isInline" :preferences-prefix="preferencesPrefix">

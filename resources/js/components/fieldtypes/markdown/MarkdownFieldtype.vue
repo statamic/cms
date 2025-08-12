@@ -56,7 +56,7 @@
                         />
 
                         <div class="drag-notification" v-show="dragging">
-                            <svg-icon name="upload" class="mb-4 size-12" />
+                            <ui-icon name="upload" class="mb-4 size-12" />
                             {{ __('Drop File to Upload') }}
                         </div>
 
@@ -80,52 +80,44 @@
                                         @mousedown.prevent
                                     >
                                         <Button
-                                            size="sm"
-                                            variant="ghost"
-                                            class="px-2! [&_svg]:size-3.5"
-                                            v-for="button in buttons"
-                                            :key="button.name"
-                                            v-tooltip="button.text"
                                             :aria-label="button.text"
+                                            :icon="button.svg"
+                                            :key="button.name"
                                             @click="handleButtonClick(button.command)"
-                                        >
-                                            <svg-icon :name="button.svg" class="size-4" />
-                                        </Button>
+                                            size="sm"
+                                            v-for="button in buttons"
+                                            v-tooltip="button.text"
+                                            variant="ghost"
+                                        />
                                     </div>
                                 </div>
-                                <!-- Hidden input for label association -->
-                                <input
-                                    v-if="id"
-                                    :id="id"
-                                    type="text"
-                                    class="sr-only"
-                                    @focus="focusCodeMirror"
-                                    tabindex="-1"
-                                />
 
-                                    <footer class="flex items-center justify-between bg-gray-50 dark:bg-gray-950 rounded-b-lg border-t border-gray-200 dark:border-white/10 p-1 text-sm w-full" :class="{ 'absolute inset-x-0 bottom-0': fullScreenMode }">
-                                        <div class="markdown-cheatsheet-helper">
-                                            <Button
-                                                icon="markdown"
-                                                size="sm"
-                                                variant="subtle"
-                                                @click="showCheatsheet = true"
-                                                :aria-label="__('Show Markdown Cheatsheet')"
-                                                :text="__('Markdown Cheatsheet')"
-                                            />
+                                <!-- Hidden input for label association -->
+                                <input v-if="id" :id="id" type="text" class="sr-only" @focus="focusCodeMirror" tabindex="-1" />
+
+                                <footer class="flex items-center justify-between bg-gray-50 dark:bg-gray-950 rounded-b-lg border-t border-gray-200 dark:border-white/10 p-1 text-sm w-full" :class="{ 'absolute inset-x-0 bottom-0': fullScreenMode }">
+                                    <div class="markdown-cheatsheet-helper">
+                                        <Button
+                                            icon="markdown"
+                                            size="sm"
+                                            variant="subtle"
+                                            @click="showCheatsheet = true"
+                                            :aria-label="__('Show Markdown Cheatsheet')"
+                                            :text="__('Markdown Cheatsheet')"
+                                        />
+                                    </div>
+                                    <div v-if="fullScreenMode" class="flex items-center pe-2 gap-3 text-xs">
+                                        <div class="whitespace-nowrap">
+                                            <span v-text="count.words" /> {{ __('Words') }}
                                         </div>
-                                        <div v-if="fullScreenMode" class="flex items-center pe-2 gap-3 text-xs">
-                                            <div class="whitespace-nowrap">
-                                                <span v-text="count.words" /> {{ __('Words') }}
-                                            </div>
-                                            <div class="whitespace-nowrap">
-                                                <span v-text="count.characters" /> {{ __('Characters') }}
-                                            </div>
+                                        <div class="whitespace-nowrap">
+                                            <span v-text="count.characters" /> {{ __('Characters') }}
                                         </div>
-                                    </footer>
+                                    </div>
+                                </footer>
 
                                 <div class="drag-notification" v-if="assetsEnabled && draggingFile">
-                                    <svg-icon name="upload" class="mb-4 size-12" />
+                                    <ui-icon name="upload" class="mb-4 size-12" />
                                     {{ __('Drop File to Upload') }}
                                 </div>
                             </div>
@@ -139,30 +131,27 @@
                     </div>
                 </uploader>
 
-                <stack
-                    v-if="showAssetSelector && !isReadOnly"
-                    name="markdown-asset-selector"
-                    @closed="closeAssetSelector"
-                >
-                    <selector
+                <stack v-if="showAssetSelector && !isReadOnly" name="markdown-asset-selector" @closed="closeAssetSelector">
+                    <asset-selector
                         :container="container"
                         :folder="folder"
                         :selected="selectedAssets"
                         :restrict-folder-navigation="restrictAssetNavigation"
+                        :columns="assetSelectorColumns"
                         @selected="assetsSelected"
                         @closed="closeAssetSelector"
                     />
                 </stack>
 
                 <stack name="markdownCheatSheet" v-if="showCheatsheet" @closed="showCheatsheet = false">
-                    <div class="relative h-full overflow-auto bg-white p-6 dark:bg-dark-600">
+                    <div class="relative h-full overflow-auto bg-white p-6 dark:bg-gray-800 rounded-l-2xl">
                         <Button
                             icon="x"
                             variant="ghost"
-                            class="absolute top-0 mt-4 ltr:right-0 ltr:mr-8 rtl:left-0 rtl:ml-8"
-                            @click="close"
+                            class="absolute top-4 end-4"
+                            @click="showCheatsheet = false"
                         />
-                        <div class="prose mx-auto my-8 max-w-md">
+                        <div class="prose prose-lg mx-auto my-8 max-w-3xl">
                             <h2 v-text="__('Markdown Cheatsheet')"></h2>
                             <div v-html="__('markdown.cheatsheet')"></div>
                         </div>
@@ -197,7 +186,7 @@ import 'codemirror/mode/yaml/yaml';
 import 'codemirror/addon/edit/continuelist';
 
 import { availableButtons } from './buttons';
-import Selector from '../../assets/Selector.vue';
+import AssetSelector from '../../assets/Selector.vue';
 import Uploader from '../../assets/Uploader.vue';
 import Uploads from '../../assets/Uploads.vue';
 import MarkdownToolbar from './MarkdownToolbar.vue';
@@ -250,7 +239,7 @@ export default {
 
     components: {
         Button,
-        Selector,
+        AssetSelector,
         Uploader,
         Uploads,
         MarkdownToolbar,
@@ -776,7 +765,11 @@ export default {
         },
 
         container() {
-            return this.config.container;
+            return this.meta.assets.container;
+        },
+
+        assetSelectorColumns() {
+            return this.meta.assets.columns;
         },
 
         editor() {
@@ -813,7 +806,7 @@ export default {
             return [
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => (vm.fullScreenMode ? 'shrink-all' : 'expand-bold'),
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'ui/collapse-all' : 'ui/expand-all'),
                     quick: true,
                     visibleWhenReadOnly: true,
                     run: this.toggleFullscreen,

@@ -11,9 +11,7 @@
                 </DropdownMenu>
             </Dropdown>
 
-            <div class="text-2xs me-4 flex pt-px text-gray-600" v-if="!canEdit">
-                <svg-icon name="light/lock" class="me-1 -mt-1 w-4" /> {{ __('Read Only') }}
-            </div>
+            <ui-badge icon="padlock-locked" :text="__('Read Only')" variant="flat" v-if="!canEdit" />
 
             <SiteSelector
                 v-if="showLocalizationSelector"

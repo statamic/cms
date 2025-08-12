@@ -1,6 +1,6 @@
 <template>
     <Button
-        class="px-2! [&_svg]:size-3.5"
+        class="px-2!"
         :class="{ active }"
         variant="ghost"
         size="sm"
@@ -8,7 +8,7 @@
         v-tooltip="button.text"
         @click="button.command(editor, button.args)"
     >
-        <svg-icon :name="button.svg" v-if="button.svg" class="size-4" />
+        <ui-icon :name="button.svg" v-if="button.svg" class="size-3.5!" />
         <div class="flex items-center" v-html="button.html" v-if="button.html" />
     </Button>
 </template>

@@ -24,17 +24,13 @@
         >
             <template #append v-if="config.show_regenerate">
                 <Button
+                    icon="sync"
                     size="sm"
                     variant="ghost"
-                    :icon-only="true"
                     @click="sync"
+                    :loading="syncing"
                     v-tooltip="__('Regenerate from: :field', { field: config.from })"
-                >
-                    <svg-icon name="light/synchronize" class="h-5 w-5" v-show="!syncing" />
-                    <div class="h-5 w-5" v-show="syncing">
-                        <Icon name="loading" class="mt-0.5 ml-0.5" />
-                    </div>
-                </Button>
+                />
             </template>
         </Input>
     </slugify>

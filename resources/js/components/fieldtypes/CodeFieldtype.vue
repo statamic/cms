@@ -44,7 +44,7 @@ export default {
             return [
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => (vm.$refs.codeEditor.fullScreenMode ? 'shrink-all' : 'expand-bold'),
+                    icon: ({ vm }) => (vm.$refs.codeEditor.fullScreenMode ? 'ui/collapse-all' : 'ui/expand-all'),
                     quick: true,
                     visibleWhenReadOnly: true,
                     run: ({ vm }) => vm.$refs.codeEditor.toggleFullscreen(),

@@ -80,21 +80,15 @@
                             </template>
 
                             <template #branch-icon="{ branch }">
-                                <svg-icon
-                                    v-if="isRedirectBranch(branch)"
-                                    class="dark:text-dark-175 inline-block h-4 w-4 text-gray-500"
-                                    name="light/external-link"
-                                    v-tooltip="__('Redirect')"
-                                />
+                                <ui-icon name="external-link" v-if="isRedirectBranch(branch)" v-tooltip="__('Redirect')" />
                             </template>
                         </page-tree>
                     </Panel>
                 </div>
             </template>
 
-            <div class="flex items-center justify-between border-t bg-gray-100 p-4 rounded-es-xl">
-                <div
-                    class="dark:text-dark-150 text-sm text-gray-700"
+            <footer class="flex items-center justify-between border-t dark:border-dark-900 bg-gray-100 dark:bg-gray-800 p-4 rounded-es-xl">
+                <ui-badge
                     v-text="
                         hasMaxSelections
                             ? __n(':count/:max selected', selections, { max: maxSelections })
@@ -111,7 +105,7 @@
                         {{ __('Select') }}
                     </Button>
                 </div>
-            </div>
+            </footer>
         </div>
     </div>
 </template>

@@ -389,7 +389,7 @@ export default {
         },
 
         saveAndClose() {
-            this.save().then(() => this.close());
+            this.save().then(() => this.$emit('closed'));
         },
 
         clearErrors() {
@@ -440,7 +440,7 @@ export default {
         actionCompleted(successful, response) {
             this.$emit('action-completed', successful, response);
             if (successful) {
-                this.close();
+                this.$emit('closed');
             }
         },
 

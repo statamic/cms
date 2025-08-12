@@ -37,13 +37,9 @@
                 </div>
             </template>
             <template #cell-two_factor="{ row: user, value }">
-                <div class="flex items-center space-x-2">
-                    <template v-if="value">
-                        <svg-icon name="light/check" class="w-3 text-green-600" />
-                    </template>
-                    <template v-else>
-                        <svg-icon name="light/close" class="w-3 text-gray-500" />
-                    </template>
+                <div class="flex items-center">
+                    <ui-icon name="checkmark" class="size-3 text-green-600" v-if="value" />
+                    <ui-icon name="x" class="size-3 text-gray-400 dark:text-gray-600" v-else />
                 </div>
             </template>
         </Listing>

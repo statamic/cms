@@ -101,9 +101,10 @@
                         @dragstart="$emit('focus')"
                     >
                         <div
-                            class="relative grid gap-6 xl:gap-10 overflow-hidden rounded-xl border border-t-0 rounded-t-none dark:border-dark-700"
+                            class="relative grid gap-4 2xl:gap-10 p-3 relative rounded-xl border border-t-0 rounded-t-none dark:border-dark-700"
                             :class="{ 'rounded-t-none': !isReadOnly && (showPicker || uploads.length) }"
                             ref="assets"
+                            style="grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));"
                         >
                             <asset-tile
                                 v-for="asset in assets"

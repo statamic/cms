@@ -33,7 +33,7 @@ const props = defineProps({
     optionLabel: { type: String, default: 'label' },
     options: { type: Array, default: null },
     optionValue: { type: String, default: 'value' },
-    placeholder: { type: String, default: 'Select...' },
+    placeholder: { type: [Boolean, String], default: 'Select...' },
     readOnly: { type: Boolean, default: false },
     searchable: { type: Boolean, default: true },
     size: { type: String, default: 'base' },

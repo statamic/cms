@@ -53,57 +53,28 @@
                             <ui-switch v-model="user.super" id="super" />
                             <label for="super" v-text="__('Super Admin')" />
                         </div>
-                        <div
-                            class="mt-2 flex items-center space-x-1 text-2xs text-gray-600 dark:text-gray-400 rtl:space-x-reverse"
-                        >
-                            <svg-icon name="info-circle" class="mb-px flex h-4 w-4 items-center"></svg-icon>
+                        <ui-description class="mt-3 flex items-center gap-2">
+                            <ui-icon name="info-square" class="size-4" />
                             <span>{{ __('messages.user_wizard_super_admin_instructions') }}</span>
-                        </div>
+                        </ui-description>
                     </div>
 
                     <!-- Roles -->
-                    <div v-if="!user.super && canAssignRoles">
-                        <ui-label for="role" :text="__('Roles')" />
-                        <publish-field-meta
-                            :config="{ handle: 'user.roles', type: 'user_roles' }"
-                            :initial-value="user.roles"
-                            v-slot="{ meta, value, loading, updateMeta }"
-                        >
-                            <div>
-                                <relationship-fieldtype
-                                    v-if="!loading"
-                                    handle="user.roles"
-                                    :config="{ type: 'user_roles', mode: 'select' }"
-                                    :value="value"
-                                    :meta="meta"
-                                    @input="user.roles = $event"
-                                    @meta-updated="updateMeta"
-                                />
-                            </div>
-                        </publish-field-meta>
-                    </div>
-
-                    <!-- Groups -->
-                    <div v-if="!user.super && canAssignGroups">
-                        <ui-label for="group" :text="__('Groups')" />
-                        <publish-field-meta
-                            :config="{ handle: 'user.groups', type: 'user_groups' }"
-                            :initial-value="user.groups"
-                            v-slot="{ meta, value, loading, updateMeta }"
-                        >
-                            <div>
-                                <relationship-fieldtype
-                                    v-if="!loading"
-                                    handle="user.groups"
-                                    :config="{ type: 'user_groups', mode: 'select' }"
-                                    :value="value"
-                                    :meta="meta"
-                                    @input="user.groups = $event"
-                                    @meta-updated="updateMeta"
-                                />
-                            </div>
-                        </publish-field-meta>
-                    </div>
+                    <ui-publish-container
+                        v-if="!user.super"
+                        :blueprint="permissionsBlueprint"
+                        :meta="meta"
+                        :model-value="{ roles: user.roles, groups: user.groups }"
+                        :track-dirty-state="false"
+                        @update:model-value="(event) => {
+                            user.roles = event.roles;
+                            user.groups = event.groups;
+                        }"
+                    >
+                        <ui-publish-fields-provider :fields="permissionsBlueprint.tabs[0].sections[0].fields">
+                            <ui-publish-fields />
+                        </ui-publish-fields-provider>
+                    </ui-publish-container>
                 </div>
             </ui-card-panel>
         </div>
@@ -249,6 +220,7 @@
 
 import isEmail from 'validator/lib/isEmail';
 import HasWizardSteps from '../HasWizardSteps.js';
+import RelationshipFieldtype from '@statamic/components/fieldtypes/relationship/RelationshipFieldtype.vue';
 
 export default {
     mixins: [HasWizardSteps],
@@ -295,6 +267,19 @@ export default {
     },
 
     computed: {
+        permissionsBlueprint() {
+            let fields = [];
+
+            if (this.canAssignRoles) {
+                fields.push({ handle: 'roles', component: 'relationship', type: 'user_roles', display: __('Roles'), mode: 'select' });
+            }
+
+            if (this.canAssignGroups) {
+                fields.push({ handle: 'groups', component: 'relationship', type: 'user_groups', display: __('Groups'), mode: 'select' });
+            }
+
+            return { tabs: [{sections: [{ fields }]}]};
+        },
         steps() {
             let steps = [__('User Information')];
             if (this.canAssignPermissions) steps.push(__('Roles & Groups'));
