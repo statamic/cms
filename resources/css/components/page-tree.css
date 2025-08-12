@@ -42,12 +42,12 @@
 .nav-builder {
     background: none;
     .tree-node {
-        @apply bg-gray-100;
+        @apply bg-gray-100 dark:bg-gray-800;
         .tree-node-inner {
             @apply px-1;
         }
         &:has(.is-section) {
-            @apply mt-8 pt-1 bg-gray-100 rounded-t-2xl;
+            @apply mt-8 pt-1 bg-gray-100 dark:bg-gray-800 rounded-t-2xl;
         }
         &:has(+ .tree-node .is-section),
         &:last-child {
