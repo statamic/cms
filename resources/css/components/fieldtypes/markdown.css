@@ -112,7 +112,7 @@
     }
 
     .editor {
-        @apply relative mx-auto my-6 max-w-5xl rounded-xl bg-white px-2 shadow-ui-md md:px-8 md:pt-8;
+        @apply relative mx-auto my-6 max-w-5xl rounded-xl bg-white dark:bg-gray-900! px-2 shadow-ui-md md:px-8 md:pt-8;
 
         .CodeMirror-scroll {
             @apply m-0;

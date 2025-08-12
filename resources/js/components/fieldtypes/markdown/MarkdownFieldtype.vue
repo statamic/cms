@@ -3,7 +3,7 @@
         <element-container @resized="refresh">
             <div
                 class="
-                    @container/markdown w-full block bg-white dark:bg-gray-900 rounded-lg relative
+                    @container/markdown w-full block bg-white dark:bg-gray-800! rounded-lg relative
                     border border-gray-300 with-contrast:border-gray-500 dark:border-x-0 dark:border-t-0 dark:border-white/10 dark:inset-shadow-2xs dark:inset-shadow-black
                     text-gray-900 dark:text-gray-300
                     appearance-none antialiased shadow-ui-sm disabled:shadow-none
@@ -95,7 +95,7 @@
                                 <!-- Hidden input for label association -->
                                 <input v-if="id" :id="id" type="text" class="sr-only" @focus="focusCodeMirror" tabindex="-1" />
 
-                                <footer class="flex items-center justify-between bg-gray-50 dark:bg-gray-950 rounded-b-lg border-t border-gray-200 dark:border-white/10 p-1 text-sm w-full" :class="{ 'absolute inset-x-0 bottom-0': fullScreenMode }">
+                                <footer class="flex items-center justify-between bg-gray-50 dark:bg-gray-950 rounded-b-lg border-t border-gray-200 dark:border-white/10 p-1 text-sm w-full" :class="{ 'absolute inset-x-0 bottom-0 rounded-': fullScreenMode }">
                                     <div class="markdown-cheatsheet-helper">
                                         <Button
                                             icon="markdown"
