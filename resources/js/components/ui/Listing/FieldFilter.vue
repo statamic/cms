@@ -80,27 +80,25 @@ function removeRow(handle) {
 </script>
 
 <template>
-    <CardPanel :heading="__('Fields')">
-        <div v-if="hasAvailableFieldFilters">
-            <FieldFilterRow
-                v-for="filter in rows"
-                :key="filter.handle"
-                :display="filter.display"
-                :fields="filter.fields"
-                :meta="filter.meta"
-                :values="filter.values"
-                @update:values="rowUpdated(filter.handle, $event)"
-                @removed="removeRow(filter.handle)"
-            />
+    <div v-if="hasAvailableFieldFilters">
+        <FieldFilterRow
+            v-for="filter in rows"
+            :key="filter.handle"
+            :display="filter.display"
+            :fields="filter.fields"
+            :meta="filter.meta"
+            :values="filter.values"
+            @update:values="rowUpdated(filter.handle, $event)"
+            @removed="removeRow(filter.handle)"
+        />
 
-            <Combobox
-                ref="fieldSelect"
-                :placeholder="__('Field')"
-                :options="fieldComboboxOptions"
-                @update:model-value="createFilter"
-            />
-        </div>
+        <Combobox
+            ref="fieldSelect"
+            :placeholder="__('Field')"
+            :options="fieldComboboxOptions"
+            @update:model-value="createFilter"
+        />
+    </div>
 
-        <div v-else v-text="__('No available filters')"></div>
-    </CardPanel>
+    <div v-else v-text="__('No available filters')"></div>
 </template>

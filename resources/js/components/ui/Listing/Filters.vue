@@ -1,5 +1,5 @@
 <script setup>
-import { Badge, Button, Panel, PanelHeader, Card, Heading } from '@statamic/ui';
+import { Badge, Button, Panel, PanelHeader, Card, Heading, CardPanel } from '@statamic/ui';
 import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
 import { computed } from 'vue';
 import FieldFilter from './FieldFilter.vue';
@@ -35,8 +35,8 @@ function removeFieldFilter(handle) {
     setFilter('fields', fields);
 }
 
-function isActive(filter) {
-    return activeFilters.value.hasOwnProperty(filter.handle);
+function isActive(handle) {
+    return activeFilters.value.hasOwnProperty(handle);
 }
 
 function needsFinalFieldBadgeMargin(index) {
@@ -68,11 +68,19 @@ function needsFinalStandardBadgeMargin(index) {
         <stack narrow name="filters" v-if="open" @closed="open = false">
             <div class="flex-1 p-3 bg-white h-full overflow-auto">
                 <div class="space-y-4">
-                    <FieldFilter
-                        :config="fieldFilter"
-                        :values="activeFilters.fields || {}"
-                        @changed="setFilter('fields', $event)"
-                    />
+                    <Panel>
+                        <PanelHeader class="flex items-center justify-between">
+                            <Heading :text="__('Fields')" />
+                            <Button v-if="isActive('fields')" size="sm" text="Clear" @click="setFilter('fields', null)" />
+                        </PanelHeader>
+                        <Card>
+                            <FieldFilter
+                                :config="fieldFilter"
+                                :values="activeFilters.fields || {}"
+                                @changed="setFilter('fields', $event)"
+                            />
+                        </Card>
+                    </Panel>
 
                     <Panel
                         v-for="filter in standardFilters"
@@ -80,7 +88,7 @@ function needsFinalStandardBadgeMargin(index) {
                     >
                         <PanelHeader class="flex items-center justify-between">
                             <Heading :text="filter.title" />
-                            <Button v-if="isActive(filter)" size="sm" text="Clear" @click="setFilter(filter.handle, null)" />
+                            <Button v-if="isActive(filter.handle)" size="sm" text="Clear" @click="setFilter(filter.handle, null)" />
                         </PanelHeader>
                         <Card>
                             <data-list-filter
