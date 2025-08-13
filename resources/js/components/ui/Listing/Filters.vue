@@ -28,15 +28,6 @@ function removeFieldFilter(handle) {
 function isActive(handle) {
     return activeFilters.value.hasOwnProperty(handle);
 }
-
-function needsFinalFieldBadgeMargin(index) {
-    return standardBadges.value.length === 0
-        && index === Object.keys(fieldFilterBadges.value).length - 1;
-}
-
-function needsFinalStandardBadgeMargin(index) {
-    return index === Object.keys(standardBadges.value).length - 1;
-}
 </script>
 
 <template>
@@ -100,7 +91,7 @@ function needsFinalStandardBadgeMargin(index) {
             :icon-append="reorderable ? null : 'x'"
             :text="badge"
             :disabled="reorderable"
-            :class="{ 'me-12': needsFinalFieldBadgeMargin(index) }"
+            class="last:me-12"
             @click="removeFieldFilter(handle)"
         />
         <Button
@@ -110,7 +101,7 @@ function needsFinalStandardBadgeMargin(index) {
             :icon-append="reorderable ? null : 'x'"
             :text="badge"
             :disabled="reorderable"
-            :class="{ 'me-12 ': needsFinalStandardBadgeMargin(index) }"
+            class="last:me-12"
             @click="setFilter(handle, null)"
         />
     </div>
