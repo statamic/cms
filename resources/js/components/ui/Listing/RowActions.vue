@@ -1,5 +1,5 @@
 <script setup>
-import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator } from '@statamic/ui';
+import { Dropdown, DropdownItem, DropdownMenu, DropdownSeparator } from '@statamic/ui';
 import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
 import ItemActions from '@statamic/components/actions/ItemActions.vue';
 import { computed, ref, watch } from 'vue';

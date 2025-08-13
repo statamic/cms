@@ -1,4 +1,4 @@
-/* GROUP GLOBAL HEADER
+/* GLOBAL HEADER
 =================================================== */
 .global-header {
     @apply relative flex h-13 w-full items-center bg-white shadow dark:bg-dark-600 dark:shadow-lg ltr:pr-4 rtl:pl-4;
@@ -17,9 +17,6 @@
         @apply dark:border-transparent dark:text-dark-100 dark:hover:border-dark-900 dark:hover:bg-dark-800 dark:hover:text-dark-100;
     }
 }
-
-/* Responsive Wangjangling
-   ========================================================================== */
 
 @media (width >= theme(--breakpoint-md)) {
     .global-header {
@@ -42,32 +39,3 @@
     max-width: 280px;
 }
 
-@keyframes rotate {
-    100% {
-        transform: rotate(1turn);
-    }
-}
-
-.animate-radar {
-    @apply relative z-0;
-
-    &::after {
-        @apply absolute bg-transparent bg-no-repeat;
-        content: '';
-        z-index: 2;
-        left: -50%;
-        top: -50%;
-        width: 200%;
-        height: 200%;
-        background-size:
-            50% 50%,
-            50% 50%;
-        background-position:
-            0 0,
-            100% 0,
-            100% 100%,
-            0 100%;
-        background-image: linear-gradient(transparent, rgba(255, 255, 255, 0.7), transparent);
-        animation: rotate 4s linear infinite;
-    }
-}

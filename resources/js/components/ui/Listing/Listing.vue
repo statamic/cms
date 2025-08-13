@@ -189,6 +189,11 @@ const items = computed({
     },
 });
 
+watch(
+    () => props.items,
+    (items) => rawItems.value = items,
+);
+
 const rawParameters = computed(() => ({
     page: currentPage.value,
     perPage: perPage.value,

@@ -108,6 +108,7 @@
         :action-url="actionUrl"
         :allow-search="false"
         :allow-customizing-columns="false"
+        @refreshing="request"
     >
         <template #cell-title="{ row: collection }">
             <a :href="collection.available_in_selected_site ? collection.entries_url : collection.edit_url" class="flex items-center gap-2">

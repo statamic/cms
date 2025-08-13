@@ -11,8 +11,8 @@
         class="bg-gray-800 font-sans leading-normal text-gray-900 dark:text-white"
         @if ($user->getPreference('strict_accessibility')) data-contrast="increased" @endif
     >
-        <config-provider>
-            <div id="statamic" v-cloak>
+        <div id="statamic">
+           <config-provider>
                 @include('statamic::partials.session-expiry')
                 @include('statamic::partials.licensing-alerts')
                  @include('statamic::partials.global-header')
@@ -33,7 +33,7 @@
                         fixed top-14 inset-x-0 bottom-0 min-h-[calc(100vh-3.5rem)]
                     ">
                         @include('statamic::partials.nav-main')
-                        <div id="main-content" class="main-content p-2 h-full flex-1 overflow-y-auto">
+                        <div id="main-content" v-cloak class="main-content p-2 h-full flex-1 overflow-y-auto">
                             <div class="relative content-card @yield('content-card-modifiers') min-h-full transition-padding duration-300">
                                 @yield('content')
                             </div>
@@ -62,10 +62,10 @@
                 </confirmation-modal>
 
                 <portal-targets></portal-targets>
-            </div>
+            </config-provider>
+        </div>
 
-            @include('statamic::partials.scripts')
-            @yield('scripts')
-        </config-provider>
+        @include('statamic::partials.scripts')
+        @yield('scripts')
     </body>
 </html>

@@ -2,14 +2,6 @@
    TABLES
    ========================================================================== */
 
-.data-list-search-input {
-    @apply bg-white;
-
-    &:focus {
-        @apply focus-outline;
-    }
-}
-
 .data-table {
     @apply w-full max-w-full outline-hidden text-gray-500 antialiased border-separate border-spacing-y-0 min-w-full overflow-x-auto text-start;
 
@@ -125,7 +117,6 @@
 }
 
 /* Row Selection */
-
 .data-table[data-has-selections] {
     tbody tr[data-row="unselected"] td {
         @apply text-gray-500! dark:text-gray-400!;
@@ -151,49 +142,3 @@
     @apply text-end w-12;
 }
 
-
-/* Index Fields
-  ========================================================================== */
-
-.bard-index-field,
-.code-index-field,
-.markdown-index-field,
-.textarea-index-field {
-    @apply line-clamp-2 text-xs;
-}
-
-.title-index-field {
-    @apply text-sm line-clamp-2 inline-flex items-center gap-2 hover:text-black dark:hover:text-white;
-    min-width: 15vw;
-    max-width: 30vw;
-}
-
-.date-index-field {
-    @apply whitespace-nowrap;
-}
-
-.slug-index-field {
-    @apply line-clamp-2 font-mono text-[.75rem];
-}
-
-.status-index-field {
-    @apply inline-block shrink justify-center rounded-full bg-gray-200/60 px-2 py-0.5 text-center text-xs text-gray-900 dark:bg-gray-300/8 dark:text-dark-150;
-
-    &.status-published:not(.status-private) {
-        @apply bg-green-200 text-green-900 dark:bg-green-300/6 dark:text-green-300;
-    }
-
-    &.status-scheduled {
-        @apply bg-amber-200 text-amber-900 dark:bg-amber-300 dark:text-amber-950;
-    }
-}
-
-.role-index-field,
-.groups-index-field {
-    @apply -mb-1.5 flex flex-wrap;
-
-    .role-index-field-item,
-    .groups-index-field-item {
-        @apply mb-1 line-clamp-1 inline-block rounded-sm border bg-gray-100 px-1 text-2xs dark:border-dark-900 dark:bg-gray-700;
-    }
-}

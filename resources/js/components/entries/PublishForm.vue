@@ -231,7 +231,7 @@
             <div class="publish-fields">
                 <div class="form-group publish-field field-w-full">
                     <label v-text="__('Origin')" />
-                    <div class="help-block mt-2" v-text="__('messages.entry_origin_instructions')"></div>
+                    <ui-description class="mt-2" :text="__('messages.entry_origin_instructions')" />
                     <Select class="w-full" v-model="selectedOrigin" :options="originOptions" placeholder="" />
                 </div>
             </div>
@@ -689,9 +689,8 @@ export default {
             });
         },
 
-        createLocalization(localizationHandle) {
+        createLocalization(localization) {
             this.selectingOrigin = false;
-            const localization = this.localizations.find((e) => e.handle === localizationHandle);
 
             if (this.isCreating) {
                 this.$nextTick(() => (window.location = localization.url));
@@ -807,7 +806,7 @@ export default {
         desyncField(handle) {
             if (!this.localizedFields.includes(handle)) this.localizedFields.push(handle);
 
-            this.$refs.container.dirty();
+            this.$refs.container?.dirty();
         },
 
         setAutosaveInterval() {

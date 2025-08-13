@@ -264,7 +264,7 @@ defineExpose({
                 @update:model-value="updateModelValue"
             >
                 <ComboboxAnchor :class="['w-full flex items-center justify-between gap-2 text-gray-900 dark:text-gray-300 antialiased appearance-none', $attrs.class]" data-ui-combobox-anchor>
-                    <ComboboxTrigger as="div" :class="triggerClasses">
+                    <ComboboxTrigger as="div" ref="trigger" :class="triggerClasses">
                         <ComboboxInput
                             v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"
                             ref="search"
@@ -303,6 +303,7 @@ defineExpose({
                             'shadow-ui-sm z-100 rounded-lg border border-gray-200 bg-white p-2 dark:border-white/10 dark:bg-gray-800',
                             'max-h-[var(--reka-combobox-content-available-height)] w-[var(--reka-combobox-trigger-width)] min-w-fit',
                         ]"
+                        @escape-key-down="nextTick(() => $refs.trigger.$el.focus())"
                     >
                         <ComboboxViewport>
                             <ComboboxEmpty class="py-2 text-sm">
@@ -319,7 +320,10 @@ defineExpose({
                                 :text-value="getOptionLabel(option)"
                                 :class="itemClasses({ size: size, selected: isSelected(option) })"
                                 as="button"
-                                @select="dropdownOpen = !closeOnSelect"
+                                @select="() => {
+                                    dropdownOpen = !closeOnSelect;
+                                    if (closeOnSelect) $refs.trigger.$el.focus();
+                                }"
                             >
                                 <slot name="option" v-bind="option">
                                     <img v-if="option.image" :src="option.image" class="size-5 rounded-full" />
