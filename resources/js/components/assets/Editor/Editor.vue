@@ -379,6 +379,7 @@ export default {
                     this.$toast.success(__('Saved'));
                     this.saving = false;
                     this.clearErrors();
+                    this.$nextTick(() => this.$refs.container.clearDirtyState());
                 })
                 .catch((e) => {
                     this.saving = false;
@@ -422,6 +423,7 @@ export default {
 
         confirmCloseWithChanges() {
             this.closingWithChanges = false;
+            this.$refs.container.clearDirtyState();
             this.$emit('closed');
         },
 
