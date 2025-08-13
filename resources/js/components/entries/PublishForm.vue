@@ -689,9 +689,8 @@ export default {
             });
         },
 
-        createLocalization(localizationHandle) {
+        createLocalization(localization) {
             this.selectingOrigin = false;
-            const localization = this.localizations.find((e) => e.handle === localizationHandle);
 
             if (this.isCreating) {
                 this.$nextTick(() => (window.location = localization.url));
@@ -807,7 +806,7 @@ export default {
         desyncField(handle) {
             if (!this.localizedFields.includes(handle)) this.localizedFields.push(handle);
 
-            this.$refs.container.dirty();
+            this.$refs.container?.dirty();
         },
 
         setAutosaveInterval() {
