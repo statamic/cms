@@ -28,7 +28,7 @@
                 >
                     {{-- @include('statamic::partials.nav-mobile') --}}
 
-                    <main id="main" class="
+                    <main id="main" v-cloak class="
                     flex bg-gray-100 dark:bg-gray-900 dark:border-t rounded-t-2xl dark:border-white/10
                         fixed top-14 inset-x-0 bottom-0 min-h-[calc(100vh-3.5rem)]
                     ">
