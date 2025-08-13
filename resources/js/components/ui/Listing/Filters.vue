@@ -65,8 +65,9 @@ function needsFinalStandardBadgeMargin(index) {
             </Button>
         </div>
 
-        <stack narrow name="filters" v-if="open" @closed="open = false">
-            <div class="flex-1 p-3 bg-white h-full overflow-auto">
+        <stack half name="filters" v-if="open" @closed="open = false">
+            <div class="flex-1 p-3 bg-white h-full overflow-auto rounded-l-2xl">
+                <ui-heading size="lg" :text="__('Filters')" class="mb-4" icon="sliders-horizontal" />
                 <div class="space-y-4">
                     <Panel>
                         <PanelHeader class="flex items-center justify-between">

@@ -13,7 +13,7 @@ const props = defineProps({
 </script>
 
 <template>
-    <div class="flex items-center justify-between">
+    <div class="flex items-center justify-between mb-3">
         <PublishContainer
             :model-value="values"
             @update:model-value="$emit('update:values', $event)"
@@ -21,23 +21,25 @@ const props = defineProps({
             :track-dirty-state="false"
         >
             <PublishFieldsProvider :fields="fields">
-                <div class="flex items-center justify-between">
-                    <div>
-                        {{ display }}
+                <div class="flex items-center gap-2 w-full">
+                    <div class="w-1/4 user-select-none">
+                        <ui-input read-only :value="display" class="focus-within:outline-none" />
                     </div>
-                    <PublishField
-                        v-for="field in fields"
-                        :key="field.handle"
-                        :config="field"
-                        v-slot="{ fieldtypeComponent, fieldtypeComponentProps, fieldtypeComponentEvents }"
-                    >
-                        <Component
-                            :is="fieldtypeComponent"
-                            v-bind="fieldtypeComponentProps"
-                            v-on="fieldtypeComponentEvents"
-                        />
-                    </PublishField>
-                    <Button @click="$emit('removed')" icon="x" />
+                    <div class="flex-1 flex items-center gap-2">
+                        <PublishField
+                            v-for="field in fields"
+                            :key="field.handle"
+                            :config="field"
+                            v-slot="{ fieldtypeComponent, fieldtypeComponentProps, fieldtypeComponentEvents }"
+                        >
+                            <Component
+                                :is="fieldtypeComponent"
+                                v-bind="fieldtypeComponentProps"
+                                v-on="fieldtypeComponentEvents"
+                            />
+                        </PublishField>
+                    </div>
+                    <Button @click="$emit('removed')" icon="x" size="sm" variant="ghost" inset />
                 </div>
             </PublishFieldsProvider>
         </PublishContainer>

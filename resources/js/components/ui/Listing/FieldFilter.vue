@@ -94,9 +94,10 @@ function removeRow(handle) {
 
         <Combobox
             ref="fieldSelect"
-            :placeholder="__('Field')"
+            :placeholder="__('Add Field')"
             :options="fieldComboboxOptions"
             @update:model-value="createFilter"
+            class="w-1/4"
         />
     </div>
 
