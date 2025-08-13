@@ -306,8 +306,8 @@ export default {
         },
 
         initializeData() {
-            if (!this.data) {
-                return this.getDataForSelections(this.selections);
+            if (!this.data || !this.data.length) {
+                return this.getDataForSelections(this.value);
             }
 
             this.loading = false;
