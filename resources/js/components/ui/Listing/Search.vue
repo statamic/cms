@@ -12,7 +12,6 @@ const input = useTemplateRef('input');
 const focus = () => input.value.focus();
 
 defineExpose({ focus });
-
 </script>
 
 <template>

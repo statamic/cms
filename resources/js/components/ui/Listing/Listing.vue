@@ -224,7 +224,6 @@ const activeFilterBadgeCount = computed(() => {
     return count;
 });
 
-
 function setParameters(params) {
     currentPage.value = parseInt(params.page);
     perPage.value = parseInt(params.perPage);

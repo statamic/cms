@@ -1,5 +1,5 @@
 <script setup>
-import { Badge, Button, Panel, PanelHeader, Card, Heading, CardPanel } from '@statamic/ui';
+import { Badge, Button, Panel, PanelHeader, Card, Heading } from '@statamic/ui';
 import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
 import { computed } from 'vue';
 import FieldFilter from './FieldFilter.vue';
@@ -48,7 +48,7 @@ function isActive(handle) {
 
         <stack half name="filters" v-if="open" @closed="open = false">
             <div class="flex-1 p-3 bg-white h-full overflow-auto rounded-l-2xl">
-                <ui-heading size="lg" :text="__('Filters')" class="mb-4" icon="sliders-horizontal" />
+                <Heading size="lg" :text="__('Filters')" class="mb-4" icon="sliders-horizontal" />
                 <div class="space-y-4">
                     <Panel>
                         <PanelHeader class="flex items-center justify-between">
