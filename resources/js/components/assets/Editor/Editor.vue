@@ -121,7 +121,7 @@
                         :extra-values="extraValues"
                         :meta="meta"
                         :errors="errors"
-                        @update:model-value="values = { ...$event, focus: values.focus }"
+                        @update:model-value="updateValues"
                     >
                         <div class="h-1/2 w-full overflow-scroll sm:p-4 md:h-full md:w-1/3 md:grow md:pt-px">
                             <div v-if="saving" class="loading">
@@ -356,6 +356,16 @@ export default {
             point = point === '50-50-1' ? null : point;
             this.values['focus'] = point;
             this.$dirty.add(this.publishContainer);
+        },
+
+        updateValues(values) {
+            let updated = { ...event, focus: values.focus };
+
+            if (JSON.stringify(values) === JSON.stringify(updated)) {
+                return
+            }
+
+            values = updated;
         },
 
         save() {
