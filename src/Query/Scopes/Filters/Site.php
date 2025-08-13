@@ -23,7 +23,7 @@ class Site extends Filter
         return [
             'site' => [
                 'display' => __('Site'),
-                'type' => 'radio',
+                'type' => 'select',
                 'options' => $this->options()->all(),
             ],
         ];
