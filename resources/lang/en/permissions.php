@@ -84,7 +84,9 @@ return [
     'edit_roles' => 'Edit roles',
     'assign_user_groups' => 'Assign groups to users',
     'assign_roles' => 'Assign roles to users',
+    'assign_roles_desc' => "Grants ability to assign roles to users, regardless of the acting user's roles.",
     'impersonate_users' => 'Impersonate users',
+    'impersonate_users_desc' => 'Grants ability to impersonate other users, including super users.',
 
     'group_updates' => 'Updates',
     'view_updates' => 'View updates',
