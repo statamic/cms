@@ -11,8 +11,7 @@
     > .field-inner {
         padding: 0;
 
-        > label,
-        > .help-block {
+        > label {
             display: none;
         }
     }

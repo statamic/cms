@@ -21,7 +21,7 @@
 
 <ui-card-panel heading="{{ __('Search Indexes') }}">
     @if ($errors->has('indexes'))
-        <p class="p-4"><small class="help-block text-red-500">{{ $errors->first() }}</small></p>
+        <ui-error-message :text="$errors->first()" class="p-4" />
     @endif
 
     <ui-table>

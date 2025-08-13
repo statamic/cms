@@ -15,7 +15,7 @@
                         :text="__('Get Command')"
                     />
                 </template>
-                <div class="prose space-y-3">
+                <div class="prose prose-sm prose-zinc prose-headings:font-medium space-y-3">
                     <p v-text="confirmationText" />
                     <ui-input v-model="command" readonly copyable class="font-mono text-sm dark" />
                     <p v-html="link" />
@@ -23,7 +23,7 @@
             </ui-modal>
         </ui-panel-header>
         <ui-card>
-            <div v-html="body" class="prose" />
+            <div v-html="body" class="prose prose-sm prose-zinc prose-headings:font-medium" />
         </ui-card>
     </ui-panel>
 </template>

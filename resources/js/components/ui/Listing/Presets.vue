@@ -208,12 +208,10 @@ function deletePreset() {
     >
         <Input v-model="savingPresetName" @keydown.enter="saveNew" />
 
-        <div v-if="presets && Object.keys(presets).includes(savingPresetHandle)">
-            <small
-                class="help-block mt-2 mb-0 text-red-500"
-                v-text="__('messages.filters_view_already_exists')"
-            ></small>
-        </div>
+        <ui-error-message
+            v-if="presets && Object.keys(presets).includes(savingPresetHandle)"
+            :text="__('messages.filters_view_already_exists')"
+        />
     </confirmation-modal>
 
     <confirmation-modal
@@ -232,10 +230,7 @@ function deletePreset() {
                     .includes(savingPresetHandle)
             "
         >
-            <small
-                class="help-block mt-2 mb-0 text-red-500"
-                v-text="__('messages.filters_view_already_exists')"
-            ></small>
+            <ui-error-message :text="__('messages.filters_view_already_exists')" />
         </div>
     </confirmation-modal>
 

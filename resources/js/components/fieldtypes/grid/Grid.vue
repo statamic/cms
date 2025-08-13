@@ -11,12 +11,9 @@
                 </publish-field-fullscreen-header>
 
                 <section :class="{ 'mt-14 p-4': fullScreenMode }">
-                    <small v-if="hasExcessRows" class="help-block text-red-500">
-                        {{ __('Max Rows') }}: {{ maxRows }}
-                    </small>
-                    <small v-else-if="hasNotEnoughRows" class="help-block text-red-500">
-                        {{ __('Min Rows') }}: {{ minRows }}
-                    </small>
+
+                    <ui-error-message v-if="hasExcessRows" :text="__('Max Rows') + ': ' + maxRows" />
+                    <ui-error-message v-else-if="hasNotEnoughRows" :text="__('Min Rows') + ': ' + minRows" />
 
                     <component
                         :is="component"

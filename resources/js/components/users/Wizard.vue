@@ -205,16 +205,6 @@
     </div>
 </template>
 
-<style scoped>
-:deep(.publish-fields .form-group .field-inner > label) {
-    /* TODO: Remove @apply */
-    /* @apply mb-1 text-base font-bold;
-    & + .help-block {
-        @apply -mt-1 !important;
-    } */
-}
-</style>
-
 <script>
 // Yer a wizard Harry
 
