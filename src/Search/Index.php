@@ -11,6 +11,7 @@ abstract class Index
     protected $name;
     protected $locale;
     protected $config;
+    protected $searchables;
 
     abstract public function search($query);
 
@@ -95,7 +96,7 @@ abstract class Index
 
     public function searchables()
     {
-        return new Searchables($this);
+        return $this->searchables ??= new Searchables($this);
     }
 
     public function extraAugmentedResultData(Result $result)
