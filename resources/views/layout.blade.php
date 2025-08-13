@@ -11,8 +11,8 @@
         class="bg-gray-800 font-sans leading-normal text-gray-900 dark:text-white"
         @if ($user->getPreference('strict_accessibility')) data-contrast="increased" @endif
     >
-        <config-provider>
-            <div id="statamic">
+        <div id="statamic">
+           <config-provider>
                 @include('statamic::partials.session-expiry')
                 @include('statamic::partials.licensing-alerts')
                  @include('statamic::partials.global-header')
@@ -62,10 +62,10 @@
                 </confirmation-modal>
 
                 <portal-targets></portal-targets>
-            </div>
+            </config-provider>
+        </div>
 
-            @include('statamic::partials.scripts')
-            @yield('scripts')
-        </config-provider>
+        @include('statamic::partials.scripts')
+        @yield('scripts')
     </body>
 </html>
