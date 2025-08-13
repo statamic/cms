@@ -9,7 +9,7 @@
 
     <body class="bg-gray-50 font-sans leading-normal scheme-light">
         <config-provider>
-            <div id="statamic" v-cloak>
+            <div id="statamic">
                 @yield('content')
                 <portal-targets></portal-targets>
             </div>

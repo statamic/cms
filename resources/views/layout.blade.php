@@ -12,7 +12,7 @@
         @if ($user->getPreference('strict_accessibility')) data-contrast="increased" @endif
     >
         <config-provider>
-            <div id="statamic" v-cloak>
+            <div id="statamic">
                 @include('statamic::partials.session-expiry')
                 @include('statamic::partials.licensing-alerts')
                  @include('statamic::partials.global-header')
