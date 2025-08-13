@@ -29,7 +29,12 @@ class Searchables
 
         $providers = collect(Arr::wrap($this->index->config()['searchables'] ?? []));
 
+        // TODO: Throw more helpful ignition error with v6 docs link?
         if ($providers->contains('all')) {
+            throw new \Exception('Searchables provider [all] no longer supported in Statamic v6!');
+        }
+
+        if ($providers->contains('content')) {
             return $manager->providers()->map(fn ($_, $key) => $manager->make($key, $this->index, ['*']));
         }
 
