@@ -1,30 +1,32 @@
 <template>
-    <div class="button-group-fieldtype-wrapper" :class="{ 'inline-mode': config.inline }">
-        <div class="btn-group" ref="buttonGroup">
-            <button
-                class="btn px-4"
-                v-for="(option, $index) in options"
-                :key="$index"
-                ref="button"
-                type="button"
-                :name="name"
-                @click="updateSelectedOption(option.value)"
-                :value="option.value"
-                :disabled="isReadOnly"
-                :class="{ active: value == option.value }"
-                v-text="option.label || option.value"
-            />
-        </div>
-    </div>
+    <ButtonGroup ref="buttonGroup">
+        <Button
+            v-for="(option, $index) in options"
+            ref="button"
+            :disabled="config.disabled"
+            :key="$index"
+            :name="name"
+            :read-only="isReadOnly"
+            :text="option.label || option.value"
+            :value="option.value"
+            :variant="value == option.value ? 'primary' : 'default'"
+            @click="updateSelectedOption(option.value)"
+        />
+    </ButtonGroup>
 </template>
 
 <script>
 import Fieldtype from './Fieldtype.vue';
 import HasInputOptions from './HasInputOptions.js';
 import ResizeObserver from 'resize-observer-polyfill';
+import { Button, ButtonGroup } from '@statamic/ui';
 
 export default {
     mixins: [Fieldtype, HasInputOptions],
+    components: {
+        Button,
+        ButtonGroup
+    },
 
     data() {
         return {
@@ -60,9 +62,9 @@ export default {
 
         setupResizeObserver() {
             this.resizeObserver = new ResizeObserver(() => {
-                this.handleWrappingOfNode(this.$refs.buttonGroup);
+                this.handleWrappingOfNode(this.$refs.buttonGroup.$el);
             });
-            this.resizeObserver.observe(this.$refs.buttonGroup);
+            this.resizeObserver.observe(this.$refs.buttonGroup.$el);
         },
 
         handleWrappingOfNode(node) {

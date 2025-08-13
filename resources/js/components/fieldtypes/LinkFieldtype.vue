@@ -1,24 +1,13 @@
 <template>
-    <div class="flex items-center">
+    <div class="flex gap-3">
         <!-- Link type selector -->
-        <div class="w-28 ltr:mr-4 rtl:ml-4">
-            <v-select
-                v-model="option"
-                append-to-body
-                :calculate-position="positionOptions"
-                :options="options"
-                :clearable="false"
-                :reduce="(option) => option.value"
-            >
-                <template #option="{ label }">
-                    {{ __(label) }}
-                </template>
-            </v-select>
+        <div class="w-fit">
+            <Select :options v-model="option"  />
         </div>
 
-        <div class="flex-1">
+        <div class="flex-1 flex">
             <!-- URL text input -->
-            <text-input v-if="option === 'url'" v-model="urlValue" />
+            <Input v-if="option === 'url'" :read-only="isReadOnly" v-model="urlValue" />
 
             <!-- Entry select -->
             <relationship-fieldtype
@@ -28,8 +17,8 @@
                 :value="selectedEntries"
                 :config="meta.entry.config"
                 :meta="meta.entry.meta"
-                @input="entriesSelected"
-                @meta-updated="meta.entry.meta = $event"
+                @update:value="entriesSelected"
+                @update:meta="meta.entry.meta = $event"
             />
 
             <!-- Asset select -->
@@ -40,19 +29,26 @@
                 :value="selectedAssets"
                 :config="meta.asset.config"
                 :meta="meta.asset.meta"
-                @input="assetsSelected"
-                @meta-updated="meta.asset.meta = $event"
+                @update:value="assetsSelected"
+                @update:meta="meta.asset.meta = $event"
             />
         </div>
     </div>
 </template>
 
+<style scoped>
+    /* :deep(.relationship-input) > div:first-child {
+        @apply h-full;
+    } */
+</style>
+
 <script>
 import Fieldtype from './Fieldtype.vue';
-import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
+import { Input, Select } from '@statamic/ui';
 
 export default {
-    mixins: [Fieldtype, PositionsSelectOptions],
+    components: { Input, Text, Select },
+    mixins: [Fieldtype],
 
     provide: {
         isInLinkField: true,
@@ -153,7 +149,7 @@ export default {
 
                 { label: __('Entry'), value: 'entry' },
 
-                this.meta.showAssetOption ? { label: __('Asset'), value: 'asset' } : null,
+                this.meta.showAssetOption ? { label: __('Asset'), value: 'asset', maxFiles: 1 } : null,
             ].filter((option) => option);
         },
 

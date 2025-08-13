@@ -51,8 +51,7 @@ test.each([
     process.env.TZ = tz;
 
     const dateIndexField = makeDateIndexField({
-        date: '2025-12-25',
-        time: '02:13',
+        date: '2025-12-25T02:13:00Z',
         mode: 'single',
         time_enabled: true,
     });
@@ -67,8 +66,8 @@ test.each([
     process.env.TZ = tz;
 
     const dateIndexField = makeDateIndexField({
-        start: { date: '2025-12-25', time: '02:13' },
-        end: { date: '2025-12-28', time: '03:59' },
+        start: '2025-12-25T02:13:00Z',
+        end: '2025-12-28T03:59:00Z',
         mode: 'range',
     });
 
@@ -82,7 +81,7 @@ test.each([
 ])('date is formatted to the users browser language (%s)', async (lang, expected) => {
     setNavigatorLanguage(lang);
 
-    const dateIndexField = makeDateIndexField({ date: '2025-12-25', time: '13:29' });
+    const dateIndexField = makeDateIndexField({ date: '2025-12-25T13:29:00Z' });
 
     expect(dateIndexField.vm.formatted).toBe(expected);
 });
@@ -94,7 +93,7 @@ test.each([
 ])('date and time is formatted to the users browser language (%s)', async (lang, expected) => {
     setNavigatorLanguage(lang);
 
-    const dateIndexField = makeDateIndexField({ date: '2025-12-25', time: '13:29', time_enabled: true });
+    const dateIndexField = makeDateIndexField({ date: '2025-12-25T13:29:00Z', time_enabled: true });
 
     expect(dateIndexField.vm.formatted).toBe(expected);
 });
@@ -107,8 +106,8 @@ test.each([
     setNavigatorLanguage(lang);
 
     const dateIndexField = makeDateIndexField({
-        start: { date: '2025-12-25', time: '02:13' },
-        end: { date: '2025-12-28', time: '03:59' },
+        start: '2025-12-25T02:13:00Z',
+        end: '2025-12-28T03:59:00Z',
         mode: 'range',
     });
 

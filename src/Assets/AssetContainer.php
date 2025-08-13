@@ -27,7 +27,6 @@ use Statamic\Facades\Search;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
 use Statamic\Support\Arr;
-use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, Augmentable
@@ -139,9 +138,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
             return null;
         }
 
-        $url = (string) Str::of($this->disk()->url('/'))
-            ->rtrim('/')
-            ->after(config('app.url'));
+        $url = rtrim($this->disk()->url('/'), '/');
 
         return ($url === '') ? '/' : $url;
     }
@@ -186,6 +183,11 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
         return cp_route('assets.browse.show', $this->handle());
     }
 
+    public function editBlueprintUrl()
+    {
+        return cp_route('blueprints.asset-containers.edit', $this->handle());
+    }
+
     public function apiUrl()
     {
         return null; // TODO
@@ -227,6 +229,14 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
                 ],
             ])->setHandle($this->handle())->setNamespace('assets');
         });
+    }
+
+    public function blueprintCommandPaletteLink()
+    {
+        return $this->blueprint()?->commandPaletteLink(
+            type: 'Asset Containers',
+            url: $this->editBlueprintUrl(),
+        );
     }
 
     public function afterSave($callback)

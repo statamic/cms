@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Fields;
 
+use Facades\Statamic\Fields\FieldRepository;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Http\Request;
 use Statamic\Facades\Blueprint;
@@ -9,7 +10,10 @@ use Statamic\Facades\Fieldset;
 use Statamic\Fields\Field;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\CP\CanManageBlueprints;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
+
+use function Statamic\trans as __;
 
 class FieldsController extends CpController
 {
@@ -39,11 +43,23 @@ class FieldsController extends CpController
             ->addValues($request->values)
             ->preProcess();
 
+        if ($request->reference) {
+            $originFields = $blueprint
+                ->fields()
+                ->addValues(FieldRepository::find($request->reference)->config())
+                ->preProcess();
+
+            $originValues = Arr::except($originFields->values()->all(), 'handle');
+            $originMeta = $originFields->meta()->all();
+        }
+
         return [
             'fieldtype' => $fieldtype->toArray(),
             'blueprint' => $blueprint->toPublishArray(),
             'values' => array_merge($request->values, $fields->values()->all()),
             'meta' => $fields->meta(),
+            'originValues' => $originValues ?? null,
+            'originMeta' => $originMeta ?? null,
         ];
     }
 

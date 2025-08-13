@@ -2,60 +2,48 @@
     @apply flex justify-between;
 
     .step {
-        @apply relative mx-auto flex-1 text-center text-xs;
+        @apply relative mx-auto flex-1 text-center text-xs cursor-pointer border-0 bg-transparent p-0;
     }
 
     .step:not(:first-child):before {
-        @apply absolute h-1 w-1/2 bg-gray-300;
+        @apply absolute h-1 w-1/2 bg-gray-300 dark:bg-gray-700 start-0 top-[18px];
         content: '';
-        left: 0;
-        [dir='rtl'] & {
-            left: auto;
-            right: 0;
-        }
-        top: 18px;
     }
 
     .step:not(:last-child):after {
-        @apply absolute h-1 w-1/2 bg-gray-300;
+        @apply absolute h-1 w-1/2 bg-gray-300 dark:bg-gray-700 start-[50%] top-[18px];
         content: '';
-        left: 50%;
-        [dir='rtl'] & {
-            left: auto;
-            right: 50%;
-        }
-        top: 18px;
     }
 
     .step.complete:before,
     .step.complete:after {
-        @apply bg-blue !important;
+        @apply bg-gray-900;
     }
 
     .ball {
-        @apply relative z-10 mx-auto h-10 w-10 rounded-full bg-gray-300 text-center text-base text-gray dark:bg-dark-800 dark:text-dark-150;
-        line-height: 40px;
+        @apply relative z-10 mx-auto size-10 rounded-full bg-gray-300 text-center text-base text-gray-600 dark:bg-gray-700 dark:text-gray-300 leading-10;
     }
 
     .label {
-        @apply mt-1 text-xs text-gray dark:text-dark-175;
+        @apply mt-1 text-xs text-gray-500 dark:text-gray-400;
     }
 
-    .complete {
-        .ball {
-            @apply bg-blue text-white;
-        }
-        .label {
-            @apply text-blue;
-        }
+    .complete .ball {
+        @apply bg-gray-900 text-white dark:bg-white dark:text-gray-900;
+    }
+
+    .complete .label {
+        @apply text-gray-900 dark:text-gray-200;
     }
 }
 
-.dark {
-    .wizard-steps {
-        .step:not(:first-child):before,
-        .step:not(:first-child):after {
-            @apply bg-dark-800;
-        }
-    }
+/* Dark mode overrides for pseudo elements */
+.dark .wizard-steps .step:before,
+.dark .wizard-steps .step:after {
+    @apply bg-gray-700;
+}
+
+.dark .wizard-steps .complete:before,
+.dark .wizard-steps .complete:after {
+    @apply bg-white;
 }

@@ -91,6 +91,11 @@ abstract class Action implements Arrayable
         return false;
     }
 
+    public function icon(): string
+    {
+        return $this->icon ?? '';
+    }
+
     public function buttonText()
     {
         /** @translation */
@@ -119,17 +124,24 @@ abstract class Action implements Arrayable
         return false;
     }
 
+    public function requiresElevatedSession(): bool
+    {
+        return false;
+    }
+
     public function toArray()
     {
         return [
             'handle' => $this->handle(),
             'title' => $this->title(),
+            'icon' => $this->icon(),
             'confirm' => $this->confirm,
             'buttonText' => $this->buttonText(),
             'confirmationText' => $this->confirmationText(),
             'warningText' => $this->warningText(),
             'dirtyWarningText' => $this->dirtyWarningText(),
             'bypassesDirtyWarning' => $this->bypassesDirtyWarning(),
+            'requiresElevatedSession' => $this->requiresElevatedSession(),
             'dangerous' => $this->dangerous,
             'fields' => $this->fields()->toPublishArray(),
             'values' => $this->fields()->preProcess()->values(),

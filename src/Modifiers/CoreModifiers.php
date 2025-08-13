@@ -739,6 +739,10 @@ class CoreModifiers extends Modifier
             return Arr::first($value);
         }
 
+        if ($value instanceof Collection) {
+            return $value->first();
+        }
+
         return Stringy::first($value, Arr::get($params, 0));
     }
 
@@ -982,6 +986,50 @@ class CoreModifiers extends Modifier
             default:
                 return $this->renderAPStyleHeadline($value);
         }
+    }
+
+    /**
+     * Returns true if the array contains $needle, false otherwise
+     *
+     * @param  string|array  $haystack
+     * @param  array  $params
+     * @param  array  $context
+     * @return bool
+     */
+    public function overlaps($haystack, $params, $context)
+    {
+        $needle = $this->getFromContext($context, $params);
+
+        if ($needle instanceof Collection) {
+            $needle = $needle->values()->all();
+        }
+
+        if (! is_array($needle)) {
+            $needle = [$needle];
+        }
+
+        if ($haystack instanceof Collection) {
+            $haystack = $haystack->values()->all();
+        }
+
+        if (! is_array($haystack)) {
+            return false;
+        }
+
+        return count(array_intersect($haystack, $needle)) > 0;
+    }
+
+    /**
+     * Returns false if the array contains $needle, true otherwise
+     *
+     * @param  string|array  $haystack
+     * @param  array  $params
+     * @param  array  $context
+     * @return bool
+     */
+    public function doesnt_overlap($haystack, $params, $context)
+    {
+        return ! $this->overlaps($haystack, $params, $context);
     }
 
     private function renderAPStyleHeadline($value)
@@ -1931,6 +1979,16 @@ class CoreModifiers extends Modifier
      */
     public function rawurlencode($value)
     {
+        return rawurlencode($value);
+    }
+
+    /**
+     * URL-encode according to RFC 3986, but allowing slashes to persist
+     *
+     * @return string
+     */
+    public function rawurlencode_except_slashes($value)
+    {
         return implode('/', array_map('rawurlencode', explode('/', $value)));
     }
 
@@ -2117,6 +2175,24 @@ class CoreModifiers extends Modifier
     public function replace($value, $params)
     {
         return Stringy::replace($value, Arr::get($params, 0), Arr::get($params, 1));
+    }
+
+    /**
+     * Resolves a specific index or all items from an array, a Collection, or a Query Builder.
+     */
+    public function resolve($value, $params)
+    {
+        $key = Arr::get($params, 0);
+
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
+
+        if ($value instanceof Collection) {
+            $value = $value->all();
+        }
+
+        return Arr::get($value, $key);
     }
 
     /**
@@ -2840,6 +2916,16 @@ class CoreModifiers extends Modifier
      * @return string
      */
     public function urlencode($value)
+    {
+        return urlencode($value);
+    }
+
+    /**
+     * URL-encodes string, but allowing slashes to persist
+     *
+     * @return string
+     */
+    public function urlencode_except_slashes($value)
     {
         return implode('/', array_map('urlencode', explode('/', $value)));
     }

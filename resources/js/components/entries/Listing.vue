@@ -1,206 +1,79 @@
 <template>
-    <div>
-        <div v-if="initializing" class="card loading">
-            <loading-graphic />
-        </div>
-
-        <data-list
-            v-if="!initializing"
-            ref="dataList"
-            :rows="items"
-            :columns="columns"
-            :sort="false"
-            :sort-column="sortColumn"
-            :sort-direction="sortDirection"
-            @visible-columns-updated="visibleColumns = $event"
-        >
-            <div>
-                <div class="card relative overflow-hidden p-0">
-                    <div
-                        v-if="!reordering"
-                        class="flex flex-wrap items-center justify-between border-b px-2 pb-2 text-sm dark:border-dark-900"
-                    >
-                        <data-list-filter-presets
-                            ref="presets"
-                            :active-preset="activePreset"
-                            :active-preset-payload="activePresetPayload"
-                            :active-filters="activeFilters"
-                            :has-active-filters="hasActiveFilters"
-                            :preferences-prefix="preferencesPrefix"
-                            :search-query="searchQuery"
-                            @selected="selectPreset"
-                            @reset="filtersReset"
-                        />
-
-                        <data-list-search
-                            class="mt-2 h-8 w-full min-w-[240px]"
-                            ref="search"
-                            v-model="searchQuery"
-                            :placeholder="searchPlaceholder"
-                        />
-
-                        <div class="mt-2 flex space-x-2 rtl:space-x-reverse">
-                            <button
-                                class="btn btn-sm ltr:ml-2 rtl:mr-2"
-                                v-text="__('Reset')"
-                                v-show="isDirty"
-                                @click="$refs.presets.refreshPreset()"
-                            />
-                            <button
-                                class="btn btn-sm ltr:ml-2 rtl:mr-2"
-                                v-text="__('Save')"
-                                v-show="isDirty"
-                                @click="$refs.presets.savePreset()"
-                            />
-                            <data-list-column-picker :preferences-key="preferencesKey('columns')" />
-                        </div>
-                    </div>
-                    <div v-show="!reordering">
-                        <data-list-filters
-                            ref="filters"
-                            :filters="filters"
-                            :active-preset="activePreset"
-                            :active-preset-payload="activePresetPayload"
-                            :active-filters="activeFilters"
-                            :active-filter-badges="activeFilterBadges"
-                            :active-count="activeFilterCount"
-                            :search-query="searchQuery"
-                            :is-searching="true"
-                            :saves-presets="true"
-                            :preferences-prefix="preferencesPrefix"
-                            @changed="filterChanged"
-                            @saved="$refs.presets.setPreset($event)"
-                            @deleted="$refs.presets.refreshPresets()"
-                        />
-                    </div>
-
-                    <div v-show="items.length === 0" class="p-6 text-center text-gray-500" v-text="__('No results')" />
-
-                    <data-list-bulk-actions
-                        :url="actionUrl"
-                        :context="actionContext"
-                        @started="actionStarted"
-                        @completed="actionCompleted"
-                    />
-                    <div class="overflow-x-auto overflow-y-hidden">
-                        <data-list-table
-                            v-show="items.length"
-                            :allow-bulk-actions="!reordering"
-                            :loading="loading"
-                            :reorderable="reordering"
-                            :sortable="!reordering"
-                            :toggle-selection-on-row-click="true"
-                            @sorted="sorted"
-                            @reordered="reordered"
-                        >
-                            <template #cell-title="{ row: entry }">
-                                <a
-                                    class="title-index-field inline-flex items-center"
-                                    :href="entry.edit_url"
-                                    @click.stop
-                                >
-                                    <span
-                                        class="little-dot ltr:mr-2 rtl:ml-2"
-                                        v-tooltip="getStatusLabel(entry)"
-                                        :class="getStatusClass(entry)"
-                                        v-if="!columnShowing('status')"
-                                    />
-                                    <span v-text="entry.title" />
-                                </a>
-                            </template>
-                            <template #cell-status="{ row: entry }">
-                                <div
-                                    class="status-index-field select-none"
-                                    v-tooltip="getStatusTooltip(entry)"
-                                    :class="`status-${entry.status}`"
-                                    v-text="getStatusLabel(entry)"
-                                />
-                            </template>
-                            <template #cell-slug="{ row: entry }">
-                                <div class="slug-index-field" :title="entry.slug">{{ entry.slug }}</div>
-                            </template>
-                            <template #actions="{ row: entry, index }">
-                                <dropdown-list placement="left-start">
-                                    <dropdown-item
-                                        :text="__('View')"
-                                        :external-link="entry.permalink"
-                                        v-if="entry.viewable && entry.permalink"
-                                    />
-                                    <dropdown-item
-                                        :text="__('Edit')"
-                                        :redirect="entry.edit_url"
-                                        v-if="entry.editable"
-                                    />
-                                    <div class="divider" v-if="entry.actions.length" />
-                                    <data-list-inline-actions
-                                        :item="entry.id"
-                                        :url="actionUrl"
-                                        :actions="entry.actions"
-                                        @started="actionStarted"
-                                        @completed="actionCompleted"
-                                    />
-                                </dropdown-list>
-                            </template>
-                        </data-list-table>
-                    </div>
-                </div>
-                <data-list-pagination
-                    class="mt-6"
-                    :resource-meta="meta"
-                    :per-page="perPage"
-                    :show-totals="true"
-                    @page-selected="selectPage"
-                    @per-page-changed="changePerPage"
-                />
-            </div>
-        </data-list>
-    </div>
+    <Listing
+        ref="listing"
+        :url="requestUrl"
+        :columns="columns"
+        :action-url="actionUrl"
+        :action-context="{ collection }"
+        :sort-column="sortColumn"
+        :sort-direction="sortDirection"
+        :preferences-prefix="preferencesPrefix"
+        :filters="filters"
+        :filters-for-reordering="filtersForReordering"
+        :reorderable="reordering"
+        push-query
+        @request-completed="requestComplete"
+        @reordered="reordered"
+    >
+        <template #cell-title="{ row: entry, isColumnVisible }">
+            <a class="title-index-field" :href="entry.edit_url" @click.stop>
+                <StatusIndicator v-if="!isColumnVisible('status')" :status="entry.status" />
+                <span v-text="entry.title" />
+            </a>
+        </template>
+        <template #cell-status="{ row: entry }">
+            <StatusIndicator :status="entry.status" show-label :show-dot="false" />
+        </template>
+        <template #prepended-row-actions="{ row: entry }">
+            <DropdownItem
+                :text="__('Visit URL')"
+                :href="entry.permalink"
+                icon="eye"
+                target="_blank"
+                v-if="entry.viewable && entry.permalink"
+            />
+            <DropdownItem :text="__('Edit')" :href="entry.edit_url" icon="edit" v-if="entry.editable" />
+        </template>
+    </Listing>
 </template>
 
 <script>
-import Listing from '../Listing.vue';
+import { StatusIndicator, DropdownItem, Listing } from '@statamic/ui';
 
 export default {
-    mixins: [Listing],
+    emits: ['reordered', 'site-changed'],
+
+    components: {
+        StatusIndicator,
+        Listing,
+        DropdownItem,
+    },
 
     props: {
         collection: String,
         reordering: Boolean,
         reorderUrl: String,
+        actionUrl: String,
+        sortColumn: String,
+        sortDirection: String,
+        columns: Array,
+        filters: Array,
         site: String,
     },
 
     data() {
         return {
-            listingKey: 'entries',
             preferencesPrefix: `collections.${this.collection}`,
             requestUrl: cp_url(`collections/${this.collection}/entries`),
             currentSite: this.site,
             initialSite: this.site,
-            pushQuery: true,
-            previousFilters: null,
+            items: null,
+            page: null,
+            perPage: null,
         };
     },
 
-    computed: {
-        actionContext() {
-            return { collection: this.collection };
-        },
-    },
-
     watch: {
-        reordering(reordering, wasReordering) {
-            if (reordering === wasReordering) return;
-            reordering ? this.reorder() : this.cancelReordering();
-        },
-
-        activeFilters: {
-            deep: true,
-            handler(filters) {
-                this.currentSite = filters.site ? filters.site.site : null;
-            },
-        },
-
         site(site) {
             this.currentSite = site;
         },
@@ -212,63 +85,11 @@ export default {
     },
 
     methods: {
-        getStatusClass(entry) {
-            // TODO: Replace with `entry.status` (will need to pass down)
-            if (entry.published && entry.private) {
-                return 'bg-transparent border border-gray-600';
-            } else if (entry.published) {
-                return 'bg-green-600';
-            } else {
-                return 'bg-gray-400 dark:bg-dark-200';
-            }
-        },
-
-        getStatusLabel(entry) {
-            if (entry.status === 'published') {
-                return __('Published');
-            } else if (entry.status === 'scheduled') {
-                return __('Scheduled');
-            } else if (entry.status === 'expired') {
-                return __('Expired');
-            } else if (entry.status === 'draft') {
-                return __('Draft');
-            }
-        },
-
-        getStatusTooltip(entry) {
-            if (entry.status === 'published') {
-                return entry.collection.dated ? __('messages.status_published_with_date', { date: entry.date }) : null; // The label is sufficient.
-            } else if (entry.status === 'scheduled') {
-                return __('messages.status_scheduled_with_date', { date: entry.date });
-            } else if (entry.status === 'expired') {
-                return __('messages.status_expired_with_date', { date: entry.date });
-            } else if (entry.status === 'draft') {
-                return null; // The label is sufficient.
-            }
-        },
-
-        reorder() {
-            this.previousFilters = this.activeFilters;
-            this.filtersReset();
-
-            // When reordering, we *need* a site, since mixing them up would be awkward.
-            // If we're dealing with multiple sites, it's possible the user "cleared"
-            // the site filter so we'll want to fall back to the initial site.
-            this.setSiteFilter(this.currentSite || this.initialSite);
-
-            this.page = 1;
-            this.sortColumn = 'order';
-            this.sortDirection = 'asc';
-        },
-
-        cancelReordering() {
-            this.resetToPreviousFilters();
-
-            this.request();
-        },
-
-        columnShowing(column) {
-            return this.visibleColumns.find((c) => c.field === column);
+        requestComplete({ items, parameters, activeFilters }) {
+            this.items = items;
+            this.page = parameters.page;
+            this.perPage = parameters.perPage;
+            this.currentSite = activeFilters.site ? activeFilters.site.site : null;
         },
 
         reordered(items) {
@@ -276,7 +97,15 @@ export default {
         },
 
         setSiteFilter(site) {
-            this.filterChanged({ handle: 'site', values: { site } });
+            this.$refs.listing.setFilter('site', site ? { site } : null);
+        },
+
+        filtersForReordering() {
+            return {
+                site: {
+                    site: this.currentSite || this.initialSite,
+                },
+            };
         },
 
         saveOrder() {
@@ -294,17 +123,8 @@ export default {
                     this.$toast.success(__('Entries successfully reordered'));
                 })
                 .catch((e) => {
-                    console.log(e);
                     this.$toast.error(__('Something went wrong'));
                 });
-        },
-
-        resetToPreviousFilters() {
-            this.filtersReset();
-
-            if (this.previousFilters) this.filtersChanged(this.previousFilters);
-
-            this.previousFilters = null;
         },
     },
 };

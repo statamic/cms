@@ -1,15 +1,30 @@
 <template>
-    <div class="toggle-fieldtype-wrapper">
-        <toggle-input :model-value="value" @update:model-value="update" :read-only="isReadOnly" :id="fieldId" />
-        <label v-if="inlineLabel" class="inline-label" v-html="$markdown(__(inlineLabel))"></label>
+    <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2">
+            <Switch
+                @update:model-value="update"
+                :disabled="config.disabled"
+                :id="fieldId"
+                :model-value="value"
+                :read-only="isReadOnly"
+            />
+            <Heading v-if="inlineLabel" v-html="$markdown(__(inlineLabel), { openLinksInNewTabs: true })" />
+        </div>
+        <div v-if="config.html" v-html="config.html" class="mt-2" />
     </div>
 </template>
 
 <script>
 import Fieldtype from './Fieldtype.vue';
+import { Switch, Heading } from '@statamic/ui';
 
 export default {
     mixins: [Fieldtype],
+
+    components: {
+        Switch,
+        Heading,
+    },
 
     computed: {
         inlineLabel() {
@@ -26,3 +41,12 @@ export default {
     },
 };
 </script>
+
+<style>
+/* Center vertically with text inputs */
+.grid-cell .toggle-fieldtype {
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+}
+</style>

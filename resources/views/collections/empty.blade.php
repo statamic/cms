@@ -2,82 +2,72 @@
 
 @extends('statamic::layout')
 @section('title', Statamic::crumb($collection->title(), 'Collections'))
+@section('content-card-modifiers', 'bg-architectural-lines')
 
 @section('content')
+    <header class="py-8 mt-8 text-center">
+        <h1 class="text-[25px] font-medium antialiased flex justify-center items-center gap-3">
+            <ui-icon name="collections" class="size-5 text-gray-500"></ui-icon>
+            {{ $collection->title() }}
+        </h1>
+    </header>
 
-<header class="mb-6">
-    @include('statamic::partials.breadcrumb', [
-        'url' => cp_route('collections.index'),
-        'title' => __('Collections')
-    ])
-    <h1 v-pre>{{ __($collection->title()) }}</h1>
-</header>
-
-<div class="card p-4 content">
-    <div class="flex flex-wrap">
+    <ui-empty-state-menu heading="{{ __('Start designing your collection with these steps') }}">
         @can('edit', $collection)
-        <a href="{{ cp_route('collections.edit', $collection->handle()) }}" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
-            <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
-                @cp_svg('icons/light/hammer-wrench')
-            </div>
-            <div class="flex-1 mb-4 md:mb-0 rtl:md:ml-6 ltr:md:mr-6">
-                <h3 class="mb-2 text-blue dark:text-blue-600">{{ __('Configure Collection') }} @rarr</h3>
-                <p>{{ __('statamic::messages.collection_next_steps_configure_description') }}</p>
-            </div>
-        </a>
+            <ui-empty-state-item
+                href="{{ $collection->editUrl() }}"
+                icon="configure"
+                heading="{{ __('Configure Collection') }}"
+                description="{{ __('statamic::messages.collection_next_steps_configure_description') }}"
+            ></ui-empty-state-item>
         @endcan
-        @can('create', ['Statamic\Contracts\Entries\Entry', $collection, \Statamic\Facades\Site::get($site)])
-        <?php $multipleBlueprints = $collection->entryBlueprints()->count() > 1 ?>
-        @if ($multipleBlueprints)<div
-        @else<a href="{{ cp_route('collections.entries.create', [$collection->handle(), $site]) }}"
-        @endif
-            class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group"
-        >
-            <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
-                @cp_svg('icons/light/content-writing')
-            </div>
-            <div class="flex-1 mb-4 md:mb-0 rtl:md:ml-6 ltr:md:mr-6">
-                <h3 class="mb-2 text-blue dark:text-blue-600">{{ $collection->createLabel() }} @if (!$multipleBlueprints) @rarr @endif</h3>
-                <p>{{ __('statamic::messages.collection_next_steps_create_entry_description') }}</p>
-                @if ($multipleBlueprints)
-                    @foreach ($collection->entryBlueprints() as $blueprint)
-                        <a href="{{ cp_route('collections.entries.create', [$collection->handle(), $site, 'blueprint' => $blueprint->handle()]) }}"
-                           class="text-blue text-sm rtl:ml-2 ltr:mr-2">{{ $blueprint->title() }} @rarr</a>
-                    @endforeach
-                @endif
-            </div>
-        @if ($multipleBlueprints)</div>@else</a>@endif
-        @endcan
-        @can('configure fields')
-        <a href="{{ cp_route('collections.blueprints.index', $collection->handle()) }}" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
-            <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
-                @cp_svg('icons/light/blueprint')
-            </div>
-            <div class="flex-1 mb-4 md:mb-0 rtl:md:ml-6 ltr:md:mr-6">
-                <h3 class="mb-2 text-blue dark:text-blue-600">{{ __('Configure Blueprints') }} @rarr</h3>
-                <p>{{ __('statamic::messages.collection_next_steps_blueprints_description') }}</p>
-            </div>
-        </a>
-        @endcan
-        @can('store', 'Statamic\Contracts\Entries\Collection')
-        <a href="{{ cp_route('collections.scaffold', $collection->handle()) }}" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
-            <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
-                @cp_svg('icons/light/crane')
-            </div>
-            <div class="flex-1 mb-4 md:mb-0 rtl:md:ml-6 ltr:md:mr-6">
-                <h3 class="mb-2 text-blue dark:text-blue-600">{{ __('Scaffold Views') }} @rarr</h3>
-                <p>{{ __('statamic::messages.collection_next_steps_scaffold_description') }}</p>
-            </div>
-        </a>
-        @endcan
-        <div class="hidden first:flex justify-center items-center p-8 w-full">
-            @cp_svg($svg ?? 'empty/content')
-        </div>
-    </div>
-</div>
 
-    @include('statamic::partials.docs-callout', [
-        'topic' => __('Collections'),
-        'url' => Statamic::docsUrl('collections')
-    ])
+        @can('create', ['Statamic\Contracts\Entries\Entry', $collection, \Statamic\Facades\Site::get($site)])
+            @php($multipleBlueprints = $collection->entryBlueprints()->count() > 1)
+
+            @if($multipleBlueprints)
+                <ui-empty-state-item
+                    icon="fieldtype-entries"
+                    heading="{{ __($collection->createLabel()) }}"
+                    description="{{ __('statamic::messages.collection_next_steps_create_entry_description') }}"
+                >
+                    @foreach ($collection->entryBlueprints() as $blueprint)
+                        <a href="{{ cp_route('collections.entries.create', [$collection->handle(), $site, 'blueprint' => $blueprint->handle()]) }}" class="text-blue-600 text-sm rtl:ml-2 ltr:mr-2">
+                            {{ $blueprint->title() }}
+                        </a>
+                    @endforeach
+                </ui-empty-state-item>
+            @else
+                <ui-empty-state-item
+                    href="{{ cp_route('collections.entries.create', [$collection->handle(), $site]) }}"
+                    icon="fieldtype-entries"
+                    heading="{{ __($collection->createLabel()) }}"
+                    description="{{ __('statamic::messages.collection_next_steps_create_entry_description') }}"
+                ></ui-empty-state-item>
+            @endif
+        @endcan
+
+        @can('configure fields')
+            <ui-empty-state-item
+                href="{{ cp_route('blueprints.collections.index', [$collection->handle()]) }}"
+                icon="blueprints"
+                heading="{{ __('Configure Blueprints') }}"
+                description="{{ __('statamic::messages.collection_next_steps_blueprints_description') }}"
+            ></ui-empty-state-item>
+        @endcan
+
+        @can('store', 'Statamic\Contracts\Entries\Collection')
+            <ui-empty-state-item
+                href="{{ cp_route('collections.scaffold', $collection->handle()) }}"
+                icon="scaffold"
+                heading="{{ __('Scaffold Views') }}"
+                description="{{ __('statamic::messages.collection_next_steps_scaffold_description') }}"
+            ></ui-empty-state-item>
+        @endcan
+    </ui-empty-state-menu>
+
+    <x-statamic::docs-callout
+        :topic="__('Collections')"
+        :url="Statamic::docsUrl('collections')"
+    />
 @stop

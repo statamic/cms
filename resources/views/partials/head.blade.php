@@ -6,6 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 <meta name="viewport" content="width=device-width" />
 <meta name="robots" content="noindex,nofollow" />
+<meta name="color-scheme" content="{{ $user?->preferredTheme() ?? 'auto' }}">
 
 <title>
     @yield('title', $title ?? __('Here')) {{ Statamic::cpDirection() === 'ltr' ? '‹' : '›' }}
@@ -17,12 +18,8 @@
 @else
     <link rel="icon" type="image/png" href="{{ Statamic::cpViteAsset('img/favicon-32x32.png') }}" sizes="32x32" />
     <link rel="icon" type="image/png" href="{{ Statamic::cpViteAsset('img/favicon-16x16.png') }}" sizes="16x16" />
-    <link
-        rel="shortcut icon"
-        type="image/x-icon"
-        href="{{ Statamic::cpViteAsset('img/favicon.ico') }}"
-        sizes="16x16 32x32"
-    />
+    <link rel="apple-touch-icon" href="{{ Statamic::cpViteAsset('img/apple-touch-icon.png') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ Statamic::cpViteAsset('img/favicon.ico') }}">
 @endif
 
 <script>
@@ -31,6 +28,10 @@
         if (!theme) theme = localStorage.getItem('statamic.theme') ?? 'auto';
         if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) theme = 'dark';
         if (theme === 'dark') document.documentElement.classList.add('dark');
+
+        let contrast = {!! $user?->getPreference('strict_accessibility') ? "'increased'" : "'auto'" !!};
+        if (contrast === 'auto' && window.matchMedia('(prefers-contrast: more)').matches) contrast = 'increased';
+        if (contrast === 'increased') document.documentElement.setAttribute('data-contrast', 'increased');
     })();
 </script>
 

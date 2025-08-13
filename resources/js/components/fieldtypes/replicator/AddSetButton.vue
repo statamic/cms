@@ -1,63 +1,58 @@
 <template>
-    <div class="replicator-set-picker">
-        <set-picker :enabled="enabled" :sets="groups" @added="addSet">
-            <template #trigger>
-                <div class="replicator-set-picker-button-wrapper flex items-center">
-                    <button
-                        v-if="enabled"
-                        class="btn-round flex items-center justify-center"
-                        :class="{
-                            'h-5 w-5': !last,
-                            'mr-2': label?.length > 0,
-                        }"
-                        @click.stop="addSetButtonClicked"
-                    >
-                        <svg-icon
-                            name="micro/plus"
-                            :class="{
-                                'dark:group-hover:dark-text-100 h-3 w-3 text-gray-800 group-hover:text-black dark:text-dark-175':
-                                    last,
-                                'dark:group-hover:dark-text-100 h-2 w-2 text-gray-700 transition duration-150 group-hover:text-black dark:text-dark-200':
-                                    !last,
-                            }"
-                        />
-                    </button>
-                    <span @click.stop="addSetButtonClicked" class="cursor-pointer text-sm dark:text-dark-175">{{
-                        __(label)
-                    }}</span>
-                </div>
-            </template>
-        </set-picker>
-    </div>
+    <set-picker :enabled="enabled" :sets="groups" @added="addSet">
+        <template #trigger>
+            <div class="flex relative pt-2" :class="{ 'pt-6': showConnector }" v-if="variant === 'button'">
+                <div v-if="showConnector" class="absolute group-hover:opacity-0 transition-opacity delay-25 duration-125 inset-y-0 h-full left-3.5 border-l-1 border-gray-400 dark:border-gray-600 border-dashed z-0 dark:bg-dark-700" />
+                <Button v-if="enabled" size="sm" :text="__('Add Block')" icon="plus" class="relative z-2" />
+            </div>
+            <Motion
+                v-if="variant === 'between'"
+                layout
+                class="flex justify-center py-3 relative group"
+                :initial="{ paddingTop: '0.75rem', paddingBottom: '0.75rem' }"
+                :hover="{ paddingTop: '1.25rem', paddingBottom: '1.25rem' }"
+                :transition="{ duration: 0.2 }"
+            >
+                <div v-if="showConnector" class="absolute group-hover:opacity-0 transition-opacity delay-25 duration-125 inset-y-0 h-full left-3.5 border-l-1 border-gray-400 dark:border-gray-600 border-dashed z-0 dark:bg-dark-700" />
+                <button class="w-full absolute inset-0 h-full opacity-0 group-hover:opacity-100 transition-opacity delay-25 duration-75 cursor-pointer">
+                    <div class="h-full flex flex-col justify-center">
+                        <div class="rounded-full bg-gray-200 h-2" />
+                    </div>
+                </button>
+                <Button v-if="enabled" round icon="plus" size="sm" class="-my-4 z-3 opacity-0 group-hover:opacity-100 transition-opacity delay-25 duration-75" />
+            </Motion>
+        </template>
+    </set-picker>
 </template>
 
 <script>
 import SetPicker from './SetPicker.vue';
+import { Button } from '@statamic/ui';
+import { Motion } from 'motion-v';
 
 export default {
     components: {
         SetPicker,
+        Button,
+        Motion,
     },
+
+    emits: ['added'],
 
     props: {
         sets: Array,
         groups: Array,
         index: Number,
-        last: Boolean,
         enabled: { type: Boolean, default: true },
         label: String,
+        showConnector: { type: Boolean, default: true },
+        variant: { type: String, default: 'button' },
     },
 
     methods: {
         addSet(handle) {
             this.$emit('added', handle, this.index);
-        },
-
-        addSetButtonClicked() {
-            if (this.sets.length === 1) {
-                this.addSet(this.sets[0].handle);
-            }
-        },
+        }
     },
 };
 </script>

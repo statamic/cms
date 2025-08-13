@@ -40,6 +40,7 @@ class CollectionsStore extends BasicStore
 
         $collection = Collection::make($handle)
             ->title(Arr::get($data, 'title'))
+            ->icon(Arr::get($data, 'icon'))
             ->routes(Arr::get($data, 'route'))
             ->requiresSlugs(Arr::get($data, 'slugs', true))
             ->titleFormats(Arr::get($data, 'title_format'))

@@ -7,95 +7,71 @@
 @section('title', __('Log in'))
 
 @section('content')
-    @include('statamic::partials.outside-logo')
 
-    <div class="relative mx-auto flex max-w-xs items-center justify-center rounded shadow-lg">
-        <div class="outside-shadow absolute inset-0"></div>
-        <div class="card auth-card">
+    <div class="relative mx-auto max-w-[400px] items-center justify-center">
+        <div class="flex items-center justify-center py-6">
+            <x-statamic::outside-logo />
+        </div>
+        <ui-auth-card
+            icon="sign-in"
+            title="{{ $emailLoginEnabled ? __('Sign in with email') : __('Sign in with OAuth') }}"
+            :description="__('Sign into your Statamic Control Panel')"
+        >
             <login
-                :show-email-login="!{{ $str::bool($oauth) }}"
                 :has-error="{{ $str::bool(count($errors) > 0) }}"
-                v-slot="{ showEmailLogin, busy, hasError }"
+                v-slot="{ busy, setBusy, hasError }"
             >
                 <div>
-                    @if ($oauth)
-                        <div class="login-oauth-providers">
-                            @foreach ($providers as $provider)
-                                <div class="provider mb-2">
-                                    <a
-                                        href="{{ $provider->loginUrl() }}?redirect={{ parse_url(cp_route('index'))['path'] }}"
-                                        class="btn-primary w-full"
-                                    >
-                                        {{ __('Log in with :provider', ['provider' => $provider->label()]) }}
+                    @if ($emailLoginEnabled)
+                        <form method="POST" class="flex flex-col gap-6" @submit="setBusy(true)">
+                            {!! csrf_field() !!}
+
+                            <input type="hidden" name="referer" value="{{ $referer }}" />
+
+
+                            <ui-field :label="__('Email')" error="{{ $errors->first('email') }}">
+                                <ui-input
+                                    name="email"
+                                    value="{{ old('email') }}"
+                                    autofocus
+                                    tabindex="1"
+                                />
+                            </ui-field>
+
+                            <ui-field :label="__('Password')" error="{{ $errors->first('password') }}">
+                                <ui-input
+                                    name="password"
+                                    type="password"
+                                    value="{{ old('password') }}"
+                                    tabindex="2"
+                                />
+                                <template #actions>
+                                    <a href="{{ cp_route('password.request') }}" class="text-blue-400 text-sm hover:text-blue-600" tabindex="3">
+                                        {{ __('Forgot password?') }}
                                     </a>
-                                </div>
+                                </template>
+                            </ui-field>
+
+                            <ui-checkbox-item name="remember" :label="__('Remember me')" />
+
+                            <ui-button type="submit" variant="primary" :disabled="busy" :text="__('Continue')" />
+
+                        </form>
+                    @endif
+                    @if ($oauth)
+                        @if ($emailLoginEnabled)
+                            <ui-separator variant="dots" :text="__('Or sign in with')" class="py-3" />
+                        @endif
+                        <div class="flex gap-4 justify-center items-center">
+                            @foreach ($providers as $provider)
+                                <ui-button as="href" class="flex-1" href="{{ $provider->loginUrl() }}?redirect={{ parse_url(cp_route('index'))['path'] }}">
+                                    @cp_svg("oauth/".$provider->name(), 'size-7')
+                                </ui-button>
                             @endforeach
                         </div>
-
-                        @if ($emailLoginEnabled)
-                            <div class="py-6 text-center text-sm text-gray-700">&mdash; {{ __('or') }} &mdash;</div>
-
-                            <div class="login-with-email" v-if="! showEmailLogin">
-                                <a class="btn w-full" @click.prevent="showEmailLogin = true">
-                                    {{ __('Log in with email') }}
-                                </a>
-                            </div>
-                        @endif
                     @endif
-
-                    <form
-                        method="POST"
-                        v-show="showEmailLogin"
-                        class="email-login select-none"
-                        @if ($oauth) v-cloak @endif
-                        @submit="busy = true"
-                    >
-                        {!! csrf_field() !!}
-
-                        <input type="hidden" name="referer" value="{{ $referer }}" />
-
-                        <div class="mb-8">
-                            <label class="mb-2" for="input-email">{{ __('Email') }}</label>
-                            <input
-                                type="text"
-                                class="input-text input-text"
-                                name="email"
-                                value="{{ old('email') }}"
-                                autofocus
-                                id="input-email"
-                            />
-                            @if ($hasError('email'))
-                                <div class="mt-2 text-xs text-red-500">{{ $errors->first('email') }}</div>
-                            @endif
-                        </div>
-
-                        <div class="mb-8">
-                            <label class="mb-2" for="input-password">{{ __('Password') }}</label>
-                            <input type="password" class="input-text input-text" name="password" id="input-password" />
-                            @if ($hasError('password'))
-                                <div class="mt-2 text-xs text-red-500">{{ $errors->first('password') }}</div>
-                            @endif
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <label for="remember-me" class="flex cursor-pointer items-center">
-                                <input type="checkbox" name="remember" id="remember-me" />
-                                <span class="ltr:ml-2 rtl:mr-2">{{ __('Remember me') }}</span>
-                            </label>
-                            <button type="submit" class="btn-primary" :disabled="busy">{{ __('Log in') }}</button>
-                        </div>
-                    </form>
                 </div>
             </login>
-        </div>
+        </ui-auth-card>
     </div>
-    @if ($emailLoginEnabled)
-        <div class="mt-4 w-full text-center dark:mt-6">
-            <a
-                href="{{ cp_route('password.request') }}"
-                class="forgot-password-link text-sm opacity-75 hover:opacity-100"
-            >
-                {{ __('Forgot password?') }}
-            </a>
-        </div>
-    @endif
 @endsection

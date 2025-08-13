@@ -13,7 +13,7 @@ class Time extends Fieldtype
     {
         return [
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Appearance'),
                 'fields' => [
                     'seconds_enabled' => [
                         'display' => __('Show Seconds'),
@@ -21,6 +21,11 @@ class Time extends Fieldtype
                         'type' => 'toggle',
                         'default' => false,
                     ],
+                ],
+            ],
+            [
+                'display' => __('Data & Format'),
+                'fields' => [
                     'default' => [
                         'display' => __('Default Value'),
                         'instructions' => __('statamic::messages.fields_default_instructions'),

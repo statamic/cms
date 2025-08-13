@@ -4,6 +4,7 @@ namespace Tests\CP\Navigation;
 
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\CP\Navigation\NavItem;
 use Statamic\Facades;
@@ -78,7 +79,6 @@ class NavTest extends TestCase
 
         Nav::droids('C-3PO')
             ->id('some::custom::id')
-            ->active('threepio*')
             ->url('/human-cyborg-relations')
             ->view('cp.nav.importer')
             ->can('index', DroidsClass::class)
@@ -91,14 +91,13 @@ class NavTest extends TestCase
         $this->assertEquals('C-3PO', $item->display());
         $this->assertEquals('http://localhost/human-cyborg-relations', $item->url());
         $this->assertEquals('cp.nav.importer', $item->view());
-        $this->assertEquals('threepio*', $item->active());
         $this->assertEquals('index', $item->authorization()->ability);
         $this->assertEquals(DroidsClass::class, $item->authorization()->arguments);
         $this->assertEquals(' target="_blank" class="red"', $item->attributes());
     }
 
     #[Test]
-    public function it_can_create_a_nav_item_which_uses_default_entries_icon()
+    public function it_can_create_a_nav_item_which_uses_default_collections_icon()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
@@ -107,24 +106,7 @@ class NavTest extends TestCase
         $item = $this->build()->get('Utilities')->last();
 
         $this->assertNull($item->icon());
-        $this->assertEquals(\Statamic\Statamic::svg('icons/light/entries'), $item->svg());
-    }
-
-    #[Test]
-    public function it_can_create_a_nav_item_with_references_to_a_bundled_light_svg_icon()
-    {
-        File::put($svg = statamic_path('resources/svg/icons/light/test.svg'), '<svg>the totally real svg</svg>');
-
-        $this->actingAs(tap(User::make()->makeSuper())->save());
-
-        Nav::utilities('Test')->icon('test');
-
-        $item = $this->build()->get('Utilities')->last();
-
-        $this->assertEquals('test', $item->icon());
-        $this->assertEquals('<svg>the totally real svg</svg>', $item->svg());
-
-        File::delete($svg);
+        $this->assertEquals(\Statamic\Statamic::svg('icons/collections', 'size-4 shrink-0'), $item->svg());
     }
 
     #[Test]
@@ -139,8 +121,11 @@ class NavTest extends TestCase
 
         $expected = '<svg><circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" /></svg>';
 
+        // ->icon() should return the raw SVG we passed in
         $this->assertEquals($expected, $item->icon());
-        $this->assertEquals($expected, $item->svg());
+
+        // ->svg() should return the SVG wrapped in classes for styling
+        $this->assertEquals(Str::replace('<svg>', '<svg class="size-4 shrink-0">', $expected), $item->svg());
     }
 
     #[Test]
@@ -233,7 +218,7 @@ class NavTest extends TestCase
     #[Test]
     public function it_sets_parent_icon_on_children()
     {
-        File::put($svg = statamic_path('resources/svg/icons/light/droid.svg'), '<svg>droid</svg>');
+        File::put($svg = statamic_path('resources/svg/icons/droid.svg'), '<svg>droid</svg>');
 
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
@@ -249,13 +234,13 @@ class NavTest extends TestCase
         $item = $this->build()->get('Droids')->first();
 
         $this->assertEquals('droid', $item->icon());
-        $this->assertEquals('<svg>droid</svg>', $item->svg());
+        $this->assertEquals('<svg class="size-4 shrink-0">droid</svg>', $item->svg());
         $this->assertEquals('droid', $item->children()->get(0)->icon());
-        $this->assertEquals('<svg>droid</svg>', $item->children()->get(0)->svg());
+        $this->assertEquals('<svg class="size-4 shrink-0">droid</svg>', $item->children()->get(0)->svg());
         $this->assertEquals('droid', $item->children()->get(1)->icon());
-        $this->assertEquals('<svg>droid</svg>', $item->children()->get(1)->svg());
+        $this->assertEquals('<svg class="size-4 shrink-0">droid</svg>', $item->children()->get(1)->svg());
         $this->assertEquals('droid', $item->children()->get(2)->icon());
-        $this->assertEquals('<svg>droid</svg>', $item->children()->get(2)->svg());
+        $this->assertEquals('<svg class="size-4 shrink-0">droid</svg>', $item->children()->get(2)->svg());
 
         File::delete($svg);
     }
@@ -497,17 +482,14 @@ class NavTest extends TestCase
     {
         tap(Nav::create('external-absolute')->url('http://domain.com'), function ($nav) {
             $this->assertEquals('http://domain.com', $nav->url());
-            $this->assertNull($nav->active());
         });
 
         tap(Nav::create('site-relative')->url('/foo/bar'), function ($nav) {
             $this->assertEquals('http://localhost/foo/bar', $nav->url());
-            $this->assertNull($nav->active());
         });
 
         tap(Nav::create('cp-relative')->url('foo/bar'), function ($nav) {
             $this->assertEquals('http://localhost/cp/foo/bar', $nav->url());
-            $this->assertEquals('foo/bar(/(.*)?|$)', $nav->active());
         });
     }
 
@@ -530,9 +512,8 @@ class NavTest extends TestCase
     #[Test]
     public function it_does_not_automatically_add_a_resolve_children_pattern_when_setting_url_if_one_is_already_defined()
     {
-        $nav = Nav::create('cp-relative')->active('foo.*')->url('foo/bar');
+        $nav = Nav::create('cp-relative')->url('foo/bar');
         $this->assertEquals('http://localhost/cp/foo/bar', $nav->url());
-        $this->assertEquals('foo.*', $nav->active());
     }
 
     #[Test]

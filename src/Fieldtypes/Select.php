@@ -17,7 +17,7 @@ class Select extends Fieldtype
     {
         return [
             [
-                'display' => __('Options'),
+                'display' => __('Selection & Options'),
                 'fields' => [
                     'options' => [
                         'display' => __('Options'),
@@ -27,69 +27,78 @@ class Select extends Fieldtype
                         'key_header' => __('Key'),
                         'value_header' => __('Label').' ('.__('Optional').')',
                         'add_button' => __('Add Option'),
+                        'width' => '50',
                     ],
                     'taggable' => [
                         'display' => __('Allow additions'),
                         'instructions' => __('statamic::fieldtypes.select.config.taggable'),
                         'type' => 'toggle',
                         'default' => false,
-                    ],
-                    'push_tags' => [
-                        'display' => __('Push Tags'),
-                        'instructions' => __('statamic::fieldtypes.select.config.push_tags'),
-                        'type' => 'toggle',
-                        'default' => false,
+                        'width' => '50',
                     ],
                 ],
             ],
             [
-                'display' => __('Selection'),
+                'display' => __('Appearance'),
                 'fields' => [
                     'placeholder' => [
                         'display' => __('Placeholder'),
                         'instructions' => __('statamic::fieldtypes.select.config.placeholder'),
                         'type' => 'text',
                         'default' => '',
-                    ],
-                    'multiple' => [
-                        'display' => __('Multiple'),
-                        'instructions' => __('statamic::fieldtypes.select.config.multiple'),
-                        'type' => 'toggle',
-                        'default' => false,
-                    ],
-                    'max_items' => [
-                        'display' => __('Max Items'),
-                        'instructions' => __('statamic::messages.max_items_instructions'),
-                        'min' => 1,
-                        'type' => 'integer',
+                        'width' => '33',
                     ],
                     'clearable' => [
                         'display' => __('Clearable'),
                         'instructions' => __('statamic::fieldtypes.select.config.clearable'),
                         'type' => 'toggle',
                         'default' => false,
+                        'width' => '33',
                     ],
                     'searchable' => [
                         'display' => __('Searchable'),
                         'instructions' => __('statamic::fieldtypes.select.config.searchable'),
                         'type' => 'toggle',
                         'default' => true,
+                        'width' => '33',
                     ],
                 ],
             ],
             [
-                'display' => __('Data'),
+                'display' => __('Boundaries & Limits'),
+                'fields' => [
+                    'multiple' => [
+                        'display' => __('Multiple'),
+                        'instructions' => __('statamic::fieldtypes.select.config.multiple'),
+                        'type' => 'toggle',
+                        'default' => false,
+                        'width' => '50',
+                    ],
+                    'max_items' => [
+                        'display' => __('Max Items'),
+                        'instructions' => __('statamic::messages.max_items_instructions'),
+                        'min' => 1,
+                        'type' => 'integer',
+                        'width' => '50',
+                        'if' => ['multiple' => true],
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Data & Format'),
                 'fields' => [
                     'cast_booleans' => [
                         'display' => __('Cast Booleans'),
                         'instructions' => __('statamic::fieldtypes.any.config.cast_booleans'),
                         'type' => 'toggle',
                         'default' => false,
+                        'width' => '50',
                     ],
                     'default' => [
                         'display' => __('Default Value'),
                         'instructions' => __('statamic::messages.fields_default_instructions'),
                         'type' => 'text',
+                        'width' => '50',
                     ],
                 ],
             ],

@@ -1,27 +1,28 @@
 <template>
     <div>
-        <dropdown-list :disabled="creatables.length === 1">
+        <ui-dropdown :disabled="creatables.length === 1">
             <template #trigger>
-                <button
-                    class="text-button flex items-center text-blue outline-none hover:text-gray-800 dark:text-dark-blue-100 dark:hover:text-dark-100 ltr:mr-6 rtl:ml-6"
+                <ui-button
+                    :icon="icon"
+                    :text="text"
+                    variant="filled"
                     @click="create"
-                >
-                    <svg-icon
-                        name="light/content-writing"
-                        class="flex h-4 w-4 items-center ltr:mr-1 rtl:ml-1"
-                    ></svg-icon>
-                    <span class="hidden @sm:block" v-text="__('Create & Link Item')" />
-                    <span class="@sm:hidden" v-text="__('Create')" />
-                </button>
+                />
             </template>
-
-            <dropdown-item
-                v-for="creatable in creatables"
-                :key="creatable.url"
-                :text="creatable.title"
-                @click="select(creatable)"
-            />
-        </dropdown-list>
+            <ui-dropdown-menu>
+                <ui-dropdown-label v-text="__('Choose Blueprint')" />
+                <ui-dropdown-item
+                    v-for="creatable in creatables"
+                    :key="creatable.url"
+                    @click="select(creatable)"
+                >
+                    <div class="flex items-center justify-between">
+                        <span>{{ creatable.blueprint }}</span>
+                        <ui-badge size="sm" variant="flat">{{ creatable.parent_title }}</ui-badge>
+                    </div>
+                </ui-dropdown-item>
+            </ui-dropdown-menu>
+        </ui-dropdown>
 
         <inline-create-form
             v-if="isCreating"
@@ -50,6 +51,8 @@ export default {
         component: String,
         componentProps: Object,
         stackSize: String,
+        icon: String,
+        text: String,
     },
 
     data() {

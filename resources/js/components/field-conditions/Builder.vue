@@ -1,26 +1,24 @@
 <template>
     <div class="w-full">
-        <div class="form-group publish-field select-fieldtype field-w-full">
-            <label class="publish-field-label">{{ __('Conditions') }}</label>
-            <div class="help-block -mt-2">
-                <p>{{ __('messages.field_conditions_instructions') }}</p>
-            </div>
+        <Field
+            :label="__('Conditions')"
+            :instructions="__('messages.field_conditions_instructions')"
+        >
+            <div class="mb-6 flex items-center gap-x-4">
+                <Select v-model="when" :options="whenOptions" />
 
-            <div class="mb-6 flex items-center">
-                <select-input v-model="when" :options="whenOptions" :placeholder="false" />
-
-                <select-input
+                <Select
                     v-if="hasConditions"
                     v-model="type"
                     :options="typeOptions"
-                    :placeholder="false"
-                    class="ltr:ml-4 rtl:mr-4"
                 />
 
-                <text-input v-if="hasConditions && isCustom" v-model="customMethod" class="flex-1 ltr:ml-4 rtl:mr-4" />
+                <Input v-if="hasConditions && isCustom" v-model="customMethod" class="flex-1" />
             </div>
+        </Field>
 
-            <condition
+        <div class="mb-6">
+            <Condition
                 v-if="hasConditions && isStandard"
                 v-for="(condition, index) in conditions"
                 :index="index"
@@ -34,17 +32,16 @@
             />
 
             <div class="border-t pt-6 dark:border-dark-900" v-if="hasConditions && isStandard">
-                <button v-text="__('Add Condition')" @click="add" class="btn-default" />
+                <Button :text="__('Add Condition')" @click="add" />
             </div>
         </div>
 
-        <div class="form-group publish-field select-fieldtype field-w-full">
-            <label class="publish-field-label">{{ __('Always Save') }}</label>
-            <div class="help-block -mt-2">
-                <p>{{ __('messages.field_conditions_always_save_instructions') }}</p>
-            </div>
-            <toggle-input v-model="alwaysSave" />
-        </div>
+        <Field
+            :label="__('Always Save')"
+            :instructions="__('messages.field_conditions_always_save_instructions')"
+        >
+            <Switch v-model="alwaysSave" />
+        </Field>
     </div>
 </template>
 
@@ -55,11 +52,21 @@ import Converter from '../field-conditions/Converter.js';
 import { KEYS, OPERATORS } from '../field-conditions/Constants.js';
 import Condition from './Condition.vue';
 import { __ } from '../../bootstrap/globals';
+import { Field, Input, Button } from '@statamic/ui';
+import Select from '@statamic/components/ui/Select/Select.vue';
+import Switch from '@statamic/components/ui/Switch.vue';
 
 export default {
     mixins: [HasInputOptions],
 
-    components: { Condition },
+    components: {
+        Field,
+        Input,
+        Button,
+        Select,
+        Switch,
+        Condition,
+    },
 
     props: {
         config: {

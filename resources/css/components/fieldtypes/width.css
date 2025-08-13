@@ -38,7 +38,7 @@
         }
 
         &.filled {
-            @apply border-gray-500 bg-gradient-to-b from-white to-gray-100 dark:border-dark-750 dark:from-dark-300 dark:to-dark-400;
+            @apply border-gray-500 bg-linear-to-b from-white to-gray-100 dark:border-dark-750 dark:from-dark-300 dark:to-dark-400;
         }
     }
 

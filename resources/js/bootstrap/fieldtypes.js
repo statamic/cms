@@ -1,10 +1,6 @@
 import { defineAsyncComponent } from 'vue';
 import RevealerFieldtype from '../components/fieldtypes/RevealerFieldtype.vue';
 import TemplateFieldtype from '../components/fieldtypes/TemplateFieldtype.vue';
-import Select from '../components/inputs/Select.vue';
-import Text from '../components/inputs/Text.vue';
-import Textarea from '../components/inputs/Textarea.vue';
-import Toggle from '../components/inputs/Toggle.vue';
 import RelationshipInput from '../components/inputs/relationship/RelationshipInput.vue';
 import TextFieldtype from '../components/fieldtypes/TextFieldtype.vue';
 import TextareaFieldtype from '../components/fieldtypes/TextareaFieldtype.vue';
@@ -14,6 +10,7 @@ import AssetsFieldtype from '../components/fieldtypes/assets/AssetsFieldtype.vue
 import AssetsIndexFieldtype from '../components/fieldtypes/assets/AssetsIndexFieldtype.vue';
 import AssetFolderFieldtype from '../components/fieldtypes/AssetFolderFieldtype.vue';
 import BardButtonsSettingFieldtype from '../components/fieldtypes/bard/BardButtonsSettingFieldtype.vue';
+import BlueprintsFieldtype from '../components/fieldtypes/BlueprintsFieldtype.vue';
 import ButtonGroupFieldtype from '../components/fieldtypes/ButtonGroupFieldtype.vue';
 import CheckboxesFieldtype from '../components/fieldtypes/CheckboxesFieldtype.vue';
 import Routes from '../components/collections/Routes.vue';
@@ -59,13 +56,9 @@ import ToggleIndexFieldtype from '../components/fieldtypes/ToggleIndexFieldtype.
 import WidthFieldtype from '../components/fieldtypes/WidthFieldtype.vue';
 import VideoFieldtype from '../components/fieldtypes/VideoFieldtype.vue';
 import SetPicker from '../components/fieldtypes/replicator/SetPicker.vue';
-import SetField from '../components/fieldtypes/replicator/Field.vue';
+import TimeFieldtype from '../components/fieldtypes/TimeFieldtype.vue';
 
 export default function registerFieldtypes(app) {
-    app.component('select-input', Select);
-    app.component('text-input', Text);
-    app.component('textarea-input', Textarea);
-    app.component('toggle-input', Toggle);
     app.component('relationship-input', RelationshipInput);
     app.component('text-fieldtype', TextFieldtype);
     app.component('textarea-fieldtype', TextareaFieldtype);
@@ -84,6 +77,7 @@ export default function registerFieldtypes(app) {
     );
     app.component('bard_buttons_setting-fieldtype', BardButtonsSettingFieldtype);
     app.component('button_group-fieldtype', ButtonGroupFieldtype);
+    app.component('blueprints-fieldtype', BlueprintsFieldtype);
     app.component('checkboxes-fieldtype', CheckboxesFieldtype);
     app.component(
         'code-fieldtype',
@@ -132,10 +126,7 @@ export default function registerFieldtypes(app) {
     app.component('tags-fieldtype-index', TagsIndexFieldtype);
     app.component('taggable-fieldtype-index', TagsIndexFieldtype);
     app.component('template_folder-fieldtype', TemplateFolderFieldtype);
-    app.component(
-        'time-fieldtype',
-        defineAsyncComponent(() => import('../components/fieldtypes/TimeFieldtype.vue')),
-    );
+    app.component('time-fieldtype', TimeFieldtype);
     app.component('toggle-fieldtype', ToggleFieldtype);
     app.component('toggle-fieldtype-index', ToggleIndexFieldtype);
     app.component('width-fieldtype', WidthFieldtype);
@@ -145,7 +136,6 @@ export default function registerFieldtypes(app) {
         defineAsyncComponent(() => import('../components/fieldtypes/YamlFieldtype.vue')),
     );
     app.component('set-picker', SetPicker);
-    app.component('set-field', SetField);
     app.component('revealer-fieldtype', RevealerFieldtype);
     app.component('template-fieldtype', TemplateFieldtype);
 }

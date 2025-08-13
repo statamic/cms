@@ -1,8 +1,11 @@
 <template>
-    <node-view-wrapper>
+    <node-view-wrapper class="my-4">
         <div
-            class="bard-set my-6 whitespace-normal rounded border bg-white shadow-md dark:border-dark-900 dark:bg-dark-500"
-            :class="{ 'border-blue-400 dark:border-dark-blue-100': selected || withinSelection, 'has-error': hasError }"
+            class="shadow-ui-sm relative z-2 w-full rounded-lg border border-gray-200 bg-white text-base dark:border-x-0 dark:border-t-0 dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
+            :class="{
+                'dark:border-dark-blue-100 border-blue-400!': selected || withinSelection,
+                'border-red-500': hasError,
+            }"
             :data-type="config.handle"
             contenteditable="false"
             @copy.stop
@@ -10,102 +13,131 @@
             @cut.stop
         >
             <div ref="content" hidden />
-            <div class="replicator-set-header" :class="{ collapsed: collapsed, invalid: isInvalid }">
-                <div class="item-move sortable-handle" data-drag-handle />
-                <div
-                    class="replicator-set-header-inner flex flex-1 cursor-pointer items-center p-2"
-                    :class="{ 'flex items-center': collapsed }"
-                    @click="toggleCollapsedState"
-                >
-                    <label class="text-xs ltr:mr-2 rtl:ml-2">
+            <header
+                class="group/header animate-border-color flex items-center rounded-lg border-b border-transparent px-1.5 antialiased duration-200 dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900!"
+                :class="{ 'rounded-b-none border-gray-200 dark:border-white/10': !collapsed }"
+            >
+                <Icon data-drag-handle name="handles" class="size-4 cursor-grab text-gray-400" v-if="!isReadOnly" />
+                <button type="button" class="flex flex-1 items-center gap-4 p-2" @click="toggleCollapsedState">
+                    <Badge variant="flat" size="lg">
                         <span v-if="isSetGroupVisible">
                             {{ __(setGroup.display) }}
-                            <svg-icon name="micro/chevron-right" class="w-4" />
+                            <Icon name="ui/chevron-right" class="relative top-px size-3" />
                         </span>
-                        {{ display || config.handle }}
-                    </label>
-                    <div class="flex items-center" v-if="config.instructions && !collapsed">
-                        <svg-icon
-                            name="micro/circle-help"
-                            class="h-3 w-3 text-xs text-gray-700 hover:text-gray-800 dark:text-dark-175 dark:hover:text-dark-100"
-                            v-tooltip="{ content: $markdown(__(config.instructions)), html: true }"
+                        {{ __(config.display) || config.handle }}
+                    </Badge>
+                    <Tooltip :markdown="__(config.instructions)">
+                        <Icon
+                            v-if="config.instructions && !collapsed"
+                            name="info-square"
+                            class="size-3.5! text-gray-500"
                         />
-                    </div>
-                    <div v-show="collapsed" class="w-1 min-w-0 flex-1 ltr:pr-8 rtl:pl-8">
-                        <div
-                            v-html="previewText"
-                            class="help-block mb-0 overflow-hidden text-ellipsis whitespace-nowrap"
-                        />
-                    </div>
-                </div>
-                <div class="replicator-set-controls">
-                    <toggle-fieldtype
-                        handle="set-enabled"
-                        class="toggle-sm ltr:mr-4 rtl:ml-4"
-                        v-model:value="enabled"
-                        v-tooltip.top="enabled ? __('Included in output') : __('Hidden from output')"
+                    </Tooltip>
+                    <Subheading
+                        v-show="collapsed"
+                        v-html="previewText"
+                        class="overflow-hidden text-ellipsis whitespace-nowrap"
                     />
-                    <dropdown-list>
-                        <dropdown-actions :actions="fieldActions" v-if="fieldActions.length" />
-                        <div class="divider" />
-                        <dropdown-item
-                            :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))"
-                            @click="toggleCollapsedState"
-                        />
-                        <dropdown-item :text="__('Duplicate Set')" @click="duplicate" />
-                        <dropdown-item :text="__('Delete Set')" class="warning" @click="deleteNode" />
-                    </dropdown-list>
+                </button>
+                <div class="flex items-center gap-2" v-if="!isReadOnly">
+                    <Tooltip :text="enabled ? __('Included in output') : __('Hidden from output')" as="span">
+                        <Switch size="xs" v-model="enabled" />
+                    </Tooltip>
+
+                    <Dropdown>
+                        <template #trigger>
+                            <Button icon="ui/dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
+                        </template>
+                        <DropdownMenu>
+                            <DropdownItem
+                                v-if="fieldActions.length"
+                                v-for="action in fieldActions"
+                                :text="action.title"
+                                :variant="action.dangerous ? 'destructive' : 'default'"
+                                @click="action.run(action)"
+                            />
+                            <DropdownSeparator v-if="fieldActions.length" />
+                            <DropdownItem
+                                :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))"
+                                @click="toggleCollapsedState"
+                            />
+                            <DropdownItem :text="__('Duplicate Set')" @click="duplicate" />
+                            <DropdownItem
+                                :text="__('Delete Set')"
+                                variant="destructive"
+                                @click="deleteNode"
+                            />
+                        </DropdownMenu>
+                    </Dropdown>
                 </div>
-            </div>
-            <div class="replicator-set-body publish-fields @container" v-show="!collapsed" v-if="index !== undefined">
-                <set-field
-                    v-for="field in fields"
-                    v-show="showField(field, fieldPath(field))"
-                    :key="field.handle"
-                    :field="field"
-                    :value="values[field.handle]"
-                    :meta="meta[field.handle]"
-                    :parent-name="parentName"
-                    :set-index="index"
-                    :field-path="fieldPath(field)"
-                    :read-only="isReadOnly"
-                    :show-field-previews="showFieldPreviews"
-                    @updated="updated(field.handle, $event)"
-                    @meta-updated="metaUpdated(field.handle, $event)"
-                    @focus="focused"
-                    @blur="blurred"
-                    @replicator-preview-updated="previewUpdated(field.handle, $event)"
-                />
-            </div>
+            </header>
+
+            <Motion
+                layout
+                v-if="index !== undefined"
+                class="overflow-hidden"
+                :initial="{ height: collapsed ? '0px' : 'auto' }"
+                :animate="{ height: collapsed ? '0px' : 'auto' }"
+                :transition="{ duration: 0.25, type: 'tween' }"
+            >
+                <FieldsProvider
+                    :fields="fields"
+                    :field-path-prefix="fieldPathPrefix"
+                    :meta-path-prefix="metaPathPrefix"
+                >
+                    <Fields class="p-4" />
+                </FieldsProvider>
+            </Motion>
         </div>
     </node-view-wrapper>
 </template>
 
 <script>
 import { NodeViewWrapper } from '@tiptap/vue-3';
-import SetField from '../replicator/Field.vue';
 import ManagesPreviewText from '../replicator/ManagesPreviewText';
-import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
 import HasFieldActions from '../../field-actions/HasFieldActions.js';
-import DropdownActions from '../../field-actions/DropdownActions.vue';
+import { Badge, Button, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, Icon, Subheading, Switch, Tooltip } from '@statamic/ui';
+import { Motion } from 'motion-v';
+import FieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
+import Fields from '@statamic/components/ui/Publish/Fields.vue';
+import { containerContextKey } from '@statamic/components/ui/Publish/Container.vue';
 
 export default {
-    props: [
-        'editor', // the editor instance
-        'node', // access the current node
-        'decorations', // an array of decorations
-        'selected', // true when there is a NodeSelection at the current node view
-        'extension', // access to the node extension, for example to get options
-        'getPos', // get the document position of the current node
-        'updateAttributes', // update attributes of the current node.
-        'deleteNode', // delete the current node
-    ],
+    props: {
+        editor: { type: Object, required: true },
+        node: { type: Object, required: true },
+        decorations: { type: Array, required: true },
+        selected: { type: Boolean, required: true },
+        extension: { type: Object, required: true },
+        getPos: { type: Function, required: true },
+        updateAttributes: { type: Function, required: true },
+        deleteNode: { type: Function, required: true },
+    },
 
-    components: { NodeViewWrapper, SetField, DropdownActions },
+    components: {
+        Button,
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
+        DropdownSeparator,
+        Fields,
+        FieldsProvider,
+        Switch,
+        Tooltip,
+        Subheading,
+        Badge,
+        Icon,
+        NodeViewWrapper,
+        Motion,
+    },
 
-    mixins: [ValidatesFieldConditions, ManagesPreviewText, HasFieldActions],
+    mixins: [ManagesPreviewText, HasFieldActions],
 
-    inject: ['bard', 'bardSets', 'store', 'storeName'],
+    inject: {
+        bard: {},
+        bardSets: {},
+        publishContainer: { from: containerContextKey },
+    },
 
     computed: {
         fields() {
@@ -129,7 +161,7 @@ export default {
         },
 
         previews() {
-            return this.extension.options.bard.meta.previews[this.node.attrs.id] || {};
+            return data_get(this.publishContainer.previews.value, this.fieldPathPrefix) || {};
         },
 
         collapsed() {
@@ -177,12 +209,28 @@ export default {
             return this.extension.options.bard.setIndexes[this.node.attrs.id];
         },
 
+        fieldPathPrefix() {
+            const fpf = this.extension.options.bard.fieldPathPrefix;
+            const handle = this.extension.options.bard.handle;
+            const prefix = fpf ? `${fpf}.${handle}` : handle;
+
+            return `${prefix}.${this.index}.attrs.values`;
+        },
+
+        metaPathPrefix() {
+            const mpp = this.extension.options.bard.metaPathPrefix;
+            const handle = this.extension.options.bard.handle;
+            const prefix = mpp ? `${mpp}.${handle}` : handle;
+
+            return `${prefix}.existing.${this.node.attrs.id}`;
+        },
+
         instructions() {
             return this.config.instructions ? markdown(__(this.config.instructions)) : null;
         },
 
         hasError() {
-            return this.extension.options.bard.setsWithErrors.includes(this.index);
+            return this.extension.options.bard.setHasError(this.node.attrs.id);
         },
 
         showFieldPreviews() {
@@ -207,40 +255,27 @@ export default {
 
         fieldActionPayload() {
             return {
-                vm: this,
-                fieldVm: this.fieldVm,
-                fieldPathPrefix: this.fieldVm.fieldPathPrefix || this.fieldVm.handle,
+                // vm: this,
+                // fieldVm: this.fieldVm,
+                // fieldPathPrefix: this.fieldVm.fieldPathPrefix || this.fieldVm.handle,
                 index: this.index,
                 values: this.values,
                 config: this.config,
-                meta: this.meta,
-                update: (handle, value) => this.updated(handle, value),
-                updateMeta: (handle, value) => this.metaUpdated(handle, value),
+                // meta: this.meta,
+                update: (handle, value) =>
+                    this.publishContainer.setFieldValue(`${this.fieldPathPrefix}.${handle}`, value),
+                updateMeta: (handle, value) =>
+                    this.publishContainer.setFieldMeta(`${this.metaPathPrefix}.${handle}`, value),
                 isReadOnly: this.isReadOnly,
-                store: this.store,
-                storeName: this.storeName,
             };
         },
+
+        fieldActionBinding() {
+            return 'bard-fieldtype-set';
+        }
     },
 
     methods: {
-        updated(handle, value) {
-            let values = Object.assign({}, this.values);
-            values.type = this.config.handle;
-            values[handle] = value;
-            this.updateAttributes({ values });
-        },
-
-        metaUpdated(handle, value) {
-            let meta = clone(this.meta);
-            meta[handle] = value;
-            this.extension.options.bard.updateSetMeta(this.node.attrs.id, meta);
-        },
-
-        previewUpdated(handle, value) {
-            this.extension.options.bard.updateSetPreviews(this.node.attrs.id, { ...this.previews, [handle]: value });
-        },
-
         focused() {
             this.extension.options.bard.$emit('focus');
         },
@@ -279,11 +314,6 @@ export default {
                 this.node.attrs,
                 this.getPos() + this.node.nodeSize,
             );
-        },
-
-        fieldPath(field) {
-            let prefix = this.extension.options.bard.fieldPathPrefix || this.extension.options.bard.handle;
-            return `${prefix}.${this.index}.attrs.values.${field.handle}`;
         },
     },
 

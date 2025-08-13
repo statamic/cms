@@ -1,38 +1,35 @@
 <template>
-    <div class="my-4 flex items-center" :class="{ 'text-red-500': status == 'error' }">
-        <div class="flex flex-1 items-center">
-            <div class="mx-2 flex items-center">
-                <svg-icon name="micro/warning" class="h-4 w-4 text-red-500" v-if="status === 'error'" />
-                <loading-graphic v-else :inline="true" text="" />
+    <div class="p-3 overflow-hidden dark:border-gray-700 dark:bg-gray-800 text-sm text-gray-600 dark:text-gray-400">
+        <div class="flex flex-1 items-center gap-3">
+            <div class="size-7 flex items-center justify-center">
+                <ui-icon name="warning-diamond" class="size-5 text-red-500" v-tooltip="error" v-if="status === 'error'" />
+                <Icon v-else name="loading" />
             </div>
 
-            <div class="filename">{{ basename }}</div>
+            <div class="truncate">{{ basename }}</div>
+
+            <div v-if="status !== 'error'" class="h-1.5 flex-1 rounded-lg bg-gray-100">
+                <div class="h-full rounded-sm bg-blue-500" :style="{ width: percent + '%' }" />
+            </div>
+            <div class="flex-1" v-else />
+
+            <div class="flex items-center gap-2" v-if="status === 'error'">
+                <Dropdown v-if="errorStatus === 409">
+                    <template #trigger>
+                        <Button size="xs" :text="`${__('Fix')}...`" />
+                    </template>
+                    <DropdownMenu>
+                        <DropdownItem @click="retryAndOverwrite" :text="__('messages.uploader_overwrite_existing')" />
+                        <DropdownItem @click="openNewFilenameModal" :text="`${__('messages.uploader_choose_new_filename')}...`" />
+                        <DropdownItem @click="retryWithTimestamp" :text="__('messages.uploader_append_timestamp')" />
+                        <DropdownItem @click="selectExisting" v-if="allowSelectingExisting" :text="__('messages.uploader_discard_use_existing')" />
+                    </DropdownMenu>
+                </Dropdown>
+                <Button size="xs" @click="clear" :text="__('Discard')" />
+            </div>
         </div>
 
-        <div v-if="status !== 'error'" class="mx-2 h-4 flex-1 rounded bg-white">
-            <div class="h-full rounded bg-blue" :style="{ width: percent + '%' }" />
-        </div>
 
-        <div class="ml-4 flex items-center gap-2 px-2" v-if="status === 'error'">
-            {{ error }}
-            <dropdown-list v-if="errorStatus === 409">
-                <template #trigger>
-                    <button class="btn btn-xs ml-4" v-text="`${__('Fix')}...`" />
-                </template>
-                <dropdown-item @click="retryAndOverwrite" :text="__('messages.uploader_overwrite_existing')" />
-                <dropdown-item
-                    @click="openNewFilenameModal"
-                    :text="`${__('messages.uploader_choose_new_filename')}...`"
-                />
-                <dropdown-item @click="retryWithTimestamp" :text="__('messages.uploader_append_timestamp')" />
-                <dropdown-item
-                    @click="selectExisting"
-                    v-if="allowSelectingExisting"
-                    :text="__('messages.uploader_discard_use_existing')"
-                />
-            </dropdown-list>
-            <button class="btn btn-xs" @click="clear" v-text="__('Discard')" />
-        </div>
 
         <confirmation-modal
             v-if="showNewFilenameModal"
@@ -40,13 +37,24 @@
             @cancel="showNewFilenameModal = false"
             @confirm="confirmNewFilename"
         >
-            <text-input autoselect v-model="newFilename" @keydown.enter="confirmNewFilename" />
+            <Input autoselect v-model="newFilename" @keydown.enter="confirmNewFilename" />
         </confirmation-modal>
     </div>
 </template>
 
 <script>
+import { Button, Dropdown, DropdownMenu, DropdownItem, Input, Icon } from '@statamic/ui';
+
 export default {
+    components: {
+        Button,
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
+        Input,
+        Icon,
+    },
+
     props: {
         extension: String,
         basename: String,

@@ -1,76 +1,103 @@
 <template>
     <div>
-        <header class="mb-6">
-            <breadcrumb :url="cp_url('users')" :title="__('Users')" />
-            <div class="flex items-center">
-                <h1 class="flex-1" v-text="title" />
-                <dropdown-list class="ltr:mr-4 rtl:ml-4" v-if="canEditBlueprint || hasItemActions">
-                    <dropdown-item
-                        :text="__('Edit Blueprint')"
-                        v-if="canEditBlueprint"
-                        :redirect="actions.editBlueprint"
-                    />
-                    <li class="divider" />
-                    <data-list-inline-actions
-                        v-if="hasItemActions"
-                        :item="values.id"
-                        :url="itemActionUrl"
-                        :actions="itemActions"
-                        :is-dirty="isDirty"
-                        @started="actionStarted"
-                        @completed="actionCompleted"
-                    />
-                </dropdown-list>
+        <Header :title="title" icon="users">
+            <ItemActions
+                v-if="canEditBlueprint || hasItemActions"
+                :item="values.id"
+                :url="itemActionUrl"
+                :actions="itemActions"
+                :is-dirty="isDirty"
+                @started="actionStarted"
+                @completed="actionCompleted"
+                v-slot="{ actions: itemActions }"
+            >
+                <Dropdown>
+                    <template #trigger>
+                        <Button icon="ui/dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
+                    </template>
+                    <DropdownMenu>
+                        <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :href="actions.editBlueprint" />
+                        <DropdownSeparator v-if="canEditBlueprint && itemActions.length" />
+                        <DropdownItem
+                            v-for="action in itemActions"
+                            :key="action.handle"
+                            :text="__(action.title)"
+                            :icon="action.icon"
+                            :variant="action.dangerous ? 'destructive' : 'default'"
+                            @click="action.run"
+                        />
+                    </DropdownMenu>
+                </Dropdown>
+            </ItemActions>
 
-                <change-password
-                    v-if="canEditPassword"
-                    :save-url="actions.password"
-                    :requires-current-password="requiresCurrentPassword"
-                    class="ltr:mr-4 rtl:ml-4"
-                />
+            <TwoFactor v-if="twoFactor" v-bind="twoFactor" />
 
-                <button class="btn-primary" @click.prevent="save" v-text="__('Save')" />
+            <change-password
+                v-if="canEditPassword"
+                :save-url="actions.password"
+                :requires-current-password="requiresCurrentPassword"
+            />
 
-                <slot name="action-buttons-right" />
-            </div>
-        </header>
+            <Button variant="primary" @click.prevent="save" v-text="__('Save')" />
 
-        <publish-container
+            <slot name="action-buttons-right" />
+        </Header>
+
+        <PublishContainer
             v-if="fieldset"
             ref="container"
             :name="publishContainer"
-            :blueprint="fieldset"
-            :values="values"
             :reference="initialReference"
+            :blueprint="fieldset"
+            v-model="values"
             :meta="meta"
             :errors="errors"
-            @updated="values = $event"
-            v-slot="{ container, setFieldValue, setFieldMeta }"
         >
-            <div>
-                <publish-tabs
-                    :enable-sidebar="false"
-                    @updated="setFieldValue"
-                    @meta-updated="setFieldMeta"
-                    @focus="container.$emit('focus', $event)"
-                    @blur="container.$emit('blur', $event)"
-                ></publish-tabs>
-            </div>
-        </publish-container>
+            <PublishTabs />
+        </PublishContainer>
     </div>
 </template>
 
 <script>
 import ChangePassword from './ChangePassword.vue';
-import HasHiddenFields from '../publish/HasHiddenFields';
 import HasActions from '../publish/HasActions';
+import TwoFactor from '@statamic/components/two-factor/TwoFactor.vue';
 import clone from '@statamic/util/clone.js';
+import resetValuesFromResponse from '@statamic/util/resetValuesFromResponse.js';
+import {
+    Button,
+    Dropdown,
+    DropdownMenu,
+    DropdownItem,
+    DropdownSeparator,
+    PublishContainer,
+    PublishTabs,
+    Header,
+} from '@statamic/ui';
+import ItemActions from '@statamic/components/actions/ItemActions.vue';
+import { SavePipeline } from '@statamic/exports.js';
+import { computed, ref } from 'vue';
+const { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } = SavePipeline;
+
+let saving = ref(false);
+let errors = ref({});
+let container = null;
 
 export default {
-    mixins: [HasHiddenFields, HasActions],
+    mixins: [HasActions],
 
     components: {
+        ItemActions,
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
+        DropdownSeparator,
+        Button,
         ChangePassword,
+        TwoFactor,
+        PublishContainer,
+        PublishTabs,
+        Header,
     },
 
     props: {
@@ -85,6 +112,7 @@ export default {
         canEditPassword: Boolean,
         canEditBlueprint: Boolean,
         requiresCurrentPassword: Boolean,
+        twoFactor: Object,
     },
 
     data() {
@@ -99,58 +127,43 @@ export default {
     },
 
     computed: {
-        store() {
-            return this.$refs.container.store;
-        },
-
-        hasErrors() {
-            return this.error || Object.keys(this.errors).length;
-        },
-
         isDirty() {
             return this.$dirty.has(this.publishContainer);
         },
     },
 
     methods: {
-        clearErrors() {
-            this.error = null;
-            this.errors = {};
-        },
-
         save() {
-            this.clearErrors();
-
-            this.$axios[this.method](this.actions.save, this.visibleValues)
+            new Pipeline()
+                .provide({ container, errors, saving })
+                .through([
+                    new BeforeSaveHooks('user', {
+                        values: this.values,
+                    }),
+                    new Request(this.actions.save, this.method),
+                    new AfterSaveHooks('user', {
+                        reference: this.initialReference,
+                    }),
+                ])
                 .then((response) => {
+                    Statamic.$toast.success('Saved');
+
                     this.title = response.data.title;
-                    this.values = this.resetValuesFromResponse(response.data.data.values);
-                    if (!response.data.saved) {
-                        return this.$toast.error(`Couldn't save user`);
-                    }
-                    if (!this.isCreating) this.$toast.success(__('Saved'));
-                    this.$refs.container.saved();
+
                     this.$nextTick(() => this.$emit('saved', response));
-                })
-                .catch((e) => {
-                    if (e.response && e.response.status === 422) {
-                        const { message, errors } = e.response.data;
-                        this.error = message;
-                        this.errors = errors;
-                        this.$toast.error(message);
-                        this.$reveal.invalid();
-                    } else {
-                        this.$toast.error(__('Something went wrong'));
-                    }
                 });
         },
 
         afterActionSuccessfullyCompleted(response) {
             if (response.data) {
                 this.title = response.data.title;
-                this.values = this.resetValuesFromResponse(response.data.values);
+                this.values = resetValuesFromResponse(response.data.values, this.$refs.container);
             }
         },
+    },
+
+    created() {
+        container = computed(() => this.$refs.container);
     },
 
     mounted() {

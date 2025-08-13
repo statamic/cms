@@ -2,211 +2,99 @@
     use function Statamic\trans as __;
 @endphp
 
-<div class="global-header">
-    <div class="lg:min-w-xl flex h-full items-center ltr:pl-2 ltr:md:pl-6 rtl:pr-2 rtl:md:pr-6">
-        <button
-            class="nav-toggle hidden shrink-0 md:flex ltr:ml-1 rtl:mr-1"
-            @click="toggleNav"
-            aria-label="{{ __('Toggle Nav') }}"
-        >
-            @cp_svg('icons/light/burger', 'h-4 w-4')
-        </button>
-        <button
-            class="nav-toggle shrink-0 md:hidden ltr:ml-1 rtl:mr-1"
-            @click="toggleMobileNav"
-            v-if="! mobileNavOpen"
-            aria-label="{{ __('Toggle Mobile Nav') }}"
-        >
-            @cp_svg('icons/light/burger', 'h-4 w-4')
-        </button>
-        <button
-            class="nav-toggle shrink-0 md:hidden ltr:ml-1 rtl:mr-1"
-            @click="toggleMobileNav"
-            v-else
-            v-cloak
-            aria-label="{{ __('Toggle Mobile Nav') }}"
-        >
-            @cp_svg('icons/light/close', 'h-3 w-3')
-        </button>
-        <a href="{{ route('statamic.cp.index') }}" class="flex items-end">
-            <div v-tooltip="version" class="hidden shrink-0 md:block">
-                @if ($customLogo)
-                    <img
-                        src="{{ $customLogo }}"
-                        alt="{{ config('statamic.cp.custom_cms_name') }}"
-                        class="white-label-logo dark:hidden"
-                    />
-                    <img
-                        src="{{ $customDarkLogo }}"
-                        alt="{{ config('statamic.cp.custom_cms_name') }}"
-                        class="white-label-logo hidden dark:block"
-                    />
-                @elseif ($customLogoText)
-                    <span class="font-medium">{{ $customLogoText }}</span>
-                @else
-                    @cp_svg('statamic-wordmark', 'logo w-24')
-                    @if (Statamic::pro())
-                        <span class="align-top text-4xs font-bold uppercase">{{ __('Pro') }}</span>
-                    @endif
-                @endif
-            </div>
-        </a>
-    </div>
-
-    <div class="mx-auto w-full max-w-full flex-1 items-center sm:px-8 lg:flex lg:justify-center">
-        <global-search
-            ref="globalSearch"
-            endpoint="{{ cp_route('search') }}"
-            placeholder="{{ __('Search...') }}"
-        ></global-search>
-    </div>
-
-    <div class="head-link flex h-full items-center justify-end space-x-3 px-6 rtl:space-x-reverse">
-        @if (Statamic\Facades\Site::authorized()->count() > 1)
-            <global-site-selector>
-                <template slot="icon">@cp_svg('icons/light/sites')</template>
-            </global-site-selector>
-        @endif
-
-        <dark-mode-toggle initial="{{ $user->preferredTheme() }}"></dark-mode-toggle>
-
-        <favorite-creator class="hidden md:block"></favorite-creator>
-
-        @if (Route::has('horizon.index') && \Laravel\Horizon\Horizon::check(request()))
-            <a
-                class="global-header-icon-button hidden md:block"
-                href="{{ route('horizon.index') }}"
-                target="_blank"
-                v-tooltip="'Laravel Horizon'"
-            >
-                @cp_svg('icons/regular/horizon')
+<header class="h-14 bg-gray-800 flex justify-between space-x-2 items-center text-white px-4 dark fixed top-0 inset-x-0 z-[3]">
+    <a class="c-skip-link z-(--z-index-header) px-4 py-2 bg-blue-800 text-sm top-2.5 left-2.25 fixed opacity-0 -translate-y-24 focus:translate-y-0 focus:opacity-100 motion-safe:transition-all motion-safe:ease-[var(--animation-timing-function-fast-out-slow-in)] rounded-md" href="#main">
+        {{ __('Skip to sidebar') }}
+    </a>
+    <a class="c-skip-link z-(--z-index-header) px-4 py-2 bg-blue-800 text-sm top-2.5 left-2.25 fixed opacity-0 -translate-y-24 focus:translate-y-0 focus:opacity-100 motion-safe:transition-all motion-safe:duration-200 motion-safe:ease-[var(--animation-timing-function-fast-out-slow-in)] rounded-md" href="#main-content">
+        {{ __('Skip to content') }}
+    </a>
+    <div class="flex items-center gap-2 text-[0.8125rem] text-gray-300">
+        {{-- Logo --}}
+        @if ($customDarkLogo)
+            <button class="flex items-center group cursor-pointer text-gray-300 hover:text-white" type="button" @click="toggleNav" aria-label="{{ __('Toggle Nav') }}">
+                <div class="p-1 size-7 inset-0 flex items-center justify-center">
+                    @cp_svg('icons/burger-menu', 'size-5')
+                </div>
+            </button>
+            <img src="{{ $customDarkLogo }}" alt="{{ config('statamic.cp.custom_cms_name') }}" class="max-w-[260px] max-h-9">
+        @else
+        <div class="flex items-center gap-2 relative">
+            <button class="flex items-center group rounded-full cursor-pointer" type="button" @click="toggleNav" aria-label="{{ __('Toggle Nav') }}" style="--focus-outline-offset: 0.2rem;">
+                <div class="opacity-0 group-hover:opacity-100 p-1 size-7 transition-opacity duration-150 absolute inset-0 flex items-center justify-center">
+                    @cp_svg('icons/burger-menu', 'size-5')
+                </div>
+                @cp_svg('ui/statamic-mark-lime', 'size-7 group-hover:opacity-0 transition-opacity duration-150')
+            </button>
+            <a href="{{ route('statamic.cp.index') }}" class="text-gray-300 rounded-xs" style="--focus-outline-offset: var(--outline-offset-button);">
+                {{ $customLogoText ?? config('app.name') }}
             </a>
-        @endif
-
-        @if (Route::has('pulse') && (app()->environment('local') || $user->can('viewPulse')))
-            <a
-                class="global-header-icon-button hidden md:block"
-                href="{{ route('pulse') }}"
-                target="_blank"
-                v-tooltip="'Laravel Pulse'"
-            >
-                @cp_svg('icons/regular/pulse')
-            </a>
-        @endif
-
-        @if (config('nova.path') && (app()->environment('local') || $user->can('viewNova')))
-            <a
-                class="global-header-icon-button hidden md:block"
-                href="/{{ trim(config('nova.path'), '/') }}/dashboards/main"
-                target="_blank"
-                v-tooltip="'Laravel Nova'"
-            >
-                @cp_svg('icons/regular/nova')
-            </a>
-        @endif
-
-        @if (Route::has('telescope') && \Laravel\Telescope\Telescope::check(request()))
-            <a
-                class="global-header-icon-button hidden md:block"
-                href="{{ route('telescope') }}"
-                target="_blank"
-                v-tooltip="'Laravel Telescope'"
-            >
-                @cp_svg('icons/regular/telescope')
-            </a>
-        @endif
-
-        <dropdown-list v-cloak>
-            <template v-slot:trigger>
-                <button
-                    class="global-header-icon-button hidden md:block"
-                    v-tooltip="__('Useful Links')"
-                    aria-label="{{ __('View Useful Links') }}"
-                >
-                    @cp_svg('icons/light/book-open')
-                </button>
-            </template>
-
-            @if (config('statamic.cp.link_to_docs'))
-                <dropdown-item external-link="https://statamic.dev" class="flex items-center">
-                    <span>{{ __('Documentation') }}</span>
-                    <i class="block w-3 ltr:ml-2 rtl:mr-2">@cp_svg('icons/light/external-link')</i>
-                </dropdown-item>
+            @if (Statamic::pro())
+                <ui-badge size="sm" variant="flat" text="Pro" class="select-none dark:bg-gray-700/55!" />
             @endif
+        </div>
+        @endif
 
-            @if (config('statamic.cp.support_url'))
-                <dropdown-item external-link="{{ config('statamic.cp.support_url') }}" class="flex items-center">
-                    <span>{{ __('Support') }}</span>
-                    <i class="block w-3 ltr:ml-2 rtl:mr-2">@cp_svg('icons/light/external-link')</i>
-                </dropdown-item>
-            @endif
-
-            <dropdown-item @click="$events.$emit('keyboard-shortcuts.open')" class="flex items-center">
-                <span>{{ __('Keyboard Shortcuts') }}</span>
-            </dropdown-item>
-        </dropdown-list>
-
-        <a
-            class="global-header-icon-button hidden md:block"
-            href="{{ Statamic\Facades\Site::selected()->url() }}"
-            target="_blank"
-            v-tooltip="'{{ __('View Site') }}'"
-            aria-label="{{ __('View Site') }}"
-        >
-            @cp_svg('icons/light/browser-com')
-        </a>
-        <dropdown-list v-cloak>
-            <template v-slot:trigger>
-                <a class="dropdown-toggle hide group relative flex h-full items-center">
-                    @if ($user->avatar())
-                        <div
-                            class="icon-header-avatar {{ session()->get('statamic_impersonated_by') ? 'animate-radar' : '' }}"
-                        >
-                            <img src="{{ $user->avatar() }}" />
-                        </div>
-                    @else
-                        <div
-                            class="icon-header-avatar {{ session()->get('statamic_impersonated_by') ? 'animate-radar' : '' }} icon-user-initials"
-                        >
-                            {{ $user->initials() }}
-                        </div>
-                    @endif
-                </a>
-            </template>
-
-            <div class="px-2">
-                <div class="mb-px text-base">{{ $user->email() }}</div>
-                @if ($user->isSuper())
-                    <div class="mt-px text-2xs text-gray-600">
-                        {{ __('Super Admin') }}
-                        @if (session()->get('statamic_impersonated_by'))
-                            (Impersonating)
+        @foreach($breadcrumbs as $breadcrumb)
+            <span class="text-gray-500">/</span>
+            <ui-button href="{{ $breadcrumb->url() }}" text="{{ __($breadcrumb->text()) }}" size="sm" variant="ghost"></ui-button>
+            @if($breadcrumb->hasLinks() || $breadcrumb->createUrl())
+                <ui-dropdown v-cloak class="relative">
+                    <template #trigger>
+                        <ui-button variant="ghost" icon="ui/chevron-vertical" class="[&_svg]:size-3! h-8! w-4! hover:bg-gray-300/5! -ml-3 mr-1"></ui-button>
+                    </template>
+                    <ui-dropdown-header
+                        class="grid grid-cols-[auto_1fr_auto] items-center"
+                        icon="{{ $breadcrumb->icon() }}"
+                        @if($breadcrumb->hasConfigureUrl())
+                            append-icon="cog-solid"
+                            append-href="{{ $breadcrumb->configureUrl() }}"
                         @endif
-                    </div>
-                @elseif (session()->get('statamic_impersonated_by'))
-                    <div class="mt-px text-2xs text-gray-600">{{ __('Impersonating') }}</div>
-                @endif
-            </div>
-            <div class="divider"></div>
-
-            <dropdown-item :text="__('Profile')" redirect="{{ route('statamic.cp.account') }}"></dropdown-item>
-            <dropdown-item
-                :text="__('Preferences')"
-                redirect="{{ cp_route('preferences.user.edit') }}"
-            ></dropdown-item>
-            @if (session()->get('statamic_impersonated_by'))
-                <dropdown-item
-                    :text="__('Stop Impersonating')"
-                    redirect="{{ cp_route('impersonation.stop') }}"
-                ></dropdown-item>
+                    >
+                        <a href="{{ $breadcrumb->url() }}">
+                            {{ __($breadcrumb->text()) }}
+                        </a>
+                    </ui-dropdown-header>
+                    @if($breadcrumb->hasLinks())
+                        <ui-dropdown-menu>
+                            @foreach($breadcrumb->links() as $link)
+                                <ui-dropdown-item
+                                    text="{{ __($link->text) }}"
+                                    icon="{{ $link->icon }}"
+                                    href="{{ $link->url }}"
+                                ></ui-dropdown-item>
+                            @endforeach
+                        </ui-dropdown-menu>
+                    @endif
+                    @if($breadcrumb->createUrl())
+                        <ui-dropdown-footer icon="plus" text="{{ __($breadcrumb->createLabel()) }}" href="{{ $breadcrumb->createUrl() }}"></ui-button>
+                    @endif
+                </ui-dropdown>
             @endif
-
-            <dropdown-item
-                :text="__('Log out')"
-                redirect="{{ route('statamic.cp.logout', ['redirect' => cp_route('index')]) }}"
-            ></dropdown-item>
-        </dropdown-list>
+        @endforeach
     </div>
-</div>
-
-<div v-if="$refs.globalSearch?.focused" v-cloak class="fixed inset-0 z-2 h-full w-full bg-black/10"></div>
+    <div class="flex-1 flex gap-4 items-center justify-end">
+        @if (Statamic\Facades\Site::authorized()->count() > 1)
+            <global-site-selector></global-site-selector>
+        @endif
+        <div><command-palette /></div>
+        <ui-command-palette-item
+            text="{{ __('View Site') }}"
+            icon="visit-website"
+            url="{{ Statamic\Facades\Site::selected()->url() }}"
+            open-new-tab
+            v-slot="{ text, url, icon }"
+        >
+            <ui-button
+                :icon="icon"
+                class="[&_svg]:size-4 -me-3"
+                variant="ghost"
+                :href="url"
+                target="_blank"
+                v-tooltip="text"
+                :aria-label="text"
+            ></ui-button>
+        </ui-command-palette-item>
+        <x-statamic::user-dropdown />
+    </div>
+</header>

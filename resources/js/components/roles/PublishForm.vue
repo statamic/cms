@@ -1,59 +1,58 @@
 <template>
-    <div>
-        <header class="mb-6">
-            <breadcrumb :url="breadcrumbUrl" :title="__('Roles & Permissions')" />
-            <div class="flex items-center justify-between">
-                <h1 v-text="__(initialTitle) || __('Create Role')" />
-                <button type="submit" class="btn-primary" @click="save">{{ __('Save') }}</button>
+    <div class="max-w-5xl mx-auto">
+        <Header :title="__(initialTitle) || __('Create Role')" icon="permissions">
+            <Button type="submit" variant="primary" @click="save" :text="__('Save')" />
+        </Header>
+
+        <Panel>
+            <div class="publish-fields-fluid">
+                <Field
+                    as="card"
+                    class="field-w-50"
+                    :label="__('Title')"
+                    :instructions="__('messages.role_title_instructions')"
+                    :errors="errors.title"
+                    id="role-title"
+                >
+                    <Input v-model="title" id="role-title" autocomplete="off" focus />
+                </Field>
+
+                <Field
+                    as="card"
+                    class="field-w-50"
+                    :label="__('Handle')"
+                    :instructions="__('messages.role_handle_instructions')"
+                    :errors="handleErrors"
+                    id="role-handle"
+                >
+                    <Input v-model="handle" id="role-handle" autocomplete="off" />
+                </Field>
+
+                <Field
+                    as="card"
+                    v-if="canAssignSuper"
+                    :label="__('permissions.super')"
+                    :instructions="__('permissions.super_desc')"
+                    id="role-super"
+                >
+                    <Switch v-model="isSuper" id="role-super" />
+                </Field>
             </div>
-        </header>
+        </Panel>
 
-        <div class="card configure-tab publish-fields mb-6 p-0 @container">
-            <form-group
-                handle="title"
-                class="border-b dark:border-dark-900"
-                :display="__('Title')"
-                :errors="errors.title"
-                :instructions="__('messages.role_title_instructions')"
-                v-model="title"
-                :focus="true"
-            />
-
-            <form-group
-                class="border-b dark:border-dark-900"
-                fieldtype="slug"
-                handle="handle"
-                :display="__('Handle')"
-                :instructions="__('messages.role_handle_instructions')"
-                :errors="errors.title"
-                v-model="handle"
-            />
-
-            <div class="p-6 pt-0 text-xs text-red-500" v-if="initialHandle && handle != initialHandle">
-                {{ __('messages.role_change_handle_warning') }}
-            </div>
-
-            <form-group
-                v-if="canAssignSuper"
-                class="toggle-fieldtype"
-                fieldtype="toggle"
-                handle="super"
-                :display="__('permissions.super')"
-                :instructions="__('permissions.super_desc')"
-                v-model="isSuper"
-            />
-        </div>
-
-        <div v-if="!isSuper">
-            <div class="content mt-6" v-for="group in permissions" :key="group.handle">
-                <h2 class="mb-2 mt-10 text-base">{{ group.label }}</h2>
-                <role-permission-tree class="card p-0" :depth="1" :initial-permissions="group.permissions" />
-            </div>
+        <div v-if="!isSuper" class="space-y-6 mt-6">
+            <CardPanel v-for="group in permissions" :key="group.handle" :heading="group.label">
+                <PermissionTree :depth="1" :initial-permissions="group.permissions" />
+            </CardPanel>
         </div>
     </div>
 </template>
 
 <script>
+import { Header, Button, CardPanel, Panel, PanelHeader, Heading, Card, Switch, Field, Input } from '@statamic/ui';
+import { requireElevatedSession } from '@statamic/components/elevated-sessions';
+import PermissionTree from '@statamic/components/roles/PermissionTree.vue';
+
 const checked = function (permissions) {
     return permissions.reduce((carry, permission) => {
         if (!permission.checked) return carry;
@@ -62,6 +61,20 @@ const checked = function (permissions) {
 };
 
 export default {
+    components: {
+        PermissionTree,
+        Header,
+        Button,
+        CardPanel,
+        Panel,
+        PanelHeader,
+        Heading,
+        Card,
+        Switch,
+        Field,
+        Input,
+    },
+
     props: {
         initialTitle: String,
         initialHandle: String,
@@ -70,7 +83,6 @@ export default {
         canAssignSuper: Boolean,
         action: String,
         method: String,
-        breadcrumbUrl: String,
         indexUrl: String,
     },
 
@@ -92,8 +104,14 @@ export default {
     },
 
     computed: {
-        hasErrors() {
-            return this.error || Object.keys(this.errors).length;
+        handleErrors() {
+            let errors = this.errors.handle || [];
+
+            if (this.initialHandle && this.handle !== this.initialHandle) {
+                errors = errors.concat(__('messages.role_change_handle_warning'));
+            }
+
+            return errors;
         },
 
         payload() {
@@ -119,6 +137,12 @@ export default {
         },
 
         save() {
+            requireElevatedSession()
+                .then(() => this.performSaveAction())
+                .catch(() => this.$toast.error(__('Unable to save role')));
+        },
+
+        performSaveAction() {
             this.clearErrors();
 
             this.$axios[this.method](this.action, this.payload)

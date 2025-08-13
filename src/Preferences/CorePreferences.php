@@ -25,26 +25,11 @@ class CorePreferences
             'instructions' => __('statamic::messages.preference_start_page_instructions'),
         ]);
 
-        Preference::register('favorites', [
-            'type' => 'grid',
-            'display' => __('Favorites'),
-            'instructions' => __('statamic::messages.preference_favorites_instructions'),
-            'fields' => [
-                [
-                    'handle' => 'name',
-                    'field' => [
-                        'type' => 'text',
-                        'width' => 33,
-                    ],
-                ],
-                [
-                    'handle' => 'url',
-                    'field' => [
-                        'display' => __('URL'),
-                        'type' => 'text',
-                    ],
-                ],
-            ],
+        Preference::register('strict_accessibility', [
+            'type' => 'toggle',
+            'display' => __('Strict WCAG 2.2 Conformity'),
+            'instructions' => __('statamic::messages.preference_wcag').'<br><a href="https://www.w3.org/WAI/WCAG2AA-Conformance" title="Explanation of WCAG 2 Level AA conformance" class="inline-block mt-3"><img height="32" width="88" src="https://www.w3.org/WAI/WCAG22/wcag2.2AA" alt="Level AA conformance, W3C WAI Web Content Accessibility Guidelines 2.2"></a>',
+            'variant' => 'inline',
         ]);
     }
 
@@ -61,6 +46,7 @@ class CorePreferences
             'de_CH' => 'German (Switzerland)',
             'en' => 'English',
             'es' => 'Spanish',
+            'et' => 'Estonian',
             'fa' => 'Persian',
             'fr' => 'French',
             'hu' => 'Hungarian',
@@ -91,7 +77,7 @@ class CorePreferences
                 ['label' => $label, 'native' => $native] = $item;
 
                 if ($locale !== $current && $label !== $native) {
-                    $label .= '<span class="ltr:ml-4 rtl:mr-4 text-gray-600">'.$native.'</span>';
+                    $label .= '<span class="ms-4 text-gray-600">'.$native.'</span>';
                 }
 
                 return $label;

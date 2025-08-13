@@ -1,69 +1,71 @@
 <template>
     <div>
-        <div v-if="!singleTab && tabs.length > 0" class="tabs-container relative">
-            <div
-                ref="tabs"
-                class="tabs flex flex-1 space-x-3 overflow-auto ltr:pr-6 rtl:space-x-reverse rtl:pl-6"
-                role="tablist"
-            >
-                <tab
-                    ref="tab"
+        <div>
+            <Tabs v-model="currentTab" :unmount-on-hide="false">
+                <div v-if="!singleTab && tabs.length > 0" class="flex items-center justify-between gap-x-2 mb-6">
+                    <TabList class="flex-1">
+                        <BlueprintTab
+                            ref="tab"
+                            v-for="tab in tabs"
+                            :key="tab._id"
+                            :tab="tab"
+                            :current-tab="currentTab"
+                            :show-instructions="showTabInstructionsField"
+                            :edit-text="editTabText"
+                            @removed="removeTab(tab._id)"
+                            @updated="updateTab(tab._id, $event)"
+                            @mouseenter="mouseEnteredTab(tab._id)"
+                        />
+                    </TabList>
+
+                    <Button icon="plus" size="sm" round v-tooltip="addTabText" @click="addAndEditTab" />
+                </div>
+
+                <Button
+                    v-if="!singleTab && tabs.length === 0"
+                    :text="addTabText"
+                    @click="addAndEditTab"
+                />
+
+                <Description v-if="errors" v-for="(error, i) in errors" :key="i" :text="error" class="mt-2 text-red-500" />
+
+                <BlueprintTabContent
                     v-for="tab in tabs"
+                    ref="tabContent"
                     :key="tab._id"
                     :tab="tab"
-                    :current-tab="currentTab"
-                    :show-instructions="showTabInstructionsField"
-                    :edit-text="editTabText"
-                    @selected="selectTab(tab._id)"
-                    @removed="removeTab(tab._id)"
+                    v-show="currentTab === tab._id"
+                    :show-section-handle-field="showSectionHandleField"
+                    :show-section-hide-field="showSectionHideField"
+                    :new-section-text="newSectionText"
+                    :edit-section-text="editSectionText"
+                    :add-section-text="addSectionText"
+                    :can-define-localizable="canDefineLocalizable"
                     @updated="updateTab(tab._id, $event)"
-                    @mouseenter="mouseEnteredTab(tab._id)"
                 />
-                <div class="fade-left" v-if="canScrollLeft" />
-            </div>
-            <div class="fade-right ltr:right-10 rtl:left-10" />
-            <button
-                class="btn-round relative top-1 flex items-center justify-center ltr:ml-2 rtl:mr-2"
-                @click="addAndEditTab"
-                v-tooltip="addTabText"
-            >
-                <svg-icon name="add" class="h-3 w-3" />
-            </button>
+            </Tabs>
         </div>
-        <button v-if="!singleTab && tabs.length === 0" class="btn" @click="addAndEditTab" v-text="addTabText" />
-        <div v-if="errors" class="-mt-2">
-            <small class="help-block text-red-500" v-for="(error, i) in errors" :key="i" v-text="error" />
-        </div>
-        <tab-content
-            v-for="tab in tabs"
-            ref="tabContent"
-            :key="tab._id"
-            :tab="tab"
-            v-show="currentTab === tab._id"
-            :show-section-handle-field="showSectionHandleField"
-            :show-section-hide-field="showSectionHideField"
-            :new-section-text="newSectionText"
-            :edit-section-text="editSectionText"
-            :add-section-text="addSectionText"
-            :can-define-localizable="canDefineLocalizable"
-            @updated="updateTab(tab._id, $event)"
-        />
     </div>
 </template>
 
 <script>
 import { Sortable, Plugins } from '@shopify/draggable';
 import uniqid from 'uniqid';
-import Tab from './Tab.vue';
-import TabContent from './TabContent.vue';
+import BlueprintTab from './Tab.vue';
+import BlueprintTabContent from './TabContent.vue';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';
+import { Tabs, TabList, Button, Description } from '@statamic/ui';
 
 export default {
     mixins: [CanDefineLocalizable],
 
     components: {
-        Tab,
-        TabContent,
+        BlueprintTab,
+        BlueprintTabContent,
+        Tabs,
+        TabList,
+        Button,
+        Description,
     },
 
     props: {

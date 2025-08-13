@@ -1,51 +1,41 @@
 <template>
-    <div class="h-full overflow-auto bg-gray-300 p-8 dark:bg-dark-800">
-        <div class="-mt-2 mb-6 flex items-center">
-            <h1 class="flex-1">
-                <small
-                    class="mt-2 block flex items-center text-xs font-medium leading-none text-gray-700 dark:text-dark-175"
-                >
-                    <svg-icon
-                        class="inline-block h-4 w-4 text-gray-700 dark:text-dark-175 ltr:mr-2 rtl:ml-2"
-                        name="paperclip"
-                    />{{ __('Linked fieldset') }}
-                </small>
-                {{ __('Fieldset') }}
-            </h1>
-            <button
-                class="text-sm text-gray-700 hover:text-gray-800 dark:text-dark-175 dark:hover:text-dark-100 ltr:mr-6 rtl:ml-6"
-                @click.prevent="close"
-                v-text="__('Cancel')"
-            ></button>
-            <button class="btn-primary" @click.prevent="commit" v-text="__('Finish')"></button>
-        </div>
-
-        <div class="card">
-            <div class="publish-fields @container">
-                <form-group
-                    handle="fieldset"
-                    :display="__('Fieldset')"
-                    :instructions="__('messages.fieldset_import_fieldset_instructions')"
-                    autofocus
-                    :model-value="config.fieldset"
-                    @update:model-value="updateField('fieldset', $event)"
-                />
-
-                <form-group
-                    handle="prefix"
-                    :display="__('Prefix')"
-                    :instructions="__('messages.fieldset_import_prefix_instructions')"
-                    :model-value="config.prefix"
-                    @update:model-value="updateField('prefix', $event)"
-                />
+    <div class="h-full overflow-auto bg-white dark:bg-gray-800 p-3 rounded-l-xl">
+        <header class="flex items-center justify-between pl-3 mb-6">
+            <Heading :text="__('Linked fieldset')" size="lg" icon="fieldsets" />
+            <div class="flex items-center gap-3">
+                <Button variant="ghost" :text="__('Cancel')" @click.prevent="close" />
+                <Button variant="primary" @click.prevent="commit" :text="__('Apply')" />
+                <Button v-if="isInsideSet" variant="primary" @click.prevent="commit(true)" :text="__('Apply & Close All')" />
             </div>
-        </div>
+        </header>
+
+        <CardPanel :heading="__('Linked fieldset')">
+            <div class="publish-fields">
+                <Field :label="__('Fieldset')" :instructions="__('messages.fieldset_import_fieldset_instructions')" class="form-group field-w-100">
+                    <Input autofocus :model-value="config.fieldset" @update:model-value="updateField('fieldset', $event)" />
+                </Field>
+
+                <Field :label="__('Prefix')" :instructions="__('messages.fieldset_import_prefix_instructions')" class="form-group field-w-100">
+                    <Input autofocus :model-value="config.prefix" @update:model-value="updateField('prefix', $event)" />
+                </Field>
+            </div>
+        </CardPanel>
     </div>
 </template>
 
 <script>
+import { Button, Heading, CardPanel, Field, Input } from '@statamic/ui';
+
 export default {
-    props: ['config'],
+    components: { Heading, Button, CardPanel, Field, Input },
+
+    props: ['config', 'isInsideSet'],
+
+    inject: {
+        commitParentField: {
+            default: () => {}
+        }
+    },
 
     model: {
         prop: 'config',
@@ -67,9 +57,13 @@ export default {
             this.values[handle] = value;
         },
 
-        commit() {
+        commit(shouldCommitParent = false) {
             this.$emit('committed', this.values);
             this.close();
+
+            if (shouldCommitParent && this.commitParentField) {
+                this.commitParentField(true);
+            }
         },
 
         close() {

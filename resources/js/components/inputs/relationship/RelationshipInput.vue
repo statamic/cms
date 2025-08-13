@@ -1,12 +1,13 @@
 <template>
-    <div class="relationship-input" :class="{ 'relationship-input-empty': items.length == 0 }">
-        <relationship-select-field
+    <div class="relationship-input @container w-full h-full" :class="{ 'relationship-input-empty': items.length == 0 }">
+        <RelationshipSelectField
             v-if="!initializing && usesSelectField"
             :config="config"
             :items="items"
             :multiple="maxItems > 1"
             :typeahead="mode === 'typeahead'"
             :taggable="taggable"
+            :max-selections="maxItems"
             :read-only="readOnly"
             :url="selectionsUrl"
             :site="site"
@@ -15,13 +16,13 @@
             @blur="$emit('blur')"
         />
 
-        <loading-graphic v-if="initializing" :inline="true" />
+        <Icon v-if="initializing" name="loading" />
 
         <template v-if="shouldShowSelectedItems">
             <div
+                v-if="items.length"
                 ref="items"
-                class="relationship-input-items space-y-1 outline-none"
-                :class="{ 'mt-4': usesSelectField && items.length }"
+                :class="{ 'mt-2': usesSelectField && items.length }"
             >
                 <component
                     :is="itemComponent"
@@ -30,52 +31,50 @@
                     :item="item"
                     :config="config"
                     :status-icon="statusIcons"
-                    :editable="canEdit"
+                    :editable="canEdit && (item.editable || item.editable === undefined)"
                     :sortable="!readOnly && canReorder"
                     :read-only="readOnly"
                     :form-component="formComponent"
                     :form-component-props="formComponentProps"
                     :form-stack-size="formStackSize"
-                    class="item outline-none"
+                    class="related-item"
                     @removed="remove(i)"
                 />
             </div>
 
-            <div class="py-2 text-xs text-gray" v-if="maxItemsReached && maxItems != 1">
+            <div class="text-gray py-2 text-xs" v-if="maxItemsReached && maxItems != 1">
                 <span>{{ __('Maximum items selected:') }}</span>
                 <span>{{ maxItems }}/{{ maxItems }}</span>
             </div>
             <div
                 v-if="canSelectOrCreate"
-                class="relationship-input-buttons relative @container"
+                class="relationship-input-buttons @container relative"
                 :class="{ 'mt-4': items.length > 0 }"
             >
-                <div class="-mb-2 flex flex-wrap items-center text-sm">
-                    <div class="relative mb-2">
-                        <create-button
-                            v-if="canCreate && creatables.length"
-                            :creatables="creatables"
-                            :site="site"
-                            :component="formComponent"
-                            :component-props="formComponentProps"
-                            :stack-size="formStackSize"
-                            @created="itemCreated"
-                        />
-                    </div>
-                    <button
+                <div class="flex flex-wrap items-center gap-2">
+                    <CreateButton
+                        v-if="canCreate && creatables.length"
+                        :creatables="creatables"
+                        :component="formComponent"
+                        :component-props="formComponentProps"
+                        :icon="icon"
+                        :text="createLabel"
+                        :site="site"
+                        :stack-size="formStackSize"
+                        @created="itemCreated"
+                    />
+                    <Button
                         ref="existing"
-                        class="mb-2 flex items-center text-blue outline-none hover:text-gray-800 dark:text-dark-blue-100 dark:hover:text-dark-100"
+                        icon="link"
+                        variant="filled"
+                        :text="linkLabel"
                         @click.prevent="isSelecting = true"
-                    >
-                        <svg-icon name="light/hyperlink" class="flex h-4 w-4 items-center ltr:mr-1 rtl:ml-1"></svg-icon>
-                        <span class="hidden @sm:block" v-text="__('Link Existing Item')" />
-                        <span class="@sm:hidden" v-text="__('Link')" />
-                    </button>
+                    />
                 </div>
             </div>
 
             <stack name="item-selector" v-if="isSelecting" @closed="isSelecting = false" v-slot="{ close }">
-                <item-selector
+                <ItemSelector
                     :name="name"
                     :filters-url="filtersUrl"
                     :selections-url="selectionsUrl"
@@ -105,6 +104,7 @@ import ItemSelector from './Selector.vue';
 import CreateButton from './CreateButton.vue';
 import { Sortable, Plugins } from '@shopify/draggable';
 import RelationshipSelectField from './SelectField.vue';
+import { Button, Icon } from '@statamic/ui';
 
 export default {
     props: {
@@ -152,11 +152,15 @@ export default {
         },
     },
 
+    emits: ['input', 'focus', 'blur', 'item-data-updated', 'loading'],
+
     components: {
         ItemSelector,
         RelatedItem,
         CreateButton,
         RelationshipSelectField,
+        Button,
+        Icon,
     },
 
     data() {
@@ -172,6 +176,50 @@ export default {
     },
 
     computed: {
+        icon() {
+            if (this.config.type === 'taxonomies') {
+                return 'add-tag';
+            }
+
+            if (this.config.type === 'users') {
+                return 'add-user';
+            }
+
+            return 'add-entry';
+        },
+
+        createLabel() {
+            if (this.config.type === 'entries') {
+                return __('Create Entry');
+            }
+
+            if (this.config.type === 'taxonomies') {
+                return __('Create Taxonomy');
+            }
+
+            if (this.config.type === 'users') {
+                return __('Create User');
+            }
+
+            return __('Create Item');
+        },
+
+        linkLabel() {
+            if (this.config.type === 'entries') {
+                return __('Link Entry');
+            }
+
+            if (this.config.type === 'taxonomies') {
+                return __('Link Taxonomy');
+            }
+
+            if (this.config.type === 'users') {
+                return __('Link User');
+            }
+
+            return __('Link Item');
+        },
+
         items() {
             if (this.value === null) return [];
 
@@ -281,7 +329,7 @@ export default {
 
         makeSortable() {
             this.sortable = new Sortable(this.$refs.items, {
-                draggable: '.item',
+                draggable: '.related-item',
                 handle: '.item-move',
                 mirror: { constrainDimensions: true, xAxis: false, appendTo: 'body' },
                 swapAnimation: { vertical: true },

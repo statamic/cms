@@ -1,84 +1,90 @@
 <template>
-    <div class="page-tree-branch flex" :class="{ 'ml-[-24px]': isTopLevel }">
+    <div class="page-tree-branch flex" :class="{
+        'ml-[-24px]': inTopLevelSection,
+        'page-tree-branch--has-children': hasChildren,
+    }">
         <div class="page-move w-6" />
-        <div class="flex flex-1 items-center p-2 text-xs leading-normal ltr:ml-2 rtl:mr-2">
-            <div class="flex flex-1 items-center" :class="{ 'opacity-50': isHidden || isInHiddenSection }">
+        <div class="flex flex-1 items-center p-1.5 text-xs leading-normal">
+            <div class="flex gap-3 grow items-center" :class="{ 'opacity-50': isHidden || isInHiddenSection }">
                 <template v-if="!isSection && !isChild">
-                    <i v-if="isAlreadySvg" class="h-4 w-4 ltr:mr-2 rtl:ml-2" v-html="icon"></i>
-                    <svg-icon v-else class="h-4 w-4 ltr:mr-2 rtl:ml-2" :name="'light/' + icon" />
+                    <i v-if="isAlreadySvg" class="size-4" v-html="icon"></i>
+                    <Icon v-else class="size-4" :name="icon" />
                 </template>
 
                 <a
                     @click="$emit('edit', $event)"
-                    :class="{ 'text-sm font-medium': isSection }"
+                    :class="{ 'text-sm font-medium is-section': isSection }"
                     v-text="__(item.text)"
                 />
 
-                <button
+                <Button
                     v-if="hasChildren && !isSection"
-                    class="dark:hover:dark-text-150 flex p-2 text-gray-600 outline-none transition duration-100 hover:text-gray-700 dark:text-dark-200"
-                    :class="{ '-rotate-90': !isOpen }"
+                    class="transition duration-100 [&_svg]:size-4! -mx-1.5"
+                    icon="ui/chevron-down"
+                    size="xs"
+                    round
+                    variant="ghost"
+                    :class="{ '-rotate-90 is-closed': !isOpen, 'is-open': isOpen }"
                     @click="$emit('toggle-open')"
-                >
-                    <svg-icon name="micro/chevron-down-xs" class="h-1.5" />
-                </button>
+                />
             </div>
 
-            <div class="flex items-center ltr:pr-2 rtl:pl-2">
+            <div class="flex items-center gap-3">
                 <slot name="branch-icon" :branch="item" />
-
-                <svg-icon
+                <ui-icon
                     v-if="isRenamedSection"
-                    class="inline-block h-4 w-4 text-gray-500"
-                    name="light/content-writing"
+                    class="size-4 text-gray-400 dark:text-gray-600"
+                    name="fieldsets"
                     v-tooltip="__('Renamed Section')"
                 />
-                <svg-icon
+                <ui-icon
                     v-else-if="isHidden"
-                    class="inline-block h-4 w-4 text-gray-500"
-                    name="light/hidden"
+                    class="size-4 text-gray-400 dark:text-gray-600"
+                    name="eye-closed"
                     v-tooltip="isSection ? __('Hidden Section') : __('Hidden Item')"
                 />
-                <svg-icon
+                <ui-icon
                     v-else-if="isPinnedAlias"
-                    class="inline-block h-4 w-4 text-gray-500"
-                    name="light/pin"
+                    class="size-4 text-gray-400 dark:text-gray-600"
+                    name="pin"
                     v-tooltip="__('Pinned Item')"
                 />
-                <svg-icon
+                <ui-icon
                     v-else-if="isAlias"
-                    class="inline-block h-4 w-4 text-gray-500"
-                    name="light/duplicate-ids"
-                    v-tooltip="__('Alias Item')"
+                    class="size-4 text-gray-400 dark:text-gray-600"
+                    name="duplicate"
+                    v-tooltip="__('Aliased Item')"
                 />
-                <svg-icon
+                <ui-icon
                     v-else-if="isMoved"
-                    class="inline-block w-4 text-gray-500"
-                    name="regular/flip-vertical"
+                    class="size-4 text-gray-400 dark:text-gray-600"
+                    name="moved"
                     v-tooltip="__('Moved Item')"
                 />
-                <svg-icon
+                <ui-icon
                     v-else-if="isModified"
-                    class="inline-block h-4 w-4 text-gray-500"
-                    name="light/content-writing"
+                    class="size-4 text-gray-400 dark:text-gray-600"
+                    name="fieldsets"
                     v-tooltip="__('Modified Item')"
                 />
-                <svg-icon
+                <ui-icon
                     v-else-if="isCustom"
-                    class="inline-block w-4 text-gray-500"
-                    name="light/user-edit"
+                    class="size-4 text-gray-400 dark:text-gray-600"
+                    name="user-edit"
                     v-tooltip="isSection ? __('Custom Section') : __('Custom Item')"
                 />
 
-                <dropdown-list class="ltr:ml-4 rtl:mr-4">
-                    <slot
-                        name="branch-options"
-                        :item="item"
-                        :depth="depth"
-                        :remove-branch="remove"
-                        :is-top-level="isTopLevel"
-                    />
-                </dropdown-list>
+                <Dropdown placement="left-start">
+                    <DropdownMenu>
+                        <slot
+                            name="branch-options"
+                            :item="item"
+                            :depth="depth"
+                            :remove-branch="remove"
+                            :in-top-level-section="inTopLevelSection"
+                        />
+                    </DropdownMenu>
+                </Dropdown>
             </div>
         </div>
     </div>
@@ -86,8 +92,16 @@
 
 <script>
 import { data_get } from '../../bootstrap/globals.js';
+import { Icon, Dropdown, DropdownMenu, Button } from '@statamic/ui';
 
 export default {
+    components: {
+        Icon,
+        Dropdown,
+        DropdownMenu,
+        Button,
+    },
+
     props: {
         item: Object,
         parentSection: Object,
@@ -140,7 +154,7 @@ export default {
         },
 
         isPinnedAlias() {
-            return data_get(this.item, 'manipulations.action') === '@alias' && this.isTopLevel;
+            return data_get(this.item, 'manipulations.action') === '@alias' && this.inTopLevelSection;
         },
 
         isAlias() {
@@ -159,8 +173,8 @@ export default {
             return data_get(this.item, 'manipulations.action') === '@create';
         },
 
-        isTopLevel() {
-            return this.stat.data?.text === 'Top Level' || this.stat.parent?.data?.text === 'Top Level';
+        inTopLevelSection() {
+            return this.parentSection?.data?.text === 'Top Level';
         },
     },
 

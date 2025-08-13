@@ -42,7 +42,6 @@ class AppServiceProvider extends ServiceProvider
             ->pushMiddleware(\Statamic\Http\Middleware\PoweredByHeader::class)
             ->pushMiddleware(\Statamic\Http\Middleware\CheckComposerJsonScripts::class)
             ->pushMiddleware(\Statamic\Http\Middleware\CheckMultisite::class)
-            ->pushMiddleware(\Statamic\Http\Middleware\DisableFloc::class)
             ->pushMiddleware(\Statamic\Http\Middleware\StopImpersonating::class);
 
         $this->loadViewsFrom("{$this->root}/resources/views", 'statamic');
@@ -58,6 +57,10 @@ class AppServiceProvider extends ServiceProvider
         $this->publishes([
             "{$this->root}/resources/dist" => public_path('vendor/statamic/cp'),
         ], 'statamic-cp');
+
+        $this->publishes([
+            "{$this->root}/resources/dist-dev" => public_path('vendor/statamic/cp-dev'),
+        ], 'statamic-cp-dev');
 
         $this->publishes([
             "{$this->root}/resources/dist-frontend" => public_path('vendor/statamic/frontend'),
@@ -129,6 +132,7 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Contracts\Forms\FormRepository::class => \Statamic\Forms\FormRepository::class,
             \Statamic\Contracts\Forms\SubmissionRepository::class => \Statamic\Stache\Repositories\SubmissionRepository::class,
             \Statamic\Contracts\Tokens\TokenRepository::class => \Statamic\Tokens\FileTokenRepository::class,
+            \Statamic\Contracts\Addons\SettingsRepository::class => \Statamic\Addons\FileSettingsRepository::class,
         ])->each(function ($concrete, $abstract) {
             if (! $this->app->bound($abstract)) {
                 Statamic::repository($abstract, $concrete);
@@ -190,6 +194,7 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Http\Middleware\Localize::class,
             \Statamic\Http\Middleware\AddViewPaths::class,
             \Statamic\Http\Middleware\AuthGuard::class,
+            \Statamic\Http\Middleware\RedirectIfTwoFactorSetupIncomplete::class,
             \Statamic\StaticCaching\Middleware\Cache::class,
         ])->each(fn ($middleware) => $router->pushMiddlewareToGroup('statamic.web', $middleware));
     }

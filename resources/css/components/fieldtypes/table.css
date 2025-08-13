@@ -2,98 +2,126 @@
    Table Fieldtype
    ========================================================================== */
 
-.table-fieldtype-table {
-    @apply relative mb-4 w-full rounded border text-gray shadow-sm outline-none dark:border-dark-900 dark:text-dark-150 ltr:text-left rtl:text-right;
+.table-contained {
+    @apply relative mb-4 w-full rounded-lg border text-gray shadow-ui-sm outline-hidden dark:border-dark-900 dark:text-dark-150 text-start;
     border-collapse: separate;
     border-spacing: 0;
     table-layout: fixed;
 }
 
-.table-fieldtype-table thead {
+.table-contained thead {
     th {
-        @apply z-10 border-b bg-gray-200 p-2 text-sm font-medium text-gray-900 dark:border-dark-900 dark:bg-dark-700 dark:text-dark-150 ltr:border-r rtl:border-l;
+        @apply z-10 border-b bg-gray-50 p-2 text-sm font-medium text-gray-900 dark:border-dark-900 dark:bg-gray-800 dark:text-gray-100 not-last:border-e;
         display: table-cell;
         position: sticky;
         top: -1px;
 
         &:first-child {
-            @apply ltr:rounded-tl ltr:pl-3 rtl:rounded-tr rtl:pr-3;
+            @apply rounded-ss-lg ps-3;
         }
+
         &:last-child {
-            @apply ltr:rounded-tr ltr:border-r-0 rtl:rounded-tl rtl:border-l-0;
+            @apply rounded-se-lg border-s-0;
         }
+
         &.grid-drag-handle-header {
             @apply w-3;
         }
     }
 }
 
-.table-fieldtype-table .input-text {
-    @apply rounded-none border-none bg-white text-sm shadow-none outline-none;
-    @apply dark:bg-dark-650;
+.table-contained .input-text {
+    @apply rounded-none border-none bg-white text-sm shadow-none outline-hidden;
+    @apply dark:bg-gray-800;
     &:focus {
-        @apply bg-gray-100 shadow-inner ring-0 dark:bg-dark-700;
+        @apply bg-gray-100 shadow-inner ring-0 dark:bg-gray-700;
     }
 }
 
-.table-fieldtype-table tbody {
-    @apply outline-none;
+
+.table-contained tbody {
+    @apply outline-hidden;
 
     tr {
-        @apply outline-none;
+        @apply outline-hidden;
+    }
+
+    th {
+        @apply bg-gray-50 p-2 text-sm font-medium text-gray-700 text-start border-r border-b border-gray-200 dark:border-dark-900 dark:bg-gray-700 dark:text-gray-100;
+    }
+
+    tr:first-child th {
+        @apply rounded-tl-lg;
+    }
+
+    tr:last-child th {
+        @apply border-b-0 rounded-bl-lg;
     }
 
     td {
-        @apply border-b p-0 dark:border-dark-900 ltr:border-r rtl:border-l;
+        @apply border-b p-0 dark:border-dark-900 border-e;
 
         &:first-child.grid-cell {
-            @apply ltr:pl-3 rtl:pr-3;
+            @apply ps-4;
         }
 
         &:last-child {
-            @apply ltr:border-r-0 rtl:border-l-0;
+            @apply border-e-0;
         }
 
         &.table-drag-handle {
-            @apply h-full w-3 p-2 ltr:border-r rtl:border-l;
-            cursor: grab;
-            background: theme('colors.gray.200') url('../../../svg/icons/light/drag-dots.svg') center center no-repeat;
+            @apply h-full w-3 p-2 cursor-grab bg-white dark:bg-gray-800;
+            background-image: url('../../svg/ui/drag-dots.svg');
+            background-repeat: no-repeat;
+            background-position: center center;
             background-size: 7px 17px;
 
-            .dark & {
-                background-color: theme(colors.dark.600);
-            }
-
             &:hover {
-                @apply bg-gray-300 dark:bg-dark-750;
+                @apply bg-gray-100 dark:bg-gray-700;
             }
         }
     }
 
+    tr:first-child td:last-child {
+        @apply rounded-se-lg overflow-hidden;
+    }
+
     tr:last-child td {
-        @apply border-b-0;
+        @apply border-b-0 overflow-hidden;
         &:first-child {
-            @apply ltr:rounded-bl rtl:rounded-br;
+            @apply rounded-es-lg;
         }
         &:last-child {
-            @apply ltr:rounded-br rtl:rounded-bl;
+            @apply rounded-ee-lg;
         }
     }
 
     tr.draggable-source--is-dragging td {
-        @apply bg-gray-100 dark:bg-dark-800;
+        @apply bg-gray-100 dark:bg-gray-800;
     }
 }
 
-.table-fieldtype-table .row-controls {
-    @apply w-8 text-center ltr:pl-0 rtl:pr-0;
+.table-contained > tbody:first-child tr:first-child td:first-child {
+    @apply rounded-tl-lg;
+}
+
+.table-contained > tbody:first-child tr:first-child td:last-child {
+    @apply rounded-tr-lg;
+}
+
+.table-contained .row-controls {
+    @apply w-8 text-center ps-0;
     vertical-align: middle;
     &:focus-within {
-        @apply bg-gray-200 dark:bg-dark-750;
+        @apply bg-gray-200 dark:bg-gray-700;
         button {
-            @apply outline-none ring-0;
+            @apply outline-hidden ring-0;
         }
     }
+}
+
+td[data-column="size"] {
+    @apply whitespace-nowrap;
 }
 
 .table-fullscreen {

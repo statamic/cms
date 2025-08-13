@@ -26,9 +26,7 @@
                     <tr v-for="site in sites" :key="site.handle">
                         <td class="align-middle" v-text="__(site.name)" />
                         <td>
-                            <text-input
-                                dir="ltr"
-                                class="slug-field"
+                            <ui-input
                                 :model-value="value[site.handle]"
                                 @update:model-value="updateSiteValue(site.handle, $event)"
                             />
@@ -39,14 +37,22 @@
         </div>
 
         <div v-if="!hasMultipleSites || !inMultipleMode">
-            <text-input :model-value="value" @update:model-value="update" class="slug-field" dir="ltr" />
+            <ui-input :model-value="value" @update:model-value="update" />
         </div>
     </div>
 </template>
 
 <script>
+import { containerContextKey } from '@statamic/components/ui/Publish/Container.vue';
+
 export default {
-    props: ['handle', 'value', 'store', 'columnHeader'],
+    props: ['handle', 'value', 'columnHeader'],
+
+    inject: {
+        publishContainer: {
+            from: containerContextKey
+        }
+    },
 
     computed: {
         mode() {
@@ -54,12 +60,12 @@ export default {
         },
 
         sites() {
-            if (!this.store.values.sites) return [];
+            if (!this.publishContainer.values.value.sites) return [];
 
-            return this.store.values.sites.map((handle, i) => {
+            return this.publishContainer.values.value.sites.map((handle, i) => {
                 return {
                     handle,
-                    name: this.store.meta.sites.data[i].title,
+                    name: this.publishContainer.meta.value.sites.data[i].title,
                 };
             });
         },

@@ -1,47 +1,35 @@
-<template>
-    <data-list :columns="columns" :rows="rows" v-slot="{ filteredRows: rows }">
-        <div class="card p-0">
-            <data-list-table :rows="rows">
-                <template #cell-title="{ row: taxonomy }">
-                    <a :href="taxonomy.terms_url">{{ __(taxonomy.title) }}</a>
-                </template>
-                <template #actions="{ row: taxonomy, index }">
-                    <dropdown-list placement="left-start">
-                        <dropdown-item :text="__('Edit')" :redirect="taxonomy.edit_url" />
-                        <dropdown-item :text="__('Edit Blueprints')" :redirect="taxonomy.blueprints_url" />
-                        <dropdown-item
-                            v-if="taxonomy.deleteable"
-                            :text="__('Delete')"
-                            class="warning"
-                            @click="$refs[`deleter_${taxonomy.id}`].confirm()"
-                        >
-                            <resource-deleter
-                                :ref="`deleter_${taxonomy.id}`"
-                                :resource="taxonomy"
-                                @deleted="removeRow(taxonomy)"
-                            >
-                            </resource-deleter>
-                        </dropdown-item>
-                    </dropdown-list>
-                </template>
-            </data-list-table>
-        </div>
-    </data-list>
-</template>
+<script setup>
+import { ref } from 'vue';
+import { DropdownItem, Listing } from '@statamic/ui';
 
-<script>
-import Listing from '../Listing.vue';
+const props = defineProps(['initialRows', 'initialColumns']);
 
-export default {
-    mixins: [Listing],
+const rows = ref(props.initialRows);
+const columns = ref(props.initialColumns);
 
-    props: ['initial-rows', 'initial-columns'],
-
-    data() {
-        return {
-            rows: this.initialRows,
-            columns: this.initialColumns,
-        };
-    },
-};
+function removeRow(row) {
+    const i = rows.value.findIndex((r) => r.id === row.id);
+    rows.value.splice(i, 1);
+}
 </script>
+
+<template>
+    <Listing :items="rows" :columns="columns" :allow-search="false" :allow-customizing-columns="false">
+        <template #cell-title="{ row: taxonomy }">
+            <a :href="taxonomy.terms_url">{{ __(taxonomy.title) }}</a>
+
+            <resource-deleter :ref="`deleter_${taxonomy.id}`" :resource="taxonomy" @deleted="removeRow(taxonomy)" />
+        </template>
+
+        <template #prepended-row-actions="{ row: taxonomy, index }">
+            <DropdownItem :text="__('Configure')" icon="cog" :href="taxonomy.edit_url" />
+            <DropdownItem :text="__('Edit Blueprints')" icon="blueprint-edit" :href="taxonomy.blueprints_url" />
+            <DropdownItem
+                :text="__('Delete Taxonomy')"
+                icon="trash"
+                variant="destructive"
+                @click="$refs[`deleter_${taxonomy.id}`].confirm()"
+            />
+        </template>
+    </Listing>
+</template>

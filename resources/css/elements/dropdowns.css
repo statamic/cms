@@ -1,80 +1,8 @@
-/* ==========================================================================
-   DROPDOWNS
-   ========================================================================== */
-
-.dropdown-list .popover-content {
-    @apply p-2;
-
-    button,
-    a {
-        @apply block w-full rounded-sm px-2 py-1 text-xs font-normal text-gray-800 dark:text-dark-100 ltr:text-left rtl:text-right;
-        line-height: 1.4;
-        white-space: nowrap;
-
-        &:hover {
-            @apply bg-blue text-white dark:bg-dark-600;
-        }
-
-        .icon {
-            color: #d0d4d7 !important;
-            margin-right: 6px;
-            [dir='rtl'] & {
-                margin-left: 6px;
-                margin-right: 0;
-            }
-            margin-left: -4px;
-            [dir='rtl'] & {
-                margin-right: -4px;
-                margin-left: 0;
-            }
-            font-size: 12px;
-            width: 20px;
-            display: block;
-            float: left;
-            [dir='rtl'] & {
-                float: right;
-            }
-            position: relative;
-            top: 2px;
-            line-height: inherit;
-            text-align: center;
-        }
-    }
-
-    button.warning,
-    a.warning {
-        @apply text-red-500;
-
-        &:hover {
-            @apply bg-red-500 text-white;
-        }
-    }
-
-    .divider {
-        @apply h-px overflow-hidden bg-gray-400 dark:bg-dark-900;
-        margin: 6px -8px;
-        /* Hide dividers that come first, last or immediately after another (due to v-if) */
-        & + &,
-        &:first-child,
-        &:last-child {
-            display: none;
-        }
-    }
-
-    .align-left & {
-        right: auto;
-        [dir='rtl'] & {
-            right: auto;
-            left: auto;
-        }
-    }
-}
-
 .quick-list {
     @apply relative;
 
     .quick-list-content {
-        @apply absolute right-full top-1/2 mr-[8px] flex min-w-max origin-right -translate-y-1/2 rounded-full bg-white p-0.5 shadow-quick transition dark:bg-dark-550;
+        @apply absolute right-full top-1/2 mr-[8px] flex min-w-max origin-right -translate-y-1/2 rounded-full bg-white p-0.5 shadow-sm transition dark:bg-dark-550;
         &::before {
             content: '';
             position: absolute;
@@ -83,9 +11,9 @@
         }
         button,
         a {
-            @apply flex shrink-0 rounded-full p-1.5 text-gray-800 dark:text-dark-100;
+            @apply flex shrink-0 rounded-full text-gray-900 dark:text-dark-100;
             &:hover {
-                @apply bg-blue text-white;
+                @apply text-white;
             }
         }
         &:empty {

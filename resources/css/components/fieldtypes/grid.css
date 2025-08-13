@@ -3,29 +3,21 @@
    ========================================================================== */
 
 .grid-table {
-    @apply relative mb-4 w-full rounded border text-gray shadow-sm outline-none dark:border-dark-900 dark:text-dark-150 ltr:text-left rtl:text-right;
+    @apply bg-white dark:bg-gray-800 relative w-full rounded-lg border text-gray shadow-ui-sm outline-hidden dark:border-gray-900 dark:text-dark-150 text-start;
     border-collapse: separate;
     border-spacing: 0;
     table-layout: auto;
 }
 
-.grid-table thead {
-    th {
-        @apply z-10 border-b bg-gray-200 px-2 py-2 text-sm font-medium text-gray-900 dark:border-dark-900 dark:bg-dark-650 dark:text-dark-150;
-        display: table-cell;
-        position: sticky;
-        top: -1px;
-        z-index: auto;
+.grid-table thead th {
+    @apply sticky -top-2 table-cell z-10 border-b bg-gray-50 p-2 text-sm font-medium text-gray-900 dark:border-gray-900 dark:bg-gray-800 dark:text-gray-100;
 
-        &:first-child {
-            @apply ltr:rounded-tl ltr:pl-3 rtl:rounded-tr rtl:pr-3;
-        }
-        &:last-child {
-            @apply ltr:rounded-tr rtl:rounded-tl;
-        }
-        &.grid-drag-handle-header {
-            @apply w-3;
-        }
+    &:first-child {
+        @apply rounded-ss-lg ps-3;
+    }
+
+    &:last-child {
+        @apply rounded-se-lg border-s-0;
     }
 }
 
@@ -34,32 +26,24 @@
 }
 
 .grid-table > tbody {
-    @apply outline-none;
+    @apply outline-hidden;
 
     > tr {
-        @apply outline-none;
+        @apply outline-hidden;
     }
 
     > tr > td {
-        @apply border-b px-2 py-3 align-top dark:border-dark-900;
+        @apply border-b px-2 py-3 align-top dark:border-gray-900;
 
         &:first-child.grid-cell {
             @apply ltr:pl-3 rtl:pr-3;
         }
 
         &.drag-handle {
-            @apply h-full p-2 ltr:border-r rtl:border-l;
+            @apply h-full p-2 cursor-grab hover:bg-gray-100 dark:hover:bg-gray-700 border-e border-transparent hover:border-e-gray-200 dark:hover:border-e-gray-600;
             width: 1%;
-            cursor: grab;
-            background: theme('colors.gray.200') url('../../../svg/icons/light/drag-dots.svg') center center no-repeat;
+            background: url('../../../svg/ui/drag-dots.svg') center center no-repeat;
             background-size: 7px 17px;
-            &:hover {
-                @apply bg-gray-300;
-            }
-
-            .dark & {
-                background-color: theme('colors.dark.700');
-            }
         }
     }
 
@@ -76,6 +60,12 @@
     tr.draggable-source--is-dragging td {
         @apply bg-gray-100;
     }
+
+    .grid-cell [data-ui-field-header],
+    .grid-cell [data-ui-label],
+    .grid-cell [data-ui-description] {
+        @apply hidden;
+    }
 }
 
 .grid-table tbody .grid-row-controls {
@@ -85,7 +75,7 @@
 }
 
 .grid-item-header {
-    @apply flex cursor-move items-center justify-between border-b bg-gray-200 px-4 py-2 text-sm outline-none;
+    @apply flex cursor-move items-center justify-between border-b bg-gray-200 px-4 py-2 text-sm outline-hidden;
 }
 
 .grid-fullscreen {

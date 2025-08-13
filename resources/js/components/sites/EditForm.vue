@@ -1,30 +1,31 @@
 <template>
-    <publish-container
+    <Header :title="pageTitle" icon="site">
+        <Button type="submit" variant="primary" @click="submit">{{ __('Save') }}</Button>
+    </Header>
+
+    <PublishContainer
         v-if="blueprint"
         ref="container"
         name="sites"
         reference="sites"
         :blueprint="blueprint"
-        :values="values"
+        v-model="values"
         :meta="meta"
         :errors="errors"
-        @updated="values = $event"
-        v-slot="{ setFieldValue, setFieldMeta }"
-    >
-        <div>
-            <header class="mb-6">
-                <div class="flex items-center">
-                    <h1 class="flex-1" v-text="pageTitle" />
-                    <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
-                </div>
-            </header>
-            <publish-tabs @updated="setFieldValue" @meta-updated="setFieldMeta" :enable-sidebar="false" />
-        </div>
-    </publish-container>
+    />
 </template>
 
 <script>
+import { Header, Button, PublishContainer, PublishTabs } from '@statamic/ui';
+
 export default {
+    components: {
+        Header,
+        Button,
+        PublishContainer,
+        PublishTabs,
+    },
+
     props: {
         blueprint: Object,
         initialValues: Object,

@@ -21,28 +21,8 @@ class DateFieldtype implements ValidationRule
             return;
         }
 
-        if (! is_array($value)) {
-            $fail('statamic::validation.array')->translate();
-
-            return;
-        }
-
         if ($this->fieldtype->config('mode') === 'single') {
-            if (! Arr::has($value, 'date')) {
-                $fail('statamic::validation.date_fieldtype_date_required')->translate();
-
-                return;
-            }
-
-            $date = $value['date'];
-
-            if ($this->fieldtype->isRequired() && ! $date) {
-                $fail('statamic::validation.date_fieldtype_date_required')->translate();
-
-                return;
-            }
-
-            if ($date && ! $this->validDateFormat($date)) {
+            if ($value && ! $this->validDateFormat($value)) {
                 $fail('statamic::validation.date')->translate();
 
                 return;
@@ -50,20 +30,16 @@ class DateFieldtype implements ValidationRule
         }
 
         if ($this->fieldtype->config('mode') === 'range') {
-            if (isset($value['start'])) {
+            $date = $value;
+
+            if (isset($date['start']) && $date['start'] instanceof Carbon) {
                 // It was already processed.
                 return;
             }
 
-            $date = $value['date'];
-
             if (! $date && $this->fieldtype->isRequired()) {
                 $fail('statamic::validation.date_fieldtype_date_required')->translate();
 
-                return;
-            }
-
-            if (! $date) {
                 return;
             }
 
@@ -78,7 +54,7 @@ class DateFieldtype implements ValidationRule
                 return;
             }
 
-            if ($this->fieldtype->isRequired() && ! $date['start'] && ! $date['end']) {
+            if (! $date['start'] && ! $date['end']) {
                 $fail('statamic::validation.date_fieldtype_date_required')->translate();
 
                 return;
@@ -108,57 +84,14 @@ class DateFieldtype implements ValidationRule
                 return;
             }
         }
-
-        if (! $this->timeEnabled()) {
-            return;
-        }
-
-        if (! Arr::has($value, 'time')) {
-            $fail('statamic::validation.date_fieldtype_time_required')->translate();
-
-            return;
-        }
-
-        $time = $value['time'];
-
-        if ($this->fieldtype->isRequired() && ! $time) {
-            $fail('statamic::validation.date_fieldtype_time_required')->translate();
-
-            return;
-        }
-
-        if ($time && ! $this->validTimeFormat($time)) {
-            $fail('statamic::validation.time')->translate();
-
-            return;
-        }
     }
 
     private function validDateFormat($value)
     {
-        return $this->matchesFormat($value, 'Y-m-d');
-    }
-
-    private function validTimeFormat($value)
-    {
-        $format = $this->fieldtype->config('time_seconds_enabled') ? 'H:i:s' : 'H:i';
-
-        return $this->matchesFormat($value, $format);
-    }
-
-    private function matchesFormat($value, string $format)
-    {
-        if (! $value) {
-            return false;
-        }
+        $format = 'Y-m-d\TH:i:s.v\Z';
 
         $date = DateTime::createFromFormat('!'.$format, $value);
 
         return $date && $date->format($format) == $value;
-    }
-
-    private function timeEnabled()
-    {
-        return $this->fieldtype->config('time_enabled');
     }
 }

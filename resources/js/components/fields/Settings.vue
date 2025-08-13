@@ -1,107 +1,80 @@
 <template>
-    <div class="h-full overflow-scroll bg-gray-300 dark:bg-dark-800">
+    <div class="h-full overflow-auto bg-white dark:bg-gray-800 p-3 rounded-l-xl">
         <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
-            <loading-graphic />
+            <Icon name="loading" />
         </div>
 
-        <header
-            v-if="!loading"
-            class="sticky inset-x-0 top-0 z-1 flex h-13 items-center bg-white px-8 py-2 shadow dark:bg-dark-550 dark:shadow-dark"
-        >
-            <h1 class="flex flex-1 items-center text-xl">
-                {{ __(values.display) || __(config.display) || config.handle }}
-                <small
-                    class="badge-pill flex items-center border bg-gray-100 text-xs font-medium leading-none text-gray-700 dark:border-dark-200 dark:bg-dark-400 dark:text-dark-150 ltr:ml-4 rtl:mr-4"
-                >
-                    <svg-icon
-                        class="inline-block h-4 w-4 text-gray-700 dark:text-dark-150 ltr:mr-2 rtl:ml-2"
-                        :name="fieldtype.icon.startsWith('<svg') ? fieldtype.icon : `light/${fieldtype.icon}`"
-                    ></svg-icon>
-                    {{ fieldtype.title }}
-                </small>
-            </h1>
-            <button
-                class="text-sm text-gray-700 hover:text-gray-800 dark:text-dark-150 dark:hover:text-dark-100 ltr:mr-6 rtl:ml-6"
-                @click.prevent="close"
-                v-text="__('Cancel')"
-            ></button>
-            <button class="btn-primary" @click.prevent="commit" v-text="__('Apply')"></button>
+        <header v-if="!loading" class="flex items-center justify-between pl-3">
+            <Heading :text="__(values.display) || __(config.display) || config.handle" size="lg" :icon="fieldtype.icon.startsWith('<svg') ? fieldtype.icon : `fieldtype-${fieldtype.icon}`" />
+            <div class="flex items-center gap-3">
+                <Button variant="ghost" :text="__('Cancel')" @click.prevent="close" />
+                <Button variant="primary" @click.prevent="commit()" :text="__('Apply')" />
+                <Button v-if="isInsideSet || isInsideConfigFields" variant="primary" @click.prevent="commit(true)" :text="__('Apply & Close All')" />
+            </div>
         </header>
-        <section class="isolate px-3 py-4 md:px-8">
-            <div class="tabs-container">
-                <div class="publish-tabs tabs">
-                    <button
-                        class="tab-button"
-                        :class="{ active: activeTab === 'settings' }"
-                        @click="activeTab = 'settings'"
-                        v-text="__('Settings')"
-                    />
-                    <button
-                        class="tab-button"
-                        :class="{ active: activeTab === 'conditions' }"
-                        @click="activeTab = 'conditions'"
-                        v-text="__('Conditions')"
-                    />
-                    <button
-                        class="tab-button"
-                        :class="{ active: activeTab === 'validation' }"
-                        @click="activeTab = 'validation'"
-                        v-text="__('Validation')"
-                    />
-                </div>
-            </div>
 
-            <div v-if="!loading" class="field-settings">
-                <publish-container
-                    :name="`field-settings-${$.uid}`"
-                    :blueprint="blueprint"
-                    :values="values"
-                    :meta="meta"
-                    :errors="errors"
-                    :is-root="true"
-                    @updated="values = $event"
-                    v-slot="{ setFieldValue, setFieldMeta }"
-                >
-                    <div v-show="activeTab === 'settings'">
-                        <publish-sections
-                            :sections="blueprint.tabs[0].sections"
-                            @updated="(handle, value) => updateField(handle, value, setFieldValue)"
-                            @meta-updated="setFieldMeta"
+        <section v-if="!loading" class="isolate px-3 py-4">
+            <Tabs v-model:modelValue="activeTab">
+                <TabList class="mb-6">
+                    <TabTrigger name="settings" :text="__('Settings')" />
+                    <TabTrigger name="conditions" :text="__('Conditions')" />
+                    <TabTrigger name="validation" :text="__('Validation')" />
+                </TabList>
+
+                <div>
+                    <TabContent name="settings">
+                        <ui-publish-container
+                            ref="container"
+                            :blueprint="adjustedBlueprint"
+                            :meta="meta"
+                            :errors="errors"
+                            v-model="values"
+                            v-model:modified-fields="editedFields"
+                            :origin-values="originValues"
+                            :origin-meta="originMeta"
+                            as-config
                         />
-                    </div>
-                </publish-container>
+                    </TabContent>
 
-                <div class="card p-0" v-show="activeTab === 'conditions'">
-                    <div class="publish-fields @container">
-                        <field-conditions-builder
-                            :config="config"
-                            :suggestable-fields="suggestableConditionFields"
-                            @updated="updateFieldConditions"
-                            @updated-always-save="updateAlwaysSave"
-                        />
-                    </div>
-                </div>
+                    <TabContent name="conditions">
+                        <CardPanel :heading="__('Conditions')">
+                            <FieldConditionsBuilder
+                                :config="config"
+                                :suggestable-fields="suggestableConditionFields"
+                                @updated="updateFieldConditions"
+                                @updated-always-save="updateAlwaysSave"
+                            />
+                        </CardPanel>
+                    </TabContent>
 
-                <div class="card p-0" v-show="activeTab === 'validation'">
-                    <div class="publish-fields @container">
-                        <field-validation-builder :config="config" @updated="updateField('validate', $event)" />
-                    </div>
+                    <TabContent name="validation">
+                        <CardPanel :heading="__('Validation')">
+                            <FieldValidationBuilder :config="config" @updated="updateField('validate', $event)" />
+                        </CardPanel>
+                    </TabContent>
                 </div>
-            </div>
+            </Tabs>
         </section>
     </div>
 </template>
 
 <script>
-import PublishField from '../publish/Field.vue';
 import { FieldConditionsBuilder, FIELD_CONDITIONS_KEYS } from '../field-conditions/FieldConditions.js';
 import FieldValidationBuilder from '../field-validation/Builder.vue';
+import { Heading, Button, Tabs, TabList, TabTrigger, TabContent, CardPanel, Icon } from '@statamic/ui';
 
 export default {
     components: {
-        PublishField,
         FieldConditionsBuilder,
         FieldValidationBuilder,
+        Heading,
+        Button,
+        Tabs,
+        TabList,
+        TabTrigger,
+        TabContent,
+        CardPanel,
+        Icon
     },
 
     props: {
@@ -120,7 +93,17 @@ export default {
             isInsideConfigFields: true,
             updateFieldSettingsValue: this.updateField,
             getFieldSettingsValue: this.getFieldValue,
+            commitParentField: this.commit,
         };
+    },
+
+    inject: {
+        isInsideConfigFields: {
+            default: false
+        },
+        commitParentField: {
+            default: () => {}
+        }
     },
 
     model: {
@@ -132,6 +115,8 @@ export default {
         return {
             values: null,
             meta: null,
+            originValues: null,
+            originMeta: null,
             error: null,
             errors: {},
             editedFields: clone(this.overrides),
@@ -143,6 +128,22 @@ export default {
     },
 
     computed: {
+        adjustedBlueprint() {
+            let blueprint = this.blueprint;
+
+            blueprint.tabs = [blueprint.tabs[0]]; // Only the first tab is supported/necessary.
+
+            // Make all fields localizable so they can be edited.
+            // Fields are non-localizable by default, but this UI requires all fields to be editable.
+            blueprint.tabs[0].sections.forEach((section, sectionIndex) => {
+                section.fields.forEach((field, fieldIndex) => {
+                    blueprint.tabs[0].sections[sectionIndex].fields[fieldIndex].localizable = true;
+                });
+            });
+
+            return blueprint;
+        },
+
         selectedWidth: function () {
             var width = this.config.width || 100;
             var found = this.widths.find((w) => w.value === width);
@@ -189,10 +190,6 @@ export default {
     },
 
     methods: {
-        configFieldClasses(field) {
-            return [`form-group p-4 m-0 ${field.type}-fieldtype`, tailwind_width_class(field.width)];
-        },
-
         getFieldValue(handle) {
             return this.values[handle];
         },
@@ -234,7 +231,7 @@ export default {
             }
         },
 
-        commit() {
+        commit(shouldCommitParent = false) {
             this.clearErrors();
 
             this.$axios
@@ -246,8 +243,13 @@ export default {
                     isInsideSet: this.isInsideSet,
                 })
                 .then((response) => {
+                    this.$refs.container?.clearDirtyState();
                     this.$emit('committed', response.data, this.editedFields);
                     this.close();
+
+                    if (shouldCommitParent && this.commitParentField) {
+                        this.commitParentField(true);
+                    }
                 })
                 .catch((e) => this.handleAxiosError(e));
         },
@@ -273,9 +275,12 @@ export default {
         },
 
         load() {
+            const field = this.fields.find(f => f.handle === this.config.handle);
+
             this.$axios
                 .post(cp_url('fields/edit'), {
                     type: this.type,
+                    reference: field?.type === 'reference' ? field.field_reference : false,
                     values: this.config,
                 })
                 .then((response) => {
@@ -284,6 +289,8 @@ export default {
                     this.blueprint = response.data.blueprint;
                     this.values = response.data.values;
                     this.meta = { ...response.data.meta };
+                    this.originValues = response.data.originValues;
+                    this.originMeta = response.data.originMeta;
                 });
         },
     },

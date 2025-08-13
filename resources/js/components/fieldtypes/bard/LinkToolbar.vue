@@ -1,67 +1,63 @@
 <template>
     <div class="bard-link-toolbar">
         <div>
-            <div class="border-b px-4 py-4 dark:border-dark-900">
-                <div class="flex">
-                    <div
-                        class="mb-4 flex h-8 items-center rounded border bg-gray-100 text-gray-800 shadow-inner dark:border-dark-200 dark:bg-dark-600 dark:text-dark-150 ltr:mr-1 rtl:ml-1"
-                    >
-                        <select class="input w-auto px-1 text-sm" v-model="linkType">
-                            <option v-for="visibleLinkType in visibleLinkTypes" :value="visibleLinkType.type">
-                                {{ visibleLinkType.title }}
-                            </option>
-                        </select>
-                    </div>
+            <div class="border-b bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 rounded-b-xl rounded-t-md">
+                <section class="flex gap-2 items-center p-4 border-b">
+                    <ui-select
+                        v-model="linkType"
+                        :options="visibleLinkTypes"
+                        option-label="title"
+                        option-value="type"
+                        size="sm"
+                        class="flex-1"
+                    />
 
-                    <div
-                        class="dark:placeholder:dark-text-dark-175 mb-4 flex h-8 w-full items-center rounded border bg-gray-100 p-2 text-gray-800 shadow-inner placeholder:text-gray-600 dark:border-dark-200 dark:bg-dark-600 dark:text-dark-150"
-                    >
+                    <div class="flex-1">
                         <!-- URL input -->
-                        <input
+                        <ui-input
                             v-if="linkType === 'url'"
                             v-model="url.url"
                             type="text"
                             ref="urlInput"
-                            class="input h-auto text-sm"
+                            size="sm"
                             :placeholder="__('URL')"
                             @keydown.enter.prevent="commit"
                         />
 
                         <!-- Email input -->
-                        <input
+                        <ui-input
                             v-else-if="linkType === 'mailto'"
                             v-model="urlData.mailto"
                             type="text"
                             ref="mailtoInput"
-                            class="input h-auto text-sm"
+                            size="sm"
                             :placeholder="__('Email Address')"
                             @keydown.enter.prevent="commit"
                         />
 
                         <!-- Phone input -->
-                        <input
+                        <ui-input
                             v-else-if="linkType === 'tel'"
                             v-model="urlData.tel"
-                            type="text"
                             ref="telInput"
-                            class="input h-auto text-sm"
-                            placeholder="Phone Number"
+                            size="sm"
+                            :placeholder="__('Phone Number')"
                             @keydown.enter.prevent="commit"
                         />
 
                         <!-- Data input -->
                         <div
                             v-else
-                            class="flex w-full cursor-pointer items-center justify-between"
+                            class="flex w-full min-w-[240px] cursor-pointer items-center justify-between"
                             @click="openSelector"
                         >
-                            <loading-graphic v-if="isLoading" :inline="true" />
+                            <Icon v-if="isLoading" name="loading" />
 
-                            <div v-else class="flex flex-1 items-center truncate ltr:mr-2 rtl:ml-2">
+                            <div v-else class="flex flex-1 items-center truncate me-2">
                                 <img
                                     v-if="linkType === 'asset' && itemData.asset && itemData.isImage"
                                     :src="itemData.asset.thumbnail || itemData.asset.url"
-                                    class="asset-thumbnail lazyloaded h-6 max-h-full w-6 max-w-full rounded object-cover ltr:mr-2 rtl:ml-2"
+                                    class="asset-thumbnail lazyloaded h-6 max-h-full w-6 max-w-full rounded-sm object-cover me-2"
                                 />
                                 {{ displayValue }}
                             </div>
@@ -72,70 +68,64 @@
                                 :aria-label="`${__('Browse')}...`"
                                 @click="openSelector"
                             >
-                                <svg-icon v-show="linkType === 'asset'" name="folder-image" class="h-4 w-4" />
-                                <svg-icon v-show="linkType !== 'asset'" name="folder-generic" class="h-4 w-4" />
+                                <ui-icon v-show="linkType === 'asset'" name="folder-image" class="size-4" />
+                                <ui-icon v-show="linkType !== 'asset'" name="folder-generic" class="size-4" />
                             </button>
                         </div>
                     </div>
-                </div>
+                </section>
 
-                <!-- Title attribute -->
-                <div
-                    class="dark:placeholder:dark-text-dark-175 mb-4 flex h-8 w-full items-center rounded border bg-gray-100 p-2 text-gray-800 shadow-inner placeholder:text-gray-600 dark:border-dark-200 dark:bg-dark-600 dark:text-dark-150"
-                >
-                    <input
+                <div class="space-y-3 p-4">
+                    <!-- Title attribute -->
+                    <ui-input
                         type="text"
                         ref="input"
+                        size="sm"
                         v-model="title"
-                        class="input placeholder-gray-50 h-auto text-sm"
-                        :placeholder="`${__('Label')} (${__('Optional')})`"
+                        :prepend="__('Label')"
+                        :placeholder="__('Optional')"
                     />
-                </div>
 
-                <!-- Rel attribute -->
-                <div
-                    class="dark:placeholder:dark-text-dark-175 flex h-8 w-full items-center rounded border bg-gray-100 p-2 text-gray-800 shadow-inner placeholder:text-gray-600 dark:border-dark-200 dark:bg-dark-600 dark:text-dark-150"
-                >
-                    <input
+                    <!-- Rel attribute -->
+                    <ui-input
                         type="text"
                         ref="input"
+                        size="sm"
                         v-model="rel"
-                        class="input placeholder-gray-50 h-auto text-sm"
-                        :placeholder="`${__('Relationship')} (${__('Optional')})`"
+                        :prepend="__('Rel')"
+                        :placeholder="__('Optional')"
+                    />
+
+                    <ui-checkbox-item
+                        :label="__('Open in new window')"
+                        v-model="targetBlank"
+                        size="sm"
                     />
                 </div>
 
-                <label
-                    for="target-blank"
-                    class="mt-4 flex cursor-pointer items-center font-normal text-gray-800 hover:text-black dark:text-dark-150 dark:hover:text-dark-100"
-                    v-if="canHaveTarget"
-                >
-                    <input class="checkbox ltr:mr-2 rtl:ml-2" type="checkbox" v-model="targetBlank" id="target-blank" />
-                    {{ __('Open in new window') }}
-                </label>
             </div>
 
-            <footer
-                class="flex items-center justify-end space-x-3 rounded-b-md bg-gray-100 p-2 font-normal dark:bg-dark-575 rtl:space-x-reverse"
-            >
-                <button
+            <footer class="flex items-center justify-end gap-3 rounded-b-md bg-gray-100 p-2 font-normal dark:bg-gray-800 rounded-b-xl">
+                <ui-button
                     @click="$emit('canceled')"
-                    class="dark:hover-text-dark-100 text-xs text-gray-600 hover:text-gray-800 dark:text-dark-175"
-                >
-                    {{ __('Cancel') }}
-                </button>
-                <button :aria-label="__('Remove Link')" @click="remove" class="btn btn-sm">
-                    {{ __('Remove Link') }}
-                </button>
-                <button
+                    :text="__('Cancel')"
+                    size="sm"
+                    inset
+                    variant="ghost"
+                />
+                <ui-button
+                    :text="__('Remove Link')"
+                    @click="remove"
+                    size="sm"
+                    inset
+                />
+                <ui-button
+                    :text="__('Apply Link')"
                     :disabled="!canCommit"
-                    v-tooltip="__('Apply Link')"
-                    :aria-label="__('Apply Link')"
                     @click="commit"
-                    class="btn btn-sm"
-                >
-                    {{ __('Save') }}
-                </button>
+                    size="sm"
+                    variant="primary"
+                />
             </footer>
         </div>
 
@@ -164,7 +154,6 @@
                 :folder="config.folder || '/'"
                 :restrict-folder-navigation="config.restrict_assets"
                 :selected="[]"
-                :view-mode="'grid'"
                 :max-files="1"
                 @selected="assetSelected"
                 @closed="closeAssetSelector"
@@ -176,12 +165,12 @@
 <script>
 import qs from 'qs';
 import AssetSelector from '../../assets/Selector.vue';
-import SvgIcon from '../../SvgIcon.vue';
+import { Icon } from '@statamic/ui';
 
 export default {
     components: {
         AssetSelector,
-        SvgIcon,
+        Icon,
     },
 
     props: {
@@ -205,7 +194,7 @@ export default {
             itemData: {},
             title: null,
             rel: null,
-            targetBlank: null,
+            targetBlank: false,
             showAssetSelector: false,
             isLoading: false,
         };
@@ -256,6 +245,7 @@ export default {
                 type: 'entries',
                 collections: this.collections,
                 max_items: 1,
+                select_across_sites: this.config.select_across_sites,
             };
         },
 
@@ -362,7 +352,7 @@ export default {
 
             this.title = attrs.title;
             this.rel = attrs.href ? attrs.rel : this.defaultRel;
-            this.targetBlank = attrs.href ? attrs.target === '_blank' : this.config.target_blank;
+            this.targetBlank = attrs.href ? attrs.target === '_blank' : (this.config.target_blank || false);
         },
 
         autofocus() {

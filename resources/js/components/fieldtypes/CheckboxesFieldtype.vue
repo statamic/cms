@@ -1,27 +1,30 @@
 <template>
-    <div class="checkboxes-fieldtype-wrapper" :class="{ 'inline-mode': config.inline }">
-        <div class="option" v-for="(option, $index) in options" :key="$index">
-            <label>
-                <input
-                    type="checkbox"
-                    ref="checkbox"
-                    :name="name + '[]'"
-                    :value="option.value"
-                    :disabled="isReadOnly"
-                    v-model="values"
-                />
-                {{ option.label || option.value }}
-            </label>
-        </div>
+    <div>
+        <CheckboxGroup v-model="values" :inline="config.inline" ref="checkboxes">
+            <Checkbox
+                v-for="(option, index) in options"
+                :disabled="config.disabled"
+                :key="index"
+                :label="option.label || option.value"
+                :read-only="isReadOnly"
+                :value="option.value"
+            />
+        </CheckboxGroup>
     </div>
 </template>
 
 <script>
 import Fieldtype from './Fieldtype.vue';
 import HasInputOptions from './HasInputOptions.js';
+import { CheckboxGroup, Checkbox } from '@statamic/ui';
 
 export default {
     mixins: [Fieldtype, HasInputOptions],
+
+    components: {
+        CheckboxGroup,
+        Checkbox,
+    },
 
     data() {
         return {
@@ -62,7 +65,7 @@ export default {
 
     methods: {
         focus() {
-            this.$refs.checkbox[0].focus();
+            this.$refs.checkboxes.focus();
         },
 
         sortValues(values) {

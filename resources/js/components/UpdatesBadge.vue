@@ -1,18 +1,22 @@
 <template>
-    <span v-if="count" class="badge-sm bg-red-500 dark:bg-blue-900">
-        {{ count }}
-    </span>
+    <Badge v-if="count" :text="String(count)" color="red" size="sm" variant="flat" pill />
 </template>
 
 <script>
 import { ref } from 'vue';
+import { Badge } from '@statamic/ui';
+
 const count = ref(null);
 const requested = ref(false);
 
 export default {
+    components: {
+        Badge,
+    },
+
     computed: {
         count() {
-            return count;
+            return count.value;
         },
     },
 

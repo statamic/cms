@@ -2,59 +2,7 @@
    ARRAY FIELDTYPE
    ========================================================================== */
 
-.array-fieldtype .row {
-    margin-bottom: 8px;
-}
-
-.array-fieldtype .array-keyed .grid-table {
-    margin-bottom: 0;
-}
-
-/* Inside a Grid field
-  ========================================================================== */
-
-.grid-table .array-fieldtype {
-    .grid-table {
-        margin-bottom: 0;
-        tr:first-child {
-            td,
-            th {
-                border-top: 0;
-            }
-        }
-        tr:last-child {
-            td,
-            th {
-                border-radius: 0;
-            }
-        }
-        tr > :first-child {
-            border-left: 0;
-            [dir='rtl'] & {
-                border-left: 0;
-                border-right: 0;
-            }
-        }
-        tr > :last-child {
-            border-right: 0;
-            [dir='rtl'] & {
-                border-right: 0;
-                border-left: 0;
-            }
-        }
-    }
-
-    /*  Dynamic Mode */
-    .array-dynamic .btn {
-        @apply block h-auto w-full border-0 text-blue shadow-none ltr:text-left rtl:text-right;
-        background: #f4f4f4;
-        padding: 10px 10px 11px;
-        margin: 15px 0 0;
-
-        &:hover,
-        &:active,
-        &:focus {
-            top: 0;
-        }
-    }
+.array-fieldtype .input-text {
+    @apply block w-full max-w-full appearance-none rounded-sm border bg-gray-100 p-2 text-sm text-gray-900 shadow-inner placeholder:text-gray-600 @lg:text-base;
+    @apply dark:bg-gray-400 dark:text-gray-200  dark:placeholder:text-gray-400;
 }

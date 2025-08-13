@@ -1,16 +1,6 @@
 <template>
-    <button
-        class="blueprint-tab tab-button"
-        role="tab"
-        :class="{ active: isActive }"
-        :aria-controls="`tab-panel-${tab._id}`"
-        :aria-selected="isActive"
-        :id="`tab-${tab._id}`"
-        :tabindex="isActive ? 0 : -1"
-        @click="$emit('selected')"
-        @mouseenter="$emit('mouseenter')"
-    >
-        <svg-icon
+    <TabTrigger :name="tab._id">
+        <Icon
             v-if="tab.icon"
             :name="iconName(tab.icon)"
             :directory="iconBaseDirectory"
@@ -19,58 +9,46 @@
 
         {{ __(tab.display) }}
 
-        <dropdown-list v-if="isActive" ref="dropdown" placement="bottom-start" class="ltr:text-left rtl:text-right">
+        <Dropdown v-if="isActive" placement="left-start" class="me-3">
             <template #trigger>
                 <button
-                    class="hover:text-gray-900 active:text-gray-900 dark:hover:text-gray-400 ltr:ml-2 rtl:mr-2"
+                    class="hover:text-gray-900 active:text-gray-900 dark:hover:text-gray-400 ms-1"
                     :aria-label="__('Open Dropdown')"
                 >
-                    <svg-icon name="micro/chevron-down-xs" class="w-2" />
+                    <Icon name="ui/chevron-down" />
                 </button>
             </template>
-            <dropdown-item @click="edit" v-text="__('Edit')" />
-            <dropdown-item @click="remove" class="warning" v-text="__('Delete')" />
-        </dropdown-list>
+            <DropdownMenu>
+                <DropdownItem :text="__('Edit')" icon="edit" @click="edit" />
+                <DropdownItem :text="__('Delete')" icon="trash" variant="destructive" @click="remove" />
+            </DropdownMenu>
+        </Dropdown>
 
         <confirmation-modal
             v-if="editing"
             :title="editText"
-            @opened="$refs.title.focus()"
+            @opened="() => {
+                this.$nextTick(() => {
+                    this.$refs.title.focus()
+                });
+            }"
             @confirm="editConfirmed"
             @cancel="editCancelled"
         >
-            <div class="publish-fields @container">
-                <div class="form-group w-full">
-                    <label v-text="__('Title')" />
-                    <input
-                        ref="title"
-                        type="text"
-                        :value="display"
-                        @input="fieldUpdated('display', $event.target.value)"
-                        class="input-text"
-                    />
-                </div>
-                <div class="form-group w-full">
-                    <label v-text="__('Handle')" />
-                    <input
-                        type="text"
-                        :value="handle"
-                        @input="fieldUpdated('handle', $event.target.value)"
-                        class="input-text font-mono text-sm"
-                    />
-                </div>
-                <div class="form-group w-full" v-if="showInstructions">
-                    <label v-text="__('Instructions')" />
-                    <input
-                        type="text"
-                        :value="instructions"
-                        @input="fieldUpdated('instructions', $event.target.value)"
-                        class="input-text text-sm"
-                    />
-                </div>
+            <div class="publish-fields">
+                <Field :label="__('Title')" class="form-group field-w-100">
+                    <Input ref="title" autofocus :model-value="display" @update:model-value="fieldUpdated('display', $event)" />
+                </Field>
 
-                <div class="form-group w-full" v-if="showInstructions">
-                    <label v-text="__('Icon')" />
+                <Field :label="__('Handle')" class="form-group field-w-100">
+                    <Input class="font-mono" :model-value="handle" @update:model-value="fieldUpdated('handle', $event)" />
+                </Field>
+
+                <Field v-if="showInstructions" :label="__('Instructions')" class="form-group field-w-100">
+                    <Input :model-value="instructions" @update:model-value="fieldUpdated('instructions', $event)" />
+                </Field>
+
+                <Field v-if="showInstructions" :label="__('Icon')" class="form-group field-w-100">
                     <publish-field-meta
                         :config="{
                             handle: 'icon',
@@ -79,24 +57,29 @@
                             folder: this.iconSubFolder,
                         }"
                         :initial-value="icon"
-                        v-slot="{ meta, value, loading }"
+                        v-slot="{ meta, value, loading, config }"
                     >
                         <icon-fieldtype
                             v-if="!loading"
                             handle="icon"
+                            :config="config"
                             :meta="meta"
                             :value="value"
-                            @input="fieldUpdated('icon', $event)"
+                            @update:value="fieldUpdated('icon', $event)"
                         />
                     </publish-field-meta>
-                </div>
+                </Field>
             </div>
         </confirmation-modal>
-    </button>
+    </TabTrigger>
 </template>
 
 <script>
+import { TabTrigger, Dropdown, DropdownMenu, DropdownItem, Icon, Field, Input } from '@statamic/ui';
+
 export default {
+    components: { TabTrigger, Dropdown, DropdownMenu, DropdownItem, Icon, Field, Input },
+
     props: {
         tab: {
             type: Object,

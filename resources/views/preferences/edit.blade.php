@@ -7,16 +7,6 @@
 
 @section('content')
 
-@if ($showBreadcrumb)
-    @include(
-        'statamic::partials.breadcrumb',
-        [
-            'url' => cp_route('preferences.index'),
-            'title' => __('Preferences'),
-        ]
-    )
-@endif
-
 <preferences-edit-form
     title="{{ $title }}"
     :blueprint="{{ Js::from($blueprint) }}"

@@ -6,16 +6,15 @@
         method="post"
         :initial-title="taxonomyCreateLabel"
         :taxonomy-handle="taxonomyHandle"
-        :breadcrumbs="breadcrumbs"
         :initial-fieldset="fieldset"
         :initial-values="values"
         :initial-meta="meta"
         :initial-published="published"
         :initial-localizations="localizations"
         :initial-has-origin="false"
-        :initial-is-root="true"
         :initial-origin-values="{}"
         :initial-site="site"
+        :can-edit-blueprint="canEditBlueprint"
         :create-another-url="createAnotherUrl"
         :listing-url="listingUrl"
         :preview-targets="previewTargets"
@@ -29,13 +28,13 @@ export default {
         'actions',
         'taxonomyHandle',
         'taxonomyCreateLabel',
-        'breadcrumbs',
         'fieldset',
         'values',
         'meta',
         'published',
         'localizations',
         'site',
+        'canEditBlueprint',
         'createAnotherUrl',
         'listingUrl',
         'previewTargets',

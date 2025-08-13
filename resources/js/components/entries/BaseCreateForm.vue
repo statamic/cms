@@ -13,13 +13,12 @@
         :initial-meta="meta"
         :initial-localizations="localizations"
         :initial-has-origin="false"
-        :initial-is-root="true"
         :initial-origin-values="{}"
         :revisions-enabled="revisions"
-        :breadcrumbs="breadcrumbs"
         :initial-site="site"
         :parent="parent"
         :can-manage-publish-state="canManagePublishState"
+        :can-edit-blueprint="canEditBlueprint"
         :create-another-url="createAnotherUrl"
         :initial-listing-url="listingUrl"
         :preview-targets="previewTargets"
@@ -40,10 +39,10 @@ export default {
         'meta',
         'localizations',
         'revisions',
-        'breadcrumbs',
         'site',
         'parent',
         'canManagePublishState',
+        'canEditBlueprint',
         'createAnotherUrl',
         'listingUrl',
         'previewTargets',

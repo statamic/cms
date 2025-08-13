@@ -1,35 +1,38 @@
 <template>
-    <popover
-        ref="popover"
-        class="set-picker select-none"
-        placement="bottom-start"
-        :disabled="!enabled || !hasMultipleSets"
-        @opened="opened"
-        @closed="closed"
-        @click="triggerWasClicked"
+    <template v-if="!hasMultipleSets">
+        <Primitive @click="singleButtonClicked">
+            <slot name="trigger" />
+        </Primitive>
+    </template>
+
+    <ui-popover
+        v-else
+        inset
+        class="set-picker select-none w-[300px]"
+        :open="isOpen"
+        @update:open="isOpen = $event"
         @clicked-away="$emit('clicked-away', $event)"
     >
         <template #trigger>
             <slot name="trigger" />
         </template>
         <template #default>
-            <div class="set-picker-header flex items-center border-b p-3 text-xs dark:border-dark-900">
-                <input
+            <div class="set-picker-header flex items-center border-b p-3 text-xs dark:border-gray-600">
+                <ui-input
                     ref="search"
+                    size="sm"
                     type="text"
-                    class="input-text h-auto w-full rounded border px-2 py-1 text-xs dark:border-gray-900 dark:bg-dark-650"
                     :placeholder="__('Search Sets')"
+                    icon-prepend="magnifying-glass"
                     v-show="showSearch"
                     v-model="search"
+                    data-set-picker-search-input
                 />
-                <div v-if="showGroupBreadcrumb" class="flex items-center font-medium text-gray-700 dark:text-gray-600">
-                    <button
-                        @click="unselectGroup"
-                        class="rounded hover:text-gray-900 dark:hover:text-gray-500 ltr:ml-2.5 rtl:mr-2.5"
-                    >
+                <div v-if="showGroupBreadcrumb" class="flex items-center font-medium text-gray-700 dark:text-gray-300 gap-1">
+                    <button @click="unselectGroup" class="hover:text-gray-900 dark:hover:text-white">
                         {{ __('Groups') }}
                     </button>
-                    <svg-icon name="micro/chevron-right" class="h-4 w-4" />
+                    <ui-icon name="ui/chevron-right" class="size-4" />
                     <span>{{ selectedGroupDisplayText }}</span>
                 </div>
             </div>
@@ -37,54 +40,37 @@
                 <div
                     v-for="(item, i) in items"
                     :key="item.handle"
-                    class="cursor-pointer rounded"
-                    :class="{ 'bg-gray-200 dark:bg-dark-600': selectionIndex === i }"
+                    class="cursor-pointer rounded-md"
+                    :class="{ 'bg-gray-100 dark:bg-gray-900': selectionIndex === i }"
                     @mouseover="selectionIndex = i"
+                    :title="__(item.instructions)"
                 >
-                    <div
-                        v-if="item.type === 'group'"
-                        @click="selectGroup(item.handle)"
-                        class="group flex items-center rounded-md px-2 py-1.5"
-                    >
-                        <svg-icon
+                    <div v-if="item.type === 'group'" @click="selectGroup(item.handle)" class="group flex rounded-md px-2 py-1.5 gap-3">
+                        <ui-icon
                             :name="groupIconName(item.icon)"
-                            :directory="iconBaseDirectory"
-                            class="h-9 w-9 rounded border border-gray-600 bg-white p-2 text-gray-800 dark:border-dark-800 dark:bg-dark-650 dark:text-dark-175 ltr:mr-2 rtl:ml-2"
+                            class="size-9 rounded-md border border-gray-300 bg-white dark:bg-gray-900/50 dark:border-gray-600 shadow-ui-xs p-2"
                         />
                         <div class="flex-1">
-                            <div class="w-52 truncate text-md font-medium text-gray-800 dark:text-dark-175">
+                            <div class="w-50 line-clamp-2 text-sm font-medium text-gray-900 dark:text-dark-175">
                                 {{ __(item.display || item.handle) }}
                             </div>
-                            <div
-                                v-if="item.instructions"
-                                class="w-52 truncate text-2xs text-gray-700 dark:text-dark-175"
-                            >
+                            <div v-if="item.instructions" class="w-50 line-clamp-2 text-2xs text-gray-700 dark:text-dark-175">
                                 {{ __(item.instructions) }}
                             </div>
                         </div>
-                        <svg-icon
-                            name="micro/chevron-right-thin"
-                            class="text-gray-600 group-hover:text-dark-800 dark:group-hover:text-dark-175"
-                        />
+                        <ui-icon name="ui/chevron-right" class="me-2" />
                     </div>
-                    <div
-                        v-if="item.type === 'set'"
-                        @click="addSet(item.handle)"
-                        class="group flex items-center rounded-md px-2 py-1.5"
-                    >
-                        <svg-icon
+                    <div v-if="item.type === 'set'" @click="addSet(item.handle)" class="group flex rounded-md px-2 py-1.5 gap-3">
+                        <ui-icon
                             :name="setIconName(item.icon)"
                             :directory="iconBaseDirectory"
-                            class="h-9 w-9 rounded border border-gray-600 bg-white p-2 text-gray-800 dark:border-dark-800 dark:bg-dark-650 dark:text-dark-175 ltr:mr-2 rtl:ml-2"
+                            class="size-9 rounded-md border border-gray-300 bg-white dark:bg-gray-900/50 dark:border-gray-600 shadow-ui-xs p-2"
                         />
                         <div class="flex-1">
-                            <div class="w-52 truncate text-md font-medium text-gray-800 dark:text-dark-175">
+                            <div class="w-52 line-clamp-2 text-sm font-medium text-gray-900 dark:text-dark-175">
                                 {{ __(item.display || item.handle) }}
                             </div>
-                            <div
-                                v-if="item.instructions"
-                                class="w-52 truncate text-2xs text-gray-700 dark:text-dark-175"
-                            >
+                            <div v-if="item.instructions" class="w-52 truncate text-2xs text-gray-700 dark:text-dark-175">
                                 {{ __(item.instructions) }}
                             </div>
                         </div>
@@ -95,11 +81,19 @@
                 </div>
             </div>
         </template>
-    </popover>
+    </ui-popover>
 </template>
 
 <script>
+import { Primitive } from 'reka-ui';
+
 export default {
+    emits: ['added', 'clicked-away'],
+
+    components: {
+        Primitive,
+    },
+
     props: {
         sets: Array,
         enabled: { type: Boolean, default: true },
@@ -111,6 +105,7 @@ export default {
             search: null,
             selectionIndex: 0,
             keybindings: [],
+            isOpen: false,
         };
     },
 
@@ -211,6 +206,16 @@ export default {
     },
 
     watch: {
+        isOpen(isOpen) {
+            if (isOpen) {
+                if (this.sets.length === 1) {
+                    this.selectedGroupHandle = this.sets[0].handle;
+                }
+                this.bindKeys();
+            } else {
+                this.unbindKeys();
+            }
+        },
         search() {
             this.selectionIndex = 0;
         },
@@ -221,7 +226,7 @@ export default {
             this.$emit('added', handle);
             this.unselectGroup();
             this.search = null;
-            this.$refs.popover.close();
+            this.isOpen = false;
         },
 
         selectGroup(handle) {
@@ -233,26 +238,13 @@ export default {
             this.selectedGroupHandle = null;
         },
 
-        opened() {
-            // setTimeout(() => this.$refs.search.focus(), 150);
-            this.$refs.search.focus();
-
-            if (this.sets.length === 1) {
-                this.selectedGroupHandle = this.sets[0].handle;
-            }
-
-            this.bindKeys();
-        },
-
-        closed() {
-            this.unbindKeys();
-        },
-
         bindKeys() {
             this.keybindings = [
                 this.$keys.bindGlobal('up', (e) => this.keypressUp(e)),
                 this.$keys.bindGlobal('down', (e) => this.keypressDown(e)),
                 this.$keys.bindGlobal('enter', (e) => this.keypressEnter(e)),
+                this.$keys.bindGlobal('right', (e) => this.keypressRight(e)),
+                this.$keys.bindGlobal('left', (e) => this.keypressLeft(e)),
             ];
         },
 
@@ -271,6 +263,17 @@ export default {
             this.selectionIndex = this.selectionIndex === this.items.length - 1 ? 0 : this.selectionIndex + 1;
         },
 
+        keypressRight(e) {
+            e.preventDefault();
+            if (this.selectedGroup || this.search) return; // Pressing right to select a set feels awkward.
+            this.keypressEnter(e);
+        },
+
+        keypressLeft(e) {
+            e.preventDefault();
+            this.unselectGroup();
+        },
+
         keypressEnter(e) {
             e.preventDefault();
             const item = this.items[this.selectionIndex];
@@ -281,22 +284,24 @@ export default {
             }
         },
 
-        triggerWasClicked() {
-            if (!this.hasMultipleSets) {
-                this.addSet(this.sets[0].sets[0].handle);
-            }
+        singleButtonClicked() {
+            this.addSet(this.sets[0].sets[0].handle);
         },
 
         groupIconName(name) {
-            if (!name) return 'folder-generic';
+            if (!name) return 'folder';
 
             return this.iconSubFolder ? this.iconSubFolder + '/' + name : name;
         },
 
         setIconName(name) {
-            if (!name) return 'light/add';
+            if (!name) return 'plus';
 
             return this.iconSubFolder ? this.iconSubFolder + '/' + name : name;
+        },
+
+        open() {
+            this.isOpen = true;
         },
     },
 };

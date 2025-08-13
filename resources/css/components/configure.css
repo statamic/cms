@@ -10,12 +10,8 @@
     /*  Push toggle off to the right */
     > .publish-fields > .toggle-fieldtype {
         @apply flex flex-wrap items-center justify-between;
-        .help-block,
-        .help-block p {
-            @apply mb-0;
-        }
         .field-inner {
-            @apply ltr:pr-8 rtl:pl-8;
+            @apply pe-8;
         }
     }
 }

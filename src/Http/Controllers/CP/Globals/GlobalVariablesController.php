@@ -19,7 +19,7 @@ class GlobalVariablesController extends CpController
         }
 
         if (! $variables = $set->in($site)) {
-            return abort(404);
+            return $this->pageNotFound();
         }
 
         $this->authorize('edit', $variables);
@@ -39,14 +39,13 @@ class GlobalVariablesController extends CpController
             'editing' => true,
             'actions' => [
                 'save' => $variables->updateUrl(),
-                'editBlueprint' => cp_route('globals.blueprint.edit', $set->handle()),
+                'editBlueprint' => cp_route('blueprints.globals.edit', $set->handle()),
             ],
             'values' => $values,
             'meta' => $meta,
             'blueprint' => $blueprint->toPublishArray(),
             'locale' => $variables->locale(),
             'localizedFields' => $variables->data()->keys()->all(),
-            'isRoot' => $variables->isRoot(),
             'hasOrigin' => $hasOrigin,
             'originValues' => $originValues ?? null,
             'originMeta' => $originMeta ?? null,
@@ -87,7 +86,7 @@ class GlobalVariablesController extends CpController
         }
 
         if (! $set = $set->in($site)) {
-            abort(404);
+            return $this->pageNotFound();
         }
 
         $this->authorize('edit', $set);
@@ -104,7 +103,7 @@ class GlobalVariablesController extends CpController
 
         $set->data($values);
 
-        $save = $set->globalSet()->addLocalization($set)->save();
+        $save = $set->save();
 
         return response()->json([
             'saved' => is_bool($save) ? $save : true,

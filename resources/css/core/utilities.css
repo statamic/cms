@@ -1,30 +1,79 @@
-/* ==========================================================================
-   UTILITES
-   ========================================================================== */
-
-.text-shadow {
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+/* UTILITIES / LAYOUT
+=================================================== */
+[v-cloak],
+[x-cloak] {
+    display: none;
 }
 
-.focus-outline {
-    @apply border border-blue-300 dark:border-dark-blue-200;
-    outline: 0;
-    box-shadow: 0 0 0 0.2rem rgba(0, 125, 255, 0.25);
+@utility max-h-screen-px {
+    max-height: calc(100vh - 1px) !important;
 }
 
-.focus-none {
-    /* @apply border-0; */
+.z-max {
+    z-index: var(--z-index-max);
+}
+
+/* UTILITIES / TEXT
+=================================================== */
+/* Avoid prefixing things with text- because this is a Tailwind prefix */
+@utility st-text-trim-start {
+    text-box: trim-start;
+    /* =Jay. When we have an SVG we probably don't want to text trim, for example in a Markdown field with button controls like Bold, Italic, etc. */
+    &:has(svg),
+    &:has(+ svg) {
+        display: flex;
+    }
+    /* =Jay. Exceptions */
+    /* e.g. for a fieldset, we don't want to trim the text when we have a label like on a collections field, Link Item button */
+    .form-group :has(> &) & {
+        text-box: unset;
+    }
+}
+@utility st-text-trim-cap {
+    /* =Jay. Sometimes this is handy e.g. the text inside the command palette searchbox */
+    text-box: cap alphabetic;
+}
+
+@utility placeholder-xs {
+    /* =Jay. The default of 1em on field inputs feels a bit clumsy/big */
+    &::placeholder {
+        font-size: 0.975em;
+    }
+}
+@utility placeholder-text-xs {
+    /* =Jay. If it needs to be used directly on the element such as the link field i.e. pseudo ::placeholder */
+    font-size: 0.975em;
+}
+
+@utility st-text-legibility {
+    font-family: "inter", sans-serif;
+    letter-spacing: -0.02em;
+    font-optical-sizing: auto;
+    font-weight: 425;
+}
+
+/* UTILITIES / STATES
+=================================================== */
+/* Here we typically need a negative outline-offset because of the inner shadow on inputs */
+@utility focus-outline {
+    outline-width: var(--focus-outline-width);
+    outline-offset: var(--focus-outline-offset);
+    outline-color: var(--focus-outline-color, currentColor);
+    outline-style: var(--focus-outline-style, solid);
+}
+/* Make the focus border more descrete for some fields such as Bard */
+@utility focus-outline-discrete {
+    &:focus-within {
+        --focus-outline-color: var(--color-blue-300);
+    }
+}
+
+@utility focus-none {
     outline: 0;
     box-shadow: none;
 }
 
-.selected-outline {
-    @apply border-blue;
-    outline: 0;
-    box-shadow: 0 0 0 2px theme('colors.blue.DEFAULT');
-}
-
-.loading {
+@utility loading {
     text-align: center;
     padding: 20px 0;
 
@@ -33,7 +82,7 @@
         margin-bottom: 5px;
     }
 
-    &.loading-basic {
+    /* &.loading-basic {
         @apply ltr:text-left rtl:text-right;
         padding: 0;
 
@@ -44,28 +93,15 @@
                 margin: -2px 0 0 5px;
             }
         }
-    }
+    } */
 }
 
-.shadow-hover-lg {
-    @apply shadow-lg;
-    transition: box-shadow 0.08s ease-in-out;
-    &:hover {
-        @apply shadow-xl;
-    }
+@utility button-active {
+    background: var(--color-button-active-light-theme);
 }
 
-.w-fit-content {
-    width: fit-content;
-}
-
-.break-overflowing-words {
-    word-break: break-word;
-    overflow-wrap: break-word;
-}
-
-.saving-overlay {
-    @apply absolute inset-0 z-200 flex items-center rounded;
+@utility saving-overlay {
+    @apply absolute inset-0 z-200 flex items-center rounded-sm;
     background: rgba(255, 255, 255, 0.9);
 
     .dark & {
@@ -87,40 +123,191 @@
     }
 }
 
-.bg-checkerboard {
+@utility bg-frosted {
+    @apply bg-white/85 backdrop-blur-sm;
+}
+
+/* UTILITIES / STATES / DECORATION / MASK BACKGROUND
+=================================================== */
+/* Notes...
+
+    URL example
+    -----------
+    /cp/taxonomies/something
+
+    What does it do?
+    ----------------
+    - Adds a pseudo element below to mask anything that flows below it
+    - This was created to add to the "customize column" button, so that filters flowing below it would be half-masked/flow under smoothly
+
+*/
+/* HTML Example...
+
+    <div class="absolute right-0 mask-bg"> <-- needs to be position:absolute or position:relative. Use a modifier class to change the amount/direction, e.g. <div class="sticky left-0 mask-bg mask-bg--left mask-bg--left-small">
+
+    </div>
+
+*/
+@utility mask-bg {
+    z-index: var(--z-index-above);
+    &::before {
+        --cover: 3rem;
+        --height-offset: 0.3rem;
+        content: '';
+        opacity: 75%;
+        position: absolute;
+        z-index: var(--z-index-below);
+        width: calc(150% + var(--cover));
+        height: calc(100% + var(--height-offset) * 2);
+        top: calc(0% - var(--height-offset));
+        background: radial-gradient(circle at center, white 0%,transparent 80%);
+        border-radius: 1.5rem 0 0 1.5rem;
+    }
+    .dark &::before {
+        background: radial-gradient(circle at center, hsl(240deg 6% 10%) 0%, transparent 80%);
+    }
+}
+@utility mask-bg--left {
+    &::before {
+        left: calc(0.5rem - var(--cover));
+    }
+}
+@utility mask-bg--left-small {
+    &::before {
+        left: calc(-0.75rem - var(--cover));
+    }
+}
+
+/* UTILITIES / STATES / DECORATION / ARCHIECTURAL LINES
+=================================================== */
+/* Notes...
+
+    URL example
+    -----------
+    /cp/collections/create
+
+    What does it do?
+    ----------------
+    - Add a background image of architectural lines to the element.
+    - Target single buttons in any descended footers to add a circular line effect around them.
+
+*/
+/* HTML Example...
+
+    <div class="content-card bg-architectural-lines"> <-- background lines added to this element
+        [data-ui-panel] <-- a central horizontal line is created here
+        <footer>
+            <button>Create Collection</button> <--- circular line effect added to this descendended button in the footer
+        </footer>
+    </div>
+
+*/
+@utility bg-architectural-lines {
+    overflow: hidden;
+    &::before {
+        content: '';
+        pointer-events: none;
+        position: absolute;
+        inset: 0;
+        background-image: url('../../svg/ui/architectural-lines.svg');
+        background-size: 100%;
+        /* Reduce the chances of the background circles overlapping the button */
+        @media (width < 1300px) {
+            background-position-y: 130%;
+        }
+        @media (width > 2000px) {
+            /* The lines become thicker because the svg gets stretched, so reduce opacity to compensate for this */
+            opacity: 0.7;
+        }
+    }
+    .dark &::before {
+        filter: invert(100%);
+    }
+    /* Central horizontal line */
+    [data-ui-panel] {
+        > * {
+            position: relative;
+            z-index: 1;
+        }
+    
+        &::after {
+            --height: 1px;
+            --line-color: hsl(0deg 0% 95%);
+            content: '';
+            pointer-events: none;
+            position: absolute;
+            inset: 0;
+            height: var(--height);
+            border-image: conic-gradient(var(--line-color) 0 0) fill 0//0 100vw;
+            top: calc(50% - var(--height));
+        }
+        .dark &::after {
+            --line-color: hsl(240deg 2.56% 15%);
+        }
+    }
+    footer {
+        position: relative;
+        &::before {
+            content: '';
+            pointer-events: none;
+            position: absolute;
+            border-block-end: 1px solid black;
+            opacity: 0.06;
+            width: 100vw;
+            top: 50%;
+            transform: translateY(50%);
+        }
+        button:only-child {
+            position: relative;
+            &::before, &::after {
+                content: '';
+                pointer-events: none;
+                position: absolute;
+                inset: 0;
+                border: 1px solid black;
+                opacity: 0.06;
+                width: 60%;
+                aspect-ratio: 1;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                border-radius: 50%;
+            }
+            &::before {
+                width: 45%;
+            }
+        }
+    }
+}
+
+/* UTILITIES / STATES / DECORATION / CHECKERBOARD
+=================================================== */
+@utility bg-checkerboard {
+    --checkerboard-light: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%23f3f4f6'/%3E%3C/svg%3E");
+    --checkerboard-dark: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%231f2937'/%3E%3C/svg%3E");
+
+    position: relative;
     background-color: #fff;
-    background-image: linear-gradient(45deg, #edf2f6 25%, transparent 25%),
-        linear-gradient(-45deg, #edf2f6 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #edf2f6 75%),
-        linear-gradient(-45deg, transparent 75%, #edf2f6 75%);
-    background-size: 16px 16px;
-    background-position:
-        0 0,
-        0 8px,
-        8px -8px,
-        -8px 0;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: var(--checkerboard-light);
+        opacity: 0;
+        transition: opacity 0.2s ease-in-out;
+        pointer-events: none;
+    }
+
+    &:hover::before {
+        opacity: 1;
+    }
 
     .dark & {
-        background-color: theme(colors.dark.600);
-        background-image: linear-gradient(45deg, theme(colors.dark.950) 25%, transparent 25%),
-            linear-gradient(-45deg, theme(colors.dark.950) 25%, transparent 25%),
-            linear-gradient(45deg, transparent 75%, theme(colors.dark.950) 75%),
-            linear-gradient(-45deg, transparent 75%, theme(colors.dark.950) 75%);
+        background-color: var(--color-gray-850);
+
+        &::before {
+            background-image: var(--checkerboard-dark);
+        }
     }
-}
-
-.clickable {
-    @apply cursor-pointer select-none border bg-gradient-to-b from-white to-gray-100 text-gray-800 dark:border-dark-800 dark:from-dark-550 dark:to-dark-600 dark:text-dark-175;
-
-    &:hover {
-        @apply border-gray-500 from-white to-gray-200 dark:border-dark-900 dark:from-dark-550 dark:to-dark-700;
-    }
-}
-
-[v-cloak],
-[x-cloak] {
-    display: none;
-}
-
-.-max-h-screen-px {
-    max-height: calc(100vh - 1px) !important;
 }

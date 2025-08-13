@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Column;
+use Statamic\CP\PublishForm;
 use Statamic\Exceptions\SiteNotFoundException;
 use Statamic\Facades\Action;
 use Statamic\Facades\Blueprint;
@@ -20,6 +21,8 @@ use Statamic\Structures\CollectionStructure;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class CollectionsController extends CpController
 {
     public function index(Request $request)
@@ -28,7 +31,7 @@ class CollectionsController extends CpController
 
         $columns = [
             Column::make('title')->label(__('Title')),
-            Column::make('entries')->label(__('Entries'))->numeric(true),
+            Column::make('entries_count')->label(__('Entries'))->numeric(true),
         ];
 
         if ($request->wantsJson()) {
@@ -56,21 +59,33 @@ class CollectionsController extends CpController
             return [
                 'id' => $collection->handle(),
                 'title' => $collection->title(),
-                'entries' => $collection->queryEntries()->where('site', Site::selected())->count(),
+                'entries' => $collection->queryEntries()->where('site', Site::selected())->orderBy('date', 'desc')->limit(5)->get(),
+                'entries_count' => $collection->queryEntries()->where('site', Site::selected())->count(),
+                'published_entries_count' => $collection->queryEntries()->where('site', Site::selected())->where('status', 'published')->count(),
+                'draft_entries_count' => $collection->queryEntries()->where('site', Site::selected())->where('status', 'draft')->count(),
+                'scheduled_entries_count' => $collection->queryEntries()->where('site', Site::selected())->where('status', 'scheduled')->count(),
+                'blueprints' => $collection->entryBlueprints()->reject->hidden()->values(),
+                'columns' => [
+                    ['label' => 'Title', 'field' => 'title', 'visible' => true],
+                    ['label' => 'Date', 'field' => 'date', 'visible' => true],
+                ],
+                'dated' => $collection->dated(),
                 'edit_url' => $collection->editUrl(),
                 'delete_url' => $collection->deleteUrl(),
                 'entries_url' => cp_route('collections.show', $collection->handle()),
+                'create_entry_url' => $collection->createEntryUrl(Site::selected()),
                 'url' => $collection->absoluteUrl(Site::selected()->handle()),
-                'blueprints_url' => cp_route('collections.blueprints.index', $collection->handle()),
+                'blueprints_url' => cp_route('blueprints.collections.index', $collection->handle()),
                 'scaffold_url' => cp_route('collections.scaffold', $collection->handle()),
                 'deleteable' => User::current()->can('delete', $collection),
                 'editable' => User::current()->can('edit', $collection),
                 'blueprint_editable' => User::current()->can('configure fields'),
                 'available_in_selected_site' => $collection->sites()->contains(Site::selected()->handle()),
                 'actions' => Action::for($collection),
-                'actions_url' => cp_route('collections.actions.run', ['collection' => $collection->handle()]),
+                'actions_url' => cp_route('collections.actions.run'),
+                'icon' => $collection->icon(),
             ];
-        })->values();
+        })->sortBy('title')->values();
     }
 
     public function show(Request $request, $collection)
@@ -161,6 +176,7 @@ class CollectionsController extends CpController
         $values = [
             'title' => $collection->title(),
             'handle' => $collection->handle(),
+            'icon' => $collection->icon(),
             'dated' => $collection->dated(),
             'past_date_behavior' => $collection->pastDateBehavior(),
             'future_date_behavior' => $collection->futureDateBehavior(),
@@ -189,17 +205,11 @@ class CollectionsController extends CpController
             'origin_behavior' => $collection->originBehavior(),
         ];
 
-        $fields = ($blueprint = $this->editFormBlueprint($collection))
-            ->fields()
-            ->addValues($values)
-            ->preProcess();
-
-        return view('statamic::collections.edit', [
-            'blueprint' => $blueprint->toPublishArray(),
-            'values' => $fields->values(),
-            'meta' => $fields->meta(),
-            'collection' => $collection,
-        ]);
+        return PublishForm::make($this->editFormBlueprint($collection))
+            ->title(__('Configure Collection'))
+            ->values($values)
+            ->asConfig()
+            ->submittingTo(cp_route('collections.update', $collection->handle()));
     }
 
     public function store(Request $request)
@@ -248,6 +258,7 @@ class CollectionsController extends CpController
 
         $collection
             ->title($values['title'])
+            ->icon($values['icon'])
             ->routes($values['routes'])
             ->dated($values['dated'])
             ->template($values['template'])
@@ -354,6 +365,13 @@ class CollectionsController extends CpController
                         'instructions' => __('statamic::messages.collection_configure_title_instructions'),
                         'type' => 'text',
                         'validate' => 'required',
+                        'width' => '66',
+                    ],
+                    'icon' => [
+                        'display' => __('Icon'),
+                        'instructions' => __('statamic::messages.collection_configure_icon_instructions'),
+                        'type' => 'icon',
+                        'width' => '33',
                     ],
                 ],
             ],
@@ -377,6 +395,7 @@ class CollectionsController extends CpController
                         'if' => [
                             'dated' => true,
                         ],
+                        'width' => '50',
                     ],
                     'future_date_behavior' => [
                         'display' => __('Future Date Behavior'),
@@ -390,6 +409,7 @@ class CollectionsController extends CpController
                         'if' => [
                             'dated' => true,
                         ],
+                        'width' => '50',
                     ],
                 ],
             ],
@@ -409,6 +429,7 @@ class CollectionsController extends CpController
                             'asc' => __('Ascending'),
                             'desc' => __('Descending'),
                         ],
+                        'width' => '66',
                     ],
                     'max_depth' => [
                         'display' => __('Max Depth'),
@@ -416,18 +437,21 @@ class CollectionsController extends CpController
                         'type' => 'integer',
                         'validate' => 'min:0',
                         'if' => ['structured' => true],
+                        'width' => '33',
                     ],
                     'expects_root' => [
                         'display' => __('Expect a root page'),
                         'instructions' => __('statamic::messages.expect_root_instructions'),
                         'type' => 'toggle',
                         'if' => ['structured' => true],
+                        'width' => '50',
                     ],
                     'show_slugs' => [
                         'display' => __('Slugs'),
                         'instructions' => __('statamic::messages.show_slugs_instructions'),
                         'type' => 'toggle',
                         'if' => ['structured' => true],
+                        'width' => '50',
                     ],
                 ],
             ],
@@ -437,28 +461,25 @@ class CollectionsController extends CpController
                     'blueprints' => [
                         'display' => __('Blueprints'),
                         'instructions' => __('statamic::messages.collections_blueprint_instructions'),
-                        'type' => 'html',
-                        'html' => ''.
-                            '<div class="text-xs">'.
-                            '   <span class="rtl:ml-4 ltr:mr-4">'.$collection->entryBlueprints()->map(fn ($bp) => __($bp->title()))->join(', ').'</span>'.
-                            '   <a href="'.cp_route('collections.blueprints.index', $collection).'" class="text-blue">'.__('Edit').'</a>'.
-                            '</div>',
-                    ],
-                    'links' => [
-                        'display' => __('Links'),
-                        'instructions' => __('statamic::messages.collections_links_instructions'),
-                        'type' => 'toggle',
-                    ],
-                    'taxonomies' => [
-                        'display' => __('Taxonomies'),
-                        'instructions' => __('statamic::messages.collections_taxonomies_instructions'),
-                        'type' => 'taxonomies',
-                        'mode' => 'select',
+                        'type' => 'blueprints',
+                        'options' => $collection->entryBlueprints()->map(fn ($bp) => [
+                            'handle' => $bp->handle(),
+                            'title' => __($bp->title()),
+                            'edit_url' => cp_route('blueprints.collections.edit', [$collection->handle(), $bp->handle()]),
+                        ])->values()->all(),
+                        'all_blueprints_url' => cp_route('blueprints.collections.index', $collection->handle()),
                     ],
                     'default_publish_state' => [
                         'display' => __('Publish by Default'),
                         'instructions' => __('statamic::messages.collections_default_publish_state_instructions'),
                         'type' => 'toggle',
+                        'width' => '50',
+                    ],
+                    'links' => [
+                        'display' => __('Links'),
+                        'instructions' => __('statamic::messages.collections_links_instructions'),
+                        'type' => 'toggle',
+                        'width' => '50',
                     ],
                     'template' => [
                         'display' => __('Template'),
@@ -466,16 +487,26 @@ class CollectionsController extends CpController
                         'type' => 'template',
                         'placeholder' => __('System default'),
                         'blueprint' => true,
+                        'width' => '50',
                     ],
                     'layout' => [
                         'display' => __('Layout'),
                         'instructions' => __('statamic::messages.collection_configure_layout_instructions'),
                         'type' => 'template',
+                        'width' => '50',
+                    ],
+                    'taxonomies' => [
+                        'display' => __('Taxonomies'),
+                        'instructions' => __('statamic::messages.collections_taxonomies_instructions'),
+                        'type' => 'taxonomies',
+                        'mode' => 'select',
+                        'width' => '50',
                     ],
                     'title_formats' => [
-                        'display' => __('Title Format'),
+                        'display' => __('Automatic Title Format'),
                         'instructions' => __('statamic::messages.collection_configure_title_format_instructions'),
                         'type' => 'collection_title_formats',
+                        'width' => '50',
                     ],
                 ],
             ],
@@ -536,6 +567,7 @@ class CollectionsController extends CpController
                         'display' => __('Require Slugs'),
                         'instructions' => __('statamic::messages.collection_configure_require_slugs_instructions'),
                         'type' => 'toggle',
+                        'width' => '50',
                     ],
                     'mount' => [
                         'display' => __('Mount'),
@@ -546,6 +578,7 @@ class CollectionsController extends CpController
                         'collections' => Collection::all()->map->handle()->reject(function ($collectionHandle) use ($collection) {
                             return $collectionHandle === $collection->handle();
                         })->values()->all(),
+                        'width' => '50',
                     ],
                     'preview_targets' => [
                         'display' => __('Preview Targets'),
@@ -582,7 +615,23 @@ class CollectionsController extends CpController
             ],
         ]);
 
-        return Blueprint::makeFromTabs($fields);
+        return Blueprint::make()->setContents(collect([
+            'tabs' => [
+                'main' => [
+                    'sections' => collect($fields)->map(function ($section) {
+                        return [
+                            'display' => $section['display'],
+                            'fields' => collect($section['fields'])->map(function ($field, $handle) {
+                                return [
+                                    'handle' => $handle,
+                                    'field' => $field,
+                                ];
+                            })->values()->all(),
+                        ];
+                    })->values()->all(),
+                ],
+            ],
+        ])->all());
     }
 
     protected function getAuthorizedSitesForCollection($collection)

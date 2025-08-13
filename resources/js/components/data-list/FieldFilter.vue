@@ -2,37 +2,28 @@
     <div>
         <div v-if="hasAvailableFieldFilters">
             <div class="flex flex-col p-3">
-                <v-select
+                <ui-combobox
                     ref="fieldSelect"
                     :placeholder="__('Field')"
                     :options="fieldOptions"
-                    :reduce="(option) => option.value"
                     :model-value="field"
                     @update:model-value="createFilter"
                 />
 
-                <publish-container
+                <ui-publish-container
                     v-if="showFieldFilter"
-                    name="filter-field"
-                    :meta="{}"
-                    :values="containerValues"
+                    :model-value="containerValues"
+                    @update:model-value="updateValues"
+                    :meta="filter.meta"
                     :track-dirty-state="false"
-                    class="filter-fields mt-2"
-                    @updated="updateValues"
-                    v-slot="{ setFieldValue, setFieldMeta }"
                 >
-                    <publish-fields
-                        :fields="filter.fields"
-                        name-prefix="filter-field"
-                        class="no-label w-full"
-                        @updated="setFieldValue"
-                        @meta-updated="setFieldMeta"
-                    />
-                    <!-- TODO: handle showing/hiding of labels more elegantly -->
-                </publish-container>
+                    <ui-publish-fields-provider :fields="filter.fields">
+                        <ui-publish-fields />
+                    </ui-publish-fields-provider>
+                </ui-publish-container>
             </div>
 
-            <div class="flex border-t text-gray-800 dark:border-dark-900 dark:text-dark-150">
+            <div class="flex border-t text-gray-900 dark:border-dark-900 dark:text-dark-150">
                 <button
                     class="flex-1 p-2 text-xs hover:bg-gray-100 dark:hover:bg-dark-600 ltr:rounded-bl rtl:rounded-br"
                     v-text="__('Clear')"
@@ -45,18 +36,16 @@
                 />
             </div>
         </div>
-        <v-select v-else :disabled="true" :placeholder="__('No available filters')" />
+        <div v-else v-text="__('No available filters')"></div>
     </div>
 </template>
 
 <script>
 import Validator from '../field-conditions/Validator.js';
-import PublishField from '../publish/Field.vue';
-import { sortBy } from 'lodash-es';
+import { sortBy, mapValues } from 'lodash-es';
 import debounce from '@statamic/util/debounce.js';
 
 export default {
-    components: { PublishField },
 
     props: {
         config: Object,
@@ -103,20 +92,18 @@ export default {
         isFilterComplete() {
             if (!this.filter) return false;
 
-            let visibleFields = _.chain(this.filter.fields)
-                .filter(function (field) {
-                    let validator = new Validator(field, this.fieldValues);
-                    return validator.passesConditions();
-                }, this)
-                .mapObject((field) => field.handle)
-                .values()
-                .value();
+            let visibleFields = this.filter.fields.filter(function (field) {
+                let validator = new Validator(field, this.fieldValues);
+                return validator.passesConditions();
+            }, this);
+
+            visibleFields = mapValues(visibleFields, (field) => field.handle);
+            visibleFields = Object.values(visibleFields);
 
             let allFieldsFilled =
-                _.chain(this.fieldValues)
-                    .filter((value, handle) => visibleFields.includes(handle) && value)
-                    .values()
-                    .value().length === visibleFields.length;
+                Object.entries(this.fieldValues || {}).filter(
+                    ([handle, value]) => visibleFields.includes(handle) && value,
+                ).length === visibleFields.length;
 
             return this.field !== null && allFieldsFilled;
         },
@@ -147,7 +134,7 @@ export default {
 
         this.reset();
 
-        this.$refs.fieldSelect.$refs.search.focus();
+        // this.$refs.fieldSelect.$refs.search.focus();
     },
 
     methods: {

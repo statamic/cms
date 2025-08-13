@@ -20,5 +20,6 @@
         :requires-current-password="{{ Statamic\Support\Str::bool($requiresCurrentPassword) }}"
         :initial-item-actions="{{ json_encode($itemActions) }}"
         item-action-url="{{ cp_route('users.actions.run') }}"
+        :two-factor="{{ json_encode($twoFactor) }}"
     ></user-publish-form>
 @endsection

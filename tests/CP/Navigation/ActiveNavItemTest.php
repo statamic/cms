@@ -197,6 +197,25 @@ class ActiveNavItemTest extends TestCase
     }
 
     #[Test]
+    public function it_resolves_core_children_closure_and_can_check_when_parent_and_descendant_of_parent_item_is_active()
+    {
+        Facades\Collection::make('pages')->title('Pages')->save();
+        Facades\Collection::make('articles')->title('Articles')->save();
+
+        $this
+            ->prepareNavCaches()
+            ->get('http://localhost/cp/collections/create')
+            ->assertStatus(200);
+
+        $collections = $this->buildAndGetItem('Content', 'Collections');
+
+        $this->assertTrue($collections->isActive());
+        $this->assertInstanceOf(Collection::class, $collections->children());
+        $this->assertFalse($collections->children()->keyBy->display()->get('Pages')->isActive());
+        $this->assertFalse($collections->children()->keyBy->display()->get('Articles')->isActive());
+    }
+
+    #[Test]
     public function it_resolves_core_children_closure_and_can_check_when_parent_and_descendant_of_child_item_is_active()
     {
         Facades\Collection::make('pages')->title('Pages')->save();
@@ -515,6 +534,25 @@ class ActiveNavItemTest extends TestCase
         $this->assertFalse($localNotCp->isActive());
         $this->assertFalse($external->isActive());
         $this->assertFalse($externalSecure->isActive());
+    }
+
+    #[Test]
+    public function active_nav_descendant_url_still_functions_properly_when_parent_item_has_no_children()
+    {
+        Facades\CP\Nav::extend(function ($nav) {
+            $nav->tools('Schopify')->url('/cp/totally-custom-url');
+        });
+
+        $this
+            ->prepareNavCaches()
+            ->get('http://localhost/cp/totally-custom-url/deeper/descendant')
+            ->assertStatus(200);
+
+        $toolsItems = $this->build()->get('Tools');
+
+        $this->assertTrue($this->getItemByDisplay($toolsItems, 'Schopify')->isActive());
+        $this->assertFalse($this->getItemByDisplay($toolsItems, 'Addons')->isActive());
+        $this->assertFalse($this->getItemByDisplay($toolsItems, 'Utilities')->isActive());
     }
 
     #[Test]

@@ -1,12 +1,12 @@
 <template>
-    <textarea-input
+    <Textarea
         :focus="config.focus"
         :name="name"
-        :isReadOnly="isReadOnly"
+        :id="fieldId"
+        :read-only="isReadOnly"
         :limit="config.character_limit || null"
         :placeholder="__(config.placeholder)"
         :model-value="value"
-        :id="fieldId"
         @blur="$emit('blur')"
         @focus="$emit('focus')"
         @update:model-value="updateDebounced"
@@ -15,8 +15,10 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
+import { Textarea } from '@statamic/ui';
 
 export default {
     mixins: [Fieldtype],
+    components: { Textarea },
 };
 </script>

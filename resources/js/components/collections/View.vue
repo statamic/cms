@@ -1,110 +1,99 @@
 <template>
     <div>
-        <header class="mb-6">
-            <breadcrumb :url="breadcrumbUrl" :title="__('Collections')" />
-
-            <div class="flex items-center">
-                <h1 class="flex-1" v-text="__(title)" />
-
-                <dropdown-list class="ltr:mr-2 rtl:ml-2" v-if="!!this.$slots.twirldown">
-                    <slot name="twirldown" :actionCompleted="actionCompleted" />
-                </dropdown-list>
-
-                <div class="btn-group ltr:mr-4 rtl:ml-4" v-if="canUseStructureTree && !treeIsDirty">
-                    <button
-                        class="btn flex items-center px-4"
-                        @click="view = 'tree'"
-                        :class="{ active: view === 'tree' }"
-                        v-tooltip="__('Tree')"
-                    >
-                        <svg-icon name="light/structures" class="h-4 w-4" />
-                    </button>
-                    <button
-                        class="btn flex items-center px-4"
-                        @click="view = 'list'"
-                        :class="{ active: view === 'list' }"
-                        v-tooltip="__('List')"
-                    >
-                        <svg-icon name="assets-mode-table" class="h-4 w-4" />
-                    </button>
-                </div>
-
-                <template v-if="view === 'tree'">
-                    <a
-                        class="text-2xs text-blue underline ltr:mr-4 rtl:ml-4"
-                        v-if="treeIsDirty"
-                        v-text="__('Discard changes')"
-                        @click="cancelTreeProgress"
-                    />
-
-                    <site-selector
-                        v-if="sites.length > 1"
-                        class="ltr:mr-4 rtl:ml-4"
-                        :sites="sites"
-                        :value="site"
-                        @input="site = $event.handle"
-                    />
-
-                    <button
-                        class="btn ltr:mr-4 rtl:ml-4"
-                        :class="{ disabled: !treeIsDirty, 'btn-danger': deletedEntries.length }"
-                        :disabled="!treeIsDirty"
-                        @click="saveTree"
-                        v-text="__('Save Changes')"
-                        v-tooltip="
-                            deletedEntries.length
-                                ? __n('An entry will be deleted|:count entries will be deleted', deletedEntries.length)
-                                : null
-                        "
-                    />
-                </template>
-
-                <template v-if="view === 'list' && reorderable">
-                    <site-selector
-                        v-if="sites.length > 1 && reordering && site"
-                        class="ltr:mr-4 rtl:ml-4"
-                        :sites="sites"
-                        :value="site"
-                        @input="site = $event.handle"
-                    />
-
-                    <button
-                        class="btn ltr:mr-4 rtl:ml-4"
-                        v-if="!reordering"
-                        @click="reordering = true"
-                        v-text="__('Reorder')"
-                    />
-
-                    <template v-if="reordering">
-                        <button class="btn ltr:ml-2 rtl:mr-2" @click="reordering = false" v-text="__('Cancel')" />
-
-                        <button
-                            class="btn-primary ltr:ml-2 rtl:mr-2"
-                            @click="$refs.list.saveOrder"
-                            v-text="__('Save Order')"
+        <Header :title="__(title)" :icon="icon">
+            <ItemActions
+                ref="actions"
+                :url="actionUrl"
+                :actions="actions"
+                :item="handle"
+                v-slot="{ actions }"
+            >
+                <Dropdown placement="left-start">
+                    <DropdownMenu>
+                        <DropdownItem v-if="canEdit" :text="__('Configure Collection')" icon="cog" :href="editUrl" />
+                        <DropdownItem v-if="canEditBlueprints" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="blueprintsUrl" />
+                        <DropdownItem v-if="canEdit" :text="__('Scaffold Views')" icon="scaffold" :href="scaffoldUrl" />
+                        <DropdownSeparator v-if="canEdit || canEditBlueprints || actions.length" />
+                        <DropdownItem
+                            v-for="action in actions"
+                            :key="action.handle"
+                            :text="__(action.title)"
+                            :icon="action.icon"
+                            :variant="action.dangerous ? 'destructive' : 'default'"
+                            @click="action.run"
                         />
-                    </template>
-                </template>
+                    </DropdownMenu>
+                </Dropdown>
+            </ItemActions>
 
-                <create-entry-button
-                    v-if="!reordering && canCreate"
-                    button-class="btn-primary"
-                    :url="createUrl"
-                    :blueprints="blueprints"
-                    :text="createLabel"
+            <template v-if="view === 'tree'">
+                <ui-button
+                    v-if="treeIsDirty"
+                    variant="filled"
+                    :text="__('Discard changes')"
+                    @click="cancelTreeProgress"
                 />
-            </div>
-        </header>
+
+                <site-selector
+                    v-if="sites.length > 1"
+                    :sites="sites"
+                    :value="site"
+                    @input="site = $event.handle"
+                />
+
+                <Button
+                    v-if="treeIsDirty"
+                    :disabled="!treeIsDirty"
+                    :text="__('Save Changes')"
+                    :variant="deletedEntries.length ? 'danger' : 'default'"
+                    @click="saveTree"
+                    v-tooltip="deletedEntries.length ? __n('An entry will be deleted|:count entries will be deleted', deletedEntries.length) : null"
+                />
+            </template>
+
+            <ui-toggle-group v-model="view" v-if="canUseStructureTree">
+                <ui-toggle-item icon="navigation" value="tree" />
+                <ui-toggle-item icon="layout-list" value="list" />
+            </ui-toggle-group>
+
+            <template v-if="view === 'list' && reorderable">
+                <site-selector
+                    v-if="sites.length > 1 && reordering && site"
+                    :sites="sites"
+                    :value="site"
+                    @input="site = $event"
+                />
+
+                <Button
+                    v-if="!reordering"
+                    @click="reordering = true"
+                    :text="__('Reorder')"
+                />
+
+                <template v-if="reordering">
+                    <Button @click="reordering = false" :text="__('Cancel')" />
+                    <Button @click="$refs.list.saveOrder" :text="__('Save Order')" variant="primary" />
+                </template>
+            </template>
+
+            <create-entry-button
+                v-if="!reordering && canCreate"
+                :url="createUrl"
+                :blueprints="blueprints"
+                :text="createLabel"
+                :command-palette="true"
+            />
+        </Header>
 
         <entry-list
             v-if="view === 'list'"
             ref="list"
             :collection="handle"
-            :initial-sort-column="sortColumn"
-            :initial-sort-direction="sortDirection"
-            :initial-columns="columns"
+            :sort-column="sortColumn"
+            :sort-direction="sortDirection"
+            :columns="columns"
             :filters="filters"
-            :action-url="actionUrl"
+            :action-url="entriesActionUrl"
             :reordering="reordering"
             :reorder-url="reorderUrl"
             :site="site"
@@ -132,30 +121,31 @@
             @canceled="markTreeClean"
         >
             <template #branch-icon="{ branch }">
-                <svg-icon
+                <ui-icon
                     v-if="isRedirectBranch(branch)"
-                    class="inline-block h-4 w-4 text-gray-500"
-                    name="light/external-link"
+                    name="external-link"
                     v-tooltip="__('Redirect')"
                 />
             </template>
 
             <template #branch-options="{ branch, removeBranch, depth }">
                 <template v-if="depth < structureMaxDepth">
-                    <h6 class="px-2" v-text="__('Create Child Entry')" v-if="blueprints.length > 1" />
-                    <li class="divider" v-if="blueprints.length > 1" />
-                    <dropdown-item
+                    <DropdownLabel :text="__('Create Child Entry')" v-if="blueprints.length > 1" />
+                    <DropdownSeparator v-if="blueprints.length > 1" />
+                    <DropdownItem
                         v-for="blueprint in blueprints"
-                        :key="blueprint.handle"
                         @click="createEntry(blueprint.handle, branch.id)"
-                        v-text="blueprints.length > 1 ? __(blueprint.title) : __('Create Child Entry')"
+                        :icon="blueprint.icon || 'add-entry'"
+                        :key="blueprint.handle"
+                        :text="blueprints.length > 1 ? __(blueprint.title) : __('Create Child Entry')"
                     />
                 </template>
                 <template v-if="branch.can_delete">
-                    <li class="divider"></li>
-                    <dropdown-item
+                    <DropdownSeparator />
+                    <DropdownItem
                         :text="__('Delete')"
-                        class="warning"
+                        icon="trash"
+                        variant="destructive"
                         @click="deleteTreeBranch(branch, removeBranch)"
                     />
                 </template>
@@ -185,13 +175,22 @@
 import DeleteEntryConfirmation from './DeleteEntryConfirmation.vue';
 import DeleteLocalizationConfirmation from './DeleteLocalizationConfirmation.vue';
 import SiteSelector from '../SiteSelector.vue';
-import HasActions from '../publish/HasActions';
 import { defineAsyncComponent } from 'vue';
+import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator, Header, Button, ToggleGroup, ToggleItem } from '@statamic/ui';
+import ItemActions from '@statamic/components/actions/ItemActions.vue';
 
 export default {
-    mixins: [HasActions],
-
     components: {
+        DropdownSeparator,
+        DropdownItem,
+        DropdownLabel,
+        DropdownMenu,
+        ItemActions,
+        Dropdown,
+        Header,
+        Button,
+        ToggleGroup,
+        ToggleItem,
         PageTree: defineAsyncComponent(() => import('../structures/PageTree.vue')),
         DeleteEntryConfirmation,
         DeleteLocalizationConfirmation,
@@ -201,18 +200,25 @@ export default {
     props: {
         title: { type: String, required: true },
         handle: { type: String, required: true },
+        icon: { type: String, required: true },
         canCreate: { type: Boolean, required: true },
         createUrls: { type: Object, required: true },
         createLabel: { type: String, required: true },
         blueprints: { type: Array, required: true },
-        breadcrumbUrl: { type: String, required: true },
         structured: { type: Boolean, default: false },
         sortColumn: { type: String, required: true },
         sortDirection: { type: String, required: true },
         columns: { type: Array, required: true },
         filters: { type: Array, required: true },
+        actions: { type: Array, required: true },
         actionUrl: { type: String, required: true },
+        entriesActionUrl: { type: String, required: true },
         reorderUrl: { type: String, required: true },
+        editUrl: { type: String, required: true },
+        blueprintsUrl: { type: String, required: true },
+        scaffoldUrl: { type: String, required: true },
+        canEdit: { type: Boolean, required: true },
+        canEditBlueprints: { type: Boolean, required: true },
         initialSite: { type: String, required: true },
         sites: { type: Array },
         totalSitesCount: { type: Number },
@@ -275,8 +281,6 @@ export default {
         view(view) {
             this.site = this.site || this.initialSite;
 
-            this.$config.set('wrapperClass', view === 'tree' ? undefined : 'max-w-full');
-
             localStorage.setItem('statamic.collection-view.' + this.handle, view);
         },
     },
@@ -284,6 +288,8 @@ export default {
     mounted() {
         this.view = this.initialView();
         this.mounted = true;
+
+        this.addToCommandPalette();
     },
 
     methods: {
@@ -370,7 +376,7 @@ export default {
             window.location = url;
         },
 
-        editPage(page, vm, store, $event) {
+        editPage(page, $event) {
             const url = page.edit_url;
             $event.metaKey ? window.open(url) : (window.location = url);
         },
@@ -378,6 +384,36 @@ export default {
         afterActionSuccessfullyCompleted(response) {
             if (!response.redirect) window.location.reload();
         },
+
+        addToCommandPalette() {
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: [__('Collection'), __('Configure')],
+                icon: 'cog',
+                url: this.editUrl,
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: [__('Collection'), __('Edit Blueprints')],
+                icon: 'blueprint-edit',
+                url: this.blueprintsUrl,
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: [__('Collection'), __('Scaffold Views')],
+                icon: 'scaffold',
+                url: this.scaffoldUrl,
+            });
+
+            this.$refs.actions.preparedActions.forEach(action => Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: [__('Collection'), action.title],
+                icon: action.icon,
+                action: action.run,
+            }));
+        }
     },
 };
 </script>

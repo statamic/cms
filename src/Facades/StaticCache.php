@@ -22,7 +22,7 @@ use Statamic\StaticCaching\StaticCacheManager;
  * @method static void includeJs()
  *
  * @see StaticCacheManager
- * @see Cacher
+ * @link Cacher
  */
 class StaticCache extends Facade
 {

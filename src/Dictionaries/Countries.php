@@ -65,13 +65,16 @@ class Countries extends BasicDictionary
                 'display' => __('Region'),
                 'instructions' => __('statamic::messages.dictionaries_countries_region_instructions'),
                 'type' => 'select',
+                'clearable' => true,
                 'options' => $this->regions,
+                'width' => 50,
             ],
             'emojis' => [
                 'display' => __('Emojis'),
                 'instructions' => __('statamic::messages.dictionaries_countries_emojis_instructions'),
                 'type' => 'toggle',
                 'default' => true,
+                'width' => 50,
             ],
         ];
     }

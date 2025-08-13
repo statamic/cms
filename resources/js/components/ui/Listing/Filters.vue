@@ -1,0 +1,105 @@
+<script setup>
+import { Badge, Button, Modal, ModalClose } from '@statamic/ui';
+import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
+import { computed } from 'vue';
+import FieldFilter from '@statamic/components/data-list/FieldFilter.vue';
+import DataListFilter from '@statamic/components/data-list/Filter.vue';
+
+const { filters, activeFilters, activeFilterBadges, setFilter, reorderable } = injectListingContext();
+
+const badgeCount = computed(() => {
+    let count = Object.keys(activeFilterBadges.value).length;
+
+    if (activeFilterBadges.value.hasOwnProperty('fields')) {
+        count = count + Object.keys(activeFilterBadges.value.fields).length - 1;
+    }
+
+    return count;
+});
+
+const fieldFilter = computed(() => filters.value.find((filter) => filter.handle === 'fields'));
+const standardFilters = computed(() => filters.value.filter((filter) => filter.handle !== 'fields'));
+const fieldFilterBadges = computed(() => activeFilterBadges.value.fields || {});
+
+const standardBadges = computed(() => {
+    const { fields, ...badges } = activeFilterBadges.value;
+    return badges;
+});
+
+function removeFieldFilter(handle) {
+    const fields = { ...activeFilters.value.fields };
+    delete fields[handle];
+    setFilter('fields', fields);
+}
+</script>
+
+<template>
+    <div class="flex flex-1 items-center gap-3 overflow-x-auto py-3 rounded-r-4xl">
+        <Modal :title="__('Apply Filters')">
+            <template #trigger>
+                <div class="sticky left-0 ps-[1px] rounded-r-lg bg-white dark:bg-gray-900 mask-bg mask-bg--left mask-bg--left-small">
+                    <Button icon="sliders-horizontal" class="[&_svg]:size-3.5" :disabled="reorderable">
+                        {{ __('Filters') }}
+                        <Badge
+                            v-if="badgeCount"
+                            :text="badgeCount"
+                            size="sm"
+                            pill
+                            class="absolute -top-1.5 -right-1.5"
+                        />
+                    </Button>
+                </div>
+            </template>
+            <div class="space-y-6 py-3">
+                <div class="bg-yellow p-2">
+                    This is ugly and broken because we haven't decided on a new design yet. It's shoehorning the
+                    existing components.
+                </div>
+                <FieldFilter
+                    ref="fieldFilter"
+                    :config="fieldFilter"
+                    :values="activeFilters.fields || {}"
+                    :badges="fieldFilterBadges"
+                    @changed="setFilter('fields', $event)"
+                />
+
+                <data-list-filter
+                    v-for="filter in standardFilters"
+                    :key="filter.handle"
+                    :filter="filter"
+                    :values="activeFilters[filter.handle]"
+                    @changed="setFilter(filter.handle, $event)"
+                />
+            </div>
+            <template #footer>
+                <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
+                    <ModalClose>
+                        <Button text="Cancel" variant="ghost" />
+                    </ModalClose>
+                    <Button text="Update Filter" variant="primary" />
+                </div>
+            </template>
+        </Modal>
+
+        <Button
+            v-for="(badge, handle, index) in fieldFilterBadges"
+            :key="handle"
+            variant="filled"
+            :icon-append="reorderable ? null : 'x'"
+            :text="badge"
+            :disabled="reorderable"
+            :class="{ 'me-12': index === Object.keys(fieldFilterBadges).length - 1 }"
+            @click="removeFieldFilter(handle)"
+        />
+        <Button
+            v-for="(badge, handle, index) in standardBadges"
+            :key="handle"
+            variant="filled"
+            :icon-append="reorderable ? null : 'x'"
+            :text="badge"
+            :disabled="reorderable"
+            :class="{ 'me-12': index === Object.keys(standardBadges).length - 1 }"
+            @click="setFilter(handle, null)"
+        />
+    </div>
+</template>

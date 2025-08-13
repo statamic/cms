@@ -1,10 +1,7 @@
 <template>
     <portal name="grid-fullscreen" :disabled="!fullScreenMode" :provide="provide">
         <element-container @resized="containerWidth = $event.width">
-            <div
-                class="grid-fieldtype-container"
-                :class="{ 'grid-fullscreen bg-white dark:bg-dark-600': fullScreenMode }"
-            >
+            <div :class="{ '@apply fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-100 dark:bg-gray-900 z-998': fullScreenMode }">
                 <publish-field-fullscreen-header
                     v-if="fullScreenMode"
                     :title="config.display"
@@ -14,12 +11,9 @@
                 </publish-field-fullscreen-header>
 
                 <section :class="{ 'mt-14 p-4': fullScreenMode }">
-                    <small v-if="hasExcessRows" class="help-block text-red-500">
-                        {{ __('Max Rows') }}: {{ maxRows }}
-                    </small>
-                    <small v-else-if="hasNotEnoughRows" class="help-block text-red-500">
-                        {{ __('Min Rows') }}: {{ minRows }}
-                    </small>
+
+                    <ui-error-message v-if="hasExcessRows" :text="__('Max Rows') + ': ' + maxRows" />
+                    <ui-error-message v-else-if="hasNotEnoughRows" :text="__('Min Rows') + ': ' + minRows" />
 
                     <component
                         :is="component"
@@ -31,6 +25,7 @@
                         :can-add-rows="canAddRows"
                         :allow-fullscreen="config.fullscreen"
                         :hide-display="config.hide_display"
+                        :errors="publishContainer.errors"
                         @updated="updated"
                         @meta-updated="updateRowMeta"
                         @removed="removed"
@@ -40,10 +35,20 @@
                         @blur="blurred"
                     />
 
-                    <button class="btn" v-if="canAddRows" v-text="__(addRowButtonLabel)" @click.prevent="addRow" />
+                    <ui-button size="sm" v-if="canAddRows" v-text="__(addRowButtonLabel)" @click.prevent="addRow" />
                 </section>
             </div>
         </element-container>
+
+        <confirmation-modal
+            v-if="deletingRow"
+            :title="__('Delete Row')"
+            :body-text="__('Are you sure?')"
+            :button-text="__('Delete')"
+            :danger="true"
+            @confirm="confirmDelete"
+            @cancel="deletingRow = null"
+        />
     </portal>
 </template>
 
@@ -53,7 +58,6 @@ import uniqid from 'uniqid';
 import GridTable from './Table.vue';
 import GridStacked from './Stacked.vue';
 import ManagesRowMeta from './ManagesRowMeta';
-import { mapValues, keyBy } from 'lodash-es';
 
 export default {
     mixins: [Fieldtype, ManagesRowMeta],
@@ -68,14 +72,12 @@ export default {
             containerWidth: null,
             focused: false,
             fullScreenMode: false,
+            deletingRow: null,
             provide: {
                 grid: this.makeGridProvide(),
-                storeName: this.storeName,
             },
         };
     },
-
-    inject: ['storeName'],
 
     provide: {
         isInGridField: true,
@@ -138,7 +140,7 @@ export default {
             return [
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => (vm.fullScreenMode ? 'shrink-all' : 'expand-bold'),
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'ui/shrink-all' : 'ui/expand-all'),
                     quick: true,
                     visibleWhenReadOnly: true,
                     run: this.toggleFullScreen,
@@ -172,7 +174,9 @@ export default {
         addRow() {
             const id = uniqid();
 
-            const row = mapValues(keyBy(this.field, 'handle'), (field) => this.meta.defaults[field.handle]);
+            const row = Object.fromEntries(
+                this.fields.map((field) => [field.handle, this.meta.defaults[field.handle]]),
+            );
 
             row._id = id;
 
@@ -185,9 +189,26 @@ export default {
         },
 
         removed(index) {
-            if (!confirm(__('Are you sure?'))) return;
+            // if the row is empty, don't show the confirmation. this.value[index] is an object with the row data
+            const row = this.value[index];
+            const emptyRow = Object.fromEntries(
+                this.fields.map((field) => [field.handle, this.meta.defaults[field.handle]]),
+            );
+
+            // Check if the row has been modified from its default state
+            const hasChanges = this.fields.some(field => row[field.handle] !== emptyRow[field.handle]);
+
+            if (hasChanges) {
+                this.deletingRow = index;
+                return;
+            }
 
             this.update([...this.value.slice(0, index), ...this.value.slice(index + 1)]);
+        },
+
+        confirmDelete() {
+            this.update([...this.value.slice(0, this.deletingRow), ...this.value.slice(this.deletingRow + 1)]);
+            this.deletingRow = null;
         },
 
         duplicate(index) {
@@ -228,6 +249,7 @@ export default {
                 isReadOnly: { get: () => this.isReadOnly },
                 handle: { get: () => this.handle },
                 fieldPathPrefix: { get: () => this.fieldPathPrefix },
+                metaPathPrefix: { get: () => this.metaPathPrefix },
                 fullScreenMode: { get: () => this.fullScreenMode },
                 toggleFullScreen: { get: () => this.toggleFullScreen },
             });

@@ -44,6 +44,12 @@ class Variables implements Arrayable, ArrayAccess, Augmentable, Contract, Locali
         $this->supplements = collect();
     }
 
+    public function __clone()
+    {
+        $this->data = clone $this->data;
+        $this->supplements = clone $this->supplements;
+    }
+
     public function globalSet($set = null)
     {
         return $this->fluentlyGetOrSet('set')
@@ -77,7 +83,7 @@ class Variables implements Arrayable, ArrayAccess, Augmentable, Contract, Locali
     {
         return vsprintf('%s/%s%s.%s', [
             rtrim(Stache::store('global-variables')->directory(), '/'),
-            Site::multiEnabled() ? $this->locale().'/' : '',
+            $this->locale().'/',
             $this->handle(),
             'yaml',
         ]);
@@ -152,6 +158,8 @@ class Variables implements Arrayable, ArrayAccess, Augmentable, Contract, Locali
             GlobalVariablesSaved::dispatch($this);
         }
 
+        Blink::forget('global-set-localizations-'.$this->globalSet()->id());
+
         return $this;
     }
 
@@ -217,6 +225,7 @@ class Variables implements Arrayable, ArrayAccess, Augmentable, Contract, Locali
             });
 
         return (new \Statamic\Fields\Blueprint)->setContents([
+            'title' => $this->globalSet()->title(),
             'tabs' => [
                 'main' => [
                     'fields' => array_values($fields->all()),
@@ -227,13 +236,18 @@ class Variables implements Arrayable, ArrayAccess, Augmentable, Contract, Locali
 
     public function fileData()
     {
-        $data = $this->data()->all();
+        return $this->data()->all();
+    }
 
-        if ($this->hasOrigin()) {
-            $data['origin'] = $this->origin()->locale();
+    public function origin($origin = null)
+    {
+        if (func_num_args() === 0) {
+            return $this->getOriginByString(
+                $this->globalSet()->origins()->get($this->locale())
+            );
         }
 
-        return $data;
+        throw new \Exception('The origin cannot be set directly. It must be defined on the global set.');
     }
 
     protected function shouldRemoveNullsFromFileData()

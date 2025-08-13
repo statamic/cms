@@ -6,77 +6,56 @@
 @section('title', __('Preferences'))
 
 @section('content')
-    <div class="mb-6 flex items-center justify-between">
-        <h1>@yield('title')</h1>
-    </div>
+    <ui-header :title="__('Preferences')" icon="preferences" />
 
-    <div class="card mb-4 p-0">
-        <table class="data-table">
-            <tr>
-                <td>
-                    <div class="flex items-center">
-                        <div class="h-4 w-4 ltr:mr-4 rtl:ml-4">@cp_svg('icons/light/earth')</div>
-                        <a href="{{ cp_route('preferences.default.edit') }}">{{ __('Default') }}</a>
-                    </div>
-                </td>
-                <td class="text-2xs text-gray-500 ltr:text-right rtl:text-left">
-                    @if (! empty(Statamic\Facades\Preference::default()->all()))
-                        {{ __('Modified') }}
-                    @endif
-                </td>
-            </tr>
-        </table>
-    </div>
+    <section class="space-y-6">
+        <ui-card-panel heading="{{ __('Global Preferences') }}">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <ui-icon name="globals" />
+                    <a href="{{ cp_route('preferences.default.edit') }}">{{ __('Default') }}</a>
+                </div>
 
-    @if (Statamic\Facades\Role::all()->isNotEmpty())
-        <h3 class="little-heading mb-2 ltr:pl-0 rtl:pr-0">{{ __('Override For Role') }}</h3>
-        <div class="card mb-4 p-0">
-            <table class="data-table">
+                @if (! empty(Statamic\Facades\Preference::default()->all()))
+                    <ui-badge color="green">{{ __('Modified') }}</ui-badge>
+                @endif
+            </div>
+        </ui-card-panel>
+
+        @if (Statamic\Facades\Role::all()->isNotEmpty())
+            <ui-card-panel heading="{{ __('Preferences by Role') }}">
                 @foreach (Statamic\Facades\Role::all() as $role)
-                    <tr>
-                        <td>
-                            <div class="flex items-center">
-                                <div class="h-4 w-4 ltr:mr-4 rtl:ml-4">@cp_svg('icons/light/shield-key')</div>
-                                <a href="{{ cp_route('preferences.role.edit', [$role->handle()]) }}">
-                                    {{ __($role->title()) }}
-                                </a>
-                            </div>
-                        </td>
-                        <td class="text-2xs text-gray-500 ltr:text-right rtl:text-left">
-                            @if (! empty($role->preferences()))
-                                {{ __('Modified') }}
-                            @endif
-                        </td>
-                    </tr>
-                @endforeach
-            </table>
-        </div>
-    @endif
-
-    <h3 class="little-heading mb-2 ltr:pl-0 rtl:pr-0">{{ __('Override For User') }}</h3>
-    <div class="card mb-4 p-0">
-        <table class="data-table">
-            <tr>
-                <td>
-                    <div class="flex items-center">
-                        <div class="h-4 w-4 ltr:mr-4 rtl:ml-4">@cp_svg('icons/light/user')</div>
-                        <a href="{{ cp_route('preferences.user.edit') }}">{{ __('My Preferences') }}</a>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <ui-icon name="permissions" />
+                            <a href="{{ cp_route('preferences.role.edit', [$role->handle()]) }}">
+                                {{ __($role->title()) }}
+                            </a>
+                        </div>
+                        @if (! empty($role->preferences()))
+                            <ui-badge color="green">{{ __('Modified') }}</ui-badge>
+                        @endif
                     </div>
-                </td>
-                <td class="text-2xs text-gray-500 ltr:text-right rtl:text-left">
-                    @if (! empty(Statamic\Facades\User::current()->preferences()))
-                        {{ __('Modified') }}
-                    @endif
-                </td>
-            </tr>
-        </table>
-    </div>
+                @endforeach
+            </ui-card-panel>
+        @endif
 
-    @include(
-        'statamic::partials.docs-callout',
-        [
-            'topic' => __('Preferences'),
-            'url' => Statamic::docsUrl('preferences'),
-        ]
-    )
+        <ui-card-panel heading="{{ __('User Preferences') }}">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <ui-icon name="avatar" />
+                    <a href="{{ cp_route('preferences.user.edit') }}">{{ __('My Preferences') }}</a>
+                </div>
+
+                @if (! empty(Statamic\Facades\User::current()->preferences()))
+                    <ui-badge color="green">{{ __('Modified') }}</ui-badge>
+                @endif
+            </div>
+        </ui-card-panel>
+    </section>
+
+    <x-statamic::docs-callout
+        :topic="__('Preferences')"
+        :url="Statamic::docsUrl('preferences')"
+    />
 @endsection

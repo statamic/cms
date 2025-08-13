@@ -31,6 +31,8 @@ use Statamic\Statamic;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
+use function Statamic\trans as __;
+
 class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract, Responsable
 {
     use ContainsCascadingData, ContainsSupplementalData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData;
@@ -81,14 +83,6 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
         return cp_route('taxonomies.show', $this->handle());
     }
 
-    public function breadcrumbUrl()
-    {
-        $referer = request()->header('referer');
-        $showUrl = $this->showUrl();
-
-        return $referer && Str::before($referer, '?') === $showUrl ? $referer : $showUrl;
-    }
-
     public function editUrl()
     {
         return cp_route('taxonomies.edit', $this->handle());
@@ -97,6 +91,11 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
     public function deleteUrl()
     {
         return cp_route('taxonomies.destroy', $this->handle());
+    }
+
+    public function editBlueprintUrl($blueprint)
+    {
+        return cp_route('blueprints.taxonomies.edit', [$this, $blueprint]);
     }
 
     public function path()
@@ -577,5 +576,17 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
     public function hasCustomTermTemplate()
     {
         return $this->termTemplate !== null;
+    }
+
+    public function termBlueprintCommandPaletteLinks()
+    {
+        $text = [__('Taxonomies'), __($this->title())];
+
+        return $this
+            ->termBlueprints()
+            ->map(fn ($blueprint) => $blueprint->commandPaletteLink(
+                type: $text,
+                url: $this->editBlueprintUrl($blueprint),
+            ));
     }
 }

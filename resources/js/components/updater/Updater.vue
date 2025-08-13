@@ -1,24 +1,18 @@
 <template>
     <div>
-        <div class="mb-6 flex items-center">
-            <h1 class="flex-1">
-                <span v-text="name" />
-                <span v-if="currentVersion" class="font-normal text-gray-700 ltr:ml-2 rtl:mr-2">{{
-                    currentVersion
-                }}</span>
-            </h1>
-            <button v-if="!onLatestVersion" class="btn-primary ltr:ml-4 rtl:mr-4" @click="modalOpen = true">
-                {{ __('Update') }}
-            </button>
-            <div v-if="onLatestVersion" v-text="__('Up to date')" />
-        </div>
+        <ui-header :title="__('Updates')" icon="updates">
+            <template v-if="!gettingChangelog" #actions>
+                <ui-badge :prepend="__('Statamic Version')" :text="currentVersion" color="green" size="lg" />
+                <div v-if="onLatestVersion" v-text="__('Up to date')" />
+            </template>
+        </ui-header>
 
-        <div v-if="gettingChangelog" class="card p-6 text-center">
-            <loading-graphic />
-        </div>
+        <ui-card v-if="gettingChangelog" class="text-center">
+            <Icon name="loading" />
+        </ui-card>
 
         <div
-            class="mb-6 flex cursor-pointer items-center justify-between rounded border border-dashed border-yellow-dark bg-yellow p-4 text-xs"
+            class="mb-6 flex cursor-pointer items-center justify-between rounded-sm border border-dashed border-yellow-dark bg-yellow p-4 text-xs"
             v-if="!showingUnlicensedReleases && hasUnlicensedReleases"
             @click="showingUnlicensedReleases = true"
         >
@@ -26,7 +20,7 @@
                 <h4 v-text="__('messages.addon_has_more_releases_beyond_license_heading')" />
                 <p v-text="__('messages.addon_has_more_releases_beyond_license_body')" />
             </div>
-            <button class="btn btn-xs" v-text="__('View additional releases')" />
+            <ui-button size="sm" v-text="__('View additional releases')" />
         </div>
 
         <template v-if="showingUnlicensedReleases">
@@ -48,23 +42,17 @@
             :package="package"
             :show-actions="showActions"
         />
-
-        <confirmation-modal v-if="modalOpen" :cancellable="false" :button-text="__('OK')" @confirm="modalOpen = false">
-            <div class="prose">
-                <p v-text="`${__('messages.updater_update_to_latest_command')}:`" />
-                <code-block copyable :text="`composer update ${package}`" />
-                <p v-html="link"></p>
-            </div>
-        </confirmation-modal>
     </div>
 </template>
 
 <script>
 import Release from './Release.vue';
+import { Icon } from '@statamic/ui';
 
 export default {
     components: {
         Release,
+        Icon,
     },
 
     props: ['slug', 'package', 'name'],
@@ -74,7 +62,6 @@ export default {
             gettingChangelog: true,
             changelog: [],
             currentVersion: null,
-            modalOpen: false,
             latestRelease: null,
             showingUnlicensedReleases: false,
         };

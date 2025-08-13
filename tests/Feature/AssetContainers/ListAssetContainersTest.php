@@ -30,23 +30,6 @@ class ListAssetContainersTest extends TestCase
             ->assertJson($this->containerArray());
     }
 
-    #[Test]
-    public function it_loads_a_view_when_requested_normally()
-    {
-        $this->setTestRoles(['test' => ['access cp', 'view two assets', 'view three assets']]);
-        $user = User::make()->assignRole('test')->save();
-        AssetContainer::make('one')->save();
-        AssetContainer::make('two')->save();
-        AssetContainer::make('three')->save();
-
-        $this
-            ->actingAs($user)
-            ->get(cp_route('asset-containers.index'))
-            ->assertSuccessful()
-            ->assertViewIs('statamic::assets.containers.index')
-            ->assertViewHas('containers', $this->containerArray());
-    }
-
     public function containerArray()
     {
         return [
@@ -60,7 +43,7 @@ class ListAssetContainersTest extends TestCase
                 'create_folders' => true,
                 'edit_url' => 'http://localhost/cp/asset-containers/three/edit',
                 'delete_url' => 'http://localhost/cp/asset-containers/three',
-                'blueprint_url' => 'http://localhost/cp/asset-containers/three/blueprint',
+                'blueprint_url' => 'http://localhost/cp/fields/blueprints/asset-containers/three/edit',
                 'can_edit' => false,
                 'can_delete' => false,
             ],
@@ -74,7 +57,7 @@ class ListAssetContainersTest extends TestCase
                 'create_folders' => true,
                 'edit_url' => 'http://localhost/cp/asset-containers/two/edit',
                 'delete_url' => 'http://localhost/cp/asset-containers/two',
-                'blueprint_url' => 'http://localhost/cp/asset-containers/two/blueprint',
+                'blueprint_url' => 'http://localhost/cp/fields/blueprints/asset-containers/two/edit',
                 'can_edit' => false,
                 'can_delete' => false,
             ],

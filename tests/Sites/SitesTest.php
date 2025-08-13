@@ -3,6 +3,7 @@
 namespace Tests\Sites;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\File;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
@@ -33,6 +34,13 @@ class SitesTest extends TestCase
             'fr' => ['url' => 'http://fr.test.com/'],
             'de' => ['url' => 'http://test.com/de/'],
         ]);
+    }
+
+    public function tearDown(): void
+    {
+        File::delete(resource_path('users/roles.yaml'));
+
+        parent::tearDown();
     }
 
     #[Test]
@@ -75,12 +83,9 @@ class SitesTest extends TestCase
     #[Test]
     public function can_reinitialize_sites_by_reproviding_the_config()
     {
-        $this->sites->setConfig([
-            'default' => 'foo',
-            'sites' => [
-                'foo' => [],
-                'bar' => [],
-            ],
+        $this->sites->setSites([
+            'foo' => [],
+            'bar' => [],
         ]);
 
         $this->assertEquals('foo', $this->sites->get('foo')->handle());
@@ -101,7 +106,7 @@ class SitesTest extends TestCase
     #[Test]
     public function can_change_specific_config_items_the_legacy_deprecated_way()
     {
-        $this->sites->setConfig('sites.en.url', 'http://foobar.com/');
+        $this->sites->setSiteValue('en', 'url', 'http://foobar.com/');
 
         $this->assertEquals('http://foobar.com', $this->sites->get('en')->url());
     }
@@ -109,21 +114,15 @@ class SitesTest extends TestCase
     #[Test]
     public function checks_whether_there_are_multiple_sites()
     {
-        $this->sites->setConfig([
-            'default' => 'foo',
-            'sites' => [
-                'foo' => [],
-                'bar' => [],
-            ],
+        $this->sites->setSites([
+            'foo' => [],
+            'bar' => [],
         ]);
 
         $this->assertTrue($this->sites->hasMultiple());
 
-        $this->sites->setConfig([
-            'default' => 'foo',
-            'sites' => [
-                'foo' => [],
-            ],
+        $this->sites->setSites([
+            'foo' => [],
         ]);
 
         $this->assertFalse($this->sites->hasMultiple());

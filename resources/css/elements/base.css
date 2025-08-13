@@ -1,0 +1,105 @@
+:root {
+    --focus-outline-width: 2px;
+    /* Here we typically need a negative outline-offset because of the inner shadow on inputs */
+    --focus-outline-offset: -1px;
+    --focus-within-outline-offset: 0px;
+    --focus-outline-color: var(--color-blue-400);
+    --focus-outline-style: solid;
+
+    /* The outline-offset value used for buttons */
+    --outline-offset-button: 0.35rem;
+
+    :is(.dark)& {
+        --focus-outline-color: var(--color-blue-500);
+        --focus-shadow-color: var(--color-blue-500);
+    }
+
+    --z-index-below: -1;
+    --z-index-base: 1;
+    --z-index-above: 2;
+    --z-index-header: 3;
+    --z-index-portal: 4;
+    --z-index-draggable: 5;
+    --z-index-modal: 50;
+    --z-index-max: 9999;
+}
+
+/* FOCUS STATES
+=================================================== */
+/* Use a base layer where we don't need the specificity */
+@layer base {
+    /* Explicitly show focus without needing to tab */
+    .show-focus:focus,
+    /* Explicitly show focus without needing to tab for buttons inside modals, e.g. Assets > cancel button on delete modal */
+    [data-dismissable-layer] button:focus,
+    /* and then a global selector for focus-visible everywhere else (except where the focus-within class will handle the focus outline target instead) */
+    :not([class*='focus-within'] *) {
+        :focus-visible& {
+            outline-width: var(--focus-outline-width);
+            outline-offset: var(--focus-outline-offset);
+            outline-color: var(--focus-outline-color, currentColor);
+            outline-style: var(--focus-outline-style, solid);
+            border-radius: inherit;
+        }
+    }
+
+    a {
+        cursor: pointer;
+    }
+
+    ::placeholder {
+        @apply text-gray-500;
+    }
+
+    [type="checkbox"] {
+        /* To effectively hide border radius clash with focus state */
+        --focus-outline-offset: -1.85px;
+    }
+}
+
+/* Use a utility layer only when we need higher specificity */
+@layer utilities {
+    [data-ui-dropdown-item] {
+        &:focus-visible {
+            outline-width: var(--focus-outline-width);
+            outline-offset: var(--focus-outline-offset);
+            outline-color: var(--focus-outline-color, currentColor);
+            outline-style: var(--focus-outline-style, solid);
+        }
+    }
+
+    /* Based on the global site picker. Only for buttons (i.e. don't affect select dropdowns on publish forms) */
+    [data-ui-combobox-anchor]:has(button):not(.main-content *) {
+        /* Decrease */
+        --focus-outline-offset: var(--outline-offset-button);
+        /* Target the button inside the combobox */
+        & :focus-visible {
+            /* Decrease */
+            @apply rounded-xs;
+            + * svg {
+                /* Since the SVG is outside the focus state let's hide it on focus because otherwise the focus state outline rests on top of it */
+                position: relative;
+                left: 0.6rem;
+            }
+        }
+    }
+    /* e.g. >> /cp/collections, when you tab to the title, and /cp/collections/pages when tabbing through the tree text. Avoid elements where border-radius has already been set, e.g. "Create Entry" button */
+    .main-content a:not([class*="rounded"]),
+    /* e.g. >> /cp/collections/pages, tabbing through the home icon. Be careful not to carpet bomb this e.g. don't want to affect Bard buttons. */
+    .page-tree .v-popper--has-tooltip {
+        &:focus-visible {
+            --focus-outline-offset: 4px;
+            @apply rounded-xs;
+        }
+    }
+
+    /* Fix "flicker" the transition causes when tabbing to disclosure e.g. >> /cp/collections/pages */
+    button:focus-visible {
+        transition: unset;
+    }
+
+    .group\/button button:focus {
+        /* Pull the focus state above any adjacent buttons e.g. >> /cp/collections/articles/entries - save button alongside the dropdown arrow */
+        z-index: var(--z-index-above);
+    }
+}

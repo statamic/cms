@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div :class="{ 'mb-4': rows.length > 0 }">
         <sortable-list
             :model-value="rows"
             :vertical="true"
@@ -13,11 +13,10 @@
             v-slot="{}"
         >
             <div
-                class="grid-stacked"
+                class="grid-stacked space-y-8"
                 :class="{
-                    'mt-0': !allowFullscreen && hideDisplay,
-                    'mt-4': !hideDisplay,
-                    'mt-10': allowFullscreen,
+                    // 'mt-0': !allowFullscreen && hideDisplay,
+                    // 'mt-4': !hideDisplay,
                 }"
             >
                 <stacked-row
@@ -28,7 +27,9 @@
                     :values="row"
                     :meta="meta[row._id]"
                     :name="name"
+                    :has-error="rowHasError(row._id)"
                     :field-path-prefix="fieldPathPrefix"
+                    :meta-path-prefix="metaPathPrefix"
                     :can-delete="canDeleteRows"
                     :can-add-rows="canAddRows"
                     @updated="(row, value) => $emit('updated', row, value)"

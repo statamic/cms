@@ -1,29 +1,49 @@
 <template>
-    <div class="field-dropdown">
+    <div class="field-dropdown relative -top-0.5">
         <div class="quick-list">
             <div class="quick-list-content">
-                <a
+                <Button
                     v-for="(action, index) in actions.filter((a) => a.quick)"
                     :key="index"
                     @click="action.run()"
                     v-tooltip="action.title"
+                    :icon-only="true"
+                    size="xs"
+                    variant="ghost"
+                    :aria-label="action.title"
+                    tabindex="-1"
                 >
-                    <svg-icon :name="action.icon" class="h-3 w-3" />
-                </a>
+                    <ui-icon :name="action.icon" class="size-3.5" />
+                </Button>
             </div>
-            <dropdown-list placement="left-start" :offset="[7, -3]">
-                <dropdown-actions :actions="actions" />
-            </dropdown-list>
+            <Dropdown>
+                <template #trigger>
+                    <Button icon="ui/dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
+                </template>
+                <DropdownMenu>
+                    <DropdownItem
+                        v-for="action in actions"
+                        :key="action.handle || action.title"
+                        :text="action.title"
+                        :variant="action.dangerous ? 'destructive' : 'default'"
+                        :aria-label="action.title"
+                        @click="action.run(action)"
+                    />
+                </DropdownMenu>
+            </Dropdown>
         </div>
     </div>
 </template>
 
 <script>
-import DropdownActions from '../field-actions/DropdownActions.vue';
+import { Button, Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
 
 export default {
     components: {
-        DropdownActions,
+        Button,
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
     },
 
     props: {

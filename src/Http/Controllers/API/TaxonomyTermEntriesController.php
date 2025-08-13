@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\API;
 
 use Facades\Statamic\API\FilterAuthorizer;
+use Facades\Statamic\API\QueryScopeAuthorizer;
 use Facades\Statamic\API\ResourceAuthorizer;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Collection;
@@ -46,7 +47,7 @@ class TaxonomyTermEntriesController extends ApiController
         $with = $this->getRelationshipFieldsFromCollections($taxonomy);
 
         return app(EntryResource::class)::collection(
-            $this->filterSortAndPaginate($query->with($with))
+            $this->updateAndPaginate($query->with($with))
         );
     }
 
@@ -71,5 +72,10 @@ class TaxonomyTermEntriesController extends ApiController
     protected function allowedFilters()
     {
         return FilterAuthorizer::allowedForSubResources('api', 'collections', $this->allowedCollections);
+    }
+
+    protected function allowedQueryScopes()
+    {
+        return QueryScopeAuthorizer::allowedForSubResources('api', 'collections', $this->allowedCollections);
     }
 }

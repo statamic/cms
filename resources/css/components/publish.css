@@ -1,76 +1,71 @@
-/* ==========================================================================
-   PUBLISH COMPONENT
-   ========================================================================== */
+/* GROUP PUBLISH COMPONENT
+=================================================== */
 
-.publishing .page-wrapper {
-    padding: 0;
+.publish-fields,
+.field-grid {
+    display: grid;
+    --grid-columns: 12;
+    grid-template-columns: repeat(var(--grid-columns), 1fr);
+    @apply gap-3 lg:gap-8;
 
-    .publish-errors {
-        margin: 0 24px 24px;
-        padding: 16px 0;
+    aside & {
+        /* Decrease */
+        @apply gap-x-2 gap-y-3 lg:gap-y-6;
     }
-}
-
-.publish-tab-outer {
-    @apply flex justify-between;
-}
-
-.publish-form {
-    position: relative;
-
-    .loading-blocker {
-        padding-top: 50px;
-        border-radius: 3px;
-    }
-}
-
-.head .status {
-    display: inline-block;
-    label {
-        margin: 0 6px 0 0;
-        [dir='rtl'] & {
-            margin: 0 0 0 6px;
-        }
-        position: relative;
-        top: 3px;
-    }
-    > div {
-        display: inline-block;
-        position: relative;
-        top: 8px;
-    }
-}
-
-code.parent-url {
-    @apply block bg-none text-3xs text-gray-700;
-    padding: 0 0 3px 0;
-    [dir='rtl'] & {
-        padding: 0 0 3px 0;
-    }
-}
-
-.publish-fields {
-    @apply flex flex-wrap;
 
     .form-group {
-        > label,
-        .field-inner > label {
-            @apply mb-2 font-medium;
-        }
+        grid-column: span var(--col-span, var(--grid-columns));
+    }
+}
+
+@variant lg {
+    .field-w-25  { --col-span: calc(var(--grid-columns) * 0.25); }
+    .field-w-33  { --col-span: calc(var(--grid-columns) * 0.333); }
+    .field-w-50  { --col-span: calc(var(--grid-columns) * 0.5); }
+    .field-w-66  { --col-span: calc(var(--grid-columns) * 0.666); }
+    .field-w-75  { --col-span: calc(var(--grid-columns) * 0.75); }
+    .field-w-undefined, .field-w-100 { --col-span: calc(var(--grid-columns) * 1); }
+}
+
+
+/* GROUP PUBLISH COMPONENT / FIELD GRID (e.g. BLUEPRINT)
+=================================================== */
+.field-grid {
+    > * {
+        grid-column: span var(--col-span, var(--grid-columns));
+    }
+}
+
+
+/* GROUP PUBLISH COMPONENT / FIELDS / FLUID
+=================================================== */
+/* =Jay. Use this class if the fields should be fluid and fill the remaining space e.g. /cp/collections/pages/edit.
+Here flexbox is much better suited to create a layout that grows to fill space. */
+.publish-fields-fluid {
+    @apply gap-2;
+
+    display: flex;
+    flex-wrap: wrap;
+    > * {
+        flex-grow: 1;
     }
 
-    > .form-group:last-child {
-        margin-bottom: 0;
+    @variant lg {
+    /* Here we have to cut short the proper width very slightly to account for the gap value. Because we're using flex-grow it should be pretty unnoticeable */
+        .field-w-25  { flex-basis: 24.5%; }
+        .field-w-33  { flex-basis: 32.5%; }
+        .field-w-50  { flex-basis: 49.4%; }
+        .field-w-66  { flex-basis: 66.1%; }
+        .field-w-75  { flex-basis: 74.5%; }
+        .field-w-undefined, .field-w-100 { flex-basis: 100%; }
     }
+}
 
-    .has-error > .field-inner > label {
-        @apply text-red-500;
-    }
 
-    .field-inner {
-        position: relative;
-    }
-
+/* GROUP PUBLISH COMPONENT / FIELD
+=================================================== */
+.publish-field {
+    position: relative;
     .read-only-overlay {
         @apply absolute inset-0 cursor-not-allowed bg-white/25;
         z-index: 100;
@@ -89,18 +84,21 @@ code.parent-url {
             }
         }
     }
-}
 
-.publish-field {
-    @apply relative;
+    code {
+        @apply bg-blue-50 text-blue-600 font-medium px-1 rounded-sm;
+    }
 }
 
 .publish-field-label {
-    @apply flex items-center;
+    @apply flex items-center font-medium text-sm mb-2;
 }
 
-.publish-sections-section {
+.publish-sections .publish-sections-section {
     @apply mb-8;
+    [data-cards-wrap="fields"] & {
+        @apply mb-12;
+    }
 }
 
 .publish-section-header {
@@ -112,16 +110,10 @@ code.parent-url {
 }
 
 .publish-sidebar {
-    @apply shrink-0;
-    margin-left: 20px;
-    [dir='rtl'] & {
-        margin-right: 20px;
-        margin-left: 0;
-    }
-    width: 300px;
+    @apply shrink-0 ms-8 w-[300px];
 
     .publish-fields .form-group {
-        @apply p-4;
+        @apply p-0;
     }
 }
 

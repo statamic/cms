@@ -1,11 +1,12 @@
 <template>
-    <text-input
+    <Input
         type="text"
-        tabindex="0"
+        :tabindex="0"
         :name="name"
         :focus="focus"
         :model-value="value"
-        :is-read-only="isReadOnly"
+        :read-only="isReadOnly"
+        :disabled="config.disabled"
         :id="fieldId"
         @update:model-value="updateDebounced"
         @focus="$emit('focus')"
@@ -15,9 +16,12 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
+import { Input } from '@statamic/ui';
 
 export default {
     mixins: [Fieldtype],
+
+    components: { Input },
 
     props: ['focus'],
 };

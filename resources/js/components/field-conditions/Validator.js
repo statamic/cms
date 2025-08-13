@@ -15,15 +15,29 @@ const isEmpty = (value) => {
 const isString = (str) => str != null && typeof str.valueOf() === 'string';
 
 export default class {
-    constructor(field, values, dottedFieldPath, store) {
+    constructor(field, values, rootValues, currentFieldPath, revealerFields) {
         this.field = field;
         this.values = values;
-        this.dottedFieldPath = dottedFieldPath;
-        this.store = store;
-        this.rootValues = store ? store.values : false;
+        this.currentFieldPath = currentFieldPath;
+        this.revealerFields = revealerFields;
+        this.rootValues = rootValues || false;
         this.passOnAny = false;
         this.showOnPass = true;
         this.converter = new Converter();
+    }
+
+    usingRootValues() {
+        if (!this.currentFieldPath) {
+            throw new Error('[currentFieldPath] constructor param required for `usingRootValues()`');
+        }
+
+        this.rootValues = this.values;
+
+        if (this.currentFieldPath.includes('.')) {
+            return this.scopeValuesToParent();
+        }
+
+        return this;
     }
 
     passesConditions(specificConditions) {
@@ -185,7 +199,7 @@ export default class {
 
     getFieldValue(field) {
         if (field.startsWith('$parent.')) {
-            field = new ParentResolver(this.dottedFieldPath).resolve(field);
+            field = new ParentResolver(this.currentFieldPath).resolve(field);
         }
 
         if (field.startsWith('$root.') || field.startsWith('root.')) {
@@ -248,8 +262,7 @@ export default class {
             targetHandle: condition.targetHandle,
             values: this.values,
             root: this.rootValues,
-            store: this.store,
-            fieldPath: this.dottedFieldPath,
+            fieldPath: this.currentFieldPath,
         });
 
         return this.showOnPass ? passes : !passes;
@@ -262,7 +275,7 @@ export default class {
             return this.passesConditions(conditions);
         }
 
-        let revealerFields = this.store.revealerFields || [];
+        let revealerFields = this.revealerFields || [];
 
         let nonRevealerConditions = (this.getConditions() ?? []).filter(
             (condition) => !revealerFields.includes(this.relativeLhsToAbsoluteFieldPath(condition.field, dottedPrefix)),
@@ -273,7 +286,7 @@ export default class {
 
     relativeLhsToAbsoluteFieldPath(lhs, dottedPrefix) {
         if (lhs.startsWith('$parent.')) {
-            lhs = new ParentResolver(this.dottedFieldPath).resolve(lhs);
+            lhs = new ParentResolver(this.currentFieldPath).resolve(lhs);
         }
 
         if (lhs.startsWith('$root.') || lhs.startsWith('root.')) {
@@ -281,5 +294,13 @@ export default class {
         }
 
         return dottedPrefix ? dottedPrefix + '.' + lhs : lhs;
+    }
+
+    scopeValuesToParent() {
+        let scope = this.currentFieldPath.replace(new RegExp('\.[^\.]+$'), '');
+
+        this.values = data_get(this.rootValues, scope);
+
+        return this;
     }
 }

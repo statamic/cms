@@ -8,6 +8,7 @@ node_modules
 .php-cs-fixer.cache
 tests/Fakes/Composer/Package/test-package/composer.json
 resources/dist
+resources/dist-dev
 resources/dist-frontend
 composer.lock
 .env

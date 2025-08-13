@@ -149,46 +149,28 @@ class DateTest extends TestCase
                 null,
                 null,
             ],
-            'object with nulls' => [
-                'UTC',
-                [],
-                ['date' => null, 'time' => null],
-                null,
-            ],
-            'object with missing time' => [
-                'UTC',
-                [],
-                ['date' => null],
-                null,
-            ],
             'date with default format' => [
                 'UTC',
                 [],
-                ['date' => '2012-08-29', 'time' => '00:00'],
+                '2012-08-29T00:00:00Z',
                 '2012-08-29 00:00',
             ],
             'date with custom format' => [
                 'UTC',
                 ['format' => 'Y--m--d H/i'],
-                ['date' => '2012-08-29', 'time' => '00:00'],
+                '2012-08-29T00:00:00Z',
                 '2012--08--29 00/00',
             ],
             'date in a different timezone' => [
                 'America/New_York', // -4000
                 [],
-                ['date' => '2012-08-29', 'time' => '00:00'],
+                '2012-08-29T00:00:00Z',
                 '2012-08-28 20:00',
-            ],
-            'date with missing time' => [
-                'UTC',
-                [],
-                ['date' => '2012-08-29'],
-                '2012-08-29 00:00',
             ],
             'date with time' => [
                 'UTC',
                 ['time_enabled' => true],
-                ['date' => '2012-08-29', 'time' => '13:43'],
+                '2012-08-29T13:43:00Z',
                 '2012-08-29 13:43',
             ],
             'null range' => [
@@ -200,19 +182,19 @@ class DateTest extends TestCase
             'range with default format' => [
                 'UTC',
                 ['mode' => 'range'],
-                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2013-09-27', 'time' => '23:59']],
+                ['start' => '2012-08-29T00:00:00Z', 'end' => '2013-09-27T23:59:00Z'],
                 ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 23:59'],
             ],
             'range with custom format' => [
                 'UTC',
                 ['mode' => 'range', 'format' => 'Y--m--d H/i'],
-                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2013-09-27', 'time' => '23:59']],
+                ['start' => '2012-08-29T00:00:00Z', 'end' => '2013-09-27T23:59:00Z'],
                 ['start' => '2012--08--29 00/00', 'end' => '2013--09--27 23/59'],
             ],
             'range in a different timezone' => [
                 'America/New_York', // -4000
                 ['mode' => 'range'],
-                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2013-09-27', 'time' => '23:59']],
+                ['start' => '2012-08-29T00:00:00Z', 'end' => '2013-09-27T23:59:00Z'],
                 ['start' => '2012-08-28 20:00', 'end' => '2013-09-27 19:59'],
             ],
         ];
@@ -221,7 +203,7 @@ class DateTest extends TestCase
     #[Test]
     public function it_saves_date_as_integer_if_format_results_in_a_number()
     {
-        $this->assertSame(20120829, $this->fieldtype(['format' => 'Ymd'])->process(['date' => '2012-08-29', 'time' => null]));
+        $this->assertSame(20120829, $this->fieldtype(['format' => 'Ymd'])->process('2012-08-29T00:00:00Z'));
     }
 
     #[Test]
@@ -231,7 +213,7 @@ class DateTest extends TestCase
 
         $this->assertSame(
             ['start' => 201208290000, 'end' => 201309272359],
-            $fieldtype->process(['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2013-09-27', 'time' => '23:59']])
+            $fieldtype->process(['start' => '2012-08-29T00:00:00Z', 'end' => '2013-09-27T23:59:00Z'])
         );
     }
 
@@ -251,49 +233,49 @@ class DateTest extends TestCase
                 'UTC',
                 [],
                 null,
-                ['date' => null, 'time' => null],
+                null,
             ],
             'now' => [
                 'UTC',
                 [],
                 'now', // this would happen if the value was null, but default was "now"
-                ['date' => '2010-12-25', 'time' => '13:43'], // current date
+                '2010-12-25T13:43:00.000Z', // current date
             ],
             'date without time' => [
                 'UTC',
                 [],
                 '2012-08-29',
-                ['date' => '2012-08-29', 'time' => '00:00'],
+                '2012-08-29T00:00:00.000Z',
             ],
             'date with default format' => [
                 'UTC',
                 [],
                 '2012-08-29 00:00',
-                ['date' => '2012-08-29', 'time' => '00:00'],
+                '2012-08-29T00:00:00.000Z',
             ],
             'date with custom format' => [
                 'UTC',
                 ['format' => 'Y--m--d H/i'],
                 '2012--08--29 00/00',
-                ['date' => '2012-08-29', 'time' => '00:00'],
+                '2012-08-29T00:00:00.000Z',
             ],
             'date in a different timezone' => [
                 'America/New_York', // -0400
                 [],
                 '2012-08-29 00:00',
-                ['date' => '2012-08-29', 'time' => '04:00'],
+                '2012-08-29T04:00:00.000Z',
             ],
             'date with time' => [
                 'UTC',
                 ['time_enabled' => true],
                 '2012-08-29 13:43',
-                ['date' => '2012-08-29', 'time' => '13:43'],
+                '2012-08-29T13:43:00.000Z',
             ],
             'date with time in a different timezone' => [
                 'America/New_York', // -0400
                 ['time_enabled' => true],
                 '2012-08-29 13:43',
-                ['date' => '2012-08-29', 'time' => '17:43'],
+                '2012-08-29T17:43:00.000Z',
             ],
             'null range' => [
                 'UTC',
@@ -305,19 +287,19 @@ class DateTest extends TestCase
                 'UTC',
                 ['mode' => 'range'],
                 ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 23:59'],
-                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2013-09-27', 'time' => '23:59']],
+                ['start' => '2012-08-29T00:00:00.000Z', 'end' => '2013-09-27T23:59:00.000Z'],
             ],
             'range with custom format' => [
                 'UTC',
                 ['mode' => 'range', 'format' => 'Y--m--d H/i'],
                 ['start' => '2012--08--29 00/00', 'end' => '2013--09--27 23/59'],
-                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2013-09-27', 'time' => '23:59']],
+                ['start' => '2012-08-29T00:00:00.000Z', 'end' => '2013-09-27T23:59:00.000Z'],
             ],
             'range in a different timezone' => [
                 'America/New_York', // -4000
                 ['mode' => 'range'],
                 ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 23:59'],
-                ['start' => ['date' => '2012-08-29', 'time' => '04:00'], 'end' => ['date' => '2013-09-28', 'time' => '03:59']],
+                ['start' => '2012-08-29T04:00:00.000Z', 'end' => '2013-09-28T03:59:00.000Z'],
             ],
             'range where single date has been provided' => [
                 'UTC',
@@ -325,26 +307,26 @@ class DateTest extends TestCase
                 // Use the single date as both the start and end dates.
                 ['mode' => 'range'],
                 '2012-08-29',
-                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2012-08-29', 'time' => '23:59']],
+                ['start' => '2012-08-29T00:00:00.000Z', 'end' => '2012-08-29T23:59:59.999Z'],
             ],
             'range where single date has been provided with custom format' => [
                 'UTC',
                 ['mode' => 'range', 'format' => 'Y--m--d'],
                 '2012--08--29',
-                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2012-08-29', 'time' => '23:59']],
+                ['start' => '2012-08-29T00:00:00.000Z', 'end' => '2012-08-29T23:59:59.999Z'],
             ],
             'date where range has been provided' => [
                 'UTC',
                 // e.g. If it was once a range field. Use the start date.
                 [],
                 ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 23:59'],
-                ['date' => '2012-08-29', 'time' => '00:00'],
+                '2012-08-29T00:00:00.000Z',
             ],
             'date where range has been provided with custom format' => [
                 'UTC',
                 ['format' => 'Y--m--d H/i'],
                 ['start' => '2012--08--29 00/00', 'end' => '2013--09--27 23/59'],
-                ['date' => '2012-08-29', 'time' => '00:00'],
+                '2012-08-29T00:00:00.000Z',
             ],
         ];
     }
@@ -371,37 +353,37 @@ class DateTest extends TestCase
                 'UTC',
                 [],
                 '2012-08-29 00:00',
-                ['date' => '2012-08-29', 'time' => '00:00', 'mode' => 'single', 'time_enabled' => false],
+                ['date' => '2012-08-29T00:00:00.000Z', 'mode' => 'single', 'time_enabled' => false],
             ],
             'date with custom format' => [
                 'UTC',
                 ['format' => 'Y--m--d H/i'],
                 '2012--08--29 00/00',
-                ['date' => '2012-08-29', 'time' => '00:00', 'mode' => 'single', 'time_enabled' => false],
+                ['date' => '2012-08-29T00:00:00.000Z', 'mode' => 'single', 'time_enabled' => false],
             ],
             'date in a different timezone' => [
                 'America/New_York', // -0400
                 [],
                 '2012-08-29 00:00',
-                ['date' => '2012-08-29', 'time' => '04:00', 'mode' => 'single', 'time_enabled' => false],
+                ['date' => '2012-08-29T04:00:00.000Z', 'mode' => 'single', 'time_enabled' => false],
             ],
             'date with time' => [
                 'UTC',
                 ['time_enabled' => true],
                 '2012-08-29 13:43',
-                ['date' => '2012-08-29', 'time' => '13:43', 'mode' => 'single', 'time_enabled' => true],
+                ['date' => '2012-08-29T13:43:00.000Z', 'mode' => 'single', 'time_enabled' => true],
             ],
             'date with time and custom format' => [
                 'UTC',
                 ['time_enabled' => true, 'format' => 'Y--m--d H:i'],
                 '2012--08--29 13:43',
-                ['date' => '2012-08-29', 'time' => '13:43', 'mode' => 'single', 'time_enabled' => true],
+                ['date' => '2012-08-29T13:43:00.000Z', 'mode' => 'single', 'time_enabled' => true],
             ],
             'date with time in a different timezone' => [
                 'America/New_York', // -0400
                 ['time_enabled' => true],
                 '2012-08-29 13:43',
-                ['date' => '2012-08-29', 'time' => '17:43', 'mode' => 'single', 'time_enabled' => true],
+                ['date' => '2012-08-29T17:43:00.000Z', 'mode' => 'single', 'time_enabled' => true],
             ],
             'null range' => [
                 'UTC',
@@ -413,19 +395,19 @@ class DateTest extends TestCase
                 'UTC',
                 ['mode' => 'range'],
                 ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 00:00'],
-                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2013-09-27', 'time' => '00:00'], 'mode' => 'range'],
+                ['start' => '2012-08-29T00:00:00.000Z', 'end' => '2013-09-27T00:00:00.000Z', 'mode' => 'range', 'time_enabled' => false],
             ],
             'range with custom format' => [
                 'UTC',
                 ['mode' => 'range', 'format' => 'Y--m--d H/i'],
                 ['start' => '2012--08--29 00/00', 'end' => '2013--09--27 00/00'],
-                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2013-09-27', 'time' => '00:00'], 'mode' => 'range'],
+                ['start' => '2012-08-29T00:00:00.000Z', 'end' => '2013-09-27T00:00:00.000Z', 'mode' => 'range', 'time_enabled' => false],
             ],
             'range in a different timezone' => [
                 'America/New_York', // -4000
                 ['mode' => 'range'],
                 ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 00:00'],
-                ['start' => ['date' => '2012-08-29', 'time' => '04:00'], 'end' => ['date' => '2013-09-27', 'time' => '04:00'], 'mode' => 'range'],
+                ['start' => '2012-08-29T04:00:00.000Z', 'end' => '2013-09-27T04:00:00.000Z', 'mode' => 'range', 'time_enabled' => false],
             ],
             'range where single date has been provided' => [
                 // e.g. If it was once a non-range field.
@@ -433,32 +415,32 @@ class DateTest extends TestCase
                 'UTC',
                 ['mode' => 'range'],
                 '2012-08-29',
-                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2012-08-29', 'time' => '00:00'], 'mode' => 'range'],
+                ['start' => '2012-08-29T00:00:00.000Z', 'end' => '2012-08-29T00:00:00.000Z', 'mode' => 'range', 'time_enabled' => false],
             ],
             'range where single date has been provided with custom format' => [
                 'UTC',
                 ['mode' => 'range', 'format' => 'Y--m--d H/i'],
                 '2012--08--29 00/00',
-                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2012-08-29', 'time' => '00:00'], 'mode' => 'range'],
+                ['start' => '2012-08-29T00:00:00.000Z', 'end' => '2012-08-29T00:00:00.000Z', 'mode' => 'range', 'time_enabled' => false],
             ],
             'date where range has been provided' => [
                 // e.g. If it was once a range field. Use the start date.
                 'UTC',
                 [],
                 ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 00:00'],
-                ['date' => '2012-08-29', 'time' => '00:00', 'mode' => 'single', 'time_enabled' => false],
+                ['date' => '2012-08-29T00:00:00.000Z', 'mode' => 'single', 'time_enabled' => false],
             ],
             'date where range has been provided with custom format' => [
                 'UTC',
                 ['format' => 'Y--m--d H/i'],
                 ['start' => '2012--08--29 00/00', 'end' => '2013--09--27 00/00'],
-                ['date' => '2012-08-29', 'time' => '00:00', 'mode' => 'single', 'time_enabled' => false],
+                ['date' => '2012-08-29T00:00:00.000Z', 'mode' => 'single', 'time_enabled' => false],
             ],
             'range where time has been enabled' => [
                 'UTC',
-                ['mode' => 'range', 'time_enabled' => true], // enabling time should have no effect.
+                ['mode' => 'range', 'time_enabled' => true],
                 ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 00:00'],
-                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2013-09-27', 'time' => '00:00'], 'mode' => 'range'],
+                ['start' => '2012-08-29T00:00:00.000Z', 'end' => '2013-09-27T00:00:00.000Z', 'mode' => 'range', 'time_enabled' => true],
             ],
         ];
     }
@@ -474,7 +456,8 @@ class DateTest extends TestCase
         if ($expected === null) {
             $this->assertNull($value);
         } else {
-            $this->assertEquals($expected, $value->format('Y-m-d H:i:s'));
+            $this->assertInstanceOf(Carbon::class, $value);
+            $this->assertEquals($expected, $value->toIso8601ZuluString('millisecond'));
         }
     }
 
@@ -490,35 +473,30 @@ class DateTest extends TestCase
             ],
             'null date when not required' => [
                 [],
-                ['date' => null, 'time' => null],
+                null,
                 null,
             ],
             'valid date' => [
                 [],
-                ['date' => '2012-01-29', 'time' => null],
-                '2012-01-29 00:00:00',
+                '2012-01-29T00:00:00.000Z',
+                '2012-01-29T00:00:00.000Z',
             ],
             'valid date and time' => [
                 ['time_enabled' => true],
-                ['date' => '2012-01-29', 'time' => '13:00'],
-                '2012-01-29 13:00:00',
+                '2012-01-29T13:00:00.000Z',
+                '2012-01-29T13:00:00.000Z',
             ],
             'valid date and time with seconds' => [
                 ['time_enabled' => true, 'time_seconds_enabled' => true],
-                ['date' => '2012-01-29', 'time' => '13:14:15'],
-                '2012-01-29 13:14:15',
-            ],
-            'null time' => [
-                ['time_enabled' => true],
-                ['date' => '2012-01-29', 'time' => null],
-                '2012-01-29 00:00:00',
+                '2012-01-29T13:14:15.000Z',
+                '2012-01-29T13:14:15.000Z',
             ],
             // A carbon instance would be passed in if it was already processed.
             // e.g. if it was nested inside a Replicator.
             'carbon instance' => [
                 [],
                 Carbon::parse('2012-01-29'),
-                '2012-01-29 00:00:00',
+                '2012-01-29T00:00:00.000Z',
             ],
         ];
     }
@@ -534,10 +512,13 @@ class DateTest extends TestCase
         if ($expected === null) {
             $this->assertNull($value);
         } else {
-            $format = 'Y-m-d H:i:s';
+            $this->assertArrayHasKey('start', $value);
+            $this->assertArrayHasKey('end', $value);
+            $this->assertInstanceOf(Carbon::class, $start = $value['start']);
+            $this->assertInstanceOf(Carbon::class, $end = $value['end']);
             $this->assertEquals($expected, [
-                'start' => $value['start']->format($format),
-                'end' => $value['end']->format($format),
+                'start' => $start->toIso8601ZuluString('millisecond'),
+                'end' => $end->toIso8601ZuluString('millisecond'),
             ]);
         }
     }
@@ -554,21 +535,8 @@ class DateTest extends TestCase
             ],
             'valid date range' => [
                 ['mode' => 'range'],
-                ['date' => ['start' => '2012-01-29', 'end' => '2012-01-30']],
-                [
-                    'start' => '2012-01-29 00:00:00',
-                    'end' => '2012-01-30 00:00:00',
-                ],
-            ],
-            'null date in range mode' => [
-                ['mode' => 'range'],
-                ['date' => null],
-                null,
-            ],
-            'both dates null' => [
-                ['mode' => 'range'],
-                ['date' => ['start' => null, 'end' => null]],
-                null,
+                ['start' => '2012-01-29T00:00:00.000Z', 'end' => '2012-01-30T00:00:00.000Z'],
+                ['start' => '2012-01-29T00:00:00.000Z', 'end' => '2012-01-30T00:00:00.000Z'],
             ],
             // Start/end array with carbon instances would be passed in if it was already processed.
             // e.g. if it was nested inside a Replicator.
@@ -576,8 +544,8 @@ class DateTest extends TestCase
                 ['mode' => 'range'],
                 ['start' => Carbon::parse('2012-01-29'), 'end' => Carbon::parse('2012-02-14')],
                 [
-                    'start' => '2012-01-29 00:00:00',
-                    'end' => '2012-02-14 00:00:00',
+                    'start' => '2012-01-29T00:00:00.000Z',
+                    'end' => '2012-02-14T00:00:00.000Z',
                 ],
             ],
         ];
@@ -605,7 +573,7 @@ class DateTest extends TestCase
         return [
             'valid date' => [
                 [],
-                ['date' => '2012-01-29', 'time' => null],
+                '2012-01-29T00:00:00.000Z',
                 [],
             ],
             'null' => [
@@ -613,165 +581,85 @@ class DateTest extends TestCase
                 null,
                 [],
             ],
-            'not an array' => [
-                [],
-                'a string',
-                ['Must be an array.'],
-            ],
-            'missing date' => [
-                [],
-                [],
-                ['Date is required.'],
-            ],
-            'null date when not required' => [
-                [],
-                ['date' => null, 'time' => null],
-                [],
-            ],
-            'null required date via bool' => [
-                ['required' => true],
-                ['date' => null, 'time' => null],
-                ['Date is required.'],
-            ],
-            'null required date via validate' => [
-                ['validate' => 'required'],
-                ['date' => null, 'time' => null],
-                ['Date is required.'],
-            ],
             'invalid date format' => [
                 [],
-                ['date' => 'marchtember oneteenth', 'time' => null],
+                '2024-01-29',
+                ['Not a valid date.'],
+            ],
+            'ridiculous invalid date format' => [
+                [],
+                'marchtember oneteenth',
                 ['Not a valid date.'],
             ],
             'invalid date' => [
                 [],
-                ['date' => '2010-06-50'],
+                '2010-06-50T00:00:00.000Z',
                 ['Not a valid date.'],
             ],
             'valid date range' => [
                 ['mode' => 'range'],
-                ['date' => ['start' => '2012-01-29', 'end' => '2012-01-30']],
+                ['start' => '2012-01-29T00:00:00.000Z', 'end' => '2012-01-30T00:00:00.000Z'],
                 [],
-            ],
-            'null date in range mode' => [
-                ['mode' => 'range'],
-                ['date' => null],
-                [],
-            ],
-            'null date in range mode required via bool' => [
-                ['mode' => 'range', 'required' => true],
-                ['date' => null],
-                ['Date is required.'],
             ],
             'null date in range mode required via validate' => [
                 ['mode' => 'range', 'validate' => 'required'],
-                ['date' => null],
-                ['Date is required.'],
+                null,
+                ['The Test field is required.'],
             ],
             'missing start date' => [
                 ['mode' => 'range'],
-                ['date' => ['end' => '2012-01-30']],
+                ['end' => '2012-01-30T00:00:00.000Z'],
                 ['Start date is required.'],
             ],
             'missing end date' => [
                 ['mode' => 'range'],
-                ['date' => ['start' => '2012-01-29']],
+                ['start' => '2012-01-29T00:00:00.000Z'],
                 ['End date is required.'],
             ],
             'null start date' => [
                 ['mode' => 'range'],
-                ['date' => ['start' => null, 'end' => '2012-01-30']],
+                ['start' => null, 'end' => '2012-01-30T00:00:00.000Z'],
                 ['Start date is required.'],
             ],
             'null end date' => [
                 ['mode' => 'range'],
-                ['date' => ['start' => '2012-01-29', 'end' => null]],
+                ['start' => '2012-01-29T00:00:00.000Z', 'end' => null],
                 ['End date is required.'],
             ],
             'both dates null' => [
                 ['mode' => 'range'],
-                ['date' => ['start' => null, 'end' => null]],
-                [], // valid because not required
+                ['start' => null, 'end' => null],
+                ['Date is required.'], // Invalid because if you want null, the whole value should be null.
             ],
             'both dates null, required via bool' => [
                 ['mode' => 'range', 'required' => true],
-                ['date' => ['start' => null, 'end' => null]],
+                ['start' => null, 'end' => null],
                 ['Date is required.'],
             ],
             'both dates null, required via validate' => [
                 ['mode' => 'range', 'validate' => 'required'],
-                ['date' => ['start' => null, 'end' => null]],
+                ['start' => null, 'end' => null],
                 ['Date is required.'],
             ],
             'invalid start date' => [
                 ['mode' => 'range'],
-                ['date' => ['start' => '2010-06-50', 'end' => '2012-01-30']],
+                ['start' => '2010-06-50T00:00:00.000Z', 'end' => '2012-01-30T00:00:00.000Z'],
                 ['Not a valid start date.'],
             ],
             'invalid end date' => [
                 ['mode' => 'range'],
-                ['date' => ['start' => '2012-01-29', 'end' => '2010-06-50']],
+                ['start' => '2012-01-29T00:00:00.000Z', 'end' => '2010-06-50T00:00:00.000Z'],
                 ['Not a valid end date.'],
             ],
             'invalid start date format' => [
                 ['mode' => 'range'],
-                ['date' => ['start' => 'marchtember oneteenth', 'end' => '2012-01-30']],
+                ['start' => 'marchtember oneteenth', 'end' => '2012-01-30T00:00:00.000Z'],
                 ['Not a valid start date.'],
             ],
             'invalid end date format' => [
                 ['mode' => 'range'],
-                ['date' => ['start' => '2012-01-29', 'end' => 'marchtember oneteenth']],
+                ['start' => '2012-01-29T00:00:00.000Z', 'end' => 'marchtember oneteenth'],
                 ['Not a valid end date.'],
-            ],
-            'valid date and time' => [
-                ['time_enabled' => true],
-                ['date' => '2012-01-29', 'time' => '13:00'],
-                [],
-            ],
-            'missing time' => [
-                ['time_enabled' => true],
-                ['date' => '2012-01-29'],
-                ['Time is required.'],
-            ],
-            'null time' => [
-                ['time_enabled' => true],
-                ['date' => '2012-01-29', 'time' => null],
-                [],
-            ],
-            'null required time via bool' => [
-                ['time_enabled' => true, 'required' => true],
-                ['date' => '2012-01-29', 'time' => null],
-                ['Time is required.'],
-            ],
-            'null required time via validate' => [
-                ['time_enabled' => true, 'validate' => 'required'],
-                ['date' => '2012-01-29', 'time' => null],
-                ['Time is required.'],
-            ],
-            'invalid time format' => [
-                ['time_enabled' => true],
-                ['date' => '2012-01-29', 'time' => 'not formatted like a time'],
-                ['Not a valid time.'],
-            ],
-            '12 hour time' => [
-                ['time_enabled' => true],
-                ['date' => '2012-01-29', 'time' => '1:00'],
-                ['Not a valid time.'],
-            ],
-            'invalid hour' => [
-                ['time_enabled' => true],
-                ['date' => '2012-01-29', 'time' => '25:00'],
-                ['Not a valid time.'],
-            ],
-            'invalid minute' => [
-                ['time_enabled' => true],
-                ['date' => '2012-01-29', 'time' => '14:65'],
-                ['Not a valid time.'],
-            ],
-            'invalid second' => [
-                ['time_enabled' => true, 'time_seconds_enabled' => true],
-                ['date' => '2012-01-29', 'time' => '13:00:60'],
-                ['Not a valid time.'],
             ],
         ];
     }

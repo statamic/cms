@@ -7,9 +7,9 @@ use Illuminate\Support\Env;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Actions;
 use Statamic\Actions\Action;
+use Statamic\Addons\Manifest;
 use Statamic\Dictionaries;
 use Statamic\Dictionaries\Dictionary;
-use Statamic\Extend\Manifest;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes;
 use Statamic\Forms\JsDrivers;
@@ -31,6 +31,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Actions\CopyPasswordResetLink::class,
         Actions\Delete::class,
         Actions\DeleteMultisiteEntry::class,
+        Actions\DisableTwoFactorAuthentication::class,
         Actions\DownloadAsset::class,
         Actions\DownloadAssetFolder::class,
         Actions\DuplicateAsset::class,
@@ -55,6 +56,8 @@ class ExtensionServiceProvider extends ServiceProvider
         Dictionaries\Countries::class,
         Dictionaries\Currencies::class,
         Dictionaries\File::class,
+        Dictionaries\Languages::class,
+        Dictionaries\Locales::class,
         Dictionaries\Timezones::class,
     ];
 
@@ -65,6 +68,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Assets\Assets::class,
         Fieldtypes\Bard::class,
         Fieldtypes\Bard\Buttons::class,
+        Fieldtypes\Blueprints::class,
         Fieldtypes\ButtonGroup::class,
         Fieldtypes\Checkboxes::class,
         Fieldtypes\Code::class,
@@ -195,7 +199,6 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Query::class,
         Tags\Range::class,
         Tags\Redirect::class,
-        Tags\Relate::class,
         Tags\Rotate::class,
         Tags\Route::class,
         Tags\Scope::class,
@@ -224,7 +227,6 @@ class ExtensionServiceProvider extends ServiceProvider
 
     protected $widgets = [
         Widgets\Collection::class,
-        Widgets\GettingStarted::class,
         Widgets\Header::class,
         Widgets\Template::class,
         Widgets\Updater::class,
@@ -248,6 +250,9 @@ class ExtensionServiceProvider extends ServiceProvider
         Updates\MigrateSitesConfigToYaml::class,
         Updates\AddTimezoneConfigOptions::class,
         Updates\RemoveParentField::class,
+        Updates\UpdateGlobalVariables::class,
+        Updates\PublishMigrationForTwoFactorColumns::class,
+        Updates\AddAddonSettingsToGitConfig::class,
     ];
 
     public function register()

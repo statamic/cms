@@ -2,16 +2,22 @@
 
 namespace Statamic\Providers;
 
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Auth\Passwords\PasswordBrokerManager;
 use Statamic\Auth\PermissionCache;
 use Statamic\Auth\Permissions;
 use Statamic\Auth\Protect\ProtectorManager;
+use Statamic\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 use Statamic\Auth\UserProvider;
 use Statamic\Auth\UserRepositoryManager;
 use Statamic\Contracts\Auth\RoleRepository;
+use Statamic\Contracts\Auth\TwoFactor\TwoFactorAuthenticationProvider as TwoFactorAuthenticationProviderContract;
+use Statamic\Contracts\Auth\UserGroup;
 use Statamic\Contracts\Auth\UserGroupRepository;
 use Statamic\Contracts\Auth\UserRepository;
 use Statamic\Facades\Permission;
@@ -30,6 +36,7 @@ class AuthServiceProvider extends ServiceProvider
         \Statamic\Contracts\Globals\GlobalSet::class => Policies\GlobalSetPolicy::class,
         \Statamic\Contracts\Globals\Variables::class => Policies\GlobalSetVariablesPolicy::class,
         \Statamic\Contracts\Auth\User::class => Policies\UserPolicy::class,
+        \Statamic\Contracts\Auth\UserGroup::class => Policies\UserGroupPolicy::class,
         \Statamic\Contracts\Forms\Form::class => Policies\FormPolicy::class,
         \Statamic\Contracts\Forms\Submission::class => Policies\FormSubmissionPolicy::class,
         \Statamic\Contracts\Assets\Asset::class => Policies\AssetPolicy::class,
@@ -37,6 +44,7 @@ class AuthServiceProvider extends ServiceProvider
         \Statamic\Contracts\Assets\AssetContainer::class => Policies\AssetContainerPolicy::class,
         \Statamic\Fields\Fieldset::class => Policies\FieldsetPolicy::class,
         \Statamic\Sites\Site::class => Policies\SitePolicy::class,
+        \Statamic\Addons\Addon::class => Policies\AddonPolicy::class,
     ];
 
     public function register()
@@ -76,6 +84,8 @@ class AuthServiceProvider extends ServiceProvider
         $this->app->singleton(PermissionCache::class, function ($app) {
             return new PermissionCache;
         });
+
+        $this->app->singleton(TwoFactorAuthenticationProviderContract::class, TwoFactorAuthenticationProvider::class);
     }
 
     public function boot()
@@ -109,6 +119,18 @@ class AuthServiceProvider extends ServiceProvider
             return ($app['auth']->getProvider() instanceof UserProvider)
                 ? new PasswordBrokerManager($app)
                 : $broker;
+        });
+
+        RateLimiter::for('two-factor', function (Request $request) {
+            return Limit::perMinute(5)->by($request->session()->get('login.id'));
+        });
+
+        RateLimiter::for('send-elevated-session-code', function () {
+            return Limit::perMinute(1)->response(function (Request $request) {
+                $message = trans_choice('statamic::messages.try_again_in_minutes', 1);
+
+                return $request->wantsJson() ? response(['error' => $message], 429) : back()->with('error', $message);
+            });
         });
     }
 }
