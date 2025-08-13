@@ -17,6 +17,7 @@ use Statamic\Auth\UserProvider;
 use Statamic\Auth\UserRepositoryManager;
 use Statamic\Contracts\Auth\RoleRepository;
 use Statamic\Contracts\Auth\TwoFactor\TwoFactorAuthenticationProvider as TwoFactorAuthenticationProviderContract;
+use Statamic\Contracts\Auth\UserGroup;
 use Statamic\Contracts\Auth\UserGroupRepository;
 use Statamic\Contracts\Auth\UserRepository;
 use Statamic\Facades\Permission;
@@ -35,6 +36,7 @@ class AuthServiceProvider extends ServiceProvider
         \Statamic\Contracts\Globals\GlobalSet::class => Policies\GlobalSetPolicy::class,
         \Statamic\Contracts\Globals\Variables::class => Policies\GlobalSetVariablesPolicy::class,
         \Statamic\Contracts\Auth\User::class => Policies\UserPolicy::class,
+        \Statamic\Contracts\Auth\UserGroup::class => Policies\UserGroupPolicy::class,
         \Statamic\Contracts\Forms\Form::class => Policies\FormPolicy::class,
         \Statamic\Contracts\Forms\Submission::class => Policies\FormSubmissionPolicy::class,
         \Statamic\Contracts\Assets\Asset::class => Policies\AssetPolicy::class,
