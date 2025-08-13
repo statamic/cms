@@ -13,7 +13,7 @@
             </div>
         </header>
 
-        <section class="isolate px-3 py-4">
+        <section v-if="!loading" class="isolate px-3 py-4">
             <Tabs v-model:modelValue="activeTab">
                 <TabList class="mb-6">
                     <TabTrigger name="settings" :text="__('Settings')" />
@@ -21,7 +21,7 @@
                     <TabTrigger name="validation" :text="__('Validation')" />
                 </TabList>
 
-                <div v-if="!loading">
+                <div>
                     <TabContent name="settings">
                         <ui-publish-container
                             ref="container"
