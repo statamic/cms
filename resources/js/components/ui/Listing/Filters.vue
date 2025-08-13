@@ -6,19 +6,9 @@ import FieldFilter from './FieldFilter.vue';
 import DataListFilter from './Filter.vue';
 import { ref } from 'vue';
 
-const { filters, activeFilters, activeFilterBadges, setFilter, reorderable } = injectListingContext();
+const { filters, activeFilters, activeFilterBadges, activeFilterBadgeCount, setFilter, reorderable } = injectListingContext();
 
 const open = ref(false);
-
-const badgeCount = computed(() => {
-    let count = Object.keys(activeFilterBadges.value).length;
-
-    if (activeFilterBadges.value.hasOwnProperty('fields')) {
-        count = count + Object.keys(activeFilterBadges.value.fields).length - 1;
-    }
-
-    return count;
-});
 
 const fieldFilter = computed(() => filters.value.find((filter) => filter.handle === 'fields'));
 const standardFilters = computed(() => filters.value.filter((filter) => filter.handle !== 'fields'));
@@ -56,8 +46,8 @@ function needsFinalStandardBadgeMargin(index) {
             <Button icon="sliders-horizontal" class="[&_svg]:size-3.5" :disabled="reorderable" @click="open = true">
                 {{ __('Filters') }}
                 <Badge
-                    v-if="badgeCount"
-                    :text="badgeCount"
+                    v-if="activeFilterBadgeCount"
+                    :text="activeFilterBadgeCount"
                     size="sm"
                     pill
                     class="absolute -top-1.5 -right-1.5"

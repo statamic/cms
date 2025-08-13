@@ -214,6 +214,17 @@ const forwardedTableCellSlots = computed(() => {
         }, {});
 });
 
+const activeFilterBadgeCount = computed(() => {
+    let count = Object.keys(activeFilterBadges.value).length;
+
+    if (activeFilterBadges.value.hasOwnProperty('fields')) {
+        count = count + Object.keys(activeFilterBadges.value.fields).length - 1;
+    }
+
+    return count;
+});
+
+
 function setParameters(params) {
     currentPage.value = parseInt(params.page);
     perPage.value = parseInt(params.perPage);
@@ -588,6 +599,7 @@ provideListingContext({
     filters: toRef(() => props.filters),
     activeFilters,
     activeFilterBadges,
+    activeFilterBadgeCount,
     setFilter,
     setFilters,
     clearFilters,
