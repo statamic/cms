@@ -17,7 +17,6 @@ use Statamic\Auth\UserProvider;
 use Statamic\Auth\UserRepositoryManager;
 use Statamic\Contracts\Auth\RoleRepository;
 use Statamic\Contracts\Auth\TwoFactor\TwoFactorAuthenticationProvider as TwoFactorAuthenticationProviderContract;
-use Statamic\Contracts\Auth\UserGroup;
 use Statamic\Contracts\Auth\UserGroupRepository;
 use Statamic\Contracts\Auth\UserRepository;
 use Statamic\Facades\Permission;
