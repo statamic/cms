@@ -33,7 +33,7 @@ class SvgTagTest extends TestCase
     #[Test]
     public function it_renders_svg_with_additional_params()
     {
-        $this->assertStringStartsWith('<svg class="mb-2" xmlns="', $this->tag('{{ svg src="users" sanitize="false" class="mb-2" }}'));
+        $this->assertStringStartsWith('<svg class="mb-2" viewBox="', $this->tag('{{ svg src="users" sanitize="false" class="mb-2" }}'));
     }
 
     #[Test]
