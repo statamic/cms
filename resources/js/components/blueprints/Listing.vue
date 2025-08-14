@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue';
-import { DropdownItem, Listing } from '@statamic/ui';
+import { DropdownItem, Listing } from '@statamic/cms/ui';
 
 defineEmits(['reordered']);
 

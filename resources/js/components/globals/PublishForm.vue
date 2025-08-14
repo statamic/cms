@@ -70,7 +70,7 @@
 <script>
 import SiteSelector from '../SiteSelector.vue';
 import clone from '@statamic/util/clone.js';
-import { Button, Dropdown, DropdownItem, DropdownMenu, Header } from '@statamic/ui';
+import { Button, Dropdown, DropdownItem, DropdownMenu, Header } from '@statamic/cms/ui';
 import PublishContainer from '@statamic/components/ui/Publish/Container.vue';
 import PublishTabs from '@statamic/components/ui/Publish/Tabs.vue';
 import PublishComponents from '@statamic/components/ui/Publish/Components.vue';

@@ -72,7 +72,7 @@
 
 <script>
 import HasInputOptions from '../fieldtypes/HasInputOptions.js';
-import { Description, Combobox, Input, Button } from '@statamic/ui';
+import { Description, Combobox, Input, Button } from '@statamic/cms/ui';
 import Select from '@statamic/components/ui/Select/Select.vue'
 import Switch from '@statamic/components/ui/Switch.vue'
 

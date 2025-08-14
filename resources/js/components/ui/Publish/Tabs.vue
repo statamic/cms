@@ -1,5 +1,5 @@
 <script setup>
-import { Tabs, TabList, TabTrigger, TabContent } from '@statamic/ui';
+import { Tabs, TabList, TabTrigger, TabContent } from '@statamic/cms/ui';
 import TabProvider from './TabProvider.vue';
 import { injectContainerContext } from './Container.vue';
 import Sections from '@statamic/components/ui/Publish/Sections.vue';

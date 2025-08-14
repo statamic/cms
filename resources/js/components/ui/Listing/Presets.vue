@@ -1,6 +1,6 @@
 <script setup>
 import PresetTrigger from './PresetTrigger.vue';
-import { Button, Input, Dropdown, DropdownItem, DropdownMenu, DropdownSeparator } from '@statamic/ui';
+import { Button, Input, Dropdown, DropdownItem, DropdownMenu, DropdownSeparator } from '@statamic/cms/ui';
 import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
 import { computed, ref, watch } from 'vue';
 

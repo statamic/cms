@@ -36,7 +36,7 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import { ref, watch } from 'vue';
-import { Combobox, Icon } from '@statamic/ui';
+import { Combobox, Icon } from '@statamic/cms/ui';
 const iconsCache = ref({});
 const loaders = ref({});
 

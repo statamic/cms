@@ -157,7 +157,7 @@ import {
     DropdownLabel,
     DropdownItem,
     DropdownSeparator,
-} from '@statamic/ui';
+} from '@statamic/cms/ui';
 import ItemActions from '@statamic/components/actions/ItemActions.vue';
 
 export default {

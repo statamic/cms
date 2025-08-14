@@ -1,6 +1,6 @@
 <script setup>
 import { SavePipeline } from 'statamic';
-import { Header, Button, Dropdown, DropdownMenu, DropdownItem, PublishContainer } from '@statamic/ui';
+import { Header, Button, Dropdown, DropdownMenu, DropdownItem, PublishContainer } from '@statamic/cms/ui';
 import { ref, useTemplateRef } from 'vue';
 const { Pipeline, Request } = SavePipeline;
 

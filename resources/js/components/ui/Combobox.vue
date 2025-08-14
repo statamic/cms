@@ -12,7 +12,7 @@ import {
     ComboboxViewport,
 } from 'reka-ui';
 import { computed, nextTick, onMounted, ref, useAttrs, useSlots, useTemplateRef, watch } from 'vue';
-import { Button, Icon, Badge } from '@statamic/ui';
+import { Button, Icon, Badge } from '@statamic/cms/ui';
 import fuzzysort from 'fuzzysort';
 import { SortableList } from '@statamic/components/sortable/Sortable.js';
 

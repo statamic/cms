@@ -32,7 +32,7 @@
 
 <script>
 import uniqid from 'uniqid';
-import { PublishContainer, FieldsProvider, PublishFields } from '@statamic/ui';
+import { PublishContainer, FieldsProvider, PublishFields } from '@statamic/cms/ui';
 
 export default {
     components: { PublishContainer, FieldsProvider, PublishFields },

@@ -1,5 +1,5 @@
 <script setup>
-import { Card, Icon } from '@statamic/ui';
+import { Card, Icon } from '@statamic/cms/ui';
 
 defineProps({
     title: String,

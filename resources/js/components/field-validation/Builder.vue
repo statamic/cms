@@ -95,9 +95,9 @@ import RULES from './Rules.js';
 import SemVer from 'semver';
 import { SortableList } from '../sortable/Sortable';
 import { sortBy } from 'lodash-es';
-import { Description, Field, Input, Badge, Button } from '@statamic/ui';
+import { Description, Field, Input, Badge, Button } from '@statamic/cms/ui';
 import Switch from '@statamic/components/ui/Switch.vue'
-import { Combobox } from '@statamic/ui';
+import { Combobox } from '@statamic/cms/ui';
 import { ComboboxInput } from 'reka-ui';
 
 export default {

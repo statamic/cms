@@ -165,7 +165,7 @@
 <script>
 import qs from 'qs';
 import AssetSelector from '../../assets/Selector.vue';
-import { Icon } from '@statamic/ui';
+import { Icon } from '@statamic/cms/ui';
 
 export default {
     components: {

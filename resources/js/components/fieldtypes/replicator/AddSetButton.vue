@@ -27,7 +27,7 @@
 
 <script>
 import SetPicker from './SetPicker.vue';
-import { Button } from '@statamic/ui';
+import { Button } from '@statamic/cms/ui';
 import { Motion } from 'motion-v';
 
 export default {

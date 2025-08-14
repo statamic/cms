@@ -1,7 +1,7 @@
 <script setup>
 import { DialogClose } from 'reka-ui';
 import { computed, useSlots } from 'vue';
-import { Button } from '@statamic/ui';
+import { Button } from '@statamic/cms/ui';
 
 const slots = useSlots();
 

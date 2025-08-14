@@ -130,7 +130,7 @@ import {
     PanelFooter,
     PanelHeader,
     ListingTable,
-} from '@statamic/ui';
+} from '@statamic/cms/ui';
 
 export default {
     mixins: [AssetBrowserMixin],

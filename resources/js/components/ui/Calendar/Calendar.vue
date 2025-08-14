@@ -15,7 +15,7 @@ import {
     CalendarNext,
 } from 'reka-ui';
 import { parseAbsolute } from '@internationalized/date';
-import { Icon } from '@statamic/ui';
+import { Icon } from '@statamic/cms/ui';
 
 defineOptions({ name: 'Calendar' });
 

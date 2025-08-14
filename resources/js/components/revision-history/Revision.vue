@@ -75,7 +75,7 @@
 import RestoreRevision from './Restore.vue';
 import RevisionPreview from './Preview.vue';
 import DateFormatter from '@statamic/components/DateFormatter.js';
-import { Subheading, Badge } from '@statamic/ui';
+import { Subheading, Badge } from '@statamic/cms/ui';
 
 export default {
     components: {

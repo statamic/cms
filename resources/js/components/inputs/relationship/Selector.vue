@@ -138,7 +138,7 @@ import {
     Checkbox,
     Icon,
     StatusIndicator,
-} from '@statamic/ui';
+} from '@statamic/cms/ui';
 
 export default {
     components: {

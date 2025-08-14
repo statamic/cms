@@ -21,7 +21,7 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import { Button, Input } from '@statamic/ui';
+import { Button, Input } from '@statamic/cms/ui';
 
 export default {
     mixins: [Fieldtype],

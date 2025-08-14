@@ -2,7 +2,7 @@
 import { computed, useTemplateRef, watch, ref } from 'vue';
 import { injectContainerContext } from './Container.vue';
 import { injectFieldsContext } from './FieldsProvider.vue';
-import { Field, Icon, Tooltip, Label } from '@statamic/ui';
+import { Field, Icon, Tooltip, Label } from '@statamic/cms/ui';
 import FieldActions from '@statamic/components/field-actions/FieldActions.vue';
 import ShowField from '@statamic/components/field-conditions/ShowField.js';
 

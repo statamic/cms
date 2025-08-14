@@ -104,7 +104,7 @@ import ItemSelector from './Selector.vue';
 import CreateButton from './CreateButton.vue';
 import { Sortable, Plugins } from '@shopify/draggable';
 import RelationshipSelectField from './SelectField.vue';
-import { Button, Icon } from '@statamic/ui';
+import { Button, Icon } from '@statamic/cms/ui';
 
 export default {
     props: {

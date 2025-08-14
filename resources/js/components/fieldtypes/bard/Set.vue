@@ -96,7 +96,7 @@
 import { NodeViewWrapper } from '@tiptap/vue-3';
 import ManagesPreviewText from '../replicator/ManagesPreviewText';
 import HasFieldActions from '../../field-actions/HasFieldActions.js';
-import { Badge, Button, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, Icon, Subheading, Switch, Tooltip } from '@statamic/ui';
+import { Badge, Button, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, Icon, Subheading, Switch, Tooltip } from '@statamic/cms/ui';
 import { Motion } from 'motion-v';
 import FieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
 import Fields from '@statamic/components/ui/Publish/Fields.vue';

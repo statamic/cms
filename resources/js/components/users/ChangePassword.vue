@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import { Button, Modal, ModalClose, Switch, Field, Input } from '@statamic/ui';
+import { Button, Modal, ModalClose, Switch, Field, Input } from '@statamic/cms/ui';
 import { requireElevatedSessionIf } from '@statamic/components/elevated-sessions';
 
 export default {

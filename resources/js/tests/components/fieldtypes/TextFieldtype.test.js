@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils';
 import { expect, test } from 'vitest';
 import TextFieldtype from '@statamic/components/fieldtypes/TextFieldtype.vue';
-import { Input } from '@statamic/ui';
+import { Input } from '@statamic/cms/ui';
 
 test('value can be updated', async () => {
     const wrapper = mount(TextFieldtype, {

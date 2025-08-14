@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { Button, Dropdown, DropdownMenu, DropdownLabel, Radio, RadioGroup } from '@statamic/ui';
+import { Button, Dropdown, DropdownMenu, DropdownLabel, Radio, RadioGroup } from '@statamic/cms/ui';
 
 export default {
     components: {

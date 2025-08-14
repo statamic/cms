@@ -1,5 +1,5 @@
 <script setup>
-import { Panel, PanelFooter } from '@statamic/ui';
+import { Panel, PanelFooter } from '@statamic/cms/ui';
 import { ref, computed, useTemplateRef, useSlots } from 'vue';
 import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
 import Pagination from './Pagination.vue';

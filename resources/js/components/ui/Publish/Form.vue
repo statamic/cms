@@ -1,7 +1,7 @@
 <script setup>
 import Container from './Container.vue';
 import Tabs from './Tabs.vue';
-import { Header, Button } from '@statamic/ui';
+import { Header, Button } from '@statamic/cms/ui';
 import uniqid from 'uniqid';
 import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
 import { SavePipeline } from '@statamic/exports.js';

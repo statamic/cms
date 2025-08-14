@@ -44,7 +44,7 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import { Input, Select } from '@statamic/ui';
+import { Input, Select } from '@statamic/cms/ui';
 
 export default {
     components: { Input, Text, Select },

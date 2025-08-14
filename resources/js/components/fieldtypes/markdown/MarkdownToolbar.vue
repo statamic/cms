@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import { Button, ToggleGroup, ToggleItem } from '@statamic/ui';
+import { Button, ToggleGroup, ToggleItem } from '@statamic/cms/ui';
 
 export default {
     components: {

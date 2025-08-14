@@ -214,7 +214,7 @@ import SiteSelector from '../SiteSelector.vue';
 import uniqid from 'uniqid';
 import { defineAsyncComponent } from 'vue';
 import { mapValues, pick } from 'lodash-es';
-import { Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, Button, EmptyStateMenu, EmptyStateItem, Header } from '@statamic/ui';
+import { Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, Button, EmptyStateMenu, EmptyStateItem, Header } from '@statamic/cms/ui';
 
 export default {
     components: {

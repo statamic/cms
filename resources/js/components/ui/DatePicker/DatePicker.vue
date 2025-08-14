@@ -19,7 +19,7 @@ import {
     DatePickerNext,
     DatePickerPrev,
 } from 'reka-ui';
-import { Card, Button, Calendar, Icon } from '@statamic/ui';
+import { Card, Button, Calendar, Icon } from '@statamic/cms/ui';
 
 const emit = defineEmits(['update:modelValue']);
 

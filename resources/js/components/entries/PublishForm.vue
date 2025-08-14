@@ -285,7 +285,7 @@ import {
     Subheading,
     Switch,
     Select,
-} from '@statamic/ui';
+} from '@statamic/cms/ui';
 import PublishContainer from '@statamic/components/ui/Publish/Container.vue';
 import PublishTabs from '@statamic/components/ui/Publish/Tabs.vue';
 import PublishComponents from '@statamic/components/ui/Publish/Components.vue';

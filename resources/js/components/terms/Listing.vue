@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import { DropdownItem, Listing } from '@statamic/ui';
+import { DropdownItem, Listing } from '@statamic/cms/ui';
 
 export default {
     components: {

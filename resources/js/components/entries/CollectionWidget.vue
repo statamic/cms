@@ -9,7 +9,7 @@ import {
     ListingTableBody as TableBody,
     ListingPagination as Pagination,
     Icon,
-} from '@statamic/ui';
+} from '@statamic/cms/ui';
 
 const props = defineProps({
     additionalColumns: Array,

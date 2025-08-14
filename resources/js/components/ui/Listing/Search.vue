@@ -1,6 +1,6 @@
 <script setup>
 import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
-import { Input } from '@statamic/ui';
+import { Input } from '@statamic/cms/ui';
 import debounce from '@statamic/util/debounce.js';
 import { useTemplateRef } from 'vue';
 

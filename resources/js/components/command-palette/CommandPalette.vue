@@ -9,7 +9,7 @@ import fuzzysort from 'fuzzysort';
 import { each, groupBy, orderBy, find, uniq } from 'lodash-es';
 import { motion } from 'motion-v';
 import { cva } from 'cva';
-import { Icon, Subheading } from '@statamic/ui';
+import { Icon, Subheading } from '@statamic/cms/ui';
 
 let open = ref(false);
 let query = ref('');

@@ -1,6 +1,6 @@
 <script setup>
 import { injectTabContext } from './TabProvider.vue';
-import { Panel, PanelHeader, Heading, Subheading, Card } from '@statamic/ui';
+import { Panel, PanelHeader, Heading, Subheading, Card } from '@statamic/cms/ui';
 import FieldsProvider from './FieldsProvider.vue';
 import Fields from './Fields.vue';
 import ShowField from '@statamic/components/field-conditions/ShowField.js';

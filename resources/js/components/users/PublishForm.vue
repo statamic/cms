@@ -73,7 +73,7 @@ import {
     PublishContainer,
     PublishTabs,
     Header,
-} from '@statamic/ui';
+} from '@statamic/cms/ui';
 import ItemActions from '@statamic/components/actions/ItemActions.vue';
 import { SavePipeline } from '@statamic/exports.js';
 import { computed, ref } from 'vue';

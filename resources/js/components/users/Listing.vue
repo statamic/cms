@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import { Listing } from '@statamic/ui';
+import { Listing } from '@statamic/cms/ui';
 
 export default {
     components: {

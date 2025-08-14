@@ -168,7 +168,7 @@ import { marked } from 'marked';
 import { markRaw } from 'vue';
 import { TextRenderer as PlainTextRenderer } from '@davidenke/marked-text-renderer';
 import throttle from '@statamic/util/throttle.js';
-import { Button } from '@statamic/ui';
+import { Button } from '@statamic/cms/ui';
 
 import CodeMirror from 'codemirror/lib/codemirror';
 import 'codemirror/addon/edit/closebrackets';

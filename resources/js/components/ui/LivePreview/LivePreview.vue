@@ -3,7 +3,7 @@ import { computed, nextTick, ref, watch, useTemplateRef, onBeforeUnmount, onUnmo
 import Resizer from './Resizer.vue';
 import { injectContainerContext } from '@statamic/components/ui/Publish/Container.vue';
 import debounce from '@statamic/util/debounce.js';
-import { Select, Button } from '@statamic/ui';
+import { Select, Button } from '@statamic/cms/ui';
 import axios from 'axios';
 import wait from '@statamic/util/wait.js';
 import { mapValues } from 'lodash-es';

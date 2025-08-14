@@ -23,7 +23,7 @@
 
 <script setup>
 import { Fieldtype } from 'statamic';
-import { Input } from '@statamic/ui';
+import { Input } from '@statamic/cms/ui';
 import { computed } from 'vue';
 
 const emit = defineEmits(Fieldtype.emits);

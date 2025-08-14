@@ -1,5 +1,5 @@
 <script setup>
-import { Button } from '@statamic/ui';
+import { Button } from '@statamic/cms/ui';
 import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
 import { computed } from 'vue';
 

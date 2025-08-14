@@ -1,5 +1,5 @@
 <script setup>
-import { Widget, Badge, Listing, Icon, Tooltip } from '@statamic/ui';
+import { Widget, Badge, Listing, Icon, Tooltip } from '@statamic/cms/ui';
 import { ref } from 'vue';
 
 defineProps({

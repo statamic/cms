@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import { Badge, DropdownItem, Listing } from '@statamic/ui';
+import { Badge, DropdownItem, Listing } from '@statamic/cms/ui';
 
 const props = defineProps(['initialRows', 'initialColumns']);
 const rows = ref(props.initialRows);
