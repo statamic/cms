@@ -45,43 +45,45 @@ class SearchablesTest extends TestCase
     }
 
     #[Test]
-    public function it_checks_all_providers_for_whether_an_item_is_searchable()
+    public function it_checks_content_providers_for_whether_an_item_is_searchable()
     {
         app(Providers::class)->register($entries = Mockery::mock(Entries::class)->makePartial());
         app(Providers::class)->register($terms = Mockery::mock(Terms::class)->makePartial());
         app(Providers::class)->register($assets = Mockery::mock(Assets::class)->makePartial());
-        app(Providers::class)->register($users = Mockery::mock(Users::class)->makePartial());
+
+        // TODO: Assert that `users` are no longer included in `content` searchables
+        // app(Providers::class)->register($users = Mockery::mock(Users::class)->makePartial());
 
         $searchable = Mockery::mock();
-        $searchables = $this->makeSearchables(['searchables' => 'all']);
+        $searchables = $this->makeSearchables(['searchables' => 'content']);
 
         // Check twice.
         // First time they'll all return false, so contains() will return false.
-        // Second time, assets will return true, so contains() will return true early, and users won't be checked.
+        // Second time, assets will return true, so contains() will return true early.
 
         $entries->shouldReceive('contains')->with($searchable)->twice()->andReturn(false, false);
         $terms->shouldReceive('contains')->with($searchable)->twice()->andReturn(false, false);
         $assets->shouldReceive('contains')->with($searchable)->twice()->andReturn(false, true);
-        $users->shouldReceive('contains')->with($searchable)->once()->andReturn(false);
 
         $this->assertFalse($searchables->contains($searchable));
         $this->assertTrue($searchables->contains($searchable));
     }
 
     #[Test]
-    public function all_searchables_include_entries_terms_assets_and_users()
+    public function content_searchables_include_entries_terms_and_assets()
     {
         app(Providers::class)->register($entries = Mockery::mock(Entries::class)->makePartial());
         app(Providers::class)->register($terms = Mockery::mock(Terms::class)->makePartial());
         app(Providers::class)->register($assets = Mockery::mock(Assets::class)->makePartial());
-        app(Providers::class)->register($users = Mockery::mock(Users::class)->makePartial());
+
+        // TODO: Assert that `users` are no longer included in `content` searchables
+        // app(Providers::class)->register($users = Mockery::mock(Users::class)->makePartial());
 
         $entries->shouldReceive('provide')->andReturn(collect([$entryA = Entry::make(), $entryB = Entry::make()]));
         $terms->shouldReceive('provide')->andReturn(collect([$termA = Term::make(), $termB = Term::make()]));
         $assets->shouldReceive('provide')->andReturn(collect([$assetA = Asset::make(), $assetB = Asset::make()]));
-        $users->shouldReceive('provide')->andReturn(collect([$userA = User::make(), $userB = User::make()]));
 
-        $searchables = $this->makeSearchables(['searchables' => 'all']);
+        $searchables = $this->makeSearchables(['searchables' => 'content']);
 
         $everything = [
             $entryA,
@@ -90,8 +92,6 @@ class SearchablesTest extends TestCase
             $termB,
             $assetA,
             $assetB,
-            $userA,
-            $userB,
         ];
 
         $items = $searchables->all();
