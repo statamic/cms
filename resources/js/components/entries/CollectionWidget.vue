@@ -53,7 +53,15 @@ function formatDate(value) {
         :sort-direction="initialSortDirection"
     >
         <template #initializing>
-            <Widget v-bind="widgetProps"><Icon name="loading" /></Widget>
+            <Widget v-bind="widgetProps">
+                <div class="flex flex-col gap-4 justify-between p-4">
+                    <ui-skeleton class="h-3 w-full" />
+                    <ui-skeleton class="h-3 w-full" />
+                    <ui-skeleton class="h-3 w-full" />
+                    <ui-skeleton class="h-3 w-full" />
+                    <ui-skeleton class="h-3 w-full" />
+                </div>
+            </Widget>
         </template>
         <template #default="{ items, loading }">
             <Widget v-bind="widgetProps">

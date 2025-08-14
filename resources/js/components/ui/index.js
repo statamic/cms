@@ -78,6 +78,7 @@ import { default as RadioGroup } from "./Radio/Group.vue";
 import { default as Select } from "./Select/Select.vue";
 import { default as Separator } from "./Separator.vue";
 import { default as Slider } from "./Slider.vue";
+import { default as Skeleton } from "./Skeleton.vue";
 import { default as SplitterGroup } from "./Splitter/Group.vue";
 import { default as SplitterPanel } from "./Splitter/Panel.vue";
 import { default as SplitterResizeHandle } from "./Splitter/ResizeHandle.vue";
@@ -181,6 +182,7 @@ export {
     Select,
     Separator,
     Slider,
+    Skeleton,
     SplitterGroup,
     SplitterPanel,
     SplitterResizeHandle,
