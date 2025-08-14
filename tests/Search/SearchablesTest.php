@@ -47,12 +47,21 @@ class SearchablesTest extends TestCase
     #[Test]
     public function it_checks_content_providers_for_whether_an_item_is_searchable()
     {
-        app(Providers::class)->register($entries = Mockery::mock(Entries::class)->makePartial());
-        app(Providers::class)->register($terms = Mockery::mock(Terms::class)->makePartial());
-        app(Providers::class)->register($assets = Mockery::mock(Assets::class)->makePartial());
+        $providers = Mockery::mock(Providers::class);
 
-        // TODO: Assert that `users` are no longer included in `content` searchables
-        // app(Providers::class)->register($users = Mockery::mock(Users::class)->makePartial());
+        $providers->shouldReceive('providers')
+            ->with('content')
+            ->andReturn(collect([
+                'collection' => $entries = Mockery::mock(Entries::class),
+                'taxonomy' => $terms = Mockery::mock(Terms::class),
+                'assets' => $assets = Mockery::mock(Assets::class),
+            ]));
+
+        $providers->shouldReceive('make')->with('collection', Mockery::any(), ['*'])->andReturn($entries);
+        $providers->shouldReceive('make')->with('taxonomy', Mockery::any(), ['*'])->andReturn($terms);
+        $providers->shouldReceive('make')->with('assets', Mockery::any(), ['*'])->andReturn($assets);
+
+        $this->app->instance(Providers::class, $providers);
 
         $searchable = Mockery::mock();
         $searchables = $this->makeSearchables(['searchables' => 'content']);
@@ -72,9 +81,21 @@ class SearchablesTest extends TestCase
     #[Test]
     public function content_searchables_include_entries_terms_and_assets()
     {
-        app(Providers::class)->register($entries = Mockery::mock(Entries::class)->makePartial());
-        app(Providers::class)->register($terms = Mockery::mock(Terms::class)->makePartial());
-        app(Providers::class)->register($assets = Mockery::mock(Assets::class)->makePartial());
+        $providers = Mockery::mock(Providers::class);
+
+        $providers->shouldReceive('providers')
+            ->with('content')
+            ->andReturn(collect([
+                'collection' => $entries = Mockery::mock(Entries::class),
+                'taxonomy' => $terms = Mockery::mock(Terms::class),
+                'assets' => $assets = Mockery::mock(Assets::class),
+            ]));
+
+        $providers->shouldReceive('make')->with('collection', Mockery::any(), ['*'])->andReturn($entries);
+        $providers->shouldReceive('make')->with('taxonomy', Mockery::any(), ['*'])->andReturn($terms);
+        $providers->shouldReceive('make')->with('assets', Mockery::any(), ['*'])->andReturn($assets);
+
+        $this->app->instance(Providers::class, $providers);
 
         // TODO: Assert that `users` are no longer included in `content` searchables
         // app(Providers::class)->register($users = Mockery::mock(Users::class)->makePartial());
@@ -102,9 +123,15 @@ class SearchablesTest extends TestCase
     #[Test]
     public function it_gets_searchables_from_specific_providers()
     {
-        app(Providers::class)->register($entries = Mockery::mock(Entries::class)->makePartial());
-        app(Providers::class)->register($terms = Mockery::mock(Terms::class)->makePartial());
-        app(Providers::class)->register($users = Mockery::mock(Users::class)->makePartial());
+        $entries = Mockery::mock(Entries::class);
+        $terms = Mockery::mock(Terms::class);
+        $users = Mockery::mock(Users::class);
+
+        $providers = Mockery::mock(Providers::class);
+        $providers->shouldReceive('make')->with('collection', Mockery::any(), ['blog', 'pages'])->andReturn($entries);
+        $providers->shouldReceive('make')->with('users', Mockery::any(), ['users'])->andReturn($users);
+
+        $this->app->instance(Providers::class, $providers);
 
         $entries->shouldReceive('provide')->once()->andReturn(collect([$entryA = Entry::make(), $entryB = Entry::make()]));
         $users->shouldReceive('provide')->once()->andReturn(collect([$userA = User::make(), $userB = User::make()]));
