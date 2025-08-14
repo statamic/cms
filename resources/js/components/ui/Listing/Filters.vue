@@ -50,7 +50,7 @@ function isActive(handle) {
             <div class="flex-1 p-3 bg-white h-full overflow-auto rounded-l-2xl">
                 <Heading size="lg" :text="__('Filters')" class="mb-4" icon="sliders-horizontal" />
                 <div class="space-y-4">
-                    <Panel>
+                    <Panel v-if="fieldFilter">
                         <PanelHeader class="flex items-center justify-between">
                             <Heading :text="__('Fields')" />
                             <Button v-if="isActive('fields')" size="sm" text="Clear" @click="setFilter('fields', null)" />
