@@ -62,24 +62,24 @@ class CommandPaletteTest extends TestCase
             ->all();
 
         $expected = [
-            ['type' => 'link', 'text' => 'Top Level > Dashboard', 'url' => 'http://localhost/cp/dashboard'],
-            ['type' => 'link', 'text' => 'Content > Collections', 'url' => 'http://localhost/cp/collections'],
-            ['type' => 'link', 'text' => 'Content > Navigation', 'url' => 'http://localhost/cp/navigation'],
-            ['type' => 'link', 'text' => 'Content > Taxonomies', 'url' => 'http://localhost/cp/taxonomies'],
-            ['type' => 'link', 'text' => 'Content > Assets', 'url' => 'http://localhost/cp/assets'],
-            ['type' => 'link', 'text' => 'Content > Globals', 'url' => 'http://localhost/cp/globals'],
-            ['type' => 'link', 'text' => 'Fields > Blueprints', 'url' => 'http://localhost/cp/fields/blueprints'],
-            ['type' => 'link', 'text' => 'Fields > Fieldsets', 'url' => 'http://localhost/cp/fields/fieldsets'],
-            ['type' => 'link', 'text' => 'Tools > Forms', 'url' => 'http://localhost/cp/forms'],
-            ['type' => 'link', 'text' => 'Tools > Updates', 'url' => 'http://localhost/cp/updater'],
-            ['type' => 'link', 'text' => 'Tools > Addons', 'url' => 'http://localhost/cp/addons'],
-            ['type' => 'link', 'text' => 'Tools > Utilities', 'url' => 'http://localhost/cp/utilities'],
-            ['type' => 'link', 'text' => 'Tools > GraphQL', 'url' => 'http://localhost/cp/graphql'],
-            ['type' => 'link', 'text' => 'Settings > Site', 'url' => 'http://localhost/cp/sites'],
-            ['type' => 'link', 'text' => 'Settings > Preferences', 'url' => 'http://localhost/cp/preferences'],
-            ['type' => 'link', 'text' => 'Users > Users', 'url' => 'http://localhost/cp/users'],
-            ['type' => 'link', 'text' => 'Users > Groups', 'url' => 'http://localhost/cp/user-groups'],
-            ['type' => 'link', 'text' => 'Users > Permissions', 'url' => 'http://localhost/cp/roles'],
+            ['text' => 'Top Level > Dashboard', 'url' => 'http://localhost/cp/dashboard'],
+            ['text' => 'Content > Collections', 'url' => 'http://localhost/cp/collections'],
+            ['text' => 'Content > Navigation', 'url' => 'http://localhost/cp/navigation'],
+            ['text' => 'Content > Taxonomies', 'url' => 'http://localhost/cp/taxonomies'],
+            ['text' => 'Content > Assets', 'url' => 'http://localhost/cp/assets'],
+            ['text' => 'Content > Globals', 'url' => 'http://localhost/cp/globals'],
+            ['text' => 'Fields > Blueprints', 'url' => 'http://localhost/cp/fields/blueprints'],
+            ['text' => 'Fields > Fieldsets', 'url' => 'http://localhost/cp/fields/fieldsets'],
+            ['text' => 'Tools > Forms', 'url' => 'http://localhost/cp/forms'],
+            ['text' => 'Tools > Updates', 'url' => 'http://localhost/cp/updater'],
+            ['text' => 'Tools > Addons', 'url' => 'http://localhost/cp/addons'],
+            ['text' => 'Tools > Utilities', 'url' => 'http://localhost/cp/utilities'],
+            ['text' => 'Tools > GraphQL', 'url' => 'http://localhost/cp/graphql'],
+            ['text' => 'Settings > Site', 'url' => 'http://localhost/cp/sites'],
+            ['text' => 'Settings > Preferences', 'url' => 'http://localhost/cp/preferences'],
+            ['text' => 'Users > Users', 'url' => 'http://localhost/cp/users'],
+            ['text' => 'Users > Groups', 'url' => 'http://localhost/cp/user-groups'],
+            ['text' => 'Users > Permissions', 'url' => 'http://localhost/cp/roles'],
         ];
 
         $this->assertEquals($expected, $navigationCommands);
@@ -114,7 +114,6 @@ class CommandPaletteTest extends TestCase
         $expected = [
             [
                 'category' => 'Miscellaneous',
-                'type' => 'link',
                 'text' => 'Ask Jeeves',
                 'url' => 'https://ask.com',
                 'openNewTab' => false,
@@ -124,7 +123,6 @@ class CommandPaletteTest extends TestCase
             ],
             [
                 'category' => 'Actions',
-                'type' => 'link',
                 'text' => 'Hotbot',
                 'url' => 'https://hotbot.com',
                 'openNewTab' => true,
@@ -154,7 +152,6 @@ class CommandPaletteTest extends TestCase
         $expected = [
             [
                 'category' => 'Miscellaneous',
-                'type' => 'link',
                 'text' => ['Preferences', 'Best Website', 'Ask Jeeves'],
                 'url' => 'https://ask.com',
                 'openNewTab' => false,
