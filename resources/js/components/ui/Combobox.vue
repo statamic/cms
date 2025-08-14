@@ -288,7 +288,7 @@ defineExpose({
                             </slot>
                         </button>
 
-                        <div class="flex gap-1.5 items-center">
+                        <div class="flex gap-1.5 items-center ms-1">
                             <Button icon="x" variant="ghost" size="xs" round v-if="clearable && modelValue" @click="clear" />
                             <Icon name="ui/chevron-down" />
                         </div>
