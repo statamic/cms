@@ -10,19 +10,20 @@ const { filters, activeFilters, activeFilterBadges, activeFilterBadgeCount, setF
 
 const open = ref(false);
 
-const fieldFilter = computed(() => filters.value.find((filter) => filter.handle === 'fields'));
-const standardFilters = computed(() => filters.value.filter((filter) => filter.handle !== 'fields'));
-const fieldFilterBadges = computed(() => activeFilterBadges.value.fields || {});
+const fieldFilter = computed(() => filters.value.find((filter) => filter.is_fields));
+const fieldFilterHandle = computed(() => fieldFilter.value.handle);
+const fieldFilterBadges = computed(() => activeFilterBadges.value[fieldFilterHandle.value] || {});
+const standardFilters = computed(() => filters.value.filter((filter) => !filter.is_fields));
 
 const standardBadges = computed(() => {
-    const { fields, ...badges } = activeFilterBadges.value;
+    const { [fieldFilterHandle.value]: fields, ...badges } = activeFilterBadges.value;
     return badges;
 });
 
 function removeFieldFilter(handle) {
-    const fields = { ...activeFilters.value.fields };
+    const fields = { ...activeFilters.value[fieldFilterHandle.value] };
     delete fields[handle];
-    setFilter('fields', fields);
+    setFilter(fieldFilterHandle.value, fields);
 }
 
 function isActive(handle) {
@@ -53,13 +54,13 @@ function isActive(handle) {
                     <Panel v-if="fieldFilter">
                         <PanelHeader class="flex items-center justify-between">
                             <Heading :text="__('Fields')" />
-                            <Button v-if="isActive('fields')" size="sm" text="Clear" @click="setFilter('fields', null)" />
+                            <Button v-if="isActive(fieldFilterHandle)" size="sm" text="Clear" @click="setFilter(fieldFilterHandle, null)" />
                         </PanelHeader>
                         <Card>
                             <FieldFilter
                                 :config="fieldFilter"
                                 :values="activeFilters.fields || {}"
-                                @changed="setFilter('fields', $event)"
+                                @changed="setFilter(fieldFilterHandle, $event)"
                             />
                         </Card>
                     </Panel>
