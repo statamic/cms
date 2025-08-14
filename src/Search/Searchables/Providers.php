@@ -16,9 +16,14 @@ class Providers
     }
 
     public function register($class)
+    public function register(string $class, ?string $group = null)
     {
         $this->providers[$handle = $class::handle()] = $class;
         $this->prefixes[$class::referencePrefix()] = $handle;
+
+        if ($group) {
+            $this->pushToGroup($handle, $group);
+        }
 
         return $this;
     }
@@ -50,5 +55,12 @@ class Providers
     public function getByPrefix(string $prefix)
     {
         return $this->providers()->get($this->prefixes[$prefix]);
+    }
+
+    protected function pushToGroup(string $handle, string $group): void
+    {
+        $inGroup = $this->groups[$group] ?? [];
+
+        $this->groups[$group] = [...$inGroup, $handle];
     }
 }
