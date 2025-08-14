@@ -1,13 +1,13 @@
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 function addAliases(config) {
     if (!config.resolve) config.resolve = {};
 
-    const jsDir = path.resolve('/@fs' + __dirname + '/../');
-
+    const dir = path.dirname(fileURLToPath(import.meta.url));
     const aliases = {
-        '@statamic/cms': `${jsDir}/package`,
-        '@statamic': jsDir,
+        '@statamic/cms': path.resolve(dir, '../package'),
+        '@statamic': path.resolve(dir, '..'),
     };
 
     config.resolve.alias = { ...aliases, ...config.resolve.alias };
