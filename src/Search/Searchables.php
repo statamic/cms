@@ -34,8 +34,9 @@ class Searchables
             throw new \Exception('Searchables provider [all] no longer supported in Statamic v6!');
         }
 
+        // TODO: Refactor this to allow `content` + `users`, etc.
         if ($providers->contains('content')) {
-            return $manager->providers()->map(fn ($_, $key) => $manager->make($key, $this->index, ['*']));
+            return $manager->providers('content')->map(fn ($_, $key) => $manager->make($key, $this->index, ['*']));
         }
 
         return $providers
