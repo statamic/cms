@@ -1,4 +1,4 @@
-<div class="logo relative z-10 pt-20">
+<div class="logo relative z-10 md:pt-18">
     @if (isset($customLogo))
         <img
             src="{{ $customLogo }}"

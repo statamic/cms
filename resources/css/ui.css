@@ -125,7 +125,7 @@
 
 @layer components {
     .content-card {
-        @apply min-h-full px-6 md:px-12 pb-6 bg-white border dark:bg-gray-900 dark:border-y-0 dark:border-r-0 border-gray-200 dark:border-white/7 rounded-2xl dark:rounded-none;
+        @apply min-h-full px-3 sm:px-6 md:px-12 sm:pb-6 bg-white border dark:bg-gray-900 dark:border-y-0 dark:border-r-0 border-gray-200 dark:border-white/7 rounded-2xl dark:rounded-none;
     }
 }
 

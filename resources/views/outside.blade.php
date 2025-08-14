@@ -7,7 +7,7 @@
         @include('statamic::partials.head')
     </head>
 
-    <body class="bg-gray-50 font-sans leading-normal scheme-light">
+    <body class="bg-gray-50 font-sans leading-normal scheme-light p-2">
         <config-provider>
             <div id="statamic">
                 @yield('content')
