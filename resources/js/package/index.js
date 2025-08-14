@@ -4,3 +4,4 @@ export { default as FieldtypeMixin } from '../components/fieldtypes/Fieldtype.vu
 export { default as IndexFieldtypeMixin } from '../components/fieldtypes/IndexFieldtype.vue';
 export * from '../components/elevated-sessions';
 export { default as DateFormatter } from '../components/DateFormatter.js';
+export { default as ItemActions } from '../components/actions/ItemActions.vue';

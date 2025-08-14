@@ -11,6 +11,7 @@ it('exports root', () => {
         'FieldtypeMixin',
         'IndexFieldtype',
         'IndexFieldtypeMixin',
+        'ItemActions',
         'requireElevatedSession',
         'requireElevatedSessionIf',
     ])
