@@ -7,15 +7,10 @@ use Statamic\Search\Index;
 
 class Providers
 {
-    protected $providers;
-    protected $prefixes;
+    protected $providers = [];
+    protected $prefixes = [];
+    protected $groups = [];
 
-    public function __construct()
-    {
-        $this->providers = Collection::make();
-    }
-
-    public function register($class)
     public function register(string $class, ?string $group = null)
     {
         $this->providers[$handle = $class::handle()] = $class;
@@ -28,11 +23,11 @@ class Providers
         return $this;
     }
 
-    public function providers(): Collection
+    public function providers(?string $group = null): Collection
     {
-        return $this->providers = $this->providers->map(function ($provider) {
-            return is_string($provider) ? app($provider) : $provider;
-        });
+        return $this->providers = collect($this->providers)
+            ->filter(fn ($class, $handle) => $group ? $this->isProviderInGroup($handle, $group) : true)
+            ->map(fn ($provider) => is_string($provider) ? app($provider) : $provider);
     }
 
     public function make(string $key, ?Index $index = null, ?array $keys = null)
@@ -62,5 +57,10 @@ class Providers
         $inGroup = $this->groups[$group] ?? [];
 
         $this->groups[$group] = [...$inGroup, $handle];
+    }
+
+    protected function isProviderInGroup(string $handle, string $group): bool
+    {
+        return collect($this->groups[$group])->contains($handle);
     }
 }
