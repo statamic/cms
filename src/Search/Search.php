@@ -34,9 +34,9 @@ class Search
         app(IndexManager::class)->extend($driver, $callback);
     }
 
-    public function registerSearchableProvider($class)
+    public function registerSearchableProvider(string $class, ?string $group = null)
     {
-        app(Providers::class)->register($class);
+        app(Providers::class)->register($class, $group);
     }
 
     public function __call($method, $parameters)
