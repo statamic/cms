@@ -8,6 +8,9 @@
     @apply overflow-y-auto fixed top-14 left-0 w-46;
     @apply [&_svg]:text-gray-500 dark:[&_svg]:text-gray-600;
     transition: all 0.3s ease-in-out;
+    /* On mobile, hide by default and overlay on top */
+    @apply md:flex;
+    @apply z-50;
 
     ul {
         @apply flex flex-col gap-0;
@@ -38,8 +41,26 @@
     }
 }
 
+
+/* Mobile nav behavior */
+@media (max-width: theme(--breakpoint-md)) {
+    .nav-main {
+        /* Always visible but off-screen by default */
+        @apply flex;
+        /* Start off-screen to the left */
+        @apply -left-46;
+    }
+
+    .nav-open .nav-main {
+        @apply bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-2xl;
+        /* Slide in from the left */
+        @apply left-0;
+    }
+}
+
+
 main {
-    @apply ps-46;
+    @apply ps-0 md:ps-46;
     transition: all 0.3s ease-in-out;
 }
 
