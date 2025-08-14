@@ -36,7 +36,6 @@ export default defineConfig(({ mode, command }) => {
                 vue: 'vue/dist/vue.esm-bundler.js',
                 '@statamic/cms': path.resolve(__dirname, 'resources/js/package'),
                 '@statamic': path.resolve(__dirname, 'resources/js'),
-                'statamic': path.resolve(__dirname, 'resources/js/exports.js'),
             },
         },
         optimizeDeps: { include: ['vue'] },

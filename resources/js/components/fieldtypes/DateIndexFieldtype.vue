@@ -3,7 +3,7 @@
 </template>
 
 <script setup>
-import { IndexFieldtype as Fieldtype } from 'statamic';
+import { IndexFieldtype as Fieldtype } from '@statamic/cms';
 import DateFormatter from '@statamic/components/DateFormatter.js';
 import { computed } from 'vue';
 

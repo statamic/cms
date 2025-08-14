@@ -22,7 +22,7 @@
 </template>
 
 <script setup>
-import { Fieldtype } from 'statamic';
+import { Fieldtype } from '@statamic/cms';
 import { Input } from '@statamic/cms/ui';
 import { computed } from 'vue';
 

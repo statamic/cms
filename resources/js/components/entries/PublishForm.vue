@@ -292,9 +292,8 @@ import PublishComponents from '@statamic/components/ui/Publish/Components.vue';
 import LocalizationsCard from '@statamic/components/ui/Publish/Localizations.vue';
 import LivePreview from '@statamic/components/ui/LivePreview/LivePreview.vue';
 import resetValuesFromResponse from '@statamic/util/resetValuesFromResponse.js';
-import { SavePipeline } from '@statamic/exports.js';
 import { computed, ref } from 'vue';
-const { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } = SavePipeline;
+import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@statamic/cms/save-pipeline';
 
 let saving = ref(false);
 let errors = ref({});

@@ -17,7 +17,7 @@
 </template>
 
 <script setup>
-import { Fieldtype } from 'statamic';
+import { Fieldtype } from '@statamic/cms';
 import { Switch, Heading, Button } from '@/components/ui';
 import { onMounted, onBeforeUnmount, watch, nextTick, computed } from 'vue';
 import { injectContainerContext } from '@statamic/components/ui/Publish/Container.vue';

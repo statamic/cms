@@ -148,10 +148,9 @@ import PublishContainer from '@statamic/components/ui/Publish/Container.vue';
 import PublishTabs from '@statamic/components/ui/Publish/Tabs.vue';
 import PublishComponents from '@statamic/components/ui/Publish/Components.vue';
 import LivePreview from '@statamic/components/ui/LivePreview/LivePreview.vue';
-import { SavePipeline } from '@statamic/exports.js';
 import resetValuesFromResponse from '@statamic/util/resetValuesFromResponse.js';
 import { ref, computed } from 'vue';
-const { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } = SavePipeline;
+import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@statamic/cms/save-pipeline';
 import LocalizationsCard from '@statamic/components/ui/Publish/Localizations.vue';
 import ItemActions from '@statamic/components/actions/ItemActions.vue';
 
