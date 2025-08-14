@@ -26,7 +26,7 @@ class Providers
     public function providers(?string $group = null): Collection
     {
         return $this->providers = collect($this->providers)
-            ->filter(fn ($class, $handle) => $group ? $this->isProviderInGroup($handle, $group) : true)
+            ->filter(fn ($_, $handle) => $group ? $this->isProviderInGroup($handle, $group) : true)
             ->map(fn ($provider) => is_string($provider) ? app($provider) : $provider);
     }
 
