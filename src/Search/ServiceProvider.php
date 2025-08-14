@@ -36,10 +36,10 @@ class ServiceProvider extends LaravelServiceProvider
         Event::subscribe(UpdateItemIndexes::class);
 
         collect([
-            Entries::class,
-            Terms::class,
-            Assets::class,
-            Users::class,
-        ])->each(fn ($provider) => Search::registerSearchableProvider($provider));
+            Entries::class => 'content',
+            Terms::class => 'content',
+            Assets::class => 'content',
+            Users::class => null,
+        ])->each(fn ($group, $provider) => Search::registerSearchableProvider($provider, $group));
     }
 }
