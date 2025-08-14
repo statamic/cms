@@ -36,6 +36,13 @@ class ComposerTest extends TestCase
 
     public function tearDown(): void
     {
+        // If the test was skipped, avoid trying to clean up. The setUp would've never happened.
+        if (! $this->files) {
+            parent::tearDown();
+
+            return;
+        }
+
         $this->files->deleteDirectory($this->basePath('tmp'));
         $this->files->deleteDirectory($this->basePath('vendor'));
         $this->files->delete($this->basePath('composer.json'));

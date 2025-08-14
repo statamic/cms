@@ -650,7 +650,16 @@ autoApplyState();
 
 <template>
     <slot name="initializing" v-if="initializing">
-        <Icon name="loading" />
+        <div class="flex flex-col gap-4 justify-between mt-2">
+            <ui-skeleton class="h-3 w-48" />
+            <div class="flex gap-3">
+                <ui-skeleton class="h-8 w-80" />
+                <ui-skeleton class="h-8 w-24" />
+                <div class="flex-1" />
+                <ui-skeleton class="size-8" />
+            </div>
+            <ui-skeleton class="h-48 w-full" />
+        </div>
     </slot>
     <slot v-if="!initializing" :items="items" :is-column-visible="isColumnVisible" :loading="loading">
         <Presets v-if="showPresets" />
