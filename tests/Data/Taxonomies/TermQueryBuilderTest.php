@@ -509,10 +509,10 @@ class TermQueryBuilderTest extends TestCase
         Term::make('4')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
         Term::make('5')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-5']])->save();
 
-        $entries = Term::query()->whereJsonContains('test_taxonomy', ['taxonomy-1', 'taxonomy-5'])->get();
+        $entries = Term::query()->whereJsonContains('test_taxonomy', ['taxonomy-1', 'taxonomy-3'])->get();
 
-        $this->assertCount(3, $entries);
-        $this->assertEquals(['1', '3', '5'], $entries->map->slug()->all());
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['3'], $entries->map->slug()->all());
 
         $entries = Term::query()->whereJsonContains('test_taxonomy', 'taxonomy-1')->get();
 
