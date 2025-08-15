@@ -34,7 +34,7 @@
         "symfony/lock": "^7.0.3",
         "symfony/var-exporter": "^7.0.3",
         "symfony/yaml": "^7.0.3",
-        "ueberdosis/tiptap-php": "^1.4",
+        "ueberdosis/tiptap-php": "^2.0",
         "voku/portable-ascii": "^2.0.2",
         "wilderborn/partyline": "^1.0"
     },
