@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import { Select } from '@statamic/cms/ui';
+import { Select } from '@/components/ui';
 
 export default {
     components: { Select },

@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import { Combobox, StatusIndicator } from '@statamic/cms/ui';
+import { Combobox, StatusIndicator } from '@/components/ui';
 
 export default {
     components: {

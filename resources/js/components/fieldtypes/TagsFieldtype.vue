@@ -16,7 +16,7 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import HasInputOptions from './HasInputOptions.js';
-import { Combobox } from '@statamic/cms/ui';
+import { Combobox } from '@/components/ui';
 
 export default {
     mixins: [Fieldtype, HasInputOptions],

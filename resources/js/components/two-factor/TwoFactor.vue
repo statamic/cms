@@ -1,10 +1,10 @@
 <script setup>
 import { ref, watch } from 'vue';
-import ConfirmationModal from '@statamic/components/modals/ConfirmationModal.vue';
+import ConfirmationModal from '@/components/modals/ConfirmationModal.vue';
 import TwoFactorSetup from './Setup.vue';
 import TwoFactorRecoveryCodesModal from './RecoveryCodesModal.vue';
-import { requireElevatedSession } from '@statamic/components/elevated-sessions';
-import { Popover, Button } from '@statamic/cms/ui';
+import { requireElevatedSession } from '@/components/elevated-sessions';
+import { Popover, Button } from '@/components/ui';
 import axios from 'axios';
 
 const props = defineProps(['wasSetup', 'isEnforced', 'routes']);

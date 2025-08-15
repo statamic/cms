@@ -90,7 +90,7 @@
 <script>
 import { dragContext, Draggable, walkTreeData } from '@he-tree/vue';
 import TreeBranch from './Branch.vue';
-import { PanelHeader, Panel, Icon } from '@statamic/cms/ui';
+import { PanelHeader, Panel, Icon } from '@/components/ui';
 
 export default {
     components: {

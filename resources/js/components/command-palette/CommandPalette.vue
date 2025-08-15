@@ -2,14 +2,14 @@
 import { ref, computed, watch } from 'vue';
 import CommandPaletteItem from './Item.vue';
 import axios from 'axios';
-import debounce from '@statamic/util/debounce';
+import debounce from '@/util/debounce';
 import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, DialogTrigger, DialogDescription, VisuallyHidden } from 'reka-ui';
 import { ComboboxContent, ComboboxEmpty, ComboboxGroup, ComboboxLabel, ComboboxInput, ComboboxItem, ComboboxRoot, ComboboxViewport } from 'reka-ui';
 import fuzzysort from 'fuzzysort';
 import { each, groupBy, orderBy, find, uniq } from 'lodash-es';
 import { motion } from 'motion-v';
 import { cva } from 'cva';
-import { Icon, Subheading } from '@statamic/cms/ui';
+import { Icon, Subheading } from '@/components/ui';
 
 let open = ref(false);
 let query = ref('');

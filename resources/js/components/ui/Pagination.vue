@@ -1,8 +1,8 @@
 <script setup>
-import HasInputOptions from '@statamic/components/fieldtypes/HasInputOptions.js';
+import HasInputOptions from '@/components/fieldtypes/HasInputOptions.js';
 const normalizeInputOptions = HasInputOptions.methods.normalizeInputOptions;
 import { flatten, sortBy, range } from 'lodash-es';
-import { Select, Button } from '@statamic/cms/ui';
+import { Select, Button } from '@/components/ui';
 import { computed } from 'vue';
 
 const emit = defineEmits(['page-selected', 'per-page-changed']);

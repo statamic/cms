@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import DateFormatter from '@statamic/components/DateFormatter.js';
+import DateFormatter from '@/components/DateFormatter.js';
 
 export default {
     props: {

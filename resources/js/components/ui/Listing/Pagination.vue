@@ -1,6 +1,6 @@
 <script setup>
-import { Pagination } from '@statamic/cms/ui';
-import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
+import { Pagination } from '@/components/ui';
+import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
 
 const {
     meta,

@@ -28,8 +28,8 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import ManagesPreviewText from './replicator/ManagesPreviewText';
-import Fields from '@statamic/components/ui/Publish/Fields.vue';
-import FieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
+import Fields from '@/components/ui/Publish/Fields.vue';
+import FieldsProvider from '@/components/ui/Publish/FieldsProvider.vue';
 
 export default {
     mixins: [Fieldtype, ManagesPreviewText],

@@ -1,12 +1,12 @@
 <script>
-import createContext from '@statamic/util/createContext.js';
+import createContext from '@/util/createContext.js';
 
 export const [injectListingContext, provideListingContext] = createContext('Listing');
 </script>
 
 <script setup>
 import { ref, toRef, computed, watch, nextTick, onMounted, onBeforeUnmount, useSlots } from 'vue';
-import { Icon, Panel, PanelFooter } from '@statamic/cms/ui';
+import { Icon, Panel, PanelFooter } from '@/components/ui';
 import axios from 'axios';
 import BulkActions from './BulkActions.vue';
 import uniqid from 'uniqid';

@@ -16,7 +16,7 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import { PublishContainer, FieldsProvider, PublishFields as Fields } from '@statamic/cms/ui';
+import { PublishContainer, FieldsProvider, PublishFields as Fields } from '@/components/ui';
 
 export default {
     mixins: [Fieldtype],

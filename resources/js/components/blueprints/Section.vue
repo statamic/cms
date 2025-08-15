@@ -89,7 +89,7 @@
 <script>
 import Fields from './Fields.vue';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';
-import { Switch, Heading } from '@statamic/cms/ui';
+import { Switch, Heading } from '@/components/ui';
 
 export default {
     mixins: [CanDefineLocalizable],

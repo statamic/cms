@@ -1,6 +1,6 @@
 <script setup>
 import { TabsIndicator, TabsList } from 'reka-ui';
-import { hasComponent } from '@statamic/composables/has-component.js';
+import { hasComponent } from '@/composables/has-component.js';
 
 const hasTabIndicatorComponent = hasComponent('TabsIndicator');
 </script>

@@ -1,10 +1,10 @@
-import debounce from '@statamic/util/debounce.js';
+import debounce from '@/util/debounce.js';
 import mixin from './Fieldtype.vue';
 import emits from './emits.js';
 import props from './props.js';
 import { computed, ref, watch } from 'vue';
-import FieldAction from '@statamic/components/field-actions/FieldAction.js';
-import toFieldActions from '@statamic/components/field-actions/toFieldActions.js';
+import FieldAction from '@/components/field-actions/FieldAction.js';
+import toFieldActions from '@/components/field-actions/toFieldActions.js';
 
 const use = function(emit, props) {
     const name = computed(() => {

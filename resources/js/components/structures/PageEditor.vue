@@ -66,7 +66,7 @@
 </template>
 
 <script>
-import { Heading, Button, PublishContainer, Icon } from '@statamic/cms/ui';
+import { Heading, Button, PublishContainer, Icon } from '@/components/ui';
 import { flatten } from 'lodash-es';
 import { computed, ref } from 'vue';
 import { Pipeline, Request } from '@statamic/cms/save-pipeline';

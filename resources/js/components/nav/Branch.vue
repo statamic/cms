@@ -92,7 +92,7 @@
 
 <script>
 import { data_get } from '../../bootstrap/globals.js';
-import { Icon, Dropdown, DropdownMenu, Button } from '@statamic/cms/ui';
+import { Icon, Dropdown, DropdownMenu, Button } from '@/components/ui';
 
 export default {
     components: {

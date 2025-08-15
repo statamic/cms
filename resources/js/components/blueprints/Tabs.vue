@@ -54,7 +54,7 @@ import uniqid from 'uniqid';
 import BlueprintTab from './Tab.vue';
 import BlueprintTabContent from './TabContent.vue';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';
-import { Tabs, TabList, Button, Description } from '@statamic/cms/ui';
+import { Tabs, TabList, Button, Description } from '@/components/ui';
 
 export default {
     mixins: [CanDefineLocalizable],

@@ -1,5 +1,5 @@
 <script setup>
-import { Heading } from '@statamic/cms/ui';
+import { Heading } from '@/components/ui';
 
 const props = defineProps({
     title: { type: String, default: null },

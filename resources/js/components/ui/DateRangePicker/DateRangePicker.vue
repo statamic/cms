@@ -19,7 +19,7 @@ import {
     DateRangePickerRoot,
     DateRangePickerTrigger,
 } from 'reka-ui';
-import { Card, Button, Calendar, Icon } from '@statamic/cms/ui';
+import { Card, Button, Calendar, Icon } from '@/components/ui';
 import { parseAbsoluteToLocal } from '@internationalized/date';
 
 const emit = defineEmits(['update:modelValue']);

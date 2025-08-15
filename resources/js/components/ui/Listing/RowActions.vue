@@ -1,7 +1,7 @@
 <script setup>
-import { Dropdown, DropdownItem, DropdownMenu, DropdownSeparator } from '@statamic/cms/ui';
-import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
-import ItemActions from '@statamic/components/actions/ItemActions.vue';
+import { Dropdown, DropdownItem, DropdownMenu, DropdownSeparator } from '@/components/ui';
+import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
+import ItemActions from '@/components/actions/ItemActions.vue';
 import { computed, ref, watch } from 'vue';
 
 const props = defineProps({

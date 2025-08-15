@@ -29,8 +29,8 @@
 
 <script>
 import GridCell from './Cell.vue';
-import FieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
-import { Dropdown, DropdownMenu, DropdownItem } from '@statamic/cms/ui';
+import FieldsProvider from '@/components/ui/Publish/FieldsProvider.vue';
+import { Dropdown, DropdownMenu, DropdownItem } from '@/components/ui';
 
 export default {
     components: { Dropdown, DropdownMenu, DropdownItem, FieldsProvider, GridCell },

@@ -133,7 +133,7 @@ import SaveButtonOptions from '../publish/SaveButtonOptions.vue';
 import HasPreferences from '../data-list/HasPreferences';
 import HasActions from '../publish/HasActions';
 import striptags from 'striptags';
-import clone from '@statamic/util/clone.js';
+import clone from '@/util/clone.js';
 import {
     Header,
     Badge,
@@ -143,16 +143,16 @@ import {
     DropdownMenu,
     DropdownItem,
     DropdownSeparator,
-} from '@statamic/cms/ui';
-import PublishContainer from '@statamic/components/ui/Publish/Container.vue';
-import PublishTabs from '@statamic/components/ui/Publish/Tabs.vue';
-import PublishComponents from '@statamic/components/ui/Publish/Components.vue';
-import LivePreview from '@statamic/components/ui/LivePreview/LivePreview.vue';
-import resetValuesFromResponse from '@statamic/util/resetValuesFromResponse.js';
+} from '@/components/ui';
+import PublishContainer from '@/components/ui/Publish/Container.vue';
+import PublishTabs from '@/components/ui/Publish/Tabs.vue';
+import PublishComponents from '@/components/ui/Publish/Components.vue';
+import LivePreview from '@/components/ui/LivePreview/LivePreview.vue';
+import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
 import { ref, computed } from 'vue';
 import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@statamic/cms/save-pipeline';
-import LocalizationsCard from '@statamic/components/ui/Publish/Localizations.vue';
-import ItemActions from '@statamic/components/actions/ItemActions.vue';
+import LocalizationsCard from '@/components/ui/Publish/Localizations.vue';
+import ItemActions from '@/components/actions/ItemActions.vue';
 
 let saving = ref(false);
 let errors = ref({});

@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import { Modal, Button, Icon } from '@statamic/cms/ui';
+import { Modal, Button, Icon } from '@/components/ui';
 
 const emit = defineEmits(['cancel', 'close']);
 

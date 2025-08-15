@@ -62,7 +62,7 @@
 </template>
 
 <script>
-import { Heading, Subheading, Button } from '@statamic/cms/ui';
+import { Heading, Subheading, Button } from '@/components/ui';
 import FocalPointPreviewFrame from './FocalPointPreviewFrame.vue';
 
 export default {

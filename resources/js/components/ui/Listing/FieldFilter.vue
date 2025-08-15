@@ -1,6 +1,6 @@
 <script setup>
 import { sortBy } from 'lodash-es';
-import { Combobox, CardPanel } from '@statamic/cms/ui';
+import { Combobox, CardPanel } from '@/components/ui';
 import { computed, ref, watch } from 'vue';
 import FieldFilterRow from './FieldFilterRow.vue';
 

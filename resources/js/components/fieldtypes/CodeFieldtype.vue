@@ -22,7 +22,7 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import { CodeEditor } from '@statamic/cms/ui';
+import { CodeEditor } from '@/components/ui';
 
 export default {
     mixins: [Fieldtype],

@@ -2,7 +2,7 @@
 import { computed, useSlots, ref, useId, useTemplateRef, onMounted, nextTick } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
-import { Icon, Button, CharacterCounter } from '@statamic/cms/ui';
+import { Icon, Button, CharacterCounter } from '@/components/ui';
 
 const slots = useSlots();
 

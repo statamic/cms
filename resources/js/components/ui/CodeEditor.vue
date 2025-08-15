@@ -1,8 +1,8 @@
 <script setup>
 import CodeMirror from 'codemirror';
 import { computed, markRaw, nextTick, onMounted, ref, useAttrs, useTemplateRef, watch } from 'vue';
-import ElementContainer from '@statamic/components/ElementContainer.vue';
-import { Select } from '@statamic/cms/ui';
+import ElementContainer from '@/components/ElementContainer.vue';
+import { Select } from '@/components/ui';
 
 // Addons
 import 'codemirror/addon/edit/matchbrackets';

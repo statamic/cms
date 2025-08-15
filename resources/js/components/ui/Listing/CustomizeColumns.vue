@@ -1,7 +1,7 @@
 <script setup>
-import { Button, Modal, Tooltip } from '@statamic/cms/ui';
-import { SortableList } from '@statamic/components/sortable/Sortable.js';
-import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
+import { Button, Modal, Tooltip } from '@/components/ui';
+import { SortableList } from '@/components/sortable/Sortable.js';
+import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
 import { computed, ref } from 'vue';
 
 const { preferencesPrefix, columns, visibleColumns, hiddenColumns, setColumns, reorderable } = injectListingContext();

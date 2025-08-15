@@ -22,7 +22,7 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import { Combobox } from '@statamic/cms/ui';
+import { Combobox } from '@/components/ui';
 
 export default {
     components: { Combobox },

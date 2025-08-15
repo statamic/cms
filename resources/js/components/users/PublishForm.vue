@@ -61,9 +61,9 @@
 <script>
 import ChangePassword from './ChangePassword.vue';
 import HasActions from '../publish/HasActions';
-import TwoFactor from '@statamic/components/two-factor/TwoFactor.vue';
-import clone from '@statamic/util/clone.js';
-import resetValuesFromResponse from '@statamic/util/resetValuesFromResponse.js';
+import TwoFactor from '@/components/two-factor/TwoFactor.vue';
+import clone from '@/util/clone.js';
+import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
 import {
     Button,
     Dropdown,
@@ -73,8 +73,8 @@ import {
     PublishContainer,
     PublishTabs,
     Header,
-} from '@statamic/cms/ui';
-import ItemActions from '@statamic/components/actions/ItemActions.vue';
+} from '@/components/ui';
+import ItemActions from '@/components/actions/ItemActions.vue';
 import { computed, ref } from 'vue';
 import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@statamic/cms/save-pipeline';
 

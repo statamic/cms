@@ -1,5 +1,5 @@
 <script setup>
-import { Icon } from '@statamic/cms/ui';
+import { Icon } from '@/components/ui';
 
 const props = defineProps({
     icon: { type: String, default: null },

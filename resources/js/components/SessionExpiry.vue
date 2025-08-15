@@ -104,7 +104,7 @@
 </template>
 
 <script>
-import { Modal, Input, Button } from '@statamic/cms/ui';
+import { Modal, Input, Button } from '@/components/ui';
 
 var counter;
 

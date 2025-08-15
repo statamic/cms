@@ -1,5 +1,5 @@
 <script setup>
-import { Modal, ModalClose, Button } from '@statamic/cms/ui';
+import { Modal, ModalClose, Button } from '@/components/ui';
 import { ref } from 'vue';
 
 const props = defineProps({

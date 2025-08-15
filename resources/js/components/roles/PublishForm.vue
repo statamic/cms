@@ -49,9 +49,9 @@
 </template>
 
 <script>
-import { Header, Button, CardPanel, Panel, PanelHeader, Heading, Card, Switch, Field, Input } from '@statamic/cms/ui';
-import { requireElevatedSession } from '@statamic/components/elevated-sessions';
-import PermissionTree from '@statamic/components/roles/PermissionTree.vue';
+import { Header, Button, CardPanel, Panel, PanelHeader, Heading, Card, Switch, Field, Input } from '@/components/ui';
+import { requireElevatedSession } from '@/components/elevated-sessions';
+import PermissionTree from '@/components/roles/PermissionTree.vue';
 
 const checked = function (permissions) {
     return permissions.reduce((carry, permission) => {

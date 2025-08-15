@@ -1,11 +1,11 @@
 <script setup>
 import { injectTabContext } from './TabProvider.vue';
-import { Panel, PanelHeader, Heading, Subheading, Card } from '@statamic/cms/ui';
+import { Panel, PanelHeader, Heading, Subheading, Card } from '@/components/ui';
 import FieldsProvider from './FieldsProvider.vue';
 import Fields from './Fields.vue';
-import ShowField from '@statamic/components/field-conditions/ShowField.js';
+import ShowField from '@/components/field-conditions/ShowField.js';
 import { injectContainerContext } from './Container.vue';
-import markdown from '@statamic/util/markdown.js';
+import markdown from '@/util/markdown.js';
 import { computed } from 'vue';
 import { Primitive } from 'reka-ui';
 import { Motion } from 'motion-v';

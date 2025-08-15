@@ -1,9 +1,9 @@
 <script setup>
 import { Motion } from 'motion-v';
-import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
+import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
 import { computed, ref, watch } from 'vue';
-import { Button, ButtonGroup } from '@statamic/cms/ui';
-import BulkActions from '@statamic/components/actions/BulkActions.vue';
+import { Button, ButtonGroup } from '@/components/ui';
+import BulkActions from '@/components/actions/BulkActions.vue';
 
 const { actionUrl, actionContext, selections, refresh, clearSelections } = injectListingContext();
 const busy = ref(false);

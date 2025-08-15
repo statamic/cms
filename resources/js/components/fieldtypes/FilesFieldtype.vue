@@ -77,7 +77,7 @@
 import Fieldtype from './Fieldtype.vue';
 import Uploader from '../assets/Uploader.vue';
 import Uploads from '../assets/Uploads.vue';
-import { Button } from '@statamic/cms/ui';
+import { Button } from '@/components/ui';
 
 export default {
     mixins: [Fieldtype],

@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import { Listing, DropdownItem } from '@statamic/cms/ui';
+import { Listing, DropdownItem } from '@/components/ui';
 import FieldsetDeleter from './FieldsetDeleter.vue';
 import FieldsetResetter from './FieldsetResetter.vue';
 

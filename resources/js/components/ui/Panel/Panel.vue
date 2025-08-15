@@ -1,5 +1,5 @@
 <script setup>
-import { PanelHeader, Heading, Subheading } from '@statamic/cms/ui';
+import { PanelHeader, Heading, Subheading } from '@/components/ui';
 
 const props = defineProps({
     heading: { type: String, default: null },

@@ -2,9 +2,9 @@ import { test, expect, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { nextTick } from 'vue';
 import { data_get } from '../bootstrap/globals';
-import FieldConditions from '@statamic/components/FieldConditions';
-import PublishContainer from '@statamic/components/ui/Publish/Container.vue';
-import ShowField from '@statamic/components/field-conditions/ShowField.js';
+import FieldConditions from '@/components/FieldConditions';
+import PublishContainer from '@/components/ui/Publish/Container.vue';
+import ShowField from '@/components/field-conditions/ShowField.js';
 
 // Even though there's no Store anymore, this variable is named Store so that all the
 // assertions don't need to be changed. This is now a reference to the PublishContainer component.

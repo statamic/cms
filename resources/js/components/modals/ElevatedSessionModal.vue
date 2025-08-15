@@ -63,7 +63,7 @@
 </template>
 
 <script>
-import { Modal, Field, Input, Button } from '@statamic/cms/ui';
+import { Modal, Field, Input, Button } from '@/components/ui';
 
 export default {
     components: {

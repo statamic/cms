@@ -75,7 +75,7 @@
 </template>
 
 <script>
-import { TabTrigger, Dropdown, DropdownMenu, DropdownItem, Icon, Field, Input } from '@statamic/cms/ui';
+import { TabTrigger, Dropdown, DropdownMenu, DropdownItem, Icon, Field, Input } from '@/components/ui';
 
 export default {
     components: { TabTrigger, Dropdown, DropdownMenu, DropdownItem, Icon, Field, Input },

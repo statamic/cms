@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import { Button, Heading, CardPanel, Field, Input } from '@statamic/cms/ui';
+import { Button, Heading, CardPanel, Field, Input } from '@/components/ui';
 
 export default {
     components: { Heading, Button, CardPanel, Field, Input },

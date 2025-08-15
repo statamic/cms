@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import { Header, Button } from '@statamic/cms/ui';
+import { Header, Button } from '@/components/ui';
 import BlueprintListing from '../blueprints/Listing.vue';
 
 export default {

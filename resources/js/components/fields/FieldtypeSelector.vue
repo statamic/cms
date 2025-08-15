@@ -56,7 +56,7 @@
 import fuzzysort from 'fuzzysort';
 import { ref } from 'vue';
 import { mapValues } from 'lodash-es';
-import { Icon } from '@statamic/cms/ui';
+import { Icon } from '@/components/ui';
 
 const loadedFieldtypes = ref(null);
 

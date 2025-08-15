@@ -3,7 +3,7 @@ import { ref, provide } from 'vue';
 import { cva } from 'cva';
 import DataTableColumns from './Columns.vue';
 import DataTableRows from './Rows.vue';
-import { Panel } from '@statamic/cms/ui';
+import { Panel } from '@/components/ui';
 
 const props = defineProps({
     variant: { type: String, default: 'normal' },

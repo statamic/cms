@@ -1,5 +1,5 @@
 <script setup>
-import { CreateForm } from '@statamic/cms/ui';
+import { CreateForm } from '@/components/ui';
 
 const props = defineProps({
     route: { type: String },

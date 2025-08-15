@@ -2,7 +2,7 @@
 import { useAttrs } from 'vue';
 import { cva } from 'cva';
 import { ContextMenuContent, ContextMenuPortal, ContextMenuRoot, ContextMenuTrigger } from 'reka-ui';
-import { Button } from '@statamic/cms/ui';
+import { Button } from '@/components/ui';
 
 defineOptions({
     inheritAttrs: false,

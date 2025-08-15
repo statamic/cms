@@ -1,6 +1,6 @@
 <script setup>
-import Fields from '@statamic/components/ui/Publish/Fields.vue';
-import FieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
+import Fields from '@/components/ui/Publish/Fields.vue';
+import FieldsProvider from '@/components/ui/Publish/FieldsProvider.vue';
 import { computed, inject, ref } from 'vue';
 import {
     Icon,
@@ -13,12 +13,12 @@ import {
     DropdownSeparator,
     Button,
     DropdownMenu,
-} from '@statamic/cms/ui';
+} from '@/components/ui';
 import { Motion } from 'motion-v';
-import { injectContainerContext } from '@statamic/components/ui/Publish/Container.vue';
-import PreviewHtml from '@statamic/components/fieldtypes/replicator/PreviewHtml.js';
-import FieldAction from '@statamic/components/field-actions/FieldAction.js';
-import toFieldActions from '@statamic/components/field-actions/toFieldActions.js';
+import { injectContainerContext } from '@/components/ui/Publish/Container.vue';
+import PreviewHtml from '@/components/fieldtypes/replicator/PreviewHtml.js';
+import FieldAction from '@/components/field-actions/FieldAction.js';
+import toFieldActions from '@/components/field-actions/toFieldActions.js';
 
 const emit = defineEmits(['collapsed', 'expanded', 'duplicated', 'removed']);
 

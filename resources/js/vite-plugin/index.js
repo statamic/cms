@@ -6,8 +6,7 @@ function addAliases(config) {
 
     const dir = path.dirname(fileURLToPath(import.meta.url));
     const aliases = {
-        '@statamic/cms': path.resolve(dir, '../package'),
-        '@statamic': path.resolve(dir, '..'),
+        '@statamic/cms': path.resolve(dir, '../../dist-package'),
     };
 
     config.resolve.alias = { ...aliases, ...config.resolve.alias };

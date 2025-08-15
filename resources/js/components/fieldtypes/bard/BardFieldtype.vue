@@ -165,7 +165,7 @@ import { availableButtons, addButtonHtml } from '../bard/buttons';
 import readTimeEstimate from 'read-time-estimate';
 import { common, createLowlight } from 'lowlight';
 import 'highlight.js/styles/github.css';
-import importTiptap from '@statamic/util/tiptap.js';
+import importTiptap from '@/util/tiptap.js';
 import { computed } from 'vue';
 
 const lowlight = createLowlight(common);

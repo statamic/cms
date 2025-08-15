@@ -1,7 +1,7 @@
 <script setup>
-import { Label, Combobox, Badge, Card, Panel, Icon } from '@statamic/cms/ui';
+import { Label, Combobox, Badge, Card, Panel, Icon } from '@/components/ui';
 import { computed } from 'vue';
-import Localization from '@statamic/components/ui/Publish/Localization.vue';
+import Localization from '@/components/ui/Publish/Localization.vue';
 
 const props = defineProps({
     localizations: {

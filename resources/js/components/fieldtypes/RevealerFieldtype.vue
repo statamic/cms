@@ -20,7 +20,7 @@
 import { Fieldtype } from '@statamic/cms';
 import { Switch, Heading, Button } from '@/components/ui';
 import { onMounted, onBeforeUnmount, watch, nextTick, computed } from 'vue';
-import { injectContainerContext } from '@statamic/components/ui/Publish/Container.vue';
+import { injectContainerContext } from '@/components/ui/Publish/Container.vue';
 
 const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);

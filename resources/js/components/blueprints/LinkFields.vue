@@ -98,7 +98,7 @@
 
 <script>
 import uniqid from 'uniqid';
-import { Combobox, Button, Input, Heading, Field } from '@statamic/cms/ui';
+import { Combobox, Button, Input, Heading, Field } from '@/components/ui';
 
 export default {
     components: { Heading, Combobox, Button, Input, Field },

@@ -1,5 +1,5 @@
 <script setup>
-import { Header, Button, Dropdown, DropdownMenu, DropdownItem, PublishContainer } from '@statamic/cms/ui';
+import { Header, Button, Dropdown, DropdownMenu, DropdownItem, PublishContainer } from '@/components/ui';
 import { ref, useTemplateRef } from 'vue';
 import { Pipeline, Request } from '@statamic/cms/save-pipeline';
 

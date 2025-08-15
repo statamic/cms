@@ -19,7 +19,7 @@
 import Fieldtype from './Fieldtype.vue';
 import HasInputOptions from './HasInputOptions.js';
 import ResizeObserver from 'resize-observer-polyfill';
-import { Button, ButtonGroup } from '@statamic/cms/ui';
+import { Button, ButtonGroup } from '@/components/ui';
 
 export default {
     mixins: [Fieldtype, HasInputOptions],

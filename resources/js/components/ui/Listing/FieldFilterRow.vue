@@ -1,6 +1,6 @@
 <script setup>
-import { Button, PublishContainer, PublishField } from '@statamic/cms/ui';
-import PublishFieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
+import { Button, PublishContainer, PublishField } from '@/components/ui';
+import PublishFieldsProvider from '@/components/ui/Publish/FieldsProvider.vue';
 
 const emit = defineEmits(['update:values', 'removed']);
 

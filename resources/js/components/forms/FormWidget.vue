@@ -1,5 +1,5 @@
 <script setup>
-import DateFormatter from '@statamic/components/DateFormatter.js';
+import DateFormatter from '@/components/DateFormatter.js';
 import { computed } from 'vue';
 import {
     Widget,
@@ -8,7 +8,7 @@ import {
     ListingTableHead as TableHead,
     ListingTableBody as TableBody,
     ListingPagination as Pagination,
-} from '@statamic/cms/ui';
+} from '@/components/ui';
 
 const props = defineProps({
     form: { type: String, required: true },

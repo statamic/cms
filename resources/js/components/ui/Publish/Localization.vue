@@ -1,5 +1,5 @@
 <script setup>
-import { Icon, Badge } from '@statamic/cms/ui';
+import { Icon, Badge } from '@/components/ui';
 
 defineProps({
     localization: {
