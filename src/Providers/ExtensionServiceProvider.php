@@ -7,9 +7,9 @@ use Illuminate\Support\Env;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Actions;
 use Statamic\Actions\Action;
+use Statamic\Addons\Manifest;
 use Statamic\Dictionaries;
 use Statamic\Dictionaries\Dictionary;
-use Statamic\Extend\Manifest;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes;
 use Statamic\Forms\JsDrivers;
@@ -252,6 +252,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Updates\RemoveParentField::class,
         Updates\UpdateGlobalVariables::class,
         Updates\PublishMigrationForTwoFactorColumns::class,
+        Updates\AddAddonSettingsToGitConfig::class,
     ];
 
     public function register()

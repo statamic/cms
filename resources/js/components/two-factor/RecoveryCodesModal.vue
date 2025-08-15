@@ -1,8 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import LoadingGraphic from '@statamic/components/LoadingGraphic.vue';
 import axios from 'axios';
-import { Modal, Button } from '@statamic/ui';
+import { Modal, Button, Icon } from '@statamic/ui';
 
 const emit = defineEmits(['cancel', 'close']);
 
@@ -49,8 +48,8 @@ function copyToClipboard() {
 <template>
     <Modal :title="__('Recovery Codes')" :open="true" @update:open="$emit('cancel')">
         <div>
-            <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
-                <loading-graphic />
+            <div v-if="loading" class="flex items-center justify-center text-center">
+                <Icon name="loading" />
             </div>
 
             <template v-else>

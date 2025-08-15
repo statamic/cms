@@ -37,7 +37,7 @@ const toggleItemClasses = computed(() => {
             variant: {
                 default: [
                     'bg-linear-to-b from-white to-gray-50 hover:to-gray-100 text-gray-900 border border-gray-300 shadow-ui-sm data-[state=on]:from-gray-100 data-[state=on]:to-gray-100 data-[state=on]:text-gray-900 data-[state=on]:inset-shadow-sm/10',
-                    'dark:from-gray-800 dark:to-gray-850 dark:hover:to-gray-800 hover:bg-gray-50 dark:hover:bg-gray-850 dark:border-b-0 dark:ring dark:ring-black dark:border-white/15 dark:text-gray-300 dark:shadow-md dark:data-[state=on]:from-gray-950 dark:data-[state=on]:to-gray-950 dark:data-[state=on]:text-white',
+                    'dark:from-gray-800 dark:to-gray-850 dark:hover:to-gray-800 hover:bg-gray-50 dark:hover:bg-gray-850 dark:border-b-0 dark:ring dark:ring-black dark:border-white/10 dark:text-gray-300 dark:shadow-md dark:data-[state=on]:from-gray-950 dark:data-[state=on]:to-gray-950 dark:data-[state=on]:text-white',
                 ],
                 primary: [
                     'bg-linear-to-b from-primary/90 to-primary hover:bg-primary-hover text-white border border-primary-border shadow-ui-md inset-shadow-2xs inset-shadow-white/25 data-[state=on]:bg-primary-hover',

@@ -86,7 +86,7 @@
 
             <template #cell-basename="{ row: asset, checkboxId }">
                 <div
-                    class="group flex w-fit items-center"
+                    class="group flex w-fit items-center gap-3"
                     :draggable="true"
                     @dragover.prevent
                     @dragstart="draggingAsset = asset.id"
@@ -95,14 +95,14 @@
                     <asset-thumbnail
                         :asset="asset"
                         :square="true"
-                        class="me-2 size-8 cursor-pointer"
+                        class="size-8 cursor-pointer"
                         @click.native.stop="$emit('edit-asset', asset)"
                     />
                     <button
-                        class="cursor-pointer normal-nums select-none group-hover:text-blue-500"
+                        class="cursor-pointer normal-nums select-none group-hover:text-blue-500 text-start"
                         @click="$emit('edit-asset', asset)"
                     >
-                        {{ asset.basename }}
+                        {{ isSearching ? asset.path : asset.basename }}
                     </button>
                 </div>
             </template>
@@ -156,6 +156,7 @@ export default {
         loading: Boolean,
         columns: Array,
         visibleColumns: Array,
+        isSearching: Boolean
     },
 
     watch: {

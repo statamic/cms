@@ -11,7 +11,6 @@ class NavComposer
 {
     const VIEWS = [
         'statamic::partials.nav-main',
-        'statamic::partials.nav-mobile',
         'statamic::partials.global-header',
     ];
 

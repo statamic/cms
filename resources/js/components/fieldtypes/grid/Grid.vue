@@ -11,12 +11,9 @@
                 </publish-field-fullscreen-header>
 
                 <section :class="{ 'mt-14 p-4': fullScreenMode }">
-                    <small v-if="hasExcessRows" class="help-block text-red-500">
-                        {{ __('Max Rows') }}: {{ maxRows }}
-                    </small>
-                    <small v-else-if="hasNotEnoughRows" class="help-block text-red-500">
-                        {{ __('Min Rows') }}: {{ minRows }}
-                    </small>
+
+                    <ui-error-message v-if="hasExcessRows" :text="__('Max Rows') + ': ' + maxRows" />
+                    <ui-error-message v-else-if="hasNotEnoughRows" :text="__('Min Rows') + ': ' + minRows" />
 
                     <component
                         :is="component"
@@ -28,6 +25,7 @@
                         :can-add-rows="canAddRows"
                         :allow-fullscreen="config.fullscreen"
                         :hide-display="config.hide_display"
+                        :errors="publishContainer.errors"
                         @updated="updated"
                         @meta-updated="updateRowMeta"
                         @removed="removed"
@@ -142,7 +140,7 @@ export default {
             return [
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => (vm.fullScreenMode ? 'shrink-all' : 'expand-bold'),
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'ui/shrink-all' : 'ui/expand-all'),
                     quick: true,
                     visibleWhenReadOnly: true,
                     run: this.toggleFullScreen,

@@ -1,7 +1,7 @@
 <template>
-    <div class="dark:bg-dark-800 h-full bg-white">
+    <div class="dark:bg-gray-800 h-full bg-white">
         <div class="flex h-full min-h-0 flex-col">
-            <div class="flex flex-1 flex-col gap-4 overflow-scroll p-4">
+            <div class="flex flex-1 flex-col gap-4 overflow-auto p-4">
                 <AssetBrowser
                     :container="container"
                     :initial-per-page="$config.get('paginationSize')"
@@ -21,7 +21,7 @@
                     <template #initializing>
                         <div class="flex flex-1">
                             <div class="absolute inset-0 z-200 flex items-center justify-center text-center">
-                                <loading-graphic />
+                                <Icon name="loading" />
                             </div>
                         </div>
                     </template>
@@ -44,9 +44,9 @@
                 </AssetBrowser>
             </div>
 
-            <div class="flex items-center justify-between border-t bg-gray-100 p-4">
+            <div class="flex items-center justify-between border-t bg-gray-100 dark:bg-dark-700 dark:border-dark-600 p-4">
                 <div
-                    class="dark:text-dark-150 text-sm text-gray-700"
+                    class="dark:text-gray-200 text-sm text-gray-700"
                     v-text="
                         hasMaxFiles
                             ? __n(':count/:max selected', browserSelections, { max: maxFiles })
@@ -80,6 +80,7 @@ import {
     Panel,
     PanelFooter,
     ListingPagination, Slider, PanelHeader,
+    Icon,
 } from '@statamic/ui';
 import HasPreferences from '@statamic/components/data-list/HasPreferences.js';
 import Breadcrumbs from '@statamic/components/assets/Browser/Breadcrumbs.vue';
@@ -103,6 +104,7 @@ export default {
         Pagination,
         Panel,
         PanelFooter,
+        Icon,
     },
 
     props: {

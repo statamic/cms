@@ -8,8 +8,8 @@ const props = defineProps({
 </script>
 
 <template>
-    <header class="grid grid-cols-[1fr_auto] items-center justify-between gap-4 py-8" data-ui-header>
-        <h1 class="text-[25px] font-medium antialiased flex items-center gap-2">
+    <header class="flex flex-wrap items-center justify-between gap-4 py-8" data-ui-header>
+        <h1 class="text-[25px] leading-[1.25] st-text-legibility font-medium antialiased flex items-center gap-2.5 flex-1">
             <Icon v-if="icon" :name="icon" class="size-5 text-gray-500"></Icon>
             <slot name="title">{{ title }}</slot>
         </h1>

@@ -1,4 +1,4 @@
-<div class="logo relative z-10 pt-20">
+<div class="logo relative z-10 md:pt-18">
     @if (isset($customLogo))
         <img
             src="{{ $customLogo }}"
@@ -13,6 +13,6 @@
     @elseif (isset($customLogoText))
         <div class="mx-auto mb-8 max-w-xs text-center text-lg font-medium opacity-50">{{ $customLogoText }}</div>
     @else
-        @cp_svg('icons/statamic-logo-lime', 'h-6')
+        @cp_svg('ui/statamic-logo-lime', 'h-6')
     @endif
 </div>

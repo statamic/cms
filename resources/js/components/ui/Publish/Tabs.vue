@@ -86,7 +86,7 @@ function tabHasError(tab) {
 <template>
     <ElementContainer @resized="width = $event.width">
         <Tabs v-model:modelValue="tab">
-            <TabList :class="{ 'mb-6': visibleMainTabs.length > 1, 'sr-only': visibleMainTabs.length === 1 }">
+            <TabList v-if="visibleMainTabs.length > 1" class="mb-6">
                 <TabTrigger
                     v-for="tab in visibleMainTabs"
                     :key="tab.handle"
@@ -97,13 +97,21 @@ function tabHasError(tab) {
             </TabList>
 
             <div :class="{ 'grid grid-cols-[1fr_320px] gap-8': shouldShowSidebar }">
-                <TabContent v-for="tab in mainTabs" :key="tab.handle" :name="tab.handle">
+                <TabContent v-if="visibleMainTabs.length > 1" v-for="tab in mainTabs" :key="tab.handle" :name="tab.handle">
                     <TabProvider :tab="tab">
                         <slot :tab="tab">
                             <Sections />
                         </slot>
                     </TabProvider>
                 </TabContent>
+
+                <template v-else>
+                    <TabProvider :tab="visibleMainTabs[0]">
+                        <slot :tab="visibleMainTabs[0]">
+                            <Sections />
+                        </slot>
+                    </TabProvider>
+                </template>
 
                 <aside class="space-y-6" v-if="shouldShowSidebar">
                     <slot name="actions" />

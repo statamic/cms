@@ -35,9 +35,7 @@
                 </Dropdown>
             </ItemActions>
 
-            <div class="text-2xs me-4 flex pt-px text-gray-600" v-if="readOnly">
-                <svg-icon name="light/lock" class="me-1 -mt-1 w-4" /> {{ __('Read Only') }}
-            </div>
+            <ui-badge icon="padlock-locked" :text="__('Read Only')" variant="flat" v-if="readOnly" />
 
             <div class="flex items-center gap-3">
                 <save-button-options
@@ -233,8 +231,8 @@
             <div class="publish-fields">
                 <div class="form-group publish-field field-w-full">
                     <label v-text="__('Origin')" />
-                    <div class="help-block mt-2" v-text="__('messages.entry_origin_instructions')"></div>
-                    <Select class="w-full" v-model="selectedOrigin" :options="originOptions" :placeholder="false" />
+                    <ui-description class="mt-2" :text="__('messages.entry_origin_instructions')" />
+                    <Select class="w-full" v-model="selectedOrigin" :options="originOptions" placeholder="" />
                 </div>
             </div>
         </confirmation-modal>
@@ -808,7 +806,7 @@ export default {
         desyncField(handle) {
             if (!this.localizedFields.includes(handle)) this.localizedFields.push(handle);
 
-            this.$refs.container.dirty();
+            this.$refs.container?.dirty();
         },
 
         setAutosaveInterval() {

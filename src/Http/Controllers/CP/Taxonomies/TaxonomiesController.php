@@ -80,7 +80,6 @@ class TaxonomiesController extends CpController
 
         $viewData = [
             'taxonomy' => $taxonomy,
-            'hasTerms' => true, // todo $taxonomy->queryTerms()->count(),
             'blueprints' => $blueprints,
             'site' => Site::selected()->handle(),
             'columns' => $columns,
@@ -254,12 +253,13 @@ class TaxonomiesController extends CpController
                     'blueprints' => [
                         'display' => __('Blueprints'),
                         'instructions' => __('statamic::messages.taxonomies_blueprints_instructions'),
-                        'type' => 'html',
-                        'html' => ''.
-                            '<div class="text-xs">'.
-                            '   <span class="rtl:ml-4 ltr:mr-4">'.$taxonomy->termBlueprints()->map(fn ($bp) => __($bp->title()))->join(', ').'</span>'.
-                            '   <a href="'.cp_route('blueprints.taxonomies.index', $taxonomy).'" class="text-blue">'.__('Edit').'</a>'.
-                            '</div>',
+                        'type' => 'blueprints',
+                        'options' => $taxonomy->termBlueprints()->map(fn ($bp) => [
+                            'handle' => $bp->handle(),
+                            'title' => __($bp->title()),
+                            'edit_url' => cp_route('blueprints.taxonomies.edit', [$taxonomy->handle(), $bp->handle()]),
+                        ])->values()->all(),
+                        'all_blueprints_url' => cp_route('blueprints.taxonomies.index', $taxonomy->handle()),
                     ],
                     'collections' => [
                         'display' => __('Collections'),

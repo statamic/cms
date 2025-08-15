@@ -135,7 +135,7 @@ function initCodeMirror() {
 }
 
 function refresh() {
-    nextTick(() => codemirror.value.refresh());
+    nextTick(() => codemirror.value?.refresh());
 }
 
 watch(
@@ -221,7 +221,7 @@ watch(
             :class="[
                 '@container/markdown border border-transparent with-contrast:border-gray-500 block w-full overflow-hidden rounded-lg bg-white dark:bg-gray-900',
                 'text-gray-900 dark:text-gray-300',
-                'shadow-ui-sm not-prose appearance-none antialiased disabled:shadow-none',
+                'shadow-ui-sm appearance-none antialiased disabled:shadow-none',
                 themeClass,
                 { 'code-fullscreen': fullScreenMode },
             ]"

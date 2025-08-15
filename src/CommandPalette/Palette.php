@@ -12,31 +12,68 @@ use Statamic\Support\Arr;
 class Palette
 {
     protected $items;
+    protected $preloadedItems;
+    protected $isBuilding = false;
 
     public function __construct()
     {
         $this->items = collect();
+        $this->preloadedItems = collect();
     }
 
-    public function addCommand(Command $command): self
+    public function add(
+        string|array $text,
+        string $url,
+        bool $openNewTab = false,
+        bool $trackRecent = true,
+        ?Category $category = null,
+        ?string $icon = null,
+        ?string $keys = null,
+    ): self {
+        $link = (new Link($text, $category ?? Category::Miscellaneous))
+            ->url($url)
+            ->openNewTab($openNewTab)
+            ->trackRecent($trackRecent);
+
+        if ($icon) {
+            $link->icon($icon);
+        }
+
+        if ($keys) {
+            $link->keys($keys);
+        }
+
+        return $this->addCommand($link);
+    }
+
+    protected function addCommand(Command $command): self
     {
-        $this->items->push(
-            $this->validateCommandArray($command->toArray()),
-        );
+        $commandArray = $this->validateCommandArray($command->toArray());
+
+        $this->isBuilding || ! app()->isBooted()
+            ? $this->items->push($commandArray)
+            : $this->preloadedItems->push($commandArray);
 
         return $this;
     }
 
     public function build(): Collection
     {
+        $this->isBuilding = true;
+
         // TODO: We need to bust this cache when content or nav changes
         // TODO: Cache per user
-        // return Cache::rememberForever('statamic-command-palette', function () {
-        return $this
+        // $built = Cache::rememberForever('statamic-command-palette', function () {
+        $built = $this
             ->buildNav()
             ->buildFields()
+            ->buildMiscellaneous()
             ->get();
         // });
+
+        $this->isBuilding = false;
+
+        return $built;
     }
 
     protected function buildNav(): self
@@ -83,10 +120,9 @@ class Palette
         $this->addCommand(Facades\User::blueprintCommandPaletteLink());
         $this->addCommand(Facades\UserGroup::blueprintCommandPaletteLink());
 
-        // TODO: Handle additional blueprint namespaces
-        // Facades\Blueprint::getAdditionalNamespaces()->keys()
-        //     ->flatMap(fn (string $key) => Facades\Blueprint::in($key)->sortBy(fn ($blueprint) => $blueprint->title()))
-        //     ->each(fn ());
+        Facades\Blueprint::getRenderableAdditionalNamespaces()
+            ->flatMap(fn ($namespace) => $namespace['blueprints']->map(fn ($renderable) => $renderable['command_palette_link']))
+            ->each(fn (Link $link) => $this->addCommand($link));
 
         Facades\Fieldset::all()
             ->map(fn (Fieldset $fieldset) => $fieldset->commandPaletteLink())
@@ -95,13 +131,35 @@ class Palette
         return $this;
     }
 
+    protected function buildMiscellaneous(): self
+    {
+        if (! Facades\User::current()->isSuper()) {
+            return $this;
+        }
+
+        $this->add(
+            text: __('Statamic Documentation'),
+            icon: 'book-next-page',
+            url: 'https://statamic.dev',
+            openNewTab: true,
+        );
+
+        return $this;
+    }
+
     public function validateCommandArray(array $command): array
     {
-        throw_unless(is_string(Arr::get($command, 'type')), new \Exception('Must output command [type] string!'));
         throw_unless(is_string(Arr::get($command, 'category')), new \Exception('Must output command [category] string!'));
-        throw_unless(is_string(Arr::get($command, 'text')), new \Exception('Must output command [text] string!'));
+
+        $text = Arr::get($command, 'text');
+        throw_unless(is_string($text) || is_array($text), new \Exception('Must output command [text] string!'));
 
         return $command;
+    }
+
+    public function getPreloadedItems(): Collection
+    {
+        return $this->preloadedItems;
     }
 
     public function get(): Collection

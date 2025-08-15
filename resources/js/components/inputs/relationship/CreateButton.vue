@@ -4,18 +4,23 @@
             <template #trigger>
                 <ui-button
                     :icon="icon"
-                    variant="filled"
                     :text="text"
+                    variant="filled"
                     @click="create"
                 />
             </template>
             <ui-dropdown-menu>
+                <ui-dropdown-label v-text="__('Choose Blueprint')" />
                 <ui-dropdown-item
                     v-for="creatable in creatables"
                     :key="creatable.url"
-                    :text="creatable.title"
                     @click="select(creatable)"
-                />
+                >
+                    <div class="flex items-center justify-between">
+                        <span>{{ creatable.blueprint }}</span>
+                        <ui-badge size="sm" variant="flat">{{ creatable.parent_title }}</ui-badge>
+                    </div>
+                </ui-dropdown-item>
             </ui-dropdown-menu>
         </ui-dropdown>
 

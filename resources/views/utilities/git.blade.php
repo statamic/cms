@@ -41,7 +41,7 @@
                     @endif
                 </div>
 
-                <pre class="rounded-md bg-gray-100 p-4 font-mono text-sm text-gray-700 dark:bg-gray-800 dark:text-gray-300">{{ $status->status }}</pre>
+                <git-status :status='{{ json_encode($status->status) }}'></git-status>
             </div>
         </ui-card-panel>
     @endforeach

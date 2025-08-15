@@ -24,6 +24,7 @@
                     :action-context="actionContext"
                     :allow-bulk-actions="allowBulkActions"
                     :selections="selectedAssets"
+                    :max-selections="maxFiles"
                     :preferences-prefix="preferencesPrefix"
                     v-model:search-query="searchQuery"
                     @request-completed="listingRequestCompleted"
@@ -91,7 +92,7 @@
 
                         <div
                             v-if="containerIsEmpty"
-                            class="rounded-lg border border-dashed border-gray-300 p-6 text-center text-gray-500"
+                            class="rounded-lg border border-dashed border-gray-300 dark:border-gray-700 p-6 text-center text-gray-500"
                             v-text="__('No results')"
                         />
 
@@ -106,7 +107,7 @@
                                 <Slider
                                     v-if="mode === 'grid'"
                                     size="sm"
-                                    class="mr-2 w-24!"
+                                    class="me-2 w-24!"
                                     variant="subtle"
                                     v-model="gridThumbnailSize"
                                     :min="60"
@@ -129,6 +130,7 @@
                                 :folders="folders"
                                 :columns="columns"
                                 :visible-columns="visibleColumns"
+                                :is-searching="!!searchQuery"
                                 v-bind="sharedAssetProps"
                                 v-on="sharedAssetEvents"
                             />

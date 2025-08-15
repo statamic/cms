@@ -8,61 +8,38 @@
 /* Elements */
 @import './elements/base.css';
 @import './elements/buttons.css';
-@import './elements/badges.css';
 @import './elements/dropdowns.css';
-@import './elements/forms.css';
-@import './elements/icons.css';
 @import './elements/tables.css';
 
 /* Components */
-@import './components/array.css';
-@import './components/assets.css';
 @import './components/blueprints.css';
-@import './components/cards.css';
-@import './components/column-picker.css';
 @import './components/configure.css';
 @import './components/focal-point.css';
 @import './components/global-header.css';
-@import './components/items.css';
-@import './components/metrics.css';
-@import './components/modal.css';
-@import './components/nav-mobile.css';
+@import './components/index-fields.css';
 @import './components/notifications.css';
-@import './components/outside.css';
 @import './components/page-tree.css';
 @import './components/pagination.css';
 @import './components/popover.css';
 @import './components/preview.css';
 @import './components/publish.css';
 @import './components/progress.css';
-@import './components/roles.css';
-@import './components/settings.css';
-@import './components/shortcuts.css';
 @import './components/sortable.css';
 @import './components/stacks.css';
 @import './components/tabs.css';
-@import './components/toggle.css';
 @import './components/tooltips.css';
-@import './components/updater.css';
 @import './components/wizard.css';
 
 /* Fieldtypes */
 @import './components/fieldtypes/array.css';
 @import './components/fieldtypes/assets.css';
 @import './components/fieldtypes/bard.css';
-@import './components/fieldtypes/button-group.css';
-@import './components/fieldtypes/checkboxes.css';
-@import './components/fieldtypes/environment.css';
 @import './components/fieldtypes/grid.css';
 @import './components/fieldtypes/hidden.css';
 @import './components/fieldtypes/markdown.css';
 @import './components/fieldtypes/partial.css';
-@import './components/fieldtypes/radio.css';
 @import './components/fieldtypes/relationship.css';
-/* @import './components/fieldtypes/replicator.css'; */
 @import './components/fieldtypes/section.css';
 @import './components/fieldtypes/spacer.css';
 @import './components/fieldtypes/table.css';
 @import './components/fieldtypes/width.css';
-@import './components/fieldtypes/video.css';
-@import './components/fieldtypes/yaml.css';

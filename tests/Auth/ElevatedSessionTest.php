@@ -2,7 +2,6 @@
 
 namespace Tests\Auth;
 
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -11,12 +10,14 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
 use Statamic\Http\Middleware\CP\RequireElevatedSession;
 use Statamic\Notifications\ElevatedSessionVerificationCode;
+use Tests\ElevatesSessions;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 #[Group('elevated-session')]
 class ElevatedSessionTest extends TestCase
 {
+    use ElevatesSessions;
     use PreventSavingStacheItemsToDisk;
 
     private $user;
@@ -40,11 +41,6 @@ class ElevatedSessionTest extends TestCase
                 return 'ok';
             })->middleware(RequireElevatedSession::class);
         });
-    }
-
-    private function withElevatedSession(?Carbon $time = null)
-    {
-        return $this->session(['statamic_elevated_session' => ($time ?? now())->timestamp]);
     }
 
     #[Test]

@@ -1,7 +1,7 @@
 <template>
     <div class="h-full overflow-auto bg-white dark:bg-gray-800 p-3 rounded-l-xl">
         <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
-            <loading-graphic />
+            <Icon name="loading" />
         </div>
 
         <header v-if="!loading" class="flex items-center justify-between pl-3">
@@ -9,11 +9,11 @@
             <div class="flex items-center gap-3">
                 <Button variant="ghost" :text="__('Cancel')" @click.prevent="close" />
                 <Button variant="primary" @click.prevent="commit()" :text="__('Apply')" />
-                <Button v-if="isInsideSet" variant="primary" @click.prevent="commit(true)" :text="__('Apply & Close All')" />
+                <Button v-if="isInsideSet || isInsideConfigFields" variant="primary" @click.prevent="commit(true)" :text="__('Apply & Close All')" />
             </div>
         </header>
 
-        <section class="isolate px-3 py-4">
+        <section v-if="!loading" class="isolate px-3 py-4">
             <Tabs v-model:modelValue="activeTab">
                 <TabList class="mb-6">
                     <TabTrigger name="settings" :text="__('Settings')" />
@@ -21,9 +21,10 @@
                     <TabTrigger name="validation" :text="__('Validation')" />
                 </TabList>
 
-                <div v-if="!loading">
+                <div>
                     <TabContent name="settings">
                         <ui-publish-container
+                            ref="container"
                             :blueprint="adjustedBlueprint"
                             :meta="meta"
                             :errors="errors"
@@ -60,7 +61,7 @@
 <script>
 import { FieldConditionsBuilder, FIELD_CONDITIONS_KEYS } from '../field-conditions/FieldConditions.js';
 import FieldValidationBuilder from '../field-validation/Builder.vue';
-import { Heading, Button, Tabs, TabList, TabTrigger, TabContent, CardPanel } from '@statamic/ui';
+import { Heading, Button, Tabs, TabList, TabTrigger, TabContent, CardPanel, Icon } from '@statamic/ui';
 
 export default {
     components: {
@@ -72,7 +73,8 @@ export default {
         TabList,
         TabTrigger,
         TabContent,
-        CardPanel
+        CardPanel,
+        Icon
     },
 
     props: {
@@ -96,6 +98,9 @@ export default {
     },
 
     inject: {
+        isInsideConfigFields: {
+            default: false
+        },
         commitParentField: {
             default: () => {}
         }
@@ -238,6 +243,7 @@ export default {
                     isInsideSet: this.isInsideSet,
                 })
                 .then((response) => {
+                    this.$refs.container?.clearDirtyState();
                     this.$emit('committed', response.data, this.editedFields);
                     this.close();
 

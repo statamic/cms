@@ -30,10 +30,10 @@ const hasVisibleHeader = computed(() => {
                 <ToggleAll v-if="allowsSelections && allowsMultipleSelections" />
             </th>
             <HeaderCell v-for="column in visibleColumns" :key="column.field" :column />
-            <!--                    <th class="type-column" v-if="type">-->
-            <!--                        <template v-if="type === 'entries'">{{ __('Collection') }}</template>-->
-            <!--                        <template v-if="type === 'terms'">{{ __('Taxonomy') }}</template>-->
-            <!--                    </th>-->
+            <!-- <th class="type-column" v-if="type">
+                <template v-if="type === 'entries'">{{ __('Collection') }}</template>
+                <template v-if="type === 'terms'">{{ __('Taxonomy') }}</template>
+            </th> -->
             <th scope="col" class="actions-column" v-if="hasActions" />
         </tr>
     </thead>

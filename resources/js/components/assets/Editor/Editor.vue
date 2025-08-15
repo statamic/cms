@@ -5,7 +5,7 @@
             :class="isImage ? 'is-image' : 'is-file'"
         >
             <div v-if="loading" class="loading">
-                <loading-graphic />
+                <Icon name="loading" />
             </div>
 
             <template v-if="!loading">
@@ -25,7 +25,7 @@
                     <ui-button variant="ghost" icon="x" class="absolute top-1.5 end-1.5" round @click="confirmClose(close)" :aria-label="__('Close Editor')" />
                 </header>
 
-                <div class="flex flex-1 grow flex-col overflow-scroll md:flex-row md:justify-between">
+                <div class="flex flex-1 grow flex-col overflow-auto md:flex-row md:justify-between">
                     <!-- Visual Area -->
                     <div class="editor-preview md:min-h-auto flex min-h-[45vh] w-full flex-1 flex-col justify-between bg-gray-800 shadow-[inset_0px_4px_3px_0px_black] dark:bg-gray-900 md:w-1/2 md:flex-auto md:grow lg:w-2/3 md:ltr:rounded-se-md">
                         <!-- Toolbar -->
@@ -121,11 +121,11 @@
                         :extra-values="extraValues"
                         :meta="meta"
                         :errors="errors"
-                        @update:model-value="values = { ...$event, focus: values.focus }"
+                        @update:model-value="updateValues"
                     >
                         <div class="h-1/2 w-full overflow-scroll sm:p-4 md:h-full md:w-1/3 md:grow md:pt-px">
                             <div v-if="saving" class="loading">
-                                <loading-graphic text="Saving" />
+                                <Icon name="loading" />
                             </div>
 
                             <PublishTabs />
@@ -172,7 +172,7 @@
 import FocalPointEditor from './FocalPointEditor.vue';
 import PdfViewer from './PdfViewer.vue';
 import { pick, flatten } from 'lodash-es';
-import { Dropdown, DropdownMenu, DropdownItem, PublishContainer, PublishTabs } from '@statamic/ui';
+import { Dropdown, DropdownMenu, DropdownItem, PublishContainer, PublishTabs, Icon } from '@statamic/ui';
 import ItemActions from '@statamic/components/actions/ItemActions.vue';
 
 export default {
@@ -187,6 +187,7 @@ export default {
         PdfViewer,
         PublishContainer,
         PublishTabs,
+        Icon,
     },
 
     props: {
@@ -357,6 +358,16 @@ export default {
             this.$dirty.add(this.publishContainer);
         },
 
+        updateValues(values) {
+            let updated = { ...event, focus: values.focus };
+
+            if (JSON.stringify(values) === JSON.stringify(updated)) {
+                return
+            }
+
+            values = updated;
+        },
+
         save() {
             this.saving = true;
             const url = cp_url(`assets/${utf8btoa(this.id)}`);
@@ -368,6 +379,7 @@ export default {
                     this.$toast.success(__('Saved'));
                     this.saving = false;
                     this.clearErrors();
+                    this.$nextTick(() => this.$refs.container.clearDirtyState());
                 })
                 .catch((e) => {
                     this.saving = false;
@@ -388,7 +400,7 @@ export default {
         },
 
         saveAndClose() {
-            this.save().then(() => this.close());
+            this.save().then(() => this.$emit('closed'));
         },
 
         clearErrors() {
@@ -411,6 +423,7 @@ export default {
 
         confirmCloseWithChanges() {
             this.closingWithChanges = false;
+            this.$refs.container.clearDirtyState();
             this.$emit('closed');
         },
 
@@ -439,7 +452,7 @@ export default {
         actionCompleted(successful, response) {
             this.$emit('action-completed', successful, response);
             if (successful) {
-                this.close();
+                this.$emit('closed');
             }
         },
 

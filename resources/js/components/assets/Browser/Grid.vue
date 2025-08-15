@@ -95,7 +95,7 @@
                     <Context>
                         <template #trigger>
                             <div
-                                class="asset-tile group relative bg-white"
+                                class="asset-tile group relative bg-white dark:bg-gray-900"
                                 :class="{
                                     'bg-checkerboard!': asset.can_be_transparent,
                                     'opacity-50!': draggingAsset === asset.id,
@@ -113,7 +113,7 @@
                                     <div class="relative flex aspect-square size-full items-center justify-center">
                                         <div class="asset-thumb">
                                             <img
-                                                v-if="asset.is_image"
+                                                v-if="asset.thumbnail"
                                                 :src="asset.thumbnail"
                                                 loading="lazy"
                                                 :draggable="false"

@@ -575,13 +575,20 @@ class NavItem
     {
         $displayItem = $parentItem ?? $this;
 
-        $text = $displayItem->section() !== 'Top Level'
-            ? __($displayItem->section()).' » '.__($displayItem->display())
-            : __($displayItem->display());
+        $sectionText = $displayItem->section() !== 'Top Level'
+            ? __($displayItem->section())
+            : null;
 
-        if ($parentItem) {
-            $text .= ' » '.__($this->display());
-        }
+        $itemText = __($displayItem->display());
+
+        $childText = $parentItem
+            ? __($this->display())
+            : null;
+
+        $text = collect([$sectionText, $itemText, $childText])
+            ->filter()
+            ->values()
+            ->all();
 
         $link = (new Link(text: $text, category: Category::Navigation))
             ->url($this->url())

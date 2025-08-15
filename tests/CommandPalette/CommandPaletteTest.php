@@ -3,6 +3,8 @@
 namespace Tests\CommandPalette;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\CommandPalette\Category;
+use Statamic\CommandPalette\ContentSearchResult;
 use Statamic\Facades;
 use Statamic\Facades\CommandPalette;
 use Statamic\Facades\User;
@@ -60,26 +62,112 @@ class CommandPaletteTest extends TestCase
             ->all();
 
         $expected = [
-            ['type' => 'link', 'text' => 'Top Level > Dashboard', 'url' => 'http://localhost/cp/dashboard'],
-            ['type' => 'link', 'text' => 'Content > Collections', 'url' => 'http://localhost/cp/collections'],
-            ['type' => 'link', 'text' => 'Content > Navigation', 'url' => 'http://localhost/cp/navigation'],
-            ['type' => 'link', 'text' => 'Content > Taxonomies', 'url' => 'http://localhost/cp/taxonomies'],
-            ['type' => 'link', 'text' => 'Content > Assets', 'url' => 'http://localhost/cp/assets'],
-            ['type' => 'link', 'text' => 'Content > Globals', 'url' => 'http://localhost/cp/globals'],
-            ['type' => 'link', 'text' => 'Fields > Blueprints', 'url' => 'http://localhost/cp/fields/blueprints'],
-            ['type' => 'link', 'text' => 'Fields > Fieldsets', 'url' => 'http://localhost/cp/fields/fieldsets'],
-            ['type' => 'link', 'text' => 'Tools > Forms', 'url' => 'http://localhost/cp/forms'],
-            ['type' => 'link', 'text' => 'Tools > Updates', 'url' => 'http://localhost/cp/updater'],
-            ['type' => 'link', 'text' => 'Tools > Addons', 'url' => 'http://localhost/cp/addons'],
-            ['type' => 'link', 'text' => 'Tools > Utilities', 'url' => 'http://localhost/cp/utilities'],
-            ['type' => 'link', 'text' => 'Tools > GraphQL', 'url' => 'http://localhost/cp/graphql'],
-            ['type' => 'link', 'text' => 'Settings > Site', 'url' => 'http://localhost/cp/sites'],
-            ['type' => 'link', 'text' => 'Settings > Preferences', 'url' => 'http://localhost/cp/preferences'],
-            ['type' => 'link', 'text' => 'Users > Users', 'url' => 'http://localhost/cp/users'],
-            ['type' => 'link', 'text' => 'Users > Groups', 'url' => 'http://localhost/cp/user-groups'],
-            ['type' => 'link', 'text' => 'Users > Permissions', 'url' => 'http://localhost/cp/roles'],
+            ['text' => 'Top Level > Dashboard', 'url' => 'http://localhost/cp/dashboard'],
+            ['text' => 'Content > Collections', 'url' => 'http://localhost/cp/collections'],
+            ['text' => 'Content > Navigation', 'url' => 'http://localhost/cp/navigation'],
+            ['text' => 'Content > Taxonomies', 'url' => 'http://localhost/cp/taxonomies'],
+            ['text' => 'Content > Assets', 'url' => 'http://localhost/cp/assets'],
+            ['text' => 'Content > Globals', 'url' => 'http://localhost/cp/globals'],
+            ['text' => 'Fields > Blueprints', 'url' => 'http://localhost/cp/fields/blueprints'],
+            ['text' => 'Fields > Fieldsets', 'url' => 'http://localhost/cp/fields/fieldsets'],
+            ['text' => 'Tools > Forms', 'url' => 'http://localhost/cp/forms'],
+            ['text' => 'Tools > Updates', 'url' => 'http://localhost/cp/updater'],
+            ['text' => 'Tools > Addons', 'url' => 'http://localhost/cp/addons'],
+            ['text' => 'Tools > Utilities', 'url' => 'http://localhost/cp/utilities'],
+            ['text' => 'Tools > GraphQL', 'url' => 'http://localhost/cp/graphql'],
+            ['text' => 'Settings > Site', 'url' => 'http://localhost/cp/sites'],
+            ['text' => 'Settings > Preferences', 'url' => 'http://localhost/cp/preferences'],
+            ['text' => 'Users > Users', 'url' => 'http://localhost/cp/users'],
+            ['text' => 'Users > Groups', 'url' => 'http://localhost/cp/user-groups'],
+            ['text' => 'Users > Permissions', 'url' => 'http://localhost/cp/roles'],
         ];
 
         $this->assertEquals($expected, $navigationCommands);
+    }
+
+    #[Test]
+    public function it_can_build_custom_command_items()
+    {
+        // Simple default miscellaneous command example
+        CommandPalette::add('Ask Jeeves', 'https://ask.com');
+
+        // More advanced config example
+        CommandPalette::add(
+            text: 'Hotbot',
+            url: 'https://hotbot.com',
+            openNewTab: true,
+            trackRecent: false,
+            icon: 'sexy-robot',
+            category: Category::Actions,
+            // keys: ... // TODO: test custom hotkey config when we set that up
+        );
+
+        $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->get(cp_route('dashboard'))
+            ->assertStatus(200);
+
+        $miscCommands = collect(CommandPalette::build())
+            ->filter(fn ($item) => in_array($item['category'], ['Actions', 'Miscellaneous']))
+            ->all();
+
+        $expected = [
+            [
+                'category' => 'Miscellaneous',
+                'text' => 'Ask Jeeves',
+                'url' => 'https://ask.com',
+                'openNewTab' => false,
+                'trackRecent' => true,
+                'icon' => 'entry',
+                'keys' => null,
+            ],
+            [
+                'category' => 'Actions',
+                'text' => 'Hotbot',
+                'url' => 'https://hotbot.com',
+                'openNewTab' => true,
+                'trackRecent' => false,
+                'icon' => 'sexy-robot',
+                'keys' => null,
+            ],
+        ];
+
+        $this->assertArraySubset($expected, $miscCommands);
+    }
+
+    #[Test]
+    public function it_can_build_command_with_array_based_text_for_rendering_arrow_separators_in_js()
+    {
+        CommandPalette::add(['Preferences', 'Best Website', 'Ask Jeeves'], 'https://ask.com');
+
+        $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->get(cp_route('dashboard'))
+            ->assertStatus(200);
+
+        $miscCommands = collect(CommandPalette::build())
+            ->filter(fn ($item) => $item['category'] === 'Miscellaneous')
+            ->all();
+
+        $expected = [
+            [
+                'category' => 'Miscellaneous',
+                'text' => ['Preferences', 'Best Website', 'Ask Jeeves'],
+                'url' => 'https://ask.com',
+                'openNewTab' => false,
+                'icon' => 'entry',
+                'keys' => null,
+            ],
+        ];
+
+        $this->assertArraySubset($expected, $miscCommands);
+    }
+
+    #[Test]
+    public function it_tracks_recent_content_search_results_by_default()
+    {
+        $searchResult = new ContentSearchResult('Articles', Category::Search);
+
+        $this->assertTrue($searchResult->toArray()['trackRecent']);
     }
 }

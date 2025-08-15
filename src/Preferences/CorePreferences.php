@@ -28,7 +28,8 @@ class CorePreferences
         Preference::register('strict_accessibility', [
             'type' => 'toggle',
             'display' => __('Strict WCAG 2.2 Conformity'),
-            'instructions' => __('statamic::messages.preference_wcag'),
+            'instructions' => __('statamic::messages.preference_wcag').'<br><a href="https://www.w3.org/WAI/WCAG2AA-Conformance" title="Explanation of WCAG 2 Level AA conformance" class="inline-block mt-3"><img height="32" width="88" src="https://www.w3.org/WAI/WCAG22/wcag2.2AA" alt="Level AA conformance, W3C WAI Web Content Accessibility Guidelines 2.2"></a>',
+            'variant' => 'inline',
         ]);
     }
 

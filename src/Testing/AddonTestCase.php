@@ -6,8 +6,8 @@ use Facades\Statamic\Version;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use ReflectionClass;
+use Statamic\Addons\Manifest;
 use Statamic\Console\Processes\Composer;
-use Statamic\Extend\Manifest;
 use Statamic\Providers\StatamicServiceProvider;
 use Statamic\Statamic;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
@@ -27,7 +27,7 @@ abstract class AddonTestCase extends OrchestraTestCase
 
         if (isset($uses[PreventsSavingStacheItemsToDisk::class])) {
             $reflection = new ReflectionClass($this);
-            $this->fakeStacheDirectory = Str::before(dirname($reflection->getFileName()), '/tests').'/tests/__fixtures__/dev-null';
+            $this->fakeStacheDirectory = Str::before(dirname($reflection->getFileName()), DIRECTORY_SEPARATOR.'tests').'/tests/__fixtures__/dev-null';
 
             $this->preventSavingStacheItemsToDisk();
         }

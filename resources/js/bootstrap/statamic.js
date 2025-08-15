@@ -5,6 +5,7 @@ import axios from 'axios';
 import Config from '../components/Config';
 import Preferences from '../components/Preference';
 import registerGlobalComponents from './components.js';
+import registerGlobalCommandPalette from './commands.js';
 import registerUiComponents from './ui.js';
 import registerFieldtypes from './fieldtypes.js';
 import useGlobalEventBus from '../composables/global-event-bus';
@@ -35,6 +36,7 @@ import DateFormatter from '@statamic/components/DateFormatter.js';
 import wait from '@statamic/util/wait.js';
 import markdown from '@statamic/util/markdown.js';
 import VueComponentDebug from 'vue-component-debug';
+import CommandPalette from '../components/CommandPalette.js';
 
 let bootingCallbacks = [];
 let bootedCallbacks = [];
@@ -129,6 +131,10 @@ export default {
         return this.$app.config.globalProperties.$events;
     },
 
+    get $commandPalette() {
+        return this.$app.config.globalProperties.$commandPalette;
+    },
+
     get user() {
         return this.$config.get('user');
     },
@@ -181,6 +187,7 @@ export default {
             $echo: new Echo(),
             $permissions: new Permission(),
             $date: new DateFormatter(),
+            $commandPalette: new CommandPalette(),
         });
 
         Object.assign(this.$app.config.globalProperties, {
@@ -220,6 +227,7 @@ export default {
 
         await registerUiComponents(this.$app);
         registerGlobalComponents(this.$app);
+        registerGlobalCommandPalette();
         registerFieldtypes(this.$app);
 
         // Suppress the translation warnings

@@ -124,7 +124,8 @@ function destroy() {
         <slot name="picker" />
         <div
             layout
-            class="shadow-ui-sm relative z-2 w-full rounded-lg border border-gray-200 bg-white text-base dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
+            class="shadow-ui-sm relative z-2 w-full rounded-lg border border-gray-200 bg-white text-base dark:border-x-0 dark:border-t-0 dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
+            :class="{ 'border-red-500': hasError }"
             :data-collapsed="collapsed ?? undefined"
             :data-error="hasError ?? undefined"
             :data-invalid="isInvalid ?? undefined"
@@ -132,8 +133,8 @@ function destroy() {
             :data-type="config.handle"
         >
             <header
-                class="group/header animate-border-color flex items-center rounded-lg border-b border-transparent px-1.5 antialiased duration-200 hover:bg-gray-50"
-                :class="{ 'rounded-b-none border-gray-200! dark:border-white/15': !collapsed }"
+                class="group/header animate-border-color flex items-center rounded-lg border-b border-transparent px-1.5 antialiased duration-200 hover:bg-gray-50 dark:hover:bg-gray-950"
+                :class="{ 'rounded-b-none border-gray-200 dark:border-white/10': !collapsed }"
             >
                 <Icon
                     name="handles"
@@ -149,13 +150,12 @@ function destroy() {
                         </span>
                         {{ __(config.display) || config.handle }}
                     </Badge>
-                    <Tooltip :markdown="__(config.instructions)">
-                        <Icon
-                            v-if="config.instructions && !collapsed"
-                            name="info-square"
-                            class="size-3.5! text-gray-500"
-                        />
-                    </Tooltip>
+                    <Icon
+                        v-if="config.instructions && !collapsed"
+                        name="info-square"
+                        class="size-3.5! text-gray-500"
+                        v-tooltip="__(config.instructions)"
+                    />
                     <Subheading
                         v-show="collapsed"
                         v-html="previewText"
@@ -163,10 +163,7 @@ function destroy() {
                     />
                 </button>
                 <div class="flex items-center gap-2" v-if="!readOnly">
-                    <Tooltip :text="enabled ? __('Included in output') : __('Hidden from output')">
-                        <Switch size="xs" :model-value="enabled" @update:model-value="toggleEnabledState" />
-                    </Tooltip>
-
+                    <Switch size="xs" :model-value="enabled" @update:model-value="toggleEnabledState" v-tooltip="enabled ? __('Included in output') : __('Hidden from output')" />
                     <Dropdown>
                         <template #trigger>
                             <Button icon="ui/dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
@@ -196,7 +193,6 @@ function destroy() {
             </header>
 
             <Motion
-                layout
                 class="overflow-hidden"
                 :initial="{ height: collapsed ? '0px' : 'auto' }"
                 :animate="{ height: collapsed ? '0px' : 'auto' }"

@@ -2,11 +2,10 @@
     <div>
         <Header :title="__(title)" :icon="icon">
             <ItemActions
+                ref="actions"
                 :url="actionUrl"
                 :actions="actions"
                 :item="handle"
-                @started="actionStarted"
-                @completed="actionCompleted"
                 v-slot="{ actions }"
             >
                 <Dropdown placement="left-start">
@@ -82,6 +81,7 @@
                 :url="createUrl"
                 :blueprints="blueprints"
                 :text="createLabel"
+                :command-palette="true"
             />
         </Header>
 
@@ -288,6 +288,8 @@ export default {
     mounted() {
         this.view = this.initialView();
         this.mounted = true;
+
+        this.addToCommandPalette();
     },
 
     methods: {
@@ -382,6 +384,36 @@ export default {
         afterActionSuccessfullyCompleted(response) {
             if (!response.redirect) window.location.reload();
         },
+
+        addToCommandPalette() {
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: [__('Collection'), __('Configure')],
+                icon: 'cog',
+                url: this.editUrl,
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: [__('Collection'), __('Edit Blueprints')],
+                icon: 'blueprint-edit',
+                url: this.blueprintsUrl,
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: [__('Collection'), __('Scaffold Views')],
+                icon: 'scaffold',
+                url: this.scaffoldUrl,
+            });
+
+            this.$refs.actions.preparedActions.forEach(action => Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: [__('Collection'), action.title],
+                icon: action.icon,
+                action: action.run,
+            }));
+        }
     },
 };
 </script>

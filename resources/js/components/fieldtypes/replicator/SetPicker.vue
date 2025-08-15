@@ -17,23 +17,22 @@
             <slot name="trigger" />
         </template>
         <template #default>
-            <div class="set-picker-header flex items-center border-b p-3 text-xs dark:border-dark-900">
+            <div class="set-picker-header flex items-center border-b p-3 text-xs dark:border-gray-600">
                 <ui-input
                     ref="search"
                     size="sm"
                     type="text"
                     :placeholder="__('Search Sets')"
+                    icon-prepend="magnifying-glass"
                     v-show="showSearch"
                     v-model="search"
+                    data-set-picker-search-input
                 />
-                <div v-if="showGroupBreadcrumb" class="flex items-center font-medium text-gray-700 dark:text-gray-600">
-                    <button
-                        @click="unselectGroup"
-                        class="rounded-sm hover:text-gray-900 dark:hover:text-gray-500 ltr:ml-2.5 rtl:mr-2.5"
-                    >
+                <div v-if="showGroupBreadcrumb" class="flex items-center font-medium text-gray-700 dark:text-gray-300 gap-1">
+                    <button @click="unselectGroup" class="hover:text-gray-900 dark:hover:text-white">
                         {{ __('Groups') }}
                     </button>
-                    <ui-icon name="micro/chevron-right" class="h-4 w-4" />
+                    <ui-icon name="ui/chevron-right" class="size-4" />
                     <span>{{ selectedGroupDisplayText }}</span>
                 </div>
             </div>
@@ -41,54 +40,37 @@
                 <div
                     v-for="(item, i) in items"
                     :key="item.handle"
-                    class="cursor-pointer rounded-sm"
-                    :class="{ 'bg-gray-100 dark:bg-dark-600': selectionIndex === i }"
+                    class="cursor-pointer rounded-md"
+                    :class="{ 'bg-gray-100 dark:bg-gray-900': selectionIndex === i }"
                     @mouseover="selectionIndex = i"
+                    :title="__(item.instructions)"
                 >
-                    <div
-                        v-if="item.type === 'group'"
-                        @click="selectGroup(item.handle)"
-                        class="group flex items-center rounded-md px-2 py-1.5"
-                    >
+                    <div v-if="item.type === 'group'" @click="selectGroup(item.handle)" class="group flex rounded-md px-2 py-1.5 gap-3">
                         <ui-icon
                             :name="groupIconName(item.icon)"
-                            :directory="iconBaseDirectory"
-                            class="h-9 w-9 rounded-sm border border-gray-600 bg-white p-2 text-gray-900 dark:border-dark-800 dark:bg-dark-650 dark:text-dark-175 ltr:mr-2 rtl:ml-2"
+                            class="size-9 rounded-md border border-gray-300 bg-white dark:bg-gray-900/50 dark:border-gray-600 shadow-ui-xs p-2"
                         />
                         <div class="flex-1">
-                            <div class="w-52 truncate text-sm font-medium text-gray-900 dark:text-dark-175">
+                            <div class="w-50 line-clamp-2 text-sm font-medium text-gray-900 dark:text-dark-175">
                                 {{ __(item.display || item.handle) }}
                             </div>
-                            <div
-                                v-if="item.instructions"
-                                class="w-52 truncate text-2xs text-gray-700 dark:text-dark-175"
-                            >
+                            <div v-if="item.instructions" class="w-50 line-clamp-2 text-2xs text-gray-700 dark:text-dark-175">
                                 {{ __(item.instructions) }}
                             </div>
                         </div>
-                        <ui-icon
-                            name="arrow-right"
-                            class="text-gray-600 group-hover:text-dark-800 dark:group-hover:text-dark-175"
-                        />
+                        <ui-icon name="ui/chevron-right" class="me-2" />
                     </div>
-                    <div
-                        v-if="item.type === 'set'"
-                        @click="addSet(item.handle)"
-                        class="group flex items-center rounded-md px-2 py-1.5"
-                    >
+                    <div v-if="item.type === 'set'" @click="addSet(item.handle)" class="group flex rounded-md px-2 py-1.5 gap-3">
                         <ui-icon
                             :name="setIconName(item.icon)"
                             :directory="iconBaseDirectory"
-                            class="h-9 w-9 rounded-sm border border-gray-600 bg-white p-2 text-gray-900 dark:border-dark-800 dark:bg-dark-650 dark:text-dark-175 ltr:mr-2 rtl:ml-2"
+                            class="size-9 rounded-md border border-gray-300 bg-white dark:bg-gray-900/50 dark:border-gray-600 shadow-ui-xs p-2"
                         />
                         <div class="flex-1">
-                            <div class="w-52 truncate text-sm font-medium text-gray-900 dark:text-dark-175">
+                            <div class="w-52 line-clamp-2 text-sm font-medium text-gray-900 dark:text-dark-175">
                                 {{ __(item.display || item.handle) }}
                             </div>
-                            <div
-                                v-if="item.instructions"
-                                class="w-52 truncate text-2xs text-gray-700 dark:text-dark-175"
-                            >
+                            <div v-if="item.instructions" class="w-52 truncate text-2xs text-gray-700 dark:text-dark-175">
                                 {{ __(item.instructions) }}
                             </div>
                         </div>
@@ -261,6 +243,8 @@ export default {
                 this.$keys.bindGlobal('up', (e) => this.keypressUp(e)),
                 this.$keys.bindGlobal('down', (e) => this.keypressDown(e)),
                 this.$keys.bindGlobal('enter', (e) => this.keypressEnter(e)),
+                this.$keys.bindGlobal('right', (e) => this.keypressRight(e)),
+                this.$keys.bindGlobal('left', (e) => this.keypressLeft(e)),
             ];
         },
 
@@ -277,6 +261,17 @@ export default {
         keypressDown(e) {
             e.preventDefault();
             this.selectionIndex = this.selectionIndex === this.items.length - 1 ? 0 : this.selectionIndex + 1;
+        },
+
+        keypressRight(e) {
+            e.preventDefault();
+            if (this.selectedGroup || this.search) return; // Pressing right to select a set feels awkward.
+            this.keypressEnter(e);
+        },
+
+        keypressLeft(e) {
+            e.preventDefault();
+            this.unselectGroup();
         },
 
         keypressEnter(e) {
@@ -303,6 +298,10 @@ export default {
             if (!name) return 'plus';
 
             return this.iconSubFolder ? this.iconSubFolder + '/' + name : name;
+        },
+
+        open() {
+            this.isOpen = true;
         },
     },
 };

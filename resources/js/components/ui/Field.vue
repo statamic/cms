@@ -1,7 +1,7 @@
 <script setup>
 import { cva } from 'cva';
 import { computed } from 'vue';
-import { Description, Label, Card } from '@statamic/components/ui/index.js';
+import { Description, Label, Card, ErrorMessage } from '@statamic/components/ui/index.js';
 import markdown from '@statamic/util/markdown.js';
 
 defineOptions({
@@ -72,14 +72,14 @@ const wrapperComponent = computed(() => props.as === 'card' ? Card : 'div');
             </slot>
             <slot name="actions" />
         </div>
-        <div v-if="label || (instructions && !instructionsBelow) || ($slots.label && !$slots.actions)" data-ui-field-text class="mb-1.5">
+        <div v-if="label || (instructions && !instructionsBelow) || ($slots.label && !$slots.actions)" data-ui-field-text :class="variant === 'inline' ? 'mb-0' : 'mb-1.5'">
             <slot v-if="!$slots.actions" name="label">
                 <Label v-if="label" v-bind="labelProps" class="flex-1" />
             </slot>
-            <Description :text="instructions" v-if="instructions && !instructionsBelow" class="mb-1.75 -mt-0.5" />
+            <Description :text="instructions" v-if="instructions && !instructionsBelow" :class="variant === 'inline' ? '-mt-0.5' : 'mb-1.75 -mt-0.5'" />
         </div>
         <slot />
         <Description :text="instructions" v-if="instructions && instructionsBelow" class="mt-2" />
-        <Description v-if="errors" v-for="(error, i) in errors" :key="i" :text="error" class="mt-2 text-red-500" />
+        <ErrorMessage v-if="errors" v-for="(error, i) in errors" :key="i" :text="error" class="mt-2" />
     </component>
 </template>

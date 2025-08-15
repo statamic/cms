@@ -5,7 +5,7 @@
     :initial-per-page="{{ $limit }}"
 >
     <template #actions>
-        <ui-button href="{{ cp_route('forms.show', $form->handle()) }}">
+        <ui-button href="{{ cp_route('forms.show', $form->handle()) }}" size="sm">
             {{ __('View All') }}
         </ui-button>
     </template>

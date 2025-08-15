@@ -15,7 +15,8 @@
 
 /* UTILITIES / TEXT
 =================================================== */
-@utility trim-text-start {
+/* Avoid prefixing things with text- because this is a Tailwind prefix */
+@utility st-text-trim-start {
     text-box: trim-start;
     /* =Jay. When we have an SVG we probably don't want to text trim, for example in a Markdown field with button controls like Bold, Italic, etc. */
     &:has(svg),
@@ -28,7 +29,7 @@
         text-box: unset;
     }
 }
-@utility trim-cap-alphabetic {
+@utility st-text-trim-cap {
     /* =Jay. Sometimes this is handy e.g. the text inside the command palette searchbox */
     text-box: cap alphabetic;
 }
@@ -38,6 +39,17 @@
     &::placeholder {
         font-size: 0.975em;
     }
+}
+@utility placeholder-text-xs {
+    /* =Jay. If it needs to be used directly on the element such as the link field i.e. pseudo ::placeholder */
+    font-size: 0.975em;
+}
+
+@utility st-text-legibility {
+    font-family: "inter", sans-serif;
+    letter-spacing: -0.02em;
+    font-optical-sizing: auto;
+    font-weight: 425;
 }
 
 /* UTILITIES / STATES
@@ -49,12 +61,11 @@
     outline-color: var(--focus-outline-color, currentColor);
     outline-style: var(--focus-outline-style, solid);
 }
-/* Same as focus-outline, but without the outline-offset, e.g. a Markdown editor */
-@utility focus-outline-within {
-    outline-offset: 0;
-    outline-width: var(--focus-outline-width);
-    outline-color: var(--focus-outline-color, currentColor);
-    outline-style: var(--focus-outline-style, solid);
+/* Make the focus border more descrete for some fields such as Bard */
+@utility focus-outline-discrete {
+    &:focus-within {
+        --focus-outline-color: var(--color-blue-300);
+    }
 }
 
 @utility focus-none {
@@ -132,7 +143,7 @@
 */
 /* HTML Example...
 
-    <div class="absolute right-0 mask-bg"> <-- needs to be position:absolute or position:relative
+    <div class="absolute right-0 mask-bg"> <-- needs to be position:absolute or position:relative. Use a modifier class to change the amount/direction, e.g. <div class="sticky left-0 mask-bg mask-bg--left mask-bg--left-small">
 
     </div>
 
@@ -148,13 +159,22 @@
         z-index: var(--z-index-below);
         width: calc(150% + var(--cover));
         height: calc(100% + var(--height-offset) * 2);
-        left: calc(0.5rem - var(--cover));
         top: calc(0% - var(--height-offset));
-        background: radial-gradient(circle at center, hsl(0deg 0% 100%) 0%,transparent 80%);
+        background: radial-gradient(circle at center, white 0%,transparent 80%);
         border-radius: 1.5rem 0 0 1.5rem;
     }
     .dark &::before {
         background: radial-gradient(circle at center, hsl(240deg 6% 10%) 0%, transparent 80%);
+    }
+}
+@utility mask-bg--left {
+    &::before {
+        left: calc(0.5rem - var(--cover));
+    }
+}
+@utility mask-bg--left-small {
+    &::before {
+        left: calc(-0.75rem - var(--cover));
     }
 }
 

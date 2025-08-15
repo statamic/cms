@@ -4,10 +4,14 @@ import { Icon, Badge } from '@statamic/ui';
 
 const props = defineProps({
     href: { type: String, default: null },
+    openNewTab: { type: Boolean, default: false },
     icon: { type: String, default: null },
     text: { type: String, default: null },
     badge: { type: String, default: null },
+    removable: { type: Boolean, default: false },
 });
+
+defineEmits(['remove']);
 
 const slots = useSlots();
 const hasDefaultSlot = !!slots.default;
@@ -41,6 +45,7 @@ function click(event) {
         data-command-palette-item
         :as="href ? 'a' : 'div'"
         :href="href"
+        :target="openNewTab ? '_blank' : '_self'"
         @click="click"
     >
         <div v-if="icon" class="flex size-6 items-center justify-center p-1 text-gray-500">
@@ -52,5 +57,11 @@ function click(event) {
             <template v-else>{{ text }}</template>
         </div>
         <Badge v-if="badge" :text="badge" variant="flat" />
+        <Icon
+            v-if="removable"
+            name="x"
+            class="size-4 opacity-30 hover:opacity-70"
+            @click.prevent.stop="$emit('remove', href)"
+        />
     </a>
 </template>

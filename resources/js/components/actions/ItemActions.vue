@@ -55,6 +55,10 @@ function loadActions() {
 
     actionsLoaded.value = true;
 }
+
+defineExpose({
+    preparedActions,
+});
 </script>
 
 <template>

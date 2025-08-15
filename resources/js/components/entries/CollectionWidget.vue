@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue';
+import DateFormatter from '@statamic/components/DateFormatter.js';
 import {
     Widget,
     StatusIndicator,
@@ -34,6 +35,10 @@ const widgetProps = computed(() => ({
     title: props.title,
     icon: 'collections',
 }));
+
+function formatDate(value) {
+    return DateFormatter.format(value, 'date');
+}
 </script>
 
 <template>
@@ -48,7 +53,15 @@ const widgetProps = computed(() => ({
         :sort-direction="initialSortDirection"
     >
         <template #initializing>
-            <Widget v-bind="widgetProps"><Icon name="loading" /></Widget>
+            <Widget v-bind="widgetProps">
+                <div class="flex flex-col gap-4 justify-between p-4">
+                    <ui-skeleton class="h-3 w-full" />
+                    <ui-skeleton class="h-3 w-full" />
+                    <ui-skeleton class="h-3 w-full" />
+                    <ui-skeleton class="h-3 w-full" />
+                    <ui-skeleton class="h-3 w-full" />
+                </div>
+            </Widget>
         </template>
         <template #default="{ items, loading }">
             <Widget v-bind="widgetProps">
@@ -56,7 +69,7 @@ const widgetProps = computed(() => ({
                     {{ __('There are no entries in this collection') }}
                 </ui-description>
                 <div class="px-4 py-3">
-                    <table class="w-full [&_td]:p-0.5 [&_td]:text-sm " :class="{ 'opacity-50': loading }">
+                    <table class="w-full [&_td]:p-0.75 [&_td]:text-sm" :class="{ 'opacity-50': loading }">
                         <TableHead sr-only />
                         <TableBody>
                             <template #cell-title="{ row: entry, isColumnVisible }">
@@ -66,6 +79,13 @@ const widgetProps = computed(() => ({
                                         entry.title
                                     }}</a>
                                 </div>
+                            </template>
+                            <template #cell-date="{ row: entry, isColumnVisible }">
+                                <div
+                                    class="text-end font-mono text-xs whitespace-nowrap text-gray-500 antialiased px-2"
+                                    v-html="formatDate(entry.datestamp)"
+                                    v-if="isColumnVisible('date')"
+                                />
                             </template>
                             <template #cell-status="{ row: entry }">
                                 <StatusIndicator :status="entry.status" :show-dot="false" show-label />

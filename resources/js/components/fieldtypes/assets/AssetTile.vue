@@ -18,8 +18,8 @@
         >
         </asset-editor>
 
-        <div class="asset-thumb-container">
-            <div class="asset-thumb" :class="{ 'bg-checkerboard': canBeTransparent }">
+        <div class="flex h-full border-b rounded-b-md relative">
+            <div class="p-1 flex flex-col items-center justify-center h-full" :class="{ 'bg-checkerboard': canBeTransparent }">
                 <template v-if="errors.length">
                     <div class="absolute z-10 inset-0 bg-white/75 dark:bg-dark-800/90 flex flex-col gap-2 items-center justify-center px-1 py-2">
                         <small
@@ -35,65 +35,47 @@
                 </template>
 
                 <template v-else>
-                    <img :src="thumbnail" v-if="isImage" :title="label" />
+                    <img :src="thumbnail" v-if="thumbnail" :title="label" class="rounded-md"  />
 
                     <template v-else>
                         <img v-if="canShowSvg" :src="asset.url" :title="label" class="p-4" />
                         <file-icon v-else :extension="asset.extension" class="h-full w-full p-4" />
                     </template>
                 </template>
+            </div>
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 duration-100 z-10">
+                <div class="flex items-center justify-center gap-2">
+                    <template v-if="!readOnly">
+                        <ui-button size="sm" @click="edit" icon="pencil" aria-label="__('Edit')" />
+                        <ui-button size="sm" @click="remove" icon="x" aria-label="__('Remove')" />
+                    </template>
 
-                <div class="asset-controls z-10">
-                    <div class="flex items-center justify-center space-x-1 rtl:space-x-reverse">
-                        <template v-if="!readOnly">
-                            <button @click="edit" class="btn btn-icon" :title="__('Edit')">
-                                <svg-icon name="micro/sharp-pencil" class="my-2 h-4" />
-                            </button>
-
-                            <button @click="remove" class="btn btn-icon" :title="__('Remove')">
-                                <span class="w-4 text-lg antialiased">×</span>
-                            </button>
-                        </template>
-
-                        <template v-else>
-                            <button
-                                v-if="asset.url && asset.isMedia && this.canDownload"
-                                @click="open"
-                                class="btn btn-icon"
-                                :title="__('Open in a new window')"
-                            >
-                                <svg-icon name="light/external-link" class="my-2 h-4" />
-                            </button>
-
-                            <button
-                                v-if="asset.allowDownloading && this.canDownload"
-                                @click="download"
-                                class="btn btn-icon"
-                                :title="__('Download file')"
-                            >
-                                <svg-icon name="light/download" class="my-2 h-4" />
-                            </button>
-                        </template>
-                    </div>
+                    <template v-else>
+                        <ui-button icon="external-link" size="sm" v-if="asset.url && asset.isMedia && this.canDownload" @click="open" :aria-label="__('Open in a new window')" />
+                        <ui-button icon="download" size="sm" v-if="asset.allowDownloading && this.canDownload" @click="download" :aria-label="__('Download file')" />
+                    </template>
                 </div>
             </div>
         </div>
 
-        <div class="asset-meta flex items-center" v-if="showFilename">
-            <div class="asset-filename flex-1 px-2 py-1" :title="label" :class="{ 'text-center': !needsAlt }">
+        <div class="flex items-center justify-between w-full px-1" v-if="showFilename">
+            <div class="truncate w-18 text-xs text-gray-500 flex-1 px-2 py-1" v-tooltip="label" :class="{ 'text-center': !needsAlt }">
                 {{ label }}
             </div>
-            <button class="asset-meta-btn" type="button" @click="edit" v-if="showSetAlt && needsAlt">
-                {{ asset.values.alt ? '✅' : __('Set Alt') }}
-            </button>
+            <ui-badge as="button" size="sm" color="blue" variant="flat" @click="edit" v-if="showSetAlt && needsAlt" :text="asset.values.alt ? '✅' : __('Set Alt')" />
         </div>
     </div>
 </template>
 
 <script>
 import Asset from './Asset';
+import { Button } from '@statamic/ui';
 
 export default {
+    components: {
+        Button,
+    },
+
     mixins: [Asset],
 
     computed: {

@@ -171,7 +171,7 @@ return [
     'taggable.config.placeholder' => 'Taip dan tekan ↩ Enter',
     'taggable.title' => 'Boleh tag',
     'taxonomies.title' => 'Taksonomi',
-    'template.config.blueprint' => 'Menambah pilihan &quot;peta ke pelan tindakan&quot;. Ketahui lebih lanjut dalam [dokumentasi](https://statamic.dev/views#inferring-templates-from-entry-blueprints).',
+    'template.config.blueprint' => 'Menambah pilihan &quot;peta ke pelan tindakan&quot;. Ketahui lebih lanjut dalam [dokumentasi](https://statamic.dev/views#map-templates-to-entry-blueprints).',
     'template.config.folder' => 'Hanya tunjukkan templat dalam folder ini.',
     'template.config.hide_partials' => 'Sebahagian separa dimaksudkan untuk digunakan sebagai templat.',
     'template.title' => 'templat',

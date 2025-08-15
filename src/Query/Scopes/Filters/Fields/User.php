@@ -58,10 +58,9 @@ class User extends FieldtypeFilter
     {
         $field = $this->fieldtype->field()->display();
         $operator = $values['operator'];
+        $translatedOperator = Arr::get($this->fieldItems(), "operator.options.{$operator}");
 
         if (in_array($operator, ['null', 'not-null'])) {
-            $translatedOperator = Arr::get($this->fieldItems(), "operator.options.{$operator}");
-
             return $field.' '.strtolower($translatedOperator);
         }
 
@@ -71,6 +70,6 @@ class User extends FieldtypeFilter
 
         $user = Users::find($user)->name();
 
-        return $field.' '.strtolower($operator).' '.$user;
+        return $field.' '.strtolower($translatedOperator).' '.$user;
     }
 }

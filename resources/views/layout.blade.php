@@ -11,8 +11,8 @@
         class="bg-gray-800 font-sans leading-normal text-gray-900 dark:text-white"
         @if ($user->getPreference('strict_accessibility')) data-contrast="increased" @endif
     >
-        <config-provider>
-            <div id="statamic" v-cloak>
+        <div id="statamic">
+           <config-provider>
                 @include('statamic::partials.session-expiry')
                 @include('statamic::partials.licensing-alerts')
                  @include('statamic::partials.global-header')
@@ -21,18 +21,13 @@
                     class="@yield('content-class') pt-14"
                     :class="{
                         'nav-closed': ! navOpen,
-                        'nav-mobile-open': mobileNavOpen,
+                        'nav-open': navOpen,
                         'showing-license-banner': showBanner
                     }"
                 >
-                    {{-- @include('statamic::partials.nav-mobile') --}}
-
-                    <main id="main" class="
-                    flex bg-gray-100 dark:bg-gray-900 dark:border-t rounded-t-2xl dark:border-white/10
-                        fixed top-14 inset-x-0 bottom-0 min-h-[calc(100vh-3.5rem)]
-                    ">
+                    <main id="main" class="flex bg-gray-100 dark:bg-gray-900 dark:border-t rounded-t-2xl dark:border-white/10 fixed top-14 inset-x-0 bottom-0 min-h-[calc(100vh-3.5rem)]">
                         @include('statamic::partials.nav-main')
-                        <div class="main-content p-2 h-full flex-1 overflow-y-auto">
+                        <div id="main-content" v-cloak class="main-content p-2 h-full flex-1 overflow-y-auto">
                             <div class="relative content-card @yield('content-card-modifiers') min-h-full transition-padding duration-300">
                                 @yield('content')
                             </div>
@@ -56,17 +51,15 @@
                     @confirm="copyToClipboardModalUrl = null"
                 >
                     <div class="prose">
-                        <code-block :text="copyToClipboardModalUrl" />
+                        <ui-input :model-value="copyToClipboardModalUrl" readonly copyable class="font-mono text-sm dark" />
                     </div>
                 </confirmation-modal>
 
-                <keyboard-shortcuts-modal></keyboard-shortcuts-modal>
-
                 <portal-targets></portal-targets>
-            </div>
+            </config-provider>
+        </div>
 
-            @include('statamic::partials.scripts')
-            @yield('scripts')
-        </config-provider>
+        @include('statamic::partials.scripts')
+        @yield('scripts')
     </body>
 </html>

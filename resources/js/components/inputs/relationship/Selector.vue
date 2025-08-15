@@ -1,5 +1,5 @@
 <template>
-    <div class="dark:bg-dark-800 h-full bg-white">
+    <div class="dark:bg-dark-800 h-full bg-white rounded-s-xl">
         <div class="flex h-full min-h-0 flex-col">
             <Listing
                 v-if="filters != null && view === 'list'"
@@ -13,16 +13,16 @@
                 <template #initializing>
                     <div class="flex flex-1">
                         <div class="absolute inset-0 z-200 flex items-center justify-center text-center">
-                            <loading-graphic />
+                            <Icon name="loading" />
                         </div>
                     </div>
                 </template>
 
-                <div class="flex flex-1 flex-col gap-4 overflow-scroll p-4">
+                <div class="flex flex-1 flex-col gap-4 overflow-auto p-4">
                     <div class="flex items-center gap-3">
                         <div class="flex flex-1 items-center gap-3">
                             <Search />
-                            <Filters />
+                            <Filters v-if="filters && filters.length" />
                         </div>
 
                         <ui-toggle-group v-model="view" v-if="canUseTree">
@@ -32,7 +32,17 @@
                     </div>
 
                     <Panel class="relative mb-0! overflow-x-auto overscroll-x-contain">
-                        <Table />
+                        <Table>
+                            <template #cell-title="{ row: entry, isColumnVisible }">
+                                <a class="title-index-field" :href="entry.edit_url" @click.stop>
+                                    <StatusIndicator v-if="!isColumnVisible('status')" :status="entry.status" />
+                                    <span v-text="entry.title" />
+                                </a>
+                            </template>
+                            <template #cell-status="{ row: entry }">
+                                <StatusIndicator :status="entry.status" show-label :show-dot="false" />
+                            </template>
+                        </Table>
                         <PanelFooter>
                             <Pagination />
                         </PanelFooter>
@@ -49,7 +59,7 @@
                     </ui-toggle-group>
                 </div>
 
-                <div class="mx-4 flex-1 overflow-scroll">
+                <div class="mx-4 flex-1 overflow-auto">
                     <Panel>
                         <page-tree
                             ref="tree"
@@ -64,35 +74,31 @@
                         >
                             <template #branch-action="{ branch, index }">
                                 <div>
-                                    <input
+                                    <Checkbox
                                         :ref="`tree-branch-${branch.id}`"
-                                        type="checkbox"
-                                        class="mt-3 ltr:ml-3 rtl:mr-3"
+                                        class="mt-3 mx-3"
                                         :value="branch.id"
-                                        :checked="isSelected(branch.id)"
+                                        :model-value="isSelected(branch.id)"
                                         :disabled="reachedSelectionLimit && !singleSelect && !isSelected(branch.id)"
-                                        :id="`checkbox-${branch.id}`"
-                                        @click="toggleSelection(branch.id)"
+                                        :label="getCheckboxLabel(branch)"
+                                        :description="getCheckboxDescription(branch)"
+                                        size="sm"
+                                        solo
+                                        @update:model-value="toggleSelection(branch.id)"
                                     />
                                 </div>
                             </template>
 
                             <template #branch-icon="{ branch }">
-                                <svg-icon
-                                    v-if="isRedirectBranch(branch)"
-                                    class="dark:text-dark-175 inline-block h-4 w-4 text-gray-500"
-                                    name="light/external-link"
-                                    v-tooltip="__('Redirect')"
-                                />
+                                <ui-icon name="external-link" v-if="isRedirectBranch(branch)" v-tooltip="__('Redirect')" />
                             </template>
                         </page-tree>
                     </Panel>
                 </div>
             </template>
 
-            <div class="flex items-center justify-between border-t bg-gray-100 p-4">
-                <div
-                    class="dark:text-dark-150 text-sm text-gray-700"
+            <footer class="flex items-center justify-between border-t dark:border-dark-900 bg-gray-100 dark:bg-gray-800 p-4 rounded-es-xl">
+                <ui-badge
                     v-text="
                         hasMaxSelections
                             ? __n(':count/:max selected', selections, { max: maxSelections })
@@ -109,7 +115,7 @@
                         {{ __('Select') }}
                     </Button>
                 </div>
-            </div>
+            </footer>
         </div>
     </div>
 </template>
@@ -129,6 +135,9 @@ import {
     Panel,
     PanelFooter,
     Heading,
+    Checkbox,
+    Icon,
+    StatusIndicator,
 } from '@statamic/ui';
 
 export default {
@@ -145,6 +154,9 @@ export default {
         Panel,
         PanelFooter,
         Heading,
+        Checkbox,
+        Icon,
+        StatusIndicator,
     },
 
     // todo, when opening and closing the stack, you cant save?
@@ -270,6 +282,31 @@ export default {
             if (!this.reachedSelectionLimit) {
                 this.selections.push(id);
             }
+        },
+
+        getCheckboxLabel(row) {
+            const rowTitle = this.getRowTitle(row);
+            return this.isSelected(row.id)
+                ? __('deselect_title', { title: rowTitle })
+                : __('select_title', { title: rowTitle });
+        },
+
+        getCheckboxDescription(row) {
+            const rowTitle = this.getRowTitle(row);
+            const isDisabled = this.reachedSelectionLimit && !this.singleSelect && !this.isSelected(row.id);
+
+            if (isDisabled) {
+                return __('selection_limit_reached', { title: rowTitle });
+            }
+
+            return this.isSelected(row.id)
+                ? __('item_selected_description', { title: rowTitle })
+                : __('item_not_selected_description', { title: rowTitle });
+        },
+
+        getRowTitle(row) {
+            // Try to get a meaningful title from common fields
+            return row.title || row.name || row.label || row.id || __('item');
         },
     },
 };

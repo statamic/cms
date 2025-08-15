@@ -1,14 +1,14 @@
 <template>
     <div>
         <ui-header :title="__('Updates')" icon="updates">
-            <template #actions>
+            <template v-if="!gettingChangelog" #actions>
                 <ui-badge :prepend="__('Statamic Version')" :text="currentVersion" color="green" size="lg" />
                 <div v-if="onLatestVersion" v-text="__('Up to date')" />
             </template>
         </ui-header>
 
         <ui-card v-if="gettingChangelog" class="text-center">
-            <loading-graphic />
+            <Icon name="loading" />
         </ui-card>
 
         <div
@@ -42,23 +42,17 @@
             :package="package"
             :show-actions="showActions"
         />
-
-        <confirmation-modal v-if="modalOpen" :cancellable="false" :button-text="__('OK')" @confirm="modalOpen = false">
-            <div class="prose">
-                <p v-text="`${__('messages.updater_update_to_latest_command')}:`" />
-                <code-block copyable :text="`composer update ${package}`" />
-                <p v-html="link"></p>
-            </div>
-        </confirmation-modal>
     </div>
 </template>
 
 <script>
 import Release from './Release.vue';
+import { Icon } from '@statamic/ui';
 
 export default {
     components: {
         Release,
+        Icon,
     },
 
     props: ['slug', 'package', 'name'],
@@ -68,7 +62,6 @@ export default {
             gettingChangelog: true,
             changelog: [],
             currentVersion: null,
-            modalOpen: false,
             latestRelease: null,
             showingUnlicensedReleases: false,
         };

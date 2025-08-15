@@ -4,6 +4,8 @@ namespace Statamic\CommandPalette;
 
 class ContentSearchResult extends Link
 {
+    use Concerns\TracksRecent;
+
     protected $badge;
     protected $reference;
 
@@ -26,6 +28,7 @@ class ContentSearchResult extends Link
         return array_merge(parent::toArray(), [
             'badge' => $this->badge,
             'reference' => $this->reference,
+            'trackRecent' => $this->trackRecent,
         ]);
     }
 }

@@ -1,31 +1,18 @@
 <template>
-    <div class="flex items-center justify-between rounded-t-xl bg-gray-50 px-2 py-1 overflow-x-scroll" data-markdown-toolbar>
+    <div data-markdown-toolbar>
         <div class="flex items-center" v-if="!isReadOnly">
             <Button
-                size="sm"
-                variant="ghost"
-                class="px-2! [&_svg]:size-3.5"
-                v-for="button in buttons"
-                :key="button.name"
-                v-tooltip="button.text"
                 :aria-label="button.text"
+                :icon="button.svg"
+                :key="button.name"
                 @click="handleButtonClick(button)"
-            >
-                <svg-icon :name="button.svg" class="size-4" />
-            </Button>
-            <Button
-                v-if="showDarkMode"
                 size="sm"
+                v-for="button in buttons"
+                v-tooltip="button.text"
                 variant="ghost"
-                class="px-2! [&_svg]:size-3.5"
-                @click="$emit('toggle-dark-mode')"
-                v-tooltip="darkMode ? __('Light Mode') : __('Dark Mode')"
-                :aria-label="__('Toggle Dark Mode')"
-            >
-                <svg-icon name="dark-mode" class="size-4" />
-            </Button>
+            />
         </div>
-        <ToggleGroup v-model="mode" size="sm" class="-me-1">
+        <ToggleGroup v-model="mode" size="sm" class="-me-1" data-markdown-mode-toggle>
             <ToggleItem icon="pencil" value="write" v-tooltip="__('Writing Mode')" />
             <ToggleItem icon="eye" value="preview" v-tooltip="__('Preview Mode')" />
         </ToggleGroup>

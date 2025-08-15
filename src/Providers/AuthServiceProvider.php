@@ -35,6 +35,7 @@ class AuthServiceProvider extends ServiceProvider
         \Statamic\Contracts\Globals\GlobalSet::class => Policies\GlobalSetPolicy::class,
         \Statamic\Contracts\Globals\Variables::class => Policies\GlobalSetVariablesPolicy::class,
         \Statamic\Contracts\Auth\User::class => Policies\UserPolicy::class,
+        \Statamic\Contracts\Auth\UserGroup::class => Policies\UserGroupPolicy::class,
         \Statamic\Contracts\Forms\Form::class => Policies\FormPolicy::class,
         \Statamic\Contracts\Forms\Submission::class => Policies\FormSubmissionPolicy::class,
         \Statamic\Contracts\Assets\Asset::class => Policies\AssetPolicy::class,
@@ -42,6 +43,7 @@ class AuthServiceProvider extends ServiceProvider
         \Statamic\Contracts\Assets\AssetContainer::class => Policies\AssetContainerPolicy::class,
         \Statamic\Fields\Fieldset::class => Policies\FieldsetPolicy::class,
         \Statamic\Sites\Site::class => Policies\SitePolicy::class,
+        \Statamic\Addons\Addon::class => Policies\AddonPolicy::class,
     ];
 
     public function register()

@@ -1,6 +1,6 @@
 <script setup>
 import { computed, nextTick, ref, watch, useTemplateRef, onBeforeUnmount, onUnmounted, onBeforeMount } from 'vue';
-import Resizer from '@statamic/components/live-preview/Resizer.vue';
+import Resizer from './Resizer.vue';
 import { injectContainerContext } from '@statamic/components/ui/Publish/Container.vue';
 import debounce from '@statamic/util/debounce.js';
 import { Select, Button } from '@statamic/ui';
@@ -397,7 +397,7 @@ Statamic.$events.$on(`live-preview.${name.value}.refresh`, () => {
                             <portal-target :name="livePreviewFieldsPortal" />
                         </div>
 
-                        <resizer
+                        <Resizer
                             v-show="!poppedOut"
                             @resized="setEditorWidth"
                             @resize-start="editorResizing = true"

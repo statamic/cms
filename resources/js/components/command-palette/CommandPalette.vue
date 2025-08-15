@@ -1,19 +1,22 @@
 <script setup>
 import { ref, computed, watch } from 'vue';
 import CommandPaletteItem from './Item.vue';
+import CommandPaletteLoadingItem from './LoadingItem.vue';
 import axios from 'axios';
 import debounce from '@statamic/util/debounce';
 import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, DialogTrigger, DialogDescription, VisuallyHidden } from 'reka-ui';
 import { ComboboxContent, ComboboxEmpty, ComboboxGroup, ComboboxLabel, ComboboxInput, ComboboxItem, ComboboxRoot, ComboboxViewport } from 'reka-ui';
 import fuzzysort from 'fuzzysort';
-import { each, groupBy, sortBy, find } from 'lodash-es';
+import { each, groupBy, orderBy, find, uniq } from 'lodash-es';
 import { motion } from 'motion-v';
 import { cva } from 'cva';
 import { Icon, Subheading } from '@statamic/ui';
 
 let open = ref(false);
 let query = ref('');
-let items = ref([]);
+let serverPreloadedItems = Statamic.$config.get('commandPalettePreloadedItems');
+let serverItemsLoaded = ref(false);
+let serverItems = ref(setServerLoadingItems());
 let searchResults = ref([]);
 let selected = ref(null);
 let recentItems = ref(getRecentItems());
@@ -36,37 +39,82 @@ each({
     });
 });
 
+const actionItems = computed(() => {
+    return sortJsInjectedItems(Statamic.$commandPalette.actions().filter(item => item.when()));
+});
+
+const miscItems = computed(() => {
+    return sortJsInjectedItems(Statamic.$commandPalette.misc().filter(item => item.when()));
+});
+
 const aggregatedItems = computed(() => [
+    ...(actionItems.value || []),
     ...(recentItems.value || []),
-    ...(items.value || []),
+    ...(serverPreloadedItems || []),
+    ...(serverItems.value || []),
+    ...(miscItems.value || []),
     ...(searchResults.value || []),
 ]);
 
 const results = computed(() => {
+    let items = aggregatedItems.value.map(item => normalizeItem(item));
+
     let filtered = fuzzysort
-        .go(query.value, aggregatedItems.value, {
+        .go(query.value, items, {
             all: true,
-            key: 'text',
+            keys: ['text'],
+            scoreFn: fuzzysortScoringAlgorithm,
         })
         .map(result => {
             return {
                 score: result._score,
-                html: result.highlight('<span class="text-blue-600 dark:text-blue-400">', '</span>'),
+                html: result[0].highlight('<span class="text-blue-600 dark:text-blue-400 underline underline-offset-4 decoration-blue-200 dark:decoration-blue-600/45">', '</span>'),
                 ...result.obj,
             };
         });
 
-    let groups = groupBy(filtered, 'category');
+    let serverCategories = Statamic.$config.get('commandPaletteCategories');
 
-    return Statamic.$config.get('commandPaletteCategories')
+    let categoryOrder = query.value
+        ? uniq(filtered.map(item => item.category))
+        : serverCategories;
+
+    let grouped = groupBy(filtered, 'category');
+
+    return categoryOrder
+        .filter(category => serverCategories.includes(category))
         .map(category => {
             return {
                 text: __(category),
-                items: groups[category],
+                items: grouped[category],
             };
         })
         .filter(category => category.items);
 });
+
+function fuzzysortScoringAlgorithm(result) {
+    let multiplier = 1;
+
+    switch (result.obj.category) {
+        case 'Recent':
+            multiplier += 0.6;
+            break;
+        case 'Navigation':
+        case 'Fields':
+            multiplier += 0.5;
+            break;
+    }
+
+    return result.score * multiplier;
+}
+
+function normalizeItem(item) {
+    if (Array.isArray(item.text)) {
+        item.text = item.text.join(' » ');
+    }
+
+    return item;
+}
 
 watch(selected, (item) => {
     if (!item) return;
@@ -80,17 +128,25 @@ watch(query, debounce(() => {
 
 watch(open, (isOpen) => {
     if (isOpen) {
-        getItems();
+        getServerItems();
         return;
     }
     reset();
 });
 
-function getItems() {
-    if (items.value.length) return;
+function setServerLoadingItems() {
+    return [
+        { category: 'Navigation', loading: true },
+        { category: 'Fields', loading: true },
+    ];
+}
+
+function getServerItems() {
+    if (serverItemsLoaded.value) return;
 
     axios.get('/cp/command-palette').then((response) => {
-        items.value = response.data;
+        serverItemsLoaded.value = true;
+        serverItems.value = response.data;
     });
 }
 
@@ -103,24 +159,25 @@ function searchContent() {
 function select(selected) {
     let item = findSelectedItem(selected);
 
-    switch (item.type) {
-        case 'link':
-        case 'content_search_result':
-            addToRecentItems(item);
+    if (item.trackRecent) {
+        addToRecentItems(item);
     }
 
     if (item.href) {
         return;
     }
 
-    switch (item.type) {
-        case 'action':
-        // TODO: Handle non <a> items
+    if (item.action) {
+        item.action();
     }
 }
 
 function findSelectedItem(selected) {
     return find(aggregatedItems.value, (result) => result.text === selected);
+}
+
+function sortJsInjectedItems(items) {
+    return orderBy(items, ['prioritize', 'text'], ['desc', 'asc']);
 }
 
 function getRecentItems() {
@@ -134,6 +191,18 @@ function addToRecentItems(item) {
 
     const filtered = getRecentItems().filter(recentItem => recentItem.text !== item.text);
     const updated = [item, ...filtered].slice(0, 5);
+
+    localStorage.setItem('statamic.command-palette.recent', JSON.stringify(updated));
+
+    recentItems.value = updated;
+}
+
+function isRecentItem(item) {
+    return item.category === 'Recent';
+}
+
+function removeRecentItem(url) {
+    const updated = recentItems.value.filter(recentItem => recentItem.url !== url);
 
     localStorage.setItem('statamic.command-palette.recent', JSON.stringify(updated));
 
@@ -169,14 +238,10 @@ const modalClasses = cva({
 <template>
     <DialogRoot v-model:open="open" :modal="true">
         <DialogTrigger>
-            <div
-                class="data-[focus-visible]:outline-focus hover flex cursor-text items-center gap-x-2 rounded-md [button:has(>&)]:rounded-md bg-gray-900 text-xs text-gray-400 shadow-[0_-1px_rgba(255,255,255,0.06),0_4px_8px_rgba(0,0,0,0.05),0_1px_6px_-4px_#000] ring-1 ring-gray-900/10 outline-none hover:ring-white/10 md:w-32 md:py-[calc(5/16*1rem)] md:ps-2 md:pe-1.5 md:shadow-[0_1px_5px_-4px_rgba(19,19,22,0.4),0_2px_5px_rgba(32,42,54,0.06)]"
-            >
+            <div class="data-[focus-visible]:outline-focus hover flex cursor-text items-center gap-x-2 rounded-md [button:has(>&)]:rounded-md bg-gray-900 text-xs text-gray-400 shadow-[0_-1px_rgba(255,255,255,0.06),0_4px_8px_rgba(0,0,0,0.05),0_1px_6px_-4px_#000] ring-1 ring-gray-900/10 outline-none hover:ring-white/10 md:w-32 md:py-[calc(5/16*1rem)] md:ps-2 md:pe-1.5 md:shadow-[0_1px_5px_-4px_rgba(19,19,22,0.4),0_2px_5px_rgba(32,42,54,0.06)]">
                 <Icon name="magnifying-glass" class="size-5 flex-none text-gray-600" />
-                <span class="sr-only leading-none md:not-sr-only trim-cap-alphabetic">Search</span>
-                <kbd
-                    class="ml-auto hidden self-center rounded bg-white/5 px-[0.3125rem] py-[0.0625rem] text-[0.625rem]/4 font-medium text-gray-400 ring-1 ring-white/7.5 [word-spacing:-0.15em] ring-inset md:block"
-                >
+                <span class="sr-only leading-none md:not-sr-only st-text-trim-cap">Search</span>
+                <kbd class="ml-auto hidden self-center rounded bg-white/5 px-[0.3125rem] py-[0.0625rem] text-[0.625rem]/4 font-medium text-gray-400 ring-1 ring-white/7.5 [word-spacing:-0.15em] ring-inset md:block">
                     <kbd class="font-sans">⌘ </kbd><kbd class="font-sans">K</kbd>
                 </kbd>
             </div>
@@ -225,6 +290,7 @@ const modalClasses = cva({
                                 >
                                     <ComboboxLabel :as-child="true">
                                         <Subheading
+                                            v-if="category.text != 'Actions'"
                                             size="sm"
                                             class="border-0 px-3 py-1"
                                             v-text="category.text"
@@ -236,11 +302,17 @@ const modalClasses = cva({
                                         :value="item.text"
                                         :text-value="item.text"
                                         :as-child="true"
+                                        :disabled="item.loading"
                                     >
+                                        <CommandPaletteLoadingItem class="rounded-lg px-2 py-1.5 w-full opacity-20" v-if="item.loading" />
                                         <CommandPaletteItem
+                                            v-else
                                             :icon="item.icon"
                                             :href="item.url"
+                                            :open-new-tab="item.openNewTab"
                                             :badge="item.keys || item.badge"
+                                            :removable="isRecentItem(item)"
+                                            @remove="removeRecentItem"
                                         >
                                             <div v-html="item.html" />
                                         </CommandPaletteItem>

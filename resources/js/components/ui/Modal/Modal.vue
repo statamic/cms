@@ -28,7 +28,7 @@ const modalClasses = cva({
 })({});
 
 const instance = getCurrentInstance();
-const isUsingOpenProp = instance && 'open' in instance.vnode.props;
+const isUsingOpenProp = instance && instance.vnode.props?.length > 0 && 'open' in instance.vnode.props;
 
 const open = ref(props.open);
 
@@ -39,7 +39,7 @@ watch(
 
 // When the parent component controls the open state, emit an update event
 // so it can update its state, which eventually gets passed down as a prop.
-// Otherwise, just update the local state.
+// Otherwise, update the local state.
 function updateOpen(value) {
     if (isUsingOpenProp) {
         emit('update:open', value);
@@ -51,18 +51,14 @@ function updateOpen(value) {
 </script>
 
 <template>
-    <DialogRoot :open @update:open="updateOpen">
+    <DialogRoot :open="open" @update:open="updateOpen">
         <DialogTrigger data-ui-modal-trigger as-child>
             <slot name="trigger" />
         </DialogTrigger>
         <DialogPortal>
-            <DialogOverlay
-                class="data-[state=open]:show fixed inset-0 z-30 bg-gray-800/20 backdrop-blur-[2px] dark:bg-gray-800/50"
-            />
+            <DialogOverlay class="data-[state=open]:show fixed inset-0 z-30 bg-gray-800/20 backdrop-blur-[2px] dark:bg-gray-800/50" />
             <DialogContent :class="[modalClasses, $attrs.class]" data-ui-modal-content :aria-describedby="undefined">
-                <div
-                    class="relative space-y-3 rounded-xl border border-gray-400/60 bg-white p-4 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:border-none dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/15"
-                >
+                <div class="relative space-y-3 rounded-xl border border-gray-400/60 bg-white p-4 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:border-none dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/15" >
                     <DialogTitle v-if="!hasModalTitleComponent" data-ui-modal-title class="font-medium">
                         {{ title }}
                     </DialogTitle>

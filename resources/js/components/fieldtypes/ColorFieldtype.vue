@@ -8,7 +8,7 @@
                         <div
                             class="size-8 rounded-full"
                             :class="{ 'cursor-not-allowed': isReadOnly }"
-                            :style="{ 'background-color': value }"
+                            :style="{ 'background-color': customColor || value }"
                         />
                     </button>
                 </template>

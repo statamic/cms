@@ -1,6 +1,6 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
-import { Modal, ModalClose, Button } from '@statamic/ui';
+import { Modal, ModalClose, Button, Icon } from '@statamic/ui';
 
 const emit = defineEmits(['opened', 'confirm', 'cancel']);
 
@@ -64,7 +64,7 @@ function submit() {
             v-if="busy"
             class="pointer-events-none absolute inset-0 flex select-none items-center justify-center bg-white bg-opacity-75 dark:bg-dark-700"
         >
-            <loading-graphic text="" />
+            <Icon name="loading" />
         </div>
 
         <p v-if="bodyText" v-text="bodyText" />

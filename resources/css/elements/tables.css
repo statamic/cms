@@ -2,14 +2,6 @@
    TABLES
    ========================================================================== */
 
-.data-list-search-input {
-    @apply bg-white;
-
-    &:focus {
-        @apply focus-outline;
-    }
-}
-
 .data-table {
     @apply w-full max-w-full outline-hidden text-gray-500 antialiased border-separate border-spacing-y-0 min-w-full overflow-x-auto text-start;
 
@@ -23,7 +15,7 @@
             @apply px-4 py-2;
 
             .contained & {
-                @apply py-2.5 border-b;
+                @apply py-2.5 border-b dark:border-gray-700;
             }
         }
 
@@ -85,10 +77,6 @@
                 @apply pl-4.5 pr-2.5 py-3 border-t border-gray-200 dark:border-white/10;
                 @apply text-gray-900 dark:text-gray-200;
             }
-
-            td.table-drag-handle {
-                @apply h-full w-1 px-0 py-2 border-e;
-            }
         }
 
         .type-column {
@@ -129,7 +117,6 @@
 }
 
 /* Row Selection */
-
 .data-table[data-has-selections] {
     tbody tr[data-row="unselected"] td {
         @apply text-gray-500! dark:text-gray-400!;
@@ -137,19 +124,9 @@
 }
 
 .table-drag-handle {
-    @apply h-full w-3 p-2 dark:border-dark-900 border-e;
-    min-width: 16px;
-    cursor: grab;
-    background: var(--color-gray-200) url('../../svg/icons/light/drag-dots.svg') center center no-repeat;
+    @apply h-full cursor-grab hover:bg-gray-100 dark:hover:bg-gray-700;
+    background: url('../../svg/ui/drag-dots.svg') center center no-repeat;
     background-size: 7px 17px;
-
-    .dark & {
-        background-color: var(--color-dark-700);
-    }
-
-    &:hover {
-        @apply bg-gray-300 dark:bg-gray-700;
-    }
 }
 
 .column-sortable {
@@ -165,49 +142,3 @@
     @apply text-end w-12;
 }
 
-
-/* Index Fields
-  ========================================================================== */
-
-.bard-index-field,
-.code-index-field,
-.markdown-index-field,
-.textarea-index-field {
-    @apply line-clamp-2 text-xs;
-}
-
-.title-index-field {
-    @apply text-sm font-medium line-clamp-2 flex items-center gap-2 hover:text-black dark:hover:text-white;
-    min-width: 15vw;
-    max-width: 30vw;
-}
-
-.date-index-field {
-    @apply whitespace-nowrap;
-}
-
-.slug-index-field {
-    @apply line-clamp-2 font-mono text-xs;
-}
-
-.status-index-field {
-    @apply inline-block shrink justify-center rounded-full bg-gray-200/60 px-2 py-0.5 text-center text-xs text-gray-900 dark:bg-gray-300/8 dark:text-dark-150;
-
-    &.status-published:not(.status-private) {
-        @apply bg-green-200 text-green-900 dark:bg-green-300/6 dark:text-green-300;
-    }
-
-    &.status-scheduled {
-        @apply bg-amber-200 text-amber-900 dark:bg-amber-300 dark:text-amber-950;
-    }
-}
-
-.role-index-field,
-.groups-index-field {
-    @apply -mb-1.5 flex flex-wrap;
-
-    .role-index-field-item,
-    .groups-index-field-item {
-        @apply mb-1 line-clamp-1 inline-block rounded-sm border bg-gray-100 px-1 text-2xs dark:border-dark-900 dark:bg-gray-700;
-    }
-}

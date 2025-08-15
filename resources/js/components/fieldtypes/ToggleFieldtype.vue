@@ -1,13 +1,16 @@
 <template>
-    <div class="flex items-center gap-2">
-        <Switch
-            @update:model-value="update"
-            :disabled="config.disabled"
-            :id="fieldId"
-            :model-value="value"
-            :read-only="isReadOnly"
-        />
-        <Heading v-if="inlineLabel" v-html="$markdown(__(inlineLabel), { openLinksInNewTabs: true })" />
+    <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2">
+            <Switch
+                @update:model-value="update"
+                :disabled="config.disabled"
+                :id="fieldId"
+                :model-value="value"
+                :read-only="isReadOnly"
+            />
+            <Heading v-if="inlineLabel" v-html="$markdown(__(inlineLabel), { openLinksInNewTabs: true })" />
+        </div>
+        <div v-if="config.html" v-html="config.html" class="mt-2" />
     </div>
 </template>
 

@@ -16,7 +16,7 @@
             @blur="$emit('blur')"
         />
 
-        <loading-graphic v-if="initializing" :inline="true" />
+        <Icon v-if="initializing" name="loading" />
 
         <template v-if="shouldShowSelectedItems">
             <div
@@ -104,7 +104,7 @@ import ItemSelector from './Selector.vue';
 import CreateButton from './CreateButton.vue';
 import { Sortable, Plugins } from '@shopify/draggable';
 import RelationshipSelectField from './SelectField.vue';
-import { Button } from '@statamic/ui';
+import { Button, Icon } from '@statamic/ui';
 
 export default {
     props: {
@@ -160,6 +160,7 @@ export default {
         CreateButton,
         RelationshipSelectField,
         Button,
+        Icon,
     },
 
     data() {
@@ -305,8 +306,8 @@ export default {
         },
 
         initializeData() {
-            if (!this.data) {
-                return this.getDataForSelections(this.selections);
+            if (!this.data || !this.data.length) {
+                return this.getDataForSelections(this.value);
             }
 
             this.loading = false;

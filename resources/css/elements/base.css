@@ -14,7 +14,6 @@
         --focus-shadow-color: var(--color-blue-500);
     }
 
-    /* =Jay. @Jack I figured to stick these in variables since we use them in class names in Bard. I thought technically layout variables maybe shouldn't be theme/should be persistent, so I put them here instead. */
     --z-index-below: -1;
     --z-index-base: 1;
     --z-index-above: 2;
@@ -49,7 +48,7 @@
     }
 
     ::placeholder {
-        @apply text-gray-400;
+        @apply text-gray-500;
     }
 
     [type="checkbox"] {
@@ -69,8 +68,8 @@
         }
     }
 
-    /* Based on the global site picker */
-    [data-ui-combobox-anchor] {
+    /* Based on the global site picker. Only for buttons (i.e. don't affect select dropdowns on publish forms) */
+    [data-ui-combobox-anchor]:has(button):not(.main-content *) {
         /* Decrease */
         --focus-outline-offset: var(--outline-offset-button);
         /* Target the button inside the combobox */

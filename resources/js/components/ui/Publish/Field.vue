@@ -1,5 +1,5 @@
 <script setup>
-import { computed, useTemplateRef, watch } from 'vue';
+import { computed, useTemplateRef, watch, ref } from 'vue';
 import { injectContainerContext } from './Container.vue';
 import { injectFieldsContext } from './FieldsProvider.vue';
 import { Field, Icon, Tooltip, Label } from '@statamic/ui';
@@ -51,7 +51,14 @@ const meta = computed(() => {
     const key = [metaPathPrefix.value, handle].filter(Boolean).join('.');
     return data_get(containerMeta.value, key);
 });
-const errors = computed(() => containerErrors.value[fullPath.value]);
+
+const errors = ref();
+watch(
+    () => containerErrors.value,
+    (newErrors) => errors.value = newErrors[fullPath.value] || [],
+    { immediate: true },
+);
+
 const fieldId = computed(() => `field_${fullPath.value.replaceAll('.', '_')}`);
 const namePrefix = '';
 const isRequired = computed(() => props.config.required);
@@ -156,56 +163,71 @@ function sync() {
 function desync() {
     desyncField(fullPath.value);
 }
+
+const fieldtypeComponentProps = computed(() => ({
+    id: fieldId.value,
+    config: props.config,
+    value: value.value,
+    meta: meta.value,
+    handle: handle,
+    namePrefix: namePrefix,
+    fieldPathPrefix: fieldPathPrefix.value,
+    metaPathPrefix: metaPathPrefix.value,
+    readOnly: isReadOnly.value,
+    showFieldPreviews: true
+}));
+
+const fieldtypeComponentEvents = computed(() => ({
+    'update:value': valueUpdated,
+    'update:meta': metaUpdated,
+    focus: focused,
+    blur: blurred,
+    replicatorPreviewUpdated: replicatorPreviewUpdated
+}));
 </script>
 
 <template>
-    <Field
-        v-show="shouldShowField"
-        :class="`${config.type}-fieldtype`"
-        :id="fieldId"
-        :instructions="config.instructions"
-        :instructions-below="config.instructions_position === 'below'"
-        :required="isRequired"
-        :errors="errors"
-        :read-only="isReadOnly"
-        :as="wrapperComponent"
+    <slot
+        :fieldtypeComponent="fieldtypeComponent"
+        :fieldtypeComponentProps="fieldtypeComponentProps"
+        :fieldtypeComponentEvents="fieldtypeComponentEvents"
     >
-        <template #label v-if="shouldShowLabel">
-            <Label :for="fieldId" :required="isRequired">
-                <template v-if="shouldShowLabelText">
-                    <Tooltip :text="config.handle" :delay="1000">
-                        {{ __(config.display) }}
-                    </Tooltip>
-                </template>
-                <ui-button size="xs" inset icon="synced" variant="ghost" v-tooltip="__('messages.field_synced_with_origin')" v-if="!isReadOnly && isSyncable" v-show="isSynced" @click="desync" />
-                <ui-button size="xs" inset icon="unsynced" variant="ghost" v-tooltip="__('messages.field_desynced_from_origin')" v-if="!isReadOnly && isSyncable" v-show="!isSynced" @click="sync" />
-            </Label>
-        </template>
-        <template #actions v-if="shouldShowFieldActions">
-            <FieldActions :actions="fieldActions" />
-        </template>
-        <div class="text-xs text-red-500" v-if="!fieldtypeComponentExists">
-            Component <code v-text="fieldtypeComponent"></code> does not exist.
-        </div>
-        <Component
-            v-else
-            ref="fieldtype"
-            :is="fieldtypeComponent"
+        <Field
+            v-show="shouldShowField"
+            :class="`${config.type}-fieldtype`"
             :id="fieldId"
-            :config="config"
-            :value="value"
-            :meta="meta"
-            :handle="handle"
-            :name-prefix="namePrefix"
-            :field-path-prefix="fieldPathPrefix"
-            :meta-path-prefix="metaPathPrefix"
+            :instructions="config.instructions"
+            :instructions-below="config.instructions_position === 'below'"
+            :required="isRequired"
+            :errors="errors"
             :read-only="isReadOnly"
-            show-field-previews
-            @update:value="valueUpdated"
-            @update:meta="metaUpdated"
-            @focus="focused"
-            @blur="blurred"
-            @replicator-preview-updated="replicatorPreviewUpdated"
-        />
-    </Field>
+            :as="wrapperComponent"
+            :variant="config.variant"
+            v-bind="$attrs"
+        >
+            <template #label v-if="shouldShowLabel">
+                <Label :for="fieldId" :required="isRequired">
+                    <template v-if="shouldShowLabelText">
+                        <Tooltip :text="config.handle" :delay="1000">
+                            {{ __(config.display) }}
+                        </Tooltip>
+                    </template>
+                    <ui-button size="xs" inset icon="synced" variant="ghost" v-tooltip="__('messages.field_synced_with_origin')" v-if="!isReadOnly && isSyncable" v-show="isSynced" @click="desync" />
+                    <ui-button size="xs" inset icon="unsynced" variant="ghost" v-tooltip="__('messages.field_desynced_from_origin')" v-if="!isReadOnly && isSyncable" v-show="!isSynced" @click="sync" />
+                </Label>
+            </template>
+            <template #actions v-if="shouldShowFieldActions">
+                <FieldActions :actions="fieldActions" />
+            </template>
+            <div class="text-xs text-red-500" v-if="!fieldtypeComponentExists">
+                Component <code v-text="fieldtypeComponent"></code> does not exist.
+            </div>
+            <Component
+                ref="fieldtype"
+                :is="fieldtypeComponent"
+                v-bind="fieldtypeComponentProps"
+                v-on="fieldtypeComponentEvents"
+            />
+        </Field>
+    </slot>
 </template>

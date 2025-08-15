@@ -40,14 +40,14 @@ class Date extends Fieldtype
                             // 'multiple' => __('Multiple'), // @TODO hook up
                             'range' => __('Range'),
                         ],
-                        'width' => 25,
+                        'width' => 50,
                     ],
                     'inline' => [
                         'display' => __('Inline'),
                         'instructions' => __('statamic::fieldtypes.date.config.inline'),
                         'type' => 'toggle',
                         'default' => false,
-                        'width' => 25,
+                        'width' => 50,
                     ],
                     'full_width' => [
                         'display' => __('Full Width'),
@@ -57,26 +57,22 @@ class Date extends Fieldtype
                         'if' => [
                             'inline' => true,
                         ],
-                        'width' => 25,
+                        'width' => 50,
                     ],
-                    'columns' => [
-                        'display' => __('Columns'),
-                        'instructions' => __('statamic::fieldtypes.date.config.columns'),
+                    'number_of_months' => [
+                        'display' => __('Number of Months'),
+                        'instructions' => __('statamic::fieldtypes.date.config.number_of_months'),
                         'type' => 'integer',
+                        'if' => [
+                            'inline' => true,
+                        ],
                         'default' => 1,
-                        'width' => 25,
-                    ],
-                    'rows' => [
-                        'display' => __('Rows'),
-                        'instructions' => __('statamic::fieldtypes.date.config.rows'),
-                        'type' => 'integer',
-                        'default' => 1,
-                        'width' => 25,
+                        'width' => 50,
                     ],
                 ],
             ],
             [
-                'display' => __('Timepicker'),
+                'display' => __('Date & Time'),
                 'fields' => [
                     'time_enabled' => [
                         'display' => __('Time Enabled'),
@@ -95,7 +91,7 @@ class Date extends Fieldtype
                 ],
             ],
             [
-                'display' => __('Boundaries'),
+                'display' => __('Boundaries & Limits'),
                 'fields' => [
                     'earliest_date' => [
                         'display' => __('Earliest Date'),
@@ -112,7 +108,7 @@ class Date extends Fieldtype
                 ],
             ],
             [
-                'display' => __('Data Format'),
+                'display' => __('Data & Format'),
                 'fields' => [
                     'format' => [
                         'display' => __('Format'),

@@ -1,5 +1,5 @@
 <template>
-    <Listing :items="items" :columns="initialColumns" :action-url="actionUrl">
+    <Listing :items="items" :columns="initialColumns" :action-url="actionUrl" @refreshing="refresh">
         <template #cell-title="{ row: form }">
             <a :href="form.show_url">{{ form.title }}</a>
         </template>
@@ -25,5 +25,11 @@ export default {
     },
 
     props: ['items', 'initialColumns', 'actionUrl'],
+
+    methods: {
+        refresh() {
+            window.location.reload();
+        },
+    },
 };
 </script>

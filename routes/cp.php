@@ -2,9 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use Statamic\Facades\Utility;
-use Statamic\Http\Controllers\CP\AddonEditionsController;
-use Statamic\Http\Controllers\CP\AddonsController;
-use Statamic\Http\Controllers\CP\API\AddonsController as AddonsApiController;
+use Statamic\Http\Controllers\CP\Addons\AddonsController;
+use Statamic\Http\Controllers\CP\Addons\AddonSettingsController;
 use Statamic\Http\Controllers\CP\API\TemplatesController;
 use Statamic\Http\Controllers\CP\Assets\ActionController as AssetActionController;
 use Statamic\Http\Controllers\CP\Assets\AssetContainerBlueprintController;
@@ -47,6 +46,7 @@ use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\DashboardController;
 use Statamic\Http\Controllers\CP\DuplicatesController;
 use Statamic\Http\Controllers\CP\FieldActionModalController;
+use Statamic\Http\Controllers\CP\Fields\AdditionalBlueprintController;
 use Statamic\Http\Controllers\CP\Fields\BlueprintController;
 use Statamic\Http\Controllers\CP\Fields\FieldsController;
 use Statamic\Http\Controllers\CP\Fields\FieldsetController;
@@ -306,9 +306,9 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
             Route::get('user-groups/edit', [UserGroupBlueprintController::class, 'edit'])->name('user-groups.edit');
             Route::patch('user-groups', [UserGroupBlueprintController::class, 'update'])->name('user-groups.update');
 
-            Route::get('{namespace}/{handle}/edit', [BlueprintController::class, 'edit'])->name('edit');
-            Route::patch('{namespace}/{handle}', [BlueprintController::class, 'update'])->name('update');
-            Route::delete('{namespace}/{handle}/reset', [BlueprintController::class, 'reset'])->name('reset');
+            Route::get('{namespace}/{handle}/edit', [AdditionalBlueprintController::class, 'edit'])->name('additional.edit');
+            Route::patch('{namespace}/{handle}', [AdditionalBlueprintController::class, 'update'])->name('additional.update');
+            Route::delete('{namespace}/{handle}/reset', [AdditionalBlueprintController::class, 'reset'])->name('additional.reset');
         });
     });
 
@@ -323,7 +323,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     });
 
     Route::get('addons', [AddonsController::class, 'index'])->name('addons.index');
-    Route::post('addons/editions', AddonEditionsController::class);
+    Route::get('addons/{addon}/settings', [AddonSettingsController::class, 'edit'])->name('addons.settings.edit');
+    Route::patch('addons/{addon}/settings', [AddonSettingsController::class, 'update'])->name('addons.settings.update');
 
     Route::post('forms/actions', [FormActionController::class, 'run'])->name('forms.actions.run');
     Route::post('forms/actions/list', [FormActionController::class, 'bulkActions'])->name('forms.actions.bulk');
@@ -378,7 +379,6 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     });
 
     Route::group(['prefix' => 'api', 'as' => 'api.'], function () {
-        Route::resource('addons', AddonsApiController::class)->only('index');
         Route::resource('templates', TemplatesController::class)->only('index');
     });
 

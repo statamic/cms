@@ -4,15 +4,15 @@
             <header
                 class="mb-4 flex items-center justify-between border-b bg-white py-2 text-lg font-medium shadow-md dark:border-dark-950 dark:bg-dark-550 ltr:pl-6 ltr:pr-3 rtl:pl-3 rtl:pr-6"
             >
-                {{ headerText }}
-                <button type="button" class="btn-close" @click="confirmClose(close)" v-html="'&times'" />
+                <Heading size="lg">{{ headerText }}</Heading>
+                <Button icon="x" variant="ghost" @click="close" />
             </header>
 
             <div v-if="loading" class="relative flex-1 overflow-auto">
                 <div
                     class="absolute inset-0 z-10 flex items-center justify-center bg-white bg-opacity-75 text-center dark:bg-dark-700"
                 >
-                    <loading-graphic />
+                    <Icon name="loading" />
                 </div>
             </div>
 
@@ -21,7 +21,7 @@
                     v-if="saving"
                     class="absolute inset-0 z-10 flex items-center justify-center bg-white bg-opacity-75 dark:bg-dark-500"
                 >
-                    <loading-graphic text="" />
+                    <Icon name="loading" />
                 </div>
 
                 <PublishContainer
@@ -44,18 +44,11 @@
                 class="flex flex-row-reverse items-center justify-between border-t bg-gray-200 p-4 dark:border-dark-900 dark:bg-dark-500"
             >
                 <div v-if="!readOnly">
-                    <button @click="confirmClose(close)" class="btn ltr:mr-2 rtl:ml-2">{{ __('Cancel') }}</button>
-                    <button @click="submit" class="btn-primary">{{ __('Submit') }}</button>
+                    <Button variant="ghost" class="me-2" :text="__('Cancel')" @click="confirmClose(close)" />
+                    <Button variant="primary" :text="__('Submit')" @click="submit" />
                 </div>
                 <div v-if="type === 'entry'">
-                    <a
-                        :href="editEntryUrl"
-                        target="_blank"
-                        class="flex items-center justify-center text-xs text-blue-600 underline hover:text-blue-600 ltr:mr-4 rtl:ml-4"
-                    >
-                        <svg-icon name="light/external-link" class="h-4 w-4 ltr:mr-2 rtl:ml-2" />
-                        {{ __('Edit Entry') }}
-                    </a>
+                    <Button icon="external-link" variant="ghost" :text="__('Edit Entry')" :href="editEntryUrl" target="_blank" />
                 </div>
             </div>
         </div>
@@ -73,7 +66,7 @@
 </template>
 
 <script>
-import { PublishContainer } from '@statamic/ui';
+import { Heading, Button, PublishContainer, Icon } from '@statamic/ui';
 import { SavePipeline } from 'statamic';
 import { flatten } from 'lodash-es';
 import { computed, ref } from 'vue';
@@ -87,7 +80,10 @@ export default {
     emits: ['closed', 'submitted', 'publish-info-updated', 'localized-fields-updated'],
 
     components: {
+        Heading,
+        Button,
         PublishContainer,
+        Icon,
     },
 
     props: {

@@ -171,7 +171,7 @@ return [
     'taggable.config.placeholder' => 'Yazın ve ↩ Enter tuşuna basın',
     'taggable.title' => 'Etiketlenebilir',
     'taxonomies.title' => 'Taksonomiler',
-    'template.config.blueprint' => 'Bir "plana eşle" seçeneği ekler. [Belgelerde](https://statamic.dev/views#inferring-templates-from-entry-blueprints) daha fazla bilgi edinin.',
+    'template.config.blueprint' => 'Bir "plana eşle" seçeneği ekler. [Belgelerde](https://statamic.dev/views#map-templates-to-entry-blueprints) daha fazla bilgi edinin.',
     'template.config.folder' => 'Yalnızca bu klasördeki şablonları göster.',
     'template.config.hide_partials' => 'Kısmi bölümlerin nadiren şablon olarak kullanılması amaçlanmıştır.',
     'template.title' => 'Şablon',
