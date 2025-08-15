@@ -12,10 +12,13 @@ use Statamic\Support\Arr;
 class Palette
 {
     protected $items;
+    protected $preloadedItems;
+    protected $isBuilding = false;
 
     public function __construct()
     {
         $this->items = collect();
+        $this->preloadedItems = collect();
     }
 
     public function add(
@@ -43,26 +46,34 @@ class Palette
         return $this->addCommand($link);
     }
 
-    public function addCommand(Command $command): self
+    protected function addCommand(Command $command): self
     {
-        $this->items->push(
-            $this->validateCommandArray($command->toArray()),
-        );
+        $commandArray = $this->validateCommandArray($command->toArray());
+
+        $this->isBuilding || ! app()->isBooted()
+            ? $this->items->push($commandArray)
+            : $this->preloadedItems->push($commandArray);
 
         return $this;
     }
 
     public function build(): Collection
     {
+        $this->isBuilding = true;
+
         // TODO: We need to bust this cache when content or nav changes
         // TODO: Cache per user
-        // return Cache::rememberForever('statamic-command-palette', function () {
-        return $this
+        // $built = Cache::rememberForever('statamic-command-palette', function () {
+        $built = $this
             ->buildNav()
             ->buildFields()
             ->buildMiscellaneous()
             ->get();
         // });
+
+        $this->isBuilding = false;
+
+        return $built;
     }
 
     protected function buildNav(): self
@@ -144,6 +155,11 @@ class Palette
         throw_unless(is_string($text) || is_array($text), new \Exception('Must output command [text] string!'));
 
         return $command;
+    }
+
+    public function getPreloadedItems(): Collection
+    {
+        return $this->preloadedItems;
     }
 
     public function get(): Collection

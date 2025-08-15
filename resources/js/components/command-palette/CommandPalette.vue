@@ -14,6 +14,7 @@ import { Icon, Subheading } from '@statamic/ui';
 
 let open = ref(false);
 let query = ref('');
+let serverPreloadedItems = Statamic.$config.get('commandPalettePreloadedItems');
 let serverItemsLoaded = ref(false);
 let serverItems = ref(setServerLoadingItems());
 let searchResults = ref([]);
@@ -49,6 +50,7 @@ const miscItems = computed(() => {
 const aggregatedItems = computed(() => [
     ...(actionItems.value || []),
     ...(recentItems.value || []),
+    ...(serverPreloadedItems || []),
     ...(serverItems.value || []),
     ...(miscItems.value || []),
     ...(searchResults.value || []),
