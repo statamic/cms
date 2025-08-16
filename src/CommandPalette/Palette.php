@@ -147,7 +147,7 @@ class Palette
         return $this;
     }
 
-    public function validateCommandArray(array $command): array
+    protected function validateCommandArray(array $command): array
     {
         throw_unless(is_string(Arr::get($command, 'category')), new \Exception('Must output command [category] string!'));
 
