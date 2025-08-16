@@ -26,7 +26,6 @@ const hasVisibleHeader = computed(() => {
                 v-if="allowsSelections || reorderable"
                 :class="{ 'checkbox-column': !reorderable, 'handle-column': reorderable }"
                 scope="col"
-                :aria-label="reorderable ? __('Reorder') : __('Select')"
             >
                 <ToggleAll v-if="allowsSelections && allowsMultipleSelections" />
             </th>
@@ -35,7 +34,7 @@ const hasVisibleHeader = computed(() => {
                 <template v-if="type === 'entries'">{{ __('Collection') }}</template>
                 <template v-if="type === 'terms'">{{ __('Taxonomy') }}</template>
             </th> -->
-            <th scope="col" class="actions-column" v-if="hasActions" :aria-label="__('Actions')" />
+            <th scope="col" class="actions-column" v-if="hasActions" />
         </tr>
     </thead>
 

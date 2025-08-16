@@ -21,7 +21,6 @@ const isCurrentSortColumn = computed(() => props.column.field === sortColumn.val
             v-else
             :text="__(column.label)"
             :icon-append="isCurrentSortColumn ? 'up-down' : null"
-            :aria-label="`Sort by ${__(column.label)}${isCurrentSortColumn ? ' (currently sorted)' : ''}`"
             size="sm"
             variant="ghost"
             class="-mt-2 -mb-1 -ml-3 text-sm! font-medium! text-gray-900! dark:text-gray-400!"
