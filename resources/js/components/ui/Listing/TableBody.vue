@@ -98,6 +98,7 @@ function handleRowClick(event, index) {
                         :model-value="isSelected(row.id)"
                         :disabled="hasReachedSelectionLimit && allowsMultipleSelections && !isSelected(row.id)"
                         :label="getCheckboxLabel(row)"
+                        :ariaLabel="getCheckboxAriaLabel(row)"
                         :description="getCheckboxDescription(row)"
                         size="sm"
                         solo

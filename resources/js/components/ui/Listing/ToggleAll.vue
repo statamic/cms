@@ -47,6 +47,7 @@ function getScreenReaderText() {
         :indeterminate="indeterminate"
         :label="getAriaLabel()"
         :description="getScreenReaderText()"
+        :aria-label="getAriaLabel()"
         :value="'all'"
         size="sm"
         solo

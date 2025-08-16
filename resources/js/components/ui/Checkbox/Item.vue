@@ -4,6 +4,8 @@ import { computed } from 'vue';
 
 const props = defineProps({
     align: { type: String, default: 'start', validator: (value) => ['start', 'center'].includes(value) },
+    ariaLabel: { type: String, default: null },
+    ariaDescribedby: { type: String, default: null },
     description: { type: String, default: null },
     disabled: { type: Boolean, default: false },
     label: { type: String, default: null },
@@ -18,6 +20,7 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue']);
 
 const id = useId();
+const descriptionId = computed(() => props.description ? `${id}-description` : null);
 
 const checkboxClasses = computed(() => {
     const sizes = {
@@ -33,13 +36,23 @@ const containerClasses = computed(() => {
 });
 
 const conditionalProps = computed(() => {
-    if (props.modelValue === null) {
-        return {};
+    const props_obj = {};
+    
+    if (props.modelValue !== null) {
+        props_obj.modelValue = props.modelValue;
     }
-
-    return {
-        modelValue: props.modelValue,
-    };
+    
+    if (props.ariaLabel) {
+        props_obj['aria-label'] = props.ariaLabel;
+    }
+    
+    if (props.ariaDescribedby) {
+        props_obj['aria-describedby'] = props.ariaDescribedby;
+    } else if (descriptionId.value) {
+        props_obj['aria-describedby'] = descriptionId.value;
+    }
+    
+    return props_obj;
 });
 </script>
 
@@ -72,7 +85,7 @@ const conditionalProps = computed(() => {
             <label class="text-sm font-normal antialiased" :for="id">
                 <slot>{{ label || value }}</slot>
             </label>
-            <p v-if="description" class="mt-0.5 block text-xs leading-snug text-gray-500 dark:text-gray-400">{{ description }}</p>
+            <p v-if="description" :id="descriptionId" class="mt-0.5 block text-xs leading-snug text-gray-500 dark:text-gray-400">{{ description }}</p>
         </div>
     </div>
 </template>
