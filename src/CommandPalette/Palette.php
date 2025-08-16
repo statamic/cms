@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Statamic\CP\Navigation\NavItem;
 use Statamic\Facades;
+use Statamic\Facades\User;
 use Statamic\Fields\Fieldset;
 use Statamic\Support\Arr;
 
@@ -61,15 +62,13 @@ class Palette
     {
         $this->isBuilding = true;
 
-        // TODO: We need to bust this cache when content or nav changes
-        // TODO: Cache per user
-        // $built = Cache::rememberForever('statamic-command-palette', function () {
-        $built = $this
-            ->buildNav()
-            ->buildFields()
-            ->buildMiscellaneous()
-            ->get();
-        // });
+        $built = Cache::rememberForever(static::cacheKey(), function () {
+            return $this
+                ->buildNav()
+                ->buildFields()
+                ->buildMiscellaneous()
+                ->get();
+        });
 
         $this->isBuilding = false;
 
@@ -155,6 +154,11 @@ class Palette
         throw_unless(is_string($text) || is_array($text), new \Exception('Must output command [text] string!'));
 
         return $command;
+    }
+
+    public static function cacheKey(): string
+    {
+        return 'statamic-command-palette-'.User::current()->id();
     }
 
     public function getPreloadedItems(): Collection
