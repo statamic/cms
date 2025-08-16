@@ -179,6 +179,17 @@ class Palette
         return $this;
     }
 
+    public function clearCache(): void
+    {
+        $manifestKey = static::cacheKey(manifest: true);
+
+        $manifest = Cache::get($manifestKey, []);
+
+        foreach ($manifest as $cacheKey) {
+            Cache::forget($cacheKey);
+        }
+
+        Cache::forget($manifestKey);
     }
 
     public function getPreloadedItems(): Collection
