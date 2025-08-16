@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue';
 import TwoFactorRecoveryCodesModal from '@statamic/components/two-factor/RecoveryCodesModal.vue';
 import axios from 'axios';
-import { Modal, Input, Button, Icon } from '@statamic/ui';
+import { Modal, Input, Button, Icon } from '@statamic/cms/ui';
 
 const emit = defineEmits(['setup-complete', 'cancel', 'close']);
 

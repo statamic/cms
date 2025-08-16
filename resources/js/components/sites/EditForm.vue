@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import { Header, Button, PublishContainer, PublishTabs } from '@statamic/ui';
+import { Header, Button, PublishContainer, PublishTabs } from '@statamic/cms/ui';
 
 export default {
     components: {

@@ -1,5 +1,5 @@
 <script setup>
-import { PublishContainer, PublishFields } from '@statamic/ui';
+import { PublishContainer, PublishFields } from '@statamic/cms/ui';
 import PublishFieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
 import { computed, nextTick, ref, watch } from 'vue';
 

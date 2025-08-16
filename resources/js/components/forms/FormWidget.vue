@@ -8,7 +8,7 @@ import {
     ListingTableHead as TableHead,
     ListingTableBody as TableBody,
     ListingPagination as Pagination,
-} from '@statamic/ui';
+} from '@statamic/cms/ui';
 
 const props = defineProps({
     form: { type: String, required: true },

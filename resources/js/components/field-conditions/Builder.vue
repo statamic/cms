@@ -52,7 +52,7 @@ import Converter from '../field-conditions/Converter.js';
 import { KEYS, OPERATORS } from '../field-conditions/Constants.js';
 import Condition from './Condition.vue';
 import { __ } from '../../bootstrap/globals';
-import { Field, Input, Button } from '@statamic/ui';
+import { Field, Input, Button } from '@statamic/cms/ui';
 import Select from '@statamic/components/ui/Select/Select.vue';
 import Switch from '@statamic/components/ui/Switch.vue';
 

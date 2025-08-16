@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import { Button, Dropdown, DropdownMenu, DropdownItem, Input, Icon } from '@statamic/ui';
+import { Button, Dropdown, DropdownMenu, DropdownItem, Input, Icon } from '@statamic/cms/ui';
 
 export default {
     components: {

@@ -13,24 +13,24 @@
         <div>
             <Header :title="title" icon="preferences">
                 <ButtonGroup role="group" aria-label="Save options">
-                    <Button 
-                        type="submit" 
-                        variant="primary" 
-                        :text="__('Save')" 
+                    <Button
+                        type="submit"
+                        variant="primary"
+                        :text="__('Save')"
                         @click="save"
                         :aria-describedby="hasSaveAsOptions ? 'save-options-description' : undefined"
                     />
 
-                    <Dropdown 
-                        align="end" 
+                    <Dropdown
+                        align="end"
                         v-if="hasSaveAsOptions"
                         :aria-label="__('Additional save options')"
                         @open="onDropdownOpen"
                         @close="onDropdownClose"
                     >
                         <template #trigger>
-                            <Button 
-                                icon="ui/chevron-down" 
+                            <Button
+                                icon="ui/chevron-down"
                                 variant="primary"
                                 :aria-label="__('Open save options menu')"
                                 :aria-expanded="isDropdownOpen"
@@ -39,7 +39,7 @@
                                 @click="toggleDropdown"
                             />
                         </template>
-                        <DropdownMenu 
+                        <DropdownMenu
                             role="menu"
                             :aria-labelledby="'save-options-label'"
                         >
@@ -55,10 +55,10 @@
                         </DropdownMenu>
                     </Dropdown>
                 </ButtonGroup>
-                
-                <div 
-                    v-if="hasSaveAsOptions" 
-                    id="save-options-description" 
+
+                <div
+                    v-if="hasSaveAsOptions"
+                    id="save-options-description"
                     class="sr-only"
                 >
                     {{ __('Press enter to access additional save options') }}
@@ -71,7 +71,7 @@
 </template>
 
 <script>
-import { Header, Button, ButtonGroup, Dropdown, DropdownMenu, DropdownItem, DropdownLabel, PublishContainer, PublishTabs } from '@statamic/ui';
+import { Header, Button, ButtonGroup, Dropdown, DropdownMenu, DropdownItem, DropdownLabel, PublishContainer, PublishTabs } from '@statamic/cms/ui';
 
 export default {
     components: {

@@ -47,7 +47,7 @@
 
 <script>
 import Release from './Release.vue';
-import { Icon } from '@statamic/ui';
+import { Icon } from '@statamic/cms/ui';
 
 export default {
     components: {

@@ -54,7 +54,7 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import { SortableList, SortableHelpers } from '../sortable/Sortable';
-import { Button } from 'statamic';
+import { Button } from '@statamic/cms/ui';
 
 export default {
     mixins: [Fieldtype, SortableHelpers],

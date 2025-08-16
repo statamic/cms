@@ -5,7 +5,7 @@ import SortableList from '@statamic/components/sortable/SortableList.vue';
 import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
 import { computed, ref, watch } from 'vue';
 import Table from '@statamic/components/ui/Listing/Table.vue';
-import { Checkbox } from '@statamic/ui';
+import { Checkbox } from '@statamic/cms/ui';
 
 const {
     items,

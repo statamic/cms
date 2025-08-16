@@ -3,7 +3,7 @@ import HasFieldActions from '../field-actions/HasFieldActions';
 import debounce from '@statamic/util/debounce.js';
 import props from './props.js';
 import emits from './emits.js';
-import { publishContextKey } from '@statamic/ui';
+import { publishContextKey } from '@statamic/cms/ui';
 import { isRef } from 'vue';
 
 export default {

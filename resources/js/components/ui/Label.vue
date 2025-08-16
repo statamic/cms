@@ -1,6 +1,6 @@
 <script setup>
 import { useSlots } from 'vue';
-import { Badge } from '@statamic/ui';
+import { Badge } from '@statamic/cms/ui';
 
 const slots = useSlots();
 const hasDefaultSlot = !!slots.default;

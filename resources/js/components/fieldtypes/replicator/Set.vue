@@ -13,7 +13,7 @@ import {
     DropdownSeparator,
     Button,
     DropdownMenu,
-} from '@statamic/ui';
+} from '@statamic/cms/ui';
 import { Motion } from 'motion-v';
 import { injectContainerContext } from '@statamic/components/ui/Publish/Container.vue';
 import PreviewHtml from '@statamic/components/fieldtypes/replicator/PreviewHtml.js';

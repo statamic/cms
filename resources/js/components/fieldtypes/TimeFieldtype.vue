@@ -9,7 +9,7 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import { TimePicker } from '@statamic/ui';
+import { TimePicker } from '@statamic/cms/ui';
 import { parseTime } from '@internationalized/date';
 
 export default {

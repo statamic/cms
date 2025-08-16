@@ -81,7 +81,7 @@ import {
     PanelFooter,
     ListingPagination, Slider, PanelHeader,
     Icon,
-} from '@statamic/ui';
+} from '@statamic/cms/ui';
 import HasPreferences from '@statamic/components/data-list/HasPreferences.js';
 import Breadcrumbs from '@statamic/components/assets/Browser/Breadcrumbs.vue';
 import Grid from '@statamic/components/assets/Browser/Grid.vue';

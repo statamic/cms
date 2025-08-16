@@ -183,7 +183,7 @@ import {
     DropdownLabel,
     DropdownItem,
     DropdownSeparator,
-} from '@statamic/ui';
+} from '@statamic/cms/ui';
 import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
 import ItemActions from '@statamic/components/actions/ItemActions.vue';
 

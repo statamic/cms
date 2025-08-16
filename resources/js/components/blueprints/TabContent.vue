@@ -18,7 +18,7 @@
 <script>
 import Sections from './Sections.vue';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';
-import { TabContent } from '@statamic/ui';
+import { TabContent } from '@statamic/cms/ui';
 
 export default {
     mixins: [CanDefineLocalizable],

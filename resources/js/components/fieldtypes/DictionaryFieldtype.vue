@@ -67,7 +67,7 @@ import Fieldtype from './Fieldtype.vue';
 import HasInputOptions from './HasInputOptions.js';
 import { SortableList } from '../sortable/Sortable';
 import debounce from '@statamic/util/debounce.js';
-import { Badge, Combobox } from '@statamic/ui';
+import { Badge, Combobox } from '@statamic/cms/ui';
 
 export default {
     mixins: [Fieldtype, HasInputOptions],

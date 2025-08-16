@@ -1,5 +1,5 @@
 <script setup>
-import { Button, Modal, Tooltip } from '@statamic/ui';
+import { Button, Modal, Tooltip } from '@statamic/cms/ui';
 import { SortableList } from '@statamic/components/sortable/Sortable.js';
 import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
 import { computed, ref } from 'vue';

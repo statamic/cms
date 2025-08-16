@@ -39,7 +39,7 @@
 <script>
 import { data_get } from '../../bootstrap/globals';
 import Fieldtype from './Fieldtype.vue';
-import { Input, Button, Icon } from '@statamic/ui';
+import { Input, Button, Icon } from '@statamic/cms/ui';
 
 export default {
     mixins: [Fieldtype],

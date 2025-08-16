@@ -176,7 +176,7 @@ import DeleteEntryConfirmation from './DeleteEntryConfirmation.vue';
 import DeleteLocalizationConfirmation from './DeleteLocalizationConfirmation.vue';
 import SiteSelector from '../SiteSelector.vue';
 import { defineAsyncComponent } from 'vue';
-import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator, Header, Button, ToggleGroup, ToggleItem } from '@statamic/ui';
+import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator, Header, Button, ToggleGroup, ToggleItem } from '@statamic/cms/ui';
 import ItemActions from '@statamic/components/actions/ItemActions.vue';
 
 export default {

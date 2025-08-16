@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onUnmounted } from 'vue';
-import { PublishContainer, FieldsProvider, PublishFields } from '@statamic/ui';
+import { PublishContainer, FieldsProvider, PublishFields } from '@statamic/cms/ui';
 import { requireElevatedSessionIf } from '@statamic/components/elevated-sessions/index.js';
 
 const props = defineProps({

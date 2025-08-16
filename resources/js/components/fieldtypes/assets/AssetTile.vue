@@ -60,7 +60,7 @@
 
 <script>
 import Asset from './Asset';
-import { Button } from '@statamic/ui';
+import { Button } from '@statamic/cms/ui';
 
 export default {
     components: {

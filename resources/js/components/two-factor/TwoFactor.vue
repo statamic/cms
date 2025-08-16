@@ -4,7 +4,7 @@ import ConfirmationModal from '@statamic/components/modals/ConfirmationModal.vue
 import TwoFactorSetup from './Setup.vue';
 import TwoFactorRecoveryCodesModal from './RecoveryCodesModal.vue';
 import { requireElevatedSession } from '@statamic/components/elevated-sessions';
-import { Popover, Button } from '@statamic/ui';
+import { Popover, Button } from '@statamic/cms/ui';
 import axios from 'axios';
 
 const props = defineProps(['wasSetup', 'isEnforced', 'routes']);

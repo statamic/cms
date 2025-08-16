@@ -73,11 +73,10 @@ import {
     PublishContainer,
     PublishTabs,
     Header,
-} from '@statamic/ui';
+} from '@statamic/cms/ui';
 import ItemActions from '@statamic/components/actions/ItemActions.vue';
-import { SavePipeline } from '@statamic/exports.js';
 import { computed, ref } from 'vue';
-const { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } = SavePipeline;
+import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@statamic/cms/save-pipeline';
 
 let saving = ref(false);
 let errors = ref({});

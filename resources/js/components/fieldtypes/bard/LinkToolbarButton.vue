@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { Popover } from '@statamic/ui';
+import { Popover } from '@statamic/cms/ui';
 import LinkToolbar from './LinkToolbar.vue';
 import BardToolbarButton from './ToolbarButton.vue';
 

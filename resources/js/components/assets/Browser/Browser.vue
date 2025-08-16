@@ -194,8 +194,8 @@ import {
     Icon,
     ToggleGroup,
     ToggleItem,
-} from '@statamic/ui';
-import { Listing, ListingTable, ListingPagination } from '@statamic/ui';
+} from '@statamic/cms/ui';
+import { Listing, ListingTable, ListingPagination } from '@statamic/cms/ui';
 import Breadcrumbs from './Breadcrumbs.vue';
 
 export default {

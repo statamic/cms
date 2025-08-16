@@ -1,5 +1,5 @@
 <script setup>
-import { Label, Combobox, Badge, Card, Panel, Icon } from '@statamic/ui';
+import { Label, Combobox, Badge, Card, Panel, Icon } from '@statamic/cms/ui';
 import { computed } from 'vue';
 import Localization from '@statamic/components/ui/Publish/Localization.vue';
 

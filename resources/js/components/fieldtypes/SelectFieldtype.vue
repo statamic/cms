@@ -18,9 +18,9 @@
 </template>
 
 <script setup>
-import { Fieldtype } from 'statamic';
+import { Fieldtype } from '@statamic/cms';
 import HasInputOptions from './HasInputOptions.js';
-import { Combobox } from '@statamic/ui';
+import { Combobox } from '@statamic/cms/ui';
 import { computed } from 'vue';
 
 const emit = defineEmits(Fieldtype.emits);

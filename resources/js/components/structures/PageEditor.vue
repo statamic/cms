@@ -66,11 +66,10 @@
 </template>
 
 <script>
-import { Heading, Button, PublishContainer, Icon } from '@statamic/ui';
-import { SavePipeline } from 'statamic';
+import { Heading, Button, PublishContainer, Icon } from '@statamic/cms/ui';
 import { flatten } from 'lodash-es';
 import { computed, ref } from 'vue';
-const { Pipeline, Request } = SavePipeline;
+import { Pipeline, Request } from '@statamic/cms/save-pipeline';
 
 let saving = ref(false);
 let errors = ref({});

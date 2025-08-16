@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import { Header, Button, CardPanel, Panel, PanelHeader, Heading, Card, Switch, Field, Input } from '@statamic/ui';
+import { Header, Button, CardPanel, Panel, PanelHeader, Heading, Card, Switch, Field, Input } from '@statamic/cms/ui';
 import { requireElevatedSession } from '@statamic/components/elevated-sessions';
 import PermissionTree from '@statamic/components/roles/PermissionTree.vue';
 

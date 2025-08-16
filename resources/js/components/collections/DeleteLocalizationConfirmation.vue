@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import { Modal, Field, Button, ButtonGroup } from '@statamic/ui';
+import { Modal, Field, Button, ButtonGroup } from '@statamic/cms/ui';
 
 export default {
     components: {

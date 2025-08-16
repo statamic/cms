@@ -33,7 +33,7 @@
 import Fields from '../blueprints/Fields.vue';
 import { Sortable, Plugins } from '@shopify/draggable';
 import SuggestsConditionalFields from '../blueprints/SuggestsConditionalFields';
-import { Header, Button } from '@statamic/ui';
+import { Header, Button } from '@statamic/cms/ui';
 
 export default {
     mixins: [SuggestsConditionalFields],

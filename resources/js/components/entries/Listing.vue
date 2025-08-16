@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import { StatusIndicator, DropdownItem, Listing } from '@statamic/ui';
+import { StatusIndicator, DropdownItem, Listing } from '@statamic/cms/ui';
 
 export default {
     emits: ['reordered', 'site-changed'],

@@ -1,7 +1,7 @@
 <script setup>
 import { DropdownMenuItem } from 'reka-ui';
 import { useSlots } from 'vue';
-import { Icon } from '@statamic/ui';
+import { Icon } from '@statamic/cms/ui';
 import { cva } from 'cva';
 
 const props = defineProps({

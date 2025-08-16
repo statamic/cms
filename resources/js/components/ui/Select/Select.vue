@@ -1,6 +1,6 @@
 <script setup>
 import { useAttrs, useSlots } from 'vue';
-import { Combobox } from '@statamic/ui';
+import { Combobox } from '@statamic/cms/ui';
 
 const emit = defineEmits(['update:modelValue']);
 
