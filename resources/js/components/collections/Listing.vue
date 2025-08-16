@@ -1,8 +1,8 @@
 <template>
     <ui-header :title="__('Collections')" icon="collections">
         <ui-toggle-group v-model="mode">
-            <ui-toggle-item icon="layout-grid" value="grid" />
-            <ui-toggle-item icon="layout-list" value="table" />
+            <ui-toggle-item icon="layout-grid" value="grid view" />
+            <ui-toggle-item icon="layout-list" value="table view" />
         </ui-toggle-group>
         <ui-button
             :href="createUrl"
