@@ -67,6 +67,7 @@ class Palette
                 ->buildNav()
                 ->buildFields()
                 ->buildMiscellaneous()
+                ->pushToCacheManifest()
                 ->get();
         });
 
@@ -156,9 +157,28 @@ class Palette
         return $command;
     }
 
-    public static function cacheKey(): string
+    public static function cacheKey(bool $manifest = false): string
     {
-        return 'statamic-command-palette-'.User::current()->id();
+        $suffix = $manifest
+            ? 'manifest'
+            : User::current()->id();
+
+        return 'statamic-command-palette-'.$suffix;
+    }
+
+    protected function pushToCacheManifest(): self
+    {
+        $manifestKey = static::cacheKey(manifest: true);
+
+        $manifest = Cache::get($manifestKey, []);
+
+        $manifest[] = static::cacheKey();
+
+        Cache::put($manifestKey, $manifest);
+
+        return $this;
+    }
+
     }
 
     public function getPreloadedItems(): Collection
