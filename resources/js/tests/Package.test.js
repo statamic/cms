@@ -1,17 +1,19 @@
 import { it, expect } from 'vitest';
 import * as modules from '@/bootstrap/cms/index.js';
 
-it('exports modules', () => {
+global.__STATAMIC__ = modules;
+
+it('exports modules', async () => {
     expect(Object.keys(modules).toSorted()).toEqual([
         'bard',
         'core',
         'savePipeline',
         'ui',
-   ]);
+    ]);
 });
 
-it('exports core', () => {
-    expect(Object.keys(modules.core).toSorted()).toEqual([
+it('exports core', async () => {
+    const expected = [
         'DateFormatter',
         'Fieldtype',
         'FieldtypeMixin',
@@ -20,27 +22,36 @@ it('exports core', () => {
         'ItemActions',
         'requireElevatedSession',
         'requireElevatedSessionIf',
-    ])
+    ];
+
+    expect(Object.keys(modules.core).toSorted()).toEqual(expected)
+    expect(Object.keys(await import('@/package/index.js')).toSorted()).toEqual(expected);
 });
 
-it('exports save pipeline', () => {
-    expect(Object.keys(modules.savePipeline).toSorted()).toEqual([
+it('exports save pipeline', async () => {
+    const expected = [
         'AfterSaveHooks',
         'BeforeSaveHooks',
         'Pipeline',
         'PipelineStopped',
         'Request',
-    ]);
+    ];
+
+    expect(Object.keys(modules.savePipeline).toSorted()).toEqual(expected);
+    expect(Object.keys(await import('@/package/save-pipeline.js')).toSorted()).toEqual(expected);
 });
 
-it('exports bard', () => {
-    expect(Object.keys(modules.bard).toSorted()).toEqual([
+it('exports bard', async () => {
+    const expected = [
         'ToolbarButtonMixin',
-    ]);
+    ];
+
+    expect(Object.keys(modules.bard).toSorted()).toEqual(expected);
+    expect(Object.keys(await import('@/package/bard.js')).toSorted()).toEqual(expected);
 });
 
-it('exports ui', () => {
-    expect(Object.keys(modules.ui).toSorted()).toEqual([
+it('exports ui', async () => {
+    const expected = [
         'AuthCard',
         'Badge',
         'Button',
@@ -143,5 +154,8 @@ it('exports ui', () => {
         'Widget',
         'injectPublishContext',
         'publishContextKey',
-    ]);
+    ];
+
+    expect(Object.keys(modules.ui).toSorted()).toEqual(expected);
+    expect(Object.keys(await import('@/package/ui.js')).toSorted()).toEqual(expected);
 });

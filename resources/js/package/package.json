@@ -11,6 +11,14 @@
             "types": "./ui.d.ts",
             "default": "./ui.js"
         },
+        "./bard": {
+            "types": "./bard.d.ts",
+            "default": "./bard.js"
+        },
+        "./save-pipeline": {
+            "types": "./save-pipeline.d.ts",
+            "default": "./save-pipeline.js"
+        },
         "./vite-plugin": {
             "default": "./vite-plugin.js"
         }

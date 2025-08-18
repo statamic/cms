@@ -5,4 +5,6 @@ export const {
     IndexFieldtypeMixin,
     DateFormatter,
     ItemActions,
+    requireElevatedSession,
+    requireElevatedSessionIf,
 } = __STATAMIC__.core;
