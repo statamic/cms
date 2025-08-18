@@ -11,7 +11,7 @@
     "test-watch": "npm run test -- --watch --notify",
     "frontend-dev": "vite -c vite-frontend.config.js",
     "frontend-build": "vite build -c vite-frontend.config.js",
-    "build-package": "vite build -c vite-package.config.js",
+    "build-package": "node resources/js/package/scripts/build-package.js",
     "knip": "knip"
   },
   "dependencies": {

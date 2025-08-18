@@ -7,6 +7,5 @@ declare module '@statamic/cms/ui' {
         size?: 'sm' | 'md' | 'lg';
         text: string;
     }
-
-    export const ExampleButton: DefineComponent<ButtonProps>;
+    export const Button: DefineComponent<ButtonProps>;
 }
