@@ -1,0 +1,189 @@
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const statamicModules = {
+    '@statamic/cms': 'StatamicCms',
+    '@statamic/cms/ui': 'StatamicCms.ui',
+    '@statamic/cms/bard': 'StatamicCms.bard',
+    '@statamic/cms/save-pipeline': 'StatamicCms.savePipeline',
+    // Add more as your package grows
+};
+
+export default function () {
+    return {
+        name: 'statamic',
+
+        resolveId(id, importer, options) {
+            // Handle @statamic/cms imports - mark as external and virtual
+            if (id.startsWith('@statamic/cms')) {
+                return {
+                    id: id,
+                    external: false // We want to handle it ourselves, not make it external
+                };
+            }
+            // Also intercept any imports that might be trying to load actual source files
+            if (id.includes('resources/js/components/ui') || id.includes('resources/js/package')) {
+                return null; // Let Vite handle normally, but this might help debug
+            }
+        },
+
+        load(id) {
+            // Provide runtime implementations for @statamic/cms modules
+            if (id === '@statamic/cms') {
+                return 'export default (typeof window !== "undefined" && window.StatamicCms) || {};';
+            }
+            if (id === '@statamic/cms/ui') {
+                // Return the runtime UI exports without importing source files
+                return `
+// Runtime UI exports - provided by window.StatamicCms.ui
+const ui = (typeof window !== "undefined" && window.StatamicCms?.ui) || {};
+const createProxy = () => new Proxy({}, { get: () => createProxy(), set: () => true, has: () => true });
+
+export const AuthCard = ui.AuthCard || createProxy();
+export const Badge = ui.Badge || createProxy();
+export const Button = ui.Button || createProxy();
+export const ButtonGroup = ui.ButtonGroup || createProxy();
+export const Calendar = ui.Calendar || createProxy();
+export const Card = ui.Card || createProxy();
+export const CardList = ui.CardList || createProxy();
+export const CardListItem = ui.CardListItem || createProxy();
+export const CardPanel = ui.CardPanel || createProxy();
+export const CharacterCounter = ui.CharacterCounter || createProxy();
+export const Checkbox = ui.Checkbox || createProxy();
+export const CheckboxGroup = ui.CheckboxGroup || createProxy();
+export const CodeEditor = ui.CodeEditor || createProxy();
+export const Combobox = ui.Combobox || createProxy();
+export const Context = ui.Context || createProxy();
+export const ContextFooter = ui.ContextFooter || createProxy();
+export const ContextItem = ui.ContextItem || createProxy();
+export const ContextLabel = ui.ContextLabel || createProxy();
+export const ContextMenu = ui.ContextMenu || createProxy();
+export const ContextSeparator = ui.ContextSeparator || createProxy();
+export const CreateForm = ui.CreateForm || createProxy();
+export const DatePicker = ui.DatePicker || createProxy();
+export const DateRangePicker = ui.DateRangePicker || createProxy();
+export const Description = ui.Description || createProxy();
+export const DragHandle = ui.DragHandle || createProxy();
+export const Dropdown = ui.Dropdown || createProxy();
+export const DropdownItem = ui.DropdownItem || createProxy();
+export const DropdownLabel = ui.DropdownLabel || createProxy();
+export const DropdownMenu = ui.DropdownMenu || createProxy();
+export const DropdownSeparator = ui.DropdownSeparator || createProxy();
+export const Editable = ui.Editable || createProxy();
+export const ErrorMessage = ui.ErrorMessage || createProxy();
+export const EmptyStateItem = ui.EmptyStateItem || createProxy();
+export const EmptyStateMenu = ui.EmptyStateMenu || createProxy();
+export const Field = ui.Field || createProxy();
+export const FieldsProvider = ui.FieldsProvider || createProxy();
+export const Header = ui.Header || createProxy();
+export const Heading = ui.Heading || createProxy();
+export const Icon = ui.Icon || createProxy();
+export const Input = ui.Input || createProxy();
+export const Label = ui.Label || createProxy();
+export const Listing = ui.Listing || createProxy();
+export const ListingCustomizeColumns = ui.ListingCustomizeColumns || createProxy();
+export const ListingFilters = ui.ListingFilters || createProxy();
+export const ListingHeaderCell = ui.ListingHeaderCell || createProxy();
+export const ListingPagination = ui.ListingPagination || createProxy();
+export const ListingPresets = ui.ListingPresets || createProxy();
+export const ListingPresetTrigger = ui.ListingPresetTrigger || createProxy();
+export const ListingRowActions = ui.ListingRowActions || createProxy();
+export const ListingSearch = ui.ListingSearch || createProxy();
+export const ListingTable = ui.ListingTable || createProxy();
+export const ListingTableBody = ui.ListingTableBody || createProxy();
+export const ListingTableHead = ui.ListingTableHead || createProxy();
+export const ListingToggleAll = ui.ListingToggleAll || createProxy();
+export const LivePreview = ui.LivePreview || createProxy();
+export const Modal = ui.Modal || createProxy();
+export const ModalClose = ui.ModalClose || createProxy();
+export const ModalTitle = ui.ModalTitle || createProxy();
+export const Pagination = ui.Pagination || createProxy();
+export const Panel = ui.Panel || createProxy();
+export const PanelFooter = ui.PanelFooter || createProxy();
+export const PanelHeader = ui.PanelHeader || createProxy();
+export const Popover = ui.Popover || createProxy();
+export const PublishComponents = ui.PublishComponents || createProxy();
+export const PublishContainer = ui.PublishContainer || createProxy();
+export const publishContextKey = ui.publishContextKey || createProxy();
+export const injectPublishContext = ui.injectPublishContext || createProxy();
+export const PublishField = ui.PublishField || createProxy();
+export const PublishFields = ui.PublishFields || createProxy();
+export const PublishForm = ui.PublishForm || createProxy();
+export const PublishLocalizations = ui.PublishLocalizations || createProxy();
+export const PublishSections = ui.PublishSections || createProxy();
+export const PublishTabs = ui.PublishTabs || createProxy();
+export const Radio = ui.Radio || createProxy();
+export const RadioGroup = ui.RadioGroup || createProxy();
+export const Select = ui.Select || createProxy();
+export const Separator = ui.Separator || createProxy();
+export const Slider = ui.Slider || createProxy();
+export const Skeleton = ui.Skeleton || createProxy();
+export const SplitterGroup = ui.SplitterGroup || createProxy();
+export const SplitterPanel = ui.SplitterPanel || createProxy();
+export const SplitterResizeHandle = ui.SplitterResizeHandle || createProxy();
+export const StatusIndicator = ui.StatusIndicator || createProxy();
+export const Subheading = ui.Subheading || createProxy();
+export const Switch = ui.Switch || createProxy();
+export const TabContent = ui.TabContent || createProxy();
+export const Table = ui.Table || createProxy();
+export const TableCell = ui.TableCell || createProxy();
+export const TableColumn = ui.TableColumn || createProxy();
+export const TableColumns = ui.TableColumns || createProxy();
+export const TableRow = ui.TableRow || createProxy();
+export const TableRows = ui.TableRows || createProxy();
+export const TabList = ui.TabList || createProxy();
+export const TabProvider = ui.TabProvider || createProxy();
+export const Tabs = ui.Tabs || createProxy();
+export const TabTrigger = ui.TabTrigger || createProxy();
+export const Textarea = ui.Textarea || createProxy();
+export const TimePicker = ui.TimePicker || createProxy();
+export const ToggleGroup = ui.ToggleGroup || createProxy();
+export const ToggleItem = ui.ToggleItem || createProxy();
+export const Tooltip = ui.Tooltip || createProxy();
+export const Widget = ui.Widget || createProxy();
+                `;
+            }
+            if (id === '@statamic/cms/vite-plugin') {
+                return 'export default function() { return { name: "statamic-stub" }; };';
+            }
+            if (id === '@statamic/cms/bard') {
+                return 'export default (typeof window !== "undefined" && window.StatamicCms?.bard) || {};';
+            }
+            if (id === '@statamic/cms/save-pipeline') {
+                return 'export default (typeof window !== "undefined" && window.StatamicCms?.savePipeline) || {};';
+            }
+        },
+
+        config(config) {
+            // Ensure rollupOptions exists
+            config.build = config.build || {};
+            config.build.rollupOptions = config.build.rollupOptions || {};
+            config.build.rollupOptions.external = config.build.rollupOptions.external || [];
+            config.build.rollupOptions.output = config.build.rollupOptions.output || {};
+
+            // Add Vue and all Statamic modules as external
+            const existingExternal = config.build.rollupOptions.external;
+            config.build.rollupOptions.external = [
+                ...existingExternal,
+                // 'vue',
+                // Match @statamic/cms and any subpath
+                /^@statamic\/cms(\/.*)?$/,
+            ];
+
+            // Set up globals for browser usage
+            const existingGlobals = config.build.rollupOptions.output.globals || {};
+            config.build.rollupOptions.output.globals = {
+                ...existingGlobals,
+                'vue': 'Vue',
+                ...statamicModules,
+            };
+
+            // Set default format if not specified
+            if (!config.build.rollupOptions.output.format) {
+                config.build.rollupOptions.output.format = 'iife';
+            }
+
+            return config;
+        }
+    };
+}

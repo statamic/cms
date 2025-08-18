@@ -6,6 +6,6 @@ export * from '../components/elevated-sessions';
 export { default as DateFormatter } from '../components/DateFormatter.js';
 export { default as ItemActions } from '../components/actions/ItemActions.vue';
 
-export * as ui from './ui.js';
+export * as ui from '../components/ui/index.js';
 export * as bard from './bard.js';
 export * as savePipeline from './save-pipeline.js';
