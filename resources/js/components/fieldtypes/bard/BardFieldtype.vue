@@ -204,6 +204,7 @@ export default {
             provide: {
                 bard: this.makeBardProvide(),
                 bardSets: this.config.sets,
+                showReplicatorFieldPreviews: this.config.previews,
             },
             errorsById: {},
         };

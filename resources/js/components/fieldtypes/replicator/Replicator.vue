@@ -107,6 +107,7 @@ export default {
             fullScreenMode: false,
             provide: {
                 replicatorSets: this.config.sets,
+                showReplicatorFieldPreviews: this.config.previews,
             },
             errorsById: {},
         };
