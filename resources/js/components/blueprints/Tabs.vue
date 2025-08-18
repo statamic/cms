@@ -4,18 +4,20 @@
             <Tabs v-model="currentTab" :unmount-on-hide="false">
                 <div v-if="!singleTab && tabs.length > 0" class="flex items-center justify-between gap-x-2 mb-6">
                     <TabList class="flex-1">
-                        <BlueprintTab
-                            ref="tab"
-                            v-for="tab in tabs"
-                            :key="tab._id"
-                            :tab="tab"
-                            :current-tab="currentTab"
-                            :show-instructions="showTabInstructionsField"
-                            :edit-text="editTabText"
-                            @removed="removeTab(tab._id)"
-                            @updated="updateTab(tab._id, $event)"
-                            @mouseenter="mouseEnteredTab(tab._id)"
-                        />
+                        <div ref="tabs" class="flex-1">
+                            <BlueprintTab
+                                ref="tab"
+                                v-for="tab in tabs"
+                                :key="tab._id"
+                                :tab="tab"
+                                :current-tab="currentTab"
+                                :show-instructions="showTabInstructionsField"
+                                :edit-text="editTabText"
+                                @removed="removeTab(tab._id)"
+                                @updated="updateTab(tab._id, $event)"
+                                @mouseenter="mouseEnteredTab(tab._id)"
+                            />
+                        </div>
                     </TabList>
 
                     <Button icon="plus" size="sm" round v-tooltip="addTabText" @click="addAndEditTab" />

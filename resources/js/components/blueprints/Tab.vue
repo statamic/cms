@@ -1,5 +1,5 @@
 <template>
-    <TabTrigger :name="tab._id">
+    <TabTrigger :name="tab._id" class="blueprint-tab">
         <Icon
             v-if="tab.icon"
             :name="iconName(tab.icon)"
