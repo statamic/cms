@@ -58,7 +58,7 @@ export default {
             return data_get(this.publishContainer.previews, this.fieldPathPrefix ? `${this.fieldPathPrefix}.${this.handle}` : this.handle) || {};
         },
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
+            if (!this.showFieldPreviews) return;
 
             return replicatorPreviewHtml(this.previewText);
         },

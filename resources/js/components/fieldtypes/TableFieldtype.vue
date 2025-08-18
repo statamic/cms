@@ -166,7 +166,7 @@ export default {
         },
 
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
+            if (!this.showFieldPreviews) return;
 
             // Join all values with commas. Exclude any empties.
             return this.data

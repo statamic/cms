@@ -127,6 +127,12 @@ const shouldShowLabel = computed(
         isSyncable.value, // Need to see the icon
 );
 
+const shouldShowFieldPreviews = computed(() => {
+    if (! props.config.replicator_preview) return false;
+
+    return inject('showReplicatorFieldPreviews', false);
+});
+
 const isLocalizable = computed(() => props.config.localizable);
 
 const isReadOnly = computed(() => {
@@ -163,12 +169,6 @@ function sync() {
 function desync() {
     desyncField(fullPath.value);
 }
-
-const shouldShowFieldPreviews = computed(() => {
-    if (! props.config.replicator_preview) return false;
-
-    return inject('showReplicatorFieldPreviews', false);
-});
 
 const fieldtypeComponentProps = computed(() => ({
     id: fieldId.value,

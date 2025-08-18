@@ -797,7 +797,7 @@ export default {
         },
 
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
+            if (!this.showFieldPreviews) return;
 
             return marked(this.data || '', { renderer: new PlainTextRenderer() }).replace(/<\/?[^>]+(>|$)/g, '');
         },

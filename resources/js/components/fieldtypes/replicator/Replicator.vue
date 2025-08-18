@@ -147,7 +147,7 @@ export default {
         },
 
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
+            if (!this.showFieldPreviews) return;
 
             return `${__(this.config.display)}: ${__n(':count set|:count sets', this.value.length)}`;
         },

@@ -27,7 +27,7 @@ const use = function(emit, props) {
     const customReplicatorPreview = ref(null);
 
     const replicatorPreview = computed(() => {
-        if (!props.showFieldPreviews || !props.config.replicator_preview) return;
+        if (!props.showFieldPreviews) return;
 
         if (customReplicatorPreview.value) return customReplicatorPreview.value.value;
 
@@ -39,7 +39,7 @@ const use = function(emit, props) {
     }
 
     watch(replicatorPreview, (text) => {
-        if (!props.showFieldPreviews || !props.config.replicator_preview) return;
+        if (!props.showFieldPreviews) return;
 
         emit('replicator-preview-updated', text);
     }, { immediate: true });
