@@ -1,104 +1,104 @@
-const ui = window.StatamicCms.ui;
-
-export const AuthCard = ui.AuthCard;
-export const Badge = ui.Badge;
-export const Button = ui.Button;
-export const ButtonGroup = ui.ButtonGroup;
-export const Calendar = ui.Calendar;
-export const Card = ui.Card;
-export const CardList = ui.CardList;
-export const CardListItem = ui.CardListItem;
-export const CardPanel = ui.CardPanel;
-export const CharacterCounter = ui.CharacterCounter;
-export const Checkbox = ui.Checkbox;
-export const CheckboxGroup = ui.CheckboxGroup;
-export const CodeEditor = ui.CodeEditor;
-export const Combobox = ui.Combobox;
-export const Context = ui.Context;
-export const ContextFooter = ui.ContextFooter;
-export const ContextItem = ui.ContextItem;
-export const ContextLabel = ui.ContextLabel;
-export const ContextMenu = ui.ContextMenu;
-export const ContextSeparator = ui.ContextSeparator;
-export const CreateForm = ui.CreateForm;
-export const DatePicker = ui.DatePicker;
-export const DateRangePicker = ui.DateRangePicker;
-export const Description = ui.Description;
-export const DragHandle = ui.DragHandle;
-export const Dropdown = ui.Dropdown;
-export const DropdownItem = ui.DropdownItem;
-export const DropdownLabel = ui.DropdownLabel;
-export const DropdownMenu = ui.DropdownMenu;
-export const DropdownSeparator = ui.DropdownSeparator;
-export const Editable = ui.Editable;
-export const ErrorMessage = ui.ErrorMessage;
-export const EmptyStateItem = ui.EmptyStateItem;
-export const EmptyStateMenu = ui.EmptyStateMenu;
-export const Field = ui.Field;
-export const FieldsProvider = ui.FieldsProvider;
-export const Header = ui.Header;
-export const Heading = ui.Heading;
-export const Icon = ui.Icon;
-export const Input = ui.Input;
-export const Label = ui.Label;
-export const Listing = ui.Listing;
-export const ListingCustomizeColumns = ui.ListingCustomizeColumns;
-export const ListingFilters = ui.ListingFilters;
-export const ListingHeaderCell = ui.ListingHeaderCell;
-export const ListingPagination = ui.ListingPagination;
-export const ListingPresets = ui.ListingPresets;
-export const ListingPresetTrigger = ui.ListingPresetTrigger;
-export const ListingRowActions = ui.ListingRowActions;
-export const ListingSearch = ui.ListingSearch;
-export const ListingTable = ui.ListingTable;
-export const ListingTableBody = ui.ListingTableBody;
-export const ListingTableHead = ui.ListingTableHead;
-export const ListingToggleAll = ui.ListingToggleAll;
-export const LivePreview = ui.LivePreview;
-export const Modal = ui.Modal;
-export const ModalClose = ui.ModalClose;
-export const ModalTitle = ui.ModalTitle;
-export const Pagination = ui.Pagination;
-export const Panel = ui.Panel;
-export const PanelFooter = ui.PanelFooter;
-export const PanelHeader = ui.PanelHeader;
-export const Popover = ui.Popover;
-export const PublishComponents = ui.PublishComponents;
-export const PublishContainer = ui.PublishContainer;
-export const publishContextKey = ui.publishContextKey;
-export const injectPublishContext = ui.injectPublishContext;
-export const PublishField = ui.PublishField;
-export const PublishFields = ui.PublishFields;
-export const PublishForm = ui.PublishForm;
-export const PublishLocalizations = ui.PublishLocalizations;
-export const PublishSections = ui.PublishSections;
-export const PublishTabs = ui.PublishTabs;
-export const Radio = ui.Radio;
-export const RadioGroup = ui.RadioGroup;
-export const Select = ui.Select;
-export const Separator = ui.Separator;
-export const Slider = ui.Slider;
-export const Skeleton = ui.Skeleton;
-export const SplitterGroup = ui.SplitterGroup;
-export const SplitterPanel = ui.SplitterPanel;
-export const SplitterResizeHandle = ui.SplitterResizeHandle;
-export const StatusIndicator = ui.StatusIndicator;
-export const Subheading = ui.Subheading;
-export const Switch = ui.Switch;
-export const TabContent = ui.TabContent;
-export const Table = ui.Table;
-export const TableCell = ui.TableCell;
-export const TableColumn = ui.TableColumn;
-export const TableColumns = ui.TableColumns;
-export const TableRow = ui.TableRow;
-export const TableRows = ui.TableRows;
-export const TabList = ui.TabList;
-export const TabProvider = ui.TabProvider;
-export const Tabs = ui.Tabs;
-export const TabTrigger = ui.TabTrigger;
-export const Textarea = ui.Textarea;
-export const TimePicker = ui.TimePicker;
-export const ToggleGroup = ui.ToggleGroup;
-export const ToggleItem = ui.ToggleItem;
-export const Tooltip = ui.Tooltip;
-export const Widget = ui.Widget;
+export const {
+    AuthCard,
+    Badge,
+    Button,
+    ButtonGroup,
+    Calendar,
+    Card,
+    CardList,
+    CardListItem,
+    CardPanel,
+    CharacterCounter,
+    Checkbox,
+    CheckboxGroup,
+    CodeEditor,
+    Combobox,
+    Context,
+    ContextFooter,
+    ContextItem,
+    ContextLabel,
+    ContextMenu,
+    ContextSeparator,
+    CreateForm,
+    DatePicker,
+    DateRangePicker,
+    Description,
+    DragHandle,
+    Dropdown,
+    DropdownItem,
+    DropdownLabel,
+    DropdownMenu,
+    DropdownSeparator,
+    Editable,
+    ErrorMessage,
+    EmptyStateItem,
+    EmptyStateMenu,
+    Field,
+    FieldsProvider,
+    Header,
+    Heading,
+    Icon,
+    Input,
+    Label,
+    Listing,
+    ListingCustomizeColumns,
+    ListingFilters,
+    ListingHeaderCell,
+    ListingPagination,
+    ListingPresets,
+    ListingPresetTrigger,
+    ListingRowActions,
+    ListingSearch,
+    ListingTable,
+    ListingTableBody,
+    ListingTableHead,
+    ListingToggleAll,
+    LivePreview,
+    Modal,
+    ModalClose,
+    ModalTitle,
+    Pagination,
+    Panel,
+    PanelFooter,
+    PanelHeader,
+    Popover,
+    PublishComponents,
+    PublishContainer,
+    publishContextKey,
+    injectPublishContext,
+    PublishField,
+    PublishFields,
+    PublishForm,
+    PublishLocalizations,
+    PublishSections,
+    PublishTabs,
+    Radio,
+    RadioGroup,
+    Select,
+    Separator,
+    Slider,
+    Skeleton,
+    SplitterGroup,
+    SplitterPanel,
+    SplitterResizeHandle,
+    StatusIndicator,
+    Subheading,
+    Switch,
+    TabContent,
+    Table,
+    TableCell,
+    TableColumn,
+    TableColumns,
+    TableRow,
+    TableRows,
+    TabList,
+    TabProvider,
+    Tabs,
+    TabTrigger,
+    Textarea,
+    TimePicker,
+    ToggleGroup,
+    ToggleItem,
+    Tooltip,
+    Widget
+} = StatamicCms.ui;
