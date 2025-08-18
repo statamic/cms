@@ -1,11 +1,17 @@
 import { it, expect } from 'vitest';
-import * as root from '../package/index.js';
-import * as bard from '../package/bard.js';
-import * as ui from '../package/ui.js';
-import * as savePipeline from '../package/save-pipeline.js';
+import * as modules from '@/bootstrap/cms/index.js';
 
-it('exports root', () => {
-    expect(Object.keys(root).toSorted()).toEqual([
+it('exports modules', () => {
+    expect(Object.keys(modules).toSorted()).toEqual([
+        'bard',
+        'core',
+        'savePipeline',
+        'ui',
+   ]);
+});
+
+it('exports core', () => {
+    expect(Object.keys(modules.core).toSorted()).toEqual([
         'DateFormatter',
         'Fieldtype',
         'FieldtypeMixin',
@@ -18,7 +24,7 @@ it('exports root', () => {
 });
 
 it('exports save pipeline', () => {
-    expect(Object.keys(savePipeline).toSorted()).toEqual([
+    expect(Object.keys(modules.savePipeline).toSorted()).toEqual([
         'AfterSaveHooks',
         'BeforeSaveHooks',
         'Pipeline',
@@ -28,13 +34,13 @@ it('exports save pipeline', () => {
 });
 
 it('exports bard', () => {
-    expect(Object.keys(bard).toSorted()).toEqual([
+    expect(Object.keys(modules.bard).toSorted()).toEqual([
         'ToolbarButtonMixin',
     ]);
 });
 
 it('exports ui', () => {
-    expect(Object.keys(ui).toSorted()).toEqual([
+    expect(Object.keys(modules.ui).toSorted()).toEqual([
         'AuthCard',
         'Badge',
         'Button',
