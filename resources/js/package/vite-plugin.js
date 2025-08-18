@@ -1,14 +1,3 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const statamicModules = {
-    '@statamic/cms': 'StatamicCms',
-    '@statamic/cms/ui': 'StatamicCms.ui',
-    '@statamic/cms/bard': 'StatamicCms.bard',
-    '@statamic/cms/save-pipeline': 'StatamicCms.savePipeline',
-    // Add more as your package grows
-};
-
 export default function () {
     return {
         name: 'statamic',
@@ -34,7 +23,10 @@ export default function () {
             config.build.rollupOptions.output.globals = {
                 ...existingGlobals,
                 'vue': 'Vue',
-                ...statamicModules,
+                '@statamic/cms': 'StatamicCms.core',
+                '@statamic/cms/ui': 'StatamicCms.ui',
+                '@statamic/cms/bard': 'StatamicCms.bard',
+                '@statamic/cms/save-pipeline': 'StatamicCms.savePipeline',
             };
 
             // Set default format if not specified

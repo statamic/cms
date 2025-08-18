@@ -85,7 +85,7 @@ fs.writeFileSync(path.join(distDir, 'ui.js'), uiContent);
 console.log('📄 Copying static files...');
 
 const staticFiles = [
-    { src: 'index.dist.js', dest: 'index.js' },
+    { src: 'index.js', dest: 'index.js' },
     { src: 'package.json', dest: 'package.json' },
     { src: 'vite-plugin.js', dest: 'vite-plugin.js' },
     { src: 'index.d.ts', dest: 'index.d.ts' },

@@ -4,7 +4,7 @@ import * as Pinia from 'pinia';
 import Alpine from 'alpinejs';
 import * as Globals from './bootstrap/globals';
 import Cookies from 'cookies-js';
-import * as StatamicCms from '@statamic/cms';
+import * as StatamicCms from './cms.js';
 
 import.meta.glob(['../img/**']);
 
