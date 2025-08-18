@@ -13,6 +13,3 @@ export const ItemActions = StatamicCms.ItemActions || createProxy();
 export const ui = StatamicCms.ui || createProxy();
 export const bard = StatamicCms.bard || createProxy();
 export const savePipeline = StatamicCms.savePipeline || createProxy();
-
-// Default export for compatibility
-export default StatamicCms;
