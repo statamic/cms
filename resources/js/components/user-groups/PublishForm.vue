@@ -1,7 +1,7 @@
 <script setup>
 import { Header, Button, Dropdown, DropdownMenu, DropdownItem, PublishContainer } from '@/components/ui';
 import { ref, useTemplateRef } from 'vue';
-import { Pipeline, Request } from '@statamic/cms/save-pipeline';
+import { Pipeline, Request } from '@/components/ui/Publish/SavePipeline.js';
 
 let saving = ref(false);
 let errors = ref({});

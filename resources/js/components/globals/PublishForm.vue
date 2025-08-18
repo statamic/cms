@@ -75,7 +75,7 @@ import PublishContainer from '@/components/ui/Publish/Container.vue';
 import PublishTabs from '@/components/ui/Publish/Tabs.vue';
 import PublishComponents from '@/components/ui/Publish/Components.vue';
 import { computed, ref } from 'vue';
-import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@statamic/cms/save-pipeline';
+import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@/components/ui/Publish/SavePipeline.js';
 
 let saving = ref(false);
 let errors = ref({});

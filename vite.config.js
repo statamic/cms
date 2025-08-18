@@ -34,7 +34,6 @@ export default defineConfig(({ mode, command }) => {
         resolve: {
             alias: {
                 vue: 'vue/dist/vue.esm-bundler.js',
-                '@statamic/cms': path.resolve(__dirname, 'resources/js/package'),
                 '@': path.resolve(__dirname, 'resources/js'),
             },
         },

@@ -150,7 +150,7 @@ import PublishComponents from '@/components/ui/Publish/Components.vue';
 import LivePreview from '@/components/ui/LivePreview/LivePreview.vue';
 import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
 import { ref, computed } from 'vue';
-import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@statamic/cms/save-pipeline';
+import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@/components/ui/Publish/SavePipeline.js';
 import LocalizationsCard from '@/components/ui/Publish/Localizations.vue';
 import ItemActions from '@/components/actions/ItemActions.vue';
 

@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-import { Fieldtype } from '@statamic/cms';
+import Fieldtype from '@/components/fieldtypes/fieldtype.js';
 import HasInputOptions from './HasInputOptions.js';
 import { Combobox } from '@/components/ui';
 import { computed } from 'vue';

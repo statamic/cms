@@ -4,7 +4,7 @@ import Tabs from './Tabs.vue';
 import { Header, Button } from '@/components/ui';
 import uniqid from 'uniqid';
 import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
-import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks } from '@statamic/cms/save-pipeline';
+import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks } from '@/components/ui/Publish/SavePipeline.js';
 
 const props = defineProps({
     icon: {
