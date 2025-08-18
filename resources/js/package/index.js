@@ -5,4 +5,4 @@ export const {
     IndexFieldtypeMixin,
     DateFormatter,
     ItemActions,
-} = StatamicCms.core;
+} = __STATAMIC__.core;

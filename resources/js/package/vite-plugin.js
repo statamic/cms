@@ -23,10 +23,10 @@ export default function () {
             config.build.rollupOptions.output.globals = {
                 ...existingGlobals,
                 'vue': 'Vue',
-                '@statamic/cms': 'StatamicCms.core',
-                '@statamic/cms/ui': 'StatamicCms.ui',
-                '@statamic/cms/bard': 'StatamicCms.bard',
-                '@statamic/cms/save-pipeline': 'StatamicCms.savePipeline',
+                '@statamic/cms': '__STATAMIC__.core',
+                '@statamic/cms/ui': '__STATAMIC__.ui',
+                '@statamic/cms/bard': '__STATAMIC__.bard',
+                '@statamic/cms/save-pipeline': '__STATAMIC__.savePipeline',
             };
 
             // Set default format if not specified

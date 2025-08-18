@@ -101,4 +101,4 @@ export const {
     ToggleItem,
     Tooltip,
     Widget
-} = StatamicCms.ui;
+} = __STATAMIC__.ui;
