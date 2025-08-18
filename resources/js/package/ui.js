@@ -1,19 +1,3 @@
-// Runtime exports for UI components
-// These are provided by window.StatamicCms during runtime
-// Addons should not compile Statamic's source code
-if (typeof window !== 'undefined' && window.StatamicCms?.ui) {
-    // Export all UI components from the global StatamicCms
-    const ui = window.StatamicCms.ui;
-
-    // Re-export individual components
-    for (const [name, component] of Object.entries(ui)) {
-        if (typeof component !== 'undefined') {
-            globalThis[name] = component;
-        }
-    }
-}
-
-// For build-time/SSR, provide empty exports to satisfy module resolution
 const createProxy = () => new Proxy({}, {
     get: () => createProxy(),
     set: () => true,
