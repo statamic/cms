@@ -14,14 +14,27 @@ it('exports modules', async () => {
 
 it('exports core', async () => {
     const expected = [
+        'ConfirmationModal',
         'DateFormatter',
         'Fieldtype',
         'FieldtypeMixin',
+        'HasActions',
+        'HasInputOptions',
+        'HasPreferences',
         'IndexFieldtype',
         'IndexFieldtypeMixin',
+        'InlineEditForm',
         'ItemActions',
+        'RelatedItem',
+        'RestoreRevision',
+        'RevisionHistory',
+        'RevisionPreview',
+        'SaveButtonOptions',
+        'SortableList',
+        'clone',
         'requireElevatedSession',
         'requireElevatedSessionIf',
+        'resetValuesFromResponse',
     ];
 
     expect(Object.keys(modules.core).toSorted()).toEqual(expected)
