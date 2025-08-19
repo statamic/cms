@@ -48,8 +48,15 @@ function isActive(handle) {
         </div>
 
         <stack half name="filters" v-if="open" @closed="open = false">
-            <div class="flex-1 p-3 bg-white h-full overflow-auto rounded-l-2xl">
-                <Heading size="lg" :text="__('Filters')" class="mb-4 px-1.5 [&_svg]:size-4" icon="sliders-horizontal" />
+            <div class="flex-1 p-3 bg-white h-full overflow-auto rounded-l-2xl relative">
+                <Button 
+                    icon="x" 
+                    variant="ghost" 
+                    size="sm" 
+                    class="absolute top-2 right-3 z-10 [&_svg]:size-4" 
+                    @click="open = false"
+                />
+                <Heading size="lg" :text="__('Filters')" class="mb-4 px-1.5 pr-12 [&_svg]:size-4" icon="sliders-horizontal" />
                 <div class="space-y-4">
                     <Panel v-if="fieldFilter">
                         <PanelHeader class="flex items-center justify-between">
