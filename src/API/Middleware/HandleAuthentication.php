@@ -19,7 +19,7 @@ class HandleAuthentication
             ($token = config('statamic.api.api_token'))
             && ($request->bearerToken() !== $token)
         ) {
-            throw new AuthenticationException();
+            throw new AuthenticationException;
         }
 
         return $next($request);
