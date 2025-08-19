@@ -1,4 +1,6 @@
-export default function () {
+import vue from '@vitejs/plugin-vue';
+
+const statamic = function (options) {
     return {
         name: 'statamic',
 
@@ -37,4 +39,11 @@ export default function () {
             return config;
         }
     };
+};
+
+export default function (options = {}) {
+    return [
+        statamic(options),
+        vue(options.vue || {}),
+    ];
 }
