@@ -8,7 +8,7 @@
     <header class="py-8 mt-8 text-center">
         <h1 class="text-[25px] font-medium antialiased flex justify-center items-center gap-2">
             <ui-icon name="taxonomies" class="size-5 text-gray-500"></ui-icon>
-            {{ $taxonomy->title() }}
+            <span v-pre>{{ $taxonomy->title() }}</span>
         </h1>
     </header>
 
