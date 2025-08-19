@@ -37,7 +37,7 @@
     }
 
     .stack-hit-area {
-        @apply absolute inset-0 cursor-pointer;
+        @apply absolute inset-0;
     }
 
     .stack-content {
