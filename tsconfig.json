@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "allowJs": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "./types",
+    "baseUrl": ".",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "paths": {
+      "@/*": ["resources/js/*"]
+    },
+    "types": ["node"]
+  },
+  "include": [
+    "resources/js/**/*",
+    "resources/js/**/*.vue"
+  ],
+  "exclude": [
+    "node_modules",
+    "vendor",
+    "resources/js/tests"
+  ]
+}
