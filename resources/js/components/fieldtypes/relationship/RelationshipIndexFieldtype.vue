@@ -37,7 +37,7 @@
 
 <script>
 import IndexFieldtype from '../IndexFieldtype.vue';
-import { Badge, StatusIndicator, Dropdown, DropdownMenu, DropdownLabel, DropdownItem } from '@statamic/ui';
+import { Badge, StatusIndicator, Dropdown, DropdownMenu, DropdownLabel, DropdownItem } from '@/components/ui';
 
 export default {
     mixins: [IndexFieldtype],

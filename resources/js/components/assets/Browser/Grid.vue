@@ -183,9 +183,9 @@ import {
     DropdownLabel,
     DropdownItem,
     DropdownSeparator,
-} from '@statamic/ui';
-import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
-import ItemActions from '@statamic/components/actions/ItemActions.vue';
+} from '@/components/ui';
+import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
+import ItemActions from '@/components/actions/ItemActions.vue';
 
 export default {
     mixins: [AssetBrowserMixin],

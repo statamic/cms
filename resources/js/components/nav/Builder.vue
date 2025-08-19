@@ -188,7 +188,7 @@ import TopLevelSectionBranch from './TopLevelSectionBranch.vue';
 import ItemEditor from './ItemEditor.vue';
 import SectionEditor from './SectionEditor.vue';
 import { data_get } from '../../bootstrap/globals.js';
-import { Header, Button, ButtonGroup, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, DropdownLabel, Panel, PanelHeader, Icon } from '@statamic/ui';
+import { Header, Button, ButtonGroup, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, DropdownLabel, Panel, PanelHeader, Icon } from '@/components/ui';
 
 export default {
     components: {

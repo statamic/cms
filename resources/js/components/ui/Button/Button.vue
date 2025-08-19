@@ -2,7 +2,7 @@
 import { computed, useSlots } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
-import { Icon } from '@statamic/ui';
+import { Icon } from '@/components/ui';
 
 const props = defineProps({
     as: { type: String, default: 'button' },

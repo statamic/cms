@@ -2,9 +2,9 @@
 import { computed, useTemplateRef, watch, ref, inject } from 'vue';
 import { injectContainerContext } from './Container.vue';
 import { injectFieldsContext } from './FieldsProvider.vue';
-import { Field, Icon, Tooltip, Label } from '@statamic/ui';
-import FieldActions from '@statamic/components/field-actions/FieldActions.vue';
-import ShowField from '@statamic/components/field-conditions/ShowField.js';
+import { Field, Icon, Tooltip, Label } from '@/components/ui';
+import FieldActions from '@/components/field-actions/FieldActions.vue';
+import ShowField from '@/components/field-conditions/ShowField.js';
 
 const props = defineProps({
     config: {

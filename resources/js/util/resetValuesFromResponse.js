@@ -1,4 +1,4 @@
-import Values from '@statamic/components/publish/Values.js';
+import Values from '@/components/publish/Values.js';
 
 export default function resetValuesFromResponse(responseValues, container) {
     const existingValues = container.values;

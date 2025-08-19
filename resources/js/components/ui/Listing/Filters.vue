@@ -1,6 +1,6 @@
 <script setup>
-import { Badge, Button, Panel, PanelHeader, Card, Heading } from '@statamic/ui';
-import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
+import { Badge, Button, Panel, PanelHeader, Card, Heading } from '@/components/ui';
+import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
 import { computed } from 'vue';
 import FieldFilter from './FieldFilter.vue';
 import DataListFilter from './Filter.vue';

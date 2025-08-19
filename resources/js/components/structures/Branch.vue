@@ -71,7 +71,7 @@
 </template>
 
 <script>
-import { Dropdown, DropdownMenu, Icon } from '@statamic/ui';
+import { Dropdown, DropdownMenu, Icon } from '@/components/ui';
 
 export default {
     components: { Dropdown, DropdownMenu, Icon },

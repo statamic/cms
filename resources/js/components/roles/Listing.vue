@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import { DropdownItem, Listing } from '@statamic/ui';
+import { DropdownItem, Listing } from '@/components/ui';
 
 const props = defineProps(['initialRows', 'initialColumns']);
 const rows = ref(props.initialRows);

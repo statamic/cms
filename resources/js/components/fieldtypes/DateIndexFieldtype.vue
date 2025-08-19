@@ -3,8 +3,8 @@
 </template>
 
 <script setup>
-import { IndexFieldtype as Fieldtype } from 'statamic';
-import DateFormatter from '@statamic/components/DateFormatter.js';
+import Fieldtype from '@/components/fieldtypes/index-fieldtype.js';
+import DateFormatter from '@/components/DateFormatter.js';
 import { computed } from 'vue';
 
 const emit = defineEmits(Fieldtype.emits);

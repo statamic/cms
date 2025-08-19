@@ -16,7 +16,7 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import { Switch, Heading } from '@statamic/ui';
+import { Switch, Heading } from '@/components/ui';
 
 export default {
     mixins: [Fieldtype],

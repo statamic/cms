@@ -1,6 +1,6 @@
 <script setup>
 import { cva } from 'cva';
-import { CharacterCounter } from '@statamic/ui';
+import { CharacterCounter } from '@/components/ui';
 
 defineEmits(['update:modelValue']);
 

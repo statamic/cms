@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import { Select } from '@statamic/ui';
+import { Select } from '@/components/ui';
 
 export default {
     components: { Select },
