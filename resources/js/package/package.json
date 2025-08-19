@@ -1,22 +1,20 @@
 {
     "name": "@statamic/cms",
-    "types": "types/index.d.ts",
-    "main": "index.js",
     "exports": {
         ".": {
-            "types": "./types/index.d.ts",
+            "types": "./types/bootstrap/cms/core.d.ts",
             "default": "./index.js"
         },
         "./ui": {
-            "types": "./types/ui.d.ts",
+            "types": "./types/bootstrap/cms/ui.d.ts",
             "default": "./ui.js"
         },
         "./bard": {
-            "types": "./types/bard.d.ts",
+            "types": "./types/bootstrap/cms/bard.d.ts",
             "default": "./bard.js"
         },
         "./save-pipeline": {
-            "types": "./types/save-pipeline.d.ts",
+            "types": "./types/bootstrap/cms/save-pipeline.d.ts",
             "default": "./save-pipeline.js"
         },
         "./vite-plugin": {

@@ -6,7 +6,7 @@
     "allowJs": true,
     "declaration": true,
     "emitDeclarationOnly": true,
-    "outDir": "./types",
+    "outDir": "./resources/js/package/types",
     "baseUrl": ".",
     "strict": true,
     "esModuleInterop": true,
@@ -18,12 +18,20 @@
     "types": ["node"]
   },
   "include": [
-    "resources/js/**/*",
-    "resources/js/**/*.vue"
+    "resources/js/bootstrap/cms/*.js",
+    "resources/js/components/ui/**/*.vue",
+    "resources/js/components/fieldtypes/fieldtype.js",
+    "resources/js/components/fieldtypes/index-fieldtype.js", 
+    "resources/js/components/fieldtypes/Fieldtype.vue",
+    "resources/js/components/fieldtypes/IndexFieldtype.vue",
+    "resources/js/components/elevated-sessions/**/*",
+    "resources/js/components/DateFormatter.js",
+    "resources/js/components/actions/ItemActions.vue"
   ],
   "exclude": [
     "node_modules",
     "vendor",
-    "resources/js/tests"
+    "resources/js/tests",
+    "resources/js/package"
   ]
 }
