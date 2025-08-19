@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue';
 import CommandPaletteItem from './Item.vue';
+import CommandPaletteLoadingItem from './LoadingItem.vue';
 import axios from 'axios';
 import debounce from '@/util/debounce';
 import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, DialogTrigger, DialogDescription, VisuallyHidden } from 'reka-ui';
@@ -13,7 +14,9 @@ import { Icon, Subheading } from '@/components/ui';
 
 let open = ref(false);
 let query = ref('');
-let serverItems = ref([]);
+let serverPreloadedItems = Statamic.$config.get('commandPalettePreloadedItems');
+let serverItemsLoaded = ref(false);
+let serverItems = ref(setServerLoadingItems());
 let searchResults = ref([]);
 let selected = ref(null);
 let recentItems = ref(getRecentItems());
@@ -47,6 +50,7 @@ const miscItems = computed(() => {
 const aggregatedItems = computed(() => [
     ...(actionItems.value || []),
     ...(recentItems.value || []),
+    ...(serverPreloadedItems || []),
     ...(serverItems.value || []),
     ...(miscItems.value || []),
     ...(searchResults.value || []),
@@ -130,10 +134,18 @@ watch(open, (isOpen) => {
     reset();
 });
 
+function setServerLoadingItems() {
+    return [
+        { category: 'Navigation', loading: true },
+        { category: 'Fields', loading: true },
+    ];
+}
+
 function getServerItems() {
-    if (serverItems.value.length) return;
+    if (serverItemsLoaded.value) return;
 
     axios.get('/cp/command-palette').then((response) => {
+        serverItemsLoaded.value = true;
         serverItems.value = response.data;
     });
 }
@@ -290,8 +302,11 @@ const modalClasses = cva({
                                         :value="item.text"
                                         :text-value="item.text"
                                         :as-child="true"
+                                        :disabled="item.loading"
                                     >
+                                        <CommandPaletteLoadingItem class="rounded-lg px-2 py-1.5 w-full opacity-20" v-if="item.loading" />
                                         <CommandPaletteItem
+                                            v-else
                                             :icon="item.icon"
                                             :href="item.url"
                                             :open-new-tab="item.openNewTab"

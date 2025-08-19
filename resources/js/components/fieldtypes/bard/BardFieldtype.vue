@@ -204,6 +204,7 @@ export default {
             provide: {
                 bard: this.makeBardProvide(),
                 bardSets: this.config.sets,
+                showReplicatorFieldPreviews: this.config.previews,
             },
             errorsById: {},
         };
@@ -276,7 +277,7 @@ export default {
         },
 
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
+            if (!this.showFieldPreviews) return;
             const stack = [...this.value];
             let text = '';
             while (stack.length) {

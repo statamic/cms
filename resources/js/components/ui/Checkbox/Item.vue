@@ -33,13 +33,22 @@ const containerClasses = computed(() => {
 });
 
 const conditionalProps = computed(() => {
-    if (props.modelValue === null) {
-        return {};
+    const props_obj = {};
+    
+    if (props.modelValue !== null) {
+        props_obj.modelValue = props.modelValue;
     }
-
-    return {
-        modelValue: props.modelValue,
-    };
+    
+    // Only add aria-describedby if description exists AND it's not a solo checkbox
+    if (props.description && !props.solo) {
+        props_obj['aria-describedby'] = `${id}-description`;
+    }
+    
+    if (props.solo && (props.label || props.value)) {
+        props_obj['aria-label'] = props.label || props.value;
+    }
+    
+    return props_obj;
 });
 </script>
 
@@ -57,7 +66,7 @@ const conditionalProps = computed(() => {
             <CheckboxIndicator
                 class="relative flex h-full w-full items-center justify-center text-white dark:text-gray-900"
             >
-                <svg viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg" class="size-2.5">
+                <svg viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg" class="size-2.5" aria-hidden="true">
                     <path
                         d="M9 1L3.5 6.5L1 4"
                         stroke="currentColor"
@@ -67,12 +76,16 @@ const conditionalProps = computed(() => {
                     />
                 </svg>
             </CheckboxIndicator>
+            <!-- Screen reader text for checkbox state -->
+            <span class="sr-only">
+                {{ modelValue ? 'Checked' : 'Unchecked' }}
+            </span>
         </CheckboxRoot>
         <div class="flex flex-col" v-if="!solo">
             <label class="text-sm font-normal antialiased" :for="id">
                 <slot>{{ label || value }}</slot>
             </label>
-            <p v-if="description" class="mt-0.5 block text-xs leading-snug text-gray-500 dark:text-gray-400">{{ description }}</p>
+            <p v-if="description" :id="`${id}-description`" class="mt-0.5 block text-xs leading-snug text-gray-500 dark:text-gray-400">{{ description }}</p>
         </div>
     </div>
 </template>

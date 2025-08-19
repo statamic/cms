@@ -3,7 +3,6 @@ import { onUnmounted } from 'vue';
 
 const props = defineProps({
     category: { type: String },
-    type: { type: String },
     icon: { type: String },
     when: { type: Function },
     text: { type: [String, Array] },
@@ -22,7 +21,6 @@ onUnmounted(() => command.remove());
 <template>
     <slot
         :category="category"
-        :type="type"
         :icon="icon"
         :when="when"
         :text="text"

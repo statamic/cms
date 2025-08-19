@@ -132,7 +132,7 @@ export default {
         },
 
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
+            if (!this.showFieldPreviews) return;
 
             return this.value.map((id) => {
                 const item = this.meta.data.find((d) => d.id === id);

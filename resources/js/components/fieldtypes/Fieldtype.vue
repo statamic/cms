@@ -66,7 +66,7 @@ export default {
         },
 
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
+            if (!this.showFieldPreviews) return;
 
             return this.value;
         },
@@ -101,7 +101,7 @@ export default {
         replicatorPreview: {
             immediate: true,
             handler(text) {
-                if (!this.showFieldPreviews || !this.config.replicator_preview) return;
+                if (!this.showFieldPreviews) return;
 
                 this.$emit('replicator-preview-updated', text);
             },

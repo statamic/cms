@@ -1,5 +1,5 @@
 <script setup>
-import { computed, useTemplateRef, watch, ref } from 'vue';
+import { computed, useTemplateRef, watch, ref, inject } from 'vue';
 import { injectContainerContext } from './Container.vue';
 import { injectFieldsContext } from './FieldsProvider.vue';
 import { Field, Icon, Tooltip, Label } from '@/components/ui';
@@ -127,6 +127,12 @@ const shouldShowLabel = computed(
         isSyncable.value, // Need to see the icon
 );
 
+const shouldShowFieldPreviews = computed(() => {
+    if (! props.config.replicator_preview) return false;
+
+    return inject('showReplicatorFieldPreviews', false);
+});
+
 const isLocalizable = computed(() => props.config.localizable);
 
 const isReadOnly = computed(() => {
@@ -174,7 +180,7 @@ const fieldtypeComponentProps = computed(() => ({
     fieldPathPrefix: fieldPathPrefix.value,
     metaPathPrefix: metaPathPrefix.value,
     readOnly: isReadOnly.value,
-    showFieldPreviews: true
+    showFieldPreviews: shouldShowFieldPreviews.value,
 }));
 
 const fieldtypeComponentEvents = computed(() => ({

@@ -10,19 +10,20 @@ const { filters, activeFilters, activeFilterBadges, activeFilterBadgeCount, setF
 
 const open = ref(false);
 
-const fieldFilter = computed(() => filters.value.find((filter) => filter.handle === 'fields'));
-const standardFilters = computed(() => filters.value.filter((filter) => filter.handle !== 'fields'));
-const fieldFilterBadges = computed(() => activeFilterBadges.value.fields || {});
+const fieldFilter = computed(() => filters.value.find((filter) => filter.is_fields));
+const fieldFilterHandle = computed(() => fieldFilter.value.handle);
+const fieldFilterBadges = computed(() => activeFilterBadges.value[fieldFilterHandle.value] || {});
+const standardFilters = computed(() => filters.value.filter((filter) => !filter.is_fields));
 
 const standardBadges = computed(() => {
-    const { fields, ...badges } = activeFilterBadges.value;
+    const { [fieldFilterHandle.value]: fields, ...badges } = activeFilterBadges.value;
     return badges;
 });
 
 function removeFieldFilter(handle) {
-    const fields = { ...activeFilters.value.fields };
+    const fields = { ...activeFilters.value[fieldFilterHandle.value] };
     delete fields[handle];
-    setFilter('fields', fields);
+    setFilter(fieldFilterHandle.value, fields);
 }
 
 function isActive(handle) {
@@ -41,25 +42,32 @@ function isActive(handle) {
                     :text="activeFilterBadgeCount"
                     size="sm"
                     pill
-                    class="absolute -top-1.5 -right-1.5"
+                    class="absolute -top-1.25 -right-2.75"
                 />
             </Button>
         </div>
 
         <stack half name="filters" v-if="open" @closed="open = false">
-            <div class="flex-1 p-3 bg-white h-full overflow-auto rounded-l-2xl">
-                <Heading size="lg" :text="__('Filters')" class="mb-4" icon="sliders-horizontal" />
+            <div class="flex-1 p-3 bg-white h-full overflow-auto rounded-l-2xl relative">
+                <Button 
+                    icon="x" 
+                    variant="ghost" 
+                    size="sm" 
+                    class="absolute top-1.75 right-3 z-10 [&_svg]:size-4" 
+                    @click="open = false"
+                />
+                <Heading size="lg" :text="__('Filters')" class="mb-4 px-1.5 pr-12 [&_svg]:size-4" icon="sliders-horizontal" />
                 <div class="space-y-4">
-                    <Panel>
+                    <Panel v-if="fieldFilter">
                         <PanelHeader class="flex items-center justify-between">
                             <Heading :text="__('Fields')" />
-                            <Button v-if="isActive('fields')" size="sm" text="Clear" @click="setFilter('fields', null)" />
+                            <Button v-if="isActive(fieldFilterHandle)" size="sm" text="Clear" @click="setFilter(fieldFilterHandle, null)" />
                         </PanelHeader>
                         <Card>
                             <FieldFilter
                                 :config="fieldFilter"
                                 :values="activeFilters.fields || {}"
-                                @changed="setFilter('fields', $event)"
+                                @changed="setFilter(fieldFilterHandle, $event)"
                             />
                         </Card>
                     </Panel>

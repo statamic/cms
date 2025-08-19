@@ -4,6 +4,7 @@
 
 @extends('statamic::layout')
 @section('title', __('Create Form'))
+@section('content-card-modifiers', 'bg-architectural-lines')
 
 @section('content')
     <ui-create-form

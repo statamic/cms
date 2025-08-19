@@ -1,14 +1,39 @@
 <script setup>
 import { Button, PublishContainer, PublishField } from '@/components/ui';
 import PublishFieldsProvider from '@/components/ui/Publish/FieldsProvider.vue';
+import { ref, nextTick } from 'vue';
 
-const emit = defineEmits(['update:values', 'removed']);
+const emit = defineEmits(['update:values', 'removed', 'enter-pressed']);
 
 const props = defineProps({
     display: { type: String, required: true },
     fields: { type: Array, required: true },
     meta: { type: Object, required: true },
     values: { type: Object, required: true },
+});
+
+const fieldContainer = ref(null);
+
+const focusFirstField = async () => {
+    await nextTick();
+    if (fieldContainer.value) {
+        // Look for the first input, textarea, or select element
+        const firstInput = fieldContainer.value.querySelector('input:not([readonly]), textarea, select, [contenteditable="true"]');
+        if (firstInput) {
+            firstInput.focus();
+        }
+    }
+};
+
+const handleKeydown = (event) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        emit('enter-pressed');
+    }
+};
+
+defineExpose({
+    focusFirstField
 });
 </script>
 
@@ -25,7 +50,7 @@ const props = defineProps({
                     <div class="w-1/4 user-select-none">
                         <ui-input read-only :value="display" class="focus-within:outline-none" />
                     </div>
-                    <div class="flex-1 flex items-center gap-2">
+                    <div ref="fieldContainer" class="flex-1 flex items-center gap-2" @keydown="handleKeydown">
                         <PublishField
                             v-for="field in fields"
                             :key="field.handle"

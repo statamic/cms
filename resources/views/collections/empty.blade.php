@@ -8,7 +8,7 @@
     <header class="py-8 mt-8 text-center">
         <h1 class="text-[25px] font-medium antialiased flex justify-center items-center gap-3">
             <ui-icon name="collections" class="size-5 text-gray-500"></ui-icon>
-            {{ $collection->title() }}
+            <span v-pre>{{ $collection->title() }}</span>
         </h1>
     </header>
 
