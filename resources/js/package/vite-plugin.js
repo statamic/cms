@@ -13,7 +13,7 @@ export default function () {
             const existingExternal = config.build.rollupOptions.external;
             config.build.rollupOptions.external = [
                 ...existingExternal,
-                // 'vue',
+                'vue',
                 // Match @statamic/cms and any subpath
                 /^@statamic\/cms(\/.*)?$/,
             ];
