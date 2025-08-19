@@ -15,10 +15,11 @@ class Authentication
      */
     public function handle($request, Closure $next)
     {
-        if ($token = config('statamic.api.api_token')) {
-            if ($token !== $request->bearerToken()) {
-                throw new AuthenticationException();
-            }
+        if (
+            ($token = config('statamic.api.api_token'))
+            && ($request->bearerToken() !== $token)
+        ) {
+            throw new AuthenticationException();
         }
 
         return $next($request);
