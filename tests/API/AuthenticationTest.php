@@ -29,9 +29,8 @@ class AuthenticationTest extends TestCase
         Facades\Config::set('statamic.api.api_token', 'foobar');
 
         $this
-            ->getJson('/api/collections/articles/entries', [
-                'Authorization' => 'Bearer foobar',
-            ])
+            ->withToken('foobar')
+            ->getJson('/api/collections/articles/entries')
             ->assertOk();
     }
 
@@ -41,9 +40,8 @@ class AuthenticationTest extends TestCase
         Facades\Config::set('statamic.api.api_token', 'foobar');
 
         $this
-            ->getJson('/api/collections/articles/entries', [
-                'Authorization' => 'Bearer invalid',
-            ])
+            ->withToken('invalid')
+            ->getJson('/api/collections/articles/entries')
             ->assertUnauthorized();
     }
 
@@ -52,7 +50,9 @@ class AuthenticationTest extends TestCase
     {
         Facades\Config::set('statamic.api.api_token', 'foobar');
 
-        $this->getJson('/api/collections/articles/entries')->assertUnauthorized();
+        $this
+            ->getJson('/api/collections/articles/entries')
+            ->assertUnauthorized();
     }
 
     #[Test]
