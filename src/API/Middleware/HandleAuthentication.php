@@ -5,7 +5,7 @@ namespace Statamic\API\Middleware;
 use Closure;
 use Statamic\Exceptions\AuthenticationException;
 
-class Authentication
+class HandleAuthentication
 {
     /**
      * Handle an incoming request.

@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Statamic\API\Middleware\Authentication;
+use Statamic\API\Middleware\HandleAuthentication;
 use Statamic\API\Middleware\Cache;
 use Statamic\Facades\Glide;
 use Statamic\Http\Middleware\CP\SwapExceptionHandler as SwapCpExceptionHandler;
@@ -10,7 +10,7 @@ use Statamic\Http\Middleware\RequireStatamicPro;
 if (config('statamic.api.enabled')) {
     Route::middleware([
         RequireStatamicPro::class,
-        Authentication::class,
+        HandleAuthentication::class,
         Cache::class,
     ])->group(function () {
         Route::middleware(config('statamic.api.middleware'))
