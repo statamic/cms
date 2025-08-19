@@ -53,7 +53,7 @@ function isActive(handle) {
                     icon="x" 
                     variant="ghost" 
                     size="sm" 
-                    class="absolute top-2 right-3 z-10 [&_svg]:size-4" 
+                    class="absolute top-1.75 right-3 z-10 [&_svg]:size-4" 
                     @click="open = false"
                 />
                 <Heading size="lg" :text="__('Filters')" class="mb-4 px-1.5 pr-12 [&_svg]:size-4" icon="sliders-horizontal" />
