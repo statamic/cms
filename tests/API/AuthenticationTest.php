@@ -24,9 +24,9 @@ class AuthenticationTest extends TestCase
     }
 
     #[Test]
-    public function it_can_authenticate_using_api_token()
+    public function it_can_authenticate_using_auth_token()
     {
-        Facades\Config::set('statamic.api.api_token', 'foobar');
+        Facades\Config::set('statamic.api.auth_token', 'foobar');
 
         $this
             ->withToken('foobar')
@@ -35,9 +35,9 @@ class AuthenticationTest extends TestCase
     }
 
     #[Test]
-    public function it_cant_authenticate_with_invalid_api_token()
+    public function it_cant_authenticate_with_invalid_auth_token()
     {
-        Facades\Config::set('statamic.api.api_token', 'foobar');
+        Facades\Config::set('statamic.api.auth_token', 'foobar');
 
         $this
             ->withToken('invalid')
@@ -46,9 +46,9 @@ class AuthenticationTest extends TestCase
     }
 
     #[Test]
-    public function it_cant_authenticate_without_api_token()
+    public function it_cant_authenticate_without_auth_token()
     {
-        Facades\Config::set('statamic.api.api_token', 'foobar');
+        Facades\Config::set('statamic.api.auth_token', 'foobar');
 
         $this
             ->getJson('/api/collections/articles/entries')
@@ -56,9 +56,9 @@ class AuthenticationTest extends TestCase
     }
 
     #[Test]
-    public function authentication_only_required_when_api_token_is_set()
+    public function authentication_only_required_when_auth_token_is_set()
     {
-        Facades\Config::set('statamic.api.api_token', null);
+        Facades\Config::set('statamic.api.auth_token', null);
 
         $this
             ->getJson('/api/collections/articles/entries')
