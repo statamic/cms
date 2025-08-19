@@ -1,5 +1,5 @@
 <script setup>
-import { CardPanel } from '@statamic/ui';
+import { CardPanel } from '@/components/ui';
 
 const props = defineProps({
     heading: {

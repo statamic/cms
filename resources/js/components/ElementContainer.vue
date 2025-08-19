@@ -1,6 +1,6 @@
 <script>
 import ResizeObserver from 'resize-observer-polyfill';
-import throttle from '@statamic/util/throttle.js';
+import throttle from '@/util/throttle.js';
 
 export default {
     emits: ['resized'],

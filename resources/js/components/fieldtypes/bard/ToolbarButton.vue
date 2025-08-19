@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { Button } from '@statamic/ui';
+import { Button } from '@/components/ui';
 
 export default {
     components: {

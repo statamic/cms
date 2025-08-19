@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import { Button, Heading, Field, Input } from 'statamic';
+import { Button, Heading, Field, Input } from '@/components/ui';
 
 export default {
     components: {

@@ -1,7 +1,7 @@
 <script setup>
 import { sortBy } from 'lodash-es';
-import { Combobox, CardPanel } from '@statamic/ui';
-import { computed, ref, watch } from 'vue';
+import { Combobox, CardPanel } from '@/components/ui';
+import { computed, ref, watch, nextTick } from 'vue';
 import FieldFilterRow from './FieldFilterRow.vue';
 
 const emit = defineEmits(['changed', 'cleared']);
@@ -12,6 +12,8 @@ const props = defineProps({
 });
 
 const rows = ref([]);
+const rowRefs = ref({});
+const fieldSelect = ref(null);
 
 watch(
     () => props.values,
@@ -52,7 +54,7 @@ const fieldComboboxOptions = computed(() => {
     return sortBy(options, (option) => option.label);
 });
 
-function createFilter(newField) {
+async function createFilter(newField) {
     const filter = availableFieldFilters.value.find((filter) => filter.handle === newField);
 
     let defaultValues = {};
@@ -62,6 +64,13 @@ function createFilter(newField) {
     filter.values = defaultValues;
 
     rows.value.push(filter);
+    
+    // Focus on the newly created row's first field
+    await nextTick();
+    const newRowRef = rowRefs.value[filter.handle];
+    if (newRowRef && newRowRef.focusFirstField) {
+        newRowRef.focusFirstField();
+    }
 }
 
 function rowUpdated(handle, newValues) {
@@ -77,6 +86,17 @@ function removeRow(handle) {
     delete newValues[handle];
     emit('changed', newValues);
 }
+
+async function handleEnterPressed() {
+    await nextTick();
+    if (fieldSelect.value && hasAvailableFieldFilters.value) {
+        // Focus the combobox to allow adding another field
+        const comboboxInput = fieldSelect.value.$el?.querySelector('input') || fieldSelect.value.$el?.querySelector('[role="combobox"]');
+        if (comboboxInput) {
+            comboboxInput.focus();
+        }
+    }
+}
 </script>
 
 <template>
@@ -84,12 +104,14 @@ function removeRow(handle) {
         <FieldFilterRow
             v-for="filter in rows"
             :key="filter.handle"
+            :ref="(el) => { if (el) rowRefs[filter.handle] = el }"
             :display="filter.display"
             :fields="filter.fields"
             :meta="filter.meta"
             :values="filter.values"
             @update:values="rowUpdated(filter.handle, $event)"
             @removed="removeRow(filter.handle)"
+            @enter-pressed="handleEnterPressed"
         />
 
         <Combobox

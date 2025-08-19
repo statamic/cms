@@ -36,8 +36,8 @@
 
 <script>
 import Revision from './Revision.vue';
-import DateFormatter from '@statamic/components/DateFormatter.js';
-import { Heading, Button, Icon } from '@statamic/ui';
+import DateFormatter from '@/components/DateFormatter.js';
+import { Heading, Button, Icon } from '@/components/ui';
 
 export default {
     components: {

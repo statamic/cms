@@ -3,7 +3,7 @@ import { computed, inject, useSlots } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
 import { ToggleGroupItem } from 'reka-ui';
-import { Icon } from '@statamic/ui';
+import { Icon } from '@/components/ui';
 
 const props = defineProps({
     value: { type: String, required: true },
@@ -78,17 +78,17 @@ const toggleItemClasses = computed(() => {
 </script>
 
 <template>
-    <ToggleGroupItem 
-        :value="value" 
+    <ToggleGroupItem
+        :value="value"
         :aria-label="accessibleLabel"
         :aria-describedby="ariaDescribedby"
         :disabled="disabled"
-        :class="toggleItemClasses" 
+        :class="toggleItemClasses"
         data-ui-group-target
     >
-        <Icon 
-            v-if="icon" 
-            :name="icon" 
+        <Icon
+            v-if="icon"
+            :name="icon"
             class="text-gray-400"
             :aria-hidden="!iconOnly"
         />

@@ -1,5 +1,5 @@
 <script setup>
-import { Card, Icon } from '@statamic/ui';
+import { Card, Icon } from '@/components/ui';
 
 defineProps({
     title: String,
@@ -15,7 +15,7 @@ defineProps({
                     <Icon :name="icon" class="hidden! size-5 text-gray-500 @xs/widget:block!" />
                     <span v-text="title" />
                 </div>
-                <div class="flex items-center gap-4 -mr-2">
+                <div class="flex items-center gap-4 -mr-2.5">
                     <slot name="actions" />
                 </div>
             </header>

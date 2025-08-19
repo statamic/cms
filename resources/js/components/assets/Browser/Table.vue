@@ -117,7 +117,7 @@
 import AssetBrowserMixin from './AssetBrowserMixin';
 import AssetThumbnail from './Thumbnail.vue';
 import Breadcrumbs from './Breadcrumbs.vue';
-import ItemActions from '@statamic/components/actions/ItemActions.vue';
+import ItemActions from '@/components/actions/ItemActions.vue';
 import {
     Card,
     Dropdown,
@@ -130,7 +130,7 @@ import {
     PanelFooter,
     PanelHeader,
     ListingTable,
-} from '@statamic/ui';
+} from '@/components/ui';
 
 export default {
     mixins: [AssetBrowserMixin],

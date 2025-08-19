@@ -1,6 +1,6 @@
 <script setup>
 import { TimeFieldInput, TimeFieldRoot } from 'reka-ui';
-import { Button } from '@statamic/ui';
+import { Button } from '@/components/ui';
 
 const emit = defineEmits(['update:modelValue']);
 

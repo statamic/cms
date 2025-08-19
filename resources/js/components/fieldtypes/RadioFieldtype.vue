@@ -14,7 +14,7 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import HasInputOptions from './HasInputOptions.js';
-import { RadioGroup, Radio } from '@statamic/ui';
+import { RadioGroup, Radio } from '@/components/ui';
 
 export default {
     mixins: [Fieldtype, HasInputOptions],

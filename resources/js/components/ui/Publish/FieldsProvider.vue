@@ -1,5 +1,5 @@
 <script>
-import createContext from '@statamic/util/createContext.js';
+import createContext from '@/util/createContext.js';
 
 export const [injectFieldsContext, provideFieldsContext] = createContext('PublishFields');
 </script>

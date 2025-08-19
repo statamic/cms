@@ -9,7 +9,7 @@
         <div class="flex items-center gap-2">
             <x-statamic::avatar :user="$user" class="size-8!" />
             <div>
-                <div class="text-sm">{{ $user->email() }}</div>
+                <div class="text-sm" v-pre>{{ $user->email() }}</div>
                 @if ($user->isSuper())
                     <div class="text-xs text-gray-500 font-normal flex items-center gap-1">
                         {{ __('Super Admin') }}

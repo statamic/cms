@@ -1,0 +1,27 @@
+{
+    "name": "@statamic/cms",
+    "dependencies": {
+        "@vitejs/plugin-vue": "^6.0.0"
+    },
+    "exports": {
+        ".": {
+            "types": "./types/bootstrap/cms/core.d.ts",
+            "default": "./index.js"
+        },
+        "./ui": {
+            "types": "./types/bootstrap/cms/ui.d.ts",
+            "default": "./ui.js"
+        },
+        "./bard": {
+            "types": "./types/bootstrap/cms/bard.d.ts",
+            "default": "./bard.js"
+        },
+        "./save-pipeline": {
+            "types": "./types/bootstrap/cms/save-pipeline.d.ts",
+            "default": "./save-pipeline.js"
+        },
+        "./vite-plugin": {
+            "default": "./vite-plugin.js"
+        }
+    }
+}

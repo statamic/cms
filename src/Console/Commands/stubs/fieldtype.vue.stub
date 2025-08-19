@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { Fieldtype } from 'statamic';
+import { Fieldtype } from '@statamic/cms';
 
 export default {
 

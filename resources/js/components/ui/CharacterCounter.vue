@@ -1,7 +1,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 import { cva } from 'cva';
-import { Tooltip } from '@statamic/ui';
+import { Tooltip } from '@/components/ui';
 
 const emit = defineEmits(['update:text']);
 

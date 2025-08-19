@@ -12,9 +12,9 @@ import {
     ComboboxViewport,
 } from 'reka-ui';
 import { computed, nextTick, onMounted, ref, useAttrs, useSlots, useTemplateRef, watch } from 'vue';
-import { Button, Icon, Badge } from '@statamic/ui';
+import { Button, Icon, Badge } from '@/components/ui';
 import fuzzysort from 'fuzzysort';
-import { SortableList } from '@statamic/components/sortable/Sortable.js';
+import { SortableList } from '@/components/sortable/Sortable.js';
 
 const emit = defineEmits(['update:modelValue', 'search', 'selected', 'added']);
 
@@ -241,6 +241,34 @@ function pushTaggableOption(e) {
     }
 }
 
+function openOnSpace(e) {
+	const target = e && e.target ? e.target : null;
+	const tag = (target && target.tagName ? target.tagName : '').toLowerCase();
+	const isEditable = target && (tag === 'input' || tag === 'textarea' || target.isContentEditable);
+
+	// If already open, do nothing so Space behaves normally
+	if (dropdownOpen.value) return;
+
+	// If focused element is editable but dropdown is closed, intercept to open
+	if (isEditable) {
+		if (e && typeof e.preventDefault === 'function') e.preventDefault();
+		updateDropdownOpen(true);
+		nextTick(() => {
+			const inputEl = searchInputRef?.value?.$el || searchInputRef?.value;
+			if (inputEl && typeof inputEl.focus === 'function') inputEl.focus();
+		});
+		return;
+	}
+
+	// Non-editable target and closed: open
+	if (e && typeof e.preventDefault === 'function') e.preventDefault();
+	updateDropdownOpen(true);
+	nextTick(() => {
+		const inputEl = searchInputRef?.value?.$el || searchInputRef?.value;
+		if (inputEl && typeof inputEl.focus === 'function') inputEl.focus();
+	});
+}
+
 defineExpose({
     searchQuery,
     filteredOptions,
@@ -264,7 +292,7 @@ defineExpose({
                 @update:model-value="updateModelValue"
             >
                 <ComboboxAnchor :class="['w-full flex items-center justify-between gap-2 text-gray-900 dark:text-gray-300 antialiased appearance-none', $attrs.class]" data-ui-combobox-anchor>
-                    <ComboboxTrigger as="div" ref="trigger" :class="triggerClasses">
+                    <ComboboxTrigger as="div" ref="trigger" :class="triggerClasses" @keydown.space="openOnSpace">
                         <ComboboxInput
                             v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"
                             ref="search"
@@ -275,13 +303,14 @@ defineExpose({
                             @paste.prevent="onPaste"
                             @keydown.enter.prevent="pushTaggableOption"
                             @blur="pushTaggableOption"
+                            @keydown.space="openOnSpace"
                         />
 
-                        <button type="button" class="flex-1 text-start truncate" v-else-if="!searchable && (dropdownOpen || !modelValue)">
+                        <button type="button" class="flex-1 text-start truncate" v-else-if="!searchable && (dropdownOpen || !modelValue)" @keydown.space="openOnSpace">
                             <span class="text-gray-400 dark:text-gray-500 placeholder-text-xs" v-text="placeholder" />
                         </button>
 
-                        <button type="button" v-else class="flex-1 text-start cursor-pointer truncate">
+                        <button type="button" v-else class="flex-1 text-start cursor-pointer truncate" @keydown.space="openOnSpace">
                             <slot name="selected-option" v-bind="{ option: selectedOption }">
                                 <span v-if="labelHtml" v-html="getOptionLabel(selectedOption)" />
                                 <span v-else v-text="getOptionLabel(selectedOption)" />

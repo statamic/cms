@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue';
-import DateFormatter from '@statamic/components/DateFormatter.js';
+import DateFormatter from '@/components/DateFormatter.js';
 import {
     Widget,
     StatusIndicator,
@@ -9,7 +9,7 @@ import {
     ListingTableBody as TableBody,
     ListingPagination as Pagination,
     Icon,
-} from '@statamic/ui';
+} from '@/components/ui';
 
 const props = defineProps({
     additionalColumns: Array,

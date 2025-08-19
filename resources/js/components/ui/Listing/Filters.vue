@@ -1,6 +1,6 @@
 <script setup>
-import { Badge, Button, Panel, PanelHeader, Card, Heading } from '@statamic/ui';
-import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
+import { Badge, Button, Panel, PanelHeader, Card, Heading } from '@/components/ui';
+import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
 import { computed } from 'vue';
 import FieldFilter from './FieldFilter.vue';
 import DataListFilter from './Filter.vue';
@@ -11,7 +11,7 @@ const { filters, activeFilters, activeFilterBadges, activeFilterBadgeCount, setF
 const open = ref(false);
 
 const fieldFilter = computed(() => filters.value.find((filter) => filter.is_fields));
-const fieldFilterHandle = computed(() => fieldFilter.value.handle);
+const fieldFilterHandle = computed(() => fieldFilter.value?.handle);
 const fieldFilterBadges = computed(() => activeFilterBadges.value[fieldFilterHandle.value] || {});
 const standardFilters = computed(() => filters.value.filter((filter) => !filter.is_fields));
 
@@ -42,14 +42,21 @@ function isActive(handle) {
                     :text="activeFilterBadgeCount"
                     size="sm"
                     pill
-                    class="absolute -top-1.5 -right-1.5"
+                    class="absolute -top-1.25 -right-2.75"
                 />
             </Button>
         </div>
 
         <stack half name="filters" v-if="open" @closed="open = false">
-            <div class="flex-1 p-3 bg-white dark:bg-gray-800 h-full overflow-auto rounded-l-2xl">
-                <Heading size="lg" :text="__('Filters')" class="mb-4" icon="sliders-horizontal" />
+            <div class="flex-1 p-3 bg-white h-full overflow-auto rounded-l-2xl relative">
+                <Button
+                    icon="x"
+                    variant="ghost"
+                    size="sm"
+                    class="absolute top-1.75 right-3 z-10 [&_svg]:size-4"
+                    @click="open = false"
+                />
+                <Heading size="lg" :text="__('Filters')" class="mb-4 px-1.5 pr-12 [&_svg]:size-4" icon="sliders-horizontal" />
                 <div class="space-y-4">
                     <Panel v-if="fieldFilter">
                         <PanelHeader class="flex items-center justify-between">
