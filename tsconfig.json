@@ -18,15 +18,7 @@
     "types": ["node"]
   },
   "include": [
-    "resources/js/bootstrap/cms/*.js",
-    "resources/js/components/ui/**/*.vue",
-    "resources/js/components/fieldtypes/fieldtype.js",
-    "resources/js/components/fieldtypes/index-fieldtype.js", 
-    "resources/js/components/fieldtypes/Fieldtype.vue",
-    "resources/js/components/fieldtypes/IndexFieldtype.vue",
-    "resources/js/components/elevated-sessions/**/*",
-    "resources/js/components/DateFormatter.js",
-    "resources/js/components/actions/ItemActions.vue"
+    "resources/js/bootstrap/cms",
   ],
   "exclude": [
     "node_modules",
