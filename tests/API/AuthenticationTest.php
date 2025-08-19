@@ -3,9 +3,9 @@
 namespace vendor\statamic\cms\tests\API;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
-use Statamic\Facades;
 
 class AuthenticationTest extends TestCase
 {
