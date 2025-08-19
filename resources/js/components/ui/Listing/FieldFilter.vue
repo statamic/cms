@@ -13,6 +13,7 @@ const props = defineProps({
 
 const rows = ref([]);
 const rowRefs = ref({});
+const fieldSelect = ref(null);
 
 watch(
     () => props.values,
@@ -85,6 +86,17 @@ function removeRow(handle) {
     delete newValues[handle];
     emit('changed', newValues);
 }
+
+async function handleEnterPressed() {
+    await nextTick();
+    if (fieldSelect.value && hasAvailableFieldFilters.value) {
+        // Focus the combobox to allow adding another field
+        const comboboxInput = fieldSelect.value.$el?.querySelector('input') || fieldSelect.value.$el?.querySelector('[role="combobox"]');
+        if (comboboxInput) {
+            comboboxInput.focus();
+        }
+    }
+}
 </script>
 
 <template>
@@ -99,6 +111,7 @@ function removeRow(handle) {
             :values="filter.values"
             @update:values="rowUpdated(filter.handle, $event)"
             @removed="removeRow(filter.handle)"
+            @enter-pressed="handleEnterPressed"
         />
 
         <Combobox

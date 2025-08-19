@@ -3,7 +3,7 @@ import { Button, PublishContainer, PublishField } from '@statamic/ui';
 import PublishFieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
 import { ref, nextTick } from 'vue';
 
-const emit = defineEmits(['update:values', 'removed']);
+const emit = defineEmits(['update:values', 'removed', 'enter-pressed']);
 
 const props = defineProps({
     display: { type: String, required: true },
@@ -25,6 +25,13 @@ const focusFirstField = async () => {
     }
 };
 
+const handleKeydown = (event) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        emit('enter-pressed');
+    }
+};
+
 defineExpose({
     focusFirstField
 });
@@ -43,7 +50,7 @@ defineExpose({
                     <div class="w-1/4 user-select-none">
                         <ui-input read-only :value="display" class="focus-within:outline-none" />
                     </div>
-                    <div ref="fieldContainer" class="flex-1 flex items-center gap-2">
+                    <div ref="fieldContainer" class="flex-1 flex items-center gap-2" @keydown="handleKeydown">
                         <PublishField
                             v-for="field in fields"
                             :key="field.handle"
