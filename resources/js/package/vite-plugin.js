@@ -11,32 +11,27 @@ const statamic = function (options) {
             config.build.rollupOptions.external = config.build.rollupOptions.external || [];
             config.build.rollupOptions.output = config.build.rollupOptions.output || {};
 
-            // Add Vue and all Statamic modules as external
+            // Add Vue as external
             const existingExternal = config.build.rollupOptions.external;
-            config.build.rollupOptions.external = [
-                ...existingExternal,
-                'vue',
-                // Match @statamic/cms and any subpath
-                /^@statamic\/cms(\/.*)?$/,
-            ];
-
-            // Set up globals for browser usage
-            const existingGlobals = config.build.rollupOptions.output.globals || {};
-            config.build.rollupOptions.output.globals = {
-                ...existingGlobals,
-                'vue': 'Vue',
-                '@statamic/cms': '__STATAMIC__.core',
-                '@statamic/cms/ui': '__STATAMIC__.ui',
-                '@statamic/cms/bard': '__STATAMIC__.bard',
-                '@statamic/cms/save-pipeline': '__STATAMIC__.savePipeline',
-            };
-
-            // Set default format if not specified
-            if (!config.build.rollupOptions.output.format) {
-                config.build.rollupOptions.output.format = 'iife';
-            }
+            config.build.rollupOptions.external = [...existingExternal, 'vue'];
 
             return config;
+        },
+
+        configResolved(resolvedConfig) {
+            resolvedConfig.build.rollupOptions.plugins = resolvedConfig.build.rollupOptions.plugins || [];
+            resolvedConfig.build.rollupOptions.plugins.push({
+                name: 'statamic-global-externals',
+                renderChunk(code, chunk) {
+                    code = code.replace(/import\s+(.+?)\s+from\s+['"]vue['"];?/g, 'const $1 = window.Vue;');
+                    code = code.replace(/import\s+(.+?)\s+from\s+['"]@statamic\/cms['"];?/g, 'const $1 = window.__STATAMIC__.core;');
+                    code = code.replace(/import\s+(.+?)\s+from\s+['"]@statamic\/cms\/ui['"];?/g, 'const $1 = window.__STATAMIC__.ui;');
+                    code = code.replace(/import\s+(.+?)\s+from\s+['"]@statamic\/cms\/bard['"];?/g, 'const $1 = window.__STATAMIC__.bard;');
+                    code = code.replace(/import\s+(.+?)\s+from\s+['"]@statamic\/cms\/save-pipeline['"];?/g, 'const $1 = window.__STATAMIC__.savePipeline;');
+
+                    return code;
+                }
+            });
         }
     };
 };
