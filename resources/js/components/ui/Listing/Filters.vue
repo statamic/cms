@@ -8,6 +8,7 @@ import DataListFilter from './Filter.vue';
 const { filters, activeFilters, activeFilterBadges, activeFilterBadgeCount, setFilter, reorderable } = injectListingContext();
 
 const open = ref(false);
+const filtersButtonWrapperRef = ref(null);
 
 const fieldFilter = computed(() => filters.value.find((filter) => filter.is_fields));
 const fieldFilterHandle = computed(() => fieldFilter.value?.handle);
@@ -29,32 +30,70 @@ function isActive(handle) {
     return activeFilters.value.hasOwnProperty(handle);
 }
 
-// Focus the "Add Field" combobox when the stack opens
 const stackContentRef = ref(null);
+const comboboxObserver = ref(null);
+
+function tryFocusCombobox(root) {
+    if (!root) return false;
+    const anchor = root.querySelector('[data-ui-combobox-anchor]');
+    if (anchor && typeof anchor.focus === 'function') {
+        anchor.focus();
+        return true;
+    }
+    const input = root.querySelector('input');
+    if (input && typeof input.focus === 'function') {
+        input.focus();
+        return true;
+    }
+    return false;
+}
+
+function focusComboboxWhenReady() {
+    const root = stackContentRef.value;
+    if (!root) return;
+
+    // If already in DOM, focus immediately
+    if (tryFocusCombobox(root)) return;
+
+    // Otherwise observe for it to appear
+    if (comboboxObserver.value) comboboxObserver.value.disconnect();
+    comboboxObserver.value = new MutationObserver(() => {
+        if (tryFocusCombobox(root)) {
+            comboboxObserver.value.disconnect();
+            comboboxObserver.value = null;
+        }
+    });
+    comboboxObserver.value.observe(root, { childList: true, subtree: true });
+}
+
 watch(open, async (isOpen) => {
     if (!isOpen) return;
     await nextTick();
-    // slight delay to ensure inner components rendered
-    setTimeout(() => {
-        const root = stackContentRef.value;
-        if (!root) return;
-        // Prefer the combobox anchor
-        const anchor = root.querySelector('[data-ui-combobox-anchor]');
-        if (anchor && typeof anchor.focus === 'function') {
-            anchor.focus();
-            return;
-        }
-        // Fallback to first input
-        const input = root.querySelector('input');
-        if (input && typeof input.focus === 'function') input.focus();
-    }, 50);
+    focusComboboxWhenReady();
 });
+
+function handleStackClosed() {
+    // Clean up observer if active
+    if (comboboxObserver.value) {
+        comboboxObserver.value.disconnect();
+        comboboxObserver.value = null;
+    }
+
+    open.value = false;
+    nextTick(() => {
+        requestAnimationFrame(() => {
+            const wrapper = filtersButtonWrapperRef.value;
+            const buttonEl = wrapper ? wrapper.querySelector('button') : null;
+            if (buttonEl && typeof buttonEl.focus === 'function') buttonEl.focus();
+        });
+    });
+}
 </script>
 
 <template>
     <div class="flex flex-1 items-center gap-3 overflow-x-auto py-3 rounded-r-4xl">
 
-        <div class="sticky left-0 ps-[1px] rounded-r-lg bg-white dark:bg-gray-900 mask-bg mask-bg--left mask-bg--left-small">
+        <div ref="filtersButtonWrapperRef" class="sticky left-0 ps-[1px] rounded-r-lg bg-white dark:bg-gray-900 mask-bg mask-bg--left mask-bg--left-small">
             <Button icon="sliders-horizontal" class="[&_svg]:size-3.5" :disabled="reorderable" @click="open = true">
                 {{ __('Filters') }}
                 <Badge
@@ -67,14 +106,14 @@ watch(open, async (isOpen) => {
             </Button>
         </div>
 
-        <stack half name="filters" v-if="open" @closed="open = false">
+        <stack half name="filters" v-if="open" @closed="handleStackClosed">
             <div ref="stackContentRef" class="flex-1 p-3 bg-white h-full overflow-auto rounded-l-2xl relative">
                 <Button
                     icon="x"
                     variant="ghost"
                     size="sm"
                     class="absolute top-1.75 right-3 z-10 [&_svg]:size-4"
-                    @click="open = false"
+                    @click="handleStackClosed"
                 />
                 <Heading size="lg" :text="__('Filters')" class="mb-4 px-1.5 pr-12 [&_svg]:size-4" icon="sliders-horizontal" />
                 <div class="space-y-4">
