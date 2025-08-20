@@ -304,7 +304,7 @@
 
             b,
             strong {
-                @apply font-bold text-gray-800;
+                @apply font-bold text-gray-800 dark:text-gray-100;
             }
 
             em,
@@ -313,7 +313,7 @@
             }
 
             a {
-                @apply break-words text-blue-600 underline dark:text-dark-blue-100;
+                @apply break-words text-blue-600 underline dark:text-blue-100;
             }
 
             a:active,
