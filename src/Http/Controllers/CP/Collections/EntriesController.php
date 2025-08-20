@@ -70,15 +70,15 @@ class EntriesController extends CpController
         $query = $collection->queryEntries();
 
         if ($search = request('search')) {
-            if ($collection->hasSearchIndex()) {
-                return $collection
-                    ->searchIndex()
-                    ->ensureExists()
-                    ->search($search)
-                    ->where('collection', $collection->handle());
-            }
-
             $query->where('title', 'like', '%'.$search.'%');
+        }
+
+        if ($search && $collection->hasSearchIndex()) {
+            $query = $collection
+                ->searchIndex()
+                ->ensureExists()
+                ->search($search)
+                ->where('collection', $collection->handle());
         }
 
         if (Site::multiEnabled()) {
