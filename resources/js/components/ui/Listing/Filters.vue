@@ -1,10 +1,9 @@
 <script setup>
 import { Badge, Button, Panel, PanelHeader, Card, Heading } from '@/components/ui';
 import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
-import { computed } from 'vue';
+import { computed, ref, watch, nextTick } from 'vue';
 import FieldFilter from './FieldFilter.vue';
 import DataListFilter from './Filter.vue';
-import { ref } from 'vue';
 
 const { filters, activeFilters, activeFilterBadges, activeFilterBadgeCount, setFilter, reorderable } = injectListingContext();
 
@@ -29,6 +28,27 @@ function removeFieldFilter(handle) {
 function isActive(handle) {
     return activeFilters.value.hasOwnProperty(handle);
 }
+
+// Focus the "Add Field" combobox when the stack opens
+const stackContentRef = ref(null);
+watch(open, async (isOpen) => {
+    if (!isOpen) return;
+    await nextTick();
+    // slight delay to ensure inner components rendered
+    setTimeout(() => {
+        const root = stackContentRef.value;
+        if (!root) return;
+        // Prefer the combobox anchor
+        const anchor = root.querySelector('[data-ui-combobox-anchor]');
+        if (anchor && typeof anchor.focus === 'function') {
+            anchor.focus();
+            return;
+        }
+        // Fallback to first input
+        const input = root.querySelector('input');
+        if (input && typeof input.focus === 'function') input.focus();
+    }, 50);
+});
 </script>
 
 <template>
@@ -48,7 +68,7 @@ function isActive(handle) {
         </div>
 
         <stack half name="filters" v-if="open" @closed="open = false">
-            <div class="flex-1 p-3 bg-white h-full overflow-auto rounded-l-2xl relative">
+            <div ref="stackContentRef" class="flex-1 p-3 bg-white h-full overflow-auto rounded-l-2xl relative">
                 <Button
                     icon="x"
                     variant="ghost"
