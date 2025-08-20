@@ -200,13 +200,16 @@ class AssetContainersController extends CpController
                 'display' => __('Fields'),
                 'fields' => [
                     'blueprint' => [
-                        'type' => 'html',
                         'display' => __('Blueprint'),
                         'instructions' => __('statamic::messages.asset_container_blueprint_instructions'),
-                        'html' => $container ? ''.
-                            '<div class="text-xs">'.
-                            '   <a href="'.cp_route('blueprints.asset-containers.edit', $container->handle()).'" class="text-blue">'.__('Edit').'</a>'.
-                            '</div>' : '<div class="text-xs text-gray">'.__('Editable once created').'</div>',
+                        'type' => 'blueprints',
+                        'options' => [
+                            [
+                                'handle' => 'default',
+                                'title' => __('Edit Blueprint'),
+                                'edit_url' => cp_route('blueprints.asset-containers.edit', $container->handle()),
+                            ],
+                        ],
                     ],
                 ],
             ];

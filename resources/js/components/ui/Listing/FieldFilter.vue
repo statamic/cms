@@ -1,7 +1,7 @@
 <script setup>
 import { sortBy } from 'lodash-es';
 import { Combobox, CardPanel } from '@/components/ui';
-import { computed, ref, watch, nextTick } from 'vue';
+import { computed, ref, watch, nextTick, onMounted } from 'vue';
 import FieldFilterRow from './FieldFilterRow.vue';
 
 const emit = defineEmits(['changed', 'cleared']);
@@ -97,6 +97,46 @@ async function handleEnterPressed() {
         }
     }
 }
+
+// Robust auto-focus for the "Add Field" combobox
+const didAutoFocus = ref(false);
+async function focusAddFieldCombobox() {
+    if (didAutoFocus.value) return;
+    await nextTick();
+    if (!fieldSelect.value) return;
+
+    // Prefer the actual input if present
+    const input = fieldSelect.value.$el?.querySelector('input');
+    if (input && typeof input.focus === 'function') {
+        input.focus();
+        didAutoFocus.value = true;
+        return;
+    }
+
+    // Fallback to the combobox anchor/trigger
+    const anchor = fieldSelect.value.$el?.querySelector('[data-ui-combobox-anchor]');
+    if (anchor && typeof anchor.focus === 'function') {
+        anchor.focus();
+        didAutoFocus.value = true;
+    }
+}
+
+onMounted(() => {
+    if (hasAvailableFieldFilters.value) {
+        focusAddFieldCombobox();
+    }
+});
+
+watch(availableFieldFilters, (list) => {
+    if (list && list.length && !didAutoFocus.value) {
+        focusAddFieldCombobox();
+    }
+});
+
+// Expose for parents that want to trigger focus explicitly
+defineExpose({
+    focusAddFieldCombobox,
+});
 </script>
 
 <template>
