@@ -296,7 +296,7 @@ defineExpose({
                         <ComboboxInput
                             v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"
                             ref="search"
-                            class="w-full text-gray-700 opacity-100 focus:outline-none placeholder-xs"
+                            class="w-full text-gray-700 dark:text-gray-400 opacity-100 focus:outline-none placeholder-xs"
                             :id="id"
                             v-model="searchQuery"
                             :placeholder

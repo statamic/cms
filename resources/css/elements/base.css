@@ -50,6 +50,9 @@
     ::placeholder {
         @apply text-gray-500;
     }
+    :where(.dark, .dark *)::placeholder {
+        @apply text-gray-400;
+    }
 
     [type="checkbox"] {
         /* To effectively hide border radius clash with focus state */

@@ -39,7 +39,7 @@ const inputClasses = computed(() => {
         base: [
             'w-full block bg-white dark:bg-gray-900',
             'border border-gray-300 with-contrast:border-gray-500 dark:border-x-0 dark:border-t-0 dark:border-white/7.5 dark:inset-shadow-2xs dark:inset-shadow-black',
-            'text-gray-950 dark:text-gray-300 placeholder:text-gray-500 dark:placeholder:text-gray-500',
+            'text-gray-950 dark:text-gray-300 placeholder:text-gray-500 dark:placeholder:text-gray-400/75',
             'appearance-none antialiased shadow-ui-sm disabled:shadow-none disabled:opacity-50 read-only:border-dashed not-prose',
         ],
         variants: {
