@@ -43,6 +43,11 @@
         }
     }
 
+    /* e.g. >> /cp/collections/pages on the filter stack when you tab to a field condition like "contains" */
+    [class*="focus-within"] button:focus {
+        outline: none;
+    }
+
     a {
         cursor: pointer;
     }
@@ -72,7 +77,7 @@
     }
 
     /* Based on the global site picker. Only for buttons (i.e. don't affect select dropdowns on publish forms) */
-    [data-ui-combobox-anchor]:has(button):not(.main-content *) {
+    [data-ui-combobox-anchor]:has(button):not(.main-content *, .stack-content *) {
         /* Decrease */
         --focus-outline-offset: var(--outline-offset-button);
         /* Target the button inside the combobox */
