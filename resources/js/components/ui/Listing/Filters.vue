@@ -107,7 +107,7 @@ function handleStackClosed() {
         </div>
 
         <stack half name="filters" v-if="open" @closed="handleStackClosed">
-            <div ref="stackContentRef" class="flex-1 p-3 bg-white h-full overflow-auto rounded-l-2xl relative">
+            <div ref="stackContentRef" class="flex-1 p-3 bg-white dark:bg-gray-800 h-full overflow-auto rounded-l-2xl relative">
                 <Button
                     icon="x"
                     variant="ghost"
