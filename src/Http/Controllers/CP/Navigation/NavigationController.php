@@ -198,12 +198,16 @@ class NavigationController extends CpController
                 'display' => __('Options'),
                 'fields' => [
                     'blueprint' => [
-                        'type' => 'html',
+                        'display' => __('Blueprint'),
                         'instructions' => __('statamic::messages.navigation_configure_blueprint_instructions'),
-                        'html' => ''.
-                            '<div class="text-xs">'.
-                            '   <a href="'.cp_route('blueprints.navigation.edit', $nav->handle()).'" class="text-blue">'.__('Edit').'</a>'.
-                            '</div>',
+                        'type' => 'blueprints',
+                        'options' => [
+                            [
+                                'handle' => 'default',
+                                'title' => __('Edit Blueprint'),
+                                'edit_url' => cp_route('blueprints.navigation.edit', $nav->handle()),
+                            ],
+                        ],
                     ],
                     'collections' => [
                         'display' => __('Collections'),
