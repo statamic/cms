@@ -257,7 +257,7 @@ return [
     'names.TON' => 'Tonga',
     'names.TTO' => 'Trinidad en Tobago',
     'names.TUN' => 'Tunesië',
-    'names.TUR' => 'Kalkoen',
+    'names.TUR' => 'Turkije',
     'names.TKM' => 'Turkmenistan',
     'names.TCA' => 'Turks- en Caicoseilanden',
     'names.TUV' => 'Tuvalu',
