@@ -1,5 +1,24 @@
 # Release Notes
 
+## 5.64.0 (2025-08-21)
+
+### What's new
+- Add `overlaps` and `doesnt_overlap` conditions and modifiers [#9491](https://github.com/statamic/cms/issues/9491) by @ryanmitchell
+- Support whereJsonOverlaps in query builders [#11112](https://github.com/statamic/cms/issues/11112) by @ryanmitchell
+- Support pluck() on eloquent query builder [#12027](https://github.com/statamic/cms/issues/12027) by @ryanmitchell
+- Show path when searching assets [#12032](https://github.com/statamic/cms/issues/12032) by @duncanmcclean
+
+### What's fixed
+- Prevent zeros being filtered out in Array fieldtype [#12039](https://github.com/statamic/cms/issues/12039) by @duncanmcclean
+- Cast numbers in list fieldtype [#11970](https://github.com/statamic/cms/issues/11970) by @duncanmcclean
+- Updated the Stache Store to not remove stache items that exist [#11863](https://github.com/statamic/cms/issues/11863) by @simonworkhouse
+- Fix Custom Set Icons not working if path contains a dot (.) [#11866](https://github.com/statamic/cms/issues/11866) by @andjsch
+- Antlers: Corrects parser error with shorthand array syntax [#12031](https://github.com/statamic/cms/issues/12031) by @JohnathonKoster
+- Dutch translations [#12059](https://github.com/statamic/cms/issues/12059) by @Jade-GG
+- Fix windows test [#12048](https://github.com/statamic/cms/issues/12048) by @duncanmcclean
+
+
+
 ## 5.63.0 (2025-08-06)
 
 ### What's new
