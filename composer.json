@@ -70,6 +70,10 @@
             {
                 "url": "https://github.com/statamic/cms/releases/download/{$version}/dist-frontend.tar.gz",
                 "path": "resources/dist-frontend"
+            },
+            {
+                "url": "https://github.com/statamic/cms/releases/download/{$version}/dist-package.tar.gz",
+                "path": "resources/dist-package"
             }
         ],
         "laravel": {
