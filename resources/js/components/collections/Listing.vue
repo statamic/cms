@@ -56,7 +56,6 @@
                             :blueprints="collection.blueprints"
                             :text="__('Create Entry')"
                             size="sm"
-                            class="-mr-2"
                         />
                     </aside>
                 </ui-panel-header>
