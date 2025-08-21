@@ -380,7 +380,7 @@ export default {
         },
 
         canCreateFolders() {
-            return this.folder && this.container.create_folders && ! this.restrictFolderNavigation && (this.can('upload '+ this.container.id +' assets') || this.can('configure asset containers'));
+            return this.folder && this.container.create_folders && ! this.restrictFolderNavigation && (this.can('create '+ this.container.id +' folders') || this.can('configure asset containers'));
         },
 
         parameters() {

@@ -12,7 +12,7 @@ class AssetFolderPolicy
     {
         $user = User::fromUser($user);
 
-        if (! $user->hasPermission("upload {$assetContainer->handle()} assets")) {
+        if (! $user->hasPermission("create {$assetContainer->handle()} folders")) {
             return false;
         }
 
@@ -23,7 +23,7 @@ class AssetFolderPolicy
     {
         $user = User::fromUser($user);
 
-        if (! $user->hasPermission("move {$assetFolder->container()->handle()} assets")) {
+        if (! $user->hasPermission("move {$assetFolder->container()->handle()} folders")) {
             return false;
         }
 
@@ -41,7 +41,7 @@ class AssetFolderPolicy
     {
         $user = User::fromUser($user);
 
-        if (! $user->hasPermission("rename {$assetFolder->container()->handle()} assets")) {
+        if (! $user->hasPermission("rename {$assetFolder->container()->handle()} folders")) {
             return false;
         }
 
@@ -59,7 +59,7 @@ class AssetFolderPolicy
     {
         $user = User::fromUser($user);
 
-        if (! $user->hasPermission("delete {$assetFolder->container()->handle()} assets")) {
+        if (! $user->hasPermission("delete {$assetFolder->container()->handle()} folders")) {
             return false;
         }
 

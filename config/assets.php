@@ -223,4 +223,18 @@ return [
 
     'svg_sanitization_on_upload' => true,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Dedicated folder permissions
+    |--------------------------------------------------------------------------
+    |
+    | Control whether asset folders should have their own, dedicated
+    | permissions. By default, the permissions to create, move, rename or
+    | delete folders is tied to the actual asset permissions. Enabling this
+    | adds dedicated permissions for folders.
+    |
+    */
+
+    'enable_folder_permissions' => false,
+
 ];
