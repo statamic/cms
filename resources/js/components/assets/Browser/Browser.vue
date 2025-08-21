@@ -380,7 +380,14 @@ export default {
         },
 
         canCreateFolders() {
-            return this.folder && this.container.create_folders && ! this.restrictFolderNavigation && (this.can('create '+ this.container.id +' folders') || this.can('configure asset containers'));
+            const hasFolderPermissions = this.container.folder_permissions_enabled
+                ? this.can('create '+ this.container.id +' folders')
+                : this.can('upload '+ this.container.id +' assets');
+
+            return this.folder
+                && this.container.create_folders
+                && ! this.restrictFolderNavigation
+                && (hasFolderPermissions || this.can('configure asset containers'));
         },
 
         parameters() {
