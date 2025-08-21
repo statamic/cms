@@ -12,6 +12,7 @@ const props = defineProps({
     readOnly: { type: Boolean, default: false },
     size: { type: String, default: 'base' },
     solo: { type: Boolean, default: false },
+    tabindex: { type: Number, default: null },
     value: { type: [String, Number, Boolean], required: true },
 });
 
@@ -62,6 +63,7 @@ const conditionalProps = computed(() => {
             v-bind="conditionalProps"
             @update:modelValue="emit('update:modelValue', $event)"
             :class="checkboxClasses"
+            :tabindex="tabindex"
         >
             <CheckboxIndicator
                 class="relative flex h-full w-full items-center justify-center text-white dark:text-gray-900"
