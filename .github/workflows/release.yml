@@ -23,6 +23,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Generate types
+        run: npm run types
+
       - name: Compile assets
         run: npm run build
 
@@ -40,6 +43,9 @@ jobs:
 
       - name: Create dist-frontend zip
         run: cd resources && tar -czvf dist-frontend.tar.gz dist-frontend
+
+      - name: Create dist-package zip
+        run: cd resources && tar -czvf dist-package.tar.gz js/package
 
       - name: Get Changelog
         id: changelog
@@ -85,4 +91,14 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./resources/dist-frontend.tar.gz
           asset_name: dist-frontend.tar.gz
+          asset_content_type: application/tar+gz
+
+      - name: Upload dist-package zip to release
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./resources/dist-package.tar.gz
+          asset_name: dist-package.tar.gz
           asset_content_type: application/tar+gz
