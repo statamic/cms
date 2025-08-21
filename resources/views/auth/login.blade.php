@@ -46,7 +46,7 @@
                                     tabindex="2"
                                 />
                                 <template #actions>
-                                    <a href="{{ cp_route('password.request') }}" class="text-blue-400 text-sm hover:text-blue-600" tabindex="5">
+                                    <a href="{{ cp_route('password.request') }}" class="text-blue-400 text-sm hover:text-blue-600" tabindex="6">
                                         {{ __('Forgot password?') }}
                                     </a>
                                 </template>
