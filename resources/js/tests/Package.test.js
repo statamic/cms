@@ -8,6 +8,7 @@ it('exports modules', async () => {
         'bard',
         'core',
         'savePipeline',
+        'temporary',
         'ui',
     ]);
 });
