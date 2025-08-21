@@ -7,7 +7,7 @@
 
 @section('content')
     <ui-header title="{{ __('Addons') }}" icon="addons">
-        <ui-button variant="primary" text="Browse the Marketplace" icon="external-link"></ui-button>
+        <ui-button variant="primary" text="Browse the Marketplace" href="https://statamic.com/addons" icon="external-link"></ui-button>
     </ui-header>
 
     <addon-list :initial-rows="{{ json_encode($addons) }}" :initial-columns="{{ json_encode($columns) }}"></addon-list>
