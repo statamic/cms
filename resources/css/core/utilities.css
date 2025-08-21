@@ -15,7 +15,7 @@
 
 /* UTILITIES / TEXT
 =================================================== */
-/* Avoid prefixing things with text- because this is a Tailwind prefix */
+/* Avoid prefixing things with `st-text-` (st for Statamic) because `text-` is a Tailwind prefix */
 @utility st-text-trim-start {
     text-box: trim-start;
     /* =Jay. When we have an SVG we probably don't want to text trim, for example in a Markdown field with button controls like Bold, Italic, etc. */
