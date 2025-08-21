@@ -30,7 +30,7 @@
                             @completed="actionCompleted"
                             v-slot="{ actions }"
                         >
-                            <Dropdown placement="left-start" class="me-3">
+                            <Dropdown placement="left-start">
                                 <DropdownMenu>
                                     <DropdownItem :text="__('View')" icon="eye" :href="collection.entries_url" />
                                     <DropdownItem v-if="collection.url" :text="__('Visit URL')" icon="external-link" target="_blank" :href="collection.url" />
