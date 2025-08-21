@@ -46,15 +46,15 @@
                                     tabindex="2"
                                 />
                                 <template #actions>
-                                    <a href="{{ cp_route('password.request') }}" class="text-blue-400 text-sm hover:text-blue-600" tabindex="3">
+                                    <a href="{{ cp_route('password.request') }}" class="text-blue-400 text-sm hover:text-blue-600" tabindex="5">
                                         {{ __('Forgot password?') }}
                                     </a>
                                 </template>
                             </ui-field>
 
-                            <ui-checkbox-item name="remember" :label="__('Remember me')" />
+                            <ui-checkbox-item name="remember" :label="__('Remember me')" tabindex="4" />
 
-                            <ui-button type="submit" variant="primary" :disabled="busy" :text="__('Continue')" />
+                            <ui-button type="submit" variant="primary" :disabled="busy" :text="__('Continue')" tabindex="5" />
 
                         </form>
                     @endif
