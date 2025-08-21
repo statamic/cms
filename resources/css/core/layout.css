@@ -6,7 +6,7 @@
     /* Same as the main element, accounting for the header with a class of h-14, which is the same as 3.5rem */
     @apply h-[calc(100vh-3.5rem)];
     @apply overflow-y-auto fixed top-14 left-0 w-46;
-    @apply [&_svg]:text-gray-500 dark:[&_svg]:text-gray-600;
+    @apply [&_svg]:text-gray-500 dark:[&_svg]:text-gray-500/85;
     /* Only inset because we don't wand to transition the color when we switch between light/dark mode */
     transition: inset 0.3s ease-in-out;
     /* On mobile, hide by default and overlay on top */
