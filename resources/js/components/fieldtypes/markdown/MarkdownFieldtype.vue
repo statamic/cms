@@ -3,8 +3,8 @@
         <element-container @resized="refresh">
             <div
                 class="
-                    @container/markdown w-full block bg-white dark:bg-gray-800! rounded-lg relative
-                    border border-gray-300 with-contrast:border-gray-500 dark:border-x-0 dark:border-t-0 dark:border-white/10 dark:inset-shadow-2xs dark:inset-shadow-black
+                    @container/markdown w-full block bg-white dark:bg-gray-900! rounded-lg relative
+                    border border-gray-300 with-contrast:border-gray-500 dark:border-white/15 dark:inset-shadow-2xs dark:inset-shadow-black
                     text-gray-900 dark:text-gray-300
                     appearance-none antialiased shadow-ui-sm disabled:shadow-none
                 "
@@ -167,8 +167,8 @@ import Fieldtype from '../Fieldtype.vue';
 import { marked } from 'marked';
 import { markRaw } from 'vue';
 import { TextRenderer as PlainTextRenderer } from '@davidenke/marked-text-renderer';
-import throttle from '@statamic/util/throttle.js';
-import { Button } from '@statamic/ui';
+import throttle from '@/util/throttle.js';
+import { Button } from '@/components/ui';
 
 import CodeMirror from 'codemirror/lib/codemirror';
 import 'codemirror/addon/edit/closebrackets';
@@ -797,7 +797,7 @@ export default {
         },
 
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
+            if (!this.showFieldPreviews) return;
 
             return marked(this.data || '', { renderer: new PlainTextRenderer() }).replace(/<\/?[^>]+(>|$)/g, '');
         },

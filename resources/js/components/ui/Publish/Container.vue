@@ -1,5 +1,5 @@
 <script>
-import createContext from '@statamic/util/createContext.js';
+import createContext from '@/util/createContext.js';
 
 export const [injectContainerContext, provideContainerContext, containerContextKey] = createContext('PublishContainer');
 </script>
@@ -7,9 +7,9 @@ export const [injectContainerContext, provideContainerContext, containerContextK
 <script setup>
 import uniqid from 'uniqid';
 import { watch, provide, getCurrentInstance, ref, computed, toRef } from 'vue';
-import Component from '@statamic/components/Component.js';
+import Component from '@/components/Component.js';
 import Tabs from './Tabs.vue';
-import Values from '@statamic/components/publish/Values.js';
+import Values from '@/components/publish/Values.js';
 
 const emit = defineEmits(['update:modelValue', 'update:visibleValues', 'update:modifiedFields']);
 

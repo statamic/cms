@@ -44,7 +44,7 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import { Input, Select } from '@statamic/ui';
+import { Input, Select } from '@/components/ui';
 
 export default {
     components: { Input, Text, Select },
@@ -75,7 +75,7 @@ export default {
         },
 
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
+            if (!this.showFieldPreviews) return;
 
             switch (this.option) {
                 case 'url':

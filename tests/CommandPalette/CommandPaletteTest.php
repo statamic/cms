@@ -102,15 +102,6 @@ class CommandPaletteTest extends TestCase
             // keys: ... // TODO: test custom hotkey config when we set that up
         );
 
-        $this
-            ->actingAs(tap(User::make()->makeSuper())->save())
-            ->get(cp_route('dashboard'))
-            ->assertStatus(200);
-
-        $miscCommands = collect(CommandPalette::build())
-            ->filter(fn ($item) => in_array($item['category'], ['Actions', 'Miscellaneous']))
-            ->all();
-
         $expected = [
             [
                 'category' => 'Miscellaneous',
@@ -132,22 +123,13 @@ class CommandPaletteTest extends TestCase
             ],
         ];
 
-        $this->assertArraySubset($expected, $miscCommands);
+        $this->assertArraySubset($expected, CommandPalette::getPreloadedItems());
     }
 
     #[Test]
     public function it_can_build_command_with_array_based_text_for_rendering_arrow_separators_in_js()
     {
         CommandPalette::add(['Preferences', 'Best Website', 'Ask Jeeves'], 'https://ask.com');
-
-        $this
-            ->actingAs(tap(User::make()->makeSuper())->save())
-            ->get(cp_route('dashboard'))
-            ->assertStatus(200);
-
-        $miscCommands = collect(CommandPalette::build())
-            ->filter(fn ($item) => $item['category'] === 'Miscellaneous')
-            ->all();
 
         $expected = [
             [
@@ -160,7 +142,7 @@ class CommandPaletteTest extends TestCase
             ],
         ];
 
-        $this->assertArraySubset($expected, $miscCommands);
+        $this->assertArraySubset($expected, CommandPalette::getPreloadedItems());
     }
 
     #[Test]

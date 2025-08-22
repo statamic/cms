@@ -119,7 +119,7 @@
                             </div>
 
                             <!-- Published Switch -->
-                            <Panel class="flex justify-between px-5 py-3" v-if="!revisionsEnabled">
+                            <Panel class="flex justify-between px-5 py-3 dark:bg-gray-800!" v-if="!revisionsEnabled">
                                 <Heading :text="__('Published')" />
                                 <Switch
                                     :model-value="published"
@@ -267,7 +267,7 @@ import RevisionHistory from '../revision-history/History.vue';
 import HasPreferences from '../data-list/HasPreferences';
 import HasActions from '../publish/HasActions';
 import striptags from 'striptags';
-import clone from '@statamic/util/clone.js';
+import clone from '@/util/clone.js';
 import {
     Button,
     Card,
@@ -285,16 +285,15 @@ import {
     Subheading,
     Switch,
     Select,
-} from '@statamic/ui';
-import PublishContainer from '@statamic/components/ui/Publish/Container.vue';
-import PublishTabs from '@statamic/components/ui/Publish/Tabs.vue';
-import PublishComponents from '@statamic/components/ui/Publish/Components.vue';
-import LocalizationsCard from '@statamic/components/ui/Publish/Localizations.vue';
-import LivePreview from '@statamic/components/ui/LivePreview/LivePreview.vue';
-import resetValuesFromResponse from '@statamic/util/resetValuesFromResponse.js';
-import { SavePipeline } from '@statamic/exports.js';
+} from '@/components/ui';
+import PublishContainer from '@/components/ui/Publish/Container.vue';
+import PublishTabs from '@/components/ui/Publish/Tabs.vue';
+import PublishComponents from '@/components/ui/Publish/Components.vue';
+import LocalizationsCard from '@/components/ui/Publish/Localizations.vue';
+import LivePreview from '@/components/ui/LivePreview/LivePreview.vue';
+import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
 import { computed, ref } from 'vue';
-const { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } = SavePipeline;
+import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@/components/ui/Publish/SavePipeline.js';
 
 let saving = ref(false);
 let errors = ref({});

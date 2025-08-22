@@ -1,8 +1,8 @@
 <script setup>
 import { cva } from 'cva';
 import { computed } from 'vue';
-import { Description, Label, Card, ErrorMessage } from '@statamic/components/ui/index.js';
-import markdown from '@statamic/util/markdown.js';
+import { Description, Label, Card, ErrorMessage } from '@/components/ui/index.js';
+import markdown from '@/util/markdown.js';
 
 defineOptions({
     inheritAttrs: false,

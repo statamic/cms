@@ -13,8 +13,8 @@
                     <div :class="{ 'bg-white dark:bg-gray-800 dark:border-dark-900 rounded-lg border': config.border }">
                         <FieldsProvider
                             :fields="fields"
-                            :field-path-prefix="fieldPathPrefix || handle"
-                            :meta-path-prefix="metaPathPrefix || handle"
+                            :field-path-prefix="fieldPathPrefix ? `${fieldPathPrefix}.${handle}` : handle"
+                            :meta-path-prefix="metaPathPrefix ? `${metaPathPrefix}.${handle}` : handle"
                         >
                             <Fields class="p-4" />
                         </FieldsProvider>
@@ -28,8 +28,8 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import ManagesPreviewText from './replicator/ManagesPreviewText';
-import Fields from '@statamic/components/ui/Publish/Fields.vue';
-import FieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
+import Fields from '@/components/ui/Publish/Fields.vue';
+import FieldsProvider from '@/components/ui/Publish/FieldsProvider.vue';
 
 export default {
     mixins: [Fieldtype, ManagesPreviewText],
@@ -55,10 +55,10 @@ export default {
             return this.config.fields;
         },
         previews() {
-            return data_get(this.publishContainer.previews, this.fieldPathPrefix || this.handle) || {};
+            return data_get(this.publishContainer.previews, this.fieldPathPrefix ? `${this.fieldPathPrefix}.${this.handle}` : this.handle) || {};
         },
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
+            if (!this.showFieldPreviews) return;
 
             return replicatorPreviewHtml(this.previewText);
         },

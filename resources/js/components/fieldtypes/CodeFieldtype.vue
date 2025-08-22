@@ -22,7 +22,7 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import { CodeEditor } from '@statamic/ui';
+import { CodeEditor } from '@/components/ui';
 
 export default {
     mixins: [Fieldtype],
@@ -35,7 +35,7 @@ export default {
         },
 
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
+            if (!this.showFieldPreviews) return;
 
             return this.value.code ? truncate(this.value.code, 60) : '';
         },

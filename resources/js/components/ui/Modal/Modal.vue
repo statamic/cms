@@ -1,6 +1,6 @@
 <script setup>
 import { cva } from 'cva';
-import { hasComponent } from '@statamic/composables/has-component.js';
+import { hasComponent } from '@/composables/has-component.js';
 import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, DialogTrigger } from 'reka-ui';
 import { getCurrentInstance, ref, watch } from 'vue';
 

@@ -172,8 +172,8 @@
 import FocalPointEditor from './FocalPointEditor.vue';
 import PdfViewer from './PdfViewer.vue';
 import { pick, flatten } from 'lodash-es';
-import { Dropdown, DropdownMenu, DropdownItem, PublishContainer, PublishTabs, Icon } from '@statamic/ui';
-import ItemActions from '@statamic/components/actions/ItemActions.vue';
+import { Dropdown, DropdownMenu, DropdownItem, PublishContainer, PublishTabs, Icon } from '@/components/ui';
+import ItemActions from '@/components/actions/ItemActions.vue';
 
 export default {
     emits: ['previous', 'next', 'saved', 'closed', 'action-started', 'action-completed'],

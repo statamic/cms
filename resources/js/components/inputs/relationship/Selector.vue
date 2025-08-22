@@ -122,7 +122,7 @@
 
 <script>
 import { defineAsyncComponent } from 'vue';
-import clone from '@statamic/util/clone.js';
+import clone from '@/util/clone.js';
 import {
     Button,
     ButtonGroup,
@@ -138,7 +138,7 @@ import {
     Checkbox,
     Icon,
     StatusIndicator,
-} from '@statamic/ui';
+} from '@/components/ui';
 
 export default {
     components: {

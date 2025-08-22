@@ -1,8 +1,8 @@
 <template>
     <ui-header :title="__('Collections')" icon="collections">
         <ui-toggle-group v-model="mode">
-            <ui-toggle-item icon="layout-grid" value="grid" />
-            <ui-toggle-item icon="layout-list" value="table" />
+            <ui-toggle-item icon="layout-grid" value="grid" aria-label="Grid view" />
+            <ui-toggle-item icon="layout-list" value="table" aria-label="Table view" />
         </ui-toggle-group>
         <ui-button
             :href="createUrl"
@@ -30,7 +30,7 @@
                             @completed="actionCompleted"
                             v-slot="{ actions }"
                         >
-                            <Dropdown placement="left-start" class="me-3">
+                            <Dropdown placement="left-start">
                                 <DropdownMenu>
                                     <DropdownItem :text="__('View')" icon="eye" :href="collection.entries_url" />
                                     <DropdownItem v-if="collection.url" :text="__('Visit URL')" icon="external-link" target="_blank" :href="collection.url" />
@@ -56,7 +56,6 @@
                             :blueprints="collection.blueprints"
                             :text="__('Create Entry')"
                             size="sm"
-                            class="-mr-2"
                         />
                     </aside>
                 </ui-panel-header>
@@ -157,8 +156,8 @@ import {
     DropdownLabel,
     DropdownItem,
     DropdownSeparator,
-} from '@statamic/ui';
-import ItemActions from '@statamic/components/actions/ItemActions.vue';
+} from '@/components/ui';
+import ItemActions from '@/components/actions/ItemActions.vue';
 
 export default {
     components: {

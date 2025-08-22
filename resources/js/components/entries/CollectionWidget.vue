@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue';
-import DateFormatter from '@statamic/components/DateFormatter.js';
+import DateFormatter from '@/components/DateFormatter.js';
 import {
     Widget,
     StatusIndicator,
@@ -9,7 +9,7 @@ import {
     ListingTableBody as TableBody,
     ListingPagination as Pagination,
     Icon,
-} from '@statamic/ui';
+} from '@/components/ui';
 
 const props = defineProps({
     additionalColumns: Array,
@@ -54,12 +54,12 @@ function formatDate(value) {
     >
         <template #initializing>
             <Widget v-bind="widgetProps">
-                <div class="flex flex-col gap-4 justify-between p-4">
-                    <ui-skeleton class="h-3 w-full" />
-                    <ui-skeleton class="h-3 w-full" />
-                    <ui-skeleton class="h-3 w-full" />
-                    <ui-skeleton class="h-3 w-full" />
-                    <ui-skeleton class="h-3 w-full" />
+                <div class="flex flex-col gap-[9px] justify-between py-3 px-4">
+                    <ui-skeleton class="h-[19px] w-full" />
+                    <ui-skeleton class="h-[19px] w-full" />
+                    <ui-skeleton class="h-[19px] w-full" />
+                    <ui-skeleton class="h-[19px] w-full" />
+                    <ui-skeleton class="h-[19px] w-full" />
                 </div>
             </Widget>
         </template>

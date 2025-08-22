@@ -1,11 +1,11 @@
 <script setup>
-import { Tabs, TabList, TabTrigger, TabContent } from '@statamic/ui';
+import { Tabs, TabList, TabTrigger, TabContent } from '@/components/ui';
 import TabProvider from './TabProvider.vue';
 import { injectContainerContext } from './Container.vue';
-import Sections from '@statamic/components/ui/Publish/Sections.vue';
+import Sections from '@/components/ui/Publish/Sections.vue';
 import { ref, computed, useSlots, onMounted, watch } from 'vue';
-import ElementContainer from '@statamic/components/ElementContainer.vue';
-import ShowField from '@statamic/components/field-conditions/ShowField.js';
+import ElementContainer from '@/components/ElementContainer.vue';
+import ShowField from '@/components/field-conditions/ShowField.js';
 
 const slots = useSlots();
 const { blueprint, visibleValues, extraValues, errors, hiddenFields, revealerFields, setHiddenField } = injectContainerContext();

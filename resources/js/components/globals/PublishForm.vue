@@ -69,14 +69,13 @@
 
 <script>
 import SiteSelector from '../SiteSelector.vue';
-import clone from '@statamic/util/clone.js';
-import { Button, Dropdown, DropdownItem, DropdownMenu, Header } from '@statamic/ui';
-import PublishContainer from '@statamic/components/ui/Publish/Container.vue';
-import PublishTabs from '@statamic/components/ui/Publish/Tabs.vue';
-import PublishComponents from '@statamic/components/ui/Publish/Components.vue';
-import { SavePipeline } from '@statamic/exports.js';
+import clone from '@/util/clone.js';
+import { Button, Dropdown, DropdownItem, DropdownMenu, Header } from '@/components/ui';
+import PublishContainer from '@/components/ui/Publish/Container.vue';
+import PublishTabs from '@/components/ui/Publish/Tabs.vue';
+import PublishComponents from '@/components/ui/Publish/Components.vue';
 import { computed, ref } from 'vue';
-const { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } = SavePipeline;
+import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@/components/ui/Publish/SavePipeline.js';
 
 let saving = ref(false);
 let errors = ref({});

@@ -1,5 +1,5 @@
 export default async (app) => {
-    const components = import.meta.glob('@statamic/components/ui/**/*.vue');
+    const components = import.meta.glob('@/components/ui/**/*.vue');
 
     for (const [path, component] of Object.entries(components)) {
         // Split full path and remove leading segments up to 'components'

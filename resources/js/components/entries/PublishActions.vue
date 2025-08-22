@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import { Heading, Button, Select, DatePicker, Textarea, Icon, Subheading } from '@statamic/ui';
+import { Heading, Button, Select, DatePicker, Textarea, Icon, Subheading } from '@/components/ui';
 
 export default {
     components: { Heading, Button, Select, DatePicker, Textarea, Icon, Subheading },

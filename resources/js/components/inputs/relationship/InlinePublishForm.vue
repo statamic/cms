@@ -45,7 +45,7 @@
 </template>
 
 <script>
-import { Button, Icon } from '@statamic/ui';
+import { Button, Icon } from '@/components/ui';
 
 export default {
     components: {

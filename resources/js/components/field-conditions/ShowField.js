@@ -1,5 +1,5 @@
-import Validator from '@statamic/components/field-conditions/Validator.js';
-import { data_get } from '@statamic/bootstrap/globals.js';
+import Validator from '@/components/field-conditions/Validator.js';
+import { data_get } from '@/bootstrap/globals.js';
 import { nextTick } from 'vue';
 
 export default class {

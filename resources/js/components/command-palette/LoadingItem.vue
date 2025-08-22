@@ -1,5 +1,5 @@
 <script setup>
-import { Icon } from '@statamic/ui';
+import { Icon } from '@/components/ui';
 </script>
 
 <template>

@@ -42,8 +42,8 @@
 </template>
 
 <script>
-import { Button, Modal, ModalClose, Switch, Field, Input } from '@statamic/ui';
-import { requireElevatedSessionIf } from '@statamic/components/elevated-sessions';
+import { Button, Modal, ModalClose, Switch, Field, Input } from '@/components/ui';
+import { requireElevatedSessionIf } from '@/components/elevated-sessions';
 
 export default {
     components: {

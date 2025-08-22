@@ -115,7 +115,7 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import { SortableList, SortableHelpers } from '../sortable/Sortable';
-import { Button } from '@statamic/ui';
+import { Button } from '@/components/ui';
 
 export default {
     mixins: [Fieldtype, SortableHelpers],
@@ -196,8 +196,7 @@ export default {
         },
 
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
-
+            if (!this.showFieldPreviews) return;
             if (!this.value) return '';
 
             return Object.entries(this.value)

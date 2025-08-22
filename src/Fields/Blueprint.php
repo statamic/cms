@@ -804,9 +804,9 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 
     public function commandPaletteLink(string|array $type, string $url): Link
     {
-        $type = is_array($type) ? $type : __($type);
+        $type = is_array($type) ? $type : [__($type)];
 
-        $text = [__('Blueprints'), $type, __($this->title())];
+        $text = [__('Blueprints'), ...$type, __($this->title())];
 
         return (new Link($text, Category::Fields))
             ->url($url)

@@ -12,16 +12,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Use Node.js 16.13.0
+      - name: Use Node.js 20.19.0
         uses: actions/setup-node@v4
         with:
-          node-version: 16.13.0
-
-      - name: Install required npm version
-        run: npm -g install npm@8.5.5
+          node-version: 20.19.0
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Generate types
+        run: npm run types
 
       - name: Compile assets
         run: npm run build
@@ -41,6 +41,9 @@ jobs:
       - name: Create dist-frontend zip
         run: cd resources && tar -czvf dist-frontend.tar.gz dist-frontend
 
+      - name: Create dist-package zip
+        run: cd resources && tar -czvf dist-package.tar.gz js/package
+
       - name: Get Changelog
         id: changelog
         uses: statamic/changelog-action@v1
@@ -56,6 +59,7 @@ jobs:
           tag_name: ${{ steps.changelog.outputs.version }}
           release_name: ${{ steps.changelog.outputs.version }}
           body: ${{ steps.changelog.outputs.text }}
+          prerelease: true
 
       - name: Upload dist zip to release
         uses: actions/upload-release-asset@v1.0.1
@@ -85,4 +89,14 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./resources/dist-frontend.tar.gz
           asset_name: dist-frontend.tar.gz
+          asset_content_type: application/tar+gz
+
+      - name: Upload dist-package zip to release
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./resources/dist-package.tar.gz
+          asset_name: dist-package.tar.gz
           asset_content_type: application/tar+gz

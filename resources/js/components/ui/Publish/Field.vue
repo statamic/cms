@@ -1,10 +1,10 @@
 <script setup>
-import { computed, useTemplateRef, watch, ref } from 'vue';
+import { computed, useTemplateRef, watch, ref, inject } from 'vue';
 import { injectContainerContext } from './Container.vue';
 import { injectFieldsContext } from './FieldsProvider.vue';
-import { Field, Icon, Tooltip, Label } from '@statamic/ui';
-import FieldActions from '@statamic/components/field-actions/FieldActions.vue';
-import ShowField from '@statamic/components/field-conditions/ShowField.js';
+import { Field, Icon, Tooltip, Label } from '@/components/ui';
+import FieldActions from '@/components/field-actions/FieldActions.vue';
+import ShowField from '@/components/field-conditions/ShowField.js';
 
 const props = defineProps({
     config: {
@@ -127,6 +127,12 @@ const shouldShowLabel = computed(
         isSyncable.value, // Need to see the icon
 );
 
+const shouldShowFieldPreviews = computed(() => {
+    if (! props.config.replicator_preview) return false;
+
+    return inject('showReplicatorFieldPreviews', false);
+});
+
 const isLocalizable = computed(() => props.config.localizable);
 
 const isReadOnly = computed(() => {
@@ -174,7 +180,7 @@ const fieldtypeComponentProps = computed(() => ({
     fieldPathPrefix: fieldPathPrefix.value,
     metaPathPrefix: metaPathPrefix.value,
     readOnly: isReadOnly.value,
-    showFieldPreviews: true
+    showFieldPreviews: shouldShowFieldPreviews.value,
 }));
 
 const fieldtypeComponentEvents = computed(() => ({

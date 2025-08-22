@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Statamic\CP\Navigation\NavItem;
 use Statamic\Facades;
+use Statamic\Facades\User;
 use Statamic\Fields\Fieldset;
 use Statamic\Support\Arr;
 
@@ -61,15 +62,14 @@ class Palette
     {
         $this->isBuilding = true;
 
-        // TODO: We need to bust this cache when content or nav changes
-        // TODO: Cache per user
-        // $built = Cache::rememberForever('statamic-command-palette', function () {
-        $built = $this
-            ->buildNav()
-            ->buildFields()
-            ->buildMiscellaneous()
-            ->get();
-        // });
+        $built = Cache::rememberForever(static::cacheKey(), function () {
+            return $this
+                ->buildNav()
+                ->buildFields()
+                ->buildMiscellaneous()
+                ->pushToCacheManifest()
+                ->get();
+        });
 
         $this->isBuilding = false;
 
@@ -147,7 +147,7 @@ class Palette
         return $this;
     }
 
-    public function validateCommandArray(array $command): array
+    protected function validateCommandArray(array $command): array
     {
         throw_unless(is_string(Arr::get($command, 'category')), new \Exception('Must output command [category] string!'));
 
@@ -155,6 +155,41 @@ class Palette
         throw_unless(is_string($text) || is_array($text), new \Exception('Must output command [text] string!'));
 
         return $command;
+    }
+
+    public static function cacheKey(bool $manifest = false): string
+    {
+        $suffix = $manifest
+            ? 'manifest'
+            : User::current()->id();
+
+        return 'statamic-command-palette-'.$suffix;
+    }
+
+    protected function pushToCacheManifest(): self
+    {
+        $manifestKey = static::cacheKey(manifest: true);
+
+        $manifest = Cache::get($manifestKey, []);
+
+        $manifest[] = static::cacheKey();
+
+        Cache::put($manifestKey, $manifest);
+
+        return $this;
+    }
+
+    public function clearCache(): void
+    {
+        $manifestKey = static::cacheKey(manifest: true);
+
+        $manifest = Cache::get($manifestKey, []);
+
+        foreach ($manifest as $cacheKey) {
+            Cache::forget($cacheKey);
+        }
+
+        Cache::forget($manifestKey);
     }
 
     public function getPreloadedItems(): Collection

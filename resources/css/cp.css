@@ -12,6 +12,7 @@
 @import './elements/tables.css';
 
 /* Components */
+@import './components/assets.css';
 @import './components/blueprints.css';
 @import './components/configure.css';
 @import './components/focal-point.css';

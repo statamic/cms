@@ -210,7 +210,7 @@
 
 import isEmail from 'validator/lib/isEmail';
 import HasWizardSteps from '../HasWizardSteps.js';
-import RelationshipFieldtype from '@statamic/components/fieldtypes/relationship/RelationshipFieldtype.vue';
+import RelationshipFieldtype from '@/components/fieldtypes/relationship/RelationshipFieldtype.vue';
 
 export default {
     mixins: [HasWizardSteps],

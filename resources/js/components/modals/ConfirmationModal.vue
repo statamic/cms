@@ -1,6 +1,6 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
-import { Modal, ModalClose, Button, Icon } from '@statamic/ui';
+import { Modal, ModalClose, Button, Icon } from '@/components/ui';
 
 const emit = defineEmits(['opened', 'confirm', 'cancel']);
 

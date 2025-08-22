@@ -52,7 +52,7 @@
             <PanelHeader>
                 <div class="page-tree-header font-medium text-sm items-center flex justify-between">
                     <div v-text="__('Navigation')" />
-                    <div class="flex gap-2 -me-3">
+                    <div class="flex gap-2">
                         <ui-button size="sm" icon="tree-collapse" :text="__('Collapse')" @click="collapseAll" />
                         <ui-button size="sm" icon="tree-expand" :text="__('Expand')" @click="expandAll" />
                     </div>
@@ -188,7 +188,7 @@ import TopLevelSectionBranch from './TopLevelSectionBranch.vue';
 import ItemEditor from './ItemEditor.vue';
 import SectionEditor from './SectionEditor.vue';
 import { data_get } from '../../bootstrap/globals.js';
-import { Header, Button, ButtonGroup, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, DropdownLabel, Panel, PanelHeader, Icon } from '@statamic/ui';
+import { Header, Button, ButtonGroup, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, DropdownLabel, Panel, PanelHeader, Icon } from '@/components/ui';
 
 export default {
     components: {

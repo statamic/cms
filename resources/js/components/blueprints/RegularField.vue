@@ -59,7 +59,7 @@ import WidthSelector from '../fields/WidthSelector.vue';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';
 import titleize from '../../util/titleize';
 import deslugify from '../../util/deslugify';
-import { Icon } from '@statamic/ui';
+import { Icon } from '@/components/ui';
 
 export default {
     mixins: [Field, CanDefineLocalizable],

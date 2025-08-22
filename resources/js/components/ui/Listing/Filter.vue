@@ -1,6 +1,6 @@
 <script setup>
-import { PublishContainer, PublishFields } from '@statamic/ui';
-import PublishFieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
+import { PublishContainer, PublishFields } from '@/components/ui';
+import PublishFieldsProvider from '@/components/ui/Publish/FieldsProvider.vue';
 import { computed, nextTick, ref, watch } from 'vue';
 
 const emit = defineEmits(['changed']);

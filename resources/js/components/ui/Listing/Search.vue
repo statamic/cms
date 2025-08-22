@@ -1,7 +1,7 @@
 <script setup>
-import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
-import { Input } from '@statamic/ui';
-import debounce from '@statamic/util/debounce.js';
+import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
+import { Input } from '@/components/ui';
+import debounce from '@/util/debounce.js';
 import { useTemplateRef } from 'vue';
 
 const { activeFilterBadgeCount, searchQuery, setSearchQuery, reorderable } = injectListingContext();

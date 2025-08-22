@@ -22,8 +22,8 @@
 </template>
 
 <script setup>
-import { Fieldtype } from 'statamic';
-import { Input } from '@statamic/ui';
+import Fieldtype from '@/components/fieldtypes/fieldtype.js';
+import { Input } from '@/components/ui';
 import { computed } from 'vue';
 
 const emit = defineEmits(Fieldtype.emits);

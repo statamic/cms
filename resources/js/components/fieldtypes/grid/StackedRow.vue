@@ -41,8 +41,8 @@
 
 <script>
 import Row from './Row.vue';
-import { default as PublishFields } from '@statamic/components/ui/Publish/Fields.vue';
-import FieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
+import { default as PublishFields } from '@/components/ui/Publish/Fields.vue';
+import FieldsProvider from '@/components/ui/Publish/FieldsProvider.vue';
 
 export default {
     mixins: [Row],
