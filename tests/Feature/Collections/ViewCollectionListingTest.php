@@ -7,7 +7,6 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\User;
 use Statamic\Entries\Collection;
 use Statamic\Facades;
-use Statamic\Facades\Site;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
