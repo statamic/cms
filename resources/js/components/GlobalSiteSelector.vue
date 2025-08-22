@@ -16,7 +16,7 @@
                 </div>
             </template>
             <template #option="option">
-                <div :class="{ 'text-gray-500': handle === active }">{{ __(option.name) }}</div>
+                <div class="whitespace-nowrap" :class="{ 'text-gray-500': handle === active }">{{ __(option.name) }}</div>
             </template>
         </Select>
     </div>
