@@ -28,6 +28,7 @@
                     :preferences-prefix="preferencesPrefix"
                     v-model:search-query="searchQuery"
                     @request-completed="listingRequestCompleted"
+                    @update:selections="$emit('selections-updated', $event)"
                 >
                     <template #initializing>
                         <slot name="initializing">
