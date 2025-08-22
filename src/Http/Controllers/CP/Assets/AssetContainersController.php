@@ -35,6 +35,7 @@ class AssetContainersController extends CpController
                 'blueprint_url' => cp_route('asset-containers.blueprint.edit', $container->handle()),
                 'can_edit' => User::current()->can('edit', $container),
                 'can_delete' => User::current()->can('delete', $container),
+                'folder_permissions_enabled' => config('statamic.assets.enable_folder_permissions'),
             ];
         })->values();
 
