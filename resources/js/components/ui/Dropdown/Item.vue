@@ -30,7 +30,7 @@ const iconClasses = cva({
         base: 'size-3.5!',
         variant: {
             default: 'text-gray-500',
-            destructive: 'text-red-400!',
+            destructive: 'text-red-500!',
         },
     },
 })({ variant: props.variant });
