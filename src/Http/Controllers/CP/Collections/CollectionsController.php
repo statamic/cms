@@ -15,7 +15,6 @@ use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Http\Resources\CP\Entries\ListedEntry;
 use Statamic\Rules\Handle;
 use Statamic\Statamic;
 use Statamic\Structures\CollectionStructure;
