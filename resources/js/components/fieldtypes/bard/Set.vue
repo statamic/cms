@@ -26,13 +26,12 @@
                         </span>
                         {{ __(config.display) || config.handle }}
                     </Badge>
-                    <Tooltip :markdown="__(config.instructions)">
                         <Icon
                             v-if="config.instructions && !collapsed"
                             name="info-square"
                             class="size-3.5! text-gray-500"
+                            v-tooltip="{ content: $markdown(__(config.instructions)), html: true }"
                         />
-                    </Tooltip>
                     <Subheading
                         v-show="collapsed"
                         v-html="previewText"
