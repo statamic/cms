@@ -24,9 +24,11 @@ class OutsideLogo extends Component
         }
 
         $config = config('statamic.cp.custom_logo_url');
+
         if ($dark && config('statamic.cp.custom_dark_logo_url')) {
             $config = config('statamic.cp.custom_dark_logo_url');
         }
+
         if ($text && config('statamic.cp.custom_logo_text')) {
             $config = config('statamic.cp.custom_logo_text');
         }

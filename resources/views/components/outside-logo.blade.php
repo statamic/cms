@@ -1,5 +1,5 @@
 <div class="logo relative z-10 md:pt-18">
-    @if (isset($customLogo))
+    @if (isset($customLogo) && $customLogo !== false)
         <img
             src="{{ $customLogo }}"
             alt="{{ config('statamic.cp.custom_cms_name') }}"
@@ -10,7 +10,7 @@
             alt="{{ config('statamic.cp.custom_cms_name') }}"
             class="white-label-logo hidden dark:block"
         />
-    @elseif (isset($customLogoText))
+    @elseif (isset($customLogoText) && ! empty($customLogoText))
         <div class="mx-auto mb-8 max-w-xs text-center text-lg font-medium opacity-50">{{ $customLogoText }}</div>
     @else
         @cp_svg('ui/statamic-logo-lime', 'h-6')
