@@ -43,7 +43,7 @@
         @apply border-blue-500 text-blue-500 dark:border-blue-400 dark:text-blue-400;
     }
     &.has-error {
-        @apply text-red-500;
+        @apply text-red-600;
 
         &.active {
             box-shadow:

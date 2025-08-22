@@ -20,7 +20,7 @@
             @apply @lg/bard:p-4;
         }
         .bard-error {
-            @apply whitespace-nowrap bg-red-100 p-2 text-xs text-red-500 @lg:px-4;
+            @apply whitespace-nowrap bg-red-100 p-2 text-xs text-red-600 @lg:px-4;
         }
     }
 }
@@ -204,7 +204,7 @@
     }
 
     .bard-set.has-error > .replicator-set-header label {
-        @apply text-red-500;
+        @apply text-red-600;
     }
 }
 

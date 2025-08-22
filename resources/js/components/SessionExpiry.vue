@@ -39,7 +39,7 @@
             <div>
                 <div v-if="twoFactorMode === 'code'" class="space-y-3">
                     <ui-description v-text="__('messages.session_expiry_enter_two_factor_code')" />
-                    <ui-description class="text-red-500" v-if="errors.code" v-text="errors.code[0]" />
+                    <ui-description class="text-red-600" v-if="errors.code" v-text="errors.code[0]" />
                     <div class="flex items-center">
                         <Input
                             name="code"
@@ -59,7 +59,7 @@
                 <div v-if="twoFactorMode === 'recovery_code'" class="form-group w-full">
                     <label v-text="__('messages.session_expiry_enter_two_factor_recovery_code')" />
                     <ui-description
-                        class="text-red-500"
+                        class="text-red-600"
                         v-if="errors.recovery_code"
                         v-text="errors.recovery_code[0]"
                     />

@@ -21,7 +21,7 @@ defineProps({
                 :class="{
                     'bg-green-600': localization.published,
                      'bg-gray-500': !localization.published,
-                     'bg-red-500': !localization.exists,
+                     'bg-red-600': !localization.exists,
                 }"
             />
             {{ __(localization.name) }}
