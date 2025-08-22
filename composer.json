@@ -45,7 +45,8 @@
         "laravel/pint": "1.16.0",
         "mockery/mockery": "^1.6.10",
         "orchestra/testbench": "^9.2 || ^10.0",
-        "phpunit/phpunit": "^11.5.3",
+        "pestphp/pest": "^4.0",
+        "phpunit/phpunit": "^12",
         "spatie/laravel-ray": "^1.37"
     },
     "config": {
@@ -54,6 +55,7 @@
         "sort-packages": true,
         "allow-plugins": {
             "composer/package-versions-deprecated": true,
+            "pestphp/pest-plugin": true,
             "pixelfear/composer-dist-plugin": true
         }
     },
