@@ -59,11 +59,11 @@
                         tabindex="0"
                     >
                         <bubble-menu
-                            class="bard-floating-toolbar"
                             :editor="editor"
                             :options="{ placement: 'top', offset: [0, 10] }"
                             v-if="editor && toolbarIsFloating && !readOnly"
                         >
+                        <div class="bard-floating-toolbar">
                             <component
                                 v-for="button in visibleButtons(buttons)"
                                 :key="button.name"
@@ -74,6 +74,7 @@
                                 :config="config"
                                 :editor="editor"
                             />
+                        </div>
                         </bubble-menu>
 
                         <floating-menu
