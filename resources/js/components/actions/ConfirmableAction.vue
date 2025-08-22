@@ -99,14 +99,14 @@ defineExpose({
         <div
             v-if="warningText"
             v-text="warningText"
-            class="text-red-500"
+            class="text-red-600"
             :class="{ 'mb-4': showDirtyWarning || action.fields.length }"
         />
 
         <div
             v-if="showDirtyWarning"
             v-text="dirtyText"
-            class="text-red-500"
+            class="text-red-600"
             :class="{ 'mb-4': action.fields.length }"
         />
 

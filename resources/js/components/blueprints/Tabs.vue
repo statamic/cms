@@ -29,7 +29,7 @@
                     @click="addAndEditTab"
                 />
 
-                <Description v-if="errors" v-for="(error, i) in errors" :key="i" :text="error" class="mt-2 text-red-500" />
+                <Description v-if="errors" v-for="(error, i) in errors" :key="i" :text="error" class="mt-2 text-red-600" />
 
                 <BlueprintTabContent
                     v-for="tab in tabs"
