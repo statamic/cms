@@ -2,7 +2,7 @@
 import { cva } from 'cva';
 import { hasComponent } from '@/composables/has-component.js';
 import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, DialogTrigger } from 'reka-ui';
-import { getCurrentInstance, ref, watch } from 'vue';
+import { computed, getCurrentInstance, ref, watch } from 'vue';
 
 const emit = defineEmits(['update:open']);
 
@@ -28,7 +28,7 @@ const modalClasses = cva({
 })({});
 
 const instance = getCurrentInstance();
-const isUsingOpenProp = instance && instance.vnode.props?.length > 0 && 'open' in instance.vnode.props;
+const isUsingOpenProp = computed(() => instance && instance.vnode.props?.length > 0 && 'open' in instance.vnode.props);
 
 const open = ref(props.open);
 
