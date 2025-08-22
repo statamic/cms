@@ -297,9 +297,11 @@ defineExpose({
                             v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"
                             ref="search"
                             class="w-full text-gray-700 dark:text-gray-400 opacity-100 focus:outline-none placeholder-xs"
+                            type="search"
                             :id="id"
                             v-model="searchQuery"
                             :placeholder
+                            autocomplete="off"
                             @paste.prevent="onPaste"
                             @keydown.enter.prevent="pushTaggableOption"
                             @blur="pushTaggableOption"
