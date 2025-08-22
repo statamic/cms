@@ -398,6 +398,8 @@ export default {
 
     mounted() {
         this.mode = this.getPreference('mode') || 'table';
+
+        this.addToCommandPalette();
     },
 
     watch: {
@@ -683,6 +685,70 @@ export default {
         uploadsUpdated(uploads) {
             this.uploads = uploads;
         },
+
+        addToCommandPalette() {
+            Statamic.$commandPalette.add({
+                when: () => this.canCreateContainers,
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Upload'),
+                icon: 'upload',
+                action: () => this.openFileBrowser(),
+                prioritize: true,
+            });
+
+            Statamic.$commandPalette.add({
+                when: () => this.canCreateContainers,
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Create Folder'),
+                icon: 'folder-add',
+                action: () => this.startCreatingFolder(),
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Toggle Grid Layout'),
+                when: () => this.mode === 'table',
+                action: () => this.mode = 'grid',
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Toggle List Layout'),
+                when: () => this.mode === 'grid',
+                action: () => this.mode = 'table',
+            });
+
+            Statamic.$commandPalette.add({
+                when: () => this.canCreateContainers,
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Create Container'),
+                icon: 'container-add',
+                url: this.createContainerUrl,
+            });
+
+            Statamic.$commandPalette.add({
+                when: () => this.container.can_edit,
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Configure Container'),
+                icon: 'cog',
+                url: this.container.edit_url,
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Edit Blueprint'),
+                icon: 'blueprint-edit',
+                url: this.container.blueprint_url,
+            });
+
+            Statamic.$commandPalette.add({
+                when: () => this.container.can_delete,
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Delete Container'),
+                icon: 'trash',
+                action: () => this.$refs.deleter.confirm(),
+            });
+        }
     },
 };
 </script>
