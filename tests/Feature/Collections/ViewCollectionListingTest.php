@@ -34,7 +34,6 @@ class ViewCollectionListingTest extends TestCase
                 [
                     'id' => 'bar',
                     'title' => 'Bar',
-                    'entries' => $collectionA->queryEntries()->where('site', Site::selected())->orderBy('date', 'desc')->limit(5)->get(),
                     'entries_count' => 1,
                     'published_entries_count' => 1,
                     'draft_entries_count' => 0,
@@ -48,6 +47,7 @@ class ViewCollectionListingTest extends TestCase
                     'edit_url' => 'http://localhost/cp/collections/bar/edit',
                     'delete_url' => 'http://localhost/cp/collections/bar',
                     'entries_url' => 'http://localhost/cp/collections/bar',
+                    'entries_listing_url' => 'http://localhost/cp/collections/bar/entries',
                     'create_entry_url' => 'http://localhost/cp/collections/bar/entries/create/en',
                     'url' => null,
                     'blueprints_url' => 'http://localhost/cp/fields/blueprints/collections/bar',
@@ -63,7 +63,6 @@ class ViewCollectionListingTest extends TestCase
                 [
                     'id' => 'foo',
                     'title' => 'Foo',
-                    'entries' => $collectionB->queryEntries()->where('site', Site::selected())->orderBy('date', 'desc')->limit(5)->get(),
                     'entries_count' => 0,
                     'published_entries_count' => 0,
                     'draft_entries_count' => 0,
@@ -77,6 +76,7 @@ class ViewCollectionListingTest extends TestCase
                     'edit_url' => 'http://localhost/cp/collections/foo/edit',
                     'delete_url' => 'http://localhost/cp/collections/foo',
                     'entries_url' => 'http://localhost/cp/collections/foo',
+                    'entries_listing_url' => 'http://localhost/cp/collections/foo/entries',
                     'create_entry_url' => 'http://localhost/cp/collections/foo/entries/create/en',
                     'url' => null,
                     'blueprints_url' => 'http://localhost/cp/fields/blueprints/collections/foo',
