@@ -17,13 +17,7 @@
                         @cp_svg('icons/burger-menu', 'size-5')
                     </div>
                 </button>
-                {{-- Mobile nav toggle --}}
-                <button class="flex items-center group cursor-pointer text-gray-300 hover:text-white md:hidden" type="button" @click="toggleMobileNav" aria-label="{{ __('Toggle Mobile Nav') }}">
-                    <div class="p-1 size-7 inset-0 flex items-center justify-center">
-                        @cp_svg('icons/burger-menu', 'size-5')
-                    </div>
-                </button>
-            <img src="{{ $customDarkLogo }}" alt="{{ config('statamic.cp.custom_cms_name') }}" class="max-w-[260px] max-h-9">
+                <img src="{{ $customDarkLogo }}" alt="{{ config('statamic.cp.custom_cms_name') }}" class="max-w-[260px] max-h-9">
         @else
         <div class="flex items-center gap-2 relative">
             <button class="flex items-center group rounded-full cursor-pointer" type="button" @click="toggleNav" aria-label="{{ __('Toggle Nav') }}" style="--focus-outline-offset: 0.2rem;">
