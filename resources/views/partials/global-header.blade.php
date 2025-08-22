@@ -9,15 +9,15 @@
     <a class="c-skip-link z-(--z-index-header) px-4 py-2 bg-blue-800 text-sm top-2.5 left-2.25 fixed opacity-0 -translate-y-24 focus:translate-y-0 focus:opacity-100 rounded-md" href="#main-content">
         {{ __('Skip to content') }}
     </a>
-        <div class="flex items-center gap-2 text-[0.8125rem] text-gray-300">
-            {{-- Logo --}}
-            @if ($customDarkLogo)
-                <button class="flex items-center group cursor-pointer text-gray-300 hover:text-white" type="button" @click="toggleNav" aria-label="{{ __('Toggle Nav') }}">
-                    <div class="p-1 size-7 inset-0 flex items-center justify-center">
-                        @cp_svg('icons/burger-menu', 'size-5')
-                    </div>
-                </button>
-                <img src="{{ $customDarkLogo }}" alt="{{ config('statamic.cp.custom_cms_name') }}" class="max-w-[260px] max-h-9">
+    <div class="flex items-center gap-2 text-[0.8125rem] text-gray-300">
+         {{-- Logo --}}
+        @if ($customDarkLogo)
+            <button class="flex items-center group cursor-pointer text-gray-300 hover:text-white" type="button" @click="toggleNav" aria-label="{{ __('Toggle Nav') }}">
+                <div class="p-1 size-7 inset-0 flex items-center justify-center">
+                    @cp_svg('icons/burger-menu', 'size-5')
+                </div>
+            </button>
+            <img src="{{ $customDarkLogo }}" alt="{{ config('statamic.cp.custom_cms_name') }}" class="max-w-[260px] max-h-9">
         @else
         <div class="flex items-center gap-2 relative">
             <button class="flex items-center group rounded-full cursor-pointer" type="button" @click="toggleNav" aria-label="{{ __('Toggle Nav') }}" style="--focus-outline-offset: 0.2rem;">
