@@ -273,7 +273,7 @@ class CoreNav
         if (Stache::duplicates()->isNotEmpty()) {
             Nav::tools('Duplicate IDs')
                 ->route('duplicates')
-                ->icon('duplicate-ids')
+                ->icon('duplicate')
                 ->view('statamic::nav.duplicates')
                 ->can('resolve duplicate ids');
         }
