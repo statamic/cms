@@ -76,26 +76,19 @@ class Entries extends Relationship
                         'instructions' => __('statamic::fieldtypes.entries.config.collections'),
                         'type' => 'collections',
                         'mode' => 'select',
+                        'width' => 50,
                     ],
                     'search_index' => [
                         'display' => __('Search Index'),
                         'instructions' => __('statamic::fieldtypes.entries.config.search_index'),
                         'type' => 'text',
-                    ],
-                    'query_scopes' => [
-                        'display' => __('Query Scopes'),
-                        'instructions' => __('statamic::fieldtypes.entries.config.query_scopes'),
-                        'type' => 'taggable',
-                        'options' => Scope::all()
-                            ->reject(fn ($scope) => $scope instanceof Filter)
-                            ->map->handle()
-                            ->values()
-                            ->all(),
+                        'width' => 50,
                     ],
                     'select_across_sites' => [
                         'display' => __('Select Across Sites'),
                         'instructions' => __('statamic::fieldtypes.entries.config.select_across_sites'),
                         'type' => 'toggle',
+                        'width' => 50,
                     ],
                 ],
             ],
@@ -112,6 +105,7 @@ class Entries extends Relationship
                             'select' => __('Select Dropdown'),
                             'typeahead' => __('Typeahead Field'),
                         ],
+                        'width' => 50,
                     ],
                     'create' => [
                         'display' => __('Allow Creating'),
@@ -121,6 +115,7 @@ class Entries extends Relationship
                         'if' => [
                             'mode' => 'default',
                         ],
+                        'width' => 50,
                     ],
                 ],
             ],
@@ -132,6 +127,21 @@ class Entries extends Relationship
                         'instructions' => __('statamic::messages.max_items_instructions'),
                         'min' => 1,
                         'type' => 'integer',
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Advanced'),
+                'fields' => [
+                    'query_scopes' => [
+                        'display' => __('Query Scopes'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.query_scopes'),
+                        'type' => 'taggable',
+                        'options' => Scope::all()
+                            ->reject(fn ($scope) => $scope instanceof Filter)
+                            ->map->handle()
+                            ->values()
+                            ->all(),
                     ],
                 ],
             ],

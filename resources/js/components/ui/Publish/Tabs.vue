@@ -92,7 +92,7 @@ function tabHasError(tab) {
                     :key="tab.handle"
                     :name="tab.handle"
                     :text="__(tab.display)"
-                    :class="{ '!text-red-500': tabHasError(tab) }"
+                    :class="{ '!text-red-600': tabHasError(tab) }"
                 />
             </TabList>
 

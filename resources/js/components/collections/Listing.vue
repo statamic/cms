@@ -60,7 +60,7 @@
                     </aside>
                 </ui-panel-header>
 
-                <ui-card class="h-40">
+                <ui-card class="h-40 px-0! py-2!">
                     <ui-listing :url="collection.entries_listing_url" :per-page="5" :columns="collection.columns">
                         <template #initializing>
                             <div class="flex flex-col gap-[6px] justify-between p-0.5">
@@ -72,9 +72,9 @@
                             </div>
                         </template>
                         <template #default="{ items }">
-                            <table v-if="items.length" class="w-full [&_td]:p-0.5 [&_td]:text-sm">
+                            <table v-if="items.length" class="w-full [&_td]:py-1 [&_td]:px-5 [&_td]:text-sm">
                                 <ui-listing-table-head sr-only />
-                                <ui-listing-table-body>
+                                <ui-listing-table-body class="divide-y divide-gray-200 dark:divide-gray-700">
                                     <template #cell-title="{ row: entry }" class="w-full">
                                         <div class="flex items-center gap-2">
                                             <StatusIndicator :status="entry.status" />

@@ -177,7 +177,7 @@
 }
 .cm-s-default .cm-string {
     color: #a11;
-    @apply dark:text-red-500;
+    @apply dark:text-red-600;
 }
 .cm-s-default .cm-string-2 {
     color: #f50;

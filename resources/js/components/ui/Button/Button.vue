@@ -36,7 +36,7 @@ const buttonClasses = computed(() => {
                 primary: [
                     'bg-linear-to-b from-primary/90 to-primary hover:bg-primary-hover text-white border border-primary-border shadow-ui-md inset-shadow-2xs inset-shadow-white/25 [&_svg]:text-white/50',
                 ],
-                danger: 'bg-linear-to-b from-red-500/90 to-red-500 hover:bg-red-500/90 text-white border border-red-600 inset-shadow-2xs inset-shadow-red-300 [&_svg]:text-red-200 disabled:text-red-200',
+                danger: 'bg-linear-to-b from-red-600/90 to-red-600 hover:bg-red-600/90 text-white border border-red-600 inset-shadow-2xs inset-shadow-red-300 [&_svg]:text-red-200 disabled:text-red-200',
                 filled: 'bg-gray-100 hover:bg-gray-200 hover:text-gray-900 dark:hover:text-white dark:bg-gray-700/80 dark:hover:bg-gray-700 [&_svg]:text-gray-700 dark:[&_svg]:text-gray-300',
                 ghost: 'bg-transparent hover:bg-gray-400/10 text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800/50 dark:hover:text-gray-200',
                 subtle: 'bg-transparent hover:bg-gray-400/10 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-gray-700/80 dark:hover:text-gray-200 [&_svg]:text-gray-400',

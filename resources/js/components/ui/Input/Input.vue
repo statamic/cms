@@ -31,8 +31,8 @@ const props = defineProps({
     focus: { type: Boolean, default: false },
 });
 
-const hasPrependedIcon = !!props.iconPrepend || !!props.icon || !!slots.prepend;
-const hasAppendedIcon = !!props.iconAppend || !!slots.append || props.clearable || props.viewable || props.copyable || props.loading;
+const hasPrependedIcon = computed(() => !!props.iconPrepend || !!props.icon || !!slots.prepend);
+const hasAppendedIcon = computed(() => !!props.iconAppend || !!slots.append || props.clearable || props.viewable || copyable.value || props.loading);
 
 const inputClasses = computed(() => {
     const classes = cva({
@@ -66,35 +66,39 @@ const inputClasses = computed(() => {
         ],
     })({
         ...props,
-        hasPrependedIcon: hasPrependedIcon,
-        hasAppendedIcon: hasAppendedIcon,
+        hasPrependedIcon: hasPrependedIcon.value,
+        hasAppendedIcon: hasAppendedIcon.value,
         hasLimit: !!props.limit,
     });
 
     return twMerge(classes);
 });
 
-const iconClasses = cva({
-    base: 'absolute top-0 bottom-0 flex items-center justify-center text-xs text-gray-400',
-    variants: {
-        size: {
-            base: '[&_svg]:size-4',
-            sm: '[&_svg]:size-3.5',
-            xs: '[&_svg]:size-3',
+const iconClasses = computed(() => {
+    const classes = cva({
+        base: 'absolute top-0 bottom-0 flex items-center justify-center text-xs text-gray-400',
+        variants: {
+            size: {
+                base: '[&_svg]:size-4',
+                sm: '[&_svg]:size-3.5',
+                xs: '[&_svg]:size-3',
+            },
         },
-    },
-    compoundVariants: [
-        { size: 'base', hasPrependedIcon: true, class: 'ps-3 has-[button]:ps-1 start-0' },
-        { size: 'sm', hasPrependedIcon: true, class: 'ps-2 has-[button]:ps-1 start-0' },
-        { size: 'xs', hasPrependedIcon: true, class: 'ps-1.5 has-[button]:ps-0 start-0' },
-        { size: 'base', hasAppendedIcon: true, class: 'pe-3 has-[button]:pe-1 end-0' },
-        { size: 'sm', hasAppendedIcon: true, class: 'pe-2 has-[button]:pe-1 end-0' },
-        { size: 'xs', hasAppendedIcon: true, class: 'pe-1.5 has-[button]:pe-0 end-0' },
-    ],
-})({
-    ...props,
-    hasPrependedIcon: hasPrependedIcon,
-    hasAppendedIcon: hasAppendedIcon,
+        compoundVariants: [
+            { size: 'base', hasPrependedIcon: true, class: 'ps-3 has-[button]:ps-1 start-0' },
+            { size: 'sm', hasPrependedIcon: true, class: 'ps-2 has-[button]:ps-1 start-0' },
+            { size: 'xs', hasPrependedIcon: true, class: 'ps-1.5 has-[button]:ps-0 start-0' },
+            { size: 'base', hasAppendedIcon: true, class: 'pe-3 has-[button]:pe-1 end-0' },
+            { size: 'sm', hasAppendedIcon: true, class: 'pe-2 has-[button]:pe-1 end-0' },
+            { size: 'xs', hasAppendedIcon: true, class: 'pe-1.5 has-[button]:pe-0 end-0' },
+        ],
+    })({
+        ...props,
+        hasPrependedIcon: hasPrependedIcon.value,
+        hasAppendedIcon: hasAppendedIcon.value,
+    });
+
+    return twMerge(classes);
 });
 
 const emit = defineEmits(['update:modelValue']);
@@ -107,9 +111,11 @@ const togglePassword = () => {
     inputType.value = inputType.value === 'password' ? 'text' : 'password';
 };
 
+const copySupported = computed(() => 'clipboard' in navigator && typeof navigator.clipboard.writeText === 'function');
+const copyable = computed(() => props.copyable && copySupported.value)
 const copied = ref(false);
 const copy = () => {
-    if (!props.modelValue) return;
+    if (!copyable.value || !props.modelValue) return;
     navigator.clipboard.writeText(props.modelValue);
     copied.value = true;
     setTimeout(() => (copied.value = false), 1000);
@@ -163,12 +169,12 @@ defineExpose({ focus });
                     />
                     <Button
                         size="sm"
-                        :icon="copied.value ? 'clipboard-check' : 'clipboard'"
+                        :icon="copied ? 'clipboard-check' : 'clipboard'"
                         variant="subtle"
                         v-else-if="copyable"
                         @click="copy"
                         class="animate"
-                        :class="copied.value ? 'animate-wiggle' : ''"
+                        :class="copied ? 'animate-wiggle' : ''"
                     />
                     <Icon v-else-if="iconAppend" :name="iconAppend" />
                     <Icon v-if="loading" name="loading" />

@@ -12,7 +12,7 @@
                 @blur="$emit('blur')"
             />
         </ui-input-group>
-        <ui-description v-if="isInvalid" class="text-red-500">{{ __('statamic::validation.url') }}</ui-description>
+        <ui-description v-if="isInvalid" class="text-red-600">{{ __('statamic::validation.url') }}</ui-description>
         <iframe
             v-if="shouldShowPreview"
             :src="embedUrl"

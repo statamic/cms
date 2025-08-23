@@ -3,7 +3,7 @@
         <div class="flex items-center gap-2">
             <Switch
                 @update:model-value="update"
-                :disabled="config.disabled"
+                :disabled="config.disabled || isReadOnly"
                 :id="fieldId"
                 :model-value="value"
                 :read-only="isReadOnly"

@@ -138,9 +138,12 @@ export default {
     },
 
     watch: {
-        browserSelections(selections) {
-            if (this.maxFiles === 1 && selections.length === 1) {
-                this.select();
+        browserSelections: {
+            deep: true,
+            handler: function (selections) {
+                if (this.maxFiles === 1 && selections.length === 1) {
+                    this.select();
+                }
             }
         },
     },
