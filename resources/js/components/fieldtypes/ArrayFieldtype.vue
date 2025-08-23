@@ -68,17 +68,13 @@
                     <tr class="sortable-row" v-for="(element, index) in data" :key="element._id">
                         <td class="sortable-handle table-drag-handle" v-if="!isReadOnly"></td>
                         <td>
-                            <input
-                                type="text"
-                                class="input-text font-medium"
+                            <ui-input
                                 v-model="element.key"
                                 :readonly="isReadOnly"
                             />
                         </td>
                         <td>
-                            <input
-                                type="text"
-                                class="input-text"
+                            <ui-input
                                 v-model="element.value"
                                 :readonly="isReadOnly"
                             />
