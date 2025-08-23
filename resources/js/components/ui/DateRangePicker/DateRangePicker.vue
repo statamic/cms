@@ -35,6 +35,7 @@ const props = defineProps({
     inline: { type: Boolean, default: false },
     clearable: { type: Boolean, default: true },
     disabled: { type: Boolean, default: false },
+    readOnly: { type: Boolean, default: false },
 });
 
 const calendarBindings = computed(() => ({
@@ -74,7 +75,7 @@ const calendarEvents = computed(() => ({
             :modelValue="modelValue"
             :granularity="granularity"
             :locale="$date.locale"
-            :disabled="disabled"
+            :disabled="disabled || readOnly"
             @update:model-value="emit('update:modelValue', $event)"
             v-bind="$attrs"
             prevent-deselect
@@ -89,6 +90,7 @@ const calendarEvents = computed(() => ({
                         'leading-[1.375rem] text-gray-600 dark:text-gray-300',
                         'shadow-ui-sm not-prose h-10 rounded-lg py-2 px-3 disabled:shadow-none',
                         'data-invalid:border-red-500',
+                        'disabled:shadow-none disabled:opacity-50 read-only:border-dashed'
                     ]"
                 >
                     <DateRangePickerTrigger v-if="!inline">
@@ -128,7 +130,7 @@ const calendarEvents = computed(() => ({
                         </DateRangePickerInput>
                     </template>
                     <div class="flex-1" />
-                    <Button @click="emit('update:modelValue', null)" variant="ghost" size="sm" icon="x" class="-my-1.25 -me-2" />
+                    <Button v-if="!readOnly" @click="emit('update:modelValue', null)" variant="ghost" size="sm" icon="x" class="-my-1.25 -me-2" :disabled="disabled" />
                 </div>
             </DateRangePickerField>
 
