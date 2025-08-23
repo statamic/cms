@@ -18,7 +18,7 @@
     }
 
     ul li a {
-        @apply flex items-center gap-3 text-gray-700 hover:bg-gray-400/10 px-2 py-1 rounded-md dark:text-gray-400 hover:text-black dark:hover:text-gray-200 hover:[&_svg]:text-gray-700 dark:hover:[&_svg]:text-gray-200;
+        @apply flex items-center gap-3 text-gray-700 hover:bg-gray-400/15 px-2 py-1 rounded-md dark:text-gray-400 hover:text-black dark:hover:text-gray-200 hover:[&_svg]:text-gray-700 dark:hover:[&_svg]:text-gray-200;
     }
 
     ul li a.active {
