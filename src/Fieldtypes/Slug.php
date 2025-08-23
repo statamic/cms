@@ -14,17 +14,19 @@ class Slug extends Text
             [
                 'display' => __('Input Behavior'),
                 'fields' => [
-                    'from' => [
-                        'display' => __('From'),
-                        'type' => 'text',
-                        'instructions' => __('statamic::fieldtypes.slug.config.from'),
-                        'default' => 'title',
-                    ],
                     'generate' => [
                         'display' => __('Generate'),
                         'type' => 'toggle',
                         'instructions' => __('statamic::fieldtypes.slug.config.generate'),
                         'default' => true,
+                        'width' => 50,
+                    ],
+                    'from' => [
+                        'display' => __('From'),
+                        'type' => 'text',
+                        'instructions' => __('statamic::fieldtypes.slug.config.from'),
+                        'default' => 'title',
+                        'width' => 50,
                     ],
                     'show_regenerate' => [
                         'display' => __('Show Regenerate Button'),

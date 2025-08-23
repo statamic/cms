@@ -50,7 +50,7 @@ class Assets extends Fieldtype
                         'instructions' => __('statamic::fieldtypes.assets.config.allow_uploads'),
                         'type' => 'toggle',
                         'default' => true,
-                        'width' => '33',
+                        'width' => '50',
                     ],
                     'folder' => [
                         'display' => __('Folder'),
@@ -61,7 +61,7 @@ class Assets extends Fieldtype
                         'if' => [
                             'container' => 'not empty',
                         ],
-                        'width' => '33',
+                        'width' => '50',
                     ],
                     'dynamic' => [
                         'display' => __('Dynamic Folder'),
@@ -77,6 +77,7 @@ class Assets extends Fieldtype
                         'if' => [
                             'container' => 'not empty',
                         ],
+                        'width' => '50',
                     ],
                     'restrict' => [
                         'display' => __('Restrict to Folder'),
@@ -86,7 +87,7 @@ class Assets extends Fieldtype
                             'container' => 'not empty',
                             'dynamic' => 'not true',
                         ],
-                        'width' => '33',
+                        'width' => '50',
                     ],
                 ],
             ],
@@ -102,18 +103,21 @@ class Assets extends Fieldtype
                             'grid' => __('Grid'),
                             'list' => __('List'),
                         ],
+                        'width' => '50',
                     ],
                     'show_filename' => [
                         'display' => __('Show Filename'),
                         'instructions' => __('statamic::fieldtypes.assets.config.show_filename'),
                         'type' => 'toggle',
                         'default' => true,
+                        'width' => '50',
                     ],
                     'show_set_alt' => [
                         'display' => __('Show Set Alt'),
                         'instructions' => __('statamic::fieldtypes.assets.config.show_set_alt'),
                         'type' => 'toggle',
                         'default' => true,
+                        'width' => '50',
                     ],
                 ],
             ],
@@ -125,12 +129,14 @@ class Assets extends Fieldtype
                         'instructions' => __('statamic::fieldtypes.assets.config.max_files'),
                         'min' => 1,
                         'type' => 'integer',
+                        'width' => '50',
                     ],
                     'min_files' => [
                         'display' => __('Min Files'),
                         'instructions' => __('statamic::fieldtypes.assets.config.min_files'),
                         'min' => 1,
                         'type' => 'integer',
+                        'width' => '50',
                     ],
                 ],
             ],
