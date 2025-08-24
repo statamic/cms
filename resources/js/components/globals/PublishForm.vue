@@ -268,6 +268,14 @@ export default {
         addToCommandPalette() {
             Statamic.$commandPalette.add({
                 category: Statamic.$commandPalette.category.Actions,
+                text: __('Save'),
+                icon: 'save',
+                action: () => this.save(),
+                prioritize: true,
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
                 text: __('Configure'),
                 icon: 'cog',
                 when: () => this.canConfigure,
