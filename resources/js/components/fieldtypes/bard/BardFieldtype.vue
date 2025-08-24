@@ -73,6 +73,7 @@
                                 :bard="this"
                                 :config="config"
                                 :editor="editor"
+                                variant="floating"
                             />
                         </div>
                         </bubble-menu>
