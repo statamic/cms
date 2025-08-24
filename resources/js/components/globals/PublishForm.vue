@@ -264,6 +264,24 @@ export default {
                 ? 'This global set exists in this site.'
                 : 'This global set does not exist for this site.';
         },
+
+        addToCommandPalette() {
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Configure'),
+                icon: 'cog',
+                when: () => this.canConfigure,
+                url: this.configureUrl,
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Edit Blueprint'),
+                icon: 'blueprint-edit',
+                when: () => this.canEditBlueprint,
+                url: this.actions.editBlueprint,
+            });
+        },
     },
 
     mounted() {
@@ -271,6 +289,8 @@ export default {
             e.preventDefault();
             this.save();
         });
+
+        this.addToCommandPalette();
     },
 
     created() {
