@@ -863,15 +863,12 @@ export default {
         container = computed(() => this.$refs.container);
     },
 
-    unmounted() {
-        clearTimeout(this.trackDirtyStateTimeout);
-    },
-
     beforeUnmount() {
         if (this.autosaveIntervalInstance) clearInterval(this.autosaveIntervalInstance);
     },
 
     unmounted() {
+        clearTimeout(this.trackDirtyStateTimeout);
         this.saveKeyBinding.destroy();
         this.quickSaveKeyBinding.destroy();
     },
