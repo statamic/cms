@@ -836,6 +836,14 @@ export default {
         addToCommandPalette() {
             Statamic.$commandPalette.add({
                 category: Statamic.$commandPalette.category.Actions,
+                text: this.saveText,
+                icon: 'save',
+                action: () => this.save(),
+                prioritize: true,
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
                 text: __('Edit Blueprint'),
                 icon: 'blueprint-edit',
                 when: () => this.canEditBlueprint,
