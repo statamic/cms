@@ -836,7 +836,7 @@ export default {
         addToCommandPalette() {
             Statamic.$commandPalette.add({
                 category: Statamic.$commandPalette.category.Actions,
-                text: [__('Entry'), __('Edit Blueprint')],
+                text: __('Edit Blueprint'),
                 icon: 'blueprint-edit',
                 when: () => this.canEditBlueprint,
                 url: this.actions.editBlueprint,
@@ -844,7 +844,7 @@ export default {
 
             this.$refs.actions.preparedActions.forEach(action => Statamic.$commandPalette.add({
                 category: Statamic.$commandPalette.category.Actions,
-                text: [__('Entry'), action.title],
+                text: action.title,
                 icon: action.icon,
                 action: action.run,
             }));
