@@ -43,9 +43,11 @@ export default {
         sortDirection: String,
         columns: Array,
         filters: Array,
+        canCreate: Boolean,
+        createUrl: String,
         taxonomyEditUrl: String,
         taxonomyBlueprintsUrl: String,
-        deleteTaxonomyAction: Function, // TODO: The resource deleter is in blade, should we have a View.vue like collections?
+        deleteTaxonomyAction: Function, // TODO: Bleh. The resource deleter is in blade, should we have a View.vue like collections?
     },
 
     data() {
@@ -65,6 +67,15 @@ export default {
         },
 
         addToCommandPalette() {
+            Statamic.$commandPalette.add({
+                when: () => this.canCreate,
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Create Term'),
+                icon: 'taxonomies',
+                url: this.createUrl,
+                prioritize: true,
+            });
+
             Statamic.$commandPalette.add({
                 when: () => Statamic.$permissions.has(`edit ${this.taxonomy} taxonomy`),
                 category: Statamic.$commandPalette.category.Actions,
