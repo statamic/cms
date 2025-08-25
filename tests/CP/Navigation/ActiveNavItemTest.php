@@ -2,7 +2,6 @@
 
 namespace Tests\CP\Navigation;
 
-use Closure;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Request;
