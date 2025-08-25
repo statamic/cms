@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="flex items-center gap-2" v-if="isToggleMode">
-            <Switch :model-value="isRevealed" @update:model-value="buttonReveal" :read-only="isReadOnly" :id="id" />
+            <Switch :model-value="isRevealed" @update:model-value="update" :read-only="isReadOnly" :id="id" />
             <Heading v-if="config.input_label" v-html="$markdown(__(config.input_label), { openLinksInNewTabs: true })" />
         </div>
         <Button
