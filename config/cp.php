@@ -1,5 +1,7 @@
 <?php
 
+use Statamic\CP\Color;
+
 return [
 
     /*
@@ -95,15 +97,16 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Theme
+    | Colors
     |--------------------------------------------------------------------------
     |
-    | Optionally spice up the login and other outside-the-control-panel
-    | screens. You may choose between "rad" or "business" themes.
+    | Adjust the colors used in the Control Panel.
     |
     */
 
-    'theme' => env('STATAMIC_THEME', 'rad'),
+    'colors' => [
+        // 'primary' => Color::Sky[600],
+    ],
 
     /*
     |--------------------------------------------------------------------------

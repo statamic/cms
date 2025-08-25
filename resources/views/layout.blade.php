@@ -7,31 +7,7 @@
         @include('statamic::partials.head')
         <style>
             :root {
-                /* --theme-color-primary: oklch(0.588 0.158 241.966); */
-                --theme-color-primary: oklch(0.274 0.006 286.033);
-                --theme-color-gray-50: oklch(0.985 0 0);
-                --theme-color-gray-100: oklch(0.967 0.001 286.375);
-                --theme-color-gray-200: oklch(0.92 0.004 286.32);
-                --theme-color-gray-300: oklch(0.871 0.006 286.286);
-                --theme-color-gray-400: oklch(0.705 0.015 286.067);
-                --theme-color-gray-500: oklch(0.552 0.016 285.938);
-                --theme-color-gray-600: oklch(0.442 0.017 285.786);
-                --theme-color-gray-700: oklch(0.37 0.013 285.805);
-                --theme-color-gray-800: oklch(0.274 0.006 286.033);
-                --theme-color-gray-850: oklch(24.48% 0.0056 285.98);
-                --theme-color-gray-900: oklch(0.21 0.006 285.885);
-                --theme-color-gray-950: oklch(0.141 0.005 285.823);
-                --theme-color-success: oklch(0.792 0.209 151.711);
-                --theme-color-danger: oklch(0.577 0.245 27.325);
-                --theme-color-body-bg: oklch(0.967 0.001 286.375);
-                --theme-color-body-border: transparent;
-                --theme-color-body-dark-bg: oklch(0.21 0.006 285.885);
-                --theme-color-body-dark-border: oklch(0.141 0.005 285.823);
-                --theme-color-content-bg: white;
-                --theme-color-content-border: oklch(0.92 0.004 286.32);
-                --theme-color-content-dark-bg: oklch(0.21 0.006 285.885);
-                --theme-color-content-dark-border: oklch(0.141 0.005 285.823);
-                --theme-color-global-header-bg: oklch(0.274 0.006 286.033);
+                {{ \Statamic\CP\Color::cssVariables() }}
             }
         </style>
     </head>
