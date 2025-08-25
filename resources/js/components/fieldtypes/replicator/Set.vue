@@ -144,7 +144,7 @@ function destroy() {
                 />
                 <button type="button" class="flex flex-1 items-center gap-4 p-2" @click="toggleCollapsedState">
                     <Badge variant="flat" size="lg">
-                        <span v-if="isSetGroupVisible">
+                        <span v-if="isSetGroupVisible" class="flex items-center gap-2">
                             {{ __(setGroup.display) }}
                             <Icon name="ui/chevron-right" class="relative top-px size-3" />
                         </span>

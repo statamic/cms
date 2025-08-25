@@ -1,5 +1,6 @@
 {
     "name": "@statamic/cms",
+    "version": "0.0.0",
     "dependencies": {
         "@vitejs/plugin-vue": "^6.0.0"
     },
