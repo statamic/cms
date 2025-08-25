@@ -102,7 +102,6 @@ class NavBuilder
     protected function resolveChildrenClosures()
     {
         collect($this->items)
-            ->filter(fn ($item) => $item->isActive() || $this->withHidden)
             ->each(fn ($item) => $item->resolveChildren());
 
         return $this;
