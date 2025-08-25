@@ -8,6 +8,7 @@
                 :max-selections="maxSelections"
                 :sort-column="sortColumn"
                 :sort-direction="sortDirection"
+                :additional-parameters="additionalParameters"
                 v-model:selections="selections"
             >
                 <template #initializing>
@@ -168,7 +169,7 @@ export default {
         initialSortColumn: String,
         initialSortDirection: String,
         maxSelections: Number,
-        site: String, // todo: this should be sent to the request.
+        site: String,
         type: String, // todo: this controls the extra column that is commented out in the new table at the moment.
         name: String,
         initialColumns: {
@@ -216,6 +217,12 @@ export default {
 
         viewLocalStorageKey() {
             return `statamic.selector.field.${this.name}`;
+        },
+
+        additionalParameters() {
+            return {
+                site: this.site,
+            }
         },
     },
 
