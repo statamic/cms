@@ -81,8 +81,8 @@ class ActiveNavItemTest extends TestCase
         $this->assertTrue(Blink::has(NavBuilder::UNRESOLVED_CHILDREN_URLS_CACHE_KEY));
         $this->assertTrue(Cache::has(NavBuilder::ALL_URLS_CACHE_KEY));
         $this->assertTrue(Blink::has(NavBuilder::ALL_URLS_CACHE_KEY));
-        $this->assertInstanceOf(Closure::class, $this->getItemByDisplay($nav->get('Content'), 'Collections')->children());
-        $this->assertInstanceOf(Closure::class, $this->getItemByDisplay($nav->get('Content'), 'Taxonomies')->children());
+        $this->assertInstanceOf(Collection::class, $this->getItemByDisplay($nav->get('Content'), 'Collections')->children());
+        $this->assertInstanceOf(Collection::class, $this->getItemByDisplay($nav->get('Content'), 'Taxonomies')->children());
     }
 
     #[Test]
@@ -155,7 +155,7 @@ class ActiveNavItemTest extends TestCase
         $collections = $this->buildAndGetItem('Content', 'Collections');
 
         $this->assertFalse($collections->isActive());
-        $this->assertInstanceOf(Closure::class, $collections->children());
+        $this->assertInstanceOf(Collection::class, $collections->children());
     }
 
     #[Test]
@@ -332,7 +332,7 @@ class ActiveNavItemTest extends TestCase
         $seoPro = $this->buildAndGetItem('Tools', 'SEO Pro');
 
         $this->assertFalse($seoPro->isActive());
-        $this->assertInstanceOf(Closure::class, $seoPro->children());
+        $this->assertInstanceOf(Collection::class, $seoPro->children());
     }
 
     #[Test]
