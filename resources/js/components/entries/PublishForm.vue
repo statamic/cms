@@ -7,6 +7,7 @@
             </template>
 
             <ItemActions
+                ref="actions"
                 v-if="!isCreating && hasItemActions"
                 :item="values.id"
                 :url="itemActionUrl"
@@ -831,6 +832,31 @@ export default {
                 this.itemActions = response.data.itemActions;
             }
         },
+
+        addToCommandPalette() {
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: this.saveText,
+                icon: 'save',
+                action: () => this.save(),
+                prioritize: true,
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Edit Blueprint'),
+                icon: 'blueprint-edit',
+                when: () => this.canEditBlueprint,
+                url: this.actions.editBlueprint,
+            });
+
+            this.$refs.actions.preparedActions.forEach(action => Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: action.title,
+                icon: action.icon,
+                action: action.run,
+            }));
+        },
     },
 
     mounted() {
@@ -850,6 +876,8 @@ export default {
         if (typeof this.autosaveInterval === 'number') {
             this.setAutosaveInterval();
         }
+
+        this.addToCommandPalette();
     },
 
     created() {
@@ -863,15 +891,12 @@ export default {
         container = computed(() => this.$refs.container);
     },
 
-    unmounted() {
-        clearTimeout(this.trackDirtyStateTimeout);
-    },
-
     beforeUnmount() {
         if (this.autosaveIntervalInstance) clearInterval(this.autosaveIntervalInstance);
     },
 
     unmounted() {
+        clearTimeout(this.trackDirtyStateTimeout);
         this.saveKeyBinding.destroy();
         this.quickSaveKeyBinding.destroy();
     },

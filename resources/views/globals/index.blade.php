@@ -8,11 +8,20 @@
 @section('content')
     <ui-header title="{{ __('Globals') }}" icon="globals">
         @can('create', 'Statamic\Contracts\Globals\GlobalSet')
-            <ui-button
-                href="{{ cp_route('globals.create') }}"
+            <ui-command-palette-item
+                category="{{ Statamic\CommandPalette\Category::Actions }}"
+                prioritize
                 text="{{ __('Create Global Set') }}"
-                variant="primary"
-            />
+                url="{{ cp_route('globals.create') }}"
+                icon="globals"
+                v-slot="{ text, url }"
+            >
+                <ui-button
+                    :text="text"
+                    :href="url"
+                    variant="primary"
+                />
+            </ui-command-palette-item>
         @endcan
     </ui-header>
 

@@ -14,9 +14,10 @@ import { Icon, Subheading } from '@/components/ui';
 
 let open = ref(false);
 let query = ref('');
+let serverCategories = Statamic.$config.get('commandPaletteCategories');
 let serverPreloadedItems = Statamic.$config.get('commandPalettePreloadedItems');
-let serverItemsLoaded = ref(false);
 let serverItems = ref(setServerLoadingItems());
+let serverItemsLoaded = ref(false);
 let searchResults = ref([]);
 let selected = ref(null);
 let recentItems = ref(getRecentItems());
@@ -72,8 +73,6 @@ const results = computed(() => {
                 ...result.obj,
             };
         });
-
-    let serverCategories = Statamic.$config.get('commandPaletteCategories');
 
     let categoryOrder = query.value
         ? uniq(filtered.map(item => item.category))
