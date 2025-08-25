@@ -44,7 +44,7 @@
                                     x-on:click.stop.prevent="open = !open"
                                     :aria-expanded="open ? 'true' : 'false'"
                                     aria-controls="{{ $submenu_id = Str::random(4) }}-submenu"
-                                    aria-label="Toggle Submenu"
+                                    aria-label="{{ __("Toggle Submenu") }}"
                                 >
                                     <div
                                         class="transform flex items-center w-full h-full justify-center"
