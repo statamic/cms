@@ -52,5 +52,8 @@
         :columns="{{ $columns->toJson() }}"
         :filters="{{ $filters->toJson() }}"
         action-url="{{ cp_route('taxonomies.terms.actions.run', $taxonomy->handle()) }}"
+        taxonomy-edit-url="{{ cp_route('taxonomies.edit', $taxonomy->handle()) }}"
+        taxonomy-blueprints-url="{{ cp_route('blueprints.taxonomies.index', $taxonomy) }}"
+        :delete-taxonomy-action="() => $refs.deleter.confirm()"
     ></term-list>
 @endsection
