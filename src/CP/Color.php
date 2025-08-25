@@ -348,7 +348,7 @@ class Color
 
     public static function theme(): array
     {
-        $config = config('statamic.cp.theme', []);
+        $config = config('statamic.cp.colors', []);
 
         return collect(static::defaultTheme())
             ->map(fn ($color, $name) => $config[$name] ?? $color)
