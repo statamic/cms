@@ -10,6 +10,7 @@ import {
     ComboboxTrigger,
     ComboboxPortal,
     ComboboxViewport,
+    FocusScope,
 } from 'reka-ui';
 import { computed, nextTick, onMounted, ref, useAttrs, useSlots, useTemplateRef, watch } from 'vue';
 import { Button, Icon, Badge } from '@/components/ui';
@@ -336,33 +337,35 @@ defineExpose({
                         ]"
                         @escape-key-down="nextTick(() => $refs.trigger.$el.focus())"
                     >
-                        <ComboboxViewport>
-                            <ComboboxEmpty class="py-2 text-sm">
-                                <slot name="no-options" v-bind="{ searchQuery }">
-                                    {{ __('No options available.') }}
-                                </slot>
-                            </ComboboxEmpty>
+                        <FocusScope asChild trapped>
+                            <ComboboxViewport>
+                                <ComboboxEmpty class="py-2 text-sm">
+                                    <slot name="no-options" v-bind="{ searchQuery }">
+                                        {{ __('No options available.') }}
+                                    </slot>
+                                </ComboboxEmpty>
 
-                            <ComboboxItem
-                                v-if="filteredOptions"
-                                v-for="(option, index) in filteredOptions"
-                                :key="index"
-                                :value="getOptionValue(option)"
-                                :text-value="getOptionLabel(option)"
-                                :class="itemClasses({ size: size, selected: isSelected(option) })"
-                                as="button"
-                                @select="() => {
-                                    dropdownOpen = !closeOnSelect;
-                                    if (closeOnSelect) $refs.trigger.$el.focus();
-                                }"
-                            >
-                                <slot name="option" v-bind="option">
-                                    <img v-if="option.image" :src="option.image" class="size-5 rounded-full" />
-                                    <span v-if="labelHtml" v-html="getOptionLabel(option)" />
-                                    <span v-else>{{ __(getOptionLabel(option)) }}</span>
-                                </slot>
-                            </ComboboxItem>
-                        </ComboboxViewport>
+                                <ComboboxItem
+                                    v-if="filteredOptions"
+                                    v-for="(option, index) in filteredOptions"
+                                    :key="index"
+                                    :value="getOptionValue(option)"
+                                    :text-value="getOptionLabel(option)"
+                                    :class="itemClasses({ size: size, selected: isSelected(option) })"
+                                    as="button"
+                                    @select="() => {
+                                        dropdownOpen = !closeOnSelect;
+                                        if (closeOnSelect) $refs.trigger.$el.focus();
+                                    }"
+                                >
+                                    <slot name="option" v-bind="option">
+                                        <img v-if="option.image" :src="option.image" class="size-5 rounded-full" />
+                                        <span v-if="labelHtml" v-html="getOptionLabel(option)" />
+                                        <span v-else>{{ __(getOptionLabel(option)) }}</span>
+                                    </slot>
+                                </ComboboxItem>
+                            </ComboboxViewport>
+                        </FocusScope>
                     </ComboboxContent>
                 </ComboboxPortal>
             </ComboboxRoot>
