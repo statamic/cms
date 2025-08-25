@@ -488,6 +488,15 @@ export default {
 
         addToCommandPalette() {
             Statamic.$commandPalette.add({
+                when: () => this.canEdit,
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Save Changes'),
+                icon: 'save',
+                action: () => this.$refs.tree?.save(),
+                prioritize: true,
+            });
+
+            Statamic.$commandPalette.add({
                 when: () => this.canEdit && this.hasCollections,
                 category: Statamic.$commandPalette.category.Actions,
                 text: __('Add Nav Item'),
