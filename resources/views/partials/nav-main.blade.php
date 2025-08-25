@@ -42,6 +42,8 @@
                                 <button
                                     class="cursor-pointer opacity-0 group-hover:opacity-100 peer-focus:opacity-100 focus:opacity-100 transition h-7 aspect-square absolute top-0 right-0 z-10"
                                     x-on:click.stop.prevent="open = !open"
+                                    :aria-expanded="open ? 'true' : 'false'"
+                                    aria-controls="{{ $submenu_id = Str::random(4) }}-submenu"
                                     aria-label="Toggle Submenu"
                                 >
                                     <div
@@ -56,6 +58,7 @@
                             @if ($item->children())
                                 <ul
                                     @if (! $item->isActive())
+                                        id="{{ $submenu_id }}-submenu"
                                         x-show="open"
                                         x-on:click.outside="open = false"
                                         style="display: none;"
