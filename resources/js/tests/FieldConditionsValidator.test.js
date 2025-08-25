@@ -80,8 +80,8 @@ let showField = function(config, dottedFieldPath = null) {
         fieldLevelValues ?? Store.values,
         fieldLevelExtraValues ?? Store.extraValues,
         Store.values,
+        Store.revealerValues,
         Store.hiddenFields,
-        Store.revealerFields,
         Store.setHiddenField
     ).showField(config, dottedFieldPath);
 }

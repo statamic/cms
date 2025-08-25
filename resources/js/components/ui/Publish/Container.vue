@@ -10,6 +10,7 @@ import { watch, provide, getCurrentInstance, ref, computed, toRef } from 'vue';
 import Component from '@/components/Component.js';
 import Tabs from './Tabs.vue';
 import Values from '@/components/publish/Values.js';
+import { data_get } from '@/bootstrap/globals.js';
 
 const emit = defineEmits(['update:modelValue', 'update:visibleValues', 'update:modifiedFields']);
 

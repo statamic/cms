@@ -3,12 +3,12 @@ import { data_get } from '@/bootstrap/globals.js';
 import { nextTick } from 'vue';
 
 export default class {
-    constructor(values, extraValues, rootValues, hiddenFields, revealerFields, setHiddenField) {
+    constructor(values, extraValues, rootValues, revealerValues, hiddenFields, setHiddenField) {
         this.values = values;
-        this.extraValues = extraValues;
+        this.extraValues = { ...extraValues, ...revealerValues };
         this.rootValues = rootValues;
+        this.revealerValues = revealerValues;
         this.hiddenFields = hiddenFields;
-        this.revealerFields = revealerFields;
         this.setHiddenField = setHiddenField;
     }
 
@@ -30,7 +30,7 @@ export default class {
         }
 
         // Use validation to determine whether field should be shown.
-        let validator = new Validator(field, { ...this.values, ...this.extraValues }, this.rootValues, dottedFieldPath, this.revealerFields);
+        let validator = new Validator(field, { ...this.values, ...this.extraValues }, this.rootValues, dottedFieldPath, Object.keys(this.revealerValues));
         let passes = validator.passesConditions();
 
         // If the field is configured to always save, never omit value.
