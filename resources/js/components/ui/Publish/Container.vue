@@ -243,6 +243,7 @@ defineExpose({
     saved,
     revealerFields,
     setFieldValue,
+    desyncField,
     clearDirtyState,
     pushComponent,
     visibleValues,
