@@ -2,7 +2,7 @@
 
 namespace Statamic\Stache\Stores;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Statamic\Entries\GetDateFromPath;
 use Statamic\Entries\GetSlugFromPath;
 use Statamic\Entries\GetSuffixFromPath;

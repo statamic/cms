@@ -10,7 +10,7 @@ import { computed } from 'vue';
 import { Primitive } from 'reka-ui';
 import { Motion } from 'motion-v';
 
-const { blueprint, container, visibleValues, extraValues, asConfig, hiddenFields, revealerFields, setHiddenField } = injectContainerContext();
+const { blueprint, container, visibleValues, extraValues, revealerValues, asConfig, hiddenFields, setHiddenField } = injectContainerContext();
 const tab = injectTabContext();
 const sections = tab.sections;
 const visibleSections = computed(() => {
@@ -20,8 +20,8 @@ const visibleSections = computed(() => {
                 visibleValues.value,
                 extraValues.value,
                 visibleValues.value,
+                revealerValues.value,
                 hiddenFields.value,
-                revealerFields.value,
                 setHiddenField
             ).showField(field, field.handle);
         });
@@ -51,17 +51,20 @@ function toggleSection(id) {
                 <Subheading v-if="section.instructions" :text="renderInstructions(section.instructions)" />
             </PanelHeader>
             <Motion
+                class="overflow-hidden"
                 :initial="{ height: section.collapsed ? '0px' : 'auto' }"
                 :animate="{ height: section.collapsed ? '0px' : 'auto' }"
                 :transition="{ duration: 0.25, type: 'tween' }"
             >
-                <Primitive :as="asConfig ? 'div' : Card">
-                    <FieldsProvider :fields="section.fields">
-                        <slot :section="section">
-                            <Fields />
-                        </slot>
-                    </FieldsProvider>
-                </Primitive>
+                <div class="p-px">
+                    <Primitive :as="asConfig ? 'div' : Card">
+                        <FieldsProvider :fields="section.fields">
+                            <slot :section="section">
+                                <Fields />
+                            </slot>
+                        </FieldsProvider>
+                    </Primitive>
+                </div>
             </Motion>
         </Panel>
     </div>

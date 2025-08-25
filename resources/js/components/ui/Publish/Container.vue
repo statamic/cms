@@ -10,6 +10,7 @@ import { watch, provide, getCurrentInstance, ref, computed, toRef } from 'vue';
 import Component from '@/components/Component.js';
 import Tabs from './Tabs.vue';
 import Values from '@/components/publish/Values.js';
+import { data_get } from '@/bootstrap/globals.js';
 
 const emit = defineEmits(['update:modelValue', 'update:visibleValues', 'update:modifiedFields']);
 
@@ -87,6 +88,13 @@ const visibleValues = computed(() => {
         (field) => hiddenFields.value[field].omitValue,
     );
     return new Values(values.value).except(omittable);
+});
+
+const revealerValues = computed(() => {
+    return revealerFields.value.reduce((obj, field) => {
+        obj[field] = data_get(values.value, field);
+        return obj;
+    }, {});
 });
 
 const setHiddenField = (field) => {
@@ -206,6 +214,7 @@ provideContainerContext({
     originValues: toRef(() => props.originValues),
     hiddenFields,
     revealerFields,
+    revealerValues,
     localizedFields,
     meta,
     site: toRef(() => props.site),
