@@ -137,7 +137,7 @@ function destroy() {
                 :class="{ 'rounded-b-none border-gray-200 dark:border-white/10': !collapsed }"
             >
                 <Icon
-                    name="handles"
+                    name="ui/handles"
                     :class="sortableHandleClass"
                     class="size-4 cursor-grab text-gray-400"
                     v-if="!readOnly"
