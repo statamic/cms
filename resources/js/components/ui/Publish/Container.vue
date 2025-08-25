@@ -232,6 +232,7 @@ defineExpose({
     values,
     saving,
     saved,
+    dirty,
     revealerFields,
     setFieldValue,
     clearDirtyState,
