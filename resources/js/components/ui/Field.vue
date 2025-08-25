@@ -53,7 +53,7 @@ const classes = computed(() =>
     })({ ...props }),
 );
 
-const instructions = computed(() => props.instructions ? markdown(props.instructions, { openLinksInNewTabs: true }) : null);
+const instructions = computed(() => props.instructions ? markdown(__(props.instructions), { openLinksInNewTabs: true }) : null);
 const wrapperComponent = computed(() => props.as === 'card' ? Card : 'div');
 </script>
 
