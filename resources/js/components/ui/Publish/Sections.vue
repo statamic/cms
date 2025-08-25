@@ -10,7 +10,7 @@ import { computed } from 'vue';
 import { Primitive } from 'reka-ui';
 import { Motion } from 'motion-v';
 
-const { blueprint, container, visibleValues, extraValues, asConfig, hiddenFields, revealerFields, setHiddenField } = injectContainerContext();
+const { blueprint, container, visibleValues, extraValues, revealerValues, asConfig, hiddenFields, setHiddenField } = injectContainerContext();
 const tab = injectTabContext();
 const sections = tab.sections;
 const visibleSections = computed(() => {
@@ -20,8 +20,8 @@ const visibleSections = computed(() => {
                 visibleValues.value,
                 extraValues.value,
                 visibleValues.value,
+                revealerValues.value,
                 hiddenFields.value,
-                revealerFields.value,
                 setHiddenField
             ).showField(field, field.handle);
         });
