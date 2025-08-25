@@ -36,7 +36,7 @@
                         icon="add-list"
                     />
                     <DropdownItem
-                        :text="__('Link to Entry')"
+                        :text="__('Add Link to Entry')"
                         @click="linkEntries()"
                         icon="add-link"
                     />
@@ -323,6 +323,8 @@ export default {
 
     mounted() {
         this.mounted = true;
+
+        this.addToCommandPalette();
     },
 
     methods: {
@@ -482,6 +484,48 @@ export default {
                 branch.id = newId;
                 this.$refs.tree.pageUpdated();
             }
+        },
+
+        addToCommandPalette() {
+            Statamic.$commandPalette.add({
+                when: () => this.canEdit && this.hasCollections,
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Add Nav Item'),
+                icon: 'add-list',
+                action: () => this.linkPage(),
+            });
+
+            Statamic.$commandPalette.add({
+                when: () => this.canEdit && this.hasCollections,
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Add Link to Entry'),
+                icon: 'add-link',
+                action: () => this.linkEntries(),
+            });
+
+            Statamic.$commandPalette.add({
+                when: () => this.canEdit && !this.hasCollections,
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Add Nav Item'),
+                icon: 'add-link',
+                action: () => this.addLink(),
+            });
+
+            Statamic.$commandPalette.add({
+                when: () => this.canEdit,
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Configure Navigation'),
+                icon: 'cog',
+                url: this.editUrl,
+            });
+
+            Statamic.$commandPalette.add({
+                when: () => this.canEditBlueprint,
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Edit Blueprints'),
+                icon: 'blueprint-edit',
+                url: this.blueprintUrl,
+            });
         },
     },
 };
