@@ -244,6 +244,9 @@ function setParameters(params) {
     if (params.hasOwnProperty('filters')) {
         activeFilters.value = params.filters ? JSON.parse(utf8atob(params.filters)) : {};
     }
+    if (params.hasOwnProperty('site')) {
+        activeFilters.value = { ...activeFilters.value, site: { site: params.site } };
+    }
 }
 
 const parameters = computed(() => {
