@@ -9,12 +9,12 @@
 
         <ui-panel v-if="showTitle" :heading="__('Settings')">
             <ui-card>
-                <ui-field :label="__('Title')" :instructions="__('messages.blueprints_title_instructions')" :errors="errors.title">
+                <ui-field :label="__('Title')" :instructions="__('messages.blueprints_title_instructions')" :errors="errors?.title">
                     <ui-input v-model="blueprint.title" />
                 </ui-field>
             </ui-card>
             <ui-card class="mt-2">
-                <ui-field :label="__('Hidden')" :instructions="__('messages.blueprints_hidden_instructions')" :error="errors.hidden" variant="inline">
+                <ui-field :label="__('Hidden')" :instructions="__('messages.blueprints_hidden_instructions')" :error="errors?.hidden" variant="inline">
                     <ui-switch v-model="blueprint.hidden" />
                 </ui-field>
             </ui-card>
@@ -24,7 +24,7 @@
             class="mt-8"
             :single-tab="!useTabs"
             :initial-tabs="tabs"
-            :errors="errors.tabs"
+            :errors="errors?.tabs"
             :can-define-localizable="canDefineLocalizable"
             @updated="tabsUpdated"
         />
