@@ -434,7 +434,7 @@ class DuplicateEntryTest extends TestCase
     }
 
     #[Test]
-    public function it_duplicates_an_entry_with_localizations_only_once()
+    public function it_duplicates_an_entry_with_localizations_without_propagating()
     {
         $this->setSites([
             'en' => ['url' => 'http://domain.com/', 'locale' => 'en'],
