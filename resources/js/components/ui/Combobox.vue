@@ -309,11 +309,11 @@ defineExpose({
                             @keydown.space="openOnSpace"
                         />
 
-                        <button type="button" class="flex-1 text-start truncate" v-else-if="!searchable && (dropdownOpen || !modelValue)" @keydown.space="openOnSpace">
+                        <button type="button" class="flex-1 text-start truncate focus:outline-none" v-else-if="!searchable && (dropdownOpen || !modelValue)" @keydown.space="openOnSpace">
                             <span class="text-gray-400 dark:text-gray-500 placeholder-text-xs" v-text="placeholder" />
                         </button>
 
-                        <button type="button" v-else class="flex-1 text-start cursor-pointer truncate" @keydown.space="openOnSpace">
+                        <button type="button" v-else class="flex-1 text-start cursor-pointer truncate focus:outline-none" @keydown.space="openOnSpace">
                             <slot name="selected-option" v-bind="{ option: selectedOption }">
                                 <span v-if="labelHtml" v-html="getOptionLabel(selectedOption)" />
                                 <span v-else v-text="getOptionLabel(selectedOption)" />
