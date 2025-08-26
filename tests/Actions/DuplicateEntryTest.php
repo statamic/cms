@@ -434,6 +434,42 @@ class DuplicateEntryTest extends TestCase
     }
 
     #[Test]
+    public function it_duplicates_an_entry_with_localizations_only_once()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://domain.com/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://domain.com/fr/', 'locale' => 'fr'],
+        ]);
+
+        $collection = Collection::make('test')->sites(['en', 'fr']);
+        $collection->save();
+
+        $entry = EntryFactory::id('alfa-id')->locale('en')->collection('test')->slug('alfa')->data(['title' => 'Alfa'])->create();
+        $entry->makeLocalization('fr')->id('alfa-id-fr')->data(['title' => 'Alfa (French)'])->save();
+
+        $this->assertEquals([
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en', 'origin' => ''],
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (French)'], 'locale' => 'fr', 'origin' => 'en.alfa'],
+        ], $this->entryData());
+
+        // Make super user since this test isn't concerned with permissions.
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        $collection->propagate(true);
+
+        (new DuplicateEntry)->run(collect([
+            Entry::find('alfa-id'),
+        ]), []);
+
+        $this->assertEquals([
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en', 'origin' => null],
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (French)'], 'locale' => 'fr', 'origin' => 'en.alfa'],
+            ['slug' => 'alfa-1', 'published' => false, 'data' => ['title' => 'Alfa (Duplicated)', 'duplicated_from' => 'alfa-id'], 'locale' => 'en', 'origin' => null],
+            ['slug' => 'alfa-1', 'published' => false, 'data' => ['title' => 'Alfa (French) (Duplicated)', 'duplicated_from' => 'alfa-id-fr'], 'locale' => 'fr', 'origin' => 'en.alfa-1'],
+        ], $this->entryData());
+    }
+
+    #[Test]
     public function if_an_entry_has_an_origin_it_duplicates_the_root_origin()
     {
         $this->setSites([
