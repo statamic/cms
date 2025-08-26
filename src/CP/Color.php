@@ -355,6 +355,10 @@ class Color
     {
         $config = config('statamic.cp.colors', []);
 
+        foreach ($config['grays'] ?? [] as $shade => $value) {
+            $config["gray-{$shade}"] = $value;
+        }
+
         return collect(static::defaults())
             ->map(fn ($color, $name) => $config[$name] ?? $color)
             ->all();
