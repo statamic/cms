@@ -321,7 +321,7 @@ class Color
     public const Black = '#fff';
     public const Transparent = 'transparent';
 
-    private static function defaultTheme(): array
+    public static function defaults(): array
     {
         return [
             'primary' => self::Zinc[800],
@@ -355,7 +355,7 @@ class Color
     {
         $config = config('statamic.cp.colors', []);
 
-        return collect(static::defaultTheme())
+        return collect(static::defaults())
             ->map(fn ($color, $name) => $config[$name] ?? $color)
             ->all();
     }
