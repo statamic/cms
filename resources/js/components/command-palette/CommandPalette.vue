@@ -144,14 +144,14 @@ function setServerLoadingItems() {
 function getServerItems() {
     if (serverItemsLoaded.value) return;
 
-    axios.get('/cp/command-palette').then((response) => {
+    axios.get(cp_url('command-palette')).then((response) => {
         serverItemsLoaded.value = true;
         serverItems.value = response.data;
     });
 }
 
 function searchContent() {
-    axios.get('/cp/command-palette/search', { params: { q: query.value } }).then((response) => {
+    axios.get(cp_url('command-palette/search'), { params: { q: query.value } }).then((response) => {
         searchResults.value = response.data;
     });
 }
