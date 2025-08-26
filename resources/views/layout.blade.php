@@ -5,11 +5,6 @@
 >
     <head>
         @include('statamic::partials.head')
-        <style>
-            :root {
-                {{ \Statamic\CP\Color::cssVariables() }}
-            }
-        </style>
     </head>
 
     <body
