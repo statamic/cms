@@ -25,7 +25,7 @@
     --color-content-border: var(--theme-color-content-border);
     --color-dark-content-bg: var(--theme-color-dark-content-bg);
     --color-dark-content-border: var(--theme-color-dark-content-border);
-    --color-global-header-bg: var(--theme-color-global-header-bg);
+    --color-global-header-bg: var(--theme-color-gray-800);
 
 
     /* Temp */
