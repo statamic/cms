@@ -4,7 +4,7 @@ namespace Statamic\CP;
 
 class Color
 {
-    public const array Slate = [
+    public const Slate = [
         50 => 'oklch(0.984 0.003 247.858)',
         100 => 'oklch(0.968 0.007 247.896)',
         200 => 'oklch(0.929 0.013 255.508)',
@@ -19,7 +19,7 @@ class Color
         950 => 'oklch(0.129 0.042 264.695)',
     ];
 
-    public const array Gray = [
+    public const Gray = [
         50 => 'oklch(0.985 0.002 247.839)',
         100 => 'oklch(0.967 0.003 264.542)',
         200 => 'oklch(0.928 0.006 264.531)',
@@ -34,7 +34,7 @@ class Color
         950 => 'oklch(0.13 0.028 261.692)',
     ];
 
-    public const array Zinc = [
+    public const Zinc = [
         50 => 'oklch(0.985 0 0)',
         100 => 'oklch(0.967 0.001 286.375)',
         200 => 'oklch(0.92 0.004 286.32)',
@@ -49,7 +49,7 @@ class Color
         950 => 'oklch(0.141 0.005 285.823)',
     ];
 
-    public const array Neutral = [
+    public const Neutral = [
         50 => 'oklch(0.985 0 0)',
         100 => 'oklch(0.97 0 0)',
         200 => 'oklch(0.922 0 0)',
@@ -64,7 +64,7 @@ class Color
         950 => 'oklch(0.145 0 0)',
     ];
 
-    public const array Stone = [
+    public const Stone = [
         50 => 'oklch(0.985 0.001 106.423)',
         100 => 'oklch(0.97 0.001 106.424)',
         200 => 'oklch(0.923 0.003 48.717)',
@@ -79,7 +79,7 @@ class Color
         950 => 'oklch(0.147 0.004 49.25)',
     ];
 
-    public const array Red = [
+    public const Red = [
         50 => 'oklch(0.971 0.013 17.38)',
         100 => 'oklch(0.936 0.032 17.717)',
         200 => 'oklch(0.885 0.062 18.334)',
@@ -93,7 +93,7 @@ class Color
         950 => 'oklch(0.258 0.092 26.042)',
     ];
 
-    public const array Orange = [
+    public const Orange = [
         50 => 'oklch(0.98 0.016 73.684)',
         100 => 'oklch(0.954 0.038 75.164)',
         200 => 'oklch(0.901 0.076 70.697)',
@@ -107,7 +107,7 @@ class Color
         950 => 'oklch(0.266 0.079 36.259)',
     ];
 
-    public const array Amber = [
+    public const Amber = [
         50 => 'oklch(0.987 0.022 95.277)',
         100 => 'oklch(0.962 0.059 95.617)',
         200 => 'oklch(0.924 0.12 95.746)',
@@ -121,7 +121,7 @@ class Color
         950 => 'oklch(0.279 0.077 45.635)',
     ];
 
-    public const array Yellow = [
+    public const Yellow = [
         50 => 'oklch(0.987 0.026 102.212)',
         100 => 'oklch(0.973 0.071 103.193)',
         200 => 'oklch(0.945 0.129 101.54)',
@@ -135,7 +135,7 @@ class Color
         950 => 'oklch(0.286 0.066 53.813)',
     ];
 
-    public const array Lime = [
+    public const Lime = [
         50 => 'oklch(0.986 0.031 120.757)',
         100 => 'oklch(0.967 0.067 122.328)',
         200 => 'oklch(0.938 0.127 124.321)',
@@ -149,7 +149,7 @@ class Color
         950 => 'oklch(0.274 0.072 132.109)',
     ];
 
-    public const array Green = [
+    public const Green = [
         50 => 'oklch(0.982 0.018 155.826)',
         100 => 'oklch(0.962 0.044 156.743)',
         200 => 'oklch(0.925 0.084 155.995)',
@@ -163,7 +163,7 @@ class Color
         950 => 'oklch(0.266 0.065 152.934)',
     ];
 
-    public const array Emerald = [
+    public const Emerald = [
         50 => 'oklch(0.979 0.021 166.113)',
         100 => 'oklch(0.95 0.052 163.051)',
         200 => 'oklch(0.905 0.093 164.15)',
@@ -177,7 +177,7 @@ class Color
         950 => 'oklch(0.262 0.051 172.552)',
     ];
 
-    public const array Teal = [
+    public const Teal = [
         50 => 'oklch(0.984 0.014 180.72)',
         100 => 'oklch(0.953 0.051 180.801)',
         200 => 'oklch(0.91 0.096 180.426)',
@@ -191,7 +191,7 @@ class Color
         950 => 'oklch(0.277 0.046 192.524)',
     ];
 
-    public const array Cyan = [
+    public const Cyan = [
         50 => 'oklch(0.984 0.019 200.873)',
         100 => 'oklch(0.956 0.045 203.388)',
         200 => 'oklch(0.917 0.08 205.041)',
@@ -205,7 +205,7 @@ class Color
         950 => 'oklch(0.302 0.056 229.695)',
     ];
 
-    public const array Sky = [
+    public const Sky = [
         50 => 'oklch(0.977 0.013 236.62)',
         100 => 'oklch(0.951 0.026 236.824)',
         200 => 'oklch(0.901 0.058 230.902)',
@@ -219,7 +219,7 @@ class Color
         950 => 'oklch(0.293 0.066 243.157)',
     ];
 
-    public const array Blue = [
+    public const Blue = [
         50 => 'oklch(0.97 0.014 254.604)',
         100 => 'oklch(0.932 0.032 255.585)',
         200 => 'oklch(0.882 0.059 254.128)',
@@ -233,7 +233,7 @@ class Color
         950 => 'oklch(0.282 0.091 267.935)',
     ];
 
-    public const array Indigo = [
+    public const Indigo = [
         50 => 'oklch(0.962 0.018 272.314)',
         100 => 'oklch(0.93 0.034 272.788)',
         200 => 'oklch(0.87 0.065 274.039)',
@@ -247,7 +247,7 @@ class Color
         950 => 'oklch(0.257 0.09 281.288)',
     ];
 
-    public const array Violet = [
+    public const Violet = [
         50 => 'oklch(0.969 0.016 293.756)',
         100 => 'oklch(0.943 0.029 294.588)',
         200 => 'oklch(0.894 0.057 293.283)',
@@ -261,7 +261,7 @@ class Color
         950 => 'oklch(0.283 0.141 291.089)',
     ];
 
-    public const array Purple = [
+    public const Purple = [
         50 => 'oklch(0.977 0.014 308.299)',
         100 => 'oklch(0.946 0.033 307.174)',
         200 => 'oklch(0.902 0.063 306.703)',
@@ -275,7 +275,7 @@ class Color
         950 => 'oklch(0.291 0.149 302.717)',
     ];
 
-    public const array Fuchsia = [
+    public const Fuchsia = [
         50 => 'oklch(0.977 0.017 320.058)',
         100 => 'oklch(0.952 0.037 318.852)',
         200 => 'oklch(0.903 0.076 319.62)',
@@ -289,7 +289,7 @@ class Color
         950 => 'oklch(0.293 0.136 325.661)',
     ];
 
-    public const array Pink = [
+    public const Pink = [
         50 => 'oklch(0.971 0.014 343.198)',
         100 => 'oklch(0.948 0.028 342.258)',
         200 => 'oklch(0.899 0.061 343.231)',
@@ -303,7 +303,7 @@ class Color
         950 => 'oklch(0.284 0.109 3.907)',
     ];
 
-    public const array Rose = [
+    public const Rose = [
         50 => 'oklch(0.969 0.015 12.422)',
         100 => 'oklch(0.941 0.03 12.58)',
         200 => 'oklch(0.892 0.058 10.001)',
@@ -317,11 +317,11 @@ class Color
         950 => 'oklch(0.271 0.105 12.094)',
     ];
 
-    public const string White = '#fff';
-    public const string Black = '#fff';
-    public const string Transparent = 'transparent';
+    public const White = '#fff';
+    public const Black = '#000';
+    public const Transparent = 'transparent';
 
-    private static function defaultTheme(): array
+    public static function defaults(): array
     {
         return [
             'primary' => self::Zinc[800],
@@ -341,21 +341,25 @@ class Color
             'danger' => self::Red[600],
             'body-bg' => self::Zinc[100],
             'body-border' => self::Transparent,
-            'body-dark-bg' => self::Zinc[900],
-            'body-dark-border' => self::Zinc[950],
-            'content-bg' => self::White,
+            'dark-body-bg' => self::Zinc[900],
+            'dark-body-border' => self::Zinc[950],
+            'content-bg' => 'linear-gradient(to right, hsl(0,0%,99%), #ffffff)',
             'content-border' => self::Zinc[200],
-            'content-dark-bg' => self::Zinc[900],
-            'content-dark-border' => self::Zinc[950],
+            'dark-content-bg' => self::Zinc[900],
+            'dark-content-border' => self::Zinc[950],
             'global-header-bg' => self::Zinc[800],
         ];
     }
 
     public static function theme(): array
     {
-        $config = config('statamic.cp.colors', []);
+        $config = config('statamic.cp.theme', []);
 
-        return collect(static::defaultTheme())
+        foreach ($config['grays'] ?? [] as $shade => $value) {
+            $config["gray-{$shade}"] = $value;
+        }
+
+        return collect(static::defaults())
             ->map(fn ($color, $name) => $config[$name] ?? $color)
             ->all();
     }

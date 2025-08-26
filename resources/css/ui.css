@@ -20,12 +20,11 @@
 
     --color-body-bg: var(--theme-color-body-bg);
     --color-body-border: var(--theme-color-body-border);
-    --color-body-dark-bg: var(--theme-color-body-dark-bg);
-    --color-body-dark-border: var(--theme-color-body-dark-border);
-    --color-content-bg: var(--theme-color-content-bg);
+    --color-dark-body-bg: var(--theme-color-dark-body-bg);
+    --color-dark-body-border: var(--theme-color-dark-body-border);
     --color-content-border: var(--theme-color-content-border);
-    --color-content-dark-bg: var(--theme-color-content-dark-bg);
-    --color-content-dark-border: var(--theme-color-content-dark-border);
+    --color-dark-content-bg: var(--theme-color-dark-content-bg);
+    --color-dark-content-border: var(--theme-color-dark-content-border);
     --color-global-header-bg: var(--theme-color-global-header-bg);
 
 
@@ -136,8 +135,8 @@
 
 @layer components {
     .content-card {
-        @apply min-h-full px-3 sm:px-6 md:px-12 sm:pb-6 bg-content-bg border dark:bg-content-dark-bg dark:border-y-0 dark:border-r-0 border-content-border dark:border-content-dark-border rounded-2xl dark:rounded-none;
-
+        @apply min-h-full px-3 sm:px-6 md:px-12 sm:pb-6 border dark:bg-dark-content-bg dark:border-y-0 dark:border-r-0 border-content-border dark:border-dark-content-border rounded-2xl dark:rounded-none;
+        background: var(--theme-color-content-bg);
     }
 }
 

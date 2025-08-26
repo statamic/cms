@@ -230,16 +230,20 @@ const activeFilterBadgeCount = computed(() => {
 });
 
 function setParameters(params) {
-    currentPage.value = parseInt(params.page);
-    perPage.value = parseInt(params.perPage);
-    sortColumn.value = params.sort;
-    sortDirection.value = params.order;
-    searchQuery.value = params.search;
-    columns.value = columns.value.map((column) => ({
-        ...column,
-        visible: params.columns.split(',').includes(column.field),
-    }));
-    activeFilters.value = params.filters ? JSON.parse(utf8atob(params.filters)) : {};
+    if (params.hasOwnProperty('page')) currentPage.value = parseInt(params.page);
+    if (params.hasOwnProperty('perPage')) perPage.value = parseInt(params.perPage);
+    if (params.hasOwnProperty('sort')) sortColumn.value = params.sort;
+    if (params.hasOwnProperty('order')) sortDirection.value = params.order;
+    if (params.hasOwnProperty('search')) searchQuery.value = params.search;
+    if (params.hasOwnProperty('columns')) {
+        columns.value = columns.value.map((column) => ({
+            ...column,
+            visible: params.columns.split(',').includes(column.field),
+        }));
+    }
+    if (params.hasOwnProperty('filters')) {
+        activeFilters.value = params.filters ? JSON.parse(utf8atob(params.filters)) : {};
+    }
 }
 
 const parameters = computed(() => {
