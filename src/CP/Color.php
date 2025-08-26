@@ -353,7 +353,7 @@ class Color
 
     public static function theme(): array
     {
-        $config = config('statamic.cp.colors', []);
+        $config = config('statamic.cp.theme', []);
 
         foreach ($config['grays'] ?? [] as $shade => $value) {
             $config["gray-{$shade}"] = $value;

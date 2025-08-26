@@ -97,7 +97,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Colors
+    | Theme
     |--------------------------------------------------------------------------
     |
     | Adjust the colors used in the Control Panel. Use the Color class
@@ -105,7 +105,7 @@ return [
     |
     */
 
-    'colors' => [
+    'theme' => [
         // 'gray-50' => Color::Zinc[50],
         // 'gray-100' => Color::Zinc[100],
         // 'gray-200' => Color::Zinc[200],

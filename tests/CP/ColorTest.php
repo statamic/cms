@@ -15,9 +15,17 @@ class ColorTest extends TestCase
     }
 
     #[Test]
+    public function theme_set_to_a_string_does_nothing()
+    {
+        config(['statamic.cp.theme' => 'rad']);
+
+        $this->assertEquals(Color::defaults(), Color::theme());
+    }
+
+    #[Test]
     public function the_theme_can_be_customized()
     {
-        config(['statamic.cp.colors' => ['primary' => Color::Sky[500]]]);
+        config(['statamic.cp.theme' => ['primary' => Color::Sky[500]]]);
 
         $this->assertEquals([
             ...Color::defaults(),
@@ -28,7 +36,7 @@ class ColorTest extends TestCase
     #[Test]
     public function grays_can_be_set_together()
     {
-        config(['statamic.cp.colors' => ['grays' => Color::Slate]]);
+        config(['statamic.cp.theme' => ['grays' => Color::Slate]]);
 
         $this->assertEquals([
             ...Color::defaults(),
