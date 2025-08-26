@@ -1,5 +1,15 @@
 # Release Notes
 
+## 6.0.0-alpha.3 (2025-08-26)
+
+### What's fixed
+- Fix dist tar download error [#12188](https://github.com/statamic/cms/issues/12188) by @jasonvarga
+- Fix modal open prop usage [#12187](https://github.com/statamic/cms/issues/12187) by @jasonvarga
+- Global header should use chosen gray family [#12185](https://github.com/statamic/cms/issues/12185) by @jackmcdade
+- Unlock laravel/framework [#12183](https://github.com/statamic/cms/issues/12183) by @jasonvarga
+
+
+
 ## 6.0.0-alpha.2 (2025-08-26)
 
 ### What's new
