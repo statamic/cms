@@ -106,34 +106,21 @@ return [
     */
 
     'theme' => [
-        // 'gray-50' => Color::Zinc[50],
-        // 'gray-100' => Color::Zinc[100],
-        // 'gray-200' => Color::Zinc[200],
-        // 'gray-300' => Color::Zinc[300],
-        // 'gray-400' => Color::Zinc[400],
-        // 'gray-500' => Color::Zinc[500],
-        // 'gray-600' => Color::Zinc[600],
-        // 'gray-700' => Color::Zinc[700],
-        // 'gray-800' => Color::Zinc[800],
-        // 'gray-850' => Color::Zinc[850],
-        // 'gray-900' => Color::Zinc[900],
-        // 'gray-950' => Color::Zinc[950],
+        // 'grays' => Color::Zinc,
 
-        // 'primary' => Color::Zinc[800],
+        // 'primary' => Color::Yellow[500],
         // 'success' => Color::Green[400],
         // 'danger' => Color::Red[600],
 
         // 'body-bg' => Color::Zinc[100],
         // 'body-border' => Color::Transparent,
-        // 'body-dark-bg' => Color::Zinc[900],
-        // 'body-dark-border' => Color::Zinc[950],
+        // 'dark-body-bg' => Color::Zinc[900],
+        // 'dark-body-border' => Color::Zinc[950],
 
-        // 'content-bg' => Color::White,
+        // 'content-bg' => "linear-gradient(to right, hsl(0,0%,99%), #ffffff)",
         // 'content-border' => Color::Zinc[200],
-        // 'content-dark-bg' => Color::Zinc[900],
-        // 'content-dark-border' => Color::Zinc[950],
-
-        // 'global-header-bg' => Color::Zinc[800],
+        // 'dark-content-bg' => Color::Zinc[900],
+        // 'dark-content-border' => Color::Zinc[950],
     ],
 
     /*

@@ -318,7 +318,7 @@ class Color
     ];
 
     public const White = '#fff';
-    public const Black = '#fff';
+    public const Black = '#000';
     public const Transparent = 'transparent';
 
     public static function defaults(): array
@@ -341,12 +341,12 @@ class Color
             'danger' => self::Red[600],
             'body-bg' => self::Zinc[100],
             'body-border' => self::Transparent,
-            'body-dark-bg' => self::Zinc[900],
-            'body-dark-border' => self::Zinc[950],
-            'content-bg' => self::White,
+            'dark-body-bg' => self::Zinc[900],
+            'dark-body-border' => self::Zinc[950],
+            'content-bg' => 'linear-gradient(to right, hsl(0,0%,99%), #ffffff)',
             'content-border' => self::Zinc[200],
-            'content-dark-bg' => self::Zinc[900],
-            'content-dark-border' => self::Zinc[950],
+            'dark-content-bg' => self::Zinc[900],
+            'dark-content-border' => self::Zinc[950],
             'global-header-bg' => self::Zinc[800],
         ];
     }
