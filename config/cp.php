@@ -100,12 +100,40 @@ return [
     | Colors
     |--------------------------------------------------------------------------
     |
-    | Adjust the colors used in the Control Panel.
+    | Adjust the colors used in the Control Panel. Use the Color class
+    | to easily access the Tailwind CSS color palette.
     |
     */
 
     'colors' => [
-        // 'primary' => Color::Sky[600],
+        // 'gray-50' => Color::Zinc[50],
+        // 'gray-100' => Color::Zinc[100],
+        // 'gray-200' => Color::Zinc[200],
+        // 'gray-300' => Color::Zinc[300],
+        // 'gray-400' => Color::Zinc[400],
+        // 'gray-500' => Color::Zinc[500],
+        // 'gray-600' => Color::Zinc[600],
+        // 'gray-700' => Color::Zinc[700],
+        // 'gray-800' => Color::Zinc[800],
+        // 'gray-850' => Color::Zinc[850],
+        // 'gray-900' => Color::Zinc[900],
+        // 'gray-950' => Color::Zinc[950],
+
+        // 'primary' => Color::Zinc[800],
+        // 'success' => Color::Green[400],
+        // 'danger' => Color::Red[600],
+
+        // 'body-bg' => Color::Zinc[100],
+        // 'body-border' => Color::Transparent,
+        // 'body-dark-bg' => Color::Zinc[900],
+        // 'body-dark-border' => Color::Zinc[950],
+
+        // 'content-bg' => Color::White,
+        // 'content-border' => Color::Zinc[200],
+        // 'content-dark-bg' => Color::Zinc[900],
+        // 'content-dark-border' => Color::Zinc[950],
+
+        // 'global-header-bg' => Color::Zinc[800],
     ],
 
     /*
