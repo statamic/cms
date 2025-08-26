@@ -1,0 +1,391 @@
+import { expect, test, beforeEach, vi, describe } from 'vitest';
+import { mount } from '@vue/test-utils';
+import { Combobox } from '@/components/ui';
+
+beforeEach(() => {
+    Element.prototype.scrollIntoView = vi.fn();
+
+    global.CSS = {
+        escape: (str) => {
+            // Simple implementation that handles most cases
+            return str.replace(/[!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, '\\$&');
+        }
+    };
+
+    document.body.innerHTML = '';
+});
+
+test('can select option', async () => {
+    const wrapper = mount(Combobox, {
+        props: {
+            options: [
+                { label: 'Jack', value: 'jack' },
+                { label: 'Jason', value: 'jason' },
+                { label: 'Jesse', value: 'jesse' },
+                { label: 'Joshua', value: 'joshua' },
+                { label: 'Juncan', value: 'juncan' },
+                { label: 'Jay', value: 'jay' },
+            ],
+        },
+    });
+
+    const trigger = wrapper.find('[data-testid="trigger"]');
+    await trigger.trigger('click');
+
+    // The option dropdown is rendered in a portal, so we need to find it in the document instead.
+    await document.querySelector('[data-testid="option-jason"]').click();
+
+    expect(wrapper.emitted('update:modelValue')[0]).toEqual(['jason']);
+    await wrapper.setProps({ modelValue: 'jason' });
+
+    expect(trigger.find('button').text()).toBe('Jason');
+});
+
+test('dropdown closes on selection', async () => {
+    const wrapper = mount(Combobox, {
+        props: {
+            multiple: true,
+            closeOnSelect: true,
+            options: [
+                { label: 'Jack', value: 'jack' },
+                { label: 'Jason', value: 'jason' },
+                { label: 'Jesse', value: 'jesse' },
+                { label: 'Joshua', value: 'joshua' },
+                { label: 'Juncan', value: 'juncan' },
+                { label: 'Jay', value: 'jay' },
+            ],
+        },
+    });
+
+    const trigger = wrapper.find('[data-testid="trigger"]');
+    await trigger.trigger('click');
+
+    await document.querySelector('[data-testid="option-jason"]').click();
+    expect(wrapper.emitted('update:modelValue')[0]).toEqual([['jason']]);
+    await wrapper.setProps({ modelValue: ['jason'] });
+
+    expect(wrapper.vm.dropdownOpen).toBeFalsy();
+
+    expect(wrapper.find('[data-testid="selected-options"]').text()).toContain('Jason');
+});
+
+test('can clear selected option', async () => {
+    const wrapper = mount(Combobox, {
+        props: {
+            clearable: true,
+            modelValue: 'juncan',
+            options: [
+                { label: 'Jack', value: 'jack' },
+                { label: 'Jason', value: 'jason' },
+                { label: 'Jesse', value: 'jesse' },
+                { label: 'Joshua', value: 'joshua' },
+                { label: 'Juncan', value: 'juncan' },
+                { label: 'Jay', value: 'jay' },
+            ],
+        },
+    });
+
+    const clearButton = wrapper.find('[data-testid="clear-button"]');
+    await clearButton.trigger('click');
+
+    expect(wrapper.vm.searchQuery).toBe('');
+    expect(wrapper.emitted('update:modelValue')[0]).toEqual([null]);
+});
+
+test('can use different optionLabel and optionValue keys', async () => {
+    const wrapper = mount(Combobox, {
+        props: {
+            optionLabel: 'title',
+            optionValue: 'id',
+            options: [
+                { title: 'Jack', id: 'jack' },
+                { title: 'Jason', id: 'jason' },
+                { title: 'Jesse', id: 'jesse' },
+                { title: 'Joshua', id: 'joshua' },
+                { title: 'Juncan', id: 'juncan' },
+                { title: 'Jay', id: 'jay' },
+            ],
+        },
+    });
+
+    const trigger = wrapper.find('[data-testid="trigger"]');
+    await trigger.trigger('click');
+
+    // The option dropdown is rendered in a portal, so we need to find it in the document instead.
+    await document.querySelector('[data-testid="option-jason"]').click();
+
+    expect(wrapper.emitted('update:modelValue')[0]).toEqual(['jason']);
+    await wrapper.setProps({ modelValue: 'jason' });
+
+    expect(trigger.find('button').text()).toBe('Jason');
+});
+
+describe('multiple options', () => {
+    test('can select multiple options', async () => {
+        const wrapper = mount(Combobox, {
+            props: {
+                multiple: true,
+                options: [
+                    { label: 'Jack', value: 'jack' },
+                    { label: 'Jason', value: 'jason' },
+                    { label: 'Jesse', value: 'jesse' },
+                    { label: 'Joshua', value: 'joshua' },
+                    { label: 'Juncan', value: 'juncan' },
+                    { label: 'Jay', value: 'jay' },
+                ],
+            },
+        });
+
+        const trigger = wrapper.find('[data-testid="trigger"]');
+        await trigger.trigger('click');
+
+        await document.querySelector('[data-testid="option-jason"]').click();
+        expect(wrapper.emitted('update:modelValue')[0]).toEqual([['jason']]);
+        await wrapper.setProps({ modelValue: ['jason'] });
+
+        await document.querySelector('[data-testid="option-jesse"]').click();
+        expect(wrapper.emitted('update:modelValue')[1]).toEqual([['jason', 'jesse']]);
+        await wrapper.setProps({ modelValue: ['jason', 'jesse'] });
+
+        await document.querySelector('[data-testid="option-juncan"]').click();
+        expect(wrapper.emitted('update:modelValue')[2]).toEqual([['jason', 'jesse', 'juncan']]);
+        await wrapper.setProps({ modelValue: ['jason', 'jesse', 'juncan'] });
+
+        expect(wrapper.find('[data-testid="selected-options"]').text()).toContain('Jason');
+        expect(wrapper.find('[data-testid="selected-options"]').text()).toContain('Jesse');
+        expect(wrapper.find('[data-testid="selected-options"]').text()).toContain('Juncan');
+    });
+
+    test('cant select more than the allowed number of options', async () => {
+        const wrapper = mount(Combobox, {
+            props: {
+                multiple: true,
+                maxSelections: 2,
+                options: [
+                    { label: 'Jack', value: 'jack' },
+                    { label: 'Jason', value: 'jason' },
+                    { label: 'Jesse', value: 'jesse' },
+                    { label: 'Joshua', value: 'joshua' },
+                    { label: 'Juncan', value: 'juncan' },
+                    { label: 'Jay', value: 'jay' },
+                ],
+            },
+        });
+
+        const trigger = wrapper.find('[data-testid="trigger"]');
+        await trigger.trigger('click');
+
+        await document.querySelector('[data-testid="option-jason"]').click();
+        expect(wrapper.emitted('update:modelValue')[0]).toEqual([['jason']]);
+        await wrapper.setProps({ modelValue: ['jason'] });
+
+        await document.querySelector('[data-testid="option-jesse"]').click();
+        expect(wrapper.emitted('update:modelValue')[1]).toEqual([['jason', 'jesse']]);
+        await wrapper.setProps({ modelValue: ['jason', 'jesse'] });
+
+        await document.querySelector('[data-testid="option-juncan"]').click();
+        expect(wrapper.emitted('update:modelValue')).toHaveLength(2); // No new event should be emitted
+
+        expect(wrapper.find('[data-testid="selected-options"]').text()).toContain('Jason');
+        expect(wrapper.find('[data-testid="selected-options"]').text()).toContain('Jesse');
+        expect(wrapper.find('[data-testid="selected-options"]').text()).not.toContain('Juncan');
+    });
+
+    test('can deselect options', async () => {
+        const wrapper = mount(Combobox, {
+            props: {
+                multiple: true,
+                modelValue: ['jason', 'jesse', 'juncan'],
+                options: [
+                    { label: 'Jack', value: 'jack' },
+                    { label: 'Jason', value: 'jason' },
+                    { label: 'Jesse', value: 'jesse' },
+                    { label: 'Joshua', value: 'joshua' },
+                    { label: 'Juncan', value: 'juncan' },
+                    { label: 'Jay', value: 'jay' },
+                ],
+            },
+        });
+
+        wrapper.find('[data-testid="selected-options"] :nth-child(2) button').trigger('click');
+
+        expect(wrapper.emitted('update:modelValue')[0]).toEqual([['jason', 'juncan']]);
+        await wrapper.setProps({ modelValue: ['jason', 'juncan'] });
+
+        expect(wrapper.find('[data-testid="selected-options"]').text()).toContain('Jason');
+        expect(wrapper.find('[data-testid="selected-options"]').text()).not.toContain('Jesse');
+        expect(wrapper.find('[data-testid="selected-options"]').text()).toContain('Juncan');
+    });
+});
+
+describe('search', () => {
+    test('can search options', async () => {
+        const wrapper = mount(Combobox, {
+            props: {
+                options: [
+                    { label: 'Jack', value: 'jack' },
+                    { label: 'Jason', value: 'jason' },
+                    { label: 'Jesse', value: 'jesse' },
+                    { label: 'Joshua', value: 'joshua' },
+                    { label: 'Juncan', value: 'juncan' },
+                    { label: 'Jay', value: 'jay' },
+                ],
+            },
+        });
+
+        const trigger = wrapper.find('[data-testid="trigger"]');
+        await trigger.trigger('click');
+
+        await trigger.find('input[type="search"]').setValue('jac');
+
+        expect(wrapper.vm.filteredOptions).toEqual([
+            { label: 'Jack', value: 'jack' },
+        ]);
+    });
+
+    test('cant search options when searchable prop is false', async () => {
+        const wrapper = mount(Combobox, {
+            props: {
+                searchable: false,
+                options: [
+                    { label: 'Jack', value: 'jack' },
+                    { label: 'Jason', value: 'jason' },
+                    { label: 'Jesse', value: 'jesse' },
+                    { label: 'Joshua', value: 'joshua' },
+                    { label: 'Juncan', value: 'juncan' },
+                    { label: 'Jay', value: 'jay' },
+                ],
+            },
+        });
+
+        const trigger = wrapper.find('[data-testid="trigger"]');
+        await trigger.trigger('click');
+
+        expect(trigger.find('input[type="search"]').exists()).toBeFalsy();
+    });
+
+    test("doesn't search when ignoreFilter prop is true", async () => {
+        const wrapper = mount(Combobox, {
+            props: {
+                ignoreFilter: true,
+                options: [
+                    { label: 'Jack', value: 'jack' },
+                    { label: 'Jason', value: 'jason' },
+                    { label: 'Jesse', value: 'jesse' },
+                    { label: 'Joshua', value: 'joshua' },
+                    { label: 'Juncan', value: 'juncan' },
+                    { label: 'Jay', value: 'jay' },
+                ],
+            },
+        });
+
+        const trigger = wrapper.find('[data-testid="trigger"]');
+        await trigger.trigger('click');
+
+        await trigger.find('input[type="search"]').setValue('jac');
+
+        expect(wrapper.emitted('search')[0][0]).toEqual('jac');
+    });
+});
+
+describe('taggable', () => {
+    test('can append options', async () => {
+        const wrapper = mount(Combobox, {
+            props: {
+                multiple: true,
+                taggable: true,
+                modelValue: [],
+            },
+        });
+
+        const trigger = wrapper.find('[data-testid="trigger"]');
+        await trigger.trigger('click');
+
+        const searchInput = trigger.find('input[type="search"]');
+        await searchInput.setValue('Jack');
+        await searchInput.trigger('keydown.enter');
+
+        expect(wrapper.emitted('update:modelValue')[0]).toEqual([['Jack']]);
+    });
+
+    test('can paste into search input', async () => {
+        const wrapper = mount(Combobox, {
+            props: {
+                multiple: true,
+                taggable: true,
+                modelValue: [],
+            },
+        });
+
+        const trigger = wrapper.find('[data-testid="trigger"]');
+        await trigger.trigger('click');
+
+        const searchInput = trigger.find('input[type="search"]');
+
+        await searchInput.trigger('paste', {
+            clipboardData: {
+                getData: () => 'Jack,Jason,Jesse',
+                types: ['text/plain']
+            }
+        });
+
+        expect(wrapper.emitted('update:modelValue')[0]).toEqual([['Jack', 'Jason', 'Jesse']]);
+    });
+});
+
+describe('accessibility', () => {
+    test('dropdown opens on space', async () => {
+        const wrapper = mount(Combobox, {
+            props: {
+                options: [
+                    { label: 'Jack', value: 'jack' },
+                    { label: 'Jason', value: 'jason' },
+                    { label: 'Jesse', value: 'jesse' },
+                    { label: 'Joshua', value: 'joshua' },
+                    { label: 'Juncan', value: 'juncan' },
+                    { label: 'Jay', value: 'jay' },
+                ],
+            },
+        });
+
+        expect(wrapper.vm.dropdownOpen).toBeFalsy();
+
+        const trigger = wrapper.find('[data-testid="trigger"]');
+        await trigger.trigger('keydown.space');
+
+        expect(wrapper.vm.dropdownOpen).toBeTruthy();
+    });
+
+    test('dropdown closes on escape', async () => {
+        const wrapper = mount(Combobox, {
+            props: {
+                closeOnSelect: false,
+                options: [
+                    { label: 'Jack', value: 'jack' },
+                    { label: 'Jason', value: 'jason' },
+                    { label: 'Jesse', value: 'jesse' },
+                    { label: 'Joshua', value: 'joshua' },
+                    { label: 'Juncan', value: 'juncan' },
+                    { label: 'Jay', value: 'jay' },
+                ],
+            },
+        });
+
+        const trigger = wrapper.find('[data-testid="trigger"]');
+        await trigger.trigger('click');
+
+        expect(wrapper.vm.dropdownOpen).toBeTruthy();
+
+        const options = document.querySelector('[data-testid="options"]');
+
+        options.dispatchEvent(new KeyboardEvent('keydown', {
+            key: 'Escape',
+            keyCode: 27,
+            which: 27,
+            bubbles: true,
+            cancelable: true
+        }));
+
+        expect(wrapper.vm.dropdownOpen).toBeFalsy();
+    });
+});

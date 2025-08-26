@@ -31,7 +31,7 @@ const props = defineProps({
     modelValue: { type: [Object, String, Number], default: null },
     multiple: { type: Boolean, default: false },
     optionLabel: { type: String, default: 'label' },
-    options: { type: Array, default: null },
+    options: { type: Array, default: [] },
     optionValue: { type: String, default: 'value' },
     placeholder: { type: String, default: 'Select...' },
     readOnly: { type: Boolean, default: false },
@@ -273,7 +273,7 @@ defineExpose({
                 @update:model-value="updateModelValue"
             >
                 <ComboboxAnchor :class="['w-full flex items-center justify-between gap-2 text-gray-900 dark:text-gray-300 antialiased appearance-none', $attrs.class]" data-ui-combobox-anchor>
-                    <ComboboxTrigger as="div" ref="trigger" :class="triggerClasses" @keydown.space.prevent="openOnSpace">
+                    <ComboboxTrigger as="div" ref="trigger" :class="triggerClasses" data-testid="trigger" @keydown.space.prevent="openOnSpace">
                         <ComboboxInput
                             v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"
                             ref="search"
@@ -301,7 +301,7 @@ defineExpose({
                         </button>
 
                         <div class="flex gap-1.5 items-center ms-1">
-                            <Button v-if="clearable && modelValue" icon="x" variant="ghost" size="xs" round @click="clear" />
+                            <Button v-if="clearable && modelValue" icon="x" variant="ghost" size="xs" round data-testid="clear-button" @click="clear" />
                             <Icon v-if="options.length || ignoreFilter" name="ui/chevron-down" />
                         </div>
                     </ComboboxTrigger>
@@ -317,7 +317,7 @@ defineExpose({
                         ]"
                         @escape-key-down="nextTick(() => $refs.trigger.$el.focus())"
                     >
-                        <ComboboxViewport>
+                        <ComboboxViewport data-testid="options">
                             <ComboboxEmpty class="py-2 text-sm">
                                 <slot name="no-options" v-bind="{ searchQuery }">
                                     {{ __('No options available.') }}
@@ -332,6 +332,7 @@ defineExpose({
                                 :text-value="getOptionLabel(option)"
                                 :class="itemClasses({ size: size, selected: isSelected(option) })"
                                 as="button"
+                                :data-testid="`option-${getOptionValue(option)}`"
                                 @select="() => {
                                     dropdownOpen = !closeOnSelect;
                                     if (closeOnSelect) $refs.trigger.$el.focus();
@@ -364,7 +365,7 @@ defineExpose({
                 :model-value="modelValue"
                 @update:modelValue="updateModelValue"
             >
-                <div class="flex flex-wrap gap-2">
+                <div class="flex flex-wrap gap-2" data-testid="selected-options">
                     <div
                         v-for="option in selectedOptions"
                         :key="getOptionValue(option)"
