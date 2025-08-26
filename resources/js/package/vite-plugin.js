@@ -6,7 +6,6 @@ const statamic = function (options) {
         name: 'statamic',
 
         config(config, { command }) {
-            // Check for force-server environment variable as alternative
             if (command === 'serve' && !process.env.STATAMIC_FORCE_SERVER) {
                 console.log('\x1b[33m[Statamic] Vite dev server current not supported. Automatically running "vite build --watch" instead...\x1b[0m');
                 console.log('\x1b[90m[Statamic] Use STATAMIC_FORCE_SERVER=1 to bypass this behavior.\x1b[0m');
