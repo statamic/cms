@@ -337,7 +337,15 @@ defineExpose({
                         ]"
                         @escape-key-down="nextTick(() => $refs.trigger.$el.focus())"
                     >
-                        <FocusScope asChild trapped>
+                        <FocusScope
+                            trapped
+                            @mount-auto-focus.prevent
+                            @unmount-auto-focus="(event) => {
+                                if (event.defaultPrevented) return;
+                                $refs.trigger.$el.focus();
+                                event.preventDefault();
+                            }"
+                        >
                             <ComboboxViewport>
                                 <ComboboxEmpty class="py-2 text-sm">
                                     <slot name="no-options" v-bind="{ searchQuery }">
