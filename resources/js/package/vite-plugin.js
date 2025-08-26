@@ -5,23 +5,11 @@ const statamic = function (options) {
     return {
         name: 'statamic',
 
-        config(config) {
-            // Ensure rollupOptions exists
-            config.build = config.build || {};
-            config.build.rollupOptions = config.build.rollupOptions || {};
-            config.build.rollupOptions.external = config.build.rollupOptions.external || [];
-            config.build.rollupOptions.output = config.build.rollupOptions.output || {};
-
-            // Add Vue as external
-            const existingExternal = config.build.rollupOptions.external;
-            config.build.rollupOptions.external = [...existingExternal, 'vue'];
-
-            return config;
-        },
-
-        configResolved(resolvedConfig) {
-            if (resolvedConfig.command === 'serve') {
+        config(config, { command }) {
+            // Check for force-server environment variable as alternative
+            if (command === 'serve' && !process.env.STATAMIC_FORCE_SERVER) {
                 console.log('\x1b[33m[Statamic] Vite dev server current not supported. Automatically running "vite build --watch" instead...\x1b[0m');
+                console.log('\x1b[90m[Statamic] Use STATAMIC_FORCE_SERVER=1 to bypass this behavior.\x1b[0m');
 
                 const child = spawn('npx', ['vite', 'build', '--watch'], {
                     stdio: 'inherit',
@@ -36,6 +24,20 @@ const statamic = function (options) {
                 process.exit(0);
             }
 
+            // Ensure rollupOptions exists
+            config.build = config.build || {};
+            config.build.rollupOptions = config.build.rollupOptions || {};
+            config.build.rollupOptions.external = config.build.rollupOptions.external || [];
+            config.build.rollupOptions.output = config.build.rollupOptions.output || {};
+
+            // Add Vue as external
+            const existingExternal = config.build.rollupOptions.external;
+            config.build.rollupOptions.external = [...existingExternal, 'vue'];
+
+            return config;
+        },
+
+        configResolved(resolvedConfig) {
             resolvedConfig.build.rollupOptions.plugins = resolvedConfig.build.rollupOptions.plugins || [];
             resolvedConfig.build.rollupOptions.plugins.push({
                 name: 'statamic-global-externals',
