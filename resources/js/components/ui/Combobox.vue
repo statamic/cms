@@ -11,7 +11,7 @@ import {
     ComboboxPortal,
     ComboboxViewport,
 } from 'reka-ui';
-import { computed, nextTick, onMounted, ref, useAttrs, useSlots, useTemplateRef, watch } from 'vue';
+import { computed, nextTick, ref, useAttrs, useTemplateRef, watch } from 'vue';
 import { Button, Icon, Badge } from '@/components/ui';
 import fuzzysort from 'fuzzysort';
 import { SortableList } from '@/components/sortable/Sortable.js';
