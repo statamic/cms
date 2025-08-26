@@ -57,8 +57,7 @@ test('dropdown closes on selection', async () => {
         },
     });
 
-    const trigger = wrapper.find('[data-testid="trigger"]');
-    await trigger.trigger('click');
+    await wrapper.find('[data-testid="trigger"]').trigger('click');
 
     await document.querySelector('[data-testid="option-jason"]').click();
     expect(wrapper.emitted('update:modelValue')[0]).toEqual([['jason']]);
@@ -85,8 +84,7 @@ test('can clear selected option', async () => {
         },
     });
 
-    const clearButton = wrapper.find('[data-testid="clear-button"]');
-    await clearButton.trigger('click');
+    await wrapper.find('[data-testid="clear-button"]').trigger('click');
 
     expect(wrapper.vm.searchQuery).toBe('');
     expect(wrapper.emitted('update:modelValue')[0]).toEqual([null]);
@@ -136,8 +134,7 @@ describe('multiple options', () => {
             },
         });
 
-        const trigger = wrapper.find('[data-testid="trigger"]');
-        await trigger.trigger('click');
+        await wrapper.find('[data-testid="trigger"]').trigger('click');
 
         await document.querySelector('[data-testid="option-jason"]').click();
         expect(wrapper.emitted('update:modelValue')[0]).toEqual([['jason']]);
@@ -172,8 +169,7 @@ describe('multiple options', () => {
             },
         });
 
-        const trigger = wrapper.find('[data-testid="trigger"]');
-        await trigger.trigger('click');
+        await wrapper.find('[data-testid="trigger"]').trigger('click');
 
         await document.querySelector('[data-testid="option-jason"]').click();
         expect(wrapper.emitted('update:modelValue')[0]).toEqual([['jason']]);
@@ -350,8 +346,7 @@ describe('accessibility', () => {
 
         expect(wrapper.vm.dropdownOpen).toBeFalsy();
 
-        const trigger = wrapper.find('[data-testid="trigger"]');
-        await trigger.trigger('keydown.space');
+        await wrapper.find('[data-testid="trigger"]').trigger('keydown.space');
 
         expect(wrapper.vm.dropdownOpen).toBeTruthy();
     });
