@@ -178,10 +178,6 @@ class DuplicateEntry extends Action
         return $this->newItems->first()->editUrl();
     }
 
-    /**
-     * @param Entry $original
-     * @return void
-     */
     private function suspendPropagation(Entry $original): void
     {
         $original->collection()->propagate(false);
