@@ -17,6 +17,7 @@ const {
     values: containerValues,
     extraValues: containerExtraValues,
     visibleValues: containerVisibleValues,
+    revealerValues,
     meta: containerMeta,
     syncField,
     desyncField,
@@ -30,7 +31,6 @@ const {
     setFieldValue,
     setFieldMeta,
     hiddenFields,
-    revealerFields,
     setHiddenField,
 } = injectContainerContext();
 const { fieldPathPrefix, metaPathPrefix } = injectFieldsContext();
@@ -112,8 +112,8 @@ const shouldShowField = computed(() => {
         visibleValues.value,
         extraValues.value,
         containerVisibleValues.value,
+        revealerValues.value,
         hiddenFields.value,
-        revealerFields.value,
         setHiddenField
     ).showField(props.config, fullPath.value);
 });

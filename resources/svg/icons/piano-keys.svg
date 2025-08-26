@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14" id="Piano-Keys--Streamline-Flex">
+  <desc>
+    Piano Keys Streamline Icon: https://streamlinehq.com
+  </desc>
+  <g id="piano-keys">
+    <path id="Vector 3763" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M4.83496 7.48047v5.28843" stroke-width="1"></path>
+    <path id="Vector 3764" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M9.16504 7.48047v5.28843" stroke-width="1"></path>
+    <path id="Intersect" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M0.959867 10.2685C1.114 11.7092 2.2727 12.8679 3.71266 13.0284 4.78221 13.1476 5.88037 13.25 7 13.25s2.21779 -0.1024 3.2873 -0.2216c1.44 -0.1605 2.5987 -1.3192 2.7528 -2.7599 0.1138 -1.06348 0.2099 -2.15535 0.2099 -3.2685 0 -1.11316 -0.0961 -2.20502 -0.2099 -3.26853 -0.1541 -1.44065 -1.3128 -2.59936 -2.7528 -2.759861C9.21779 0.852392 8.11963 0.75 7 0.75S4.78221 0.852392 3.71266 0.971609C2.2727 1.13211 1.114 2.29082 0.959867 3.73147 0.846083 4.79498 0.75 5.88684 0.75 7c0 1.11315 0.096084 2.20502 0.209867 3.2685Z" stroke-width="1"></path>
+    <path id="Intersect_2" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M5.90204 0.780273c-0.72335 0.038056 -1.43648 0.107937 -2.1374 0.185626 -0.02185 1.705991 -0.01435 4.702181 0.0225 5.522171 0.02861 0.63655 0.40255 0.99285 1.04748 0.99285 0.64494 0 1.01888 -0.3563 1.04749 -0.99285 0.03822 -0.85063 0.04487 -4.04309 0.01993 -5.707797Z" stroke-width="1"></path>
+    <path id="Intersect_3" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M10.2352 0.965897C9.53426 0.888209 8.82112 0.818327 8.09778 0.780273c-0.02494 1.664707 -0.0183 4.857167 0.01993 5.707797 0.0286 0.63656 0.40255 0.99285 1.04748 0.99285s1.01891 -0.35629 1.04751 -0.99285c0.0368 -0.81999 0.0443 -3.81618 0.0225 -5.522173Z" stroke-width="1"></path>
+  </g>
+</svg>
