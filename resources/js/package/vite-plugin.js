@@ -1,4 +1,5 @@
 import vue from '@vitejs/plugin-vue';
+import { spawn } from 'child_process';
 
 const statamic = function (options) {
     return {
@@ -19,6 +20,22 @@ const statamic = function (options) {
         },
 
         configResolved(resolvedConfig) {
+            if (resolvedConfig.command === 'serve') {
+                console.log('\x1b[33m[Statamic] Vite dev server current not supported. Automatically running "vite build --watch" instead...\x1b[0m');
+
+                const child = spawn('npx', ['vite', 'build', '--watch'], {
+                    stdio: 'inherit',
+                    cwd: process.cwd()
+                });
+
+                child.on('error', (err) => {
+                    console.error('Failed to start vite build --watch:', err);
+                    process.exit(1);
+                });
+
+                process.exit(0);
+            }
+
             resolvedConfig.build.rollupOptions.plugins = resolvedConfig.build.rollupOptions.plugins || [];
             resolvedConfig.build.rollupOptions.plugins.push({
                 name: 'statamic-global-externals',
