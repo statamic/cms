@@ -21,7 +21,6 @@ use Statamic\Tags\FluentTag;
 
 class Statamic
 {
-    // making a change to trigger test
     const CORE_SLUG = 'statamic';
     const PACKAGE = 'statamic/cms';
 
