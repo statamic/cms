@@ -51,4 +51,10 @@
     @endforeach
 @endforeach
 
+<style>
+:root {
+    {{ \Statamic\CP\Color::cssVariables() }}
+}
+</style>
+
 @stack('head')
