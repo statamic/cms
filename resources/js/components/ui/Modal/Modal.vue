@@ -41,7 +41,7 @@ watch(
 // so it can update its state, which eventually gets passed down as a prop.
 // Otherwise, update the local state.
 function updateOpen(value) {
-    if (isUsingOpenProp) {
+    if (isUsingOpenProp.value) {
         emit('update:open', value);
         return;
     }

@@ -2,7 +2,7 @@
     use function Statamic\trans as __;
 @endphp
 
-<header class="h-14 bg-gray-800 flex justify-between space-x-2 items-center text-white px-4 dark fixed overflow-x-auto top-0 inset-x-0 z-[3]">
+<header class="h-14 bg-global-header-bg flex justify-between space-x-2 items-center text-white px-4 dark fixed overflow-x-auto top-0 inset-x-0 z-[3]">
     <a class="c-skip-link z-(--z-index-header) px-4 py-2 bg-blue-800 text-sm top-2.5 left-2.25 fixed opacity-0 -translate-y-24 focus:translate-y-0 focus:opacity-100 rounded-md" href="#main">
         {{ __('Skip to sidebar') }}
     </a>
@@ -42,9 +42,9 @@
                 @if($breadcrumb->hasLinks() || $breadcrumb->createUrl())
                     <ui-dropdown v-cloak class="relative" aria-label="{{ __('More options for') }} {{ __($breadcrumb->text()) }}">
                         <template #trigger>
-                            <ui-button 
-                                variant="ghost" 
-                                icon="ui/chevron-vertical" 
+                            <ui-button
+                                variant="ghost"
+                                icon="ui/chevron-vertical"
                                 class="[&_svg]:size-3! h-8! w-4! hover:bg-gray-300/5! -ml-3 mr-1"
                                 :aria-label="'{{ __('Options for') }} {{ __($breadcrumb->text()) }}'"
                                 aria-haspopup="true"
@@ -55,7 +55,7 @@
                             class="grid grid-cols-[auto_1fr_auto] items-center"
                             icon="{{ $breadcrumb->icon() }}"
                             @if($breadcrumb->hasConfigureUrl())
-                                append-icon="cog-solid"
+                                append-icon="ui/cog-solid"
                                 append-href="{{ $breadcrumb->configureUrl() }}"
                             @endif
                             role="menuitem"
@@ -78,9 +78,9 @@
                             </ui-dropdown-menu>
                         @endif
                         @if($breadcrumb->createUrl())
-                            <ui-dropdown-footer 
-                                icon="plus" 
-                                text="{{ __($breadcrumb->createLabel()) }}" 
+                            <ui-dropdown-footer
+                                icon="plus"
+                                text="{{ __($breadcrumb->createLabel()) }}"
                                 href="{{ $breadcrumb->createUrl() }}"
                                 role="menuitem"
                                 :aria-label="'{{ __($breadcrumb->createLabel()) }} - {{ __('Create new') }}'"

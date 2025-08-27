@@ -51,17 +51,20 @@ function toggleSection(id) {
                 <Subheading v-if="section.instructions" :text="renderInstructions(section.instructions)" />
             </PanelHeader>
             <Motion
+                class="overflow-hidden"
                 :initial="{ height: section.collapsed ? '0px' : 'auto' }"
                 :animate="{ height: section.collapsed ? '0px' : 'auto' }"
                 :transition="{ duration: 0.25, type: 'tween' }"
             >
-                <Primitive :as="asConfig ? 'div' : Card">
-                    <FieldsProvider :fields="section.fields">
-                        <slot :section="section">
-                            <Fields />
-                        </slot>
-                    </FieldsProvider>
-                </Primitive>
+                <div class="p-px">
+                    <Primitive :as="asConfig ? 'div' : Card">
+                        <FieldsProvider :fields="section.fields">
+                            <slot :section="section">
+                                <Fields />
+                            </slot>
+                        </FieldsProvider>
+                    </Primitive>
+                </div>
             </Motion>
         </Panel>
     </div>

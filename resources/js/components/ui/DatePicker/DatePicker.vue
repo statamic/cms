@@ -35,6 +35,7 @@ const props = defineProps({
     numberOfMonths: { type: Number, default: 1 },
     clearable: { type: Boolean, default: true },
     disabled: { type: Boolean, default: false },
+    readOnly: { type: Boolean, default: false },
 });
 
 const calendarBindings = computed(() => ({
@@ -96,7 +97,7 @@ const getInputLabel = (part) => {
             :modelValue="modelValue"
             :granularity="granularity"
             :locale="$date.locale"
-            :disabled="disabled"
+            :disabled="disabled || readOnly"
             @update:model-value="emit('update:modelValue', $event)"
             v-bind="$attrs"
             prevent-deselect
@@ -113,6 +114,7 @@ const getInputLabel = (part) => {
                         'text-gray-600 dark:text-gray-300',
                         'shadow-ui-sm not-prose h-10 rounded-lg px-2 disabled:shadow-none',
                         'data-invalid:border-red-500',
+                        'disabled:shadow-none disabled:opacity-50 read-only:border-dashed'
                     ]"
                     :aria-invalid="isInvalid"
                     role="textbox"
@@ -148,7 +150,7 @@ const getInputLabel = (part) => {
                         </template>
                     </div>
                     <button
-                        v-if="clearable"
+                        v-if="clearable && !readOnly"
                         @click="emit('update:modelValue', null)"
                         :disabled="disabled"
                         type="button"

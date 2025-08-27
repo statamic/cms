@@ -417,6 +417,7 @@ export default {
                 id: uniqid(),
                 title: values.title,
                 url: values.url,
+                status: null,
             };
 
             this.publishInfo[page.id] = {
