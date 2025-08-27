@@ -82,6 +82,7 @@
                     :text="[ __('Export Submissions'), '{{ $exporter->title() }}' ]"
                     icon="save"
                     url="{{ $exporter->downloadUrl() }}"
+                    prioritize
                 >
                 </ui-command-palette-item>
             @endforeach
