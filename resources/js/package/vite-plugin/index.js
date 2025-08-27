@@ -1,12 +1,8 @@
 import vue from '@vitejs/plugin-vue';
 import { spawn } from 'child_process';
-import { readFileSync, existsSync } from 'fs';
-import { dirname, join } from 'path';
-import { fileURLToPath } from 'url';
+import tailwindExclusions from './tailwind-exclusions.js';
 
 const statamic = function (options) {
-    const { excludeStatamicClasses = true } = options;
-
     return {
         name: 'statamic',
 
@@ -58,37 +54,13 @@ const statamic = function (options) {
             });
         },
 
-        load(id) {
-            // Inject Tailwind exclusions into CSS files that request them
-            if (excludeStatamicClasses && id.endsWith('.css')) {
-                // Read the original CSS file
-                if (existsSync(id)) {
-                    const originalCSS = readFileSync(id, 'utf8');
-                    // Look for the explicit opt-in directive
-                    if (originalCSS.includes('@source not statamic;')) {
-                        console.log('\x1b[36m[Statamic] Injecting Tailwind exclusions into CSS\x1b[0m');
-                        
-                        // Read the exclusions file
-                        const __dirname = dirname(fileURLToPath(import.meta.url));
-                        const exclusionsPath = join(__dirname, 'tailwind-exclusions.css');
-                        const exclusions = readFileSync(exclusionsPath, 'utf8');
-                        
-                        // Replace the directive with the actual exclusions
-                        return originalCSS.replace(
-                            '@source not statamic;',
-                            exclusions
-                        );
-                    }
-                }
-            }
-            return null;
-        }
     };
 };
 
 export default function (options = {}) {
     return [
         statamic(options),
+        tailwindExclusions(),
         vue(options.vue || {}),
     ];
 }
