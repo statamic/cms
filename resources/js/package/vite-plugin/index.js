@@ -52,7 +52,7 @@ const statamic = function (options) {
                     return code;
                 }
             });
-        },
+        }
 
     };
 };
