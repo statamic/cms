@@ -13,30 +13,30 @@ function generateTailwindExclusions(isProdBuild) {
         writeBundle(options, bundle) {
             // Only generate on production builds
             if (!isProdBuild) return;
-            
+
             try {
                 // Find the main CSS asset
-                const cssFile = Object.keys(bundle).find(file => 
+                const cssFile = Object.keys(bundle).find(file =>
                     file.startsWith('assets/app-') && file.endsWith('.css')
                 );
-                
+
                 if (!cssFile) {
                     console.warn('⚠️  Could not find main CSS file to generate Tailwind exclusions');
                     return;
                 }
-                
+
                 const cssAsset = bundle[cssFile];
                 const cssContent = cssAsset.source || cssAsset.code;
                 const tailwindClasses = extractTailwindUtilities(cssContent);
-                
+
                 // Generate exclusion CSS
                 const exclusionCSS = `@source not inline("${tailwindClasses.join(' ')}");`;
-                
+
                 // Write to package directory for distribution
-                writeFileSync('resources/js/package/tailwind-exclusions.css', exclusionCSS);
-                
+                writeFileSync('resources/js/package/vite-plugin/tailwind-exclusions.css', exclusionCSS);
+
                 console.log(`✅ Generated ${tailwindClasses.length} Tailwind exclusions for addon developers`);
-                
+
             } catch (error) {
                 console.warn('⚠️  Failed to generate Tailwind exclusions:', error.message);
             }
@@ -46,7 +46,7 @@ function generateTailwindExclusions(isProdBuild) {
 
 function extractTailwindUtilities(cssContent) {
     const utilities = new Set();
-    
+
     // More comprehensive patterns to extract Tailwind utilities from CSS
     const patterns = [
         // Look for all class definitions starting with common Tailwind prefixes
@@ -84,7 +84,7 @@ function extractTailwindUtilities(cssContent) {
         /\.scale(?:-x|-y)?-(?:\d+|\d+\.\d+)\b/g,
         /\.overflow-(?:auto|hidden|clip|visible|scroll|x-auto|y-auto|x-hidden|y-hidden|x-clip|y-clip|x-visible|y-visible|x-scroll|y-scroll)\b/g,
     ];
-    
+
     patterns.forEach(pattern => {
         const matches = cssContent.match(pattern) || [];
         matches.forEach(match => {
@@ -93,14 +93,14 @@ function extractTailwindUtilities(cssContent) {
             utilities.add(className);
         });
     });
-    
+
     // Filter out custom Statamic classes and components
     const excludePatterns = [
         'btn', 'card', 'stack', 'content-', 'cp-', 'ui-', 'bg-architectural-lines',
         'bg-checkerboard', 'mask-bg', 'prose', 'not-prose', 'container', 'sr-only',
         'pointer-events-', 'collapse', 'invisible', 'visible-'
     ];
-    
+
     return Array.from(utilities)
         .filter(className => !excludePatterns.some(pattern => className.startsWith(pattern)))
         .sort();
