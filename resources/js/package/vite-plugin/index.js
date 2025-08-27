@@ -1,5 +1,4 @@
 import vue from '@vitejs/plugin-vue';
-import { spawn } from 'child_process';
 import tailwindExclusions from './tailwind-exclusions.js';
 import preventServer from './prevent-server.js';
 

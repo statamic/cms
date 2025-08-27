@@ -1,6 +1,5 @@
 import { spawn } from 'child_process';
 
-
 export default function() {
     return {
         name: 'statamic-prevent-server',
