@@ -28,6 +28,30 @@
                 </ui-dropdown-menu>
             </ui-dropdown>
 
+            <ui-command-palette-item
+                category="{{ Statamic\CommandPalette\Category::Actions }}"
+                :text="__('Configure Form')"
+                icon="cog"
+                url="{{ $form->editUrl() }}"
+            >
+            </ui-command-palette-item>
+
+            <ui-command-palette-item
+                category="{{ Statamic\CommandPalette\Category::Actions }}"
+                :text="__('Edit Blueprint')"
+                icon="blueprint-edit"
+                url="{{ cp_route('blueprints.forms.edit', $form->handle()) }}"
+            >
+            </ui-command-palette-item>
+
+            <ui-command-palette-item
+                category="{{ Statamic\CommandPalette\Category::Actions }}"
+                :text="__('Delete Form')"
+                icon="trash"
+                :action="() => $refs.deleter.confirm()"
+            >
+            </ui-command-palette-item>
+
             @can('delete', $form)
                 <resource-deleter
                     ref="deleter"
