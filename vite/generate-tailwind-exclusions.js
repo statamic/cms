@@ -77,14 +77,5 @@ function extractTailwindUtilities(cssContent) {
         });
     });
 
-    // Filter out custom Statamic classes and components
-    const excludePatterns = [
-        'btn', 'card', 'stack', 'content-', 'cp-', 'ui-', 'bg-architectural-lines',
-        'bg-checkerboard', 'mask-bg', 'prose', 'not-prose', 'container', 'sr-only',
-        'pointer-events-', 'collapse', 'invisible', 'visible-'
-    ];
-
-    return Array.from(utilities)
-        .filter(className => !excludePatterns.some(pattern => className.startsWith(pattern)))
-        .sort();
+    return Array.from(utilities).sort();
 }
