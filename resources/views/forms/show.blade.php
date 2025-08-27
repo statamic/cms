@@ -52,6 +52,15 @@
                     @endforeach
                 </ui-dropdown-menu>
             </ui-dropdown>
+            @foreach ($exporters as $exporter)
+                <ui-command-palette-item
+                    category="{{ Statamic\CommandPalette\Category::Actions }}"
+                    :text="[ __('Export Submissions'), '{{ $exporter->title() }}' ]"
+                    icon="save"
+                    url="{{ $exporter->downloadUrl() }}"
+                >
+                </ui-command-palette-item>
+            @endforeach
         @endif
     </ui-header>
 
