@@ -26,6 +26,7 @@
                 :editing-field="editingField"
                 :exclude-fieldset="fieldset.handle"
                 :suggestable-condition-fields="suggestableConditionFields(this)"
+                with-command-palette
                 @field-created="fieldCreated"
                 @field-updated="fieldUpdated"
                 @field-linked="fieldLinked"
