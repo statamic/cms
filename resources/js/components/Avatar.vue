@@ -1,10 +1,10 @@
 <template>
-    <div class="overflow-hidden rounded-full" v-tooltip="user.name">
-        <img v-if="useAvatar" :src="avatarSrc" class="block" @error="hasAvatarError = true" />
-        <div v-if="useInitials" class="flex h-full w-full items-center justify-center bg-pink text-center text-white">
-            <span>{{ initials }}</span>
-        </div>
-    </div>
+    <template v-if="hasAvatar">
+        <img :src="avatarSrc" class="size-7 rounded-full [button:has(&)]:rounded-full" :alt="user.name" @error="hasAvatarError = true" />
+    </template>
+    <template v-else>
+        <div :aria-label="user.name" class="size-7 text-white text-2xs font-medium flex items-center justify-center rounded-full [button:has(&)]:rounded-full bg-gradient-to-tr from-purple-500 to-red-600">{{ initials }}</div>
+    </template>
 </template>
 
 <script>
