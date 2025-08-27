@@ -112,6 +112,9 @@ return [
         // 'success' => Color::Green[400],
         // 'danger' => Color::Red[600],
 
+        // 'ui-accent' => Color::Zinc[800],
+        // 'dark-ui-accent' => Color::Zinc[200],
+
         // 'body-bg' => Color::Zinc[100],
         // 'body-border' => Color::Transparent,
         // 'dark-body-bg' => Color::Zinc[900],

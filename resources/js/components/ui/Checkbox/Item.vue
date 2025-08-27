@@ -1,6 +1,7 @@
 <script setup>
 import { CheckboxIndicator, CheckboxRoot, useId } from 'reka-ui';
 import { computed } from 'vue';
+import { cva } from 'cva';
 
 const props = defineProps({
     align: { type: String, default: 'start', validator: (value) => ['start', 'center'].includes(value) },
@@ -21,34 +22,53 @@ const emit = defineEmits(['update:modelValue']);
 const id = useId();
 
 const checkboxClasses = computed(() => {
-    const sizes = {
-        sm: 'size-3.75',
-        base: 'size-4',
-    };
-
-    return `shadow-ui-xs mt-0.5 ${sizes[props.size]} cursor-default rounded-sm border border-gray-300 bg-white dark:bg-gray-600 dark:border-gray-900 data-[state=checked]:border-gray-900 data-[state=checked]:bg-gray-900 dark:border-none dark:data-[state=checked]:bg-gray-400 dark:data-[state=checked]:border-gray-700 dark:data-[disabled]:bg-gray-800 dark:data-[disabled]:border-gray-700 dark:data-[disabled]:text-gray-400 dark:data-[disabled]:cursor-not-allowed shrink-0`;
+    return cva({
+        base: [
+            'shadow-ui-xs mt-0.5 cursor-default rounded-sm border border-gray-300 bg-white',
+            'dark:bg-gray-400 dark:border-gray-900',
+            'data-[state=checked]:border-ui-accent data-[state=checked]:bg-ui-accent',
+            'dark:border-none dark:data-[state=checked]:bg-dark-ui-accent dark:data-[state=checked]:border-dark-ui-accent',
+            'dark:data-[disabled]:bg-dark-ui-accent/60 dark:data-[disabled]:border-dark-ui-accent/70',
+            'dark:data-[disabled]:text-gray-400 dark:data-[disabled]:cursor-not-allowed',
+            'shrink-0'
+        ],
+        variants: {
+            size: {
+                sm: 'size-3.75',
+                base: 'size-4',
+            },
+        },
+    })({ ...props });
 });
 
 const containerClasses = computed(() => {
-    return `flex items-${props.align} gap-2`;
+    return cva({
+        base: 'flex gap-2',
+        variants: {
+            align: {
+                start: 'items-start',
+                center: 'items-center',
+            },
+        },
+    })({ ...props });
 });
 
 const conditionalProps = computed(() => {
     const props_obj = {};
-    
+
     if (props.modelValue !== null) {
         props_obj.modelValue = props.modelValue;
     }
-    
+
     // Only add aria-describedby if description exists AND it's not a solo checkbox
     if (props.description && !props.solo) {
         props_obj['aria-describedby'] = `${id}-description`;
     }
-    
+
     if (props.solo && (props.label || props.value)) {
         props_obj['aria-label'] = props.label || props.value;
     }
-    
+
     return props_obj;
 });
 </script>
@@ -65,20 +85,9 @@ const conditionalProps = computed(() => {
             :class="checkboxClasses"
             :tabindex="tabindex"
         >
-            <CheckboxIndicator
-                class="relative flex h-full w-full items-center justify-center text-white dark:text-gray-900"
-            >
-                <svg viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg" class="size-2.5" aria-hidden="true">
-                    <path
-                        d="M9 1L3.5 6.5L1 4"
-                        stroke="currentColor"
-                        stroke-width="1.5"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                    />
-                </svg>
+            <CheckboxIndicator class="relative flex h-full w-full items-center justify-center text-white">
+                <svg viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg" class="size-2.5" aria-hidden="true"><path d="M9 1L3.5 6.5L1 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
             </CheckboxIndicator>
-            <!-- Screen reader text for checkbox state -->
             <span class="sr-only">
                 {{ modelValue ? 'Checked' : 'Unchecked' }}
             </span>
@@ -87,7 +96,7 @@ const conditionalProps = computed(() => {
             <label class="text-sm font-normal antialiased" :for="id">
                 <slot>{{ label || value }}</slot>
             </label>
-            <p v-if="description" :id="`${id}-description`" class="mt-0.5 block text-xs leading-snug text-gray-500 dark:text-gray-400">{{ description }}</p>
+            <p v-if="description" :id="`${id}-description`" class="mt-0.5 block text-xs leading-snug text-gray-500 dark:text-gray-200">{{ description }}</p>
         </div>
     </div>
 </template>

@@ -347,6 +347,8 @@ class Color
             'content-border' => self::Zinc[200],
             'dark-content-bg' => self::Zinc[900],
             'dark-content-border' => self::Zinc[950],
+            'ui-accent' => self::Zinc[800],
+            'dark-ui-accent' => self::Zinc[950],
         ];
     }
 
