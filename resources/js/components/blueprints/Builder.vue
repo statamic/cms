@@ -3,7 +3,16 @@
         <ui-header :title="__('Edit Blueprint')" icon="blueprints">
             <template #actions>
                 <slot name="actions"></slot>
-                <ui-button type="submit" variant="primary" @click.prevent="save" v-text="__('Save')" />
+                <ui-command-palette-item
+                    :category="$commandPalette.category.Actions"
+                    :text="__('Save')"
+                    icon="save"
+                    :action="save"
+                    prioritize
+                    v-slot="{ text, action }"
+                >
+                    <ui-button type="submit" variant="primary" @click.prevent="action" v-text="text" />
+                </ui-command-palette-item>
             </template>
         </ui-header>
 
