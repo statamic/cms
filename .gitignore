@@ -11,6 +11,7 @@ resources/dist
 resources/dist-dev
 resources/dist-frontend
 resources/js/package/types
+resources/js/package/tailwind-exclusions.css
 composer.lock
 .env
 bundle-stats.html
