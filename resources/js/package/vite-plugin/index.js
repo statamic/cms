@@ -1,5 +1,6 @@
 import vue from '@vitejs/plugin-vue';
 import { spawn } from 'child_process';
+import tailwindExclusions from './tailwind-exclusions.js';
 
 const statamic = function (options) {
     return {
@@ -58,6 +59,7 @@ const statamic = function (options) {
 export default function (options = {}) {
     return [
         statamic(options),
+        tailwindExclusions(),
         vue(options.vue || {}),
     ];
 }

@@ -26,7 +26,7 @@
             "default": "./temporary.js"
         },
         "./vite-plugin": {
-            "default": "./vite-plugin.js"
+            "default": "./vite-plugin/index.js"
         }
     }
 }
