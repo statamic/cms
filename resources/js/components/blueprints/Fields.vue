@@ -27,7 +27,7 @@
         <div class="blueprint-section-field-actions flex gap-2">
             <LinkFields
                 :exclude-fieldset="excludeFieldset"
-                with-command-palette
+                :with-command-palette="withCommandPalette"
                 @linked="$emit('field-linked', $event)"
             />
             <ui-button icon="add-circle" :text="__('Create Field')" @click="createField" />
