@@ -53,7 +53,6 @@ const statamic = function (options) {
                 }
             });
         }
-
     };
 };
 
