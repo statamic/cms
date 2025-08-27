@@ -124,6 +124,8 @@ return [
         // 'content-border' => Color::Zinc[200],
         // 'dark-content-bg' => Color::Zinc[900],
         // 'dark-content-border' => Color::Zinc[950],
+
+        // 'progress-bar' => Color::Volt,
     ],
 
     /*
