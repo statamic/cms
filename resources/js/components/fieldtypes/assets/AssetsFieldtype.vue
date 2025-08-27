@@ -28,7 +28,7 @@
 
                 <div
                     v-if="!isReadOnly && showPicker"
-                    class="not-[.link-fieldtype_&]:p-2 not-[.link-fieldtype_&]:border border-gray-400 dark:border-gray-700 border-dashed rounded-xl flex flex-col @2xs:flex-row items-center gap-4"
+                    class="not-[.link-fieldtype_&]:p-2 not-[.link-fieldtype_&]:border border-gray-300 dark:border-gray-700 dark:bg-gray-850 rounded-xl flex flex-col @2xs:flex-row items-center gap-4"
                     :class="{
                         'rounded-b-none': expanded,
                         'bard-drag-handle': isInBardField,
@@ -101,7 +101,7 @@
                         @dragstart="$emit('focus')"
                     >
                         <div
-                            class="relative grid gap-4 2xl:gap-10 p-3 relative rounded-xl border border-t-0 rounded-t-none dark:border-dark-700"
+                            class="relative grid gap-4 2xl:gap-10 p-3 relative rounded-xl border border-gray-300 border-t-0 rounded-t-none dark:bg-gray-850 dark:border-dark-500"
                             :class="{ 'rounded-t-none': !isReadOnly && (showPicker || uploads.length) }"
                             ref="assets"
                             style="grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));"
