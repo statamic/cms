@@ -6,6 +6,7 @@
                 :text="__('Save')"
                 icon="save"
                 :action="save"
+                prioritize
                 v-slot="{ text, url, icon, action }"
             >
                 <Button type="submit" variant="primary" @click.prevent="action" v-text="text" />
