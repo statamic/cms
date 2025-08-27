@@ -1,7 +1,15 @@
 <template>
     <div>
         <Header :title="__('Edit Fieldset')" icon="fieldsets">
-            <Button type="submit" variant="primary" @click.prevent="save" v-text="__('Save')" />
+            <ui-command-palette-item
+                :category="$commandPalette.category.Actions"
+                :text="__('Save')"
+                icon="save"
+                :action="save"
+                v-slot="{ text, url, icon, action }"
+            >
+                <Button type="submit" variant="primary" @click.prevent="action" v-text="text" />
+            </ui-command-palette-item>
         </Header>
 
         <ui-panel :heading="__('Settings')">
