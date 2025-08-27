@@ -28,8 +28,7 @@
     --color-global-header-bg: var(--theme-color-gray-800);
     --color-ui-accent: var(--theme-color-ui-accent);
     --color-dark-ui-accent: var(--theme-color-dark-ui-accent);
-
-
+    --color-toggle-bg: var(--theme-color-toggle-bg);
 
     /* Temp */
     --color-dark-100: #dfe1e5;
