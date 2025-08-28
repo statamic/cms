@@ -30,7 +30,8 @@
     --color-progress-bar: var(--theme-color-progress-bar);
     --color-ui-accent: var(--theme-color-ui-accent);
     --color-dark-ui-accent: var(--theme-color-dark-ui-accent);
-    --color-toggle-bg: var(--theme-color-toggle-bg);
+    --color-switch-bg: var(--theme-color-switch-bg);
+    --color-dark-switch-bg: var(--theme-color-dark-switch-bg);
 
     /* Temp */
     --color-dark-100: #dfe1e5;

@@ -1,5 +1,27 @@
 # Release Notes
 
+## 6.0.0-alpha.4 (2025-08-28)
+
+### What's new
+- Configurable progress bar color [#12202](https://github.com/statamic/cms/issues/12202) by @jackmcdade
+- UI accent color theme config [#12201](https://github.com/statamic/cms/issues/12201) by @jackmcdade
+
+### What's fixed
+- Fix spacer field from collapsing [#12211](https://github.com/statamic/cms/issues/12211) by @JayGeorge
+- Lowercase Inter font directory [#12213](https://github.com/statamic/cms/issues/12213) by @jasonvarga
+- Remove unnecessary whitespace in bard link toolbar [#12207](https://github.com/statamic/cms/issues/12207) by @duncanmcclean
+- Make border colors more consistent [#12209](https://github.com/statamic/cms/issues/12209) by @JayGeorge
+- Tidy Vite [#12204](https://github.com/statamic/cms/issues/12204) by @jasonvarga
+- Reduce negative letter-spacing for the st-text-legibility legibility (e.g. Bard fields) based [d479c45](https://github.com/statamic/cms/commit/d479c45) by @JayGeorge
+- Vite Tailwind Exclusions [#12200](https://github.com/statamic/cms/issues/12200) by @jasonvarga
+- UI improvements & fixes [#12203](https://github.com/statamic/cms/issues/12203) by @jackmcdade
+- Make panel background slightly darker to improve legibility [2413ae7](https://github.com/statamic/cms/commit/2413ae7) by @JayGeorge
+- Fix dark content bg [#12198](https://github.com/statamic/cms/issues/12198) by @jackmcdade
+- Switch (Toggle) accents [#12210](https://github.com/statamic/cms/issues/12210) by @jasonvarga
+- Automatically run vite build watch [#12193](https://github.com/statamic/cms/issues/12193) by @jasonvarga
+
+
+
 ## 6.0.0-alpha.3 (2025-08-26)
 
 ### What's fixed
