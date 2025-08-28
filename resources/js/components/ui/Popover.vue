@@ -63,7 +63,7 @@ function updateOpen(value) {
                 :side
             >
                 <slot v-bind="slotProps" />
-                <PopoverClose>
+                <PopoverClose as-child>
                     <slot name="close" v-bind="slotProps" />
                 </PopoverClose>
                 <PopoverArrow v-if="arrow" class="fill-white stroke-gray-300" />
