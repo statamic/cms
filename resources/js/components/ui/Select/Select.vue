@@ -8,7 +8,6 @@ const props = defineProps({
     buttonAppearance: { type: Boolean, default: true },
     clearable: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
-    flat: { type: Boolean, default: false },
     modelValue: { type: [Object, String, Number], default: null },
     optionLabel: { type: String, default: 'label' },
     options: { type: Array, default: null },
@@ -16,6 +15,7 @@ const props = defineProps({
     placeholder: { type: String, default: 'Select...' },
     readOnly: { type: Boolean, default: false },
     size: { type: String, default: 'base' },
+    variant: { type: String, default: 'default' },
 });
 
 defineOptions({
@@ -36,7 +36,6 @@ const usingOptionSlot = !!slots['option'];
         :button-appearance
         :clearable
         :disabled
-        :flat
         :model-value="modelValue"
         :option-label
         :option-value
@@ -45,6 +44,7 @@ const usingOptionSlot = !!slots['option'];
         :read-only
         :searchable="false"
         :size
+        :variant
         @update:modelValue="emit('update:modelValue', $event)"
     >
         <template #selected-option="{ option }" v-if="usingSelectedOptionSlot">

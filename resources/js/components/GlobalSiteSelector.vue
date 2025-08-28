@@ -1,13 +1,13 @@
 <template>
-    <div class="site-selector flex h-full items-center dark:border-dark-900">
+    <div class="flex h-full items-center">
         <Select
+            :model-value="active"
             :options="sites"
+            :searchable="false"
+            @update:model-value="selected"
             option-label="name"
             option-value="handle"
-            :searchable="false"
-            :model-value="active"
-            :button-appearance="false"
-            @update:model-value="selected"
+            variant="filled"
         >
             <template #selected-option="{ option }">
                 <div class="flex items-center gap-2 text-sm font-medium text-[0.8125rem] text-gray-300 hover:text-white">

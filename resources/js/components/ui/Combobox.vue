@@ -50,14 +50,14 @@ const attrs = useAttrs();
 const triggerClasses = cva({
     base: 'min-h-full w-full flex items-center',
     variants: {
+        variant: {
+            default: 'border border-gray-300 with-contrast:border-gray-500 dark:border-b-0 dark:ring-3 dark:ring-gray-900 dark:border-white/10 shadow-ui-sm dark:shadow-md focus-within:focus-outline',
+            ghost: 'border-none',
+        },
         size: {
             base: 'text-base rounded-lg ps-3 pe-2.5 py-2 h-10 leading-[1.375rem]',
             sm: 'text-sm rounded-md ps-2.5 pe-2 py-1.5 h-8 leading-[1.125rem]',
             xs: 'text-xs rounded-sm ps-2 pe-1.5 py-1.5 h-6 leading-[1.125rem]',
-        },
-        flat: {
-            true: 'shadow-none',
-            false: 'bg-linear-to-b from-white to-gray-50 hover:to-gray-100 dark:from-gray-800 dark:to-gray-800 dark:hover:to-gray-850 shadow-ui-sm',
         },
         'discrete-focus-outline': {
             true: 'focus-outline-discrete',
@@ -66,10 +66,6 @@ const triggerClasses = cva({
             true: 'border border-gray-300 with-contrast:border-gray-500 dark:border-b-0 dark:ring-3 dark:ring-gray-900 dark:border-white/10 shadow-ui-sm dark:shadow-md focus-within:focus-outline',
             false: '',
         },
-        // disabled: {
-        //     true: 'data-disabled:text-gray-300 data-disabled:pointer-events-none data-highlighted:outline-hidden',
-        //     false: '',
-        // },
         readOnly: {
             true: 'border-dashed',
         }

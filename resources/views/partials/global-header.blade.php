@@ -105,13 +105,15 @@
             v-slot="{ text, url, icon }"
         >
             <ui-button
-                :icon="icon"
-                class="[&_svg]:size-4 -me-3"
-                variant="ghost"
+                :aria-label="text"
                 :href="url"
+                :icon="icon"
+                :round="true"
+                class="[&_svg]:size-4 -me-3"
+                size="sm"
                 target="_blank"
                 v-tooltip="text"
-                :aria-label="text"
+                variant="ghost"
             ></ui-button>
         </ui-command-palette-item>
         <x-statamic::user-dropdown />
