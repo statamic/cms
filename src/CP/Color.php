@@ -351,8 +351,8 @@ class Color
             'progress-bar' => self::Volt,
             'ui-accent' => self::Zinc[800],
             'dark-ui-accent' => self::Zinc[950],
-            'toggle-bg' => 'var(--theme-color-ui-accent)',
-            'dark-toggle-bg' => 'var(--theme-color-dark-ui-accent)',
+            'switch-bg' => 'var(--theme-color-ui-accent)',
+            'dark-switch-bg' => 'var(--theme-color-dark-ui-accent)',
         ];
     }
 
