@@ -1,5 +1,5 @@
 <template>
-    <div class="flex h-full items-center">
+    <div class="flex h-full items-center" data-ui-global-site-selector>
         <Select
             :model-value="active"
             :options="sites"
@@ -7,18 +7,9 @@
             @update:model-value="selected"
             option-label="name"
             option-value="handle"
-            variant="filled"
-        >
-            <template #selected-option="{ option }">
-                <div class="flex items-center gap-2 text-sm font-medium text-[0.8125rem] text-gray-300 hover:text-white">
-                    <ui-icon name="globe-arrow" class="size-4" />
-                    <div class="whitespace-nowrap">{{ __(option.name) }}</div>
-                </div>
-            </template>
-            <template #option="option">
-                <div class="whitespace-nowrap" :class="{ 'text-gray-500': handle === active }">{{ __(option.name) }}</div>
-            </template>
-        </Select>
+            size="sm"
+            icon="globe-arrow"
+        />
     </div>
 </template>
 
@@ -51,3 +42,10 @@ export default {
     },
 };
 </script>
+
+<style>
+[data-ui-global-site-selector] [data-ui-combobox-trigger] {
+    background: color-mix(in srgb, var(--theme-color-global-header-bg) 70%, black 80%) !important;
+    border: transparent !important;
+}
+</style>

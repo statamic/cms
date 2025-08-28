@@ -5,9 +5,9 @@ import { Combobox } from '@/components/ui';
 const emit = defineEmits(['update:modelValue']);
 
 const props = defineProps({
-    buttonAppearance: { type: Boolean, default: true },
     clearable: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
+    icon: { type: String, default: null },
     modelValue: { type: [Object, String, Number], default: null },
     optionLabel: { type: String, default: 'label' },
     options: { type: Array, default: null },
@@ -33,9 +33,9 @@ const usingOptionSlot = !!slots['option'];
 <template>
     <Combobox
         v-bind="attrs"
-        :button-appearance
         :clearable
         :disabled
+        :icon
         :model-value="modelValue"
         :option-label
         :option-value

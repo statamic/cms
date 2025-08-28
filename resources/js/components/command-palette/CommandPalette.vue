@@ -239,8 +239,8 @@ const modalClasses = cva({
     <DialogRoot v-model:open="open" :modal="true">
         <DialogTrigger>
             <div class="
-                data-[focus-visible]:outline-focus hover flex cursor-text items-center gap-x-1.5 group
-                rounded-md [button:has(>&)]:rounded-md bg-black/40 text-xs text-white/60 outline-none
+                data-[focus-visible]:outline-focus hover flex cursor-text items-center gap-x-1.5 group h-8
+                rounded-lg [button:has(>&)]:rounded-md bg-black/40 text-xs text-white/60 outline-none
                 border-b border-b-white/20 inset-shadow-sm inset-shadow-black/20
                 md:w-32 md:py-[calc(5/16*1rem)] md:px-2
                 hover:bg-black/45 hover:text-white/70
