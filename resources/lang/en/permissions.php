@@ -31,6 +31,7 @@ return [
     'publish_{collection}_entries_desc' => 'Ability to change from draft to published and vice versa',
     'reorder_{collection}_entries' => 'Reorder entries',
     'reorder_{collection}_entries_desc' => 'Enables drag and drop reordering',
+    'view_other_authors_{collection}_entries' => "View other authors' entries",
     'edit_other_authors_{collection}_entries' => "Edit other authors' entries",
     'publish_other_authors_{collection}_entries' => "Manage publish state of other authors' entries",
     'delete_other_authors_{collection}_entries' => "Delete other authors' entries",
