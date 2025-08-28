@@ -77,5 +77,5 @@ function extractTailwindUtilities(cssContent) {
         });
     });
 
-    return Array.from(utilities).sort();
+    return Array.from(utilities).map(utility => `{dark:,hover:,focus:,}${utility}`);
 }
