@@ -45,7 +45,7 @@ export default {
 
 <style>
 [data-ui-global-site-selector] [data-ui-combobox-trigger] {
-    background: color-mix(in srgb, var(--theme-color-global-header-bg) 70%, black 80%) !important;
+    background: rgba(0,0,0,.5) !important;
     border: transparent !important;
 }
 </style>

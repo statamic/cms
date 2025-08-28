@@ -26,6 +26,7 @@
     --color-dark-content-bg: var(--theme-color-dark-content-bg);
     --color-dark-content-border: var(--theme-color-dark-content-border);
     --color-global-header-bg: var(--theme-color-global-header-bg);
+    --color-dark-global-header-bg: var(--theme-color-dark-global-header-bg);
     --color-progress-bar: var(--theme-color-progress-bar);
     --color-ui-accent: var(--theme-color-ui-accent);
     --color-dark-ui-accent: var(--theme-color-dark-ui-accent);

@@ -2,14 +2,14 @@
     use function Statamic\trans as __;
 @endphp
 
-<header class="h-14 bg-global-header-bg flex justify-between space-x-2 items-center text-white px-4 dark fixed overflow-x-auto top-0 inset-x-0 z-[3]">
+<header class="h-14 bg-global-header-bg dark:bg-dark-global-header-bg flex justify-between space-x-2 items-center text-white px-4 fixed overflow-x-auto top-0 inset-x-0 z-[3]">
     <a class="c-skip-link z-(--z-index-header) px-4 py-2 bg-blue-800 text-sm top-2.5 left-2.25 fixed opacity-0 -translate-y-24 focus:translate-y-0 focus:opacity-100 rounded-md" href="#main">
         {{ __('Skip to sidebar') }}
     </a>
     <a class="c-skip-link z-(--z-index-header) px-4 py-2 bg-blue-800 text-sm top-2.5 left-2.25 fixed opacity-0 -translate-y-24 focus:translate-y-0 focus:opacity-100 rounded-md" href="#main-content">
         {{ __('Skip to content') }}
     </a>
-    <div class="flex items-center gap-2 text-[0.8125rem] text-gray-300">
+    <div class="dark flex items-center gap-2 text-[0.8125rem] text-gray-300">
          {{-- Logo --}}
         @if ($customDarkLogo)
             <button class="flex items-center group cursor-pointer text-gray-300 hover:text-white" type="button" @click="toggleNav" aria-label="{{ __('Toggle Nav') }}">
@@ -30,7 +30,7 @@
                 {{ $customLogoText ?? config('app.name') }}
             </a>
             @if (Statamic::pro())
-                <ui-badge size="sm" variant="flat" text="Pro" class="hidden sm:block select-none dark:bg-gray-700/55!" />
+                <ui-badge size="sm" variant="flat" text="Pro" class="hidden sm:block select-none dark:bg-black/20!" />
             @endif
         </div>
         @endif
@@ -92,7 +92,7 @@
         </div>
     </div>
 
-    <div class="flex-1 flex gap-1 md:gap-4 items-center justify-end shrink-0">
+    <div class="dark flex-1 flex gap-1 md:gap-4 items-center justify-end shrink-0">
         @if (Statamic\Facades\Site::authorized()->count() > 1)
             <global-site-selector></global-site-selector>
         @endif
