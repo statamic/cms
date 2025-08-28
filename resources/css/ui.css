@@ -27,9 +27,10 @@
     --color-dark-content-border: var(--theme-color-dark-content-border);
     --color-global-header-bg: var(--theme-color-gray-800);
     --color-progress-bar: var(--theme-color-progress-bar);
-    --color-ui-accent: var(--theme-color-ui-accent, var(--color-primary));
-    --color-dark-ui-accent: var(--theme-color-dark-ui-accent, var(--color-primary));
-    --color-toggle-bg: var(--theme-color-ui-accent, var(--color-primary));
+    --color-ui-accent: var(--theme-color-ui-accent);
+    --color-dark-ui-accent: var(--theme-color-dark-ui-accent);
+    --color-toggle-bg: var(--theme-color-toggle-bg);
+    --color-dark-toggle-bg: var(--theme-color-dark-toggle-bg);
 
     /* Temp */
     --color-dark-100: #dfe1e5;
