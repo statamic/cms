@@ -92,7 +92,7 @@
         </div>
     </div>
 
-    <div class="dark flex-1 flex gap-1 md:gap-4 items-center justify-end shrink-0">
+    <div class="dark flex-1 flex gap-1 md:gap-3 items-center justify-end shrink-0">
         @if (Statamic\Facades\Site::authorized()->count() > 1)
             <global-site-selector></global-site-selector>
         @endif
@@ -109,7 +109,7 @@
                 :href="url"
                 :icon="icon"
                 :round="true"
-                class="[&_svg]:size-4 -me-3"
+                class="[&_svg]:size-4 -me-2"
                 size="sm"
                 target="_blank"
                 v-tooltip="text"
