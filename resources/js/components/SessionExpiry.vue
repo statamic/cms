@@ -11,7 +11,7 @@
             <Button @click="extend" variant="primary" icon="rewind" :text="__('Extend Session')" class="w-full" />
         </Modal>
 
-        <Modal :title="__('Resume Your Session')" :open="isShowingLogin" height="auto" class="max-w-[500px]!">
+        <Modal :title="__('Resume Your Session')" :open="isShowingLogin" height="auto" class="max-w-[500px]!" :dismissable="false">
             <div v-if="isUsingOauth" class="space-y-3">
                 <ui-description v-text="__('messages.session_expiry_new_window')" />
                 <ui-button variant="primary" class="w-full" :href="oauthProvider.loginUrl" target="_blank" :text="__('Log in with :provider', { provider: oauthProvider.label })" />
