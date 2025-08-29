@@ -1,46 +1,51 @@
-<template>
-    <div class="overflow-hidden rounded-full" v-tooltip="user.name">
-        <img v-if="useAvatar" :src="avatarSrc" class="block" @error="hasAvatarError = true" />
-        <div v-if="useInitials" class="flex h-full w-full items-center justify-center bg-pink text-center text-white">
-            <span>{{ initials }}</span>
-        </div>
-    </div>
-</template>
+<script setup>
+import { cva } from 'cva';
+import { twMerge } from 'tailwind-merge';
+import {computed, ref} from "vue";
 
-<script>
-export default {
-    props: {
-        user: Object,
-    },
+const props = defineProps({
+    user: Object,
+    class: {
+        type: String,
+        default: ''
+    }
+})
 
-    data() {
-        return {
-            hasAvatarError: false,
-        };
-    },
+const hasAvatarError = ref(false);
 
-    computed: {
-        initials() {
-            return this.user.initials || '?';
-        },
+const hasAvatar = computed(() => {
+    return !!props.user.avatar && !hasAvatarError.value
+});
 
-        useAvatar() {
-            return this.hasAvatar && !this.hasAvatarError;
-        },
+const avatarSrc = computed(() => {
+    if (!hasAvatar.value) return null;
 
-        hasAvatar() {
-            return !!this.user.avatar;
-        },
+    return props.user.avatar.permalink || props.user.avatar;
+})
 
-        avatarSrc() {
-            if (!this.hasAvatar) return null;
+const avatarClasses = computed(() => {
+    const classes = cva({
+        base: 'size-7 rounded-full [button:has(&)]:rounded-full',
+        variants: {
+            type: {
+                avatar: '',
+                initials: 'text-white text-2xs font-medium flex flex-shrink-0 items-center justify-center bg-gradient-to-tr from-purple-500 to-red-600'
+            }
+        }
+    })({
+        type: hasAvatar.value ? 'avatar' : 'initials'
+    })
 
-            return this.user.avatar.permalink || this.user.avatar;
-        },
-
-        useInitials() {
-            return !this.hasAvatar || this.hasAvatarError;
-        },
-    },
-};
+    return twMerge(classes, props.class);
+})
 </script>
+<template>
+    <template v-if="hasAvatar">
+        <img :src="avatarSrc" :class="avatarClasses" :alt="user.name" @error="hasAvatarError = true" />
+    </template>
+    <template v-else>
+        <div :aria-label="user.name" :class="avatarClasses">
+            {{ user.initials || '?' }}
+        </div>
+    </template>
+</template>

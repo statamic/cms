@@ -1,13 +1,15 @@
 <ui-dropdown align="end" x-cloak>
     <template #trigger>
         <ui-button :icon-only="true" variant="ghost">
-            <x-statamic::avatar :user="$user" />
+            <avatar :user='@json($user)' />
         </ui-button>
     </template>
 
     <ui-dropdown-header>
         <div class="flex items-center gap-2">
-            <x-statamic::avatar :user="$user" class="size-8!" />
+            <div>
+                <avatar :user='@json($user)' class="size-8" />
+            </div>
             <div>
                 <div class="text-sm" v-pre>{{ $user->email() }}</div>
                 @if ($user->isSuper())
