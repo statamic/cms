@@ -29,11 +29,11 @@ test('can select option', async () => {
         },
     });
 
-    const trigger = wrapper.find('[data-testid="trigger"]');
+    const trigger = wrapper.find('[data-ui-combobox-trigger]');
     await trigger.trigger('click');
 
     // The option dropdown is rendered in a portal, so we need to find it in the document instead.
-    await document.querySelector('[data-testid="option-jason"]').click();
+    await document.querySelector('[data-ui-combobox-item="jason"]').click();
 
     expect(wrapper.emitted('update:modelValue')[0]).toEqual(['jason']);
     await wrapper.setProps({ modelValue: 'jason' });
@@ -57,15 +57,15 @@ test('dropdown closes on selection', async () => {
         },
     });
 
-    await wrapper.find('[data-testid="trigger"]').trigger('click');
+    await wrapper.find('[data-ui-combobox-trigger]').trigger('click');
 
-    await document.querySelector('[data-testid="option-jason"]').click();
+    await document.querySelector('[data-ui-combobox-item="jason"]').click();
     expect(wrapper.emitted('update:modelValue')[0]).toEqual([['jason']]);
     await wrapper.setProps({ modelValue: ['jason'] });
 
     expect(wrapper.vm.dropdownOpen).toBeFalsy();
 
-    expect(wrapper.find('[data-testid="selected-options"]').text()).toContain('Jason');
+    expect(wrapper.find('[data-ui-combobox-selected-options]').text()).toContain('Jason');
 });
 
 test('can clear selected option', async () => {
@@ -84,7 +84,7 @@ test('can clear selected option', async () => {
         },
     });
 
-    await wrapper.find('[data-testid="clear-button"]').trigger('click');
+    await wrapper.find('[data-ui-combobox-clear-button]').trigger('click');
 
     expect(wrapper.vm.searchQuery).toBe('');
     expect(wrapper.emitted('update:modelValue')[0]).toEqual([null]);
@@ -106,11 +106,11 @@ test('can use different optionLabel and optionValue keys', async () => {
         },
     });
 
-    const trigger = wrapper.find('[data-testid="trigger"]');
+    const trigger = wrapper.find('[data-ui-combobox-trigger]');
     await trigger.trigger('click');
 
     // The option dropdown is rendered in a portal, so we need to find it in the document instead.
-    await document.querySelector('[data-testid="option-jason"]').click();
+    await document.querySelector('[data-ui-combobox-item="jason"]').click();
 
     expect(wrapper.emitted('update:modelValue')[0]).toEqual(['jason']);
     await wrapper.setProps({ modelValue: 'jason' });
@@ -134,23 +134,23 @@ describe('multiple options', () => {
             },
         });
 
-        await wrapper.find('[data-testid="trigger"]').trigger('click');
+        await wrapper.find('[data-ui-combobox-trigger]').trigger('click');
 
-        await document.querySelector('[data-testid="option-jason"]').click();
+        await document.querySelector('[data-ui-combobox-item="jason"]').click();
         expect(wrapper.emitted('update:modelValue')[0]).toEqual([['jason']]);
         await wrapper.setProps({ modelValue: ['jason'] });
 
-        await document.querySelector('[data-testid="option-jesse"]').click();
+        await document.querySelector('[data-ui-combobox-item="jesse"]').click();
         expect(wrapper.emitted('update:modelValue')[1]).toEqual([['jason', 'jesse']]);
         await wrapper.setProps({ modelValue: ['jason', 'jesse'] });
 
-        await document.querySelector('[data-testid="option-juncan"]').click();
+        await document.querySelector('[data-ui-combobox-item="juncan"]').click();
         expect(wrapper.emitted('update:modelValue')[2]).toEqual([['jason', 'jesse', 'juncan']]);
         await wrapper.setProps({ modelValue: ['jason', 'jesse', 'juncan'] });
 
-        expect(wrapper.find('[data-testid="selected-options"]').text()).toContain('Jason');
-        expect(wrapper.find('[data-testid="selected-options"]').text()).toContain('Jesse');
-        expect(wrapper.find('[data-testid="selected-options"]').text()).toContain('Juncan');
+        expect(wrapper.find('[data-ui-combobox-selected-options]').text()).toContain('Jason');
+        expect(wrapper.find('[data-ui-combobox-selected-options]').text()).toContain('Jesse');
+        expect(wrapper.find('[data-ui-combobox-selected-options]').text()).toContain('Juncan');
     });
 
     test('cant select more than the allowed number of options', async () => {
@@ -169,22 +169,22 @@ describe('multiple options', () => {
             },
         });
 
-        await wrapper.find('[data-testid="trigger"]').trigger('click');
+        await wrapper.find('[data-ui-combobox-trigger]').trigger('click');
 
-        await document.querySelector('[data-testid="option-jason"]').click();
+        await document.querySelector('[data-ui-combobox-item="jason"]').click();
         expect(wrapper.emitted('update:modelValue')[0]).toEqual([['jason']]);
         await wrapper.setProps({ modelValue: ['jason'] });
 
-        await document.querySelector('[data-testid="option-jesse"]').click();
+        await document.querySelector('[data-ui-combobox-item="jesse"]').click();
         expect(wrapper.emitted('update:modelValue')[1]).toEqual([['jason', 'jesse']]);
         await wrapper.setProps({ modelValue: ['jason', 'jesse'] });
 
-        await document.querySelector('[data-testid="option-juncan"]').click();
+        await document.querySelector('[data-ui-combobox-item="juncan"]').click();
         expect(wrapper.emitted('update:modelValue')).toHaveLength(2); // No new event should be emitted
 
-        expect(wrapper.find('[data-testid="selected-options"]').text()).toContain('Jason');
-        expect(wrapper.find('[data-testid="selected-options"]').text()).toContain('Jesse');
-        expect(wrapper.find('[data-testid="selected-options"]').text()).not.toContain('Juncan');
+        expect(wrapper.find('[data-ui-combobox-selected-options]').text()).toContain('Jason');
+        expect(wrapper.find('[data-ui-combobox-selected-options]').text()).toContain('Jesse');
+        expect(wrapper.find('[data-ui-combobox-selected-options]').text()).not.toContain('Juncan');
     });
 
     test('can deselect options', async () => {
@@ -203,14 +203,14 @@ describe('multiple options', () => {
             },
         });
 
-        wrapper.find('[data-testid="selected-options"] :nth-child(2) button').trigger('click');
+        wrapper.find('[data-ui-combobox-selected-options] :nth-child(2) button').trigger('click');
 
         expect(wrapper.emitted('update:modelValue')[0]).toEqual([['jason', 'juncan']]);
         await wrapper.setProps({ modelValue: ['jason', 'juncan'] });
 
-        expect(wrapper.find('[data-testid="selected-options"]').text()).toContain('Jason');
-        expect(wrapper.find('[data-testid="selected-options"]').text()).not.toContain('Jesse');
-        expect(wrapper.find('[data-testid="selected-options"]').text()).toContain('Juncan');
+        expect(wrapper.find('[data-ui-combobox-selected-options]').text()).toContain('Jason');
+        expect(wrapper.find('[data-ui-combobox-selected-options]').text()).not.toContain('Jesse');
+        expect(wrapper.find('[data-ui-combobox-selected-options]').text()).toContain('Juncan');
     });
 });
 
@@ -229,7 +229,7 @@ describe('search', () => {
             },
         });
 
-        const trigger = wrapper.find('[data-testid="trigger"]');
+        const trigger = wrapper.find('[data-ui-combobox-trigger]');
         await trigger.trigger('click');
 
         await trigger.find('input[type="search"]').setValue('jac');
@@ -254,7 +254,7 @@ describe('search', () => {
             },
         });
 
-        const trigger = wrapper.find('[data-testid="trigger"]');
+        const trigger = wrapper.find('[data-ui-combobox-trigger]');
         await trigger.trigger('click');
 
         expect(trigger.find('input[type="search"]').exists()).toBeFalsy();
@@ -275,7 +275,7 @@ describe('search', () => {
             },
         });
 
-        const trigger = wrapper.find('[data-testid="trigger"]');
+        const trigger = wrapper.find('[data-ui-combobox-trigger]');
         await trigger.trigger('click');
 
         await trigger.find('input[type="search"]').setValue('jac');
@@ -294,7 +294,7 @@ describe('taggable', () => {
             },
         });
 
-        const trigger = wrapper.find('[data-testid="trigger"]');
+        const trigger = wrapper.find('[data-ui-combobox-trigger]');
         await trigger.trigger('click');
 
         const searchInput = trigger.find('input[type="search"]');
@@ -313,7 +313,7 @@ describe('taggable', () => {
             },
         });
 
-        const trigger = wrapper.find('[data-testid="trigger"]');
+        const trigger = wrapper.find('[data-ui-combobox-trigger]');
         await trigger.trigger('click');
 
         const searchInput = trigger.find('input[type="search"]');
@@ -346,7 +346,7 @@ describe('accessibility', () => {
 
         expect(wrapper.vm.dropdownOpen).toBeFalsy();
 
-        await wrapper.find('[data-testid="trigger"]').trigger('keydown.space');
+        await wrapper.find('[data-ui-combobox-trigger]').trigger('keydown.space');
 
         expect(wrapper.vm.dropdownOpen).toBeTruthy();
     });
@@ -366,12 +366,12 @@ describe('accessibility', () => {
             },
         });
 
-        const trigger = wrapper.find('[data-testid="trigger"]');
+        const trigger = wrapper.find('[data-ui-combobox-trigger]');
         await trigger.trigger('click');
 
         expect(wrapper.vm.dropdownOpen).toBeTruthy();
 
-        const options = document.querySelector('[data-testid="options"]');
+        const options = document.querySelector('[data-ui-combobox-content]');
 
         options.dispatchEvent(new KeyboardEvent('keydown', {
             key: 'Escape',

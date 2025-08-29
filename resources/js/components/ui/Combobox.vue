@@ -263,7 +263,7 @@ defineExpose({
                 v-bind="attrs"
             >
                 <ComboboxAnchor :class="[$attrs.class]" data-ui-combobox-anchor>
-                    <ComboboxTrigger as="div" ref="trigger" :class="triggerClasses" @keydown.space.prevent="openOnSpace" data-testid="trigger" data-ui-combobox-trigger>
+                    <ComboboxTrigger as="div" ref="trigger" :class="triggerClasses" @keydown.space.prevent="openOnSpace" data-ui-combobox-trigger>
                         <div class="flex-1 min-w-0">
                             <ComboboxInput
                                 v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"
@@ -294,7 +294,7 @@ defineExpose({
                         </div>
 
                         <div class="flex gap-1.5 items-center shrink-0 ms-1.5">
-                            <Button v-if="clearable && modelValue" icon="x" variant="ghost" size="xs" round @click="clear" data-testid="clear-button" data-ui-combobox-clear-button />
+                            <Button v-if="clearable && modelValue" icon="x" variant="ghost" size="xs" round @click="clear" data-ui-combobox-clear-button />
                             <Icon v-if="options.length || ignoreFilter" name="ui/chevron-down" class="text-gray-400 dark:text-white/40" data-ui-combobox-chevron />
                         </div>
                     </ComboboxTrigger>
@@ -311,7 +311,7 @@ defineExpose({
                         @escape-key-down="nextTick(() => $refs.trigger.$el.focus())"
                         data-ui-combobox-content
                     >
-                        <ComboboxViewport data-testid="options">
+                        <ComboboxViewport>
                             <ComboboxEmpty class="py-2 text-sm" data-ui-combobox-empty>
                                 <slot name="no-options" v-bind="{ searchQuery }">
                                     {{ __('No options available.') }}
@@ -326,8 +326,7 @@ defineExpose({
                                 :text-value="getOptionLabel(option)"
                                 :class="itemClasses({ size: size, selected: isSelected(option) })"
                                 as="button"
-                                data-ui-combobox-item
-                                :data-testid="`option-${getOptionValue(option)}`"
+                                :data-ui-combobox-item="getOptionValue(option)"
                                 @select="() => {
                                     dropdownOpen = !closeOnSelect;
                                     if (closeOnSelect) $refs.trigger.$el.focus();
@@ -361,7 +360,7 @@ defineExpose({
                 :model-value="modelValue"
                 @update:modelValue="updateModelValue"
             >
-                <div class="flex flex-wrap gap-2" data-testid="selected-options">
+                <div class="flex flex-wrap gap-2">
                     <div
                         v-for="option in selectedOptions"
                         :key="getOptionValue(option)"
