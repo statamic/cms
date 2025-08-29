@@ -30,7 +30,7 @@
                 {{ $customLogoText ?? config('app.name') }}
             </a>
             @if (Statamic::pro())
-                <ui-badge size="sm" variant="flat" text="Pro" class="hidden sm:block select-none dark:bg-black/20!" />
+                <ui-badge size="sm" variant="flat" text="Pro" class="hidden sm:block select-none bg-white/15!" />
             @endif
         </div>
         @endif
