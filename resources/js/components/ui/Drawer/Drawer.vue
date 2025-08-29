@@ -33,7 +33,7 @@ const drawerClasses = cva({
 })({ ...props });
 
 const instance = getCurrentInstance();
-const isUsingOpenProp = computed(() => instance && instance.vnode.props?.length > 0 && 'open' in instance.vnode.props);
+const isUsingOpenProp = computed(() => instance?.vnode.props?.hasOwnProperty('open'));
 
 const open = ref(props.open);
 
