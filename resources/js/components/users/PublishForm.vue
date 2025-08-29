@@ -38,7 +38,16 @@
                 :requires-current-password="requiresCurrentPassword"
             />
 
-            <Button variant="primary" @click.prevent="save" v-text="__('Save')" />
+            <ui-command-palette-item
+                :category="$commandPalette.category.Actions"
+                :text="__('Save')"
+                icon="save"
+                :action="save"
+                prioritize
+                v-slot="{ text, action }"
+            >
+                <Button variant="primary" @click.prevent="action" :text="text" />
+            </ui-command-palette-item>
 
             <slot name="action-buttons-right" />
         </Header>
