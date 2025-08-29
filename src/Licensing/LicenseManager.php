@@ -130,4 +130,84 @@ class LicenseManager
     {
         return $this->outpost->usingLicenseKeyFile();
     }
+
+    public function getLicensingAlert()
+    {
+        // Return null if outpost is offline (no alert needed)
+        if ($this->outpostIsOffline()) {
+            return null;
+        }
+
+        // Handle request failures
+        if ($this->requestFailed()) {
+            return [
+                'type' => 'request_failed',
+                'message' => $this->getRequestFailureMessage(),
+                'variant' => 'default',
+            ];
+        }
+
+        // Handle invalid licenses
+        if ($this->invalid()) {
+            $isTestDomain = $this->isOnTestDomain();
+
+            return [
+                'type' => 'invalid_license',
+                'message' => $this->getInvalidLicenseMessage($isTestDomain),
+                'is_test_domain' => $isTestDomain,
+                'variant' => 'danger',
+            ];
+        }
+
+        return null;
+    }
+
+    protected function getRequestFailureMessage()
+    {
+        if ($this->usingLicenseKeyFile()) {
+            return __('statamic::messages.outpost_license_key_error');
+        }
+
+        if ($this->requestErrorCode() === 422) {
+            return __('statamic::messages.outpost_error_422').' '.
+                   implode(' ', $this->requestValidationErrors()->unique());
+        }
+
+        if ($this->requestErrorCode() === 429) {
+            return __('statamic::messages.outpost_error_429').' '.
+                   trans_choice('statamic::messages.try_again_in_seconds', $this->failedRequestRetrySeconds());
+        }
+
+        return __('statamic::messages.outpost_issue_try_later');
+    }
+
+    protected function getInvalidLicenseMessage($isTestDomain)
+    {
+        if ($isTestDomain) {
+            if ($this->onlyAddonsAreInvalid()) {
+                return __('statamic::messages.licensing_trial_mode_alert_addons');
+            }
+
+            if ($this->onlyStatamicIsInvalid()) {
+                return __('statamic::messages.licensing_trial_mode_alert_statamic');
+            }
+
+            return __('statamic::messages.licensing_trial_mode_alert');
+        }
+
+        // Production domain
+        if ($this->onlyAddonsAreInvalid()) {
+            return __('statamic::messages.licensing_production_alert_addons');
+        }
+
+        if ($this->onlyStatamicIsInvalid()) {
+            if ($this->statamicNeedsRenewal()) {
+                return __('statamic::messages.licensing_production_alert_renew_statamic');
+            }
+
+            return __('statamic::messages.licensing_production_alert_statamic');
+        }
+
+        return __('statamic::messages.licensing_production_alert');
+    }
 }

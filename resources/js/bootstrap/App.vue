@@ -84,7 +84,6 @@ export default {
             navOpen: false,
             showBanner: true,
             appendedComponents: Statamic.$components.components,
-            isLicensingBannerSnoozed: localStorage.getItem(`statamic.snooze_license_banner`) > new Date().valueOf(),
             copyToClipboardModalUrl: null,
         };
     },
@@ -113,7 +112,7 @@ export default {
 
         this.fixAutofocus();
 
-        this.showBanner = !this.isLicensingBannerSnoozed && Statamic.$config.get('hasLicenseBanner');
+        this.showBanner = sessionStorage.getItem(`statamic.snooze_license_banner`) !== 'true' && Statamic.$config.get('hasLicenseBanner');
 
         this.$toast.registerInterceptor(this.$axios);
         this.$toast.displayInitialToasts();
@@ -151,7 +150,7 @@ export default {
 
         hideBanner() {
             this.showBanner = false;
-            localStorage.setItem(`statamic.snooze_license_banner`, new Date(Date.now() + 5 * 60 * 1000).valueOf());
+            sessionStorage.setItem(`statamic.snooze_license_banner`, 'true');
         },
 
         fixAutofocus() {
