@@ -282,6 +282,7 @@ export default {
 
     mounted() {
         this.setInitialNav(this.nav);
+        this.addToCommandPalette();
     },
 
     computed: {
@@ -754,6 +755,29 @@ export default {
             this.updateItemAction(this.draggingStat);
             this.draggingStat = false;
             return true;
+        },
+
+        addToCommandPalette() {
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Add Nav Item'),
+                icon: 'plus',
+                action: () => this.addItemToTopLevel(),
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Add Section'),
+                icon: 'add-section',
+                action: () => this.addSection(),
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Reset Nav Customizations'),
+                icon: 'history',
+                action: () => this.confirmingReset = true,
+            });
         },
     },
 };
