@@ -1,7 +1,7 @@
 <template>
     <Modal v-model:open="open" :title="__('Change Password')">
         <template #trigger>
-            <Button v-text="__('Change Password')" />
+            <Button v-text="__('Change Password')" ref="trigger" />
         </template>
 
         <div class="publish-fields">
@@ -71,6 +71,10 @@ export default {
         };
     },
 
+    mounted() {
+        this.addToCommandPalette();
+    },
+
     methods: {
         clearErrors() {
             this.errors = {};
@@ -111,6 +115,15 @@ export default {
                         this.saving = false;
                     }
                 });
+        },
+
+        addToCommandPalette() {
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Change Password'),
+                icon: 'key',
+                action: () => this.$refs.trigger.$el.click(),
+            });
         },
     },
 };
