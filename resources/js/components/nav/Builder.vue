@@ -193,7 +193,7 @@
             :buttonText="__('Remove')"
             :danger="true"
             @confirm="removeItem(confirmingRemoval, true)"
-            @cancel="confirmingReset = false"
+            @cancel="confirmingRemoval = false"
         />
     </div>
 </template>
