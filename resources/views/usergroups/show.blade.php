@@ -20,11 +20,20 @@
         @endcan
 
         @can('edit', $group)
-            <ui-button
-                :text="__('Edit Group')"
-                variant="primary"
-                href="{{ $group->editUrl() }}"
-            ></ui-button>
+            <ui-command-palette-item
+                category="{{ Statamic\CommandPalette\Category::Actions }}"
+                text="{{ __('Edit Group') }}"
+                url="{{ $group->editUrl() }}"
+                icon="groups"
+                prioritize
+                v-slot="{ text, url }"
+            >
+                <ui-button
+                    :text="text"
+                    :href="url"
+                    variant="primary"
+                ></ui-button>
+            </ui-command-palette-item>
         @endcan
     </ui-header>
 
