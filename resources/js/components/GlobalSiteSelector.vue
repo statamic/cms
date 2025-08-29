@@ -1,24 +1,15 @@
 <template>
-    <div class="site-selector flex h-full items-center dark:border-dark-900">
+    <div class="flex h-full items-center" data-ui-global-site-selector>
         <Select
+            :model-value="active"
             :options="sites"
+            :searchable="false"
+            @update:model-value="selected"
             option-label="name"
             option-value="handle"
-            :searchable="false"
-            :model-value="active"
-            :button-appearance="false"
-            @update:model-value="selected"
-        >
-            <template #selected-option="{ option }">
-                <div class="flex items-center gap-2 text-sm font-medium text-[0.8125rem] text-gray-300 hover:text-white">
-                    <ui-icon name="globe-arrow" class="size-4" />
-                    <div class="whitespace-nowrap">{{ __(option.name) }}</div>
-                </div>
-            </template>
-            <template #option="option">
-                <div class="whitespace-nowrap" :class="{ 'text-gray-500': handle === active }">{{ __(option.name) }}</div>
-            </template>
-        </Select>
+            size="sm"
+            icon="globe-arrow"
+        />
     </div>
 </template>
 
@@ -51,3 +42,10 @@ export default {
     },
 };
 </script>
+
+<style>
+[data-ui-global-site-selector] [data-ui-combobox-trigger] {
+    background: rgba(0,0,0,.5) !important;
+    border: transparent !important;
+}
+</style>

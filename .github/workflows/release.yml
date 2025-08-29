@@ -42,7 +42,7 @@ jobs:
         run: cd resources && tar -czvf dist-frontend.tar.gz dist-frontend
 
       - name: Create dist-package zip
-        run: cd resources && tar -czvf dist-package.tar.gz -C js/package .
+        run: cd resources/js/package && tar -czvf ../../dist-package.tar.gz *
 
       - name: Get Changelog
         id: changelog

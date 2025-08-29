@@ -5,6 +5,7 @@ import vue from '@vitejs/plugin-vue';
 import { visualizer } from 'rollup-plugin-visualizer';
 import svgLoader from 'vite-svg-loader';
 import path from 'path';
+import generateTailwindExclusions from './vite/generate-tailwind-exclusions.js';
 
 export default defineConfig(({ mode, command }) => {
     const env = loadEnv(mode, process.cwd(), '');
@@ -25,6 +26,7 @@ export default defineConfig(({ mode, command }) => {
             }),
             vue(),
             svgLoader(),
+            generateTailwindExclusions(isProdBuild),
         ],
         css: {
             devSourcemap: true,
