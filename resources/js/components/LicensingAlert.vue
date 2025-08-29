@@ -9,12 +9,7 @@ const props = defineProps({
 });
 
 const key = 'statamic.snooze_license_banner';
-
-const open = ref(
-    Statamic.$config.get('hasLicenseBanner')
-    && localStorage.getItem(key) < new Date().valueOf()
-);
-
+const open = ref(localStorage.getItem(key) < new Date().valueOf());
 const snoozeMinutes = computed(() => props.testing ? (24 * 60) : 5);
 const snoozeMilliseconds = computed(() => snoozeMinutes.value * 60 * 1000);
 
