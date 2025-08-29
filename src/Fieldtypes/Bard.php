@@ -16,6 +16,7 @@ use Statamic\GraphQL\Types\BardSetsType;
 use Statamic\GraphQL\Types\BardTextType;
 use Statamic\GraphQL\Types\ReplicatorSetType;
 use Statamic\Query\Scopes\Filters\Fields\Bard as BardFilter;
+use Statamic\Rules\RequiredIfAny;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\Hookable;
@@ -177,6 +178,9 @@ class Bard extends Replicator
                             'buttons' => 'contains_any anchor, image',
                         ],
                         'width' => 50,
+                        'validate' => [
+                            new RequiredIfAny('buttons', 'image'),
+                        ],
                     ],
                 ],
             ],
