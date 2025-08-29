@@ -90,7 +90,8 @@ const calendarEvents = computed(() => ({
                         'leading-[1.375rem] text-gray-600 dark:text-gray-300',
                         'shadow-ui-sm not-prose h-10 rounded-lg py-2 px-3 disabled:shadow-none',
                         'data-invalid:border-red-500',
-                        'disabled:shadow-none disabled:opacity-50 read-only:border-dashed'
+                        'disabled:shadow-none disabled:opacity-50',
+                        readOnly ? 'border-dashed' : '',
                     ]"
                 >
                     <DateRangePickerTrigger v-if="!inline">

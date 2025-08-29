@@ -1,5 +1,6 @@
 {
     "name": "@statamic/cms",
+    "type": "module",
     "version": "0.0.0",
     "dependencies": {
         "@vitejs/plugin-vue": "^6.0.0"
@@ -26,7 +27,7 @@
             "default": "./temporary.js"
         },
         "./vite-plugin": {
-            "default": "./vite-plugin.js"
+            "default": "./vite-plugin/index.js"
         }
     }
 }
