@@ -12,7 +12,7 @@
                 :category="$commandPalette.category.Actions"
                 :text="__('Discard changes')"
                 icon="trash"
-                :action="$refs.tree.cancel"
+                :action="discardChanges"
                 v-slot="{ text, action }"
             >
                 <Button
