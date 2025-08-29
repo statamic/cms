@@ -1,21 +1,26 @@
 <script setup>
 import { Modal, Description, Button } from '@/components/ui';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 const props = defineProps({
     message: String,
-    variant: String,
+    testing: Boolean,
     manageUrl: String,
 });
 
+const key = 'statamic.snooze_license_banner';
+
 const open = ref(
     Statamic.$config.get('hasLicenseBanner')
-    && sessionStorage.getItem(`statamic.snooze_license_banner`) !== 'true'
+    && localStorage.getItem(key) < new Date().valueOf()
 );
+
+const snoozeMinutes = computed(() => props.testing ? (24 * 60) : 5);
+const snoozeMilliseconds = computed(() => snoozeMinutes.value * 60 * 1000);
 
 function snooze() {
     open.value = false;
-    sessionStorage.setItem(`statamic.snooze_license_banner`, 'true');
+    localStorage.setItem(key, new Date(Date.now() + snoozeMilliseconds.value).valueOf());
 }
 
 function manageLicenses() {
