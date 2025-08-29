@@ -8,13 +8,22 @@
 @section('content')
 
     <ui-header title="{{ __('Cache Manager') }}" icon="cache">
-        <form method="POST" action="{{ cp_route('utilities.cache.clear', 'all') }}">
+        <form method="POST" action="{{ cp_route('utilities.cache.clear', 'all') }}" ref="clearAllForm">
             @csrf
-            <ui-button
+            <ui-command-palette-item
+                category="{{ Statamic\CommandPalette\Category::Actions }}"
                 text="{{ __('Clear All') }}"
-                type="submit"
-                variant="primary"
-            />
+                icon="wand"
+                :action="() => $refs.clearAllForm.submit()"
+                prioritize
+                v-slot="{ text }"
+            >
+                <ui-button
+                    :text="text"
+                    type="submit"
+                    variant="primary"
+                />
+            </ui-command-palette-item>
         </form>
     </ui-header>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
