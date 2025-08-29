@@ -1,7 +1,6 @@
 /* ==========================================================================
    TABLES
    ========================================================================== */
-
 .data-table {
     @apply w-full max-w-full outline-hidden text-gray-500 antialiased border-separate border-spacing-y-0 min-w-full overflow-x-auto text-start;
 
@@ -29,7 +28,7 @@
     }
 
     tbody {
-        @apply text-sm shadow-sm rounded-xl outline-none;
+        @apply text-sm shadow-sm-b rounded-xl outline-none;
         .contained & {
             @apply shadow-none rounded-none;
         }
@@ -41,18 +40,22 @@
                     @apply ltr:rounded-tl-xl rtl:rounded-tr-xl;
                 }
 
+                td {
+                    @apply border-t border-t-gray-200 dark:border-gray-700;
+                }
+
                 td:last-child,
                 th:last-child {
                     @apply ltr:rounded-tr-xl rtl:rounded-tl-xl;
-                }
-
-                td {
-                    @apply border-0;
                 }
             }
 
             &:last-child {
                 @apply border-none;
+
+                td {
+                    @apply border-b border-b-gray-200 dark:border-gray-700;
+                }
 
                 td:first-child,
                 th:first-child {
@@ -73,6 +76,12 @@
                 @apply bg-white dark:bg-gray-900;
                 @apply pl-4.5 pr-2.5 py-3 border-t border-gray-200 dark:border-white/10;
                 @apply text-gray-900 dark:text-gray-200;
+                &:first-child {
+                    @apply border-s border-s-gray-200 dark:border-gray-700;
+                }
+                &:last-child {
+                    @apply border-e border-e-gray-200 dark:border-gray-700;
+                }
             }
 
             /* When the row is hovered, change the background of all its cells to a hover state color */
