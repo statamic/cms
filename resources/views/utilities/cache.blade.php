@@ -13,7 +13,7 @@
             <ui-command-palette-item
                 category="{{ Statamic\CommandPalette\Category::Actions }}"
                 text="{{ __('Clear All') }}"
-                icon="wand"
+                icon="live-preview"
                 :action="() => $refs.clearAllForm.submit()"
                 prioritize
                 v-slot="{ text }"
