@@ -818,7 +818,7 @@ export default {
                 url: this.actions.editBlueprint,
             });
 
-            this.$refs.actions.preparedActions.forEach(action => Statamic.$commandPalette.add({
+            this.$refs.actions?.preparedActions.forEach(action => Statamic.$commandPalette.add({
                 category: Statamic.$commandPalette.category.Actions,
                 text: action.title,
                 icon: action.icon,
