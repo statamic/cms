@@ -56,6 +56,9 @@
 =================================================== */
 @utility shadow-sm-b {
     box-shadow: 0 3px 2px -1px hsl(0deg 0% 90%), 0 1px 2px hsl(0deg 0% 90%);
+    &:where(.dark, .dark *) {
+        box-shadow: unset;
+    }
 }
 
 /* UTILITIES / STATES

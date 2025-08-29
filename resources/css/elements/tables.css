@@ -41,7 +41,7 @@
                 }
 
                 td {
-                    @apply border-t border-t-gray-200 dark:border-gray-700;
+                    @apply border-t border-t-gray-200 dark:border-t-gray-800;
                 }
 
                 td:last-child,
@@ -54,7 +54,7 @@
                 @apply border-none;
 
                 td {
-                    @apply border-b border-b-gray-200 dark:border-gray-700;
+                    @apply border-b border-b-gray-200 dark:border-b-gray-800;
                 }
 
                 td:first-child,
@@ -77,10 +77,10 @@
                 @apply pl-4.5 pr-2.5 py-3 border-t border-gray-200 dark:border-white/10;
                 @apply text-gray-900 dark:text-gray-200;
                 &:first-child {
-                    @apply border-s border-s-gray-200 dark:border-gray-700;
+                    @apply border-s border-s-gray-200 dark:border-s-gray-800;
                 }
                 &:last-child {
-                    @apply border-e border-e-gray-200 dark:border-gray-700;
+                    @apply border-e border-e-gray-200 dark:border-e-gray-800;
                 }
             }
 
