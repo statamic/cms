@@ -7,100 +7,83 @@
 @if ($licenses->outpostIsOffline())
     {{-- Do nothing. --}}
 @elseif ($licenses->requestFailed())
-    <div class="fixed bottom-0 z-20 w-full p-2">
-        <div
-            class="w-full rounded-lg bg-yellow-200 border border-yellow-400 px-4 py-2 text-sm dark:border-none dark:bg-blue-500"
-        >
-            @if ($licenses->usingLicenseKeyFile())
-                {{ __('statamic::messages.outpost_license_key_error') }}
-            @elseif ($licenses->requestErrorCode() === 422)
-                {{ __('statamic::messages.outpost_error_422') }}
-                {{ join(' ', $licenses->requestValidationErrors()->unique()) }}
-            @elseif ($licenses->requestErrorCode() === 429)
-                {{ __('statamic::messages.outpost_error_429') }}
-                {{ trans_choice('statamic::messages.try_again_in_seconds', $licenses->failedRequestRetrySeconds()) }}
-            @else
-                {{ __('statamic::messages.outpost_issue_try_later') }}
-            @endif
-        </div>
-    </div>
+    <ui-modal :title="__('Licensing Alert')" :open="true || showBanner">
+        @if ($licenses->usingLicenseKeyFile())
+            {{ __('statamic::messages.outpost_license_key_error') }}
+        @elseif ($licenses->requestErrorCode() === 422)
+            {{ __('statamic::messages.outpost_error_422') }}
+            {{ join(' ', $licenses->requestValidationErrors()->unique()) }}
+        @elseif ($licenses->requestErrorCode() === 429)
+            {{ __('statamic::messages.outpost_error_429') }}
+            {{ trans_choice('statamic::messages.try_again_in_seconds', $licenses->failedRequestRetrySeconds()) }}
+        @else
+            {{ __('statamic::messages.outpost_issue_try_later') }}
+        @endif
+    </ui-modal>
 @else
+{{-- $licenses->isOnTestDomain() --}}
+{{-- $licenses->isOnPublicDomain() --}}
     @if ($licenses->invalid())
-        <div class="fixed bottom-0 z-20 w-full p-2" v-cloak v-show="showBanner">
-            <div
-                @class([
-                    'w-full rounded-lg px-4 py-2 text-sm',
-                    'bg-blue-100 dark:bg-blue-800 text-blue-700 dark:text-blue-200' => $licenses->isOnTestDomain(),
-                    'bg-red-600 text-white' => $licenses->isOnPublicDomain(),
-                ])
-            >
-                @if ($licenses->isOnTestDomain())
-                    <div class="flex items-center justify-between">
-                        <span>
-                            <b class="me-2">{{ __('Trial Mode') }}:</b>
-                            @if ($licenses->onlyAddonsAreInvalid())
-                                {{ __('statamic::messages.licensing_trial_mode_alert_addons') }}
-                            @elseif ($licenses->onlyStatamicIsInvalid())
-                                {{ __('statamic::messages.licensing_trial_mode_alert_statamic') }}
-                            @else
-                                {{ __('statamic::messages.licensing_trial_mode_alert') }}
-                            @endif
-                        </span>
-                        <div class="flex gap-1">
-                            <ui-button @click="hideBanner"
-                                variant="ghost"
-                                :text="__('Dismiss')"
-                                size="sm"
-                                inset
-                                class="text-blue-700! dark:text-blue-200!"
-                            />
-                            @can('access licensing utility')
-                                <ui-button
-                                    href="{{ cp_route('utilities.licensing') }}"
-                                    variant="ghost"
-                                    :text="__('Manage Licenses')"
-                                    size="sm"
-                                    inset
-                                    class="text-blue-700! dark:text-blue-200!"
-                                />
-                            @endcan
-                        </div>
-                    </div>
-                @else
-                    <div class="flex items-center justify-between">
+        <ui-modal
+            :title="__('Licensing Alert')"
+            icon="alert-alarm-bell"
+            :open="true || showBanner"
+            class="[&_[data-ui-heading]]:text-red-700! [&_svg]:text-red-700! dark:[&_[data-ui-heading]]:text-red-400! dark:[&_svg]:text-red-400!"
+        >
+            @if ($licenses->isOnTestDomain())
+                <div class="flex items-center justify-between">
+                    <ui-description>
                         @if ($licenses->onlyAddonsAreInvalid())
-                            {{ __('statamic::messages.licensing_production_alert_addons') }}
+                            {{ __('statamic::messages.licensing_trial_mode_alert_addons') }}
                         @elseif ($licenses->onlyStatamicIsInvalid())
-                            @if ($licenses->statamicNeedsRenewal())
-                                {{ __('statamic::messages.licensing_production_alert_renew_statamic') }}
-                            @else
-                                {{ __('statamic::messages.licensing_production_alert_statamic') }}
-                            @endif
+                            {{ __('statamic::messages.licensing_trial_mode_alert_statamic') }}
                         @else
-                            {{ __('statamic::messages.licensing_production_alert') }}
+                            {{ __('statamic::messages.licensing_trial_mode_alert') }}
                         @endif
-                        <div class="flex gap-1">
-                            <ui-button @click="hideBanner"
+                    </ui-description>
+                </div>
+                <template #footer>
+                    <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
+                        <ui-button @click="hideBanner" :text="__('Snooze')" variant="ghost" tabindex="-1" />
+                        @can('access licensing utility')
+                            <ui-button href="{{ cp_route('utilities.licensing') }}" :text="__('Manage Licenses')" />
+                        @endcan
+                    </div>
+                </template>
+            @else
+                <div class="flex items-center justify-between">
+                    @if ($licenses->onlyAddonsAreInvalid())
+                        {{ __('statamic::messages.licensing_production_alert_addons') }}
+                    @elseif ($licenses->onlyStatamicIsInvalid())
+                        @if ($licenses->statamicNeedsRenewal())
+                            {{ __('statamic::messages.licensing_production_alert_renew_statamic') }}
+                        @else
+                            {{ __('statamic::messages.licensing_production_alert_statamic') }}
+                        @endif
+                    @else
+                        {{ __('statamic::messages.licensing_production_alert') }}
+                    @endif
+                    <div class="flex gap-1">
+                        <ui-button @click="hideBanner"
+                            variant="ghost"
+                            :text="__('Dismiss')"
+                            size="sm"
+                            inset
+                            class="text-blue-700! dark:text-blue-200!"
+                        />
+                        @can('access licensing utility')
+                            <ui-button
+                                href="{{ cp_route('utilities.licensing') }}"
                                 variant="ghost"
-                                :text="__('Dismiss')"
+                                :text="__('Manage Licenses')"
                                 size="sm"
                                 inset
                                 class="text-blue-700! dark:text-blue-200!"
                             />
-                            @can('access licensing utility')
-                               <ui-button
-                                    href="{{ cp_route('utilities.licensing') }}"
-                                    variant="ghost"
-                                    :text="__('Manage Licenses')"
-                                    size="sm"
-                                    inset
-                                    class="text-blue-700! dark:text-blue-200!"
-                                />
-                            @endcan
-                        </div>
+                        @endcan
                     </div>
-                @endif
-            </div>
-        </div>
+                </div>
+            @endif
+        </ui-modal>
     @endif
 @endif
