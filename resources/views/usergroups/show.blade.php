@@ -8,15 +8,22 @@
 @section('content')
     <ui-header title="{{ __($group->title()) }}" icon="groups">
         @can('delete', $group)
-            <ui-button @click="$refs.deleter.confirm()">
-                {{ __('Delete Group') }}
-                <resource-deleter
-                    ref="deleter"
-                    resource-title="{{ $group->title() }}"
-                    route="{{ cp_route('user-groups.destroy', $group->handle()) }}"
-                    redirect="{{ cp_route('user-groups.index') }}"
-                ></resource-deleter>
-            </ui-button>
+            <ui-command-palette-item
+                category="{{ Statamic\CommandPalette\Category::Actions }}"
+                text="{{ __('Delete Group') }}"
+                :action="() => $refs.deleter.confirm()"
+                icon="trash"
+            >
+                <ui-button @click="$refs.deleter.confirm()">
+                    {{ __('Delete Group') }}
+                    <resource-deleter
+                        ref="deleter"
+                        resource-title="{{ $group->title() }}"
+                        route="{{ cp_route('user-groups.destroy', $group->handle()) }}"
+                        redirect="{{ cp_route('user-groups.index') }}"
+                    ></resource-deleter>
+                </ui-button>
+            </ui-command-palette-item>
         @endcan
 
         @can('edit', $group)
