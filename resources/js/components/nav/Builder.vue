@@ -7,19 +7,27 @@
                 </DropdownMenu>
             </Dropdown>
 
-            <Button
+            <ui-command-palette-item
                 v-if="isDirty"
-                variant="filled"
+                :category="$commandPalette.category.Actions"
                 :text="__('Discard changes')"
-                @click="$refs.tree.cancel"
-            />
+                icon="trash"
+                :action="$refs.tree.cancel"
+                v-slot="{ text, action }"
+            >
+                <Button
+                    variant="filled"
+                    :text="__('Discard changes')"
+                    @click="action"
+                />
+            </ui-command-palette-item>
 
             <Dropdown placement="left-start">
                 <template #trigger>
                     <Button :text="__('Add')" icon-append="ui/chevron-down" />
                 </template>
                 <DropdownMenu>
-                    <DropdownItem :text="__('Add Nav Item')" @click="addItem($refs.tree.rootChildren[0])" icon="plus" />
+                    <DropdownItem :text="__('Add Nav Item')" @click="addItemToTopLevel" icon="plus" />
                     <DropdownItem :text="__('Add Section')" @click="addSection" icon="add-section" />
                 </DropdownMenu>
             </Dropdown>
@@ -404,6 +412,10 @@ export default {
             this.targetStat = targetStat;
             this.creatingItem = true;
             this.creatingItemIsChild = this.isParentItemNode(targetStat);
+        },
+
+        addItemToTopLevel() {
+            this.addItem(this.$refs.tree.rootChildren[0]);
         },
 
         addSection() {
