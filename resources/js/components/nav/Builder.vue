@@ -25,7 +25,16 @@
             </Dropdown>
 
             <ButtonGroup>
-                <Button type="submit" variant="primary" :disabled="!changed" :text="__('Save')" @click="save" />
+                <ui-command-palette-item
+                    :category="$commandPalette.category.Actions"
+                    :text="__('Save')"
+                    icon="save"
+                    :action="save"
+                    prioritize
+                    v-slot="{ text, action }"
+                >
+                    <Button type="submit" variant="primary" :disabled="!changed" :text="text" @click="action" />
+                </ui-command-palette-item>
 
                 <Dropdown align="end" v-if="hasSaveAsOptions">
                     <template #trigger>
