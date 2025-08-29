@@ -5,6 +5,7 @@
             :open="isWarning && !isShowingLogin"
             :title="__('Your Session is Expiring')"
             class="max-w-[500px]!"
+            :dismissable="false"
         >
             <ui-description v-text="warningText" />
             <Button @click="extend" variant="primary" icon="rewind" :text="__('Extend Session')" class="w-full" />
@@ -35,7 +36,7 @@
             </div>
         </Modal>
 
-        <Modal :title="__('Resume Your Session')" :open="isShowingTwoFactorChallenge" height="auto" class="max-w-[500px]!">
+        <Modal :title="__('Resume Your Session')" :open="isShowingTwoFactorChallenge" height="auto" class="max-w-[500px]!" :dismissable="false">
             <div>
                 <div v-if="twoFactorMode === 'code'" class="space-y-3">
                     <ui-description v-text="__('messages.session_expiry_enter_two_factor_code')" />
