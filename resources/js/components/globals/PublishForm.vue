@@ -15,7 +15,6 @@
 
             <SiteSelector
                 v-if="showLocalizationSelector"
-                class="ltr:mr-4 rtl:ml-4"
                 :sites="localizations"
                 :value="site"
                 @input="localizationSelected"
