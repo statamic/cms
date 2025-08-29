@@ -78,6 +78,7 @@ it('exports ui', async () => {
         'DateRangePicker',
         'Description',
         'DragHandle',
+        'Drawer',
         'Dropdown',
         'DropdownItem',
         'DropdownLabel',
