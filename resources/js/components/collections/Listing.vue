@@ -61,7 +61,13 @@
                 </ui-panel-header>
 
                 <ui-card class="h-40 px-0! py-2!">
-                    <ui-listing :url="collection.entries_listing_url" :per-page="5" :columns="collection.columns">
+                    <ui-listing
+                        :url="collection.entries_listing_url"
+                        :per-page="5"
+                        :columns="collection.columns"
+                        :sort-column="collection.sort_column"
+                        :sort-direction="collection.sort_direction"
+                    >
                         <template #initializing>
                             <div class="flex flex-col gap-[9px] justify-between py-1 px-5">
                                 <ui-skeleton class="h-[19px] w-full" />
