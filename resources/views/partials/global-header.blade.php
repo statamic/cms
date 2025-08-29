@@ -40,11 +40,13 @@
                             @if ($licenses->requestFailed())
                                 color="yellow"
                                 icon="alert-warning-exclamation-mark"
+                            @elseif ($licenses->isOnPublicDomain())
+                                color="red"
                             @else
                                 color="green"
                             @endif
                             href="{{ cp_route('utilities.licensing') }}"
-                            text="{{ __('Pro') }} – {{ __('Trial Mode') }}"
+                            text="{{ __('Pro') }} – {{ $licenses->isOnPublicDomain() ? __('statamic::messages.licensing_error_unlicensed') : __('Trial Mode') }}"
                         ></ui-badge>
                     </ui-tooltip>
                 @endif
