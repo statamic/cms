@@ -5,7 +5,7 @@
             :open="isWarning && !isShowingLogin"
             :title="__('Your Session is Expiring')"
             class="max-w-[500px]!"
-            :dismissable="false"
+            :dismissible="false"
         >
             <ui-description v-text="warningText" />
             <Button @click="extend" variant="primary" icon="rewind" :text="__('Extend Session')" class="w-full" />

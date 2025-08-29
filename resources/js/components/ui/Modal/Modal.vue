@@ -9,7 +9,7 @@ const emit = defineEmits(['update:open']);
 const props = defineProps({
     title: { type: String, default: '' },
     open: { type: Boolean, default: false },
-    dismissable: { type: Boolean, default: true },
+    dismissible: { type: Boolean, default: true },
 });
 
 const hasModalTitleComponent = hasComponent('ModalTitle');
@@ -51,7 +51,7 @@ function updateOpen(value) {
 }
 
 function preventIfNotDismissible(event) {
-    if (!props.dismissable) event.preventDefault();
+    if (!props.dismissible) event.preventDefault();
 }
 </script>
 
