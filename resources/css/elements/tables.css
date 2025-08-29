@@ -29,7 +29,7 @@
     }
 
     tbody {
-        @apply text-sm bg-white dark:bg-gray-900 shadow-sm rounded-xl outline-none;
+        @apply text-sm dark:bg-gray-900 shadow-sm rounded-xl outline-none;
         .contained & {
             @apply shadow-none rounded-none;
         }
@@ -65,17 +65,19 @@
                 }
             }
 
-            &:hover {
-                @apply bg-gray-50 dark:bg-white/2.5;
-            }
-
             th {
                 @apply py-2 ltr:pr-4 rtl:pl-4;
             }
 
             td {
+                @apply bg-white;
                 @apply pl-4.5 pr-2.5 py-3 border-t border-gray-200 dark:border-white/10;
                 @apply text-gray-900 dark:text-gray-200;
+            }
+
+            /* When the row is hovered, change the background of all its cells to a hover state color */
+            &:has(:hover) td {
+                @apply bg-gray-50 dark:bg-white/2.5;
             }
         }
 
