@@ -190,6 +190,13 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             ->args(func_get_args());
     }
 
+    public function freshBlueprint()
+    {
+        Blink::forget("entry-{$this->id()}-blueprint");
+
+        return $this->blueprint();
+    }
+
     public function collectionHandle()
     {
         return $this->collection;

@@ -93,7 +93,7 @@ class EntriesController extends CpController
 
         $entry = $entry->fromWorkingCopy();
 
-        $blueprint = $entry->blueprint();
+        $blueprint = $entry->freshBlueprint();
 
         if (! $blueprint) {
             throw new BlueprintNotFoundException($entry->value('blueprint'), 'collections/'.$collection->handle());
