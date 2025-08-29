@@ -114,7 +114,8 @@ const getInputLabel = (part) => {
                         'text-gray-600 dark:text-gray-300',
                         'shadow-ui-sm not-prose h-10 rounded-lg px-2 disabled:shadow-none',
                         'data-invalid:border-red-500',
-                        'disabled:shadow-none disabled:opacity-50 read-only:border-dashed'
+                        'disabled:shadow-none disabled:opacity-50',
+                        readOnly ? 'border-dashed' : '',
                     ]"
                     :aria-invalid="isInvalid"
                     role="textbox"
