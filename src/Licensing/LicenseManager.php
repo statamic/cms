@@ -131,38 +131,19 @@ class LicenseManager
         return $this->outpost->usingLicenseKeyFile();
     }
 
-    public function getLicensingAlert()
+    public function licensingAlert()
     {
-        // Return null if outpost is offline (no alert needed)
-        if ($this->outpostIsOffline()) {
+        if ($this->outpostIsOffline() || $this->requestFailed() || ! $this->invalid()) {
             return null;
         }
 
-        // Handle request failures
-        if ($this->requestFailed()) {
-            return [
-                'type' => 'request_failed',
-                'message' => $this->getRequestFailureMessage(),
-                'variant' => 'default',
-            ];
-        }
-
-        // Handle invalid licenses
-        if ($this->invalid()) {
-            $isTestDomain = $this->isOnTestDomain();
-
-            return [
-                'type' => 'invalid_license',
-                'message' => $this->getInvalidLicenseMessage($isTestDomain),
-                'is_test_domain' => $isTestDomain,
-                'variant' => 'danger',
-            ];
-        }
-
-        return null;
+        return [
+            'testing' => $isTestDomain = $this->isOnTestDomain(),
+            'message' => $this->invalidLicenseMessage($isTestDomain),
+        ];
     }
 
-    protected function getRequestFailureMessage()
+    public function requestFailureMessage()
     {
         if ($this->usingLicenseKeyFile()) {
             return __('statamic::messages.outpost_license_key_error');
@@ -170,18 +151,18 @@ class LicenseManager
 
         if ($this->requestErrorCode() === 422) {
             return __('statamic::messages.outpost_error_422').' '.
-                   implode(' ', $this->requestValidationErrors()->unique());
+                implode(' ', $this->requestValidationErrors()->unique());
         }
 
         if ($this->requestErrorCode() === 429) {
             return __('statamic::messages.outpost_error_429').' '.
-                   trans_choice('statamic::messages.try_again_in_seconds', $this->failedRequestRetrySeconds());
+                trans_choice('statamic::messages.try_again_in_seconds', $this->failedRequestRetrySeconds());
         }
 
         return __('statamic::messages.outpost_issue_try_later');
     }
 
-    protected function getInvalidLicenseMessage($isTestDomain)
+    private function invalidLicenseMessage($isTestDomain)
     {
         if ($isTestDomain) {
             if ($this->onlyAddonsAreInvalid()) {
@@ -195,7 +176,6 @@ class LicenseManager
             return __('statamic::messages.licensing_trial_mode_alert');
         }
 
-        // Production domain
         if ($this->onlyAddonsAreInvalid()) {
             return __('statamic::messages.licensing_production_alert_addons');
         }

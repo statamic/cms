@@ -32,10 +32,21 @@
                 {{ $customLogoText ?? config('app.name') }}
             </a>
             @if (Statamic::pro())
-                @if (!$licenses->statamicValid())
-                    <ui-badge color="green" text="Pro – Trial Mode" href="{{ cp_route('utilities.licensing') }}" />
+                @if ($licenses->valid())
+                    <ui-badge size="sm" variant="flat" text="{{ __('Pro') }}" class="hidden sm:block select-none dark:bg-black/20!" />
                 @else
-                    <ui-badge size="sm" variant="flat" text="Pro" class="hidden sm:block select-none dark:bg-black/20!" />
+                    <ui-tooltip :text="{{ $licenses->requestFailed() ? "'".$licenses->requestFailureMessage()."'" : 'null' }}">
+                        <ui-badge
+                            @if ($licenses->requestFailed())
+                                color="yellow"
+                                icon="alert-warning-exclamation-mark"
+                            @else
+                                color="green"
+                            @endif
+                            href="{{ cp_route('utilities.licensing') }}"
+                            text="{{ __('Pro') }} – {{ __('Trial Mode') }}"
+                        ></ui-badge>
+                    </ui-tooltip>
                 @endif
             @endif
         </div>
