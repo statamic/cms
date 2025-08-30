@@ -22,7 +22,6 @@
                     :class="{
                         'nav-closed': ! navOpen,
                         'nav-open': navOpen,
-                        'showing-license-banner': showBanner
                     }"
                 >
                     <main id="main" class="flex bg-body-bg dark:bg-dark-body-bg dark:border-t rounded-t-2xl dark:border-dark-body-border fixed top-14 inset-x-0 bottom-0 min-h-[calc(100vh-3.5rem)]">
