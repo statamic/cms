@@ -233,13 +233,9 @@ class StaticWarm extends Command
     {
         $uri = URL::makeRelative($uri);
 
-        if (Str::endsWith($pattern, '*')) {
-            $prefix = Str::removeRight($pattern, '*');
-
-            if (Str::startsWith($uri, $prefix) && ! (Str::endsWith($prefix, '/') && $uri === $prefix)) {
-                return true;
-            }
-        } elseif (Str::removeRight($uri, '/') === Str::removeRight($pattern, '/')) {
+        if (Str::endsWith($pattern, '*') && Str::startsWith($uri, Str::removeRight($pattern, '*'))) {
+            return true;
+        } elseif (URL::tidy($uri, '/') === URL::tidy($pattern, '/')) {
             return true;
         }
 
