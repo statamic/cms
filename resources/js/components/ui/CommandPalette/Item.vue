@@ -9,6 +9,8 @@ const props = defineProps({
     url: { type: String },
     action: { type: Function },
     openNewTab: { type: Boolean },
+    badge: { type: String },
+    keys: { type: String },
     trackRecent: { type: Boolean },
     prioritize: { type: Boolean },
 });
@@ -26,5 +28,7 @@ onUnmounted(() => command.remove());
         :text="text"
         :url="url"
         :action="action"
+        :badge="badge"
+        :keys="keys"
     />
 </template>

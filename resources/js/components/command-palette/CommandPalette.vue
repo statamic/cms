@@ -112,6 +112,10 @@ function normalizeItem(item) {
         item.text = item.text.join(' » ');
     }
 
+    if (typeof item.keys === 'string') {
+        item.keys = Statamic.$keys.render(item.keys).map(key => key.toUpperCase());
+    }
+
     return item;
 }
 
@@ -315,7 +319,8 @@ const modalClasses = cva({
                                             :icon="item.icon"
                                             :href="item.url"
                                             :open-new-tab="item.openNewTab"
-                                            :badge="item.keys || item.badge"
+                                            :badge="item.badge"
+                                            :keys="item.keys"
                                             :removable="isRecentItem(item)"
                                             @remove="removeRecentItem"
                                         >
