@@ -319,7 +319,8 @@ const modalClasses = cva({
                                             :icon="item.icon"
                                             :href="item.url"
                                             :open-new-tab="item.openNewTab"
-                                            :badge="item.keys || item.badge"
+                                            :badge="item.badge"
+                                            :keys="item.keys"
                                             :removable="isRecentItem(item)"
                                             @remove="removeRecentItem"
                                         >
