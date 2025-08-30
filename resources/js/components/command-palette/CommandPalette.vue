@@ -112,6 +112,10 @@ function normalizeItem(item) {
         item.text = item.text.join(' » ');
     }
 
+    if (typeof item.keys === 'string') {
+        item.keys = Statamic.$keys.render(item.keys).map(key => key.toUpperCase());
+    }
+
     return item;
 }
 
