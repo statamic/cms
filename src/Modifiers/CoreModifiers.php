@@ -2870,7 +2870,7 @@ class CoreModifiers extends Modifier
     {
         $timezone = Arr::get($params, 0, Statamic::displayTimezone());
 
-        return $this->carbon($value)->tz($timezone);
+        return $this->carbon($value)->clone()->tz($timezone);
     }
 
     public function typeOf($value)
