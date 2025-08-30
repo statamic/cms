@@ -190,7 +190,7 @@
                 <td>
                     <div class="flex items-center">
                         <div class="w-4 h-4 rtl:ml-4 ltr:mr-4">@cp_svg('icons/light/blueprint')</div>
-                        <a href="{{ cp_route('blueprints.edit', [$blueprint['namespace'], $blueprint['handle']]) }}">{{ $blueprint['title'] }}</a>
+                        <a href="{{ cp_route('blueprints.edit', [$blueprint['namespace'], $blueprint['handle']]) }}">{{ __($blueprint['title']) }}</a>
                     </div>
                 </td>
                 <th class="actions-column">
