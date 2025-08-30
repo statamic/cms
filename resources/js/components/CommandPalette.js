@@ -16,6 +16,7 @@ class Command {
         this.action = command.action;
         this.prioritize = command.prioritize ?? false;
         this.trackRecent = command.trackRecent ?? false;
+        this.keys = command.keys;
 
         this.#validate();
     }
