@@ -31,7 +31,7 @@
                 @class([
                     'w-full rounded-lg px-4 py-2 text-sm',
                     'bg-blue-100 dark:bg-blue-800 text-blue-700 dark:text-blue-200' => $licenses->isOnTestDomain(),
-                    'bg-red-500 text-white' => $licenses->isOnPublicDomain(),
+                    'bg-red-600 text-white' => $licenses->isOnPublicDomain(),
                 ])
             >
                 @if ($licenses->isOnTestDomain())

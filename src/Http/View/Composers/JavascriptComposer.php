@@ -6,6 +6,7 @@ use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 use Statamic\CommandPalette\Category;
+use Statamic\Facades\CommandPalette;
 use Statamic\Facades\CP\Toast;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
@@ -74,6 +75,7 @@ class JavascriptComposer
             'hasLicenseBanner' => ! $licenses->outpostIsOffline() && ($licenses->invalid() || $licenses->requestFailed()),
             'customSvgIcons' => Icon::getCustomSvgIcons(),
             'commandPaletteCategories' => Category::order(),
+            'commandPalettePreloadedItems' => CommandPalette::getPreloadedItems(),
         ];
     }
 

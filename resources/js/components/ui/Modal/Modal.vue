@@ -1,14 +1,15 @@
 <script setup>
 import { cva } from 'cva';
-import { hasComponent } from '@statamic/composables/has-component.js';
+import { hasComponent } from '@/composables/has-component.js';
 import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, DialogTrigger } from 'reka-ui';
-import { getCurrentInstance, ref, watch } from 'vue';
+import { computed, getCurrentInstance, ref, watch } from 'vue';
 
 const emit = defineEmits(['update:open']);
 
 const props = defineProps({
     title: { type: String, default: '' },
     open: { type: Boolean, default: false },
+    dismissible: { type: Boolean, default: true },
 });
 
 const hasModalTitleComponent = hasComponent('ModalTitle');
@@ -28,7 +29,7 @@ const modalClasses = cva({
 })({});
 
 const instance = getCurrentInstance();
-const isUsingOpenProp = instance && 'open' in instance.vnode.props;
+const isUsingOpenProp = computed(() => instance?.vnode.props?.hasOwnProperty('open'));
 
 const open = ref(props.open);
 
@@ -39,30 +40,36 @@ watch(
 
 // When the parent component controls the open state, emit an update event
 // so it can update its state, which eventually gets passed down as a prop.
-// Otherwise, just update the local state.
+// Otherwise, update the local state.
 function updateOpen(value) {
-    if (isUsingOpenProp) {
+    if (isUsingOpenProp.value) {
         emit('update:open', value);
         return;
     }
 
     open.value = value;
 }
+
+function preventIfNotDismissible(event) {
+    if (!props.dismissible) event.preventDefault();
+}
 </script>
 
 <template>
-    <DialogRoot :open @update:open="updateOpen">
+    <DialogRoot :open="open" @update:open="updateOpen">
         <DialogTrigger data-ui-modal-trigger as-child>
             <slot name="trigger" />
         </DialogTrigger>
         <DialogPortal>
-            <DialogOverlay
-                class="data-[state=open]:show fixed inset-0 z-30 bg-gray-800/20 backdrop-blur-[2px] dark:bg-gray-800/50"
-            />
-            <DialogContent :class="[modalClasses, $attrs.class]" data-ui-modal-content :aria-describedby="undefined">
-                <div
-                    class="relative space-y-3 rounded-xl border border-gray-400/60 bg-white p-4 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:border-none dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/15"
-                >
+            <DialogOverlay class="data-[state=open]:show fixed inset-0 z-30 bg-gray-800/20 backdrop-blur-[2px] dark:bg-gray-800/50" />
+            <DialogContent
+                :class="[modalClasses, $attrs.class]"
+                data-ui-modal-content
+                :aria-describedby="undefined"
+                @pointer-down-outside="preventIfNotDismissible"
+                @escape-key-down="preventIfNotDismissible"
+            >
+                <div class="relative space-y-3 rounded-xl border border-gray-400/60 bg-white p-4 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:border-none dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/15" >
                     <DialogTitle v-if="!hasModalTitleComponent" data-ui-modal-title class="font-medium">
                         {{ title }}
                     </DialogTitle>

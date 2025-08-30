@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import { Button, Dropdown, DropdownMenu, DropdownItem, DropdownLabel } from '@statamic/ui';
+import { Button, Dropdown, DropdownMenu, DropdownItem, DropdownLabel } from '@/components/ui';
 
 export default {
     components: {

@@ -1,22 +1,37 @@
 @theme inline {
-    --color-primary: var(--color-zinc-800);
+    --color-primary: var(--theme-color-primary);
     --color-primary-border: color-mix(in oklch, var(--color-primary) 100%, black 20%);
     --color-primary-hover: color-mix(in oklch, var(--color-primary) 100%, black 30%);
     --color-primary-gap: color-mix(in oklch, var(--color-primary) 100%, black 50%);
-    --color-success: var(--color-green-400);
-    --color-gray-50: var(--color-zinc-50);
-    --color-gray-100: var(--color-zinc-100);
-    --color-gray-200: var(--color-zinc-200);
-    --color-gray-300: var(--color-zinc-300);
-    --color-gray-400: var(--color-zinc-400);
-    --color-gray-500: var(--color-zinc-500);
-    --color-gray-600: var(--color-zinc-600);
-    --color-gray-700: var(--color-zinc-700);
-    --color-gray-800: var(--color-zinc-800);
-    --color-gray-850: oklch(24.48% 0.0056 285.98);
-    --color-gray-900: var(--color-zinc-900);
-    --color-gray-950: var(--color-zinc-950);
+    --color-success: var(--theme-color-success);
+    --color-gray-50: var(--theme-color-gray-50);
+    --color-gray-100: var(--theme-color-gray-100);
+    --color-gray-200: var(--theme-color-gray-200);
+    --color-gray-300: var(--theme-color-gray-300);
+    --color-gray-400: var(--theme-color-gray-400);
+    --color-gray-500: var(--theme-color-gray-500);
+    --color-gray-600: var(--theme-color-gray-600);
+    --color-gray-700: var(--theme-color-gray-700);
+    --color-gray-800: var(--theme-color-gray-800);
+    --color-gray-850: var(--theme-color-gray-850);
+    --color-gray-900: var(--theme-color-gray-900);
+    --color-gray-950: var(--theme-color-zinc-950);
     --color-volt: oklch(93.86% 0.2018 122.24);
+
+    --color-body-bg: var(--theme-color-body-bg);
+    --color-body-border: var(--theme-color-body-border);
+    --color-dark-body-bg: var(--theme-color-dark-body-bg);
+    --color-dark-body-border: var(--theme-color-dark-body-border);
+    --color-content-border: var(--theme-color-content-border);
+    --color-dark-content-bg: var(--theme-color-dark-content-bg);
+    --color-dark-content-border: var(--theme-color-dark-content-border);
+    --color-global-header-bg: var(--theme-color-global-header-bg);
+    --color-dark-global-header-bg: var(--theme-color-dark-global-header-bg);
+    --color-progress-bar: var(--theme-color-progress-bar);
+    --color-ui-accent: var(--theme-color-ui-accent);
+    --color-dark-ui-accent: var(--theme-color-dark-ui-accent);
+    --color-switch-bg: var(--theme-color-switch-bg);
+    --color-dark-switch-bg: var(--theme-color-dark-switch-bg);
 
     /* Temp */
     --color-dark-100: #dfe1e5;
@@ -96,6 +111,8 @@
     --shadow-ui-lg: 0px 4px 7px -4px rgba(0,0,0,0.15);
     --shadow-ui-xl: 0px 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
 
+    --animation-timing-function-fast-out-slow-in: cubic-bezier(.4,0,.2,1);
+
     /* Custom value because gray-100 is too light and gray-200 is too dark, e.g. Bard active buttons */
     --color-button-active-light-theme: hsl(from var(--color-gray-200) h s l / 0.6);
 
@@ -123,7 +140,11 @@
 
 @layer components {
     .content-card {
-        @apply min-h-full px-6 md:px-12 pb-6 bg-white border dark:bg-gray-900 dark:border-y-0 dark:border-r-0 border-gray-200 dark:border-white/7 rounded-2xl dark:rounded-none;
+        @apply min-h-full px-3 sm:px-6 md:px-12 sm:pb-6 border dark:bg-dark-content-bg dark:border-y-0 dark:border-r-0 border-content-border dark:border-dark-content-border rounded-2xl dark:rounded-none;
+        background: var(--theme-color-content-bg);
+    }
+    .dark .content-card {
+        background: var(--theme-color-dark-content-bg);
     }
 }
 

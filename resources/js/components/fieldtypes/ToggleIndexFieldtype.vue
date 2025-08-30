@@ -1,7 +1,7 @@
 <template>
     <div class="flex items-center">
-        <svg-icon name="light/check" class="w-3 text-green-600" v-if="this.value" />
-        <svg-icon name="light/close" class="w-3 text-gray-500" v-if="!this.value" />
+        <ui-icon name="checkmark" class="text-green-600" v-if="this.value" />
+        <ui-icon name="x" class="text-gray-400 dark:text-gray-600" v-if="!this.value" />
     </div>
 </template>
 

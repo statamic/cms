@@ -17,6 +17,7 @@
             <create-entry-button
                 text="{{ $button }}"
                 url="{{ $collection->createEntryUrl(Site::selected()) }}"
+                size="sm"
                 variant="default"
                 :blueprints="{{ $blueprints->toJson() }}"
             ></create-entry-button>

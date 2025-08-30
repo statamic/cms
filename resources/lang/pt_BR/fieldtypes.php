@@ -171,7 +171,7 @@ return [
     'taggable.config.placeholder' => 'Digite e pressione ↩ Enter',
     'taggable.title' => 'Tagável',
     'taxonomies.title' => 'Taxonomias',
-    'template.config.blueprint' => 'Adiciona uma opção &quot;map to blueprint&quot;. Saiba mais na [documentação](https://statamic.dev/views#inferring-templates-from-entry-blueprints).',
+    'template.config.blueprint' => 'Adiciona uma opção &quot;map to blueprint&quot;. Saiba mais na [documentação](https://statamic.dev/views#map-templates-to-entry-blueprints).',
     'template.config.folder' => 'Mostrar somente modelos nesta pasta.',
     'template.config.hide_partials' => 'Parciais raramente são usados como modelos.',
     'template.title' => 'Modelo',

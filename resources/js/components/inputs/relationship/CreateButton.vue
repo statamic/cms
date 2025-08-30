@@ -1,12 +1,18 @@
 <template>
     <div>
-        <ui-dropdown :disabled="creatables.length === 1">
+        <ui-button
+            v-if="creatables.length === 1"
+            :icon="icon"
+            :text="text"
+            variant="filled"
+            @click="create"
+        />
+        <ui-dropdown v-else>
             <template #trigger>
                 <ui-button
                     :icon="icon"
                     :text="text"
                     variant="filled"
-                    @click="create"
                 />
             </template>
             <ui-dropdown-menu>

@@ -1,6 +1,8 @@
 import { marked } from 'marked';
 
 export default function (markdown, options = {}) {
+    if (!markdown) return '';
+
     const renderer = new marked.Renderer();
 
     if (options.openLinksInNewTabs) {

@@ -174,7 +174,7 @@ return [
     'taggable.config.placeholder' => 'Escribe y pulsa ↩ Enter',
     'taggable.title' => 'Taggable',
     'taxonomies.title' => 'Taxonomías',
-    'template.config.blueprint' => 'Agrega una opción de "mapa a plano". Obtenga más información en la [documentación](https://statamic.dev/views#inferring-templates-from-entry-blueprints).',
+    'template.config.blueprint' => 'Agrega una opción de "mapa a plano". Obtenga más información en la [documentación](https://statamic.dev/views#map-templates-to-entry-blueprints).',
     'template.config.folder' => 'Solo mostrar plantillas en esta carpeta.',
     'template.config.hide_partials' => 'Los parciales rara vez están destinados a ser utilizados como plantillas.',
     'template.title' => 'Plantilla',

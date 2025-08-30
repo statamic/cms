@@ -1,10 +1,22 @@
 <script setup>
-import { ref } from 'vue';
-import { Badge, DropdownItem, Listing } from '@statamic/ui';
+import { ref, onMounted } from 'vue';
+import { Badge, DropdownItem, Listing } from '@/components/ui';
 
 const props = defineProps(['initialRows', 'initialColumns']);
 const rows = ref(props.initialRows);
 const columns = ref(props.initialColumns);
+
+onMounted(() => {
+    props.initialRows.forEach(addon => {
+        Statamic.$commandPalette.add({
+            category: Statamic.$commandPalette.category.Actions,
+            text: [__('Browse the Marketplace'), addon.name],
+            icon: 'external-link',
+            url: addon.marketplace_url,
+            openNewTab: true,
+        });
+    });
+});
 </script>
 
 <template>

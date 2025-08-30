@@ -31,19 +31,21 @@ class Group extends Fieldtype
                 ],
             ],
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Appearance'),
                 'fields' => [
                     'fullscreen' => [
                         'display' => __('Allow Fullscreen Mode'),
                         'instructions' => __('statamic::fieldtypes.grid.config.fullscreen'),
                         'type' => 'toggle',
                         'default' => true,
+                        'width' => 50,
                     ],
                     'border' => [
                         'display' => __('Border'),
                         'instructions' => __('statamic::fieldtypes.grid.config.border'),
                         'type' => 'toggle',
                         'default' => true,
+                        'width' => 50,
                     ],
                 ],
             ],

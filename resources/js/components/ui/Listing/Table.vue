@@ -1,7 +1,7 @@
 <script setup>
-import { Panel, PanelFooter } from '@statamic/ui';
+import { Panel, PanelFooter } from '@/components/ui';
 import { ref, computed, useTemplateRef, useSlots } from 'vue';
-import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
+import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
 import Pagination from './Pagination.vue';
 import TableHead from './TableHead.vue';
 import TableBody from './TableBody.vue';
@@ -17,7 +17,7 @@ const props = defineProps({
     },
 });
 
-const { visibleColumns, selections, hasActions, showBulkActions, loading, reorderable } = injectListingContext();
+const { visibleColumns, selections, items, hasActions, showBulkActions, loading, reorderable } = injectListingContext();
 const shifting = ref(false);
 const hasSelections = computed(() => selections.value.length > 0);
 
@@ -42,6 +42,7 @@ const forwardedTableCellSlots = computed(() => {
 
 <template>
     <table
+        v-if="items.length > 0"
         :data-size="relativeColumnsSize"
         :class="{
             'select-none': shifting,
@@ -66,4 +67,9 @@ const forwardedTableCellSlots = computed(() => {
             </template>
         </TableBody>
     </table>
+    <div v-if="items.length === 0">
+        <div class="text-center text-gray-500 text-sm pt-4">
+            {{ __('No items found') }}
+        </div>
+    </div>
 </template>

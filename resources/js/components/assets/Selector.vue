@@ -21,7 +21,7 @@
                     <template #initializing>
                         <div class="flex flex-1">
                             <div class="absolute inset-0 z-200 flex items-center justify-center text-center">
-                                <loading-graphic />
+                                <Icon name="loading" />
                             </div>
                         </div>
                     </template>
@@ -80,11 +80,12 @@ import {
     Panel,
     PanelFooter,
     ListingPagination, Slider, PanelHeader,
-} from '@statamic/ui';
-import HasPreferences from '@statamic/components/data-list/HasPreferences.js';
-import Breadcrumbs from '@statamic/components/assets/Browser/Breadcrumbs.vue';
-import Grid from '@statamic/components/assets/Browser/Grid.vue';
-import Uploads from '@statamic/components/assets/Uploads.vue';
+    Icon,
+} from '@/components/ui';
+import HasPreferences from '@/components/data-list/HasPreferences.js';
+import Breadcrumbs from '@/components/assets/Browser/Breadcrumbs.vue';
+import Grid from '@/components/assets/Browser/Grid.vue';
+import Uploads from '@/components/assets/Uploads.vue';
 
 export default {
     mixins: [HasPreferences],
@@ -103,6 +104,7 @@ export default {
         Pagination,
         Panel,
         PanelFooter,
+        Icon,
     },
 
     props: {
@@ -136,9 +138,12 @@ export default {
     },
 
     watch: {
-        browserSelections(selections) {
-            if (this.maxFiles === 1 && selections.length === 1) {
-                this.select();
+        browserSelections: {
+            deep: true,
+            handler: function (selections) {
+                if (this.maxFiles === 1 && selections.length === 1) {
+                    this.select();
+                }
             }
         },
     },

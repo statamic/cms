@@ -171,7 +171,7 @@ return [
     'taggable.config.placeholder' => 'Napište a stiskněte ↩ Enter',
     'taggable.title' => 'Označení',
     'taxonomies.title' => 'Taxonomie',
-    'template.config.blueprint' => 'Přidá možnost „mapovat k plánu“. Další informace najdete v [dokumentaci](https://statamic.dev/views#inferring-templates-from-entry-blueprints).',
+    'template.config.blueprint' => 'Přidá možnost „mapovat k plánu“. Další informace najdete v [dokumentaci](https://statamic.dev/views#map-templates-to-entry-blueprints).',
     'template.config.folder' => 'Zobrazit pouze šablony v této složce.',
     'template.config.hide_partials' => 'Skrýt všechny části šablony.',
     'template.title' => 'Šablona',

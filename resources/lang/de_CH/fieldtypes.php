@@ -175,7 +175,7 @@ return [
     'taggable.config.placeholder' => 'Tippen und ↩ Enter drücken',
     'taggable.title' => 'Tags',
     'taxonomies.title' => 'Taxonomien',
-    'template.config.blueprint' => 'Fügt die Option «Korrespondiert mit Blueprint» hinzu. Erfahre mehr in der [Dokumentation](https://statamic.dev/views#inferring-templates-from-entry-blueprints).',
+    'template.config.blueprint' => 'Fügt die Option «Korrespondiert mit Blueprint» hinzu. Erfahre mehr in der [Dokumentation](https://statamic.dev/views#map-templates-to-entry-blueprints).',
     'template.config.folder' => 'Nur Templates aus diesem Ordner anzeigen.',
     'template.config.hide_partials' => 'Partials sind selten als Templates gedacht.',
     'template.title' => 'Template',

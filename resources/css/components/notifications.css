@@ -21,11 +21,11 @@
     }
 
     &.success i {
-        @apply bg-green-400 text-green-900 dark:bg-green-500 dark:text-green-950;
+        @apply bg-green-400 text-green-900 dark:bg-green-400 dark:text-green-950;
     }
 
     &.error i {
-        @apply bg-red-500 dark:bg-red-600;
+        @apply bg-red-600 dark:bg-red-600;
     }
 
     &.default i {

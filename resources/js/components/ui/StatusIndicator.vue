@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue';
-import { Tooltip } from '@statamic/ui';
+import { Tooltip } from '@/components/ui';
 
 const props = defineProps({
     status: {

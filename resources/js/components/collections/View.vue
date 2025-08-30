@@ -6,8 +6,6 @@
                 :url="actionUrl"
                 :actions="actions"
                 :item="handle"
-                @started="actionStarted"
-                @completed="actionCompleted"
                 v-slot="{ actions }"
             >
                 <Dropdown placement="left-start">
@@ -83,6 +81,7 @@
                 :url="createUrl"
                 :blueprints="blueprints"
                 :text="createLabel"
+                :command-palette="true"
             />
         </Header>
 
@@ -177,8 +176,8 @@ import DeleteEntryConfirmation from './DeleteEntryConfirmation.vue';
 import DeleteLocalizationConfirmation from './DeleteLocalizationConfirmation.vue';
 import SiteSelector from '../SiteSelector.vue';
 import { defineAsyncComponent } from 'vue';
-import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator, Header, Button, ToggleGroup, ToggleItem } from '@statamic/ui';
-import ItemActions from '@statamic/components/actions/ItemActions.vue';
+import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator, Header, Button, ToggleGroup, ToggleItem } from '@/components/ui';
+import ItemActions from '@/components/actions/ItemActions.vue';
 
 export default {
     components: {
@@ -388,25 +387,29 @@ export default {
 
         addToCommandPalette() {
             Statamic.$commandPalette.add({
-                text: __('Collection') + ' » ' + __('Configure'),
+                category: Statamic.$commandPalette.category.Actions,
+                text: [__('Collection'), __('Configure')],
                 icon: 'cog',
                 url: this.editUrl,
             });
 
             Statamic.$commandPalette.add({
-                text: __('Collection') + ' » ' + __('Edit Blueprints'),
-                icon: 'cog',
+                category: Statamic.$commandPalette.category.Actions,
+                text: [__('Collection'), __('Edit Blueprints')],
+                icon: 'blueprint-edit',
                 url: this.blueprintsUrl,
             });
 
             Statamic.$commandPalette.add({
-                text: __('Collection') + ' » ' + __('Scaffold Views'),
+                category: Statamic.$commandPalette.category.Actions,
+                text: [__('Collection'), __('Scaffold Views')],
                 icon: 'scaffold',
                 url: this.scaffoldUrl,
             });
 
-            this.$refs.actions.preparedActions.forEach(action => Statamic.$commandPalette.add({
-                text: __('Collection') + ' » ' + action.title,
+            this.$refs.actions?.preparedActions.forEach(action => Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: [__('Collection'), action.title],
                 icon: action.icon,
                 action: action.run,
             }));

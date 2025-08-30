@@ -1,5 +1,5 @@
 <script setup>
-import { Card, Icon } from '@statamic/ui';
+import { Card, Icon } from '@/components/ui';
 
 defineProps({
     title: String,
@@ -10,12 +10,12 @@ defineProps({
 <template>
     <Card inset class="@container/widget">
         <div class="flex h-full min-h-54 flex-col">
-            <header class="flex h-15 items-center justify-between border-b border-gray-200 px-4 py-2 dark:border-gray-700">
+            <header class="flex items-center min-h-[49px] justify-between border-b border-gray-200 px-4.5 py-2 dark:border-gray-700">
                 <div class="flex items-center gap-3">
                     <Icon :name="icon" class="hidden! size-5 text-gray-500 @xs/widget:block!" />
                     <span v-text="title" />
                 </div>
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-4 -mr-2.5">
                     <slot name="actions" />
                 </div>
             </header>

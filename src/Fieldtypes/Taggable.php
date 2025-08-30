@@ -4,6 +4,7 @@ namespace Statamic\Fieldtypes;
 
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
+use Statamic\Support\Arr;
 
 class Taggable extends Fieldtype
 {
@@ -13,17 +14,22 @@ class Taggable extends Fieldtype
     protected function configFieldItems(): array
     {
         return [
-            'placeholder' => [
-                'display' => __('Placeholder'),
-                'instructions' => __('statamic::fieldtypes.select.config.placeholder'),
-                'type' => 'text',
-                'default' => __('statamic::fieldtypes.taggable.config.placeholder'),
-            ],
-            'options' => [
-                'display' => __('Options'),
-                'instructions' => __('statamic::fieldtypes.taggable.config.options'),
-                'type' => 'list',
-                'add_button' => __('Add Option'),
+            [
+                'display' => __('Selection & Options'),
+                'fields' => [
+                    'placeholder' => [
+                        'display' => __('Placeholder'),
+                        'instructions' => __('statamic::fieldtypes.select.config.placeholder'),
+                        'type' => 'text',
+                        'default' => __('statamic::fieldtypes.taggable.config.placeholder'),
+                    ],
+                    'options' => [
+                        'display' => __('Options'),
+                        'instructions' => __('statamic::fieldtypes.taggable.config.options'),
+                        'type' => 'list',
+                        'add_button' => __('Add Option'),
+                    ],
+                ],
             ],
         ];
     }
@@ -37,7 +43,7 @@ class Taggable extends Fieldtype
 
     public function preProcess($data)
     {
-        return ($data) ? $data : [];
+        return Arr::wrap($data);
     }
 
     public function toGqlType()

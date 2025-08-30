@@ -1,22 +1,7 @@
 <template>
-    <node-view-wrapper>
-        <Motion
-            layout
-            class="flex justify-center py-3 relative group"
-            :initial="{ paddingTop: '0.75rem', paddingBottom: '0.75rem' }"
-            :hover="{ paddingTop: '1.25rem', paddingBottom: '1.25rem' }"
-            :transition="{ duration: 0.2 }"
-        >
-            <div v-if="showConnector" class="absolute group-hover:opacity-0 transition-opacity delay-25 duration-125 inset-y-0 h-full left-3.5 border-l-1 border-gray-400 dark:border-gray-600 border-dashed z-0 dark:bg-dark-700" />
-            <button class="w-full absolute inset-0 h-full opacity-0 group-hover:opacity-100 transition-opacity delay-25 duration-75 cursor-pointer">
-                <div class="h-full flex flex-col justify-center">
-                    <div class="rounded-full bg-gray-200 h-2" />
-                </div>
-            </button>
-            <Button v-if="enabled" round icon="plus" size="sm" class="-my-4 z-3 opacity-0 group-hover:opacity-100 transition-opacity delay-25 duration-75" />
-        </Motion>
+    <node-view-wrapper class="my-4">
         <div
-            class="shadow-ui-sm relative z-2 w-full rounded-lg border border-gray-200 bg-white text-base dark:border-x-0 dark:border-t-0 dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
+            class="shadow-ui-sm relative z-2 w-full rounded-lg border border-gray-300 bg-white text-base dark:border-x-0 dark:border-t-0 dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
             :class="{
                 'dark:border-dark-blue-100 border-blue-400!': selected || withinSelection,
                 'border-red-500': hasError,
@@ -29,25 +14,24 @@
         >
             <div ref="content" hidden />
             <header
-                class="group/header animate-border-color flex items-center rounded-lg border-b border-transparent px-1.5 antialiased duration-200 hover:bg-gray-50"
-                :class="{ 'rounded-b-none border-gray-200! dark:border-white/10': !collapsed, invalid: isInvalid }"
+                class="group/header animate-border-color flex items-center rounded-lg border-b border-transparent px-1.5 antialiased duration-200 dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900!"
+                :class="{ 'rounded-b-none border-gray-200 dark:border-white/10': !collapsed }"
             >
-                <Icon data-drag-handle name="handles" class="size-4 cursor-grab text-gray-400" v-if="!isReadOnly" />
-                <button type="button" class="flex flex-1 items-center gap-4 p-2" @click="toggleCollapsedState">
+                <Icon data-drag-handle name="ui/handles" class="size-4 cursor-grab text-gray-400" v-if="!isReadOnly" />
+                <button type="button" class="flex flex-1 items-center gap-4 p-2 min-w-0" @click="toggleCollapsedState">
                     <Badge variant="flat" size="lg">
-                        <span v-if="isSetGroupVisible">
+                        <span v-if="isSetGroupVisible" class="flex items-center gap-2">
                             {{ __(setGroup.display) }}
                             <Icon name="ui/chevron-right" class="relative top-px size-3" />
                         </span>
                         {{ __(config.display) || config.handle }}
                     </Badge>
-                    <Tooltip :markdown="__(config.instructions)">
                         <Icon
                             v-if="config.instructions && !collapsed"
                             name="info-square"
                             class="size-3.5! text-gray-500"
+                            v-tooltip="{ content: $markdown(__(config.instructions)), html: true }"
                         />
-                    </Tooltip>
                     <Subheading
                         v-show="collapsed"
                         v-html="previewText"
@@ -55,7 +39,7 @@
                     />
                 </button>
                 <div class="flex items-center gap-2" v-if="!isReadOnly">
-                    <Tooltip :text="enabled ? __('Included in output') : __('Hidden from output')">
+                    <Tooltip :text="enabled ? __('Included in output') : __('Hidden from output')" as="span">
                         <Switch size="xs" v-model="enabled" />
                     </Tooltip>
 
@@ -111,12 +95,11 @@
 import { NodeViewWrapper } from '@tiptap/vue-3';
 import ManagesPreviewText from '../replicator/ManagesPreviewText';
 import HasFieldActions from '../../field-actions/HasFieldActions.js';
-import { Badge, Button, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, Icon, Subheading, Switch, Tooltip } from '@statamic/ui';
+import { Badge, Button, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, Icon, Subheading, Switch, Tooltip } from '@/components/ui';
 import { Motion } from 'motion-v';
-import FieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
-import Fields from '@statamic/components/ui/Publish/Fields.vue';
-import { within } from '@popperjs/core/lib/utils/within.js';
-import { containerContextKey } from '@statamic/components/ui/Publish/Container.vue';
+import FieldsProvider from '@/components/ui/Publish/FieldsProvider.vue';
+import Fields from '@/components/ui/Publish/Fields.vue';
+import { containerContextKey } from '@/components/ui/Publish/Container.vue';
 
 export default {
     props: {
@@ -128,7 +111,6 @@ export default {
         getPos: { type: Function, required: true },
         updateAttributes: { type: Function, required: true },
         deleteNode: { type: Function, required: true },
-        showConnector: { type: Boolean, default: true },
     },
 
     components: {
@@ -293,9 +275,6 @@ export default {
     },
 
     methods: {
-        within() {
-            return within;
-        },
         focused() {
             this.extension.options.bard.$emit('focus');
         },

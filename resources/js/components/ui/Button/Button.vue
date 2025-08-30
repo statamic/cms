@@ -2,7 +2,7 @@
 import { computed, useSlots } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
-import { Icon } from '@statamic/ui';
+import { Icon } from '@/components/ui';
 
 const props = defineProps({
     as: { type: String, default: 'button' },
@@ -26,21 +26,20 @@ const iconOnly = computed(() => (props.icon && !hasDefaultSlot && !props.text) |
 
 const buttonClasses = computed(() => {
     const classes = cva({
-        base: 'inline-flex items-center justify-center whitespace-nowrap shrink-0 font-medium antialiased cursor-pointer no-underline disabled:text-gray-400 dark:disabled:text-gray-600 disabled:cursor-not-allowed [&_svg]:shrink-0 [&_svg]:text-gray-500',
+        base: 'inline-flex items-center justify-center whitespace-nowrap shrink-0 font-medium antialiased cursor-pointer no-underline disabled:text-gray-400 dark:disabled:text-gray-600 disabled:cursor-not-allowed [&_svg]:shrink-0 [&_svg]:text-black [&_svg]:opacity-60 dark:[&_svg]:text-white',
         variants: {
             variant: {
                 default: [
-                    'bg-linear-to-b from-white to-gray-50 hover:to-gray-100 text-gray-900 border border-gray-300 shadow-ui-sm',
-                    'dark:from-gray-850 dark:to-gray-900 dark:hover:to-gray-850 hover:bg-gray-50 dark:hover:bg-gray-900 dark:ring-3 dark:ring-black/25 dark:border-white/12 dark:border-b-white/5 dark:text-gray-300 dark:shadow-md',
+                    'bg-linear-to-b from-white to-gray-50 hover:to-gray-100 hover:bg-gray-50 text-gray-900 border border-gray-300 shadow-ui-sm',
+                    'dark:from-gray-850 dark:to-gray-900 dark:hover:to-gray-850 dark:hover:bg-gray-900 dark:border-gray-700 dark:text-gray-300 dark:shadow-ui-md',
                 ],
                 primary: [
-                    'bg-linear-to-b from-primary/90 to-primary hover:bg-primary-hover text-white border border-primary-border shadow-ui-md inset-shadow-2xs inset-shadow-white/25 [&_svg]:text-gray-400',
-                    'dark:from-gray-700 dark:to-gray-800 dark:hover:from-gray-600 dark:text-white dark:[&_svg]:text-white/50',
+                    'bg-linear-to-b from-primary/90 to-primary hover:bg-primary-hover text-white border border-primary-border shadow-ui-md inset-shadow-2xs inset-shadow-white/25 [&_svg]:text-white [&_svg]:opacity-60',
                 ],
-                danger: 'bg-linear-to-b from-red-500/90 to-red-500 hover:bg-red-500/90 text-white border border-red-600 inset-shadow-2xs inset-shadow-red-300 [&_svg]:text-red-200 disabled:text-red-200',
-                filled: 'bg-gray-100 hover:bg-gray-200 hover:text-gray-900 dark:hover:text-white dark:bg-gray-700/80 dark:hover:bg-gray-700 [&_svg]:text-gray-700 dark:[&_svg]:text-gray-300',
-                ghost: 'bg-transparent hover:bg-gray-400/10 text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800/50 dark:hover:text-gray-200',
-                subtle: 'bg-transparent hover:bg-gray-400/10 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-gray-700/80 dark:hover:text-gray-200 [&_svg]:text-gray-400',
+                danger: 'bg-linear-to-b from-red-600/90 to-red-600 hover:bg-red-600/90 text-white border border-red-600 inset-shadow-2xs inset-shadow-red-300 [&_svg]:text-red-200 disabled:text-red-200',
+                filled: 'bg-black/5 hover:bg-black/10 hover:text-gray-900 dark:hover:text-white dark:bg-white/15 dark:hover:bg-white/20 [&_svg]:opacity-70',
+                ghost: 'bg-transparent hover:bg-gray-400/10 text-gray-900 dark:text-gray-300 dark:hover:bg-white/15 dark:hover:text-gray-200',
+                subtle: 'bg-transparent hover:bg-gray-400/10 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-white/15 dark:hover:text-gray-200 [&_svg]:opacity-40',
             },
             size: {
                 lg: 'px-6 h-12 text-base gap-2 rounded-lg text-base',
@@ -95,8 +94,7 @@ const buttonClasses = computed(() => {
         <Icon v-if="icon" :name="icon" />
         <Icon v-if="loading" name="loading" :size />
 
-        <!-- =Jay. trim-text-start seems to make smaller buttons look worse such as the collections index "Create Entry" buttons -->
-        <div :class="{ 'trim-text-start': size !== 'xs' && size !== 'sm' }" class="flex content-center">
+        <div :class="{ 'st-text-trim-start': size !== 'xs' && size !== 'sm' }" class="flex content-center">
             <slot v-if="hasDefaultSlot" />
             <template v-else>{{ text }}</template>
         </div>

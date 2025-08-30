@@ -171,7 +171,7 @@ return [
     'taggable.config.placeholder' => 'Ketik dan tekan ↩ Enter',
     'taggable.title' => 'Taggable',
     'taxonomies.title' => 'Taxonomies',
-    'template.config.blueprint' => 'Menambahkan opsi &quot;petakan ke cetak biru&quot;. Pelajari lebih lanjut dalam [dokumentasi](https://statamic.dev/views#inferring-templates-from-entry-blueprints).',
+    'template.config.blueprint' => 'Menambahkan opsi &quot;petakan ke cetak biru&quot;. Pelajari lebih lanjut dalam [dokumentasi](https://statamic.dev/views#map-templates-to-entry-blueprints).',
     'template.config.folder' => 'Hanya tampilkan templat dalam folder ini.',
     'template.config.hide_partials' => 'Parsial jarang dimaksudkan untuk digunakan sebagai template.',
     'template.title' => 'Template',

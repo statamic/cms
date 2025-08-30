@@ -171,7 +171,7 @@ return [
     'taggable.config.placeholder' => 'Skriv og trykk ↩ Enter',
     'taggable.title' => 'Kan merkes',
     'taxonomies.title' => 'Taksonomier',
-    'template.config.blueprint' => 'Legger til et "koble til blueprint" valg. Les mer om dette i [dokumentasjonen](https://statamic.dev/views#inferring-templates-from-entry-blueprints).',
+    'template.config.blueprint' => 'Legger til et "koble til blueprint" valg. Les mer om dette i [dokumentasjonen](https://statamic.dev/views#map-templates-to-entry-blueprints).',
     'template.config.folder' => 'Vis bare maler i denne mappen.',
     'template.config.hide_partials' => 'Delreplikaer er sjeldent ment for bruk som maler.',
     'template.title' => 'Mal',

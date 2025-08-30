@@ -1,7 +1,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 import { cva } from 'cva';
-import { Tooltip } from '@statamic/ui';
+import { Tooltip } from '@/components/ui';
 
 const emit = defineEmits(['update:text']);
 
@@ -56,7 +56,7 @@ const circleClasses = cva({
         color: {
             green: 'text-green-500',
             amber: 'text-amber-500',
-            red: 'text-red-500',
+            red: 'text-red-600',
             gray: 'text-gray-200 dark:text-gray-700',
         },
     },
@@ -96,7 +96,7 @@ const circleClasses = cva({
                 />
                 <line v-if="isOverLimit" x1="20" y1="20" x2="80" y2="80" stroke="currentColor" stroke-width="8" />
             </svg>
-            <span v-if="isNearLimit" class="text-2xs absolute z-10 text-red-500">
+            <span v-if="isNearLimit" class="text-2xs absolute z-10 text-red-600">
                 {{ charsRemaining }}
             </span>
         </div>

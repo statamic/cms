@@ -74,15 +74,13 @@
 }
 
 .live-preview-resizer {
-    @apply w-4 border-gray-400 shadow-sm dark:border-dark-900 ltr:border-l ltr:border-r rtl:border-l rtl:border-r;
+    @apply w-4 border-gray-400 shadow-sm dark:bg-gray-800 dark:border-gray-600 border-s;
     z-index: 1;
     cursor: ew-resize;
-    background: var(--color-gray-100) url('../../svg/icons/light/drag-dots.svg') center center no-repeat;
+    background-image: url('../../svg/ui/drag-dots.svg');
+    background-repeat: no-repeat;
+    background-position: center center;
     background-size: 7px 17px;
-
-    .dark & {
-        background-color: var(--color-dark-500);
-    }
 }
 
 .live-preview-header-slide-enter-active,

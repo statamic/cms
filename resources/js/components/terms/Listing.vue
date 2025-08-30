@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import { DropdownItem, Listing } from '@statamic/ui';
+import { DropdownItem, Listing } from '@/components/ui';
 
 export default {
     components: {
@@ -43,6 +43,11 @@ export default {
         sortDirection: String,
         columns: Array,
         filters: Array,
+        canCreate: Boolean,
+        createUrl: String,
+        taxonomyEditUrl: String,
+        taxonomyBlueprintsUrl: String,
+        deleteTaxonomyAction: Function, // TODO: Bleh. The resource deleter is in blade, should we have a View.vue like collections?
     },
 
     data() {
@@ -52,9 +57,48 @@ export default {
         };
     },
 
+    mounted() {
+        this.addToCommandPalette();
+    },
+
     methods: {
         requestComplete({ items, parameters }) {
             this.items = items;
+        },
+
+        addToCommandPalette() {
+            Statamic.$commandPalette.add({
+                when: () => this.canCreate,
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Create Term'),
+                icon: 'taxonomies',
+                url: this.createUrl,
+                prioritize: true,
+            });
+
+            Statamic.$commandPalette.add({
+                when: () => Statamic.$permissions.has(`edit ${this.taxonomy} taxonomy`),
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Configure Taxonomy'),
+                icon: 'cog',
+                url: this.taxonomyEditUrl,
+            });
+
+            Statamic.$commandPalette.add({
+                when: () => Statamic.$permissions.has('configure fields'),
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Edit Blueprints'),
+                icon: 'blueprint-edit',
+                url: this.taxonomyBlueprintsUrl,
+            });
+
+            Statamic.$commandPalette.add({
+                when: () => Statamic.$permissions.has(`delete ${this.taxonomy} taxonomy`),
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Delete Taxonomy'),
+                icon: 'trash',
+                action: this.deleteTaxonomyAction,
+            });
         },
     },
 };

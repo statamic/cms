@@ -171,7 +171,7 @@ return [
     'taggable.config.placeholder' => 'を入力して ↩ Enter を押します',
     'taggable.title' => 'タグ付け可能',
     'taxonomies.title' => 'タクソノミー',
-    'template.config.blueprint' => '「ブループリントにマップ」オプションを追加します。詳細については、[ドキュメント](https://statamic.dev/views#inferring-templates-from-entry-blueprints)をご覧ください。',
+    'template.config.blueprint' => '「ブループリントにマップ」オプションを追加します。詳細については、[ドキュメント](https://statamic.dev/views#map-templates-to-entry-blueprints)をご覧ください。',
     'template.config.folder' => 'このフォルダー内のテンプレートのみを表示します。',
     'template.config.hide_partials' => 'パーシャルがテンプレートとして使用されることを目的とすることはほとんどありません。',
     'template.title' => 'テンプレート',

@@ -45,32 +45,17 @@
         ></resource-deleter>
     @endcan
 
-    @if ($hasTerms)
-        <term-list
-            taxonomy="{{ $taxonomy->handle() }}"
-            sort-column="{{ $taxonomy->sortField() }}"
-            sort-direction="{{ $taxonomy->sortDirection() }}"
-            :columns="{{ $columns->toJson() }}"
-            :filters="{{ $filters->toJson() }}"
-            action-url="{{ cp_route('taxonomies.terms.actions.run', $taxonomy->handle()) }}"
-        ></term-list>
-    @else
-        @component(
-            'statamic::partials.create-first',
-            [
-                'resource' => __("{$taxonomy->title()} term"),
-                'svg' => 'empty/taxonomy', // TODO: Do we want separate term SVG?
-                'can' => $user->can('create', ['Statamic\Contracts\Taxonomies\Term', $taxonomy]),
-            ]
-        )
-            @slot('button')
-                {{--
-                    <create-term-button
-                    url="{{ cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site]) }}"
-                    :blueprints="{{ $blueprints->toJson() }}">
-                    </create-term-button>
-                --}}
-            @endslot
-        @endcomponent
-    @endif
+    <term-list
+        taxonomy="{{ $taxonomy->handle() }}"
+        sort-column="{{ $taxonomy->sortField() }}"
+        sort-direction="{{ $taxonomy->sortDirection() }}"
+        :columns="{{ $columns->toJson() }}"
+        :filters="{{ $filters->toJson() }}"
+        action-url="{{ cp_route('taxonomies.terms.actions.run', $taxonomy->handle()) }}"
+        can-create="{{ $canCreate }}"
+        create-url="{{ cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site]) }}"
+        taxonomy-edit-url="{{ cp_route('taxonomies.edit', $taxonomy->handle()) }}"
+        taxonomy-blueprints-url="{{ cp_route('blueprints.taxonomies.index', $taxonomy) }}"
+        :delete-taxonomy-action="() => $refs.deleter.confirm()"
+    ></term-list>
 @endsection

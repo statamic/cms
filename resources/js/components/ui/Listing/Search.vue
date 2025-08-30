@@ -1,10 +1,10 @@
 <script setup>
-import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
-import { Input } from '@statamic/ui';
-import debounce from '@statamic/util/debounce.js';
+import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
+import { Input } from '@/components/ui';
+import debounce from '@/util/debounce.js';
 import { useTemplateRef } from 'vue';
 
-const { searchQuery, setSearchQuery, reorderable } = injectListingContext();
+const { activeFilterBadgeCount, searchQuery, setSearchQuery, reorderable } = injectListingContext();
 const placeholder = 'Search...';
 const searchQueryUpdated = debounce((event) => setSearchQuery(event.target.value), 300);
 
@@ -15,7 +15,7 @@ defineExpose({ focus });
 </script>
 
 <template>
-    <div class="flex-1 max-w-md">
+    <div class="flex-1 max-w-sm" :class="{ 'max-w-60!': activeFilterBadgeCount > 2 }">
         <label for="listings-search" class="sr-only">{{ __('Search entries') }}</label>
         <Input
             autofocus

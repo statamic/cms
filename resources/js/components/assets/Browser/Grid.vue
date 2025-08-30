@@ -32,7 +32,7 @@
                     <Context>
                         <template #trigger>
                             <button @dblclick="selectFolder(folder.path)" class="group h-[66px] w-[80px]">
-                                <ui-icon name="asset-folder" class="size-full text-blue-400/90 hover:text-blue-400" />
+                                <ui-icon name="ui/folder" class="size-full text-blue-400/90 hover:text-blue-400" />
                                 <div
                                     class="overflow-hidden text-center font-mono text-xs text-ellipsis whitespace-nowrap text-gray-500"
                                     v-text="folder.basename"
@@ -55,7 +55,7 @@
             </div>
             <div v-if="creatingFolder" class="group/folder relative">
                 <div class="group h-[66px] w-[80px]">
-                    <ui-icon name="asset-folder" class="size-full text-blue-400/90 hover:text-blue-400" />
+                    <ui-icon name="ui/folder" class="size-full text-blue-400/90 hover:text-blue-400" />
 
                     <Editable
                         ref="newFolderInput"
@@ -95,7 +95,7 @@
                     <Context>
                         <template #trigger>
                             <div
-                                class="asset-tile group relative bg-white"
+                                class="asset-tile group relative bg-white dark:bg-gray-900"
                                 :class="{
                                     'bg-checkerboard!': asset.can_be_transparent,
                                     'opacity-50!': draggingAsset === asset.id,
@@ -183,9 +183,9 @@ import {
     DropdownLabel,
     DropdownItem,
     DropdownSeparator,
-} from '@statamic/ui';
-import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
-import ItemActions from '@statamic/components/actions/ItemActions.vue';
+} from '@/components/ui';
+import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
+import ItemActions from '@/components/actions/ItemActions.vue';
 
 export default {
     mixins: [AssetBrowserMixin],

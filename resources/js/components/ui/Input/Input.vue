@@ -2,7 +2,7 @@
 import { computed, useSlots, ref, useId, useTemplateRef, onMounted, nextTick } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
-import { Icon, Button, CharacterCounter } from '@statamic/ui';
+import { Icon, Button, CharacterCounter } from '@/components/ui';
 
 const slots = useSlots();
 
@@ -31,15 +31,15 @@ const props = defineProps({
     focus: { type: Boolean, default: false },
 });
 
-const hasPrependedIcon = !!props.iconPrepend || !!props.icon || !!slots.prepend;
-const hasAppendedIcon = !!props.iconAppend || !!slots.append || props.clearable || props.viewable || props.copyable || props.loading;
+const hasPrependedIcon = computed(() => !!props.iconPrepend || !!props.icon || !!slots.prepend);
+const hasAppendedIcon = computed(() => !!props.iconAppend || !!slots.append || props.clearable || props.viewable || copyable.value || props.loading);
 
 const inputClasses = computed(() => {
     const classes = cva({
         base: [
-            'w-full block bg-white dark:bg-gray-900',
-            'border border-gray-300 with-contrast:border-gray-500 dark:border-x-0 dark:border-t-0 dark:border-white/7.5 dark:inset-shadow-2xs dark:inset-shadow-black',
-            'text-gray-950 dark:text-gray-300 placeholder:text-gray-500 dark:placeholder:text-gray-500',
+            'w-full block bg-white dark:bg-gray-950',
+            'border border-gray-300 with-contrast:border-gray-500 dark:border-white/15 dark:inset-shadow-2xs dark:inset-shadow-black',
+            'text-gray-950 dark:text-gray-300 placeholder:text-gray-500 dark:placeholder:text-gray-400/75',
             'appearance-none antialiased shadow-ui-sm disabled:shadow-none disabled:opacity-50 read-only:border-dashed not-prose',
         ],
         variants: {
@@ -66,35 +66,39 @@ const inputClasses = computed(() => {
         ],
     })({
         ...props,
-        hasPrependedIcon: hasPrependedIcon,
-        hasAppendedIcon: hasAppendedIcon,
+        hasPrependedIcon: hasPrependedIcon.value,
+        hasAppendedIcon: hasAppendedIcon.value,
         hasLimit: !!props.limit,
     });
 
     return twMerge(classes);
 });
 
-const iconClasses = cva({
-    base: 'absolute top-0 bottom-0 flex items-center justify-center text-xs text-gray-400',
-    variants: {
-        size: {
-            base: '[&_svg]:size-4',
-            sm: '[&_svg]:size-3.5',
-            xs: '[&_svg]:size-3',
+const iconClasses = computed(() => {
+    const classes = cva({
+        base: 'absolute top-0 bottom-0 flex items-center justify-center text-xs text-gray-400',
+        variants: {
+            size: {
+                base: '[&_svg]:size-4',
+                sm: '[&_svg]:size-3.5',
+                xs: '[&_svg]:size-3',
+            },
         },
-    },
-    compoundVariants: [
-        { size: 'base', hasPrependedIcon: true, class: 'ps-3 has-[button]:ps-1 start-0' },
-        { size: 'sm', hasPrependedIcon: true, class: 'ps-2 has-[button]:ps-1 start-0' },
-        { size: 'xs', hasPrependedIcon: true, class: 'ps-1.5 has-[button]:ps-0 start-0' },
-        { size: 'base', hasAppendedIcon: true, class: 'pe-3 has-[button]:pe-1 end-0' },
-        { size: 'sm', hasAppendedIcon: true, class: 'pe-2 has-[button]:pe-1 end-0' },
-        { size: 'xs', hasAppendedIcon: true, class: 'pe-1.5 has-[button]:pe-0 end-0' },
-    ],
-})({
-    ...props,
-    hasPrependedIcon: hasPrependedIcon,
-    hasAppendedIcon: hasAppendedIcon,
+        compoundVariants: [
+            { size: 'base', hasPrependedIcon: true, class: 'ps-3 has-[button]:ps-1 start-0' },
+            { size: 'sm', hasPrependedIcon: true, class: 'ps-2 has-[button]:ps-1 start-0' },
+            { size: 'xs', hasPrependedIcon: true, class: 'ps-1.5 has-[button]:ps-0 start-0' },
+            { size: 'base', hasAppendedIcon: true, class: 'pe-3 has-[button]:pe-1 end-0' },
+            { size: 'sm', hasAppendedIcon: true, class: 'pe-2 has-[button]:pe-1 end-0' },
+            { size: 'xs', hasAppendedIcon: true, class: 'pe-1.5 has-[button]:pe-0 end-0' },
+        ],
+    })({
+        ...props,
+        hasPrependedIcon: hasPrependedIcon.value,
+        hasAppendedIcon: hasAppendedIcon.value,
+    });
+
+    return twMerge(classes);
 });
 
 const emit = defineEmits(['update:modelValue']);
@@ -107,10 +111,12 @@ const togglePassword = () => {
     inputType.value = inputType.value === 'password' ? 'text' : 'password';
 };
 
+const copySupported = computed(() => 'clipboard' in navigator && typeof navigator.clipboard.writeText === 'function');
+const copyable = computed(() => props.copyable && copySupported.value)
 const copied = ref(false);
 const copy = () => {
-    if (!props.modelValue) return;
-    navigator.clipboard.writeText('props.modelValue');
+    if (!copyable.value || !props.modelValue) return;
+    navigator.clipboard.writeText(props.modelValue);
     copied.value = true;
     setTimeout(() => (copied.value = false), 1000);
 };
@@ -130,7 +136,7 @@ defineExpose({ focus });
 <template>
     <ui-input-group>
         <ui-input-group-prepend v-if="prepend" v-text="prepend" />
-        <div class="group/input relative block w-full typography-content focus-outline-discrete" data-ui-input>
+        <div class="group/input relative block w-full st-text-legibility focus-outline-discrete" data-ui-input>
             <div v-if="hasPrependedIcon" :class="iconClasses">
                 <slot name="prepend">
                     <Icon :name="iconPrepend || icon" />
@@ -171,7 +177,7 @@ defineExpose({ focus });
                         :class="copied ? 'animate-wiggle' : ''"
                     />
                     <Icon v-else-if="iconAppend" :name="iconAppend" />
-                    <loading-graphic v-if="loading" inline text=""/>
+                    <Icon v-if="loading" name="loading" />
                 </slot>
             </div>
             <div v-if="limit" class="absolute inset-y-0 right-2 flex items-center">

@@ -1,6 +1,15 @@
 <template>
     <Header :title="pageTitle" icon="site">
-        <Button type="submit" variant="primary" @click="submit">{{ __('Save') }}</Button>
+        <ui-command-palette-item
+            :category="$commandPalette.category.Actions"
+            :text="__('Save')"
+            icon="save"
+            :action="submit"
+            prioritize
+            v-slot="{ text, action }"
+        >
+            <Button type="submit" variant="primary" @click="action">{{ text }}</Button>
+        </ui-command-palette-item>
     </Header>
 
     <PublishContainer
@@ -16,7 +25,7 @@
 </template>
 
 <script>
-import { Header, Button, PublishContainer, PublishTabs } from '@statamic/ui';
+import { Header, Button, PublishContainer, PublishTabs } from '@/components/ui';
 
 export default {
     components: {

@@ -5,6 +5,7 @@
 @inject('str', 'Statamic\Support\Str')
 @extends('statamic::layout')
 @section('title', __('Create User'))
+@section('content-card-modifiers', 'bg-architectural-lines')
 
 @section('content')
 <user-wizard

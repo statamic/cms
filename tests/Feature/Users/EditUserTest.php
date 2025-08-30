@@ -5,13 +5,16 @@ namespace Tests\Feature\Users;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
+use Tests\ElevatesSessions;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 #[Group('2fa')]
+#[Group('elevated-session')]
 class EditUserTest extends TestCase
 {
+    use ElevatesSessions;
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
@@ -23,10 +26,23 @@ class EditUserTest extends TestCase
         $me = tap(User::make()->email('admin@domain.com')->assignRole('test'))->save();
 
         $this
-            ->actingAs($me)
+            ->actingAsWithElevatedSession($me)
             ->get($user->editUrl())
             ->assertOk()
             ->assertViewHas('title', 'test@domain.com');
+    }
+
+    #[Test]
+    public function it_requires_an_elevated_session()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit users']]);
+        $user = tap(User::make()->email('test@domain.com')->set('name', 'Johh Smith'))->save();
+        $me = tap(User::make()->email('admin@domain.com')->assignRole('test'))->save();
+
+        $this
+            ->actingAs($me)
+            ->get($user->editUrl())
+            ->assertRedirectToConfirmPasswordForElevatedSession();
     }
 
     #[Test]
@@ -36,7 +52,7 @@ class EditUserTest extends TestCase
         $me = tap(User::make()->email('admin@domain.com')->assignRole('test'))->save();
 
         $this
-            ->actingAs($me)
+            ->actingAsWithElevatedSession($me)
             ->get($me->editUrl())
             ->assertOk()
             ->assertViewHasAll([
@@ -58,7 +74,7 @@ class EditUserTest extends TestCase
         $me = tap(User::make()->email('admin@domain.com')->assignRole('test'))->save();
 
         $this
-            ->actingAs($me)
+            ->actingAsWithElevatedSession($me)
             ->get($user->editUrl())
             ->assertOk()
             ->assertViewHas('twoFactor', fn ($twoFactor) => $twoFactor === null);

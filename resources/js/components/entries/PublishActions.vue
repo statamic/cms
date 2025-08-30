@@ -10,7 +10,7 @@
 
             <div class="flex-1 overflow-auto">
                 <div class="loading flex h-full items-center justify-center" v-if="saving">
-                    <loading-graphic />
+                    <Icon name="loading" />
                 </div>
 
                 <div class="p-3 flex flex-col space-y-6" v-else>
@@ -37,9 +37,9 @@
                             <Subheading size="sm" class="flex-1" :text="actionInfoText" />
                         </div>
 
-                        <div class="flex text-red-500" v-if="action === 'schedule'">
+                        <div class="flex text-red-600" v-if="action === 'schedule'">
                             <Icon name="info" class="size-4 shrink-0 me-2" />
-                            <Subheading size="sm" class="flex-1 text-red-500" :text="__('messages.publish_actions_current_becomes_draft_because_scheduled')" />
+                            <Subheading size="sm" class="flex-1 text-red-600" :text="__('messages.publish_actions_current_becomes_draft_because_scheduled')" />
                         </div>
                     </template>
                 </div>
@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import { Heading, Button, Select, DatePicker, Textarea, Icon, Subheading } from '@statamic/ui';
+import { Heading, Button, Select, DatePicker, Textarea, Icon, Subheading } from '@/components/ui';
 
 export default {
     components: { Heading, Button, Select, DatePicker, Textarea, Icon, Subheading },
@@ -83,7 +83,7 @@ export default {
                 }
             }
 
-            options.push({ value: 'schedule', label: __('Schedule') });
+            // options.push({ value: 'schedule', label: __('Schedule') });
 
             options.push({ value: 'revision', label: __('Create Revision') });
 

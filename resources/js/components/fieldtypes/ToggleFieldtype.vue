@@ -1,19 +1,22 @@
 <template>
-    <div class="flex items-center gap-2">
-        <Switch
-            @update:model-value="update"
-            :disabled="config.disabled"
-            :id="fieldId"
-            :model-value="value"
-            :read-only="isReadOnly"
-        />
-        <Heading v-if="inlineLabel" v-html="$markdown(__(inlineLabel), { openLinksInNewTabs: true })" />
+    <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2">
+            <Switch
+                @update:model-value="update"
+                :disabled="config.disabled || isReadOnly"
+                :id="fieldId"
+                :model-value="value"
+                :read-only="isReadOnly"
+            />
+            <Heading v-if="inlineLabel" v-html="$markdown(__(inlineLabel), { openLinksInNewTabs: true })" />
+        </div>
+        <div v-if="config.html" v-html="config.html" class="mt-2" />
     </div>
 </template>
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import { Switch, Heading } from '@statamic/ui';
+import { Switch, Heading } from '@/components/ui';
 
 export default {
     mixins: [Fieldtype],
@@ -31,7 +34,7 @@ export default {
         },
 
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
+            if (!this.showFieldPreviews) return;
 
             return (this.value ? '✓' : '✗') + ' ' + __(this.config.display);
         },

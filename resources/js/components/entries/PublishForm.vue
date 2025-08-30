@@ -7,6 +7,7 @@
             </template>
 
             <ItemActions
+                ref="actions"
                 v-if="!isCreating && hasItemActions"
                 :item="values.id"
                 :url="itemActionUrl"
@@ -35,9 +36,7 @@
                 </Dropdown>
             </ItemActions>
 
-            <div class="text-2xs me-4 flex pt-px text-gray-600" v-if="readOnly">
-                <svg-icon name="light/lock" class="me-1 -mt-1 w-4" /> {{ __('Read Only') }}
-            </div>
+            <ui-badge icon="padlock-locked" :text="__('Read Only')" variant="flat" v-if="readOnly" />
 
             <div class="flex items-center gap-3">
                 <save-button-options
@@ -121,7 +120,7 @@
                             </div>
 
                             <!-- Published Switch -->
-                            <Panel class="flex justify-between px-5 py-3" v-if="!revisionsEnabled">
+                            <Panel class="flex justify-between px-5 py-3 dark:bg-gray-800!" v-if="!revisionsEnabled">
                                 <Heading :text="__('Published')" />
                                 <Switch
                                     :model-value="published"
@@ -233,8 +232,8 @@
             <div class="publish-fields">
                 <div class="form-group publish-field field-w-full">
                     <label v-text="__('Origin')" />
-                    <div class="help-block mt-2" v-text="__('messages.entry_origin_instructions')"></div>
-                    <Select class="w-full" v-model="selectedOrigin" :options="originOptions" :placeholder="false" />
+                    <ui-description class="mt-2" :text="__('messages.entry_origin_instructions')" />
+                    <Select class="w-full" v-model="selectedOrigin" :options="originOptions" placeholder="" />
                 </div>
             </div>
         </confirmation-modal>
@@ -248,16 +247,6 @@
             @confirm="confirmSwitchLocalization"
             @cancel="pendingLocalization = null"
         />
-
-        <confirmation-modal
-            v-if="syncingField"
-            :title="__('Sync Field')"
-            :body-text="__('Are you sure? This field\'s value will be replaced by the value in the original entry.')"
-            :button-text="__('Sync Field')"
-            :danger="true"
-            @confirm="confirmSyncField"
-            @cancel="syncingField = null"
-        />
     </div>
 </template>
 
@@ -269,7 +258,7 @@ import RevisionHistory from '../revision-history/History.vue';
 import HasPreferences from '../data-list/HasPreferences';
 import HasActions from '../publish/HasActions';
 import striptags from 'striptags';
-import clone from '@statamic/util/clone.js';
+import clone from '@/util/clone.js';
 import {
     Button,
     Card,
@@ -287,16 +276,15 @@ import {
     Subheading,
     Switch,
     Select,
-} from '@statamic/ui';
-import PublishContainer from '@statamic/components/ui/Publish/Container.vue';
-import PublishTabs from '@statamic/components/ui/Publish/Tabs.vue';
-import PublishComponents from '@statamic/components/ui/Publish/Components.vue';
-import LocalizationsCard from '@statamic/components/ui/Publish/Localizations.vue';
-import LivePreview from '@statamic/components/ui/LivePreview/LivePreview.vue';
-import resetValuesFromResponse from '@statamic/util/resetValuesFromResponse.js';
-import { SavePipeline } from '@statamic/exports.js';
+} from '@/components/ui';
+import PublishContainer from '@/components/ui/Publish/Container.vue';
+import PublishTabs from '@/components/ui/Publish/Tabs.vue';
+import PublishComponents from '@/components/ui/Publish/Components.vue';
+import LocalizationsCard from '@/components/ui/Publish/Localizations.vue';
+import LivePreview from '@/components/ui/LivePreview/LivePreview.vue';
+import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
 import { computed, ref } from 'vue';
-const { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } = SavePipeline;
+import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@/components/ui/Publish/SavePipeline.js';
 
 let saving = ref(false);
 let errors = ref({});
@@ -410,7 +398,6 @@ export default {
             autosaveIntervalInstance: null,
             syncFieldConfirmationText: __('messages.sync_entry_field_confirmation_text'),
             pendingLocalization: null,
-            syncingField: null,
         };
     },
 
@@ -785,30 +772,9 @@ export default {
         },
 
         setFieldValue(handle, value) {
-            if (this.hasOrigin) this.desyncField(handle);
+            if (this.hasOrigin) this.$refs.container.desyncField(handle);
 
             this.$refs.container.setFieldValue(handle, value);
-        },
-
-        syncField(handle) {
-            this.syncingField = handle;
-        },
-
-        confirmSyncField() {
-            const handle = this.syncingField;
-            this.localizedFields = this.localizedFields.filter((field) => field !== handle);
-            this.$refs.container.setFieldValue(handle, this.originValues[handle]);
-
-            // Update the meta for this field. For instance, a relationship field would have its data preloaded into it.
-            // If you sync the field, the preloaded data would be outdated and an ID would show instead of the titles.
-            this.meta[handle] = this.originMeta[handle];
-            this.syncingField = null;
-        },
-
-        desyncField(handle) {
-            if (!this.localizedFields.includes(handle)) this.localizedFields.push(handle);
-
-            this.$refs.container.dirty();
         },
 
         setAutosaveInterval() {
@@ -834,6 +800,31 @@ export default {
                 this.itemActions = response.data.itemActions;
             }
         },
+
+        addToCommandPalette() {
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: this.saveText,
+                icon: 'save',
+                action: () => this.save(),
+                prioritize: true,
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Edit Blueprint'),
+                icon: 'blueprint-edit',
+                when: () => this.canEditBlueprint,
+                url: this.actions.editBlueprint,
+            });
+
+            this.$refs.actions?.preparedActions.forEach(action => Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: action.title,
+                icon: action.icon,
+                action: action.run,
+            }));
+        },
     },
 
     mounted() {
@@ -853,6 +844,8 @@ export default {
         if (typeof this.autosaveInterval === 'number') {
             this.setAutosaveInterval();
         }
+
+        this.addToCommandPalette();
     },
 
     created() {
@@ -866,15 +859,12 @@ export default {
         container = computed(() => this.$refs.container);
     },
 
-    unmounted() {
-        clearTimeout(this.trackDirtyStateTimeout);
-    },
-
     beforeUnmount() {
         if (this.autosaveIntervalInstance) clearInterval(this.autosaveIntervalInstance);
     },
 
     unmounted() {
+        clearTimeout(this.trackDirtyStateTimeout);
         this.saveKeyBinding.destroy();
         this.quickSaveKeyBinding.destroy();
     },

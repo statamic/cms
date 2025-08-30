@@ -1,7 +1,7 @@
 <script setup>
 import { DropdownMenuItem } from 'reka-ui';
 import { useSlots } from 'vue';
-import { Icon } from '@statamic/ui';
+import { Icon } from '@/components/ui';
 import { cva } from 'cva';
 
 const props = defineProps({
@@ -20,7 +20,7 @@ const classes = cva({
     variants: {
         variant: {
             default: 'text-gray-700 dark:text-gray-300',
-            destructive: 'text-red-500',
+            destructive: 'text-red-600',
         },
     },
 })({ variant: props.variant });
@@ -30,7 +30,7 @@ const iconClasses = cva({
         base: 'size-3.5!',
         variant: {
             default: 'text-gray-500',
-            destructive: 'text-red-400!',
+            destructive: 'text-red-500!',
         },
     },
 })({ variant: props.variant });

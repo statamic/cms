@@ -487,6 +487,7 @@ class Field implements Arrayable
                 'display' => __('Display Label'),
                 'instructions' => __('statamic::messages.fields_display_instructions'),
                 'type' => 'field_display',
+                'width' => 50,
             ],
             'hide_display' => [
                 'type' => 'toggle',
@@ -505,6 +506,7 @@ class Field implements Arrayable
                     'not_in:'.implode(',', $reserved),
                 ],
                 'show_regenerate' => true,
+                'width' => 50,
             ],
             'instructions' => [
                 'display' => __('Instructions'),
@@ -525,6 +527,17 @@ class Field implements Arrayable
                 'if' => [
                     'instructions' => 'not null',
                 ],
+            ],
+            'variant' => [
+                'display' => __('Field Layout'),
+                'instructions' => __('statamic::messages.fields_layout_instructions'),
+                'type' => 'select',
+                'options' => [
+                    'block' => __('Stacked'),
+                    'inline' => __('Side by Side'),
+                ],
+                'default' => 'block',
+                'width' => 50,
             ],
             'listable' => [
                 'display' => __('Listable'),
@@ -563,7 +576,7 @@ class Field implements Arrayable
                 'unless' => [
                     'visibility' => 'equals computed',
                 ],
-                'width' => 25,
+                'width' => 50,
             ],
             'replicator_preview' => [
                 'display' => __('Preview'),
@@ -571,7 +584,7 @@ class Field implements Arrayable
                 'type' => 'toggle',
                 'validate' => 'boolean',
                 'default' => true,
-                'width' => 25,
+                'width' => 50,
             ],
             'duplicate' => [
                 'display' => __('Duplicate'),
@@ -579,15 +592,15 @@ class Field implements Arrayable
                 'type' => 'toggle',
                 'validate' => 'boolean',
                 'default' => true,
-                'width' => 25,
+                'width' => 50,
 
             ],
             'actions' => [
-                'display' => __('Actions'),
+                'display' => __('Show Actions'),
                 'instructions' => __('statamic::messages.fields_actions_instructions'),
                 'type' => 'toggle',
                 'default' => true,
-                'width' => 25,
+                'width' => 50,
 
             ],
         ])->map(fn ($field, $handle) => compact('handle', 'field'))->values()->all();

@@ -12,6 +12,7 @@
             </template>
 
             <ItemActions
+                ref="actions"
                 v-if="!isCreating && hasItemActions"
                 :item="values.id"
                 :url="itemActionUrl"
@@ -45,9 +46,7 @@
                 </Dropdown>
             </ItemActions>
 
-            <div class="text-2xs flex pt-px text-gray-600 ltr:mr-4 rtl:ml-4" v-if="readOnly">
-                <svg-icon name="light/lock" class="-mt-1 w-4 ltr:mr-1 rtl:ml-1" /> {{ __('Read Only') }}
-            </div>
+            <ui-badge icon="padlock-locked" :text="__('Read Only')" variant="flat" v-if="readOnly" />
 
             <div class="hidden items-center md:flex">
                 <save-button-options v-if="!readOnly" :show-options="!isInline" :preferences-prefix="preferencesPrefix">
@@ -135,7 +134,7 @@ import SaveButtonOptions from '../publish/SaveButtonOptions.vue';
 import HasPreferences from '../data-list/HasPreferences';
 import HasActions from '../publish/HasActions';
 import striptags from 'striptags';
-import clone from '@statamic/util/clone.js';
+import clone from '@/util/clone.js';
 import {
     Header,
     Badge,
@@ -145,17 +144,16 @@ import {
     DropdownMenu,
     DropdownItem,
     DropdownSeparator,
-} from '@statamic/ui';
-import PublishContainer from '@statamic/components/ui/Publish/Container.vue';
-import PublishTabs from '@statamic/components/ui/Publish/Tabs.vue';
-import PublishComponents from '@statamic/components/ui/Publish/Components.vue';
-import LivePreview from '@statamic/components/ui/LivePreview/LivePreview.vue';
-import { SavePipeline } from '@statamic/exports.js';
-import resetValuesFromResponse from '@statamic/util/resetValuesFromResponse.js';
+} from '@/components/ui';
+import PublishContainer from '@/components/ui/Publish/Container.vue';
+import PublishTabs from '@/components/ui/Publish/Tabs.vue';
+import PublishComponents from '@/components/ui/Publish/Components.vue';
+import LivePreview from '@/components/ui/LivePreview/LivePreview.vue';
+import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
 import { ref, computed } from 'vue';
-const { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } = SavePipeline;
-import LocalizationsCard from '@statamic/components/ui/Publish/Localizations.vue';
-import ItemActions from '@statamic/components/actions/ItemActions.vue';
+import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@/components/ui/Publish/SavePipeline.js';
+import LocalizationsCard from '@/components/ui/Publish/Localizations.vue';
+import ItemActions from '@/components/actions/ItemActions.vue';
 
 let saving = ref(false);
 let errors = ref({});
@@ -454,6 +452,31 @@ export default {
                 this.values = resetValuesFromResponse(response.data.values, this.$refs.container);
             }
         },
+
+        addToCommandPalette() {
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: this.saveText,
+                icon: 'save',
+                action: () => this.save(),
+                prioritize: true,
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Edit Blueprint'),
+                icon: 'blueprint-edit',
+                when: () => this.canEditBlueprint,
+                url: this.actions.editBlueprint,
+            });
+
+            this.$refs.actions?.preparedActions.forEach(action => Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: action.title,
+                icon: action.icon,
+                action: action.run,
+            }));
+        },
     },
 
     mounted() {
@@ -467,6 +490,8 @@ export default {
             this.quickSave = true;
             this.save();
         });
+
+        this.addToCommandPalette();
     },
 
     created() {

@@ -10,6 +10,9 @@ tests/Fakes/Composer/Package/test-package/composer.json
 resources/dist
 resources/dist-dev
 resources/dist-frontend
+resources/js/package/types
+resources/js/package/vite-plugin/tailwind-exclusions.css
 composer.lock
 .env
 bundle-stats.html
+.claude

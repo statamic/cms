@@ -1,7 +1,7 @@
 <script setup>
-import HeaderCell from '@statamic/components/ui/Listing/HeaderCell.vue';
-import ToggleAll from '@statamic/components/ui/Listing/ToggleAll.vue';
-import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
+import HeaderCell from '@/components/ui/Listing/HeaderCell.vue';
+import ToggleAll from '@/components/ui/Listing/ToggleAll.vue';
+import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
 import { computed } from 'vue';
 
 const { allowsSelections, reorderable, hasActions, visibleColumns, allowsMultipleSelections } = injectListingContext();
@@ -30,10 +30,10 @@ const hasVisibleHeader = computed(() => {
                 <ToggleAll v-if="allowsSelections && allowsMultipleSelections" />
             </th>
             <HeaderCell v-for="column in visibleColumns" :key="column.field" :column />
-            <!--                    <th class="type-column" v-if="type">-->
-            <!--                        <template v-if="type === 'entries'">{{ __('Collection') }}</template>-->
-            <!--                        <template v-if="type === 'terms'">{{ __('Taxonomy') }}</template>-->
-            <!--                    </th>-->
+            <!-- <th class="type-column" v-if="type">
+                <template v-if="type === 'entries'">{{ __('Collection') }}</template>
+                <template v-if="type === 'terms'">{{ __('Taxonomy') }}</template>
+            </th> -->
             <th scope="col" class="actions-column" v-if="hasActions" />
         </tr>
     </thead>

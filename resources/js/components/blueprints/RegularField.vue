@@ -1,7 +1,7 @@
 <template>
     <ui-card class="py-0.75! px-2! field-grid-item blueprint-section-field" :class="widthClass">
         <div class="flex items-center gap-2">
-            <ui-icon name="handles" class="blueprint-drag-handle size-4 cursor-grab text-gray-300" />
+            <ui-icon name="ui/handles" class="blueprint-drag-handle size-4 cursor-grab text-gray-300" />
             <div class="flex flex-1 items-center justify-between">
                 <div class="flex flex-1 items-center py-2">
                     <ui-icon
@@ -59,7 +59,7 @@ import WidthSelector from '../fields/WidthSelector.vue';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';
 import titleize from '../../util/titleize';
 import deslugify from '../../util/deslugify';
-import { Icon } from '@statamic/ui';
+import { Icon } from '@/components/ui';
 
 export default {
     mixins: [Field, CanDefineLocalizable],

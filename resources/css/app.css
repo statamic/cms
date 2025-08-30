@@ -20,6 +20,7 @@
 @import './core/utilities.css';
 @import './dark.css';
 @import './tailwind-animate.css';
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -38,6 +39,6 @@
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: var(--color-gray-200, currentColor);
+    border-color: var(--color-gray-300, currentColor);
   }
 }

@@ -6,21 +6,35 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Statamic\CP\Navigation\NavItem;
 use Statamic\Facades;
+use Statamic\Facades\User;
 use Statamic\Fields\Fieldset;
 use Statamic\Support\Arr;
 
 class Palette
 {
     protected $items;
+    protected $preloadedItems;
+    protected $isBuilding = false;
 
     public function __construct()
     {
         $this->items = collect();
+        $this->preloadedItems = collect();
     }
 
-    public function add(string $text, string $url, ?Category $category = null, ?string $icon = null, ?string $keys = null): self
-    {
-        $link = (new Link($text, $category ?? Category::Miscellaneous))->url($url);
+    public function add(
+        string|array $text,
+        string $url,
+        bool $openNewTab = false,
+        bool $trackRecent = true,
+        ?Category $category = null,
+        ?string $icon = null,
+        ?string $keys = null,
+    ): self {
+        $link = (new Link($text, $category ?? Category::Miscellaneous))
+            ->url($url)
+            ->openNewTab($openNewTab)
+            ->trackRecent($trackRecent);
 
         if ($icon) {
             $link->icon($icon);
@@ -33,25 +47,33 @@ class Palette
         return $this->addCommand($link);
     }
 
-    public function addCommand(Command $command): self
+    protected function addCommand(Command $command): self
     {
-        $this->items->push(
-            $this->validateCommandArray($command->toArray()),
-        );
+        $commandArray = $this->validateCommandArray($command->toArray());
+
+        $this->isBuilding || ! app()->isBooted()
+            ? $this->items->push($commandArray)
+            : $this->preloadedItems->push($commandArray);
 
         return $this;
     }
 
     public function build(): Collection
     {
-        // TODO: We need to bust this cache when content or nav changes
-        // TODO: Cache per user
-        // return Cache::rememberForever('statamic-command-palette', function () {
-        return $this
-            ->buildNav()
-            ->buildFields()
-            ->get();
-        // });
+        $this->isBuilding = true;
+
+        $built = Cache::rememberForever(static::cacheKey(), function () {
+            return $this
+                ->buildNav()
+                ->buildFields()
+                ->buildMiscellaneous()
+                ->pushToCacheManifest()
+                ->get();
+        });
+
+        $this->isBuilding = false;
+
+        return $built;
     }
 
     protected function buildNav(): self
@@ -109,13 +131,70 @@ class Palette
         return $this;
     }
 
-    public function validateCommandArray(array $command): array
+    protected function buildMiscellaneous(): self
     {
-        throw_unless(is_string(Arr::get($command, 'type')), new \Exception('Must output command [type] string!'));
+        if (! Facades\User::current()->isSuper()) {
+            return $this;
+        }
+
+        $this->add(
+            text: __('Statamic Documentation'),
+            icon: 'book-next-page',
+            url: 'https://statamic.dev',
+            openNewTab: true,
+        );
+
+        return $this;
+    }
+
+    protected function validateCommandArray(array $command): array
+    {
         throw_unless(is_string(Arr::get($command, 'category')), new \Exception('Must output command [category] string!'));
-        throw_unless(is_string(Arr::get($command, 'text')), new \Exception('Must output command [text] string!'));
+
+        $text = Arr::get($command, 'text');
+        throw_unless(is_string($text) || is_array($text), new \Exception('Must output command [text] string!'));
 
         return $command;
+    }
+
+    public static function cacheKey(bool $manifest = false): string
+    {
+        $suffix = $manifest
+            ? 'manifest'
+            : User::current()->id();
+
+        return 'statamic-command-palette-'.$suffix;
+    }
+
+    protected function pushToCacheManifest(): self
+    {
+        $manifestKey = static::cacheKey(manifest: true);
+
+        $manifest = Cache::get($manifestKey, []);
+
+        $manifest[] = static::cacheKey();
+
+        Cache::put($manifestKey, $manifest);
+
+        return $this;
+    }
+
+    public function clearCache(): void
+    {
+        $manifestKey = static::cacheKey(manifest: true);
+
+        $manifest = Cache::get($manifestKey, []);
+
+        foreach ($manifest as $cacheKey) {
+            Cache::forget($cacheKey);
+        }
+
+        Cache::forget($manifestKey);
+    }
+
+    public function getPreloadedItems(): Collection
+    {
+        return $this->preloadedItems;
     }
 
     public function get(): Collection

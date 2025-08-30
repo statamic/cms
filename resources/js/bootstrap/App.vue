@@ -81,8 +81,7 @@ export default {
 
     data() {
         return {
-            navOpen: true,
-            mobileNavOpen: false,
+            navOpen: false,
             showBanner: true,
             appendedComponents: Statamic.$components.components,
             isLicensingBannerSnoozed: localStorage.getItem(`statamic.snooze_license_banner`) > new Date().valueOf(),
@@ -105,6 +104,8 @@ export default {
             e.preventDefault();
             this.toggleNav();
         });
+
+
 
         if (this.$config.get('broadcasting.enabled')) {
             this.$echo.start();
@@ -146,9 +147,7 @@ export default {
             localStorage.setItem('statamic.nav', this.navOpen ? 'open' : 'closed');
         },
 
-        toggleMobileNav() {
-            this.mobileNavOpen = !this.mobileNavOpen;
-        },
+
 
         hideBanner() {
             this.showBanner = false;

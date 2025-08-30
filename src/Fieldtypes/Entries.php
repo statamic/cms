@@ -69,14 +69,32 @@ class Entries extends Relationship
     {
         return [
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Input Behavior'),
                 'fields' => [
-                    'max_items' => [
-                        'display' => __('Max Items'),
-                        'instructions' => __('statamic::messages.max_items_instructions'),
-                        'min' => 1,
-                        'type' => 'integer',
+                    'collections' => [
+                        'display' => __('Collections'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.collections'),
+                        'type' => 'collections',
+                        'mode' => 'select',
+                        'width' => 50,
                     ],
+                    'search_index' => [
+                        'display' => __('Search Index'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.search_index'),
+                        'type' => 'text',
+                        'width' => 50,
+                    ],
+                    'select_across_sites' => [
+                        'display' => __('Select Across Sites'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.select_across_sites'),
+                        'type' => 'toggle',
+                        'width' => 50,
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Appearance'),
+                'fields' => [
                     'mode' => [
                         'display' => __('UI Mode'),
                         'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
@@ -87,6 +105,7 @@ class Entries extends Relationship
                             'select' => __('Select Dropdown'),
                             'typeahead' => __('Typeahead Field'),
                         ],
+                        'width' => 50,
                     ],
                     'create' => [
                         'display' => __('Allow Creating'),
@@ -96,18 +115,24 @@ class Entries extends Relationship
                         'if' => [
                             'mode' => 'default',
                         ],
+                        'width' => 50,
                     ],
-                    'collections' => [
-                        'display' => __('Collections'),
-                        'instructions' => __('statamic::fieldtypes.entries.config.collections'),
-                        'type' => 'collections',
-                        'mode' => 'select',
+                ],
+            ],
+            [
+                'display' => __('Boundaries & Limits'),
+                'fields' => [
+                    'max_items' => [
+                        'display' => __('Max Items'),
+                        'instructions' => __('statamic::messages.max_items_instructions'),
+                        'min' => 1,
+                        'type' => 'integer',
                     ],
-                    'search_index' => [
-                        'display' => __('Search Index'),
-                        'instructions' => __('statamic::fieldtypes.entries.config.search_index'),
-                        'type' => 'text',
-                    ],
+                ],
+            ],
+            [
+                'display' => __('Advanced'),
+                'fields' => [
                     'query_scopes' => [
                         'display' => __('Query Scopes'),
                         'instructions' => __('statamic::fieldtypes.entries.config.query_scopes'),
@@ -117,11 +142,6 @@ class Entries extends Relationship
                             ->map->handle()
                             ->values()
                             ->all(),
-                    ],
-                    'select_across_sites' => [
-                        'display' => __('Select Across Sites'),
-                        'instructions' => __('statamic::fieldtypes.entries.config.select_across_sites'),
-                        'type' => 'toggle',
                     ],
                 ],
             ],

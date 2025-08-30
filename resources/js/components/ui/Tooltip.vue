@@ -1,6 +1,8 @@
 <script setup>
 import { TooltipArrow, TooltipContent, TooltipPortal, TooltipProvider, TooltipRoot, TooltipTrigger } from 'reka-ui';
-import { computed } from 'vue';
+import { computed, useAttrs } from 'vue';
+
+const attrs = useAttrs();
 
 const props = defineProps({
     text: { type: String, default: null },
@@ -9,12 +11,17 @@ const props = defineProps({
 });
 
 const tooltipText = computed(() => (props.markdown ? markdown(props.markdown) : props.text));
+
+const triggerAttrs = computed(() => ({
+    'as-child': !attrs.as,
+    ...attrs,
+}));
 </script>
 
 <template>
     <TooltipProvider :ariaLabel="tooltipText" :delay-duration="delay">
         <TooltipRoot>
-            <TooltipTrigger as-child>
+            <TooltipTrigger v-bind="triggerAttrs">
                 <slot />
             </TooltipTrigger>
             <TooltipPortal>

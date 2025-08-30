@@ -8,7 +8,7 @@
                         <div
                             class="size-8 rounded-full"
                             :class="{ 'cursor-not-allowed': isReadOnly }"
-                            :style="{ 'background-color': value }"
+                            :style="{ 'background-color': customColor || value }"
                         />
                     </button>
                 </template>
@@ -85,7 +85,7 @@ export default {
 
     computed: {
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
+            if (!this.showFieldPreviews) return;
 
             return this.value
                 ? replicatorPreviewHtml(`<span class="little-dot" style="background-color:${this.value}"></span>`)

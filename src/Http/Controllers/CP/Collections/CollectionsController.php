@@ -59,7 +59,6 @@ class CollectionsController extends CpController
             return [
                 'id' => $collection->handle(),
                 'title' => $collection->title(),
-                'entries' => $collection->queryEntries()->where('site', Site::selected())->orderBy('date', 'desc')->limit(5)->get(),
                 'entries_count' => $collection->queryEntries()->where('site', Site::selected())->count(),
                 'published_entries_count' => $collection->queryEntries()->where('site', Site::selected())->where('status', 'published')->count(),
                 'draft_entries_count' => $collection->queryEntries()->where('site', Site::selected())->where('status', 'draft')->count(),
@@ -73,6 +72,7 @@ class CollectionsController extends CpController
                 'edit_url' => $collection->editUrl(),
                 'delete_url' => $collection->deleteUrl(),
                 'entries_url' => cp_route('collections.show', $collection->handle()),
+                'entries_listing_url' => cp_route('collections.entries.index', $collection->handle()),
                 'create_entry_url' => $collection->createEntryUrl(Site::selected()),
                 'url' => $collection->absoluteUrl(Site::selected()->handle()),
                 'blueprints_url' => cp_route('blueprints.collections.index', $collection->handle()),
@@ -371,7 +371,6 @@ class CollectionsController extends CpController
                         'display' => __('Icon'),
                         'instructions' => __('statamic::messages.collection_configure_icon_instructions'),
                         'type' => 'icon',
-                        'folder' => 'light',
                         'width' => '33',
                     ],
                 ],

@@ -27,8 +27,17 @@ class CorePreferences
 
         Preference::register('strict_accessibility', [
             'type' => 'toggle',
-            'display' => __('Strict WCAG 2.2 Conformity'),
-            'instructions' => __('statamic::messages.preference_wcag'),
+            'display' => __('Stricter WCAG 2.2 Mode'),
+            'instructions' => __('statamic::messages.preference_strict_accessibility_instructions'),
+            'variant' => 'inline',
+        ]);
+
+        Preference::register('confirm_dirty_navigation', [
+            'type' => 'toggle',
+            'default' => true,
+            'display' => __('Confirm Dirty Navigation'),
+            'instructions' => __('statamic::messages.preference_confirm_dirty_navigation_instructions'),
+            'variant' => 'inline',
         ]);
     }
 

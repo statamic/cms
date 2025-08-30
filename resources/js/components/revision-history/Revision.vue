@@ -56,7 +56,7 @@
                     :component-props="componentProps"
                     @closed="showDetails = false"
                 >
-                    <template slot="action-buttons-right">
+                    <template #action-buttons-right>
                         <restore-revision
                             v-if="canRestoreRevisions"
                             :revision="revision"
@@ -74,8 +74,8 @@
 <script>
 import RestoreRevision from './Restore.vue';
 import RevisionPreview from './Preview.vue';
-import DateFormatter from '@statamic/components/DateFormatter.js';
-import { Subheading, Badge } from '@statamic/ui';
+import DateFormatter from '@/components/DateFormatter.js';
+import { Subheading, Badge } from '@/components/ui';
 
 export default {
     components: {

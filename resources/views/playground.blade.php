@@ -36,6 +36,31 @@
     </section>
 
     <section class="space-y-4">
+        <ui-heading size="lg">Buttons</ui-heading>
+        <div class="mb-4 flex gap-3 items-end">
+            <ui-button text="Default" />
+            <ui-button text="Primary" variant="primary" />
+            <ui-button text="Filled" variant="filled" />
+            <ui-button text="Ghost" variant="ghost" />
+            <ui-button text="Subtle" variant="subtle" />
+        </div>
+        <div class="mb-4 flex gap-3 items-end">
+            <ui-button icon="save" text="Default" />
+            <ui-button icon="save" text="Primary" variant="primary" />
+            <ui-button icon="save" text="Filled" variant="filled" />
+            <ui-button icon="save" text="Ghost" variant="ghost" />
+            <ui-button icon="save" text="Subtle" variant="subtle" />
+        </div>
+        <div class="mb-4 flex gap-3 items-end">
+            <ui-button icon="save" />
+            <ui-button icon="save" variant="primary" />
+            <ui-button icon="save" variant="filled" />
+            <ui-button icon="save" variant="ghost" />
+            <ui-button icon="save" variant="subtle" />
+        </div>
+    </section>
+
+    <section class="space-y-4">
         <ui-heading size="lg">Calendar</ui-heading>
         <div class="flex gap-6">
             <ui-card>

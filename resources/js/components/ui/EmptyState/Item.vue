@@ -1,5 +1,5 @@
 <script setup>
-import { CardPanel, Icon } from '@statamic/ui';
+import { CardPanel, Icon } from '@/components/ui';
 import { useSlots } from 'vue';
 
 const props = defineProps({

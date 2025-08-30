@@ -6,7 +6,7 @@
         <div :class="{ 'publish-fields': fullScreenMode }">
             <div :class="fullScreenMode && wrapperClasses">
                 <div
-                    class="bard-fieldtype antialiased typography-content with-contrast:border-gray-500 shadow-ui-sm focus-outline-discrete"
+                    class="bard-fieldtype antialiased st-text-legibility with-contrast:border-gray-500 shadow-ui-sm focus-outline-discrete"
                     :class="{ 'bard-fullscreen': fullScreenMode }"
                     ref="container"
                     @dragstart.stop="ignorePageHeader(true)"
@@ -59,11 +59,11 @@
                         tabindex="0"
                     >
                         <bubble-menu
-                            class="bard-floating-toolbar"
                             :editor="editor"
-                            :tippy-options="{ maxWidth: 'none', zIndex: 1000 }"
+                            :options="{ placement: 'top', offset: [0, 10] }"
                             v-if="editor && toolbarIsFloating && !readOnly"
                         >
+                        <div class="bard-floating-toolbar">
                             <component
                                 v-for="button in visibleButtons(buttons)"
                                 :key="button.name"
@@ -73,7 +73,9 @@
                                 :bard="this"
                                 :config="config"
                                 :editor="editor"
+                                variant="floating"
                             />
+                        </div>
                         </bubble-menu>
 
                         <floating-menu
@@ -86,6 +88,7 @@
                             @hidden="showAddSetButton = false"
                         >
                             <set-picker
+                                ref="setPicker"
                                 v-if="showAddSetButton"
                                 :sets="groupConfigs"
                                 class="bard-set-selector"
@@ -94,15 +97,12 @@
                                 <template #trigger>
                                     <button
                                         type="button"
-                                        class="btn-round bard-add-set-button group"
-                                        :style="{ transform: `translateY(${y}px)` }"
+                                        class="btn-round bard-add-set-button group size-7!"
+                                        :style="{ transform: `translateY(${y+2}px)` }"
                                         :aria-label="__('Add Set')"
                                         v-tooltip="__('Add Set')"
                                     >
-                                        <svg-icon
-                                            name="micro/plus"
-                                            class="dark:group-hover:dark-text-100 dark:text-dark-175 h-3 w-3 text-gray-900 group-hover:text-black"
-                                        />
+                                        <ui-icon name="plus" class="size-4" />
                                     </button>
                                 </template>
                             </set-picker>
@@ -129,37 +129,31 @@
 import Fieldtype from '../Fieldtype.vue';
 import uniqid from 'uniqid';
 import Emitter from 'tiny-emitter';
-import { BubbleMenu, Editor, EditorContent } from '@tiptap/vue-3';
+import { Editor, EditorContent } from '@tiptap/vue-3';
+import { BubbleMenu } from '@tiptap/vue-3/menus';
 import { Extension } from '@tiptap/core';
 import { FloatingMenu } from './FloatingMenu';
 import Blockquote from '@tiptap/extension-blockquote';
 import Bold from '@tiptap/extension-bold';
-import BulletList from '@tiptap/extension-bullet-list';
+import { BulletList, OrderedList, ListItem } from '@tiptap/extension-list';
 import CharacterCount from '@tiptap/extension-character-count';
 import Code from '@tiptap/extension-code';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
-import Dropcursor from '@tiptap/extension-dropcursor';
-import Gapcursor from '@tiptap/extension-gapcursor';
 import HardBreak from '@tiptap/extension-hard-break';
 import Heading from '@tiptap/extension-heading';
 import History from '@tiptap/extension-history';
 import HorizontalRule from '@tiptap/extension-horizontal-rule';
 import Italic from '@tiptap/extension-italic';
-import ListItem from '@tiptap/extension-list-item';
-import OrderedList from '@tiptap/extension-ordered-list';
 import Paragraph from '@tiptap/extension-paragraph';
-import Placeholder from '@tiptap/extension-placeholder';
 import Strike from '@tiptap/extension-strike';
 import Subscript from '@tiptap/extension-subscript';
 import Superscript from '@tiptap/extension-superscript';
-import Table from '@tiptap/extension-table';
-import TableRow from '@tiptap/extension-table-row';
-import TableCell from '@tiptap/extension-table-cell';
-import TableHeader from '@tiptap/extension-table-header';
+import { Table, TableRow, TableCell, TableHeader } from '@tiptap/extension-table';
 import Text from '@tiptap/extension-text';
 import TextAlign from '@tiptap/extension-text-align';
 import Typography from '@tiptap/extension-typography';
 import Underline from '@tiptap/extension-underline';
+import { Placeholder, Dropcursor, Gapcursor } from '@tiptap/extensions';
 import SetPicker from '../replicator/SetPicker.vue';
 import { DocumentBlock, DocumentInline } from './Document';
 import { Set } from './Set';
@@ -173,7 +167,8 @@ import { availableButtons, addButtonHtml } from '../bard/buttons';
 import readTimeEstimate from 'read-time-estimate';
 import { common, createLowlight } from 'lowlight';
 import 'highlight.js/styles/github.css';
-import importTiptap from '@statamic/util/tiptap.js';
+import importTiptap from '@/util/tiptap.js';
+import { computed } from 'vue';
 
 const lowlight = createLowlight(common);
 let tiptap = null;
@@ -211,6 +206,7 @@ export default {
             provide: {
                 bard: this.makeBardProvide(),
                 bardSets: this.config.sets,
+                showReplicatorFieldPreviews: this.config.previews,
             },
             errorsById: {},
         };
@@ -283,7 +279,7 @@ export default {
         },
 
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
+            if (!this.showFieldPreviews) return;
             const stack = [...this.value];
             let text = '';
             while (stack.length) {
@@ -327,7 +323,7 @@ export default {
             return [
                 {
                     title: __('Expand All Sets'),
-                    icon: 'expand-vertical-4',
+                    icon: 'ui/expand',
                     quick: true,
                     visibleWhenReadOnly: true,
                     run: this.expandAll,
@@ -335,7 +331,7 @@ export default {
                 },
                 {
                     title: __('Collapse All Sets'),
-                    icon: 'shrink-vertical',
+                    icon: 'ui/collapse',
                     quick: true,
                     visibleWhenReadOnly: true,
                     run: this.collapseAll,
@@ -343,7 +339,7 @@ export default {
                 },
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => (vm.fullScreenMode ? 'shrink-all' : 'expand'),
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'ui/collapse-all' : 'ui/expand-all'),
                     quick: true,
                     run: this.toggleFullscreen,
                     visibleWhenReadOnly: true,
@@ -526,6 +522,11 @@ export default {
         },
 
         shouldShowSetButton({ view, state }) {
+            const isActive = this.suitableToShowSetButton({ view, state });
+            return this.setConfigs.length && (this.config.always_show_set_button || isActive);
+        },
+
+        suitableToShowSetButton({ view, state }) {
             const { selection } = state;
             const { $anchor, empty } = selection;
             const isRootDepth = $anchor.depth === 1;
@@ -534,8 +535,7 @@ export default {
             const isAroundInlineImage =
                 state.selection.$to.nodeBefore?.type.name === 'image' ||
                 state.selection.$to.nodeAfter?.type.name === 'image';
-            const isActive = view.hasFocus() && empty && isRootDepth && isEmptyTextBlock && !isAroundInlineImage;
-            return this.setConfigs.length && (this.config.always_show_set_button || isActive);
+            return view.hasFocus() && empty && isRootDepth && isEmptyTextBlock && !isAroundInlineImage;
         },
 
         initToolbarButtons() {
@@ -712,8 +712,11 @@ export default {
                     // Since clicking into a field inside a set would also trigger a blur, we can't just emit the
                     // blur event immediately. We need to make sure that the newly focused element is outside
                     // of Bard. We use a timeout because activeElement only exists after the blur event.
+                    // Additionally, check that the focused element isn't the set picker's search input.
                     setTimeout(() => {
-                        if (!this.$refs.container.contains(document.activeElement)) {
+                        const isInsideBard = this.$refs.container.contains(document.activeElement);
+                        const isSetPickerSearch = document.activeElement.hasAttribute('data-set-picker-search-input');
+                        if (!isInsideBard && !isSetPickerSearch) {
                             this.$emit('blur');
                             this.showAddSetButton = false;
                         }
@@ -796,6 +799,7 @@ export default {
 
             // Allow passthrough of Ctrl/Cmd + Enter to submit the form
             const DisableCtrlEnter = Extension.create({
+                name: 'disableCtrlEnter',
                 addKeyboardShortcuts() {
                     return {
                         'Ctrl-Enter': () => true,
@@ -804,10 +808,34 @@ export default {
                 },
             });
 
+            // Handle forward slash to open set picker
+            const SlashSetPicker = Extension.create({
+                name: 'slashSetPicker',
+                addKeyboardShortcuts() {
+                    return {
+                        '/': () => {
+                            const { view, state } = this.editor;
+
+                            if (this.options.allowed({ view, state})) {
+                                this.options.openSetPicker();
+                                return true; // Prevent inserting a slash.
+                            }
+
+                            return false; // Allow default behavior (insert slash)
+                        },
+                    };
+                },
+            });
+
             let exts = [
                 CharacterCount.configure({ limit: this.config.character_limit }),
                 ...modeExts,
                 DisableCtrlEnter,
+                SlashSetPicker.configure({
+                    shown: computed(() => this.showAddSetButton),
+                    allowed: this.suitableToShowSetButton,
+                    openSetPicker: this.openSetPicker,
+                }),
                 Dropcursor,
                 Gapcursor,
                 History,
@@ -892,6 +920,10 @@ export default {
             });
             return bard;
         },
+
+        openSetPicker() {
+            this.$refs.setPicker.open();
+        }
     },
 };
 </script>

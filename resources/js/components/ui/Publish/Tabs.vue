@@ -1,14 +1,14 @@
 <script setup>
-import { Tabs, TabList, TabTrigger, TabContent } from '@statamic/ui';
+import { Tabs, TabList, TabTrigger, TabContent } from '@/components/ui';
 import TabProvider from './TabProvider.vue';
 import { injectContainerContext } from './Container.vue';
-import Sections from '@statamic/components/ui/Publish/Sections.vue';
+import Sections from '@/components/ui/Publish/Sections.vue';
 import { ref, computed, useSlots, onMounted, watch } from 'vue';
-import ElementContainer from '@statamic/components/ElementContainer.vue';
-import ShowField from '@statamic/components/field-conditions/ShowField.js';
+import ElementContainer from '@/components/ElementContainer.vue';
+import ShowField from '@/components/field-conditions/ShowField.js';
 
 const slots = useSlots();
-const { blueprint, visibleValues, extraValues, errors, hiddenFields, revealerFields, setHiddenField } = injectContainerContext();
+const { blueprint, visibleValues, extraValues, revealerValues, errors, hiddenFields, setHiddenField } = injectContainerContext();
 const tabs = ref(blueprint.value.tabs);
 const width = ref(null);
 const sidebarTab = computed(() => tabs.value.find((tab) => tab.handle === 'sidebar'));
@@ -23,8 +23,8 @@ const visibleMainTabs = computed(() => {
                     visibleValues.value,
                     extraValues.value,
                     visibleValues.value,
+                    revealerValues.value,
                     hiddenFields.value,
-                    revealerFields.value,
                     setHiddenField
                 ).showField(field, field.handle);
             });
@@ -92,18 +92,26 @@ function tabHasError(tab) {
                     :key="tab.handle"
                     :name="tab.handle"
                     :text="__(tab.display)"
-                    :class="{ '!text-red-500': tabHasError(tab) }"
+                    :class="{ '!text-red-600': tabHasError(tab) }"
                 />
             </TabList>
 
             <div :class="{ 'grid grid-cols-[1fr_320px] gap-8': shouldShowSidebar }">
-                <TabContent v-for="tab in mainTabs" :key="tab.handle" :name="tab.handle">
+                <TabContent v-if="visibleMainTabs.length > 1" v-for="tab in mainTabs" :key="tab.handle" :name="tab.handle">
                     <TabProvider :tab="tab">
                         <slot :tab="tab">
                             <Sections />
                         </slot>
                     </TabProvider>
                 </TabContent>
+
+                <template v-else>
+                    <TabProvider :tab="visibleMainTabs[0]">
+                        <slot :tab="visibleMainTabs[0]">
+                            <Sections />
+                        </slot>
+                    </TabProvider>
+                </template>
 
                 <aside class="space-y-6" v-if="shouldShowSidebar">
                     <slot name="actions" />

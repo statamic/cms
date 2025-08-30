@@ -1,5 +1,5 @@
 <script setup>
-import { Modal, ModalClose, Button } from '@statamic/ui';
+import { Modal, ModalClose, Button } from '@/components/ui';
 import { ref } from 'vue';
 
 const props = defineProps({
@@ -24,7 +24,7 @@ const shouldDeleteChildren = ref(false);
                     <Button variant="ghost" :text="__('Cancel')" />
                 </ModalClose>
                 <Button
-                    variant="primary"
+                    variant="danger"
                     :text="__('Delete')"
                     @click="$emit('confirm', shouldDeleteChildren)"
                 />

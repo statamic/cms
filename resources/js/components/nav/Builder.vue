@@ -7,25 +7,42 @@
                 </DropdownMenu>
             </Dropdown>
 
-            <Button
+            <ui-command-palette-item
                 v-if="isDirty"
-                variant="filled"
+                :category="$commandPalette.category.Actions"
                 :text="__('Discard changes')"
-                @click="$refs.tree.cancel"
-            />
+                icon="trash"
+                :action="discardChanges"
+                v-slot="{ text, action }"
+            >
+                <Button
+                    variant="filled"
+                    :text="__('Discard changes')"
+                    @click="action"
+                />
+            </ui-command-palette-item>
 
             <Dropdown placement="left-start">
                 <template #trigger>
                     <Button :text="__('Add')" icon-append="ui/chevron-down" />
                 </template>
                 <DropdownMenu>
-                    <DropdownItem :text="__('Add Nav Item')" @click="addItem($refs.tree.rootChildren[0])" icon="plus" />
+                    <DropdownItem :text="__('Add Nav Item')" @click="addItemToTopLevel" icon="plus" />
                     <DropdownItem :text="__('Add Section')" @click="addSection" icon="add-section" />
                 </DropdownMenu>
             </Dropdown>
 
             <ButtonGroup>
-                <Button type="submit" variant="primary" :disabled="!changed" :text="__('Save')" @click="save" />
+                <ui-command-palette-item
+                    :category="$commandPalette.category.Actions"
+                    :text="__('Save')"
+                    icon="save"
+                    :action="save"
+                    prioritize
+                    v-slot="{ text, action }"
+                >
+                    <Button type="submit" variant="primary" :disabled="!changed" :text="text" @click="action" />
+                </ui-command-palette-item>
 
                 <Dropdown align="end" v-if="hasSaveAsOptions">
                     <template #trigger>
@@ -46,13 +63,13 @@
 
         <Panel class="nav-builder">
             <div class="loading card" v-if="loading">
-                <loading-graphic />
+                <Icon name="loading" />
             </div>
 
             <PanelHeader>
                 <div class="page-tree-header font-medium text-sm items-center flex justify-between">
                     <div v-text="__('Navigation')" />
-                    <div class="flex gap-2 -me-3">
+                    <div class="flex gap-2">
                         <ui-button size="sm" icon="tree-collapse" :text="__('Collapse')" @click="collapseAll" />
                         <ui-button size="sm" icon="tree-expand" :text="__('Expand')" @click="expandAll" />
                     </div>
@@ -176,7 +193,7 @@
             :buttonText="__('Remove')"
             :danger="true"
             @confirm="removeItem(confirmingRemoval, true)"
-            @cancel="confirmingReset = false"
+            @cancel="confirmingRemoval = false"
         />
     </div>
 </template>
@@ -188,7 +205,7 @@ import TopLevelSectionBranch from './TopLevelSectionBranch.vue';
 import ItemEditor from './ItemEditor.vue';
 import SectionEditor from './SectionEditor.vue';
 import { data_get } from '../../bootstrap/globals.js';
-import { Header, Button, ButtonGroup, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, DropdownLabel, Panel, PanelHeader } from '@statamic/ui';
+import { Header, Button, ButtonGroup, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, DropdownLabel, Panel, PanelHeader, Icon } from '@/components/ui';
 
 export default {
     components: {
@@ -207,6 +224,7 @@ export default {
         TopLevelSectionBranch,
         Panel,
         PanelHeader,
+        Icon,
     },
 
     props: {
@@ -264,6 +282,7 @@ export default {
 
     mounted() {
         this.setInitialNav(this.nav);
+        this.addToCommandPalette();
     },
 
     computed: {
@@ -394,6 +413,10 @@ export default {
             this.targetStat = targetStat;
             this.creatingItem = true;
             this.creatingItemIsChild = this.isParentItemNode(targetStat);
+        },
+
+        addItemToTopLevel() {
+            this.addItem(this.$refs.tree.rootChildren[0]);
         },
 
         addSection() {
@@ -732,6 +755,29 @@ export default {
             this.updateItemAction(this.draggingStat);
             this.draggingStat = false;
             return true;
+        },
+
+        addToCommandPalette() {
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Add Nav Item'),
+                icon: 'plus',
+                action: () => this.addItemToTopLevel(),
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Add Section'),
+                icon: 'add-section',
+                action: () => this.addSection(),
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Reset Nav Customizations'),
+                icon: 'history',
+                action: () => this.confirmingReset = true,
+            });
         },
     },
 };

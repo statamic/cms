@@ -30,7 +30,7 @@ class Section
 
     public function collapsed(): bool
     {
-        return $this->collapsible() && $this->contents['collapsed'] ?? false;
+        return $this->collapsible() && ($this->contents['collapsed'] ?? false);
     }
 
     public function contents(): array

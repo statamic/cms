@@ -1,6 +1,6 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
-import { Button } from '@statamic/ui';
+import { Button } from '@/components/ui';
 
 export default {
     mixins: [Fieldtype],
@@ -23,7 +23,7 @@ export default {
         >
             {{ blueprint.title }}
         </Button>
-        <Button size="sm" :href="config.all_blueprints_url">
+        <Button size="sm" :href="config.all_blueprints_url" v-if="config.all_blueprints_url">
             {{ __('View All Blueprints') }}
         </Button>
     </div>

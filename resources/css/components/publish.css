@@ -1,46 +1,6 @@
 /* GROUP PUBLISH COMPONENT
 =================================================== */
-.publish-tab-outer {
-    @apply flex justify-between;
-}
 
-.publish-form {
-    position: relative;
-
-    .loading-blocker {
-        padding-top: 50px;
-        border-radius: 3px;
-    }
-}
-
-.head .status {
-    display: inline-block;
-    label {
-        margin: 0 6px 0 0;
-        [dir='rtl'] & {
-            margin: 0 0 0 6px;
-        }
-        position: relative;
-        top: 3px;
-    }
-    > div {
-        display: inline-block;
-        position: relative;
-        top: 8px;
-    }
-}
-
-code.parent-url {
-    @apply block bg-none text-3xs text-gray-700;
-    padding: 0 0 3px 0;
-    [dir='rtl'] & {
-        padding: 0 0 3px 0;
-    }
-}
-
-
-/* GROUP PUBLISH COMPONENT / FIELDS
-=================================================== */
 .publish-fields,
 .field-grid {
     display: grid;
@@ -57,6 +17,7 @@ code.parent-url {
         grid-column: span var(--col-span, var(--grid-columns));
     }
 }
+
 @variant lg {
     .field-w-25  { --col-span: calc(var(--grid-columns) * 0.25); }
     .field-w-33  { --col-span: calc(var(--grid-columns) * 0.333); }

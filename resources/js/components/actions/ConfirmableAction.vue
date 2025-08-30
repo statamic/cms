@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onUnmounted } from 'vue';
-import { PublishContainer, FieldsProvider, PublishFields } from '@statamic/ui';
-import { requireElevatedSessionIf } from '@statamic/components/elevated-sessions/index.js';
+import { PublishContainer, FieldsProvider, PublishFields } from '@/components/ui';
+import { requireElevatedSessionIf } from '@/components/elevated-sessions/index.js';
 
 const props = defineProps({
     action: { type: Object, required: true },
@@ -99,14 +99,14 @@ defineExpose({
         <div
             v-if="warningText"
             v-text="warningText"
-            class="text-red-500"
+            class="text-red-600"
             :class="{ 'mb-4': showDirtyWarning || action.fields.length }"
         />
 
         <div
             v-if="showDirtyWarning"
             v-text="dirtyText"
-            class="text-red-500"
+            class="text-red-600"
             :class="{ 'mb-4': action.fields.length }"
         />
 

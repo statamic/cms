@@ -11,7 +11,7 @@
             <div class="min-h-20">
                 <div v-if="bodyText" v-text="bodyText" :class="{ 'mb-4': warningText || hasFields }" />
 
-                <div v-if="warningText" v-text="warningText" class="text-red-500" :class="{ 'mb-4': hasFields }" />
+                <div v-if="warningText" v-text="warningText" class="text-red-600" :class="{ 'mb-4': hasFields }" />
 
                 <PublishContainer
                     v-if="hasFields && !resolving"
@@ -32,7 +32,7 @@
 
 <script>
 import uniqid from 'uniqid';
-import { PublishContainer, FieldsProvider, PublishFields } from '@statamic/ui';
+import { PublishContainer, FieldsProvider, PublishFields } from '@/components/ui';
 
 export default {
     components: { PublishContainer, FieldsProvider, PublishFields },

@@ -6,7 +6,10 @@
 @extends($authed ? 'statamic::layout' : 'statamic::outside')
 
 @section('content')
-    <div class="{{ $authed ? 'pt-30' : 'items-center' }} flex min-h-screen justify-center">
-        <h1 class="mb-10 text-center text-3xl tracking-tighter opacity-50">{{ __('Page Not Found') }}</h1>
+    <div class="flex min-h-screen flex-col items-center justify-center">
+        <ui-card class="text-center flex flex-col items-center space-y-2">
+            <ui-heading size="2xl">{{ __('404') }}</ui-heading>
+            <ui-description>{{ __('The page you are looking for could not be found.') }}</ui-description>
+        </ui-card>
     </div>
 @endsection

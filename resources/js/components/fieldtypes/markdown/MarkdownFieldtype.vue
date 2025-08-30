@@ -3,8 +3,8 @@
         <element-container @resized="refresh">
             <div
                 class="
-                    @container/markdown w-full block bg-white dark:bg-gray-900 rounded-lg relative
-                    border border-gray-300 with-contrast:border-gray-500 dark:border-x-0 dark:border-t-0 dark:border-white/10 dark:inset-shadow-2xs dark:inset-shadow-black
+                    @container/markdown w-full block bg-white dark:bg-gray-900! rounded-lg relative
+                    border border-gray-300 with-contrast:border-gray-500 dark:border-white/15 dark:inset-shadow-2xs dark:inset-shadow-black
                     text-gray-900 dark:text-gray-300
                     appearance-none antialiased shadow-ui-sm disabled:shadow-none
                 "
@@ -44,7 +44,7 @@
                         </publish-field-fullscreen-header>
 
                         <markdown-toolbar
-                            v-if="!fullScreenMode"
+                            v-if="!fullScreenMode && showFixedToolbar"
                             v-model:mode="mode"
                             :buttons="buttons"
                             :is-read-only="isReadOnly"
@@ -56,7 +56,7 @@
                         />
 
                         <div class="drag-notification" v-show="dragging">
-                            <svg-icon name="upload" class="mb-4 size-12" />
+                            <ui-icon name="upload" class="mb-4 size-12" />
                             {{ __('Drop File to Upload') }}
                         </div>
 
@@ -72,40 +72,52 @@
                                 @drop="draggingFile = false"
                                 @keydown="shortcut"
                             >
-                                <div class="editor relative z-6 typography-content focus-within:focus-outline focus-outline-discrete" ref="codemirror"></div>
-                                <!-- Hidden input for label association -->
-                                <input
-                                    v-if="id"
-                                    :id="id"
-                                    type="text"
-                                    class="sr-only"
-                                    @focus="focusCodeMirror"
-                                    tabindex="-1"
-                                />
+                                <div class="editor relative z-6 st-text-legibility focus-within:focus-outline focus-outline-discrete" ref="codemirror">
+                                    <div
+                                        v-if="showFloatingToolbar && toolbarIsFloating && !isReadOnly"
+                                        class="markdown-floating-toolbar absolute z-50 flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-2 py-1 shadow-lg dark:border-white/10 dark:bg-gray-900"
+                                        :style="{ left: `${floatingToolbarX}px`, top: `${floatingToolbarY}px` }"
+                                        @mousedown.prevent
+                                    >
+                                        <Button
+                                            :aria-label="button.text"
+                                            :icon="button.svg"
+                                            :key="button.name"
+                                            @click="handleButtonClick(button.command)"
+                                            size="sm"
+                                            v-for="button in buttons"
+                                            v-tooltip="button.text"
+                                            variant="ghost"
+                                        />
+                                    </div>
+                                </div>
 
-                                    <footer class="flex items-center justify-between bg-gray-50 dark:bg-gray-950 rounded-b-lg border-t border-gray-200 dark:border-white/10 p-1 text-sm w-full" :class="{ 'absolute inset-x-0 bottom-0': fullScreenMode }">
-                                        <div class="markdown-cheatsheet-helper">
-                                            <Button
-                                                icon="markdown"
-                                                size="sm"
-                                                variant="subtle"
-                                                @click="showCheatsheet = true"
-                                                :aria-label="__('Show Markdown Cheatsheet')"
-                                                :text="__('Markdown Cheatsheet')"
-                                            />
+                                <!-- Hidden input for label association -->
+                                <input v-if="id" :id="id" type="text" class="sr-only" @focus="focusCodeMirror" tabindex="-1" />
+
+                                <footer class="flex items-center justify-between bg-gray-50 dark:bg-gray-950 rounded-b-lg border-t border-gray-200 dark:border-white/10 p-1 text-sm w-full" :class="{ 'absolute inset-x-0 bottom-0 rounded-': fullScreenMode }">
+                                    <div class="markdown-cheatsheet-helper">
+                                        <Button
+                                            icon="markdown"
+                                            size="sm"
+                                            variant="subtle"
+                                            @click="showCheatsheet = true"
+                                            :aria-label="__('Show Markdown Cheatsheet')"
+                                            :text="__('Markdown Cheatsheet')"
+                                        />
+                                    </div>
+                                    <div v-if="fullScreenMode" class="flex items-center pe-2 gap-3 text-xs">
+                                        <div class="whitespace-nowrap">
+                                            <span v-text="count.words" /> {{ __('Words') }}
                                         </div>
-                                        <div v-if="fullScreenMode" class="flex items-center pe-2 gap-3 text-xs">
-                                            <div class="whitespace-nowrap">
-                                                <span v-text="count.words" /> {{ __('Words') }}
-                                            </div>
-                                            <div class="whitespace-nowrap">
-                                                <span v-text="count.characters" /> {{ __('Characters') }}
-                                            </div>
+                                        <div class="whitespace-nowrap">
+                                            <span v-text="count.characters" /> {{ __('Characters') }}
                                         </div>
-                                    </footer>
+                                    </div>
+                                </footer>
 
                                 <div class="drag-notification" v-if="assetsEnabled && draggingFile">
-                                    <svg-icon name="upload" class="mb-4 size-12" />
+                                    <ui-icon name="upload" class="mb-4 size-12" />
                                     {{ __('Drop File to Upload') }}
                                 </div>
                             </div>
@@ -119,31 +131,27 @@
                     </div>
                 </uploader>
 
-                <stack
-                    v-if="showAssetSelector && !isReadOnly"
-                    name="markdown-asset-selector"
-                    @closed="closeAssetSelector"
-                >
-                    <selector
+                <stack v-if="showAssetSelector && !isReadOnly" name="markdown-asset-selector" @closed="closeAssetSelector">
+                    <asset-selector
                         :container="container"
                         :folder="folder"
                         :selected="selectedAssets"
                         :restrict-folder-navigation="restrictAssetNavigation"
+                        :columns="assetSelectorColumns"
                         @selected="assetsSelected"
                         @closed="closeAssetSelector"
                     />
                 </stack>
 
                 <stack name="markdownCheatSheet" v-if="showCheatsheet" @closed="showCheatsheet = false">
-                    <div class="relative h-full overflow-auto bg-white p-6 dark:bg-dark-600">
-                        <button
-                            class="btn-close absolute top-0 mt-4 ltr:right-0 ltr:mr-8 rtl:left-0 rtl:ml-8"
+                    <div class="relative h-full overflow-auto bg-white p-6 dark:bg-gray-800 rounded-l-2xl">
+                        <Button
+                            icon="x"
+                            variant="ghost"
+                            class="absolute top-4 end-4"
                             @click="showCheatsheet = false"
-                            :aria-label="__('Close Markdown Cheatsheet')"
-                        >
-                            &times;
-                        </button>
-                        <div class="prose mx-auto my-8 max-w-md">
+                        />
+                        <div class="prose prose-zinc prose-headings:font-medium mx-auto my-8 max-w-3xl">
                             <h2 v-text="__('Markdown Cheatsheet')"></h2>
                             <div v-html="__('markdown.cheatsheet')"></div>
                         </div>
@@ -159,8 +167,8 @@ import Fieldtype from '../Fieldtype.vue';
 import { marked } from 'marked';
 import { markRaw } from 'vue';
 import { TextRenderer as PlainTextRenderer } from '@davidenke/marked-text-renderer';
-import throttle from '@statamic/util/throttle.js';
-import { Button } from '@statamic/ui';
+import throttle from '@/util/throttle.js';
+import { Button } from '@/components/ui';
 
 import CodeMirror from 'codemirror/lib/codemirror';
 import 'codemirror/addon/edit/closebrackets';
@@ -178,7 +186,7 @@ import 'codemirror/mode/yaml/yaml';
 import 'codemirror/addon/edit/continuelist';
 
 import { availableButtons } from './buttons';
-import Selector from '../../assets/Selector.vue';
+import AssetSelector from '../../assets/Selector.vue';
 import Uploader from '../../assets/Uploader.vue';
 import Uploads from '../../assets/Uploads.vue';
 import MarkdownToolbar from './MarkdownToolbar.vue';
@@ -231,7 +239,7 @@ export default {
 
     components: {
         Button,
-        Selector,
+        AssetSelector,
         Uploader,
         Uploads,
         MarkdownToolbar,
@@ -245,7 +253,6 @@ export default {
             selections: null,
             showAssetSelector: false,
             selectedAssets: [],
-            selectorViewMode: null,
             draggingFile: false,
             showCheatsheet: false,
             fullScreenMode: false,
@@ -258,6 +265,9 @@ export default {
             },
             escBinding: null,
             markdownPreviewText: null,
+            showFloatingToolbar: false,
+            floatingToolbarX: 0,
+            floatingToolbarY: 0,
         };
     },
 
@@ -295,6 +305,12 @@ export default {
         this.$events.$off('livepreview.opened', this.throttledResizeEvent);
         this.$events.$off('livepreview.closed', this.throttledResizeEvent);
         this.$events.$off('livepreview.resizing', this.throttledResizeEvent);
+
+        // Clean up CodeMirror event listeners
+        if (this.codemirror && this.toolbarIsFloating) {
+            this.codemirror.off('cursorActivity', this.handleCursorActivity);
+            this.codemirror.off('blur', this.hideFloatingToolbar);
+        }
     },
 
     methods: {
@@ -642,6 +658,12 @@ export default {
                 }),
             );
 
+                        // Set up floating toolbar event listeners if in floating mode
+            if (this.toolbarIsFloating) {
+                self.codemirror.on('cursorActivity', this.handleCursorActivity);
+                self.codemirror.on('blur', this.hideFloatingToolbar);
+            }
+
             // Note: ID is set on a hidden input element for label association
             // The CodeMirror element doesn't need the ID attribute
 
@@ -698,6 +720,43 @@ export default {
         handleButtonClick(command) {
             command(this);
         },
+
+        handleCursorActivity() {
+            if (!this.toolbarIsFloating) return;
+
+            const selection = this.codemirror.getSelection();
+
+            if (selection && selection.length > 0 && !this.isReadOnly) {
+                const doc = this.codemirror.getDoc();
+                this.selections = doc.listSelections();
+
+                this.showFloatingToolbar = true;
+                this.updateFloatingToolbarPosition();
+            } else {
+                this.showFloatingToolbar = false;
+            }
+        },
+
+        hideFloatingToolbar() {
+            this.showFloatingToolbar = false;
+        },
+
+        updateFloatingToolbarPosition() {
+            if (!this.codemirror || !this.showFloatingToolbar) return;
+
+            const from = this.codemirror.getCursor('from');
+            const to = this.codemirror.getCursor('to');
+
+            const fromCoords = this.codemirror.cursorCoords(from);
+            const toCoords = this.codemirror.cursorCoords(to);
+
+            const editorRect = this.codemirror.getWrapperElement().getBoundingClientRect();
+            const x = Math.round((fromCoords.left + toCoords.right) / 2 - editorRect.left);
+            const y = Math.round(fromCoords.top - editorRect.top - 50);
+
+            this.floatingToolbarX = x;
+            this.floatingToolbarY = y;
+        },
     },
 
     computed: {
@@ -706,7 +765,11 @@ export default {
         },
 
         container() {
-            return this.config.container;
+            return this.meta.assets?.container;
+        },
+
+        assetSelectorColumns() {
+            return this.meta.assets?.columns;
         },
 
         editor() {
@@ -721,8 +784,20 @@ export default {
             return this.config.restrict_assets || false;
         },
 
+        toolbarIsFixed() {
+            return this.config.toolbar_mode === 'fixed';
+        },
+
+        toolbarIsFloating() {
+            return this.config.toolbar_mode === 'floating';
+        },
+
+        showFixedToolbar() {
+            return this.toolbarIsFixed && this.buttons.length > 0;
+        },
+
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
+            if (!this.showFieldPreviews) return;
 
             return marked(this.data || '', { renderer: new PlainTextRenderer() }).replace(/<\/?[^>]+(>|$)/g, '');
         },
@@ -731,7 +806,7 @@ export default {
             return [
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => (vm.fullScreenMode ? 'shrink-all' : 'expand-bold'),
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'ui/collapse-all' : 'ui/expand-all'),
                     quick: true,
                     visibleWhenReadOnly: true,
                     run: this.toggleFullscreen,

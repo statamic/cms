@@ -1,5 +1,5 @@
 <script setup>
-import { Modal, Button } from '@statamic/ui';
+import { Modal, Button } from '@/components/ui';
 import { ref } from 'vue';
 
 const emits = defineEmits(['confirm', 'cancel']);

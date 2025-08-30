@@ -1,5 +1,5 @@
 import axios from 'axios';
-import resetValuesFromResponse from '@statamic/util/resetValuesFromResponse.js';
+import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
 
 let container = null;
 let errors = null;
