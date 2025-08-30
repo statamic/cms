@@ -19,19 +19,21 @@ export default class Keys {
         return new GlobalBinding(this.globals).bind(bindings, callback);
     }
 
-    parse(bindings) {
+    render(bindings) {
         if (Array.isArray(bindings)) {
             bindings = bindings[0];
         }
 
         return bindings.toLowerCase().split('+').map(key => {
             switch(key) {
+                case "command":
                 case "cmd":
-                    return "command";
+                    return "⌘";
+                case "control":
                 case "ctrl":
-                    return "control";
+                    return "^";
                 case "mod":
-                    return "command"; // TODO: handle normalizing 'mod' cross platform
+                    return "⌘"; // TODO: handle normalizing 'mod' cross platform
                 default:
                     return key;
             }
