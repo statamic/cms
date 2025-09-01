@@ -170,7 +170,7 @@ class CorePermissions
                 ]),
             ];
 
-            if (config('statamic.assets.enable_folder_permissions')) {
+            if (config('statamic.assets.v6_permissions')) {
                 $childPermissions[] = $this->permission('edit {container} folders')->children([
                     $this->permission('create {container} folders'),
                     $this->permission('move {container} folders'),

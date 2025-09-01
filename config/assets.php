@@ -225,16 +225,14 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Dedicated folder permissions
+    | Use V6 Permissions
     |--------------------------------------------------------------------------
     |
-    | Control whether asset folders should have their own, dedicated
-    | permissions. By default, the permissions to create, move, rename or
-    | delete folders is tied to the actual asset permissions. Enabling this
-    | adds dedicated permissions for folders.
+    | This allows you to opt in to the asset permissions that will become the
+    | default behavior in Statamic 6. This will be removed in Statamic 6.
     |
     */
 
-    'enable_folder_permissions' => false,
+    'v6_permissions' => false,
 
 ];

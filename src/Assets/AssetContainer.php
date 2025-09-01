@@ -510,6 +510,10 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
      */
     public function allowDownloading($allowDownloading = null)
     {
+        if (config('statamic.assets.v6_permissions')) {
+            throw new \Exception('The allowDownloading method is deprecated and cannot be used when the v6_permissions setting is enabled.');
+        }
+
         return $this
             ->fluentlyGetOrSet('allowDownloading')
             ->getter(function ($allowDownloading) {
@@ -526,6 +530,10 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
      */
     public function allowMoving($allowMoving = null)
     {
+        if (config('statamic.assets.v6_permissions')) {
+            throw new \Exception('The allowMoving method is deprecated and cannot be used when the v6_permissions setting is enabled.');
+        }
+
         return $this
             ->fluentlyGetOrSet('allowMoving')
             ->getter(function ($allowMoving) {
@@ -542,6 +550,10 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
      */
     public function allowRenaming($allowRenaming = null)
     {
+        if (config('statamic.assets.v6_permissions')) {
+            throw new \Exception('The allowRenaming method is deprecated and cannot be used when the v6_permissions setting is enabled.');
+        }
+
         return $this
             ->fluentlyGetOrSet('allowRenaming')
             ->getter(function ($allowRenaming) {
@@ -558,6 +570,10 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
      */
     public function allowUploads($allowUploads = null)
     {
+        if (config('statamic.assets.v6_permissions')) {
+            throw new \Exception('The allowUploads method is deprecated and cannot be used when the v6_permissions setting is enabled.');
+        }
+
         return $this
             ->fluentlyGetOrSet('allowUploads')
             ->getter(function ($allowUploads) {
@@ -574,6 +590,10 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
      */
     public function createFolders($createFolders = null)
     {
+        if (config('statamic.assets.v6_permissions')) {
+            throw new \Exception('The createFolders method is deprecated and cannot be used when the v6_permissions setting is enabled.');
+        }
+
         return $this
             ->fluentlyGetOrSet('createFolders')
             ->getter(function ($createFolders) {

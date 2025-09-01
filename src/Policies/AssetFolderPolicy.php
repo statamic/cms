@@ -12,7 +12,7 @@ class AssetFolderPolicy
     {
         $user = User::fromUser($user);
 
-        $permission = config('statamic.assets.enable_folder_permissions')
+        $permission = config('statamic.assets.v6_permissions')
             ? "create {$assetContainer->handle()} folders"
             : "upload {$assetContainer->handle()} assets";
 
@@ -27,7 +27,7 @@ class AssetFolderPolicy
     {
         $user = User::fromUser($user);
 
-        $permission = config('statamic.assets.enable_folder_permissions')
+        $permission = config('statamic.assets.v6_permissions')
             ? "move {$assetFolder->container()->handle()} folders"
             : "move {$assetFolder->container()->handle()} assets";
 
@@ -49,7 +49,7 @@ class AssetFolderPolicy
     {
         $user = User::fromUser($user);
 
-        $permission = config('statamic.assets.enable_folder_permissions')
+        $permission = config('statamic.assets.v6_permissions')
             ? "rename {$assetFolder->container()->handle()} folders"
             : "rename {$assetFolder->container()->handle()} assets";
 
@@ -71,7 +71,7 @@ class AssetFolderPolicy
     {
         $user = User::fromUser($user);
 
-        $permission = config('statamic.assets.enable_folder_permissions')
+        $permission = config('statamic.assets.v6_permissions')
             ? "delete {$assetFolder->container()->handle()} folders"
             : "delete {$assetFolder->container()->handle()} assets";
 
