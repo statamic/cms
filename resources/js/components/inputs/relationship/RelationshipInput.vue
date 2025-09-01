@@ -49,7 +49,7 @@
             <div
                 v-if="canSelectOrCreate"
                 class="relationship-input-buttons @container relative"
-                :class="{ 'mt-4': items.length > 0 }"
+                :class="{ 'mt-3': items.length > 0 }"
             >
                 <div class="flex flex-wrap items-center gap-2">
                     <CreateButton
@@ -66,7 +66,7 @@
                     <Button
                         ref="existing"
                         icon="link"
-                        variant="filled"
+                        size="sm"
                         :text="linkLabel"
                         @click.prevent="isSelecting = true"
                     />

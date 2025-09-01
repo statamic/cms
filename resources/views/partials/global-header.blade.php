@@ -33,7 +33,7 @@
             </a>
             @if (Statamic::pro())
                 @if ($licenses->valid())
-                    <ui-badge size="sm" variant="flat" text="{{ __('Pro') }}" class="hidden sm:block select-none dark:bg-black/20!" />
+                    <ui-badge size="sm" variant="flat" text="{{ __('Pro') }}" class="hidden sm:block select-none bg-white/15!" />
                 @else
                     <ui-tooltip :text="{{ $licenses->requestFailed() ? "'".$licenses->requestFailureMessage()."'" : 'null' }}">
                         <ui-badge
@@ -111,7 +111,7 @@
         </div>
     </div>
 
-    <div class="dark flex-1 flex gap-1 md:gap-4 items-center justify-end shrink-0">
+    <div class="dark flex-1 flex gap-1 md:gap-3 items-center justify-end shrink-0">
         @if (Statamic\Facades\Site::authorized()->count() > 1)
             <global-site-selector></global-site-selector>
         @endif
@@ -127,8 +127,7 @@
                 :aria-label="text"
                 :href="url"
                 :icon="icon"
-                :round="true"
-                class="[&_svg]:size-4 -me-3"
+                class="[&_svg]:size-4 -me-2"
                 size="sm"
                 target="_blank"
                 v-tooltip="text"
