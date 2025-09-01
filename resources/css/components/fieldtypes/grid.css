@@ -8,6 +8,10 @@
     border-spacing: 0;
     table-layout: auto;
 
+    [data-ui-field-text] {
+        @apply sr-only;
+    }
+
     thead th {
         @apply sticky -top-2 table-cell z-10 border-b bg-gray-100/75 p-2 text-sm font-medium text-gray-900 dark:border-gray-900 dark:bg-gray-800 dark:text-gray-100;
     
@@ -67,9 +71,8 @@
     }
 
     tbody .grid-row-controls {
-        @apply text-center ltr:pl-0 rtl:pr-0;
+        @apply text-center pt-3 ltr:pl-0 rtl:pr-0;
         width: 1%;
-        padding-top: 21px; /*  pseudo-center for text/select fields */
     }
 }
 
