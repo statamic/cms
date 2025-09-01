@@ -131,6 +131,7 @@ return [
     'date_fieldtype_time_required' => 'Eine Zeitangabe ist erforderlich.',
     'duplicate_field_handle' => 'Ein Feld mit einem Handle :handle gibt es bereits.',
     'duplicate_uri' => 'Doppelte URI :value',
+    'elevated_session_verification_code' => 'Der Authentifizierungscode ist falsch.',
     'email_available' => 'Eine Benutzer:in mit dieser E-Mail-Adresse existiert bereits.',
     'fieldset_imported_recursively' => 'Fieldset :handle wird rekursiv importiert.',
     'one_site_without_origin' => 'Mindestens eine Website darf keine Quelle enthalten.',
@@ -151,6 +152,8 @@ return [
     'asset_file_exists' => 'Es gibt bereits eine Datei mit diesem Namen.',
     'asset_file_exists_same_content' => 'Es gibt bereits eine Datei mit diesem Namen und demselben Inhalt. Du möchtest sie vielleicht lieber löschen, anstatt umzubenennen.',
     'asset_file_exists_different_content' => 'Es gibt bereits eine Datei mit diesem Namen, die aber einen anderen Inhalt hat. Möglicherweise möchtest du die andere Datei durch diese Datei ersetzen.',
+    'invalid_two_factor_code' => 'Der angegebene Zwei-Faktor-Authentifizierungscode war ungültig.',
+    'invalid_two_factor_recovery_code' => 'Der angegebene Zwei-Faktor-Wiederherstellungscode war ungültig.',
     'custom.attribute-name.rule-name' => 'benutzerdefinierte Nachricht',
     'attributes' => [],
 ];
