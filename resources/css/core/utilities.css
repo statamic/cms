@@ -232,7 +232,7 @@
             position: relative;
             z-index: 1;
         }
-    
+
         &::after {
             --height: 1px;
             --line-color: hsl(0deg 0% 95%);
@@ -313,4 +313,8 @@
             background-image: var(--checkerboard-dark);
         }
     }
+}
+
+@utility shape-squircle {
+    corner-shape: squircle;
 }
