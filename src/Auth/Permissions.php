@@ -3,6 +3,7 @@
 namespace Statamic\Auth;
 
 use Facades\Statamic\Auth\CorePermissions;
+use Statamic\Facades\Blink;
 
 class Permissions
 {
@@ -136,6 +137,10 @@ class Permissions
 
     public function flattened()
     {
-        return collect($this->permissions)->flatMap->flattened();
+        $blink = 'flattened-permissions'.md5(json_encode($this->permissions));
+
+        return Blink::once($blink, function () {
+            return collect($this->permissions)->flatMap->flattened();
+        });
     }
 }
