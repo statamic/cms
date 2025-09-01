@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .grid-table {
-    @apply bg-white dark:bg-gray-800 relative w-full rounded-lg border text-gray shadow-ui-sm outline-hidden dark:border-gray-900 dark:text-dark-150 text-start;
+    @apply bg-white dark:bg-gray-800 relative w-full rounded-lg border shadow-ui-sm outline-hidden dark:border-gray-900 dark:text-dark-150 text-start;
     border-collapse: separate;
     border-spacing: 0;
     table-layout: auto;
