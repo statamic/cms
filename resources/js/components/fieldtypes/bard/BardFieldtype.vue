@@ -129,7 +129,7 @@
 import Fieldtype from '../Fieldtype.vue';
 import uniqid from 'uniqid';
 import Emitter from 'tiny-emitter';
-import { Editor, EditorContent, NodeViewWrapper } from '@tiptap/vue-3';
+import { Editor, EditorContent, NodeViewWrapper, NodeViewContent } from '@tiptap/vue-3';
 import { BubbleMenu } from '@tiptap/vue-3/menus';
 import { Extension } from '@tiptap/core';
 import { FloatingMenu } from './FloatingMenu';
@@ -351,6 +351,7 @@ export default {
 
     created() {
         Statamic.$components.register('NodeViewWrapper', NodeViewWrapper);
+        Statamic.$components.register('NodeViewContent', NodeViewContent);
     },
 
     async mounted() {
