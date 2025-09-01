@@ -10,7 +10,7 @@
 }
 
 .grid-table thead th {
-    @apply sticky -top-2 table-cell z-10 border-b bg-gray-50 p-2 text-sm font-medium text-gray-900 dark:border-gray-900 dark:bg-gray-800 dark:text-gray-100;
+    @apply sticky -top-2 table-cell z-10 border-b bg-gray-100/75 p-2 text-sm font-medium text-gray-900 dark:border-gray-900 dark:bg-gray-800 dark:text-gray-100;
 
     &:first-child {
         @apply rounded-ss-lg ps-3;
@@ -40,9 +40,9 @@
         }
 
         &.drag-handle {
-            @apply h-full p-2 cursor-grab hover:bg-gray-100 dark:hover:bg-gray-700 border-e border-transparent hover:border-e-gray-200 dark:hover:border-e-gray-600;
+            @apply h-full p-2 cursor-grab hover:bg-gray-100 dark:hover:bg-gray-700 border-e border-gray-200 hover:border-e-gray-300 dark:hover:border-e-gray-600;
             width: 1%;
-            background: url('../../../svg/ui/drag-dots.svg') center center no-repeat;
+            background: var(--color-gray-50) url('../../../svg/ui/drag-dots.svg') center center no-repeat;
             background-size: 7px 17px;
         }
     }
@@ -50,10 +50,10 @@
     tr:last-child td {
         @apply border-b-0;
         &:first-child {
-            @apply ltr:rounded-bl rtl:rounded-br;
+            @apply ltr:rounded-bl-[7px] rtl:rounded-br-[7px];
         }
         &:last-child {
-            @apply ltr:rounded-br rtl:rounded-bl;
+            @apply ltr:rounded-br-[7px] rtl:rounded-bl-[7px];
         }
     }
 
