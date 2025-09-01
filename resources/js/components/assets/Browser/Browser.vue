@@ -376,18 +376,11 @@ export default {
         },
 
         canUpload() {
-            return this.folder && this.container.allow_uploads && (this.can('upload '+ this.container.id +' assets') || this.can('configure asset containers'));
+            return this.folder && this.container.allow_uploads;
         },
 
         canCreateFolders() {
-            const hasFolderPermissions = this.container.folder_permissions_enabled
-                ? this.can('create '+ this.container.id +' folders')
-                : this.can('upload '+ this.container.id +' assets');
-
-            return this.folder
-                && this.container.create_folders
-                && ! this.restrictFolderNavigation
-                && (hasFolderPermissions || this.can('configure asset containers'));
+            return this.folder && this.container.create_folders && ! this.restrictFolderNavigation;
         },
 
         parameters() {
