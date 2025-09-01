@@ -127,7 +127,6 @@
                 :aria-label="text"
                 :href="url"
                 :icon="icon"
-                :round="true"
                 class="[&_svg]:size-4 -me-2"
                 size="sm"
                 target="_blank"
