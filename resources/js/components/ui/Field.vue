@@ -39,7 +39,7 @@ const classes = computed(() =>
             variant: {
                 block: 'w-full',
                 inline: [
-                    'flex justify-between gap-x-3 gap-y-1.5',
+                    'flex justify-between gap-x-7 gap-y-1.5',
                     'has-[[data-ui-label]~[data-ui-control]]:grid-cols-[1fr_auto]',
                     'has-[[data-ui-control]~[data-ui-label]]:grid-cols-[auto_1fr]',
                     '[&>[data-ui-control]~[data-ui-description]]:row-start-2 [&>[data-ui-control]~[data-ui-description]]:col-start-2',
