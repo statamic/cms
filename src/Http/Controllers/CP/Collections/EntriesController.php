@@ -9,6 +9,7 @@ use Statamic\CP\Breadcrumbs;
 use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades\Action;
 use Statamic\Facades\Asset;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
@@ -93,7 +94,8 @@ class EntriesController extends CpController
 
         $entry = $entry->fromWorkingCopy();
 
-        $blueprint = $entry->freshBlueprint();
+        Blink::forget("entry-{$entry->id()}-blueprint");
+        $blueprint = $entry->blueprint();
 
         if (! $blueprint) {
             throw new BlueprintNotFoundException($entry->value('blueprint'), 'collections/'.$collection->handle());
