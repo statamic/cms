@@ -18,7 +18,7 @@ const id = useId();
             :value="value"
             class="
                 shadow-ui-xs mt-0.5 size-4 cursor-default rounded-full
-                focus:focus-outline border border-gray-300 dark:border-none bg-white outline-hidden
+                focus:focus-outline border border-gray-400/75 dark:border-none bg-white outline-hidden
                 data-[state=checked]:border-ui-accent
                 dark:bg-gray-400 dark:data-[state=checked]:border-none dark:data-[state=checked]:bg-gray-300
             "

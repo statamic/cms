@@ -13,13 +13,22 @@
         <div>
             <Header :title="title" icon="preferences">
                 <ButtonGroup role="group" aria-label="Save options">
-                    <Button
-                        type="submit"
-                        variant="primary"
+                    <ui-command-palette-item
+                        :category="$commandPalette.category.Actions"
                         :text="__('Save')"
-                        @click="save"
-                        :aria-describedby="hasSaveAsOptions ? 'save-options-description' : undefined"
-                    />
+                        icon="save"
+                        :action="save"
+                        prioritize
+                        v-slot="{ text, action }"
+                    >
+                        <Button
+                            type="submit"
+                            variant="primary"
+                            :text="text"
+                            @click="action"
+                            :aria-describedby="hasSaveAsOptions ? 'save-options-description' : undefined"
+                        />
+                    </ui-command-palette-item>
 
                     <Dropdown
                         align="end"

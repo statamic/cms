@@ -3,11 +3,13 @@ import { cva } from 'cva';
 import { hasComponent } from '@/composables/has-component.js';
 import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, DialogTrigger } from 'reka-ui';
 import { computed, getCurrentInstance, ref, watch } from 'vue';
+import { Icon } from '@/components/ui';
 
 const emit = defineEmits(['update:open']);
 
 const props = defineProps({
     title: { type: String, default: '' },
+    icon: { type: [String, null], default: null },
     open: { type: Boolean, default: false },
     dismissible: { type: Boolean, default: true },
 });
@@ -70,8 +72,9 @@ function preventIfNotDismissible(event) {
                 @escape-key-down="preventIfNotDismissible"
             >
                 <div class="relative space-y-3 rounded-xl border border-gray-400/60 bg-white p-4 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:border-none dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/15" >
-                    <DialogTitle v-if="!hasModalTitleComponent" data-ui-modal-title class="font-medium">
-                        {{ title }}
+                    <DialogTitle v-if="!hasModalTitleComponent" data-ui-modal-title class="flex items-center gap-2">
+                        <Icon :name="icon" v-if="icon" class="size-4" />
+                        <ui-heading :text="title" size="lg" class="font-medium" />
                     </DialogTitle>
                     <slot />
                 </div>
