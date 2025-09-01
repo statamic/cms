@@ -507,6 +507,8 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
      *
      * @param  bool|null  $allowDownloading
      * @return bool|$this
+     *
+     * @deprecated
      */
     public function allowDownloading($allowDownloading = null)
     {
@@ -527,6 +529,8 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
      *
      * @param  bool|null  $allowMoving
      * @return bool|$this
+     *
+     * @deprecated
      */
     public function allowMoving($allowMoving = null)
     {
@@ -547,6 +551,8 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
      *
      * @param  bool|null  $allowRenaming
      * @return bool|$this
+     *
+     * @deprecated
      */
     public function allowRenaming($allowRenaming = null)
     {
@@ -567,6 +573,8 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
      *
      * @param  bool|null  $allowUploads
      * @return bool|$this
+     *
+     * @deprecated
      */
     public function allowUploads($allowUploads = null)
     {
@@ -587,6 +595,8 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
      *
      * @param  bool|null  $createFolders
      * @return bool|$this
+     *
+     * @deprecated
      */
     public function createFolders($createFolders = null)
     {
