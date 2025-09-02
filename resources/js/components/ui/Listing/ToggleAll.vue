@@ -30,14 +30,14 @@ function getScreenReaderText() {
     const selectedItems = selections.value.length;
 
     if (indeterminate.value) {
-        return __('items_selected_count', { selected: selectedItems, total: totalItems });
+        return __('messages.selections_select_all', { selected: selectedItems, total: totalItems });
     }
 
     if (anyItemsChecked.value) {
-        return __('all_items_selected', { total: totalItems });
+        return __('messages.selections_click_to_deselect_all', { total: totalItems });
     }
 
-    return __('no_items_selected', { total: totalItems });
+    return __('messages.selections_click_to_select_all', { total: totalItems });
 }
 </script>
 

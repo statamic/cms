@@ -39,12 +39,12 @@ function getCheckboxDescription(row) {
     const isDisabled = hasReachedSelectionLimit.value && allowsMultipleSelections.value && !isSelected(row.id);
 
     if (isDisabled) {
-        return __('selection_limit_reached', { title: rowTitle });
+        return __('messages.selections_limit_reached', { title: rowTitle });
     }
 
     return isSelected(row.id)
-        ? __('item_selected_description', { title: rowTitle })
-        : __('item_not_selected_description', { title: rowTitle });
+        ? __('messages.selections_item_selected', { title: rowTitle })
+        : __('messages.selections_item_unselected', { title: rowTitle });
 }
 
 function getRowTitle(row) {
