@@ -19,9 +19,10 @@ function checkMaximumAmountOfItems() {
 
 function getAriaLabel() {
     if (indeterminate.value) {
-        return __('select_all_items');
+        return __('Select all items');
     }
-    return anyItemsChecked.value ? __('deselect_all_items') : __('select_all_items');
+
+    return anyItemsChecked.value ? __('Deselect all items') : __('Select all items');
 }
 
 function getScreenReaderText() {

@@ -30,15 +30,8 @@ function isSelected(id) {
 function getCheckboxLabel(row) {
     const rowTitle = getRowTitle(row);
     return isSelected(row.id)
-        ? __('deselect_title', { title: rowTitle })
-        : __('select_title', { title: rowTitle });
-}
-
-function getCheckboxAriaLabel(row) {
-    const rowTitle = getRowTitle(row);
-    return isSelected(row.id)
-        ? __('deselect_title', { title: rowTitle })
-        : __('select_title', { title: rowTitle });
+        ? __('Deselect :title', { title: rowTitle })
+        : __('Select :title', { title: rowTitle });
 }
 
 function getCheckboxDescription(row) {
