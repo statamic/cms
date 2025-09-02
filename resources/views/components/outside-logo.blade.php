@@ -1,4 +1,4 @@
-<div class="logo relative z-10 max-w-[300px] md:pt-18">
+<div class="logo relative z-10 max-w-3/4 md:pt-18">
     @if ($customLogo)
         <img
             src="{{ $customLogo }}"
