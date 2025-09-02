@@ -16,14 +16,10 @@ export default class Preference {
     }
 
     set(key, value) {
-        if (!Statamic.$config.get('user')) return;
-
         return this.commitOnSuccessAndReturnPromise(axios.post(this.url, { key, value }));
     }
 
     append(key, value) {
-        if (!Statamic.$config.get('user')) return;
-
         return this.commitOnSuccessAndReturnPromise(axios.post(this.url, { key, value, append: true }));
     }
 
@@ -32,8 +28,6 @@ export default class Preference {
     }
 
     remove(key, value = null, cleanup = true) {
-        if (!Statamic.$config.get('user')) return;
-
         return this.commitOnSuccessAndReturnPromise(axios.delete(`${this.url}/${key}`, { data: { value, cleanup } }));
     }
 
