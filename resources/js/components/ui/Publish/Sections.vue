@@ -32,6 +32,10 @@ function renderInstructions(instructions) {
     return instructions ? markdown(__(instructions), { openLinksInNewTabs: true }) : '';
 }
 
+function isCollapsed(section) {
+    return section.display && section.collapsed;
+}
+
 function toggleSection(id) {
     if (sections[id].collapsible) {
         sections[id].collapsed = !sections[id].collapsed;
@@ -51,9 +55,9 @@ function toggleSection(id) {
                 <Subheading v-if="section.instructions" :text="renderInstructions(section.instructions)" />
             </PanelHeader>
             <Motion
-                :class="{ 'overflow-hidden': section.collapsed }"
-                :initial="{ height: section.collapsed ? '0px' : 'auto' }"
-                :animate="{ height: section.collapsed ? '0px' : 'auto' }"
+                :class="{ 'overflow-hidden': isCollapsed(section) }"
+                :initial="{ height: isCollapsed(section) ? '0px' : 'auto' }"
+                :animate="{ height: isCollapsed(section) ? '0px' : 'auto' }"
                 :transition="{ duration: 0.25, type: 'tween' }"
             >
                 <div class="p-px">
