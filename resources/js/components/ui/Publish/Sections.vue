@@ -58,7 +58,7 @@ function toggleSection(id) {
                     v-if="section.collapsible"
                     name="ui/chevron-down"
                     class="size-5 text-gray-400"
-                    :class="section.collapsed ? 'rotate-180' : 'rotate-0'"
+                    :class="section.collapsed ? 'rotate-270' : 'rotate-0'"
                 />
             </PanelHeader>
             <Motion
