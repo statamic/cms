@@ -48,7 +48,6 @@ function getCheckboxDescription(row) {
 }
 
 function getRowTitle(row) {
-    // Try to get a meaningful title from common fields
     return row.title || row.name || row.label || row.id || __('item');
 }
 
