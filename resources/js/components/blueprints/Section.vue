@@ -28,7 +28,7 @@
                 <template v-slot:empty-state>
                     <ui-subheading
                         v-text="__('Drag and drop fields below.')"
-                        class="rounded-xl min-h-16 flex items-center justify-center border border-dashed border-gray-300 p-3 text-center w-full"
+                        class="rounded-xl min-h-16 flex items-center justify-center border border-dashed border-gray-300 dark:border-gray-700 p-3 text-center w-full"
                     />
                 </template>
             </Fields>
