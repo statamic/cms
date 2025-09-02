@@ -30,15 +30,8 @@ function isSelected(id) {
 function getCheckboxLabel(row) {
     const rowTitle = getRowTitle(row);
     return isSelected(row.id)
-        ? __('deselect_title', { title: rowTitle })
-        : __('select_title', { title: rowTitle });
-}
-
-function getCheckboxAriaLabel(row) {
-    const rowTitle = getRowTitle(row);
-    return isSelected(row.id)
-        ? __('deselect_title', { title: rowTitle })
-        : __('select_title', { title: rowTitle });
+        ? __('Deselect :title', { title: rowTitle })
+        : __('Select :title', { title: rowTitle });
 }
 
 function getCheckboxDescription(row) {
@@ -46,16 +39,15 @@ function getCheckboxDescription(row) {
     const isDisabled = hasReachedSelectionLimit.value && allowsMultipleSelections.value && !isSelected(row.id);
 
     if (isDisabled) {
-        return __('selection_limit_reached', { title: rowTitle });
+        return __('messages.selections_limit_reached', { title: rowTitle });
     }
 
     return isSelected(row.id)
-        ? __('item_selected_description', { title: rowTitle })
-        : __('item_not_selected_description', { title: rowTitle });
+        ? __('messages.selections_item_selected', { title: rowTitle })
+        : __('messages.selections_item_unselected', { title: rowTitle });
 }
 
 function getRowTitle(row) {
-    // Try to get a meaningful title from common fields
     return row.title || row.name || row.label || row.id || __('item');
 }
 
