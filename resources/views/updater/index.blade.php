@@ -22,9 +22,16 @@
                     <ui-table class="w-full">
                         <ui-table-row>
                             <ui-table-cell class="w-64 font-bold">
-                                <a href="{{ route('statamic.cp.updater.product', 'statamic') }}">
-                                    {{ __('Statamic') }}
-                                </a>
+                                <ui-command-palette-item
+                                    category="{{ Statamic\CommandPalette\Category::Actions }}"
+                                    :text="[__('Updates'), __('Core'), '{{ __('Statamic') }}']"
+                                    icon="updates"
+                                    url="{{ route('statamic.cp.updater.product', 'statamic') }}"
+                                    prioritize
+                                    v-slot="{ url }"
+                                >
+                                    <a :href="url">{{ __('Statamic') }}</a>
+                                </ui-command-palette-item>
                             </ui-table-cell>
                             <ui-table-cell>{{ $statamic->currentVersion() }}</ui-table-cell>
                             @if ($count = $statamic->availableUpdatesCount())
@@ -46,9 +53,15 @@
                             @foreach ($addons as $addon)
                                 <ui-table-row>
                                     <ui-table-cell class="w-64 font-bold">
-                                        <a href="{{ route('statamic.cp.updater.product', $addon->slug()) }}">
-                                            {{ $addon->name() }}
-                                        </a>
+                                        <ui-command-palette-item
+                                            category="{{ Statamic\CommandPalette\Category::Actions }}"
+                                            :text="[__('Updates'), __('Addons'), '{{ $addon->name() }}']"
+                                            icon="updates"
+                                            url="{{ route('statamic.cp.updater.product', $addon->slug()) }}"
+                                            v-slot="{ url }"
+                                        >
+                                            <a :href="url">{{ $addon->name() }}</a>
+                                        </ui-command-palette-item>
                                     </ui-table-cell>
                                     <ui-table-cell>{{ $addon->version() }}</ui-table-cell>
                                     @if ($count = $addon->changelog()->availableUpdatesCount())

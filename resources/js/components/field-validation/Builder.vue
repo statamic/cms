@@ -41,7 +41,7 @@
                 @added="ifSearchNotFoundAddCustom"
             >
                 <template #option="option">
-                    {{ __(option.display) }} <code class="ms-2 text-sm">{{ valueWithoutTrailingColon(option.value) }}</code>
+                    {{ __(option.display) }} <code class="px-1 rounded-sm text-[0.8rem]">{{ valueWithoutTrailingColon(option.value) }}</code>
                 </template>
 
                 <template #selected-options>
