@@ -71,7 +71,7 @@
                             :site="site"
                             :preferences-prefix="`selector-field.${name}`"
                             :editable="false"
-                            @branch-clicked="$refs[`tree-branch-${$event.id}`].click()"
+                            @branch-clicked="toggleSelection($event.id)"
                         >
                             <template #branch-action="{ branch, index }">
                                 <div>
