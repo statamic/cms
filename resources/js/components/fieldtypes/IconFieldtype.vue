@@ -53,7 +53,7 @@ export default {
 
     computed: {
         cacheKey() {
-            return `${this.meta.directory}/${this.meta.set}`;
+            return this.meta.directory;
         },
 
         options() {
@@ -106,10 +106,6 @@ export default {
         },
 
         getOptionIcon(option) {
-            if (this.meta.set) {
-                return `${this.meta.set}/${option.label}`;
-            }
-
             return option.label;
         },
     },

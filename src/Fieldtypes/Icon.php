@@ -18,19 +18,18 @@ class Icon extends Fieldtype
 
     public function preload(): array
     {
-        [$path, $directory, $folder, $hasConfiguredDirectory] = $this->resolveParts();
+        [$path, $directory, $hasConfiguredDirectory] = $this->resolveParts();
 
         return [
             'url' => cp_route('icon-fieldtype'),
             'native' => ! $hasConfiguredDirectory,
             'directory' => $directory,
-            'set' => $folder,
         ];
     }
 
     public function icons()
     {
-        [$path, $directory, $folder, $hasConfiguredDirectory] = $this->resolveParts();
+        [$path, $directory, $hasConfiguredDirectory] = $this->resolveParts();
 
         return collect(Folder::getFilesByType($path, 'svg'))->mapWithKeys(fn ($path) => [
             pathinfo($path)['filename'] => $hasConfiguredDirectory ? File::get($path) : null,
@@ -48,12 +47,6 @@ class Icon extends Fieldtype
                         'instructions' => __('statamic::fieldtypes.icon.config.directory'),
                         'type' => 'text',
                         'placeholder' => 'vendor/statamic/cms/resources/svg/icons',
-                        'width' => 50,
-                    ],
-                    'folder' => [
-                        'display' => __('Folder'),
-                        'instructions' => __('statamic::fieldtypes.icon.config.folder'),
-                        'type' => 'text',
                         'width' => 50,
                     ],
                     'default' => [
@@ -83,14 +76,11 @@ class Icon extends Fieldtype
             $directory = statamic_path('resources/svg/icons');
         }
 
-        $folder = $this->config('folder');
-
-        $path = Path::tidy($directory.'/'.$folder);
+        $path = Path::tidy($directory);
 
         return [
             $path,
             $directory,
-            $folder,
             $hasConfiguredDirectory,
         ];
     }
@@ -101,9 +91,9 @@ class Icon extends Fieldtype
      * @param  string  $directory
      * @param  string|null  $folder
      */
-    public static function provideCustomSvgIconsToScript($directory, $folder = null)
+    public static function provideCustomSvgIconsToScript($directory)
     {
-        $path = Str::removeRight(Path::tidy($directory.'/'.$folder), '/');
+        $path = Str::removeRight(Path::tidy($directory), '/');
 
         static::$customSvgIcons[$path] = collect(app(Filesystem::class)->files($path))
             ->filter(fn ($file) => strtolower($file->getExtension()) === 'svg')
