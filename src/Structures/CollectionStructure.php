@@ -72,8 +72,8 @@ class CollectionStructure extends Structure
             throw new \Exception("Duplicate entry [{$entryId}] in [{$this->collection()->handle()}] collection's structure.");
         }
 
-        $thisCollectionsEntries = Blink::once('collection-structure-tree-entries::'.$this->collection()->handle().'::'.$locale, fn () => $this->collection()->queryEntries()->where('site', $locale)->get())
-            ->pluck('id');
+        $thisCollectionsEntries = Blink::once('collection-structure-tree-entries::'.$this->handle().'::'.$locale, fn () => $this->collection()->queryEntries())
+            ->where('site', $locale)->pluck('id');
 
         $otherCollectionEntries = $entryIds->diff($thisCollectionsEntries);
 
