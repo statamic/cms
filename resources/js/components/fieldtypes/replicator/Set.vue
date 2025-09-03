@@ -128,7 +128,7 @@ function destroy() {
         <slot name="picker" />
         <div
             layout
-            class="relative z-2 w-full rounded-lg border border-gray-300 text-base dark:border-x-0 dark:border-t-0 dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black shadow-ui-sm"
+            class="relative z-2 w-full rounded-lg border border-gray-300 text-base dark:border-x-0 dark:border-t-0 dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black shadow-ui-sm replicator-set"
             :class="{ 
                 'border-red-500': hasError,
                 'bg-white': !hasNestedReplicator,

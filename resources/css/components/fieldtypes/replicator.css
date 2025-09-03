@@ -1,3 +1,13 @@
 /* ==========================================================================
    REPLICATOR FIELDTYPE
    ========================================================================== */
+
+/* Where there are replicators inside replicators */
+.replicator-set:has(.replicator-fieldtype-container) {
+    [data-ui-combobox-trigger] {
+        :where(:not(.dark, .dark *)) & {
+            /* Make comboboxes straight white rather than a gray gradient, since we already have a gray background and the defaul combobox looks muddy */
+            @apply to-white;
+        }
+    }
+}
