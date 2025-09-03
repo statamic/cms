@@ -185,4 +185,33 @@ class AssetPolicyTest extends PolicyTestCase
             'none' => ['canEdit' => false, 'canStore' => false, 'expected' => false],
         ];
     }
+
+    #[Test]
+    public function user_with_configure_permission_can_do_it_all()
+    {
+        $userWithPermission = $this->userWithPermissions(['configure asset containers']);
+        $userWithoutPermission = $this->userWithPermissions([]);
+
+        $container = tap(AssetContainer::make('alfa'))->save();
+        $asset = $container->makeAsset('test.txt');
+
+        $this->assertTrue($userWithPermission->can('view', $asset));
+        $this->assertTrue($userWithPermission->can('edit', $asset));
+        $this->assertTrue($userWithPermission->can('store', [Asset::class, $container]));
+        $this->assertTrue($userWithPermission->can('move', $asset));
+        $this->assertTrue($userWithPermission->can('rename', $asset));
+        $this->assertTrue($userWithPermission->can('delete', $asset));
+        $this->assertTrue($userWithPermission->can('replace', $asset));
+        $this->assertTrue($userWithPermission->can('reupload', $asset));
+
+        $this->assertFalse($userWithoutPermission->can('view', $asset));
+        $this->assertFalse($userWithoutPermission->can('edit', $asset));
+        $this->assertFalse($userWithoutPermission->can('store', [Asset::class, $container]));
+        $this->assertFalse($userWithoutPermission->can('move', $asset));
+        $this->assertFalse($userWithoutPermission->can('rename', $asset));
+        $this->assertFalse($userWithoutPermission->can('delete', $asset));
+        $this->assertFalse($userWithoutPermission->can('replace', $asset));
+        $this->assertFalse($userWithoutPermission->can('reupload', $asset));
+
+    }
 }

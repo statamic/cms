@@ -192,4 +192,24 @@ class AssetFolderPolicyTest extends PolicyTestCase
 
         $this->assertEquals($expected, $user->can('delete', $container->assetFolder('path/to/folder')));
     }
+
+    #[Test]
+    public function user_with_configure_permission_can_do_it_all()
+    {
+        $userWithPermission = $this->userWithPermissions(['configure asset containers']);
+        $userWithoutPermission = $this->userWithPermissions([]);
+
+        $container = tap(AssetContainer::make('alfa'))->save();
+        $folder = $container->assetFolder('path/to/folder');
+
+        $this->assertTrue($userWithPermission->can('create', [AssetFolder::class, $container]));
+        $this->assertTrue($userWithPermission->can('move', $folder));
+        $this->assertTrue($userWithPermission->can('rename', $folder));
+        $this->assertTrue($userWithPermission->can('delete', $folder));
+
+        $this->assertFalse($userWithoutPermission->can('create', [AssetFolder::class, $container]));
+        $this->assertFalse($userWithoutPermission->can('move', $folder));
+        $this->assertFalse($userWithoutPermission->can('rename', $folder));
+        $this->assertFalse($userWithoutPermission->can('delete', $folder));
+    }
 }
