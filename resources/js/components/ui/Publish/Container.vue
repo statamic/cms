@@ -223,7 +223,6 @@ const provided = {
     previews,
     syncField,
     desyncField,
-    container,
     components,
     asConfig: toRef(() => props.asConfig),
     isTrackingOriginValues: computed(() => !!props.originValues),
