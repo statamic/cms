@@ -188,18 +188,6 @@ class AssetContainerTest extends TestCase
     }
 
     #[Test]
-    public function it_gets_and_sets_whether_downloading_is_allowed()
-    {
-        $container = new AssetContainer;
-        $this->assertTrue($container->allowDownloading());
-
-        $return = $container->allowDownloading(false);
-
-        $this->assertEquals($container, $return);
-        $this->assertFalse($container->allowDownloading());
-    }
-
-    #[Test]
     public function it_gets_and_sets_the_validation_rules()
     {
         $container = new AssetContainer;

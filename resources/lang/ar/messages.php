@@ -13,7 +13,6 @@ return [
     'asset_container_disk_instructions' => 'تحدد أقراص نظام الأصول مكان تخزين الملفات — إما محليًا أو في موقع عن بعد مثل Amazon S3. يمكن تكوينها في `config/filesystems.php`',
     'asset_container_handle_instructions' => 'يستخدم للإشارة إلى هذه الحاوية على الواجهة الأمامية. من غير السهل تغييره لاحقًا.',
     'asset_container_intro' => 'تخزن الوسائط والمستندات في مجلدات على الخادم أو خدمات تخزين الملفات الأخرى. كل من هذه المواقع يسمى حاوية.',
-    'asset_container_quick_download_instructions' => 'عند التمكين، سيضيف زر تنزيل سريع في مدير الأصول.',
     'asset_container_source_preset_instructions' => 'سيتم معالجة الصور المرفوعة بشكل دائم باستخدام هذا الإعداد المسبق.',
     'asset_container_title_instructions' => 'عادة ما يكون اسمًا بصيغة الجمع، مثل الصور أو المستندات',
     'asset_container_validation_rules_instructions' => 'ستطبق هذه القواعد على الملفات المرفوعة.',

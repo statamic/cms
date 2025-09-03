@@ -13,7 +13,6 @@ return [
     'asset_container_disk_instructions' => 'Failisüsteemi kettad määravad failide salvestuskoha – kas lokaalselt või kaugsalvestuses, näiteks Amazon S3-s. Neid saab seadistada failis `config/filesystems.php`.',
     'asset_container_handle_instructions' => 'Kasutatakse sellele konteinerile viitamiseks esiotsas. Selle hilisem muutmine võib lehe lõhkuda.',
     'asset_container_intro' => 'Meedia- ja dokumendifailid asuvad serveris või muudes failisalvestusteenustes kaustades. Iga sellist asukohta nimetatakse konteineriks.',
-    'asset_container_quick_download_instructions' => 'Kui see on lubatud, lisatakse varahaldurisse kiire allalaadimise nupp.',
     'asset_container_source_preset_instructions' => 'Üleslaaditud pilte töödeldakse selle eelseadistuse abil jäädavalt.',
     'asset_container_title_instructions' => 'Tavaliselt mitmuses nimisõna, näiteks "Pildid" või "Dokumendid".',
     'asset_container_validation_rules_instructions' => 'Neid reegleid rakendatakse üleslaaditud failidele.',

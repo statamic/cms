@@ -13,7 +13,6 @@ return [
     'asset_container_disk_instructions' => 'Filesystem schijf specificeren waar bestanden moeten worden opgeslagen. Danwel lokaal of op een remote location, zoals Amazon S3. Ze kunnen geconfigureerd worden in `config/filesystems.php`.',
     'asset_container_handle_instructions' => 'Wordt gebruikt om aan de voorkant van de website aan deze container te refereren. Het is niet persé eenvoudig om nadien te wijzigen.',
     'asset_container_intro' => 'Media en documenten worden opgeslagen in mappen op de server op op andere file-storage-diensten. Elke van deze locaties noemt men een container.',
-    'asset_container_quick_download_instructions' => 'Indien ingeschakeld, wordt er een downloadknop weergegeven in de asset-manager.',
     'asset_container_source_preset_instructions' => 'Geüploade afbeeldingen worden permanent verwerkt met deze preset.',
     'asset_container_title_instructions' => 'Meestal een zelfstandig naamwoord in meervoud, zoals Afbeeldingen of Documenten.',
     'asset_container_validation_rules_instructions' => 'Deze regels worden toegepast op geüploade bestanden.',

@@ -13,7 +13,6 @@ return [
     'asset_container_disk_instructions' => 'Dosya sistemi diskleri, yerel olarak veya Amazon S3 gibi uzak bir konumda dosyaların nerede depolanacağını belirtir. `config/filesystems.php` içinde yapılandırılabilirler.',
     'asset_container_handle_instructions' => 'Ön uçta bu kapsayıcıya başvurmak için kullanılır. Daha sonra değiştirmesi zor olabilir.',
     'asset_container_intro' => 'Medya ve belge dosyaları, sunucudaki veya diğer dosya depolama hizmetlerindeki klasörlerde bulunur. Bu konumların her birine kapsayıcı denir.',
-    'asset_container_quick_download_instructions' => 'Etkinleştirildiğinde, Varlık Yöneticisine bir hızlı indirme düğmesi eklenecektir.',
     'asset_container_source_preset_instructions' => 'Yüklenen görüntüler bu ön ayar kullanılarak kalıcı olarak işlenecektir.',
     'asset_container_title_instructions' => 'Genellikle Görüntüler veya Belgeler gibi çoğul bir isim',
     'asset_container_validation_rules_instructions' => 'Yüklenen dosyalara uygulanacak kurallar.',

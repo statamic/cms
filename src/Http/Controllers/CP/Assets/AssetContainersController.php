@@ -47,7 +47,6 @@ class AssetContainersController extends CpController
             'title' => $container->title(),
             'handle' => $container->handle(),
             'disk' => $container->diskHandle(),
-            'allow_downloading' => $container->allowDownloading(),
             'create_folders' => $container->createFolders(),
             'source_preset' => $container->sourcePreset(),
             'warm_intelligent' => $intelligent = $container->warmsPresetsIntelligently(),
@@ -75,7 +74,6 @@ class AssetContainersController extends CpController
         $container
             ->title($values['title'])
             ->disk($values['disk'])
-            ->allowDownloading($values['allow_downloading'])
             ->createFolders($values['create_folders'])
             ->sourcePreset($values['source_preset'])
             ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets'])
@@ -213,12 +211,6 @@ class AssetContainersController extends CpController
                         'type' => 'toggle',
                         'display' => __('Create Folders'),
                         'instructions' => __('statamic::messages.asset_container_create_folder_instructions'),
-                        'default' => true,
-                    ],
-                    'allow_downloading' => [
-                        'type' => 'toggle',
-                        'display' => __('Allow Downloading'),
-                        'instructions' => __('statamic::messages.asset_container_quick_download_instructions'),
                         'default' => true,
                     ],
                     'validation' => [

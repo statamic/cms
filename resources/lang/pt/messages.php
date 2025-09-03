@@ -13,7 +13,6 @@ return [
     'asset_container_disk_instructions' => 'O disco do sistema que esta biblioteca usará.',
     'asset_container_handle_instructions' => 'Utilizado para referenciar este contentor no front-end. É não trivial mudar mais tarde.',
     'asset_container_intro' => 'Os arquivos de mídia e documento vivem em pastas no servidor ou em outros serviços de armazenamento de arquivos. Cada um desses locais é chamado de contêiner.',
-    'asset_container_quick_download_instructions' => 'Active o botão de download rápido quando editar arquivos.',
     'asset_container_source_preset_instructions' => 'As imagens enviadas serão processadas permanentemente usando esta predefinição.',
     'asset_container_title_instructions' => 'Normalmente um substantivo plural, como Imagens ou Documentos',
     'asset_container_validation_rules_instructions' => 'Essas regras serão aplicadas aos arquivos enviados.',

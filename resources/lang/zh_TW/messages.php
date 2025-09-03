@@ -13,7 +13,6 @@ return [
     'asset_container_disk_instructions' => '檔案系統磁碟用於指定檔案要儲存的位置 — 可儲存於本機或如 Amazon S3 等遠端位置。這些磁碟可在 `config/filesystems.php` 內設定',
     'asset_container_handle_instructions' => '用於在前端參照該容器。設定後將難以修改。',
     'asset_container_intro' => '媒體與文件檔案會儲存於伺服器或其他當那儲存服務中的資料夾。這個位置就稱為容器。',
-    'asset_container_quick_download_instructions' => '啟用後可在素材管理員中加上快速下載按鈕。',
     'asset_container_source_preset_instructions' => '上传的图像将使用此预设进行永久处理。',
     'asset_container_title_instructions' => '通常為英語複數名詞，如 Images 或 Documents',
     'asset_container_validation_rules_instructions' => '这些规则将应用于上传的文件。',

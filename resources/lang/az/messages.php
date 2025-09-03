@@ -13,7 +13,6 @@ return [
     'asset_container_disk_instructions' => 'Fayl sistemi diskləri faylların harada saxlanılacağını müəyyən edir - ya yerli, ya da Amazon S3 kimi uzaq yerdə. Onlar `config/filesystems.php` faylında konfiqurasiya edilə bilər.',
     'asset_container_handle_instructions' => 'Bu konteyneri frontend-də istinad etmək üçün istifadə olunur. Sonradan dəyişdirmək çətin olacaq.',
     'asset_container_intro' => 'Media və sənəd faylları serverdəki qovluqlarda və ya digər fayl saxlama xidmətlərində saxlanılır. Bu yerlərin hər biri konteyner adlanır.',
-    'asset_container_quick_download_instructions' => 'Aktiv edildikdə, Varlıg Menecerində tez yükləmə düyməsini əlavə edəcək.',
     'asset_container_source_preset_instructions' => 'Yüklənmiş şəkillər bu hazır parametrlə daimi olaraq emal ediləcək.',
     'asset_container_title_instructions' => 'Adətən, Çoxluq isim, məsələn, Şəkillər və ya Sənədlər',
     'asset_container_validation_rules_instructions' => 'Bu qaydalar yüklənmiş fayllara tətbiq ediləcək.',

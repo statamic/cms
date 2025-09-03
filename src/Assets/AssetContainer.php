@@ -37,7 +37,6 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     protected $handle;
     protected $disk;
     protected $private;
-    protected $allowDownloading;
     protected $createFolders;
     protected $sourcePreset;
     protected $warmPresets;
@@ -513,24 +512,6 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     }
 
     /**
-     * Enable the quick download button when editing files in this container.
-     *
-     * @param  bool|null  $allowDownloading
-     * @return bool|$this
-     *
-     * @deprecated
-     */
-    public function allowDownloading($allowDownloading = null)
-    {
-        return $this
-            ->fluentlyGetOrSet('allowDownloading')
-            ->getter(function ($allowDownloading) {
-                return (bool) ($allowDownloading ?? true);
-            })
-            ->args(func_get_args());
-    }
-
-    /**
      * The ability to create folders within this container.
      *
      * @param  bool|null  $createFolders
@@ -603,7 +584,6 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
             'title' => $this->title,
             'disk' => $this->disk,
             'search_index' => $this->searchIndex,
-            'allow_downloading' => $this->allowDownloading,
             'create_folders' => $this->createFolders,
             'source_preset' => $this->sourcePreset,
             'warm_presets' => $this->warmPresets,
