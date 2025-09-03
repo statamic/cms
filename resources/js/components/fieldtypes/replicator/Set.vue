@@ -141,7 +141,7 @@ function destroy() {
             :data-type="config.handle"
         >
             <header
-                class="group/header animate-border-color flex items-center rounded-lg px-1.5 antialiased duration-200 bg-gray-100/75 hover:bg-gray-100 dark:hover:bg-gray-950 border-gray-300 dark:border-white/10"
+                class="group/header animate-border-color flex items-center rounded-lg px-1.5 antialiased duration-200 bg-gray-100/50 hover:bg-gray-100 dark:hover:bg-gray-950 border-gray-300 dark:border-white/10"
                 :class="{ 
                     'bg-gray-200/50 rounded-b-none border-b border-gray-300 dark:border-white/10': !collapsed
                 }"
@@ -153,7 +153,7 @@ function destroy() {
                     v-if="!readOnly"
                 />
                 <button type="button" class="flex flex-1 items-center gap-4 p-2 min-w-0" @click="toggleCollapsedState">
-                    <Badge size="lg" pill="true" color="white">
+                    <Badge size="lg" pill="true" color="white" class="px-3">
                         <span v-if="isSetGroupVisible" class="flex items-center gap-2">
                             {{ __(setGroup.display) }}
                             <Icon name="ui/chevron-right" class="relative top-px size-3" />
