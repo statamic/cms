@@ -15,7 +15,6 @@ return [
     'asset_container_intro' => '媒體與文件檔案會儲存於伺服器或其他當那儲存服務中的資料夾。這個位置就稱為容器。',
     'asset_container_move_instructions' => '啟用後將允許使用者在該容器內四處移動檔案。',
     'asset_container_quick_download_instructions' => '啟用後可在素材管理員中加上快速下載按鈕。',
-    'asset_container_rename_instructions' => '啟用後將允許使用者在該容器內重新命名檔案。',
     'asset_container_source_preset_instructions' => '上传的图像将使用此预设进行永久处理。',
     'asset_container_title_instructions' => '通常為英語複數名詞，如 Images 或 Documents',
     'asset_container_validation_rules_instructions' => '这些规则将应用于上传的文件。',

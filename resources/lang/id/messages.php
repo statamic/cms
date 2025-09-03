@@ -15,7 +15,6 @@ return [
     'asset_container_intro' => 'File media dan dokumen tinggal di folder pada server atau layanan penyimpanan file lainnya. Masing-masing lokasi ini disebut penampung.',
     'asset_container_move_instructions' => 'Jika diaktifkan akan memungkinkan pengguna untuk memindahkan file di dalam penampung ini.',
     'asset_container_quick_download_instructions' => 'Saat diaktifkan akan menambahkan tombol unduh cepat di Manager Aset.',
-    'asset_container_rename_instructions' => 'Jika diaktifkan akan memungkinkan pengguna untuk mengganti nama file dalam penampung ini.',
     'asset_container_source_preset_instructions' => 'Gambar yang diunggah akan diproses secara permanen menggunakan prasetel ini.',
     'asset_container_title_instructions' => 'Biasanya kata benda jamak, seperti Gambar atau Dokumen',
     'asset_container_validation_rules_instructions' => 'Aturan ini akan diterapkan pada file yang diunggah.',

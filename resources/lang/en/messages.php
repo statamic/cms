@@ -15,7 +15,6 @@ return [
     'asset_container_intro' => 'Media and document files are stored in folders on the server or other storage services. Each storage location is called a container.',
     'asset_container_move_instructions' => 'When enabled, users will be able to move files within this container.',
     'asset_container_quick_download_instructions' => 'When enabled, a quick download button will appear in the Asset Manager.',
-    'asset_container_rename_instructions' => 'When enabled, users will be able to rename files in this container.',
     'asset_container_source_preset_instructions' => 'Uploaded images will be processed using this preset.',
     'asset_container_title_instructions' => 'Use a plural noun, such as \'Images\' or \'Documents\'',
     'asset_container_validation_rules_instructions' => 'These validation rules will be applied to uploaded files.',

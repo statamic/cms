@@ -188,18 +188,6 @@ class AssetContainerTest extends TestCase
     }
 
     #[Test]
-    public function it_gets_and_sets_whether_renaming_is_allowed()
-    {
-        $container = new AssetContainer;
-        $this->assertTrue($container->allowRenaming());
-
-        $return = $container->allowRenaming(false);
-
-        $this->assertEquals($container, $return);
-        $this->assertFalse($container->allowRenaming());
-    }
-
-    #[Test]
     public function it_gets_and_sets_whether_moving_is_allowed()
     {
         $container = new AssetContainer;

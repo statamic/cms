@@ -48,7 +48,6 @@ class AssetContainersController extends CpController
             'handle' => $container->handle(),
             'disk' => $container->diskHandle(),
             'allow_downloading' => $container->allowDownloading(),
-            'allow_renaming' => $container->allowRenaming(),
             'allow_moving' => $container->allowMoving(),
             'create_folders' => $container->createFolders(),
             'source_preset' => $container->sourcePreset(),
@@ -78,7 +77,6 @@ class AssetContainersController extends CpController
             ->title($values['title'])
             ->disk($values['disk'])
             ->allowDownloading($values['allow_downloading'])
-            ->allowRenaming($values['allow_renaming'])
             ->allowMoving($values['allow_moving'])
             ->createFolders($values['create_folders'])
             ->sourcePreset($values['source_preset'])
@@ -217,12 +215,6 @@ class AssetContainersController extends CpController
                         'type' => 'toggle',
                         'display' => __('Create Folders'),
                         'instructions' => __('statamic::messages.asset_container_create_folder_instructions'),
-                        'default' => true,
-                    ],
-                    'allow_renaming' => [
-                        'type' => 'toggle',
-                        'display' => __('Allow Renaming'),
-                        'instructions' => __('statamic::messages.asset_container_rename_instructions'),
                         'default' => true,
                     ],
                     'allow_moving' => [

@@ -15,7 +15,6 @@ return [
     'asset_container_intro' => '媒体和文档文件位于服务器或其他文件存储服务的文件夹中。 这些位置中的每一个都称为容器。',
     'asset_container_move_instructions' => '在此容器中移动文件的能力。',
     'asset_container_quick_download_instructions' => '编辑文件时启用快速下载按钮。',
-    'asset_container_rename_instructions' => '在此容器中重命名文件的能力。',
     'asset_container_source_preset_instructions' => '上传的图像将使用此预设进行永久处理。',
     'asset_container_title_instructions' => '通常是复数名词，例如图像或文档',
     'asset_container_validation_rules_instructions' => '这些规则将应用于上传的文件。',

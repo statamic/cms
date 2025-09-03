@@ -15,7 +15,6 @@ return [
     'asset_container_intro' => 'Les fichiers media et documents sont stockés dans des répertoires sur votre serveur ou dans d’autres services de stockage de fichiers. Chacun de ces emplacements est appelé un conteneur.',
     'asset_container_move_instructions' => 'Les utilisateurs peuvent-ils déplacer les fichiers au sein de ce conteneur ?',
     'asset_container_quick_download_instructions' => 'Ajouter un bouton de téléchargement rapide dans le Gestionnaire de Ressources ?',
-    'asset_container_rename_instructions' => 'Les utilisateurs peuvent-ils renommer les fichiers dans ce conteneur ?',
     'asset_container_source_preset_instructions' => 'Les images téléchargées seront systématiquement traitées par le biais de ce préréglage.',
     'asset_container_title_instructions' => 'Habituellement un nom au pluriel, comme "Images" ou "Documents".',
     'asset_container_validation_rules_instructions' => 'Ces règles s’appliqueront aux fichiers téléchargés.',

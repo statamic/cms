@@ -15,7 +15,6 @@ return [
     'asset_container_intro' => 'Medie- og dokumentfiler ligger i mapper på serveren eller andre fillagringstjenester. Hver av disse plasseringene kalles en beholder.',
     'asset_container_move_instructions' => 'Når dette er aktivert, kan brukere flytte rundt på filer inne i beholderen.',
     'asset_container_quick_download_instructions' => 'Når dette er aktivert, blir en knapp for hurtignedlasting lagt til i Filer.',
-    'asset_container_rename_instructions' => 'Når dette er aktivert, kan brukere endre navn på filer i denne beholderen.',
     'asset_container_source_preset_instructions' => 'Opplastede bilder vil bli prosessert ved hjelp av denne forhåndsinnstillingen.',
     'asset_container_title_instructions' => 'Vanligvis et substantiv i flertall, som bilder eller dokumenter.',
     'asset_container_validation_rules_instructions' => 'Disse reglene vil bli brukt på opplastede filer.',

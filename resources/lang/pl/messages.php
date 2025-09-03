@@ -15,7 +15,6 @@ return [
     'asset_container_intro' => 'Pliki mediów i dokumentów znajdują się w folderach na serwerze lub innych usługach przechowywania plików. Każda z tych lokalizacji jest nazywana kontenerem.',
     'asset_container_move_instructions' => 'Po włączeniu pozwoli użytkownikom na przenoszenie plików wewnątrz tego kontenera.',
     'asset_container_quick_download_instructions' => 'Po włączeniu doda przycisk szybkiego pobierania w Menedżerze Zasobów.',
-    'asset_container_rename_instructions' => 'Po włączeniu pozwoli użytkownikom na zmianę nazw plików w tym kontenerze.',
     'asset_container_source_preset_instructions' => 'Przesłane obrazy będą trwale przetwarzane przy użyciu tego presetu.',
     'asset_container_title_instructions' => 'Zazwyczaj rzeczownik w liczbie mnogiej, jak &quot;Obrazy&quot; lub &quot;Dokumenty&quot;',
     'asset_container_validation_rules_instructions' => 'Zasady te będą stosowane do przesłanych plików.',

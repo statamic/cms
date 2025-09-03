@@ -43,13 +43,7 @@ class AssetPolicy
 
     public function rename($user, $asset)
     {
-        $user = User::fromUser($user);
-
-        if (! $user->hasPermission("rename {$asset->container()->handle()} assets")) {
-            return false;
-        }
-
-        return $asset->container()->allowRenaming();
+        return User::fromUser($user)->hasPermission("rename {$asset->container()->handle()} assets");
     }
 
     public function delete($user, $asset)

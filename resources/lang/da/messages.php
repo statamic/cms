@@ -15,7 +15,6 @@ return [
     'asset_container_intro' => 'Medie- og dokumentfiler lever i mapper på serveren eller andre filopbevaringstjenester. Hver af disse placeringer kaldes en beholder.',
     'asset_container_move_instructions' => 'Når dette er aktiveret, vil brugerne kunne flytte filer inde i denne beholder.',
     'asset_container_quick_download_instructions' => 'Når det er aktiveret, tilføjes en hurtig download-knap i medie modulet.',
-    'asset_container_rename_instructions' => 'Når dette er aktiveret, vil brugerne kunne omdøbe filerne i denne beholder.',
     'asset_container_source_preset_instructions' => 'Uploadede billeder vil blive permanent behandlet ved hjælp af denne forudindstilling.',
     'asset_container_title_instructions' => 'Normalt et flertals navneord, som billeder eller dokumenter',
     'asset_container_validation_rules_instructions' => 'Disse regler vil blive anvendt på uploadede filer.',

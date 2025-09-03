@@ -15,7 +15,6 @@ return [
     'asset_container_intro' => 'Arquivos de mídia e documentos ficam em pastas no servidor ou em outros serviços de armazenamento de arquivos. Cada um desses locais é chamado de contêiner.',
     'asset_container_move_instructions' => 'Quando ativado, permitirá que os usuários movam arquivos dentro deste contêiner.',
     'asset_container_quick_download_instructions' => 'Quando ativado, adicionará um botão de download rápido no Gerenciador de Arquivo.',
-    'asset_container_rename_instructions' => 'Quando ativado, permitirá que os usuários renomeiem os arquivos neste contêiner.',
     'asset_container_source_preset_instructions' => 'As imagens enviadas serão processadas permanentemente usando esta predefinição.',
     'asset_container_title_instructions' => 'Geralmente um substantivo plural, como Imagens ou Documentos',
     'asset_container_validation_rules_instructions' => 'Essas regras serão aplicadas aos arquivos enviados.',

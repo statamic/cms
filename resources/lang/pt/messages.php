@@ -15,7 +15,6 @@ return [
     'asset_container_intro' => 'Os arquivos de mídia e documento vivem em pastas no servidor ou em outros serviços de armazenamento de arquivos. Cada um desses locais é chamado de contêiner.',
     'asset_container_move_instructions' => 'A capacidade de mover arquivos nesta biblioteca.',
     'asset_container_quick_download_instructions' => 'Active o botão de download rápido quando editar arquivos.',
-    'asset_container_rename_instructions' => 'A capacidade de renomear arquivos nesta biblioteca.',
     'asset_container_source_preset_instructions' => 'As imagens enviadas serão processadas permanentemente usando esta predefinição.',
     'asset_container_title_instructions' => 'Normalmente um substantivo plural, como Imagens ou Documentos',
     'asset_container_validation_rules_instructions' => 'Essas regras serão aplicadas aos arquivos enviados.',

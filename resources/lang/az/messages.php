@@ -15,7 +15,6 @@ return [
     'asset_container_intro' => 'Media və sənəd faylları serverdəki qovluqlarda və ya digər fayl saxlama xidmətlərində saxlanılır. Bu yerlərin hər biri konteyner adlanır.',
     'asset_container_move_instructions' => 'Aktiv edildikdə, istifadəçilərə bu konteyner daxilində faylları hərəkət etdirmək imkanı verəcək.',
     'asset_container_quick_download_instructions' => 'Aktiv edildikdə, Varlıg Menecerində tez yükləmə düyməsini əlavə edəcək.',
-    'asset_container_rename_instructions' => 'Aktiv edildikdə, istifadəçilərə bu konteynerdəki faylları yenidən adlandırmaq imkanı verəcək.',
     'asset_container_source_preset_instructions' => 'Yüklənmiş şəkillər bu hazır parametrlə daimi olaraq emal ediləcək.',
     'asset_container_title_instructions' => 'Adətən, Çoxluq isim, məsələn, Şəkillər və ya Sənədlər',
     'asset_container_validation_rules_instructions' => 'Bu qaydalar yüklənmiş fayllara tətbiq ediləcək.',

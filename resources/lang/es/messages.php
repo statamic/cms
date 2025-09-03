@@ -15,7 +15,6 @@ return [
     'asset_container_intro' => 'Los medios y documentos viven en carpetas en el servidor u otros servicios de almacenamiento de archivos. Cada una de estas ubicaciones se llama contenedor.',
     'asset_container_move_instructions' => 'Al activarse permitirá a los usuarios mover medios dentro del contenedor.',
     'asset_container_quick_download_instructions' => 'Al activarse añadirá un enlace de descarga rápida en la Biblioteca de Medios.',
-    'asset_container_rename_instructions' => 'Al activarse permitirá a los usuarios renombrar medios en este contenedor.',
     'asset_container_source_preset_instructions' => 'Las imágenes cargadas se procesarán permanentemente utilizando este ajuste preestablecido.',
     'asset_container_title_instructions' => 'Generalmente un sustantivo plural, como "Imágenes" o "Documentos"',
     'asset_container_validation_rules_instructions' => 'Estas reglas se aplicarán a los archivos cargados.',

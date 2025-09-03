@@ -69,7 +69,7 @@ class AssetFolderPolicy
                 ->isEmpty();
         }
 
-        return $assetFolder->container()->allowRenaming();
+        return true;
     }
 
     public function delete($user, $assetFolder)

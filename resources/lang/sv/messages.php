@@ -15,7 +15,6 @@ return [
     'asset_container_intro' => 'Media- och dokumentfiler finns i mappar på servern eller andra fillagringstjänster. Var och en av dessa platser kallas en container.',
     'asset_container_move_instructions' => 'När det är aktiverat kan användare flytta runt filer i den här behållaren.',
     'asset_container_quick_download_instructions' => 'När den är aktiverad kommer en snabbnedladdningsknapp att läggas till i Asset Manager.',
-    'asset_container_rename_instructions' => 'När det är aktiverat kan användare byta namn på filerna i den här behållaren.',
     'asset_container_source_preset_instructions' => 'Uppladdade bilder kommer att bearbetas permanent med denna förinställning.',
     'asset_container_title_instructions' => 'Vanligtvis ett substantiv i plural, som bilder eller dokument',
     'asset_container_validation_rules_instructions' => 'Dessa regler kommer att tillämpas på uppladdade filer.',

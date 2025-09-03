@@ -15,7 +15,6 @@ return [
     'asset_container_intro' => 'Fail media dan dokumen hidup dalam folder pada pelayan atau perkhidmatan storan fail lain. Setiap lokasi ini dipanggil penampung.',
     'asset_container_move_instructions' => 'Apabila didayakan akan membolehkan pengguna mengalihkan fail di dalam penampung ini.',
     'asset_container_quick_download_instructions' => 'Apabila didayakan akan menambah butang muat turun pantas dalam Pengurus Aset.',
-    'asset_container_rename_instructions' => 'Apabila didayakan akan membolehkan pengguna menamakan semula fail dalam penampung ini.',
     'asset_container_source_preset_instructions' => 'Imej yang dimuat naik akan diproses secara kekal menggunakan pratetap ini.',
     'asset_container_title_instructions' => 'Biasanya kata nama majmuk, seperti Imej atau Dokumen',
     'asset_container_validation_rules_instructions' => 'Peraturan ini akan digunakan pada fail yang dimuat naik.',

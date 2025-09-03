@@ -15,7 +15,6 @@ return [
     'asset_container_intro' => 'メディア ファイルとドキュメント ファイルは、サーバー上のフォルダーまたは他のファイル ストレージ サービスに存在します。これらの各場所はコンテナと呼ばれます。',
     'asset_container_move_instructions' => '有効にすると、ユーザーはこのコンテナ内でファイルを移動できるようになります。',
     'asset_container_quick_download_instructions' => '有効にすると、アセット マネージャーにクイック ダウンロード ボタンが追加されます。',
-    'asset_container_rename_instructions' => '有効にすると、ユーザーはこのコンテナ内のファイルの名前を変更できるようになります。',
     'asset_container_source_preset_instructions' => 'アップロードされた画像は、このプリセットを使用して永続的に処理されます。',
     'asset_container_title_instructions' => '通常、画像やドキュメントなどの複数名詞',
     'asset_container_validation_rules_instructions' => 'これらのルールはアップロードされたファイルに適用されます。',

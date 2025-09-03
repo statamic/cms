@@ -39,7 +39,6 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     protected $private;
     protected $allowDownloading;
     protected $allowMoving;
-    protected $allowRenaming;
     protected $createFolders;
     protected $sourcePreset;
     protected $warmPresets;
@@ -551,24 +550,6 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     }
 
     /**
-     * The ability to rename files in this container.
-     *
-     * @param  bool|null  $allowRenaming
-     * @return bool|$this
-     *
-     * @deprecated
-     */
-    public function allowRenaming($allowRenaming = null)
-    {
-        return $this
-            ->fluentlyGetOrSet('allowRenaming')
-            ->getter(function ($allowRenaming) {
-                return (bool) ($allowRenaming ?? true);
-            })
-            ->args(func_get_args());
-    }
-
-    /**
      * The ability to create folders within this container.
      *
      * @param  bool|null  $createFolders
@@ -642,7 +623,6 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
             'disk' => $this->disk,
             'search_index' => $this->searchIndex,
             'allow_downloading' => $this->allowDownloading,
-            'allow_renaming' => $this->allowRenaming,
             'allow_moving' => $this->allowMoving,
             'create_folders' => $this->createFolders,
             'source_preset' => $this->sourcePreset,

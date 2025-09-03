@@ -15,7 +15,6 @@ return [
     'asset_container_intro' => 'فایل‌ها و اسناد در پوشه‌هایی روی سرور یا سایر سرویس‌های ذخیره‌سازی فایل قرار دارند. هر یک از این مکان‌ها یک کانتینر نامیده می‌شود.',
     'asset_container_move_instructions' => 'به کاربران امکان جابجایی فایل داخل این کانتینر را بدهید.',
     'asset_container_quick_download_instructions' => 'پس از فعال شدن این گزینه یک دکمه‌ی دانلود در صفحه‌ی مدیریت فایل نمایان خواهد شد.',
-    'asset_container_rename_instructions' => 'به کاربران امکان تغییر نام فایل‌ها را بدهید.',
     'asset_container_source_preset_instructions' => 'پردازش روی تصاویر به محض آپلود شدن براساس تنظیمات زیر انجام می‌گیرد.',
     'asset_container_title_instructions' => 'معمولاً یک اسم جمع، مانند تصاویر یا اسناد',
     'asset_container_validation_rules_instructions' => 'این قوانین به فایل‌های آپلود شده اعمال خواهند شد.',

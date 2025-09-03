@@ -15,7 +15,6 @@ return [
     'asset_container_intro' => 'Media en documenten worden opgeslagen in mappen op de server op op andere file-storage-diensten. Elke van deze locaties noemt men een container.',
     'asset_container_move_instructions' => 'Indien ingeschakeld, kunnen gebruikers bestanden verplaatsen binnenin deze container.',
     'asset_container_quick_download_instructions' => 'Indien ingeschakeld, wordt er een downloadknop weergegeven in de asset-manager.',
-    'asset_container_rename_instructions' => 'Indien ingeschakeld, kunnen gebruikers bestanden hernoemen in deze container.',
     'asset_container_source_preset_instructions' => 'Geüploade afbeeldingen worden permanent verwerkt met deze preset.',
     'asset_container_title_instructions' => 'Meestal een zelfstandig naamwoord in meervoud, zoals Afbeeldingen of Documenten.',
     'asset_container_validation_rules_instructions' => 'Deze regels worden toegepast op geüploade bestanden.',
