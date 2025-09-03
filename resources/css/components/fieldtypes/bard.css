@@ -256,7 +256,7 @@
     }
 
     .bard-fieldtype .bard-content {
-        @apply text-gray-900 dark:text-gray-300;
+        @apply bg-white rounded-lg text-gray-900 dark:text-gray-300;
         blockquote,
         ol,
         p,

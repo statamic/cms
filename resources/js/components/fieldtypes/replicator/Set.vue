@@ -62,6 +62,10 @@ const setGroup = computed(() => {
 
 const isSetGroupVisible = computed(() => replicatorSets.length > 1 && setGroup.value.display);
 
+const hasNestedReplicator = computed(() => {
+    return props.config.fields && props.config.fields.some(field => field.type === 'replicator');
+});
+
 const fieldActionPayload = computed(() => ({
     // vm: this,
     // fieldVm: this.fieldVm,
@@ -124,8 +128,12 @@ function destroy() {
         <slot name="picker" />
         <div
             layout
-            class="shadow-ui-sm relative z-2 w-full rounded-lg border border-gray-300 bg-white text-base dark:border-x-0 dark:border-t-0 dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
-            :class="{ 'border-red-500': hasError }"
+            class="relative z-2 w-full rounded-lg border border-gray-300 text-base dark:border-x-0 dark:border-t-0 dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black shadow-ui-sm"
+            :class="{ 
+                'border-red-500': hasError,
+                'bg-white': !hasNestedReplicator,
+                'bg-gray-50/50': hasNestedReplicator
+            }"
             :data-collapsed="collapsed ?? undefined"
             :data-error="hasError ?? undefined"
             :data-invalid="isInvalid ?? undefined"
@@ -133,10 +141,9 @@ function destroy() {
             :data-type="config.handle"
         >
             <header
-                class="group/header animate-border-color flex items-center rounded-lg px-1.5 antialiased duration-200 bg-gray-100/75 hover:bg-gray-100 dark:hover:bg-gray-950"
+                class="group/header animate-border-color flex items-center rounded-lg px-1.5 antialiased duration-200 bg-gray-100/75 hover:bg-gray-100 dark:hover:bg-gray-950 border-gray-300 dark:border-white/10"
                 :class="{ 
-                    'dark:border-white/10': collapsed,
-                    'bg-gray-100 rounded-b-none border-b border-gray-300 dark:border-white/10': !collapsed
+                    'bg-gray-200/50 rounded-b-none border-b border-gray-300 dark:border-white/10': !collapsed
                 }"
             >
                 <Icon
