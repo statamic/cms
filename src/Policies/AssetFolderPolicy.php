@@ -21,9 +21,7 @@ class AssetFolderPolicy
     {
         $user = User::fromUser($user);
 
-        $permission = config('statamic.assets.v6_permissions')
-            ? "edit {$assetContainer->handle()} folders"
-            : "upload {$assetContainer->handle()} assets";
+        $permission = "edit {$assetContainer->handle()} folders";
 
         if (! $user->hasPermission($permission)) {
             return false;
@@ -36,10 +34,8 @@ class AssetFolderPolicy
     {
         $user = User::fromUser($user);
 
-        $hasPermission = config('statamic.assets.v6_permissions')
-            ? ($user->hasPermission("edit {$assetFolder->container()->handle()} folders")
-                && $user->hasPermission("move {$assetFolder->container()->handle()} assets"))
-            : $user->hasPermission("move {$assetFolder->container()->handle()} assets");
+        $hasPermission = $user->hasPermission("edit {$assetFolder->container()->handle()} folders")
+            && $user->hasPermission("move {$assetFolder->container()->handle()} assets");
 
         if (! $hasPermission) {
             return false;
@@ -59,10 +55,8 @@ class AssetFolderPolicy
     {
         $user = User::fromUser($user);
 
-        $hasPermission = config('statamic.assets.v6_permissions')
-            ? ($user->hasPermission("edit {$assetFolder->container()->handle()} folders")
-                && $user->hasPermission("rename {$assetFolder->container()->handle()} assets"))
-            : $user->hasPermission("rename {$assetFolder->container()->handle()} assets");
+        $hasPermission = $user->hasPermission("edit {$assetFolder->container()->handle()} folders")
+            && $user->hasPermission("rename {$assetFolder->container()->handle()} assets");
 
         if (! $hasPermission) {
             return false;
@@ -82,10 +76,8 @@ class AssetFolderPolicy
     {
         $user = User::fromUser($user);
 
-        $hasPermission = config('statamic.assets.v6_permissions')
-            ? ($user->hasPermission("edit {$assetFolder->container()->handle()} folders")
-                && $user->hasPermission("delete {$assetFolder->container()->handle()} assets"))
-            : $user->hasPermission("delete {$assetFolder->container()->handle()} assets");
+        $hasPermission = $user->hasPermission("edit {$assetFolder->container()->handle()} folders")
+            && $user->hasPermission("delete {$assetFolder->container()->handle()} assets");
 
         if (! $hasPermission) {
             return false;
