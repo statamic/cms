@@ -223,4 +223,16 @@ return [
 
     'svg_sanitization_on_upload' => true,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Use V6 Permissions
+    |--------------------------------------------------------------------------
+    |
+    | This allows you to opt in to the asset permissions that will become the
+    | default behavior in Statamic 6. This will be removed in Statamic 6.
+    |
+    */
+
+    'v6_permissions' => false,
+
 ];
