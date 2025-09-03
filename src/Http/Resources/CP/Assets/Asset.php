@@ -56,7 +56,7 @@ class Asset extends JsonResource
             $this->merge($this->thumbnails()),
             $this->merge($this->publishFormData()),
 
-            'allowDownloading' => $this->container()->allowDownloading(),
+            'allowDownloading' => config('statamic.assets.v6_permissions') ? true : $this->container()->allowDownloading(),
             'actionUrl' => cp_route('assets.actions.run'),
             'actions' => Action::for($this->resource, [
                 'container' => $this->container()->handle(),
