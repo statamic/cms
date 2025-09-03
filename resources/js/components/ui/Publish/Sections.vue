@@ -49,7 +49,7 @@ function toggleSection(id) {
                 { 'pb-0': section.collapsed }
             ]"
         >
-            <PanelHeader @click="toggleSection(i)" class="flex justify-between">
+            <PanelHeader v-if="section.display || section.collapsible" @click="toggleSection(i)" class="flex justify-between">
                 <div>
                     <Heading :text="__(section.display)" />
                     <Subheading v-if="section.instructions" :text="renderInstructions(section.instructions)" />
