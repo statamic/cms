@@ -9,6 +9,7 @@ use Statamic\Assets\AssetUploader;
 use Statamic\Assets\UploadedReplacementFile;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
+use Statamic\Contracts\Assets\AssetFolder;
 use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
@@ -87,8 +88,8 @@ class AssetsController extends CpController
         $file = $request->file('file');
         $folder = $request->folder;
 
-        // Append relative path as subfolder when upload was part of a folder and container allows it
-        if ($container->createFolders() && ($relativePath = AssetUploader::getSafePath($request->relativePath))) {
+        // Append relative path as subfolder when upload was part of a folder and user is allowed to create folders
+        if (User::current()->can('create', [AssetFolder::class, $container]) && ($relativePath = AssetUploader::getSafePath($request->relativePath))) {
             $folder = rtrim($folder, '/').'/'.$relativePath;
         }
 
