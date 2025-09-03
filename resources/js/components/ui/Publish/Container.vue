@@ -203,7 +203,7 @@ function pushComponent(name, { props }) {
     return component;
 }
 
-provideContainerContext({
+const provided = {
     name: toRef(() => props.name),
     parentContainer,
     blueprint: toRef(() => props.blueprint),
@@ -234,7 +234,9 @@ provideContainerContext({
     setRevealerField,
     unsetRevealerField,
     setHiddenField,
-});
+};
+
+provideContainerContext({ ...provided, container: provided });
 
 defineExpose({
     name: props.name,
