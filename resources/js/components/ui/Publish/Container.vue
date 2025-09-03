@@ -253,9 +253,6 @@ defineExpose({
     setExtraValues,
 });
 
-// Backwards compatibility.
-provide('publishContainer', getCurrentInstance()); // temporarily used by ShowField.js
-
 // The following are shims to make things temporarily work.
 function saving() {}
 function saved() {
