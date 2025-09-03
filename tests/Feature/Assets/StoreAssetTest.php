@@ -79,17 +79,6 @@ class StoreAssetTest extends TestCase
     }
 
     #[Test]
-    public function it_denies_access_if_uploads_are_disabled()
-    {
-        $this->container->allowUploads(false);
-
-        $this
-            ->actingAs($this->userWithPermission())
-            ->submit()
-            ->assertStatus(403);
-    }
-
-    #[Test]
     public function it_doesnt_upload_without_a_container()
     {
         $this

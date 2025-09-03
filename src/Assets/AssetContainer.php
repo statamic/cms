@@ -37,7 +37,6 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     protected $handle;
     protected $disk;
     protected $private;
-    protected $allowUploads;
     protected $allowDownloading;
     protected $allowMoving;
     protected $allowRenaming;
@@ -570,24 +569,6 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     }
 
     /**
-     * The ability to upload into this container.
-     *
-     * @param  bool|null  $allowUploads
-     * @return bool|$this
-     *
-     * @deprecated
-     */
-    public function allowUploads($allowUploads = null)
-    {
-        return $this
-            ->fluentlyGetOrSet('allowUploads')
-            ->getter(function ($allowUploads) {
-                return (bool) ($allowUploads ?? true);
-            })
-            ->args(func_get_args());
-    }
-
-    /**
      * The ability to create folders within this container.
      *
      * @param  bool|null  $createFolders
@@ -660,7 +641,6 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
             'title' => $this->title,
             'disk' => $this->disk,
             'search_index' => $this->searchIndex,
-            'allow_uploads' => $this->allowUploads,
             'allow_downloading' => $this->allowDownloading,
             'allow_renaming' => $this->allowRenaming,
             'allow_moving' => $this->allowMoving,

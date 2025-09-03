@@ -8,7 +8,6 @@ return [
     'addon_install_command' => 'For at installere denne tilføjelse skal du køre følgende kommando',
     'addon_list_loading_error' => 'Der gik noget galt under indlæsning af tilføjelser. Prøv igen senere.',
     'addon_uninstall_command' => 'For at afinstallere denne tilføjelse skal du køre følgende kommando',
-    'asset_container_allow_uploads_instructions' => 'Når det er aktiveret, giver det brugerne mulighed for at uploade filer til denne container.',
     'asset_container_blueprint_instructions' => 'Blueprints definerer yderligere tilpassede felter, der er tilgængelige, når du redigerer aktiver.',
     'asset_container_create_folder_instructions' => 'Når det er aktiveret, giver det brugerne mulighed for at oprette mapper i denne beholder.',
     'asset_container_disk_instructions' => 'Filsystemdiske specificerer, hvor filer gemmes - enten lokalt eller på en ekstern placering som Amazon S3. De kan konfigureres i `config / filesystems.php`',

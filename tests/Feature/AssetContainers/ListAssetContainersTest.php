@@ -36,7 +36,6 @@ class ListAssetContainersTest extends TestCase
             [
                 'id' => 'three',
                 'title' => 'Three',
-                'allow_uploads' => false,
                 'create_folders' => false,
                 'edit_url' => 'http://localhost/cp/asset-containers/three/edit',
                 'delete_url' => 'http://localhost/cp/asset-containers/three',
@@ -47,7 +46,6 @@ class ListAssetContainersTest extends TestCase
             [
                 'id' => 'two',
                 'title' => 'Two',
-                'allow_uploads' => false,
                 'create_folders' => false,
                 'edit_url' => 'http://localhost/cp/asset-containers/two/edit',
                 'delete_url' => 'http://localhost/cp/asset-containers/two',

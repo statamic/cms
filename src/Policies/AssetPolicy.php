@@ -27,13 +27,7 @@ class AssetPolicy
 
     public function store($user, $assetContainer)
     {
-        $user = User::fromUser($user);
-
-        if (! $user->hasPermission("upload {$assetContainer->handle()} assets")) {
-            return false;
-        }
-
-        return $assetContainer->allowUploads();
+        return User::fromUser($user)->hasPermission("upload {$assetContainer->handle()} assets");
     }
 
     public function move($user, $asset)

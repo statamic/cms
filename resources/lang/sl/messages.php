@@ -8,7 +8,6 @@ return [
     'addon_install_command' => 'Če želite namestiti ta dodatek, zaženite naslednji ukaz',
     'addon_list_loading_error' => 'Pri nalaganju dodatkov je šlo kaj narobe. Poskusi znova kasneje.',
     'addon_uninstall_command' => 'Če želite odstraniti ta dodatek, zaženite naslednji ukaz',
-    'asset_container_allow_uploads_instructions' => 'Če je omogočena, bo uporabnikom omogočila nalaganje datotek v ta vsebnik.',
     'asset_container_blueprint_instructions' => 'Načrti opredeljujejo dodatna polja po meri, ki so na voljo pri urejanju sredstev.',
     'asset_container_create_folder_instructions' => 'Če je omogočena, bo uporabnikom omogočeno ustvarjanje map v tem vsebniku.',
     'asset_container_disk_instructions' => 'Diski datotečnega sistema določajo, kje se datoteke shranjujejo - lokalno ali na oddaljenem mestu, kot je Amazon S3. Lahko jih konfigurirate v `config / filesystems.php`',

@@ -8,7 +8,6 @@ return [
     'addon_install_command' => 'このアドオンをインストールするには、次のコマンドを実行します',
     'addon_list_loading_error' => 'アドオンの読み込み中に問題が発生しました。あとでもう一度試してみてください。',
     'addon_uninstall_command' => 'このアドオンをアンインストールするには、次のコマンドを実行します',
-    'asset_container_allow_uploads_instructions' => '有効にすると、ユーザーはこのコンテナにファイルをアップロードできるようになります。',
     'asset_container_blueprint_instructions' => 'ブループリントは、アセットの編集時に使用できる追加のカスタム フィールドを定義します。',
     'asset_container_create_folder_instructions' => '有効にすると、ユーザーはこのコンテナ内にフォルダーを作成できるようになります。',
     'asset_container_disk_instructions' => 'ファイルシステム ディスクは、ファイルがローカルに保存されるか、Amazon S3 などのリモートの場所に保存されるかを指定します。これらは「config/filesystems.php」で設定できます。',

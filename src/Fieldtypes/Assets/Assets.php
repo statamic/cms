@@ -208,7 +208,6 @@ class Assets extends Fieldtype
                 'blueprint_url' => cp_route('blueprints.asset-containers.edit', $container->handle()),
                 'can_edit' => User::current()->can('edit', $container),
                 'can_delete' => User::current()->can('delete', $container),
-                'allow_uploads' => $container->allowUploads(),
                 'create_folders' => $container->createFolders(),
                 'sort_field' => $container->sortField(),
                 'sort_direction' => $container->sortDirection(),

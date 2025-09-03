@@ -305,7 +305,7 @@ export default {
         },
 
         canUpload() {
-            return this.folder && this.container.allow_uploads;
+            return this.folder;
         },
 
         containerIsEmpty() {

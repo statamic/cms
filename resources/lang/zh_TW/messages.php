@@ -8,7 +8,6 @@ return [
     'addon_install_command' => '要安装此插件，请运行以下命令',
     'addon_list_loading_error' => '載入附加元件時發生錯誤。請稍後重試。',
     'addon_uninstall_command' => '要卸载此插件，请运行以下命令',
-    'asset_container_allow_uploads_instructions' => '啟用後將允許使用者將檔案上傳至容器。',
     'asset_container_blueprint_instructions' => '藍圖可用來定義編輯素材時的額外自定欄位。',
     'asset_container_create_folder_instructions' => '啟用後將允許使用者在本容器內建立資料夾。',
     'asset_container_disk_instructions' => '檔案系統磁碟用於指定檔案要儲存的位置 — 可儲存於本機或如 Amazon S3 等遠端位置。這些磁碟可在 `config/filesystems.php` 內設定',

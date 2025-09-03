@@ -3,7 +3,6 @@
 namespace Statamic\Http\Controllers\CP\Assets;
 
 use Illuminate\Http\Request;
-use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Assets\AssetFolder;
 use Statamic\CP\PublishForm;
@@ -28,7 +27,6 @@ class AssetContainersController extends CpController
             return [
                 'id' => $container->handle(),
                 'title' => $container->title(),
-                'allow_uploads' => User::current()->can('store', [Asset::class, $container]),
                 'create_folders' => User::current()->can('create', [AssetFolder::class, $container]),
                 'edit_url' => $container->editUrl(),
                 'delete_url' => $container->deleteUrl(),
@@ -49,7 +47,6 @@ class AssetContainersController extends CpController
             'title' => $container->title(),
             'handle' => $container->handle(),
             'disk' => $container->diskHandle(),
-            'allow_uploads' => $container->allowUploads(),
             'allow_downloading' => $container->allowDownloading(),
             'allow_renaming' => $container->allowRenaming(),
             'allow_moving' => $container->allowMoving(),
@@ -83,7 +80,6 @@ class AssetContainersController extends CpController
             ->allowDownloading($values['allow_downloading'])
             ->allowRenaming($values['allow_renaming'])
             ->allowMoving($values['allow_moving'])
-            ->allowUploads($values['allow_uploads'])
             ->createFolders($values['create_folders'])
             ->sourcePreset($values['source_preset'])
             ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets'])
@@ -124,7 +120,6 @@ class AssetContainersController extends CpController
         $container = AssetContainer::make($values['handle'])
             ->title($values['title'])
             ->disk($values['disk'])
-            ->allowUploads($values['allow_uploads'])
             ->createFolders($values['create_folders'])
             ->sourcePreset($values['source_preset'])
             ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets']);
@@ -218,12 +213,6 @@ class AssetContainersController extends CpController
             'settings' => [
                 'display' => __('Settings'),
                 'fields' => [
-                    'allow_uploads' => [
-                        'type' => 'toggle',
-                        'display' => __('Allow Uploads'),
-                        'instructions' => __('statamic::messages.asset_container_allow_uploads_instructions'),
-                        'default' => true,
-                    ],
                     'create_folders' => [
                         'type' => 'toggle',
                         'display' => __('Create Folders'),

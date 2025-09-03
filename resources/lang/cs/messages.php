@@ -8,7 +8,6 @@ return [
     'addon_install_command' => 'Chcete-li nainstalovat tento doplněk, spusťte následující příkaz',
     'addon_list_loading_error' => 'Došlo k chybě při načítání seznamu doplněků. Zkuste to prosím znovu později.',
     'addon_uninstall_command' => 'Chcete-li tento doplněk odinstalovat, spusťte následující příkaz',
-    'asset_container_allow_uploads_instructions' => 'Použijte toto pole pro nastavení, které soubory mohou být nahrány do této kontejneru:',
     'asset_container_blueprint_instructions' => 'Použijte toto pole pro nastavení, které soubory mohou být nahrány do této kontejneru:',
     'asset_container_create_folder_instructions' => 'Použijte toto pole pro nastavení, které soubory mohou být nahrány do tohoto kontejneru:',
     'asset_container_disk_instructions' => 'Jednotky souborového systému určují místo, kam se mají soubory ukládat - buď lokálně, nebo ve vzdáleném umístění, jako je například Amazon S3. Lze je nakonfigurovat v souboru `config/filesystems.php`.',

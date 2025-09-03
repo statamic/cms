@@ -8,7 +8,6 @@ return [
     'addon_install_command' => 'Untuk memasang addon ini, jalankan arahan berikut',
     'addon_list_loading_error' => 'Kesilapan telah berlaku semasa memuatkan alat tambah. Cuba lagi nanti.',
     'addon_uninstall_command' => 'Untuk menyahpasang addon ini, jalankan arahan berikut',
-    'asset_container_allow_uploads_instructions' => 'Apabila didayakan akan memberi pengguna keupayaan memuat naik fail ke dalam penampung ini.',
     'asset_container_blueprint_instructions' => 'Cetakan biru mentakrifkan bidang tersuai tambahan yang tersedia semasa mengedit aset.',
     'asset_container_create_folder_instructions' => 'Apabila didayakan akan memberi pengguna keupayaan untuk mencipta folder dalam penampung ini.',
     'asset_container_disk_instructions' => 'Cakera sistem fail menentukan tempat fail disimpan — sama ada secara setempat atau di lokasi terpencil seperti Amazon S3. Ia boleh dikonfigurasikan dalam `config/filesystems.php`',

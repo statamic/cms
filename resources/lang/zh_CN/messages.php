@@ -8,7 +8,6 @@ return [
     'addon_install_command' => '要安装此插件，请运行以下命令',
     'addon_list_loading_error' => '加载插件时出了点问题。 稍后再试。',
     'addon_uninstall_command' => '要卸载此插件，请运行以下命令',
-    'asset_container_allow_uploads_instructions' => '启用后，用户可以将文件上传到此容器中。',
     'asset_container_blueprint_instructions' => '上传到此容器的能力。',
     'asset_container_create_folder_instructions' => '在此容器中创建文件夹的能力。',
     'asset_container_disk_instructions' => '文件系统磁盘指定文件的存储位置-在本地或在 Amazon S3 之类的远程位置。 可以在`config / filesystems.php`中配置它们',

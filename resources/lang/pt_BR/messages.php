@@ -8,7 +8,6 @@ return [
     'addon_install_command' => 'Para instalar este complemento, execute o seguinte comando',
     'addon_list_loading_error' => 'Algo deu errado ao carregar os addons. Tente novamente mais tarde.',
     'addon_uninstall_command' => 'Para desinstalar este complemento, execute o seguinte comando',
-    'asset_container_allow_uploads_instructions' => 'Quando ativado, dará aos usuários a habilidade de enviar arquivos neste recipiente.',
     'asset_container_blueprint_instructions' => 'Os diagramas definem campos personalizados adicionais disponíveis ao editar ativos.',
     'asset_container_create_folder_instructions' => 'Quando ativado, dará aos usuários a capacidade de criar pastas neste recipiente.',
     'asset_container_disk_instructions' => 'Os discos do sistema de arquivos especificam onde os arquivos são armazenados — tanto localmente ou remotamente, como o Amazon S3. Eles podem ser configurados em `config/filesystems.php`',

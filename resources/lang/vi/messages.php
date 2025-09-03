@@ -8,7 +8,6 @@ return [
     'addon_install_command' => 'Để cài đặt addon này, hãy chạy lệnh sau',
     'addon_list_loading_error' => 'Có lỗi xảy ra khi tải addon. Vui lòng thử lại sau.',
     'addon_uninstall_command' => 'Để gỡ bỏ addon này, hãy chạy lệnh sau',
-    'asset_container_allow_uploads_instructions' => 'Khi bật, người dùng có thể tải tệp lên container này.',
     'asset_container_blueprint_instructions' => 'Blueprints định nghĩa các trường tùy chỉnh khi chỉnh sửa tài nguyên.',
     'asset_container_create_folder_instructions' => 'Khi bật, người dùng có thể tạo thư mục trong container này.',
     'asset_container_disk_instructions' => 'Đĩa lưu trữ tệp quy định nơi lưu trữ tệp — cục bộ hoặc trên dịch vụ như Amazon S3. Được cấu hình trong `config/filesystems.php`.',

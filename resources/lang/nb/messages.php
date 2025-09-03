@@ -8,7 +8,6 @@ return [
     'addon_install_command' => 'For å installere dette tillegget, kjør følgende kommando',
     'addon_list_loading_error' => 'Noe gikk galt under lasting av utvidelser. Prøv igjen senere.',
     'addon_uninstall_command' => 'For å avinstallere dette tillegget, kjør følgende kommando',
-    'asset_container_allow_uploads_instructions' => 'Når det er aktivert, kan brukere laste opp filer til denne beholderen.',
     'asset_container_blueprint_instructions' => 'Blueprint definerer ytterligere tilpassede felt som er tilgjengelige ved redigering av innhold.',
     'asset_container_create_folder_instructions' => 'Når det er aktivert, kan brukere opprette mapper i denne beholderen.',
     'asset_container_disk_instructions' => 'Filsystemdisker spesifiserer hvor filer lagres – enten lokalt eller på en ekstern lagringsenhet, for eksempel på Amazon S3. De kan konfigureres i `config/filesystems.php`',

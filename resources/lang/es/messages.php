@@ -8,7 +8,6 @@ return [
     'addon_install_command' => 'Para instalar este complemento, ejecute el siguiente comando',
     'addon_list_loading_error' => 'Algo salió mal al cargar los complementos. Intenta nuevamente más tarde.',
     'addon_uninstall_command' => 'Para desinstalar este complemento, ejecute el siguiente comando',
-    'asset_container_allow_uploads_instructions' => 'Cuando está habilitado, los usuarios pueden cargar archivos en este contenedor.',
     'asset_container_blueprint_instructions' => 'Los planos definen campos personalizados adicionales al editar medios.',
     'asset_container_create_folder_instructions' => 'Al activarse dará a los usuarios la capacidad de crear carpetas en este contenedor.',
     'asset_container_disk_instructions' => 'Los discos del sistema de archivos especifican dónde se alojan los medios&mdash;localmente o bien en una localización remota como Amazon S3. Pueden ser configurados en `config/filesystems.php`',

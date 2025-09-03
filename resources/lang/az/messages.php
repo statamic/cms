@@ -8,7 +8,6 @@ return [
     'addon_install_command' => 'Bu əlavəni quraşdırmaq üçün aşağıdakı əmri yerinə yetirin',
     'addon_list_loading_error' => 'Əlavələri yükləyərkən bir şey səhv getdi. Zəhmət olmasa, bir az sonra yenidən cəhd edin.',
     'addon_uninstall_command' => 'Bu əlavəni silmək üçün aşağıdakı əmri yerinə yetirin',
-    'asset_container_allow_uploads_instructions' => 'Aktiv edildikdə, istifadəçilərə bu konteynerə fayllar yükləmək imkanı verəcək.',
     'asset_container_blueprint_instructions' => 'Planlar varlığlari redaktə edərkən mövcud olan əlavə xüsusi sahələri müəyyən edir.',
     'asset_container_create_folder_instructions' => 'Aktiv edildikdə, istifadəçilərə bu konteynerdə qovluqlar yaratmaq imkanı verəcək.',
     'asset_container_disk_instructions' => 'Fayl sistemi diskləri faylların harada saxlanılacağını müəyyən edir - ya yerli, ya da Amazon S3 kimi uzaq yerdə. Onlar `config/filesystems.php` faylında konfiqurasiya edilə bilər.',

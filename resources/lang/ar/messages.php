@@ -8,7 +8,6 @@ return [
     'addon_install_command' => 'لتثبيت هذه الإضافة، قم بتشغيل الأمر التالي',
     'addon_list_loading_error' => 'حدث خطأ أثناء تحميل الإضافات. حاول مرة أخرى لاحقًا.',
     'addon_uninstall_command' => 'لإلغاء تثبيت هذه الإضافة، قم بتشغيل الأمر التالي',
-    'asset_container_allow_uploads_instructions' => 'عند التمكين، سيمكن المستخدمين من رفع الملفات إلى هذه الحاوية.',
     'asset_container_blueprint_instructions' => 'تحدد المخططات الحقول المخصصة الإضافية المتاحة عند تحرير الأصول.',
     'asset_container_create_folder_instructions' => 'عند التمكين، سيمكن المستخدمين من إنشاء مجلدات في هذه الحاوية.',
     'asset_container_disk_instructions' => 'تحدد أقراص نظام الأصول مكان تخزين الملفات — إما محليًا أو في موقع عن بعد مثل Amazon S3. يمكن تكوينها في `config/filesystems.php`',

@@ -8,7 +8,6 @@ return [
     'addon_install_command' => 'Untuk menginstal addon ini, jalankan perintah berikut',
     'addon_list_loading_error' => 'Terjadi masalah saat memuat pengaya. Coba lagi nanti.',
     'addon_uninstall_command' => 'Untuk menghapus addon ini, jalankan perintah berikut',
-    'asset_container_allow_uploads_instructions' => 'Jika diaktifkan, pengguna akan diberi kemampuan untuk mengunggah file ke dalam penampung ini.',
     'asset_container_blueprint_instructions' => 'Cetak biru menentukan bidang khusus tambahan yang tersedia saat mengedit aset.',
     'asset_container_create_folder_instructions' => 'Jika diaktifkan akan memberi pengguna kemampuan untuk membuat folder di penampung ini.',
     'asset_container_disk_instructions' => 'Disk Filesystem file menentukan di mana file disimpan - baik secara lokal atau di lokasi jarak jauh seperti Amazon S3. Mereka dapat dikonfigurasi di `config/filesystems.php`',

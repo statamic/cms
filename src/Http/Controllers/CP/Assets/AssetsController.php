@@ -78,7 +78,6 @@ class AssetsController extends CpController
 
         $container = AssetContainer::find($request->container);
 
-        abort_unless($container->allowUploads(), 403);
         $this->authorize('store', [AssetContract::class, $container]);
 
         $request->validate([

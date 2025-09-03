@@ -8,7 +8,6 @@ return [
     'addon_install_command' => 'برای نصب این افزونه دستوری که در ادامه آمده است را اجرا کنید',
     'addon_list_loading_error' => 'هنگام لیست کردن افزونه‌ها مشکلی بوجود آمد. لطفا لحظاتی دیگر مجدد سر بزنید.',
     'addon_uninstall_command' => 'برای حذف این افزونه دستوری که در ادامه آمده است را اجرا کنید',
-    'asset_container_allow_uploads_instructions' => 'به کاربران امکان آپلود فایل به این کانتینر را بدهید.',
     'asset_container_blueprint_instructions' => 'با طرح‌ها می‌توان فیلدهای دلخواه دیگری را به فرم‌های ویرایش فایل اضافه نمود.',
     'asset_container_create_folder_instructions' => 'به کاربران امکان ایجاد فولدر در کانتینر را بدهید.',
     'asset_container_disk_instructions' => 'دیسک مشخص می‌کند که فایل‌ها کجا ذخیره شوند — یا بصورت لوکال یا ریموت مانند آمازون S3. البته این دیسک‌ها را می‌توان در `config/filesystems.php` پیکربندی نمود.',

@@ -8,7 +8,6 @@ return [
     'addon_install_command' => 'Bu eklentiyi yüklemek için aşağıdaki komutu çalıştırın',
     'addon_list_loading_error' => 'Eklentiler yüklenirken bir şeyler ters gitti. Daha sonra tekrar deneyin.',
     'addon_uninstall_command' => 'Bu eklentiyi kaldırmak için aşağıdaki komutu çalıştırın',
-    'asset_container_allow_uploads_instructions' => 'Etkinleştirildiğinde, kullanıcılara bu kapsayıcıya dosya yükleme yeteneği verir.',
     'asset_container_blueprint_instructions' => 'Planlar, varlıkları düzenlerken kullanılabilen ek özel alanları tanımlar.',
     'asset_container_create_folder_instructions' => 'Etkinleştirildiğinde, kullanıcılara bu kapsayıcıda klasör oluşturma yeteneği verir.',
     'asset_container_disk_instructions' => 'Dosya sistemi diskleri, yerel olarak veya Amazon S3 gibi uzak bir konumda dosyaların nerede depolanacağını belirtir. `config/filesystems.php` içinde yapılandırılabilirler.',
