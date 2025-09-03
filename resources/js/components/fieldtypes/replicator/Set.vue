@@ -133,8 +133,11 @@ function destroy() {
             :data-type="config.handle"
         >
             <header
-                class="group/header animate-border-color flex items-center rounded-lg border-b border-transparent px-1.5 antialiased duration-200 hover:bg-gray-50 dark:hover:bg-gray-950"
-                :class="{ 'rounded-b-none border-gray-200 dark:border-white/10': !collapsed }"
+                class="group/header animate-border-color flex items-center rounded-lg px-1.5 antialiased duration-200 bg-gray-100/75 hover:bg-gray-100 dark:hover:bg-gray-950"
+                :class="{ 
+                    'dark:border-white/10': collapsed,
+                    'bg-gray-100 rounded-b-none border-b border-gray-300 dark:border-white/10': !collapsed
+                }"
             >
                 <Icon
                     name="ui/handles"
@@ -143,7 +146,7 @@ function destroy() {
                     v-if="!readOnly"
                 />
                 <button type="button" class="flex flex-1 items-center gap-4 p-2 min-w-0" @click="toggleCollapsedState">
-                    <Badge variant="flat" size="lg">
+                    <Badge size="lg" color="white">
                         <span v-if="isSetGroupVisible" class="flex items-center gap-2">
                             {{ __(setGroup.display) }}
                             <Icon name="ui/chevron-right" class="relative top-px size-3" />
