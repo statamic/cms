@@ -55,7 +55,7 @@
                             <div class="w-50 line-clamp-2 text-sm font-medium text-gray-900 dark:text-dark-175">
                                 {{ __(item.display || item.handle) }}
                             </div>
-                            <div v-if="item.instructions" class="w-50 pb-1 line-clamp-2 text-2xs leading-tight text-gray-700 dark:text-dark-175">
+                            <div v-if="item.instructions" class="w-50 mb-1 line-clamp-2 text-2xs leading-tight text-gray-700 dark:text-dark-175">
                                 {{ __(item.instructions) }}
                             </div>
                         </div>
