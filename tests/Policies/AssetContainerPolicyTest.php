@@ -2,9 +2,8 @@
 
 namespace Policies;
 
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Contracts\Assets\Asset;
+use Statamic\Contracts\Assets\AssetContainer as ContainerContract;
 use Statamic\Facades\AssetContainer;
 use Tests\Policies\PolicyTestCase;
 
@@ -17,113 +16,55 @@ class AssetContainerPolicyTest extends PolicyTestCase
         $containerA = tap(AssetContainer::make('alfa'))->save();
         $containerB = tap(AssetContainer::make('bravo'))->save();
 
-        $this->assertTrue($user->can('view', $containerA->makeAsset('test.txt')));
-        $this->assertFalse($user->can('view', $containerB->makeAsset('test.txt')));
+        $this->assertTrue($user->can('view', $containerA));
+        $this->assertFalse($user->can('view', $containerB));
     }
 
     #[Test]
-    public function it_can_be_edited()
+    public function it_can_only_see_index_if_there_are_authorized_containers()
     {
-        $user = $this->userWithPermissions(['edit alfa assets']);
-        $containerA = tap(AssetContainer::make('alfa'))->save();
-        $containerB = tap(AssetContainer::make('bravo'))->save();
+        $userAlfa = $this->userWithPermissions(['view alfa assets']);
+        $userBravo = $this->userWithPermissions(['view bravo assets']);
+        $userAlfaBravo = $this->userWithPermissions(['view alfa assets', 'view bravo assets']);
+        $userNone = $this->userWithPermissions([]);
 
-        $this->assertTrue($user->can('edit', $containerA->makeAsset('test.txt')));
-        $this->assertFalse($user->can('edit', $containerB->makeAsset('test.txt')));
+        tap(AssetContainer::make('alfa'))->save();
+        tap(AssetContainer::make('bravo'))->save();
+
+        $this->assertTrue($userAlfa->can('index', [ContainerContract::class]));
+        $this->assertTrue($userBravo->can('index', [ContainerContract::class]));
+        $this->assertTrue($userAlfaBravo->can('index', [ContainerContract::class]));
+        $this->assertFalse($userNone->can('index', [ContainerContract::class]));
     }
 
     #[Test]
-    public function it_can_be_stored()
+    public function configure_permission_grants_access_to_everything_else()
     {
-        $user = $this->userWithPermissions(['upload alfa assets']);
-        $containerA = tap(AssetContainer::make('alfa'))->save();
-        $containerB = tap(AssetContainer::make('bravo'))->save();
+        $userWithPermission = $this->userWithPermissions(['configure asset containers']);
+        $userWithoutConfigurePermission = $this->userWithPermissions(['view alfa assets']);
+        $userWithoutAnyPermissions = $this->userWithPermissions([]);
 
-        $this->assertTrue($user->can('store', [Asset::class, $containerA]));
-        $this->assertFalse($user->can('store', [Asset::class, $containerB]));
-    }
-
-    #[Test]
-    public function it_can_be_moved()
-    {
-        $user = $this->userWithPermissions(['move alfa assets']);
-        $containerA = tap(AssetContainer::make('alfa'))->save();
-        $containerB = tap(AssetContainer::make('bravo'))->save();
-
-        $this->assertTrue($user->can('move', $containerA->makeAsset('test.txt')));
-        $this->assertFalse($user->can('move', $containerB->makeAsset('test.txt')));
-    }
-
-    #[Test]
-    public function it_can_be_renamed()
-    {
-        $user = $this->userWithPermissions(['rename alfa assets']);
-        $containerA = tap(AssetContainer::make('alfa'))->save();
-        $containerB = tap(AssetContainer::make('bravo'))->save();
-
-        $this->assertTrue($user->can('rename', $containerA->makeAsset('test.txt')));
-        $this->assertFalse($user->can('rename', $containerB->makeAsset('test.txt')));
-    }
-
-    #[Test]
-    public function it_can_be_deleted()
-    {
-        $user = $this->userWithPermissions(['delete alfa assets']);
-        $containerA = tap(AssetContainer::make('alfa'))->save();
-        $containerB = tap(AssetContainer::make('bravo'))->save();
-
-        $this->assertTrue($user->can('delete', $containerA->makeAsset('test.txt')));
-        $this->assertFalse($user->can('delete', $containerB->makeAsset('test.txt')));
-    }
-
-    #[Test]
-    #[DataProvider('replaceProvider')]
-    public function it_can_be_replaced($canEdit, $canStore, $canDelete, $expected)
-    {
-        $user = $this->userWithPermissions(collect([
-            $canEdit ? 'edit alfa assets' : null,
-            $canStore ? 'upload alfa assets' : null,
-            $canDelete ? 'delete alfa assets' : null,
-        ])->filter()->all());
         $container = tap(AssetContainer::make('alfa'))->save();
 
-        $this->assertEquals($expected, $user->can('replace', $container->makeAsset('test.txt')));
-    }
+        $this->assertTrue($userWithPermission->can('view', $container));
+        $this->assertTrue($userWithPermission->can('index', [ContainerContract::class]));
+        $this->assertTrue($userWithPermission->can('create', [ContainerContract::class]));
+        $this->assertTrue($userWithPermission->can('edit', $container));
+        $this->assertTrue($userWithPermission->can('update', $container));
+        $this->assertTrue($userWithPermission->can('delete', $container));
 
-    public static function replaceProvider()
-    {
-        return [
-            'edit, store, delete' => ['canEdit' => true, 'canStore' => true, 'canDelete' => true, 'expected' => true],
-            'edit, store' => ['canEdit' => true, 'canStore' => true, 'canDelete' => false, 'expected' => false],
-            'edit, delete' => ['canEdit' => true, 'canStore' => false, 'canDelete' => true, 'expected' => false],
-            'store, delete' => ['canEdit' => false, 'canStore' => true, 'canDelete' => true, 'expected' => false],
-            'edit only' => ['canEdit' => true, 'canStore' => false, 'canDelete' => false, 'expected' => false],
-            'store only' => ['canEdit' => false, 'canStore' => true, 'canDelete' => false, 'expected' => false],
-            'delete only' => ['canEdit' => false, 'canStore' => false, 'canDelete' => true, 'expected' => false],
-            'none' => ['canEdit' => false, 'canStore' => false, 'canDelete' => false, 'expected' => false],
-        ];
-    }
+        $this->assertTrue($userWithoutConfigurePermission->can('view', $container));
+        $this->assertTrue($userWithoutConfigurePermission->can('index', [ContainerContract::class]));
+        $this->assertFalse($userWithoutConfigurePermission->can('create', [ContainerContract::class]));
+        $this->assertFalse($userWithoutConfigurePermission->can('edit', $container));
+        $this->assertFalse($userWithoutConfigurePermission->can('update', $container));
+        $this->assertFalse($userWithoutConfigurePermission->can('delete', $container));
 
-    #[Test]
-    #[DataProvider('reuploadProvider')]
-    public function it_can_be_reuploaded($canEdit, $canStore, $expected)
-    {
-        $user = $this->userWithPermissions(collect([
-            $canEdit ? 'edit alfa assets' : null,
-            $canStore ? 'upload alfa assets' : null,
-        ])->filter()->all());
-        $container = tap(AssetContainer::make('alfa'))->save();
-
-        $this->assertEquals($expected, $user->can('reupload', $container->makeAsset('test.txt')));
-    }
-
-    public static function reuploadProvider()
-    {
-        return [
-            'edit, store' => ['canEdit' => true, 'canStore' => true, 'expected' => true],
-            'edit only' => ['canEdit' => true, 'canStore' => false, 'expected' => false],
-            'store only' => ['canEdit' => false, 'canStore' => true, 'expected' => false],
-            'none' => ['canEdit' => false, 'canStore' => false, 'expected' => false],
-        ];
+        $this->assertFalse($userWithoutAnyPermissions->can('view', $container));
+        $this->assertFalse($userWithoutAnyPermissions->can('index', [ContainerContract::class]));
+        $this->assertFalse($userWithoutAnyPermissions->can('create', [ContainerContract::class]));
+        $this->assertFalse($userWithoutAnyPermissions->can('edit', $container));
+        $this->assertFalse($userWithoutAnyPermissions->can('update', $container));
+        $this->assertFalse($userWithoutAnyPermissions->can('delete', $container));
     }
 }
