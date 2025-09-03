@@ -129,11 +129,10 @@ title: 'New Container'
 EOT;
         $this->assertStringEqualsFile($this->tempDir.'/new.yaml', $expected);
 
-        $container->createFolders(false)->validationRules(['max:150', 'mimes:jpg'])->save();
+        $container->validationRules(['max:150', 'mimes:jpg'])->save();
 
         $expected = <<<'EOT'
 title: 'New Container'
-create_folders: false
 validate:
   - 'max:150'
   - 'mimes:jpg'

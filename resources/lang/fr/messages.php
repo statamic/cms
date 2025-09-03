@@ -9,7 +9,6 @@ return [
     'addon_list_loading_error' => 'Une erreur s’est produite lors du chargement des addons. Réessayez plus tard.',
     'addon_uninstall_command' => 'Pour désinstaller cet addon, exécutez la commande suivante',
     'asset_container_blueprint_instructions' => 'Les Blueprints définissent les champs personnalisés additionnels disponibles lors de la modification des ressources.',
-    'asset_container_create_folder_instructions' => 'Les utilisateurs peuvent-ils créer des dossiers dans ce conteneur ?',
     'asset_container_disk_instructions' => 'Les disques du système de fichiers vous permettent de préciser où seront stockés les fichiers, soit localement, soit sur un emplacement externe comme Amazon S3. Ils peuvent être configurés dans `config/filesystems.php`',
     'asset_container_handle_instructions' => 'Comment vous allez faire référence à ce conteneur sur le frontal. Il n’est pas évident de le modifier par la suite.',
     'asset_container_intro' => 'Les fichiers media et documents sont stockés dans des répertoires sur votre serveur ou dans d’autres services de stockage de fichiers. Chacun de ces emplacements est appelé un conteneur.',

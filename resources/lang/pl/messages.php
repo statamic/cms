@@ -9,7 +9,6 @@ return [
     'addon_list_loading_error' => 'Coś poszło nie tak podczas ładowania dodatków. Spróbuj ponownie później.',
     'addon_uninstall_command' => 'Aby odinstalować ten dodatek, uruchom następujące polecenie',
     'asset_container_blueprint_instructions' => 'Blueprinty definiują dodatkowe niestandardowe pola dostępne podczas edycji zasobów.',
-    'asset_container_create_folder_instructions' => 'Po włączeniu pozwoli użytkownikom na tworzenie folderów w tym kontenerze.',
     'asset_container_disk_instructions' => 'Dyski systemu plików określają, gdzie pliki są przechowywane — lokalnie lub w zdalnej lokalizacji, takiej jak Amazon S3. Mogą być konfigurowane w `config/filesystems.php`',
     'asset_container_handle_instructions' => 'Używany do odwoływania się do tego kontenera na frontendzie. Później trudno to zmienić.',
     'asset_container_intro' => 'Pliki mediów i dokumentów znajdują się w folderach na serwerze lub innych usługach przechowywania plików. Każda z tych lokalizacji jest nazywana kontenerem.',

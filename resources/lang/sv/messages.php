@@ -9,7 +9,6 @@ return [
     'addon_list_loading_error' => 'Något gick fel när tillägg laddades. Försök igen senare.',
     'addon_uninstall_command' => 'För att avinstallera detta tillägg, kör följande kommando',
     'asset_container_blueprint_instructions' => 'Ritningar definierar ytterligare anpassade fält som är tillgängliga vid redigering av tillgångar.',
-    'asset_container_create_folder_instructions' => 'När det är aktiverat kommer användarna att kunna skapa mappar i den här behållaren.',
     'asset_container_disk_instructions' => 'Filsystemsdiskar anger var filerna lagras - antingen lokalt eller på en avlägsen plats som Amazon S3. De kan konfigureras i `config/filesystems.php`',
     'asset_container_handle_instructions' => 'Används för att referera till denna behållare på frontend. Det är inte trivialt att ändra senare.',
     'asset_container_intro' => 'Media- och dokumentfiler finns i mappar på servern eller andra fillagringstjänster. Var och en av dessa platser kallas en container.',

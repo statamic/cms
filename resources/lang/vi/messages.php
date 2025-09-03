@@ -9,7 +9,6 @@ return [
     'addon_list_loading_error' => 'Có lỗi xảy ra khi tải addon. Vui lòng thử lại sau.',
     'addon_uninstall_command' => 'Để gỡ bỏ addon này, hãy chạy lệnh sau',
     'asset_container_blueprint_instructions' => 'Blueprints định nghĩa các trường tùy chỉnh khi chỉnh sửa tài nguyên.',
-    'asset_container_create_folder_instructions' => 'Khi bật, người dùng có thể tạo thư mục trong container này.',
     'asset_container_disk_instructions' => 'Đĩa lưu trữ tệp quy định nơi lưu trữ tệp — cục bộ hoặc trên dịch vụ như Amazon S3. Được cấu hình trong `config/filesystems.php`.',
     'asset_container_handle_instructions' => 'Được dùng để tham chiếu container này trên frontend. Khó thay đổi sau này.',
     'asset_container_intro' => 'Các tệp tài liệu và media nằm trong các thư mục trên máy chủ hoặc dịch vụ lưu trữ khác. Mỗi nơi như vậy được gọi là container.',

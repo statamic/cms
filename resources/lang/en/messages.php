@@ -9,7 +9,6 @@ return [
     'addon_list_loading_error' => 'Failed to load addons. Please try again later.',
     'addon_uninstall_command' => 'Run this command to uninstall the addon:',
     'asset_container_blueprint_instructions' => 'Blueprints define custom fields available when editing assets.',
-    'asset_container_create_folder_instructions' => 'When enabled, users will be able to create folders in this container.',
     'asset_container_disk_instructions' => 'Filesystem disks specify where files are stored (locally or remotely like Amazon S3). Configure in `config/filesystems.php`',
     'asset_container_handle_instructions' => 'Used to reference this container on the frontend. This cannot be easily changed later.',
     'asset_container_intro' => 'Media and document files are stored in folders on the server or other storage services. Each storage location is called a container.',

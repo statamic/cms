@@ -9,7 +9,6 @@ return [
     'addon_list_loading_error' => 'Valami hiba történt az addonok betöltése során. Próbálja újra később.',
     'addon_uninstall_command' => 'A kiegészítő eltávolításához futtassa a következő parancsot',
     'asset_container_blueprint_instructions' => 'A Blueprintek további egyéni mezőket határoznak meg a Médiák szerkesztésekor.',
-    'asset_container_create_folder_instructions' => 'Ha engedélyezve van, a felhasználók mappákat hozhatnak létre ebben a Médiatárolóban.',
     'asset_container_disk_instructions' => 'A Meghajtók (disk) határozzák meg, hogy a fájlok hol tárolódnak: lokálisan a szerveren vagy egy távoli helyen (pl. Amazon S3). A beállításai a `config/filesystems.php` fájlban találhatóak.',
     'asset_container_handle_instructions' => 'Erre a Médiatárolóra való hivatkozásra szolgál. Nem olyan egyszerű később módosítani!',
     'asset_container_intro' => 'A média- és dokumentumfájlok a szerveren vagy más fájltároló-szolgáltatásokon található mappákban vannak. Ezen helyeket nevezzük Médiatárolóknak.',

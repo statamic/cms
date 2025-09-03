@@ -9,7 +9,6 @@ return [
     'addon_list_loading_error' => 'Beim Laden der Addons ist ein Fehler aufgetreten. Versuch es später noch einmal.',
     'addon_uninstall_command' => 'Führe zum Deinstallieren dieses Addons den folgenden Befehl aus',
     'asset_container_blueprint_instructions' => 'Blueprints enthalten zusätzliche benutzerdefinierte Felder, die beim Bearbeiten der Dateien verfügbar sind.',
-    'asset_container_create_folder_instructions' => 'Ist diese Option aktiviert, können Benutzer:innen Ordner in diesem Container erstellen.',
     'asset_container_disk_instructions' => 'Dateisystem-Laufwerke legen fest, wo Dateien gespeichert werden sollen – entweder lokal oder an einem entfernten Ort wie Amazon S3. Sie können in `config/filesystems.php` konfiguriert werden.',
     'asset_container_handle_instructions' => 'Damit wird im Frontend auf diesen Container verwiesen. Dies kann später nicht ohne Weiteres geändert werden.',
     'asset_container_intro' => 'Mediendateien und Dokumente befinden sich in Ordnern auf dem Server oder anderen Speicherdiensten. Jeder dieser Speicherorte wird als Container bezeichnet.',

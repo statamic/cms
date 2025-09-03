@@ -36,7 +36,6 @@ class ListAssetContainersTest extends TestCase
             [
                 'id' => 'three',
                 'title' => 'Three',
-                'create_folders' => false,
                 'edit_url' => 'http://localhost/cp/asset-containers/three/edit',
                 'delete_url' => 'http://localhost/cp/asset-containers/three',
                 'blueprint_url' => 'http://localhost/cp/fields/blueprints/asset-containers/three/edit',
@@ -46,7 +45,6 @@ class ListAssetContainersTest extends TestCase
             [
                 'id' => 'two',
                 'title' => 'Two',
-                'create_folders' => false,
                 'edit_url' => 'http://localhost/cp/asset-containers/two/edit',
                 'delete_url' => 'http://localhost/cp/asset-containers/two',
                 'blueprint_url' => 'http://localhost/cp/fields/blueprints/asset-containers/two/edit',

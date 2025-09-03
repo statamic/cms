@@ -4,7 +4,6 @@ namespace Statamic\Http\Controllers\CP\Assets;
 
 use Illuminate\Http\Request;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
-use Statamic\Contracts\Assets\AssetFolder;
 use Statamic\CP\PublishForm;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
@@ -27,7 +26,6 @@ class AssetContainersController extends CpController
             return [
                 'id' => $container->handle(),
                 'title' => $container->title(),
-                'create_folders' => User::current()->can('create', [AssetFolder::class, $container]),
                 'edit_url' => $container->editUrl(),
                 'delete_url' => $container->deleteUrl(),
                 'blueprint_url' => cp_route('blueprints.asset-containers.edit', $container->handle()),
@@ -47,7 +45,6 @@ class AssetContainersController extends CpController
             'title' => $container->title(),
             'handle' => $container->handle(),
             'disk' => $container->diskHandle(),
-            'create_folders' => $container->createFolders(),
             'source_preset' => $container->sourcePreset(),
             'warm_intelligent' => $intelligent = $container->warmsPresetsIntelligently(),
             'warm_presets' => $intelligent ? [] : $container->warmPresets(),
@@ -74,7 +71,6 @@ class AssetContainersController extends CpController
         $container
             ->title($values['title'])
             ->disk($values['disk'])
-            ->createFolders($values['create_folders'])
             ->sourcePreset($values['source_preset'])
             ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets'])
             ->validationRules($values['validation'] ?? null);
@@ -114,7 +110,6 @@ class AssetContainersController extends CpController
         $container = AssetContainer::make($values['handle'])
             ->title($values['title'])
             ->disk($values['disk'])
-            ->createFolders($values['create_folders'])
             ->sourcePreset($values['source_preset'])
             ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets']);
 
@@ -207,12 +202,6 @@ class AssetContainersController extends CpController
             'settings' => [
                 'display' => __('Settings'),
                 'fields' => [
-                    'create_folders' => [
-                        'type' => 'toggle',
-                        'display' => __('Create Folders'),
-                        'instructions' => __('statamic::messages.asset_container_create_folder_instructions'),
-                        'default' => true,
-                    ],
                     'validation' => [
                         'type' => 'taggable',
                         'display' => __('Validation Rules'),

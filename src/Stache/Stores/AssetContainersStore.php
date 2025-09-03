@@ -21,7 +21,6 @@ class AssetContainersStore extends BasicStore
         return AssetContainer::make($handle)
             ->disk(Arr::get($data, 'disk'))
             ->title(Arr::get($data, 'title'))
-            ->createFolders(Arr::get($data, 'create_folders'))
             ->sourcePreset(Arr::get($data, 'source_preset'))
             ->warmPresets(Arr::get($data, 'warm_presets'))
             ->searchIndex(Arr::get($data, 'search_index'))

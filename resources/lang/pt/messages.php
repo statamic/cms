@@ -9,7 +9,6 @@ return [
     'addon_list_loading_error' => 'Ocorreu um erro ao carregar extensões. Tente mais tarde.',
     'addon_uninstall_command' => 'Para desinstalar este complemento, execute o seguinte comando',
     'asset_container_blueprint_instructions' => 'A capacidade de carregar para esta biblioteca.',
-    'asset_container_create_folder_instructions' => 'A capacidade de criar pastas nesta biblioteca.',
     'asset_container_disk_instructions' => 'O disco do sistema que esta biblioteca usará.',
     'asset_container_handle_instructions' => 'Utilizado para referenciar este contentor no front-end. É não trivial mudar mais tarde.',
     'asset_container_intro' => 'Os arquivos de mídia e documento vivem em pastas no servidor ou em outros serviços de armazenamento de arquivos. Cada um desses locais é chamado de contêiner.',

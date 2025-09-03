@@ -19,15 +19,7 @@ class AssetFolderPolicy
 
     public function create($user, $assetContainer)
     {
-        $user = User::fromUser($user);
-
-        $permission = "edit {$assetContainer->handle()} folders";
-
-        if (! $user->hasPermission($permission)) {
-            return false;
-        }
-
-        return $assetContainer->createFolders();
+        return User::fromUser($user)->hasPermission("edit {$assetContainer->handle()} folders");
     }
 
     public function move($user, $assetFolder)

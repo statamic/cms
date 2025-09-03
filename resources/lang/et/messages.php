@@ -9,7 +9,6 @@ return [
     'addon_list_loading_error' => 'Lisade laadimisel tekkis viga. Proovi hiljem uuesti.',
     'addon_uninstall_command' => 'Selle lisa eemaldamiseks käivita järgmine käsk',
     'asset_container_blueprint_instructions' => 'Mallid määratlevad varade redigeerimisel saadaolevad täiendavad kohandatud väljad.',
-    'asset_container_create_folder_instructions' => 'Kui see on lubatud, saavad kasutajad selles konteineris kaustu luua.',
     'asset_container_disk_instructions' => 'Failisüsteemi kettad määravad failide salvestuskoha – kas lokaalselt või kaugsalvestuses, näiteks Amazon S3-s. Neid saab seadistada failis `config/filesystems.php`.',
     'asset_container_handle_instructions' => 'Kasutatakse sellele konteinerile viitamiseks esiotsas. Selle hilisem muutmine võib lehe lõhkuda.',
     'asset_container_intro' => 'Meedia- ja dokumendifailid asuvad serveris või muudes failisalvestusteenustes kaustades. Iga sellist asukohta nimetatakse konteineriks.',

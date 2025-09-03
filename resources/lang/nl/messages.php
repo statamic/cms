@@ -9,7 +9,6 @@ return [
     'addon_list_loading_error' => 'Er is iets misgegaan bij het laden van add-ons. Probeer het later opnieuw.',
     'addon_uninstall_command' => 'Om deze addon te verwijderen, voer je het volgende commando uit',
     'asset_container_blueprint_instructions' => 'Blueprints definiëren aanvullende aangepaste velden die te gebruiken zijn als je assets bewerkt.',
-    'asset_container_create_folder_instructions' => 'Indien ingeschakeld kunnen gebruikers mappen aanmaken in deze container.',
     'asset_container_disk_instructions' => 'Filesystem schijf specificeren waar bestanden moeten worden opgeslagen. Danwel lokaal of op een remote location, zoals Amazon S3. Ze kunnen geconfigureerd worden in `config/filesystems.php`.',
     'asset_container_handle_instructions' => 'Wordt gebruikt om aan de voorkant van de website aan deze container te refereren. Het is niet persé eenvoudig om nadien te wijzigen.',
     'asset_container_intro' => 'Media en documenten worden opgeslagen in mappen op de server op op andere file-storage-diensten. Elke van deze locaties noemt men een container.',

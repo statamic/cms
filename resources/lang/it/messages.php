@@ -9,7 +9,6 @@ return [
     'addon_list_loading_error' => 'Si è verificato un errore durante il caricamento degli addon. Riprova più tardi.',
     'addon_uninstall_command' => 'Per disinstallare questo addon, eseguire il seguente comando',
     'asset_container_blueprint_instructions' => 'I progetti definiscono campi personalizzati aggiuntivi durante la modifica dei media.',
-    'asset_container_create_folder_instructions' => 'Se abilitato, fornisce all\'utente la possibilità di creare cartelle in questo container.',
     'asset_container_disk_instructions' => 'I dischi del filesystem identificano dove vengono salvati i file - in locale o in una posizione remota come Amazon S3. Possono essere configurati in `config/filesystems.php`',
     'asset_container_handle_instructions' => 'Utilizzato come riferimento a questo contenitore sul frontend. Non è semplice modificarlo successivamente.',
     'asset_container_intro' => 'I media risiedono in cartelle sul server o su altri servizi di archiviazione. Ognuna di queste posizioni viene chiamata contenitore.',

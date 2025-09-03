@@ -176,18 +176,6 @@ class AssetContainerTest extends TestCase
     }
 
     #[Test]
-    public function it_gets_and_sets_whether_folders_can_be_created()
-    {
-        $container = new AssetContainer;
-        $this->assertTrue($container->createFolders());
-
-        $return = $container->createFolders(false);
-
-        $this->assertEquals($container, $return);
-        $this->assertFalse($container->createFolders());
-    }
-
-    #[Test]
     public function it_gets_and_sets_the_validation_rules()
     {
         $container = new AssetContainer;

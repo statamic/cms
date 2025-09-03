@@ -9,7 +9,6 @@ return [
     'addon_list_loading_error' => 'Pri nalaganju dodatkov je šlo kaj narobe. Poskusi znova kasneje.',
     'addon_uninstall_command' => 'Če želite odstraniti ta dodatek, zaženite naslednji ukaz',
     'asset_container_blueprint_instructions' => 'Načrti opredeljujejo dodatna polja po meri, ki so na voljo pri urejanju sredstev.',
-    'asset_container_create_folder_instructions' => 'Če je omogočena, bo uporabnikom omogočeno ustvarjanje map v tem vsebniku.',
     'asset_container_disk_instructions' => 'Diski datotečnega sistema določajo, kje se datoteke shranjujejo - lokalno ali na oddaljenem mestu, kot je Amazon S3. Lahko jih konfigurirate v `config / filesystems.php`',
     'asset_container_handle_instructions' => 'Uporablja se za sklicevanje na ta vsebnik na čelni strani. Pozneje se spreminjati ni trivialno.',
     'asset_container_intro' => 'Datoteke z mediji in dokumenti se nahajajo v mapah na strežniku ali v drugih storitvah za shranjevanje datotek. Vsako od teh lokacij imenujemo zabojnik.',

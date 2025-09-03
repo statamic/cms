@@ -9,7 +9,6 @@ return [
     'addon_list_loading_error' => 'حدث خطأ أثناء تحميل الإضافات. حاول مرة أخرى لاحقًا.',
     'addon_uninstall_command' => 'لإلغاء تثبيت هذه الإضافة، قم بتشغيل الأمر التالي',
     'asset_container_blueprint_instructions' => 'تحدد المخططات الحقول المخصصة الإضافية المتاحة عند تحرير الأصول.',
-    'asset_container_create_folder_instructions' => 'عند التمكين، سيمكن المستخدمين من إنشاء مجلدات في هذه الحاوية.',
     'asset_container_disk_instructions' => 'تحدد أقراص نظام الأصول مكان تخزين الملفات — إما محليًا أو في موقع عن بعد مثل Amazon S3. يمكن تكوينها في `config/filesystems.php`',
     'asset_container_handle_instructions' => 'يستخدم للإشارة إلى هذه الحاوية على الواجهة الأمامية. من غير السهل تغييره لاحقًا.',
     'asset_container_intro' => 'تخزن الوسائط والمستندات في مجلدات على الخادم أو خدمات تخزين الملفات الأخرى. كل من هذه المواقع يسمى حاوية.',

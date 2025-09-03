@@ -9,7 +9,6 @@ return [
     'addon_list_loading_error' => 'Algo deu errado ao carregar os addons. Tente novamente mais tarde.',
     'addon_uninstall_command' => 'Para desinstalar este complemento, execute o seguinte comando',
     'asset_container_blueprint_instructions' => 'Os diagramas definem campos personalizados adicionais disponíveis ao editar ativos.',
-    'asset_container_create_folder_instructions' => 'Quando ativado, dará aos usuários a capacidade de criar pastas neste recipiente.',
     'asset_container_disk_instructions' => 'Os discos do sistema de arquivos especificam onde os arquivos são armazenados — tanto localmente ou remotamente, como o Amazon S3. Eles podem ser configurados em `config/filesystems.php`',
     'asset_container_handle_instructions' => 'Usado para fazer referência a esse contêiner no frontend. Não é trivial mudar depois.',
     'asset_container_intro' => 'Arquivos de mídia e documentos ficam em pastas no servidor ou em outros serviços de armazenamento de arquivos. Cada um desses locais é chamado de contêiner.',

@@ -37,7 +37,6 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     protected $handle;
     protected $disk;
     protected $private;
-    protected $createFolders;
     protected $sourcePreset;
     protected $warmPresets;
     protected $searchIndex;
@@ -512,24 +511,6 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     }
 
     /**
-     * The ability to create folders within this container.
-     *
-     * @param  bool|null  $createFolders
-     * @return bool|$this
-     *
-     * @deprecated
-     */
-    public function createFolders($createFolders = null)
-    {
-        return $this
-            ->fluentlyGetOrSet('createFolders')
-            ->getter(function ($createFolders) {
-                return (bool) ($createFolders ?? true);
-            })
-            ->args(func_get_args());
-    }
-
-    /**
      * The glide source preset to be permanently applied to source image on upload.
      *
      * @param  string|null  $preset
@@ -584,7 +565,6 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
             'title' => $this->title,
             'disk' => $this->disk,
             'search_index' => $this->searchIndex,
-            'create_folders' => $this->createFolders,
             'source_preset' => $this->sourcePreset,
             'warm_presets' => $this->warmPresets,
             'validate' => $this->validation,
