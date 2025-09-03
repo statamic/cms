@@ -7,7 +7,6 @@ use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\CP\PublishForm;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
-use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Rules\Handle;
 
@@ -16,25 +15,6 @@ class AssetContainersController extends CpController
     public function show($container)
     {
         return redirect()->cpRoute('assets.browse.show', $container->handle());
-    }
-
-    public function index(Request $request)
-    {
-        $containers = AssetContainer::all()->sortBy->title()->filter(function ($container) {
-            return User::current()->can('view', $container);
-        })->map(function ($container) {
-            return [
-                'id' => $container->handle(),
-                'title' => $container->title(),
-                'edit_url' => $container->editUrl(),
-                'delete_url' => $container->deleteUrl(),
-                'blueprint_url' => cp_route('blueprints.asset-containers.edit', $container->handle()),
-                'can_edit' => User::current()->can('edit', $container),
-                'can_delete' => User::current()->can('delete', $container),
-            ];
-        })->values();
-
-        return $containers;
     }
 
     public function edit($container)
