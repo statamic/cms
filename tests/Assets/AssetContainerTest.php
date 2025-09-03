@@ -188,17 +188,6 @@ class AssetContainerTest extends TestCase
     }
 
     #[Test]
-    public function exception_is_thrown_when_using_allow_uploads_with_v6_setting()
-    {
-        config(['statamic.assets.v6_permissions' => true]);
-
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('The allowUploads method is deprecated and cannot be used when the v6_permissions setting is enabled.');
-
-        (new AssetContainer)->allowUploads();
-    }
-
-    #[Test]
     public function it_gets_and_sets_whether_folders_can_be_created()
     {
         $container = new AssetContainer;
@@ -208,17 +197,6 @@ class AssetContainerTest extends TestCase
 
         $this->assertEquals($container, $return);
         $this->assertFalse($container->createFolders());
-    }
-
-    #[Test]
-    public function exception_is_thrown_when_using_create_folders_with_v6_setting()
-    {
-        config(['statamic.assets.v6_permissions' => true]);
-
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('The createFolders method is deprecated and cannot be used when the v6_permissions setting is enabled.');
-
-        (new AssetContainer)->createFolders();
     }
 
     #[Test]
@@ -234,17 +212,6 @@ class AssetContainerTest extends TestCase
     }
 
     #[Test]
-    public function exception_is_thrown_when_using_allow_renaming_with_v6_setting()
-    {
-        config(['statamic.assets.v6_permissions' => true]);
-
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('The allowRenaming method is deprecated and cannot be used when the v6_permissions setting is enabled.');
-
-        (new AssetContainer)->allowRenaming();
-    }
-
-    #[Test]
     public function it_gets_and_sets_whether_moving_is_allowed()
     {
         $container = new AssetContainer;
@@ -257,17 +224,6 @@ class AssetContainerTest extends TestCase
     }
 
     #[Test]
-    public function exception_is_thrown_when_using_allow_moving_with_v6_setting()
-    {
-        config(['statamic.assets.v6_permissions' => true]);
-
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('The allowMoving method is deprecated and cannot be used when the v6_permissions setting is enabled.');
-
-        (new AssetContainer)->allowMoving();
-    }
-
-    #[Test]
     public function it_gets_and_sets_whether_downloading_is_allowed()
     {
         $container = new AssetContainer;
@@ -277,17 +233,6 @@ class AssetContainerTest extends TestCase
 
         $this->assertEquals($container, $return);
         $this->assertFalse($container->allowDownloading());
-    }
-
-    #[Test]
-    public function exception_is_thrown_when_using_allow_downloading_with_v6_setting()
-    {
-        config(['statamic.assets.v6_permissions' => true]);
-
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('The allowDownloading method is deprecated and cannot be used when the v6_permissions setting is enabled.');
-
-        (new AssetContainer)->allowDownloading();
     }
 
     #[Test]
