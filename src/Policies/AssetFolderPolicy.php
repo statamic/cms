@@ -8,6 +8,15 @@ use Statamic\Facades\User;
 
 class AssetFolderPolicy
 {
+    public function before($user)
+    {
+        $user = User::fromUser($user);
+
+        if ($user->hasPermission('configure asset containers')) {
+            return true;
+        }
+    }
+
     public function create($user, $assetContainer)
     {
         $user = User::fromUser($user);
