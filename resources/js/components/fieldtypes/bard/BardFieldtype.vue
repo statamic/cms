@@ -378,8 +378,8 @@ export default {
     },
 
     beforeUnmount() {
-        this.editor.destroy();
-        this.escBinding.destroy();
+        this.editor?.destroy();
+        this.escBinding?.destroy();
     },
 
     watch: {
