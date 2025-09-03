@@ -297,7 +297,7 @@ export default {
         },
 
         canCreateFolders() {
-            return this.folder && this.container.create_folders && !this.restrictFolderNavigation;
+            return this.folder && this.container.can_create_folders && !this.restrictFolderNavigation;
         },
 
         canEdit() {
@@ -305,7 +305,7 @@ export default {
         },
 
         canUpload() {
-            return this.folder;
+            return this.folder && this.container.can_upload;
         },
 
         containerIsEmpty() {
