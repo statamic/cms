@@ -679,7 +679,7 @@ export default {
 
         addToCommandPalette() {
             Statamic.$commandPalette.add({
-                when: () => this.canCreateContainers,
+                when: () => this.canUpload,
                 category: Statamic.$commandPalette.category.Actions,
                 text: __('Upload'),
                 icon: 'upload',
@@ -688,7 +688,7 @@ export default {
             });
 
             Statamic.$commandPalette.add({
-                when: () => this.canCreateContainers,
+                when: () => this.canCreateFolders,
                 category: Statamic.$commandPalette.category.Actions,
                 text: __('Create Folder'),
                 icon: 'folder-add',
