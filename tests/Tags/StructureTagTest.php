@@ -221,6 +221,48 @@ EOT;
     }
 
     #[Test]
+    public function it_renders_a_nav_with_as()
+    {
+        $this->createCollectionAndNav();
+
+        // The html uses <i> tags (could be any tag, but i is short) to prevent whitespace comparison issues in the assertion.
+        $template = <<<'EOT'
+<ul>
+{{ nav:test as="navtastic" }}
+    <li>Something before the loop</li>
+    {{ navtastic }}
+    <li>
+        <i>{{ nav_title or title }} {{ foo }}</i>
+    </li>
+    {{ /navtastic }}
+{{ /nav:test }}
+</ul>
+EOT;
+
+        $expected = <<<'EOT'
+<ul>
+    <li>Something before the loop</li>
+    <li>
+        <i>Navtitle One bar</i>
+    </li>
+    <li>
+        <i>Two notbar</i>
+    </li>
+    <li>
+        <i>Three bar</i>
+    </li>
+    <li>
+        <i>Title only bar</i>
+    </li>
+</ul>
+EOT;
+
+        $this->assertXmlStringEqualsXmlString($expected, (string) Antlers::parse($template, [
+            'foo' => 'bar', // to test that cascade is inherited.
+        ]));
+    }
+
+    #[Test]
     public function it_hides_unpublished_entries_by_default()
     {
         $this->createCollectionAndNav();

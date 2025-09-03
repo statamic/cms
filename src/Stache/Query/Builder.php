@@ -329,6 +329,36 @@ abstract class Builder extends BaseBuilder
         });
     }
 
+    protected function filterWhereJsonOverlaps($values, $where)
+    {
+        return $values->filter(function ($value) use ($where) {
+            if (is_null($value) || is_null($where['values'])) {
+                return false;
+            }
+
+            if (! is_array($value) && ! is_array($where['values'])) {
+                return $value === $where['values'];
+            }
+
+            return ! empty(array_intersect(Arr::wrap($value), $where['values']));
+        });
+    }
+
+    protected function filterWhereJsonDoesntOverlap($values, $where)
+    {
+        return $values->filter(function ($value) use ($where) {
+            if (is_null($value) || is_null($where['values'])) {
+                return true;
+            }
+
+            if (! is_array($value) && ! is_array($where['values'])) {
+                return $value !== $where['values'];
+            }
+
+            return empty(array_intersect(Arr::wrap($value), $where['values']));
+        });
+    }
+
     protected function filterWhereColumn($values, $where)
     {
         $whereColumnKeys = $this->getWhereColumnKeyValuesByIndex($where['value']);

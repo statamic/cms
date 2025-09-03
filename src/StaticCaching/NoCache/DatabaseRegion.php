@@ -15,4 +15,9 @@ class DatabaseRegion extends Model
     protected $casts = [
         'key' => 'string',
     ];
+
+    public function getConnectionName()
+    {
+        return config('statamic.static_caching.nocache_db_connection') ?: parent::getConnectionName();
+    }
 }

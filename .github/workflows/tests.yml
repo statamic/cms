@@ -45,7 +45,7 @@ jobs:
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v44
+        uses: tj-actions/changed-files@v46
         with:
           files: |
             config
@@ -116,7 +116,7 @@ jobs:
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v44
+        uses: tj-actions/changed-files@v46
         with:
           files: |
             **/*.{js,vue,ts}
@@ -149,7 +149,7 @@ jobs:
 
   slack:
     name: Slack Notification
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     needs: [php-tests, js-tests]
     if: always()
     steps:

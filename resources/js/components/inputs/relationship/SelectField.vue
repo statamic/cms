@@ -42,7 +42,7 @@
                 >
             </template>
              <template #no-options>
-                <div class="text-sm text-gray-700 rtl:text-right ltr:text-left py-2 px-4" v-text="__('No options to choose from.')" />
+                <div class="text-sm text-gray-700 rtl:text-right ltr:text-left py-2 px-4" v-text="noOptionsText" />
             </template>
         </v-select>
     </div>
@@ -81,6 +81,7 @@ export default {
 
     data() {
         return {
+            requested: false,
             options: [],
         }
     },
@@ -98,6 +99,12 @@ export default {
                 paginate: false,
                 columns: 'title,id',
             }
+        },
+
+        noOptionsText() {
+            return this.typeahead && !this.requested
+                ? __('Start typing to search.')
+                : __('No options to choose from.');
         }
     },
 
@@ -120,6 +127,7 @@ export default {
 
             return this.$axios.get(this.url, { params }).then(response => {
                 this.options = response.data.data;
+                this.requested = true;
                 return Promise.resolve(response);
             });
         },

@@ -88,6 +88,12 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         $this->supplements = collect();
     }
 
+    public function __clone()
+    {
+        $this->data = clone $this->data;
+        $this->supplements = clone $this->supplements;
+    }
+
     public function id($id = null)
     {
         return $this->fluentlyGetOrSet('id')->args(func_get_args());
@@ -430,8 +436,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         if ($isNew && ! $this->hasOrigin() && $this->collection()->propagate()) {
             $this->collection()->sites()
                 ->reject($this->site()->handle())
-                ->each(function ($siteHandle) {
-                    $this->makeLocalization($siteHandle)->save();
+                ->each(function ($siteHandle) use ($withEvents) {
+                    $this->makeLocalization($siteHandle)->{$withEvents ? 'save' : 'saveQuietly'}();
                 });
         }
 
@@ -620,6 +626,11 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         }
 
         return $this->blueprint()->field('date')->fieldtype()->secondsEnabled();
+    }
+
+    public function hasExplicitDate(): bool
+    {
+        return $this->hasDate() && $this->date;
     }
 
     public function sites()
@@ -946,7 +957,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     protected function getOriginByString($origin)
     {
-        return Facades\Entry::find($origin);
+        return $this->collection()->queryEntries()->where('id', $origin)->first();
     }
 
     protected function getOriginFallbackValues()
