@@ -8,6 +8,7 @@
     <ui-popover
         v-else
         inset
+        align="start"
         class="set-picker select-none w-[300px]"
         :open="isOpen"
         @update:open="isOpen = $event"
