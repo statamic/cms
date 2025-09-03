@@ -171,12 +171,7 @@ class CorePermissions
             ];
 
             if (config('statamic.assets.v6_permissions')) {
-                $childPermissions[] = $this->permission('edit {container} folders')->children([
-                    $this->permission('create {container} folders'),
-                    $this->permission('move {container} folders'),
-                    $this->permission('rename {container} folders'),
-                    $this->permission('delete {container} folders'),
-                ]);
+                $childPermissions[] = $this->permission('edit {container} folders');
             }
 
             $this->permission($permission)->children($childPermissions)->replacements('container', function () {
