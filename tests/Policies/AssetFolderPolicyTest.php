@@ -14,8 +14,9 @@ class AssetFolderPolicyTest extends PolicyTestCase
     #[Test]
     #[TestWith([true, true], 'with permission')]
     #[TestWith([false, false], 'without permission')]
-    public function it_can_be_created($hasPermission, $expected)
+    public function it_can_be_created_v6($hasPermission, $expected)
     {
+        // The v6 way doesn't need to check the container for createFolders() because it'll be removed.
         config(['statamic.assets.v6_permissions' => true]);
 
         $user = $this->userWithPermissions(
@@ -28,11 +29,9 @@ class AssetFolderPolicyTest extends PolicyTestCase
     }
 
     #[Test]
-    #[DataProvider('createLegacyProvider')]
-    public function it_can_be_created_legacy($hasPermission, $createFolders, $expected)
+    #[DataProvider('createProvider')]
+    public function it_can_be_created($hasPermission, $createFolders, $expected)
     {
-        // the legacy way is to check for asset upload permission and assetContainer->createFolders()
-
         $user = $this->userWithPermissions(
             $hasPermission ? ['upload alfa assets'] : []
         );
@@ -42,7 +41,7 @@ class AssetFolderPolicyTest extends PolicyTestCase
         $this->assertEquals($expected, $user->can('create', [AssetFolder::class, $container]));
     }
 
-    public static function createLegacyProvider()
+    public static function createProvider()
     {
         return [
             'with permission, can create' => [true, true, true],
@@ -53,9 +52,10 @@ class AssetFolderPolicyTest extends PolicyTestCase
     }
 
     #[Test]
-    #[DataProvider('moveProvider')]
-    public function it_can_be_moved($folder, $asset, $expected)
+    #[DataProvider('moveV6Provider')]
+    public function it_can_be_moved_v6($folder, $asset, $expected)
     {
+        // The v6 way doesn't need to check the container for allowMoving() because it'll be removed.
         config(['statamic.assets.v6_permissions' => true]);
 
         $user = $this->userWithPermissions(collect([
@@ -67,7 +67,7 @@ class AssetFolderPolicyTest extends PolicyTestCase
         $this->assertEquals($expected, $user->can('move', $container->assetFolder('path/to/folder')));
     }
 
-    public static function moveProvider()
+    public static function moveV6Provider()
     {
         return [
             'folder, asset' => ['folder' => true, 'asset' => true, 'expected' => true],
@@ -78,11 +78,9 @@ class AssetFolderPolicyTest extends PolicyTestCase
     }
 
     #[Test]
-    #[DataProvider('moveLegacyProvider')]
-    public function it_can_be_moved_legacy($hasPermission, $allowMoving, $expected)
+    #[DataProvider('moveProvider')]
+    public function it_can_be_moved($hasPermission, $allowMoving, $expected)
     {
-        // the legacy way is to check for asset move permission and assetContainer->allowMoving()
-
         $user = $this->userWithPermissions(
             $hasPermission ? ['move alfa assets'] : []
         );
@@ -92,7 +90,7 @@ class AssetFolderPolicyTest extends PolicyTestCase
         $this->assertEquals($expected, $user->can('move', $container->assetFolder('path/to/folder')));
     }
 
-    public static function moveLegacyProvider()
+    public static function moveProvider()
     {
         return [
             'with permission, can move' => [true, true, true],
@@ -103,9 +101,10 @@ class AssetFolderPolicyTest extends PolicyTestCase
     }
 
     #[Test]
-    #[DataProvider('renameProvider')]
-    public function it_can_be_renamed($folder, $asset, $expected)
+    #[DataProvider('renameV6Provider')]
+    public function it_can_be_renamed_v6($folder, $asset, $expected)
     {
+        // The v6 way doesn't need to check the container for allowRenaming() because it'll be removed.
         config(['statamic.assets.v6_permissions' => true]);
 
         $user = $this->userWithPermissions(collect([
@@ -117,7 +116,7 @@ class AssetFolderPolicyTest extends PolicyTestCase
         $this->assertEquals($expected, $user->can('rename', $container->assetFolder('path/to/folder')));
     }
 
-    public static function renameProvider()
+    public static function renameV6Provider()
     {
         return [
             'folder, asset' => ['folder' => true, 'asset' => true, 'expected' => true],
@@ -128,11 +127,9 @@ class AssetFolderPolicyTest extends PolicyTestCase
     }
 
     #[Test]
-    #[DataProvider('renameLegacyProvider')]
-    public function it_can_be_renamed_legacy()
+    #[DataProvider('renameProvider')]
+    public function it_can_be_renamed()
     {
-        // the legacy way is to check for asset rename permission and assetContainer->allowRenaming()
-
         $user = $this->userWithPermissions(
             ['rename alfa assets']
         );
@@ -142,7 +139,7 @@ class AssetFolderPolicyTest extends PolicyTestCase
         $this->assertTrue($user->can('rename', $container->assetFolder('path/to/folder')));
     }
 
-    public static function renameLegacyProvider()
+    public static function renameProvider()
     {
         return [
             'with permission, can rename' => [true, true, true],
@@ -153,9 +150,10 @@ class AssetFolderPolicyTest extends PolicyTestCase
     }
 
     #[Test]
-    #[DataProvider('deleteProvider')]
-    public function it_can_be_deleted($folder, $asset, $expected)
+    #[DataProvider('deleteV6Provider')]
+    public function it_can_be_deleted_v6($folder, $asset, $expected)
     {
+        // the v6 way checks for both folder and asset delete permissions.
         config(['statamic.assets.v6_permissions' => true]);
 
         $user = $this->userWithPermissions(collect([
@@ -167,7 +165,7 @@ class AssetFolderPolicyTest extends PolicyTestCase
         $this->assertEquals($expected, $user->can('delete', $container->assetFolder('path/to/folder')));
     }
 
-    public static function deleteProvider()
+    public static function deleteV6Provider()
     {
         return [
             'folder, asset' => ['folder' => true, 'asset' => true, 'expected' => true],
@@ -180,7 +178,7 @@ class AssetFolderPolicyTest extends PolicyTestCase
     #[Test]
     #[TestWith([true, true], 'with permission')]
     #[TestWith([false, false], 'without permission')]
-    public function it_can_be_deleted_legacy($hasPermission, $expected)
+    public function it_can_be_deleted($hasPermission, $expected)
     {
         // the legacy way is to check for asset delete permission
 

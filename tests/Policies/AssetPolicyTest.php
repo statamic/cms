@@ -32,8 +32,11 @@ class AssetPolicyTest extends PolicyTestCase
     }
 
     #[Test]
-    public function it_can_be_stored()
+    public function it_can_be_stored_v6()
     {
+        // The v6 way doesn't need to check the container for allowUploads() because it'll be removed.
+        config(['statamic.assets.v6_permissions' => true]);
+
         $user = $this->userWithPermissions(['upload alfa assets']);
         $containerA = tap(AssetContainer::make('alfa'))->save();
         $containerB = tap(AssetContainer::make('bravo'))->save();
@@ -43,10 +46,8 @@ class AssetPolicyTest extends PolicyTestCase
     }
 
     #[Test]
-    public function it_can_be_stored_legacy()
+    public function it_can_be_stored()
     {
-        // the legacy way would also check the container for allowUploads()
-
         $user = $this->userWithPermissions([
             'upload alfa assets',
             'upload charlie assets',
@@ -63,8 +64,11 @@ class AssetPolicyTest extends PolicyTestCase
     }
 
     #[Test]
-    public function it_can_be_moved()
+    public function it_can_be_moved_v6()
     {
+        // The v6 way doesn't need to check the container for allowMoving() because it'll be removed.
+        config(['statamic.assets.v6_permissions' => true]);
+
         $user = $this->userWithPermissions(['move alfa assets']);
         $containerA = tap(AssetContainer::make('alfa'))->save();
         $containerB = tap(AssetContainer::make('bravo'))->save();
@@ -74,10 +78,8 @@ class AssetPolicyTest extends PolicyTestCase
     }
 
     #[Test]
-    public function it_can_be_moved_legacy()
+    public function it_can_be_moved()
     {
-        // the legacy way would also check thecontainer for allowMoving()
-
         $user = $this->userWithPermissions([
             'move alfa assets',
             'move charlie assets',
@@ -94,8 +96,11 @@ class AssetPolicyTest extends PolicyTestCase
     }
 
     #[Test]
-    public function it_can_be_renamed()
+    public function it_can_be_renamed_v6()
     {
+        // The v6 way doesn't need to check the container for allowRenaming() because it'll be removed.
+        config(['statamic.assets.v6_permissions' => true]);
+
         $user = $this->userWithPermissions(['rename alfa assets']);
         $containerA = tap(AssetContainer::make('alfa'))->save();
         $containerB = tap(AssetContainer::make('bravo'))->save();
@@ -105,10 +110,8 @@ class AssetPolicyTest extends PolicyTestCase
     }
 
     #[Test]
-    public function it_can_be_renamed_legacy()
+    public function it_can_be_renamed()
     {
-        // the legacy way would also check thecontainer for allowRenaming()
-
         $user = $this->userWithPermissions([
             'rename alfa assets',
             'rename charlie assets',
@@ -212,6 +215,5 @@ class AssetPolicyTest extends PolicyTestCase
         $this->assertFalse($userWithoutPermission->can('delete', $asset));
         $this->assertFalse($userWithoutPermission->can('replace', $asset));
         $this->assertFalse($userWithoutPermission->can('reupload', $asset));
-
     }
 }
