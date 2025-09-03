@@ -38,7 +38,6 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     protected $disk;
     protected $private;
     protected $allowDownloading;
-    protected $allowMoving;
     protected $createFolders;
     protected $sourcePreset;
     protected $warmPresets;
@@ -532,24 +531,6 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     }
 
     /**
-     * The ability to move files around within this container.
-     *
-     * @param  bool|null  $allowMoving
-     * @return bool|$this
-     *
-     * @deprecated
-     */
-    public function allowMoving($allowMoving = null)
-    {
-        return $this
-            ->fluentlyGetOrSet('allowMoving')
-            ->getter(function ($allowMoving) {
-                return (bool) ($allowMoving ?? true);
-            })
-            ->args(func_get_args());
-    }
-
-    /**
      * The ability to create folders within this container.
      *
      * @param  bool|null  $createFolders
@@ -623,7 +604,6 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
             'disk' => $this->disk,
             'search_index' => $this->searchIndex,
             'allow_downloading' => $this->allowDownloading,
-            'allow_moving' => $this->allowMoving,
             'create_folders' => $this->createFolders,
             'source_preset' => $this->sourcePreset,
             'warm_presets' => $this->warmPresets,

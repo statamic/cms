@@ -13,7 +13,6 @@ return [
     'asset_container_disk_instructions' => 'Cakera sistem fail menentukan tempat fail disimpan — sama ada secara setempat atau di lokasi terpencil seperti Amazon S3. Ia boleh dikonfigurasikan dalam `config/filesystems.php`',
     'asset_container_handle_instructions' => 'Digunakan untuk merujuk penampung ini pada bahagian hadapan. Ia bukan perkara remeh untuk menukar kemudian.',
     'asset_container_intro' => 'Fail media dan dokumen hidup dalam folder pada pelayan atau perkhidmatan storan fail lain. Setiap lokasi ini dipanggil penampung.',
-    'asset_container_move_instructions' => 'Apabila didayakan akan membolehkan pengguna mengalihkan fail di dalam penampung ini.',
     'asset_container_quick_download_instructions' => 'Apabila didayakan akan menambah butang muat turun pantas dalam Pengurus Aset.',
     'asset_container_source_preset_instructions' => 'Imej yang dimuat naik akan diproses secara kekal menggunakan pratetap ini.',
     'asset_container_title_instructions' => 'Biasanya kata nama majmuk, seperti Imej atau Dokumen',

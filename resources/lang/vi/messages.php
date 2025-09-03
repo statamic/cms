@@ -13,7 +13,6 @@ return [
     'asset_container_disk_instructions' => 'Đĩa lưu trữ tệp quy định nơi lưu trữ tệp — cục bộ hoặc trên dịch vụ như Amazon S3. Được cấu hình trong `config/filesystems.php`.',
     'asset_container_handle_instructions' => 'Được dùng để tham chiếu container này trên frontend. Khó thay đổi sau này.',
     'asset_container_intro' => 'Các tệp tài liệu và media nằm trong các thư mục trên máy chủ hoặc dịch vụ lưu trữ khác. Mỗi nơi như vậy được gọi là container.',
-    'asset_container_move_instructions' => 'Khi bật, người dùng có thể di chuyển tệp trong container này.',
     'asset_container_quick_download_instructions' => 'Khi bật, sẽ có nút tải nhanh trong Trình Quản Lý Tài Nguyên.',
     'asset_container_source_preset_instructions' => 'Hình ảnh tải lên sẽ được xử lý với preset này vĩnh viễn.',
     'asset_container_title_instructions' => 'Thường là danh từ số nhiều, như "Hình ảnh" hoặc "Tài liệu".',

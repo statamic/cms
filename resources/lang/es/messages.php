@@ -13,7 +13,6 @@ return [
     'asset_container_disk_instructions' => 'Los discos del sistema de archivos especifican dónde se alojan los medios&mdash;localmente o bien en una localización remota como Amazon S3. Pueden ser configurados en `config/filesystems.php`',
     'asset_container_handle_instructions' => 'Se usa para hacer referencia a este contenedor en la interfaz. Es complicado cambiarlo más tarde.',
     'asset_container_intro' => 'Los medios y documentos viven en carpetas en el servidor u otros servicios de almacenamiento de archivos. Cada una de estas ubicaciones se llama contenedor.',
-    'asset_container_move_instructions' => 'Al activarse permitirá a los usuarios mover medios dentro del contenedor.',
     'asset_container_quick_download_instructions' => 'Al activarse añadirá un enlace de descarga rápida en la Biblioteca de Medios.',
     'asset_container_source_preset_instructions' => 'Las imágenes cargadas se procesarán permanentemente utilizando este ajuste preestablecido.',
     'asset_container_title_instructions' => 'Generalmente un sustantivo plural, como "Imágenes" o "Documentos"',

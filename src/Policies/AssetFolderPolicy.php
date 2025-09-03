@@ -48,7 +48,7 @@ class AssetFolderPolicy
                 ->isEmpty();
         }
 
-        return $assetFolder->container()->allowMoving();
+        return true;
     }
 
     public function rename($user, $assetFolder)

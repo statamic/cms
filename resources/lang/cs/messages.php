@@ -13,7 +13,6 @@ return [
     'asset_container_disk_instructions' => 'Jednotky souborového systému určují místo, kam se mají soubory ukládat - buď lokálně, nebo ve vzdáleném umístění, jako je například Amazon S3. Lze je nakonfigurovat v souboru `config/filesystems.php`.',
     'asset_container_handle_instructions' => 'Odkazuje na tento kontejner ve frontendu. Není bezproblémové to následně změnit.',
     'asset_container_intro' => 'Mediální soubory a dokumenty jsou umístěny ve složkách na serveru nebo v jiných úložných službách. Každé z těchto úložišť se nazývá kontejner.',
-    'asset_container_move_instructions' => 'Pokud je tato možnost aktivována, mohou uživatelé přesouvat soubory v rámci tohoto kontejneru.',
     'asset_container_quick_download_instructions' => 'Pokud je tato možnost aktivována, přidá se do správce souborů tlačítko pro stahování.',
     'asset_container_source_preset_instructions' => 'Nahrané obrázky budou trvale zpracovány pomocí této předvolby.',
     'asset_container_title_instructions' => 'Název kontejneru, který se zobrazí v administraci.',

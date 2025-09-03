@@ -13,7 +13,6 @@ return [
     'asset_container_disk_instructions' => 'Filsystemsdiskar anger var filerna lagras - antingen lokalt eller på en avlägsen plats som Amazon S3. De kan konfigureras i `config/filesystems.php`',
     'asset_container_handle_instructions' => 'Används för att referera till denna behållare på frontend. Det är inte trivialt att ändra senare.',
     'asset_container_intro' => 'Media- och dokumentfiler finns i mappar på servern eller andra fillagringstjänster. Var och en av dessa platser kallas en container.',
-    'asset_container_move_instructions' => 'När det är aktiverat kan användare flytta runt filer i den här behållaren.',
     'asset_container_quick_download_instructions' => 'När den är aktiverad kommer en snabbnedladdningsknapp att läggas till i Asset Manager.',
     'asset_container_source_preset_instructions' => 'Uppladdade bilder kommer att bearbetas permanent med denna förinställning.',
     'asset_container_title_instructions' => 'Vanligtvis ett substantiv i plural, som bilder eller dokument',

@@ -13,7 +13,6 @@ return [
     'asset_container_disk_instructions' => 'Diski datotečnega sistema določajo, kje se datoteke shranjujejo - lokalno ali na oddaljenem mestu, kot je Amazon S3. Lahko jih konfigurirate v `config / filesystems.php`',
     'asset_container_handle_instructions' => 'Uporablja se za sklicevanje na ta vsebnik na čelni strani. Pozneje se spreminjati ni trivialno.',
     'asset_container_intro' => 'Datoteke z mediji in dokumenti se nahajajo v mapah na strežniku ali v drugih storitvah za shranjevanje datotek. Vsako od teh lokacij imenujemo zabojnik.',
-    'asset_container_move_instructions' => 'Če je omogočena, bo uporabnikom omogočil premikanje datotek znotraj tega vsebnika.',
     'asset_container_quick_download_instructions' => 'Ko je omogočeno, bo v upravitelju sredstev dodan gumb za hiter prenos.',
     'asset_container_source_preset_instructions' => 'Naložene slike bodo trajno obdelane s to prednastavitvijo.',
     'asset_container_title_instructions' => 'Ponavadi samostalnik v množini, na primer Slike ali Dokumenti',

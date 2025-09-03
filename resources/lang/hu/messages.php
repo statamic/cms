@@ -13,7 +13,6 @@ return [
     'asset_container_disk_instructions' => 'A Meghajtók (disk) határozzák meg, hogy a fájlok hol tárolódnak: lokálisan a szerveren vagy egy távoli helyen (pl. Amazon S3). A beállításai a `config/filesystems.php` fájlban találhatóak.',
     'asset_container_handle_instructions' => 'Erre a Médiatárolóra való hivatkozásra szolgál. Nem olyan egyszerű később módosítani!',
     'asset_container_intro' => 'A média- és dokumentumfájlok a szerveren vagy más fájltároló-szolgáltatásokon található mappákban vannak. Ezen helyeket nevezzük Médiatárolóknak.',
-    'asset_container_move_instructions' => 'Ha engedélyezve van, akkor a felhasználók mozgathatják a fájlokat ebben a Médiatárolóban.',
     'asset_container_quick_download_instructions' => 'Ha engedélyezve van, a rendszer hozzáad egy gyorsletöltés gombot az Eszközkezelőhöz.',
     'asset_container_source_preset_instructions' => 'A feltöltött képeket a rendszer véglegesen feldolgozza ezzel az előbeállítással.',
     'asset_container_title_instructions' => 'Általában többes számú főnév, például Images (képek) vagy Documents (dokumentumok).',

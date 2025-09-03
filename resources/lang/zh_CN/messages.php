@@ -13,7 +13,6 @@ return [
     'asset_container_disk_instructions' => '文件系统磁盘指定文件的存储位置-在本地或在 Amazon S3 之类的远程位置。 可以在`config / filesystems.php`中配置它们',
     'asset_container_handle_instructions' => '用于在前端引用此容器。以后不能轻易更改。',
     'asset_container_intro' => '媒体和文档文件位于服务器或其他文件存储服务的文件夹中。 这些位置中的每一个都称为容器。',
-    'asset_container_move_instructions' => '在此容器中移动文件的能力。',
     'asset_container_quick_download_instructions' => '编辑文件时启用快速下载按钮。',
     'asset_container_source_preset_instructions' => '上传的图像将使用此预设进行永久处理。',
     'asset_container_title_instructions' => '通常是复数名词，例如图像或文档',

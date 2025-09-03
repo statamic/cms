@@ -13,7 +13,6 @@ return [
     'asset_container_disk_instructions' => 'Disk Filesystem file menentukan di mana file disimpan - baik secara lokal atau di lokasi jarak jauh seperti Amazon S3. Mereka dapat dikonfigurasi di `config/filesystems.php`',
     'asset_container_handle_instructions' => 'Digunakan untuk mereferensikan penampung ini di frontend. Tidak sepele untuk berubah nanti.',
     'asset_container_intro' => 'File media dan dokumen tinggal di folder pada server atau layanan penyimpanan file lainnya. Masing-masing lokasi ini disebut penampung.',
-    'asset_container_move_instructions' => 'Jika diaktifkan akan memungkinkan pengguna untuk memindahkan file di dalam penampung ini.',
     'asset_container_quick_download_instructions' => 'Saat diaktifkan akan menambahkan tombol unduh cepat di Manager Aset.',
     'asset_container_source_preset_instructions' => 'Gambar yang diunggah akan diproses secara permanen menggunakan prasetel ini.',
     'asset_container_title_instructions' => 'Biasanya kata benda jamak, seperti Gambar atau Dokumen',

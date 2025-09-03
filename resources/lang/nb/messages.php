@@ -13,7 +13,6 @@ return [
     'asset_container_disk_instructions' => 'Filsystemdisker spesifiserer hvor filer lagres – enten lokalt eller på en ekstern lagringsenhet, for eksempel på Amazon S3. De kan konfigureres i `config/filesystems.php`',
     'asset_container_handle_instructions' => 'Brukes for å henvise til denne beholderen på frontend. Det er vanskelig å endre senere.',
     'asset_container_intro' => 'Medie- og dokumentfiler ligger i mapper på serveren eller andre fillagringstjenester. Hver av disse plasseringene kalles en beholder.',
-    'asset_container_move_instructions' => 'Når dette er aktivert, kan brukere flytte rundt på filer inne i beholderen.',
     'asset_container_quick_download_instructions' => 'Når dette er aktivert, blir en knapp for hurtignedlasting lagt til i Filer.',
     'asset_container_source_preset_instructions' => 'Opplastede bilder vil bli prosessert ved hjelp av denne forhåndsinnstillingen.',
     'asset_container_title_instructions' => 'Vanligvis et substantiv i flertall, som bilder eller dokumenter.',

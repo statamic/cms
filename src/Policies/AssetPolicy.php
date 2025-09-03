@@ -32,13 +32,7 @@ class AssetPolicy
 
     public function move($user, $asset)
     {
-        $user = User::fromUser($user);
-
-        if (! $user->hasPermission("move {$asset->container()->handle()} assets")) {
-            return false;
-        }
-
-        return $asset->container()->allowMoving();
+        return User::fromUser($user)->hasPermission("move {$asset->container()->handle()} assets");
     }
 
     public function rename($user, $asset)

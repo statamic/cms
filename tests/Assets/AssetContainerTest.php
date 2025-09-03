@@ -188,18 +188,6 @@ class AssetContainerTest extends TestCase
     }
 
     #[Test]
-    public function it_gets_and_sets_whether_moving_is_allowed()
-    {
-        $container = new AssetContainer;
-        $this->assertTrue($container->allowMoving());
-
-        $return = $container->allowMoving(false);
-
-        $this->assertEquals($container, $return);
-        $this->assertFalse($container->allowMoving());
-    }
-
-    #[Test]
     public function it_gets_and_sets_whether_downloading_is_allowed()
     {
         $container = new AssetContainer;

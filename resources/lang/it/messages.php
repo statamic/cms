@@ -13,7 +13,6 @@ return [
     'asset_container_disk_instructions' => 'I dischi del filesystem identificano dove vengono salvati i file - in locale o in una posizione remota come Amazon S3. Possono essere configurati in `config/filesystems.php`',
     'asset_container_handle_instructions' => 'Utilizzato come riferimento a questo contenitore sul frontend. Non è semplice modificarlo successivamente.',
     'asset_container_intro' => 'I media risiedono in cartelle sul server o su altri servizi di archiviazione. Ognuna di queste posizioni viene chiamata contenitore.',
-    'asset_container_move_instructions' => 'Se abilitato, consente agli utenti di spostare file in questo contenitore.',
     'asset_container_quick_download_instructions' => 'Se abilitato, aggiunge un pulsante per il download rapido nel gestore dei media.',
     'asset_container_source_preset_instructions' => 'Le immagini caricate verranno elaborate in modo permanente utilizzando questo preset.',
     'asset_container_title_instructions' => 'Di solito un nome plurale, come "Immagini" o "Documenti"',
