@@ -6,40 +6,36 @@
 @section('title', __('Duplicate IDs'))
 
 @section('content')
-
-<header class="mb-6">
-    <div class="flex items-center justify-between">
-        <h1>{{ __('Duplicate IDs') }}</h1>
-    </div>
-</header>
+<ui-header icon="duplicate" :title="__('Duplicate IDs')"></ui-header>
 
 @if ($duplicates->isEmpty())
-    <div class="card flex items-center">
-        {{ __('No items with duplicate IDs.') }}
-    </div>
+    <div
+        class="rounded-lg border border-dashed border-gray-300 p-6 text-center text-gray-500"
+        v-text="__('No items with duplicate IDs.')"
+    />
 @endif
 
 @foreach ($duplicates as $id => $paths)
-    <h6 class="mt-8">{{ $id }}</h6>
-
-    <div class="card mt-2 p-0">
-        <table class="data-table">
-            @foreach ($paths as $path)
-                <tr>
-                    <td class="font-mono text-xs">
-                        {{ $path }}
-                    </td>
-                    <td class="text-2xs ltr:text-right rtl:text-left">
-                        <form method="POST" action="{{ cp_route('duplicates.regenerate') }}">
-                            @csrf
-                            <input type="hidden" name="path" value="{{ $path }}" />
-                            <button class="text-blue">{{ __('Regenerate') }}</button>
-                        </form>
-                    </td>
-                </tr>
-            @endforeach
-        </table>
-    </div>
+    <ui-panel heading="{{ $id }}">
+        <ui-card class="py-0!">
+            <ui-table>
+                @foreach ($paths as $path)
+                    <ui-table-row>
+                        <ui-table-cell class="font-mono">
+                            {{ $path }}
+                        </ui-table-cell>
+                        <ui-table-cell class="flex items-center justify-end">
+                            <form method="POST" action="{{ cp_route('duplicates.regenerate') }}">
+                                @csrf
+                                <input type="hidden" name="path" value="{{ $path }}" />
+                                <ui-button size="sm">{{ __('Regenerate') }}</ui-button>
+                            </form>
+                        </ui-table-cell>
+                    </ui-table-row>
+                @endforeach
+            </ui-table>
+        </ui-card>
+    </ui-panel>
 @endforeach
 
 @stop

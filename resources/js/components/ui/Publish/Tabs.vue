@@ -8,7 +8,7 @@ import ElementContainer from '@/components/ElementContainer.vue';
 import ShowField from '@/components/field-conditions/ShowField.js';
 
 const slots = useSlots();
-const { blueprint, visibleValues, extraValues, errors, hiddenFields, revealerFields, setHiddenField } = injectContainerContext();
+const { blueprint, visibleValues, extraValues, revealerValues, errors, hiddenFields, setHiddenField } = injectContainerContext();
 const tabs = ref(blueprint.value.tabs);
 const width = ref(null);
 const sidebarTab = computed(() => tabs.value.find((tab) => tab.handle === 'sidebar'));
@@ -23,8 +23,8 @@ const visibleMainTabs = computed(() => {
                     visibleValues.value,
                     extraValues.value,
                     visibleValues.value,
+                    revealerValues.value,
                     hiddenFields.value,
-                    revealerFields.value,
                     setHiddenField
                 ).showField(field, field.handle);
             });
@@ -92,7 +92,7 @@ function tabHasError(tab) {
                     :key="tab.handle"
                     :name="tab.handle"
                     :text="__(tab.display)"
-                    :class="{ '!text-red-500': tabHasError(tab) }"
+                    :class="{ '!text-red-600': tabHasError(tab) }"
                 />
             </TabList>
 

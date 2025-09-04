@@ -1,8 +1,0 @@
-/* ==========================================================================
-   ARRAY FIELDTYPE
-   ========================================================================== */
-
-.array-fieldtype .input-text {
-    @apply block w-full max-w-full appearance-none rounded-sm border bg-gray-100 p-2 text-sm text-gray-900 shadow-inner placeholder:text-gray-600 @lg:text-base;
-    @apply dark:bg-gray-400 dark:text-gray-200  dark:placeholder:text-gray-400;
-}

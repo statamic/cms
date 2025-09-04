@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="flex">
         <Button @click="create" v-if="!hasMultipleBlueprints" :variant :text="text" :size="size" />
         <Dropdown v-else>
             <template #trigger>

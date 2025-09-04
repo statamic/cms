@@ -7,6 +7,7 @@
             </template>
 
             <ItemActions
+                ref="actions"
                 v-if="!isCreating && hasItemActions"
                 :item="values.id"
                 :url="itemActionUrl"
@@ -119,7 +120,7 @@
                             </div>
 
                             <!-- Published Switch -->
-                            <Panel class="flex justify-between px-5 py-3" v-if="!revisionsEnabled">
+                            <Panel class="flex justify-between px-5 py-3 dark:bg-gray-800!" v-if="!revisionsEnabled">
                                 <Heading :text="__('Published')" />
                                 <Switch
                                     :model-value="published"
@@ -245,16 +246,6 @@
             :danger="true"
             @confirm="confirmSwitchLocalization"
             @cancel="pendingLocalization = null"
-        />
-
-        <confirmation-modal
-            v-if="syncingField"
-            :title="__('Sync Field')"
-            :body-text="__('Are you sure? This field\'s value will be replaced by the value in the original entry.')"
-            :button-text="__('Sync Field')"
-            :danger="true"
-            @confirm="confirmSyncField"
-            @cancel="syncingField = null"
         />
     </div>
 </template>
@@ -407,7 +398,6 @@ export default {
             autosaveIntervalInstance: null,
             syncFieldConfirmationText: __('messages.sync_entry_field_confirmation_text'),
             pendingLocalization: null,
-            syncingField: null,
         };
     },
 
@@ -782,30 +772,9 @@ export default {
         },
 
         setFieldValue(handle, value) {
-            if (this.hasOrigin) this.desyncField(handle);
+            if (this.hasOrigin) this.$refs.container.desyncField(handle);
 
             this.$refs.container.setFieldValue(handle, value);
-        },
-
-        syncField(handle) {
-            this.syncingField = handle;
-        },
-
-        confirmSyncField() {
-            const handle = this.syncingField;
-            this.localizedFields = this.localizedFields.filter((field) => field !== handle);
-            this.$refs.container.setFieldValue(handle, this.originValues[handle]);
-
-            // Update the meta for this field. For instance, a relationship field would have its data preloaded into it.
-            // If you sync the field, the preloaded data would be outdated and an ID would show instead of the titles.
-            this.meta[handle] = this.originMeta[handle];
-            this.syncingField = null;
-        },
-
-        desyncField(handle) {
-            if (!this.localizedFields.includes(handle)) this.localizedFields.push(handle);
-
-            this.$refs.container?.dirty();
         },
 
         setAutosaveInterval() {
@@ -831,6 +800,31 @@ export default {
                 this.itemActions = response.data.itemActions;
             }
         },
+
+        addToCommandPalette() {
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: this.saveText,
+                icon: 'save',
+                action: () => this.save(),
+                prioritize: true,
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Edit Blueprint'),
+                icon: 'blueprint-edit',
+                when: () => this.canEditBlueprint,
+                url: this.actions.editBlueprint,
+            });
+
+            this.$refs.actions?.preparedActions.forEach(action => Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: action.title,
+                icon: action.icon,
+                action: action.run,
+            }));
+        },
     },
 
     mounted() {
@@ -850,6 +844,8 @@ export default {
         if (typeof this.autosaveInterval === 'number') {
             this.setAutosaveInterval();
         }
+
+        this.addToCommandPalette();
     },
 
     created() {
@@ -863,15 +859,12 @@ export default {
         container = computed(() => this.$refs.container);
     },
 
-    unmounted() {
-        clearTimeout(this.trackDirtyStateTimeout);
-    },
-
     beforeUnmount() {
         if (this.autosaveIntervalInstance) clearInterval(this.autosaveIntervalInstance);
     },
 
     unmounted() {
+        clearTimeout(this.trackDirtyStateTimeout);
         this.saveKeyBinding.destroy();
         this.quickSaveKeyBinding.destroy();
     },

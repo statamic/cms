@@ -1,5 +1,7 @@
 {
     "name": "@statamic/cms",
+    "type": "module",
+    "version": "0.0.0",
     "dependencies": {
         "@vitejs/plugin-vue": "^6.0.0"
     },
@@ -20,8 +22,12 @@
             "types": "./types/bootstrap/cms/save-pipeline.d.ts",
             "default": "./save-pipeline.js"
         },
+        "./temporary": {
+            "types": "./types/bootstrap/cms/temporary.d.ts",
+            "default": "./temporary.js"
+        },
         "./vite-plugin": {
-            "default": "./vite-plugin.js"
+            "default": "./vite-plugin/index.js"
         }
     }
 }

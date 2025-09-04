@@ -18,10 +18,9 @@
                             :class="{ 'rounded-tl': index === 0 }"
                         ></td>
                         <td>
-                            <input
+                            <ui-input
                                 type="text"
                                 ref="listItem"
-                                class="input-text"
                                 v-model="element.value"
                                 :readonly="isReadOnly"
                                 @blur="focused = false"

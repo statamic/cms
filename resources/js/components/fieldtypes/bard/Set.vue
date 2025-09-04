@@ -1,7 +1,7 @@
 <template>
     <node-view-wrapper class="my-4">
         <div
-            class="shadow-ui-sm relative z-2 w-full rounded-lg border border-gray-200 bg-white text-base dark:border-x-0 dark:border-t-0 dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
+            class="shadow-ui-sm relative z-2 w-full rounded-lg border border-gray-300 bg-white text-base dark:border-x-0 dark:border-t-0 dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
             :class="{
                 'dark:border-dark-blue-100 border-blue-400!': selected || withinSelection,
                 'border-red-500': hasError,
@@ -17,22 +17,21 @@
                 class="group/header animate-border-color flex items-center rounded-lg border-b border-transparent px-1.5 antialiased duration-200 dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900!"
                 :class="{ 'rounded-b-none border-gray-200 dark:border-white/10': !collapsed }"
             >
-                <Icon data-drag-handle name="handles" class="size-4 cursor-grab text-gray-400" v-if="!isReadOnly" />
-                <button type="button" class="flex flex-1 items-center gap-4 p-2" @click="toggleCollapsedState">
+                <Icon data-drag-handle name="ui/handles" class="size-4 cursor-grab text-gray-400" v-if="!isReadOnly" />
+                <button type="button" class="flex flex-1 items-center gap-4 p-2 min-w-0" @click="toggleCollapsedState">
                     <Badge variant="flat" size="lg">
-                        <span v-if="isSetGroupVisible">
+                        <span v-if="isSetGroupVisible" class="flex items-center gap-2">
                             {{ __(setGroup.display) }}
                             <Icon name="ui/chevron-right" class="relative top-px size-3" />
                         </span>
                         {{ __(config.display) || config.handle }}
                     </Badge>
-                    <Tooltip :markdown="__(config.instructions)">
                         <Icon
                             v-if="config.instructions && !collapsed"
                             name="info-square"
                             class="size-3.5! text-gray-500"
+                            v-tooltip="{ content: $markdown(__(config.instructions)), html: true }"
                         />
-                    </Tooltip>
                     <Subheading
                         v-show="collapsed"
                         v-html="previewText"

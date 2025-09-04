@@ -67,11 +67,5 @@
 import Asset from './Asset';
 export default {
     mixins: [Asset],
-
-    methods: {
-        editOrOpen() {
-            return this.readOnly ? this.open() : this.edit();
-        },
-    },
 };
 </script>

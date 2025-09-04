@@ -12,7 +12,7 @@
             <ui-panel-header>
                 <div class="page-tree-header font-medium text-sm items-center flex justify-between">
                     <div v-text="__('Tree Structure')" />
-                    <div class="flex gap-2 -me-3">
+                    <div class="flex gap-2">
                         <ui-button size="sm" icon="tree-collapse" :text="__('Collapse')" @click="collapseAll" />
                         <ui-button size="sm" icon="tree-expand" :text="__('Expand')" @click="expandAll" />
                     </div>

@@ -1,8 +1,8 @@
 <template>
     <portal name="focal-point">
         <div class="focal-point">
-            <div class="focal-point-toolbox card p-0">
-                <div class="p-4">
+            <Card class="focal-point-toolbox" inset>
+                <div class="p-6">
                     <Heading size="xl">{{ __('Focal Point') }}</Heading>
                     <Subheading>{{ __('messages.focal_point_instructions') }}</Subheading>
                     <div class="focal-point-image">
@@ -46,7 +46,7 @@
                 <h6 class="rounded-b bg-gray-100  p-4 text-center  dark:bg-dark-800">
                     {{ __('messages.focal_point_previews_are_examples') }}
                 </h6>
-            </div>
+            </Card>
             <div v-for="n in 9" :key="n" :class="`frame frame-${n}`">
                 <focal-point-preview-frame
                     v-if="imageDimensions"
@@ -62,11 +62,12 @@
 </template>
 
 <script>
-import { Heading, Subheading, Button } from '@/components/ui';
+import { Card, Heading, Subheading, Button } from '@/components/ui';
 import FocalPointPreviewFrame from './FocalPointPreviewFrame.vue';
 
 export default {
     components: {
+        Card,
         Heading,
         Subheading,
         Button,

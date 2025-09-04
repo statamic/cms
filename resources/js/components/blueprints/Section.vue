@@ -1,9 +1,9 @@
 <template>
     <div class="blueprint-section min-h-40 w-full outline-hidden @container">
         <ui-panel>
-            <ui-panel-header class="flex items-center justify-between pb-0.75! pt-0! pl-2.75! pr-3.25! ">
+            <ui-panel-header class="flex items-center justify-between pl-2.75! pr-3.25! ">
                 <div class="flex items-center gap-2 flex-1">
-                    <ui-icon name="handles-sm" class="blueprint-section-drag-handle size-3! cursor-grab text-gray-400" />
+                    <ui-icon name="ui/handles-sm" class="blueprint-section-drag-handle size-3! cursor-grab text-gray-400" />
                     <ui-icon :name="iconName(section.icon)" v-if="section.icon" />
                     <ui-heading v-text="__(section.display ?? 'Section')" />
                 </div>
@@ -28,7 +28,7 @@
                 <template v-slot:empty-state>
                     <ui-subheading
                         v-text="__('Drag and drop fields below.')"
-                        class="rounded-xl min-h-16 flex items-center justify-center border border-dashed border-gray-300 p-3 text-center w-full"
+                        class="rounded-xl min-h-16 flex items-center justify-center border border-dashed border-gray-300 dark:border-gray-700 p-3 text-center w-full"
                     />
                 </template>
             </Fields>

@@ -9,7 +9,7 @@
 =================================================== */
 @layer ui {
     .bard-editor {
-        @apply relative rounded-sm p-0 text-gray-900 dark:bg-gray-900 dark:text-gray-100;
+        @apply relative rounded-b-lg p-0 text-gray-900 dark:bg-gray-900 dark:text-gray-100;
         /* The focus state inherits this */
         > * {
             @apply rounded-b-lg;
@@ -20,7 +20,7 @@
             @apply @lg/bard:p-4;
         }
         .bard-error {
-            @apply whitespace-nowrap bg-red-100 p-2 text-xs text-red-500 @lg:px-4;
+            @apply whitespace-nowrap bg-red-100 p-2 text-xs text-red-600 @lg:px-4;
         }
     }
 }
@@ -141,48 +141,10 @@
 =================================================== */
 @layer ui {
     .bard-floating-toolbar {
-        @apply flex rounded-full bg-black px-0 shadow-lg whitespace-nowrap;
+        @apply flex rounded-full bg-black px-2 shadow-lg whitespace-nowrap;
 
         &:before {
-            content: '';
-            border: 6px solid transparent;
-            border-top-color: black;
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            [dir='rtl'] & {
-                left: auto;
-                right: 50%;
-            }
-            margin-left: -3px;
-        }
-
-        .bard-toolbar-button {
-            @apply flex size-10 items-center justify-center rounded-lg bg-black text-center text-gray-200;
-            font-size: 16px;
-            transition: all 0.1s ease-in-out;
-            svg {
-                @apply size-4;
-            }
-        }
-
-        .bard-toolbar-button:hover {
-            @apply text-white;
-        }
-
-        .bard-toolbar-button.active {
-            @apply text-blue-700;
-        }
-
-        .bard-toolbar-button:focus {
-            outline: none;
-        }
-
-        .bard-toolbar-button:disabled {
-            @apply opacity-50;
-            &:hover {
-                @apply text-gray-200;
-            }
+            @apply border-t-black top-full start-1/2 absolute -ml-[3px] content-none border-6 border-transparent;
         }
     }
 
@@ -204,7 +166,7 @@
     }
 
     .bard-set.has-error > .replicator-set-header label {
-        @apply text-red-500;
+        @apply text-red-600;
     }
 }
 
@@ -294,7 +256,7 @@
     }
 
     .bard-fieldtype .bard-content {
-        @apply text-gray-600 dark:text-gray-300;
+        @apply text-gray-900 dark:text-gray-300 bg-white dark:bg-gray-950 rounded-b-lg;
         blockquote,
         ol,
         p,
@@ -304,7 +266,7 @@
 
             b,
             strong {
-                @apply font-bold text-gray-800;
+                @apply font-bold text-gray-800 dark:text-gray-100;
             }
 
             em,
@@ -313,7 +275,7 @@
             }
 
             a {
-                @apply break-words text-blue-600 underline dark:text-dark-blue-100;
+                @apply break-words text-blue-600 underline dark:text-blue-100;
             }
 
             a:active,

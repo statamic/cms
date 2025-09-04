@@ -29,7 +29,7 @@
                     <!-- Visual Area -->
                     <div class="editor-preview md:min-h-auto flex min-h-[45vh] w-full flex-1 flex-col justify-between bg-gray-800 shadow-[inset_0px_4px_3px_0px_black] dark:bg-gray-900 md:w-1/2 md:flex-auto md:grow lg:w-2/3 md:ltr:rounded-se-md">
                         <!-- Toolbar -->
-                        <div v-if="isToolbarVisible" class="@container/toolbar dark flex items-center justify-center gap-2 px-2 py-4">
+                        <div v-if="isToolbarVisible" class="@container/toolbar dark flex flex-wrap items-center justify-center gap-2 px-2 py-4">
                             <ItemActions
                                 :item="id"
                                 :url="actionUrl"
@@ -38,13 +38,14 @@
                                 @completed="actionCompleted"
                                 v-slot="{ actions }"
                             >
-                                <ui-button v-if="isImage && isFocalPointEditorEnabled" @click.prevent="openFocalPointEditor" icon="focus" variant="filled" v-tooltip="__('Focal Point')" />
-                                <ui-button v-if="canRunAction('rename_asset')" @click.prevent="runAction(actions, 'rename_asset')" icon="rename" variant="filled" v-tooltip="__('Rename')" />
-                                <ui-button v-if="canRunAction('move_asset')" @click.prevent="runAction(actions, 'move_asset')" icon="move-folder" variant="filled" v-tooltip="__('Move to Folder')" />
-                                <ui-button v-if="canRunAction('replace_asset')" @click.prevent="runAction(actions, 'replace_asset')" icon="replace" variant="filled" v-tooltip="__('Replace')" />
-                                <ui-button v-if="canRunAction('reupload_asset')" @click.prevent="runAction(actions, 'reupload_asset')" icon="upload-cloud" variant="filled" v-tooltip="__('Reupload')" />
-                                <ui-button v-if="asset.allowDownloading" @click="download" icon="download" variant="filled" v-tooltip="__('Download')" />
-                                <ui-button v-if="allowDeleting && canRunAction('delete')" @click="runAction(actions, 'delete')" icon="trash" variant="filled" v-tooltip="__('Delete')" />
+                                <ui-button inset size="sm" v-if="isImage && isFocalPointEditorEnabled" @click.prevent="openFocalPointEditor" icon="focus" variant="subtle" :text="__('Focal Point')" />
+                                <ui-button inset size="sm" v-if="canRunAction('rename_asset')" @click.prevent="runAction(actions, 'rename_asset')" icon="rename" variant="subtle" :text="__('Rename')" />
+                                <ui-button inset size="sm" v-if="canRunAction('move_asset')" @click.prevent="runAction(actions, 'move_asset')" icon="move-folder" variant="subtle" :text="__('Move to Folder')" />
+                                <ui-button inset size="sm" v-if="canRunAction('replace_asset')" @click.prevent="runAction(actions, 'replace_asset')" icon="replace" variant="subtle" :text="__('Replace')" />
+                                <ui-button inset size="sm" v-if="canRunAction('reupload_asset')" @click.prevent="runAction(actions, 'reupload_asset')" icon="upload-cloud" variant="subtle" :text="__('Reupload')" />
+                                <ui-button inset size="sm" @click="download" icon="download" variant="subtle" :text="__('Download')" />
+                                <ui-button inset size="sm" v-if="allowDeleting && canRunAction('delete')" @click="runAction(actions, 'delete')" icon="trash" variant="subtle" :text="__('Delete')" />
+
                                 <Dropdown class="me-4">
                                     <DropdownMenu>
                                         <DropdownItem
@@ -114,6 +115,7 @@
                     <PublishContainer
                         v-if="fields"
                         ref="container"
+                        :read-only="readOnly"
                         :name="publishContainer"
                         :reference="id"
                         :blueprint="fieldset"
@@ -194,9 +196,6 @@ export default {
         id: {
             required: true,
         },
-        readOnly: {
-            type: Boolean,
-        },
         showToolbar: {
             type: Boolean,
             default: true,
@@ -229,6 +228,10 @@ export default {
     },
 
     computed: {
+        readOnly() {
+            return !this.asset.isEditable;
+        },
+
         isImage() {
             if (!this.asset) return false;
 

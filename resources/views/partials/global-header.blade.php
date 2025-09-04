@@ -2,27 +2,23 @@
     use function Statamic\trans as __;
 @endphp
 
-<header class="h-14 bg-gray-800 flex justify-between space-x-2 items-center text-white px-4 dark fixed overflow-x-auto top-0 inset-x-0 z-[3]">
+@inject('licenses', 'Statamic\Licensing\LicenseManager')
+
+<header class="h-14 bg-global-header-bg dark:bg-dark-global-header-bg flex justify-between space-x-2 items-center text-white px-4 fixed overflow-x-auto top-0 inset-x-0 z-[3]">
     <a class="c-skip-link z-(--z-index-header) px-4 py-2 bg-blue-800 text-sm top-2.5 left-2.25 fixed opacity-0 -translate-y-24 focus:translate-y-0 focus:opacity-100 rounded-md" href="#main">
         {{ __('Skip to sidebar') }}
     </a>
     <a class="c-skip-link z-(--z-index-header) px-4 py-2 bg-blue-800 text-sm top-2.5 left-2.25 fixed opacity-0 -translate-y-24 focus:translate-y-0 focus:opacity-100 rounded-md" href="#main-content">
         {{ __('Skip to content') }}
     </a>
-        <div class="flex items-center gap-2 text-[0.8125rem] text-gray-300">
-            {{-- Logo --}}
-            @if ($customDarkLogo)
-                <button class="flex items-center group cursor-pointer text-gray-300 hover:text-white" type="button" @click="toggleNav" aria-label="{{ __('Toggle Nav') }}">
-                    <div class="p-1 size-7 inset-0 flex items-center justify-center">
-                        @cp_svg('icons/burger-menu', 'size-5')
-                    </div>
-                </button>
-                {{-- Mobile nav toggle --}}
-                <button class="flex items-center group cursor-pointer text-gray-300 hover:text-white md:hidden" type="button" @click="toggleMobileNav" aria-label="{{ __('Toggle Mobile Nav') }}">
-                    <div class="p-1 size-7 inset-0 flex items-center justify-center">
-                        @cp_svg('icons/burger-menu', 'size-5')
-                    </div>
-                </button>
+    <div class="dark flex items-center gap-2 text-[0.8125rem] text-gray-300">
+         {{-- Logo --}}
+        @if ($customDarkLogo)
+            <button class="flex items-center group cursor-pointer text-gray-300 hover:text-white" type="button" @click="toggleNav" aria-label="{{ __('Toggle Nav') }}">
+                <div class="p-1 size-7 inset-0 flex items-center justify-center">
+                    @cp_svg('icons/burger-menu', 'size-5')
+                </div>
+            </button>
             <img src="{{ $customDarkLogo }}" alt="{{ config('statamic.cp.custom_cms_name') }}" class="max-w-[260px] max-h-9">
         @else
         <div class="flex items-center gap-2 relative">
@@ -36,7 +32,24 @@
                 {{ $customLogoText ?? config('app.name') }}
             </a>
             @if (Statamic::pro())
-                <ui-badge size="sm" variant="flat" text="Pro" class="hidden sm:block select-none dark:bg-gray-700/55!" />
+                @if ($licenses->valid())
+                    <ui-badge size="sm" variant="flat" text="{{ __('Pro') }}" class="hidden sm:block select-none bg-white/15!" />
+                @else
+                    <ui-tooltip :text="{{ $licenses->requestFailed() ? "'".$licenses->requestFailureMessage()."'" : 'null' }}">
+                        <ui-badge
+                            @if ($licenses->requestFailed())
+                                color="yellow"
+                                icon="alert-warning-exclamation-mark"
+                            @elseif ($licenses->isOnPublicDomain())
+                                color="red"
+                            @else
+                                color="green"
+                            @endif
+                            href="{{ cp_route('utilities.licensing') }}"
+                            text="{{ __('Pro') }} – {{ $licenses->isOnPublicDomain() ? __('statamic::messages.licensing_error_unlicensed') : __('Trial Mode') }}"
+                        ></ui-badge>
+                    </ui-tooltip>
+                @endif
             @endif
         </div>
         @endif
@@ -48,9 +61,9 @@
                 @if($breadcrumb->hasLinks() || $breadcrumb->createUrl())
                     <ui-dropdown v-cloak class="relative" aria-label="{{ __('More options for') }} {{ __($breadcrumb->text()) }}">
                         <template #trigger>
-                            <ui-button 
-                                variant="ghost" 
-                                icon="ui/chevron-vertical" 
+                            <ui-button
+                                variant="ghost"
+                                icon="ui/chevron-vertical"
                                 class="[&_svg]:size-3! h-8! w-4! hover:bg-gray-300/5! -ml-3 mr-1"
                                 :aria-label="'{{ __('Options for') }} {{ __($breadcrumb->text()) }}'"
                                 aria-haspopup="true"
@@ -61,7 +74,7 @@
                             class="grid grid-cols-[auto_1fr_auto] items-center"
                             icon="{{ $breadcrumb->icon() }}"
                             @if($breadcrumb->hasConfigureUrl())
-                                append-icon="cog-solid"
+                                append-icon="ui/cog-solid"
                                 append-href="{{ $breadcrumb->configureUrl() }}"
                             @endif
                             role="menuitem"
@@ -84,9 +97,9 @@
                             </ui-dropdown-menu>
                         @endif
                         @if($breadcrumb->createUrl())
-                            <ui-dropdown-footer 
-                                icon="plus" 
-                                text="{{ __($breadcrumb->createLabel()) }}" 
+                            <ui-dropdown-footer
+                                icon="plus"
+                                text="{{ __($breadcrumb->createLabel()) }}"
                                 href="{{ $breadcrumb->createUrl() }}"
                                 role="menuitem"
                                 :aria-label="'{{ __($breadcrumb->createLabel()) }} - {{ __('Create new') }}'"
@@ -98,7 +111,7 @@
         </div>
     </div>
 
-    <div class="flex-1 flex gap-1 md:gap-4 items-center justify-end shrink-0">
+    <div class="dark flex-1 flex gap-1 md:gap-3 items-center justify-end shrink-0">
         @if (Statamic\Facades\Site::authorized()->count() > 1)
             <global-site-selector></global-site-selector>
         @endif
@@ -111,13 +124,14 @@
             v-slot="{ text, url, icon }"
         >
             <ui-button
-                :icon="icon"
-                class="[&_svg]:size-4 -me-3"
-                variant="ghost"
+                :aria-label="text"
                 :href="url"
+                :icon="icon"
+                class="[&_svg]:size-4 -me-2"
+                size="sm"
                 target="_blank"
                 v-tooltip="text"
-                :aria-label="text"
+                variant="ghost"
             ></ui-button>
         </ui-command-palette-item>
         <x-statamic::user-dropdown />

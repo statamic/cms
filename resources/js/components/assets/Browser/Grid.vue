@@ -32,7 +32,7 @@
                     <Context>
                         <template #trigger>
                             <button @dblclick="selectFolder(folder.path)" class="group h-[66px] w-[80px]">
-                                <ui-icon name="asset-folder" class="size-full text-blue-400/90 hover:text-blue-400" />
+                                <ui-icon name="ui/folder" class="size-full text-blue-400/90 hover:text-blue-400" />
                                 <div
                                     class="overflow-hidden text-center font-mono text-xs text-ellipsis whitespace-nowrap text-gray-500"
                                     v-text="folder.basename"
@@ -55,7 +55,7 @@
             </div>
             <div v-if="creatingFolder" class="group/folder relative">
                 <div class="group h-[66px] w-[80px]">
-                    <ui-icon name="asset-folder" class="size-full text-blue-400/90 hover:text-blue-400" />
+                    <ui-icon name="ui/folder" class="size-full text-blue-400/90 hover:text-blue-400" />
 
                     <Editable
                         ref="newFolderInput"
@@ -130,7 +130,7 @@
                                     <Dropdown placement="left-start">
                                         <DropdownMenu>
                                             <DropdownItem
-                                                :text="__(canEdit ? 'Edit' : 'View')"
+                                                :text="__(asset.editable ? 'Edit' : 'View')"
                                                 @click="edit(asset.id)"
                                                 icon="edit"
                                             />
@@ -149,7 +149,7 @@
                             </div>
                         </template>
                         <ContextMenu>
-                            <ContextItem icon="edit" :text="__(canEdit ? 'Edit' : 'View')" @click="edit(asset.id)" />
+                            <ContextItem icon="edit" :text="__(asset.editable ? 'Edit' : 'View')" @click="edit(asset.id)" />
                             <ContextSeparator />
                             <ContextItem
                                 v-for="action in actions"

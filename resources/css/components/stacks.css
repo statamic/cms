@@ -25,8 +25,7 @@
     }
 
     .stack-overlay {
-        @apply absolute inset-0 bg-black;
-        opacity: 0.2;
+        @apply absolute inset-0 bg-black opacity-20 dark:opacity-30;
         pointer-events: none;
         transition: all 0.3s ease;
 

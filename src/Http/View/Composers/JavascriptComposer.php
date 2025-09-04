@@ -72,7 +72,6 @@ class JavascriptComposer
             'preloadableFieldtypes' => FieldtypeRepository::preloadable()->keys(),
             'livePreview' => config('statamic.live_preview'),
             'permissions' => $this->permissions($user),
-            'hasLicenseBanner' => ! $licenses->outpostIsOffline() && ($licenses->invalid() || $licenses->requestFailed()),
             'customSvgIcons' => Icon::getCustomSvgIcons(),
             'commandPaletteCategories' => Category::order(),
             'commandPalettePreloadedItems' => CommandPalette::getPreloadedItems(),

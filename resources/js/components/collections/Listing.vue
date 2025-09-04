@@ -30,7 +30,7 @@
                             @completed="actionCompleted"
                             v-slot="{ actions }"
                         >
-                            <Dropdown placement="left-start" class="me-3">
+                            <Dropdown placement="left-start">
                                 <DropdownMenu>
                                     <DropdownItem :text="__('View')" icon="eye" :href="collection.entries_url" />
                                     <DropdownItem v-if="collection.url" :text="__('Visit URL')" icon="external-link" target="_blank" :href="collection.url" />
@@ -56,31 +56,41 @@
                             :blueprints="collection.blueprints"
                             :text="__('Create Entry')"
                             size="sm"
-                            class="-mr-2"
                         />
                     </aside>
                 </ui-panel-header>
 
-                <ui-card class="h-40">
-                    <ui-listing :items="collection.entries" :columns="collection.columns">
-                        <table class="w-full [&_td]:p-0.5 [&_td]:text-sm">
-                            <ui-listing-table-head sr-only />
-                            <ui-listing-table-body>
-                                <template #cell-title="{ row: entry }" class="w-full">
-                                    <div class="flex items-center gap-2">
-                                        <StatusIndicator :status="entry.status" />
-                                        <a :href="entry.edit_url" class="line-clamp-1 overflow-hidden text-ellipsis" :text="entry.title" />
-                                    </div>
-                                </template>
-                                <template #cell-date="{ row: entry }" v-if="collection.dated">
-                                    <div class="text-end font-mono text-xs text-gray-500 ps-6">
-                                        <date-time :of="entry.date" date-only />
-                                    </div>
-                                </template>
-                            </ui-listing-table-body>
-                        </table>
+                <ui-card class="h-40 px-0! py-2!">
+                    <ui-listing :url="collection.entries_listing_url" :per-page="5" :columns="collection.columns">
+                        <template #initializing>
+                            <div class="flex flex-col gap-[9px] justify-between py-1 px-5">
+                                <ui-skeleton class="h-[19px] w-full" />
+                                <ui-skeleton class="h-[19px] w-full" />
+                                <ui-skeleton class="h-[19px] w-full" />
+                                <ui-skeleton class="h-[19px] w-full" />
+                                <ui-skeleton class="h-[19px] w-full" />
+                            </div>
+                        </template>
+                        <template #default="{ items }">
+                            <table v-if="items.length" class="w-full [&_td]:py-1 [&_td]:px-5 [&_td]:text-sm">
+                                <ui-listing-table-head sr-only />
+                                <ui-listing-table-body class="divide-y divide-gray-200 dark:divide-gray-700">
+                                    <template #cell-title="{ row: entry }" class="w-full">
+                                        <div class="flex items-center gap-2">
+                                            <StatusIndicator :status="entry.status" />
+                                            <a :href="entry.edit_url" class="line-clamp-1 overflow-hidden text-ellipsis" :text="entry.title" />
+                                        </div>
+                                    </template>
+                                    <template #cell-date="{ row: entry }" v-if="collection.dated">
+                                        <div class="text-end font-mono text-xs text-gray-500 ps-6">
+                                            <date-time :of="entry.date.date" date-only />
+                                        </div>
+                                    </template>
+                                </ui-listing-table-body>
+                            </table>
+                            <ui-subheading v-else class="text-center h-full flex items-center justify-center">{{ __('Nothing to see here, yet.') }}</ui-subheading>
+                        </template>
                     </ui-listing>
-                    <ui-subheading v-if="collection.entries.length === 0" class="text-center h-full flex items-center justify-center">{{ __('Nothing to see here, yet.') }}</ui-subheading>
                 </ui-card>
 
                 <ui-panel-footer class="flex items-center gap-6 text-sm text-gray-600">
@@ -257,6 +267,7 @@ export default {
             Statamic.$commandPalette.add({
                 category: Statamic.$commandPalette.category.Actions,
                 text: __('Toggle Grid Layout'),
+                icon: 'layout-grid',
                 when: () => this.mode === 'table',
                 action: () => this.mode = 'grid',
             });
@@ -264,6 +275,7 @@ export default {
             Statamic.$commandPalette.add({
                 category: Statamic.$commandPalette.category.Actions,
                 text: __('Toggle List Layout'),
+                icon: 'layout-list',
                 when: () => this.mode === 'grid',
                 action: () => this.mode = 'table',
             });
