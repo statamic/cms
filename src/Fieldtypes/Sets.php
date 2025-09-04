@@ -15,8 +15,6 @@ class Sets extends Fieldtype
 
     protected static $iconsDirectory = null;
 
-    protected static $iconsFolder = null;
-
     /**
      * Converts the "sets" array of a Replicator (or Bard) field into what the
      * <sets-fieldtype> Vue component is expecting, within either the Blueprint
@@ -137,35 +135,22 @@ class Sets extends Fieldtype
     }
 
     /**
-     * Allow the user to set custom icon directory and/or folder for SVG set icons.
+     * Allow the user to set a custom icon directory for SVG set icons.
      *
-     * @param  string|null  $directory
-     * @param  string|null  $folder
+     * @param  string  $directory
      */
-    public static function setIconsDirectory($directory = null, $folder = null)
+    public static function setIconsDirectory($directory)
     {
-        // If they are specifying new base directory, ensure we do not assume sub-folder
-        if ($directory) {
-            static::$iconsDirectory = $directory;
-            static::$iconsFolder = $folder;
-        }
-
-        // Of if they are specifying just a sub-folder, use that with original base directory
-        elseif ($folder) {
-            static::$iconsFolder = $folder;
-        }
+        static::$iconsDirectory = $directory;
 
         // Then provide to script for <icon-fieldtype> selector components in blueprint config
         Statamic::provideToScript([
             'setIconsDirectory' => static::$iconsDirectory,
-            'setIconsFolder' => static::$iconsFolder,
         ]);
 
-        // And finally, provide the file contents of all custom svg icons to script,
-        // but only if custom directory because our <svg-icon> component cannot
-        // reference custom paths at runtime without a full Vite re-build
-        if ($directory) {
-            Icon::provideCustomSvgIconsToScript($directory, $folder);
-        }
+        // Finally, provide the file contents of all custom svg icons to script,
+        // because our <Icon> component cannot reference custom paths at runtime
+        // without a full Vite re-build.
+        Icon::provideCustomSvgIconsToScript($directory);
     }
 }

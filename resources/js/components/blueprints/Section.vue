@@ -4,7 +4,7 @@
             <ui-panel-header class="flex items-center justify-between pl-2.75! pr-3.25! ">
                 <div class="flex items-center gap-2 flex-1">
                     <ui-icon name="ui/handles-sm" class="blueprint-section-drag-handle size-3! cursor-grab text-gray-400" />
-                    <ui-icon :name="iconName(section.icon)" v-if="section.icon" />
+                    <ui-icon :name="section.icon" :directory="iconsDirectory" v-if="section.icon" />
                     <ui-heading v-text="__(section.display ?? 'Section')" />
                 </div>
                 <ui-button icon="pencil-line" size="sm" variant="ghost" @click="edit" />
@@ -64,7 +64,11 @@
                 </ui-field>
                 <ui-field :label="__('Icon')" v-if="showHandleField">
                     <publish-field-meta
-                        :config="{ handle: 'icon', type: 'icon' }"
+                        :config="{
+                            handle: 'icon',
+                            type: 'icon',
+                            directory: iconsDirectory,
+                        }"
                         :initial-value="editingSection.icon"
                         v-slot="{ meta, value, loading, config }"
                     >
@@ -123,6 +127,10 @@ export default {
     computed: {
         suggestableConditionFields() {
             return this.suggestableConditionFieldsProvider?.suggestableFields(this) || [];
+        },
+
+        iconsDirectory() {
+            return this.$config.get('setIconsDirectory');
         },
     },
 
@@ -194,12 +202,6 @@ export default {
 
         editCancelled() {
             this.editingSection = false;
-        },
-
-        iconName(name) {
-            if (!name) return null;
-
-            return name;
         },
     },
 };

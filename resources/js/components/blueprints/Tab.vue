@@ -3,8 +3,8 @@
         <Icon
             v-if="tab.icon"
             :name="iconName(tab.icon)"
-            :directory="iconBaseDirectory"
-            class="h-4 w-4 ltr:mr-1 rtl:ml-1"
+            :directory="iconsDirectory"
+            class="h-4 w-4 me-1"
         />
 
         {{ __(tab.display) }}
@@ -53,8 +53,7 @@
                         :config="{
                             handle: 'icon',
                             type: 'icon',
-                            directory: this.iconBaseDirectory,
-                            folder: this.iconSubFolder,
+                            directory: iconsDirectory,
                         }"
                         :initial-value="icon"
                         v-slot="{ meta, value, loading, config }"
@@ -122,12 +121,8 @@ export default {
             return this.currentTab === this.tab._id;
         },
 
-        iconBaseDirectory() {
+        iconsDirectory() {
             return this.$config.get('setIconsDirectory');
-        },
-
-        iconSubFolder() {
-            return this.$config.get('setIconsFolder');
         },
     },
 
@@ -177,7 +172,7 @@ export default {
         iconName(name) {
             if (!name) return null;
 
-            return this.iconSubFolder ? this.iconSubFolder + '/' + name : name;
+            return name;
         },
     },
 };

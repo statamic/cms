@@ -425,17 +425,6 @@ class SetsTest extends TestCase
     }
 
     #[Test]
-    public function it_can_provide_custom_user_icons_subfolder()
-    {
-        Sets::setIconsDirectory(folder: 'light');
-
-        $jsonVariables = Statamic::jsonVariables(request());
-
-        $this->assertNull($jsonVariables['setIconsDirectory']);
-        $this->assertEquals('light', $jsonVariables['setIconsFolder']);
-    }
-
-    #[Test]
     public function it_can_provide_custom_user_icons_directory()
     {
         Sets::setIconsDirectory($customDir = resource_path());
@@ -443,17 +432,5 @@ class SetsTest extends TestCase
         $jsonVariables = Statamic::jsonVariables(request());
 
         $this->assertEquals($customDir, $jsonVariables['setIconsDirectory']);
-        $this->assertEquals(null, $jsonVariables['setIconsFolder']);
-    }
-
-    #[Test]
-    public function it_can_provide_custom_user_icons_directory_and_sub_folder()
-    {
-        Sets::setIconsDirectory($customDir = base_path(), $customSubFolder = 'resources');
-
-        $jsonVariables = Statamic::jsonVariables(request());
-
-        $this->assertEquals($customDir, $jsonVariables['setIconsDirectory']);
-        $this->assertEquals($customSubFolder, $jsonVariables['setIconsFolder']);
     }
 }
