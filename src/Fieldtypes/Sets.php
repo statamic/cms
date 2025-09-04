@@ -136,10 +136,8 @@ class Sets extends Fieldtype
 
     /**
      * Allow the user to set a custom icon directory for SVG set icons.
-     *
-     * @param  string  $directory
      */
-    public static function setIconsDirectory($directory)
+    public static function setIconsDirectory(string $directory): void
     {
         static::$iconsDirectory = $directory;
 

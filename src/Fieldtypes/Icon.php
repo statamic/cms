@@ -86,10 +86,8 @@ class Icon extends Fieldtype
 
     /**
      * Provide custom SVG icons to script.
-     *
-     * @param  string  $directory
      */
-    public static function provideCustomSvgIconsToScript(string $directory)
+    public static function provideCustomSvgIconsToScript(string $directory): void
     {
         $path = Str::removeRight(Path::tidy($directory), '/');
 
@@ -103,10 +101,8 @@ class Icon extends Fieldtype
 
     /**
      * Get custom SVG icons for script.
-     *
-     * @return array
      */
-    public static function getCustomSvgIcons()
+    public static function getCustomSvgIcons(): array
     {
         return static::$customSvgIcons;
     }
