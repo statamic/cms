@@ -344,10 +344,10 @@ class AssetQueryBuilderTest extends TestCase
         Asset::find('test::d.jpg')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
         Asset::find('test::e.jpg')->data(['test_taxonomy' => ['taxonomy-5']])->save();
 
-        $assets = $this->container->queryAssets()->whereJsonContains('test_taxonomy', ['taxonomy-1', 'taxonomy-5'])->get();
+        $assets = $this->container->queryAssets()->whereJsonContains('test_taxonomy', ['taxonomy-1', 'taxonomy-3'])->get();
 
-        $this->assertCount(3, $assets);
-        $this->assertEquals(['a', 'c', 'e'], $assets->map->filename()->all());
+        $this->assertCount(1, $assets);
+        $this->assertEquals(['c'], $assets->map->filename()->all());
 
         $assets = $this->container->queryAssets()->whereJsonContains('test_taxonomy', 'taxonomy-1')->get();
 
