@@ -124,7 +124,7 @@ function destroy() {
         <slot name="picker" />
         <div
             layout
-            class="relative z-2 w-full rounded-lg border border-gray-300 text-base dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black shadow-ui-sm [&_[data-ui-switch]]:border-gray-600 [&_[data-ui-switch]]:border-1"
+            class="relative z-2 w-full rounded-lg border border-gray-300 text-base dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black shadow-ui-sm dark:[&_[data-ui-switch]]:border-gray-600 dark:[&_[data-ui-switch]]:border-1"
             :class="{ 
                 'border-red-500': hasError
             }"
