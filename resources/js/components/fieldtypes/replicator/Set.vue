@@ -146,7 +146,7 @@ function destroy() {
                     class="size-4 cursor-grab text-gray-400"
                     v-if="!readOnly"
                 />
-                <button type="button" class="flex flex-1 items-center gap-4 p-2 py-1.75 min-w-0" @click="toggleCollapsedState">
+                <button type="button" class="flex flex-1 items-center gap-4 p-2 py-1.75 min-w-0 cursor-pointer" @click="toggleCollapsedState">
                     <Badge size="lg" pill="true" color="white" shadow="false" class="px-3">
                         <span v-if="isSetGroupVisible" class="flex items-center gap-2">
                             {{ __(setGroup.display) }}

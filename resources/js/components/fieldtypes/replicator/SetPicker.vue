@@ -30,7 +30,7 @@
                     data-set-picker-search-input
                 />
                 <div v-if="showGroupBreadcrumb" class="flex items-center font-medium text-gray-700 dark:text-gray-300 gap-1">
-                    <button @click="unselectGroup" class="hover:text-gray-900 dark:hover:text-white">
+                    <button @click="unselectGroup" class="hover:text-gray-900 dark:hover:text-white cursor-pointer">
                         {{ __('Groups') }}
                     </button>
                     <ui-icon name="ui/chevron-right" class="size-4" />
