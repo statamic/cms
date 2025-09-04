@@ -8,7 +8,7 @@
     <ui-popover
         v-else
         inset
-        align="start"
+        :align="align"
         class="set-picker select-none w-[300px]"
         :open="isOpen"
         @update:open="isOpen = $event"
@@ -98,6 +98,7 @@ export default {
     props: {
         sets: Array,
         enabled: { type: Boolean, default: true },
+        align: { type: String, default: 'start' },
     },
 
     data() {
