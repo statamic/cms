@@ -124,8 +124,10 @@ function destroy() {
         <slot name="picker" />
         <div
             layout
-            class="shadow-ui-sm relative z-2 w-full rounded-lg border border-gray-300 bg-white text-base dark:border-x-0 dark:border-t-0 dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
-            :class="{ 'border-red-500': hasError }"
+            class="relative z-2 w-full rounded-lg border border-gray-300 text-base dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black shadow-ui-sm dark:[&_[data-ui-switch]]:border-gray-600 dark:[&_[data-ui-switch]]:border-1"
+            :class="{ 
+                'border-red-500': hasError
+            }"
             :data-collapsed="collapsed ?? undefined"
             :data-error="hasError ?? undefined"
             :data-invalid="isInvalid ?? undefined"
@@ -133,8 +135,10 @@ function destroy() {
             :data-type="config.handle"
         >
             <header
-                class="group/header animate-border-color flex items-center rounded-lg border-b border-transparent px-1.5 antialiased duration-200 hover:bg-gray-50 dark:hover:bg-gray-950"
-                :class="{ 'rounded-b-none border-gray-200 dark:border-white/10': !collapsed }"
+                class="group/header animate-border-color flex items-center rounded-lg px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-950 hover:bg-gray-100 dark:hover:bg-gray-950 border-gray-300 dark:border-white/10"
+                :class="{ 
+                    'bg-gray-200/50 rounded-b-none border-b border-gray-300': !collapsed
+                }"
             >
                 <Icon
                     name="ui/handles"
@@ -142,8 +146,8 @@ function destroy() {
                     class="size-4 cursor-grab text-gray-400"
                     v-if="!readOnly"
                 />
-                <button type="button" class="flex flex-1 items-center gap-4 p-2 min-w-0 cursor-pointer" @click="toggleCollapsedState">
-                    <Badge variant="flat" size="lg">
+                <button type="button" class="flex flex-1 items-center gap-4 p-2 py-1.75 min-w-0 cursor-pointer" @click="toggleCollapsedState">
+                    <Badge size="lg" pill="true" color="white" shadow="false" class="px-3">
                         <span v-if="isSetGroupVisible" class="flex items-center gap-2">
                             {{ __(setGroup.display) }}
                             <Icon name="ui/chevron-right" class="relative top-px size-3" />
