@@ -331,7 +331,7 @@ defineExpose({
                         data-ui-combobox-content
                     >
                         <ComboboxViewport>
-                            <ComboboxEmpty class="py-2 text-sm" data-ui-combobox-empty>
+                            <ComboboxEmpty class="p-2 text-sm" data-ui-combobox-empty>
                                 <slot name="no-options" v-bind="{ searchQuery }">
                                     {{ __('No options available.') }}
                                 </slot>
