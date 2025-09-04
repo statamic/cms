@@ -33,7 +33,6 @@
 /* Fieldtypes */
 @import './components/fieldtypes/assets.css';
 @import './components/fieldtypes/bard.css';
-@import './components/fieldtypes/replicator.css';
 @import './components/fieldtypes/grid.css';
 @import './components/fieldtypes/hidden.css';
 @import './components/fieldtypes/markdown.css';
