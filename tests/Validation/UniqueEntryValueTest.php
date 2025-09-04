@@ -83,4 +83,30 @@ class UniqueEntryValueTest extends TestCase
             ['slug' => new UniqueEntryValue(collection: 'collection-one', site: 'site-two')]
         )->passes());
     }
+
+    #[Test]
+    public function it_fails_when_theres_a_duplicate_date_value()
+    {
+        EntryFactory::id('123')->slug('foo')->collection('collection-one')
+            ->data(['test_date' => '2021-11-15 20:31:04'])
+            ->create();
+
+        $this->assertTrue(Validator::make(
+            ['test_date' => '2021-11-15 20:31:04'],
+            ['test_date' => new UniqueEntryValue]
+        )->fails());
+    }
+
+    #[Test]
+    public function it_fails_when_theres_a_duplicate_date_range_value()
+    {
+        EntryFactory::id('123')->slug('foo')->collection('collection-one')
+            ->data(['test_date' => ['start' => '2021-11-14 09:00:00', 'end' => '2021-11-15 20:31:04']])
+            ->create();
+
+        $this->assertTrue(Validator::make(
+            ['test_date' => ['start' => '2021-11-14 09:00:00', 'end' => '2021-11-15 20:31:04']],
+            ['test_date' => new UniqueEntryValue]
+        )->fails());
+    }
 }
