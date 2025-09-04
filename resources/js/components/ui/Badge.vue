@@ -13,6 +13,7 @@ const props = defineProps({
     iconAppend: { type: String, default: null },
     pill: { type: Boolean, default: false },
     prepend: { type: [String, Number, Boolean, null], default: null },
+    shadow: { type: [Boolean, String], default: true },
     size: { type: String, default: 'default' },
     text: { type: [String, Number, Boolean, null], default: null },
     variant: { type: String, default: 'default' },
@@ -58,6 +59,10 @@ const badgeClasses = computed(() => {
                 flat: 'border-0 shadow-none',
             },
             pill: { true: 'rounded-full' },
+            shadow: { 
+                false: 'shadow-none!',
+                true: 'shadow-ui-sm'
+            }
         },
     })({ ...props });
 
