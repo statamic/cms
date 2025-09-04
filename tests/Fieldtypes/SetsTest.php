@@ -66,7 +66,7 @@ class SetsTest extends TestCase
                                 'handle' => 'field_one',
                                 'type' => 'inline',
                                 'fieldtype' => 'text',
-                                'icon' => 'text',
+                                'icon' => 'fieldtype-text',
                                 'config' => [
                                     'type' => 'text',
                                     'width' => 100,
@@ -97,7 +97,7 @@ class SetsTest extends TestCase
                                 'handle' => 'field_two',
                                 'type' => 'inline',
                                 'fieldtype' => 'text',
-                                'icon' => 'text',
+                                'icon' => 'fieldtype-text',
                                 'config' => [
                                     'type' => 'text',
                                     'width' => 100,
@@ -148,7 +148,7 @@ class SetsTest extends TestCase
                                 'handle' => 'field_one',
                                 'type' => 'inline',
                                 'fieldtype' => 'text',
-                                'icon' => 'text',
+                                'icon' => 'fieldtype-text',
                                 'config' => [
                                     'type' => 'text',
                                     'width' => 100,
