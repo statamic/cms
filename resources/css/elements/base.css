@@ -1,4 +1,7 @@
 :root {
+    /* For animating height */
+    interpolate-size: allow-keywords;
+
     --focus-outline-width: 2px;
     /* Here we typically need a negative outline-offset because of the inner shadow on inputs */
     --focus-outline-offset: -1px;
@@ -110,4 +113,10 @@
         /* Pull the focus state above any adjacent buttons e.g. >> /cp/collections/articles/entries - save button alongside the dropdown arrow */
         z-index: var(--z-index-above);
     }
+}
+
+code {
+    /* Take the UI accent for code color/background. Use relative colors to 1) Make sure the text color is not too bright and 2) Create a light background */
+    color: hsl(from var(--theme-color-ui-accent) h l 18);
+    background: hsl(from var(--theme-color-ui-accent) h s l / 0.085);
 }

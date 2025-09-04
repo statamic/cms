@@ -39,7 +39,7 @@ const classes = computed(() =>
             variant: {
                 block: 'w-full',
                 inline: [
-                    'flex justify-between gap-x-3 gap-y-1.5',
+                    'flex justify-between gap-x-7 gap-y-1.5',
                     'has-[[data-ui-label]~[data-ui-control]]:grid-cols-[1fr_auto]',
                     'has-[[data-ui-control]~[data-ui-label]]:grid-cols-[auto_1fr]',
                     '[&>[data-ui-control]~[data-ui-description]]:row-start-2 [&>[data-ui-control]~[data-ui-description]]:col-start-2',
@@ -76,7 +76,7 @@ const wrapperComponent = computed(() => props.as === 'card' ? Card : 'div');
             <slot v-if="!$slots.actions" name="label">
                 <Label v-if="label" v-bind="labelProps" class="flex-1" />
             </slot>
-            <Description :text="instructions" v-if="instructions && !instructionsBelow" :class="variant === 'inline' ? '-mt-0.5' : 'mb-1.75 -mt-0.5'" />
+            <Description :text="instructions" v-if="instructions && !instructionsBelow" :class="variant === 'inline' ? '-mt-0.5' : 'mb-2 -mt-0.5'" />
         </div>
         <slot />
         <Description :text="instructions" v-if="instructions && instructionsBelow" class="mt-2" />

@@ -130,7 +130,7 @@
                                     <Dropdown placement="left-start">
                                         <DropdownMenu>
                                             <DropdownItem
-                                                :text="__(canEdit ? 'Edit' : 'View')"
+                                                :text="__(asset.editable ? 'Edit' : 'View')"
                                                 @click="edit(asset.id)"
                                                 icon="edit"
                                             />
@@ -149,7 +149,7 @@
                             </div>
                         </template>
                         <ContextMenu>
-                            <ContextItem icon="edit" :text="__(canEdit ? 'Edit' : 'View')" @click="edit(asset.id)" />
+                            <ContextItem icon="edit" :text="__(asset.editable ? 'Edit' : 'View')" @click="edit(asset.id)" />
                             <ContextSeparator />
                             <ContextItem
                                 v-for="action in actions"

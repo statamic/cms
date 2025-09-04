@@ -9,7 +9,7 @@
 }
 
 .toasted-container {
-    @apply items-start;
+    @apply items-start fixed;
 }
 
 .toasted-container .toasted.statamic {

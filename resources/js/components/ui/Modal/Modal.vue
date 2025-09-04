@@ -3,12 +3,15 @@ import { cva } from 'cva';
 import { hasComponent } from '@/composables/has-component.js';
 import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, DialogTrigger } from 'reka-ui';
 import { computed, getCurrentInstance, ref, watch } from 'vue';
+import { Icon } from '@/components/ui';
 
 const emit = defineEmits(['update:open']);
 
 const props = defineProps({
     title: { type: String, default: '' },
+    icon: { type: [String, null], default: null },
     open: { type: Boolean, default: false },
+    dismissible: { type: Boolean, default: true },
 });
 
 const hasModalTitleComponent = hasComponent('ModalTitle');
@@ -28,7 +31,7 @@ const modalClasses = cva({
 })({});
 
 const instance = getCurrentInstance();
-const isUsingOpenProp = computed(() => instance && instance.vnode.props?.length > 0 && 'open' in instance.vnode.props);
+const isUsingOpenProp = computed(() => instance?.vnode.props?.hasOwnProperty('open'));
 
 const open = ref(props.open);
 
@@ -48,6 +51,10 @@ function updateOpen(value) {
 
     open.value = value;
 }
+
+function preventIfNotDismissible(event) {
+    if (!props.dismissible) event.preventDefault();
+}
 </script>
 
 <template>
@@ -57,10 +64,17 @@ function updateOpen(value) {
         </DialogTrigger>
         <DialogPortal>
             <DialogOverlay class="data-[state=open]:show fixed inset-0 z-30 bg-gray-800/20 backdrop-blur-[2px] dark:bg-gray-800/50" />
-            <DialogContent :class="[modalClasses, $attrs.class]" data-ui-modal-content :aria-describedby="undefined">
+            <DialogContent
+                :class="[modalClasses, $attrs.class]"
+                data-ui-modal-content
+                :aria-describedby="undefined"
+                @pointer-down-outside="preventIfNotDismissible"
+                @escape-key-down="preventIfNotDismissible"
+            >
                 <div class="relative space-y-3 rounded-xl border border-gray-400/60 bg-white p-4 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:border-none dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/15" >
-                    <DialogTitle v-if="!hasModalTitleComponent" data-ui-modal-title class="font-medium">
-                        {{ title }}
+                    <DialogTitle v-if="!hasModalTitleComponent" data-ui-modal-title class="flex items-center gap-2">
+                        <Icon :name="icon" v-if="icon" class="size-4" />
+                        <ui-heading :text="title" size="lg" class="font-medium" />
                     </DialogTitle>
                     <slot />
                 </div>
