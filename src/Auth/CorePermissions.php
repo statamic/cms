@@ -165,14 +165,20 @@ class CorePermissions
         $this->register('configure asset containers');
 
         $this->register('view {container} assets', function ($permission) {
-            $this->permission($permission)->children([
+            $childPermissions = [
                 $this->permission('upload {container} assets'),
                 $this->permission('edit {container} assets')->children([
                     $this->permission('move {container} assets'),
                     $this->permission('rename {container} assets'),
                     $this->permission('delete {container} assets'),
                 ]),
-            ])->replacements('container', function () {
+            ];
+
+            if (config('statamic.assets.v6_permissions')) {
+                $childPermissions[] = $this->permission('edit {container} folders');
+            }
+
+            $this->permission($permission)->children($childPermissions)->replacements('container', function () {
                 return AssetContainer::all()->map(function ($container) {
                     return ['value' => $container->handle(), 'label' => __($container->title())];
                 });
