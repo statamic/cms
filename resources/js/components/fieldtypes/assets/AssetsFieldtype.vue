@@ -390,20 +390,15 @@ export default {
         },
 
         canBrowse() {
-            const hasPermission =
-                this.can('configure asset containers') || this.can('view ' + this.container.handle + ' assets');
-
-            if (!hasPermission) return false;
+            if (!this.container.can_view) return false;
 
             return !this.hasPendingDynamicFolder;
         },
 
         canUpload() {
-            const hasPermission =
-                this.config.allow_uploads &&
-                (this.can('configure asset containers') || this.can('upload ' + this.container.handle + ' assets'));
+            if (!this.config.allow_uploads) return false;
 
-            if (!hasPermission) return false;
+            if (!this.container.can_upload) return false;
 
             return !this.hasPendingDynamicFolder;
         },

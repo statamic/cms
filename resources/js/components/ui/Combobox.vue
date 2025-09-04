@@ -287,7 +287,7 @@ defineExpose({
                             <ComboboxInput
                                 v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"
                                 ref="search"
-                                class="w-full bg-transparent text-gray-900 dark:text-gray-300 opacity-100 focus:outline-none placeholder-gray-500 dark:placeholder-gray-400"
+                                class="w-full bg-transparent text-gray-900 dark:text-gray-300 opacity-100 focus:outline-none placeholder-gray-500 dark:placeholder-gray-400 [&::-webkit-search-cancel-button]:hidden"
                                 type="search"
                                 :id="id"
                                 v-model="searchQuery"
@@ -326,12 +326,13 @@ defineExpose({
                         :class="[
                             'shadow-ui-sm z-100 rounded-lg border border-gray-200 bg-white p-2 dark:border-white/10 dark:bg-gray-800',
                             'max-h-[var(--reka-combobox-content-available-height)] w-[var(--reka-combobox-trigger-width)] min-w-fit',
+                            '[&_[data-reka-combobox-viewport]]:grid [&_[data-reka-combobox-viewport]]:gap-1'
                         ]"
                         @escape-key-down="nextTick(() => $refs.trigger.$el.focus())"
                         data-ui-combobox-content
                     >
                         <ComboboxViewport>
-                            <ComboboxEmpty class="py-2 text-sm" data-ui-combobox-empty>
+                            <ComboboxEmpty class="p-2 text-sm" data-ui-combobox-empty>
                                 <slot name="no-options" v-bind="{ searchQuery }">
                                     {{ __('No options available.') }}
                                 </slot>

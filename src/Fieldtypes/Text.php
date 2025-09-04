@@ -115,7 +115,7 @@ class Text extends Fieldtype
                         'display' => __('Placeholder'),
                         'instructions' => __('statamic::fieldtypes.text.config.placeholder'),
                         'type' => 'text',
-                        'width' => '50',
+                        'width' => '100',
                     ],
                     'prepend' => [
                         'display' => __('Prepend'),

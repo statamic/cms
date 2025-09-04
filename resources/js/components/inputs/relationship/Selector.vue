@@ -35,7 +35,7 @@
                     <Panel class="relative mb-0! overflow-x-auto overscroll-x-contain">
                         <Table>
                             <template #cell-title="{ row: entry, isColumnVisible }">
-                                <a class="title-index-field" :href="entry.edit_url" @click.stop>
+                                <a class="title-index-field" :href="entry.edit_url" @click.prevent="toggleSelection(entry.id)">
                                     <StatusIndicator v-if="!isColumnVisible('status')" :status="entry.status" />
                                     <span v-text="entry.title" />
                                 </a>
@@ -71,7 +71,7 @@
                             :site="site"
                             :preferences-prefix="`selector-field.${name}`"
                             :editable="false"
-                            @branch-clicked="$refs[`tree-branch-${$event.id}`].click()"
+                            @branch-clicked="toggleSelection($event.id)"
                         >
                             <template #branch-action="{ branch, index }">
                                 <div>

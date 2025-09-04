@@ -4,6 +4,7 @@ namespace Statamic\Http\Resources\CP\Assets;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Statamic\Facades\Action;
+use Statamic\Facades\User;
 use Statamic\Support\Str;
 
 class FolderAsset extends JsonResource
@@ -37,6 +38,7 @@ class FolderAsset extends JsonResource
             'url' => $this->absoluteUrl(),
             'size_formatted' => Str::fileSizeForHumans($this->size(), 0),
             'last_modified_relative' => $this->lastModified()->diffForHumans(),
+            'editable' => User::current()->can('edit', $this->resource),
 
             $this->merge($this->values()),
 

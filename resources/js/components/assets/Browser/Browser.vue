@@ -158,7 +158,6 @@
         <AssetEditor
             v-if="showAssetEditor"
             :id="editedAssetId"
-            :read-only="!canEdit"
             @previous="editPreviousAsset"
             @next="editNextAsset"
             @closed="closeAssetEditor"
@@ -297,24 +296,11 @@ export default {
         },
 
         canCreateFolders() {
-            return (
-                this.folder &&
-                this.container.create_folders &&
-                !this.restrictFolderNavigation &&
-                (this.can('upload ' + this.container.id + ' assets') || this.can('configure asset containers'))
-            );
-        },
-
-        canEdit() {
-            return this.can('edit ' + this.container.id + ' assets') || this.can('configure asset containers');
+            return this.folder && this.container.can_create_folders && !this.restrictFolderNavigation;
         },
 
         canUpload() {
-            return (
-                this.folder &&
-                this.container.allow_uploads &&
-                (this.can('upload ' + this.container.id + ' assets') || this.can('configure asset containers'))
-            );
+            return this.folder && this.container.can_upload;
         },
 
         containerIsEmpty() {
@@ -371,7 +357,6 @@ export default {
         sharedAssetProps() {
             return {
                 actionUrl: this.actionUrl,
-                canEdit: this.canEdit,
                 containerIsEmpty: this.containerIsEmpty,
                 folder: this.folder,
                 folderActionUrl: this.folderActionUrl,
@@ -688,7 +673,7 @@ export default {
 
         addToCommandPalette() {
             Statamic.$commandPalette.add({
-                when: () => this.canCreateContainers,
+                when: () => this.canUpload,
                 category: Statamic.$commandPalette.category.Actions,
                 text: __('Upload'),
                 icon: 'upload',
@@ -697,7 +682,7 @@ export default {
             });
 
             Statamic.$commandPalette.add({
-                when: () => this.canCreateContainers,
+                when: () => this.canCreateFolders,
                 category: Statamic.$commandPalette.category.Actions,
                 text: __('Create Folder'),
                 icon: 'folder-add',

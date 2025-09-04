@@ -83,7 +83,7 @@ function formatDate(value) {
                             <template #cell-date="{ row: entry, isColumnVisible }">
                                 <div
                                     class="text-end font-mono text-xs whitespace-nowrap text-gray-500 antialiased px-2"
-                                    v-html="formatDate(entry.datestamp)"
+                                    v-html="formatDate(entry.date.date)"
                                     v-if="isColumnVisible('date')"
                                 />
                             </template>
