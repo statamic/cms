@@ -144,7 +144,7 @@ class NestedFieldsTest extends TestCase
                     'localizable' => false,
                 ],
                 'fieldtype' => 'text',
-                'icon' => 'text',
+                'icon' => 'fieldtype-text',
                 '_id' => 0,
             ],
             [
@@ -159,7 +159,7 @@ class NestedFieldsTest extends TestCase
                 ],
                 'config_overrides' => ['width', 'display'],
                 'fieldtype' => 'text',
-                'icon' => 'text',
+                'icon' => 'fieldtype-text',
                 '_id' => 1,
             ],
             [
