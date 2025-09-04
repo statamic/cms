@@ -92,7 +92,7 @@
 </template>
 
 <script>
-import { NodeViewWrapper } from '@tiptap/vue-3';
+import { NodeViewWrapper, nodeViewProps } from '@tiptap/vue-3';
 import ManagesPreviewText from '../replicator/ManagesPreviewText';
 import HasFieldActions from '../../field-actions/HasFieldActions.js';
 import { Badge, Button, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, Icon, Subheading, Switch, Tooltip } from '@/components/ui';
@@ -102,16 +102,7 @@ import Fields from '@/components/ui/Publish/Fields.vue';
 import { containerContextKey } from '@/components/ui/Publish/Container.vue';
 
 export default {
-    props: {
-        editor: { type: Object, required: true },
-        node: { type: Object, required: true },
-        decorations: { type: Array, required: true },
-        selected: { type: Boolean, required: true },
-        extension: { type: Object, required: true },
-        getPos: { type: Function, required: true },
-        updateAttributes: { type: Function, required: true },
-        deleteNode: { type: Function, required: true },
-    },
+    props: nodeViewProps,
 
     components: {
         Button,
