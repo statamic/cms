@@ -61,11 +61,9 @@ function toggleSection(id) {
                     :class="section.collapsed ? 'rotate-270' : 'rotate-0'"
                 />
             </PanelHeader>
-            <Motion
-                :class="{ 'overflow-hidden': section.collapsed }"
-                :initial="{ height: section.collapsed ? '0px' : 'auto' }"
-                :animate="{ height: section.collapsed ? '0px' : 'auto' }"
-                :transition="{ duration: 0.25, type: 'tween' }"
+            <div
+                class="h-auto overflow-clip visible transition-[height,visibility] duration-[250ms,2s]"
+                :class="{ 'h-0! visibility-hidden': section.collapsed }"
             >
                 <div class="p-px">
                     <Primitive :as="asConfig ? 'div' : Card">
@@ -76,7 +74,7 @@ function toggleSection(id) {
                         </FieldsProvider>
                     </Primitive>
                 </div>
-            </Motion>
+            </div>
         </Panel>
     </div>
 </template>
