@@ -70,11 +70,11 @@ class AuthenticationTest extends TestCase
         Facades\Config::set('statamic.api.auth_token', null);
 
         $this
-            ->getJson('/api/collections/articles/entries')
+            ->getJson($url = '/api/collections/articles/entries')
             ->assertOk();
 
         $this
-            ->get('/api/collections/articles/entries')
+            ->get($url)
             ->assertOk();
     }
 }
