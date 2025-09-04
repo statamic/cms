@@ -1,5 +1,78 @@
 # Release Notes
 
+## 6.0.0-alpha.5 (2025-09-04)
+
+### What's new
+- REST API Authentication [#12051](https://github.com/statamic/cms/issues/12051) by @duncanmcclean
+- Bard adjustments [#12240](https://github.com/statamic/cms/issues/12240) by @jasonvarga
+- Make `container` available in custom field conditions [#12277](https://github.com/statamic/cms/issues/12277) by @duncanmcclean
+- Updated asset and folder permissions [#12281](https://github.com/statamic/cms/issues/12281) by @jasonvarga
+- Addon setting helper [#12244](https://github.com/statamic/cms/issues/12244) by @edalzell
+- Themeable global header [#12214](https://github.com/statamic/cms/issues/12214) by @jackmcdade
+- Redesign trial mode banner [#12239](https://github.com/statamic/cms/issues/12239) by @jackmcdade
+- Fleshing out command palette actions [#12140](https://github.com/statamic/cms/issues/12140) by @jesseleite
+
+### What's fixed
+
+- Replicator - change the set picker to be in the center when in between blocks, but left when under the "Add Block" button [4de68783d](https://github.com/statamic/cms/commit/4de68783d) by @JayGeorge
+- Respect configured sort column & direction on collection index [#12234](https://github.com/statamic/cms/issues/12234) by @duncanmcclean
+- Table fixes for Safari and Firefox [#12233](https://github.com/statamic/cms/issues/12233) by @JayGeorge
+- Third-party fieldtypes should be able to use first-party icons [#12291](https://github.com/statamic/cms/issues/12291) by @duncanmcclean
+- German translations [#12252](https://github.com/statamic/cms/issues/12252) by @helloDanuk
+- Add `cursor-pointer` to replicator set headers & set picker [#12236](https://github.com/statamic/cms/issues/12236) by @duncanmcclean
+- Prepend append consistency [#12272](https://github.com/statamic/cms/issues/12272) by @JayGeorge
+- Fix errors from BardFieldtype when closing Live Preview [#12275](https://github.com/statamic/cms/issues/12275) by @duncanmcclean
+- Replicator legibility improvements [#12278](https://github.com/statamic/cms/issues/12278) by @JayGeorge
+- Combobox item separation [#12292](https://github.com/statamic/cms/issues/12292) by @JayGeorge
+- Make collapsable sections buttery smooth [#12285](https://github.com/statamic/cms/issues/12285) by @JayGeorge
+- Combobox - add a bit of horizontal padding, based on when they say "no options currently" available [eca16ffca](https://github.com/statamic/cms/commit/eca16ffca) by @JayGeorge
+- Only render publish section headers when display is set or collapsible is enabled [#12274](https://github.com/statamic/cms/issues/12274) by @JayGeorge
+- Add display text to fallback blueprint section [#12280](https://github.com/statamic/cms/issues/12280) by @jasonvarga
+- Fix field filter combobox [#12273](https://github.com/statamic/cms/issues/12273) by @duncanmcclean
+- Combobox hover contrast [#12287](https://github.com/statamic/cms/issues/12287) by @JayGeorge
+- Bard - fix background and border-radius, including for dark mode [cfe217464](https://github.com/statamic/cms/commit/cfe217464) by @JayGeorge
+- Cache flattened permissions [#12258](https://github.com/statamic/cms/issues/12258) by @duncanmcclean
+- Hide search cancel button in combobox input [#12224](https://github.com/statamic/cms/issues/12224) by @duncanmcclean
+- Fix the toast notification position from sometimes breaking [#12271](https://github.com/statamic/cms/issues/12271) by @JayGeorge
+- Add a chevron to collapsible sections [#12260](https://github.com/statamic/cms/issues/12260) by @duncanmcclean
+- Login custom logo width [#12262](https://github.com/statamic/cms/issues/12262) by @JayGeorge
+- Avoid saving theme preference when unauthenticated [#12264](https://github.com/statamic/cms/issues/12264) by @duncanmcclean
+- Prevent Live Preview panels from blending into the background [#12269](https://github.com/statamic/cms/issues/12269) by @JayGeorge
+- Fix focal point editor [#12259](https://github.com/statamic/cms/issues/12259) by @duncanmcclean
+- Tweak distance between field instructions and fields an itsy bitsy amount [9ff62636e](https://github.com/statamic/cms/commit/9ff62636e) by @JayGeorge
+- Relationship selector tweaks [#12265](https://github.com/statamic/cms/issues/12265) by @duncanmcclean
+- Fix border color in dark mode empty states [#12266](https://github.com/statamic/cms/issues/12266) by @duncanmcclean
+- Fix listing translations [#12263](https://github.com/statamic/cms/issues/12263) by @duncanmcclean
+- Fix date column in collection widget [#12267](https://github.com/statamic/cms/issues/12267) by @duncanmcclean
+- Field type / text - change the way append/prepend are laid out so they're next to each other [4280afc1b](https://github.com/statamic/cms/commit/4280afc1b) by @duncanmcclean
+- More UI tweaks [#12248](https://github.com/statamic/cms/issues/12248) by @jackmcdade
+- Fix timezone modifier altering original value [#12218](https://github.com/statamic/cms/issues/12218) by @marcorieser
+- Grid field type - remove text-gray class because it was affecting things like link buttons, making the button text light [a0874c72d](https://github.com/statamic/cms/commit/a0874c72d) by @JayGeorge
+- Grid field type - fix some alignment issues [aaeb4020c](https://github.com/statamic/cms/commit/aaeb4020c) by @JayGeorge
+- Grid field type - tidy CSS more [b4cffe8fd](https://github.com/statamic/cms/commit/b4cffe8fd) by @JayGeorge
+- Add `resources/dist-package` to `.gitignore` [#12246](https://github.com/statamic/cms/issues/12246) by @duncanmcclean
+- Grid field -- a couple of dark mode adjustments [824916a71](https://github.com/statamic/cms/commit/824916a71) by @JayGeorge
+- Radio field - improve border legibility [16df2bb5f](https://github.com/statamic/cms/commit/16df2bb5f) by @JayGeorge
+- Dictionary field - improve text legibility [842848f93](https://github.com/statamic/cms/commit/842848f93) by @JayGeorge
+- Checkboxes - improve border legibility [6d2320e32](https://github.com/statamic/cms/commit/6d2320e32) by @JayGeorge
+- Grid field -- improve legibility [ee23bb6e4](https://github.com/statamic/cms/commit/ee23bb6e4) by @JayGeorge
+- Remove some container focus states [51b90435f](https://github.com/statamic/cms/commit/51b90435f) by @JayGeorge
+- Add fluid publish fields to the top of the Edit Blueprint screen to help layout [a07251738](https://github.com/statamic/cms/commit/a07251738) by @JayGeorge
+- Add a modifier class to fluid publish fields that prevents the fields from being fluid on smaller screens to help legibility [c04551e11](https://github.com/statamic/cms/commit/c04551e11) by @JayGeorge
+- Minor tweak to UI accent color for code comments to make them more legible [3b7998674](https://github.com/statamic/cms/commit/3b7998674) by @JayGeorge
+- Improve `code` presentation for field configuration [1e7ebce33](https://github.com/statamic/cms/commit/1e7ebce33) by @JayGeorge
+- Improve code presentation for validation rule lists [4068d526c](https://github.com/statamic/cms/commit/4068d526c) by @JayGeorge
+- Remove unnecessary margin from globals publish form [#12235](https://github.com/statamic/cms/issues/12235) by @duncanmcclean
+- Date Fieldtype: Prevent dashed border showing in non-read-only state [#12237](https://github.com/statamic/cms/issues/12237) by @duncanmcclean
+- Add `:dismissible="false"` to other modal in `SessionExpiry.vue` [#12231](https://github.com/statamic/cms/issues/12231) by @duncanmcclean
+- Add/manipulate the UI accent color for code comments [9daa324bb](https://github.com/statamic/cms/commit/9daa324bb) by @JayGeorge
+- Prevent session expiry modal from being dismissed [#12223](https://github.com/statamic/cms/issues/12223) by @duncanmcclean
+- Clearer WCAG 2.2 Messaging [#12225](https://github.com/statamic/cms/issues/12225) by @
+- Improve the gap between text and toggles so that long text (e.g. instructions) don't get too close to the toggle [deea7660e](https://github.com/statamic/cms/commit/deea7660e) by @JayGeorge
+- Tweak the switch color values a shade so they're less intense [f89cbd0c0](https://github.com/statamic/cms/commit/f89cbd0c0) by @JayGeorge
+
+
+
 ## 6.0.0-alpha.4 (2025-08-28)
 
 ### What's new
