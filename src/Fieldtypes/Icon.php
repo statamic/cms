@@ -12,7 +12,7 @@ use Statamic\Support\Str;
 class Icon extends Fieldtype
 {
     protected $categories = ['media'];
-    protected $icon = 'icon_picker';
+    protected $icon = 'fieldtype-icon_picker';
 
     protected static $customSvgIcons = [];
 
