@@ -206,6 +206,8 @@ class Assets extends Fieldtype
                 'edit_url' => $container->editUrl(),
                 'delete_url' => $container->deleteUrl(),
                 'blueprint_url' => cp_route('blueprints.asset-containers.edit', $container->handle()),
+                'can_view' => User::current()->can('view', $container),
+                'can_upload' => User::current()->can('store', [\Statamic\Contracts\Assets\Asset::class, $container]),
                 'can_edit' => User::current()->can('edit', $container),
                 'can_delete' => User::current()->can('delete', $container),
                 'sort_field' => $container->sortField(),

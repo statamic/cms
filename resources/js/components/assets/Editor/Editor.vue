@@ -115,6 +115,7 @@
                     <PublishContainer
                         v-if="fields"
                         ref="container"
+                        :read-only="readOnly"
                         :name="publishContainer"
                         :reference="id"
                         :blueprint="fieldset"
@@ -195,9 +196,6 @@ export default {
         id: {
             required: true,
         },
-        readOnly: {
-            type: Boolean,
-        },
         showToolbar: {
             type: Boolean,
             default: true,
@@ -230,6 +228,10 @@ export default {
     },
 
     computed: {
+        readOnly() {
+            return !this.asset.isEditable;
+        },
+
         isImage() {
             if (!this.asset) return false;
 

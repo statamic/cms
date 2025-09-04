@@ -158,7 +158,6 @@
         <AssetEditor
             v-if="showAssetEditor"
             :id="editedAssetId"
-            :read-only="!canEdit"
             @previous="editPreviousAsset"
             @next="editNextAsset"
             @closed="closeAssetEditor"
@@ -300,10 +299,6 @@ export default {
             return this.folder && this.container.can_create_folders && !this.restrictFolderNavigation;
         },
 
-        canEdit() {
-            return this.can('edit ' + this.container.id + ' assets') || this.can('configure asset containers');
-        },
-
         canUpload() {
             return this.folder && this.container.can_upload;
         },
@@ -362,7 +357,6 @@ export default {
         sharedAssetProps() {
             return {
                 actionUrl: this.actionUrl,
-                canEdit: this.canEdit,
                 containerIsEmpty: this.containerIsEmpty,
                 folder: this.folder,
                 folderActionUrl: this.folderActionUrl,
