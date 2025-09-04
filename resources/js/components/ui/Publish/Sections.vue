@@ -22,7 +22,8 @@ const visibleSections = computed(() => {
                 visibleValues.value,
                 revealerValues.value,
                 hiddenFields.value,
-                setHiddenField
+                setHiddenField,
+                { container }
             ).showField(field, field.handle);
         });
     });
