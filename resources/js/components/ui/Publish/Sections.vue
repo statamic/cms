@@ -62,6 +62,7 @@ function toggleSection(id) {
                 />
             </PanelHeader>
             <div
+                style="--tw-ease: ease;"
                 class="h-auto overflow-clip visible transition-[height,visibility] duration-[250ms,2s]"
                 :class="{ 'h-0! visibility-hidden': section.collapsed }"
             >
