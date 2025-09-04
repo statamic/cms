@@ -172,6 +172,17 @@ class NoCacheSessionTest extends TestCase
     }
 
     #[Test]
+    public function it_normalizes_query_string()
+    {
+        $this->get('/test?utm_source=linkedin.com&utm_medium=referral&utm_campaign=foo');
+
+        $session = $this->app->make(Session::class);
+
+        $this->assertInstanceOf(Session::class, $session);
+        $this->assertEquals('http://localhost/test?utm_campaign=foo&utm_medium=referral&utm_source=linkedin.com', $session->url());
+    }
+
+    #[Test]
     public function it_writes_session_if_a_nocache_tag_is_used()
     {
         $this->withStandardFakeViews();
