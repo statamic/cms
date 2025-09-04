@@ -18,11 +18,10 @@ class Icon extends Fieldtype
 
     public function preload(): array
     {
-        [$path, $directory, $hasConfiguredDirectory] = $this->resolveParts();
+        [$path, $directory] = $this->resolveParts();
 
         return [
             'url' => cp_route('icon-fieldtype'),
-            'native' => ! $hasConfiguredDirectory,
             'directory' => $directory,
         ];
     }
