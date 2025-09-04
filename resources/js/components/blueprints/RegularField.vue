@@ -6,7 +6,7 @@
                 <div class="flex flex-1 items-center py-2">
                     <ui-icon
                         class="size-4 me-2 text-gray-500"
-                        :name="field.icon.startsWith('<svg') ? field.icon : `fieldtype-${field.icon}`"
+                        :name="field.icon"
                         v-tooltip="tooltipText"
                     />
                     <div class="flex items-center gap-2">
