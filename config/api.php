@@ -39,7 +39,7 @@ return [
     |
     */
 
-    'auth_token' => env('STATAMIC_API_TOKEN', null),
+    'auth_token' => env('STATAMIC_API_TOKEN'),
 
     /*
     |--------------------------------------------------------------------------
