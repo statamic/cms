@@ -107,7 +107,7 @@
                 </div>
             </template>
             <template #prepended-row-actions="{ row: asset }">
-                <DropdownItem :text="__(canEdit ? 'Edit' : 'View')" @click="edit(asset.id)" icon="edit" />
+                <DropdownItem :text="__(asset.editable ? 'Edit' : 'View')" @click="edit(asset.id)" icon="edit" />
             </template>
         </ListingTable>
     </Card>

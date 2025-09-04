@@ -1,7 +1,16 @@
 <template>
     <div class="max-w-5xl mx-auto">
         <Header :title="__(initialTitle) || __('Create Role')" icon="permissions">
-            <Button type="submit" variant="primary" @click="save" :text="__('Save')" />
+            <ui-command-palette-item
+                :category="$commandPalette.category.Actions"
+                :text="__('Save')"
+                icon="save"
+                :action="save"
+                prioritize
+                v-slot="{ text, action }"
+            >
+                <Button type="submit" variant="primary" @click="action" :text="text" />
+            </ui-command-palette-item>
         </Header>
 
         <Panel>

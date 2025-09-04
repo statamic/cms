@@ -11,6 +11,7 @@ class Permissions
     protected $groups = [];
     protected $pendingGroup = null;
     protected $booted = false;
+    private $flattened;
 
     public function boot()
     {
@@ -136,6 +137,6 @@ class Permissions
 
     public function flattened()
     {
-        return collect($this->permissions)->flatMap->flattened();
+        return $this->flattened ??= collect($this->permissions)->flatMap->flattened();
     }
 }

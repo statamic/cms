@@ -287,7 +287,7 @@ defineExpose({
                             <ComboboxInput
                                 v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"
                                 ref="search"
-                                class="w-full bg-transparent text-gray-700 dark:text-gray-400 opacity-100 focus:outline-none placeholder-gray-400 dark:placeholder-gray-500"
+                                class="w-full bg-transparent text-gray-900 dark:text-gray-300 opacity-100 focus:outline-none placeholder-gray-500 dark:placeholder-gray-400 [&::-webkit-search-cancel-button]:hidden"
                                 type="search"
                                 :id="id"
                                 v-model="searchQuery"
@@ -331,7 +331,7 @@ defineExpose({
                         data-ui-combobox-content
                     >
                         <ComboboxViewport>
-                            <ComboboxEmpty class="py-2 text-sm" data-ui-combobox-empty>
+                            <ComboboxEmpty class="p-2 text-sm" data-ui-combobox-empty>
                                 <slot name="no-options" v-bind="{ searchQuery }">
                                     {{ __('No options available.') }}
                                 </slot>
