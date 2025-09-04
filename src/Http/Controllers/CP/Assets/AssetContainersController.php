@@ -3,13 +3,10 @@
 namespace Statamic\Http\Controllers\CP\Assets;
 
 use Illuminate\Http\Request;
-use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
-use Statamic\Contracts\Assets\AssetFolder;
 use Statamic\CP\PublishForm;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
-use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Rules\Handle;
 
@@ -20,27 +17,6 @@ class AssetContainersController extends CpController
         return redirect()->cpRoute('assets.browse.show', $container->handle());
     }
 
-    public function index(Request $request)
-    {
-        $containers = AssetContainer::all()->sortBy->title()->filter(function ($container) {
-            return User::current()->can('view', $container);
-        })->map(function ($container) {
-            return [
-                'id' => $container->handle(),
-                'title' => $container->title(),
-                'allow_uploads' => User::current()->can('store', [Asset::class, $container]),
-                'create_folders' => User::current()->can('create', [AssetFolder::class, $container]),
-                'edit_url' => $container->editUrl(),
-                'delete_url' => $container->deleteUrl(),
-                'blueprint_url' => cp_route('blueprints.asset-containers.edit', $container->handle()),
-                'can_edit' => User::current()->can('edit', $container),
-                'can_delete' => User::current()->can('delete', $container),
-            ];
-        })->values();
-
-        return $containers;
-    }
-
     public function edit($container)
     {
         $this->authorize('edit', $container, 'You are not authorized to edit asset containers.');
@@ -49,11 +25,6 @@ class AssetContainersController extends CpController
             'title' => $container->title(),
             'handle' => $container->handle(),
             'disk' => $container->diskHandle(),
-            'allow_uploads' => $container->allowUploads(),
-            'allow_downloading' => $container->allowDownloading(),
-            'allow_renaming' => $container->allowRenaming(),
-            'allow_moving' => $container->allowMoving(),
-            'create_folders' => $container->createFolders(),
             'source_preset' => $container->sourcePreset(),
             'warm_intelligent' => $intelligent = $container->warmsPresetsIntelligently(),
             'warm_presets' => $intelligent ? [] : $container->warmPresets(),
@@ -80,11 +51,6 @@ class AssetContainersController extends CpController
         $container
             ->title($values['title'])
             ->disk($values['disk'])
-            ->allowDownloading($values['allow_downloading'])
-            ->allowRenaming($values['allow_renaming'])
-            ->allowMoving($values['allow_moving'])
-            ->allowUploads($values['allow_uploads'])
-            ->createFolders($values['create_folders'])
             ->sourcePreset($values['source_preset'])
             ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets'])
             ->validationRules($values['validation'] ?? null);
@@ -124,8 +90,6 @@ class AssetContainersController extends CpController
         $container = AssetContainer::make($values['handle'])
             ->title($values['title'])
             ->disk($values['disk'])
-            ->allowUploads($values['allow_uploads'])
-            ->createFolders($values['create_folders'])
             ->sourcePreset($values['source_preset'])
             ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets']);
 
@@ -218,36 +182,6 @@ class AssetContainersController extends CpController
             'settings' => [
                 'display' => __('Settings'),
                 'fields' => [
-                    'allow_uploads' => [
-                        'type' => 'toggle',
-                        'display' => __('Allow Uploads'),
-                        'instructions' => __('statamic::messages.asset_container_allow_uploads_instructions'),
-                        'default' => true,
-                    ],
-                    'create_folders' => [
-                        'type' => 'toggle',
-                        'display' => __('Create Folders'),
-                        'instructions' => __('statamic::messages.asset_container_create_folder_instructions'),
-                        'default' => true,
-                    ],
-                    'allow_renaming' => [
-                        'type' => 'toggle',
-                        'display' => __('Allow Renaming'),
-                        'instructions' => __('statamic::messages.asset_container_rename_instructions'),
-                        'default' => true,
-                    ],
-                    'allow_moving' => [
-                        'type' => 'toggle',
-                        'display' => __('Allow Moving'),
-                        'instructions' => __('statamic::messages.asset_container_move_instructions'),
-                        'default' => true,
-                    ],
-                    'allow_downloading' => [
-                        'type' => 'toggle',
-                        'display' => __('Allow Downloading'),
-                        'instructions' => __('statamic::messages.asset_container_quick_download_instructions'),
-                        'default' => true,
-                    ],
                     'validation' => [
                         'type' => 'taggable',
                         'display' => __('Validation Rules'),
