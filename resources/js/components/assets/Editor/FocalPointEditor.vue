@@ -37,7 +37,7 @@
                 </div>
                 <div class="px-4">
                     <input type="range" v-model="z" min="1" max="10" step="0.1" class="mb-4 w-full" />
-                    <div class="mb-4 flex flex-wrap items-center justify-center space-x-2">
+                    <div class="mb-4 flex flex-wrap items-center justify-center gap-2">
                         <Button :text="__('Cancel')" @click="close" />
                         <Button :text="__('Reset')" @click="reset" />
                         <Button variant="primary" :text="__('Finish')" @click="select" />
