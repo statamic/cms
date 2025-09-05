@@ -1,0 +1,44 @@
+{
+  "name": "@statamic/ui",
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Standalone UI components from Statamic CMS",
+  "keywords": ["statamic", "ui", "vue", "components", "tailwind"],
+  "homepage": "https://statamic.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/statamic/cms.git",
+    "directory": "resources/js/ui-package"
+  },
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./style.css": "./dist/ui.css",
+    "./ui-source.css": "./ui-source.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "peerDependencies": {
+    "vue": "^3.4.0",
+    "tailwindcss": "^4.0.0"
+  },
+  "dependencies": {
+    "cva": "^1.0.0-beta.3",
+    "tailwind-merge": "^3.0.2"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.0",
+    "typescript": "^5.9.2",
+    "vite": "^7.0.4",
+    "vue-tsc": "^3.0.5"
+  },
+  "scripts": {
+    "build": "vite build && vue-tsc --declaration --emitDeclarationOnly",
+    "dev": "vite build --watch",
+    "clean": "rm -rf dist"
+  }
+}
