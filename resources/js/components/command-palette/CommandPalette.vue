@@ -328,11 +328,11 @@ const modalClasses = cva({
                                 <div class="flex items-center gap-1.5">
                                     <Icon name="up-square" class="size-4 text-gray-500" />
                                     <Icon name="down-square" class="size-4 text-gray-500" />
-                                    <span class="text-sm text-gray-600 dark:text-gray-500">Navigate</span>
+                                    <span class="text-sm text-gray-600 dark:text-gray-500">{{ __('Navigate') }}</span>
                                 </div>
                                 <div class="flex items-center gap-1.5">
                                     <Icon name="return-square" class="size-4 text-gray-500" />
-                                    <span class="text-sm text-gray-600 dark:text-gray-500">Select</span>
+                                    <span class="text-sm text-gray-600 dark:text-gray-500">{{ __('Select') }}</span>
                                 </div>
                             </footer>
                         </ComboboxContent>
