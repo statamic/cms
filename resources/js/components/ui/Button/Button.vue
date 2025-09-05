@@ -47,6 +47,13 @@ const buttonClasses = computed(() => {
                 sm: 'px-3 h-8 text-[0.8125rem] leading-tight gap-2 rounded-lg [&_svg]:size-3',
                 xs: 'px-2 h-6 text-xs gap-1.5 rounded-md [&_svg]:size-2.5',
             },
+            groupBorder: {
+                // Danger button base styling should be the same as default buttons when in a group
+                danger: [
+                    'btn-danger bg-linear-to-b from-white to-gray-50 hover:to-gray-100 hover:bg-gray-50 text-gray-900 border border-gray-300 shadow-ui-sm',
+                    'dark:from-gray-850 dark:to-gray-900 dark:hover:to-gray-850 dark:hover:bg-gray-900 dark:border-gray-700 dark:text-gray-300 dark:shadow-ui-md',
+                ],
+            },
             iconOnly: { true: 'px-0 gap-0' },
             round: { true: 'rounded-full' },
         },
