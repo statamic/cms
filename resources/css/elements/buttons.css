@@ -6,7 +6,6 @@
         [data-ui-group-target] {
             /* Only the first child gets a left border */
             &:not(:first-child) {
-                /* border-inline-start: 1px solid currentColor; */
                 border-inline-start: 0;
             }
 
