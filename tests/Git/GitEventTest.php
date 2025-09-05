@@ -442,6 +442,7 @@ class GitEventTest extends TestCase
 
         $file = Mockery::mock(ReplacementFile::class);
         $file->shouldReceive('extension')->andReturn('txt');
+        $file->shouldReceive('basename')->andReturn('file.txt');
         $file->shouldReceive('writeTo');
 
         $this->makeAsset()->reupload($file);
