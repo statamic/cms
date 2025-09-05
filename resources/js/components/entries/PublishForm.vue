@@ -276,12 +276,12 @@ import {
     Subheading,
     Switch,
     Select,
-} from '@/components/ui';
-import PublishContainer from '@ui/Publish/Container.vue';
-import PublishTabs from '@ui/Publish/Tabs.vue';
-import PublishComponents from '@ui/Publish/Components.vue';
-import LocalizationsCard from '@ui/Publish/Localizations.vue';
-import LivePreview from '@ui/LivePreview/LivePreview.vue';
+    PublishContainer,
+    PublishTabs,
+    PublishComponents,
+    PublishLocalizations as LocalizationsCard,
+    LivePreview,
+} from '@ui';
 import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
 import { computed, ref } from 'vue';
 import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';

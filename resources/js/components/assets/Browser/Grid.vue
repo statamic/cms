@@ -171,18 +171,20 @@
 <script>
 import AssetBrowserMixin from './AssetBrowserMixin';
 import Breadcrumbs from './Breadcrumbs.vue';
-import Context from '@ui/Context/Context.vue';
-import ContextMenu from '@ui/Context/Menu.vue';
-import ContextItem from '@ui/Context/Item.vue';
-import ContextLabel from '@ui/Context/Label.vue';
-import ContextSeparator from '@ui/Context/Separator.vue';
-import Editable from '@ui/Editable.vue';
-import Dropdown from '@ui/Dropdown/Dropdown.vue';
-import DropdownMenu from '@ui/Dropdown/Menu.vue';
-import DropdownLabel from '@ui/Dropdown/Label.vue';
-import DropdownItem from '@ui/Dropdown/Item.vue';
-import DropdownSeparator from '@ui/Dropdown/Separator.vue';
-import { injectListingContext } from '@ui/Listing/Listing.vue';
+import {
+    Context,
+    ContextMenu,
+    ContextItem,
+    ContextLabel,
+    ContextSeparator,
+    Editable,
+    Dropdown,
+    DropdownMenu,
+    DropdownLabel,
+    DropdownItem,
+    DropdownSeparator
+} from '@ui';
+import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
 import ItemActions from '@/components/actions/ItemActions.vue';
 
 export default {

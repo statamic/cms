@@ -1,9 +1,0 @@
-export { default as Badge } from "@ui/Badge.vue";
-export { default as Button } from "@ui/Button/Button.vue";
-export { default as Card } from "@ui/Card/Card.vue";
-export { default as Heading } from "@ui/Heading.vue";
-export { default as Icon } from "@ui/Icon.vue";
-export { default as Input } from "@ui/Input/Input.vue";
-export { default as Label } from "@ui/Label.vue";
-export { default as Modal } from "@ui/Modal/Modal.vue";
-export { default as Separator } from "@ui/Separator.vue";

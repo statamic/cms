@@ -11,7 +11,7 @@ export default defineConfig({
     ],
     build: {
         lib: {
-            entry: path.resolve(__dirname, 'index.js'),
+            entry: path.resolve(__dirname, 'src/index.js'),
             name: 'StatamicUI',
             formats: ['es'],
             fileName: () => 'index.js'
@@ -34,8 +34,8 @@ export default defineConfig({
     resolve: {
         alias: {
             // Resolve the @ alias used in the UI components to the correct path
-            '@': path.resolve(__dirname, '../../'),
-            '@ui': path.resolve(__dirname, '../../components/ui')
+            '@': path.resolve(__dirname, '../..'),
+            '@ui': path.resolve(__dirname, './src'),
         }
     },
     css: {

@@ -1,8 +1,10 @@
 <script setup>
-import Button from '@ui/Button/Button.vue';
-import PublishContainer from '@ui/Publish/Container.vue';
-import PublishField from '@ui/Publish/Field.vue';
-import PublishFieldsProvider from '@ui/Publish/FieldsProvider.vue';
+import {
+    Button,
+    PublishContainer,
+    PublishField,
+} from '@ui';
+import PublishFieldsProvider from '../Publish/FieldsProvider.vue';
 import { ref, nextTick } from 'vue';
 
 const emit = defineEmits(['update:values', 'removed', 'enter-pressed']);

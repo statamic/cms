@@ -69,10 +69,7 @@
 <script>
 import SiteSelector from '../SiteSelector.vue';
 import clone from '@/util/clone.js';
-import { Button, Dropdown, DropdownItem, DropdownMenu, Header } from '@/components/ui';
-import PublishContainer from '@ui/Publish/Container.vue';
-import PublishTabs from '@ui/Publish/Tabs.vue';
-import PublishComponents from '@ui/Publish/Components.vue';
+import { Button, Dropdown, DropdownItem, DropdownMenu, Header, PublishContainer, PublishTabs, PublishComponents } from '@ui';
 import { computed, ref } from 'vue';
 import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';
 

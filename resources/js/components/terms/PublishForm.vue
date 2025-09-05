@@ -144,15 +144,15 @@ import {
     DropdownMenu,
     DropdownItem,
     DropdownSeparator,
-} from '@/components/ui';
-import PublishContainer from '@ui/Publish/Container.vue';
-import PublishTabs from '@ui/Publish/Tabs.vue';
-import PublishComponents from '@ui/Publish/Components.vue';
-import LivePreview from '@ui/LivePreview/LivePreview.vue';
+    PublishContainer,
+    PublishTabs,
+    PublishComponents,
+    PublishLocalizations as LocalizationsCard,
+    LivePreview,
+} from '@ui';
 import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
 import { ref, computed } from 'vue';
 import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';
-import LocalizationsCard from '@ui/Publish/Localizations.vue';
 import ItemActions from '@/components/actions/ItemActions.vue';
 
 let saving = ref(false);

@@ -118,17 +118,19 @@ import AssetBrowserMixin from './AssetBrowserMixin';
 import AssetThumbnail from './Thumbnail.vue';
 import Breadcrumbs from './Breadcrumbs.vue';
 import ItemActions from '@/components/actions/ItemActions.vue';
-import Card from '@ui/Card/Card.vue';
-import Dropdown from '@ui/Dropdown/Dropdown.vue';
-import DropdownItem from '@ui/Dropdown/Item.vue';
-import DropdownLabel from '@ui/Dropdown/Label.vue';
-import DropdownMenu from '@ui/Dropdown/Menu.vue';
-import DropdownSeparator from '@ui/Dropdown/Separator.vue';
-import Editable from '@ui/Editable.vue';
-import Panel from '@ui/Panel/Panel.vue';
-import PanelFooter from '@ui/Panel/Footer.vue';
-import PanelHeader from '@ui/Panel/Header.vue';
-import ListingTable from '@ui/Listing/Table.vue';
+import {
+    Card,
+    Dropdown,
+    DropdownItem,
+    DropdownLabel,
+    DropdownMenu,
+    DropdownSeparator,
+    Editable,
+    Panel,
+    PanelFooter,
+    PanelHeader,
+    ListingTable,
+} from '@ui';
 
 export default {
     mixins: [AssetBrowserMixin],

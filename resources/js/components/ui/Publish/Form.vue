@@ -1,8 +1,7 @@
 <script setup>
 import Container from './Container.vue';
 import Tabs from './Tabs.vue';
-import Header from '@ui/Header.vue';
-import Button from '@ui/Button/Button.vue';
+import { Header, Button } from '@ui';
 import uniqid from 'uniqid';
 import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
 import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks } from '@ui/Publish/SavePipeline.js';

@@ -13,10 +13,10 @@
   "license": "MIT",
   "exports": {
     ".": {
-      "types": "./dist/ui/index.d.ts",
-      "default": "./dist/ui/index.js"
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
     },
-    "./ui.css": "./ui.css"
+    "./ui.css": "./src/ui.css"
   },
   "files": [
     "dist"

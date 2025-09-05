@@ -18,9 +18,8 @@
 
 <script setup>
 import Fieldtype from '@/components/fieldtypes/fieldtype.js';
-import { Switch, Heading, Button } from '@/components/ui';
+import { Switch, Heading, Button, injectPublishContext as injectContainerContext } from '@ui';
 import { onMounted, onBeforeUnmount, watch, nextTick, computed } from 'vue';
-import { injectContainerContext } from '@ui/Publish/Container.vue';
 
 const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);

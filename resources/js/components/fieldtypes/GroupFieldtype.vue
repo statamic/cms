@@ -28,8 +28,7 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import ManagesPreviewText from './replicator/ManagesPreviewText';
-import Fields from '@ui/Publish/Fields.vue';
-import FieldsProvider from '@ui/Publish/FieldsProvider.vue';
+import { PublishFields as Fields, FieldsProvider } from '@ui';
 
 export default {
     mixins: [Fieldtype, ManagesPreviewText],

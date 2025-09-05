@@ -1,6 +1,5 @@
 <script setup>
-import Icon from '@ui/Icon.vue';
-import Badge from '@ui/Badge.vue';
+import { Icon, Badge } from '@ui';
 
 defineProps({
     localization: {

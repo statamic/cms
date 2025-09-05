@@ -1,7 +1,6 @@
 <script setup>
 import { sortBy } from 'lodash-es';
-import Combobox from '@ui/Combobox.vue';
-import CardPanel from '@ui/Card/Panel.vue';
+import { Combobox, CardPanel } from '@ui';
 import { computed, ref, watch, nextTick, onMounted } from 'vue';
 import FieldFilterRow from './FieldFilterRow.vue';
 
@@ -65,7 +64,7 @@ async function createFilter(newField) {
     filter.values = defaultValues;
 
     rows.value.push(filter);
-    
+
     // Focus on the newly created row's first field
     await nextTick();
     const newRowRef = rowRefs.value[filter.handle];

@@ -36,6 +36,7 @@ export default defineConfig(({ mode, command }) => {
                 vue: 'vue/dist/vue.esm-bundler.js',
                 '@': path.resolve(__dirname, 'resources/js'),
                 '@ui': path.resolve(__dirname, 'resources/js/components/ui'),
+                '@statamic/ui': path.resolve(__dirname, 'resources/js/packages/ui/src'),
             },
         },
         build: {

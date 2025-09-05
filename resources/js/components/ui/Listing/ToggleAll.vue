@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue';
-import { injectListingContext } from '@ui/Listing/Listing.vue';
-import Checkbox from '@ui/Checkbox/Item.vue';
+import { injectListingContext } from '../Listing/Listing.vue';
+import { Checkbox } from '@ui';
 
 const { items, selections, maxSelections, clearSelections, reorderable } = injectListingContext();
 const anyItemsChecked = computed(() => selections.value.length > 0);
