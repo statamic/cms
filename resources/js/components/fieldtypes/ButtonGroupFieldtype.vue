@@ -9,7 +9,7 @@
             :read-only="isReadOnly"
             :text="option.label || option.value"
             :value="option.value"
-            :variant="value == option.value ? 'primary' : 'default'"
+            :variant="value == option.value ? 'depressed' : 'default'"
             @click="updateSelectedOption(option.value)"
         />
     </ButtonGroup>
