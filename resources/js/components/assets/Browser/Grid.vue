@@ -53,7 +53,7 @@
                     </Context>
                 </ItemActions>
             </div>
-            <div v-if="creatingFolder" class="group/folder relative">
+            <div v-if="creatingFolder" class="group/folder relative p-1">
                 <div class="group h-[66px] w-[80px]">
                     <ui-icon name="ui/folder" class="size-full text-blue-400/90 hover:text-blue-400" />
 
@@ -63,7 +63,7 @@
                         :start-with-edit-mode="true"
                         submit-mode="enter"
                         :placeholder="__('New Folder')"
-                        class="flex w-[80px] items-center justify-center overflow-hidden text-center font-mono text-xs text-ellipsis whitespace-nowrap text-gray-500"
+                        class="flex w-[80px] items-center justify-center overflow-hidden mt-2 text-center font-mono text-xs text-ellipsis whitespace-nowrap text-gray-500"
                         @submit="$emit('create-folder', newFolderName)"
                         @cancel="
                             () => {
