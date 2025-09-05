@@ -34,7 +34,7 @@ export default defineConfig({
     resolve: {
         alias: {
             // Resolve the @ alias used in the UI components to the correct path
-            '@': path.resolve(__dirname, '../..'),
+            '@': path.resolve(__dirname, '../../resources/js'),
             '@ui': path.resolve(__dirname, './src'),
         }
     },
