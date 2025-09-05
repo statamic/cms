@@ -64,6 +64,7 @@
                     <ui-listing
                         :url="collection.entries_listing_url"
                         :per-page="5"
+                        :filters="collection.filters"
                         :columns="collection.columns"
                         :sort-column="collection.sort_column"
                         :sort-direction="collection.sort_direction"
