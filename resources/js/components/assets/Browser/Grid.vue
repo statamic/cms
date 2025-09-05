@@ -34,7 +34,7 @@
                             <button @dblclick="selectFolder(folder.path)" class="group h-[66px] w-[80px]">
                                 <ui-icon name="ui/folder" class="size-full text-blue-400/90 hover:text-blue-400" />
                                 <div
-                                    class="overflow-hidden text-center font-mono text-xs text-ellipsis whitespace-nowrap text-gray-500"
+                                    class="overflow-hidden mt-2 text-center font-mono text-xs text-ellipsis whitespace-nowrap text-gray-500"
                                     v-text="folder.basename"
                                     :title="folder.basename"
                                 />
