@@ -59,6 +59,7 @@ const buttonClasses = computed(() => {
                 danger: 'in-data-ui-button-group:border-s-0 in-data-ui-button-group:border-e [:is([data-ui-button-group]>&:last-child,_[data-ui-button-group]_:last-child>&)]:border-e-0 in-data-ui-button-group:border-red-600',
                 filled: 'in-data-ui-button-group:border-e [:is([data-ui-button-group]>&:last-child,_[data-ui-button-group]_:last-child>&)]:border-e-0 in-data-ui-button-group:border-gray-300/70',
                 ghost: '',
+                depressed: 'in-data-ui-button-group:border-s-0 [:is([data-ui-button-group]>&:first-child,_[data-ui-button-group]_:first-child>&)]:border-s-[1px]',
             },
             iconOnly: { true: 'px-0 gap-0' },
             round: { true: 'rounded-full' },
