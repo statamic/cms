@@ -2,8 +2,8 @@
 import { defineAsyncComponent, shallowRef, watch } from 'vue';
 
 // Import all icons from the icons and ui directories (lazy loaded)
-// const icons = import.meta.glob('../../../svg/icons/*.svg');
-// const uiIcons = import.meta.glob('../../../svg/ui/*.svg');
+const icons = import.meta.glob('../../../svg/icons/*.svg');
+const uiIcons = import.meta.glob('../../../svg/ui/*.svg');
 
 const props = defineProps({
     name: { type: String, required: true },

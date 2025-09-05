@@ -13,32 +13,29 @@ export default defineConfig({
         lib: {
             entry: path.resolve(__dirname, 'index.js'),
             name: 'StatamicUI',
-            formats: ['es', 'cjs'],
-            fileName: (format) => `index.${format === 'es' ? 'js' : 'cjs'}`
+            formats: ['es'],
+            fileName: () => 'index.js'
         },
         rollupOptions: {
             // Make sure to externalize deps that shouldn't be bundled
             external: ['vue'],
             output: {
-                globals: {
-                    vue: 'Vue'
-                },
-                // Separate CSS file
-                assetFileNames: (assetInfo) => {
-                    if (assetInfo.name === 'style.css') return 'style.css';
-                    return assetInfo.name;
-                }
+                // Don't preserve modules - this should help with CSS inlining
+                preserveModules: true,
+                preserveModulesRoot: path.resolve(__dirname, '../'),
+                entryFileNames: '[name].js',
+                // Use a single entry file
+                // entryFileNames: 'index.js'
             }
         },
-        // Build CSS alongside JS
-        cssCodeSplit: false,
         outDir: 'dist',
         emptyOutDir: true
     },
     resolve: {
         alias: {
             // Resolve the @ alias used in the UI components to the correct path
-            '@': path.resolve(__dirname, '../')
+            '@': path.resolve(__dirname, '../../'),
+            '@ui': path.resolve(__dirname, '../../components/ui')
         }
     },
     css: {

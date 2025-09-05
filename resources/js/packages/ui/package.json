@@ -8,16 +8,15 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/statamic/cms.git",
-    "directory": "resources/js/ui-package"
+    "directory": "resources/js/packages/ui"
   },
   "license": "MIT",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "types": "./dist/ui/index.d.ts",
+      "default": "./dist/ui/index.js"
     },
-    "./style.css": "./dist/ui.css",
-    "./ui-source.css": "./ui-source.css"
+    "./ui.css": "./ui.css"
   },
   "files": [
     "dist"

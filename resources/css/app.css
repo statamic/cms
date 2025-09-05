@@ -15,7 +15,7 @@
 }
 
 @import 'tailwindcss';
-@import './ui.css';
+@import '../js/packages/ui/ui.css';
 @import './cp.css';
 @import './core/utilities.css';
 @import './dark.css';
