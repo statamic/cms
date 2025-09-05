@@ -1,7 +1,9 @@
 <script setup>
-import { Button, Modal, Tooltip } from '@/components/ui';
+import Button from '@ui/Button/Button.vue';
+import Modal from '@ui/Modal/Modal.vue';
+import Tooltip from '@ui/Tooltip.vue';
 import { SortableList } from '@/components/sortable/Sortable.js';
-import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
+import { injectListingContext } from '@ui/Listing/Listing.vue';
 import { computed, ref } from 'vue';
 
 const { preferencesPrefix, columns, visibleColumns, hiddenColumns, setColumns, reorderable } = injectListingContext();

@@ -1,6 +1,7 @@
 <script setup>
 import { sortBy } from 'lodash-es';
-import { Combobox, CardPanel } from '@/components/ui';
+import Combobox from '@ui/Combobox.vue';
+import CardPanel from '@ui/Card/Panel.vue';
 import { computed, ref, watch, nextTick, onMounted } from 'vue';
 import FieldFilterRow from './FieldFilterRow.vue';
 

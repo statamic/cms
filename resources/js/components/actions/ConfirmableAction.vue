@@ -1,6 +1,8 @@
 <script setup>
 import { ref, computed, onUnmounted } from 'vue';
-import { PublishContainer, FieldsProvider, PublishFields } from '@/components/ui';
+import PublishContainer from '@ui/Publish/Container.vue';
+import FieldsProvider from '@ui/Publish/FieldsProvider.vue';
+import PublishFields from '@ui/Publish/Fields.vue';
 import { requireElevatedSessionIf } from '@/components/elevated-sessions/index.js';
 
 const props = defineProps({

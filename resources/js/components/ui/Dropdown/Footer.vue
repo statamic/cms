@@ -1,7 +1,7 @@
 <script setup>
 import { useSlots } from 'vue';
 import { cva } from 'cva';
-import { Icon } from '@/components/ui';
+import Icon from '@ui/Icon.vue';
 
 defineProps({
     href: { type: String, default: null },

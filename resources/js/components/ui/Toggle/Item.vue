@@ -3,7 +3,7 @@ import { computed, inject, useSlots } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
 import { ToggleGroupItem } from 'reka-ui';
-import { Icon } from '@/components/ui';
+import Icon from '@ui/Icon.vue';
 
 const props = defineProps({
     value: { type: String, required: true },

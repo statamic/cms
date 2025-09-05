@@ -2,7 +2,9 @@
 import { cva } from 'cva';
 import { ComboboxAnchor, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxRoot, ComboboxTrigger, ComboboxPortal, ComboboxViewport } from 'reka-ui';
 import { computed, nextTick, onMounted, ref, useAttrs, useSlots, useTemplateRef, watch } from 'vue';
-import { Button, Icon, Badge } from '@/components/ui';
+import Button from '@ui/Button/Button.vue';
+import Icon from '@ui/Icon.vue';
+import Badge from '@ui/Badge.vue';
 import fuzzysort from 'fuzzysort';
 import { SortableList } from '@/components/sortable/Sortable.js';
 

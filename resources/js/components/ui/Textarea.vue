@@ -1,6 +1,6 @@
 <script setup>
 import { cva } from 'cva';
-import { CharacterCounter } from '@/components/ui';
+import CharacterCounter from '@ui/CharacterCounter.vue';
 
 defineEmits(['update:modelValue']);
 

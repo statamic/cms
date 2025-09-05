@@ -1,9 +1,10 @@
 <script setup>
 import { computed, nextTick, ref, watch, useTemplateRef, onBeforeUnmount, onUnmounted, onBeforeMount } from 'vue';
 import Resizer from './Resizer.vue';
-import { injectContainerContext } from '@/components/ui/Publish/Container.vue';
+import { injectContainerContext } from '@ui/Publish/Container.vue';
 import debounce from '@/util/debounce.js';
-import { Select, Button } from '@/components/ui';
+import Select from '@ui/Select/Select.vue';
+import Button from '@ui/Button/Button.vue';
 import axios from 'axios';
 import wait from '@/util/wait.js';
 import { mapValues } from 'lodash-es';

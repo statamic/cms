@@ -97,9 +97,9 @@ import ManagesPreviewText from '../replicator/ManagesPreviewText';
 import HasFieldActions from '../../field-actions/HasFieldActions.js';
 import { Badge, Button, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, Icon, Subheading, Switch, Tooltip } from '@/components/ui';
 import { Motion } from 'motion-v';
-import FieldsProvider from '@/components/ui/Publish/FieldsProvider.vue';
-import Fields from '@/components/ui/Publish/Fields.vue';
-import { containerContextKey } from '@/components/ui/Publish/Container.vue';
+import FieldsProvider from '@ui/Publish/FieldsProvider.vue';
+import Fields from '@ui/Publish/Fields.vue';
+import { containerContextKey } from '@ui/Publish/Container.vue';
 
 export default {
     props: nodeViewProps,

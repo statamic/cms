@@ -2,7 +2,7 @@
 import CodeMirror from 'codemirror';
 import { computed, markRaw, nextTick, onMounted, ref, useAttrs, useTemplateRef, watch } from 'vue';
 import ElementContainer from '@/components/ElementContainer.vue';
-import { Select } from '@/components/ui';
+import Select from '@ui/Select/Select.vue';
 
 // Addons
 import 'codemirror/addon/edit/matchbrackets';

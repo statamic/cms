@@ -177,25 +177,25 @@ import HasPreferences from '../../data-list/HasPreferences';
 import Uploader from '../Uploader.vue';
 import Uploads from '../Uploads.vue';
 import { debounce, sortBy } from 'lodash-es';
-import {
-    Header,
-    Button,
-    ButtonGroup,
-    Dropdown,
-    DropdownSeparator,
-    DropdownItem,
-    DropdownMenu,
-    Panel,
-    PanelHeader,
-    PanelFooter,
-    ListingSearch,
-    ListingCustomizeColumns,
-    Slider,
-    Icon,
-    ToggleGroup,
-    ToggleItem,
-} from '@/components/ui';
-import { Listing, ListingTable, ListingPagination } from '@/components/ui';
+import Header from '@ui/Header.vue';
+import Button from '@ui/Button/Button.vue';
+import ButtonGroup from '@ui/Button/Group.vue';
+import Dropdown from '@ui/Dropdown/Dropdown.vue';
+import DropdownSeparator from '@ui/Dropdown/Separator.vue';
+import DropdownItem from '@ui/Dropdown/Item.vue';
+import DropdownMenu from '@ui/Dropdown/Menu.vue';
+import Panel from '@ui/Panel/Panel.vue';
+import PanelHeader from '@ui/Panel/Header.vue';
+import PanelFooter from '@ui/Panel/Footer.vue';
+import Listing from '@ui/Listing/Listing.vue';
+import ListingTable from '@ui/Listing/Table.vue';
+import ListingPagination from '@ui/Listing/Pagination.vue';
+import ListingSearch from '@ui/Listing/Search.vue';
+import ListingCustomizeColumns from '@ui/Listing/CustomizeColumns.vue';
+import Slider from '@ui/Slider.vue';
+import Icon from '@ui/Icon.vue';
+import ToggleGroup from '@ui/Toggle/Group.vue';
+import ToggleItem from '@ui/Toggle/Item.vue';
 import Breadcrumbs from './Breadcrumbs.vue';
 
 export default {

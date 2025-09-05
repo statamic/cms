@@ -62,7 +62,10 @@
 </template>
 
 <script>
-import { Card, Heading, Subheading, Button } from '@/components/ui';
+import Card from '@ui/Card/Card.vue';
+import Heading from '@ui/Heading.vue';
+import Subheading from '@ui/Subheading.vue';
+import Button from '@ui/Button/Button.vue';
 import FocalPointPreviewFrame from './FocalPointPreviewFrame.vue';
 
 export default {

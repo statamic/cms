@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import { containerContextKey } from '@/components/ui/Publish/Container.vue';
+import { containerContextKey } from '@ui/Publish/Container.vue';
 
 export default {
     props: ['handle', 'value', 'columnHeader'],

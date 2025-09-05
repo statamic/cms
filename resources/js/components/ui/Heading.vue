@@ -1,7 +1,7 @@
 <script setup>
 import { cva } from 'cva';
 import { computed, useSlots } from 'vue';
-import { Icon } from '@/components/ui';
+import Icon from '@ui/Icon.vue';
 
 const props = defineProps({
     href: { type: [String, null], default: null },

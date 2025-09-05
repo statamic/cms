@@ -1,5 +1,9 @@
 <script setup>
-import { Panel, PanelHeader, Heading, Subheading, Card } from '@/components/ui';
+import Panel from '@ui/Panel/Panel.vue';
+import PanelHeader from '@ui/Panel/Header.vue';
+import Heading from '@ui/Heading.vue';
+import Subheading from '@ui/Subheading.vue';
+import Card from '@ui/Card/Card.vue';
 
 const props = defineProps({
     heading: { type: String, default: null },

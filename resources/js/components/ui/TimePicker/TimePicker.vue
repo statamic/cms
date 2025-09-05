@@ -1,6 +1,6 @@
 <script setup>
 import { TimeFieldInput, TimeFieldRoot } from 'reka-ui';
-import { Button } from '@/components/ui';
+import Button from '@ui/Button/Button.vue';
 
 const emit = defineEmits(['update:modelValue']);
 

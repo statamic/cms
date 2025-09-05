@@ -2,7 +2,9 @@
 import { computed, useSlots, ref, useId, useTemplateRef, onMounted, nextTick } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
-import { Icon, Button, CharacterCounter } from '@/components/ui';
+import Icon from '@ui/Icon.vue';
+import Button from '@ui/Button/Button.vue';
+import CharacterCounter from '@ui/CharacterCounter.vue';
 
 const slots = useSlots();
 

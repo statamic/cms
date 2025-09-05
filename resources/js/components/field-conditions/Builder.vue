@@ -53,8 +53,8 @@ import { KEYS, OPERATORS } from '../field-conditions/Constants.js';
 import Condition from './Condition.vue';
 import { __ } from '../../bootstrap/globals';
 import { Field, Input, Button } from '@/components/ui';
-import Select from '@/components/ui/Select/Select.vue';
-import Switch from '@/components/ui/Switch.vue';
+import Select from '@ui/Select/Select.vue';
+import Switch from '@ui/Switch.vue';
 
 export default {
     mixins: [HasInputOptions],

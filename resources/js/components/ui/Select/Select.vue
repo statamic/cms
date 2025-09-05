@@ -1,6 +1,6 @@
 <script setup>
 import { useAttrs, useSlots } from 'vue';
-import { Combobox } from '@/components/ui';
+import Combobox from '@ui/Combobox.vue';
 
 const emit = defineEmits(['update:modelValue']);
 

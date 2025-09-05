@@ -1,6 +1,6 @@
 <script setup>
 import { useSlots } from 'vue';
-import { Badge } from '@/components/ui';
+import Badge from '@ui/Badge.vue';
 
 const slots = useSlots();
 const hasDefaultSlot = !!slots.default;

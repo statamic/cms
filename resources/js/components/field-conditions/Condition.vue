@@ -73,8 +73,8 @@
 <script>
 import HasInputOptions from '../fieldtypes/HasInputOptions.js';
 import { Description, Combobox, Input, Button } from '@/components/ui';
-import Select from '@/components/ui/Select/Select.vue'
-import Switch from '@/components/ui/Switch.vue'
+import Select from '@ui/Select/Select.vue'
+import Switch from '@ui/Switch.vue'
 
 export default {
     mixins: [HasInputOptions],

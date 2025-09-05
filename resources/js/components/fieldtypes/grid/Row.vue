@@ -29,7 +29,7 @@
 
 <script>
 import GridCell from './Cell.vue';
-import FieldsProvider from '@/components/ui/Publish/FieldsProvider.vue';
+import FieldsProvider from '@ui/Publish/FieldsProvider.vue';
 import { Dropdown, DropdownMenu, DropdownItem } from '@/components/ui';
 
 export default {

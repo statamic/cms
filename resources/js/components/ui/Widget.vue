@@ -1,5 +1,6 @@
 <script setup>
-import { Card, Icon } from '@/components/ui';
+import Card from '@ui/Card/Card.vue';
+import Icon from '@ui/Icon.vue';
 
 defineProps({
     title: String,

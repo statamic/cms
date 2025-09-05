@@ -1,7 +1,8 @@
 <script setup>
-import { Panel, PanelFooter } from '@/components/ui';
+import Panel from '@ui/Panel/Panel.vue';
+import PanelFooter from '@ui/Panel/Footer.vue';
 import { ref, computed, useTemplateRef, useSlots } from 'vue';
-import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
+import { injectListingContext } from '@ui/Listing/Listing.vue';
 import Pagination from './Pagination.vue';
 import TableHead from './TableHead.vue';
 import TableBody from './TableBody.vue';

@@ -1,7 +1,7 @@
 <script setup>
 import { ContextMenuItem } from 'reka-ui';
 import { useSlots } from 'vue';
-import { Icon } from '@/components/ui';
+import Icon from '@ui/Icon.vue';
 
 defineProps({
     href: { type: String, default: null },

@@ -96,7 +96,7 @@ import SemVer from 'semver';
 import { SortableList } from '../sortable/Sortable';
 import { sortBy } from 'lodash-es';
 import { Description, Field, Input, Badge, Button } from '@/components/ui';
-import Switch from '@/components/ui/Switch.vue'
+import Switch from '@ui/Switch.vue'
 import { Combobox } from '@/components/ui';
 import { ComboboxInput } from 'reka-ui';
 

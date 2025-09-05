@@ -1,8 +1,11 @@
 <script setup>
-import { Tabs, TabList, TabTrigger, TabContent } from '@/components/ui';
+import Tabs from '@ui/Tabs/Tabs.vue';
+import TabList from '@ui/Tabs/List.vue';
+import TabTrigger from '@ui/Tabs/Trigger.vue';
+import TabContent from '@ui/Tabs/Content.vue';
 import TabProvider from './TabProvider.vue';
 import { injectContainerContext } from './Container.vue';
-import Sections from '@/components/ui/Publish/Sections.vue';
+import Sections from '@ui/Publish/Sections.vue';
 import { ref, computed, useSlots, onMounted, watch } from 'vue';
 import ElementContainer from '@/components/ElementContainer.vue';
 import ShowField from '@/components/field-conditions/ShowField.js';

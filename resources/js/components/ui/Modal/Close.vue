@@ -1,7 +1,7 @@
 <script setup>
 import { DialogClose } from 'reka-ui';
 import { computed, useSlots } from 'vue';
-import { Button } from '@/components/ui';
+import Button from '@ui/Button/Button.vue';
 
 const slots = useSlots();
 

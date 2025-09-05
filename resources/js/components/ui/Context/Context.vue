@@ -2,7 +2,7 @@
 import { useAttrs } from 'vue';
 import { cva } from 'cva';
 import { ContextMenuContent, ContextMenuPortal, ContextMenuRoot, ContextMenuTrigger } from 'reka-ui';
-import { Button } from '@/components/ui';
+import Button from '@ui/Button/Button.vue';
 
 defineOptions({
     inheritAttrs: false,

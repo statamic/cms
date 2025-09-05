@@ -19,7 +19,10 @@ import {
     DatePickerNext,
     DatePickerPrev,
 } from 'reka-ui';
-import { Card, Button, Calendar, Icon } from '@/components/ui';
+import Card from '@ui/Card/Card.vue';
+import Button from '@ui/Button/Button.vue';
+import Calendar from '@ui/Calendar/Calendar.vue';
+import Icon from '@ui/Icon.vue';
 
 const emit = defineEmits(['update:modelValue']);
 

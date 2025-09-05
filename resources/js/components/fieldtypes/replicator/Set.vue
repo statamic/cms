@@ -1,6 +1,6 @@
 <script setup>
-import Fields from '@/components/ui/Publish/Fields.vue';
-import FieldsProvider from '@/components/ui/Publish/FieldsProvider.vue';
+import Fields from '@ui/Publish/Fields.vue';
+import FieldsProvider from '@ui/Publish/FieldsProvider.vue';
 import { computed, inject, ref } from 'vue';
 import {
     Icon,
@@ -15,7 +15,7 @@ import {
     DropdownMenu,
 } from '@/components/ui';
 import { Motion } from 'motion-v';
-import { injectContainerContext } from '@/components/ui/Publish/Container.vue';
+import { injectContainerContext } from '@ui/Publish/Container.vue';
 import PreviewHtml from '@/components/fieldtypes/replicator/PreviewHtml.js';
 import FieldAction from '@/components/field-actions/FieldAction.js';
 import toFieldActions from '@/components/field-actions/toFieldActions.js';

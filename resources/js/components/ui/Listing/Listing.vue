@@ -6,7 +6,9 @@ export const [injectListingContext, provideListingContext] = createContext('List
 
 <script setup>
 import { ref, toRef, computed, watch, nextTick, onMounted, onBeforeUnmount, useSlots } from 'vue';
-import { Icon, Panel, PanelFooter } from '@/components/ui';
+import Icon from '@ui/Icon.vue';
+import Panel from '@ui/Panel/Panel.vue';
+import PanelFooter from '@ui/Panel/Footer.vue';
 import axios from 'axios';
 import BulkActions from './BulkActions.vue';
 import uniqid from 'uniqid';

@@ -15,7 +15,7 @@ import {
     CalendarNext,
 } from 'reka-ui';
 import { parseAbsolute } from '@internationalized/date';
-import { Icon } from '@/components/ui';
+import Icon from '@ui/Icon.vue';
 
 defineOptions({ name: 'Calendar' });
 

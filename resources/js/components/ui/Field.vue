@@ -1,7 +1,7 @@
 <script setup>
 import { cva } from 'cva';
 import { computed } from 'vue';
-import { Description, Label, Card, ErrorMessage } from '@/components/ui/index.js';
+import { Description, Label, Card, ErrorMessage } from '@ui/index.js';
 import markdown from '@/util/markdown.js';
 
 defineOptions({
