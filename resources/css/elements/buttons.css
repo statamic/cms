@@ -1,0 +1,21 @@
+@layer ui {
+    /* BUTTON GROUP
+    =================================================== */
+    [data-ui-button-group] {
+        /* Base styles for all buttons in groups */
+        [data-ui-group-target] {
+            /* Remove inset shadows for all button variants in groups */
+            box-shadow: none;
+
+            /* Only the first child gets a left border */
+            &:not(:first-child) {
+                /* border-inline-start: 1px solid currentColor; */
+                border-inline-start: 0;
+            }
+
+            &.btn-danger {
+                @apply text-red-600;
+            }
+        }
+    }
+}
