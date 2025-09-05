@@ -446,7 +446,7 @@
     "Entry saved": "Eintrag gespeichert",
     "Entry schedule reached": "Zeitplan für Eintrag erreicht",
     "Entry unpublished|Entries unpublished": "Eintrag nicht veröffentlicht|Einträge nicht veröffentlicht",
-    "entry_count": "Anzahl der Einträge",
+    "entry_count": ":count Einträge",
     "equals": "ist gleich",
     "Equals": "Gleich",
     "Escape Markup": "Markup escapen",
