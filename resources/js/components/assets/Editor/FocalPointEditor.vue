@@ -24,11 +24,11 @@
                 <div class="mb-4 flex items-center justify-center text-sm">
                     <div class="mx-4 flex items-center">
                         <div class="ltr:mr-1 rtl:ml-1">X</div>
-                        <div class="value">{{ x }}<sup>%</sup></div>
+                        <div class="value">{{ x }}%</div>
                     </div>
                     <div class="mx-4 flex items-center">
                         <div class="ltr:mr-1 rtl:ml-1">Y</div>
-                        <div class="value">{{ y }}<sup>%</sup></div>
+                        <div class="value">{{ y }}%</div>
                     </div>
                     <div class="mx-4 flex items-center">
                         <div class="ltr:mr-1 rtl:ml-1">Z</div>
