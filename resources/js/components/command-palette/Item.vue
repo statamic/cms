@@ -8,6 +8,7 @@ const props = defineProps({
     icon: { type: String, default: null },
     text: { type: String, default: null },
     badge: { type: String, default: null },
+    keys: { type: Array, default: null },
     removable: { type: Boolean, default: false },
 });
 
@@ -57,6 +58,7 @@ function click(event) {
             <template v-else>{{ text }}</template>
         </div>
         <Badge v-if="badge" :text="badge" variant="flat" />
+        <Badge v-if="keys" v-for="key in keys" :key="key" :text="key" variant="flat" />
         <Icon
             v-if="removable"
             name="x"
