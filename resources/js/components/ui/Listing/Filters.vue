@@ -120,7 +120,7 @@ function handleStackClosed() {
                     <Panel v-if="fieldFilter">
                         <PanelHeader class="flex items-center justify-between">
                             <Heading :text="__('Fields')" />
-                            <Button v-if="isActive(fieldFilterHandle)" size="sm" text="Clear" @click="setFilter(fieldFilterHandle, null)" />
+                            <Button v-if="isActive(fieldFilterHandle)" size="sm" :text="__('Clear')" @click="setFilter(fieldFilterHandle, null)" />
                         </PanelHeader>
                         <Card>
                             <FieldFilter
@@ -137,7 +137,7 @@ function handleStackClosed() {
                     >
                         <PanelHeader class="flex items-center justify-between">
                             <Heading :text="filter.title" />
-                            <Button v-if="isActive(filter.handle)" size="sm" text="Clear" @click="setFilter(filter.handle, null)" />
+                            <Button v-if="isActive(filter.handle)" size="sm" :text="__('Clear')" @click="setFilter(filter.handle, null)" />
                         </PanelHeader>
                         <Card>
                             <data-list-filter
