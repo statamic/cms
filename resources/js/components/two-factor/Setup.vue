@@ -40,8 +40,8 @@ function confirm() {
             setupModalOpen.value = false;
             recoveryCodesModalOpen.value = true;
         })
-        .catch((error) => {
-            error.value = error.response.data.errors.code[0];
+        .catch((e) => {
+            error.value = e.response.data.errors.code[0];
         });
 }
 
