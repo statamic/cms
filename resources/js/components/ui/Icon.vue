@@ -1,5 +1,5 @@
 <script setup>
-import { defineAsyncComponent, shallowRef, watch } from 'vue';
+import { computed, defineAsyncComponent, shallowRef, watch } from 'vue';
 
 // Import all icons from the icons and ui directories (lazy loaded)
 const icons = import.meta.glob('../../../svg/icons/*.svg');
@@ -7,11 +7,30 @@ const uiIcons = import.meta.glob('../../../svg/ui/*.svg');
 
 const props = defineProps({
     name: { type: String, required: true },
+    directory: { type: String, required: false },
 });
 
 const icon = shallowRef(null);
 
+const customIcon = computed(() => {
+    if (! props.directory) return;
+
+    let directory = props.directory;
+    let file = props.name;
+
+    let svgIcons = Statamic.$config.get('customSvgIcons')[directory] ?? [];
+
+    return svgIcons[file] ?? null;
+});
+
 const loadIcon = () => {
+    // When it's a custom icon, return it as a component
+    if (customIcon.value) {
+        return defineAsyncComponent(() => {
+            return new Promise(resolve => resolve({ template: customIcon.value }));
+        });
+    }
+
     // When the icon is an SVG string, return it as a component
     if (props.name.startsWith('<svg')) {
         return defineAsyncComponent(() => {
