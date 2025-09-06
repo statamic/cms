@@ -5,7 +5,7 @@
     @apply flex flex-col gap-6 py-6 px-3 text-sm antialiased select-none;
     /* Same as the main element, accounting for the header with a class of h-14, which is the same as 3.5rem */
     @apply h-[calc(100vh-3.5rem)];
-    @apply overflow-y-auto fixed top-14 left-0 w-48;
+    @apply overflow-y-auto fixed top-14 start-0 w-48;
     @apply [&_svg]:text-gray-500 dark:[&_svg]:text-gray-500/85;
     /* Only inset because we don't wand to transition the color when we switch between light/dark mode */
     transition: inset 0.3s ease-in-out;
@@ -49,13 +49,13 @@
         /* Always visible but off-screen by default */
         @apply flex;
         /* Start off-screen to the left */
-        @apply -left-46;
+        @apply -start-46;
     }
 
     .nav-open .nav-main {
         @apply bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-2xl;
         /* Slide in from the left */
-        @apply left-0;
+        @apply start-0;
     }
 }
 
