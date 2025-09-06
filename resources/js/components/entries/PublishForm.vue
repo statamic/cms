@@ -6,32 +6,20 @@
                 {{ formattedTitle }}
             </template>
 
-            <ItemActions
-                ref="actions"
-                v-if="!isCreating && hasItemActions"
-                :item="values.id"
-                :url="itemActionUrl"
-                :actions="itemActions"
-                :is-dirty="isDirty"
-                @started="actionStarted"
-                @completed="actionCompleted"
-                v-slot="{ actions: itemActions }"
-            >
+            <ItemActions ref="actions" v-if="!isCreating && hasItemActions" :item="values.id" :url="itemActionUrl"
+                :actions="itemActions" :is-dirty="isDirty" @started="actionStarted" @completed="actionCompleted"
+                v-slot="{ actions: itemActions }">
                 <Dropdown v-if="canEditBlueprint || hasItemActions">
                     <template #trigger>
                         <Button icon="ui/dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
                     </template>
                     <DropdownMenu>
-                        <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :href="actions.editBlueprint" />
+                        <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint"
+                            :href="actions.editBlueprint" />
                         <DropdownSeparator v-if="canEditBlueprint && itemActions.length" />
-                        <DropdownItem
-                            v-for="action in itemActions"
-                            :key="action.handle"
-                            :text="__(action.title)"
-                            :icon="action.icon"
-                            :variant="action.dangerous ? 'destructive' : 'default'"
-                            @click="action.run"
-                        />
+                        <DropdownItem v-for="action in itemActions" :key="action.handle" :text="__(action.title)"
+                            :icon="action.icon" :variant="action.dangerous ? 'destructive' : 'default'"
+                            @click="action.run" />
                     </DropdownMenu>
                 </Dropdown>
             </ItemActions>
@@ -39,60 +27,29 @@
             <ui-badge icon="padlock-locked" :text="__('Read Only')" variant="flat" v-if="readOnly" />
 
             <div class="flex items-center gap-3">
-                <save-button-options
-                    v-if="!readOnly"
-                    :show-options="!revisionsEnabled && !isInline"
-                    :preferences-prefix="preferencesPrefix"
-                >
-                    <Button
-                        :disabled="!canSave"
-                        :variant="!revisionsEnabled ? 'primary' : 'default'"
-                        @click.prevent="save"
-                        v-text="saveText"
-                    />
+                <save-button-options v-if="!readOnly" :show-options="!revisionsEnabled && !isInline"
+                    :preferences-prefix="preferencesPrefix">
+                    <Button :disabled="!canSave" :variant="!revisionsEnabled ? 'primary' : 'default'"
+                        @click.prevent="save" v-text="saveText" />
                 </save-button-options>
 
-                <save-button-options
-                    v-if="revisionsEnabled && !isCreating"
-                    :show-options="!isInline"
-                    :preferences-prefix="preferencesPrefix"
-                >
-                    <Button
-                        variant="primary"
-                        :disabled="!canPublish"
-                        @click="confirmingPublish = true"
-                        :text="publishButtonText"
-                    />
+                <save-button-options v-if="revisionsEnabled && !isCreating" :show-options="!isInline"
+                    :preferences-prefix="preferencesPrefix">
+                    <Button variant="primary" :disabled="!canPublish" @click="confirmingPublish = true"
+                        :text="publishButtonText" />
                 </save-button-options>
             </div>
 
             <slot name="action-buttons-right" />
         </Header>
 
-        <PublishContainer
-            v-if="fieldset"
-            ref="container"
-            :name="publishContainer"
-            :reference="initialReference"
-            :blueprint="fieldset"
-            v-model="values"
-            :extra-values="extraValues"
-            :meta="meta"
-            :origin-values="originValues"
-            :origin-meta="originMeta"
-            :errors="errors"
-            :site="site"
-            v-model:modified-fields="localizedFields"
-            :track-dirty-state="trackDirtyState"
-            :sync-field-confirmation-text="syncFieldConfirmationText"
-        >
-            <LivePreview
-                :enabled="isPreviewing"
-                :url="livePreviewUrl"
-                :targets="previewTargets"
-                @opened="openLivePreview"
-                @closed="closeLivePreview"
-            >
+        <PublishContainer v-if="fieldset" ref="container" :name="publishContainer" :reference="initialReference"
+            :blueprint="fieldset" v-model="values" :extra-values="extraValues" :meta="meta"
+            :origin-values="originValues" :origin-meta="originMeta" :errors="errors" :site="site"
+            v-model:modified-fields="localizedFields" :track-dirty-state="trackDirtyState"
+            :sync-field-confirmation-text="syncFieldConfirmationText">
+            <LivePreview :enabled="isPreviewing" :url="livePreviewUrl" :targets="previewTargets"
+                @opened="openLivePreview" @closed="closeLivePreview">
                 <PublishComponents />
 
                 <PublishTabs>
@@ -101,45 +58,26 @@
                             <!-- Live Preview / Visit URL Buttons -->
                             <div v-if="collectionHasRoutes">
                                 <div class="flex flex-wrap gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
-                                    <Button
-                                        :text="__('Live Preview')"
-                                        class="flex-1"
-                                        icon="live-preview"
-                                        @click="openLivePreview"
-                                        v-if="showLivePreviewButton"
-                                    />
-                                    <Button
-                                        :href="permalink"
-                                        :text="__('Visit URL')"
-                                        class="flex-1"
-                                        icon="external-link"
-                                        target="_blank"
-                                        v-if="showVisitUrlButton"
-                                    />
+                                    <Button :text="__('Live Preview')" class="flex-1" icon="live-preview"
+                                        @click="openLivePreview" v-if="showLivePreviewButton" />
+                                    <Button :href="permalink" :text="__('Visit URL')" class="flex-1"
+                                        icon="external-link" target="_blank" v-if="showVisitUrlButton" />
                                 </div>
                             </div>
 
                             <!-- Published Switch -->
                             <Panel class="flex justify-between px-5 py-3 dark:bg-gray-800!" v-if="!revisionsEnabled">
                                 <Heading :text="__('Published')" />
-                                <Switch
-                                    :model-value="published"
-                                    :read-only="!canManagePublishState"
-                                    @update:model-value="setFieldValue('published', $event)"
-                                />
+                                <Switch :model-value="published" :read-only="!canManagePublishState"
+                                    @update:model-value="setFieldValue('published', $event)" />
                             </Panel>
 
                             <!-- Revisions -->
                             <Panel v-if="revisionsEnabled && !isCreating">
                                 <PanelHeader class="flex items-center justify-between">
                                     <Heading :text="__('Revisions')" />
-                                    <Button
-                                        @click="showRevisionHistory = true"
-                                        icon="history"
-                                        :text="__('View History')"
-                                        size="xs"
-                                        class="-me-4"
-                                    />
+                                    <Button @click="showRevisionHistory = true" icon="history"
+                                        :text="__('View History')" size="xs" class="-me-4" />
                                 </PanelHeader>
                                 <Card class="space-y-2">
                                     <Subheading v-if="published" class="flex items-center gap-2">
@@ -161,74 +99,35 @@
                                 </Card>
                             </Panel>
 
-                            <LocalizationsCard
-                                v-if="showLocalizationSelector"
-                                :localizations
-                                :localizing="localizing !== null"
-                                @selected="localizationSelected"
-                            />
+                            <!-- Here -->
+                            <LocalizationsCard v-if="showLocalizationSelector" :localizations
+                                :localizing="localizing !== null" @selected="localizationSelected" />
                         </div>
                     </template>
                 </PublishTabs>
                 <template #buttons>
-                    <Button
-                        v-if="!readOnly"
-                        size="sm"
-                        :variant="revisionsEnabled ? 'default' : 'primary'"
-                        :disabled="!canSave"
-                        @click.prevent="save"
-                        :text="saveText"
-                    ></Button>
+                    <Button v-if="!readOnly" size="sm" :variant="revisionsEnabled ? 'default' : 'primary'"
+                        :disabled="!canSave" @click.prevent="save" :text="saveText"></Button>
 
-                    <Button
-                        v-if="revisionsEnabled"
-                        size="sm"
-                        variant="primary"
-                        :disabled="!canPublish"
-                        @click="confirmingPublish = true"
-                        :text="publishButtonText"
-                    />
+                    <Button v-if="revisionsEnabled" size="sm" variant="primary" :disabled="!canPublish"
+                        @click="confirmingPublish = true" :text="publishButtonText" />
                 </template>
             </LivePreview>
         </PublishContainer>
 
-        <stack
-            name="revision-history"
-            v-if="showRevisionHistory"
-            @closed="showRevisionHistory = false"
-            :narrow="true"
-            v-slot="{ close }"
-        >
-            <revision-history
-                :index-url="actions.revisions"
-                :restore-url="actions.restore"
-                :reference="initialReference"
-                :can-restore-revisions="!readOnly"
-                @closed="close"
-            />
+        <stack name="revision-history" v-if="showRevisionHistory" @closed="showRevisionHistory = false" :narrow="true"
+            v-slot="{ close }">
+            <revision-history :index-url="actions.revisions" :restore-url="actions.restore"
+                :reference="initialReference" :can-restore-revisions="!readOnly" @closed="close" />
         </stack>
 
-        <publish-actions
-            v-if="confirmingPublish"
-            :actions="actions"
-            :published="published"
-            :collection="collectionHandle"
-            :reference="initialReference"
-            :publish-container="publishContainer"
-            :can-manage-publish-state="canManagePublishState"
-            @closed="confirmingPublish = false"
-            @saving="saving = true"
-            @saved="publishActionCompleted"
-            @failed="publishActionFailed"
-        />
+        <publish-actions v-if="confirmingPublish" :actions="actions" :published="published"
+            :collection="collectionHandle" :reference="initialReference" :publish-container="publishContainer"
+            :can-manage-publish-state="canManagePublishState" @closed="confirmingPublish = false"
+            @saving="saving = true" @saved="publishActionCompleted" @failed="publishActionFailed" />
 
-        <confirmation-modal
-            v-if="selectingOrigin"
-            :title="__('Create Localization')"
-            :buttonText="__('Create')"
-            @cancel="cancelLocalization()"
-            @confirm="createLocalization(localizing)"
-        >
+        <confirmation-modal v-if="selectingOrigin" :title="__('Create Localization')" :buttonText="__('Create')"
+            @cancel="cancelLocalization()" @confirm="createLocalization(localizing)">
             <div class="publish-fields">
                 <div class="form-group publish-field field-w-full">
                     <label v-text="__('Origin')" />
@@ -238,15 +137,9 @@
             </div>
         </confirmation-modal>
 
-        <confirmation-modal
-            v-if="pendingLocalization"
-            :title="__('Unsaved Changes')"
-            :body-text="__('Are you sure? Unsaved changes will be lost.')"
-            :button-text="__('Continue')"
-            :danger="true"
-            @confirm="confirmSwitchLocalization"
-            @cancel="pendingLocalization = null"
-        />
+        <confirmation-modal v-if="pendingLocalization" :title="__('Unsaved Changes')"
+            :body-text="__('Are you sure? Unsaved changes will be lost.')" :button-text="__('Continue')" :danger="true"
+            @confirm="confirmSwitchLocalization" @cancel="pendingLocalization = null" />
     </div>
 </template>
 
@@ -651,6 +544,18 @@ export default {
         },
 
         editLocalization(localization) {
+            Statamic.$hooks
+                .run('localization.selecting', {
+                    localization,
+                })
+                .then(async () => await this.editLocalizationRequest(localization))
+                .then(response => this.runAfterLocalizationHook(localization, response))
+                .catch((error) => {
+                    this.$toast.error(error || __('Something went wrong'));
+                });
+        },
+
+        editLocalizationRequest(localization) {
             return this.$axios.get(localization.url).then((response) => {
                 clearTimeout(this.trackDirtyStateTimeout);
                 this.trackDirtyState = false;
@@ -675,10 +580,38 @@ export default {
                 this.readOnly = data.readOnly;
 
                 this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500); // after any fieldtypes do a debounced update
+
+                return response.data;
             });
         },
 
+        runAfterLocalizationHook(localization, response) {
+            // Once the localization request has completed, we want to run the "after" hook.
+            // Devs can do what they need and we'll wait for them, but they can't cancel anything.
+            Statamic.$hooks
+                .run('localization.selected', {
+                    localization,
+                    response: response
+                })
+                .then(() => {
+                    this.$events.$emit('localization.selected', { container: this.$refs.container });
+                })
+                .catch((e) => { });
+        },
+
         createLocalization(localization) {
+            Statamic.$hooks
+                .run('localization.creating', {
+                    localization,
+                })
+                .then(async () => await this.createLocalizationRequest(localization))
+                .then(response => this.runAfterCreateLocalizationHook(localization, response))
+                .catch((error) => {
+                    this.$toast.error(error || __('Something went wrong'));
+                });
+        },
+
+        createLocalizationRequest(localization) {
             this.selectingOrigin = false;
 
             if (this.isCreating) {
@@ -688,15 +621,28 @@ export default {
 
             const originLocalization = this.localizations.find((e) => e.handle === this.selectedOrigin);
             const url = originLocalization.url + '/localize';
-            this.$axios.post(url, { site: localization.handle }).then((response) => {
-                this.editLocalization(response.data).then(() => {
+
+            return this.$axios
+                .post(url, { site: localization.handle })
+                .then((response) => this.editLocalizationRequest(response.data));
+        },
+
+        runAfterCreateLocalizationHook(localization, response) {
+            // Once the localization has been created, we want to run the "after" hook.
+            // Devs can do what they need and we'll wait for them, but they can't cancel anything.
+            Statamic.$hooks
+                .run('localization.created', {
+                    localization,
+                    response: response,
+                })
+                .then(() => {
                     this.$events.$emit('localization.created', { container: this.$refs.container });
 
                     if (this.originValues.published) {
                         this.setFieldValue('published', true);
                     }
-                });
-            });
+                })
+                .catch((e) => { });
         },
 
         cancelLocalization() {
