@@ -63,13 +63,18 @@ export default {
          * When a user has navigated to another folder.
          */
         navigate(path) {
+            let previousPath = this.path;
+
             this.path = path;
             this.pushState();
 
             // Clear out any selections. It would be confusing to navigate to a different
-            // folder and/or container, perform an action, and discover you performed
-            // it on an asset that was still selected, but no longer visible.
-            this.selectedAssets = [];
+            // folder, perform an action, and discover you performed it on an asset that
+            // was still selected, but no longer visible. We only want to do this when
+            // navigating to/from folders, not when navigating between assets.
+            if (! path.includes('/edit') && ! previousPath.includes('/edit')) {
+                this.selectedAssets = [];
+            }
         },
 
         /**
