@@ -32,7 +32,7 @@ class Width extends Fieldtype
                         'display' => __('Size'),
                         'instructions' => __('statamic::fieldtypes.width.config.size'),
                         'type' => 'select',
-                        'options' => ['base' => 'Base', 'lg' => 'Large'],
+                        'options' => ['base' => __('Base'), 'lg' => __('Large')],
                         'default' => 'lg',
                     ],
                 ],
