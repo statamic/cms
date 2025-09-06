@@ -57,11 +57,7 @@ class UrlBuilder implements UrlBuilderContract
         // If provided variables had no matching value, we would end up with
         // blank spaces in the URL, possibly resulting in double slashes.
         // Tidying up the URL will de-duplicate those extra slashes.
-        $url = URL::tidy($url);
-
-        $url = rtrim($url, '/');
-
-        return Str::ensureLeft($url, '/');
+        return URL::tidy($url, withTrailingSlash: false);
     }
 
     private function convertToAntlers($route)
