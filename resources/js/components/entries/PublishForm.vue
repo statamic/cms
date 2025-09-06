@@ -612,6 +612,10 @@ export default {
         },
 
         localizationSelected(localization) {
+            if (typeof localization === "string") {
+                localization = this.localizations.find(el => el.handle === localization)
+            }
+            
             if (!this.canSave) {
                 if (localization.exists) this.editLocalization(localization);
                 return;
