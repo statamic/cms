@@ -591,7 +591,7 @@ export default {
             Statamic.$hooks
                 .run('localization.selected', {
                     localization,
-                    response: response
+                    entry: response?.values
                 })
                 .then(() => {
                     this.$events.$emit('localization.selected', { container: this.$refs.container });
@@ -633,7 +633,7 @@ export default {
             Statamic.$hooks
                 .run('localization.created', {
                     localization,
-                    response: response,
+                    entry: response?.values
                 })
                 .then(() => {
                     this.$events.$emit('localization.created', { container: this.$refs.container });
