@@ -68,6 +68,9 @@ class CollectionsController extends CpController
                     ['label' => 'Title', 'field' => 'title', 'visible' => true],
                     ['label' => 'Date', 'field' => 'date', 'visible' => true],
                 ],
+                'filters' => Scope::filters('entries', [
+                    'collection' => $collection->handle(),
+                ]),
                 'dated' => $collection->dated(),
                 'edit_url' => $collection->editUrl(),
                 'delete_url' => $collection->deleteUrl(),
