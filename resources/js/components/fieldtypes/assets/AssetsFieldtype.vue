@@ -46,7 +46,7 @@
 
                     <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center flex-1" v-if="canUpload">
                         <ui-icon name="upload-cloud" class="size-5 text-gray-500 me-2" />
-                        <span v-text="__('Drag & drop here or&nbsp;')" />
+                        <span v-text="`${__('Drag & drop here or')}&nbsp;`" />
                         <button type="button" class="underline underline-offset-2 cursor-pointer hover:text-black dark:hover:text-gray-200" @click.prevent="uploadFile">
                             {{ __('choose a file') }}
                         </button>
