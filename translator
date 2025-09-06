@@ -107,6 +107,7 @@ $additionalKeys = [
         'user_roles.title',
         'users.title',
         'video.title',
+        'width.title',
         'yaml.title',
     ],
 ];
