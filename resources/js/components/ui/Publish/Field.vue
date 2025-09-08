@@ -108,12 +108,26 @@ const extraValues = computed(() => {
     return fieldPathPrefix.value ? data_get(containerExtraValues.value, fieldPathPrefix.value) : containerExtraValues.value;
 });
 
+const relevantRevealerValues = computed(() => {
+    return Object.keys(revealerValues.value).reduce((obj, key) => {
+        if (!fieldPathPrefix.value) {
+            obj[key] = revealerValues.value[key];
+        }
+
+        if (key.startsWith(fieldPathPrefix.value)) {
+            obj[key.replace(`${fieldPathPrefix.value}.`, '')] = revealerValues.value[key];
+        }
+
+        return obj;
+    }, {});
+});
+
 const shouldShowField = computed(() => {
     return new ShowField(
         visibleValues.value,
         extraValues.value,
         containerVisibleValues.value,
-        revealerValues.value,
+        relevantRevealerValues.value,
         hiddenFields.value,
         setHiddenField,
         { container },
