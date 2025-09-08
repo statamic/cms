@@ -93,6 +93,13 @@
             "src/helpers.php",
             "src/namespaced_helpers.php",
             "src/View/Blade/helpers.php"
+        ],
+        "exclude-from-classmap": [
+            "tests/Auth/Eloquent/__migrations__/**",
+            "tests/StarterKits/__fixtures__/**",
+            "tests/Translator/__fixtures__/**",
+            "tests/Console/Kernel.php",
+            "src/Console/Please/app-kernel.php"
         ]
     },
     "autoload-dev": {
