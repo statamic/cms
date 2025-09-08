@@ -1,6 +1,6 @@
 <?php
 
-namespace Policies;
+namespace Tests\Policies;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
