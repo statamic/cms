@@ -1,5 +1,22 @@
 # Release Notes
 
+## 5.65.0 (2025-09-08)
+
+### What's new
+- Make UpdateAssetReferences overwritable [#12283](https://github.com/statamic/cms/issues/12283) by @simonerd
+- Ability to opt into v6 asset folder permissions [#12060](https://github.com/statamic/cms/issues/12060) by @simonerd
+
+### What's fixed
+- Prevent PSR-4 warnings [#12347](https://github.com/statamic/cms/issues/12347) by @duncanmcclean
+- Corrects issue with unless conditions. [#12253](https://github.com/statamic/cms/issues/12253) by @JohnathonKoster
+- Fix blueprint blink cache issue [#12232](https://github.com/statamic/cms/issues/12232) by @aerni
+- Translate additional blueprint titles [#12242](https://github.com/statamic/cms/issues/12242) by @martyf
+- Dutch translations [#12212](https://github.com/statamic/cms/issues/12212) by @robdekort
+- Prevent null parse_url deprecation warning [#12197](https://github.com/statamic/cms/issues/12197) by @martinoak
+- Bump brace-expansion [#12072](https://github.com/statamic/cms/issues/12072) by @dependabot
+
+
+
 ## 5.64.0 (2025-08-21)
 
 ### What's new
