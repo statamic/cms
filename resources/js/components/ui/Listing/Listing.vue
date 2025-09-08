@@ -194,6 +194,17 @@ watch(
     (items) => rawItems.value = items,
 );
 
+watch(
+    () => props.selections,
+    () => {
+        if (JSON.stringify(props.selections) === JSON.stringify(selections.value)) {
+            return;
+        }
+
+        selections.value = props.selections || [];
+    }
+);
+
 const rawParameters = computed(() => ({
     page: currentPage.value,
     perPage: perPage.value,
