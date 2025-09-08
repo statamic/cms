@@ -1,5 +1,5 @@
 <template>
-    <Popover ref="popover" class="!w-84" :inset="true" v-model:open="showingToolbar">
+    <Popover ref="popover" class="!size-min" :inset="true" v-model:open="showingToolbar">
         <template #trigger>
             <Button
                 class="px-2!"
@@ -15,7 +15,7 @@
         </template>
         <link-toolbar
             v-if="linkAttrs !== null"
-            class="w-84"
+            class="min-w-84 size-min"
             ref="toolbar"
             :link-attrs="linkAttrs"
             :config="config"
