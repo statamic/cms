@@ -15,6 +15,7 @@
         display: table-cell;
         position: sticky;
         top: -1px;
+        text-align: left;
 
         &:first-child {
             @apply rounded-ss-lg ps-3;
