@@ -52,6 +52,11 @@
     font-weight: 425;
 }
 
+@utility input-text {
+    width: 100%;
+    @apply p-2 text-gray-900;
+}
+
 /* UTILITIES / DECORATION / SHADOWS
 =================================================== */
 @utility shadow-sm-b {
