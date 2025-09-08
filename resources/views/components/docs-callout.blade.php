@@ -13,7 +13,7 @@
             v-slot="{ url, icon }"
         >
             <ui-badge
-                text="{{ __("Learn about $topic") }}"
+                text="{{ __('Learn about :topic', ['topic' => $topic]) }}"
                 icon-append="external-link"
                 :href="url"
                 target="_blank"

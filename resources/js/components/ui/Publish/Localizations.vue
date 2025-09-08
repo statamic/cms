@@ -33,7 +33,7 @@ const activeLocalization = computed(() => {
                     option-value="handle"
                     option-label="name"
                     :model-value="activeLocalization?.handle"
-                    @update:modelValue="$emit('selected', $event)"
+                    @update:modelValue="$emit('selected', localizations.find(l => l.handle === $event))"
                 >
                     <template #option="option">
                         <Localization :localization="option" :localizing />
