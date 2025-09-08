@@ -14,24 +14,26 @@
         >
             <div ref="content" hidden />
             <header
-                class="group/header animate-border-color flex items-center rounded-lg border-b border-transparent px-1.5 antialiased duration-200 dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900!"
-                :class="{ 'rounded-b-none border-gray-200 dark:border-white/10': !collapsed }"
+                class="group/header animate-border-color flex items-center rounded-lg px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-950 hover:bg-gray-100 dark:hover:bg-gray-950 border-gray-300 border-b-1 border-b-transparent"
+                :class="{ 
+                    'bg-gray-200/50 rounded-b-none border-b-gray-300! dark:border-b-white/10!': !collapsed
+                }"
             >
                 <Icon data-drag-handle name="ui/handles" class="size-4 cursor-grab text-gray-400" v-if="!isReadOnly" />
                 <button type="button" class="flex flex-1 items-center gap-4 p-2 min-w-0 cursor-pointer" @click="toggleCollapsedState">
-                    <Badge variant="flat" size="lg">
+                    <Badge size="lg" pill="true" color="white" shadow="false" class="px-3">
                         <span v-if="isSetGroupVisible" class="flex items-center gap-2">
                             {{ __(setGroup.display) }}
                             <Icon name="ui/chevron-right" class="relative top-px size-3" />
                         </span>
                         {{ __(config.display) || config.handle }}
                     </Badge>
-                        <Icon
-                            v-if="config.instructions && !collapsed"
-                            name="info-square"
-                            class="size-3.5! text-gray-500"
-                            v-tooltip="{ content: $markdown(__(config.instructions)), html: true }"
-                        />
+                    <Icon
+                        v-if="config.instructions && !collapsed"
+                        name="info-square"
+                        class="size-3.5! text-gray-500"
+                        v-tooltip="{ content: $markdown(__(config.instructions)), html: true }"
+                    />
                     <Subheading
                         v-show="collapsed"
                         v-html="previewText"

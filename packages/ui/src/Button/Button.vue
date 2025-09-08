@@ -40,6 +40,10 @@ const buttonClasses = computed(() => {
                 filled: 'bg-black/5 hover:bg-black/10 hover:text-gray-900 dark:hover:text-white dark:bg-white/15 dark:hover:bg-white/20 [&_svg]:opacity-70',
                 ghost: 'bg-transparent hover:bg-gray-400/10 text-gray-900 dark:text-gray-300 dark:hover:bg-white/15 dark:hover:text-gray-200',
                 subtle: 'bg-transparent hover:bg-gray-400/10 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-white/15 dark:hover:text-gray-200 [&_svg]:opacity-40',
+                pressed: [
+                    'bg-linear-to-b from-gray-100 to-gray-100 text-gray-900 border border-gray-300 inset-shadow-sm/10',
+                    'dark:from-gray-950 dark:to-gray-950 dark:text-white dark:border-white/10',
+                ],
             },
             size: {
                 lg: 'px-6 h-12 text-base gap-2 rounded-lg text-base',
@@ -55,6 +59,7 @@ const buttonClasses = computed(() => {
                 danger: 'in-data-ui-button-group:border-s-0 in-data-ui-button-group:border-e [:is([data-ui-button-group]>&:last-child,_[data-ui-button-group]_:last-child>&)]:border-e-0 in-data-ui-button-group:border-red-600',
                 filled: 'in-data-ui-button-group:border-e [:is([data-ui-button-group]>&:last-child,_[data-ui-button-group]_:last-child>&)]:border-e-0 in-data-ui-button-group:border-gray-300/70',
                 ghost: '',
+                pressed: 'in-data-ui-button-group:border-s-0 [:is([data-ui-button-group]>&:first-child,_[data-ui-button-group]_:first-child>&)]:border-s-[1px]',
             },
             iconOnly: { true: 'px-0 gap-0' },
             round: { true: 'rounded-full' },

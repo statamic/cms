@@ -115,6 +115,16 @@
     }
 }
 
+/* Prevent tailwind typography from adding backticks around code elements */
+@utility prose {
+    code {
+        &::before,
+        &::after {
+            content: none;
+        }
+    }
+}
+
 code {
     /* Take the UI accent for code color/background. Use relative colors to 1) Make sure the text color is not too bright and 2) Create a light background */
     color: hsl(from var(--theme-color-ui-accent) h l 18);

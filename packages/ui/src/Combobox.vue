@@ -301,13 +301,14 @@ defineExpose({
                                 @keydown.space="openOnSpace"
                             />
 
-                            <button type="button" class="w-full text-start truncate bg-transparent cursor-pointer" v-else-if="!searchable && (dropdownOpen || !modelValue)" @keydown.space="openOnSpace" data-ui-combobox-placeholder>
+                            <button type="button" class="w-full text-start truncate flex items-center gap-2 bg-transparent cursor-pointer" v-else-if="!searchable && (dropdownOpen || !modelValue)" @keydown.space="openOnSpace" data-ui-combobox-placeholder>
+                            <Icon v-if="icon" :name="icon" class="text-gray-400 dark:text-white dark:opacity-50" />
                                 <span class="text-gray-400 dark:text-gray-500" v-text="placeholder" />
                             </button>
 
                             <button type="button" v-else class="w-full text-start bg-transparent truncate flex items-center gap-2 cursor-pointer" @keydown.space="openOnSpace" data-ui-combobox-selected-option>
                                 <slot name="selected-option" v-bind="{ option: selectedOption }">
-                                    <Icon v-if="icon" :name="icon" class="text-white-400 dark:text-white dark:opacity-50" />
+                                    <Icon v-if="icon" :name="icon" class="text-gray-400 dark:text-white dark:opacity-50" />
                                     <span v-if="labelHtml" v-html="getOptionLabel(selectedOption)" />
                                     <span v-else v-text="getOptionLabel(selectedOption)" />
                                 </slot>

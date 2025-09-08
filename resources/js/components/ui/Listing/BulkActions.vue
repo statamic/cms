@@ -55,7 +55,13 @@ function actionFailed(response) {
                     :text="__n(`Deselect :count item|Deselect all :count items`, selections.length)"
                     @click="clearSelections"
                 />
-                <Button v-for="action in actions" :key="action.handle" :text="__(action.title)" @click="action.run" />
+                <Button
+                    v-for="action in actions"
+                    :key="action.handle"
+                    :text="__(action.title)"
+                    :variant="action.dangerous ? 'danger' : 'default'"
+                    @click="action.run"
+                />
             </ButtonGroup>
             </div>
         </Motion>
