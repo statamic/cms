@@ -18,7 +18,7 @@
                     <div class="flex items-center gap-1.5">
                         <ui-heading size="lg" :text="__(collection.title)" :href="collection.available_in_selected_site ? collection.entries_url : collection.edit_url" />
                         <span class="text-sm text-gray-600">
-                            ({{ __('entry_count', { count: collection.entries_count }) }})
+                            ({{ __('messages.entry_count', { count: collection.entries_count }) }})
                         </span>
                     </div>
                     <aside class="flex items-center gap-2">
