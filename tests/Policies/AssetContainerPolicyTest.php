@@ -5,7 +5,6 @@ namespace Tests\Policies;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Assets\AssetContainer as ContainerContract;
 use Statamic\Facades\AssetContainer;
-use Tests\Policies\PolicyTestCase;
 
 class AssetContainerPolicyTest extends PolicyTestCase
 {
