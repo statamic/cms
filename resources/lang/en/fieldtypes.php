@@ -204,5 +204,6 @@ return [
     'video.title' => 'Video',
     'width.config.options' => 'Set the available width options.',
     'width.config.size' => 'Choose between large and default UI sizes.',
+    'width.title' => 'Width',
     'yaml.title' => 'YAML',
 ];
