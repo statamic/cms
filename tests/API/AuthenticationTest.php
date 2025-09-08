@@ -1,6 +1,6 @@
 <?php
 
-namespace vendor\statamic\cms\tests\API;
+namespace Tests\API;
 
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
