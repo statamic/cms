@@ -37,7 +37,7 @@ class Arr extends Fieldtype
                 'fields' => [
                     'expand' => [
                         'type' => 'toggle',
-                        'display' => __('Expand'),
+                        'display' => __('Expanded format'),
                         'instructions' => __('statamic::fieldtypes.array.config.expand'),
                     ],
                 ],
