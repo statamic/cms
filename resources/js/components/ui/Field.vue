@@ -62,7 +62,7 @@ const wrapperComponent = computed(() => props.as === 'card' ? Card : 'div');
         <div
             v-if="$slots.actions"
             :class="[
-                'flex items-center gap-x-1',
+                'flex items-center gap-x-1 mb-0',
                 props.label || $slots.label ? 'justify-between' : 'justify-end',
             ]"
             data-ui-field-header
