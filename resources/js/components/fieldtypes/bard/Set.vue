@@ -3,6 +3,7 @@
         <div
             class="shadow-ui-sm relative z-2 w-full rounded-lg border border-gray-300 bg-white text-base dark:border-x-0 dark:border-t-0 dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
             :class="{
+                'dark:border-blue-400! border-blue-300! border-2!': selected || withinSelection,
                 'border-red-500': hasError,
             }"
             :data-type="config.handle"
