@@ -2,10 +2,8 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\CP\Icons\IconSet;
 use Statamic\Facades\CP\Icon as Icons;
-use Statamic\Facades\File;
-use Statamic\Facades\Folder;
-use Statamic\Facades\Path;
 use Statamic\Fields\Fieldtype;
 
 class Icon extends Fieldtype
@@ -13,25 +11,20 @@ class Icon extends Fieldtype
     protected $categories = ['media'];
     protected $icon = 'icon_picker';
 
-    protected static $customSvgIcons = [];
-
     public function preload(): array
     {
-        [$path, $directory] = $this->resolveParts();
-
         return [
             'url' => cp_route('icon-fieldtype'),
-            'directory' => $directory,
         ];
     }
 
     public function icons()
     {
-        [$path, $directory, $hasConfiguredDirectory] = $this->resolveParts();
+        $set = $this->iconSet();
 
-        return collect(Folder::getFilesByType($path, 'svg'))->mapWithKeys(fn ($path) => [
-            pathinfo($path)['filename'] => $hasConfiguredDirectory ? File::get($path) : null,
-        ])->all();
+        return $set->name() === 'default'
+            ? $set->names()->mapWithKeys(fn ($name) => [$name => null])->all()
+            : $set->contents();
     }
 
     protected function configFieldItems(): array
@@ -44,7 +37,6 @@ class Icon extends Fieldtype
                         'display' => __('Icon Set'),
                         'instructions' => __('statamic::fieldtypes.icon.config.set'),
                         'type' => 'text',
-                        'placeholder' => 'vendor/statamic/cms/resources/svg/icons',
                         'width' => 50,
                     ],
                     'default' => [
@@ -60,28 +52,11 @@ class Icon extends Fieldtype
 
     public function augment($value)
     {
-        [$path] = $this->resolveParts();
-
-        return File::get($path.'/'.$value.'.svg');
+        return $this->iconSet()->get($value);
     }
 
-    private function resolveParts()
+    private function iconSet(): IconSet
     {
-        $customSet = false;
-
-        if ($set = $this->config('set')) {
-            $directory = Icons::get($set)->directory();
-            $customSet = true;
-        } else {
-            $directory = statamic_path('resources/svg/icons');
-        }
-
-        $path = Path::tidy($directory);
-
-        return [
-            $path,
-            $directory,
-            $customSet,
-        ];
+        return Icons::get($this->config('set', 'default'));
     }
 }

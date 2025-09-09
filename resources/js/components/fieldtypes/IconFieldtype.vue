@@ -12,8 +12,7 @@ const icons = ref([]);
 const loading = ref(true);
 const loaders = ref({});
 const iconsCache = ref({});
-
-const cacheKey = computed(() => props.meta.directory);
+const cacheKey = computed(() => props.config.set ?? '__default__');
 
 const options = computed(() => {
     let options = [];

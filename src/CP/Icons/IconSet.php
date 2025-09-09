@@ -3,14 +3,19 @@
 namespace Statamic\CP\Icons;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
 use Statamic\Facades\Path;
 use Statamic\Support\Str;
 
 class IconSet
 {
-    public function __construct(private string $name, private string $directory)
+    private string $directory;
+    private Filesystem $filesystem;
+
+    public function __construct(private string $name, string $directory)
     {
-        //
+        $this->directory = Str::removeRight(Path::tidy($directory), '/');
+        $this->filesystem = app(Filesystem::class);
     }
 
     public function name()
@@ -23,15 +28,25 @@ class IconSet
         return $this->directory;
     }
 
+    public function names()
+    {
+        return $this->files()->map->getBasename('.svg')->values();
+    }
+
     public function contents()
     {
-        $path = Str::removeRight(Path::tidy($this->directory), '/');
+        return $this->files()->map->getContents()->all();
+    }
 
-        return collect(app(Filesystem::class)->files($path))
+    public function get(string $name): string
+    {
+        return $this->filesystem->get($this->directory.'/'.$name.'.svg');
+    }
+
+    private function files(): Collection
+    {
+        return collect($this->filesystem->files($this->directory))
             ->filter(fn ($file) => strtolower($file->getExtension()) === 'svg')
-            ->keyBy(fn ($file) => pathinfo($file->getBasename(), PATHINFO_FILENAME))
-            ->map
-            ->getContents()
-            ->all();
+            ->keyBy(fn ($file) => $file->getBasename('.svg'));
     }
 }
