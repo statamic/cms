@@ -33,20 +33,37 @@ Table Fieldtype
     tbody {
         @apply outline-hidden dark:bg-gray-800;
 
-        tr {
-            @apply outline-hidden;
-        }
-
         th {
             @apply bg-gray-50 p-2 text-sm font-medium text-gray-700 text-start border-r border-b border-gray-200 dark:border-dark-900 dark:bg-gray-700 dark:text-gray-100;
+
+            tr:first-child & {
+                @apply rounded-tl-lg;
+            }
+            tr:last-child & {
+                @apply border-b-0 rounded-bl-lg;
+            }
         }
 
-        tr:first-child th {
-            @apply rounded-tl-lg;
-        }
+        tr {
+            @apply outline-hidden;
 
-        tr:last-child th {
-            @apply border-b-0 rounded-bl-lg;
+            &:first-child td:last-child {
+                @apply overflow-hidden;
+            }
+
+            &:last-child td {
+                @apply border-b-0 overflow-hidden;
+                &:first-child {
+                    @apply rounded-es-lg;
+                }
+                &:last-child {
+                    @apply rounded-ee-lg;
+                }
+            }
+
+            &.draggable-source--is-dragging td {
+                @apply bg-gray-100 dark:bg-gray-800;
+            }
         }
 
         td {
@@ -68,30 +85,13 @@ Table Fieldtype
             }
         }
 
-        tr:first-child td:last-child {
-            @apply overflow-hidden;
-        }
-
-        tr:last-child td {
-            @apply border-b-0 overflow-hidden;
-            &:first-child {
-                @apply rounded-es-lg;
+        > tbody:first-child tr:first-child {
+            td:first-child {
+                @apply rounded-tl-lg;
             }
-            &:last-child {
-                @apply rounded-ee-lg;
+            td:last-child {
+                @apply rounded-tr-lg;
             }
-        }
-
-        tr.draggable-source--is-dragging td {
-            @apply bg-gray-100 dark:bg-gray-800;
-        }
-
-        > tbody:first-child tr:first-child td:first-child {
-            @apply rounded-tl-lg;
-        }
-
-        > tbody:first-child tr:first-child td:last-child {
-            @apply rounded-tr-lg;
         }
     }
 
