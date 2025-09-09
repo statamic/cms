@@ -55,7 +55,7 @@
                     <ui-table class="w-full">
                         <ui-table-row>
                             <ui-table-cell class="w-64 font-bold">
-                                <span class="little-dot {{ $site->valid() ? 'bg-green-600' : 'bg-red-700' }} me-2"></span>
+                                <span class="little-dot {{ $site->valid() ? 'bg-green-500 dark:bg-green-600' : 'bg-red-500 dark:bg-red-600' }} me-2"></span>
                                 {{ $site->key() ?? __('No license key') }}
                             </ui-table-cell>
                             <ui-table-cell class="relative">
@@ -83,7 +83,7 @@
                     <ui-table class="w-full">
                         <ui-table-row>
                             <ui-table-cell class="w-64 font-bold">
-                                <span class="little-dot {{ $statamic->valid() ? 'bg-green-600' : 'bg-red-700' }} me-2"></span>
+                                <span class="little-dot {{ $statamic->valid() ? 'bg-green-500 dark:bg-green-600' : 'bg-red-500 dark:bg-red-600' }} me-2"></span>
                                 {{ __('Statamic') }}
 
                                 @if ($statamic->pro())
@@ -112,7 +112,7 @@
                             @foreach ($addons as $addon)
                                 <ui-table-row>
                                     <ui-table-cell class="w-64 me-2">
-                                        <span class="little-dot {{ $addon->valid() ? 'bg-green-600' : 'bg-red-700' }} me-2"></span>
+                                        <span class="little-dot {{ $addon->valid() ? 'bg-green-500 dark:bg-green-600' : 'bg-red-500 dark:bg-red-600' }} me-2"></span>
                                         <span class="font-bold">
                                             <a href="{{ $addon->addon()->marketplaceUrl() }}" class="underline">
                                                 {{ $addon->name() }}
@@ -140,7 +140,7 @@
                             @foreach ($unlistedAddons as $addon)
                                 <ui-table-row>
                                     <ui-table-cell class="w-64 font-bold me-2">
-                                        <span class="little-dot bg-green-500 me-2"></span>
+                                        <span class="little-dot bg-green-500 dark:bg-green-600 me-2"></span>
                                         {{ $addon->name() }}
                                     </ui-table-cell>
                                     <ui-table-cell>{{ $addon->version() }}</ui-table-cell>
