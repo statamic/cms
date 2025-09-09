@@ -65,7 +65,7 @@
 
 /* Use a utility layer only when we need higher specificity */
 @layer utilities {
-    /* When we have focus within a focus, only the inner-most focused contain should _have_ focus. e.g. if we're focusing on Bard field within a Bard field, only the inner Bard field should receive the focus outline. */
+    /* When we have a focus state within a focus state, only the inner-most focused container should _have_ focus. e.g. if we're focusing on a Bard field within a Bard field, only the inner Bard field should receive the focus outline. */
     [class*="focus-within"]:has([class*="focus-within"]:focus-within) {
         outline: none;
     }
