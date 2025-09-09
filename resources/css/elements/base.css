@@ -35,8 +35,8 @@
     .show-focus:focus,
     /* Explicitly show focus without needing to tab for buttons inside modals, e.g. Assets > cancel button on delete modal */
     [data-dismissable-layer] button:focus,
-    /* and then a global selector for focus-visible everywhere else (except where the focus-within class will handle the focus outline target instead) */
-    :not([class*='focus-within'] *) {
+    /* and then a global selector for focus-visible everywhere else (except where the focus-within class will handle the focus outline target instead). Use a direct descendant here so we don't affect things like the focus state of Bard field > Replicator > then another Bard field. */
+    :not([class*='focus-within'] > *) {
         :focus-visible& {
             outline-width: var(--focus-outline-width);
             outline-offset: var(--focus-outline-offset);
