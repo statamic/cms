@@ -212,7 +212,7 @@
         pointer-events: none;
         position: absolute;
         inset: 0;
-        background-image: url('../../svg/ui/architectural-lines.svg');
+        background-image: url('../../svg/architectural-lines.svg');
         background-size: 100%;
         /* Reduce the chances of the background circles overlapping the button */
         @media (width < 1300px) {

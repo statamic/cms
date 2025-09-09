@@ -32,7 +32,7 @@
                     <button @click="unselectGroup" class="hover:text-gray-900 dark:hover:text-white">
                         {{ __('Groups') }}
                     </button>
-                    <ui-icon name="ui/chevron-right" class="size-4" />
+                    <ui-icon name="chevron-right" class="size-4" />
                     <span>{{ selectedGroupDisplayText }}</span>
                 </div>
             </div>
@@ -58,7 +58,7 @@
                                 {{ __(item.instructions) }}
                             </div>
                         </div>
-                        <ui-icon name="ui/chevron-right" class="me-2" />
+                        <ui-icon name="chevron-right" class="me-2" />
                     </div>
                     <div v-if="item.type === 'set'" @click="addSet(item.handle)" class="group flex rounded-md px-2 py-1.5 gap-3">
                         <ui-icon

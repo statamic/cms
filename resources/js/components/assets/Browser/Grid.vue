@@ -32,7 +32,7 @@
                     <Context>
                         <template #trigger>
                             <button @dblclick="selectFolder(folder.path)" class="group h-[66px] w-[80px]">
-                                <ui-icon name="ui/folder" class="size-full text-blue-400/90 hover:text-blue-400" />
+                                <ui-icon name="folder" class="size-full text-blue-400/90 hover:text-blue-400" />
                                 <div
                                     class="overflow-hidden text-center font-mono text-xs text-ellipsis whitespace-nowrap text-gray-500"
                                     v-text="folder.basename"
@@ -55,7 +55,7 @@
             </div>
             <div v-if="creatingFolder" class="group/folder relative">
                 <div class="group h-[66px] w-[80px]">
-                    <ui-icon name="ui/folder" class="size-full text-blue-400/90 hover:text-blue-400" />
+                    <ui-icon name="folder" class="size-full text-blue-400/90 hover:text-blue-400" />
 
                     <Editable
                         ref="newFolderInput"

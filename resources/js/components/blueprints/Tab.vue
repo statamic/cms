@@ -14,7 +14,7 @@
                     class="hover:text-gray-900 active:text-gray-900 dark:hover:text-gray-400 ms-1"
                     :aria-label="__('Open Dropdown')"
                 >
-                    <Icon name="ui/chevron-down" />
+                    <Icon name="chevron-down" />
                 </button>
             </template>
             <DropdownMenu>

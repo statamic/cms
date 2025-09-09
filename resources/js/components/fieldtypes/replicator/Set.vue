@@ -137,7 +137,7 @@ function destroy() {
                 :class="{ 'rounded-b-none border-gray-200 dark:border-white/10': !collapsed }"
             >
                 <Icon
-                    name="ui/handles"
+                    name="handles"
                     :class="sortableHandleClass"
                     class="size-4 cursor-grab text-gray-400"
                     v-if="!readOnly"
@@ -146,7 +146,7 @@ function destroy() {
                     <Badge variant="flat" size="lg">
                         <span v-if="isSetGroupVisible" class="flex items-center gap-2">
                             {{ __(setGroup.display) }}
-                            <Icon name="ui/chevron-right" class="relative top-px size-3" />
+                            <Icon name="chevron-right" class="relative top-px size-3" />
                         </span>
                         {{ __(config.display) || config.handle }}
                     </Badge>
@@ -166,7 +166,7 @@ function destroy() {
                     <Switch size="xs" :model-value="enabled" @update:model-value="toggleEnabledState" v-tooltip="enabled ? __('Included in output') : __('Hidden from output')" />
                     <Dropdown>
                         <template #trigger>
-                            <Button icon="ui/dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
+                            <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
                         </template>
                         <DropdownMenu>
                             <DropdownItem
