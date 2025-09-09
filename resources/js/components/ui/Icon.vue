@@ -1,13 +1,13 @@
 <script setup>
-import { computed, defineAsyncComponent, shallowRef, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 
-const icons = import.meta.glob('../../../svg/icons/*.svg');
+const icons = import.meta.glob('../../../svg/icons/*.svg', { query: '?raw', import: 'default' });
 
 const props = defineProps({
     name: { type: String, required: true },
 });
 
-const icon = shallowRef(null);
+const svgContent = ref('');
 
 const customIcon = computed(() => {
     if (! props.name.includes('/')) {
@@ -25,40 +25,47 @@ const customIcon = computed(() => {
     return manifest[iconSet][icon] || null;
 });
 
-const loadIcon = () => {
-    // When the icon is an SVG string, return it as a component
+const loadIcon = async () => {
+    // When the icon is an SVG string, use it directly
     if (props.name.startsWith('<svg')) {
-        return defineAsyncComponent(() => {
-            return new Promise((resolve) => resolve({ template: props.name }));
-        });
+        svgContent.value = props.name;
+        return;
     }
 
-    // When it's a custom icon, return it as a component
+    // When it's a custom icon, use it directly
     if (customIcon.value) {
-        return defineAsyncComponent(() => {
-            return new Promise(resolve => resolve({ template: customIcon.value }));
-        });
+        svgContent.value = customIcon.value;
+        return;
     }
 
     const icon = icons[`../../../svg/icons/${props.name}.svg`];
 
     if (!icon) {
         console.warn(`Icon not found: ${props.name}`);
-        return null;
+        svgContent.value = '';
+        return;
     }
 
-    return defineAsyncComponent(() => icon());
+    try {
+        svgContent.value = await icon();
+    } catch (error) {
+        console.warn(`Failed to load icon: ${props.name}`, error);
+        svgContent.value = '';
+    }
 };
 
 watch(
     () => props.name,
-    () => {
-        icon.value = loadIcon();
-    },
+    () => loadIcon(),
     { immediate: true },
 );
 </script>
 
 <template>
-    <component :is="icon" :class="['size-4 shrink-0']" v-bind="$attrs" />
+    <svg
+        v-if="svgContent"
+        v-html="svgContent"
+        :class="['size-4 shrink-0']"
+        v-bind="$attrs"
+    />
 </template>
