@@ -79,6 +79,7 @@ return [
     'elevated_session_verification_code_sent' => 'Verification code has been sent to your email.',
     'email_utility_configuration_description' => 'Mail settings are configured in <code>:path</code>',
     'email_utility_description' => 'Check email configuration settings and send test emails.',
+    'entry_count' => ':count entries',
     'entry_origin_instructions' => 'The new localization will inherit values from the entry in the selected site.',
     'expect_root_instructions' => 'Consider the first page in the tree a "root" or "home" page.',
     'field_conditions_always_save_instructions' => 'Always save field value, even if the field is hidden.',
