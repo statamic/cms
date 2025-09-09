@@ -7,11 +7,11 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 use Statamic\CommandPalette\Category;
 use Statamic\Facades\CommandPalette;
+use Statamic\Facades\CP\Icon;
 use Statamic\Facades\CP\Toast;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
-use Statamic\Fieldtypes\Icon;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 use voku\helper\ASCII;
@@ -72,7 +72,7 @@ class JavascriptComposer
             'preloadableFieldtypes' => FieldtypeRepository::preloadable()->keys(),
             'livePreview' => config('statamic.live_preview'),
             'permissions' => $this->permissions($user),
-            'customSvgIcons' => Icon::getCustomSvgIcons(),
+            'customSvgIcons' => Icon::toArray(),
             'commandPaletteCategories' => Category::order(),
             'commandPalettePreloadedItems' => CommandPalette::getPreloadedItems(),
         ];

@@ -3,7 +3,6 @@
         <Icon
             v-if="tab.icon"
             :name="iconName(tab.icon)"
-            :directory="iconsDirectory"
             class="h-4 w-4 me-1"
         />
 
@@ -53,7 +52,7 @@
                         :config="{
                             handle: 'icon',
                             type: 'icon',
-                            directory: iconsDirectory,
+                            set: iconSet,
                         }"
                         :initial-value="icon"
                         v-slot="{ meta, value, loading, config }"
@@ -121,8 +120,8 @@ export default {
             return this.currentTab === this.tab._id;
         },
 
-        iconsDirectory() {
-            return this.$config.get('setIconsDirectory');
+        iconSet() {
+            return this.$config.get('replicatorSetIcons');
         },
     },
 
@@ -172,7 +171,7 @@ export default {
         iconName(name) {
             if (!name) return null;
 
-            return name;
+            return this.iconSet ? `${this.iconSet}/${name}` : name;
         },
     },
 };

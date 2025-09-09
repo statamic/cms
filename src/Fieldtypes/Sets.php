@@ -2,7 +2,8 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\Facades\File;
+use Statamic\Exceptions\ReplicatorIconSetNotFoundException;
+use Statamic\Facades\CP\Icon;
 use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Fields\Fieldtype;
@@ -12,8 +13,6 @@ use Statamic\Support\Arr;
 class Sets extends Fieldtype
 {
     protected $selectable = false;
-
-    protected static $iconsDirectory = null;
 
     /**
      * Converts the "sets" array of a Replicator (or Bard) field into what the
@@ -135,20 +134,18 @@ class Sets extends Fieldtype
     }
 
     /**
-     * Allow the user to set a custom icon directory for SVG set icons.
+     * Allow the user to define a custom icon set.
      */
-    public static function setIconsDirectory(string $directory): void
+    public static function useIcons(string $name, ?string $directory = null): void
     {
-        static::$iconsDirectory = $directory;
+        if ($directory) {
+            Icon::register($name, $directory);
+        } elseif (! Icon::has($name)) {
+            throw new ReplicatorIconSetNotFoundException($name);
+        }
 
-        // Then provide to script for <icon-fieldtype> selector components in blueprint config
-        Statamic::provideToScript([
-            'setIconsDirectory' => static::$iconsDirectory,
-        ]);
-
-        // Finally, provide the file contents of all custom svg icons to script,
-        // because our <Icon> component cannot reference custom paths at runtime
-        // without a full Vite re-build.
-        Icon::provideCustomSvgIconsToScript($directory);
+        // Provide to script for <icon-fieldtype> selector components in blueprint config.
+        // If a directory hasn't been provided, it will assume they've manually registered the set.
+        Statamic::provideToScript(['replicatorSetIcons' => $name]);
     }
 }

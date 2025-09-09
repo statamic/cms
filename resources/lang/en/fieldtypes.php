@@ -106,7 +106,7 @@ return [
     'hidden.title' => 'Hidden',
     'html.config.html_instruct' => 'Manage the HTML to be displayed in the publish form. This is for display purposes only, the HTML will not be saved.',
     'html.title' => 'HTML',
-    'icon.config.directory' => 'The path to the directory containing the icons.',
+    'icon.config.set' => 'The name of a custom icon set.',
     'icon.title' => 'Icon',
     'integer.title' => 'Integer',
     'link.config.collections' => 'Entries from these collections will be available. Leaving this empty will make entries from routable collections available.',

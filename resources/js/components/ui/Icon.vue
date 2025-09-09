@@ -1,36 +1,31 @@
 <script setup>
 import { computed, defineAsyncComponent, shallowRef, watch } from 'vue';
 
-// Import all icons from the icons and ui directories (lazy loaded)
 const icons = import.meta.glob('../../../svg/icons/*.svg');
-const uiIcons = import.meta.glob('../../../svg/ui/*.svg');
 
 const props = defineProps({
     name: { type: String, required: true },
-    directory: { type: String, required: false },
 });
 
 const icon = shallowRef(null);
 
 const customIcon = computed(() => {
-    if (! props.directory) return;
+    if (! props.name.includes('/')) {
+        return null;
+    }
 
-    let directory = props.directory;
-    let file = props.name;
+    const manifest = Statamic.$config.get('customSvgIcons');
+    const [iconSet, icon] = props.name.split('/');
 
-    let svgIcons = Statamic.$config.get('customSvgIcons')[directory] ?? [];
+    // If there's no key in the manifest with the set name, return null.
+    if (!manifest[iconSet]) {
+        return null;
+    }
 
-    return svgIcons[file] ?? null;
+    return manifest[iconSet][icon] || null;
 });
 
 const loadIcon = () => {
-    // When it's a custom icon, return it as a component
-    if (customIcon.value) {
-        return defineAsyncComponent(() => {
-            return new Promise(resolve => resolve({ template: customIcon.value }));
-        });
-    }
-
     // When the icon is an SVG string, return it as a component
     if (props.name.startsWith('<svg')) {
         return defineAsyncComponent(() => {
@@ -38,21 +33,21 @@ const loadIcon = () => {
         });
     }
 
-    // Find the icon in either the icons or ui directory
-    const iconPath = props.name.includes('/')
-        ? `../../../svg/ui/${props.name.split('/')[1]}.svg`
-        : `../../../svg/icons/${props.name}.svg`;
+    // When it's a custom icon, return it as a component
+    if (customIcon.value) {
+        return defineAsyncComponent(() => {
+            return new Promise(resolve => resolve({ template: customIcon.value }));
+        });
+    }
 
-    const iconLoader = props.name.includes('/')
-        ? uiIcons[iconPath]
-        : icons[`../../../svg/icons/${props.name}.svg`];
+    const icon = icons[`../../../svg/icons/${props.name}.svg`];
 
-    if (!iconLoader) {
+    if (!icon) {
         console.warn(`Icon not found: ${props.name}`);
         return null;
     }
 
-    return defineAsyncComponent(() => iconLoader());
+    return defineAsyncComponent(() => icon());
 };
 
 watch(

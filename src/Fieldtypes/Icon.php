@@ -2,12 +2,11 @@
 
 namespace Statamic\Fieldtypes;
 
-use Illuminate\Filesystem\Filesystem;
+use Statamic\Facades\CP\Icon as Icons;
 use Statamic\Facades\File;
 use Statamic\Facades\Folder;
 use Statamic\Facades\Path;
 use Statamic\Fields\Fieldtype;
-use Statamic\Support\Str;
 
 class Icon extends Fieldtype
 {
@@ -41,9 +40,9 @@ class Icon extends Fieldtype
             [
                 'display' => __('Selection'),
                 'fields' => [
-                    'directory' => [
-                        'display' => __('Directory'),
-                        'instructions' => __('statamic::fieldtypes.icon.config.directory'),
+                    'set' => [
+                        'display' => __('Icon Set'),
+                        'instructions' => __('statamic::fieldtypes.icon.config.set'),
                         'type' => 'text',
                         'placeholder' => 'vendor/statamic/cms/resources/svg/icons',
                         'width' => 50,
@@ -68,10 +67,12 @@ class Icon extends Fieldtype
 
     private function resolveParts()
     {
-        $hasConfiguredDirectory = true;
+        $customSet = false;
 
-        if (! $directory = $this->config('directory')) {
-            $hasConfiguredDirectory = false;
+        if ($set = $this->config('set')) {
+            $directory = Icons::get($set)->directory();
+            $customSet = true;
+        } else {
             $directory = statamic_path('resources/svg/icons');
         }
 
@@ -80,30 +81,7 @@ class Icon extends Fieldtype
         return [
             $path,
             $directory,
-            $hasConfiguredDirectory,
+            $customSet,
         ];
-    }
-
-    /**
-     * Provide custom SVG icons to script.
-     */
-    public static function provideCustomSvgIconsToScript(string $directory): void
-    {
-        $path = Str::removeRight(Path::tidy($directory), '/');
-
-        static::$customSvgIcons[$path] = collect(app(Filesystem::class)->files($path))
-            ->filter(fn ($file) => strtolower($file->getExtension()) === 'svg')
-            ->keyBy(fn ($file) => pathinfo($file->getBasename(), PATHINFO_FILENAME))
-            ->map
-            ->getContents()
-            ->all();
-    }
-
-    /**
-     * Get custom SVG icons for script.
-     */
-    public static function getCustomSvgIcons(): array
-    {
-        return static::$customSvgIcons;
     }
 }
