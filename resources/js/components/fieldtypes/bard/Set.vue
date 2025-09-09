@@ -23,7 +23,7 @@
                 }"
             >
                 <Icon data-drag-handle name="ui/handles" class="size-4 cursor-grab text-gray-400" v-if="!isReadOnly" />
-                <button type="button" class="flex flex-1 items-center gap-4 p-2 min-w-0 cursor-pointer" @click="toggleCollapsedState">
+                <button type="button" class="flex flex-1 items-center gap-4 p-2 min-w-0 cursor-pointer [&:focus-visible]:outline-none [&:focus-visible]:[&_[data-ui-badge]]:focus-outline" @click="toggleCollapsedState">
                     <Badge size="lg" pill="true" color="white" shadow="false" class="px-3">
                         <span v-if="isSetGroupVisible" class="flex items-center gap-2">
                             {{ __(setGroup.display) }}
