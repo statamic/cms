@@ -107,7 +107,7 @@ Table Fieldtype
         @apply w-8 text-center ps-0;
         vertical-align: middle;
         &:focus-within {
-            @apply bg-gray-200 dark:bg-gray-700;
+            @apply bg-gray-100 dark:bg-gray-700;
             button {
                 @apply outline-hidden ring-0;
             }
