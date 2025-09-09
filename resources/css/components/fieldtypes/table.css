@@ -69,7 +69,7 @@ Table Fieldtype
         }
 
         tr:first-child td:last-child {
-            @apply rounded-se-lg overflow-hidden;
+            @apply overflow-hidden;
         }
 
         tr:last-child td {
