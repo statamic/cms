@@ -140,7 +140,7 @@
                             @foreach ($unlistedAddons as $addon)
                                 <ui-table-row>
                                     <ui-table-cell class="w-64 font-bold me-2">
-                                        <span class="little-dot bg-green-600 me-2"></span>
+                                        <span class="little-dot bg-green-500 me-2"></span>
                                         {{ $addon->name() }}
                                     </ui-table-cell>
                                     <ui-table-cell>{{ $addon->version() }}</ui-table-cell>
