@@ -1,10 +1,11 @@
 <script setup>
-import { updateIframeContents } from './UpdatesIframes.js';
+import { useIframeManager } from './ManagesIframes.js';
 import { onMounted, ref, useTemplateRef } from 'vue';
 
 const channel = ref(null);
-const previousUrl = ref(null);
 const iframeContentContainer = useTemplateRef('contents');
+
+const { updateIframeContents } = useIframeManager();
 
 function setIframeAttributes(iframe) {
     iframe.setAttribute('class', 'min-h-screen');
@@ -16,7 +17,7 @@ onMounted(() => {
     channel.value.onmessage = (e) => {
         switch (e.data.event) {
             case 'updated':
-                updateIframeContents(e.data.url, e.data.target, e.data.payload, setIframeAttributes, iframeContentContainer, previousUrl);
+                updateIframeContents(e.data.url, e.data.target, e.data.payload, setIframeAttributes, iframeContentContainer);
                 break;
             case 'ping':
                 channel.value.postMessage({ event: 'popout.pong' });

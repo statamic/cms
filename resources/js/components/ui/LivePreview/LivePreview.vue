@@ -7,7 +7,7 @@ import { Select, Button } from '@/components/ui';
 import axios from 'axios';
 import wait from '@/util/wait.js';
 import { mapValues } from 'lodash-es';
-import { updateIframeContents } from './UpdatesIframes.js';
+import { useIframeManager } from './ManagesIframes.js';
 
 const props = defineProps({
     enabled: {
@@ -44,9 +44,10 @@ const loading = ref(true);
 const extras = ref({});
 const token = ref(null);
 const target = ref(0);
-const previousUrl = ref(null);
 const iframeContentContainer = useTemplateRef('contents');
 let source;
+
+const { updateIframeContents } = useIframeManager();
 
 const livePreviewFieldsPortal = computed(() => {
     return `live-preview-fields-${name.value}`;
@@ -107,7 +108,7 @@ const update = debounce(() => {
             const payload = { token: token.value, reference: props.reference };
             poppedOut.value
                 ? channel.value.postMessage({ event: 'updated', url, target: tgt, payload })
-                : updateIframeContents(url, target, payload, setIframeAttributes, iframeContentContainer, previousUrl);
+                : updateIframeContents(url, target, payload, setIframeAttributes, iframeContentContainer);
             loading.value = false;
         })
         .catch((e) => {
