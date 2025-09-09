@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 
-export function useIframeManager() {
+export function useIframeManager(iframeContentContainer) {
     const previousUrl = ref(null);
 
     const hasIframeSourceChanged = (existingSrc, newSrc) => {
@@ -12,11 +12,11 @@ export function useIframeManager() {
         return existingSrc.toString() !== newSrc.toString();
     };
 
-    const postMessageToIframe = (container, url, payload) => {
+    const postMessageToIframe = (url, payload) => {
         // If the target is a relative url, we'll get the origin from the current window.
         const targetOrigin = /^https?:\/\//.test(url) ? new URL(url)?.origin : window.origin;
 
-        container.firstChild.contentWindow.postMessage(
+        iframeContentContainer.value.firstChild.contentWindow.postMessage(
             {
                 name: 'statamic.preview.updated',
                 url,
@@ -26,7 +26,7 @@ export function useIframeManager() {
         );
     };
 
-    const updateIframeContents = (url, target, payload, setIframeAttributes, iframeContentContainer) => {
+    const updateIframeContents = (url, target, payload, setIframeAttributes) => {
         const iframe = document.createElement('iframe');
         iframe.setAttribute('frameborder', '0');
         iframe.setAttribute('src', url);
@@ -51,7 +51,7 @@ export function useIframeManager() {
         }
 
         if (!shouldRefresh) {
-            postMessageToIframe(container, url, payload);
+            postMessageToIframe(url, payload);
             return;
         }
 

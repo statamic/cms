@@ -47,7 +47,7 @@ const target = ref(0);
 const iframeContentContainer = useTemplateRef('contents');
 let source;
 
-const { updateIframeContents } = useIframeManager();
+const { updateIframeContents } = useIframeManager(iframeContentContainer);
 
 const livePreviewFieldsPortal = computed(() => {
     return `live-preview-fields-${name.value}`;
@@ -108,7 +108,7 @@ const update = debounce(() => {
             const payload = { token: token.value, reference: props.reference };
             poppedOut.value
                 ? channel.value.postMessage({ event: 'updated', url, target: tgt, payload })
-                : updateIframeContents(url, tgt, payload, setIframeAttributes, iframeContentContainer);
+                : updateIframeContents(url, tgt, payload, setIframeAttributes);
             loading.value = false;
         })
         .catch((e) => {
