@@ -46,11 +46,6 @@
         }
     }
 
-    /* e.g. >> /cp/collections/pages on the filter stack when you tab to a field condition like "contains" */
-    [class*="focus-within"] button:focus {
-        outline: none;
-    }
-
     a {
         cursor: pointer;
     }
