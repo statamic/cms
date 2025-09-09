@@ -3,7 +3,7 @@
         <div
             class="shadow-ui-sm relative z-2 w-full rounded-lg border border-gray-300 bg-white text-base dark:border-x-0 dark:border-t-0 dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
             :class="{
-                'border-blue-300! dark:border-blue-400! before:content-[\'\'] before:absolute before:inset-[-1px] before:border-2 before:border-blue-300 dark:before:border-blue-400 before:rounded-lg': selected || withinSelection,
+                '[&:not(:has(:focus-within))]:border-blue-300! [&:not(:has(:focus-within))]:dark:border-blue-400! [&:not(:has(:focus-within))]:before:content-[\'\'] [&:not(:has(:focus-within))]:before:absolute [&:not(:has(:focus-within))]:before:inset-[-1px] [&:not(:has(:focus-within))]:before:border-2 [&:not(:has(:focus-within))]:before:border-blue-300 [&:not(:has(:focus-within))]:dark:before:border-blue-400 [&:not(:has(:focus-within))]:before:rounded-lg': selected || withinSelection,
                 'border-red-500': hasError,
             }"
             :data-type="config.handle"
