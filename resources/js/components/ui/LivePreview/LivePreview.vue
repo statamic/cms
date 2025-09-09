@@ -108,7 +108,7 @@ const update = debounce(() => {
             const payload = { token: token.value, reference: props.reference };
             poppedOut.value
                 ? channel.value.postMessage({ event: 'updated', url, target: tgt, payload })
-                : updateIframeContents(url, target, payload, setIframeAttributes, iframeContentContainer);
+                : updateIframeContents(url, tgt, payload, setIframeAttributes, iframeContentContainer);
             loading.value = false;
         })
         .catch((e) => {
