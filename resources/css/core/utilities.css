@@ -54,7 +54,8 @@
 
 @utility input-text {
     width: 100%;
-    @apply p-2 text-gray-900;
+    /* e.g. in a Bard table */
+    @apply p-2 text-gray-900 dark:text-gray-100;
 }
 
 /* UTILITIES / DECORATION / SHADOWS
