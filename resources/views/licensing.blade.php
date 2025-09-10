@@ -124,7 +124,7 @@
                                                 <a href="{{ $addon->addon()->marketplaceUrl() }}" class="underline">{{ $addon->name() }}</a>
                                             </span>
                                             @if ($addon->edition())
-                                                <div>
+                                                <div class="ms-auto">
                                                     <ui-badge>
                                                         {{ $addon->edition() ?? '' }}
                                                     </ui-badge>
