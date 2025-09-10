@@ -15,7 +15,6 @@
                     allow-selecting-existing-upload
                     :allow-bulk-actions="false"
                     @selections-updated="selectionsUpdated"
-                    @asset-doubleclicked="select"
                     @edit-asset="toggleAssetSelection"
                     @initialized="focusSearchInput"
                 >
