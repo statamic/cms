@@ -21,24 +21,36 @@ let serverItemsLoaded = ref(false);
 let searchResults = ref([]);
 let selected = ref(null);
 let recentItems = ref(getRecentItems());
+let keyboardBindings = ref([]);
 
 Statamic.$keys.bindGlobal(['mod+k'], (e) => {
     e.preventDefault();
     open.value = true;
 });
 
-each({
-    esc: () => open.value = false,
-    'ctrl+n': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' })),
-    'ctrl+p': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp' })),
-}, (callback, binding) => {
-    Statamic.$keys.bindGlobal([binding], (e) => {
-        if (open.value) {
-            e.preventDefault();
-            callback();
-        }
+function bindKeyboardShortcuts() {
+    each({
+        esc: () => open.value = false,
+        'ctrl+n': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' })),
+        'ctrl+p': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp' })),
+    }, (callback, binding) => {
+        keyboardBindings.value.push(Statamic.$keys.bindGlobal([binding], (e) => {
+            if (open.value) {
+                e.preventDefault();
+                callback();
+            }
+        }));
     });
-});
+}
+
+watch(
+    () => open.value,
+    (isOpen) => {
+        isOpen
+            ? bindKeyboardShortcuts()
+            : keyboardBindings.value.forEach((binding) => binding.destroy());
+    }
+)
 
 const actionItems = computed(() => {
     return sortJsInjectedItems(Statamic.$commandPalette.actions().filter(item => item.when()));
