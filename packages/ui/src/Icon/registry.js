@@ -23,4 +23,4 @@ export function registerIconSetFromStrings(name, icons) {
     registry.set(name, { type: 'strings', data: icons });
 }
 
-registerIconSet('default', import.meta.glob('../../../../resources/svg/icons/*.svg', { query: '?raw', import: 'default' }));
+registerIconSet('default', import.meta.glob('../../icons/*.svg', { query: '?raw', import: 'default' }));
