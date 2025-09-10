@@ -72,6 +72,7 @@ class Integer extends Fieldtype
             'step' => $this->config('step'),
         ];
     }
+
     public function preProcess($data)
     {
         if ($data === null) {
