@@ -8,7 +8,7 @@
 
         <uploader
             ref="uploader"
-            :container="container.handle"
+            :container="container.id"
             :enabled="canUpload"
             :path="folder"
             @updated="uploadsUpdated"
