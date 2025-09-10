@@ -82,7 +82,8 @@ let showField = function(config, dottedFieldPath = null) {
         Store.values,
         Store.revealerValues,
         Store.hiddenFields,
-        Store.setHiddenField
+        Store.setHiddenField,
+        { foo: 'bar' }
     ).showField(config, dottedFieldPath);
 }
 
@@ -463,9 +464,10 @@ test('it can call a custom function', () => {
         favorite_animals: ['cats', 'dogs'],
     });
 
-    Statamic.$conditions.add('reallyLovesAnimals', function ({ target, params, values }) {
+    Statamic.$conditions.add('reallyLovesAnimals', function ({ target, params, values, foo }) {
         expect(target).toBe(null);
         expect(params).toEqual([]);
+        expect(foo).toEqual('bar');
         return values.favorite_animals.length > 3;
     });
 

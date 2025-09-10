@@ -22,7 +22,8 @@ const visibleSections = computed(() => {
                 visibleValues.value,
                 revealerValues.value,
                 hiddenFields.value,
-                setHiddenField
+                setHiddenField,
+                { container }
             ).showField(field, field.handle);
         });
     });
@@ -49,7 +50,7 @@ function toggleSection(id) {
                 { 'pb-0': section.collapsed }
             ]"
         >
-            <PanelHeader @click="toggleSection(i)" class="flex justify-between">
+            <PanelHeader v-if="section.display || section.collapsible" @click="toggleSection(i)" class="flex justify-between">
                 <div>
                     <Heading :text="__(section.display)" />
                     <Subheading v-if="section.instructions" :text="renderInstructions(section.instructions)" />
@@ -61,11 +62,10 @@ function toggleSection(id) {
                     :class="section.collapsed ? 'rotate-270' : 'rotate-0'"
                 />
             </PanelHeader>
-            <Motion
-                :class="{ 'overflow-hidden': section.collapsed }"
-                :initial="{ height: section.collapsed ? '0px' : 'auto' }"
-                :animate="{ height: section.collapsed ? '0px' : 'auto' }"
-                :transition="{ duration: 0.25, type: 'tween' }"
+            <div
+                style="--tw-ease: ease;"
+                class="h-auto overflow-clip visible transition-[height,visibility] duration-[250ms,2s]"
+                :class="{ 'h-0! visibility-hidden': section.collapsed }"
             >
                 <div class="p-px">
                     <Primitive :as="asConfig ? 'div' : Card">
@@ -76,7 +76,7 @@ function toggleSection(id) {
                         </FieldsProvider>
                     </Primitive>
                 </div>
-            </Motion>
+            </div>
         </Panel>
     </div>
 </template>

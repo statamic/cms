@@ -19,27 +19,15 @@ class AssetFolderPolicy
 
     public function create($user, $assetContainer)
     {
-        $user = User::fromUser($user);
-
-        $permission = config('statamic.assets.v6_permissions')
-            ? "edit {$assetContainer->handle()} folders"
-            : "upload {$assetContainer->handle()} assets";
-
-        if (! $user->hasPermission($permission)) {
-            return false;
-        }
-
-        return $assetContainer->createFolders();
+        return User::fromUser($user)->hasPermission("edit {$assetContainer->handle()} folders");
     }
 
     public function move($user, $assetFolder)
     {
         $user = User::fromUser($user);
 
-        $hasPermission = config('statamic.assets.v6_permissions')
-            ? ($user->hasPermission("edit {$assetFolder->container()->handle()} folders")
-                && $user->hasPermission("move {$assetFolder->container()->handle()} assets"))
-            : $user->hasPermission("move {$assetFolder->container()->handle()} assets");
+        $hasPermission = $user->hasPermission("edit {$assetFolder->container()->handle()} folders")
+            && $user->hasPermission("move {$assetFolder->container()->handle()} assets");
 
         if (! $hasPermission) {
             return false;
@@ -52,17 +40,15 @@ class AssetFolderPolicy
                 ->isEmpty();
         }
 
-        return $assetFolder->container()->allowMoving();
+        return true;
     }
 
     public function rename($user, $assetFolder)
     {
         $user = User::fromUser($user);
 
-        $hasPermission = config('statamic.assets.v6_permissions')
-            ? ($user->hasPermission("edit {$assetFolder->container()->handle()} folders")
-                && $user->hasPermission("rename {$assetFolder->container()->handle()} assets"))
-            : $user->hasPermission("rename {$assetFolder->container()->handle()} assets");
+        $hasPermission = $user->hasPermission("edit {$assetFolder->container()->handle()} folders")
+            && $user->hasPermission("rename {$assetFolder->container()->handle()} assets");
 
         if (! $hasPermission) {
             return false;
@@ -75,17 +61,15 @@ class AssetFolderPolicy
                 ->isEmpty();
         }
 
-        return $assetFolder->container()->allowRenaming();
+        return true;
     }
 
     public function delete($user, $assetFolder)
     {
         $user = User::fromUser($user);
 
-        $hasPermission = config('statamic.assets.v6_permissions')
-            ? ($user->hasPermission("edit {$assetFolder->container()->handle()} folders")
-                && $user->hasPermission("delete {$assetFolder->container()->handle()} assets"))
-            : $user->hasPermission("delete {$assetFolder->container()->handle()} assets");
+        $hasPermission = $user->hasPermission("edit {$assetFolder->container()->handle()} folders")
+            && $user->hasPermission("delete {$assetFolder->container()->handle()} assets");
 
         if (! $hasPermission) {
             return false;

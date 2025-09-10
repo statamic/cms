@@ -8,6 +8,7 @@
     <ui-popover
         v-else
         inset
+        :align="align"
         class="set-picker select-none w-[300px]"
         :open="isOpen"
         @update:open="isOpen = $event"
@@ -29,7 +30,7 @@
                     data-set-picker-search-input
                 />
                 <div v-if="showGroupBreadcrumb" class="flex items-center font-medium text-gray-700 dark:text-gray-300 gap-1">
-                    <button @click="unselectGroup" class="hover:text-gray-900 dark:hover:text-white">
+                    <button @click="unselectGroup" class="hover:text-gray-900 dark:hover:text-white cursor-pointer">
                         {{ __('Groups') }}
                     </button>
                     <ui-icon name="chevron-right" class="size-4" />
@@ -45,7 +46,7 @@
                     @mouseover="selectionIndex = i"
                     :title="__(item.instructions)"
                 >
-                    <div v-if="item.type === 'group'" @click="selectGroup(item.handle)" class="group flex rounded-md px-2 py-1.5 gap-3">
+                    <div v-if="item.type === 'group'" @click="selectGroup(item.handle)" class="group flex rounded-md p-2 gap-3">
                         <ui-icon
                             :name="item.icon || 'folder'"
                             :set="iconSet"
@@ -55,23 +56,23 @@
                             <div class="w-50 line-clamp-2 text-sm font-medium text-gray-900 dark:text-dark-175">
                                 {{ __(item.display || item.handle) }}
                             </div>
-                            <div v-if="item.instructions" class="w-50 line-clamp-2 text-2xs text-gray-700 dark:text-dark-175">
+                            <div v-if="item.instructions" class="w-50 mb-1 line-clamp-2 text-2xs leading-tight text-gray-700 dark:text-dark-175">
                                 {{ __(item.instructions) }}
                             </div>
                         </div>
                         <ui-icon name="chevron-right" class="me-2" />
                     </div>
-                    <div v-if="item.type === 'set'" @click="addSet(item.handle)" class="group flex rounded-md px-2 py-1.5 gap-3">
+                    <div v-if="item.type === 'set'" @click="addSet(item.handle)" class="group flex rounded-md p-2 gap-3">
                         <ui-icon
                             :name="item.icon || 'plus'"
                             :set="iconSet"
                             class="size-9 rounded-md border border-gray-300 bg-white dark:bg-gray-900/50 dark:border-gray-600 shadow-ui-xs p-2"
                         />
                         <div class="flex-1">
-                            <div class="w-52 line-clamp-2 text-sm font-medium text-gray-900 dark:text-dark-175">
+                            <div class="w-52 pb-1 line-clamp-2 text-sm font-medium text-gray-900 dark:text-dark-175">
                                 {{ __(item.display || item.handle) }}
                             </div>
-                            <div v-if="item.instructions" class="w-52 truncate text-2xs text-gray-700 dark:text-dark-175">
+                            <div v-if="item.instructions" class="w-52 truncate text-2xs leading-tight text-gray-700 dark:text-dark-175">
                                 {{ __(item.instructions) }}
                             </div>
                         </div>
@@ -98,6 +99,7 @@ export default {
     props: {
         sets: Array,
         enabled: { type: Boolean, default: true },
+        align: { type: String, default: 'start' },
     },
 
     data() {

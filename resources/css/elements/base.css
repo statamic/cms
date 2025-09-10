@@ -1,4 +1,7 @@
 :root {
+    /* For animating height */
+    interpolate-size: allow-keywords;
+
     --focus-outline-width: 2px;
     /* Here we typically need a negative outline-offset because of the inner shadow on inputs */
     --focus-outline-offset: -1px;
@@ -33,7 +36,7 @@
     /* Explicitly show focus without needing to tab for buttons inside modals, e.g. Assets > cancel button on delete modal */
     [data-dismissable-layer] button:focus,
     /* and then a global selector for focus-visible everywhere else (except where the focus-within class will handle the focus outline target instead) */
-    :not([class*='focus-within'] *) {
+    :not([class*='focus-within'] > *) {
         :focus-visible& {
             outline-width: var(--focus-outline-width);
             outline-offset: var(--focus-outline-offset);
@@ -109,6 +112,16 @@
     .group\/button button:focus {
         /* Pull the focus state above any adjacent buttons e.g. >> /cp/collections/articles/entries - save button alongside the dropdown arrow */
         z-index: var(--z-index-above);
+    }
+}
+
+/* Prevent tailwind typography from adding backticks around code elements */
+@utility prose {
+    code {
+        &::before,
+        &::after {
+            content: none;
+        }
     }
 }
 

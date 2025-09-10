@@ -8,7 +8,7 @@
 
         <uploader
             ref="uploader"
-            :container="container.handle"
+            :container="container.id"
             :enabled="canUpload"
             :path="folder"
             @updated="uploadsUpdated"
@@ -28,7 +28,7 @@
 
                 <div
                     v-if="!isReadOnly && showPicker"
-                    class="not-[.link-fieldtype_&]:p-2 not-[.link-fieldtype_&]:border border-gray-300 dark:border-gray-700 dark:bg-gray-850 rounded-xl flex flex-col @2xs:flex-row items-center gap-4"
+                    class="not-[.link-fieldtype_&]:p-2 not-[.link-fieldtype_&]:border border-gray-300 dark:border-gray-700 dark:bg-gray-850 rounded-xl flex flex-col @2xs:flex-row items-center gap-4 gap-y-3"
                     :class="{
                         'rounded-b-none': expanded,
                         'bard-drag-handle': isInBardField,
@@ -44,13 +44,14 @@
                         @keyup.space.enter="openSelector"
                     />
 
-                    <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center flex-1" v-if="canUpload">
+                    <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center flex-1 gap-1" v-if="canUpload">
                         <ui-icon name="upload-cloud" class="size-5 text-gray-500 me-2" />
-                        <span v-text="__('Drag & drop here or&nbsp;')" />
-                        <button type="button" class="underline underline-offset-2 cursor-pointer hover:text-black dark:hover:text-gray-200" @click.prevent="uploadFile">
-                            {{ __('choose a file') }}
-                        </button>
-                        <span>.</span>
+                        <div>
+                            <span class="leading-tight" v-text="`${__('Drag & drop here or')}&nbsp;`" />
+                            <button type="button" class="text-left underline underline-offset-2 cursor-pointer hover:text-black dark:hover:text-gray-200" @click.prevent="uploadFile">
+                                {{ __('choose a file') }}.
+                            </button>
+                        </div>
                     </div>
 
                     <div class="flex items-center justify-end" v-if="meta.rename_folder">
@@ -390,20 +391,15 @@ export default {
         },
 
         canBrowse() {
-            const hasPermission =
-                this.can('configure asset containers') || this.can('view ' + this.container.handle + ' assets');
-
-            if (!hasPermission) return false;
+            if (!this.container.can_view) return false;
 
             return !this.hasPendingDynamicFolder;
         },
 
         canUpload() {
-            const hasPermission =
-                this.config.allow_uploads &&
-                (this.can('configure asset containers') || this.can('upload ' + this.container.handle + ' assets'));
+            if (!this.config.allow_uploads) return false;
 
-            if (!hasPermission) return false;
+            if (!this.container.can_upload) return false;
 
             return !this.hasPendingDynamicFolder;
         },

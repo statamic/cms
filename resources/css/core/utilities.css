@@ -52,6 +52,33 @@
     font-weight: 425;
 }
 
+@utility input-text {
+    width: 100%;
+    /* e.g. in a Bard table */
+    @apply p-2 text-gray-900 dark:text-gray-100;
+}
+
+/* UTILITIES / DECORATION / SHADOWS
+=================================================== */
+@utility shadow-sm-b {
+    box-shadow: 0 3px 2px -1px hsl(0deg 0% 90%), 0 1px 2px hsl(0deg 0% 90%);
+    &:where(.dark, .dark *) {
+        box-shadow: unset;
+    }
+}
+
+/* UTILITIES / DECORATION / OTHER
+=================================================== */
+/* e.g. /cp/utilities/licensing */
+@utility little-dot {
+    border-radius:7px;
+    display:inline-block;
+    height:7px;
+    position:relative;
+    width:7px;
+    flex-shrink:0
+}
+
 /* UTILITIES / STATES
 =================================================== */
 /* Here we typically need a negative outline-offset because of the inner shadow on inputs */
@@ -130,7 +157,7 @@
     @apply bg-white/85 backdrop-blur-sm;
 }
 
-/* UTILITIES / STATES / DECORATION / MASK BACKGROUND
+/* UTILITIES / DECORATION / MASK BACKGROUND
 =================================================== */
 /* Notes...
 
@@ -181,7 +208,7 @@
     }
 }
 
-/* UTILITIES / STATES / DECORATION / ARCHIECTURAL LINES
+/* UTILITIES / DECORATION / ARCHIECTURAL LINES
 =================================================== */
 /* Notes...
 
@@ -283,7 +310,7 @@
     }
 }
 
-/* UTILITIES / STATES / DECORATION / CHECKERBOARD
+/* UTILITIES / DECORATION / CHECKERBOARD
 =================================================== */
 @utility bg-checkerboard {
     --checkerboard-light: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%23f3f4f6'/%3E%3C/svg%3E");

@@ -6,7 +6,7 @@
         <div :class="{ 'publish-fields': fullScreenMode }">
             <div :class="fullScreenMode && wrapperClasses">
                 <div
-                    class="bard-fieldtype antialiased st-text-legibility with-contrast:border-gray-500 shadow-ui-sm focus-outline-discrete"
+                    class="bard-fieldtype antialiased with-contrast:border-gray-500 shadow-ui-sm focus-outline-discrete"
                     :class="{ 'bard-fullscreen': fullScreenMode }"
                     ref="container"
                     @dragstart.stop="ignorePageHeader(true)"
@@ -19,7 +19,7 @@
                         @close="toggleFullscreen"
                     >
                         <div class="bard-fixed-toolbar border-0" v-if="!readOnly && showFixedToolbar">
-                            <div class="no-select flex flex-1 flex-wrap items-center" v-if="toolbarIsFixed">
+                            <div class="no-select flex flex-1 flex-wrap items-center gap-1" v-if="toolbarIsFixed">
                                 <component
                                     v-for="button in visibleButtons(buttons)"
                                     :key="button.name"
@@ -35,7 +35,7 @@
                     </publish-field-fullscreen-header>
 
                     <div class="bard-fixed-toolbar flex items-center justify-between rounded-t-xl border-b border-gray-300 bg-gray-50 px-2 py-1 dark:border-white/10 dark:bg-gray-950" v-if="!readOnly && showFixedToolbar && !fullScreenMode">
-                        <div class="no-select flex flex-1 flex-wrap items-center" v-if="toolbarIsFixed">
+                        <div class="no-select flex flex-1 flex-wrap items-center gap-1" v-if="toolbarIsFixed">
                             <component
                                 v-for="button in visibleButtons(buttons)"
                                 :key="button.name"
@@ -129,7 +129,7 @@
 import Fieldtype from '../Fieldtype.vue';
 import uniqid from 'uniqid';
 import Emitter from 'tiny-emitter';
-import { Editor, EditorContent } from '@tiptap/vue-3';
+import { Editor, EditorContent, NodeViewWrapper, NodeViewContent } from '@tiptap/vue-3';
 import { BubbleMenu } from '@tiptap/vue-3/menus';
 import { Extension } from '@tiptap/core';
 import { FloatingMenu } from './FloatingMenu';
@@ -349,6 +349,11 @@ export default {
         },
     },
 
+    created() {
+        Statamic.$components.register('NodeViewWrapper', NodeViewWrapper);
+        Statamic.$components.register('NodeViewContent', NodeViewContent);
+    },
+
     async mounted() {
         tiptap = await importTiptap();
 
@@ -378,8 +383,8 @@ export default {
     },
 
     beforeUnmount() {
-        this.editor.destroy();
-        this.escBinding.destroy();
+        this.editor?.destroy();
+        this.escBinding?.destroy();
     },
 
     watch: {
