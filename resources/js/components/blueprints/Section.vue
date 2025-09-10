@@ -130,7 +130,7 @@ export default {
         },
 
         iconSet() {
-            return this.$config.get('replicatorSetIcons');
+            return this.$config.get('replicatorSetIcons') || undefined;
         },
     },
 
