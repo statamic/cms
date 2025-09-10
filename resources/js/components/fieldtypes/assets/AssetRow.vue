@@ -1,5 +1,5 @@
 <template>
-    <tr class="cursor-grab bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-900">
+    <tr class="cursor-grab bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-900 border-b dark:border-dark-500 last:border-b-0">
         <td class="flex gap-3 h-full items-center p-3">
             <div
                 v-if="canShowSvg"
@@ -23,7 +23,7 @@
             <button
                 v-if="showFilename"
                 @click="editOrOpen"
-                class="flex w-full flex-1 items-center truncate text-sm text-gray-600 dark:text-gray-400 text-start"
+                class="flex flex-1 items-center w-24 @xs:w-full truncate text-sm text-gray-600 dark:text-gray-400 text-start"
                 :title="__('Edit')"
                 :aria-label="__('Edit Asset')"
             >
@@ -39,12 +39,12 @@
             />
             <div v-text="asset.size" class="asset-filesize hidden px-2 text-sm text-gray-600 dark:text-gray-400 @xs:inline" />
         </td>
-        <td class="p-3 align-middle text-end" v-if="!readOnly">
+        <td class="pe-3 align-middle text-end" v-if="!readOnly">
             <ui-button
                 @click="remove"
                 icon="x"
-                round
                 size="xs"
+                inset
                 variant="ghost"
                 :aria-label="__('Remove Asset')"
                 :title="__('Remove')"
