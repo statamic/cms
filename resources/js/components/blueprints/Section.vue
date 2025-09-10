@@ -4,7 +4,7 @@
             <ui-panel-header class="flex items-center justify-between pl-2.75! pr-3.25! ">
                 <div class="flex items-center gap-2 flex-1">
                     <ui-icon name="handles-sm" class="blueprint-section-drag-handle size-3! cursor-grab text-gray-400" />
-                    <ui-icon :name="iconName(section.icon)" v-if="section.icon" />
+                    <ui-icon :name="section.icon" :set="iconSet" v-if="section.icon" />
                     <ui-heading v-text="__(section.display ?? 'Section')" />
                 </div>
                 <ui-button icon="pencil-line" size="sm" variant="ghost" @click="edit" />
@@ -202,12 +202,6 @@ export default {
 
         editCancelled() {
             this.editingSection = false;
-        },
-
-        iconName(name) {
-            if (!name) return null;
-
-            return this.iconSet ? `${this.iconSet}/${name}` : name;
         },
     },
 };

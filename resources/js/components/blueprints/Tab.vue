@@ -2,7 +2,8 @@
     <TabTrigger :name="tab._id" class="blueprint-tab flex items-center">
         <Icon
             v-if="tab.icon"
-            :name="iconName(tab.icon)"
+            :name="tab.icon"
+            :set="iconSet"
             class="h-4 w-4 me-1"
         />
 
@@ -166,12 +167,6 @@ export default {
 
         remove() {
             this.$emit('removed');
-        },
-
-        iconName(name) {
-            if (!name) return null;
-
-            return this.iconSet ? `${this.iconSet}/${name}` : name;
         },
     },
 };

@@ -47,7 +47,8 @@
                 >
                     <div v-if="item.type === 'group'" @click="selectGroup(item.handle)" class="group flex rounded-md px-2 py-1.5 gap-3">
                         <ui-icon
-                            :name="groupIconName(item.icon)"
+                            :name="item.icon || 'folder'"
+                            :set="iconSet"
                             class="size-9 rounded-md border border-gray-300 bg-white dark:bg-gray-900/50 dark:border-gray-600 shadow-ui-xs p-2"
                         />
                         <div class="flex-1">
@@ -62,7 +63,8 @@
                     </div>
                     <div v-if="item.type === 'set'" @click="addSet(item.handle)" class="group flex rounded-md px-2 py-1.5 gap-3">
                         <ui-icon
-                            :name="setIconName(item.icon)"
+                            :name="item.icon || 'plus'"
+                            :set="iconSet"
                             class="size-9 rounded-md border border-gray-300 bg-white dark:bg-gray-900/50 dark:border-gray-600 shadow-ui-xs p-2"
                         />
                         <div class="flex-1">
@@ -270,18 +272,6 @@ export default {
 
         singleButtonClicked() {
             this.addSet(this.sets[0].sets[0].handle);
-        },
-
-        groupIconName(name) {
-            if (! name) return 'folder';
-
-            return this.iconSet ? `${this.iconSet}/${name}` : name;
-        },
-
-        setIconName(name) {
-            if (! name) return 'plus';
-
-            return this.iconSet ? `${this.iconSet}/${name}` : name;
         },
 
         open() {
