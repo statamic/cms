@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
-import { getIconSet } from './Icon/registry.js';
+import { getIconSet } from './registry.js';
 
 const props = defineProps({
     name: { type: String, required: true },
