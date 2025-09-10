@@ -1,6 +1,6 @@
 <script setup>
 import CardPanel from '../Card/Panel.vue';
-import Icon from '../Icon.vue';
+import Icon from '../Icon/Icon.vue';
 import { useSlots } from 'vue';
 
 const props = defineProps({

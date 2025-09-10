@@ -43,7 +43,7 @@
     
                 &.drag-handle {
                     width: 1%;
-                    background: url('../../../svg/ui/drag-dots.svg') center center no-repeat;
+                    background: url('../../../svg/icons/drag-dots.svg') center center no-repeat;
                     background-size: 7px 17px;
                     @apply h-full p-2 cursor-grab bg-gray-50 dark:bg-gray-900/25 hover:bg-gray-100 dark:hover:bg-gray-700 border-e border-gray-200 dark:border-gray-900 hover:border-e-gray-300 dark:hover:border-e-gray-600;
                 }

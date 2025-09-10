@@ -24,7 +24,7 @@
 
             <Dropdown placement="left-start">
                 <template #trigger>
-                    <Button :text="__('Add')" icon-append="ui/chevron-down" />
+                    <Button :text="__('Add')" icon-append="chevron-down" />
                 </template>
                 <DropdownMenu>
                     <DropdownItem :text="__('Add Nav Item')" @click="addItemToTopLevel" icon="plus" />
@@ -46,7 +46,7 @@
 
                 <Dropdown align="end" v-if="hasSaveAsOptions">
                     <template #trigger>
-                        <Button icon="ui/chevron-down" variant="primary" />
+                        <Button icon="chevron-down" variant="primary" />
                     </template>
                     <DropdownMenu>
                         <DropdownLabel>{{ __('Save to') }}...</DropdownLabel>

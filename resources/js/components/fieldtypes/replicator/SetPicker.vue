@@ -33,7 +33,7 @@
                     <button @click="unselectGroup" class="hover:text-gray-900 dark:hover:text-white cursor-pointer">
                         {{ __('Groups') }}
                     </button>
-                    <ui-icon name="ui/chevron-right" class="size-4" />
+                    <ui-icon name="chevron-right" class="size-4" />
                     <span>{{ selectedGroupDisplayText }}</span>
                 </div>
             </div>
@@ -48,7 +48,8 @@
                 >
                     <div v-if="item.type === 'group'" @click="selectGroup(item.handle)" class="group flex rounded-md p-2 gap-3">
                         <ui-icon
-                            :name="groupIconName(item.icon)"
+                            :name="item.icon || 'folder'"
+                            :set="iconSet"
                             class="size-9 rounded-md border border-gray-300 bg-white dark:bg-gray-900/50 dark:border-gray-600 shadow-ui-xs p-2"
                         />
                         <div class="flex-1">
@@ -59,12 +60,12 @@
                                 {{ __(item.instructions) }}
                             </div>
                         </div>
-                        <ui-icon name="ui/chevron-right" class="me-2" />
+                        <ui-icon name="chevron-right" class="me-2" />
                     </div>
                     <div v-if="item.type === 'set'" @click="addSet(item.handle)" class="group flex rounded-md p-2 gap-3">
                         <ui-icon
-                            :name="setIconName(item.icon)"
-                            :directory="iconBaseDirectory"
+                            :name="item.icon || 'plus'"
+                            :set="iconSet"
                             class="size-9 rounded-md border border-gray-300 bg-white dark:bg-gray-900/50 dark:border-gray-600 shadow-ui-xs p-2"
                         />
                         <div class="flex-1">
@@ -187,23 +188,8 @@ export default {
             return this.search && this.visibleSets.length === 0;
         },
 
-        iconBaseDirectory() {
-            return this.$config.get('setIconsDirectory');
-        },
-
-        iconSubFolder() {
-            return this.$config.get('setIconsFolder');
-        },
-
-        iconDirectory() {
-            let iconDirectory = this.$config.get('setIconsDirectory');
-            let iconFolder = this.$config.get('setIconsFolder');
-
-            if (iconFolder) {
-                iconDirectory = iconDirectory + '/' + iconFolder;
-            }
-
-            return iconDirectory;
+        iconSet() {
+            return this.$config.get('replicatorSetIcons') || undefined;
         },
     },
 
@@ -288,18 +274,6 @@ export default {
 
         singleButtonClicked() {
             this.addSet(this.sets[0].sets[0].handle);
-        },
-
-        groupIconName(name) {
-            if (!name) return 'folder';
-
-            return this.iconSubFolder ? this.iconSubFolder + '/' + name : name;
-        },
-
-        setIconName(name) {
-            if (!name) return 'plus';
-
-            return this.iconSubFolder ? this.iconSubFolder + '/' + name : name;
         },
 
         open() {

@@ -3,7 +3,7 @@ import { cva } from 'cva';
 import { ComboboxAnchor, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxRoot, ComboboxTrigger, ComboboxPortal, ComboboxViewport } from 'reka-ui';
 import { computed, nextTick, onMounted, ref, useAttrs, useSlots, useTemplateRef, watch } from 'vue';
 import Button from './Button/Button.vue';
-import Icon from './Icon.vue';
+import Icon from './Icon/Icon.vue';
 import Badge from './Badge.vue';
 import fuzzysort from 'fuzzysort';
 import { SortableList } from '@/components/sortable/Sortable.js';
@@ -317,7 +317,7 @@ defineExpose({
 
                         <div class="flex gap-1.5 items-center shrink-0 ms-1.5">
                             <Button v-if="clearable && modelValue" icon="x" variant="ghost" size="xs" round @click="clear" data-ui-combobox-clear-button />
-                            <Icon v-if="options.length || ignoreFilter" name="ui/chevron-down" class="text-gray-400 dark:text-white/40" data-ui-combobox-chevron />
+                            <Icon v-if="options.length || ignoreFilter" name="chevron-down" class="text-gray-400 dark:text-white/40" data-ui-combobox-chevron />
                         </div>
                     </ComboboxTrigger>
                 </ComboboxAnchor>

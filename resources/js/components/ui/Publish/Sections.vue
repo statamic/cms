@@ -64,7 +64,7 @@ function toggleSection(id) {
                 </div>
                 <Icon
                     v-if="section.collapsible"
-                    name="ui/chevron-down"
+                    name="chevron-down"
                     class="size-5 text-gray-400"
                     :class="section.collapsed ? 'rotate-270' : 'rotate-0'"
                 />

@@ -3,7 +3,7 @@ import { cva } from 'cva';
 import { hasComponent } from '@/composables/has-component.js';
 import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, DialogTrigger } from 'reka-ui';
 import { computed, getCurrentInstance, ref, watch } from 'vue';
-import Icon from '../Icon.vue';
+import Icon from '../Icon/Icon.vue';
 
 const emit = defineEmits(['update:open']);
 
