@@ -1,5 +1,5 @@
 <template>
-    <div class="@container relative w-full light:bg-gray-50">
+    <div class="@container relative w-full bg-gray-50 dark:bg-transparent">
         <div
             v-if="hasPendingDynamicFolder"
             class="w-full rounded-md border border-dashed px-4 py-3 text-sm text-gray-700 dark:border-gray-300 dark:text-gray-200"
@@ -123,7 +123,13 @@
                     </sortable-list>
 
                     <div class="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700 not-[.link-fieldtype_&]:border-t-0! not-[.link-fieldtype_&]:rounded-t-none" v-if="displayMode === 'list'">
-                        <table class="w-full">
+                        <table class="table-fixed w-full">
+                            <thead>
+                                <tr>
+                                    <th class="sr-only">Asset</th>
+                                    <th class="sr-only">Actions</th>
+                                </tr>
+                            </thead>
                             <sortable-list
                                 v-model="assets"
                                 item-class="asset-row"
