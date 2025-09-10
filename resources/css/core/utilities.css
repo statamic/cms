@@ -61,6 +61,18 @@
     }
 }
 
+/* UTILITIES / DECORATION / OTHER
+=================================================== */
+/* e.g. /cp/utilities/licensing */
+@utility little-dot {
+    border-radius:7px;
+    display:inline-block;
+    height:7px;
+    position:relative;
+    width:7px;
+    flex-shrink:0
+}
+
 /* UTILITIES / STATES
 =================================================== */
 /* Here we typically need a negative outline-offset because of the inner shadow on inputs */
