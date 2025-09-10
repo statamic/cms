@@ -70,7 +70,7 @@
                                 v-model:modelValue="newFolderName"
                                 :start-with-edit-mode="true"
                                 submit-mode="enter"
-                                :placeholder="__('New Folder')"
+                                :placeholder="__('new-folder')"
                                 @submit="$emit('create-folder', newFolderName)"
                                 @cancel="
                                     () => {
