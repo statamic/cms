@@ -21,7 +21,7 @@ const tag = computed(() => {
 });
 
 const classes = cva({
-    base: 'font-medium [&:has(+[data-ui-subheading])]:mb-0.5 [&:has(+[data-ui-subheading])]:text-gray-950 antialiased flex items-center gap-2',
+    base: 'font-medium [&:has(+[data-ui-subheading])]:mb-0.5 [&:has(+[data-ui-subheading])]:text-gray-950 dark:[&:has(+[data-ui-subheading])]:text-white antialiased flex items-center gap-2',
     variants: {
         size: {
             base: 'text-sm tracking-tight text-gray-700 dark:text-white',
