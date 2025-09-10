@@ -11,7 +11,6 @@ import { each, groupBy, orderBy, find, uniq } from 'lodash-es';
 import { motion } from 'motion-v';
 import { cva } from 'cva';
 import { Icon, Subheading } from '@/components/ui';
-import mousetrap from 'mousetrap';
 
 let metaPressed = ref(false);
 let open = ref(false);
@@ -43,7 +42,7 @@ each({
     });
 });
 
-mousetrap.bind('mod', () => metaPressed.value = false, 'keyup');
+Statamic.$keys.bind('mod+keyup', () => metaPressed.value = false);
 
 const actionItems = computed(() => {
     return sortJsInjectedItems(Statamic.$commandPalette.actions().filter(item => item.when()));
