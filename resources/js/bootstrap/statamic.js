@@ -37,7 +37,7 @@ import wait from '@/util/wait.js';
 import markdown from '@/util/markdown.js';
 import VueComponentDebug from 'vue-component-debug';
 import CommandPalette from '../components/CommandPalette.js';
-import { registerIconSetFromStrings } from '@statamic/ui';
+import { registerIconSetFromStrings } from '@ui';
 
 let bootingCallbacks = [];
 let bootedCallbacks = [];
