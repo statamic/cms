@@ -66,8 +66,8 @@ class Integer extends Fieldtype
     public function viewData($data)
     {
         return [
-            'min'  => $this->config('min'),
-            'max'  => $this->config('max'),
+            'min' => $this->config('min'),
+            'max' => $this->config('max'),
             'step' => $this->config('step'),
         ];
     }
