@@ -19,7 +19,7 @@ function rekeyGlobs(globbed) {
     return cleaned;
 }
 
-export function registerStringIconSet(name, icons) {
+export function registerIconSetFromStrings(name, icons) {
     registry.set(name, { type: 'strings', data: icons });
 }
 

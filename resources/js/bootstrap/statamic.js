@@ -37,7 +37,7 @@ import wait from '@/util/wait.js';
 import markdown from '@/util/markdown.js';
 import VueComponentDebug from 'vue-component-debug';
 import CommandPalette from '../components/CommandPalette.js';
-import { registerStringIconSet } from '@/components/ui/Icon/registry.js';
+import { registerIconSetFromStrings } from '@/components/ui/Icon/registry.js';
 
 let bootingCallbacks = [];
 let bootedCallbacks = [];
@@ -257,6 +257,6 @@ function registerIconSets(config) {
     const sets = config.customSvgIcons;
 
     for (const name in sets) {
-        registerStringIconSet(name, sets[name]);
+        registerIconSetFromStrings(name, sets[name]);
     }
 }
