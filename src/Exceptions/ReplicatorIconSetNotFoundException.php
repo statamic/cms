@@ -7,7 +7,7 @@ use Spatie\ErrorSolutions\Contracts\BaseSolution;
 use Spatie\ErrorSolutions\Contracts\ProvidesSolution;
 use Spatie\ErrorSolutions\Contracts\Solution;
 use Spatie\ErrorSolutions\Support\Laravel\StringComparator;
-use Statamic\CP\Icons\IconManager;
+use Statamic\Icons\IconManager;
 use Statamic\Statamic;
 
 class ReplicatorIconSetNotFoundException extends Exception implements ProvidesSolution

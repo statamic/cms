@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\CP\Icons;
+namespace Statamic\Icons;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;

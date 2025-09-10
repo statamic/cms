@@ -1,15 +1,15 @@
 <?php
 
-namespace Statamic\Facades\CP;
+namespace Statamic\Facades;
 
 use Illuminate\Support\Facades\Facade;
-use Statamic\CP\Icons\IconManager;
-use Statamic\CP\Icons\IconSet;
+use Statamic\Icons\IconManager;
+use Statamic\Icons\IconSet;
 
 /**
  * @method static IconSet get(string $name)
  *
- * @see \Statamic\CP\Icons\IconManager
+ * @see \Statamic\Icons\IconManager
  */
 class Icon extends Facade
 {

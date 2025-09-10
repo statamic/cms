@@ -3,7 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Exceptions\ReplicatorIconSetNotFoundException;
-use Statamic\Facades\CP\Icon;
+use Statamic\Facades\Icon;
 use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Fields\Fieldtype;

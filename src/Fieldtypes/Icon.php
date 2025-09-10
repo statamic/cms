@@ -2,9 +2,9 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\CP\Icons\IconSet;
-use Statamic\Facades\CP\Icon as Icons;
+use Statamic\Facades\Icon as Icons;
 use Statamic\Fields\Fieldtype;
+use Statamic\Icons\IconSet;
 
 class Icon extends Fieldtype
 {

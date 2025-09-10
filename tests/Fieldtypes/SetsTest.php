@@ -3,7 +3,7 @@
 namespace Tests\Fieldtypes;
 
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Facades\CP\Icon;
+use Statamic\Facades\Icon;
 use Statamic\Facades\Path;
 use Statamic\Fields\ConfigField;
 use Statamic\Fields\Field;
