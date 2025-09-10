@@ -8,11 +8,11 @@
             ></div>
             <button
                 v-else
-                class="size-15 cursor-pointer items-center justify-center whitespace-nowrap"
+                class="flex size-7 cursor-pointer items-center justify-center whitespace-nowrap"
                 @click="editOrOpen"
             >
                 <img
-                    class="asset-thumbnail text-gray-600 max-h-full max-w-full rounded-sm object-cover"
+                    class="asset-thumbnail size-7 text-gray-600 max-h-full max-w-full rounded-sm object-cover"
                     loading="lazy"
                     :src="thumbnail"
                     :alt="asset.basename"
