@@ -124,6 +124,12 @@
 
                     <div class="asset-rows relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700 not-[.link-fieldtype_&]:border-t-0! not-[.link-fieldtype_&]:rounded-t-none" v-if="displayMode === 'list'">
                         <table>
+                            <thead>
+                                <tr>
+                                    <th class="hidden">Asset</th>
+                                    <th class="hidden">Actions</th>
+                                </tr>
+                            </thead>
                             <sortable-list
                                 v-model="assets"
                                 item-class="asset-row"
