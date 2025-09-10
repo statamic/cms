@@ -1,5 +1,5 @@
 <template>
-    <tr class="asset-rows__row cursor-grab bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-900">
+    <tr class="relative cursor-grab bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-900">
         <td class="flex gap-3 h-full items-center p-3">
             <div
                 v-if="canShowSvg"
@@ -30,7 +30,7 @@
                 {{ asset.basename }}
             </button>
         </td>
-        <td class="asset-badges p-3 align-middle text-end">
+        <td class="absolute top-0 right-0 flex items-center bg-[linear-gradient(to_right,transparent_0%,white_1rem)] p-3 ps-[2rem] align-middle text-end">
             <ui-badge
                 v-if="showSetAlt && needsAlt"
                 as="button"

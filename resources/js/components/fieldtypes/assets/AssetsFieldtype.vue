@@ -122,8 +122,8 @@
                         </div>
                     </sortable-list>
 
-                    <div class="asset-rows relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700 not-[.link-fieldtype_&]:border-t-0! not-[.link-fieldtype_&]:rounded-t-none" v-if="displayMode === 'list'">
-                        <table>
+                    <div class="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700 not-[.link-fieldtype_&]:border-t-0! not-[.link-fieldtype_&]:rounded-t-none" v-if="displayMode === 'list'">
+                        <table class="table-fixed w-full">
                             <thead>
                                 <tr>
                                     <th class="sr-only">Asset</th>
