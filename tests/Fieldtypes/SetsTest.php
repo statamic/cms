@@ -4,6 +4,7 @@ namespace Tests\Fieldtypes;
 
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\CP\Icon;
+use Statamic\Facades\Path;
 use Statamic\Fields\ConfigField;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Sets;
@@ -433,6 +434,6 @@ class SetsTest extends TestCase
         $jsonVariables = Statamic::jsonVariables(request());
 
         $this->assertEquals('foo', $jsonVariables['replicatorSetIcons']);
-        $this->assertEquals($customDir, Icon::get('foo')->directory());
+        $this->assertEquals(Path::tidy($customDir), Icon::get('foo')->directory());
     }
 }
