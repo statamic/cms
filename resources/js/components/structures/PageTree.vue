@@ -91,6 +91,7 @@
 import { dragContext, Draggable, walkTreeData } from '@he-tree/vue';
 import TreeBranch from './Branch.vue';
 import { PanelHeader, Panel, Icon } from '@/components/ui';
+import { clone } from '@/bootstrap/globals.js';
 
 export default {
     components: {
@@ -160,7 +161,7 @@ export default {
         this.collapsedState = this.getCollapsedState();
 
         this.getPages().then(() => {
-            this.initialPages = this.pages;
+            this.initialPages = clone(this.pages);
         });
 
         this.$keys.bindGlobal(['mod+s'], (e) => {

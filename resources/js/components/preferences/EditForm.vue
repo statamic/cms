@@ -39,7 +39,7 @@
                     >
                         <template #trigger>
                             <Button
-                                icon="ui/chevron-down"
+                                icon="chevron-down"
                                 variant="primary"
                                 :aria-label="__('Open save options menu')"
                                 :aria-expanded="isDropdownOpen"

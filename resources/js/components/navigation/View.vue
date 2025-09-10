@@ -26,7 +26,7 @@
                 <template #trigger>
                     <Button
                         :text="__('Add')"
-                        icon-append="ui/chevron-down"
+                        icon-append="chevron-down"
                     />
                 </template>
                 <DropdownMenu>

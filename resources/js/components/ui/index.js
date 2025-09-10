@@ -36,7 +36,7 @@ import { default as Field } from "./Field.vue";
 import { default as FieldsProvider } from "./Publish/FieldsProvider.vue";
 import { default as Header } from "./Header.vue";
 import { default as Heading } from "./Heading.vue";
-import { default as Icon } from "./Icon.vue";
+import { default as Icon } from "./Icon/Icon.vue";
 import { default as Input } from "./Input/Input.vue";
 import { default as Label } from "./Label.vue";
 import { default as Listing } from "./Listing/Listing.vue";

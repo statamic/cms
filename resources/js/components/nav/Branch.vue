@@ -20,7 +20,7 @@
                 <Button
                     v-if="hasChildren && !isSection"
                     class="transition duration-100 [&_svg]:size-4! -mx-1.5"
-                    icon="ui/chevron-down"
+                    icon="chevron-down"
                     size="xs"
                     round
                     variant="ghost"

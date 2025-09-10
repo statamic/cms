@@ -142,8 +142,8 @@
                         <ui-badge icon="fingerprint" :text="asset.lastModifiedRelative" />
                     </div>
                     <div class="flex items-center space-x-3 rtl:space-x-reverse">
-                        <ui-button icon="ui/chevron-left" @click="navigateToPreviousAsset" v-tooltip="__('Previous Asset')" />
-                        <ui-button icon="ui/chevron-right" @click="navigateToNextAsset" v-tooltip="__('Next Asset')" />
+                        <ui-button icon="chevron-left" @click="navigateToPreviousAsset" v-tooltip="__('Previous Asset')" />
+                        <ui-button icon="chevron-right" @click="navigateToNextAsset" v-tooltip="__('Next Asset')" />
                         <ui-button variant="primary" icon="save" @click="saveAndClose" v-if="!readOnly" :text="__('Save')" />
                     </div>
                 </div>
