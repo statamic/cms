@@ -9,6 +9,7 @@ use Statamic\Query\Scopes\Filters\Fields\Integer as IntegerFilter;
 class Integer extends Fieldtype
 {
     protected $categories = ['number'];
+	
     protected $selectableInForms = true;
 
     protected function configFieldItems(): array
