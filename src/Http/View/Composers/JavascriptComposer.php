@@ -12,6 +12,7 @@ use Statamic\Facades\Icon;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Statamic\Icons\IconSet;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 use voku\helper\ASCII;
@@ -72,7 +73,7 @@ class JavascriptComposer
             'preloadableFieldtypes' => FieldtypeRepository::preloadable()->keys(),
             'livePreview' => config('statamic.live_preview'),
             'permissions' => $this->permissions($user),
-            'customSvgIcons' => Icon::toArray(),
+            'customSvgIcons' => $this->icons(),
             'commandPaletteCategories' => Category::order(),
             'commandPalettePreloadedItems' => CommandPalette::getPreloadedItems(),
         ];
@@ -115,5 +116,12 @@ class JavascriptComposer
         $fallbackTranslations = tap(app('translator'))->setLocale(app('translator')->getFallback())->toJson();
 
         return array_merge($fallbackTranslations, $translations);
+    }
+
+    private function icons()
+    {
+        return Icon::sets()->mapWithKeys(fn (IconSet $set) => [
+            $set->name() => $set->contents(),
+        ]);
     }
 }

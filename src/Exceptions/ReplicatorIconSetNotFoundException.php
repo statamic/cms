@@ -7,7 +7,7 @@ use Spatie\ErrorSolutions\Contracts\BaseSolution;
 use Spatie\ErrorSolutions\Contracts\ProvidesSolution;
 use Spatie\ErrorSolutions\Contracts\Solution;
 use Spatie\ErrorSolutions\Support\Laravel\StringComparator;
-use Statamic\Icons\IconManager;
+use Statamic\Facades\Icon;
 use Statamic\Statamic;
 
 class ReplicatorIconSetNotFoundException extends Exception implements ProvidesSolution
@@ -39,7 +39,7 @@ class ReplicatorIconSetNotFoundException extends Exception implements ProvidesSo
     protected function getSuggestedSet()
     {
         return StringComparator::findClosestMatch(
-            array_keys(IconManager::all()),
+            Icon::sets()->keys()->all(),
             $this->set
         );
     }

@@ -17,7 +17,7 @@ class IconManager
         $this->sets[$name] = new IconSet($name, $directory);
     }
 
-    public function all(): Collection
+    public function sets(): Collection
     {
         return collect($this->sets);
     }
@@ -35,17 +35,5 @@ class IconManager
     public function default(): IconSet
     {
         return new IconSet('default', statamic_path('resources/svg/icons'));
-    }
-
-    public function has(string $name)
-    {
-        return array_key_exists($name, $this->sets);
-    }
-
-    public function toArray()
-    {
-        return $this->all()->mapWithKeys(function (IconSet $set) {
-            return [$set->name() => $set->contents()];
-        });
     }
 }

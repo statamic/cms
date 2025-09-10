@@ -140,7 +140,7 @@ class Sets extends Fieldtype
     {
         if ($directory) {
             Icon::register($name, $directory);
-        } elseif (! Icon::has($name)) {
+        } elseif (! Icon::sets()->has($name)) {
             throw new ReplicatorIconSetNotFoundException($name);
         }
 
