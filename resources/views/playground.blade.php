@@ -2,7 +2,7 @@
     use function Statamic\trans as __;
     use Illuminate\Support\Facades\File;
 
-    $icons = collect(File::files(base_path('vendor/statamic/cms/resources/svg/icons')))->map(function ($file) {
+    $icons = collect(File::files(statamic_path('packages/ui/icons')))->map(function ($file) {
         return $file->getFilenameWithoutExtension();
     })->all();
 
