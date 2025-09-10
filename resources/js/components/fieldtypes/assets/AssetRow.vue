@@ -31,7 +31,6 @@
             </button>
         </td>
         <td class="asset-badges p-3 align-middle text-end">
-            <div v-text="asset.size" class="asset-filesize hidden px-2 text-sm text-gray-600 dark:text-gray-400 @xs:inline" />
             <ui-badge
                 v-if="showSetAlt && needsAlt"
                 as="button"
@@ -40,6 +39,7 @@
                 :text="__('Set Alt')"
                 @click="editOrOpen"
             />
+            <div v-text="asset.size" class="asset-filesize hidden px-2 text-sm text-gray-600 dark:text-gray-400 @xs:inline" />
             <div v-if="!readOnly">
                 <ui-button
                     @click="remove"
