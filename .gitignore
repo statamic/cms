@@ -11,8 +11,8 @@ resources/dist
 resources/dist-dev
 resources/dist-frontend
 resources/dist-package
-resources/js/package/types
-resources/js/package/vite-plugin/tailwind-exclusions.css
+packages/cms/types
+packages/cms/vite-plugin/tailwind-exclusions.css
 composer.lock
 .env
 bundle-stats.html

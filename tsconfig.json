@@ -6,7 +6,7 @@
     "allowJs": true,
     "declaration": true,
     "emitDeclarationOnly": true,
-    "outDir": "./resources/js/package/types",
+    "outDir": "./packages/cms/types",
     "baseUrl": ".",
     "strict": true,
     "esModuleInterop": true,
@@ -24,6 +24,6 @@
     "node_modules",
     "vendor",
     "resources/js/tests",
-    "resources/js/package"
+    "packages",
   ]
 }

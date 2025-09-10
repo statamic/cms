@@ -14,7 +14,7 @@
     "frontend-dev": "vite -c vite-frontend.config.js",
     "frontend-build": "vite build -c vite-frontend.config.js",
     "knip": "knip",
-    "types": "rm -rf resources/js/package/types && vue-tsc --declaration --emitDeclarationOnly || true"
+    "types": "rm -rf packages/cms/types && vue-tsc --declaration --emitDeclarationOnly || true"
   },
   "dependencies": {
     "@davidenke/marked-text-renderer": "^3.0.0",
