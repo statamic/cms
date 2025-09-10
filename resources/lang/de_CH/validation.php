@@ -119,7 +119,7 @@ return [
     'arr_fieldtype' => 'Dies ist ungültig.',
     'handle' => 'Darf nur Kleinbuchstaben und Zahlen enthalten, Unterstriche dienen als Trenner.',
     'handle_starts_with_number' => 'Darf nicht mit einer Zahl beginnen.',
-   'slug' => 'Darf nur Buchstaben und Zahlen enthalten, Bindestriche oder Unterstriche dienen als Trenner.',
+    'slug' => 'Darf nur Buchstaben und Zahlen enthalten, Bindestriche oder Unterstriche dienen als Trenner.',
     'code_fieldtype_rulers' => 'Dies ist ungültig.',
     'composer_package' => 'Muss ein gültiger Composer-Paketname sein (z.B. hasselhoff/kung-fury).',
     'date_fieldtype_date_required' => 'Ein Datum ist erforderlich.',
