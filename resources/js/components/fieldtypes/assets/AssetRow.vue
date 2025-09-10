@@ -40,7 +40,7 @@
                 :text="__('Set Alt')"
                 @click="editOrOpen"
             />
-            <!-- <div v-if="!readOnly"> -->
+            <div v-if="!readOnly">
                 <ui-button
                     @click="remove"
                     icon="x"
@@ -60,7 +60,7 @@
                     @action-completed="actionCompleted"
                 >
                 </asset-editor>
-            <!-- </div> -->
+            </div>
         </td>
     </tr>
 </template>
