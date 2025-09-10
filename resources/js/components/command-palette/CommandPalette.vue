@@ -11,7 +11,9 @@ import { each, groupBy, orderBy, find, uniq } from 'lodash-es';
 import { motion } from 'motion-v';
 import { cva } from 'cva';
 import { Icon, Subheading } from '@/components/ui';
+import mousetrap from 'mousetrap';
 
+let metaPressed = ref(false);
 let open = ref(false);
 let query = ref('');
 let serverCategories = Statamic.$config.get('commandPaletteCategories');
@@ -31,6 +33,7 @@ each({
     esc: () => open.value = false,
     'ctrl+n': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' })),
     'ctrl+p': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp' })),
+    mod: () => metaPressed.value = true,
 }, (callback, binding) => {
     Statamic.$keys.bindGlobal([binding], (e) => {
         if (open.value) {
@@ -39,6 +42,8 @@ each({
         }
     });
 });
+
+mousetrap.bind('mod', () => metaPressed.value = false, 'keyup');
 
 const actionItems = computed(() => {
     return sortJsInjectedItems(Statamic.$commandPalette.actions().filter(item => item.when()));
@@ -314,7 +319,7 @@ const modalClasses = cva({
                                             v-else
                                             :icon="item.icon"
                                             :href="item.url"
-                                            :open-new-tab="item.openNewTab"
+                                            :open-new-tab="metaPressed || item.openNewTab"
                                             :badge="item.keys || item.badge"
                                             :removable="isRecentItem(item)"
                                             @remove="removeRecentItem"
