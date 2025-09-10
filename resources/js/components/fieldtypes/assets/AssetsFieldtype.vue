@@ -126,8 +126,8 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th class="hidden">Asset</th>
-                                    <th class="hidden">Actions</th>
+                                    <th class="sr-only">Asset</th>
+                                    <th class="sr-only">Actions</th>
                                 </tr>
                             </thead>
                             <sortable-list
