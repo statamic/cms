@@ -52,6 +52,12 @@
     font-weight: 425;
 }
 
+@utility input-text {
+    width: 100%;
+    /* e.g. in a Bard table */
+    @apply p-2 text-gray-900 dark:text-gray-100;
+}
+
 /* UTILITIES / DECORATION / SHADOWS
 =================================================== */
 @utility shadow-sm-b {
@@ -59,6 +65,18 @@
     &:where(.dark, .dark *) {
         box-shadow: unset;
     }
+}
+
+/* UTILITIES / DECORATION / OTHER
+=================================================== */
+/* e.g. /cp/utilities/licensing */
+@utility little-dot {
+    border-radius:7px;
+    display:inline-block;
+    height:7px;
+    position:relative;
+    width:7px;
+    flex-shrink:0
 }
 
 /* UTILITIES / STATES
