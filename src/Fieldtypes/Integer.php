@@ -22,6 +22,21 @@ class Integer extends Fieldtype
                         'instructions' => __('statamic::fieldtypes.text.config.placeholder'),
                         'type' => 'text',
                     ],
+                    'min' => [
+                        'display' => __('Minimum Value'),
+                        'instructions' => __('The minimum allowed value.'),
+                        'type' => 'integer',
+                    ],
+                    'max' => [
+                        'display' => __('Maximum Value'),
+                        'instructions' => __('The maximum allowed value.'),
+                        'type' => 'integer',
+                    ],
+                    'step' => [
+                        'display' => __('Step'),
+                        'instructions' => __('The interval between valid numbers.'),
+                        'type' => 'integer',
+                    ],
                     'default' => [
                         'display' => __('Default Value'),
                         'instructions' => __('statamic::messages.fields_default_instructions'),
@@ -48,6 +63,14 @@ class Integer extends Fieldtype
         ];
     }
 
+    public function viewData($data)
+    {
+        return [
+            'min'  => $this->config('min'),
+            'max'  => $this->config('max'),
+            'step' => $this->config('step'),
+        ];
+    }
     public function preProcess($data)
     {
         if ($data === null) {
@@ -82,6 +105,14 @@ class Integer extends Fieldtype
 
         if ($min = $this->config('min')) {
             $rules[] = 'min:'.$min;
+        }
+
+        if ($max = $this->config('max')) {
+            $rules[] = 'max:'.$max;
+        }
+
+        if ($step = $this->config('step')) {
+            $rules[] = 'multiple_of:'.$step;
         }
 
         return $rules;
