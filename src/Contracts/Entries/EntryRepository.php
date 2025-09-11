@@ -16,6 +16,8 @@ interface EntryRepository
 
     public function findByUri(string $uri);
 
+    public function findByIds($ids);
+
     public function make();
 
     public function query();
