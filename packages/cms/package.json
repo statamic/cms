@@ -15,6 +15,7 @@
             "default": "./ui.js"
         },
         "./ui.css": "./ui.css",
+        "./tailwind.css": "./tailwind.css",
         "./bard": {
             "types": "./types/bootstrap/cms/bard.d.ts",
             "default": "./bard.js"
