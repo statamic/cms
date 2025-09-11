@@ -63,7 +63,7 @@
                         <a class="group flex cursor-pointer items-center">
                             <file-icon
                                 extension="folder"
-                                class="me-2 inline-block size-8 text-blue-400 group-hover:text-blue-500"
+                                class="me-2 inline-block size-8 text-blue-400 group-hover:text-blue-600"
                             />
                             <Editable
                                 ref="newFolderInput"
@@ -99,7 +99,7 @@
                         @click.native.stop="$emit('edit-asset', asset)"
                     />
                     <button
-                        class="cursor-pointer normal-nums select-none group-hover:text-blue-500 text-start"
+                        class="cursor-pointer normal-nums select-none group-hover:text-blue-600 text-start"
                         @click="$emit('edit-asset', asset)"
                     >
                         {{ isSearching ? asset.path : asset.basename }}
