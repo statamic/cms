@@ -19,7 +19,7 @@
 <div class="space-y-12">
     <section class="space-y-4">
         <ui-heading size="lg">Drawer</ui-heading>
-        <ui-drawer title="Drawer Demo" description="This is a drawer description.">
+        <ui-drawer title="Drawer Demo" description="This is a drawer description." variant="layered">
             <template #trigger>
                 <ui-button text="Open Drawer" />
             </template>
