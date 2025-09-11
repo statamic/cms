@@ -26,7 +26,7 @@
                     </div>
 
                     <div class="flex items-center">
-                        <ui-button v-if="canDefineLocalizable" inset size="sm" icon="earth" :variant="localizable ? 'ghost' : 'subtle'" v-tooltip="__('Localizable')" @click="localizable = !localizable" />
+                        <ui-button v-if="canDefineLocalizable" inset size="sm" icon="earth" :variant="localizable ? 'ghost-pressed' : 'subtle'" v-tooltip="__('Localizable')" @click="localizable = !localizable" />
                         <ui-button inset size="sm" icon="duplicate" variant="subtle" @click.prevent="$emit('duplicate')" v-tooltip="__('Duplicate')" />
                         <ui-button inset size="sm" icon="trash" variant="subtle" @click.prevent="$emit('deleted')" v-tooltip="__('Remove')" />
                     </div>
