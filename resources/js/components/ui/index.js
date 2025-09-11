@@ -23,6 +23,7 @@ import { default as DatePicker } from "./DatePicker/DatePicker.vue";
 import { default as DateRangePicker } from "./DateRangePicker/DateRangePicker.vue";
 import { default as Description } from "./Description.vue";
 import { default as DragHandle } from "./DragHandle.vue";
+import { default as Drawer } from "./Drawer/Drawer.vue";
 import { default as Dropdown } from "./Dropdown/Dropdown.vue";
 import { default as DropdownItem } from "./Dropdown/Item.vue";
 import { default as DropdownLabel } from "./Dropdown/Label.vue";
@@ -129,6 +130,7 @@ export {
     DateRangePicker,
     Description,
     DragHandle,
+    Drawer,
     Dropdown,
     DropdownItem,
     DropdownLabel,

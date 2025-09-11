@@ -129,7 +129,7 @@
                     icon="edit"
                 />
                 <DropdownItem
-                    :text="__('Edit Nav item')"
+                    :text="__('Edit Nav Item')"
                     @click="editPage(branch)"
                     icon="edit"
                 />
