@@ -1,6 +1,5 @@
 @layer theme, utilities;
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/utilities.css" layer(utilities);
-@source not statamic;
 
 /** Your custom styles go here */
