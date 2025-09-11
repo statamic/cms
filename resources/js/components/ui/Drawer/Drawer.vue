@@ -7,11 +7,21 @@ import { Motion } from 'motion-v'
 const emit = defineEmits(['update:open']);
 
 const props = defineProps({
+    blur: { type: Boolean, default: false },
     description: { type: [String, null], default: null },
     open: { type: Boolean, default: false },
     side: { type: String, default: 'right' },
     title: { type: String, default: '' },
 });
+
+const overlayClasses = cva({
+    base: 'fixed inset-0 z-30 bg-gray-800/20 dark:bg-gray-800/50',
+    variants: {
+        blur: {
+            true: 'backdrop-blur-[2px]',
+        },
+    },
+})({ ...props });
 
 const drawerClasses = cva({
     base: [
@@ -65,7 +75,7 @@ const hasFooter = !!slots.footer;
         </DialogTrigger>
         <DialogPortal>
             <DialogOverlay as-child>
-                <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :exit="{ opacity: 0 }" :transition="{ duration: 0.25 }" class="fixed inset-0 z-30 bg-gray-800/20 dark:bg-gray-800/50" />
+                <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :exit="{ opacity: 0 }" :transition="{ duration: 0.25 }" :class="overlayClasses" />
             </DialogOverlay>
             <DialogContent :class="[drawerClasses, $attrs.class]" data-ui-drawer-content :aria-describedby="description || undefined">
                 <header class="py-2 px-4">
