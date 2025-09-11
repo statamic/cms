@@ -18,8 +18,8 @@
             <site-selector
                 v-if="sites.length > 1"
                 :sites="sites"
-                :value="site"
-                @input="siteSelected"
+                :model-value="site"
+                @update:modelValue="siteSelected"
             />
 
             <Dropdown v-if="canEdit && hasCollections" placement="left-start" :disabled="!hasCollections">
@@ -443,7 +443,7 @@ export default {
         },
 
         siteSelected(site) {
-            window.location = site.url;
+            window.location = this.sites.find((s) => s.handle === site).url;
         },
 
         updatePublishInfo(info) {
