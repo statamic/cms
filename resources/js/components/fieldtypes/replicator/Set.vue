@@ -12,7 +12,7 @@ import {
     Button,
     DropdownMenu,
     PublishFields as Fields,
-    FieldsProvider,
+    PublishFieldsProvider as FieldsProvider,
     injectPublishContext as injectContainerContext,
 } from '@/components/ui';
 import { Motion } from 'motion-v';

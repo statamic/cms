@@ -1,7 +1,6 @@
 export * from '@statamic/ui';
 
 export { default as CreateForm } from "./CreateForm.vue";
-export { default as FieldsProvider } from "./Publish/FieldsProvider.vue";
 export { default as LivePreview } from "./LivePreview/LivePreview.vue";
 export { default as PublishComponents } from "./Publish/Components.vue";
 export {
@@ -11,6 +10,7 @@ export {
 } from "./Publish/Container.vue";
 export { default as PublishField } from "./Publish/Field.vue";
 export { default as PublishFields } from "./Publish/Fields.vue";
+export { default as PublishFieldsProvider } from "./Publish/FieldsProvider.vue";
 export { default as PublishForm } from "./Publish/Form.vue";
 export { default as PublishLocalizations } from "./Publish/Localizations.vue";
 export { default as PublishSections } from "./Publish/Sections.vue";

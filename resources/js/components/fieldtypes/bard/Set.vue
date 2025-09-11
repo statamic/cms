@@ -109,7 +109,7 @@ import {
     Subheading,
     Switch,
     Tooltip,
-    FieldsProvider,
+    PublishFieldsProvider as FieldsProvider,
     PublishFields as Fields,
     publishContextKey
 } from '@ui';

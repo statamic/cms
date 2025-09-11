@@ -2,7 +2,7 @@
 import { ref, computed, onUnmounted } from 'vue';
 import {
     PublishContainer,
-    FieldsProvider,
+    PublishFieldsProvider as FieldsProvider,
     PublishFields,
 } from '@ui';
 import { requireElevatedSessionIf } from '@/components/elevated-sessions/index.js';
