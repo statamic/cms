@@ -35,6 +35,7 @@ export default defineConfig(({ mode, command }) => {
                 '@': path.resolve(__dirname, 'resources/js'),
                 '@ui': path.resolve(__dirname, 'resources/js/components/ui'),
                 '@statamic/ui': path.resolve(__dirname, 'packages/ui/src'),
+                '@statamic/cms': path.resolve(__dirname, 'packages/cms'),
             },
         },
         build: {
