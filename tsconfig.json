@@ -13,17 +13,19 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "paths": {
-      "@/*": ["resources/js/*"]
+      "@/*": ["resources/js/*"],
+      "@statamic/ui": ["packages/ui/src/index.js"]
     },
     "types": ["node"]
   },
   "include": [
     "resources/js/bootstrap/cms",
+    "packages/ui/src"
   ],
   "exclude": [
     "node_modules",
     "vendor",
     "resources/js/tests",
-    "packages",
+    "packages/cms"
   ]
 }

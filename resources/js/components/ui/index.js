@@ -1,4 +1,4 @@
-export * from '@statamic/ui';
+export * from '../../../../packages/ui/src/index.js';
 
 export { default as CreateForm } from "./CreateForm.vue";
 export { default as LivePreview } from "./LivePreview/LivePreview.vue";
