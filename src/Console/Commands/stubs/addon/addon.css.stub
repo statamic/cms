@@ -1,5 +1,4 @@
-@layer theme, utilities;
-@import "tailwindcss/theme.css" layer(theme);
-@import "tailwindcss/utilities.css" layer(utilities);
+@import '@statamic/cms/tailwind.css';
+@source '../js';
 
 /** Your custom styles go here */
