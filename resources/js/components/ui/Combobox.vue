@@ -23,7 +23,7 @@ const props = defineProps({
     optionLabel: { type: String, default: 'label' },
     options: { type: Array, default: null },
     optionValue: { type: String, default: 'value' },
-    placeholder: { type: String, default: 'Select...' },
+    placeholder: { type: String, default: () => __('Select...') },
     readOnly: { type: Boolean, default: false },
     searchable: { type: Boolean, default: true },
     size: { type: String, default: 'base' },
@@ -299,13 +299,14 @@ defineExpose({
                                 @keydown.space="openOnSpace"
                             />
 
-                            <button type="button" class="w-full text-start truncate bg-transparent cursor-pointer" v-else-if="!searchable && (dropdownOpen || !modelValue)" @keydown.space="openOnSpace" data-ui-combobox-placeholder>
+                            <button type="button" class="w-full text-start truncate flex items-center gap-2 bg-transparent cursor-pointer" v-else-if="!searchable && (dropdownOpen || !modelValue)" @keydown.space="openOnSpace" data-ui-combobox-placeholder>
+                            <Icon v-if="icon" :name="icon" class="text-gray-400 dark:text-white dark:opacity-50" />
                                 <span class="text-gray-400 dark:text-gray-500" v-text="placeholder" />
                             </button>
 
                             <button type="button" v-else class="w-full text-start bg-transparent truncate flex items-center gap-2 cursor-pointer" @keydown.space="openOnSpace" data-ui-combobox-selected-option>
                                 <slot name="selected-option" v-bind="{ option: selectedOption }">
-                                    <Icon v-if="icon" :name="icon" class="text-white-400 dark:text-white dark:opacity-50" />
+                                    <Icon v-if="icon" :name="icon" class="text-gray-400 dark:text-white dark:opacity-50" />
                                     <span v-if="labelHtml" v-html="getOptionLabel(selectedOption)" />
                                     <span v-else v-text="getOptionLabel(selectedOption)" />
                                 </slot>
@@ -314,7 +315,7 @@ defineExpose({
 
                         <div class="flex gap-1.5 items-center shrink-0 ms-1.5">
                             <Button v-if="clearable && modelValue" icon="x" variant="ghost" size="xs" round @click="clear" data-ui-combobox-clear-button />
-                            <Icon v-if="options.length || ignoreFilter" name="ui/chevron-down" class="text-gray-400 dark:text-white/40" data-ui-combobox-chevron />
+                            <Icon v-if="options.length || ignoreFilter" name="chevron-down" class="text-gray-400 dark:text-white/40" data-ui-combobox-chevron />
                         </div>
                     </ComboboxTrigger>
                 </ComboboxAnchor>

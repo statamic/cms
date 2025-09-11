@@ -39,7 +39,12 @@ const buttonClasses = computed(() => {
                 danger: 'btn-danger bg-linear-to-b from-red-600/90 to-red-600 hover:bg-red-600/90 text-white border border-red-600 inset-shadow-2xs inset-shadow-red-300 [&_svg]:text-red-200 disabled:text-red-200',
                 filled: 'bg-black/5 hover:bg-black/10 hover:text-gray-900 dark:hover:text-white dark:bg-white/15 dark:hover:bg-white/20 [&_svg]:opacity-70',
                 ghost: 'bg-transparent hover:bg-gray-400/10 text-gray-900 dark:text-gray-300 dark:hover:bg-white/15 dark:hover:text-gray-200',
-                subtle: 'bg-transparent hover:bg-gray-400/10 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-white/15 dark:hover:text-gray-200 [&_svg]:opacity-40',
+                'ghost-pressed': 'bg-transparent hover:bg-gray-400/10 text-black dark:text-white dark:hover:bg-white/15 dark:hover:text-white [&_svg]:opacity-100',
+                subtle: 'bg-transparent hover:bg-gray-400/10 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-white/15 dark:hover:text-gray-200 [&_svg]:opacity-35',
+                pressed: [
+                    'bg-linear-to-b from-gray-100 to-gray-100 text-gray-900 border border-gray-300 inset-shadow-sm/10',
+                    'dark:from-gray-950 dark:to-gray-950 dark:text-white dark:border-white/10',
+                ],
             },
             size: {
                 lg: 'px-6 h-12 text-base gap-2 rounded-lg text-base',
@@ -48,11 +53,14 @@ const buttonClasses = computed(() => {
                 xs: 'px-2 h-6 text-xs gap-1.5 rounded-md [&_svg]:size-2.5',
             },
             groupBorder: {
-                // Danger button base styling should be the same as default buttons when in a group
-                danger: [
-                    'btn-danger bg-linear-to-b from-white to-gray-50 hover:to-gray-100 hover:bg-gray-50 text-gray-900 border border-gray-300 shadow-ui-sm',
-                    'dark:from-gray-850 dark:to-gray-900 dark:hover:to-gray-850 dark:hover:bg-gray-900 dark:border-gray-700 dark:text-gray-300 dark:shadow-ui-md',
-                ],
+                default:
+                    'in-data-ui-button-group:border-s-0 [:is([data-ui-button-group]>&:first-child,_[data-ui-button-group]_:first-child>&)]:border-s-[1px]',
+                primary:
+                    'in-data-ui-button-group:border-s-0 [:is([data-ui-button-group]>&:first-child,_[data-ui-button-group]_:first-child>&)]:border-s-[1px] [:is([data-ui-button-group]>&:last-child,_[data-ui-button-group]_:last-child>&)]:border-e-[1px] [:is([data-ui-button-group]>&:not(:first-child),_[data-ui-button-group]_:not(:first-child)>&)]:border-s-primary-gap',
+                danger: 'in-data-ui-button-group:border-s-0 in-data-ui-button-group:border-e [:is([data-ui-button-group]>&:last-child,_[data-ui-button-group]_:last-child>&)]:border-e-0 in-data-ui-button-group:border-red-600',
+                filled: 'in-data-ui-button-group:border-e [:is([data-ui-button-group]>&:last-child,_[data-ui-button-group]_:last-child>&)]:border-e-0 in-data-ui-button-group:border-gray-300/70',
+                ghost: '',
+                pressed: 'in-data-ui-button-group:border-s-0 [:is([data-ui-button-group]>&:first-child,_[data-ui-button-group]_:first-child>&)]:border-s-[1px]',
             },
             iconOnly: { true: 'px-0 gap-0' },
             round: { true: 'rounded-full' },

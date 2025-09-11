@@ -1,6 +1,6 @@
 <?php
 
-namespace CP\Breadcrumbs;
+namespace Tests\CP\Breadcrumbs;
 
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\CP\Breadcrumbs\Breadcrumb;

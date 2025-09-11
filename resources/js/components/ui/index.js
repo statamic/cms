@@ -23,6 +23,7 @@ import { default as DatePicker } from "./DatePicker/DatePicker.vue";
 import { default as DateRangePicker } from "./DateRangePicker/DateRangePicker.vue";
 import { default as Description } from "./Description.vue";
 import { default as DragHandle } from "./DragHandle.vue";
+import { default as Drawer } from "./Drawer/Drawer.vue";
 import { default as Dropdown } from "./Dropdown/Dropdown.vue";
 import { default as DropdownItem } from "./Dropdown/Item.vue";
 import { default as DropdownLabel } from "./Dropdown/Label.vue";
@@ -36,7 +37,7 @@ import { default as Field } from "./Field.vue";
 import { default as FieldsProvider } from "./Publish/FieldsProvider.vue";
 import { default as Header } from "./Header.vue";
 import { default as Heading } from "./Heading.vue";
-import { default as Icon } from "./Icon.vue";
+import { default as Icon } from "./Icon/Icon.vue";
 import { default as Input } from "./Input/Input.vue";
 import { default as Label } from "./Label.vue";
 import { default as Listing } from "./Listing/Listing.vue";
@@ -129,6 +130,7 @@ export {
     DateRangePicker,
     Description,
     DragHandle,
+    Drawer,
     Dropdown,
     DropdownItem,
     DropdownLabel,

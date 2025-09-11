@@ -14,7 +14,7 @@ const props = defineProps({
     disabled: { type: Boolean, default: false },
     readOnly: { type: Boolean, default: false },
     error: { type: String },
-    errors: { type: Object, default: (props) => (props.error ? [props.error] : []) },
+    errors: { type: Object },
     id: { type: String },
     instructions: { type: String, default: '' },
     instructionsBelow: { type: Boolean, default: false },
@@ -55,6 +55,14 @@ const classes = computed(() =>
 
 const instructions = computed(() => props.instructions ? markdown(__(props.instructions), { openLinksInNewTabs: true }) : null);
 const wrapperComponent = computed(() => props.as === 'card' ? Card : 'div');
+
+const errors = computed(() => {
+    if (props.error) {
+        return [props.error];
+    }
+
+    return props.errors;
+});
 </script>
 
 <template>
@@ -62,7 +70,7 @@ const wrapperComponent = computed(() => props.as === 'card' ? Card : 'div');
         <div
             v-if="$slots.actions"
             :class="[
-                'flex items-center gap-x-1',
+                'flex items-center gap-x-1 mb-0',
                 props.label || $slots.label ? 'justify-between' : 'justify-end',
             ]"
             data-ui-field-header

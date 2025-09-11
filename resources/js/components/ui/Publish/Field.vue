@@ -216,7 +216,7 @@ const fieldtypeComponentEvents = computed(() => ({
             <template #label v-if="shouldShowLabel">
                 <Label :for="fieldId" :required="isRequired">
                     <template v-if="shouldShowLabelText">
-                        <Tooltip :text="config.handle" :delay="1000">
+                        <Tooltip :text="config.handle" :delay="1000" as="span">
                             {{ __(config.display) }}
                         </Tooltip>
                     </template>

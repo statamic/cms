@@ -17,8 +17,28 @@
 </ui-header>
 
 <div class="space-y-12">
-
-    <ui-switch />
+    <section class="space-y-4">
+        <ui-heading size="lg">Drawer</ui-heading>
+        <ui-drawer title="Drawer Demo" description="This is a drawer description." variant="layered">
+            <template #trigger>
+                <ui-button text="Open Drawer" />
+            </template>
+            <div class="space-y-8">
+                <ui-field name="name" label="Name" placeholder="Your name">
+                    <ui-input label="Name" placeholder="Your name" />
+                </ui-field>
+                <ui-field name="email" label="Email">
+                    <ui-input label="Email" type="email" placeholder="Your email" />
+                </ui-field>
+            </div>
+            <template #footer>
+                <div class="flex gap-2 items-center justify-end">
+                    <ui-button text="Cancel" variant="ghost" />
+                    <ui-button text="Save" variant="primary" />
+                </div>
+            </template>
+        </ui-drawer>
+    </section>
 
     <section class="space-y-4">
         <ui-heading size="lg">Badges</ui-heading>
@@ -122,7 +142,7 @@
         <div class="flex">
             <ui-dropdown>
                 <template #trigger>
-                    <ui-button text="Do a Action" variant="filled" icon-append="ui/chevron-vertical" class="[&_svg]:size-2" />
+                    <ui-button text="Do a Action" variant="filled" icon-append="chevron-vertical" class="[&_svg]:size-2" />
                 </template>
             <ui-dropdown-menu>
                 <ui-dropdown-item text="Bake a food" />
@@ -223,9 +243,22 @@
     </section>
 
     <section class="space-y-4">
+        <ui-heading size="lg">Disabled Radio Items</ui-heading>
+        <ui-radio-group name="favorite" label="Choose your favorite Star Wars movie">
+            <ui-radio-item label="A New Hope" value="ep4"/>
+            <ui-radio-item label="Empire Strikes Back" value="ep5" />
+            <ui-radio-item label="Return of the Jedi" value="ep6" />
+            <ui-radio-item disabled label="the Force Awakens" value="ep7" />
+            <ui-radio-item disabled label="The Last Jedi" value="ep8" />
+            <ui-radio-item disabled label="The Rise of Skywalker" value="ep9" />
+        </ui-radio-group>
+    </section>
+
+    <section class="space-y-4">
         <ui-heading size="lg">Select</ui-heading>
         <div class="flex">
             <ui-select
+                icon="money-bag-dollar"
                 class="w-full"
                 label="Favorite band"
                 :options="[

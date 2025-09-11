@@ -44,7 +44,7 @@
                         class="w-full mt-6"
                         variant="primary"
                         :disabled="!reference"
-                        :text="__('Link')"
+                        :text="__('Link Field')"
                         @click="linkField"
                     />
 
@@ -87,7 +87,7 @@
                         class="w-full mt-6"
                         variant="primary"
                         :disabled="!fieldset"
-                        :text="__('Link')"
+                        :text="__('Link Fieldset')"
                         @click="linkFieldset"
                     />
                 </div>
