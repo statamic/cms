@@ -12,7 +12,7 @@ resources/dist-dev
 resources/dist-frontend
 resources/dist-package
 packages/cms/types
-packages/cms/ui.css
+packages/cms/src/ui.css
 composer.lock
 .env
 bundle-stats.html

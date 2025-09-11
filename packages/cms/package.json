@@ -8,28 +8,28 @@
     "exports": {
         ".": {
             "types": "./types/bootstrap/cms/core.d.ts",
-            "default": "./index.js"
+            "default": "./src/index.js"
         },
         "./ui": {
             "types": "./types/bootstrap/cms/ui.d.ts",
-            "default": "./ui.js"
+            "default": "./src/ui.js"
         },
-        "./ui.css": "./ui.css",
-        "./tailwind.css": "./tailwind.css",
+        "./ui.css": "./src/ui.css",
+        "./tailwind.css": "./src/tailwind.css",
         "./bard": {
             "types": "./types/bootstrap/cms/bard.d.ts",
-            "default": "./bard.js"
+            "default": "./src/bard.js"
         },
         "./save-pipeline": {
             "types": "./types/bootstrap/cms/save-pipeline.d.ts",
-            "default": "./save-pipeline.js"
+            "default": "./src/save-pipeline.js"
         },
         "./temporary": {
             "types": "./types/bootstrap/cms/temporary.d.ts",
-            "default": "./temporary.js"
+            "default": "./src/temporary.js"
         },
         "./vite-plugin": {
-            "default": "./vite-plugin/index.js"
+            "default": "./src/vite-plugin/index.js"
         }
     }
 }
