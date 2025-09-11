@@ -1,6 +1,6 @@
 <?php
 
-namespace Feature\Users;
+namespace Tests\Feature\Users;
 
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;

@@ -130,8 +130,8 @@ return [
 
         // 'progress-bar' => Color::Volt,
 
-        // 'switch-bg' => Color::Green[400],
-        // 'dark-switch-bg' => Color::Green[500],
+        // 'switch-bg' => Color::Green[500],
+        // 'dark-switch-bg' => Color::Green[600],
     ],
 
     /*

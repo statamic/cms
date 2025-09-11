@@ -7,29 +7,46 @@
                 </DropdownMenu>
             </Dropdown>
 
-            <Button
+            <ui-command-palette-item
                 v-if="isDirty"
-                variant="filled"
+                :category="$commandPalette.category.Actions"
                 :text="__('Discard changes')"
-                @click="$refs.tree.cancel"
-            />
+                icon="trash"
+                :action="discardChanges"
+                v-slot="{ text, action }"
+            >
+                <Button
+                    variant="filled"
+                    :text="__('Discard changes')"
+                    @click="action"
+                />
+            </ui-command-palette-item>
 
             <Dropdown placement="left-start">
                 <template #trigger>
-                    <Button :text="__('Add')" icon-append="ui/chevron-down" />
+                    <Button :text="__('Add')" icon-append="chevron-down" />
                 </template>
                 <DropdownMenu>
-                    <DropdownItem :text="__('Add Nav Item')" @click="addItem($refs.tree.rootChildren[0])" icon="plus" />
+                    <DropdownItem :text="__('Add Nav Item')" @click="addItemToTopLevel" icon="plus" />
                     <DropdownItem :text="__('Add Section')" @click="addSection" icon="add-section" />
                 </DropdownMenu>
             </Dropdown>
 
             <ButtonGroup>
-                <Button type="submit" variant="primary" :disabled="!changed" :text="__('Save')" @click="save" />
+                <ui-command-palette-item
+                    :category="$commandPalette.category.Actions"
+                    :text="__('Save')"
+                    icon="save"
+                    :action="save"
+                    prioritize
+                    v-slot="{ text, action }"
+                >
+                    <Button type="submit" variant="primary" :disabled="!changed" :text="text" @click="action" />
+                </ui-command-palette-item>
 
                 <Dropdown align="end" v-if="hasSaveAsOptions">
                     <template #trigger>
-                        <Button icon="ui/chevron-down" variant="primary" />
+                        <Button icon="chevron-down" variant="primary" />
                     </template>
                     <DropdownMenu>
                         <DropdownLabel>{{ __('Save to') }}...</DropdownLabel>
@@ -176,7 +193,7 @@
             :buttonText="__('Remove')"
             :danger="true"
             @confirm="removeItem(confirmingRemoval, true)"
-            @cancel="confirmingReset = false"
+            @cancel="confirmingRemoval = false"
         />
     </div>
 </template>
@@ -265,6 +282,7 @@ export default {
 
     mounted() {
         this.setInitialNav(this.nav);
+        this.addToCommandPalette();
     },
 
     computed: {
@@ -395,6 +413,10 @@ export default {
             this.targetStat = targetStat;
             this.creatingItem = true;
             this.creatingItemIsChild = this.isParentItemNode(targetStat);
+        },
+
+        addItemToTopLevel() {
+            this.addItem(this.$refs.tree.rootChildren[0]);
         },
 
         addSection() {
@@ -733,6 +755,29 @@ export default {
             this.updateItemAction(this.draggingStat);
             this.draggingStat = false;
             return true;
+        },
+
+        addToCommandPalette() {
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Add Nav Item'),
+                icon: 'plus',
+                action: () => this.addItemToTopLevel(),
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Add Section'),
+                icon: 'add-section',
+                action: () => this.addSection(),
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Reset Nav Customizations'),
+                icon: 'history',
+                action: () => this.confirmingReset = true,
+            });
         },
     },
 };

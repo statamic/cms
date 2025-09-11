@@ -46,11 +46,7 @@ function formatDate(value) {
         <template #initializing>
             <Widget v-bind="widgetProps">
                 <div class="flex flex-col gap-4 justify-between p-4">
-                    <ui-skeleton class="h-3 w-full" />
-                    <ui-skeleton class="h-3 w-full" />
-                    <ui-skeleton class="h-3 w-full" />
-                    <ui-skeleton class="h-3 w-full" />
-                    <ui-skeleton class="h-3 w-full" />
+                    <ui-skeleton v-for="i in initialPerPage" class="h-3 w-full" />
                 </div>
             </Widget>
         </template>

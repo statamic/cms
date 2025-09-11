@@ -19,7 +19,7 @@ const triggerAttrs = computed(() => ({
 </script>
 
 <template>
-    <TooltipProvider :ariaLabel="tooltipText" :delay-duration="delay">
+    <TooltipProvider v-if="tooltipText" :ariaLabel="tooltipText" :delay-duration="delay">
         <TooltipRoot>
             <TooltipTrigger v-bind="triggerAttrs">
                 <slot />
@@ -46,4 +46,5 @@ const triggerAttrs = computed(() => ({
             </TooltipPortal>
         </TooltipRoot>
     </TooltipProvider>
+    <slot v-else />
 </template>

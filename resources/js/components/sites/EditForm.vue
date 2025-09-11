@@ -1,6 +1,15 @@
 <template>
     <Header :title="pageTitle" icon="site">
-        <Button type="submit" variant="primary" @click="submit">{{ __('Save') }}</Button>
+        <ui-command-palette-item
+            :category="$commandPalette.category.Actions"
+            :text="__('Save')"
+            icon="save"
+            :action="submit"
+            prioritize
+            v-slot="{ text, action }"
+        >
+            <Button type="submit" variant="primary" @click="action">{{ text }}</Button>
+        </ui-command-palette-item>
     </Header>
 
     <PublishContainer

@@ -32,6 +32,7 @@ const {
     setFieldMeta,
     hiddenFields,
     setHiddenField,
+    container,
 } = injectContainerContext();
 const { fieldPathPrefix, metaPathPrefix } = injectFieldsContext();
 const handle = props.config.handle;
@@ -114,7 +115,8 @@ const shouldShowField = computed(() => {
         containerVisibleValues.value,
         revealerValues.value,
         hiddenFields.value,
-        setHiddenField
+        setHiddenField,
+        { container },
     ).showField(props.config, fullPath.value);
 });
 

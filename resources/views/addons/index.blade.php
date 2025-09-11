@@ -7,7 +7,17 @@
 
 @section('content')
     <ui-header title="{{ __('Addons') }}" icon="addons">
-        <ui-button variant="primary" :text="__('Browse the Marketplace')" href="https://statamic.com/addons" icon="external-link" target="_blank"></ui-button>
+        <ui-command-palette-item
+            category="{{ Statamic\CommandPalette\Category::Actions }}"
+            text="{{ __('Browse the Marketplace') }}"
+            icon="external-link"
+            url="https://statamic.com/addons"
+            open-new-tab
+            prioritize
+            v-slot="{ text, url, icon }"
+        >
+            <ui-button variant="primary" :text="text" :href="url" :icon="icon" target="_blank"></ui-button>
+        </ui-command-palette-item>
     </ui-header>
 
     <addon-list :initial-rows="{{ json_encode($addons) }}" :initial-columns="{{ json_encode($columns) }}"></addon-list>

@@ -14,7 +14,7 @@ const props = defineProps({
     disabled: { type: Boolean, default: false },
     readOnly: { type: Boolean, default: false },
     error: { type: String },
-    errors: { type: Object, default: (props) => (props.error ? [props.error] : []) },
+    errors: { type: Object },
     id: { type: String },
     instructions: { type: String, default: '' },
     instructionsBelow: { type: Boolean, default: false },
@@ -39,7 +39,7 @@ const classes = computed(() =>
             variant: {
                 block: 'w-full',
                 inline: [
-                    'flex justify-between gap-x-3 gap-y-1.5',
+                    'flex justify-between gap-x-7 gap-y-1.5',
                     'has-[[data-ui-label]~[data-ui-control]]:grid-cols-[1fr_auto]',
                     'has-[[data-ui-control]~[data-ui-label]]:grid-cols-[auto_1fr]',
                     '[&>[data-ui-control]~[data-ui-description]]:row-start-2 [&>[data-ui-control]~[data-ui-description]]:col-start-2',
@@ -55,6 +55,14 @@ const classes = computed(() =>
 
 const instructions = computed(() => props.instructions ? markdown(__(props.instructions), { openLinksInNewTabs: true }) : null);
 const wrapperComponent = computed(() => props.as === 'card' ? Card : 'div');
+
+const errors = computed(() => {
+    if (props.error) {
+        return [props.error];
+    }
+
+    return props.errors;
+});
 </script>
 
 <template>
@@ -62,7 +70,7 @@ const wrapperComponent = computed(() => props.as === 'card' ? Card : 'div');
         <div
             v-if="$slots.actions"
             :class="[
-                'flex items-center gap-x-1',
+                'flex items-center gap-x-1 mb-0',
                 props.label || $slots.label ? 'justify-between' : 'justify-end',
             ]"
             data-ui-field-header
@@ -76,7 +84,7 @@ const wrapperComponent = computed(() => props.as === 'card' ? Card : 'div');
             <slot v-if="!$slots.actions" name="label">
                 <Label v-if="label" v-bind="labelProps" class="flex-1" />
             </slot>
-            <Description :text="instructions" v-if="instructions && !instructionsBelow" :class="variant === 'inline' ? '-mt-0.5' : 'mb-1.75 -mt-0.5'" />
+            <Description :text="instructions" v-if="instructions && !instructionsBelow" :class="variant === 'inline' ? '-mt-0.5' : 'mb-2 -mt-0.5'" />
         </div>
         <slot />
         <Description :text="instructions" v-if="instructions && instructionsBelow" class="mt-2" />

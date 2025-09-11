@@ -157,7 +157,7 @@ function getRange(start, end) {
                 size="sm"
                 :variant="hasPrevious && !showPageLinks ? 'filled' : 'ghost'"
                 round
-                icon="ui/chevron-left"
+                icon="chevron-left"
                 :disabled="!hasPrevious"
                 @click="selectPreviousPage"
             />
@@ -178,7 +178,7 @@ function getRange(start, end) {
                 size="sm"
                 :variant="hasNext && !showPageLinks ? 'filled' : 'ghost'"
                 round
-                icon="ui/chevron-right"
+                icon="chevron-right"
                 :disabled="!hasNext"
                 @click="selectNextPage"
             />

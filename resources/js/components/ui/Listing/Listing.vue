@@ -194,6 +194,17 @@ watch(
     (items) => rawItems.value = items,
 );
 
+watch(
+    () => props.selections,
+    () => {
+        if (JSON.stringify(props.selections) === JSON.stringify(selections.value)) {
+            return;
+        }
+
+        selections.value = props.selections || [];
+    }
+);
+
 const rawParameters = computed(() => ({
     page: currentPage.value,
     perPage: perPage.value,
@@ -677,7 +688,7 @@ autoApplyState();
 
         <div
             v-if="!items.length"
-            class="rounded-lg border border-dashed border-gray-300 p-6 text-center text-gray-500"
+            class="rounded-lg border border-dashed border-gray-300 dark:border-gray-700 p-6 text-center text-gray-500"
             v-text="__('No results')"
         />
 

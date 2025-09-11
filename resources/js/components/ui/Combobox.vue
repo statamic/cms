@@ -23,7 +23,7 @@ const props = defineProps({
     optionLabel: { type: String, default: 'label' },
     options: { type: Array, default: null },
     optionValue: { type: String, default: 'value' },
-    placeholder: { type: String, default: 'Select...' },
+    placeholder: { type: String, default: () => __('Select...') },
     readOnly: { type: Boolean, default: false },
     searchable: { type: Boolean, default: true },
     size: { type: String, default: 'base' },
@@ -287,7 +287,7 @@ defineExpose({
                             <ComboboxInput
                                 v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"
                                 ref="search"
-                                class="w-full bg-transparent text-gray-700 dark:text-gray-400 opacity-100 focus:outline-none placeholder-gray-400 dark:placeholder-gray-500"
+                                class="w-full bg-transparent text-gray-900 dark:text-gray-300 opacity-100 focus:outline-none placeholder-gray-500 dark:placeholder-gray-400 [&::-webkit-search-cancel-button]:hidden"
                                 type="search"
                                 :id="id"
                                 v-model="searchQuery"
@@ -299,13 +299,14 @@ defineExpose({
                                 @keydown.space="openOnSpace"
                             />
 
-                            <button type="button" class="w-full text-start truncate bg-transparent cursor-pointer" v-else-if="!searchable && (dropdownOpen || !modelValue)" @keydown.space="openOnSpace" data-ui-combobox-placeholder>
+                            <button type="button" class="w-full text-start truncate flex items-center gap-2 bg-transparent cursor-pointer" v-else-if="!searchable && (dropdownOpen || !modelValue)" @keydown.space="openOnSpace" data-ui-combobox-placeholder>
+                            <Icon v-if="icon" :name="icon" class="text-gray-400 dark:text-white dark:opacity-50" />
                                 <span class="text-gray-400 dark:text-gray-500" v-text="placeholder" />
                             </button>
 
                             <button type="button" v-else class="w-full text-start bg-transparent truncate flex items-center gap-2 cursor-pointer" @keydown.space="openOnSpace" data-ui-combobox-selected-option>
                                 <slot name="selected-option" v-bind="{ option: selectedOption }">
-                                    <Icon v-if="icon" :name="icon" class="text-white-400 dark:text-white dark:opacity-50" />
+                                    <Icon v-if="icon" :name="icon" class="text-gray-400 dark:text-white dark:opacity-50" />
                                     <span v-if="labelHtml" v-html="getOptionLabel(selectedOption)" />
                                     <span v-else v-text="getOptionLabel(selectedOption)" />
                                 </slot>
@@ -314,7 +315,7 @@ defineExpose({
 
                         <div class="flex gap-1.5 items-center shrink-0 ms-1.5">
                             <Button v-if="clearable && modelValue" icon="x" variant="ghost" size="xs" round @click="clear" data-ui-combobox-clear-button />
-                            <Icon v-if="options.length || ignoreFilter" name="ui/chevron-down" class="text-gray-400 dark:text-white/40" data-ui-combobox-chevron />
+                            <Icon v-if="options.length || ignoreFilter" name="chevron-down" class="text-gray-400 dark:text-white/40" data-ui-combobox-chevron />
                         </div>
                     </ComboboxTrigger>
                 </ComboboxAnchor>
@@ -326,12 +327,13 @@ defineExpose({
                         :class="[
                             'shadow-ui-sm z-100 rounded-lg border border-gray-200 bg-white p-2 dark:border-white/10 dark:bg-gray-800',
                             'max-h-[var(--reka-combobox-content-available-height)] w-[var(--reka-combobox-trigger-width)] min-w-fit',
+                            '[&_[data-reka-combobox-viewport]]:grid [&_[data-reka-combobox-viewport]]:gap-1'
                         ]"
                         @escape-key-down="nextTick(() => $refs.trigger.$el.focus())"
                         data-ui-combobox-content
                     >
                         <ComboboxViewport>
-                            <ComboboxEmpty class="py-2 text-sm" data-ui-combobox-empty>
+                            <ComboboxEmpty class="p-2 text-sm" data-ui-combobox-empty>
                                 <slot name="no-options" v-bind="{ searchQuery }">
                                     {{ __('No options available.') }}
                                 </slot>
