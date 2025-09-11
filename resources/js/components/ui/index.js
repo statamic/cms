@@ -54,6 +54,7 @@ import { default as ListingTableBody } from "./Listing/TableBody.vue";
 import { default as ListingTableHead } from "./Listing/TableHead.vue";
 import { default as ListingToggleAll } from "./Listing/ToggleAll.vue";
 import { default as LivePreview } from "./LivePreview/LivePreview.vue";
+import { default as LivePreviewPopout } from "./LivePreview/Popout.vue";
 import { default as Modal } from "./Modal/Modal.vue";
 import { default as ModalClose } from "./Modal/Close.vue";
 import { default as ModalTitle } from "./Modal/Title.vue";
@@ -161,6 +162,7 @@ export {
     ListingTableHead,
     ListingToggleAll,
     LivePreview,
+    LivePreviewPopout,
     Modal,
     ModalClose,
     ModalTitle,
