@@ -1,3 +1,12 @@
+<script setup>
+import { Select } from '@/components/ui';
+
+defineProps({
+    sites: { type: Array, required: true },
+    value: { type: String, required: true },
+});
+</script>
+
 <template>
     <Select
         :options="sites"
@@ -7,16 +16,3 @@
         @update:model-value="$emit('input', $event)"
     />
 </template>
-
-<script>
-import { Select } from '@/components/ui';
-
-export default {
-    components: { Select },
-
-    props: {
-        sites: { type: Array, required: true },
-        value: { type: String, required: true },
-    },
-};
-</script>
