@@ -56,7 +56,7 @@
 
         <div class="items-center gap-2 hidden md:flex" data-global-header-breadcrumbs>
             @foreach($breadcrumbs as $breadcrumb)
-                <span class="text-white/25">/</span>
+                <span class="text-white/30">/</span>
                 <ui-button href="{{ $breadcrumb->url() }}" text="{{ __($breadcrumb->text()) }}" size="sm" variant="ghost" class="dark:text-white/85! hover:text-white!"></ui-button>
                 @if($breadcrumb->hasLinks() || $breadcrumb->createUrl())
                     <ui-dropdown v-cloak class="relative" aria-label="{{ __('More options for') }} {{ __($breadcrumb->text()) }}">
