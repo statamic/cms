@@ -8,6 +8,7 @@ const props = defineProps({
 });
 
 const svgContent = ref('');
+const iconComponent = computed(() => ({ template: svgContent.value }));
 
 const loadIcon = async () => {
     if (props.name.startsWith('<svg')) {
@@ -65,9 +66,9 @@ watch(
 </script>
 
 <template>
-    <svg
+    <component
         v-if="svgContent"
-        v-html="svgContent"
+        :is="iconComponent"
         :class="['size-4 shrink-0']"
         v-bind="$attrs"
     />
