@@ -24,6 +24,7 @@ export {
     DateRangePicker,
     Description,
     DragHandle,
+    Drawer,
     Dropdown,
     DropdownItem,
     DropdownLabel,
