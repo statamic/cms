@@ -3,8 +3,10 @@ import { Select } from '@/components/ui';
 
 defineProps({
     sites: { type: Array, required: true },
-    value: { type: String, required: true },
+    modelValue: { type: String, required: true },
 });
+
+defineEmits(['update:modelValue']);
 </script>
 
 <template>
@@ -12,7 +14,7 @@ defineProps({
         :options="sites"
         option-label="name"
         option-value="handle"
-        :model-value="value"
-        @update:model-value="$emit('input', $event)"
+        :model-value="modelValue"
+        @update:model-value="$emit('update:modelValue', $event)"
     />
 </template>
