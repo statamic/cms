@@ -41,6 +41,9 @@ jobs:
       - name: Create dist-frontend zip
         run: cd resources && tar -czvf dist-frontend.tar.gz dist-frontend
 
+      - name: Copy UI CSS to CMS package
+        run: cp packages/ui/src/ui.css packages/cms/ui.css
+
       - name: Create dist-package zip
         run: cd packages/cms && tar -czvf ../../resources/dist-package.tar.gz *
 
