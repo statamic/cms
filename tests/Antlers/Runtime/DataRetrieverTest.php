@@ -76,4 +76,38 @@ class DataRetrieverTest extends ParserTestCase
         $value = $this->getPathValue('page[view:nested:nested1:nested2]', $data);
         $this->assertSame(12345, $value);
     }
+
+    public function test_object_methods_are_retrieved()
+    {
+        $data = [
+            'view' => [
+                'object' => new class
+                {
+                    public function publicMethod()
+                    {
+                        return 'Hello Public World!';
+                    }
+
+                    protected function protectedMethod()
+                    {
+                        return 'Hello Protected World!';
+                    }
+
+                    private function privateMethod()
+                    {
+                        return 'Hello Private World!';
+                    }
+                },
+            ],
+        ];
+
+        $value = $this->getPathValue('view.object.public_method', $data);
+        $this->assertSame('Hello Public World!', $value);
+
+        $value = $this->getPathValue('view.object.protected_method', $data);
+        $this->assertNull($value);
+
+        $value = $this->getPathValue('view.object.private_method', $data);
+        $this->assertNull($value);
+    }
 }
