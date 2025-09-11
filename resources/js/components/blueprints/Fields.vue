@@ -25,8 +25,12 @@
         </div>
 
         <div class="blueprint-section-field-actions flex gap-2">
-            <LinkFields :exclude-fieldset="excludeFieldset" @linked="$emit('field-linked', $event)" />
-            <ui-button icon="add-circle" :text="__('Create Field')" @click="isSelectingNewFieldtype = true" />
+            <LinkFields
+                :exclude-fieldset="excludeFieldset"
+                :with-command-palette="withCommandPalette"
+                @linked="$emit('field-linked', $event)"
+            />
+            <ui-button icon="add-circle" :text="__('Create Field')" @click="createField" />
         </div>
 
         <stack
@@ -86,6 +90,7 @@ export default {
         editingField: {},
         suggestableConditionFields: Array,
         excludeFieldset: String,
+        withCommandPalette: Boolean,
     },
 
     inject: {
@@ -97,6 +102,12 @@ export default {
             isSelectingNewFieldtype: false,
             pendingCreatedField: null,
         };
+    },
+
+    mounted() {
+        if (this.withCommandPalette) {
+            this.addToCommandPalette();
+        }
     },
 
     methods: {
@@ -119,6 +130,10 @@ export default {
             };
 
             this.$nextTick(() => (this.pendingCreatedField = pending));
+        },
+
+        createField() {
+            this.isSelectingNewFieldtype = true;
         },
 
         fieldCreated(created) {
@@ -153,6 +168,19 @@ export default {
             };
 
             this.$nextTick(() => (this.pendingCreatedField = pending));
+        },
+
+        addToCommandPalette() {
+            if (!this.withCommandPalette) {
+                return;
+            }
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Create Field'),
+                icon: 'add-circle',
+                action: this.createField,
+            });
         },
     },
 };

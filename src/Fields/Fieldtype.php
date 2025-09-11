@@ -309,7 +309,7 @@ abstract class Fieldtype implements Arrayable
 
     public function icon()
     {
-        return $this->icon ?? $this->handle();
+        return $this->icon ?? "fieldtype-{$this->handle()}";
     }
 
     public function process($data)

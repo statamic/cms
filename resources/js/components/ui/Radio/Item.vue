@@ -16,10 +16,11 @@ const id = useId();
         <RadioGroupItem
             :id
             :value="value"
+            :disabled
             class="
                 shadow-ui-xs mt-0.5 size-4 cursor-default rounded-full
-                focus:focus-outline border border-gray-300 dark:border-none bg-white outline-hidden
-                data-[state=checked]:border-ui-accent
+                focus:focus-outline border border-gray-400/75 dark:border-none bg-white outline-hidden
+                data-[state=checked]:border-ui-accent data-[disabled]:opacity-50
                 dark:bg-gray-400 dark:data-[state=checked]:border-none dark:data-[state=checked]:bg-gray-300
             "
         >
@@ -31,7 +32,7 @@ const id = useId();
                 "
             />
         </RadioGroupItem>
-        <label class="flex flex-col" :for="id">
+        <label class="flex flex-col" :class="{ 'opacity-50': disabled }" :for="id">
             <span class="text-sm font-normal text-gray-600 antialiased dark:text-gray-200">
                 <slot>{{ label || value }}</slot>
             </span>

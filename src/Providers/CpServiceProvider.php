@@ -14,7 +14,6 @@ use Statamic\CP\Utilities\UtilityRepository;
 use Statamic\Extensions\Translation\Loader;
 use Statamic\Extensions\Translation\Translator;
 use Statamic\Facades\User;
-use Statamic\Fieldtypes\Sets;
 use Statamic\Http\Middleware\CP\StartSession;
 use Statamic\Http\View\Composers\CustomLogoComposer;
 use Statamic\Http\View\Composers\FieldComposer;
@@ -49,8 +48,6 @@ class CpServiceProvider extends ServiceProvider
         Blade::directive('rarr', function ($expression) {
             return "<?php echo Statamic::cpDirection() === 'ltr' ? '&rarr;' : '&larr;' ?>";
         });
-
-        Sets::setIconsDirectory();
 
         $this->registerMiddlewareGroups();
 

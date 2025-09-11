@@ -156,21 +156,21 @@ export default {
             return [
                 {
                     title: __('Expand All Sets'),
-                    icon: 'ui/expand',
+                    icon: 'expand',
                     quick: true,
                     visibleWhenReadOnly: true,
                     run: this.expandAll,
                 },
                 {
                     title: __('Collapse All Sets'),
-                    icon: 'ui/collapse',
+                    icon: 'collapse',
                     quick: true,
                     visibleWhenReadOnly: true,
                     run: this.collapseAll,
                 },
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => (vm.fullScreenMode ? 'ui/collapse-all' : 'ui/expand-all'),
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'collapse-all' : 'expand-all'),
                     quick: true,
                     visibleWhenReadOnly: true,
                     run: this.toggleFullscreen,

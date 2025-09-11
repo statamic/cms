@@ -70,7 +70,7 @@
                                 v-model:modelValue="newFolderName"
                                 :start-with-edit-mode="true"
                                 submit-mode="enter"
-                                :placeholder="__('New Folder')"
+                                :placeholder="__('new-folder')"
                                 @submit="$emit('create-folder', newFolderName)"
                                 @cancel="
                                     () => {
@@ -107,7 +107,7 @@
                 </div>
             </template>
             <template #prepended-row-actions="{ row: asset }">
-                <DropdownItem :text="__(canEdit ? 'Edit' : 'View')" @click="edit(asset.id)" icon="edit" />
+                <DropdownItem :text="__(asset.editable ? 'Edit' : 'View')" @click="edit(asset.id)" icon="edit" />
             </template>
         </ListingTable>
     </Card>

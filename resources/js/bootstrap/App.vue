@@ -34,6 +34,7 @@ import SitesEditForm from '../components/sites/EditForm.vue';
 import CommandPalette from '../components/command-palette/CommandPalette.vue';
 import ItemActions from '../components/actions/ItemActions.vue';
 import BulkActions from '../components/actions/BulkActions.vue';
+import LicensingAlert from '../components/LicensingAlert.vue';
 
 import { defineAsyncComponent } from 'vue';
 import { ConfigProvider } from 'reka-ui';
@@ -77,14 +78,13 @@ export default {
         ConfigProvider,
         ItemActions,
         BulkActions,
+        LicensingAlert,
     },
 
     data() {
         return {
             navOpen: false,
-            showBanner: true,
             appendedComponents: Statamic.$components.components,
-            isLicensingBannerSnoozed: localStorage.getItem(`statamic.snooze_license_banner`) > new Date().valueOf(),
             copyToClipboardModalUrl: null,
         };
     },
@@ -112,8 +112,6 @@ export default {
         }
 
         this.fixAutofocus();
-
-        this.showBanner = !this.isLicensingBannerSnoozed && Statamic.$config.get('hasLicenseBanner');
 
         this.$toast.registerInterceptor(this.$axios);
         this.$toast.displayInitialToasts();
@@ -145,13 +143,6 @@ export default {
         toggleNav() {
             this.navOpen = !this.navOpen;
             localStorage.setItem('statamic.nav', this.navOpen ? 'open' : 'closed');
-        },
-
-
-
-        hideBanner() {
-            this.showBanner = false;
-            localStorage.setItem(`statamic.snooze_license_banner`, new Date(Date.now() + 5 * 60 * 1000).valueOf());
         },
 
         fixAutofocus() {

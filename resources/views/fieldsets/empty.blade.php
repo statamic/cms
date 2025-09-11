@@ -15,12 +15,20 @@
     </header>
 
     <ui-empty-state-menu heading="{{ __('statamic::messages.fieldset_intro') }}">
-        <ui-empty-state-item
-            href="{{ cp_route('fieldsets.create') }}"
+        <ui-command-palette-item
+            category="{{ Statamic\CommandPalette\Category::Actions }}"
+            text="{{ __('Create Fieldset') }}"
             icon="fieldsets"
-            heading="{{ __('Create Fieldset') }}"
-            description="{{ __('Get started by creating your first fieldset.') }}"
-        ></ui-empty-state-item>
+            url="{{ cp_route('fieldsets.create') }}"
+            v-slot="{ text, url, icon }"
+        >
+            <ui-empty-state-item
+                :heading="text"
+                :href="url"
+                :icon="icon"
+                description="{{ __('Get started by creating your first fieldset.') }}"
+            ></ui-empty-state-item>
+        </ui-command-palette-item>
     </ui-empty-state-menu>
 
     <x-statamic::docs-callout

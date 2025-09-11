@@ -8,6 +8,7 @@
             option-label="name"
             option-value="handle"
             size="sm"
+            variant="ghost"
             icon="globe-arrow"
             class="[&_[data-ui-combobox-trigger]]:text-white/85"
         />
@@ -43,10 +44,3 @@ export default {
     },
 };
 </script>
-
-<style>
-[data-ui-global-site-selector] [data-ui-combobox-trigger] {
-    background: rgba(0,0,0,.5) !important;
-    border: transparent !important;
-}
-</style>
