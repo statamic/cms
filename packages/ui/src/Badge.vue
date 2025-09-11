@@ -56,7 +56,7 @@ const badgeClasses = computed(() => {
             },
             variant: {
                 default: 'border dark:border-none shadow-ui-sm',
-                flat: 'border-0 shadow-none',
+                flat: 'border-0 shadow-none!',
             },
             pill: { true: 'rounded-full' },
             shadow: {

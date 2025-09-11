@@ -18,7 +18,7 @@
         >
         </asset-editor>
 
-        <div class="flex h-full border-b rounded-b-md relative">
+        <div class="flex h-full border-b dark:border-gray-700 rounded-b-md relative">
             <div class="p-1 flex flex-col items-center justify-center h-full" :class="{ 'bg-checkerboard': canBeTransparent }">
                 <!-- Solo Bard -->
                 <template v-if="isImage && isInBardField && !isInAssetBrowser">
