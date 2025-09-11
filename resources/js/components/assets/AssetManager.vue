@@ -11,7 +11,6 @@
         :initial-columns="columns"
         @navigated="navigate"
         @selections-updated="updateSelections"
-        @asset-doubleclicked="editAsset"
         @edit-asset="editAsset"
     />
 </template>
