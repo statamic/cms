@@ -4,6 +4,6 @@
         data-drag-handle
         :aria-label="__('Drag to reorder')"
     >
-        <ui-icon name="ui/drag-dots" class="w-[7px] h-[17px]" />
+        <ui-icon name="drag-dots" class="w-[7px] h-[17px]" />
     </button>
 </template>

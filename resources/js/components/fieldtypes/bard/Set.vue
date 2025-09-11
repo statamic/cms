@@ -22,12 +22,12 @@
                     'bg-gray-200/50 rounded-b-none border-b-gray-300! dark:border-b-white/10!': !collapsed
                 }"
             >
-                <Icon data-drag-handle name="ui/handles" class="size-4 cursor-grab text-gray-400" v-if="!isReadOnly" />
+                <Icon data-drag-handle name="handles" class="size-4 cursor-grab text-gray-400" v-if="!isReadOnly" />
                 <button type="button" class="flex flex-1 items-center gap-4 p-2 min-w-0 cursor-pointer [&:focus-visible]:outline-none [&:focus-visible]:[&_[data-ui-badge]]:focus-outline" @click="toggleCollapsedState">
                     <Badge size="lg" pill="true" color="white" shadow="false" class="px-3">
                         <span v-if="isSetGroupVisible" class="flex items-center gap-2">
                             {{ __(setGroup.display) }}
-                            <Icon name="ui/chevron-right" class="relative top-px size-3" />
+                            <Icon name="chevron-right" class="relative top-px size-3" />
                         </span>
                         {{ __(config.display) || config.handle }}
                     </Badge>
@@ -50,7 +50,7 @@
 
                     <Dropdown>
                         <template #trigger>
-                            <Button icon="ui/dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
+                            <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
                         </template>
                         <DropdownMenu>
                             <DropdownItem

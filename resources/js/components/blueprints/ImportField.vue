@@ -3,7 +3,7 @@
         <div class="pr-1.5 w-full bg-white dark:bg-gray-850 rounded-xl ring ring-gray-200 dark:ring-x-0 dark:ring-b-0 dark:ring-gray-700">
             <ui-card class="py-0.75! px-2! z-10 relative blueprint-section/import w-full">
                 <div class="flex items-center gap-2">
-                    <ui-icon name="ui/handles" class="blueprint-drag-handle size-4 cursor-grab text-gray-300" />
+                    <ui-icon name="handles" class="blueprint-drag-handle size-4 cursor-grab text-gray-300" />
                     <div class="flex flex-1 items-center justify-between">
                         <div class="flex flex-1 items-center py-2">
                             <ui-icon class="size-4 me-2 text-blue-600" name="fieldsets" />
