@@ -101,7 +101,7 @@
 @utility focus-none {
     outline: 0;
     box-shadow: none;
-    }
+}
 
 @utility loading {
     text-align: center;

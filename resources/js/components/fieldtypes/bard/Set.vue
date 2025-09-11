@@ -3,7 +3,10 @@
         <div
             class="shadow-ui-sm relative z-2 w-full rounded-lg border border-gray-300 bg-white text-base dark:border-x-0 dark:border-t-0 dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
             :class="{
-                'dark:border-dark-blue-100 border-blue-400!': selected || withinSelection,
+                // We’re styling a Set so that it shows a “selection outline” when selected with the mouse or keyboard.
+                // The extra `&:not(:has(:focus-within))` rule turns that outline off if any element inside the Set has focus (e.g. when editing inside a Bard field).
+                // This prevents the outer selection outline from showing while the user is actively working inside the Set.
+                '[&:not(:has(:focus-within))]:border-blue-300! [&:not(:has(:focus-within))]:dark:border-blue-400! [&:not(:has(:focus-within))]:before:content-[\'\'] [&:not(:has(:focus-within))]:before:absolute [&:not(:has(:focus-within))]:before:inset-[-1px] [&:not(:has(:focus-within))]:before:border-2 [&:not(:has(:focus-within))]:before:border-blue-300 [&:not(:has(:focus-within))]:dark:before:border-blue-400 [&:not(:has(:focus-within))]:before:rounded-lg': selected || withinSelection,
                 'border-red-500': hasError,
             }"
             :data-type="config.handle"
@@ -20,7 +23,7 @@
                 }"
             >
                 <Icon data-drag-handle name="handles" class="size-4 cursor-grab text-gray-400" v-if="!isReadOnly" />
-                <button type="button" class="flex flex-1 items-center gap-4 p-2 min-w-0 cursor-pointer" @click="toggleCollapsedState">
+                <button type="button" class="flex flex-1 items-center gap-4 p-2 min-w-0 cursor-pointer [&:focus-visible]:outline-none [&:focus-visible]:[&_[data-ui-badge]]:focus-outline" @click="toggleCollapsedState">
                     <Badge size="lg" pill="true" color="white" shadow="false" class="px-3">
                         <span v-if="isSetGroupVisible" class="flex items-center gap-2">
                             {{ __(setGroup.display) }}
