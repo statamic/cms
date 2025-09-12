@@ -3,7 +3,7 @@
 @endphp
 
 @if (config('statamic.cp.link_to_docs'))
-    <div class="mt-12 flex justify-center text-center">
+    <div class="mt-12 flex justify-center text-center entry-animate-in entry-animate-in--siblings">
         <ui-command-palette-item
             :text="[__('Statamic Documentation'), '{{ $topic }}']"
             icon="book-next-page"

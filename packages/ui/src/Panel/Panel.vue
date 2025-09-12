@@ -13,7 +13,7 @@ const props = defineProps({
     <div
         :class="[
             'relative bg-gray-200/50 dark:bg-gray-950 dark:inset-shadow-2xs dark:inset-shadow-black',
-            'w-full rounded-2xl mb-5 p-1.5 [&:has([data-ui-panel-header])]:pt-0 focus-none',
+            'w-full rounded-2xl mb-5 p-1.5 [&:has([data-ui-panel-header])]:pt-0 focus-none entry-animate-in entry-animate-in--siblings',
         ]"
         data-ui-panel
     >

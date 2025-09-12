@@ -55,3 +55,31 @@
         animation: rotate 4s linear infinite;
     }
 }
+
+/* ENTRY ANIMATIONS 
+=================================================== */
+/* Notes...
+
+    What does it do?
+    ----------------
+    - Soft-animates an element on page load using @starting-style
+    - These should be almost-instant otherwise they'll get annoying
+
+*/
+/* HTML Example...
+
+*/
+.entry-animate-in {
+    transition: opacity 0.2s;
+    @starting-style {
+        opacity: 0;
+    }
+}
+
+.entry-animate-in--quick {
+    transition: opacity 0.1s;
+}
+
+.entry-animate-in--siblings {
+    transition-delay: calc(sibling-index() * 0.02s);
+}
