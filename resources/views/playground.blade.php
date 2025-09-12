@@ -2,7 +2,7 @@
     use function Statamic\trans as __;
     use Illuminate\Support\Facades\File;
 
-    $icons = collect(File::files(base_path('vendor/statamic/cms/resources/svg/icons')))->map(function ($file) {
+    $icons = collect(File::files(statamic_path('packages/ui/icons')))->map(function ($file) {
         return $file->getFilenameWithoutExtension();
     })->all();
 
@@ -17,8 +17,28 @@
 </ui-header>
 
 <div class="space-y-12">
-
-    <ui-switch />
+    <section class="space-y-4">
+        <ui-heading size="lg">Drawer</ui-heading>
+        <ui-drawer title="Drawer Demo" description="This is a drawer description." variant="layered">
+            <template #trigger>
+                <ui-button text="Open Drawer" />
+            </template>
+            <div class="space-y-8">
+                <ui-field name="name" label="Name" placeholder="Your name">
+                    <ui-input label="Name" placeholder="Your name" />
+                </ui-field>
+                <ui-field name="email" label="Email">
+                    <ui-input label="Email" type="email" placeholder="Your email" />
+                </ui-field>
+            </div>
+            <template #footer>
+                <div class="flex gap-2 items-center justify-end">
+                    <ui-button text="Cancel" variant="ghost" />
+                    <ui-button text="Save" variant="primary" />
+                </div>
+            </template>
+        </ui-drawer>
+    </section>
 
     <section class="space-y-4">
         <ui-heading size="lg">Badges</ui-heading>
@@ -99,13 +119,13 @@
         <ui-heading size="lg">Checkboxes</ui-heading>
         <div class="flex">
             <ui-checkbox-group name="meals" label="Select your favorite meals">
-                <ui-checkbox-item
+                <ui-checkbox
                     label="Breakfast"
                     description="The morning meal. Should include eggs."
                     value="breakfast"
                 />
-                <ui-checkbox-item label="Lunch" description="The mid-day meal. Should be protein heavy." value="lunch" />
-                <ui-checkbox-item label="Dinner" description="The evening meal. Should be delicious." value="dinner" />
+                <ui-checkbox label="Lunch" description="The mid-day meal. Should be protein heavy." value="lunch" />
+                <ui-checkbox label="Dinner" description="The evening meal. Should be delicious." value="dinner" />
             </ui-checkbox-group>
         </div>
     </section>
@@ -113,7 +133,7 @@
     <section class="space-y-4">
         <ui-heading size="lg">Datepicker</ui-heading>
         <div class="flex">
-            <ui-datepicker />
+            <ui-date-picker />
         </div>
     </section>
 
@@ -122,7 +142,7 @@
         <div class="flex">
             <ui-dropdown>
                 <template #trigger>
-                    <ui-button text="Do a Action" variant="filled" icon-append="ui/chevron-vertical" class="[&_svg]:size-2" />
+                    <ui-button text="Do a Action" variant="filled" icon-append="chevron-vertical" class="[&_svg]:size-2" />
                 </template>
             <ui-dropdown-menu>
                 <ui-dropdown-item text="Bake a food" />
@@ -210,22 +230,35 @@
         <ui-heading size="lg">Radio Group</ui-heading>
         <div class="flex">
             <ui-radio-group name="favorite" label="Choose your favorite meal">
-                <ui-radio-item
+                <ui-radio
                     label="Breakfast"
                     description="The morning meal. Should include eggs."
                     value="breakfast"
                     checked
             />
-            <ui-radio-item label="Lunch" description="The mid-day meal. Should be protein heavy." value="lunch" />
-                <ui-radio-item label="Dinner" description="The evening meal Should be delicious." value="dinner" />
+            <ui-radio label="Lunch" description="The mid-day meal. Should be protein heavy." value="lunch" />
+                <ui-radio label="Dinner" description="The evening meal Should be delicious." value="dinner" />
             </ui-radio-group>
         </div>
+    </section>
+
+    <section class="space-y-4">
+        <ui-heading size="lg">Disabled Radio Items</ui-heading>
+        <ui-radio-group name="favorite" label="Choose your favorite Star Wars movie">
+            <ui-radio-item label="A New Hope" value="ep4"/>
+            <ui-radio-item label="Empire Strikes Back" value="ep5" />
+            <ui-radio-item label="Return of the Jedi" value="ep6" />
+            <ui-radio-item disabled label="the Force Awakens" value="ep7" />
+            <ui-radio-item disabled label="The Last Jedi" value="ep8" />
+            <ui-radio-item disabled label="The Rise of Skywalker" value="ep9" />
+        </ui-radio-group>
     </section>
 
     <section class="space-y-4">
         <ui-heading size="lg">Select</ui-heading>
         <div class="flex">
             <ui-select
+                icon="money-bag-dollar"
                 class="w-full"
                 label="Favorite band"
                 :options="[
@@ -308,20 +341,20 @@
         <ui-heading size="lg">Tabs</ui-heading>
         <div class="flex">
             <ui-tabs default-tab="tab1" class="w-full">
-                <ui-tabs-list>
-                    <ui-tabs-trigger text="Shiny" name="tab1" />
-                    <ui-tabs-trigger text="Happy" name="tab2" />
-                    <ui-tabs-trigger text="People" name="tab3" />
-                </ui-tabs-list>
-                <ui-tabs-content name="tab1">
+                <ui-tab-list>
+                    <ui-tab-trigger text="Shiny" name="tab1" />
+                    <ui-tab-trigger text="Happy" name="tab2" />
+                    <ui-tab-trigger text="People" name="tab3" />
+                </ui-tab-list>
+                <ui-tab-content name="tab1">
                     <p class="py-8">Tab 1 content</p>
-                </ui-tabs-content>
-                <ui-tabs-content name="tab2">
+                </ui-tab-content>
+                <ui-tab-content name="tab2">
                     <p class="py-8">Tab 2 content</p>
-                </ui-tabs-content>
-                <ui-tabs-content name="tab3">
+                </ui-tab-content>
+                <ui-tab-content name="tab3">
                     <p class="py-8">Tab 3 content</p>
-                </ui-tabs-content>
+                </ui-tab-content>
             </ui-tabs>
         </div>
     </section>

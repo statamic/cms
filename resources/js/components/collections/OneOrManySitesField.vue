@@ -43,14 +43,14 @@
 </template>
 
 <script>
-import { containerContextKey } from '@/components/ui/Publish/Container.vue';
+import { publishContextKey } from '@ui';
 
 export default {
     props: ['handle', 'value', 'columnHeader'],
 
     inject: {
         publishContainer: {
-            from: containerContextKey
+            from: publishContextKey
         }
     },
 

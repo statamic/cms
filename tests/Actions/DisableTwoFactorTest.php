@@ -1,6 +1,6 @@
 <?php
 
-namespace Actions;
+namespace Tests\Actions;
 
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;

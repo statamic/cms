@@ -18,15 +18,15 @@
             <site-selector
                 v-if="sites.length > 1"
                 :sites="sites"
-                :value="site"
-                @input="siteSelected"
+                :model-value="site"
+                @update:modelValue="siteSelected"
             />
 
             <Dropdown v-if="canEdit && hasCollections" placement="left-start" :disabled="!hasCollections">
                 <template #trigger>
                     <Button
                         :text="__('Add')"
-                        icon-append="ui/chevron-down"
+                        icon-append="chevron-down"
                     />
                 </template>
                 <DropdownMenu>
@@ -129,7 +129,7 @@
                     icon="edit"
                 />
                 <DropdownItem
-                    :text="__('Edit Nav item')"
+                    :text="__('Edit Nav Item')"
                     @click="editPage(branch)"
                     icon="edit"
                 />
@@ -443,7 +443,7 @@ export default {
         },
 
         siteSelected(site) {
-            window.location = site.url;
+            window.location = this.sites.find((s) => s.handle === site).url;
         },
 
         updatePublishInfo(info) {

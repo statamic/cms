@@ -1,14 +1,19 @@
 <script setup>
-import { Tabs, TabList, TabTrigger, TabContent } from '@/components/ui';
-import TabProvider from './TabProvider.vue';
+import {
+    Tabs,
+    TabList,
+    TabTrigger,
+    TabContent,
+    TabProvider,
+} from '@ui';
 import { injectContainerContext } from './Container.vue';
-import Sections from '@/components/ui/Publish/Sections.vue';
+import Sections from './Sections.vue';
 import { ref, computed, useSlots, onMounted, watch } from 'vue';
 import ElementContainer from '@/components/ElementContainer.vue';
 import ShowField from '@/components/field-conditions/ShowField.js';
 
 const slots = useSlots();
-const { blueprint, visibleValues, extraValues, revealerValues, errors, hiddenFields, setHiddenField } = injectContainerContext();
+const { blueprint, visibleValues, extraValues, revealerValues, errors, hiddenFields, setHiddenField, container } = injectContainerContext();
 const tabs = ref(blueprint.value.tabs);
 const width = ref(null);
 const sidebarTab = computed(() => tabs.value.find((tab) => tab.handle === 'sidebar'));
@@ -25,7 +30,8 @@ const visibleMainTabs = computed(() => {
                     visibleValues.value,
                     revealerValues.value,
                     hiddenFields.value,
-                    setHiddenField
+                    setHiddenField,
+                    { container }
                 ).showField(field, field.handle);
             });
         });

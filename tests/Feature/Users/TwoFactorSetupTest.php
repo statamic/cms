@@ -1,6 +1,6 @@
 <?php
 
-namespace Feature\Users;
+namespace Tests\Feature\Users;
 
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\Group;

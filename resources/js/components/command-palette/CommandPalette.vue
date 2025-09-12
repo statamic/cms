@@ -12,6 +12,7 @@ import { motion } from 'motion-v';
 import { cva } from 'cva';
 import { Icon, Subheading } from '@/components/ui';
 
+let metaPressed = ref(false);
 let open = ref(false);
 let query = ref('');
 let serverCategories = Statamic.$config.get('commandPaletteCategories');
@@ -21,24 +22,39 @@ let serverItemsLoaded = ref(false);
 let searchResults = ref([]);
 let selected = ref(null);
 let recentItems = ref(getRecentItems());
+let keyboardBindings = ref([]);
 
 Statamic.$keys.bindGlobal(['mod+k'], (e) => {
     e.preventDefault();
     open.value = true;
 });
 
-each({
-    esc: () => open.value = false,
-    'ctrl+n': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' })),
-    'ctrl+p': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp' })),
-}, (callback, binding) => {
-    Statamic.$keys.bindGlobal([binding], (e) => {
-        if (open.value) {
-            e.preventDefault();
-            callback();
-        }
+function bindKeyboardShortcuts() {
+    each({
+        esc: () => open.value = false,
+        'ctrl+n': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' })),
+        'ctrl+p': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp' })),
+        mod: () => metaPressed.value = true,
+    }, (callback, binding) => {
+        keyboardBindings.value.push(Statamic.$keys.bindGlobal([binding], (e) => {
+            if (open.value) {
+                e.preventDefault();
+                callback();
+            }
+        }));
     });
-});
+
+    keyboardBindings.value.push(Statamic.$keys.bind('mod+keyup', () => metaPressed.value = false));
+}
+
+watch(
+    () => open.value,
+    (isOpen) => {
+        isOpen
+            ? bindKeyboardShortcuts()
+            : keyboardBindings.value.forEach((binding) => binding.destroy());
+    }
+)
 
 const actionItems = computed(() => {
     return sortJsInjectedItems(Statamic.$commandPalette.actions().filter(item => item.when()));
@@ -249,7 +265,7 @@ const modalClasses = cva({
                 hover:bg-black/45 hover:text-white/70
             ">
                 <Icon name="magnifying-glass" class="size-5 flex-none text-white/50 group-hover:text-white/70" />
-                <span class="sr-only leading-none md:not-sr-only st-text-trim-cap">Search</span>
+                <span class="sr-only leading-none md:not-sr-only st-text-trim-cap">{{ __('Search') }}</span>
                 <kbd class="ml-auto hidden self-center rounded bg-white/5 px-[0.3125rem] py-[0.0625rem] text-[0.625rem]/4 font-medium text-white/60 group-hover:text-white/70 ring-1 ring-white/7.5 [word-spacing:-0.15em] ring-inset md:block">
                     <kbd class="font-sans">⌘ </kbd><kbd class="font-sans">K</kbd>
                 </kbd>
@@ -318,7 +334,7 @@ const modalClasses = cva({
                                             v-else
                                             :icon="item.icon"
                                             :href="item.url"
-                                            :open-new-tab="item.openNewTab"
+                                            :open-new-tab="metaPressed || item.openNewTab"
                                             :badge="item.badge"
                                             :keys="item.keys"
                                             :removable="isRecentItem(item)"
@@ -333,11 +349,11 @@ const modalClasses = cva({
                                 <div class="flex items-center gap-1.5">
                                     <Icon name="up-square" class="size-4 text-gray-500" />
                                     <Icon name="down-square" class="size-4 text-gray-500" />
-                                    <span class="text-sm text-gray-600 dark:text-gray-500">Navigate</span>
+                                    <span class="text-sm text-gray-600 dark:text-gray-500">{{ __('Navigate') }}</span>
                                 </div>
                                 <div class="flex items-center gap-1.5">
                                     <Icon name="return-square" class="size-4 text-gray-500" />
-                                    <span class="text-sm text-gray-600 dark:text-gray-500">Select</span>
+                                    <span class="text-sm text-gray-600 dark:text-gray-500">{{ __('Select') }}</span>
                                 </div>
                             </footer>
                         </ComboboxContent>
