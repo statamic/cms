@@ -57,4 +57,6 @@
 }
 </style>
 
+<link rel="expect" href="#main-content" blocking="render" />
+
 @stack('head')
