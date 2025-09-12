@@ -1,6 +1,7 @@
 <script setup>
-import { PublishContainer, PublishFields } from '@/components/ui';
-import PublishFieldsProvider from '@/components/ui/Publish/FieldsProvider.vue';
+import PublishContainer from '../Publish/Container.vue';
+import PublishFields from '../Publish/Fields.vue';
+import PublishFieldsProvider from '../Publish/FieldsProvider.vue';
 import { computed, nextTick, ref, watch } from 'vue';
 
 const emit = defineEmits(['changed']);

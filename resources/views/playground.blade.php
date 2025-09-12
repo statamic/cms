@@ -2,7 +2,7 @@
     use function Statamic\trans as __;
     use Illuminate\Support\Facades\File;
 
-    $icons = collect(File::files(base_path('vendor/statamic/cms/resources/svg/icons')))->map(function ($file) {
+    $icons = collect(File::files(statamic_path('packages/ui/icons')))->map(function ($file) {
         return $file->getFilenameWithoutExtension();
     })->all();
 
@@ -119,13 +119,13 @@
         <ui-heading size="lg">Checkboxes</ui-heading>
         <div class="flex">
             <ui-checkbox-group name="meals" label="Select your favorite meals">
-                <ui-checkbox-item
+                <ui-checkbox
                     label="Breakfast"
                     description="The morning meal. Should include eggs."
                     value="breakfast"
                 />
-                <ui-checkbox-item label="Lunch" description="The mid-day meal. Should be protein heavy." value="lunch" />
-                <ui-checkbox-item label="Dinner" description="The evening meal. Should be delicious." value="dinner" />
+                <ui-checkbox label="Lunch" description="The mid-day meal. Should be protein heavy." value="lunch" />
+                <ui-checkbox label="Dinner" description="The evening meal. Should be delicious." value="dinner" />
             </ui-checkbox-group>
         </div>
     </section>
@@ -133,7 +133,7 @@
     <section class="space-y-4">
         <ui-heading size="lg">Datepicker</ui-heading>
         <div class="flex">
-            <ui-datepicker />
+            <ui-date-picker />
         </div>
     </section>
 
@@ -230,14 +230,14 @@
         <ui-heading size="lg">Radio Group</ui-heading>
         <div class="flex">
             <ui-radio-group name="favorite" label="Choose your favorite meal">
-                <ui-radio-item
+                <ui-radio
                     label="Breakfast"
                     description="The morning meal. Should include eggs."
                     value="breakfast"
                     checked
             />
-            <ui-radio-item label="Lunch" description="The mid-day meal. Should be protein heavy." value="lunch" />
-                <ui-radio-item label="Dinner" description="The evening meal Should be delicious." value="dinner" />
+            <ui-radio label="Lunch" description="The mid-day meal. Should be protein heavy." value="lunch" />
+                <ui-radio label="Dinner" description="The evening meal Should be delicious." value="dinner" />
             </ui-radio-group>
         </div>
     </section>
@@ -341,20 +341,20 @@
         <ui-heading size="lg">Tabs</ui-heading>
         <div class="flex">
             <ui-tabs default-tab="tab1" class="w-full">
-                <ui-tabs-list>
-                    <ui-tabs-trigger text="Shiny" name="tab1" />
-                    <ui-tabs-trigger text="Happy" name="tab2" />
-                    <ui-tabs-trigger text="People" name="tab3" />
-                </ui-tabs-list>
-                <ui-tabs-content name="tab1">
+                <ui-tab-list>
+                    <ui-tab-trigger text="Shiny" name="tab1" />
+                    <ui-tab-trigger text="Happy" name="tab2" />
+                    <ui-tab-trigger text="People" name="tab3" />
+                </ui-tab-list>
+                <ui-tab-content name="tab1">
                     <p class="py-8">Tab 1 content</p>
-                </ui-tabs-content>
-                <ui-tabs-content name="tab2">
+                </ui-tab-content>
+                <ui-tab-content name="tab2">
                     <p class="py-8">Tab 2 content</p>
-                </ui-tabs-content>
-                <ui-tabs-content name="tab3">
+                </ui-tab-content>
+                <ui-tab-content name="tab3">
                     <p class="py-8">Tab 3 content</p>
-                </ui-tabs-content>
+                </ui-tab-content>
             </ui-tabs>
         </div>
     </section>

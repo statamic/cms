@@ -52,7 +52,7 @@
                                 </template>
                             </ui-field>
 
-                            <ui-checkbox-item name="remember" :label="__('Remember me')" tabindex="4" />
+                            <ui-checkbox name="remember" :label="__('Remember me')" tabindex="4" />
 
                             <ui-button type="submit" variant="primary" :disabled="busy" :text="__('Continue')" tabindex="5" />
 

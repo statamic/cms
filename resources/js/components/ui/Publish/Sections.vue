@@ -1,6 +1,13 @@
 <script setup>
 import { injectTabContext } from './TabProvider.vue';
-import { Panel, PanelHeader, Heading, Subheading, Card, Icon } from '@/components/ui';
+import {
+    Panel,
+    PanelHeader,
+    Heading,
+    Subheading,
+    Card,
+    Icon,
+} from '@ui';
 import FieldsProvider from './FieldsProvider.vue';
 import Fields from './Fields.vue';
 import ShowField from '@/components/field-conditions/ShowField.js';

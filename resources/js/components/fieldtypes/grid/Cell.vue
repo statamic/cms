@@ -5,7 +5,8 @@
 </template>
 
 <script>
-import Field from '@/components/ui/Publish/Field.vue';
+import { Field } from '@ui';
+
 export default {
     components: {
         Field,

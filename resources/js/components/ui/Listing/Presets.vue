@@ -1,7 +1,14 @@
 <script setup>
 import PresetTrigger from './PresetTrigger.vue';
-import { Button, Input, Dropdown, DropdownItem, DropdownMenu, DropdownSeparator } from '@/components/ui';
-import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
+import {
+    Button,
+    Input,
+    Dropdown,
+    DropdownItem,
+    DropdownMenu,
+    DropdownSeparator,
+} from '@ui';
+import { injectListingContext } from '../Listing/Listing.vue';
 import { computed, ref, watch } from 'vue';
 
 const { preferencesPrefix, activeFilters, searchQuery, setFilters, clearFilters, setSearchQuery, clearSearchQuery } =

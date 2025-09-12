@@ -1,6 +1,11 @@
 <script setup>
-import { Dropdown, DropdownItem, DropdownMenu, DropdownSeparator } from '@/components/ui';
-import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
+import {
+    Dropdown,
+    DropdownItem,
+    DropdownMenu,
+    DropdownSeparator,
+} from '@ui';
+import { injectListingContext } from '../Listing/Listing.vue';
 import ItemActions from '@/components/actions/ItemActions.vue';
 import { computed, ref, watch } from 'vue';
 

@@ -174,7 +174,14 @@
 import FocalPointEditor from './FocalPointEditor.vue';
 import PdfViewer from './PdfViewer.vue';
 import { pick, flatten } from 'lodash-es';
-import { Dropdown, DropdownMenu, DropdownItem, PublishContainer, PublishTabs, Icon } from '@/components/ui';
+import {
+    Dropdown,
+    DropdownMenu,
+    DropdownItem,
+    PublishContainer,
+    PublishTabs,
+    Icon,
+} from '@ui';
 import ItemActions from '@/components/actions/ItemActions.vue';
 
 export default {

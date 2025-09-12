@@ -69,8 +69,7 @@
 <script>
 import { getActivePinia } from 'pinia';
 import InlineEditForm from './InlineEditForm.vue';
-import { Button, Dropdown, DropdownMenu, DropdownItem } from '@/components/ui';
-import { containerContextKey } from '@/components/ui/Publish/Container.vue';
+import { Button, Dropdown, DropdownMenu, DropdownItem, publishContextKey as containerContextKey } from '@/components/ui';
 
 export default {
     components: {

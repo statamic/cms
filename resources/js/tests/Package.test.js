@@ -26,7 +26,7 @@ it('exports core', async () => {
     ];
 
     expect(Object.keys(modules.core).toSorted()).toEqual(expected)
-    expect(Object.keys(await import('@/package/index.js')).toSorted()).toEqual(expected);
+    expect(Object.keys(await import('@statamic/cms/index.js')).toSorted()).toEqual(expected);
 });
 
 it('exports save pipeline', async () => {
@@ -39,7 +39,7 @@ it('exports save pipeline', async () => {
     ];
 
     expect(Object.keys(modules.savePipeline).toSorted()).toEqual(expected);
-    expect(Object.keys(await import('@/package/save-pipeline.js')).toSorted()).toEqual(expected);
+    expect(Object.keys(await import('@statamic/cms/save-pipeline.js')).toSorted()).toEqual(expected);
 });
 
 it('exports bard', async () => {
@@ -48,7 +48,7 @@ it('exports bard', async () => {
     ];
 
     expect(Object.keys(modules.bard).toSorted()).toEqual(expected);
-    expect(Object.keys(await import('@/package/bard.js')).toSorted()).toEqual(expected);
+    expect(Object.keys(await import('@statamic/cms/bard.js')).toSorted()).toEqual(expected);
 });
 
 it('exports ui', async () => {
@@ -89,7 +89,6 @@ it('exports ui', async () => {
         'EmptyStateMenu',
         'ErrorMessage',
         'Field',
-        'FieldsProvider',
         'Header',
         'Heading',
         'Icon',
@@ -121,6 +120,7 @@ it('exports ui', async () => {
         'PublishContainer',
         'PublishField',
         'PublishFields',
+        'PublishFieldsProvider',
         'PublishForm',
         'PublishLocalizations',
         'PublishSections',
@@ -159,5 +159,5 @@ it('exports ui', async () => {
     ];
 
     expect(Object.keys(modules.ui).toSorted()).toEqual(expected);
-    expect(Object.keys(await import('@/package/ui.js')).toSorted()).toEqual(expected);
+    expect(Object.keys(await import('@statamic/cms/ui.js')).toSorted()).toEqual(expected);
 });

@@ -130,7 +130,7 @@ import {
     PanelFooter,
     PanelHeader,
     ListingTable,
-} from '@/components/ui';
+} from '@ui';
 
 export default {
     mixins: [AssetBrowserMixin],
