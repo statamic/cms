@@ -128,7 +128,28 @@ function normalizeItem(item) {
         item.text = item.text.join(' » ');
     }
 
+    if (typeof item.keys === 'string') {
+        item.keys = renderKeys(item.keys);
+    }
+
     return item;
+}
+
+function renderKeys(keys) {
+    return keys.toLowerCase().split('+').map(key => {
+        switch(key) {
+            case "command":
+            case "cmd":
+                return "⌘";
+            case "control":
+            case "ctrl":
+                return "^";
+            case "mod":
+                return "⌘"; // TODO: handle normalizing 'mod' cross platform
+            default:
+                return key;
+        }
+    }).map(key => key.toUpperCase());
 }
 
 watch(selected, (item) => {
@@ -331,7 +352,8 @@ const modalClasses = cva({
                                             :icon="item.icon"
                                             :href="item.url"
                                             :open-new-tab="metaPressed || item.openNewTab"
-                                            :badge="item.keys || item.badge"
+                                            :badge="item.badge"
+                                            :keys="item.keys"
                                             :removable="isRecentItem(item)"
                                             @remove="removeRecentItem"
                                         >
