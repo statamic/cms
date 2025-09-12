@@ -37,8 +37,7 @@
                 <site-selector
                     v-if="sites.length > 1"
                     :sites="sites"
-                    :value="site"
-                    @input="site = $event.handle"
+                    v-model="site"
                 />
 
                 <Button
@@ -60,8 +59,7 @@
                 <site-selector
                     v-if="sites.length > 1 && reordering && site"
                     :sites="sites"
-                    :value="site"
-                    @input="site = $event"
+                    v-model="site"
                 />
 
                 <Button
