@@ -12,7 +12,7 @@
     .page-move {
         @apply w-6 dark:text-gray-200 ltr:rounded-xl;
         cursor: grab;
-        background-image: url('../../svg/ui/drag-dots.svg');
+        background-image: url('../../svg/drag-dots.svg');
         background-size: 7px 17px;
         background-position: center center;
         background-repeat: no-repeat;

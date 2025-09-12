@@ -1,6 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { Badge, DropdownItem, Listing } from '@/components/ui';
+import {
+    Badge,
+    DropdownItem,
+    Listing
+} from '@ui';
 
 const props = defineProps(['initialRows', 'initialColumns']);
 const rows = ref(props.initialRows);

@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue';
-import { Tooltip } from '@/components/ui';
+import { Tooltip } from '@ui';
 
 const props = defineProps({
     status: {

@@ -1,6 +1,13 @@
 <script setup>
 import { injectTabContext } from './TabProvider.vue';
-import { Panel, PanelHeader, Heading, Subheading, Card, Icon } from '@/components/ui';
+import {
+    Panel,
+    PanelHeader,
+    Heading,
+    Subheading,
+    Card,
+    Icon,
+} from '@ui';
 import FieldsProvider from './FieldsProvider.vue';
 import Fields from './Fields.vue';
 import ShowField from '@/components/field-conditions/ShowField.js';
@@ -22,7 +29,8 @@ const visibleSections = computed(() => {
                 visibleValues.value,
                 revealerValues.value,
                 hiddenFields.value,
-                setHiddenField
+                setHiddenField,
+                { container }
             ).showField(field, field.handle);
         });
     });
@@ -56,12 +64,13 @@ function toggleSection(id) {
                 </div>
                 <Icon
                     v-if="section.collapsible"
-                    name="ui/chevron-down"
+                    name="chevron-down"
                     class="size-5 text-gray-400"
                     :class="section.collapsed ? 'rotate-270' : 'rotate-0'"
                 />
             </PanelHeader>
             <div
+                style="--tw-ease: ease;"
                 class="h-auto overflow-clip visible transition-[height,visibility] duration-[250ms,2s]"
                 :class="{ 'h-0! visibility-hidden': section.collapsed }"
             >

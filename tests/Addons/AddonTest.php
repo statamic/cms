@@ -1,6 +1,6 @@
 <?php
 
-namespace Addons;
+namespace Tests\Addons;
 
 use Facades\Statamic\Licensing\LicenseManager;
 use Foo\Bar\TestAddonServiceProvider;
