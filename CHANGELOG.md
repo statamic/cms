@@ -1,5 +1,15 @@
 # Release Notes
 
+## 5.65.1 (2025-09-12)
+
+### What's fixed
+- Fix casing of "Edit Nav item" dropdown item [#12387](https://github.com/statamic/cms/issues/12387) by @duncanmcclean
+- Require `spatie/error-solutions` instead of `spatie/ignition` [#12385](https://github.com/statamic/cms/issues/12385) by @duncanmcclean
+- Allow `spatie/error-solutions` v1 [#12418](https://github.com/statamic/cms/issues/12418) by @jasonvarga
+- Bump axios from 1.8.2 to 1.12.0 [#12420](https://github.com/statamic/cms/issues/12420) by @dependabot
+
+
+
 ## 5.65.0 (2025-09-08)
 
 ### What's new
