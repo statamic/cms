@@ -43,13 +43,6 @@ function formatDate(value) {
         :show-pagination-page-links="false"
         :show-pagination-per-page-selector="false"
     >
-        <template #initializing>
-            <Widget v-bind="widgetProps">
-                <div class="flex flex-col gap-4 justify-between p-4">
-                    <ui-skeleton v-for="i in initialPerPage" class="h-3 w-full" />
-                </div>
-            </Widget>
-        </template>
         <template #default="{ items }">
             <Widget v-bind="widgetProps">
                 <ui-description v-if="!items.length" class="flex-1 flex items-center justify-center">
