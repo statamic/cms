@@ -320,10 +320,16 @@ export default {
 
         expandAll() {
             this.$refs.tree.openAll();
+            this.collapsedState = [];
         },
 
         collapseAll() {
             this.$refs.tree.closeAll();
+            // Get all node IDs to mark them as collapsed
+            this.collapsedState = [];
+            walkTreeData(this.treeData, (node) => {
+                this.collapsedState.push(node.id);
+            });
         },
 
         getNodeByBranchId(id) {
