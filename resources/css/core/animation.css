@@ -62,24 +62,33 @@
 
     What does it do?
     ----------------
+    - View transitions are effectively used to fade the page _out_
     - Soft-animates an element on page load using @starting-style
     - These should be almost-instant otherwise they'll get annoying
 
 */
-/* HTML Example...
-
-*/
-.entry-animate-in {
-    transition: opacity 0.2s;
-    @starting-style {
-        opacity: 0;
+@media (prefers-reduced-motion: no-preference) {
+    @view-transition {
+        navigation: auto;
     }
-}
 
-.entry-animate-in--quick {
-    transition: opacity 0.1s;
-}
+    ::view-transition-group(root) {
+        /* Speed up the view transition. Bear in mind 0.25 is the default - https://developer.mozilla.org/en-US/docs/Web/CSS/::view-transition-old */
+        animation-duration: 0.1s;
+    }
 
-.entry-animate-in--siblings {
-    transition-delay: calc(sibling-index() * 0.015s);
+    .entry-animate-in {
+        transition: opacity 0.2s;
+        @starting-style {
+            opacity: 0;
+        }
+    }
+    
+    .entry-animate-in--quick {
+        transition: opacity 0.1s;
+    }
+    
+    .entry-animate-in--siblings {
+        transition-delay: calc(sibling-index() * 0.015s);
+    }
 }
