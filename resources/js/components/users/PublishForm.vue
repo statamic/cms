@@ -2,6 +2,7 @@
     <div>
         <Header :title="title" icon="users">
             <ItemActions
+                ref="actions"
                 v-if="canEditBlueprint || hasItemActions"
                 :item="values.id"
                 :url="itemActionUrl"
@@ -13,7 +14,7 @@
             >
                 <Dropdown>
                     <template #trigger>
-                        <Button icon="ui/dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
+                        <Button icon="dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
                     </template>
                     <DropdownMenu>
                         <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :href="actions.editBlueprint" />
@@ -38,7 +39,16 @@
                 :requires-current-password="requiresCurrentPassword"
             />
 
-            <Button variant="primary" @click.prevent="save" v-text="__('Save')" />
+            <ui-command-palette-item
+                :category="$commandPalette.category.Actions"
+                :text="__('Save')"
+                icon="save"
+                :action="save"
+                prioritize
+                v-slot="{ text, action }"
+            >
+                <Button variant="primary" @click.prevent="action" :text="text" />
+            </ui-command-palette-item>
 
             <slot name="action-buttons-right" />
         </Header>
@@ -76,7 +86,7 @@ import {
 } from '@/components/ui';
 import ItemActions from '@/components/actions/ItemActions.vue';
 import { computed, ref } from 'vue';
-import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@/components/ui/Publish/SavePipeline.js';
+import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';
 
 let saving = ref(false);
 let errors = ref({});
@@ -159,6 +169,22 @@ export default {
                 this.values = resetValuesFromResponse(response.data.values, this.$refs.container);
             }
         },
+
+        addToCommandPalette() {
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Edit Blueprint'),
+                icon: 'blueprint-edit',
+                url: this.actions.editBlueprint,
+            });
+
+            this.$refs.actions?.preparedActions.forEach(action => Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: action.title,
+                icon: action.icon,
+                action: action.run,
+            }));
+        },
     },
 
     created() {
@@ -170,6 +196,8 @@ export default {
             e.preventDefault();
             this.save();
         });
+
+        this.addToCommandPalette();
     },
 };
 </script>

@@ -2,7 +2,12 @@
 import { computed, useTemplateRef, watch, ref, inject } from 'vue';
 import { injectContainerContext } from './Container.vue';
 import { injectFieldsContext } from './FieldsProvider.vue';
-import { Field, Icon, Tooltip, Label } from '@/components/ui';
+import {
+    Field,
+    Icon,
+    Tooltip,
+    Label,
+} from '@ui';
 import FieldActions from '@/components/field-actions/FieldActions.vue';
 import ShowField from '@/components/field-conditions/ShowField.js';
 
@@ -32,6 +37,7 @@ const {
     setFieldMeta,
     hiddenFields,
     setHiddenField,
+    container,
 } = injectContainerContext();
 const { fieldPathPrefix, metaPathPrefix } = injectFieldsContext();
 const handle = props.config.handle;
@@ -114,7 +120,8 @@ const shouldShowField = computed(() => {
         containerVisibleValues.value,
         revealerValues.value,
         hiddenFields.value,
-        setHiddenField
+        setHiddenField,
+        { container },
     ).showField(props.config, fullPath.value);
 });
 
@@ -214,7 +221,7 @@ const fieldtypeComponentEvents = computed(() => ({
             <template #label v-if="shouldShowLabel">
                 <Label :for="fieldId" :required="isRequired">
                     <template v-if="shouldShowLabelText">
-                        <Tooltip :text="config.handle" :delay="1000">
+                        <Tooltip :text="config.handle" :delay="1000" as="span">
                             {{ __(config.display) }}
                         </Tooltip>
                     </template>

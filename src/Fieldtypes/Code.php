@@ -123,7 +123,7 @@ class Code extends Fieldtype
                         'instructions' => __('statamic::fieldtypes.code.config.rulers'),
                         'type' => 'array',
                         'key_header' => __('Columns'),
-                        'value_header' => __('Line Style (dashed or solid)'),
+                        'value_header' => __('statamic::fieldtypes.code.config.rulers_value_header'),
                         'add_button' => __('Add Ruler'),
                         'width' => '50',
                     ],

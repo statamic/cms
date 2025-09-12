@@ -9,7 +9,6 @@ use Statamic\Query\Scopes\Filters\Fields\Floatval as FloatFilter;
 class Floatval extends Fieldtype
 {
     protected $categories = ['number'];
-    protected $icon = 'float';
     protected $rules = ['numeric'];
     protected static $handle = 'float';
 

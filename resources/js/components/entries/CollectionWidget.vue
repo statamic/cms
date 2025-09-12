@@ -55,11 +55,7 @@ function formatDate(value) {
         <template #initializing>
             <Widget v-bind="widgetProps">
                 <div class="flex flex-col gap-[9px] justify-between py-3 px-4">
-                    <ui-skeleton class="h-[19px] w-full" />
-                    <ui-skeleton class="h-[19px] w-full" />
-                    <ui-skeleton class="h-[19px] w-full" />
-                    <ui-skeleton class="h-[19px] w-full" />
-                    <ui-skeleton class="h-[19px] w-full" />
+                    <ui-skeleton v-for="i in initialPerPage" class="h-[19px] w-full" />
                 </div>
             </Widget>
         </template>
@@ -83,7 +79,7 @@ function formatDate(value) {
                             <template #cell-date="{ row: entry, isColumnVisible }">
                                 <div
                                     class="text-end font-mono text-xs whitespace-nowrap text-gray-500 antialiased px-2"
-                                    v-html="formatDate(entry.datestamp)"
+                                    v-html="formatDate(entry.date.date)"
                                     v-if="isColumnVisible('date')"
                                 />
                             </template>

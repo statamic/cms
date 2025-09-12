@@ -1,6 +1,6 @@
 <script setup>
 import { sortBy } from 'lodash-es';
-import { Combobox, CardPanel } from '@/components/ui';
+import { Combobox, CardPanel } from '@ui';
 import { computed, ref, watch, nextTick, onMounted } from 'vue';
 import FieldFilterRow from './FieldFilterRow.vue';
 
@@ -64,7 +64,7 @@ async function createFilter(newField) {
     filter.values = defaultValues;
 
     rows.value.push(filter);
-    
+
     // Focus on the newly created row's first field
     await nextTick();
     const newRowRef = rowRefs.value[filter.handle];
@@ -159,7 +159,6 @@ defineExpose({
             :placeholder="__('Add Field')"
             :options="fieldComboboxOptions"
             @update:model-value="createFilter"
-            class="w-1/4"
         />
     </div>
 

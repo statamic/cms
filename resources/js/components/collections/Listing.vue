@@ -18,7 +18,7 @@
                     <div class="flex items-center gap-1.5">
                         <ui-heading size="lg" :text="__(collection.title)" :href="collection.available_in_selected_site ? collection.entries_url : collection.edit_url" />
                         <span class="text-sm text-gray-600">
-                            ({{ __('entry_count', { count: collection.entries_count }) }})
+                            ({{ __('messages.entry_count', { count: collection.entries_count }) }})
                         </span>
                     </div>
                     <aside class="flex items-center gap-2">
@@ -61,7 +61,13 @@
                 </ui-panel-header>
 
                 <ui-card class="h-40 px-0! py-2!">
-                    <ui-listing :url="collection.entries_listing_url" :per-page="5" :columns="collection.columns">
+                    <ui-listing
+                        :url="collection.entries_listing_url"
+                        :per-page="5"
+                        :columns="collection.columns"
+                        :sort-column="collection.sort_column"
+                        :sort-direction="collection.sort_direction"
+                    >
                         <template #initializing>
                             <div class="flex flex-col gap-[9px] justify-between py-1 px-5">
                                 <ui-skeleton class="h-[19px] w-full" />
@@ -267,6 +273,7 @@ export default {
             Statamic.$commandPalette.add({
                 category: Statamic.$commandPalette.category.Actions,
                 text: __('Toggle Grid Layout'),
+                icon: 'layout-grid',
                 when: () => this.mode === 'table',
                 action: () => this.mode = 'grid',
             });
@@ -274,6 +281,7 @@ export default {
             Statamic.$commandPalette.add({
                 category: Statamic.$commandPalette.category.Actions,
                 text: __('Toggle List Layout'),
+                icon: 'layout-list',
                 when: () => this.mode === 'grid',
                 action: () => this.mode = 'table',
             });

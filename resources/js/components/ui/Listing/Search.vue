@@ -1,11 +1,10 @@
 <script setup>
-import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
-import { Input } from '@/components/ui';
+import { injectListingContext } from '../Listing/Listing.vue';
+import { Input } from '@ui';
 import debounce from '@/util/debounce.js';
 import { useTemplateRef } from 'vue';
 
 const { activeFilterBadgeCount, searchQuery, setSearchQuery, reorderable } = injectListingContext();
-const placeholder = 'Search...';
 const searchQueryUpdated = debounce((event) => setSearchQuery(event.target.value), 300);
 
 const input = useTemplateRef('input');
@@ -23,7 +22,7 @@ defineExpose({ focus });
             icon="magnifying-glass"
             id="listings-search"
             variant="light"
-            :placeholder="__(placeholder)"
+            :placeholder="__('Search...')"
             :value="searchQuery"
             :disabled="reorderable"
             @input="searchQueryUpdated"

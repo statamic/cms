@@ -51,13 +51,22 @@ Here flexbox is much better suited to create a layout that grows to fill space. 
     }
 
     @variant lg {
-    /* Here we have to cut short the proper width very slightly to account for the gap value. Because we're using flex-grow it should be pretty unnoticeable */
+        /* Here we have to cut short the proper width very slightly to account for the gap value. Because we're using flex-grow it should be pretty unnoticeable */
         .field-w-25  { flex-basis: 24.5%; }
         .field-w-33  { flex-basis: 32.5%; }
         .field-w-50  { flex-basis: 49.4%; }
         .field-w-66  { flex-basis: 66.1%; }
         .field-w-75  { flex-basis: 74.5%; }
         .field-w-undefined, .field-w-100 { flex-basis: 100%; }
+    }
+}
+
+.publish-fields-fluid--xl-only {
+    /* A modifier that prevents the fields from being fluid on smaller screens to help legibility, for example on the Blueprints builder */
+    @media (width < 1400px) {
+        [class*="field-w-"] {
+            flex-basis: 100%;
+        }
     }
 }
 

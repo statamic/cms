@@ -407,7 +407,7 @@ export default {
                 url: this.scaffoldUrl,
             });
 
-            this.$refs.actions.preparedActions.forEach(action => Statamic.$commandPalette.add({
+            this.$refs.actions?.preparedActions.forEach(action => Statamic.$commandPalette.add({
                 category: Statamic.$commandPalette.category.Actions,
                 text: [__('Collection'), action.title],
                 icon: action.icon,
