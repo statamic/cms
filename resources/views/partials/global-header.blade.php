@@ -59,7 +59,7 @@
                 <span class="text-gray-500">/</span>
                 <ui-button href="{{ $breadcrumb->url() }}" text="{{ __($breadcrumb->text()) }}" size="sm" variant="ghost"></ui-button>
                 @if($breadcrumb->hasLinks() || $breadcrumb->createUrl())
-                    <ui-dropdown v-cloak class="relative" aria-label="{{ __('More options for') }} {{ __($breadcrumb->text()) }}">
+                    <ui-dropdown class="relative" aria-label="{{ __('More options for') }} {{ __($breadcrumb->text()) }}">
                         <template #trigger>
                             <ui-button
                                 variant="ghost"
