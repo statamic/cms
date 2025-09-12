@@ -13,8 +13,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "paths": {
-      "@/*": ["resources/js/*"],
-      "@statamic/ui": ["packages/ui/src/index.js"]
+      "@/*": ["resources/js/*"]
     },
     "types": ["node"]
   },
