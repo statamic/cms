@@ -363,8 +363,6 @@ export default {
         this.json = this.editor.getJSON().content;
         this.html = this.editor.getHTML();
 
-        this.escBinding = this.$keys.bind('esc', this.closeFullscreen);
-
         this.$nextTick(() => {
             this.mounted = true;
             if (this.config.collapse) this.collapseAll();
@@ -416,8 +414,14 @@ export default {
             this.updateMeta(meta);
         },
 
-        fullScreenMode() {
+        fullScreenMode(fullScreenMode) {
             this.initEditor();
+
+            if (fullScreenMode) {
+                this.escBinding = this.$keys.bindGlobal('esc', this.closeFullscreen);
+            } else {
+                this.escBinding?.destroy();
+            }
         },
 
         'publishContainer.errors': {
