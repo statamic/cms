@@ -6,20 +6,19 @@
     "allowJs": true,
     "declaration": true,
     "emitDeclarationOnly": true,
-    "outDir": "./packages/cms/types",
+    "outDir": "./types",
     "baseUrl": ".",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "paths": {
-      "@/*": ["resources/js/*"]
+      "@/*": ["../../resources/js/*"]
     },
     "types": ["node"]
   },
   "include": [
-    "resources/js/bootstrap/cms",
-    "packages/ui/src"
+    "../../resources/js/bootstrap/cms"
   ],
   "exclude": [
     "node_modules",
