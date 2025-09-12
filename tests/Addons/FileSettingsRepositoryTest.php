@@ -1,6 +1,6 @@
 <?php
 
-namespace Addons;
+namespace Tests\Addons;
 
 use Foo\Bar\TestAddonServiceProvider;
 use Illuminate\Support\Facades\File;

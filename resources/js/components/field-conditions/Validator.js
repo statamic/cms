@@ -15,11 +15,12 @@ const isEmpty = (value) => {
 const isString = (str) => str != null && typeof str.valueOf() === 'string';
 
 export default class {
-    constructor(field, values, rootValues, currentFieldPath, revealerFields) {
+    constructor(field, values, rootValues, currentFieldPath, revealerFields, extraPayload) {
         this.field = field;
         this.values = values;
         this.currentFieldPath = currentFieldPath;
         this.revealerFields = revealerFields;
+        this.extraPayload = extraPayload;
         this.rootValues = rootValues || false;
         this.passOnAny = false;
         this.showOnPass = true;
@@ -263,6 +264,7 @@ export default class {
             values: this.values,
             root: this.rootValues,
             fieldPath: this.currentFieldPath,
+            ...this.extraPayload,
         });
 
         return this.showOnPass ? passes : !passes;
