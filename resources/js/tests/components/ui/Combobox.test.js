@@ -5,6 +5,8 @@ import { Combobox } from '@/components/ui';
 beforeEach(() => {
     Element.prototype.scrollIntoView = vi.fn();
 
+    global.__ = (key) => key;
+
     global.CSS = {
         escape: (str) => {
             // Simple implementation that handles most cases
