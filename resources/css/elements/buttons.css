@@ -10,6 +10,7 @@
             }
 
             &.btn-danger {
+                box-shadow: none;
                 @apply text-red-600;
             }
         }
