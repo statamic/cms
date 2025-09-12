@@ -17,7 +17,7 @@
                 <ui-panel-header class="flex items-center justify-between">
                     <div class="flex items-center gap-1.5">
                         <ui-heading size="lg" :text="__(collection.title)" :href="collection.available_in_selected_site ? collection.entries_url : collection.edit_url" />
-                        <span class="text-sm text-gray-600">
+                        <span v-if="collection.available_in_selected_site" class="text-sm text-gray-600">
                             ({{ __('messages.entry_count', { count: collection.entries_count }) }})
                         </span>
                     </div>
@@ -32,8 +32,8 @@
                         >
                             <Dropdown placement="left-start">
                                 <DropdownMenu>
-                                    <DropdownItem :text="__('View')" icon="eye" :href="collection.entries_url" />
-                                    <DropdownItem v-if="collection.url" :text="__('Visit URL')" icon="external-link" target="_blank" :href="collection.url" />
+                                    <DropdownItem v-if="collection.available_in_selected_site" :text="__('View')" icon="eye" :href="collection.entries_url" />
+                                    <DropdownItem v-if="collection.available_in_selected_site && collection.url" :text="__('Visit URL')" icon="external-link" target="_blank" :href="collection.url" />
                                     <DropdownItem v-if="collection.editable" :text="__('Configure')" icon="cog" :href="collection.edit_url" />
                                     <DropdownItem v-if="collection.blueprint_editable" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="collection.blueprints_url" />
                                     <DropdownItem v-if="collection.editable" :text="__('Scaffold Views')" icon="scaffold" :href="collection.scaffold_url" />
@@ -51,6 +51,7 @@
                         </ItemActions>
 
                         <create-entry-button
+                            v-if="collection.available_in_selected_site"
                             :url="collection.create_entry_url"
                             variant="default"
                             :blueprints="collection.blueprints"
@@ -62,8 +63,10 @@
 
                 <ui-card class="h-40 px-0! py-2!">
                     <ui-listing
+                        v-if="collection.available_in_selected_site"
                         :url="collection.entries_listing_url"
                         :per-page="5"
+                        :filters="collection.filters"
                         :columns="collection.columns"
                         :sort-column="collection.sort_column"
                         :sort-direction="collection.sort_direction"
@@ -88,9 +91,13 @@
                             <ui-subheading v-else class="text-center h-full flex items-center justify-center">{{ __('Nothing to see here, yet.') }}</ui-subheading>
                         </template>
                     </ui-listing>
+                    <div v-else class="flex flex-col items-center justify-center space-y-2 h-full">
+                        <ui-subheading class="text-center">{{ __("This collection isn't available in this site.") }}</ui-subheading>
+                        <ui-button :href="collection.edit_url" :text="__('Configure')" size="sm" />
+                    </div>
                 </ui-card>
 
-                <ui-panel-footer class="flex items-center gap-6 text-sm text-gray-600">
+                <ui-panel-footer v-if="collection.available_in_selected_site" class="flex items-center gap-6 text-sm text-gray-600">
                     <div class="flex items-center gap-2">
                         <ui-badge variant="flat" :text="String(collection.published_entries_count)" pill class="bg-gray-200 dark:bg-gray-700" />
                         <span>{{ __('Published') }}</span>
