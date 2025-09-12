@@ -12,6 +12,7 @@ import { motion } from 'motion-v';
 import { cva } from 'cva';
 import { Icon, Subheading } from '@/components/ui';
 
+let metaPressed = ref(false);
 let open = ref(false);
 let query = ref('');
 let serverCategories = Statamic.$config.get('commandPaletteCategories');
@@ -31,6 +32,7 @@ each({
     esc: () => open.value = false,
     'ctrl+n': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' })),
     'ctrl+p': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp' })),
+    mod: () => metaPressed.value = true,
 }, (callback, binding) => {
     Statamic.$keys.bindGlobal([binding], (e) => {
         if (open.value) {
@@ -39,6 +41,8 @@ each({
         }
     });
 });
+
+Statamic.$keys.bind('mod+keyup', () => metaPressed.value = false);
 
 const actionItems = computed(() => {
     return sortJsInjectedItems(Statamic.$commandPalette.actions().filter(item => item.when()));
@@ -239,7 +243,7 @@ const modalClasses = cva({
         <DialogTrigger>
             <div class="
                 data-[focus-visible]:outline-focus hover flex cursor-text items-center gap-x-1.5 group h-8
-                rounded-lg [button:has(>&)]:rounded-md bg-black/40 text-xs text-white/60 outline-none
+                rounded-lg [button:has(>&)]:rounded-md bg-black/15 text-xs text-white/70 outline-none
                 border-b border-b-white/20 inset-shadow-sm inset-shadow-black/20
                 md:w-32 md:py-[calc(5/16*1rem)] md:px-2
                 hover:bg-black/45 hover:text-white/70
@@ -314,7 +318,7 @@ const modalClasses = cva({
                                             v-else
                                             :icon="item.icon"
                                             :href="item.url"
-                                            :open-new-tab="item.openNewTab"
+                                            :open-new-tab="metaPressed || item.openNewTab"
                                             :badge="item.keys || item.badge"
                                             :removable="isRecentItem(item)"
                                             @remove="removeRecentItem"

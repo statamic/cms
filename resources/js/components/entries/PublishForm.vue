@@ -138,7 +138,6 @@
                                         icon="history"
                                         :text="__('View History')"
                                         size="xs"
-                                        class="-me-4"
                                     />
                                 </PanelHeader>
                                 <Card class="space-y-2">

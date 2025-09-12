@@ -22,6 +22,7 @@ export { default as DatePicker } from './DatePicker/DatePicker.vue';
 export { default as DateRangePicker } from './DateRangePicker/DateRangePicker.vue';
 export { default as Description } from './Description.vue';
 export { default as DragHandle } from './DragHandle.vue';
+export { default as Drawer } from './Drawer/Drawer.vue';
 export { default as Dropdown } from './Dropdown/Dropdown.vue';
 export { default as DropdownItem } from './Dropdown/Item.vue';
 export { default as DropdownLabel } from './Dropdown/Label.vue';

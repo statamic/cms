@@ -24,6 +24,7 @@ export const {
     DateRangePicker,
     Description,
     DragHandle,
+    Drawer,
     Dropdown,
     DropdownItem,
     DropdownLabel,
