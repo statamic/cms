@@ -7,6 +7,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\User;
 use Statamic\Entries\Collection;
 use Statamic\Facades;
+use Statamic\Facades\Scope;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -60,6 +61,9 @@ class ViewCollectionListingTest extends TestCase
                     'icon' => 'collections',
                     'sort_column' => 'title',
                     'sort_direction' => 'asc',
+                    'filters' => Scope::filters('entries', [
+                        'collection' => $collectionA->handle(),
+                    ]),
                 ],
                 [
                     'id' => 'foo',
@@ -91,6 +95,9 @@ class ViewCollectionListingTest extends TestCase
                     'icon' => 'collections',
                     'sort_column' => 'title',
                     'sort_direction' => 'asc',
+                    'filters' => Scope::filters('entries', [
+                        'collection' => $collectionB->handle(),
+                    ]),
                 ],
             ]))
             ->assertDontSee('ui-empty-state-menu');
