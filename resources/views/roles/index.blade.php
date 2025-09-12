@@ -7,11 +7,20 @@
 
 @section('content')
     <ui-header title="{{ __('Roles & Permissions') }}" icon="permissions">
-        <ui-button
-            href="{{ cp_route('roles.create') }}"
-            variant="primary"
-            :text="__('Create Role')"
-        ></ui-button>
+        <ui-command-palette-item
+            category="{{ Statamic\CommandPalette\Category::Actions }}"
+            text="{{ __('Create Role') }}"
+            url="{{ cp_route('roles.create') }}"
+            icon="permissions"
+            prioritize
+            v-slot="{ text, url }"
+        >
+            <ui-button
+                :text="text"
+                :href="url"
+                variant="primary"
+            ></ui-button>
+        </ui-command-palette-item>
     </ui-header>
 
     <role-listing

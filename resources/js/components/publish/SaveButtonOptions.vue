@@ -3,7 +3,7 @@
         <slot />
         <Dropdown v-if="showOptions" align="end">
             <template #trigger>
-                <Button variant="primary" icon="ui/chevron-down" :aria-label="__('Save options')" />
+                <Button variant="primary" icon="chevron-down" :aria-label="__('Save options')" />
             </template>
             <DropdownMenu>
                 <DropdownLabel id="after-saving-label" v-text="__('After Saving')" />
@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { Button, Dropdown, DropdownMenu, DropdownLabel, Radio, RadioGroup } from '@statamic/ui';
+import { Button, Dropdown, DropdownMenu, DropdownLabel, Radio, RadioGroup } from '@/components/ui';
 
 export default {
     components: {

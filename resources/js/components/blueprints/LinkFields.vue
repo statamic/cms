@@ -44,7 +44,7 @@
                         class="w-full mt-6"
                         variant="primary"
                         :disabled="!reference"
-                        :text="__('Link')"
+                        :text="__('Link Field')"
                         @click="linkField"
                     />
 
@@ -87,7 +87,7 @@
                         class="w-full mt-6"
                         variant="primary"
                         :disabled="!fieldset"
-                        :text="__('Link')"
+                        :text="__('Link Fieldset')"
                         @click="linkFieldset"
                     />
                 </div>
@@ -98,13 +98,14 @@
 
 <script>
 import uniqid from 'uniqid';
-import { Combobox, Button, Input, Heading, Field } from '@statamic/ui';
+import { Combobox, Button, Input, Heading, Field } from '@/components/ui';
 
 export default {
     components: { Heading, Combobox, Button, Input, Field },
 
     props: {
         excludeFieldset: String,
+        withCommandPalette: Boolean,
     },
 
     data() {
@@ -138,6 +139,12 @@ export default {
             })),
             fieldsets,
         };
+    },
+
+    mounted() {
+        if (this.withCommandPalette) {
+            this.addToCommandPalette();
+        }
     },
 
     methods: {
@@ -174,6 +181,19 @@ export default {
             this.reference = null;
             this.fieldset = null;
             this.importPrefix = null;
+        },
+
+        addToCommandPalette() {
+            if (!this.withCommandPalette) {
+                return;
+            }
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Link Existing'),
+                icon: 'link',
+                action: () => this.open = true,
+            });
         },
     },
 };

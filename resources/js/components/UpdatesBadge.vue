@@ -4,7 +4,7 @@
 
 <script>
 import { ref } from 'vue';
-import { Badge } from '@statamic/ui';
+import { Badge } from '@/components/ui';
 
 const count = ref(null);
 const requested = ref(false);

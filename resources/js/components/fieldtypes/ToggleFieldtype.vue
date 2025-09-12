@@ -3,7 +3,7 @@
         <div class="flex items-center gap-2">
             <Switch
                 @update:model-value="update"
-                :disabled="config.disabled"
+                :disabled="config.disabled || isReadOnly"
                 :id="fieldId"
                 :model-value="value"
                 :read-only="isReadOnly"
@@ -16,7 +16,7 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import { Switch, Heading } from '@statamic/ui';
+import { Switch, Heading } from '@/components/ui';
 
 export default {
     mixins: [Fieldtype],
@@ -34,7 +34,7 @@ export default {
         },
 
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
+            if (!this.showFieldPreviews) return;
 
             return (this.value ? '✓' : '✗') + ' ' + __(this.config.display);
         },

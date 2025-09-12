@@ -13,12 +13,12 @@
                     :aria-label="action.title"
                     tabindex="-1"
                 >
-                    <svg-icon :name="action.icon" class="size-3" />
+                    <ui-icon :name="action.icon" class="size-3.5" />
                 </Button>
             </div>
             <Dropdown>
                 <template #trigger>
-                    <Button icon="ui/dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
+                    <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
                 </template>
                 <DropdownMenu>
                     <DropdownItem
@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import { Button, Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
+import { Button, Dropdown, DropdownMenu, DropdownItem } from '@/components/ui';
 
 export default {
     components: {

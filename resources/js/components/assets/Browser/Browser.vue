@@ -28,6 +28,7 @@
                     :preferences-prefix="preferencesPrefix"
                     v-model:search-query="searchQuery"
                     @request-completed="listingRequestCompleted"
+                    @update:selections="$emit('selections-updated', $event)"
                 >
                     <template #initializing>
                         <slot name="initializing">
@@ -92,12 +93,12 @@
 
                         <div
                             v-if="containerIsEmpty"
-                            class="rounded-lg border border-dashed border-gray-300 p-6 text-center text-gray-500"
+                            class="rounded-lg border border-dashed border-gray-300 dark:border-gray-700 p-6 text-center text-gray-500"
                             v-text="__('No results')"
                         />
 
                         <Panel v-else :class="{ 'relative overflow-x-auto overscroll-x-contain': mode === 'table' }">
-                            <PanelHeader class="flex items-center justify-between p-1!">
+                            <PanelHeader class="flex items-center justify-between px-1!">
                                 <Breadcrumbs
                                     v-if="!restrictFolderNavigation"
                                     :path="path"
@@ -107,7 +108,7 @@
                                 <Slider
                                     v-if="mode === 'grid'"
                                     size="sm"
-                                    class="mr-2 w-24!"
+                                    class="me-2 w-24!"
                                     variant="subtle"
                                     v-model="gridThumbnailSize"
                                     :min="60"
@@ -157,7 +158,6 @@
         <AssetEditor
             v-if="showAssetEditor"
             :id="editedAssetId"
-            :read-only="!canEdit"
             @previous="editPreviousAsset"
             @next="editNextAsset"
             @closed="closeAssetEditor"
@@ -188,14 +188,16 @@ import {
     Panel,
     PanelHeader,
     PanelFooter,
+    Listing,
+    ListingTable,
+    ListingPagination,
     ListingSearch,
     ListingCustomizeColumns,
     Slider,
     Icon,
     ToggleGroup,
     ToggleItem,
-} from '@statamic/ui';
-import { Listing, ListingTable, ListingPagination } from '@statamic/ui';
+} from '@ui';
 import Breadcrumbs from './Breadcrumbs.vue';
 
 export default {
@@ -296,24 +298,11 @@ export default {
         },
 
         canCreateFolders() {
-            return (
-                this.folder &&
-                this.container.create_folders &&
-                !this.restrictFolderNavigation &&
-                (this.can('upload ' + this.container.id + ' assets') || this.can('configure asset containers'))
-            );
-        },
-
-        canEdit() {
-            return this.can('edit ' + this.container.id + ' assets') || this.can('configure asset containers');
+            return this.folder && this.container.can_create_folders && !this.restrictFolderNavigation;
         },
 
         canUpload() {
-            return (
-                this.folder &&
-                this.container.allow_uploads &&
-                (this.can('upload ' + this.container.id + ' assets') || this.can('configure asset containers'))
-            );
+            return this.folder && this.container.can_upload;
         },
 
         containerIsEmpty() {
@@ -370,7 +359,6 @@ export default {
         sharedAssetProps() {
             return {
                 actionUrl: this.actionUrl,
-                canEdit: this.canEdit,
                 containerIsEmpty: this.containerIsEmpty,
                 folder: this.folder,
                 folderActionUrl: this.folderActionUrl,
@@ -397,6 +385,8 @@ export default {
 
     mounted() {
         this.mode = this.getPreference('mode') || 'table';
+
+        this.addToCommandPalette();
     },
 
     watch: {
@@ -682,6 +672,72 @@ export default {
         uploadsUpdated(uploads) {
             this.uploads = uploads;
         },
+
+        addToCommandPalette() {
+            Statamic.$commandPalette.add({
+                when: () => this.canUpload,
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Upload'),
+                icon: 'upload',
+                action: () => this.openFileBrowser(),
+                prioritize: true,
+            });
+
+            Statamic.$commandPalette.add({
+                when: () => this.canCreateFolders,
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Create Folder'),
+                icon: 'folder-add',
+                action: () => this.startCreatingFolder(),
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Toggle Grid Layout'),
+                icon: 'layout-grid',
+                when: () => this.mode === 'table',
+                action: () => this.mode = 'grid',
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Toggle List Layout'),
+                icon: 'layout-list',
+                when: () => this.mode === 'grid',
+                action: () => this.mode = 'table',
+            });
+
+            Statamic.$commandPalette.add({
+                when: () => this.canCreateContainers,
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Create Container'),
+                icon: 'container-add',
+                url: this.createContainerUrl,
+            });
+
+            Statamic.$commandPalette.add({
+                when: () => this.container.can_edit,
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Configure Container'),
+                icon: 'cog',
+                url: this.container.edit_url,
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Edit Blueprint'),
+                icon: 'blueprint-edit',
+                url: this.container.blueprint_url,
+            });
+
+            Statamic.$commandPalette.add({
+                when: () => this.container.can_delete,
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Delete Container'),
+                icon: 'trash',
+                action: () => this.$refs.deleter.confirm(),
+            });
+        }
     },
 };
 </script>

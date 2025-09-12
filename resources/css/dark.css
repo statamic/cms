@@ -1,21 +1,4 @@
-.prose {
-    @apply dark:text-dark-150;
 
-    :where(h2),
-    :where(h3),
-    :where(strong) {
-        &:not(:where([class~='not-prose'] *)) {
-            @apply dark:text-dark-100;
-        }
-    }
-
-    :where(pre),
-    :where(code) {
-        &:not(:where([class~='not-prose'] *)) {
-            @apply dark:bg-dark-950 dark:text-dark-100;
-        }
-    }
-}
 
 .dark {
     input:-webkit-autofill {
@@ -29,19 +12,5 @@
         }
     }
 
-    .CodeMirror-selected {
-        background: rgba(255, 255, 255, 0.1);
-    }
 
-    .CodeMirror-line::selection,
-    .CodeMirror-line > span::selection,
-    .CodeMirror-line > span > span::selection {
-        background: rgba(255, 255, 255, 0.1);
-    }
-
-    .CodeMirror-line::-moz-selection,
-    .CodeMirror-line > span::-moz-selection,
-    .CodeMirror-line > span > span::-moz-selection {
-        background: rgba(255, 255, 255, 0.1);
-    }
 }

@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import { Modal, Button, Icon } from '@statamic/ui';
+import { Modal, Button, Icon } from '@/components/ui';
 
 const emit = defineEmits(['cancel', 'close']);
 
@@ -56,7 +56,7 @@ function copyToClipboard() {
                 <div class="space-y-6">
                     <ui-description>{{ __('statamic::messages.two_factor_recovery_codes') }}</ui-description>
 
-                    <div class="bg-gray-200 py-8 rounded-xl">
+                    <div class="bg-gray-200 dark:bg-gray-800 py-8 rounded-xl">
                         <ul class="grid gap-2 md:grid-cols-2 text-center justify-center">
                             <li
                                 v-for="recoveryCode in recoveryCodes"

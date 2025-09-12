@@ -9,7 +9,7 @@
             <template #trigger>
                 <ui-button
                     text="{{ __('Create Blueprint') }}"
-                    icon-append="ui/chevron-down"
+                    icon-append="chevron-down"
                     variant="primary"
                 ></ui-button>
             </template>
@@ -258,7 +258,7 @@
                             <td>
                                 <div class="flex items-center gap-2">
                                     <ui-icon name="blueprints" class="text-gray-500 me-1" />
-                                    <a href="{{ cp_route('blueprints.additional.edit', [$blueprint['namespace'], $blueprint['handle']]) }}">{{ $blueprint['title'] }}</a>
+                                    <a href="{{ cp_route('blueprints.additional.edit', [$blueprint['namespace'], $blueprint['handle']]) }}" v-pre>{{ __($blueprint['title']) }}</a>
                                 </div>
                             </td>
                             <td class="actions-column">

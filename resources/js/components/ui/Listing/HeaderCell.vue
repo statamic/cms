@@ -1,6 +1,6 @@
 <script setup>
-import { Button } from '@statamic/ui';
-import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
+import { Button } from '@ui';
+import { injectListingContext } from '../Listing/Listing.vue';
 import { computed } from 'vue';
 
 const props = defineProps({

@@ -15,7 +15,7 @@
 
 /* UTILITIES / TEXT
 =================================================== */
-/* Avoid prefixing things with text- because this is a Tailwind prefix */
+/* Avoid prefixing things with `st-text-` (st for Statamic) because `text-` is a Tailwind prefix */
 @utility st-text-trim-start {
     text-box: trim-start;
     /* =Jay. When we have an SVG we probably don't want to text trim, for example in a Markdown field with button controls like Bold, Italic, etc. */
@@ -47,9 +47,36 @@
 
 @utility st-text-legibility {
     font-family: "inter", sans-serif;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.01em;
     font-optical-sizing: auto;
     font-weight: 425;
+}
+
+@utility input-text {
+    width: 100%;
+    /* e.g. in a Bard table */
+    @apply p-2 text-gray-900 dark:text-gray-100;
+}
+
+/* UTILITIES / DECORATION / SHADOWS
+=================================================== */
+@utility shadow-sm-b {
+    box-shadow: 0 3px 2px -1px hsl(0deg 0% 90%), 0 1px 2px hsl(0deg 0% 90%);
+    &:where(.dark, .dark *) {
+        box-shadow: unset;
+    }
+}
+
+/* UTILITIES / DECORATION / OTHER
+=================================================== */
+/* e.g. /cp/utilities/licensing */
+@utility little-dot {
+    border-radius:7px;
+    display:inline-block;
+    height:7px;
+    position:relative;
+    width:7px;
+    flex-shrink:0
 }
 
 /* UTILITIES / STATES
@@ -61,17 +88,20 @@
     outline-color: var(--focus-outline-color, currentColor);
     outline-style: var(--focus-outline-style, solid);
 }
-/* Make the focus border more descrete for some fields such as Bard */
+/* Make the focus border more descrete/subtle for some fields such as Bard */
 @utility focus-outline-discrete {
     &:focus-within {
         --focus-outline-color: var(--color-blue-300);
+        :where(.dark, .dark *) {
+            --focus-outline-color: var(--color-blue-400);
+        }
     }
 }
 
 @utility focus-none {
     outline: 0;
     box-shadow: none;
-}
+    }
 
 @utility loading {
     text-align: center;
@@ -127,7 +157,7 @@
     @apply bg-white/85 backdrop-blur-sm;
 }
 
-/* UTILITIES / STATES / DECORATION / MASK BACKGROUND
+/* UTILITIES / DECORATION / MASK BACKGROUND
 =================================================== */
 /* Notes...
 
@@ -178,7 +208,7 @@
     }
 }
 
-/* UTILITIES / STATES / DECORATION / ARCHIECTURAL LINES
+/* UTILITIES / DECORATION / ARCHIECTURAL LINES
 =================================================== */
 /* Notes...
 
@@ -209,7 +239,7 @@
         pointer-events: none;
         position: absolute;
         inset: 0;
-        background-image: url('../../svg/ui/architectural-lines.svg');
+        background-image: url('../../svg/architectural-lines.svg');
         background-size: 100%;
         /* Reduce the chances of the background circles overlapping the button */
         @media (width < 1300px) {
@@ -229,7 +259,7 @@
             position: relative;
             z-index: 1;
         }
-    
+
         &::after {
             --height: 1px;
             --line-color: hsl(0deg 0% 95%);
@@ -280,7 +310,7 @@
     }
 }
 
-/* UTILITIES / STATES / DECORATION / CHECKERBOARD
+/* UTILITIES / DECORATION / CHECKERBOARD
 =================================================== */
 @utility bg-checkerboard {
     --checkerboard-light: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%23f3f4f6'/%3E%3C/svg%3E");
@@ -310,4 +340,8 @@
             background-image: var(--checkerboard-dark);
         }
     }
+}
+
+@utility shape-squircle {
+    corner-shape: squircle;
 }

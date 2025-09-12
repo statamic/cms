@@ -1,11 +1,10 @@
 <template>
     <div class="blueprint-section min-h-40 w-full outline-hidden @container">
         <ui-panel>
-            <ui-panel-header class="flex items-center justify-between pb-0.75! pt-0! pl-2.75! pr-3.25! ">
+            <ui-panel-header class="flex items-center justify-between pl-2.75! pr-3.25! ">
                 <div class="flex items-center gap-2 flex-1">
                     <ui-icon name="handles-sm" class="blueprint-section-drag-handle size-3! cursor-grab text-gray-400" />
-                    <!-- @TODO: Add backwards support for old icons -->
-                    <!-- <svg-icon :name="iconName(section.icon)" :directory="iconBaseDirectory" /> -->
+                    <ui-icon :name="section.icon" :set="iconSet" v-if="section.icon" />
                     <ui-heading v-text="__(section.display ?? 'Section')" />
                 </div>
                 <ui-button icon="pencil-line" size="sm" variant="ghost" @click="edit" />
@@ -29,7 +28,7 @@
                 <template v-slot:empty-state>
                     <ui-subheading
                         v-text="__('Drag and drop fields below.')"
-                        class="rounded-xl min-h-16 flex items-center justify-center border border-dashed border-gray-300 p-3 text-center w-full"
+                        class="rounded-xl min-h-16 flex items-center justify-center border border-dashed border-gray-300 dark:border-gray-700 p-3 text-center w-full"
                     />
                 </template>
             </Fields>
@@ -42,44 +41,33 @@
             @confirm="editConfirmed"
             @cancel="editCancelled"
         >
-            <div class="publish-fields">
-                <div class="form-group w-full">
-                    <label v-text="__('Display')" />
-                    <input ref="displayInput" type="text" class="input-text" v-model="editingSection.display" />
-                </div>
-                <div class="form-group w-full" v-if="showHandleField">
-                    <label v-text="__('Handle')" />
-                    <input
+            <div class="space-y-6">
+                <ui-field :label="__('Display')">
+                    <ui-input ref="displayInput" type="text" v-model="editingSection.display" />
+                </ui-field>
+                <ui-field :label="__('Handle')" v-if="showHandleField">
+                    <ui-input
                         type="text"
-                        class="input-text font-mono text-sm"
+                        class="font-mono text-sm"
                         v-model="editingSection.handle"
                         @input="handleSyncedWithDisplay = false"
                     />
-                </div>
-                <div class="form-group w-full">
-                    <label v-text="__('Instructions')" />
-                    <input type="text" class="input-text" v-model="editingSection.instructions" />
-                </div>
-                <div class="form-group field-w-50">
-                    <div class="flex items-center gap-2">
-                        <Switch v-model="editingSection.collapsible" />
-                        <Heading :text="__('Collapsible')" />
-                    </div>
-                </div>
-                <div class="form-group field-w-50" v-if="editingSection.collapsible">
-                    <div class="flex items-center gap-2">
-                        <Switch v-model="editingSection.collapsed" />
-                        <Heading :text="__('Collapsed by default')" />
-                    </div>
-                </div>
-                <div class="form-group w-full" v-if="showHandleField">
-                    <label v-text="__('Icon')" />
+                </ui-field>
+                <ui-field :label="__('Instructions')">
+                    <ui-input type="text" v-model="editingSection.instructions" />
+                </ui-field>
+                <ui-field :label="__('Collapsible')">
+                    <ui-switch v-model="editingSection.collapsible" />
+                </ui-field>
+                <ui-field :label="__('Collapsed by default')" v-if="editingSection.collapsible">
+                    <ui-switch v-model="editingSection.collapsed" />
+                </ui-field>
+                <ui-field :label="__('Icon')" v-if="showHandleField">
                     <publish-field-meta
                         :config="{
                             handle: 'icon',
                             type: 'icon',
-                            directory: this.iconBaseDirectory,
-                            folder: this.iconSubFolder,
+                            set: iconSet,
                         }"
                         :initial-value="editingSection.icon"
                         v-slot="{ meta, value, loading, config }"
@@ -93,13 +81,10 @@
                             @update:value="editingSection.icon = $event"
                         />
                     </publish-field-meta>
-                </div>
-                <div class="form-group field-w-50" v-if="showHideField">
-                    <div class="flex items-center gap-2">
-                        <Switch v-model="editingSection.hide" />
-                        <Heading :text="__('Hidden')" />
-                    </div>
-                </div>
+                </ui-field>
+                <ui-field :label="__('Hidden')" v-if="showHideField">
+                    <ui-switch v-model="editingSection.hide" />
+                </ui-field>
             </div>
         </confirmation-modal>
     </div>
@@ -108,7 +93,7 @@
 <script>
 import Fields from './Fields.vue';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';
-import { Switch, Heading } from '@statamic/ui';
+import { Switch, Heading } from '@/components/ui';
 
 export default {
     mixins: [CanDefineLocalizable],
@@ -124,24 +109,11 @@ export default {
     },
 
     props: {
-        tabId: {
-            type: String,
-        },
-        section: {
-            type: Object,
-            required: true,
-        },
-        showHandleField: {
-            type: Boolean,
-            default: false,
-        },
-        showHideField: {
-            type: Boolean,
-            default: false,
-        },
-        editText: {
-            type: String,
-        },
+        tabId: { type: String },
+        section: { type: Object, required: true },
+        showHandleField: { type: Boolean, default: false },
+        showHideField: { type: Boolean, default: false },
+        editText: { type: String },
     },
 
     data() {
@@ -157,12 +129,8 @@ export default {
             return this.suggestableConditionFieldsProvider?.suggestableFields(this) || [];
         },
 
-        iconBaseDirectory() {
-            return this.$config.get('setIconsDirectory');
-        },
-
-        iconSubFolder() {
-            return this.$config.get('setIconsFolder');
+        iconSet() {
+            return this.$config.get('replicatorSetIcons') || undefined;
         },
     },
 
@@ -234,12 +202,6 @@ export default {
 
         editCancelled() {
             this.editingSection = false;
-        },
-
-        iconName(name) {
-            if (!name) return 'folder-generic';
-
-            return this.iconSubFolder ? this.iconSubFolder + '/' + name : name;
         },
     },
 };

@@ -49,7 +49,7 @@
             <div
                 v-if="canSelectOrCreate"
                 class="relationship-input-buttons @container relative"
-                :class="{ 'mt-4': items.length > 0 }"
+                :class="{ 'mt-3': items.length > 0 }"
             >
                 <div class="flex flex-wrap items-center gap-2">
                     <CreateButton
@@ -66,7 +66,7 @@
                     <Button
                         ref="existing"
                         icon="link"
-                        variant="filled"
+                        size="sm"
                         :text="linkLabel"
                         @click.prevent="isSelecting = true"
                     />
@@ -104,7 +104,7 @@ import ItemSelector from './Selector.vue';
 import CreateButton from './CreateButton.vue';
 import { Sortable, Plugins } from '@shopify/draggable';
 import RelationshipSelectField from './SelectField.vue';
-import { Button, Icon } from '@statamic/ui';
+import { Button, Icon } from '@/components/ui';
 
 export default {
     props: {
@@ -306,8 +306,8 @@ export default {
         },
 
         initializeData() {
-            if (!this.data) {
-                return this.getDataForSelections(this.selections);
+            if (!this.data || !this.data.length) {
+                return this.getDataForSelections(this.value);
             }
 
             this.loading = false;

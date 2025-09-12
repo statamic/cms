@@ -39,13 +39,12 @@
 
             <stack v-if="showingSelector" name="asset-selector" @closed="closeSelector">
                 <selector
-                    :container="extension.options.bard.meta.asset_container"
+                    :container="extension.options.bard.meta.assets.container"
                     :folder="extension.options.bard.config.folder || '/'"
                     :restrict-folder-navigation="extension.options.bard.config.restrict_assets"
                     :selected="selections"
-                    :view-mode="'grid'"
                     :max-files="1"
-                    :columns="extension.options.bard.meta.asset_columns"
+                    :columns="extension.options.bard.meta.assets.columns"
                     @selected="assetsSelected"
                     @closed="closeSelector"
                 >
@@ -70,8 +69,8 @@
 import Asset from '../assets/Asset';
 import { NodeViewWrapper } from '@tiptap/vue-3';
 import Selector from '../../assets/Selector.vue';
-import { containerContextKey } from '@statamic/components/ui/Publish/Container.vue';
-import { Input, Button } from '@statamic/ui';
+import { Input, Button } from '@ui';
+import { containerContextKey } from '@/components/ui/Publish/Container.vue';
 
 export default {
     mixins: [Asset],

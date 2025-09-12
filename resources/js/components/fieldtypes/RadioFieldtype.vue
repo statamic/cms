@@ -14,7 +14,7 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import HasInputOptions from './HasInputOptions.js';
-import { RadioGroup, Radio } from '@statamic/ui';
+import { RadioGroup, Radio } from '@/components/ui';
 
 export default {
     mixins: [Fieldtype, HasInputOptions],
@@ -30,7 +30,7 @@ export default {
         },
 
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
+            if (!this.showFieldPreviews) return;
 
             var option = this.options.find((o) => o.value === this.value);
             return option ? option.label : this.value;

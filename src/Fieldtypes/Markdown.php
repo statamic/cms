@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Facades\GraphQL;
+use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Query\Scopes\Filters\Fields\Markdown as MarkdownFilter;
 use Statamic\Support\Html;
@@ -26,7 +27,7 @@ class Markdown extends Fieldtype
                         'type' => 'asset_container',
                         'mode' => 'select',
                         'max_items' => 1,
-                        'width' => 33,
+                        'width' => 50,
                     ],
                     'folder' => [
                         'display' => __('Folder'),
@@ -36,7 +37,7 @@ class Markdown extends Fieldtype
                         'if' => [
                             'container' => 'not empty',
                         ],
-                        'width' => 33,
+                        'width' => 50,
                     ],
                     'restrict' => [
                         'display' => __('Restrict'),
@@ -73,49 +74,49 @@ class Markdown extends Fieldtype
                             'fixed' => __('Fixed'),
                             'floating' => __('Floating'),
                         ],
-                        'width' => 33,
+                        'width' => 50,
                     ],
                     'automatic_line_breaks' => [
                         'display' => __('Automatic Line Breaks'),
                         'instructions' => __('statamic::fieldtypes.markdown.config.automatic_line_breaks'),
                         'type' => 'toggle',
                         'default' => true,
-                        'width' => 33,
+                        'width' => 50,
                     ],
                     'automatic_links' => [
                         'display' => __('Automatic Links'),
                         'instructions' => __('statamic::fieldtypes.markdown.config.automatic_links'),
                         'type' => 'toggle',
                         'default' => false,
-                        'width' => 33,
+                        'width' => 50,
                     ],
                     'escape_markup' => [
                         'display' => __('Escape Markup'),
                         'instructions' => __('statamic::fieldtypes.markdown.config.escape_markup'),
                         'type' => 'toggle',
                         'default' => false,
-                        'width' => 33,
+                        'width' => 50,
                     ],
                     'heading_anchors' => [
                         'display' => __('Heading Anchors'),
                         'instructions' => __('statamic::fieldtypes.markdown.config.heading_anchors'),
                         'type' => 'toggle',
                         'default' => false,
-                        'width' => 33,
+                        'width' => 50,
                     ],
                     'smartypants' => [
                         'display' => __('Smartypants'),
                         'instructions' => __('statamic::fieldtypes.markdown.config.smartypants'),
                         'type' => 'toggle',
                         'default' => false,
-                        'width' => 33,
+                        'width' => 50,
                     ],
                     'table_of_contents' => [
                         'display' => __('Table of Contents'),
                         'instructions' => __('statamic::fieldtypes.markdown.config.table_of_contents'),
                         'type' => 'toggle',
                         'default' => false,
-                        'width' => 33,
+                        'width' => 50,
                     ],
                     'default' => [
                         'display' => __('Default Value'),
@@ -216,9 +217,27 @@ class Markdown extends Fieldtype
 
     public function preload()
     {
-        return [
+        $data = [
             'previewUrl' => cp_route('markdown.preview'),
         ];
+
+        if (
+            $this->config('container')
+            && $container = \Statamic\Facades\AssetContainer::find($this->config('container'))
+        ) {
+            $assetField = (new Field('asset', [
+                'type' => 'assets',
+                'container' => $container->handle(),
+                'folder' => $this->config('folder'),
+            ]));
+
+            $data['assets'] = [
+                'container' => $assetField->meta()['container'],
+                'columns' => $assetField->meta()['columns'],
+            ];
+        }
+
+        return $data;
     }
 
     public function shouldParseAntlersFromRawString(): bool

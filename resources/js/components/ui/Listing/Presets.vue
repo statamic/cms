@@ -1,7 +1,14 @@
 <script setup>
 import PresetTrigger from './PresetTrigger.vue';
-import { Button, Input, Dropdown, DropdownItem, DropdownMenu, DropdownSeparator } from '@statamic/ui';
-import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
+import {
+    Button,
+    Input,
+    Dropdown,
+    DropdownItem,
+    DropdownMenu,
+    DropdownSeparator,
+} from '@ui';
+import { injectListingContext } from '../Listing/Listing.vue';
 import { computed, ref, watch } from 'vue';
 
 const { preferencesPrefix, activeFilters, searchQuery, setFilters, clearFilters, setSearchQuery, clearSearchQuery } =
@@ -166,7 +173,7 @@ function deletePreset() {
             <template v-if="handle === activePreset">
                 <Dropdown class="w-48!">
                     <template #trigger>
-                        <Button class="absolute top-1.5 -right-4" variant="ghost" size="xs" icon="ui/chevron-down" />
+                        <Button class="absolute top-1.5 -right-4" variant="ghost" size="xs" icon="chevron-down" />
                     </template>
                     <DropdownMenu>
                         <DropdownItem :text="__('Duplicate')" icon="duplicate" @click="createPreset" />
@@ -208,12 +215,10 @@ function deletePreset() {
     >
         <Input v-model="savingPresetName" @keydown.enter="saveNew" />
 
-        <div v-if="presets && Object.keys(presets).includes(savingPresetHandle)">
-            <small
-                class="help-block mt-2 mb-0 text-red-500"
-                v-text="__('messages.filters_view_already_exists')"
-            ></small>
-        </div>
+        <ui-error-message
+            v-if="presets && Object.keys(presets).includes(savingPresetHandle)"
+            :text="__('messages.filters_view_already_exists')"
+        />
     </confirmation-modal>
 
     <confirmation-modal
@@ -232,10 +237,7 @@ function deletePreset() {
                     .includes(savingPresetHandle)
             "
         >
-            <small
-                class="help-block mt-2 mb-0 text-red-500"
-                v-text="__('messages.filters_view_already_exists')"
-            ></small>
+            <ui-error-message :text="__('messages.filters_view_already_exists')" />
         </div>
     </confirmation-modal>
 

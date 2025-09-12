@@ -6,8 +6,6 @@
                 :url="actionUrl"
                 :actions="actions"
                 :item="handle"
-                @started="actionStarted"
-                @completed="actionCompleted"
                 v-slot="{ actions }"
             >
                 <Dropdown placement="left-start">
@@ -178,8 +176,8 @@ import DeleteEntryConfirmation from './DeleteEntryConfirmation.vue';
 import DeleteLocalizationConfirmation from './DeleteLocalizationConfirmation.vue';
 import SiteSelector from '../SiteSelector.vue';
 import { defineAsyncComponent } from 'vue';
-import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator, Header, Button, ToggleGroup, ToggleItem } from '@statamic/ui';
-import ItemActions from '@statamic/components/actions/ItemActions.vue';
+import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator, Header, Button, ToggleGroup, ToggleItem } from '@/components/ui';
+import ItemActions from '@/components/actions/ItemActions.vue';
 
 export default {
     components: {
@@ -409,7 +407,7 @@ export default {
                 url: this.scaffoldUrl,
             });
 
-            this.$refs.actions.preparedActions.forEach(action => Statamic.$commandPalette.add({
+            this.$refs.actions?.preparedActions.forEach(action => Statamic.$commandPalette.add({
                 category: Statamic.$commandPalette.category.Actions,
                 text: [__('Collection'), action.title],
                 icon: action.icon,

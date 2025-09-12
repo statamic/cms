@@ -1,15 +1,15 @@
 <template>
     <div class="relative">
         <div class="bard-fixed-toolbar bard-toolbar-setting dark" ref="buttons">
-            <button
+            <ui-button
                 v-for="button in buttons"
-                :key="button.name"
-                v-tooltip="button.text"
                 :class="{ active: enabled(button.name) }"
+                :icon="button.svg"
+                :key="button.name"
                 @click="toggleButton(button.name)"
-            >
-                <svg-icon :name="button.svg"></svg-icon>
-            </button>
+                v-tooltip="button.text"
+                variant="ghost"
+            />
         </div>
     </div>
 </template>

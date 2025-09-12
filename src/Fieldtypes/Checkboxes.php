@@ -25,6 +25,7 @@ class Checkboxes extends Fieldtype
                         'instructions' => __('statamic::fieldtypes.checkboxes.config.options'),
                         'type' => 'array',
                         'expand' => true,
+                        'value_header' => __('Label').' ('.__('Optional').')',
                         'field' => [
                             'type' => 'text',
                         ],

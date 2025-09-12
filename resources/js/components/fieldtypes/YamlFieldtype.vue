@@ -16,7 +16,7 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import { CodeEditor } from '@statamic/ui';
+import { CodeEditor } from '@/components/ui';
 
 export default {
     mixins: [Fieldtype],

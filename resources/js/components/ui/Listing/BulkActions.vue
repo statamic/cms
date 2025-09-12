@@ -1,9 +1,9 @@
 <script setup>
 import { Motion } from 'motion-v';
-import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
+import { injectListingContext } from '../Listing/Listing.vue';
 import { computed, ref, watch } from 'vue';
-import { Button, ButtonGroup } from '@statamic/ui';
-import BulkActions from '@statamic/components/actions/BulkActions.vue';
+import { Button, ButtonGroup } from '@ui';
+import BulkActions from '@/components/actions/BulkActions.vue';
 
 const { actionUrl, actionContext, selections, refresh, clearSelections } = injectListingContext();
 const busy = ref(false);
@@ -55,7 +55,13 @@ function actionFailed(response) {
                     :text="__n(`Deselect :count item|Deselect all :count items`, selections.length)"
                     @click="clearSelections"
                 />
-                <Button v-for="action in actions" :key="action.handle" :text="__(action.title)" @click="action.run" />
+                <Button
+                    v-for="action in actions"
+                    :key="action.handle"
+                    :text="__(action.title)"
+                    :variant="action.dangerous ? 'danger' : 'default'"
+                    @click="action.run"
+                />
             </ButtonGroup>
             </div>
         </Motion>

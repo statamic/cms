@@ -41,7 +41,7 @@
                 @added="ifSearchNotFoundAddCustom"
             >
                 <template #option="option">
-                    {{ __(option.display) }} <code class="ms-2 text-sm">{{ valueWithoutTrailingColon(option.value) }}</code>
+                    {{ __(option.display) }} <code class="px-1 rounded-sm text-[0.8rem]">{{ valueWithoutTrailingColon(option.value) }}</code>
                 </template>
 
                 <template #selected-options>
@@ -95,9 +95,7 @@ import RULES from './Rules.js';
 import SemVer from 'semver';
 import { SortableList } from '../sortable/Sortable';
 import { sortBy } from 'lodash-es';
-import { Description, Field, Input, Badge, Button } from '@statamic/ui';
-import Switch from '@statamic/components/ui/Switch.vue'
-import { Combobox } from '@statamic/ui';
+import { Description, Field, Input, Badge, Button, Switch, Combobox } from '@ui';
 import { ComboboxInput } from 'reka-ui';
 
 export default {

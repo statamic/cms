@@ -153,7 +153,7 @@ const availableButtons = () => [
         text: __('Horizontal Rule'),
         command: (editor) => editor.commands.setHorizontalRule(),
         activeName: 'horizontalRule',
-        svg: 'subtract',
+        svg: 'hr',
     },
     {
         name: 'alignleft',

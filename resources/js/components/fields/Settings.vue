@@ -1,5 +1,5 @@
 <template>
-    <div class="h-full overflow-auto bg-white dark:bg-gray-800 p-3 rounded-l-xl">
+    <div class="h-full overflow-auto bg-white dark:bg-gray-800 focus-none p-3 rounded-l-xl">
         <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
             <Icon name="loading" />
         </div>
@@ -13,7 +13,7 @@
             </div>
         </header>
 
-        <section class="isolate px-3 py-4">
+        <section v-if="!loading" class="isolate px-3 py-4">
             <Tabs v-model:modelValue="activeTab">
                 <TabList class="mb-6">
                     <TabTrigger name="settings" :text="__('Settings')" />
@@ -21,7 +21,7 @@
                     <TabTrigger name="validation" :text="__('Validation')" />
                 </TabList>
 
-                <div v-if="!loading">
+                <div>
                     <TabContent name="settings">
                         <ui-publish-container
                             ref="container"
@@ -61,7 +61,7 @@
 <script>
 import { FieldConditionsBuilder, FIELD_CONDITIONS_KEYS } from '../field-conditions/FieldConditions.js';
 import FieldValidationBuilder from '../field-validation/Builder.vue';
-import { Heading, Button, Tabs, TabList, TabTrigger, TabContent, CardPanel, Icon } from '@statamic/ui';
+import { Heading, Button, Tabs, TabList, TabTrigger, TabContent, CardPanel, Icon } from '@/components/ui';
 
 export default {
     components: {

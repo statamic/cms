@@ -20,8 +20,8 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import DateFormatter from '@statamic/components/DateFormatter.js';
-import { DatePicker, DateRangePicker, Button } from '@statamic/ui';
+import DateFormatter from '@/components/DateFormatter.js';
+import { DatePicker, DateRangePicker, Button } from '@/components/ui';
 import { parseAbsoluteToLocal, toTimeZone, toZoned } from '@internationalized/date';
 
 export default {
@@ -86,8 +86,7 @@ export default {
         },
 
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
-
+            if (!this.showFieldPreviews) return;
             if (!this.value) return;
 
             if (this.isRange) {

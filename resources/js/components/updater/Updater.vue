@@ -1,7 +1,7 @@
 <template>
     <div>
         <ui-header :title="__('Updates')" icon="updates">
-            <template #actions>
+            <template v-if="!gettingChangelog" #actions>
                 <ui-badge :prepend="__('Statamic Version')" :text="currentVersion" color="green" size="lg" />
                 <div v-if="onLatestVersion" v-text="__('Up to date')" />
             </template>
@@ -47,7 +47,7 @@
 
 <script>
 import Release from './Release.vue';
-import { Icon } from '@statamic/ui';
+import { Icon } from '@/components/ui';
 
 export default {
     components: {

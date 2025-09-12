@@ -32,11 +32,12 @@ import Reveal from '../components/Reveal';
 import Echo from '../components/Echo';
 import Permission from '../components/Permission';
 import autosize from 'autosize';
-import DateFormatter from '@statamic/components/DateFormatter.js';
-import wait from '@statamic/util/wait.js';
-import markdown from '@statamic/util/markdown.js';
+import DateFormatter from '@/components/DateFormatter.js';
+import wait from '@/util/wait.js';
+import markdown from '@/util/markdown.js';
 import VueComponentDebug from 'vue-component-debug';
 import CommandPalette from '../components/CommandPalette.js';
+import { registerIconSetFromStrings } from '@ui';
 
 let bootingCallbacks = [];
 let bootedCallbacks = [];
@@ -229,6 +230,7 @@ export default {
         registerGlobalComponents(this.$app);
         registerGlobalCommandPalette();
         registerFieldtypes(this.$app);
+        registerIconSets(this.initialConfig);
 
         // Suppress the translation warnings
         this.$app.config.warnHandler = (msg, vm, trace) => {
@@ -250,3 +252,11 @@ export default {
         bootedCallbacks = [];
     },
 };
+
+function registerIconSets(config) {
+    const sets = config.customSvgIcons;
+
+    for (const name in sets) {
+        registerIconSetFromStrings(name, sets[name]);
+    }
+}

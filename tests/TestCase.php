@@ -31,6 +31,10 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             $this->preventSavingStacheItemsToDisk();
         }
 
+        if (isset($uses[ElevatesSessions::class])) {
+            $this->addElevatedSessionMacros();
+        }
+
         if ($this->shouldFakeVersion) {
             \Facades\Statamic\Version::shouldReceive('get')->zeroOrMoreTimes()->andReturn('3.0.0-testing');
             $this->addToAssertionCount(-1); // Dont want to assert this

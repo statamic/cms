@@ -233,7 +233,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::get('globals/{global_set}', [GlobalVariablesController::class, 'edit'])->name('globals.variables.edit');
     Route::patch('globals/{global_set}/variables', [GlobalVariablesController::class, 'update'])->name('globals.variables.update');
 
-    Route::resource('asset-containers', AssetContainersController::class);
+    Route::resource('asset-containers', AssetContainersController::class)->except('index');
     Route::post('asset-containers/{asset_container}/folders', [FoldersController::class, 'store']);
     Route::patch('asset-containers/{asset_container}/folders/{path}', [FoldersController::class, 'update'])->where('path', '.*');
     Route::post('assets/actions', [AssetActionController::class, 'run'])->name('assets.actions.run');

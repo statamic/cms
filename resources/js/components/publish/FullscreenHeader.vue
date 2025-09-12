@@ -7,7 +7,7 @@
         <div class="flex items-center justify-end py-2.5">
             <Dropdown class="mr-2">
                 <template #trigger>
-                    <Button icon="ui/dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
+                    <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
                 </template>
                 <DropdownMenu>
                     <DropdownItem
@@ -26,14 +26,14 @@
                 v-tooltip="action.title"
                 @click="action.run()"
             >
-                <svg-icon :name="action.icon" class="size-3.5 fill-gray-600" />
+                <ui-icon :name="action.icon" class="size-3.5 text-gray-400 dark:text-gray-600" />
             </button>
         </div>
     </header>
 </template>
 
 <script>
-import { Button, Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
+import { Button, Dropdown, DropdownMenu, DropdownItem } from '@/components/ui';
 
 export default {
     components: {

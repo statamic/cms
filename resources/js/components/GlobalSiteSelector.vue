@@ -1,31 +1,22 @@
 <template>
-    <div class="site-selector flex h-full items-center dark:border-dark-900">
+    <div class="flex h-full items-center" data-ui-global-site-selector>
         <Select
+            :model-value="active"
             :options="sites"
+            :searchable="false"
+            @update:model-value="selected"
             option-label="name"
             option-value="handle"
-            :searchable="false"
-            :model-value="active"
-            :button-appearance="false"
-            @update:model-value="selected"
-        >
-            <template #selected-option="{ option }">
-                <div
-                    class="anti flex items-center text-sm font-medium text-gray text-[0.8125rem] text-gray-900 dark:text-gray-300 dark:hover:text-gray-200"
-                >
-                    <svg-icon name="sites" class="h-4 w-4 ltr:mr-2 rtl:ml-2 text-gray-500" />
-                    <div class="whitespace-nowrap">{{ __(option.name) }}</div>
-                </div>
-            </template>
-            <template #option="option">
-                <div :class="{ 'text-gray-500': handle === active }">{{ __(option.name) }}</div>
-            </template>
-        </Select>
+            size="sm"
+            variant="ghost"
+            icon="globe-arrow"
+            class="[&_[data-ui-combobox-trigger]]:text-white/85"
+        />
     </div>
 </template>
 
 <script>
-import { Select } from '@statamic/ui';
+import { Select } from '@/components/ui';
 
 export default {
     components: { Select },

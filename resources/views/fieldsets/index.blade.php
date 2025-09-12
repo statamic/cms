@@ -8,11 +8,19 @@
 @section('content')
     @unless ($fieldsets->isEmpty())
         <ui-header title="{{ __('Fieldsets') }}" icon="fieldsets">
-            <ui-button
-                href="{{ cp_route('fieldsets.create') }}"
+            <ui-command-palette-item
+                category="{{ Statamic\CommandPalette\Category::Actions }}"
                 text="{{ __('Create Fieldset') }}"
-                variant="primary"
-            ></ui-button>
+                icon="fieldsets"
+                url="{{ cp_route('fieldsets.create') }}"
+                v-slot="{ text, url }"
+            >
+                <ui-button
+                    :href="url"
+                    :text="text"
+                    variant="primary"
+                ></ui-button>
+            </ui-command-palette-item>
         </ui-header>
 
         @foreach ($fieldsets as $key => $f)

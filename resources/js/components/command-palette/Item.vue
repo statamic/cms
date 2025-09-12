@@ -1,6 +1,6 @@
 <script setup>
 import { useSlots, shallowRef, onMounted } from 'vue';
-import { Icon, Badge } from '@statamic/ui';
+import { Icon, Badge } from '@/components/ui';
 
 const props = defineProps({
     href: { type: String, default: null },
@@ -27,8 +27,6 @@ function click(event) {
     if (props.href) return;
 
     event.preventDefault();
-
-    // TODO: Handle ctrl/cmd + enter key to open item in new browser tab, just like ctrl/cms + click does
 }
 </script>
 

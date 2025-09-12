@@ -1,5 +1,5 @@
 <script setup>
-import TwoFactorSetup from '@statamic/components/two-factor/Setup.vue';
+import TwoFactorSetup from '@/components/two-factor/Setup.vue';
 import { ref } from 'vue';
 
 const props = defineProps({

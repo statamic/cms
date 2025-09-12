@@ -1,5 +1,5 @@
 <template>
-    <div class="@container relative w-full">
+    <div class="@container relative w-full bg-gray-50 dark:bg-transparent">
         <div
             v-if="hasPendingDynamicFolder"
             class="w-full rounded-md border border-dashed px-4 py-3 text-sm text-gray-700 dark:border-gray-300 dark:text-gray-200"
@@ -8,7 +8,7 @@
 
         <uploader
             ref="uploader"
-            :container="container.handle"
+            :container="container.id"
             :enabled="canUpload"
             :path="folder"
             @updated="uploadsUpdated"
@@ -28,7 +28,7 @@
 
                 <div
                     v-if="!isReadOnly && showPicker"
-                    class="not-[.link-fieldtype_&]:p-2 not-[.link-fieldtype_&]:border border-gray-400 dark:border-gray-700 border-dashed rounded-xl flex flex-col @2xs:flex-row items-center gap-4"
+                    class="not-[.link-fieldtype_&]:p-2 not-[.link-fieldtype_&]:border border-gray-300 dark:border-gray-700 dark:bg-gray-850 rounded-xl flex flex-col @2xs:flex-row items-center gap-4 gap-y-3"
                     :class="{
                         'rounded-b-none': expanded,
                         'bard-drag-handle': isInBardField,
@@ -44,13 +44,14 @@
                         @keyup.space.enter="openSelector"
                     />
 
-                    <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center flex-1" v-if="canUpload">
+                    <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center flex-1 gap-1" v-if="canUpload">
                         <ui-icon name="upload-cloud" class="size-5 text-gray-500 me-2" />
-                        <span v-text="__('Drag & drop here or&nbsp;')" />
-                        <button type="button" class="underline underline-offset-2 cursor-pointer hover:text-black dark:hover:text-gray-200" @click.prevent="uploadFile">
-                            {{ __('choose a file') }}
-                        </button>
-                        <span>.</span>
+                        <div class="text-xs">
+                            <span class="leading-tight" v-text="`${__('Drag & drop here or')}&nbsp;`" />
+                            <button type="button" class="text-left underline underline-offset-2 cursor-pointer hover:text-black dark:hover:text-gray-200" @click.prevent="uploadFile">
+                                {{ __('choose a file') }}.
+                            </button>
+                        </div>
                     </div>
 
                     <div class="flex items-center justify-end" v-if="meta.rename_folder">
@@ -101,9 +102,10 @@
                         @dragstart="$emit('focus')"
                     >
                         <div
-                            class="relative grid gap-6 xl:gap-10 overflow-hidden rounded-xl border border-t-0 rounded-t-none dark:border-dark-700"
+                            class="bg-white relative grid gap-4 2xl:gap-10 p-3 relative rounded-xl border border-gray-300 border-t-0 rounded-t-none dark:bg-gray-850 dark:border-dark-500"
                             :class="{ 'rounded-t-none': !isReadOnly && (showPicker || uploads.length) }"
                             ref="assets"
+                            style="grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));"
                         >
                             <asset-tile
                                 v-for="asset in assets"
@@ -121,7 +123,13 @@
                     </sortable-list>
 
                     <div class="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700 not-[.link-fieldtype_&]:border-t-0! not-[.link-fieldtype_&]:rounded-t-none" v-if="displayMode === 'list'">
-                        <table class="w-full">
+                        <table class="table-fixed w-full">
+                            <thead>
+                                <tr>
+                                    <th class="sr-only">Asset</th>
+                                    <th class="sr-only">Actions</th>
+                                </tr>
+                            </thead>
                             <sortable-list
                                 v-model="assets"
                                 item-class="asset-row"
@@ -179,8 +187,8 @@ import Uploader from '../../assets/Uploader.vue';
 import Uploads from '../../assets/Uploads.vue';
 import { SortableList } from '../../sortable/Sortable';
 import { isEqual } from 'lodash-es';
-import { Button, Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
-import ItemActions from '@statamic/components/actions/ItemActions.vue';
+import { Button, Dropdown, DropdownMenu, DropdownItem } from '@/components/ui';
+import ItemActions from '@/components/actions/ItemActions.vue';
 
 export default {
     components: {
@@ -357,7 +365,7 @@ export default {
         },
 
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
+            if (!this.showFieldPreviews) return;
 
             return replicatorPreviewHtml(
                 this.assets
@@ -373,15 +381,9 @@ export default {
         showPicker() {
             if (!this.canBrowse && !this.canUpload) return false;
 
-            if (this.maxFilesReached && !this.isFullWidth) return false;
-
             if (this.maxFilesReached && (this.isInGridField || this.isInLinkField)) return false;
 
             return true;
-        },
-
-        isFullWidth() {
-            return !(this.config.width && this.config.width < 100);
         },
 
         showSetAlt() {
@@ -389,20 +391,15 @@ export default {
         },
 
         canBrowse() {
-            const hasPermission =
-                this.can('configure asset containers') || this.can('view ' + this.container.handle + ' assets');
-
-            if (!hasPermission) return false;
+            if (!this.container.can_view) return false;
 
             return !this.hasPendingDynamicFolder;
         },
 
         canUpload() {
-            const hasPermission =
-                this.config.allow_uploads &&
-                (this.can('configure asset containers') || this.can('upload ' + this.container.handle + ' assets'));
+            if (!this.config.allow_uploads) return false;
 
-            if (!hasPermission) return false;
+            if (!this.container.can_upload) return false;
 
             return !this.hasPendingDynamicFolder;
         },

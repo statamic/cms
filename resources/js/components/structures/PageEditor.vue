@@ -66,11 +66,11 @@
 </template>
 
 <script>
-import { Heading, Button, PublishContainer, Icon } from '@statamic/ui';
-import { SavePipeline } from 'statamic';
+import { Heading, Button, PublishContainer, Icon } from '@/components/ui';
 import { flatten } from 'lodash-es';
 import { computed, ref } from 'vue';
-const { Pipeline, Request } = SavePipeline;
+import { Pipeline, Request } from '@ui/Publish/SavePipeline.js';
+import { clone } from '@/bootstrap/globals.js';
 
 let saving = ref(false);
 let errors = ref({});
@@ -271,7 +271,7 @@ export default {
         },
 
         emitPublishInfoUpdated(isNew) {
-            this.$emit('publish-info-updated', {
+            this.$emit('publish-info-updated', clone({
                 values: this.values,
                 originValues: this.originValues,
                 meta: this.meta,
@@ -280,7 +280,7 @@ export default {
                 localizedFields: this.localizedFields,
                 entry: this.entry,
                 new: isNew,
-            });
+            }));
         },
     },
 

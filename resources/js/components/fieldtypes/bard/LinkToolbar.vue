@@ -1,8 +1,8 @@
 <template>
     <div class="bard-link-toolbar">
         <div>
-            <div class="border-b bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 rounded-b-xl rounded-t-md">
-                <section class="flex gap-2 items-center p-4 border-b">
+            <div class="border-b bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 rounded-t-md">
+                <section class="flex gap-2 items-center p-4 border-b dark:border-gray-800">
                     <ui-select
                         v-model="linkType"
                         :options="visibleLinkTypes"
@@ -68,8 +68,8 @@
                                 :aria-label="`${__('Browse')}...`"
                                 @click="openSelector"
                             >
-                                <svg-icon v-show="linkType === 'asset'" name="folder-image" class="size-4" />
-                                <svg-icon v-show="linkType !== 'asset'" name="folder-generic" class="size-4" />
+                                <ui-icon v-show="linkType === 'asset'" name="folder-image" class="size-4" />
+                                <ui-icon v-show="linkType !== 'asset'" name="folder-generic" class="size-4" />
                             </button>
                         </div>
                     </div>
@@ -96,7 +96,7 @@
                         :placeholder="__('Optional')"
                     />
 
-                    <ui-checkbox-item
+                    <ui-checkbox
                         :label="__('Open in new window')"
                         v-model="targetBlank"
                         size="sm"
@@ -154,7 +154,6 @@
                 :folder="config.folder || '/'"
                 :restrict-folder-navigation="config.restrict_assets"
                 :selected="[]"
-                :view-mode="'grid'"
                 :max-files="1"
                 @selected="assetSelected"
                 @closed="closeAssetSelector"
@@ -166,13 +165,11 @@
 <script>
 import qs from 'qs';
 import AssetSelector from '../../assets/Selector.vue';
-import SvgIcon from '../../SvgIcon.vue';
-import { Icon } from '@statamic/ui';
+import { Icon } from '@/components/ui';
 
 export default {
     components: {
         AssetSelector,
-        SvgIcon,
         Icon,
     },
 

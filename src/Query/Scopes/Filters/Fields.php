@@ -28,7 +28,8 @@ class Fields extends Filter
                 return [
                     'handle' => $field->handle(),
                     'display' => __($field->display()),
-                    'fields' => $field->fieldtype()->filter()->fields()->toPublishArray(),
+                    'fields' => ($fields = $field->fieldtype()->filter()->fields())->toPublishArray(),
+                    'meta' => $fields->meta(),
                 ];
             })
             ->values()
@@ -39,7 +40,7 @@ class Fields extends Filter
     {
         $this->getFields()
             ->filter(function ($field, $handle) use ($values) {
-                return isset($values[$handle]);
+                return isset($values[$handle]) && $this->isComplete($values[$handle]);
             })
             ->each(function ($field, $handle) use ($query, $values) {
                 $filter = $field->fieldtype()->filter();
@@ -52,7 +53,7 @@ class Fields extends Filter
     {
         return $this->getFields()
             ->filter(function ($field, $handle) use ($values) {
-                return isset($values[$handle]);
+                return isset($values[$handle]) && $this->isComplete($values[$handle]);
             })
             ->map(function ($field, $handle) use ($values) {
                 $filter = $field->fieldtype()->filter();
@@ -114,5 +115,12 @@ class Fields extends Filter
         }
 
         return collect();
+    }
+
+    private function isComplete(array $values): bool
+    {
+        $values = array_filter($values);
+
+        return Arr::has($values, 'operator') && Arr::has($values, 'value');
     }
 }

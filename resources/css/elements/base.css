@@ -1,4 +1,7 @@
 :root {
+    /* For animating height */
+    interpolate-size: allow-keywords;
+
     --focus-outline-width: 2px;
     /* Here we typically need a negative outline-offset because of the inner shadow on inputs */
     --focus-outline-offset: -1px;
@@ -14,7 +17,6 @@
         --focus-shadow-color: var(--color-blue-500);
     }
 
-    /* =Jay. @Jack I figured to stick these in variables since we use them in class names in Bard. I thought technically layout variables maybe shouldn't be theme/should be persistent, so I put them here instead. */
     --z-index-below: -1;
     --z-index-base: 1;
     --z-index-above: 2;
@@ -34,7 +36,7 @@
     /* Explicitly show focus without needing to tab for buttons inside modals, e.g. Assets > cancel button on delete modal */
     [data-dismissable-layer] button:focus,
     /* and then a global selector for focus-visible everywhere else (except where the focus-within class will handle the focus outline target instead) */
-    :not([class*='focus-within'] *) {
+    :not([class*='focus-within'] > *) {
         :focus-visible& {
             outline-width: var(--focus-outline-width);
             outline-offset: var(--focus-outline-offset);
@@ -44,12 +46,20 @@
         }
     }
 
+    /* e.g. >> /cp/collections/pages on the filter stack when you tab to a field condition like "contains" */
+    [class*="focus-within"] button:focus {
+        outline: none;
+    }
+
     a {
         cursor: pointer;
     }
 
     ::placeholder {
         @apply text-gray-500;
+    }
+    :where(.dark, .dark *)::placeholder {
+        @apply text-gray-400;
     }
 
     [type="checkbox"] {
@@ -70,7 +80,7 @@
     }
 
     /* Based on the global site picker. Only for buttons (i.e. don't affect select dropdowns on publish forms) */
-    [data-ui-combobox-anchor]:has(button):not(.main-content *) {
+    [data-ui-combobox-anchor]:has(button):not(.main-content *, .stack-content *) {
         /* Decrease */
         --focus-outline-offset: var(--outline-offset-button);
         /* Target the button inside the combobox */
@@ -102,5 +112,25 @@
     .group\/button button:focus {
         /* Pull the focus state above any adjacent buttons e.g. >> /cp/collections/articles/entries - save button alongside the dropdown arrow */
         z-index: var(--z-index-above);
+    }
+}
+
+/* Prevent tailwind typography from adding backticks around code elements */
+@utility prose {
+    code {
+        &::before,
+        &::after {
+            content: none;
+        }
+    }
+}
+
+code {
+    /* Take the UI accent for code color/background. Use relative colors to 1) Make sure the text color is not too bright and 2) Create a light background */
+    color: hsl(from var(--theme-color-ui-accent) h s 30);
+    background: hsl(from var(--theme-color-ui-accent) h s l / 0.08);
+    &:where(.dark, .dark *) {
+        color: hsl(from var(--theme-color-dark-ui-accent) h s 90);
+        background: hsl(from var(--theme-color-dark-ui-accent) h s 10 / 0.5);
     }
 }

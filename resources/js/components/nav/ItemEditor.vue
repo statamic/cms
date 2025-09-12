@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import { Button, Heading, Field, Input } from '@statamic/ui';
+import { Button, Heading, Field, Input } from '@/components/ui';
 import { data_get } from '../../bootstrap/globals.js';
 
 export default {

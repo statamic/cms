@@ -28,6 +28,30 @@
                 </ui-dropdown-menu>
             </ui-dropdown>
 
+            <ui-command-palette-item
+                category="{{ Statamic\CommandPalette\Category::Actions }}"
+                :text="__('Configure Form')"
+                icon="cog"
+                url="{{ $form->editUrl() }}"
+            >
+            </ui-command-palette-item>
+
+            <ui-command-palette-item
+                category="{{ Statamic\CommandPalette\Category::Actions }}"
+                :text="__('Edit Blueprint')"
+                icon="blueprint-edit"
+                url="{{ cp_route('blueprints.forms.edit', $form->handle()) }}"
+            >
+            </ui-command-palette-item>
+
+            <ui-command-palette-item
+                category="{{ Statamic\CommandPalette\Category::Actions }}"
+                :text="__('Delete Form')"
+                icon="trash"
+                :action="() => $refs.deleter.confirm()"
+            >
+            </ui-command-palette-item>
+
             @can('delete', $form)
                 <resource-deleter
                     ref="deleter"
@@ -52,6 +76,16 @@
                     @endforeach
                 </ui-dropdown-menu>
             </ui-dropdown>
+            @foreach ($exporters as $exporter)
+                <ui-command-palette-item
+                    category="{{ Statamic\CommandPalette\Category::Actions }}"
+                    :text="[ __('Export Submissions'), '{{ $exporter->title() }}' ]"
+                    icon="save"
+                    url="{{ $exporter->downloadUrl() }}"
+                    prioritize
+                >
+                </ui-command-palette-item>
+            @endforeach
         @endif
     </ui-header>
 
@@ -74,12 +108,5 @@
         :columns="{{ $columns->toJson() }}"
         :filters="{{ $filters->toJson() }}"
         v-cloak
-    >
-        <div slot="no-results" class="rounded-lg border-2 border-dashed text-center dark:border-dark-400">
-            <div class="mx-auto max-w-md px-8 py-30">
-                @cp_svg('empty/form')
-                <h1 class="my-6">{{ __('No submissions') }}</h1>
-            </div>
-        </div>
-    </form-submission-listing>
+    ></form-submission-listing>
 @endsection
