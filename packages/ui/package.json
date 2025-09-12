@@ -3,7 +3,10 @@
   "version": "0.0.0",
   "type": "module",
   "exports": {
-    ".": "./src/index.js",
+    ".": {
+      "types": "./types/index.d.ts",
+      "default": "./src/index.js"
+    },
     "./ui.css": "./src/ui.css"
   },
   "peerDependencies": {
@@ -13,5 +16,8 @@
   "dependencies": {
     "cva": "^1.0.0-beta.3",
     "tailwind-merge": "^3.0.2"
+  },
+  "scripts": {
+    "types": "rm -rf types && vue-tsc --declaration --emitDeclarationOnly || true"
   }
 }
