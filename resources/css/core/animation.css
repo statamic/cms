@@ -89,6 +89,6 @@
     }
     
     .entry-animate-in--siblings {
-        transition-delay: calc(sibling-index() * 0.015s);
+        transition-delay: calc(sibling-index() * 0.01s);
     }
 }
