@@ -110,9 +110,9 @@ import {
     Switch,
     Tooltip,
     PublishFieldsProvider as FieldsProvider,
-    PublishFields as Fields,
-    publishContextKey
+    PublishFields as Fields
 } from '@ui';
+import { containerContextKey } from '@/components/ui/Publish/Container.vue';
 
 export default {
     props: nodeViewProps,
@@ -139,7 +139,7 @@ export default {
     inject: {
         bard: {},
         bardSets: {},
-        publishContainer: { from: publishContextKey },
+        publishContainer: { from: containerContextKey },
     },
 
     computed: {
