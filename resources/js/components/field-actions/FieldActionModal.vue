@@ -32,7 +32,7 @@
 
 <script>
 import uniqid from 'uniqid';
-import { PublishContainer, FieldsProvider, PublishFields } from '@/components/ui';
+import { PublishContainer, PublishFieldsProvider as FieldsProvider, PublishFields } from '@/components/ui';
 
 export default {
     components: { PublishContainer, FieldsProvider, PublishFields },

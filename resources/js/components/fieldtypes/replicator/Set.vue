@@ -1,6 +1,4 @@
 <script setup>
-import Fields from '@/components/ui/Publish/Fields.vue';
-import FieldsProvider from '@/components/ui/Publish/FieldsProvider.vue';
 import { computed, inject, ref } from 'vue';
 import {
     Icon,
@@ -13,9 +11,11 @@ import {
     DropdownSeparator,
     Button,
     DropdownMenu,
+    PublishFields as Fields,
+    PublishFieldsProvider as FieldsProvider,
+    injectPublishContext as injectContainerContext,
 } from '@/components/ui';
 import { Motion } from 'motion-v';
-import { injectContainerContext } from '@/components/ui/Publish/Container.vue';
 import PreviewHtml from '@/components/fieldtypes/replicator/PreviewHtml.js';
 import FieldAction from '@/components/field-actions/FieldAction.js';
 import toFieldActions from '@/components/field-actions/toFieldActions.js';
@@ -125,7 +125,7 @@ function destroy() {
         <div
             layout
             class="relative z-2 w-full rounded-lg border border-gray-300 text-base dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black shadow-ui-sm dark:[&_[data-ui-switch]]:border-gray-600 dark:[&_[data-ui-switch]]:border-1"
-            :class="{ 
+            :class="{
                 'border-red-500': hasError
             }"
             :data-collapsed="collapsed ?? undefined"
@@ -136,12 +136,12 @@ function destroy() {
         >
             <header
                 class="group/header animate-border-color flex items-center rounded-lg px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-950 hover:bg-gray-100 dark:hover:bg-gray-950 border-gray-300 border-b-1 border-b-transparent"
-                :class="{ 
+                :class="{
                     'bg-gray-200/50 rounded-b-none border-b-gray-300! dark:border-b-white/10!': !collapsed
                 }"
             >
                 <Icon
-                    name="ui/handles"
+                    name="handles"
                     :class="sortableHandleClass"
                     class="size-4 cursor-grab text-gray-400"
                     v-if="!readOnly"
@@ -150,7 +150,7 @@ function destroy() {
                     <Badge size="lg" pill="true" color="white" shadow="false" class="px-3">
                         <span v-if="isSetGroupVisible" class="flex items-center gap-2">
                             {{ __(setGroup.display) }}
-                            <Icon name="ui/chevron-right" class="relative top-px size-3" />
+                            <Icon name="chevron-right" class="relative top-px size-3" />
                         </span>
                         {{ __(config.display) || config.handle }}
                     </Badge>
@@ -170,7 +170,7 @@ function destroy() {
                     <Switch size="xs" :model-value="enabled" @update:model-value="toggleEnabledState" v-tooltip="enabled ? __('Included in output') : __('Hidden from output')" />
                     <Dropdown>
                         <template #trigger>
-                            <Button icon="ui/dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
+                            <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
                         </template>
                         <DropdownMenu>
                             <DropdownItem

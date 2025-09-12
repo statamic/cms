@@ -12,6 +12,7 @@ import { motion } from 'motion-v';
 import { cva } from 'cva';
 import { Icon, Subheading } from '@/components/ui';
 
+let metaPressed = ref(false);
 let open = ref(false);
 let query = ref('');
 let serverCategories = Statamic.$config.get('commandPaletteCategories');
@@ -33,6 +34,7 @@ function bindKeyboardShortcuts() {
         esc: () => open.value = false,
         'ctrl+n': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' })),
         'ctrl+p': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp' })),
+        mod: () => metaPressed.value = true,
     }, (callback, binding) => {
         keyboardBindings.value.push(Statamic.$keys.bindGlobal([binding], (e) => {
             if (open.value) {
@@ -41,6 +43,8 @@ function bindKeyboardShortcuts() {
             }
         }));
     });
+
+    keyboardBindings.value.push(Statamic.$keys.bind('mod+keyup', () => metaPressed.value = false));
 }
 
 watch(
@@ -326,7 +330,7 @@ const modalClasses = cva({
                                             v-else
                                             :icon="item.icon"
                                             :href="item.url"
-                                            :open-new-tab="item.openNewTab"
+                                            :open-new-tab="metaPressed || item.openNewTab"
                                             :badge="item.keys || item.badge"
                                             :removable="isRecentItem(item)"
                                             @remove="removeRecentItem"

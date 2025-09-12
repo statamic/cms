@@ -24,7 +24,7 @@
                 <ui-button
                     v-if="hasChildren"
                     class="transition duration-100 [&_svg]:size-4! -mx-1.5"
-                    icon="ui/chevron-down"
+                    icon="chevron-down"
                     size="xs"
                     round
                     variant="ghost"
@@ -37,9 +37,9 @@
                 <div v-if="page.collection && editable" class="flex items-center gap-2">
                     <Icon name="navigation" class="size-3.5 text-gray-500" />
                     <div>
-                        <a :href="page.collection.create_url" v-text="__('Add')" class="hover:text-blue-500" />
+                        <a :href="page.collection.create_url" v-text="__('Add')" class="hover:text-blue-600" />
                         <span class="mx-1 text-gray-400 dark:text-gray-500">/</span>
-                        <a :href="page.collection.edit_url" v-text="__('Edit')" class="hover:text-blue-500" />
+                        <a :href="page.collection.edit_url" v-text="__('Edit')" class="hover:text-blue-600" />
                     </div>
                 </div>
             </div>

@@ -10,6 +10,7 @@
             size="sm"
             variant="ghost"
             icon="globe-arrow"
+            class="[&_[data-ui-combobox-trigger]]:text-white/85"
         />
     </div>
 </template>
