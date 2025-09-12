@@ -97,10 +97,21 @@
 import { NodeViewWrapper, nodeViewProps } from '@tiptap/vue-3';
 import ManagesPreviewText from '../replicator/ManagesPreviewText';
 import HasFieldActions from '../../field-actions/HasFieldActions.js';
-import { Badge, Button, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, Icon, Subheading, Switch, Tooltip } from '@/components/ui';
 import { Motion } from 'motion-v';
-import FieldsProvider from '@/components/ui/Publish/FieldsProvider.vue';
-import Fields from '@/components/ui/Publish/Fields.vue';
+import {
+    Badge,
+    Button,
+    Dropdown,
+    DropdownMenu,
+    DropdownItem,
+    DropdownSeparator,
+    Icon,
+    Subheading,
+    Switch,
+    Tooltip,
+    PublishFieldsProvider as FieldsProvider,
+    PublishFields as Fields
+} from '@ui';
 import { containerContextKey } from '@/components/ui/Publish/Container.vue';
 
 export default {

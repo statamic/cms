@@ -1,6 +1,13 @@
 <script setup>
-import { Badge, Button, Panel, PanelHeader, Card, Heading } from '@/components/ui';
-import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
+import {
+    Badge,
+    Button,
+    Panel,
+    PanelHeader,
+    Card,
+    Heading,
+} from '@ui';
+import { injectListingContext } from '../Listing/Listing.vue';
 import { computed, ref, watch, nextTick } from 'vue';
 import FieldFilter from './FieldFilter.vue';
 import DataListFilter from './Filter.vue';

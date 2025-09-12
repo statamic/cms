@@ -188,14 +188,16 @@ import {
     Panel,
     PanelHeader,
     PanelFooter,
+    Listing,
+    ListingTable,
+    ListingPagination,
     ListingSearch,
     ListingCustomizeColumns,
     Slider,
     Icon,
     ToggleGroup,
     ToggleItem,
-} from '@/components/ui';
-import { Listing, ListingTable, ListingPagination } from '@/components/ui';
+} from '@ui';
 import Breadcrumbs from './Breadcrumbs.vue';
 
 export default {

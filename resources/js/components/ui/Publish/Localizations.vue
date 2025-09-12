@@ -1,7 +1,14 @@
 <script setup>
-import { Label, Combobox, Badge, Card, Panel, Icon } from '@/components/ui';
+import {
+    Label,
+    Combobox,
+    Badge,
+    Card,
+    Panel,
+    Icon,
+} from '@ui';
 import { computed } from 'vue';
-import Localization from '@/components/ui/Publish/Localization.vue';
+import Localization from './Localization.vue';
 
 const props = defineProps({
     localizations: {
