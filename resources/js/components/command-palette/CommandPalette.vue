@@ -129,10 +129,27 @@ function normalizeItem(item) {
     }
 
     if (typeof item.keys === 'string') {
-        item.keys = Statamic.$keys.render(item.keys).map(key => key.toUpperCase());
+        item.keys = renderKeys(item.keys);
     }
 
     return item;
+}
+
+function renderKeys(keys) {
+    return keys.toLowerCase().split('+').map(key => {
+        switch(key) {
+            case "command":
+            case "cmd":
+                return "⌘";
+            case "control":
+            case "ctrl":
+                return "^";
+            case "mod":
+                return "⌘"; // TODO: handle normalizing 'mod' cross platform
+            default:
+                return key;
+        }
+    }).map(key => key.toUpperCase());
 }
 
 watch(selected, (item) => {
