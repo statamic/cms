@@ -37,11 +37,6 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     protected $handle;
     protected $disk;
     protected $private;
-    protected $allowUploads;
-    protected $allowDownloading;
-    protected $allowMoving;
-    protected $allowRenaming;
-    protected $createFolders;
     protected $sourcePreset;
     protected $warmPresets;
     protected $searchIndex;
@@ -514,86 +509,6 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     }
 
     /**
-     * Enable the quick download button when editing files in this container.
-     *
-     * @param  bool|null  $allowDownloading
-     * @return bool|$this
-     */
-    public function allowDownloading($allowDownloading = null)
-    {
-        return $this
-            ->fluentlyGetOrSet('allowDownloading')
-            ->getter(function ($allowDownloading) {
-                return (bool) ($allowDownloading ?? true);
-            })
-            ->args(func_get_args());
-    }
-
-    /**
-     * The ability to move files around within this container.
-     *
-     * @param  bool|null  $allowMoving
-     * @return bool|$this
-     */
-    public function allowMoving($allowMoving = null)
-    {
-        return $this
-            ->fluentlyGetOrSet('allowMoving')
-            ->getter(function ($allowMoving) {
-                return (bool) ($allowMoving ?? true);
-            })
-            ->args(func_get_args());
-    }
-
-    /**
-     * The ability to rename files in this container.
-     *
-     * @param  bool|null  $allowRenaming
-     * @return bool|$this
-     */
-    public function allowRenaming($allowRenaming = null)
-    {
-        return $this
-            ->fluentlyGetOrSet('allowRenaming')
-            ->getter(function ($allowRenaming) {
-                return (bool) ($allowRenaming ?? true);
-            })
-            ->args(func_get_args());
-    }
-
-    /**
-     * The ability to upload into this container.
-     *
-     * @param  bool|null  $allowUploads
-     * @return bool|$this
-     */
-    public function allowUploads($allowUploads = null)
-    {
-        return $this
-            ->fluentlyGetOrSet('allowUploads')
-            ->getter(function ($allowUploads) {
-                return (bool) ($allowUploads ?? true);
-            })
-            ->args(func_get_args());
-    }
-
-    /**
-     * The ability to create folders within this container.
-     *
-     * @param  bool|null  $createFolders
-     * @return bool|$this
-     */
-    public function createFolders($createFolders = null)
-    {
-        return $this
-            ->fluentlyGetOrSet('createFolders')
-            ->getter(function ($createFolders) {
-                return (bool) ($createFolders ?? true);
-            })
-            ->args(func_get_args());
-    }
-
-    /**
      * The glide source preset to be permanently applied to source image on upload.
      *
      * @param  string|null  $preset
@@ -648,11 +563,6 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
             'title' => $this->title,
             'disk' => $this->disk,
             'search_index' => $this->searchIndex,
-            'allow_uploads' => $this->allowUploads,
-            'allow_downloading' => $this->allowDownloading,
-            'allow_renaming' => $this->allowRenaming,
-            'allow_moving' => $this->allowMoving,
-            'create_folders' => $this->createFolders,
             'source_preset' => $this->sourcePreset,
             'warm_presets' => $this->warmPresets,
             'validate' => $this->validation,

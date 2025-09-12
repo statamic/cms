@@ -1,4 +1,7 @@
 :root {
+    /* For animating height */
+    interpolate-size: allow-keywords;
+
     --focus-outline-width: 2px;
     /* Here we typically need a negative outline-offset because of the inner shadow on inputs */
     --focus-outline-offset: -1px;
@@ -33,7 +36,7 @@
     /* Explicitly show focus without needing to tab for buttons inside modals, e.g. Assets > cancel button on delete modal */
     [data-dismissable-layer] button:focus,
     /* and then a global selector for focus-visible everywhere else (except where the focus-within class will handle the focus outline target instead) */
-    :not([class*='focus-within'] *) {
+    :not([class*='focus-within'] > *) {
         :focus-visible& {
             outline-width: var(--focus-outline-width);
             outline-offset: var(--focus-outline-offset);
@@ -112,8 +115,22 @@
     }
 }
 
+/* Prevent tailwind typography from adding backticks around code elements */
+@utility prose {
+    code {
+        &::before,
+        &::after {
+            content: none;
+        }
+    }
+}
+
 code {
     /* Take the UI accent for code color/background. Use relative colors to 1) Make sure the text color is not too bright and 2) Create a light background */
-    color: hsl(from var(--theme-color-ui-accent) h l 20);
+    color: hsl(from var(--theme-color-ui-accent) h s 30);
     background: hsl(from var(--theme-color-ui-accent) h s l / 0.08);
+    &:where(.dark, .dark *) {
+        color: hsl(from var(--theme-color-dark-ui-accent) h s 90);
+        background: hsl(from var(--theme-color-dark-ui-accent) h s 10 / 0.5);
+    }
 }

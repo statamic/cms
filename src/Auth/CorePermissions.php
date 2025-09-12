@@ -167,6 +167,7 @@ class CorePermissions
         $this->register('view {container} assets', function ($permission) {
             $this->permission($permission)->children([
                 $this->permission('upload {container} assets'),
+                $this->permission('edit {container} folders'),
                 $this->permission('edit {container} assets')->children([
                     $this->permission('move {container} assets'),
                     $this->permission('rename {container} assets'),

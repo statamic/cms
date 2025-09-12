@@ -364,6 +364,11 @@ final class Addon
         return Blueprint::make()->setContents(app($binding));
     }
 
+    public function setting($key, $default = null): mixed
+    {
+        return $this->settings()->get($key, $default);
+    }
+
     public function settings(): Settings
     {
         $repo = app(SettingsRepository::class);

@@ -1,7 +1,6 @@
 export default {
     props: {
         actionUrl: String,
-        canEdit: Boolean,
         containerIsEmpty: Boolean,
         folder: Object,
         folderActionUrl: String,

@@ -96,7 +96,7 @@
                         :placeholder="__('Optional')"
                     />
 
-                    <ui-checkbox-item
+                    <ui-checkbox
                         :label="__('Open in new window')"
                         v-model="targetBlank"
                         size="sm"

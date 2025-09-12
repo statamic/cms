@@ -26,7 +26,7 @@
                 <template #trigger>
                     <Button
                         :text="__('Add')"
-                        icon-append="ui/chevron-down"
+                        icon-append="chevron-down"
                     />
                 </template>
                 <DropdownMenu>
@@ -129,7 +129,7 @@
                     icon="edit"
                 />
                 <DropdownItem
-                    :text="__('Edit Nav item')"
+                    :text="__('Edit Nav Item')"
                     @click="editPage(branch)"
                     icon="edit"
                 />
