@@ -81,5 +81,5 @@
 }
 
 .entry-animate-in--siblings {
-    transition-delay: calc(sibling-index() * 0.02s);
+    transition-delay: calc(sibling-index() * 0.015s);
 }
