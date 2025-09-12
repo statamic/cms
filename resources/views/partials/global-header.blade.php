@@ -32,31 +32,29 @@
                 {{ $customLogoText ?? config('app.name') }}
             </a>
             @if (Statamic::pro())
-                <div class="hidden sm:block select-none min-w-[300px] h-6 flex items-center">
-                    @if ($licenses->valid())
-                        <ui-badge size="sm" variant="flat" text="{{ __('Pro') }}" class="bg-white/15!" />
-                    @else
-                        <ui-tooltip :text="{{ $licenses->requestFailed() ? "'".$licenses->requestFailureMessage()."'" : 'null' }}">
-                            <ui-badge
-                                @if ($licenses->requestFailed())
-                                    color="yellow"
-                                    icon="alert-warning-exclamation-mark"
-                                @elseif ($licenses->isOnPublicDomain())
-                                    color="red"
-                                @else
-                                    color="green"
-                                @endif
-                                href="{{ cp_route('utilities.licensing') }}"
-                                text="{{ __('Pro') }} – {{ $licenses->isOnPublicDomain() ? __('statamic::messages.licensing_error_unlicensed') : __('Trial Mode') }}"
-                            ></ui-badge>
-                        </ui-tooltip>
-                    @endif
-                </div>
+                @if ($licenses->valid())
+                    <ui-badge size="sm" variant="flat" text="{{ __('Pro') }}" class="hidden sm:block select-none bg-white/15!" />
+                @else
+                    <ui-tooltip :text="{{ $licenses->requestFailed() ? "'".$licenses->requestFailureMessage()."'" : 'null' }}">
+                        <ui-badge
+                            @if ($licenses->requestFailed())
+                                color="yellow"
+                                icon="alert-warning-exclamation-mark"
+                            @elseif ($licenses->isOnPublicDomain())
+                                color="red"
+                            @else
+                                color="green"
+                            @endif
+                            href="{{ cp_route('utilities.licensing') }}"
+                            text="{{ __('Pro') }} – {{ $licenses->isOnPublicDomain() ? __('statamic::messages.licensing_error_unlicensed') : __('Trial Mode') }}"
+                        ></ui-badge>
+                    </ui-tooltip>
+                @endif
             @endif
         </div>
         @endif
 
-        <div class="items-center gap-2 hidden md:flex" data-global-header-breadcrumbs>
+        <div class="items-center gap-2 hidden md:flex" data-global-header-breadcrumbs v-cloak>
             @foreach($breadcrumbs as $breadcrumb)
                 <span class="text-white/30">/</span>
                 <ui-button href="{{ $breadcrumb->url() }}" text="{{ __($breadcrumb->text()) }}" size="sm" variant="ghost" class="dark:text-white/85! hover:text-white! px-2! mr-1.75"></ui-button>
