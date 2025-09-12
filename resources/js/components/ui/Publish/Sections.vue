@@ -1,6 +1,13 @@
 <script setup>
 import { injectTabContext } from './TabProvider.vue';
-import { Panel, PanelHeader, Heading, Subheading, Card, Icon } from '@/components/ui';
+import {
+    Panel,
+    PanelHeader,
+    Heading,
+    Subheading,
+    Card,
+    Icon,
+} from '@ui';
 import FieldsProvider from './FieldsProvider.vue';
 import Fields from './Fields.vue';
 import ShowField from '@/components/field-conditions/ShowField.js';
@@ -57,7 +64,7 @@ function toggleSection(id) {
                 </div>
                 <Icon
                     v-if="section.collapsible"
-                    name="ui/chevron-down"
+                    name="chevron-down"
                     class="size-5 text-gray-400"
                     :class="section.collapsed ? 'rotate-270' : 'rotate-0'"
                 />

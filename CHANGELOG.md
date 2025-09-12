@@ -1,5 +1,49 @@
 # Release Notes
 
+## 6.0.0-alpha.6 (2025-09-08)
+
+### What's fixed
+- Bring back entry_count translation [#12364](https://github.com/statamic/cms/issues/12364) by @jasonvarga
+- Prevent PSR-4 warnings [#12348](https://github.com/statamic/cms/issues/12348) by @duncanmcclean
+- Differentiate dangerous actions in bulk actions toolbar [#12300](https://github.com/statamic/cms/issues/12300) by @duncanmcclean
+- Selected assets shouldn't be cleared when editing assets [#12301](https://github.com/statamic/cms/issues/12301) by @duncanmcclean
+- Separate the string 'Expand' for better translations [#12357](https://github.com/statamic/cms/issues/12357) by @helloDanuk
+- Make active buttons in a group field type look pressed rather than a primary button [#12305](https://github.com/statamic/cms/issues/12305) by @JayGeorge
+- Asset field responsiveness [#12303](https://github.com/statamic/cms/issues/12303) by @JayGeorge
+- Fix too many backticks in markdown cheatsheet [#12358](https://github.com/statamic/cms/issues/12358) by @duncanmcclean
+- Replicator improvements including Bard replicators [#12361](https://github.com/statamic/cms/issues/12361) by @JayGeorge
+- Apply Inter more selectively in Bard [#12363](https://github.com/statamic/cms/issues/12363) by @JayGeorge
+- Separate the string 'Link' for better translations [#12359](https://github.com/statamic/cms/issues/12359) by @helloDanuk
+- Fix missing fieldtype icons [#12304](https://github.com/statamic/cms/issues/12304) by @duncanmcclean
+- Dutch translations [#12356](https://github.com/statamic/cms/issues/12356) by @Frank-L93
+- Focal Point Editor tweaks [#12302](https://github.com/statamic/cms/issues/12302) by @duncanmcclean
+- Remove some unused translations [#12306](https://github.com/statamic/cms/issues/12306) by @helloDanuk
+- Fix translation in docs callout [#12311](https://github.com/statamic/cms/issues/12311) by @duncanmcclean
+- Fix errors not showing on two factor setup modal [#12313](https://github.com/statamic/cms/issues/12313) by @duncanmcclean
+- Adjust the sidebar position for RTL mode [#12335](https://github.com/statamic/cms/issues/12335) by @tao
+- Add translations in command palette [#12320](https://github.com/statamic/cms/issues/12320) by @helloDanuk
+- Invert text colour of Markdown Cheatsheet in dark mode [#12322](https://github.com/statamic/cms/issues/12322) by @duncanmcclean
+- Fix missing translation in Assets & Files fieldtypes [#12325](https://github.com/statamic/cms/issues/12325) by @duncanmcclean
+- Allow localization to be selected from ComboBox [#12337](https://github.com/statamic/cms/issues/12337) by @tao
+- Take `initialPerPage` into account when rendering widget skeleton [#12326](https://github.com/statamic/cms/issues/12326) by @duncanmcclean
+- Border radius fixes for the main containers [#12344](https://github.com/statamic/cms/issues/12344) by @JayGeorge
+- Fix translation in Code Fieldtype [#12345](https://github.com/statamic/cms/issues/12345) by @duncanmcclean
+- Pass placeholder to search input as a string, not a variable [#12323](https://github.com/statamic/cms/issues/12323) by @duncanmcclean
+- Left align table heads e.g. Checkbox field type key/value headings [#12346](https://github.com/statamic/cms/issues/12346) by @JayGeorge
+- Make sure field actions do not inherit bottom margin [#12349](https://github.com/statamic/cms/issues/12349) by @JayGeorge
+- Checkboxes fieldtype: Option value should be a "label" [#12350](https://github.com/statamic/cms/issues/12350) by @duncanmcclean
+- Integer fieldtype: Adjust config field widths [#12351](https://github.com/statamic/cms/issues/12351) by @duncanmcclean
+- Popovers shouldn't use fixed widths, to account for localization [#12352](https://github.com/statamic/cms/issues/12352) by @duncanmcclean
+- Add translation for "Search..." in German [#12317](https://github.com/statamic/cms/issues/12317) by @duncanmcclean
+- Add missing fieldtype titles to translator [#12343](https://github.com/statamic/cms/issues/12343) by @helloDanuk
+- Make Base & Large translatable in width field type [#12340](https://github.com/statamic/cms/issues/12340) by @helloDanuk
+- Make 'Clear' translatable in Filters.vue [#12331](https://github.com/statamic/cms/issues/12331) by @helloDanuk
+- Radio items can now be disabled [#12319](https://github.com/statamic/cms/issues/12319) by @jackmcdade
+- Fix German entry count translation [#12296](https://github.com/statamic/cms/issues/12296) by @daun
+- Fix Select/Combobox icon [ae5b544fd](https://github.com/statamic/cms/commit/ae5b544fd) by @jackmcdade
+
+
+
 ## 6.0.0-alpha.5 (2025-09-04)
 
 ### What's new

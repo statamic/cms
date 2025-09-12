@@ -1,5 +1,5 @@
 <template>
-    <div class="@container relative w-full">
+    <div class="@container relative w-full bg-gray-50 dark:bg-transparent">
         <div
             v-if="hasPendingDynamicFolder"
             class="w-full rounded-md border border-dashed px-4 py-3 text-sm text-gray-700 dark:border-gray-300 dark:text-gray-200"
@@ -8,7 +8,7 @@
 
         <uploader
             ref="uploader"
-            :container="container.handle"
+            :container="container.id"
             :enabled="canUpload"
             :path="folder"
             @updated="uploadsUpdated"
@@ -28,7 +28,7 @@
 
                 <div
                     v-if="!isReadOnly && showPicker"
-                    class="not-[.link-fieldtype_&]:p-2 not-[.link-fieldtype_&]:border border-gray-300 dark:border-gray-700 dark:bg-gray-850 rounded-xl flex flex-col @2xs:flex-row items-center gap-4"
+                    class="not-[.link-fieldtype_&]:p-2 not-[.link-fieldtype_&]:border border-gray-300 dark:border-gray-700 dark:bg-gray-850 rounded-xl flex flex-col @2xs:flex-row items-center gap-4 gap-y-3"
                     :class="{
                         'rounded-b-none': expanded,
                         'bard-drag-handle': isInBardField,
@@ -44,13 +44,14 @@
                         @keyup.space.enter="openSelector"
                     />
 
-                    <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center flex-1" v-if="canUpload">
+                    <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center flex-1 gap-1" v-if="canUpload">
                         <ui-icon name="upload-cloud" class="size-5 text-gray-500 me-2" />
-                        <span v-text="__('Drag & drop here or&nbsp;')" />
-                        <button type="button" class="underline underline-offset-2 cursor-pointer hover:text-black dark:hover:text-gray-200" @click.prevent="uploadFile">
-                            {{ __('choose a file') }}
-                        </button>
-                        <span>.</span>
+                        <div class="text-xs">
+                            <span class="leading-tight" v-text="`${__('Drag & drop here or')}&nbsp;`" />
+                            <button type="button" class="text-left underline underline-offset-2 cursor-pointer hover:text-black dark:hover:text-gray-200" @click.prevent="uploadFile">
+                                {{ __('choose a file') }}.
+                            </button>
+                        </div>
                     </div>
 
                     <div class="flex items-center justify-end" v-if="meta.rename_folder">
@@ -101,7 +102,7 @@
                         @dragstart="$emit('focus')"
                     >
                         <div
-                            class="relative grid gap-4 2xl:gap-10 p-3 relative rounded-xl border border-gray-300 border-t-0 rounded-t-none dark:bg-gray-850 dark:border-dark-500"
+                            class="bg-white relative grid gap-4 2xl:gap-10 p-3 relative rounded-xl border border-gray-300 border-t-0 rounded-t-none dark:bg-gray-850 dark:border-dark-500"
                             :class="{ 'rounded-t-none': !isReadOnly && (showPicker || uploads.length) }"
                             ref="assets"
                             style="grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));"
@@ -122,7 +123,13 @@
                     </sortable-list>
 
                     <div class="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700 not-[.link-fieldtype_&]:border-t-0! not-[.link-fieldtype_&]:rounded-t-none" v-if="displayMode === 'list'">
-                        <table class="w-full">
+                        <table class="table-fixed w-full">
+                            <thead>
+                                <tr>
+                                    <th class="sr-only">Asset</th>
+                                    <th class="sr-only">Actions</th>
+                                </tr>
+                            </thead>
                             <sortable-list
                                 v-model="assets"
                                 item-class="asset-row"
@@ -374,15 +381,9 @@ export default {
         showPicker() {
             if (!this.canBrowse && !this.canUpload) return false;
 
-            if (this.maxFilesReached && !this.isFullWidth) return false;
-
             if (this.maxFilesReached && (this.isInGridField || this.isInLinkField)) return false;
 
             return true;
-        },
-
-        isFullWidth() {
-            return !(this.config.width && this.config.width < 100);
         },
 
         showSetAlt() {

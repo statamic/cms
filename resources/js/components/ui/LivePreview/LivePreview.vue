@@ -1,12 +1,16 @@
 <script setup>
 import { computed, nextTick, ref, watch, useTemplateRef, onBeforeUnmount, onUnmounted, onBeforeMount } from 'vue';
 import Resizer from './Resizer.vue';
-import { injectContainerContext } from '@/components/ui/Publish/Container.vue';
+import {
+    Select,
+    Button,
+    injectPublishContext as injectContainerContext,
+} from '@ui';
 import debounce from '@/util/debounce.js';
-import { Select, Button } from '@/components/ui';
 import axios from 'axios';
 import wait from '@/util/wait.js';
 import { mapValues } from 'lodash-es';
+import { useIframeManager } from './ManagesIframes.js';
 
 const props = defineProps({
     enabled: {
@@ -43,9 +47,10 @@ const loading = ref(true);
 const extras = ref({});
 const token = ref(null);
 const target = ref(0);
-const previousUrl = ref(null);
 const iframeContentContainer = useTemplateRef('contents');
 let source;
+
+const { updateIframeContents } = useIframeManager(iframeContentContainer);
 
 const livePreviewFieldsPortal = computed(() => {
     return `live-preview-fields-${name.value}`;
@@ -106,7 +111,7 @@ const update = debounce(() => {
             const payload = { token: token.value, reference: props.reference };
             poppedOut.value
                 ? channel.value.postMessage({ event: 'updated', url, target: tgt, payload })
-                : updateIframeContents(url, target, payload);
+                : updateIframeContents(url, tgt, payload, setIframeAttributes);
             loading.value = false;
         })
         .catch((e) => {
@@ -114,83 +119,6 @@ const update = debounce(() => {
             throw e;
         });
 }, 150);
-
-// This was in a mixin. Probably should go into a composable.
-const hasIframeSourceChanged = (existingSrc, newSrc) => {
-    existingSrc = new URL(existingSrc);
-    newSrc = new URL(newSrc);
-    existingSrc.searchParams.delete('live-preview');
-    newSrc.searchParams.delete('live-preview');
-
-    return existingSrc.toString() !== newSrc.toString();
-};
-
-// This was in a mixin. Probably should go into a composable.
-const postMessageToIframe = (container, url, payload) => {
-    // If the target is a relative url, we'll get the origin from the current window.
-    const targetOrigin = /^https?:\/\//.test(url) ? new URL(url)?.origin : window.origin;
-
-    container.firstChild.contentWindow.postMessage(
-        {
-            name: 'statamic.preview.updated',
-            url,
-            ...payload,
-        },
-        targetOrigin,
-    );
-};
-
-// This was in a mixin. Probably should go into a composable.
-function updateIframeContents(url, target, payload) {
-    const iframe = document.createElement('iframe');
-    iframe.setAttribute('frameborder', '0');
-    iframe.setAttribute('src', url);
-    iframe.setAttribute('id', 'live-preview-iframe');
-    setIframeAttributes(iframe);
-
-    const container = iframeContentContainer.value;
-    let iframeUrl = new URL(url);
-    let cleanUrl = iframeUrl.host + iframeUrl.pathname;
-
-    // If there's no iframe yet, just append it.
-    if (!container.firstChild) {
-        container.appendChild(iframe);
-        previousUrl.value = cleanUrl;
-        return;
-    }
-
-    let shouldRefresh = target.refresh;
-
-    if (hasIframeSourceChanged(container.firstChild.src, iframe.src)) {
-        shouldRefresh = true;
-    }
-
-    if (!shouldRefresh) {
-        postMessageToIframe(container, url, payload);
-        return;
-    }
-
-    let isSameOrigin = url.startsWith('/') || iframeUrl.host === window.location.host;
-    let preserveScroll = isSameOrigin && cleanUrl === previousUrl.value;
-
-    let scroll = preserveScroll
-        ? [container.firstChild.contentWindow.scrollX ?? 0, container.firstChild.contentWindow.scrollY ?? 0]
-        : null;
-
-    container.replaceChild(iframe, container.firstChild);
-
-    if (preserveScroll) {
-        let iframeContentWindow = iframe.contentWindow;
-        const iframeScrollUpdate = (event) => {
-            iframeContentWindow.scrollTo(...scroll);
-        };
-
-        iframeContentWindow.addEventListener('DOMContentLoaded', iframeScrollUpdate, true);
-        iframeContentWindow.addEventListener('load', iframeScrollUpdate, true);
-    }
-
-    previousUrl.value = cleanUrl;
-}
 
 function setIframeAttributes(iframe) {
     iframe.setAttribute('frameborder', '0');

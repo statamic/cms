@@ -2,9 +2,9 @@
     <TabTrigger :name="tab._id" class="blueprint-tab flex items-center">
         <Icon
             v-if="tab.icon"
-            :name="iconName(tab.icon)"
-            :directory="iconBaseDirectory"
-            class="h-4 w-4 ltr:mr-1 rtl:ml-1"
+            :name="tab.icon"
+            :set="iconSet"
+            class="h-4 w-4 me-1"
         />
 
         {{ __(tab.display) }}
@@ -15,7 +15,7 @@
                     class="hover:text-gray-900 active:text-gray-900 dark:hover:text-gray-400 ms-1"
                     :aria-label="__('Open Dropdown')"
                 >
-                    <Icon name="ui/chevron-down" />
+                    <Icon name="chevron-down" />
                 </button>
             </template>
             <DropdownMenu>
@@ -53,8 +53,7 @@
                         :config="{
                             handle: 'icon',
                             type: 'icon',
-                            directory: this.iconBaseDirectory,
-                            folder: this.iconSubFolder,
+                            set: iconSet,
                         }"
                         :initial-value="icon"
                         v-slot="{ meta, value, loading, config }"
@@ -122,12 +121,8 @@ export default {
             return this.currentTab === this.tab._id;
         },
 
-        iconBaseDirectory() {
-            return this.$config.get('setIconsDirectory');
-        },
-
-        iconSubFolder() {
-            return this.$config.get('setIconsFolder');
+        iconSet() {
+            return this.$config.get('replicatorSetIcons') || undefined;
         },
     },
 
@@ -172,12 +167,6 @@ export default {
 
         remove() {
             this.$emit('removed');
-        },
-
-        iconName(name) {
-            if (!name) return null;
-
-            return this.iconSubFolder ? this.iconSubFolder + '/' + name : name;
         },
     },
 };

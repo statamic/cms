@@ -1,7 +1,7 @@
 <template>
     <ui-card class="py-0.75! px-2! field-grid-item blueprint-section-field" :class="widthClass">
         <div class="flex items-center gap-2">
-            <ui-icon name="ui/handles" class="blueprint-drag-handle size-4 cursor-grab text-gray-300" />
+            <ui-icon name="handles" class="blueprint-drag-handle size-4 cursor-grab text-gray-300" />
             <div class="flex flex-1 items-center justify-between">
                 <div class="flex flex-1 items-center py-2">
                     <ui-icon
@@ -10,7 +10,7 @@
                         v-tooltip="tooltipText"
                     />
                     <div class="flex items-center gap-2">
-                        <button class="cursor-pointer overflow-hidden text-ellipsis text-sm hover:text-blue-500" type="button" v-text="__(labelText)" @click="$emit('edit')" />
+                        <button class="cursor-pointer overflow-hidden text-ellipsis text-sm hover:text-blue-600" type="button" v-text="__(labelText)" @click="$emit('edit')" />
                         <ui-icon v-if="isReferenceField" name="link" class="text-gray-400" />
                         <span v-if="isReferenceField" class="text-gray-500 font-mono text-2xs cursor-help" v-text="__('field')" v-tooltip="__('Imported from: ') + field.field_reference" />
                     </div>
@@ -26,7 +26,7 @@
                     </div>
 
                     <div class="flex items-center">
-                        <ui-button v-if="canDefineLocalizable" inset size="sm" icon="earth" :variant="localizable ? 'ghost' : 'subtle'" v-tooltip="__('Localizable')" @click="localizable = !localizable" />
+                        <ui-button v-if="canDefineLocalizable" inset size="sm" icon="earth" :variant="localizable ? 'ghost-pressed' : 'subtle'" v-tooltip="__('Localizable')" @click="localizable = !localizable" />
                         <ui-button inset size="sm" icon="duplicate" variant="subtle" @click.prevent="$emit('duplicate')" v-tooltip="__('Duplicate')" />
                         <ui-button inset size="sm" icon="trash" variant="subtle" @click.prevent="$emit('deleted')" v-tooltip="__('Remove')" />
                     </div>

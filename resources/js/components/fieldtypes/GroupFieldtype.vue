@@ -28,8 +28,7 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import ManagesPreviewText from './replicator/ManagesPreviewText';
-import Fields from '@/components/ui/Publish/Fields.vue';
-import FieldsProvider from '@/components/ui/Publish/FieldsProvider.vue';
+import { PublishFields as Fields, PublishFieldsProvider as FieldsProvider } from '@ui';
 
 export default {
     mixins: [Fieldtype, ManagesPreviewText],
@@ -66,7 +65,7 @@ export default {
             return [
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => (vm.fullScreenMode ? 'ui/shrink-all' : 'ui/expand-all'),
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'collapse-all' : 'expand-all'),
                     quick: true,
                     run: this.toggleFullscreen,
                     visible: this.config.fullscreen,

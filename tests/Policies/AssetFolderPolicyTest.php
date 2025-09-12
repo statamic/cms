@@ -1,13 +1,12 @@
 <?php
 
-namespace Policies;
+namespace Tests\Policies;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
 use Statamic\Contracts\Assets\AssetFolder;
 use Statamic\Facades\AssetContainer;
-use Tests\Policies\PolicyTestCase;
 
 class AssetFolderPolicyTest extends PolicyTestCase
 {
