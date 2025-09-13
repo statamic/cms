@@ -7,6 +7,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\View\Compilers\BladeCompiler;
 use InvalidArgumentException;
 use ParseError;
 use Statamic\Contracts\Data\Augmentable;
@@ -31,6 +32,7 @@ use Statamic\View\Antlers\Language\Nodes\AbstractNode;
 use Statamic\View\Antlers\Language\Nodes\AntlersNode;
 use Statamic\View\Antlers\Language\Nodes\Conditions\ConditionNode;
 use Statamic\View\Antlers\Language\Nodes\Conditions\ExecutionBranch;
+use Statamic\View\Antlers\Language\Nodes\DirectiveNode;
 use Statamic\View\Antlers\Language\Nodes\EscapedContentNode;
 use Statamic\View\Antlers\Language\Nodes\LiteralNode;
 use Statamic\View\Antlers\Language\Nodes\Operators\Assignment\LeftAssignmentOperator;
@@ -1268,6 +1270,17 @@ class NodeProcessor
                         continue;
                     }
 
+                    if ($node instanceof DirectiveNode) {
+                        if ($node->hasParsedRuntimeNodes == false) {
+                            $node->parsedRuntimeNodes = $this->languageParser->parse($node->runtimeNodes);
+                            $node->hasParsedRuntimeNodes = true;
+                        }
+
+                        $this->evaluateDirective($node);
+
+                        continue;
+                    }
+
                     if ($this->doStackIntercept && $node->name->name == 'stack') {
                         if ($node->isClosingTag) {
                             continue;
@@ -1584,6 +1597,16 @@ class NodeProcessor
                             'tag_method' => $tagMethod,
                         ]);
 
+                        $suspendedData = null;
+                        $capturedRuntimeState = null;
+
+                        if ($tag::$isolated) {
+                            $tag->setIsolatedContext($tagActiveData);
+                            $suspendedData = $this->getAllData();
+                            $this->data = [];
+                            $capturedRuntimeState = GlobalRuntimeState::captureAndIsolate();
+                        }
+
                         if (in_array(CachesOutput::class, class_implements($tag))) {
                             $isCacheTag = true;
                             GlobalRuntimeState::$isCacheEnabled = true;
@@ -1618,6 +1641,12 @@ class NodeProcessor
                             GlobalRuntimeState::$requiresRuntimeIsolation = $currentIsolationState;
                             GlobalRuntimeState::$evaulatingTagContents = false;
                             $this->stopMeasuringTag();
+
+                            if ($suspendedData != null) {
+                                $this->data = $suspendedData;
+
+                                GlobalRuntimeState::restoreState($capturedRuntimeState);
+                            }
                         }
 
                         $afterAssignments = $this->runtimeAssignments;
@@ -2456,34 +2485,70 @@ class NodeProcessor
         return ob_get_clean();
     }
 
-    protected function evaluateAntlersPhpNode(PhpExecutionNode $___node)
+    protected function evaluateDirective(DirectiveNode $directive)
+    {
+        $env = new Environment;
+        $env->setProcessor($this)
+            ->cascade($this->cascade)
+            ->setData($this->getActiveData());
+
+        $args = $env->evaluate($directive->parsedRuntimeNodes);
+
+        unset($env);
+
+        // We can't be sure that we're not already compiling Blade.
+        // Because of this, we need our own Blade compiler to
+        // not accidentally mess with raw PHP blocks, etc.
+        $blade = new BladeCompiler(
+            app('files'),
+            config('view.compiled'),
+            config('view.relative_hash', false) ? base_path() : '',
+            false,
+            'php',
+        );
+
+        $buffer = $blade->compileString($directive->directiveName.'($___directiveArgs)');
+
+        $this->evaluatePhpBuffer($buffer, true, [
+            '___directiveArgs' => $args,
+        ]);
+    }
+
+    protected function evaluateAntlersPhpNode(PhpExecutionNode $node)
     {
         if (! GlobalRuntimeState::$allowPhpInContent && GlobalRuntimeState::$isEvaluatingUserData) {
-            return StringUtilities::sanitizePhp($___node->content);
+            return StringUtilities::sanitizePhp($node->content);
         }
 
-        $___phpBuffer = '';
+        if (! $node->isEchoNode) {
+            $buffer = $node->content;
 
-        if ($___node->isEchoNode == false) {
-            $___phpBuffer = $___node->content;
-
-            if (! Str::contains($___node->content, $this->validPhpOpenTags)) {
-                $___phpBuffer = '<?php '.$___node->content.' ?>';
+            if (! Str::contains($node->content, $this->validPhpOpenTags)) {
+                $buffer = '<?php '.$node->content.' ?>';
             }
         } else {
-            $___phpBuffer = '<?php echo '.$___node->content.'; ?>';
+            $buffer = '<?php echo '.$node->content.'; ?>';
         }
 
+        return $this->evaluatePhpBuffer(
+            $buffer,
+            ! $node->isEchoNode
+        );
+    }
+
+    private function evaluatePhpBuffer(string $___phpBuffer, bool $___processAssignments = false, array $___extraContext = [])
+    {
         $___phpRuntimeAssignments = [];
         ob_start();
 
         try {
             extract($this->getActiveData());
+            extract($___extraContext);
             $___antlersVarBefore = get_defined_vars();
             eval('?>'.$___phpBuffer.'<?php ');
             $___antlersPhpExecutionResult = ob_get_clean();
 
-            if (! $___node->isEchoNode) {
+            if ($___processAssignments) {
                 $___antlersVarAfter = get_defined_vars();
 
                 foreach ($___antlersVarAfter as $___varKey => $___varValue) {
@@ -2498,9 +2563,12 @@ class NodeProcessor
             throw new SyntaxError("{$e->getMessage()} on line {$e->getLine()} of:\n\n{$___phpBuffer}");
         }
 
-        if (! $___node->isEchoNode && ! empty($___phpRuntimeAssignments)) {
+        if ($___processAssignments && ! empty($___phpRuntimeAssignments)) {
             unset($___phpRuntimeAssignments['___antlersVarBefore']);
             unset($___phpRuntimeAssignments['___antlersPhpExecutionResult']);
+            unset($___phpRuntimeAssignments['___extraContext']);
+            unset($___phpRuntimeAssignments['___phpBuffer']);
+            unset($___phpRuntimeAssignments['___processAssignments']);
 
             $this->processAssignments($___phpRuntimeAssignments);
         }
