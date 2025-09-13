@@ -3,6 +3,7 @@
 namespace Tests\Antlers\Components;
 
 use Illuminate\Support\Facades\Blade;
+use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Tests\Antlers\Fixtures\Components\Card;
 use Tests\Antlers\ParserTestCase;
 
@@ -120,8 +121,8 @@ Attributes: class="mt-4"
 EXPECTED;
 
         $this->assertSame(
-            $expected,
-            Blade::render($template)
+            StringUtilities::normalizeLineEndings($expected),
+            StringUtilities::normalizeLineEndings(Blade::render($template))
         );
     }
 
