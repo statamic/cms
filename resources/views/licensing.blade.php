@@ -130,6 +130,7 @@
                                                     </ui-badge>
                                                 </div>
                                             @endif
+                                        </div>
                                     </ui-table-cell>
                                     <ui-table-cell>{{ $addon->version() }}</ui-table-cell>
                                     <ui-table-cell class="text-red-700 text-end">{{ $addon->invalidReason() }}</ui-table-cell>
