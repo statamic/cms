@@ -131,6 +131,7 @@ return [
     'date_fieldtype_time_required' => 'Horaire obligatoire.',
     'duplicate_field_handle' => 'Le champ avec l’identifiant :handle ne peut pas être utilisé plus d’une fois.',
     'duplicate_uri' => 'URI en doublon :value',
+    'elevated_session_verification_code' => 'Le code de vérification est incorrect.',
     'email_available' => 'Un utilisateur possédant cet email existe déjà.',
     'fieldset_imported_recursively' => 'Le jeu de champs :handle est importé de manière récursive.',
     'one_site_without_origin' => 'Au moins un site ne doit pas avoir d’origine.',
@@ -151,6 +152,9 @@ return [
     'asset_file_exists' => 'Un fichier portant ce nom existe déjà.',
     'asset_file_exists_same_content' => 'Un fichier existe déjà avec ce nom et a le même contenu. Vous souhaiterez peut-être supprimer ceci plutôt que le renommer.',
     'asset_file_exists_different_content' => 'Un fichier existe déjà avec ce nom mais son contenu est différent. Vous pouvez remplacer l’autre fichier par celui-ci.',
+    'invalid_two_factor_code' => 'Le code d’authentification à deux facteurs fourni n’est pas valide.',
+    'invalid_two_factor_recovery_code' => 'Le code de récupération à deux facteurs fourni n’est pas valide.',
+    'bard_container_required_by_button' => '',
     'custom.attribute-name.rule-name' => 'message personnalisé',
     'attributes' => [],
 ];
