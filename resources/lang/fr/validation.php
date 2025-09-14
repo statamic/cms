@@ -154,7 +154,6 @@ return [
     'asset_file_exists_different_content' => 'Un fichier existe déjà avec ce nom mais son contenu est différent. Vous pouvez remplacer l’autre fichier par celui-ci.',
     'invalid_two_factor_code' => 'Le code d’authentification à deux facteurs fourni n’est pas valide.',
     'invalid_two_factor_recovery_code' => 'Le code de récupération à deux facteurs fourni n’est pas valide.',
-    'bard_container_required_by_button' => '',
     'custom.attribute-name.rule-name' => 'message personnalisé',
     'attributes' => [],
 ];

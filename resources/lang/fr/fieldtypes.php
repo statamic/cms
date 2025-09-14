@@ -104,7 +104,6 @@ return [
     'hidden.title' => 'Hidden',
     'html.config.html_instruct' => 'Gère le HTML à afficher dans le formulaire de publication.',
     'html.title' => 'HTML',
-    'icon.config.set' => '',
     'icon.title' => 'Icon',
     'integer.title' => 'Integer',
     'link.config.collections' => 'Les entrées de ces collections seront disponibles. Si vous laissez cette zone à blanc, les entrées des collections routables seront disponibles.',
