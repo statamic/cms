@@ -27,6 +27,7 @@
                     :indent="24"
                     :dir="direction"
                     :node-key="(stat) => stat.data.id"
+                    :dragOverThrottleInterval="30"
                     :each-droppable="eachDroppable"
                     :root-droppable="rootDroppable"
                     :max-level="maxDepth"
