@@ -2,9 +2,7 @@
 
 @php
 $requestFailed = $licenses->requestFailed();
-$requestFailed = true;
 $onPublicDomain = $licenses->isOnPublicDomain();
-$onPublicDomain = true;
 
 $base = 'relative inline-flex items-center justify-center gap-1 font-normal antialiased whitespace-nowrap no-underline not-prose [button]:cursor-pointer group [&_svg]:opacity-60 [&_svg]:group-hover:opacity-80 dark:[&_svg]:group-hover:opacity-70';
 $sizeDefault = 'text-xs leading-5.5 px-2 rounded-sm [&_svg]:size-3.5 gap-2';
@@ -15,7 +13,7 @@ $red = 'bg-red-100/80 border-red-400/80 text-red-700 dark:bg-red-300/6 dark:text
 $green = 'bg-green-100/80 border-green-400 text-green-700 dark:bg-green-300/6 dark:text-green-300 [a]:hover:bg-green-200/60 [button]:hover:bg-green-200/60 dark:[a]:hover:bg-green-300/15';
 @endphp
 
-@if (!$licenses->valid())
+@if ($licenses->valid())
     <div class="{{ $base }} {{ $flat }} {{ $sizeSm }} bg-white/15!">
         {{ __('Pro') }}
     </div>
