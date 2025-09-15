@@ -1,5 +1,5 @@
 <template>
-    <div class="relationship-input @container w-full h-full" :class="{ 'relationship-input-empty': items.length == 0 }">
+    <div class="relationship-input @container w-full" :class="{ 'relationship-input-empty': items.length == 0 }">
         <RelationshipSelectField
             v-if="!initializing && usesSelectField"
             :config="config"
