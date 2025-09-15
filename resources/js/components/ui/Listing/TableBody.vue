@@ -78,7 +78,7 @@ function handleRowClick(event, index) {
             <tr
                 v-for="(row, index) in items"
                 :key="row.id"
-                class="sortable-row outline-hidden"
+                class="sortable-row outline-hidden entry-animate-in entry-animate-in--siblings"
                 :data-row="isSelected(row.id) ? 'selected' : 'unselected'"
                 @click="handleRowClick($event, index)"
             >
