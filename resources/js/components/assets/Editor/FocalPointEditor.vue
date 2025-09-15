@@ -1,8 +1,8 @@
 <template>
     <portal name="focal-point">
         <div class="focal-point">
-            <div class="focal-point-toolbox card p-0">
-                <div class="p-4">
+            <Card class="focal-point-toolbox" inset>
+                <div class="p-6">
                     <Heading size="xl">{{ __('Focal Point') }}</Heading>
                     <Subheading>{{ __('messages.focal_point_instructions') }}</Subheading>
                     <div class="focal-point-image">
@@ -24,11 +24,11 @@
                 <div class="mb-4 flex items-center justify-center text-sm">
                     <div class="mx-4 flex items-center">
                         <div class="ltr:mr-1 rtl:ml-1">X</div>
-                        <div class="value">{{ x }}<sup>%</sup></div>
+                        <div class="value">{{ x }}%</div>
                     </div>
                     <div class="mx-4 flex items-center">
                         <div class="ltr:mr-1 rtl:ml-1">Y</div>
-                        <div class="value">{{ y }}<sup>%</sup></div>
+                        <div class="value">{{ y }}%</div>
                     </div>
                     <div class="mx-4 flex items-center">
                         <div class="ltr:mr-1 rtl:ml-1">Z</div>
@@ -37,7 +37,7 @@
                 </div>
                 <div class="px-4">
                     <input type="range" v-model="z" min="1" max="10" step="0.1" class="mb-4 w-full" />
-                    <div class="mb-4 flex flex-wrap items-center justify-center space-x-2">
+                    <div class="mb-4 flex flex-wrap items-center justify-center gap-2">
                         <Button :text="__('Cancel')" @click="close" />
                         <Button :text="__('Reset')" @click="reset" />
                         <Button variant="primary" :text="__('Finish')" @click="select" />
@@ -46,7 +46,7 @@
                 <h6 class="rounded-b bg-gray-100  p-4 text-center  dark:bg-dark-800">
                     {{ __('messages.focal_point_previews_are_examples') }}
                 </h6>
-            </div>
+            </Card>
             <div v-for="n in 9" :key="n" :class="`frame frame-${n}`">
                 <focal-point-preview-frame
                     v-if="imageDimensions"
@@ -62,11 +62,17 @@
 </template>
 
 <script>
-import { Heading, Subheading, Button } from '@/components/ui';
+import {
+    Card,
+    Heading,
+    Subheading,
+    Button,
+} from '@ui';
 import FocalPointPreviewFrame from './FocalPointPreviewFrame.vue';
 
 export default {
     components: {
+        Card,
         Heading,
         Subheading,
         Button,

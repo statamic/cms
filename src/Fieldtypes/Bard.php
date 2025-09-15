@@ -2,7 +2,10 @@
 
 namespace Statamic\Fieldtypes;
 
+use Closure;
 use Facades\Statamic\Fieldtypes\RowId;
+use Illuminate\Contracts\Validation\DataAwareRule;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
@@ -65,14 +68,14 @@ class Bard extends Replicator
                             'fixed' => __('Fixed'),
                             'floating' => __('Floating'),
                         ],
-                        'width' => 33,
+                        'width' => 50,
                     ],
                     'smart_typography' => [
                         'display' => __('Smart Typography'),
                         'instructions' => __('statamic::fieldtypes.bard.config.smart_typography'),
                         'type' => 'toggle',
                         'default' => false,
-                        'width' => 33,
+                        'width' => 50,
                     ],
                     'enable_input_rules' => [
                         'display' => __('Enable Input Rules'),
@@ -80,26 +83,26 @@ class Bard extends Replicator
                         'type' => 'toggle',
                         'default' => true,
                         'validate' => 'accepted_if:smart_typography,true',
-                        'width' => 33,
+                        'width' => 50,
                     ],
                     'enable_paste_rules' => [
                         'display' => __('Enable Paste Rules'),
                         'instructions' => __('statamic::fieldtypes.bard.config.enable_paste_rules'),
                         'type' => 'toggle',
                         'default' => true,
-                        'width' => 33,
+                        'width' => 50,
                     ],
                     'placeholder' => [
                         'display' => __('Placeholder'),
                         'instructions' => __('statamic::fieldtypes.text.config.placeholder'),
                         'type' => 'text',
-                        'width' => 33,
+                        'width' => 50,
                     ],
                     'character_limit' => [
                         'display' => __('Character Limit'),
                         'instructions' => __('statamic::fieldtypes.text.config.character_limit'),
                         'type' => 'integer',
-                        'width' => 33,
+                        'width' => 50,
                     ],
                 ],
             ],
@@ -111,21 +114,21 @@ class Bard extends Replicator
                         'instructions' => __('statamic::fieldtypes.bard.config.reading_time'),
                         'type' => 'toggle',
                         'default' => false,
-                        'width' => 33,
+                        'width' => 50,
                     ],
                     'word_count' => [
                         'display' => __('Show Word Count'),
                         'instructions' => __('statamic::fieldtypes.bard.config.word_count'),
                         'type' => 'toggle',
                         'default' => false,
-                        'width' => 33,
+                        'width' => 50,
                     ],
                     'fullscreen' => [
                         'display' => __('Allow Fullscreen Mode'),
                         'instructions' => __('statamic::fieldtypes.bard.config.fullscreen'),
                         'type' => 'toggle',
                         'default' => true,
-                        'width' => 33,
+                        'width' => 50,
                     ],
                 ],
             ],
@@ -138,21 +141,21 @@ class Bard extends Replicator
                         'instructions' => __('statamic::fieldtypes.bard.config.link_noopener'),
                         'type' => 'toggle',
                         'default' => false,
-                        'width' => 33,
+                        'width' => 50,
                     ],
                     'link_noreferrer' => [
                         'display' => __('Link Noreferrer'),
                         'instructions' => __('statamic::fieldtypes.bard.config.link_noreferrer'),
                         'type' => 'toggle',
                         'default' => false,
-                        'width' => 33,
+                        'width' => 50,
                     ],
                     'target_blank' => [
                         'display' => __('Target Blank'),
                         'type' => 'toggle',
                         'default' => false,
                         'instructions' => __('statamic::fieldtypes.bard.config.target_blank'),
-                        'width' => 33,
+                        'width' => 50,
                     ],
                     'link_collections' => [
                         'display' => __('Link Collections'),
@@ -177,6 +180,9 @@ class Bard extends Replicator
                             'buttons' => 'contains_any anchor, image',
                         ],
                         'width' => 50,
+                        'validate' => [
+                            $this->containerRequiredRule(),
+                        ],
                     ],
                 ],
             ],
@@ -201,7 +207,7 @@ class Bard extends Replicator
                         'instructions' => __('statamic::fieldtypes.bard.config.always_show_set_button'),
                         'type' => 'toggle',
                         'default' => false,
-                        'width' => 33,
+                        'width' => 50,
                     ],
                     'collapse' => [
                         'display' => __('Collapse'),
@@ -214,14 +220,14 @@ class Bard extends Replicator
                             'accordion' => __('statamic::fieldtypes.replicator.config.collapse.accordion'),
                         ],
                         'default' => false,
-                        'width' => 33,
+                        'width' => 50,
                     ],
                     'previews' => [
                         'display' => __('Field Previews'),
                         'instructions' => __('statamic::fieldtypes.bard.config.previews'),
                         'type' => 'toggle',
                         'default' => true,
-                        'width' => 33,
+                        'width' => 50,
                     ],
                 ],
             ],
@@ -796,5 +802,25 @@ class Bard extends Replicator
     public static function setDefaultButtons(array $buttons): void
     {
         static::$defaultButtons = $buttons;
+    }
+
+    private function containerRequiredRule(): ValidationRule
+    {
+        return new class implements DataAwareRule, ValidationRule
+        {
+            private $data;
+
+            public function setData(array $data)
+            {
+                $this->data = $data;
+            }
+
+            public function validate(string $attribute, mixed $value, Closure $fail): void
+            {
+                if (in_array('image', $this->data['buttons'])) {
+                    $fail('statamic::validation.bard_container_required_by_button')->translate();
+                }
+            }
+        };
     }
 }

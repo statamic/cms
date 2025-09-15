@@ -12,7 +12,7 @@
             <ui-panel-header>
                 <div class="page-tree-header font-medium text-sm items-center flex justify-between">
                     <div v-text="__('Tree Structure')" />
-                    <div class="flex gap-2 -me-3">
+                    <div class="flex gap-2">
                         <ui-button size="sm" icon="tree-collapse" :text="__('Collapse')" @click="collapseAll" />
                         <ui-button size="sm" icon="tree-expand" :text="__('Expand')" @click="expandAll" />
                     </div>
@@ -91,6 +91,7 @@
 import { dragContext, Draggable, walkTreeData } from '@he-tree/vue';
 import TreeBranch from './Branch.vue';
 import { PanelHeader, Panel, Icon } from '@/components/ui';
+import { clone } from '@/bootstrap/globals.js';
 
 export default {
     components: {
@@ -160,7 +161,7 @@ export default {
         this.collapsedState = this.getCollapsedState();
 
         this.getPages().then(() => {
-            this.initialPages = this.pages;
+            this.initialPages = clone(this.pages);
         });
 
         this.$keys.bindGlobal(['mod+s'], (e) => {
@@ -319,10 +320,16 @@ export default {
 
         expandAll() {
             this.$refs.tree.openAll();
+            this.collapsedState = [];
         },
 
         collapseAll() {
             this.$refs.tree.closeAll();
+            // Get all node IDs to mark them as collapsed
+            this.collapsedState = [];
+            walkTreeData(this.treeData, (node) => {
+                this.collapsedState.push(node.id);
+            });
         },
 
         getNodeByBranchId(id) {

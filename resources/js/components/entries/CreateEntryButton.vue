@@ -1,9 +1,9 @@
 <template>
-    <div>
+    <div class="flex">
         <Button @click="create" v-if="!hasMultipleBlueprints" :variant :text="text" :size="size" />
         <Dropdown v-else>
             <template #trigger>
-                <Button @click.prevent="create" :variant icon-append="ui/chevron-down" :text="text" :size="size" />
+                <Button @click.prevent="create" :variant icon-append="chevron-down" :text="text" :size="size" />
             </template>
             <DropdownMenu>
                 <DropdownLabel v-text="__('Choose Blueprint')" />

@@ -23,7 +23,7 @@
 
                     <statamic:get_errors:all bag="passwordProtect">
                         @foreach($messages as $message)
-                            <ui-description class="text-red-500" text="{{ $message['message'] }}" />
+                            <ui-description class="text-red-600" text="{{ $message['message'] }}" />
                         @endforeach
                     </statamic:get_errors:all>
 

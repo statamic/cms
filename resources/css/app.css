@@ -1,5 +1,5 @@
 /* =Jay. Tailwind already uses "Cascade Layers" internally. Here we are just adding an extra layer (to their internal layers) to manage states--particulary with complex fields like Bard--where specificity is much easier to handle with layers. */
-@layer base, components, utilities, ui, ui-states;
+@layer addon-theme, addon-utilities, base, components, utilities, ui, ui-states;
 
 /* =Jay. Map layers to Tailwind's internal layers so that we can inject custom layers as needed */
 @layer base {
@@ -15,7 +15,7 @@
 }
 
 @import 'tailwindcss';
-@import './ui.css';
+@import '@statamic/ui/ui.css';
 @import './cp.css';
 @import './core/utilities.css';
 @import './dark.css';
@@ -39,6 +39,28 @@
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: var(--color-gray-200, currentColor);
+    border-color: var(--color-gray-300, currentColor);
   }
+}
+
+.popoverAnimation {
+    @apply duration-100 will-change-[transform,opacity];
+    @apply data-[state=open]:animate-in data-[state=closed]:animate-out;
+    @apply data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0;
+    @apply data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95;
+    @apply data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2;
+    @apply data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2;
+}
+
+@layer components {
+    .content-card {
+        @apply min-h-full px-3 sm:px-6 md:px-12 sm:pb-6 border dark:bg-dark-content-bg dark:border-y-0 dark:border-r-0 border-content-border dark:border-dark-content-border rounded-2xl rounded-r-xl dark:rounded-none;
+        background: var(--theme-color-content-bg);
+        .nav-closed & {
+            @apply rounded-xl;
+        }
+    }
+    .dark .content-card {
+        background: var(--theme-color-dark-content-bg);
+    }
 }

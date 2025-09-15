@@ -63,14 +63,14 @@
                         <a class="group flex cursor-pointer items-center">
                             <file-icon
                                 extension="folder"
-                                class="me-2 inline-block size-8 text-blue-400 group-hover:text-blue-500"
+                                class="me-2 inline-block size-8 text-blue-400 group-hover:text-blue-600"
                             />
                             <Editable
                                 ref="newFolderInput"
                                 v-model:modelValue="newFolderName"
                                 :start-with-edit-mode="true"
                                 submit-mode="enter"
-                                :placeholder="__('New Folder')"
+                                :placeholder="__('new-folder')"
                                 @submit="$emit('create-folder', newFolderName)"
                                 @cancel="
                                     () => {
@@ -99,7 +99,7 @@
                         @click.native.stop="$emit('edit-asset', asset)"
                     />
                     <button
-                        class="cursor-pointer normal-nums select-none group-hover:text-blue-500 text-start"
+                        class="cursor-pointer normal-nums select-none group-hover:text-blue-600 text-start"
                         @click="$emit('edit-asset', asset)"
                     >
                         {{ isSearching ? asset.path : asset.basename }}
@@ -107,7 +107,7 @@
                 </div>
             </template>
             <template #prepended-row-actions="{ row: asset }">
-                <DropdownItem :text="__(canEdit ? 'Edit' : 'View')" @click="edit(asset.id)" icon="edit" />
+                <DropdownItem :text="__(asset.editable ? 'Edit' : 'View')" @click="edit(asset.id)" icon="edit" />
             </template>
         </ListingTable>
     </Card>
@@ -130,7 +130,7 @@ import {
     PanelFooter,
     PanelHeader,
     ListingTable,
-} from '@/components/ui';
+} from '@ui';
 
 export default {
     mixins: [AssetBrowserMixin],

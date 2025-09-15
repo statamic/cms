@@ -10,9 +10,10 @@
                 @update:model-value="update"
                 @focus="$emit('focus')"
                 @blur="$emit('blur')"
+                class="border-s-0"
             />
         </ui-input-group>
-        <ui-description v-if="isInvalid" class="text-red-500">{{ __('statamic::validation.url') }}</ui-description>
+        <ui-description v-if="isInvalid" class="text-red-600">{{ __('statamic::validation.url') }}</ui-description>
         <iframe
             v-if="shouldShowPreview"
             :src="embedUrl"

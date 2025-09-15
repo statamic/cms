@@ -1,5 +1,7 @@
 <?php
 
+use Statamic\CP\Color;
+
 return [
 
     /*
@@ -98,12 +100,39 @@ return [
     | Theme
     |--------------------------------------------------------------------------
     |
-    | Optionally spice up the login and other outside-the-control-panel
-    | screens. You may choose between "rad" or "business" themes.
+    | Adjust the colors used in the Control Panel. Use the Color class
+    | to easily access the Tailwind CSS color palette.
     |
     */
 
-    'theme' => env('STATAMIC_THEME', 'rad'),
+    'theme' => [
+        // 'grays' => Color::Zinc,
+
+        // 'primary' => Color::Zinc[800],
+        // 'success' => Color::Green[400],
+        // 'danger' => Color::Red[600],
+
+        // 'ui-accent' => Color::Zinc[800],
+        // 'dark-ui-accent' => Color::Zinc[200],
+
+        // 'body-bg' => Color::Zinc[100],
+        // 'body-border' => Color::Transparent,
+        // 'dark-body-bg' => Color::Zinc[900],
+        // 'dark-body-border' => Color::Zinc[950],
+
+        // 'global-header-bg' => Color::Zinc[800],
+        // 'dark-global-header-bg' => Color::Zinc[800],
+
+        // 'content-bg' => "linear-gradient(to right, hsl(0,0%,99%), #ffffff)",
+        // 'content-border' => Color::Zinc[200],
+        // 'dark-content-bg' => Color::Zinc[900],
+        // 'dark-content-border' => Color::Zinc[950],
+
+        // 'progress-bar' => Color::Volt,
+
+        // 'switch-bg' => Color::Green[500],
+        // 'dark-switch-bg' => Color::Green[600],
+    ],
 
     /*
     |--------------------------------------------------------------------------

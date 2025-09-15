@@ -15,7 +15,7 @@
                     allow-selecting-existing-upload
                     :allow-bulk-actions="false"
                     @selections-updated="selectionsUpdated"
-                    @asset-doubleclicked="select"
+                    @edit-asset="toggleAssetSelection"
                     @initialized="focusSearchInput"
                 >
                     <template #initializing>
@@ -138,9 +138,12 @@ export default {
     },
 
     watch: {
-        browserSelections(selections) {
-            if (this.maxFiles === 1 && selections.length === 1) {
-                this.select();
+        browserSelections: {
+            deep: true,
+            handler: function (selections) {
+                if (this.maxFiles === 1 && selections.length === 1) {
+                    this.select();
+                }
             }
         },
     },
@@ -166,6 +169,12 @@ export default {
          */
         selectionsUpdated(selections) {
             this.browserSelections = selections;
+        },
+
+        toggleAssetSelection(asset) {
+            this.browserSelections = this.browserSelections.includes(asset.id)
+                ? this.browserSelections.filter(id => id !== asset.id)
+                : [...this.browserSelections, asset.id];
         },
 
         focusSearchInput() {

@@ -1,5 +1,5 @@
 <script setup>
-import { Icon, Badge } from '@/components/ui';
+import { Icon, Badge } from '@ui';
 
 defineProps({
     localization: {
@@ -21,7 +21,7 @@ defineProps({
                 :class="{
                     'bg-green-600': localization.published,
                      'bg-gray-500': !localization.published,
-                     'bg-red-500': !localization.exists,
+                     'bg-red-600': !localization.exists,
                 }"
             />
             {{ __(localization.name) }}

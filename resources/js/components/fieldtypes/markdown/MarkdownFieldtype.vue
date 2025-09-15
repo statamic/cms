@@ -3,8 +3,8 @@
         <element-container @resized="refresh">
             <div
                 class="
-                    @container/markdown w-full block bg-white dark:bg-gray-800! rounded-lg relative
-                    border border-gray-300 with-contrast:border-gray-500 dark:border-x-0 dark:border-t-0 dark:border-white/10 dark:inset-shadow-2xs dark:inset-shadow-black
+                    @container/markdown w-full block bg-white dark:bg-gray-900! rounded-lg relative
+                    border border-gray-300 with-contrast:border-gray-500 dark:border-white/15 dark:inset-shadow-2xs dark:inset-shadow-black
                     text-gray-900 dark:text-gray-300
                     appearance-none antialiased shadow-ui-sm disabled:shadow-none
                 "
@@ -151,7 +151,7 @@
                             class="absolute top-4 end-4"
                             @click="showCheatsheet = false"
                         />
-                        <div class="prose prose-zinc prose-headings:font-medium mx-auto my-8 max-w-3xl">
+                        <div class="prose dark:prose-invert prose-zinc prose-headings:font-medium prose-pre:prose-code:!text-white mx-auto my-8 max-w-3xl">
                             <h2 v-text="__('Markdown Cheatsheet')"></h2>
                             <div v-html="__('markdown.cheatsheet')"></div>
                         </div>
@@ -806,7 +806,7 @@ export default {
             return [
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => (vm.fullScreenMode ? 'ui/collapse-all' : 'ui/expand-all'),
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'collapse-all' : 'expand-all'),
                     quick: true,
                     visibleWhenReadOnly: true,
                     run: this.toggleFullscreen,

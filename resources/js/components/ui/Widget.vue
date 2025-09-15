@@ -1,5 +1,5 @@
 <script setup>
-import { Card, Icon } from '@/components/ui';
+import { Card, Icon } from '@ui';
 
 defineProps({
     title: String,

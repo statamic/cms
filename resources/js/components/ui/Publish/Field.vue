@@ -2,7 +2,12 @@
 import { computed, useTemplateRef, watch, ref, inject } from 'vue';
 import { injectContainerContext } from './Container.vue';
 import { injectFieldsContext } from './FieldsProvider.vue';
-import { Field, Icon, Tooltip, Label } from '@/components/ui';
+import {
+    Field,
+    Icon,
+    Tooltip,
+    Label,
+} from '@ui';
 import FieldActions from '@/components/field-actions/FieldActions.vue';
 import ShowField from '@/components/field-conditions/ShowField.js';
 
@@ -17,6 +22,7 @@ const {
     values: containerValues,
     extraValues: containerExtraValues,
     visibleValues: containerVisibleValues,
+    revealerValues,
     meta: containerMeta,
     syncField,
     desyncField,
@@ -30,8 +36,8 @@ const {
     setFieldValue,
     setFieldMeta,
     hiddenFields,
-    revealerFields,
     setHiddenField,
+    container,
 } = injectContainerContext();
 const { fieldPathPrefix, metaPathPrefix } = injectFieldsContext();
 const handle = props.config.handle;
@@ -112,9 +118,10 @@ const shouldShowField = computed(() => {
         visibleValues.value,
         extraValues.value,
         containerVisibleValues.value,
+        revealerValues.value,
         hiddenFields.value,
-        revealerFields.value,
-        setHiddenField
+        setHiddenField,
+        { container },
     ).showField(props.config, fullPath.value);
 });
 
@@ -214,7 +221,7 @@ const fieldtypeComponentEvents = computed(() => ({
             <template #label v-if="shouldShowLabel">
                 <Label :for="fieldId" :required="isRequired">
                     <template v-if="shouldShowLabelText">
-                        <Tooltip :text="config.handle" :delay="1000">
+                        <Tooltip :text="config.handle" :delay="1000" as="span">
                             {{ __(config.display) }}
                         </Tooltip>
                     </template>
@@ -225,7 +232,7 @@ const fieldtypeComponentEvents = computed(() => ({
             <template #actions v-if="shouldShowFieldActions">
                 <FieldActions :actions="fieldActions" />
             </template>
-            <div class="text-xs text-red-500" v-if="!fieldtypeComponentExists">
+            <div class="text-xs text-red-600" v-if="!fieldtypeComponentExists">
                 Component <code v-text="fieldtypeComponent"></code> does not exist.
             </div>
             <Component

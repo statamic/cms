@@ -4,7 +4,7 @@
             <Tabs v-model="currentTab" :unmount-on-hide="false">
                 <div v-if="!singleTab && tabs.length > 0" class="flex items-center justify-between gap-x-2 mb-6">
                     <TabList class="flex-1">
-                        <div ref="tabs" class="flex-1">
+                        <div ref="tabs" class="flex-1 flex items-center">
                             <BlueprintTab
                                 ref="tab"
                                 v-for="tab in tabs"
@@ -29,7 +29,7 @@
                     @click="addAndEditTab"
                 />
 
-                <Description v-if="errors" v-for="(error, i) in errors" :key="i" :text="error" class="mt-2 text-red-500" />
+                <Description v-if="errors" v-for="(error, i) in errors" :key="i" :text="error" class="mt-2 text-red-600" />
 
                 <BlueprintTabContent
                     v-for="tab in tabs"
