@@ -68,7 +68,7 @@ const forwardedTableCellSlots = computed(() => {
         </TableBody>
     </table>
     <div v-if="items.length === 0">
-        <div class="text-center text-gray-500 text-sm pt-4">
+        <div class="text-center text-gray-500 text-sm py-4">
             {{ __('No items found') }}
         </div>
     </div>
