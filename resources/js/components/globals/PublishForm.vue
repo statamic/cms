@@ -16,8 +16,8 @@
             <SiteSelector
                 v-if="showLocalizationSelector"
                 :sites="localizations"
-                :value="site"
-                @input="localizationSelected"
+                :model-value="site"
+                @update:modelValue="localizationSelected"
             />
 
             <div class="hidden items-center gap-3 md:flex">

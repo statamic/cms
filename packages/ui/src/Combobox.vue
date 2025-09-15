@@ -1,6 +1,6 @@
 <script setup>
 import { cva } from 'cva';
-import { ComboboxAnchor, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxRoot, ComboboxTrigger, ComboboxPortal, ComboboxViewport } from 'reka-ui';
+import { ComboboxAnchor, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxRoot, ComboboxTrigger, ComboboxPortal, ComboboxViewport, FocusScope } from 'reka-ui';
 import { computed, nextTick, ref, useAttrs, useTemplateRef, watch } from 'vue';
 import Button from './Button/Button.vue';
 import Icon from './Icon/Icon.vue';
@@ -282,12 +282,12 @@ defineExpose({
                                 @keydown.space="openOnSpace"
                             />
 
-                            <button type="button" class="w-full text-start truncate flex items-center gap-2 bg-transparent cursor-pointer" v-else-if="!searchable && (dropdownOpen || !modelValue)" @keydown.space="openOnSpace" data-ui-combobox-placeholder>
+                            <button type="button" class="w-full text-start truncate flex items-center gap-2 bg-transparent cursor-pointer focus:outline-none" v-else-if="!searchable && (dropdownOpen || !modelValue)" @keydown.space="openOnSpace" data-ui-combobox-placeholder>
                             <Icon v-if="icon" :name="icon" class="text-gray-400 dark:text-white dark:opacity-50" />
                                 <span class="text-gray-400 dark:text-gray-500" v-text="placeholder" />
                             </button>
 
-                            <button type="button" v-else class="w-full text-start bg-transparent truncate flex items-center gap-2 cursor-pointer" @keydown.space="openOnSpace" data-ui-combobox-selected-option>
+                            <button type="button" v-else class="w-full text-start bg-transparent truncate flex items-center gap-2 cursor-pointer focus:outline-none" @keydown.space="openOnSpace" data-ui-combobox-selected-option>
                                 <slot name="selected-option" v-bind="{ option: selectedOption }">
                                     <Icon v-if="icon" :name="icon" class="text-white/85 dark:text-white dark:opacity-50" />
                                     <span v-if="labelHtml" v-html="getOptionLabel(selectedOption)" />
@@ -315,34 +315,44 @@ defineExpose({
                         @escape-key-down="nextTick(() => $refs.trigger.$el.focus())"
                         data-ui-combobox-content
                     >
-                        <ComboboxViewport>
-                            <ComboboxEmpty class="p-2 text-sm" data-ui-combobox-empty>
-                                <slot name="no-options" v-bind="{ searchQuery }">
-                                    {{ __('No options available.') }}
-                                </slot>
-                            </ComboboxEmpty>
+                        <FocusScope
+                            trapped
+                            @mount-auto-focus.prevent
+                            @unmount-auto-focus="(event) => {
+                                if (event.defaultPrevented) return;
+                                $refs.trigger.$el.focus();
+                                event.preventDefault();
+                            }"
+                        >
+                            <ComboboxViewport>
+                                <ComboboxEmpty class="p-2 text-sm" data-ui-combobox-empty>
+                                    <slot name="no-options" v-bind="{ searchQuery }">
+                                        {{ __('No options available.') }}
+                                    </slot>
+                                </ComboboxEmpty>
 
-                            <ComboboxItem
-                                v-if="filteredOptions"
-                                v-for="(option, index) in filteredOptions"
-                                :key="index"
-                                :value="getOptionValue(option)"
-                                :text-value="getOptionLabel(option)"
-                                :class="itemClasses({ size: size, selected: isSelected(option) })"
-                                as="button"
-                                :data-ui-combobox-item="getOptionValue(option)"
-                                @select="() => {
-                                    dropdownOpen = !closeOnSelect;
-                                    if (closeOnSelect) $refs.trigger.$el.focus();
-                                }"
-                            >
-                                <slot name="option" v-bind="option">
-                                    <img v-if="option.image" :src="option.image" class="size-5 rounded-full" />
-                                    <span v-if="labelHtml" v-html="getOptionLabel(option)" />
-                                    <span v-else>{{ __(getOptionLabel(option)) }}</span>
-                                </slot>
-                            </ComboboxItem>
-                        </ComboboxViewport>
+                                <ComboboxItem
+                                    v-if="filteredOptions"
+                                    v-for="(option, index) in filteredOptions"
+                                    :key="index"
+                                    :value="getOptionValue(option)"
+                                    :text-value="getOptionLabel(option)"
+                                    :class="itemClasses({ size: size, selected: isSelected(option) })"
+                                    as="button"
+                                    :data-ui-combobox-item="getOptionValue(option)"
+                                    @select="() => {
+                                        dropdownOpen = !closeOnSelect;
+                                        if (closeOnSelect) $refs.trigger.$el.focus();
+                                    }"
+                                >
+                                    <slot name="option" v-bind="option">
+                                        <img v-if="option.image" :src="option.image" class="size-5 rounded-full" />
+                                        <span v-if="labelHtml" v-html="getOptionLabel(option)" />
+                                        <span v-else>{{ __(getOptionLabel(option)) }}</span>
+                                    </slot>
+                                </ComboboxItem>
+                            </ComboboxViewport>
+                        </FocusScope>
                     </ComboboxContent>
                 </ComboboxPortal>
             </ComboboxRoot>

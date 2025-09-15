@@ -22,27 +22,39 @@ let serverItemsLoaded = ref(false);
 let searchResults = ref([]);
 let selected = ref(null);
 let recentItems = ref(getRecentItems());
+let keyboardBindings = ref([]);
 
 Statamic.$keys.bindGlobal(['mod+k'], (e) => {
     e.preventDefault();
     open.value = true;
 });
 
-each({
-    esc: () => open.value = false,
-    'ctrl+n': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' })),
-    'ctrl+p': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp' })),
-    mod: () => metaPressed.value = true,
-}, (callback, binding) => {
-    Statamic.$keys.bindGlobal([binding], (e) => {
-        if (open.value) {
-            e.preventDefault();
-            callback();
-        }
+function bindKeyboardShortcuts() {
+    each({
+        esc: () => open.value = false,
+        'ctrl+n': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' })),
+        'ctrl+p': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp' })),
+        mod: () => metaPressed.value = true,
+    }, (callback, binding) => {
+        keyboardBindings.value.push(Statamic.$keys.bindGlobal([binding], (e) => {
+            if (open.value) {
+                e.preventDefault();
+                callback();
+            }
+        }));
     });
-});
 
-Statamic.$keys.bind('mod+keyup', () => metaPressed.value = false);
+    keyboardBindings.value.push(Statamic.$keys.bind('mod+keyup', () => metaPressed.value = false));
+}
+
+watch(
+    () => open.value,
+    (isOpen) => {
+        isOpen
+            ? bindKeyboardShortcuts()
+            : keyboardBindings.value.forEach((binding) => binding.destroy());
+    }
+)
 
 const actionItems = computed(() => {
     return sortJsInjectedItems(Statamic.$commandPalette.actions().filter(item => item.when()));
@@ -116,7 +128,28 @@ function normalizeItem(item) {
         item.text = item.text.join(' » ');
     }
 
+    if (typeof item.keys === 'string') {
+        item.keys = renderKeys(item.keys);
+    }
+
     return item;
+}
+
+function renderKeys(keys) {
+    return keys.toLowerCase().split('+').map(key => {
+        switch(key) {
+            case "command":
+            case "cmd":
+                return "⌘";
+            case "control":
+            case "ctrl":
+                return "^";
+            case "mod":
+                return "⌘"; // TODO: handle normalizing 'mod' cross platform
+            default:
+                return key;
+        }
+    }).map(key => key.toUpperCase());
 }
 
 watch(selected, (item) => {
@@ -243,7 +276,7 @@ const modalClasses = cva({
         <DialogTrigger>
             <div class="
                 data-[focus-visible]:outline-focus hover flex cursor-text items-center gap-x-1.5 group h-8
-                rounded-lg [button:has(>&)]:rounded-md bg-black/15 text-xs text-white/70 outline-none
+                rounded-lg [button:has(>&)]:rounded-md bg-black/40 text-xs text-white/60 outline-none
                 border-b border-b-white/20 inset-shadow-sm inset-shadow-black/20
                 md:w-32 md:py-[calc(5/16*1rem)] md:px-2
                 hover:bg-black/45 hover:text-white/70
@@ -319,7 +352,8 @@ const modalClasses = cva({
                                             :icon="item.icon"
                                             :href="item.url"
                                             :open-new-tab="metaPressed || item.openNewTab"
-                                            :badge="item.keys || item.badge"
+                                            :badge="item.badge"
+                                            :keys="item.keys"
                                             :removable="isRecentItem(item)"
                                             @remove="removeRecentItem"
                                         >

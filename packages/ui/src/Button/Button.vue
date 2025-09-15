@@ -53,12 +53,12 @@ const buttonClasses = computed(() => {
                 xs: 'px-2 h-6 text-xs gap-1.5 rounded-md [&_svg]:size-2.5',
             },
             groupBorder: {
-                default:
-                    'in-data-ui-button-group:border-s-0 [:is([data-ui-button-group]>&:first-child,_[data-ui-button-group]_:first-child>&)]:border-s-[1px]',
-                primary:
-                    'in-data-ui-button-group:border-s-0 [:is([data-ui-button-group]>&:first-child,_[data-ui-button-group]_:first-child>&)]:border-s-[1px] [:is([data-ui-button-group]>&:last-child,_[data-ui-button-group]_:last-child>&)]:border-e-[1px] [:is([data-ui-button-group]>&:not(:first-child),_[data-ui-button-group]_:not(:first-child)>&)]:border-s-primary-gap',
                 danger: 'in-data-ui-button-group:border-s-0 in-data-ui-button-group:border-e [:is([data-ui-button-group]>&:last-child,_[data-ui-button-group]_:last-child>&)]:border-e-0 in-data-ui-button-group:border-red-600',
-                filled: 'in-data-ui-button-group:border-e [:is([data-ui-button-group]>&:last-child,_[data-ui-button-group]_:last-child>&)]:border-e-0 in-data-ui-button-group:border-gray-300/70',
+                // Danger button base styling should be the same as default buttons when in a group
+                danger: [
+                    'btn-danger in-data-ui-button-group:bg-linear-to-b in-data-ui-button-group:from-white in-data-ui-button-group:to-gray-50 in-data-ui-button-group:hover:to-gray-100 in-data-ui-button-group:hover:bg-gray-50 in-data-ui-button-group:text-gray-900 in-data-ui-button-group:border in-data-ui-button-group:border-gray-300 in-data-ui-button-group:shadow-ui-sm',
+                    'dark:from-gray-850 dark:to-gray-900 dark:hover:to-gray-850 dark:hover:bg-gray-900 dark:border-gray-700 dark:text-gray-300 dark:shadow-ui-md',
+                ],
                 ghost: '',
                 pressed: 'in-data-ui-button-group:border-s-0 [:is([data-ui-button-group]>&:first-child,_[data-ui-button-group]_:first-child>&)]:border-s-[1px]',
             },

@@ -21,7 +21,7 @@ jobs:
         run: npm ci
 
       - name: Build release assets
-        run: ./scripts/build-release.sh
+        run: bash ./scripts/build-release.sh
 
       - name: Get Changelog
         id: changelog
