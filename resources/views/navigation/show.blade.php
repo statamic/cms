@@ -1,7 +1,7 @@
 @inject('str', 'Statamic\Support\Str')
 @extends('statamic::layout')
 @section('title', Statamic::crumb($nav->title(), 'Navigation'))
-@section('content-card-modifiers', 'bg-architectural-lines bg-architectural-lines--simple')
+@section('content-card-modifiers', $nav->in($site)->pages()->all()->isEmpty() ? 'bg-architectural-lines bg-architectural-lines--simple' : '')
 
 @section('content')
     <navigation-view
