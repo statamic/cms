@@ -1,10 +1,10 @@
 <template>
     <div>
-        <div v-if="!loading && pages.length == 0" class="no-results flex w-full items-center">
+        <div v-if="!loading && treeData.length == 0" class="no-results flex w-full items-center">
             <slot name="empty" />
         </div>
 
-        <ui-panel v-show="pages.length">
+        <ui-panel v-show="treeData.length">
             <div class="loading card" v-if="loading">
                 <Icon name="loading" />
             </div>
