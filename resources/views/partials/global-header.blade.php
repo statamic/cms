@@ -117,25 +117,10 @@
         @if (Statamic\Facades\Site::authorized()->count() > 1)
             <global-site-selector></global-site-selector>
         @endif
-        <div class="flex items-center"><command-palette /></div>
-        <ui-command-palette-item
-            text="{{ __('View Site') }}"
-            icon="visit-website"
-            url="{{ Statamic\Facades\Site::selected()->url() }}"
-            open-new-tab
-            v-slot="{ text, url, icon }"
-        >
-            <ui-button
-                :aria-label="text"
-                :href="url"
-                :icon="icon"
-                class="[&_svg]:size-4 -me-2 [&_svg]:text-white/85!"
-                size="sm"
-                target="_blank"
-                v-tooltip="text"
-                variant="ghost"
-            ></ui-button>
-        </ui-command-palette-item>
+        <div class="flex items-center">
+            <x-statamic::command-palette />
+        </div>
+        <x-statamic::view-site-button />
         <x-statamic::user-dropdown />
     </div>
 </header>
