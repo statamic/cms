@@ -13,6 +13,7 @@
   "dependencies": {
     "@floating-ui/dom": "^1.2.5",
     "@shopify/draggable": "^1.0.0-beta.12",
+    "@simplewebauthn/browser": "^8.3.4",
     "@tiptap/core": "^2.0.2",
     "@tiptap/extension-blockquote": "^2.0.2",
     "@tiptap/extension-bold": "^2.0.2",
