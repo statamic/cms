@@ -309,6 +309,12 @@
         }
     }
 }
+/* This as a couple less  */
+@utility bg-architectural-lines--simple {
+    &::before {
+        background-image: url('../../svg/architectural-lines-simple.svg');
+    }
+}
 
 /* UTILITIES / DECORATION / CHECKERBOARD
 =================================================== */

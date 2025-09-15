@@ -1,6 +1,8 @@
 @extends('statamic::layout')
 
 @section('content')
+@section('content-card-modifiers', 'bg-architectural-lines')
+
     <nav-builder
         title="{{ $title }}"
         index-url="{{ Statamic\Statamic::pro() && Statamic\Facades\User::current()->can('manage preferences') ? cp_route('preferences.nav.index') : false }}"
