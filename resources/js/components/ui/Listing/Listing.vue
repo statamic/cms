@@ -6,6 +6,7 @@ export const [injectListingContext, provideListingContext] = createContext('List
 
 <script setup>
 import { ref, toRef, computed, watch, nextTick, onMounted, onBeforeUnmount, useSlots } from 'vue';
+import useSkeletonDelay from '@/composables/skeleton-delay.js';
 import {
     Icon,
     Panel,
@@ -160,11 +161,7 @@ const hasActions = computed(() => !!props.actionUrl);
 const hasFilters = computed(() => props.filters && props.filters.length > 0);
 const showPresets = computed(() => props.allowPresets && props.preferencesPrefix);
 const showBulkActions = computed(() => props.allowBulkActions && hasActions.value);
-
-// We only want to show the skeleton after a small delay, to avoid flickering when loading is very fast.
-const shouldShowSkeleton = ref(false);
-setTimeout(() => shouldShowSkeleton.value = initializing.value, 300);
-watch(initializing, () => shouldShowSkeleton.value = false);
+const shouldShowSkeleton = useSkeletonDelay(initializing);
 
 const items = computed({
     get() {
