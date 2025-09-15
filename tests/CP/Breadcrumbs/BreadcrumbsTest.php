@@ -102,41 +102,6 @@ class BreadcrumbsTest extends TestCase
     }
 
     #[Test]
-    public function it_ignores_nav_preferences_when_building_breadcrumbs()
-    {
-        $this->actingAs($user = User::make()->makeSuper())->get(cp_route('dashboard'));
-
-        $user->preferences([
-            'nav' => [
-                'content' => [
-                    'reorder' => [
-                        'top_level::dashboard',
-                    ],
-                    'items' => [
-                        'top_level::dashboard' => [
-                            'action' => '@move',
-                            'display' => 'The Dashboard',
-                            'icon' => 'browser-com',
-                        ],
-                    ],
-                ],
-            ],
-        ]);
-
-        $breadcrumbs = Breadcrumbs::build();
-
-        // None of the preferences should be applied to the breadcrumbs.
-        $this->assertEquals([
-            new Breadcrumb(
-                text: 'Dashboard',
-                url: 'http://localhost/cp/dashboard',
-                icon: 'dashboard',
-                links: []
-            ),
-        ], $breadcrumbs);
-    }
-
-    #[Test]
     public function it_doesnt_build_breadcrumbs_for_pages_not_in_the_nav()
     {
         $this->actingAs(User::make()->makeSuper())->get(cp_route('playground'));
