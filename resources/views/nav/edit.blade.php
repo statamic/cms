@@ -1,7 +1,6 @@
 @extends('statamic::layout')
 
 @section('content')
-@section('content-card-modifiers', 'bg-architectural-lines')
 
     <nav-builder
         title="{{ $title }}"
