@@ -52,6 +52,13 @@ function formatDate(value) {
         :sort-column="initialSortColumn"
         :sort-direction="initialSortDirection"
     >
+        <template #initializing>
+            <Widget v-bind="widgetProps">
+                <div class="flex flex-col gap-[9px] justify-between py-3 px-4">
+                    <ui-skeleton v-for="i in initialPerPage" class="h-[19px] w-full" />
+                </div>
+            </Widget>
+        </template>
         <template #default="{ items, loading }">
             <Widget v-bind="widgetProps">
                 <ui-description v-if="!items.length" class="flex-1 flex items-center justify-center">
