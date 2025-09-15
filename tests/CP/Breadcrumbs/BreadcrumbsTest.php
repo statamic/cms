@@ -102,6 +102,46 @@ class BreadcrumbsTest extends TestCase
     }
 
     #[Test]
+    public function it_uses_nav_preferences_when_building_breadcrumbs()
+    {
+        $this->actingAs($user = User::make()->makeSuper())->get(cp_route('dashboard'));
+
+        $user->preferences([
+            'nav' => [
+                'content' => [
+                    'reorder' => [
+                        'top_level::dashboard',
+                    ],
+                    'items' => [
+                        'top_level::dashboard' => [
+                            'action' => '@move',
+                            'display' => 'The Dashboard',
+                            'icon' => 'browser-com',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $breadcrumbs = Breadcrumbs::build();
+
+        $this->assertEquals([
+            new Breadcrumb(
+                text: 'The Dashboard',
+                url: 'http://localhost/cp/dashboard',
+                icon: 'browser-com',
+                links: [
+                    ['icon' => 'collections', 'text' => 'Collections', 'url' => 'http://localhost/cp/collections'],
+                    ['icon' => 'navigation', 'text' => 'Navigation', 'url' => 'http://localhost/cp/navigation'],
+                    ['icon' => 'taxonomies', 'text' => 'Taxonomies', 'url' => 'http://localhost/cp/taxonomies'],
+                    ['icon' => 'assets', 'text' => 'Assets', 'url' => 'http://localhost/cp/assets'],
+                    ['icon' => 'globals', 'text' => 'Globals', 'url' => 'http://localhost/cp/globals'],
+                ]
+            ),
+        ], $breadcrumbs);
+    }
+
+    #[Test]
     public function it_doesnt_build_breadcrumbs_for_pages_not_in_the_nav()
     {
         $this->actingAs(User::make()->makeSuper())->get(cp_route('playground'));
