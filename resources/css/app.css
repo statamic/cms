@@ -64,30 +64,3 @@
         background: var(--theme-color-dark-content-bg);
     }
 }
-
-
-::view-transition-group(root) {
- /* Delay slightly to smooth things out. Bear in mind 0.25 is the default - https://developer.mozilla.org/en-US/docs/Web/CSS/::view-transition-old */
- /* animation-duration: 5s; */
-}
-::view-transition-new(root) {
- /* animation-delay: 100ms; */
-}
-
-::view-transition-group(header) {
- /* animation-duration: 1s; */
-}
-
-
-/* ::view-transition-old(root) {
- animation-duration: 150ms;
-}
-::view-transition-new(root) {
- animation: 150ms 100ms both slide-up;
-}
-@keyframes slide-up {
- from {
-   opacity: 0;
-   transform: translateY(10vh);
- }
-} */
