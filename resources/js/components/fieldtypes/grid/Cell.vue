@@ -1,15 +1,15 @@
 <template>
     <td class="grid-cell" :class="classes" :width="width">
-        <PublishField :config="field" />
+        <Field :config="field" />
     </td>
 </template>
 
 <script>
-import { PublishField } from '@ui';
+import { PublishField as Field } from '@ui';
 
 export default {
     components: {
-        PublishField,
+        Field,
     },
 
     props: {
