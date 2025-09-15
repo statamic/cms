@@ -161,6 +161,11 @@ const hasFilters = computed(() => props.filters && props.filters.length > 0);
 const showPresets = computed(() => props.allowPresets && props.preferencesPrefix);
 const showBulkActions = computed(() => props.allowBulkActions && hasActions.value);
 
+// We only want to show the skeleton after a small delay, to avoid flickering when loading is very fast.
+const shouldShowSkeleton = ref(false);
+setTimeout(() => shouldShowSkeleton.value = initializing.value, 300);
+watch(initializing, () => shouldShowSkeleton.value = false);
+
 const items = computed({
     get() {
         let items = rawItems.value;
@@ -668,8 +673,8 @@ autoApplyState();
 </script>
 
 <template>
-    <slot name="initializing" v-if="initializing">
-        <div class="flex flex-col gap-4 justify-between mt-2">
+    <slot name="initializing" v-if="shouldShowSkeleton">
+        <div class="flex flex-col gap-4 justify-between mt-2 animate-in fade-in duration-[1s]">
             <ui-skeleton class="h-3 w-48" />
             <div class="flex gap-3">
                 <ui-skeleton class="h-8 w-80" />
