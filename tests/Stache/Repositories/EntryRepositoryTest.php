@@ -3,6 +3,7 @@
 namespace Tests\Stache\Repositories;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Entries\EntryCollection;
@@ -188,6 +189,27 @@ class EntryRepositoryTest extends TestCase
         $this->assertInstanceOf(Entry::class, $entry);
         $this->assertEquals('pages-directors', $entry->id());
         $this->assertEquals('Directors', $entry->title());
+    }
+
+    #[Test, Group('EntryRepository#findByIds')]
+    #[DataProvider('entriesByIdsProvider')]
+    public function it_gets_entries_by_ids($ids, $expected)
+    {
+        $actual = $this->repo->findByIds($ids);
+
+        $this->assertInstanceOf(EntryCollection::class, $actual);
+        $this->assertEquals($expected, $actual->map->get('title')->all());
+    }
+
+    public static function entriesByIdsProvider()
+    {
+        return [
+            'no ids' => [[], []],
+            'single' => [['numeric-one'], ['One']],
+            'multiple' => [['numeric-one', 'numeric-two', 'numeric-three'], ['One', 'Two', 'Three']],
+            'missing' => [['numeric-one', 'unknown', 'numeric-three'], ['One', 'Three']],
+            'ordered' => [['numeric-three', 'numeric-one', 'numeric-two'], ['Three', 'One', 'Two']],
+        ];
     }
 
     #[Test]
