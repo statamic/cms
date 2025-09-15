@@ -54,63 +54,7 @@
         </div>
         @endif
 
-        <div class="items-center gap-2 hidden md:flex" data-global-header-breadcrumbs v-cloak>
-            @foreach($breadcrumbs as $breadcrumb)
-                <div class="items-center gap-2 md:flex entry-animate-in entry-animate-in--quick">
-                <span class="text-white/30">/</span>
-                <ui-button href="{{ $breadcrumb->url() }}" text="{{ __($breadcrumb->text()) }}" size="sm" variant="ghost" class="dark:text-white/85! hover:text-white! px-2! mr-1.75"></ui-button>
-                @if($breadcrumb->hasLinks() || $breadcrumb->createUrl())
-                    <ui-dropdown class="relative" aria-label="{{ __('More options for') }} {{ __($breadcrumb->text()) }}">
-                        <template #trigger>
-                            <ui-button
-                                variant="ghost"
-                                icon="chevron-vertical"
-                                class="[&_svg]:size-3! h-8! w-4! hover:bg-gray-300/5! -ml-3 mr-1"
-                                :aria-label="'{{ __('Options for') }} {{ __($breadcrumb->text()) }}'"
-                                aria-haspopup="true"
-                                aria-expanded="false"
-                            ></ui-button>
-                        </template>
-                        <ui-dropdown-header
-                            class="grid grid-cols-[auto_1fr_auto] items-center"
-                            icon="{{ $breadcrumb->icon() }}"
-                            @if($breadcrumb->hasConfigureUrl())
-                                append-icon="cog-solid"
-                                append-href="{{ $breadcrumb->configureUrl() }}"
-                            @endif
-                            role="menuitem"
-                        >
-                            <a href="{{ $breadcrumb->url() }}" aria-label="{{ __('Navigate to') }} {{ __($breadcrumb->text()) }}">
-                                {{ __($breadcrumb->text()) }}
-                            </a>
-                        </ui-dropdown-header>
-                        @if($breadcrumb->hasLinks())
-                            <ui-dropdown-menu role="menu">
-                                @foreach($breadcrumb->links() as $link)
-                                    <ui-dropdown-item
-                                        text="{{ __($link->text) }}"
-                                        icon="{{ $link->icon }}"
-                                        href="{{ $link->url }}"
-                                        role="menuitem"
-                                        :aria-label="'{{ __($link->text) }} - {{ __('Navigate to') }}'"
-                                    ></ui-dropdown-item>
-                                @endforeach
-                            </ui-dropdown-menu>
-                        @endif
-                        @if($breadcrumb->createUrl())
-                            <ui-dropdown-footer
-                                icon="plus"
-                                text="{{ __($breadcrumb->createLabel()) }}"
-                                href="{{ $breadcrumb->createUrl() }}"
-                                role="menuitem"
-                                :aria-label="'{{ __($breadcrumb->createLabel()) }} - {{ __('Create new') }}'"
-                            ></ui-button>
-                        @endif
-                    </ui-dropdown>
-                    </div>
-                @endif
-            @endforeach
-        </div>
+        <x-statamic::breadcrumbs :$breadcrumbs />
     </div>
 
     <div class="dark flex-1 flex gap-1 md:gap-3 items-center justify-end shrink-0">
