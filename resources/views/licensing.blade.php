@@ -37,7 +37,7 @@
         </ui-card>
     @else
 
-        <section class="space-y-6">
+        <section class="space-y-6" v-cloak>
             @if ($configCached)
                 <ui-card-panel heading="{{ __('Configuration is cached') }}">
                     <p class="text-gray-700 text-sm">{!! __('statamic::messages.licensing_config_cached_warning') !!}</p>

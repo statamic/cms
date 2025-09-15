@@ -26,7 +26,7 @@
             </ui-command-palette-item>
         </form>
     </ui-header>
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" v-cloak>
 
         <ui-panel class="h-full flex flex-col">
             <ui-panel-header class="flex items-center justify-between min-h-10">
