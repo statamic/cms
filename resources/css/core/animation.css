@@ -77,7 +77,9 @@
         animation-duration: 0.1s;
     }
 
-    .entry-animate-in {
+    .entry-animate-in,
+    .entry-animate-in-children > *,
+    .publish-fields > * {
         transition: opacity 0.2s;
         @starting-style {
             opacity: 0;
@@ -88,7 +90,10 @@
         transition: opacity 0.1s;
     }
 
-    .entry-animate-in--siblings {
+    .entry-animate-in--siblings,
+    /* Assume that when we're animating children we want a sibling delay */
+    .entry-animate-in-children > *,
+    .publish-fields > * {
         transition-delay: calc(sibling-index() * 0.01s);
     }
 }
