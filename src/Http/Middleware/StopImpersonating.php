@@ -4,6 +4,7 @@ namespace Statamic\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Response;
+use Statamic\Facades\Preference;
 
 class StopImpersonating
 {
@@ -43,8 +44,14 @@ class StopImpersonating
     {
         $content = $response->content();
 
+        $locale = Preference::get('locale') ?? app()->getLocale();
+
+        // Make locale config with dashes backwards compatible, as they should be underscores.
+        $locale = str_replace('-', '_', $locale);
+
         $link = view('statamic::impersonator.terminate', [
             'url' => route('statamic.cp.impersonation.stop'),
+            'locale' => $locale,
         ])->render();
 
         return $response->setContent(str_replace('</body>', $link.'</body>', $content));
