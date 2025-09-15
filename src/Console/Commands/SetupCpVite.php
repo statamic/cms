@@ -58,7 +58,7 @@ class SetupCpVite extends Command
                 }
 
                 if (! $installedDependencies->contains('@statamic/cms')) {
-                    $contents['dependencies']['@statamic/cms'] = 'file:./vendor/statamic/cms/resources/js/package';
+                    $contents['dependencies']['@statamic/cms'] = 'file:./vendor/statamic/cms/resources/dist-package';
                 }
 
                 File::put($packageJsonPath, json_encode($contents, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
