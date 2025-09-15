@@ -165,6 +165,11 @@
                 <div class="asset-filename" v-text="truncateFilename(asset.basename)" :title="asset.basename" />
             </div>
         </section>
+
+        <!-- Empty state -->
+        <div v-if="folders.length === 0 && assets.length === 0" class="text-center text-gray-500 text-sm">
+            {{ __('No items found') }}
+        </div>
     </ui-card>
 </template>
 
