@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { Field } from '@ui';
+import { PublishField as Field } from '@ui';
 
 export default {
     components: {
