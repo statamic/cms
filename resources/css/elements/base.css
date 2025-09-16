@@ -115,22 +115,12 @@
     }
 }
 
-/* Prevent tailwind typography from adding backticks around code elements */
-@utility prose {
-    code {
-        &::before,
-        &::after {
-            content: none;
-        }
-    }
-}
-
-code {
-    /* Take the UI accent for code color/background. Use relative colors to 1) Make sure the text color is not too bright and 2) Create a light background */
+/* Take the UI accent for code color/background. Use relative colors to 1) Make sure the text color is not too bright and 2) Create a light background */
+/* code {
     color: hsl(from var(--theme-color-ui-accent) h s 30);
     background: hsl(from var(--theme-color-ui-accent) h s l / 0.08);
     &:where(.dark, .dark *) {
         color: hsl(from var(--theme-color-dark-ui-accent) h s 90);
         background: hsl(from var(--theme-color-dark-ui-accent) h s 10 / 0.5);
     }
-}
+} */
