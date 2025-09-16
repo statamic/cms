@@ -270,7 +270,7 @@ defineExpose({
     <div>
         <div class="flex">
             <ComboboxRoot
-                :disabled="disabled || (multiple && limitReached) || readOnly"
+                :disabled="disabled || readOnly"
                 :model-value="modelValue"
                 :multiple
                 :open="dropdownOpen"
