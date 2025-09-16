@@ -310,12 +310,6 @@
         }
     }
 }
-/* This as a couple less vertical lines. You may wish to use this if there is text to the left/right of the main panel that overlay the lines  */
-@utility bg-architectural-lines--simple {
-    &::before {
-        background-image: url('../../svg/architectural-lines-simple.svg');
-    }
-}
 
 /* UTILITIES / DECORATION / CHECKERBOARD
 =================================================== */
