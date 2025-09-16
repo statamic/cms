@@ -40,7 +40,7 @@
 
     <div class="dark flex-1 flex gap-1 md:gap-3 items-center justify-end shrink-0">
         @if (Statamic\Facades\Site::authorized()->count() > 1)
-            <global-site-selector></global-site-selector>
+            <x-statamic::global-site-selector />
         @endif
         <div class="flex items-center">
             <x-statamic::command-palette />
