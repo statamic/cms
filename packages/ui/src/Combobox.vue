@@ -118,6 +118,13 @@ const getOptionLabel = (option) => option?.[props.optionLabel];
 const getOptionValue = (option) => option?.[props.optionValue];
 const isSelected = (option) => selectedOptions.value.filter((item) => getOptionValue(item) === getOptionValue(option)).length > 0;
 
+const isOptionDisabled = (option) => {
+    if (isSelected(option)) return false;
+    if (props.multiple && limitReached.value) return true;
+
+    return false;
+};
+
 const limitReached = computed(() => {
     if (! props.maxSelections) return false;
 
@@ -353,9 +360,10 @@ defineExpose({
                                 <ComboboxItem
                                     v-if="filteredOptions"
                                     v-for="(option, index) in filteredOptions"
-                                    :key="index"
+                                    :key="index + JSON.stringify(modelValue)"
                                     :value="getOptionValue(option)"
                                     :text-value="getOptionLabel(option)"
+                                    :disabled="isOptionDisabled(option)"
                                     :class="itemClasses({ size: size, selected: isSelected(option) })"
                                     as="button"
                                     data-ui-combobox-item
