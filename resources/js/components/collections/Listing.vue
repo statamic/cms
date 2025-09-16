@@ -72,12 +72,12 @@
                         :sort-direction="collection.sort_direction"
                     >
                         <template #initializing>
-                            <div class="flex flex-col gap-[9px] justify-between py-1 px-5">
-                                <ui-skeleton class="h-[19px] w-full" />
-                                <ui-skeleton class="h-[19px] w-full" />
-                                <ui-skeleton class="h-[19px] w-full" />
-                                <ui-skeleton class="h-[19px] w-full" />
-                                <ui-skeleton class="h-[19px] w-full" />
+                            <div class="flex flex-col gap-[8px] justify-between py-1 px-5">
+                                <ui-skeleton class="h-[18px] w-full" />
+                                <ui-skeleton class="h-[18px] w-full" />
+                                <ui-skeleton class="h-[18px] w-full" />
+                                <ui-skeleton class="h-[18px] w-full" />
+                                <ui-skeleton class="h-[18px] w-full" />
                             </div>
                         </template>
                         <template #default="{ items }">
