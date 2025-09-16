@@ -2,7 +2,7 @@
     use function Statamic\trans as __;
 @endphp
 
-<header style="view-transition-name: header" class="h-14 bg-global-header-bg dark:bg-dark-global-header-bg flex justify-between space-x-2 items-center text-white px-4 fixed overflow-x-auto top-0 inset-x-0 z-[3]">
+<header class="h-14 bg-global-header-bg dark:bg-dark-global-header-bg flex justify-between space-x-2 items-center text-white px-4 fixed overflow-x-auto top-0 inset-x-0 z-[3]">
     <a class="c-skip-link z-(--z-index-header) px-4 py-2 bg-blue-800 text-sm top-2.5 left-2.25 fixed opacity-0 -translate-y-24 focus:translate-y-0 focus:opacity-100 rounded-md" href="#main">
         {{ __('Skip to sidebar') }}
     </a>
