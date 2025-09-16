@@ -1,5 +1,6 @@
 <script setup>
 import { Fieldtype } from '@statamic/cms';
+import { Input } from '@statamic/cms/ui';
 
 const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
@@ -9,6 +10,6 @@ defineExpose(expose);
 
 <template>
     <div class="example-fieldtype-container">
-        <ui-input :model-value="value" @update:model-value="update" />
+        <Input :model-value="value" @update:model-value="update" />
     </div>
 </template>
