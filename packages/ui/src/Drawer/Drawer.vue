@@ -24,17 +24,9 @@ const overlayClasses = cva({
     },
 })({ ...props });
 
-const wrapperClasses = cva({
-    variants: {
-        variant: {
-            layered: 'relative h-full space-y-3 rounded-xl border border-gray-400/60 bg-white p-4 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:border-none dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/15',
-        },
-    },
-})({ ...props });
-
 const drawerClasses = cva({
     base: [
-        'fixed flex flex-col outline-hidden overflow-auto z-50 w-full',
+        'fixed flex flex-col outline-hidden overflow-auto z-50 w-full max-h-[calc(100vh-1rem)]',
         'duration-250 will-change-[transform] transition-translate-x',
         'data-[state=open]:animate-in data-[state=closed]:animate-out',
     ],
@@ -52,10 +44,19 @@ const drawerClasses = cva({
             ],
         },
         side: {
-            right: 'right-2 slide-in-from-right slide-out-to-right h-[calc(100vh-1rem)] max-w-md inset-y-2',
+            right: 'right-2 inset-y-2 slide-in-from-right slide-out-to-right max-w-md',
             left: 'left-2 slide-in-from-left slide-out-to-left h-[calc(100vh-1rem)] max-w-md inset-y-2',
             bottom: 'bottom-2 slide-in-from-bottom slide-out-to-bottom inset-x h-auto max-h-[80vh]',
             top: 'top-2 slide-in-from-top slide-out-to-top inset-x h-auto max-h-[80vh]',
+        },
+    },
+})({ ...props });
+
+const innerClasses = cva({
+    variants: {
+        variant: {
+            default: 'p-2',
+            layered: 'relative h-full overflow-auto space-y-3 rounded-xl border border-gray-400/60 p-4 bg-white shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:border-none dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/15',
         },
     },
 })({ ...props });
@@ -105,14 +106,14 @@ const hasFooter = !!slots.footer;
                 <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :exit="{ opacity: 0 }" :transition="{ duration: 0.25 }" :class="overlayClasses" />
             </DialogOverlay>
             <DialogContent :class="[drawerClasses, $attrs.class]" data-ui-drawer-content :aria-describedby="description || undefined">
-                <div :class="wrapperClasses">
+                <div :class="innerClasses">
                     <header class="py-2 px-4">
                         <div class="flex items-center justify-between">
                             <ui-heading size="lg">
                                 <DialogTitle>{{ title }}</DialogTitle>
                             </ui-heading>
                             <DialogClose as-child :aria-label="__('Close')">
-                                <ui-button icon="x" variant="ghost" class="-me-2" />
+                                <ui-button icon="x" variant="ghost" class="-me-4" />
                             </DialogClose>
                         </div>
                         <DialogDescription v-if="description">
