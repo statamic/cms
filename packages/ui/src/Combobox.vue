@@ -118,6 +118,13 @@ const getOptionLabel = (option) => option?.[props.optionLabel];
 const getOptionValue = (option) => option?.[props.optionValue];
 const isSelected = (option) => selectedOptions.value.filter((item) => getOptionValue(item) === getOptionValue(option)).length > 0;
 
+const isOptionDisabled = (option) => {
+    if (isSelected(option)) return false;
+    if (props.multiple && limitReached.value) return true;
+
+    return false;
+};
+
 const limitReached = computed(() => {
     if (! props.maxSelections) return false;
 
@@ -251,7 +258,7 @@ defineExpose({
     <div>
         <div class="flex">
             <ComboboxRoot
-                :disabled="disabled || (multiple && limitReached) || readOnly"
+                :disabled="disabled || readOnly"
                 :model-value="modelValue"
                 :multiple
                 :open="dropdownOpen"
@@ -334,9 +341,10 @@ defineExpose({
                                 <ComboboxItem
                                     v-if="filteredOptions"
                                     v-for="(option, index) in filteredOptions"
-                                    :key="index"
+                                    :key="index + JSON.stringify(modelValue)"
                                     :value="getOptionValue(option)"
                                     :text-value="getOptionLabel(option)"
+                                    :disabled="isOptionDisabled(option)"
                                     :class="itemClasses({ size: size, selected: isSelected(option) })"
                                     as="button"
                                     :data-ui-combobox-item="getOptionValue(option)"
@@ -370,7 +378,7 @@ defineExpose({
                 handle-class="sortable-item"
                 :distance="5"
                 :mirror="false"
-                :disabled
+                :disabled="disabled || readOnly"
                 :model-value="modelValue"
                 @update:modelValue="updateModelValue"
             >
@@ -385,7 +393,7 @@ defineExpose({
                             <div v-else>{{ __(getOptionLabel(option)) }}</div>
 
                             <button
-                                v-if="!disabled"
+                                v-if="!disabled && !readOnly"
                                 type="button"
                                 class="opacity-75 hover:opacity-100 cursor-pointer"
                                 :aria-label="__('Deselect option')"
