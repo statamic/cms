@@ -91,6 +91,10 @@
         transition: opacity 0.1s;
     }
 
+    .entry-animate-in--slow {
+        transition: opacity 1s;
+    }
+
     .entry-animate-in--siblings,
     /* Assume that when we're animating children we want a sibling delay */
     .entry-animate-in-children > *,
