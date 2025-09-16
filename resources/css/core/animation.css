@@ -62,21 +62,11 @@
 
     What does it do?
     ----------------
-    - View transitions are effectively used to fade the page _out_
     - Soft-animates an element on page load using @starting-style
     - These should be almost-instant otherwise they'll get annoying
 
 */
 @media (prefers-reduced-motion: no-preference) {
-    @view-transition {
-        navigation: auto;
-    }
-
-    ::view-transition-group(root) {
-        /* Speed up the view transition. Bear in mind 0.25 is the default - https://developer.mozilla.org/en-US/docs/Web/CSS/::view-transition-old */
-        animation-duration: 0.1s;
-    }
-
     .entry-animate-in,
     .entry-animate-in-children > *,
     .publish-fields > *,
