@@ -97,14 +97,21 @@
 
                                 <footer class="flex items-center justify-between bg-gray-50 dark:bg-gray-950 rounded-b-lg border-t border-gray-200 dark:border-white/10 p-1 text-sm w-full" :class="{ 'absolute inset-x-0 bottom-0 rounded-': fullScreenMode }">
                                     <div class="markdown-cheatsheet-helper">
-                                        <Button
-                                            icon="markdown"
-                                            size="sm"
-                                            variant="subtle"
-                                            @click="showCheatsheet = true"
-                                            :aria-label="__('Show Markdown Cheatsheet')"
-                                            :text="__('Markdown Cheatsheet')"
-                                        />
+                                        <ui-drawer :title="__('Markdown Cheatsheet')" variant="layered">
+                                            <template #trigger>
+                                                <Button
+                                                    icon="markdown"
+                                                    size="sm"
+                                                    variant="subtle"
+                                                    @click="showCheatsheet = true"
+                                                    :aria-label="__('Show Markdown Cheatsheet')"
+                                                    :text="__('Markdown Cheatsheet')"
+                                                />
+                                            </template>
+                                            <div class="prose dark:prose-invert prose-zinc prose-headings:font-medium prose-pre:prose-code:!text-white mx-auto my-8 max-w-3xl">
+                                                <div v-html="__('markdown.cheatsheet')"></div>
+                                            </div>
+                                        </ui-drawer>
                                     </div>
                                     <div v-if="fullScreenMode" class="flex items-center pe-2 gap-3 text-xs">
                                         <div class="whitespace-nowrap">
@@ -141,21 +148,6 @@
                         @selected="assetsSelected"
                         @closed="closeAssetSelector"
                     />
-                </stack>
-
-                <stack name="markdownCheatSheet" v-if="showCheatsheet" @closed="showCheatsheet = false">
-                    <div class="relative h-full overflow-auto bg-white p-6 dark:bg-gray-800 rounded-l-2xl">
-                        <Button
-                            icon="x"
-                            variant="ghost"
-                            class="absolute top-4 end-4"
-                            @click="showCheatsheet = false"
-                        />
-                        <div class="prose dark:prose-invert prose-zinc prose-headings:font-medium prose-pre:prose-code:!text-white mx-auto my-8 max-w-3xl">
-                            <h2 v-text="__('Markdown Cheatsheet')"></h2>
-                            <div v-html="__('markdown.cheatsheet')"></div>
-                        </div>
-                    </div>
                 </stack>
             </div>
         </element-container>
