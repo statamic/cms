@@ -671,13 +671,13 @@ autoApplyState();
 
 <template>
     <slot name="initializing" v-if="shouldShowSkeleton">
-        <div class="flex flex-col gap-4 justify-between mt-2 entry-animate-in entry-animate-in--slow">
-            <ui-skeleton class="h-3 w-48" />
+        <div class="flex flex-col gap-4 justify-between mt-3 entry-animate-in entry-animate-in--slow">
+            <ui-skeleton class="h-5 w-48" />
             <div class="flex gap-3">
-                <ui-skeleton class="h-8 w-80" />
-                <ui-skeleton class="h-8 w-24" />
+                <ui-skeleton class="h-9 w-96" />
+                <ui-skeleton class="h-9 w-24" />
                 <div class="flex-1" />
-                <ui-skeleton class="size-8" />
+                <ui-skeleton class="size-10" />
             </div>
             <ui-skeleton class="h-48 w-full" />
         </div>
