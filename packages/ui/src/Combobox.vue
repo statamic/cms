@@ -1,7 +1,7 @@
 <script setup>
 import { cva } from 'cva';
 import { ComboboxAnchor, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxRoot, ComboboxTrigger, ComboboxPortal, ComboboxViewport, FocusScope } from 'reka-ui';
-import { computed, nextTick, onMounted, ref, useAttrs, useSlots, useTemplateRef, watch } from 'vue';
+import { computed, nextTick, ref, useAttrs, useTemplateRef, watch } from 'vue';
 import Button from './Button/Button.vue';
 import Icon from './Icon/Icon.vue';
 import Badge from './Badge.vue';
@@ -23,7 +23,7 @@ const props = defineProps({
     modelValue: { type: [Object, String, Number], default: null },
     multiple: { type: Boolean, default: false },
     optionLabel: { type: String, default: 'label' },
-    options: { type: Array, default: null },
+    options: { type: Array, default: [] },
     optionValue: { type: String, default: 'value' },
     placeholder: { type: String, default: () => __('Select...') },
     readOnly: { type: Boolean, default: false },
@@ -233,31 +233,12 @@ function pushTaggableOption(e) {
 }
 
 function openOnSpace(e) {
-	const target = e && e.target ? e.target : null;
-	const tag = (target && target.tagName ? target.tagName : '').toLowerCase();
-	const isEditable = target && (tag === 'input' || tag === 'textarea' || target.isContentEditable);
+    if (dropdownOpen.value) return;
+    if (typeof e.preventDefault === 'function') e.preventDefault();
 
-	// If already open, do nothing so Space behaves normally
-	if (dropdownOpen.value) return;
+    updateDropdownOpen(true);
 
-	// If focused element is editable but dropdown is closed, intercept to open
-	if (isEditable) {
-		if (e && typeof e.preventDefault === 'function') e.preventDefault();
-		updateDropdownOpen(true);
-		nextTick(() => {
-			const inputEl = searchInputRef?.value?.$el || searchInputRef?.value;
-			if (inputEl && typeof inputEl.focus === 'function') inputEl.focus();
-		});
-		return;
-	}
-
-	// Non-editable target and closed: open
-	if (e && typeof e.preventDefault === 'function') e.preventDefault();
-	updateDropdownOpen(true);
-	nextTick(() => {
-		const inputEl = searchInputRef?.value?.$el || searchInputRef?.value;
-		if (inputEl && typeof inputEl.focus === 'function') inputEl.focus();
-	});
+    nextTick(() => searchInputRef?.value?.$el?.focus());
 }
 
 defineExpose({
@@ -358,7 +339,7 @@ defineExpose({
                                     :text-value="getOptionLabel(option)"
                                     :class="itemClasses({ size: size, selected: isSelected(option) })"
                                     as="button"
-                                    data-ui-combobox-item
+                                    :data-ui-combobox-item="getOptionValue(option)"
                                     @select="() => {
                                         dropdownOpen = !closeOnSelect;
                                         if (closeOnSelect) $refs.trigger.$el.focus();
