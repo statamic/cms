@@ -335,7 +335,6 @@ defineExpose({
                         data-ui-combobox-content
                     >
                         <FocusScope
-                            trapped
                             @mount-auto-focus.prevent
                             @unmount-auto-focus="(event) => {
                                 if (event.defaultPrevented) return;
