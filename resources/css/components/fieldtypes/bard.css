@@ -103,6 +103,9 @@
 
         &.bard-toolbar-setting {
             @apply grid grid-cols-[repeat(auto-fit,minmax(--spacing(8),1fr))] rounded-[--spacing(5)];
+            button {
+                @apply justify-self-center;
+            }
         }
     }
 
