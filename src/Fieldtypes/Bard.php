@@ -817,7 +817,7 @@ class Bard extends Replicator
 
             public function validate(string $attribute, mixed $value, Closure $fail): void
             {
-                if (in_array('image', $this->data['buttons'])) {
+                if (empty($value) && in_array('image', $this->data['buttons'])) {
                     $fail('statamic::validation.bard_container_required_by_button')->translate();
                 }
             }
