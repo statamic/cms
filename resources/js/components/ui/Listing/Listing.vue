@@ -671,7 +671,7 @@ autoApplyState();
 
 <template>
     <slot name="initializing" v-if="shouldShowSkeleton">
-        <div class="flex flex-col gap-4 justify-between mt-2 animate-in fade-in duration-[1s]">
+        <div class="flex flex-col gap-4 justify-between mt-2 entry-animate-in entry-animate-in--slow">
             <ui-skeleton class="h-3 w-48" />
             <div class="flex gap-3">
                 <ui-skeleton class="h-8 w-80" />
