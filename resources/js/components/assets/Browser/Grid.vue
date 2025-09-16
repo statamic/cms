@@ -1,5 +1,8 @@
 <template>
-    <ui-card class="space-y-8">
+    <ui-card :class="{
+        'space-y-8': folders.length || assets.length,
+        '!p-0': folders.length === 0 && assets.length === 0
+    }">
         <!-- Folders -->
         <section class="folder-grid-listing" v-if="folders.length || creatingFolder">
             <div
@@ -32,7 +35,7 @@
                     <Context>
                         <template #trigger>
                             <button @dblclick="selectFolder(folder.path)" class="group h-[66px] w-[80px]">
-                                <ui-icon name="folder" class="size-full text-blue-400/90 hover:text-blue-400" />
+                                <FolderSvg class="size-full text-blue-400/90 hover:text-blue-400" />
                                 <div
                                     class="overflow-hidden mt-2 text-center font-mono text-xs text-ellipsis whitespace-nowrap text-gray-500"
                                     v-text="folder.basename"
@@ -55,7 +58,7 @@
             </div>
             <div v-if="creatingFolder" class="group/folder relative p-1">
                 <div class="group h-[66px] w-[80px]">
-                    <ui-icon name="folder" class="size-full text-blue-400/90 hover:text-blue-400" />
+                    <FolderSvg class="size-full text-blue-400/90 hover:text-blue-400" />
 
                     <Editable
                         ref="newFolderInput"
@@ -165,6 +168,11 @@
                 <div class="asset-filename" v-text="truncateFilename(asset.basename)" :title="asset.basename" />
             </div>
         </section>
+
+        <!-- Empty state -->
+        <div v-if="folders.length === 0 && assets.length === 0" class="text-center text-gray-500 text-sm py-4">
+            {{ __('No items found') }}
+        </div>
     </ui-card>
 </template>
 
@@ -182,10 +190,11 @@ import {
     DropdownMenu,
     DropdownLabel,
     DropdownItem,
-    DropdownSeparator,
-} from '@/components/ui';
+    DropdownSeparator
+} from '@ui';
 import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
 import ItemActions from '@/components/actions/ItemActions.vue';
+import FolderSvg from '@/../svg/folder.svg';
 
 export default {
     mixins: [AssetBrowserMixin],
@@ -204,6 +213,7 @@ export default {
         DropdownItem,
         DropdownSeparator,
         ItemActions,
+        FolderSvg,
     },
 
     props: {

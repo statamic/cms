@@ -1,5 +1,5 @@
 <template>
-    <div class="relationship-input @container w-full h-full" :class="{ 'relationship-input-empty': items.length == 0 }">
+    <div class="relationship-input @container w-full" :class="{ 'relationship-input-empty': items.length == 0 }">
         <RelationshipSelectField
             v-if="!initializing && usesSelectField"
             :config="config"
@@ -48,10 +48,10 @@
             </div>
             <div
                 v-if="canSelectOrCreate"
-                class="relationship-input-buttons @container relative"
+                class="relationship-input-buttons @container relative h-full"
                 :class="{ 'mt-3': items.length > 0 }"
             >
-                <div class="flex flex-wrap items-center gap-2">
+                <div class="flex flex-wrap items-center gap-2 h-full">
                     <CreateButton
                         v-if="canCreate && creatables.length"
                         :creatables="creatables"
@@ -62,6 +62,7 @@
                         :site="site"
                         :stack-size="formStackSize"
                         @created="itemCreated"
+                        class="h-full"
                     />
                     <Button
                         ref="existing"
@@ -69,6 +70,7 @@
                         size="sm"
                         :text="linkLabel"
                         @click.prevent="isSelecting = true"
+                        class="h-full"
                     />
                 </div>
             </div>

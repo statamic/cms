@@ -87,7 +87,7 @@
                                 <div class="flex flex-1 items-center gap-3">
                                     <ListingSearch />
                                 </div>
-                                <ListingCustomizeColumns />
+                                <ListingCustomizeColumns v-if="mode === 'table'" />
                             </div>
                         </slot>
 
@@ -188,14 +188,16 @@ import {
     Panel,
     PanelHeader,
     PanelFooter,
+    Listing,
+    ListingTable,
+    ListingPagination,
     ListingSearch,
     ListingCustomizeColumns,
     Slider,
     Icon,
     ToggleGroup,
     ToggleItem,
-} from '@/components/ui';
-import { Listing, ListingTable, ListingPagination } from '@/components/ui';
+} from '@ui';
 import Breadcrumbs from './Breadcrumbs.vue';
 
 export default {

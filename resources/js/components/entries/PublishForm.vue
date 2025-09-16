@@ -138,7 +138,6 @@
                                         icon="history"
                                         :text="__('View History')"
                                         size="xs"
-                                        class="-me-4"
                                     />
                                 </PanelHeader>
                                 <Card class="space-y-2">
@@ -230,11 +229,9 @@
             @confirm="createLocalization(localizing)"
         >
             <div class="publish-fields">
-                <div class="form-group publish-field field-w-full">
-                    <label v-text="__('Origin')" />
-                    <ui-description class="mt-2" :text="__('messages.entry_origin_instructions')" />
+                <ui-field class="form-group field-w-100" :label="__('Origin')" :instructions="__('messages.entry_origin_instructions')">
                     <Select class="w-full" v-model="selectedOrigin" :options="originOptions" placeholder="" />
-                </div>
+                </ui-field>
             </div>
         </confirmation-modal>
 
@@ -276,15 +273,15 @@ import {
     Subheading,
     Switch,
     Select,
-} from '@/components/ui';
-import PublishContainer from '@/components/ui/Publish/Container.vue';
-import PublishTabs from '@/components/ui/Publish/Tabs.vue';
-import PublishComponents from '@/components/ui/Publish/Components.vue';
-import LocalizationsCard from '@/components/ui/Publish/Localizations.vue';
-import LivePreview from '@/components/ui/LivePreview/LivePreview.vue';
+    PublishContainer,
+    PublishTabs,
+    PublishComponents,
+    PublishLocalizations as LocalizationsCard,
+    LivePreview,
+} from '@ui';
 import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
 import { computed, ref } from 'vue';
-import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@/components/ui/Publish/SavePipeline.js';
+import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';
 
 let saving = ref(false);
 let errors = ref({});

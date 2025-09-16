@@ -2,7 +2,10 @@
 
 namespace Statamic\Fieldtypes;
 
+use Closure;
 use Facades\Statamic\Fieldtypes\RowId;
+use Illuminate\Contracts\Validation\DataAwareRule;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
@@ -177,6 +180,9 @@ class Bard extends Replicator
                             'buttons' => 'contains_any anchor, image',
                         ],
                         'width' => 50,
+                        'validate' => [
+                            $this->containerRequiredRule(),
+                        ],
                     ],
                 ],
             ],
@@ -796,5 +802,25 @@ class Bard extends Replicator
     public static function setDefaultButtons(array $buttons): void
     {
         static::$defaultButtons = $buttons;
+    }
+
+    private function containerRequiredRule(): ValidationRule
+    {
+        return new class implements DataAwareRule, ValidationRule
+        {
+            private $data;
+
+            public function setData(array $data)
+            {
+                $this->data = $data;
+            }
+
+            public function validate(string $attribute, mixed $value, Closure $fail): void
+            {
+                if (empty($value) && in_array('image', $this->data['buttons'])) {
+                    $fail('statamic::validation.bard_container_required_by_button')->translate();
+                }
+            }
+        };
     }
 }

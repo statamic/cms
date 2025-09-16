@@ -102,7 +102,7 @@ class BreadcrumbsTest extends TestCase
     }
 
     #[Test]
-    public function it_ignores_nav_preferences_when_building_breadcrumbs()
+    public function it_uses_nav_preferences_when_building_breadcrumbs()
     {
         $this->actingAs($user = User::make()->makeSuper())->get(cp_route('dashboard'));
 
@@ -125,13 +125,18 @@ class BreadcrumbsTest extends TestCase
 
         $breadcrumbs = Breadcrumbs::build();
 
-        // None of the preferences should be applied to the breadcrumbs.
         $this->assertEquals([
             new Breadcrumb(
-                text: 'Dashboard',
+                text: 'The Dashboard',
                 url: 'http://localhost/cp/dashboard',
-                icon: 'dashboard',
-                links: []
+                icon: 'browser-com',
+                links: [
+                    ['icon' => 'collections', 'text' => 'Collections', 'url' => 'http://localhost/cp/collections'],
+                    ['icon' => 'navigation', 'text' => 'Navigation', 'url' => 'http://localhost/cp/navigation'],
+                    ['icon' => 'taxonomies', 'text' => 'Taxonomies', 'url' => 'http://localhost/cp/taxonomies'],
+                    ['icon' => 'assets', 'text' => 'Assets', 'url' => 'http://localhost/cp/assets'],
+                    ['icon' => 'globals', 'text' => 'Globals', 'url' => 'http://localhost/cp/globals'],
+                ]
             ),
         ], $breadcrumbs);
     }

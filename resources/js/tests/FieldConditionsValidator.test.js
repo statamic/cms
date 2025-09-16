@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils';
 import { nextTick } from 'vue';
 import { data_get } from '../bootstrap/globals';
 import FieldConditions from '@/components/FieldConditions';
-import PublishContainer from '@/components/ui/Publish/Container.vue';
+import PublishContainer from '@ui/Publish/Container.vue';
 import ShowField from '@/components/field-conditions/ShowField.js';
 
 // Even though there's no Store anymore, this variable is named Store so that all the

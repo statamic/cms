@@ -243,10 +243,14 @@ class Statamic
 
     public static function svg($name, $attrs = null, $fallback = null)
     {
-        $path = statamic_path("resources/svg/{$name}.svg");
+        $dir = str_starts_with($name, 'icons/')
+            ? statamic_path('packages/ui')
+            : statamic_path('resources/svg');
+
+        $path = "{$dir}/{$name}.svg";
 
         if ($fallback && ! File::exists($path)) {
-            $path = statamic_path("resources/svg/{$fallback}.svg");
+            $path = "{$dir}/{$fallback}.svg";
         }
 
         if (File::exists($path) && $attrs) {

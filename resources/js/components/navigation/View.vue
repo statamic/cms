@@ -18,8 +18,8 @@
             <site-selector
                 v-if="sites.length > 1"
                 :sites="sites"
-                :value="site"
-                @input="siteSelected"
+                :model-value="site"
+                @update:modelValue="siteSelected"
             />
 
             <Dropdown v-if="canEdit && hasCollections" placement="left-start" :disabled="!hasCollections">
@@ -89,7 +89,7 @@
                         icon="fieldtype-link"
                         :heading="__('Link to URL')"
                         :description="__('messages.navigation_link_to_url_instructions')"
-                        @click="linkPage"
+                        @click="linkPage()"
                     />
 
                     <EmptyStateItem
@@ -129,7 +129,7 @@
                     icon="edit"
                 />
                 <DropdownItem
-                    :text="__('Edit Nav item')"
+                    :text="__('Edit Nav Item')"
                     @click="editPage(branch)"
                     icon="edit"
                 />
@@ -443,7 +443,7 @@ export default {
         },
 
         siteSelected(site) {
-            window.location = site.url;
+            window.location = this.sites.find((s) => s.handle === site).url;
         },
 
         updatePublishInfo(info) {
