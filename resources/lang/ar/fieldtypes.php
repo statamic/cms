@@ -173,7 +173,7 @@ return [
     'taggable.config.placeholder' => 'اكتب واضغط ↩ Enter',
     'taggable.title' => 'قابل للوسم',
     'taxonomies.title' => 'تصنيفات',
-    'template.config.blueprint' => 'إضافة خيار "رسم إلى مخطط". تعرف على المزيد في [التوثيق](https://statamic.dev/views#inferring-templates-from-entry-blueprints).',
+    'template.config.blueprint' => 'إضافة خيار "رسم إلى مخطط". تعرف على المزيد في [التوثيق](https://statamic.dev/views#map-templates-to-entry-blueprints).',
     'template.config.folder' => 'عرض القوالب فقط في هذا المجلد.',
     'template.config.hide_partials' => 'نادرًا ما تكون الجزئيات معدة للاستخدام كقوالب.',
     'template.title' => 'قالب',
