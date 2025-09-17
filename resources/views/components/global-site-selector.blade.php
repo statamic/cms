@@ -1,6 +1,7 @@
 <global-site-selector></global-site-selector>
 
 <div
+    :class="{'absolute inset-0 animate-out fade-out duration-900 fill-mode-forwards':true}"
     class="
         antialiased bg-transparent border-none cursor-pointer
         dark:hover:bg-white/15 dark:hover:text-gray-200 dark:text-gray-300
@@ -8,7 +9,6 @@
         items-center justify-between px-3 rounded-lg text-[0.8125rem] text-gray-900
     "
     data-ui-combobox-trigger
-    v-if="false"
 >
     <div class="flex-1 min-w-0">
         <button

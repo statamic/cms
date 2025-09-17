@@ -1,5 +1,5 @@
 <template>
-    <div class="flex h-full items-center" data-ui-global-site-selector>
+    <div class="flex h-full items-center animate-in fade-in duration-600 fill-mode-forwards" data-ui-global-site-selector>
         <Select
             :model-value="active"
             :options="sites"
