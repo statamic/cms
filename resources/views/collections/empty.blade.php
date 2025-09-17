@@ -5,7 +5,7 @@
 @section('content-card-modifiers', 'bg-architectural-lines')
 
 @section('content')
-    <header class="py-8 mt-8 text-center entry-animate-in" v-cloak>
+    <header class="py-8 mt-8 text-center starting-style-transition" v-cloak>
         <h1 class="text-[25px] font-medium antialiased flex justify-center items-center gap-3">
             <ui-icon name="collections" class="size-5 text-gray-500"></ui-icon>
             <span v-pre>{{ $collection->title() }}</span>

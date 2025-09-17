@@ -8,7 +8,7 @@ const props = defineProps({
 </script>
 
 <template>
-    <header class="flex flex-wrap items-center justify-between gap-4 py-8 entry-animate-in" data-ui-header>
+    <header class="flex flex-wrap items-center justify-between gap-4 py-8 starting-style-transition" data-ui-header>
         <h1 class="text-[25px] leading-[1.25] st-text-legibility font-medium antialiased flex items-center gap-2.5 flex-1">
             <!-- Wrap icon in a fixed size div (the same size as the icon) to prevent layout shift once it loads -->
             <div v-if="icon" class="size-5">

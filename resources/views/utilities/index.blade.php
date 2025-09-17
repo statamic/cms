@@ -9,7 +9,7 @@
     <ui-header title="{{ __('Utilities') }}" icon="utilities" />
 
     <ui-card-panel>
-        <div class="flex flex-wrap entry-animate-in-children" v-cloak>
+        <div class="flex flex-wrap starting-style-transition-children" v-cloak>
             @foreach ($utilities as $utility)
                 <a
                     href="{{ $utility->url() }}"

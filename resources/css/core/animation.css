@@ -56,7 +56,7 @@
     }
 }
 
-/* ENTRY ANIMATIONS
+/* STARTING STYLE TRANSITIONS
 =================================================== */
 /* Notes...
 
@@ -67,8 +67,8 @@
 
 */
 @media (prefers-reduced-motion: no-preference) {
-    .entry-animate-in,
-    .entry-animate-in-children > *,
+    .starting-style-transition,
+    .starting-style-transition-children > *,
     .publish-fields > *,
     .publish-fields-fluid > *  {
         transition: opacity 0.2s;
@@ -77,17 +77,17 @@
         }
     }
 
-    .entry-animate-in--quick {
+    .starting-style-transition--quick {
         transition: opacity 0.1s;
     }
 
-    .entry-animate-in--slow {
+    .starting-style-transition--slow {
         transition: opacity 1s;
     }
 
-    .entry-animate-in--siblings,
+    .starting-style-transition--siblings,
     /* Assume that when we're animating children we want a sibling delay */
-    .entry-animate-in-children > *,
+    .starting-style-transition-children > *,
     .publish-fields > *,
     .publish-fields-fluid > * {
         transition-delay: calc(sibling-index() * 0.01s);

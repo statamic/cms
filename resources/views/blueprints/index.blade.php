@@ -44,7 +44,7 @@
         </ui-dropdown>
     </ui-header>
 
-    <section class="space-y-6 entry-animate-in-children" v-cloak>
+    <section class="space-y-6 starting-style-transition-children" v-cloak>
     @if (Statamic\Facades\Collection::all()->count() > 0)
         <ui-subheading size="lg" class="mb-2">{{ __('Collections') }}</ui-subheading>
             <ui-panel>
