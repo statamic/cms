@@ -4,6 +4,7 @@
             v-for="(option, $index) in options"
             ref="button"
             :disabled="config.disabled"
+            :size="config.size"
             :key="$index"
             :name="name"
             :read-only="isReadOnly"

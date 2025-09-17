@@ -7,6 +7,7 @@
         :autocomplete="config.autocomplete"
         :autoselect="config.autoselect"
         :type="config.input_type"
+        :size="config.size"
         :read-only="isReadOnly"
         :prepend="__(config.prepend)"
         :append="__(config.append)"
