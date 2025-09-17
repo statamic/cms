@@ -9,6 +9,7 @@ const emit = defineEmits(['update:open']);
 const props = defineProps({
     blur: { type: Boolean, default: false },
     description: { type: [String, null], default: null },
+    icon: { type: [String, null], default: null },
     open: { type: Boolean, default: false },
     side: { type: String, default: 'right' },
     variant: { type: String, default: 'default' },
@@ -110,7 +111,10 @@ const hasFooter = !!slots.footer;
                     <header class="py-2 px-4">
                         <div class="flex items-center justify-between">
                             <ui-heading size="lg">
-                                <DialogTitle>{{ title }}</DialogTitle>
+                                <DialogTitle class="flex items-center gap-2">
+                                    <ui-icon v-if="icon" :name="icon" class="size-4" />
+                                    {{ title }}
+                                </DialogTitle>
                             </ui-heading>
                             <DialogClose as-child :aria-label="__('Close')">
                                 <ui-button icon="x" variant="ghost" class="-me-4" />
