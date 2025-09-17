@@ -294,7 +294,7 @@ defineExpose({
                                 <span class="text-gray-400 dark:text-gray-500" v-text="placeholder" />
                             </button>
 
-                            <button type="button" v-else class="w-full text-start bg-transparent truncate flex items-center gap-2 cursor-pointer focus:outline-none" @keydown.space="openDropdown" data-ui-combobox-selected-option>
+                            <button type="button" v-else class="w-full text-start bg-transparent truncate flex items-center gap-2 cursor-pointer focus-none" @keydown.space="openDropdown" data-ui-combobox-selected-option>
                                 <slot name="selected-option" v-bind="{ option: selectedOption }">
                                     <div class="size-4">
                                         <Icon v-if="icon" :name="icon" class="text-white/85 dark:text-white dark:opacity-50" />
