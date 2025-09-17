@@ -20,6 +20,18 @@ class Floatval extends Fieldtype
                 'instructions' => __('statamic::messages.fields_default_instructions'),
                 'type' => 'text',
             ],
+            'prepend' => [
+                'display' => __('Prepend'),
+                'instructions' => __('statamic::fieldtypes.text.config.prepend'),
+                'type' => 'text',
+                'width' => '50',
+            ],
+            'append' => [
+                'display' => __('Append'),
+                'instructions' => __('statamic::fieldtypes.text.config.append'),
+                'type' => 'text',
+                'width' => '50',
+            ],
         ];
     }
 
