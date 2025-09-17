@@ -71,14 +71,14 @@
     .starting-style-transition-children > *,
     .publish-fields > *,
     .publish-fields-fluid > *  {
-        transition: opacity 0.2s;
+        transition: opacity 0.1s;
         @starting-style {
             opacity: 0;
         }
     }
 
     .starting-style-transition--quick {
-        transition: opacity 0.1s;
+        transition: opacity 0.05s;
     }
 
     .starting-style-transition--slow {
