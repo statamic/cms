@@ -173,7 +173,7 @@ return [
     'taggable.config.placeholder' => 'Nhập và nhấn ↩ Enter',
     'taggable.title' => 'Có thể gắn thẻ',
     'taxonomies.title' => 'Phân loại',
-    'template.config.blueprint' => 'Thêm tùy chọn &quot;bản đồ đến bản thiết kế&quot;. Tìm hiểu thêm trong [tài liệu](https://statamic.dev/views#inferring-templates-from-entry-blueprints).',
+    'template.config.blueprint' => 'Thêm tùy chọn &quot;bản đồ đến bản thiết kế&quot;. Tìm hiểu thêm trong [tài liệu](https://statamic.dev/views#map-templates-to-entry-blueprints).',
     'template.config.folder' => 'Chỉ hiển thị các mẫu trong thư mục này.',
     'template.config.hide_partials' => 'Các phần này hiếm khi được dùng làm mẫu.',
     'template.title' => 'Mẫu',
