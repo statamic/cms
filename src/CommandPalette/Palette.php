@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Statamic\CP\Navigation\NavItem;
 use Statamic\Facades;
+use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Fields\Fieldset;
 use Statamic\Support\Arr;
@@ -141,6 +142,13 @@ class Palette
             text: __('Statamic Documentation'),
             icon: 'book-next-page',
             url: 'https://statamic.dev',
+            openNewTab: true,
+        );
+
+        $this->add(
+            text: __('View Site'),
+            icon: 'visit-website',
+            url: Site::selected()->url(),
             openNewTab: true,
         );
 

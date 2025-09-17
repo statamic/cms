@@ -4,7 +4,7 @@
 @section('title', __('Blueprints'))
 
 @section('content')
-    <ui-header title="{{ __('Blueprints') }}" icon="blueprints">
+    <ui-header title="{{ __('Blueprints') }}" icon="blueprints" v-cloak>
         <ui-dropdown>
             <template #trigger>
                 <ui-button
@@ -44,7 +44,7 @@
         </ui-dropdown>
     </ui-header>
 
-    <section class="space-y-6">
+    <section class="space-y-6 starting-style-transition-children" v-cloak>
     @if (Statamic\Facades\Collection::all()->count() > 0)
         <ui-subheading size="lg" class="mb-2">{{ __('Collections') }}</ui-subheading>
             <ui-panel>

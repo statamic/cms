@@ -11,7 +11,7 @@
 
 <div class="widgets @container/widgets flex flex-wrap py-2 gap-y-6 -mx-3">
     @foreach ($widgets as $widget)
-        <div class="{{ Statamic\Support\Str::tailwindWidthClass($widget['width']) }} {{ $widget['classes'] }} px-3">
+        <div class="{{ Statamic\Support\Str::tailwindWidthClass($widget['width']) }} {{ $widget['classes'] }} min-h-54 px-3 starting-style-transition starting-style-transition--siblings">
             {!! $widget['html'] !!}
         </div>
     @endforeach

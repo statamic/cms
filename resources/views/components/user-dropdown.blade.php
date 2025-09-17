@@ -1,4 +1,8 @@
-<ui-dropdown align="end" x-cloak>
+<div v-if="false" class="inline-flex items-center justify-center h-10 w-10">
+    <x-statamic::avatar :user="$user" />
+</div>
+
+<ui-dropdown align="end" v-cloak>
     <template #trigger>
         <ui-button :icon-only="true" variant="ghost">
             <x-statamic::avatar :user="$user" />

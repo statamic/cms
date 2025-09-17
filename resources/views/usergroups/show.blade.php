@@ -6,7 +6,7 @@
 @section('title', Statamic::crumb($group->title(), 'User Group'))
 
 @section('content')
-    <ui-header title="{{ __($group->title()) }}" icon="groups">
+    <ui-header title="{{ __($group->title()) }}" icon="groups" v-cloak>
         @can('delete', $group)
             <ui-command-palette-item
                 category="{{ Statamic\CommandPalette\Category::Actions }}"

@@ -119,7 +119,7 @@ function tabHasError(tab) {
                     </TabProvider>
                 </template>
 
-                <aside class="space-y-6" v-if="shouldShowSidebar">
+                <aside class="space-y-6 starting-style-transition-children" v-if="shouldShowSidebar">
                     <slot name="actions" />
                     <TabProvider v-if="sidebarTab" :tab="sidebarTab">
                         <Sections />
