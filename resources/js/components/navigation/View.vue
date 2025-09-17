@@ -110,15 +110,9 @@
             </template>
 
             <template #branch-icon="{ branch }">
-                <ui-tooltip v-if="isEntryBranch(branch)" :text="__('Entry link')">
-                    <ui-icon class="size-3.5! text-gray-500" name="link" tabindex="-1" />
-                </ui-tooltip>
-                <ui-tooltip v-if="isLinkBranch(branch)" :text="__('External link')">
-                    <ui-icon class="size-3.5! text-gray-500" name="external-link" tabindex="-1" />
-                </ui-tooltip>
-                <ui-tooltip v-if="isTextBranch(branch)" :text="__('Text')">
-                    <ui-icon class="size-3.5! text-gray-500" name="page" tabindex="-1" />
-                </ui-tooltip>
+                <ui-icon v-if="isEntryBranch(branch)" v-tooltip="__('Entry link')" class="size-3.5! text-gray-500" name="link" tabindex="-1" />
+                <ui-icon v-if="isLinkBranch(branch)" v-tooltip="__('External link')" class="size-3.5! text-gray-500" name="external-link" tabindex="-1" />
+                <ui-icon v-if="isTextBranch(branch)" v-tooltip="__('Text')" class="size-3.5! text-gray-500" name="page" tabindex="-1" />
             </template>
 
             <template v-if="canEdit" #branch-options="{ branch, removeBranch, stat, depth }">
