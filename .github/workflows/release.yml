@@ -20,29 +20,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Generate types
-        run: npm run types
-
-      - name: Compile assets
-        run: npm run build
-
-      - name: Compile dev assets
-        run: npm run build-dev
-
-      - name: Compile frontend assets
-        run: npm run frontend-build
-
-      - name: Create dist zip
-        run: cd resources && tar -czvf dist.tar.gz dist
-
-      - name: Create dist-dev zip
-        run: cd resources && tar -czvf dist-dev.tar.gz dist-dev
-
-      - name: Create dist-frontend zip
-        run: cd resources && tar -czvf dist-frontend.tar.gz dist-frontend
-
-      - name: Create dist-package zip
-        run: cd resources && tar -czvf dist-package.tar.gz -C js/package .
+      - name: Build release assets
+        run: bash ./scripts/build-release.sh
 
       - name: Get Changelog
         id: changelog
@@ -99,4 +78,14 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./resources/dist-package.tar.gz
           asset_name: dist-package.tar.gz
+          asset_content_type: application/tar+gz
+
+      - name: Upload dist-ui zip to release
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./resources/dist-ui.tar.gz
+          asset_name: dist-ui.tar.gz
           asset_content_type: application/tar+gz

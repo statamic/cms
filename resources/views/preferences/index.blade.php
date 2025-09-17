@@ -8,7 +8,7 @@
 @section('content')
     <ui-header :title="__('Preferences')" icon="preferences" />
 
-    <section class="space-y-6">
+    <section class="space-y-6" v-cloak>
         <ui-card-panel heading="{{ __('Global Preferences') }}">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">

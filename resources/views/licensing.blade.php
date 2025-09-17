@@ -37,7 +37,7 @@
         </ui-card>
     @else
 
-        <section class="space-y-6">
+        <section class="space-y-6" v-cloak>
             @if ($configCached)
                 <ui-card-panel heading="{{ __('Configuration is cached') }}">
                     <p class="text-gray-700 text-sm">{!! __('statamic::messages.licensing_config_cached_warning') !!}</p>
@@ -55,7 +55,9 @@
                     <ui-table class="w-full">
                         <ui-table-row>
                             <ui-table-cell class="w-64 font-bold">
-                                <span class="little-dot {{ $site->valid() ? 'bg-green-600' : 'bg-red-700' }} me-2"></span>
+                                <div class="flex gap-3">
+                                    <span class="little-dot {{ $site->valid() ? 'bg-green-500 dark:bg-green-600' : 'bg-red-500 dark:bg-red-600' }} me-2"></span>
+                                </div>
                                 {{ $site->key() ?? __('No license key') }}
                             </ui-table-cell>
                             <ui-table-cell class="relative">
@@ -83,14 +85,18 @@
                     <ui-table class="w-full">
                         <ui-table-row>
                             <ui-table-cell class="w-64 font-bold">
-                                <span class="little-dot {{ $statamic->valid() ? 'bg-green-600' : 'bg-red-700' }} me-2"></span>
-                                {{ __('Statamic') }}
+                                <div class="flex gap-3">
+                                    <span class="little-dot mt-[0.45rem] {{ $statamic->valid() ? 'bg-green-500 dark:bg-green-600' : 'bg-red-500 dark:bg-red-600' }}"></span>
+                                    <span>
+                                        {{ __('Statamic') }}
 
-                                @if ($statamic->pro())
-                                    <span class="text-pink">{{ __('Pro') }}</span>
-                                @else
-                                    {{ __('Free') }}
-                                @endif
+                                        @if ($statamic->pro())
+                                            <span class="text-pink">{{ __('Pro') }}</span>
+                                        @else
+                                            {{ __('Free') }}
+                                        @endif
+                                    </span>
+                                </div>
                             </ui-table-cell>
                             <ui-table-cell>{{ $statamic->version() }}</ui-table-cell>
                             <ui-table-cell class="text-end">
@@ -111,18 +117,20 @@
                         <ui-table class="w-full">
                             @foreach ($addons as $addon)
                                 <ui-table-row>
-                                    <ui-table-cell class="w-64 me-2">
-                                        <span class="little-dot {{ $addon->valid() ? 'bg-green-600' : 'bg-red-700' }} me-2"></span>
-                                        <span class="font-bold">
-                                            <a href="{{ $addon->addon()->marketplaceUrl() }}" class="underline">
-                                                {{ $addon->name() }}
-                                            </a>
-                                        </span>
-                                        @if ($addon->edition())
-                                            <ui-badge>
-                                                {{ $addon->edition() ?? '' }}
-                                            </ui-badge>
-                                        @endif
+                                    <ui-table-cell class="w-64">
+                                        <div class="flex gap-3">
+                                            <span class="little-dot mt-[0.45rem] {{ $addon->valid() ? 'bg-green-500 dark:bg-green-600' : 'bg-red-500 dark:bg-red-600' }}"></span>
+                                            <span class="font-bold">
+                                                <a href="{{ $addon->addon()->marketplaceUrl() }}" class="underline">{{ $addon->name() }}</a>
+                                            </span>
+                                            @if ($addon->edition())
+                                                <div class="ms-auto">
+                                                    <ui-badge>
+                                                        {{ $addon->edition() ?? '' }}
+                                                    </ui-badge>
+                                                </div>
+                                            @endif
+                                        </div>
                                     </ui-table-cell>
                                     <ui-table-cell>{{ $addon->version() }}</ui-table-cell>
                                     <ui-table-cell class="text-red-700 text-end">{{ $addon->invalidReason() }}</ui-table-cell>
@@ -139,9 +147,11 @@
                         <ui-table class="w-full">
                             @foreach ($unlistedAddons as $addon)
                                 <ui-table-row>
-                                    <ui-table-cell class="w-64 font-bold me-2">
-                                        <span class="little-dot bg-green-600 me-2"></span>
-                                        {{ $addon->name() }}
+                                    <ui-table-cell class="w-64">
+                                        <div class="flex gap-3">
+                                            <span class="little-dot bg-green-500 dark:bg-green-600 me-2"></span>
+                                            {{ $addon->name() }}
+                                        </div>
                                     </ui-table-cell>
                                     <ui-table-cell>{{ $addon->version() }}</ui-table-cell>
                                 </ui-table-row>

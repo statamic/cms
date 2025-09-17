@@ -37,8 +37,7 @@
                 <site-selector
                     v-if="sites.length > 1"
                     :sites="sites"
-                    :value="site"
-                    @input="site = $event.handle"
+                    v-model="site"
                 />
 
                 <Button
@@ -60,8 +59,7 @@
                 <site-selector
                     v-if="sites.length > 1 && reordering && site"
                     :sites="sites"
-                    :value="site"
-                    @input="site = $event"
+                    v-model="site"
                 />
 
                 <Button
@@ -407,7 +405,7 @@ export default {
                 url: this.scaffoldUrl,
             });
 
-            this.$refs.actions.preparedActions.forEach(action => Statamic.$commandPalette.add({
+            this.$refs.actions?.preparedActions.forEach(action => Statamic.$commandPalette.add({
                 category: Statamic.$commandPalette.category.Actions,
                 text: [__('Collection'), action.title],
                 icon: action.icon,

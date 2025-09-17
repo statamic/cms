@@ -9,7 +9,9 @@
 =================================================== */
 @layer ui {
     .bard-editor {
-        @apply relative rounded-sm p-0 text-gray-900 dark:bg-gray-900 dark:text-gray-100;
+        /* We need a transparent border inside Bard to properly see the focus outline. Without this border, the focus outline is hairline-thin */
+        border: 1px solid transparent;
+        @apply relative rounded-b-lg p-0 text-gray-900 dark:bg-gray-900 dark:text-gray-100;
         /* The focus state inherits this */
         > * {
             @apply rounded-b-lg;
@@ -21,6 +23,9 @@
         }
         .bard-error {
             @apply whitespace-nowrap bg-red-100 p-2 text-xs text-red-600 @lg:px-4;
+        }
+        p, ol, li {
+            @apply st-text-legibility;
         }
     }
 }
@@ -95,6 +100,13 @@
 
             button.active svg {
                 @apply text-white;
+            }
+        }
+
+        &.bard-toolbar-setting {
+            @apply grid grid-cols-[repeat(auto-fit,minmax(--spacing(8),1fr))] rounded-[--spacing(5)];
+            button {
+                @apply justify-self-center;
             }
         }
     }
@@ -256,7 +268,7 @@
     }
 
     .bard-fieldtype .bard-content {
-        @apply text-gray-600 dark:text-gray-300;
+        @apply text-gray-900 dark:text-gray-300 bg-white dark:bg-gray-950 rounded-b-lg;
         blockquote,
         ol,
         p,

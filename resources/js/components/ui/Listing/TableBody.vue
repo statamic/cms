@@ -1,11 +1,10 @@
 <script setup>
 import TableField from '@/components/data-list/TableField.vue';
-import RowActions from '@/components/ui/Listing/RowActions.vue';
+import RowActions from '../Listing/RowActions.vue';
 import SortableList from '@/components/sortable/SortableList.vue';
-import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
+import { injectListingContext } from '../Listing/Listing.vue';
 import { computed, ref, watch } from 'vue';
-import Table from '@/components/ui/Listing/Table.vue';
-import { Checkbox } from '@/components/ui';
+import { Checkbox } from '@ui';
 
 const {
     items,
@@ -30,15 +29,8 @@ function isSelected(id) {
 function getCheckboxLabel(row) {
     const rowTitle = getRowTitle(row);
     return isSelected(row.id)
-        ? __('deselect_title', { title: rowTitle })
-        : __('select_title', { title: rowTitle });
-}
-
-function getCheckboxAriaLabel(row) {
-    const rowTitle = getRowTitle(row);
-    return isSelected(row.id)
-        ? __('deselect_title', { title: rowTitle })
-        : __('select_title', { title: rowTitle });
+        ? __('Deselect :title', { title: rowTitle })
+        : __('Select :title', { title: rowTitle });
 }
 
 function getCheckboxDescription(row) {
@@ -46,16 +38,15 @@ function getCheckboxDescription(row) {
     const isDisabled = hasReachedSelectionLimit.value && allowsMultipleSelections.value && !isSelected(row.id);
 
     if (isDisabled) {
-        return __('selection_limit_reached', { title: rowTitle });
+        return __('messages.selections_limit_reached', { title: rowTitle });
     }
 
     return isSelected(row.id)
-        ? __('item_selected_description', { title: rowTitle })
-        : __('item_not_selected_description', { title: rowTitle });
+        ? __('messages.selections_item_selected', { title: rowTitle })
+        : __('messages.selections_item_unselected', { title: rowTitle });
 }
 
 function getRowTitle(row) {
-    // Try to get a meaningful title from common fields
     return row.title || row.name || row.label || row.id || __('item');
 }
 
@@ -87,7 +78,7 @@ function handleRowClick(event, index) {
             <tr
                 v-for="(row, index) in items"
                 :key="row.id"
-                class="sortable-row outline-hidden"
+                class="sortable-row outline-hidden starting-style-transition starting-style-transition--siblings"
                 :data-row="isSelected(row.id) ? 'selected' : 'unselected'"
                 @click="handleRowClick($event, index)"
             >

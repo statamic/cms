@@ -1,5 +1,5 @@
 <script setup>
-import { Icon, Badge } from '@/components/ui';
+import { Icon, Badge } from '@ui';
 
 defineProps({
     localization: {

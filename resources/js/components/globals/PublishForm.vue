@@ -3,7 +3,7 @@
         <Header :title="__(title)" icon="globals">
             <Dropdown v-if="canConfigure || canEditBlueprint">
                 <template #trigger>
-                    <Button icon="ui/dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
+                    <Button icon="dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
                 </template>
                 <DropdownMenu>
                     <DropdownItem :text="__('Configure')" icon="cog" v-if="canConfigure" :href="configureUrl" />
@@ -15,10 +15,9 @@
 
             <SiteSelector
                 v-if="showLocalizationSelector"
-                class="ltr:mr-4 rtl:ml-4"
                 :sites="localizations"
-                :value="site"
-                @input="localizationSelected"
+                :model-value="site"
+                @update:modelValue="localizationSelected"
             />
 
             <div class="hidden items-center gap-3 md:flex">
@@ -70,12 +69,9 @@
 <script>
 import SiteSelector from '../SiteSelector.vue';
 import clone from '@/util/clone.js';
-import { Button, Dropdown, DropdownItem, DropdownMenu, Header } from '@/components/ui';
-import PublishContainer from '@/components/ui/Publish/Container.vue';
-import PublishTabs from '@/components/ui/Publish/Tabs.vue';
-import PublishComponents from '@/components/ui/Publish/Components.vue';
+import { Button, Dropdown, DropdownItem, DropdownMenu, Header, PublishContainer, PublishTabs, PublishComponents } from '@ui';
 import { computed, ref } from 'vue';
-import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@/components/ui/Publish/SavePipeline.js';
+import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';
 
 let saving = ref(false);
 let errors = ref({});
@@ -264,6 +260,32 @@ export default {
                 ? 'This global set exists in this site.'
                 : 'This global set does not exist for this site.';
         },
+
+        addToCommandPalette() {
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Save'),
+                icon: 'save',
+                action: () => this.save(),
+                prioritize: true,
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Configure'),
+                icon: 'cog',
+                when: () => this.canConfigure,
+                url: this.configureUrl,
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Edit Blueprint'),
+                icon: 'blueprint-edit',
+                when: () => this.canEditBlueprint,
+                url: this.actions.editBlueprint,
+            });
+        },
     },
 
     mounted() {
@@ -271,6 +293,8 @@ export default {
             e.preventDefault();
             this.save();
         });
+
+        this.addToCommandPalette();
     },
 
     created() {

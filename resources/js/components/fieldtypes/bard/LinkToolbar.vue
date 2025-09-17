@@ -1,7 +1,7 @@
 <template>
     <div class="bard-link-toolbar">
         <div>
-            <div class="border-b bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 rounded-b-xl rounded-t-md">
+            <div class="border-b bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 rounded-t-md">
                 <section class="flex gap-2 items-center p-4 border-b dark:border-gray-800">
                     <ui-select
                         v-model="linkType"
@@ -96,7 +96,7 @@
                         :placeholder="__('Optional')"
                     />
 
-                    <ui-checkbox-item
+                    <ui-checkbox
                         :label="__('Open in new window')"
                         v-model="targetBlank"
                         size="sm"

@@ -14,7 +14,7 @@
                         :selected="element.key === selectedKey"
                     />
                 </select>
-                <ui-icon name="ui/chevron-down" class="size-3 ms-1" />
+                <ui-icon name="chevron-down" class="size-3 ms-1" />
             </ui-input-group-prepend>
             <template v-for="(element, index) in keyedData">
                 <ui-input

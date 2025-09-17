@@ -9,7 +9,7 @@
 
 <ui-header title="{{ __('PHP Info') }}" icon="info"></ui-header>
 
-<section class="space-y-6">
+<section class="space-y-6" v-cloak>
     <ui-card-panel heading="{{ __('PHP version') }}">
         <ui-table>
             <ui-table-row>

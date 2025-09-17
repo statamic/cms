@@ -1,10 +1,10 @@
 <script setup>
 import Container from './Container.vue';
 import Tabs from './Tabs.vue';
-import { Header, Button } from '@/components/ui';
+import { Header, Button } from '@ui';
 import uniqid from 'uniqid';
 import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
-import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks } from '@/components/ui/Publish/SavePipeline.js';
+import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks } from '@ui/Publish/SavePipeline.js';
 
 const props = defineProps({
     icon: {
@@ -84,7 +84,7 @@ onUnmounted(() => saveKeyBinding.destroy());
 
 <template>
     <Header :title="title" :icon="icon">
-        <Button v-if="!readOnly" variant="primary" text="Save" @click="save" :disabled="saving" />
+        <Button v-if="!readOnly" variant="primary" :text="__('Save')" @click="save" :disabled="saving" />
     </Header>
     <Container
         ref="container"

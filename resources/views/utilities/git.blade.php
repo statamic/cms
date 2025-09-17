@@ -18,7 +18,7 @@
 
 @if ($statuses)
     @foreach ($statuses as $path => $status)
-        <ui-card-panel heading="{{ __('Repository') }}" subheading="{{ $path }}">
+        <ui-card-panel heading="{{ __('Repository') }}" subheading="{{ $path }}" v-cloak>
             <div class="space-y-4">
                 <div class="flex flex-wrap gap-2">
                     <ui-badge :prepend="__('Affected files')">
