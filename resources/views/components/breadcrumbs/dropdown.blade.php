@@ -1,6 +1,6 @@
 {{-- Hardcoded duplicate of the dropdown trigger in blade to prevent Vue pop in --}}
 <button
-    v-if="false"
+    :class="{'absolute right-0 animate-out fade-out duration-700 fill-mode-forwards':true}"
     class="
         inline-flex items-center justify-center whitespace-nowrap shrink-0
         font-medium antialiased cursor-pointer no-underline
@@ -21,7 +21,7 @@
         <ui-button
             variant="ghost"
             icon="chevron-vertical"
-            class="[&_svg]:size-3! h-8! w-4! hover:bg-gray-300/5! -ml-3 mr-1"
+            class="[&_svg]:size-3! h-8! w-4! hover:bg-gray-300/5! -ml-3 mr-1 animate-in fade-in duration-500"
             :aria-label="'{{ __('Options for') }} {{ __($breadcrumb->text()) }}'"
             aria-haspopup="true"
             aria-expanded="false"

@@ -1,6 +1,6 @@
 <div class="items-center gap-2 hidden md:flex" data-global-header-breadcrumbs>
     @foreach($breadcrumbs as $breadcrumb)
-        <div class="items-center gap-2 md:flex">
+        <div class="items-center gap-2 md:flex relative">
             <span class="text-white/30">/</span>
             <a
                 class="
