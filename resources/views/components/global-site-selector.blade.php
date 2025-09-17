@@ -1,7 +1,7 @@
 <global-site-selector></global-site-selector>
 
 <div
-    :class="{'absolute inset-0 animate-out fade-out duration-900 fill-mode-forwards':true}"
+    :class="{'absolute inset-0 animate-out fade-out duration-1200 fill-mode-forwards':true}"
     class="
         antialiased bg-transparent border-none cursor-pointer
         dark:hover:bg-white/15 dark:hover:text-gray-200 dark:text-gray-300
