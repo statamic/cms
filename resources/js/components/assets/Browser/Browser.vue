@@ -87,7 +87,7 @@
                                 <div class="flex flex-1 items-center gap-3">
                                     <ListingSearch />
                                 </div>
-                                <ListingCustomizeColumns />
+                                <ListingCustomizeColumns v-if="mode === 'table'" />
                             </div>
                         </slot>
 

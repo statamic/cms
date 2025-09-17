@@ -89,7 +89,7 @@
                         icon="fieldtype-link"
                         :heading="__('Link to URL')"
                         :description="__('messages.navigation_link_to_url_instructions')"
-                        @click="linkPage"
+                        @click="linkPage()"
                     />
 
                     <EmptyStateItem

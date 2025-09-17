@@ -1,10 +1,10 @@
 <template>
     <div>
-        <div v-if="!loading && pages.length == 0" class="no-results flex w-full items-center">
+        <div v-if="!loading && treeData.length == 0" class="no-results flex w-full items-center">
             <slot name="empty" />
         </div>
 
-        <ui-panel v-show="pages.length">
+        <ui-panel v-show="treeData.length">
             <div class="loading card" v-if="loading">
                 <Icon name="loading" />
             </div>
@@ -27,6 +27,7 @@
                     :indent="24"
                     :dir="direction"
                     :node-key="(stat) => stat.data.id"
+                    :dragOverThrottleInterval="30"
                     :each-droppable="eachDroppable"
                     :root-droppable="rootDroppable"
                     :max-level="maxDepth"

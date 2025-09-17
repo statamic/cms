@@ -1,7 +1,7 @@
 <script setup>
 import { cva } from 'cva';
 import { ComboboxAnchor, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxRoot, ComboboxTrigger, ComboboxPortal, ComboboxViewport, FocusScope } from 'reka-ui';
-import { computed, nextTick, onMounted, ref, useAttrs, useSlots, useTemplateRef, watch } from 'vue';
+import { computed, nextTick, ref, useAttrs, useTemplateRef, watch } from 'vue';
 import Button from './Button/Button.vue';
 import Icon from './Icon/Icon.vue';
 import Badge from './Badge.vue';
@@ -23,7 +23,7 @@ const props = defineProps({
     modelValue: { type: [Object, String, Number], default: null },
     multiple: { type: Boolean, default: false },
     optionLabel: { type: String, default: 'label' },
-    options: { type: Array, default: null },
+    options: { type: Array, default: [] },
     optionValue: { type: String, default: 'value' },
     placeholder: { type: String, default: () => __('Select...') },
     readOnly: { type: Boolean, default: false },
@@ -117,6 +117,13 @@ const selectedOption = computed(() => {
 const getOptionLabel = (option) => option?.[props.optionLabel];
 const getOptionValue = (option) => option?.[props.optionValue];
 const isSelected = (option) => selectedOptions.value.filter((item) => getOptionValue(item) === getOptionValue(option)).length > 0;
+
+const isOptionDisabled = (option) => {
+    if (isSelected(option)) return false;
+    if (props.multiple && limitReached.value) return true;
+
+    return false;
+};
 
 const limitReached = computed(() => {
     if (! props.maxSelections) return false;
@@ -232,32 +239,13 @@ function pushTaggableOption(e) {
     }
 }
 
-function openOnSpace(e) {
-	const target = e && e.target ? e.target : null;
-	const tag = (target && target.tagName ? target.tagName : '').toLowerCase();
-	const isEditable = target && (tag === 'input' || tag === 'textarea' || target.isContentEditable);
+function openDropdown(e) {
+    if (dropdownOpen.value) return;
+    if (typeof e.preventDefault === 'function') e.preventDefault();
 
-	// If already open, do nothing so Space behaves normally
-	if (dropdownOpen.value) return;
+    updateDropdownOpen(true);
 
-	// If focused element is editable but dropdown is closed, intercept to open
-	if (isEditable) {
-		if (e && typeof e.preventDefault === 'function') e.preventDefault();
-		updateDropdownOpen(true);
-		nextTick(() => {
-			const inputEl = searchInputRef?.value?.$el || searchInputRef?.value;
-			if (inputEl && typeof inputEl.focus === 'function') inputEl.focus();
-		});
-		return;
-	}
-
-	// Non-editable target and closed: open
-	if (e && typeof e.preventDefault === 'function') e.preventDefault();
-	updateDropdownOpen(true);
-	nextTick(() => {
-		const inputEl = searchInputRef?.value?.$el || searchInputRef?.value;
-		if (inputEl && typeof inputEl.focus === 'function') inputEl.focus();
-	});
+    nextTick(() => searchInputRef?.value?.$el?.focus());
 }
 
 defineExpose({
@@ -270,7 +258,7 @@ defineExpose({
     <div>
         <div class="flex">
             <ComboboxRoot
-                :disabled="disabled || (multiple && limitReached) || readOnly"
+                :disabled="disabled || readOnly"
                 :model-value="modelValue"
                 :multiple
                 :open="dropdownOpen"
@@ -284,7 +272,7 @@ defineExpose({
                 v-bind="attrs"
             >
                 <ComboboxAnchor :class="[$attrs.class]" data-ui-combobox-anchor>
-                    <ComboboxTrigger as="div" ref="trigger" :class="triggerClasses" @keydown.space="openOnSpace" data-ui-combobox-trigger>
+                    <ComboboxTrigger as="div" ref="trigger" :class="triggerClasses" @keydown.enter="openDropdown" @keydown.space="openDropdown" data-ui-combobox-trigger>
                         <div class="flex-1 min-w-0">
                             <ComboboxInput
                                 v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"
@@ -298,15 +286,15 @@ defineExpose({
                                 @paste.prevent="onPaste"
                                 @keydown.enter.prevent="pushTaggableOption"
                                 @blur="pushTaggableOption"
-                                @keydown.space="openOnSpace"
+                                @keydown.space="openDropdown"
                             />
 
-                            <button type="button" class="w-full text-start truncate flex items-center gap-2 bg-transparent cursor-pointer focus:outline-none" v-else-if="!searchable && (dropdownOpen || !modelValue)" @keydown.space="openOnSpace" data-ui-combobox-placeholder>
+                            <button type="button" class="w-full text-start truncate flex items-center gap-2 bg-transparent cursor-pointer focus:outline-none" v-else-if="!searchable && (dropdownOpen || !modelValue)" @keydown.space="openDropdown" data-ui-combobox-placeholder>
                             <Icon v-if="icon" :name="icon" class="text-gray-400 dark:text-white dark:opacity-50" />
                                 <span class="text-gray-400 dark:text-gray-500" v-text="placeholder" />
                             </button>
 
-                            <button type="button" v-else class="w-full text-start bg-transparent truncate flex items-center gap-2 cursor-pointer focus:outline-none" @keydown.space="openOnSpace" data-ui-combobox-selected-option>
+                            <button type="button" v-else class="w-full text-start bg-transparent truncate flex items-center gap-2 cursor-pointer focus:outline-none" @keydown.space="openDropdown" data-ui-combobox-selected-option>
                                 <slot name="selected-option" v-bind="{ option: selectedOption }">
                                     <div class="size-4">
                                         <Icon v-if="icon" :name="icon" class="text-white/85 dark:text-white dark:opacity-50" />
@@ -337,7 +325,7 @@ defineExpose({
                         data-ui-combobox-content
                     >
                         <FocusScope
-                            trapped
+                            :trapped="!searchable"
                             @mount-auto-focus.prevent
                             @unmount-auto-focus="(event) => {
                                 if (event.defaultPrevented) return;
@@ -355,12 +343,13 @@ defineExpose({
                                 <ComboboxItem
                                     v-if="filteredOptions"
                                     v-for="(option, index) in filteredOptions"
-                                    :key="index"
+                                    :key="index + JSON.stringify(modelValue)"
                                     :value="getOptionValue(option)"
                                     :text-value="getOptionLabel(option)"
+                                    :disabled="isOptionDisabled(option)"
                                     :class="itemClasses({ size: size, selected: isSelected(option) })"
                                     as="button"
-                                    data-ui-combobox-item
+                                    :data-ui-combobox-item="getOptionValue(option)"
                                     @select="() => {
                                         dropdownOpen = !closeOnSelect;
                                         if (closeOnSelect) $refs.trigger.$el.focus();
@@ -391,7 +380,7 @@ defineExpose({
                 handle-class="sortable-item"
                 :distance="5"
                 :mirror="false"
-                :disabled
+                :disabled="disabled || readOnly"
                 :model-value="modelValue"
                 @update:modelValue="updateModelValue"
             >
@@ -406,7 +395,7 @@ defineExpose({
                             <div v-else>{{ __(getOptionLabel(option)) }}</div>
 
                             <button
-                                v-if="!disabled"
+                                v-if="!disabled && !readOnly"
                                 type="button"
                                 class="opacity-75 hover:opacity-100 cursor-pointer"
                                 :aria-label="__('Deselect option')"
