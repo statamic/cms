@@ -48,180 +48,178 @@ body {
         'calt' off;
 }
 
-@utility prose {
+.prose {
     color: var(--tw-prose-body);
     max-width: 65ch;
     font-size: var(--text-base);
     line-height: calc(var(--leading-normal) + 0.25);
 
-    & :where(p):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
-        margin-top: 1.25em;
-        margin-bottom: 1.25em;
-    }
+    &:not([class~='not-prose'], [class~='not-prose'] *) {
+        p {
+            margin-top: 1.25em;
+            margin-bottom: 1.25em;
+        }
 
-    & :where(a):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
-        color: var(--tw-prose-links);
-        text-decoration: underline;
-        font-weight: var(--font-weight-medium);
-    }
+        a {
+            color: var(--tw-prose-links);
+            text-decoration: underline;
+            font-weight: var(--font-weight-medium);
+        }
 
-    & :where(strong):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
-        color: var(--tw-prose-bold);
-        font-weight: var(--font-weight-semibold);
-    }
+        strong {
+            color: var(--tw-prose-bold);
+            font-weight: var(--font-weight-semibold);
 
-    & :where(a strong):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
-        color: inherit;
-    }
+            a &,
+            blockquote &,
+            thead th & {
+                color: inherit;
+            }
+        }
 
-    & :where(blockquote strong):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
-        color: inherit;
-    }
+        hr {
+            border-color: var(--tw-prose-hr);
+            border-top-width: 1px;
+            margin-top: 3em;
+            margin-bottom: 3em;
+        }
 
-    & :where(thead th strong):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
-        color: inherit;
-    }
+        blockquote {
+            font-weight: var(--font-weight-medium);
+            font-style: italic;
+            color: var(--tw-prose-quotes);
+            border-inline-start-width: 0.25rem;
+            border-inline-start-color: var(--tw-prose-quote-borders);
+            quotes: '\201C' '\201D' '\2018' '\2019';
+            margin-top: 1.6em;
+            margin-bottom: 1.6em;
+            padding-inline-start: 1em;
 
-    & :where(ol):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
-        list-style-type: decimal;
-        margin-top: 1.25em;
-        margin-bottom: 1.25em;
-        padding-inline-start: 1.625em;
-    }
+            p {
+                &::before {
+                    content: open-quote;
+                }
+                &:last-of-type::after {
+                    content: close-quote;
+                }
+            }
+        }
 
-    & :where(ul):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
-        list-style-type: disc;
-        margin-top: 1.25em;
-        margin-bottom: 1.25em;
-        padding-inline-start: 1.625em;
-    }
+        /* GROUP PROSE / LISTS
+        =================================================== */
 
-    & :where(ol > li):not(:where([class~='not-prose'], [class~='not-prose'] *))::marker {
-        font-weight: var(--font-weight-normal);
-        color: var(--tw-prose-counters);
-    }
+        ol, ul {
+            margin-top: 1.25em;
+            margin-bottom: 1.25em;
+            padding-inline-start: 1.625em;
+        }
 
-    & :where(ul > li):not(:where([class~='not-prose'], [class~='not-prose'] *))::marker {
-        color: var(--tw-prose-bullets);
-    }
+        ol {
+            list-style-type: decimal;
+            > li {
+                font-weight: var(--font-weight-normal);
+                color: var(--tw-prose-counters);
+            }
+        }
 
-    & :where(dt):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
-        color: var(--tw-prose-headings);
-        font-weight: var(--font-weight-semibold);
-        margin-top: 1.25em;
-    }
+        ul {
+            list-style-type: disc;
+            > li {
+                color: var(--tw-prose-bullets);
+            }
+        }
 
-    & :where(hr):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
-        border-color: var(--tw-prose-hr);
-        border-top-width: 1px;
-        margin-top: 3em;
-        margin-bottom: 3em;
-    }
+        dt {
+            color: var(--tw-prose-headings);
+            font-weight: var(--font-weight-semibold);
+            margin-top: 1.25em;
+        }
 
-    & :where(blockquote):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
-        font-weight: var(--font-weight-medium);
-        font-style: italic;
-        color: var(--tw-prose-quotes);
-        border-inline-start-width: 0.25rem;
-        border-inline-start-color: var(--tw-prose-quote-borders);
-        quotes: '\201C' '\201D' '\2018' '\2019';
-        margin-top: 1.6em;
-        margin-bottom: 1.6em;
-        padding-inline-start: 1em;
-    }
+        /* GROUP PROSE / HEADINGS
+        =================================================== */
+        h1 {
+            color: var(--tw-prose-headings);
+            font-size: 1.75em;
+            font-weight: var(--font-weight-medium);
+            letter-spacing: -0.01em;
+            line-height: var(--leading-normal);
+            margin-top: 0;
+            margin-bottom: 1em;
 
-    & :where(blockquote p:first-of-type):not(:where([class~='not-prose'], [class~='not-prose'] *))::before {
-        content: open-quote;
-    }
+            strong {
+                font-weight: var(--font-weight-bold);
+                color: inherit;
+            }
+        }
 
-    & :where(blockquote p:last-of-type):not(
-            :where([class~='not-prose'], [class~='not-prose'] *)
-        )::after {
-        content: close-quote;
-    }
+        h2 {
+            color: var(--tw-prose-headings);
+            font-size: 1.35em;
+            letter-spacing: -0.01em;
+            line-height: var(--leading-normal);
+            margin-top: 0;
+            margin-bottom: 0.5em;
+            font-weight: var(--font-weight-medium);
 
-    & :where(h1):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
-        color: var(--tw-prose-headings);
-        font-size: 1.75em;
-        font-weight: var(--font-weight-medium);
-        letter-spacing: -0.01em;
-        line-height: var(--leading-normal);
-        margin-top: 0;
-        margin-bottom: 1em;
-    }
+            strong {
+                font-weight: var(--font-weight-bold);
+                color: inherit;
+            }
+        }
 
-    & :where(h1 strong):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
-        font-weight: var(--font-weight-bold);
-        color: inherit;
-    }
+        h3 {
+            color: var(--tw-prose-headings);
+            font-weight: var(--font-weight-medium);
+            font-size: 1.15em;
+            line-height: var(--leading-normal);
+            margin-top: 0;
+            margin-bottom: 0.5em;
 
-    & :where(h2):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
-        color: var(--tw-prose-headings);
-        font-size: 1.35em;
-        letter-spacing: -0.01em;
-        line-height: var(--leading-normal);
-        margin-top: 0;
-        margin-bottom: 0.5em;
-        font-weight: var(--font-weight-medium);
-    }
+            strong {
+                font-weight: var(--font-weight-bold);
+                color: inherit;
+            }
+        }
 
-    & :where(h2 strong):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
-        font-weight: var(--font-weight-bold);
-        color: inherit;
-    }
+        h4 {
+            color: var(--tw-prose-headings);
+            font-weight: var(--font-weight-medium);
+            line-height: var(--leading-normal);
+            margin-top: 0;
+            margin-bottom: 0.5em;
 
-    & :where(h3):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
-        color: var(--tw-prose-headings);
-        font-weight: var(--font-weight-medium);
-        font-size: 1.15em;
-        margin-top: 0;
-        margin-bottom: 0.5em;
-        line-height: var(--leading-normal);
-    }
+            strong {
+                font-weight: var(--font-weight-bold);
+                color: inherit;
+            }
+        }
 
-    & :where(h3 strong):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
-        font-weight: var(--font-weight-bold);
-        color: inherit;
-    }
+        h5 {
+            color: var(--tw-prose-headings);
+            font-weight: var(--font-weight-normal);
+            margin-top: 0;
+            margin-bottom: 0.5em;
+            line-height: var(--leading-normal);
 
-    & :where(h4):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
-        color: var(--tw-prose-headings);
-        font-weight: var(--font-weight-medium);
-        margin-top: 0;
-        margin-bottom: 0.5em;
-        line-height: var(--leading-normal);
-    }
+            strong {
+                font-weight: var(--font-weight-bold);
+                color: inherit;
+            }
+        }
 
-    & :where(h4 strong):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
-        font-weight: var(--font-weight-bold);
-        color: inherit;
-    }
+        h6 {
+            color: var(--tw-prose-headings);
+            font-size: .875em;
+            font-weight: var(--font-weight-normal);
+            margin-top: 0;
+            margin-bottom: 0.5em;
+            line-height: var(--leading-normal);
 
-    & :where(h5):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
-        color: var(--tw-prose-headings);
-        font-weight: var(--font-weight-normal);
-        margin-top: 0;
-        margin-bottom: 0.5em;
-        line-height: var(--leading-normal);
-    }
-
-    & :where(h5 strong):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
-        font-weight: var(--font-weight-bold);
-        color: inherit;
-    }
-
-    & :where(h6):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
-        color: var(--tw-prose-headings);
-        font-size: .875em;
-        font-weight: var(--font-weight-normal);
-        margin-top: 0;
-        margin-bottom: 0.5em;
-        line-height: var(--leading-normal);
-    }
-
-    & :where(h6 strong):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
-        font-weight: var(--font-weight-bold);
-        color: inherit;
+            strong {
+                font-weight: var(--font-weight-bold);
+                color: inherit;
+            }
+        }
     }
 
     & :where(img):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
