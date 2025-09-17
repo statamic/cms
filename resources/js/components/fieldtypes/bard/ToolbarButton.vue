@@ -1,14 +1,14 @@
 <template>
     <Button
         class="px-2!"
-        :class="{ active }"
-        variant="ghost"
+        :class="{ active, group: variant === 'floating' }"
+        :variant="variant === 'floating' ? 'subtle' : 'ghost'"
         size="sm"
         :aria-label="button.text"
         v-tooltip="button.text"
         @click="button.command(editor, button.args)"
     >
-        <ui-icon :name="button.svg" v-if="button.svg" class="size-3.5!" />
+        <ui-icon :name="button.svg" v-if="button.svg" class="size-3.5! " :class="{ 'group-hover:text-white text-yellow-300!': active && variant === 'floating' }" />
         <div class="flex items-center" v-html="button.html" v-if="button.html" />
     </Button>
 </template>
@@ -23,6 +23,7 @@ export default {
     props: {
         button: Object,
         active: Boolean,
+        variant: String,
         config: Object,
         bard: {},
         editor: {},

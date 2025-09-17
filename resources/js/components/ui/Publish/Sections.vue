@@ -1,6 +1,13 @@
 <script setup>
 import { injectTabContext } from './TabProvider.vue';
-import { Panel, PanelHeader, Heading, Subheading, Card } from '@/components/ui';
+import {
+    Panel,
+    PanelHeader,
+    Heading,
+    Subheading,
+    Card,
+    Icon,
+} from '@ui';
 import FieldsProvider from './FieldsProvider.vue';
 import Fields from './Fields.vue';
 import ShowField from '@/components/field-conditions/ShowField.js';
@@ -10,7 +17,7 @@ import { computed } from 'vue';
 import { Primitive } from 'reka-ui';
 import { Motion } from 'motion-v';
 
-const { blueprint, container, visibleValues, extraValues, asConfig, hiddenFields, revealerFields, setHiddenField } = injectContainerContext();
+const { blueprint, container, visibleValues, extraValues, revealerValues, asConfig, hiddenFields, setHiddenField } = injectContainerContext();
 const tab = injectTabContext();
 const sections = tab.sections;
 const visibleSections = computed(() => {
@@ -20,9 +27,10 @@ const visibleSections = computed(() => {
                 visibleValues.value,
                 extraValues.value,
                 visibleValues.value,
+                revealerValues.value,
                 hiddenFields.value,
-                revealerFields.value,
-                setHiddenField
+                setHiddenField,
+                { container }
             ).showField(field, field.handle);
         });
     });
@@ -44,25 +52,38 @@ function toggleSection(id) {
         <Panel
             v-for="(section, i) in visibleSections"
             :key="i"
-            :class="asConfig ? 'mb-12' : 'mb-6'"
+            :class="[
+                asConfig ? 'mb-12' : 'mb-6',
+                { 'pb-0': section.collapsed }
+            ]"
         >
-            <PanelHeader v-if="section.display" @click="toggleSection(i)">
-                <Heading :text="__(section.display)" />
-                <Subheading v-if="section.instructions" :text="renderInstructions(section.instructions)" />
+            <PanelHeader v-if="section.display || section.collapsible" @click="toggleSection(i)" class="flex justify-between">
+                <div>
+                    <Heading :text="__(section.display)" />
+                    <Subheading v-if="section.instructions" :text="renderInstructions(section.instructions)" />
+                </div>
+                <Icon
+                    v-if="section.collapsible"
+                    name="chevron-down"
+                    class="size-5 text-gray-400"
+                    :class="section.collapsed ? 'rotate-270' : 'rotate-0'"
+                />
             </PanelHeader>
-            <Motion
-                :initial="{ height: section.collapsed ? '0px' : 'auto' }"
-                :animate="{ height: section.collapsed ? '0px' : 'auto' }"
-                :transition="{ duration: 0.25, type: 'tween' }"
+            <div
+                style="--tw-ease: ease;"
+                class="h-auto overflow-clip visible transition-[height,visibility] duration-[250ms,2s]"
+                :class="{ 'h-0! visibility-hidden': section.collapsed }"
             >
-                <Primitive :as="asConfig ? 'div' : Card">
-                    <FieldsProvider :fields="section.fields">
-                        <slot :section="section">
-                            <Fields />
-                        </slot>
-                    </FieldsProvider>
-                </Primitive>
-            </Motion>
+                <div class="p-px">
+                    <Primitive :as="asConfig ? 'div' : Card">
+                        <FieldsProvider :fields="section.fields">
+                            <slot :section="section">
+                                <Fields />
+                            </slot>
+                        </FieldsProvider>
+                    </Primitive>
+                </div>
+            </div>
         </Panel>
     </div>
 </template>

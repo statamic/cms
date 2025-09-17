@@ -14,7 +14,7 @@
                         :selected="element.key === selectedKey"
                     />
                 </select>
-                <ui-icon name="ui/chevron-down" class="size-3 ms-1" />
+                <ui-icon name="chevron-down" class="size-3 ms-1" />
             </ui-input-group-prepend>
             <template v-for="(element, index) in keyedData">
                 <ui-input
@@ -68,17 +68,13 @@
                     <tr class="sortable-row" v-for="(element, index) in data" :key="element._id">
                         <td class="sortable-handle table-drag-handle" v-if="!isReadOnly"></td>
                         <td>
-                            <input
-                                type="text"
-                                class="input-text font-medium"
+                            <ui-input
                                 v-model="element.key"
                                 :readonly="isReadOnly"
                             />
                         </td>
                         <td>
-                            <input
-                                type="text"
-                                class="input-text"
+                            <ui-input
                                 v-model="element.value"
                                 :readonly="isReadOnly"
                             />

@@ -7,11 +7,19 @@
 
 @section('content')
     <ui-header title="{{ __('User Groups') }}" icon="groups">
-        <ui-button
-            href="{{ cp_route('user-groups.create') }}"
-            variant="primary"
-            :text="__('Create User Group')"
-        ></ui-button>
+        <ui-command-palette-item
+            category="{{ Statamic\CommandPalette\Category::Actions }}"
+            text="{{ __('Create User Group') }}"
+            url="{{ cp_route('user-groups.create') }}"
+            icon="groups"
+            v-slot="{ text, url }"
+        >
+            <ui-button
+                :href="url"
+                variant="primary"
+                :text="text"
+            ></ui-button>
+        </ui-command-palette-item>
     </ui-header>
 
     <user-group-listing :initial-rows="{{ json_encode($groups) }}"></user-group-listing>

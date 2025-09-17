@@ -2291,14 +2291,8 @@ class CoreModifiers extends Modifier
             $segment = $this->getFromContext($context, $params);
         }
 
-        $url = parse_url($value);
-
-        // Get everything after a possible domain
-        // and make sure it starts with a /
-        $uris = Stringy::ensureLeft(Arr::get($url, 'path'), '/');
-
-        //Boom
-        $segments = explode('/', $uris);
+        // Explode segments
+        $segments = explode('/', URL::makeRelative($value));
 
         return Arr::get($segments, $segment);
     }
@@ -2870,7 +2864,7 @@ class CoreModifiers extends Modifier
     {
         $timezone = Arr::get($params, 0, Statamic::displayTimezone());
 
-        return $this->carbon($value)->tz($timezone);
+        return $this->carbon($value)->clone()->tz($timezone);
     }
 
     public function typeOf($value)

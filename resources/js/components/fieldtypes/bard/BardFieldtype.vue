@@ -6,7 +6,7 @@
         <div :class="{ 'publish-fields': fullScreenMode }">
             <div :class="fullScreenMode && wrapperClasses">
                 <div
-                    class="bard-fieldtype antialiased st-text-legibility with-contrast:border-gray-500 shadow-ui-sm focus-outline-discrete"
+                    class="bard-fieldtype antialiased with-contrast:border-gray-500 shadow-ui-sm focus-outline-discrete"
                     :class="{ 'bard-fullscreen': fullScreenMode }"
                     ref="container"
                     @dragstart.stop="ignorePageHeader(true)"
@@ -19,7 +19,7 @@
                         @close="toggleFullscreen"
                     >
                         <div class="bard-fixed-toolbar border-0" v-if="!readOnly && showFixedToolbar">
-                            <div class="no-select flex flex-1 flex-wrap items-center" v-if="toolbarIsFixed">
+                            <div class="no-select flex flex-1 flex-wrap items-center gap-1" v-if="toolbarIsFixed">
                                 <component
                                     v-for="button in visibleButtons(buttons)"
                                     :key="button.name"
@@ -35,7 +35,7 @@
                     </publish-field-fullscreen-header>
 
                     <div class="bard-fixed-toolbar flex items-center justify-between rounded-t-xl border-b border-gray-300 bg-gray-50 px-2 py-1 dark:border-white/10 dark:bg-gray-950" v-if="!readOnly && showFixedToolbar && !fullScreenMode">
-                        <div class="no-select flex flex-1 flex-wrap items-center" v-if="toolbarIsFixed">
+                        <div class="no-select flex flex-1 flex-wrap items-center gap-1" v-if="toolbarIsFixed">
                             <component
                                 v-for="button in visibleButtons(buttons)"
                                 :key="button.name"
@@ -59,11 +59,11 @@
                         tabindex="0"
                     >
                         <bubble-menu
-                            class="bard-floating-toolbar"
                             :editor="editor"
                             :options="{ placement: 'top', offset: [0, 10] }"
                             v-if="editor && toolbarIsFloating && !readOnly"
                         >
+                        <div class="bard-floating-toolbar">
                             <component
                                 v-for="button in visibleButtons(buttons)"
                                 :key="button.name"
@@ -73,7 +73,9 @@
                                 :bard="this"
                                 :config="config"
                                 :editor="editor"
+                                variant="floating"
                             />
+                        </div>
                         </bubble-menu>
 
                         <floating-menu
@@ -127,7 +129,7 @@
 import Fieldtype from '../Fieldtype.vue';
 import uniqid from 'uniqid';
 import Emitter from 'tiny-emitter';
-import { Editor, EditorContent } from '@tiptap/vue-3';
+import { Editor, EditorContent, NodeViewWrapper, NodeViewContent } from '@tiptap/vue-3';
 import { BubbleMenu } from '@tiptap/vue-3/menus';
 import { Extension } from '@tiptap/core';
 import { FloatingMenu } from './FloatingMenu';
@@ -321,7 +323,7 @@ export default {
             return [
                 {
                     title: __('Expand All Sets'),
-                    icon: 'ui/expand',
+                    icon: 'expand',
                     quick: true,
                     visibleWhenReadOnly: true,
                     run: this.expandAll,
@@ -329,7 +331,7 @@ export default {
                 },
                 {
                     title: __('Collapse All Sets'),
-                    icon: 'ui/collapse',
+                    icon: 'collapse',
                     quick: true,
                     visibleWhenReadOnly: true,
                     run: this.collapseAll,
@@ -337,7 +339,7 @@ export default {
                 },
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => (vm.fullScreenMode ? 'ui/collapse-all' : 'ui/expand-all'),
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'collapse-all' : 'expand-all'),
                     quick: true,
                     run: this.toggleFullscreen,
                     visibleWhenReadOnly: true,
@@ -345,6 +347,11 @@ export default {
                 },
             ];
         },
+    },
+
+    created() {
+        Statamic.$components.register('NodeViewWrapper', NodeViewWrapper);
+        Statamic.$components.register('NodeViewContent', NodeViewContent);
     },
 
     async mounted() {
@@ -355,8 +362,6 @@ export default {
 
         this.json = this.editor.getJSON().content;
         this.html = this.editor.getHTML();
-
-        this.escBinding = this.$keys.bind('esc', this.closeFullscreen);
 
         this.$nextTick(() => {
             this.mounted = true;
@@ -376,8 +381,8 @@ export default {
     },
 
     beforeUnmount() {
-        this.editor.destroy();
-        this.escBinding.destroy();
+        this.editor?.destroy();
+        this.escBinding?.destroy();
     },
 
     watch: {
@@ -409,8 +414,14 @@ export default {
             this.updateMeta(meta);
         },
 
-        fullScreenMode() {
+        fullScreenMode(fullScreenMode) {
             this.initEditor();
+
+            if (fullScreenMode) {
+                this.escBinding = this.$keys.bindGlobal('esc', this.closeFullscreen);
+            } else {
+                this.escBinding?.destroy();
+            }
         },
 
         'publishContainer.errors': {

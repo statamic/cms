@@ -7,7 +7,6 @@
   ========================================================================== */
 
 .grid-fieldtype .grid-table .markdown-fieldtype {
-
     .markdown-preview {
         @apply border-none p-2 text-start;
         p {
@@ -75,7 +74,7 @@
     }
 
     pre {
-        @apply rounded-sm px-4 py-2 dark:bg-gray-700 dark:text-red-500;
+        @apply rounded-sm px-4 py-2 dark:bg-gray-700 dark:text-red-600;
         color: #c7254e;
         background-color: #f9f2f4;
         direction: ltr;

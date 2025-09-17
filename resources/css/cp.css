@@ -16,7 +16,6 @@
 @import './components/blueprints.css';
 @import './components/configure.css';
 @import './components/focal-point.css';
-@import './components/global-header.css';
 @import './components/index-fields.css';
 @import './components/notifications.css';
 @import './components/page-tree.css';
@@ -32,7 +31,6 @@
 @import './components/wizard.css';
 
 /* Fieldtypes */
-@import './components/fieldtypes/array.css';
 @import './components/fieldtypes/assets.css';
 @import './components/fieldtypes/bard.css';
 @import './components/fieldtypes/grid.css';

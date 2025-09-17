@@ -33,6 +33,7 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\MigrateDatesToUtc::class,
         Commands\MakeUser::class,
         Commands\Rtfm::class,
+        Commands\SetupCpVite::class,
         Commands\StacheClear::class,
         Commands\StacheRefresh::class,
         Commands\StacheWarm::class,

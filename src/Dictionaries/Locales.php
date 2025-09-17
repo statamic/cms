@@ -17,7 +17,7 @@ class Locales extends BasicDictionary
 
     protected function getItems(): array
     {
-        $output = Process::run(['locale', '-a']);
+        $output = Process::run($this->buildLocalesCommand());
 
         return collect(explode(PHP_EOL, $output))
             ->map(fn ($locale) => Str::before($locale, '.'))
@@ -27,5 +27,19 @@ class Locales extends BasicDictionary
             ->values()
             ->map(fn ($locale) => ['name' => $locale])
             ->all();
+    }
+
+    private function buildLocalesCommand(): array
+    {
+        if (windows_os()) {
+            return [
+                'powershell',
+                '-NoProfile',
+                '-Command',
+                '[System.Globalization.CultureInfo]::GetCultures([System.Globalization.CultureTypes]::InstalledWin32Cultures) | ForEach-Object { $_.Name }',
+            ];
+        }
+
+        return ['locale', '-a'];
     }
 }

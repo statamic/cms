@@ -8,28 +8,53 @@
 @section('content')
 
     <ui-header title="{{ __('Cache Manager') }}" icon="cache">
-        <form method="POST" action="{{ cp_route('utilities.cache.clear', 'all') }}">
+        <form method="POST" action="{{ cp_route('utilities.cache.clear', 'all') }}" ref="clearAllForm">
             @csrf
-            <ui-button
+            <ui-command-palette-item
+                category="{{ Statamic\CommandPalette\Category::Actions }}"
                 text="{{ __('Clear All') }}"
-                type="submit"
-                variant="primary"
-            />
+                icon="live-preview"
+                :action="() => $refs.clearAllForm.submit()"
+                prioritize
+                v-slot="{ text }"
+            >
+                <ui-button
+                    :text="text"
+                    type="submit"
+                    variant="primary"
+                />
+            </ui-command-palette-item>
         </form>
     </ui-header>
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" v-cloak>
 
         <ui-panel class="h-full flex flex-col">
             <ui-panel-header class="flex items-center justify-between min-h-10">
                 <ui-heading>{{ __('Content Stache') }}</ui-heading>
                 <div class="flex gap-2">
-                    <form method="POST" action="{{ cp_route('utilities.cache.warm', 'stache') }}">
+                    <form method="POST" action="{{ cp_route('utilities.cache.warm', 'stache') }}" ref="warmStacheForm">
                         @csrf
-                        <ui-button text="{{ __('Warm') }}" type="submit" size="sm" />
+                        <ui-command-palette-item
+                            category="{{ Statamic\CommandPalette\Category::Actions }}"
+                            :text="['{{ __('Warm') }}', '{{ __('Content Stache') }}']"
+                            icon="fire-flame-burn-hot"
+                            :action="() => $refs.warmStacheForm.submit()"
+                            v-slot="{ text }"
+                        >
+                            <ui-button text="{{ __('Warm') }}" type="submit" size="sm" />
+                        </ui-command-palette-item>
                     </form>
-                    <form method="POST" action="{{ cp_route('utilities.cache.clear', 'stache') }}">
+                    <form method="POST" action="{{ cp_route('utilities.cache.clear', 'stache') }}" ref="clearStacheForm">
                         @csrf
-                        <ui-button text="{{ __('Clear') }}" type="submit" size="sm" />
+                        <ui-command-palette-item
+                            category="{{ Statamic\CommandPalette\Category::Actions }}"
+                            :text="['{{ __('Clear') }}', '{{ __('Content Stache') }}']"
+                            icon="live-preview"
+                            :action="() => $refs.clearStacheForm.submit()"
+                            v-slot="{ text }"
+                        >
+                            <ui-button text="{{ __('Clear') }}" type="submit" size="sm" />
+                        </ui-command-palette-item>
                     </form>
                 </div>
             </ui-panel-header>
@@ -65,9 +90,16 @@
                 <ui-heading>{{ __('Static Page Cache') }}</ui-heading>
                 @if ($static['enabled'])
                     <div class="flex gap-2">
-                        <form method="POST" action="{{ cp_route('utilities.cache.clear', 'static') }}">
+                        <form method="POST" action="{{ cp_route('utilities.cache.clear', 'static') }}" ref="clearStaticCacheForm">
                             @csrf
-                            <ui-button text="{{ __('Clear') }}" type="submit" size="sm" />
+                            <ui-command-palette-item
+                                category="{{ Statamic\CommandPalette\Category::Actions }}"
+                                :text="['{{ __('Clear') }}', '{{ __('Static Page Stache') }}']"
+                                icon="live-preview"
+                                :action="() => $refs.clearStaticCacheForm.submit()"
+                            >
+                                <ui-button text="{{ __('Clear') }}" type="submit" size="sm" />
+                            </ui-command-palette-item>
                         </form>
                     </div>
                 @endif
@@ -91,9 +123,16 @@
             <ui-panel-header class="flex items-center justify-between min-h-10">
                 <ui-heading>{{ __('Application Cache') }}</ui-heading>
                 <div class="flex gap-2">
-                    <form method="POST" action="{{ cp_route('utilities.cache.clear', 'application') }}">
+                    <form method="POST" action="{{ cp_route('utilities.cache.clear', 'application') }}" ref="clearAppCacheForm">
                         @csrf
-                        <ui-button text="{{ __('Clear') }}" type="submit" size="sm" />
+                        <ui-command-palette-item
+                            category="{{ Statamic\CommandPalette\Category::Actions }}"
+                            :text="['{{ __('Clear') }}', '{{ __('Application Cache') }}']"
+                            icon="live-preview"
+                            :action="() => $refs.clearAppCacheForm.submit()"
+                        >
+                            <ui-button text="{{ __('Clear') }}" type="submit" size="sm" />
+                        </ui-command-palette-item>
                     </form>
                 </div>
             </ui-panel-header>
@@ -111,9 +150,16 @@
             <ui-panel-header class="flex items-center justify-between min-h-10">
                 <ui-heading>{{ __('Image Cache') }}</ui-heading>
                 <div class="flex gap-2">
-                    <form method="POST" action="{{ cp_route('utilities.cache.clear', 'image') }}">
+                    <form method="POST" action="{{ cp_route('utilities.cache.clear', 'image') }}" ref="clearImageCacheForm">
                         @csrf
-                        <ui-button text="{{ __('Clear') }}" type="submit" size="sm" />
+                        <ui-command-palette-item
+                            category="{{ Statamic\CommandPalette\Category::Actions }}"
+                            :text="['{{ __('Clear') }}', '{{ __('Image Cache') }}']"
+                            icon="live-preview"
+                            :action="() => $refs.clearImageCacheForm.submit()"
+                        >
+                            <ui-button text="{{ __('Clear') }}" type="submit" size="sm" />
+                        </ui-command-palette-item>
                     </form>
                 </div>
             </ui-panel-header>

@@ -12,13 +12,13 @@
         />
     </ui-header>
     <div class="@container/collections flex flex-wrap py-2 gap-y-6 -mx-3" v-if="mode === 'grid'">
-        <div v-for="collection in items" class="w-full @4xl:w-1/2 px-3">
+        <div v-for="collection in items" class="w-full @4xl:w-1/2 px-3" :key="collection.id">
             <ui-panel>
                 <ui-panel-header class="flex items-center justify-between">
                     <div class="flex items-center gap-1.5">
                         <ui-heading size="lg" :text="__(collection.title)" :href="collection.available_in_selected_site ? collection.entries_url : collection.edit_url" />
-                        <span class="text-sm text-gray-600">
-                            ({{ __('entry_count', { count: collection.entries_count }) }})
+                        <span v-if="collection.available_in_selected_site" class="text-sm text-gray-600">
+                            ({{ __('messages.entry_count', { count: collection.entries_count }) }})
                         </span>
                     </div>
                     <aside class="flex items-center gap-2">
@@ -32,8 +32,8 @@
                         >
                             <Dropdown placement="left-start">
                                 <DropdownMenu>
-                                    <DropdownItem :text="__('View')" icon="eye" :href="collection.entries_url" />
-                                    <DropdownItem v-if="collection.url" :text="__('Visit URL')" icon="external-link" target="_blank" :href="collection.url" />
+                                    <DropdownItem v-if="collection.available_in_selected_site" :text="__('View')" icon="eye" :href="collection.entries_url" />
+                                    <DropdownItem v-if="collection.available_in_selected_site && collection.url" :text="__('Visit URL')" icon="external-link" target="_blank" :href="collection.url" />
                                     <DropdownItem v-if="collection.editable" :text="__('Configure')" icon="cog" :href="collection.edit_url" />
                                     <DropdownItem v-if="collection.blueprint_editable" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="collection.blueprints_url" />
                                     <DropdownItem v-if="collection.editable" :text="__('Scaffold Views')" icon="scaffold" :href="collection.scaffold_url" />
@@ -51,6 +51,7 @@
                         </ItemActions>
 
                         <create-entry-button
+                            v-if="collection.available_in_selected_site"
                             :url="collection.create_entry_url"
                             variant="default"
                             :blueprints="collection.blueprints"
@@ -60,29 +61,52 @@
                     </aside>
                 </ui-panel-header>
 
-                <ui-card class="h-40">
-                    <ui-listing :items="collection.entries" :columns="collection.columns">
-                        <table class="w-full [&_td]:p-0.5 [&_td]:text-sm">
-                            <ui-listing-table-head sr-only />
-                            <ui-listing-table-body>
-                                <template #cell-title="{ row: entry }" class="w-full">
-                                    <div class="flex items-center gap-2">
-                                        <StatusIndicator :status="entry.status" />
-                                        <a :href="entry.edit_url" class="line-clamp-1 overflow-hidden text-ellipsis" :text="entry.title" />
-                                    </div>
-                                </template>
-                                <template #cell-date="{ row: entry }" v-if="collection.dated">
-                                    <div class="text-end font-mono text-xs text-gray-500 ps-6">
-                                        <date-time :of="entry.date" date-only />
-                                    </div>
-                                </template>
-                            </ui-listing-table-body>
-                        </table>
+                <ui-card class="h-40 px-0! py-2!">
+                    <ui-listing
+                        v-if="collection.available_in_selected_site"
+                        :url="collection.entries_listing_url"
+                        :per-page="5"
+                        :filters="collection.filters"
+                        :columns="collection.columns"
+                        :sort-column="collection.sort_column"
+                        :sort-direction="collection.sort_direction"
+                    >
+                        <template #initializing>
+                            <div class="flex flex-col gap-[8px] justify-between py-1 px-5">
+                                <ui-skeleton class="h-[18px] w-full" />
+                                <ui-skeleton class="h-[18px] w-full" />
+                                <ui-skeleton class="h-[18px] w-full" />
+                                <ui-skeleton class="h-[18px] w-full" />
+                                <ui-skeleton class="h-[18px] w-full" />
+                            </div>
+                        </template>
+                        <template #default="{ items }">
+                            <table v-if="items.length" class="w-full [&_td]:py-1 [&_td]:px-5 [&_td]:text-sm">
+                                <ui-listing-table-head sr-only />
+                                <ui-listing-table-body class="divide-y divide-gray-200 dark:divide-gray-700">
+                                    <template #cell-title="{ row: entry }" class="w-full">
+                                        <div class="flex items-center gap-2">
+                                            <StatusIndicator :status="entry.status" />
+                                            <a :href="entry.edit_url" class="line-clamp-1 overflow-hidden text-ellipsis" :text="entry.title" />
+                                        </div>
+                                    </template>
+                                    <template #cell-date="{ row: entry }" v-if="collection.dated">
+                                        <div class="text-end font-mono text-xs text-gray-500 ps-6">
+                                            <date-time :of="entry.date.date" date-only />
+                                        </div>
+                                    </template>
+                                </ui-listing-table-body>
+                            </table>
+                            <ui-subheading v-else class="text-center h-full flex items-center justify-center">{{ __('Nothing to see here, yet.') }}</ui-subheading>
+                        </template>
                     </ui-listing>
-                    <ui-subheading v-if="collection.entries.length === 0" class="text-center h-full flex items-center justify-center">{{ __('Nothing to see here, yet.') }}</ui-subheading>
+                    <div v-else class="flex flex-col items-center justify-center space-y-2 h-full">
+                        <ui-subheading class="text-center">{{ __("This collection isn't available in this site.") }}</ui-subheading>
+                        <ui-button :href="collection.edit_url" :text="__('Configure')" size="sm" />
+                    </div>
                 </ui-card>
 
-                <ui-panel-footer class="flex items-center gap-6 text-sm text-gray-600">
+                <ui-panel-footer v-if="collection.available_in_selected_site" class="flex items-center gap-6 text-sm text-gray-600">
                     <div class="flex items-center gap-2">
                         <ui-badge variant="flat" :text="String(collection.published_entries_count)" pill class="bg-gray-200 dark:bg-gray-700" />
                         <span>{{ __('Published') }}</span>
@@ -256,6 +280,7 @@ export default {
             Statamic.$commandPalette.add({
                 category: Statamic.$commandPalette.category.Actions,
                 text: __('Toggle Grid Layout'),
+                icon: 'layout-grid',
                 when: () => this.mode === 'table',
                 action: () => this.mode = 'grid',
             });
@@ -263,6 +288,7 @@ export default {
             Statamic.$commandPalette.add({
                 category: Statamic.$commandPalette.category.Actions,
                 text: __('Toggle List Layout'),
+                icon: 'layout-list',
                 when: () => this.mode === 'grid',
                 action: () => this.mode = 'table',
             });

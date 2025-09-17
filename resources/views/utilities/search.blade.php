@@ -7,7 +7,7 @@
 
 @section('content')
 
-<ui-header title="{{ __('Search') }}" icon="magnifying-glass">
+<ui-header title="{{ __('Search') }}" icon="magnifying-glass" v-cloak>
     <form method="POST" action="{{ cp_route('utilities.search', 'all') }}">
         @csrf
 
@@ -19,7 +19,7 @@
     </form>
 </ui-header>
 
-<ui-card-panel heading="{{ __('Search Indexes') }}">
+<ui-card-panel heading="{{ __('Search Indexes') }}" v-cloak>
     @if ($errors->has('indexes'))
         <ui-error-message :text="$errors->first()" class="p-4" />
     @endif

@@ -26,6 +26,10 @@ export default {
     },
 
     computed: {
+        isViewable() {
+            return this.asset.isViewable;
+        },
+
         isImage() {
             return this.asset.isImage;
         },
@@ -42,10 +46,6 @@ export default {
             return ['png', 'svg', 'webp', 'avif'].includes(this.asset.extension);
         },
 
-        canDownload() {
-            return Statamic.$permissions.has(`view ${this.container} assets`);
-        },
-
         thumbnail() {
             return this.asset.thumbnail;
         },
@@ -60,6 +60,12 @@ export default {
     },
 
     methods: {
+        editOrOpen() {
+            if (!this.isViewable) return;
+
+            return this.readOnly ? this.open() : this.edit();
+        },
+
         edit() {
             if (this.readOnly) return;
 

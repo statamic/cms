@@ -1,6 +1,6 @@
 <?php
 
-namespace CP;
+namespace Tests\CP;
 
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\File;

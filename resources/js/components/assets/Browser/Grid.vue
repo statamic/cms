@@ -1,5 +1,8 @@
 <template>
-    <ui-card class="space-y-8">
+    <ui-card :class="{
+        'space-y-8': folders.length || assets.length,
+        '!p-0': folders.length === 0 && assets.length === 0
+    }">
         <!-- Folders -->
         <section class="folder-grid-listing" v-if="folders.length || creatingFolder">
             <div
@@ -32,9 +35,9 @@
                     <Context>
                         <template #trigger>
                             <button @dblclick="selectFolder(folder.path)" class="group h-[66px] w-[80px]">
-                                <ui-icon name="asset-folder" class="size-full text-blue-400/90 hover:text-blue-400" />
+                                <FolderSvg class="size-full text-blue-400/90 hover:text-blue-400" />
                                 <div
-                                    class="overflow-hidden text-center font-mono text-xs text-ellipsis whitespace-nowrap text-gray-500"
+                                    class="overflow-hidden mt-2 text-center font-mono text-xs text-ellipsis whitespace-nowrap text-gray-500"
                                     v-text="folder.basename"
                                     :title="folder.basename"
                                 />
@@ -53,17 +56,17 @@
                     </Context>
                 </ItemActions>
             </div>
-            <div v-if="creatingFolder" class="group/folder relative">
+            <div v-if="creatingFolder" class="group/folder relative p-1">
                 <div class="group h-[66px] w-[80px]">
-                    <ui-icon name="asset-folder" class="size-full text-blue-400/90 hover:text-blue-400" />
+                    <FolderSvg class="size-full text-blue-400/90 hover:text-blue-400" />
 
                     <Editable
                         ref="newFolderInput"
                         v-model:modelValue="newFolderName"
                         :start-with-edit-mode="true"
                         submit-mode="enter"
-                        :placeholder="__('New Folder')"
-                        class="flex w-[80px] items-center justify-center overflow-hidden text-center font-mono text-xs text-ellipsis whitespace-nowrap text-gray-500"
+                        :placeholder="__('new-folder')"
+                        class="flex w-[80px] items-center justify-center overflow-hidden mt-2 text-center font-mono text-xs text-ellipsis whitespace-nowrap text-gray-500"
                         @submit="$emit('create-folder', newFolderName)"
                         @cancel="
                             () => {
@@ -130,7 +133,7 @@
                                     <Dropdown placement="left-start">
                                         <DropdownMenu>
                                             <DropdownItem
-                                                :text="__(canEdit ? 'Edit' : 'View')"
+                                                :text="__(asset.editable ? 'Edit' : 'View')"
                                                 @click="edit(asset.id)"
                                                 icon="edit"
                                             />
@@ -149,7 +152,7 @@
                             </div>
                         </template>
                         <ContextMenu>
-                            <ContextItem icon="edit" :text="__(canEdit ? 'Edit' : 'View')" @click="edit(asset.id)" />
+                            <ContextItem icon="edit" :text="__(asset.editable ? 'Edit' : 'View')" @click="edit(asset.id)" />
                             <ContextSeparator />
                             <ContextItem
                                 v-for="action in actions"
@@ -165,6 +168,11 @@
                 <div class="asset-filename" v-text="truncateFilename(asset.basename)" :title="asset.basename" />
             </div>
         </section>
+
+        <!-- Empty state -->
+        <div v-if="folders.length === 0 && assets.length === 0" class="text-center text-gray-500 text-sm py-4">
+            {{ __('No items found') }}
+        </div>
     </ui-card>
 </template>
 
@@ -182,10 +190,11 @@ import {
     DropdownMenu,
     DropdownLabel,
     DropdownItem,
-    DropdownSeparator,
-} from '@/components/ui';
+    DropdownSeparator
+} from '@ui';
 import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
 import ItemActions from '@/components/actions/ItemActions.vue';
+import FolderSvg from '@/../svg/folder.svg';
 
 export default {
     mixins: [AssetBrowserMixin],
@@ -204,6 +213,7 @@ export default {
         DropdownItem,
         DropdownSeparator,
         ItemActions,
+        FolderSvg,
     },
 
     props: {
