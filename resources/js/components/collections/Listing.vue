@@ -12,7 +12,7 @@
         />
     </ui-header>
     <div class="@container/collections flex flex-wrap py-2 gap-y-6 -mx-3" v-if="mode === 'grid'">
-        <div v-for="collection in items" class="w-full @4xl:w-1/2 px-3">
+        <div v-for="collection in items" class="w-full @4xl:w-1/2 px-3" :key="collection.id">
             <ui-panel>
                 <ui-panel-header class="flex items-center justify-between">
                     <div class="flex items-center gap-1.5">
