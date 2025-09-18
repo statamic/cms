@@ -49,7 +49,7 @@ body {
     ;
 }
 
-@prose {
+@utility prose {
     color: var(--tw-prose-body);
     max-width: 65ch;
     font-size: var(--text-base);
@@ -735,3 +735,4 @@ body {
             }
         }
     }
+}
