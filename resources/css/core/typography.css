@@ -48,7 +48,7 @@ body {
         'calt' off;
 }
 
-@utility prose {
+@prose {
     color: var(--tw-prose-body);
     max-width: 65ch;
     font-size: var(--text-base);
@@ -89,17 +89,6 @@ body {
             }
         }
 
-        hr {
-            border-color: var(--tw-prose-hr);
-            border-top-width: 1px;
-            margin-top: 3em;
-            margin-bottom: 3em;
-
-            + * {
-                margin-block-start: 0;
-            }
-        }
-
         blockquote {
             font-weight: var(--font-weight-medium);
             font-style: italic;
@@ -121,72 +110,15 @@ body {
             }
         }
 
-        /* GROUP PROSE / LISTS
-        =================================================== */
+        hr {
+            border-color: var(--tw-prose-hr);
+            border-top-width: 1px;
+            margin-top: 3em;
+            margin-bottom: 3em;
 
-        ol, ul {
-            margin-top: 1.25em;
-            margin-bottom: 1.25em;
-            padding-inline-start: 1.625em;
-        }
-
-        :where(ul, ol) :where(ul, ol) {
-            margin-top: 0.75em;
-            margin-bottom: 0.75em;
-        }
-
-        li {
-            margin-top: 0.5em;
-            margin-bottom: 0.5em;
-        }
-
-        ol {
-            list-style-type: decimal;
-            > li {
-                padding-inline-start: 0.375em;
-                font-weight: var(--font-weight-normal);
-                color: var(--tw-prose-counters);
-                p {
-                    margin-top: 0.5em;
-                    margin-bottom: 0.5em;
-                    &:first-child {
-                        margin-top: 1.25em;
-                    }
-                    &:last-child {
-                        margin-bottom: 1.25em;
-                    }
-                }
-                > p {
-                    margin-top: 1.25em;
-                }
+            + * {
+                margin-block-start: 0;
             }
-        }
-
-        ul {
-            list-style-type: disc;
-            > li {
-                padding-inline-start: 0.375em;
-                color: var(--tw-prose-bullets);
-            }
-        }
-
-        /* GROUP PROSE / LISTS / DESCRIPTIONS
-        =================================================== */
-
-        dt {
-            color: var(--tw-prose-headings);
-            font-weight: var(--font-weight-semibold);
-            margin-top: 1.25em;
-        }
-
-        dl {
-            margin-top: 1.25em;
-            margin-bottom: 1.25em;
-        }
-
-        dd {
-            margin-top: 0.5em;
-            padding-inline-start: 1.625em;
         }
 
         /* GROUP PROSE / HEADINGS
@@ -282,29 +214,85 @@ body {
             }
         }
 
+        /* GROUP PROSE / LISTS
+        =================================================== */
+
+        ol, ul {
+            margin-top: 1.25em;
+            margin-bottom: 1.25em;
+            padding-inline-start: 1.625em;
+        }
+
+        :where(ul, ol) :where(ul, ol) {
+            margin-block: 0.75em;
+        }
+
+        li {
+            margin-block: 0.5em;
+        }
+
+        ol {
+            list-style-type: decimal;
+            > li {
+                padding-inline-start: 0.375em;
+                font-weight: var(--font-weight-normal);
+                color: var(--tw-prose-counters);
+                p {
+                    margin-top: 0.5em;
+                    margin-bottom: 0.5em;
+                    &:first-child {
+                        margin-top: 1.25em;
+                    }
+                    &:last-child {
+                        margin-bottom: 1.25em;
+                    }
+                }
+                > p {
+                    margin-top: 1.25em;
+                }
+            }
+        }
+
+        ul {
+            list-style-type: disc;
+            > li {
+                padding-inline-start: 0.375em;
+                color: var(--tw-prose-bullets);
+            }
+        }
+
+        /* GROUP PROSE / LISTS / DESCRIPTIONS
+        =================================================== */
+
+        dl {
+            margin-block: 1.25em;
+        }
+
+        dt {
+            color: var(--tw-prose-headings);
+            font-weight: var(--font-weight-semibold);
+            margin-block-start: 1.25em;
+        }
+
+        dd {
+            margin-block-start: 0.5em;
+            padding-inline-start: 1.625em;
+        }
+
         /* GROUP PROSE / MEDIA
         =================================================== */
 
-        img {
-            margin-top: 2em;
-            margin-bottom: 2em;
+        picture, img, video {
+            margin-block: 2em;
         }
 
         picture {
             display: block;
-            margin-top: 2em;
-            margin-bottom: 2em;
-        }
-
-        video {
-            margin-top: 2em;
-            margin-bottom: 2em;
         }
 
         figure > *,
         picture > img {
-            margin-top: 0;
-            margin-bottom: 0;
+            margin-block: 0;
         }
 
         figure {
@@ -315,7 +303,7 @@ body {
             color: var(--tw-prose-captions);
             font-size: 0.875em;
             line-height: 1.5;
-            margin-top: 0.825em;
+            margin-block-start: 0.825em;
         }
 
         /* GROUP PROSE / CODE
@@ -330,10 +318,7 @@ body {
                 0 2px 0 oklch(from var(--tw-prose-kbd-shadows) l c h / 10%);
             font-size: 0.875em;
             border-radius: 0.3125rem;
-            padding-top: 0.1875em;
-            padding-inline-end: 0.375em;
-            padding-bottom: 0.1875em;
-            padding-inline-start: 0.375em;
+            padding: 0.1875em 0.375em;
         }
 
         code {
@@ -358,13 +343,9 @@ body {
             font-weight: var(--font-weight-normal);
             font-size: 0.875em;
             line-height: 1.75;
-            margin-top: 1.75em;
-            margin-bottom: 1.75em;
+            margin-block: 1.75em;
             border-radius: var(--radius-md);
-            padding-top: 0.825em;
-            padding-inline-end: 1.25em;
-            padding-bottom: 0.825em;
-            padding-inline-start: 1.25em;
+            padding: 0.825em 1.25em;
 
             code {
                 background-color: transparent;
@@ -389,8 +370,7 @@ body {
         table {
             width: 100%;
             table-layout: auto;
-            margin-top: 2em;
-            margin-bottom: 2em;
+            margin-block: 2em;
             font-size: 0.875em;
             line-height: 1.75;
         }
@@ -403,9 +383,8 @@ body {
                 color: var(--tw-prose-headings);
                 font-weight: var(--font-weight-semibold);
                 vertical-align: bottom;
-                padding-inline-end: 0.5em;
-                padding-bottom: 0.5em;
-                padding-inline-start: 0.5em;
+                padding-inline: 0.5em;
+                padding-block-end: 0.5em;
 
                 &:first-child {
                     padding-inline-start: 0;
@@ -464,20 +443,8 @@ body {
 
     &:not([class~='not-prose'], [class~='not-prose'] *) {
 
-        > :first-child {
-            margin-block-start: 0;
-        }
-
-        > :last-child {
-            margin-block-end: 0;
-        }
-
         /* GROUP PROSE / ELEMENTS
         =================================================== */
-
-        p {
-            margin-block: 1.25rem;
-        }
 
         [class~='lead'] {
             font-size: 1.25em;
@@ -492,25 +459,15 @@ body {
 
         hr {
             margin-block-end: 2.8571429em;
-
-            + * {
-                margin-block-start: 0;
-            }
         }
 
         /* GROUP PROSE / HEADINGS
         =================================================== */
 
         h1 {
-            font-size: 2.15;
+            font-size: 2.15em;
             line-height: 1.2;
             margin-block: 0 0.8rem;
-        }
-
-        h2, h3, h4 {
-            + * {
-                margin-block-start: 0;
-            }
         }
 
         h2 {
@@ -530,6 +487,56 @@ body {
             line-height: 1.5;
         }
 
+        /* GROUP PROSE / LISTS
+        =================================================== */
+
+        ol, ul {
+            margin-block: 1.25em;
+            padding-inline-start: 1.5em;
+
+            > li {
+                padding-inline-start: 0.4285714em;
+            }
+        }
+
+        :where(ul, ol) :where(ul, ol) {
+            margin-block: 0.5em;
+        }
+
+        li {
+            margin-block: 0.25em;
+        }
+
+        > ul > li {
+            p {
+                margin-block: 0.5em;
+            }
+            > p {
+                margin-block-start: 1.25em;
+                &:first-child {
+                    margin-block-start: 1.25em;
+                }
+                &:last-child {
+                    margin-block-end: 1.25em;
+                }
+            }
+        }
+        > ol > li {
+            > p {
+                &:last-child {
+                    margin-block-end: 1.25em;
+                }
+            }
+        }
+
+        /* GROUP PROSE / LISTS / DESCRIPTIONS
+        =================================================== */
+
+        dd {
+            margin-block-start: 0.25em;
+            padding-inline-start: 1.5em;
+        }
+
         /* GROUP PROSE / MEDIA
         =================================================== */
 
@@ -537,15 +544,8 @@ body {
             margin-block: 1.75em;
         }
 
-        picture > img {
-            margin-block: 0;
-        }
-
         figure {
             margin-block: 1.75em;
-            > * {
-                margin-block: 0;
-            }
         }
 
         figcaption {
@@ -583,67 +583,6 @@ body {
             padding: 0.5em 1em;
         }
 
-        /* GROUP PROSE / LISTS
-        =================================================== */
-
-        :where(ul, ol) :where(ul, ol) {
-            margin-top: 0.5em;
-            margin-bottom: 0.5em;
-        }
-
-        ol, ul {
-            margin-block: 1.25em;
-            padding-inline-start: 1.5em;
-
-            > li {
-                padding-inline-start: 0.4285714em;
-            }
-        }
-
-        li {
-            margin-block: 0.25em;
-        }
-
-        .prose-sm {
-            > ul > li {
-                p {
-                    margin-block: 0.5em;
-                }
-                > p {
-                    margin-block-start: 1.25em;
-                    &:first-child {
-                        margin-block-start: 1.25em;
-                    }
-                    &:last-child {
-                        margin-block-end: 1.25em;
-                    }
-                }
-            }
-            > ol > li {
-                > p {
-                    &:last-child {
-                        margin-block-end: 1.25em;
-                    }
-                }
-            }
-        }
-
-        /* GROUP PROSE / LISTS / DESCRIPTIONS
-        =================================================== */
-
-        dl {
-            margin-block: 1.25em;
-        }
-
-        dt {
-            margin-block-start: 1.25em;
-        }
-
-        dd {
-            margin-block-start: 0.25em;
-            padding-inline-start: 1.5em;
-        }
-
         /* GROUP PROSE / TABLES
         =================================================== */
 
@@ -652,18 +591,8 @@ body {
             line-height: var(--leading-normal);
         }
 
-        thead {
-            th {
-                padding-inline: 1em;
-                padding-block-end: 0.5em;
-
-                &:first-child {
-                    padding-inline-start: 0;
-                }
-                &:last-child {
-                    padding-inline-end: 0;
-                }
-            }
+        thead th {
+            padding-inline: 1em;
         }
 
         tbody, tfoot {
@@ -671,9 +600,6 @@ body {
                 padding: 0.5em 1em;
                 &:first-child {
                     padding-inline-start: 0;
-                }
-                &:last-child {
-                    padding-inline-end: 0;
                 }
             }
         }
