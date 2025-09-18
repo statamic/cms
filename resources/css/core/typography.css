@@ -285,7 +285,7 @@ body {
         }
 
         figure {
-            margin-block-end: 2rem;
+            margin-block-end: 2em;
         }
 
         figcaption {
@@ -438,11 +438,11 @@ body {
         [class~='lead'] {
             font-size: 1.25em;
             line-height: 1.5;
-            margin-block: 0.875rem;
+            margin-block: 0.875em;
         }
 
         blockquote {
-            margin-block-end: 1.25rem;
+            margin-block-end: 1.25em;
             padding-inline-start: 1em;
         }
 
@@ -456,12 +456,12 @@ body {
         h1 {
             font-size: 2.15em;
             line-height: 1.2;
-            margin-block: 0 0.8rem;
+            margin-block: 0 0.8em;
         }
 
         h2 {
             font-size: 1.5em;
-            margin-block: 1.6rem 0.8rem;
+            margin-block: 1.6em 0.8em;
             line-height: 1.4;
         }
 
