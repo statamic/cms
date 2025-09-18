@@ -296,8 +296,8 @@ defineExpose({
 
                             <button type="button" v-else class="w-full text-start bg-transparent truncate flex items-center gap-2 cursor-pointer focus-none" @keydown.space="openDropdown" data-ui-combobox-selected-option>
                                 <slot name="selected-option" v-bind="{ option: selectedOption }">
-                                    <div class="size-4">
-                                        <Icon v-if="icon" :name="icon" class="text-white/85 dark:text-white dark:opacity-50" />
+                                    <div v-if="icon" class="size-4">
+                                        <Icon :name="icon" class="text-white/85 dark:text-white dark:opacity-50" />
                                     </div>
                                     <span v-if="labelHtml" v-html="getOptionLabel(selectedOption)" />
                                     <span v-else v-text="getOptionLabel(selectedOption)" />
@@ -305,7 +305,7 @@ defineExpose({
                             </button>
                         </div>
 
-                        <div class="flex gap-1.5 items-center shrink-0 ms-1.5 size-4">
+                        <div class="flex gap-1.5 items-center shrink-0 ms-1.5">
                             <Button v-if="clearable && modelValue" icon="x" variant="ghost" size="xs" round @click="clear" data-ui-combobox-clear-button />
                             <Icon v-if="options.length || ignoreFilter" name="chevron-down" class="text-gray-400 dark:text-white/40" data-ui-combobox-chevron />
                         </div>
