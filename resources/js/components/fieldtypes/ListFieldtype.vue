@@ -21,6 +21,7 @@
                             <ui-input
                                 type="text"
                                 ref="listItem"
+                                class="!inset-shadow-none focus:!inset-shadow-none"
                                 v-model="element.value"
                                 :readonly="isReadOnly"
                                 @blur="focused = false"
