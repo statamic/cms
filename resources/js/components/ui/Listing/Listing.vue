@@ -6,6 +6,7 @@ export const [injectListingContext, provideListingContext] = createContext('List
 
 <script setup>
 import { ref, toRef, computed, watch, nextTick, onMounted, onBeforeUnmount, useSlots } from 'vue';
+import useSkeletonDelay from '@/composables/skeleton-delay.js';
 import {
     Icon,
     Panel,
@@ -160,6 +161,7 @@ const hasActions = computed(() => !!props.actionUrl);
 const hasFilters = computed(() => props.filters && props.filters.length > 0);
 const showPresets = computed(() => props.allowPresets && props.preferencesPrefix);
 const showBulkActions = computed(() => props.allowBulkActions && hasActions.value);
+const shouldShowSkeleton = useSkeletonDelay(initializing);
 
 const items = computed({
     get() {
@@ -668,21 +670,21 @@ autoApplyState();
 </script>
 
 <template>
-    <slot name="initializing" v-if="initializing">
-        <div class="flex flex-col gap-4 justify-between mt-2">
-            <ui-skeleton class="h-3 w-48" />
+    <slot name="initializing" v-if="shouldShowSkeleton">
+        <div class="flex flex-col gap-4 justify-between mt-3 starting-style-transition starting-style-transition--slow">
+            <ui-skeleton class="h-5 w-48" />
             <div class="flex gap-3">
-                <ui-skeleton class="h-8 w-80" />
-                <ui-skeleton class="h-8 w-24" />
+                <ui-skeleton class="h-9 w-96" />
+                <ui-skeleton class="h-9 w-24" />
                 <div class="flex-1" />
-                <ui-skeleton class="size-8" />
+                <ui-skeleton class="size-10" />
             </div>
             <ui-skeleton class="h-48 w-full" />
         </div>
     </slot>
     <slot v-if="!initializing" :items="items" :is-column-visible="isColumnVisible" :loading="loading">
         <Presets v-if="showPresets" />
-        <div v-if="allowSearch || hasFilters || allowCustomizingColumns" class="relative flex items-center gap-3 min-h-16">
+        <div v-if="allowSearch || hasFilters || allowCustomizingColumns" class="relative flex items-center gap-3 min-h-16 starting-style-transition starting-style-transition--siblings">
             <div class="flex flex-1 items-center gap-3 w-full">
                 <Search v-if="allowSearch" />
                 <Filters v-if="hasFilters" />

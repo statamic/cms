@@ -1,5 +1,42 @@
 # Release Notes
 
+## 6.0.0-alpha.8 (2025-09-17)
+
+### What's new
+- Smoother page loads using animation [#12454](https://github.com/statamic/cms/issues/12454) by @JayGeorge
+- Add `setup-cp-vite` command [#12056](https://github.com/statamic/cms/issues/12056) by @duncanmcclean
+- Add `prepend` and `append` options to Float fieldtype [#12476](https://github.com/statamic/cms/issues/12476) by @duncanmcclean
+
+### What's fixed
+- Add missing architectural lines to navigation > getting started screen [#12468](https://github.com/statamic/cms/issues/12468) by @JayGeorge
+- Bard focus states [#12360](https://github.com/statamic/cms/issues/12360) by @JayGeorge
+- Collection grid missing v-for key [#12477](https://github.com/statamic/cms/issues/12477) by @martyf
+- Ensure "Stop Impersonating" string is translated correctly [#12456](https://github.com/statamic/cms/issues/12456) by @duncanmcclean
+- Combobox shouldn't be disabled when max selections limit has been reached [#12472](https://github.com/statamic/cms/issues/12472) by @duncanmcclean
+- Make bard buttons setting responsive [#12474](https://github.com/statamic/cms/issues/12474) by @jacksleight
+- Combobox: Fix search input focus [#12471](https://github.com/statamic/cms/issues/12471) by @duncanmcclean
+- Fix permission labels not being localized correctly [#12316](https://github.com/statamic/cms/issues/12316) by @duncanmcclean
+- Add tests for the `Combobox` component [#12174](https://github.com/statamic/cms/issues/12174) by @duncanmcclean
+- Add `cursor-pointer` to Create Form links [#12453](https://github.com/statamic/cms/issues/12453) by @duncanmcclean
+- Fix licensing table [#12429](https://github.com/statamic/cms/issues/12429) by @duncanmcclean
+- Textareas should autosize [#12435](https://github.com/statamic/cms/issues/12435) by @duncanmcclean
+- Hide "Customize Columns" button in Grid mode [#12448](https://github.com/statamic/cms/issues/12448) by @duncanmcclean
+- Optimize PageTree performance issues with larger collections [#12434](https://github.com/statamic/cms/issues/12434) by @o1y
+- French translations [#12430](https://github.com/statamic/cms/issues/12430) by @ebeauchamps
+- Validation error shouldn't be thrown when asset container has value [#12437](https://github.com/statamic/cms/issues/12437) by @duncanmcclean
+- Fix string on terms empty state [#12447](https://github.com/statamic/cms/issues/12447) by @duncanmcclean
+- Fix icon in field settings stack [#12436](https://github.com/statamic/cms/issues/12436) by @duncanmcclean
+- Fix validation errors not showing for relationship fieldtypes [#12438](https://github.com/statamic/cms/issues/12438) by @duncanmcclean
+- Improve folder empty states in asset browser [#12452](https://github.com/statamic/cms/issues/12452) by @duncanmcclean
+- Add `target` and `variant` props to Context Item component [#12451](https://github.com/statamic/cms/issues/12451) by @duncanmcclean
+- Fix adding nav items from empty state [#12463](https://github.com/statamic/cms/issues/12463) by @duncanmcclean
+- Ensure nav customizations apply to breadcrumbs [#12460](https://github.com/statamic/cms/issues/12460) by @duncanmcclean
+- Fix Grid fieldtype's table mode [#12439](https://github.com/statamic/cms/issues/12439) by @duncanmcclean
+- "Imported from: ..." translation should include variable [#12455](https://github.com/statamic/cms/issues/12455) by @duncanmcclean
+- Make translator tool look in the ui package [#12423](https://github.com/statamic/cms/issues/12423) by @jasonvarga
+
+
+
 ## 6.0.0-alpha.7 (2025-09-12)
 
 ### What's new

@@ -1,6 +1,8 @@
 <script setup>
 import { cva } from 'cva';
 import CharacterCounter from './CharacterCounter.vue';
+import autosize from 'autosize/dist/autosize.js';
+import { nextTick, onBeforeUnmount, onMounted, useTemplateRef } from 'vue';
 
 defineEmits(['update:modelValue']);
 
@@ -35,11 +37,21 @@ const classes = cva({
         },
     },
 })({ ...props });
+
+const textarea = useTemplateRef('textarea');
+
+onMounted(() => {
+    autosize(textarea.value);
+    setTimeout(() => nextTick(() => autosize.update(textarea.value)), 1);
+});
+
+onBeforeUnmount(() => autosize.destroy(textarea.value));
 </script>
 
 <template>
     <div class="group/input relative block w-full" data-ui-input>
         <textarea
+            ref="textarea"
             :class="classes"
             :rows="rows"
             :id="id"

@@ -8,6 +8,8 @@
         :read-only="isReadOnly"
         :disabled="config.disabled"
         :id="fieldId"
+        :prepend="__(config.prepend)"
+        :append="__(config.append)"
         @update:model-value="updateDebounced"
         @focus="$emit('focus')"
         @blur="$emit('blur')"

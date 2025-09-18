@@ -12,7 +12,7 @@
         />
     </ui-header>
     <div class="@container/collections flex flex-wrap py-2 gap-y-6 -mx-3" v-if="mode === 'grid'">
-        <div v-for="collection in items" class="w-full @4xl:w-1/2 px-3">
+        <div v-for="collection in items" class="w-full @4xl:w-1/2 px-3" :key="collection.id">
             <ui-panel>
                 <ui-panel-header class="flex items-center justify-between">
                     <div class="flex items-center gap-1.5">
@@ -72,12 +72,12 @@
                         :sort-direction="collection.sort_direction"
                     >
                         <template #initializing>
-                            <div class="flex flex-col gap-[9px] justify-between py-1 px-5">
-                                <ui-skeleton class="h-[19px] w-full" />
-                                <ui-skeleton class="h-[19px] w-full" />
-                                <ui-skeleton class="h-[19px] w-full" />
-                                <ui-skeleton class="h-[19px] w-full" />
-                                <ui-skeleton class="h-[19px] w-full" />
+                            <div class="flex flex-col gap-[8px] justify-between py-1 px-5">
+                                <ui-skeleton class="h-[18px] w-full" />
+                                <ui-skeleton class="h-[18px] w-full" />
+                                <ui-skeleton class="h-[18px] w-full" />
+                                <ui-skeleton class="h-[18px] w-full" />
+                                <ui-skeleton class="h-[18px] w-full" />
                             </div>
                         </template>
                         <template #default="{ items }">

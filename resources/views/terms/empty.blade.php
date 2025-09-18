@@ -17,7 +17,7 @@
             <ui-empty-state-item
                 href="{{ cp_route('taxonomies.edit', $taxonomy->handle()) }}"
                 icon="configure"
-                heading="{{ __('Configure Collection') }}"
+                heading="{{ __('Configure Taxonomy') }}"
                 description="{{ __('statamic::messages.taxonomy_next_steps_configure_description') }}"
             ></ui-empty-state-item>
         @endcan
