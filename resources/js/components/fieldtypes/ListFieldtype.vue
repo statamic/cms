@@ -15,7 +15,6 @@
                         <td
                             class="sortable-handle table-drag-handle"
                             v-if="!isReadOnly"
-                            :class="{ 'rounded-tl': index === 0 }"
                         ></td>
                         <td>
                             <ui-input
