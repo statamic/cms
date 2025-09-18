@@ -68,8 +68,7 @@ body {
         =================================================== */
 
         p {
-            margin-top: 1.25em;
-            margin-bottom: 1.25em;
+            margin-block: 1.25em;
         }
 
         a {
@@ -96,8 +95,7 @@ body {
             border-inline-start-width: 0.25rem;
             border-inline-start-color: var(--tw-prose-quote-borders);
             quotes: '\201C' '\201D' '\2018' '\2019';
-            margin-top: 1.6em;
-            margin-bottom: 1.6em;
+            margin-block: 1.6em;
             padding-inline-start: 1em;
 
             p {
@@ -113,8 +111,7 @@ body {
         hr {
             border-color: var(--tw-prose-hr);
             border-top-width: 1px;
-            margin-top: 3em;
-            margin-bottom: 3em;
+            margin-block: 3em;
 
             + * {
                 margin-block-start: 0;
@@ -130,8 +127,7 @@ body {
             font-weight: var(--font-weight-medium);
             letter-spacing: -0.01em;
             line-height: var(--leading-normal);
-            margin-top: 0;
-            margin-bottom: 1em;
+            margin-block: 0 1em;
 
             strong {
                 font-weight: var(--font-weight-bold);
@@ -150,8 +146,7 @@ body {
             font-size: 1.35em;
             letter-spacing: -0.01em;
             line-height: var(--leading-normal);
-            margin-top: 0;
-            margin-bottom: 0.5em;
+            margin-block: 0 0.5em;
             font-weight: var(--font-weight-medium);
 
             strong {
@@ -165,8 +160,7 @@ body {
             font-weight: var(--font-weight-medium);
             font-size: 1.15em;
             line-height: var(--leading-normal);
-            margin-top: 0;
-            margin-bottom: 0.5em;
+            margin-block: 0 0.5em;
 
             strong {
                 font-weight: var(--font-weight-bold);
@@ -178,8 +172,7 @@ body {
             color: var(--tw-prose-headings);
             font-weight: var(--font-weight-medium);
             line-height: var(--leading-normal);
-            margin-top: 0;
-            margin-bottom: 0.5em;
+            margin-block: 0 0.5em;
 
             strong {
                 font-weight: var(--font-weight-bold);
@@ -190,8 +183,7 @@ body {
         h5 {
             color: var(--tw-prose-headings);
             font-weight: var(--font-weight-normal);
-            margin-top: 0;
-            margin-bottom: 0.5em;
+            margin-block: 0 0.5em;
             line-height: var(--leading-normal);
 
             strong {
@@ -204,8 +196,7 @@ body {
             color: var(--tw-prose-headings);
             font-size: .875em;
             font-weight: var(--font-weight-normal);
-            margin-top: 0;
-            margin-bottom: 0.5em;
+            margin-block: 0 0.5em;
             line-height: var(--leading-normal);
 
             strong {
@@ -218,8 +209,7 @@ body {
         =================================================== */
 
         ol, ul {
-            margin-top: 1.25em;
-            margin-bottom: 1.25em;
+            margin-block: 1.25em;
             padding-inline-start: 1.625em;
         }
 
@@ -238,17 +228,16 @@ body {
                 font-weight: var(--font-weight-normal);
                 color: var(--tw-prose-counters);
                 p {
-                    margin-top: 0.5em;
-                    margin-bottom: 0.5em;
+                    margin-block: 0.5em;
                     &:first-child {
-                        margin-top: 1.25em;
+                        margin-block-start: 1.25em;
                     }
                     &:last-child {
-                        margin-bottom: 1.25em;
+                        margin-block-end: 1.25em;
                     }
                 }
                 > p {
-                    margin-top: 1.25em;
+                    margin-block-start: 1.25em;
                 }
             }
         }
