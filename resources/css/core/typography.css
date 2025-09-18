@@ -90,14 +90,14 @@ body {
         }
 
         blockquote {
+            margin-block: 1.6em;
+            padding-inline-start: 1em;
             font-weight: var(--font-weight-medium);
             font-style: italic;
             color: var(--tw-prose-quotes);
             border-inline-start-width: 0.25rem;
             border-inline-start-color: var(--tw-prose-quote-borders);
             quotes: '\201C' '\201D' '\2018' '\2019';
-            margin-block: 1.6em;
-            padding-inline-start: 1em;
 
             p {
                 &::before {
@@ -110,9 +110,9 @@ body {
         }
 
         hr {
+            margin-block: 3em;
             border-color: var(--tw-prose-hr);
             border-top-width: 1px;
-            margin-block: 3em;
 
             + * {
                 margin-block-start: 0;
@@ -121,14 +121,9 @@ body {
 
         /* GROUP PROSE / HEADINGS
         =================================================== */
-
-        h1 {
+        h1, h2, h3, h4, h5, h6 {
+            margin-block: 0 0.5em;
             color: var(--tw-prose-headings);
-            font-size: 1.75em;
-            font-weight: var(--font-weight-medium);
-            letter-spacing: -0.01em;
-            line-height: var(--leading-normal);
-            margin-block: 0 1em;
 
             strong {
                 font-weight: var(--font-weight-bold);
@@ -137,73 +132,42 @@ body {
         }
 
         h2, h3, h4 {
+            font-weight: var(--font-weight-medium);
             + * {
                 margin-block-start: 0;
             }
         }
 
-        h2 {
-            color: var(--tw-prose-headings);
-            font-size: 1.35em;
+        h5, h6 {
+            font-weight: var(--font-weight-normal);
+            line-height: var(--leading-normal);
+        }
+
+        h1 {
+            margin-block: 0 1em;
+            font-size: 1.75em;
+            font-weight: var(--font-weight-medium);
             letter-spacing: -0.01em;
             line-height: var(--leading-normal);
-            margin-block: 0 0.5em;
-            font-weight: var(--font-weight-medium);
+        }
 
-            strong {
-                font-weight: var(--font-weight-bold);
-                color: inherit;
-            }
+        h2 {
+            font-size: 1.35em;
+            line-height: var(--leading-normal);
+            letter-spacing: -0.01em;
         }
 
         h3 {
-            color: var(--tw-prose-headings);
-            font-weight: var(--font-weight-medium);
             font-size: 1.15em;
             line-height: var(--leading-normal);
-            margin-block: 0 0.5em;
-
-            strong {
-                font-weight: var(--font-weight-bold);
-                color: inherit;
-            }
         }
 
         h4 {
-            color: var(--tw-prose-headings);
-            font-weight: var(--font-weight-medium);
             line-height: var(--leading-normal);
-            margin-block: 0 0.5em;
-
-            strong {
-                font-weight: var(--font-weight-bold);
-                color: inherit;
-            }
-        }
-
-        h5 {
-            color: var(--tw-prose-headings);
-            font-weight: var(--font-weight-normal);
-            margin-block: 0 0.5em;
-            line-height: var(--leading-normal);
-
-            strong {
-                font-weight: var(--font-weight-bold);
-                color: inherit;
-            }
         }
 
         h6 {
-            color: var(--tw-prose-headings);
             font-size: .875em;
-            font-weight: var(--font-weight-normal);
-            margin-block: 0 0.5em;
-            line-height: var(--leading-normal);
-
-            strong {
-                font-weight: var(--font-weight-bold);
-                color: inherit;
-            }
         }
 
         /* GROUP PROSE / LISTS
