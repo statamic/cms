@@ -174,8 +174,12 @@ body {
         =================================================== */
 
         ol, ul {
-            margin-block: 1.25em;
             padding-inline-start: 1.625em;
+            > li {
+                &::marker {
+                    color: var(--tw-prose-counters);
+                }
+            }
         }
 
         :where(ul, ol) :where(ul, ol) {
@@ -191,7 +195,6 @@ body {
             > li {
                 padding-inline-start: 0.375em;
                 font-weight: var(--font-weight-normal);
-                color: var(--tw-prose-counters);
                 p {
                     margin-block: 0.5em;
                     &:first-child {
@@ -211,7 +214,6 @@ body {
             list-style-type: disc;
             > li {
                 padding-inline-start: 0.375em;
-                color: var(--tw-prose-bullets);
             }
         }
 
