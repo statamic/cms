@@ -27,7 +27,7 @@ class NavigationBlueprintController extends CpController
         $blueprint = $nav->blueprint();
 
         Breadcrumbs::push(new Breadcrumb(
-            text: 'Navigaton',
+            text: 'Navigation',
         ));
 
         Breadcrumbs::push(new Breadcrumb(
