@@ -655,7 +655,7 @@ body {
             margin-block: 0.875em;
         }
 
-        ul > li
+        ul > li {
             p {
                 margin-block: 0.875em;
             }
