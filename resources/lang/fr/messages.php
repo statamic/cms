@@ -224,7 +224,7 @@ return [
     'set_new_password_instructions' => 'Confirmez votre adresse e-mail et créez un nouveau mot de passe.',
     'show_slugs_instructions' => 'Afficher les identifiants dans la vue arborescente ?',
     'site_configure_attributes_instructions' => 'Ajoutez des attributs arbitraires à la configuration de votre site, accessibles dans vos modèles. [En savoir plus](https://statamic.dev/multi-site#additional-attributes).',
-    'site_configure_handle_instructions' => 'Une référence unique à ce site. Il n’est pas évident de le modifier par la suite.',
+    'site_configure_handle_instructions' => 'Comment vous allez faire référence à ce site sur le frontal. Il n’est pas évident de le modifier par la suite.',
     'site_configure_lang_instructions' => 'En savoir plus sur les [Langues](https://statamic.dev/multi-site#language).',
     'site_configure_locale_instructions' => 'En savoir plus sur les [Paramètres régionaux](https://statamic.dev/multi-site#locale).',
     'site_configure_name_instructions' => 'Nom du site affiché dans le panneau de contrôle.',
