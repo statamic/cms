@@ -1,0 +1,1 @@
+@php $the_var = 'the value'; @endphp

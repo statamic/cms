@@ -214,6 +214,40 @@ class GlobalRuntimeState
 
     public static $isCacheEnabled = false;
 
+    public static function isolate(): void
+    {
+        self::$traceTagAssignments = false;
+        self::$tracedRuntimeAssignments = [];
+        self::$requiresRuntimeIsolation = true;
+    }
+
+    public static function captureRuntimeState(): array
+    {
+        return [
+            self::$requiresRuntimeIsolation,
+            self::$traceTagAssignments,
+            self::$tracedRuntimeAssignments,
+        ];
+    }
+
+    public static function captureAndIsolate(): array
+    {
+        $captured = self::captureRuntimeState();
+
+        self::isolate();
+
+        return $captured;
+    }
+
+    public static function restoreState(array $capturedState): void
+    {
+        [$requiresIsolation, $traceTagAssignments, $tracedRuntimeAssignments] = $capturedState;
+
+        self::$requiresRuntimeIsolation = $requiresIsolation;
+        self::$traceTagAssignments = $traceTagAssignments;
+        self::$tracedRuntimeAssignments = $tracedRuntimeAssignments;
+    }
+
     public static function resetGlobalState()
     {
         self::$templateFileStack = [];
