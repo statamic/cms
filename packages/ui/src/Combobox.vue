@@ -1,6 +1,18 @@
 <script setup>
 import { cva } from 'cva';
-import { ComboboxAnchor, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxRoot, ComboboxTrigger, ComboboxPortal, ComboboxViewport, ComboboxVirtualizer, FocusScope } from 'reka-ui';
+import {
+    ComboboxAnchor,
+    ComboboxContent,
+    ComboboxEmpty,
+    ComboboxInput,
+    ComboboxItem,
+    ComboboxRoot,
+    ComboboxTrigger,
+    ComboboxPortal,
+    ComboboxViewport,
+    ComboboxVirtualizer,
+    FocusScope
+} from 'reka-ui';
 import { computed, nextTick, ref, useAttrs, useTemplateRef, watch } from 'vue';
 import Button from './Button/Button.vue';
 import Icon from './Icon/Icon.vue';
