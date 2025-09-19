@@ -17,7 +17,9 @@ class LivePreview
 
         $response = $next($request);
 
-        if (!$item) return $response;
+        if (!$item) {
+            return $response;
+        }
 
         $item->repository()->substitute($item);
 
