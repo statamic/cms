@@ -1,42 +1,42 @@
 @theme {
-    --tw-prose-body: var(--color-gray-700);
-    --tw-prose-headings: var(--color-gray-900);
-    --tw-prose-lead: var(--color-gray-600);
-    --tw-prose-links: var(--color-gray-900);
-    --tw-prose-bold: var(--color-gray-900);
-    --tw-prose-counters: var(--color-gray-500);
-    --tw-prose-bullets: var(--color-gray-400);
-    --tw-prose-hr: var(--color-gray-200);
-    --tw-prose-quotes: var(--color-gray-900);
-    --tw-prose-quote-borders: var(--color-gray-200);
-    --tw-prose-captions: var(--color-gray-500);
-    --tw-prose-kbd: var(--color-gray-900);
-    --tw-prose-kbd-shadows: var(--color-gray-900);
-    --tw-prose-code: var(--color-gray-900);
-    --tw-prose-pre-code: var(--color-gray-900);
-    --tw-prose-pre-bg: var(--color-gray-200);
-    --tw-prose-th-borders: var(--color-gray-300);
-    --tw-prose-td-borders: var(--color-gray-200);
+    --prose-body: var(--color-gray-700);
+    --prose-headings: var(--color-gray-900);
+    --prose-lead: var(--color-gray-600);
+    --prose-links: var(--color-gray-900);
+    --prose-bold: var(--color-gray-900);
+    --prose-counters: var(--color-gray-500);
+    --prose-bullets: var(--color-gray-400);
+    --prose-hr: var(--color-gray-200);
+    --prose-quotes: var(--color-gray-900);
+    --prose-quote-borders: var(--color-gray-200);
+    --prose-captions: var(--color-gray-500);
+    --prose-kbd: var(--color-gray-900);
+    --prose-kbd-shadows: var(--color-gray-900);
+    --prose-code: var(--color-gray-900);
+    --prose-pre-code: var(--color-gray-900);
+    --prose-pre-bg: var(--color-gray-200);
+    --prose-th-borders: var(--color-gray-300);
+    --prose-td-borders: var(--color-gray-200);
 
     /* Dark theme variables (for prose-invert) */
-    --tw-prose-invert-body: var(--color-gray-300);
-    --tw-prose-invert-headings: var(--color-white);
-    --tw-prose-invert-lead: var(--color-gray-400);
-    --tw-prose-invert-links: var(--color-white);
-    --tw-prose-invert-bold: var(--color-white);
-    --tw-prose-invert-counters: var(--color-gray-400);
-    --tw-prose-invert-bullets: var(--color-gray-600);
-    --tw-prose-invert-hr: var(--color-gray-700);
-    --tw-prose-invert-quotes: var(--color-gray-100);
-    --tw-prose-invert-quote-borders: var(--color-gray-700);
-    --tw-prose-invert-captions: var(--color-gray-400);
-    --tw-prose-invert-kbd: var(--color-white);
-    --tw-prose-invert-kbd-shadows: var(--color-white);
-    --tw-prose-invert-code: var(--color-white);
-    --tw-prose-invert-pre-code: var(--color-gray-300);
-    --tw-prose-invert-pre-bg: oklch(from var(--color-black) l c h / 0.5);
-    --tw-prose-invert-th-borders: var(--color-gray-600);
-    --tw-prose-invert-td-borders: var(--color-gray-700);
+    --prose-invert-body: var(--color-gray-300);
+    --prose-invert-headings: var(--color-white);
+    --prose-invert-lead: var(--color-gray-400);
+    --prose-invert-links: var(--color-white);
+    --prose-invert-bold: var(--color-white);
+    --prose-invert-counters: var(--color-gray-400);
+    --prose-invert-bullets: var(--color-gray-600);
+    --prose-invert-hr: var(--color-gray-700);
+    --prose-invert-quotes: var(--color-gray-100);
+    --prose-invert-quote-borders: var(--color-gray-700);
+    --prose-invert-captions: var(--color-gray-400);
+    --prose-invert-kbd: var(--color-white);
+    --prose-invert-kbd-shadows: var(--color-white);
+    --prose-invert-code: var(--color-white);
+    --prose-invert-pre-code: var(--color-gray-300);
+    --prose-invert-pre-bg: oklch(from var(--color-black) l c h / 0.5);
+    --prose-invert-th-borders: var(--color-gray-600);
+    --prose-invert-td-borders: var(--color-gray-700);
 }
 
 body {
@@ -50,7 +50,7 @@ body {
 }
 
 @utility prose {
-    color: var(--tw-prose-body);
+    color: var(--prose-body);
     max-width: 65ch;
     font-size: var(--text-base);
     line-height: calc(var(--leading-normal) + 0.25);
@@ -77,13 +77,13 @@ body {
         }
 
         a {
-            color: var(--tw-prose-links);
+            color: var(--prose-links);
             text-decoration: underline;
             font-weight: var(--font-weight-medium);
         }
 
         strong {
-            color: var(--tw-prose-bold);
+            color: var(--prose-bold);
             font-weight: var(--font-weight-semibold);
 
             a &,
@@ -98,9 +98,9 @@ body {
             padding-inline-start: 1em;
             font-weight: var(--font-weight-medium);
             font-style: italic;
-            color: var(--tw-prose-quotes);
+            color: var(--prose-quotes);
             border-inline-start-width: 0.25rem;
-            border-inline-start-color: var(--tw-prose-quote-borders);
+            border-inline-start-color: var(--prose-quote-borders);
             quotes: '\201C' '\201D' '\2018' '\2019';
 
             p {
@@ -115,7 +115,7 @@ body {
 
         hr {
             margin-block: 3em;
-            border-color: var(--tw-prose-hr);
+            border-color: var(--prose-hr);
             border-top-width: 1px;
 
             + * {
@@ -127,7 +127,7 @@ body {
         =================================================== */
         h1, h2, h3, h4, h5, h6 {
             margin-block: 0 0.5em;
-            color: var(--tw-prose-headings);
+            color: var(--prose-headings);
 
             strong {
                 font-weight: var(--font-weight-bold);
@@ -181,7 +181,7 @@ body {
             padding-inline-start: 1.625em;
             > li {
                 &::marker {
-                    color: var(--tw-prose-counters);
+                    color: var(--prose-counters);
                 }
             }
         }
@@ -229,7 +229,7 @@ body {
         }
 
         dt {
-            color: var(--tw-prose-headings);
+            color: var(--prose-headings);
             font-weight: var(--font-weight-semibold);
             margin-block-start: 1.25em;
         }
@@ -260,7 +260,7 @@ body {
         }
 
         figcaption {
-            color: var(--tw-prose-captions);
+            color: var(--prose-captions);
             font-size: 0.875em;
             line-height: 1.5;
             margin-block-start: 0.825em;
@@ -272,17 +272,17 @@ body {
         kbd {
             font-weight: var(--font-weight-medium);
             font-family: inherit;
-            color: var(--tw-prose-kbd);
+            color: var(--prose-kbd);
             box-shadow:
-                0 0 0 1px oklch(from var(--tw-prose-kbd-shadows) l c h / 10%),
-                0 2px 0 oklch(from var(--tw-prose-kbd-shadows) l c h / 10%);
+                0 0 0 1px oklch(from var(--prose-kbd-shadows) l c h / 10%),
+                0 2px 0 oklch(from var(--prose-kbd-shadows) l c h / 10%);
             font-size: 0.875em;
             border-radius: 0.3125rem;
             padding: 0.1875em 0.375em;
         }
 
         code {
-            color: var(--tw-prose-code);
+            color: var(--prose-code);
             font-weight: var(--font-weight-semibold);
             font-size: 0.875em;
             color: inherit;
@@ -297,8 +297,8 @@ body {
         }
 
         pre {
-            color: var(--tw-prose-pre-code);
-            background-color: var(--tw-prose-pre-bg);
+            color: var(--prose-pre-code);
+            background-color: var(--prose-pre-bg);
             overflow-x: auto;
             font-weight: var(--font-weight-normal);
             font-size: 0.875em;
@@ -337,10 +337,10 @@ body {
 
         thead {
             border-bottom-width: 1px;
-            border-bottom-color: var(--tw-prose-th-borders);
+            border-bottom-color: var(--prose-th-borders);
 
             th {
-                color: var(--tw-prose-headings);
+                color: var(--prose-headings);
                 font-weight: var(--font-weight-semibold);
                 vertical-align: bottom;
                 padding-inline: 0.5em;
@@ -367,7 +367,7 @@ body {
         tbody {
             tr {
                 border-bottom-width: 1px;
-                border-bottom-color: var(--tw-prose-td-borders);
+                border-bottom-color: var(--prose-td-borders);
 
                 &:last-child {
                     border-bottom-width: 0;
@@ -384,7 +384,7 @@ body {
 
         tfoot {
             border-top-width: 1px;
-            border-top-color: var(--tw-prose-th-borders);
+            border-top-color: var(--prose-th-borders);
 
             td {
                 vertical-align: top;
