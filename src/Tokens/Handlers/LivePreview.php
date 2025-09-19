@@ -15,9 +15,11 @@ class LivePreview
     {
         $item = Facade::item($token);
 
-        $item->repository()->substitute($item);
-
         $response = $next($request);
+
+        if (!$item) return $response;
+
+        $item->repository()->substitute($item);
 
         if (Sites::multiEnabled()) {
             /** @var Collection */
