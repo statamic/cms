@@ -79,14 +79,14 @@
             <p>Inline code can be written using <code>console.log('Hello, World!')</code> for JavaScript or <code>printf("Hello, World!")</code> for C.</p>
             <h3>Code Blocks</h3>
             <pre>
-        <code>function fibonacci(n) {
-        if (n &lt;= 1) return n;
-        return fibonacci(n - 1) + fibonacci(n - 2);
-        }
+                <code>function fibonacci(n) {
+                if (n &lt;= 1) return n;
+                return fibonacci(n - 1) + fibonacci(n - 2);
+                }
 
-        // Usage example
-        console.log(fibonacci(10)); // Output: 55</code>
-        </pre>
+                // Usage example
+                console.log(fibonacci(10)); // Output: 55</code>
+            </pre>
             <h3>Keyboard Input</h3>
             <p>To save a file, press <kbd>Ctrl</kbd> + <kbd>S</kbd> on Windows or <kbd>Cmd</kbd> + <kbd>S</kbd> on Mac.</p>
             <h2>Tables</h2>
@@ -153,7 +153,7 @@
             <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
             <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
         </div>
-        <div class="space-y-12">
+        <div class="space-y-12 prose">
             <section class="space-y-4">
                 <p>This is some <code>code</code> in a paragraph.</p>
                 <pre>

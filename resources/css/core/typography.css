@@ -65,7 +65,7 @@ body {
     color: var(--prose-body);
     max-width: 65ch;
     font-size: var(--text-base);
-    line-height: calc(var(--leading-normal) + 0.25);
+    line-height: var(--leading-normal);
 
     &:not([class~='not-prose'], [class~='not-prose'] *) {
 
@@ -85,6 +85,10 @@ body {
 
         p {
             margin-block: 1.25em;
+        }
+
+        .lead {
+            font-size: 1.1em;
         }
 
         a {
@@ -172,6 +176,7 @@ body {
 
         h2 {
             font-size: 1.35em;
+            font-weight: var(--prose-font-weight-bold);
             line-height: var(--leading-normal);
             letter-spacing: -0.01em;
         }
