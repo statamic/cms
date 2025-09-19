@@ -17,7 +17,7 @@ class LivePreview
 
         $response = $next($request);
 
-        if (!$item) {
+        if (! $item) {
             return $response;
         }
 
