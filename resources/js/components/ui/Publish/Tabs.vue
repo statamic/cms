@@ -109,7 +109,7 @@ function tabHasError(tab) {
                             <Sections />
                         </slot>
 
-                        <slot name="actions" />
+                        <slot v-if="!shouldShowSidebar" name="actions" />
                     </TabProvider>
                 </TabContent>
 
