@@ -4,6 +4,7 @@
         searchable
         ignore-filter
         :disabled="config.disabled"
+        :clearable="config.clearable"
         :max-selections="config.max_items"
         :model-value="value"
         :multiple
