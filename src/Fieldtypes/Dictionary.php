@@ -38,6 +38,13 @@ class Dictionary extends Fieldtype
                         'type' => 'text',
                         'default' => '',
                     ],
+                    'clearable' => [
+                        'display' => __('Clearable'),
+                        'instructions' => __('statamic::fieldtypes.select.config.clearable'),
+                        'type' => 'toggle',
+                        'default' => false,
+                        'width' => '50',
+                    ],
                 ],
             ],
             [

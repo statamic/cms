@@ -239,7 +239,7 @@ return [
     'taxonomy_configure_intro' => 'A taxonomy is a system of classifying data around a set of unique characteristics, such as categories, tags, or colors.',
     'taxonomy_configure_layout_instructions' => 'Set this taxonomy\'s default layout. Terms can override this setting with a `layout` field.',
     'taxonomy_configure_template_instructions' => 'Set this taxonomy\'s default template.',
-    'taxonomy_configure_term_template_instructions' => 'Set this taxonomy\'s default template. Terms can override this setting with a `template` field.',
+    'taxonomy_configure_term_template_instructions' => 'Set this taxonomy\'s default term template. Terms can override this setting with a `template` field.',
     'taxonomy_configure_title_instructions' => 'Use a plural noun, such as \'Categories\' or \'Tags\'',
     'taxonomy_next_steps_blueprints_description' => 'Manage the blueprints and fields available for this taxonomy.',
     'taxonomy_next_steps_configure_description' => 'Configure names, associate collections, define blueprints, and more.',

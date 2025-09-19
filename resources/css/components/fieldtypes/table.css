@@ -97,7 +97,7 @@ Table Fieldtype
 
     [data-ui-control] {
         @apply block w-full max-w-full rounded-none appearance-none border p-2;
-        @apply border-none bg-white text-sm shadow-none outline-hidden;
+        @apply border-none bg-white dark:bg-gray-800 text-sm shadow-none outline-hidden;
         &:focus {
             @apply bg-gray-100 inset-shadow-xs ring-0 dark:bg-gray-700;
         }
