@@ -19,12 +19,16 @@ const props = defineProps({
         type: String,
         default: (props) => props.pathPrefix,
     },
+    size: {
+        type: String,
+    },
 });
 
 provideFieldsContext({
     fields: toRef(() => props.fields),
     fieldPathPrefix: toRef(() => props.fieldPathPrefix),
     metaPathPrefix: toRef(() => props.metaPathPrefix),
+    size: toRef(() => props.size),
 });
 </script>
 

@@ -7,7 +7,7 @@
         :autocomplete="config.autocomplete"
         :autoselect="config.autoselect"
         :type="config.input_type"
-        :size="config.size"
+        :size="size"
         :read-only="isReadOnly"
         :prepend="__(config.prepend)"
         :append="__(config.append)"
@@ -26,6 +26,9 @@
 import Fieldtype from '@/components/fieldtypes/fieldtype.js';
 import { Input } from '@/components/ui';
 import { computed } from 'vue';
+import { injectFieldsContext } from './../ui/Publish/FieldsProvider.vue';
+
+const { size } = injectFieldsContext();
 
 const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);

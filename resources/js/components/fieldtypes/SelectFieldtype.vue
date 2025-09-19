@@ -5,7 +5,6 @@
         :disabled="config.disabled"
         :label-html="config.label_html"
         :max-selections="config.max_items"
-        :size="config.size"
         :model-value="value"
         :multiple="config.multiple"
         :options="options"

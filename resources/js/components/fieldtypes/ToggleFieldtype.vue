@@ -4,7 +4,6 @@
             <Switch
                 @update:model-value="update"
                 :disabled="config.disabled || isReadOnly"
-                :size="config.size"
                 :id="fieldId"
                 :model-value="value"
                 :read-only="isReadOnly"
