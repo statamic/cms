@@ -7,6 +7,7 @@
             :key="$index"
             :name="name"
             :read-only="isReadOnly"
+            :size="fieldsContext.size.value"
             :text="option.label || option.value"
             :value="option.value"
             :variant="value == option.value ? 'pressed' : 'default'"
@@ -26,6 +27,10 @@ export default {
     components: {
         Button,
         ButtonGroup
+    },
+
+    inject: {
+        fieldsContext: 'PublishFieldsContext',
     },
 
     data() {

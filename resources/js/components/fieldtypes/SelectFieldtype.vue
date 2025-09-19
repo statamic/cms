@@ -11,6 +11,7 @@
         :placeholder="__(config.placeholder)"
         :read-only="isReadOnly"
         :searchable="config.searchable || config.taggable"
+        :size="size"
         :taggable="config.taggable"
         :id="id"
         @update:modelValue="comboboxUpdated"
@@ -22,6 +23,9 @@ import Fieldtype from '@/components/fieldtypes/fieldtype.js';
 import HasInputOptions from './HasInputOptions.js';
 import { Combobox } from '@/components/ui';
 import { computed } from 'vue';
+import { injectFieldsContext } from './../ui/Publish/FieldsProvider.vue';
+
+const { size } = injectFieldsContext();
 
 const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
