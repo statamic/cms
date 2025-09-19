@@ -68,6 +68,10 @@ body {
         /* GROUP PROSE / ELEMENTS
         =================================================== */
 
+        p, ol, li {
+            @apply st-text-legibility;
+        }
+
         p {
             margin-block: 1.25em;
         }
