@@ -77,8 +77,10 @@ request();
     >
         <template #option="option">
             <div class="flex items-center">
-                <Icon v-if="!option.html" :name="option.label" class="size-4" />
-                <div v-if="option.html" v-html="option.html" class="size-4" />
+                <div class="size-4">
+                    <Icon v-if="!option.html" :name="option.label" class="size-4" />
+                    <div v-if="option.html" v-html="option.html" class="size-4" />
+                </div>
                 <span class="ms-3 truncate">
                     {{ __(option.label) }}
                 </span>
