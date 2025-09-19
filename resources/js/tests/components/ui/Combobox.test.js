@@ -2,6 +2,32 @@ import { expect, test, beforeEach, vi, describe } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { Combobox } from '@/components/ui';
 
+// Mock the ComboboxVirtualizer to render options without virtualization.
+// This is necessary because virtualization relies on browser APIs which aren't available in our tests.
+vi.mock('reka-ui', async () => {
+    const actual = await vi.importActual('reka-ui');
+    return {
+        ...actual,
+        ComboboxVirtualizer: {
+            name: 'ComboboxVirtualizer',
+            props: ['options', 'overscan', 'estimateSize', 'textContent'],
+            setup(props, { slots }) {
+                // Instead of virtualization, render all items directly
+                return () => {
+                    const items = props.options.map((option, index) => {
+                        return slots.default({
+                            option,
+                            virtualItem: { index, key: index, start: index * 37 },
+                            virtualizer: { scrollToIndex: () => {} }
+                        });
+                    });
+                    return items;
+                };
+            }
+        }
+    };
+});
+
 beforeEach(() => {
     Element.prototype.scrollIntoView = vi.fn();
 
