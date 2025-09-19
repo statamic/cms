@@ -108,6 +108,8 @@ function tabHasError(tab) {
                         <slot :tab="tab">
                             <Sections />
                         </slot>
+
+                        <slot name="actions" />
                     </TabProvider>
                 </TabContent>
 
