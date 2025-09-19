@@ -294,8 +294,8 @@ export default {
         getCheckboxLabel(row) {
             const rowTitle = this.getRowTitle(row);
             return this.isSelected(row.id)
-                ? __('deselect_title', { title: rowTitle })
-                : __('select_title', { title: rowTitle });
+                ? __('Deselect :title', { title: rowTitle })
+                : __('Select :title', { title: rowTitle });
         },
 
         getCheckboxDescription(row) {
@@ -303,12 +303,12 @@ export default {
             const isDisabled = this.reachedSelectionLimit && !this.singleSelect && !this.isSelected(row.id);
 
             if (isDisabled) {
-                return __('selection_limit_reached', { title: rowTitle });
+                return __('messages.selections_limit_reached', { title: rowTitle });
             }
 
             return this.isSelected(row.id)
-                ? __('item_selected_description', { title: rowTitle })
-                : __('item_not_selected_description', { title: rowTitle });
+                ? __('messages.selections_item_selected', { title: rowTitle })
+                : __('messages.selections_item_unselected', { title: rowTitle });
         },
 
         getRowTitle(row) {
