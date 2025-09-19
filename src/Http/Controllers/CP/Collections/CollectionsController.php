@@ -493,12 +493,14 @@ class CollectionsController extends CpController
                         'placeholder' => __('System default'),
                         'blueprint' => true,
                         'width' => '50',
+                        'clearable' => true,
                     ],
                     'layout' => [
                         'display' => __('Layout'),
                         'instructions' => __('statamic::messages.collection_configure_layout_instructions'),
                         'type' => 'template',
                         'width' => '50',
+                        'clearable' => true,
                     ],
                     'taxonomies' => [
                         'display' => __('Taxonomies'),
