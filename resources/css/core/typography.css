@@ -1,4 +1,14 @@
 @theme {
+    /* GROUP VARIABLES -- DECORATION -- TEXT -- SIZES
+    =================================================== */
+    --prose-font-weight-normal: 400;
+    --prose-font-weight-medium: 500;
+    --prose-font-weight-semibold: 600;
+    --prose-font-weight-bold: 700;
+    --prose-font-weight-heavy: 900;
+
+    /* GROUP VARIABLES -- DECORATION -- COLORS -- LIGHT
+    =================================================== */
     --prose-body: var(--color-gray-700);
     --prose-headings: var(--color-gray-900);
     --prose-lead: var(--color-gray-600);
@@ -18,6 +28,8 @@
     --prose-th-borders: var(--color-gray-300);
     --prose-td-borders: var(--color-gray-200);
 
+    /* GROUP VARIABLES -- DECORATION -- COLORS -- DARK
+    =================================================== */
     /* Dark theme variables (for prose-invert) */
     --prose-invert-body: var(--color-gray-300);
     --prose-invert-headings: var(--color-white);
@@ -67,7 +79,6 @@ body {
 
         /* GROUP PROSE / ELEMENTS
         =================================================== */
-
         p, ol, li {
             @apply st-text-legibility;
         }
@@ -79,12 +90,12 @@ body {
         a {
             color: var(--prose-links);
             text-decoration: underline;
-            font-weight: var(--font-weight-medium);
+            font-weight: var(--prose-font-weight-medium);
         }
 
         strong {
             color: var(--prose-bold);
-            font-weight: var(--font-weight-semibold);
+            font-weight: var(--prose-font-weight-semibold);
 
             a &,
             blockquote &,
@@ -96,7 +107,7 @@ body {
         blockquote {
             margin-block: 1.6em;
             padding-inline-start: 1em;
-            font-weight: var(--font-weight-medium);
+            font-weight: var(--prose-font-weight-medium);
             font-style: italic;
             color: var(--prose-quotes);
             border-inline-start-width: 0.25rem;
@@ -130,29 +141,33 @@ body {
             color: var(--prose-headings);
 
             strong {
-                font-weight: var(--font-weight-bold);
+                font-weight: var(--prose-font-weight-bold);
                 color: inherit;
             }
         }
 
         h2, h3, h4 {
-            font-weight: var(--font-weight-medium);
+            font-weight: var(--prose-font-weight-medium);
             + * {
                 margin-block-start: 0;
             }
         }
 
         h5, h6 {
-            font-weight: var(--font-weight-normal);
+            font-weight: var(--prose-font-weight-normal);
             line-height: var(--leading-normal);
         }
 
         h1 {
             margin-block: 0 1em;
             font-size: 1.75em;
-            font-weight: var(--font-weight-medium);
+            font-weight: var(--prose-font-weight-bold);
             letter-spacing: -0.01em;
             line-height: var(--leading-normal);
+
+            strong {
+                font-weight: var(--prose-font-weight-heavy);
+            }
         }
 
         h2 {
@@ -198,7 +213,7 @@ body {
             list-style-type: decimal;
             > li {
                 padding-inline-start: 0.375em;
-                font-weight: var(--font-weight-normal);
+                font-weight: var(--prose-font-weight-normal);
                 p {
                     margin-block: 0.5em;
                     &:first-child {
@@ -230,7 +245,7 @@ body {
 
         dt {
             color: var(--prose-headings);
-            font-weight: var(--font-weight-semibold);
+            font-weight: var(--prose-font-weight-semibold);
             margin-block-start: 1.25em;
         }
 
@@ -270,7 +285,7 @@ body {
         =================================================== */
 
         kbd {
-            font-weight: var(--font-weight-medium);
+            font-weight: var(--prose-font-weight-medium);
             font-family: inherit;
             color: var(--prose-kbd);
             box-shadow:
@@ -283,7 +298,7 @@ body {
 
         code {
             color: var(--prose-code);
-            font-weight: var(--font-weight-semibold);
+            font-weight: var(--prose-font-weight-semibold);
             font-size: 0.875em;
             color: inherit;
 
@@ -300,7 +315,7 @@ body {
             color: var(--prose-pre-code);
             background-color: var(--prose-pre-bg);
             overflow-x: auto;
-            font-weight: var(--font-weight-normal);
+            font-weight: var(--prose-font-weight-normal);
             font-size: 0.875em;
             line-height: 1.75;
             margin-block: 1.75em;
@@ -341,7 +356,7 @@ body {
 
             th {
                 color: var(--prose-headings);
-                font-weight: var(--font-weight-semibold);
+                font-weight: var(--prose-font-weight-semibold);
                 vertical-align: bottom;
                 padding-inline: 0.5em;
                 padding-block-end: 0.5em;
