@@ -34,10 +34,7 @@ beforeEach(() => {
     global.__ = (key) => key;
 
     global.CSS = {
-        escape: (str) => {
-            // Simple implementation that handles most cases
-            return str.replace(/[!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, '\\$&');
-        }
+        escape: (str) => str.replace(/[!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, '\\$&')
     };
 
     document.body.innerHTML = '';
