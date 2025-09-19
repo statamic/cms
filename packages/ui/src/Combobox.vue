@@ -1,6 +1,6 @@
 <script setup>
 import { cva } from 'cva';
-import { ComboboxAnchor, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxRoot, ComboboxTrigger, ComboboxPortal, ComboboxViewport, FocusScope } from 'reka-ui';
+import { ComboboxAnchor, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxRoot, ComboboxTrigger, ComboboxPortal, ComboboxViewport, ComboboxVirtualizer, FocusScope } from 'reka-ui';
 import { computed, nextTick, ref, useAttrs, useTemplateRef, watch } from 'vue';
 import Button from './Button/Button.vue';
 import Icon from './Icon/Icon.vue';
@@ -319,7 +319,7 @@ defineExpose({
                         :class="[
                             'shadow-ui-sm z-100 rounded-lg border border-gray-200 bg-white p-2 dark:border-white/10 dark:bg-gray-800',
                             'max-h-[var(--reka-combobox-content-available-height)] w-[var(--reka-combobox-trigger-width)] min-w-fit',
-                            '[&_[data-reka-combobox-viewport]]:grid [&_[data-reka-combobox-viewport]]:gap-1 overflow-y-scroll'
+                            'overflow-hidden'
                         ]"
                         @escape-key-down="nextTick(() => $refs.trigger.$el.focus())"
                         data-ui-combobox-content
@@ -333,34 +333,42 @@ defineExpose({
                                 event.preventDefault();
                             }"
                         >
-                            <ComboboxViewport>
+                            <ComboboxViewport class="max-h-[700px] overflow-y-auto">
                                 <ComboboxEmpty class="p-2 text-sm" data-ui-combobox-empty>
                                     <slot name="no-options" v-bind="{ searchQuery }">
                                         {{ __('No options available.') }}
                                     </slot>
                                 </ComboboxEmpty>
 
-                                <ComboboxItem
+                                <ComboboxVirtualizer
                                     v-if="filteredOptions"
-                                    v-for="(option, index) in filteredOptions"
-                                    :key="index + JSON.stringify(modelValue)"
-                                    :value="getOptionValue(option)"
-                                    :text-value="getOptionLabel(option)"
-                                    :disabled="isOptionDisabled(option)"
-                                    :class="itemClasses({ size: size, selected: isSelected(option) })"
-                                    as="button"
-                                    :data-ui-combobox-item="getOptionValue(option)"
-                                    @select="() => {
+                                    v-slot="{ option, virtualItem }"
+                                    :options="filteredOptions"
+                                    :estimate-size="37"
+                                    :text-content="(opt) => getOptionLabel(opt)"
+                                >
+                                    <div class="py-1 w-full">
+                                        <ComboboxItem
+                                            :key="virtualItem.index + JSON.stringify(modelValue)"
+                                            :value="getOptionValue(option)"
+                                            :text-value="getOptionLabel(option)"
+                                            :disabled="isOptionDisabled(option)"
+                                            :class="itemClasses({ size: size, selected: isSelected(option) })"
+                                            as="button"
+                                            :data-ui-combobox-item="getOptionValue(option)"
+                                            @select="() => {
                                         dropdownOpen = !closeOnSelect;
                                         if (closeOnSelect) $refs.trigger.$el.focus();
                                     }"
-                                >
-                                    <slot name="option" v-bind="option">
-                                        <img v-if="option.image" :src="option.image" class="size-5 rounded-full" />
-                                        <span v-if="labelHtml" v-html="getOptionLabel(option)" />
-                                        <span v-else>{{ __(getOptionLabel(option)) }}</span>
-                                    </slot>
-                                </ComboboxItem>
+                                        >
+                                            <slot name="option" v-bind="option">
+                                                <img v-if="option.image" :src="option.image" class="size-5 rounded-full" />
+                                                <span v-if="labelHtml" v-html="getOptionLabel(option)" />
+                                                <span v-else>{{ __(getOptionLabel(option)) }}</span>
+                                            </slot>
+                                        </ComboboxItem>
+                                    </div>
+                                </ComboboxVirtualizer>
                             </ComboboxViewport>
                         </FocusScope>
                     </ComboboxContent>
