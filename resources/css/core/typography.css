@@ -196,7 +196,6 @@ body {
 
         /* GROUP PROSE / LISTS
         =================================================== */
-
         ol, ul {
             padding-inline-start: 1.625em;
             > li {
@@ -243,7 +242,6 @@ body {
 
         /* GROUP PROSE / LISTS / DESCRIPTIONS
         =================================================== */
-
         dl {
             margin-block: 1.25em;
         }
@@ -261,7 +259,6 @@ body {
 
         /* GROUP PROSE / MEDIA
         =================================================== */
-
         picture, img, video {
             margin-block: 2em;
         }
@@ -288,7 +285,6 @@ body {
 
         /* GROUP PROSE / CODE
         =================================================== */
-
         kbd {
             font-weight: var(--prose-font-weight-medium);
             font-family: inherit;
@@ -346,7 +342,6 @@ body {
 
         /* GROUP PROSE / TABLES
         =================================================== */
-
         table {
             width: 100%;
             table-layout: auto;
@@ -425,7 +420,6 @@ body {
 
         /* GROUP PROSE / ELEMENTS
         =================================================== */
-
         [class~='lead'] {
             font-size: 1.25em;
             line-height: 1.5;
@@ -443,7 +437,6 @@ body {
 
         /* GROUP PROSE / HEADINGS
         =================================================== */
-
         h1 {
             font-size: 2.15em;
             line-height: 1.2;
@@ -469,7 +462,6 @@ body {
 
         /* GROUP PROSE / LISTS
         =================================================== */
-
         ol, ul {
             margin-block: 1.25em;
             padding-inline-start: 1.5em;
@@ -511,7 +503,6 @@ body {
 
         /* GROUP PROSE / LISTS / DESCRIPTIONS
         =================================================== */
-
         dd {
             margin-block-start: 0.25em;
             padding-inline-start: 1.5em;
@@ -519,7 +510,6 @@ body {
 
         /* GROUP PROSE / MEDIA
         =================================================== */
-
         picture, img, video {
             margin-block: 1.75em;
         }
@@ -536,7 +526,6 @@ body {
 
         /* GROUP PROSE / CODE
         =================================================== */
-
         kbd {
             padding: 0.15em 0.35em;
             font-size: 0.825em;
@@ -565,7 +554,6 @@ body {
 
         /* GROUP PROSE / TABLES
         =================================================== */
-
         table {
             font-size: 0.825em;
             line-height: var(--leading-normal);
@@ -594,7 +582,6 @@ body {
 
         /* GROUP PROSE / ELEMENTS
         =================================================== */
-
         [class~='lead'] {
             font-size: 1.25em;
             line-height: 1.5;
@@ -607,7 +594,6 @@ body {
 
         /* GROUP PROSE / HEADINGS
         =================================================== */
-
         h1 {
             font-size: 2.5em;
             margin-block: 0 0.75em;
@@ -633,7 +619,6 @@ body {
 
         /* GROUP PROSE / LISTS
         =================================================== */
-
         ol, ul {
             padding-inline-start: 1.5em;
             > li {
@@ -665,14 +650,12 @@ body {
 
         /* GROUP PROSE / LISTS / DESCRIPTIONS
         =================================================== */
-
         dd {
             padding-inline-start: 1.5em;
         }
 
         /* GROUP PROSE / MEDIA
         =================================================== */
-
         picture, img, video {
             margin-block: 1.75em;
         }
@@ -688,7 +671,6 @@ body {
 
         /* GROUP PROSE / CODE
         =================================================== */
-
         kbd {
             padding: 0.25em 0.5em;
         }
@@ -707,7 +689,6 @@ body {
 
         /* GROUP PROSE / TABLES
         =================================================== */
-
         table {
             line-height: var(--leading-normal);
         }
