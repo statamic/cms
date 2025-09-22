@@ -78,7 +78,9 @@ class MakeFieldtype extends GeneratorCommand
             $this->wireUpAddonJs($addon);
         } else {
             if (! $this->appJsIsWiredUp()) {
-                Artisan::call('statamic:setup-cp-vite');
+                Artisan::call('statamic:setup-cp-vite', [
+                    '--without-example-fieldtype' => true,
+                ]);
                 $this->newLine();
             }
 

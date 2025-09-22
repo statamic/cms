@@ -6,7 +6,6 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Str;
-use Statamic\Addons\Manifest;
 use Statamic\Console\RunsInPlease;
 
 use function Laravel\Prompts\spin;
@@ -20,7 +19,7 @@ class SetupCpVite extends Command
      *
      * @var string
      */
-    protected $signature = 'statamic:setup-cp-vite';
+    protected $signature = 'statamic:setup-cp-vite {--without-example-fieldtype : Do not publish the ExampleFieldtype component}';
 
     /**
      * The console command description.
@@ -34,7 +33,7 @@ class SetupCpVite extends Command
      *
      * @return mixed
      */
-    public function handle(Manifest $manifest): void
+    public function handle(): void
     {
         $this
             ->installDependencies()
@@ -123,7 +122,7 @@ class SetupCpVite extends Command
             File::put(resource_path('js/cp.js'), File::get(__DIR__.'/stubs/app/cp.js.stub'));
         }
 
-        if (! File::exists(resource_path('js/components/fieldtypes/ExampleFieldtype.vue'))) {
+        if (! File::exists(resource_path('js/components/fieldtypes/ExampleFieldtype.vue')) && ! $this->option('without-example-fieldtype')) {
             File::ensureDirectoryExists(resource_path('js/components/fieldtypes'));
 
             File::put(resource_path('js/components/fieldtypes/ExampleFieldtype.vue'), File::get(__DIR__.'/stubs/fieldtype.vue.stub'));
