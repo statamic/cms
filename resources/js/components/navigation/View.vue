@@ -18,8 +18,8 @@
             <site-selector
                 v-if="sites.length > 1"
                 :sites="sites"
-                :value="site"
-                @input="siteSelected"
+                :model-value="site"
+                @update:modelValue="siteSelected"
             />
 
             <Dropdown v-if="canEdit && hasCollections" placement="left-start" :disabled="!hasCollections">
@@ -89,7 +89,7 @@
                         icon="fieldtype-link"
                         :heading="__('Link to URL')"
                         :description="__('messages.navigation_link_to_url_instructions')"
-                        @click="linkPage"
+                        @click="linkPage()"
                     />
 
                     <EmptyStateItem
@@ -110,15 +110,9 @@
             </template>
 
             <template #branch-icon="{ branch }">
-                <ui-tooltip v-if="isEntryBranch(branch)" :text="__('Entry link')">
-                    <ui-icon class="size-3.5! text-gray-500" name="link" tabindex="-1" />
-                </ui-tooltip>
-                <ui-tooltip v-if="isLinkBranch(branch)" :text="__('External link')">
-                    <ui-icon class="size-3.5! text-gray-500" name="external-link" tabindex="-1" />
-                </ui-tooltip>
-                <ui-tooltip v-if="isTextBranch(branch)" :text="__('Text')">
-                    <ui-icon class="size-3.5! text-gray-500" name="page" tabindex="-1" />
-                </ui-tooltip>
+                <ui-icon v-if="isEntryBranch(branch)" v-tooltip="__('Entry link')" class="size-3.5! text-gray-500" name="link" tabindex="-1" />
+                <ui-icon v-if="isLinkBranch(branch)" v-tooltip="__('External link')" class="size-3.5! text-gray-500" name="external-link" tabindex="-1" />
+                <ui-icon v-if="isTextBranch(branch)" v-tooltip="__('Text')" class="size-3.5! text-gray-500" name="page" tabindex="-1" />
             </template>
 
             <template v-if="canEdit" #branch-options="{ branch, removeBranch, stat, depth }">
@@ -443,7 +437,7 @@ export default {
         },
 
         siteSelected(site) {
-            window.location = site.url;
+            window.location = this.sites.find((s) => s.handle === site).url;
         },
 
         updatePublishInfo(info) {

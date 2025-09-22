@@ -17,7 +17,7 @@ class Breadcrumbs
 
     public static function build(): array
     {
-        $breadcrumbs = Nav::build(preferences: false)->map(function (array $section): ?array {
+        $breadcrumbs = Nav::build()->map(function (array $section): ?array {
             $primaryNavItem = $section['items']->first(function (NavItem $navItem) {
                 return $navItem->isActive();
             });

@@ -41,7 +41,7 @@
         </element-container>
 
         <confirmation-modal
-            v-if="deletingRow"
+            v-if="deletingRow !== null"
             :title="__('Delete Row')"
             :body-text="__('Are you sure?')"
             :button-text="__('Delete')"

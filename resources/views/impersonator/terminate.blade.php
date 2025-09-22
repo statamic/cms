@@ -86,5 +86,5 @@
             ></path>
         </g>
     </svg>
-    {{ __('Stop impersonating') }}
+    {{ __('Stop impersonating', locale: $locale) }}
 </a>

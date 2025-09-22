@@ -224,6 +224,7 @@ class Sites
                     'max_items' => 1,
                     'width' => 33,
                     'direction' => 'ltr',
+                    'clearable' => true,
                 ],
             ],
             [

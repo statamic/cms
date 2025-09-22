@@ -107,6 +107,5 @@
         sort-direction="desc"
         :columns="{{ $columns->toJson() }}"
         :filters="{{ $filters->toJson() }}"
-        v-cloak
     ></form-submission-listing>
 @endsection

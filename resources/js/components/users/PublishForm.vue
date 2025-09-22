@@ -44,6 +44,7 @@
                 :text="__('Save')"
                 icon="save"
                 :action="save"
+                keys="mod+s"
                 prioritize
                 v-slot="{ text, action }"
             >

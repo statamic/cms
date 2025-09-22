@@ -1,5 +1,94 @@
 # Release Notes
 
+## 6.0.0-alpha.8 (2025-09-17)
+
+### What's new
+- Smoother page loads using animation [#12454](https://github.com/statamic/cms/issues/12454) by @JayGeorge
+- Add `setup-cp-vite` command [#12056](https://github.com/statamic/cms/issues/12056) by @duncanmcclean
+- Add `prepend` and `append` options to Float fieldtype [#12476](https://github.com/statamic/cms/issues/12476) by @duncanmcclean
+
+### What's fixed
+- Add missing architectural lines to navigation > getting started screen [#12468](https://github.com/statamic/cms/issues/12468) by @JayGeorge
+- Bard focus states [#12360](https://github.com/statamic/cms/issues/12360) by @JayGeorge
+- Collection grid missing v-for key [#12477](https://github.com/statamic/cms/issues/12477) by @martyf
+- Ensure "Stop Impersonating" string is translated correctly [#12456](https://github.com/statamic/cms/issues/12456) by @duncanmcclean
+- Combobox shouldn't be disabled when max selections limit has been reached [#12472](https://github.com/statamic/cms/issues/12472) by @duncanmcclean
+- Make bard buttons setting responsive [#12474](https://github.com/statamic/cms/issues/12474) by @jacksleight
+- Combobox: Fix search input focus [#12471](https://github.com/statamic/cms/issues/12471) by @duncanmcclean
+- Fix permission labels not being localized correctly [#12316](https://github.com/statamic/cms/issues/12316) by @duncanmcclean
+- Add tests for the `Combobox` component [#12174](https://github.com/statamic/cms/issues/12174) by @duncanmcclean
+- Add `cursor-pointer` to Create Form links [#12453](https://github.com/statamic/cms/issues/12453) by @duncanmcclean
+- Fix licensing table [#12429](https://github.com/statamic/cms/issues/12429) by @duncanmcclean
+- Textareas should autosize [#12435](https://github.com/statamic/cms/issues/12435) by @duncanmcclean
+- Hide "Customize Columns" button in Grid mode [#12448](https://github.com/statamic/cms/issues/12448) by @duncanmcclean
+- Optimize PageTree performance issues with larger collections [#12434](https://github.com/statamic/cms/issues/12434) by @o1y
+- French translations [#12430](https://github.com/statamic/cms/issues/12430) by @ebeauchamps
+- Validation error shouldn't be thrown when asset container has value [#12437](https://github.com/statamic/cms/issues/12437) by @duncanmcclean
+- Fix string on terms empty state [#12447](https://github.com/statamic/cms/issues/12447) by @duncanmcclean
+- Fix icon in field settings stack [#12436](https://github.com/statamic/cms/issues/12436) by @duncanmcclean
+- Fix validation errors not showing for relationship fieldtypes [#12438](https://github.com/statamic/cms/issues/12438) by @duncanmcclean
+- Improve folder empty states in asset browser [#12452](https://github.com/statamic/cms/issues/12452) by @duncanmcclean
+- Add `target` and `variant` props to Context Item component [#12451](https://github.com/statamic/cms/issues/12451) by @duncanmcclean
+- Fix adding nav items from empty state [#12463](https://github.com/statamic/cms/issues/12463) by @duncanmcclean
+- Ensure nav customizations apply to breadcrumbs [#12460](https://github.com/statamic/cms/issues/12460) by @duncanmcclean
+- Fix Grid fieldtype's table mode [#12439](https://github.com/statamic/cms/issues/12439) by @duncanmcclean
+- "Imported from: ..." translation should include variable [#12455](https://github.com/statamic/cms/issues/12455) by @duncanmcclean
+- Make translator tool look in the ui package [#12423](https://github.com/statamic/cms/issues/12423) by @jasonvarga
+
+
+
+## 6.0.0-alpha.7 (2025-09-12)
+
+### What's new
+- Standalone UI package etc [#12329](https://github.com/statamic/cms/issues/12329) by @jasonvarga
+- Command palette `keys` API and display [#12241](https://github.com/statamic/cms/issues/12241) by @jesseleite
+- URL trailing slash normalizations and support for enforcing them [#11840](https://github.com/statamic/cms/issues/11840) by @jesseleite
+- Drawer UI component [#12215](https://github.com/statamic/cms/issues/12215) by @jackmcdade
+
+### What's fixed
+- Require Bard container when image button is enabled [#12238](https://github.com/statamic/cms/issues/12238) by @godismyjudge95
+- Fix site selectors [#12411](https://github.com/statamic/cms/issues/12411) by @duncanmcclean
+- Page Tree now remembers collapseAll and expandAll [ddda9f48d](https://github.com/statamic/cms/commit/ddda9f48d) by @jackmcdade
+- ColorFieldtype now stores updated values when you click away. [b97ed4fb5](https://github.com/statamic/cms/commit/b97ed4fb5) by @jackmcdade
+- Improve collection grid listing in multisite [#12324](https://github.com/statamic/cms/issues/12324) by @duncanmcclean
+- Fix locales dictionary on Windows [#12407](https://github.com/statamic/cms/issues/12407) by @duncanmcclean
+- Fix combobox dropdown not showing in modals [#12158](https://github.com/statamic/cms/issues/12158) by @duncanmcclean
+- Fix "ESC" key to dismiss the command palette when Bard is on the page [#12394](https://github.com/statamic/cms/issues/12394) by @duncanmcclean
+- Restore breadcrumb hover padding [b5431a009](https://github.com/statamic/cms/commit/b5431a009) by @JayGeorge
+- Pressing meta + enter on command palette should open new window [#12389](https://github.com/statamic/cms/issues/12389) by @ryanmitchell
+- Fix Live Preview popout [#12366](https://github.com/statamic/cms/issues/12366) by @duncanmcclean
+- Simplify Button groups [#12327](https://github.com/statamic/cms/issues/12327) by @JayGeorge
+- Global header - switch out grey text colors in favour of faded white colors so that theming looks better [#12405](https://github.com/statamic/cms/issues/12405) by @JayGeorge
+- Tone down global search background opacity so it works better with different colors [#12414](https://github.com/statamic/cms/issues/12414) by @JayGeorge
+- Change from text-balance to text-pretty [#12403](https://github.com/statamic/cms/issues/12403) by @helloDanuk
+- Breadcrumb hover padding [#12408](https://github.com/statamic/cms/issues/12408) by @JayGeorge
+- Fix position of revisions "View History" button [#12406](https://github.com/statamic/cms/issues/12406) by @duncanmcclean
+- Switch hover state from blue-500 to blue-600 to hit AA for accessibility [#12409](https://github.com/statamic/cms/issues/12409) by @JayGeorge
+- Fix field label tooltip [#12410](https://github.com/statamic/cms/issues/12410) by @duncanmcclean
+- Increase contrast for localizable toggle [#12413](https://github.com/statamic/cms/issues/12413) by @JayGeorge
+- Assets Fieldtype: Clicking on filename should select asset [#12383](https://github.com/statamic/cms/issues/12383) by @duncanmcclean
+- Add code accent for dark mode and tweak light mode values [#12398](https://github.com/statamic/cms/issues/12398) by @JayGeorge
+- Fix folder svg [#12415](https://github.com/statamic/cms/issues/12415) by @jasonvarga
+- Fix double svg in icon component [#12412](https://github.com/statamic/cms/issues/12412) by @jasonvarga
+- Make 'Enter text...' translatable [#12401](https://github.com/statamic/cms/issues/12401) by @helloDanuk
+- Fix header dark mode when subheading is present [12c0fee15](https://github.com/statamic/cms/commit/12c0fee15) by @jackmcdade
+- Improve the way that the Asset Field type keeps important information visible [#12396](https://github.com/statamic/cms/issues/12396) by @JayGeorge
+- Improve asset fieldtype tiles and rows [#12397](https://github.com/statamic/cms/issues/12397) by @jackmcdade
+- Icon changes, bring back custom set icons [#12286](https://github.com/statamic/cms/issues/12286) by @duncanmcclean
+- Fix discarding nav items [#12390](https://github.com/statamic/cms/issues/12390) by @duncanmcclean
+- Table styling [#12367](https://github.com/statamic/cms/issues/12367) by @JayGeorge
+- German translations [#12370](https://github.com/statamic/cms/issues/12370) by @helloDanuk
+- Make "Save" translatable on publish forms [#12375](https://github.com/statamic/cms/issues/12375) by @duncanmcclean
+- Fix uploading via the asset fieldtype [#12379](https://github.com/statamic/cms/issues/12379) by @duncanmcclean
+- Improve licensing layout and fix little dot [#12381](https://github.com/statamic/cms/issues/12381) by @JayGeorge
+- Asset button text alignment [#12382](https://github.com/statamic/cms/issues/12382) by @JayGeorge
+- Asset UI tweaks [#12384](https://github.com/statamic/cms/issues/12384) by @JayGeorge
+- Make 'Select...' translatable [#12369](https://github.com/statamic/cms/issues/12369) by @helloDanuk
+- Add some gap between Bard icons, for when they are "pressed" [#12368](https://github.com/statamic/cms/issues/12368) by @JayGeorge
+- Improve the difference between the `data-ui-subheading` and the heading [#12268](https://github.com/statamic/cms/issues/12268) by @JayGeorge
+
+
+
 ## 6.0.0-alpha.6 (2025-09-08)
 
 ### What's fixed

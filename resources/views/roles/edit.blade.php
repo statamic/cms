@@ -14,6 +14,5 @@
         initial-handle="{{ $role->handle() }}"
         :initial-super="{{ Statamic\Support\Str::bool($super) }}"
         :initial-permissions="{{ json_encode($permissions) }}"
-        v-cloak
     ></role-publish-form>
 @endsection

@@ -9,6 +9,8 @@
 =================================================== */
 @layer ui {
     .bard-editor {
+        /* We need a transparent border inside Bard to properly see the focus outline. Without this border, the focus outline is hairline-thin */
+        border: 1px solid transparent;
         @apply relative rounded-b-lg p-0 text-gray-900 dark:bg-gray-900 dark:text-gray-100;
         /* The focus state inherits this */
         > * {
@@ -98,6 +100,13 @@
 
             button.active svg {
                 @apply text-white;
+            }
+        }
+
+        &.bard-toolbar-setting {
+            @apply grid grid-cols-[repeat(auto-fit,minmax(--spacing(8),1fr))] rounded-[--spacing(5)];
+            button {
+                @apply justify-self-center;
             }
         }
     }

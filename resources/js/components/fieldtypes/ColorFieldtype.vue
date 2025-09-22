@@ -81,6 +81,12 @@ export default {
         value(value) {
             this.customColor = value;
         },
+
+        popoverOpen(isOpen) {
+            if (!isOpen && this.customColor !== this.value) {
+                this.commitCustomColor();
+            }
+        },
     },
 
     computed: {
