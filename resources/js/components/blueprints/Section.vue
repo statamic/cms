@@ -34,82 +34,95 @@
             </Fields>
         </ui-panel>
 
-        <confirmation-modal
+        <stack
+            narrow
             v-if="editingSection"
-            :title="editText"
             @opened="$refs.displayInput?.select()"
-            @confirm="editConfirmed"
-            @cancel="editCancelled"
+            @closed="editCancelled"
         >
-            <div class="space-y-6">
-                <ui-field :label="__('Display')">
-                    <ui-input ref="displayInput" type="text" v-model="editingSection.display" />
-                </ui-field>
-                <ui-field :label="__('Handle')" v-if="showHandleField">
-                    <ui-input
-                        type="text"
-                        class="font-mono text-sm"
-                        v-model="editingSection.handle"
-                        @input="handleSyncedWithDisplay = false"
-                    />
-                </ui-field>
-                <ui-field :label="__('Instructions')">
-                    <ui-input type="text" v-model="editingSection.instructions" />
-                </ui-field>
-                <ui-field :label="__('Collapsible')">
-                    <ui-switch v-model="editingSection.collapsible" />
-                </ui-field>
-                <ui-field :label="__('Collapsed by default')" v-if="editingSection.collapsible">
-                    <ui-switch v-model="editingSection.collapsed" />
-                </ui-field>
-                <ui-field :label="__('Icon')" v-if="showHandleField">
-                    <publish-field-meta
-                        :config="{
-                            handle: 'icon',
-                            type: 'icon',
-                            set: iconSet,
-                        }"
-                        :initial-value="editingSection.icon"
-                        v-slot="{ meta, value, loading, config }"
-                    >
-                        <icon-fieldtype
-                            v-if="!loading"
-                            handle="icon"
-                            :config="config"
-                            :meta="meta"
-                            :value="value"
-                            @update:value="editingSection.icon = $event"
+            <div class="h-full overflow-scroll overflow-x-auto bg-white px-6 rounded-l-xl dark:bg-dark-800">
+                <header class="py-2">
+                    <div class="flex items-center justify-between">
+                        <ui-heading size="lg">
+                            {{ editText }}
+                        </ui-heading>
+                        <ui-button icon="x" variant="ghost" class="-me-2" @click="editCancelled" />
+                    </div>
+                </header>
+                <div class="space-y-6">
+                    <ui-field :label="__('Display')">
+                        <ui-input ref="displayInput" type="text" v-model="editingSection.display" />
+                    </ui-field>
+                    <ui-field :label="__('Handle')" v-if="showHandleField">
+                        <ui-input
+                            type="text"
+                            class="font-mono text-sm"
+                            v-model="editingSection.handle"
+                            @input="handleSyncedWithDisplay = false"
                         />
-                    </publish-field-meta>
-                </ui-field>
-                <ui-field :label="__('Thumbnail')" v-if="showHandleField">
-                    <publish-field-meta
-                        :config="{
-                            handle: 'thumbnail',
-                            type: 'assets',
-                            container: thumbnailContainer,
-                            folder: thumbnailFolder,
-                            restrict: !! thumbnailFolder,
-                            allow_uploads: true,
-                        }"
-                        :initial-value="editingSection.thumbnail"
-                        v-slot="{ meta, value, loading, config }"
-                    >
-                        <assets-fieldtype
-                            v-if="!loading"
-                            handle="thumbnail"
-                            :config="config"
-                            :meta="meta"
-                            :value="value"
-                            @update:value="editingSection.thumbnail = $event?.[0] || null"
-                        />
-                    </publish-field-meta>
-                </ui-field>
-                <ui-field :label="__('Hidden')" v-if="showHideField">
-                    <ui-switch v-model="editingSection.hide" />
-                </ui-field>
+                    </ui-field>
+                    <ui-field :label="__('Instructions')">
+                        <ui-input type="text" v-model="editingSection.instructions" />
+                    </ui-field>
+                    <ui-field :label="__('Collapsible')">
+                        <ui-switch v-model="editingSection.collapsible" />
+                    </ui-field>
+                    <ui-field :label="__('Collapsed by default')" v-if="editingSection.collapsible">
+                        <ui-switch v-model="editingSection.collapsed" />
+                    </ui-field>
+                    <ui-field :label="__('Icon')" v-if="showHandleField">
+                        <publish-field-meta
+                            :config="{
+                                handle: 'icon',
+                                type: 'icon',
+                                set: iconSet,
+                            }"
+                            :initial-value="editingSection.icon"
+                            v-slot="{ meta, value, loading, config }"
+                        >
+                            <icon-fieldtype
+                                v-if="!loading"
+                                handle="icon"
+                                :config="config"
+                                :meta="meta"
+                                :value="value"
+                                @update:value="editingSection.icon = $event"
+                            />
+                        </publish-field-meta>
+                    </ui-field>
+                    <ui-field :label="__('Thumbnail')" v-if="showHandleField">
+                        <publish-field-meta
+                            :config="{
+                                handle: 'thumbnail',
+                                type: 'assets',
+                                container: thumbnailContainer,
+                                folder: thumbnailFolder,
+                                restrict: !! thumbnailFolder,
+                                allow_uploads: true,
+                            }"
+                            :initial-value="editingSection.thumbnail"
+                            v-slot="{ meta, value, loading, config }"
+                        >
+                            <assets-fieldtype
+                                v-if="!loading"
+                                handle="thumbnail"
+                                :config="config"
+                                :meta="meta"
+                                :value="value"
+                                @update:value="editingSection.thumbnail = $event?.[0] || null"
+                            />
+                        </publish-field-meta>
+                    </ui-field>
+                    <ui-field :label="__('Hidden')" v-if="showHideField">
+                        <ui-switch v-model="editingSection.hide" />
+                    </ui-field>
+                    <div class="py-4 space-x-2">
+                        <ui-button :text="__('Confirm')" @click="editConfirmed" variant="primary" />
+                        <ui-button :text="__('Cancel')" @click="editCancelled" variant="ghost" />
+                    </div>
+                </div>
             </div>
-        </confirmation-modal>
+        </stack>
     </div>
 </template>
 
