@@ -12,6 +12,7 @@
         :append="__(config.append)"
         :limit="config.character_limit"
         :placeholder="__(config.placeholder)"
+        :size="size"
         :name="name"
         :id="id"
         :direction="config.direction"
@@ -25,6 +26,9 @@
 import Fieldtype from '@/components/fieldtypes/fieldtype.js';
 import { Input } from '@/components/ui';
 import { computed } from 'vue';
+import { injectFieldsContext } from './../ui/Publish/FieldsProvider.vue';
+
+const { size } = injectFieldsContext() || {};
 
 const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);

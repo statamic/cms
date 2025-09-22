@@ -7,6 +7,7 @@
         :limit="config.character_limit || null"
         :placeholder="__(config.placeholder)"
         :model-value="value"
+        :size="fieldsContext.size.value"
         @blur="$emit('blur')"
         @focus="$emit('focus')"
         @update:model-value="updateDebounced"
@@ -20,5 +21,8 @@ import { Textarea } from '@/components/ui';
 export default {
     mixins: [Fieldtype],
     components: { Textarea },
+    inject: {
+        fieldsContext: 'PublishFieldsContext',
+    },
 };
 </script>

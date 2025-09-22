@@ -7,6 +7,7 @@
                 :id="fieldId"
                 :model-value="value"
                 :read-only="isReadOnly"
+                :size="fieldsContext.size.value"
             />
             <Heading v-if="inlineLabel" v-html="$markdown(__(inlineLabel), { openLinksInNewTabs: true })" />
         </div>
@@ -24,6 +25,10 @@ export default {
     components: {
         Switch,
         Heading,
+    },
+
+    inject: {
+        fieldsContext: 'PublishFieldsContext',
     },
 
     computed: {
