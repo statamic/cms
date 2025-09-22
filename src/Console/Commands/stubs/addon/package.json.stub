@@ -9,7 +9,7 @@
         "@statamic/cms": "file:./vendor/statamic/cms/resources/dist-package"
     },
     "devDependencies": {
-        "laravel-vite-plugin": "^0.7.2",
-        "vite": "^4.0.0"
+        "laravel-vite-plugin": "^2.0.0",
+        "vite": "^7.0.4"
     }
 }
