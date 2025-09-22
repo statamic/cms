@@ -25,7 +25,7 @@ import { Combobox } from '@/components/ui';
 import { computed } from 'vue';
 import { injectFieldsContext } from './../ui/Publish/FieldsProvider.vue';
 
-const { size } = injectFieldsContext();
+const { size } = injectFieldsContext() || {};
 
 const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
