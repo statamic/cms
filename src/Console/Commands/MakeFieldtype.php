@@ -3,6 +3,8 @@
 namespace Statamic\Console\Commands;
 
 use Archetype\Facades\PHPFile;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Process;
 use Statamic\Console\RunsInPlease;
 use Statamic\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
@@ -75,6 +77,11 @@ class MakeFieldtype extends GeneratorCommand
         if ($addon = $this->argument('addon')) {
             $this->wireUpAddonJs($addon);
         } else {
+            if (! $this->appJsIsWiredUp()) {
+                Artisan::call('statamic:setup-cp-vite');
+                $this->newLine();
+            }
+
             $this->components->info("Fieldtype Vue component [{$relativePath}] created successfully.");
 
             $this->components->bulletList([
@@ -89,6 +96,11 @@ class MakeFieldtype extends GeneratorCommand
     protected function fieldtypeAlreadyExists()
     {
         return $this->files->exists($this->getAddonPath($this->argument('addon')).'/resources/js/addon.js');
+    }
+
+    protected function appJsIsWiredUp()
+    {
+        return $this->files->exists(base_path('resources/js/cp.js'));
     }
 
     /**
