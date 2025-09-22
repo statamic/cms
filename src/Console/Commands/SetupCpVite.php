@@ -122,7 +122,10 @@ class SetupCpVite extends Command
             File::put(resource_path('js/cp.js'), File::get(__DIR__.'/stubs/app/cp.js.stub'));
         }
 
-        if (! File::exists(resource_path('js/components/fieldtypes/ExampleFieldtype.vue')) && ! $this->option('without-example-fieldtype')) {
+        if (
+            ! File::exists(resource_path('js/components/fieldtypes/ExampleFieldtype.vue'))
+            && ! $this->option('without-example-fieldtype')
+        ) {
             File::ensureDirectoryExists(resource_path('js/components/fieldtypes'));
 
             File::put(resource_path('js/components/fieldtypes/ExampleFieldtype.vue'), File::get(__DIR__.'/stubs/fieldtype.vue.stub'));
