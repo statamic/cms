@@ -28,6 +28,8 @@ use Statamic\Facades\Path;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 {
     use ExistsAsFile, HasAugmentedData;
@@ -69,6 +71,19 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
     public function namespace(): ?string
     {
         return $this->namespace;
+    }
+
+    public function fullyQualifiedHandle(): string
+    {
+        $handle = $this->handle();
+
+        if ($this->namespace()) {
+            $handle = $this->isNamespaced()
+                ? $this->namespace().'::'.$handle
+                : $this->namespace().'.'.$handle;
+        }
+
+        return $handle;
     }
 
     public function setOrder($order)
@@ -307,7 +322,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
     {
         $this->parent = $parent;
 
-        $this->resetFieldsCache();
+        $this->resetBlueprintCache()->resetFieldsCache();
 
         return $this;
     }
@@ -612,7 +627,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
     private function getTabFields($tab)
     {
         return collect($this->contents['tabs'][$tab]['sections'])->flatMap(function ($section, $sectionIndex) {
-            return collect($section['fields'])->map(function ($field, $fieldIndex) use ($sectionIndex) {
+            return collect($section['fields'] ?? [])->map(function ($field, $fieldIndex) use ($sectionIndex) {
                 return $field + ['fieldIndex' => $fieldIndex, 'sectionIndex' => $sectionIndex];
             });
         })->keyBy('handle');

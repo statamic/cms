@@ -6,7 +6,7 @@
                 class="btn-primary flex items-center"
                 @click="create"
             >
-                <span v-text="__('Create Term')" />
+                <span v-text="text" />
                 <svg-icon name="micro/chevron-down-xs" class="rtl:mr-2 ltr:ml-2 -mr-2 w-2" v-if="blueprints.length > 1" />
             </button>
         </template>
@@ -25,7 +25,8 @@ export default {
 
     props: {
         url: String,
-        blueprints: Array
+        blueprints: Array,
+        text: { type: String, default: () => __('Create Term') },
     },
 
     methods: {

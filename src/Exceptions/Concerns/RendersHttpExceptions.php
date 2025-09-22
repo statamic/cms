@@ -2,6 +2,7 @@
 
 namespace Statamic\Exceptions\Concerns;
 
+use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Statamic\Facades\Cascade;
@@ -12,8 +13,14 @@ use Statamic\View\View;
 
 trait RendersHttpExceptions
 {
-    public function render()
+    private static ?Closure $renderCallback = null;
+
+    public function render(Request $request)
     {
+        if (static::$renderCallback && ($response = Closure::fromCallable(static::$renderCallback)->call($this, $request))) {
+            return $response;
+        }
+
         if (Statamic::isCpRoute()) {
             return response()->view('statamic::errors.'.$this->getStatusCode(), [], $this->getStatusCode());
         }
@@ -48,7 +55,7 @@ trait RendersHttpExceptions
         $layouts = collect([
             'errors.layout',
             'layouts.layout',
-            'layout',
+            config('statamic.system.layout', 'layout'),
             'statamic::blank',
         ]);
 
@@ -81,5 +88,10 @@ trait RendersHttpExceptions
         return $cacher->hasCachedPage($request)
             ? $cacher->getCachedPage($request)->toResponse($request)
             : null;
+    }
+
+    public static function renderUsing(Closure $callback): void
+    {
+        static::$renderCallback = $callback;
     }
 }

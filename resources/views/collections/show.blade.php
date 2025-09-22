@@ -53,17 +53,6 @@
                 :actions="{{ $actions }}"
                 @completed="actionCompleted"
             ></data-list-inline-actions>
-            @can('delete', $collection)
-                <dropdown-item :text="__('Delete Collection')" class="warning" @click="$refs.deleter.confirm()">
-                    <resource-deleter
-                        ref="deleter"
-                        resource-title="{{ $collection->title() }}"
-                        route="{{ cp_route('collections.destroy', $collection->handle()) }}"
-                        redirect="{{ cp_route('collections.index') }}"
-                    ></resource-deleter>
-                </dropdown-item>
-            @endcan
-
         </template>
         @endif
     </collection-view>

@@ -7,6 +7,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
+use Statamic\Query\Scopes\Scope;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -407,6 +408,78 @@ class AssetQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function assets_are_found_using_where_json_overlaps()
+    {
+        Asset::find('test::a.jpg')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
+        Asset::find('test::b.txt')->data(['test_taxonomy' => ['taxonomy-3']])->save();
+        Asset::find('test::c.txt')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
+        Asset::find('test::d.jpg')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        Asset::find('test::e.jpg')->data(['test_taxonomy' => ['taxonomy-5']])->save();
+
+        $assets = $this->container->queryAssets()->whereJsonOverlaps('test_taxonomy', ['taxonomy-1', 'taxonomy-5'])->get();
+
+        $this->assertCount(3, $assets);
+        $this->assertEquals(['a', 'c', 'e'], $assets->map->filename()->all());
+
+        $assets = $this->container->queryAssets()->whereJsonOverlaps('test_taxonomy', 'taxonomy-1')->get();
+
+        $this->assertCount(2, $assets);
+        $this->assertEquals(['a', 'c'], $assets->map->filename()->all());
+    }
+
+    #[Test]
+    public function assets_are_found_using_where_json_doesnt_overlap()
+    {
+        Asset::find('test::a.jpg')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
+        Asset::find('test::b.txt')->data(['test_taxonomy' => ['taxonomy-3']])->save();
+        Asset::find('test::c.txt')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
+        Asset::find('test::d.jpg')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        Asset::find('test::e.jpg')->data(['test_taxonomy' => ['taxonomy-5']])->save();
+        Asset::find('test::f.jpg')->data(['test_taxonomy' => ['taxonomy-1']])->save();
+
+        $assets = $this->container->queryAssets()->whereJsonDoesntOverlap('test_taxonomy', ['taxonomy-1'])->get();
+
+        $this->assertCount(3, $assets);
+        $this->assertEquals(['b', 'd', 'e'], $assets->map->filename()->all());
+
+        $assets = $this->container->queryAssets()->whereJsonDoesntOverlap('test_taxonomy', 'taxonomy-1')->get();
+
+        $this->assertCount(3, $assets);
+        $this->assertEquals(['b', 'd', 'e'], $assets->map->filename()->all());
+    }
+
+    #[Test]
+    public function assets_are_found_using_or_where_json_overlaps()
+    {
+        Asset::find('test::a.jpg')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
+        Asset::find('test::b.txt')->data(['test_taxonomy' => ['taxonomy-3']])->save();
+        Asset::find('test::c.txt')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
+        Asset::find('test::d.jpg')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        Asset::find('test::e.jpg')->data(['test_taxonomy' => ['taxonomy-5']])->save();
+
+        $assets = $this->container->queryAssets()->whereJsonOverlaps('test_taxonomy', ['taxonomy-1'])->orWhereJsonOverlaps('test_taxonomy', ['taxonomy-5'])->get();
+
+        $this->assertCount(3, $assets);
+        $this->assertEquals(['a', 'c', 'e'], $assets->map->filename()->all());
+    }
+
+    #[Test]
+    public function assets_are_found_using_or_where_json_doesnt_overlap()
+    {
+        Asset::find('test::a.jpg')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
+        Asset::find('test::b.txt')->data(['test_taxonomy' => ['taxonomy-3']])->save();
+        Asset::find('test::c.txt')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
+        Asset::find('test::d.jpg')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        Asset::find('test::e.jpg')->data(['test_taxonomy' => ['taxonomy-5']])->save();
+        Asset::find('test::f.jpg')->data(['test_taxonomy' => ['taxonomy-5']])->save();
+
+        $assets = $this->container->queryAssets()->whereJsonOverlaps('test_taxonomy', ['taxonomy-1'])->orWhereJsonDoesntOverlap('test_taxonomy', ['taxonomy-5'])->get();
+
+        $this->assertCount(4, $assets);
+        $this->assertEquals(['a', 'c', 'b', 'd'], $assets->map->filename()->all());
+    }
+
+    #[Test]
     public function assets_are_found_using_where_json_length()
     {
         Asset::find('test::a.jpg')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
@@ -526,6 +599,17 @@ class AssetQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function assets_are_found_using_scopes()
+    {
+        CustomScope::register();
+        Asset::allowQueryScope(CustomScope::class);
+        Asset::allowQueryScope(CustomScope::class, 'whereCustom');
+
+        $this->assertCount(1, $this->container->queryAssets()->customScope(['path' => 'a.jpg'])->get());
+        $this->assertCount(1, $this->container->queryAssets()->whereCustom(['path' => 'a.jpg'])->get());
+    }
+
+    #[Test]
     public function assets_are_found_using_offset()
     {
         $query = $this->container->queryAssets()->limit(3);
@@ -630,5 +714,13 @@ class AssetQueryBuilderTest extends TestCase
             'e.jpg',
             'f.jpg',
         ], $this->container->queryAssets()->where('extension', 'jpg')->pluck('path')->all());
+    }
+}
+
+class CustomScope extends Scope
+{
+    public function apply($query, $params)
+    {
+        $query->where('path', $params['path']);
     }
 }

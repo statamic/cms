@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use League\Flysystem\PathTraversalDetected;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainerContents;
@@ -53,6 +54,25 @@ class AssetFolderTest extends TestCase
         $this->assertEquals($folder, $return);
         $this->assertEquals('path/to/folder', $folder->path());
         $this->assertEquals('folder', $folder->basename());
+    }
+
+    #[Test]
+    public function it_cannot_use_traversal_in_path()
+    {
+        $folder = (new Folder)->path('path/to/folder');
+
+        try {
+            $folder->path('path/to/../folder');
+        } catch (PathTraversalDetected $e) {
+            $this->assertEquals('Path traversal detected: path/to/../folder', $e->getMessage());
+
+            // Even if exception was thrown, make sure that the path didn't somehow get updated.
+            $this->assertEquals('path/to/folder', $folder->path());
+
+            return;
+        }
+
+        $this->fail('Exception was not thrown.');
     }
 
     #[Test]
@@ -1129,6 +1149,24 @@ class AssetFolderTest extends TestCase
             'parent_path' => 'grandparent/parent',
             'basename' => 'child',
         ], $folder->toArray());
+    }
+
+    #[Test]
+    public function it_uses_a_custom_cache_store()
+    {
+        config([
+            'cache.stores.asset_container_contents' => [
+                'driver' => 'file',
+                'path' => storage_path('statamic/asset-container-contents'),
+            ],
+        ]);
+
+        Storage::fake('local');
+
+        $store = Facades\AssetContainer::make('test')->disk('local')->contents()->cacheStore();
+
+        // ideally we would have checked the store name, but laravel 10 doesnt give us a way to do that
+        $this->assertStringContainsString('asset-container-contents', $store->getStore()->getDirectory());
     }
 
     private function containerWithDisk()

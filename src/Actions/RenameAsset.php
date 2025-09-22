@@ -3,6 +3,7 @@
 namespace Statamic\Actions;
 
 use Statamic\Contracts\Assets\Asset;
+use Statamic\Rules\AvailableAssetFilename;
 
 class RenameAsset extends Action
 {
@@ -14,6 +15,11 @@ class RenameAsset extends Action
     public function visibleTo($item)
     {
         return $item instanceof Asset;
+    }
+
+    public function visibleToBulk($items)
+    {
+        return false;
     }
 
     public function authorize($user, $asset)
@@ -44,15 +50,19 @@ class RenameAsset extends Action
 
     protected function fieldItems()
     {
+        $asset = $this->items->first();
+
         return [
             'filename' => [
                 'type' => 'text',
                 'display' => __('Filename'),
-                'validate' => 'required', // TODO: Better filename validation
+                'validate' => ['required', new AvailableAssetFilename($asset)],
                 'classes' => 'mousetrap',
                 'focus' => true,
-                'placeholder' => $this->items->containsOneItem() ? $this->items->first()->filename() : null,
+                'default' => $value = $asset->filename(),
+                'placeholder' => $value,
                 'debounce' => false,
+                'autoselect' => true,
             ],
         ];
     }

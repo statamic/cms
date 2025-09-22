@@ -36,6 +36,7 @@
             @if($canCreate)
                 <create-term-button
                     url="{{ cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site]) }}"
+                    text="{{ $taxonomy->createLabel() }}"
                     :blueprints="{{ $blueprints->toJson() }}">
                 </create-term-button>
             @endif

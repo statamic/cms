@@ -125,8 +125,8 @@ final class InstallableModule extends Module
      */
     protected function expandExportDirectoriesToFiles(string $to, ?string $from = null): Collection
     {
-        $to = Path::tidy($this->starterKitPath($to));
-        $from = Path::tidy($from ? $this->starterKitPath($from) : $to);
+        $to = Path::tidy($this->installableFilesPath($to));
+        $from = Path::tidy($from ? $this->installableFilesPath($from) : $to);
 
         $paths = collect([$from => $to]);
 
@@ -139,11 +139,22 @@ final class InstallableModule extends Module
                 ]);
         }
 
+        return $paths->mapWithKeys(fn ($to, $from) => [
+            Path::tidy($from) => Path::tidy($this->convertInstallableToDestinationPath($to)),
+        ]);
+    }
+
+    /**
+     * Convert installable vendor file path to destination path.
+     */
+    protected function convertInstallableToDestinationPath(string $path): string
+    {
         $package = $this->installer->package();
 
-        return $paths->mapWithKeys(fn ($to, $from) => [
-            Path::tidy($from) => Path::tidy(str_replace("/vendor/{$package}", '', $to)),
-        ]);
+        $path = str_replace("/vendor/{$package}/export", '', $path);
+        $path = str_replace("/vendor/{$package}", '', $path);
+
+        return $path;
     }
 
     /**
@@ -186,7 +197,7 @@ final class InstallableModule extends Module
         $this
             ->exportPaths()
             ->merge($this->exportAsPaths())
-            ->reject(fn ($path) => $this->files->exists($this->starterKitPath($path)))
+            ->reject(fn ($path) => $this->files->exists($this->installableFilesPath($path)))
             ->each(function ($path) {
                 throw new StarterKitException("Starter kit path [{$path}] does not exist.");
             });
@@ -229,13 +240,19 @@ final class InstallableModule extends Module
     }
 
     /**
-     * Get starter kit vendor path.
+     * Get starter kit installable files path.
      */
-    protected function starterKitPath(?string $path = null): string
+    protected function installableFilesPath(?string $path = null): string
     {
         $package = $this->installer->package();
 
-        return collect([base_path("vendor/{$package}"), $path])->filter()->implode('/');
+        // Scope to new `export` folder if it exists, otherwise we'll
+        // look in starter kit root for backwards compatibility
+        $scope = $this->files->exists(base_path("vendor/{$package}/export"))
+            ? 'export'
+            : null;
+
+        return collect([base_path("vendor/{$package}"), $scope, $path])->filter()->implode('/');
     }
 
     /**

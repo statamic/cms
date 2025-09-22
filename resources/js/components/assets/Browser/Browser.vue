@@ -74,7 +74,9 @@
                             <uploads
                                 v-if="uploads.length"
                                 :uploads="uploads"
-                                class="-mt-px"
+                                :allow-selecting-existing="allowSelectingExistingUpload"
+                                :class="{ '-mt-px': !hasSelections, 'mt-10': hasSelections }"
+                                @existing-selected="existingUploadSelected"
                             />
 
                             <div class="overflow-x-auto overflow-y-hidden">
@@ -127,7 +129,7 @@
                                     <div class="flex items-center w-fit-content group">
                                         <asset-thumbnail :asset="asset" :square="true" class="w-8 h-8 rtl:ml-2 ltr:mr-2 cursor-pointer" @click.native.stop="$emit('edit-asset', asset)" />
                                         <label :for="checkboxId" class="cursor-pointer select-none group-hover:text-blue normal-nums" @click.stop="$emit('edit-asset', asset)">
-                                            {{ asset.basename }}
+                                            {{ searchQuery ? asset.path : asset.basename }}
                                         </label>
                                     </div>
                                 </template>
@@ -317,6 +319,7 @@ export default {
         initialEditingAssetId: String,
         autoselectUploads: Boolean,
         autofocusSearch: Boolean,
+        allowSelectingExistingUpload: Boolean
     },
 
     data() {
@@ -373,11 +376,11 @@ export default {
         },
 
         canUpload() {
-            return this.folder && this.container.allow_uploads && (this.can('upload '+ this.container.id +' assets') || this.can('configure asset containers'));
+            return this.folder && this.container.allow_uploads;
         },
 
         canCreateFolders() {
-            return this.folder && this.container.create_folders && ! this.restrictFolderNavigation && (this.can('upload '+ this.container.id +' assets') || this.can('configure asset containers'));
+            return this.folder && this.container.create_folders && ! this.restrictFolderNavigation;
         },
 
         parameters() {
@@ -451,6 +454,13 @@ export default {
 
         path() {
             this.loadAssets();
+        },
+
+        selectedPath(selectedPath) {
+            // The selected path might change from outside due to a popstate navigation
+            if (!selectedPath.endsWith('/edit')) {
+                this.path = selectedPath;
+            }
         },
 
         parameters(after, before) {
@@ -579,6 +589,14 @@ export default {
         uploadError(upload, uploads) {
             this.uploads = uploads;
             this.$toast.error(upload.errorMessage);
+        },
+
+        existingUploadSelected(upload) {
+            const path = `${this.folder.path}/${upload.basename}`.replace(/^\/+/, '');
+            const id = `${this.container.id}::${path}`;
+
+            this.selectedAssets.push(id);
+            this.$emit('selections-updated', this.selectedAssets);
         },
 
         openFileBrowser() {

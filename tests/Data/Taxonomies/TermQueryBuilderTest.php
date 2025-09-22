@@ -9,6 +9,7 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
+use Statamic\Query\Scopes\Scope;
 use Statamic\Taxonomies\LocalizedTerm;
 use Statamic\Taxonomies\TermCollection;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -573,6 +574,80 @@ class TermQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function terms_are_found_using_where_json_overlaps()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('1')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
+        Term::make('2')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3']])->save();
+        Term::make('3')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
+        Term::make('4')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        Term::make('5')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-5']])->save();
+
+        $entries = Term::query()->whereJsonOverlaps('test_taxonomy', ['taxonomy-1', 'taxonomy-5'])->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['1', '3', '5'], $entries->map->slug()->all());
+
+        $entries = Term::query()->whereJsonOverlaps('test_taxonomy', 'taxonomy-1')->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['1', '3'], $entries->map->slug()->all());
+    }
+
+    #[Test]
+    public function terms_are_found_using_where_json_doesnt_overlap()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('1')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
+        Term::make('2')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3']])->save();
+        Term::make('3')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
+        Term::make('4')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        Term::make('5')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-5']])->save();
+
+        $entries = Term::query()->whereJsonDoesntOverlap('test_taxonomy', ['taxonomy-1'])->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['2', '4', '5'], $entries->map->slug()->all());
+
+        $entries = Term::query()->whereJsonDoesntOverlap('test_taxonomy', 'taxonomy-1')->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['2', '4', '5'], $entries->map->slug()->all());
+    }
+
+    #[Test]
+    public function terms_are_found_using_or_where_json_overlaps()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('1')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
+        Term::make('2')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3']])->save();
+        Term::make('3')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
+        Term::make('4')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        Term::make('5')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-5']])->save();
+
+        $entries = Term::query()->whereJsonOverlaps('test_taxonomy', ['taxonomy-1'])->orWhereJsonOverlaps('test_taxonomy', ['taxonomy-5'])->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['1', '3', '5'], $entries->map->slug()->all());
+    }
+
+    #[Test]
+    public function terms_are_found_using_or_where_json_doesnt_overlap()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('1')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
+        Term::make('2')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3']])->save();
+        Term::make('3')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
+        Term::make('4')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        Term::make('5')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-5']])->save();
+
+        $entries = Term::query()->whereJsonOverlaps('test_taxonomy', ['taxonomy-1'])->orWhereJsonDoesntOverlap('test_taxonomy', ['taxonomy-5'])->get();
+
+        $this->assertCount(4, $entries);
+        $this->assertEquals(['1', '3', '2', '4'], $entries->map->slug()->all());
+    }
+
+    #[Test]
     public function terms_are_found_using_where_json_length()
     {
         Taxonomy::make('tags')->save();
@@ -589,6 +664,21 @@ class TermQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function terms_are_found_using_scopes()
+    {
+        CustomScope::register();
+        Term::allowQueryScope(CustomScope::class);
+        Term::allowQueryScope(CustomScope::class, 'whereCustom');
+
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data(['title' => 'Post 1'])->save();
+        Term::make('b')->taxonomy('tags')->data(['title' => 'Post 2'])->save();
+
+        $this->assertCount(1, Term::query()->customScope(['title' => 'Post 1'])->get());
+        $this->assertCount(1, Term::query()->whereCustom(['title' => 'Post 1'])->get());
+    }
+
+    #[Test]
     public function terms_are_found_using_offset()
     {
         Taxonomy::make('tags')->save();
@@ -601,5 +691,13 @@ class TermQueryBuilderTest extends TestCase
 
         $terms = Term::query()->offset(1)->get();
         $this->assertEquals(['b', 'c'], $terms->map->slug()->all());
+    }
+}
+
+class CustomScope extends Scope
+{
+    public function apply($query, $params)
+    {
+        $query->where('title', $params['title']);
     }
 }

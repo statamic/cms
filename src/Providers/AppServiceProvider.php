@@ -2,6 +2,7 @@
 
 namespace Statamic\Providers;
 
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Http\Request;
@@ -15,6 +16,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Token;
 use Statamic\Fields\FieldsetRecursionStack;
+use Statamic\Jobs\HandleEntrySchedule;
 use Statamic\Sites\Sites;
 use Statamic\Statamic;
 use Statamic\Tokens\Handlers\LivePreview;
@@ -94,9 +96,15 @@ class AppServiceProvider extends ServiceProvider
             return optional($this->statamicToken())->handler() === LivePreview::class;
         });
 
-        TrimStrings::skipWhen(fn (Request $request) => $request->is(config('statamic.cp.route').'/*'));
+        TrimStrings::skipWhen(function (Request $request) {
+            $route = config('statamic.cp.route');
+
+            return ! $route || $request->is($route.'/*');
+        });
 
         $this->addAboutCommandInfo();
+
+        $this->app->make(Schedule::class)->job(new HandleEntrySchedule)->everyMinute();
     }
 
     public function register()
@@ -166,6 +174,8 @@ class AppServiceProvider extends ServiceProvider
         ])->each(function ($binding, $alias) {
             app()->bind('statamic.queries.'.$alias, $binding);
         });
+
+        $this->app->instance('statamic.query-scopes', collect());
 
         $this->app->bind('statamic.imaging.guzzle', function () {
             return new \GuzzleHttp\Client;

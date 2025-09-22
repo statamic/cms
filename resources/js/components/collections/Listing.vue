@@ -18,18 +18,6 @@
                             :actions="collection.actions"
                             @completed="actionCompleted"
                         ></data-list-inline-actions>
-                        <dropdown-item
-                            v-if="collection.deleteable"
-                            :text="__('Delete Collection')"
-                            class="warning"
-                            @click="$refs[`deleter_${collection.id}`].confirm()"
-                        >
-                            <resource-deleter
-                                :ref="`deleter_${collection.id}`"
-                                :resource="collection"
-                                @deleted="removeRow(collection)">
-                            </resource-deleter>
-                        </dropdown-item>
                     </dropdown-list>
                 </template>
             </data-list-table>

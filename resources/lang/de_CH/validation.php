@@ -118,6 +118,7 @@ return [
     'uuid' => 'Muss eine gültige UUID sein.',
     'arr_fieldtype' => 'Dies ist ungültig.',
     'handle' => 'Darf nur Kleinbuchstaben und Zahlen mit Unterstrichen als Trennzeichen enthalten.',
+    'handle_starts_with_number' => 'Darf nicht mit einer Zahl beginnen.',
     'slug' => 'Darf nur Buchstaben und Zahlen mit Bindestrichen oder Unterstrichen als Trennzeichen enthalten.',
     'code_fieldtype_rulers' => 'Dies ist ungültig.',
     'composer_package' => 'Muss ein gültiger Composer-Paketname sein (z.B. hasselhoff/kung-fury).',
@@ -146,6 +147,10 @@ return [
     'unique_user_value' => 'Dieser Wert wurde bereits vergeben.',
     'unique_uri' => 'Diese URI wurde bereits vergeben.',
     'time' => 'Keine gültige Uhrzeit.',
+    'asset_current_filename' => 'Das ist der aktuelle Dateiname.',
+    'asset_file_exists' => 'Es gibt bereits eine Datei mit diesem Namen.',
+    'asset_file_exists_same_content' => 'Es gibt bereits eine Datei mit diesem Namen und demselben Inhalt. Du möchtest sie vielleicht lieber löschen, anstatt umzubenennen.',
+    'asset_file_exists_different_content' => 'Es gibt bereits eine Datei mit diesem Namen, die aber einen anderen Inhalt hat. Möglicherweise möchtest du die andere Datei durch diese Datei ersetzen.',
     'custom.attribute-name.rule-name' => 'benutzerdefinierte Nachricht',
     'attributes' => [],
 ];

@@ -118,6 +118,7 @@ return [
     'uuid' => 'Doit être un UUID valide.',
     'arr_fieldtype' => 'Ceci est invalide.',
     'handle' => 'Peut uniquement contenir des lettres minuscules et des chiffres avec des traits de soulignement comme séparateurs.',
+    'handle_starts_with_number' => 'Ne peut pas commencer par un chiffre.',
     'slug' => 'Ne peut contenir que des lettres et des chiffres avec des tirets ou des traits de soulignement comme séparateurs.',
     'code_fieldtype_rulers' => 'Les données saisies sont invalides.',
     'composer_package' => 'Doit être un nom de paquet composer valide (ex. hasselhoff/kung-fury).',
@@ -146,6 +147,10 @@ return [
     'unique_user_value' => 'Cette valeur a déjà été prise.',
     'unique_uri' => 'Cette URI est déjà prise.',
     'time' => 'N’est pas un horaire valide.',
+    'asset_current_filename' => 'Ceci est le nom actuel du fichier.',
+    'asset_file_exists' => 'Un fichier portant ce nom existe déjà.',
+    'asset_file_exists_same_content' => 'Un fichier existe déjà avec ce nom et a le même contenu. Vous souhaiterez peut-être supprimer ceci plutôt que le renommer.',
+    'asset_file_exists_different_content' => 'Un fichier existe déjà avec ce nom mais son contenu est différent. Vous pouvez remplacer l’autre fichier par celui-ci.',
     'custom.attribute-name.rule-name' => 'message personnalisé',
     'attributes' => [],
 ];

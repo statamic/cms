@@ -58,7 +58,7 @@ class FullMeasureStaticCachingTest extends TestCase
         })::register();
 
         $this->withFakeViews();
-        $this->viewShouldReturnRaw('layout', '<html><head></head><body>{{ template_content }}</body></html>');
+        $this->viewShouldReturnRaw('layout', '<html><body>{{ template_content }}</body></html>');
         $this->viewShouldReturnRaw('default', '{{ example_count }} {{ nocache }}{{ example_count }}{{ /nocache }}');
 
         $this->createPage('about');
@@ -75,14 +75,14 @@ class FullMeasureStaticCachingTest extends TestCase
         $region = app(Session::class)->regions()->first();
 
         // Initial response should be dynamic and not contain javascript.
-        $this->assertEquals('<html><head></head><body>1 2</body></html>', $response->getContent());
+        $this->assertEquals('<html><body>1 2</body></html>', $response->getContent());
 
         // The cached response should have the nocache placeholder, and the javascript.
         $this->assertTrue(file_exists($this->dir.'/about_.html'));
-        $this->assertEquals(vsprintf('<html><head>%s</head><body>1 <span class="nocache" data-nocache="%s">%s</span></body></html>', [
-            '<script type="text/javascript">js here</script>',
+        $this->assertEquals(vsprintf('<html><body>1 <span class="nocache" data-nocache="%s">%s</span>%s</body></html>', [
             $region->key(),
             '<svg>Loading...</svg>',
+            '<script>js here</script>',
         ]), file_get_contents($this->dir.'/about_.html'));
     }
 
@@ -135,7 +135,7 @@ class FullMeasureStaticCachingTest extends TestCase
     public function it_should_add_the_javascript_if_there_is_a_csrf_token()
     {
         $this->withFakeViews();
-        $this->viewShouldReturnRaw('layout', '<html><head></head><body>{{ template_content }}</body></html>');
+        $this->viewShouldReturnRaw('layout', '<html><body>{{ template_content }}</body></html>');
         $this->viewShouldReturnRaw('default', '{{ csrf_token }}');
 
         $this->createPage('about');
@@ -149,12 +149,12 @@ class FullMeasureStaticCachingTest extends TestCase
             ->assertOk();
 
         // Initial response should be dynamic and not contain javascript.
-        $this->assertEquals('<html><head></head><body>'.csrf_token().'</body></html>', $response->getContent());
+        $this->assertEquals('<html><body>'.csrf_token().'</body></html>', $response->getContent());
 
         // The cached response should have the token placeholder, and the javascript.
         $this->assertTrue(file_exists($this->dir.'/about_.html'));
-        $this->assertEquals(vsprintf('<html><head>%s</head><body>STATAMIC_CSRF_TOKEN</body></html>', [
-            '<script type="text/javascript">js here</script>',
+        $this->assertEquals(vsprintf('<html><body>STATAMIC_CSRF_TOKEN%s</body></html>', [
+            '<script>js here</script>',
         ]), file_get_contents($this->dir.'/about_.html'));
     }
 }

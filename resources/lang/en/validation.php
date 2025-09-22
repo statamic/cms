@@ -156,6 +156,7 @@ return [
 
     'arr_fieldtype' => 'This is invalid.',
     'handle' => 'Must contain only lowercase letters and numbers with underscores as separators.',
+    'handle_starts_with_number' => 'Cannot start with a number.',
     'slug' => 'Must contain only letters and numbers with dashes or underscores as separators.',
     'code_fieldtype_rulers' => 'This is invalid.',
     'composer_package' => 'Must be a valid composer package name (eg. hasselhoff/kung-fury).',
@@ -184,6 +185,10 @@ return [
     'unique_user_value' => 'This value has already been taken.',
     'unique_uri' => 'This URI has already been taken.',
     'time' => 'Not a valid time.',
+    'asset_current_filename' => 'This is the current filename.',
+    'asset_file_exists' => 'A file already exists with this name.',
+    'asset_file_exists_same_content' => 'A file already exists with this name and has the same content. You may want to delete this rather than rename it.',
+    'asset_file_exists_different_content' => 'A file already exists with this name but has different content. You may want to replace the other file with this one instead.',
 
     /*
     |--------------------------------------------------------------------------

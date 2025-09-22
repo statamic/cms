@@ -10,10 +10,13 @@ use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
+use Statamic\Query\Scopes\AllowsScopes;
 use Statamic\Support\Str;
 
 class AssetRepository implements Contract
 {
+    use AllowsScopes;
+
     public function all()
     {
         return AssetCollection::make(AssetContainer::all()->flatMap(function ($container) {
