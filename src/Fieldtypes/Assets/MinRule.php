@@ -4,11 +4,13 @@ namespace Statamic\Fieldtypes\Assets;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Statamic\Contracts\GraphQL\CastableToValidationString;
 use Statamic\Facades\Asset;
 use Statamic\Statamic;
+use Stringable;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class MinRule implements ValidationRule
+class MinRule implements CastableToValidationString, Stringable, ValidationRule
 {
     public function __construct(protected $parameters)
     {
@@ -32,5 +34,15 @@ class MinRule implements ValidationRule
     public function message(): string
     {
         return __((Statamic::isCpRoute() ? 'statamic::' : '').'validation.min.file', ['min' => $this->parameters[0]]);
+    }
+
+    public function __toString(): string
+    {
+        return 'min_filesize:'.$this->parameters[0];
+    }
+
+    public function toGqlValidationString(): string
+    {
+        return $this->__toString();
     }
 }

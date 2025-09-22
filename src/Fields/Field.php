@@ -145,10 +145,18 @@ class Field implements Arrayable
 
         $rules = [];
         if ($this->type() === 'assets') {
-            $rules = [
-                $this->handle.'.*' => $temp_rules->reject(fn ($rule) => in_array($rule, ['array', 'required', 'nullable']))->values()->all(),
-                $this->handle => $temp_rules->filter(fn ($rule) => in_array($rule, ['array', 'required', 'nullable']))->values()->all(),
-            ];
+            $rules = $temp_rules->reduce(function ($result, $rule) {
+                // These rules need to be applied to the field as a whole vs each asset in the field
+                if (Str::of($rule)->before(':')->is(['array', 'required', 'nullable', 'max', 'min'])) {
+                    $result[$this->handle] ??= [];
+                    $result[$this->handle][] = $rule;
+                } else {
+                    $result["{$this->handle}.*"] ??= [];
+                    $result["{$this->handle}.*"][] = $rule;
+                }
+
+                return $result;
+            }, []);
         } else {
             $rules = [$this->handle => $temp_rules->all()];
         }
