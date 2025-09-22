@@ -126,7 +126,7 @@ class SetupCpVite extends Command
         if (! File::exists(resource_path('js/components/fieldtypes/ExampleFieldtype.vue'))) {
             File::ensureDirectoryExists(resource_path('js/components/fieldtypes'));
 
-            File::put(resource_path('js/components/fieldtypes/ExampleFieldtype.vue'), File::get(__DIR__.'/stubs/app/ExampleFieldtype.vue.stub'));
+            File::put(resource_path('js/components/fieldtypes/ExampleFieldtype.vue'), File::get(__DIR__.'/stubs/fieldtype.vue.stub'));
         }
 
         $this->components->info('Published stubs for Control Panel CSS & JavaScript.');
