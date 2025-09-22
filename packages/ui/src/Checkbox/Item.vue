@@ -14,7 +14,7 @@ const props = defineProps({
     size: { type: String, default: 'base' },
     solo: { type: Boolean, default: false },
     tabindex: { type: Number, default: null },
-    value: { type: [String, Number, Boolean], required: true },
+    value: { type: [String, Number, Boolean] },
 });
 
 const emit = defineEmits(['update:modelValue']);
