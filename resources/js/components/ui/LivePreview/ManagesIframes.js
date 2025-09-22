@@ -60,7 +60,7 @@ export function useIframeManager(iframeContentContainer) {
                 const updatedDocument = new DOMParser().parseFromString(updatedHtml, 'text/html');
 
                 if (typeof iframeWindow.StatamicLivePreviewMorph !== 'undefined') {
-                    iframeWindow.StatamicLivePreviewMorph(iframeDocument.body, updatedDocument.body);
+                    iframeWindow.StatamicLivePreviewMorph(iframeDocument, updatedDocument);
                     return;
                 }
 
