@@ -324,7 +324,10 @@ body {
             color: var(--prose-code);
             font-weight: var(--prose-font-weight-semibold);
             font-size: var(--prose-font-size-sm);
-            color: inherit;
+
+            a & {
+                color: inherit;
+            }
 
             h2 & {
                 font-size: var(--prose-font-size-sm);
