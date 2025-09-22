@@ -61,6 +61,7 @@ class SetsTest extends TestCase
                         'display' => 'One',
                         'instructions' => 'One instructions',
                         'icon' => 'one-icon',
+                        'thumbnail' => null,
                         'hide' => true,
                         'fields' => [
                             [
@@ -92,6 +93,7 @@ class SetsTest extends TestCase
                         'display' => null,
                         'instructions' => null,
                         'icon' => null,
+                        'thumbnail' => null,
                         'hide' => null,
                         'fields' => [
                             [
@@ -143,6 +145,7 @@ class SetsTest extends TestCase
                         'display' => 'One',
                         'instructions' => 'One instructions',
                         'icon' => 'one-icon',
+                        'thumbnail' => null,
                         'hide' => null,
                         'fields' => [
                             [
@@ -249,6 +252,7 @@ class SetsTest extends TestCase
                         ],
                         'handle' => 'one',
                         'id' => 'one',
+                        'thumbnail' => null,
                     ],
                 ],
                 'handle' => 'alfa',
@@ -288,6 +292,7 @@ class SetsTest extends TestCase
                         ],
                         'handle' => 'two',
                         'id' => 'two',
+                        'thumbnail' => null,
                     ],
                 ],
                 'handle' => 'bravo',
@@ -350,6 +355,7 @@ class SetsTest extends TestCase
                         ],
                         'handle' => 'one',
                         'id' => 'one',
+                        'thumbnail' => null,
                     ],
                 ],
                 'handle' => 'main',
@@ -410,6 +416,7 @@ class SetsTest extends TestCase
                         'display' => 'One',
                         'instructions' => 'One Instructions',
                         'icon' => 'one-icon',
+                        'thumbnail' => null,
                         'hide' => false,
                         'fields' => [
                             [
