@@ -108,6 +108,8 @@ function tabHasError(tab) {
                         <slot :tab="tab">
                             <Sections />
                         </slot>
+
+                        <slot v-if="!shouldShowSidebar" name="actions" />
                     </TabProvider>
                 </TabContent>
 
