@@ -75,6 +75,7 @@
                             <div v-if="item.instructions" class="w-52 truncate text-2xs leading-tight text-gray-700 dark:text-dark-175">
                                 {{ __(item.instructions) }}
                             </div>
+                            <img v-if="item.thumbnail" :src="item.thumbnail" />
                         </div>
                     </div>
                 </div>

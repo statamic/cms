@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Exceptions\ReplicatorIconSetNotFoundException;
+use Statamic\Facades\Asset;
 use Statamic\Facades\Icon;
 use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldTransformer;
@@ -13,6 +14,7 @@ use Statamic\Support\Arr;
 class Sets extends Fieldtype
 {
     protected $selectable = false;
+    private static ?array $thumbnail = null;
 
     /**
      * Converts the "sets" array of a Replicator (or Bard) field into what the
@@ -52,6 +54,7 @@ class Sets extends Fieldtype
                         'display' => $set['display'] ?? null,
                         'instructions' => $set['instructions'] ?? null,
                         'icon' => $set['icon'] ?? null,
+                        'thumbnail' => $this->preProcessThumbnail($set['thumbnail'] ?? null),
                         'hide' => $set['hide'] ?? null,
                         'fields' => collect($set['fields'] ?? [])->map(function ($field, $i) use ($setId) {
                             return array_merge(FieldTransformer::toVue($field), ['_id' => $setId.'-'.$i]);
@@ -92,6 +95,7 @@ class Sets extends Fieldtype
                         return array_merge($config, [
                             'handle' => $name,
                             'id' => $name,
+                            'thumbnail' => $this->thumbnailUrl($config['thumbnail'] ?? null),
                             'fields' => (new NestedFields)->preProcessConfig(Arr::get($config, 'fields', [])),
                         ]);
                     })
@@ -120,6 +124,7 @@ class Sets extends Fieldtype
                                 'display' => $section['display'],
                                 'instructions' => $section['instructions'] ?? null,
                                 'icon' => $section['icon'] ?? null,
+                                'thumbnail' => $this->processThumbnail($section['thumbnail'] ?? null),
                                 'hide' => $section['hide'] ?? null,
                                 'fields' => collect($section['fields'])->map(function ($field) {
                                     return FieldTransformer::fromVue($field);
@@ -147,5 +152,50 @@ class Sets extends Fieldtype
         // Provide to script for <icon-fieldtype> selector components in blueprint config.
         // If a directory hasn't been provided, it will assume they've manually registered the set.
         Statamic::provideToScript(['replicatorSetIcons' => $name]);
+    }
+
+    public static function useThumbnails(string $container, ?string $folder = null): void
+    {
+        static::$thumbnail = [$container, $folder];
+
+        Statamic::provideToScript(['replicatorSetThumbnails' => [
+            'container' => $container,
+            'folder' => $folder,
+        ]]);
+    }
+
+    private function preProcessThumbnail($thumbnail)
+    {
+        if (! $thumbnail) {
+            return null;
+        }
+
+        [$container, $folder] = static::$thumbnail;
+
+        $prefix = sprintf('%s::%s', $container, $folder ? $folder.'/' : '');
+
+        return $prefix.$thumbnail;
+    }
+
+    private function processThumbnail($thumbnail)
+    {
+        if (! $thumbnail) {
+            return null;
+        }
+
+        [$container, $folder] = static::$thumbnail;
+
+        $prefix = sprintf('%s::%s', $container, $folder ? $folder.'/' : '');
+
+        return (string) str($thumbnail)->after($prefix);
+    }
+
+    private function thumbnailUrl($thumbnail)
+    {
+        if (! $path = $this->preProcessThumbnail($thumbnail)) {
+            return null;
+        }
+
+        return Asset::find($path)->thumbnailUrl();
     }
 }

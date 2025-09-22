@@ -82,6 +82,29 @@
                         />
                     </publish-field-meta>
                 </ui-field>
+                <ui-field :label="__('Thumbnail')" v-if="showHandleField">
+                    <publish-field-meta
+                        :config="{
+                            handle: 'thumbnail',
+                            type: 'assets',
+                            container: thumbnailContainer,
+                            folder: thumbnailFolder,
+                            restrict: !! thumbnailFolder,
+                            allow_uploads: true,
+                        }"
+                        :initial-value="editingSection.thumbnail"
+                        v-slot="{ meta, value, loading, config }"
+                    >
+                        <assets-fieldtype
+                            v-if="!loading"
+                            handle="thumbnail"
+                            :config="config"
+                            :meta="meta"
+                            :value="value"
+                            @update:value="editingSection.thumbnail = $event?.[0] || null"
+                        />
+                    </publish-field-meta>
+                </ui-field>
                 <ui-field :label="__('Hidden')" v-if="showHideField">
                     <ui-switch v-model="editingSection.hide" />
                 </ui-field>
@@ -131,6 +154,14 @@ export default {
 
         iconSet() {
             return this.$config.get('replicatorSetIcons') || undefined;
+        },
+
+        thumbnailContainer() {
+            return this.$config.get('replicatorSetThumbnails.container') || null;
+        },
+
+        thumbnailFolder() {
+            return this.$config.get('replicatorSetThumbnails.folder') || null;
         },
     },
 
@@ -185,6 +216,7 @@ export default {
                 handle: this.section.handle,
                 instructions: this.section.instructions,
                 icon: this.section.icon,
+                thumbnail: this.section.thumbnail,
                 hide: this.section.hide,
                 collapsible: this.section.collapsible,
                 collapsed: this.section.collapsed,
