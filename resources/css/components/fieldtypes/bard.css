@@ -109,6 +109,14 @@
                 @apply justify-self-center;
             }
         }
+
+        /* When there's a fixed toolbar the the bard editor should have square radius in the top corners to but up against the bottom of the toolbar */
+        .bard-fieldtype:has(> &) {
+            .bard-editor:focus-within {
+                border-top-left-radius: 0!important;
+                border-top-right-radius: 0!important;
+            }
+        }
     }
 
     /* Only top-level Bard fields should have a sticky header */
@@ -268,7 +276,7 @@
     }
 
     .bard-fieldtype .bard-content {
-        @apply text-gray-900 dark:text-gray-300 bg-white dark:bg-gray-950 rounded-b-lg;
+        @apply text-gray-900 dark:text-gray-300 bg-white dark:bg-gray-950 rounded-lg;
         blockquote,
         ol,
         p,
