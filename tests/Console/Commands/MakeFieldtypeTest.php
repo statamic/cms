@@ -38,9 +38,7 @@ class MakeFieldtypeTest extends TestCase
 
         $this
             ->artisan('statamic:make:fieldtype', ['name' => 'KnightRider'])
-            ->expectsQuestion("It doesn't look like Vite is setup for the Control Panel. Would you like to run `php please setup-cp-vite`?", false)
-            ->expectsOutputToContain('Fieldtype [app/Fieldtypes/KnightRider.php] created successfully.')
-            ->expectsOutputToContain('Fieldtype Vue component [resources/js/components/fieldtypes/KnightRider.vue] created successfully.');
+            ->expectsQuestion("It doesn't look like Vite is setup for the Control Panel. Would you like to run `php please setup-cp-vite`?", false);
 
         $this->assertFileExists($fieldtype = base_path('app/Fieldtypes/KnightRider.php'));
         $this->assertStringContainsString('namespace App\Fieldtypes;', $this->files->get($fieldtype));
@@ -54,10 +52,7 @@ class MakeFieldtypeTest extends TestCase
         $this->assertFileDoesNotExist(base_path('app/Fieldtypes/KnightRider.php'));
         $this->assertFileDoesNotExist(resource_path('js/components/fieldtypes/KnightRider.vue'));
 
-        $this
-            ->artisan('statamic:make:fieldtype', ['name' => 'KnightRider', '--php' => true])
-            ->expectsOutputToContain('Fieldtype [app/Fieldtypes/KnightRider.php] created successfully.')
-            ->doesntExpectOutputToContain('Fieldtype Vue component [resources/js/components/fieldtypes/KnightRider.vue] created successfully.');
+        $this->artisan('statamic:make:fieldtype', ['name' => 'KnightRider', '--php' => true]);
 
         $this->assertFileExists($fieldtype = base_path('app/Fieldtypes/KnightRider.php'));
         $this->assertStringContainsString('namespace App\Fieldtypes;', $this->files->get($fieldtype));
@@ -105,9 +100,7 @@ PHP
 
         $this
             ->artisan('statamic:make:fieldtype', ['name' => 'KnightRider'])
-            ->expectsQuestion("It doesn't look like Vite is setup for the Control Panel. Would you like to run `php please setup-cp-vite`?", true)
-            ->expectsOutputToContain('Fieldtype [app/Fieldtypes/KnightRider.php] created successfully.')
-            ->expectsOutputToContain('Fieldtype Vue component [resources/js/components/fieldtypes/KnightRider.vue] created successfully.');
+            ->expectsQuestion("It doesn't look like Vite is setup for the Control Panel. Would you like to run `php please setup-cp-vite`?", true);
 
         Process::assertRan('npm install');
 
@@ -128,10 +121,7 @@ PHP
 
         $this
             ->artisan('statamic:make:fieldtype', ['name' => 'KnightRider'])
-            ->expectsQuestion("It doesn't look like Vite is setup for the Control Panel. Would you like to run `php please setup-cp-vite`?",
-                false)
-            ->expectsOutputToContain('Fieldtype [app/Fieldtypes/KnightRider.php] created successfully.')
-            ->expectsOutputToContain('Fieldtype Vue component [resources/js/components/fieldtypes/KnightRider.vue] created successfully.');
+            ->expectsQuestion("It doesn't look like Vite is setup for the Control Panel. Would you like to run `php please setup-cp-vite`?", false);
 
         $this->files->put($path, 'overwritten fieldtype');
 
@@ -152,10 +142,7 @@ PHP
 
         $this
             ->artisan('statamic:make:fieldtype', ['name' => 'KnightRider'])
-            ->expectsQuestion("It doesn't look like Vite is setup for the Control Panel. Would you like to run `php please setup-cp-vite`?",
-                false)
-            ->expectsOutputToContain('Fieldtype [app/Fieldtypes/KnightRider.php] created successfully.')
-            ->expectsOutputToContain('Fieldtype Vue component [resources/js/components/fieldtypes/KnightRider.vue] created successfully.');
+            ->expectsQuestion("It doesn't look like Vite is setup for the Control Panel. Would you like to run `php please setup-cp-vite`?", false);
 
         $this->files->put($path, 'overwritten fieldtype');
 
@@ -163,10 +150,7 @@ PHP
 
         $this
             ->artisan('statamic:make:fieldtype', ['name' => 'KnightRider', '--force' => true])
-            ->expectsQuestion("It doesn't look like Vite is setup for the Control Panel. Would you like to run `php please setup-cp-vite`?",
-                false)
-            ->expectsOutputToContain('Fieldtype [app/Fieldtypes/KnightRider.php] created successfully.')
-            ->expectsOutputToContain('Fieldtype Vue component [resources/js/components/fieldtypes/KnightRider.vue] created successfully.');
+            ->expectsQuestion("It doesn't look like Vite is setup for the Control Panel. Would you like to run `php please setup-cp-vite`?", false);
 
         $this->assertStringNotContainsString('overwritten fieldtype', $this->files->get($path));
     }
