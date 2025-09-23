@@ -109,10 +109,11 @@ PHP
             ->expectsOutputToContain('Fieldtype [app/Fieldtypes/KnightRider.php] created successfully.')
             ->expectsOutputToContain('Fieldtype Vue component [resources/js/components/fieldtypes/KnightRider.vue] created successfully.');
 
+        Process::assertRan('npm install');
+
         $this->assertFileExists($fieldtype = base_path('app/Fieldtypes/KnightRider.php'));
         $this->assertStringContainsString('namespace App\Fieldtypes;', $this->files->get($fieldtype));
 
-        $this->assertDirectoryExists(base_path('node_modules'));
         $this->assertFileExists(base_path('vite-cp.config.js'));
         $this->assertFileExists(resource_path('js/cp.js'));
         $this->assertFileExists(resource_path('js/components/fieldtypes/KnightRider.vue'));
