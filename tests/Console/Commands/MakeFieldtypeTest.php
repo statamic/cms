@@ -68,6 +68,8 @@ class MakeFieldtypeTest extends TestCase
     #[Test]
     public function it_can_generate_a_fieldtype_and_run_setup_cp_vite()
     {
+        Process::fake();
+
         $this->assertFileDoesNotExist(base_path('app/Fieldtypes/KnightRider.php'));
         $this->assertFileDoesNotExist(resource_path('js/components/fieldtypes/KnightRider.vue'));
 
@@ -103,8 +105,7 @@ PHP
 
         $this
             ->artisan('statamic:make:fieldtype', ['name' => 'KnightRider'])
-            ->expectsQuestion("It doesn't look like Vite is setup for the Control Panel. Would you like to run `php please setup-cp-vite`?",
-                true)
+            ->expectsQuestion("It doesn't look like Vite is setup for the Control Panel. Would you like to run `php please setup-cp-vite`?", true)
             ->expectsOutputToContain('Fieldtype [app/Fieldtypes/KnightRider.php] created successfully.')
             ->expectsOutputToContain('Fieldtype Vue component [resources/js/components/fieldtypes/KnightRider.vue] created successfully.');
 

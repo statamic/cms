@@ -20,6 +20,8 @@ class SetupCpViteTest extends TestCase
         $this->files = app('files');
 
         $this->makeNecessaryFiles();
+
+        Process::fake();
     }
 
     public function tearDown(): void
@@ -32,8 +34,6 @@ class SetupCpViteTest extends TestCase
     #[Test]
     public function it_installs_dependencies()
     {
-        Process::fake();
-
         $this->files->put(base_path('package.json'), <<<'JSON'
 {
     "dependencies": {
