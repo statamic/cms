@@ -56,27 +56,28 @@
 
         .bard-toolbar-button {
             @apply m-0 flex size-8 items-center justify-center rounded-sm px-1 text-center text-base text-gray-900 dark:text-gray-100;
+
             svg {
                 @apply h-4 w-auto;
             }
-        }
 
-        .bard-toolbar-button:hover {
-            @apply bg-gray-200 dark:bg-gray-600;
-        }
-
-        .bard-toolbar-button.active {
-            @apply bg-gray-300 text-black dark:bg-gray-600 dark:text-white;
-        }
-
-        .bard-toolbar-button:focus {
-            @apply focus-outline;
-        }
-
-        .bard-toolbar-button:disabled {
-            @apply opacity-50;
             &:hover {
-                @apply text-gray-900 dark:text-gray-100;
+                @apply bg-gray-200 dark:bg-gray-600;
+            }
+
+            &:focus {
+                @apply focus-outline;
+            }
+
+            &.active {
+                @apply bg-gray-300 text-black dark:bg-gray-600 dark:text-white;
+            }
+
+            &:disabled {
+                @apply opacity-50;
+                &:hover {
+                    @apply text-gray-900 dark:text-gray-100;
+                }
             }
         }
 
@@ -93,18 +94,20 @@
 
             button {
                 @apply mx-0.5 my-0 flex size-8 items-center justify-center rounded-sm bg-transparent px-1 text-center text-base text-gray-500;
+
                 svg {
                     @apply h-4 w-auto;
-                }
-            }
 
-            button.active svg {
-                @apply text-white;
+                    .active & {
+                        @apply text-white;
+                    }
+                }
             }
         }
 
         &.bard-toolbar-setting {
             @apply grid grid-cols-[repeat(auto-fit,minmax(--spacing(8),1fr))] rounded-[--spacing(5)];
+
             button {
                 @apply justify-self-center;
             }
@@ -141,14 +144,15 @@
         /*  Fixed toolbar below fixed global header */
         .bard-fixed-toolbar {
             top: 52px;
-        }
-        .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar {
-            top: 92px;
-        }
 
-        /*  Fixed toolbar inside a stack */
-        .stack-content .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar {
-            top: 16px;
+            .bard-fieldtype .bard-fieldtype & {
+                top: 92px;
+            }
+
+            /*  Fixed toolbar inside a stack */
+            .stack-content .bard-fieldtype .bard-fieldtype & {
+                top: 16px;
+            }
         }
 
         /* We don't need the `top` when in Live Preview */
@@ -312,8 +316,7 @@
         }
 
         blockquote,
-        blockquote ol li,
-        blockquote ul li,
+        blockquote :is(ol li, ul li),
         ol li,
         ul li {
             > p {
@@ -323,16 +326,14 @@
 
         hr {
             @apply bg-gray-200 dark:bg-gray-500 h-0.75 border-0 my-8;
-        }
-
-        hr:after,
-        hr:before {
-            display: table;
-            content: ' ';
-        }
-
-        hr:after {
-            clear: both;
+            &::after,
+            &::before {
+                display: table;
+                content: ' ';
+            }
+            &:after {
+                clear: both;
+            }
         }
 
         h1,
@@ -358,6 +359,10 @@
                 outline: 0;
                 text-decoration: underline;
             }
+
+            &:first-child {
+                margin-top: 0;
+            }
         }
 
         h1 { @apply text-3xl; }
@@ -366,15 +371,6 @@
         h4 { @apply text-base; }
         h5 { @apply text-sm; }
         h6 { @apply text-2xs uppercase text-gray-800 dark:text-gray-500 tracking-wider; }
-
-        h1:first-child,
-        h2:first-child,
-        h3:first-child,
-        h4:first-child,
-        h5:first-child,
-        h6:first-child {
-            margin-top: 0;
-        }
 
         ul,
         blockquote ul,
@@ -390,85 +386,71 @@
 
         ol,
         ul,
-        blockquote ol,
-        blockquote ul {
+        blockquote :is(ol, ul) {
             @apply ms-4 ps-4;
         }
 
-        .tableWrapper table ol,
-        .tableWrapper table ul {
+        .tableWrapper table :is(ol, ul) {
             @apply ms-4 ps-4;
         }
 
-        ol ol,
-        ol ul,
-        ul ol,
-        ul ul {
+        :is(ol, ul) :is(ol, ul) {
             @apply ms-4 ps-4 my-0;
         }
 
-        ul ul {
+        ul {
             list-style-type: circle;
         }
 
-        ol ol {
+        ol {
             list-style-type: decimal;
-        }
-
-        ul ol {
-            list-style-type: decimal;
-        }
-
-        ol ul {
-            list-style-type: circle;
         }
 
         blockquote {
             @apply border-gray-900 dark:border-gray-100 px-4 text-gray-900 dark:text-gray-100 border-s-4 ms-1;
-        }
-
-        blockquote:first-child {
-            margin-top: 0;
-        }
-
-        blockquote:last-child {
-            margin-bottom: 0;
-        }
-
-        .tableWrapper table,
-        blockquote > .tableWrapper table,
-        ol li > .tableWrapper table,
-        ul li > .tableWrapper table {
-            @apply m-0 mb-4 w-full overflow-hidden bg-white text-sm dark:bg-dark-500 border-collapse table-fixed;
-
-            th {
-                @apply bg-gray-200 font-bold dark:bg-gray-600 text-start;
+            &:first-child {
+                margin-top: 0;
             }
-
-            td,
-            th {
-                @apply relative border px-2 py-1 align-top dark:border-gray-600;
-                min-width: 1em;
+            &:last-child {
+                margin-bottom: 0;
             }
+        }
 
-            .selectedCell {
-                @apply relative;
+        table {
+            .tableWrapper &,
+            blockquote > .tableWrapper &,
+            :is(ol, ul) li > .tableWrapper & {
+                @apply m-0 mb-4 w-full overflow-hidden bg-white text-sm dark:bg-dark-500 border-collapse table-fixed;
 
-                &:after {
-                    @apply pointer-events-none absolute inset-0 bg-gray-400 opacity-25 dark:bg-gray-600;
-                    content: '';
+                th {
+                    @apply bg-gray-200 font-bold dark:bg-gray-600 text-start;
                 }
-            }
 
-            a {
-                @apply break-words text-blue-700 underline dark:text-blue-100;
-            }
+                td,
+                th {
+                    @apply relative border px-2 py-1 align-top dark:border-gray-600;
+                    min-width: 1em;
+                }
 
-            a:active,
-            a:focus,
-            a:hover {
-                outline: 0;
-                text-decoration: underline;
+                .selectedCell {
+                    @apply relative;
+
+                    &:after {
+                        @apply pointer-events-none absolute inset-0 bg-gray-400 opacity-25 dark:bg-gray-600;
+                        content: '';
+                    }
+                }
+
+                a {
+                    @apply break-words text-blue-700 underline dark:text-blue-100;
+                }
+
+                a:active,
+                a:focus,
+                a:hover {
+                    outline: 0;
+                    text-decoration: underline;
+                }
             }
         }
 
@@ -478,10 +460,9 @@
 
         pre {
             @apply mb-2;
-        }
-
-        pre code {
-            @apply block w-full rounded-lg bg-gray-200 p-4 font-mono text-xs dark:bg-black dark:text-gray-100 leading-normal mb-4;
+            code {
+                @apply block w-full rounded-lg bg-gray-200 p-4 font-mono text-xs dark:bg-black dark:text-gray-100 leading-normal mb-4;
+            }
         }
     }
 }
