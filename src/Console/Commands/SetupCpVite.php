@@ -19,7 +19,7 @@ class SetupCpVite extends Command
      *
      * @var string
      */
-    protected $signature = 'statamic:setup-cp-vite {--without-example-fieldtype : Do not publish the ExampleFieldtype component}';
+    protected $signature = 'statamic:setup-cp-vite {--only-necessary : Only configure the necessary parts for Vite to work with the Control Panel}';
 
     /**
      * The console command description.
@@ -124,7 +124,7 @@ class SetupCpVite extends Command
 
         if (
             ! File::exists(resource_path('js/components/fieldtypes/ExampleFieldtype.vue'))
-            && ! $this->option('without-example-fieldtype')
+            && ! $this->option('only-necessary')
         ) {
             File::ensureDirectoryExists(resource_path('js/components/fieldtypes'));
 

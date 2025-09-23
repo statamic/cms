@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Process;
 use Statamic\Console\RunsInPlease;
 use Statamic\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
+use function Laravel\Prompts\confirm;
 
 class MakeFieldtype extends GeneratorCommand
 {
@@ -78,10 +79,12 @@ class MakeFieldtype extends GeneratorCommand
             $this->wireUpAddonJs($addon);
         } else {
             if (! $this->appJsIsWiredUp()) {
-                Artisan::call('statamic:setup-cp-vite', [
-                    '--without-example-fieldtype' => true,
-                ]);
-                $this->newLine();
+                if (confirm(
+                    label: "It doesn't look like Vite is setup for the Control Panel. Would you like to run `php please setup-cp-vite`?",
+                    hint: 'You can always run this command later.'
+                )) {
+                    $this->call('statamic:setup-cp-vite', ['--only-necessary' => true]);
+                }
             }
 
             $this->components->info("Fieldtype Vue component [{$relativePath}] created successfully.");
