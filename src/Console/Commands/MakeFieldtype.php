@@ -3,11 +3,11 @@
 namespace Statamic\Console\Commands;
 
 use Archetype\Facades\PHPFile;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Process;
 use Statamic\Console\RunsInPlease;
 use Statamic\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
+
 use function Laravel\Prompts\confirm;
 
 class MakeFieldtype extends GeneratorCommand
