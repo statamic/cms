@@ -398,11 +398,11 @@
             @apply ms-4 ps-4 my-0;
         }
 
-        ul {
+        :is(ol, ul) ul {
             list-style-type: circle;
         }
 
-        ol {
+        :is(ol, ul) ol {
             list-style-type: decimal;
         }
 
