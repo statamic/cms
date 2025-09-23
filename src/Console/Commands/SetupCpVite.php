@@ -157,7 +157,7 @@ PHP);
             message: 'Adding Statamic::vite() snippet to AppServiceProvider...'
         );
 
-        $this->components->info("Added Statamic::vite() snippet to AppServiceProvider.");
+        $this->components->info('Added Statamic::vite() snippet to AppServiceProvider.');
 
         return $this;
     }
