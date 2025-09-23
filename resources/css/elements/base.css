@@ -10,7 +10,7 @@
     --focus-outline-style: solid;
 
     /* The outline-offset value used for buttons */
-    --outline-offset-button: 0.35rem;
+    --outline-offset-button: 6px;
 
     :is(.dark)& {
         --focus-outline-color: var(--color-blue-500);
@@ -60,6 +60,10 @@
     [type="checkbox"] {
         /* To effectively hide border radius clash with focus state */
         --focus-outline-offset: -1.85px;
+    }
+    [data-ui-combobox-trigger] {
+        /* Set to the standard value */
+        /* --focus-outline-offset: -1px; */
     }
 }
 
