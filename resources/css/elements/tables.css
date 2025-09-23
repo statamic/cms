@@ -1,10 +1,15 @@
 /* ==========================================================================
    TABLES
    ========================================================================== */
+/* Modifiers...
+
+    - .data-table--contained is used when the table head appears _inside_ the container, for example /assets.
+
+*/
 .data-table {
     @apply w-full max-w-full outline-hidden text-gray-500 antialiased border-separate border-spacing-y-0 min-w-full overflow-x-auto text-start;
 
-    &.contained {
+    &.data-table--contained {
         @apply rounded-xl;
     }
 
@@ -13,7 +18,7 @@
             @apply whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-300 text-start;
             @apply px-4 py-2;
 
-            .contained & {
+            .data-table--contained & {
                 @apply py-2.5 border-b dark:border-gray-700;
             }
         }
@@ -29,7 +34,7 @@
 
     tbody {
         @apply text-sm shadow-sm-b rounded-xl outline-none;
-        .contained & {
+        .data-table--contained & {
             @apply shadow-none rounded-none;
         }
 
@@ -104,7 +109,7 @@
 .data-table {
     thead th.checkbox-column {
         @apply sticky z-1 ps-3 w-8;
-        .contained & {
+        .data-table--contained & {
             @apply sticky ps-4;
         }
     }
@@ -117,7 +122,7 @@
 
     tbody .checkbox-column {
         @apply sticky px-3 -start-px;
-        .contained & {
+        .data-table--contained & {
             @apply sticky ps-4;
         }
     }
