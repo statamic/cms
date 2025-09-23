@@ -61,10 +61,6 @@
         /* To effectively hide border radius clash with focus state */
         --focus-outline-offset: -1.85px;
     }
-    [data-ui-combobox-trigger] {
-        /* Set to the standard value */
-        /* --focus-outline-offset: -1px; */
-    }
 }
 
 /* Use a utility layer only when we need higher specificity */
@@ -83,21 +79,6 @@
         }
     }
 
-    /* Based on the global site picker. Only for buttons (i.e. don't affect select dropdowns on publish forms) */
-    [data-ui-combobox-anchor]:has(button):not(.main-content *, .stack-content *) {
-        /* Decrease */
-        --focus-outline-offset: var(--outline-offset-button);
-        /* Target the button inside the combobox */
-        & :focus-visible {
-            /* Decrease */
-            @apply rounded-xs;
-            + * svg {
-                /* Since the SVG is outside the focus state let's hide it on focus because otherwise the focus state outline rests on top of it */
-                position: relative;
-                left: 0.6rem;
-            }
-        }
-    }
     /* e.g. >> /cp/collections, when you tab to the title, and /cp/collections/pages when tabbing through the tree text. Avoid elements where border-radius has already been set, e.g. "Create Entry" button */
     .main-content a:not([class*="rounded"]),
     /* e.g. >> /cp/collections/pages, tabbing through the home icon. Be careful not to carpet bomb this e.g. don't want to affect Bard buttons. */
