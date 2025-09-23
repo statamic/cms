@@ -32,6 +32,36 @@
         }
     }
 
+    /* Make sure we only apply this where the data table "head" is in the gray wrapper, i.e. _not_ assets, since otherwise we would be rounding the second row */
+    &:not(.data-table--contained) {
+        tbody {
+            tr:first-child {
+                /* [1] Round the corners */
+                td:first-child,
+                th:first-child {
+                    @apply ltr:rounded-tl-xl rtl:rounded-tr-xl;
+                }
+                td:last-child,
+                th:last-child {
+                    @apply ltr:rounded-tr-xl rtl:rounded-tl-xl;
+                }
+                /* [2] Add a border */
+                td {
+                    @apply border-t border-t-gray-200 dark:border-t-gray-800;
+                }
+            }
+            tr td {
+                /* [3] Add left and right borders */
+                &:first-child {
+                    @apply border-s border-s-gray-200 dark:border-s-gray-800;
+                }
+                &:last-child {
+                    @apply border-e border-e-gray-200 dark:border-e-gray-800;
+                }
+            }
+        }
+    }
+
     tbody {
         @apply text-sm shadow-sm-b rounded-xl outline-none;
         .data-table--contained & {
@@ -39,22 +69,6 @@
         }
 
         tr {
-            &:first-child {
-                td:first-child,
-                th:first-child {
-                    @apply ltr:rounded-tl-xl rtl:rounded-tr-xl;
-                }
-
-                td {
-                    @apply border-t border-t-gray-200 dark:border-t-gray-800;
-                }
-
-                td:last-child,
-                th:last-child {
-                    @apply ltr:rounded-tr-xl rtl:rounded-tl-xl;
-                }
-            }
-
             &:last-child {
                 @apply border-none;
 
@@ -102,6 +116,12 @@
 
     .date-index-field {
         @apply whitespace-nowrap;
+    }
+}
+
+.data-table--contained tbody {
+    tr:first-child td {
+        border-top: unset;
     }
 }
 
