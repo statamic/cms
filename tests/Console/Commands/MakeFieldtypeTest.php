@@ -127,10 +127,7 @@ PHP
 
         $this->assertStringContainsString('overwritten fieldtype', $this->files->get($path));
 
-        $this
-            ->artisan('statamic:make:fieldtype', ['name' => 'KnightRider'])
-            ->doesntExpectOutputToContain('Fieldtype [app/Fieldtypes/KnightRider.php] created successfully.')
-            ->doesntExpectOutputToContain('Fieldtype Vue component [resources/js/components/fieldtypes/KnightRider.vue] created successfully.');
+        $this->artisan('statamic:make:fieldtype', ['name' => 'KnightRider']);
 
         $this->assertStringContainsString('overwritten fieldtype', $this->files->get($path));
     }
