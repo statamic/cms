@@ -77,7 +77,7 @@ class JavascriptComposer
             'customSvgIcons' => $this->icons(),
             'commandPaletteCategories' => Category::order(),
             'commandPalettePreloadedItems' => CommandPalette::getPreloadedItems(),
-            'replicatorSetThumbnails' => $this->replicatorSetThumbnails(),
+            'replicatorSetThumbnails' => Sets::thumbnailConfig(),
         ];
     }
 
@@ -125,12 +125,5 @@ class JavascriptComposer
         return Icon::sets()->mapWithKeys(fn (IconSet $set) => [
             $set->name() => $set->contents(),
         ]);
-    }
-
-    private function replicatorSetThumbnails()
-    {
-        [$container, $folder] = Sets::thumbnailConfig();
-
-        return $container ? compact('container', 'folder') : null;
     }
 }

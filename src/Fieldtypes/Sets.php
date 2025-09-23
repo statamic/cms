@@ -160,7 +160,7 @@ class Sets extends Fieldtype
             return null;
         }
 
-        [$container, $folder] = static::thumbnailConfig();
+        ['container' => $container, 'folder' => $folder] = static::thumbnailConfig();
 
         $prefix = sprintf('%s::%s', $container, $folder ? $folder.'/' : '');
 
@@ -173,7 +173,7 @@ class Sets extends Fieldtype
             return null;
         }
 
-        [$container, $folder] = static::thumbnailConfig();
+        ['container' => $container, 'folder' => $folder] = static::thumbnailConfig();
 
         $prefix = sprintf('%s::%s', $container, $folder ? $folder.'/' : '');
 
@@ -189,19 +189,19 @@ class Sets extends Fieldtype
         return Asset::find($path)?->thumbnailUrl();
     }
 
-    public static function thumbnailConfig()
+    public static function thumbnailConfig(): ?array
     {
         if (! $config = config('statamic.assets.set_thumbnails')) {
-            return [null, null];
+            return null;
         }
 
         $container = $config['container'] ?? null;
         $folder = $config['folder'] ?? null;
 
         if (! AssetContainer::find($container)) {
-            return [null, null];
+            return null;
         }
 
-        return [$container, $folder];
+        return compact('container', 'folder');
     }
 }
