@@ -62,7 +62,7 @@ class SetupCpVite extends Command
 
                 File::put($packageJsonPath, json_encode($contents, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
-                Process::path(base_path())->tty()->run('npm install');
+                Process::path(base_path())->tty($this->input->isInteractive())->run('npm install');
             },
             message: 'Installing dependencies...'
         );
