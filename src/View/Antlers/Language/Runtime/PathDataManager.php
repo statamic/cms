@@ -658,7 +658,7 @@ class PathDataManager
 
                         continue;
                     } else {
-                        if ($this->cascade != null) {
+                        if (GlobalRuntimeState::$isCascadeEnabled && $this->cascade != null) {
                             // Attempt to locate the data in the cascade.
                             $cascadeData = $this->cascade->get($pathItem->name);
 

@@ -28,13 +28,6 @@ EXECTED;
         );
     }
 
-    public function test_directives_must_contain_args()
-    {
-        $this->expectExceptionMessage('Missing arguments for @props directive');
-
-        $this->renderString('@props');
-    }
-
     public function test_directives_args_must_be_finished()
     {
         $this->expectExceptionMessage('Incomplete arguments for @props directive');

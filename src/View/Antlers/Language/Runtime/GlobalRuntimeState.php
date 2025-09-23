@@ -202,6 +202,8 @@ class GlobalRuntimeState
 
     public static $userContentEvalState = null;
 
+    public static $isCascadeEnabled = true;
+
     /**
      * A list of callbacks that will be invoked when ___internal_debug:peek is called.
      *
@@ -219,6 +221,7 @@ class GlobalRuntimeState
         self::$traceTagAssignments = false;
         self::$tracedRuntimeAssignments = [];
         self::$requiresRuntimeIsolation = true;
+        self::$isCascadeEnabled = false;
     }
 
     public static function captureRuntimeState(): array
@@ -246,6 +249,7 @@ class GlobalRuntimeState
         self::$requiresRuntimeIsolation = $requiresIsolation;
         self::$traceTagAssignments = $traceTagAssignments;
         self::$tracedRuntimeAssignments = $tracedRuntimeAssignments;
+        self::$isCascadeEnabled = true;
     }
 
     public static function resetGlobalState()

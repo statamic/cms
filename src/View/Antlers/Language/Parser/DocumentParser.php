@@ -353,7 +353,7 @@ class DocumentParser
             $lastOffset = $thisIndex;
         }
 
-        preg_match_all('/(@?{{|@?(props|aware))/u', $this->content, $antlersStartCandidates, PREG_OFFSET_CAPTURE);
+        preg_match_all('/(@?{{|@?(props|aware|cascade))/u', $this->content, $antlersStartCandidates, PREG_OFFSET_CAPTURE);
 
         $lastAntlersOffset = 0;
         $lastWasEscaped = false;
@@ -361,7 +361,7 @@ class DocumentParser
             $antlersRegion = $antlersMatch[0];
 
             if (Str::startsWith($antlersRegion, '@')) {
-                if (in_array($antlersRegion, ['@props', '@aware'])) {
+                if (in_array($antlersRegion, ['@props', '@aware', '@cascade'])) {
                     $offset = mb_strpos($this->content, $antlersRegion, $lastAntlersOffset);
 
                     if ($antlersMatch[1] > 0) {
@@ -861,73 +861,82 @@ class DocumentParser
             }
         }
 
-        if ($this->next === null || ctype_space($this->cur)) {
+        $args = '';
+        $parseArgs = true;
+
+        if ($this->next === null || ctype_space($this->next) || ctype_space($this->cur)) {
+            $rollbackTo = $this->currentIndex;
             $this->advanceWhitespace();
 
+            if (ctype_space($this->cur) && $this->next === '(') {
+                $this->currentIndex++;
+                $this->checkCurrentOffsets();
+            }
+
             if ($this->cur != '(') {
+                $parseArgs = false;
+                $this->currentIndex = $rollbackTo;
+                $this->checkCurrentOffsets();
+            }
+        }
+
+        if ($parseArgs) {
+            $argsStarted = $this->currentIndex;
+
+            $this->currentIndex += 1;
+
+            $args = '(';
+            $inString = false;
+            $stringTerminator = null;
+            $parenCount = 1;
+
+            for ($this->currentIndex; $this->currentIndex < $this->inputLen; $this->currentIndex += 1) {
+                $this->checkCurrentOffsets();
+
+                if (! $inString && ($this->cur === self::String_Terminator_SingleQuote || $this->cur === self::String_Terminator_DoubleQuote)) {
+                    $inString = true;
+                    $stringTerminator = $this->cur;
+                    $args .= $this->cur;
+
+                    continue;
+                }
+
+                if ($inString) {
+                    $args .= $this->cur;
+
+                    if ($this->cur === $stringTerminator && $this->prev !== self::String_EscapeCharacter) {
+                        $inString = false;
+                    }
+
+                    continue;
+                }
+
+                if ($this->cur === self::LeftParen) {
+                    $parenCount++;
+                    $args .= $this->cur;
+
+                    continue;
+                } elseif ($this->cur === self::RightParent) {
+                    $parenCount--;
+                    $args .= $this->cur;
+
+                    if ($parenCount === 0) {
+                        break;
+                    }
+
+                    continue;
+                }
+
+                $args .= $this->cur;
+            }
+
+            if ($parenCount != 0) {
                 throw ErrorFactory::makeSyntaxError(
                     AntlersErrorCodes::TYPE_DIRECTIVE_MISSING_ARGUMENTS,
-                    ParserFailNode::makeWithStartPosition($this->positionFromOffset($this->startIndex, $this->startIndex)),
-                    "Missing arguments for {$name} directive",
+                    ParserFailNode::makeWithStartPosition($this->positionFromOffset($argsStarted, $argsStarted)),
+                    "Incomplete arguments for {$name} directive",
                 );
             }
-        }
-
-        $argsStarted = $this->currentIndex;
-
-        $this->currentIndex += 1;
-
-        $args = '(';
-        $inString = false;
-        $stringTerminator = null;
-        $parenCount = 1;
-
-        for ($this->currentIndex; $this->currentIndex < $this->inputLen; $this->currentIndex += 1) {
-            $this->checkCurrentOffsets();
-
-            if (! $inString && ($this->cur === self::String_Terminator_SingleQuote || $this->cur === self::String_Terminator_DoubleQuote)) {
-                $inString = true;
-                $stringTerminator = $this->cur;
-                $args .= $this->cur;
-
-                continue;
-            }
-
-            if ($inString) {
-                $args .= $this->cur;
-
-                if ($this->cur === $stringTerminator && $this->prev !== self::String_EscapeCharacter) {
-                    $inString = false;
-                }
-
-                continue;
-            }
-
-            if ($this->cur === self::LeftParen) {
-                $parenCount++;
-                $args .= $this->cur;
-
-                continue;
-            } elseif ($this->cur === self::RightParent) {
-                $parenCount--;
-                $args .= $this->cur;
-
-                if ($parenCount === 0) {
-                    break;
-                }
-
-                continue;
-            }
-
-            $args .= $this->cur;
-        }
-
-        if ($parenCount != 0) {
-            throw ErrorFactory::makeSyntaxError(
-                AntlersErrorCodes::TYPE_DIRECTIVE_MISSING_ARGUMENTS,
-                ParserFailNode::makeWithStartPosition($this->positionFromOffset($argsStarted, $argsStarted)),
-                "Incomplete arguments for {$name} directive",
-            );
         }
 
         $node = $this->makeDirectiveNode($name, $args, $this->currentIndex);

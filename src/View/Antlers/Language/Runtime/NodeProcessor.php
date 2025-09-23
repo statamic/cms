@@ -5,6 +5,7 @@ namespace Statamic\View\Antlers\Language\Runtime;
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\View\Compilers\BladeCompiler;
@@ -2506,6 +2507,10 @@ class NodeProcessor
             false,
             'php',
         );
+
+        foreach (Blade::getCustomDirectives() as $directiveName => $compiler) {
+            $blade->directive($directiveName, $compiler);
+        }
 
         $buffer = $blade->compileString($directive->directiveName.'($___directiveArgs)');
 
