@@ -61,7 +61,7 @@ class SetsTest extends TestCase
                         'display' => 'One',
                         'instructions' => 'One instructions',
                         'icon' => 'one-icon',
-                        'thumbnail' => null,
+                        'image' => null,
                         'hide' => true,
                         'fields' => [
                             [
@@ -93,7 +93,7 @@ class SetsTest extends TestCase
                         'display' => null,
                         'instructions' => null,
                         'icon' => null,
-                        'thumbnail' => null,
+                        'image' => null,
                         'hide' => null,
                         'fields' => [
                             [
@@ -145,7 +145,7 @@ class SetsTest extends TestCase
                         'display' => 'One',
                         'instructions' => 'One instructions',
                         'icon' => 'one-icon',
-                        'thumbnail' => null,
+                        'image' => null,
                         'hide' => null,
                         'fields' => [
                             [
@@ -252,7 +252,7 @@ class SetsTest extends TestCase
                         ],
                         'handle' => 'one',
                         'id' => 'one',
-                        'thumbnail' => null,
+                        'image' => null,
                     ],
                 ],
                 'handle' => 'alfa',
@@ -292,7 +292,7 @@ class SetsTest extends TestCase
                         ],
                         'handle' => 'two',
                         'id' => 'two',
-                        'thumbnail' => null,
+                        'image' => null,
                     ],
                 ],
                 'handle' => 'bravo',
@@ -355,7 +355,7 @@ class SetsTest extends TestCase
                         ],
                         'handle' => 'one',
                         'id' => 'one',
-                        'thumbnail' => null,
+                        'image' => null,
                     ],
                 ],
                 'handle' => 'main',
@@ -416,7 +416,7 @@ class SetsTest extends TestCase
                         'display' => 'One',
                         'instructions' => 'One Instructions',
                         'icon' => 'one-icon',
-                        'thumbnail' => null,
+                        'image' => null,
                         'hide' => false,
                         'fields' => [
                             [

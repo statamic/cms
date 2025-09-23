@@ -90,26 +90,26 @@
                             />
                         </publish-field-meta>
                     </ui-field>
-                    <ui-field :label="__('Thumbnail')" v-if="showHandleField && thumbnailContainer">
+                    <ui-field :label="__('Preview Image')" v-if="showHandleField && previewImageContainer">
                         <publish-field-meta
                             :config="{
-                                handle: 'thumbnail',
+                                handle: 'image',
                                 type: 'assets',
-                                container: thumbnailContainer,
-                                folder: thumbnailFolder,
-                                restrict: !! thumbnailFolder,
+                                container: previewImageContainer,
+                                folder: previewImageFolder,
+                                restrict: !! previewImageFolder,
                                 allow_uploads: true,
                             }"
-                            :initial-value="editingSection.thumbnail"
+                            :initial-value="editingSection.image"
                             v-slot="{ meta, value, loading, config }"
                         >
                             <assets-fieldtype
                                 v-if="!loading"
-                                handle="thumbnail"
+                                handle="image"
                                 :config="config"
                                 :meta="meta"
                                 :value="value"
-                                @update:value="editingSection.thumbnail = $event?.[0] || null"
+                                @update:value="editingSection.image = $event?.[0] || null"
                             />
                         </publish-field-meta>
                     </ui-field>
@@ -169,12 +169,12 @@ export default {
             return this.$config.get('replicatorSetIcons') || undefined;
         },
 
-        thumbnailContainer() {
-            return this.$config.get('replicatorSetThumbnails.container') || null;
+        previewImageContainer() {
+            return this.$config.get('setPreviewImages.container') || null;
         },
 
-        thumbnailFolder() {
-            return this.$config.get('replicatorSetThumbnails.folder') || null;
+        previewImageFolder() {
+            return this.$config.get('setPreviewImages.folder') || null;
         },
     },
 
@@ -229,7 +229,7 @@ export default {
                 handle: this.section.handle,
                 instructions: this.section.instructions,
                 icon: this.section.icon,
-                thumbnail: this.section.thumbnail,
+                image: this.section.image,
                 hide: this.section.hide,
                 collapsible: this.section.collapsible,
                 collapsed: this.section.collapsed,

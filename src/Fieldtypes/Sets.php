@@ -54,7 +54,7 @@ class Sets extends Fieldtype
                         'display' => $set['display'] ?? null,
                         'instructions' => $set['instructions'] ?? null,
                         'icon' => $set['icon'] ?? null,
-                        'thumbnail' => $this->preProcessThumbnail($set['thumbnail'] ?? null),
+                        'image' => $this->preProcessPreviewImage($set['image'] ?? null),
                         'hide' => $set['hide'] ?? null,
                         'fields' => collect($set['fields'] ?? [])->map(function ($field, $i) use ($setId) {
                             return array_merge(FieldTransformer::toVue($field), ['_id' => $setId.'-'.$i]);
@@ -95,7 +95,7 @@ class Sets extends Fieldtype
                         return array_merge($config, [
                             'handle' => $name,
                             'id' => $name,
-                            'thumbnail' => $this->thumbnailUrl($config['thumbnail'] ?? null),
+                            'image' => $this->previewImageUrl($config['image'] ?? null),
                             'fields' => (new NestedFields)->preProcessConfig(Arr::get($config, 'fields', [])),
                         ]);
                     })
@@ -124,7 +124,7 @@ class Sets extends Fieldtype
                                 'display' => $section['display'],
                                 'instructions' => $section['instructions'] ?? null,
                                 'icon' => $section['icon'] ?? null,
-                                'thumbnail' => $this->processThumbnail($section['thumbnail'] ?? null),
+                                'image' => $this->processPreviewImage($section['image'] ?? null),
                                 'hide' => $section['hide'] ?? null,
                                 'fields' => collect($section['fields'])->map(function ($field) {
                                     return FieldTransformer::fromVue($field);
@@ -154,44 +154,45 @@ class Sets extends Fieldtype
         Statamic::provideToScript(['replicatorSetIcons' => $name]);
     }
 
-    private function preProcessThumbnail($thumbnail)
+    private function preProcessPreviewImage($image)
     {
-        if (! $thumbnail) {
+        if (! $image) {
             return null;
         }
 
-        ['container' => $container, 'folder' => $folder] = static::thumbnailConfig();
+        ['container' => $container, 'folder' => $folder] = static::previewImageConfig();
 
         $prefix = sprintf('%s::%s', $container, $folder ? $folder.'/' : '');
 
-        return $prefix.$thumbnail;
+        return $prefix.$image;
     }
 
-    private function processThumbnail($thumbnail)
+    private function processPreviewImage($image)
     {
-        if (! $thumbnail) {
+        if (! $image) {
             return null;
         }
 
-        ['container' => $container, 'folder' => $folder] = static::thumbnailConfig();
+        ['container' => $container, 'folder' => $folder] = static::previewImageConfig();
 
         $prefix = sprintf('%s::%s', $container, $folder ? $folder.'/' : '');
 
-        return (string) str($thumbnail)->after($prefix);
+        return (string) str($image)->after($prefix);
     }
 
-    private function thumbnailUrl($thumbnail)
+    private function previewImageUrl($image)
     {
-        if (! $path = $this->preProcessThumbnail($thumbnail)) {
+        if (! $path = $this->preProcessPreviewImage($image)) {
             return null;
         }
 
         return Asset::find($path)?->thumbnailUrl();
     }
 
-    public static function thumbnailConfig(): ?array
+    public static function previewImageConfig(): ?array
     {
-        if (! $config = config('statamic.assets.set_thumbnails')) {
+        if (! $config = config('statamic.assets.set_preview_images')) {
+
             return null;
         }
 

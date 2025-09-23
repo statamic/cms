@@ -77,7 +77,7 @@ class JavascriptComposer
             'customSvgIcons' => $this->icons(),
             'commandPaletteCategories' => Category::order(),
             'commandPalettePreloadedItems' => CommandPalette::getPreloadedItems(),
-            'replicatorSetThumbnails' => Sets::thumbnailConfig(),
+            'setPreviewImages' => Sets::previewImageConfig(),
         ];
     }
 
