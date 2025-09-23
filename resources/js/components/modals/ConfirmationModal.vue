@@ -21,7 +21,7 @@ const props = defineProps({
     },
     cancelText: {
         type: String,
-        default: 'Cancel',
+        default: () => __('Cancel'),
     },
     danger: {
         type: Boolean,

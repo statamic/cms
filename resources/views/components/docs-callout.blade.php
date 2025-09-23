@@ -5,7 +5,7 @@
 @if (config('statamic.cp.link_to_docs'))
     <div class="mt-12 flex justify-center text-center starting-style-transition starting-style-transition--siblings">
         <ui-command-palette-item
-            :text="[__('Statamic Documentation'), '{{ $topic }}']"
+            :text="[__('Statamic Documentation'), `{{ $topic }}`]"
             icon="book-next-page"
             url="{{ $url }}"
             open-new-tab
