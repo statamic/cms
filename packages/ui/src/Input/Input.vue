@@ -47,8 +47,8 @@ const inputClasses = computed(() => {
         variants: {
             size: {
                 base: 'text-base rounded-lg px-3 py-2 h-10 leading-[1.375rem]',
-                sm: 'text-sm rounded-md px-2.5 py-1.5 h-8 leading-[1.125rem]',
-                xs: 'text-xs rounded-xs px-2 py-1.5 h-6 leading-[1.125rem]',
+                sm: 'text-sm rounded-lg px-2.5 py-1.5 h-8 leading-[1.125rem]',
+                xs: 'text-xs rounded-md px-2 py-1.5 h-6 leading-[1.125rem]',
             },
             variant: {
                 default: '',

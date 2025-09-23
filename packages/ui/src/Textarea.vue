@@ -29,8 +29,8 @@ const classes = cva({
     variants: {
         size: {
             base: 'text-base rounded-lg px-3 pt-2.5 pb-3',
-            sm: 'text-sm rounded-md px-2.5 pt-1.5 pb-2',
-            xs: 'text-xs rounded-xs px-2 pt-1 pb-1.5',
+            sm: 'text-sm rounded-lg px-2.5 pt-1.5 pb-2',
+            xs: 'text-xs rounded-md px-2 pt-1 pb-1.5',
         },
         resize: {
             both: 'resize',

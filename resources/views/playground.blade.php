@@ -168,31 +168,24 @@
     </section>
 
     <section class="space-y-4">
-        <ui-heading size="lg">Input</ui-heading>
+        <ui-heading size="lg" id="input">Input</ui-heading>
         <div class="flex gap-2">
-            <ui-input
-                name="email"
-                type="email"
-                required
-                label="Email"
-                value="Edit me"
-            />
-            <ui-input
-                name="email"
-                type="email"
-                required
-                label="Email"
-                read-only
-                value="Read only. Tab, select, but not edit."
-            />
-            <ui-input
-                name="email"
-                type="email"
-                required
-                label="Email"
-                disabled
-                value="Disabled. Cant touch me."
-            />
+            <ui-button text="Default" />
+            <ui-input name="email" type="email" required label="Email" value="Edit me" />
+            <ui-input name="email" type="email" required label="Email" read-only value="Read only. Tab, select, but not edit." />
+            <ui-input name="email" type="email" required label="Email" disabled value="Disabled. Cant touch me." />
+        </div>
+        <div class="flex gap-2">
+        <ui-button text="Small" size="sm" />
+            <ui-input name="email" type="email" size="sm" required label="Email" value="Edit me" />
+            <ui-input name="email" type="email" size="sm" required label="Email" read-only value="Read only. Tab, select, but not edit." />
+            <ui-input name="email" type="email" size="sm" required label="Email" disabled value="Disabled. Cant touch me." />
+        </div>
+        <div class="flex gap-2">
+            <ui-button text="Extra Small" size="xs" />
+            <ui-input name="email" type="email" size="xs" required label="Email" value="Edit me" />
+            <ui-input name="email" type="email" size="xs" required label="Email" read-only value="Read only. Tab, select, but not edit." />
+            <ui-input name="email" type="email" size="xs" required label="Email" disabled value="Disabled. Cant touch me." />
         </div>
     </section>
 
