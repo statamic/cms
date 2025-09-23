@@ -64,7 +64,7 @@
                     </div>
                     <div v-if="item.type === 'set'" @click="addSet(item.handle)" class="group flex items-center rounded-xl p-2.5 gap-3">
                         <ui-icon :name="item.icon || 'plus'" :set="iconSet" class="size-4 text-gray-600 dark:text-gray-300" />
-                        <ui-hover-card :delay="0">
+                        <ui-hover-card :delay="0" :open="selectionIndex === i">
                             <template #trigger>
                                 <div class="flex-1">
                                     <div class="line-clamp-1 text-sm text-gray-900 dark:text-gray-200">

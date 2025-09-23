@@ -1,11 +1,13 @@
 <script setup>
 import { cva } from 'cva';
 import { HoverCardArrow, HoverCardContent, HoverCardPortal, HoverCardRoot, HoverCardTrigger } from 'reka-ui';
-import { ref, watch } from 'vue';
+import { computed, getCurrentInstance, ref, watch } from 'vue';
 
 defineOptions({
     inheritAttrs: false,
 });
+
+const emit = defineEmits(['update:open']);
 
 const props = defineProps({
     align: { type: String, default: 'center' },
@@ -35,10 +37,34 @@ const HoverCardContentClasses = cva({
     ...props,
 });
 
+
+const instance = getCurrentInstance();
+const isUsingOpenProp = computed(() => instance?.vnode.props?.hasOwnProperty('open'));
+const open = ref(props.open);
+watch(
+    () => props.open,
+    (value) => open.value = value,
+);
+// When the parent component controls the open state, emit an update event
+// so it can update its state, which eventually gets passed down as a prop.
+// Otherwise, update the local state.
+function updateOpen(value) {
+    if (isUsingOpenProp.value) {
+        emit('update:open', value);
+        return;
+    }
+
+    open.value = value;
+}
 </script>
 
 <template>
-    <HoverCardRoot v-slot="slotProps" :open-delay="delay">
+    <HoverCardRoot
+        v-slot="slotProps"
+        :open-delay="delay"
+        :open="open"
+        @update:open="updateOpen"
+    >
         <HoverCardTrigger data-ui-hover-card-trigger as-child>
             <slot name="trigger" />
         </HoverCardTrigger>
