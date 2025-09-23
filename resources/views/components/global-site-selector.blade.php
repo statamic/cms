@@ -9,6 +9,7 @@
         items-center justify-between px-3 rounded-lg text-[0.8125rem] text-gray-900
     "
     data-ui-combobox-trigger
+    tabindex="-1"
 >
     <div class="flex-1 min-w-0">
         <button
