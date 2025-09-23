@@ -11,14 +11,15 @@
 
             <!-- Entry select -->
             <relationship-fieldtype
-                v-if="option === 'entry'"
-                ref="entries"
-                handle="entry"
-                :value="selectedEntries"
                 :config="meta.entry.config"
                 :meta="meta.entry.meta"
-                @update:value="entriesSelected"
+                :value="selectedEntries"
                 @update:meta="meta.entry.meta = $event"
+                @update:value="entriesSelected"
+                button-size="base"
+                handle="entry"
+                ref="entries"
+                v-if="option === 'entry'"
             />
 
             <!-- Asset select -->
@@ -35,12 +36,6 @@
         </div>
     </div>
 </template>
-
-<style scoped>
-    /* :deep(.relationship-input) > div:first-child {
-        @apply h-full;
-    } */
-</style>
 
 <script>
 import Fieldtype from './Fieldtype.vue';
