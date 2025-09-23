@@ -12,6 +12,7 @@
     "
     type="button"
     data-ui-dropdown-trigger
+    tabindex="-1"
 >
     @cp_svg('icons/chevron-vertical')
 </button>
