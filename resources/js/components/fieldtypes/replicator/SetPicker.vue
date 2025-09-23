@@ -9,7 +9,7 @@
         v-else
         inset
         :align="align"
-        class="set-picker select-none w-[300px]"
+        class="set-picker select-none w-72"
         :open="isOpen"
         @update:open="isOpen = $event"
         @clicked-away="$emit('clicked-away', $event)"
@@ -18,65 +18,70 @@
             <slot name="trigger" />
         </template>
         <template #default>
-            <div class="set-picker-header flex items-center border-b p-3 text-xs dark:border-gray-600">
+            <div class="flex items-center border-b border-gray-200 dark:border-gray-600 p-1.5">
                 <ui-input
+                    :placeholder="__('Search Sets')"
+                    class="[&_svg]:size-5"
+                    data-set-picker-search-input
+                    icon-prepend="magnifying-glass"
                     ref="search"
                     size="sm"
                     type="text"
-                    :placeholder="__('Search Sets')"
-                    icon-prepend="magnifying-glass"
-                    v-show="showSearch"
                     v-model="search"
-                    data-set-picker-search-input
+                    v-show="showSearch"
+                    variant="ghost"
                 />
-                <div v-if="showGroupBreadcrumb" class="flex items-center font-medium text-gray-700 dark:text-gray-300 gap-1">
-                    <button @click="unselectGroup" class="hover:text-gray-900 dark:hover:text-white cursor-pointer">
+                <div v-if="showGroupBreadcrumb" class="flex items-center">
+                    <ui-button @click="unselectGroup" size="xs" variant="ghost">
                         {{ __('Groups') }}
-                    </button>
-                    <ui-icon name="chevron-right" class="size-4" />
-                    <span>{{ selectedGroupDisplayText }}</span>
+                    </ui-button>
+                    <ui-icon name="chevron-right" class="size-3! mt-[1px]" />
+                    <span class="text-gray-700 dark:text-gray-300 text-xs px-2">
+                        {{ selectedGroupDisplayText }}
+                    </span>
                 </div>
             </div>
-            <div class="max-h-[21rem] overflow-auto p-1">
+            <div class="max-h-[21rem] overflow-auto p-1.5">
                 <div
                     v-for="(item, i) in items"
                     :key="item.handle"
-                    class="cursor-pointer rounded-md"
+                    class="cursor-pointer rounded-lg"
                     :class="{ 'bg-gray-100 dark:bg-gray-900': selectionIndex === i }"
                     @mouseover="selectionIndex = i"
                     :title="__(item.instructions)"
                 >
-                    <div v-if="item.type === 'group'" @click="selectGroup(item.handle)" class="group flex rounded-md p-2 gap-3">
-                        <ui-icon
-                            :name="item.icon || 'folder'"
-                            :set="iconSet"
-                            class="size-9 rounded-md border border-gray-300 bg-white dark:bg-gray-900/50 dark:border-gray-600 shadow-ui-xs p-2"
-                        />
+                    <div v-if="item.type === 'group'" @click="selectGroup(item.handle)" class="group flex items-center rounded-lg p-2 gap-3">
+                        <ui-icon :name="item.icon || 'folder'" :set="iconSet" class="size-4 text-gray-600 dark:text-gray-300" />
                         <div class="flex-1">
-                            <div class="w-50 line-clamp-2 text-sm font-medium text-gray-900 dark:text-dark-175">
+                            <div class="line-clamp-1 text-sm text-gray-900 dark:text-gray-200">
                                 {{ __(item.display || item.handle) }}
                             </div>
-                            <div v-if="item.instructions" class="w-50 mb-1 line-clamp-2 text-2xs leading-tight text-gray-700 dark:text-dark-175">
+                            <ui-description v-if="item.instructions" class="w-48 truncate text-2xs">
                                 {{ __(item.instructions) }}
-                            </div>
+                            </ui-description>
                         </div>
-                        <ui-icon name="chevron-right" class="me-2" />
+                        <ui-icon name="chevron-right" class="me-1 size-2" />
                     </div>
-                    <div v-if="item.type === 'set'" @click="addSet(item.handle)" class="group flex rounded-md p-2 gap-3">
-                        <ui-icon
-                            :name="item.icon || 'plus'"
-                            :set="iconSet"
-                            class="size-9 rounded-md border border-gray-300 bg-white dark:bg-gray-900/50 dark:border-gray-600 shadow-ui-xs p-2"
-                        />
-                        <div class="flex-1">
-                            <div class="w-52 pb-1 line-clamp-2 text-sm font-medium text-gray-900 dark:text-dark-175">
-                                {{ __(item.display || item.handle) }}
+                    <div v-if="item.type === 'set'" @click="addSet(item.handle)" class="group flex items-center rounded-xl p-2.5 gap-3">
+                        <ui-icon :name="item.icon || 'plus'" :set="iconSet" class="size-4 text-gray-600 dark:text-gray-300" />
+                        <ui-hover-card :delay="0">
+                            <template #trigger>
+                                <div class="flex-1">
+                                    <div class="line-clamp-1 text-sm text-gray-900 dark:text-gray-200">
+                                        {{ __(item.display || item.handle) }}
+                                    </div>
+                                    <ui-description v-if="item.instructions" class="w-56 truncate text-2xs">
+                                        {{ __(item.instructions) }}
+                                    </ui-description>
+                                </div>
+                            </template>
+                            <div class="max-w-96 max-h-[calc(80vh)] screen-fit">
+                                <p v-if="item.instructions" class="text-gray-700 dark:text-gray-300 mb-2">
+                                    {{ __(item.instructions) }}
+                                </p>
+                                <img v-if="item.thumbnail" :src="item.thumbnail" class="rounded-lg" />
                             </div>
-                            <div v-if="item.instructions" class="w-52 truncate text-2xs leading-tight text-gray-700 dark:text-dark-175">
-                                {{ __(item.instructions) }}
-                            </div>
-                            <img v-if="item.thumbnail" :src="item.thumbnail" />
-                        </div>
+                        </ui-hover-card>
                     </div>
                 </div>
                 <div v-if="noSearchResults" class="p-3 text-center text-xs text-gray-600">
