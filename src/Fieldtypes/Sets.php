@@ -192,8 +192,11 @@ class Sets extends Fieldtype
     public static function previewImageConfig(): ?array
     {
         if (! $config = config('statamic.assets.set_preview_images')) {
-
             return null;
+        }
+
+        if (is_string($config)) {
+            $config = ['container' => $config];
         }
 
         $container = $config['container'] ?? null;
