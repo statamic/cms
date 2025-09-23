@@ -158,7 +158,9 @@ class MakeFieldtype extends GeneratorCommand
 
         $this->files->makeDirectory($addonPath.'/resources/dist', 0777, true, true);
 
-        Process::path($addonPath)->tty($this->input->isInteractive())->run('npm install');
+        Process::path(base_path())->run('npm install', function (string $type, string $buffer) {
+            echo $buffer;
+        });
     }
 
     /**
