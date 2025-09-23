@@ -48,10 +48,10 @@
             </div>
             <div
                 v-if="canSelectOrCreate"
-                class="relationship-input-buttons @container relative h-full"
+                class="relationship-input-buttons @container relative"
                 :class="{ 'mt-3': items.length > 0 }"
             >
-                <div class="flex flex-wrap items-center gap-2 h-full">
+                <div class="flex flex-wrap items-center gap-2">
                     <CreateButton
                         v-if="canCreate && creatables.length"
                         :creatables="creatables"
@@ -62,15 +62,13 @@
                         :site="site"
                         :stack-size="formStackSize"
                         @created="itemCreated"
-                        class="h-full"
                     />
                     <Button
                         ref="existing"
                         icon="link"
-                        size="sm"
+                        :size="buttonSize"
                         :text="linkLabel"
                         @click.prevent="isSelecting = true"
-                        class="h-full"
                     />
                 </div>
             </div>
@@ -133,6 +131,7 @@ export default {
         search: { type: Boolean },
         selectionsUrl: { type: String },
         site: { type: String },
+        buttonSize: { type: String, default: 'sm' },
         statusIcons: { type: Boolean },
         taggable: { type: Boolean },
         tree: { type: Object },
