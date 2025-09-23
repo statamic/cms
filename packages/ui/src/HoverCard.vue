@@ -42,7 +42,7 @@ const HoverCardContentClasses = cva({
         <HoverCardTrigger data-ui-hover-card-trigger as-child>
             <slot name="trigger" />
         </HoverCardTrigger>
-        <HoverCardPortal>
+        <HoverCardPortal v-if="$slots.default">
             <HoverCardContent
                 data-ui-hover-card-content
                 :class="[HoverCardContentClasses, $attrs.class]"
