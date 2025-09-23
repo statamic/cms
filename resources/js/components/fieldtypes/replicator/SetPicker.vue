@@ -75,11 +75,11 @@
                                     </ui-description>
                                 </div>
                             </template>
-                            <div class="max-w-96 max-h-[calc(80vh)] screen-fit">
+                            <div class="max-w-96 max-h-[calc(80vh)] screen-fit" v-if="item.thumbnail">
                                 <p v-if="item.instructions" class="text-gray-700 dark:text-gray-300 mb-2">
                                     {{ __(item.instructions) }}
                                 </p>
-                                <img v-if="item.thumbnail" :src="item.thumbnail" class="rounded-lg" />
+                                <img :src="item.thumbnail" class="rounded-lg" />
                             </div>
                         </ui-hover-card>
                     </div>
