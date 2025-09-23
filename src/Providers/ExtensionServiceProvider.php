@@ -168,6 +168,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Cache::class,
         Tags\Can::class,
         Tags\Children::class,
+        Tags\ComponentProxy::class,
         Tags\Collection\Collection::class,
         Tags\Cookie::class,
         Tags\Dd::class,
