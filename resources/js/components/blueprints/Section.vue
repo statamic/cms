@@ -90,7 +90,7 @@
                             />
                         </publish-field-meta>
                     </ui-field>
-                    <ui-field :label="__('Thumbnail')" v-if="showHandleField">
+                    <ui-field :label="__('Thumbnail')" v-if="showHandleField && thumbnailContainer">
                         <publish-field-meta
                             :config="{
                                 handle: 'thumbnail',
