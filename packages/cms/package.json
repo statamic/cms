@@ -5,6 +5,9 @@
     "scripts": {
         "types": "rm -rf types && vue-tsc --declaration --emitDeclarationOnly || true"
     },
+    "dependencies": {
+        "@vitejs/plugin-vue": "^6.0.0"
+    },
     "exports": {
         ".": {
             "types": "./types/resources/js/bootstrap/cms/index.d.ts",

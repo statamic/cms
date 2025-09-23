@@ -47,7 +47,7 @@
                     />
                 </ui-field>
 
-                <ui-button type="submit" variant="primary" :text="$title" />
+                <ui-button type="submit" variant="primary" text="{{ $title }}" />
             </form>
         </ui-auth-card>
     </div>
