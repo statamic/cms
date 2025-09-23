@@ -398,12 +398,13 @@
             @apply ms-4 ps-4 my-0;
         }
 
-        :is(ol, ul) ul {
-            list-style-type: circle;
-        }
-
-        :is(ol, ul) ol {
-            list-style-type: decimal;
+        :is(ol, ul) {
+            ul {
+                list-style-type: circle;
+            }
+            ol {
+                list-style-type: decimal;
+            }
         }
 
         blockquote {
