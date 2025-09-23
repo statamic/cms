@@ -4,6 +4,7 @@ namespace Statamic\Fieldtypes;
 
 use Statamic\Exceptions\ReplicatorIconSetNotFoundException;
 use Statamic\Facades\Asset;
+use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Icon;
 use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldTransformer;
@@ -14,7 +15,6 @@ use Statamic\Support\Arr;
 class Sets extends Fieldtype
 {
     protected $selectable = false;
-    private static ?array $thumbnail = null;
 
     /**
      * Converts the "sets" array of a Replicator (or Bard) field into what the
@@ -154,23 +154,13 @@ class Sets extends Fieldtype
         Statamic::provideToScript(['replicatorSetIcons' => $name]);
     }
 
-    public static function useThumbnails(string $container, ?string $folder = null): void
-    {
-        static::$thumbnail = [$container, $folder];
-
-        Statamic::provideToScript(['replicatorSetThumbnails' => [
-            'container' => $container,
-            'folder' => $folder,
-        ]]);
-    }
-
     private function preProcessThumbnail($thumbnail)
     {
         if (! $thumbnail) {
             return null;
         }
 
-        [$container, $folder] = static::$thumbnail;
+        [$container, $folder] = static::thumbnailConfig();
 
         $prefix = sprintf('%s::%s', $container, $folder ? $folder.'/' : '');
 
@@ -183,7 +173,7 @@ class Sets extends Fieldtype
             return null;
         }
 
-        [$container, $folder] = static::$thumbnail;
+        [$container, $folder] = static::thumbnailConfig();
 
         $prefix = sprintf('%s::%s', $container, $folder ? $folder.'/' : '');
 
@@ -197,5 +187,21 @@ class Sets extends Fieldtype
         }
 
         return Asset::find($path)?->thumbnailUrl();
+    }
+
+    public static function thumbnailConfig()
+    {
+        if (! $config = config('statamic.assets.set_thumbnails')) {
+            return [null, null];
+        }
+
+        $container = $config['container'] ?? null;
+        $folder = $config['folder'] ?? null;
+
+        if (! AssetContainer::find($container)) {
+            return [null, null];
+        }
+
+        return [$container, $folder];
     }
 }

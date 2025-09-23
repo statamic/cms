@@ -12,6 +12,7 @@ use Statamic\Facades\Icon;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Statamic\Fieldtypes\Sets;
 use Statamic\Icons\IconSet;
 use Statamic\Statamic;
 use Statamic\Support\Str;
@@ -76,6 +77,7 @@ class JavascriptComposer
             'customSvgIcons' => $this->icons(),
             'commandPaletteCategories' => Category::order(),
             'commandPalettePreloadedItems' => CommandPalette::getPreloadedItems(),
+            'replicatorSetThumbnails' => $this->replicatorSetThumbnails(),
         ];
     }
 
@@ -123,5 +125,12 @@ class JavascriptComposer
         return Icon::sets()->mapWithKeys(fn (IconSet $set) => [
             $set->name() => $set->contents(),
         ]);
+    }
+
+    private function replicatorSetThumbnails()
+    {
+        [$container, $folder] = Sets::thumbnailConfig();
+
+        return $container ? compact('container', 'folder') : null;
     }
 }

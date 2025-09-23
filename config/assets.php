@@ -235,4 +235,20 @@ return [
         'cache_path' => storage_path('statamic/glide/ffmpeg'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Thumbnails for Replicator and Bard Sets
+    |--------------------------------------------------------------------------
+    |
+    | Replicator and Bard sets may have thumbnail images to give users a visual
+    | representation of the content within. Here you may specify the asset
+    | container and folder where these thumbnails are to be stored.
+    |
+    */
+
+    'set_thumbnails' => [
+        'container' => 'assets',
+        'folder' => 'set-thumbnails',
+    ],
+
 ];
