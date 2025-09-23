@@ -196,6 +196,6 @@ class Sets extends Fieldtype
             return null;
         }
 
-        return Asset::find($path)->thumbnailUrl();
+        return Asset::find($path)?->thumbnailUrl();
     }
 }
