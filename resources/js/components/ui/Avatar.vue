@@ -4,7 +4,11 @@ import { twMerge } from 'tailwind-merge';
 import {computed, ref} from "vue";
 
 const props = defineProps({
-    user: Object,
+    user: {
+        type: Object,
+        required: true,
+        default: () => ({})
+    },
     class: {
         type: String,
         default: ''
