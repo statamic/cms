@@ -1,18 +1,25 @@
-<script setup>
+<script setup lang="ts">
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
 import {computed, ref} from "vue";
 
-const props = defineProps({
-    user: {
-        type: Object,
-        required: true,
-        default: () => ({})
-    },
-    class: {
-        type: String,
-        default: ''
-    }
+interface Asset {
+    permalink: string;
+}
+
+interface User {
+    initials?: string;
+    avatar?: string | Asset;
+}
+
+interface Props {
+    user: User;
+    class?: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    user: () => ({}),
+    class: ''
 })
 
 const hasAvatarError = ref(false);
