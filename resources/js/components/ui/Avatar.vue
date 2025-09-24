@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
-import {computed, ref} from "vue";
+import {computed, ref, useAttrs} from "vue";
 
 interface Asset {
     permalink: string;
@@ -14,14 +14,13 @@ interface User {
 
 interface Props {
     user: User;
-    class?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    user: () => ({}),
-    class: ''
+    user: () => ({})
 })
 
+const attrs = useAttrs();
 const hasAvatarError = ref(false);
 
 const hasAvatar = computed(() => {
@@ -47,7 +46,7 @@ const avatarClasses = computed(() => {
         type: hasAvatar.value ? 'avatar' : 'initials'
     })
 
-    return twMerge(classes, props.class);
+    return twMerge(classes, attrs.class);
 })
 </script>
 <template>
