@@ -10,6 +10,7 @@ interface Asset {
 interface User {
     initials?: string;
     avatar?: string | Asset;
+    name?: string;
 }
 
 interface Props {
@@ -27,7 +28,7 @@ const hasAvatar = computed(() => !!props.user.avatar && !hasAvatarError.value);
 const avatarSrc = computed(() => {
     if (!hasAvatar.value) return null;
 
-    return props.user.avatar.permalink || props.user.avatar;
+    return typeof props.user.avatar === 'object' ? props.user.avatar.permalink : props.user.avatar;
 })
 
 const avatarClasses = computed(() => {
@@ -43,7 +44,7 @@ const avatarClasses = computed(() => {
         type: hasAvatar.value ? 'avatar' : 'initials'
     })
 
-    return twMerge(classes, attrs.class);
+    return twMerge(classes, attrs.class as string);
 })
 </script>
 
