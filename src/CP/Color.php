@@ -325,7 +325,7 @@ class Color
     public static function defaults(): array
     {
         return [
-            'primary' => self::Blue[800],
+            'primary' => self::Zinc[800],
             'gray-50' => self::Zinc[50],
             'gray-100' => self::Zinc[100],
             'gray-200' => self::Zinc[200],
