@@ -3,7 +3,6 @@
 <div
     :class="{'absolute inset-0 animate-out fade-out duration-1200 fill-mode-forwards':true}"
     class="
-        firefox-opacity-0
         antialiased bg-transparent border-none cursor-pointer pointer-events-none
         dark:hover:bg-white/15 dark:hover:text-gray-200 dark:text-gray-300
         flex focus-within:focus-outline h-8 hover:bg-gray-400/10
