@@ -1,5 +1,58 @@
 # Release Notes
 
+
+## 6.0.0-alpha.9 (2025-09-24)
+
+### What's new
+- Blade Component Support in Antlers [#12424](https://github.com/statamic/cms/issues/12424) by @JohnathonKoster
+- Avatar component [#12194](https://github.com/statamic/cms/issues/12194) by @martyf
+- Update `make:fieldtype` stubs [#12533](https://github.com/statamic/cms/issues/12533) by @duncanmcclean
+- Update `make:widget` stub [#12521](https://github.com/statamic/cms/issues/12521) by @duncanmcclean
+
+### What's fixed
+
+- Border radius inception [#12571](https://github.com/statamic/cms/issues/12571) by @JayGeorge
+- Fix JS package tests [#12572](https://github.com/statamic/cms/issues/12572) by @jasonvarga
+- Fix "Contained data table" styling [#12556](https://github.com/statamic/cms/issues/12556) by @JayGeorge
+- Smoother page loading, mostly for Firefox [#12568](https://github.com/statamic/cms/issues/12568) by @JayGeorge
+- Fix license rows [#12569](https://github.com/statamic/cms/issues/12569) by @JayGeorge
+- Remove create child entry separator [#12570](https://github.com/statamic/cms/issues/12570) by @JayGeorge
+- Bard toolbar fixes [#12543](https://github.com/statamic/cms/issues/12543) by @JayGeorge
+- Make "Cancel" in ConfirmationModal translatable [#12539](https://github.com/statamic/cms/issues/12539) by @duncanmcclean
+- Fix JS errors caused by single quotes in translations [#12541](https://github.com/statamic/cms/issues/12541) by @duncanmcclean
+- Fix button text on password reset page [#12540](https://github.com/statamic/cms/issues/12540) by @duncanmcclean
+- Make Origin dropdown clearable on Global Set settings [#12542](https://github.com/statamic/cms/issues/12542) by @duncanmcclean
+- Fake breadcrumb keyboard focus [#12545](https://github.com/statamic/cms/issues/12545) by @JayGeorge
+- Fix a few focus states in the global header [#12546](https://github.com/statamic/cms/issues/12546) by @JayGeorge
+- Assets upload icon spacing [#12550](https://github.com/statamic/cms/issues/12550) by @JayGeorge
+- Improve combobox legibility to pass AA [#12544](https://github.com/statamic/cms/issues/12544) by @JayGeorge
+- Fix relationship input size edge cases [#12549](https://github.com/statamic/cms/issues/12549) by @jackmcdade
+- Checkbox item component shouldnt have required value prop [#12534](https://github.com/statamic/cms/issues/12534) by @jasonvarga
+- Match whereJsonContains to how Laravel handles it [#11117](https://github.com/statamic/cms/issues/11117) by @ryanmitchell
+- Hot-reload contents of Live Preview embed [#11982](https://github.com/statamic/cms/issues/11982) by @duncanmcclean
+- Add `@vitejs/plugin-vue` dependency to package [#12531](https://github.com/statamic/cms/issues/12531) by @duncanmcclean
+- Replace tailwind/typography [#12516](https://github.com/statamic/cms/issues/12516) by @JayGeorge
+- Improve Combobox performance [#12499](https://github.com/statamic/cms/issues/12499) by @duncanmcclean
+- Add dependencies to UI package [#12512](https://github.com/statamic/cms/issues/12512) by @duncanmcclean
+- Ensure field names are always left-aligned in blueprint builder [#12501](https://github.com/statamic/cms/issues/12501) by @duncanmcclean
+- Fix publish form actions showing at bottom when sidebar is visible [#12509](https://github.com/statamic/cms/issues/12509) by @duncanmcclean
+- Fix global site selector [#12497](https://github.com/statamic/cms/issues/12497) by @duncanmcclean
+- Improve List fieldtype in dark mode [#12495](https://github.com/statamic/cms/issues/12495) by @duncanmcclean
+- Fix translations in relationship selector [#12498](https://github.com/statamic/cms/issues/12498) by @duncanmcclean
+- Add `clearable` option to Dictionary fieldtype [#12506](https://github.com/statamic/cms/issues/12506) by @duncanmcclean
+- Make template & layout dropdowns clearable [#12505](https://github.com/statamic/cms/issues/12505) by @duncanmcclean
+- Ensure publish form actions are visible on smaller screens [#12500](https://github.com/statamic/cms/issues/12500) by @duncanmcclean
+- Improve term template instructions [#12507](https://github.com/statamic/cms/issues/12507) by @duncanmcclean
+- Correct select icon and spacing [#12486](https://github.com/statamic/cms/issues/12486) by @martyf
+- Fix typo in navigation blueprint breadcrumb [#12494](https://github.com/statamic/cms/issues/12494) by @duncanmcclean
+- Correct Grid fieldtype deleting row condition [#12488](https://github.com/statamic/cms/issues/12488) by @martyf
+- Replace page tree ui/tooltips with regular directive tooltips. [9859261fc](https://github.com/statamic/cms/commit/9859261fc) by @jackmcdade
+- Section toggle is now a button for a11y. [4b1fb74b3](https://github.com/statamic/cms/commit/4b1fb74b3) by @jackmcdade
+- German translations [#12529](https://github.com/statamic/cms/issues/12529) by @helloDanuk
+- French translations [#12493](https://github.com/statamic/cms/issues/12493) by @ebeauchamps
+
+
+
 ## 6.0.0-alpha.8 (2025-09-17)
 
 ### What's new
