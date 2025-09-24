@@ -14,7 +14,7 @@ class Cache extends Tags implements CachesOutput
     public function index()
     {
         if (! $this->isEnabled()) {
-            return [];
+            return $this->parse([]);
         }
 
         $store = LaraCache::store($this->params->get('store'));
