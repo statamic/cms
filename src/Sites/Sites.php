@@ -268,7 +268,9 @@ class Sites
 
     protected function hydrateConfig($config): Collection
     {
-        return collect($config)->map(fn ($site, $handle) => new Site($handle, $site));
+        $defaultSiteHandle = array_key_first($config);
+
+        return collect($config)->map(fn ($site, $handle) => new Site($handle, $site, $handle === $defaultSiteHandle));
     }
 
     protected function getNewSites(): Collection
