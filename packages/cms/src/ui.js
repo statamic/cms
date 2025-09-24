@@ -1,5 +1,6 @@
 export const {
     AuthCard,
+    Avatar,
     Badge,
     Button,
     ButtonGroup,
