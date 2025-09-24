@@ -55,6 +55,9 @@ it('exports bard', async () => {
 });
 
 it('exports ui', async () => {
+    // The multiple sets of exports is admittedly messy, so this test ensures that if you add
+    // a component to one place that you don't forget to add it to the other places.
+
     const expectedUiPackageExports = [
         'AuthCard',
         'Badge',
@@ -178,16 +181,18 @@ it('exports ui', async () => {
     // Defined in packages/ui/index.js.
     expect(Object.keys(uiComponentLibrary).toSorted()).toEqual(expectedUiPackageExports);
 
-    // Internally, we use `import { Something } from @ui`. This is a merge of the UI component
-    // library and additional CP-specific components. Defined in resources/js/components/ui/index.js.
+    // Internally, we use `import { Something } from @ui`.
+    // This is a merge of the UI component library and additional CP-specific components.
+    // Defined in resources/js/components/ui/index.js.
     expect(Object.keys(internalUiComponents).toSorted()).toEqual(expectedCmsPackageExports);
 
     // The @statamic/cms package has a UI module that exposes the same set of components.
     // It will expect it to be exposed to window.__STATAMIC__.ui.
+    // Defined in resources/js/bootstrap/cms/ui.js
     expect(Object.keys(modules.ui).toSorted()).toEqual(expectedCmsPackageExports);
 
     // Finally, check that @statamic/cms/ui will have the same exports.
     // It's not the actual items, but the keys should match.
+    // Defined in packages/cms/src/ui.js
     expect(Object.keys(await import('@statamic/cms/ui.js')).toSorted()).toEqual(expectedCmsPackageExports);
-
 });
