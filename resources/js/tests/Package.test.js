@@ -82,6 +82,8 @@ it('exports ui', async () => {
         'DragHandle',
         'Drawer',
         'Dropdown',
+        'DropdownFooter',
+        'DropdownHeader',
         'DropdownItem',
         'DropdownLabel',
         'DropdownMenu',
@@ -95,6 +97,9 @@ it('exports ui', async () => {
         'Heading',
         'Icon',
         'Input',
+        'InputGroup',
+        'InputGroupAppend',
+        'InputGroupPrepend',
         'Label',
         'Modal',
         'ModalClose',
@@ -130,10 +135,13 @@ it('exports ui', async () => {
         'ToggleGroup',
         'ToggleItem',
         'Tooltip',
+        'registerIconSet',
+        'registerIconSetFromStrings',
     ].toSorted();
 
     const expectedCmsPackageExports = [
         ...expectedUiPackageExports,
+        'CommandPaletteItem',
         'CreateForm',
         'Listing',
         'ListingCustomizeColumns',
