@@ -219,7 +219,7 @@ watch(
     <portal name="code-fullscreen" :disabled="!fullScreenMode" target-class="code-fieldtype">
         <div
             :class="[
-                '@container/markdown border border-transparent with-contrast:border-gray-500 block w-full overflow-hidden rounded-lg bg-white dark:bg-gray-900',
+                '@container/markdown with-contrast:border with-contrast:border-gray-500 block w-full overflow-hidden rounded-lg bg-white dark:bg-gray-900',
                 'text-gray-900 dark:text-gray-300',
                 'shadow-ui-sm appearance-none antialiased disabled:shadow-none',
                 themeClass,
@@ -244,7 +244,7 @@ watch(
                 <div v-else-if="showModeLabel" v-text="modeLabel" class="font-mono text-xs text-gray-700"></div>
             </publish-field-fullscreen-header>
             <div
-                class="flex items-center justify-between rounded-t-lg bg-gray-50 px-2 py-1 dark:bg-gray-950 border border-b-0 border-gray-300 dark:border-none"
+                class="flex items-center justify-between rounded-t-[calc(var(--radius-lg)-1px)] bg-gray-50 px-2 py-1 dark:bg-gray-950 border border-b-0 border-gray-300 dark:border-none"
                 :class="{ 'border-dashed': readOnly }"
                 v-if="showToolbar"
             >
