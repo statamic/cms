@@ -13,9 +13,7 @@
 
     <ui-dropdown-header>
         <div class="flex items-center gap-2">
-            <div>
-                <ui-avatar :user='{{ $userJson }}' class="size-8" />
-            </div>
+            <ui-avatar :user='{{ $userJson }}' class="size-8" />
             <div>
                 <div class="text-sm" v-pre>{{ $user->email() }}</div>
                 @if ($user->isSuper())
