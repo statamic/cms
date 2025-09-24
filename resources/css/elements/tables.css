@@ -19,7 +19,7 @@
             @apply px-4 py-2;
 
             .data-table--contained & {
-                @apply py-2.5 border-b dark:border-gray-700;
+                @apply py-2.5 border-b border-gray-200 dark:border-gray-700;
             }
         }
 
@@ -95,12 +95,6 @@
                 @apply bg-white dark:bg-gray-900;
                 @apply pl-4.5 pr-2.5 py-3 border-t border-gray-200 dark:border-white/10;
                 @apply text-gray-900 dark:text-gray-200;
-                &:first-child {
-                    @apply border-s border-s-gray-200 dark:border-s-gray-800;
-                }
-                &:last-child {
-                    @apply border-e border-e-gray-200 dark:border-e-gray-800;
-                }
             }
 
             /* When the row is hovered, change the background of all its cells to a hover state color */
