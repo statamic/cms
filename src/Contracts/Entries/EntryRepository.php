@@ -2,6 +2,8 @@
 
 namespace Statamic\Contracts\Entries;
 
+use Closure;
+
 interface EntryRepository
 {
     public function all();
@@ -15,6 +17,16 @@ interface EntryRepository
     public function findOrFail($id);
 
     public function findByUri(string $uri);
+
+    public function findOrNew($id);
+
+    public function findOr($id, Closure $callback);
+
+    public function firstOrNew(array $attributes, array $values = []);
+
+    public function firstOrCreate(array $attributes, array $values = []);
+
+    public function updateOrCreate(array $attributes, array $values = []);
 
     public function make();
 
