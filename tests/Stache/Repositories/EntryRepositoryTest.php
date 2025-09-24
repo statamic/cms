@@ -3,7 +3,6 @@
 namespace Tests\Stache\Repositories;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Entries\EntryCollection;
@@ -191,7 +190,7 @@ class EntryRepositoryTest extends TestCase
         $this->assertEquals('Directors', $entry->title());
     }
 
-    #[Test, Group('EntryRepository#findByIds')]
+    #[Test]
     #[DataProvider('entriesByIdsProvider')]
     public function it_gets_entries_by_ids($ids, $expected)
     {
