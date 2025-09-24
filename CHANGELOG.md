@@ -1,5 +1,18 @@
 # Release Notes
 
+## 5.65.2 (2025-09-24)
+
+### What's fixed
+- Prevent duplicate queries on collection structure [#12276](https://github.com/statamic/cms/issues/12276) by @ryanmitchell
+- Prevent caching during live preview [#12558](https://github.com/statamic/cms/issues/12558) by @helloiamlukas
+- Prevent empty cache tag when using Blade [#12567](https://github.com/statamic/cms/issues/12567) by @helloiamlukas
+- Fix incorrect blueprint being resolved on localizations [#11810](https://github.com/statamic/cms/issues/11810) by @duncanmcclean
+- Make asset GraphQL type always nullable [#11975](https://github.com/statamic/cms/issues/11975) by @lostgeek
+- Resolving PHP Warning and PHP Notice errors [#12257](https://github.com/statamic/cms/issues/12257) by @martinoak
+- Fix form submission search query [#12514](https://github.com/statamic/cms/issues/12514) by @duncanmcclean
+
+
+
 ## 5.65.1 (2025-09-12)
 
 ### What's fixed
