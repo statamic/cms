@@ -1,5 +1,5 @@
 <template>
-    <Card inset>
+    <Card inset variant="flat">
         <ListingTable contained>
             <template #tbody-start>
                 <tr

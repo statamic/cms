@@ -64,9 +64,6 @@
 
     tbody {
         @apply text-sm shadow-sm-b rounded-xl outline-none;
-        .data-table--contained & {
-            @apply shadow-none rounded-none;
-        }
 
         tr {
             &:last-child {
