@@ -10,26 +10,33 @@ class SelectedSite
 {
     public function handle($request, Closure $next)
     {
-        $this->updateSelectedSite($request);
+        $this->selectFromRequest($request);
+
+        $this->selectFromAuth();
 
         return $next($request);
     }
 
-    private function updateSelectedSite($request)
+    private function selectFromAuth()
     {
-        $siteByUrl = Site::findByUrl($request->getSchemeAndHttpHost());
-
-        /* Ensure that we only make this automatic selection when first logging in */
-        if (! session('statamic.cp.selected-site') && $siteByUrl) {
-            Site::setSelected($siteByUrl->handle());
-        }
-
         if (User::current()->can('view', Site::selected())) {
             return;
         }
 
         if ($first = Site::authorized()->first()) {
             Site::setSelected($first->handle());
+        }
+    }
+
+    private function selectFromRequest($request)
+    {
+        // If the session already has a selected site, don't override it.
+        if (session('statamic.cp.selected-site')) {
+            return;
+        }
+
+        if ($siteByUrl = Site::findByUrl($request->getSchemeAndHttpHost())) {
+            Site::setSelected($siteByUrl->handle());
         }
     }
 }
