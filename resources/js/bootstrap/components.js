@@ -17,7 +17,6 @@ import FileIcon from '../components/FileIcon.vue';
 
 import Slugify from '../components/slugs/Slugify.vue';
 import ElementContainer from '../components/ElementContainer.vue';
-import Avatar from '../components/Avatar.vue';
 import CreateEntryButton from '../components/entries/CreateEntryButton.vue';
 import Portal from '../components/portals/Portal.vue';
 import ConfirmationModal from '../components/modals/ConfirmationModal.vue';
@@ -62,7 +61,6 @@ export default function registerGlobalComponents(app) {
 
     app.component('slugify', Slugify);
     app.component('element-container', ElementContainer);
-    app.component('avatar', Avatar);
     app.component('create-entry-button', CreateEntryButton);
     app.component('portal', Portal);
     app.component('date-time', DateTime);

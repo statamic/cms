@@ -1,18 +1,18 @@
 <div v-if="false" class="inline-flex items-center justify-center h-10 w-10">
-    <avatar :user='@json($user)' />
+    <ui-avatar :user='@json($user)' />
 </div>
 
 <ui-dropdown align="end" v-cloak>
     <template #trigger>
         <ui-button :icon-only="true" variant="ghost">
-            <avatar :user='@json($user)' />
+            <ui-avatar :user='@json($user)' />
         </ui-button>
     </template>
 
     <ui-dropdown-header>
         <div class="flex items-center gap-2">
             <div>
-                <avatar :user='@json($user)' class="size-8" />
+                <ui-avatar :user='@json($user)' class="size-8" />
             </div>
             <div>
                 <div class="text-sm" v-pre>{{ $user->email() }}</div>
