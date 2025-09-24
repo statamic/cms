@@ -41,7 +41,7 @@
         </element-container>
 
         <confirmation-modal
-            v-if="deletingRow"
+            v-if="deletingRow !== null"
             :title="__('Delete Row')"
             :body-text="__('Are you sure?')"
             :button-text="__('Delete')"
@@ -140,7 +140,7 @@ export default {
             return [
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => (vm.fullScreenMode ? 'ui/shrink-all' : 'ui/expand-all'),
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'collapse-all' : 'expand-all'),
                     quick: true,
                     visibleWhenReadOnly: true,
                     run: this.toggleFullScreen,

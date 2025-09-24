@@ -1,5 +1,5 @@
 <template>
-    <div class="relationship-input @container w-full h-full" :class="{ 'relationship-input-empty': items.length == 0 }">
+    <div class="relationship-input @container w-full" :class="{ 'relationship-input-empty': items.length == 0 }">
         <RelationshipSelectField
             v-if="!initializing && usesSelectField"
             :config="config"
@@ -49,7 +49,7 @@
             <div
                 v-if="canSelectOrCreate"
                 class="relationship-input-buttons @container relative"
-                :class="{ 'mt-4': items.length > 0 }"
+                :class="{ 'mt-3': items.length > 0 }"
             >
                 <div class="flex flex-wrap items-center gap-2">
                     <CreateButton
@@ -66,7 +66,7 @@
                     <Button
                         ref="existing"
                         icon="link"
-                        variant="filled"
+                        :size="buttonSize"
                         :text="linkLabel"
                         @click.prevent="isSelecting = true"
                     />
@@ -108,48 +108,34 @@ import { Button, Icon } from '@/components/ui';
 
 export default {
     props: {
-        name: String,
+        canCreate: { type: Boolean },
+        canEdit: { type: Boolean },
+        canReorder: { type: Boolean },
+        columns: { type: Array, default: () => [] },
+        config: { type: Object },
+        creatables: { type: Array },
+        data: { type: Array },
+        exclusions: { type: Array },
+        filtersUrl: { type: String },
+        formComponent: { type: String },
+        formComponentProps: { type: Object },
+        formStackSize: { type: String },
+        initialSortColumn: { type: String, default: 'title' },
+        initialSortDirection: { type: String, default: 'asc' },
+        itemComponent: { type: String, default: 'RelatedItem' },
+        itemDataUrl: { type: String },
+        maxItems: { type: Number },
+        mode: { type: String, default: 'default' },
+        name: { type: String },
+        readOnly: { type: Boolean },
+        search: { type: Boolean },
+        selectionsUrl: { type: String },
+        site: { type: String },
+        buttonSize: { type: String, default: 'sm' },
+        statusIcons: { type: Boolean },
+        taggable: { type: Boolean },
+        tree: { type: Object },
         value: { required: true },
-        config: Object,
-        data: Array,
-        maxItems: Number,
-        itemComponent: {
-            type: String,
-            default: 'RelatedItem',
-        },
-        itemDataUrl: String,
-        filtersUrl: String,
-        selectionsUrl: String,
-        statusIcons: Boolean,
-        site: String,
-        search: Boolean,
-        canEdit: Boolean,
-        canCreate: Boolean,
-        canReorder: Boolean,
-        readOnly: Boolean,
-        exclusions: Array,
-        creatables: Array,
-        formComponent: String,
-        formComponentProps: Object,
-        formStackSize: String,
-        mode: {
-            type: String,
-            default: 'default',
-        },
-        taggable: Boolean,
-        columns: {
-            type: Array,
-            default: () => [],
-        },
-        tree: Object,
-        initialSortColumn: {
-            type: String,
-            default: 'title',
-        },
-        initialSortDirection: {
-            type: String,
-            default: 'asc',
-        },
     },
 
     emits: ['input', 'focus', 'blur', 'item-data-updated', 'loading'],

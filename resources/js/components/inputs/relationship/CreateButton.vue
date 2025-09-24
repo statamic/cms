@@ -4,7 +4,7 @@
             v-if="creatables.length === 1"
             :icon="icon"
             :text="text"
-            variant="filled"
+            size="sm"
             @click="create"
         />
         <ui-dropdown v-else>
@@ -12,7 +12,7 @@
                 <ui-button
                     :icon="icon"
                     :text="text"
-                    variant="filled"
+                    size="sm"
                 />
             </template>
             <ui-dropdown-menu>

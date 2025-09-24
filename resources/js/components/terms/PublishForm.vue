@@ -12,6 +12,7 @@
             </template>
 
             <ItemActions
+                ref="actions"
                 v-if="!isCreating && hasItemActions"
                 :item="values.id"
                 :url="itemActionUrl"
@@ -23,7 +24,7 @@
             >
                 <Dropdown class="ltr:mr-4 rtl:ml-4" v-if="canEditBlueprint || hasItemActions">
                     <template #trigger>
-                        <Button icon="ui/dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
+                        <Button icon="dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
                     </template>
                     <DropdownMenu>
                         <DropdownItem
@@ -143,15 +144,15 @@ import {
     DropdownMenu,
     DropdownItem,
     DropdownSeparator,
-} from '@/components/ui';
-import PublishContainer from '@/components/ui/Publish/Container.vue';
-import PublishTabs from '@/components/ui/Publish/Tabs.vue';
-import PublishComponents from '@/components/ui/Publish/Components.vue';
-import LivePreview from '@/components/ui/LivePreview/LivePreview.vue';
+    PublishContainer,
+    PublishTabs,
+    PublishComponents,
+    PublishLocalizations as LocalizationsCard,
+    LivePreview,
+} from '@ui';
 import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
 import { ref, computed } from 'vue';
-import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@/components/ui/Publish/SavePipeline.js';
-import LocalizationsCard from '@/components/ui/Publish/Localizations.vue';
+import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';
 import ItemActions from '@/components/actions/ItemActions.vue';
 
 let saving = ref(false);
@@ -451,6 +452,31 @@ export default {
                 this.values = resetValuesFromResponse(response.data.values, this.$refs.container);
             }
         },
+
+        addToCommandPalette() {
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: this.saveText,
+                icon: 'save',
+                action: () => this.save(),
+                prioritize: true,
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Edit Blueprint'),
+                icon: 'blueprint-edit',
+                when: () => this.canEditBlueprint,
+                url: this.actions.editBlueprint,
+            });
+
+            this.$refs.actions?.preparedActions.forEach(action => Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: action.title,
+                icon: action.icon,
+                action: action.run,
+            }));
+        },
     },
 
     mounted() {
@@ -464,6 +490,8 @@ export default {
             this.quickSave = true;
             this.save();
         });
+
+        this.addToCommandPalette();
     },
 
     created() {

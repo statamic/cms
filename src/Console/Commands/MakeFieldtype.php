@@ -3,9 +3,12 @@
 namespace Statamic\Console\Commands;
 
 use Archetype\Facades\PHPFile;
+use Illuminate\Support\Facades\Process;
 use Statamic\Console\RunsInPlease;
 use Statamic\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
+
+use function Laravel\Prompts\confirm;
 
 class MakeFieldtype extends GeneratorCommand
 {
@@ -75,6 +78,15 @@ class MakeFieldtype extends GeneratorCommand
         if ($addon = $this->argument('addon')) {
             $this->wireUpAddonJs($addon);
         } else {
+            if (! $this->appJsIsWiredUp()) {
+                if (confirm(
+                    label: "It doesn't look like Vite is setup for the Control Panel. Would you like to run `php please setup-cp-vite`?",
+                    hint: 'You can always run this command later.'
+                )) {
+                    $this->call('statamic:setup-cp-vite', ['--only-necessary' => true]);
+                }
+            }
+
             $this->components->info("Fieldtype Vue component [{$relativePath}] created successfully.");
 
             $this->components->bulletList([
@@ -89,6 +101,11 @@ class MakeFieldtype extends GeneratorCommand
     protected function fieldtypeAlreadyExists()
     {
         return $this->files->exists($this->getAddonPath($this->argument('addon')).'/resources/js/addon.js');
+    }
+
+    protected function appJsIsWiredUp()
+    {
+        return $this->files->exists(base_path('resources/js/cp.js'));
     }
 
     /**
@@ -140,6 +157,10 @@ class MakeFieldtype extends GeneratorCommand
         }
 
         $this->files->makeDirectory($addonPath.'/resources/dist', 0777, true, true);
+
+        Process::path(base_path())->run('npm install', function (string $type, string $buffer) {
+            echo $buffer;
+        });
     }
 
     /**

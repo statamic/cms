@@ -18,15 +18,15 @@
             <site-selector
                 v-if="sites.length > 1"
                 :sites="sites"
-                :value="site"
-                @input="siteSelected"
+                :model-value="site"
+                @update:modelValue="siteSelected"
             />
 
             <Dropdown v-if="canEdit && hasCollections" placement="left-start" :disabled="!hasCollections">
                 <template #trigger>
                     <Button
                         :text="__('Add')"
-                        icon-append="ui/chevron-down"
+                        icon-append="chevron-down"
                     />
                 </template>
                 <DropdownMenu>
@@ -36,7 +36,7 @@
                         icon="add-list"
                     />
                     <DropdownItem
-                        :text="__('Link to Entry')"
+                        :text="__('Add Link to Entry')"
                         @click="linkEntries()"
                         icon="add-link"
                     />
@@ -89,7 +89,7 @@
                         icon="fieldtype-link"
                         :heading="__('Link to URL')"
                         :description="__('messages.navigation_link_to_url_instructions')"
-                        @click="linkPage"
+                        @click="linkPage()"
                     />
 
                     <EmptyStateItem
@@ -110,15 +110,9 @@
             </template>
 
             <template #branch-icon="{ branch }">
-                <ui-tooltip v-if="isEntryBranch(branch)" :text="__('Entry link')">
-                    <ui-icon class="size-3.5! text-gray-500" name="link" tabindex="-1" />
-                </ui-tooltip>
-                <ui-tooltip v-if="isLinkBranch(branch)" :text="__('External link')">
-                    <ui-icon class="size-3.5! text-gray-500" name="external-link" tabindex="-1" />
-                </ui-tooltip>
-                <ui-tooltip v-if="isTextBranch(branch)" :text="__('Text')">
-                    <ui-icon class="size-3.5! text-gray-500" name="page" tabindex="-1" />
-                </ui-tooltip>
+                <ui-icon v-if="isEntryBranch(branch)" v-tooltip="__('Entry link')" class="size-3.5! text-gray-500" name="link" tabindex="-1" />
+                <ui-icon v-if="isLinkBranch(branch)" v-tooltip="__('External link')" class="size-3.5! text-gray-500" name="external-link" tabindex="-1" />
+                <ui-icon v-if="isTextBranch(branch)" v-tooltip="__('Text')" class="size-3.5! text-gray-500" name="page" tabindex="-1" />
             </template>
 
             <template v-if="canEdit" #branch-options="{ branch, removeBranch, stat, depth }">
@@ -129,7 +123,7 @@
                     icon="edit"
                 />
                 <DropdownItem
-                    :text="__('Edit Nav item')"
+                    :text="__('Edit Nav Item')"
                     @click="editPage(branch)"
                     icon="edit"
                 />
@@ -323,6 +317,8 @@ export default {
 
     mounted() {
         this.mounted = true;
+
+        this.addToCommandPalette();
     },
 
     methods: {
@@ -441,7 +437,7 @@ export default {
         },
 
         siteSelected(site) {
-            window.location = site.url;
+            window.location = this.sites.find((s) => s.handle === site).url;
         },
 
         updatePublishInfo(info) {
@@ -483,6 +479,57 @@ export default {
                 branch.id = newId;
                 this.$refs.tree.pageUpdated();
             }
+        },
+
+        addToCommandPalette() {
+            Statamic.$commandPalette.add({
+                when: () => this.canEdit,
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Save Changes'),
+                icon: 'save',
+                action: () => this.$refs.tree?.save(),
+                prioritize: true,
+            });
+
+            Statamic.$commandPalette.add({
+                when: () => this.canEdit && this.hasCollections,
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Add Nav Item'),
+                icon: 'add-list',
+                action: () => this.linkPage(),
+            });
+
+            Statamic.$commandPalette.add({
+                when: () => this.canEdit && this.hasCollections,
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Add Link to Entry'),
+                icon: 'add-link',
+                action: () => this.linkEntries(),
+            });
+
+            Statamic.$commandPalette.add({
+                when: () => this.canEdit && !this.hasCollections,
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Add Nav Item'),
+                icon: 'add-link',
+                action: () => this.addLink(),
+            });
+
+            Statamic.$commandPalette.add({
+                when: () => this.canEdit,
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Configure Navigation'),
+                icon: 'cog',
+                url: this.editUrl,
+            });
+
+            Statamic.$commandPalette.add({
+                when: () => this.canEditBlueprint,
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Edit Blueprints'),
+                icon: 'blueprint-edit',
+                url: this.blueprintUrl,
+            });
         },
     },
 };

@@ -25,11 +25,11 @@ const avatarSrc = computed(() => {
 
 const avatarClasses = computed(() => {
     const classes = cva({
-        base: 'size-7 rounded-full [button:has(&)]:rounded-full',
+        base: 'size-7 rounded-xl [button:has(&)]:rounded-xl shape-squircle',
         variants: {
             type: {
                 avatar: '',
-                initials: 'text-white text-2xs font-medium flex flex-shrink-0 items-center justify-center bg-gradient-to-tr from-purple-500 to-red-600'
+                initials: 'antialiased text-white text-2xs font-medium flex flex-shrink-0 items-center justify-center bg-gradient-to-tr from-purple-500 to-red-600'
             }
         }
     })({

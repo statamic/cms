@@ -6,7 +6,12 @@ export const [injectListingContext, provideListingContext] = createContext('List
 
 <script setup>
 import { ref, toRef, computed, watch, nextTick, onMounted, onBeforeUnmount, useSlots } from 'vue';
-import { Icon, Panel, PanelFooter } from '@/components/ui';
+import useSkeletonDelay from '@/composables/skeleton-delay.js';
+import {
+    Icon,
+    Panel,
+    PanelFooter,
+} from '@ui';
 import axios from 'axios';
 import BulkActions from './BulkActions.vue';
 import uniqid from 'uniqid';
@@ -156,6 +161,7 @@ const hasActions = computed(() => !!props.actionUrl);
 const hasFilters = computed(() => props.filters && props.filters.length > 0);
 const showPresets = computed(() => props.allowPresets && props.preferencesPrefix);
 const showBulkActions = computed(() => props.allowBulkActions && hasActions.value);
+const shouldShowSkeleton = useSkeletonDelay(initializing);
 
 const items = computed({
     get() {
@@ -192,6 +198,17 @@ const items = computed({
 watch(
     () => props.items,
     (items) => rawItems.value = items,
+);
+
+watch(
+    () => props.selections,
+    () => {
+        if (JSON.stringify(props.selections) === JSON.stringify(selections.value)) {
+            return;
+        }
+
+        selections.value = props.selections || [];
+    }
 );
 
 const rawParameters = computed(() => ({
@@ -653,21 +670,21 @@ autoApplyState();
 </script>
 
 <template>
-    <slot name="initializing" v-if="initializing">
-        <div class="flex flex-col gap-4 justify-between mt-2">
-            <ui-skeleton class="h-3 w-48" />
+    <slot name="initializing" v-if="shouldShowSkeleton">
+        <div class="flex flex-col gap-4 justify-between mt-3 starting-style-transition starting-style-transition--slow">
+            <ui-skeleton class="h-5 w-48" />
             <div class="flex gap-3">
-                <ui-skeleton class="h-8 w-80" />
-                <ui-skeleton class="h-8 w-24" />
+                <ui-skeleton class="h-9 w-96" />
+                <ui-skeleton class="h-9 w-24" />
                 <div class="flex-1" />
-                <ui-skeleton class="size-8" />
+                <ui-skeleton class="size-10" />
             </div>
             <ui-skeleton class="h-48 w-full" />
         </div>
     </slot>
     <slot v-if="!initializing" :items="items" :is-column-visible="isColumnVisible" :loading="loading">
         <Presets v-if="showPresets" />
-        <div v-if="allowSearch || hasFilters || allowCustomizingColumns" class="relative flex items-center gap-3 min-h-16">
+        <div v-if="allowSearch || hasFilters || allowCustomizingColumns" class="relative flex items-center gap-3 min-h-16 starting-style-transition starting-style-transition--siblings">
             <div class="flex flex-1 items-center gap-3 w-full">
                 <Search v-if="allowSearch" />
                 <Filters v-if="hasFilters" />
@@ -677,7 +694,7 @@ autoApplyState();
 
         <div
             v-if="!items.length"
-            class="rounded-lg border border-dashed border-gray-300 p-6 text-center text-gray-500"
+            class="rounded-lg border border-dashed border-gray-300 dark:border-gray-700 p-6 text-center text-gray-500"
             v-text="__('No results')"
         />
 

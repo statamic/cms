@@ -1,10 +1,10 @@
 <template>
     <div>
-        <div v-if="!loading && pages.length == 0" class="no-results flex w-full items-center">
+        <div v-if="!loading && treeData.length == 0" class="no-results flex w-full items-center">
             <slot name="empty" />
         </div>
 
-        <ui-panel v-show="pages.length">
+        <ui-panel v-show="treeData.length">
             <div class="loading card" v-if="loading">
                 <Icon name="loading" />
             </div>
@@ -27,6 +27,7 @@
                     :indent="24"
                     :dir="direction"
                     :node-key="(stat) => stat.data.id"
+                    :dragOverThrottleInterval="30"
                     :each-droppable="eachDroppable"
                     :root-droppable="rootDroppable"
                     :max-level="maxDepth"
@@ -91,6 +92,7 @@
 import { dragContext, Draggable, walkTreeData } from '@he-tree/vue';
 import TreeBranch from './Branch.vue';
 import { PanelHeader, Panel, Icon } from '@/components/ui';
+import { clone } from '@/bootstrap/globals.js';
 
 export default {
     components: {
@@ -160,7 +162,7 @@ export default {
         this.collapsedState = this.getCollapsedState();
 
         this.getPages().then(() => {
-            this.initialPages = this.pages;
+            this.initialPages = clone(this.pages);
         });
 
         this.$keys.bindGlobal(['mod+s'], (e) => {
@@ -319,10 +321,16 @@ export default {
 
         expandAll() {
             this.$refs.tree.openAll();
+            this.collapsedState = [];
         },
 
         collapseAll() {
             this.$refs.tree.closeAll();
+            // Get all node IDs to mark them as collapsed
+            this.collapsedState = [];
+            walkTreeData(this.treeData, (node) => {
+                this.collapsedState.push(node.id);
+            });
         },
 
         getNodeByBranchId(id) {

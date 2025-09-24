@@ -7,6 +7,7 @@
             </template>
 
             <ItemActions
+                ref="actions"
                 v-if="!isCreating && hasItemActions"
                 :item="values.id"
                 :url="itemActionUrl"
@@ -18,7 +19,7 @@
             >
                 <Dropdown v-if="canEditBlueprint || hasItemActions">
                     <template #trigger>
-                        <Button icon="ui/dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
+                        <Button icon="dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
                     </template>
                     <DropdownMenu>
                         <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :href="actions.editBlueprint" />
@@ -137,7 +138,6 @@
                                         icon="history"
                                         :text="__('View History')"
                                         size="xs"
-                                        class="-me-4"
                                     />
                                 </PanelHeader>
                                 <Card class="space-y-2">
@@ -229,11 +229,9 @@
             @confirm="createLocalization(localizing)"
         >
             <div class="publish-fields">
-                <div class="form-group publish-field field-w-full">
-                    <label v-text="__('Origin')" />
-                    <ui-description class="mt-2" :text="__('messages.entry_origin_instructions')" />
+                <ui-field class="form-group field-w-100" :label="__('Origin')" :instructions="__('messages.entry_origin_instructions')">
                     <Select class="w-full" v-model="selectedOrigin" :options="originOptions" placeholder="" />
-                </div>
+                </ui-field>
             </div>
         </confirmation-modal>
 
@@ -275,15 +273,15 @@ import {
     Subheading,
     Switch,
     Select,
-} from '@/components/ui';
-import PublishContainer from '@/components/ui/Publish/Container.vue';
-import PublishTabs from '@/components/ui/Publish/Tabs.vue';
-import PublishComponents from '@/components/ui/Publish/Components.vue';
-import LocalizationsCard from '@/components/ui/Publish/Localizations.vue';
-import LivePreview from '@/components/ui/LivePreview/LivePreview.vue';
+    PublishContainer,
+    PublishTabs,
+    PublishComponents,
+    PublishLocalizations as LocalizationsCard,
+    LivePreview,
+} from '@ui';
 import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
 import { computed, ref } from 'vue';
-import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@/components/ui/Publish/SavePipeline.js';
+import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';
 
 let saving = ref(false);
 let errors = ref({});
@@ -799,6 +797,31 @@ export default {
                 this.itemActions = response.data.itemActions;
             }
         },
+
+        addToCommandPalette() {
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: this.saveText,
+                icon: 'save',
+                action: () => this.save(),
+                prioritize: true,
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Edit Blueprint'),
+                icon: 'blueprint-edit',
+                when: () => this.canEditBlueprint,
+                url: this.actions.editBlueprint,
+            });
+
+            this.$refs.actions?.preparedActions.forEach(action => Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: action.title,
+                icon: action.icon,
+                action: action.run,
+            }));
+        },
     },
 
     mounted() {
@@ -818,6 +841,8 @@ export default {
         if (typeof this.autosaveInterval === 'number') {
             this.setAutosaveInterval();
         }
+
+        this.addToCommandPalette();
     },
 
     created() {
@@ -831,15 +856,12 @@ export default {
         container = computed(() => this.$refs.container);
     },
 
-    unmounted() {
-        clearTimeout(this.trackDirtyStateTimeout);
-    },
-
     beforeUnmount() {
         if (this.autosaveIntervalInstance) clearInterval(this.autosaveIntervalInstance);
     },
 
     unmounted() {
+        clearTimeout(this.trackDirtyStateTimeout);
         this.saveKeyBinding.destroy();
         this.quickSaveKeyBinding.destroy();
     },

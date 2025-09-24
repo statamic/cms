@@ -320,6 +320,7 @@ class Color
     public const White = '#fff';
     public const Black = '#000';
     public const Transparent = 'transparent';
+    public const Volt = 'oklch(93.86% 0.2018 122.24)';
 
     public static function defaults(): array
     {
@@ -347,6 +348,13 @@ class Color
             'content-border' => self::Zinc[200],
             'dark-content-bg' => self::Zinc[900],
             'dark-content-border' => self::Zinc[950],
+            'global-header-bg' => self::Zinc[800],
+            'dark-global-header-bg' => self::Zinc[800],
+            'progress-bar' => self::Volt,
+            'ui-accent' => self::Zinc[800],
+            'dark-ui-accent' => self::Zinc[950],
+            'switch-bg' => 'var(--theme-color-ui-accent)',
+            'dark-switch-bg' => 'var(--theme-color-dark-ui-accent)',
         ];
     }
 

@@ -68,6 +68,9 @@ class CollectionsController extends CpController
                     ['label' => 'Title', 'field' => 'title', 'visible' => true],
                     ['label' => 'Date', 'field' => 'date', 'visible' => true],
                 ],
+                'filters' => Scope::filters('entries', [
+                    'collection' => $collection->handle(),
+                ]),
                 'dated' => $collection->dated(),
                 'edit_url' => $collection->editUrl(),
                 'delete_url' => $collection->deleteUrl(),
@@ -84,6 +87,8 @@ class CollectionsController extends CpController
                 'actions' => Action::for($collection),
                 'actions_url' => cp_route('collections.actions.run'),
                 'icon' => $collection->icon(),
+                'sort_column' => $collection->sortField(),
+                'sort_direction' => $collection->sortDirection(),
             ];
         })->sortBy('title')->values();
     }
@@ -488,12 +493,14 @@ class CollectionsController extends CpController
                         'placeholder' => __('System default'),
                         'blueprint' => true,
                         'width' => '50',
+                        'clearable' => true,
                     ],
                     'layout' => [
                         'display' => __('Layout'),
                         'instructions' => __('statamic::messages.collection_configure_layout_instructions'),
                         'type' => 'template',
                         'width' => '50',
+                        'clearable' => true,
                     ],
                     'taxonomies' => [
                         'display' => __('Taxonomies'),

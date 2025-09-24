@@ -34,6 +34,7 @@
     class="mt-6"
     heading="{{ __('Configuration') }}"
     subheading="{{ __('statamic::messages.email_utility_configuration_description', ['path' => config_path('mail.php')]) }}"
+    v-cloak
 >
     <ui-table>
         <ui-table-rows>

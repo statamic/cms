@@ -1,6 +1,14 @@
 <script setup>
 import { injectTabContext } from './TabProvider.vue';
-import { Panel, PanelHeader, Heading, Subheading, Card } from '@/components/ui';
+import {
+    Button,
+    Panel,
+    PanelHeader,
+    Heading,
+    Subheading,
+    Card,
+    Icon,
+} from '@ui';
 import FieldsProvider from './FieldsProvider.vue';
 import Fields from './Fields.vue';
 import ShowField from '@/components/field-conditions/ShowField.js';
@@ -22,7 +30,8 @@ const visibleSections = computed(() => {
                 visibleValues.value,
                 revealerValues.value,
                 hiddenFields.value,
-                setHiddenField
+                setHiddenField,
+                { container }
             ).showField(field, field.handle);
         });
     });
@@ -44,17 +53,31 @@ function toggleSection(id) {
         <Panel
             v-for="(section, i) in visibleSections"
             :key="i"
-            :class="asConfig ? 'mb-12' : 'mb-6'"
+            :class="[
+                asConfig ? 'mb-12' : 'mb-6',
+                { 'pb-0': section.collapsed }
+            ]"
         >
-            <PanelHeader v-if="section.display" @click="toggleSection(i)">
-                <Heading :text="__(section.display)" />
-                <Subheading v-if="section.instructions" :text="renderInstructions(section.instructions)" />
+            <PanelHeader v-if="section.display || section.collapsible" class="flex items-center justify-between">
+                <div>
+                    <Heading :text="__(section.display)" />
+                    <Subheading v-if="section.instructions" :text="renderInstructions(section.instructions)" />
+                </div>
+                <Button
+                    @click="toggleSection(i)"
+                    v-if="section.collapsible"
+                    class="[&_svg]:size-5 rounded-xl"
+                    icon="chevron-down"
+                    size="sm"
+                    variant="ghost"
+                    :aria-label="__('Toggle section visibility')"
+                    :class="section.collapsed ? '[&_svg]:rotate-270' : '[&_svg]:rotate-0'"
+                />
             </PanelHeader>
-            <Motion
-                class="overflow-hidden"
-                :initial="{ height: section.collapsed ? '0px' : 'auto' }"
-                :animate="{ height: section.collapsed ? '0px' : 'auto' }"
-                :transition="{ duration: 0.25, type: 'tween' }"
+            <div
+                style="--tw-ease: ease;"
+                class="h-auto visible transition-[height,visibility] duration-[250ms,2s]"
+                :class="{ 'h-0! visibility-hidden overflow-clip': section.collapsed }"
             >
                 <div class="p-px">
                     <Primitive :as="asConfig ? 'div' : Card">
@@ -65,7 +88,7 @@ function toggleSection(id) {
                         </FieldsProvider>
                     </Primitive>
                 </div>
-            </Motion>
+            </div>
         </Panel>
     </div>
 </template>

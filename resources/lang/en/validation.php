@@ -192,6 +192,7 @@ return [
     'asset_file_exists_different_content' => 'A file already exists with this name but has different content. You may want to replace the other file with this one instead.',
     'invalid_two_factor_code' => 'The provided two factor authentication code was invalid.',
     'invalid_two_factor_recovery_code' => 'The provided two factor recovery code was invalid.',
+    'bard_container_required_by_button' => 'This field is required by a toolbar button.',
 
     /*
     |--------------------------------------------------------------------------

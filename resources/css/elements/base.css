@@ -1,4 +1,7 @@
 :root {
+    /* For animating height */
+    interpolate-size: allow-keywords;
+
     --focus-outline-width: 2px;
     /* Here we typically need a negative outline-offset because of the inner shadow on inputs */
     --focus-outline-offset: -1px;
@@ -7,7 +10,7 @@
     --focus-outline-style: solid;
 
     /* The outline-offset value used for buttons */
-    --outline-offset-button: 0.35rem;
+    --outline-offset-button: 6px;
 
     :is(.dark)& {
         --focus-outline-color: var(--color-blue-500);
@@ -32,8 +35,8 @@
     .show-focus:focus,
     /* Explicitly show focus without needing to tab for buttons inside modals, e.g. Assets > cancel button on delete modal */
     [data-dismissable-layer] button:focus,
-    /* and then a global selector for focus-visible everywhere else (except where the focus-within class will handle the focus outline target instead) */
-    :not([class*='focus-within'] *) {
+    /* and then a global selector for focus-visible everywhere else (except where the focus-within class will handle the focus outline target instead). Use a direct descendant here so we don't affect things like the focus state of Bard field > Replicator > then another Bard field. */
+    :not([class*='focus-within'] > *) {
         :focus-visible& {
             outline-width: var(--focus-outline-width);
             outline-offset: var(--focus-outline-offset);
@@ -41,11 +44,6 @@
             outline-style: var(--focus-outline-style, solid);
             border-radius: inherit;
         }
-    }
-
-    /* e.g. >> /cp/collections/pages on the filter stack when you tab to a field condition like "contains" */
-    [class*="focus-within"] button:focus {
-        outline: none;
     }
 
     a {
@@ -67,6 +65,11 @@
 
 /* Use a utility layer only when we need higher specificity */
 @layer utilities {
+    /* When we have a focus state within a focus state, only the inner-most focused container should _have_ focus. e.g. if we're focusing on a Bard field within a Bard field, only the inner Bard field should receive the focus outline. */
+    [class*="focus-within"]:has([class*="focus-within"]:focus-within) {
+        outline: none;
+    }
+
     [data-ui-dropdown-item] {
         &:focus-visible {
             outline-width: var(--focus-outline-width);
@@ -76,21 +79,6 @@
         }
     }
 
-    /* Based on the global site picker. Only for buttons (i.e. don't affect select dropdowns on publish forms) */
-    [data-ui-combobox-anchor]:has(button):not(.main-content *, .stack-content *) {
-        /* Decrease */
-        --focus-outline-offset: var(--outline-offset-button);
-        /* Target the button inside the combobox */
-        & :focus-visible {
-            /* Decrease */
-            @apply rounded-xs;
-            + * svg {
-                /* Since the SVG is outside the focus state let's hide it on focus because otherwise the focus state outline rests on top of it */
-                position: relative;
-                left: 0.6rem;
-            }
-        }
-    }
     /* e.g. >> /cp/collections, when you tab to the title, and /cp/collections/pages when tabbing through the tree text. Avoid elements where border-radius has already been set, e.g. "Create Entry" button */
     .main-content a:not([class*="rounded"]),
     /* e.g. >> /cp/collections/pages, tabbing through the home icon. Be careful not to carpet bomb this e.g. don't want to affect Bard buttons. */
@@ -109,5 +97,25 @@
     .group\/button button:focus {
         /* Pull the focus state above any adjacent buttons e.g. >> /cp/collections/articles/entries - save button alongside the dropdown arrow */
         z-index: var(--z-index-above);
+    }
+}
+
+/* Prevent tailwind typography from adding backticks around code elements */
+@utility prose {
+    code {
+        &::before,
+        &::after {
+            content: none;
+        }
+    }
+}
+
+code:not(pre *) {
+    /* Take the UI accent for code color/background. Use relative colors to 1) Make sure the text color is not too bright and 2) Create a light background */
+    color: hsl(from var(--theme-color-ui-accent) h s 30);
+    background: hsl(from var(--theme-color-ui-accent) h s l / 0.08);
+    &:where(.dark, .dark *) {
+        color: hsl(from var(--theme-color-dark-ui-accent) h s 90);
+        background: hsl(from var(--theme-color-dark-ui-accent) h s 10 / 0.5);
     }
 }

@@ -8,6 +8,7 @@ use Countable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
+use Illuminate\View\ComponentSlot;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades\Antlers;
@@ -1079,6 +1080,11 @@ class CoreModifiers extends Modifier
         return $headline;
     }
 
+    public function hasActualContent($value)
+    {
+        return (new ComponentSlot($value))->hasActualContent();
+    }
+
     /**
      * Converts a hex color to rgb values.
      *
@@ -1352,6 +1358,11 @@ class CoreModifiers extends Modifier
     public function isPast($value)
     {
         return $this->carbon($value)->isPast();
+    }
+
+    public function isString($value)
+    {
+        return is_string($value);
     }
 
     /**
@@ -2291,14 +2302,8 @@ class CoreModifiers extends Modifier
             $segment = $this->getFromContext($context, $params);
         }
 
-        $url = parse_url($value);
-
-        // Get everything after a possible domain
-        // and make sure it starts with a /
-        $uris = Stringy::ensureLeft(Arr::get($url, 'path'), '/');
-
-        //Boom
-        $segments = explode('/', $uris);
+        // Explode segments
+        $segments = explode('/', URL::makeRelative($value));
 
         return Arr::get($segments, $segment);
     }
@@ -2870,7 +2875,7 @@ class CoreModifiers extends Modifier
     {
         $timezone = Arr::get($params, 0, Statamic::displayTimezone());
 
-        return $this->carbon($value)->tz($timezone);
+        return $this->carbon($value)->clone()->tz($timezone);
     }
 
     public function typeOf($value)
