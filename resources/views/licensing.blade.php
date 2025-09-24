@@ -56,9 +56,9 @@
                         <ui-table-row>
                             <ui-table-cell class="w-64 font-bold">
                                 <div class="flex gap-3">
-                                    <span class="little-dot {{ $site->valid() ? 'bg-green-500 dark:bg-green-600' : 'bg-red-500 dark:bg-red-600' }} me-2"></span>
+                                    <span class="little-dot mt-[0.45rem] {{ $site->valid() ? 'bg-green-500 dark:bg-green-600' : 'bg-red-500 dark:bg-red-600' }}"></span>
+                                    {{ $site->key() ?? __('No license key') }}
                                 </div>
-                                {{ $site->key() ?? __('No license key') }}
                             </ui-table-cell>
                             <ui-table-cell class="relative">
                                 {{ $site->domain()['url'] ?? '' }}
@@ -149,7 +149,7 @@
                                 <ui-table-row>
                                     <ui-table-cell class="w-64">
                                         <div class="flex gap-3">
-                                            <span class="little-dot bg-green-500 dark:bg-green-600 me-2"></span>
+                                            <span class="little-dot mt-[0.45rem] bg-green-500 dark:bg-green-600"></span>
                                             {{ $addon->name() }}
                                         </div>
                                     </ui-table-cell>
