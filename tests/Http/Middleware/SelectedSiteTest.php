@@ -3,6 +3,7 @@
 namespace Tests\Http\Middleware;
 
 use Illuminate\Http\Request;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -81,13 +82,12 @@ class SelectedSiteTest extends TestCase
         $this->assertEquals('de', Site::selected()->handle());
     }
 
-    #[Test]
-    public function it_sets_the_correct_site_when_first_logging_in()
+    #[Test, DataProvider('firstLoginProvider')]
+    public function it_sets_the_correct_site_when_first_logging_in($existingSelection, $url, $expectedSelection)
     {
         $this->setSites([
             'en' => ['url' => 'https://en.test', 'locale' => 'en'],
             'fr' => ['url' => 'https://fr.test', 'locale' => 'fr'],
-            'de' => ['url' => 'https://de.test', 'locale' => 'de'],
         ]);
 
         $this->setTestRoles(['test' => [
@@ -96,8 +96,10 @@ class SelectedSiteTest extends TestCase
         $user = tap(User::make()->assignRole('test'))->save();
 
         $this->actingAs($user);
-        $request = $this->createRequest('https://fr.test/cp/foo');
+        $request = $this->createRequest($url);
         $handled = false;
+
+        $this->session(['statamic.cp.selected-site' => $existingSelection]);
 
         (new SelectedSite())->handle($request, function () use (&$handled) {
             $handled = true;
@@ -106,21 +108,26 @@ class SelectedSiteTest extends TestCase
         });
 
         $this->assertTrue($handled);
-        $this->assertEquals('fr', Site::selected()->handle());
+        $this->assertEquals($expectedSelection, Site::selected()->handle());
+    }
 
-        Site::setSelected('en');
+    public static function firstLoginProvider()
+    {
+        $enUrl = 'https://en.test/cp/foo';
+        $frUrl = 'https://fr.test/cp/foo';
+        $unknownUrl = 'https://unknown.test/cp/foo';
 
-        $request = $this->createRequest('https://fr.test/cp/bar');
-        $handled = false;
-
-        (new SelectedSite())->handle($request, function () use (&$handled) {
-            $handled = true;
-
-            return new Response;
-        });
-
-        $this->assertTrue($handled);
-        $this->assertEquals('en', Site::selected()->handle());
+        return [
+            'en site: fresh session' => [null, $enUrl, 'en'],
+            'en site: existing en session' => ['en', $enUrl, 'en'],
+            'en site: existing fr session' => ['fr', $enUrl, 'fr'],
+            'fr site: fresh session' => [null, $frUrl, 'fr'],
+            'fr site: existing fr session' => ['fr', $frUrl, 'fr'],
+            'fr site: existing en session' => ['en', $frUrl, 'en'],
+            'unknown site: fresh session' => [null, $unknownUrl, 'en'],
+            'unknown site: existing en session' => ['en', $unknownUrl, 'en'],
+            'unknown site: existing fr session' => ['fr', $unknownUrl, 'fr'],
+        ];
     }
 
     #[Test]
