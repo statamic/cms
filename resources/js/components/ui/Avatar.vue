@@ -31,6 +31,19 @@ const avatarSrc = computed(() => {
     return typeof props.user.avatar === 'object' ? props.user.avatar.permalink : props.user.avatar;
 })
 
+const initials = computed(() => {
+    if (props.user.initials) return props.user.initials;
+
+    if (props.user.name) {
+        const names = props.user.name.split(' ');
+        return names.length === 1
+            ? names[0].charAt(0).toUpperCase()
+            : (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
+    }
+
+    return '?';
+});
+
 const avatarClasses = computed(() => {
     const classes = cva({
         base: 'size-7 rounded-xl [button:has(&)]:rounded-xl shape-squircle',
@@ -54,7 +67,7 @@ const avatarClasses = computed(() => {
     </template>
     <template v-else>
         <div :aria-label="user.name" :class="avatarClasses">
-            {{ user.initials || '?' }}
+            {{ initials }}
         </div>
     </template>
 </template>
