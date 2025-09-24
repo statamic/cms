@@ -10,13 +10,13 @@ interface EntryRepository
 
     public function whereInCollection(array $handles);
 
+    // public function whereInId(array $ids);
+
     public function find($id);
 
     public function findOrFail($id);
 
     public function findByUri(string $uri);
-
-    public function findByIds($ids);
 
     public function make();
 

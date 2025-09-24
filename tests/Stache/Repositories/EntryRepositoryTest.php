@@ -195,7 +195,7 @@ class EntryRepositoryTest extends TestCase
     #[DataProvider('entriesByIdsProvider')]
     public function it_gets_entries_by_ids($ids, $expected)
     {
-        $actual = $this->repo->findByIds($ids);
+        $actual = $this->repo->whereInId($ids);
 
         $this->assertInstanceOf(EntryCollection::class, $actual);
         $this->assertEquals($expected, $actual->map->get('title')->all());
