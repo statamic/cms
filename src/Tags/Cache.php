@@ -64,7 +64,11 @@ class Cache extends Tags implements CachesOutput
             return false;
         }
 
-        // Only GET requests. This disables the cache during live preview.
+        if (request()->isLivePreview()) {
+            return false;
+        }
+
+        // Only GET requests.
         return request()->method() === 'GET';
     }
 
