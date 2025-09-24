@@ -144,6 +144,7 @@ it('exports ui', async () => {
 
     const expectedCmsPackageExports = [
         ...expectedUiPackageExports,
+        'Avatar',
         'CommandPaletteItem',
         'CreateForm',
         'Listing',

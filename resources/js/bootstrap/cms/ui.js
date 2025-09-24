@@ -1,5 +1,6 @@
 export {
     AuthCard,
+    Avatar,
     Badge,
     Button,
     ButtonGroup,
