@@ -135,7 +135,7 @@ function destroy() {
             :data-type="config.handle"
         >
             <header
-                class="group/header animate-border-color flex items-center rounded-lg px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-950 hover:bg-gray-100 dark:hover:bg-gray-950 border-gray-300 border-b-1 border-b-transparent"
+                class="group/header animate-border-color flex items-center rounded-md px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-950 hover:bg-gray-100 dark:hover:bg-gray-950 border-gray-300 border-b-1 border-b-transparent"
                 :class="{
                     'bg-gray-200/50 rounded-b-none border-b-gray-300! dark:border-b-white/10!': !collapsed
                 }"

@@ -51,7 +51,7 @@
 ========================================================================== */
 
 [data-markdown-toolbar] {
-    @apply flex items-center justify-between rounded-t-lg bg-gray-50 px-2 py-1 overflow-x-auto;
+    @apply flex items-center justify-between rounded-t-[calc(var(--radius-lg)-1px)] bg-gray-50 px-2 py-1 overflow-x-auto;
     @apply sticky -top-2 z-8 border-b border-gray-300 dark:border-white/20 dark:bg-black;
 }
 
