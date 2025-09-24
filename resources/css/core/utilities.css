@@ -13,6 +13,18 @@
     z-index: var(--z-index-max);
 }
 
+@utility firefox-opacity-0 {
+    @supports (-moz-appearance: none) {
+        opacity: 0;
+    }
+}
+
+@utility firefox-transition-duration-200 {
+    @supports (-moz-appearance: none) {
+        transition-duration: 0.2s!important;
+    }
+}
+
 /* UTILITIES / TEXT
 =================================================== */
 /* Avoid prefixing things with `st-text-` (st for Statamic) because `text-` is a Tailwind prefix */

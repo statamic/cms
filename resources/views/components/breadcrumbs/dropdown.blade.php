@@ -2,6 +2,7 @@
 <button
     :class="{'absolute right-0 animate-out fade-out duration-700 fill-mode-forwards':true}"
     class="
+        firefox-opacity-0
         inline-flex items-center justify-center whitespace-nowrap shrink-0
         font-medium antialiased cursor-pointer no-underline
         disabled:text-gray-400 dark:disabled:text-gray-600 disabled:cursor-not-allowed
