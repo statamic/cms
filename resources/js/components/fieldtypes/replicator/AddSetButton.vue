@@ -19,7 +19,7 @@
                                 'w-2 h-2 text-gray-700 dark:text-dark-200 group-hover:text-black dark:group-hover:dark-text-100 transition duration-150': !last
                             }" />
                     </button>
-                    <span class="text-sm dark:text-dark-175">{{ __(label) }}</span>
+                    <span @click="addSetButtonClicked" class="cursor-pointer text-sm dark:text-dark-175">{{ __(label) }}</span>
                 </div>
             </template>
         </set-picker>

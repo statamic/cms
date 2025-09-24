@@ -24,6 +24,7 @@ use Statamic\Support\Str;
 class Assets extends Fieldtype
 {
     protected $categories = ['media', 'relationship'];
+    protected $keywords = ['file', 'files', 'image', 'images', 'video', 'videos', 'audio', 'upload'];
     protected $selectableInForms = true;
 
     protected function configFieldItems(): array
@@ -160,7 +161,7 @@ class Assets extends Fieldtype
         $max_files = (int) $this->config('max_files');
 
         $values = collect($data)->map(function ($id) {
-            return Asset::find($id)->path();
+            return Asset::findOrFail($id)->path();
         });
 
         return $this->config('max_files') === 1 ? $values->first() : $values->all();
@@ -229,7 +230,7 @@ class Assets extends Fieldtype
         $action = Action::for($assetFolder, [
             'container' => $container->handle(),
             'folder' => $folder,
-        ])->first(fn ($action) => get_class($action) === RenameAssetFolder::class)->toArray();
+        ])->first(fn ($action) => get_class($action) === RenameAssetFolder::class)?->toArray();
 
         return [
             'url' => cp_route('assets.folders.actions.run', $container),
@@ -264,7 +265,9 @@ class Assets extends Fieldtype
 
         $query = new OrderedQueryBuilder($query, $ids);
 
-        return $single ? Blink::once($key, fn () => $query->first()) : $query;
+        return $single && ! config('statamic.system.always_augment_to_query', false)
+            ? Blink::once($key, fn () => $query->first())
+            : $query;
     }
 
     public function shallowAugment($values)

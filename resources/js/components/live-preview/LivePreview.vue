@@ -142,9 +142,17 @@ export default {
 
         deviceSelectOptions() {
             let options = Object.values(_.mapObject(this.$config.get('livePreview.devices'), (dimensions, device) => {
+                if (device === 'Responsive') {
+                    return { value: null, label: __('Responsive') };
+                }
+
                 return { value: device, label: __(device) };
             }));
-            options.unshift({ value: null, label: __('Responsive') });
+
+            if (options.filter((option) => option.label === __('Responsive')).length === 0) {
+                options.unshift({ value: null, label: __('Responsive') });
+            }
+
             return options;
         },
 
@@ -217,6 +225,7 @@ export default {
     },
 
     created() {
+        this.previewDevice = this.deviceSelectOptions[0].value;
         this.editorWidth = localStorage.getItem(widthLocalStorageKey) || 400
 
         this.keybinding = this.$keys.bindGlobal('mod+shift+p', () => {

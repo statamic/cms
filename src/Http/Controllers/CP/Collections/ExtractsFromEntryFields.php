@@ -41,6 +41,11 @@ trait ExtractsFromEntryFields
             'published' => $entry->published(),
         ]);
 
-        return [$values->all(), $fields->meta()];
+        $extraValues = [
+            'depth' => $entry->page()?->depth(),
+            'children' => $entry->page()?->flattenedPages()->pluck('id')->all(),
+        ];
+
+        return [$values->all(), $fields->meta(), $extraValues];
     }
 }

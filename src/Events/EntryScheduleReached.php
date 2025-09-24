@@ -6,11 +6,8 @@ use Statamic\Contracts\Git\ProvidesCommitMessage;
 
 class EntryScheduleReached extends Event implements ProvidesCommitMessage
 {
-    public $entry;
-
-    public function __construct($entry)
+    public function __construct(public $entry)
     {
-        $this->entry = $entry;
     }
 
     public function commitMessage()

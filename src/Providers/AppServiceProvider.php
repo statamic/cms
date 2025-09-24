@@ -96,7 +96,11 @@ class AppServiceProvider extends ServiceProvider
             return optional($this->statamicToken())->handler() === LivePreview::class;
         });
 
-        TrimStrings::skipWhen(fn (Request $request) => $request->is(config('statamic.cp.route').'/*'));
+        TrimStrings::skipWhen(function (Request $request) {
+            $route = config('statamic.cp.route');
+
+            return ! $route || $request->is($route.'/*');
+        });
 
         $this->addAboutCommandInfo();
 

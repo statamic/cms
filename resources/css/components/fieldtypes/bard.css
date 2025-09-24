@@ -49,11 +49,11 @@
     }
 
     .bard-toolbar-button:hover {
-        @apply bg-gray-200 dark:bg-dark-700;
+        @apply bg-gray-200 dark:bg-dark-650;
     }
 
     .bard-toolbar-button.active {
-        @apply bg-gray-300 dark:bg-dark-800 text-black dark:text-dark-100;
+        @apply bg-gray-300 dark:bg-dark-600 text-black dark:text-white;
     }
 
     .bard-toolbar-button:focus {
@@ -206,7 +206,7 @@
    ========================================================================== */
 
 .bard-fullscreen {
-    @apply fixed bg-gray-200 dark:bg-dark-700 inset-0 min-h-screen overflow-scroll rounded-none pt-16;
+    @apply fixed bg-gray-200 dark:bg-dark-700 inset-0 min-h-screen overflow-scroll rounded-none pt-14;
 
     & > .bard-editor {
         @apply bg-white dark:bg-dark-800 shadow dark:shadow-dark max-w-xl mx-auto rounded relative my-6 px-8;

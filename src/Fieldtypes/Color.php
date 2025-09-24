@@ -7,6 +7,7 @@ use Statamic\Fields\Fieldtype;
 class Color extends Fieldtype
 {
     protected $categories = ['special'];
+    protected $keywords = ['rgb', 'hex', 'colour'];
 
     protected function configFieldItems(): array
     {

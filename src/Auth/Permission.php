@@ -4,6 +4,8 @@ namespace Statamic\Auth;
 
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
+use function Statamic\trans as __;
+
 class Permission
 {
     use FluentlyGetsAndSets;

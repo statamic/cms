@@ -13,6 +13,7 @@
     <blueprint-builder
         action="{{ cp_route('users.blueprint.update') }}"
         :initial-blueprint="{{ json_encode($blueprintVueObject) }}"
+        :can-define-localizable="false"
     ></blueprint-builder>
 
     @include('statamic::partials.docs-callout', [

@@ -10,6 +10,7 @@ use Statamic\Support\Html;
 class Markdown extends Fieldtype
 {
     protected $categories = ['text'];
+    protected $keywords = ['md', 'content', 'html'];
 
     use Concerns\ResolvesStatamicUrls;
 
@@ -196,5 +197,10 @@ class Markdown extends Fieldtype
         return [
             'previewUrl' => cp_route('markdown.preview'),
         ];
+    }
+
+    public function shouldParseAntlersFromRawString(): bool
+    {
+        return $this->config('smartypants', false);
     }
 }

@@ -124,6 +124,9 @@ export default {
                     setValues(state, values) {
                         state.values = values;
                     },
+                    setExtraValues(state, values) {
+                        state.extraValues = values;
+                    },
                     setHiddenField(state, field) {
                         state.hiddenFields[field.dottedKey] = {
                             hidden: field.hidden,
@@ -211,6 +214,9 @@ export default {
                         context.commit('setValues', payload);
                         vm.emitUpdatedEvent(context.state.values);
                     },
+                    setExtraValues(context, payload) {
+                        context.commit('setExtraValues', payload);
+                    },
                     setMeta(context, payload) {
                         context.commit('setMeta', payload);
                     }
@@ -273,6 +279,14 @@ export default {
             handler(after, before) {
                 if (_.isEqual(before, after)) return;
                 this.$store.commit(`publish/${this.name}/setValues`, after);
+            }
+        },
+
+        extraValues: {
+            deep: true,
+            handler(after, before) {
+                if (_.isEqual(before, after)) return;
+                this.$store.commit(`publish/${this.name}/setExtraValues`, after);
             }
         },
 

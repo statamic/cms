@@ -20,6 +20,8 @@ use Statamic\Structures\CollectionStructure;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class CollectionsController extends CpController
 {
     public function index(Request $request)

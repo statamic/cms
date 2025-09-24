@@ -6,6 +6,7 @@ use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\MessageBag;
+use Illuminate\Support\Str;
 use Illuminate\Support\ViewErrorBag;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -22,6 +23,7 @@ use Statamic\Fields\Fieldtype;
 use Statamic\Fields\LabeledValue;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
+use Statamic\Tags\Concerns\OutputsItems;
 use Statamic\Tags\Tags;
 use Statamic\View\Cascade;
 use Tests\Antlers\Fixtures\Addon\Tags\RecursiveChildren;
@@ -2598,6 +2600,77 @@ PARTIAL;
     {
         $input = 'Hey, look at that @{{ noun }}!';
         $this->assertSame('Hey, look at that {{ noun }}!', $this->renderString($input, []));
+    }
+
+    #[Test]
+    public function no_results_value_is_added_automatically()
+    {
+        (new class extends Tags
+        {
+            use OutputsItems;
+            public static $handle = 'the_tag';
+
+            public function index()
+            {
+                if ($this->params->get('has_value')) {
+                    return $this->output(collect([
+                        'one',
+                        'two',
+                        'three',
+                    ]));
+                }
+
+                return $this->parseNoResults();
+            }
+        })::register();
+
+        $template = <<<'TEMPLATE'
+{{ the_tag }}
+   {{ if no_results }}
+   No Results 1.
+    {{ the_tag has_value="true" }}
+        {{ if no_results }}
+            No Results 2.
+        {{ else }}
+            {{ value }}
+        {{ /if }}
+    {{ /the_tag }}
+    
+    {{ if no_results }} No Results 1.1 {{ /if }}
+   {{ else }}
+   Has Results 1.
+   {{ /if }}
+{{ /the_tag }}
+TEMPLATE;
+
+        $this->assertSame(
+            'No Results 1. one two three No Results 1.1',
+            Str::squish($this->renderString($template, [], true))
+        );
+
+        $template = <<<'TEMPLATE'
+{{ the_tag }}
+   {{ if no_results }}
+   No Results 1.
+    {{ the_tag has_value="true" as="items" }}
+        {{ if no_results }}
+            No Results 2.
+        {{ else }}
+            {{ items }}{{ value }} {{ /items }}
+        {{ /if }}
+    {{ /the_tag }}
+    
+    {{ if no_results }} No Results 1.1 {{ /if }}
+   {{ else }}
+   Has Results 1.
+   {{ /if }}
+{{ /the_tag }}
+TEMPLATE;
+
+        $this->assertSame(
+            'No Results 1. one two three No Results 1.1',
+            Str::squish($this->renderString($template, [], true))
+        );
     }
 }
 

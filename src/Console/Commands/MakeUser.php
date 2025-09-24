@@ -71,7 +71,13 @@ class MakeUser extends Command
     public function handle()
     {
         if (! Statamic::pro() && User::query()->count() > 0) {
-            return error(__('Statamic Pro is required.'));
+            error(__('Statamic Pro is required.'));
+
+            if (confirm(__('Enable Statamic Pro?'))) {
+                $this->call('statamic:pro:enable');
+            } else {
+                return self::SUCCESS;
+            }
         }
 
         if ($password = $this->option('password')) {

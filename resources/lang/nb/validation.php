@@ -146,6 +146,10 @@ return [
     'unique_user_value' => 'Denne verdien er allerede brukt.',
     'unique_uri' => 'Denne URI-en er allerede brukt.',
     'time' => 'Tid',
+    'asset_current_filename' => 'Dette er gjeldende filnavn.',
+    'asset_file_exists' => 'Det finnes allerede en fil med dette navnet.',
+    'asset_file_exists_same_content' => 'Det finnes allerede en fil med dette navnet og har samme innhold. Det kan være lurt å slette dette i stedet for å gi det nytt navn.',
+    'asset_file_exists_different_content' => 'Det finnes allerede en fil med dette navnet, men har et annet innhold. Det kan være lurt å erstatte den andre filen med denne i stedet.',
     'custom.attribute-name.rule-name' => 'brukerdefinert melding',
     'attributes' => [],
 ];

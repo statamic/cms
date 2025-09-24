@@ -108,6 +108,10 @@ trait Revisable
 
         $item->deleteWorkingCopy();
 
+        if ($item instanceof Entry) {
+            $item->blueprint()->setParent($item);
+        }
+
         return $item;
     }
 
@@ -132,6 +136,10 @@ trait Revisable
             ->save();
 
         $item->deleteWorkingCopy();
+
+        if ($item instanceof Entry) {
+            $item->blueprint()->setParent($item);
+        }
 
         return $item;
     }
