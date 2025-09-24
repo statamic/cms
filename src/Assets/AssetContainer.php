@@ -27,7 +27,6 @@ use Statamic\Facades\Search;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
 use Statamic\Support\Arr;
-use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, Augmentable
@@ -139,9 +138,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
             return null;
         }
 
-        $url = (string) Str::of($this->disk()->url('/'))
-            ->rtrim('/')
-            ->after(config('app.url'));
+        $url = rtrim($this->disk()->url('/'), '/');
 
         return ($url === '') ? '/' : $url;
     }
@@ -510,6 +507,8 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
      *
      * @param  bool|null  $allowDownloading
      * @return bool|$this
+     *
+     * @deprecated
      */
     public function allowDownloading($allowDownloading = null)
     {
@@ -526,6 +525,8 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
      *
      * @param  bool|null  $allowMoving
      * @return bool|$this
+     *
+     * @deprecated
      */
     public function allowMoving($allowMoving = null)
     {
@@ -542,6 +543,8 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
      *
      * @param  bool|null  $allowRenaming
      * @return bool|$this
+     *
+     * @deprecated
      */
     public function allowRenaming($allowRenaming = null)
     {
@@ -558,6 +561,8 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
      *
      * @param  bool|null  $allowUploads
      * @return bool|$this
+     *
+     * @deprecated
      */
     public function allowUploads($allowUploads = null)
     {
@@ -574,6 +579,8 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
      *
      * @param  bool|null  $createFolders
      * @return bool|$this
+     *
+     * @deprecated
      */
     public function createFolders($createFolders = null)
     {

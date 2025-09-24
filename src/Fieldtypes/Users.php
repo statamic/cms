@@ -90,6 +90,7 @@ class Users extends Relationship
                 'title' => $user->name(),
                 'id' => $id,
                 'edit_url' => $user->editUrl(),
+                'editable' => User::current()->can('edit', $user),
             ];
         }
 

@@ -390,4 +390,9 @@ abstract class Fieldtype implements Arrayable
     {
         return [];
     }
+
+    public function shouldParseAntlersFromRawString(): bool
+    {
+        return false;
+    }
 }

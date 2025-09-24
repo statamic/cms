@@ -9,6 +9,7 @@ use Statamic\CP\Breadcrumbs;
 use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades\Action;
 use Statamic\Facades\Asset;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
@@ -70,7 +71,11 @@ class EntriesController extends CpController
 
         if ($search = request('search')) {
             if ($collection->hasSearchIndex()) {
-                return $collection->searchIndex()->ensureExists()->search($search);
+                return $collection
+                    ->searchIndex()
+                    ->ensureExists()
+                    ->search($search)
+                    ->where('collection', $collection->handle());
             }
 
             $query->where('title', 'like', '%'.$search.'%');
@@ -89,6 +94,7 @@ class EntriesController extends CpController
 
         $entry = $entry->fromWorkingCopy();
 
+        Blink::forget("entry-{$entry->id()}-blueprint");
         $blueprint = $entry->blueprint();
 
         if (! $blueprint) {

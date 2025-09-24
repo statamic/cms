@@ -34,7 +34,7 @@ class TaxonomiesController extends CpController
             return [
                 'id' => $taxonomy->handle(),
                 'title' => $taxonomy->title(),
-                'terms' => $taxonomy->queryTerms()->count(),
+                'terms' => $taxonomy->queryTerms()->pluck('slug')->unique()->count(),
                 'edit_url' => $taxonomy->editUrl(),
                 'delete_url' => $taxonomy->deleteUrl(),
                 'terms_url' => cp_route('taxonomies.show', $taxonomy->handle()),

@@ -108,6 +108,11 @@ class Fieldset
         return $this->fields()->get($handle);
     }
 
+    public function hasField($field)
+    {
+        return $this->fields()->has($field);
+    }
+
     public function isNamespaced(): bool
     {
         return Str::contains($this->handle(), '::');

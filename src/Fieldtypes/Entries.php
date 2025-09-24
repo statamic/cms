@@ -95,6 +95,9 @@ class Entries extends Relationship
                         'instructions' => __('statamic::fieldtypes.entries.config.create'),
                         'type' => 'toggle',
                         'default' => true,
+                        'if' => [
+                            'mode' => 'default',
+                        ],
                     ],
                     'collections' => [
                         'display' => __('Collections'),
@@ -179,7 +182,11 @@ class Entries extends Relationship
             $collections = $this->getConfiguredCollections();
         }
 
-        return Collection::findByHandle(Arr::first($collections));
+        $collection = Collection::findByHandle($collectionHandle = Arr::first($collections));
+
+        throw_if(! $collection, new CollectionNotFoundException($collectionHandle));
+
+        return $collection;
     }
 
     public function getSortColumn($request)
