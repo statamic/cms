@@ -26,7 +26,7 @@ const iconOnly = computed(() => (props.icon && !hasDefaultSlot && !props.text) |
 
 const buttonClasses = computed(() => {
     const classes = cva({
-        base: 'relative inline-flex items-center justify-center whitespace-nowrap shrink-0 font-medium antialiased cursor-pointer no-underline disabled:text-gray-400 dark:disabled:text-gray-600 disabled:cursor-not-allowed [&_svg]:shrink-0 [&_svg]:text-black [&_svg]:opacity-60 dark:[&_svg]:text-white',
+        base: 'relative inline-flex items-center justify-center whitespace-nowrap shrink-0 font-medium antialiased cursor-pointer no-underline disabled:text-white/60 dark:disabled:text-white/50 disabled:cursor-not-allowed [&_svg]:shrink-0 [&_svg]:text-black [&_svg]:opacity-60 dark:[&_svg]:text-white',
         variants: {
             variant: {
                 default: [
