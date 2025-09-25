@@ -11,7 +11,17 @@
         class="bg-global-header-bg dark:bg-dark-global-header-bg font-sans leading-normal text-gray-900 dark:text-white"
         @if ($user->getPreference('strict_accessibility')) data-contrast="increased" @endif
     >
-        @inertia('statamic')
+        <div
+            id="statamic"
+            data-page="{{ json_encode($page ?? [
+                'url' => '/'.request()->path(),
+                'component' => 'NonInertiaPage',
+                'version' => inertia()->getVersion(),
+            ]) }}"
+        >
+            @yield('content')
+        </div>
+
         {{--
         <div id="statamic">
            <config-provider>

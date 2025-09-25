@@ -15,6 +15,7 @@ import VueClickAway from 'vue3-click-away';
 import FloatingVue from 'floating-vue';
 import 'floating-vue/dist/style.css';
 import { createInertiaApp } from '@inertiajs/vue3';
+import { router } from '@inertiajs/vue3';
 import Toasts from '../components/Toasts';
 import PortalVue from 'portal-vue';
 import Keys from '../components/keys/Keys';
@@ -151,10 +152,22 @@ export default {
     },
 
     async start() {
+        const el = document.getElementById('statamic');
+        const bladeContent = el?.innerHTML || '';
         const _this = this;
+
         await createInertiaApp({
             id: 'statamic',
             resolve: name => {
+                if (name === 'NonInertiaPage') {
+                    return {
+                        default: {
+                            layout: Layout,
+                            template: `<div>${bladeContent}</div>`,
+                        }
+                    }
+                }
+
                 const pages = import.meta.glob('../pages/**/*.vue', { eager: true })
                 let page = pages[`../pages/${name}.vue`];
                 page.default.layout = Layout;
@@ -165,6 +178,14 @@ export default {
                 app.use(plugin).mount(el);
             },
         })
+
+        // Handle non-Inertia responses with full page reload
+        router.on('invalid', (event) => {
+            if (event.detail.response.status === 200) {
+                event.preventDefault();
+                window.location.href = event.detail.response.request.responseURL;
+            }
+        });
 
         bootedCallbacks.forEach((callback) => callback(this));
         bootedCallbacks = [];
