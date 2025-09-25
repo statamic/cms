@@ -858,7 +858,7 @@
     "Seller": "Venditore",
     "Send Email Invitation": "Invia email di invito",
     "Send Password Reset": "Invia reimpostazione password",
-    "Send password reset email to this user?|Send password reset email to these :count users?": "Inviare a questo utente una mail per reimpostare la password?|Inviare a questi :count utenti una mail per reimpostare la password?",
+    "Would you like to email a reset link to this user?|Would you like to email a reset link to these :count users?": "Inviare a questo utente una mail per reimpostare la password?|Inviare a questi :count utenti una mail per reimpostare la password?",
     "Send Test Email": "Invia email di prova",
     "Sender": "Mittente",
     "Sendmail": "Sendmail",

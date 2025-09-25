@@ -890,7 +890,7 @@
     "Seller": "Verkoper",
     "Send Email Invitation": "E-mailuitnodiging versturen",
     "Send Password Reset": "Wachtwoordreset versturen",
-    "Send password reset email to this user?|Send password reset email to these :count users?": "Stuur een wachtwoorresetmail naar deze gebruiker?|Stuur een wachtwoordresetmail naar :count gebruikers?",
+    "Would you like to email a reset link to this user?|Would you like to email a reset link to these :count users?": "Stuur een wachtwoorresetmail naar deze gebruiker?|Stuur een wachtwoordresetmail naar :count gebruikers?",
     "Send Test Email": "Verstuur testmail",
     "Sender": "Verzender",
     "Sendmail": "Verstuur mail",
