@@ -12,6 +12,7 @@
         :title="__('Add Set')"
         @update:open="isOpen = $event"
         v-else-if="shouldUseModal"
+        class="xl:max-w-3xl 2xl:max-w-5xl"
     >
         <template #trigger>
             <slot name="trigger" />
@@ -66,8 +67,9 @@
                             <div @click="addSet(item.handle)" class="p-2.5">
                                 <div class="h-40 w-full flex items-center justify-center">
                                     <img :src="item.image" class="rounded-lg h-40 object-cover" v-if="item.image" />
+                                    <ui-icon :name="item.icon || 'add-section'" :set="iconSet" class="size-8 text-gray-600 dark:text-gray-300" v-else />
                                 </div>
-                                <div class="line-clamp-1 text-base mt-1 text-gray-900 dark:text-gray-200">
+                                <div class="line-clamp-1 text-base mt-1 text-center text-gray-900 dark:text-gray-200">
                                     {{ __(item.display || item.handle) }}
                                 </div>
                                 <p v-if="item.instructions" class="text-gray-800 dark:text-gray-200 mb-2">
@@ -81,58 +83,6 @@
                     </div>
                 </ui-tab-content>
             </ui-tabs>
-
-
-            <!-- List Mode -->
-            <div class="max-h-[21rem] overflow-auto p-1.5" v-if="mode === 'list'">
-                <div
-                    v-for="(item, i) in items"
-                    :key="item.handle"
-                    class="cursor-pointer rounded-lg"
-                    :class="{ 'bg-gray-100 dark:bg-gray-900': selectionIndex === i }"
-                    @mouseover="selectionIndex = i"
-                    :title="__(item.instructions)"
-                >
-                    <div v-if="item.type === 'group'" @click="selectGroup(item.handle)" class="group flex items-center rounded-lg p-2 gap-3">
-                        <ui-icon :name="item.icon || 'folder'" :set="iconSet" class="size-4 text-gray-600 dark:text-gray-300" />
-                        <div class="flex-1">
-                            <div class="line-clamp-1 text-sm text-gray-900 dark:text-gray-200">
-                                {{ __(item.display || item.handle) }}
-                            </div>
-                            <ui-description v-if="item.instructions" class="w-48 truncate text-2xs">
-                                {{ __(item.instructions) }}
-                            </ui-description>
-                        </div>
-                        <ui-icon name="chevron-right" class="me-1 size-2" />
-                    </div>
-                    <div v-if="item.type === 'set'" @click="addSet(item.handle)" class="group flex items-center rounded-xl p-2.5 gap-3">
-                        <ui-icon :name="item.icon || 'plus'" :set="iconSet" class="size-4 text-gray-600 dark:text-gray-300" />
-                        <ui-hover-card :delay="0" :open="selectionIndex === i">
-                            <template #trigger>
-                                <div class="flex-1">
-                                    <div class="line-clamp-1 text-sm text-gray-900 dark:text-gray-200">
-                                        {{ __(item.display || item.handle) }}
-                                    </div>
-                                    <ui-description v-if="item.instructions" class="w-56 truncate text-2xs">
-                                        {{ __(item.instructions) }}
-                                    </ui-description>
-                                </div>
-                            </template>
-                            <template #default v-if="item.image">
-                                <div class="max-w-96 max-h-[calc(80vh)] screen-fit">
-                                    <p v-if="item.instructions" class="text-gray-800 dark:text-gray-200 mb-2">
-                                        {{ __(item.instructions) }}
-                                    </p>
-                                    <img :src="item.image" class="rounded-lg" />
-                                </div>
-                            </template>
-                        </ui-hover-card>
-                    </div>
-                </div>
-                <div v-if="noSearchResults" class="p-3 text-center text-xs text-gray-600">
-                    {{ __('No results') }}
-                </div>
-            </div>
         </template>
     </ui-modal>
 
