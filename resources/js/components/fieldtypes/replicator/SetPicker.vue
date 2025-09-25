@@ -5,27 +5,20 @@
         </Primitive>
     </template>
 
-    <ui-popover
-        :align="align"
+    <!-- Modal for Grid Mode -->
+    <ui-modal
+        :blur="false"
         :open="isOpen"
-        @clicked-away="$emit('clicked-away', $event)"
+        :title="__('Add Set')"
         @update:open="isOpen = $event"
-        class="set-picker select-none"
-        prioritize-position
-        :class="{
-            'w-72': mode === 'list',
-            'w-224': mode === 'grid',
-        }"
-        inset
-        v-else
+        v-else-if="shouldUseModal"
     >
         <template #trigger>
             <slot name="trigger" />
         </template>
 
         <template #default>
-
-            <div class="flex items-center border-b border-gray-200 dark:border-gray-600 p-1.5 gap-1.5">
+            <div class="flex items-center p-1.5 gap-1.5">
                 <ui-input
                     :placeholder="__('Search Sets')"
                     class="[&_svg]:size-5"
@@ -35,12 +28,12 @@
                     size="sm"
                     type="text"
                     v-model="search"
-                    variant="ghost"
+                    :variant="mode === 'list' ? 'ghost' : 'default'"
                 />
 
                 <ui-toggle-group v-model="mode" size="sm">
-                    <ui-toggle-item icon="layout-list" value="list" aria-label="List view" />
-                    <ui-toggle-item icon="layout-grid" value="grid" aria-label="Grid view" />
+                    <ui-toggle-item icon="layout-list" value="list" :aria-label="__('List view')" />
+                    <ui-toggle-item icon="layout-grid" value="grid" :aria-label="__('Grid view')" />
                 </ui-toggle-group>
             </div>
 
@@ -92,6 +85,105 @@
 
             <!-- List Mode -->
             <div class="max-h-[21rem] overflow-auto p-1.5" v-if="mode === 'list'">
+                <div
+                    v-for="(item, i) in items"
+                    :key="item.handle"
+                    class="cursor-pointer rounded-lg"
+                    :class="{ 'bg-gray-100 dark:bg-gray-900': selectionIndex === i }"
+                    @mouseover="selectionIndex = i"
+                    :title="__(item.instructions)"
+                >
+                    <div v-if="item.type === 'group'" @click="selectGroup(item.handle)" class="group flex items-center rounded-lg p-2 gap-3">
+                        <ui-icon :name="item.icon || 'folder'" :set="iconSet" class="size-4 text-gray-600 dark:text-gray-300" />
+                        <div class="flex-1">
+                            <div class="line-clamp-1 text-sm text-gray-900 dark:text-gray-200">
+                                {{ __(item.display || item.handle) }}
+                            </div>
+                            <ui-description v-if="item.instructions" class="w-48 truncate text-2xs">
+                                {{ __(item.instructions) }}
+                            </ui-description>
+                        </div>
+                        <ui-icon name="chevron-right" class="me-1 size-2" />
+                    </div>
+                    <div v-if="item.type === 'set'" @click="addSet(item.handle)" class="group flex items-center rounded-xl p-2.5 gap-3">
+                        <ui-icon :name="item.icon || 'plus'" :set="iconSet" class="size-4 text-gray-600 dark:text-gray-300" />
+                        <ui-hover-card :delay="0" :open="selectionIndex === i">
+                            <template #trigger>
+                                <div class="flex-1">
+                                    <div class="line-clamp-1 text-sm text-gray-900 dark:text-gray-200">
+                                        {{ __(item.display || item.handle) }}
+                                    </div>
+                                    <ui-description v-if="item.instructions" class="w-56 truncate text-2xs">
+                                        {{ __(item.instructions) }}
+                                    </ui-description>
+                                </div>
+                            </template>
+                            <template #default v-if="item.image">
+                                <div class="max-w-96 max-h-[calc(80vh)] screen-fit">
+                                    <p v-if="item.instructions" class="text-gray-800 dark:text-gray-200 mb-2">
+                                        {{ __(item.instructions) }}
+                                    </p>
+                                    <img :src="item.image" class="rounded-lg" />
+                                </div>
+                            </template>
+                        </ui-hover-card>
+                    </div>
+                </div>
+                <div v-if="noSearchResults" class="p-3 text-center text-xs text-gray-600">
+                    {{ __('No results') }}
+                </div>
+            </div>
+        </template>
+    </ui-modal>
+
+    <!-- Use Popover for list mode when content fits -->
+    <ui-popover
+        v-else
+        :align="align"
+        :open="isOpen"
+        @clicked-away="$emit('clicked-away', $event)"
+        @update:open="isOpen = $event"
+        class="set-picker select-none w-72"
+        inset
+    >
+        <template #trigger>
+            <slot name="trigger" />
+        </template>
+
+        <template #default>
+            <!-- Popover content with toggle group -->
+            <div class="flex items-center border-b border-gray-200 dark:border-gray-600 p-1.5 gap-1.5">
+                <ui-input
+                    :placeholder="__('Search Sets')"
+                    class="[&_svg]:size-5"
+                    data-set-picker-search-input
+                    icon-prepend="magnifying-glass"
+                    ref="search"
+                    size="sm"
+                    type="text"
+                    v-model="search"
+                    variant="ghost"
+                />
+
+                <ui-toggle-group v-model="mode" size="sm">
+                    <ui-toggle-item icon="layout-list" value="list" aria-label="List view" />
+                    <ui-toggle-item icon="layout-grid" value="grid" aria-label="Grid view" />
+                </ui-toggle-group>
+            </div>
+
+            <!-- Breadcrumbs for List Mode -->
+            <div v-if="showGroupBreadcrumb" class="flex items-center p-1.5 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-600">
+                <ui-button @click="unselectGroup" size="xs" variant="ghost">
+                    {{ __('Groups') }}
+                </ui-button>
+                <ui-icon name="chevron-right" class="size-3! mt-[1px]" />
+                <span class="text-gray-700 dark:text-gray-300 text-xs px-2">
+                    {{ selectedGroupDisplayText }}
+                </span>
+            </div>
+
+            <!-- List Mode -->
+            <div class="max-h-[21rem] overflow-auto p-1.5">
                 <div
                     v-for="(item, i) in items"
                     :key="item.handle"
@@ -284,6 +376,12 @@ export default {
 
             const group = this.groupedItems[this.selectedTab];
             return group ? group.items : [];
+        },
+
+        // Determine whether to use Modal or Popover
+        shouldUseModal() {
+            // Modal for grid mode, Popover for list mode
+            return this.mode === 'grid';
         },
     },
 

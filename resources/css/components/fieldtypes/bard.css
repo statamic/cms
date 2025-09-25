@@ -213,10 +213,6 @@
             }
         }
     }
-
-    .set-picker .popover .popover-content {
-        min-width: 320px !important;
-    }
 }
 /* Fullscreen mode
    ========================================================================== */
