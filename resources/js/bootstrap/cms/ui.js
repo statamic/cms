@@ -37,6 +37,7 @@ export {
     Field,
     Header,
     Heading,
+    HoverCard,
     Icon,
     Input,
     Label,
