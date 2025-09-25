@@ -10,7 +10,7 @@ Table Fieldtype
 
     thead {
         th {
-            @apply z-10 border-b bg-gray-50 p-2 text-sm font-medium text-gray-900 dark:border-gray-800 dark:border-b-gray-700 dark:bg-gray-900 dark:text-gray-100 not-last:border-e;
+            @apply z-10 border-b bg-gray-50 p-2 text-sm font-medium text-gray-900 dark:border-gray-800 dark:border-b-gray-700 dark:bg-gray-900 dark:text-gray-100 not-last:border-e overflow-hidden;
             display: table-cell;
             position: sticky;
             top: -1px;
@@ -34,7 +34,7 @@ Table Fieldtype
         @apply outline-hidden dark:bg-gray-800;
 
         th {
-            @apply bg-gray-50 p-2 text-sm font-medium text-gray-700 text-start border-r border-b border-gray-200 dark:border-dark-900 dark:bg-gray-700 dark:text-gray-100;
+            @apply bg-gray-50 p-2 text-sm font-medium text-gray-700 text-start border-r border-b border-gray-200 dark:border-dark-900 dark:bg-gray-700 dark:text-gray-100 overflow-hidden;
 
             tr:first-child & {
                 @apply rounded-tl-lg;
@@ -47,17 +47,23 @@ Table Fieldtype
         tr {
             @apply outline-hidden;
 
-            &:first-child td:last-child {
+            &:first-child td {
                 @apply overflow-hidden;
+                &:first-child {
+                    @apply rounded-tl-lg;
+                }
+                &:last-child {
+                    @apply rounded-tr-lg;
+                }
             }
 
             &:last-child td {
                 @apply border-b-0 overflow-hidden;
                 &:first-child {
-                    @apply rounded-es-lg;
+                    @apply rounded-bl-lg;
                 }
                 &:last-child {
-                    @apply rounded-ee-lg;
+                    @apply rounded-br-lg;
                 }
             }
 
@@ -85,14 +91,6 @@ Table Fieldtype
             }
         }
 
-        > tbody:first-child tr:first-child {
-            td:first-child {
-                @apply rounded-tl-lg;
-            }
-            td:last-child {
-                @apply rounded-tr-lg;
-            }
-        }
     }
 
     [data-ui-control] {
