@@ -239,7 +239,7 @@ return [
     'taxonomy_configure_intro' => 'Une taxonomie est un système de classification des données autour d’un ensemble de caractéristiques uniques, telles que la catégorie ou la couleur.',
     'taxonomy_configure_layout_instructions' => 'Définissez la présentation par défaut de cette taxonomie. Les termes peuvent remplacer ce paramètre avec un champ `Layout`.',
     'taxonomy_configure_template_instructions' => 'Définissez le modèle par défaut de cette taxonomie.',
-    'taxonomy_configure_term_template_instructions' => 'Définissez le modèle par défaut de cette taxonomie. Les termes peuvent remplacer ce paramètre avec un champ `Template`.',
+    'taxonomy_configure_term_template_instructions' => 'Définissez le modèle de terme par défaut de cette taxonomie. Les termes peuvent remplacer ce paramètre avec un champ `Template`.',
     'taxonomy_configure_title_instructions' => 'Nous recommandons un nom au pluriel, comme "Catégories" ou "Etiquettes".',
     'taxonomy_next_steps_blueprints_description' => 'Gérez les Blueprints et les champs disponibles pour cette taxonomie.',
     'taxonomy_next_steps_configure_description' => 'Configurez des noms, associez des collections, définissez des Blueprints et plus encore.',
