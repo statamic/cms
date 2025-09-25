@@ -1,4 +1,4 @@
-import { createApp, ref, markRaw } from 'vue';
+import { createApp, markRaw, h } from 'vue';
 import App from './App.vue';
 import { createPinia, defineStore } from 'pinia';
 import axios from 'axios';
@@ -14,6 +14,7 @@ import useDirtyState from '../composables/dirty-state';
 import VueClickAway from 'vue3-click-away';
 import FloatingVue from 'floating-vue';
 import 'floating-vue/dist/style.css';
+import { createInertiaApp } from '@inertiajs/vue3';
 import Toasts from '../components/Toasts';
 import PortalVue from 'portal-vue';
 import Keys from '../components/keys/Keys';
@@ -38,6 +39,7 @@ import markdown from '@/util/markdown.js';
 import VueComponentDebug from 'vue-component-debug';
 import CommandPalette from '../components/CommandPalette.js';
 import { registerIconSetFromStrings } from '@ui';
+import Layout from '@/pages/layout/Layout.vue';
 
 let bootingCallbacks = [];
 let bootedCallbacks = [];
@@ -149,7 +151,30 @@ export default {
     },
 
     async start() {
-        this.$app = createApp(App);
+        const _this = this;
+        await createInertiaApp({
+            id: 'statamic',
+            resolve: name => {
+                const pages = import.meta.glob('../pages/**/*.vue', { eager: true })
+                let page = pages[`../pages/${name}.vue`];
+                page.default.layout = Layout;
+                return page;
+            },
+            async setup({ el, App: InertiaApp, props, plugin }) {
+                const app = await _this.configureApp(InertiaApp, props);
+                app.use(plugin).mount(el);
+            },
+        })
+
+        bootedCallbacks.forEach((callback) => callback(this));
+        bootedCallbacks = [];
+    },
+
+    async configureApp(InertiaApp, props, el) {
+        this.$app = createApp({
+            ...App,
+            render: () => h(InertiaApp, props),
+        });
 
         this.$app.config.silent = false;
         this.$app.config.devtools = true;
@@ -246,10 +271,7 @@ export default {
         bootingCallbacks.forEach((callback) => callback(this));
         bootingCallbacks = [];
 
-        this.$app.mount('#statamic');
-
-        bootedCallbacks.forEach((callback) => callback(this));
-        bootedCallbacks = [];
+        return this.$app;
     },
 };
 

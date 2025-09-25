@@ -11,6 +11,8 @@
         class="bg-global-header-bg dark:bg-dark-global-header-bg font-sans leading-normal text-gray-900 dark:text-white"
         @if ($user->getPreference('strict_accessibility')) data-contrast="increased" @endif
     >
+        @inertia('statamic')
+        {{--
         <div id="statamic">
            <config-provider>
                 @include('statamic::partials.session-expiry')
@@ -57,6 +59,7 @@
                 <portal-targets></portal-targets>
             </config-provider>
         </div>
+        --}}
 
         @include('statamic::partials.scripts')
         @yield('scripts')

@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Column;
@@ -143,6 +144,8 @@ class CollectionsController extends CpController
             'canChangeLocalizationDeleteBehavior' => count($authorizedSites) > 1 && (count($authorizedSites) == $collection->sites()->count()),
             'actions' => Action::for($collection, ['view' => 'form']),
         ];
+
+        return Inertia::render('collections/Show');
 
         if ($collection->queryEntries()->count() === 0) {
             return view('statamic::collections.empty', $viewData);

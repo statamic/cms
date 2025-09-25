@@ -29,7 +29,6 @@ import PreferencesEditForm from '../components/preferences/EditForm.vue';
 import NavigationView from '../components/navigation/View.vue';
 import TaxonomyBlueprintListing from '../components/taxonomies/BlueprintListing.vue';
 import Updater from '../components/updater/Updater.vue';
-import PortalTargets from '../components/portals/PortalTargets.vue';
 import SitesEditForm from '../components/sites/EditForm.vue';
 import CommandPalette from '../components/command-palette/CommandPalette.vue';
 import ItemActions from '../components/actions/ItemActions.vue';
@@ -37,7 +36,6 @@ import BulkActions from '../components/actions/BulkActions.vue';
 import LicensingAlert from '../components/LicensingAlert.vue';
 
 import { defineAsyncComponent } from 'vue';
-import { ConfigProvider } from 'reka-ui';
 
 export default {
     components: {
@@ -73,9 +71,7 @@ export default {
         TaxonomyBlueprintListing,
         NavBuilder: defineAsyncComponent(() => import('../components/nav/Builder.vue')),
         Updater,
-        PortalTargets,
         SitesEditForm,
-        ConfigProvider,
         ItemActions,
         BulkActions,
         LicensingAlert,

@@ -36,6 +36,7 @@
 </script>
 
 {{ Statamic::cpViteScripts() }}
+@inertiaHead
 
 @if (Statamic::pro() && config('statamic.cp.custom_css_url'))
     <link href="{{ config('statamic.cp.custom_css_url') }}?v={{ Statamic::version() }}" rel="stylesheet" />
