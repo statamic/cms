@@ -14,7 +14,7 @@
         >
             <template #cell-email="{ row: user }">
                 <a class="title-index-field" :href="user.edit_url" @click.stop>
-                    <avatar v-if="user.avatar" :user="user" class="size-8 text-xs ltr:mr-2 rtl:ml-2" />
+                    <ui-avatar :user="user" class="size-8 text-xs ltr:mr-2 rtl:ml-2" />
                     <span v-text="user.email" />
                 </a>
             </template>
