@@ -921,7 +921,7 @@
     "Send": "Senden",
     "Send Email Invitation": "Einladung per E-Mail senden",
     "Send Password Reset": "Passwort zurücksetzen",
-    "Send password reset email to this user?|Send password reset email to these :count users?": "E-Mail zum Zurücksetzen des Passworts an diese Benutzer:in senden?|E-Mail zum Zurücksetzen des Passworts an diese :count Benutzer:innen senden?",
+    "Would you like to email a reset link to this user?|Would you like to email a reset link to these :count users?": "E-Mail zum Zurücksetzen des Passworts an diese Benutzer:in senden?|E-Mail zum Zurücksetzen des Passworts an diese :count Benutzer:innen senden?",
     "Send Test Email": "Test-E-Mail senden",
     "Sender": "Absender:in",
     "Sendmail": "Sendmail",

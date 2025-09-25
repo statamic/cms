@@ -858,7 +858,7 @@
     "Seller": "Selger",
     "Send Email Invitation": "Send e-postinvitasjon",
     "Send Password Reset": "Send tilbakestilling av passord",
-    "Send password reset email to this user?|Send password reset email to these :count users?": "Sende e-post med tilbakestilling av passord til denne brukeren?|Sende e-post med tilbakestilling av passord til disse :count brukerne?",
+    "Would you like to email a reset link to this user?|Would you like to email a reset link to these :count users?": "Sende e-post med tilbakestilling av passord til denne brukeren?|Sende e-post med tilbakestilling av passord til disse :count brukerne?",
     "Send Test Email": "Test utsendelse av e-post",
     "Sender": "Sender",
     "Sendmail": "Send e-post",

@@ -1,17 +1,19 @@
+@php($userJson = json_encode($user))
+
 <div v-if="false" class="inline-flex items-center justify-center h-10 w-10">
-    <x-statamic::avatar :user="$user" />
+    <ui-avatar :user='{{ $userJson }}' />
 </div>
 
 <ui-dropdown align="end" v-cloak>
     <template #trigger>
         <ui-button :icon-only="true" variant="ghost">
-            <x-statamic::avatar :user="$user" />
+            <ui-avatar :user='{{ $userJson }}' />
         </ui-button>
     </template>
 
     <ui-dropdown-header>
         <div class="flex items-center gap-2">
-            <x-statamic::avatar :user="$user" class="size-8!" />
+            <ui-avatar :user='{{ $userJson }}' class="size-8" />
             <div>
                 <div class="text-sm" v-pre>{{ $user->email() }}</div>
                 @if ($user->isSuper())

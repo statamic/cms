@@ -62,8 +62,11 @@
 
 main {
     @apply ps-0 md:ps-46;
-    /* Only padding because we don't wand to transition the color when we switch between light/dark mode */
-    transition: padding 0.3s ease-in-out;
+    /* Wait for Vue to load before allowing this transition otherwise you see the Sidebar animate in on load in Firefox (and sometimes Safari) */
+    body:has([data-v-app]) & {
+        /* Only padding because we don't wand to transition the color when we switch between light/dark mode */
+        transition: padding 0.3s ease-in-out;
+    }
 }
 
 .nav-closed main {

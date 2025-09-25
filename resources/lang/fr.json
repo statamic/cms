@@ -921,7 +921,7 @@
     "Send": "Envoyer",
     "Send Email Invitation": "Envoyer une invitation par courrier électronique",
     "Send Password Reset": "Envoyer une réinitialisation du mot de passe",
-    "Send password reset email to this user?|Send password reset email to these :count users?": "Envoyer un email de réinitialisation du mot de passe à cet utilisateur ?|Envoyer un email de réinitialisation du mot de passe à ces :count utilisateurs ?",
+    "Would you like to email a reset link to this user?|Would you like to email a reset link to these :count users?": "Envoyer un email de réinitialisation du mot de passe à cet utilisateur ?|Envoyer un email de réinitialisation du mot de passe à ces :count utilisateurs ?",
     "Send Test Email": "Envoyer un email de test",
     "Sender": "Emetteur",
     "Sendmail": "Envoyer un mail",

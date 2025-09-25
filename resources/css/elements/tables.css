@@ -1,10 +1,15 @@
 /* ==========================================================================
    TABLES
    ========================================================================== */
+/* Modifiers...
+
+    - .data-table--contained is used when the table head appears _inside_ the container, for example /assets.
+
+*/
 .data-table {
     @apply w-full max-w-full outline-hidden text-gray-500 antialiased border-separate border-spacing-y-0 min-w-full overflow-x-auto text-start;
 
-    &.contained {
+    &.data-table--contained {
         @apply rounded-xl;
     }
 
@@ -13,8 +18,8 @@
             @apply whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-300 text-start;
             @apply px-4 py-2;
 
-            .contained & {
-                @apply py-2.5 border-b dark:border-gray-700;
+            .data-table--contained & {
+                @apply py-2.5 border-b border-gray-200 dark:border-gray-700;
             }
         }
 
@@ -27,29 +32,40 @@
         }
     }
 
-    tbody {
-        @apply text-sm shadow-sm-b rounded-xl outline-none;
-        .contained & {
-            @apply shadow-none rounded-none;
-        }
-
-        tr {
-            &:first-child {
+    /* Make sure we only apply this where the data table "head" is in the gray wrapper, i.e. _not_ assets, since otherwise we would be rounding the second row */
+    &:not(.data-table--contained) {
+        tbody {
+            tr:first-child {
+                /* [1] Round the corners */
                 td:first-child,
                 th:first-child {
                     @apply ltr:rounded-tl-xl rtl:rounded-tr-xl;
                 }
-
-                td {
-                    @apply border-t border-t-gray-200 dark:border-t-gray-800;
-                }
-
                 td:last-child,
                 th:last-child {
                     @apply ltr:rounded-tr-xl rtl:rounded-tl-xl;
                 }
+                /* [2] Add a border */
+                td {
+                    @apply border-t border-t-gray-200 dark:border-t-gray-800;
+                }
             }
+            tr td {
+                /* [3] Add left and right borders */
+                &:first-child {
+                    @apply border-s border-s-gray-200 dark:border-s-gray-800;
+                }
+                &:last-child {
+                    @apply border-e border-e-gray-200 dark:border-e-gray-800;
+                }
+            }
+        }
+    }
 
+    tbody {
+        @apply text-sm shadow-sm-b rounded-xl outline-none;
+
+        tr {
             &:last-child {
                 @apply border-none;
 
@@ -76,12 +92,6 @@
                 @apply bg-white dark:bg-gray-900;
                 @apply pl-4.5 pr-2.5 py-3 border-t border-gray-200 dark:border-white/10;
                 @apply text-gray-900 dark:text-gray-200;
-                &:first-child {
-                    @apply border-s border-s-gray-200 dark:border-s-gray-800;
-                }
-                &:last-child {
-                    @apply border-e border-e-gray-200 dark:border-e-gray-800;
-                }
             }
 
             /* When the row is hovered, change the background of all its cells to a hover state color */
@@ -100,11 +110,17 @@
     }
 }
 
+.data-table--contained tbody {
+    tr:first-child td {
+        border-top: unset;
+    }
+}
+
 /* Sticky Meta Columns */
 .data-table {
     thead th.checkbox-column {
         @apply sticky z-1 ps-3 w-8;
-        .contained & {
+        .data-table--contained & {
             @apply sticky ps-4;
         }
     }
@@ -117,7 +133,7 @@
 
     tbody .checkbox-column {
         @apply sticky px-3 -start-px;
-        .contained & {
+        .data-table--contained & {
             @apply sticky ps-4;
         }
     }

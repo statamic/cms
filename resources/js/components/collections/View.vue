@@ -129,7 +129,6 @@
             <template #branch-options="{ branch, removeBranch, depth }">
                 <template v-if="depth < structureMaxDepth">
                     <DropdownLabel :text="__('Create Child Entry')" v-if="blueprints.length > 1" />
-                    <DropdownSeparator v-if="blueprints.length > 1" />
                     <DropdownItem
                         v-for="blueprint in blueprints"
                         @click="createEntry(blueprint.handle, branch.id)"

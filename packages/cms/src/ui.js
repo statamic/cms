@@ -1,5 +1,6 @@
 export const {
     AuthCard,
+    Avatar,
     Badge,
     Button,
     ButtonGroup,
@@ -13,6 +14,7 @@ export const {
     CheckboxGroup,
     CodeEditor,
     Combobox,
+    CommandPaletteItem,
     Context,
     ContextFooter,
     ContextItem,
@@ -30,6 +32,8 @@ export const {
     DropdownLabel,
     DropdownMenu,
     DropdownSeparator,
+    DropdownFooter,
+    DropdownHeader,
     Editable,
     ErrorMessage,
     EmptyStateItem,
@@ -39,6 +43,9 @@ export const {
     Heading,
     Icon,
     Input,
+    InputGroup,
+    InputGroupAppend,
+    InputGroupPrepend,
     Label,
     Listing,
     ListingCustomizeColumns,
@@ -101,5 +108,7 @@ export const {
     ToggleGroup,
     ToggleItem,
     Tooltip,
-    Widget
+    Widget,
+    registerIconSet,
+    registerIconSetFromStrings,
 } = __STATAMIC__.ui;
