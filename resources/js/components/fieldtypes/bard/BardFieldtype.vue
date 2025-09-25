@@ -277,6 +277,8 @@ export default {
 
         htmlWithReplacedLinks() {
             return this.html.replaceAll(/\"statamic:\/\/(.*?)\"/g, (match, ref) => {
+                // Get everything in the "ref" string before a ? or #.
+                ref = ref.split(/[?#]/)[0]
                 const linkData = this.meta.linkData[ref];
                 if (! linkData) {
                     this.$toast.error(`${__('No link data found for')} ${ref}`);
