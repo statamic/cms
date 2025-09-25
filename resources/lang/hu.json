@@ -858,7 +858,7 @@
     "Seller": "Eladó",
     "Send Email Invitation": "Meghívó küldése e-mailben",
     "Send Password Reset": "Jelszó visszaállítás küldése",
-    "Send password reset email to this user?|Send password reset email to these :count users?": "Jelszó-visszaállítási e-mailt küld ennek a felhasználónak?|Jelszó-visszaállítási e-mailt küld ennek a :count felhasználónak?",
+    "Would you like to email a reset link to this user?|Would you like to email a reset link to these :count users?": "Jelszó-visszaállítási e-mailt küld ennek a felhasználónak?|Jelszó-visszaállítási e-mailt küld ennek a :count felhasználónak?",
     "Send Test Email": "Teszt e-mail küldése",
     "Sender": "Feladó",
     "Sendmail": "Sendmail",

@@ -858,7 +858,7 @@
     "Seller": "Продавець",
     "Send Email Invitation": "Надіслати запрошення електронною поштою",
     "Send Password Reset": "Надіслати скидання пароля",
-    "Send password reset email to this user?|Send password reset email to these :count users?": "Надіслати лист для скидання пароля цьому користувачу?|Надіслати лист для скидання пароля цим :count користувачам?",
+    "Would you like to email a reset link to this user?|Would you like to email a reset link to these :count users?": "Надіслати лист для скидання пароля цьому користувачу?|Надіслати лист для скидання пароля цим :count користувачам?",
     "Send Test Email": "Надіслати тестовий лист",
     "Sender": "Відправник",
     "Sendmail": "Sendmail",
