@@ -4,6 +4,7 @@ import {
     PublishContainer,
     PublishFieldsProvider as FieldsProvider,
     PublishFields,
+    Description,
 } from '@ui';
 import { requireElevatedSessionIf } from '@/components/elevated-sessions/index.js';
 
@@ -94,9 +95,9 @@ defineExpose({
         @confirm="confirmed"
         @cancel="reset"
     >
-        <div
+        <Description
             v-if="confirmationText"
-            v-text="confirmationText"
+            :text="confirmationText"
             :class="{ 'mb-4': warningText || showDirtyWarning || action.fields.length }"
         />
 
