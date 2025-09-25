@@ -54,12 +54,14 @@ class SitesConfigTest extends TestCase
         $this->assertSame('/', Site::default()->url());
         $this->assertSame('en_US', Site::default()->locale());
         $this->assertSame('en', Site::default()->lang());
+        $this->assertTrue(Site::default()->isDefault());
 
         $this->assertSame('french', Site::get('french')->handle());
         $this->assertSame('French', Site::get('french')->name());
         $this->assertSame('/fr', Site::get('french')->url());
         $this->assertSame('fr_FR', Site::get('french')->locale());
         $this->assertSame('fr', Site::get('french')->lang());
+        $this->assertFalse(Site::get('french')->isDefault());
     }
 
     #[Test]
@@ -78,6 +80,7 @@ class SitesConfigTest extends TestCase
         $this->assertSame('/', Site::default()->url());
         $this->assertSame(config('app.locale'), Site::default()->locale());
         $this->assertSame(config('app.locale'), Site::default()->lang());
+        $this->assertTrue(Site::default()->isDefault());
     }
 
     #[Test]
