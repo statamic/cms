@@ -6,19 +6,26 @@
     </template>
 
     <ui-popover
-        v-else
-        inset
         :align="align"
-        class="set-picker select-none w-72"
         :open="isOpen"
-        @update:open="isOpen = $event"
         @clicked-away="$emit('clicked-away', $event)"
+        @update:open="isOpen = $event"
+        class="set-picker select-none"
+        prioritize-position
+        :class="{
+            'w-72': mode === 'list',
+            'w-224': mode === 'grid',
+        }"
+        inset
+        v-else
     >
         <template #trigger>
             <slot name="trigger" />
         </template>
+
         <template #default>
-            <div class="flex items-center border-b border-gray-200 dark:border-gray-600 p-1.5">
+
+            <div class="flex items-center border-b border-gray-200 dark:border-gray-600 p-1.5 gap-1.5">
                 <ui-input
                     :placeholder="__('Search Sets')"
                     class="[&_svg]:size-5"
@@ -28,20 +35,63 @@
                     size="sm"
                     type="text"
                     v-model="search"
-                    v-show="showSearch"
                     variant="ghost"
                 />
-                <div v-if="showGroupBreadcrumb" class="flex items-center">
-                    <ui-button @click="unselectGroup" size="xs" variant="ghost">
-                        {{ __('Groups') }}
-                    </ui-button>
-                    <ui-icon name="chevron-right" class="size-3! mt-[1px]" />
-                    <span class="text-gray-700 dark:text-gray-300 text-xs px-2">
-                        {{ selectedGroupDisplayText }}
-                    </span>
-                </div>
+
+                <ui-toggle-group v-model="mode" size="sm">
+                    <ui-toggle-item icon="layout-list" value="list" aria-label="List view" />
+                    <ui-toggle-item icon="layout-grid" value="grid" aria-label="Grid view" />
+                </ui-toggle-group>
             </div>
-            <div class="max-h-[21rem] overflow-auto p-1.5">
+
+            <!-- Breadcrumbs for List Mode -->
+            <div v-if="showGroupBreadcrumb" class="flex items-center p-1.5 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-600">
+                <ui-button @click="unselectGroup" size="xs" variant="ghost">
+                    {{ __('Groups') }}
+                </ui-button>
+                <ui-icon name="chevron-right" class="size-3! mt-[1px]" />
+                <span class="text-gray-700 dark:text-gray-300 text-xs px-2">
+                    {{ selectedGroupDisplayText }}
+                </span>
+            </div>
+
+            <!-- Tabs for Grid Mode -->
+            <ui-tabs default-tab="all" v-model="selectedTab" class="w-full" v-if="mode === 'grid'">
+                <ui-tab-list class="px-2">
+                    <ui-tab-trigger :text="group.display" :name="group.handle" v-for="group in groupedItems" :key="group.handle" />
+                </ui-tab-list>
+                <ui-tab-content :name="group.handle" v-for="group in groupedItems" :key="group.handle">
+                    <div class="p-3 grid grid-cols-3 gap-6">
+                        <div
+                            v-for="(item, i) in group.items"
+                            :key="item.handle"
+                            class="cursor-pointer rounded-lg"
+                            :class="{ 'bg-gray-100 dark:bg-gray-900': selectionIndex === i }"
+                            @mouseover="selectionIndex = i"
+                            :title="__(item.instructions)"
+                        >
+                            <div @click="addSet(item.handle)" class="p-2.5">
+                                <div class="h-40 w-full flex items-center justify-center">
+                                    <img :src="item.image" class="rounded-lg h-40 object-cover" v-if="item.image" />
+                                </div>
+                                <div class="line-clamp-1 text-base mt-1 text-gray-900 dark:text-gray-200">
+                                    {{ __(item.display || item.handle) }}
+                                </div>
+                                <p v-if="item.instructions" class="text-gray-800 dark:text-gray-200 mb-2">
+                                    {{ __(item.instructions) }}
+                                </p>
+                            </div>
+                        </div>
+                        <div v-if="group.items.length === 0" class="p-3 text-center text-xs text-gray-600">
+                            {{ __('No sets available') }}
+                        </div>
+                    </div>
+                </ui-tab-content>
+            </ui-tabs>
+
+
+            <!-- List Mode -->
+            <div class="max-h-[21rem] overflow-auto p-1.5" v-if="mode === 'list'">
                 <div
                     v-for="(item, i) in items"
                     :key="item.handle"
@@ -117,6 +167,8 @@ export default {
             selectionIndex: 0,
             keybindings: [],
             isOpen: false,
+            mode: this.getStoredMode(),
+            selectedTab: 'all',
         };
     },
 
@@ -199,6 +251,40 @@ export default {
         iconSet() {
             return this.$config.get('replicatorSetIcons') || undefined;
         },
+
+        // For Grid Mode - groups items into tabs
+        groupedItems() {
+            const groups = {};
+
+            // Add all sets to 'all' group
+            groups.all = {
+                display: __('All'),
+                handle: 'all',
+                items: []
+            };
+
+            // Group sets by their parent group
+            this.sets.forEach(group => {
+                groups[group.handle] = {
+                    display: group.display || group.handle,
+                    handle: group.handle,
+                    items: group.sets.filter(set => !set.hide)
+                };
+
+                // Add sets to 'all' group
+                groups.all.items = groups.all.items.concat(group.sets.filter(set => !set.hide));
+            });
+
+            return groups;
+        },
+
+        // Get items for the currently selected tab
+        currentTabItems() {
+            if (this.mode !== 'grid') return [];
+
+            const group = this.groupedItems[this.selectedTab];
+            return group ? group.items : [];
+        },
     },
 
     watch: {
@@ -214,6 +300,12 @@ export default {
         },
         search() {
             this.selectionIndex = 0;
+        },
+        selectedTab() {
+            this.selectionIndex = 0;
+        },
+        mode() {
+            this.saveMode();
         },
     },
 
@@ -251,12 +343,14 @@ export default {
 
         keypressUp(e) {
             e.preventDefault();
-            this.selectionIndex = this.selectionIndex === 0 ? this.items.length - 1 : this.selectionIndex - 1;
+            const items = this.mode === 'grid' ? this.currentTabItems : this.items;
+            this.selectionIndex = this.selectionIndex === 0 ? items.length - 1 : this.selectionIndex - 1;
         },
 
         keypressDown(e) {
             e.preventDefault();
-            this.selectionIndex = this.selectionIndex === this.items.length - 1 ? 0 : this.selectionIndex + 1;
+            const items = this.mode === 'grid' ? this.currentTabItems : this.items;
+            this.selectionIndex = this.selectionIndex === items.length - 1 ? 0 : this.selectionIndex + 1;
         },
 
         keypressRight(e) {
@@ -272,10 +366,11 @@ export default {
 
         keypressEnter(e) {
             e.preventDefault();
-            const item = this.items[this.selectionIndex];
-            if (item.type === 'group') {
+            const items = this.mode === 'grid' ? this.currentTabItems : this.items;
+            const item = items[this.selectionIndex];
+            if (item && item.type === 'group') {
                 this.selectGroup(item.handle);
-            } else {
+            } else if (item) {
                 this.addSet(item.handle);
             }
         },
@@ -286,6 +381,22 @@ export default {
 
         open() {
             this.isOpen = true;
+        },
+
+        getStoredMode() {
+            try {
+                return localStorage.getItem('statamic.replicator.setPicker.mode') || 'list';
+            } catch (e) {
+                return 'list';
+            }
+        },
+
+        saveMode() {
+            try {
+                localStorage.setItem('statamic.replicator.setPicker.mode', this.mode);
+            } catch (e) {
+                // Ignore localStorage errors
+            }
         },
     },
 };
