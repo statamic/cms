@@ -98,6 +98,7 @@ it('exports ui', async () => {
         'Field',
         'Header',
         'Heading',
+        'HoverCard',
         'Icon',
         'Input',
         'InputGroup',

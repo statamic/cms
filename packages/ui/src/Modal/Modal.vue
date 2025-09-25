@@ -8,6 +8,7 @@ import Icon from '../Icon/Icon.vue';
 const emit = defineEmits(['update:open']);
 
 const props = defineProps({
+    blur: { type: Boolean, default: true },
     title: { type: String, default: '' },
     icon: { type: [String, null], default: null },
     open: { type: Boolean, default: false },
@@ -15,6 +16,15 @@ const props = defineProps({
 });
 
 const hasModalTitleComponent = hasComponent('ModalTitle');
+
+const overlayClasses = cva({
+    base: 'data-[state=open]:show fixed inset-0 z-30 bg-gray-800/20 dark:bg-gray-800/50',
+    variants: {
+        blur: {
+            true: 'backdrop-blur-[2px]',
+        },
+    },
+})({ ...props });
 
 const modalClasses = cva({
     base: [
@@ -63,7 +73,7 @@ function preventIfNotDismissible(event) {
             <slot name="trigger" />
         </DialogTrigger>
         <DialogPortal>
-            <DialogOverlay class="data-[state=open]:show fixed inset-0 z-30 bg-gray-800/20 backdrop-blur-[2px] dark:bg-gray-800/50" />
+            <DialogOverlay :class="overlayClasses" />
             <DialogContent
                 :class="[modalClasses, $attrs.class]"
                 data-ui-modal-content

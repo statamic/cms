@@ -37,6 +37,7 @@ export { default as EmptyStateMenu } from './EmptyState/Menu.vue';
 export { default as Field } from './Field.vue';
 export { default as Header } from './Header.vue';
 export { default as Heading } from './Heading.vue';
+export { default as HoverCard } from './HoverCard.vue';
 export { default as Icon } from './Icon/Icon.vue';
 export { registerIconSet, registerIconSetFromStrings } from './Icon/registry.js';
 export { default as Input } from './Input/Input.vue';

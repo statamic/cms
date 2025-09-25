@@ -95,15 +95,15 @@
                                 @added="addSet"
                             >
                                 <template #trigger>
-                                    <button
-                                        type="button"
-                                        class="btn-round bard-add-set-button group size-7!"
-                                        :style="{ transform: `translateY(${y+2}px)` }"
-                                        :aria-label="__('Add Set')"
-                                        v-tooltip="__('Add Set')"
-                                    >
-                                        <ui-icon name="plus" class="size-4" />
-                                    </button>
+                                    <div class="absolute flex items-center gap-2 top-[-6px] z-1 -start-4.5 group" :style="{ transform: `translateY(${y}px)` }">
+                                        <ui-button
+                                            icon="plus"
+                                            size="sm"
+                                            :aria-label="__('Add Set')"
+                                            v-tooltip="__('Add Set')"
+                                        />
+                                        <ui-description v-if="!$refs.setPicker?.isOpen" :text="__('Type \'/\' to insert a set')" />
+                                    </div>
                                 </template>
                             </set-picker>
                         </floating-menu>

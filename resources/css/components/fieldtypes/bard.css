@@ -176,10 +176,6 @@
         }
     }
 
-    .bard-add-set-button {
-        @apply absolute top-[-6px] z-1 flex items-center justify-center -start-4;
-    }
-
     .bard-footer-toolbar {
         @apply flex items-center justify-between rounded-b border-t bg-white p-2 text-xs text-gray-700 shadow-none dark:border-dark-300 dark:bg-dark-550 dark:text-dark-175;
         padding: 8px 12px;
@@ -216,10 +212,6 @@
                 left: auto;
             }
         }
-    }
-
-    .set-picker .popover .popover-content {
-        min-width: 320px !important;
     }
 }
 /* Fullscreen mode
