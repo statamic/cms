@@ -76,7 +76,7 @@
                             </div>
                         </div>
                         <div v-if="group.items.length === 0" class="p-3 text-center text-xs text-gray-600">
-                            {{ __('No sets available') }}
+                            {{ search ? __('No results') : __('No sets available') }}
                         </div>
                     </div>
                 </ui-tab-content>
@@ -357,14 +357,26 @@ export default {
 
             // Group sets by their parent group
             this.sets.forEach(group => {
+                let filteredSets = group.sets.filter(set => !set.hide);
+
+                // Apply search filter if there's a search term
+                if (this.search) {
+                    filteredSets = filteredSets.filter(set => {
+                        return (
+                            __(set.display).toLowerCase().includes(this.search.toLowerCase()) ||
+                            set.handle.toLowerCase().includes(this.search.toLowerCase())
+                        );
+                    });
+                }
+
                 groups[group.handle] = {
                     display: group.display || group.handle,
                     handle: group.handle,
-                    items: group.sets.filter(set => !set.hide)
+                    items: filteredSets
                 };
 
-                // Add sets to 'all' group
-                groups.all.items = groups.all.items.concat(group.sets.filter(set => !set.hide));
+                // Add filtered sets to 'all' group
+                groups.all.items = groups.all.items.concat(filteredSets);
             });
 
             return groups;
