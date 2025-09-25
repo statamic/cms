@@ -105,16 +105,56 @@ const meshGradientStyle = computed(() => {
     }
 
     // Generate vivid colors with good contrast for white text
-    const colors = hues.map(hue => {
-        const saturation = 70 + Math.floor(Math.random() * 25); // 70-95% (more vivid)
-        const lightness = 40 + Math.floor(Math.random() * 30);  // 40-70% (vivid but not too light)
+    const colors = hues.map((hue, index) => {
+        const saturationKey = `avatar-saturation-${userId}-${index}`;
+        const lightnessKey = `avatar-lightness-${userId}-${index}`;
+
+        let saturation, lightness;
+
+        if (typeof sessionStorage !== 'undefined') {
+            const storedSaturation = sessionStorage.getItem(saturationKey);
+            const storedLightness = sessionStorage.getItem(lightnessKey);
+
+            if (storedSaturation !== null && storedLightness !== null) {
+                saturation = parseInt(storedSaturation);
+                lightness = parseInt(storedLightness);
+            } else {
+                saturation = 70 + Math.floor(Math.random() * 25); // 70-95% (more vivid)
+                lightness = 40 + Math.floor(Math.random() * 30);  // 40-70% (vivid but not too light)
+                sessionStorage.setItem(saturationKey, saturation.toString());
+                sessionStorage.setItem(lightnessKey, lightness.toString());
+            }
+        } else {
+            // Fallback: deterministic values based on hue
+            saturation = 70 + (hue % 25);
+            lightness = 40 + ((hue * 2) % 30);
+        }
+
         return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
     });
 
     // Generate positions
-    const positions = colors.map(() =>
-        `${20 + Math.floor(Math.random() * 60)}% ${20 + Math.floor(Math.random() * 60)}%`
-    );
+    const positions = colors.map((color, index) => {
+        const positionKey = `avatar-position-${userId}-${index}`;
+
+        if (typeof sessionStorage !== 'undefined') {
+            const storedPosition = sessionStorage.getItem(positionKey);
+            if (storedPosition !== null) {
+                return storedPosition;
+            } else {
+                const x = 20 + Math.floor(Math.random() * 60);
+                const y = 20 + Math.floor(Math.random() * 60);
+                const position = `${x}% ${y}%`;
+                sessionStorage.setItem(positionKey, position);
+                return position;
+            }
+        } else {
+            // Fallback: deterministic position based on hue
+            const x = 20 + (hues[index] % 60);
+            const y = 20 + ((hues[index] * 2) % 60);
+            return `${x}% ${y}%`;
+        }
+    });
 
     // Build gradient string with larger sizes for small avatars
     const gradients = colors.map((color, index) =>
