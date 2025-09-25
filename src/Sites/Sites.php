@@ -16,7 +16,9 @@ use Statamic\Support\Str;
 class Sites
 {
     protected $sites;
+
     protected $current;
+
     protected ?Closure $currentUrlCallback = null;
 
     public function __construct()
@@ -268,7 +270,7 @@ class Sites
 
     protected function hydrateConfig($config): Collection
     {
-        $defaultSiteHandle = array_key_first($config);
+        $defaultSiteHandle = collect($config)->keys()->first();
 
         return collect($config)->map(fn ($site, $handle) => new Site($handle, $site, $handle === $defaultSiteHandle));
     }
