@@ -16,7 +16,6 @@ class Site implements Augmentable
     protected $handle;
     protected $config;
     protected $rawConfig;
-
     protected $isDefault;
 
     public function __construct($handle, $config, $isDefault = false)

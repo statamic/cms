@@ -16,9 +16,7 @@ use Statamic\Support\Str;
 class Sites
 {
     protected $sites;
-
     protected $current;
-
     protected ?Closure $currentUrlCallback = null;
 
     public function __construct()
