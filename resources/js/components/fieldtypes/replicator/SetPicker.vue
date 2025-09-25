@@ -54,7 +54,7 @@
                     <ui-tab-trigger :text="group.display" :name="group.handle" v-for="group in groupedItems" :key="group.handle" />
                 </ui-tab-list>
                 <ui-tab-content :name="group.handle" v-for="group in groupedItems" :key="group.handle">
-                    <div class="p-3 grid grid-cols-3 gap-6">
+                    <div class="p-3 grid grid-cols-2 md:grid-cols-3 gap-6">
                         <div
                             v-for="(item, i) in group.items"
                             :key="item.handle"
