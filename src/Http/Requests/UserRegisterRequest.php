@@ -59,7 +59,7 @@ class UserRegisterRequest extends FormRequest
             ->process()
             ->values()
             ->only(array_keys($this->submittedValues))
-            ->except(['email', 'password', 'groups', 'roles', 'super']);
+            ->except(['email', 'groups', 'roles', 'super', 'password_confirmation']);
     }
 
     public function processedAssets()
