@@ -50,9 +50,10 @@
                 />
             </template>
 
-            <ui-toggle-group v-model="view" v-if="canUseStructureTree">
-                <ui-toggle-item icon="navigation" value="tree" />
+            <ui-toggle-group v-model="view" v-if="canUseStructureTree || canUseCalendar">
+                <ui-toggle-item icon="navigation" value="tree" v-if="canUseStructureTree" />
                 <ui-toggle-item icon="layout-list" value="list" />
+                <ui-toggle-item icon="calendar" value="calendar" v-if="canUseCalendar" />
             </ui-toggle-group>
 
             <template v-if="view === 'list' && reorderable">
@@ -149,6 +150,11 @@
             </template>
         </page-tree>
 
+        <CollectionCalendar
+            v-if="view === 'calendar'"
+            :collection="handle"
+        />
+
         <delete-entry-confirmation
             v-if="showEntryDeletionConfirmation"
             :children="numberOfChildrenToBeDeleted"
@@ -178,69 +184,70 @@ import ItemActions from '@/components/actions/ItemActions.vue';
 
 export default {
     components: {
-        DropdownSeparator,
+        Button,
+        DeleteEntryConfirmation,
+        DeleteLocalizationConfirmation,
+        Dropdown,
         DropdownItem,
         DropdownLabel,
         DropdownMenu,
-        ItemActions,
-        Dropdown,
+        DropdownSeparator,
         Header,
-        Button,
+        ItemActions,
+        PageTree: defineAsyncComponent(() => import('../structures/PageTree.vue')),
+        SiteSelector,
         ToggleGroup,
         ToggleItem,
-        PageTree: defineAsyncComponent(() => import('../structures/PageTree.vue')),
-        DeleteEntryConfirmation,
-        DeleteLocalizationConfirmation,
-        SiteSelector,
     },
 
     props: {
-        title: { type: String, required: true },
-        handle: { type: String, required: true },
-        icon: { type: String, required: true },
-        canCreate: { type: Boolean, required: true },
-        createUrls: { type: Object, required: true },
-        createLabel: { type: String, required: true },
-        blueprints: { type: Array, required: true },
-        structured: { type: Boolean, default: false },
-        sortColumn: { type: String, required: true },
-        sortDirection: { type: String, required: true },
-        columns: { type: Array, required: true },
-        filters: { type: Array, required: true },
         actions: { type: Array, required: true },
         actionUrl: { type: String, required: true },
-        entriesActionUrl: { type: String, required: true },
-        reorderUrl: { type: String, required: true },
-        editUrl: { type: String, required: true },
+        blueprints: { type: Array, required: true },
         blueprintsUrl: { type: String, required: true },
-        scaffoldUrl: { type: String, required: true },
+        canChangeLocalizationDeleteBehavior: { type: Boolean },
+        canCreate: { type: Boolean, required: true },
         canEdit: { type: Boolean, required: true },
         canEditBlueprints: { type: Boolean, required: true },
+        columns: { type: Array, required: true },
+        createLabel: { type: String, required: true },
+        createUrls: { type: Object, required: true },
+        dated: { type: Boolean, default: false },
+        editUrl: { type: String, required: true },
+        entriesActionUrl: { type: String, required: true },
+        filters: { type: Array, required: true },
+        handle: { type: String, required: true },
+        icon: { type: String, required: true },
         initialSite: { type: String, required: true },
+        reorderUrl: { type: String, required: true },
+        scaffoldUrl: { type: String, required: true },
         sites: { type: Array },
-        totalSitesCount: { type: Number },
-        canChangeLocalizationDeleteBehavior: { type: Boolean },
-        structurePagesUrl: { type: String },
-        structureSubmitUrl: { type: String },
-        structureMaxDepth: { type: Number, default: Infinity },
+        sortColumn: { type: String, required: true },
+        sortDirection: { type: String, required: true },
+        structured: { type: Boolean, default: false },
         structureExpectsRoot: { type: Boolean },
+        structureMaxDepth: { type: Number, default: Infinity },
+        structurePagesUrl: { type: String },
         structureShowSlugs: { type: Boolean },
+        structureSubmitUrl: { type: String },
+        title: { type: String, required: true },
+        totalSitesCount: { type: Number },
     },
 
     data() {
         return {
-            mounted: false,
-            view: null,
             deletedEntries: [],
-            showEntryDeletionConfirmation: false,
+            deleteLocalizationBehavior: null,
             entryBeingDeleted: null,
             entryDeletionConfirmCallback: null,
-            deleteLocalizationBehavior: null,
-            showLocalizationDeleteBehaviorConfirmation: false,
             localizationDeleteBehaviorConfirmCallback: null,
-            site: this.initialSite,
-            reordering: false,
+            mounted: false,
             preferencesPrefix: `collections.${this.handle}`,
+            reordering: false,
+            showEntryDeletionConfirmation: false,
+            showLocalizationDeleteBehaviorConfirmation: false,
+            site: this.initialSite,
+            view: null,
         };
     },
 
@@ -251,6 +258,10 @@ export default {
 
         canUseStructureTree() {
             return this.structured && this.structureMaxDepth !== 1;
+        },
+
+        canUseCalendar() {
+            return this.dated;
         },
 
         reorderable() {

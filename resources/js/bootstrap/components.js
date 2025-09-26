@@ -3,6 +3,7 @@ import Browser from '../components/assets/Browser/Browser.vue';
 import UpdatesBadge from '../components/UpdatesBadge.vue';
 import FullscreenHeader from '../components/publish/FullscreenHeader.vue';
 import FieldMeta from '../components/publish/FieldMeta.vue';
+import CollectionCalendar from '../components/entries/CollectionCalendar.vue';
 import EntryPublishForm from '../components/entries/PublishForm.vue';
 import TermPublishForm from '../components/terms/PublishForm.vue';
 import UserPublishForm from '../components/users/PublishForm.vue';
@@ -40,6 +41,7 @@ export default function registerGlobalComponents(app) {
     app.component('publish-field-meta', FieldMeta);
     app.component('publish-field-fullscreen-header', FullscreenHeader);
 
+    app.component('CollectionCalendar', CollectionCalendar);
     app.component('EntryPublishForm', EntryPublishForm);
     app.component('TermPublishForm', TermPublishForm);
     app.component('UserPublishForm', UserPublishForm);
