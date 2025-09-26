@@ -1,5 +1,5 @@
 <template>
-    <div class="h-full overflow-auto bg-white dark:bg-gray-800 focus-none p-3 rounded-l-xl">
+    <div class="h-full overflow-auto bg-white dark:bg-gray-800 focus-none p-3">
         <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
             <Icon name="loading" />
         </div>
