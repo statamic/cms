@@ -164,7 +164,7 @@ onMounted(() => {
                                         </span>
                                     </a>
                                     <div v-if="getEntriesForDate(weekDate).length > 5" class="text-xs text-gray-500 dark:text-gray-400">
-                                        +{{ getEntriesForDate(weekDate).length - 3 }} {{ __('more') }}
+                                        +{{ getEntriesForDate(weekDate).length - 5 }} {{ __('more') }}
                                     </div>
                                 </div>
                             </CalendarCellTrigger>
