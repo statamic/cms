@@ -14,6 +14,7 @@ use Statamic\Facades\Icon;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Statamic\Fieldtypes\Sets;
 use Statamic\Icons\IconSet;
 use Statamic\Licensing\LicenseManager;
 use Statamic\Statamic;
@@ -83,6 +84,7 @@ class JavascriptComposer
             'customSvgIcons' => $this->icons(),
             'commandPaletteCategories' => Category::order(),
             'commandPalettePreloadedItems' => CommandPalette::getPreloadedItems(),
+            'setPreviewImages' => Sets::previewImageConfig(),
             'linkToDocs' => config('statamic.cp.link_to_docs'),
             'licensing' => $this->licensing(),
             'nav' => $this->nav(),

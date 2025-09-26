@@ -3,6 +3,8 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Exceptions\ReplicatorIconSetNotFoundException;
+use Statamic\Facades\Asset;
+use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Icon;
 use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldTransformer;
@@ -52,6 +54,7 @@ class Sets extends Fieldtype
                         'display' => $set['display'] ?? null,
                         'instructions' => $set['instructions'] ?? null,
                         'icon' => $set['icon'] ?? null,
+                        'image' => $this->preProcessPreviewImage($set['image'] ?? null),
                         'hide' => $set['hide'] ?? null,
                         'fields' => collect($set['fields'] ?? [])->map(function ($field, $i) use ($setId) {
                             return array_merge(FieldTransformer::toVue($field), ['_id' => $setId.'-'.$i]);
@@ -92,6 +95,7 @@ class Sets extends Fieldtype
                         return array_merge($config, [
                             'handle' => $name,
                             'id' => $name,
+                            'image' => $this->previewImageUrl($config['image'] ?? null),
                             'fields' => (new NestedFields)->preProcessConfig(Arr::get($config, 'fields', [])),
                         ]);
                     })
@@ -120,6 +124,7 @@ class Sets extends Fieldtype
                                 'display' => $section['display'],
                                 'instructions' => $section['instructions'] ?? null,
                                 'icon' => $section['icon'] ?? null,
+                                'image' => $this->processPreviewImage($section['image'] ?? null),
                                 'hide' => $section['hide'] ?? null,
                                 'fields' => collect($section['fields'])->map(function ($field) {
                                     return FieldTransformer::fromVue($field);
@@ -147,5 +152,60 @@ class Sets extends Fieldtype
         // Provide to script for <icon-fieldtype> selector components in blueprint config.
         // If a directory hasn't been provided, it will assume they've manually registered the set.
         Statamic::provideToScript(['replicatorSetIcons' => $name]);
+    }
+
+    private function preProcessPreviewImage($image)
+    {
+        if (! $image) {
+            return null;
+        }
+
+        ['container' => $container, 'folder' => $folder] = static::previewImageConfig();
+
+        $prefix = sprintf('%s::%s', $container, $folder ? $folder.'/' : '');
+
+        return $prefix.$image;
+    }
+
+    private function processPreviewImage($image)
+    {
+        if (! $image) {
+            return null;
+        }
+
+        ['container' => $container, 'folder' => $folder] = static::previewImageConfig();
+
+        $prefix = sprintf('%s::%s', $container, $folder ? $folder.'/' : '');
+
+        return (string) str($image)->after($prefix);
+    }
+
+    private function previewImageUrl($image)
+    {
+        if (! $path = $this->preProcessPreviewImage($image)) {
+            return null;
+        }
+
+        return Asset::find($path)?->thumbnailUrl();
+    }
+
+    public static function previewImageConfig(): ?array
+    {
+        if (! $config = config('statamic.assets.set_preview_images')) {
+            return null;
+        }
+
+        if (is_string($config)) {
+            $config = ['container' => $config];
+        }
+
+        $container = $config['container'] ?? null;
+        $folder = $config['folder'] ?? null;
+
+        if (! AssetContainer::find($container)) {
+            return null;
+        }
+
+        return compact('container', 'folder');
     }
 }

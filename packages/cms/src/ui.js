@@ -42,6 +42,7 @@ export const {
     Field,
     Header,
     Heading,
+    HoverCard,
     Icon,
     Input,
     InputGroup,

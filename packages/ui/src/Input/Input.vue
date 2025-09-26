@@ -53,6 +53,7 @@ const inputClasses = computed(() => {
             variant: {
                 default: '',
                 light: 'dark:bg-gray-800/20',
+                ghost: 'bg-transparent border-none shadow-none! inset-shadow-none!',
             },
             hasLimit: {
                 true: 'pe-9',

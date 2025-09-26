@@ -42,6 +42,7 @@ export {
     Field,
     Header,
     Heading,
+    HoverCard,
     Icon,
     Input,
     InputGroup,

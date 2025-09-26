@@ -8,6 +8,7 @@ import Icon from '../Icon/Icon.vue';
 const emit = defineEmits(['update:open']);
 
 const props = defineProps({
+    blur: { type: Boolean, default: true },
     title: { type: String, default: '' },
     icon: { type: [String, null], default: null },
     open: { type: Boolean, default: false },
@@ -15,6 +16,15 @@ const props = defineProps({
 });
 
 const hasModalTitleComponent = hasComponent('ModalTitle');
+
+const overlayClasses = cva({
+    base: 'data-[state=open]:show fixed inset-0 z-30 bg-gray-800/20 dark:bg-gray-800/50',
+    variants: {
+        blur: {
+            true: 'backdrop-blur-[2px]',
+        },
+    },
+})({ ...props });
 
 const modalClasses = cva({
     base: [
@@ -63,7 +73,7 @@ function preventIfNotDismissible(event) {
             <slot name="trigger" />
         </DialogTrigger>
         <DialogPortal>
-            <DialogOverlay class="data-[state=open]:show fixed inset-0 z-30 bg-gray-800/20 backdrop-blur-[2px] dark:bg-gray-800/50" />
+            <DialogOverlay :class="overlayClasses" />
             <DialogContent
                 :class="[modalClasses, $attrs.class]"
                 data-ui-modal-content
@@ -71,7 +81,7 @@ function preventIfNotDismissible(event) {
                 @pointer-down-outside="preventIfNotDismissible"
                 @escape-key-down="preventIfNotDismissible"
             >
-                <div class="relative space-y-3 rounded-xl border border-gray-400/60 bg-white p-4 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:border-none dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/15" >
+                <div class="relative space-y-3 rounded-xl overflow-auto max-h-[60vh] border border-gray-400/60 bg-white p-4 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:border-none dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/15" >
                     <DialogTitle v-if="!hasModalTitleComponent" data-ui-modal-title class="flex items-center gap-2">
                         <Icon :name="icon" v-if="icon" class="size-4" />
                         <ui-heading :text="title" size="lg" class="font-medium" />

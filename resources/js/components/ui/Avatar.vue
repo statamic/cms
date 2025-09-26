@@ -120,14 +120,14 @@ const meshGradientStyle = computed(() => {
                 lightness = parseInt(storedLightness);
             } else {
                 saturation = 70 + Math.floor(Math.random() * 25); // 70-95% (more vivid)
-                lightness = 40 + Math.floor(Math.random() * 30);  // 40-70% (vivid but not too light)
+                lightness = 35 + Math.floor(Math.random() * 15);  // 35-50% (maximum lightness for AA)
                 sessionStorage.setItem(saturationKey, saturation.toString());
                 sessionStorage.setItem(lightnessKey, lightness.toString());
             }
         } else {
             // Fallback: deterministic values based on hue
             saturation = 70 + (hue % 25);
-            lightness = 40 + ((hue * 2) % 30);
+            lightness = 35 + ((hue * 2) % 15);
         }
 
         return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
