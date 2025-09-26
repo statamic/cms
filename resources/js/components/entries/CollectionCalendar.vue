@@ -65,10 +65,6 @@ function formatTime(dateString) {
 }
 
 watch(() => [currentDate.value.year, currentDate.value.month], fetchEntries, { immediate: true });
-
-onMounted(() => {
-    fetchEntries();
-});
 </script>
 
 <template>
