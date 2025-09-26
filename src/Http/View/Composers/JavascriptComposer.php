@@ -72,6 +72,7 @@ class JavascriptComposer
             'sites' => $this->sites(),
             'selectedSite' => Site::selected()->handle(),
             'selectedSiteUrl' => Site::selected()->url(),
+            'supportUrl' => config('statamic.cp.support_url'),
             'preloadableFieldtypes' => FieldtypeRepository::preloadable()->keys(),
             'livePreview' => config('statamic.live_preview'),
             'permissions' => $this->permissions($user),
@@ -109,6 +110,7 @@ class JavascriptComposer
             'preferences' => Preference::all(),
             'permissions' => $user->permissions()->all(),
             'theme' => $user->preferredTheme(),
+            'is_impersonating' => session()->has('statamic_impersonated_by'),
         ])->toArray();
     }
 
