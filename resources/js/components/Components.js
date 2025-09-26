@@ -3,13 +3,32 @@ import uniqid from 'uniqid';
 import Component from './Component';
 
 class Components {
-    constructor(app) {
-        this.app = app;
+    #booted = false;
+
+    constructor() {
+        this.queue = {};
         this.components = ref([]);
     }
 
+    boot(app) {
+        if (this.#booted) return;
+
+        this.app = app;
+
+        Object.entries(this.queue).forEach(([name, component]) => {
+            this.app.component(name, component);
+        });
+
+        this.#booted = true;
+    }
+
     register(name, component) {
-        this.app.component(name, component);
+        if (this.#booted) {
+            this.app.component(name, component);
+            return;
+        }
+
+        this.queue[name] = component;
     }
 
     append(name, { props }) {

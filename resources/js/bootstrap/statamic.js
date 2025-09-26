@@ -44,7 +44,7 @@ import Layout from '@/pages/layout/Layout.vue';
 
 let bootingCallbacks = [];
 let bootedCallbacks = [];
-let components;
+let components = new Components;
 
 export default {
     booting(callback) {
@@ -152,6 +152,9 @@ export default {
     },
 
     async start() {
+        bootingCallbacks.forEach((callback) => callback(this));
+        bootingCallbacks = [];
+
         const el = document.getElementById('statamic');
         const bladeContent = el?.innerHTML || '';
         const _this = this;
@@ -168,8 +171,18 @@ export default {
                     }
                 }
 
-                const pages = import.meta.glob('../pages/**/*.vue', { eager: true })
+                // Resolve core pages
+                const pages = import.meta.glob('../pages/**/*.vue', { eager: true });
                 let page = pages[`../pages/${name}.vue`];
+
+                // Resolve addon pages
+                if (!page) {
+                    const addonPage = components.queue[`Pages/${name}`];
+                    if (addonPage) page = { default: addonPage };
+                }
+
+                if (!page) throw new Error(`Couldn't find Inertia component for the [${name}] page. Did you you register a [Pages/${name}] component?`);
+
                 page.default.layout = Layout;
                 return page;
             },
@@ -207,8 +220,6 @@ export default {
         this.$app.use(VueComponentDebug, { enabled: import.meta.env.VITE_VUE_COMPONENT_DEBUG === 'true' });
 
         const portals = markRaw(new Portals());
-
-        components = new Components(this.$app);
 
         Object.assign(this.$app.config.globalProperties, {
             $config: new Config(this.initialConfig),
@@ -277,6 +288,7 @@ export default {
         registerGlobalCommandPalette();
         registerFieldtypes(this.$app);
         registerIconSets(this.initialConfig);
+        components.boot(this.$app);
 
         // Suppress the translation warnings
         this.$app.config.warnHandler = (msg, vm, trace) => {
@@ -288,9 +300,6 @@ export default {
 
         axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
         axios.defaults.headers.common['X-CSRF-TOKEN'] = Statamic.$config.get('csrfToken');
-
-        bootingCallbacks.forEach((callback) => callback(this));
-        bootingCallbacks = [];
 
         return this.$app;
     },
