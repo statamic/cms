@@ -10,6 +10,7 @@ const props = defineProps({
     as: { type: String, default: 'div' },
     color: { type: String, default: 'default' },
     href: { type: String, default: null },
+    target: { type: String, default: null },
     icon: { type: String, default: null },
     iconAppend: { type: String, default: null },
     pill: { type: Boolean, default: false },
@@ -22,7 +23,12 @@ const props = defineProps({
 
 const slots = useSlots();
 const hasDefaultSlot = !!slots.default;
-const tag = computed(() => (props.href ? Link : props.as));
+const tag = computed(() => {
+    if (props.href) {
+        return props.target === '_blank' ? 'a' : Link;
+    }
+    return props.as;
+});
 
 const badgeClasses = computed(() => {
     const classes = cva({
@@ -72,7 +78,7 @@ const badgeClasses = computed(() => {
 </script>
 
 <template>
-    <component :is="tag" :class="badgeClasses" :href="props.href" data-ui-badge>
+    <component :is="tag" :class="badgeClasses" :href="props.href" :target="target" data-ui-badge>
         <span v-if="props.prepend" class="font-medium border-e border-inherit pe-2">{{ prepend }}</span>
         <Icon v-if="icon" :name="icon" />
         <slot v-if="hasDefaultSlot" />
