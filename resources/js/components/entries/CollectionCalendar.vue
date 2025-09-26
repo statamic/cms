@@ -160,6 +160,22 @@ watch(() => [currentDate.value.year, currentDate.value.month], fetchEntries, { i
                                     }"
                                 />
 
+                                <div class="@3xl:hidden w-full" v-if="getEntriesForDate(weekDate).length > 0">
+                                    <div class="flex h-1 rounded-full overflow-hidden">
+                                        <div
+                                            v-for="(entry, index) in getEntriesForDate(weekDate).slice(0, 4)"
+                                            :key="entry.id"
+                                            class="h-full"
+                                            :class="{
+                                                'bg-green-500': entry.status === 'published',
+                                                'bg-gray-300': entry.status === 'draft',
+                                                'bg-purple-500': entry.status === 'scheduled'
+                                            }"
+                                            :style="{ width: `${100 / Math.min(getEntriesForDate(weekDate).length, 4)}%` }"
+                                        />
+                                    </div>
+                                </div>
+
                                 <!-- Entries -->
                                 <div class="space-y-1.5 flex-1 overflow-scroll h-full hidden @3xl:block">
                                     <a
