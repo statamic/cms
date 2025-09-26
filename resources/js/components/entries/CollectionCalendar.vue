@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { ref, watch } from 'vue';
 import axios from 'axios';
 import { CalendarCell, CalendarCellTrigger, CalendarGrid, CalendarGridBody, CalendarGridHead, CalendarGridRow, CalendarHeadCell, CalendarHeader, CalendarHeading, CalendarRoot, CalendarPrev, CalendarNext } from 'reka-ui';
 import { CalendarDate } from '@internationalized/date';
@@ -63,26 +63,6 @@ function formatTime(dateString) {
         hour12: true
     });
 }
-
-function handleKeydown(event) {
-    if (event.key === 'ArrowLeft') {
-        // Previous month
-        const prevMonth = currentDate.value.subtract({ months: 1 });
-        currentDate.value = prevMonth;
-    } else if (event.key === 'ArrowRight') {
-        // Next month
-        const nextMonth = currentDate.value.add({ months: 1 });
-        currentDate.value = nextMonth;
-    }
-}
-
-onMounted(() => {
-    document.addEventListener('keydown', handleKeydown);
-});
-
-onUnmounted(() => {
-    document.removeEventListener('keydown', handleKeydown);
-});
 
 watch(() => [currentDate.value.year, currentDate.value.month], fetchEntries, { immediate: true });
 </script>
