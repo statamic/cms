@@ -74,7 +74,7 @@ watch(() => [currentDate.value.year, currentDate.value.month], fetchEntries, { i
         fixed-weeks
         v-slot="{ weekDays, grid }"
         weekday-format="long"
-        class="bg-gray-100 dark:bg-gray-900 rounded-2xl p-3 lg:p-6"
+        class="bg-gray-100 dark:bg-gray-800 rounded-2xl p-3 lg:p-6"
     >
         <CalendarHeader class="flex items-center justify-between mb-4 pb-8">
             <CalendarHeading class="text-lg font-normal text-gray-800 dark:text-white" />
