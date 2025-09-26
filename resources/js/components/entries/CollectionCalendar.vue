@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import axios from 'axios';
 import { CalendarCell, CalendarCellTrigger, CalendarGrid, CalendarGridBody, CalendarGridHead, CalendarGridRow, CalendarHeadCell, CalendarHeader, CalendarHeading, CalendarRoot, CalendarPrev, CalendarNext } from 'reka-ui';
 import { CalendarDate } from '@internationalized/date';
@@ -64,6 +64,26 @@ function formatTime(dateString) {
     });
 }
 
+function handleKeydown(event) {
+    if (event.key === 'ArrowLeft') {
+        // Previous month
+        const prevMonth = currentDate.value.subtract({ months: 1 });
+        currentDate.value = prevMonth;
+    } else if (event.key === 'ArrowRight') {
+        // Next month
+        const nextMonth = currentDate.value.add({ months: 1 });
+        currentDate.value = nextMonth;
+    }
+}
+
+onMounted(() => {
+    document.addEventListener('keydown', handleKeydown);
+});
+
+onUnmounted(() => {
+    document.removeEventListener('keydown', handleKeydown);
+});
+
 watch(() => [currentDate.value.year, currentDate.value.month], fetchEntries, { immediate: true });
 </script>
 
@@ -77,7 +97,10 @@ watch(() => [currentDate.value.year, currentDate.value.month], fetchEntries, { i
         class="bg-gray-100 dark:bg-gray-800 rounded-2xl p-3 lg:p-6"
     >
         <CalendarHeader class="flex items-center justify-between mb-4 pb-8">
-            <CalendarHeading class="text-lg font-normal text-gray-800 dark:text-white" />
+            <div class="flex items-center gap-2">
+                <CalendarHeading class="text-lg font-normal text-gray-800 dark:text-white" />
+                <ui-badge :text="entries.length" variant="flat" color="white" pill />
+            </div>
             <div class="flex items-center gap-2">
                 <CalendarPrev as-child>
                     <ui-button icon="chevron-left" />
