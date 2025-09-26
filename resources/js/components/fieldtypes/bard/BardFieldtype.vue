@@ -826,6 +826,22 @@ export default {
                             const { view, state } = this.editor;
 
                             if (this.options.allowed({ view, state})) {
+                                // Check if there's only one set available
+                                const totalSets = this.options.getTotalSets();
+                                if (totalSets === 1) {
+                                    // Auto-insert the single available set
+                                    const singleSetHandle = this.options.getSingleSetHandle();
+                                    if (singleSetHandle) {
+                                        // Insert the set
+                                        this.options.addSet(singleSetHandle);
+                                        return true; // Prevent inserting a slash.
+                                        // Ensure focus returns to the editor after set insertion
+                                        this.$nextTick(() => {
+                                            this.editor.commands.focus();
+                                        });
+                                    }
+                                }
+                                
                                 this.options.openSetPicker();
                                 return true; // Prevent inserting a slash.
                             }
@@ -844,6 +860,9 @@ export default {
                     shown: computed(() => this.showAddSetButton),
                     allowed: this.suitableToShowSetButton,
                     openSetPicker: this.openSetPicker,
+                    getTotalSets: this.getTotalSets,
+                    getSingleSetHandle: this.getSingleSetHandle,
+                    addSet: this.addSet,
                 }),
                 Dropcursor,
                 Gapcursor,
@@ -932,6 +951,17 @@ export default {
 
         openSetPicker() {
             this.$refs.setPicker.open();
+        },
+
+        getTotalSets() {
+            return this.setConfigs.length;
+        },
+
+        getSingleSetHandle() {
+            if (this.setConfigs.length === 1) {
+                return this.setConfigs[0].handle;
+            }
+            return null;
         }
     },
 };
