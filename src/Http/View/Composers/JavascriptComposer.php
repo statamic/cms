@@ -81,6 +81,7 @@ class JavascriptComposer
             'customSvgIcons' => $this->icons(),
             'commandPaletteCategories' => Category::order(),
             'commandPalettePreloadedItems' => CommandPalette::getPreloadedItems(),
+            'linkToDocs' => config('statamic.cp.link_to_docs'),
             'licensing' => $this->licensing(),
         ];
     }

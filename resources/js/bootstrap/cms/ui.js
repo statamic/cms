@@ -25,6 +25,7 @@ export {
     DatePicker,
     DateRangePicker,
     Description,
+    DocsCallout,
     DragHandle,
     Drawer,
     Dropdown,

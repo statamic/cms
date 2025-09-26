@@ -147,6 +147,7 @@ it('exports ui', async () => {
         'Avatar',
         'CommandPaletteItem',
         'CreateForm',
+        'DocsCallout',
         'Listing',
         'ListingCustomizeColumns',
         'ListingFilters',
