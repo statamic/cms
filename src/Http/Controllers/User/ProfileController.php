@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\User;
 
+use Statamic\Facades\Asset;
 use Statamic\Facades\User;
 use Statamic\Http\Requests\UserProfileRequest;
 
@@ -16,6 +17,22 @@ class ProfileController
         }
 
         foreach ($request->processedValues() as $key => $value) {
+            $user->set($key, $value);
+        }
+
+        $processedAssets = $request->processedAssets();
+        if (config('statamic.users.delete_replaced_profile_form_assets')) {
+            User::blueprint()
+                ->fields()
+                ->addValues($user->data()->all())
+                ->only($processedAssets->keys())
+                ->preProcess()
+                ->values()
+                ->flatten()
+                ->map(fn ($id) => Asset::findById($id))
+                ->each->delete();
+        }
+        foreach ($processedAssets as $key => $value) {
             $user->set($key, $value);
         }
 

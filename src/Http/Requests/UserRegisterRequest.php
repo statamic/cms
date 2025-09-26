@@ -10,7 +10,10 @@ use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Statamic\Forms\Uploaders\AssetsUploader;
+use Statamic\Rules\AllowedFile;
 use Statamic\Rules\UniqueUserValue;
+use Statamic\Support\Arr;
 
 class UserRegisterRequest extends FormRequest
 {
@@ -18,6 +21,7 @@ class UserRegisterRequest extends FormRequest
 
     public $blueprintFields;
     public $submittedValues;
+    public $submittedAssets;
 
     public function authorize(): bool
     {
@@ -50,9 +54,21 @@ class UserRegisterRequest extends FormRequest
 
     public function processedValues()
     {
-        return $this->blueprintFields->process()->values()
+        return $this->blueprintFields
+            ->addValues($this->submittedValues)
+            ->process()
+            ->values()
             ->only(array_keys($this->submittedValues))
-            ->except(['email', 'groups', 'roles', 'super', 'password_confirmation']);
+            ->except(['email', 'password', 'groups', 'roles', 'super']);
+    }
+
+    public function processedAssets()
+    {
+        return $this->blueprintFields
+            ->addValues($this->uploadAssetFiles($this->blueprintFields))
+            ->process()
+            ->values()
+            ->only(array_keys($this->submittedAssets));
     }
 
     public function validator()
@@ -63,14 +79,19 @@ class UserRegisterRequest extends FormRequest
 
         $fields = $blueprint->fields();
         $this->submittedValues = $this->valuesWithoutAssetFields($fields);
-        $this->blueprintFields = $fields->addValues($this->submittedValues);
+        $this->submittedAssets = $this->normalizeAssetsValues($fields);
+        $this->blueprintFields = $fields;
 
-        return $this->blueprintFields
+        return $fields
+            ->addValues(array_merge(
+                $this->submittedValues,
+                $this->submittedAssets,
+            ))
             ->validator()
-            ->withRules([
+            ->withRules(array_merge([
                 'email' => ['required', 'email', new UniqueUserValue],
                 'password' => ['required', 'confirmed', Password::default()],
-            ])
+            ], $this->extraRules($fields)))
             ->validator();
     }
 
@@ -88,5 +109,31 @@ class UserRegisterRequest extends FormRequest
             ->keys()->all();
 
         return $this->except($assets);
+    }
+
+    private function normalizeAssetsValues($fields)
+    {
+        return $fields->all()
+            ->filter(fn ($field) => $field->fieldtype()->handle() === 'assets' && $this->hasFile($field->handle()))
+            ->map(fn ($field) => Arr::wrap($this->file($field->handle())))
+            ->all();
+    }
+
+    protected function uploadAssetFiles($fields)
+    {
+        return $fields->all()
+            ->filter(fn ($field) => $field->fieldtype()->handle() === 'assets' && $this->hasFile($field->handle()))
+            ->map(fn ($field) => AssetsUploader::field($field)->upload($this->file($field->handle())))
+            ->all();
+    }
+
+    private function extraRules($fields)
+    {
+        return $fields->all()
+            ->filter(fn ($field) => $field->fieldtype()->handle() === 'assets')
+            ->mapWithKeys(function ($field) {
+                return [$field->handle().'.*' => ['file', new AllowedFile]];
+            })
+            ->all();
     }
 }
