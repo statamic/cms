@@ -1,8 +1,9 @@
 <script setup>
 import { DropdownMenuItem } from 'reka-ui';
-import { useSlots } from 'vue';
+import { computed, useSlots } from 'vue';
 import Icon from '../Icon/Icon.vue';
 import { cva } from 'cva';
+import { Link } from '@inertiajs/vue3';
 
 const props = defineProps({
     href: { type: String, default: null },
@@ -14,6 +15,10 @@ const props = defineProps({
 
 const slots = useSlots();
 const hasDefaultSlot = !!slots.default;
+const tag = computed(() => {
+    if (! props.href) return 'div';
+    return props.target === '_blank' ? 'a' : Link;
+});
 
 const classes = cva({
     base: 'col-span-2 grid grid-cols-subgrid items-center rounded-lg px-1 py-1.5 text-sm antialiased text-gray-900 dark:text-gray-300 not-data-disabled:cursor-pointer data-disabled:opacity-50 hover:not-data-disabled:bg-gray-100 dark:hover:not-data-disabled:bg-gray-800 outline-hidden',
@@ -41,7 +46,7 @@ const iconClasses = cva({
     <DropdownMenuItem
         :class="classes"
         data-ui-dropdown-item
-        :as="href ? 'a' : 'div'"
+        :as="tag"
         :href
         :target
     >
