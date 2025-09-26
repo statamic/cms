@@ -109,7 +109,9 @@ onMounted(() => {
             <CalendarGridBody class="space-y-4">
                 <template v-for="month in grid" :key="month.value.toString()">
                     <CalendarGridRow
-                        v-for="(weekDates, weekIndex) in month.rows"
+                        v-for="(weekDates, weekIndex) in month.rows.filter(weekDates =>
+                            weekDates.some(date => date.month === month.value.month)
+                        )"
                         :key="`weekDate-${weekIndex}`"
                         class="grid grid-cols-7 gap-4"
                     >
