@@ -148,7 +148,7 @@ onMounted(() => {
                                     <a
                                         :href="entry.edit_url"
                                         :key="entry.id"
-                                        class="text-xs px-2 block line-clamp-2 border-s-2 rounded-e-sm cursor-pointer"
+                                        class="text-xs px-2 border-s-2 rounded-e-sm cursor-pointer flex flex-col"
                                         :class="{
                                             'border-green-500 hover:bg-green-50': entry.status === 'published',
                                             'border-gray-300 hover:bg-gray-50': entry.status === 'draft',
@@ -156,7 +156,9 @@ onMounted(() => {
                                         }"
                                         v-for="entry in getEntriesForDate(weekDate).slice(0, 3)"
                                     >
-                                        {{ entry.title }}<br>
+                                        <span class="line-clamp-2">
+                                            {{ entry.title }}
+                                        </span>
                                         <span class="text-2xs text-gray-400 dark:text-gray-400">
                                             {{ formatTime(entry.date?.date || entry.date) }}
                                         </span>
