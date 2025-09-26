@@ -19,6 +19,10 @@
                 'version' => inertia()->getVersion(),
             ]) }}"
         >
+            <div id="blade-title" data-title="
+                @yield('title', $title ?? __('Here')) {{ Statamic::cpDirection() === 'ltr' ? '‹' : '›' }}
+                {{ __(Statamic::pro() ? config('statamic.cp.custom_cms_name', 'Statamic') : 'Statamic') }}
+            "></div>
             @yield('content')
         </div>
 

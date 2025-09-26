@@ -48,6 +48,7 @@ class JavascriptComposer
             'direction' => Statamic::cpDirection(),
             'asciiReplaceExtraSymbols' => $replaceSymbols = config('statamic.system.ascii_replace_extra_symbols'),
             'charmap' => ASCII::charsArray($replaceSymbols),
+            'cmsName' => __(Statamic::pro() ? config('statamic.cp.custom_cms_name', 'Statamic') : 'Statamic'),
         ];
     }
 

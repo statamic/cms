@@ -156,6 +156,8 @@ export default {
         bootingCallbacks = [];
 
         const el = document.getElementById('statamic');
+        const titleEl = document.getElementById('blade-title');
+        const bladeTitle = titleEl.dataset.title;
         const bladeContent = el?.innerHTML || '';
         const _this = this;
 
@@ -190,6 +192,7 @@ export default {
                 const app = await _this.configureApp(InertiaApp, props);
                 app.use(plugin).mount(el);
             },
+            title: (title) => title || bladeTitle
         })
 
         // Handle non-Inertia responses with full page reload
