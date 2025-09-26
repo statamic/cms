@@ -16,6 +16,7 @@ const currentDate = ref(new CalendarDate(new Date().getFullYear(), new Date().ge
 const entries = ref([]);
 const loading = ref(false);
 
+
 function fetchEntries() {
     loading.value = true;
 
@@ -97,10 +98,7 @@ watch(() => [currentDate.value.year, currentDate.value.month], fetchEntries, { i
         class="bg-gray-100 dark:bg-gray-800 rounded-2xl p-3 lg:p-6"
     >
         <CalendarHeader class="flex items-center justify-between mb-4 pb-8">
-            <div class="flex items-center gap-2">
-                <CalendarHeading class="text-lg font-normal text-gray-800 dark:text-white" />
-                <ui-badge :text="entries.length" variant="flat" color="white" pill />
-            </div>
+            <CalendarHeading class="text-lg font-normal text-gray-800 dark:text-white" />
             <div class="flex items-center gap-2">
                 <CalendarPrev as-child>
                     <ui-button icon="chevron-left" />
