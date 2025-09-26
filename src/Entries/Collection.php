@@ -457,7 +457,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
     public function createLabel()
     {
-        $key = "messages.{$this->handle()}_collection_create_entry";
+        $key = "statamic::messages.{$this->handle()}_collection_create_entry";
 
         $translation = __($key);
 
