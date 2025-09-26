@@ -13,6 +13,7 @@ use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Icons\IconSet;
+use Statamic\Licensing\LicenseManager;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 use voku\helper\ASCII;
@@ -56,7 +57,6 @@ class JavascriptComposer
     private function protectedVariables()
     {
         $user = User::current();
-        $licenses = app('Statamic\Licensing\LicenseManager');
 
         return [
             'version' => Statamic::version(),
@@ -81,6 +81,7 @@ class JavascriptComposer
             'customSvgIcons' => $this->icons(),
             'commandPaletteCategories' => Category::order(),
             'commandPalettePreloadedItems' => CommandPalette::getPreloadedItems(),
+            'licensing' => $this->licensing(),
         ];
     }
 
@@ -155,6 +156,18 @@ class JavascriptComposer
                 'nav' => $dark['nav'] ?? null,
                 'outside' => $dark['outside'] ?? null,
             ],
+        ];
+    }
+
+    private function licensing()
+    {
+        $licenses = app(LicenseManager::class);
+
+        return [
+            'valid' => $licenses->valid(),
+            'requestFailed' => $licenses->requestFailed(),
+            'requestFailureMessage' => $licenses->requestFailureMessage(),
+            'isOnPublicDomain' => $licenses->isOnPublicDomain(),
         ];
     }
 }
