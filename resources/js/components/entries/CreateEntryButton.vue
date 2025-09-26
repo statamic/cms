@@ -1,9 +1,17 @@
 <template>
     <div class="flex">
-        <Button @click="create" v-if="!hasMultipleBlueprints" :variant :text="text" :size="size" />
+        <template v-if="!hasMultipleBlueprints">
+            <slot name="trigger" :create="create" v-if="customTrigger">
+                <Button @click="create" :variant :text="text" :size="size" :icon="icon" />
+            </slot>
+            <Button v-else @click="create" :variant :text="text" :size="size" :icon="icon" />
+        </template>
         <Dropdown v-else>
             <template #trigger>
-                <Button @click.prevent="create" :variant icon-append="chevron-down" :text="text" :size="size" />
+                <slot name="trigger" :create="create" v-if="customTrigger">
+                    <Button @click.prevent="create" :variant icon-append="chevron-down" :text="text" :size="size" :icon="icon" />
+                </slot>
+                <Button v-else @click.prevent="create" :variant icon-append="chevron-down" :text="text" :size="size" :icon="icon" />
             </template>
             <DropdownMenu>
                 <DropdownLabel v-text="__('Choose Blueprint')" />
@@ -31,13 +39,15 @@ export default {
     },
 
     props: {
-        url: String,
-        blueprints: Array,
-        variant: { type: String, default: 'primary' },
-        text: { type: String, default: () => __('Create Entry') },
-        size: { type: String, default: 'base' },
+        blueprints: {type: Array },
         buttonClass: { type: String, default: 'btn' },
         commandPalette: { type: Boolean, default: false },
+        icon: { type: String, default: null },
+        size: { type: String, default: 'base' },
+        text: { type: String, default: () => __('Create Entry') },
+        url: { type: String },
+        variant: { type: String, default: 'primary' },
+        customTrigger: { type: Boolean, default: false },
     },
 
     computed: {

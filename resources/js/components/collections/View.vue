@@ -153,6 +153,8 @@
         <CollectionCalendar
             v-if="view === 'calendar'"
             :collection="handle"
+            :blueprints="blueprints"
+            :create-url="createUrl"
         />
 
         <delete-entry-confirmation
