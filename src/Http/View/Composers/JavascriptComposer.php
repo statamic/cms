@@ -49,6 +49,7 @@ class JavascriptComposer
             'asciiReplaceExtraSymbols' => $replaceSymbols = config('statamic.system.ascii_replace_extra_symbols'),
             'charmap' => ASCII::charsArray($replaceSymbols),
             'cmsName' => __(Statamic::pro() ? config('statamic.cp.custom_cms_name', 'Statamic') : 'Statamic'),
+            'logos' => $this->logos(),
         ];
     }
 
@@ -59,6 +60,7 @@ class JavascriptComposer
 
         return [
             'version' => Statamic::version(),
+            'isPro' => Statamic::pro(),
             'laravelVersion' => app()->version(),
             'locales' => config('statamic.system.locales'),
             'ajaxTimeout' => config('statamic.system.ajax_timeout'),
@@ -127,5 +129,32 @@ class JavascriptComposer
         return Icon::sets()->mapWithKeys(fn (IconSet $set) => [
             $set->name() => $set->contents(),
         ]);
+    }
+
+    private function logos()
+    {
+        if (! Statamic::pro()) {
+            return false;
+        }
+
+        if (is_string($light = config('statamic.cp.custom_logo_url'))) {
+            $light = ['nav' => $light, 'outside' => $light];
+        }
+
+        if (is_string($dark = config('statamic.cp.custom_dark_logo_url'))) {
+            $dark = ['nav' => $dark, 'outside' => $dark];
+        }
+
+        return [
+            'text' => config('statamic.cp.custom_logo_text') ?? config('app.name'),
+            'light' => [
+                'nav' => $light['nav'] ?? null,
+                'outside' => $light['outside'] ?? null,
+            ],
+            'dark' => [
+                'nav' => $dark['nav'] ?? null,
+                'outside' => $dark['outside'] ?? null,
+            ],
+        ];
     }
 }
