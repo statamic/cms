@@ -87,6 +87,7 @@ class CollectionsController extends CpController
                 'actions' => Action::for($collection),
                 'actions_url' => cp_route('collections.actions.run'),
                 'icon' => $collection->icon(),
+                'create_label' => $collection->createLabel(),
                 'sort_column' => $collection->sortField(),
                 'sort_direction' => $collection->sortDirection(),
             ];

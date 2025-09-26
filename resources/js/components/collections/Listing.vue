@@ -55,7 +55,7 @@
                             :url="collection.create_entry_url"
                             variant="default"
                             :blueprints="collection.blueprints"
-                            :text="__('Create Entry')"
+                            :text="collection.create_label"
                             size="sm"
                         />
                     </aside>
