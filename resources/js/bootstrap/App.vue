@@ -21,7 +21,6 @@ import RolePublishForm from '../components/roles/PublishForm.vue';
 import UserGroupListing from '../components/user-groups/Listing.vue';
 import UserGroupPublishForm from '../components/user-groups/PublishForm.vue';
 import CollectionScaffolder from '../components/collections/Scaffolder.vue';
-import CollectionView from '../components/collections/View.vue';
 import CollectionBlueprintListing from '../components/collections/BlueprintListing.vue';
 import SessionExpiry from '../components/SessionExpiry.vue';
 import NavigationListing from '../components/navigation/Listing.vue';
@@ -62,7 +61,6 @@ export default {
         UserGroupListing,
         UserGroupPublishForm,
         CollectionScaffolder,
-        CollectionView,
         CollectionBlueprintListing,
         SessionExpiry,
         NavigationListing,
