@@ -832,8 +832,13 @@ export default {
                                     // Auto-insert the single available set
                                     const singleSetHandle = this.options.getSingleSetHandle();
                                     if (singleSetHandle) {
+                                        // Insert the set
                                         this.options.addSet(singleSetHandle);
                                         return true; // Prevent inserting a slash.
+                                        // Ensure focus returns to the editor after set insertion
+                                        this.$nextTick(() => {
+                                            this.editor.commands.focus();
+                                        });
                                     }
                                 }
                                 
