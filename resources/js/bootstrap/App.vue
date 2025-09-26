@@ -1,5 +1,4 @@
 <script>
-import GlobalSiteSelector from '../components/GlobalSiteSelector.vue';
 import Login from '../components/login/Login.vue';
 import TwoFactorChallenge from '../components/login/TwoFactorChallenge.vue';
 import EnableTwoFactorAuthentication from '../components/login/EnableTwoFactorAuthentication.vue';
@@ -37,7 +36,6 @@ import { defineAsyncComponent } from 'vue';
 
 export default {
     components: {
-        GlobalSiteSelector,
         Login,
         TwoFactorChallenge,
         EnableTwoFactorAuthentication,

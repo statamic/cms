@@ -2,7 +2,7 @@
 
 import Logo from './Logo.vue';
 import Breadcrumbs from './Breadcrumbs.vue';
-import SiteSelector from './SiteSelector.vue';
+import SiteSelector from '@/components/GlobalSiteSelector.vue';
 import CommandPalette from './CommandPalette.vue';
 import ViewSiteButton from './ViewSiteButton.vue';
 import UserDropdown from './UserDropdown.vue';
