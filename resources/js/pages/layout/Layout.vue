@@ -5,6 +5,10 @@ import { ConfigProvider } from 'reka-ui';
 import PortalTargets from '@/components/portals/PortalTargets.vue';
 import { ref } from 'vue';
 
+const props = defineProps({
+    architecturalBackground: { type: Boolean, default: false },
+});
+
 const navOpen = ref(true);
 </script>
 
@@ -35,7 +39,7 @@ const navOpen = ref(true);
 <!--                @include('statamic::partials.nav-main')-->
                 <Nav />
                 <div id="main-content" class="main-content p-2 h-full flex-1 overflow-y-auto rounded-t-2xl">
-                    <div class="relative content-card @yield('content-card-modifiers') min-h-full">
+                    <div class="relative content-card min-h-full" :class="{'bg-architectural-lines': architecturalBackground}">
 <!--                        @yield('content')-->
                         <slot />
                     </div>

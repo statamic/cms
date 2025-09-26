@@ -44,9 +44,13 @@ class CollectionsController extends CpController
             ];
         }
 
-        return view('statamic::collections.index', [
-            'collections' => $this->collections(),
+        return Inertia::render('collections/Index', [
+            'collections' => $collections = $this->collections()->all(),
+            'architecturalBackground' => empty($collections),
             'columns' => $columns,
+            'createUrl' => cp_route('collections.create'),
+            'actionUrl' => cp_route('collections.actions.run'),
+            'canCreate' => User::current()->can('create', 'Statamic\Contracts\Entries\Collection'),
         ]);
     }
 
