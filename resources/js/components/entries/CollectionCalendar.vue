@@ -1,9 +1,8 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
 import axios from 'axios';
 import { CalendarCell, CalendarCellTrigger, CalendarGrid, CalendarGridBody, CalendarGridHead, CalendarGridRow, CalendarHeadCell, CalendarHeader, CalendarHeading, CalendarRoot, CalendarPrev, CalendarNext } from 'reka-ui';
 import { CalendarDate } from '@internationalized/date';
-import { Icon } from '@ui';
 import CreateEntryButton from './CreateEntryButton.vue';
 
 const props = defineProps({
@@ -95,9 +94,9 @@ watch(() => [currentDate.value.year, currentDate.value.month], fetchEntries, { i
         fixed-weeks
         v-slot="{ weekDays, grid }"
         weekday-format="long"
-        class="bg-gray-100 dark:bg-gray-800 rounded-2xl p-3 lg:p-6"
+        class="@container bg-gray-100 dark:bg-gray-800 rounded-2xl p-3 lg:p-6"
     >
-        <CalendarHeader class="flex items-center justify-between mb-4 pb-8">
+        <CalendarHeader class="flex flex-col @3xl:flex-row items-center justify-between gap-4 @3xl:mb-4 pb-4 @3xl:pb-8">
             <CalendarHeading class="text-lg font-normal text-gray-800 dark:text-white" />
             <div class="flex items-center gap-2">
                 <CalendarPrev as-child>
@@ -118,7 +117,8 @@ watch(() => [currentDate.value.year, currentDate.value.month], fetchEntries, { i
                         :key="day"
                         class="p-2 text-center font-normal text-sm text-gray-500 dark:text-gray-400"
                     >
-                        {{ day }}
+                        <span class="@4xl:hidden">{{ day.slice(0, 2) }}</span>
+                        <span class="hidden @4xl:block">{{ day }}</span>
                     </CalendarHeadCell>
                 </CalendarGridRow>
             </CalendarGridHead>
@@ -145,27 +145,27 @@ watch(() => [currentDate.value.year, currentDate.value.month], fetchEntries, { i
                             <CalendarCellTrigger
                                 :day="weekDate"
                                 :month="month.value"
-                                class="w-full h-full flex flex-col"
+                                class="w-full h-full flex flex-col items-center justify-center @3xl:items-start @3xl:justify-start"
                                 v-slot="{ dayValue, selected, today, outsideView }"
                             >
                                 <!-- Date number -->
                                 <div
-                                    class="text-sm mb-1"
+                                    class="text-sm mb-1 rounded-full size-6 flex items-center justify-center"
                                     v-text="dayValue"
                                     :class="{
                                         'text-gray-400 dark:text-gray-600': outsideView,
                                         'text-gray-900 dark:text-white': !outsideView,
-                                        // 'bg-blue-600 text-white rounded-full size-6 flex items-center justify-center': selected,
-                                        'bg-ui-accent text-white rounded-full size-6 flex items-center justify-center': today
+                                        // 'bg-blue-600': selected, // TODO: Add a mobile version that shows the entries on a date
+                                        'text-white bg-ui-accent': today
                                     }"
                                 />
 
                                 <!-- Entries -->
-                                <div class="space-y-1.5 flex-1 overflow-scroll h-full">
+                                <div class="space-y-1.5 flex-1 overflow-scroll h-full hidden @3xl:block">
                                     <a
                                         :href="entry.edit_url"
                                         :key="entry.id"
-                                        class="text-xs px-2 border-s-2 rounded-e-sm cursor-pointer flex flex-col"
+                                        class="text-2xs @3xl:text-xs px-2 border-s-2 rounded-e-sm cursor-pointer flex flex-col"
                                         :class="{
                                             'border-green-500 hover:bg-green-50': entry.status === 'published',
                                             'border-gray-300 hover:bg-gray-50': entry.status === 'draft',
@@ -176,7 +176,7 @@ watch(() => [currentDate.value.year, currentDate.value.month], fetchEntries, { i
                                         <span class="line-clamp-2">
                                             {{ entry.title }}
                                         </span>
-                                        <span class="text-2xs text-gray-400 dark:text-gray-400">
+                                        <span class="hidden @4xl:block text-2xs text-gray-400 dark:text-gray-400">
                                             {{ formatTime(entry.date?.date || entry.date) }}
                                         </span>
                                     </a>
