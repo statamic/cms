@@ -3,6 +3,7 @@ import { computed, useSlots } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
 import Icon from './Icon/Icon.vue';
+import { Link } from '@inertiajs/vue3';
 
 const props = defineProps({
     append: { type: [String, Number, Boolean, null], default: null },
@@ -21,7 +22,7 @@ const props = defineProps({
 
 const slots = useSlots();
 const hasDefaultSlot = !!slots.default;
-const tag = computed(() => (props.href ? 'a' : props.as));
+const tag = computed(() => (props.href ? Link : props.as));
 
 const badgeClasses = computed(() => {
     const classes = cva({
