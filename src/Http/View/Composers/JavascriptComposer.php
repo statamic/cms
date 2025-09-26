@@ -6,7 +6,9 @@ use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 use Statamic\CommandPalette\Category;
+use Statamic\CP\Navigation\NavItem;
 use Statamic\Facades\CommandPalette;
+use Statamic\Facades\CP\Nav;
 use Statamic\Facades\CP\Toast;
 use Statamic\Facades\Icon;
 use Statamic\Facades\Preference;
@@ -83,6 +85,7 @@ class JavascriptComposer
             'commandPalettePreloadedItems' => CommandPalette::getPreloadedItems(),
             'linkToDocs' => config('statamic.cp.link_to_docs'),
             'licensing' => $this->licensing(),
+            'nav' => $this->nav(),
         ];
     }
 
@@ -170,5 +173,29 @@ class JavascriptComposer
             'requestFailureMessage' => $licenses->requestFailureMessage(),
             'isOnPublicDomain' => $licenses->isOnPublicDomain(),
         ];
+    }
+
+    private function nav()
+    {
+        return collect(Nav::build())->map(function ($section) {
+            return [
+                'display' => $section['display'],
+                'items' => $this->navItems($section['items']->all()),
+            ];
+        })->all();
+    }
+
+    private function navItems(array $items)
+    {
+        return collect($items)->map(function (NavItem $item) {
+            return [
+                'display' => $item->display(),
+                'icon' => $item->icon(),
+                'url' => $item->url(),
+                'attributes' => $item->attributes(),
+                'active' => $item->isActive(),
+                'children' => $this->navItems($item->resolveChildren()->children()?->all() ?? []),
+            ];
+        })->all();
     }
 }
