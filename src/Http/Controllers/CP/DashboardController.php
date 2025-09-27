@@ -24,9 +24,7 @@ class DashboardController extends CpController
             return view('statamic::dashboard.empty');
         }
 
-        return Inertia::render('Dashboard');
-
-        return view('statamic::dashboard.dashboard', [
+        return Inertia::render('Dashboard', [
             'widgets' => $widgets,
         ]);
     }
