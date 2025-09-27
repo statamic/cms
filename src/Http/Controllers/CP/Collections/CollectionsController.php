@@ -149,10 +149,6 @@ class CollectionsController extends CpController
             'actions' => Action::for($collection, ['view' => 'form']),
         ];
 
-        if ($collection->queryEntries()->count() === 0) {
-            return view('statamic::collections.empty', $viewData);
-        }
-
         $user = \Statamic\Facades\User::current();
         $props = [
             'title' => $collection->title(),
@@ -161,7 +157,10 @@ class CollectionsController extends CpController
             'canCreate' => $viewData['canCreate'],
             'createUrls' => $viewData['createUrls'],
             'createLabel' => $collection->createLabel(),
-            'blueprints' => $blueprints->all(),
+            'blueprints' => $blueprints->map(fn ($blueprint) => [
+                ...$blueprint,
+                'createEntryUrl' => cp_route('collections.entries.create', [$collection->handle(), $site, 'blueprint' => $blueprint['handle']]),
+            ])->all(),
             'sortColumn' => $collection->sortField(),
             'sortDirection' => $collection->sortDirection(),
             'columns' => $columns,
@@ -191,6 +190,24 @@ class CollectionsController extends CpController
                 'structureExpectsRoot' => $structure->expectsRoot(),
                 'structureShowSlugs' => $structure->showSlugs(),
             ];
+        }
+
+        if ($collection->queryEntries()->count() === 0) {
+            return Inertia::render('collections/Empty', [
+                ...Arr::only($props, [
+                    'title',
+                    'blueprints',
+                    'canEdit',
+                    'editUrl',
+                    'canEditBlueprints',
+                    'canCreate',
+                    'createLabel',
+                    'blueprintsUrl',
+                    'scaffoldUrl',
+                ]),
+                'createEntryUrl' => $viewData['createUrls'][$site->handle()],
+                'architecturalBackground' => true,
+            ]);
         }
 
         return Inertia::render('collections/Show', $props);

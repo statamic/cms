@@ -52,7 +52,6 @@
 
                         <create-entry-button
                             v-if="collection.available_in_selected_site"
-                            :url="collection.create_entry_url"
                             variant="default"
                             :blueprints="collection.blueprints"
                             :text="__('Create Entry')"

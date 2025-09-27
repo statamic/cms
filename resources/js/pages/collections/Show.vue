@@ -77,7 +77,6 @@
 
             <create-entry-button
                 v-if="!reordering && canCreate"
-                :url="createUrl"
                 :blueprints="blueprints"
                 :text="createLabel"
                 :command-palette="true"
