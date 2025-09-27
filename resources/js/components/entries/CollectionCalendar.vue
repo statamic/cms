@@ -258,7 +258,8 @@ watch(viewMode, (newMode) => {
                                 class="aspect-square p-2 rounded-xl shadow-ui-sm group relative"
                                 :class="{
                                     'bg-gray-100 dark:bg-gray-800 ring-1 ring-gray-200 dark:ring-gray-700': weekDate.month !== month.value.month,
-                                    'bg-white dark:bg-gray-900': weekDate.month === month.value.month
+                                    'bg-white dark:bg-gray-900': weekDate.month === month.value.month,
+                                    'bg-orange-50! dark:bg-orange-900/20! border border-orange-400! dark:border-orange-900!': isToday(weekDate)
                                 }"
                             >
                                 <CalendarCellTrigger
@@ -276,7 +277,7 @@ watch(viewMode, (newMode) => {
                                             'text-gray-400 dark:text-gray-600': outsideView,
                                             'text-gray-900 dark:text-white': !outsideView,
                                             'text-white bg-blue-600': selectedDate && selectedDate.toString() === weekDate.toString(),
-                                            'text-white bg-ui-accent': today
+                                            'text-orange-600': today
                                         }"
                                     />
 
