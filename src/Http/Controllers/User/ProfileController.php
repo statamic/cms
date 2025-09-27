@@ -30,6 +30,7 @@ class ProfileController
                 ->values()
                 ->flatten()
                 ->map(fn ($id) => Asset::findById($id))
+                ->filter()
                 ->each->delete();
         }
         foreach ($processedAssets as $key => $value) {
