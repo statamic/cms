@@ -126,6 +126,7 @@ export default {
             fieldtype: null,
             loading: true,
             blueprint: null,
+            isSaving: false, // Prevent multiple simultaneous saves
         };
     },
 
@@ -189,6 +190,23 @@ export default {
 
     created() {
         this.load();
+        
+        // Add keyboard shortcut for Cmd+S / Ctrl+S only when this component is focused
+        this.saveBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
+            // Only handle if this component is currently visible/focused
+            if (this.$el && this.$el.offsetParent !== null) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.handleSaveShortcut();
+            }
+        });
+    },
+
+    beforeUnmount() {
+        // Clean up keyboard binding
+        if (this.saveBinding) {
+            this.saveBinding.destroy();
+        }
     },
 
     methods: {
@@ -279,18 +297,27 @@ export default {
         },
 
         findAndCallBlueprintSave() {
-            // Walk up the component tree to find the Builder component with a save method
-            let parent = this.$parent;
-            while (parent) {
-                if (parent.save && typeof parent.save === 'function') {
-                    parent.save();
-                    break;
-                }
-                parent = parent.$parent;
+            // Emit a global event to trigger blueprint save
+            this.$events.$emit('blueprint-save');
+        },
+
+        handleSaveShortcut() {
+            // If we're inside a set or config fields, call the same method as "Save & Close All" button
+            if (this.isInsideSet || this.isInsideConfigFields) {
+                this.commitAndSaveAndCloseAll();
+            } else {
+                // For regular blueprint fields, call the same method as "Apply & Save" button
+                this.commitAndSave();
             }
         },
 
         commitAndSaveAndCloseAll() {
+            if (this.isSaving) {
+                return;
+            }
+            
+            this.isSaving = true;
+            
             this.clearErrors();
 
             this.$axios
@@ -305,16 +332,22 @@ export default {
                     this.$refs.container?.clearDirtyState();
                     this.$emit('committed', response.data, this.editedFields);
                     
-                    // Find and call the blueprint's save method
-                    this.findAndCallBlueprintSave();
-                    
-                    // Close all stacks (same as commit(true))
+                    // Close all stacks first
                     this.close();
                     if (this.commitParentField) {
                         this.commitParentField(true);
                     }
+                    
+                    // Wait a bit for the field changes to be fully processed, then save the blueprint
+                    setTimeout(() => {
+                        this.findAndCallBlueprintSave();
+                        this.isSaving = false;
+                    }, 100);
                 })
-                .catch((e) => this.handleAxiosError(e));
+                .catch((e) => {
+                    this.handleAxiosError(e);
+                    this.isSaving = false;
+                });
         },
 
         handleAxiosError(e) {

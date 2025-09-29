@@ -81,9 +81,19 @@ export default {
             this.save();
         });
 
+        // Listen for blueprint-save events from child components
+        this.$events.$on('blueprint-save', () => {
+            this.save();
+        });
+
         if (this.isFormBlueprint) {
             Statamic.$config.set('isFormBlueprint', true);
         }
+    },
+
+    beforeUnmount() {
+        // Clean up event listener
+        this.$events.$off('blueprint-save');
     },
 
     watch: {
@@ -109,10 +119,12 @@ export default {
         },
 
         save() {
-            // this.$axios[this.method](this.action, this.fieldset)
             this.$axios['patch'](this.action, this.blueprint)
-                .then((response) => this.saved(response))
+                .then((response) => {
+                    this.saved(response);
+                })
                 .catch((e) => {
+                    console.error('Blueprint save failed:', e);
                     this.$toast.error(e.response.data.message);
                     this.errors = e.response.data.errors;
                 });
