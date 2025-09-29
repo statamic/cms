@@ -9,9 +9,9 @@
             <div class="flex items-center gap-3">
                 <Button variant="ghost" :text="__('Cancel')" @click.prevent="close" />
                 <Button variant="primary" @click.prevent="commit()" :text="__('Apply')" />
-                <Button v-if="!(isInsideSet || isInsideConfigFields)" variant="primary" @click.prevent="commitAndSave()" :text="__('Apply & Save')" />
+                <Button v-if="!(isInsideSet || isInsideConfigFields)" variant="primary" @click.prevent="commitAndSave()" icon="save" :text="__('Apply & Save')" />
                 <Button v-if="isInsideSet || isInsideConfigFields" variant="primary" @click.prevent="commit(true)" :text="__('Apply & Close All')" />
-                <Button v-if="isInsideSet || isInsideConfigFields" variant="primary" @click.prevent="commitAndSaveAndCloseAll()" :text="__('Save & Close All')" />
+                <Button v-if="isInsideSet || isInsideConfigFields" variant="primary" @click.prevent="commitAndSaveAndCloseAll()" icon="save" :text="__('Save & Close All')" />
             </div>
         </header>
 
