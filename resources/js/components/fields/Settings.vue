@@ -1,11 +1,11 @@
 <template>
-    <div class="h-full overflow-auto bg-white dark:bg-gray-800 focus-none p-3 pt-0 rounded-l-xl">
+    <div class="h-full overflow-auto bg-white dark:bg-gray-800 focus-none p-3">
         <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
             <Icon name="loading" />
         </div>
 
-        <header v-if="!loading" class="flex items-center justify-between pt-3 pb-4 pl-3 sticky top-0 z-1">
-            <Heading :text="__(values.display) || __(config.display) || config.handle" size="lg" :icon="fieldtype.icon" class="p-6 -m-6 bg-white dark:bg-gray-800 rounded-br-2xl" />
+        <header v-if="!loading" class="flex items-center justify-between pl-3">
+            <Heading :text="__(values.display) || __(config.display) || config.handle" size="lg" :icon="fieldtype.icon" />
             <div class="flex items-center gap-3">
                 <Button variant="ghost" :text="__('Cancel')" @click.prevent="close" />
                 <Button variant="primary" @click.prevent="commit()" :text="__('Apply')" />
@@ -13,7 +13,7 @@
             </div>
         </header>
 
-        <section v-if="!loading" class="isolate px-3 py-4 pt-0">
+        <section v-if="!loading" class="isolate px-3 py-4">
             <Tabs v-model:modelValue="activeTab">
                 <TabList class="mb-6">
                     <TabTrigger name="settings" :text="__('Settings')" />
