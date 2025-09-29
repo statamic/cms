@@ -5,7 +5,7 @@
         </div>
 
         <header v-if="!loading" class="flex items-center justify-between pl-3 pt-3 pb-3 -mb-3 sticky top-0 z-1 bg-gradient-to-b from-white dark:from-gray-800">
-            <Heading :text="__(values.display) || __(config.display) || config.handle" size="lg" :icon="fieldtype.icon" class="bg-white/50 dark:bg-gray-800/50 p-6 -m-6 rounded-br-2xl backdrop-blur-[15px]" />
+            <Heading :text="__(values.display) || __(config.display) || config.handle" size="lg" :icon="fieldtype.icon" class="bg-white/50 dark:bg-gray-800/50 p-6 -m-6 pb-3 -mb-3 rounded-br-xl backdrop-blur-[15px]" />
             <div class="flex items-center gap-3">
                 <Button variant="ghost" :text="__('Cancel')" @click.prevent="close" />
                 <Button variant="primary" @click.prevent="commit()" :text="__('Apply')" />
