@@ -32,7 +32,6 @@ import UpdaterWidget from '../components/updater/UpdaterWidget.vue';
 import Login from '../components/login/Login.vue';
 import TwoFactorChallenge from '../components/login/TwoFactorChallenge.vue';
 import EnableTwoFactorAuthentication from '../components/login/EnableTwoFactorAuthentication.vue';
-import BaseEntryCreateForm from '../components/entries/BaseCreateForm.vue';
 import BaseTermCreateForm from '../components/terms/BaseCreateForm.vue';
 import CreateTermButton from '../components/terms/CreateTermButton.vue';
 import FieldsetListing from '../components/fieldsets/Listing.vue';
@@ -116,7 +115,6 @@ export default function registerGlobalComponents(app) {
     app.component('Login', Login);
     app.component('TwoFactorChallenge', TwoFactorChallenge);
     app.component('EnableTwoFactorAuthentication', EnableTwoFactorAuthentication);
-    app.component('BaseEntryCreateForm', BaseEntryCreateForm);
     app.component('BaseTermCreateForm', BaseTermCreateForm);
     app.component('CreateTermButton', CreateTermButton);
     app.component('FieldsetListing', FieldsetListing);

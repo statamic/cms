@@ -1,4 +1,36 @@
+
+<script setup>
+import EntryPublishForm from '@/components/entries/PublishForm.vue';
+import { router } from '@inertiajs/vue3';
+
+defineProps([
+    'actions',
+    'collectionHandle',
+    'collectionCreateLabel',
+    'collectionHasRoutes',
+    'blueprint',
+    'values',
+    'extraValues',
+    'meta',
+    'localizations',
+    'revisions',
+    'site',
+    'parent',
+    'canManagePublishState',
+    'canEditBlueprint',
+    'createAnotherUrl',
+    'listingUrl',
+    'previewTargets',
+]);
+
+function saved(response) {
+    router.get(response.data.data.edit_url + '?created=true');
+}
+</script>
+
 <template>
+    <Head :title="collectionCreateLabel" />
+
     <entry-publish-form
         :is-creating="true"
         publish-container="base"
@@ -7,7 +39,7 @@
         :initial-title="collectionCreateLabel"
         :collection-handle="collectionHandle"
         :collection-has-routes="collectionHasRoutes"
-        :initial-fieldset="fieldset"
+        :initial-fieldset="blueprint"
         :initial-values="values"
         :initial-extra-values="extraValues"
         :initial-meta="meta"
@@ -25,33 +57,3 @@
         @saved="saved"
     ></entry-publish-form>
 </template>
-
-<script>
-export default {
-    props: [
-        'actions',
-        'collectionHandle',
-        'collectionCreateLabel',
-        'collectionHasRoutes',
-        'fieldset',
-        'values',
-        'extraValues',
-        'meta',
-        'localizations',
-        'revisions',
-        'site',
-        'parent',
-        'canManagePublishState',
-        'canEditBlueprint',
-        'createAnotherUrl',
-        'listingUrl',
-        'previewTargets',
-    ],
-
-    methods: {
-        saved(response) {
-            window.location = response.data.data.edit_url + '?created=true';
-        },
-    },
-};
-</script>
