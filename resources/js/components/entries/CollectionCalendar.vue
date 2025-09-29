@@ -23,7 +23,7 @@ const loading = ref(false);
 const error = ref(null);
 const saving = ref(false);
 const viewMode = ref('month'); // 'month' or 'week'
-const weekViewContainer = ref(null);
+const weekViewRef = ref(null);
 const pendingDateChanges = ref(new Map()); // Track entry ID -> new date
 const isDirty = ref(false);
 // Reactive drag state for Vue class bindings
@@ -159,9 +159,9 @@ function selectDate(date) {
 }
 
 function scrollTo8AM() {
-    if (weekViewContainer.value) {
+    if (weekViewRef.value?.weekViewContainer) {
         // Each hour is h-18 (72px), so 8 AM is at position 8 * 72 = 576px
-        weekViewContainer.value.scrollTop = 8 * 72;
+        weekViewRef.value.weekViewContainer.scrollTop = 8 * 72;
     }
 }
 
@@ -460,6 +460,7 @@ watch(viewMode, (newMode) => {
             <!-- Week View -->
             <CalendarWeekView
                 v-else
+                ref="weekViewRef"
                 :week-dates="getWeekDates(currentDate)"
                 :entries="entries"
                 :pending-date-changes="pendingDateChanges"

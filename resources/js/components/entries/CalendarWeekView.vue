@@ -84,7 +84,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, ref, defineExpose } from 'vue';
 import CalendarWeekEntry from './CalendarWeekEntry.vue';
 import CreateEntryButton from './CreateEntryButton.vue';
 import { useCalendarDates } from '@/composables/useCalendarDates';
@@ -161,4 +161,8 @@ const handleDragLeave = (event) => {
 const handleDrop = (event, targetDate, targetHour) => {
     emit('drop', event, targetDate, targetHour);
 };
+
+// Expose the container ref for parent component to access
+const weekViewContainer = ref(null);
+defineExpose({ weekViewContainer });
 </script>
