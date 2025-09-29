@@ -12,12 +12,17 @@ const props = defineProps({
     createUrl: { type: String, required: true },
 });
 
+const emit = defineEmits(['changed', 'saved', 'canceled']);
+
 const currentDate = ref(new CalendarDate(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()));
 const selectedDate = ref(null);
 const entries = ref([]);
 const loading = ref(false);
 const viewMode = ref('month'); // 'month' or 'week'
 const weekViewContainer = ref(null);
+const pendingDateChanges = ref(new Map()); // Track entry ID -> new date
+const isDirty = ref(false);
+const dragOverTarget = ref(null); // Track which cell/hour is being dragged over
 
 
 function fetchEntries() {
@@ -64,6 +69,12 @@ function fetchEntries() {
 function getEntriesForDate(date) {
     const dateStr = new Date(date.year, date.month - 1, date.day).toISOString().split('T')[0];
     return entries.value.filter(entry => {
+        // Check if this entry has a pending date change
+        if (pendingDateChanges.value.has(entry.id)) {
+            const newDate = pendingDateChanges.value.get(entry.id);
+            return newDate.toISOString().split('T')[0] === dateStr;
+        }
+
         const entryDate = new Date(entry.date?.date || entry.date);
         return entryDate.toISOString().split('T')[0] === dateStr;
     });
@@ -120,6 +131,16 @@ function getWeekDates() {
 function getEntriesForHour(date, hour) {
     const dateStr = new Date(date.year, date.month - 1, date.day).toISOString().split('T')[0];
     return entries.value.filter(entry => {
+        // Check if this entry has a pending date change
+        if (pendingDateChanges.value.has(entry.id)) {
+            const newDate = pendingDateChanges.value.get(entry.id);
+            const newDateStr = newDate.toISOString().split('T')[0];
+            if (newDateStr !== dateStr) return false;
+
+            const newHour = newDate.getHours();
+            return newHour === hour;
+        }
+
         const entryDate = new Date(entry.date?.date || entry.date);
         const entryDateStr = entryDate.toISOString().split('T')[0];
         if (entryDateStr !== dateStr) return false;
@@ -170,6 +191,151 @@ function isSelectedDate(date) {
     return selectedDate.value && selectedDate.value.toString() === date.toString();
 }
 
+// Drag and drop functions
+function handleEntryDragStart(event, entry) {
+    event.dataTransfer.setData('text/plain', JSON.stringify({
+        entryId: entry.id,
+        entryTitle: entry.title
+    }));
+    event.dataTransfer.effectAllowed = 'move';
+}
+
+function handleDateDrop(event, targetDate) {
+    event.preventDefault();
+
+    try {
+        const data = JSON.parse(event.dataTransfer.getData('text/plain'));
+        const entryId = data.entryId;
+
+        // Find the entry
+        const entry = entries.value.find(e => e.id === entryId);
+        if (!entry) return;
+
+        // Create new date with the same time but new date
+        const originalDate = new Date(entry.date?.date || entry.date);
+        const newDate = new Date(targetDate.year, targetDate.month - 1, targetDate.day,
+                                originalDate.getHours(), originalDate.getMinutes(), originalDate.getSeconds());
+
+        // Store the pending change
+        pendingDateChanges.value.set(entryId, newDate);
+        isDirty.value = true;
+
+        // Emit change event to parent
+        emit('changed');
+
+    } catch (error) {
+        console.error('Failed to handle drop:', error);
+    }
+}
+
+function handleHourDrop(event, targetDate, targetHour) {
+    event.preventDefault();
+
+    try {
+        const data = JSON.parse(event.dataTransfer.getData('text/plain'));
+        const entryId = data.entryId;
+
+        // Find the entry
+        const entry = entries.value.find(e => e.id === entryId);
+        if (!entry) return;
+
+        // Create new date with the new date and hour
+        const originalDate = new Date(entry.date?.date || entry.date);
+        const newDate = new Date(targetDate.year, targetDate.month - 1, targetDate.day,
+                                targetHour, originalDate.getMinutes(), originalDate.getSeconds());
+
+        // Store the pending change
+        pendingDateChanges.value.set(entryId, newDate);
+        isDirty.value = true;
+
+        // Emit change event to parent
+        emit('changed');
+
+    } catch (error) {
+        console.error('Failed to handle drop:', error);
+    }
+}
+
+function handleDragOver(event) {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+}
+
+function handleDragEnter(event, target) {
+    event.preventDefault();
+    dragOverTarget.value = target;
+}
+
+function handleDragLeave(event) {
+    // Only clear if we're actually leaving the drop zone
+    if (!event.currentTarget.contains(event.relatedTarget)) {
+        dragOverTarget.value = null;
+    }
+}
+
+function handleDrop(event, targetDate, targetHour = null) {
+    event.preventDefault();
+    dragOverTarget.value = null;
+
+    if (targetHour !== null) {
+        handleHourDrop(event, targetDate, targetHour);
+    } else {
+        handleDateDrop(event, targetDate);
+    }
+}
+
+// Save and cancel functions
+function saveChanges() {
+    if (pendingDateChanges.value.size === 0) return Promise.resolve();
+
+
+    // Update each entry individually
+    const promises = Array.from(pendingDateChanges.value.entries()).map(([entryId, newDate]) => {
+        // Find the entry to get its current title and slug
+        const entry = entries.value.find(e => e.id === entryId);
+
+        return axios.patch(cp_url(`collections/${props.collection}/entries/${entryId}`), {
+            date: newDate.toISOString(),
+            title: entry.title,
+            slug: entry.slug
+        });
+    });
+
+    return Promise.all(promises)
+    .then(response => {
+        // Clear pending changes
+        pendingDateChanges.value.clear();
+        isDirty.value = false;
+
+        // Emit saved event
+        emit('saved');
+
+        // Refresh the entries from the server
+        fetchEntries();
+
+        Statamic.$toast.success(__('Saved'));
+        return response;
+    })
+    .catch(error => {
+        console.error('Failed to save changes:', error);
+        Statamic.$toast.error(__('Failed to save changes'));
+        throw error;
+    });
+}
+
+function cancelChanges() {
+    pendingDateChanges.value.clear();
+    isDirty.value = false;
+    emit('canceled');
+}
+
+// Expose methods to parent
+defineExpose({
+    saveChanges,
+    cancelChanges,
+    isDirty: () => isDirty.value
+});
+
 
 const selectedDateEntries = computed(() => {
     if (!selectedDate.value) return [];
@@ -192,6 +358,7 @@ watch(viewMode, (newMode) => {
         });
     }
 }, { immediate: true });
+
 </script>
 
 <template>
@@ -259,8 +426,13 @@ watch(viewMode, (newMode) => {
                                 :class="{
                                     'bg-gray-100 dark:bg-gray-800 ring-1 ring-gray-200 dark:ring-gray-700': weekDate.month !== month.value.month,
                                     'bg-white dark:bg-gray-900': weekDate.month === month.value.month,
-                                    'bg-orange-50! dark:bg-orange-900/20! border border-orange-400! dark:border-orange-900!': isToday(weekDate)
+                                    'bg-orange-50! dark:bg-orange-900/20! border border-orange-400! dark:border-orange-900!': isToday(weekDate),
+                                    'ring-2 ring-blue-400 bg-blue-50 dark:bg-blue-900/20': dragOverTarget && dragOverTarget.toString() === weekDate.toString()
                                 }"
+                                @dragover="handleDragOver"
+                                @dragenter="handleDragEnter($event, weekDate)"
+                                @dragleave="handleDragLeave"
+                                @drop="handleDrop($event, weekDate)"
                             >
                                 <CalendarCellTrigger
                                     :day="weekDate"
@@ -309,6 +481,8 @@ watch(viewMode, (newMode) => {
                                                 'border-purple-500 hover:bg-purple-50': entry.status === 'scheduled'
                                             }"
                                             v-for="entry in getEntriesForDate(weekDate).slice(0, 3)"
+                                            draggable="true"
+                                            @dragstart="handleEntryDragStart($event, entry)"
                                         >
                                             <span class="line-clamp-2">
                                                 {{ entry.title }}
@@ -398,8 +572,15 @@ watch(viewMode, (newMode) => {
                             v-for="hour in getVisibleHours()"
                             :key="hour"
                             class="h-18 border-b border-gray-200 dark:border-gray-700 relative group"
-                            :class="{ 'hover:bg-gray-50 dark:hover:bg-gray-800/50': getEntriesForHour(date, hour).length === 0 }"
+                            :class="{
+                                'hover:bg-gray-50 dark:hover:bg-gray-800/50': getEntriesForHour(date, hour).length === 0,
+                                'border-2 border-blue-400 bg-blue-50 dark:bg-blue-900/20': dragOverTarget && dragOverTarget.date && dragOverTarget.date.toString() === date.toString() && dragOverTarget.hour === hour
+                            }"
                             @click="selectDate(date)"
+                            @dragover="handleDragOver"
+                            @dragenter="handleDragEnter($event, { date, hour })"
+                            @dragleave="handleDragLeave"
+                            @drop="handleDrop($event, date, hour)"
                         >
                             <!-- Entries for this hour -->
                             <div class="absolute inset-0 p-1">
@@ -413,9 +594,12 @@ watch(viewMode, (newMode) => {
                                         'border-gray-300 bg-gray-50 dark:bg-gray-800': entry.status === 'draft',
                                         'border-purple-500 bg-purple-50 dark:bg-purple-900/20': entry.status === 'scheduled'
                                     }"
+                                    draggable="true"
+                                    @dragstart="handleEntryDragStart($event, entry)"
                                 >
                                     <div class="font-medium line-clamp-2">{{ entry.title }}</div>
                                 </a>
+
                             </div>
 
                             <!-- Create entry button (shows on hover) -->

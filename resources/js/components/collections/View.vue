@@ -50,12 +50,6 @@
                 />
             </template>
 
-            <ui-toggle-group v-model="view" v-if="canUseStructureTree || canUseCalendar">
-                <ui-toggle-item icon="navigation" value="tree" v-if="canUseStructureTree" />
-                <ui-toggle-item icon="layout-list" value="list" />
-                <ui-toggle-item icon="calendar" value="calendar" v-if="canUseCalendar" />
-            </ui-toggle-group>
-
             <template v-if="view === 'list' && reorderable">
                 <site-selector
                     v-if="sites.length > 1 && reordering && site"
@@ -74,6 +68,24 @@
                     <Button @click="$refs.list.saveOrder" :text="__('Save Order')" variant="primary" />
                 </template>
             </template>
+
+            <template v-if="view === 'calendar' && calendarIsDirty">
+                <Button
+                    :text="__('Discard changes')"
+                    variant="filled"
+                    @click="cancelCalendarProgress"
+                />
+                <Button
+                    :text="__('Save Changes')"
+                    @click="saveCalendar"
+                />
+            </template>
+
+            <ui-toggle-group v-model="view" v-if="canUseStructureTree || canUseCalendar">
+                <ui-toggle-item icon="navigation" value="tree" v-if="canUseStructureTree" />
+                <ui-toggle-item icon="layout-list" value="list" />
+                <ui-toggle-item icon="calendar" value="calendar" v-if="canUseCalendar" />
+            </ui-toggle-group>
 
             <create-entry-button
                 v-if="!reordering && canCreate"
@@ -152,9 +164,13 @@
 
         <CollectionCalendar
             v-if="view === 'calendar'"
+            ref="calendar"
             :collection="handle"
             :blueprints="blueprints"
             :create-url="createUrl"
+            @changed="markCalendarDirty"
+            @saved="markCalendarClean"
+            @canceled="markCalendarClean"
         />
 
         <delete-entry-confirmation
@@ -180,6 +196,7 @@
 import DeleteEntryConfirmation from './DeleteEntryConfirmation.vue';
 import DeleteLocalizationConfirmation from './DeleteLocalizationConfirmation.vue';
 import SiteSelector from '../SiteSelector.vue';
+import CollectionCalendar from '../entries/CollectionCalendar.vue';
 import { defineAsyncComponent } from 'vue';
 import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator, Header, Button, ToggleGroup, ToggleItem } from '@/components/ui';
 import ItemActions from '@/components/actions/ItemActions.vue';
@@ -187,6 +204,7 @@ import ItemActions from '@/components/actions/ItemActions.vue';
 export default {
     components: {
         Button,
+        CollectionCalendar,
         DeleteEntryConfirmation,
         DeleteLocalizationConfirmation,
         Dropdown,
@@ -258,6 +276,10 @@ export default {
             return this.$dirty.has('page-tree');
         },
 
+        calendarIsDirty() {
+            return this.$dirty.has('calendar');
+        },
+
         canUseStructureTree() {
             return this.structured && this.structureMaxDepth !== 1;
         },
@@ -287,11 +309,12 @@ export default {
         },
     },
 
-    watch: {
+        watch: {
         view(view) {
             this.site = this.site || this.initialSite;
 
-            localStorage.setItem('statamic.collection-view.' + this.handle, view);
+            // Save to preferences instead of localStorage
+            this.$preferences.set(`collections.${this.handle}.view`, view);
         },
     },
 
@@ -345,12 +368,37 @@ export default {
             this.$dirty.remove('page-tree');
         },
 
+        markCalendarDirty() {
+            this.$dirty.add('calendar');
+        },
+
+        markCalendarClean() {
+            this.$dirty.remove('calendar');
+        },
+
+        cancelCalendarProgress() {
+            this.$refs.calendar.cancelChanges();
+        },
+
+        saveCalendar() {
+            this.$refs.calendar.saveChanges();
+        },
+
         initialView() {
-            if (!this.canUseStructureTree) return 'list';
+            // Get from preferences instead of localStorage
+            const savedView = this.$preferences.get(`collections.${this.handle}.view`);
 
-            const fallback = this.canUseStructureTree ? 'tree' : 'list';
+            // If we have a saved view, validate it's available and return it
+            if (savedView) {
+                if (savedView === 'tree' && this.canUseStructureTree) return 'tree';
+                if (savedView === 'calendar' && this.canUseCalendar) return 'calendar';
+                if (savedView === 'list') return 'list';
+            }
 
-            return localStorage.getItem('statamic.collection-view.' + this.handle) || fallback;
+            // Fallback logic
+            if (this.canUseStructureTree) return 'tree';
+            if (this.canUseCalendar) return 'calendar';
+            return 'list';
         },
 
         deleteTreeBranch(branch, removeFromUi) {
