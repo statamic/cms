@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, computed, nextTick, shallowRef } from 'vue';
+import { ref, watch, computed, nextTick } from 'vue';
 import axios from 'axios';
 import { CalendarCell, CalendarCellTrigger, CalendarGrid, CalendarGridBody, CalendarGridHead, CalendarGridRow, CalendarHeadCell, CalendarHeader, CalendarHeading, CalendarRoot, CalendarPrev, CalendarNext } from 'reka-ui';
 import { CalendarDate } from '@internationalized/date';
@@ -22,8 +22,8 @@ const viewMode = ref('month'); // 'month' or 'week'
 const weekViewContainer = ref(null);
 const pendingDateChanges = ref(new Map()); // Track entry ID -> new date
 const isDirty = ref(false);
-// Track current drag over element for direct DOM manipulation
-let currentDragOverElement = null;
+// Reactive drag state for Vue class bindings
+const dragOverTarget = ref(null);
 
 
 function fetchEntries() {
@@ -192,6 +192,17 @@ function isSelectedDate(date) {
     return selectedDate.value && selectedDate.value.toString() === date.toString();
 }
 
+function isDragOverDate(date) {
+    return dragOverTarget.value && dragOverTarget.value.toString() === date.toString();
+}
+
+function isDragOverHour(date, hour) {
+    return dragOverTarget.value &&
+           dragOverTarget.value.date &&
+           dragOverTarget.value.date.toString() === date.toString() &&
+           dragOverTarget.value.hour === hour;
+}
+
 
 // Drag and drop functions
 function handleEntryDragStart(event, entry) {
@@ -261,40 +272,23 @@ function handleHourDrop(event, targetDate, targetHour) {
 function handleDragOver(event) {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
-
-    // Set drag over state during dragover for immediate feedback
-    if (currentDragOverElement !== event.currentTarget) {
-        // Remove previous drag over class
-        if (currentDragOverElement) {
-            currentDragOverElement.classList.remove('border-2', 'border-blue-400', 'bg-blue-50', 'dark:bg-blue-900/20');
-        }
-
-        // Add drag over class to current element
-        currentDragOverElement = event.currentTarget;
-        currentDragOverElement.classList.add('border-2', 'border-blue-400', 'bg-blue-50', 'dark:bg-blue-900/20');
-    }
 }
 
-function handleDragEnter(event) {
+function handleDragEnter(event, target) {
     event.preventDefault();
+    dragOverTarget.value = target;
 }
 
 function handleDragLeave(event) {
-    // Clear the drag over styling when leaving
-    if (currentDragOverElement) {
-        currentDragOverElement.classList.remove('border-2', 'border-blue-400', 'bg-blue-50', 'dark:bg-blue-900/20');
-        currentDragOverElement = null;
+    // Only clear if we're actually leaving the drop zone
+    if (!event.relatedTarget || !event.currentTarget.contains(event.relatedTarget)) {
+        dragOverTarget.value = null;
     }
 }
 
 function handleDrop(event, targetDate, targetHour = null) {
     event.preventDefault();
-
-    // Clear drag over styling
-    if (currentDragOverElement) {
-        currentDragOverElement.classList.remove('border-2', 'border-blue-400', 'bg-blue-50', 'dark:bg-blue-900/20');
-        currentDragOverElement = null;
-    }
+    dragOverTarget.value = null;
 
     if (targetHour !== null) {
         handleHourDrop(event, targetDate, targetHour);
@@ -457,10 +451,11 @@ watch(viewMode, (newMode) => {
                                 :class="{
                                     'bg-gray-100 dark:bg-gray-800 ring-1 ring-gray-200 dark:ring-gray-700': weekDate.month !== month.value.month,
                                     'bg-white dark:bg-gray-900': weekDate.month === month.value.month,
-                                    'bg-orange-50! dark:bg-orange-900/20! border border-orange-400! dark:border-orange-900!': isToday(weekDate)
+                                    'bg-orange-50! dark:bg-orange-900/20! border border-orange-400! dark:border-orange-900!': isToday(weekDate),
+                                    'border-2 border-blue-400 bg-blue-50 dark:bg-blue-900/20': isDragOverDate(weekDate)
                                 }"
                                 @dragover="handleDragOver"
-                                @dragenter="handleDragEnter"
+                                @dragenter="handleDragEnter($event, weekDate)"
                                 @dragleave="handleDragLeave"
                                 @drop="handleDrop($event, weekDate)"
                             >
@@ -551,11 +546,11 @@ watch(viewMode, (newMode) => {
             <div v-else class="w-full">
                 <!-- Week header with days -->
                 <div class="grid grid-cols-8 border border-gray-200 dark:border-gray-700 rounded-t-lg overflow-hidden">
-                    <div class="p-3 text-sm bg-white font-medium text-gray-500 dark:text-gray-400"></div>
+                    <div class="p-3 text-sm bg-gray-50 font-medium text-gray-500 dark:text-gray-400"></div>
                     <div
                         v-for="date in getWeekDates()"
                         :key="date.toString()"
-                        class="p-3 bg-white text-center border-l border-gray-200 dark:border-gray-700"
+                        class="p-3 bg-gray-50 text-center border-l border-gray-200 dark:border-gray-700"
                         :class="{
                             'bg-blue-50 dark:bg-blue-900/20': isSelectedDate(date),
                             'bg-gray-50 dark:bg-gray-800': isToday(date)
@@ -580,7 +575,7 @@ watch(viewMode, (newMode) => {
                 <!-- Hourly grid -->
                 <div ref="weekViewContainer" class="grid grid-cols-8 gap-0 border border-gray-200 dark:border-gray-700 rounded-b-lg overflow-auto max-h-[60vh]">
                     <!-- Hour labels column -->
-                    <div class="bg-gray-50 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
+                    <div class="bg-gray-50 dark:bg-gray-800">
                         <div
                             v-for="hour in getVisibleHours()"
                             :key="hour"
@@ -596,18 +591,19 @@ watch(viewMode, (newMode) => {
                     <div
                         v-for="date in getWeekDates()"
                         :key="date.toString()"
-                        class="border-l border-gray-200 dark:border-gray-700"
+                        class="bg-white border-l border-gray-200 dark:border-gray-700"
                     >
                         <div
                             v-for="hour in getVisibleHours()"
                             :key="hour"
                             class="h-18 border-b border-gray-200 dark:border-gray-700 relative group"
                             :class="{
-                                'hover:bg-gray-50 dark:hover:bg-gray-800/50': entriesByHour[`${date.toString()}-${hour}`]?.length === 0
+                                'hover:bg-gray-50 dark:hover:bg-gray-800/50': entriesByHour[`${date.toString()}-${hour}`]?.length === 0,
+                                'bg-blue-50 dark:bg-blue-900/20': isDragOverHour(date, hour)
                             }"
                             @click="selectDate(date)"
                             @dragover="handleDragOver"
-                            @dragenter="handleDragEnter"
+                            @dragenter="handleDragEnter($event, { date, hour })"
                             @dragleave="handleDragLeave"
                             @drop="handleDrop($event, date, hour)"
                         >
@@ -617,7 +613,7 @@ watch(viewMode, (newMode) => {
                                     v-for="entry in entriesByHour[`${date.toString()}-${hour}`] || []"
                                     :key="entry.id"
                                     :href="entry.edit_url"
-                                    class="block text-xs p-1 rounded border-l-2 mb-1 cursor-pointer hover:shadow-sm"
+                                    class="block text-xs p-1 rounded-r border-l-2 mb-1 cursor-pointer hover:shadow-sm"
                                     :class="{
                                         'border-green-500 bg-green-50 dark:bg-green-900/20': entry.status === 'published',
                                         'border-gray-300 bg-gray-50 dark:bg-gray-800': entry.status === 'draft',
