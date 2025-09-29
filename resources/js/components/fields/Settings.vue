@@ -4,8 +4,8 @@
             <Icon name="loading" />
         </div>
 
-        <header v-if="!loading" class="flex items-center justify-between pl-3">
-            <Heading :text="__(values.display) || __(config.display) || config.handle" size="lg" :icon="fieldtype.icon" />
+        <header v-if="!loading" class="flex items-center justify-between pl-3 sticky top-0 z-1">
+            <Heading :text="__(values.display) || __(config.display) || config.handle" size="lg" :icon="fieldtype.icon" class="p-6 -m-6 bg-white dark:bg-gray-800 rounded-br-2xl" />
             <div class="flex items-center gap-3">
                 <Button variant="ghost" :text="__('Cancel')" @click.prevent="close" />
                 <Button variant="primary" @click.prevent="commit()" :text="__('Apply')" />
