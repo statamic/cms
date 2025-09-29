@@ -11,6 +11,7 @@
                 <Button variant="primary" @click.prevent="commit()" :text="__('Apply')" />
                 <Button v-if="!(isInsideSet || isInsideConfigFields)" variant="primary" @click.prevent="commitAndSave()" :text="__('Apply & Save')" />
                 <Button v-if="isInsideSet || isInsideConfigFields" variant="primary" @click.prevent="commit(true)" :text="__('Apply & Close All')" />
+                <Button v-if="isInsideSet || isInsideConfigFields" variant="primary" @click.prevent="commitAndSaveAndCloseAll()" :text="__('Save & Close All')" />
             </div>
         </header>
 
@@ -287,6 +288,33 @@ export default {
                 }
                 parent = parent.$parent;
             }
+        },
+
+        commitAndSaveAndCloseAll() {
+            this.clearErrors();
+
+            this.$axios
+                .post(cp_url('fields/update'), {
+                    id: this.id,
+                    type: this.type,
+                    values: this.values,
+                    fields: this.fields,
+                    isInsideSet: this.isInsideSet,
+                })
+                .then((response) => {
+                    this.$refs.container?.clearDirtyState();
+                    this.$emit('committed', response.data, this.editedFields);
+                    
+                    // Find and call the blueprint's save method
+                    this.findAndCallBlueprintSave();
+                    
+                    // Close all stacks (same as commit(true))
+                    this.close();
+                    if (this.commitParentField) {
+                        this.commitParentField(true);
+                    }
+                })
+                .catch((e) => this.handleAxiosError(e));
         },
 
         handleAxiosError(e) {
