@@ -303,7 +303,7 @@ defineExpose({
 
                             <button type="button" class="w-full text-start flex items-center gap-2 bg-transparent cursor-pointer focus:outline-none" v-else-if="!searchable && (dropdownOpen || !modelValue)" @keydown.space="openDropdown" data-ui-combobox-placeholder>
                             <Icon v-if="icon" :name="icon" class="text-gray-500 dark:text-white dark:opacity-50" />
-                                <span class="block truncate text-gray-500" v-text="placeholder" />
+                                <span class="block truncate text-gray-500 dark:text-gray-400" v-text="placeholder" />
                             </button>
 
                             <button type="button" v-else class="w-full text-start bg-transparent flex items-center gap-2 cursor-pointer focus-none" @keydown.space="openDropdown" data-ui-combobox-selected-option>
