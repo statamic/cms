@@ -4,7 +4,7 @@
             <Icon name="loading" />
         </div>
 
-        <header v-if="!loading" class="flex items-center justify-between pt-3 pb-4 pl-3 sticky top-0 bg-white from-50% dark:bg-gray-800 to-transparent z-1">
+        <header v-if="!loading" class="flex items-center justify-between pt-3 pb-4 pl-3 sticky top-0 bg-gradient-to-b from-white from-80% dark:from-gray-800 z-1">
             <Heading :text="__(values.display) || __(config.display) || config.handle" size="lg" :icon="fieldtype.icon" />
             <div class="flex items-center gap-3">
                 <Button variant="ghost" :text="__('Cancel')" @click.prevent="close" />
