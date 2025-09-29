@@ -9,6 +9,7 @@
             <div class="flex items-center gap-3">
                 <Button variant="ghost" :text="__('Cancel')" @click.prevent="close" />
                 <Button variant="primary" @click.prevent="commit()" :text="__('Apply')" />
+                <Button variant="primary" @click.prevent="commitAndSave()" :text="__('Apply & Save')" />
                 <Button v-if="isInsideSet || isInsideConfigFields" variant="primary" @click.prevent="commit(true)" :text="__('Apply & Close All')" />
             </div>
         </header>
@@ -252,6 +253,40 @@ export default {
                     }
                 })
                 .catch((e) => this.handleAxiosError(e));
+        },
+
+        commitAndSave() {
+            this.clearErrors();
+
+            this.$axios
+                .post(cp_url('fields/update'), {
+                    id: this.id,
+                    type: this.type,
+                    values: this.values,
+                    fields: this.fields,
+                    isInsideSet: this.isInsideSet,
+                })
+                .then((response) => {
+                    this.$refs.container?.clearDirtyState();
+                    this.$emit('committed', response.data, this.editedFields);
+                    
+                    // Find and call the blueprint's save method
+                    this.findAndCallBlueprintSave();
+                    this.close();
+                })
+                .catch((e) => this.handleAxiosError(e));
+        },
+
+        findAndCallBlueprintSave() {
+            // Walk up the component tree to find the Builder component with a save method
+            let parent = this.$parent;
+            while (parent) {
+                if (parent.save && typeof parent.save === 'function') {
+                    parent.save();
+                    break;
+                }
+                parent = parent.$parent;
+            }
         },
 
         handleAxiosError(e) {
