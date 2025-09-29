@@ -9,7 +9,7 @@
             <div class="flex items-center gap-3">
                 <Button variant="ghost" :text="__('Cancel')" @click.prevent="close" />
                 <Button variant="primary" @click.prevent="commit()" :text="__('Apply')" />
-                <Button variant="primary" @click.prevent="commitAndSave()" :text="__('Apply & Save')" />
+                <Button v-if="!(isInsideSet || isInsideConfigFields)" variant="primary" @click.prevent="commitAndSave()" :text="__('Apply & Save')" />
                 <Button v-if="isInsideSet || isInsideConfigFields" variant="primary" @click.prevent="commit(true)" :text="__('Apply & Close All')" />
             </div>
         </header>
