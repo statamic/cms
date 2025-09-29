@@ -303,7 +303,7 @@ export default {
                 return true;
             }
 
-            return dragContext.dragNode.children.length === 0;
+            return true;
         },
 
         eachDroppable(targetStat) {
