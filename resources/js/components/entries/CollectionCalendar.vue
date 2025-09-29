@@ -316,15 +316,20 @@ function saveChanges() {
 
     return Promise.all(promises)
     .then(response => {
+        // Update local entries with the new dates
+        pendingDateChanges.value.forEach((newDate, entryId) => {
+            const entry = entries.value.find(e => e.id === entryId);
+            if (entry) {
+                entry.date = newDate.toISOString();
+            }
+        });
+
         // Clear pending changes
         pendingDateChanges.value.clear();
         isDirty.value = false;
 
         // Emit saved event
         emit('saved');
-
-        // Refresh the entries from the server
-        fetchEntries();
 
         Statamic.$toast.success(__('Saved'));
         return response;
