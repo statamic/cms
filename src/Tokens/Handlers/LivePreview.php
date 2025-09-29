@@ -14,14 +14,14 @@ class LivePreview
     public function handle(Token $token, $request, Closure $next)
     {
         $item = Facade::item($token);
-
-        $response = $next($request);
-
+        
         if (! $item) {
-            return $response;
+            return $next($request);
         }
 
         $item->repository()->substitute($item);
+
+        $response = $next($request);
 
         if (Sites::multiEnabled()) {
             /** @var Collection */
