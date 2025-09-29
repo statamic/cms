@@ -208,14 +208,6 @@
     }
 }
 
-@utility mask-heading-left {
-    --stop-color: white;
-    background: radial-gradient(circle at top left, var(--stop-color) 10%,transparent 25%);
-    .dark & {
-        --stop-color: var(--color-gray-800);
-    }
-}
-
 /* UTILITIES / DECORATION / ARCHIECTURAL LINES
 =================================================== */
 /* Notes...
