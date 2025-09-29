@@ -59,6 +59,7 @@ class ViewCollectionListingTest extends TestCase
                     'actions' => Facades\Action::for($collectionA, ['view' => 'list']),
                     'actions_url' => 'http://localhost/cp/collections/actions',
                     'icon' => 'collections',
+                    'create_label' => 'Create Entry',
                     'sort_column' => 'title',
                     'sort_direction' => 'asc',
                     'filters' => Scope::filters('entries', [
@@ -93,6 +94,7 @@ class ViewCollectionListingTest extends TestCase
                     'actions' => Facades\Action::for($collectionB, ['view' => 'list']),
                     'actions_url' => 'http://localhost/cp/collections/actions',
                     'icon' => 'collections',
+                    'create_label' => 'Create Entry',
                     'sort_column' => 'title',
                     'sort_direction' => 'asc',
                     'filters' => Scope::filters('entries', [
