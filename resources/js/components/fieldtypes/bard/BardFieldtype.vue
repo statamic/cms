@@ -826,7 +826,11 @@ export default {
                             const { view, state } = this.editor;
 
                             if (this.options.allowed({ view, state})) {
-                                this.options.openSetPicker();
+                                if (this.options.setConfigs.length === 1) {
+                                    this.options.addSet(this.options.setConfigs[0].handle);
+                                } else {
+                                    this.options.openSetPicker();
+                                }
                                 return true; // Prevent inserting a slash.
                             }
 
@@ -844,6 +848,8 @@ export default {
                     shown: computed(() => this.showAddSetButton),
                     allowed: this.suitableToShowSetButton,
                     openSetPicker: this.openSetPicker,
+                    setConfigs: this.setConfigs,
+                    addSet: this.addSet,
                 }),
                 Dropcursor,
                 Gapcursor,
