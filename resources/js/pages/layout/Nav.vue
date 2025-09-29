@@ -1,27 +1,9 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
 import { Icon } from '@ui';
+import useNavigation from './navigation.js';
 
-const nav = Statamic.$config.get('nav');
-
-function unsetActiveItem() {
-    nav.forEach(section => {
-        section.items.forEach(item => {
-            item.active = false;
-            item.children.forEach(child => child.active = false);
-        });
-    });
-}
-
-function setParentActive(parent) {
-    unsetActiveItem();
-    parent.active = true;
-}
-
-function setChildActive(parent, child) {
-    setParentActive(parent);
-    child.active = true;
-}
+const { nav, setParentActive, setChildActive } = useNavigation();
 </script>
 
 <template>

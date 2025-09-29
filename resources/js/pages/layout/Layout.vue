@@ -3,13 +3,30 @@ import Header from './Header.vue';
 import Nav from './Nav.vue';
 import { ConfigProvider } from 'reka-ui';
 import PortalTargets from '@/components/portals/PortalTargets.vue';
-import { ref } from 'vue';
+import { provide, ref, toRef, watch } from 'vue';
+import { router } from '@inertiajs/vue3';
 
 const props = defineProps({
     architecturalBackground: { type: Boolean, default: false },
+    additionalBreadcrumbs: { type: Array, default: () => [] },
+});
+
+// Pushed breadcrumbs for the initial page load will come through Blade and be in the config. This is so
+// non-Inertia pages can have breadcrumbs too. On subsequent Inertia navigations, the prop will be
+// populated with the correct data, and we should replace it. We don't want to do it for the
+// first navigate event, since the prop will be empty and override the Blade data.
+const additionalBreadcrumbs = ref(Statamic.$config.get('additionalBreadcrumbs'));
+let firstRun = true;
+router.on('navigate', () => {
+    if (! firstRun) additionalBreadcrumbs.value = props.additionalBreadcrumbs;
+    firstRun = false;
 });
 
 const navOpen = ref(true);
+
+provide('layout', {
+    additionalBreadcrumbs,
+});
 </script>
 
 <template>

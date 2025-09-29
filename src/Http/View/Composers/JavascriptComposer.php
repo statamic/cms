@@ -6,6 +6,7 @@ use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 use Statamic\CommandPalette\Category;
+use Statamic\CP\Breadcrumbs\Breadcrumbs;
 use Statamic\CP\Navigation\NavItem;
 use Statamic\Facades\CommandPalette;
 use Statamic\Facades\CP\Nav;
@@ -88,6 +89,7 @@ class JavascriptComposer
             'linkToDocs' => config('statamic.cp.link_to_docs'),
             'licensing' => $this->licensing(),
             'nav' => $this->nav(),
+            'additionalBreadcrumbs' => $this->breadcrumbs(),
         ];
     }
 
@@ -197,7 +199,13 @@ class JavascriptComposer
                 'attributes' => $item->attributes(),
                 'active' => $item->isActive(),
                 'children' => $this->navItems($item->resolveChildren()->children()?->all() ?? []),
+                'extra' => $item->extra(),
             ];
         })->all();
+    }
+
+    private function breadcrumbs()
+    {
+        return Breadcrumbs::additional();
     }
 }
