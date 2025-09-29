@@ -4,7 +4,7 @@
     class="
         inline-flex items-center justify-center whitespace-nowrap shrink-0
         font-medium antialiased cursor-pointer no-underline
-        disabled:text-gray-400 dark:disabled:text-gray-600 disabled:cursor-not-allowed
+        disabled:text-white/60 dark:disabled:text-white/50 disabled:cursor-not-allowed
         [&_svg]:shrink-0 [&_svg]:text-black [&_svg]:opacity-60 dark:[&_svg]:text-white
         bg-transparent hover:bg-gray-400/10 text-gray-900 dark:text-gray-300 dark:hover:bg-white/15 dark:hover:text-gray-200
         h-10 text-sm rounded-lg px-0 gap-0 w-10
@@ -23,7 +23,7 @@
             variant="ghost"
             icon="chevron-vertical"
             class="[&_svg]:size-3! h-8! w-4! hover:bg-gray-300/5! -ml-3 mr-1 animate-in fade-in duration-500"
-            :aria-label="'{{ __('Options for') }} {{ __($breadcrumb->text()) }}'"
+            aria-label="'{{ __('Options for') }} {{ __($breadcrumb->text()) }}'"
             aria-haspopup="true"
             aria-expanded="false"
         ></ui-button>
