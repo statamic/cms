@@ -1,10 +1,12 @@
 <script setup>
 import { ref, watch, computed, nextTick } from 'vue';
 import axios from 'axios';
-import { CalendarCell, CalendarCellTrigger, CalendarGrid, CalendarGridBody, CalendarGridHead, CalendarGridRow, CalendarHeadCell, CalendarHeader, CalendarHeading, CalendarRoot, CalendarPrev, CalendarNext } from 'reka-ui';
+import { CalendarHeader, CalendarHeading, CalendarRoot } from 'reka-ui';
 import { CalendarDate } from '@internationalized/date';
-import CreateEntryButton from './CreateEntryButton.vue';
+import CalendarMonthView from './CalendarMonthView.vue';
+import CalendarWeekView from './CalendarWeekView.vue';
 import { Listing, StatusIndicator } from '@/components/ui';
+import { useCalendarDates } from '@/composables/useCalendarDates';
 
 const props = defineProps({
     collection: { type: String, required: true },
@@ -18,6 +20,8 @@ const currentDate = ref(new CalendarDate(new Date().getFullYear(), new Date().ge
 const selectedDate = ref(null);
 const entries = ref([]);
 const loading = ref(false);
+const error = ref(null);
+const saving = ref(false);
 const viewMode = ref('month'); // 'month' or 'week'
 const weekViewContainer = ref(null);
 const pendingDateChanges = ref(new Map()); // Track entry ID -> new date
@@ -25,50 +29,59 @@ const isDirty = ref(false);
 // Reactive drag state for Vue class bindings
 const dragOverTarget = ref(null);
 
+// Use composables
+const {
+    formatDateString,
+    createDateFromCalendarDate,
+    getWeekDates,
+    getVisibleHours,
+    getHourLabel,
+    formatTime,
+    isToday,
+    getCurrentDateRange
+} = useCalendarDates();
 
-function fetchEntries() {
+// ============================================================================
+// API & Data Management
+// ============================================================================
+
+async function fetchEntries() {
     loading.value = true;
+    error.value = null;
 
-    let startDate, endDate;
-
-    if (viewMode.value === 'week') {
-        // Get start of week (Sunday) and end of week (Saturday)
-        const currentWeekStart = new Date(currentDate.value.year, currentDate.value.month - 1, currentDate.value.day);
-        const dayOfWeek = currentWeekStart.getDay();
-        const startOfWeek = new Date(currentWeekStart);
-        startOfWeek.setDate(currentWeekStart.getDate() - dayOfWeek);
-
-        const endOfWeek = new Date(startOfWeek);
-        endOfWeek.setDate(startOfWeek.getDate() + 6);
-
-        startDate = startOfWeek;
-        endDate = endOfWeek;
-    } else {
-        // Month view
-        startDate = new Date(currentDate.value.year, currentDate.value.month - 1, 1);
-        endDate = new Date(currentDate.value.year, currentDate.value.month, 0);
-    }
-
-    axios.get(cp_url(`collections/${props.collection}/entries`), {
-        params: {
-            date: `${startDate.toISOString().split('T')[0]} to ${endDate.toISOString().split('T')[0]}`,
-            per_page: 1000
+    try {
+        // Guard against undefined values
+        if (!currentDate.value || !viewMode.value) {
+            console.warn('fetchEntries called with undefined values:', { currentDate: currentDate.value, viewMode: viewMode.value });
+            return;
         }
-    })
-    .then(response => {
+
+        const { startDate, endDate } = getCurrentDateRange(currentDate.value, viewMode.value);
+
+        if (!startDate || !endDate) {
+            console.error('getCurrentDateRange returned undefined values:', { startDate, endDate });
+            return;
+        }
+
+        const response = await axios.get(cp_url(`collections/${props.collection}/entries`), {
+            params: {
+                date: `${startDate.toISOString().split('T')[0]} to ${endDate.toISOString().split('T')[0]}`,
+                per_page: 1000
+            }
+        });
+
         entries.value = Object.values(response.data.data);
-    })
-    .catch(error => {
-        console.error('Failed to fetch entries:', error);
+    } catch (err) {
+        error.value = err;
+        console.error('Failed to fetch entries:', err);
         Statamic.$toast.error(__('Failed to load entries'));
-    })
-    .finally(() => {
+    } finally {
         loading.value = false;
-    });
+    }
 }
 
 function getEntriesForDate(date) {
-    const dateStr = new Date(date.year, date.month - 1, date.day).toISOString().split('T')[0];
+    const dateStr = formatDateString(date);
     return entries.value.filter(entry => {
         // Check if this entry has a pending date change
         if (pendingDateChanges.value.has(entry.id)) {
@@ -80,6 +93,32 @@ function getEntriesForDate(date) {
         return entryDate.toISOString().split('T')[0] === dateStr;
     });
 }
+
+function getEntriesForHour(date, hour) {
+    const dateStr = formatDateString(date);
+    return entries.value.filter(entry => {
+        // Check if this entry has a pending date change
+        if (pendingDateChanges.value.has(entry.id)) {
+            const newDate = pendingDateChanges.value.get(entry.id);
+            const newDateStr = newDate.toISOString().split('T')[0];
+            if (newDateStr !== dateStr) return false;
+
+            const newHour = newDate.getHours();
+            return newHour === hour;
+        }
+
+        const entryDate = new Date(entry.date?.date || entry.date);
+        const entryDateStr = entryDate.toISOString().split('T')[0];
+        if (entryDateStr !== dateStr) return false;
+
+        const entryHour = entryDate.getHours();
+        return entryHour === hour;
+    });
+}
+
+// ============================================================================
+// Date Navigation
+// ============================================================================
 
 function goToToday() {
     const today = new Date();
@@ -114,54 +153,6 @@ function goToNextPeriod() {
     }
 }
 
-function getWeekDates() {
-    const currentWeekStart = new Date(currentDate.value.year, currentDate.value.month - 1, currentDate.value.day);
-    const dayOfWeek = currentWeekStart.getDay();
-    const startOfWeek = new Date(currentWeekStart);
-    startOfWeek.setDate(currentWeekStart.getDate() - dayOfWeek);
-
-    const weekDates = [];
-    for (let i = 0; i < 7; i++) {
-        const date = new Date(startOfWeek);
-        date.setDate(startOfWeek.getDate() + i);
-        weekDates.push(new CalendarDate(date.getFullYear(), date.getMonth() + 1, date.getDate()));
-    }
-    return weekDates;
-}
-
-function getEntriesForHour(date, hour) {
-    const dateStr = new Date(date.year, date.month - 1, date.day).toISOString().split('T')[0];
-    return entries.value.filter(entry => {
-        // Check if this entry has a pending date change
-        if (pendingDateChanges.value.has(entry.id)) {
-            const newDate = pendingDateChanges.value.get(entry.id);
-            const newDateStr = newDate.toISOString().split('T')[0];
-            if (newDateStr !== dateStr) return false;
-
-            const newHour = newDate.getHours();
-            return newHour === hour;
-        }
-
-        const entryDate = new Date(entry.date?.date || entry.date);
-        const entryDateStr = entryDate.toISOString().split('T')[0];
-        if (entryDateStr !== dateStr) return false;
-
-        const entryHour = entryDate.getHours();
-        return entryHour === hour;
-    });
-}
-
-function getHourLabel(hour) {
-    if (hour === 0) return '12 AM';
-    if (hour < 12) return `${hour} AM`;
-    if (hour === 12) return '12 PM';
-    return `${hour - 12} PM`;
-}
-
-function getVisibleHours() {
-    // Return all 24 hours of the day
-    return Array.from({length: 24}, (_, i) => i);
-}
 
 function selectDate(date) {
     selectedDate.value = date;
@@ -174,20 +165,9 @@ function scrollTo8AM() {
     }
 }
 
-function formatTime(dateString) {
-    if (!dateString) return '';
-
-    const date = new Date(dateString);
-    return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
-}
-
-// Date comparison helpers
-function isToday(date) {
-    const today = new Date();
-    const compareDate = new Date(date.year, date.month - 1, date.day);
-    return compareDate.toDateString() === today.toDateString();
-}
-
+// ============================================================================
+// Date Comparison Helpers
+// ============================================================================
 function isSelectedDate(date) {
     return selectedDate.value && selectedDate.value.toString() === date.toString();
 }
@@ -204,7 +184,9 @@ function isDragOverHour(date, hour) {
 }
 
 
-// Drag and drop functions
+// ============================================================================
+// Drag and Drop Functions
+// ============================================================================
 function handleEntryDragStart(event, entry) {
     event.dataTransfer.setData('text/plain', JSON.stringify({
         entryId: entry.id,
@@ -297,25 +279,30 @@ function handleDrop(event, targetDate, targetHour = null) {
     }
 }
 
-// Save and cancel functions
-function saveChanges() {
+// ============================================================================
+// Save and Cancel Functions
+// ============================================================================
+async function saveChanges() {
     if (pendingDateChanges.value.size === 0) return Promise.resolve();
 
+    saving.value = true;
+    error.value = null;
 
-    // Update each entry individually
-    const promises = Array.from(pendingDateChanges.value.entries()).map(([entryId, newDate]) => {
-        // Find the entry to get its current title and slug
-        const entry = entries.value.find(e => e.id === entryId);
+    try {
+        // Update each entry individually
+        const promises = Array.from(pendingDateChanges.value.entries()).map(([entryId, newDate]) => {
+            // Find the entry to get its current title and slug
+            const entry = entries.value.find(e => e.id === entryId);
 
-        return axios.patch(cp_url(`collections/${props.collection}/entries/${entryId}`), {
-            date: newDate.toISOString(),
-            title: entry.title,
-            slug: entry.slug
+            return axios.patch(cp_url(`collections/${props.collection}/entries/${entryId}`), {
+                date: newDate.toISOString(),
+                title: entry.title,
+                slug: entry.slug
+            });
         });
-    });
 
-    return Promise.all(promises)
-    .then(response => {
+        const response = await Promise.all(promises);
+
         // Update local entries with the new dates
         pendingDateChanges.value.forEach((newDate, entryId) => {
             const entry = entries.value.find(e => e.id === entryId);
@@ -333,12 +320,14 @@ function saveChanges() {
 
         Statamic.$toast.success(__('Saved'));
         return response;
-    })
-    .catch(error => {
-        console.error('Failed to save changes:', error);
+    } catch (err) {
+        error.value = err;
+        console.error('Failed to save changes:', err);
         Statamic.$toast.error(__('Failed to save changes'));
-        throw error;
-    });
+        throw err;
+    } finally {
+        saving.value = false;
+    }
 }
 
 function cancelChanges() {
@@ -347,6 +336,10 @@ function cancelChanges() {
     emit('canceled');
 }
 
+// ============================================================================
+// Component API
+// ============================================================================
+
 // Expose methods to parent
 defineExpose({
     saveChanges,
@@ -354,7 +347,9 @@ defineExpose({
     isDirty: () => isDirty.value
 });
 
-
+// ============================================================================
+// Computed Properties
+// ============================================================================
 const selectedDateEntries = computed(() => {
     if (!selectedDate.value) return [];
     return getEntriesForDate(selectedDate.value);
@@ -368,7 +363,7 @@ const columns = computed(() => [
 // Memoize entries for each hour to prevent re-computation during drag
 const entriesByHour = computed(() => {
     const result = {};
-    getWeekDates().forEach(date => {
+    getWeekDates(currentDate.value).forEach(date => {
         getVisibleHours().forEach(hour => {
             const key = `${date.toString()}-${hour}`;
             result[key] = getEntriesForHour(date, hour);
@@ -377,6 +372,25 @@ const entriesByHour = computed(() => {
     return result;
 });
 
+// Group entries by date for efficient lookup
+const entriesByDate = computed(() => {
+    const grouped = {};
+    entries.value.forEach(entry => {
+        const dateStr = formatDateString(entry.date);
+        if (!grouped[dateStr]) grouped[dateStr] = [];
+        grouped[dateStr].push(entry);
+    });
+    return grouped;
+});
+
+// Current view date range
+const currentDateRange = computed(() => {
+    return getCurrentDateRange(currentDate.value, viewMode.value);
+});
+
+// ============================================================================
+// Watchers
+// ============================================================================
 
 watch(() => [currentDate.value.year, currentDate.value.month, currentDate.value.day, viewMode.value], fetchEntries, { immediate: true });
 
@@ -425,231 +439,42 @@ watch(viewMode, (newMode) => {
             </CalendarHeader>
 
             <!-- Month View -->
-            <CalendarGrid v-if="viewMode === 'month'" class="w-full border-collapse">
-                <CalendarGridHead>
-                    <CalendarGridRow class="grid grid-cols-7 gap-1 mb-2">
-                        <CalendarHeadCell
-                            v-for="day in weekDays"
-                            :key="day"
-                            class="p-2 text-center font-normal text-sm text-gray-500 dark:text-gray-400"
-                        >
-                            <span class="@4xl:hidden">{{ day.slice(0, 2) }}</span>
-                            <span class="hidden @4xl:block">{{ day }}</span>
-                        </CalendarHeadCell>
-                    </CalendarGridRow>
-                </CalendarGridHead>
-
-                <CalendarGridBody class="space-y-4">
-                    <template v-for="month in grid" :key="month.value.toString()">
-                        <CalendarGridRow
-                            v-for="(weekDates, weekIndex) in month.rows.filter(weekDates =>
-                                weekDates.some(date => date.month === month.value.month)
-                            )"
-                            :key="`weekDate-${weekIndex}`"
-                            class="grid grid-cols-7 gap-4"
-                        >
-                            <CalendarCell
-                                v-for="weekDate in weekDates"
-                                :key="weekDate.toString()"
-                                :date="weekDate"
-                                class="aspect-square p-2 rounded-xl shadow-ui-sm group relative"
-                                :class="{
-                                    'bg-gray-100 dark:bg-gray-800 ring-1 ring-gray-200 dark:ring-gray-700': weekDate.month !== month.value.month,
-                                    'bg-white dark:bg-gray-900': weekDate.month === month.value.month,
-                                    'bg-orange-50! dark:bg-orange-900/20! border border-orange-400! dark:border-orange-900!': isToday(weekDate),
-                                    'border-2 border-blue-400 bg-blue-50 dark:bg-blue-900/20': isDragOverDate(weekDate)
-                                }"
-                                @dragover="handleDragOver"
-                                @dragenter="handleDragEnter($event, weekDate)"
-                                @dragleave="handleDragLeave"
-                                @drop="handleDrop($event, weekDate)"
-                            >
-                                <CalendarCellTrigger
-                                    :day="weekDate"
-                                    :month="month.value"
-                                    class="w-full h-full flex flex-col items-center justify-center @3xl:items-start @3xl:justify-start"
-                                    v-slot="{ dayValue, selected, today, outsideView }"
-                                    @click="selectDate(weekDate)"
-                                >
-                                    <!-- Date number -->
-                                    <div
-                                        class="text-sm mb-1 rounded-full size-6 flex items-center justify-center"
-                                        v-text="dayValue"
-                                        :class="{
-                                            'text-gray-400 dark:text-gray-600': outsideView,
-                                            'text-gray-900 dark:text-white': !outsideView,
-                                            'text-white bg-blue-600': selectedDate && selectedDate.toString() === weekDate.toString(),
-                                            'text-orange-600': today
-                                        }"
-                                    />
-
-                                    <div class="@3xl:hidden w-full" v-if="getEntriesForDate(weekDate).length > 0">
-                                        <div class="flex h-1 rounded-full overflow-hidden items-center justify-center">
-                                            <div
-                                                v-for="(entry, index) in getEntriesForDate(weekDate).slice(0, 4)"
-                                                :key="entry.id"
-                                                class="h-full first:rounded-s-full last:rounded-e-full"
-                                                :class="{
-                                                    'bg-green-500': entry.status === 'published',
-                                                    'bg-gray-300': entry.status === 'draft',
-                                                    'bg-purple-500': entry.status === 'scheduled'
-                                                }"
-                                                style="width: 25%"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <!-- Entries -->
-                                    <div class="space-y-1.5 flex-1 overflow-scroll h-full hidden @3xl:block">
-                                        <a
-                                            :href="entry.edit_url"
-                                            :key="entry.id"
-                                            class="text-2xs @3xl:text-xs px-2 border-s-2 rounded-e-sm cursor-pointer flex flex-col"
-                                            :class="{
-                                                'border-green-500 hover:bg-green-50': entry.status === 'published',
-                                                'border-gray-300 hover:bg-gray-50': entry.status === 'draft',
-                                                'border-purple-500 hover:bg-purple-50': entry.status === 'scheduled'
-                                            }"
-                                            v-for="entry in getEntriesForDate(weekDate).slice(0, 3)"
-                                            draggable="true"
-                                            @dragstart="handleEntryDragStart($event, entry)"
-                                        >
-                                            <span class="line-clamp-2">
-                                                {{ entry.title }}
-                                            </span>
-                                            <span class="hidden @4xl:block text-2xs text-gray-400 dark:text-gray-400">
-                                                {{ formatTime(entry.date?.date || entry.date) }}
-                                            </span>
-                                        </a>
-                                        <div v-if="getEntriesForDate(weekDate).length > 5" class="text-xs text-gray-500 dark:text-gray-400">
-                                            +{{ getEntriesForDate(weekDate).length - 5 }} {{ __('more') }}
-                                        </div>
-                                    </div>
-                                </CalendarCellTrigger>
-
-                                <!-- Create entry button (shows on hover) -->
-                                <div class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity hidden @3xl:block">
-                                    <CreateEntryButton
-                                        :url="`${createUrl}?date=${weekDate.year}-${String(weekDate.month).padStart(2, '0')}-${String(weekDate.day).padStart(2, '0')}`"
-                                        :blueprints="blueprints"
-                                        variant="subtle"
-                                        size="sm"
-                                        :custom-trigger="true"
-                                    >
-                                        <template #trigger="{ create }">
-                                            <ui-button icon="plus" size="sm" variant="subtle" @click="create" />
-                                        </template>
-                                    </CreateEntryButton>
-                                </div>
-                            </CalendarCell>
-                        </CalendarGridRow>
-                    </template>
-                </CalendarGridBody>
-            </CalendarGrid>
+            <CalendarMonthView
+                v-if="viewMode === 'month'"
+                :week-days="weekDays"
+                :grid="grid"
+                :entries="entries"
+                :pending-date-changes="pendingDateChanges"
+                :selected-date="selectedDate"
+                :drag-over-target="dragOverTarget"
+                :create-url="createUrl"
+                :blueprints="blueprints"
+                @select-date="selectDate"
+                @entry-dragstart="handleEntryDragStart"
+                @drag-over="handleDragOver"
+                @drag-enter="handleDragEnter"
+                @drag-leave="handleDragLeave"
+                @drop="handleDrop"
+            />
 
             <!-- Week View -->
-            <div v-else class="w-full">
-                <!-- Week header with days -->
-                <div class="grid grid-cols-8 border border-gray-200 dark:border-gray-700 rounded-t-lg overflow-hidden">
-                    <div class="p-3 text-sm bg-gray-50 font-medium text-gray-500 dark:text-gray-400"></div>
-                    <div
-                        v-for="date in getWeekDates()"
-                        :key="date.toString()"
-                        class="p-3 bg-gray-50 text-center border-l border-gray-200 dark:border-gray-700"
-                        :class="{
-                            'bg-blue-50 dark:bg-blue-900/20': isSelectedDate(date),
-                            'bg-gray-50 dark:bg-gray-800': isToday(date)
-                        }"
-                    >
-                        <div class="text-xs text-gray-500 dark:text-gray-400">
-                            {{ new Date(date.year, date.month - 1, date.day).toLocaleDateString($date.locale, { weekday: 'short' }) }}
-                        </div>
-                        <div
-                            class="text-sm font-medium inline p-1"
-                            :class="{
-                                'text-blue-600 dark:text-blue-400': isSelectedDate(date),
-                                'text-gray-900 dark:text-white': !isSelectedDate(date),
-                                'rounded-full text-white bg-ui-accent': isToday(date)
-                            }"
-                        >
-                            {{ date.day }}
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Hourly grid -->
-                <div ref="weekViewContainer" class="grid grid-cols-8 gap-0 border border-gray-200 dark:border-gray-700 rounded-b-lg overflow-auto max-h-[60vh]">
-                    <!-- Hour labels column -->
-                    <div class="bg-gray-50 dark:bg-gray-800">
-                        <div
-                            v-for="hour in getVisibleHours()"
-                            :key="hour"
-                            class="h-18 border-b border-gray-200 dark:border-gray-700 flex items-start justify-end pr-2 pt-1"
-                        >
-                            <span class="text-xs text-gray-500 dark:text-gray-400">
-                                {{ getHourLabel(hour) }}
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- Day columns -->
-                    <div
-                        v-for="date in getWeekDates()"
-                        :key="date.toString()"
-                        class="bg-white border-l border-gray-200 dark:border-gray-700"
-                    >
-                        <div
-                            v-for="hour in getVisibleHours()"
-                            :key="hour"
-                            class="h-18 border-b border-gray-200 dark:border-gray-700 relative group"
-                            :class="{
-                                'hover:bg-gray-50 dark:hover:bg-gray-800/50': entriesByHour[`${date.toString()}-${hour}`]?.length === 0,
-                                'bg-blue-50 dark:bg-blue-900/20': isDragOverHour(date, hour)
-                            }"
-                            @click="selectDate(date)"
-                            @dragover="handleDragOver"
-                            @dragenter="handleDragEnter($event, { date, hour })"
-                            @dragleave="handleDragLeave"
-                            @drop="handleDrop($event, date, hour)"
-                        >
-                            <!-- Entries for this hour -->
-                            <div class="absolute inset-0 p-1">
-                                <a
-                                    v-for="entry in entriesByHour[`${date.toString()}-${hour}`] || []"
-                                    :key="entry.id"
-                                    :href="entry.edit_url"
-                                    class="block text-xs p-1 rounded-r border-l-2 mb-1 cursor-pointer hover:shadow-sm"
-                                    :class="{
-                                        'border-green-500 bg-green-50 dark:bg-green-900/20': entry.status === 'published',
-                                        'border-gray-300 bg-gray-50 dark:bg-gray-800': entry.status === 'draft',
-                                        'border-purple-500 bg-purple-50 dark:bg-purple-900/20': entry.status === 'scheduled'
-                                    }"
-                                    draggable="true"
-                                    @dragstart="handleEntryDragStart($event, entry)"
-                                >
-                                    <div class="font-medium line-clamp-2">{{ entry.title }}</div>
-                                </a>
-
-                            </div>
-
-                            <!-- Create entry button (shows on hover) -->
-                            <div v-if="entriesByHour[`${date.toString()}-${hour}`]?.length === 0" class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <CreateEntryButton
-                                    :url="`${createUrl}?date=${date.year}-${String(date.month).padStart(2, '0')}-${String(date.day).padStart(2, '0')}&time=${String(hour).padStart(2, '0')}:00`"
-                                    :blueprints="blueprints"
-                                    variant="subtle"
-                                    size="sm"
-                                    :custom-trigger="true"
-                                >
-                                    <template #trigger="{ create }">
-                                        <ui-button icon="plus" size="sm" variant="subtle" @click="create" />
-                                    </template>
-                                </CreateEntryButton>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <CalendarWeekView
+                v-else
+                :week-dates="getWeekDates(currentDate)"
+                :entries="entries"
+                :pending-date-changes="pendingDateChanges"
+                :selected-date="selectedDate"
+                :drag-over-target="dragOverTarget"
+                :create-url="createUrl"
+                :blueprints="blueprints"
+                :entries-by-hour="entriesByHour"
+                @select-date="selectDate"
+                @entry-dragstart="handleEntryDragStart"
+                @drag-over="handleDragOver"
+                @drag-enter="handleDragEnter"
+                @drag-leave="handleDragLeave"
+                @drop="handleDrop"
+            />
         </CalendarRoot>
          <!-- Mobile entries list -->
         <div class="@3xl:hidden mt-6" v-if="selectedDate">
