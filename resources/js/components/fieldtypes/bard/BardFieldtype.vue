@@ -938,7 +938,7 @@ export default {
 
         openSetPicker() {
             this.$refs.setPicker.open();
-        },
+        }
     },
 };
 </script>
