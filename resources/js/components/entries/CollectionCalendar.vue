@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, computed, nextTick } from 'vue';
+import { ref, watch, computed, nextTick, shallowRef } from 'vue';
 import axios from 'axios';
 import { CalendarCell, CalendarCellTrigger, CalendarGrid, CalendarGridBody, CalendarGridHead, CalendarGridRow, CalendarHeadCell, CalendarHeader, CalendarHeading, CalendarRoot, CalendarPrev, CalendarNext } from 'reka-ui';
 import { CalendarDate } from '@internationalized/date';
@@ -22,7 +22,8 @@ const viewMode = ref('month'); // 'month' or 'week'
 const weekViewContainer = ref(null);
 const pendingDateChanges = ref(new Map()); // Track entry ID -> new date
 const isDirty = ref(false);
-const dragOverTarget = ref(null); // Track which cell/hour is being dragged over
+// Track current drag over element for direct DOM manipulation
+let currentDragOverElement = null;
 
 
 function fetchEntries() {
@@ -191,6 +192,7 @@ function isSelectedDate(date) {
     return selectedDate.value && selectedDate.value.toString() === date.toString();
 }
 
+
 // Drag and drop functions
 function handleEntryDragStart(event, entry) {
     event.dataTransfer.setData('text/plain', JSON.stringify({
@@ -259,23 +261,40 @@ function handleHourDrop(event, targetDate, targetHour) {
 function handleDragOver(event) {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
+
+    // Set drag over state during dragover for immediate feedback
+    if (currentDragOverElement !== event.currentTarget) {
+        // Remove previous drag over class
+        if (currentDragOverElement) {
+            currentDragOverElement.classList.remove('border-2', 'border-blue-400', 'bg-blue-50', 'dark:bg-blue-900/20');
+        }
+
+        // Add drag over class to current element
+        currentDragOverElement = event.currentTarget;
+        currentDragOverElement.classList.add('border-2', 'border-blue-400', 'bg-blue-50', 'dark:bg-blue-900/20');
+    }
 }
 
-function handleDragEnter(event, target) {
+function handleDragEnter(event) {
     event.preventDefault();
-    dragOverTarget.value = target;
 }
 
 function handleDragLeave(event) {
-    // Only clear if we're actually leaving the drop zone
-    if (!event.currentTarget.contains(event.relatedTarget)) {
-        dragOverTarget.value = null;
+    // Clear the drag over styling when leaving
+    if (currentDragOverElement) {
+        currentDragOverElement.classList.remove('border-2', 'border-blue-400', 'bg-blue-50', 'dark:bg-blue-900/20');
+        currentDragOverElement = null;
     }
 }
 
 function handleDrop(event, targetDate, targetHour = null) {
     event.preventDefault();
-    dragOverTarget.value = null;
+
+    // Clear drag over styling
+    if (currentDragOverElement) {
+        currentDragOverElement.classList.remove('border-2', 'border-blue-400', 'bg-blue-50', 'dark:bg-blue-900/20');
+        currentDragOverElement = null;
+    }
 
     if (targetHour !== null) {
         handleHourDrop(event, targetDate, targetHour);
@@ -346,6 +365,18 @@ const columns = computed(() => [
     { label: 'Title', field: 'title', visible: true },
     { label: 'Status', field: 'status', visible: true }
 ]);
+
+// Memoize entries for each hour to prevent re-computation during drag
+const entriesByHour = computed(() => {
+    const result = {};
+    getWeekDates().forEach(date => {
+        getVisibleHours().forEach(hour => {
+            const key = `${date.toString()}-${hour}`;
+            result[key] = getEntriesForHour(date, hour);
+        });
+    });
+    return result;
+});
 
 
 watch(() => [currentDate.value.year, currentDate.value.month, currentDate.value.day, viewMode.value], fetchEntries, { immediate: true });
@@ -426,11 +457,10 @@ watch(viewMode, (newMode) => {
                                 :class="{
                                     'bg-gray-100 dark:bg-gray-800 ring-1 ring-gray-200 dark:ring-gray-700': weekDate.month !== month.value.month,
                                     'bg-white dark:bg-gray-900': weekDate.month === month.value.month,
-                                    'bg-orange-50! dark:bg-orange-900/20! border border-orange-400! dark:border-orange-900!': isToday(weekDate),
-                                    'ring-2 ring-blue-400 bg-blue-50 dark:bg-blue-900/20': dragOverTarget && dragOverTarget.toString() === weekDate.toString()
+                                    'bg-orange-50! dark:bg-orange-900/20! border border-orange-400! dark:border-orange-900!': isToday(weekDate)
                                 }"
                                 @dragover="handleDragOver"
-                                @dragenter="handleDragEnter($event, weekDate)"
+                                @dragenter="handleDragEnter"
                                 @dragleave="handleDragLeave"
                                 @drop="handleDrop($event, weekDate)"
                             >
@@ -573,19 +603,18 @@ watch(viewMode, (newMode) => {
                             :key="hour"
                             class="h-18 border-b border-gray-200 dark:border-gray-700 relative group"
                             :class="{
-                                'hover:bg-gray-50 dark:hover:bg-gray-800/50': getEntriesForHour(date, hour).length === 0,
-                                'border-2 border-blue-400 bg-blue-50 dark:bg-blue-900/20': dragOverTarget && dragOverTarget.date && dragOverTarget.date.toString() === date.toString() && dragOverTarget.hour === hour
+                                'hover:bg-gray-50 dark:hover:bg-gray-800/50': entriesByHour[`${date.toString()}-${hour}`]?.length === 0
                             }"
                             @click="selectDate(date)"
                             @dragover="handleDragOver"
-                            @dragenter="handleDragEnter($event, { date, hour })"
+                            @dragenter="handleDragEnter"
                             @dragleave="handleDragLeave"
                             @drop="handleDrop($event, date, hour)"
                         >
                             <!-- Entries for this hour -->
                             <div class="absolute inset-0 p-1">
                                 <a
-                                    v-for="entry in getEntriesForHour(date, hour)"
+                                    v-for="entry in entriesByHour[`${date.toString()}-${hour}`] || []"
                                     :key="entry.id"
                                     :href="entry.edit_url"
                                     class="block text-xs p-1 rounded border-l-2 mb-1 cursor-pointer hover:shadow-sm"
@@ -603,7 +632,7 @@ watch(viewMode, (newMode) => {
                             </div>
 
                             <!-- Create entry button (shows on hover) -->
-                            <div v-if="getEntriesForHour(date, hour).length === 0" class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div v-if="entriesByHour[`${date.toString()}-${hour}`]?.length === 0" class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <CreateEntryButton
                                     :url="`${createUrl}?date=${date.year}-${String(date.month).padStart(2, '0')}-${String(date.day).padStart(2, '0')}&time=${String(hour).padStart(2, '0')}:00`"
                                     :blueprints="blueprints"
