@@ -56,7 +56,6 @@ import PreferencesEditForm from '../components/preferences/EditForm.vue';
 import NavigationView from '../components/navigation/View.vue';
 import TaxonomyBlueprintListing from '../components/taxonomies/BlueprintListing.vue';
 import Updater from '../components/updater/Updater.vue';
-import SitesEditForm from '../components/sites/EditForm.vue';
 import ItemActions from '../components/actions/ItemActions.vue';
 import BulkActions from '../components/actions/BulkActions.vue';
 import LicensingAlert from '../components/LicensingAlert.vue';
@@ -140,7 +139,6 @@ export default function registerGlobalComponents(app) {
     app.component('TaxonomyBlueprintListing', TaxonomyBlueprintListing);
     app.component('NavBuilder', defineAsyncComponent(() => import('../components/nav/Builder.vue')));
     app.component('Updater', Updater);
-    app.component('SitesEditForm', SitesEditForm);
     app.component('ItemActions', ItemActions);
     app.component('BulkActions', BulkActions);
     app.component('LicensingAlert', LicensingAlert);
