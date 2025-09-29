@@ -14,7 +14,7 @@ class LivePreview
     public function handle(Token $token, $request, Closure $next)
     {
         $item = Facade::item($token);
-        
+
         if (! $item) {
             return $next($request);
         }
