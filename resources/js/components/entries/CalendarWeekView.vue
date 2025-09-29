@@ -2,11 +2,11 @@
     <div class="w-full">
         <!-- Week header with days -->
         <div class="grid grid-cols-8 border border-gray-200 dark:border-gray-700 rounded-t-lg overflow-hidden">
-            <div class="p-3 text-sm bg-gray-50 font-medium text-gray-500 dark:text-gray-400"></div>
+            <div class="p-3 text-sm bg-gray-50 dark:bg-gray-900/10 font-medium text-gray-500 dark:text-gray-400"></div>
             <div
                 v-for="date in weekDates"
                 :key="date.toString()"
-                class="p-3 bg-gray-50 text-center border-l border-gray-200 dark:border-gray-700"
+                class="p-3 bg-gray-50 dark:bg-gray-900/10 text-center border-l border-gray-200 dark:border-gray-700"
                 :class="headerClasses(date)"
             >
                 <div class="text-xs text-gray-500 dark:text-gray-400">
@@ -24,7 +24,7 @@
         <!-- Hourly grid -->
         <div ref="weekViewContainer" class="grid grid-cols-8 gap-0 border border-gray-200 dark:border-gray-700 rounded-b-lg overflow-auto max-h-[60vh]">
             <!-- Hour labels column -->
-            <div class="bg-gray-50 dark:bg-gray-800">
+            <div class="bg-gray-50 dark:bg-gray-900/10">
                 <div
                     v-for="hour in visibleHours"
                     :key="hour"
@@ -40,7 +40,7 @@
             <div
                 v-for="date in weekDates"
                 :key="date.toString()"
-                class="bg-white border-l border-gray-200 dark:border-gray-700"
+                class="bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-700"
             >
                 <div
                     v-for="hour in visibleHours"
