@@ -30,7 +30,7 @@ class JavascriptComposer
     {
         $variables = $this->commonVariables();
 
-        if (Gate::allows('access cp')) {
+        if (! Statamic::$isRenderingCpException && Gate::allows('access cp')) {
             $variables = array_merge($variables, $this->protectedVariables());
         }
 

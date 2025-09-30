@@ -36,6 +36,7 @@ class Statamic
     protected static $jsonVariables = [];
     protected static $bootedCallbacks = [];
     protected static $afterInstalledCallbacks = [];
+    public static bool $isRenderingCpException = false;
 
     public static function version()
     {
