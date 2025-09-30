@@ -33,14 +33,6 @@ provide('layout', {
 </script>
 
 <template>
-<!--    <div class="bg-white">-->
-<!--        <Link href="/cp/dashboard">Dashboard</Link>-->
-<!--        <Link href="/cp/collections/articles">Articles Collection</Link>-->
-<!--        <slot />-->
-<!--    </div>-->
-
-
-
     <ConfigProvider>
 <!--        @include('statamic::partials.session-expiry')-->
 <!--        @include('statamic::partials.licensing-alerts')-->
