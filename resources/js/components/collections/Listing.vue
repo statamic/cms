@@ -1,8 +1,8 @@
 <template>
     <ui-header :title="__('Collections')" icon="collections">
         <ui-toggle-group v-model="mode">
-            <ui-toggle-item icon="layout-list" value="list" aria-label="__('List view')" />
-            <ui-toggle-item icon="layout-grid" value="grid" aria-label="__('Grid view')" />
+            <ui-toggle-item icon="layout-list" value="list" :aria-label="__('List view')" />
+            <ui-toggle-item icon="layout-grid" value="grid" :aria-label="__('Grid view')" />
         </ui-toggle-group>
         <ui-button
             :href="createUrl"
