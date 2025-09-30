@@ -67,16 +67,13 @@
                             </div>
 
                             <!-- Desktop entries -->
-                            <div class="space-y-1.5 flex-1 overflow-scroll h-full hidden @3xl:block">
+                            <div class="space-y-1.5 flex-1 overflow-scroll h-full w-full hidden @3xl:block">
                                 <CalendarEntry
-                                    v-for="entry in getEntriesForDate(weekDate).slice(0, 3)"
+                                    v-for="entry in getEntriesForDate(weekDate)"
                                     :key="entry.id"
                                     :entry="entry"
                                     @dragstart="handleEntryDragStart"
                                 />
-                                <div v-if="getEntriesForDate(weekDate).length > 5" class="text-xs text-gray-500 dark:text-gray-400">
-                                    +{{ getEntriesForDate(weekDate).length - 5 }} {{ __('more') }}
-                                </div>
                             </div>
                         </CalendarCellTrigger>
 
