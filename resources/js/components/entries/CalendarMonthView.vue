@@ -128,7 +128,7 @@ const handleDrop = (event, targetDate) => {
                     )"
                     :key="`weekDate-${weekIndex}`"
                     :data-week-has-entries="weekHasEntries(weekDates)"
-                    class="grid grid-cols-7 gap-3 data-[week-has-entries=false]:[&_td]:aspect-[2/1]"
+                    class="grid grid-cols-7 gap-3"
                 >
                     <CalendarCell
                         v-for="weekDate in weekDates"
@@ -200,3 +200,12 @@ const handleDrop = (event, targetDate) => {
     </CalendarGrid>
 </template>
 
+<style scoped>
+@media (max-height: 999px) {
+    .calendar-grid {
+        tr:not([data-week-has-entries="true"]) td {
+            aspect-ratio: 2 / 1;
+        }
+    }
+}
+</style>

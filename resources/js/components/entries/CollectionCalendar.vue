@@ -28,6 +28,8 @@ const pendingDateChanges = ref(new Map()); // Track entry ID -> new date
 const isDirty = ref(false);
 // Reactive drag state for Vue class bindings
 const dragOverTarget = ref(null);
+// Calendar heading edit mode
+const isEditingHeading = ref(false);
 
 // Use composables
 const {
@@ -163,6 +165,20 @@ function scrollTo8AM() {
         // Each hour is h-18 (72px), so 8 AM is at position 8 * 72 = 576px
         weekViewRef.value.weekViewContainer.scrollTop = 8 * 72;
     }
+}
+
+function toggleHeadingEdit() {
+    isEditingHeading.value = !isEditingHeading.value;
+}
+
+function handleMonthChange(newMonth) {
+    currentDate.value = new CalendarDate(currentDate.value.year, newMonth, currentDate.value.day);
+    isEditingHeading.value = false;
+}
+
+function handleYearChange(newYear) {
+    currentDate.value = new CalendarDate(newYear, currentDate.value.month, currentDate.value.day);
+    isEditingHeading.value = false;
 }
 
 // ============================================================================
@@ -348,6 +364,34 @@ defineExpose({
 });
 
 // ============================================================================
+// Month and Year Options
+// ============================================================================
+
+const monthOptions = computed(() => {
+    const months = [];
+    for (let i = 1; i <= 12; i++) {
+        const date = new Date(2024, i - 1, 1);
+        months.push({
+            value: i,
+            label: date.toLocaleDateString($date.locale, { month: 'long' })
+        });
+    }
+    return months;
+});
+
+const yearOptions = computed(() => {
+    const currentYear = new Date().getFullYear();
+    const years = [];
+    for (let i = currentYear - 10; i <= currentYear + 10; i++) {
+        years.push({
+            value: i,
+            label: i.toString()
+        });
+    }
+    return years;
+});
+
+// ============================================================================
 // Computed Properties
 // ============================================================================
 const selectedDateEntries = computed(() => {
@@ -429,7 +473,35 @@ watch(viewMode, (newMode) => {
                     </div>
                 </div>
 
-                <CalendarHeading class="@3xl:flex-1 px-2 text-2xl font-medium text-gray-800 dark:text-white text-center" />
+                <!-- Calendar Heading with Edit Mode -->
+                <div class="@3xl:flex-1 px-2 text-center">
+                    <!-- Normal heading display -->
+                    <CalendarHeading
+                        v-if="!isEditingHeading"
+                        class="text-2xl font-medium text-gray-800 dark:text-white cursor-pointer hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                        @click="toggleHeadingEdit"
+                    />
+
+                    <!-- Edit mode with selects -->
+                    <div v-else class="flex items-center justify-center gap-2">
+                        <ui-select
+                            :model-value="currentDate.month"
+                            :options="monthOptions"
+                            option-value="value"
+                            option-label="label"
+                            size="sm"
+                            @update:modelValue="handleMonthChange"
+                        />
+                        <ui-select
+                            :model-value="currentDate.year"
+                            :options="yearOptions"
+                            option-value="value"
+                            option-label="label"
+                            size="sm"
+                            @update:modelValue="handleYearChange"
+                        />
+                    </div>
+                </div>
 
                 <div class="hidden @3xl:flex @3xl:flex-1 items-center gap-2 w-1/4 justify-end">
                     <ui-button icon="chevron-left" @click="goToPreviousPeriod" />
