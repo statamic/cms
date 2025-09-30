@@ -1,11 +1,11 @@
 <template>
     <CalendarGrid class="w-full border-collapse">
         <CalendarGridHead>
-            <CalendarGridRow class="grid grid-cols-7 gap-1 mb-2">
+            <CalendarGridRow class="grid grid-cols-7 gap-4 mb-2">
                 <CalendarHeadCell
                     v-for="day in weekDays"
                     :key="day"
-                    class="p-2 text-center font-normal text-sm text-gray-500 dark:text-gray-400"
+                    class="p-2 text-center font-normal text-sm text-gray-600 dark:text-gray-400"
                 >
                     <span class="@4xl:hidden">{{ day.slice(0, 2) }}</span>
                     <span class="hidden @4xl:block">{{ day }}</span>
