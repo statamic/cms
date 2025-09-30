@@ -37,9 +37,11 @@
             </template>
         </asset-manager>
 
-        <x-statamic::docs-callout
-            topic="{{ __('Assets') }}"
-            url="{{ Statamic::docsUrl('assets') }}"
-        />
+        <div class="starting-style-transition starting-style-transition--delay">
+            <x-statamic::docs-callout
+                topic="{{ __('Assets') }}"
+                url="{{ Statamic::docsUrl('assets') }}"
+            />
+        </div>
     </div>
 @endsection
