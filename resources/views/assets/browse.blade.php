@@ -14,7 +14,6 @@
             initial-path="{{ $folder }}"
             initial-editing-asset-id="{{ $editing ?? null }}"
             :columns="{{ $columns->toJson() }}"
-            class="starting-style-transition"
         >
             <template #initializing>
                 <!-- Header Skeleton -->
@@ -41,7 +40,6 @@
         <x-statamic::docs-callout
             topic="{{ __('Assets') }}"
             url="{{ Statamic::docsUrl('assets') }}"
-            class="starting-style-transition"
         />
     </div>
 @endsection
