@@ -17,12 +17,21 @@
             class="starting-style-transition"
         >
             <template #initializing>
-                <!-- Toolbar skeleton -->
-                <div class="flex justify-between">
-                    <ui-skeleton class="h-9 w-95 mb-3" />
-                    <ui-skeleton class="h-9 w-10 mb-3" />
+                <!-- Header Skeleton -->
+                <div class="flex justify-between py-8">
+                    <ui-skeleton class="h-8 w-95" />
+                    <div class="flex gap-3">
+                        <ui-skeleton class="h-10 w-26" />
+                        <ui-skeleton class="h-10 w-36" />
+                        <ui-skeleton class="h-10 w-20" />
+                    </div>
                 </div>
-                <!-- Assets grid skeleton -->
+                <!-- Toolbar Skeleton -->
+                <div class="flex justify-between py-3">
+                    <ui-skeleton class="h-9 w-95" />
+                    <ui-skeleton class="h-9 w-10" />
+                </div>
+                <!-- Assets grid Skeleton -->
                 <div class="flex justify-between">
                     <ui-skeleton class="h-100 w-full" />
                 </div>
