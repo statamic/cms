@@ -155,7 +155,7 @@ class JavascriptComposer
         }
 
         return [
-            'text' => config('statamic.cp.custom_logo_text') ?? config('app.name'),
+            'text' => config('statamic.cp.custom_logo_text'),
             'light' => [
                 'nav' => $light['nav'] ?? null,
                 'outside' => $light['outside'] ?? null,
