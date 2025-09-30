@@ -81,8 +81,8 @@
         transition: opacity 0.1s;
     }
 
-    .starting-style-transition--slow {
-        transition: opacity 1s;
+    .starting-style-transition--delay {
+        transition-delay: 0.5s;
     }
 
     .starting-style-transition--siblings,
