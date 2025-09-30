@@ -3,12 +3,18 @@
         <CalendarGridHead>
             <CalendarGridRow class="grid grid-cols-7 gap-3 mb-2">
                 <CalendarHeadCell
-                    v-for="day in weekDays"
+                    v-for="(day, index) in weekDays"
                     :key="day"
                     class="p-2 text-center font-medium text-sm text-gray-700 dark:text-gray-400 bg-gray-200/75 dark:bg-gray-900/75 rounded-lg"
                 >
-                    <span class="@4xl:hidden">{{ day.slice(0, 2) }}</span>
-                    <span class="hidden @4xl:block">{{ day }}</span>
+                    <div class="flex items-center justify-center gap-1">
+                        <div 
+                            v-if="isCurrentDay(index)"
+                            class="w-1.5 h-1.5 mr-1 bg-orange-500 rounded-full"
+                        ></div>
+                        <span class="@4xl:hidden">{{ day.slice(0, 2) }}</span>
+                        <span class="hidden @4xl:block">{{ day }}</span>
+                    </div>
                 </CalendarHeadCell>
             </CalendarGridRow>
         </CalendarGridHead>
@@ -116,6 +122,18 @@ const props = defineProps({
 const emit = defineEmits(['select-date', 'entry-dragstart', 'drag-over', 'drag-enter', 'drag-leave', 'drop']);
 
 const { formatDateString, isToday } = useCalendarDates();
+
+const isCurrentDay = (dayIndex) => {
+    const today = new Date();
+    const currentDayName = today.toLocaleDateString('en-US', {weekday: 'long'});
+    
+    // Find the index of today's day name in the weekDays array
+    const todayIndex = props.weekDays.findIndex(day => 
+        day.toLowerCase() === currentDayName.toLowerCase()
+    );
+    
+    return dayIndex === todayIndex;
+};
 
 const getEntriesForDate = (date) => {
     const dateStr = formatDateString(date);
