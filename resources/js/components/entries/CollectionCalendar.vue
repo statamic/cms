@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, computed, nextTick } from 'vue';
+import { ref, watch, computed, nextTick, getCurrentInstance } from 'vue';
 import axios from 'axios';
 import { CalendarHeader, CalendarHeading, CalendarRoot } from 'reka-ui';
 import { CalendarDate } from '@internationalized/date';
@@ -28,8 +28,7 @@ const pendingDateChanges = ref(new Map()); // Track entry ID -> new date
 const isDirty = ref(false);
 // Reactive drag state for Vue class bindings
 const dragOverTarget = ref(null);
-// Calendar heading edit mode
-const isEditingHeading = ref(false);
+const datePickerOpen = ref(false);
 
 // Use composables
 const {
@@ -167,18 +166,12 @@ function scrollTo8AM() {
     }
 }
 
-function toggleHeadingEdit() {
-    isEditingHeading.value = !isEditingHeading.value;
-}
-
 function handleMonthChange(newMonth) {
     currentDate.value = new CalendarDate(currentDate.value.year, newMonth, currentDate.value.day);
-    isEditingHeading.value = false;
 }
 
 function handleYearChange(newYear) {
     currentDate.value = new CalendarDate(newYear, currentDate.value.month, currentDate.value.day);
-    isEditingHeading.value = false;
 }
 
 // ============================================================================
@@ -368,12 +361,14 @@ defineExpose({
 // ============================================================================
 
 const monthOptions = computed(() => {
+    const instance = getCurrentInstance();
+    const $date = instance?.appContext.config.globalProperties.$date;
     const months = [];
     for (let i = 1; i <= 12; i++) {
         const date = new Date(2024, i - 1, 1);
         months.push({
             value: i,
-            label: date.toLocaleDateString($date.locale, { month: 'long' })
+            label: date.toLocaleDateString($date?.locale || 'en', { month: 'long' })
         });
     }
     return months;
@@ -473,34 +468,40 @@ watch(viewMode, (newMode) => {
                     </div>
                 </div>
 
-                <!-- Calendar Heading with Edit Mode -->
+                <!-- Calendar Heading with Popover -->
                 <div class="@3xl:flex-1 px-2 text-center">
-                    <!-- Normal heading display -->
-                    <CalendarHeading
-                        v-if="!isEditingHeading"
-                        class="text-2xl font-medium text-gray-800 dark:text-white cursor-pointer hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                        @click="toggleHeadingEdit"
-                    />
+                    <ui-popover v-model:open="datePickerOpen" class="w-full" arrow>
+                        <template #trigger>
+                            <button @click="datePickerOpen = true">
+                                <CalendarHeading
+                                    class="text-2xl font-medium text-gray-800 dark:text-white cursor-pointer hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                                />
+                            </button>
+                        </template>
 
-                    <!-- Edit mode with selects -->
-                    <div v-else class="flex items-center justify-center gap-2">
-                        <ui-select
-                            :model-value="currentDate.month"
-                            :options="monthOptions"
-                            option-value="value"
-                            option-label="label"
-                            size="sm"
-                            @update:modelValue="handleMonthChange"
-                        />
-                        <ui-select
-                            :model-value="currentDate.year"
-                            :options="yearOptions"
-                            option-value="value"
-                            option-label="label"
-                            size="sm"
-                            @update:modelValue="handleYearChange"
-                        />
-                    </div>
+                        <div class="flex items-center gap-3">
+                            <div class="space-y-2">
+                                <ui-label for="month">{{ __('Month') }}</ui-label>
+                                <ui-select
+                                    :model-value="currentDate.month"
+                                    :options="monthOptions"
+                                    option-value="value"
+                                    option-label="label"
+                                    @update:modelValue="handleMonthChange"
+                                />
+                            </div>
+                            <div class="space-y-2">
+                                <ui-label for="month">{{ __('Year') }}</ui-label>
+                                <ui-select
+                                    :model-value="currentDate.year"
+                                    :options="yearOptions"
+                                    option-value="value"
+                                    option-label="label"
+                                    @update:modelValue="handleYearChange"
+                                />
+                            </div>
+                        </div>
+                    </ui-popover>
                 </div>
 
                 <div class="hidden @3xl:flex @3xl:flex-1 items-center gap-2 w-1/4 justify-end">

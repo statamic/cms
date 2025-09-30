@@ -20,7 +20,7 @@ const props = defineProps({
 
 const popoverContentClasses = cva({
     base: [
-        'rounded-xl w-64 bg-white dark:bg-gray-800 outline-hidden overflow-hidden',
+        'rounded-xl w-64 bg-white dark:bg-gray-800 outline-hidden',
         'border border-gray-200 dark:border-white/10 dark:border-b-0 shadow-lg',
         'duration-100 will-change-[transform,opacity]',
         'data-[state=open]:animate-in data-[state=closed]:animate-out',
@@ -66,7 +66,7 @@ function updateOpen(value) {
                 <PopoverClose as-child>
                     <slot name="close" v-bind="slotProps" />
                 </PopoverClose>
-                <PopoverArrow v-if="arrow" class="fill-white stroke-gray-300" />
+                <PopoverArrow v-if="arrow" class="fill-white dark:fill-gray-800 stroke-gray-300 dark:stroke-gray-700" />
             </PopoverContent>
         </PopoverPortal>
     </PopoverRoot>
