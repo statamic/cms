@@ -413,12 +413,10 @@ watch(viewMode, (newMode) => {
             fixed-weeks
             v-slot="{ weekDays, grid }"
             weekday-format="long"
-            class="bg-gray-100 dark:bg-gray-800 rounded-2xl p-3 lg:p-6"
+            class="bg-gray-100 dark:bg-gray-800 rounded-2xl p-3"
         >
-            <CalendarHeader class="flex flex-col @3xl:flex-row items-center gap-4 @3xl:mb-4 pb-4 @3xl:pb-8">
-                <CalendarHeading class="w-full @3xl:w-1/4 text-lg font-normal text-gray-800 dark:text-white text-center @3xl:text-left" />
-
-                <div class="flex items-center justify-between w-full @3xl:flex-1 @3xl:justify-center">
+            <CalendarHeader class="flex flex-col @3xl:flex-row items-center gap-4 pb-4 @3xl:pb-8">
+                <div class="flex items-center justify-between w-full @3xl:flex-1 @3xl:justify-start">
                     <ui-toggle-group v-model="viewMode" class="flex">
                         <ui-toggle-item value="week" :label="__('Week')" />
                         <ui-toggle-item value="month" :label="__('Month')" />
@@ -431,7 +429,9 @@ watch(viewMode, (newMode) => {
                     </div>
                 </div>
 
-                <div class="hidden @3xl:flex items-center gap-2 w-1/4 justify-end">
+                <CalendarHeading class="@3xl:flex-1 px-2 text-2xl font-medium text-gray-800 dark:text-white text-center" />
+
+                <div class="hidden @3xl:flex @3xl:flex-1 items-center gap-2 w-1/4 justify-end">
                     <ui-button icon="chevron-left" @click="goToPreviousPeriod" />
                     <ui-button @click="goToToday" :text="__('Today')" />
                     <ui-button icon="chevron-right" @click="goToNextPeriod" />

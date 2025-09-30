@@ -1,11 +1,11 @@
 <template>
     <CalendarGrid class="w-full border-collapse">
         <CalendarGridHead>
-            <CalendarGridRow class="grid grid-cols-7 gap-4 mb-2">
+            <CalendarGridRow class="grid grid-cols-7 gap-3 mb-2">
                 <CalendarHeadCell
                     v-for="day in weekDays"
                     :key="day"
-                    class="p-2 text-center font-normal text-sm text-gray-600 dark:text-gray-400"
+                    class="p-2 text-center font-medium text-sm text-gray-700 dark:text-gray-400 bg-gray-200/75 dark:bg-gray-900/75 rounded-lg"
                 >
                     <span class="@4xl:hidden">{{ day.slice(0, 2) }}</span>
                     <span class="hidden @4xl:block">{{ day }}</span>
@@ -13,20 +13,20 @@
             </CalendarGridRow>
         </CalendarGridHead>
 
-        <CalendarGridBody class="space-y-4">
+        <CalendarGridBody class="space-y-3">
             <template v-for="month in grid" :key="month.value.toString()">
                 <CalendarGridRow
                     v-for="(weekDates, weekIndex) in month.rows.filter(weekDates =>
                         weekDates.some(date => date.month === month.value.month)
                     )"
                     :key="`weekDate-${weekIndex}`"
-                    class="grid grid-cols-7 gap-4"
+                    class="grid grid-cols-7 gap-3"
                 >
                     <CalendarCell
                         v-for="weekDate in weekDates"
                         :key="weekDate.toString()"
                         :date="weekDate"
-                        class="aspect-square p-2 rounded-xl shadow-ui-sm group relative"
+                        class="aspect-square p-2 rounded-xl ring ring-gray-200 dark:ring-gray-700 shadow-ui-sm group relative"
                         :class="cellClasses(weekDate, month.value)"
                         @dragover="handleDragOver"
                         @dragenter="handleDragEnter($event, weekDate)"
