@@ -59,13 +59,13 @@ provide('layout', {
             </main>
         </div>
 
-<!--        <component-->
-<!--            v-for="component in appendedComponents"-->
-<!--            :key="component.id"-->
-<!--            :is="component.name"-->
-<!--            v-bind="component.props"-->
-<!--            v-on="component.events"-->
-<!--        ></component>-->
+        <Component
+            v-for="component in $root.appendedComponents"
+            :key="component.id"
+            :is="component.name"
+            v-bind="component.props"
+            v-on="component.events"
+        />
 
         <confirmation-modal
             v-if="$root.copyToClipboardModalUrl"

@@ -49,14 +49,6 @@
                     </main>
                 </div>
 
-                <component
-                    v-for="component in appendedComponents"
-                    :key="component.id"
-                    :is="component.name"
-                    v-bind="component.props"
-                    v-on="component.events"
-                ></component>
-
                 <portal-targets></portal-targets>
             </config-provider>
         </div>
