@@ -10,7 +10,7 @@
                     <div class="flex items-center justify-center gap-1">
                         <div 
                             v-if="isCurrentDay(index)"
-                            class="w-1.5 h-1.5 mr-1 bg-orange-500 rounded-full"
+                            class="w-1.5 h-1.5 mr-1 bg-ui-accent rounded-full"
                         ></div>
                         <span class="@4xl:hidden">{{ day.slice(0, 2) }}</span>
                         <span class="hidden @4xl:block">{{ day }}</span>
@@ -152,7 +152,7 @@ const getEntriesForDate = (date) => {
 const cellClasses = (weekDate, monthValue) => ({
     'bg-gray-100 dark:bg-gray-800 ring-1 ring-gray-200 dark:ring-gray-700': weekDate.month !== monthValue.month,
     'bg-white dark:bg-gray-900': weekDate.month === monthValue.month,
-    'bg-orange-50! dark:bg-orange-900/20! border border-orange-400! dark:border-orange-900!': isToday(weekDate),
+    'bg-ui-accent/10! border border-ui-accent!': isToday(weekDate),
     'border-2 border-blue-400 bg-blue-50 dark:bg-blue-900/20': isDragOverDate(weekDate)
 });
 
@@ -160,7 +160,7 @@ const dateNumberClasses = (weekDate, selected, today, outsideView) => ({
     'text-gray-400 dark:text-gray-600': outsideView,
     'text-gray-900 dark:text-white': !outsideView,
     'text-white bg-blue-600': props.selectedDate && props.selectedDate.toString() === weekDate.toString(),
-    'text-orange-600': today
+    'text-ui-accent': today
 });
 
 const entryStatusClasses = (status) => ({
