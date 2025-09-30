@@ -33,7 +33,7 @@
                  @include('statamic::partials.global-header')
 
                 <div
-                    class="@yield('content-class') pt-14"
+                    class="pt-14"
                     :class="{
                         'nav-closed': ! navOpen,
                         'nav-open': navOpen,
