@@ -33,7 +33,7 @@
                 </div>
                 <!-- Assets grid Skeleton -->
                 <div class="flex justify-between">
-                    <ui-skeleton class="h-100 w-full" />
+                    <ui-skeleton class="h-30 w-full" />
                 </div>
             </template>
         </asset-manager>
