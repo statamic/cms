@@ -19,6 +19,7 @@ abstract class Action implements Arrayable
     protected $dangerous = false;
     protected $fields = [];
     protected $context = [];
+    protected $component;
 
     public function __construct()
     {
@@ -96,6 +97,11 @@ abstract class Action implements Arrayable
         return $this->icon ?? '';
     }
 
+    public function component(): ?string
+    {
+        return $this->component;
+    }
+
     public function buttonText()
     {
         /** @translation */
@@ -135,6 +141,7 @@ abstract class Action implements Arrayable
             'handle' => $this->handle(),
             'title' => $this->title(),
             'icon' => $this->icon(),
+            'component' => $this->component(),
             'confirm' => $this->confirm,
             'buttonText' => $this->buttonText(),
             'confirmationText' => $this->confirmationText(),
