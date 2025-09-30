@@ -19,7 +19,7 @@
             </CalendarGridRow>
         </CalendarGridHead>
 
-        <CalendarGridBody class="space-y-3">
+        <CalendarGridBody class="space-y-3 calendar-grid">
             <template v-for="month in grid" :key="month.value.toString()">
                 <CalendarGridRow
                     v-for="(weekDates, weekIndex) in month.rows.filter(weekDates =>
