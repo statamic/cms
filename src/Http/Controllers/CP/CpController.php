@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP;
 
 use Illuminate\Auth\Access\AuthorizationException as LaravelAuthException;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Exceptions\AuthorizationException;
 use Statamic\Exceptions\ElevatedSessionAuthorizationException;
 use Statamic\Http\Controllers\Controller;
@@ -30,9 +31,11 @@ class CpController extends Controller
     /**
      * 404.
      */
-    public function pageNotFound()
+    public function pageNotFound(Request $request)
     {
-        return response()->view('statamic::errors.404', [], 404);
+        return Inertia::render('errors/404')
+            ->toResponse($request)
+            ->setStatusCode(404);
     }
 
     public function authorize($ability, $args = [], $message = null)
