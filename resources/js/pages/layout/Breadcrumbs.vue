@@ -9,6 +9,10 @@ const additionalBreadcrumbs = inject('layout').additionalBreadcrumbs;
 const activeSection = computed(() => nav.value.find(section => section.items.some(item => item.active)));
 
 const primaryItem = computed(() => {
+    if (! activeSection.value) {
+        return null;
+    }
+
     const item = activeSection.value.items.find(item => item.active);
 
     if (item) item.links = activeSection.value.items.filter(i => i !== item);
@@ -25,9 +29,9 @@ const secondaryItem = computed(() => {
 
     if (item) {
         item.links = primaryItem.value.children.filter(i => i !== item);
-        item.createLabel = primaryItem.value.extra.breadcrumbs.create_label;
-        item.createUrl = primaryItem.value.extra.breadcrumbs.create_url;
-        item.configureUrl = primaryItem.value.extra.breadcrumbs.configure_url;
+        item.createLabel = primaryItem.value.extra?.breadcrumbs?.create_label;
+        item.createUrl = primaryItem.value.extra?.breadcrumbs?.create_url;
+        item.configureUrl = primaryItem.value.extra?.breadcrumbs?.configure_url;
     }
 
     return item;
