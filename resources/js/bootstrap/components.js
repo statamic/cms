@@ -29,9 +29,6 @@ import GitStatus from '../components/GitStatus.vue';
 import DateTime from '../components/DateTime.vue';
 import UpdaterWidget from '../components/updater/UpdaterWidget.vue';
 
-import Login from '../components/login/Login.vue';
-import TwoFactorChallenge from '../components/login/TwoFactorChallenge.vue';
-import EnableTwoFactorAuthentication from '../components/login/EnableTwoFactorAuthentication.vue';
 import BaseTermCreateForm from '../components/terms/BaseCreateForm.vue';
 import CreateTermButton from '../components/terms/CreateTermButton.vue';
 import FieldsetListing from '../components/fieldsets/Listing.vue';
@@ -111,9 +108,6 @@ export default function registerGlobalComponents(app) {
     // Temporarily global during intertia migration
     // These are no longer used at the top level since there's now a layout component.
     // Eventually they will be moved into their respective pages.
-    app.component('Login', Login);
-    app.component('TwoFactorChallenge', TwoFactorChallenge);
-    app.component('EnableTwoFactorAuthentication', EnableTwoFactorAuthentication);
     app.component('BaseTermCreateForm', BaseTermCreateForm);
     app.component('CreateTermButton', CreateTermButton);
     app.component('FieldsetListing', FieldsetListing);

@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Facades\User;
 
 class TwoFactorSetupController extends Controller
@@ -20,7 +21,7 @@ class TwoFactorSetupController extends Controller
             return redirect($this->redirectPath());
         }
 
-        return view('statamic::auth.two-factor.setup', [
+        return Inertia::render('auth/two-factor/Setup', [
             'routes' => $this->routes($user),
             'redirect' => $this->redirectPath(),
         ]);

@@ -8,8 +8,7 @@
     </head>
 
     <body
-        class="bg-global-header-bg dark:bg-dark-global-header-bg font-sans leading-normal text-gray-900 dark:text-white"
-        @if ($user->getPreference('strict_accessibility')) data-contrast="increased" @endif
+        @if ($user && $user->getPreference('strict_accessibility')) data-contrast="increased" @endif
     >
         <div
             id="statamic"

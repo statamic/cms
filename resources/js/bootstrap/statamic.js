@@ -185,7 +185,7 @@ export default {
 
                 if (!page) throw new Error(`Couldn't find Inertia component for the [${name}] page. Did you you register a [Pages/${name}] component?`);
 
-                page.default.layout = Layout;
+                page.default.layout = page.default.layout || Layout;
                 return page;
             },
             async setup({ el, App: InertiaApp, props, plugin }) {

@@ -3,8 +3,11 @@ import Header from './Header.vue';
 import Nav from './Nav.vue';
 import { ConfigProvider } from 'reka-ui';
 import PortalTargets from '@/components/portals/PortalTargets.vue';
-import { provide, ref, toRef, watch } from 'vue';
+import { onMounted, onUnmounted, provide, ref, toRef, watch } from 'vue';
 import { router } from '@inertiajs/vue3';
+import useBodyClasses from './body-classes.js';
+
+useBodyClasses('bg-global-header-bg dark:bg-dark-global-header-bg font-sans leading-normal text-gray-900 dark:text-white');
 
 const props = defineProps({
     architecturalBackground: { type: Boolean, default: false },
