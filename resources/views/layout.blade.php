@@ -48,8 +48,6 @@
                         </div>
                     </main>
                 </div>
-
-                <portal-targets></portal-targets>
             </config-provider>
         </div>
         --}}

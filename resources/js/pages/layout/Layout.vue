@@ -79,6 +79,6 @@ provide('layout', {
             </div>
         </confirmation-modal>
 
-        <portal-targets></portal-targets>
+        <PortalTargets />
     </ConfigProvider>
 </template>
