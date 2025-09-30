@@ -90,6 +90,7 @@ defineExpose({
         v-if="confirming"
         :title="action.title"
         :danger="action.dangerous"
+        :submittable="action.runnable"
         :buttonText="runButtonText"
         :busy="running"
         @confirm="confirmed"

@@ -102,6 +102,11 @@ abstract class Action implements Arrayable
         return $this->component;
     }
 
+    public function runnable(): bool
+    {
+        return true;
+    }
+
     public function buttonText()
     {
         /** @translation */
@@ -142,6 +147,7 @@ abstract class Action implements Arrayable
             'title' => $this->title(),
             'icon' => $this->icon(),
             'component' => $this->component(),
+            'runnable' => $this->runnable(),
             'confirm' => $this->confirm,
             'buttonText' => $this->buttonText(),
             'confirmationText' => $this->confirmationText(),
