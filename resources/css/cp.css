@@ -14,7 +14,6 @@
 /* Components */
 @import './components/assets.css';
 @import './components/blueprints.css';
-@import './components/calendar.css';
 @import './components/configure.css';
 @import './components/focal-point.css';
 @import './components/index-fields.css';

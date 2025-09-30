@@ -1,3 +1,104 @@
+<script setup>
+import { computed } from 'vue';
+import { CalendarCell, CalendarCellTrigger, CalendarGrid, CalendarGridBody, CalendarGridHead, CalendarGridRow, CalendarHeadCell } from 'reka-ui';
+import CalendarEntry from './CalendarEntry.vue';
+import CreateEntryButton from './CreateEntryButton.vue';
+import { useCalendarDates } from '@/composables/useCalendarDates';
+
+const props = defineProps({
+    weekDays: { type: Array, required: true },
+    grid: { type: Array, required: true },
+    entries: { type: Array, required: true },
+    pendingDateChanges: { type: Map, required: true },
+    selectedDate: { type: Object, default: null },
+    dragOverTarget: { type: Object, default: null },
+    createUrl: { type: String, required: true },
+    blueprints: { type: Array, default: () => [] }
+});
+
+const emit = defineEmits(['select-date', 'entry-dragstart', 'drag-over', 'drag-enter', 'drag-leave', 'drop']);
+
+const { formatDateString, isToday } = useCalendarDates();
+
+const isCurrentDay = (dayIndex) => {
+    const today = new Date();
+    const currentDayName = today.toLocaleDateString('en-US', {weekday: 'long'});
+
+    // Find the index of today's day name in the weekDays array
+    const todayIndex = props.weekDays.findIndex(day =>
+        day.toLowerCase() === currentDayName.toLowerCase()
+    );
+
+    return dayIndex === todayIndex;
+};
+
+const getEntriesForDate = (date) => {
+    const dateStr = formatDateString(date);
+    return props.entries.filter(entry => {
+        // Check if this entry has a pending date change
+        if (props.pendingDateChanges.has(entry.id)) {
+            const newDate = props.pendingDateChanges.get(entry.id);
+            return newDate.toISOString().split('T')[0] === dateStr;
+        }
+
+        const entryDate = new Date(entry.date?.date || entry.date);
+        return entryDate.toISOString().split('T')[0] === dateStr;
+    });
+};
+
+const weekHasEntries = (weekDates) => {
+    return weekDates.some(date => getEntriesForDate(date).length > 0);
+};
+
+const cellClasses = (weekDate, monthValue) => ({
+    'bg-gray-100 dark:bg-gray-800 ring-1 ring-gray-200 dark:ring-gray-700': weekDate.month !== monthValue.month,
+    'bg-white dark:bg-gray-900': weekDate.month === monthValue.month,
+    'bg-ui-accent/10! border border-ui-accent!': isToday(weekDate),
+    'border-2 border-blue-400 bg-blue-50 dark:bg-blue-900/20': isDragOverDate(weekDate)
+});
+
+const dateNumberClasses = (weekDate, selected, today, outsideView) => ({
+    'text-gray-400 dark:text-gray-600': outsideView,
+    'text-gray-900 dark:text-white': !outsideView,
+    'text-white bg-blue-600': props.selectedDate && props.selectedDate.toString() === weekDate.toString(),
+    'text-ui-accent': today
+});
+
+const entryStatusClasses = (status) => ({
+    'bg-green-500': status === 'published',
+    'bg-gray-300': status === 'draft',
+    'bg-purple-500': status === 'scheduled'
+});
+
+const isDragOverDate = (date) => {
+    return props.dragOverTarget && props.dragOverTarget.toString() === date.toString();
+};
+
+const selectDate = (date) => {
+    emit('select-date', date);
+};
+
+const handleEntryDragStart = (event, entry) => {
+    emit('entry-dragstart', event, entry);
+};
+
+const handleDragOver = (event) => {
+    emit('drag-over', event);
+};
+
+const handleDragEnter = (event, target) => {
+    emit('drag-enter', event, target);
+};
+
+const handleDragLeave = (event) => {
+    emit('drag-leave', event);
+};
+
+const handleDrop = (event, targetDate) => {
+    emit('drop', event, targetDate);
+};
+</script>
+
 <template>
     <CalendarGrid class="w-full border-collapse">
         <CalendarGridHead>
@@ -8,7 +109,7 @@
                     class="p-2 text-center font-medium text-sm text-gray-700 dark:text-gray-400 bg-gray-200/75 dark:bg-gray-900/75 rounded-lg"
                 >
                     <div class="flex items-center justify-center gap-1">
-                        <div 
+                        <div
                             v-if="isCurrentDay(index)"
                             class="w-1.5 h-1.5 mr-1 bg-ui-accent rounded-full"
                         ></div>
@@ -26,7 +127,8 @@
                         weekDates.some(date => date.month === month.value.month)
                     )"
                     :key="`weekDate-${weekIndex}`"
-                    class="grid grid-cols-7 gap-3"
+                    :data-week-has-entries="weekHasEntries(weekDates)"
+                    class="grid grid-cols-7 gap-3 data-[week-has-entries=false]:[&_td]:aspect-[2/1]"
                 >
                     <CalendarCell
                         v-for="weekDate in weekDates"
@@ -98,99 +200,3 @@
     </CalendarGrid>
 </template>
 
-<script setup>
-import { computed } from 'vue';
-import { CalendarCell, CalendarCellTrigger, CalendarGrid, CalendarGridBody, CalendarGridHead, CalendarGridRow, CalendarHeadCell } from 'reka-ui';
-import CalendarEntry from './CalendarEntry.vue';
-import CreateEntryButton from './CreateEntryButton.vue';
-import { useCalendarDates } from '@/composables/useCalendarDates';
-
-const props = defineProps({
-    weekDays: { type: Array, required: true },
-    grid: { type: Array, required: true },
-    entries: { type: Array, required: true },
-    pendingDateChanges: { type: Map, required: true },
-    selectedDate: { type: Object, default: null },
-    dragOverTarget: { type: Object, default: null },
-    createUrl: { type: String, required: true },
-    blueprints: { type: Array, default: () => [] }
-});
-
-const emit = defineEmits(['select-date', 'entry-dragstart', 'drag-over', 'drag-enter', 'drag-leave', 'drop']);
-
-const { formatDateString, isToday } = useCalendarDates();
-
-const isCurrentDay = (dayIndex) => {
-    const today = new Date();
-    const currentDayName = today.toLocaleDateString('en-US', {weekday: 'long'});
-    
-    // Find the index of today's day name in the weekDays array
-    const todayIndex = props.weekDays.findIndex(day => 
-        day.toLowerCase() === currentDayName.toLowerCase()
-    );
-    
-    return dayIndex === todayIndex;
-};
-
-const getEntriesForDate = (date) => {
-    const dateStr = formatDateString(date);
-    return props.entries.filter(entry => {
-        // Check if this entry has a pending date change
-        if (props.pendingDateChanges.has(entry.id)) {
-            const newDate = props.pendingDateChanges.get(entry.id);
-            return newDate.toISOString().split('T')[0] === dateStr;
-        }
-
-        const entryDate = new Date(entry.date?.date || entry.date);
-        return entryDate.toISOString().split('T')[0] === dateStr;
-    });
-};
-
-const cellClasses = (weekDate, monthValue) => ({
-    'bg-gray-100 dark:bg-gray-800 ring-1 ring-gray-200 dark:ring-gray-700': weekDate.month !== monthValue.month,
-    'bg-white dark:bg-gray-900': weekDate.month === monthValue.month,
-    'bg-ui-accent/10! border border-ui-accent!': isToday(weekDate),
-    'border-2 border-blue-400 bg-blue-50 dark:bg-blue-900/20': isDragOverDate(weekDate)
-});
-
-const dateNumberClasses = (weekDate, selected, today, outsideView) => ({
-    'text-gray-400 dark:text-gray-600': outsideView,
-    'text-gray-900 dark:text-white': !outsideView,
-    'text-white bg-blue-600': props.selectedDate && props.selectedDate.toString() === weekDate.toString(),
-    'text-ui-accent': today
-});
-
-const entryStatusClasses = (status) => ({
-    'bg-green-500': status === 'published',
-    'bg-gray-300': status === 'draft',
-    'bg-purple-500': status === 'scheduled'
-});
-
-const isDragOverDate = (date) => {
-    return props.dragOverTarget && props.dragOverTarget.toString() === date.toString();
-};
-
-const selectDate = (date) => {
-    emit('select-date', date);
-};
-
-const handleEntryDragStart = (event, entry) => {
-    emit('entry-dragstart', event, entry);
-};
-
-const handleDragOver = (event) => {
-    emit('drag-over', event);
-};
-
-const handleDragEnter = (event, target) => {
-    emit('drag-enter', event, target);
-};
-
-const handleDragLeave = (event) => {
-    emit('drag-leave', event);
-};
-
-const handleDrop = (event, targetDate) => {
-    emit('drop', event, targetDate);
-};
-</script>
