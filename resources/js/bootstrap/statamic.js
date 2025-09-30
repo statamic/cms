@@ -183,7 +183,13 @@ export default {
                     if (addonPage) page = { default: addonPage };
                 }
 
-                if (!page) throw new Error(`Couldn't find Inertia component for the [${name}] page. Did you you register a [Pages/${name}] component?`);
+                if (!page) {
+                    let message = `Couldn't find Inertia component for the [${name}] page. `;
+                    message += name.endsWith('.vue')
+                        ? 'You do not need to include the .vue extension when referencing a page.'
+                        : 'Did you you register a [Pages/${name}] component?';
+                    throw new Error(message);
+                }
 
                 page.default.layout = page.default.layout || Layout;
                 return page;
