@@ -28,7 +28,7 @@
                 <div
                     v-for="hour in visibleHours"
                     :key="hour"
-                    class="h-18 border-b border-gray-200 dark:border-gray-700 flex items-start justify-end pr-2 pt-1"
+                    class="h-12 border-b border-gray-200 dark:border-gray-700 flex items-start justify-end pr-2 pt-1"
                 >
                     <span class="text-xs text-gray-500 dark:text-gray-400">
                         {{ getHourLabel(hour) }}
@@ -45,7 +45,7 @@
                 <div
                     v-for="hour in visibleHours"
                     :key="hour"
-                    class="h-18 border-b border-gray-200 dark:border-gray-700 relative group"
+                    class="h-12 border-b border-gray-200 dark:border-gray-700 relative group"
                     :class="hourCellClasses(date, hour)"
                     @click="selectDate(date)"
                     @dragover="handleDragOver"
