@@ -57,18 +57,6 @@
                     v-on="component.events"
                 ></component>
 
-                <confirmation-modal
-                    v-if="copyToClipboardModalUrl"
-                    :cancellable="false"
-                    :button-text="__('OK')"
-                    :title="__('Copy to clipboard')"
-                    @confirm="copyToClipboardModalUrl = null"
-                >
-                    <div class="prose">
-                        <ui-input :model-value="copyToClipboardModalUrl" readonly copyable class="font-mono text-sm dark" />
-                    </div>
-                </confirmation-modal>
-
                 <portal-targets></portal-targets>
             </config-provider>
         </div>
