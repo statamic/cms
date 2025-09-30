@@ -54,7 +54,7 @@
                     @drop="handleDrop($event, date, hour)"
                 >
                     <!-- Entries for this hour -->
-                    <div class="absolute inset-0 p-1">
+                    <div class="absolute inset-0 p-1 overflow-scroll">
                         <CalendarWeekEntry
                             v-for="entry in getEntriesForHour(date, hour)"
                             :key="entry.id"
