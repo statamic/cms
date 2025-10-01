@@ -10,11 +10,12 @@ Table Fieldtype
 
     thead {
         th {
-            @apply z-10 border-b bg-gray-50 p-2 text-sm font-medium text-gray-900 dark:border-gray-800 dark:border-b-gray-700 dark:bg-gray-900 dark:text-gray-100 not-last:border-e overflow-hidden;
+            @apply border-b bg-gray-50 p-2 text-sm font-medium text-gray-900 dark:border-gray-800 dark:border-b-gray-700 dark:bg-gray-900 dark:text-gray-100 not-last:border-e overflow-hidden;
             display: table-cell;
             position: sticky;
             top: -1px;
             text-align: left;
+            z-index: var(--z-index-above);
 
             &:first-child {
                 @apply rounded-ss-lg ps-3;
