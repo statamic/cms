@@ -76,12 +76,3 @@
     }
 }
 
-.grid-item-header {
-    @apply flex cursor-move items-center justify-between border-b bg-gray-200 px-4 py-2 text-sm outline-hidden;
-}
-
-.grid-fullscreen {
-    @apply fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-200;
-    z-index: 998; /*  to appear over the top of the rest of the stuff on the page. */
-    /*  too high and it'll be over the top of stacks, etc. */
-}
