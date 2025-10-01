@@ -257,6 +257,10 @@ class Field implements Arrayable
 
     public function isRevisable()
     {
+        if ($this->visibility() === 'computed') {
+            return true;
+        }
+
         return (bool) $this->get('revisable', true);
     }
 
