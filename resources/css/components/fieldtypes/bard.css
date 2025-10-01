@@ -130,7 +130,7 @@
 
     /*  Fixed toolbar inside another bard field */
     .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar {
-        z-index: 4;
+        z-index: var(--z-index-portal);
         top: 40px;
     }
 

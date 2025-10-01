@@ -38,7 +38,7 @@
     &::after {
         @apply absolute bg-transparent bg-no-repeat;
         content: '';
-        z-index: 2;
+        z-index: var(--z-index-above);
         left: -50%;
         top: -50%;
         width: 200%;
