@@ -5,7 +5,7 @@ import { ConfigProvider } from 'reka-ui';
 import SessionExpiry from '@/components/SessionExpiry.vue';
 import LicensingAlert from '@/components/LicensingAlert.vue';
 import PortalTargets from '@/components/portals/PortalTargets.vue';
-import { onMounted, onUnmounted, provide, ref, toRef, watch } from 'vue';
+import { provide, ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import useBodyClasses from './body-classes.js';
 
@@ -36,17 +36,12 @@ provide('layout', {
     <ConfigProvider>
         <SessionExpiry />
         <LicensingAlert />
-
-<!--        @include('statamic::partials.licensing-alerts')-->
-<!--        @include('statamic::partials.global-header')-->
-
         <Header />
 
         <main id="main" class="flex bg-body-bg dark:bg-dark-body-bg dark:border-t rounded-t-2xl dark:border-dark-body-border fixed top-14 inset-x-0 bottom-0 min-h-[calc(100vh-3.5rem)]">
             <Nav />
             <div id="main-content" class="main-content p-2 h-full flex-1 overflow-y-auto rounded-t-2xl">
                 <div class="relative content-card min-h-full" :class="{'bg-architectural-lines': architecturalBackground}">
-                    <!--                        @yield('content')-->
                     <slot />
                 </div>
             </div>
