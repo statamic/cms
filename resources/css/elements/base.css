@@ -20,7 +20,7 @@
     --z-index-below: -1;
     --z-index-base: 1;
     --z-index-above: 2;
-    --z-index-header: 3;
+    --z-index-global-header: 3;
     --z-index-portal: 4;
     --z-index-draggable: 5;
     --z-index-modal: 50;
