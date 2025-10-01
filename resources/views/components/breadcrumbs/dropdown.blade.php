@@ -49,7 +49,7 @@
                     icon="{{ $link->icon }}"
                     href="{{ $link->url }}"
                     role="menuitem"
-                    :aria-label="'{{ __($link->text) }} - {{ __('Navigate to') }}'"
+                    aria-label="'{{ __('Navigate to') }} {{ __($link->text) }}'"
                 ></ui-dropdown-item>
             @endforeach
         </ui-dropdown-menu>
@@ -60,7 +60,7 @@
             text="{{ __($breadcrumb->createLabel()) }}"
             href="{{ $breadcrumb->createUrl() }}"
             role="menuitem"
-            :aria-label="'{{ __($breadcrumb->createLabel()) }} - {{ __('Create new') }}'"
+            aria-label="'{{ __('Create new') }} {{ __($breadcrumb->createLabel()) }}'"
         ></ui-dropdown-footer>
     @endif
 </ui-dropdown>
