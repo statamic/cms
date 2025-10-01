@@ -10,6 +10,7 @@ use Statamic\Entries\Entry as EntriesEntry;
 use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades\Action;
 use Statamic\Facades\Asset;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
@@ -95,6 +96,7 @@ class EntriesController extends CpController
 
         $entry = $entry->fromWorkingCopy();
 
+        Blink::forget("entry-{$entry->id()}-blueprint");
         $blueprint = $entry->blueprint();
 
         if (! $blueprint) {

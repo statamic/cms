@@ -1,5 +1,64 @@
 # Release Notes
 
+## 5.65.2 (2025-09-24)
+
+### What's fixed
+- Prevent duplicate queries on collection structure [#12276](https://github.com/statamic/cms/issues/12276) by @ryanmitchell
+- Prevent caching during live preview [#12558](https://github.com/statamic/cms/issues/12558) by @helloiamlukas
+- Prevent empty cache tag when using Blade [#12567](https://github.com/statamic/cms/issues/12567) by @helloiamlukas
+- Fix incorrect blueprint being resolved on localizations [#11810](https://github.com/statamic/cms/issues/11810) by @duncanmcclean
+- Make asset GraphQL type always nullable [#11975](https://github.com/statamic/cms/issues/11975) by @lostgeek
+- Resolving PHP Warning and PHP Notice errors [#12257](https://github.com/statamic/cms/issues/12257) by @martinoak
+- Fix form submission search query [#12514](https://github.com/statamic/cms/issues/12514) by @duncanmcclean
+
+
+
+## 5.65.1 (2025-09-12)
+
+### What's fixed
+- Fix casing of "Edit Nav item" dropdown item [#12387](https://github.com/statamic/cms/issues/12387) by @duncanmcclean
+- Require `spatie/error-solutions` instead of `spatie/ignition` [#12385](https://github.com/statamic/cms/issues/12385) by @duncanmcclean
+- Allow `spatie/error-solutions` v1 [#12418](https://github.com/statamic/cms/issues/12418) by @jasonvarga
+- Bump axios from 1.8.2 to 1.12.0 [#12420](https://github.com/statamic/cms/issues/12420) by @dependabot
+
+
+
+## 5.65.0 (2025-09-08)
+
+### What's new
+- Make UpdateAssetReferences overwritable [#12283](https://github.com/statamic/cms/issues/12283) by @simonerd
+- Ability to opt into v6 asset folder permissions [#12060](https://github.com/statamic/cms/issues/12060) by @simonerd
+
+### What's fixed
+- Prevent PSR-4 warnings [#12347](https://github.com/statamic/cms/issues/12347) by @duncanmcclean
+- Corrects issue with unless conditions. [#12253](https://github.com/statamic/cms/issues/12253) by @JohnathonKoster
+- Fix blueprint blink cache issue [#12232](https://github.com/statamic/cms/issues/12232) by @aerni
+- Translate additional blueprint titles [#12242](https://github.com/statamic/cms/issues/12242) by @martyf
+- Dutch translations [#12212](https://github.com/statamic/cms/issues/12212) by @robdekort
+- Prevent null parse_url deprecation warning [#12197](https://github.com/statamic/cms/issues/12197) by @martinoak
+- Bump brace-expansion [#12072](https://github.com/statamic/cms/issues/12072) by @dependabot
+
+
+
+## 5.64.0 (2025-08-21)
+
+### What's new
+- Add `overlaps` and `doesnt_overlap` conditions and modifiers [#9491](https://github.com/statamic/cms/issues/9491) by @ryanmitchell
+- Support whereJsonOverlaps in query builders [#11112](https://github.com/statamic/cms/issues/11112) by @ryanmitchell
+- Support pluck() on eloquent query builder [#12027](https://github.com/statamic/cms/issues/12027) by @ryanmitchell
+- Show path when searching assets [#12032](https://github.com/statamic/cms/issues/12032) by @duncanmcclean
+
+### What's fixed
+- Prevent zeros being filtered out in Array fieldtype [#12039](https://github.com/statamic/cms/issues/12039) by @duncanmcclean
+- Cast numbers in list fieldtype [#11970](https://github.com/statamic/cms/issues/11970) by @duncanmcclean
+- Updated the Stache Store to not remove stache items that exist [#11863](https://github.com/statamic/cms/issues/11863) by @simonworkhouse
+- Fix Custom Set Icons not working if path contains a dot (.) [#11866](https://github.com/statamic/cms/issues/11866) by @andjsch
+- Antlers: Corrects parser error with shorthand array syntax [#12031](https://github.com/statamic/cms/issues/12031) by @JohnathonKoster
+- Dutch translations [#12059](https://github.com/statamic/cms/issues/12059) by @Jade-GG
+- Fix windows test [#12048](https://github.com/statamic/cms/issues/12048) by @duncanmcclean
+
+
+
 ## 5.63.0 (2025-08-06)
 
 ### What's new
