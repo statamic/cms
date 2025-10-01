@@ -5,7 +5,6 @@ export default {
 
     data() {
         return {
-            navOpen: false,
             appendedComponents: Statamic.$components.components,
             copyToClipboardModalUrl: null,
         };
@@ -22,13 +21,6 @@ export default {
     },
 
     mounted() {
-        this.$keys.bind(['command+\\'], (e) => {
-            e.preventDefault();
-            this.toggleNav();
-        });
-
-
-
         if (this.$config.get('broadcasting.enabled')) {
             this.$echo.start();
         }
@@ -41,8 +33,6 @@ export default {
 
     created() {
         const app = this;
-        const state = localStorage.getItem('statamic.nav') || 'open';
-        this.navOpen = state === 'open';
 
         Statamic.$callbacks.add('copyToClipboard', async function (url) {
             try {
@@ -62,10 +52,6 @@ export default {
     },
 
     methods: {
-        toggleNav() {
-            this.navOpen = !this.navOpen;
-            localStorage.setItem('statamic.nav', this.navOpen ? 'open' : 'closed');
-        },
 
         fixAutofocus() {
             // Fix autofocus issues in Safari and Firefox
