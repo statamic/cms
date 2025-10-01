@@ -3,6 +3,7 @@ import { Link } from '@inertiajs/vue3';
 import { Icon } from '@ui';
 import useNavigation from './navigation.js';
 import { nextTick, onMounted, ref, watch } from 'vue';
+import DynamicHtmlRenderer from '@/components/DynamicHtmlRenderer.vue';
 
 const { nav, setParentActive, setChildActive } = useNavigation();
 const localStorageKey = 'statamic.nav';
@@ -39,26 +40,29 @@ Statamic.$keys.bind(['command+\\'], (e) => {
             />
             <ul>
                 <li v-for="(item, i) in section.items" :key="i">
-                    <Link
-                        :href="item.url"
-                        v-bind="item.attributes"
-                        :class="{ 'active': item.active }"
-                        @click="setParentActive(item)"
-                    >
-                        <Icon :name="item.icon" />
-                        <span v-text="item.display" />
-                    </Link>
-                    <ul v-if="item.children.length && item.active">
-                        <li v-for="(child, i) in item.children" :key="i">
-                            <Link
-                                :href="child.url"
-                                v-bind="child.attributes"
-                                v-text="child.display"
-                                :class="{ 'active': child.active }"
-                                @click="setChildActive(item, child)"
-                            />
-                        </li>
-                    </ul>
+                    <DynamicHtmlRenderer v-if="item.view" :html="item.view" />
+                    <template v-else>
+                        <Link
+                            :href="item.url"
+                            v-bind="item.attributes"
+                            :class="{ 'active': item.active }"
+                            @click="setParentActive(item)"
+                        >
+                            <Icon :name="item.icon" />
+                            <span v-text="item.display" />
+                        </Link>
+                        <ul v-if="item.children.length && item.active">
+                            <li v-for="(child, i) in item.children" :key="i">
+                                <Link
+                                    :href="child.url"
+                                    v-bind="child.attributes"
+                                    v-text="child.display"
+                                    :class="{ 'active': child.active }"
+                                    @click="setChildActive(item, child)"
+                                />
+                            </li>
+                        </ul>
+                    </template>
                 </li>
             </ul>
         </div>

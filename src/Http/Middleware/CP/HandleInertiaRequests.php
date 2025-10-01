@@ -134,6 +134,7 @@ class HandleInertiaRequests extends Middleware
                 'active' => $item->isActive(),
                 'children' => $this->navItems($item->resolveChildren()->children()?->all() ?? []),
                 'extra' => $item->extra(),
+                'view' => ($view = $item->view()) ? view($view, ['item' => $item])->render() : null,
             ];
         })->all();
     }
