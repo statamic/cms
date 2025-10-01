@@ -2,18 +2,20 @@
 import { Link } from '@inertiajs/vue3';
 import { Icon } from '@ui';
 import useNavigation from './navigation.js';
-import { onMounted, ref, watch } from 'vue';
+import { nextTick, onMounted, ref, watch } from 'vue';
 
 const { nav, setParentActive, setChildActive } = useNavigation();
 const localStorageKey = 'statamic.nav';
 const isOpen = ref(localStorage.getItem(localStorageKey) !== 'closed');
 
 onMounted(() => {
-    watch(isOpen, (isOpen) => {
-        const el = document.getElementById('main');
-        el.classList.toggle('nav-closed', !isOpen);
-        el.classList.toggle('nav-open', isOpen);
-    }, { immediate: true });
+    nextTick(() => {
+        watch(isOpen, (isOpen) => {
+            const el = document.getElementById('main');
+            el.classList.toggle('nav-closed', !isOpen);
+            el.classList.toggle('nav-open', isOpen);
+        }, { immediate: true });
+    });
 });
 
 function toggle() {
