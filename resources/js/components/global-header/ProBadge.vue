@@ -1,8 +1,9 @@
 <script setup>
 import { Badge, Tooltip } from '@ui';
 import { computed } from 'vue';
+import useStatamicPageProps from '@/composables/page-props.js';
 
-const licensing = Statamic.$config.get('licensing');
+const { licensing } = useStatamicPageProps();
 
 const problemBadgeColor = computed(() => {
     if (licensing.requestFailed) {

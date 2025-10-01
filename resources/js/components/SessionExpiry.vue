@@ -106,6 +106,7 @@
 
 <script>
 import { Modal, Input, Button } from '@/components/ui';
+import useStatamicPageProps from '@/composables/page-props.js';
 
 var counter;
 
@@ -117,9 +118,7 @@ export default {
     },
 
     data() {
-        const {
-            warnAt, email, lifetime, oauthProvider, auth,
-        } = Statamic.$config.get('sessionExpiry');
+        const { sessionExpiry: { warnAt, email, lifetime, oauthProvider, auth }} = useStatamicPageProps();
 
         return {
             warnAt,

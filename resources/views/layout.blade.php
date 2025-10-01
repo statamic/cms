@@ -16,6 +16,7 @@
                 'url' => '/'.request()->path(),
                 'component' => 'NonInertiaPage',
                 'version' => inertia()->getVersion(),
+                'props' => \Inertia\Inertia::getShared()
             ]) }}"
         >
             <div id="blade-title" data-title="

@@ -1,8 +1,9 @@
 <script setup>
 import { computed } from 'vue';
 import { Avatar, Button, DropdownHeader, Badge, Dropdown, DropdownMenu, DropdownItem, DropdownFooter, ToggleGroup, ToggleItem } from '@ui';
+import useStatamicPageProps from '@/composables/page-props.js';
 
-const supportUrl = Statamic.$config.get('supportUrl');
+const { supportUrl } = useStatamicPageProps();
 const logoutUrl = `${cp_url('auth/logout')}?redirect=${cp_url('/')}`;
 const user = Statamic.user;
 const isImpersonating = computed((() => user.is_impersonating));

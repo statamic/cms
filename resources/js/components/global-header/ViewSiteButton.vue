@@ -1,6 +1,8 @@
 <script setup>
 import { Icon } from '@ui';
-const url = Statamic.$config.get('selectedSiteUrl');
+import useStatamicPageProps from '@/composables/page-props.js';
+
+const { selectedSiteUrl: url } = useStatamicPageProps();
 </script>
 
 <template>

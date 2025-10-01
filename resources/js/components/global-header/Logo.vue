@@ -4,11 +4,9 @@ import { Icon } from '@ui';
 import StatamicLogo from '@/../svg/statamic-mark-lime.svg';
 import ProBadge from './ProBadge.vue';
 import { Link } from '@inertiajs/vue3';
+import useStatamicPageProps from '@/composables/page-props.js';
 
-const logos = Statamic.$config.get('logos');
-const isPro = Statamic.$config.get('isPro');
-const cmsName = Statamic.$config.get('cmsName');
-
+const { logos, isPro, cmsName } = useStatamicPageProps();
 const customLogo = computed(() => {
     if (! logos) return null
     return logos.dark.nav ?? logos.light.nav;

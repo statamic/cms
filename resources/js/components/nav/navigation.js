@@ -1,13 +1,14 @@
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
+import useStatamicPageProps from '@/composables/page-props.js';
+import { deepClone } from '@/util/clone.js';
+
+let nav = null;
 
 export default function useNavigation() {
-    const nav = ref(Statamic.$config.get('nav'));
-
-    watch(
-        nav,
-        (newNav) => Statamic.$config.set('nav', newNav),
-        { deep: true }
-    );
+    if (!nav) {
+        const { nav: navProp } = useStatamicPageProps();
+        nav = ref(deepClone(navProp));
+    }
 
     function unsetActiveItem() {
         nav.value.forEach(section => {
