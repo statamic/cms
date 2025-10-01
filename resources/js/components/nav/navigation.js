@@ -5,7 +5,6 @@ import { router } from '@inertiajs/vue3';
 
 let navData = null;
 let breadcrumbsData = null;
-let pendingUpdate = null;
 
 function unsetActiveItem(data) {
     data.forEach(section => {
@@ -43,10 +42,9 @@ function applyUpdate(data, update) {
 }
 
 router.on('success', () => {
-    if (pendingUpdate) {
-        applyUpdate(breadcrumbsData.value, pendingUpdate);
-        pendingUpdate = null;
-    }
+    const freshNav = deepClone(useStatamicPageProps().nav);
+    navData.value = freshNav;
+    breadcrumbsData.value = deepClone(freshNav);
 });
 
 export default function useNavigation() {
@@ -63,7 +61,6 @@ export default function useNavigation() {
         if (source === 'nav') {
             // Nav: update immediately, breadcrumbs wait for success
             applyUpdate(navData.value, update);
-            pendingUpdate = update;
         } else {
             // Breadcrumbs: update both immediately
             applyUpdate(navData.value, update);
@@ -77,7 +74,6 @@ export default function useNavigation() {
         if (source === 'nav') {
             // Nav: update immediately, breadcrumbs wait for success
             applyUpdate(navData.value, update);
-            pendingUpdate = update;
         } else {
             // Breadcrumbs: update both immediately
             applyUpdate(navData.value, update);

@@ -46,12 +46,20 @@ class HandleInertiaRequests extends Middleware
     {
         return array_filter([
             ...parent::share($request),
-            '_statamic' => $request->inertia() ? null : [
+            '_statamic' => $request->inertia() ? $this->alwaysProps() : [
+                ...$this->alwaysProps(),
                 ...$this->protectedProps(),
                 'cmsName' => __(Statamic::pro() ? config('statamic.cp.custom_cms_name', 'Statamic') : 'Statamic'),
                 'logos' => $this->logos(),
             ],
         ]);
+    }
+
+    private function alwaysProps()
+    {
+        return [
+            'nav' => $this->nav(),
+        ];
     }
 
     private function protectedProps()
@@ -64,7 +72,6 @@ class HandleInertiaRequests extends Middleware
             'isPro' => Statamic::pro(),
             'selectedSiteUrl' => Site::selected()->url(),
             'licensing' => $this->licensing(),
-            'nav' => $this->nav(),
             'sessionExpiry' => $this->sessionExpiry(),
         ];
     }
