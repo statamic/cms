@@ -54,7 +54,6 @@ import TaxonomyBlueprintListing from '../components/taxonomies/BlueprintListing.
 import Updater from '../components/updater/Updater.vue';
 import ItemActions from '../components/actions/ItemActions.vue';
 import BulkActions from '../components/actions/BulkActions.vue';
-import LicensingAlert from '../components/LicensingAlert.vue';
 
 import { defineAsyncComponent } from 'vue';
 
@@ -133,5 +132,4 @@ export default function registerGlobalComponents(app) {
     app.component('Updater', Updater);
     app.component('ItemActions', ItemActions);
     app.component('BulkActions', BulkActions);
-    app.component('LicensingAlert', LicensingAlert);
 }

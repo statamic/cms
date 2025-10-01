@@ -178,6 +178,10 @@ class JavascriptComposer
             'requestFailed' => $licenses->requestFailed(),
             'requestFailureMessage' => $licenses->requestFailureMessage(),
             'isOnPublicDomain' => $licenses->isOnPublicDomain(),
+            'alert' => ($alert = $licenses->licensingAlert()) ? [
+                ...$alert,
+                'manageUrl' => User::current()->can('access licensing utility') ? cp_route('utilities.licensing') : null,
+            ] : null,
         ];
     }
 

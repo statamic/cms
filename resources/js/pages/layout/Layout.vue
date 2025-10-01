@@ -3,6 +3,7 @@ import Header from './Header.vue';
 import Nav from './Nav.vue';
 import { ConfigProvider } from 'reka-ui';
 import SessionExpiry from '@/components/SessionExpiry.vue';
+import LicensingAlert from '@/components/LicensingAlert.vue';
 import PortalTargets from '@/components/portals/PortalTargets.vue';
 import { onMounted, onUnmounted, provide, ref, toRef, watch } from 'vue';
 import { router } from '@inertiajs/vue3';
@@ -34,6 +35,7 @@ provide('layout', {
 <template>
     <ConfigProvider>
         <SessionExpiry />
+        <LicensingAlert />
 
 <!--        @include('statamic::partials.licensing-alerts')-->
 <!--        @include('statamic::partials.global-header')-->

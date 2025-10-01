@@ -28,7 +28,6 @@
         {{--
         <div id="statamic">
            <config-provider>
-                @include('statamic::partials.licensing-alerts')
                  @include('statamic::partials.global-header')
 
                 <div
