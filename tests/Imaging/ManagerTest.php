@@ -4,7 +4,6 @@ namespace Tests\Imaging;
 
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Imaging\ImageManipulator;
-use Statamic\Facades\Image;
 use Statamic\Imaging\Manager;
 use Tests\TestCase;
 

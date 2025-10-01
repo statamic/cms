@@ -100,9 +100,6 @@ class Manager
 
     /**
      * Register custom image manipulation presets.
-     *
-     * @param  array  $presets
-     * @return void
      */
     public function registerCustomManipulationPresets(array $presets): void
     {
@@ -113,8 +110,6 @@ class Manager
 
     /**
      * Get custom image manipulation presets.
-     *
-     * @return array
      */
     public function customManipulationPresets(): array
     {
