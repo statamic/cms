@@ -177,6 +177,11 @@ class Field implements Arrayable
         return collect($this->rules()[$this->handle])->contains('required');
     }
 
+    private function hasSometimesRule()
+    {
+        return collect($this->rules()[$this->handle])->contains('sometimes');
+    }
+
     public function setValidationContext($context)
     {
         $this->validationContext = $context;
@@ -443,7 +448,7 @@ class Field implements Arrayable
             $type = ['type' => $type];
         }
 
-        if ($this->isRequired()) {
+        if ($this->isRequired() && ! $this->hasSometimesRule()) {
             $type['type'] = GraphQL::nonNull($type['type']);
         }
 

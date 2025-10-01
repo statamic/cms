@@ -112,16 +112,16 @@
 
                                 <div :class="{ 'hi': !shouldShowSidebar }">
 
-                                    <div class="p-3 flex items-center space-x-2" v-if="showLivePreviewButton || showVisitUrlButton">
+                                    <div class="p-3 flex flex-wrap items-center gap-2" v-if="showLivePreviewButton || showVisitUrlButton">
                                         <button
-                                            class="flex items-center justify-center btn w-full"
+                                            class="flex flex-1 items-center justify-center btn px-2"
                                             v-if="showLivePreviewButton"
                                             @click="openLivePreview">
                                             <svg-icon name="light/synchronize" class="h-4 w-4 rtl:ml-2 ltr:mr-2 shrink-0" />
                                             <span>{{ __('Live Preview') }}</span>
                                         </button>
                                         <a
-                                            class="flex items-center justify-center btn w-full"
+                                            class="flex flex-1 items-center justify-center btn px-2"
                                             v-if="showVisitUrlButton"
                                             :href="permalink"
                                             target="_blank">

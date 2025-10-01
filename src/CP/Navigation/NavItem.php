@@ -293,6 +293,14 @@ class NavItem
     }
 
     /**
+     * Check if we should assume nested URL conventions for active state on children.
+     */
+    protected function doesntHaveExplicitChildren(): bool
+    {
+        return (bool) ! $this->children;
+    }
+
+    /**
      * Check if this nav item was ever a child before user preferences were applied.
      */
     protected function wasOriginallyChild(): bool
@@ -393,6 +401,7 @@ class NavItem
         if ($this->currentUrlIsNotExplicitlyReferencedInNav()) {
             switch (true) {
                 case $this->currentUrlIsRestfulDescendant():
+                case $this->doesntHaveExplicitChildren():
                 case $this->wasOriginallyChild():
                     return $this->isActiveByPattern($this->active);
             }

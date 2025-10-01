@@ -19,7 +19,7 @@ class GitTest extends TestCase
 
     private $files;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -264,6 +264,65 @@ EOT;
 
         $this->assertStringContainsString($expectedUser, $lastCommit);
         $this->assertStringContainsString($expectedMessage, $lastCommit);
+    }
+
+    #[Test]
+    public function it_commits_with_spaces_in_paths()
+    {
+        $this->files->put(base_path('content/collections/file with spaces.yaml'), 'title: File with spaces in path!');
+        $this->files->makeDirectory(base_path('content/collections/folder with spaces'));
+        $this->files->put(base_path('content/collections/folder with spaces/file.yaml'), 'title: Folder with spaces in path!');
+
+        $expectedContentStatus = <<<'EOT'
+?? "collections/file with spaces.yaml"
+?? "collections/folder with spaces/"
+EOT;
+
+        $this->assertEquals($expectedContentStatus, GitProcess::create(Path::resolve(base_path('content')))->status());
+
+        $this->assertStringContainsString('Initial commit.', $this->showLastCommit(base_path('content')));
+
+        Git::commit();
+
+        $this->assertStringContainsString('Content saved', $commit = $this->showLastCommit(base_path('content')));
+        $this->assertStringContainsString('Spock <spock@example.com>', $commit);
+        $this->assertStringContainsString('collections/file with spaces.yaml', $commit);
+        $this->assertStringContainsString('title: File with spaces in path!', $commit);
+        $this->assertStringContainsString('collections/folder with spaces/file.yaml', $commit);
+        $this->assertStringContainsString('title: Folder with spaces in path!', $commit);
+    }
+
+    #[Test]
+    public function it_commits_with_spaces_in_explicitly_configured_paths()
+    {
+        Config::set('statamic.git.paths', [
+            'content/path with spaces',
+        ]);
+
+        $this->files->makeDirectory(base_path('content/path with spaces'));
+        $this->files->put(base_path('content/path with spaces/file.yaml'), 'title: File with spaces in path!');
+        $this->files->put(base_path('content/path with spaces/nested file with spaces.yaml'), 'title: Nested file with spaces in path!');
+        $this->files->makeDirectory(base_path('content/path with spaces/nested folder with spaces'));
+        $this->files->put(base_path('content/path with spaces/nested folder with spaces/file.yaml'), 'title: Nested folder with spaces in path!');
+
+        $expectedStatus = <<<'EOT'
+?? "path with spaces/"
+EOT;
+
+        $this->assertEquals($expectedStatus, GitProcess::create(Path::resolve(base_path('content')))->status());
+
+        $this->assertStringContainsString('Initial commit.', $this->showLastCommit(base_path('content')));
+
+        Git::commit();
+
+        $this->assertStringContainsString('Content saved', $commit = $this->showLastCommit(base_path('content')));
+        $this->assertStringContainsString('Spock <spock@example.com>', $commit);
+        $this->assertStringContainsString('path with spaces/file.yaml', $commit);
+        $this->assertStringContainsString('title: File with spaces in path!', $commit);
+        $this->assertStringContainsString('path with spaces/nested file with spaces.yaml', $commit);
+        $this->assertStringContainsString('title: Nested file with spaces in path!', $commit);
+        $this->assertStringContainsString('path with spaces/nested folder with spaces/file.yaml', $commit);
+        $this->assertStringContainsString('title: Nested folder with spaces in path!', $commit);
     }
 
     #[Test]

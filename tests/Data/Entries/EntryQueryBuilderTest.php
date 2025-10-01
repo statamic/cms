@@ -478,6 +478,76 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function entries_are_found_using_where_json_overlaps()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'test_taxonomy' => ['taxonomy-3']])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->create();
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->create();
+        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'test_taxonomy' => ['taxonomy-5']])->create();
+
+        $entries = Entry::query()->whereJsonOverlaps('test_taxonomy', ['taxonomy-1', 'taxonomy-5'])->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['Post 1', 'Post 3', 'Post 5'], $entries->map->title->all());
+
+        $entries = Entry::query()->whereJsonOverlaps('test_taxonomy', 'taxonomy-1')->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_where_json_doesnt_overlap()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'test_taxonomy' => ['taxonomy-3']])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->create();
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->create();
+        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'test_taxonomy' => ['taxonomy-5']])->create();
+
+        $entries = Entry::query()->whereJsonDoesntOverlap('test_taxonomy', ['taxonomy-1'])->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['Post 2', 'Post 4', 'Post 5'], $entries->map->title->all());
+
+        $entries = Entry::query()->whereJsonDoesntOverlap('test_taxonomy', 'taxonomy-1')->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['Post 2', 'Post 4', 'Post 5'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_or_where_json_overlaps()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'test_taxonomy' => ['taxonomy-3']])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->create();
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->create();
+        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'test_taxonomy' => ['taxonomy-5']])->create();
+
+        $entries = Entry::query()->whereJsonOverlaps('test_taxonomy', ['taxonomy-1'])->orWhereJsonOverlaps('test_taxonomy', ['taxonomy-5'])->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['Post 1', 'Post 3', 'Post 5'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_or_where_json_doesnt_overlap()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'test_taxonomy' => ['taxonomy-3']])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->create();
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->create();
+        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'test_taxonomy' => ['taxonomy-5']])->create();
+
+        $entries = Entry::query()->whereJsonOverlaps('test_taxonomy', ['taxonomy-1'])->orWhereJsonDoesntOverlap('test_taxonomy', ['taxonomy-5'])->get();
+
+        $this->assertCount(4, $entries);
+        $this->assertEquals(['Post 1', 'Post 3', 'Post 2', 'Post 4'], $entries->map->title->all());
+    }
+
+    #[Test]
     public function entries_are_found_using_array_of_wheres()
     {
         EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'content' => 'Test'])->create();

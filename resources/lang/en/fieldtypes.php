@@ -177,7 +177,7 @@ return [
     'taggable.config.placeholder' => 'Type and press ↩ Enter',
     'taggable.title' => 'Taggable',
     'taxonomies.title' => 'Taxonomies',
-    'template.config.blueprint' => 'Adds a "map to blueprint" option. Learn more in the [documentation](https://statamic.dev/views#inferring-templates-from-entry-blueprints).',
+    'template.config.blueprint' => 'Adds a "map to blueprint" option. Learn more in the [documentation](https://statamic.dev/views#map-templates-to-entry-blueprints).',
     'template.config.folder' => 'Only show templates in this folder.',
     'template.config.hide_partials' => 'Partials are rarely intended to be used as templates.',
     'template.title' => 'Template',

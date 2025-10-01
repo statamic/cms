@@ -126,7 +126,7 @@ class AssetsGeneratePresets extends Command
         if (property_exists($this, 'components')) {
             $errors = Arr::pull($counts, 'errors');
             collect($counts)
-                ->put('errors', $errors)
+                ->when($errors, fn ($counts) => $counts->put('errors', $errors))
                 ->each(function ($count, $preset) {
                     $preset = $preset === 'errors' ? '<fg=red>errors</>' : $preset;
                     $this->components->twoColumnDetail($preset, $count);
