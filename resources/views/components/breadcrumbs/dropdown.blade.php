@@ -60,7 +60,7 @@
             text="{{ __($breadcrumb->createLabel()) }}"
             href="{{ $breadcrumb->createUrl() }}"
             role="menuitem"
-            aria-label="'{{ __('Create new') }} {{ __($breadcrumb->createLabel()) }}'"
+            aria-label="'{{ __($breadcrumb->createLabel()) }}'"
         ></ui-dropdown-footer>
     @endif
 </ui-dropdown>
