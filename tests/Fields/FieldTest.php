@@ -294,6 +294,7 @@ class FieldTest extends TestCase
             ->andReturn(new class extends Fieldtype
             {
                 protected $component = 'example';
+
                 protected $configFields = [
                     'a_config_field_with_pre_processing' => ['type' => 'with_processing'],
                     'a_config_field_without_pre_processing' => ['type' => 'without_processing'],
@@ -688,5 +689,13 @@ class FieldTest extends TestCase
         $field = new Field('test', ['type' => 'text', 'revisable' => false]);
 
         $this->assertFalse($field->isRevisable());
+    }
+
+    #[Test]
+    public function its_revisable_when_computed()
+    {
+        $field = new Field('test', ['type' => 'text', 'revisable' => false, 'visibility' => 'computed']);
+
+        $this->assertTrue($field->isRevisable());
     }
 }
