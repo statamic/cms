@@ -1,6 +1,6 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
-import useNavigation from './navigation.js';
+import useNavigation from '../nav/navigation.js';
 import { computed, inject } from 'vue';
 
 const { nav, setParentActive, setChildActive } = useNavigation();

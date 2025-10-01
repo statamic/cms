@@ -1,6 +1,6 @@
 <script setup>
-import Header from './Header.vue';
-import Nav from './Nav.vue';
+import Header from '@/components/global-header/Header.vue';
+import Nav from '@/components/nav/Nav.vue';
 import { ConfigProvider } from 'reka-ui';
 import SessionExpiry from '@/components/SessionExpiry.vue';
 import LicensingAlert from '@/components/LicensingAlert.vue';

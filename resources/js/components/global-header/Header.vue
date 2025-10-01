@@ -1,9 +1,8 @@
 <script setup>
-
 import Logo from './Logo.vue';
 import Breadcrumbs from './Breadcrumbs.vue';
-import SiteSelector from '@/components/GlobalSiteSelector.vue';
-import CommandPalette from './CommandPalette.vue';
+import SiteSelector from './SiteSelector.vue';
+import Search from './Search.vue';
 import ViewSiteButton from './ViewSiteButton.vue';
 import UserDropdown from './UserDropdown.vue';
 </script>
@@ -24,7 +23,7 @@ import UserDropdown from './UserDropdown.vue';
         <div class="dark flex-1 flex gap-1 md:gap-3 items-center justify-end shrink-0">
             <SiteSelector />
             <div class="flex items-center">
-                <CommandPalette />
+                <Search />
             </div>
             <ViewSiteButton />
             <UserDropdown />
