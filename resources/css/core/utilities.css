@@ -257,7 +257,7 @@
         [data-ui-panel] {
             > * {
                 position: relative;
-                z-index: 1;
+                z-index: var(--z-index-above);
             }
 
             &::after {
