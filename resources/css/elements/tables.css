@@ -132,7 +132,7 @@
     }
 
     tbody .checkbox-column {
-        @apply sticky px-3 -start-px;
+        @apply px-3 -start-px sticky -left-1.5;
         .data-table--contained & {
             @apply sticky ps-4;
         }
