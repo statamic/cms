@@ -12,6 +12,7 @@ use Statamic\Facades\CommandPalette;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\CP\Toast;
 use Statamic\Facades\Icon;
+use Statamic\Facades\OAuth;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -90,6 +91,7 @@ class JavascriptComposer
             'licensing' => $this->licensing(),
             'nav' => $this->nav(),
             'additionalBreadcrumbs' => $this->breadcrumbs(),
+            'sessionExpiry' => $this->sessionExpiry(),
         ];
     }
 
@@ -207,5 +209,25 @@ class JavascriptComposer
     private function breadcrumbs()
     {
         return Breadcrumbs::additional();
+    }
+
+    private function sessionExpiry()
+    {
+        return [
+            'email' => User::current()->email(),
+            'lifetime' => config('session.lifetime') * 60,
+            'warnAt' => 60,
+            'oauthProvider' => $this->sessionExpiryOauth(),
+            'auth' => config('statamic.cp.auth'),
+        ];
+    }
+
+    private function sessionExpiryOauth()
+    {
+        if (! $provider = session('oauth-provider')) {
+            return null;
+        }
+
+        return OAuth::provider($provider)->toArray();
     }
 }

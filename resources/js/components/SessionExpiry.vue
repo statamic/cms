@@ -116,16 +116,17 @@ export default {
         Button,
     },
 
-    props: {
-        warnAt: Number,
-        lifetime: Number,
-        email: String,
-        oauthProvider: String,
-        auth: Object,
-    },
-
     data() {
+        const {
+            warnAt, email, lifetime, oauthProvider, auth,
+        } = Statamic.$config.get('sessionExpiry');
+
         return {
+            warnAt,
+            email,
+            lifetime,
+            oauthProvider,
+            auth,
             isShowingLogin: false,
             isShowingTwoFactorChallenge: false,
             count: this.lifetime, // The timer used in vue

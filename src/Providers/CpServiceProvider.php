@@ -17,7 +17,6 @@ use Statamic\Facades\User;
 use Statamic\Http\Middleware\CP\StartSession;
 use Statamic\Http\View\Composers\FieldComposer;
 use Statamic\Http\View\Composers\JavascriptComposer;
-use Statamic\Http\View\Composers\SessionExpiryComposer;
 use Statamic\Licensing\LicenseManager;
 use Statamic\Licensing\Outpost;
 use Statamic\Notifications\ElevatedSessionVerificationCode;
@@ -32,7 +31,6 @@ class CpServiceProvider extends ServiceProvider
         });
 
         View::composer(FieldComposer::VIEWS, FieldComposer::class);
-        View::composer(SessionExpiryComposer::VIEWS, SessionExpiryComposer::class);
         View::composer(JavascriptComposer::VIEWS, JavascriptComposer::class);
 
         Blade::component('statamic::outside-logo', OutsideLogo::class);
