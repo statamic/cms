@@ -86,7 +86,7 @@
                                     <template #cell-title="{ row: entry }" class="w-full">
                                         <div class="flex items-center gap-2">
                                             <StatusIndicator :status="entry.status" />
-                                            <a :href="entry.edit_url" class="line-clamp-1 overflow-hidden text-ellipsis" :text="entry.title" />
+                                            <Link :href="entry.edit_url" class="line-clamp-1 overflow-hidden text-ellipsis" :text="entry.title" />
                                         </div>
                                     </template>
                                     <template #cell-date="{ row: entry }" v-if="collection.dated">
@@ -133,10 +133,10 @@
         @refreshing="request"
     >
         <template #cell-title="{ row: collection }">
-            <a :href="collection.available_in_selected_site ? collection.entries_url : collection.edit_url" class="flex items-center gap-2">
+            <Link :href="collection.available_in_selected_site ? collection.entries_url : collection.edit_url" class="flex items-center gap-2">
                 <ui-icon :name="collection.icon || 'collections'" />
                 {{ __(collection.title) }}
-            </a>
+            </Link>
         </template>
         <template #cell-entries_count="{ row: collection }">
             <div class="flex items-center gap-3">
@@ -181,9 +181,11 @@ import {
     DropdownSeparator,
 } from '@/components/ui';
 import ItemActions from '@/components/actions/ItemActions.vue';
+import { Link } from '@inertiajs/vue3';
 
 export default {
     components: {
+        Link,
         CardPanel,
         StatusIndicator,
         Badge,

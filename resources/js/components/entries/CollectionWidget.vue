@@ -10,6 +10,7 @@ import {
     ListingPagination as Pagination,
     Icon,
 } from '@/components/ui';
+import { Link } from '@inertiajs/vue3';
 
 const props = defineProps({
     additionalColumns: Array,
@@ -71,9 +72,9 @@ function formatDate(value) {
                             <template #cell-title="{ row: entry, isColumnVisible }">
                                 <div class="flex items-center gap-2">
                                     <StatusIndicator v-if="!isColumnVisible('status')" :status="entry.status" />
-                                    <a :href="entry.edit_url" class="line-clamp-1 overflow-hidden text-ellipsis">{{
+                                    <Link :href="entry.edit_url" class="line-clamp-1 overflow-hidden text-ellipsis">{{
                                         entry.title
-                                    }}</a>
+                                    }}</Link>
                                 </div>
                             </template>
                             <template #cell-date="{ row: entry, isColumnVisible }">
