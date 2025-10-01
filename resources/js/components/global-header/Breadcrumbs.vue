@@ -3,7 +3,7 @@ import { Link } from '@inertiajs/vue3';
 import useNavigation from '../nav/navigation.js';
 import { computed, inject } from 'vue';
 
-const { nav, setParentActive, setChildActive } = useNavigation();
+const { breadcrumbs: nav, setParentActive, setChildActive } = useNavigation();
 const additionalBreadcrumbs = inject('layout').additionalBreadcrumbs;
 
 const activeSection = computed(() => nav.value.find(section => section.items.some(item => item.active)));
@@ -45,17 +45,17 @@ const breadcrumbs = computed(() => [
 
 function setBreadcrumbActive(index) {
     if (index === 0) {
-        setParentActive(primaryItem.value);
+        setParentActive(primaryItem.value, 'breadcrumbs');
     } else if (index === 1 && secondaryItem.value) {
-        setChildActive(primaryItem.value, secondaryItem.value);
+        setChildActive(primaryItem.value, secondaryItem.value, 'breadcrumbs');
     }
 }
 
 function setDropdownItemActive(breadcrumbIndex, linkIndex, breadcrumb) {
     if (breadcrumbIndex === 0) {
-        setParentActive(breadcrumb.links[linkIndex]);
+        setParentActive(breadcrumb.links[linkIndex], 'breadcrumbs');
     } else if (breadcrumbIndex === 1 && secondaryItem.value) {
-        setChildActive(primaryItem.value, breadcrumb.links[linkIndex]);
+        setChildActive(primaryItem.value, breadcrumb.links[linkIndex], 'breadcrumbs');
     }
 }
 </script>

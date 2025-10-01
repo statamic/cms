@@ -65,7 +65,6 @@ class HandleInertiaRequests extends Middleware
             'selectedSiteUrl' => Site::selected()->url(),
             'licensing' => $this->licensing(),
             'nav' => $this->nav(),
-            'additionalBreadcrumbs' => $this->breadcrumbs(),
             'sessionExpiry' => $this->sessionExpiry(),
         ];
     }
@@ -115,24 +114,28 @@ class HandleInertiaRequests extends Middleware
 
     private function nav()
     {
-        return collect(Nav::build())->map(function ($section) {
+        return collect(Nav::build())->map(function ($section, $sectionIndex) {
             return [
+                'id' => (string) $sectionIndex,
                 'display' => $section['display'],
-                'items' => $this->navItems($section['items']->all()),
+                'items' => $this->navItems($section['items']->all(), $sectionIndex),
             ];
         })->all();
     }
 
-    private function navItems(array $items)
+    private function navItems(array $items, $parentId = null)
     {
-        return collect($items)->map(function (NavItem $item) {
+        return collect($items)->map(function (NavItem $item, $index) use ($parentId) {
+            $id = $parentId !== null ? "{$parentId}.{$index}" : (string) $index;
+
             return [
+                'id' => $id,
                 'display' => $item->display(),
                 'icon' => $item->icon(),
                 'url' => $item->url(),
                 'attributes' => $item->attributes(),
                 'active' => $item->isActive(),
-                'children' => $this->navItems($item->resolveChildren()->children()?->all() ?? []),
+                'children' => $this->navItems($item->resolveChildren()->children()?->all() ?? [], $id),
                 'extra' => $item->extra(),
                 'view' => ($view = $item->view()) ? view($view, ['item' => $item])->render() : null,
             ];

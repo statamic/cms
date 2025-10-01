@@ -1,35 +1,94 @@
 import { ref } from 'vue';
 import useStatamicPageProps from '@/composables/page-props.js';
 import { deepClone } from '@/util/clone.js';
+import { router } from '@inertiajs/vue3';
 
-let nav = null;
+let navData = null;
+let breadcrumbsData = null;
+let pendingUpdate = null;
+
+function unsetActiveItem(data) {
+    data.forEach(section => {
+        section.items.forEach(item => {
+            item.active = false;
+            item.children.forEach(child => child.active = false);
+        });
+    });
+}
+
+function findItemInNav(data, id) {
+    for (const section of data) {
+        for (const item of section.items) {
+            if (item.id === id) {
+                return item;
+            }
+        }
+    }
+}
+
+function findItemInChildren(parent, id) {
+    return parent.children.find(c => c.id === id);
+}
+
+function applyUpdate(data, update) {
+    unsetActiveItem(data);
+
+    if (update.type === 'parent') {
+        findItemInNav(data, update.parentId).active = true;
+    } else if (update.type === 'child') {
+        const parent = findItemInNav(data, update.parentId);
+        parent.active = true;
+        findItemInChildren(parent, update.childId).active = true;
+    }
+}
+
+router.on('success', () => {
+    if (pendingUpdate) {
+        applyUpdate(breadcrumbsData.value, pendingUpdate);
+        pendingUpdate = null;
+    }
+});
 
 export default function useNavigation() {
-    if (!nav) {
+    if (!navData) {
         const { nav: navProp } = useStatamicPageProps();
-        nav = ref(deepClone(navProp));
+        const cloned = deepClone(navProp);
+        navData = ref(cloned);
+        breadcrumbsData = ref(deepClone(cloned));
     }
 
-    function unsetActiveItem() {
-        nav.value.forEach(section => {
-            section.items.forEach(item => {
-                item.active = false;
-                item.children.forEach(child => child.active = false);
-            });
-        });
+    function setParentActive(parent, source = 'nav') {
+        const update = { type: 'parent', parentId: parent.id };
+
+        if (source === 'nav') {
+            // Nav: update immediately, breadcrumbs wait for success
+            applyUpdate(navData.value, update);
+            pendingUpdate = update;
+        } else {
+            // Breadcrumbs: update both immediately
+            applyUpdate(navData.value, update);
+            applyUpdate(breadcrumbsData.value, update);
+        }
     }
 
-    function setParentActive(parent) {
-        unsetActiveItem();
-        parent.active = true;
-    }
+    function setChildActive(parent, child, source = 'nav') {
+        const update = { type: 'child', parentId: parent.id, childId: child.id };
 
-    function setChildActive(parent, child) {
-        setParentActive(parent);
-        child.active = true;
+        if (source === 'nav') {
+            // Nav: update immediately, breadcrumbs wait for success
+            applyUpdate(navData.value, update);
+            pendingUpdate = update;
+        } else {
+            // Breadcrumbs: update both immediately
+            applyUpdate(navData.value, update);
+            applyUpdate(breadcrumbsData.value, update);
+        }
     }
 
     return {
-        nav, setParentActive, setChildActive
+        nav: navData,
+        breadcrumbs: breadcrumbsData,
+        setParentActive,
+        setChildActive
     }
 }
