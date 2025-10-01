@@ -157,6 +157,6 @@ const calendarEvents = computed(() => ({
 
 <style>
 [data-reka-popper-content-wrapper] {
-    @apply z-100!;
+    z-index: var(--z-index-portal);
 }
 </style>

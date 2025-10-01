@@ -11,7 +11,7 @@
     transition: inset 0.3s ease-in-out;
     /* On mobile, hide by default and overlay on top */
     @apply md:flex;
-    @apply z-50;
+    z-index: var(--z-index-portal);
 
     ul {
         @apply flex flex-col gap-0;

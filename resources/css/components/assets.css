@@ -171,7 +171,8 @@
     }
 
     .loading {
-        @apply absolute inset-0 z-10 flex items-center justify-center rounded-sm bg-white/70;
+        @apply absolute inset-0 flex items-center justify-center rounded-sm bg-white/70;
+        z-index: var(--z-index-portal);
     }
 
     .publish-fields {
