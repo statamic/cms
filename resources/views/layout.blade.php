@@ -12,12 +12,7 @@
     >
         <div
             id="statamic"
-            data-page="{{ json_encode($page ?? [
-                'url' => '/'.request()->path(),
-                'component' => 'NonInertiaPage',
-                'version' => inertia()->getVersion(),
-                'props' => \Inertia\Inertia::getShared()
-            ]) }}"
+            data-page="{{ json_encode($page ?? Statamic::nonInertiaPageData()) }}"
         >
             <div id="blade-title" data-title="
                 @yield('title', $title ?? __('Here')) {{ Statamic::cpDirection() === 'ltr' ? '‹' : '›' }}

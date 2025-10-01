@@ -1,10 +1,12 @@
 <script setup>
-import { Link } from '@inertiajs/vue3';
-import { Icon } from '@ui';
+import { Link, usePage } from '@inertiajs/vue3';
+import { Badge, Icon, Tooltip } from '@ui';
 import useNavigation from './navigation.js';
 import { nextTick, onMounted, ref, watch } from 'vue';
 import DynamicHtmlRenderer from '@/components/DynamicHtmlRenderer.vue';
+import { useReactiveStatamicPageProps } from '@/composables/page-props.js';
 
+const { isInertia } = useReactiveStatamicPageProps();
 const { nav, setParentActive, setChildActive } = useNavigation();
 const localStorageKey = 'statamic.nav';
 const isOpen = ref(localStorage.getItem(localStorageKey) !== 'closed');
@@ -65,6 +67,11 @@ Statamic.$keys.bind(['command+\\'], (e) => {
                     </template>
                 </li>
             </ul>
+        </div>
+        <div>
+            <Tooltip text="This page is rendered using a traditional Blade view, not Inertia. This badge is temporary.">
+                <Badge v-if="!isInertia" text="Blade" color="yellow" />
+            </Tooltip>
         </div>
     </nav>
 </template>

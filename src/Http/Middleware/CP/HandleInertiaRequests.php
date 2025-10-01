@@ -59,6 +59,7 @@ class HandleInertiaRequests extends Middleware
     {
         return [
             'nav' => $this->nav(),
+            'isInertia' => true,
         ];
     }
 
