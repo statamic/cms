@@ -33,10 +33,20 @@
             top: auto;
         }
 
-        /* Fixed toolbar inside another bard field */
+        /* Bard fieldtype > Grid fieldtype */
         .bard-content & {
             @apply top-8;
         }
+    }
+
+    /* Grid fieldtype > Bard fieldtype */
+    .bard-fixed-toolbar {
+        @apply top-8;
+    }
+
+    /* Bard fieldtype > Grid fieldtype > Bard fieldtype */
+    .bard-content & .bard-fixed-toolbar {
+        @apply top-16;
     }
 
     > tbody {

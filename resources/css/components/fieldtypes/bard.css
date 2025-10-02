@@ -145,6 +145,10 @@
     .bard-content .bard-fixed-toolbar {
         @apply top-8;
     }
+    /* Bard > Grid > Bard */
+    .bard-content .grid-fieldtype .bard-fixed-toolbar {
+        @apply top-16;
+    }
 
     /*  Fixed toolbar inside a stack */
     .stack-content .bard-fixed-toolbar {
