@@ -79,15 +79,13 @@ function toggleSection(id) {
                 class="h-auto visible transition-[height,visibility] duration-[250ms,2s]"
                 :class="{ 'h-0! visibility-hidden overflow-clip': section.collapsed }"
             >
-                <div class="p-px">
-                    <Primitive :as="asConfig ? 'div' : Card">
-                        <FieldsProvider :fields="section.fields">
-                            <slot :section="section">
-                                <Fields />
-                            </slot>
-                        </FieldsProvider>
-                    </Primitive>
-                </div>
+                <Primitive :as="asConfig ? 'div' : Card">
+                    <FieldsProvider :fields="section.fields">
+                        <slot :section="section">
+                            <Fields />
+                        </slot>
+                    </FieldsProvider>
+                </Primitive>
             </div>
         </Panel>
     </div>

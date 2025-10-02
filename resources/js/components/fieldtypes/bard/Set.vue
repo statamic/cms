@@ -79,7 +79,7 @@
             <Motion
                 layout
                 v-if="index !== undefined"
-                class="overflow-hidden"
+                class="contain-paint"
                 :initial="{ height: collapsed ? '0px' : 'auto' }"
                 :animate="{ height: collapsed ? '0px' : 'auto' }"
                 :transition="{ duration: 0.25, type: 'tween' }"
