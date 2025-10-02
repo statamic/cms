@@ -698,7 +698,7 @@ autoApplyState();
             v-text="__('No results')"
         />
 
-        <Panel v-else class="relative overflow-x-auto overscroll-x-contain">
+        <Panel v-else class="relative overflow-x-auto overscroll-x-contain" style="container-type: scroll-state;">
             <Table>
                 <template v-for="(slot, slotName) in forwardedTableCellSlots" :key="slotName" #[slotName]="slotProps">
                     <component :is="slot" v-bind="slotProps" />
