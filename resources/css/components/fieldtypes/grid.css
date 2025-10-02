@@ -13,7 +13,7 @@
     }
 
     thead th {
-        @apply sticky -top-2 table-cell z-10 border-b bg-gray-50 p-2 text-sm font-medium text-gray-900 dark:border-gray-900 dark:bg-gray-800 dark:text-gray-100;
+        @apply sticky -top-2 table-cell z-10 border-b bg-gray-100/75 backdrop-blur-[10px] p-2 text-sm font-medium text-gray-900 dark:border-gray-900 dark:bg-gray-800 dark:text-gray-100;
         /* Prevent the sticky toolbar from hitting the very end of container, which causes it to overlap the container's border-radius */
         margin-block-end: 8px;
         /* Pull the subsequent element up to compensate for this */
