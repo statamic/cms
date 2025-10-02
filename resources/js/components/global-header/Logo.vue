@@ -13,7 +13,7 @@ const customLogo = computed(() => {
 });
 
 function toggleNav() {
-    //
+    Statamic.$events.$emit('nav.toggle');
 }
 </script>
 

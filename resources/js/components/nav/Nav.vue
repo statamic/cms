@@ -30,6 +30,8 @@ Statamic.$keys.bind(['command+\\'], (e) => {
     e.preventDefault();
     toggle();
 });
+
+Statamic.$events.$on('nav.toggle', toggle);
 </script>
 
 <template>
