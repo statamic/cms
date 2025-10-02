@@ -55,12 +55,14 @@ import ItemActions from '../components/actions/ItemActions.vue';
 import BulkActions from '../components/actions/BulkActions.vue';
 
 import { defineAsyncComponent } from 'vue';
+import { Link } from '@inertiajs/vue3';
 
 export default function registerGlobalComponents(app) {
     // Core
     app.component('asset-manager', AssetManager);
     app.component('asset-browser', Browser);
     app.component('updates-badge', UpdatesBadge);
+    app.component('inertia-link', Link);
 
     // Publish
     app.component('publish-field-meta', FieldMeta);
