@@ -1,11 +1,8 @@
 <script setup>
 import Head from '@/pages/layout/Head.vue';
-import Outside from '@/pages/layout/Outside.vue';
 import { AuthCard, Input, Field, Button, Description } from '@ui';
 import { computed } from 'vue';
 import { Form } from '@inertiajs/vue3';
-
-defineOptions({ layout: Outside });
 
 const props = defineProps(['method', 'status', 'submitUrl', 'resendUrl']);
 const isConfirmingPassword = computed(() => props.method === 'password_confirmation');
@@ -17,6 +14,7 @@ const isUsingVerificationCode = computed(() => props.method === 'verification_co
 
     <AuthCard
         icon="key"
+        class="max-w-md mx-auto mt-8"
         :title="isConfirmingPassword ? __('Confirm Your Password') : __('Verification Code')"
         :description="isConfirmingPassword
             ? __('statamic::messages.elevated_session_enter_password')
