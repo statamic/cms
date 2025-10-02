@@ -122,6 +122,10 @@ class HandleInertiaRequests extends Middleware
 
     private function nav()
     {
+        if (Statamic::$isRenderingCpException || ! Gate::allows('access cp')) {
+            return [];
+        }
+
         return collect(Nav::build())->map(function ($section, $sectionIndex) {
             return [
                 'id' => (string) $sectionIndex,
