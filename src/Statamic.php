@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Vite;
+use Inertia\Inertia;
 use Laravel\Nova\Nova;
 use Statamic\Facades\File;
 use Statamic\Facades\URL;
@@ -36,6 +37,7 @@ class Statamic
     protected static $jsonVariables = [];
     protected static $bootedCallbacks = [];
     protected static $afterInstalledCallbacks = [];
+    public static bool $isRenderingCpException = false;
 
     public static function version()
     {
@@ -466,5 +468,18 @@ class Statamic
     public static function cpDirection()
     {
         return TextDirection::of(static::cpLocale());
+    }
+
+    public static function nonInertiaPageData()
+    {
+        $props = Inertia::getShared();
+        $props['_statamic']['isInertia'] = false;
+
+        return [
+            'url' => '/'.request()->path(),
+            'component' => 'NonInertiaPage',
+            'version' => inertia()->getVersion(),
+            'props' => $props,
+        ];
     }
 }

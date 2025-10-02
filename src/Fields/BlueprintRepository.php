@@ -278,7 +278,7 @@ class BlueprintRepository
                 $files = $files->merge($overrides)->values();
             }
 
-            return $files;
+            return $files->collect();
         });
     }
 

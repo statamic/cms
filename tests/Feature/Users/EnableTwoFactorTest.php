@@ -112,12 +112,13 @@ class EnableTwoFactorTest extends TestCase
         $user->set('two_factor_recovery_codes', $originalRecoveryCodes = encrypt(['abc', 'def', 'ghi', 'jkl', 'mno', 'pqr', 'stu', 'vwx']));
         $user->save();
 
+        $errors = new \Illuminate\Support\ViewErrorBag;
+        $errors->put('default', new \Illuminate\Support\MessageBag(['code' => 'The provided two factor authentication code was invalid.']));
+
         $this
             ->actingAs($user)
             ->withActiveElevatedSession()
-            ->session([
-                'errors' => collect(['code' => 'The provided two factor authentication code was invalid.']),
-            ])
+            ->withSession(['errors' => $errors])
             ->get($url())
             ->assertOk()
             ->assertJsonStructure(['qr', 'secret_key', 'confirm_url']);

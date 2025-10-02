@@ -221,9 +221,6 @@ class NavItem
     {
         return $this
             ->fluentlyGetOrSet('attributes')
-            ->setter(function ($value) {
-                return is_array($value) ? Html::attributes($value) : $value;
-            })
             ->value($attrs);
     }
 
