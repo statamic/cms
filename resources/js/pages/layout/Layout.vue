@@ -7,6 +7,7 @@ import LicensingAlert from '@/components/LicensingAlert.vue';
 import PortalTargets from '@/components/portals/PortalTargets.vue';
 import { provide, watch, ref } from 'vue';
 import useBodyClasses from './body-classes.js';
+import useStatamicPageProps from '@/composables/page-props.js';
 
 useBodyClasses('bg-global-header-bg dark:bg-dark-global-header-bg font-sans leading-normal text-gray-900 dark:text-white');
 
@@ -18,8 +19,11 @@ const props = defineProps({
 const additionalBreadcrumbs = ref(props.additionalBreadcrumbs);
 watch(() => props.additionalBreadcrumbs, (newVal) => additionalBreadcrumbs.value = newVal);
 
+const { cmsName } = useStatamicPageProps();
+
 provide('layout', {
     additionalBreadcrumbs,
+    cmsName,
 });
 </script>
 
