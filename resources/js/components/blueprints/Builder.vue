@@ -120,9 +120,7 @@ export default {
 
         save() {
             this.$axios['patch'](this.action, this.blueprint)
-                .then((response) => {
-                    this.saved(response);
-                })
+                .then((response) => this.saved(response))
                 .catch((e) => {
                     console.error('Blueprint save failed:', e);
                     this.$toast.error(e.response.data.message);
