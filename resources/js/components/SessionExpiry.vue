@@ -128,8 +128,8 @@ export default {
             auth,
             isShowingLogin: false,
             isShowingTwoFactorChallenge: false,
-            count: this.lifetime, // The timer used in vue
-            remaining: this.lifetime, // The actual time remaining as per server responses
+            count: lifetime, // The timer used in vue
+            remaining: lifetime, // The actual time remaining as per server responses
             errors: {},
             password: null,
             twoFactorCode: null,
