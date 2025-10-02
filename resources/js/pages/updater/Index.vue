@@ -3,11 +3,7 @@ import { Link } from '@inertiajs/vue3';
 import Head from '@/pages/layout/Head.vue';
 import { Header, Card, Panel, Table, TableRow, TableCell, Badge, Heading, Button, DocsCallout, CommandPaletteItem } from '@ui';
 
-defineProps({
-    requestError: Boolean,
-    statamic: Object,
-    addons: Array,
-});
+defineProps(['requestError', 'statamic', 'addons']);
 </script>
 
 <template>
