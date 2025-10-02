@@ -141,7 +141,7 @@
         }
     }
 
-    /*  Fixed toolbar inside another bard field */
+    /* Fixed toolbar inside another bard field */
     .bard-content .bard-fixed-toolbar {
         @apply top-8;
     }
