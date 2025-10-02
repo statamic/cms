@@ -9,7 +9,6 @@ import UserPublishForm from '../components/users/PublishForm.vue';
 import EntryListing from '../components/entries/Listing.vue';
 import TaxonomyListing from '../components/taxonomies/Listing.vue';
 import TermListing from '../components/terms/Listing.vue';
-import AddonListing from '../components/addons/Listing.vue';
 import CollectionWidget from '../components/entries/CollectionWidget.vue';
 import FormWidget from '../components/forms/FormWidget.vue';
 import FileIcon from '../components/FileIcon.vue';
@@ -75,7 +74,6 @@ export default function registerGlobalComponents(app) {
     app.component('entry-list', EntryListing);
     app.component('taxonomy-list', TaxonomyListing);
     app.component('term-list', TermListing);
-    app.component('addon-list', AddonListing);
 
     // Widgets
     app.component('collection-widget', CollectionWidget);

@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Addons;
 
+use Inertia\Inertia;
 use Statamic\Addons\Addon;
 use Statamic\CP\Column;
 use Statamic\Facades;
@@ -13,7 +14,7 @@ class AddonsController extends CpController
     {
         $this->authorize('index', Addon::class);
 
-        return view('statamic::addons.index', [
+        return Inertia::render('addons/Index', [
             'addons' => Facades\Addon::all()->map(fn (Addon $addon) => [
                 'name' => $addon->name(),
                 'version' => $addon->version(),
