@@ -81,8 +81,9 @@ export default {
             this.save();
         });
 
-        // Listen for blueprint-save events from child components
-        this.$events.$on('blueprint-save', () => {
+        // Listen for root-form-save events from child components
+        // This also happens on the fieldset builder.
+        this.$events.$on('root-form-save', () => {
             this.save();
         });
 
@@ -92,8 +93,7 @@ export default {
     },
 
     beforeUnmount() {
-        // Clean up event listener
-        this.$events.$off('blueprint-save');
+        this.$events.$off('root-form-save');
     },
 
     watch: {

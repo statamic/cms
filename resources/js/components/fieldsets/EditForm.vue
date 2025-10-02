@@ -136,6 +136,16 @@ export default {
             e.preventDefault();
             this.save();
         });
+
+        // Listen for root-form-save events from child components
+        // This also happens on the blueprint builder.
+        this.$events.$on('root-form-save', () => {
+            this.save();
+        });
+    },
+
+    beforeUnmount() {
+        this.$events.$off('root-form-save');
     },
 };
 </script>

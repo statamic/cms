@@ -289,14 +289,15 @@ export default {
                     this.$refs.container?.clearDirtyState();
                     this.$emit('committed', response.data, this.editedFields);
 
-                    this.saveBlueprint();
+                    this.saveRootForm();
                     this.close();
                 })
                 .catch((e) => this.handleAxiosError(e));
         },
 
-        saveBlueprint() {
-            this.$events.$emit('blueprint-save');
+        saveRootForm() {
+            // The "root form" could be the blueprint or fieldset forms.
+            this.$events.$emit('root-form-save');
         },
 
         handleSaveShortcut() {
@@ -336,7 +337,7 @@ export default {
 
                     // Wait a bit for the field changes to be fully processed, then save the blueprint
                     setTimeout(() => {
-                        this.saveBlueprint();
+                        this.saveRootForm();
                         this.isSaving = false;
                     }, 100);
                 })
