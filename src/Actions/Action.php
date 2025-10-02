@@ -19,6 +19,7 @@ abstract class Action implements Arrayable
     protected $dangerous = false;
     protected $fields = [];
     protected $context = [];
+    protected $runnable = true;
     protected $component;
 
     public function __construct()
@@ -104,7 +105,7 @@ abstract class Action implements Arrayable
 
     public function runnable(): bool
     {
-        return true;
+        return $this->runnable;
     }
 
     public function buttonText()
