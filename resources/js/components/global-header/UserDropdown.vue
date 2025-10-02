@@ -56,6 +56,7 @@ const isImpersonating = computed((() => user.is_impersonating));
                 :text="__('Stop impersonating')"
             />
             <DropdownItem
+                as="a"
                 :href="logoutUrl"
                 icon="sign-out"
                 :text="__('Sign out')"
