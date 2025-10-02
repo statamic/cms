@@ -50,7 +50,6 @@ import NavigationListing from '../components/navigation/Listing.vue';
 import PreferencesEditForm from '../components/preferences/EditForm.vue';
 import NavigationView from '../components/navigation/View.vue';
 import TaxonomyBlueprintListing from '../components/taxonomies/BlueprintListing.vue';
-import Updater from '../components/updater/Updater.vue';
 import ItemActions from '../components/actions/ItemActions.vue';
 import BulkActions from '../components/actions/BulkActions.vue';
 
@@ -129,7 +128,6 @@ export default function registerGlobalComponents(app) {
     app.component('NavigationView', NavigationView);
     app.component('TaxonomyBlueprintListing', TaxonomyBlueprintListing);
     app.component('NavBuilder', defineAsyncComponent(() => import('../components/nav/Builder.vue')));
-    app.component('Updater', Updater);
     app.component('ItemActions', ItemActions);
     app.component('BulkActions', BulkActions);
 }
