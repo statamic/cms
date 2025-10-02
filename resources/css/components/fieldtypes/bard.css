@@ -123,15 +123,27 @@
     }
 
     /* Only top-level Bard fields should have a sticky header */
+    /* =Jay. I don't think we have the "workspace" class anymore, in which case this should be removed */
     .workspace .publish-fields:not(.replicator-set-body) > .bard-fieldtype .bard-fixed-toolbar,
     .live-preview .publish-fields:not(.replicator-set-body) > .bard-fieldtype .bard-fixed-toolbar {
         @apply sticky;
     }
 
-    /*  Fixed toolbar inside another bard field */
-    .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar {
+    .bard-fixed-toolbar {
         z-index: 4;
-        top: 40px;
+        position: sticky;
+        @apply -top-2;
+        /* Prevent the sticky toolbar from hitting the very end of container, which causes it to overlap the container's border-radius */
+        margin-block-end: 8px;
+        /* Pull the subsequent element up to compensate for this */
+        + * {
+            margin-block-start: -8px;
+        }
+    }
+
+    /*  Fixed toolbar inside another bard field */
+    .bard-content .bard-fixed-toolbar {
+        @apply top-8;
     }
 
     /*  Fixed toolbar inside a stack */
@@ -143,13 +155,7 @@
     @media (width >= theme(--breakpoint-md)) {
         /*  Fixed toolbar below fixed global header */
         .bard-fixed-toolbar {
-            top: 52px;
-
-            .bard-fieldtype .bard-fieldtype & {
-                top: 92px;
-            }
-
-            /*  Fixed toolbar inside a stack */
+            /* Fixed toolbar inside a stack */
             .stack-content .bard-fieldtype .bard-fieldtype & {
                 top: 16px;
             }
