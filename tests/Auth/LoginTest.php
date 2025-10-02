@@ -24,7 +24,7 @@ class LoginTest extends TestCase
         $this
             ->get(cp_route('login'))
             ->assertOk()
-            ->assertViewIs('statamic::auth.login');
+            ->assertInertia(fn ($page) => $page->component('auth/Login'));
     }
 
     #[Test]

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
 use Statamic\CP\Utilities\UtilityRepository;
 use Statamic\Extensions\Translation\Loader;
 use Statamic\Extensions\Translation\Translator;
@@ -26,6 +27,8 @@ class CpServiceProvider extends ServiceProvider
 {
     public function boot()
     {
+        Inertia::setRootView('statamic::layout');
+
         View::composer('statamic::*', function ($view) {
             $view->with('user', User::current());
         });
@@ -88,12 +91,12 @@ class CpServiceProvider extends ServiceProvider
             \Statamic\Http\Middleware\CP\StartSession::class,
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
+            \Statamic\Http\Middleware\CP\HandleInertiaRequests::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \Statamic\Http\Middleware\CP\ContactOutpost::class,
             \Statamic\Http\Middleware\CP\AuthGuard::class,
             \Statamic\Http\Middleware\CP\AddToasts::class,
             \Statamic\Http\Middleware\CP\TrimStrings::class,
-            \Statamic\Http\Middleware\CP\HandleInertiaRequests::class,
         ]);
 
         $router->middlewareGroup('statamic.cp.authenticated', [

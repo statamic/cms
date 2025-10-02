@@ -31,10 +31,10 @@ class CpController extends Controller
     /**
      * 404.
      */
-    public function pageNotFound(Request $request)
+    public function pageNotFound()
     {
         return Inertia::render('errors/404')
-            ->toResponse($request)
+            ->toResponse(request())
             ->setStatusCode(404);
     }
 
