@@ -190,7 +190,7 @@ export default {
 
     created() {
         this.load();
-        
+
         // Add keyboard shortcut for Cmd+S / Ctrl+S only when this component is focused
         this.saveBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
             // Only handle if this component is currently visible/focused
@@ -288,25 +288,21 @@ export default {
                 .then((response) => {
                     this.$refs.container?.clearDirtyState();
                     this.$emit('committed', response.data, this.editedFields);
-                    
-                    // Find and call the blueprint's save method
-                    this.findAndCallBlueprintSave();
+
+                    this.saveBlueprint();
                     this.close();
                 })
                 .catch((e) => this.handleAxiosError(e));
         },
 
-        findAndCallBlueprintSave() {
-            // Emit a global event to trigger blueprint save
+        saveBlueprint() {
             this.$events.$emit('blueprint-save');
         },
 
         handleSaveShortcut() {
-            // If we're inside a set or config fields, call the same method as "Save & Close All" button
             if (this.isInsideSet || this.isInsideConfigFields) {
                 this.commitAndSaveAndCloseAll();
             } else {
-                // For regular blueprint fields, call the same method as "Apply & Save" button
                 this.commitAndSave();
             }
         },
@@ -315,9 +311,9 @@ export default {
             if (this.isSaving) {
                 return;
             }
-            
+
             this.isSaving = true;
-            
+
             this.clearErrors();
 
             this.$axios
@@ -331,16 +327,16 @@ export default {
                 .then((response) => {
                     this.$refs.container?.clearDirtyState();
                     this.$emit('committed', response.data, this.editedFields);
-                    
+
                     // Close all stacks first
                     this.close();
                     if (this.commitParentField) {
                         this.commitParentField(true);
                     }
-                    
+
                     // Wait a bit for the field changes to be fully processed, then save the blueprint
                     setTimeout(() => {
-                        this.findAndCallBlueprintSave();
+                        this.saveBlueprint();
                         this.isSaving = false;
                     }, 100);
                 })
