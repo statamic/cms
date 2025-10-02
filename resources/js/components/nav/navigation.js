@@ -5,6 +5,7 @@ import { router } from '@inertiajs/vue3';
 
 let navData = null;
 let breadcrumbsData = null;
+let routerEventListener = null;
 
 export default function useNavigation() {
     if (!navData) {
@@ -14,11 +15,13 @@ export default function useNavigation() {
         breadcrumbsData = ref(deepClone(cloned));
     }
 
-    router.on('success', () => {
-        const freshNav = deepClone(useStatamicPageProps().nav);
-        navData.value = freshNav;
-        breadcrumbsData.value = deepClone(freshNav);
-    });
+    if (! routerEventListener) {
+        routerEventListener = router.on('success', () => {
+            const freshNav = deepClone(useStatamicPageProps().nav);
+            navData.value = freshNav;
+            breadcrumbsData.value = deepClone(freshNav);
+        });
+    }
 
     function unsetActiveItem(data) {
         data.forEach(section => {
