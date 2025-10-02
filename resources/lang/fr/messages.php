@@ -206,7 +206,7 @@ return [
     'reset_password_notification_subject' => 'Notification de réinitialisation du mot de passe',
     'role_change_handle_warning' => 'Changer l’identifiant ne mettra pas à jour les références à ce dernier dans les utilisateurs et les groupes.',
     'role_handle_instructions' => 'Comment vous allez faire référence à ce rôle sur le frontal. Il n’est pas évident de le modifier par la suite.',
-    'role_intro' => 'Les rôles sont des groupes d’autorisations d’accès et d’action qui peuvent être attribuées aux utilisateurs et aux groupes d’utilisateurs.',
+    'role_intro' => 'Les rôles sont des groupes d’autorisations d’accès et d’action qui peuvent être attribués aux utilisateurs et aux groupes d’utilisateurs.',
     'role_title_instructions' => 'Habituellement un nom singulier, comme "Editeur" ou "Admin".',
     'search_utility_description' => 'Gérez et affichez des informations importantes sur les index de recherche de Statamic.',
     'selections_click_to_deselect_all' => ':total éléments tous sélectionnés. Décochez la case pour désélectionner tous les éléments.',

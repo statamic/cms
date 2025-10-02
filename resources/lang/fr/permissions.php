@@ -73,7 +73,7 @@ return [
     'create_users' => 'Créer des utilisateurs',
     'delete_users' => 'Supprimer des utilisateurs',
     'change_passwords' => 'Changer les mots de passe',
-    'edit_user_groups' => 'Modifier les groupes',
+    'edit_user_groups' => 'Modifier les groupes d’utilisateurs',
     'edit_roles' => 'Modifier les rôles',
     'assign_user_groups' => 'Affecter des groupes aux utilisateurs',
     'assign_roles' => 'Affecter des rôles aux utilisateurs',
