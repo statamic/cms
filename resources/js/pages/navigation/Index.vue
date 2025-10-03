@@ -1,6 +1,7 @@
 <script setup>
 import Head from '@/pages/layout/Head.vue';
 import { Header, Button, DocsCallout, CommandPaletteItem, Icon, EmptyStateMenu, EmptyStateItem, CardList, CardListItem, Dropdown, DropdownMenu, DropdownItem } from '@ui';
+import { Link } from '@inertiajs/vue3';
 
 defineProps(['navs', 'canCreate', 'createUrl']);
 </script>
@@ -29,7 +30,7 @@ defineProps(['navs', 'canCreate', 'createUrl']);
     <template v-if="navs.length">
         <CardList :heading="__('Title')">
             <CardListItem v-for="item in navs" :key="item.id">
-                <a
+                <Link
                     :href="item.available_in_selected_site ? item.show_url : item.edit_url"
                     v-text="__(item.title)"
                 />

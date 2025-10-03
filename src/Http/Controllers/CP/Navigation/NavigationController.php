@@ -81,11 +81,14 @@ class NavigationController extends CpController
 
         $this->authorize('view', $nav->in($site), __('You are not authorized to view navs.'));
 
-        return view('statamic::navigation.show', [
+        return Inertia::render('navigation/Show', [
+            'title' => $nav->title(),
+            'handle' => $nav->handle(),
+            'pagesUrl' => cp_route('navigation.tree.index', $nav->handle()),
+            'submitUrl' => cp_route('navigation.tree.update', $nav->handle()),
+            'editUrl' => $nav->editUrl(),
+            'blueprintUrl' => cp_route('blueprints.navigation.edit', $nav->handle()),
             'site' => $site,
-            'nav' => $nav,
-            'expectsRoot' => $nav->expectsRoot(),
-            'collections' => $nav->collections()->map->handle()->all(),
             'sites' => $this->getAuthorizedTreesForNav($nav)->map(function ($tree) {
                 return [
                     'handle' => $tree->locale(),
@@ -93,7 +96,13 @@ class NavigationController extends CpController
                     'url' => $tree->showUrl(),
                 ];
             })->values()->all(),
+            'collections' => $nav->collections()->map->handle()->all(),
+            'maxDepth' => $nav->maxDepth(),
+            'expectsRoot' => $nav->expectsRoot(),
             'blueprint' => $nav->blueprint()->toPublishArray(),
+            'canEdit' => User::current()->can('edit', $nav),
+            'canSelectAcrossSites' => $nav->canSelectAcrossSites(),
+            'canEditBlueprint' => User::current()->can('configure fields'),
         ]);
     }
 
