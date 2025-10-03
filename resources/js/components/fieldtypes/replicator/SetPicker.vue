@@ -61,9 +61,9 @@
                                 <div class="line-clamp-1 text-base mt-1 text-center text-gray-900 dark:text-gray-200">
                                     {{ __(item.display || item.handle) }}
                                 </div>
-                                <p v-if="item.instructions" class="text-gray-800 dark:text-gray-200 mb-2">
+                                <ui-description v-if="item.instructions" class="text-center mb-2">
                                     {{ __(item.instructions) }}
-                                </p>
+                                </ui-description>
                             </div>
                         </div>
                         <div v-if="group.items.length === 0" class="p-3 text-center text-xs text-gray-600">
