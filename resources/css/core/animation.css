@@ -90,6 +90,6 @@
     .starting-style-transition-children > *,
     .publish-fields > *,
     .publish-fields-fluid > * {
-        transition-delay: calc(sibling-index() * var(--starting-style-transition-duration));
+        transition-delay: calc(sibling-index() * var(--starting-style-sibling-delay));
     }
 }

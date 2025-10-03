@@ -29,7 +29,8 @@
     --z-index-max: 9999;
 
     /* Used for entry animations */
-    --starting-style-transition-duration: 0.1s;
+    --starting-style-transition-duration: 0.125s;
+    --starting-style-sibling-delay: 0.01s;
 }
 
 /* FOCUS STATES
