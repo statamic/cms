@@ -1,4 +1,5 @@
 <script setup>
+import { Link } from '@inertiajs/vue3';
 import Head from '@/pages/layout/Head.vue';
 import { Header, Dropdown, DropdownMenu, DropdownLabel, DropdownItem, Button, Subheading, Panel, DocsCallout, Icon, StatusIndicator } from '@ui';
 
@@ -62,7 +63,7 @@ defineProps(['collections', 'taxonomies', 'navs', 'assetContainers', 'globals', 
                                     <div class="flex items-center gap-2">
                                         <Icon name="collections" class="text-gray-500 me-1" />
                                         <StatusIndicator :status="blueprint.hidden ? 'hidden' : 'published'" v-tooltip="__(blueprint.hidden ? 'Hidden' : 'Visible')" />
-                                        <a :href="blueprint.edit_url" v-text="__(blueprint.title)" />
+                                        <Link :href="blueprint.edit_url" v-text="__(blueprint.title)" />
                                     </div>
                                 </td>
                                 <td class="text-end">
@@ -92,7 +93,7 @@ defineProps(['collections', 'taxonomies', 'navs', 'assetContainers', 'globals', 
                                     <div class="flex items-center gap-2">
                                         <Icon name="taxonomies" class="text-gray-500 me-1" />
                                         <StatusIndicator :status="blueprint.hidden ? 'hidden' : 'published'" v-tooltip="__(blueprint.hidden ? 'Hidden' : 'Visible')" />
-                                        <a :href="blueprint.edit_url" v-text="__(blueprint.title)" />
+                                        <Link :href="blueprint.edit_url" v-text="__(blueprint.title)" />
                                     </div>
                                 </td>
                                 <td class="text-end">
@@ -119,7 +120,7 @@ defineProps(['collections', 'taxonomies', 'navs', 'assetContainers', 'globals', 
                             <td>
                                 <div class="flex items-center gap-2">
                                     <Icon name="navigation" class="text-gray-500 me-1" />
-                                    <a :href="nav.edit_url" v-text="__(nav.title)" />
+                                    <Link :href="nav.edit_url" v-text="__(nav.title)" />
                                 </div>
                             </td>
                         </tr>
@@ -142,7 +143,7 @@ defineProps(['collections', 'taxonomies', 'navs', 'assetContainers', 'globals', 
                             <td>
                                 <div class="flex items-center gap-2">
                                     <Icon name="assets" class="text-gray-500 me-1" />
-                                    <a :href="container.edit_url" v-text="__(container.title)" />
+                                    <Link :href="container.edit_url" v-text="__(container.title)" />
                                 </div>
                             </td>
                         </tr>
@@ -165,7 +166,7 @@ defineProps(['collections', 'taxonomies', 'navs', 'assetContainers', 'globals', 
                             <td>
                                 <div class="flex items-center gap-2">
                                     <Icon name="globals" class="text-gray-500 me-1" />
-                                    <a :href="global.edit_url" v-text="__(global.title)" />
+                                    <Link :href="global.edit_url" v-text="__(global.title)" />
                                 </div>
                             </td>
                         </tr>
@@ -188,7 +189,7 @@ defineProps(['collections', 'taxonomies', 'navs', 'assetContainers', 'globals', 
                             <td>
                                 <div class="flex items-center gap-2">
                                     <Icon name="forms" class="text-gray-500 me-1" />
-                                    <a :href="form.edit_url" v-text="__(form.title)" />
+                                    <Link :href="form.edit_url" v-text="__(form.title)" />
                                 </div>
                             </td>
                         </tr>
@@ -210,7 +211,7 @@ defineProps(['collections', 'taxonomies', 'navs', 'assetContainers', 'globals', 
                         <td>
                             <div class="flex items-center gap-2">
                                 <Icon name="users" class="text-gray-500 me-1" />
-                                <a :href="userBlueprint.edit_url">{{ __('User') }}</a>
+                                <Link :href="userBlueprint.edit_url" v-text="__('User')" />
                             </div>
                         </td>
                     </tr>
@@ -218,7 +219,7 @@ defineProps(['collections', 'taxonomies', 'navs', 'assetContainers', 'globals', 
                         <td>
                             <div class="flex items-center gap-2">
                                 <Icon name="groups" class="text-gray-500 me-1" />
-                                <a :href="groupBlueprint.edit_url">{{ __('Group') }}</a>
+                                <Link :href="groupBlueprint.edit_url" v-text="__('Group')" />
                             </div>
                         </td>
                     </tr>
@@ -241,7 +242,7 @@ defineProps(['collections', 'taxonomies', 'navs', 'assetContainers', 'globals', 
                             <td>
                                 <div class="flex items-center gap-2">
                                     <Icon name="blueprints" class="text-gray-500 me-1" />
-                                    <a :href="cp_url(`blueprints/additional/${blueprint.namespace}/${blueprint.handle}/edit`)" v-text="__(blueprint.title)" />
+                                    <Link :href="cp_url(`blueprints/additional/${blueprint.namespace}/${blueprint.handle}/edit`)" v-text="__(blueprint.title)" />
                                 </div>
                             </td>
                             <td class="actions-column">
