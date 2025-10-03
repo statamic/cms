@@ -1,3 +1,5 @@
+/* VARIABLES
+=================================================== */
 :root {
     /* For animating height */
     interpolate-size: allow-keywords;
@@ -25,6 +27,10 @@
     --z-index-draggable: 5;
     --z-index-modal: 50;
     --z-index-max: 9999;
+
+    /* Used for entry animations */
+    --starting-style-transition-duration: 0.125s;
+    --starting-style-sibling-delay: 0.01s;
 }
 
 /* FOCUS STATES
