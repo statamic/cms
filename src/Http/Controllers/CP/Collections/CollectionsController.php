@@ -45,8 +45,7 @@ class CollectionsController extends CpController
         }
 
         return Inertia::render('collections/Index', [
-            'collections' => $collections = $this->collections()->all(),
-            'architecturalBackground' => empty($collections),
+            'collections' => $this->collections()->all(),
             'columns' => $columns,
             'createUrl' => cp_route('collections.create'),
             'actionUrl' => cp_route('collections.actions.run'),
@@ -207,7 +206,6 @@ class CollectionsController extends CpController
                     'scaffoldUrl',
                 ]),
                 'createEntryUrl' => $viewData['createUrls'][$site->handle()],
-                'architecturalBackground' => true,
             ]);
         }
 

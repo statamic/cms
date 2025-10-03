@@ -2,8 +2,11 @@
 import Head from '@/pages/layout/Head.vue';
 import { Header, Button, DocsCallout, CommandPaletteItem, Icon, EmptyStateMenu, EmptyStateItem, CardList, CardListItem, Dropdown, DropdownMenu, DropdownItem } from '@ui';
 import { Link } from '@inertiajs/vue3';
+import useArchitecturalBackground from '@/pages/layout/architectural-background.js';
 
-defineProps(['navs', 'canCreate', 'createUrl']);
+const props = defineProps(['navs', 'canCreate', 'createUrl']);
+
+if (props.navs.length === 0) useArchitecturalBackground();
 </script>
 
 <template>
