@@ -2,28 +2,47 @@
 
 namespace Statamic\Fieldtypes\Assets;
 
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
+use Statamic\Contracts\GraphQL\CastableToValidationString;
+use Statamic\Facades\Asset;
 use Statamic\Statamic;
+use Stringable;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class MinRule extends SizeBasedRule
+class MinRule implements CastableToValidationString, Stringable, ValidationRule
 {
-    /**
-     * Determine if the the rule passes for the given size.
-     *
-     * @param  int  $size
-     * @return bool
-     */
-    public function sizePasses($size)
+    public function __construct(protected $parameters)
     {
-        return $size >= $this->parameters[0];
     }
 
-    /**
-     * Get the validation error message.
-     *
-     * @return string
-     */
-    public function message()
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        return str_replace(':min', $this->parameters[0], __((Statamic::isCpRoute() ? 'statamic::' : '').'validation.min.file'));
+        $size = 0;
+
+        if ($value instanceof UploadedFile) {
+            $size = $value->getSize() / 1024;
+        } elseif ($asset = Asset::find($value)) {
+            $size = $asset->size() / 1024;
+        }
+
+        if ($size < $this->parameters[0]) {
+            $fail($this->message());
+        }
+    }
+
+    public function message(): string
+    {
+        return __((Statamic::isCpRoute() ? 'statamic::' : '').'validation.min.file', ['min' => $this->parameters[0]]);
+    }
+
+    public function __toString(): string
+    {
+        return 'min_filesize:'.$this->parameters[0];
+    }
+
+    public function toGqlValidationString(): string
+    {
+        return $this->__toString();
     }
 }
