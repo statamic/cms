@@ -68,7 +68,13 @@ class CollectionsController extends CpController
                 'published_entries_count' => $collection->queryEntries()->where('site', Site::selected())->where('status', 'published')->count(),
                 'draft_entries_count' => $collection->queryEntries()->where('site', Site::selected())->where('status', 'draft')->count(),
                 'scheduled_entries_count' => $collection->queryEntries()->where('site', Site::selected())->where('status', 'scheduled')->count(),
-                'blueprints' => $collection->entryBlueprints()->reject->hidden()->values(),
+                'blueprints' => $collection->entryBlueprints()->reject->hidden()
+                    ->map(fn ($blueprint) => [
+                        ...$blueprint->toArray(),
+                        'createEntryUrl' => cp_route('collections.entries.create', [$collection->handle(), Site::selected(), 'blueprint' => $blueprint->handle()]),
+                    ])
+                    ->values()
+                    ->all(),
                 'columns' => [
                     ['label' => 'Title', 'field' => 'title', 'visible' => true],
                     ['label' => 'Date', 'field' => 'date', 'visible' => true],
