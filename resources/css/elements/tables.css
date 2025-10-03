@@ -51,6 +51,7 @@
                 }
             }
             tr td {
+                @apply dark:bg-gray-850;
                 /* [3] Add left and right borders */
                 &:first-child {
                     @apply border-s border-s-gray-200 dark:border-s-gray-800;

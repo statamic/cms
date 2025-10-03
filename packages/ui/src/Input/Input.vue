@@ -41,7 +41,7 @@ const inputClasses = computed(() => {
         base: [
             'w-full block bg-white dark:bg-gray-950',
             'border border-gray-300 with-contrast:border-gray-500 dark:border-white/15 dark:inset-shadow-2xs dark:inset-shadow-black',
-            'text-gray-950 dark:text-gray-300 placeholder:text-gray-500 dark:placeholder:text-gray-400/75',
+            'text-gray-950 dark:text-gray-300 placeholder:text-gray-500 dark:placeholder:text-gray-400/85',
             'appearance-none antialiased shadow-ui-sm disabled:shadow-none disabled:opacity-50 read-only:border-dashed not-prose',
         ],
         variants: {
@@ -79,7 +79,7 @@ const inputClasses = computed(() => {
 
 const iconClasses = computed(() => {
     const classes = cva({
-        base: 'absolute top-0 bottom-0 flex items-center justify-center text-xs text-gray-400',
+        base: 'absolute top-0 bottom-0 flex items-center justify-center text-xs text-gray-400 dark:text-gray-500',
         variants: {
             size: {
                 base: '[&_svg]:size-4',
