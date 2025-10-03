@@ -1,6 +1,6 @@
 <template>
     <div
-        class="asset-tile"
+        class="asset-tile asset-thumb-container"
         :class="{
             'is-image': isImage && !canShowSvg,
             'is-svg': canShowSvg,
