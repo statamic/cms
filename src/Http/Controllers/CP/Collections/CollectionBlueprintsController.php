@@ -68,10 +68,10 @@ class CollectionBlueprintsController extends CpController
             createUrl: cp_route('blueprints.collections.create', $collection),
         ));
 
-        return view('statamic::collections.blueprints.edit', [
-            'collection' => $collection,
-            'blueprint' => $blueprint,
-            'blueprintVueObject' => $this->toVueObject($blueprint),
+        return $this->renderEditPage([
+            'blueprint' => $this->toVueObject($blueprint),
+            'action' => cp_route('blueprints.collections.update', [$collection, $blueprint]),
+            'showTitle' => true,
         ]);
     }
 

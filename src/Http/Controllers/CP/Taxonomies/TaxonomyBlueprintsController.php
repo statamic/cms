@@ -68,10 +68,10 @@ class TaxonomyBlueprintsController extends CpController
             createUrl: cp_route('blueprints.taxonomies.create', $taxonomy),
         ));
 
-        return view('statamic::taxonomies.blueprints.edit', [
-            'taxonomy' => $taxonomy,
-            'blueprint' => $blueprint,
-            'blueprintVueObject' => $this->toVueObject($blueprint),
+        return $this->renderEditPage([
+            'blueprint' => $this->toVueObject($blueprint),
+            'action' => cp_route('blueprints.taxonomies.update', [$taxonomy, $blueprint]),
+            'showTitle' => true,
         ]);
     }
 
