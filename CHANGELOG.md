@@ -4,6 +4,7 @@
 
 ### What's new
 - Inertia [#12610](https://github.com/statamic/cms/issues/12610) by @jasonvarga
+- Replicator and Bard Set Preview Images [#12532](https://github.com/statamic/cms/issues/12532) by @jasonvarga
 - Improve stack saving ux [#12606](https://github.com/statamic/cms/issues/12606) by @JayGeorge
 - Ability to use custom components & hide "Run action" button in action modals [#12612](https://github.com/statamic/cms/issues/12612) by @duncanmcclean
 
@@ -12,7 +13,6 @@
 - Asset table fixes for Safari [#12575](https://github.com/statamic/cms/issues/12575) by @JayGeorge
 - Use new Avatar component in User Listing [#12576](https://github.com/statamic/cms/issues/12576) by @JayGeorge
 - Make the Avatar gradient mesh more readable / AA compliant [#12579](https://github.com/statamic/cms/issues/12579) by @JayGeorge
-- Replicator and Bard Set Preview Images [#12532](https://github.com/statamic/cms/issues/12532) by @jasonvarga
 - Scrollable modals [#12580](https://github.com/statamic/cms/issues/12580) by @jackmcdade
 - Fix table container rounded corners [#12581](https://github.com/statamic/cms/issues/12581) by @jackmcdade
 - Improve relationship field padding [#12604](https://github.com/statamic/cms/issues/12604) by @JayGeorge
