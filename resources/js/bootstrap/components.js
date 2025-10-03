@@ -46,7 +46,6 @@ import UserGroupListing from '../components/user-groups/Listing.vue';
 import UserGroupPublishForm from '../components/user-groups/PublishForm.vue';
 import CollectionScaffolder from '../components/collections/Scaffolder.vue';
 import CollectionBlueprintListing from '../components/collections/BlueprintListing.vue';
-import NavigationListing from '../components/navigation/Listing.vue';
 import PreferencesEditForm from '../components/preferences/EditForm.vue';
 import NavigationView from '../components/navigation/View.vue';
 import TaxonomyBlueprintListing from '../components/taxonomies/BlueprintListing.vue';
@@ -123,7 +122,6 @@ export default function registerGlobalComponents(app) {
     app.component('UserGroupPublishForm', UserGroupPublishForm);
     app.component('CollectionScaffolder', CollectionScaffolder);
     app.component('CollectionBlueprintListing', CollectionBlueprintListing);
-    app.component('NavigationListing', NavigationListing);
     app.component('PreferencesEditForm', PreferencesEditForm);
     app.component('NavigationView', NavigationView);
     app.component('TaxonomyBlueprintListing', TaxonomyBlueprintListing);

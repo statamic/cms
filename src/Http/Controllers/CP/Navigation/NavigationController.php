@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Navigation;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Contracts\Structures\Nav as NavContract;
 use Statamic\CP\PublishForm;
 use Statamic\Facades\Blueprint;
@@ -34,11 +35,11 @@ class NavigationController extends CpController
             ];
         })->values();
 
-        if ($navs->isEmpty()) {
-            return view('statamic::navigation.empty');
-        }
-
-        return view('statamic::navigation.index', compact('navs'));
+        return Inertia::render('navigation/Index', [
+            'navs' => $navs->all(),
+            'canCreate' => User::current()->can('create', NavContract::class),
+            'createUrl' => cp_route('navigation.create'),
+        ]);
     }
 
     public function edit($nav)
