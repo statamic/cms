@@ -43,6 +43,32 @@ class BrowserController extends CpController
         $this->setColumns($container);
 
         return Inertia::render('assets/Browse', [
+            ...$this->browseData($container, $path),
+            'editing' => null,
+        ]);
+    }
+
+    public function edit($container, $path)
+    {
+        $containerHandle = $container->handle();
+
+        $asset = Asset::find("{$containerHandle}::{$path}");
+
+        abort_unless($container && $asset, 404);
+
+        $this->authorize('view', $asset);
+
+        $this->setColumns($container);
+
+        return Inertia::render('assets/Browse', [
+            ...$this->browseData($container, $asset->folder()),
+            'editing' => $asset->id(),
+        ]);
+    }
+
+    protected function browseData($container, $path)
+    {
+        return [
             'container' => [
                 'id' => $container->id(),
                 'title' => $container->title(),
@@ -60,32 +86,7 @@ class BrowserController extends CpController
             'columns' => $this->columns,
             'canCreateContainers' => User::current()->can('create', \Statamic\Contracts\Assets\AssetContainer::class),
             'createContainerUrl' => cp_route('asset-containers.create'),
-            'editing' => null,
-        ]);
-    }
-
-    public function edit($container, $path)
-    {
-        $containerHandle = $container->handle();
-
-        $asset = Asset::find("{$containerHandle}::{$path}");
-
-        abort_unless($container && $asset, 404);
-
-        $this->authorize('view', $asset);
-
-        $this->setColumns($container);
-
-        return view('statamic::assets.browse', [
-            'container' => [
-                'id' => $container->id(),
-                'title' => $container->title(),
-                'edit_url' => $container->editUrl(),
-            ],
-            'folder' => $asset->folder(),
-            'editing' => $asset->id(),
-            'columns' => $this->columns,
-        ]);
+        ];
     }
 
     public function folder(Request $request, $container, $path = '/')
