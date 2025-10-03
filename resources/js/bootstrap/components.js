@@ -7,7 +7,6 @@ import EntryPublishForm from '../components/entries/PublishForm.vue';
 import TermPublishForm from '../components/terms/PublishForm.vue';
 import UserPublishForm from '../components/users/PublishForm.vue';
 import EntryListing from '../components/entries/Listing.vue';
-import TermListing from '../components/terms/Listing.vue';
 import CollectionWidget from '../components/entries/CollectionWidget.vue';
 import FormWidget from '../components/forms/FormWidget.vue';
 import FileIcon from '../components/FileIcon.vue';
@@ -70,7 +69,6 @@ export default function registerGlobalComponents(app) {
 
     // Resource Type Lists
     app.component('entry-list', EntryListing);
-    app.component('term-list', TermListing);
 
     // Widgets
     app.component('collection-widget', CollectionWidget);

@@ -78,7 +78,8 @@ class TaxonomiesController extends CpController
             ->values();
 
         $viewData = [
-            'taxonomy' => $taxonomy,
+            'taxonomy' => $taxonomy->handle(),
+            'taxonomyTitle' => $taxonomy->title(),
             'blueprints' => $blueprints,
             'site' => Site::selected()->handle(),
             'columns' => $columns,
@@ -87,13 +88,28 @@ class TaxonomiesController extends CpController
                 'blueprints' => $blueprints->pluck('handle')->all(),
             ]),
             'canCreate' => User::current()->can('create', [TermContract::class, $taxonomy]) && $taxonomy->hasVisibleTermBlueprint(),
+            'createUrl' => cp_route('taxonomies.terms.create', [$taxonomy->handle(), Site::selected()->handle()]),
+            'taxonomyEditUrl' => cp_route('taxonomies.edit', $taxonomy->handle()),
+            'taxonomyBlueprintsUrl' => cp_route('blueprints.taxonomies.index', $taxonomy),
+            'canEdit' => User::current()->can('edit', $taxonomy),
+            'canConfigureFields' => User::current()->can('configure fields'),
         ];
 
         if ($taxonomy->queryTerms()->count() === 0) {
-            return view('statamic::terms.empty', $viewData);
+            return Inertia::render('taxonomies/Empty', [
+                ...$viewData,
+                'architecturalBackground' => true,
+            ]);
         }
 
-        return view('statamic::taxonomies.show', $viewData);
+        return Inertia::render('taxonomies/Show', array_merge($viewData, [
+            'actionUrl' => cp_route('taxonomies.terms.actions.run', $taxonomy->handle()),
+            'sortColumn' => $taxonomy->sortField(),
+            'sortDirection' => $taxonomy->sortDirection(),
+            'canDelete' => User::current()->can('delete', $taxonomy),
+            'deleteUrl' => cp_route('taxonomies.destroy', $taxonomy->handle()),
+            'createLabel' => $taxonomy->createLabel(),
+        ]));
     }
 
     public function create()
