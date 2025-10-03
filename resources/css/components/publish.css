@@ -6,7 +6,7 @@
     display: grid;
     --grid-columns: 12;
     grid-template-columns: repeat(var(--grid-columns), 1fr);
-    @apply gap-3 @lg/panel:gap-8;
+    @apply gap-x-3 gap-6 @lg/panel:gap-8;
 
     aside & {
         /* Decrease */
