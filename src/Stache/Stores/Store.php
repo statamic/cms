@@ -209,7 +209,10 @@ abstract class Store
         // Get all the deleted files.
         // This would be any paths that exist in the cached array that aren't there anymore.
         $keys = $this->paths()->flip();
-        $deleted = $existing->keys()->map(fn ($path) => $keys->get($path))->diff($files->keys()->map(fn ($path) => $keys->get($path)))->values();
+        $deleted = $existing->keys()
+            ->map(fn ($path) => $keys->get($path))
+            ->diff($files->keys()->map(fn ($path) => $keys->get($path)))
+            ->values();
 
         // If there are no modified or deleted files, there's nothing to update.
         if ($modified->isEmpty() && $deleted->isEmpty()) {
