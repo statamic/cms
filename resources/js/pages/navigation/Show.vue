@@ -8,6 +8,7 @@ import PageSelector from '@/components/structures/PageSelector.vue';
 import RemovePageConfirmation from '@/components/navigation/RemovePageConfirmation.vue';
 import SiteSelector from '@/components/SiteSelector.vue';
 import { Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, Button, EmptyStateMenu, EmptyStateItem, Header } from '@ui';
+import { toggleArchitecturalBackground } from '@/pages/layout/architectural-background.js';
 
 export default {
     components: {
@@ -266,6 +267,16 @@ export default {
             this.changed = false;
         },
 
+        treeLoaded(pages) {
+            toggleArchitecturalBackground(pages.length === 0);
+        },
+
+        treeChanged(pages) {
+            this.changed = true;
+            this.targetParent = null;
+            toggleArchitecturalBackground(pages.length === 0);
+        },
+
         replaceGeneratedIds(ids) {
             for (let [oldId, newId] of Object.entries(ids)) {
                 // Replace the ID in the publishInfo so if the tree is saved again, its
@@ -408,10 +419,8 @@ export default {
             :preferences-prefix="preferencesPrefix"
             :editable="canEdit"
             @edit-page="editPage"
-            @changed="
-                changed = true;
-                targetParent = null;
-            "
+            @loaded="treeLoaded"
+            @changed="treeChanged"
             @saved="treeSaved"
             @canceled="changed = false"
         >

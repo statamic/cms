@@ -3,8 +3,11 @@ import { ref } from 'vue';
 import Head from '@/pages/layout/Head.vue';
 import { Header, Button, DocsCallout, CommandPaletteItem, Icon, EmptyStateMenu, EmptyStateItem, Listing, DropdownItem } from '@ui';
 import { Link } from '@inertiajs/vue3';
+import useArchitecturalBackground from '@/pages/layout/architectural-background.js';
 
 const props = defineProps(['taxonomies', 'columns', 'canCreate', 'createUrl']);
+
+if (props.taxonomies.length === 0) useArchitecturalBackground();
 
 const rows = ref(props.taxonomies);
 

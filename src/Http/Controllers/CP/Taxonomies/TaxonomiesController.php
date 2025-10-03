@@ -96,10 +96,7 @@ class TaxonomiesController extends CpController
         ];
 
         if ($taxonomy->queryTerms()->count() === 0) {
-            return Inertia::render('taxonomies/Empty', [
-                ...$viewData,
-                'architecturalBackground' => true,
-            ]);
+            return Inertia::render('taxonomies/Empty', $viewData);
         }
 
         return Inertia::render('taxonomies/Show', array_merge($viewData, [

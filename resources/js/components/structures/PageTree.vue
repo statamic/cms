@@ -188,12 +188,13 @@ export default {
                 this.pages = response.data.pages;
                 this.updateTreeData();
                 this.loading = false;
+                this.$emit('loaded', this.pages);
             });
         },
 
         treeUpdated() {
             this.pages = this.$refs.tree.getData();
-            this.$emit('changed');
+            this.$emit('changed', this.pages);
         },
 
         cleanPagesForSubmission(pages) {

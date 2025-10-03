@@ -1,6 +1,9 @@
 <script setup>
 import Head from '@/pages/layout/Head.vue';
 import { Icon, EmptyStateMenu, EmptyStateItem, DocsCallout } from '@ui';
+import useArchitecturalBackground from '@/pages/layout/architectural-background.js';
+
+useArchitecturalBackground();
 
 defineProps([
     'taxonomyTitle',
