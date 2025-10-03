@@ -49,7 +49,6 @@ class HandleInertiaRequests extends Middleware
             '_statamic' => $request->inertia() ? $this->alwaysProps() : [
                 ...$this->alwaysProps(),
                 ...$this->protectedProps(),
-                'cmsName' => __(Statamic::pro() ? config('statamic.cp.custom_cms_name', 'Statamic') : 'Statamic'),
                 'logos' => $this->logos(),
             ],
         ]);
@@ -60,6 +59,7 @@ class HandleInertiaRequests extends Middleware
         return [
             'nav' => $this->nav(),
             'isInertia' => true,
+            'cmsName' => __(Statamic::pro() ? config('statamic.cp.custom_cms_name', 'Statamic') : 'Statamic'),
         ];
     }
 

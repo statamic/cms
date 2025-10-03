@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed, inject } from 'vue';
 import { Head } from '@inertiajs/vue3';
+import useStatamicPageProps from '@/composables/page-props.js';
 
 const props = defineProps<{
     title?: string | string[];
 }>();
 
-const { cmsName } = inject('layout');
+const { cmsName } = useStatamicPageProps();
 
 const title = computed(() => {
     let title = props.title;

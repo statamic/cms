@@ -19,11 +19,8 @@ const props = defineProps({
 const additionalBreadcrumbs = ref(props.additionalBreadcrumbs);
 watch(() => props.additionalBreadcrumbs, (newVal) => additionalBreadcrumbs.value = newVal);
 
-const { cmsName } = useStatamicPageProps();
-
 provide('layout', {
     additionalBreadcrumbs,
-    cmsName,
 });
 </script>
 
