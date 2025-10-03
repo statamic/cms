@@ -39,9 +39,9 @@ class UserGroupBlueprintController extends CpController
             ],
         ));
 
-        return view('statamic::usergroups.blueprints.edit', [
-            'blueprint' => $blueprint,
-            'blueprintVueObject' => $this->toVueObject($blueprint),
+        return $this->renderEditPage([
+            'blueprint' => $this->toVueObject($blueprint),
+            'action' => cp_route('blueprints.user-groups.update'),
         ]);
     }
 

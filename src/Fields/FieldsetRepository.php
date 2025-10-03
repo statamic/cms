@@ -220,6 +220,7 @@ class FieldsetRepository
                     ->initialPath($file)
                     ->setContents(YAML::file($file)->parse());
             })
-            ->keyBy->handle();
+            ->keyBy->handle()
+            ->collect();
     }
 }

@@ -41,10 +41,9 @@ class AssetContainerBlueprintController extends CpController
                 ->all(),
         ));
 
-        return view('statamic::assets.containers.blueprints.edit', [
-            'container' => $container,
-            'blueprint' => $blueprint,
-            'blueprintVueObject' => $this->toVueObject($blueprint),
+        return $this->renderEditPage([
+            'blueprint' => $this->toVueObject($blueprint),
+            'action' => cp_route('blueprints.asset-containers.update', $container->handle()),
         ]);
     }
 

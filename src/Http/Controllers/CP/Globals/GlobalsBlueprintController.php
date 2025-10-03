@@ -45,10 +45,9 @@ class GlobalsBlueprintController extends CpController
                 ->all(),
         ));
 
-        return view('statamic::globals.blueprints.edit', [
-            'set' => $set,
-            'blueprint' => $blueprint,
-            'blueprintVueObject' => $this->toVueObject($blueprint),
+        return $this->renderEditPage([
+            'blueprint' => $this->toVueObject($blueprint),
+            'action' => cp_route('blueprints.globals.update', $set->handle()),
         ]);
     }
 

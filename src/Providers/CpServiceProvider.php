@@ -16,7 +16,6 @@ use Statamic\Extensions\Translation\Loader;
 use Statamic\Extensions\Translation\Translator;
 use Statamic\Facades\User;
 use Statamic\Http\Middleware\CP\StartSession;
-use Statamic\Http\View\Composers\FieldComposer;
 use Statamic\Http\View\Composers\JavascriptComposer;
 use Statamic\Licensing\LicenseManager;
 use Statamic\Licensing\Outpost;
@@ -33,7 +32,6 @@ class CpServiceProvider extends ServiceProvider
             $view->with('user', User::current());
         });
 
-        View::composer(FieldComposer::VIEWS, FieldComposer::class);
         View::composer(JavascriptComposer::VIEWS, JavascriptComposer::class);
 
         Blade::component('statamic::outside-logo', OutsideLogo::class);
