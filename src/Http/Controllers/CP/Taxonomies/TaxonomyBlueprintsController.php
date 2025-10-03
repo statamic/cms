@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Taxonomies;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Contracts\Taxonomies\Taxonomy as TaxonomyContract;
 use Statamic\CP\Breadcrumbs\Breadcrumb;
 use Statamic\CP\Breadcrumbs\Breadcrumbs;
@@ -26,7 +27,11 @@ class TaxonomyBlueprintsController extends CpController
 
         $blueprints = $this->indexItems($taxonomy->termBlueprints(), $taxonomy);
 
-        return view('statamic::taxonomies.blueprints.index', compact('taxonomy', 'blueprints'));
+        return Inertia::render('blueprints/ScopedIndex', [
+            'blueprints' => $blueprints,
+            'reorderUrl' => cp_route('blueprints.taxonomies.reorder', $taxonomy),
+            'createUrl' => cp_route('blueprints.taxonomies.create', $taxonomy),
+        ]);
     }
 
     private function editUrl($taxonomy, $blueprint)

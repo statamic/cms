@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
 use Statamic\CP\Breadcrumbs\Breadcrumb;
 use Statamic\CP\Breadcrumbs\Breadcrumbs;
@@ -26,7 +27,11 @@ class CollectionBlueprintsController extends CpController
 
         $blueprints = $this->indexItems($collection->entryBlueprints(), $collection);
 
-        return view('statamic::collections.blueprints.index', compact('collection', 'blueprints'));
+        return Inertia::render('blueprints/ScopedIndex', [
+            'blueprints' => $blueprints,
+            'reorderUrl' => cp_route('blueprints.collections.reorder', $collection),
+            'createUrl' => cp_route('blueprints.collections.create', $collection),
+        ]);
     }
 
     private function editUrl($collection, $blueprint)
