@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
 use Statamic\Facades\User;
 
 class ElevatedSessionController
@@ -34,8 +35,11 @@ class ElevatedSessionController
             session()->sendElevatedSessionVerificationCodeIfRequired();
         }
 
-        return view('statamic::auth.confirm-password', [
+        return Inertia::render('auth/ConfirmPassword', [
             'method' => $method,
+            'status' => session('status'),
+            'submitUrl' => cp_route('elevated-session.confirm'),
+            'resendUrl' => cp_route('elevated-session.resend-code'),
         ]);
     }
 

@@ -34,3 +34,4 @@ export { default as ListingTableBody } from "./Listing/TableBody.vue";
 export { default as ListingTableHead } from "./Listing/TableHead.vue";
 export { default as ListingToggleAll } from "./Listing/ToggleAll.vue";
 export { default as CommandPaletteItem } from "./CommandPalette/Item.vue";
+export { default as DocsCallout } from "./DocsCallout.vue";

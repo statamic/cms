@@ -8,11 +8,6 @@
 <meta name="robots" content="noindex,nofollow" />
 <meta name="color-scheme" content="{{ $user?->preferredTheme() ?? 'auto' }}">
 
-<title>
-    @yield('title', $title ?? __('Here')) {{ Statamic::cpDirection() === 'ltr' ? '‹' : '›' }}
-    {{ __(Statamic::pro() ? config('statamic.cp.custom_cms_name', 'Statamic') : 'Statamic') }}
-</title>
-
 @if (Statamic::pro() && config('statamic.cp.custom_favicon_url'))
     @include('statamic::partials.favicon', ['favicon_url' => config('statamic.cp.custom_favicon_url')])
 @else

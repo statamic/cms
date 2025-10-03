@@ -106,6 +106,7 @@
 
 <script>
 import { Modal, Input, Button } from '@/components/ui';
+import useStatamicPageProps from '@/composables/page-props.js';
 
 var counter;
 
@@ -116,20 +117,19 @@ export default {
         Button,
     },
 
-    props: {
-        warnAt: Number,
-        lifetime: Number,
-        email: String,
-        oauthProvider: String,
-        auth: Object,
-    },
-
     data() {
+        const { sessionExpiry: { warnAt, email, lifetime, oauthProvider, auth }} = useStatamicPageProps();
+
         return {
+            warnAt,
+            email,
+            lifetime,
+            oauthProvider,
+            auth,
             isShowingLogin: false,
             isShowingTwoFactorChallenge: false,
-            count: this.lifetime, // The timer used in vue
-            remaining: this.lifetime, // The actual time remaining as per server responses
+            count: lifetime, // The timer used in vue
+            remaining: lifetime, // The actual time remaining as per server responses
             errors: {},
             password: null,
             twoFactorCode: null,

@@ -12,7 +12,11 @@
         @navigated="navigate"
         @selections-updated="updateSelections"
         @edit-asset="editAsset"
-    />
+    >
+        <template #initializing>
+            <slot name="initializing" />
+        </template>
+    </asset-browser>
 </template>
 
 <script>

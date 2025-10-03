@@ -21,7 +21,9 @@ function actionCompleted(successful = null, response = {}) {
 }
 
 function actionSuccess(response) {
-    Statamic.$toast.success(response.message || __('Action completed'));
+    if (response.message !== false) {
+        Statamic.$toast.success(response.message || __('Action completed'));
+    }
     refresh();
     clearSelections();
 }

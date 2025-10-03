@@ -2,6 +2,7 @@
 
 namespace Statamic\CP\Breadcrumbs;
 
+use Inertia\Inertia;
 use Statamic\CP\Navigation\NavItem;
 use Statamic\Facades\CP\Nav;
 use Statamic\Statamic;
@@ -13,6 +14,8 @@ class Breadcrumbs
     public static function push(Breadcrumb $breadcrumb)
     {
         static::$pushed[] = $breadcrumb;
+
+        Inertia::share(['additionalBreadcrumbs' => static::additional()]);
     }
 
     public static function build(): array
@@ -87,5 +90,23 @@ class Breadcrumbs
         $arrow = Statamic::cpDirection() === 'ltr' ? ' ‹ ' : ' › ';
 
         return $crumbs->reverse()->join($arrow);
+    }
+
+    public static function additional()
+    {
+        return collect(static::$pushed)->map(function (Breadcrumb $crumb) {
+            return [
+                'display' => $crumb->text(),
+                'url' => $crumb->url(),
+                'icon' => $crumb->icon(),
+                'links' => collect($crumb->links())->map(function ($link) {
+                    return [
+                        'display' => $link->text,
+                        'url' => $link->url,
+                        'icon' => $link->icon,
+                    ];
+                }),
+            ];
+        })->all();
     }
 }

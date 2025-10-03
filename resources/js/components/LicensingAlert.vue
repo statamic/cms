@@ -1,16 +1,16 @@
 <script setup>
 import { Modal, Description, Button } from '@/components/ui';
 import { computed, ref } from 'vue';
+import useStatamicPageProps from '@/composables/page-props.js';
 
-const props = defineProps({
-    message: String,
-    testing: Boolean,
-    manageUrl: String,
-});
-
+const { licensing } = useStatamicPageProps();
+const { alert } = licensing;
+const message = ref(alert?.message);
+const testing = ref(alert?.testing);
+const manageUrl = ref(alert?.manageUrl);
 const key = 'statamic.snooze_license_banner';
 const open = ref(localStorage.getItem(key) < new Date().valueOf());
-const snoozeMinutes = computed(() => props.testing ? (24 * 60) : 5);
+const snoozeMinutes = computed(() => testing.value ? (24 * 60) : 5);
 const snoozeMilliseconds = computed(() => snoozeMinutes.value * 60 * 1000);
 
 function snooze() {
@@ -20,12 +20,13 @@ function snooze() {
 
 function manageLicenses() {
     snooze();
-    window.location = props.manageUrl;
+    window.location = manageUrl.value;
 }
 </script>
 
 <template>
     <Modal
+        v-if="alert"
         :title="__('Licensing Alert')"
         :open="open"
         @update:open="snooze"

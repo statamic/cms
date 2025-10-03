@@ -3,6 +3,8 @@
 namespace Statamic\Exceptions\Concerns;
 
 use Illuminate\Auth\Access\AuthorizationException as IlluminateAuthException;
+use Inertia\Inertia;
+use Statamic\Statamic;
 
 trait RendersControlPanelExceptions
 {
@@ -12,7 +14,17 @@ trait RendersControlPanelExceptions
             return redirect($this->getAuthExceptionRedirectUrl())->withError($e->getMessage());
         }
 
-        return parent::render($request, $e);
+        $response = parent::render($request, $e);
+
+        if (app()->isProduction()) {
+            Statamic::$isRenderingCpException = true;
+
+            return Inertia::render('errors/Error', ['status' => $response->getStatusCode()])
+                ->toResponse($request)
+                ->setStatusCode($response->getStatusCode());
+        }
+
+        return $response;
     }
 
     protected function getAuthExceptionRedirectUrl()

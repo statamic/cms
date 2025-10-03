@@ -1,4 +1,4 @@
-import { createApp, ref, markRaw } from 'vue';
+import { createApp, markRaw, h } from 'vue';
 import App from './App.vue';
 import { createPinia, defineStore } from 'pinia';
 import axios from 'axios';
@@ -14,6 +14,8 @@ import useDirtyState from '../composables/dirty-state';
 import VueClickAway from 'vue3-click-away';
 import FloatingVue from 'floating-vue';
 import 'floating-vue/dist/style.css';
+import { createInertiaApp } from '@inertiajs/vue3';
+import { router } from '@inertiajs/vue3';
 import Toasts from '../components/Toasts';
 import PortalVue from 'portal-vue';
 import Keys from '../components/keys/Keys';
@@ -38,10 +40,11 @@ import markdown from '@/util/markdown.js';
 import VueComponentDebug from 'vue-component-debug';
 import CommandPalette from '../components/CommandPalette.js';
 import { registerIconSetFromStrings } from '@ui';
+import Layout from '@/pages/layout/Layout.vue';
 
 let bootingCallbacks = [];
 let bootedCallbacks = [];
-let components;
+let components = new Components;
 
 export default {
     booting(callback) {
@@ -149,7 +152,72 @@ export default {
     },
 
     async start() {
-        this.$app = createApp(App);
+        bootingCallbacks.forEach((callback) => callback(this));
+        bootingCallbacks = [];
+
+        const el = document.getElementById('statamic');
+        const titleEl = document.getElementById('blade-title');
+        const bladeTitle = titleEl.dataset.title;
+        const bladeContent = el?.innerHTML || '';
+        const _this = this;
+
+        await createInertiaApp({
+            id: 'statamic',
+            resolve: name => {
+                if (name === 'NonInertiaPage') {
+                    return {
+                        default: {
+                            layout: Layout,
+                            template: `<div>${bladeContent}</div>`,
+                        }
+                    }
+                }
+
+                // Resolve core pages
+                const pages = import.meta.glob('../pages/**/*.vue', { eager: true });
+                let page = pages[`../pages/${name}.vue`];
+
+                // Resolve addon pages
+                if (!page) {
+                    const addonPage = components.queue[`Pages/${name}`];
+                    if (addonPage) page = { default: addonPage };
+                }
+
+                if (!page) {
+                    let message = `Couldn't find Inertia component for the [${name}] page. `;
+                    message += name.endsWith('.vue')
+                        ? 'You do not need to include the .vue extension when referencing a page.'
+                        : 'Did you you register a [Pages/${name}] component?';
+                    throw new Error(message);
+                }
+
+                page.default.layout = page.default.layout || Layout;
+                return page;
+            },
+            async setup({ el, App: InertiaApp, props, plugin }) {
+                const app = await _this.configureApp(InertiaApp, props);
+                app.use(plugin).mount(el);
+            },
+            title: (title) => title || bladeTitle
+        })
+
+        // Handle non-Inertia responses with full page reload
+        router.on('invalid', (event) => {
+            if (event.detail.response.status === 200) {
+                event.preventDefault();
+                window.location.href = event.detail.response.request.responseURL;
+            }
+        });
+
+        bootedCallbacks.forEach((callback) => callback(this));
+        bootedCallbacks = [];
+    },
+
+    async configureApp(InertiaApp, props, el) {
+        this.$app = createApp({
+            ...App,
+            render: () => h(InertiaApp, props),
+        });
 
         this.$app.config.silent = false;
         this.$app.config.devtools = true;
@@ -161,8 +229,6 @@ export default {
         this.$app.use(VueComponentDebug, { enabled: import.meta.env.VITE_VUE_COMPONENT_DEBUG === 'true' });
 
         const portals = markRaw(new Portals());
-
-        components = new Components(this.$app);
 
         Object.assign(this.$app.config.globalProperties, {
             $config: new Config(this.initialConfig),
@@ -231,6 +297,7 @@ export default {
         registerGlobalCommandPalette();
         registerFieldtypes(this.$app);
         registerIconSets(this.initialConfig);
+        components.boot(this.$app);
 
         // Suppress the translation warnings
         this.$app.config.warnHandler = (msg, vm, trace) => {
@@ -243,13 +310,7 @@ export default {
         axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
         axios.defaults.headers.common['X-CSRF-TOKEN'] = Statamic.$config.get('csrfToken');
 
-        bootingCallbacks.forEach((callback) => callback(this));
-        bootingCallbacks = [];
-
-        this.$app.mount('#statamic');
-
-        bootedCallbacks.forEach((callback) => callback(this));
-        bootedCallbacks = [];
+        return this.$app;
     },
 };
 

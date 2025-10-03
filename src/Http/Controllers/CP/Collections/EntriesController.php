@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades\Action;
@@ -171,6 +172,14 @@ class EntriesController extends CpController
             session()->now('success', __('Entry created'));
         }
 
+        return Inertia::render('entries/Edit', [
+            ...$viewData,
+            'canEditBlueprint' => User::current()->can('configure fields'),
+            'createAnotherUrl' => cp_route('collections.entries.create', [$viewData['collection'], $viewData['locale']]),
+            'initialListingUrl' => cp_route('collections.show', $viewData['collection']),
+            'itemActionUrl' => cp_route('collections.entries.actions.run', $viewData['collection']),
+        ]);
+
         return view('statamic::entries.edit', array_merge($viewData, [
             'entry' => $entry,
         ]));
@@ -333,7 +342,9 @@ class EntriesController extends CpController
             return collect($viewData);
         }
 
-        return view('statamic::entries.create', $viewData);
+        return Inertia::render('entries/Create', [
+            ...$viewData,
+        ]);
     }
 
     public function store(Request $request, $collection, $site)
