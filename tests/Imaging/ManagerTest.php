@@ -71,12 +71,24 @@ class ManagerTest extends TestCase
             'cp_thumbnail_small_square' => ['w' => '400', 'h' => '400'],
         ], $this->manager->cpManipulationPresets());
 
+        $this->manager->registerCustomManipulationPresets([
+            'og_image' => ['w' => 1146, 'h' => 600],
+            'twitter_image' => ['w' => 1200, 'h' => 600],
+        ]);
+
+        $this->assertEquals([
+            'og_image' => ['w' => 1146, 'h' => 600],
+            'twitter_image' => ['w' => 1200, 'h' => 600],
+        ], $this->manager->customManipulationPresets());
+
         $this->assertEquals([
             'alfa' => ['w' => 100, 'h' => 200, 'q' => 50],
             'bravo' => ['w' => 200, 'h' => 100, 'q' => 20],
             'cp_thumbnail_small_landscape' => ['w' => '400', 'h' => '400', 'fit' => 'contain'],
             'cp_thumbnail_small_portrait' => ['h' => '400', 'fit' => 'contain'],
             'cp_thumbnail_small_square' => ['w' => '400', 'h' => '400'],
+            'og_image' => ['w' => 1146, 'h' => 600],
+            'twitter_image' => ['w' => 1200, 'h' => 600],
         ], $this->manager->manipulationPresets());
     }
 }
