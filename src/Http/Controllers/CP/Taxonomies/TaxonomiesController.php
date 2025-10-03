@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Taxonomies;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Contracts\Taxonomies\Taxonomy as TaxonomyContract;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Contracts\Taxonomies\TermRepository;
@@ -44,16 +45,14 @@ class TaxonomiesController extends CpController
             ];
         })->values();
 
-        if ($taxonomies->isEmpty()) {
-            return view('statamic::taxonomies.empty');
-        }
-
-        return view('statamic::taxonomies.index', [
-            'taxonomies' => $taxonomies,
+        return Inertia::render('taxonomies/Index', [
+            'taxonomies' => $taxonomies->all(),
             'columns' => [
                 Column::make('title')->label(__('Title')),
                 Column::make('terms')->label(__('Terms'))->numeric(true),
             ],
+            'canCreate' => User::current()->can('create', TaxonomyContract::class),
+            'createUrl' => cp_route('taxonomies.create'),
         ]);
     }
 
