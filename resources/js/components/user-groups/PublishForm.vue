@@ -31,7 +31,7 @@ function save() {
         .through([new Request(props.actions.save, props.method)])
         .then((response) => {
             if (props.isCreating) window.location = response.data.redirect;
-            Statamic.$toast.success('Saved');
+            Statamic.$toast.success(__('Saved'));
             title.value = response.data.title;
         });
 }
