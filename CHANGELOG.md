@@ -1,5 +1,24 @@
 # Release Notes
 
+## 5.66.0 (2025-10-03)
+
+### What's new
+- Ability to register custom image presets [#12624](https://github.com/statamic/cms/issues/12624) by @duncanmcclean
+- Add `isDefault` to `Site` [#12574](https://github.com/statamic/cms/issues/12574) by @edalzell
+- Add whereInId to EntryRepository [#11668](https://github.com/statamic/cms/issues/11668) by @nadinengland
+
+### What's fixed
+- Fix performance regression from 11863 [#12628](https://github.com/statamic/cms/issues/12628) by @simonworkhouse
+- Ensure HandleEntrySchedule uses the minute it was dispatched [#12626](https://github.com/statamic/cms/issues/12626) by @ryanmitchell
+- Select correct site when using multiple domains [#11042](https://github.com/statamic/cms/issues/11042) by @aerni
+- Changing Stache index name from collection to collectionHandle [#11324](https://github.com/statamic/cms/issues/11324) by @Krzemo
+- Prevent entry propagation when duplicating [#12186](https://github.com/statamic/cms/issues/12186) by @marcorieser
+- Italian translations [#12642](https://github.com/statamic/cms/issues/12642) by @ivanandre
+- Italian translations [#12643](https://github.com/statamic/cms/issues/12643) by @ivanandre
+- Norwegian translations [#12636](https://github.com/statamic/cms/issues/12636) by @Keuto
+
+
+
 ## 5.65.2 (2025-09-24)
 
 ### What's fixed
