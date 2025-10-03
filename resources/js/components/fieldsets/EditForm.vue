@@ -85,12 +85,22 @@ export default {
         this.makeSortable();
     },
 
+    watch: {
+        fieldset: {
+            deep: true,
+            handler() {
+                this.$dirty.add('fieldsets');
+            },
+        },
+    },
+
     methods: {
         save() {
             this.$axios[this.method](this.action, this.fieldset)
                 .then((response) => {
                     this.$toast.success(__('Saved'));
                     this.errors = {};
+                    this.$dirty.remove('fieldsets');
                 })
                 .catch((e) => {
                     this.$toast.error(e.response.data.message);
