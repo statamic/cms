@@ -6,11 +6,11 @@
 @section('title', __('Blueprints'))
 
 @section('content')
-    <taxonomy-blueprint-listing
+    <collection-blueprint-listing
         :initial-rows="{{ json_encode($blueprints) }}"
         reorder-url="{{ cp_route('blueprints.taxonomies.reorder', $taxonomy) }}"
         create-url="{{ cp_route('blueprints.taxonomies.create', $taxonomy) }}"
-    ></taxonomy-blueprint-listing>
+    ></collection-blueprint-listing>
 
     <x-statamic::docs-callout
         topic="{{ __('Blueprints') }}"
