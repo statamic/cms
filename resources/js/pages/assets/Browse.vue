@@ -1,39 +1,18 @@
-<template>
-    <asset-browser
-        ref="browser"
-        :can-create-containers="canCreateContainers"
-        :create-container-url="createContainerUrl"
-        :container="container"
-        :initial-per-page="$config.get('paginationSize')"
-        :initial-editing-asset-id="initialEditingAssetId"
-        :selected-path="path"
-        :selected-assets="selectedAssets"
-        :initial-columns="columns"
-        @navigated="navigate"
-        @selections-updated="updateSelections"
-        @edit-asset="editAsset"
-    >
-        <template #initializing>
-            <slot name="initializing" />
-        </template>
-    </asset-browser>
-</template>
-
 <script>
+import Head from '@/pages/layout/Head.vue';
+import { DocsCallout } from '@ui';
+
 export default {
-    props: {
-        container: Object,
-        initialPath: String,
-        initialEditingAssetId: String,
-        actions: Array,
-        canCreateContainers: Boolean,
-        createContainerUrl: String,
-        columns: Array,
+    components: {
+        Head,
+        DocsCallout,
     },
+
+    props: ['container', 'folder', 'columns', 'canCreateContainers', 'createContainerUrl', 'editing'],
 
     data() {
         return {
-            path: this.initialPath,
+            path: this.folder,
             selectedAssets: [],
         };
     },
@@ -109,3 +88,49 @@ export default {
     },
 };
 </script>
+
+<template>
+    <div v-cloak>
+        <Head :title="container.title" />
+
+        <asset-browser
+            ref="browser"
+            :can-create-containers="canCreateContainers"
+            :create-container-url="createContainerUrl"
+            :container="container"
+            :initial-per-page="$config.get('paginationSize')"
+            :initial-editing-asset-id="editing"
+            :selected-path="path"
+            :selected-assets="selectedAssets"
+            :initial-columns="columns"
+            @navigated="navigate"
+            @selections-updated="updateSelections"
+            @edit-asset="editAsset"
+        >
+            <template #initializing>
+                <!-- Header Skeleton -->
+                <div class="flex justify-between py-8">
+                    <ui-skeleton class="h-8 w-95" />
+                    <div class="flex gap-3">
+                        <ui-skeleton class="h-10 w-26" />
+                        <ui-skeleton class="h-10 w-36" />
+                        <ui-skeleton class="h-10 w-20" />
+                    </div>
+                </div>
+                <!-- Toolbar Skeleton -->
+                <div class="flex justify-between py-3">
+                    <ui-skeleton class="h-9 w-95" />
+                    <ui-skeleton class="h-9 w-10" />
+                </div>
+                <!-- Assets grid Skeleton -->
+                <div class="flex justify-between">
+                    <ui-skeleton class="h-30 w-full" />
+                </div>
+            </template>
+        </asset-browser>
+
+        <div class="starting-style-transition starting-style-transition--delay">
+            <DocsCallout :topic="__('Assets')" url="assets" />
+        </div>
+    </div>
+</template>

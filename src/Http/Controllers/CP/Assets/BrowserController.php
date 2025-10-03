@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Assets;
 
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
+use Inertia\Inertia;
 use Statamic\Assets\AssetFolder;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\CP\Column;
@@ -41,7 +42,7 @@ class BrowserController extends CpController
 
         $this->setColumns($container);
 
-        return view('statamic::assets.browse', [
+        return Inertia::render('assets/Browse', [
             'container' => [
                 'id' => $container->id(),
                 'title' => $container->title(),
@@ -57,6 +58,9 @@ class BrowserController extends CpController
             ],
             'folder' => $path,
             'columns' => $this->columns,
+            'canCreateContainers' => User::current()->can('create', \Statamic\Contracts\Assets\AssetContainer::class),
+            'createContainerUrl' => cp_route('asset-containers.create'),
+            'editing' => null,
         ]);
     }
 

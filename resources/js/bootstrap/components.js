@@ -1,4 +1,3 @@
-import AssetManager from '../components/assets/AssetManager.vue';
 import Browser from '../components/assets/Browser/Browser.vue';
 import UpdatesBadge from '../components/UpdatesBadge.vue';
 import FullscreenHeader from '../components/publish/FullscreenHeader.vue';
@@ -54,7 +53,6 @@ import { Link } from '@inertiajs/vue3';
 
 export default function registerGlobalComponents(app) {
     // Core
-    app.component('asset-manager', AssetManager);
     app.component('asset-browser', Browser);
     app.component('updates-badge', UpdatesBadge);
     app.component('inertia-link', Link);
