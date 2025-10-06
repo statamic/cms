@@ -20,6 +20,7 @@ const props = defineProps({
 const { visibleColumns, selections, items, hasActions, showBulkActions, loading, reorderable } = injectListingContext();
 const shifting = ref(false);
 const hasSelections = computed(() => selections.value.length > 0);
+const hasTbodyStartSlot = computed(() => !!slots['tbody-start']);
 
 const relativeColumnsSize = computed(() => {
     if (visibleColumns.value.length <= 4) return 'sm';
@@ -42,7 +43,7 @@ const forwardedTableCellSlots = computed(() => {
 
 <template>
     <table
-        v-if="items.length > 0"
+        v-if="items.length > 0 || hasTbodyStartSlot"
         :data-size="relativeColumnsSize"
         :class="{
             'select-none': shifting,
@@ -67,7 +68,7 @@ const forwardedTableCellSlots = computed(() => {
             </template>
         </TableBody>
     </table>
-    <div v-if="items.length === 0">
+    <div v-if="items.length === 0 && !hasTbodyStartSlot">
         <div class="text-center text-gray-500 text-sm py-4">
             {{ __('No items found') }}
         </div>
