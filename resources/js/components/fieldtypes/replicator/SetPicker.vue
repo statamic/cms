@@ -38,17 +38,6 @@
                 </ui-toggle-group>
             </div>
 
-            <!-- Breadcrumbs for List Mode -->
-            <div v-if="showGroupBreadcrumb" class="flex items-center p-1.5 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-600">
-                <ui-button @click="unselectGroup" size="xs" variant="ghost">
-                    {{ __('Groups') }}
-                </ui-button>
-                <ui-icon name="chevron-right" class="size-3! mt-[1px]" />
-                <span class="text-gray-700 dark:text-gray-300 text-xs px-2">
-                    {{ selectedGroupDisplayText }}
-                </span>
-            </div>
-
             <!-- Tabs for Grid Mode -->
             <ui-tabs default-tab="all" v-model="selectedTab" class="w-full" v-if="mode === 'grid'">
                 <ui-tab-list class="px-2">
@@ -72,9 +61,9 @@
                                 <div class="line-clamp-1 text-base mt-1 text-center text-gray-900 dark:text-gray-200">
                                     {{ __(item.display || item.handle) }}
                                 </div>
-                                <p v-if="item.instructions" class="text-gray-800 dark:text-gray-200 mb-2">
+                                <ui-description v-if="item.instructions" class="text-center mb-2">
                                     {{ __(item.instructions) }}
-                                </p>
+                                </ui-description>
                             </div>
                         </div>
                         <div v-if="group.items.length === 0" class="p-3 text-center text-xs text-gray-600">

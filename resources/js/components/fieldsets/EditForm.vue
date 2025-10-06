@@ -85,12 +85,22 @@ export default {
         this.makeSortable();
     },
 
+    watch: {
+        fieldset: {
+            deep: true,
+            handler() {
+                this.$dirty.add('fieldsets');
+            },
+        },
+    },
+
     methods: {
         save() {
             this.$axios[this.method](this.action, this.fieldset)
                 .then((response) => {
                     this.$toast.success(__('Saved'));
                     this.errors = {};
+                    this.$dirty.remove('fieldsets');
                 })
                 .catch((e) => {
                     this.$toast.error(e.response.data.message);
@@ -136,6 +146,16 @@ export default {
             e.preventDefault();
             this.save();
         });
+
+        // Listen for root-form-save events from child components
+        // This also happens on the blueprint builder.
+        this.$events.$on('root-form-save', () => {
+            this.save();
+        });
+    },
+
+    beforeUnmount() {
+        this.$events.$off('root-form-save');
     },
 };
 </script>

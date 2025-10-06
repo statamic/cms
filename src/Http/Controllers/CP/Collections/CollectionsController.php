@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Column;
@@ -43,9 +44,12 @@ class CollectionsController extends CpController
             ];
         }
 
-        return view('statamic::collections.index', [
-            'collections' => $this->collections(),
+        return Inertia::render('collections/Index', [
+            'collections' => $this->collections()->all(),
             'columns' => $columns,
+            'createUrl' => cp_route('collections.create'),
+            'actionUrl' => cp_route('collections.actions.run'),
+            'canCreate' => User::current()->can('create', 'Statamic\Contracts\Entries\Collection'),
         ]);
     }
 
@@ -63,7 +67,13 @@ class CollectionsController extends CpController
                 'published_entries_count' => $collection->queryEntries()->where('site', Site::selected())->where('status', 'published')->count(),
                 'draft_entries_count' => $collection->queryEntries()->where('site', Site::selected())->where('status', 'draft')->count(),
                 'scheduled_entries_count' => $collection->queryEntries()->where('site', Site::selected())->where('status', 'scheduled')->count(),
-                'blueprints' => $collection->entryBlueprints()->reject->hidden()->values(),
+                'blueprints' => $collection->entryBlueprints()->reject->hidden()
+                    ->map(fn ($blueprint) => [
+                        ...$blueprint->toArray(),
+                        'createEntryUrl' => cp_route('collections.entries.create', [$collection->handle(), Site::selected(), 'blueprint' => $blueprint->handle()]),
+                    ])
+                    ->values()
+                    ->all(),
                 'columns' => [
                     ['label' => 'Title', 'field' => 'title', 'visible' => true],
                     ['label' => 'Date', 'field' => 'date', 'visible' => true],
@@ -145,20 +155,67 @@ class CollectionsController extends CpController
             'actions' => Action::for($collection, ['view' => 'form']),
         ];
 
+        $user = \Statamic\Facades\User::current();
+        $props = [
+            'title' => $collection->title(),
+            'handle' => $collection->handle(),
+            'icon' => $collection->icon(),
+            'canCreate' => $viewData['canCreate'],
+            'createUrls' => $viewData['createUrls'],
+            'createLabel' => $collection->createLabel(),
+            'blueprints' => $blueprints->map(fn ($blueprint) => [
+                ...$blueprint,
+                'createEntryUrl' => cp_route('collections.entries.create', [$collection->handle(), $site, 'blueprint' => $blueprint['handle']]),
+            ])->all(),
+            'sortColumn' => $collection->sortField(),
+            'sortDirection' => $collection->sortDirection(),
+            'columns' => $columns,
+            'filters' => $viewData['filters'],
+            'actions' => $viewData['actions'],
+            'actionUrl' => cp_route('collections.actions.run'),
+            'entriesActionUrl' => cp_route('collections.entries.actions.run', $collection->handle()),
+            'reorderUrl' => cp_route('collections.entries.reorder', $collection->handle()),
+            'editUrl' => $collection->editUrl(),
+            'blueprintsUrl' => cp_route('blueprints.collections.index', $collection),
+            'scaffoldUrl' => cp_route('collections.scaffold', $collection->handle()),
+            'canEdit' => $user->can('edit', $collection),
+            'canEditBlueprints' => $user->can('configure fields'),
+            'initialSite' => $site->handle(),
+            'sites' => $viewData['sites'],
+            'canChangeLocalizationDeleteBehavior' => $viewData['canChangeLocalizationDeleteBehavior'],
+        ];
+
+        if ($collection->hasStructure()) {
+            $structure = $collection->structure();
+            $props = [
+                ...$props,
+                'structured' => $user->can('reorder', $collection),
+                'structurePagesUrl' => cp_route('collections.tree.index', $structure->handle()),
+                'structureSubmitUrl' => cp_route('collections.tree.update', $collection->handle()),
+                'structureMaxDepth' => $structure->maxDepth() ?? PHP_FLOAT_MAX, // "Infinity"
+                'structureExpectsRoot' => $structure->expectsRoot(),
+                'structureShowSlugs' => $structure->showSlugs(),
+            ];
+        }
+
         if ($collection->queryEntries()->count() === 0) {
-            return view('statamic::collections.empty', $viewData);
+            return Inertia::render('collections/Empty', [
+                ...Arr::only($props, [
+                    'title',
+                    'blueprints',
+                    'canEdit',
+                    'editUrl',
+                    'canEditBlueprints',
+                    'canCreate',
+                    'createLabel',
+                    'blueprintsUrl',
+                    'scaffoldUrl',
+                ]),
+                'createEntryUrl' => $viewData['createUrls'][$site->handle()],
+            ]);
         }
 
-        if (! $collection->hasStructure()) {
-            return view('statamic::collections.show', $viewData);
-        }
-
-        $structure = $collection->structure();
-
-        return view('statamic::collections.show', array_merge($viewData, [
-            'structure' => $structure,
-            'expectsRoot' => $structure->expectsRoot(),
-        ]));
+        return Inertia::render('collections/Show', $props);
     }
 
     public function create()

@@ -3,6 +3,7 @@ import { computed, useSlots } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
 import Icon from '../Icon/Icon.vue';
+import { Link } from '@inertiajs/vue3';
 
 const props = defineProps({
     as: { type: String, default: 'button' },
@@ -21,7 +22,12 @@ const props = defineProps({
 
 const slots = useSlots();
 const hasDefaultSlot = !!slots.default;
-const tag = computed(() => (props.href ? 'a' : props.as));
+const tag = computed(() => {
+    if (props.href) {
+        return props.target === '_blank' ? 'a' : Link;
+    }
+    return props.as;
+});
 const iconOnly = computed(() => (props.icon && !hasDefaultSlot && !props.text) || props.iconOnly);
 
 const buttonClasses = computed(() => {

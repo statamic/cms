@@ -90,30 +90,40 @@ defineExpose({
         v-if="confirming"
         :title="action.title"
         :danger="action.dangerous"
+        :submittable="action.runnable"
         :buttonText="runButtonText"
         :busy="running"
         @confirm="confirmed"
         @cancel="reset"
     >
-        <Description
-            v-if="confirmationText"
-            :text="confirmationText"
-            :class="{ 'mb-4': warningText || showDirtyWarning || action.fields.length }"
+        <component
+            v-if="action.component"
+            :is="action.component"
+            :action="action"
+            :values="values"
         />
 
-        <div
-            v-if="warningText"
-            v-text="warningText"
-            class="text-red-600"
-            :class="{ 'mb-4': showDirtyWarning || action.fields.length }"
-        />
+        <template v-else>
+            <Description
+                v-if="confirmationText"
+                :text="confirmationText"
+                :class="{ 'mb-4': warningText || showDirtyWarning || action.fields.length }"
+            />
 
-        <div
-            v-if="showDirtyWarning"
-            v-text="dirtyText"
-            class="text-red-600"
-            :class="{ 'mb-4': action.fields.length }"
-        />
+            <div
+                v-if="warningText"
+                v-text="warningText"
+                class="text-red-600"
+                :class="{ 'mb-4': showDirtyWarning || action.fields.length }"
+            />
+
+            <div
+                v-if="showDirtyWarning"
+                v-text="dirtyText"
+                class="text-red-600"
+                :class="{ 'mb-4': action.fields.length }"
+            />
+        </template>
 
         <PublishContainer
             v-if="action.fields.length"

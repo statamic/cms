@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 use Statamic\Events\TwoFactorAuthenticationFailed;
 use Statamic\Events\ValidTwoFactorAuthenticationCodeProvided;
 use Statamic\Http\Middleware\RedirectIfAuthenticated;
@@ -24,10 +25,11 @@ class TwoFactorChallengeController extends Controller
             throw new HttpResponseException(redirect()->route('statamic.cp.login'));
         }
 
-        return view('statamic::auth.two-factor.challenge', [
-            'hasError' => $this->hasError(),
+        return Inertia::render('auth/two-factor/Challenge', [
             'action' => $this->formAction(),
             'mode' => session()->get('errors')?->getBag('default')->has('recovery_code') ? 'recovery_code' : 'code',
+            'csrfToken' => csrf_token(),
+            'redirect' => $request->redirect,
         ]);
     }
 
@@ -64,19 +66,5 @@ class TwoFactorChallengeController extends Controller
     protected function redirectPath()
     {
         return request('redirect') ?? route('statamic.site');
-    }
-
-    protected function hasError()
-    {
-        return function ($field) {
-            if (! $error = optional(session('errors'))->first($field)) {
-                return false;
-            }
-
-            return ! in_array($error, [
-                __('auth.failed'),
-                __('statamic::validation.required'),
-            ]);
-        };
     }
 }

@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Taxonomies;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Contracts\Taxonomies\Taxonomy as TaxonomyContract;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Contracts\Taxonomies\TermRepository;
@@ -44,16 +45,14 @@ class TaxonomiesController extends CpController
             ];
         })->values();
 
-        if ($taxonomies->isEmpty()) {
-            return view('statamic::taxonomies.empty');
-        }
-
-        return view('statamic::taxonomies.index', [
-            'taxonomies' => $taxonomies,
+        return Inertia::render('taxonomies/Index', [
+            'taxonomies' => $taxonomies->all(),
             'columns' => [
                 Column::make('title')->label(__('Title')),
                 Column::make('terms')->label(__('Terms'))->numeric(true),
             ],
+            'canCreate' => User::current()->can('create', TaxonomyContract::class),
+            'createUrl' => cp_route('taxonomies.create'),
         ]);
     }
 
@@ -79,7 +78,8 @@ class TaxonomiesController extends CpController
             ->values();
 
         $viewData = [
-            'taxonomy' => $taxonomy,
+            'taxonomy' => $taxonomy->handle(),
+            'taxonomyTitle' => $taxonomy->title(),
             'blueprints' => $blueprints,
             'site' => Site::selected()->handle(),
             'columns' => $columns,
@@ -88,13 +88,25 @@ class TaxonomiesController extends CpController
                 'blueprints' => $blueprints->pluck('handle')->all(),
             ]),
             'canCreate' => User::current()->can('create', [TermContract::class, $taxonomy]) && $taxonomy->hasVisibleTermBlueprint(),
+            'createUrl' => cp_route('taxonomies.terms.create', [$taxonomy->handle(), Site::selected()->handle()]),
+            'taxonomyEditUrl' => cp_route('taxonomies.edit', $taxonomy->handle()),
+            'taxonomyBlueprintsUrl' => cp_route('blueprints.taxonomies.index', $taxonomy),
+            'canEdit' => User::current()->can('edit', $taxonomy),
+            'canConfigureFields' => User::current()->can('configure fields'),
         ];
 
         if ($taxonomy->queryTerms()->count() === 0) {
-            return view('statamic::terms.empty', $viewData);
+            return Inertia::render('taxonomies/Empty', $viewData);
         }
 
-        return view('statamic::taxonomies.show', $viewData);
+        return Inertia::render('taxonomies/Show', array_merge($viewData, [
+            'actionUrl' => cp_route('taxonomies.terms.actions.run', $taxonomy->handle()),
+            'sortColumn' => $taxonomy->sortField(),
+            'sortDirection' => $taxonomy->sortDirection(),
+            'canDelete' => User::current()->can('delete', $taxonomy),
+            'deleteUrl' => cp_route('taxonomies.destroy', $taxonomy->handle()),
+            'createLabel' => $taxonomy->createLabel(),
+        ]));
     }
 
     public function create()

@@ -69,15 +69,12 @@ main {
     }
 }
 
-.nav-closed main {
-    @apply ps-0;
-}
-
 .nav-closed .nav-main {
     @apply -start-46;
 }
 
-.nav-closed main {
+main.nav-closed {
+    @apply ps-0;
     @apply md:ps-0;
 }
 

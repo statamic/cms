@@ -11,7 +11,7 @@
     .bard-editor {
         /* We need a transparent border inside Bard to properly see the focus outline. Without this border, the focus outline is hairline-thin */
         border: 1px solid transparent;
-        @apply relative rounded-b-lg p-0 text-gray-900 dark:bg-gray-900 dark:text-gray-100;
+        @apply relative rounded-lg p-0 text-gray-900 dark:bg-gray-900 dark:text-gray-100;
         /* The focus state inherits this */
         > * {
             @apply rounded-b-lg;
@@ -123,15 +123,31 @@
     }
 
     /* Only top-level Bard fields should have a sticky header */
+    /* =Jay. I don't think we have the "workspace" class anymore, in which case this should be removed */
     .workspace .publish-fields:not(.replicator-set-body) > .bard-fieldtype .bard-fixed-toolbar,
     .live-preview .publish-fields:not(.replicator-set-body) > .bard-fieldtype .bard-fixed-toolbar {
         @apply sticky;
     }
 
-    /*  Fixed toolbar inside another bard field */
-    .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar {
+    .bard-fixed-toolbar {
         z-index: var(--z-index-portal);
-        top: 40px;
+        position: sticky;
+        @apply -top-2;
+        /* Prevent the sticky toolbar from hitting the very end of container, which causes it to overlap the container's border-radius */
+        margin-block-end: 8px;
+        /* Pull the subsequent element up to compensate for this */
+        + * {
+            margin-block-start: -8px;
+        }
+    }
+
+    /* Fixed toolbar inside another bard field */
+    .bard-content .bard-fixed-toolbar {
+        @apply top-8;
+    }
+    /* Bard > Grid > Bard */
+    .bard-content .grid-fieldtype .bard-fixed-toolbar {
+        @apply top-16;
     }
 
     /*  Fixed toolbar inside a stack */
@@ -143,13 +159,7 @@
     @media (width >= theme(--breakpoint-md)) {
         /*  Fixed toolbar below fixed global header */
         .bard-fixed-toolbar {
-            top: 52px;
-
-            .bard-fieldtype .bard-fieldtype & {
-                top: 92px;
-            }
-
-            /*  Fixed toolbar inside a stack */
+            /* Fixed toolbar inside a stack */
             .stack-content .bard-fieldtype .bard-fieldtype & {
                 top: 16px;
             }

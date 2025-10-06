@@ -42,8 +42,8 @@
                 />
             </div>
 
-            <div class="text-gray py-2 text-xs" v-if="maxItemsReached && maxItems != 1">
-                <span>{{ __('Maximum items selected:') }}</span>
+            <div class="ml-1 text-gray py-2 text-xs" v-if="maxItemsReached && maxItems != 1">
+                <span class="mr-1">{{ __('Maximum items selected:') }}</span>
                 <span>{{ maxItems }}/{{ maxItems }}</span>
             </div>
             <div

@@ -8,6 +8,8 @@ use Statamic\Support\Arr;
 
 class Manager
 {
+    private array $customManipulationPresets = [];
+
     /**
      * Get a URL manipulator instance to continue chaining, or a URL right away if provided with params.
      *
@@ -49,7 +51,10 @@ class Manager
      */
     public function manipulationPresets()
     {
-        $presets = $this->userManipulationPresets();
+        $presets = [
+            ...$this->userManipulationPresets(),
+            ...$this->customManipulationPresets(),
+        ];
 
         if (config('statamic.cp.enabled')) {
             $presets = array_merge($presets, $this->cpManipulationPresets());
@@ -91,6 +96,24 @@ class Manager
                 "cp_thumbnail_{$name}_square" => ['w' => $size, 'h' => $size],
             ])
             ->all();
+    }
+
+    /**
+     * Register custom image manipulation presets.
+     */
+    public function registerCustomManipulationPresets(array $presets): void
+    {
+        foreach ($presets as $name => $preset) {
+            $this->customManipulationPresets[$name] = $this->normalizePreset($preset);
+        }
+    }
+
+    /**
+     * Get custom image manipulation presets.
+     */
+    public function customManipulationPresets(): array
+    {
+        return $this->customManipulationPresets;
     }
 
     /**
