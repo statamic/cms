@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Fields;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\CP\Breadcrumbs\Breadcrumb;
 use Statamic\CP\Breadcrumbs\Breadcrumbs;
 use Statamic\Facades;
@@ -51,10 +52,15 @@ class FieldsetController extends CpController
         }
 
         if ($fieldsets->count() === 0) {
-            return view('statamic::fieldsets.empty');
+            return Inertia::render('fieldsets/Empty', [
+                'createUrl' => cp_route('fieldsets.create'),
+            ]);
         }
 
-        return view('statamic::fieldsets.index', compact('fieldsets'));
+        return Inertia::render('fieldsets/Index', [
+            'fieldsets' => $fieldsets,
+            'createUrl' => cp_route('fieldsets.create'),
+        ]);
     }
 
     private function group(Blueprint|Fieldset $item)
