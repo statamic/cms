@@ -15,15 +15,15 @@ const darkCustomLogo = logos.dark.outside ?? logos.light.outside ?? null;
 let themeInstance = null;
 
 onMounted(() => {
-    // Get user theme preference from localStorage (same as main app)
+    // Get user theme preference from localStorage, defaulting to 'auto' if not set
     let userTheme = localStorage.getItem('statamic.theme');
-    
-    // Handle null, undefined, or the string "undefined" case by defaulting to 'auto'
+
+    // Handle null, undefined, or the string "undefined" case
     if (userTheme === null || userTheme === undefined || userTheme === 'undefined') {
         userTheme = 'auto';
     }
-    
-    // Create Theme instance with the same logic as main app
+
+    // Create Theme instance to manage dark mode (same as main application)
     themeInstance = new Theme(userTheme);
 });
 </script>
