@@ -141,8 +141,8 @@
         }
     }
 
-    /* Fixed toolbar inside another bard field */
-    .bard-content .bard-fixed-toolbar {
+    /* Bard field with a fixed toolbar > then another fixed toolbar inside this */
+    .bard-fieldtype:has(> .bard-fixed-toolbar) .bard-content .bard-fixed-toolbar {
         @apply top-8;
     }
     /* Bard > Grid > Bard */
@@ -150,7 +150,7 @@
         @apply top-16;
     }
 
-    /*  Fixed toolbar inside a stack */
+    /* Fixed toolbar inside a stack */
     .stack-content .bard-fixed-toolbar {
         top: -24px;
     }
