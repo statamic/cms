@@ -1,9 +1,12 @@
 <script setup>
+import { ref } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import Head from '@/pages/layout/Head.vue';
 import { Header, Dropdown, DropdownMenu, DropdownLabel, DropdownItem, Button, Subheading, Panel, DocsCallout, Icon, StatusIndicator } from '@ui';
 
 defineProps(['collections', 'taxonomies', 'navs', 'assetContainers', 'globals', 'forms', 'userBlueprint', 'groupBlueprint', 'additional']);
+
+const resetters = ref({});
 </script>
 
 <template>
@@ -252,12 +255,12 @@ defineProps(['collections', 'taxonomies', 'navs', 'assetContainers', 'globals', 
                                             <DropdownItem
                                                 :text="__('Reset')"
                                                 variant="destructive"
-                                                @click="$refs[`resetter_${blueprint.namespace}_${blueprint.handle}`].confirm()"
+                                                @click="resetters[`${blueprint.namespace}_${blueprint.handle}`].confirm()"
                                             />
                                         </DropdownMenu>
                                     </Dropdown>
                                     <blueprint-resetter
-                                        :ref="`resetter_${blueprint.namespace}_${blueprint.handle}`"
+                                        :ref="el => resetters[`${blueprint.namespace}_${blueprint.handle}`] = el"
                                         :resource="blueprint"
                                         reload
                                     />
