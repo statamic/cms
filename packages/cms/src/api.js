@@ -15,4 +15,11 @@ export const {
     progress,
     reveal,
     slug,
+    config,
+    preferences,
+    toast,
+    theme,
+    contrast,
+    portals,
+    stacks,
 } = __STATAMIC__.api;

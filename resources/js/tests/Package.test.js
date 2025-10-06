@@ -40,6 +40,8 @@ it('exports api', async () => {
         'commandPalette',
         'components',
         'conditions',
+        'config',
+        'contrast',
         'dateFormatter',
         'dirty',
         'echo',
@@ -48,9 +50,14 @@ it('exports api', async () => {
         'hooks',
         'keys',
         'permissions',
+        'portals',
+        'preferences',
         'progress',
         'reveal',
         'slug',
+        'stacks',
+        'theme',
+        'toast',
     ];
 
     expect(Object.keys(modules.api).toSorted()).toEqual(expected)
