@@ -8,6 +8,9 @@ import FieldsetResetter from '@/components/fieldsets/FieldsetResetter.vue';
 
 defineProps(['fieldsets', 'createUrl']);
 
+const deleters = ref({});
+const resetters = ref({});
+
 const columns = ref([
     { label: __('Title'), field: 'title' },
     { label: __('Handle'), field: 'handle', width: '25%' },
@@ -52,8 +55,8 @@ function removeRow(rows, row) {
             >
                 <template #cell-title="{ row: fieldset }">
                     <Link :href="fieldset.edit_url" v-text="__(fieldset.title)" />
-                    <fieldset-resetter :ref="`resetter_${fieldset.id}`" :resource="fieldset" :reload="true" />
-                    <fieldset-deleter :ref="`deleter_${fieldset.id}`" :resource="fieldset" @deleted="removeRow(rows, fieldset)" />
+                    <fieldset-resetter :ref="el => resetters[fieldset.id] = el" :resource="fieldset" :reload="true" />
+                    <fieldset-deleter :ref="el => deleters[fieldset.id] = el" :resource="fieldset" @deleted="removeRow(rows, fieldset)" />
                 </template>
                 <template #cell-handle="{ value }">
                     <span class="font-mono text-xs" v-text="value" />
@@ -65,14 +68,14 @@ function removeRow(rows, row) {
                         :text="__('Reset')"
                         icon="history"
                         variant="destructive"
-                        @click="$refs[`resetter_${fieldset.id}`].confirm()"
+                        @click="resetters[fieldset.id].confirm()"
                     />
                     <DropdownItem
                         v-if="fieldset.is_deletable"
                         :text="__('Delete')"
                         icon="trash"
                         variant="destructive"
-                        @click="$refs[`deleter_${fieldset.id}`].confirm()"
+                        @click="deleters[fieldset.id].confirm()"
                     />
                 </template>
             </Listing>
