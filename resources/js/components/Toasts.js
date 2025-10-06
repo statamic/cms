@@ -2,7 +2,7 @@ export default class Toasts {
     #app;
     #plugin;
 
-    constructor(app) {
+    initialize(app) {
         this.#app = app;
     }
 
