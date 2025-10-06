@@ -149,7 +149,9 @@ class FieldsetController extends CpController
 
     public function create()
     {
-        return view('statamic::fieldsets.create');
+        return Inertia::render('fieldsets/Create', [
+            'route' => cp_route('fieldsets.store'),
+        ]);
     }
 
     public function store(Request $request)
