@@ -1,4 +1,4 @@
-import { createApp, markRaw, h } from 'vue';
+import { createApp, h } from 'vue';
 import App from './App.vue';
 import { createPinia, defineStore } from 'pinia';
 import axios from 'axios';
@@ -12,8 +12,6 @@ import 'floating-vue/dist/style.css';
 import { createInertiaApp } from '@inertiajs/vue3';
 import { router } from '@inertiajs/vue3';
 import PortalVue from 'portal-vue';
-import Portals from '../components/portals/Portals';
-import Stacks from '../components/stacks/Stacks';
 import autosize from 'autosize';
 import wait from '@/util/wait.js';
 import markdown from '@/util/markdown.js';
@@ -42,13 +40,12 @@ import {
     config,
     preferences,
     toast,
+    portals,
+    stacks,
 } from '@api';
 
 let bootingCallbacks = [];
 let bootedCallbacks = [];
-
-const portals = markRaw(new Portals());
-let stacks = new Stacks(portals);
 
 export default {
     booting(callback) {

@@ -1,3 +1,4 @@
+import { markRaw } from 'vue';
 import Keys from './components/keys/Keys.js';
 import Components from './components/Components.js';
 import useGlobalEventBus from './composables/global-event-bus.js';
@@ -19,6 +20,8 @@ import Contrast from './components/Contrast.js';
 import Config from './components/Config.js';
 import Preferences from './components/Preference.js';
 import Toasts from './components/Toasts.js';
+import Portals from './components/portals/Portals.js';
+import Stacks from './components/stacks/Stacks.js';
 
 export const keys = new Keys();
 export const components = new Components;
@@ -41,3 +44,5 @@ export const contrast = new Contrast();
 export const config = new Config();
 export const preferences = new Preferences();
 export const toast = new Toasts();
+export const portals = markRaw(new Portals());
+export const stacks = new Stacks(portals);
