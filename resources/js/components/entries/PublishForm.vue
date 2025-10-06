@@ -651,6 +651,18 @@ export default {
         },
 
         editLocalization(localization) {
+            Statamic.$hooks
+                .run('localization.selecting', {
+                    localization,
+                })
+                .then(async () => await this.editLocalizationRequest(localization))
+                .then(response => this.runAfterLocalizationHook(localization, response))
+                .catch((error) => {
+                    this.$toast.error(error || __('Something went wrong'));
+                });
+        },
+
+        editLocalizationRequest(localization) {
             return this.$axios.get(localization.url).then((response) => {
                 clearTimeout(this.trackDirtyStateTimeout);
                 this.trackDirtyState = false;
@@ -675,10 +687,38 @@ export default {
                 this.readOnly = data.readOnly;
 
                 this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500); // after any fieldtypes do a debounced update
+
+                return response.data;
             });
         },
 
+        runAfterLocalizationHook(localization, response) {
+            // Once the localization request has completed, we want to run the "after" hook.
+            // Devs can do what they need and we'll wait for them, but they can't cancel anything.
+            Statamic.$hooks
+                .run('localization.selected', {
+                    localization,
+                    entry: response?.values
+                })
+                .then(() => {
+                    this.$events.$emit('localization.selected', { container: this.$refs.container });
+                })
+                .catch((e) => { });
+        },
+
         createLocalization(localization) {
+            Statamic.$hooks
+                .run('localization.creating', {
+                    localization,
+                })
+                .then(async () => await this.createLocalizationRequest(localization))
+                .then(response => this.runAfterCreateLocalizationHook(localization, response))
+                .catch((error) => {
+                    this.$toast.error(error || __('Something went wrong'));
+                });
+        },
+
+        createLocalizationRequest(localization) {
             this.selectingOrigin = false;
 
             if (this.isCreating) {
@@ -688,15 +728,28 @@ export default {
 
             const originLocalization = this.localizations.find((e) => e.handle === this.selectedOrigin);
             const url = originLocalization.url + '/localize';
-            this.$axios.post(url, { site: localization.handle }).then((response) => {
-                this.editLocalization(response.data).then(() => {
+
+            return this.$axios
+                .post(url, { site: localization.handle })
+                .then((response) => this.editLocalizationRequest(response.data));
+        },
+
+        runAfterCreateLocalizationHook(localization, response) {
+            // Once the localization has been created, we want to run the "after" hook.
+            // Devs can do what they need and we'll wait for them, but they can't cancel anything.
+            Statamic.$hooks
+                .run('localization.created', {
+                    localization,
+                    entry: response?.values
+                })
+                .then(() => {
                     this.$events.$emit('localization.created', { container: this.$refs.container });
 
                     if (this.originValues.published) {
                         this.setFieldValue('published', true);
                     }
-                });
-            });
+                })
+                .catch((e) => { });
         },
 
         cancelLocalization() {
