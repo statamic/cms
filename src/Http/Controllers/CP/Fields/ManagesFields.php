@@ -1,30 +1,21 @@
 <?php
 
-namespace Statamic\Http\View\Composers;
+namespace Statamic\Http\Controllers\CP\Fields;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 use Statamic\Facades\Fieldset;
 use Statamic\Fields\FieldTransformer;
-use Statamic\Statamic;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
-class FieldComposer
+trait ManagesFields
 {
-    const VIEWS = [
-        'statamic::blueprints.edit',
-        'statamic::*.blueprints.edit',
-        'statamic::fieldsets.edit',
-    ];
-
-    protected $fieldsetFields;
-
-    public function compose()
+    private function fieldProps()
     {
-        Statamic::provideToScript([
+        return [
             'fieldsets' => $this->fieldsets(),
             'extensionRules' => $this->extensionRules(),
-        ]);
+        ];
     }
 
     private function fieldsets()

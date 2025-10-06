@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, watch, onMounted, getCurrentInstance } from 'vue';
+import { router } from '@inertiajs/vue3';
 
 const props = defineProps({
     title: { type: String, required: true },
@@ -40,7 +41,7 @@ const submit = () => {
     $axios
         .post(props.route, payload)
         .then((response) => {
-            window.location = response.data.redirect;
+            router.get(response.data.redirect);
         })
         .catch((error) => {
             $toast.error(error.response.data.message);

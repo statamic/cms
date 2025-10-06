@@ -39,9 +39,10 @@ class UserBlueprintController extends CpController
             ],
         ));
 
-        return view('statamic::users.blueprints.edit', [
-            'blueprint' => $blueprint,
-            'blueprintVueObject' => $this->toVueObject($blueprint),
+        return $this->renderEditPage([
+            'blueprint' => $this->toVueObject($blueprint),
+            'action' => cp_route('blueprints.users.update'),
+            'canDefineLocalizable' => false,
         ]);
     }
 

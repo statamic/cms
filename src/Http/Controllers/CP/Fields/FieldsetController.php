@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Fields;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\CP\Breadcrumbs\Breadcrumb;
 use Statamic\CP\Breadcrumbs\Breadcrumbs;
 use Statamic\Facades;
@@ -18,6 +19,8 @@ use function Statamic\trans as __;
 
 class FieldsetController extends CpController
 {
+    use ManagesFields;
+
     public function __construct()
     {
         $this->middleware(\Illuminate\Auth\Middleware\Authorize::class.':configure fields');
@@ -51,10 +54,15 @@ class FieldsetController extends CpController
         }
 
         if ($fieldsets->count() === 0) {
-            return view('statamic::fieldsets.empty');
+            return Inertia::render('fieldsets/Empty', [
+                'createUrl' => cp_route('fieldsets.create'),
+            ]);
         }
 
-        return view('statamic::fieldsets.index', compact('fieldsets'));
+        return Inertia::render('fieldsets/Index', [
+            'fieldsets' => $fieldsets,
+            'createUrl' => cp_route('fieldsets.create'),
+        ]);
     }
 
     private function group(Blueprint|Fieldset $item)
@@ -109,9 +117,10 @@ class FieldsetController extends CpController
             })->all(),
         ];
 
-        return view('statamic::fieldsets.edit', [
-            'fieldset' => $fieldset,
-            'fieldsetVueObject' => $vue,
+        return Inertia::render('fieldsets/Edit', [
+            'initialFieldset' => $vue,
+            'action' => cp_route('fieldsets.update', $fieldset->handle()),
+            ...$this->fieldProps(),
         ]);
     }
 
@@ -140,7 +149,9 @@ class FieldsetController extends CpController
 
     public function create()
     {
-        return view('statamic::fieldsets.create');
+        return Inertia::render('fieldsets/Create', [
+            'route' => cp_route('fieldsets.store'),
+        ]);
     }
 
     public function store(Request $request)
