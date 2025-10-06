@@ -13,14 +13,14 @@
             <div>
                 <div
                     v-show="dragging"
-                    class="absolute inset-0 flex flex-col gap-2 items-center justify-center bg-white/80 backdrop-blur-sm border border-gray-400 border-dashed rounded-lg"
+                    class="absolute inset-0 flex  gap-2 items-center justify-center bg-white/80 backdrop-blur-sm border border-gray-400 border-dashed rounded-lg"
                 >
                     <ui-icon name="upload-cloud" class="size-5 text-gray-500" />
-                    <ui-heading size="lg">{{ __('Drop to Upload') }}</ui-heading>
+                    <div class="text-sm text-gray-600 dark:text-gray-400">{{ __('Drop to Upload') }}</div>
                 </div>
 
                 <div class="border border-gray-400 dark:border-gray-700 border-dashed rounded-xl p-4 flex flex-col @2xs:flex-row items-center gap-4" :class="{ 'rounded-b-none': value.length }">
-                    <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center flex-1">
+                    <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center flex-1 justify-center">
                         <ui-icon name="upload-cloud" class="size-5 text-gray-500 me-2" />
                         <span v-text="`${__('Drag & drop here or')}&nbsp;`" />
                         <button type="button" class="underline underline-offset-2 cursor-pointer hover:text-black dark:hover:text-gray-200" @click.prevent="uploadFile">
