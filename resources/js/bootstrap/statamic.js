@@ -11,7 +11,6 @@ import FloatingVue from 'floating-vue';
 import 'floating-vue/dist/style.css';
 import { createInertiaApp } from '@inertiajs/vue3';
 import { router } from '@inertiajs/vue3';
-import Toasts from '../components/Toasts';
 import PortalVue from 'portal-vue';
 import Portals from '../components/portals/Portals';
 import Stacks from '../components/stacks/Stacks';
@@ -42,12 +41,11 @@ import {
     contrast,
     config,
     preferences,
+    toast,
 } from '@api';
 
 let bootingCallbacks = [];
 let bootedCallbacks = [];
-
-let toast;
 
 const portals = markRaw(new Portals());
 let stacks = new Stacks(portals);
@@ -238,7 +236,7 @@ export default {
         theme.initialize(this.initialConfig.user?.theme);
         contrast.initialize(this.initialConfig.user?.preferences?.strict_accessibility);
         preferences.initialize(this.initialConfig.user?.preferences, this.initialConfig.defaultPreferences);
-        toast = new Toasts(this.$app);
+        toast.initialize(this.$app);
 
         Object.assign(this.$app.config.globalProperties, {
             $config: config,

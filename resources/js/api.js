@@ -18,6 +18,7 @@ import Theme from './components/Theme.js';
 import Contrast from './components/Contrast.js';
 import Config from './components/Config.js';
 import Preferences from './components/Preference.js';
+import Toasts from './components/Toasts.js';
 
 export const keys = new Keys();
 export const components = new Components;
@@ -39,3 +40,4 @@ export const theme = new Theme();
 export const contrast = new Contrast();
 export const config = new Config();
 export const preferences = new Preferences();
+export const toast = new Toasts();
