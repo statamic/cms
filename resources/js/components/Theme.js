@@ -6,6 +6,7 @@ export default class Theme {
 
     constructor(preference) {
         this.#preference = ref(preference);
+        this.#setTheme(preference);
         this.#watchPreferences();
         this.#watchTheme();
         this.#listenForColorSchemeChange();
@@ -26,8 +27,7 @@ export default class Theme {
             (preference) => {
                 this.#setTheme(preference);
                 this.#savePreference(preference);
-            },
-            { immediate: true },
+            }
         );
     }
 

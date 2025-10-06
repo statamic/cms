@@ -44,7 +44,31 @@ import Layout from '@/pages/layout/Layout.vue';
 
 let bootingCallbacks = [];
 let bootedCallbacks = [];
+
+let config;
+let preferences;
 let components = new Components;
+let events = useGlobalEventBus();
+let progress = useProgressBar();
+let keys = new Keys();
+let fieldActions = new FieldActions();
+let conditions = new FieldConditions();
+let callbacks = new Callbacks();
+let dirty = useDirtyState();
+let slug = new Slugs();
+let hooks = new Hooks();
+let bard = new Bard();
+let reveal = new Reveal();
+let echo = new Echo();
+let permissions = new Permission();
+let dateFormatter = new DateFormatter();
+let commandPalette = new CommandPalette();
+let toast;
+let theme;
+let contrast;
+
+const portals = markRaw(new Portals());
+let stacks = new Stacks(portals);
 
 export default {
     booting(callback) {
@@ -56,39 +80,39 @@ export default {
     },
 
     get $config() {
-        return this.$app.config.globalProperties.$config;
+        return config;
     },
 
     get $preferences() {
-        return this.$app.config.globalProperties.$preferences;
+        return preferences;
     },
 
     get $callbacks() {
-        return this.$app.config.globalProperties.$callbacks;
+        return callbacks;
     },
 
     get $hooks() {
-        return this.$app.config.globalProperties.$hooks;
+        return hooks;
     },
 
     get $toast() {
-        return this.$app.config.globalProperties.$toast;
+        return toast;
     },
 
     get $conditions() {
-        return this.$app.config.globalProperties.$conditions;
+        return conditions;
     },
 
     get $slug() {
-        return this.$app.config.globalProperties.$slug;
+        return slug;
     },
 
     get $bard() {
-        return this.$app.config.globalProperties.$bard;
+        return bard;
     },
 
     get $echo() {
-        return this.$app.config.globalProperties.$echo;
+        return echo;
     },
 
     get $pinia() {
@@ -96,11 +120,11 @@ export default {
     },
 
     get $keys() {
-        return this.$app.config.globalProperties.$keys;
+        return keys;
     },
 
     get $permissions() {
-        return this.$app.config.globalProperties.$permissions;
+        return permissions;
     },
 
     get $components() {
@@ -108,35 +132,35 @@ export default {
     },
 
     get $date() {
-        return this.$app.config.globalProperties.$date;
+        return dateFormatter;
     },
 
     get $progress() {
-        return this.$app.config.globalProperties.$progress;
+        return progress;
     },
 
     get $theme() {
-        return this.$app.config.globalProperties.$theme;
+        return theme;
     },
 
     get $contrast() {
-        return this.$app.config.globalProperties.$contrast;
+        return contrast;
     },
 
     get $fieldActions() {
-        return this.$app.config.globalProperties.$fieldActions;
+        return fieldActions;
     },
 
     get $dirty() {
-        return this.$app.config.globalProperties.$dirty;
+        return dirty;
     },
 
     get $events() {
-        return this.$app.config.globalProperties.$events;
+        return events;
     },
 
     get $commandPalette() {
-        return this.$app.config.globalProperties.$commandPalette;
+        return commandPalette;
     },
 
     get user() {
@@ -228,38 +252,36 @@ export default {
         this.$app.use(FloatingVue, { disposeTimeout: 30000, distance: 10 });
         this.$app.use(VueComponentDebug, { enabled: import.meta.env.VITE_VUE_COMPONENT_DEBUG === 'true' });
 
-        const portals = markRaw(new Portals());
+        config = new Config(this.initialConfig);
+        theme = new Theme(this.initialConfig.user?.theme);
+        contrast = new Contrast(this.initialConfig.user?.preferences?.strict_accessibility);
+        preferences = new Preferences();
+        toast = new Toasts(this.$app);
 
         Object.assign(this.$app.config.globalProperties, {
-            $config: new Config(this.initialConfig),
-        });
-
-        Object.assign(this.$app.config.globalProperties, {
+            $config: config,
             $axios: axios,
-            $events: useGlobalEventBus(),
-            $preferences: new Preferences(),
-            $progress: useProgressBar(),
-            $keys: new Keys(),
-            $fieldActions: new FieldActions(),
-            $conditions: new FieldConditions(),
-            $callbacks: new Callbacks(),
-            $dirty: useDirtyState(),
-            $slug: new Slugs(),
+            $events: events,
+            $preferences: preferences,
+            $progress: progress,
+            $keys: keys,
+            $fieldActions: fieldActions,
+            $conditions: conditions,
+            $callbacks: callbacks,
+            $dirty: dirty,
+            $slug: slug,
             $portals: portals,
-            $stacks: new Stacks(portals),
-            $hooks: new Hooks(),
-            $toast: new Toasts(this.$app),
-            $bard: new Bard(),
-            $reveal: new Reveal(),
-            $echo: new Echo(),
-            $permissions: new Permission(),
-            $date: new DateFormatter(),
-            $commandPalette: new CommandPalette(),
-        });
-
-        Object.assign(this.$app.config.globalProperties, {
-            $theme: new Theme(this.initialConfig.user?.theme),
-            $contrast: new Contrast(this.initialConfig.user?.preferences?.strict_accessibility),
+            $stacks: stacks,
+            $hooks: hooks,
+            $toast: toast,
+            $bard: bard,
+            $reveal: reveal,
+            $echo: echo,
+            $permissions: permissions,
+            $date: dateFormatter,
+            $commandPalette: commandPalette,
+            $theme: theme,
+            $contrast: contrast,
         });
 
         Object.assign(this.$app.config.globalProperties, {
