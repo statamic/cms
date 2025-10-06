@@ -14,6 +14,8 @@ import Echo from './components/Echo.js';
 import Permission from './components/Permission.js';
 import DateFormatter from './components/DateFormatter.js';
 import CommandPalette from './components/CommandPalette.js';
+import Theme from './components/Theme.js';
+import Contrast from './components/Contrast.js';
 
 export const keys = new Keys();
 export const components = new Components;
@@ -31,3 +33,5 @@ export const echo = new Echo();
 export const permissions = new Permission();
 export const dateFormatter = new DateFormatter();
 export const commandPalette = new CommandPalette();
+export const theme = new Theme();
+export const contrast = new Contrast();

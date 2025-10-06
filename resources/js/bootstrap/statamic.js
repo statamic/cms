@@ -17,8 +17,6 @@ import Toasts from '../components/Toasts';
 import PortalVue from 'portal-vue';
 import Portals from '../components/portals/Portals';
 import Stacks from '../components/stacks/Stacks';
-import Theme from '../components/Theme.js';
-import Contrast from '../components/Contrast.js';
 import autosize from 'autosize';
 import wait from '@/util/wait.js';
 import markdown from '@/util/markdown.js';
@@ -42,6 +40,8 @@ import {
     permissions,
     dateFormatter,
     commandPalette,
+    theme,
+    contrast
 } from '@api';
 
 let bootingCallbacks = [];
@@ -50,8 +50,6 @@ let bootedCallbacks = [];
 let config;
 let preferences;
 let toast;
-let theme;
-let contrast;
 
 const portals = markRaw(new Portals());
 let stacks = new Stacks(portals);
@@ -239,8 +237,8 @@ export default {
         this.$app.use(VueComponentDebug, { enabled: import.meta.env.VITE_VUE_COMPONENT_DEBUG === 'true' });
 
         config = new Config(this.initialConfig);
-        theme = new Theme(this.initialConfig.user?.theme);
-        contrast = new Contrast(this.initialConfig.user?.preferences?.strict_accessibility);
+        theme.initialize(this.initialConfig.user?.theme);
+        contrast.initialize(this.initialConfig.user?.preferences?.strict_accessibility);
         preferences = new Preferences();
         toast = new Toasts(this.$app);
 
