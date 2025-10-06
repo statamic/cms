@@ -2,12 +2,30 @@
 import StatamicLogo from '@/../svg/statamic-logo-lime.svg';
 import useBodyClasses from './body-classes.js';
 import useStatamicPageProps from '@/composables/page-props.js';
+import { onMounted } from 'vue';
+import Theme from '@/components/Theme.js';
 
-useBodyClasses('bg-gray-50 font-sans leading-normal scheme-light p-2');
+useBodyClasses('bg-gray-50 dark:bg-gray-900 font-sans leading-normal scheme-light p-2');
 const { logos, cmsName } = useStatamicPageProps();
 const customLogo = logos.light.outside ?? logos.dark.outside ?? null;
 const lightCustomLogo = logos.light.outside ?? null;
 const darkCustomLogo = logos.dark.outside ?? logos.light.outside ?? null;
+
+// Use the same Theme class as the main application
+let themeInstance = null;
+
+onMounted(() => {
+    // Get user theme preference from localStorage (same as main app)
+    let userTheme = localStorage.getItem('statamic.theme');
+    
+    // Handle null, undefined, or the string "undefined" case by defaulting to 'auto'
+    if (userTheme === null || userTheme === undefined || userTheme === 'undefined') {
+        userTheme = 'auto';
+    }
+    
+    // Create Theme instance with the same logic as main app
+    themeInstance = new Theme(userTheme);
+});
 </script>
 
 <template>
