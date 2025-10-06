@@ -89,8 +89,9 @@ class TaxonomyBlueprintsController extends CpController
     {
         $this->pushTaxonomyBreadcrumbs($taxonomy);
 
-        return view('statamic::taxonomies.blueprints.create', [
-            'action' => cp_route('blueprints.taxonomies.store', $taxonomy),
+        return Inertia::render('blueprints/Create', [
+            'route' => cp_route('blueprints.taxonomies.store', $taxonomy),
+            'icon' => 'taxonomies',
         ]);
     }
 

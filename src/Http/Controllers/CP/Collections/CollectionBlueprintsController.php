@@ -89,8 +89,9 @@ class CollectionBlueprintsController extends CpController
     {
         $this->pushCollectionBreadcrumbs($collection);
 
-        return view('statamic::collections.blueprints.create', [
-            'action' => cp_route('blueprints.collections.store', $collection),
+        return Inertia::render('blueprints/Create', [
+            'route' => cp_route('blueprints.collections.store', $collection),
+            'icon' => 'collections',
         ]);
     }
 
