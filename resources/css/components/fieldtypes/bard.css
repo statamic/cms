@@ -2,7 +2,7 @@
 =================================================== */
 @layer ui {
     .bard-fieldtype:not(.form-group) {
-        @apply relative rounded-lg border outline-hidden dark:border-gray-600;
+        @apply relative rounded-lg border outline-hidden dark:border-gray-700;
     }
 }
 /* BARD / EDITOR
@@ -85,6 +85,9 @@
             @apply button-active;
             svg {
                 @apply text-black;
+                :where(.dark) & {
+                    @apply text-white;
+                }
             }
         }
 
@@ -286,7 +289,7 @@
     }
 
     .bard-fieldtype .bard-content {
-        @apply text-gray-900 dark:text-gray-300 bg-white dark:bg-gray-950 rounded-lg;
+        @apply text-gray-900 dark:text-gray-300 bg-white dark:bg-gray-900 rounded-lg;
         blockquote,
         ol,
         p,
