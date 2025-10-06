@@ -19,6 +19,8 @@ use function Statamic\trans as __;
 
 class FieldsetController extends CpController
 {
+    use ManagesFields;
+
     public function __construct()
     {
         $this->middleware(\Illuminate\Auth\Middleware\Authorize::class.':configure fields');
@@ -115,9 +117,10 @@ class FieldsetController extends CpController
             })->all(),
         ];
 
-        return view('statamic::fieldsets.edit', [
-            'fieldset' => $fieldset,
-            'fieldsetVueObject' => $vue,
+        return Inertia::render('fieldsets/Edit', [
+            'initialFieldset' => $vue,
+            'action' => cp_route('fieldsets.update', $fieldset->handle()),
+            ...$this->fieldProps(),
         ]);
     }
 

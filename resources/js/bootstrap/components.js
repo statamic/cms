@@ -27,7 +27,6 @@ import UpdaterWidget from '../components/updater/UpdaterWidget.vue';
 
 import BaseTermCreateForm from '../components/terms/BaseCreateForm.vue';
 import CreateTermButton from '../components/terms/CreateTermButton.vue';
-import FieldsetEditForm from '../components/fieldsets/EditForm.vue';
 import BlueprintListing from '../components/blueprints/Listing.vue';
 import BlueprintBuilder from '../components/blueprints/Builder.vue';
 import FormListing from '../components/forms/Listing.vue';
@@ -96,7 +95,6 @@ export default function registerGlobalComponents(app) {
     // Eventually they will be moved into their respective pages.
     app.component('BaseTermCreateForm', BaseTermCreateForm);
     app.component('CreateTermButton', CreateTermButton);
-    app.component('FieldsetEditForm', FieldsetEditForm);
     app.component('BlueprintListing', BlueprintListing);
     app.component('BlueprintBuilder', BlueprintBuilder);
     app.component('FormListing', FormListing);

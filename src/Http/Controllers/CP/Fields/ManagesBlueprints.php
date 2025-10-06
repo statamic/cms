@@ -4,13 +4,11 @@ namespace Statamic\Http\Controllers\CP\Fields;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Statamic\Exceptions\DuplicateFieldException;
 use Statamic\Exceptions\FieldsetRecursionException;
 use Statamic\Facades;
-use Statamic\Facades\Fieldset;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Support\Arr;
@@ -18,6 +16,8 @@ use Statamic\Support\Str;
 
 trait ManagesBlueprints
 {
+    use ManagesFields;
+
     private function indexItems(Collection $blueprints, $item)
     {
         return $blueprints->map(function ($blueprint) use ($item) {
@@ -179,35 +179,9 @@ trait ManagesBlueprints
 
     private function renderEditPage(array $props)
     {
-        return Inertia::render('blueprints/Edit', array_merge($props, [
-            'fieldsets' => $this->fieldsets(),
-            'extensionRules' => $this->extensionRules(),
-        ]));
-    }
-
-    private function fieldsets()
-    {
-        return Fieldset::all()->mapWithKeys(function ($fieldset) {
-            return [$fieldset->handle() => [
-                'handle' => $fieldset->handle(),
-                'title' => $fieldset->title(),
-                'fields' => collect(Arr::get($fieldset->contents(), 'fields'))->map(function ($field) {
-                    return FieldTransformer::toVue($field);
-                })->sortBy('config.display')->values()->all(),
-            ]];
-        })->sortBy('title');
-    }
-
-    private function extensionRules()
-    {
-        return collect(Validator::make([], [])->extensions)
-            ->keys()
-            ->map(function ($rule) {
-                return [
-                    'label' => Str::title(str_replace('_', ' ', $rule)),
-                    'value' => $rule,
-                ];
-            })
-            ->all();
+        return Inertia::render('blueprints/Edit', [
+            ...$props,
+            ...$this->fieldProps(),
+        ]);
     }
 }
