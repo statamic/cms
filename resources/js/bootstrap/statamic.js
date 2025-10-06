@@ -2,7 +2,6 @@ import { createApp, markRaw, h } from 'vue';
 import App from './App.vue';
 import { createPinia, defineStore } from 'pinia';
 import axios from 'axios';
-import Preferences from '../components/Preference';
 import registerGlobalComponents from './components.js';
 import registerGlobalCommandPalette from './commands.js';
 import registerUiComponents from './ui.js';
@@ -41,13 +40,13 @@ import {
     commandPalette,
     theme,
     contrast,
-    config
+    config,
+    preferences,
 } from '@api';
 
 let bootingCallbacks = [];
 let bootedCallbacks = [];
 
-let preferences;
 let toast;
 
 const portals = markRaw(new Portals());
@@ -238,7 +237,7 @@ export default {
         config.initialize(this.initialConfig);
         theme.initialize(this.initialConfig.user?.theme);
         contrast.initialize(this.initialConfig.user?.preferences?.strict_accessibility);
-        preferences = new Preferences();
+        preferences.initialize(this.initialConfig.user?.preferences, this.initialConfig.defaultPreferences);
         toast = new Toasts(this.$app);
 
         Object.assign(this.$app.config.globalProperties, {
