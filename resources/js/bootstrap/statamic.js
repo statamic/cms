@@ -2,7 +2,6 @@ import { createApp, markRaw, h } from 'vue';
 import App from './App.vue';
 import { createPinia, defineStore } from 'pinia';
 import axios from 'axios';
-import Config from '../components/Config';
 import Preferences from '../components/Preference';
 import registerGlobalComponents from './components.js';
 import registerGlobalCommandPalette from './commands.js';
@@ -41,13 +40,13 @@ import {
     dateFormatter,
     commandPalette,
     theme,
-    contrast
+    contrast,
+    config
 } from '@api';
 
 let bootingCallbacks = [];
 let bootedCallbacks = [];
 
-let config;
 let preferences;
 let toast;
 
@@ -236,7 +235,7 @@ export default {
         this.$app.use(FloatingVue, { disposeTimeout: 30000, distance: 10 });
         this.$app.use(VueComponentDebug, { enabled: import.meta.env.VITE_VUE_COMPONENT_DEBUG === 'true' });
 
-        config = new Config(this.initialConfig);
+        config.initialize(this.initialConfig);
         theme.initialize(this.initialConfig.user?.theme);
         contrast.initialize(this.initialConfig.user?.preferences?.strict_accessibility);
         preferences = new Preferences();
