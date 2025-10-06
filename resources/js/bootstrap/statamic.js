@@ -8,9 +8,6 @@ import registerGlobalComponents from './components.js';
 import registerGlobalCommandPalette from './commands.js';
 import registerUiComponents from './ui.js';
 import registerFieldtypes from './fieldtypes.js';
-import useGlobalEventBus from '../composables/global-event-bus';
-import useProgressBar from '../composables/progress-bar';
-import useDirtyState from '../composables/dirty-state';
 import VueClickAway from 'vue3-click-away';
 import FloatingVue from 'floating-vue';
 import 'floating-vue/dist/style.css';
@@ -18,51 +15,40 @@ import { createInertiaApp } from '@inertiajs/vue3';
 import { router } from '@inertiajs/vue3';
 import Toasts from '../components/Toasts';
 import PortalVue from 'portal-vue';
-import Keys from '../components/keys/Keys';
-import FieldActions from '../components/field-actions/FieldActions.js';
-import Callbacks from '../components/Callbacks';
-import Slugs from '../components/slugs/Manager';
 import Portals from '../components/portals/Portals';
 import Stacks from '../components/stacks/Stacks';
-import Hooks from '../components/Hooks';
-import Bard from '../components/Bard';
-import Components from '../components/Components';
 import Theme from '../components/Theme.js';
 import Contrast from '../components/Contrast.js';
-import FieldConditions from '../components/FieldConditions';
-import Reveal from '../components/Reveal';
-import Echo from '../components/Echo';
-import Permission from '../components/Permission';
 import autosize from 'autosize';
-import DateFormatter from '@/components/DateFormatter.js';
 import wait from '@/util/wait.js';
 import markdown from '@/util/markdown.js';
 import VueComponentDebug from 'vue-component-debug';
-import CommandPalette from '../components/CommandPalette.js';
 import { registerIconSetFromStrings } from '@ui';
 import Layout from '@/pages/layout/Layout.vue';
+import {
+    keys,
+    components,
+    events,
+    progress,
+    fieldActions,
+    conditions,
+    callbacks,
+    dirty,
+    slug,
+    hooks,
+    bard,
+    reveal,
+    echo,
+    permissions,
+    dateFormatter,
+    commandPalette,
+} from '@api';
 
 let bootingCallbacks = [];
 let bootedCallbacks = [];
 
 let config;
 let preferences;
-let components = new Components;
-let events = useGlobalEventBus();
-let progress = useProgressBar();
-let keys = new Keys();
-let fieldActions = new FieldActions();
-let conditions = new FieldConditions();
-let callbacks = new Callbacks();
-let dirty = useDirtyState();
-let slug = new Slugs();
-let hooks = new Hooks();
-let bard = new Bard();
-let reveal = new Reveal();
-let echo = new Echo();
-let permissions = new Permission();
-let dateFormatter = new DateFormatter();
-let commandPalette = new CommandPalette();
 let toast;
 let theme;
 let contrast;

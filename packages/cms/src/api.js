@@ -1,0 +1,18 @@
+export const {
+    bard,
+    callbacks,
+    commandPalette,
+    components,
+    conditions,
+    dateFormatter,
+    dirty,
+    echo,
+    events,
+    fieldActions,
+    hooks,
+    keys,
+    permissions,
+    progress,
+    reveal,
+    slug,
+} = __STATAMIC__.api;
