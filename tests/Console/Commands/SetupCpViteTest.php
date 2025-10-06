@@ -1,6 +1,6 @@
 <?php
 
-namespace Console\Commands;
+namespace Tests\Console\Commands;
 
 use Illuminate\Support\Facades\Process;
 use PHPUnit\Framework\Attributes\Test;

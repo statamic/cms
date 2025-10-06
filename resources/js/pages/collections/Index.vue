@@ -1,6 +1,7 @@
 <script setup>
 import Listing from '@/components/collections/Listing.vue';
 import { Icon, EmptyStateMenu, EmptyStateItem, DocsCallout } from '@ui';
+import useArchitecturalBackground from '@/pages/layout/architectural-background.js';
 
 const props = defineProps({
     collections: Array,
@@ -9,6 +10,8 @@ const props = defineProps({
     actionUrl: String,
     canCreate: Boolean,
 });
+
+if (props.collections.length === 0) useArchitecturalBackground();
 </script>
 
 <template>

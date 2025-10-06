@@ -1,223 +1,24 @@
-<template>
-    <div>
-        <Header v-if="mounted" :title="title" icon="navigation">
-            <Dropdown placement="left-start">
-                <DropdownMenu>
-                    <DropdownItem v-if="canEdit" :text="__('Configure Navigation')" icon="cog" :href="editUrl" />
-                    <DropdownItem v-if="canEditBlueprint" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="blueprintUrl" />
-                </DropdownMenu>
-            </Dropdown>
-
-            <ui-button
-                v-if="isDirty"
-                variant="filled"
-                :text="__('Discard changes')"
-                @click="$refs.tree.cancel"
-            />
-
-            <site-selector
-                v-if="sites.length > 1"
-                :sites="sites"
-                :model-value="site"
-                @update:modelValue="siteSelected"
-            />
-
-            <Dropdown v-if="canEdit && hasCollections" placement="left-start" :disabled="!hasCollections">
-                <template #trigger>
-                    <Button
-                        :text="__('Add')"
-                        icon-append="chevron-down"
-                    />
-                </template>
-                <DropdownMenu>
-                    <DropdownItem
-                        :text="__('Add Nav Item')"
-                        @click="linkPage()"
-                        icon="add-list"
-                    />
-                    <DropdownItem
-                        :text="__('Add Link to Entry')"
-                        @click="linkEntries()"
-                        icon="add-link"
-                    />
-                </DropdownMenu>
-            </Dropdown>
-
-            <Button
-                v-else-if="canEdit && !hasCollections"
-                :text="__('Add Nav Item')"
-                @click="addLink"
-            />
-
-            <Button
-                v-if="canEdit"
-                :disabled="!changed"
-                variant="primary"
-                :text="__('Save Changes')"
-                @click="$refs.tree?.save"
-            />
-        </Header>
-
-        <page-tree
-            ref="tree"
-            :pages-url="pagesUrl"
-            :submit-url="submitUrl"
-            :submit-parameters="{ data: submissionData }"
-            :max-depth="maxDepth"
-            :expects-root="expectsRoot"
-            :site="site"
-            :preferences-prefix="preferencesPrefix"
-            :editable="canEdit"
-            @edit-page="editPage"
-            @changed="
-                changed = true;
-                targetParent = null;
-            "
-            @saved="treeSaved"
-            @canceled="changed = false"
-        >
-            <template #empty>
-                <EmptyStateMenu :heading="__('Start designing your navigation with these steps')">
-                    <EmptyStateItem
-                        :href="editUrl"
-                        icon="configure"
-                        :heading="__('Configure Navigation')"
-                        :description="__('messages.navigation_configure_settings_intro')"
-                    />
-
-                    <EmptyStateItem
-                        icon="fieldtype-link"
-                        :heading="__('Link to URL')"
-                        :description="__('messages.navigation_link_to_url_instructions')"
-                        @click="linkPage()"
-                    />
-
-                    <EmptyStateItem
-                        v-if="hasCollections"
-                        icon="navigation"
-                        :heading="__('Link to Entry')"
-                        :description="__('messages.navigation_link_to_entry_instructions')"
-                        @click="linkEntries()"
-                    />
-
-                    <EmptyStateItem
-                        :href="docs_url('navigation')"
-                        icon="support"
-                        :heading="__('Read the Documentation')"
-                        :description="__('messages.navigation_documentation_instructions')"
-                    />
-                </EmptyStateMenu>
-            </template>
-
-            <template #branch-icon="{ branch }">
-                <ui-icon v-if="isEntryBranch(branch)" v-tooltip="__('Entry link')" class="size-3.5! text-gray-500" name="link" tabindex="-1" />
-                <ui-icon v-if="isLinkBranch(branch)" v-tooltip="__('External link')" class="size-3.5! text-gray-500" name="external-link" tabindex="-1" />
-                <ui-icon v-if="isTextBranch(branch)" v-tooltip="__('Text')" class="size-3.5! text-gray-500" name="page" tabindex="-1" />
-            </template>
-
-            <template v-if="canEdit" #branch-options="{ branch, removeBranch, stat, depth }">
-                <DropdownItem
-                    v-if="isEntryBranch(stat)"
-                    :text="__('Edit Entry')"
-                    :href="branch.edit_url"
-                    icon="edit"
-                />
-                <DropdownItem
-                    :text="__('Edit Nav Item')"
-                    @click="editPage(branch)"
-                    icon="edit"
-                />
-                <DropdownItem
-                    v-if="depth < maxDepth"
-                    :text="__('Add child nav item')"
-                    @click="linkPage(stat)"
-                    icon="add-list"
-                />
-                <DropdownItem
-                    v-if="depth < maxDepth && hasCollections"
-                    :text="__('Add child link to entry')"
-                    @click="linkEntries(stat)"
-                    icon="add-link"
-                />
-                <DropdownSeparator />
-                <DropdownItem
-                    :text="__('Remove')"
-                    variant="destructive"
-                    @click="deleteTreeBranch(branch, removeBranch)"
-                    icon="trash"
-                />
-            </template>
-        </page-tree>
-
-        <page-selector
-            v-if="hasCollections"
-            ref="selector"
-            :site="site"
-            :collections="collections"
-            :max-items="maxPagesSelection"
-            :can-select-across-sites="canSelectAcrossSites"
-            @selected="entriesSelected"
-        />
-
-        <page-editor
-            v-if="editingPage"
-            :site="site"
-            :id="editingPage.page.id"
-            :entry="editingPage.page.entry"
-            :editEntryUrl="editingPage.page.entry ? editingPage.page.edit_url : null"
-            :publish-info="publishInfo[editingPage.page.id]"
-            :blueprint="blueprint"
-            :handle="handle"
-            :read-only="!canEdit"
-            @publish-info-updated="updatePublishInfo"
-            @localized-fields-updated="updateLocalizedFields"
-            @closed="closePageEditor"
-            @submitted="updatePage"
-        />
-
-        <page-editor
-            v-if="creatingPage"
-            creating
-            :site="site"
-            :blueprint="blueprint"
-            :handle="handle"
-            :read-only="!canEdit"
-            @publish-info-updated="updatePendingCreatedPagePublishInfo"
-            @localized-fields-updated="updatePendingCreatedPageLocalizedFields"
-            @closed="closePageCreator"
-            @submitted="pageCreated"
-        />
-
-        <remove-page-confirmation
-            v-if="showPageDeletionConfirmation"
-            :children="numberOfChildrenToBeDeleted"
-            @confirm="pageDeletionConfirmCallback"
-            @cancel="
-                showPageDeletionConfirmation = false;
-                pageBeingDeleted = null;
-            "
-        />
-    </div>
-</template>
-
 <script>
-import PageEditor from '../structures/PageEditor.vue';
-import PageSelector from '../structures/PageSelector.vue';
-import RemovePageConfirmation from './RemovePageConfirmation.vue';
-import SiteSelector from '../SiteSelector.vue';
-import uniqid from 'uniqid';
 import { defineAsyncComponent } from 'vue';
 import { mapValues, pick } from 'lodash-es';
-import { Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, Button, EmptyStateMenu, EmptyStateItem, Header } from '@/components/ui';
+import uniqid from 'uniqid';
+import Head from '@/pages/layout/Head.vue';
+import PageEditor from '@/components/structures/PageEditor.vue';
+import PageSelector from '@/components/structures/PageSelector.vue';
+import RemovePageConfirmation from '@/components/navigation/RemovePageConfirmation.vue';
+import SiteSelector from '@/components/SiteSelector.vue';
+import { Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, Button, EmptyStateMenu, EmptyStateItem, Header } from '@ui';
+import { toggleArchitecturalBackground } from '@/pages/layout/architectural-background.js';
 
 export default {
     components: {
+        Head,
         Button,
         Dropdown,
         DropdownMenu,
         DropdownItem,
         DropdownSeparator,
-        PageTree: defineAsyncComponent(() => import('../structures/PageTree.vue')),
+        PageTree: defineAsyncComponent(() => import('@/components/structures/PageTree.vue')),
         PageEditor,
         PageSelector,
         RemovePageConfirmation,
@@ -466,6 +267,16 @@ export default {
             this.changed = false;
         },
 
+        treeLoaded(pages) {
+            toggleArchitecturalBackground(pages.length === 0);
+        },
+
+        treeChanged(pages) {
+            this.changed = true;
+            this.targetParent = null;
+            toggleArchitecturalBackground(pages.length === 0);
+        },
+
         replaceGeneratedIds(ids) {
             for (let [oldId, newId] of Object.entries(ids)) {
                 // Replace the ID in the publishInfo so if the tree is saved again, its
@@ -534,3 +345,205 @@ export default {
     },
 };
 </script>
+
+<template>
+    <div>
+        <Head :title="title" />
+
+        <Header v-if="mounted" :title="title" icon="navigation">
+            <Dropdown placement="left-start">
+                <DropdownMenu>
+                    <DropdownItem v-if="canEdit" :text="__('Configure Navigation')" icon="cog" :href="editUrl" />
+                    <DropdownItem v-if="canEditBlueprint" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="blueprintUrl" />
+                </DropdownMenu>
+            </Dropdown>
+
+            <ui-button
+                v-if="isDirty"
+                variant="filled"
+                :text="__('Discard changes')"
+                @click="$refs.tree.cancel"
+            />
+
+            <site-selector
+                v-if="sites.length > 1"
+                :sites="sites"
+                :model-value="site"
+                @update:modelValue="siteSelected"
+            />
+
+            <Dropdown v-if="canEdit && hasCollections" placement="left-start" :disabled="!hasCollections">
+                <template #trigger>
+                    <Button
+                        :text="__('Add')"
+                        icon-append="chevron-down"
+                    />
+                </template>
+                <DropdownMenu>
+                    <DropdownItem
+                        :text="__('Add Nav Item')"
+                        @click="linkPage()"
+                        icon="add-list"
+                    />
+                    <DropdownItem
+                        :text="__('Add Link to Entry')"
+                        @click="linkEntries()"
+                        icon="add-link"
+                    />
+                </DropdownMenu>
+            </Dropdown>
+
+            <Button
+                v-else-if="canEdit && !hasCollections"
+                :text="__('Add Nav Item')"
+                @click="addLink"
+            />
+
+            <Button
+                v-if="canEdit"
+                :disabled="!changed"
+                variant="primary"
+                :text="__('Save Changes')"
+                @click="$refs.tree?.save"
+            />
+        </Header>
+
+        <page-tree
+            ref="tree"
+            :pages-url="pagesUrl"
+            :submit-url="submitUrl"
+            :submit-parameters="{ data: submissionData }"
+            :max-depth="maxDepth"
+            :expects-root="expectsRoot"
+            :site="site"
+            :preferences-prefix="preferencesPrefix"
+            :editable="canEdit"
+            @edit-page="editPage"
+            @loaded="treeLoaded"
+            @changed="treeChanged"
+            @saved="treeSaved"
+            @canceled="changed = false"
+        >
+            <template #empty>
+                <EmptyStateMenu :heading="__('Start designing your navigation with these steps')">
+                    <EmptyStateItem
+                        :href="editUrl"
+                        icon="configure"
+                        :heading="__('Configure Navigation')"
+                        :description="__('messages.navigation_configure_settings_intro')"
+                    />
+
+                    <EmptyStateItem
+                        icon="fieldtype-link"
+                        :heading="__('Link to URL')"
+                        :description="__('messages.navigation_link_to_url_instructions')"
+                        @click="linkPage()"
+                    />
+
+                    <EmptyStateItem
+                        v-if="hasCollections"
+                        icon="navigation"
+                        :heading="__('Link to Entry')"
+                        :description="__('messages.navigation_link_to_entry_instructions')"
+                        @click="linkEntries()"
+                    />
+
+                    <EmptyStateItem
+                        :href="docs_url('navigation')"
+                        icon="support"
+                        :heading="__('Read the Documentation')"
+                        :description="__('messages.navigation_documentation_instructions')"
+                    />
+                </EmptyStateMenu>
+            </template>
+
+            <template #branch-icon="{ branch }">
+                <ui-icon v-if="isEntryBranch(branch)" v-tooltip="__('Entry link')" class="size-3.5! text-gray-500" name="link" tabindex="-1" />
+                <ui-icon v-if="isLinkBranch(branch)" v-tooltip="__('External link')" class="size-3.5! text-gray-500" name="external-link" tabindex="-1" />
+                <ui-icon v-if="isTextBranch(branch)" v-tooltip="__('Text')" class="size-3.5! text-gray-500" name="page" tabindex="-1" />
+            </template>
+
+            <template v-if="canEdit" #branch-options="{ branch, removeBranch, stat, depth }">
+                <DropdownItem
+                    v-if="isEntryBranch(stat)"
+                    :text="__('Edit Entry')"
+                    :href="branch.edit_url"
+                    icon="edit"
+                />
+                <DropdownItem
+                    :text="__('Edit Nav Item')"
+                    @click="editPage(branch)"
+                    icon="edit"
+                />
+                <DropdownItem
+                    v-if="depth < maxDepth"
+                    :text="__('Add child nav item')"
+                    @click="linkPage(stat)"
+                    icon="add-list"
+                />
+                <DropdownItem
+                    v-if="depth < maxDepth && hasCollections"
+                    :text="__('Add child link to entry')"
+                    @click="linkEntries(stat)"
+                    icon="add-link"
+                />
+                <DropdownSeparator />
+                <DropdownItem
+                    :text="__('Remove')"
+                    variant="destructive"
+                    @click="deleteTreeBranch(branch, removeBranch)"
+                    icon="trash"
+                />
+            </template>
+        </page-tree>
+
+        <page-selector
+            v-if="hasCollections"
+            ref="selector"
+            :site="site"
+            :collections="collections"
+            :max-items="maxPagesSelection"
+            :can-select-across-sites="canSelectAcrossSites"
+            @selected="entriesSelected"
+        />
+
+        <page-editor
+            v-if="editingPage"
+            :site="site"
+            :id="editingPage.page.id"
+            :entry="editingPage.page.entry"
+            :editEntryUrl="editingPage.page.entry ? editingPage.page.edit_url : null"
+            :publish-info="publishInfo[editingPage.page.id]"
+            :blueprint="blueprint"
+            :handle="handle"
+            :read-only="!canEdit"
+            @publish-info-updated="updatePublishInfo"
+            @localized-fields-updated="updateLocalizedFields"
+            @closed="closePageEditor"
+            @submitted="updatePage"
+        />
+
+        <page-editor
+            v-if="creatingPage"
+            creating
+            :site="site"
+            :blueprint="blueprint"
+            :handle="handle"
+            :read-only="!canEdit"
+            @publish-info-updated="updatePendingCreatedPagePublishInfo"
+            @localized-fields-updated="updatePendingCreatedPageLocalizedFields"
+            @closed="closePageCreator"
+            @submitted="pageCreated"
+        />
+
+        <remove-page-confirmation
+            v-if="showPageDeletionConfirmation"
+            :children="numberOfChildrenToBeDeleted"
+            @confirm="pageDeletionConfirmCallback"
+            @cancel="
+                showPageDeletionConfirmation = false;
+                pageBeingDeleted = null;
+            "
+        />
+    </div>
+</template>

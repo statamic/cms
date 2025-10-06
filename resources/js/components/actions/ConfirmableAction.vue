@@ -99,6 +99,8 @@ defineExpose({
         <component
             v-if="action.component"
             :is="action.component"
+            :action="action"
+            :values="values"
         />
 
         <template v-else>

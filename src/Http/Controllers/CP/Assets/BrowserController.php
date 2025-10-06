@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Assets;
 
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
+use Inertia\Inertia;
 use Statamic\Assets\AssetFolder;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\CP\Column;
@@ -41,22 +42,9 @@ class BrowserController extends CpController
 
         $this->setColumns($container);
 
-        return view('statamic::assets.browse', [
-            'container' => [
-                'id' => $container->id(),
-                'title' => $container->title(),
-                'edit_url' => $container->editUrl(),
-                'delete_url' => $container->deleteUrl(),
-                'blueprint_url' => cp_route('blueprints.asset-containers.edit', $container->handle()),
-                'can_edit' => User::current()->can('edit', $container),
-                'can_delete' => User::current()->can('delete', $container),
-                'can_upload' => User::current()->can('store', [\Statamic\Contracts\Assets\Asset::class, $container]),
-                'can_create_folders' => User::current()->can('create', [\Statamic\Contracts\Assets\AssetFolder::class, $container]),
-                'sort_field' => $container->sortField(),
-                'sort_direction' => $container->sortDirection(),
-            ],
-            'folder' => $path,
-            'columns' => $this->columns,
+        return Inertia::render('assets/Browse', [
+            ...$this->browseData($container, $path),
+            'editing' => null,
         ]);
     }
 
@@ -72,16 +60,33 @@ class BrowserController extends CpController
 
         $this->setColumns($container);
 
-        return view('statamic::assets.browse', [
+        return Inertia::render('assets/Browse', [
+            ...$this->browseData($container, $asset->folder()),
+            'editing' => $asset->id(),
+        ]);
+    }
+
+    protected function browseData($container, $path)
+    {
+        return [
             'container' => [
                 'id' => $container->id(),
                 'title' => $container->title(),
                 'edit_url' => $container->editUrl(),
+                'delete_url' => $container->deleteUrl(),
+                'blueprint_url' => cp_route('blueprints.asset-containers.edit', $container->handle()),
+                'can_edit' => User::current()->can('edit', $container),
+                'can_delete' => User::current()->can('delete', $container),
+                'can_upload' => User::current()->can('store', [\Statamic\Contracts\Assets\Asset::class, $container]),
+                'can_create_folders' => User::current()->can('create', [\Statamic\Contracts\Assets\AssetFolder::class, $container]),
+                'sort_field' => $container->sortField(),
+                'sort_direction' => $container->sortDirection(),
             ],
-            'folder' => $asset->folder(),
-            'editing' => $asset->id(),
+            'folder' => $path,
             'columns' => $this->columns,
-        ]);
+            'canCreateContainers' => User::current()->can('create', \Statamic\Contracts\Assets\AssetContainer::class),
+            'createContainerUrl' => cp_route('asset-containers.create'),
+        ];
     }
 
     public function folder(Request $request, $container, $path = '/')

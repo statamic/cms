@@ -1,17 +1,17 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import {
-    Badge,
-    DropdownItem,
-    Listing
-} from '@ui';
+import Head from '@/pages/layout/Head.vue';
+import { Header, Button, DocsCallout, CommandPaletteItem, Listing, Badge, DropdownItem } from '@ui';
 
-const props = defineProps(['initialRows', 'initialColumns']);
-const rows = ref(props.initialRows);
-const columns = ref(props.initialColumns);
+const props = defineProps({
+    addons: Array,
+    columns: Array,
+});
+
+const rows = ref(props.addons);
 
 onMounted(() => {
-    props.initialRows.forEach(addon => {
+    props.addons.forEach(addon => {
         Statamic.$commandPalette.add({
             category: Statamic.$commandPalette.category.Actions,
             text: [__('Browse the Marketplace'), addon.name],
@@ -24,13 +24,35 @@ onMounted(() => {
 </script>
 
 <template>
+    <Head :title="__('Addons')" />
+
+    <Header :title="__('Addons')" icon="addons">
+        <CommandPaletteItem
+            category="Actions"
+            :text="__('Browse the Marketplace')"
+            icon="external-link"
+            url="https://statamic.com/addons"
+            open-new-tab
+            prioritize
+            v-slot="{ text, url, icon }"
+        >
+            <Button
+                variant="primary"
+                :text="text"
+                :href="url"
+                :icon="icon"
+                target="_blank"
+            />
+        </CommandPaletteItem>
+    </Header>
+
     <Listing
         :items="rows"
         :columns="columns"
         :allow-search="false"
         :allow-customizing-columns="false"
     >
-        <template #cell-name="{ row: addon, index }">
+        <template #cell-name="{ row: addon }">
             <a v-if="addon.marketplace_url" :href="addon.marketplace_url" target="_blank">{{ __(addon.name) }}</a>
             <span v-else>
                 {{ __(addon.name) }}
@@ -46,4 +68,6 @@ onMounted(() => {
             <DropdownItem v-if="addon.settings_url" :text="__('Settings')" icon="cog" :href="addon.settings_url" />
         </template>
     </Listing>
+
+    <DocsCallout :topic="__('Addons')" url="addons" />
 </template>

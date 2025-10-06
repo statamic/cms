@@ -1,5 +1,8 @@
 <script setup>
 import Head from '@/pages/layout/Head.vue';
+import useArchitecturalBackground from '@/pages/layout/architectural-background.js';
+
+useArchitecturalBackground();
 
 const props = defineProps([
     'title',

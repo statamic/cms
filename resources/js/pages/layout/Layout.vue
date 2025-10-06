@@ -7,11 +7,11 @@ import LicensingAlert from '@/components/LicensingAlert.vue';
 import PortalTargets from '@/components/portals/PortalTargets.vue';
 import { provide, watch, ref } from 'vue';
 import useBodyClasses from './body-classes.js';
+import useStatamicPageProps from '@/composables/page-props.js';
 
 useBodyClasses('bg-global-header-bg dark:bg-dark-global-header-bg font-sans leading-normal text-gray-900 dark:text-white');
 
 const props = defineProps({
-    architecturalBackground: { type: Boolean, default: false },
     additionalBreadcrumbs: { type: Array, default: () => [] },
 });
 
@@ -32,7 +32,7 @@ provide('layout', {
         <main id="main" class="flex bg-body-bg dark:bg-dark-body-bg dark:border-t rounded-t-2xl dark:border-dark-body-border fixed top-14 inset-x-0 bottom-0 min-h-[calc(100vh-3.5rem)]">
             <Nav />
             <div id="main-content" class="main-content p-2 h-full flex-1 overflow-y-auto rounded-t-2xl">
-                <div class="relative content-card min-h-full" :class="{'bg-architectural-lines': architecturalBackground}">
+                <div id="content-card" class="relative content-card min-h-full">
                     <slot />
                 </div>
             </div>
