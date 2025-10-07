@@ -23,9 +23,6 @@ class HandleInertiaRequests extends Middleware
 
     public function share(Request $request): array
     {
-        $toasts = $this->toasts->toArray();
-        $this->toasts->clear();
-
         return array_filter([
             ...parent::share($request),
             '_statamic' => [
@@ -33,7 +30,7 @@ class HandleInertiaRequests extends Middleware
                 'cmsName' => __(Statamic::pro() ? config('statamic.cp.custom_cms_name', 'Statamic') : 'Statamic'),
                 'logos' => $this->logos(),
             ],
-            '_toasts' => $toasts ?: null,
+            '_toasts' => $this->toasts($request),
         ]);
     }
 
@@ -62,5 +59,28 @@ class HandleInertiaRequests extends Middleware
                 'outside' => $dark['outside'] ?? null,
             ],
         ];
+    }
+
+    private function toasts(Request $request)
+    {
+        $session = $request->session();
+
+        if ($message = $session->get('success')) {
+            $this->toasts->success($message);
+        }
+
+        if ($message = $session->get('error')) {
+            $this->toasts->error($message);
+        }
+
+        if ($message = $session->get('info')) {
+            $this->toasts->info($message);
+        }
+
+        $toasts = $this->toasts->toArray();
+
+        $this->toasts->clear();
+
+        return $toasts;
     }
 }
