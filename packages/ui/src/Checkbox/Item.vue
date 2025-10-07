@@ -21,6 +21,15 @@ const emit = defineEmits(['update:modelValue']);
 
 const id = useId();
 
+const handleKeydown = (event) => {
+    if (event.key === 'Enter') {
+        const form = event.target.closest('form');
+        if (form) {
+            form.requestSubmit();
+        }
+    }
+};
+
 const checkboxClasses = computed(() => {
     return cva({
         base: [
@@ -82,6 +91,7 @@ const conditionalProps = computed(() => {
             :value="value"
             v-bind="conditionalProps"
             @update:modelValue="emit('update:modelValue', $event)"
+            @keydown="handleKeydown"
             :class="checkboxClasses"
             :tabindex="tabindex"
         >
