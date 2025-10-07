@@ -62,7 +62,7 @@ const badgeClasses = computed(() => {
                 yellow: 'bg-yellow-100 dark:bg-yellow-300/6 border-yellow-400 dark:border-yellow-400/25 text-yellow-700 dark:text-yellow-300 [a]:hover:bg-yellow-200/80 dark:[a]:hover:bg-yellow-300/15 [button]:hover:bg-yellow-200/80 dark:[button]:hover:bg-yellow-200/9',
             },
             variant: {
-                default: 'border dark:border-none shadow-ui-sm',
+                default: 'border dark:border-none shadow-ui-sm dark:pb-0.25',
                 flat: 'border-0 shadow-none!',
             },
             pill: { true: 'rounded-full' },
