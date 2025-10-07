@@ -33,7 +33,7 @@ function enableWarning() {
 
     // For Inertia navigation (e.g. through Link component)
     inertiaWarningListener = router.on('before', event => {
-        const confirmed = confirm('You have unsaved changes. Are you sure you want to leave this page?');
+        const confirmed = confirm(__('statamic::messages.dirty_navigation_warning'));
         if (confirmed) {
             // Clear state so subsequent navigations don't prompt again
             router.on('success', () => clear());
