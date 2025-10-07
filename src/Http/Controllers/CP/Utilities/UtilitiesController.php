@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Utilities;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Facades\Utility;
 use Statamic\Http\Controllers\CP\CpController;
 
@@ -10,8 +11,13 @@ class UtilitiesController extends CpController
 {
     public function index()
     {
-        return view('statamic::utilities.index', [
-            'utilities' => Utility::authorized()->sortBy->title(),
+        return Inertia::render('utilities/Index', [
+            'utilities' => Utility::authorized()->sortBy->title()->map(fn ($utility) => [
+                'title' => $utility->title(),
+                'description' => $utility->description(),
+                'icon' => $utility->icon(),
+                'url' => $utility->url(),
+            ])->values(),
         ]);
     }
 
