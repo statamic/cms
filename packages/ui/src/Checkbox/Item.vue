@@ -17,12 +17,14 @@ const props = defineProps({
     value: { type: [String, Number, Boolean] },
 });
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue', 'keydown']);
 
 const id = useId();
 
 const handleKeydown = (event) => {
-    if (event.key === 'Enter') {
+    emit('keydown', event);
+
+    if (event.key === 'Enter' && !event.defaultPrevented) {
         const form = event.target.closest('form');
         if (form) {
             form.requestSubmit();
