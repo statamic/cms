@@ -43,6 +43,7 @@ class HandleInertiaRequests extends Middleware
 
         return [
             'text' => config('statamic.cp.custom_logo_text'),
+            'siteName' => config('app.name'),
             'light' => [
                 'nav' => $light['nav'] ?? null,
                 'outside' => $light['outside'] ?? null,
