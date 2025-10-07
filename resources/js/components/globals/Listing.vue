@@ -2,7 +2,7 @@
     <CardList :heading="__('Title')">
         <CardListItem v-for="global in globals" :key="global.id">
             <Tooltip :text="global.handle" :delay="1000">
-                <a :href="global.edit_url">{{ __(global.title) }}</a>
+                <a class="text-sm" :href="global.edit_url">{{ __(global.title) }}</a>
             </Tooltip>
             <Dropdown>
                 <DropdownMenu>

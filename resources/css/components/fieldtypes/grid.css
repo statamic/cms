@@ -33,8 +33,8 @@
             top: auto;
         }
 
-        /* Bard fieldtype > Grid fieldtype */
-        .bard-content & {
+        /* Bard field with a fixed toolbar > Grid fieldtype */
+        .bard-fieldtype:has(> .bard-fixed-toolbar) .bard-content & {
             @apply top-8;
         }
     }
@@ -44,8 +44,8 @@
         @apply top-8;
     }
 
-    /* Bard fieldtype > Grid fieldtype > Bard fieldtype */
-    .bard-content & .bard-fixed-toolbar {
+    /* Bard field with a fixed toolbar > Grid fieldtype > Bard fieldtype */
+    .bard-fieldtype:has(> .bard-fixed-toolbar) .bard-content & .bard-fixed-toolbar {
         @apply top-16;
     }
 

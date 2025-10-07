@@ -4,6 +4,7 @@ namespace Statamic\Http\Middleware\CP;
 
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use Statamic\CP\Toasts\Manager;
 use Statamic\Statamic;
 
 class HandleInertiaRequests extends Middleware
@@ -15,6 +16,11 @@ class HandleInertiaRequests extends Middleware
         return parent::version($request);
     }
 
+    public function __construct(private Manager $toasts)
+    {
+        //
+    }
+
     public function share(Request $request): array
     {
         return array_filter([
@@ -24,6 +30,7 @@ class HandleInertiaRequests extends Middleware
                 'cmsName' => __(Statamic::pro() ? config('statamic.cp.custom_cms_name', 'Statamic') : 'Statamic'),
                 'logos' => $this->logos(),
             ],
+            '_toasts' => $this->toasts($request),
         ]);
     }
 
@@ -43,6 +50,7 @@ class HandleInertiaRequests extends Middleware
 
         return [
             'text' => config('statamic.cp.custom_logo_text'),
+            'siteName' => config('app.name'),
             'light' => [
                 'nav' => $light['nav'] ?? null,
                 'outside' => $light['outside'] ?? null,
@@ -52,5 +60,28 @@ class HandleInertiaRequests extends Middleware
                 'outside' => $dark['outside'] ?? null,
             ],
         ];
+    }
+
+    private function toasts(Request $request)
+    {
+        $session = $request->session();
+
+        if ($message = $session->get('success')) {
+            $this->toasts->success($message);
+        }
+
+        if ($message = $session->get('error')) {
+            $this->toasts->error($message);
+        }
+
+        if ($message = $session->get('info')) {
+            $this->toasts->info($message);
+        }
+
+        $toasts = $this->toasts->toArray();
+
+        $this->toasts->clear();
+
+        return $toasts;
     }
 }
