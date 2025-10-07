@@ -53,7 +53,7 @@ function actionFailed(response) {
             <div class="[.nav-open_&]:translate-x-23 transition-transform duration-300 relative space-y-3 rounded-xl border border-gray-300/60 p-1 bg-gray-200/50 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:border-none dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/15">
             <ButtonGroup>
                 <Button
-                    class="text-blue-500!"
+                    class="text-blue-500! dark:text-blue-400!"
                     :text="__n(`Deselect :count item|Deselect all :count items`, selections.length)"
                     @click="clearSelections"
                 />
