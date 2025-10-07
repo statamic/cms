@@ -25,10 +25,7 @@ const handleKeydown = (event) => {
     emit('keydown', event);
 
     if (event.key === 'Enter' && !event.defaultPrevented) {
-        const form = event.target.closest('form');
-        if (form) {
-            form.requestSubmit();
-        }
+        event.target.closest('form')?.requestSubmit();
     }
 };
 
