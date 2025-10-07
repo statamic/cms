@@ -4,6 +4,7 @@ namespace Statamic\Http\Middleware\CP;
 
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use Statamic\CP\Toasts\Manager;
 use Statamic\Statamic;
 
 class HandleInertiaRequests extends Middleware
@@ -15,8 +16,16 @@ class HandleInertiaRequests extends Middleware
         return parent::version($request);
     }
 
+    public function __construct(private Manager $toasts)
+    {
+        //
+    }
+
     public function share(Request $request): array
     {
+        $toasts = $this->toasts->toArray();
+        $this->toasts->clear();
+
         return array_filter([
             ...parent::share($request),
             '_statamic' => [
@@ -24,6 +33,7 @@ class HandleInertiaRequests extends Middleware
                 'cmsName' => __(Statamic::pro() ? config('statamic.cp.custom_cms_name', 'Statamic') : 'Statamic'),
                 'logos' => $this->logos(),
             ],
+            '_toasts' => $toasts ?: null,
         ]);
     }
 
