@@ -2,6 +2,7 @@
 
 namespace Statamic\CP\Utilities;
 
+use Statamic\Facades\Search;
 use Statamic\Facades\Utility;
 use Statamic\Http\Controllers\CP\LicensingController;
 use Statamic\Http\Controllers\CP\Utilities\CacheController;
@@ -37,7 +38,7 @@ class CoreUtilities
             ->docsUrl(Statamic::docsUrl('utilities/phpinfo'));
 
         Utility::register('search')
-            ->view('statamic::utilities.search')
+            ->inertia('utilities/Search', fn () => static::searchData())
             ->title(__('Search'))
             ->icon('magnifying-glass')
             ->description(__('statamic::messages.search_utility_description'))
@@ -76,5 +77,21 @@ class CoreUtilities
                     $router->post('/', [GitController::class, 'commit'])->name('commit');
                 });
         }
+    }
+
+    private static function searchData()
+    {
+        return [
+            'updateUrl' => cp_route('utilities.search.update'),
+            'indexes' => Search::indexes()->map(fn ($index) => [
+                'name' => $index->name(),
+                'locale' => $index->locale(),
+                'title' => $index->title(),
+                'driver' => $index->config()['driver'],
+                'driverIcon' => Statamic::svg('search-drivers/'.$index->config()['driver'], '', 'search-drivers/local'),
+                'searchables' => $index->config()['searchables'],
+                'fields' => $index->config()['fields'],
+            ])->values(),
+        ];
     }
 }

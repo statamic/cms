@@ -25,13 +25,17 @@ class UtilitiesController extends CpController
     {
         $utility = Utility::findBySlug($this->getUtilityHandle($request));
 
+        if ($component = $utility->inertia()) {
+            return Inertia::render($component, $utility->viewData($request));
+        }
+
         if ($view = $utility->view()) {
             return Inertia::render('utilities/Show', [
                 'html' => $this->renderView($view, $utility->viewData($request)),
             ]);
         }
 
-        throw new \Exception("Utility [{$utility->handle()}] has not been provided with an action or view.");
+        throw new \Exception("Utility [{$utility->handle()}] has not been provided with an action, view, or inertia component.");
     }
 
     private function renderView($view, $data)
