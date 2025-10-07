@@ -308,7 +308,7 @@
             }
 
             a {
-                @apply break-words text-blue-600 underline dark:text-blue-100;
+                @apply break-words text-blue-600 underline dark:text-blue-400;
             }
 
             a:active,
