@@ -5,7 +5,7 @@
             <div class="flex flex-1 items-center justify-between">
                 <div class="flex flex-1 items-center py-2">
                     <ui-icon
-                        class="size-4 me-2 text-gray-500"
+                        class="size-4 me-2 text-gray-500 dark:text-gray-400"
                         :name="field.icon"
                         v-tooltip="tooltipText"
                     />
