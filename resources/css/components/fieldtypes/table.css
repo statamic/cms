@@ -50,7 +50,7 @@ Table Fieldtype
     }
 
     tbody {
-        @apply outline-hidden dark:bg-gray-800;
+        @apply outline-hidden dark:bg-gray-850;
 
         th {
             @apply bg-gray-50 p-2 text-sm font-medium text-gray-700 text-start border-r border-b border-gray-200 dark:border-dark-900 dark:bg-gray-700 dark:text-gray-100 overflow-hidden;
@@ -86,7 +86,7 @@ Table Fieldtype
         }
 
         td {
-            @apply border-b p-0 dark:border-dark-900 border-e;
+            @apply border-b p-0 dark:border-dark-600 border-e;
 
             &:first-child.grid-cell {
                 @apply ps-4;
