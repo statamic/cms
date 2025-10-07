@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Forms;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\CP\Column;
 use Statamic\CP\PublishForm;
@@ -45,14 +46,13 @@ class FormsController extends CpController
             })
             ->values();
 
-        if ($forms->count() === 0) {
-            return view('statamic::forms.empty');
-        }
-
-        return view('statamic::forms.index', [
+        return Inertia::render('forms/Index', [
             'forms' => $forms,
             'initialColumns' => $columns,
             'actionUrl' => cp_route('forms.actions.run'),
+            'canCreate' => User::current()->can('create', FormContract::class),
+            'createUrl' => cp_route('forms.create'),
+            'configureEmailUrl' => cp_route('utilities.email'),
         ]);
     }
 

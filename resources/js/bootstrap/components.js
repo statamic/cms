@@ -28,7 +28,6 @@ import BaseTermCreateForm from '../components/terms/BaseCreateForm.vue';
 import CreateTermButton from '../components/terms/CreateTermButton.vue';
 import BlueprintListing from '../components/blueprints/Listing.vue';
 import BlueprintBuilder from '../components/blueprints/Builder.vue';
-import FormListing from '../components/forms/Listing.vue';
 import FormSubmissionListing from '../components/forms/SubmissionListing.vue';
 import GlobalListing from '../components/globals/Listing.vue';
 import GlobalPublishForm from '../components/globals/PublishForm.vue';
@@ -94,7 +93,6 @@ export default function registerGlobalComponents(app) {
     app.component('CreateTermButton', CreateTermButton);
     app.component('BlueprintListing', BlueprintListing);
     app.component('BlueprintBuilder', BlueprintBuilder);
-    app.component('FormListing', FormListing);
     app.component('FormSubmissionListing', FormSubmissionListing);
     app.component('GlobalListing', GlobalListing);
     app.component('GlobalPublishForm', GlobalPublishForm);
