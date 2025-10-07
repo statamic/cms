@@ -109,6 +109,7 @@ class CpServiceProvider extends ServiceProvider
             \Statamic\Http\Middleware\CP\AddVaryHeaderToResponse::class,
             \Statamic\Http\Middleware\CP\RedirectIfTwoFactorSetupIncomplete::class,
             \Statamic\Http\Middleware\DeleteTemporaryFileUploads::class,
+            \Statamic\Http\Middleware\CP\HandleAuthenticatedInertiaRequests::class,
         ]);
     }
 
