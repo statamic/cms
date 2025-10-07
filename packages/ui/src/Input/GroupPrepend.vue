@@ -14,7 +14,7 @@ const props = defineProps({
         ]"
         data-ui-input-group-prepend
     >
-        <span v-if="text" class="text-gray-500 dark:text-gray-600">{{ text }}</span>
+        <span v-if="text" class="text-gray-500 dark:text-gray-400">{{ text }}</span>
         <slot v-else />
     </div>
 </template>
