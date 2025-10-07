@@ -68,12 +68,6 @@ Table Fieldtype
 
             &:first-child td {
                 @apply overflow-hidden;
-                &:first-child {
-                    @apply rounded-tl-lg;
-                }
-                &:last-child {
-                    @apply rounded-tr-lg;
-                }
             }
 
             &:last-child td {
