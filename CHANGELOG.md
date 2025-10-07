@@ -1,5 +1,27 @@
 # Release Notes
 
+## 6.0.0-alpha.11 (2025-10-07)
+
+### What's new
+- JS API fixes and adjustments [#12665](https://github.com/statamic/cms/issues/12665) by @jasonvarga
+- Inertia-fy Utilities [#12674](https://github.com/statamic/cms/issues/12674) by @jasonvarga
+- Inertia-fy the blueprints and fieldsets areas [#12656](https://github.com/statamic/cms/issues/12656) by @jasonvarga
+
+### What's fixed
+- Inertia toast handling [#12670](https://github.com/statamic/cms/issues/12670) by @jasonvarga
+- Bard sticky floating toolbar fixes [#12661](https://github.com/statamic/cms/issues/12661) by @JayGeorge
+- If you're focused on a checkbox, Enter now submits the nearest form.  [#12671](https://github.com/statamic/cms/issues/12671) by @jackmcdade
+- Fix missing site name in header [#12673](https://github.com/statamic/cms/issues/12673) by @jasonvarga
+- Fix translations [#12666](https://github.com/statamic/cms/issues/12666) by @jasonvarga
+- Move blade badge to header [#12669](https://github.com/statamic/cms/issues/12669) by @jasonvarga
+- Global site selector should only be visible when you have > 1 site [#12655](https://github.com/statamic/cms/issues/12655) by @duncanmcclean
+- Make the Globals index look like the other indexes [aceb87731](https://github.com/statamic/cms/commit/aceb87731)
+- Fix select/combobox chevron overflow [247d4d143](https://github.com/statamic/cms/commit/247d4d143)
+- Fix drop-to-upload ui [7fd35d50c](https://github.com/statamic/cms/commit/7fd35d50c)
+- French translations [#12672](https://github.com/statamic/cms/issues/12672) by @ebeauchamps
+
+
+
 ## 6.0.0-alpha.10 (2025-10-03)
 
 ### What's new
