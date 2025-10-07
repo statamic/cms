@@ -1,7 +1,8 @@
 /* BARD
 =================================================== */
 @layer ui {
-    .bard-fieldtype:not(.form-group) {
+    /* .grid-cell, [data-ui-input-group] are exceptions for Bard fieldtypes inside a Grid fieldtype, since these cause double borders */
+    .bard-fieldtype:not(.form-group, .grid-cell, [data-ui-input-group]) {
         @apply relative rounded-lg border outline-hidden dark:border-gray-700;
     }
 }
