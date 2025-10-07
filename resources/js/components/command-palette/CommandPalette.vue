@@ -286,7 +286,7 @@ const modalClasses = cva({
                     <DialogDescription>{{ __('Search for content, navigate, and run actions.') }}</DialogDescription>
                 </VisuallyHidden>
                 <motion.div
-                    class="relative rounded-xl border-b border-gray-200/80 bg-white shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:border-gray-950 dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/15"
+                    class="relative rounded-xl border-b border-gray-200/80 bg-white shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:border-gray-950 dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/10"
                     :initial="{ scale: 1.0 }"
                     :whilePress="{ scale: 0.985 }"
                     :transition="{ duration: 0.1 }"
