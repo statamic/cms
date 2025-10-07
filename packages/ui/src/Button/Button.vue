@@ -42,7 +42,7 @@ const buttonClasses = computed(() => {
                 primary: [
                     'bg-linear-to-b from-primary/90 to-primary hover:bg-primary-hover text-white disabled:text-white/60 dark:disabled:text-white/50 border border-primary-border shadow-ui-md inset-shadow-2xs inset-shadow-white/25 [&_svg]:text-white [&_svg]:opacity-60',
                 ],
-                danger: 'btn-danger bg-linear-to-b from-red-600/90 to-red-600 hover:bg-red-600/90 text-white border border-red-600 inset-shadow-2xs inset-shadow-red-300 [&_svg]:text-red-200 disabled:text-red-200',
+                danger: 'btn-danger bg-linear-to-b from-red-600/90 to-red-600 dark:from-red-600/85 dark:to-red-600 hover:bg-red-600/90 text-white border border-red-600 inset-shadow-2xs inset-shadow-red-300 [&_svg]:text-red-200 disabled:text-red-200',
                 filled: 'bg-black/5 hover:bg-black/10 hover:text-gray-900 dark:hover:text-white dark:bg-white/15 dark:hover:bg-white/20 [&_svg]:opacity-70',
                 ghost: 'bg-transparent hover:bg-gray-400/10 text-gray-900 dark:text-gray-300 dark:hover:bg-white/15 dark:hover:text-gray-200',
                 'ghost-pressed': 'bg-transparent hover:bg-gray-400/10 text-black dark:text-white dark:hover:bg-white/15 dark:hover:text-white [&_svg]:opacity-100',
@@ -63,7 +63,6 @@ const buttonClasses = computed(() => {
                 // Danger button base styling should be the same as default buttons when in a group
                 danger: [
                     'btn-danger in-data-ui-button-group:bg-linear-to-b in-data-ui-button-group:from-white in-data-ui-button-group:to-gray-50 in-data-ui-button-group:hover:to-gray-100 in-data-ui-button-group:hover:bg-gray-50 in-data-ui-button-group:text-gray-900 in-data-ui-button-group:border in-data-ui-button-group:border-gray-300 in-data-ui-button-group:shadow-ui-sm',
-                    'dark:from-gray-850 dark:to-gray-900 dark:hover:to-gray-850 dark:hover:bg-gray-900 dark:border-gray-700 dark:text-gray-300 dark:shadow-ui-md',
                 ],
                 ghost: '',
                 pressed: 'in-data-ui-button-group:border-s-0 [:is([data-ui-button-group]>&:first-child,_[data-ui-button-group]_:first-child>&)]:border-s-[1px]',
