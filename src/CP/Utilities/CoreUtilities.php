@@ -47,7 +47,7 @@ class CoreUtilities
             });
 
         Utility::register('email')
-            ->view('statamic::utilities.email')
+            ->inertia('utilities/Email', fn () => static::emailData())
             ->title(__('Email'))
             ->icon('mail')
             ->description(__('statamic::messages.email_utility_description'))
@@ -92,6 +92,36 @@ class CoreUtilities
                 'searchables' => $index->config()['searchables'],
                 'fields' => $index->config()['fields'],
             ])->values(),
+        ];
+    }
+
+    private static function emailData()
+    {
+        return [
+            'sendUrl' => cp_route('utilities.email'),
+            'defaultEmail' => auth()->user()->email(),
+            'config' => [
+                'path' => config_path('mail.php'),
+                'default' => config('mail.default'),
+                'smtp' => config('mail.default') === 'smtp' ? [
+                    'host' => config('mail.mailers.smtp.host'),
+                    'port' => config('mail.mailers.smtp.port'),
+                    'encryption' => config('mail.mailers.smtp.encryption'),
+                    'username' => config('mail.mailers.smtp.username'),
+                    'password' => config('mail.mailers.smtp.password'),
+                ] : null,
+                'sendmail' => config('mail.default') === 'sendmail' ? [
+                    'path' => config('mail.mailers.sendmail.path'),
+                ] : null,
+                'from' => [
+                    'address' => config('mail.from.address'),
+                    'name' => config('mail.from.name'),
+                ],
+                'markdown' => [
+                    'theme' => config('mail.markdown.theme'),
+                    'paths' => config('mail.markdown.paths', []),
+                ],
+            ],
         ];
     }
 }
