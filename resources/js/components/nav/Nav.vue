@@ -44,7 +44,8 @@ Statamic.$events.$on('nav.toggle', toggle);
                 <li v-for="(item, i) in section.items" :key="i">
                     <DynamicHtmlRenderer v-if="item.view" :html="item.view" />
                     <template v-else>
-                        <Link
+                        <component
+                            :is="item.attributes?.target === '_blank' ? 'a' : Link"
                             :href="item.url"
                             v-bind="item.attributes"
                             :class="{ 'active': item.active }"
@@ -52,10 +53,11 @@ Statamic.$events.$on('nav.toggle', toggle);
                         >
                             <Icon :name="item.icon" />
                             <span v-text="__(item.display)" />
-                        </Link>
+                        </component>
                         <ul v-if="item.children.length && item.active">
                             <li v-for="(child, i) in item.children" :key="i">
-                                <Link
+                                <component
+                                    :is="child.attributes?.target === '_blank' ? 'a' : Link"
                                     :href="child.url"
                                     v-bind="child.attributes"
                                     v-text="__(child.display)"
