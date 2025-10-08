@@ -282,6 +282,7 @@ import {
 import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
 import { computed, ref } from 'vue';
 import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';
+import { router } from '@inertiajs/vue3';
 
 let saving = ref(false);
 let errors = ref({});
@@ -570,12 +571,12 @@ export default {
 
                     // If the user has opted to create another entry, redirect them to create page.
                     if (!this.isInline && nextAction === 'create_another') {
-                        window.location = this.createAnotherUrl;
+                        this.redirectTo(this.createAnotherUrl);
                     }
 
                     // If the user has opted to go to listing (default/null option), redirect them there.
                     else if (!this.isInline && nextAction === null) {
-                        window.location = this.listingUrl;
+                        this.redirectTo(this.listingUrl);
                     }
 
                     // Otherwise, leave them on the edit form and emit an event. We need to wait until after
@@ -679,7 +680,7 @@ export default {
             this.selectingOrigin = false;
 
             if (this.isCreating) {
-                this.$nextTick(() => (window.location = localization.url));
+                this.$nextTick(() => this.redirectTo(localization.url));
                 return;
             }
 
@@ -738,12 +739,12 @@ export default {
 
             // If the user has opted to create another entry, redirect them to create page.
             if (!this.isInline && nextAction === 'create_another') {
-                window.location = this.createAnotherUrl;
+                this.redirectTo(this.createAnotherUrl);
             }
 
             // If the user has opted to go to listing (default/null option), redirect them there.
             else if (!this.isInline && nextAction === null) {
-                window.location = this.listingUrl;
+                this.redirectTo(this.listingUrl);
             }
 
             // Otherwise, leave them on the edit form and emit an event. We need to wait until after
@@ -822,6 +823,10 @@ export default {
                 action: action.run,
             }));
         },
+
+        redirectTo(location) {
+            router.get(location);
+        }
     },
 
     mounted() {

@@ -1,8 +1,8 @@
 <template>
     <ui-header :title="__('Collections')" icon="collections">
         <ui-toggle-group v-model="mode">
-            <ui-toggle-item icon="layout-grid" value="grid" aria-label="Grid view" />
-            <ui-toggle-item icon="layout-list" value="table" aria-label="Table view" />
+            <ui-toggle-item icon="layout-list" value="list" :aria-label="__('List view')" />
+            <ui-toggle-item icon="layout-grid" value="grid" :aria-label="__('Grid view')" />
         </ui-toggle-group>
         <ui-button
             :href="createUrl"
@@ -52,10 +52,9 @@
 
                         <create-entry-button
                             v-if="collection.available_in_selected_site"
-                            :url="collection.create_entry_url"
                             variant="default"
                             :blueprints="collection.blueprints"
-                            :text="__('Create Entry')"
+                            :text="collection.create_label"
                             size="sm"
                         />
                     </aside>
@@ -87,7 +86,7 @@
                                     <template #cell-title="{ row: entry }" class="w-full">
                                         <div class="flex items-center gap-2">
                                             <StatusIndicator :status="entry.status" />
-                                            <a :href="entry.edit_url" class="line-clamp-1 overflow-hidden text-ellipsis" :text="entry.title" />
+                                            <Link :href="entry.edit_url" class="line-clamp-1 overflow-hidden text-ellipsis" :text="entry.title" />
                                         </div>
                                     </template>
                                     <template #cell-date="{ row: entry }" v-if="collection.dated">
@@ -125,7 +124,7 @@
     </div>
 
     <ui-listing
-        v-if="mode === 'table'"
+        v-if="mode === 'list'"
         :items="items"
         :columns="columns"
         :action-url="actionUrl"
@@ -134,10 +133,10 @@
         @refreshing="request"
     >
         <template #cell-title="{ row: collection }">
-            <a :href="collection.available_in_selected_site ? collection.entries_url : collection.edit_url" class="flex items-center gap-2">
+            <Link :href="collection.available_in_selected_site ? collection.entries_url : collection.edit_url" class="flex items-center gap-2">
                 <ui-icon :name="collection.icon || 'collections'" />
                 {{ __(collection.title) }}
-            </a>
+            </Link>
         </template>
         <template #cell-entries_count="{ row: collection }">
             <div class="flex items-center gap-3">
@@ -182,9 +181,11 @@ import {
     DropdownSeparator,
 } from '@/components/ui';
 import ItemActions from '@/components/actions/ItemActions.vue';
+import { Link } from '@inertiajs/vue3';
 
 export default {
     components: {
+        Link,
         CardPanel,
         StatusIndicator,
         Badge,
@@ -210,7 +211,7 @@ export default {
             items: this.initialRows,
             columns: this.initialColumns,
             requestUrl: cp_url(`collections`),
-            mode: this.$preferences.get('collections.listing_mode', 'grid'),
+            mode: this.$preferences.get('collections.listing_mode', 'list'),
             source: null,
         };
     },
@@ -281,7 +282,7 @@ export default {
                 category: Statamic.$commandPalette.category.Actions,
                 text: __('Toggle Grid Layout'),
                 icon: 'layout-grid',
-                when: () => this.mode === 'table',
+                when: () => this.mode === 'list',
                 action: () => this.mode = 'grid',
             });
 
@@ -290,7 +291,7 @@ export default {
                 text: __('Toggle List Layout'),
                 icon: 'layout-list',
                 when: () => this.mode === 'grid',
-                action: () => this.mode = 'table',
+                action: () => this.mode = 'list',
             });
 
             // TODO: We can add more two-step actions later.

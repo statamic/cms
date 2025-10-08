@@ -45,10 +45,10 @@ class NavigationBlueprintController extends CpController
                 ->all(),
         ));
 
-        return view('statamic::navigation.blueprints.edit', [
-            'nav' => $nav,
-            'blueprint' => $blueprint,
-            'blueprintVueObject' => $this->toVueObject($blueprint),
+        return $this->renderEditPage([
+            'blueprint' => $this->toVueObject($blueprint),
+            'action' => cp_route('blueprints.navigation.update', $nav->handle()),
+            'useTabs' => false,
         ]);
     }
 

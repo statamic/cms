@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Fields;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
 use Statamic\Exceptions\DuplicateFieldException;
 use Statamic\Exceptions\FieldsetRecursionException;
 use Statamic\Facades;
@@ -15,6 +16,8 @@ use Statamic\Support\Str;
 
 trait ManagesBlueprints
 {
+    use ManagesFields;
+
     private function indexItems(Collection $blueprints, $item)
     {
         return $blueprints->map(function ($blueprint) use ($item) {
@@ -172,5 +175,13 @@ trait ManagesBlueprints
         $blueprint->save();
 
         return $blueprint;
+    }
+
+    private function renderEditPage(array $props)
+    {
+        return Inertia::render('blueprints/Edit', [
+            ...$props,
+            ...$this->fieldProps(),
+        ]);
     }
 }

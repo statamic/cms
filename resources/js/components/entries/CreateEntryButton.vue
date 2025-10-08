@@ -18,7 +18,7 @@
                 <DropdownItem
                     v-for="blueprint in blueprints"
                     :key="blueprint.handle"
-                    @click="select(blueprint.handle, $event)"
+                    @click="select(blueprint, $event)"
                     :text="blueprint.title"
                 />
             </DropdownMenu>
@@ -72,13 +72,8 @@ export default {
         },
 
         createUrl(blueprint) {
-            let url = this.url;
-
-            if (blueprint) {
-                url = url += `?blueprint=${blueprint}`;
-            }
-
-            return url;
+            if (!blueprint) blueprint = this.blueprints[0];
+            return blueprint.createEntryUrl;
         },
 
         addToCommandPalette() {
@@ -93,7 +88,7 @@ export default {
                     category: Statamic.$commandPalette.category.Actions,
                     text: this.hasMultipleBlueprints ? [title, blueprint.title] : title,
                     icon: 'entry',
-                    url: this.createUrl(blueprint.handle),
+                    url: this.createUrl(blueprint),
                     prioritize: true,
                 });
             });

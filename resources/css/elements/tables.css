@@ -118,6 +118,13 @@
 
 /* Sticky Meta Columns */
 .data-table {
+    .checkbox-column {
+        /* When the table is scrolled on smaller screens, remove the left border radius from the sticky checkbox column */
+        @container scroll-state(scrollable: inline-start) {
+            @apply rounded-l-none!;
+        }
+    }
+
     thead th.checkbox-column {
         @apply sticky z-1 ps-3 w-8;
         .data-table--contained & {
@@ -132,7 +139,8 @@
     }
 
     tbody .checkbox-column {
-        @apply sticky px-3 -start-px;
+        @apply px-3 -start-px sticky -left-1.5;
+        container-type: scroll-state;
         .data-table--contained & {
             @apply sticky ps-4;
         }

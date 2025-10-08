@@ -13,7 +13,7 @@ const shouldDeleteChildren = ref(false);
 </script>
 
 <template>
-    <Modal :title="__('Remove Page')" v-model:open="modalOpen">
+    <Modal :title="__('Remove Page')" v-model:open="modalOpen" @dismissed="$emit('cancel')">
         <p class="mb-4" v-text="__('Are you sure you want to remove this page?')" />
         <p class="mb-4" v-text="__('Only the references will be removed. Entries will not be deleted.')" />
         <label class="flex items-center" v-if="children">

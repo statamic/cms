@@ -3,6 +3,7 @@
 namespace Statamic\CP;
 
 use Illuminate\Contracts\Support\Responsable;
+use Inertia\Inertia;
 use Statamic\Fields\Blueprint;
 
 class PublishForm implements Responsable
@@ -113,6 +114,6 @@ class PublishForm implements Responsable
             return $viewData;
         }
 
-        return view('statamic::publish.form', $viewData);
+        return Inertia::render('PublishForm', $viewData)->toResponse($request);
     }
 }

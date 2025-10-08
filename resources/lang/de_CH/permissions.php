@@ -83,7 +83,7 @@ return [
     'group_addons' => 'Add-ons',
     'configure_addons' => 'Add-ons konfigurieren',
     'configure_addons_desc' => 'Zugriff auf sämtliche Berechtigungen für Add-ons erlauben.',
-    'edit_addon_settings' => ':addon Einstellungen',
+    'edit_addon_settings' => 'Einstellungen für :addon',
     'group_utilities' => 'Hilfsmittel',
     'access_utility' => ':title',
     'access_utility_desc' => 'Zugriff auf das Hilfsmittel :title erlauben.',

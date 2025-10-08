@@ -62,7 +62,7 @@ function save() {
             new AfterSaveHooks('entry'),
         ])
         .then((response) => {
-            Statamic.$toast.success('Saved');
+            Statamic.$toast.success(__('Saved'));
 
             if (response.data.redirect) {
                 window.location = response.data.redirect;

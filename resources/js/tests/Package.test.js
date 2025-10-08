@@ -8,6 +8,7 @@ global.__STATAMIC__ = modules;
 
 it('exports modules', async () => {
     expect(Object.keys(modules).toSorted()).toEqual([
+        'api',
         'bard',
         'core',
         'savePipeline',
@@ -30,6 +31,37 @@ it('exports core', async () => {
 
     expect(Object.keys(modules.core).toSorted()).toEqual(expected)
     expect(Object.keys(await import('@statamic/cms/index.js')).toSorted()).toEqual(expected);
+});
+
+it('exports api', async () => {
+    const expected = [
+        'bard',
+        'callbacks',
+        'commandPalette',
+        'components',
+        'conditions',
+        'config',
+        'contrast',
+        'dateFormatter',
+        'dirty',
+        'echo',
+        'events',
+        'fieldActions',
+        'hooks',
+        'keys',
+        'permissions',
+        'portals',
+        'preferences',
+        'progress',
+        'reveal',
+        'slug',
+        'stacks',
+        'theme',
+        'toast',
+    ];
+
+    expect(Object.keys(modules.api).toSorted()).toEqual(expected)
+    expect(Object.keys(await import('@statamic/cms/api.js')).toSorted()).toEqual(expected);
 });
 
 it('exports save pipeline', async () => {
@@ -148,6 +180,7 @@ it('exports ui', async () => {
         'Avatar',
         'CommandPaletteItem',
         'CreateForm',
+        'DocsCallout',
         'Listing',
         'ListingCustomizeColumns',
         'ListingFilters',

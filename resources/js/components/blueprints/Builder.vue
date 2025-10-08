@@ -81,9 +81,19 @@ export default {
             this.save();
         });
 
+        // Listen for root-form-save events from child components
+        // This also happens on the fieldset builder.
+        this.$events.$on('root-form-save', () => {
+            this.save();
+        });
+
         if (this.isFormBlueprint) {
             Statamic.$config.set('isFormBlueprint', true);
         }
+    },
+
+    beforeUnmount() {
+        this.$events.$off('root-form-save');
     },
 
     watch: {
@@ -109,10 +119,10 @@ export default {
         },
 
         save() {
-            // this.$axios[this.method](this.action, this.fieldset)
             this.$axios['patch'](this.action, this.blueprint)
                 .then((response) => this.saved(response))
                 .catch((e) => {
+                    console.error('Blueprint save failed:', e);
                     this.$toast.error(e.response.data.message);
                     this.errors = e.response.data.errors;
                 });

@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP;
 
+use Inertia\Inertia;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -23,7 +24,7 @@ class DashboardController extends CpController
             return view('statamic::dashboard.empty');
         }
 
-        return view('statamic::dashboard.dashboard', [
+        return Inertia::render('Dashboard', [
             'widgets' => $widgets,
         ]);
     }

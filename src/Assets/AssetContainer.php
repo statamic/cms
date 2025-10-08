@@ -540,7 +540,10 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
                     return $presets;
                 }
 
-                $presets = Image::userManipulationPresets();
+                $presets = [
+                    ...Image::userManipulationPresets(),
+                    ...Image::customManipulationPresets(),
+                ];
 
                 $presets = Arr::except($presets, $this->sourcePreset);
 
