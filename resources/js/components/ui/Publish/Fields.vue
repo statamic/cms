@@ -8,7 +8,10 @@ const { fields, fieldPathPrefix } = injectFieldsContext();
 </script>
 
 <template>
-    <div class="divide-y divide-gray-200 dark:divide-gray-800" :class="{ 'publish-fields': !asConfig }">
+    <div :class="{
+        'publish-fields': !asConfig,
+        'divide-y divide-gray-200 dark:divide-gray-800': asConfig
+    }">
         <Field
             v-for="field in fields"
             :key="field.handle"
