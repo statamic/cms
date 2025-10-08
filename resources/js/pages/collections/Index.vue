@@ -2,6 +2,7 @@
 import Listing from '@/components/collections/Listing.vue';
 import { Icon, EmptyStateMenu, EmptyStateItem, DocsCallout } from '@ui';
 import useArchitecturalBackground from '@/pages/layout/architectural-background.js';
+import Head from '@/pages/layout/Head.vue';
 
 const props = defineProps({
     collections: Array,
@@ -15,6 +16,8 @@ if (props.collections.length === 0) useArchitecturalBackground();
 </script>
 
 <template>
+    <Head :title="__('Collections')" />
+
     <Listing
         v-if="collections.length"
         :initial-rows="collections"
