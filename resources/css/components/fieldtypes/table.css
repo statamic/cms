@@ -50,6 +50,16 @@ Table Fieldtype
         }
     }
 
+    /* If the table has no header, top left and top right corners of the first row should be rounded */
+    tbody:not(:has(th)):first-child td {
+        &:first-child {
+            @apply rounded-tl-lg;
+        }
+        &:last-child {
+            @apply rounded-tr-lg;
+        }
+    }
+
     tbody {
         @apply outline-hidden dark:bg-gray-900;
 
