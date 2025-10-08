@@ -13,8 +13,7 @@ Table Fieldtype
             @apply
                 z-10
                 p-2
-                dark:bg-gray-950/75
-                dark:backdrop-blur-[10px]
+                dark:bg-gray-925
                 border-b bg-gray-50
                 not-last:border-e overflow-hidden
                 dark:border-gray-800 dark:border-b-gray-700
