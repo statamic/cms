@@ -5,9 +5,9 @@ import useStatamicPageProps from '@/composables/page-props.js';
 
 useBodyClasses('bg-gray-50 font-sans leading-normal scheme-light p-2');
 const { logos, cmsName } = useStatamicPageProps();
-const customLogo = logos.light.outside ?? logos.dark.outside ?? null;
-const lightCustomLogo = logos.light.outside ?? null;
-const darkCustomLogo = logos.dark.outside ?? logos.light.outside ?? null;
+const customLogo = logos?.light?.outside ?? logos?.dark?.outside ?? null;
+const lightCustomLogo = logos?.light?.outside ?? null;
+const darkCustomLogo = logos?.dark?.outside ?? logos?.light?.outside ?? null;
 </script>
 
 <template>
