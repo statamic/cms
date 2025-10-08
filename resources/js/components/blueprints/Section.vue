@@ -100,7 +100,6 @@
                                 restrict: !! previewImageFolder,
                                 allow_uploads: true,
                                 show_set_alt: false,
-                                mode: 'list',
                                 max_items: 1
                             }"
                             :initial-value="editingSection.image"
