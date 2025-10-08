@@ -99,6 +99,8 @@
                                 folder: previewImageFolder,
                                 restrict: !! previewImageFolder,
                                 allow_uploads: true,
+                                show_set_alt: false,
+                                max_items: 1
                             }"
                             :initial-value="editingSection.image"
                             v-slot="{ meta, value, loading, config }"
