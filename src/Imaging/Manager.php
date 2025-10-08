@@ -2,6 +2,7 @@
 
 namespace Statamic\Imaging;
 
+use League\Glide\Server;
 use Statamic\Contracts\Imaging\ImageManipulator;
 use Statamic\Facades\Glide;
 use Statamic\Support\Arr;
@@ -106,6 +107,9 @@ class Manager
         foreach ($presets as $name => $preset) {
             $this->customManipulationPresets[$name] = $this->normalizePreset($preset);
         }
+
+        $server = app(Server::class);
+        $server->setPresets([...$server->getPresets(), ...$this->customManipulationPresets()]);
     }
 
     /**
