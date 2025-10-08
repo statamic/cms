@@ -1,5 +1,6 @@
 <script setup>
 import EntryPublishForm from '@/components/entries/PublishForm.vue';
+import Head from '@/pages/layout/Head.vue';
 
 defineProps([
     'actions',
@@ -34,6 +35,8 @@ defineProps([
 </script>
 
 <template>
+    <Head :title />
+
     <EntryPublishForm
         publish-container="base"
         :initial-actions="actions"
