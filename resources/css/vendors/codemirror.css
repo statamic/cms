@@ -2,7 +2,7 @@
    CODEMIRROR
    ========================================================================== */
 
-.CodeMirror {
+   .CodeMirror {
     /* Set height, width, borders, and global font properties here */
     @apply text-gray-900 dark:text-gray-300 leading-normal min-h-20;
 }
@@ -495,13 +495,13 @@ span.CodeMirror-selectedtext {
 
 .cm-s-material.CodeMirror {
     background: #263238;
-    @apply dark:bg-gray-950;
+    @apply dark:bg-gray-900;
     color: #eeffff;
 }
 
 .cm-s-material .CodeMirror-gutters {
     background: #263238;
-    @apply dark:bg-gray-950;
+    @apply dark:bg-gray-900;
     color: #546e7a;
     border: none;
 }
