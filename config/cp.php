@@ -169,5 +169,5 @@ return [
     'thumbnail_presets' => [
         // 'medium' => 800,
     ],
-    
+
 ];
