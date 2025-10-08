@@ -54,7 +54,7 @@ function toggleSection(id) {
             v-for="(section, i) in visibleSections"
             :key="i"
             :class="[
-                asConfig ? 'mb-12' : 'mb-6',
+                'mb-6',
                 { 'pb-0': section.collapsed }
             ]"
         >
@@ -79,13 +79,13 @@ function toggleSection(id) {
                 class="h-auto visible transition-[height,visibility] duration-[250ms,2s]"
                 :class="{ 'h-0! visibility-hidden overflow-clip': section.collapsed }"
             >
-                <Primitive :as="asConfig ? 'div' : Card">
+                <Card :class="{ 'p-0!': asConfig }">
                     <FieldsProvider :fields="section.fields">
                         <slot :section="section">
                             <Fields />
                         </slot>
                     </FieldsProvider>
-                </Primitive>
+                </Card>
             </div>
         </Panel>
     </div>
