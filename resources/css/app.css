@@ -40,6 +40,9 @@
   ::backdrop,
   ::file-selector-button {
     border-color: var(--color-gray-300, currentColor);
+    .dark & {
+      border-color: var(--color-gray-700, currentColor);
+    }
   }
 }
 
