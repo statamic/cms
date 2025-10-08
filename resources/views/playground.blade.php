@@ -250,7 +250,7 @@
 
             <section class="space-y-4">
                 <ui-heading size="lg">Card</ui-heading>
-                <div class="flex items-center justify-center bg-gray-50 rounded-xl border border-gray-200 p-12">
+                <div class="flex items-center justify-center bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-12">
                 <ui-card class="w-80 space-y-6">
                     <header>
                         <ui-heading size="lg">Create a new account</ui-heading>
@@ -315,7 +315,7 @@
                 <ui-heading size="lg">Icons</ui-heading>
                 <div class="grid grid-cols-4 md:grid-cols-6 2xl:grid-cols-10 gap-4">
                     @foreach ($icons as $icon)
-                        <div class="bg-gray-50 rounded-lg py-6 px-2 flex flex-col items-center gap-3">
+                        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg py-6 px-2 flex flex-col items-center gap-3">
                             <ui-icon name="{{ $icon }}" class="size-6" />
                             <span class="text-xs text-gray-500">{{ $icon }}</span>
                         </div>
@@ -435,13 +435,13 @@
 
             <section class="space-y-4">
                 <ui-heading size="lg">Splitter</ui-heading>
-                <div class="flex bg-gray-50 rounded-xl p-4 border border-gray-200">
+                <div class="flex bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
                     <ui-splitter-group>
-                        <ui-splitter-panel class="flex h-24 items-center justify-center rounded-xl bg-white">
+                        <ui-splitter-panel class="flex h-24 items-center justify-center rounded-xl bg-white dark:bg-gray-900">
                             Left
                     </ui-splitter-panel>
                     <ui-splitter-resize-handle class="w-3" />
-                    <ui-splitter-panel class="flex h-24 items-center justify-center rounded-xl bg-white">
+                    <ui-splitter-panel class="flex h-24 items-center justify-center rounded-xl bg-white dark:bg-gray-900">
                         Right
                         </ui-splitter-panel>
                     </ui-splitter-group>
@@ -472,21 +472,21 @@
                             <ui-table-cell>
                                 <ui-badge color="green" pill>In Stock</ui-badge>
                             </ui-table-cell>
-                            <ui-table-cell class="text-right font-semibold text-black">$159.00</ui-table-cell>
+                            <ui-table-cell class="text-right font-semibold text-black dark:text-gray-300">$159.00</ui-table-cell>
                         </ui-table-row>
                         <ui-table-row>
                             <ui-table-cell>Ergonomic Mouse</ui-table-cell>
                             <ui-table-cell>
                                 <ui-badge color="red" pill>Out of Stock</ui-badge>
                             </ui-table-cell>
-                            <ui-table-cell class="text-right font-semibold text-black">$89.00</ui-table-cell>
+                            <ui-table-cell class="text-right font-semibold text-black dark:text-gray-300">$89.00</ui-table-cell>
                         </ui-table-row>
                         <ui-table-row>
                             <ui-table-cell>4K Monitor</ui-table-cell>
                             <ui-table-cell>
                                 <ui-badge color="yellow" pill>Low Stock</ui-badge>
                             </ui-table-cell>
-                            <ui-table-cell class="text-right font-semibold text-black">$349.00</ui-table-cell>
+                            <ui-table-cell class="text-right font-semibold text-black dark:text-gray-300">$349.00</ui-table-cell>
                         </ui-table-row>
                         </ui-table-rows>
                     </ui-table>
