@@ -35,7 +35,7 @@ function toggleNav() {
                 <StatamicLogo class="size-7 group-hover:opacity-0 transition-opacity duration-150" />
             </button>
             <Link :href="cp_url('/')" class="hidden sm:block text-white/85 rounded-xs whitespace-nowrap" style="--focus-outline-offset: var(--outline-offset-button);">
-                {{ logos.text }}
+                {{ logos.text ?? logos.siteName }}
             </Link>
             <ProBadge v-if="isPro" />
         </div>

@@ -63,6 +63,7 @@ return [
     'collections_taxonomies_instructions' => 'Connect entries in this collection to taxonomies. Fields will be automatically added to publish forms.',
     'dictionaries_countries_emojis_instructions' => 'Include flag emojis in country labels.',
     'dictionaries_countries_region_instructions' => 'Optionally filter the countries by region.',
+    'dirty_navigation_warning' => 'You have unsaved changes. Are you sure you want to leave this page?',
     'disable_two_factor_authentication' => 'Are you sure you want to disable two-factor authentication?',
     'disable_two_factor_authentication_current_user_enforced' => 'You will be logged out immediately and will need to set up two-factor authentication again on your next login.',
     'disable_two_factor_authentication_current_user_optional' => 'This action will render both your authenticator and backup codes invalid, and will allow complete access to your account using only its password.',

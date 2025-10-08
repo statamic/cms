@@ -1,5 +1,7 @@
 <template>
     <div>
+        <Head :title="__('Edit Fieldset')" />
+
         <Header :title="__('Edit Fieldset')" icon="fieldsets">
             <ui-command-palette-item
                 :category="$commandPalette.category.Actions"
@@ -40,15 +42,17 @@
 </template>
 
 <script>
-import Fields from '../blueprints/Fields.vue';
+import Fields from '@/components/blueprints/Fields.vue';
 import { Sortable, Plugins } from '@shopify/draggable';
-import SuggestsConditionalFields from '../blueprints/SuggestsConditionalFields';
+import SuggestsConditionalFields from '@/components/blueprints/SuggestsConditionalFields';
 import { Header, Button } from '@/components/ui';
+import Head from '@/pages/layout/Head.vue';
 
 export default {
     mixins: [SuggestsConditionalFields],
 
     components: {
+        Head,
         Fields,
         Header,
         Button,

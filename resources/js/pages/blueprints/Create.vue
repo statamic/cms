@@ -1,13 +1,15 @@
 <script setup>
+import Head from '@/pages/layout/Head.vue';
 import { CreateForm } from '@/components/ui';
+import useArchitecturalBackground from '@/pages/layout/architectural-background.js';
 
-const props = defineProps({
-    route: { type: String },
-    icon: { type: String },
-});
+defineProps(['route', 'icon']);
+useArchitecturalBackground();
 </script>
 
 <template>
+    <Head :title="__('Create Blueprint')" />
+
     <CreateForm
         :icon
         :route

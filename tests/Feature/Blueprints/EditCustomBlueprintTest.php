@@ -53,7 +53,7 @@ class EditCustomBlueprintTest extends TestCase
             ->actingAs($user)
             ->get(cp_route('blueprints.additional.edit', [$namespace, $handle]))
             ->assertOk()
-            ->assertViewIs('statamic::blueprints.edit');
+            ->assertInertia(fn ($page) => $page->component('blueprints/Edit'));
     }
 
     private function createBlueprint($namespace, $handle)

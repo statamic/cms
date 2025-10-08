@@ -46,9 +46,12 @@ class AdditionalBlueprintController extends CpController
                 ->all(),
         ));
 
-        return view('statamic::blueprints.edit', [
-            'blueprint' => $blueprint,
-            'blueprintVueObject' => $this->toVueObject($blueprint),
+        return $this->renderEditPage([
+            'blueprint' => $this->toVueObject($blueprint),
+            'action' => cp_route('blueprints.additional.update', [$blueprint->namespace(), $blueprint->handle()]),
+            'showTitle' => true,
+            'isResettable' => $blueprint->isResettable(),
+            'resetRoute' => $blueprint->resetAdditionalBlueprintUrl(),
         ]);
     }
 
