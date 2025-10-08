@@ -183,6 +183,7 @@ class CollectionsController extends CpController
             'initialSite' => $site->handle(),
             'sites' => $viewData['sites'],
             'canChangeLocalizationDeleteBehavior' => $viewData['canChangeLocalizationDeleteBehavior'],
+            'dated' => $collection->dated(),
         ];
 
         if ($collection->hasStructure()) {
