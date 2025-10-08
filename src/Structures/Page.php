@@ -417,7 +417,15 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
     public function toResponse($request)
     {
         if ($this->reference && $this->referenceExists()) {
-            return (new \Statamic\Http\Responses\DataResponse($this))->toResponse($request);
+            $response = (new \Statamic\Http\Responses\DataResponse($this))->toResponse($request);
+
+            if (($content = $response->getContent())) {
+                $response
+                    ->setEtag(md5($content))
+                    ->isNotModified($request);
+            }
+
+            return $response;
         }
 
         throw new \LogicException('A page without a reference to an entry cannot be rendered.');
