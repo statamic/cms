@@ -128,7 +128,9 @@ class FormsController extends CpController
 
         $this->authorize('create', FormContract::class);
 
-        return view('statamic::forms.create');
+        return Inertia::render('forms/Create', [
+            'submitUrl' => cp_route('forms.store'),
+        ]);
     }
 
     public function store(Request $request)
