@@ -76,7 +76,7 @@ const errors = computed(() => {
 </script>
 
 <template>
-    <div :class="[classes, $attrs.class]" data-ui-input-group data-marps>
+    <div :class="[classes, $attrs.class]" data-ui-input-group>
         <div
             v-if="$slots.actions"
             :class="[
