@@ -20,7 +20,7 @@ const emit = defineEmits(['confirmed']);
 let confirming = ref(false);
 let running = ref(false);
 let fieldset = ref({ tabs: [{ fields: props.action.fields }] });
-let values = ref(props.action.values);
+let values = ref(clone(props.action.values));
 
 let confirmationText = computed(() => {
     if (!props.action.confirmationText) return;
