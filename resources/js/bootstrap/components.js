@@ -28,7 +28,6 @@ import BaseTermCreateForm from '../components/terms/BaseCreateForm.vue';
 import CreateTermButton from '../components/terms/CreateTermButton.vue';
 import BlueprintListing from '../components/blueprints/Listing.vue';
 import BlueprintBuilder from '../components/blueprints/Builder.vue';
-import FormListing from '../components/forms/Listing.vue';
 import FormSubmissionListing from '../components/forms/SubmissionListing.vue';
 import GlobalListing from '../components/globals/Listing.vue';
 import GlobalPublishForm from '../components/globals/PublishForm.vue';
@@ -39,7 +38,6 @@ import RolePublishForm from '../components/roles/PublishForm.vue';
 import UserGroupListing from '../components/user-groups/Listing.vue';
 import UserGroupPublishForm from '../components/user-groups/PublishForm.vue';
 import CollectionScaffolder from '../components/collections/Scaffolder.vue';
-import PreferencesEditForm from '../components/preferences/EditForm.vue';
 import ItemActions from '../components/actions/ItemActions.vue';
 import BulkActions from '../components/actions/BulkActions.vue';
 
@@ -95,7 +93,6 @@ export default function registerGlobalComponents(app) {
     app.component('CreateTermButton', CreateTermButton);
     app.component('BlueprintListing', BlueprintListing);
     app.component('BlueprintBuilder', BlueprintBuilder);
-    app.component('FormListing', FormListing);
     app.component('FormSubmissionListing', FormSubmissionListing);
     app.component('GlobalListing', GlobalListing);
     app.component('GlobalPublishForm', GlobalPublishForm);
@@ -106,7 +103,6 @@ export default function registerGlobalComponents(app) {
     app.component('UserGroupListing', UserGroupListing);
     app.component('UserGroupPublishForm', UserGroupPublishForm);
     app.component('CollectionScaffolder', CollectionScaffolder);
-    app.component('PreferencesEditForm', PreferencesEditForm);
     app.component('NavBuilder', defineAsyncComponent(() => import('../components/nav/Builder.vue')));
     app.component('ItemActions', ItemActions);
     app.component('BulkActions', BulkActions);

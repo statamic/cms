@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Preferences;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Role;
@@ -17,7 +18,7 @@ trait ManagesPreferences
 
         $fields = $blueprint->fields()->addValues($preferences)->preProcess();
 
-        return view('statamic::preferences.edit', [
+        return Inertia::render('preferences/Edit', [
             'title' => $title,
             'actionUrl' => $actionUrl,
             'blueprint' => $blueprint->toPublishArray(),
