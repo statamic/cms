@@ -65,7 +65,7 @@ class LinkMark extends Link
         }
 
         if (! $this->isApi() && $item instanceof Entry) {
-            return ($item->in(Site::current()->handle()) ?? $item)->url();
+            return ($item->in(Site::current()->handle()) ?? $item)->permalink;
         }
 
         return $item->url();
