@@ -244,7 +244,7 @@ watch(
                 <div v-else-if="showModeLabel" v-text="modeLabel" class="font-mono text-xs text-gray-700"></div>
             </publish-field-fullscreen-header>
             <div
-                class="flex items-center justify-between rounded-t-[calc(var(--radius-lg)-1px)] bg-gray-50 px-2 py-1 dark:bg-gray-950/75 dark:backdrop-blur-[20px] border border-b-0 border-gray-300 dark:border-gray-700 dark:border-b-1 dark:border-b-white/10"
+                class="flex items-center justify-between rounded-t-[calc(var(--radius-lg)-1px)] bg-gray-50 px-2 py-1 dark:bg-gray-950/75 dark:backdrop-blur-[10px] border border-b-0 border-gray-300 dark:border-gray-700 dark:border-b-1 dark:border-b-white/10"
                 :class="{ 'border-dashed': readOnly }"
                 v-if="showToolbar"
             >
