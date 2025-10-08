@@ -1,5 +1,6 @@
 <script setup>
 import { PublishForm } from '@/components/ui';
+import Head from '@/pages/layout/Head.vue';
 
 const props = defineProps({
     icon: { type: String, required: false },
@@ -15,6 +16,8 @@ const props = defineProps({
 </script>
 
 <template>
+    <Head :title />
+
     <div :class="{ 'max-w-5xl mx-auto': asConfig }">
         <PublishForm
             :icon

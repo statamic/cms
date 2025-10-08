@@ -1,7 +1,7 @@
-
 <script setup>
 import EntryPublishForm from '@/components/entries/PublishForm.vue';
 import { router } from '@inertiajs/vue3';
+import Head from '@/pages/layout/Head.vue';
 
 defineProps([
     'actions',

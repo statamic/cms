@@ -7,9 +7,9 @@ import Theme from '@/components/Theme.js';
 
 useBodyClasses('bg-gray-50 dark:bg-gray-900 font-sans leading-normal scheme-light p-2');
 const { logos, cmsName } = useStatamicPageProps();
-const customLogo = logos.light.outside ?? logos.dark.outside ?? null;
-const lightCustomLogo = logos.light.outside ?? null;
-const darkCustomLogo = logos.dark.outside ?? logos.light.outside ?? null;
+const customLogo = logos?.light?.outside ?? logos?.dark?.outside ?? null;
+const lightCustomLogo = logos?.light?.outside ?? null;
+const darkCustomLogo = logos?.dark?.outside ?? logos?.light?.outside ?? null;
 
 // Use the same Theme class as the main application
 let themeInstance = null;

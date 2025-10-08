@@ -45,7 +45,7 @@
             >
                 <div v-if="!readOnly">
                     <Button variant="ghost" class="me-2" :text="__('Cancel')" @click="confirmClose(close)" />
-                    <Button variant="primary" :text="__('Submit')" @click="submit" />
+                    <Button variant="primary" :text="__('Apply')" @click="submit" />
                 </div>
                 <div v-if="type === 'entry'">
                     <Button icon="external-link" variant="ghost" :text="__('Edit Entry')" :href="editEntryUrl" target="_blank" />

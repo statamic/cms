@@ -1,4 +1,6 @@
 <template>
+    <Head :title="title" />
+
     <PublishContainer
         ref="container"
         :name="name"
@@ -7,7 +9,6 @@
         reference="collection"
         :meta="meta"
         :errors="errors"
-        :read-only="readOnly"
         as-config
     >
         <div>
@@ -81,9 +82,11 @@
 
 <script>
 import { Header, Button, ButtonGroup, Dropdown, DropdownMenu, DropdownItem, DropdownLabel, PublishContainer, PublishTabs } from '@/components/ui';
+import Head from '@/pages/layout/Head.vue';
 
 export default {
     components: {
+        Head,
         Header,
         Button,
         ButtonGroup,
@@ -100,20 +103,17 @@ export default {
         meta: { required: true, type: Object },
         values: { required: true, type: Object },
         title: { required: true, type: String },
-        name: { type: String, default: 'base' },
-        action: String,
-        readOnly: { type: Boolean, default: false },
-        reloadOnSave: { type: Boolean, default: false },
+        actionUrl: { required: true, type: String },
         saveAsOptions: { type: Array, default: () => [] },
     },
 
     data() {
         return {
+            name: 'base',
             saving: false,
             currentValues: this.values,
             error: null,
             errors: {},
-            hasSidebar: this.blueprint.tabs.map((tab) => tab.handle).includes('sidebar'),
             isDropdownOpen: false,
         };
     },
@@ -135,7 +135,7 @@ export default {
         },
 
         save() {
-            this.saveAs(this.action);
+            this.saveAs(this.actionUrl);
         },
 
         saveAs(url) {

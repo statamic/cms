@@ -5,7 +5,7 @@ import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, Di
 import { computed, getCurrentInstance, ref, watch } from 'vue';
 import Icon from '../Icon/Icon.vue';
 
-const emit = defineEmits(['update:open']);
+const emit = defineEmits(['update:open', 'dismissed']);
 
 const props = defineProps({
     blur: { type: Boolean, default: true },
@@ -64,6 +64,8 @@ function updateOpen(value) {
 
 function preventIfNotDismissible(event) {
     if (!props.dismissible) event.preventDefault();
+
+    emit('dismissed');
 }
 </script>
 
