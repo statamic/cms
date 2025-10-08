@@ -64,7 +64,16 @@ const calendarBindings = computed(() => ({
 }));
 
 const calendarEvents = computed(() => ({
-    'update:model-value': (event) => emit('update:modelValue', event),
+    'update:model-value': (event) => {
+        if (props.granularity === 'day') {
+            event.hour = 0;
+            event.minute = 0;
+            event.second = 0;
+            event.millisecond = 0;
+        }
+
+        emit('update:modelValue', event);
+    },
 }));
 
 const isInvalid = computed(() => {
