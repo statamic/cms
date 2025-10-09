@@ -24,6 +24,7 @@
 
 <script>
 import { Button, Dropdown, DropdownMenu, DropdownItem, DropdownLabel } from '@/components/ui';
+import { router } from '@inertiajs/vue3';
 
 export default {
     components: {
@@ -63,7 +64,7 @@ export default {
         select(blueprint, $event) {
             let url = this.createUrl(blueprint);
 
-            $event.metaKey ? window.open(url) : (window.location = url);
+            $event.metaKey ? window.open(url) : router.get(url);
         },
 
         createUrl(blueprint) {
