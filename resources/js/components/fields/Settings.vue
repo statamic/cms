@@ -15,7 +15,7 @@
             </div>
         </header>
 
-        <section v-if="!loading" class="isolate px-3 py-4">
+        <section v-if="!loading" class="isolate lg:px-3 py-4">
             <Tabs v-model:modelValue="activeTab">
                 <TabList class="mb-6">
                     <TabTrigger name="settings" :text="__('Settings')" />
