@@ -1,7 +1,7 @@
 <template>
     <div
         :class="[
-            'group/button flex',
+            'group/button flex flex-wrap justify-center gap-y-1',
             '[&>[data-ui-group-target]:not(:first-child):not(:last-child)]:rounded-none',
             '[&>[data-ui-group-target]:first-child:not(:last-child)]:rounded-e-none',
             '[&>[data-ui-group-target]:last-child:not(:first-child)]:rounded-s-none',
