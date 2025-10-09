@@ -39,11 +39,11 @@ class Fields extends Filter
     public function apply($query, $values)
     {
         $this->getFields()
-            ->filter(function ($field, $handle) use ($values) {
-                return isset($values[$handle]) && $this->isComplete($values[$handle]);
-            })
             ->each(function ($field, $handle) use ($query, $values) {
                 $filter = $field->fieldtype()->filter();
+                if (! isset($values[$handle]) || ! $filter->isComplete($values[$handle])) {
+                    return null;
+                }
                 $values = $filter->fields()->addValues($values[$handle])->process()->values();
                 $filter->apply($query, $handle, $values);
             });
@@ -52,11 +52,11 @@ class Fields extends Filter
     public function badge($values)
     {
         return $this->getFields()
-            ->filter(function ($field, $handle) use ($values) {
-                return isset($values[$handle]) && $this->isComplete($values[$handle]);
-            })
             ->map(function ($field, $handle) use ($values) {
                 $filter = $field->fieldtype()->filter();
+                if (! isset($values[$handle]) || ! $filter->isComplete($values[$handle])) {
+                    return null;
+                }
                 $values = $filter->fields()->addValues($values[$handle])->process()->values();
 
                 return $filter->badge($values);
@@ -115,12 +115,5 @@ class Fields extends Filter
         }
 
         return collect();
-    }
-
-    private function isComplete(array $values): bool
-    {
-        $values = array_filter($values);
-
-        return Arr::has($values, 'operator') && Arr::has($values, 'value');
     }
 }

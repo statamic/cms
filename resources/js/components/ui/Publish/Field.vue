@@ -204,6 +204,7 @@ const fieldtypeComponentEvents = computed(() => ({
         :fieldtypeComponent="fieldtypeComponent"
         :fieldtypeComponentProps="fieldtypeComponentProps"
         :fieldtypeComponentEvents="fieldtypeComponentEvents"
+        :shouldShowField="shouldShowField"
     >
         <Field
             v-show="shouldShowField"
