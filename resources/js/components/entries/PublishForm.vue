@@ -100,7 +100,7 @@
                         <div class="space-y-6">
                             <!-- Live Preview / Visit URL Buttons -->
                             <div v-if="collectionHasRoutes">
-                                <div class="flex flex-wrap gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
+                                <div class="flex flex-wrap gap-3 lg:gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
                                     <Button
                                         :text="__('Live Preview')"
                                         class="flex-1"
