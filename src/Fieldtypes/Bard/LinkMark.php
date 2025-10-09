@@ -64,15 +64,15 @@ class LinkMark extends Link
             return '';
         }
 
-        if (! $this->isApi() && $item instanceof Entry) {
-            if (Site::current()->sameDomain($item->site())) {
-                return $item->url();
-            }
-
-            return $item->permalink;
+        if (
+            ! Augmentor::$currentBardConfig['select_across_sites'] &&
+            ! $this->isApi() &&
+            $item instanceof Entry
+        ) {
+            return ($item->in(Site::current()->handle()) ?? $item)->url();
         }
 
-        return $item->url();
+        return $item->permalink ?? $item->url();
     }
 
     private function isApi()
