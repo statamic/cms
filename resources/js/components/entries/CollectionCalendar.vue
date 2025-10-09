@@ -7,6 +7,7 @@ import CalendarMonthView from './CalendarMonthView.vue';
 import CalendarWeekView from './CalendarWeekView.vue';
 import { Listing, StatusIndicator } from '@/components/ui';
 import { formatDateString, getWeekDates, getVisibleHours, getCurrentDateRange } from '@/util/calendar.js';
+import { Link } from '@inertiajs/vue3';
 
 const props = defineProps({
     collection: { type: String, required: true },
@@ -535,7 +536,7 @@ watch(viewMode, (newMode) => {
                 :show-pagination-per-page-selector="false"
             >
                 <template #cell-title="{ row: entry, isColumnVisible }">
-                    <a :href="entry.edit_url" v-text="entry.title" />
+                    <Link :href="entry.edit_url" v-text="entry.title" />
                 </template>
                 <template #cell-status="{ row: entry }">
                     <StatusIndicator :status="entry.status" :show-dot="false" show-label />
