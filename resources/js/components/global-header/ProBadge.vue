@@ -25,6 +25,7 @@ const problemBadgeColor = computed(() => {
         <Badge
             variant="flat"
             :color="problemBadgeColor"
+            class="hidden! sm:block!"
         >
             {{ __('Pro') }} – {{ licensing.isOnPublicDomain ? __('statamic::messages.licensing_error_unlicensed') : __('Trial Mode') }}
         </Badge>
