@@ -4,9 +4,11 @@
     [data-ui-button-group] {
         /* Base styles for all buttons in groups */
         [data-ui-group-target] {
-            /* Only the first child gets a left border */
-            &:not(:first-child) {
-                border-inline-start: 0;
+            /* Only the first child gets a left border on higher MQs */
+            @media (width >= 1024px) {
+                &:not(:first-child) {
+                    border-inline-start: 0;
+                }
             }
 
             &.btn-danger {

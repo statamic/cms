@@ -45,7 +45,7 @@ function actionFailed(response) {
         <Motion
             v-if="hasSelections"
             layout
-            class="fixed inset-x-0 bottom-6 z-100 flex w-full max-w-[95vw] mx-auto justify-center "
+            class="fixed inset-x-0 bottom-1 sm:bottom-6 z-100 flex w-full max-w-[95vw] mx-auto justify-center "
             :initial="{ y: 100, opacity: 0 }"
             :animate="{ y: 0, opacity: 1 }"
             :transition="{ duration: 0.2, ease: 'easeInOut' }"
