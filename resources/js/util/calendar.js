@@ -1,4 +1,4 @@
-import { CalendarDate } from '@internationalized/date';
+import { CalendarDate, CalendarDateTime, fromDate, getLocalTimeZone } from '@internationalized/date';
 
 export function formatDateString(date) {
     return new Date(date.year, date.month - 1, date.day).toISOString().split('T')[0];
@@ -83,4 +83,14 @@ export function getCurrentDateRange(currentDate, viewMode) {
             endDate,
         };
     }
+}
+
+export function getCreateUrlDateParam(date, hour) {
+    // The date argument is a CalendarDate object, which has no timezone so we assume it's the local timezone.
+    // The server expects the date to be in UTC timezone, so we convert it.
+    if (hour) date = new CalendarDateTime(date.year, date.month, date.day, hour, 0);
+    const localDate = date.toDate(getLocalTimeZone());
+    const d = fromDate(localDate, 'UTC');
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${d.year}-${pad(d.month)}-${pad(d.day)}-${pad(d.hour)}${pad(d.minute)}`;
 }

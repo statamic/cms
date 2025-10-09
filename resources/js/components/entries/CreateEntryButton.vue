@@ -25,6 +25,7 @@
 <script>
 import { Button, Dropdown, DropdownMenu, DropdownItem, DropdownLabel } from '@/components/ui';
 import { router } from '@inertiajs/vue3';
+import qs from 'qs';
 
 export default {
     components: {
@@ -43,7 +44,7 @@ export default {
         buttonClass: { type: String, default: 'btn' },
         commandPalette: { type: Boolean, default: false },
         icon: { type: String, default: null },
-        url: { type: String },
+        params: { type: Object },
     },
 
     computed: {
@@ -69,7 +70,14 @@ export default {
 
         createUrl(blueprint) {
             if (!blueprint) blueprint = this.blueprints[0];
-            return blueprint.createEntryUrl;
+            let url = blueprint.createEntryUrl;
+
+            const [baseUrl, existingQuery] = url.split('?');
+            const existingParams = existingQuery ? qs.parse(existingQuery) : {};
+            const params = { ...existingParams, ...this.params };
+            const queryString = qs.stringify(params);
+
+            return queryString ? `${baseUrl}?${queryString}` : baseUrl;
         },
 
         addToCommandPalette() {

@@ -66,11 +66,10 @@
                     <!-- Create entry button (shows on hover) -->
                     <div v-if="getEntriesForHour(date, hour).length === 0" class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <CreateEntryButton
-                            :url="`${createUrl}?date=${date.year}-${String(date.month).padStart(2, '0')}-${String(date.day).padStart(2, '0')}&time=${String(hour).padStart(2, '0')}:00`"
+                            :params="{ values: { date: getCreateUrlDateParam(date, hour) } }"
                             :blueprints="blueprints"
                             variant="subtle"
                             size="sm"
-                            :custom-trigger="true"
                         >
                             <template #trigger="{ create }">
                                 <ui-button icon="plus" size="sm" variant="subtle" @click="create" />
@@ -87,7 +86,7 @@
 import { ref, defineExpose } from 'vue';
 import CalendarWeekEntry from './CalendarWeekEntry.vue';
 import CreateEntryButton from './CreateEntryButton.vue';
-import { getVisibleHours, getHourLabel, isToday } from '@/util/calendar.js';
+import { getVisibleHours, getHourLabel, isToday, getCreateUrlDateParam } from '@/util/calendar.js';
 
 const props = defineProps({
     weekDates: { type: Array, required: true },

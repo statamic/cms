@@ -2,7 +2,7 @@
 import { CalendarCell, CalendarCellTrigger, CalendarGrid, CalendarGridBody, CalendarGridHead, CalendarGridRow, CalendarHeadCell } from 'reka-ui';
 import CalendarEntry from './CalendarEntry.vue';
 import CreateEntryButton from './CreateEntryButton.vue';
-import { formatDateString, isToday } from '@/util/calendar.js';
+import { formatDateString, isToday, getCreateUrlDateParam } from '@/util/calendar.js';
 
 const props = defineProps({
     weekDays: { type: Array, required: true },
@@ -179,7 +179,7 @@ const handleDrop = (event, targetDate) => {
                         <!-- Create entry button (shows on hover) -->
                         <div class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity hidden @3xl:block">
                             <CreateEntryButton
-                                :url="`${createUrl}?date=${weekDate.year}-${String(weekDate.month).padStart(2, '0')}-${String(weekDate.day).padStart(2, '0')}`"
+                                :params="{ values: { date: getCreateUrlDateParam(weekDate) } }"
                                 :blueprints="blueprints"
                                 variant="subtle"
                                 size="sm"
