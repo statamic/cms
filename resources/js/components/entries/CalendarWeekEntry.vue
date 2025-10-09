@@ -1,5 +1,5 @@
 <template>
-    <a
+    <Link
         :href="entry.edit_url"
         :key="entry.id"
         class="block text-xs p-1 rounded-r border-l-2 mb-1 cursor-pointer hover:shadow-sm"
@@ -8,11 +8,12 @@
         @dragstart="handleDragStart"
     >
         <div class="font-medium line-clamp-2">{{ entry.title }}</div>
-    </a>
+    </Link>
 </template>
 
 <script setup>
 import { computed } from 'vue';
+import { Link } from '@inertiajs/vue3';
 
 const props = defineProps({
     entry: { type: Object, required: true }
