@@ -39,14 +39,14 @@ export default {
     },
 
     props: {
-        blueprints: {type: Array },
+        blueprints: Array,
+        variant: { type: String, default: 'primary' },
+        text: { type: String, default: () => __('Create Entry') },
+        size: { type: String, default: 'base' },
         buttonClass: { type: String, default: 'btn' },
         commandPalette: { type: Boolean, default: false },
         icon: { type: String, default: null },
-        size: { type: String, default: 'base' },
-        text: { type: String, default: () => __('Create Entry') },
         url: { type: String },
-        variant: { type: String, default: 'primary' },
         customTrigger: { type: Boolean, default: false },
     },
 
