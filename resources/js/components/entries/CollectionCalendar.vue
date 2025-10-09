@@ -6,7 +6,7 @@ import { CalendarDate } from '@internationalized/date';
 import CalendarMonthView from './CalendarMonthView.vue';
 import CalendarWeekView from './CalendarWeekView.vue';
 import { Listing, StatusIndicator } from '@/components/ui';
-import { useCalendarDates } from '@/util/calendar.js';
+import { formatDateString, getWeekDates, getVisibleHours, getCurrentDateRange } from '@/util/calendar.js';
 
 const props = defineProps({
     collection: { type: String, required: true },
@@ -29,18 +29,6 @@ const isDirty = ref(false);
 // Reactive drag state for Vue class bindings
 const dragOverTarget = ref(null);
 const datePickerOpen = ref(false);
-
-// Use composables
-const {
-    formatDateString,
-    createDateFromCalendarDate,
-    getWeekDates,
-    getVisibleHours,
-    getHourLabel,
-    formatTime,
-    isToday,
-    getCurrentDateRange
-} = useCalendarDates();
 
 // ============================================================================
 // API & Data Management

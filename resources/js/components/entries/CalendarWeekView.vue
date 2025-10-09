@@ -87,7 +87,7 @@
 import { computed, ref, defineExpose } from 'vue';
 import CalendarWeekEntry from './CalendarWeekEntry.vue';
 import CreateEntryButton from './CreateEntryButton.vue';
-import { useCalendarDates } from '@/util/calendar.js';
+import { getVisibleHours, getHourLabel, isToday } from '@/util/calendar.js';
 
 const props = defineProps({
     weekDates: { type: Array, required: true },
@@ -101,8 +101,6 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['select-date', 'entry-dragstart', 'drag-over', 'drag-enter', 'drag-leave', 'drop']);
-
-const { formatDateString, getVisibleHours, getHourLabel, isToday } = useCalendarDates();
 
 const visibleHours = getVisibleHours();
 

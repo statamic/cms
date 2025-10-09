@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { CalendarCell, CalendarCellTrigger, CalendarGrid, CalendarGridBody, CalendarGridHead, CalendarGridRow, CalendarHeadCell } from 'reka-ui';
 import CalendarEntry from './CalendarEntry.vue';
 import CreateEntryButton from './CreateEntryButton.vue';
-import { useCalendarDates } from '@/util/calendar.js';
+import { formatDateString, isToday } from '@/util/calendar.js';
 
 const props = defineProps({
     weekDays: { type: Array, required: true },
@@ -17,8 +17,6 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['select-date', 'entry-dragstart', 'drag-over', 'drag-enter', 'drag-leave', 'drop']);
-
-const { formatDateString, isToday } = useCalendarDates();
 
 const isCurrentDay = (dayIndex) => {
     const today = new Date();

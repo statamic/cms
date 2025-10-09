@@ -18,15 +18,13 @@
 
 <script setup>
 import { computed } from 'vue';
-import { useCalendarDates } from '@/util/calendar.js';
+import { formatTime } from '@/util/calendar.js';
 
 const props = defineProps({
     entry: { type: Object, required: true }
 });
 
 const emit = defineEmits(['dragstart']);
-
-const { formatTime } = useCalendarDates();
 
 const entryClasses = computed(() => ({
     'border-green-500 hover:bg-green-50': props.entry.status === 'published',
