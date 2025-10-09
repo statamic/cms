@@ -50,7 +50,7 @@ onMounted(() => {
 });
 
 function handleClickOutside(event) {
-    // Only handle click-outside on mobile (less than md breakpoint)
+    // Only handle click-outside on mobile (less than lg breakpoint)
     if (!isOpen.value || !clickListenerActive || !isMobile.value) return;
     if (navRef.value && !navRef.value.contains(event.target)) {
         isOpen.value = false;
@@ -61,6 +61,24 @@ function handleClickOutside(event) {
 function toggle() {
     isOpen.value = !isOpen.value;
     localStorage.setItem(localStorageKey, isOpen.value ? 'open' : 'closed');
+}
+
+function handleParentClick(item) {
+    setParentActive(item);
+    // Close nav on mobile when clicking a nav item
+    if (isMobile.value) {
+        isOpen.value = false;
+        localStorage.setItem(localStorageKey, 'closed');
+    }
+}
+
+function handleChildClick(item, child) {
+    setChildActive(item, child);
+    // Close nav on mobile when clicking a child nav item
+    if (isMobile.value) {
+        isOpen.value = false;
+        localStorage.setItem(localStorageKey, 'closed');
+    }
 }
 
 Statamic.$keys.bind(['command+\\'], (e) => {
@@ -88,7 +106,7 @@ Statamic.$events.$on('nav.toggle', toggle);
                             :href="item.url"
                             v-bind="item.attributes"
                             :class="{ 'active': item.active }"
-                            @click="setParentActive(item)"
+                            @click="handleParentClick(item)"
                         >
                             <Icon :name="item.icon" />
                             <span v-text="__(item.display)" />
@@ -101,7 +119,7 @@ Statamic.$events.$on('nav.toggle', toggle);
                                     v-bind="child.attributes"
                                     v-text="__(child.display)"
                                     :class="{ 'active': child.active }"
-                                    @click="setChildActive(item, child)"
+                                    @click="handleChildClick(item, child)"
                                 />
                             </li>
                         </ul>
