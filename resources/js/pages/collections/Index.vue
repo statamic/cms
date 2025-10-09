@@ -29,7 +29,7 @@ if (props.collections.length === 0) useArchitecturalBackground();
 
     <template v-else>
         <header class="py-8 mt-8 text-center">
-            <h1 class="text-[25px] font-medium antialiased flex justify-center items-center gap-3">
+            <h1 class="text-[25px] font-medium antialiased flex justify-center items-center gap-2 sm:gap-3">
                 <Icon name="collections" class="size-5 text-gray-500" />
                 {{ __('Collections') }}
             </h1>

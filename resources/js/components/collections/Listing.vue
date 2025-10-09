@@ -139,7 +139,7 @@
             </Link>
         </template>
         <template #cell-entries_count="{ row: collection }">
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 sm:gap-3">
                 <ui-badge
                     v-if="collection.published_entries_count > 0"
                     color="green"

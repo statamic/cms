@@ -20,7 +20,7 @@ const props = defineProps([
     <section class="space-y-6">
         <CardPanel :heading="__('Global Preferences')">
             <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 sm:gap-3">
                     <Icon name="globals" />
                     <Link :href="defaultPreferencesUrl">{{ __('Default') }}</Link>
                 </div>
@@ -31,7 +31,7 @@ const props = defineProps([
 
         <CardPanel v-if="roles.length" :heading="__('Preferences by Role')">
             <div v-for="role in roles" :key="role.handle" class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 sm:gap-3">
                     <Icon name="permissions" />
                     <Link :href="role.editUrl">{{ role.title }}</Link>
                 </div>
@@ -41,7 +41,7 @@ const props = defineProps([
 
         <CardPanel :heading="__('User Preferences')">
             <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 sm:gap-3">
                     <Icon name="avatar" />
                     <Link :href="userPreferencesUrl">{{ __('My Preferences') }}</Link>
                 </div>

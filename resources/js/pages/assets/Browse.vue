@@ -111,7 +111,7 @@ export default {
                 <!-- Header Skeleton -->
                 <div class="flex justify-between py-8">
                     <ui-skeleton class="h-8 w-95" />
-                    <div class="flex gap-3">
+                    <div class="flex gap-2 sm:gap-3">
                         <ui-skeleton class="h-10 w-26" />
                         <ui-skeleton class="h-10 w-36" />
                         <ui-skeleton class="h-10 w-20" />
