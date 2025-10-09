@@ -209,6 +209,7 @@ const fieldtypeComponentEvents = computed(() => ({
             :errors="errors"
             :read-only="isReadOnly"
             :variant="config.variant"
+            :full-width-setting="config.full_width_setting"
             v-bind="$attrs"
         >
             <template #label v-if="shouldShowLabel">

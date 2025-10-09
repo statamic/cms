@@ -16,6 +16,7 @@ const props = defineProps({
     disabled: { type: Boolean, default: false },
     error: { type: String },
     errors: { type: Object },
+    fullWidthSetting: { type: Boolean, default: false },
     id: { type: String },
     instructions: { type: String, default: '' },
     instructionsBelow: { type: Boolean, default: false },
@@ -34,7 +35,7 @@ const labelProps = computed(() => ({
 
 const inline = computed(() => props.asConfig ? true : props.variant === 'inline');
 
-const classes = computed(() =>
+const rootClasses = computed(() =>
     cva({
         base: [
             'min-w-0',
@@ -56,11 +57,33 @@ const classes = computed(() =>
             asConfig: {
                 true: 'grid grid-cols-2 items-start px-4.5 py-4 gap-x-5!',
             },
+            fullWidthSetting: {
+                true: '!grid-cols-1',
+            },
         },
     })({
         ...props,
         inline: inline.value,
         asConfig: props.asConfig,
+        fullWidthSetting: props.fullWidthSetting,
+    }),
+);
+
+const descriptionClasses = computed(() =>
+    cva({
+        base: ['mb-2 -mt-0.5'],
+        variants: {
+            inline: {
+                true: 'mb-0!',
+            },
+            fullWidth: {
+                true: 'mb-2!',
+            },
+        },
+    })({
+        ...props,
+        inline: inline.value,
+        fullWidth: props.fullWidthSetting,
     }),
 );
 
@@ -76,7 +99,7 @@ const errors = computed(() => {
 </script>
 
 <template>
-    <div :class="[classes, $attrs.class]" data-ui-input-group>
+    <div :class="[rootClasses, $attrs.class]" data-ui-input-group>
         <div
             v-if="$slots.actions"
             :class="[
@@ -94,7 +117,7 @@ const errors = computed(() => {
             <slot v-if="!$slots.actions" name="label">
                 <Label v-if="label" v-bind="labelProps" class="flex-1" />
             </slot>
-            <Description :text="instructions" v-if="instructions && !instructionsBelow" :class="inline ? '-mt-0.5' : 'mb-2 -mt-0.5'" />
+            <Description :text="instructions" v-if="instructions && !instructionsBelow" :class="descriptionClasses" />
         </div>
         <slot />
         <div>
