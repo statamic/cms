@@ -10,7 +10,7 @@
     /* Only inset because we don't wand to transition the color when we switch between light/dark mode */
     transition: inset 0.3s ease-in-out;
     /* On mobile, hide by default and overlay on top */
-    @apply md:flex;
+    @apply lg:flex;
     @apply z-50;
 
     ul {
@@ -44,7 +44,7 @@
 
 
 /* Mobile nav behavior */
-@media (max-width: theme(--breakpoint-md)) {
+@media (max-width: theme(--breakpoint-lg)) {
     .nav-main {
         /* Always visible but off-screen by default */
         @apply flex;
@@ -59,7 +59,7 @@
 
 
 main {
-    @apply ps-0 md:ps-46;
+    @apply ps-0 lg:ps-46;
     /* Wait for Vue to load before allowing this transition otherwise you see the Sidebar animate in on load in Firefox (and sometimes Safari) */
     body:has([data-v-app]) & {
         /* Only padding because we don't wand to transition the color when we switch between light/dark mode */
@@ -74,7 +74,7 @@ main {
 
 main.nav-closed {
     @apply ps-0;
-    @apply md:ps-0;
+    @apply lg:ps-0;
 }
 
 /* ==========================================================================

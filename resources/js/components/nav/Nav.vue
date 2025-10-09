@@ -13,8 +13,8 @@ const isMobile = ref(false);
 let clickListenerActive = false;
 
 onMounted(() => {
-    // Check if screen is less than md breakpoint (768px)
-    const mediaQuery = window.matchMedia('(width < 768px)');
+    // Check if screen is less than lg breakpoint (1024px)
+    const mediaQuery = window.matchMedia('(width < 1024px)');
     isMobile.value = mediaQuery.matches;
     
     const handleMediaChange = (e) => {
