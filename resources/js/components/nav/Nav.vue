@@ -9,9 +9,20 @@ const { nav, setParentActive, setChildActive } = useNavigation();
 const localStorageKey = 'statamic.nav';
 const isOpen = ref(localStorage.getItem(localStorageKey) !== 'closed');
 const navRef = ref(null);
+const isMobile = ref(false);
 let clickListenerActive = false;
 
 onMounted(() => {
+    // Check if screen is less than md breakpoint (768px)
+    const mediaQuery = window.matchMedia('(width < 768px)');
+    isMobile.value = mediaQuery.matches;
+    
+    const handleMediaChange = (e) => {
+        isMobile.value = e.matches;
+    };
+    
+    mediaQuery.addEventListener('change', handleMediaChange);
+    
     nextTick(() => {
         watch(isOpen, (isOpen) => {
             const el = document.getElementById('main');
@@ -29,16 +40,18 @@ onMounted(() => {
         }, { immediate: true });
     });
 
-    // Close nav when clicking outside
+    // Close nav when clicking outside (only on mobile)
     document.addEventListener('click', handleClickOutside);
-});
-
-onUnmounted(() => {
-    document.removeEventListener('click', handleClickOutside);
+    
+    onUnmounted(() => {
+        document.removeEventListener('click', handleClickOutside);
+        mediaQuery.removeEventListener('change', handleMediaChange);
+    });
 });
 
 function handleClickOutside(event) {
-    if (!isOpen.value || !clickListenerActive) return;
+    // Only handle click-outside on mobile (less than md breakpoint)
+    if (!isOpen.value || !clickListenerActive || !isMobile.value) return;
     if (navRef.value && !navRef.value.contains(event.target)) {
         isOpen.value = false;
         localStorage.setItem(localStorageKey, 'closed');
