@@ -67,9 +67,23 @@ export function useCalendarDates() {
                 endDate: new Date(weekDates[6].year, weekDates[6].month - 1, weekDates[6].day)
             };
         } else {
+            // For month view, get the visible date range including days from adjacent months
+            const firstDayOfMonth = new Date(currentDate.year, currentDate.month - 1, 1);
+            const lastDayOfMonth = new Date(currentDate.year, currentDate.month, 0);
+
+            // Calculate the first visible day (start of the week containing the 1st)
+            const dayOfWeek = firstDayOfMonth.getDay();
+            const startDate = new Date(firstDayOfMonth);
+            startDate.setDate(firstDayOfMonth.getDate() - dayOfWeek);
+
+            // Calculate the last visible day (end of the week containing the last day)
+            const lastDayOfWeek = lastDayOfMonth.getDay();
+            const endDate = new Date(lastDayOfMonth);
+            endDate.setDate(lastDayOfMonth.getDate() + (6 - lastDayOfWeek));
+
             return {
-                startDate: new Date(currentDate.year, currentDate.month - 1, 1),
-                endDate: new Date(currentDate.year, currentDate.month, 0)
+                startDate,
+                endDate
             };
         }
     };
