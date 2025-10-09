@@ -27,8 +27,8 @@
                     </template>
 
                     <template #header="{ canUpload, openFileBrowser, canCreateFolders, startCreatingFolder, mode, modeChanged }">
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="flex flex-1 items-center gap-3">
+                        <div class="flex items-center gap-2 sm:gap-3 mb-4">
+                            <div class="flex flex-1 items-center gap-2 sm:gap-3">
                                 <Search ref="search" />
                             </div>
 

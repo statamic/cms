@@ -16,7 +16,7 @@ const props = defineProps({
             </div>
             <slot name="title">{{ title }}</slot>
         </h1>
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 sm:gap-3">
             <slot name="actions">
                 <slot></slot>
             </slot>

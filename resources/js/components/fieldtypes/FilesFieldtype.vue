@@ -42,7 +42,7 @@
                                 :key="file"
                                 class="asset-row bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-900"
                             >
-                                <td class="flex gap-3 h-full items-center p-3">
+                                <td class="flex gap-2 sm:gap-3 h-full items-center p-3">
                                     <div
                                         class="flex size-7 cursor-pointer items-center justify-center whitespace-nowrap"
                                     >
