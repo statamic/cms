@@ -1,5 +1,4 @@
 <script setup>
-import { computed } from 'vue';
 import { CalendarCell, CalendarCellTrigger, CalendarGrid, CalendarGridBody, CalendarGridHead, CalendarGridRow, CalendarHeadCell } from 'reka-ui';
 import CalendarEntry from './CalendarEntry.vue';
 import CreateEntryButton from './CreateEntryButton.vue';

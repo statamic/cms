@@ -84,7 +84,7 @@
 </template>
 
 <script setup>
-import { computed, ref, defineExpose } from 'vue';
+import { ref, defineExpose } from 'vue';
 import CalendarWeekEntry from './CalendarWeekEntry.vue';
 import CreateEntryButton from './CreateEntryButton.vue';
 import { getVisibleHours, getHourLabel, isToday } from '@/util/calendar.js';

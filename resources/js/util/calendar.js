@@ -4,10 +4,6 @@ export function formatDateString(date) {
     return new Date(date.year, date.month - 1, date.day).toISOString().split('T')[0];
 }
 
-export function createDateFromCalendarDate (calendarDate, hours = 0, minutes = 0, seconds = 0) {
-    return new Date(calendarDate.year, calendarDate.month - 1, calendarDate.day, hours, minutes, seconds);
-}
-
 export function getWeekDates(currentDate) {
     if (!currentDate) {
         console.warn('getWeekDates called with undefined currentDate');

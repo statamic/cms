@@ -172,24 +172,6 @@ function handleYearChange(newYear) {
     currentDate.value = new CalendarDate(newYear, currentDate.value.month, currentDate.value.day);
 }
 
-// ============================================================================
-// Date Comparison Helpers
-// ============================================================================
-function isSelectedDate(date) {
-    return selectedDate.value && selectedDate.value.toString() === date.toString();
-}
-
-function isDragOverDate(date) {
-    return dragOverTarget.value && dragOverTarget.value.toString() === date.toString();
-}
-
-function isDragOverHour(date, hour) {
-    return dragOverTarget.value &&
-           dragOverTarget.value.date &&
-           dragOverTarget.value.date.toString() === date.toString() &&
-           dragOverTarget.value.hour === hour;
-}
-
 
 // ============================================================================
 // Drag and Drop Functions
@@ -407,22 +389,6 @@ const entriesByHour = computed(() => {
         });
     });
     return result;
-});
-
-// Group entries by date for efficient lookup
-const entriesByDate = computed(() => {
-    const grouped = {};
-    entries.value.forEach(entry => {
-        const dateStr = formatDateString(entry.date);
-        if (!grouped[dateStr]) grouped[dateStr] = [];
-        grouped[dateStr].push(entry);
-    });
-    return grouped;
-});
-
-// Current view date range
-const currentDateRange = computed(() => {
-    return getCurrentDateRange(currentDate.value, viewMode.value);
 });
 
 // ============================================================================
