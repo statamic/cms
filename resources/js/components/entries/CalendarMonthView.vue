@@ -183,7 +183,6 @@ const handleDrop = (event, targetDate) => {
                                 :blueprints="blueprints"
                                 variant="subtle"
                                 size="sm"
-                                :custom-trigger="true"
                             >
                                 <template #trigger="{ create }">
                                     <ui-button icon="plus" size="sm" variant="subtle" @click="create" />

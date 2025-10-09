@@ -1,17 +1,15 @@
 <template>
     <div class="flex">
         <template v-if="!hasMultipleBlueprints">
-            <slot name="trigger" :create="create" v-if="customTrigger">
+            <slot name="trigger" :create="create">
                 <Button @click="create" :variant :text="text" :size="size" :icon="icon" />
             </slot>
-            <Button v-else @click="create" :variant :text="text" :size="size" :icon="icon" />
         </template>
         <Dropdown v-else>
             <template #trigger>
-                <slot name="trigger" :create="create" v-if="customTrigger">
+                <slot name="trigger" :create="create">
                     <Button @click.prevent="create" :variant icon-append="chevron-down" :text="text" :size="size" :icon="icon" />
                 </slot>
-                <Button v-else @click.prevent="create" :variant icon-append="chevron-down" :text="text" :size="size" :icon="icon" />
             </template>
             <DropdownMenu>
                 <DropdownLabel v-text="__('Choose Blueprint')" />
@@ -47,7 +45,6 @@ export default {
         commandPalette: { type: Boolean, default: false },
         icon: { type: String, default: null },
         url: { type: String },
-        customTrigger: { type: Boolean, default: false },
     },
 
     computed: {
