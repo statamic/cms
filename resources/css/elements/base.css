@@ -20,13 +20,12 @@
     }
 
     --z-index-below: -1;
-    --z-index-base: 1;
-    --z-index-above: 2;
-    --z-index-header: 3;
-    --z-index-portal: 4;
-    --z-index-draggable: 5;
-    --z-index-modal: 50;
-    --z-index-max: 9999;
+    --z-index-above: 1;
+    --z-index-global-header: 2;
+    --z-index-portal: 3;
+    --z-index-draggable: 4;
+    --z-index-modal: 5;
+    --z-index-max: 6;
 
     /* Used for entry animations */
     --starting-style-transition-duration: 0.125s;

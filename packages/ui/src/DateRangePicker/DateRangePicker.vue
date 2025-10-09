@@ -170,7 +170,12 @@ const calendarEvents = computed(() => ({
 </template>
 
 <style>
+/* Reka inlines a z-index of 50. We need to override it to fall inline with our z-index system and ensure it's at least above the global header. */
 [data-reka-popper-content-wrapper] {
-    @apply z-100!;
+    z-index: var(--z-index-global-header)!important;
+}
+/* We can't use a direct descendant selector because the stack is inside a portal, so instead we'll check to see if there is a stack present. */
+body:has(.stack) [data-reka-popper-content-wrapper] {
+    z-index: var(--z-index-portal)!important;
 }
 </style>

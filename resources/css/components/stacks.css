@@ -3,9 +3,9 @@
    ========================================================================== */
 
 .portal-targets {
-    /* position on top of global header (z-index 3) but ignore clicks */
+    /* position on top of global header but ignore clicks */
     @apply pointer-events-none fixed inset-0;
-    z-index: 4;
+    z-index: var(--z-index-portal);
 
     .vue-portal-target {
         @apply pointer-events-auto;
