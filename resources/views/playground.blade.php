@@ -198,7 +198,7 @@
 
             <section class="space-y-4">
                 <ui-heading size="lg">Badges</ui-heading>
-                <div class="mb-4 flex gap-3 items-end">
+                <div class="mb-4 flex gap-2 sm:gap-3 items-end">
                     <ui-badge size="lg" text="Green" color="green" />
                     <ui-badge size="lg" text="Red" color="red" />
                     <ui-badge size="lg" text="Black" color="black" />
@@ -213,21 +213,21 @@
 
             <section class="space-y-4">
                 <ui-heading size="lg">Buttons</ui-heading>
-                <div class="mb-4 flex gap-3 items-end">
+                <div class="mb-4 flex gap-2 sm:gap-3 items-end">
                     <ui-button text="Default" />
                     <ui-button text="Primary" variant="primary" />
                     <ui-button text="Filled" variant="filled" />
                     <ui-button text="Ghost" variant="ghost" />
                     <ui-button text="Subtle" variant="subtle" />
                 </div>
-                <div class="mb-4 flex gap-3 items-end">
+                <div class="mb-4 flex gap-2 sm:gap-3 items-end">
                     <ui-button icon="save" text="Default" />
                     <ui-button icon="save" text="Primary" variant="primary" />
                     <ui-button icon="save" text="Filled" variant="filled" />
                     <ui-button icon="save" text="Ghost" variant="ghost" />
                     <ui-button icon="save" text="Subtle" variant="subtle" />
                 </div>
-                <div class="mb-4 flex gap-3 items-end">
+                <div class="mb-4 flex gap-2 sm:gap-3 items-end">
                     <ui-button icon="save" />
                     <ui-button icon="save" variant="primary" />
                     <ui-button icon="save" variant="filled" />
@@ -315,7 +315,7 @@
                 <ui-heading size="lg">Icons</ui-heading>
                 <div class="grid grid-cols-4 md:grid-cols-6 2xl:grid-cols-10 gap-4">
                     @foreach ($icons as $icon)
-                        <div class="bg-gray-50 rounded-lg py-6 px-2 flex flex-col items-center gap-3">
+                        <div class="bg-gray-50 rounded-lg py-6 px-2 flex flex-col items-center gap-2 sm:gap-3">
                             <ui-icon name="{{ $icon }}" class="size-6" />
                             <span class="text-xs text-gray-500">{{ $icon }}</span>
                         </div>

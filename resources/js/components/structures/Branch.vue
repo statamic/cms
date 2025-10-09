@@ -4,7 +4,7 @@
             <div v-if="editable" class="page-move w-6" />
         </slot>
         <div class="flex flex-1 items-center p-1.5 text-xs leading-normal">
-            <div class="flex gap-3 grow items-center" @click="$emit('branch-clicked', page)">
+            <div class="flex gap-2 sm:gap-3 grow items-center" @click="$emit('branch-clicked', page)">
                 <ui-status-indicator :status="page.status" v-tooltip="getStatusTooltip()" />
                 <ui-icon v-if="isRoot" name="home" class="size-4" v-tooltip="__('This is the root page')" />
                 <a
@@ -44,7 +44,7 @@
                 </div>
             </div>
 
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 sm:gap-3">
                 <ui-badge
                     v-if="showBlueprint && page.entry_blueprint"
                     :text="__(page.entry_blueprint.title)"

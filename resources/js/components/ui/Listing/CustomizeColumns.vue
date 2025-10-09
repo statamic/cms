@@ -106,7 +106,7 @@ function reset() {
                             >
                                 <div class="space-y-1.5 p-3 select-none">
                                     <div
-                                        class="item sortable cursor-grab py-2 px-2.5 gap-3 relative rounded-lg bg-white dark:bg-gray-700 flex items-center justify-between text-xs shadow"
+                                        class="item sortable cursor-grab py-2 px-2.5 gap-2 sm:gap-3 relative rounded-lg bg-white dark:bg-gray-700 flex items-center justify-between text-xs shadow"
                                         v-for="column in selectedColumns"
                                         :key="column.field"
                                         tabindex="-1"

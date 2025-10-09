@@ -12,7 +12,7 @@
                 <!-- Header -->
                 <header id="asset-editor-header" class="relative flex w-full justify-between px-2">
                     <button
-                        class="group flex items-center gap-3 p-4"
+                        class="group flex items-center gap-2 sm:gap-3 p-4"
                         @click="open"
                         v-tooltip.right="__('Open in a new window')"
                         :aria-label="__('Open in a new window')"
@@ -136,7 +136,7 @@
                 </div>
 
                 <div class="flex w-full items-center justify-end rounded-b border-t dark:border-gray-700 bg-gray-100 dark:bg-gray-900 px-4 py-3">
-                    <div class="hidden h-full flex-1 gap-3 py-1 sm:flex">
+                    <div class="hidden h-full flex-1 gap-2 sm:gap-3 py-1 sm:flex">
                         <ui-badge v-if="isImage" icon="assets" :text="__('messages.width_x_height', { width: asset.width, height: asset.height })" />
                         <ui-badge icon="memory" :text="asset.size" />
                         <ui-badge icon="fingerprint" :text="asset.lastModifiedRelative" />

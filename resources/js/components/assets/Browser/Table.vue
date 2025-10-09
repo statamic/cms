@@ -87,7 +87,7 @@
 
             <template #cell-basename="{ row: asset, checkboxId }">
                 <div
-                    class="group flex w-fit items-center gap-3"
+                    class="group flex w-fit items-center gap-2 sm:gap-3"
                     :draggable="true"
                     @dragover.prevent
                     @dragstart="draggingAsset = asset.id"

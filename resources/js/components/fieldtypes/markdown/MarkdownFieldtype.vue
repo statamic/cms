@@ -106,7 +106,7 @@
                                             :text="__('Markdown Cheatsheet')"
                                         />
                                     </div>
-                                    <div v-if="fullScreenMode" class="flex items-center pe-2 gap-3 text-xs">
+                                    <div v-if="fullScreenMode" class="flex items-center pe-2 gap-2 sm:gap-3 text-xs">
                                         <div class="whitespace-nowrap">
                                             <span v-text="count.words" /> {{ __('Words') }}
                                         </div>

@@ -16,7 +16,7 @@
     thead {
         th {
             @apply whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-300 text-start;
-            @apply px-4 py-2;
+            @apply px-2 md:px-4 py-2;
 
             .data-table--contained & {
                 @apply py-2.5 border-b border-gray-200 dark:border-gray-700;
@@ -90,7 +90,7 @@
 
             td {
                 @apply bg-white dark:bg-gray-900;
-                @apply pl-4.5 pr-2.5 py-3 border-t border-gray-200 dark:border-white/10;
+                @apply ps-2 md:pl-4.5 pe-1 md:pe-2.5 py-3 border-t border-gray-200 dark:border-white/10;
                 @apply text-gray-900 dark:text-gray-200;
             }
 
