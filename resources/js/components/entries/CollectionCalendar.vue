@@ -6,7 +6,7 @@ import { CalendarDate } from '@internationalized/date';
 import CalendarMonthView from './CalendarMonthView.vue';
 import CalendarWeekView from './CalendarWeekView.vue';
 import { Listing, StatusIndicator } from '@/components/ui';
-import { useCalendarDates } from '@/composables/useCalendarDates';
+import { useCalendarDates } from '@/util/calendar.js';
 
 const props = defineProps({
     collection: { type: String, required: true },

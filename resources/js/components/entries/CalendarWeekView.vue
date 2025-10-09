@@ -87,7 +87,7 @@
 import { computed, ref, defineExpose } from 'vue';
 import CalendarWeekEntry from './CalendarWeekEntry.vue';
 import CreateEntryButton from './CreateEntryButton.vue';
-import { useCalendarDates } from '@/composables/useCalendarDates';
+import { useCalendarDates } from '@/util/calendar.js';
 
 const props = defineProps({
     weekDates: { type: Array, required: true },

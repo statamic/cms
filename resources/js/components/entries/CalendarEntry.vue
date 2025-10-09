@@ -18,7 +18,7 @@
 
 <script setup>
 import { computed } from 'vue';
-import { useCalendarDates } from '@/composables/useCalendarDates';
+import { useCalendarDates } from '@/util/calendar.js';
 
 const props = defineProps({
     entry: { type: Object, required: true }
