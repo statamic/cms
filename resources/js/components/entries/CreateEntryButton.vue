@@ -1,10 +1,8 @@
 <template>
     <div class="flex">
-        <template v-if="!hasMultipleBlueprints">
-            <slot name="trigger" :create="create">
-                <Button @click="create" :variant :text="text" :size="size" :icon="icon" />
-            </slot>
-        </template>
+        <slot v-if="!hasMultipleBlueprints" name="trigger" :create="create">
+            <Button @click="create" :variant :text="text" :size="size" :icon="icon" />
+        </slot>
         <Dropdown v-else>
             <template #trigger>
                 <slot name="trigger" :create="create">
