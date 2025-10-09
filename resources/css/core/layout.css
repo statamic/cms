@@ -69,7 +69,7 @@ main {
 
 .nav-closed .nav-main {
     /* Start off-screen to the left */
-    @apply -start-48;
+    @apply -start-50;
 }
 
 main.nav-closed {
