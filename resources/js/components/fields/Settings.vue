@@ -4,9 +4,9 @@
             <Icon name="loading" />
         </div>
 
-        <header v-if="!loading" class="flex items-center justify-between pl-3 pt-3 pb-4 -mb-4 sticky top-0 z-1 bg-gradient-to-b from-white from-75% dark:from-gray-800">
+        <header v-if="!loading" class="flex flex-wrap items-center justify-between pl-3 pt-3 pb-4 -mb-4 sticky top-0 z-1 bg-gradient-to-b from-white from-75% dark:from-gray-800">
             <Heading :text="__(values.display) || __(config.display) || config.handle" size="lg" :icon="fieldtype.icon" />
-            <div class="flex items-center gap-2 sm:gap-3">
+            <div class="flex items-center gap-2 sm:gap-3 pt-4 sm:pt-0">
                 <Button variant="ghost" :text="__('Cancel')" @click.prevent="close" />
                 <Button variant="default" @click.prevent="commit()" :text="__('Apply')" />
                 <Button v-if="!(isInsideSet || isInsideConfigFields)" variant="primary" @click.prevent="commitAndSave()" icon="save" :text="__('Apply & Save')" />
