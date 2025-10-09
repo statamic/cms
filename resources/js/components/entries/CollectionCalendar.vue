@@ -66,7 +66,17 @@ async function fetchEntries() {
 
         const response = await axios.get(cp_url(`collections/${props.collection}/entries`), {
             params: {
-                date: `${startDate.toISOString().split('T')[0]} to ${endDate.toISOString().split('T')[0]}`,
+                filters: utf8btoa(JSON.stringify({
+                    fields: {
+                        date: {
+                            operator: 'between',
+                            range_value: {
+                                start: startDate.toISOString(),
+                                end: endDate.toISOString(),
+                            }
+                        }
+                    }
+                })),
                 per_page: 1000
             }
         });
