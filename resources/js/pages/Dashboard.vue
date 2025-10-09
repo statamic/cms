@@ -10,9 +10,9 @@ function classes(widget) {
 
 function tailwindWidthClass(width) {
     const sizes = {
-        sm: 'w-full @lg:w-1/2 @4xl:w-1/3 @8xl:w-1/4',
-        md: 'w-full @lg:w-1/2 @4xl:w-1/2 @8xl:w-1/3',
-        lg: 'w-full @lg:w-full @4xl:w-2/3 @8xl:w-3/4',
+        sm: 'w-full @2xl:w-1/2 @4xl:w-1/3 @8xl:w-1/4',
+        md: 'w-full @2xl:w-1/2 @4xl:w-1/2 @8xl:w-1/3',
+        lg: 'w-full @2xl:w-full @4xl:w-2/3 @8xl:w-3/4',
         full: 'w-full',
     };
 
