@@ -102,11 +102,6 @@ class Site implements Augmentable
         return $this->isDefault;
     }
 
-    public function sameDomain(Site $site): bool
-    {
-        return $this->removePath($this->absoluteUrl()) === $this->removePath($site->absoluteUrl());
-    }
-
     public function set($key, $value)
     {
         $this->config[$key] = $this->resolveAntlersValue($value);
