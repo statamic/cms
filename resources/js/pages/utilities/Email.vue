@@ -15,7 +15,7 @@ function send() {
 </script>
 
 <template>
-    <Head :title="__('Email')" />
+    <Head :title="[__('Email'), __('Utilities')]" />
 
     <Header :title="__('Email')" icon="mail-settings" />
 

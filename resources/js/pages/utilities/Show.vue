@@ -2,11 +2,11 @@
 import Head from '@/pages/layout/Head.vue';
 import DynamicHtmlRenderer from '@/components/DynamicHtmlRenderer.vue';
 
-defineProps(['html']);
+defineProps(['title', 'html']);
 </script>
 
 <template>
-    <Head :title="__('Utility')" />
+    <Head :title="[title, __('Utilities')]" />
 
     <DynamicHtmlRenderer :html="html" />
 </template>

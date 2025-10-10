@@ -1,108 +1,109 @@
 /* ==========================================================================
    Grid Fieldtype
    ========================================================================== */
+   @layer ui {
+    .grid-table {
+        @apply bg-white dark:bg-gray-900 relative w-full rounded-lg border shadow-ui-sm outline-hidden dark:border-gray-700 dark:text-dark-150 text-start;
+        border-collapse: separate;
+        border-spacing: 0;
+        table-layout: auto;
 
-.grid-table {
-    @apply bg-white dark:bg-gray-800 relative w-full rounded-lg border shadow-ui-sm outline-hidden dark:border-gray-900 dark:text-dark-150 text-start;
-    border-collapse: separate;
-    border-spacing: 0;
-    table-layout: auto;
-
-    [data-ui-field-text] {
-        @apply sr-only;
-    }
-
-    thead th {
-        @apply sticky -top-2 table-cell z-10 border-b bg-gray-100/75 backdrop-blur-[10px] p-2 text-sm font-medium text-gray-900 dark:border-gray-900 dark:bg-gray-800 dark:text-gray-100;
-        /* Prevent the sticky toolbar from hitting the very end of container, which causes it to overlap the container's border-radius */
-        margin-block-end: 8px;
-        /* Pull the subsequent element up to compensate for this */
-        + * {
-            margin-block-start: -8px;
-        }
-    
-        &:first-child {
-            @apply rounded-ss-lg ps-3;
-        }
-    
-        &:last-child {
-            @apply rounded-se-lg border-s-0;
+        [data-ui-field-text] {
+            @apply sr-only;
         }
 
-        .stack-container & {
-            top: auto;
+        thead th {
+            @apply sticky -top-2 table-cell z-10 border-b bg-gray-100/75 p-2 text-sm font-medium text-gray-900 dark:border-gray-700 dark:bg-gray-925 dark:text-gray-100;
+            /* Prevent the sticky toolbar from hitting the very end of container, which causes it to overlap the container's border-radius */
+            margin-block-end: 8px;
+            /* Pull the subsequent element up to compensate for this */
+            + * {
+                margin-block-start: -8px;
+            }
+        
+            &:first-child {
+                @apply rounded-ss-lg ps-3;
+            }
+        
+            &:last-child {
+                @apply rounded-se-lg border-s-0;
+            }
+
+            .stack-container & {
+                top: auto;
+            }
+
+            /* Bard field with a fixed toolbar > Grid fieldtype */
+            .bard-fieldtype:has(> .bard-fixed-toolbar) .bard-content & {
+                @apply top-8;
+            }
         }
 
-        /* Bard field with a fixed toolbar > Grid fieldtype */
-        .bard-fieldtype:has(> .bard-fixed-toolbar) .bard-content & {
+        /* Grid fieldtype > Bard fieldtype */
+        .bard-fixed-toolbar {
             @apply top-8;
         }
-    }
 
-    /* Grid fieldtype > Bard fieldtype */
-    .bard-fixed-toolbar {
-        @apply top-8;
-    }
+        /* Bard field with a fixed toolbar > Grid fieldtype > Bard fieldtype */
+        .bard-fieldtype:has(> .bard-fixed-toolbar) .bard-content & .bard-fixed-toolbar {
+            @apply top-16;
+        }
 
-    /* Bard field with a fixed toolbar > Grid fieldtype > Bard fieldtype */
-    .bard-fieldtype:has(> .bard-fixed-toolbar) .bard-content & .bard-fixed-toolbar {
-        @apply top-16;
-    }
-
-    > tbody {
-        @apply outline-hidden;
-
-        > tr {
+        > tbody {
             @apply outline-hidden;
 
-            > td {
-                @apply border-b px-2 py-3 align-top dark:border-gray-900;
-    
-                &:first-child.grid-cell {
-                    @apply ltr:pl-3 rtl:pr-3;
+            > tr {
+                @apply outline-hidden;
+
+                > td {
+                    @apply border-b px-2 py-3 align-top dark:border-gray-900;
+        
+                    &:first-child.grid-cell {
+                        @apply ltr:pl-3 rtl:pr-3;
+                    }
+        
+                    &.drag-handle {
+                        width: 1%;
+                        background: url('../../../svg/drag-dots.svg') center center no-repeat;
+                        background-size: 7px 17px;
+                        @apply h-full p-2 cursor-grab bg-gray-50 dark:bg-gray-850 hover:bg-gray-100 dark:hover:bg-gray-800 border-e border-gray-200 dark:border-gray-800 hover:border-e-gray-300 dark:hover:border-e-gray-600;
+                    }
                 }
-    
-                &.drag-handle {
-                    width: 1%;
-                    background: url('../../../svg/drag-dots.svg') center center no-repeat;
-                    background-size: 7px 17px;
-                    @apply h-full p-2 cursor-grab bg-gray-50 dark:bg-gray-900/25 hover:bg-gray-100 dark:hover:bg-gray-700 border-e border-gray-200 dark:border-gray-900 hover:border-e-gray-300 dark:hover:border-e-gray-600;
+            }
+
+            tr {
+                &:last-child td {
+                    @apply border-b-0;
+                    &:first-child {
+                        @apply ltr:rounded-bl-[7px] rtl:rounded-br-[7px];
+                    }
+                    &:last-child {
+                        @apply ltr:rounded-br-[7px] rtl:rounded-bl-[7px];
+                    }
                 }
+                &.draggable-source--is-dragging td {
+                    @apply bg-gray-100;
+                }
+            }
+
+            .grid-cell :is([data-ui-field-header], [data-ui-label], [data-ui-description]) {
+                @apply hidden;
             }
         }
 
-        tr {
-            &:last-child td {
-                @apply border-b-0;
-                &:first-child {
-                    @apply ltr:rounded-bl-[7px] rtl:rounded-br-[7px];
-                }
-                &:last-child {
-                    @apply ltr:rounded-br-[7px] rtl:rounded-bl-[7px];
-                }
-            }
-            &.draggable-source--is-dragging td {
-                @apply bg-gray-100;
-            }
-        }
-
-        .grid-cell :is([data-ui-field-header], [data-ui-label], [data-ui-description]) {
-            @apply hidden;
+        tbody .grid-row-controls {
+            @apply text-center pt-3 ltr:pl-0 rtl:pr-0;
+            width: 1%;
         }
     }
 
-    tbody .grid-row-controls {
-        @apply text-center pt-3 ltr:pl-0 rtl:pr-0;
-        width: 1%;
+    .grid-item-header {
+        @apply flex cursor-move items-center justify-between border-b bg-gray-200 px-4 py-2 text-sm outline-hidden;
     }
-}
 
-.grid-item-header {
-    @apply flex cursor-move items-center justify-between border-b bg-gray-200 px-4 py-2 text-sm outline-hidden;
-}
-
-.grid-fullscreen {
-    @apply fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-200;
-    z-index: 998; /*  to appear over the top of the rest of the stuff on the page. */
-    /*  too high and it'll be over the top of stacks, etc. */
+    .grid-fullscreen {
+        @apply fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-200;
+        z-index: 998; /*  to appear over the top of the rest of the stuff on the page. */
+        /*  too high and it'll be over the top of stacks, etc. */
+    }
 }

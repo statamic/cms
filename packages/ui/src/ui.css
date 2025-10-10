@@ -15,6 +15,7 @@
     --color-gray-800: var(--theme-color-gray-800);
     --color-gray-850: var(--theme-color-gray-850);
     --color-gray-900: var(--theme-color-gray-900);
+    --color-gray-925: var(--theme-color-gray-925);
     --color-gray-950: var(--theme-color-zinc-950);
     --color-volt: oklch(93.86% 0.2018 122.24);
 
@@ -111,11 +112,6 @@
     --shadow-ui-lg: 0px 4px 7px -4px rgba(0,0,0,0.15);
     --shadow-ui-xl: 0px 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
 
-    --animation-timing-function-fast-out-slow-in: cubic-bezier(.4,0,.2,1);
-
-    /* Custom value because gray-100 is too light and gray-200 is too dark, e.g. Bard active buttons */
-    --color-button-active-light-theme: hsl(from var(--color-gray-200) h s l / 0.6);
-
     --animate-wiggle: wiggle 200ms ease-in-out infinite;
 
     @keyframes wiggle {
@@ -127,6 +123,17 @@
             transform: rotate(3deg);
         }
     }
+}
+
+:root {
+    --animation-timing-function-fast-out-slow-in: cubic-bezier(.4,0,.2,1);
+
+    /* Custom value because gray-100 is too light and gray-200 is too dark, e.g. Bard active buttons */
+    --color-button-active: hsl(from var(--color-gray-300) h s l / 0.45);
+}
+
+.dark {
+    --color-button-active: hsl(from var(--color-gray-700) h s l / 0.45);
 }
 
 @custom-variant with-contrast (&:where([data-contrast="increased"] *));

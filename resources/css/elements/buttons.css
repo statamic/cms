@@ -14,6 +14,10 @@
             &.btn-danger {
                 box-shadow: none;
                 @apply text-red-600;
+                .dark & {
+                    /* Override the default dark danger button. This needs to be overriden because .dark means it has greater specificity */
+                    @apply from-gray-850 to-gray-900 hover:to-gray-850 hover:bg-gray-900 border-gray-700;
+                }
             }
         }
     }

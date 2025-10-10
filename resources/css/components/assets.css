@@ -134,9 +134,12 @@
 }
 
 .asset-filename {
-    @apply font-mono text-xs text-gray-500 mt-2 whitespace-nowrap text-center;
+    @apply font-mono text-xs text-gray-500 dark:text-gray-300 mt-2 whitespace-nowrap text-center;
     .selected & {
         @apply text-blue-500;
+        .dark & {
+            @apply text-blue-400;
+        }
     }
 }
 

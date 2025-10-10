@@ -3,7 +3,6 @@ import { cva } from 'cva';
 import { computed } from 'vue';
 import Description from './Description.vue';
 import Label from './Label.vue';
-import Card from './Card/Card.vue';
 import ErrorMessage from './ErrorMessage.vue';
 import markdown from '@/util/markdown.js';
 
@@ -12,16 +11,17 @@ defineOptions({
 });
 
 const props = defineProps({
-    as: { type: String, default: 'div', validator: (value) => ['div', 'card'].includes(value) },
+    asConfig: { type: Boolean, default: false },
     badge: { type: String, default: '' },
     disabled: { type: Boolean, default: false },
-    readOnly: { type: Boolean, default: false },
     error: { type: String },
     errors: { type: Object },
+    fullWidthSetting: { type: Boolean, default: false },
     id: { type: String },
     instructions: { type: String, default: '' },
     instructionsBelow: { type: Boolean, default: false },
     label: { type: String },
+    readOnly: { type: Boolean, default: false },
     required: { type: Boolean, default: false },
     variant: { type: String, default: 'block' },
 });
@@ -33,7 +33,9 @@ const labelProps = computed(() => ({
     text: props.label,
 }));
 
-const classes = computed(() =>
+const inline = computed(() => props.asConfig ? true : props.variant === 'inline');
+
+const rootClasses = computed(() =>
     cva({
         base: [
             'min-w-0',
@@ -52,12 +54,40 @@ const classes = computed(() =>
             disabled: {
                 true: 'opacity-50',
             },
+            asConfig: {
+                true: 'grid grid-cols-2 items-start px-4.5 py-4 gap-x-5!',
+            },
+            fullWidthSetting: {
+                true: '!grid-cols-1',
+            },
         },
-    })({ ...props }),
+    })({
+        ...props,
+        inline: inline.value,
+        asConfig: props.asConfig,
+        fullWidthSetting: props.fullWidthSetting,
+    }),
+);
+
+const descriptionClasses = computed(() =>
+    cva({
+        base: ['mb-2 -mt-0.5'],
+        variants: {
+            inline: {
+                true: 'mb-0!',
+            },
+            fullWidth: {
+                true: 'mb-2!',
+            },
+        },
+    })({
+        ...props,
+        inline: inline.value,
+        fullWidth: props.fullWidthSetting,
+    }),
 );
 
 const instructions = computed(() => props.instructions ? markdown(__(props.instructions), { openLinksInNewTabs: true }) : null);
-const wrapperComponent = computed(() => props.as === 'card' ? Card : 'div');
 
 const errors = computed(() => {
     if (props.error) {
@@ -69,7 +99,7 @@ const errors = computed(() => {
 </script>
 
 <template>
-    <component :is="wrapperComponent" :class="[classes, $attrs.class]" data-ui-input-group>
+    <div :class="[rootClasses, $attrs.class]" data-ui-input-group>
         <div
             v-if="$slots.actions"
             :class="[
@@ -83,14 +113,16 @@ const errors = computed(() => {
             </slot>
             <slot name="actions" />
         </div>
-        <div v-if="label || (instructions && !instructionsBelow) || ($slots.label && !$slots.actions)" data-ui-field-text :class="variant === 'inline' ? 'mb-0' : 'mb-1.5'">
+        <div v-if="label || (instructions && !instructionsBelow) || ($slots.label && !$slots.actions)" data-ui-field-text :class="inline ? 'mb-0' : 'mb-1.5'">
             <slot v-if="!$slots.actions" name="label">
                 <Label v-if="label" v-bind="labelProps" class="flex-1" />
             </slot>
-            <Description :text="instructions" v-if="instructions && !instructionsBelow" :class="variant === 'inline' ? '-mt-0.5' : 'mb-2 -mt-0.5'" />
+            <Description :text="instructions" v-if="instructions && !instructionsBelow" :class="descriptionClasses" />
         </div>
         <slot />
-        <Description :text="instructions" v-if="instructions && instructionsBelow" class="mt-2" />
-        <ErrorMessage v-if="errors" v-for="(error, i) in errors" :key="i" :text="error" class="mt-2" />
-    </component>
+        <div>
+            <Description :text="instructions" v-if="instructions && instructionsBelow" class="mt-2" />
+            <ErrorMessage v-if="errors" v-for="(error, i) in errors" :key="i" :text="error" class="mt-2" />
+        </div>
+    </div>
 </template>

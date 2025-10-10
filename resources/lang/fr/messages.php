@@ -63,6 +63,7 @@ return [
     'collections_taxonomies_instructions' => 'Reliez les entrées de cette collection à des taxonomies. Les champs seront automatiquement ajoutés aux formulaires.',
     'dictionaries_countries_emojis_instructions' => 'Inclure les émojis de drapeaux dans les étiquettes ?',
     'dictionaries_countries_region_instructions' => 'Filtrez éventuellement les pays par région.',
+    'dirty_navigation_warning' => 'Vous avez des modifications non enregistrées. Êtes-vous sûr de vouloir quitter cette page ?',
     'disable_two_factor_authentication' => 'Êtes-vous sûr de vouloir désactiver l’authentification à deux facteurs ?',
     'disable_two_factor_authentication_current_user_enforced' => 'Vous serez immédiatement déconnecté et devrez à nouveau configurer l’authentification à deux facteurs lors de votre prochaine connexion.',
     'disable_two_factor_authentication_current_user_optional' => 'Cette action rendra vos codes d’authentification et de sauvegarde invalides et permettra un accès complet à votre compte en utilisant uniquement son mot de passe.',
