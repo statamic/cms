@@ -8,6 +8,7 @@ import { Link } from '@inertiajs/vue3';
 const props = defineProps({
     as: { type: String, default: 'button' },
     href: { type: String, default: null },
+    target: { type: String, default: null },
     icon: { type: String, default: null },
     iconAppend: { type: String, default: null },
     iconOnly: { type: Boolean, default: false },
