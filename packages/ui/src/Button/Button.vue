@@ -6,7 +6,7 @@ import Icon from '../Icon/Icon.vue';
 import { Link } from '@inertiajs/vue3';
 
 const props = defineProps({
-    as: { type: String, default: 'button' },
+    as: { type: String, default: null },
     href: { type: String, default: null },
     target: { type: String, default: null },
     icon: { type: String, default: null },
@@ -24,10 +24,11 @@ const props = defineProps({
 const slots = useSlots();
 const hasDefaultSlot = !!slots.default;
 const tag = computed(() => {
+    if (props.as) return props.as;
     if (props.href) {
         return props.target === '_blank' ? 'a' : Link;
     }
-    return props.as;
+    return 'button';
 });
 const iconOnly = computed(() => (props.icon && !hasDefaultSlot && !props.text) || props.iconOnly);
 
