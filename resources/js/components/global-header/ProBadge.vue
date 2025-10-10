@@ -25,6 +25,7 @@ const problemBadgeColor = computed(() => {
         <Badge
             variant="flat"
             :color="problemBadgeColor"
+            class="max-[390px]:max-w-[25vw] contain-paint inline! text-ellipsis"
         >
             {{ __('Pro') }} – {{ licensing.isOnPublicDomain ? __('statamic::messages.licensing_error_unlicensed') : __('Trial Mode') }}
         </Badge>

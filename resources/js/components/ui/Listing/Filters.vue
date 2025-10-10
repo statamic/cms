@@ -98,7 +98,7 @@ function handleStackClosed() {
 </script>
 
 <template>
-    <div class="flex flex-1 items-center gap-3 overflow-x-auto py-3 rounded-r-4xl">
+    <div class="flex flex-1 items-center gap-2 sm:gap-3 overflow-x-auto py-3 rounded-r-4xl">
 
         <div ref="filtersButtonWrapperRef" class="sticky left-0 ps-[1px] rounded-r-lg bg-white dark:bg-gray-900 mask-bg mask-bg--left mask-bg--left-small">
             <Button icon="sliders-horizontal" class="[&_svg]:size-3.5" :disabled="reorderable" @click="open = true">

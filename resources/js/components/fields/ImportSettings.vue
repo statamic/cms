@@ -2,7 +2,7 @@
     <div class="h-full overflow-auto bg-white dark:bg-gray-800 p-3 rounded-l-xl">
         <header class="flex items-center justify-between pl-3 mb-6">
             <Heading :text="__('Linked fieldset')" size="lg" icon="fieldsets" />
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 sm:gap-3">
                 <Button variant="ghost" :text="__('Cancel')" @click.prevent="close" />
                 <Button variant="primary" @click.prevent="commit" :text="__('Apply')" />
                 <Button v-if="isInsideSet" variant="primary" @click.prevent="commit(true)" :text="__('Apply & Close All')" />

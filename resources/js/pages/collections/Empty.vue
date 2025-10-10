@@ -22,7 +22,7 @@ const props = defineProps([
     <Head :title="[__(title), __('Collections')]" />
 
     <header class="py-8 mt-8 text-center starting-style-transition" v-cloak>
-        <h1 class="text-[25px] font-medium antialiased flex justify-center items-center gap-3">
+        <h1 class="text-[25px] font-medium antialiased flex justify-center items-center gap-2 sm:gap-3">
             <ui-icon name="collections" class="size-5 text-gray-500"></ui-icon>
             <span v-text="__(title)" />
         </h1>

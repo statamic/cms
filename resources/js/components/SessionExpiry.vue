@@ -20,7 +20,7 @@
             <div v-if="!isUsingOauth">
                 <ui-field :errors="errors" class="space-y-3">
                     <ui-description v-text="__('messages.session_expiry_enter_password')" />
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 sm:gap-3">
                         <Input
                             type="password"
                             v-model="password"

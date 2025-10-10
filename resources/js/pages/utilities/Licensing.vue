@@ -60,7 +60,7 @@ const props = defineProps([
                 <Table class="w-full">
                     <TableRow>
                         <TableCell class="w-64 font-bold">
-                            <div class="flex gap-3">
+                            <div class="flex gap-2 sm:gap-3">
                                 <span class="little-dot mt-[0.45rem]" :class="site.valid ? 'bg-green-500 dark:bg-green-600' : 'bg-red-500 dark:bg-red-600'" />
                                 {{ site.key ?? __('No license key') }}
                             </div>
@@ -86,7 +86,7 @@ const props = defineProps([
                 <Table class="w-full">
                     <TableRow>
                         <TableCell class="w-64 font-bold">
-                            <div class="flex gap-3">
+                            <div class="flex gap-2 sm:gap-3">
                                 <span class="little-dot mt-[0.45rem]" :class="statamic.valid ? 'bg-green-500 dark:bg-green-600' : 'bg-red-500 dark:bg-red-600'" />
                                 <span>
                                     {{ __('Statamic') }}
@@ -111,7 +111,7 @@ const props = defineProps([
                 <Table class="w-full">
                     <TableRow v-for="addon in addons" :key="addon.name">
                         <TableCell class="w-64">
-                            <div class="flex gap-3">
+                            <div class="flex gap-2 sm:gap-3">
                                 <span class="little-dot mt-[0.45rem]" :class="addon.valid ? 'bg-green-500 dark:bg-green-600' : 'bg-red-500 dark:bg-red-600'" />
                                 <span class="font-bold">
                                     <a :href="addon.marketplaceUrl" class="underline">{{ addon.name }}</a>
@@ -133,7 +133,7 @@ const props = defineProps([
                 <Table class="w-full">
                     <TableRow v-for="addon in unlistedAddons" :key="addon.name">
                         <TableCell class="w-64">
-                            <div class="flex gap-3">
+                            <div class="flex gap-2 sm:gap-3">
                                 <span class="little-dot mt-[0.45rem] bg-green-500 dark:bg-green-600" />
                                 {{ addon.name }}
                             </div>

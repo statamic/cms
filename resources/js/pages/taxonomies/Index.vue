@@ -61,7 +61,7 @@ function removeRow(row) {
 
     <template v-else>
         <header class="py-8 mt-8 text-center">
-            <h1 class="text-[25px] font-medium antialiased flex justify-center items-center gap-3">
+            <h1 class="text-[25px] font-medium antialiased flex justify-center items-center gap-2 sm:gap-3">
                 <Icon name="taxonomies" class="size-5 text-gray-500" />
                 {{ __('Taxonomies') }}
             </h1>
