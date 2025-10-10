@@ -158,13 +158,6 @@ function selectDate(date) {
     selectedDate.value = date;
 }
 
-function scrollTo8AM() {
-    if (weekViewRef.value?.weekViewContainer) {
-        // Each hour is h-18 (72px), so 8 AM is at position 8 * 72 = 576px
-        weekViewRef.value.weekViewContainer.scrollTop = 8 * 72;
-    }
-}
-
 function handleMonthChange(newMonth) {
     currentDate.value = new CalendarDate(currentDate.value.year, newMonth, currentDate.value.day);
 }
@@ -398,15 +391,6 @@ const entriesByHour = computed(() => {
 
 watch(() => [currentDate.value.year, currentDate.value.month, currentDate.value.day, viewMode.value], fetchEntries, { immediate: true });
 
-watch(viewMode, (newMode) => {
-    if (newMode === 'week') {
-        // Wait for DOM to update, then scroll to 8 AM
-        nextTick(() => {
-            scrollTo8AM();
-        });
-    }
-}, { immediate: true });
-
 </script>
 
 <template>
@@ -419,6 +403,7 @@ watch(viewMode, (newMode) => {
             weekday-format="long"
             class="bg-gray-100 dark:bg-gray-800 rounded-2xl p-3"
         >
+            {{ currentDate }}
             <CalendarHeader class="flex flex-col @3xl:flex-row items-center gap-4 pb-4 @3xl:pb-8">
                 <div class="flex items-center justify-between w-full @3xl:flex-1 @3xl:justify-start">
                     <ui-toggle-group v-model="viewMode" class="flex">
@@ -516,7 +501,7 @@ watch(viewMode, (newMode) => {
             />
         </CalendarRoot>
          <!-- Mobile entries list -->
-        <div class="@3xl:hidden mt-6" v-if="selectedDate">
+        <div class="mt-6" v-if="selectedDate">
             <ui-heading size="lg" class="flex justify-center pb-4">
                 {{ new Date(selectedDate.year, selectedDate.month - 1, selectedDate.day).toLocaleDateString($date.locale, {
                     weekday: 'long',
