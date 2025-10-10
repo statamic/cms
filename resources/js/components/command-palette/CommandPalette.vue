@@ -258,7 +258,7 @@ function keydownTab(e) {
 
 const modalClasses = cva({
     base: [
-        'fixed outline-hidden left-1/2 top-[100px] z-50 w-full max-w-3xl -translate-x-1/2 ',
+        'fixed outline-hidden left-1/2 top-[100px] z-50 w-full max-w-[min(90vw,48rem)] -translate-x-1/2 ',
         'backdrop-blur-[2px] rounded-2xl',
         'shadow-[0_8px_5px_-6px_rgba(0,0,0,0.12),_0_3px_8px_0_rgba(0,0,0,0.02),_0_30px_22px_-22px_rgba(39,39,42,0.35)]',
         'dark:shadow-[0_5px_20px_rgba(0,0,0,.5)]',

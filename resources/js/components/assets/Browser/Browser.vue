@@ -79,8 +79,8 @@
                                 </ToggleGroup>
                             </Header>
 
-                            <div class="flex items-center gap-3 py-3 relative">
-                                <div class="flex flex-1 items-center gap-3">
+                            <div class="flex items-center gap-2 sm:gap-3 py-3 relative">
+                                <div class="flex flex-1 items-center gap-2 sm:gap-3">
                                     <ListingSearch />
                                 </div>
                                 <ListingCustomizeColumns v-if="mode === 'table'" />

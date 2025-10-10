@@ -105,11 +105,11 @@
   ========================================================================== */
 
 .asset-grid-listing {
-    @apply relative grid gap-6 xl:gap-10;
+    @apply relative grid gap-5 md:gap-6 xl:gap-10;
 }
 
 .folder-grid-listing {
-    @apply relative grid gap-7;
+    @apply relative grid gap-5 md:gap-7;
     grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
 }
 

@@ -20,7 +20,7 @@
                 @update:modelValue="localizationSelected"
             />
 
-            <div class="hidden items-center gap-3 md:flex">
+            <div class="hidden items-center gap-2 sm:gap-3 md:flex">
                 <Button
                     v-if="canEdit"
                     variant="primary"

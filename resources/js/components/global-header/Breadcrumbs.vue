@@ -65,7 +65,7 @@ function setDropdownItemActive(breadcrumbIndex, linkIndex, breadcrumb) {
         <div
             v-for="(breadcrumb, breadcrumbIndex) in breadcrumbs"
             :key="breadcrumbIndex"
-            class="items-center gap-2 md:flex relative"
+            class="items-center gap-1 lg:gap-2 md:flex relative"
         >
             <span class="text-white/30">/</span>
             <Component

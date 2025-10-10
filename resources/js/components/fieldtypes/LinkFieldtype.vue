@@ -1,5 +1,5 @@
 <template>
-    <div class="flex gap-3">
+    <div class="flex gap-2 sm:gap-3">
         <!-- Link type selector -->
         <div class="w-fit">
             <Select :options v-model="option"  />

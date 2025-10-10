@@ -4,8 +4,8 @@
             <Icon name="loading" />
         </div>
 
-        <header v-if="!loading" class="flex items-center justify-between pl-3 pt-3 pb-4 -mb-4 sticky top-0 z-1 bg-gradient-to-b from-white from-75% dark:from-gray-800">
-            <Heading :text="__(values.display) || __(config.display) || config.handle" size="lg" :icon="fieldtype.icon" />
+        <header v-if="!loading" class="flex flex-wrap items-center justify-between pl-3 pt-3 pb-4 -mb-4 sticky top-0 z-1 bg-gradient-to-b from-white from-75% dark:from-gray-800">
+            <Heading :text=" __(fieldtype.title + ' ' + 'Field')" size="lg" :icon="fieldtype.icon" />
             <div class="flex items-center gap-3">
                 <Button variant="ghost" :text="__('Cancel')" @click.prevent="close" />
                 <Button variant="default" @click.prevent="commit()" :text="__('Apply')" />
@@ -15,7 +15,7 @@
             </div>
         </header>
 
-        <section v-if="!loading" class="isolate px-3 py-4">
+        <section v-if="!loading" class="isolate lg:px-3 py-4">
             <Tabs v-model:modelValue="activeTab">
                 <TabList class="mb-6">
                     <TabTrigger name="settings" :text="__('Settings')" />

@@ -9,7 +9,7 @@
             <tbody>
                 <tr>
                     <td class="w-1/4">
-                        <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-2 sm:gap-3">
                             <ui-switch
                                 v-model="selected.index"
                                 size="sm"
@@ -24,7 +24,7 @@
                 </tr>
                 <tr>
                     <td class="w-1/4">
-                        <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-2 sm:gap-3">
                             <ui-switch
                                 v-model="selected.show"
                                 size="sm"
