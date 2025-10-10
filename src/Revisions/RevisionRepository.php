@@ -8,6 +8,7 @@ use Statamic\Contracts\Revisions\RevisionRepository as Contract;
 use Statamic\Facades\File;
 use Statamic\Facades\Folder;
 use Statamic\Facades\YAML;
+use Statamic\Support\Arr;
 use Statamic\Support\FileCollection;
 use Statamic\Support\Str;
 
@@ -67,7 +68,7 @@ class RevisionRepository implements Contract
     {
         $yaml = YAML::parse(File::get($path));
 
-        return (new Revision)
+        $revision = (new Revision)
             ->key($key)
             ->action($yaml['action'] ?? false)
             ->id($date = $yaml['date'])
@@ -75,5 +76,11 @@ class RevisionRepository implements Contract
             ->user($yaml['user'] ?? false)
             ->message($yaml['message'] ?? false)
             ->attributes($yaml['attributes']);
+
+        if (! is_null($timestamp = Arr::get($yaml, 'publish_at'))) {
+            $revision->publishAt(Carbon::createFromTimestamp($timestamp));
+        }
+
+        return $revision;
     }
 }
