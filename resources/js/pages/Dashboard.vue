@@ -37,7 +37,7 @@ function tailwindWidthClass(width) {
 
     <ui-header :title="__('Dashboard')" icon="dashboard" />
 
-    <div class="widgets @container/widgets flex flex-wrap gap-y-6 -mx-3">
+    <div class="widgets @container/widgets flex flex-wrap gap-y-6 -mx-2 sm:-mx-3">
         <div
             v-for="widget in widgets"
             class="min-h-54 px-3 starting-style-transition starting-style-transition--siblings"
