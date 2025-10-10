@@ -9,6 +9,7 @@
             '[&>*:first-child:not(:last-child)_[data-ui-group-target]]:rounded-e-none',
             '[&>*:last-child:not(:first-child)_[data-ui-group-target]]:rounded-s-none',
             'dark:[&_button]:ring-0',
+            'max-lg:[[data-floating-toolbar]_&_button]:rounded-md!',
         ]"
         data-ui-button-group
     >
