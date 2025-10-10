@@ -315,7 +315,7 @@
                 <ui-heading size="lg">Icons</ui-heading>
                 <div class="grid grid-cols-4 md:grid-cols-6 2xl:grid-cols-10 gap-4">
                     @foreach ($icons as $icon)
-                        <div class="bg-gray-50 rounded-lg py-6 px-2 flex flex-col items-center gap-2 sm:gap-3">
+                        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg py-6 px-2 flex flex-col items-center gap-2 sm:gap-3">
                             <ui-icon name="{{ $icon }}" class="size-6" />
                             <span class="text-xs text-gray-500">{{ $icon }}</span>
                         </div>

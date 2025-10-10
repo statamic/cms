@@ -40,6 +40,9 @@
   ::backdrop,
   ::file-selector-button {
     border-color: var(--color-gray-300, currentColor);
+    .dark & {
+      border-color: var(--color-gray-700, currentColor);
+    }
   }
 }
 
@@ -58,6 +61,9 @@
         background: var(--theme-color-content-bg);
         .nav-closed & {
             @apply sm:rounded-xl;
+            .dark & {
+              border: 0;
+            }
         }
     }
     .dark .content-card {

@@ -13,7 +13,7 @@ Table Fieldtype
             @apply
                 z-10
                 p-2
-                dark:bg-gray-900
+                dark:bg-gray-925
                 border-b bg-gray-50
                 not-last:border-e overflow-hidden
                 dark:border-gray-800 dark:border-b-gray-700
@@ -50,8 +50,18 @@ Table Fieldtype
         }
     }
 
+    /* If the table has no header, top left and top right corners of the first row should be rounded */
+    tbody:not(:has(th)):first-child td {
+        &:first-child {
+            @apply rounded-tl-lg;
+        }
+        &:last-child {
+            @apply rounded-tr-lg;
+        }
+    }
+
     tbody {
-        @apply outline-hidden dark:bg-gray-800;
+        @apply outline-hidden dark:bg-gray-900;
 
         th {
             @apply bg-gray-50 p-2 text-sm font-medium text-gray-700 text-start border-r border-b border-gray-200 dark:border-dark-900 dark:bg-gray-700 dark:text-gray-100 overflow-hidden;
@@ -69,12 +79,6 @@ Table Fieldtype
 
             &:first-child td {
                 @apply overflow-hidden;
-                &:first-child {
-                    @apply rounded-tl-lg;
-                }
-                &:last-child {
-                    @apply rounded-tr-lg;
-                }
             }
 
             &:last-child td {
@@ -93,7 +97,7 @@ Table Fieldtype
         }
 
         td {
-            @apply border-b p-0 dark:border-dark-900 border-e;
+            @apply border-b p-0 dark:border-dark-600 border-e;
 
             &:first-child.grid-cell {
                 @apply ps-4;
@@ -104,7 +108,7 @@ Table Fieldtype
             }
 
             &.table-drag-handle {
-                @apply w-3 p-2 bg-white dark:bg-gray-800;
+                @apply w-3 p-2 bg-white dark:bg-gray-850;
                 &:hover {
                     @apply bg-gray-100 dark:bg-gray-700;
                 }
@@ -115,9 +119,9 @@ Table Fieldtype
 
     [data-ui-control] {
         @apply block w-full max-w-full rounded-none appearance-none border p-2;
-        @apply border-none bg-white dark:bg-gray-800 text-sm shadow-none outline-hidden;
+        @apply border-none bg-white dark:bg-gray-900 text-sm shadow-none outline-hidden;
         &:focus {
-            @apply bg-gray-100 inset-shadow-xs ring-0 dark:bg-gray-700;
+            @apply bg-gray-100 inset-shadow-xs ring-0 dark:bg-gray-800;
         }
     }
 

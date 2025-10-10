@@ -38,13 +38,13 @@
                                 @completed="actionCompleted"
                                 v-slot="{ actions }"
                             >
-                                <ui-button inset size="sm" v-if="isImage && isFocalPointEditorEnabled" @click.prevent="openFocalPointEditor" icon="focus" variant="subtle" :text="__('Focal Point')" />
-                                <ui-button inset size="sm" v-if="canRunAction('rename_asset')" @click.prevent="runAction(actions, 'rename_asset')" icon="rename" variant="subtle" :text="__('Rename')" />
-                                <ui-button inset size="sm" v-if="canRunAction('move_asset')" @click.prevent="runAction(actions, 'move_asset')" icon="move-folder" variant="subtle" :text="__('Move to Folder')" />
-                                <ui-button inset size="sm" v-if="canRunAction('replace_asset')" @click.prevent="runAction(actions, 'replace_asset')" icon="replace" variant="subtle" :text="__('Replace')" />
-                                <ui-button inset size="sm" v-if="canRunAction('reupload_asset')" @click.prevent="runAction(actions, 'reupload_asset')" icon="upload-cloud" variant="subtle" :text="__('Reupload')" />
-                                <ui-button inset size="sm" @click="download" icon="download" variant="subtle" :text="__('Download')" />
-                                <ui-button inset size="sm" v-if="allowDeleting && canRunAction('delete')" @click="runAction(actions, 'delete')" icon="trash" variant="subtle" :text="__('Delete')" />
+                                <ui-button inset size="sm" v-if="isImage && isFocalPointEditorEnabled" @click.prevent="openFocalPointEditor" icon="focus" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Focal Point')" />
+                                <ui-button inset size="sm" v-if="canRunAction('rename_asset')" @click.prevent="runAction(actions, 'rename_asset')" icon="rename" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Rename')" />
+                                <ui-button inset size="sm" v-if="canRunAction('move_asset')" @click.prevent="runAction(actions, 'move_asset')" icon="move-folder" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Move to Folder')" />
+                                <ui-button inset size="sm" v-if="canRunAction('replace_asset')" @click.prevent="runAction(actions, 'replace_asset')" icon="replace" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Replace')" />
+                                <ui-button inset size="sm" v-if="canRunAction('reupload_asset')" @click.prevent="runAction(actions, 'reupload_asset')" icon="upload-cloud" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Reupload')" />
+                                <ui-button inset size="sm" @click="download" icon="download" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Download')" />
+                                <ui-button inset size="sm" v-if="allowDeleting && canRunAction('delete')" @click="runAction(actions, 'delete')" icon="trash" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Delete')" />
 
                                 <Dropdown class="me-4">
                                     <DropdownMenu>

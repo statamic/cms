@@ -241,10 +241,10 @@ watch(
                     :model-value="mode"
                     @update:modelValue="$emit('update:mode', $event)"
                 />
-                <div v-else-if="showModeLabel" v-text="modeLabel" class="font-mono text-xs text-gray-700"></div>
+                <div v-else-if="showModeLabel" v-text="modeLabel" class="font-mono text-xs text-gray-700 dark:text-gray-300"></div>
             </publish-field-fullscreen-header>
             <div
-                class="flex items-center justify-between rounded-t-[calc(var(--radius-lg)-1px)] bg-gray-50 px-2 py-1 dark:bg-gray-950 border border-b-0 border-gray-300 dark:border-none"
+                class="flex items-center justify-between rounded-t-[calc(var(--radius-lg)-1px)] bg-gray-50 px-2 py-1 dark:bg-gray-925 border border-b-0 border-gray-300 dark:border-gray-700 dark:border-b-1 dark:border-b-white/10"
                 :class="{ 'border-dashed': readOnly }"
                 v-if="showToolbar"
             >
@@ -260,11 +260,11 @@ watch(
                         @update:modelValue="$emit('update:mode', $event)"
                     />
 
-                    <span v-else v-text="modeLabel" class="font-mono text-xs text-gray-700" />
+                    <span v-else v-text="modeLabel" class="font-mono text-xs text-gray-700 dark:text-gray-300" />
                 </div>
             </div>
             <ElementContainer @resized="refresh">
-                <div ref="codemirrorElement" class="font-mono text-sm"></div>
+                <div ref="codemirrorElement" class="font-mono text-sm dark:border dark:border-white/10 dark:bg-gray-900 rounded-lg [&_.CodeMirror]:rounded-lg" :class="{ 'dark:border-t-0 rounded-t-none [&_.CodeMirror]:rounded-t-none': showToolbar }"></div>
             </ElementContainer>
         </div>
     </portal>

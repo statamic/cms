@@ -21,7 +21,7 @@ const id = useId();
                 shadow-ui-xs mt-0.5 size-4 cursor-default rounded-full
                 focus:focus-outline border border-gray-400/75 dark:border-none bg-white outline-hidden
                 data-[state=checked]:border-ui-accent data-[disabled]:opacity-50
-                dark:bg-gray-400 dark:data-[state=checked]:border-none dark:data-[state=checked]:bg-gray-300
+                dark:bg-gray-500 dark:data-[state=checked]:border-none dark:data-[state=checked]:bg-gray-300
             "
         >
             <RadioGroupIndicator
