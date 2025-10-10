@@ -17,7 +17,7 @@ function updateIndex(index) {
 </script>
 
 <template>
-    <Head :title="__('Search')" />
+    <Head :title="[__('Search'), __('Utilities')]" />
 
     <Header :title="__('Search')" icon="magnifying-glass">
         <Button variant="primary" @click="updateAll">

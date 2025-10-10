@@ -16,7 +16,7 @@ const props = defineProps([
 </script>
 
 <template>
-    <Head :title="__('Licensing')" />
+    <Head :title="[__('Licensing'), __('Utilities')]" />
 
     <Header :title="__('Licensing')" icon="license">
         <Button
