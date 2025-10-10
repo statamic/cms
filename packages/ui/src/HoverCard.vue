@@ -29,6 +29,7 @@ const HoverCardContentClasses = cva({
         'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
         'data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2',
         'data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
+        'wait-for-image-to-load',
     ],
     variants: {
         inset: { true: 'inset-0', false: 'p-4' },
@@ -87,5 +88,20 @@ function updateOpen(value) {
 [data-ui-hover-card-content] {
     max-height: var(--reka-hover-card-content-available-height);
     transform-origin: var(--reka-hover-card-content-transform-origin);
+}
+
+.wait-for-image-to-load {
+    animation: delayedShow 100ms;
+}
+
+@keyframes delayedShow {
+    0%, 99% {
+        opacity: 0;
+        visibility: hidden;
+    }
+    100% {
+        opacity: 1;
+        visibility: visible;
+    }
 }
 </style>
