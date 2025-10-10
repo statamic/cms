@@ -31,6 +31,7 @@ class UtilitiesController extends CpController
 
         if ($view = $utility->view()) {
             return Inertia::render('utilities/Show', [
+                'title' => $utility->title(),
                 'html' => $this->renderView($view, $utility->viewData($request)),
             ]);
         }
