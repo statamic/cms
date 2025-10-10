@@ -27,9 +27,9 @@ function toggleNav() {
         <img :src="customLogo" :alt="cmsName" class="max-w-[260px] max-h-9">
     </template>
     <template v-else>
-        <div class="flex items-center gap-2 relative">
+        <div class="flex items-center gap-1.5 sm:gap-2 relative">
             <button class="flex items-center group rounded-lg cursor-pointer" type="button" @click="toggleNav" aria-label="{{ __('Toggle Nav') }}" style="--focus-outline-offset: 0.2rem;">
-                <div class="max-sm:hidden p-1 mr-2 size-7 flex items-center justify-center">
+                <div class="p-1 mr-1 sm:mr-2 size-7 flex items-center justify-center">
                     <Icon name="burger-menu" class="size-5 opacity-60" />
                 </div>
                 <StatamicLogo class="size-7" />

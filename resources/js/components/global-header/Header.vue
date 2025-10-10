@@ -5,14 +5,10 @@ import SiteSelector from './SiteSelector.vue';
 import Search from './Search.vue';
 import ViewSiteButton from './ViewSiteButton.vue';
 import UserDropdown from './UserDropdown.vue';
-import { Badge, Tooltip, Icon } from '@statamic/ui';
+import { Badge, Tooltip } from '@statamic/ui';
 import { useReactiveStatamicPageProps } from '@/composables/page-props.js';
 
 const { isInertia } = useReactiveStatamicPageProps();
-
-function toggleNav() {
-    Statamic.$events.$emit('nav.toggle');
-}
 </script>
 
 <template>
@@ -38,11 +34,6 @@ function toggleNav() {
             </div>
             <ViewSiteButton />
             <UserDropdown />
-            <button class="sm:hidden -ms-1.5 flex items-center group [&_svg]:opacity-50 dark:[&_svg]:text-white rounded-lg cursor-pointer" type="button" @click="toggleNav" aria-label="{{ __('Toggle Nav') }}" style="--focus-outline-offset: 0.2rem;">
-                <div class="p-1 size-7 flex items-center justify-center">
-                    <Icon name="burger-menu" class="size-5" />
-                </div>
-            </button>
         </div>
     </header>
 </template>
