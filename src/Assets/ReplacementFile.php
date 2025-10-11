@@ -24,6 +24,11 @@ class ReplacementFile
         return pathinfo($this->path, PATHINFO_EXTENSION);
     }
 
+    public function basename()
+    {
+        return pathinfo($this->path, PATHINFO_BASENAME);
+    }
+
     public function writeTo(Filesystem $disk, $path)
     {
         $disk->put(
