@@ -49,7 +49,7 @@ class Cache
      */
     public function handle($request, Closure $next)
     {
-        if(!config('static_caching.strategy')) {
+        if(!config('statamic.static_caching.strategy')) {
             return $next($request);
         }
 
