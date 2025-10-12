@@ -49,6 +49,10 @@ class Cache
      */
     public function handle($request, Closure $next)
     {
+        if(!config('static_caching.strategy')) {
+            return $next($request);
+        }
+
         if ($response = $this->attemptToServeCachedResponse($request)) {
             return $response;
         }
