@@ -3,6 +3,7 @@
 namespace Statamic\CP\Utilities;
 
 use Statamic\Facades\Search;
+use Statamic\Facades\User;
 use Statamic\Facades\Utility;
 use Statamic\Http\Controllers\CP\LicensingController;
 use Statamic\Http\Controllers\CP\Utilities\CacheController;
@@ -99,7 +100,7 @@ class CoreUtilities
     {
         return [
             'sendUrl' => cp_route('utilities.email'),
-            'defaultEmail' => auth()->user()->email(),
+            'defaultEmail' => User::current()->email(),
             'config' => [
                 'path' => config_path('mail.php'),
                 'default' => config('mail.default'),
