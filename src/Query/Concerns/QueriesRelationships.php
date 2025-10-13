@@ -21,6 +21,10 @@ trait QueriesRelationships
      */
     public function has($relation, $operator = '>=', $count = 1, $boolean = 'and', ?Closure $callback = null)
     {
+        if (str_contains($relation, '.')) {
+            throw new InvalidArgumentException('Nested relations are not supported');
+        }
+
         [$relationQueryBuilder, $relationField] = $this->getRelationQueryBuilderAndField($relation);
 
         $maxItems = $relationField->config()['max_items'] ?? 0;
