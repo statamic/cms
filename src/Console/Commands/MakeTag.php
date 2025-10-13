@@ -2,8 +2,6 @@
 
 namespace Statamic\Console\Commands;
 
-use Archetype\Facades\PHPFile;
-use PhpParser\BuilderFactory;
 use Statamic\Console\RunsInPlease;
 use Statamic\Support\Str;
 
@@ -23,7 +21,7 @@ class MakeTag extends GeneratorCommand
      *
      * @var string
      */
-    protected $description = 'Create a new tag addon';
+    protected $description = 'Create a new tag';
 
     /**
      * The type of class being generated.
@@ -38,40 +36,6 @@ class MakeTag extends GeneratorCommand
      * @var string
      */
     protected $stub = 'tag.php.stub';
-
-    /**
-     * Execute the console command.
-     *
-     * @return bool|null
-     */
-    public function handle()
-    {
-        if (parent::handle() === false) {
-            return false;
-        }
-
-        if ($this->argument('addon')) {
-            $this->updateServiceProvider();
-        }
-    }
-
-    /**
-     * Update the Service Provider to register the Tag component.
-     */
-    protected function updateServiceProvider()
-    {
-        $factory = new BuilderFactory();
-
-        $tagsClassValue = $factory->classConstFetch('Tags\\'.$this->getNameInput(), 'class');
-
-        try {
-            PHPFile::load("addons/{$this->package}/src/ServiceProvider.php")
-                ->add()->protected()->property('tags', $tagsClassValue)
-                ->save();
-        } catch (\Exception $e) {
-            $this->comment("Don't forget to register the Tag class in your addon's service provider.");
-        }
-    }
 
     /**
      * Build the class with the given name.

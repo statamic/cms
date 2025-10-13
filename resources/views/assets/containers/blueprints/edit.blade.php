@@ -14,6 +14,7 @@
         action="{{ cp_route('asset-containers.blueprint.update', $container->handle()) }}"
         :initial-blueprint="{{ json_encode($blueprintVueObject) }}"
         :use-tabs="false"
+        :can-define-localizable="false"
     ></blueprint-builder>
 
     @include('statamic::partials.docs-callout', [

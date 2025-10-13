@@ -25,7 +25,7 @@
 
         <div v-show="focused && (hasResults || hasFavorites)" class="global-search-results">
 
-            <div v-if="hasResults" v-for="(result, index) in results" class="global-search-result-item p-2 flex items-center" :class="{ 'active': current == index }" @click="hit" @mousemove="setActive(index)">
+            <div v-if="hasResults" v-for="(result, index) in results" class="global-search-result-item break-overflowing-words p-2 flex items-start" :class="{ 'active': current == index }" @click="hit" @mousemove="setActive(index)">
                 <svg-icon :name="`light/${getResultIcon(result)}`" class="icon"></svg-icon>
                 <div class="flex-1 rtl:mr-2 ltr:ml-2 title" v-html="result.title"></div>
                 <span class="global-search-result-badge" v-text="result.badge" />

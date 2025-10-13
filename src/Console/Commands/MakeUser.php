@@ -43,6 +43,13 @@ class MakeUser extends Command
     protected $email;
 
     /**
+     * The user's password.
+     *
+     * @var string
+     */
+    protected $password;
+
+    /**
      * The user's data.
      *
      * @var array
@@ -64,7 +71,17 @@ class MakeUser extends Command
     public function handle()
     {
         if (! Statamic::pro() && User::query()->count() > 0) {
-            return error(__('Statamic Pro is required.'));
+            error(__('Statamic Pro is required.'));
+
+            if (confirm(__('Enable Statamic Pro?'))) {
+                $this->call('statamic:pro:enable');
+            } else {
+                return self::SUCCESS;
+            }
+        }
+
+        if ($password = $this->option('password')) {
+            $this->password = $password;
         }
 
         // If email argument exists, non-interactively create user.
@@ -133,7 +150,11 @@ class MakeUser extends Command
      */
     protected function promptPassword()
     {
-        $this->data['password'] = password(label: 'Password', required: true);
+        if ($this->password) {
+            return $this;
+        }
+
+        $this->password = password(label: 'Password', required: true);
 
         if ($this->passwordValidationFails()) {
             return $this->promptPassword();
@@ -172,7 +193,8 @@ class MakeUser extends Command
 
         $user = User::make()
             ->email($this->email)
-            ->data($this->data);
+            ->data($this->data)
+            ->password($this->password);
 
         if ($this->super || $this->option('super')) {
             $user->makeSuper();
@@ -201,7 +223,7 @@ class MakeUser extends Command
     protected function passwordValidationFails()
     {
         return $this->validationFails(
-            $this->data['password'],
+            $this->password,
             ['required', Password::default()]
         );
     }
@@ -241,6 +263,7 @@ class MakeUser extends Command
     {
         return array_merge(parent::getOptions(), [
             ['super', '', InputOption::VALUE_NONE, 'Generate a super user with permission to do everything'],
+            ['password', '', InputOption::VALUE_OPTIONAL, 'Generate a user with given password'],
         ]);
     }
 }

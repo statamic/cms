@@ -36,15 +36,15 @@ class GlideUrlBuilder extends ImageUrlBuilder
 
         switch ($this->itemType()) {
             case 'url':
-                $path = 'http/'.base64_encode($item);
+                $path = 'http/'.Str::toBase64Url($item);
                 $filename = Str::afterLast($item, '/');
                 break;
             case 'asset':
-                $path = 'asset/'.base64_encode($this->item->containerId().'/'.$this->item->path());
+                $path = 'asset/'.Str::toBase64Url($this->item->containerId().'/'.$this->item->path());
                 $filename = Str::afterLast($this->item->path(), '/');
                 break;
             case 'id':
-                $path = 'asset/'.base64_encode(str_replace('::', '/', $this->item));
+                $path = 'asset/'.Str::toBase64Url(str_replace('::', '/', $this->item));
                 break;
             case 'path':
                 $path = URL::encode($this->item);
@@ -61,7 +61,7 @@ class GlideUrlBuilder extends ImageUrlBuilder
 
         if (isset($params['mark']) && $params['mark'] instanceof Asset) {
             $asset = $params['mark'];
-            $params['mark'] = 'asset::'.base64_encode($asset->containerId().'/'.$asset->path());
+            $params['mark'] = 'asset::'.Str::toBase64Url($asset->containerId().'/'.$asset->path());
         }
 
         return URL::prependSiteRoot($builder->getUrl($path, $params));

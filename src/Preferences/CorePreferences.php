@@ -61,6 +61,7 @@ class CorePreferences
             'de_CH' => 'German (Switzerland)',
             'en' => 'English',
             'es' => 'Spanish',
+            'et' => 'Estonian',
             'fa' => 'Persian',
             'fr' => 'French',
             'hu' => 'Hungarian',
@@ -78,6 +79,7 @@ class CorePreferences
             'sv' => 'Swedish',
             'tr' => 'Turkish',
             'uk' => 'Ukrainian',
+            'vi' => 'Vietnamese',
             'zh_CN' => 'Chinese (China)',
             'zh_TW' => 'Chinese (Taiwan)',
         ])->when(extension_loaded('intl'), fn ($locales) => $locales

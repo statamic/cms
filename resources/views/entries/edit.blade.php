@@ -15,6 +15,7 @@
         initial-reference="{{ $reference }}"
         :initial-fieldset="{{ json_encode($blueprint) }}"
         :initial-values="{{ json_encode($values) }}"
+        :initial-extra-values="{{ json_encode($extraValues) }}"
         :initial-localized-fields="{{ json_encode($localizedFields) }}"
         :initial-meta="{{ json_encode($meta) }}"
         initial-permalink="{{ $permalink }}"

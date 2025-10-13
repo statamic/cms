@@ -3,9 +3,9 @@
 namespace Statamic\Fieldtypes\Assets;
 
 use LogicException;
-use Spatie\Ignition\Contracts\BaseSolution;
-use Spatie\Ignition\Contracts\ProvidesSolution;
-use Spatie\Ignition\Contracts\Solution;
+use Spatie\ErrorSolutions\Contracts\BaseSolution;
+use Spatie\ErrorSolutions\Contracts\ProvidesSolution;
+use Spatie\ErrorSolutions\Contracts\Solution;
 use Statamic\Statamic;
 
 class UndefinedContainerException extends LogicException implements ProvidesSolution

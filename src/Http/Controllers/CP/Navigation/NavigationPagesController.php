@@ -52,7 +52,7 @@ class NavigationPagesController extends CpController
 
         $page = $nav->in($request->site)->find($page);
 
-        [$values, $meta] = $this->extractValuesAndMeta($page, $blueprint);
+        [$values, $meta, $extraValues] = $this->extractValuesAndMeta($page, $blueprint);
 
         if ($entry = $page->entry()) {
             [$originValues, $originMeta] = $this->extractValuesAndMeta($entry, $blueprint);
@@ -63,6 +63,7 @@ class NavigationPagesController extends CpController
             'meta' => $meta,
             'originValues' => $originValues ?? null,
             'originMeta' => $originMeta ?? null,
+            'extraValues' => $extraValues,
             'localizedFields' => $this->getLocalizedFields($page),
             'syncableFields' => $this->getSyncableFields($nav, $entry),
         ];
@@ -113,7 +114,11 @@ class NavigationPagesController extends CpController
 
         $values = $fields->values();
 
-        return [$values->all(), $fields->meta()];
+        $extraValues = [
+            'depth' => $page instanceof Page ? $page->depth() : null,
+        ];
+
+        return [$values->all(), $fields->meta(), $extraValues];
     }
 
     private function getPageValues($page)

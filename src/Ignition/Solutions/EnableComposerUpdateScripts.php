@@ -4,7 +4,7 @@ namespace Statamic\Ignition\Solutions;
 
 use Exception;
 use Facades\Statamic\UpdateScripts\Manager as UpdateScriptManager;
-use Spatie\Ignition\Contracts\RunnableSolution;
+use Spatie\ErrorSolutions\Contracts\RunnableSolution;
 use Statamic\Console\Composer\Json as ComposerJson;
 use Statamic\Console\NullConsole;
 use Statamic\Statamic;

@@ -12,6 +12,8 @@ use Statamic\Rules\Handle;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class FieldsetController extends CpController
 {
     public function __construct()

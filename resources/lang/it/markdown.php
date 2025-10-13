@@ -3,55 +3,55 @@
 return [
 
     'cheatsheet' => '
-<p>Markdown is a text-to-HTML markup syntax for web writers. Markdown allows you to write using an easy-to-read, easy-to-write plain text format that is converted to structurally valid HTML.</p>
+<p>Markdown è un linguaggio di marcatura per scrittori del web. Permette di scrivere dei testi utilizzando una sintassi facili da leggere e da scrivere, convertendo il codice in strutture HTML semanticamente corrette.</p>
 
-<h3>Headers</h3>
-<pre class="language-markdown"><code># This is an h1
-## This is an h2
-### This is an h3, and so on.
+<h3>Intestazioni</h3>
+<pre class="language-markdown"><code># Questo è un h1
+## Questo è un h2
+### Questo è un h3, e così via.
 </code></pre>
 
-<h3>Bold &amp; Italic</h3>
-<pre class="language-markdown"><code>You can make things *emphasized*, **bold**, or _**both**_.</code></pre>
+<h3>Grassetto &amp; Corsivo</h3>
+<pre class="language-markdown"><code>Puoi scrivere del testo in *corsivo*, **grassetto** o _**entrambi**_.</code></pre>
 
-<h3>Links</h3>
-<pre class="language-markdown"><code>This is an [example link](http://example.com).</code></pre>
+<h3>Link</h3>
+<pre class="language-markdown"><code>Questo è un [esempio di link](http://example.com).</code></pre>
 
-<h3>Code</h3>
+<h3>Codice</h3>
 <p>
-Wrap your code with 3 backticks (<code>```</code>) on the line before and after.
+Racchiudi il tuo codice tra 3 apici inversi (<code>```</code>).
 </p>
 
 <pre class="language-markdown"><code>```
 this: is some yaml
 ```</code></pre>
 
-<p>You can also add code inline by wrapping content with <code>`</code> single backticks.
+<p>Puoi aggiunge anche del codice in linea racchiudendolo tra un <code>`</code> singolo apice inverso.
 
-<h3>Quoting</h3>
+<h3>Citazioni</h3>
 
-<p>Create a blockquote by starting your text with <code>> </code>.</p>
+<p>Crea un blocco citazione iniziando il tuo testo con <code>> </code>.</p>
 
-<pre class="language-markdown"><code>> This is going to be a blockquote.</code></pre>
+<pre class="language-markdown"><code>> Questo è un blocco citazione.</code></pre>
 
-<h3>Images</h3>
-<pre class="language-markdown"><code>![alt text](http://example.com/image.jpg)</code></pre>
+<h3>Immagini</h3>
+<pre class="language-markdown"><code>![testo alternativo](http://example.com/image.jpg)</code></pre>
 
-<h3>Unordered List</h3>
+<h3>Liste non ordinate</h3>
 <pre class="language-markdown"><code>- Bacon
 - Steak
 - Beer</code></pre>
 
-<h3>Ordered List</h3>
+<h3>Liste ordinate</h3>
 <pre class="language-markdown"><code>1. Eat
 2. Drink
 3. Be merry</code></pre>
 
-<h3>Tables</h3>
+<h3>Tabelle</h3>
 
-<pre class="language-markdown"><code>First Header  | Second Header
+<pre class="language-markdown"><code>Prima intestazione  | Seconda intestazione
 ------------- | -------------
-Content Cell  | Content Cell
-Content Cell  | Content Cell</code></pre>',
+Contenuto cella  | Contenuto cella
+Contenuto cella  | Contenuto cella</code></pre>',
 
 ];

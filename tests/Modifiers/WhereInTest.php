@@ -1,6 +1,6 @@
 <?php
 
-namespace Modifiers;
+namespace Tests\Modifiers;
 
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
