@@ -66,11 +66,7 @@ class LinkMark extends Link
 
         $selectAcrossSites = Augmentor::$currentBardConfig['select_across_sites'] ?? false;
 
-        if (
-            ! $selectAcrossSites &&
-            ! $this->isApi() &&
-            $item instanceof Entry
-        ) {
+        if (! $selectAcrossSites && ! $this->isApi() && $item instanceof Entry) {
             return ($item->in(Site::current()->handle()) ?? $item)->url();
         }
 
