@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Query\Traits;
+namespace Statamic\Query\Concerns;
 
 use Closure;
 use InvalidArgumentException;
