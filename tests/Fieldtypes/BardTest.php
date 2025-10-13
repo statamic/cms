@@ -1370,6 +1370,8 @@ EOT;
             'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
         ]);
 
+        Facades\Site::setCurrent('en');
+
         tap(Facades\Collection::make('blog')->routes('blog/{slug}'))->sites(['en', 'fr'])->save();
 
         EntryFactory::id('parent')->collection('blog')->slug('theparent')->id(123)->locale('en')->create();
