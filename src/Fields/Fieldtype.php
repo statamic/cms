@@ -386,6 +386,11 @@ abstract class Fieldtype implements Arrayable
         return false;
     }
 
+    public function relationshipQueryIdMapFn(): ?\Closure
+    {
+        return null;
+    }
+
     public function toQueryableValue($value)
     {
         return $value;

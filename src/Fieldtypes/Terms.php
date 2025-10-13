@@ -494,6 +494,13 @@ class Terms extends Relationship
             ->when($taxonomies, fn ($query) => $query->whereIn('taxonomy', $taxonomies));
     }
 
+    public function relationshipQueryIdMapFn(): ?\Closure
+    {
+        return $this->usingSingleTaxonomy()
+            ? fn ($term) => Str::after($term->id(), '::')
+            : null;
+    }
+
     public function getItemHint($item): ?string
     {
         return collect([

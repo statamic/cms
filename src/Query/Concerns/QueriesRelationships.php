@@ -4,7 +4,6 @@ namespace Statamic\Query\Concerns;
 
 use Closure;
 use InvalidArgumentException;
-use Statamic\Support\Str;
 
 trait QueriesRelationships
 {
@@ -47,10 +46,16 @@ trait QueriesRelationships
             throw new InvalidArgumentException('Counting with subqueries in has clauses is not supported');
         }
 
+        // Get the "IDs" - but really it's the values that are stored in the content.
+        // In some cases, like taxonomy term fields, the values saved to the content
+        // are not the actual IDs. e.g. term slugs will get saved when the field
+        // is only configured with a single taxonomy.
+        $idMapFn = $relationField->fieldtype()->relationshipQueryIdMapFn() ?? fn ($item) => $item->id();
+
         $ids = $relationQueryBuilder
             ->where($callback)
             ->get(['id'])
-            ->map(fn ($item) => Str::after($item->id(), '::'))
+            ->map($idMapFn)
             ->all();
 
         if ($maxItems == 1) {
