@@ -64,15 +64,17 @@ class LinkMark extends Link
             return '';
         }
 
+        $selectAcrossSites = Augmentor::$currentBardConfig['select_across_sites'] ?? false;
+
         if (
-            ! Augmentor::$currentBardConfig['select_across_sites'] &&
+            ! $selectAcrossSites &&
             ! $this->isApi() &&
             $item instanceof Entry
         ) {
             return ($item->in(Site::current()->handle()) ?? $item)->url();
         }
 
-        return $item->permalink ?? $item->url();
+        return $selectAcrossSites ? $item->absoluteUrl() : $item->url();
     }
 
     private function isApi()
