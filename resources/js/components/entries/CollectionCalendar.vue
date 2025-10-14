@@ -370,7 +370,32 @@ const entriesByHour = computed(() => {
 // Watchers
 // ============================================================================
 
-watch(() => [currentDate.value.year, currentDate.value.month, currentDate.value.day, viewMode.value], fetchEntries, { immediate: true });
+watch(
+    () => [currentDate.value.year, currentDate.value.month, currentDate.value.day, viewMode.value],
+    (newValue, oldValue) => {
+        if (shouldFetchEntries(newValue, oldValue)) fetchEntries();
+    },
+    { deep: true }
+);
+
+function shouldFetchEntries(
+    [year, month, day, view],
+    [oldYear, oldMonth, oldDay, oldView]
+) {
+    if (view !== oldView) return true;
+
+    if (view === 'month' && (year !== oldYear || month !== oldMonth)) return true;
+
+    if (view === 'week') {
+        const newDate = new CalendarDate(year, month, day);
+        const oldDate = new CalendarDate(oldYear, oldMonth, oldDay);
+        const newWeekStart = getWeekDates(newDate)[0];
+        const oldWeekStart = getWeekDates(oldDate)[0];
+        return newWeekStart.toString() !== oldWeekStart.toString();
+    }
+
+    return false;
+}
 
 </script>
 
