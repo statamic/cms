@@ -16,6 +16,12 @@ const props = defineProps({
         type: Object,
         required: true,
     },
+    fieldPathPrefix: {
+        type: String,
+    },
+    metaPathPrefix: {
+        type: String,
+    },
 });
 
 const {
@@ -39,7 +45,9 @@ const {
     setHiddenField,
     container,
 } = injectContainerContext();
-const { fieldPathPrefix, metaPathPrefix } = injectFieldsContext();
+const { fieldPathPrefix: injectedFieldPathPrefix, metaPathPrefix: injectedMetaPathPrefix } = injectFieldsContext();
+const fieldPathPrefix = computed(() => props.fieldPathPrefix || injectedFieldPathPrefix.value);
+const metaPathPrefix = computed(() => props.metaPathPrefix || injectedMetaPathPrefix.value);
 const handle = props.config.handle;
 
 const fieldtypeComponent = computed(() => {
