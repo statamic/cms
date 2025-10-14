@@ -93,7 +93,7 @@
                             </div>
 
                             <!-- Video -->
-                            <video :src="asset.url" controls v-else-if="asset.isVideo" />
+                            <video :src="asset.url" class="max-w-full max-h-full object-contain" controls v-else-if="asset.isVideo" />
                         </div>
 
 
