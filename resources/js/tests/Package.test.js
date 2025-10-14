@@ -3,7 +3,6 @@ import * as modules from '@/bootstrap/cms/index.js';
 import * as uiComponentLibrary from '../../../packages/ui/src/index.js';
 import * as internalUiComponents from '@/components/ui/index.js';
 
-
 global.__STATAMIC__ = modules;
 
 it('exports modules', async () => {
@@ -11,6 +10,7 @@ it('exports modules', async () => {
         'api',
         'bard',
         'core',
+        'inertia',
         'savePipeline',
         'temporary',
         'ui',
@@ -62,6 +62,17 @@ it('exports api', async () => {
 
     expect(Object.keys(modules.api).toSorted()).toEqual(expected)
     expect(Object.keys(await import('@statamic/cms/api.js')).toSorted()).toEqual(expected);
+});
+
+it('exports inertia', async () => {
+    const expected = [
+        'Head',
+        'Link',
+        'router',
+    ];
+
+    expect(Object.keys(modules.inertia).toSorted()).toEqual(expected);
+    expect(Object.keys(await import('@statamic/cms/inertia.js')).toSorted()).toEqual(expected);
 });
 
 it('exports save pipeline', async () => {
