@@ -66,9 +66,11 @@ it('exports api', async () => {
 
 it('exports inertia', async () => {
     const expected = [
+        'Form',
         'Head',
         'Link',
         'router',
+        'useForm',
     ];
 
     expect(Object.keys(modules.inertia).toSorted()).toEqual(expected);

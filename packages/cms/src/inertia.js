@@ -1,5 +1,7 @@
 export const {
+    Form,
+    Head,
     Link,
     router,
-    Head,
+    useForm,
 } = __STATAMIC__.inertia;

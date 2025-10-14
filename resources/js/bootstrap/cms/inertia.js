@@ -1,6 +1,8 @@
 export {
+    Form,
     Link,
-    router
+    router,
+    useForm,
 } from '@inertiajs/vue3';
 
 export { default as Head } from '../../pages/layout/Head.vue';
