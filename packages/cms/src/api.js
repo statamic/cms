@@ -12,6 +12,7 @@ export const {
     events,
     fieldActions,
     hooks,
+    inertia,
     keys,
     permissions,
     portals,

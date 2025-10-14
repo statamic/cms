@@ -31,6 +31,10 @@
             "types": "./types/resources/js/bootstrap/cms/save-pipeline.d.ts",
             "default": "./src/save-pipeline.js"
         },
+        "./inertia": {
+            "types": "./types/resources/js/bootstrap/cms/inertia.d.ts",
+            "default": "./src/inertia.js"
+        },
         "./temporary": {
             "types": "./types/resources/js/bootstrap/cms/temporary.d.ts",
             "default": "./src/temporary.js"
