@@ -203,6 +203,8 @@ const dropdownOpen = ref(false);
 const closeOnSelect = computed(() => props.closeOnSelect || !props.multiple);
 
 function updateDropdownOpen(open) {
+    if (props.disabled) return;
+
     // Prevent dropdown from opening when it's a taggable combobox with no options.
     if (props.taggable && props.options.length === 0) {
         return;
