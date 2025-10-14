@@ -4,8 +4,6 @@
         :key="entry.id"
         class="text-2xs @3xl:text-xs px-2 border-s-2 rounded-e-sm cursor-pointer flex flex-col"
         :class="entryClasses"
-        draggable="true"
-        @dragstart="handleDragStart"
     >
         <span class="line-clamp-2">
             {{ entry.title }}
@@ -25,15 +23,9 @@ const props = defineProps({
     entry: { type: Object, required: true }
 });
 
-const emit = defineEmits(['dragstart']);
-
 const entryClasses = computed(() => ({
     'border-green-500 hover:bg-green-50': props.entry.status === 'published',
     'border-gray-300 hover:bg-gray-50': props.entry.status === 'draft',
     'border-purple-500 hover:bg-purple-50': props.entry.status === 'scheduled'
 }));
-
-const handleDragStart = (event) => {
-    emit('dragstart', event, props.entry);
-};
 </script>

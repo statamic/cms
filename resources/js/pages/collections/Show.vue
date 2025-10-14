@@ -70,18 +70,6 @@
                 </template>
             </template>
 
-            <template v-if="view === 'calendar' && calendarIsDirty">
-                <Button
-                    :text="__('Discard changes')"
-                    variant="filled"
-                    @click="cancelCalendarProgress"
-                />
-                <Button
-                    :text="__('Save Changes')"
-                    @click="saveCalendar"
-                />
-            </template>
-
             <ui-toggle-group v-model="view" v-if="canUseStructureTree || canUseCalendar">
                 <ui-toggle-item icon="navigation" value="tree" v-if="canUseStructureTree" />
                 <ui-toggle-item icon="layout-list" value="list" />
@@ -129,7 +117,6 @@
             @edit-page="editPage"
             @changed="markTreeDirty"
             @saved="markTreeClean"
-            @canceled="markTreeClean"
         >
             <template #branch-icon="{ branch }">
                 <ui-icon
@@ -168,9 +155,6 @@
             :collection="handle"
             :blueprints="blueprints"
             :create-url="createUrl"
-            @changed="markCalendarDirty"
-            @saved="markCalendarClean"
-            @canceled="markCalendarClean"
         />
 
         <delete-entry-confirmation
@@ -278,10 +262,6 @@ export default {
             return this.$dirty.has('page-tree');
         },
 
-        calendarIsDirty() {
-            return this.$dirty.has('calendar');
-        },
-
         canUseStructureTree() {
             return this.structured && this.structureMaxDepth !== 1;
         },
@@ -368,22 +348,6 @@ export default {
 
         markTreeClean() {
             this.$dirty.remove('page-tree');
-        },
-
-        markCalendarDirty() {
-            this.$dirty.add('calendar');
-        },
-
-        markCalendarClean() {
-            this.$dirty.remove('calendar');
-        },
-
-        cancelCalendarProgress() {
-            this.$refs.calendar.cancelChanges();
-        },
-
-        saveCalendar() {
-            this.$refs.calendar.saveChanges();
         },
 
         initialView() {

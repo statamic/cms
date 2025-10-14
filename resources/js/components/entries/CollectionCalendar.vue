@@ -15,20 +15,15 @@ const props = defineProps({
     createUrl: { type: String, required: true },
 });
 
-const emit = defineEmits(['changed', 'saved', 'canceled']);
-
 const currentDate = ref(new CalendarDate(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()));
 const selectedDate = ref(null);
 const entries = ref([]);
 const loading = ref(false);
 const error = ref(null);
-const saving = ref(false);
 const viewMode = ref('month'); // 'month' or 'week'
 const weekViewRef = ref(null);
-const pendingDateChanges = ref(new Map()); // Track entry ID -> new date
 const isDirty = ref(false);
 // Reactive drag state for Vue class bindings
-const dragOverTarget = ref(null);
 const datePickerOpen = ref(false);
 
 // ============================================================================
@@ -83,36 +78,8 @@ async function fetchEntries() {
 function getEntriesForDate(date) {
     const dateStr = formatDateString(date);
     return entries.value.filter(entry => {
-        // Check if this entry has a pending date change
-        if (pendingDateChanges.value.has(entry.id)) {
-            const newDate = pendingDateChanges.value.get(entry.id);
-            return newDate.toISOString().split('T')[0] === dateStr;
-        }
-
         const entryDate = new Date(entry.date?.date || entry.date);
         return entryDate.toISOString().split('T')[0] === dateStr;
-    });
-}
-
-function getEntriesForHour(date, hour) {
-    const dateStr = formatDateString(date);
-    return entries.value.filter(entry => {
-        // Check if this entry has a pending date change
-        if (pendingDateChanges.value.has(entry.id)) {
-            const newDate = pendingDateChanges.value.get(entry.id);
-            const newDateStr = newDate.toISOString().split('T')[0];
-            if (newDateStr !== dateStr) return false;
-
-            const newHour = newDate.getHours();
-            return newHour === hour;
-        }
-
-        const entryDate = new Date(entry.date?.date || entry.date);
-        const entryDateStr = entryDate.toISOString().split('T')[0];
-        if (entryDateStr !== dateStr) return false;
-
-        const entryHour = entryDate.getHours();
-        return entryHour === hour;
     });
 }
 
@@ -147,167 +114,12 @@ function handleYearChange(newYear) {
     currentDate.value = new CalendarDate(newYear, currentDate.value.month, currentDate.value.day);
 }
 
-
-// ============================================================================
-// Drag and Drop Functions
-// ============================================================================
-function handleEntryDragStart(event, entry) {
-    event.dataTransfer.setData('text/plain', JSON.stringify({
-        entryId: entry.id,
-        entryTitle: entry.title
-    }));
-    event.dataTransfer.effectAllowed = 'move';
-}
-
-function handleDateDrop(event, targetDate) {
-    event.preventDefault();
-
-    try {
-        const data = JSON.parse(event.dataTransfer.getData('text/plain'));
-        const entryId = data.entryId;
-
-        // Find the entry
-        const entry = entries.value.find(e => e.id === entryId);
-        if (!entry) return;
-
-        // Create new date with the same time but new date
-        const originalDate = new Date(entry.date?.date || entry.date);
-        const newDate = new Date(targetDate.year, targetDate.month - 1, targetDate.day,
-                                originalDate.getHours(), originalDate.getMinutes(), originalDate.getSeconds());
-
-        // Store the pending change
-        pendingDateChanges.value.set(entryId, newDate);
-        isDirty.value = true;
-
-        // Emit change event to parent
-        emit('changed');
-
-    } catch (error) {
-        console.error('Failed to handle drop:', error);
-    }
-}
-
-function handleHourDrop(event, targetDate, targetHour) {
-    event.preventDefault();
-
-    try {
-        const data = JSON.parse(event.dataTransfer.getData('text/plain'));
-        const entryId = data.entryId;
-
-        // Find the entry
-        const entry = entries.value.find(e => e.id === entryId);
-        if (!entry) return;
-
-        // Create new date with the new date and hour
-        const originalDate = new Date(entry.date?.date || entry.date);
-        const newDate = new Date(targetDate.year, targetDate.month - 1, targetDate.day,
-                                targetHour, originalDate.getMinutes(), originalDate.getSeconds());
-
-        // Store the pending change
-        pendingDateChanges.value.set(entryId, newDate);
-        isDirty.value = true;
-
-        // Emit change event to parent
-        emit('changed');
-
-    } catch (error) {
-        console.error('Failed to handle drop:', error);
-    }
-}
-
-function handleDragOver(event) {
-    event.preventDefault();
-    event.dataTransfer.dropEffect = 'move';
-}
-
-function handleDragEnter(event, target) {
-    event.preventDefault();
-    dragOverTarget.value = target;
-}
-
-function handleDragLeave(event) {
-    // Only clear if we're actually leaving the drop zone
-    if (!event.relatedTarget || !event.currentTarget.contains(event.relatedTarget)) {
-        dragOverTarget.value = null;
-    }
-}
-
-function handleDrop(event, targetDate, targetHour = null) {
-    event.preventDefault();
-    dragOverTarget.value = null;
-
-    if (targetHour !== null) {
-        handleHourDrop(event, targetDate, targetHour);
-    } else {
-        handleDateDrop(event, targetDate);
-    }
-}
-
-// ============================================================================
-// Save and Cancel Functions
-// ============================================================================
-async function saveChanges() {
-    if (pendingDateChanges.value.size === 0) return Promise.resolve();
-
-    saving.value = true;
-    error.value = null;
-
-    try {
-        // Update each entry individually
-        const promises = Array.from(pendingDateChanges.value.entries()).map(([entryId, newDate]) => {
-            // Find the entry to get its current title and slug
-            const entry = entries.value.find(e => e.id === entryId);
-
-            return axios.patch(cp_url(`collections/${props.collection}/entries/${entryId}`), {
-                date: newDate.toISOString(),
-                title: entry.title,
-                slug: entry.slug
-            });
-        });
-
-        const response = await Promise.all(promises);
-
-        // Update local entries with the new dates
-        pendingDateChanges.value.forEach((newDate, entryId) => {
-            const entry = entries.value.find(e => e.id === entryId);
-            if (entry) {
-                entry.date = newDate.toISOString();
-            }
-        });
-
-        // Clear pending changes
-        pendingDateChanges.value.clear();
-        isDirty.value = false;
-
-        // Emit saved event
-        emit('saved');
-
-        Statamic.$toast.success(__('Saved'));
-        return response;
-    } catch (err) {
-        error.value = err;
-        console.error('Failed to save changes:', err);
-        Statamic.$toast.error(__('Failed to save changes'));
-        throw err;
-    } finally {
-        saving.value = false;
-    }
-}
-
-function cancelChanges() {
-    pendingDateChanges.value.clear();
-    isDirty.value = false;
-    emit('canceled');
-}
-
 // ============================================================================
 // Component API
 // ============================================================================
 
 // Expose methods to parent
 defineExpose({
-    saveChanges,
-    cancelChanges,
     isDirty: () => isDirty.value
 });
 
@@ -353,18 +165,6 @@ const columns = computed(() => [
     { label: 'Title', field: 'title', visible: true },
     { label: 'Status', field: 'status', visible: true }
 ]);
-
-// Memoize entries for each hour to prevent re-computation during drag
-const entriesByHour = computed(() => {
-    const result = {};
-    getWeekDates(currentDate.value).forEach(date => {
-        getVisibleHours().forEach(hour => {
-            const key = `${date.toString()}-${hour}`;
-            result[key] = getEntriesForHour(date, hour);
-        });
-    });
-    return result;
-});
 
 // ============================================================================
 // Watchers
@@ -473,17 +273,10 @@ function shouldFetchEntries(
                 :week-days="weekDays"
                 :grid="grid"
                 :entries="entries"
-                :pending-date-changes="pendingDateChanges"
                 :selected-date="selectedDate"
-                :drag-over-target="dragOverTarget"
                 :create-url="createUrl"
                 :blueprints="blueprints"
                 @select-date="selectDate"
-                @entry-dragstart="handleEntryDragStart"
-                @drag-over="handleDragOver"
-                @drag-enter="handleDragEnter"
-                @drag-leave="handleDragLeave"
-                @drop="handleDrop"
             />
 
             <!-- Week View -->
@@ -492,18 +285,10 @@ function shouldFetchEntries(
                 ref="weekViewRef"
                 :week-dates="getWeekDates(currentDate)"
                 :entries="entries"
-                :pending-date-changes="pendingDateChanges"
                 :selected-date="selectedDate"
-                :drag-over-target="dragOverTarget"
                 :create-url="createUrl"
                 :blueprints="blueprints"
-                :entries-by-hour="entriesByHour"
                 @select-date="selectDate"
-                @entry-dragstart="handleEntryDragStart"
-                @drag-over="handleDragOver"
-                @drag-enter="handleDragEnter"
-                @drag-leave="handleDragLeave"
-                @drop="handleDrop"
             />
         </CalendarRoot>
          <!-- Mobile entries list -->

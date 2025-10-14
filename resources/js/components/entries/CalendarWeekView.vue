@@ -48,10 +48,6 @@
                     class="h-12 border-b border-gray-200 dark:border-gray-700 relative group"
                     :class="hourCellClasses(date, hour)"
                     @click="selectDate(date)"
-                    @dragover="handleDragOver"
-                    @dragenter="handleDragEnter($event, { date, hour })"
-                    @dragleave="handleDragLeave"
-                    @drop="handleDrop($event, date, hour)"
                 >
                     <!-- Entries for this hour -->
                     <div class="absolute inset-0 p-1 overflow-scroll">
@@ -59,7 +55,6 @@
                             v-for="entry in getEntriesForHour(date, hour)"
                             :key="entry.id"
                             :entry="entry"
-                            @dragstart="handleEntryDragStart"
                         />
                     </div>
 
@@ -83,30 +78,41 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import CalendarWeekEntry from './CalendarWeekEntry.vue';
 import CreateEntryButton from './CreateEntryButton.vue';
-import { getVisibleHours, getHourLabel, isToday, getCreateUrlDateParam } from '@/util/calendar.js';
+import {
+    getVisibleHours,
+    getHourLabel,
+    isToday,
+    getCreateUrlDateParam,
+    getWeekDates,
+    formatDateString,
+} from '@/util/calendar.js';
 
 const props = defineProps({
     weekDates: { type: Array, required: true },
     entries: { type: Array, required: true },
-    pendingDateChanges: { type: Map, required: true },
     selectedDate: { type: Object, default: null },
-    dragOverTarget: { type: Object, default: null },
     createUrl: { type: String, required: true },
     blueprints: { type: Array, default: () => [] },
-    entriesByHour: { type: Object, required: true }
 });
 
-const emit = defineEmits(['select-date', 'entry-dragstart', 'drag-over', 'drag-enter', 'drag-leave', 'drop']);
+const emit = defineEmits(['select-date']);
 
 const visibleHours = getVisibleHours();
 
-const getEntriesForHour = (date, hour) => {
-    const key = `${date.toString()}-${hour}`;
-    return props.entriesByHour[key] || [];
-};
+function getEntriesForHour(date, hour) {
+    const dateStr = formatDateString(date);
+    return props.entries.filter(entry => {
+        const entryDate = new Date(entry.date?.date || entry.date);
+        const entryDateStr = entryDate.toISOString().split('T')[0];
+        if (entryDateStr !== dateStr) return false;
+
+        const entryHour = entryDate.getHours();
+        return entryHour === hour;
+    });
+}
 
 const headerClasses = (date) => ({
     'bg-blue-50 dark:bg-blue-900/20': isSelectedDate(date),
@@ -121,42 +127,14 @@ const dateNumberClasses = (date) => ({
 
 const hourCellClasses = (date, hour) => ({
     'hover:bg-gray-50 dark:hover:bg-gray-800/50': getEntriesForHour(date, hour).length === 0,
-    'bg-blue-50 dark:bg-blue-900/20': isDragOverHour(date, hour)
 });
 
 const isSelectedDate = (date) => {
     return props.selectedDate && props.selectedDate.toString() === date.toString();
 };
 
-const isDragOverHour = (date, hour) => {
-    return props.dragOverTarget &&
-           props.dragOverTarget.date &&
-           props.dragOverTarget.date.toString() === date.toString() &&
-           props.dragOverTarget.hour === hour;
-};
-
 const selectDate = (date) => {
     emit('select-date', date);
-};
-
-const handleEntryDragStart = (event, entry) => {
-    emit('entry-dragstart', event, entry);
-};
-
-const handleDragOver = (event) => {
-    emit('drag-over', event);
-};
-
-const handleDragEnter = (event, target) => {
-    emit('drag-enter', event, target);
-};
-
-const handleDragLeave = (event) => {
-    emit('drag-leave', event);
-};
-
-const handleDrop = (event, targetDate, targetHour) => {
-    emit('drop', event, targetDate, targetHour);
 };
 
 // Expose the container ref for parent component to access
