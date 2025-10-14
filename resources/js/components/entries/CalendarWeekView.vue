@@ -83,7 +83,7 @@
 </template>
 
 <script setup>
-import { ref, defineExpose } from 'vue';
+import { ref } from 'vue';
 import CalendarWeekEntry from './CalendarWeekEntry.vue';
 import CreateEntryButton from './CreateEntryButton.vue';
 import { getVisibleHours, getHourLabel, isToday, getCreateUrlDateParam } from '@/util/calendar.js';
