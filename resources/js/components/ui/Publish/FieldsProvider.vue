@@ -17,7 +17,7 @@ const props = defineProps({
     },
     metaPathPrefix: {
         type: String,
-        default: (props) => props.pathPrefix,
+        default: (props) => props.fieldPathPrefix,
     },
 });
 
