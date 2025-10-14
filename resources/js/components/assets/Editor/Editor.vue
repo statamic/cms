@@ -63,7 +63,7 @@
 
                         <!-- Image Preview -->
                         <div
-                            v-if="asset.isImage || asset.isSvg || asset.isAudio || asset.isVideo || asset.preview || asset.thumbnail"
+                            v-if="asset.isImage || asset.isSvg || asset.isAudio || asset.isVideo || asset.preview"
                             class="editor-preview-image"
                         >
                             <div class="image-wrapper">
@@ -97,7 +97,7 @@
                                 <video :src="asset.url" controls v-else-if="asset.isVideo" />
 
                                 <!-- Other thumbnail -->
-                                <img v-else-if="asset.preview || asset.thumbnail" :src="asset.preview || asset.thumbnail" class="asset-thumb" />
+                                <img v-else-if="asset.preview" :src="asset.preview" class="asset-thumb" />
                             </div>
                         </div>
 
