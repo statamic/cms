@@ -1,6 +1,7 @@
 import { ref } from 'vue';
 import uniqid from 'uniqid';
 import { CATEGORY } from './command-palette/Constants.js';
+import { router } from '@inertiajs/vue3';
 
 const commands = ref({});
 
@@ -37,6 +38,10 @@ class Command {
 }
 
 export default class CommandPalette {
+    constructor() {
+        router.on('success', () => commands.value = []);
+    }
+
     get category() {
         return CATEGORY;
     }
