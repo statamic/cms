@@ -126,33 +126,14 @@ function goToToday() {
 }
 
 function goToPreviousPeriod() {
-    if (viewMode.value === 'week') {
-        // Move back one week
-        const currentDateObj = new Date(currentDate.value.year, currentDate.value.month - 1, currentDate.value.day);
-        currentDateObj.setDate(currentDateObj.getDate() - 7);
-        currentDate.value = new CalendarDate(currentDateObj.getFullYear(), currentDateObj.getMonth() + 1, currentDateObj.getDate());
-    } else {
-        // Move back one month (existing behavior)
-        const currentDateObj = new Date(currentDate.value.year, currentDate.value.month - 1, currentDate.value.day);
-        currentDateObj.setMonth(currentDateObj.getMonth() - 1);
-        currentDate.value = new CalendarDate(currentDateObj.getFullYear(), currentDateObj.getMonth() + 1, currentDateObj.getDate());
-    }
+    const period = viewMode.value === 'week' ? 'weeks' : 'months';
+    currentDate.value = currentDate.value.subtract({ [period]: 1 });
 }
 
 function goToNextPeriod() {
-    if (viewMode.value === 'week') {
-        // Move forward one week
-        const currentDateObj = new Date(currentDate.value.year, currentDate.value.month - 1, currentDate.value.day);
-        currentDateObj.setDate(currentDateObj.getDate() + 7);
-        currentDate.value = new CalendarDate(currentDateObj.getFullYear(), currentDateObj.getMonth() + 1, currentDateObj.getDate());
-    } else {
-        // Move forward one month (existing behavior)
-        const currentDateObj = new Date(currentDate.value.year, currentDate.value.month - 1, currentDate.value.day);
-        currentDateObj.setMonth(currentDateObj.getMonth() + 1);
-        currentDate.value = new CalendarDate(currentDateObj.getFullYear(), currentDateObj.getMonth() + 1, currentDateObj.getDate());
-    }
+    const period = viewMode.value === 'week' ? 'weeks' : 'months';
+    currentDate.value = currentDate.value.add({ [period]: 1 });
 }
-
 
 function selectDate(date) {
     selectedDate.value = date;
