@@ -45,7 +45,11 @@ const {
     setHiddenField,
     container,
 } = injectContainerContext();
-const { fieldPathPrefix: injectedFieldPathPrefix, metaPathPrefix: injectedMetaPathPrefix } = injectFieldsContext();
+const {
+    fieldPathPrefix: injectedFieldPathPrefix,
+    metaPathPrefix: injectedMetaPathPrefix,
+    readOnly: fieldsProviderReadOnly,
+} = injectFieldsContext();
 const fieldPathPrefix = computed(() => props.fieldPathPrefix || injectedFieldPathPrefix.value);
 const metaPathPrefix = computed(() => props.metaPathPrefix || injectedMetaPathPrefix.value);
 const handle = props.config.handle;
@@ -152,6 +156,7 @@ const isLocalizable = computed(() => props.config.localizable);
 
 const isReadOnly = computed(() => {
     if (containerReadOnly.value) return true;
+    if (fieldsProviderReadOnly.value) return true;
 
     if (isTrackingOriginValues.value && isSyncable.value && !isLocalizable.value) return true;
 

@@ -19,12 +19,17 @@ const props = defineProps({
         type: String,
         default: (props) => props.fieldPathPrefix,
     },
+    readOnly: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 provideFieldsContext({
     fields: toRef(() => props.fields),
     fieldPathPrefix: toRef(() => props.fieldPathPrefix),
     metaPathPrefix: toRef(() => props.metaPathPrefix),
+    readOnly: toRef(() => props.readOnly),
 });
 </script>
 
