@@ -116,7 +116,7 @@
                     </div>
                     <div class="flex items-center gap-2 text-sm" v-if="collection.draft_entries_count > 0">
                         <ui-badge variant="flat" :text="String(collection.draft_entries_count)" pill class="bg-gray-200 dark:" />
-                        <span>{{ __n('Draft|Drafts', collection.draft_entries_count) }}</span>
+                        <span>{{ __('Drafts') }}</span>
                     </div>
                 </ui-panel-footer>
             </ui-panel>
@@ -143,18 +143,21 @@
                 <ui-badge
                     v-if="collection.published_entries_count > 0"
                     color="green"
-                    :text="String(collection.published_entries_count) + ' ' + __('Published')"
+                    :text="__('Published')"
+                    :append="String(collection.published_entries_count)"
                     pill
                 />
                 <ui-badge
                     v-if="collection.scheduled_entries_count > 0"
                     color="yellow"
-                    :text="String(collection.scheduled_entries_count) + ' ' + __('Scheduled')"
+                    :text="__('Scheduled')"
+                    :append="String(collection.scheduled_entries_count)"
                     pill
                 />
                 <ui-badge
                     v-if="collection.draft_entries_count > 0"
-                    :text="String(collection.draft_entries_count) + ' ' + __n('Draft|Drafts', collection.draft_entries_count)"
+                    :text="__('Drafts')"
+                    :append="String(collection.draft_entries_count)"
                     pill
                 />
             </div>
