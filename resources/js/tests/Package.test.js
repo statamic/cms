@@ -48,6 +48,7 @@ it('exports api', async () => {
         'events',
         'fieldActions',
         'hooks',
+        'inertia',
         'keys',
         'permissions',
         'portals',
