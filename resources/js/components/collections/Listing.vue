@@ -144,20 +144,20 @@
                     v-if="collection.published_entries_count > 0"
                     color="green"
                     :text="__('Published')"
-                    :append="String(collection.published_entries_count)"
+                    :append="collection.published_entries_count"
                     pill
                 />
                 <ui-badge
                     v-if="collection.scheduled_entries_count > 0"
                     color="yellow"
                     :text="__('Scheduled')"
-                    :append="String(collection.scheduled_entries_count)"
+                    :append="collection.scheduled_entries_count"
                     pill
                 />
                 <ui-badge
                     v-if="collection.draft_entries_count > 0"
                     :text="__('Drafts')"
-                    :append="String(collection.draft_entries_count)"
+                    :append="collection.draft_entries_count"
                     pill
                 />
             </div>
