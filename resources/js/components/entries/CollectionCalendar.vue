@@ -373,9 +373,9 @@ const entriesByHour = computed(() => {
 watch(
     () => [currentDate.value.year, currentDate.value.month, currentDate.value.day, viewMode.value],
     (newValue, oldValue) => {
-        if (shouldFetchEntries(newValue, oldValue)) fetchEntries();
+        if (!oldValue || shouldFetchEntries(newValue, oldValue)) fetchEntries();
     },
-    { deep: true }
+    { deep: true, immediate: true }
 );
 
 function shouldFetchEntries(
