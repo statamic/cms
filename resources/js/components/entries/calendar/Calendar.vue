@@ -185,7 +185,6 @@ function shouldFetchEntries(
                     </div>
                 </div>
 
-                <!-- Calendar Heading with Popover -->
                 <div class="@3xl:flex-1 px-2 text-center">
                     <Popover class="w-full" arrow>
                         <template #trigger>
@@ -239,7 +238,6 @@ function shouldFetchEntries(
                 @select-date="selectDate"
             />
 
-            <!-- Week View -->
             <Week
                 v-else
                 :week-dates="getWeekDates(currentDate)"
@@ -250,7 +248,7 @@ function shouldFetchEntries(
                 @select-date="selectDate"
             />
         </CalendarRoot>
-         <!-- Mobile entries list -->
+
         <div class="mt-6" v-if="selectedDate">
             <Heading
                 size="lg"
@@ -267,7 +265,7 @@ function shouldFetchEntries(
                 :show-pagination-page-links="false"
                 :show-pagination-per-page-selector="false"
             >
-                <template #cell-title="{ row: entry, isColumnVisible }">
+                <template #cell-title="{ row: entry }">
                     <Link :href="entry.edit_url" v-text="entry.title" />
                 </template>
                 <template #cell-status="{ row: entry }">

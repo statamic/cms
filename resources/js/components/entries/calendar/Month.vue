@@ -110,27 +110,23 @@ const selectDate = (date) => {
                             v-slot="{ dayValue, selected, today, outsideView }"
                             @click="selectDate(weekDate)"
                         >
-                            <!-- Date number -->
                             <div
                                 class="text-sm mb-1 rounded-full size-6 flex items-center justify-center"
                                 v-text="dayValue"
                                 :class="dateNumberClasses(weekDate, selected, today, outsideView)"
                             />
 
-                            <!-- Mobile entry indicators -->
                             <div class="@3xl:hidden w-full" v-if="getEntriesForDate(weekDate).length > 0">
                                 <div class="flex h-1 rounded-full overflow-hidden items-center justify-center">
                                     <div
                                         v-for="(entry, index) in getEntriesForDate(weekDate).slice(0, 4)"
                                         :key="entry.id"
-                                        class="h-full first:rounded-s-full last:rounded-e-full"
+                                        class="w-1/4 h-full first:rounded-s-full last:rounded-e-full"
                                         :class="entryStatusClasses(entry.status)"
-                                        style="width: 25%"
                                     />
                                 </div>
                             </div>
 
-                            <!-- Desktop entries -->
                             <div class="space-y-1.5 flex-1 overflow-scroll h-full w-full hidden @3xl:block">
                                 <CalendarEntry
                                     v-for="entry in getEntriesForDate(weekDate)"
@@ -140,7 +136,6 @@ const selectDate = (date) => {
                             </div>
                         </CalendarCellTrigger>
 
-                        <!-- Create entry button (shows on hover) -->
                         <div class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity hidden @3xl:block">
                             <CreateEntryButton
                                 :params="{ values: { date: getCreateUrlDateParam(weekDate) } }"
