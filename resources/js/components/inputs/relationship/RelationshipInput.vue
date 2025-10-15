@@ -314,6 +314,8 @@ export default {
         },
 
         makeSortable() {
+            if (! this.$refs.items) return;
+
             this.sortable = new Sortable(this.$refs.items, {
                 draggable: '.related-item',
                 handle: '.item-move',

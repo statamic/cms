@@ -147,31 +147,6 @@
   ========================================================================== */
 
 .asset-editor {
-    .editor-preview {
-        .editor-preview-image {
-            @apply flex flex-1 flex-col p-8;
-        }
-
-        .image-wrapper {
-            flex: 1 1 auto;
-            position: relative;
-
-            > * {
-                @apply absolute h-auto max-h-full w-auto max-w-full;
-                left: 50%;
-                [dir='rtl'] & {
-                    left: auto;
-                    right: 50%;
-                }
-                top: 50%;
-                transform: translate(-50%, -50%);
-                [dir='rtl'] & {
-                    transform: translate(50%, -50%);
-                }
-                box-shadow: 0 0 32px rgba(0, 0, 0, 0.35);
-            }
-        }
-    }
 
     .loading {
         @apply absolute inset-0 z-10 flex items-center justify-center rounded-sm bg-white/70;

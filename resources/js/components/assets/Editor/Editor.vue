@@ -61,42 +61,41 @@
                             </ItemActions>
                         </div>
 
-                        <!-- Image Preview -->
+                        <!-- Asset Preview Area -->
                         <div
                             v-if="asset.isImage || asset.isSvg || asset.isAudio || asset.isVideo"
-                            class="editor-preview-image"
+                            class="flex flex-1 flex-col justify-center items-center p-8 h-full min-h-0"
                         >
-                            <div class="image-wrapper">
-                                <!-- Image -->
-                                <img v-if="asset.isImage" :src="asset.preview" class="asset-thumb" />
+                            <!-- Image -->
+                            <img v-if="asset.isImage" :src="asset.preview" class="asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
 
-                                <!-- SVG -->
-                                <div v-else-if="asset.isSvg" class="flex h-full w-full flex-col">
-                                    <div class="grid grid-cols-3 gap-1">
-                                        <div class="bg-checkerboard flex items-center justify-center p-3 aspect-square">
-                                            <img :src="asset.url" class="asset-thumb relative z-10 size-4" />
-                                        </div>
-                                        <div class="bg-checkerboard flex items-center justify-center p-3 aspect-square">
-                                            <img :src="asset.url" class="asset-thumb relative z-10 size-12" />
-                                        </div>
-                                        <div class="bg-checkerboard flex items-center justify-center p-3 aspect-square">
-                                            <img :src="asset.url" class="asset-thumb relative z-10 size-24" />
-                                        </div>
+                            <!-- SVG -->
+                            <div v-else-if="asset.isSvg" class="flex h-full w-full flex-col shadow-ui-xl">
+                                <div class="grid grid-cols-3 gap-1">
+                                    <div class="bg-checkerboard flex items-center justify-center p-3 aspect-square">
+                                        <img :src="asset.url" class="asset-thumb relative z-10 size-4" />
                                     </div>
-                                    <div class="bg-checkerboard h-full min-h-0 mt-1 flex items-center justify-center p-3 aspect-square">
-                                        <img :src="asset.url" class="asset-thumb relative z-10 max-h-full w-2/3 max-w-full" />
+                                    <div class="bg-checkerboard flex items-center justify-center p-3 aspect-square">
+                                        <img :src="asset.url" class="asset-thumb relative z-10 size-12" />
+                                    </div>
+                                    <div class="bg-checkerboard flex items-center justify-center p-3 aspect-square">
+                                        <img :src="asset.url" class="asset-thumb relative z-10 size-24" />
                                     </div>
                                 </div>
-
-                                <!-- Audio -->
-                                <div class="w-full shadow-none" v-else-if="asset.isAudio">
-                                    <audio :src="asset.url" class="w-full" controls preload="auto" />
+                                <div class="bg-checkerboard h-full min-h-0 mt-1 flex items-center justify-center p-3 aspect-square">
+                                    <img :src="asset.url" class="asset-thumb relative z-10 max-h-full w-2/3 max-w-full" />
                                 </div>
-
-                                <!-- Video -->
-                                <video :src="asset.url" controls v-else-if="asset.isVideo" />
                             </div>
+
+                            <!-- Audio -->
+                            <div class="w-full shadow-none" v-else-if="asset.isAudio">
+                                <audio :src="asset.url" class="w-full" controls preload="auto" />
+                            </div>
+
+                            <!-- Video -->
+                            <video :src="asset.url" class="max-w-full max-h-full object-contain" controls v-else-if="asset.isVideo" />
                         </div>
+
 
                         <div class="h-full" v-else-if="asset.isPdf">
                             <pdf-viewer :src="asset.pdfUrl" />
