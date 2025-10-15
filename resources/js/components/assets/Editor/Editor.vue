@@ -63,7 +63,7 @@
 
                         <!-- Asset Preview Area -->
                         <div
-                            v-if="asset.isImage || asset.isSvg || asset.isAudio || asset.isVideo"
+                            v-if="asset.isImage || asset.isSvg || asset.isAudio || asset.isVideo || asset.preview"
                             class="flex flex-1 flex-col justify-center items-center p-8 h-full min-h-0"
                         >
                             <!-- Image -->
@@ -94,6 +94,9 @@
 
                             <!-- Video -->
                             <video :src="asset.url" class="max-w-full max-h-full object-contain" controls v-else-if="asset.isVideo" />
+
+                            <!-- Other thumbnail -->
+                            <img v-else-if="asset.preview" :src="asset.preview" class="asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
                         </div>
 
 
