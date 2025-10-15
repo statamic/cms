@@ -30,7 +30,6 @@ const datePickerOpen = ref(false);
 const viewModePreferenceKey = `collections.${props.collection}.calendar.view`;
 const viewMode = ref(preferences.get(viewModePreferenceKey, 'month')); // 'month' or 'week'
 watch(viewMode, (viewMode) => preferences.set(viewModePreferenceKey, viewMode));
-const weekViewRef = ref(null);
 
 async function fetchEntries() {
     loading.value = true;
@@ -247,7 +246,6 @@ function shouldFetchEntries(
             <!-- Week View -->
             <Week
                 v-else
-                ref="weekViewRef"
                 :week-dates="getWeekDates(currentDate)"
                 :entries="entries"
                 :selected-date="selectedDate"
