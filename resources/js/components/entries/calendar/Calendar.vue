@@ -2,7 +2,7 @@
 import { ref, watch, computed, getCurrentInstance } from 'vue';
 import axios from 'axios';
 import { CalendarHeader, CalendarHeading, CalendarRoot } from 'reka-ui';
-import { CalendarDate } from '@internationalized/date';
+import { CalendarDate, toCalendarDateTime } from '@internationalized/date';
 import Month from './Month.vue';
 import Week from './Week.vue';
 import { Listing, StatusIndicator } from '@/components/ui';
@@ -22,6 +22,7 @@ const props = defineProps({
 const $date = new DateFormatter;
 const currentDate = ref(new CalendarDate(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()));
 const selectedDate = ref(null);
+const selectedDateTime = computed(() => toCalendarDateTime(selectedDate.value));
 const entries = ref([]);
 const loading = ref(false);
 
@@ -253,7 +254,7 @@ function shouldFetchEntries(
             <Heading
                 size="lg"
                 class="flex justify-center pb-4"
-                :text="$date.format(selectedDate, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })"
+                :text="$date.format(selectedDateTime, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })"
             />
 
             <Listing
