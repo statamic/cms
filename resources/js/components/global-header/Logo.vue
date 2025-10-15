@@ -20,8 +20,8 @@ function toggleNav() {
 <template>
     <template v-if="customLogo">
         <button class="flex items-center group cursor-pointer text-white/85 hover:text-white" type="button" @click="toggleNav" aria-label="{{ __('Toggle Nav') }}">
-            <div class="p-1 size-7 inset-0 flex items-center justify-center">
-                <Icon name="burger-menu" class="size-5" />
+            <div class="p-1 mr-1 sm:mr-2 size-7 inset-0 flex items-center justify-center">
+                <Icon name="burger-menu" class="size-5 opacity-60 hover:opacity-100" />
             </div>
         </button>
         <img :src="customLogo" :alt="cmsName" class="max-w-[260px] max-h-9">
