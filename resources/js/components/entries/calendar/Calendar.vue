@@ -24,7 +24,6 @@ const currentDate = ref(new CalendarDate(new Date().getFullYear(), new Date().ge
 const selectedDate = ref(null);
 const entries = ref([]);
 const loading = ref(false);
-const datePickerOpen = ref(false);
 
 const viewModePreferenceKey = `collections.${props.collection}.calendar.view`;
 const viewMode = ref(preferences.get(viewModePreferenceKey, 'month')); // 'month' or 'week'
@@ -188,9 +187,9 @@ function shouldFetchEntries(
 
                 <!-- Calendar Heading with Popover -->
                 <div class="@3xl:flex-1 px-2 text-center">
-                    <Popover v-model:open="datePickerOpen" class="w-full" arrow>
+                    <Popover class="w-full" arrow>
                         <template #trigger>
-                            <button @click="datePickerOpen = true">
+                            <button>
                                 <CalendarHeading
                                     class="text-2xl font-medium text-gray-800 dark:text-white cursor-pointer hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
                                 />
