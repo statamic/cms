@@ -25,40 +25,47 @@
     }
 
     .stack-overlay {
-        @apply absolute inset-0 bg-black opacity-20 dark:opacity-30;
-        pointer-events: none;
-        transition: all 0.3s ease;
-
-        &.stack-overlay-fade-enter,
-        &.stack-overlay-fade-leave-to {
-            opacity: 0;
-        }
+        @apply pointer-events-none;
     }
 
     .stack-hit-area {
-        @apply absolute inset-0;
+        @apply absolute inset-0 cursor-pointer;
     }
 
     .stack-content {
-        @apply relative h-full shadow-lg;
-        transition: all 0.2s ease;
+        @apply relative h-full;
+    }
 
-        &.stack-slide-enter,
-        &.stack-slide-leave-to {
-            transform: translateX(10px);
-            opacity: 0;
+    .stack-overlay-fade-enter-active,
+    .stack-overlay-fade-leave-active {
+        transition: opacity 250ms ease;
+    }
 
-            [dir='rtl'] & {
-                transform: translateX(-10px);
-            }
+    .stack-overlay-fade-enter-from,
+    .stack-overlay-fade-leave-to {
+        opacity: 0;
+    }
+
+    .stack-slide-enter-active,
+    .stack-slide-leave-active {
+        transition: transform 250ms ease, opacity 250ms ease;
+    }
+
+    .stack-slide-enter-from {
+        transform: translateX(10%);
+        opacity: 0;
+
+        [dir='rtl'] & {
+            transform: translateX(-10%);
         }
     }
 
-    .hovering .stack-content {
-        transform: translateX(-16px);
+    .stack-slide-leave-to {
+        transform: translateX(10%);
+        opacity: 0;
 
         [dir='rtl'] & {
-            transform: translateX(16px);
+            transform: translateX(-10%);
         }
     }
 }
