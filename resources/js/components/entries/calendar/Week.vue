@@ -75,6 +75,7 @@ function getHourLabel(hour) {
                 :key="date.toString()"
                 class="p-3 bg-gray-50 dark:bg-gray-900/10 text-center border-l border-gray-200 dark:border-gray-700"
                 :class="headerClasses(date)"
+                @click="selectDate(date)"
             >
                 <div class="text-xs text-gray-500 dark:text-gray-400" v-text="$date.format(date, { weekday: 'short'})" />
                 <div
