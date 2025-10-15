@@ -2,6 +2,7 @@
 
 namespace Tests\Search;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Search\Index;
 
@@ -15,17 +16,34 @@ trait IndexTests
         parent::tearDown();
     }
 
-    #[Test]
-    public function it_can_set_a_name_resolver()
+    abstract public function getIndexClass();
+
+    public function getIndex($name, $config, $locale)
     {
-        $index = $this->getIndex('myindex');
+        $class = $this->getIndexClass();
 
-        $index::resolveNameUsing(function ($name) {
-            $this->assertEquals('myindex', $name);
+        return new $class($name, $config, $locale);
+    }
 
-            return 'prefixed_'.$name;
-        });
+    #[Test, DataProvider('nameProvider')]
+    public function it_can_get_the_name($name, $config, $locale, $resolver, $expected)
+    {
+        if ($resolver) {
+            $this->getIndexClass()::resolveNameUsing($resolver);
+        }
 
-        $this->assertEquals('prefixed_myindex', $index->name());
+        $index = $this->getIndex($name, $config, $locale);
+
+        $this->assertEquals($expected, $index->name());
+    }
+
+    public static function nameProvider()
+    {
+        return [
+            'basic' => ['test', [], null, null, 'test'],
+            'with locale' => ['test', [], 'en', null, 'test_en'],
+            'resolver' => ['test', [], null, fn ($name, $locale) => 'prefix_'.$name.'_'.$locale, 'prefix_test_'],
+            'resolver with locale' => ['test', [], 'en', fn ($name, $locale) => 'prefix_'.$name.'_'.$locale, 'prefix_test_en'],
+        ];
     }
 }

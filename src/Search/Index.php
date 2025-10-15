@@ -26,17 +26,16 @@ abstract class Index
 
     public function __construct($name, array $config, ?string $locale = null)
     {
-        $this->name = $locale ? $name.'_'.$locale : $name;
+        $this->name = static::$nameCallback
+            ? call_user_func(static::$nameCallback, $name, $locale)
+            : ($locale ? $name.'_'.$locale : $name);
+
         $this->config = $config;
         $this->locale = $locale;
     }
 
     public function name()
     {
-        if (static::$nameCallback) {
-            return call_user_func(static::$nameCallback, $this->name);
-        }
-
         return $this->name;
     }
 
