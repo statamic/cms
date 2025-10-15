@@ -68,7 +68,6 @@ function getHourLabel(hour) {
 
 <template>
     <div class="w-full">
-        <!-- Week header with days -->
         <div class="grid grid-cols-8 border border-gray-200 dark:border-gray-700 rounded-t-lg overflow-hidden">
             <div class="p-3 text-sm bg-gray-50 dark:bg-gray-900/10 font-medium text-gray-500 dark:text-gray-400"></div>
             <div
@@ -86,9 +85,7 @@ function getHourLabel(hour) {
             </div>
         </div>
 
-        <!-- Hourly grid -->
         <div ref="weekViewContainer" class="grid grid-cols-8 gap-0 border border-gray-200 dark:border-gray-700 rounded-b-lg overflow-auto max-h-[60vh]">
-            <!-- Hour labels column -->
             <div class="bg-gray-50 dark:bg-gray-900/10">
                 <div
                     v-for="hour in visibleHours"
@@ -99,7 +96,6 @@ function getHourLabel(hour) {
                 </div>
             </div>
 
-            <!-- Day columns -->
             <div
                 v-for="date in weekDates"
                 :key="date.toString()"
@@ -112,7 +108,6 @@ function getHourLabel(hour) {
                     :class="hourCellClasses(date, hour)"
                     @click="selectDate(date)"
                 >
-                    <!-- Entries for this hour -->
                     <div class="absolute inset-0 p-1 overflow-scroll">
                         <CalendarEntry
                             v-for="entry in getEntriesForHour(date, hour)"
@@ -121,7 +116,6 @@ function getHourLabel(hour) {
                         />
                     </div>
 
-                    <!-- Create entry button (shows on hover) -->
                     <div v-if="getEntriesForHour(date, hour).length === 0" class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <CreateEntryButton
                             :params="{ values: { date: getCreateUrlDateParam(date, hour) } }"
