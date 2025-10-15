@@ -1,3 +1,67 @@
+<script setup>
+import { ref } from 'vue';
+import CalendarWeekEntry from './CalendarWeekEntry.vue';
+import CreateEntryButton from './CreateEntryButton.vue';
+import {
+    getVisibleHours,
+    getHourLabel,
+    isToday,
+    getCreateUrlDateParam,
+    formatDateString,
+} from '@/util/calendar.js';
+
+const props = defineProps({
+    weekDates: { type: Array, required: true },
+    entries: { type: Array, required: true },
+    selectedDate: { type: Object, default: null },
+    createUrl: { type: String, required: true },
+    blueprints: { type: Array, default: () => [] },
+});
+
+const emit = defineEmits(['select-date']);
+
+const visibleHours = getVisibleHours();
+
+function getEntriesForHour(date, hour) {
+    const dateStr = formatDateString(date);
+    return props.entries.filter(entry => {
+        const entryDate = new Date(entry.date?.date || entry.date);
+        const entryDateStr = entryDate.toISOString().split('T')[0];
+        if (entryDateStr !== dateStr) return false;
+
+        const entryHour = entryDate.getHours();
+        return entryHour === hour;
+    });
+}
+
+const headerClasses = (date) => ({
+    'bg-blue-50 dark:bg-blue-900/20': isSelectedDate(date),
+    'bg-gray-50 dark:bg-gray-800': isToday(date)
+});
+
+const dateNumberClasses = (date) => ({
+    'text-blue-600 dark:text-blue-400': isSelectedDate(date),
+    'text-gray-900 dark:text-white': !isSelectedDate(date),
+    'rounded-full text-white bg-ui-accent': isToday(date)
+});
+
+const hourCellClasses = (date, hour) => ({
+    'hover:bg-gray-50 dark:hover:bg-gray-800/50': getEntriesForHour(date, hour).length === 0,
+});
+
+const isSelectedDate = (date) => {
+    return props.selectedDate && props.selectedDate.toString() === date.toString();
+};
+
+const selectDate = (date) => {
+    emit('select-date', date);
+};
+
+// Expose the container ref for parent component to access
+const weekViewContainer = ref(null);
+defineExpose({ weekViewContainer });
+</script>
+
 <template>
     <div class="w-full">
         <!-- Week header with days -->
@@ -76,67 +140,3 @@
         </div>
     </div>
 </template>
-
-<script setup>
-import { ref } from 'vue';
-import CalendarWeekEntry from './CalendarWeekEntry.vue';
-import CreateEntryButton from './CreateEntryButton.vue';
-import {
-    getVisibleHours,
-    getHourLabel,
-    isToday,
-    getCreateUrlDateParam,
-    formatDateString,
-} from '@/util/calendar.js';
-
-const props = defineProps({
-    weekDates: { type: Array, required: true },
-    entries: { type: Array, required: true },
-    selectedDate: { type: Object, default: null },
-    createUrl: { type: String, required: true },
-    blueprints: { type: Array, default: () => [] },
-});
-
-const emit = defineEmits(['select-date']);
-
-const visibleHours = getVisibleHours();
-
-function getEntriesForHour(date, hour) {
-    const dateStr = formatDateString(date);
-    return props.entries.filter(entry => {
-        const entryDate = new Date(entry.date?.date || entry.date);
-        const entryDateStr = entryDate.toISOString().split('T')[0];
-        if (entryDateStr !== dateStr) return false;
-
-        const entryHour = entryDate.getHours();
-        return entryHour === hour;
-    });
-}
-
-const headerClasses = (date) => ({
-    'bg-blue-50 dark:bg-blue-900/20': isSelectedDate(date),
-    'bg-gray-50 dark:bg-gray-800': isToday(date)
-});
-
-const dateNumberClasses = (date) => ({
-    'text-blue-600 dark:text-blue-400': isSelectedDate(date),
-    'text-gray-900 dark:text-white': !isSelectedDate(date),
-    'rounded-full text-white bg-ui-accent': isToday(date)
-});
-
-const hourCellClasses = (date, hour) => ({
-    'hover:bg-gray-50 dark:hover:bg-gray-800/50': getEntriesForHour(date, hour).length === 0,
-});
-
-const isSelectedDate = (date) => {
-    return props.selectedDate && props.selectedDate.toString() === date.toString();
-};
-
-const selectDate = (date) => {
-    emit('select-date', date);
-};
-
-// Expose the container ref for parent component to access
-const weekViewContainer = ref(null);
-defineExpose({ weekViewContainer });
-</script>

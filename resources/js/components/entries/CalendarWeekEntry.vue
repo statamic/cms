@@ -1,14 +1,3 @@
-<template>
-    <Link
-        :href="entry.edit_url"
-        :key="entry.id"
-        class="block text-xs p-1 rounded-r border-l-2 mb-1 cursor-pointer hover:shadow-sm"
-        :class="entryClasses"
-    >
-        <div class="font-medium line-clamp-2">{{ entry.title }}</div>
-    </Link>
-</template>
-
 <script setup>
 import { computed } from 'vue';
 import { Link } from '@inertiajs/vue3';
@@ -23,3 +12,14 @@ const entryClasses = computed(() => ({
     'border-purple-500 bg-purple-50 dark:bg-purple-900/20': props.entry.status === 'scheduled'
 }));
 </script>
+
+<template>
+    <Link
+        :href="entry.edit_url"
+        :key="entry.id"
+        class="block text-xs p-1 rounded-r border-l-2 mb-1 cursor-pointer hover:shadow-sm"
+        :class="entryClasses"
+    >
+        <div class="font-medium line-clamp-2">{{ entry.title }}</div>
+    </Link>
+</template>
