@@ -24,7 +24,6 @@ const currentDate = ref(new CalendarDate(new Date().getFullYear(), new Date().ge
 const selectedDate = ref(null);
 const entries = ref([]);
 const loading = ref(false);
-const error = ref(null);
 const datePickerOpen = ref(false);
 
 const viewModePreferenceKey = `collections.${props.collection}.calendar.view`;
@@ -33,7 +32,6 @@ watch(viewMode, (viewMode) => preferences.set(viewModePreferenceKey, viewMode));
 
 async function fetchEntries() {
     loading.value = true;
-    error.value = null;
 
     try {
         const { startDate, endDate } = getCurrentDateRange(currentDate.value, viewMode.value);
@@ -60,7 +58,6 @@ async function fetchEntries() {
 
         entries.value = Object.values(response.data.data);
     } catch (err) {
-        error.value = err;
         console.error('Failed to fetch entries:', err);
         Statamic.$toast.error(__('Failed to load entries'));
     } finally {
