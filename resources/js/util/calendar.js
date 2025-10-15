@@ -6,8 +6,7 @@ export function formatDateString(date) {
 
 export function getWeekDates(currentDate) {
     if (!currentDate) {
-        console.warn('getWeekDates called with undefined currentDate');
-        return [];
+        throw new Error('getWeekDates called with undefined currentDate');
     }
 
     const currentWeekStart = new Date(currentDate.year, currentDate.month - 1, currentDate.day);
@@ -49,40 +48,37 @@ export function isToday(date) {
 
 export function getCurrentDateRange(currentDate, viewMode) {
     if (!currentDate || !viewMode) {
-        console.warn('getCurrentDateRange called with undefined values:', { currentDate, viewMode });
-        return { startDate: null, endDate: null };
+        throw new Error('getCurrentDateRange called with undefined values');
     }
 
-    if (viewMode === 'week') {
-        const weekDates = getWeekDates(currentDate);
-        if (!weekDates || weekDates.length < 7) {
-            console.warn('getWeekDates returned invalid data:', weekDates);
-            return { startDate: null, endDate: null };
-        }
-        return {
-            startDate: new Date(weekDates[0].year, weekDates[0].month - 1, weekDates[0].day),
-            endDate: new Date(weekDates[6].year, weekDates[6].month - 1, weekDates[6].day),
-        };
-    } else {
-        // For month view, get the visible date range including days from adjacent months
-        const firstDayOfMonth = new Date(currentDate.year, currentDate.month - 1, 1);
-        const lastDayOfMonth = new Date(currentDate.year, currentDate.month, 0);
+    return viewMode === 'week' ? getWeekDateRange(currentDate) : getMonthDateRange(currentDate);
+}
 
-        // Calculate the first visible day (start of the week containing the 1st)
-        const dayOfWeek = firstDayOfMonth.getDay();
-        const startDate = new Date(firstDayOfMonth);
-        startDate.setDate(firstDayOfMonth.getDate() - dayOfWeek);
+function getWeekDateRange(date) {
+    const weekDates = getWeekDates(date);
 
-        // Calculate the last visible day (end of the week containing the last day)
-        const lastDayOfWeek = lastDayOfMonth.getDay();
-        const endDate = new Date(lastDayOfMonth);
-        endDate.setDate(lastDayOfMonth.getDate() + (6 - lastDayOfWeek));
+    return {
+        startDate: new Date(weekDates[0].year, weekDates[0].month - 1, weekDates[0].day),
+        endDate: new Date(weekDates[6].year, weekDates[6].month - 1, weekDates[6].day),
+    };
+}
 
-        return {
-            startDate,
-            endDate,
-        };
-    }
+function getMonthDateRange(date) {
+    // Get the visible date range including days from adjacent months
+    const firstDayOfMonth = new Date(date.year, date.month - 1, 1);
+    const lastDayOfMonth = new Date(date.year, date.month, 0);
+
+    // Calculate the first visible day (start of the week containing the 1st)
+    const dayOfWeek = firstDayOfMonth.getDay();
+    const startDate = new Date(firstDayOfMonth);
+    startDate.setDate(firstDayOfMonth.getDate() - dayOfWeek);
+
+    // Calculate the last visible day (end of the week containing the last day)
+    const lastDayOfWeek = lastDayOfMonth.getDay();
+    const endDate = new Date(lastDayOfMonth);
+    endDate.setDate(lastDayOfMonth.getDate() + (6 - lastDayOfWeek));
+
+    return { startDate, endDate };
 }
 
 export function getCreateUrlDateParam(date, hour) {

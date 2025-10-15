@@ -22,29 +22,14 @@ const loading = ref(false);
 const error = ref(null);
 const viewMode = ref('month'); // 'month' or 'week'
 const weekViewRef = ref(null);
-const isDirty = ref(false);
 const datePickerOpen = ref(false);
-
-// ============================================================================
-// API & Data Management
-// ============================================================================
 
 async function fetchEntries() {
     loading.value = true;
     error.value = null;
 
     try {
-        if (!currentDate.value || !viewMode.value) {
-            console.warn('fetchEntries called with undefined values:', { currentDate: currentDate.value, viewMode: viewMode.value });
-            return;
-        }
-
         const { startDate, endDate } = getCurrentDateRange(currentDate.value, viewMode.value);
-
-        if (!startDate || !endDate) {
-            console.error('getCurrentDateRange returned undefined values:', { startDate, endDate });
-            return;
-        }
 
         const response = await axios.get(cp_url(`collections/${props.collection}/entries`), {
             params: {
