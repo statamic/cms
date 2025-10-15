@@ -10,6 +10,7 @@ import DateFormatter from '@/components/DateFormatter.js';
 import { formatDateString, getWeekDates, getCurrentDateRange } from './calendar.js';
 import { Link } from '@inertiajs/vue3';
 import { ToggleGroup, ToggleItem, Button, Popover, Label, Select, Heading } from '@ui';
+import { preferences } from '@api';
 
 const props = defineProps({
     collection: { type: String, required: true },
@@ -24,9 +25,12 @@ const selectedDate = ref(null);
 const entries = ref([]);
 const loading = ref(false);
 const error = ref(null);
-const viewMode = ref('month'); // 'month' or 'week'
-const weekViewRef = ref(null);
 const datePickerOpen = ref(false);
+
+const viewModePreferenceKey = `collections.${props.collection}.calendar.view`;
+const viewMode = ref(preferences.get(viewModePreferenceKey, 'month')); // 'month' or 'week'
+watch(viewMode, (viewMode) => preferences.set(viewModePreferenceKey, viewMode));
+const weekViewRef = ref(null);
 
 async function fetchEntries() {
     loading.value = true;
