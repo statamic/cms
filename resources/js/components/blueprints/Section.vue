@@ -40,7 +40,7 @@
             @opened="$refs.displayInput?.select()"
             @closed="editCancelled"
         >
-            <div class="h-full overflow-scroll overflow-x-auto bg-white px-6 rounded-l-xl dark:bg-dark-800">
+            <div class="h-full overflow-scroll overflow-x-auto bg-white px-6 dark:bg-dark-800">
                 <header class="py-2">
                     <div class="flex items-center justify-between">
                         <ui-heading size="lg">
