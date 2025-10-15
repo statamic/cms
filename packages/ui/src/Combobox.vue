@@ -64,7 +64,8 @@ const triggerClasses = cva({
             subtle: 'bg-transparent hover:bg-gray-400/10 text-gray-500 hover:text-gray-700 border-none dark:text-gray-300 dark:hover:bg-white/7 dark:hover:text-gray-200 focus-within:focus-outline',
         },
         size: {
-            lg: 'px-6 h-12 text-base rounded-lg',
+            xl: 'px-5 h-12 text-lg rounded-lg',
+            lg: 'px-4 h-12 text-base rounded-lg',
             base: 'px-4 h-10 text-sm rounded-lg',
             sm: 'px-3 h-8 text-[0.8125rem] rounded-lg',
             xs: 'px-2 h-6 text-xs rounded-md',
@@ -283,10 +284,10 @@ defineExpose({
                 class="cursor-pointer"
                 data-ui-combobox
                 ignore-filter
-                v-bind="attrs"
+                v-bind="{ ...attrs, class: undefined }"
             >
-                <ComboboxAnchor :class="[$attrs.class]" data-ui-combobox-anchor>
-                    <ComboboxTrigger as="div" ref="trigger" :class="triggerClasses" @keydown.enter="openDropdown" @keydown.space="openDropdown" data-ui-combobox-trigger>
+                <ComboboxAnchor  data-ui-combobox-anchor>
+                    <ComboboxTrigger as="div" ref="trigger" :class="[triggerClasses, $attrs.class]" @keydown.enter="openDropdown" @keydown.space="openDropdown" data-ui-combobox-trigger>
                         <div class="flex-1 min-w-0">
                             <ComboboxInput
                                 v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"

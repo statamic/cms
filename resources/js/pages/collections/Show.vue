@@ -51,11 +51,6 @@
                 />
             </template>
 
-            <ui-toggle-group v-model="view" v-if="canUseStructureTree">
-                <ui-toggle-item icon="navigation" value="tree" />
-                <ui-toggle-item icon="layout-list" value="list" />
-            </ui-toggle-group>
-
             <template v-if="view === 'list' && reorderable">
                 <site-selector
                     v-if="sites.length > 1 && reordering && site"
@@ -74,6 +69,20 @@
                     <Button @click="$refs.list.saveOrder" :text="__('Save Order')" variant="primary" />
                 </template>
             </template>
+
+            <template v-if="view == 'calendar'">
+                <site-selector
+                    v-if="sites.length > 1"
+                    :sites="sites"
+                    v-model="site"
+                />
+            </template>
+
+            <ui-toggle-group v-model="view" v-if="canUseStructureTree || canUseCalendar">
+                <ui-toggle-item icon="navigation" value="tree" v-if="canUseStructureTree" />
+                <ui-toggle-item icon="layout-list" value="list" />
+                <ui-toggle-item icon="calendar" value="calendar" v-if="canUseCalendar" />
+            </ui-toggle-group>
 
             <create-entry-button
                 v-if="!reordering && canCreate"
@@ -116,7 +125,6 @@
             @edit-page="editPage"
             @changed="markTreeDirty"
             @saved="markTreeClean"
-            @canceled="markTreeClean"
         >
             <template #branch-icon="{ branch }">
                 <ui-icon
@@ -149,6 +157,15 @@
             </template>
         </page-tree>
 
+        <CollectionCalendar
+            v-if="view === 'calendar'"
+            ref="calendar"
+            :collection="handle"
+            :blueprints="blueprints"
+            :create-url="createUrl"
+            :site="site"
+        />
+
         <delete-entry-confirmation
             v-if="showEntryDeletionConfirmation"
             :children="numberOfChildrenToBeDeleted"
@@ -171,6 +188,7 @@
 <script>
 import DeleteEntryConfirmation from '@/components/collections/DeleteEntryConfirmation.vue';
 import DeleteLocalizationConfirmation from '@/components/collections/DeleteLocalizationConfirmation.vue';
+import CollectionCalendar from '@/components/entries/calendar/Calendar.vue';
 import SiteSelector from '@/components/SiteSelector.vue';
 import { defineAsyncComponent } from 'vue';
 import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator, Header, Button, ToggleGroup, ToggleItem } from '@/components/ui';
@@ -194,6 +212,7 @@ export default {
         DeleteEntryConfirmation,
         DeleteLocalizationConfirmation,
         SiteSelector,
+        CollectionCalendar,
     },
 
     props: {
@@ -205,6 +224,7 @@ export default {
         createLabel: { type: String, required: true },
         blueprints: { type: Array, required: true },
         structured: { type: Boolean, default: false },
+        dated: { type: Boolean, default: false },
         sortColumn: { type: String, required: true },
         sortDirection: { type: String, required: true },
         columns: { type: Array, required: true },
@@ -255,6 +275,10 @@ export default {
             return this.structured && this.structureMaxDepth !== 1;
         },
 
+        canUseCalendar() {
+            return this.dated;
+        },
+
         reorderable() {
             return this.structured && this.structureMaxDepth === 1;
         },
@@ -280,7 +304,7 @@ export default {
         view(view) {
             this.site = this.site || this.initialSite;
 
-            localStorage.setItem('statamic.collection-view.' + this.handle, view);
+            this.$preferences.set(`collections.${this.handle}.view`, view);
         },
     },
 
@@ -335,11 +359,20 @@ export default {
         },
 
         initialView() {
-            if (!this.canUseStructureTree) return 'list';
+            // Get from preferences instead of localStorage
+            const savedView = this.$preferences.get(`collections.${this.handle}.view`);
 
-            const fallback = this.canUseStructureTree ? 'tree' : 'list';
+            // If we have a saved view, validate it's available and return it
+            if (savedView) {
+                if (savedView === 'tree' && this.canUseStructureTree) return 'tree';
+                if (savedView === 'calendar' && this.canUseCalendar) return 'calendar';
+                if (savedView === 'list') return 'list';
+            }
 
-            return localStorage.getItem('statamic.collection-view.' + this.handle) || fallback;
+            // Fallback logic
+            if (this.canUseStructureTree) return 'tree';
+            if (this.canUseCalendar) return 'calendar';
+            return 'list';
         },
 
         deleteTreeBranch(branch, removeFromUi) {
