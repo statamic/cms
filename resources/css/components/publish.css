@@ -9,8 +9,7 @@
     @apply gap-x-3 gap-6 @lg/panel:gap-8;
 
     aside & {
-        /* Decrease */
-        @apply gap-x-2 gap-y-3 @lg/panel:gap-y-6;
+        @apply gap-x-2 gap-y-6;
     }
 
     .form-group {
