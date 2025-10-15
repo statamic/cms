@@ -23,10 +23,6 @@ export function getWeekDates(currentDate) {
     return weekDates;
 }
 
-export function getVisibleHours() {
-    return Array.from({ length: 24 }, (_, i) => i);
-}
-
 export function isToday(date) {
     const today = new Date();
     const compareDate = new Date(date.year, date.month - 1, date.day);

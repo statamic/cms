@@ -4,7 +4,6 @@ import CalendarEntry from './WeekEntry.vue';
 import CreateEntryButton from '../CreateEntryButton.vue';
 import { Button } from '@ui';
 import {
-    getVisibleHours,
     isToday,
     getCreateUrlDateParam,
     formatDateString,
@@ -22,7 +21,8 @@ const props = defineProps({
 const emit = defineEmits(['select-date']);
 
 const $date = new DateFormatter;
-const visibleHours = getVisibleHours();
+
+const visibleHours = Array.from({ length: 24 }, (_, i) => i);
 
 function getEntriesForHour(date, hour) {
     const dateStr = formatDateString(date);
