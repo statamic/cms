@@ -55,7 +55,7 @@
                         >
                             <div @click="addSet(item.handle)" class="p-2.5">
                                 <div class="h-40 w-full flex items-center justify-center">
-                                    <img :src="item.image" class="rounded-lg h-40 object-cover" v-if="item.image" />
+                                    <img :src="item.image" class="rounded-lg h-40 object-contain bg-gray-50 dark:bg-gray-850" v-if="item.image" />
                                     <ui-icon :name="item.icon || 'add-section'" :set="iconSet" class="size-8 text-gray-600 dark:text-gray-300" v-else />
                                 </div>
                                 <div class="line-clamp-1 text-base mt-1 text-center text-gray-900 dark:text-gray-200">

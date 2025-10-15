@@ -22,6 +22,7 @@ import Preferences from './components/Preference.js';
 import Toasts from './components/Toasts.js';
 import Portals from './components/portals/Portals.js';
 import Stacks from './components/stacks/Stacks.js';
+import Inertia from './components/Inertia';
 
 export const keys = new Keys();
 export const components = new Components;
@@ -46,3 +47,4 @@ export const preferences = new Preferences();
 export const toast = new Toasts();
 export const portals = markRaw(new Portals());
 export const stacks = new Stacks(portals);
+export const inertia = new Inertia();

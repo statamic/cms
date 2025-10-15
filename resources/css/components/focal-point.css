@@ -15,7 +15,7 @@
         left: auto;
         right: 20px;
     }
-    z-index: 120;
+    z-index: var(--z-index-above);
     width: 380px;
     overflow-y: auto;
     max-height: 95vh;

@@ -64,7 +64,8 @@ const triggerClasses = cva({
             subtle: 'bg-transparent hover:bg-gray-400/10 text-gray-500 hover:text-gray-700 border-none dark:text-gray-300 dark:hover:bg-white/7 dark:hover:text-gray-200 focus-within:focus-outline',
         },
         size: {
-            lg: 'px-6 h-12 text-base rounded-lg',
+            xl: 'px-5 h-12 text-lg rounded-lg',
+            lg: 'px-4 h-12 text-base rounded-lg',
             base: 'px-4 h-10 text-sm rounded-lg',
             sm: 'px-3 h-8 text-[0.8125rem] rounded-lg',
             xs: 'px-2 h-6 text-xs rounded-md',
@@ -203,6 +204,8 @@ const dropdownOpen = ref(false);
 const closeOnSelect = computed(() => props.closeOnSelect || !props.multiple);
 
 function updateDropdownOpen(open) {
+    if (props.disabled) return;
+
     // Prevent dropdown from opening when it's a taggable combobox with no options.
     if (props.taggable && props.options.length === 0) {
         return;
@@ -281,10 +284,10 @@ defineExpose({
                 class="cursor-pointer"
                 data-ui-combobox
                 ignore-filter
-                v-bind="attrs"
+                v-bind="{ ...attrs, class: undefined }"
             >
-                <ComboboxAnchor :class="[$attrs.class]" data-ui-combobox-anchor>
-                    <ComboboxTrigger as="div" ref="trigger" :class="triggerClasses" @keydown.enter="openDropdown" @keydown.space="openDropdown" data-ui-combobox-trigger>
+                <ComboboxAnchor  data-ui-combobox-anchor>
+                    <ComboboxTrigger as="div" ref="trigger" :class="[triggerClasses, $attrs.class]" @keydown.enter="openDropdown" @keydown.space="openDropdown" data-ui-combobox-trigger>
                         <div class="flex-1 min-w-0">
                             <ComboboxInput
                                 v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"
@@ -329,7 +332,7 @@ defineExpose({
                         position="popper"
                         :side-offset="5"
                         :class="[
-                            'shadow-ui-sm z-100 rounded-lg border border-gray-200 bg-white p-2 dark:border-white/10 dark:bg-gray-800',
+                            'shadow-ui-sm z-(--z-index-above) rounded-lg border border-gray-200 bg-white p-2 dark:border-white/10 dark:bg-gray-800',
                             'max-h-[var(--reka-combobox-content-available-height)] w-[var(--reka-combobox-trigger-width)] min-w-fit',
                             'overflow-hidden'
                         ]"

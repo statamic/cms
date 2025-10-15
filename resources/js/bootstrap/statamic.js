@@ -42,6 +42,7 @@ import {
     toast,
     portals,
     stacks,
+    inertia,
 } from '@api';
 
 let bootingCallbacks = [];
@@ -106,6 +107,10 @@ export default {
 
     get $components() {
         return components;
+    },
+
+    get $inertia() {
+        return inertia;
     },
 
     get $date() {
@@ -180,7 +185,7 @@ export default {
 
                 // Resolve addon pages
                 if (!page) {
-                    const addonPage = components.queue[`Pages/${name}`];
+                    const addonPage = inertia.get(name);
                     if (addonPage) page = { default: addonPage };
                 }
 

@@ -11,7 +11,6 @@ Table Fieldtype
     thead {
         th {
             @apply
-                z-10
                 p-2
                 dark:bg-gray-925
                 border-b bg-gray-50
@@ -28,6 +27,7 @@ Table Fieldtype
             display: table-cell;
             position: sticky;
             text-align: left;
+            z-index: var(--z-index-above);
 
             &:first-child {
                 @apply rounded-ss-lg ps-3;
@@ -143,6 +143,6 @@ td[data-column="size"] {
 
 .table-fullscreen {
     @apply fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-200;
-    z-index: 998; /*  to appear over the top of the rest of the stuff on the page. */
+    z-index: var(--z-index-portal); /*  to appear over the top of the rest of the stuff on the page. */
     /*  too high and it'll be over the top of stacks, etc. */
 }

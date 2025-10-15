@@ -1,7 +1,7 @@
 /* ==========================================================================
    Grid Fieldtype
    ========================================================================== */
-   @layer ui {
+@layer ui {
     .grid-table {
         @apply bg-white dark:bg-gray-900 relative w-full rounded-lg border shadow-ui-sm outline-hidden dark:border-gray-700 dark:text-dark-150 text-start;
         border-collapse: separate;
@@ -99,11 +99,5 @@
 
     .grid-item-header {
         @apply flex cursor-move items-center justify-between border-b bg-gray-200 px-4 py-2 text-sm outline-hidden;
-    }
-
-    .grid-fullscreen {
-        @apply fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-200;
-        z-index: 998; /*  to appear over the top of the rest of the stuff on the page. */
-        /*  too high and it'll be over the top of stacks, etc. */
     }
 }
