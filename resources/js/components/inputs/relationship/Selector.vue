@@ -20,8 +20,8 @@
                 </template>
 
                 <div class="flex flex-1 flex-col gap-4 overflow-auto p-4">
-                    <div class="flex items-center gap-3">
-                        <div class="flex flex-1 items-center gap-3">
+                    <div class="flex items-center gap-2 sm:gap-3">
+                        <div class="flex flex-1 items-center gap-2 sm:gap-3">
                             <Search />
                             <Filters v-if="filters && filters.length" />
                         </div>

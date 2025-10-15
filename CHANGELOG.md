@@ -1,5 +1,55 @@
 # Release Notes
 
+## 6.0.0-alpha.12 (2025-10-10)
+
+### What's fixed
+- Go back to v5 style config fields [#12700](https://github.com/statamic/cms/issues/12700) by @jackmcdade
+- Fix inconsistent spacing in cp config [#12677](https://github.com/statamic/cms/issues/12677) by @duncanmcclean
+- Inertia-fy Forms [#12676](https://github.com/statamic/cms/issues/12676) by @jasonvarga
+- Nav items with `target="_blank"` shouldn't be Inertia Links [#12683](https://github.com/statamic/cms/issues/12683) by @duncanmcclean
+- Fix Reupload Asset action [#12689](https://github.com/statamic/cms/issues/12689) by @duncanmcclean
+- Change wording of "Submit" button in nav page editor [#12688](https://github.com/statamic/cms/issues/12688) by @duncanmcclean
+- Fix deletion modals on structure trees [#12687](https://github.com/statamic/cms/issues/12687) by @duncanmcclean
+- Tweak config of set preview asset field [#12684](https://github.com/statamic/cms/issues/12684) by @duncanmcclean
+- Mobile - fix a tiny bit of overflow on the dashboard widget view [125224fd5](https://github.com/statamic/cms/commit/125224fd5) by @JayGeorge 
+- Fix missing page titles [#12682](https://github.com/statamic/cms/issues/12682) by @duncanmcclean
+- Fix inertia pro logic [#12692](https://github.com/statamic/cms/issues/12692) by @jasonvarga
+- Date Picker: Avoid passing current time when time is disabled [#12686](https://github.com/statamic/cms/issues/12686) by @duncanmcclean
+- Fix field / date filtering [#12696](https://github.com/statamic/cms/issues/12696) by @jasonvarga
+- Responsive improvements [#12697](https://github.com/statamic/cms/issues/12697) by @JayGeorge
+- Allow initializing values into entry create form [#12699](https://github.com/statamic/cms/issues/12699) by @jasonvarga
+- Markdown fieldtype - Remove/Comment out the purple-ish selection colo… [#12693](https://github.com/statamic/cms/issues/12693) by @JayGeorge
+- Target group buttons _only_ in the floating toolbar [#12707](https://github.com/statamic/cms/issues/12707) by @JayGeorge
+- Pass existing data into asset thumbnail hook [#12702](https://github.com/statamic/cms/issues/12702) by @daun
+- Fix front-end 2FA pages [#12711](https://github.com/statamic/cms/issues/12711) by @jasonvarga
+- Utility tweaks [#12712](https://github.com/statamic/cms/issues/12712) by @jasonvarga
+- French translations [#12706](https://github.com/statamic/cms/issues/12706) by @ebeauchamps
+- Dark mode improvements [#12691](https://github.com/statamic/cms/issues/12691) by @JayGeorge
+
+
+
+## 6.0.0-alpha.11 (2025-10-07)
+
+### What's new
+- JS API fixes and adjustments [#12665](https://github.com/statamic/cms/issues/12665) by @jasonvarga
+- Inertia-fy Utilities [#12674](https://github.com/statamic/cms/issues/12674) by @jasonvarga
+- Inertia-fy the blueprints and fieldsets areas [#12656](https://github.com/statamic/cms/issues/12656) by @jasonvarga
+
+### What's fixed
+- Inertia toast handling [#12670](https://github.com/statamic/cms/issues/12670) by @jasonvarga
+- Bard sticky floating toolbar fixes [#12661](https://github.com/statamic/cms/issues/12661) by @JayGeorge
+- If you're focused on a checkbox, Enter now submits the nearest form.  [#12671](https://github.com/statamic/cms/issues/12671) by @jackmcdade
+- Fix missing site name in header [#12673](https://github.com/statamic/cms/issues/12673) by @jasonvarga
+- Fix translations [#12666](https://github.com/statamic/cms/issues/12666) by @jasonvarga
+- Move blade badge to header [#12669](https://github.com/statamic/cms/issues/12669) by @jasonvarga
+- Global site selector should only be visible when you have > 1 site [#12655](https://github.com/statamic/cms/issues/12655) by @duncanmcclean
+- Make the Globals index look like the other indexes [aceb87731](https://github.com/statamic/cms/commit/aceb87731)
+- Fix select/combobox chevron overflow [247d4d143](https://github.com/statamic/cms/commit/247d4d143)
+- Fix drop-to-upload ui [7fd35d50c](https://github.com/statamic/cms/commit/7fd35d50c)
+- French translations [#12672](https://github.com/statamic/cms/issues/12672) by @ebeauchamps
+
+
+
 ## 6.0.0-alpha.10 (2025-10-03)
 
 ### What's new

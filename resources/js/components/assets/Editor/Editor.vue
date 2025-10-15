@@ -12,7 +12,7 @@
                 <!-- Header -->
                 <header id="asset-editor-header" class="relative flex w-full justify-between px-2">
                     <button
-                        class="group flex items-center gap-3 p-4"
+                        class="group flex items-center gap-2 sm:gap-3 p-4"
                         @click="open"
                         v-tooltip.right="__('Open in a new window')"
                         :aria-label="__('Open in a new window')"
@@ -38,13 +38,13 @@
                                 @completed="actionCompleted"
                                 v-slot="{ actions }"
                             >
-                                <ui-button inset size="sm" v-if="isImage && isFocalPointEditorEnabled" @click.prevent="openFocalPointEditor" icon="focus" variant="subtle" :text="__('Focal Point')" />
-                                <ui-button inset size="sm" v-if="canRunAction('rename_asset')" @click.prevent="runAction(actions, 'rename_asset')" icon="rename" variant="subtle" :text="__('Rename')" />
-                                <ui-button inset size="sm" v-if="canRunAction('move_asset')" @click.prevent="runAction(actions, 'move_asset')" icon="move-folder" variant="subtle" :text="__('Move to Folder')" />
-                                <ui-button inset size="sm" v-if="canRunAction('replace_asset')" @click.prevent="runAction(actions, 'replace_asset')" icon="replace" variant="subtle" :text="__('Replace')" />
-                                <ui-button inset size="sm" v-if="canRunAction('reupload_asset')" @click.prevent="runAction(actions, 'reupload_asset')" icon="upload-cloud" variant="subtle" :text="__('Reupload')" />
-                                <ui-button inset size="sm" @click="download" icon="download" variant="subtle" :text="__('Download')" />
-                                <ui-button inset size="sm" v-if="allowDeleting && canRunAction('delete')" @click="runAction(actions, 'delete')" icon="trash" variant="subtle" :text="__('Delete')" />
+                                <ui-button inset size="sm" v-if="isImage && isFocalPointEditorEnabled" @click.prevent="openFocalPointEditor" icon="focus" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Focal Point')" />
+                                <ui-button inset size="sm" v-if="canRunAction('rename_asset')" @click.prevent="runAction(actions, 'rename_asset')" icon="rename" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Rename')" />
+                                <ui-button inset size="sm" v-if="canRunAction('move_asset')" @click.prevent="runAction(actions, 'move_asset')" icon="move-folder" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Move to Folder')" />
+                                <ui-button inset size="sm" v-if="canRunAction('replace_asset')" @click.prevent="runAction(actions, 'replace_asset')" icon="replace" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Replace')" />
+                                <ui-button inset size="sm" v-if="canRunAction('reupload_asset')" @click.prevent="runAction(actions, 'reupload_asset')" icon="upload-cloud" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Reupload')" />
+                                <ui-button inset size="sm" @click="download" icon="download" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Download')" />
+                                <ui-button inset size="sm" v-if="allowDeleting && canRunAction('delete')" @click="runAction(actions, 'delete')" icon="trash" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Delete')" />
 
                                 <Dropdown class="me-4">
                                     <DropdownMenu>
@@ -61,42 +61,41 @@
                             </ItemActions>
                         </div>
 
-                        <!-- Image Preview -->
+                        <!-- Asset Preview Area -->
                         <div
                             v-if="asset.isImage || asset.isSvg || asset.isAudio || asset.isVideo"
-                            class="editor-preview-image"
+                            class="flex flex-1 flex-col justify-center items-center p-8 h-full min-h-0"
                         >
-                            <div class="image-wrapper">
-                                <!-- Image -->
-                                <img v-if="asset.isImage" :src="asset.preview" class="asset-thumb" />
+                            <!-- Image -->
+                            <img v-if="asset.isImage" :src="asset.preview" class="asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
 
-                                <!-- SVG -->
-                                <div v-else-if="asset.isSvg" class="flex h-full w-full flex-col">
-                                    <div class="grid grid-cols-3 gap-1">
-                                        <div class="bg-checkerboard flex items-center justify-center p-3 aspect-square">
-                                            <img :src="asset.url" class="asset-thumb relative z-10 size-4" />
-                                        </div>
-                                        <div class="bg-checkerboard flex items-center justify-center p-3 aspect-square">
-                                            <img :src="asset.url" class="asset-thumb relative z-10 size-12" />
-                                        </div>
-                                        <div class="bg-checkerboard flex items-center justify-center p-3 aspect-square">
-                                            <img :src="asset.url" class="asset-thumb relative z-10 size-24" />
-                                        </div>
+                            <!-- SVG -->
+                            <div v-else-if="asset.isSvg" class="flex h-full w-full flex-col shadow-ui-xl">
+                                <div class="grid grid-cols-3 gap-1">
+                                    <div class="bg-checkerboard flex items-center justify-center p-3 aspect-square">
+                                        <img :src="asset.url" class="asset-thumb relative z-10 size-4" />
                                     </div>
-                                    <div class="bg-checkerboard h-full min-h-0 mt-1 flex items-center justify-center p-3 aspect-square">
-                                        <img :src="asset.url" class="asset-thumb relative z-10 max-h-full w-2/3 max-w-full" />
+                                    <div class="bg-checkerboard flex items-center justify-center p-3 aspect-square">
+                                        <img :src="asset.url" class="asset-thumb relative z-10 size-12" />
+                                    </div>
+                                    <div class="bg-checkerboard flex items-center justify-center p-3 aspect-square">
+                                        <img :src="asset.url" class="asset-thumb relative z-10 size-24" />
                                     </div>
                                 </div>
-
-                                <!-- Audio -->
-                                <div class="w-full shadow-none" v-else-if="asset.isAudio">
-                                    <audio :src="asset.url" class="w-full" controls preload="auto" />
+                                <div class="bg-checkerboard h-full min-h-0 mt-1 flex items-center justify-center p-3 aspect-square">
+                                    <img :src="asset.url" class="asset-thumb relative z-10 max-h-full w-2/3 max-w-full" />
                                 </div>
-
-                                <!-- Video -->
-                                <video :src="asset.url" controls v-else-if="asset.isVideo" />
                             </div>
+
+                            <!-- Audio -->
+                            <div class="w-full shadow-none" v-else-if="asset.isAudio">
+                                <audio :src="asset.url" class="w-full" controls preload="auto" />
+                            </div>
+
+                            <!-- Video -->
+                            <video :src="asset.url" class="max-w-full max-h-full object-contain" controls v-else-if="asset.isVideo" />
                         </div>
+
 
                         <div class="h-full" v-else-if="asset.isPdf">
                             <pdf-viewer :src="asset.pdfUrl" />
@@ -136,7 +135,7 @@
                 </div>
 
                 <div class="flex w-full items-center justify-end rounded-b border-t dark:border-gray-700 bg-gray-100 dark:bg-gray-900 px-4 py-3">
-                    <div class="hidden h-full flex-1 gap-3 py-1 sm:flex">
+                    <div class="hidden h-full flex-1 gap-2 sm:gap-3 py-1 sm:flex">
                         <ui-badge v-if="isImage" icon="assets" :text="__('messages.width_x_height', { width: asset.width, height: asset.height })" />
                         <ui-badge icon="memory" :text="asset.size" />
                         <ui-badge icon="fingerprint" :text="asset.lastModifiedRelative" />

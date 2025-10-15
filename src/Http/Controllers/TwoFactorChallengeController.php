@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Statamic\Events\TwoFactorAuthenticationFailed;
 use Statamic\Events\ValidTwoFactorAuthenticationCodeProvided;
+use Statamic\Http\Middleware\CP\HandleInertiaRequests;
 use Statamic\Http\Middleware\RedirectIfAuthenticated;
 use Statamic\Http\Requests\TwoFactorChallengeRequest;
 
@@ -16,6 +17,7 @@ class TwoFactorChallengeController extends Controller
     public function __construct(Request $request)
     {
         $this->middleware('throttle:two-factor');
+        $this->middleware(HandleInertiaRequests::class);
         $this->middleware(RedirectIfAuthenticated::class);
     }
 

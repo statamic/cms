@@ -292,6 +292,10 @@ class EntriesController extends CpController
 
         $values = Entry::make()->collection($collection)->values()->all();
 
+        if ($request->values) {
+            $values = [...$values, ...$request->values];
+        }
+
         $fields = $blueprint
             ->fields()
             ->addValues($values)

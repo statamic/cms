@@ -162,12 +162,6 @@ const isSyncable = computed(() => {
 
 const isSynced = computed(() => isSyncable.value && !localizedFields.value.includes(fullPath.value));
 const isNested = computed(() => fullPath.value.includes('.'));
-const wrapperComponent = computed(() => {
-    // Todo: Find a way to not need to hard code this.
-    if (props.config.type === 'dictionary_fields') return 'div';
-
-    return asConfig.value && !isNested.value ? 'card' : 'div';
-});
 
 function sync() {
     syncField(fullPath.value);
@@ -204,6 +198,7 @@ const fieldtypeComponentEvents = computed(() => ({
         :fieldtypeComponent="fieldtypeComponent"
         :fieldtypeComponentProps="fieldtypeComponentProps"
         :fieldtypeComponentEvents="fieldtypeComponentEvents"
+        :shouldShowField="shouldShowField"
     >
         <Field
             v-show="shouldShowField"
@@ -214,8 +209,8 @@ const fieldtypeComponentEvents = computed(() => ({
             :required="isRequired"
             :errors="errors"
             :read-only="isReadOnly"
-            :as="wrapperComponent"
             :variant="config.variant"
+            :full-width-setting="config.full_width_setting"
             v-bind="$attrs"
         >
             <template #label v-if="shouldShowLabel">

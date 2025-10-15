@@ -17,18 +17,14 @@
         </ui-header>
 
         <ui-panel v-if="showTitle" :heading="__('Settings')">
-            <div class="publish-fields-fluid publish-fields-fluid--xl-only">
-                <ui-card class="field-w-75">
-                    <ui-field :label="__('Title')" :instructions="__('messages.blueprints_title_instructions')" :errors="errors?.title">
-                        <ui-input v-model="blueprint.title" />
-                    </ui-field>
-                </ui-card>
-                <ui-card class="field-w-25">
-                    <ui-field :label="__('Hidden')" :instructions="__('messages.blueprints_hidden_instructions')" :error="errors?.hidden" variant="inline">
-                        <ui-switch v-model="blueprint.hidden" />
-                    </ui-field>
-                </ui-card>
-            </div>
+            <ui-card class="p-0! divide-y divide-gray-200 dark:divide-gray-800">
+                <ui-field as-config :label="__('Title')" :instructions="__('messages.blueprints_title_instructions')" :errors="errors?.title">
+                    <ui-input v-model="blueprint.title" />
+                </ui-field>
+                <ui-field as-config :label="__('Hidden')" :instructions="__('messages.blueprints_hidden_instructions')" :error="errors?.hidden" variant="inline">
+                    <ui-switch v-model="blueprint.hidden" />
+                </ui-field>
+            </ui-card>
         </ui-panel>
 
         <Tabs

@@ -127,7 +127,7 @@
 }
 
 @utility button-active {
-    background: var(--color-button-active-light-theme);
+    background: var(--color-button-active);
 }
 
 @utility saving-overlay {

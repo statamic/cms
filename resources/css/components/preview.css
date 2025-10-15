@@ -3,15 +3,13 @@
 }
 
 .live-preview-header {
-    @apply relative flex h-13 items-center justify-between py-2 shadow-md ltr:pl-6 ltr:pr-4 rtl:pl-4 rtl:pr-6;
-    background: linear-gradient(180deg, #fff, #f9fafb);
+    @apply 
+        relative flex h-13 items-center justify-between py-2 shadow-md ltr:pl-6 ltr:pr-4 rtl:pl-4 rtl:pr-6
+        bg-white dark:bg-dark-800
+    ;
+    
     border-bottom: 1px solid #c4cdd6;
     z-index: 2;
-
-    .dark & {
-        background: linear-gradient(180deg, var(--color-dark-500), var(--color-dark-550));
-        border-color: var(--color-dark-900);
-    }
 }
 
 .live-preview-main {

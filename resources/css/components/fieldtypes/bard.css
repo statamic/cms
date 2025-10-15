@@ -1,8 +1,9 @@
 /* BARD
 =================================================== */
 @layer ui {
-    .bard-fieldtype:not(.form-group) {
-        @apply relative rounded-lg border outline-hidden dark:border-gray-600;
+    /* .grid-cell, [data-ui-input-group] are exceptions for Bard fieldtypes inside a Grid fieldtype, since these cause double borders */
+    .bard-fieldtype:not(.form-group, .grid-cell, [data-ui-input-group]) {
+        @apply relative rounded-lg border outline-hidden dark:border-gray-700;
     }
 }
 /* BARD / EDITOR
@@ -52,7 +53,7 @@
 =================================================== */
 @layer ui {
     .bard-fixed-toolbar {
-        @apply top-0 z-5 flex items-start justify-between rounded-t-[calc(var(--radius-lg)-1px)] border-b border-gray-300 bg-gray-50 p-1 text-sm shadow-none px-2 py-1 dark:border-white/10 dark:bg-gray-900;
+        @apply top-0 z-5 flex items-start justify-between rounded-t-[calc(var(--radius-lg)-1px)] border-b border-gray-300 bg-gray-50 p-1 text-sm shadow-none px-2 py-1 dark:border-white/10 dark:bg-gray-925;
 
         .bard-toolbar-button {
             @apply m-0 flex size-8 items-center justify-center rounded-sm px-1 text-center text-base text-gray-900 dark:text-gray-100;
@@ -85,6 +86,9 @@
             @apply button-active;
             svg {
                 @apply text-black;
+                :where(.dark) & {
+                    @apply text-white;
+                }
             }
         }
 
@@ -141,8 +145,8 @@
         }
     }
 
-    /* Fixed toolbar inside another bard field */
-    .bard-content .bard-fixed-toolbar {
+    /* Bard field with a fixed toolbar > then another fixed toolbar inside this */
+    .bard-fieldtype:has(> .bard-fixed-toolbar) .bard-content .bard-fixed-toolbar {
         @apply top-8;
     }
     /* Bard > Grid > Bard */
@@ -150,7 +154,7 @@
         @apply top-16;
     }
 
-    /*  Fixed toolbar inside a stack */
+    /* Fixed toolbar inside a stack */
     .stack-content .bard-fixed-toolbar {
         top: -24px;
     }
@@ -286,7 +290,7 @@
     }
 
     .bard-fieldtype .bard-content {
-        @apply text-gray-900 dark:text-gray-300 bg-white dark:bg-gray-950 rounded-lg;
+        @apply text-gray-900 dark:text-gray-300 bg-white dark:bg-gray-900 rounded-lg;
         blockquote,
         ol,
         p,
@@ -305,7 +309,7 @@
             }
 
             a {
-                @apply break-words text-blue-600 underline dark:text-blue-100;
+                @apply break-words text-blue-600 underline dark:text-blue-400;
             }
 
             a:active,

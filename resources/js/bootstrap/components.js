@@ -19,7 +19,6 @@ import FieldActionModal from '../components/field-actions/FieldActionModal.vue';
 import ElevatedSessionModal from '../components/modals/ElevatedSessionModal.vue';
 import ResourceDeleter from '../components/ResourceDeleter.vue';
 import Stack from '../components/stacks/Stack.vue';
-import BlueprintCreateForm from '../components/blueprints/BlueprintCreateForm.vue';
 import BlueprintResetter from '../components/blueprints/BlueprintResetter.vue';
 import GitStatus from '../components/GitStatus.vue';
 import DateTime from '../components/DateTime.vue';
@@ -27,11 +26,8 @@ import UpdaterWidget from '../components/updater/UpdaterWidget.vue';
 
 import BaseTermCreateForm from '../components/terms/BaseCreateForm.vue';
 import CreateTermButton from '../components/terms/CreateTermButton.vue';
-import FieldsetListing from '../components/fieldsets/Listing.vue';
-import FieldsetEditForm from '../components/fieldsets/EditForm.vue';
 import BlueprintListing from '../components/blueprints/Listing.vue';
 import BlueprintBuilder from '../components/blueprints/Builder.vue';
-import FormListing from '../components/forms/Listing.vue';
 import FormSubmissionListing from '../components/forms/SubmissionListing.vue';
 import GlobalListing from '../components/globals/Listing.vue';
 import GlobalPublishForm from '../components/globals/PublishForm.vue';
@@ -42,9 +38,6 @@ import RolePublishForm from '../components/roles/PublishForm.vue';
 import UserGroupListing from '../components/user-groups/Listing.vue';
 import UserGroupPublishForm from '../components/user-groups/PublishForm.vue';
 import CollectionScaffolder from '../components/collections/Scaffolder.vue';
-import CollectionBlueprintListing from '../components/collections/BlueprintListing.vue';
-import PreferencesEditForm from '../components/preferences/EditForm.vue';
-import TaxonomyBlueprintListing from '../components/taxonomies/BlueprintListing.vue';
 import ItemActions from '../components/actions/ItemActions.vue';
 import BulkActions from '../components/actions/BulkActions.vue';
 
@@ -91,7 +84,6 @@ export default function registerGlobalComponents(app) {
 
     app.component('stack', Stack);
 
-    app.component('blueprint-create-form', BlueprintCreateForm);
     app.component('blueprint-resetter', BlueprintResetter);
 
     // Temporarily global during intertia migration
@@ -99,11 +91,8 @@ export default function registerGlobalComponents(app) {
     // Eventually they will be moved into their respective pages.
     app.component('BaseTermCreateForm', BaseTermCreateForm);
     app.component('CreateTermButton', CreateTermButton);
-    app.component('FieldsetListing', FieldsetListing);
-    app.component('FieldsetEditForm', FieldsetEditForm);
     app.component('BlueprintListing', BlueprintListing);
     app.component('BlueprintBuilder', BlueprintBuilder);
-    app.component('FormListing', FormListing);
     app.component('FormSubmissionListing', FormSubmissionListing);
     app.component('GlobalListing', GlobalListing);
     app.component('GlobalPublishForm', GlobalPublishForm);
@@ -114,9 +103,6 @@ export default function registerGlobalComponents(app) {
     app.component('UserGroupListing', UserGroupListing);
     app.component('UserGroupPublishForm', UserGroupPublishForm);
     app.component('CollectionScaffolder', CollectionScaffolder);
-    app.component('CollectionBlueprintListing', CollectionBlueprintListing);
-    app.component('PreferencesEditForm', PreferencesEditForm);
-    app.component('TaxonomyBlueprintListing', TaxonomyBlueprintListing);
     app.component('NavBuilder', defineAsyncComponent(() => import('../components/nav/Builder.vue')));
     app.component('ItemActions', ItemActions);
     app.component('BulkActions', BulkActions);

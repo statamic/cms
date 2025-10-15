@@ -258,7 +258,7 @@ function keydownTab(e) {
 
 const modalClasses = cva({
     base: [
-        'fixed outline-hidden left-1/2 top-[100px] z-50 w-full max-w-3xl -translate-x-1/2 ',
+        'fixed outline-hidden left-1/2 top-[100px] z-50 w-full max-w-[min(90vw,48rem)] -translate-x-1/2 ',
         'backdrop-blur-[2px] rounded-2xl',
         'shadow-[0_8px_5px_-6px_rgba(0,0,0,0.12),_0_3px_8px_0_rgba(0,0,0,0.02),_0_30px_22px_-22px_rgba(39,39,42,0.35)]',
         'dark:shadow-[0_5px_20px_rgba(0,0,0,.5)]',
@@ -286,7 +286,7 @@ const modalClasses = cva({
                     <DialogDescription>{{ __('Search for content, navigate, and run actions.') }}</DialogDescription>
                 </VisuallyHidden>
                 <motion.div
-                    class="relative rounded-xl border-b border-gray-200/80 bg-white shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:border-gray-950 dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/15"
+                    class="relative rounded-xl border-b border-gray-200/80 bg-white shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:border-gray-950 dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/10"
                     :initial="{ scale: 1.0 }"
                     :whilePress="{ scale: 0.985 }"
                     :transition="{ duration: 0.1 }"

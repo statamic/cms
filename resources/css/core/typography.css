@@ -50,28 +50,30 @@
     --prose-pre-bg: var(--color-gray-200);
     --prose-th-borders: var(--color-gray-300);
     --prose-td-borders: var(--color-gray-200);
+}
 
-    /* GROUP VARIABLES -- DECORATION -- COLORS -- DARK
-    =================================================== */
-    /* Dark theme variables (for prose-invert) */
-    --prose-invert-body: var(--color-gray-300);
-    --prose-invert-headings: var(--color-white);
-    --prose-invert-lead: var(--color-gray-400);
-    --prose-invert-links: var(--color-white);
-    --prose-invert-bold: var(--color-white);
-    --prose-invert-counters: var(--color-gray-400);
-    --prose-invert-bullets: var(--color-gray-600);
-    --prose-invert-hr: var(--color-gray-700);
-    --prose-invert-quotes: var(--color-gray-100);
-    --prose-invert-quote-borders: var(--color-gray-700);
-    --prose-invert-captions: var(--color-gray-400);
-    --prose-invert-kbd: var(--color-white);
-    --prose-invert-kbd-shadows: var(--color-white);
-    --prose-invert-code: var(--color-white);
-    --prose-invert-pre-code: var(--color-gray-300);
-    --prose-invert-pre-bg: oklch(from var(--color-black) l c h / 0.5);
-    --prose-invert-th-borders: var(--color-gray-600);
-    --prose-invert-td-borders: var(--color-gray-700);
+/* GROUP VARIABLES -- DECORATION -- COLORS -- DARK
+=================================================== */
+.dark {
+    /* Dark theme variables */
+    --prose-body: var(--color-gray-300);
+    --prose-headings: var(--color-white);
+    --prose-lead: var(--color-gray-400);
+    --prose-links: var(--color-white);
+    --prose-bold: var(--color-white);
+    --prose-counters: var(--color-gray-400);
+    --prose-bullets: var(--color-gray-600);
+    --prose-hr: var(--color-gray-700);
+    --prose-quotes: var(--color-gray-100);
+    --prose-quote-borders: var(--color-gray-700);
+    --prose-captions: var(--color-gray-400);
+    --prose-kbd: var(--color-white);
+    --prose-kbd-shadows: var(--color-white);
+    --prose-code: var(--color-white);
+    --prose-pre-code: var(--color-gray-300);
+    --prose-pre-bg: oklch(from var(--color-black) l c h / 0.5);
+    --prose-th-borders: var(--color-gray-600);
+    --prose-td-borders: var(--color-gray-700);
 }
 
 body {

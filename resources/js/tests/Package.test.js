@@ -3,13 +3,14 @@ import * as modules from '@/bootstrap/cms/index.js';
 import * as uiComponentLibrary from '../../../packages/ui/src/index.js';
 import * as internalUiComponents from '@/components/ui/index.js';
 
-
 global.__STATAMIC__ = modules;
 
 it('exports modules', async () => {
     expect(Object.keys(modules).toSorted()).toEqual([
+        'api',
         'bard',
         'core',
+        'inertia',
         'savePipeline',
         'temporary',
         'ui',
@@ -30,6 +31,51 @@ it('exports core', async () => {
 
     expect(Object.keys(modules.core).toSorted()).toEqual(expected)
     expect(Object.keys(await import('@statamic/cms/index.js')).toSorted()).toEqual(expected);
+});
+
+it('exports api', async () => {
+    const expected = [
+        'bard',
+        'callbacks',
+        'commandPalette',
+        'components',
+        'conditions',
+        'config',
+        'contrast',
+        'dateFormatter',
+        'dirty',
+        'echo',
+        'events',
+        'fieldActions',
+        'hooks',
+        'inertia',
+        'keys',
+        'permissions',
+        'portals',
+        'preferences',
+        'progress',
+        'reveal',
+        'slug',
+        'stacks',
+        'theme',
+        'toast',
+    ];
+
+    expect(Object.keys(modules.api).toSorted()).toEqual(expected)
+    expect(Object.keys(await import('@statamic/cms/api.js')).toSorted()).toEqual(expected);
+});
+
+it('exports inertia', async () => {
+    const expected = [
+        'Form',
+        'Head',
+        'Link',
+        'router',
+        'useForm',
+    ];
+
+    expect(Object.keys(modules.inertia).toSorted()).toEqual(expected);
+    expect(Object.keys(await import('@statamic/cms/inertia.js')).toSorted()).toEqual(expected);
 });
 
 it('exports save pipeline', async () => {

@@ -99,6 +99,7 @@
 <script>
 import uniqid from 'uniqid';
 import { Combobox, Button, Input, Heading, Field } from '@/components/ui';
+import { usePage } from '@inertiajs/vue3';
 
 export default {
     components: { Heading, Combobox, Button, Input, Field },
@@ -109,9 +110,10 @@ export default {
     },
 
     data() {
+        const fieldsetsData = usePage().props.fieldsets;
         const fieldsets = JSON.parse(
             JSON.stringify(
-                Object.values(this.$config.get('fieldsets')).filter(
+                Object.values(fieldsetsData).filter(
                     (fieldset) => fieldset.handle != this.excludeFieldset,
                 ),
             ),

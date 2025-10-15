@@ -11,7 +11,7 @@ const shouldDeleteChildren = ref(false);
 </script>
 
 <template>
-    <Modal :title="__('Delete Entry')" v-model:open="modalOpen">
+    <Modal :title="__('Delete Entry')" v-model:open="modalOpen" @dismissed="$emit('cancel')">
         <p class="mb-4" v-text="__('Are you sure you want to delete this entry?')" />
         <label class="flex items-center" v-if="children">
             <input type="checkbox" class="ltr:mr-2 rtl:ml-2" v-model="shouldDeleteChildren" />
