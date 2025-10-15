@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import CalendarWeekEntry from './CalendarWeekEntry.vue';
 import CreateEntryButton from './CreateEntryButton.vue';
+import { Button } from '@ui';
 import {
     getVisibleHours,
     getHourLabel,
@@ -131,7 +132,7 @@ defineExpose({ weekViewContainer });
                             size="sm"
                         >
                             <template #trigger="{ create }">
-                                <ui-button icon="plus" size="sm" variant="subtle" @click="create" />
+                                <Button icon="plus" size="sm" variant="subtle" @click="create" />
                             </template>
                         </CreateEntryButton>
                     </div>

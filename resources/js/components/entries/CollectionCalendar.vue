@@ -8,6 +8,7 @@ import CalendarWeekView from './CalendarWeekView.vue';
 import { Listing, StatusIndicator } from '@/components/ui';
 import { formatDateString, getWeekDates, getCurrentDateRange } from '@/util/calendar.js';
 import { Link } from '@inertiajs/vue3';
+import { ToggleGroup, ToggleItem, Button, Popover, Label, Select, Heading } from '@ui';
 
 const props = defineProps({
     collection: { type: String, required: true },
@@ -167,21 +168,21 @@ function shouldFetchEntries(
         >
             <CalendarHeader class="flex flex-col @3xl:flex-row items-center gap-4 pb-4 @3xl:pb-8">
                 <div class="flex items-center justify-between w-full @3xl:flex-1 @3xl:justify-start">
-                    <ui-toggle-group v-model="viewMode" class="flex">
-                        <ui-toggle-item value="week" :label="__('Week')" />
-                        <ui-toggle-item value="month" :label="__('Month')" />
-                    </ui-toggle-group>
+                    <ToggleGroup v-model="viewMode" class="flex">
+                        <ToggleItem value="week" :label="__('Week')" />
+                        <ToggleItem value="month" :label="__('Month')" />
+                    </ToggleGroup>
 
                     <div class="flex items-center gap-2 @3xl:hidden">
-                        <ui-button icon="chevron-left" @click="goToPreviousPeriod" />
-                        <ui-button @click="goToToday" :text="__('Today')" />
-                        <ui-button icon="chevron-right" @click="goToNextPeriod" />
+                        <Button icon="chevron-left" @click="goToPreviousPeriod" />
+                        <Button @click="goToToday" :text="__('Today')" />
+                        <Button icon="chevron-right" @click="goToNextPeriod" />
                     </div>
                 </div>
 
                 <!-- Calendar Heading with Popover -->
                 <div class="@3xl:flex-1 px-2 text-center">
-                    <ui-popover v-model:open="datePickerOpen" class="w-full" arrow>
+                    <Popover v-model:open="datePickerOpen" class="w-full" arrow>
                         <template #trigger>
                             <button @click="datePickerOpen = true">
                                 <CalendarHeading
@@ -192,8 +193,8 @@ function shouldFetchEntries(
 
                         <div class="flex items-center gap-3">
                             <div class="space-y-2">
-                                <ui-label for="month">{{ __('Month') }}</ui-label>
-                                <ui-select
+                                <Label for="month">{{ __('Month') }}</Label>
+                                <Select
                                     :model-value="currentDate.month"
                                     :options="monthOptions"
                                     option-value="value"
@@ -202,8 +203,8 @@ function shouldFetchEntries(
                                 />
                             </div>
                             <div class="space-y-2">
-                                <ui-label for="month">{{ __('Year') }}</ui-label>
-                                <ui-select
+                                <Label for="month">{{ __('Year') }}</Label>
+                                <Select
                                     :model-value="currentDate.year"
                                     :options="yearOptions"
                                     option-value="value"
@@ -212,13 +213,13 @@ function shouldFetchEntries(
                                 />
                             </div>
                         </div>
-                    </ui-popover>
+                    </Popover>
                 </div>
 
                 <div class="hidden @3xl:flex @3xl:flex-1 items-center gap-2 w-1/4 justify-end">
-                    <ui-button icon="chevron-left" @click="goToPreviousPeriod" />
-                    <ui-button @click="goToToday" :text="__('Today')" />
-                    <ui-button icon="chevron-right" @click="goToNextPeriod" />
+                    <Button icon="chevron-left" @click="goToPreviousPeriod" />
+                    <Button @click="goToToday" :text="__('Today')" />
+                    <Button icon="chevron-right" @click="goToNextPeriod" />
                 </div>
             </CalendarHeader>
 
@@ -248,14 +249,14 @@ function shouldFetchEntries(
         </CalendarRoot>
          <!-- Mobile entries list -->
         <div class="mt-6" v-if="selectedDate">
-            <ui-heading size="lg" class="flex justify-center pb-4">
+            <Heading size="lg" class="flex justify-center pb-4">
                 {{ new Date(selectedDate.year, selectedDate.month - 1, selectedDate.day).toLocaleDateString($date.locale, {
                     weekday: 'long',
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric'
                 }) }}
-            </ui-heading>
+            </Heading>
 
             <Listing
                 :items="selectedDateEntries"

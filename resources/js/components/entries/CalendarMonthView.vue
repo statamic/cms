@@ -2,6 +2,7 @@
 import { CalendarCell, CalendarCellTrigger, CalendarGrid, CalendarGridBody, CalendarGridHead, CalendarGridRow, CalendarHeadCell } from 'reka-ui';
 import CalendarEntry from './CalendarEntry.vue';
 import CreateEntryButton from './CreateEntryButton.vue';
+import { Button } from '@ui';
 import { formatDateString, isToday, getCreateUrlDateParam } from '@/util/calendar.js';
 
 const props = defineProps({
@@ -148,7 +149,7 @@ const selectDate = (date) => {
                                 size="sm"
                             >
                                 <template #trigger="{ create }">
-                                    <ui-button icon="plus" size="sm" variant="subtle" @click="create" />
+                                    <Button icon="plus" size="sm" variant="subtle" @click="create" />
                                 </template>
                             </CreateEntryButton>
                         </div>
