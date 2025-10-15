@@ -6,7 +6,7 @@ const props = defineProps(['phpinfo', 'version']);
 </script>
 
 <template>
-    <Head :title="__('PHP Info')" />
+    <Head :title="[__('PHP Info'), __('Utilities')]" />
 
     <Header :title="__('PHP Info')" icon="info" />
 

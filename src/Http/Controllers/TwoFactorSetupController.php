@@ -5,12 +5,14 @@ namespace Statamic\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Statamic\Facades\User;
+use Statamic\Http\Middleware\CP\HandleInertiaRequests;
 
 class TwoFactorSetupController extends Controller
 {
     public function __construct(Request $request)
     {
         $this->middleware('auth');
+        $this->middleware(HandleInertiaRequests::class);
     }
 
     public function __invoke(Request $request)

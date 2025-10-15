@@ -37,7 +37,7 @@
                             <button @click="selectFolder(folder.path)" class="group h-[66px] w-[80px]">
                                 <FolderSvg class="size-full text-blue-400/90 hover:text-blue-400" />
                                 <div
-                                    class="overflow-hidden mt-2 text-center font-mono text-xs text-ellipsis whitespace-nowrap text-gray-500"
+                                    class="overflow-hidden mt-2 text-center font-mono text-xs text-ellipsis whitespace-nowrap text-gray-500 dark:text-gray-300"
                                     v-text="folder.basename"
                                     :title="folder.basename"
                                 />

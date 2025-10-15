@@ -51,6 +51,7 @@
                 }
             }
             tr td {
+                @apply dark:bg-gray-850;
                 /* [3] Add left and right borders */
                 &:first-child {
                     @apply border-s border-s-gray-200 dark:border-s-gray-800;
@@ -159,7 +160,7 @@
 }
 
 .table-drag-handle {
-    @apply h-full cursor-grab hover:bg-gray-100 dark:hover:bg-gray-700;
+    @apply h-full cursor-grab hover:bg-gray-100 dark:hover:bg-gray-700 dark:opacity-75;
     background-image: url('../../svg/drag-dots.svg');
     background-repeat: no-repeat;
     background-position: center center;

@@ -42,7 +42,7 @@ function clearImage() {
 </script>
 
 <template>
-    <Head :title="__('Cache Manager')" />
+    <Head :title="[__('Cache Manager'), __('Utilities')]" />
 
     <Header :title="__('Cache Manager')" icon="cache">
         <CommandPaletteItem
