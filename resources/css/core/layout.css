@@ -10,7 +10,7 @@
     /* Only inset because we don't wand to transition the color when we switch between light/dark mode */
     transition: inset 0.3s ease-in-out;
     /* On mobile, hide by default and overlay on top */
-    z-index: var(--z-index-portal);
+    z-index: var(--z-index-draggable);
     @apply lg:flex;
 
     ul {
