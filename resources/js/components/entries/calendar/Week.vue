@@ -64,10 +64,6 @@ function getHourLabel(hour) {
     date.setHours(hour, 0, 0, 0);
     return DateFormatter.format(date, { hour: 'numeric', hour12: true });
 }
-
-// Expose the container ref for parent component to access
-const weekViewContainer = ref(null);
-defineExpose({ weekViewContainer });
 </script>
 
 <template>
