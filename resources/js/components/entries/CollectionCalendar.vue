@@ -6,6 +6,7 @@ import { CalendarDate } from '@internationalized/date';
 import CalendarMonthView from './CalendarMonthView.vue';
 import CalendarWeekView from './CalendarWeekView.vue';
 import { Listing, StatusIndicator } from '@/components/ui';
+import DateFormatter from '@/components/DateFormatter.js';
 import { formatDateString, getWeekDates, getCurrentDateRange } from '@/util/calendar.js';
 import { Link } from '@inertiajs/vue3';
 import { ToggleGroup, ToggleItem, Button, Popover, Label, Select, Heading } from '@ui';
@@ -16,6 +17,7 @@ const props = defineProps({
     createUrl: { type: String, required: true },
 });
 
+const $date = new DateFormatter;
 const currentDate = ref(new CalendarDate(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()));
 const selectedDate = ref(null);
 const entries = ref([]);
@@ -87,14 +89,12 @@ function handleYearChange(newYear) {
 }
 
 const monthOptions = computed(() => {
-    const instance = getCurrentInstance();
-    const $date = instance?.appContext.config.globalProperties.$date;
     const months = [];
     for (let i = 1; i <= 12; i++) {
         const date = new Date(2024, i - 1, 1);
         months.push({
             value: i,
-            label: date.toLocaleDateString($date?.locale || 'en', { month: 'long' })
+            label: $date.format(date, { month: 'long' })
         });
     }
     return months;
@@ -249,14 +249,11 @@ function shouldFetchEntries(
         </CalendarRoot>
          <!-- Mobile entries list -->
         <div class="mt-6" v-if="selectedDate">
-            <Heading size="lg" class="flex justify-center pb-4">
-                {{ new Date(selectedDate.year, selectedDate.month - 1, selectedDate.day).toLocaleDateString($date.locale, {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                }) }}
-            </Heading>
+            <Heading
+                size="lg"
+                class="flex justify-center pb-4"
+                :text="$date.format(selectedDate, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })"
+            />
 
             <Listing
                 :items="selectedDateEntries"

@@ -10,6 +10,7 @@ import {
     getCreateUrlDateParam,
     formatDateString,
 } from '@/util/calendar.js';
+import DateFormatter from '@/components/DateFormatter.js';
 
 const props = defineProps({
     weekDates: { type: Array, required: true },
@@ -21,6 +22,7 @@ const props = defineProps({
 
 const emit = defineEmits(['select-date']);
 
+const $date = new DateFormatter;
 const visibleHours = getVisibleHours();
 
 function getEntriesForHour(date, hour) {
@@ -74,9 +76,7 @@ defineExpose({ weekViewContainer });
                 class="p-3 bg-gray-50 dark:bg-gray-900/10 text-center border-l border-gray-200 dark:border-gray-700"
                 :class="headerClasses(date)"
             >
-                <div class="text-xs text-gray-500 dark:text-gray-400">
-                    {{ new Date(date.year, date.month - 1, date.day).toLocaleDateString($date.locale, { weekday: 'short' }) }}
-                </div>
+                <div class="text-xs text-gray-500 dark:text-gray-400" v-text="$date.format(date, { weekday: 'short'})" />
                 <div
                     class="text-sm font-medium inline p-1"
                     :class="dateNumberClasses(date)"

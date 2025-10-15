@@ -4,6 +4,7 @@ import CalendarEntry from './CalendarEntry.vue';
 import CreateEntryButton from './CreateEntryButton.vue';
 import { Button } from '@ui';
 import { formatDateString, isToday, getCreateUrlDateParam } from '@/util/calendar.js';
+import DateFormatter from '@/components/DateFormatter.js';
 
 const props = defineProps({
     weekDays: { type: Array, required: true },
@@ -17,8 +18,7 @@ const props = defineProps({
 const emit = defineEmits(['select-date']);
 
 const isCurrentDay = (dayIndex) => {
-    const today = new Date();
-    const currentDayName = today.toLocaleDateString('en-US', {weekday: 'long'});
+    const currentDayName = DateFormatter.format('now', { weekday: 'long' });
 
     // Find the index of today's day name in the weekDays array
     const todayIndex = props.weekDays.findIndex(day =>
