@@ -34,12 +34,6 @@ export function getHourLabel(hour) {
     return `${hour - 12} PM`;
 }
 
-export function formatTime(dateString) {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
-}
-
 export function isToday(date) {
     const today = new Date();
     const compareDate = new Date(date.year, date.month - 1, date.day);
