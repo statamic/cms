@@ -12,7 +12,7 @@ This addon does:
 
 ## How to Install
 
-You can search for this addon in the `Tools > Addons` section of the Statamic control panel and click **install**, or run the following command from your project root:
+You can install this addon via Composer:
 
 ``` bash
 composer require {{ package }}

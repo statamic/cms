@@ -25,6 +25,7 @@
                     :name="publishContainer"
                     :blueprint="adjustedBlueprint"
                     :values="values"
+                    :extra-values="extraValues"
                     :meta="meta"
                     :errors="errors"
                     :localized-fields="localizedFields"
@@ -73,7 +74,13 @@
 </template>
 
 <script>
+import HasHiddenFields from "../publish/HasHiddenFields";
+
 export default {
+
+    mixins: [
+        HasHiddenFields,
+    ],
 
     props: {
         id: String,
@@ -94,6 +101,7 @@ export default {
             meta: null,
             originValues: null,
             originMeta: null,
+            extraValues: null,
             localizedFields: null,
             syncableFields: null,
             loading: true,
@@ -184,9 +192,9 @@ export default {
 
             this.$axios.post(postUrl, {
                 type: this.type,
-                values: this.values
+                values: this.visibleValues
             }).then(response => {
-                this.$emit('submitted', this.values);
+                this.$emit('submitted', this.visibleValues);
             }).catch(e => {
                 this.validating = false;
                 if (e.response && e.response.status === 422) {
@@ -275,6 +283,7 @@ export default {
             this.originValues = info.originValues;
             this.meta = info.meta;
             this.originMeta = info.originMeta;
+            this.extraValues = info.extraValues;
             this.localizedFields = info.localizedFields;
             this.syncableFields = info.syncableFields;
         },
@@ -285,6 +294,7 @@ export default {
                 originValues: this.originValues,
                 meta: this.meta,
                 originMeta: this.originMeta,
+                extraValues: this.extraValues,
                 localizedFields: this.localizedFields,
                 syncableFields: this.syncableFields,
                 entry: this.entry,

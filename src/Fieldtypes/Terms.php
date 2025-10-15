@@ -19,12 +19,14 @@ use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
 use Statamic\GraphQL\Types\TermInterface;
-use Statamic\Http\Resources\CP\Taxonomies\Terms as TermsResource;
+use Statamic\Http\Resources\CP\Taxonomies\TermsFieldtypeTerms as TermsResource;
 use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filter;
 use Statamic\Query\Scopes\Filters\Fields\Terms as TermsFilter;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+
+use function Statamic\trans as __;
 
 class Terms extends Relationship
 {
@@ -123,7 +125,9 @@ class Terms extends Relationship
 
         $query = $this->queryBuilder($values);
 
-        return $single ? Blink::once($key, fn () => $query->first()) : $query;
+        return $single && ! config('statamic.system.always_augment_to_query', false)
+            ? Blink::once($key, fn () => $query->first())
+            : $query;
     }
 
     private function queryBuilder($values)
@@ -207,6 +211,7 @@ class Terms extends Relationship
                 return explode('::', $id, 2)[1];
             })
                 ->unique()
+                ->values()
                 ->all();
 
             if ($this->field->get('max_items') === 1) {
@@ -252,7 +257,7 @@ class Terms extends Relationship
 
     public function getResourceCollection($request, $items)
     {
-        return (new TermsResource($items))
+        return (new TermsResource($items, $this))
             ->blueprint($this->getBlueprint($request))
             ->columnPreferenceKey("taxonomies.{$this->getFirstTaxonomyFromRequest($request)->handle()}.columns");
     }
@@ -368,6 +373,8 @@ class Terms extends Relationship
             'published' => $term->published(),
             'private' => $term->private(),
             'edit_url' => $term->editUrl(),
+            'editable' => User::current()->can('edit', $term),
+            'hint' => $this->getItemHint($term),
         ];
     }
 
@@ -477,5 +484,12 @@ class Terms extends Relationship
         }
 
         return $this->config('max_items') === 1 ? collect([$augmented]) : $augmented->get();
+    }
+
+    public function getItemHint($item): ?string
+    {
+        return collect([
+            count($this->getConfiguredTaxonomies()) > 1 ? __($item->taxonomy()->title()) : null,
+        ])->filter()->implode(' • ');
     }
 }

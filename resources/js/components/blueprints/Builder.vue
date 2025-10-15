@@ -24,7 +24,7 @@
                     </div>
                 </div>
 
-                <div class="form-group config-field" v-if="showHidden">
+                <div class="form-group config-field">
                     <div class="field-inner">
                         <label class="block">{{ __('Hidden') }}</label>
                         <p class="help-block">{{ __('messages.blueprints_hidden_instructions') }}</p>
@@ -43,6 +43,7 @@
             :single-tab="!useTabs"
             :initial-tabs="tabs"
             :errors="errors.tabs"
+            :can-define-localizable="canDefineLocalizable"
             @updated="tabsUpdated"
         />
 
@@ -53,10 +54,11 @@
 <script>
 import SuggestsConditionalFields from './SuggestsConditionalFields';
 import Tabs from './Tabs.vue';
+import CanDefineLocalizable from "../fields/CanDefineLocalizable";
 
 export default {
 
-    mixins: [SuggestsConditionalFields],
+    mixins: [SuggestsConditionalFields, CanDefineLocalizable],
 
     components: {
         Tabs,
@@ -68,7 +70,6 @@ export default {
         showTitle: Boolean,
         useTabs: { type: Boolean, default: true },
         isFormBlueprint: { type: Boolean, default: false },
-        showHidden: { type: Boolean, default: true },
     },
 
     data() {

@@ -12,7 +12,7 @@
         {{ elseif fieldtype == "radio" }}
             {{ value:label ?? value }}
 
-        {{ elseif fieldtype == "select" || fieldtype == "checkboxes" }}
+        {{ elseif fieldtype == "select" || fieldtype == "checkboxes" || fieldtype == "dictionary" }}
             {{ value }}{{ label ?? value }}{{ if !last }}, {{ /if }}{{ /value }}
 
         {{ elseif value|is_iterable }}

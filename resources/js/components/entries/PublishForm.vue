@@ -3,11 +3,11 @@
     <div>
         <breadcrumb v-if="breadcrumbs" :url="breadcrumbs[1].url" :title="breadcrumbs[1].text" />
 
-        <div class="flex items-center mb-6">
-            <h1 class="flex-1">
-                <div class="flex items-center">
-                    <span v-if="! isCreating" class="little-dot rtl:ml-2 ltr:mr-2" :class="activeLocalization.status" v-tooltip="__(activeLocalization.status)" />
-                    <span v-html="$options.filters.striptags(__(title))" />
+        <div class="flex items-baseline mb-6">
+            <h1 class="flex-1 self-start rtl:ml-4 ltr:mr-4">
+                <div class="flex items-baseline">
+                    <span v-if="! isCreating" class="little-dot rtl:ml-2 ltr:mr-2 -top-1" :class="activeLocalization.status" v-tooltip="__(activeLocalization.status)" />
+                    <span class="break-overflowing-words" v-html="$options.filters.striptags(__(title))" />
                 </div>
             </h1>
 
@@ -30,7 +30,6 @@
             </div>
 
             <div class="hidden md:flex items-center">
-
                 <save-button-options
                     v-if="!readOnly"
                     :show-options="!revisionsEnabled && !isInline"
@@ -45,13 +44,19 @@
                     />
                 </save-button-options>
 
-                <button
+                <save-button-options
                     v-if="revisionsEnabled && !isCreating"
-                    class="rtl:mr-4 ltr:ml-4 btn-primary flex items-center"
-                    :disabled="!canPublish"
-                    @click="confirmingPublish = true"
-                    v-text="publishButtonText"
-                />
+                    :show-options="!isInline"
+                    button-class="btn-primary"
+                    :preferences-prefix="preferencesPrefix"
+                >
+                    <button
+                        class="rtl:mr-4 ltr:ml-4 btn-primary flex items-center"
+                        :disabled="!canPublish"
+                        @click="confirmingPublish = true"
+                        v-text="publishButtonText"
+                    />
+                </save-button-options>
             </div>
 
             <slot name="action-buttons-right" />
@@ -63,6 +68,7 @@
             :name="publishContainer"
             :blueprint="fieldset"
             :values="values"
+            :extra-values="extraValues"
             :reference="initialReference"
             :meta="meta"
             :errors="errors"
@@ -112,16 +118,16 @@
 
                                 <div v-if="collectionHasRoutes" :class="{ 'hi': !shouldShowSidebar }">
 
-                                    <div class="p-3 flex items-center space-x-2" v-if="showLivePreviewButton || showVisitUrlButton">
+                                    <div class="p-3 flex flex-wrap items-center gap-2 rtl:space-x-reverse" v-if="showLivePreviewButton || showVisitUrlButton">
                                         <button
-                                            class="flex items-center justify-center btn w-full"
+                                            class="flex flex-1 items-center justify-center btn px-2"
                                             v-if="showLivePreviewButton"
                                             @click="openLivePreview">
                                             <svg-icon name="light/synchronize" class="h-4 w-4 rtl:ml-2 ltr:mr-2 shrink-0" />
                                             <span>{{ __('Live Preview') }}</span>
                                         </button>
                                         <a
-                                            class="flex items-center justify-center btn w-full"
+                                            class="flex flex-1 items-center justify-center btn px-2"
                                             v-if="showVisitUrlButton"
                                             :href="permalink"
                                             target="_blank">
@@ -275,6 +281,7 @@
             @closed="confirmingPublish = false"
             @saving="saving = true"
             @saved="publishActionCompleted"
+            @failed="publishActionFailed"
         />
 
         <confirmation-modal
@@ -329,6 +336,7 @@ export default {
         initialReference: String,
         initialFieldset: Object,
         initialValues: Object,
+        initialExtraValues: Object,
         initialMeta: Object,
         initialTitle: String,
         initialLocalizations: Array,
@@ -369,6 +377,7 @@ export default {
             title: this.initialTitle,
             values: _.clone(this.initialValues),
             meta: _.clone(this.initialMeta),
+            extraValues: _.clone(this.initialExtraValues),
             localizations: _.clone(this.initialLocalizations),
             localizedFields: this.initialLocalizedFields,
             hasOrigin: this.initialHasOrigin,
@@ -600,7 +609,8 @@ export default {
                         clearTimeout(this.trackDirtyStateTimeout)
                         this.trackDirtyState = false
                         this.values = this.resetValuesFromResponse(response.data.data.values);
-                        this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 350)
+                        this.extraValues = response.data.data.extraValues;
+                        this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 750)
                         this.$nextTick(() => this.$emit('saved', response));
                         return;
                     }
@@ -624,7 +634,8 @@ export default {
                         clearTimeout(this.trackDirtyStateTimeout);
                         this.trackDirtyState = false;
                         this.values = this.resetValuesFromResponse(response.data.data.values);
-                        this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 350);
+                        this.extraValues = response.data.data.extraValues;
+                        this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 750);
                         this.initialPublished = response.data.data.published;
                         this.activeLocalization.published = response.data.data.published;
                         this.activeLocalization.status = response.data.data.status;
@@ -713,7 +724,7 @@ export default {
                 this.initialPublished = data.values.published;
                 this.readOnly = data.readOnly;
 
-                this.trackDirtyStateTimeout = setTimeout(() => this.trackDirtyState = true, 300); // after any fieldtypes do a debounced update
+                this.trackDirtyStateTimeout = setTimeout(() => this.trackDirtyState = true, 750); // after any fieldtypes do a debounced update
             })
         },
 
@@ -775,16 +786,39 @@ export default {
             this.$refs.container.saved();
             this.isWorkingCopy = isWorkingCopy;
             this.confirmingPublish = false;
-            this.title = response.data.data.title;
-            clearTimeout(this.trackDirtyStateTimeout);
-            this.trackDirtyState = false;
-            this.values = this.resetValuesFromResponse(response.data.data.values);
-            this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 350);
-            this.activeLocalization.title = response.data.data.title;
-            this.activeLocalization.published = response.data.data.published;
-            this.activeLocalization.status = response.data.data.status;
-            this.permalink = response.data.data.permalink
-            this.$nextTick(() => this.$emit('saved', response));
+
+            let nextAction = this.quickSave || this.isAutosave ? 'continue_editing' : this.afterSaveOption;
+
+            // If the user has opted to create another entry, redirect them to create page.
+            if (!this.isInline && nextAction === 'create_another') {
+                window.location = this.createAnotherUrl;
+            }
+
+            // If the user has opted to go to listing (default/null option), redirect them there.
+            else if (!this.isInline && nextAction === null) {
+                window.location = this.listingUrl;
+            }
+
+            // Otherwise, leave them on the edit form and emit an event. We need to wait until after
+            // the hooks are resolved because if this form is being shown in a stack, we only
+            // want to close it once everything's done.
+            else {
+                this.title = response.data.data.title;
+                clearTimeout(this.trackDirtyStateTimeout);
+                this.trackDirtyState = false;
+                this.values = this.resetValuesFromResponse(response.data.data.values);
+                this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 750);
+                this.activeLocalization.title = response.data.data.title;
+                this.activeLocalization.published = response.data.data.published;
+                this.activeLocalization.status = response.data.data.status;
+                this.permalink = response.data.data.permalink
+                this.$nextTick(() => this.$emit('saved', response));
+            }
+        },
+
+        publishActionFailed() {
+            this.confirmPublish = false;
+            this.saving = false;
         },
 
         setFieldValue(handle, value) {
@@ -830,7 +864,7 @@ export default {
                 clearTimeout(this.trackDirtyStateTimeout);
                 this.trackDirtyState = false;
                 this.values = this.resetValuesFromResponse(response.data.values);
-                this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 350);
+                this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 750);
                 this.initialPublished = response.data.published;
                 this.activeLocalization.published = response.data.published;
                 this.activeLocalization.status = response.data.status;

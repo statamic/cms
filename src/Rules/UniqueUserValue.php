@@ -20,7 +20,11 @@ class UniqueUserValue implements ValidationRule
         $this->column ??= $attribute;
 
         $existing = User::query()
-            ->where($this->column, $value)
+            ->when(
+                is_array($value),
+                fn ($query) => $query->whereIn($this->column, $value),
+                fn ($query) => $query->where($this->column, $value)
+            )
             ->first();
 
         if (! $existing) {

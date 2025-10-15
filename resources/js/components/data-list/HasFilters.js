@@ -47,19 +47,12 @@ export default {
 
         searchPlaceholder() {
             if (this.activePreset) {
-                return __('Searching in: ') + this.activePresetPayload.display;
+                return `${__('Searching in:')} ${this.activePresetPayload.display}`;
             }
 
             return __('Search');
         },
 
-    },
-
-    created() {
-        this.$keys.bind('f', e => {
-            e.preventDefault();
-            this.handleShowFilters();
-        });
     },
 
     methods: {

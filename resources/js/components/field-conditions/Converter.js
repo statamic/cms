@@ -32,11 +32,17 @@ export default class {
     }
 
     getScopedFieldHandle(field, prefix) {
-        if (field.startsWith('root.') || ! prefix) {
+        if (field.startsWith('$root.') || field.startsWith('root.')) {
             return field;
         }
 
-        return prefix + field;
+        if (field.startsWith('$parent.')) {
+            return field;
+        }
+
+        return prefix
+            ? prefix + field
+            : field;
     }
 
     getOperatorFromRhs(condition) {

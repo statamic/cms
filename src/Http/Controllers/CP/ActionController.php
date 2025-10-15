@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP;
 
+use Exception;
 use Illuminate\Http\Request;
 use Statamic\Facades\Action;
 use Statamic\Facades\User;
@@ -35,8 +36,14 @@ abstract class ActionController extends CpController
         abort_unless($unauthorized->isEmpty(), 403, __('You are not authorized to run this action.'));
 
         $values = $action->fields()->addValues($request->all())->process()->values()->all();
+        $successful = true;
 
-        $response = $action->run($items, $values);
+        try {
+            $response = $action->run($items, $values);
+        } catch (Exception $e) {
+            $response = empty($msg = $e->getMessage()) ? __('Action failed') : $msg;
+            $successful = false;
+        }
 
         if ($redirect = $action->redirect($items, $values)) {
             return [
@@ -52,6 +59,7 @@ abstract class ActionController extends CpController
         }
 
         $response = $response ?: [];
+        $response['success'] = $successful;
 
         if (Arr::get($context, 'view') === 'form') {
             $response['data'] = $this->getItemData($items->first(), $context);

@@ -82,7 +82,7 @@ class FullMeasureStaticCachingTest extends TestCase
         $this->assertEquals(vsprintf('<html><body>1 <span class="nocache" data-nocache="%s">%s</span>%s</body></html>', [
             $region->key(),
             '<svg>Loading...</svg>',
-            '<script type="text/javascript">js here</script>',
+            '<script>js here</script>',
         ]), file_get_contents($this->dir.'/about_.html'));
     }
 
@@ -154,7 +154,7 @@ class FullMeasureStaticCachingTest extends TestCase
         // The cached response should have the token placeholder, and the javascript.
         $this->assertTrue(file_exists($this->dir.'/about_.html'));
         $this->assertEquals(vsprintf('<html><body>STATAMIC_CSRF_TOKEN%s</body></html>', [
-            '<script type="text/javascript">js here</script>',
+            '<script>js here</script>',
         ]), file_get_contents($this->dir.'/about_.html'));
     }
 }

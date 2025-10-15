@@ -26,6 +26,7 @@ abstract class Relationship extends Fieldtype
     protected $formComponentProps = [
         '_' => '_', // forces an object in js
     ];
+    protected $formStackSize;
 
     protected function configFieldItems(): array
     {
@@ -130,9 +131,10 @@ abstract class Relationship extends Fieldtype
             'canCreate' => $this->canCreate(),
             'canSearch' => $this->canSearch(),
             'statusIcons' => $this->statusIcons(),
-            'creatables' => $this->getCreatables(),
+            'creatables' => $this->canCreate() ? $this->getCreatables() : [],
             'formComponent' => $this->getFormComponent(),
             'formComponentProps' => $this->getFormComponentProps(),
+            'formStackSize' => $this->getFormStackSize(),
             'taggable' => $this->getTaggable(),
             'initialSortColumn' => $this->initialSortColumn(),
             'initialSortDirection' => $this->initialSortDirection(),
@@ -182,6 +184,11 @@ abstract class Relationship extends Fieldtype
         return $this->formComponentProps;
     }
 
+    protected function getFormStackSize()
+    {
+        return $this->formStackSize;
+    }
+
     protected function getColumns()
     {
         return [
@@ -229,6 +236,11 @@ abstract class Relationship extends Fieldtype
         return collect($values)->map(function ($id) {
             return $this->toItemArray($id);
         })->values();
+    }
+
+    public function getItemHint($item): ?string
+    {
+        return null;
     }
 
     abstract protected function toItemArray($id);

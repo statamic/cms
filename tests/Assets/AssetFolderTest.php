@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use League\Flysystem\PathTraversalDetected;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainerContents;
@@ -53,6 +54,25 @@ class AssetFolderTest extends TestCase
         $this->assertEquals($folder, $return);
         $this->assertEquals('path/to/folder', $folder->path());
         $this->assertEquals('folder', $folder->basename());
+    }
+
+    #[Test]
+    public function it_cannot_use_traversal_in_path()
+    {
+        $folder = (new Folder)->path('path/to/folder');
+
+        try {
+            $folder->path('path/to/../folder');
+        } catch (PathTraversalDetected $e) {
+            $this->assertEquals('Path traversal detected: path/to/../folder', $e->getMessage());
+
+            // Even if exception was thrown, make sure that the path didn't somehow get updated.
+            $this->assertEquals('path/to/folder', $folder->path());
+
+            return;
+        }
+
+        $this->fail('Exception was not thrown.');
     }
 
     #[Test]
@@ -709,6 +729,91 @@ class AssetFolderTest extends TestCase
     }
 
     #[Test]
+    public function it_sanitizes_when_moving_to_another_folder_with_a_new_folder_name()
+    {
+        $container = $this->containerWithDisk();
+        $disk = $container->disk()->filesystem();
+
+        $paths = collect([
+            'move/one.txt',
+            'move/two.txt',
+            'move/sub/three.txt',
+            'move/sub/subsub/four.txt',
+            'destination/folder/five.txt',
+        ]);
+
+        $paths->each(function ($path) use ($disk, $container) {
+            $disk->put($path, '');
+            $container->makeAsset($path)->save();
+        });
+
+        $folder = (new Folder)->container($container)->path('move');
+
+        Event::fake();
+
+        $folder->move('destination/folder', 'new move');
+
+        $disk->assertMissing('move');
+        $disk->assertMissing('move/sub');
+        $disk->assertMissing('move/sub/subsub');
+
+        $disk->assertExists('destination/folder/new-move');
+        $disk->assertExists('destination/folder/new-move/sub');
+        $disk->assertExists('destination/folder/new-move/sub/subsub');
+
+        $this->assertEquals([
+            'destination',
+            'destination/folder',
+            'destination/folder/new-move',
+            'destination/folder/new-move/sub',
+            'destination/folder/new-move/sub/subsub',
+        ], $container->folders()->all());
+
+        $this->assertEquals([
+            'destination',
+            'destination/folder',
+            'destination/folder/five.txt',
+            'destination/folder/new-move',
+            'destination/folder/new-move/sub',
+            'destination/folder/new-move/sub/subsub',
+            'destination/folder/new-move/sub/subsub/four.txt',
+            'destination/folder/new-move/sub/three.txt',
+            'destination/folder/new-move/one.txt',
+            'destination/folder/new-move/two.txt',
+        ], $container->contents()->cached()->keys()->all());
+
+        // Assert asset folder events.
+        $paths = ['move', 'move/sub', 'move/sub/subsub'];
+        Event::assertDispatchedTimes(AssetFolderDeleted::class, count($paths));
+        Event::assertDispatchedTimes(AssetFolderSaved::class, count($paths));
+        foreach ($paths as $path) {
+            Event::assertDispatched(AssetFolderDeleted::class, function (AssetFolderDeleted $event) use ($path) {
+                return $event->folder->path() === $path;
+            });
+        }
+        $paths = ['new-move', 'new-move/sub', 'new-move/sub/subsub'];
+        foreach ($paths as $path) {
+            Event::assertDispatched(AssetFolderSaved::class, function (AssetFolderSaved $event) use ($path) {
+                return $event->folder->path() === 'destination/folder/'.$path;
+            });
+        }
+
+        // Assert asset events.
+        $paths = [
+            'destination/folder/new-move/one.txt',
+            'destination/folder/new-move/two.txt',
+            'destination/folder/new-move/sub/three.txt',
+            'destination/folder/new-move/sub/subsub/four.txt',
+        ];
+        Event::assertDispatchedTimes(AssetSaved::class, count($paths));
+        foreach ($paths as $path) {
+            Event::assertDispatched(AssetSaved::class, function (AssetSaved $event) use ($path) {
+                return $event->asset->path() === $path;
+            });
+        }
+    }
+
+    #[Test]
     public function it_cannot_be_moved_to_its_own_subfolder()
     {
         $container = $this->containerWithDisk();
@@ -1044,6 +1149,24 @@ class AssetFolderTest extends TestCase
             'parent_path' => 'grandparent/parent',
             'basename' => 'child',
         ], $folder->toArray());
+    }
+
+    #[Test]
+    public function it_uses_a_custom_cache_store()
+    {
+        config([
+            'cache.stores.asset_container_contents' => [
+                'driver' => 'file',
+                'path' => storage_path('statamic/asset-container-contents'),
+            ],
+        ]);
+
+        Storage::fake('local');
+
+        $store = Facades\AssetContainer::make('test')->disk('local')->contents()->cacheStore();
+
+        // ideally we would have checked the store name, but laravel 10 doesnt give us a way to do that
+        $this->assertStringContainsString('asset-container-contents', $store->getStore()->getDirectory());
     }
 
     private function containerWithDisk()

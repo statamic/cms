@@ -190,8 +190,22 @@
                 <td>
                     <div class="flex items-center">
                         <div class="w-4 h-4 rtl:ml-4 ltr:mr-4">@cp_svg('icons/light/blueprint')</div>
-                        <a href="{{ cp_route('blueprints.edit', [$blueprint['namespace'], $blueprint['handle']]) }}">{{ $blueprint['title'] }}</a>
+                        <a href="{{ cp_route('blueprints.edit', [$blueprint['namespace'], $blueprint['handle']]) }}">{{ __($blueprint['title']) }}</a>
                     </div>
+                </td>
+                <th class="actions-column">
+                    @if ($blueprint['is_resettable'])
+                        <dropdown-list class="dropdown-list">
+                            <dropdown-item :text="__('Reset')" class="warning" @click="$refs[`resetter_{{ $blueprint['namespace'] }}_{{ $blueprint['handle'] }}`].confirm()">
+                                <blueprint-resetter
+                                    ref="resetter_{{ $blueprint['namespace'] }}_{{ $blueprint['handle'] }}"
+                                    :resource='@json($blueprint)'
+                                    reload
+                                >
+                                </blueprint-resetter>
+                            </dropdown-item>
+                        </dropdown-list>
+                    @endif
                 </td>
             </tr>
         @endforeach

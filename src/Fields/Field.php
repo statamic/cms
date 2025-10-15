@@ -13,6 +13,8 @@ use Statamic\Rules\Handle;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class Field implements Arrayable
 {
     protected $handle;
@@ -173,6 +175,11 @@ class Field implements Arrayable
     public function isRequired()
     {
         return collect($this->rules()[$this->handle])->contains('required');
+    }
+
+    private function hasSometimesRule()
+    {
+        return collect($this->rules()[$this->handle])->contains('sometimes');
     }
 
     public function setValidationContext($context)
@@ -435,7 +442,7 @@ class Field implements Arrayable
             $type = ['type' => $type];
         }
 
-        if ($this->isRequired()) {
+        if ($this->isRequired() && ! $this->hasSometimesRule() && $this->type() !== 'assets') {
             $type['type'] = GraphQL::nonNull($type['type']);
         }
 
@@ -472,7 +479,6 @@ class Field implements Arrayable
             'resource',
             'status',
             'unless',
-            'value', // todo: can be removed when https://github.com/statamic/cms/issues/2495 is resolved
             'views',
         ];
 
@@ -538,6 +544,9 @@ class Field implements Arrayable
                 'instructions' => __('statamic::messages.fields_sortable_instructions'),
                 'type' => 'toggle',
                 'default' => true,
+                'unless' => [
+                    'visibility' => 'equals computed',
+                ],
             ],
             'visibility' => [
                 'display' => __('Visibility'),

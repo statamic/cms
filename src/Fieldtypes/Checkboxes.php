@@ -22,6 +22,7 @@ class Checkboxes extends Fieldtype
                         'display' => __('Options'),
                         'instructions' => __('statamic::fieldtypes.checkboxes.config.options'),
                         'type' => 'array',
+                        'expand' => true,
                         'field' => [
                             'type' => 'text',
                         ],
@@ -39,7 +40,7 @@ class Checkboxes extends Fieldtype
                     'default' => [
                         'display' => __('Default Value'),
                         'instructions' => __('statamic::messages.fields_default_instructions'),
-                        'type' => 'text',
+                        'type' => 'taggable',
                     ],
                 ],
             ],

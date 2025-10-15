@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 class CheckboxesTest extends TestCase
 {
-    use CastsMultipleBooleansTests, MultipleLabeledValueTests;
+    use CastsMultipleBooleansTests, HasSelectOptionsTests, MultipleLabeledValueTests;
 
     private function field($config)
     {

@@ -50,7 +50,7 @@
                     <toggle-input v-model="user.super" id="super" />
                     <label class="font-bold rtl:mr-2 ltr:ml-2" for="super">{{ __('Super Admin') }}</label>
                 </div>
-                <div class="text-2xs text-gray-600 dark:text-dark-150 mt-2 flex items-center space-x-1">
+                <div class="text-2xs text-gray-600 dark:text-dark-150 mt-2 flex items-center space-x-1 rtl:space-x-reverse">
                     <svg-icon name="info-circle" class="h-4 w-4 flex items-center mb-px"></svg-icon>
                     <span>{{ __('messages.user_wizard_super_admin_instructions') }}</span>
                 </div>
@@ -61,15 +61,17 @@
                 <label class="font-bold text-base mb-1" for="role">{{ __('Roles') }}</label>
                 <publish-field-meta
                     :config="{ handle: 'user.roles', type: 'user_roles' }"
-                    :initial-value="user.roles">
-                    <div slot-scope="{ meta, value, loading }">
+                    :initial-value="user.roles"
+                >
+                    <div slot-scope="{ meta, value, loading, updateMeta }">
                         <relationship-fieldtype
                             v-if="!loading"
                             handle="user.roles"
                             :config="{ type: 'user_roles', mode: 'select' }"
                             :value="value"
                             :meta="meta"
-                            @input="user.roles = $event" />
+                            @input="user.roles = $event"
+                            @meta-updated="updateMeta" />
                     </div>
                 </publish-field-meta>
             </div>
@@ -79,15 +81,17 @@
                 <label class="font-bold text-base mb-1" for="group">{{ __('Groups') }}</label>
                 <publish-field-meta
                     :config="{ handle: 'user.groups', type: 'user_groups' }"
-                    :initial-value="user.groups">
-                    <div slot-scope="{ meta, value, loading }">
+                    :initial-value="user.groups"
+                >
+                    <div slot-scope="{ meta, value, loading, updateMeta }">
                         <relationship-fieldtype
                             v-if="!loading"
                             handle="user.groups"
                             :config="{ type: 'user_groups', mode: 'select' }"
                             :value="value"
                             :meta="meta"
-                            @input="user.groups = $event" />
+                            @input="user.groups = $event"
+                            @meta-updated="updateMeta"/>
                     </div>
                 </publish-field-meta>
             </div>

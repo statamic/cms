@@ -22,6 +22,7 @@ class Radio extends Fieldtype
                         'display' => __('Options'),
                         'instructions' => __('statamic::fieldtypes.radio.config.options'),
                         'type' => 'array',
+                        'expand' => true,
                         'field' => [
                             'type' => 'text',
                         ],

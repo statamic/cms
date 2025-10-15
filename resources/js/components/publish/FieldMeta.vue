@@ -28,6 +28,8 @@ export default {
             meta: this.meta,
             value: this.value,
             loading: this.loading,
+            updateMeta: this.updateMeta,
+            config: this.config
         });
     },
 
@@ -62,11 +64,16 @@ export default {
                 value: this.value,
             };
 
-            this.$axios.get(cp_url('fields/field-meta'), { params }).then(response => {
+            this.$axios.post(cp_url('fields/field-meta'), params).then(response => {
                 this.meta = response.data.meta;
                 this.value = response.data.value;
                 this.loading = false;
+                this.$emit('loaded');
             });
+        },
+
+        updateMeta(value) {
+            this.meta = value;
         }
 
     }

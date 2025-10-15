@@ -7,6 +7,7 @@ use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
 use Statamic\GraphQL\Types\GroupType;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class Group extends Fieldtype
@@ -37,6 +38,12 @@ class Group extends Fieldtype
                         'type' => 'toggle',
                         'default' => true,
                     ],
+                    'border' => [
+                        'display' => __('Border'),
+                        'instructions' => __('statamic::fieldtypes.grid.config.border'),
+                        'type' => 'toggle',
+                        'default' => true,
+                    ],
                 ],
             ],
         ];
@@ -44,7 +51,9 @@ class Group extends Fieldtype
 
     public function process($data)
     {
-        return $this->fields()->addValues($data ?? [])->process()->values()->all();
+        $values = $this->fields()->addValues($data ?? [])->process()->values()->all();
+
+        return Arr::removeNullValues($values);
     }
 
     public function preProcess($data)
@@ -69,7 +78,7 @@ class Group extends Fieldtype
             ->addValues((array) $this->field->value())
             ->validator()
             ->withContext([
-                'prefix' => $this->field->handle().'.',
+                'prefix' => $this->field->validationContext('prefix'),
             ])
             ->rules();
 

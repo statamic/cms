@@ -3,12 +3,15 @@
 namespace Statamic\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use Statamic\Contracts\View\Antlers\Parser;
+use Statamic\View\Antlers\AntlersString;
 
 /**
- * @method static mixed parser()
- * @method static mixed usingParser(Parser $parser, Closure $callback)
- * @method static mixed parse($str, $variables = [])
- * @method static string parseLoop($content, $data, $supplement = true, $context = [])
+ * @method static Parser parser()
+ * @method static mixed usingParser(Parser $parser, \Closure $callback)
+ * @method static AntlersString parse(string $str, array $variables = [])
+ * @method static string parseLoop(string $content, array $data, bool $supplement = true, array $context = [])
+ * @method static array identifiers(string $content)
  *
  * @see \Statamic\View\Antlers\Antlers
  */

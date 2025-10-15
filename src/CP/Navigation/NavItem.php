@@ -188,15 +188,19 @@ class NavItem
      */
     public function icon($icon = null)
     {
-        return $this
-            ->fluentlyGetOrSet('icon')
-            ->getter(function ($value) {
-                return $value ?? Statamic::svg('entries');
-            })
-            ->setter(function ($value) {
-                return Str::startsWith($value, '<svg') ? $value : Statamic::svg('icons/light/'.$value);
-            })
-            ->args(func_get_args());
+        return $this->fluentlyGetOrSet('icon')->args(func_get_args());
+    }
+
+    /**
+     * Get icon as resolved renderable SVG.
+     *
+     * @return string
+     */
+    public function svg()
+    {
+        $value = $this->icon() ?? 'entries';
+
+        return Str::startsWith($value, '<svg') ? $value : Statamic::svg('icons/light/'.$value);
     }
 
     /**
@@ -278,12 +282,28 @@ class NavItem
     }
 
     /**
-     * Check if this nav item was ever a child before user preferences were applied.
-     *
-     * @param  bool|null  $isChild
-     * @return mixed
+     * Check if current url is a restful descendant.
      */
-    protected function wasOriginallyChild()
+    protected function currentUrlIsRestfulDescendant(): bool
+    {
+        return (bool) Str::endsWith(request()->url(), [
+            '/create',
+            '/edit',
+        ]);
+    }
+
+    /**
+     * Check if we should assume nested URL conventions for active state on children.
+     */
+    protected function doesntHaveExplicitChildren(): bool
+    {
+        return (bool) ! $this->children;
+    }
+
+    /**
+     * Check if this nav item was ever a child before user preferences were applied.
+     */
+    protected function wasOriginallyChild(): bool
     {
         return (bool) $this->wasOriginallyChild;
     }
@@ -378,8 +398,13 @@ class NavItem
         // If the current URL is not explicitly referenced in the CP nav,
         // and if this item is/was ever a child nav item,
         // then check against URL heirarchy conventions using regex pattern.
-        if ($this->currentUrlIsNotExplicitlyReferencedInNav() && $this->wasOriginallyChild()) {
-            return $this->isActiveByPattern($this->active);
+        if ($this->currentUrlIsNotExplicitlyReferencedInNav()) {
+            switch (true) {
+                case $this->currentUrlIsRestfulDescendant():
+                case $this->doesntHaveExplicitChildren():
+                case $this->wasOriginallyChild():
+                    return $this->isActiveByPattern($this->active);
+            }
         }
 
         return request()->url() === URL::removeQueryAndFragment($this->url);

@@ -9,10 +9,12 @@ use Statamic\CP\Breadcrumbs;
 use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades\Action;
 use Statamic\Facades\Asset;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\User;
+use Statamic\Hooks\CP\EntriesIndexQuery;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Entries\Entries;
@@ -49,7 +51,7 @@ class EntriesController extends CpController
             $query->orderBy($sortField, $sortDirection);
         }
 
-        $entries = $query->paginate(request('perPage'));
+        $entries = (new EntriesIndexQuery($query, $collection))->paginate(request('perPage'));
 
         if (request('search') && $collection->hasSearchIndex()) {
             $entries->setCollection($entries->getCollection()->map->getSearchable());
@@ -69,7 +71,11 @@ class EntriesController extends CpController
 
         if ($search = request('search')) {
             if ($collection->hasSearchIndex()) {
-                return $collection->searchIndex()->ensureExists()->search($search);
+                return $collection
+                    ->searchIndex()
+                    ->ensureExists()
+                    ->search($search)
+                    ->where('collection', $collection->handle());
             }
 
             $query->where('title', 'like', '%'.$search.'%');
@@ -88,6 +94,7 @@ class EntriesController extends CpController
 
         $entry = $entry->fromWorkingCopy();
 
+        Blink::forget("entry-{$entry->id()}-blueprint");
         $blueprint = $entry->blueprint();
 
         if (! $blueprint) {
@@ -100,7 +107,7 @@ class EntriesController extends CpController
             $blueprint->ensureFieldHasConfig('author', ['visibility' => 'read_only']);
         }
 
-        [$values, $meta] = $this->extractFromFields($entry, $blueprint);
+        [$values, $meta, $extraValues] = $this->extractFromFields($entry, $blueprint);
 
         if ($hasOrigin = $entry->hasOrigin()) {
             [$originValues, $originMeta] = $this->extractFromFields($entry->origin(), $blueprint);
@@ -120,6 +127,7 @@ class EntriesController extends CpController
                 'editBlueprint' => cp_route('collections.blueprints.edit', [$collection, $blueprint]),
             ],
             'values' => array_merge($values, ['id' => $entry->id()]),
+            'extraValues' => $extraValues,
             'meta' => $meta,
             'collection' => $collection->handle(),
             'collectionHasRoutes' => ! is_null($collection->route($entry->locale())),
@@ -247,7 +255,7 @@ class EntriesController extends CpController
                         ->save();
                 });
 
-                $values->forget('parent');
+                $entry->remove('parent');
             }
         }
 
@@ -269,11 +277,12 @@ class EntriesController extends CpController
             $saved = $entry->updateLastModified(User::current())->save();
         }
 
-        [$values] = $this->extractFromFields($entry, $blueprint);
+        [$values, $meta, $extraValues] = $this->extractFromFields($entry, $blueprint);
 
         return [
             'data' => array_merge((new EntryResource($entry->fresh()))->resolve()['data'], [
                 'values' => $values,
+                'extraValues' => $extraValues,
             ]),
             'saved' => $saved,
         ];
@@ -318,8 +327,12 @@ class EntriesController extends CpController
             'title' => $collection->createLabel(),
             'actions' => [
                 'save' => cp_route('collections.entries.store', [$collection->handle(), $site->handle()]),
+                'editBlueprint' => cp_route('collections.blueprints.edit', [$collection, $blueprint]),
             ],
             'values' => $values->all(),
+            'extraValues' => [
+                'depth' => 1,
+            ],
             'meta' => $fields->meta(),
             'collection' => $collection->handle(),
             'collectionCreateLabel' => $collection->createLabel(),
@@ -539,7 +552,7 @@ class EntriesController extends CpController
             ],
             [
                 'text' => $collection->title(),
-                'url' => $collection->showUrl(),
+                'url' => $collection->breadcrumbUrl(),
             ],
         ]);
     }

@@ -3,9 +3,12 @@
 namespace Statamic\Providers;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Env;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Actions;
 use Statamic\Actions\Action;
+use Statamic\Dictionaries;
+use Statamic\Dictionaries\Dictionary;
 use Statamic\Extend\Manifest;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes;
@@ -48,6 +51,13 @@ class ExtensionServiceProvider extends ServiceProvider
         Actions\Impersonate::class,
     ];
 
+    protected $dictionaries = [
+        Dictionaries\Countries::class,
+        Dictionaries\Currencies::class,
+        Dictionaries\File::class,
+        Dictionaries\Timezones::class,
+    ];
+
     protected $fieldtypes = [
         Fieldtypes\Arr::class,
         Fieldtypes\AssetContainer::class,
@@ -63,6 +73,8 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Collections::class,
         Fieldtypes\Color::class,
         Fieldtypes\Date::class,
+        Fieldtypes\Dictionary::class,
+        Fieldtypes\DictionaryFields::class,
         Fieldtypes\Entries::class,
         Fieldtypes\FieldDisplay::class,
         Fieldtypes\Files::class,
@@ -155,6 +167,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Collection\Collection::class,
         Tags\Cookie::class,
         Tags\Dd::class,
+        Tags\Dictionary\Dictionary::class,
         Tags\Dump::class,
         Tags\GetContent::class,
         Tags\GetError::class,
@@ -246,10 +259,16 @@ class ExtensionServiceProvider extends ServiceProvider
 
     protected function registerAddonManifest()
     {
+        $cachePath = $this->app->bootstrapPath().'/cache/addons.php';
+
+        if (! is_null($env = Env::get('STATAMIC_ADDONS_CACHE'))) {
+            $cachePath = Str::startsWith($env, ['/', '\\']) ? $env : $this->app->basePath($env);
+        }
+
         $this->app->instance(Manifest::class, new Manifest(
             new Filesystem,
             $this->app->basePath(),
-            $this->app->bootstrapPath().'/cache/addons.php'
+            $cachePath
         ));
     }
 
@@ -262,6 +281,11 @@ class ExtensionServiceProvider extends ServiceProvider
                 'class' => Action::class,
                 'directory' => 'Actions',
                 'extensions' => $this->actions,
+            ],
+            'dictionaries' => [
+                'class' => Dictionary::class,
+                'directory' => 'Dictionaries',
+                'extensions' => $this->dictionaries,
             ],
             'fieldtypes' => [
                 'class' => Fieldtype::class,
@@ -318,9 +342,12 @@ class ExtensionServiceProvider extends ServiceProvider
             return;
         }
 
-        foreach ($this->app['files']->files($path) as $file) {
+        foreach ($this->app['files']->allFiles($path) as $file) {
+            $relativePathOfFolder = str_replace(app_path(DIRECTORY_SEPARATOR), '', $file->getPath());
+            $namespace = str_replace('/', '\\', $relativePathOfFolder);
             $class = $file->getBasename('.php');
-            $fqcn = $this->app->getNamespace()."{$folder}\\{$class}";
+
+            $fqcn = $this->app->getNamespace()."{$namespace}\\{$class}";
             if (is_subclass_of($fqcn, $requiredClass)) {
                 $fqcn::register();
             }

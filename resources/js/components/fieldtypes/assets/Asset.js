@@ -41,7 +41,7 @@ export default {
         },
 
         canBeTransparent() {
-            return ['png', 'svg'].includes(this.asset.extension)
+            return ['png', 'svg', 'webp', 'avif'].includes(this.asset.extension)
         },
 
         canDownload() {

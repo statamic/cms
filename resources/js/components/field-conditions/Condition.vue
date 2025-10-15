@@ -103,7 +103,7 @@ export default {
 
         showValueToggle() {
             return this.field
-                && ['toggle'].includes(this.field.config.type)
+                && ['toggle', 'revealer'].includes(this.field.config.type)
                 && ['equals', 'not', '===', '!=='].includes(this.condition.operator);
         },
 

@@ -22,7 +22,9 @@ class ForgotPasswordController extends Controller
 
     public function showLinkRequestForm()
     {
-        return view('statamic::auth.passwords.email');
+        return view('statamic::auth.passwords.email')->with([
+            'title' => __('Forgot Your Password?'),
+        ]);
     }
 
     public function sendResetLinkEmail(Request $request)

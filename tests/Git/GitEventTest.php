@@ -377,6 +377,31 @@ class GitEventTest extends TestCase
     }
 
     #[Test]
+    public function it_commits_when_site_is_saved_and_deleted()
+    {
+        // Ensure we have one `en` site to start
+        Facades\File::put(resource_path('sites.yaml'), Facades\YAML::dump([
+            'en' => [
+                'name' => 'English',
+                'url' => 'http://localhost/',
+                'locale' => 'en_US',
+            ],
+        ]));
+
+        Git::shouldReceive('dispatchCommit')->with('Site saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Site deleted')->once();
+
+        // Delete the `en` site and save a new `fr` site
+        Facades\Site::setSites([
+            'fr' => [
+                'name' => 'French',
+                'url' => 'http://localhost/',
+                'locale' => 'fr_FR',
+            ],
+        ])->save();
+    }
+
+    #[Test]
     public function it_commits_when_asset_container_is_saved_and_deleted()
     {
         Git::shouldReceive('dispatchCommit')->with('Asset container saved')->once();

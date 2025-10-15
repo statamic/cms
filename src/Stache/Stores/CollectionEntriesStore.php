@@ -160,7 +160,7 @@ class CollectionEntriesStore extends ChildStore
         $indexes = collect([
             'slug',
             'uri',
-            'collection',
+            'collectionHandle',
             'published',
             'title',
             'site' => Indexes\Site::class,

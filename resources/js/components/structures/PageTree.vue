@@ -35,6 +35,7 @@
                 @nodeOpenChanged="saveTreeState"
             >
                 <tree-branch
+                    :ref="`branch-${page.id}`"
                     slot-scope="{ data: page, store, vm }"
                     :page="page"
                     :depth="vm.level"
@@ -206,6 +207,10 @@ export default {
             };
 
             return this.$axios.patch(this.submitUrl, payload).then(response => {
+                if (! response.data.saved) {
+                    return this.$toast.error(`Couldn't save tree`)
+                }
+
                 this.$emit('saved', response);
                 this.$toast.success(__('Saved'));
                 this.initialPages = this.pages;

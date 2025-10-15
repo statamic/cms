@@ -46,6 +46,12 @@ class CacheServiceProvider extends ServiceProvider
                 ), $this->app['config']['cache.stores.file']);
             });
 
+            // Don't extend the file store if it's already being extended.
+            $creators = (fn () => $this->customCreators)->call(Cache::getFacadeRoot());
+            if (isset($creators['file'])) {
+                return;
+            }
+
             Cache::extend('file', function ($app, $config) {
                 return Cache::repository(
                     (new FileStore($app['files'], $config['path'], $config['permission'] ?? null))
@@ -70,7 +76,7 @@ class CacheServiceProvider extends ServiceProvider
 
             $keyValuePair = $callback();
             $value = reset($keyValuePair);
-            $expiration = Carbon::now()->addMinutes(key($keyValuePair));
+            $expiration = Carbon::now()->addMinutes((int) key($keyValuePair));
 
             return Cache::remember($cacheKey, $expiration, function () use ($value) {
                 return $value;

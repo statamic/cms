@@ -24,7 +24,7 @@ class Textarea extends Fieldtype
                     'character_limit' => [
                         'display' => __('Character Limit'),
                         'instructions' => __('statamic::fieldtypes.text.config.character_limit'),
-                        'type' => 'text',
+                        'type' => 'integer',
                     ],
                     'default' => [
                         'display' => __('Default Value'),

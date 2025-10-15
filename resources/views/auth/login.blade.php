@@ -35,7 +35,7 @@
                 @endif
             @endif
 
-            <form method="POST" v-show="showEmailLogin" class="email-login select-none" @if ($oauth) v-cloak @endif>
+            <form method="POST" v-show="showEmailLogin" class="email-login select-none" @if ($oauth) v-cloak @endif @submit="busy = true">
                 {!! csrf_field() !!}
 
                 <input type="hidden" name="referer" value="{{ $referer }}" />
@@ -56,7 +56,7 @@
                         <input type="checkbox" name="remember" id="remember-me">
                         <span class="rtl:mr-2 ltr:ml-2">{{ __('Remember me') }}</span>
                     </label>
-                    <button type="submit" class="btn-primary">{{ __('Log in') }}</button>
+                    <button type="submit" class="btn-primary" :disabled="busy">{{ __('Log in') }}</button>
                 </div>
             </form>
         </div>

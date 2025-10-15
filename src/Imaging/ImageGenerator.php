@@ -11,7 +11,6 @@ use League\Glide\Manipulators\Watermark;
 use League\Glide\Server;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Events\GlideImageGenerated;
-use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Asset as Assets;
 use Statamic\Facades\Config;
 use Statamic\Facades\File;
@@ -120,12 +119,13 @@ class ImageGenerator
         $this->setParams($params);
 
         $parsed = $this->parseUrl($url);
+        $qs = $parsed['query'];
 
         $this->server->setSource($this->guzzleSourceFilesystem($parsed['base']));
         $this->server->setSourcePathPrefix('/');
         $this->server->setCachePathPrefix('http');
 
-        return $this->generate($parsed['path']);
+        return $this->generate($parsed['path'].($qs ? '?'.$qs : ''));
     }
 
     /**
@@ -199,7 +199,7 @@ class ImageGenerator
     private function getWatermarkFilesystemAndParam($item)
     {
         if (is_string($item) && Str::startsWith($item, 'asset::')) {
-            $decoded = base64_decode(Str::after($item, 'asset::'));
+            $decoded = Str::fromBase64Url(Str::after($item, 'asset::'));
             [$container, $path] = explode('/', $decoded, 2);
             $item = Assets::find($container.'::'.$path);
         }
@@ -258,7 +258,7 @@ class ImageGenerator
         try {
             $path = $this->server->makeImage($image, $this->params);
         } catch (GlideFileNotFoundException $e) {
-            throw new NotFoundHttpException;
+            throw UnableToReadFile::fromLocation($image);
         }
 
         GlideImageGenerated::dispatch($path, $this->params);
@@ -331,6 +331,7 @@ class ImageGenerator
         return [
             'path' => Str::after($parsed['path'], '/'),
             'base' => $parsed['scheme'].'://'.$parsed['host'],
+            'query' => $parsed['query'] ?? null,
         ];
     }
 }

@@ -7,6 +7,7 @@ use Statamic\Contracts\Entries\Collection as CollectionContract;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Column;
 use Statamic\Exceptions\SiteNotFoundException;
+use Statamic\Facades\Action;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Scope;
@@ -19,13 +20,37 @@ use Statamic\Structures\CollectionStructure;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class CollectionsController extends CpController
 {
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('index', CollectionContract::class, __('You are not authorized to view collections.'));
 
-        $collections = Collection::all()->filter(function ($collection) {
+        $columns = [
+            Column::make('title')->label(__('Title')),
+            Column::make('entries')->label(__('Entries'))->numeric(true),
+        ];
+
+        if ($request->wantsJson()) {
+            return [
+                'data' => $this->collections(),
+                'meta' => [
+                    'columns' => $columns,
+                ],
+            ];
+        }
+
+        return view('statamic::collections.index', [
+            'collections' => $this->collections(),
+            'columns' => $columns,
+        ]);
+    }
+
+    private function collections()
+    {
+        return Collection::all()->filter(function ($collection) {
             return User::current()->can('configure collections')
                 || User::current()->can('view', $collection)
                 && $collection->sites()->contains(Site::selected()->handle());
@@ -44,16 +69,10 @@ class CollectionsController extends CpController
                 'editable' => User::current()->can('edit', $collection),
                 'blueprint_editable' => User::current()->can('configure fields'),
                 'available_in_selected_site' => $collection->sites()->contains(Site::selected()->handle()),
+                'actions' => Action::for($collection),
+                'actions_url' => cp_route('collections.actions.run', ['collection' => $collection->handle()]),
             ];
         })->values();
-
-        return view('statamic::collections.index', [
-            'collections' => $collections,
-            'columns' => [
-                Column::make('title')->label(__('Title')),
-                Column::make('entries')->label(__('Entries'))->numeric(true),
-            ],
-        ]);
     }
 
     public function show(Request $request, $collection)
@@ -98,11 +117,13 @@ class CollectionsController extends CpController
                 'collection' => $collection->handle(),
                 'blueprints' => $blueprints->pluck('handle')->all(),
             ]),
-            'sites' => $this->getAuthorizedSitesForCollection($collection),
+            'sites' => $authorizedSites = $this->getAuthorizedSitesForCollection($collection),
             'createUrls' => $collection->sites()
                 ->mapWithKeys(fn ($site) => [$site => cp_route('collections.entries.create', [$collection->handle(), $site])])
                 ->all(),
             'canCreate' => User::current()->can('create', [EntryContract::class, $collection]) && $collection->hasVisibleEntryBlueprint(),
+            'canChangeLocalizationDeleteBehavior' => count($authorizedSites) > 1 && (count($authorizedSites) == $collection->sites()->count()),
+            'actions' => Action::for($collection, ['view' => 'form']),
         ];
 
         if ($collection->queryEntries()->count() === 0) {

@@ -8,6 +8,7 @@
             :title="action.title"
             :danger="action.dangerous"
             :buttonText="runButtonText"
+            :busy="running"
             @confirm="confirm"
             @cancel="reset"
         >
@@ -71,6 +72,7 @@ export default {
             confirming: false,
             fieldset: {tabs:[{fields:this.action.fields}]},
             values: this.action.values,
+            running: false,
         }
     },
 
@@ -113,6 +115,9 @@ export default {
     },
 
     methods: {
+        onDone() {
+            this.running = false;
+        },
 
         select() {
             if (this.action.confirm) {
@@ -120,11 +125,13 @@ export default {
                 return;
             }
 
-            this.$emit('selected', this.action, this.values);
+            this.running = true;
+            this.$emit('selected', this.action, this.values, this.onDone);
         },
 
         confirm() {
-            this.$emit('selected', this.action, this.values);
+            this.running = true;
+            this.$emit('selected', this.action, this.values, this.onDone);
         },
 
         reset() {

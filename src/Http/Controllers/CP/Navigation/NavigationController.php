@@ -49,6 +49,7 @@ class NavigationController extends CpController
             'root' => $nav->expectsRoot(),
             'sites' => $nav->trees()->keys()->all(),
             'max_depth' => $nav->maxDepth(),
+            'select_across_sites' => $nav->canSelectAcrossSites(),
         ];
 
         $fields = ($blueprint = $this->editFormBlueprint($nav))
@@ -132,6 +133,8 @@ class NavigationController extends CpController
             foreach (array_diff($existingSites, $sites) as $site) {
                 $nav->in($site)->delete();
             }
+
+            $nav->canSelectAcrossSites($values['select_across_sites']);
         }
 
         $nav->save();
@@ -230,6 +233,12 @@ class NavigationController extends CpController
                 'type' => 'sites',
                 'mode' => 'select',
                 'required' => true,
+            ];
+
+            $contents['options']['fields']['select_across_sites'] = [
+                'display' => __('Select Across Sites'),
+                'instructions' => __('statamic::messages.navigation_configure_select_across_sites'),
+                'type' => 'toggle',
             ];
         }
 

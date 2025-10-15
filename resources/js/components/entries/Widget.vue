@@ -31,6 +31,7 @@
                     :resource-meta="meta"
                     @page-selected="selectPage"
                     :scroll-to-top="false"
+                    :show-page-links="false"
                 />
             </div>
         </data-list>
@@ -70,7 +71,7 @@ export default {
             } else if (entry.published) {
                 return 'bg-green-600';
             } else {
-                return 'bg-gray-400';
+                return 'bg-gray-400 dark:bg-dark-200';
             }
         },
 

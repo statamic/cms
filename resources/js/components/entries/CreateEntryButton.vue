@@ -12,8 +12,10 @@
         </template>
         <h6 v-text="__('Choose Blueprint')" class="p-2" />
 
-        <div v-for="blueprint in blueprints" :key="blueprint.handle">
-            <dropdown-item :text="blueprint.title" @click="select(blueprint.handle, $event)" />
+        <div class="max-h-[75vh] overflow-y-auto">
+            <div v-for="blueprint in blueprints" :key="blueprint.handle"">
+                <dropdown-item :text="blueprint.title" @click="select(blueprint.handle, $event)" />
+            </div>
         </div>
     </dropdown-list>
 

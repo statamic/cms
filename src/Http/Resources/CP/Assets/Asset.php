@@ -23,6 +23,7 @@ class Asset extends JsonResource
             'size' => Str::fileSizeForHumans($this->size()),
             'lastModified' => $this->lastModified()->inPreferredFormat(),
             'lastModifiedRelative' => $this->lastModified()->diffForHumans(),
+            'mimeType' => $this->mimeType(),
             'isImage' => $this->isImage(),
             'isSvg' => $this->isSvg(),
             'isAudio' => $this->isAudio(),
@@ -31,10 +32,21 @@ class Asset extends JsonResource
             'isPdf' => $this->isPdf(),
             'isPreviewable' => $this->isPreviewable(),
 
-            $this->mergeWhen($this->isImage() || $this->isSvg(), function () {
+            $this->mergeWhen($this->hasDimensions(), function () {
                 return [
                     'width' => $this->width(),
                     'height' => $this->height(),
+                ];
+            }),
+
+            $this->mergeWhen($this->hasDuration(), function () {
+                return [
+                    'duration' => $this->duration(),
+                ];
+            }),
+
+            $this->mergeWhen($this->isImage() || $this->isSvg(), function () {
+                return [
                     'preview' => $this->previewUrl(),
                     'thumbnail' => $this->thumbnailUrl('small'),
                 ];
@@ -48,7 +60,7 @@ class Asset extends JsonResource
 
             $this->merge($this->publishFormData()),
 
-            'allowDownloading' => $this->container()->allowDownloading(),
+            'allowDownloading' => config('statamic.assets.v6_permissions') ? true : $this->container()->allowDownloading(),
             'actionUrl' => cp_route('assets.actions.run'),
             'actions' => Action::for($this->resource, [
                 'container' => $this->container()->handle(),

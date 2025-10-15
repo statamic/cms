@@ -96,6 +96,10 @@ class CoreModifiers extends Modifier
      */
     public function ampersandList($value, $params)
     {
+        if ($value instanceof Collection) {
+            $value = $value->all();
+        }
+
         if (! is_array($value)) {
             return $value;
         }
@@ -281,6 +285,11 @@ class CoreModifiers extends Modifier
         $text = '';
         while (count($value)) {
             $item = array_shift($value);
+
+            if (! isset($item['type'])) {
+                continue;
+            }
+
             if ($item['type'] === 'text') {
                 $text .= ' '.($item['text'] ?? '');
             }
@@ -537,7 +546,7 @@ class CoreModifiers extends Modifier
      */
     public function daysAgo($value, $params)
     {
-        return $this->carbon($value)->diffInDays(Arr::get($params, 0));
+        return (int) abs($this->carbon($value)->diffInDays(Arr::get($params, 0)));
     }
 
     /**
@@ -706,6 +715,19 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Filters out empty values from an array or collection.
+     *
+     * @param  array  $value
+     * @return array
+     */
+    public function filterEmpty($value)
+    {
+        return collect($value)
+            ->filter()
+            ->when(is_array($value), fn ($collection) => $collection->all());
+    }
+
+    /**
      * Returns the first $params[0] characters of a string, or the first element of an array.
      *
      * @return string
@@ -714,6 +736,10 @@ class CoreModifiers extends Modifier
     {
         if (is_array($value)) {
             return Arr::first($value);
+        }
+
+        if ($value instanceof Collection) {
+            return $value->first();
         }
 
         return Stringy::first($value, Arr::get($params, 0));
@@ -961,6 +987,50 @@ class CoreModifiers extends Modifier
         }
     }
 
+    /**
+     * Returns true if the array contains $needle, false otherwise
+     *
+     * @param  string|array  $haystack
+     * @param  array  $params
+     * @param  array  $context
+     * @return bool
+     */
+    public function overlaps($haystack, $params, $context)
+    {
+        $needle = $this->getFromContext($context, $params);
+
+        if ($needle instanceof Collection) {
+            $needle = $needle->values()->all();
+        }
+
+        if (! is_array($needle)) {
+            $needle = [$needle];
+        }
+
+        if ($haystack instanceof Collection) {
+            $haystack = $haystack->values()->all();
+        }
+
+        if (! is_array($haystack)) {
+            return false;
+        }
+
+        return count(array_intersect($haystack, $needle)) > 0;
+    }
+
+    /**
+     * Returns false if the array contains $needle, true otherwise
+     *
+     * @param  string|array  $haystack
+     * @param  array  $params
+     * @param  array  $context
+     * @return bool
+     */
+    public function doesnt_overlap($haystack, $params, $context)
+    {
+        return ! $this->overlaps($haystack, $params, $context);
+    }
+
     private function renderAPStyleHeadline($value)
     {
         $exceptions = [
@@ -1033,7 +1103,7 @@ class CoreModifiers extends Modifier
      */
     public function hoursAgo($value, $params)
     {
-        return $this->carbon($value)->diffInHours(Arr::get($params, 0));
+        return (int) abs($this->carbon($value)->diffInHours(Arr::get($params, 0)));
     }
 
     /**
@@ -1452,6 +1522,10 @@ class CoreModifiers extends Modifier
     {
         $limit = Arr::get($params, 0, 0);
 
+        if (Compare::isQueryBuilder($value)) {
+            return $value->limit($limit);
+        }
+
         if ($value instanceof Collection) {
             return $value->take($limit);
         }
@@ -1591,7 +1665,7 @@ class CoreModifiers extends Modifier
      */
     public function minutesAgo($value, $params)
     {
-        return $this->carbon($value)->diffInMinutes(Arr::get($params, 0));
+        return (int) abs($this->carbon($value)->diffInMinutes(Arr::get($params, 0)));
     }
 
     /**
@@ -1626,7 +1700,7 @@ class CoreModifiers extends Modifier
      */
     public function monthsAgo($value, $params)
     {
-        return $this->carbon($value)->diffInMonths(Arr::get($params, 0));
+        return (int) abs($this->carbon($value)->diffInMonths(Arr::get($params, 0)));
     }
 
     /**
@@ -1820,6 +1894,41 @@ class CoreModifiers extends Modifier
             }
 
             return method_exists($item, 'value') ? $item->value($key) : $item->get($key);
+        });
+
+        return $wasArray ? $items->all() : $items;
+    }
+
+    /**
+     * Selects certain values from each item in a collection.
+     *
+     * @param  array|Collection  $value
+     * @param  array  $params
+     * @return array|Collection
+     */
+    public function select($value, $params)
+    {
+        $keys = Arr::wrap($params);
+
+        if ($wasArray = is_array($value)) {
+            $value = collect($value);
+        }
+
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
+
+        $items = $value->map(function ($item) use ($keys) {
+            return collect($keys)->mapWithKeys(function ($key) use ($item) {
+                $value = null;
+                if (is_array($item) || $item instanceof ArrayAccess) {
+                    $value = Arr::get($item, $key);
+                } else {
+                    $value = method_exists($item, 'value') ? $item->value($key) : $item->get($key);
+                }
+
+                return [$key => $value];
+            })->all();
         });
 
         return $wasArray ? $items->all() : $items;
@@ -2058,6 +2167,24 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Resolves a specific index or all items from an array, a Collection, or a Query Builder.
+     */
+    public function resolve($value, $params)
+    {
+        $key = Arr::get($params, 0);
+
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
+
+        if ($value instanceof Collection) {
+            $value = $value->all();
+        }
+
+        return Arr::get($value, $key);
+    }
+
+    /**
      * Reverses the order of a string or list.
      *
      * @param  string|array|Collection  $value
@@ -2173,7 +2300,7 @@ class CoreModifiers extends Modifier
      */
     public function secondsAgo($value, $params)
     {
-        return $this->carbon($value)->diffInSeconds(Arr::get($params, 0));
+        return (int) abs($this->carbon($value)->diffInSeconds(Arr::get($params, 0)));
     }
 
     /**
@@ -2319,7 +2446,12 @@ class CoreModifiers extends Modifier
     public function sort($value, $params)
     {
         $key = Arr::get($params, 0, 'true');
-        $desc = strtolower(Arr::get($params, 1, 'asc')) == 'desc';
+        $order = strtolower(Arr::get($params, 1, 'asc'));
+        $desc = $order == 'desc';
+
+        if (Compare::isQueryBuilder($value)) {
+            return $key === 'random' ? $value->inRandomOrder() : $value->orderBy($key, $order);
+        }
 
         $value = $value instanceof Collection ? $value : collect($value);
 
@@ -2867,7 +2999,7 @@ class CoreModifiers extends Modifier
      */
     public function weeksAgo($value, $params)
     {
-        return $this->carbon($value)->diffInWeeks(Arr::get($params, 0));
+        return (int) abs($this->carbon($value)->diffInWeeks(Arr::get($params, 0)));
     }
 
     /**
@@ -2886,12 +3018,29 @@ class CoreModifiers extends Modifier
         if (! $opr && Str::contains($key, ':')) {
             [$key, $opr] = explode(':', $key);
         }
-        if (! $val) {
+        if (count($params) < 3) {
             $val = $opr;
             $opr = '==';
         }
 
         $collection = collect($value)->where($key, $opr, $val);
+
+        return $collection->values()->all();
+    }
+
+    /**
+     * Filters the data by a given key that matches an array of values.
+     *
+     * @param  array  $value
+     * @param  array  $params
+     * @return array
+     */
+    public function whereIn($value, $params)
+    {
+        $key = Arr::get($params, 0);
+        $arr = Arr::get($params, 1);
+
+        $collection = collect($value)->whereIn($key, $arr);
 
         return $collection->values()->all();
     }
@@ -2962,7 +3111,7 @@ class CoreModifiers extends Modifier
      */
     public function yearsAgo($value, $params)
     {
-        return $this->carbon($value)->diffInYears(Arr::get($params, 0));
+        return (int) abs($this->carbon($value)->diffInYears(Arr::get($params, 0)));
     }
 
     /**
@@ -3023,6 +3172,10 @@ class CoreModifiers extends Modifier
             $url = str_replace('//youtube-nocookie.com', '//www.youtube-nocookie.com', $url);
         }
 
+        if (Str::contains($url, '&') && ! Str::contains($url, '?')) {
+            $url = Str::replaceFirst('&', '?', $url);
+        }
+
         return $url;
     }
 
@@ -3050,6 +3203,10 @@ class CoreModifiers extends Modifier
 
         if (Str::contains($url, 'youtube.com/watch?v=')) {
             $url = str_replace('watch?v=', 'embed/', $url);
+        }
+
+        if (Str::contains($url, '&') && ! Str::contains($url, '?')) {
+            $url = Str::replaceFirst('&', '?', $url);
         }
 
         return $url;
@@ -3119,7 +3276,7 @@ class CoreModifiers extends Modifier
     private function carbon($value)
     {
         if (! $value instanceof Carbon) {
-            $value = (is_numeric($value)) ? Date::createFromTimestamp($value) : Date::parse($value);
+            $value = (is_numeric($value)) ? Date::createFromTimestamp($value, config('app.timezone')) : Date::parse($value);
         }
 
         return $value;
@@ -3144,7 +3301,8 @@ class CoreModifiers extends Modifier
     private function handleUnlistedVimeoUrls($url)
     {
         $hash = '';
-        if (Str::substrCount($url, '/') > 4) {
+
+        if (! Str::contains($url, 'progressive_redirect') && Str::substrCount($url, '/') > 4) {
             $hash = Str::afterLast($url, '/');
             $url = Str::beforeLast($url, '/');
 

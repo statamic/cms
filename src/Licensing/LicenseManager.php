@@ -4,6 +4,7 @@ namespace Statamic\Licensing;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Support\MessageBag;
+use Statamic\Events\LicensesRefreshed;
 use Statamic\Support\Arr;
 
 class LicenseManager
@@ -34,13 +35,18 @@ class LicenseManager
     public function failedRequestRetrySeconds()
     {
         return $this->requestRateLimited()
-            ? Carbon::createFromTimestamp($this->response('expiry'))->diffInSeconds()
+            ? (int) Carbon::createFromTimestamp($this->response('expiry'), config('app.timezone'))->diffInSeconds(absolute: true)
             : null;
     }
 
     public function requestValidationErrors()
     {
         return new MessageBag($this->response('error') === 422 ? $this->response('errors') : []);
+    }
+
+    public function outpostIsOffline()
+    {
+        return $this->requestErrorCode() >= 500 && $this->requestErrorCode() < 600;
     }
 
     public function isOnPublicDomain()
@@ -116,6 +122,8 @@ class LicenseManager
     public function refresh()
     {
         $this->outpost->clearCachedResponse();
+
+        LicensesRefreshed::dispatch();
     }
 
     public function usingLicenseKeyFile()

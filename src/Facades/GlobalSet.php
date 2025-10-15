@@ -7,12 +7,14 @@ use Statamic\Contracts\Globals\GlobalRepository;
 
 /**
  * @method static \Statamic\Globals\GlobalCollection all()
- * @method static null|\Statamic\Globals\GlobalCollection find($id)
- * @method static null|\Statamic\Globals\GlobalCollection findByHandle($handle)
- * @method static \Statamic\Globals\GlobalCollection findOrFail($id)
- * @method static void save($global);
+ * @method static null|\Statamic\Contracts\Globals\GlobalSet find($id)
+ * @method static null|\Statamic\Contracts\Globals\GlobalSet findByHandle(string $handle)
+ * @method static \Statamic\Contracts\Globals\GlobalSet findOrFail($id)
+ * @method static void save(\Statamic\Contracts\Globals\GlobalSet $global)
+ * @method static void delete(\Statamic\Contracts\Globals\GlobalSet $global)
  *
- * @see \Statamic\Globals\GlobalCollection
+ * @see \Statamic\Stache\Repositories\GlobalRepository
+ * @link \Statamic\Globals\GlobalSet
  */
 class GlobalSet extends Facade
 {

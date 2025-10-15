@@ -3,10 +3,12 @@
 namespace Tests\StaticCaching;
 
 use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\UrlInvalidated;
+use Statamic\Facades\File;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\StaticCaching\Cachers\Writer;
@@ -297,6 +299,32 @@ class FileCacherTest extends TestCase
     }
 
     #[Test]
+    public function invalidating_a_url_deletes_the_file_even_if_it_is_not_in_application_cache()
+    {
+        $writer = \Mockery::spy(Writer::class);
+        $cache = app(Repository::class);
+        $cacher = $this->fileCacher([
+            'path' => public_path('static'),
+        ], $writer, $cache);
+
+        File::put($cacher->getFilePath('/one'), '');
+        File::put($cacher->getFilePath('/one?foo=bar'), '');
+        File::put($cacher->getFilePath('/onemore'), '');
+        File::put($cacher->getFilePath('/two'), '');
+
+        $cacher->invalidateUrl('/one', 'http://example.com');
+
+        File::delete($cacher->getFilePath('/one'));
+        File::delete($cacher->getFilePath('/one?foo=bar'));
+        File::delete($cacher->getFilePath('/onemore'));
+        File::delete($cacher->getFilePath('/two'));
+
+        $writer->shouldHaveReceived('delete')->times(2);
+        $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/one'))->once();
+        $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/one?foo=bar'))->once();
+    }
+
+    #[Test]
     #[DataProvider('invalidateEventProvider')]
     public function invalidating_a_url_dispatches_event($domain, $expectedUrl)
     {
@@ -322,6 +350,60 @@ class FileCacherTest extends TestCase
             'no domain' => [null, 'http://base.com/foo'],
             'configured base domain' => ['http://base.com', 'http://base.com/foo'],
             'another domain' => ['http://another.com', 'http://another.com/foo'],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('currentUrlProvider')]
+    public function it_gets_the_current_url(
+        array $query,
+        array $config,
+        string $expectedUrl
+    ) {
+        $request = Request::create('http://example.com/test', 'GET', $query);
+
+        $cacher = $this->fileCacher($config);
+
+        $this->assertEquals($expectedUrl, $cacher->getUrl($request));
+    }
+
+    public static function currentUrlProvider()
+    {
+        return [
+            'no query' => [
+                [],
+                [],
+                'http://example.com/test',
+            ],
+            'with query' => [
+                ['bravo' => 'b', 'charlie' => 'c', 'alfa' => 'a'],
+                [],
+                'http://example.com/test?bravo=b&charlie=c&alfa=a',
+            ],
+            'with query, ignoring query' => [
+                ['bravo' => 'b', 'charlie' => 'c', 'alfa' => 'a'],
+                ['ignore_query_strings' => true],
+                'http://example.com/test',
+            ],
+            'with query, allowed query' => [
+                ['bravo' => 'b', 'charlie' => 'c', 'alfa' => 'a'],
+                ['allowed_query_strings' => ['alfa', 'bravo']],
+                'http://example.com/test?bravo=b&charlie=c&alfa=a', // allowed_query_strings has no effect
+            ],
+            'with query, disallowed query' => [
+                ['bravo' => 'b', 'charlie' => 'c', 'alfa' => 'a'],
+                ['disallowed_query_strings' => ['charlie']],
+                'http://example.com/test?bravo=b&charlie=c&alfa=a', // disallowed_query_strings has no effect
+
+            ],
+            'with query, allowed and disallowed' => [
+                ['bravo' => 'b', 'charlie' => 'c', 'alfa' => 'a'],
+                [
+                    'allowed_query_strings' => ['alfa', 'bravo'],
+                    'disallowed_query_strings' => ['bravo'],
+                ],
+                'http://example.com/test?bravo=b&charlie=c&alfa=a', // allowed_query_strings and disallowed_query_strings have no effect
+            ],
         ];
     }
 
