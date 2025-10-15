@@ -10,16 +10,10 @@ class AlgoliaIndexTest extends TestCase
 {
     use IndexTests;
 
-    public function getIndex()
+    public function getIndex($name)
     {
-        $name = 'algolia';
-
-        $locale = 'en';
-
-        $config = [];
-
         $client = Mockery::mock(\Algolia\AlgoliaSearch\SearchClient::class);
 
-        return new AlgoliaIndex($client, $name, $config, $locale);
+        return new AlgoliaIndex($client, $name, [], null);
     }
 }

@@ -35,12 +35,8 @@ class CombIndexTest extends TestCase
             ->andReturn('[[]]');
     }
 
-    public function getIndex()
+    public function getIndex($name)
     {
-        $name = 'local';
-
-        $config = [];
-
-        return new Index($name, $config);
+        return new Index($name, []);
     }
 }
