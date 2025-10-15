@@ -300,7 +300,7 @@ export default {
         },
     },
 
-        watch: {
+    watch: {
         view(view) {
             this.site = this.site || this.initialSite;
 
