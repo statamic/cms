@@ -127,8 +127,8 @@ const selectedDateEntries = computed(() => {
 });
 
 const columns = computed(() => [
-    { label: 'Title', field: 'title', visible: true },
-    { label: 'Status', field: 'status', visible: true }
+    { label: __('Title'), field: 'title', visible: true },
+    { label: __('Status'), field: 'status', visible: true }
 ]);
 
 watch(() => props.site, () => fetchEntries());
