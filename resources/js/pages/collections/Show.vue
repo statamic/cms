@@ -304,7 +304,6 @@ export default {
         view(view) {
             this.site = this.site || this.initialSite;
 
-            // Save to preferences instead of localStorage
             this.$preferences.set(`collections.${this.handle}.view`, view);
         },
     },
