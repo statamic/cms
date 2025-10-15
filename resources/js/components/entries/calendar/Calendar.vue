@@ -3,11 +3,11 @@ import { ref, watch, computed, getCurrentInstance } from 'vue';
 import axios from 'axios';
 import { CalendarHeader, CalendarHeading, CalendarRoot } from 'reka-ui';
 import { CalendarDate } from '@internationalized/date';
-import CalendarMonthView from './CalendarMonthView.vue';
-import CalendarWeekView from './CalendarWeekView.vue';
+import Month from './Month.vue';
+import Week from './Week.vue';
 import { Listing, StatusIndicator } from '@/components/ui';
 import DateFormatter from '@/components/DateFormatter.js';
-import { formatDateString, getWeekDates, getCurrentDateRange } from '@/util/calendar.js';
+import { formatDateString, getWeekDates, getCurrentDateRange } from './calendar.js';
 import { Link } from '@inertiajs/vue3';
 import { ToggleGroup, ToggleItem, Button, Popover, Label, Select, Heading } from '@ui';
 
@@ -223,8 +223,7 @@ function shouldFetchEntries(
                 </div>
             </CalendarHeader>
 
-            <!-- Month View -->
-            <CalendarMonthView
+            <Month
                 v-if="viewMode === 'month'"
                 :week-days="weekDays"
                 :grid="grid"
@@ -236,7 +235,7 @@ function shouldFetchEntries(
             />
 
             <!-- Week View -->
-            <CalendarWeekView
+            <Week
                 v-else
                 ref="weekViewRef"
                 :week-dates="getWeekDates(currentDate)"

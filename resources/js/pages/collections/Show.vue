@@ -179,7 +179,7 @@
 <script>
 import DeleteEntryConfirmation from '@/components/collections/DeleteEntryConfirmation.vue';
 import DeleteLocalizationConfirmation from '@/components/collections/DeleteLocalizationConfirmation.vue';
-import CollectionCalendar from '@/components/entries/CollectionCalendar.vue';
+import CollectionCalendar from '@/components/entries/calendar/Calendar.vue';
 import SiteSelector from '@/components/SiteSelector.vue';
 import { defineAsyncComponent } from 'vue';
 import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator, Header, Button, ToggleGroup, ToggleItem } from '@/components/ui';

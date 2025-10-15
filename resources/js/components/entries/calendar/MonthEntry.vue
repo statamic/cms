@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue';
-import { formatTime } from '@/util/calendar.js';
+import { formatTime } from './calendar.js';
 import { Link } from '@inertiajs/vue3';
 
 const props = defineProps({

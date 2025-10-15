@@ -1,9 +1,9 @@
 <script setup>
 import { CalendarCell, CalendarCellTrigger, CalendarGrid, CalendarGridBody, CalendarGridHead, CalendarGridRow, CalendarHeadCell } from 'reka-ui';
-import CalendarEntry from './CalendarEntry.vue';
-import CreateEntryButton from './CreateEntryButton.vue';
+import CalendarEntry from './MonthEntry.vue';
+import CreateEntryButton from '../CreateEntryButton.vue';
 import { Button } from '@ui';
-import { formatDateString, isToday, getCreateUrlDateParam } from '@/util/calendar.js';
+import { formatDateString, isToday, getCreateUrlDateParam } from './calendar.js';
 import DateFormatter from '@/components/DateFormatter.js';
 
 const props = defineProps({

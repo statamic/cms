@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue';
-import CalendarWeekEntry from './CalendarWeekEntry.vue';
-import CreateEntryButton from './CreateEntryButton.vue';
+import CalendarEntry from './WeekEntry.vue';
+import CreateEntryButton from '../CreateEntryButton.vue';
 import { Button } from '@ui';
 import {
     getVisibleHours,
@@ -9,7 +9,7 @@ import {
     isToday,
     getCreateUrlDateParam,
     formatDateString,
-} from '@/util/calendar.js';
+} from './calendar.js';
 import DateFormatter from '@/components/DateFormatter.js';
 
 const props = defineProps({
@@ -116,7 +116,7 @@ defineExpose({ weekViewContainer });
                 >
                     <!-- Entries for this hour -->
                     <div class="absolute inset-0 p-1 overflow-scroll">
-                        <CalendarWeekEntry
+                        <CalendarEntry
                             v-for="entry in getEntriesForHour(date, hour)"
                             :key="entry.id"
                             :entry="entry"
