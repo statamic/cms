@@ -15,6 +15,7 @@ const props = defineProps({
     collection: { type: String, required: true },
     blueprints: { type: Array, default: () => [] },
     createUrl: { type: String, required: true },
+    site: { type: String, required: true },
 });
 
 const $date = new DateFormatter;
@@ -37,6 +38,9 @@ async function fetchEntries() {
         const response = await axios.get(cp_url(`collections/${props.collection}/entries`), {
             params: {
                 filters: utf8btoa(JSON.stringify({
+                    site: {
+                        site: props.site,
+                    },
                     fields: {
                         date: {
                             operator: 'between',
@@ -127,6 +131,8 @@ const columns = computed(() => [
     { label: 'Title', field: 'title', visible: true },
     { label: 'Status', field: 'status', visible: true }
 ]);
+
+watch(() => props.site, () => fetchEntries());
 
 watch(
     () => [currentDate.value.year, currentDate.value.month, currentDate.value.day, viewMode.value],

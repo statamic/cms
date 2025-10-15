@@ -70,6 +70,14 @@
                 </template>
             </template>
 
+            <template v-if="view == 'calendar'">
+                <site-selector
+                    v-if="sites.length > 1"
+                    :sites="sites"
+                    v-model="site"
+                />
+            </template>
+
             <ui-toggle-group v-model="view" v-if="canUseStructureTree || canUseCalendar">
                 <ui-toggle-item icon="navigation" value="tree" v-if="canUseStructureTree" />
                 <ui-toggle-item icon="layout-list" value="list" />
@@ -155,6 +163,7 @@
             :collection="handle"
             :blueprints="blueprints"
             :create-url="createUrl"
+            :site="site"
         />
 
         <delete-entry-confirmation
