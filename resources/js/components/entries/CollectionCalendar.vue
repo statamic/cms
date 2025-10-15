@@ -1,12 +1,12 @@
 <script setup>
-import { ref, watch, computed, nextTick, getCurrentInstance } from 'vue';
+import { ref, watch, computed, getCurrentInstance } from 'vue';
 import axios from 'axios';
 import { CalendarHeader, CalendarHeading, CalendarRoot } from 'reka-ui';
 import { CalendarDate } from '@internationalized/date';
 import CalendarMonthView from './CalendarMonthView.vue';
 import CalendarWeekView from './CalendarWeekView.vue';
 import { Listing, StatusIndicator } from '@/components/ui';
-import { formatDateString, getWeekDates, getVisibleHours, getCurrentDateRange } from '@/util/calendar.js';
+import { formatDateString, getWeekDates, getCurrentDateRange } from '@/util/calendar.js';
 import { Link } from '@inertiajs/vue3';
 
 const props = defineProps({
@@ -23,7 +23,6 @@ const error = ref(null);
 const viewMode = ref('month'); // 'month' or 'week'
 const weekViewRef = ref(null);
 const isDirty = ref(false);
-// Reactive drag state for Vue class bindings
 const datePickerOpen = ref(false);
 
 // ============================================================================
@@ -35,7 +34,6 @@ async function fetchEntries() {
     error.value = null;
 
     try {
-        // Guard against undefined values
         if (!currentDate.value || !viewMode.value) {
             console.warn('fetchEntries called with undefined values:', { currentDate: currentDate.value, viewMode: viewMode.value });
             return;
@@ -83,10 +81,6 @@ function getEntriesForDate(date) {
     });
 }
 
-// ============================================================================
-// Date Navigation
-// ============================================================================
-
 function goToToday() {
     const today = new Date();
     currentDate.value = new CalendarDate(today.getFullYear(), today.getMonth() + 1, today.getDate());
@@ -114,19 +108,6 @@ function handleYearChange(newYear) {
     currentDate.value = new CalendarDate(newYear, currentDate.value.month, currentDate.value.day);
 }
 
-// ============================================================================
-// Component API
-// ============================================================================
-
-// Expose methods to parent
-defineExpose({
-    isDirty: () => isDirty.value
-});
-
-// ============================================================================
-// Month and Year Options
-// ============================================================================
-
 const monthOptions = computed(() => {
     const instance = getCurrentInstance();
     const $date = instance?.appContext.config.globalProperties.$date;
@@ -153,9 +134,6 @@ const yearOptions = computed(() => {
     return years;
 });
 
-// ============================================================================
-// Computed Properties
-// ============================================================================
 const selectedDateEntries = computed(() => {
     if (!selectedDate.value) return [];
     return getEntriesForDate(selectedDate.value);
@@ -165,10 +143,6 @@ const columns = computed(() => [
     { label: 'Title', field: 'title', visible: true },
     { label: 'Status', field: 'status', visible: true }
 ]);
-
-// ============================================================================
-// Watchers
-// ============================================================================
 
 watch(
     () => [currentDate.value.year, currentDate.value.month, currentDate.value.day, viewMode.value],
@@ -196,7 +170,6 @@ function shouldFetchEntries(
 
     return false;
 }
-
 </script>
 
 <template>
@@ -209,7 +182,6 @@ function shouldFetchEntries(
             weekday-format="long"
             class="bg-gray-100 dark:bg-gray-800 rounded-2xl p-3"
         >
-            {{ currentDate }}
             <CalendarHeader class="flex flex-col @3xl:flex-row items-center gap-4 pb-4 @3xl:pb-8">
                 <div class="flex items-center justify-between w-full @3xl:flex-1 @3xl:justify-start">
                     <ui-toggle-group v-model="viewMode" class="flex">

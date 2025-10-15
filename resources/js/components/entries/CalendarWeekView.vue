@@ -78,7 +78,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import CalendarWeekEntry from './CalendarWeekEntry.vue';
 import CreateEntryButton from './CreateEntryButton.vue';
 import {
@@ -86,7 +86,6 @@ import {
     getHourLabel,
     isToday,
     getCreateUrlDateParam,
-    getWeekDates,
     formatDateString,
 } from '@/util/calendar.js';
 
