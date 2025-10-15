@@ -23,9 +23,7 @@ const time = computed(() => DateFormatter.format(props.entry.date?.date || props
         class="text-2xs @3xl:text-xs px-2 border-s-2 rounded-e-sm cursor-pointer flex flex-col"
         :class="entryClasses"
     >
-        <span class="line-clamp-2">
-            {{ entry.title }}
-        </span>
+        <span class="line-clamp-2" v-text="entry.title" />
         <span
             class="hidden @4xl:block text-2xs text-gray-400 dark:text-gray-400"
             v-text="time"

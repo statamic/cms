@@ -81,9 +81,8 @@ function getHourLabel(hour) {
                 <div
                     class="text-sm font-medium inline p-1"
                     :class="dateNumberClasses(date)"
-                >
-                    {{ date.day }}
-                </div>
+                    v-text="date.day"
+                />
             </div>
         </div>
 
@@ -96,9 +95,7 @@ function getHourLabel(hour) {
                     :key="hour"
                     class="h-12 border-b border-gray-200 dark:border-gray-700 flex items-start justify-end pr-2 pt-1"
                 >
-                    <span class="text-xs text-gray-500 dark:text-gray-400">
-                        {{ getHourLabel(hour) }}
-                    </span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400" v-text="getHourLabel(hour)" />
                 </div>
             </div>
 

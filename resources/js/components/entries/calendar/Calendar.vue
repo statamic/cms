@@ -198,7 +198,7 @@ function shouldFetchEntries(
 
                         <div class="flex items-center gap-3">
                             <div class="space-y-2">
-                                <Label for="month">{{ __('Month') }}</Label>
+                                <Label for="month" :text="__('Month')" />
                                 <Select
                                     :model-value="currentDate.month"
                                     :options="monthOptions"
@@ -208,7 +208,7 @@ function shouldFetchEntries(
                                 />
                             </div>
                             <div class="space-y-2">
-                                <Label for="month">{{ __('Year') }}</Label>
+                                <Label for="month" :text="__('Year')" />
                                 <Select
                                     :model-value="currentDate.year"
                                     :options="yearOptions"

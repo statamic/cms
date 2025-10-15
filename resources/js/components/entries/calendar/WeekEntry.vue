@@ -20,6 +20,6 @@ const entryClasses = computed(() => ({
         class="block text-xs p-1 rounded-r border-l-2 mb-1 cursor-pointer hover:shadow-sm"
         :class="entryClasses"
     >
-        <div class="font-medium line-clamp-2">{{ entry.title }}</div>
+        <div class="font-medium line-clamp-2" v-text="entry.title" />
     </Link>
 </template>

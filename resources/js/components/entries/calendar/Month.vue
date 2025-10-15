@@ -79,8 +79,8 @@ const selectDate = (date) => {
                             v-if="isCurrentDay(index)"
                             class="w-1.5 h-1.5 mr-1 bg-ui-accent rounded-full"
                         ></div>
-                        <span class="@4xl:hidden">{{ day.slice(0, 2) }}</span>
-                        <span class="hidden @4xl:block">{{ day }}</span>
+                        <span class="@4xl:hidden" v-text="day.slice(0, 2)" />
+                        <span class="hidden @4xl:block" v-text="day" />
                     </div>
                 </CalendarHeadCell>
             </CalendarGridRow>
