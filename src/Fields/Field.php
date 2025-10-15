@@ -442,7 +442,7 @@ class Field implements Arrayable
             $type = ['type' => $type];
         }
 
-        if ($this->isRequired() && ! $this->hasSometimesRule() && $this->config['type'] !== 'assets') {
+        if ($this->isRequired() && ! $this->hasSometimesRule() && $this->type() !== 'assets') {
             $type['type'] = GraphQL::nonNull($type['type']);
         }
 
