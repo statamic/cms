@@ -10,8 +10,8 @@
     /* Only inset because we don't wand to transition the color when we switch between light/dark mode */
     transition: inset 0.3s ease-in-out;
     /* On mobile, hide by default and overlay on top */
+    z-index: var(--z-index-draggable);
     @apply lg:flex;
-    @apply z-50;
 
     ul {
         @apply flex flex-col gap-0;
@@ -83,7 +83,7 @@ main.nav-closed {
 
 .draggable-mirror {
     position: relative;
-    z-index: 1000;
+    z-index: var(--z-index-modal);
 }
 
 .draggable-source--is-dragging {
@@ -92,5 +92,5 @@ main.nav-closed {
 
 /* Mirrors that have been appended to the body should appear on top of everything. (Portals are 4) */
 body > .draggable-mirror {
-    z-index: 5;
+    z-index: var(--z-index-draggable);
 }

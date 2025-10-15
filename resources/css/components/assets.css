@@ -5,7 +5,7 @@
 .asset-modal {
     .saving {
         @apply absolute inset-0 flex items-center rounded-xs bg-white/90;
-        z-index: 200;
+        z-index: var(--z-index-modal);
 
         .inner {
             text-align: center;
@@ -29,7 +29,7 @@
     @apply absolute inset-0 flex items-center justify-center rounded-sm p-1 text-center text-xs leading-tight @sm:text-lg;
     border: 1px dashed var(--color-gray-600);
     pointer-events: none;
-    z-index: 1049;
+    z-index: var(--z-index-draggable);
     background: rgba(255, 255, 255, 0.9);
 
     .dark & {
@@ -149,7 +149,8 @@
 .asset-editor {
 
     .loading {
-        @apply absolute inset-0 z-10 flex items-center justify-center rounded-sm bg-white/70;
+        @apply absolute inset-0 flex items-center justify-center rounded-sm bg-white/70;
+        z-index: var(--z-index-portal);
     }
 
     .publish-fields {

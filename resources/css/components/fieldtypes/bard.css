@@ -134,7 +134,7 @@
     }
 
     .bard-fixed-toolbar {
-        z-index: 4;
+        z-index: var(--z-index-portal);
         position: sticky;
         @apply -top-2;
         /* Prevent the sticky toolbar from hitting the very end of container, which causes it to overlap the container's border-radius */

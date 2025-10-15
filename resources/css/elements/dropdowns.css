@@ -7,7 +7,7 @@
             content: '';
             position: absolute;
             inset: -8px -8px -8px -20px;
-            z-index: -1;
+            z-index: var(--z-index-below);
         }
         button,
         a {
