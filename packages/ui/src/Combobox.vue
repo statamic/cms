@@ -14,7 +14,6 @@ import {
     FocusScope
 } from 'reka-ui';
 import { computed, nextTick, ref, useAttrs, useTemplateRef, watch } from 'vue';
-import { omit } from 'lodash-es';
 import Button from './Button/Button.vue';
 import Icon from './Icon/Icon.vue';
 import Badge from './Badge.vue';
@@ -283,7 +282,7 @@ defineExpose({
                 class="cursor-pointer"
                 data-ui-combobox
                 ignore-filter
-                v-bind="omit(attrs, ['class'])"
+                v-bind="{ ...attrs, class: undefined }"
             >
                 <ComboboxAnchor  data-ui-combobox-anchor>
                     <ComboboxTrigger as="div" ref="trigger" :class="[triggerClasses, $attrs.class]" @keydown.enter="openDropdown" @keydown.space="openDropdown" data-ui-combobox-trigger>
