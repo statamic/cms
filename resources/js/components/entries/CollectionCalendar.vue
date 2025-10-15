@@ -58,14 +58,6 @@ async function fetchEntries() {
     }
 }
 
-function getEntriesForDate(date) {
-    const dateStr = formatDateString(date);
-    return entries.value.filter(entry => {
-        const entryDate = new Date(entry.date?.date || entry.date);
-        return entryDate.toISOString().split('T')[0] === dateStr;
-    });
-}
-
 function goToToday() {
     const today = new Date();
     currentDate.value = new CalendarDate(today.getFullYear(), today.getMonth() + 1, today.getDate());
@@ -121,7 +113,13 @@ const yearOptions = computed(() => {
 
 const selectedDateEntries = computed(() => {
     if (!selectedDate.value) return [];
-    return getEntriesForDate(selectedDate.value);
+
+    const dateStr = formatDateString(selectedDate.value);
+
+    return entries.value.filter(entry => {
+        const entryDate = new Date(entry.date?.date || entry.date);
+        return entryDate.toISOString().split('T')[0] === dateStr;
+    });
 });
 
 const columns = computed(() => [
