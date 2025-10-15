@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\NoCache\Session;
 use Statamic\StaticCaching\NoCache\StringRegion;
 use Tests\FakesContent;
@@ -174,7 +175,13 @@ class NoCacheSessionTest extends TestCase
     #[Test]
     public function it_normalizes_query_string()
     {
-        $this->get('/test?utm_source=linkedin.com&utm_medium=referral&utm_campaign=foo');
+        // Mock the Cacher to return a non-normalized URL.
+        // In tests, it always returns the current URL, so we have to mock it.
+        $cacher = Mockery::mock(Cacher::class);
+        $cacher->shouldReceive('getUrl')
+            ->andReturn('http://localhost/test?utm_source=linkedin.com&utm_medium=referral&utm_campaign=foo');
+
+        $this->app->instance(Cacher::class, $cacher);
 
         $session = $this->app->make(Session::class);
 
