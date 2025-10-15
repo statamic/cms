@@ -38,7 +38,8 @@ function getEntriesForHour(date, hour) {
 
 const headerClasses = (date) => ({
     'bg-blue-50 dark:bg-blue-900/20': isSelectedDate(date),
-    'bg-gray-50 dark:bg-gray-800': isToday(date)
+    'bg-gray-50 dark:bg-gray-800': isToday(date),
+    'bg-gray-50 dark:bg-gray-900/10': !isSelectedDate(date) && !isToday(date),
 });
 
 const dateNumberClasses = (date) => ({
@@ -73,7 +74,7 @@ function getHourLabel(hour) {
             <div
                 v-for="date in weekDates"
                 :key="date.toString()"
-                class="p-3 bg-gray-50 dark:bg-gray-900/10 text-center border-l border-gray-200 dark:border-gray-700"
+                class="p-3 text-center border-l border-gray-200 dark:border-gray-700"
                 :class="headerClasses(date)"
                 @click="selectDate(date)"
             >
