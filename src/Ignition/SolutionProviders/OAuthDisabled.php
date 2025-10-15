@@ -2,7 +2,7 @@
 
 namespace Statamic\Ignition\SolutionProviders;
 
-use Spatie\Ignition\Contracts\HasSolutionsForThrowable;
+use Spatie\ErrorSolutions\Contracts\HasSolutionsForThrowable;
 use Statamic\Ignition\Solutions\EnableOAuth;
 use Throwable;
 

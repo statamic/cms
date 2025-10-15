@@ -48,7 +48,7 @@
                                     </div>
                                     <div
                                         class="flex items-center flex-1 rtl:mr-2 ltr:ml-2 text-xs rtl:text-right ltr:text-left truncate"
-                                        v-text="file.slice(11)"
+                                        v-text="file"
                                     />
                                 </td>
                                 <td class="p-0 w-8 rtl:text-left ltr:text-right align-middle">

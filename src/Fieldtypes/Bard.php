@@ -182,6 +182,11 @@ class Bard extends Replicator
                         'type' => 'collections',
                         'mode' => 'select',
                     ],
+                    'select_across_sites' => [
+                        'display' => __('Select Across Sites'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.select_across_sites'),
+                        'type' => 'toggle',
+                    ],
                     'container' => [
                         'display' => __('Container'),
                         'instructions' => __('statamic::fieldtypes.bard.config.container'),
@@ -370,7 +375,7 @@ class Bard extends Replicator
         }
 
         if (is_string($value)) {
-            $value = str_replace('statamic://', '', $value);
+            $value = str_replace('src="statamic://', 'src="', $value);
             $doc = (new Augmentor($this))->renderHtmlToProsemirror($value);
             $value = $doc['content'];
         } elseif ($this->isLegacyData($value)) {

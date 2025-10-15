@@ -4,7 +4,7 @@ namespace Statamic\View\Antlers\Language\Runtime;
 
 use Illuminate\Http\Exceptions\HttpResponseException;
 use ReflectionProperty;
-use Spatie\Ignition\Contracts\ProvidesSolution;
+use Spatie\ErrorSolutions\Contracts\ProvidesSolution;
 use Spatie\LaravelIgnition\Exceptions\ViewException;
 use Spatie\LaravelIgnition\Exceptions\ViewExceptionWithSolution;
 use Statamic\Contracts\View\Antlers\Parser;
@@ -314,6 +314,11 @@ class RuntimeParser implements Parser
         return class_exists(ViewException::class) || class_exists('Spatie\LaravelIgnition\Exceptions\ViewException');
     }
 
+    protected function shouldCacheRenderNodes($text)
+    {
+        return ! str_contains($text, '/noparse');
+    }
+
     /**
      * Parses and renders the input text, with the provided runtime data.
      *
@@ -350,7 +355,7 @@ class RuntimeParser implements Parser
             $parseText = $this->sanitizePhp($text);
             $cacheSlug = md5($parseText);
 
-            if (! array_key_exists($cacheSlug, self::$standardRenderNodeCache)) {
+            if (! array_key_exists($cacheSlug, self::$standardRenderNodeCache) || ! $this->shouldCacheRenderNodes($text)) {
                 $this->documentParser->setIsVirtual($this->view == '');
 
                 if (strlen($this->view) > 0) {
@@ -897,5 +902,13 @@ INFO;
     public function callback($callback)
     {
         return $this;
+    }
+
+    /**
+     * Clears the standard render node cache.
+     */
+    public static function clearRenderNodeCache()
+    {
+        self::$standardRenderNodeCache = [];
     }
 }

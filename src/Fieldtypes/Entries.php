@@ -27,6 +27,8 @@ use Statamic\Search\Index;
 use Statamic\Search\Result;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class Entries extends Relationship
 {
     use QueriesFilters;
@@ -46,6 +48,7 @@ class Entries extends Relationship
         'initialReference' => 'reference',
         'initialFieldset' => 'blueprint',
         'initialValues' => 'values',
+        'initialExtraValues' => 'extraValues',
         'initialLocalizedFields' => 'localizedFields',
         'initialMeta' => 'meta',
         'initialPermalink' => 'permalink',
@@ -92,6 +95,9 @@ class Entries extends Relationship
                         'instructions' => __('statamic::fieldtypes.entries.config.create'),
                         'type' => 'toggle',
                         'default' => true,
+                        'if' => [
+                            'mode' => 'default',
+                        ],
                     ],
                     'collections' => [
                         'display' => __('Collections'),
@@ -176,7 +182,11 @@ class Entries extends Relationship
             $collections = $this->getConfiguredCollections();
         }
 
-        return Collection::findByHandle(Arr::first($collections));
+        $collection = Collection::findByHandle($collectionHandle = Arr::first($collections));
+
+        throw_if(! $collection, new CollectionNotFoundException($collectionHandle));
+
+        return $collection;
     }
 
     public function getSortColumn($request)
@@ -369,7 +379,9 @@ class Entries extends Relationship
 
         $query = $this->queryBuilder($values);
 
-        return $single ? Blink::once($key, fn () => $query->first()) : $query;
+        return $single && ! config('statamic.system.always_augment_to_query', false)
+            ? Blink::once($key, fn () => $query->first())
+            : $query;
     }
 
     public function shallowAugment($values)

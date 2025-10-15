@@ -104,7 +104,7 @@
 
 .vs__open-indicator {
 	@apply clickable;
-    @apply flex items-center rounded-e px-2 text-sm shrink-0 h-full border-e-0 dark:border-dark-800;
+    @apply flex items-center rounded-e px-2 text-sm shrink-0 h-full border-e-0 bg-clip-padding dark:border-dark-800;
 	/* height: 2.375rem; */
 }
 

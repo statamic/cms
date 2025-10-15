@@ -1,4 +1,5 @@
 @php use Statamic\Facades\Site; @endphp
+@php use function Statamic\trans as __; @endphp
 
 <div class="card p-0 overflow-hidden h-full flex flex-col">
     <div class="flex justify-between items-center p-4 border-b dark:bg-dark-650 dark:border-b dark:border-dark-900">

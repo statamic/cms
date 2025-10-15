@@ -13,6 +13,7 @@ class FolderAsset extends JsonResource
         return [
             'id' => $this->id(),
             'basename' => $this->basename(),
+            'path' => $this->path(),
             'extension' => $this->extension(),
             'url' => $this->absoluteUrl(),
             'size_formatted' => Str::fileSizeForHumans($this->size(), 0),

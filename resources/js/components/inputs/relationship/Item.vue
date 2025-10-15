@@ -22,6 +22,7 @@
                 :item="item"
                 :component="formComponent"
                 :component-props="formComponentProps"
+                :stack-size="formStackSize"
                 @updated="itemUpdated"
                 @closed="isEditing = false"
             />
@@ -67,6 +68,7 @@ export default {
         readOnly: Boolean,
         formComponent: String,
         formComponentProps: Object,
+        formStackSize: String,
     },
 
     data() {

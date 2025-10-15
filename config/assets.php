@@ -76,7 +76,7 @@ return [
         |--------------------------------------------------------------------------
         |
         | You may define global defaults for all manipulation parameters, such as
-        | quality, format, and sharpness. These can and will be be overwritten
+        | quality, format, and sharpness. These can and will be overwritten
         | on the tag parameter level as well as the preset level.
         |
         */
@@ -222,5 +222,17 @@ return [
     */
 
     'svg_sanitization_on_upload' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Use V6 Permissions
+    |--------------------------------------------------------------------------
+    |
+    | This allows you to opt in to the asset permissions that will become the
+    | default behavior in Statamic 6. This will be removed in Statamic 6.
+    |
+    */
+
+    'v6_permissions' => false,
 
 ];

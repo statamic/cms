@@ -79,7 +79,6 @@ return [
     'NAD' => 'Namibischer Dollar',
     'NGN' => 'Nigerianischer Naira',
     'NIO' => 'Nicaraguanischer Córdoba',
-    'NOK' => 'Norwegian Krone',
     'NOK' => 'Norwegische Krone',
     'NPR' => 'Nepalesische Rupie',
     'NZD' => 'Neuseeland-Dollar',
