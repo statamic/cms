@@ -72,6 +72,7 @@ it('exports inertia', async () => {
         'Link',
         'router',
         'useForm',
+        'usePoll',
     ];
 
     expect(Object.keys(modules.inertia).toSorted()).toEqual(expected);
