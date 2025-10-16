@@ -154,6 +154,23 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
         });
     }
 
+    protected function getBlueprintsForRelations()
+    {
+        $collections = empty($this->collections)
+            ? Facades\Collection::all()
+            : $this->collections;
+
+        return collect($collections)->flatMap(function ($collection) {
+            if (is_string($collection)) {
+                $collection = Facades\Collection::find($collection);
+            }
+
+            return $collection ? $collection->entryBlueprints() : false;
+        })
+            ->filter()
+            ->unique();
+    }
+
     private function ensureCollectionsAreQueriedForStatusQuery(): void
     {
         // If the collections property isn't empty, it means the user has explicitly
