@@ -3,6 +3,7 @@
 namespace Statamic\CP\Navigation;
 
 use Facades\Statamic\CP\Navigation\NavItemIdHasher;
+use Illuminate\Support\Collection;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\URL;
 use Statamic\Support\Arr;
@@ -63,8 +64,8 @@ class NavTransformer
     protected function transform()
     {
         $this->config['reorder'] = $this->getReorderedItems(
-            $this->coreNav->map(fn ($section) => $this->transformSectionKey($section)),
-            collect($this->submitted)->map(fn ($section) => $this->transformSectionKey($section)),
+            $this->transformReorderableSections($this->coreNav),
+            $this->transformReorderableSections($this->submitted),
         );
 
         $this->config['sections'] = collect($this->submitted)
@@ -73,6 +74,16 @@ class NavTransformer
             ->all();
 
         return $this;
+    }
+
+    /**
+     * Transform reorderable sections list.
+     */
+    protected function transformReorderableSections(Collection|array $reorderableSections): Collection
+    {
+        return collect($reorderableSections)
+            ->map(fn ($section) => $this->transformSectionKey($section))
+            ->reject(fn ($section) => $section === 'top_level');
     }
 
     /**
@@ -260,10 +271,12 @@ class NavTransformer
      */
     protected function getReorderedItems($originalList, $newList): bool|array
     {
-        $itemsAreReordered = collect($originalList)
+        $comparableLists = collect($originalList)
             ->intersect($newList)
             ->values()
-            ->zip($newList)
+            ->zip($newList);
+
+        $itemsAreReordered = $comparableLists
             ->reject(fn ($pair) => is_null($pair->first()))
             ->reject(fn ($pair) => $pair->first() === $pair->last())
             ->isNotEmpty();
@@ -273,33 +286,56 @@ class NavTransformer
         }
 
         return collect($newList)
-            ->take($this->calculateMinimumItemsForReorder($originalList, $newList))
+            ->take($this->calculateMinimumItemsForReorder($comparableLists->map->first(), $comparableLists->map->last()))
             ->all();
     }
 
     /**
      * Calculate minimum number of items needed for reorder config.
-     *
-     * @param  array  $originalList
-     * @param  array  $newList
      */
-    protected function calculateMinimumItemsForReorder($originalList, $newList): int
+    protected function calculateMinimumItemsForReorder(Collection $originalList, Collection $newList): int
+    {
+        $originalList = $originalList->filter();
+
+        $newList = $this->rejectNewItemsFromEndOfNewList($originalList, $newList)->filter();
+
+        $minimumItemsCount = 0;
+
+        while (true) {
+            if ($originalList->all() == $newList->all()) {
+                break;
+            }
+
+            $originalList = $originalList
+                ->reject(fn ($item) => $item === $newList->first())
+                ->values();
+
+            $newList->shift();
+
+            $minimumItemsCount++;
+        }
+
+        return $minimumItemsCount;
+    }
+
+    /**
+     * Reject new items from the tail end end of our new list by checking to see if they existed in the old list.
+     */
+    protected function rejectNewItemsFromEndOfNewList(Collection $originalList, Collection $newList): Collection
     {
         $continueRejecting = true;
 
-        $minimumItemsCount = collect($originalList)
+        return $newList
             ->reverse()
-            ->zip(collect($newList)->reverse())
-            ->reject(function ($pair) use (&$continueRejecting) {
-                if ($continueRejecting && $pair->first() === $pair->last()) {
+            ->reject(function ($item) use ($originalList, &$continueRejecting) {
+                if ($continueRejecting && ! $originalList->contains($item)) {
                     return true;
                 }
 
                 return $continueRejecting = false;
             })
-            ->count();
-
-        return max(1, $minimumItemsCount - 1);
+            ->reverse()
+            ->values();
     }
 
     /**
@@ -329,7 +365,6 @@ class NavTransformer
             ->pipe(fn ($sections) => $this->rejectInherits($sections));
 
         $reorder = collect(Arr::get($this->config, 'reorder') ?: [])
-            ->reject(fn ($section) => $section === 'top_level')
             ->values()
             ->all();
 
