@@ -27,7 +27,6 @@ export const {
     Description,
     DocsCallout,
     DragHandle,
-    Drawer,
     Dropdown,
     DropdownItem,
     DropdownLabel,

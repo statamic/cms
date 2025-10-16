@@ -174,29 +174,6 @@
 
         <div class="space-y-12">
             <section class="space-y-4">
-                <ui-heading size="lg">Drawer</ui-heading>
-                <ui-drawer title="Drawer Demo" description="This is a drawer description." variant="layered">
-                    <template #trigger>
-                        <ui-button text="Open Drawer" />
-                    </template>
-                    <div class="space-y-8">
-                        <ui-field name="name" label="Name" placeholder="Your name">
-                            <ui-input label="Name" placeholder="Your name" />
-                        </ui-field>
-                        <ui-field name="email" label="Email">
-                            <ui-input label="Email" type="email" placeholder="Your email" />
-                        </ui-field>
-                    </div>
-                    <template #footer>
-                        <div class="flex gap-2 items-center justify-end">
-                            <ui-button text="Cancel" variant="ghost" />
-                            <ui-button text="Save" variant="primary" />
-                        </div>
-                    </template>
-                </ui-drawer>
-            </section>
-
-            <section class="space-y-4">
                 <ui-heading size="lg">Badges</ui-heading>
                 <div class="mb-4 flex gap-2 sm:gap-3 items-end">
                     <ui-badge size="lg" text="Green" color="green" />
