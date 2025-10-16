@@ -1,5 +1,42 @@
 # Release Notes
 
+## 6.0.0-alpha.13 (2025-10-16)
+
+### What's new
+- Collection Calendar mode [#12597](https://github.com/statamic/cms/issues/12597) by @jackmcdade
+- Inertia fixes and additions [#12747](https://github.com/statamic/cms/issues/12747) by @jasonvarga
+- Allow extra config on ALL fieldtypes [#12722](https://github.com/statamic/cms/issues/12722) by @ryanmitchell
+
+### What's fixed
+- Fix button tag/target logic [#12715](https://github.com/statamic/cms/issues/12715) by @jasonvarga
+- Fix user in email utility [#12726](https://github.com/statamic/cms/issues/12726) by @jasonvarga
+- Fix error from `RelationshipInput` when items aren't displayed [#12745](https://github.com/statamic/cms/issues/12745) by @duncanmcclean
+- Pluralize "Draft" on collection listings [#12740](https://github.com/statamic/cms/issues/12740) by @duncanmcclean
+- Inertia-fy Duplicate IDs page [#12742](https://github.com/statamic/cms/issues/12742) by @duncanmcclean
+- Prevent combobox dropdown opening when disabled [#12746](https://github.com/statamic/cms/issues/12746) by @duncanmcclean
+- Fix error when augmenting icon field [#12741](https://github.com/statamic/cms/issues/12741) by @duncanmcclean
+- Fix invisible audio player in asset editor [#12735](https://github.com/statamic/cms/issues/12735) by @daun
+- Match Markdown footer border color with header [#12728](https://github.com/statamic/cms/issues/12728) by @helloDanuk
+- Container shade [#12749](https://github.com/statamic/cms/issues/12749) by @JayGeorge
+- Improve Nav icon ux [#12752](https://github.com/statamic/cms/issues/12752) by @JayGeorge
+- Consistent stacks [#12754](https://github.com/statamic/cms/issues/12754) by @JayGeorge
+- Use object-contain instead of object-cover in the thumbnail view [#12755](https://github.com/statamic/cms/issues/12755) by @JayGeorge
+- Improve live preview sidebar [#12756](https://github.com/statamic/cms/issues/12756) by @JayGeorge
+- Maps z-index values across the CP to variables [#12617](https://github.com/statamic/cms/issues/12617) by @JayGeorge
+- Improve collection listing badges [#12753](https://github.com/statamic/cms/issues/12753) by @JayGeorge
+- Display available preview in asset editor [#12734](https://github.com/statamic/cms/issues/12734) by @daun
+- Publish field component changes [#12743](https://github.com/statamic/cms/issues/12743) by @duncanmcclean
+- Stacks facelift [#12761](https://github.com/statamic/cms/issues/12761) by @jackmcdade
+- Translate "Saved" string when saving user [#12762](https://github.com/statamic/cms/issues/12762) by @duncanmcclean
+- Export Inertia's `usePoll` composable [#12764](https://github.com/statamic/cms/issues/12764) by @duncanmcclean
+- Remove Drawer Component [#12766](https://github.com/statamic/cms/issues/12766) by @jasonvarga
+- Bard sticky stuck toolbar [#12767](https://github.com/statamic/cms/issues/12767) by @JayGeorge
+- Field toolbar fixes [#12768](https://github.com/statamic/cms/issues/12768) by @JayGeorge
+- Improve scrolling cut-off point on the page editor [#12770](https://github.com/statamic/cms/issues/12770) by @JayGeorge
+- German translations [#12733](https://github.com/statamic/cms/issues/12733) by @helloDanuk
+
+
+
 ## 6.0.0-alpha.12 (2025-10-10)
 
 ### What's fixed
