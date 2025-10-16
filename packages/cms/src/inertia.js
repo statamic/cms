@@ -4,4 +4,5 @@ export const {
     Link,
     router,
     useForm,
+    usePoll,
 } = __STATAMIC__.inertia;
