@@ -284,10 +284,10 @@ defineExpose({
                 class="cursor-pointer"
                 data-ui-combobox
                 ignore-filter
-                v-bind="{ ...attrs, class: undefined }"
+                v-bind="attrs"
             >
                 <ComboboxAnchor  data-ui-combobox-anchor>
-                    <ComboboxTrigger as="div" ref="trigger" :class="[triggerClasses, $attrs.class]" @keydown.enter="openDropdown" @keydown.space="openDropdown" data-ui-combobox-trigger>
+                    <ComboboxTrigger as="div" ref="trigger" :class="triggerClasses" @keydown.enter="openDropdown" @keydown.space="openDropdown" data-ui-combobox-trigger>
                         <div class="flex-1 min-w-0">
                             <ComboboxInput
                                 v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"
