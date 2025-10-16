@@ -2,7 +2,7 @@
     <stack narrow name="page-tree-linker" :before-close="shouldClose" @closed="$emit('closed')" v-slot="{ close }">
         <div class="flex h-full flex-col bg-gray-100 dark:bg-dark-700">
             <header
-                class="mb-4 flex items-center justify-between border-b bg-white py-2 text-lg font-medium shadow-md dark:border-dark-950 dark:bg-dark-600 ltr:pl-6 ltr:pr-3 rtl:pl-3 rtl:pr-6"
+                class="flex items-center justify-between border-b bg-white py-2 text-lg font-medium shadow-md dark:border-dark-950 dark:bg-dark-600 ltr:pl-6 ltr:pr-3 rtl:pl-3 rtl:pr-6"
             >
                 <Heading size="lg">{{ headerText }}</Heading>
                 <Button icon="x" variant="ghost" @click="close" />
@@ -16,7 +16,7 @@
                 </div>
             </div>
 
-            <div v-if="!loading" class="flex-1 overflow-auto px-1">
+            <div v-if="!loading" class="flex-1 overflow-auto px-1 pt-4">
                 <div
                     v-if="saving"
                     class="absolute inset-0 z-10 flex items-center justify-center bg-white bg-opacity-75 dark:bg-dark-500"
