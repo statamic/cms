@@ -384,7 +384,7 @@ class Color
             'body-border' => self::Transparent,
             'dark-body-bg' => self::Zinc[900],
             'dark-body-border' => self::Zinc[950],
-            'content-bg' => 'linear-gradient(to right, hsl(0,0%,99%), #ffffff)',
+            'content-bg' => 'white',
             'content-border' => self::Zinc[200],
             'dark-content-bg' => self::Zinc[900],
             'dark-content-border' => self::Zinc[950],
