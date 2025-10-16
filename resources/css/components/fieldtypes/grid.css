@@ -41,7 +41,7 @@
 
         /* Grid fieldtype > Bard fieldtype */
         .bard-fixed-toolbar {
-            @apply top-8;
+            @apply top-7;
         }
 
         /* Bard field with a fixed toolbar > Grid fieldtype > Bard fieldtype */
