@@ -1,5 +1,27 @@
 # Release Notes
 
+## 5.67.0 (2025-10-16)
+
+### What's new
+- Ability to configure blueprint storage paths [#10639](https://github.com/statamic/cms/issues/10639) by @jacksleight
+- Added the ability for Protectors to allow static caching [#11542](https://github.com/statamic/cms/issues/11542) by @kingsven
+- Allow stache stores to be excluded from warming and clearing [#11830](https://github.com/statamic/cms/issues/11830) by @ryanmitchell
+- Provide search index name callback [#10435](https://github.com/statamic/cms/issues/10435) by @ajnsn
+- Add mount field to Collection type in GraphQL [#12607](https://github.com/statamic/cms/issues/12607) by @Skullsneeze
+- Throw exception if collection is queried after status [#12744](https://github.com/statamic/cms/issues/12744) by @jasonvarga
+- Allow adding of GraphQL mutations [#11908](https://github.com/statamic/cms/issues/11908) by @Skullsneeze
+
+### What's fixed
+- Normalize query string when creating nocache session [#11545](https://github.com/statamic/cms/issues/11545) by @duncanmcclean
+- CP nav reordering fixes [#11054](https://github.com/statamic/cms/issues/11054) by @jesseleite
+- Fix GraphQL error when field doesnt have type [#12757](https://github.com/statamic/cms/issues/12757) by @jasonvarga
+- Fix Bard entry links across domains [#12694](https://github.com/statamic/cms/issues/12694) by @edalzell
+- Update norwegian translations [#12714](https://github.com/statamic/cms/issues/12714) by @kjetilhole
+- Updating CP search to respect selected site. [#12704](https://github.com/statamic/cms/issues/12704) by @tommulroy
+- Registering a custom preset should update existing `Server` instance [#12660](https://github.com/statamic/cms/issues/12660) by @duncanmcclean
+
+
+
 ## 5.66.0 (2025-10-03)
 
 ### What's new
