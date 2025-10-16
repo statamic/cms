@@ -156,7 +156,7 @@ export default {
                     }),
                 ])
                 .then((response) => {
-                    Statamic.$toast.success('Saved');
+                    Statamic.$toast.success(__('Saved'));
 
                     this.title = response.data.title;
 
