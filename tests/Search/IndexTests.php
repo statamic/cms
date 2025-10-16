@@ -2,29 +2,48 @@
 
 namespace Tests\Search;
 
-use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Events\SearchQueryPerformed;
+use Statamic\Search\Index;
 
 trait IndexTests
 {
-    #[Test]
-    public function search_event_gets_emitted()
+    public function tearDown(): void
     {
-        $this->markTestSkipped();
+        // Reset the static state of the Index class
+        Index::resolveNameUsing(null);
 
-        Event::fake();
-
-        $this->beforeSearched();
-
-        $this->getIndex()->setName('test')->search('foo');
-
-        Event::assertDispatched(SearchQueryPerformed::class, function ($event) {
-            return $event->query === 'foo';
-        });
+        parent::tearDown();
     }
 
-    protected function beforeSearched()
+    abstract public function getIndexClass();
+
+    public function getIndex($name, $config, $locale)
     {
+        $class = $this->getIndexClass();
+
+        return new $class($name, $config, $locale);
+    }
+
+    #[Test, DataProvider('nameProvider')]
+    public function it_can_get_the_name($name, $config, $locale, $resolver, $expected)
+    {
+        if ($resolver) {
+            $this->getIndexClass()::resolveNameUsing($resolver);
+        }
+
+        $index = $this->getIndex($name, $config, $locale);
+
+        $this->assertEquals($expected, $index->name());
+    }
+
+    public static function nameProvider()
+    {
+        return [
+            'basic' => ['test', [], null, null, 'test'],
+            'with locale' => ['test', [], 'en', null, 'test_en'],
+            'resolver' => ['test', [], null, fn ($name, $locale) => 'prefix_'.$name.'_'.$locale, 'prefix_test_'],
+            'resolver with locale' => ['test', [], 'en', fn ($name, $locale) => 'prefix_'.$name.'_'.$locale, 'prefix_test_en'],
+        ];
     }
 }

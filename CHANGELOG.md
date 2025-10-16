@@ -1,5 +1,37 @@
 # Release Notes
 
+## 5.66.0 (2025-10-03)
+
+### What's new
+- Ability to register custom image presets [#12624](https://github.com/statamic/cms/issues/12624) by @duncanmcclean
+- Add `isDefault` to `Site` [#12574](https://github.com/statamic/cms/issues/12574) by @edalzell
+- Add whereInId to EntryRepository [#11668](https://github.com/statamic/cms/issues/11668) by @nadinengland
+
+### What's fixed
+- Fix performance regression from 11863 [#12628](https://github.com/statamic/cms/issues/12628) by @simonworkhouse
+- Ensure HandleEntrySchedule uses the minute it was dispatched [#12626](https://github.com/statamic/cms/issues/12626) by @ryanmitchell
+- Select correct site when using multiple domains [#11042](https://github.com/statamic/cms/issues/11042) by @aerni
+- Changing Stache index name from collection to collectionHandle [#11324](https://github.com/statamic/cms/issues/11324) by @Krzemo
+- Prevent entry propagation when duplicating [#12186](https://github.com/statamic/cms/issues/12186) by @marcorieser
+- Italian translations [#12642](https://github.com/statamic/cms/issues/12642) by @ivanandre
+- Italian translations [#12643](https://github.com/statamic/cms/issues/12643) by @ivanandre
+- Norwegian translations [#12636](https://github.com/statamic/cms/issues/12636) by @Keuto
+
+
+
+## 5.65.2 (2025-09-24)
+
+### What's fixed
+- Prevent duplicate queries on collection structure [#12276](https://github.com/statamic/cms/issues/12276) by @ryanmitchell
+- Prevent caching during live preview [#12558](https://github.com/statamic/cms/issues/12558) by @helloiamlukas
+- Prevent empty cache tag when using Blade [#12567](https://github.com/statamic/cms/issues/12567) by @helloiamlukas
+- Fix incorrect blueprint being resolved on localizations [#11810](https://github.com/statamic/cms/issues/11810) by @duncanmcclean
+- Make asset GraphQL type always nullable [#11975](https://github.com/statamic/cms/issues/11975) by @lostgeek
+- Resolving PHP Warning and PHP Notice errors [#12257](https://github.com/statamic/cms/issues/12257) by @martinoak
+- Fix form submission search query [#12514](https://github.com/statamic/cms/issues/12514) by @duncanmcclean
+
+
+
 ## 5.65.1 (2025-09-12)
 
 ### What's fixed
