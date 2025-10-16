@@ -88,6 +88,14 @@ class ViewsTest extends TestCase
     }
 
     #[Test]
+    public function it_doesnt_load_the_term_url_if_there_are_additional_segments()
+    {
+        $this->viewShouldReturnRaw('tags.show', 'showing {{ title }}');
+
+        $this->get('/tags/test/extra/segments')->assertNotFound();
+    }
+
+    #[Test]
     public function it_loads_the_localized_term_url_if_the_view_exists()
     {
         $this->viewShouldReturnRaw('tags.show', 'showing {{ title }}');

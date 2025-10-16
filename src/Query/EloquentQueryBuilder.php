@@ -11,6 +11,8 @@ use InvalidArgumentException;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Blink;
+use Statamic\Query\Exceptions\MultipleRecordsFoundException;
+use Statamic\Query\Exceptions\RecordsNotFoundException;
 use Statamic\Query\Scopes\AppliesScopes;
 use Statamic\Support\Arr;
 
@@ -75,9 +77,66 @@ abstract class EloquentQueryBuilder implements Builder
         return $items;
     }
 
+    public function pluck($column, $key = null)
+    {
+        $items = $this->get();
+
+        if (! $key) {
+            return $items->map(fn ($item) => $item->{$column})->values();
+        }
+
+        return $items->mapWithKeys(fn ($item) => [$item->{$key} => $item->{$column}]);
+    }
+
     public function first()
     {
         return $this->get()->first();
+    }
+
+    public function firstOrFail($columns = ['*'])
+    {
+        if (! is_null($item = $this->select($columns)->first($columns))) {
+            return $item;
+        }
+
+        throw new RecordsNotFoundException();
+    }
+
+    public function firstOr($columns = ['*'], ?Closure $callback = null)
+    {
+        if ($columns instanceof Closure) {
+            $callback = $columns;
+
+            $columns = ['*'];
+        }
+
+        if (! is_null($model = $this->select($columns)->first())) {
+            return $model;
+        }
+
+        return $callback();
+    }
+
+    public function sole($columns = ['*'])
+    {
+        $result = $this->get($columns);
+
+        $count = $result->count();
+
+        if ($count === 0) {
+            throw new RecordsNotFoundException();
+        }
+
+        if ($count > 1) {
+            throw new MultipleRecordsFoundException($count);
+        }
+
+        return $result->first();
+    }
+
+    public function exists()
+    {
+        return $this->builder->count() >= 1;
     }
 
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
@@ -112,12 +171,16 @@ abstract class EloquentQueryBuilder implements Builder
             return $this->whereNested($column, $boolean);
         }
 
-        if (strtolower($operator) == 'like') {
+        if ($operator !== null && strtolower($operator) == 'like') {
             $grammar = $this->builder->getConnection()->getQueryGrammar();
             $this->builder->whereRaw('LOWER('.$grammar->wrap($this->column($column)).') LIKE ?', strtolower($value), $boolean);
 
             return $this;
         }
+
+        [$value, $operator] = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
 
         $this->builder->where($this->column($column), $operator, $value, $boolean);
 
@@ -204,6 +267,30 @@ abstract class EloquentQueryBuilder implements Builder
         return $this->whereJsonLength($column, $operator, $value, 'or');
     }
 
+    public function whereJsonOverlaps($column, $values, $boolean = 'and')
+    {
+        $this->builder->whereJsonOverlaps($this->column($column), $values, $boolean);
+
+        return $this;
+    }
+
+    public function orWhereJsonOverlaps($column, $values)
+    {
+        return $this->whereJsonOverlaps($column, $values, 'or');
+    }
+
+    public function whereJsonDoesntOverlap($column, $values, $boolean = 'and')
+    {
+        $this->builder->whereJsonDoesntOverlap($this->column($column), $values, $boolean);
+
+        return $this;
+    }
+
+    public function orWhereJsonDoesntOverlap($column, $values)
+    {
+        return $this->whereJsonDoesntOverlap($column, $values, 'or');
+    }
+
     public function whereNull($column, $boolean = 'and', $not = false)
     {
         $this->builder->whereNull($this->column($column), $boolean, $not);
@@ -240,7 +327,7 @@ abstract class EloquentQueryBuilder implements Builder
 
     public function whereNotBetween($column, $values, $boolean = 'and')
     {
-        return $this->whereBetween($column, $values, 'or', true);
+        return $this->whereBetween($column, $values, $boolean, true);
     }
 
     public function orWhereNotBetween($column, $values)
@@ -395,6 +482,13 @@ abstract class EloquentQueryBuilder implements Builder
         return $this;
     }
 
+    public function orderByDesc($column)
+    {
+        $this->builder->orderBy($this->column($column), 'desc');
+
+        return $this;
+    }
+
     public function reorder($column = null, $direction = 'asc')
     {
         if ($column) {
@@ -464,13 +558,21 @@ abstract class EloquentQueryBuilder implements Builder
     {
         $this->enforceOrderBy();
 
+        $skip = $this->getOffset();
+        $remaining = $this->getLimit();
+
         $page = 1;
 
         do {
-            // We'll execute the query for the given page and get the results. If there are
-            // no results we can just break and return from here. When there are results
-            // we will call the callback with the current chunk of these results here.
-            $results = $this->forPage($page, $count)->get();
+            $offset = (($page - 1) * $count) + intval($skip);
+
+            $limit = is_null($remaining) ? $count : min($count, $remaining);
+
+            if ($limit == 0) {
+                break;
+            }
+
+            $results = $this->offset($offset)->limit($limit)->get();
 
             $countResults = $results->count();
 
@@ -478,9 +580,10 @@ abstract class EloquentQueryBuilder implements Builder
                 break;
             }
 
-            // On each chunk result set, we will pass them to the callback and then let the
-            // developer take care of everything within the callback, which allows us to
-            // keep the memory low for spinning through large result sets for working.
+            if (! is_null($remaining)) {
+                $remaining = max($remaining - $countResults, 0);
+            }
+
             if ($callback($results, $page) === false) {
                 return false;
             }
@@ -491,6 +594,26 @@ abstract class EloquentQueryBuilder implements Builder
         } while ($countResults == $count);
 
         return true;
+    }
+
+    /**
+     * Get the "limit" value from the query or null if it's not set.
+     *
+     * @return mixed
+     */
+    public function getLimit()
+    {
+        return $this->builder->getQuery()->getLimit();
+    }
+
+    /**
+     * Get the "offset" value from the query or null if it's not set.
+     *
+     * @return mixed
+     */
+    public function getOffset()
+    {
+        return $this->builder->getQuery()->getOffset();
     }
 
     /**

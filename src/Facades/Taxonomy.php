@@ -20,7 +20,7 @@ use Statamic\Contracts\Taxonomies\TaxonomyRepository;
  * @method static additionalPreviewTargets(string $handle)
  *
  * @see \Statamic\Stache\Repositories\TaxonomyRepository
- * @see \Statamic\Taxonomies\Taxonomy
+ * @link \Statamic\Taxonomies\Taxonomy
  */
 class Taxonomy extends Facade
 {

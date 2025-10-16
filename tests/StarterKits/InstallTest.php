@@ -14,6 +14,7 @@ use Statamic\Console\Commands\StarterKitInstall as InstallCommand;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Config;
 use Statamic\Facades\Path;
+use Statamic\Facades\Search;
 use Statamic\Facades\YAML;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -115,38 +116,6 @@ class InstallTest extends TestCase
         $this->assertFileExists(base_path('copied.md'));
         $this->assertFileExists(config_path('filesystems.php'));
         $this->assertFileHasContent('bobsled_pics', config_path('filesystems.php'));
-    }
-
-    #[Test]
-    public function it_still_installs_from_export_as_paths_for_backwards_compatibility()
-    {
-        $this->setConfig([
-            'export_as' => [
-                'README.md' => 'README-for-new-site.md',
-                'original-dir' => 'renamed-dir',
-            ],
-        ]);
-
-        $this->assertFileDoesNotExist($this->kitVendorPath());
-        $this->assertComposerJsonDoesntHave('repositories');
-        $this->assertFileDoesNotExist($renamedFile = base_path('README.md'));
-        $this->assertFileDoesNotExist($renamedFolder = base_path('original-dir'));
-
-        $this->installCoolRunnings();
-
-        $this->assertFalse(Blink::has('starter-kit-repository-added'));
-        $this->assertFileDoesNotExist($this->kitVendorPath());
-        $this->assertFileDoesNotExist(base_path('composer.json.bak'));
-        $this->assertComposerJsonDoesntHave('repositories');
-        $this->assertFileExists($renamedFile);
-        $this->assertFileExists($renamedFolder);
-
-        $this->assertFileDoesNotExist(base_path('README-for-new-site.md')); // This was renamed back to original path on install
-        $this->assertFileDoesNotExist(base_path('renamed-dir')); // This was renamed back to original path on install
-
-        $this->assertFileHasContent('This readme should get installed to README.md.', $renamedFile);
-        $this->assertFileHasContent('One.', $renamedFolder.'/one.txt');
-        $this->assertFileHasContent('Two.', $renamedFolder.'/two.txt');
     }
 
     #[Test]
@@ -495,7 +464,8 @@ EOT;
 
         $this
             ->installCoolRunningsInteractively(['--without-user' => true])
-            ->expectsConfirmation('Clear site first?', 'yes');
+            ->expectsConfirmation('Clear site first?', 'yes')
+            ->expectsConfirmation('Would you like to update your search index(es) as well?', 'no');
 
         $this->assertFileExists(base_path('content/collections/pages/home.md'));
         $this->assertFileDoesNotExist(base_path('content/collections/pages/contact.md'));
@@ -862,8 +832,8 @@ EOT;
                     ],
                 ],
                 'jamaica' => [
-                    'export_as' => [
-                        'resources/css/theme.css' => 'resources/css/jamaica.css',
+                    'export_paths' => [
+                        'resources/css/jamaica.css',
                     ],
                 ],
             ],
@@ -872,7 +842,7 @@ EOT;
         $this->assertFileDoesNotExist(base_path('copied.md'));
         $this->assertFileDoesNotExist(base_path('resources/css/seo.css'));
         $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
-        $this->assertFileDoesNotExist(base_path('resources/css/theme.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/jamaica.css'));
         $this->assertComposerJsonDoesntHave('statamic/seo-pro');
         $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
 
@@ -881,7 +851,7 @@ EOT;
         $this->assertFileExists(base_path('copied.md'));
         $this->assertFileDoesNotExist(base_path('resources/css/seo.css'));
         $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
-        $this->assertFileDoesNotExist(base_path('resources/css/theme.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/jamaica.css'));
         $this->assertComposerJsonDoesntHave('statamic/seo-pro');
         $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
     }
@@ -919,8 +889,8 @@ EOT;
                 ],
                 'jamaica' => [
                     'prompt' => false, // Setting `prompt: false` normally skips confirmation and ensures it always gets installed
-                    'export_as' => [
-                        'resources/css/theme.css' => 'resources/css/jamaica.css',
+                    'export_paths' => [
+                        'resources/css/jamaica.css',
                     ],
                 ],
                 'js' => [
@@ -970,7 +940,7 @@ EOT;
         $this->assertFileExists(base_path('resources/css/seo.css'));
         $this->assertFileExists(base_path('resources/css/hockey.css'));
         $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
-        $this->assertFileExists(base_path('resources/css/theme.css'));
+        $this->assertFileExists(base_path('resources/css/jamaica.css'));
         $this->assertComposerJsonHasPackageVersion('require', 'statamic/seo-pro', '^0.2.0');
         $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
         $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
@@ -1003,8 +973,8 @@ EOT;
                     ],
                 ],
                 'jamaica' => [
-                    'export_as' => [
-                        'resources/css/theme.css' => 'resources/css/jamaica.css',
+                    'export_paths' => [
+                        'resources/css/jamaica.css',
                     ],
                 ],
                 'js' => [
@@ -1049,7 +1019,7 @@ EOT;
         $this->assertFileDoesNotExist(base_path('copied.md'));
         $this->assertFileDoesNotExist(base_path('resources/css/seo.css'));
         $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
-        $this->assertFileDoesNotExist(base_path('resources/css/theme.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/jamaica.css'));
         $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
         $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
         $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
@@ -1070,7 +1040,7 @@ EOT;
         $this->assertFileExists(base_path('copied.md'));
         $this->assertFileExists(base_path('resources/css/seo.css'));
         $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
-        $this->assertFileExists(base_path('resources/css/theme.css'));
+        $this->assertFileExists(base_path('resources/css/jamaica.css'));
         $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
         $this->assertFileExists(base_path('resources/js/vue.js'));
         $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
@@ -1388,11 +1358,6 @@ EOT;
                     'copied.md',
                 ],
             ]],
-            'export as paths' => [[
-                'export_as' => [
-                    'copied.md' => 'resources/js/vue.js',
-                ],
-            ]],
             'dependencies' => [[
                 'dependencies' => [
                     'statamic/seo-pro' => '^1.0',
@@ -1575,8 +1540,8 @@ EOT;
                     ],
                 ],
                 'jamaica' => [
-                    'export_as' => [
-                        'resources/css/theme.css' => 'resources/css/jamaica.css',
+                    'export_paths' => [
+                        'resources/css/jamaica.css',
                     ],
                     'modules' => [
                         'bobsled' => [
@@ -1632,9 +1597,66 @@ EOT;
         $this->assertFileDoesNotExist(base_path('resources/js/mootools.js'));
         $this->assertFileDoesNotExist(base_path('resources/css/hockey.css'));
         $this->assertFileDoesNotExist(base_path('resources/dictionaries/players.yaml'));
-        $this->assertFileExists(base_path('resources/css/theme.css'));
+        $this->assertFileExists(base_path('resources/css/jamaica.css'));
         $this->assertFileExists(base_path('resources/css/bobsled.css'));
         $this->assertComposerJsonHasPackageVersion('require', 'bobsled/speed-calculator', '^1.0.0');
+    }
+
+    #[Test]
+    public function it_doesnt_update_search_index_by_default_when_installed_non_interactively()
+    {
+        Search::shouldReceive('indexes')->never();
+
+        $this
+            ->installCoolRunnings()
+            ->assertSuccessful();
+
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
+    #[Test]
+    public function it_updates_search_index_when_update_search_flag_is_passed()
+    {
+        Search::shouldReceive('indexes')
+            ->once()
+            ->andReturn([]);
+
+        $this
+            ->installCoolRunnings(['--update-search' => true])
+            ->assertSuccessful();
+
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
+    #[Test]
+    public function it_doesnt_update_search_index_by_default_when_installed_interactively()
+    {
+        Search::shouldReceive('indexes')->never();
+
+        $this
+            ->installCoolRunningsInteractively()
+            ->expectsConfirmation('Clear site first?', 'no')
+            ->expectsConfirmation('Would you like to update your search index(es) as well?', 'no')
+            ->doesntExpectOutput('statamic:search:update')
+            ->assertSuccessful();
+
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
+    #[Test]
+    public function it_updates_search_index_when_installed_interactively_confirmed()
+    {
+        Search::shouldReceive('indexes')
+            ->once()
+            ->andReturn([]);
+
+        $this
+            ->installCoolRunningsInteractively()
+            ->expectsConfirmation('Clear site first?', 'no')
+            ->expectsConfirmation('Would you like to update your search index(es) as well?', 'yes')
+            ->assertSuccessful();
+
+        $this->assertFileExists(base_path('copied.md'));
     }
 
     private function kitRepoPath($path = null)
@@ -1692,6 +1714,7 @@ EOT;
         return $this->installCoolRunningsInteractively(array_merge($options, [
             '--clear-site' => true,   // skip clear site prompt
             '--without-user' => true, // skip create user prompt
+            '--update-search' => true, // skip update search index prompt
         ]), $customHttpFake);
     }
 

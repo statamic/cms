@@ -35,7 +35,7 @@ class AssetContainerContents
             return $this->files;
         }
 
-        return $this->files = Cache::remember($this->key(), $this->ttl(), function () {
+        return $this->files = $this->cacheStore()->remember($this->key(), $this->ttl(), function () {
             return collect($this->getRawFlysystemDirectoryListing())
                 ->keyBy('path')
                 ->map(fn ($file) => $this->normalizeFlysystemAttributes($file))
@@ -164,7 +164,7 @@ class AssetContainerContents
 
     public function cached()
     {
-        return Cache::get($this->key());
+        return $this->cacheStore()->get($this->key());
     }
 
     public function files()
@@ -271,7 +271,7 @@ class AssetContainerContents
 
     public function save()
     {
-        Cache::put($this->key(), $this->all(), $this->ttl());
+        $this->cacheStore()->put($this->key(), $this->all(), $this->ttl());
     }
 
     public function forget($path)
@@ -298,7 +298,7 @@ class AssetContainerContents
         $files = $this->all()->put($path, $metadata);
 
         if (Statamic::isWorker()) {
-            Cache::put($this->key(), $files, $this->ttl());
+            $this->cacheStore()->put($this->key(), $files, $this->ttl());
         }
 
         $this->filteredFiles = null;
@@ -315,5 +315,15 @@ class AssetContainerContents
     private function ttl()
     {
         return Stache::isWatcherEnabled() ? 0 : null;
+    }
+
+    public function cacheStore()
+    {
+        return Cache::store($this->hasCustomStore() ? 'asset_container_contents' : null);
+    }
+
+    private function hasCustomStore(): bool
+    {
+        return config()->has('cache.stores.asset_container_contents');
     }
 }

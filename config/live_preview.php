@@ -33,4 +33,28 @@ return [
         //
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Force Reload Javascript Modules
+    |--------------------------------------------------------------------------
+    |
+    | To force a reload, Live Preview appends a timestamp to the URL on
+    | script tags of type 'module'. You may disable this behavior here.
+    |
+    */
+
+    'force_reload_js_modules' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Hot Reload Contents
+    |--------------------------------------------------------------------------
+    |
+    | Should the Live Preview embed be hot-reloaded when the content changes?
+    | Only applies when "Refresh" is disabled on the live preview target.
+    |
+    */
+
+    'hot_reload_contents' => true,
+
 ];

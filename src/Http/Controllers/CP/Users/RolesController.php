@@ -8,15 +8,19 @@ use Statamic\Facades\Permission;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Middleware\CP\RequireElevatedSession;
 use Statamic\Http\Middleware\RequireStatamicPro;
 use Statamic\Rules\Handle;
 use Statamic\Support\Str;
+
+use function Statamic\trans as __;
 
 class RolesController extends CpController
 {
     public function __construct()
     {
         $this->middleware(RequireStatamicPro::class);
+        $this->middleware(RequireElevatedSession::class)->except('index');
     }
 
     public function index(Request $request)
@@ -36,6 +40,10 @@ class RolesController extends CpController
 
         if ($request->wantsJson()) {
             return $roles;
+        }
+
+        if ($roles->count() === 0) {
+            return view('statamic::roles.empty');
         }
 
         return view('statamic::roles.index', [
@@ -114,6 +122,8 @@ class RolesController extends CpController
 
     public function update(Request $request, $role)
     {
+        $this->requireElevatedSession();
+
         $this->authorize('edit roles');
 
         if (! $role = Role::find($role)) {

@@ -3,6 +3,7 @@
 namespace Statamic\Fields;
 
 use Closure;
+use Illuminate\Support\Collection;
 use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades\Blink;
 use Statamic\Facades\File;
@@ -228,6 +229,32 @@ class BlueprintRepository
         return collect($this->additionalNamespaces);
     }
 
+    public function getRenderableAdditionalNamespaces(): Collection
+    {
+        return $this
+            ->getAdditionalNamespaces()
+            ->keys()
+            ->map(fn ($namespace) => Blueprint::in($namespace))
+            ->reject(fn ($blueprints) => $blueprints->isEmpty())
+            ->map(function ($blueprints) {
+                return [
+                    'title' => $type = $blueprints->first()->renderableNamespace(),
+                    'blueprints' => $blueprints
+                        ->map(fn ($blueprint) => [
+                            'handle' => $blueprint->handle(),
+                            'namespace' => $blueprint->namespace(),
+                            'title' => $blueprint->title(),
+                            'reset_url' => $blueprint->resetAdditionalBlueprintUrl(),
+                            'is_resettable' => $blueprint->isResettable(),
+                            'command_palette_link' => $blueprint->commandPaletteLink($type, $blueprint->editAdditionalBlueprintUrl()),
+                        ])
+                        ->sortBy('title')
+                        ->values(),
+                ];
+            })
+            ->sortBy('title');
+    }
+
     protected function filesIn($namespace)
     {
         return Blink::store(self::BLINK_NAMESPACE_PATHS)->once($namespace, function () use ($namespace) {
@@ -251,7 +278,7 @@ class BlueprintRepository
                 $files = $files->merge($overrides)->values();
             }
 
-            return $files;
+            return $files->collect();
         });
     }
 

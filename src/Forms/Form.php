@@ -45,6 +45,13 @@ class Form implements Arrayable, Augmentable, FormContract
     public function __construct()
     {
         $this->data = collect();
+        $this->supplements = collect();
+    }
+
+    public function __clone()
+    {
+        $this->data = clone $this->data;
+        $this->supplements = clone $this->supplements;
     }
 
     /**
@@ -82,6 +89,14 @@ class Form implements Arrayable, Augmentable, FormContract
         FormBlueprintFound::dispatch($blueprint, $this);
 
         return $blueprint;
+    }
+
+    public function blueprintCommandPaletteLink()
+    {
+        return $this->blueprint()?->commandPaletteLink(
+            type: 'Forms',
+            url: $this->editBlueprintUrl(),
+        );
     }
 
     /**
@@ -383,14 +398,9 @@ class Form implements Arrayable, Augmentable, FormContract
         return cp_route('forms.destroy', $this->handle());
     }
 
-    /**
-     * Get the date format.
-     *
-     * @return string
-     */
-    public function dateFormat()
+    public function editBlueprintUrl()
     {
-        return Statamic::isCpRoute() ? Statamic::cpDateTimeFormat() : Statamic::dateTimeFormat();
+        return cp_route('blueprints.forms.edit', $this->handle());
     }
 
     public function hasFiles()

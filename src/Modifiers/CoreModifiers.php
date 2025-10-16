@@ -8,6 +8,7 @@ use Countable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
+use Illuminate\View\ComponentSlot;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades\Antlers;
@@ -27,6 +28,7 @@ use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Bard;
 use Statamic\Fieldtypes\Bard\Augmentor;
 use Statamic\Fieldtypes\Link\ArrayableLink;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Dumper;
 use Statamic\Support\Html;
@@ -738,6 +740,10 @@ class CoreModifiers extends Modifier
             return Arr::first($value);
         }
 
+        if ($value instanceof Collection) {
+            return $value->first();
+        }
+
         return Stringy::first($value, Arr::get($params, 0));
     }
 
@@ -983,6 +989,50 @@ class CoreModifiers extends Modifier
         }
     }
 
+    /**
+     * Returns true if the array contains $needle, false otherwise
+     *
+     * @param  string|array  $haystack
+     * @param  array  $params
+     * @param  array  $context
+     * @return bool
+     */
+    public function overlaps($haystack, $params, $context)
+    {
+        $needle = $this->getFromContext($context, $params);
+
+        if ($needle instanceof Collection) {
+            $needle = $needle->values()->all();
+        }
+
+        if (! is_array($needle)) {
+            $needle = [$needle];
+        }
+
+        if ($haystack instanceof Collection) {
+            $haystack = $haystack->values()->all();
+        }
+
+        if (! is_array($haystack)) {
+            return false;
+        }
+
+        return count(array_intersect($haystack, $needle)) > 0;
+    }
+
+    /**
+     * Returns false if the array contains $needle, true otherwise
+     *
+     * @param  string|array  $haystack
+     * @param  array  $params
+     * @param  array  $context
+     * @return bool
+     */
+    public function doesnt_overlap($haystack, $params, $context)
+    {
+        return ! $this->overlaps($haystack, $params, $context);
+    }
+
     private function renderAPStyleHeadline($value)
     {
         $exceptions = [
@@ -1028,6 +1078,11 @@ class CoreModifiers extends Modifier
         })->implode(' ');
 
         return $headline;
+    }
+
+    public function hasActualContent($value)
+    {
+        return (new ComponentSlot($value))->hasActualContent();
     }
 
     /**
@@ -1303,6 +1358,11 @@ class CoreModifiers extends Modifier
     public function isPast($value)
     {
         return $this->carbon($value)->isPast();
+    }
+
+    public function isString($value)
+    {
+        return is_string($value);
     }
 
     /**
@@ -1930,6 +1990,16 @@ class CoreModifiers extends Modifier
      */
     public function rawurlencode($value)
     {
+        return rawurlencode($value);
+    }
+
+    /**
+     * URL-encode according to RFC 3986, but allowing slashes to persist
+     *
+     * @return string
+     */
+    public function rawurlencode_except_slashes($value)
+    {
         return implode('/', array_map('rawurlencode', explode('/', $value)));
     }
 
@@ -2119,6 +2189,24 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Resolves a specific index or all items from an array, a Collection, or a Query Builder.
+     */
+    public function resolve($value, $params)
+    {
+        $key = Arr::get($params, 0);
+
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
+
+        if ($value instanceof Collection) {
+            $value = $value->all();
+        }
+
+        return Arr::get($value, $key);
+    }
+
+    /**
      * Reverses the order of a string or list.
      *
      * @param  string|array|Collection  $value
@@ -2214,14 +2302,8 @@ class CoreModifiers extends Modifier
             $segment = $this->getFromContext($context, $params);
         }
 
-        $url = parse_url($value);
-
-        // Get everything after a possible domain
-        // and make sure it starts with a /
-        $uris = Stringy::ensureLeft(Arr::get($url, 'path'), '/');
-
-        //Boom
-        $segments = explode('/', $uris);
+        // Explode segments
+        $segments = explode('/', URL::makeRelative($value));
 
         return Arr::get($segments, $segment);
     }
@@ -2791,9 +2873,9 @@ class CoreModifiers extends Modifier
      */
     public function timezone($value, $params)
     {
-        $timezone = Arr::get($params, 0, Config::get('app.timezone'));
+        $timezone = Arr::get($params, 0, Statamic::displayTimezone());
 
-        return $this->carbon($value)->tz($timezone);
+        return $this->carbon($value)->clone()->tz($timezone);
     }
 
     public function typeOf($value)
@@ -2839,6 +2921,16 @@ class CoreModifiers extends Modifier
      * @return string
      */
     public function urlencode($value)
+    {
+        return urlencode($value);
+    }
+
+    /**
+     * URL-encodes string, but allowing slashes to persist
+     *
+     * @return string
+     */
+    public function urlencode_except_slashes($value)
     {
         return implode('/', array_map('urlencode', explode('/', $value)));
     }
@@ -3045,7 +3137,7 @@ class CoreModifiers extends Modifier
      */
     public function yearsAgo($value, $params)
     {
-        return $this->carbon($value)->diffInYears(Arr::get($params, 0));
+        return (int) abs($this->carbon($value)->diffInYears(Arr::get($params, 0)));
     }
 
     /**
@@ -3210,7 +3302,11 @@ class CoreModifiers extends Modifier
     private function carbon($value)
     {
         if (! $value instanceof Carbon) {
-            $value = (is_numeric($value)) ? Date::createFromTimestamp($value) : Date::parse($value);
+            $value = (is_numeric($value)) ? Date::createFromTimestamp($value, config('app.timezone')) : Date::parse($value);
+        }
+
+        if (config('statamic.system.localize_dates_in_modifiers')) {
+            $value->setTimezone(Statamic::displayTimezone());
         }
 
         return $value;

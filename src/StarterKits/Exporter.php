@@ -153,7 +153,9 @@ class Exporter
             return $this;
         }
 
-        $this->files->cleanDirectory($this->exportPath);
+        $this->preserveGitRepository(function () {
+            $this->files->cleanDirectory($this->exportPath);
+        });
 
         return $this;
     }
@@ -203,7 +205,6 @@ class Exporter
 
         $normalizedModuleKeyOrder = [
             'export_paths',
-            'export_as',
             'dependencies',
             'dependencies_dev',
             'modules',
@@ -256,5 +257,21 @@ class Exporter
         $this->files->put("{$this->exportPath}/starter-kit.yaml", YAML::dump($config->all()));
 
         return $this;
+    }
+
+    /**
+     * Prevent filesystem callback from affecting .git repository.
+     */
+    protected function preserveGitRepository($callback): void
+    {
+        $this->files->makeDirectory(storage_path('statamic/tmp'), 0777, true, true);
+
+        $this->files->moveDirectory($this->exportPath.'/.git', storage_path('statamic/tmp/.git'));
+
+        $callback();
+
+        $this->files->moveDirectory(storage_path('statamic/tmp/.git'), $this->exportPath.'/.git');
+
+        $this->files->deleteDirectory(storage_path('statamic/tmp'));
     }
 }

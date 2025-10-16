@@ -6,6 +6,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\Eloquent\User as EloquentUser;
 use Statamic\Auth\File\Role;
@@ -19,6 +20,7 @@ use Tests\Auth\UserContractTests;
 use Tests\Preferences\HasPreferencesTests;
 use Tests\TestCase;
 
+#[Group('2fa')]
 class EloquentUserTest extends TestCase
 {
     use HasPreferencesTests, PermissibleContractTests, UserContractTests, WithFaker;
@@ -302,5 +304,29 @@ class EloquentUserTest extends TestCase
 
         $this->assertFalse($user->super);
         $this->assertFalse($user->model()->super);
+    }
+
+    #[Test]
+    public function it_does_not_save_null_values_on_the_model()
+    {
+        $user = $this->user();
+
+        $user->set('null_field', null);
+        $user->set('not_null_field', true);
+
+        $attributes = $user->model()->getAttributes();
+
+        $this->assertArrayNotHasKey('null_field', $attributes);
+        $this->assertTrue($attributes['not_null_field']);
+
+        $user->merge([
+            'null_field' => null,
+            'not_null_field' => false,
+        ]);
+
+        $attributes = $user->model()->getAttributes();
+
+        $this->assertArrayNotHasKey('null_field', $attributes);
+        $this->assertFalse($attributes['not_null_field']);
     }
 }

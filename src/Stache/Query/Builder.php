@@ -301,7 +301,7 @@ abstract class Builder extends BaseBuilder
                 return false;
             }
 
-            return ! empty(array_intersect($value, $where['values']));
+            return count(array_intersect($value, $where['values'])) == count($where['values']);
         });
     }
 
@@ -312,7 +312,7 @@ abstract class Builder extends BaseBuilder
                 return true;
             }
 
-            return empty(array_intersect($value, $where['values']));
+            return count(array_intersect($value, $where['values'])) != count($where['values']);
         });
     }
 
@@ -326,6 +326,36 @@ abstract class Builder extends BaseBuilder
             }
 
             return $this->{$method}(count($value), $where['value']);
+        });
+    }
+
+    protected function filterWhereJsonOverlaps($values, $where)
+    {
+        return $values->filter(function ($value) use ($where) {
+            if (is_null($value) || is_null($where['values'])) {
+                return false;
+            }
+
+            if (! is_array($value) && ! is_array($where['values'])) {
+                return $value === $where['values'];
+            }
+
+            return ! empty(array_intersect(Arr::wrap($value), $where['values']));
+        });
+    }
+
+    protected function filterWhereJsonDoesntOverlap($values, $where)
+    {
+        return $values->filter(function ($value) use ($where) {
+            if (is_null($value) || is_null($where['values'])) {
+                return true;
+            }
+
+            if (! is_array($value) && ! is_array($where['values'])) {
+                return $value !== $where['values'];
+            }
+
+            return empty(array_intersect(Arr::wrap($value), $where['values']));
         });
     }
 

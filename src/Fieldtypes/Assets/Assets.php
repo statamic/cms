@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Statamic\Actions\RenameAssetFolder;
 use Statamic\Assets\OrderedQueryBuilder;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\CP\Column;
 use Statamic\Exceptions\AssetContainerNotFoundException;
 use Statamic\Facades\Action;
 use Statamic\Facades\Asset;
@@ -31,30 +32,8 @@ class Assets extends Fieldtype
     {
         return [
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Input Behavior'),
                 'fields' => [
-                    'max_files' => [
-                        'display' => __('Max Files'),
-                        'instructions' => __('statamic::fieldtypes.assets.config.max_files'),
-                        'min' => 1,
-                        'type' => 'integer',
-                    ],
-                    'min_files' => [
-                        'display' => __('Min Files'),
-                        'instructions' => __('statamic::fieldtypes.assets.config.min_files'),
-                        'min' => 1,
-                        'type' => 'integer',
-                    ],
-                    'mode' => [
-                        'display' => __('UI Mode'),
-                        'instructions' => __('statamic::fieldtypes.assets.config.mode'),
-                        'type' => 'select',
-                        'default' => 'list',
-                        'options' => [
-                            'grid' => __('Grid'),
-                            'list' => __('List'),
-                        ],
-                    ],
                     'container' => [
                         'display' => __('Container'),
                         'instructions' => __('statamic::fieldtypes.assets.config.container'),
@@ -64,15 +43,25 @@ class Assets extends Fieldtype
                         'required' => true,
                         'default' => AssetContainer::all()->count() == 1 ? AssetContainer::all()->first()->handle() : null,
                         'force_in_config' => true,
+                        'width' => '50',
+                    ],
+                    'allow_uploads' => [
+                        'display' => __('Allow Uploads'),
+                        'instructions' => __('statamic::fieldtypes.assets.config.allow_uploads'),
+                        'type' => 'toggle',
+                        'default' => true,
+                        'width' => '50',
                     ],
                     'folder' => [
                         'display' => __('Folder'),
                         'instructions' => __('statamic::fieldtypes.assets.config.folder'),
                         'type' => 'asset_folder',
                         'max_items' => 1,
+                        'mode' => 'select',
                         'if' => [
                             'container' => 'not empty',
                         ],
+                        'width' => '50',
                     ],
                     'dynamic' => [
                         'display' => __('Dynamic Folder'),
@@ -88,6 +77,7 @@ class Assets extends Fieldtype
                         'if' => [
                             'container' => 'not empty',
                         ],
+                        'width' => '50',
                     ],
                     'restrict' => [
                         'display' => __('Restrict to Folder'),
@@ -97,25 +87,62 @@ class Assets extends Fieldtype
                             'container' => 'not empty',
                             'dynamic' => 'not true',
                         ],
+                        'width' => '50',
                     ],
-                    'allow_uploads' => [
-                        'display' => __('Allow Uploads'),
-                        'instructions' => __('statamic::fieldtypes.assets.config.allow_uploads'),
-                        'type' => 'toggle',
-                        'default' => true,
+                ],
+            ],
+            [
+                'display' => __('Appearance'),
+                'fields' => [
+                    'mode' => [
+                        'display' => __('UI Mode'),
+                        'instructions' => __('statamic::fieldtypes.assets.config.mode'),
+                        'type' => 'select',
+                        'default' => 'list',
+                        'options' => [
+                            'grid' => __('Grid'),
+                            'list' => __('List'),
+                        ],
+                        'width' => '50',
                     ],
                     'show_filename' => [
                         'display' => __('Show Filename'),
                         'instructions' => __('statamic::fieldtypes.assets.config.show_filename'),
                         'type' => 'toggle',
                         'default' => true,
+                        'width' => '50',
                     ],
                     'show_set_alt' => [
                         'display' => __('Show Set Alt'),
                         'instructions' => __('statamic::fieldtypes.assets.config.show_set_alt'),
                         'type' => 'toggle',
                         'default' => true,
+                        'width' => '50',
                     ],
+                ],
+            ],
+            [
+                'display' => __('Boundaries & Limits'),
+                'fields' => [
+                    'max_files' => [
+                        'display' => __('Max Files'),
+                        'instructions' => __('statamic::fieldtypes.assets.config.max_files'),
+                        'min' => 1,
+                        'type' => 'integer',
+                        'width' => '50',
+                    ],
+                    'min_files' => [
+                        'display' => __('Min Files'),
+                        'instructions' => __('statamic::fieldtypes.assets.config.min_files'),
+                        'min' => 1,
+                        'type' => 'integer',
+                        'width' => '50',
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Advanced'),
+                'fields' => [
                     'query_scopes' => [
                         'display' => __('Query Scopes'),
                         'instructions' => __('statamic::fieldtypes.assets.config.query_scopes'),
@@ -169,12 +196,61 @@ class Assets extends Fieldtype
 
     public function preload()
     {
+        $container = $this->container();
+
         return [
             'data' => $this->getItemData($this->field->value() ?? $this->defaultValue),
-            'container' => $container = $this->container()->handle(),
+            'container' => [
+                'id' => $container->id(),
+                'title' => $container->title(),
+                'edit_url' => $container->editUrl(),
+                'delete_url' => $container->deleteUrl(),
+                'blueprint_url' => cp_route('blueprints.asset-containers.edit', $container->handle()),
+                'can_view' => User::current()->can('view', $container),
+                'can_upload' => User::current()->can('store', [\Statamic\Contracts\Assets\Asset::class, $container]),
+                'can_edit' => User::current()->can('edit', $container),
+                'can_delete' => User::current()->can('delete', $container),
+                'sort_field' => $container->sortField(),
+                'sort_direction' => $container->sortDirection(),
+            ],
             'dynamicFolder' => $dynamicFolder = $this->dynamicFolder(),
             'rename_folder' => $this->renameFolderAction($dynamicFolder),
+            'columns' => $this->getColumns(),
         ];
+    }
+
+    protected function getColumns()
+    {
+        $columns = $this->container()->blueprint()->columns()->map(fn ($column) => clone $column);
+
+        $basename = Column::make('basename')
+            ->label(__('File'))
+            ->visible(true)
+            ->defaultVisibility(true)
+            ->sortable(true)
+            ->required(true);
+
+        $size = Column::make('size')
+            ->label(__('Size'))
+            ->value('size_formatted')
+            ->visible(true)
+            ->defaultVisibility(true)
+            ->sortable(true);
+
+        $lastModified = Column::make('last_modified')
+            ->label(__('Last Modified'))
+            ->value('last_modified_relative')
+            ->visible(true)
+            ->defaultVisibility(true)
+            ->sortable(true);
+
+        $columns->put('basename', $basename);
+        $columns->put('size', $size);
+        $columns->put('last_modified', $lastModified);
+
+        $columns->setPreferred("assets.{$this->container()->handle()}.columns");
+
+        return $columns->rejectUnlisted()->values();
     }
 
     private function dynamicFolder()

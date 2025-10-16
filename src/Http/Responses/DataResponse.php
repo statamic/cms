@@ -149,7 +149,7 @@ class DataResponse implements Responsable
     {
         $contents = $this->view()->render();
 
-        if ($this->request->isLivePreview()) {
+        if ($this->request->isLivePreview() && config('statamic.live_preview.force_reload_js_modules', true)) {
             $contents = $this->versionJavascriptModules($contents);
         }
 

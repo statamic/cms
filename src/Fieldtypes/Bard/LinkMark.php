@@ -17,6 +17,10 @@ class LinkMark extends Link
                 'rel' => '',
                 'target' => '_blank',
             ],
+            'allowedProtocols' => [
+                'http', 'https', 'ftp', 'ftps', 'mailto', 'tel', 'callto', 'sms', 'cid', 'xmpp', 'statamic', 'entry', 'asset',
+            ],
+            'isAllowedUri' => fn ($uri) => $this->isAllowedUri($uri),
         ];
     }
 
@@ -25,13 +29,12 @@ class LinkMark extends Link
         return [
             'href' => [
                 'renderHTML' => function ($attributes) {
-                    $href = $attributes->href;
-                    if (! isset($href)) {
+                    if (! isset($attributes->href)) {
                         return null;
                     }
 
                     return [
-                        'href' => $this->convertHref($href) ?? '',
+                        'href' => $this->convertHref($attributes->href) ?? '',
                     ];
                 },
             ],

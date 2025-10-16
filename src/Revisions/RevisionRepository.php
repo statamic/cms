@@ -29,13 +29,15 @@ class RevisionRepository implements Contract
 
         $files = Folder::getFiles($directory);
 
-        return FileCollection::make($files)->filterByExtension('yaml')->reject(function ($path) {
+        $revisions = FileCollection::make($files)->filterByExtension('yaml')->reject(function ($path) {
             return Str::endsWith($path, 'working.yaml');
         })->map(function ($path) use ($key) {
             return $this->makeRevisionFromFile($key, $path);
         })->keyBy(function ($revision) {
             return $revision->date()->timestamp;
         });
+
+        return collect($revisions->all());
     }
 
     public function findWorkingCopyByKey($key)
@@ -69,7 +71,7 @@ class RevisionRepository implements Contract
             ->key($key)
             ->action($yaml['action'] ?? false)
             ->id($date = $yaml['date'])
-            ->date(Carbon::createFromTimestamp($date))
+            ->date(Carbon::createFromTimestamp($date, config('app.timezone')))
             ->user($yaml['user'] ?? false)
             ->message($yaml['message'] ?? false)
             ->attributes($yaml['attributes']);
