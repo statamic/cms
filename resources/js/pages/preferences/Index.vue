@@ -13,43 +13,45 @@ const props = defineProps([
 </script>
 
 <template>
-    <Head :title="__('Preferences')" />
+    <div class="max-w-5xl mx-auto">
+        <Head :title="__('Preferences')" />
 
-    <Header :title="__('Preferences')" icon="preferences" />
+        <Header :title="__('Preferences')" icon="preferences" />
 
-    <section class="space-y-6">
-        <CardPanel :heading="__('Global Preferences')">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2 sm:gap-3">
-                    <Icon name="globals" />
-                    <Link :href="defaultPreferencesUrl">{{ __('Default') }}</Link>
+        <section class="space-y-6">
+            <CardPanel :heading="__('Global Preferences')">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2 sm:gap-3">
+                        <Icon name="globals" />
+                        <Link :href="defaultPreferencesUrl">{{ __('Default') }}</Link>
+                    </div>
+
+                    <Badge v-if="Object.keys(defaultPreferences).length" color="green">{{ __('Modified') }}</Badge>
                 </div>
+            </CardPanel>
 
-                <Badge v-if="Object.keys(defaultPreferences).length" color="green">{{ __('Modified') }}</Badge>
-            </div>
-        </CardPanel>
-
-        <CardPanel v-if="roles.length" :heading="__('Preferences by Role')">
-            <div v-for="role in roles" :key="role.handle" class="flex items-center justify-between">
-                <div class="flex items-center gap-2 sm:gap-3">
-                    <Icon name="permissions" />
-                    <Link :href="role.editUrl">{{ role.title }}</Link>
+            <CardPanel v-if="roles.length" :heading="__('Preferences by Role')">
+                <div v-for="role in roles" :key="role.handle" class="flex items-center justify-between">
+                    <div class="flex items-center gap-2 sm:gap-3">
+                        <Icon name="permissions" />
+                        <Link :href="role.editUrl">{{ role.title }}</Link>
+                    </div>
+                    <Badge v-if="Object.keys(role.preferences).length" color="green">{{ __('Modified') }}</Badge>
                 </div>
-                <Badge v-if="Object.keys(role.preferences).length" color="green">{{ __('Modified') }}</Badge>
-            </div>
-        </CardPanel>
+            </CardPanel>
 
-        <CardPanel :heading="__('User Preferences')">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2 sm:gap-3">
-                    <Icon name="avatar" />
-                    <Link :href="userPreferencesUrl">{{ __('My Preferences') }}</Link>
+            <CardPanel :heading="__('User Preferences')">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2 sm:gap-3">
+                        <Icon name="avatar" />
+                        <Link :href="userPreferencesUrl">{{ __('My Preferences') }}</Link>
+                    </div>
+
+                    <Badge v-if="Object.keys(userPreferences).length" color="green">{{ __('Modified') }}</Badge>
                 </div>
+            </CardPanel>
+        </section>
 
-                <Badge v-if="Object.keys(userPreferences).length" color="green">{{ __('Modified') }}</Badge>
-            </div>
-        </CardPanel>
-    </section>
-
-    <DocsCallout :topic="__('Preferences')" url="preferences" />
+        <DocsCallout :topic="__('Preferences')" url="preferences" />
+    </div>
 </template>
