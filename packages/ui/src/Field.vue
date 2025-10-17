@@ -55,7 +55,7 @@ const rootClasses = computed(() =>
                 true: 'opacity-50',
             },
             asConfig: {
-                true: 'grid grid-cols-2 items-start px-4.5 py-4 gap-x-5! gap-y-5',
+                true: 'grid grid-cols-2 items-start px-4.5 py-4 gap-x-5!',
             },
             fullWidthSetting: {
                 true: '!grid-cols-1',
@@ -77,7 +77,7 @@ const descriptionClasses = computed(() =>
                 true: 'mb-0!',
             },
             fullWidth: {
-                true: 'mb-2!',
+                true: 'mb-3!',
             },
         },
     })({
