@@ -14,6 +14,7 @@ const props = defineProps({
     form: { type: String, required: true },
     fields: { type: Array, default: () => [] },
     title: { type: String },
+    submissionsUrl: { type: String },
     initialPerPage: { type: Number, default: 5 },
 });
 
@@ -27,6 +28,7 @@ const cols = computed(() => [
 const widgetProps = computed(() => ({
     title: props.title,
     icon: 'forms',
+    href: props.submissionsUrl,
 }));
 
 function formatDate(value) {

@@ -210,7 +210,6 @@
 
 import isEmail from 'validator/lib/isEmail';
 import HasWizardSteps from '../HasWizardSteps.js';
-import RelationshipFieldtype from '@/components/fieldtypes/relationship/RelationshipFieldtype.vue';
 
 export default {
     mixins: [HasWizardSteps],
@@ -345,8 +344,10 @@ export default {
                         return;
                     }
 
+                    this.$dirty.remove('user-wizard');
+
                     if (this.invitation.send) {
-                        window.location = response.data.redirect;
+                        this.$nextTick(() => (window.location = response.data.redirect));
                     } else {
                         this.completed = true;
                         this.editUrl = response.data.redirect;
@@ -376,6 +377,15 @@ export default {
     },
 
     watch: {
+        values: {
+            deep: true,
+            handler() {
+                if (! this.$dirty.has('user-wizard')) {
+                    this.$dirty.add('user-wizard');
+                }
+            }
+        },
+
         'values.email': function (email) {
             if (email && isEmail(email)) this.checkIfUserExists(email);
         },

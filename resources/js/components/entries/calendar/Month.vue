@@ -127,7 +127,7 @@ const selectDate = (date) => {
                                 </div>
                             </div>
 
-                            <div class="space-y-1.5 flex-1 overflow-scroll h-full w-full hidden @3xl:block">
+                            <div class="space-y-1.5 flex-1 overflow-scroll overscroll-contain h-full w-full hidden @3xl:block">
                                 <CalendarEntry
                                     v-for="entry in getEntriesForDate(weekDate)"
                                     :key="entry.id"

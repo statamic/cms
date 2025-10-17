@@ -13,11 +13,10 @@
             </ui-command-palette-item>
         </Header>
 
-        <Panel>
-            <div class="publish-fields-fluid">
+        <Panel :heading="__('Settings')">
+            <Card class="p-0! divide-y divide-gray-200 dark:divide-gray-800">
                 <Field
-                    as="card"
-                    class="field-w-50"
+                    as-config
                     :label="__('Title')"
                     :instructions="__('messages.role_title_instructions')"
                     :errors="errors.title"
@@ -27,8 +26,7 @@
                 </Field>
 
                 <Field
-                    as="card"
-                    class="field-w-50"
+                    as-config
                     :label="__('Handle')"
                     :instructions="__('messages.role_handle_instructions')"
                     :errors="handleErrors"
@@ -38,15 +36,16 @@
                 </Field>
 
                 <Field
-                    as="card"
+                    as-config
                     v-if="canAssignSuper"
                     :label="__('permissions.super')"
                     :instructions="__('permissions.super_desc')"
+                    variant="inline"
                     id="role-super"
                 >
                     <Switch v-model="isSuper" id="role-super" />
                 </Field>
-            </div>
+            </Card>
         </Panel>
 
         <div v-if="!isSuper" class="space-y-6 mt-6">
@@ -81,7 +80,7 @@ export default {
         Card,
         Switch,
         Field,
-        Input,
+        Input
     },
 
     props: {

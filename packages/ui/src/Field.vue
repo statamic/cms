@@ -77,7 +77,7 @@ const descriptionClasses = computed(() =>
                 true: 'mb-0!',
             },
             fullWidth: {
-                true: 'mb-2!',
+                true: 'mb-3!',
             },
         },
     })({
@@ -95,6 +95,11 @@ const errors = computed(() => {
     }
 
     return props.errors;
+});
+
+const hasErrors = computed(() => {
+    if (!errors.value) return false;
+    return Array.isArray(errors.value) ? errors.value.length > 0 : Object.keys(errors.value).length > 0;
 });
 </script>
 
@@ -120,7 +125,7 @@ const errors = computed(() => {
             <Description :text="instructions" v-if="instructions && !instructionsBelow" :class="descriptionClasses" />
         </div>
         <slot />
-        <div>
+        <div v-if="(instructions && instructionsBelow) || hasErrors">
             <Description :text="instructions" v-if="instructions && instructionsBelow" class="mt-2" />
             <ErrorMessage v-if="errors" v-for="(error, i) in errors" :key="i" :text="error" class="mt-2" />
         </div>

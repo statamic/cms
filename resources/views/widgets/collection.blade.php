@@ -6,6 +6,7 @@
 <collection-widget
     collection="{{ $collection->handle() }}"
     title="{{ $title }}"
+    listing-url="{{ cp_route('collections.show', $collection) }}"
     :additional-columns="{{ $columns->toJson() }}"
     :filters="{{ $filters->toJson() }}"
     initial-sort-column="{{ $sortColumn }}"
