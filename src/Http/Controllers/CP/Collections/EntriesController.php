@@ -348,6 +348,9 @@ class EntriesController extends CpController
 
         return Inertia::render('entries/Create', [
             ...$viewData,
+            'canEditBlueprint' => User::current()->can('configure fields'),
+            'createAnotherUrl' => cp_route('collections.entries.create', [$collection, $site->handle(), 'blueprint' => $blueprint['handle'], 'parent' => $values['parent'] ?? null]),
+            'initialListingUrl' => cp_route('collections.show', $collection),
         ]);
     }
 
