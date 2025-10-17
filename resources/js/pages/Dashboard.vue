@@ -43,7 +43,8 @@ function tailwindWidthClass(width) {
             class="min-h-54 px-3 starting-style-transition starting-style-transition--siblings"
             :class="classes(widget)"
         >
-            <DynamicHtmlRenderer :html="widget.html" />
+            <component v-if="widget.component" :is="widget.component" v-bind="widget.data" />
+            <DynamicHtmlRenderer v-else :html="widget.html" />
         </div>
     </div>
 
