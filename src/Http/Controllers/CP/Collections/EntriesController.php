@@ -179,10 +179,6 @@ class EntriesController extends CpController
             'initialListingUrl' => cp_route('collections.show', $viewData['collection']),
             'itemActionUrl' => cp_route('collections.entries.actions.run', $viewData['collection']),
         ]);
-
-        return view('statamic::entries.edit', array_merge($viewData, [
-            'entry' => $entry,
-        ]));
     }
 
     public function update(Request $request, $collection, $entry)
