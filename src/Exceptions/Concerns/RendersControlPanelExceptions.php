@@ -16,7 +16,7 @@ trait RendersControlPanelExceptions
 
         $response = parent::render($request, $e);
 
-        if (app()->isProduction()) {
+        if (app()->isProduction() && $response->getStatusCode() >= 400) {
             Statamic::$isRenderingCpException = true;
 
             return Inertia::render('errors/Error', ['status' => $response->getStatusCode()])
