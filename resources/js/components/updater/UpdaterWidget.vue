@@ -10,7 +10,7 @@ defineProps({
 
 <template>
     <Listing :items="items" v-slot="{ items }">
-        <Widget :title="__('Updates')" icon="updates">
+        <Widget :title="__('Updates')" icon="updates" :href="cp_url('updater')">
             <table v-if="items.length" class="">
                 <tr v-for="update in items" class="text-sm">
                     <td class="py-1 pr-4 leading-tight">
