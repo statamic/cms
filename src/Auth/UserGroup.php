@@ -212,7 +212,7 @@ abstract class UserGroup implements Arrayable, ArrayAccess, Augmentable, UserGro
 
     protected function matchesWildcard(string $wildcardPermission, string $requestedPermission): bool
     {
-        if (!str_contains($wildcardPermission, '*')) {
+        if (! str_contains($wildcardPermission, '*')) {
             return false;
         }
 
