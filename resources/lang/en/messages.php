@@ -191,6 +191,7 @@ return [
     'publish_actions_current_becomes_draft_because_scheduled' => 'Since the current revision is published and you\'ve selected a date in the future, once you submit, the revision will act like a draft until the selected date.',
     'publish_actions_publish' => 'Changes to the working copy will applied to the entry and it will be published immediately.',
     'publish_actions_schedule' => 'Changes to the working copy will applied to the entry and it will be appear published on the selected date.',
+    'publish_actions_schedule_revision' => 'A revision will be created based off the working copy and published on the selected date.',
     'publish_actions_unpublish' => 'The current revision will be unpublished.',
     'reset_password_notification_body' => 'You are receiving this email because we received a password reset request for your account.',
     'reset_password_notification_no_action' => 'If you did not request a password reset, no further action is required.',
