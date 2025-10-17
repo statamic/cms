@@ -133,9 +133,17 @@ abstract class UserGroup implements Arrayable, ArrayAccess, Augmentable, UserGro
 
     public function hasPermission($permission)
     {
-        return $this->roles->reduce(function ($carry, $role) {
+        $permissions = $this->roles->reduce(function ($carry, $role) {
             return $carry->merge($role->permissions());
-        }, collect())->contains($permission);
+        }, collect());
+
+        if ($permissions->contains($permission)) {
+            return true;
+        }
+
+        return $permissions->contains(function ($groupPermission) use ($permission) {
+            return $this->matchesWildcard($groupPermission, $permission);
+        });
     }
 
     public function isSuper(): bool
@@ -200,5 +208,18 @@ abstract class UserGroup implements Arrayable, ArrayAccess, Augmentable, UserGro
     public function blueprint()
     {
         return Facades\UserGroup::blueprint();
+    }
+
+    protected function matchesWildcard(string $wildcardPermission, string $requestedPermission): bool
+    {
+        if (!str_contains($wildcardPermission, '*')) {
+            return false;
+        }
+
+        $pattern = preg_quote($wildcardPermission, '/');
+        $pattern = str_replace('\*', '.*', $pattern);
+        $pattern = '/^' . $pattern . '$/';
+
+        return (bool) preg_match($pattern, $requestedPermission);
     }
 }
