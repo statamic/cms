@@ -106,7 +106,7 @@ const selectDate = (date) => {
                         <CalendarCellTrigger
                             :day="weekDate"
                             :month="month.value"
-                            class="w-full h-full flex flex-col items-center justify-center @3xl:items-start @3xl:justify-start"
+                            class="max-w-full max-h-full flex flex-col items-center justify-center @3xl:items-start @3xl:justify-start"
                             v-slot="{ dayValue, selected, today, outsideView }"
                             @click="selectDate(weekDate)"
                         >
