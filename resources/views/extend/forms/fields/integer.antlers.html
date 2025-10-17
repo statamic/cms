@@ -3,6 +3,9 @@
     name="{{ handle }}"
     value="{{ value }}"
     {{ if placeholder }}placeholder="{{ placeholder }}"{{ /if }}
+    {{ if min }}min="{{ min }}"{{ /if }}
+    {{ if max }}max="{{ max }}"{{ /if }}
+    {{ if step }}step="{{ step }}"{{ /if }}
     {{ if character_limit }}maxlength="{{ character_limit }}"{{ /if }}
     {{ if autocomplete }}autocomplete="{{ autocomplete }}"{{ /if }}
     {{ if js_driver }}{{ js_attributes }}{{ /if }}
