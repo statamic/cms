@@ -693,7 +693,7 @@ class TermQueryBuilderTest extends TestCase
         $this->assertEquals(['b', 'c'], $terms->map->slug()->all());
     }
 
-    /** @test **/
+    #[Test]
     public function terms_are_found_using_where_has_when_max_items_1()
     {
         $blueprint = Blueprint::makeFromFields(['terms_field' => ['type' => 'terms', 'max_items' => 1, 'taxonomies' => ['tags']]]);
@@ -726,10 +726,10 @@ class TermQueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'c'], $terms->map->slug->all());
     }
 
-    /** @test **/
+    #[Test]
     public function terms_are_found_using_where_has_when_max_items_not_1()
     {
-        $blueprint = Blueprint::makeFromFields(['terms_field' => ['type' => 'terms', 'max_items' => 1, 'taxonomies' => ['tags']]]);
+        $blueprint = Blueprint::makeFromFields(['terms_field' => ['type' => 'terms', 'taxonomies' => ['tags']]]);
         Blueprint::shouldReceive('in')->with('taxonomies/tags')->andReturn(collect(['tags' => $blueprint]));
 
         Taxonomy::make('tags')->save();
@@ -759,7 +759,7 @@ class TermQueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'b'], $terms->map->slug->all());
     }
 
-    /** @test **/
+    #[Test]
     public function terms_are_found_using_where_relation()
     {
         $blueprint = Blueprint::makeFromFields(['terms_field' => ['type' => 'terms', 'max_items' => 1, 'taxonomies' => ['tags']]]);
