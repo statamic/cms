@@ -131,7 +131,7 @@ watch(
 watch(
     values,
     (values) => {
-        if (props.trackDirtyState) dirty();
+        dirty();
         emit('update:modelValue', values);
     },
     { deep: true },
@@ -150,11 +150,11 @@ watch(
 );
 
 function dirty() {
-    Statamic.$dirty.add(props.name);
+    if (props.trackDirtyState) Statamic.$dirty.add(props.name);
 }
 
 function clearDirtyState() {
-    Statamic.$dirty.remove(props.name);
+    if (props.trackDirtyState) Statamic.$dirty.remove(props.name);
 }
 
 function setValues(newValues) {
@@ -183,7 +183,7 @@ function syncField(path) {
 
 function desyncField(path) {
     addLocalizedField(path);
-    if (props.trackDirtyState) dirty();
+    dirty();
 }
 
 function addLocalizedField(path) {
