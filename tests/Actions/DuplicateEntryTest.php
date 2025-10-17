@@ -564,7 +564,7 @@ class DuplicateEntryTest extends TestCase
             $arr = [
                 'slug' => $entry->slug(),
                 'published' => $entry->published(),
-                'data' => $entry->data()->all(),
+                'data' => $entry->data()->except(['updated_at', 'updated_by'])->all(),
             ];
 
             if (Site::hasMultiple()) {
