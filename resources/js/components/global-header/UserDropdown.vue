@@ -26,6 +26,7 @@ const isImpersonating = computed((() => user.is_impersonating));
                         {{ __('Super Admin') }}
                         <Badge v-if="isImpersonating" size="sm" pill :text="__('Impersonating')" />
                     </div>
+                    <Badge v-else-if="isImpersonating" size="sm" pill :text="__('Impersonating')" />
                 </div>
             </div>
         </DropdownHeader>
