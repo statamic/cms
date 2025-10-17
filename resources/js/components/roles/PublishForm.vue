@@ -13,40 +13,39 @@
             </ui-command-palette-item>
         </Header>
 
-        <Panel>
-            <div class="publish-fields-fluid">
-                <Field
-                    as="card"
-                    class="field-w-50"
+        <Panel :heading="__('Settings')">
+            <ui-card class="p-0! divide-y divide-gray-200 dark:divide-gray-800">
+                <ui-field
+                    as-config
                     :label="__('Title')"
                     :instructions="__('messages.role_title_instructions')"
                     :errors="errors.title"
                     id="role-title"
                 >
-                    <Input v-model="title" id="role-title" autocomplete="off" focus />
-                </Field>
+                    <ui-input v-model="title" id="role-title" autocomplete="off" focus />
+                </ui-field>
 
-                <Field
-                    as="card"
-                    class="field-w-50"
+                <ui-field
+                    as-config
                     :label="__('Handle')"
                     :instructions="__('messages.role_handle_instructions')"
                     :errors="handleErrors"
                     id="role-handle"
                 >
-                    <Input v-model="handle" id="role-handle" autocomplete="off" />
-                </Field>
+                    <ui-input v-model="handle" id="role-handle" autocomplete="off" />
+                </ui-field>
 
-                <Field
-                    as="card"
+                <ui-field
+                    as-config
                     v-if="canAssignSuper"
                     :label="__('permissions.super')"
                     :instructions="__('permissions.super_desc')"
+                    variant="inline"
                     id="role-super"
                 >
-                    <Switch v-model="isSuper" id="role-super" />
-                </Field>
-            </div>
+                    <ui-switch v-model="isSuper" id="role-super" />
+                </ui-field>
+            </ui-card>
         </Panel>
 
         <div v-if="!isSuper" class="space-y-6 mt-6">
@@ -58,7 +57,7 @@
 </template>
 
 <script>
-import { Header, Button, CardPanel, Panel, PanelHeader, Heading, Card, Switch, Field, Input } from '@/components/ui';
+import { Header, Button, CardPanel, Panel, PanelHeader, Heading, Card } from '@/components/ui';
 import { requireElevatedSession } from '@/components/elevated-sessions';
 import PermissionTree from '@/components/roles/PermissionTree.vue';
 
@@ -79,9 +78,6 @@ export default {
         PanelHeader,
         Heading,
         Card,
-        Switch,
-        Field,
-        Input,
     },
 
     props: {
