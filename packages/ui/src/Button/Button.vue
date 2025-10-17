@@ -102,6 +102,7 @@ const buttonClasses = computed(() => {
         :disabled="loading"
         :data-ui-group-target="['subtle', 'ghost'].includes(props.variant) ? null : true"
         :href
+        :target
         :type="props.href ? null : type"
     >
         <Icon v-if="icon" :name="icon" />

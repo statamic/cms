@@ -408,7 +408,7 @@ class FrontendTest extends TestCase
         $page->set('protect', 'test')->save();
 
         $this
-            ->actingAs(User::make())
+            ->actingAs(User::make()->save())
             ->get('/about')
             ->assertOk()
             ->assertHeaderMissing('X-Statamic-Protected');
