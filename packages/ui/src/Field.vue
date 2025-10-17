@@ -55,7 +55,7 @@ const rootClasses = computed(() =>
                 true: 'opacity-50',
             },
             asConfig: {
-                true: 'grid grid-cols-2 items-start px-4.5 py-4 gap-x-5!',
+                true: 'grid grid-cols-2 items-start px-4.5 py-4 gap-x-5! gap-y-5',
             },
             fullWidthSetting: {
                 true: '!grid-cols-1',
@@ -96,6 +96,11 @@ const errors = computed(() => {
 
     return props.errors;
 });
+
+const hasErrors = computed(() => {
+    if (!errors.value) return false;
+    return Array.isArray(errors.value) ? errors.value.length > 0 : Object.keys(errors.value).length > 0;
+});
 </script>
 
 <template>
@@ -120,7 +125,7 @@ const errors = computed(() => {
             <Description :text="instructions" v-if="instructions && !instructionsBelow" :class="descriptionClasses" />
         </div>
         <slot />
-        <div>
+        <div v-if="(instructions && instructionsBelow) || hasErrors">
             <Description :text="instructions" v-if="instructions && instructionsBelow" class="mt-2" />
             <ErrorMessage v-if="errors" v-for="(error, i) in errors" :key="i" :text="error" class="mt-2" />
         </div>
