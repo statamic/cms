@@ -183,7 +183,7 @@ function syncField(path) {
 
 function desyncField(path) {
     addLocalizedField(path);
-    dirty();
+    if (props.trackDirtyState) dirty();
 }
 
 function addLocalizedField(path) {
