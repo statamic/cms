@@ -12,7 +12,7 @@ export default {
 </script>
 
 <template>
-    <div class="mt-4 flex items-center gap-2">
+    <div class="mt-4 flex flex-wrap items-center gap-2">
         <Button
             v-if="config.options.length > 0"
             :href="blueprint.edit_url"
