@@ -110,7 +110,7 @@ function getHourLabel(hour) {
                     :class="hourCellClasses(date, hour)"
                     @click="selectDate(date)"
                 >
-                    <div class="absolute inset-0 p-1 overflow-scroll">
+                    <div class="absolute inset-0 p-1 overflow-scroll overscroll-contain">
                         <CalendarEntry
                             v-for="entry in getEntriesForHour(date, hour)"
                             :key="entry.id"
