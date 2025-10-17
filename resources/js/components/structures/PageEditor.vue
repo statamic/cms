@@ -41,9 +41,9 @@
 
             <div
                 v-if="!loading && (!readOnly || type === 'entry')"
-                class="flex flex-row-reverse items-center justify-between border-t bg-gray-200 p-4 dark:border-dark-900 dark:bg-dark-600"
+                class="flex flex-wrap flex-row-reverse gap-2 items-end justify-between border-t bg-gray-200 p-4 dark:border-dark-900 dark:bg-dark-600"
             >
-                <div v-if="!readOnly">
+                <div class="flex flex-wrap justify-end" v-if="!readOnly">
                     <Button variant="ghost" class="me-2" :text="__('Cancel')" @click="confirmClose(close)" />
                     <Button variant="primary" :text="__('Apply')" @click="submit" />
                 </div>
