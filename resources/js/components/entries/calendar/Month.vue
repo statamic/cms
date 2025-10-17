@@ -156,7 +156,7 @@ const selectDate = (date) => {
 </template>
 
 <style scoped>
-@media (height < 1000px) and (width >= 1400px) {
+@media (height < 1000px) and (width >= 1200px) {
     .calendar-grid {
         tr:not([data-week-has-entries="true"]) td {
             aspect-ratio: 2 / 1;
