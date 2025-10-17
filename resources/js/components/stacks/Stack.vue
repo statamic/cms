@@ -88,13 +88,13 @@ export default {
 
         offset() {
             if (this.isTopStack && this.narrow) {
-                return window.innerWidth - 400;
+                return window.innerWidth - 450;
             } else if (this.isTopStack && this.half) {
                 return window.innerWidth / 2;
             }
 
             // max of 200px, min of 80px
-            return Math.max(400 / (this.$stacks.count() + 1), 80);
+            return Math.max(450 / (this.$stacks.count() + 1), 80);
         },
 
         leftOffset() {
