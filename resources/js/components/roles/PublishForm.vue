@@ -43,7 +43,7 @@
                     variant="inline"
                     id="role-super"
                 >
-                    <ui-switch v-model="isSuper" id="role-super" />
+                    <Switch v-model="isSuper" id="role-super" />
                 </Field>
             </Card>
         </Panel>
