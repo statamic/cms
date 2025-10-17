@@ -52,12 +52,9 @@ trait RendersControlPanelExceptions
         return $target;
     }
 
-    protected function shouldRenderErrorPage($response): bool
+    private function shouldRenderErrorPage($response): bool
     {
-        if (
-            $response instanceof JsonResponse
-            || $response instanceof RedirectResponse
-        ) {
+        if ($response instanceof JsonResponse || $response instanceof RedirectResponse) {
             return false;
         }
 
