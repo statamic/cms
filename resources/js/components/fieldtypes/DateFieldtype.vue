@@ -100,6 +100,10 @@ export default {
 
     created() {
         this.$events.$on(`container.${this.publishContainer.name}.saving`, this.triggerChangeOnFocusedField);
+
+        if ((this.hasDate || this.isInline) && !this.value) {
+            this.addDate();
+        }
     },
 
     unmounted() {
