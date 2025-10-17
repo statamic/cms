@@ -140,7 +140,7 @@ class Role extends BaseRole
 
         $pattern = preg_quote($wildcardPermission, '/');
         $pattern = str_replace('\*', '.*', $pattern);
-        $pattern = '/^' . $pattern . '$/';
+        $pattern = '/^'.$pattern.'$/';
 
         return (bool) preg_match($pattern, $requestedPermission);
     }
