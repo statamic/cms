@@ -24,6 +24,8 @@ use function Statamic\trans as __;
 
 class CollectionsController extends CpController
 {
+    use QueriesAuthorEntries;
+
     public function index(Request $request)
     {
         $this->authorize('index', CollectionContract::class, __('You are not authorized to view collections.'));
@@ -55,10 +57,18 @@ class CollectionsController extends CpController
                 || User::current()->can('view', $collection)
                 && $collection->sites()->contains(Site::selected()->handle());
         })->map(function ($collection) {
+            $entriesCount = $collection->queryEntries()
+                ->where('site', Site::selected())
+                ->when(
+                    User::current()->cant('view-other-authors-entries', [EntryContract::class, $collection]),
+                    fn ($query) => $this->queryAuthorEntries($query, $collection)
+                )
+                ->count();
+
             return [
                 'id' => $collection->handle(),
                 'title' => $collection->title(),
-                'entries' => $collection->queryEntries()->where('site', Site::selected())->count(),
+                'entries' => $entriesCount,
                 'edit_url' => $collection->editUrl(),
                 'delete_url' => $collection->deleteUrl(),
                 'entries_url' => cp_route('collections.show', $collection->handle()),
