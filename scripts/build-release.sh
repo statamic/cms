@@ -2,6 +2,15 @@
 
 set -e
 
+# Check if version argument is provided
+if [ -z "$1" ]; then
+    echo "Usage: ./build-release.sh VERSION"
+    echo "Example: ./build-release.sh 6.0.0-alpha.14"
+    exit 1
+fi
+
+VERSION=$1
+
 # Generate types for all packages
 npm run types
 
@@ -11,20 +20,42 @@ npm run build-dev
 npm run frontend-build
 
 # Create tarballs for the Laravel package
-cd resources
-tar -czvf dist.tar.gz dist
-tar -czvf dist-dev.tar.gz dist-dev
-tar -czvf dist-frontend.tar.gz dist-frontend
-cd ..
-
-# Create a tarball for @statamic/cms
-cp packages/ui/src/ui.css packages/cms/src/ui.css
-cd packages/cms
-tar -czvf ../../resources/dist-package.tar.gz *
+cd resources/dist
+tar -czvf ../dist.tar.gz *
+cd ../dist-dev
+tar -czvf ../dist-dev.tar.gz *
+cd ../dist-frontend
+tar -czvf ../dist-frontend.tar.gz *
 cd ../..
 
-# Create a tarball for @statamic/ui
+# Create npm pack tarballs for packages with stable symlinks
+mkdir -p temp-packages
+
 cd packages/ui
-tar -czvf ../../resources/dist-ui.tar.gz *
+npm version $VERSION --no-git-tag-version
+npm pack --pack-destination ../../temp-packages
+cd ../../temp-packages
+ln -sf statamic-ui-*.tgz ui.tgz
+cd ..
+
+cp packages/ui/src/ui.css packages/cms/src/ui.css
+cd packages/cms
+npm version $VERSION --no-git-tag-version
+npm pack --pack-destination ../../temp-packages
+cd ../../temp-packages
+ln -sf statamic-cms-*.tgz cms.tgz
+cd ..
+
+# Create consolidated packages tarball with flat structure
+cd temp-packages
+tar -czvf ../resources/dist-packages.tar.gz *
+cd ..
+rm -rf temp-packages
+
+# Reset package versions back to 0.0.0
+cd packages/ui
+npm version 0.0.0 --no-git-tag-version
+cd ../cms
+npm version 0.0.0 --no-git-tag-version
 cd ../..
 

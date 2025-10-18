@@ -73,12 +73,8 @@
                 "path": "resources/dist-frontend"
             },
             {
-                "url": "https://github.com/statamic/cms/releases/download/{$version}/dist-package.tar.gz",
-                "path": "resources/dist-package"
-            },
-            {
-                "url": "https://github.com/statamic/cms/releases/download/{$version}/dist-ui.tar.gz",
-                "path": "resources/dist-ui"
+                "url": "https://github.com/statamic/cms/releases/download/{$version}/dist-packages.tar.gz",
+                "path": "packages"
             }
         ],
         "laravel": {
