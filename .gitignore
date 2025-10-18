@@ -12,7 +12,9 @@ resources/dist-dev
 resources/dist-frontend
 resources/dist-package
 resources/dist-ui
+resources/*.tar.gz
 packages/cms/src/ui.css
+packages/*.tgz
 composer.lock
 .env
 bundle-stats.html

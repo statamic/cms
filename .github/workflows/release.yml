@@ -21,7 +21,7 @@ jobs:
         run: npm ci
 
       - name: Build release assets
-        run: bash ./scripts/build-release.sh
+        run: bash ./scripts/build-release.sh ${{ github.ref_name }}
 
       - name: Get Changelog
         id: changelog
@@ -70,22 +70,12 @@ jobs:
           asset_name: dist-frontend.tar.gz
           asset_content_type: application/tar+gz
 
-      - name: Upload dist-package zip to release
+      - name: Upload dist-packages zip to release
         uses: actions/upload-release-asset@v1.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./resources/dist-package.tar.gz
-          asset_name: dist-package.tar.gz
-          asset_content_type: application/tar+gz
-
-      - name: Upload dist-ui zip to release
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./resources/dist-ui.tar.gz
-          asset_name: dist-ui.tar.gz
+          asset_path: ./resources/dist-packages.tar.gz
+          asset_name: dist-packages.tar.gz
           asset_content_type: application/tar+gz
