@@ -106,25 +106,25 @@ const hasErrors = computed(() => {
 <template>
     <div :class="[rootClasses, $attrs.class]" data-ui-input-group>
         <div v-if="label || (instructions && !instructionsBelow) || $slots.label || $slots.actions">
-        <div
-            v-if="$slots.actions"
-            :class="[
-                'flex items-center gap-x-1 mb-0',
-                props.label || $slots.label ? 'justify-between' : 'justify-end',
-            ]"
-            data-ui-field-header
-        >
-            <slot name="label">
-                <Label v-if="label" v-bind="labelProps" class="flex-1" />
-            </slot>
-            <slot name="actions" />
-        </div>
-        <div v-if="label || (instructions && !instructionsBelow) || ($slots.label && !$slots.actions)" data-ui-field-text :class="inline ? 'mb-0' : 'mb-1.5'">
-            <slot v-if="!$slots.actions" name="label">
-                <Label v-if="label" v-bind="labelProps" class="flex-1" />
-            </slot>
-            <Description :text="instructions" v-if="instructions && !instructionsBelow" :class="descriptionClasses" />
-        </div>
+            <div
+                v-if="$slots.actions"
+                :class="[
+                    'flex items-center gap-x-1 mb-0',
+                    props.label || $slots.label ? 'justify-between' : 'justify-end',
+                ]"
+                data-ui-field-header
+            >
+                <slot name="label">
+                    <Label v-if="label" v-bind="labelProps" class="flex-1" />
+                </slot>
+                <slot name="actions" />
+            </div>
+            <div v-if="label || (instructions && !instructionsBelow) || ($slots.label && !$slots.actions)" data-ui-field-text :class="inline ? 'mb-0' : 'mb-1.5'">
+                <slot v-if="!$slots.actions" name="label">
+                    <Label v-if="label" v-bind="labelProps" class="flex-1" />
+                </slot>
+                <Description :text="instructions" v-if="instructions && !instructionsBelow" :class="descriptionClasses" />
+            </div>
         </div>
         <slot />
         <div v-if="(instructions && instructionsBelow) || hasErrors">
