@@ -12,7 +12,7 @@ class MarkdownContentTest extends ParserTestCase
     public function test_markdown_content_is_not_parsed_as_antlers()
     {
         $content = <<<'EOT'
-<div class="max-w-3xl mx-auto my-30">
+<div class="max-w-7xl mx-auto my-30">
     {{ markdown }}
 </div>
 EOT;

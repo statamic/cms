@@ -116,6 +116,12 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         $this->supplements = collect();
     }
 
+    public function __clone()
+    {
+        $this->data = clone $this->data;
+        $this->supplements = clone $this->supplements;
+    }
+
     public function id($id = null)
     {
         if ($id) {
@@ -769,6 +775,13 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         return $this;
     }
 
+    public function moveQuietly($folder, $filename = null)
+    {
+        $this->withEvents = false;
+
+        return $this->move(...func_get_args());
+    }
+
     /**
      * Replace an asset and/or its references where necessary.
      *
@@ -781,13 +794,13 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         // until after the `AssetReplaced` event is fired. We still want to fire events
         // like `AssetDeleted` and `AssetSaved` though, so that other listeners will
         // get triggered (for cache invalidation, clearing of glide cache, etc.)
-        UpdateAssetReferencesSubscriber::disable();
+        app(UpdateAssetReferencesSubscriber::class)::disable();
 
         if ($deleteOriginal) {
             $originalAsset->delete();
         }
 
-        UpdateAssetReferencesSubscriber::enable();
+        app(UpdateAssetReferencesSubscriber::class)::enable();
 
         AssetReplaced::dispatch($originalAsset, $this);
 

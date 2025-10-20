@@ -8,6 +8,8 @@ use Statamic\Facades\Asset as Assets;
 
 class DuplicateAsset extends Action
 {
+    protected $icon = 'duplicate';
+
     public static function title()
     {
         return __('Duplicate');

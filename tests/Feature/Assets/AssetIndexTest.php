@@ -38,7 +38,7 @@ class AssetIndexTest extends TestCase
             ->actingAs($user)
             ->get(cp_route('assets.index'))
             ->assertSuccessful()
-            ->assertSee(cp_route('asset-containers.create'));
+            ->assertSee('Create Asset Container');
     }
 
     #[Test]

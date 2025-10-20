@@ -1,32 +1,20 @@
-<template>
+<script setup>
+import { Select } from '@/components/ui';
 
-    <v-select
-        class="text-sm"
-        :value="site"
-        :clearable="false"
-        :searchable="false"
-        :get-option-label="site => __(site.name)"
-        :options="sites"
-        @input="$emit('input', $event)"
-    />
+defineProps({
+    sites: { type: Array, required: true },
+    modelValue: { type: String, required: true },
+});
 
-</template>
-
-<script>
-export default {
-
-    props: {
-        sites: { type: Array, required: true },
-        value: { type: String, required: true },
-    },
-
-    computed: {
-
-        site() {
-            return _.findWhere(this.sites, { handle: this.value });
-        }
-
-    }
-
-}
+defineEmits(['update:modelValue']);
 </script>
+
+<template>
+    <Select
+        :options="sites"
+        option-label="name"
+        option-value="handle"
+        :model-value="modelValue"
+        @update:model-value="$emit('update:modelValue', $event)"
+    />
+</template>

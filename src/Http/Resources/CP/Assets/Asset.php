@@ -4,10 +4,13 @@ namespace Statamic\Http\Resources\CP\Assets;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Statamic\Facades\Action;
+use Statamic\Facades\User;
 use Statamic\Support\Str;
 
 class Asset extends JsonResource
 {
+    use HasThumbnails;
+
     public function toArray($request)
     {
         $data = [
@@ -21,7 +24,7 @@ class Asset extends JsonResource
             'extension' => $this->extension(),
             'downloadUrl' => $this->cpDownloadUrl(),
             'size' => Str::fileSizeForHumans($this->size()),
-            'lastModified' => $this->lastModified()->inPreferredFormat(),
+            'lastModified' => $this->lastModified()->toIso8601String(),
             'lastModifiedRelative' => $this->lastModified()->diffForHumans(),
             'mimeType' => $this->mimeType(),
             'isImage' => $this->isImage(),
@@ -31,6 +34,8 @@ class Asset extends JsonResource
             'isMedia' => $this->isMedia(),
             'isPdf' => $this->isPdf(),
             'isPreviewable' => $this->isPreviewable(),
+            'isEditable' => User::current()->can('edit', $this->resource),
+            'isViewable' => User::current()->can('view', $this->resource),
 
             $this->mergeWhen($this->hasDimensions(), function () {
                 return [
@@ -45,22 +50,15 @@ class Asset extends JsonResource
                 ];
             }),
 
-            $this->mergeWhen($this->isImage() || $this->isSvg(), function () {
-                return [
-                    'preview' => $this->previewUrl(),
-                    'thumbnail' => $this->thumbnailUrl('small'),
-                ];
-            }),
-
             $this->mergeWhen($this->isPdf(), function () {
                 return [
                     'pdfUrl' => $this->pdfUrl(),
                 ];
             }),
 
+            $this->merge($this->thumbnails()),
             $this->merge($this->publishFormData()),
 
-            'allowDownloading' => $this->container()->allowDownloading(),
             'actionUrl' => cp_route('assets.actions.run'),
             'actions' => Action::for($this->resource, [
                 'container' => $this->container()->handle(),
@@ -72,13 +70,6 @@ class Asset extends JsonResource
         ];
 
         return ['data' => $data];
-    }
-
-    protected function previewUrl()
-    {
-        // Public asset containers can use their regular URLs.
-        // Private ones don't have URLs so we'll generate an actual-size "thumbnail".
-        return $this->container()->accessible() ? $this->url() : $this->thumbnailUrl();
     }
 
     protected function publishFormData()

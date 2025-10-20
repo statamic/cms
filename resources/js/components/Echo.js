@@ -1,9 +1,4 @@
-import LaravelEcho from 'laravel-echo';
-import Pusher from 'pusher-js';
-window.Pusher = Pusher;
-
 class Echo {
-
     constructor() {
         this.configCallbacks = [];
         this.bootedCallbacks = [];
@@ -17,18 +12,25 @@ class Echo {
         this.bootedCallbacks.push(callback);
     }
 
-    start() {
+    async start() {
+        const [{ default: LaravelEcho }, { default: Pusher }] = await Promise.all([
+            import('laravel-echo'),
+            import('pusher-js'),
+        ]);
+
+        window.Pusher = Pusher;
+
         let config = {
             ...Statamic.$config.get('broadcasting.options'),
             csrfToken: Statamic.$config.get('csrfToken'),
             authEndpoint: Statamic.$config.get('broadcasting.endpoint'),
         };
 
-        this.configCallbacks.forEach(callback => config = callback(config));
+        this.configCallbacks.forEach((callback) => (config = callback(config)));
 
         this.echo = new LaravelEcho(config);
 
-        this.bootedCallbacks.forEach(callback => callback(this));
+        this.bootedCallbacks.forEach((callback) => callback(this));
         this.bootedCallbacks = [];
     }
 }
@@ -47,7 +49,7 @@ class Echo {
     'registerVueRequestInterceptor',
     'registerAxiosRequestInterceptor',
     'registerjQueryAjaxSetup',
-].forEach(method => {
+].forEach((method) => {
     Echo.prototype[method] = function (...args) {
         return this.echo[method](...args);
     };

@@ -7,6 +7,7 @@ use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\Assert;
 use Statamic\Facades\Config;
 use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\Http\Middleware\CP\AuthenticateSession;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
@@ -29,6 +30,10 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
         if (isset($uses[PreventSavingStacheItemsToDisk::class])) {
             $this->preventSavingStacheItemsToDisk();
+        }
+
+        if (isset($uses[ElevatesSessions::class])) {
+            $this->addElevatedSessionMacros();
         }
 
         if ($this->shouldFakeVersion) {
@@ -59,6 +64,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     {
         return [
             \Statamic\Providers\StatamicServiceProvider::class,
+            \Inertia\ServiceProvider::class,
             \Rebing\GraphQL\GraphQLServiceProvider::class,
             \Wilderborn\Partyline\ServiceProvider::class,
             \Archetype\ServiceProvider::class,
@@ -87,6 +93,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     protected function getEnvironmentSetUp($app)
     {
+        $app['config']->set('inertia.testing.page_paths', [statamic_path('resources/js/pages')]);
+
         $app['config']->set('auth.providers.users.driver', 'statamic');
         $app['config']->set('statamic.stache.watcher', false);
         $app['config']->set('statamic.users.repository', 'file');
@@ -138,6 +146,8 @@ YAML);
         Site::setSites($sites);
 
         Config::set('statamic.system.multisite', Site::hasMultiple());
+
+        URL::clearUrlCache();
     }
 
     protected function setSiteValue($site, $key, $value)
@@ -145,6 +155,8 @@ YAML);
         Site::setSiteValue($site, $key, $value);
 
         Config::set('statamic.system.multisite', Site::hasMultiple());
+
+        URL::clearUrlCache();
     }
 
     protected function assertEveryItem($items, $callback)

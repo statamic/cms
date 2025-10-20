@@ -1,35 +1,33 @@
 export default {
-
     provide() {
         return {
             suggestableConditionFieldsProvider: this.makeConditionsProvider(),
-        }
+        };
     },
 
     computed: {
-
         fieldsForConditionSuggestions() {
             return this.tabs.reduce((fields, tab) => {
-                return fields.concat(tab.sections.reduce((fields, section) => {
-                    return fields.concat(section.fields);
-                }, []));
+                return fields.concat(
+                    tab.sections.reduce((fields, section) => {
+                        return fields.concat(section.fields);
+                    }, []),
+                );
             }, []);
-        }
-
+        },
     },
 
     methods: {
-
         suggestableConditionFields(section = null) {
             let fields = this.getSectionFieldsForConditionSuggestions(section).reduce((fields, field) => {
                 return fields.concat(
                     field.type === 'import'
                         ? this.getFieldsFromImportedFieldset(field.fieldset, field.prefix)
-                        : [field]
+                        : [field],
                 );
             }, []);
 
-            return _.unique(fields);
+            return [...new Set(fields)];
         },
 
         makeConditionsProvider() {
@@ -40,21 +38,20 @@ export default {
         },
 
         getFieldsFromImportedFieldset(fieldset, prefix) {
-            return Statamic.$config.get(`fieldsets.${fieldset}.fields`, [])
+            return Statamic.$config
+                .get(`fieldsets.${fieldset}.fields`, [])
                 .reduce((fields, field) => {
                     return fields.concat(
                         field.type === 'import'
                             ? this.getFieldsFromImportedFieldset(field.fieldset, field.prefix)
-                            : [field]
+                            : [field],
                     );
                 }, [])
-                .map(field => prefix ? { ...field, handle: prefix + field.handle } : field);
+                .map((field) => (prefix ? { ...field, handle: prefix + field.handle } : field));
         },
 
         getSectionFieldsForConditionSuggestions(vm = null) {
             return this.fieldsForConditionSuggestions;
-        }
-
-    }
-
-}
+        },
+    },
+};

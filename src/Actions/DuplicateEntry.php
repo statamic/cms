@@ -10,6 +10,8 @@ use Statamic\Facades\User;
 
 class DuplicateEntry extends Action
 {
+    protected $icon = 'duplicate';
+
     private $newItems;
 
     public static function title()
@@ -66,6 +68,8 @@ class DuplicateEntry extends Action
 
     private function duplicateEntry(Entry $original, ?string $origin = null)
     {
+        $this->suspendPropagation($original);
+
         $originalParent = $this->getEntryParentFromStructure($original);
         [$title, $slug] = $this->generateTitleAndSlug($original);
 
@@ -88,7 +92,7 @@ class DuplicateEntry extends Action
             $entry->slug($slug);
         }
 
-        if ($original->hasDate()) {
+        if ($original->hasExplicitDate()) {
             $entry->date($original->date());
         }
 
@@ -174,5 +178,10 @@ class DuplicateEntry extends Action
         }
 
         return $this->newItems->first()->editUrl();
+    }
+
+    private function suspendPropagation(Entry $original): void
+    {
+        $original->collection()->propagate(false);
     }
 }

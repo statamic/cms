@@ -2,18 +2,24 @@
 
 namespace Tests\Antlers\Runtime;
 
+use Illuminate\Support\Facades\Log;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
+use Statamic\Fieldtypes\Text;
+use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Statamic\View\Antlers\Language\Runtime\RuntimeConfiguration;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Tests\Antlers\ParserTestCase;
 use Tests\Factories\EntryFactory;
+use Tests\FakesViews;
 use Tests\PreventSavingStacheItemsToDisk;
 
 class PhpEnabledTest extends ParserTestCase
 {
-    use PreventSavingStacheItemsToDisk;
+    use FakesViews,
+        PreventSavingStacheItemsToDisk;
 
     public function test_php_has_access_to_scope_data()
     {
@@ -513,8 +519,8 @@ EOT;
     public function test_assignments_from_php_nodes()
     {
         $template = <<<'EOT'
-{{? 
-    $value_one = 100; 
+{{?
+    $value_one = 100;
     $value_two = 0;
 ?}}
 
@@ -532,5 +538,175 @@ EOT;
         $result = $this->renderString($template, [], true);
         $this->assertStringContainsString('<value_one: 1125>', $result);
         $this->assertStringContainsString('<value_two: 1025>', $result);
+    }
+
+    public function test_updating_variables_within_scope_using_php()
+    {
+        $data = [
+            'blocks' => [
+                [
+                    'type' => 'the_block',
+                ],
+            ],
+        ];
+
+        $outerPartial = <<<'EOT'
+Outer Partial Before: {{ view.blocks }}{{ type }}{{ /view.blocks }}
+{{ partial:inner_partial :blocks="blocks" /}}
+Outer Partial After: {{ view.blocks }}{{ type }}{{ /view.blocks }}
+EOT;
+
+        $innerPartial = <<<'EOT'
+Inner Partial Before: {{ view.blocks }}{{ type }} {{ /view.blocks }}
+
+{{ if view.blocks.0 && view.blocks.0.type != 'hero_block' }}
+    {{?
+        array_unshift($view['blocks'], [
+            'type' => 'hero_block',
+            'simple_bard_field' => [
+                'type' => 'text',
+                'text' => 'The Text',
+            ],
+        ]);
+    ?}}
+{{ /if }}
+
+Inner Partial After: {{ view.blocks }}{{ type }} {{ /view.blocks }}
+EOT;
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('outer_partial', $outerPartial);
+        $this->viewShouldReturnRaw('inner_partial', $innerPartial);
+
+        $expected = <<<'EXPECTED'
+Outer Partial Before: the_block
+Inner Partial Before: the_block
+
+
+
+
+Inner Partial After: hero_block the_block
+Outer Partial After: the_block
+EXPECTED;
+
+        $this->assertSame(
+            (string) str($expected)->squish(),
+            (string) str($this->renderString('{{ partial:outer_partial :blocks="blocks" /}}', $data))->squish(),
+        );
+    }
+
+    public function test_variables_created_inside_php_do_not_override_injected_values()
+    {
+        $this->withFakeViews();
+
+        $partial = <<<'EOT'
+{{? $title = 'The Title'; ?}}
+
+Partial: {{ title }}
+EOT;
+
+        $this->viewShouldReturnRaw('the_partial', $partial);
+
+        $template = <<<'EOT'
+Before: {{ title }}
+{{ partial:the_partial /}}
+After: {{ title }}
+EOT;
+
+        $expected = <<<'EXPECTED'
+Before: The Original Title
+
+
+Partial: The Title
+After: The Original Title
+EXPECTED;
+
+        $this->assertSame(
+            $expected,
+            $this->renderString($template, ['title' => 'The Original Title']),
+        );
+
+        $template = <<<'EOT'
+Before: {{ title }}
+{{ partial:the_partial :title="title" /}}
+After: {{ title }}
+EOT;
+
+        $this->assertSame(
+            $expected,
+            $this->renderString($template, ['title' => 'The Original Title']),
+        );
+    }
+
+    public function test_disabled_php_echo_node_inside_user_values()
+    {
+        $textFieldtype = new Text();
+        $field = new Field('text_field', [
+            'type' => 'text',
+            'antlers' => true,
+        ]);
+
+        $textContent = <<<'TEXT'
+Text: {{$ Str::upper('hello, world.') $}}
+TEXT;
+
+        $textFieldtype->setField($field);
+        $value = new Value($textContent, 'text_field', $textFieldtype);
+
+        Log::shouldReceive('warning')
+            ->once()
+            ->with("PHP Node evaluated in user content: {{\$ Str::upper('hello, world.') \$}}", [
+                'file' => null,
+                'trace' => [],
+                'content' => " Str::upper('hello, world.') ",
+            ]);
+
+        $result = $this->renderString('{{ text_field }}', ['text_field' => $value]);
+
+        $this->assertSame('Text: ', $result);
+
+        GlobalRuntimeState::$allowPhpInContent = true;
+
+        $result = $this->renderString('{{ text_field }}', ['text_field' => $value]);
+
+        $this->assertSame('Text: HELLO, WORLD.', $result);
+
+        GlobalRuntimeState::$allowPhpInContent = false;
+    }
+
+    public function test_disabled_php_node_inside_user_values()
+    {
+        $textFieldtype = new Text();
+        $field = new Field('text_field', [
+            'type' => 'text',
+            'antlers' => true,
+        ]);
+
+        $textContent = <<<'TEXT'
+Text: {{? echo Str::upper('hello, world.') ?}}
+TEXT;
+
+        $textFieldtype->setField($field);
+        $value = new Value($textContent, 'text_field', $textFieldtype);
+
+        Log::shouldReceive('warning')
+            ->once()
+            ->with("PHP Node evaluated in user content: {{? echo Str::upper('hello, world.') ?}}", [
+                'file' => null,
+                'trace' => [],
+                'content' => " echo Str::upper('hello, world.') ",
+            ]);
+
+        $result = $this->renderString('{{ text_field }}', ['text_field' => $value]);
+
+        $this->assertSame('Text: ', $result);
+
+        GlobalRuntimeState::$allowPhpInContent = true;
+
+        $result = $this->renderString('{{ text_field }}', ['text_field' => $value]);
+
+        $this->assertSame('Text: HELLO, WORLD.', $result);
+
+        GlobalRuntimeState::$allowPhpInContent = false;
     }
 }

@@ -47,6 +47,28 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Blueprints Path
+    |--------------------------------------------------------------------------
+    |
+    | Where your blueprint YAML files are stored.
+    |
+    */
+
+    'blueprints_path' => resource_path('blueprints'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fieldsets Path
+    |--------------------------------------------------------------------------
+    |
+    | Where your fieldset YAML files are stored.
+    |
+    */
+
+    'fieldsets_path' => resource_path('fieldsets'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Send the Powered-By Header
     |--------------------------------------------------------------------------
     |
@@ -73,6 +95,35 @@ return [
     */
 
     'date_format' => 'F jS, Y',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Timezone
+    |--------------------------------------------------------------------------
+    |
+    | Statamic will use this timezone when displaying dates on the front-end.
+    | You can use any timezone supported by PHP. When set to null it will
+    | fall back to the timezone defined in your `app.php` config file.
+    |
+    | https://www.php.net/manual/en/timezones.php
+    |
+    */
+
+    'display_timezone' => null,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Localize Dates in Modifiers
+    |--------------------------------------------------------------------------
+    |
+    | When using date-related modifiers, Carbon instances will be in UTC.
+    | Enabling this setting will ensure that dates get localized into
+    | the timezone defined in `display_timezone`. Otherwise you'll
+    | need to manually localize dates in all of your templates.
+    |
+    */
+
+    'localize_dates_in_modifiers' => false,
 
     /*
     |--------------------------------------------------------------------------

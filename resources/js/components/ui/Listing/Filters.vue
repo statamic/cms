@@ -1,0 +1,182 @@
+<script setup>
+import {
+    Badge,
+    Button,
+    Panel,
+    PanelHeader,
+    Card,
+    Heading,
+} from '@ui';
+import { injectListingContext } from '../Listing/Listing.vue';
+import { computed, ref, watch, nextTick } from 'vue';
+import FieldFilter from './FieldFilter.vue';
+import DataListFilter from './Filter.vue';
+
+const { filters, activeFilters, activeFilterBadges, activeFilterBadgeCount, setFilter, reorderable } = injectListingContext();
+
+const open = ref(false);
+const filtersButtonWrapperRef = ref(null);
+
+const fieldFilter = computed(() => filters.value.find((filter) => filter.is_fields));
+const fieldFilterHandle = computed(() => fieldFilter.value?.handle);
+const fieldFilterBadges = computed(() => activeFilterBadges.value[fieldFilterHandle.value] || {});
+const standardFilters = computed(() => filters.value.filter((filter) => !filter.is_fields));
+
+const standardBadges = computed(() => {
+    const { [fieldFilterHandle.value]: fields, ...badges } = activeFilterBadges.value;
+    return badges;
+});
+
+function removeFieldFilter(handle) {
+    const fields = { ...activeFilters.value[fieldFilterHandle.value] };
+    delete fields[handle];
+    setFilter(fieldFilterHandle.value, fields);
+}
+
+function isActive(handle) {
+    return activeFilters.value.hasOwnProperty(handle);
+}
+
+const stackContentRef = ref(null);
+const comboboxObserver = ref(null);
+
+function tryFocusCombobox(root) {
+    if (!root) return false;
+    const anchor = root.querySelector('[data-ui-combobox-anchor]');
+    if (anchor && typeof anchor.focus === 'function') {
+        anchor.focus();
+        return true;
+    }
+    const input = root.querySelector('input');
+    if (input && typeof input.focus === 'function') {
+        input.focus();
+        return true;
+    }
+    return false;
+}
+
+function focusComboboxWhenReady() {
+    const root = stackContentRef.value;
+    if (!root) return;
+
+    // If already in DOM, focus immediately
+    if (tryFocusCombobox(root)) return;
+
+    // Otherwise observe for it to appear
+    if (comboboxObserver.value) comboboxObserver.value.disconnect();
+    comboboxObserver.value = new MutationObserver(() => {
+        if (tryFocusCombobox(root)) {
+            comboboxObserver.value.disconnect();
+            comboboxObserver.value = null;
+        }
+    });
+    comboboxObserver.value.observe(root, { childList: true, subtree: true });
+}
+
+watch(open, async (isOpen) => {
+    if (!isOpen) return;
+    await nextTick();
+    focusComboboxWhenReady();
+});
+
+function handleStackClosed() {
+    // Clean up observer if active
+    if (comboboxObserver.value) {
+        comboboxObserver.value.disconnect();
+        comboboxObserver.value = null;
+    }
+
+    open.value = false;
+    nextTick(() => {
+        requestAnimationFrame(() => {
+            const wrapper = filtersButtonWrapperRef.value;
+            const buttonEl = wrapper ? wrapper.querySelector('button') : null;
+            if (buttonEl && typeof buttonEl.focus === 'function') buttonEl.focus();
+        });
+    });
+}
+</script>
+
+<template>
+    <div class="flex flex-1 items-center gap-2 sm:gap-3 overflow-x-auto py-3 rounded-r-4xl">
+
+        <div ref="filtersButtonWrapperRef" class="sticky left-0 ps-[1px] rounded-r-lg bg-white dark:bg-gray-900 mask-bg mask-bg--left mask-bg--left-small">
+            <Button icon="sliders-horizontal" class="[&_svg]:size-3.5" :disabled="reorderable" @click="open = true">
+                {{ __('Filters') }}
+                <Badge
+                    v-if="activeFilterBadgeCount"
+                    :text="activeFilterBadgeCount"
+                    size="sm"
+                    pill
+                    class="absolute -top-1.25 -right-2.75"
+                />
+            </Button>
+        </div>
+
+        <stack half name="filters" v-if="open" @closed="handleStackClosed">
+            <div ref="stackContentRef" class="flex-1 p-3 bg-white dark:bg-gray-800 h-full overflow-auto rounded-l-2xl relative">
+                <Button
+                    icon="x"
+                    variant="ghost"
+                    size="sm"
+                    class="absolute top-1.75 right-3 z-10 [&_svg]:size-4"
+                    @click="handleStackClosed"
+                />
+                <Heading size="lg" :text="__('Filters')" class="mb-4 px-1.5 pr-12 [&_svg]:size-4" icon="sliders-horizontal" />
+                <div class="space-y-4">
+                    <Panel v-if="fieldFilter">
+                        <PanelHeader class="flex items-center justify-between">
+                            <Heading :text="__('Fields')" />
+                            <Button v-if="isActive(fieldFilterHandle)" size="sm" :text="__('Clear')" @click="setFilter(fieldFilterHandle, null)" />
+                        </PanelHeader>
+                        <Card>
+                            <FieldFilter
+                                :config="fieldFilter"
+                                :values="activeFilters.fields || {}"
+                                @changed="setFilter(fieldFilterHandle, $event)"
+                            />
+                        </Card>
+                    </Panel>
+
+                    <Panel
+                        v-for="filter in standardFilters"
+                        :key="filter.handle"
+                    >
+                        <PanelHeader class="flex items-center justify-between">
+                            <Heading :text="filter.title" />
+                            <Button v-if="isActive(filter.handle)" size="sm" :text="__('Clear')" @click="setFilter(filter.handle, null)" />
+                        </PanelHeader>
+                        <Card>
+                            <data-list-filter
+                                :filter="filter"
+                                :values="activeFilters[filter.handle]"
+                                @changed="setFilter(filter.handle, $event)"
+                            />
+                        </Card>
+                    </Panel>
+                </div>
+            </div>
+        </stack>
+
+        <Button
+            v-for="(badge, handle, index) in fieldFilterBadges"
+            :key="handle"
+            variant="filled"
+            :icon-append="reorderable ? null : 'x'"
+            :text="badge"
+            :disabled="reorderable"
+            class="last:me-12"
+            @click="removeFieldFilter(handle)"
+        />
+        <Button
+            v-for="(badge, handle, index) in standardBadges"
+            :key="handle"
+            variant="filled"
+            :icon-append="reorderable ? null : 'x'"
+            :text="badge"
+            :disabled="reorderable"
+            class="last:me-12"
+            @click="setFilter(handle, null)"
+        />
+    </div>
+</template>

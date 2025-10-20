@@ -858,7 +858,7 @@
     "Seller": "Автор",
     "Send Email Invitation": "Отправить имейл с приглашением",
     "Send Password Reset": "Отправить имейл для сброса пароля",
-    "Send password reset email to this user?|Send password reset email to these :count users?": "Отправить имейл для сброса пароля этому пользователю?|Отправить имейлы для сброса паролей этим :count пользователям?",
+    "Would you like to email a reset link to this user?|Would you like to email a reset link to these :count users?": "Отправить имейл для сброса пароля этому пользователю?|Отправить имейлы для сброса паролей этим :count пользователям?",
     "Send Test Email": "Отправить тестовый имейл",
     "Sender": "Отправитель",
     "Sendmail": "Sendmail",

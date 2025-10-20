@@ -658,7 +658,7 @@ class PathDataManager
 
                         continue;
                     } else {
-                        if ($this->cascade != null) {
+                        if (GlobalRuntimeState::$isCascadeEnabled && $this->cascade != null) {
                             // Attempt to locate the data in the cascade.
                             $cascadeData = $this->cascade->get($pathItem->name);
 
@@ -699,6 +699,8 @@ class PathDataManager
                 }
 
                 if ($this->reducedVar instanceof Model) {
+                    $this->reducedVar = $this->reducedVar->{$pathItem->name};
+                } elseif (is_object($this->reducedVar) && property_exists($this->reducedVar, $pathItem->name)) {
                     $this->reducedVar = $this->reducedVar->{$pathItem->name};
                 } else {
                     $this->reduceVar($pathItem, $data);

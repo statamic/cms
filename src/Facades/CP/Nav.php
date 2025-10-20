@@ -16,7 +16,6 @@ use Statamic\CP\Navigation\NavItem;
  * @method static NavItem|null findOrCreate(string $section, string $name)
  * @method static self remove(string $section, $name = null)
  * @method static Collection build()
- * @method static Collection buildWithoutPreferences()
  * @method static void clearCachedUrls()
  * @method static array items()
  *

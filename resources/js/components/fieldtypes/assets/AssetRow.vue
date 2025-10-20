@@ -1,79 +1,74 @@
 <template>
-    <tr class="cursor-grab bg-white dark:bg-dark-750 hover:bg-gray-100 dark:hover:bg-dark-700">
-        <td class="flex items-center h-full">
+    <!-- Safari doesn't support `position: relative` on `<tr>` elements, but these two properties can be used as an alternative. Source: https://mtsknn.fi/blog/relative-tr-in-safari/ transform: translate(0); clip-path: inset(0); -->
+    <tr class="relative cursor-grab bg-white hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-900 border-b dark:border-dark-500 last:border-b-0" style="transform: translate(0); clip-path: inset(0);">
+        <td class="flex gap-2 sm:gap-3 h-full items-center p-3">
             <div
                 v-if="canShowSvg"
-                class="img svg-img h-7 w-7 bg-no-repeat bg-center bg-cover text-center flex items-center justify-center"
+                class="img svg-img flex size-7 items-center justify-center bg-cover bg-center bg-no-repeat text-center"
                 :style="'background-image:url(' + thumbnail + ')'"
             ></div>
             <button
-                class="w-7 h-7 cursor-pointer whitespace-nowrap flex items-center justify-center"
-                @click="editOrOpen"
                 v-else
+                class="flex size-7 cursor-pointer items-center justify-center whitespace-nowrap"
+                @click="editOrOpen"
             >
                 <img
-                    class="asset-thumbnail max-h-full max-w-full rounded w-7 h-7 object-cover"
+                    class="asset-thumbnail size-7 text-gray-600 max-h-full max-w-full rounded-sm object-cover"
                     loading="lazy"
                     :src="thumbnail"
                     :alt="asset.basename"
-                    v-if="isImage"
+                    v-if="thumbnail"
                 />
-                <file-icon :extension="asset.extension" v-else class="w-7 h-7" />
+                <file-icon :extension="asset.extension" v-else class="size-7" />
             </button>
             <button
                 v-if="showFilename"
                 @click="editOrOpen"
-                class="flex items-center flex-1 rtl:mr-3 ltr:ml-3 text-xs rtl:text-right ltr:text-left truncate w-full"
+                class="w-full truncate text-sm text-gray-600 dark:text-gray-400 text-start"
                 :title="__('Edit')"
                 :aria-label="__('Edit Asset')"
             >
                 {{ asset.basename }}
             </button>
-
-            <button
-                v-if="showSetAlt && needsAlt"
-                class="asset-set-alt text-blue dark:text-dark-blue-100 px-4 text-sm hover:text-black dark:hover:text-dark-100"
-                type="button"
-                @click="editOrOpen"
-            >
-                {{ asset.values.alt ? "✅" : __("Set Alt") }}
-            </button>
-            <div v-text="asset.size" class="hidden @xs:inline asset-filesize text-xs text-gray-600 px-2" />
         </td>
-        <td class="p-0 w-8 rtl:text-left ltr:text-right align-middle" v-if="!readOnly">
-            <button
-                class="flex items-center p-1 w-6 h-8 text-lg antialiased text-gray-600 dark:text-dark-150 hover:text-gray-900 dark:hover:text-dark-100"
-                @click="remove"
-                :title="__('Remove')"
-                :aria-label="__('Remove Asset')"
-            >
-                ×
-            </button>
+        <td class="absolute top-0 right-0 flex items-center bg-gradient-to-r to-20% from-transparent to-white dark:to-gray-900 p-3 ps-[2rem] align-middle text-end">
+            <ui-badge
+                v-if="showSetAlt && needsAlt"
+                as="button"
+                color="sky"
+                variant="flat"
+                :text="__('Set Alt')"
+                @click="editOrOpen"
+            />
+            <div v-text="asset.size" class="asset-filesize hidden px-2 text-sm text-gray-600 dark:text-gray-400 @xs:inline" />
+            <div v-if="!readOnly">
+                <ui-button
+                    @click="remove"
+                    icon="x"
+                    round
+                    size="xs"
+                    variant="ghost"
+                    :aria-label="__('Remove Asset')"
+                    :title="__('Remove')"
+                />
 
-            <asset-editor
-                v-if="editing"
-                :id="asset.id"
-                :allow-deleting="false"
-                @closed="closeEditor"
-                @saved="assetSaved"
-                @action-completed="actionCompleted"
-            >
-            </asset-editor>
+                <asset-editor
+                    v-if="editing"
+                    :id="asset.id"
+                    :allow-deleting="false"
+                    @closed="closeEditor"
+                    @saved="assetSaved"
+                    @action-completed="actionCompleted"
+                >
+                </asset-editor>
+            </div>
         </td>
     </tr>
 </template>
 
 <script>
-import Asset from "./Asset";
+import Asset from './Asset';
 export default {
-
     mixins: [Asset],
-
-    methods: {
-        editOrOpen() {
-            return this.readOnly ? this.open() : this.edit();
-        }
-    },
-
 };
 </script>

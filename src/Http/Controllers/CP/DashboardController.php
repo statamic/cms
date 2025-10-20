@@ -2,9 +2,11 @@
 
 namespace Statamic\Http\Controllers\CP;
 
+use Inertia\Inertia;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Widgets\Loader;
 
@@ -17,8 +19,14 @@ class DashboardController extends CpController
      */
     public function index(Loader $loader)
     {
-        return view('statamic::dashboard', [
-            'widgets' => $this->getDisplayableWidgets($loader),
+        $widgets = $this->getDisplayableWidgets($loader);
+
+        return Inertia::render('Dashboard', [
+            'widgets' => $widgets,
+            'pro' => Statamic::pro(),
+            'blueprintsUrl' => cp_route('blueprints.index'),
+            'collectionsCreateUrl' => cp_route('collections.create'),
+            'navigationCreateUrl' => cp_route('navigation.create'),
         ]);
     }
 
@@ -37,6 +45,10 @@ class DashboardController extends CpController
                 return is_string($config) ? ['type' => $config] : $config;
             })
             ->filter(function ($config) {
+                if ($config['type'] === 'getting_started') {
+                    return false;
+                }
+
                 if (! $sites = $config['sites'] ?? null) {
                     return true;
                 }

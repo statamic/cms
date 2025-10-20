@@ -7,7 +7,8 @@ $files = new Illuminate\Filesystem\Filesystem;
 $discovery = new Statamic\Translator\MethodDiscovery($files, [
     __DIR__.'/src',
     __DIR__.'/resources/js',
-    __DIR__.'/resources/views'
+    __DIR__.'/resources/views',
+    __DIR__.'/packages/ui',
 ]);
 
 // Translation strings starting with these substrings will be ignored.
@@ -22,7 +23,6 @@ $manualFiles = [
     'permissions',
     'markdown',
     'validation',
-    'moment',
     'dictionary-countries',
     'dictionary-currencies',
 ];
@@ -74,6 +74,7 @@ $additionalKeys = [
         'collections.title',
         'color.title',
         'date.title',
+        'dictionary.title',
         'entries.title',
         'float.title',
         'form.title',
@@ -86,6 +87,7 @@ $additionalKeys = [
         'link.title',
         'list.title',
         'markdown.title',
+        'navs.title',
         'radio.title',
         'range.title',
         'replicator.title',
@@ -93,6 +95,7 @@ $additionalKeys = [
         'section.title',
         'select.title',
         'sites.title',
+        'spacer.title',
         'structures.title',
         'slug.title',
         'table.title',
@@ -108,6 +111,7 @@ $additionalKeys = [
         'user_roles.title',
         'users.title',
         'video.title',
+        'width.title',
         'yaml.title',
     ],
 ];
