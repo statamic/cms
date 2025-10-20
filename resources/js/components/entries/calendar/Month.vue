@@ -106,7 +106,7 @@ const selectDate = (date) => {
                         <CalendarCellTrigger
                             :day="weekDate"
                             :month="month.value"
-                            class="w-full h-full flex flex-col items-center justify-center @3xl:items-start @3xl:justify-start"
+                            class="max-w-full max-h-full aspect-square flex flex-col items-center justify-center @3xl:items-start @3xl:justify-start"
                             v-slot="{ dayValue, selected, today, outsideView }"
                             @click="selectDate(weekDate)"
                         >
@@ -127,7 +127,7 @@ const selectDate = (date) => {
                                 </div>
                             </div>
 
-                            <div class="space-y-1.5 flex-1 overflow-scroll h-full w-full hidden @3xl:block">
+                            <div class="space-y-1.5 flex-1 overflow-scroll overscroll-contain h-full w-full hidden @3xl:block">
                                 <CalendarEntry
                                     v-for="entry in getEntriesForDate(weekDate)"
                                     :key="entry.id"
@@ -156,7 +156,7 @@ const selectDate = (date) => {
 </template>
 
 <style scoped>
-@media (max-height: 999px) {
+@media (height < 1000px) and (width >= 1200px) {
     .calendar-grid {
         tr:not([data-week-has-entries="true"]) td {
             aspect-ratio: 2 / 1;

@@ -52,6 +52,7 @@ class Collection extends Widget
             'canCreate' => User::current()->can('create', [EntryContract::class, $collection]) && $collection->hasVisibleEntryBlueprint(),
             'createLabel' => $collection->createLabel(),
             'blueprints' => $collection->entryBlueprints()->reject->hidden()->values(),
+            'listingUrl' => cp_route('collections.show', $collection),
         ];
     }
 

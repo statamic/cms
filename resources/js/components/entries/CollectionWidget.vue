@@ -16,6 +16,7 @@ const props = defineProps({
     additionalColumns: Array,
     collection: String,
     title: String,
+    listingUrl: String,
     initialPerPage: {
         type: Number,
         default: 5,
@@ -38,6 +39,7 @@ const cols = computed(() => [{ label: 'Title', field: 'title', visible: true }, 
 const widgetProps = computed(() => ({
     title: props.title,
     icon: 'collections',
+    href: props.listingUrl,
 }));
 
 function formatDate(value) {

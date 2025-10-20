@@ -33,7 +33,7 @@
     }
 
     .stack-content {
-        @apply relative h-full;
+        @apply relative h-[calc(100svh-1rem)];
     }
 
     .stack-overlay-fade-enter-active,
