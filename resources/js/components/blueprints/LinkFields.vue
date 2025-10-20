@@ -133,7 +133,9 @@ export default {
     methods: {
 
         linkField() {
-            const [fieldsetHandle, fieldHandle] = this.reference.split('.');
+            const lastDot = this.reference.lastIndexOf('.');
+            const fieldsetHandle = this.reference.substring(0, lastDot);
+            const fieldHandle = this.reference.substring(lastDot + 1);
 
             const field = this.fieldsets
                 .find(fieldset => fieldset.handle === fieldsetHandle).fields
