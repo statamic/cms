@@ -40,6 +40,15 @@ onMounted(() => {
         }, { immediate: true });
     });
 
+    // Mark page as fully loaded after all resources are loaded
+    if (document.readyState === 'complete') {
+        document.documentElement.classList.add('page-fully-loaded');
+    } else {
+        window.addEventListener('load', () => {
+            document.documentElement.classList.add('page-fully-loaded');
+        });
+    }
+
     // Close nav when clicking outside (only on mobile)
     document.addEventListener('click', handleClickOutside);
     
