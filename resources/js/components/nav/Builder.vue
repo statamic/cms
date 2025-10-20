@@ -143,7 +143,7 @@
                                     variant="destructive"
                                     @click="isHideable(stat) ? hideItem(stat) : removeItem(stat)"
                                 />
-                                <DropdownItem v-else :text="__('Show')" @click="showItem(stat)" />
+                                <DropdownItem v-else :text="__('Show')" icon="eye" @click="showItem(stat)" />
                             </template>
                         </tree-branch>
                     </template>
