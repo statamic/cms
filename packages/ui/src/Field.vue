@@ -105,6 +105,7 @@ const hasErrors = computed(() => {
 
 <template>
     <div :class="[rootClasses, $attrs.class]" data-ui-input-group>
+        <div v-if="label || (instructions && !instructionsBelow) || $slots.label || $slots.actions">
         <div
             v-if="$slots.actions"
             :class="[
@@ -123,6 +124,7 @@ const hasErrors = computed(() => {
                 <Label v-if="label" v-bind="labelProps" class="flex-1" />
             </slot>
             <Description :text="instructions" v-if="instructions && !instructionsBelow" :class="descriptionClasses" />
+        </div>
         </div>
         <slot />
         <div v-if="(instructions && instructionsBelow) || hasErrors">
