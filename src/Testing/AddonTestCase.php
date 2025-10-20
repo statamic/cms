@@ -54,6 +54,7 @@ abstract class AddonTestCase extends OrchestraTestCase
     {
         $serviceProviders = [
             StatamicServiceProvider::class,
+            \Inertia\ServiceProvider::class,
             $this->addonServiceProvider,
         ];
 
@@ -95,6 +96,8 @@ abstract class AddonTestCase extends OrchestraTestCase
                 'provider' => $this->addonServiceProvider,
             ],
         ];
+
+        $app['config']->set('inertia.testing.page_paths', [$directory.'/../resources/js/pages']);
 
         $app['config']->set('statamic.users.repository', 'file');
 
