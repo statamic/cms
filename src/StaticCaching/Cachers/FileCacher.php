@@ -298,7 +298,7 @@ EOT;
         }
         return map;
     }
-    
+
     var map = createMap();
 
     fetch('/!/nocache', {
@@ -312,7 +312,7 @@ EOT;
     .then((response) => response.json())
     .then((data) => {
         map = createMap(); // Recreate map in case the DOM changed.
-        
+
         const regions = data.regions;
         for (var key in regions) {
             if (map[key]) map[key].outerHTML = regions[key];
