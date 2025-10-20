@@ -59,11 +59,6 @@ abstract class Widget
         //
     }
 
-    public function with()
-    {
-        return [];
-    }
-
     public function html()
     {
         //

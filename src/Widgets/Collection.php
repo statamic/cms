@@ -12,18 +12,17 @@ class Collection extends Widget
 {
     public function component()
     {
-        $collection = $this->getCollection();
+        $collection = $this->config('collection');
+
+        if (! CollectionAPI::handleExists($collection)) {
+            return "Error: Collection [$collection] doesn't exist.";
+        }
+
+        $collection = CollectionAPI::findByHandle($collection);
 
         if (! User::current()->can('view', $collection)) {
             return null;
         }
-
-        return 'collection-widget';
-    }
-
-    public function with()
-    {
-        $collection = $this->getCollection();
 
         [$sortColumn, $sortDirection] = $this->parseSort($collection);
 
@@ -39,7 +38,7 @@ class Collection extends Widget
             ->map(fn ($column) => $column->sortable(false)->visible(true))
             ->values();
 
-        return [
+        return VueComponent::render('collection-widget', [
             'collection' => $collection->handle(),
             'title' => $this->config('title', $collection->title()),
             'additionalColumns' => $columns,
@@ -53,18 +52,7 @@ class Collection extends Widget
             'createLabel' => $collection->createLabel(),
             'blueprints' => $collection->entryBlueprints()->reject->hidden()->values(),
             'listingUrl' => cp_route('collections.show', $collection),
-        ];
-    }
-
-    protected function getCollection()
-    {
-        $collection = $this->config('collection');
-
-        if (! CollectionAPI::handleExists($collection)) {
-            return "Error: Collection [$collection] doesn't exist.";
-        }
-
-        return CollectionAPI::findByHandle($collection);
+        ]);
     }
 
     /**
