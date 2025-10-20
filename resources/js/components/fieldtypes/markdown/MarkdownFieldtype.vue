@@ -148,7 +148,7 @@
                         <Button
                             icon="x"
                             variant="ghost"
-                            class="absolute top-4 end-4"
+                            class="sticky top-0 translate-[-20%] bg-white dark:bg-gray-800"
                             @click="showCheatsheet = false"
                         />
                         <div class="prose prose-zinc prose-headings:font-medium prose-pre:prose-code:!text-white mx-auto my-8 max-w-3xl">
