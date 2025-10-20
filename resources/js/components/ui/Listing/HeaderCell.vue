@@ -1,6 +1,6 @@
 <script setup>
-import { Button } from '@statamic/ui';
-import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
+import { Button } from '@ui';
+import { injectListingContext } from '../Listing/Listing.vue';
 import { computed } from 'vue';
 
 const props = defineProps({
@@ -23,7 +23,7 @@ const isCurrentSortColumn = computed(() => props.column.field === sortColumn.val
             :icon-append="isCurrentSortColumn ? 'up-down' : null"
             size="sm"
             variant="ghost"
-            class="-mt-2 -mb-1 -ml-3 text-sm! font-medium! text-gray-900! dark:text-gray-400!"
+            class="-mt-2 -mb-1 -ms-3 text-sm! font-medium! text-gray-900! dark:text-gray-400!"
             @click.prevent="setSortColumn(column.field)"
         />
     </th>

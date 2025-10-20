@@ -1,8 +1,8 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import TwoFactorRecoveryCodesModal from '@statamic/components/two-factor/RecoveryCodesModal.vue';
+import TwoFactorRecoveryCodesModal from '@/components/two-factor/RecoveryCodesModal.vue';
 import axios from 'axios';
-import { Modal, Input, Button, Icon } from '@statamic/ui';
+import { Modal, Input, Button, Icon } from '@/components/ui';
 
 const emit = defineEmits(['setup-complete', 'cancel', 'close']);
 
@@ -40,8 +40,8 @@ function confirm() {
             setupModalOpen.value = false;
             recoveryCodesModalOpen.value = true;
         })
-        .catch((error) => {
-            error.value = error.response.data.errors.code[0];
+        .catch((e) => {
+            error.value = e.response.data.errors.code[0];
         });
 }
 

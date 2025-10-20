@@ -26,6 +26,7 @@
                     <Select
                         class="w-full"
                         :options="siteOriginOptions(site)"
+                        :clearable="true"
                         :model-value="site.origin"
                         @update:model-value="site.origin = $event"
                     />
@@ -37,7 +38,7 @@
 
 <script>
 import Fieldtype from '../fieldtypes/Fieldtype.vue';
-import { Switch, Heading, Select } from '@statamic/ui';
+import { Switch, Heading, Select } from '@/components/ui';
 
 export default {
     mixins: [Fieldtype],

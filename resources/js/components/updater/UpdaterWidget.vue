@@ -1,6 +1,7 @@
 <script setup>
-import { Widget, Badge, Listing, Icon, Tooltip } from '@statamic/ui';
+import { Widget, Badge, Listing, Icon, Tooltip } from '@/components/ui';
 import { ref } from 'vue';
+import { Link } from '@inertiajs/vue3';
 
 defineProps({
     items: Object,
@@ -9,11 +10,11 @@ defineProps({
 
 <template>
     <Listing :items="items" v-slot="{ items }">
-        <Widget :title="__('Updates')" icon="updates">
+        <Widget :title="__('Updates')" icon="updates" :href="cp_url('updater')">
             <table v-if="items.length" class="">
                 <tr v-for="update in items" class="text-sm">
                     <td class="py-1 pr-4 leading-tight">
-                        <a :href="update.url" class="flex items-center gap-2" v-text="update.name" />
+                        <Link :href="update.url" class="flex items-center gap-2" v-text="update.name" />
                     </td>
                     <td>
                         <Badge pill variant="flat" :color="update.critical ? 'red' : 'green'" :text="update.count" />

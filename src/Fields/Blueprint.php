@@ -145,9 +145,8 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
             $namespace = 'vendor/'.$namespace;
         }
 
-        return Path::tidy(vsprintf('%s/%s/%s.yaml', [
-            Facades\Blueprint::directory(),
-            $namespace,
+        return Path::tidy(vsprintf('%s/%s.yaml', [
+            Facades\Blueprint::namespaceDirectory($namespace),
             $this->handle(),
         ]));
     }
@@ -804,9 +803,9 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 
     public function commandPaletteLink(string|array $type, string $url): Link
     {
-        $type = is_array($type) ? $type : __($type);
+        $type = is_array($type) ? $type : [__($type)];
 
-        $text = [__('Blueprints'), $type, __($this->title())];
+        $text = [__('Blueprints'), ...$type, __($this->title())];
 
         return (new Link($text, Category::Fields))
             ->url($url)

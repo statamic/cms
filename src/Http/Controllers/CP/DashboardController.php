@@ -2,9 +2,11 @@
 
 namespace Statamic\Http\Controllers\CP;
 
+use Inertia\Inertia;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Widgets\Loader;
 
@@ -19,12 +21,12 @@ class DashboardController extends CpController
     {
         $widgets = $this->getDisplayableWidgets($loader);
 
-        if ($widgets->isEmpty()) {
-            return view('statamic::dashboard.empty');
-        }
-
-        return view('statamic::dashboard.dashboard', [
+        return Inertia::render('Dashboard', [
             'widgets' => $widgets,
+            'pro' => Statamic::pro(),
+            'blueprintsUrl' => cp_route('blueprints.index'),
+            'collectionsCreateUrl' => cp_route('collections.create'),
+            'navigationCreateUrl' => cp_route('navigation.create'),
         ]);
     }
 

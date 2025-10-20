@@ -30,9 +30,11 @@ class Localize
 
         Date::setToStringFormat(DateTime::ATOM);
 
-        $response = $next($request);
-
-        Date::setToStringFormat($originalToStringFormat);
+        try {
+            $response = $next($request);
+        } finally {
+            Date::setToStringFormat($originalToStringFormat);
+        }
 
         return $response;
     }

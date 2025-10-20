@@ -6,7 +6,7 @@
         <div :class="{ 'publish-fields': fullScreenMode }">
             <div :class="fullScreenMode && wrapperClasses">
                 <div
-                    class="bard-fieldtype antialiased st-text-legibility with-contrast:border-gray-500 shadow-ui-sm focus-outline-discrete"
+                    class="bard-fieldtype antialiased with-contrast:border-gray-500 shadow-ui-sm focus-outline-discrete"
                     :class="{ 'bard-fullscreen': fullScreenMode }"
                     ref="container"
                     @dragstart.stop="ignorePageHeader(true)"
@@ -19,7 +19,7 @@
                         @close="toggleFullscreen"
                     >
                         <div class="bard-fixed-toolbar border-0" v-if="!readOnly && showFixedToolbar">
-                            <div class="no-select flex flex-1 flex-wrap items-center" v-if="toolbarIsFixed">
+                            <div class="no-select flex flex-1 flex-wrap items-center gap-1" v-if="toolbarIsFixed">
                                 <component
                                     v-for="button in visibleButtons(buttons)"
                                     :key="button.name"
@@ -34,8 +34,8 @@
                         </div>
                     </publish-field-fullscreen-header>
 
-                    <div class="bard-fixed-toolbar flex items-center justify-between rounded-t-xl border-b border-gray-300 bg-gray-50 px-2 py-1 dark:border-white/10 dark:bg-gray-950" v-if="!readOnly && showFixedToolbar && !fullScreenMode">
-                        <div class="no-select flex flex-1 flex-wrap items-center" v-if="toolbarIsFixed">
+                    <div class="bard-fixed-toolbar" v-if="!readOnly && showFixedToolbar && !fullScreenMode">
+                        <div class="no-select flex flex-1 flex-wrap items-center gap-1" v-if="toolbarIsFixed">
                             <component
                                 v-for="button in visibleButtons(buttons)"
                                 :key="button.name"
@@ -50,7 +50,7 @@
                     </div>
 
                     <div
-                        class="bard-editor @container/bard focus-within:focus-outline focus-within:rounded-b-lg! focus-within:rounded-t-none!"
+                        class="bard-editor @container/bard focus-within:focus-outline"
                         :class="{
                             'mode:read-only': readOnly,
                             'mode:minimal': !showFixedToolbar,
@@ -59,11 +59,11 @@
                         tabindex="0"
                     >
                         <bubble-menu
-                            class="bard-floating-toolbar"
                             :editor="editor"
                             :options="{ placement: 'top', offset: [0, 10] }"
                             v-if="editor && toolbarIsFloating && !readOnly"
                         >
+                        <div class="bard-floating-toolbar">
                             <component
                                 v-for="button in visibleButtons(buttons)"
                                 :key="button.name"
@@ -73,7 +73,9 @@
                                 :bard="this"
                                 :config="config"
                                 :editor="editor"
+                                variant="floating"
                             />
+                        </div>
                         </bubble-menu>
 
                         <floating-menu
@@ -93,15 +95,15 @@
                                 @added="addSet"
                             >
                                 <template #trigger>
-                                    <button
-                                        type="button"
-                                        class="btn-round bard-add-set-button group size-7!"
-                                        :style="{ transform: `translateY(${y+2}px)` }"
-                                        :aria-label="__('Add Set')"
-                                        v-tooltip="__('Add Set')"
-                                    >
-                                        <ui-icon name="plus" class="size-4" />
-                                    </button>
+                                    <div class="absolute flex items-center gap-2 top-[-6px] z-1 -start-4.5 group" :style="{ transform: `translateY(${y}px)` }">
+                                        <ui-button
+                                            icon="plus"
+                                            size="sm"
+                                            :aria-label="__('Add Set')"
+                                            v-tooltip="__('Add Set')"
+                                        />
+                                        <ui-description v-if="!$refs.setPicker?.isOpen" :text="__('Type \'/\' to insert a set')" />
+                                    </div>
                                 </template>
                             </set-picker>
                         </floating-menu>
@@ -127,7 +129,7 @@
 import Fieldtype from '../Fieldtype.vue';
 import uniqid from 'uniqid';
 import Emitter from 'tiny-emitter';
-import { Editor, EditorContent } from '@tiptap/vue-3';
+import { Editor, EditorContent, NodeViewWrapper, NodeViewContent } from '@tiptap/vue-3';
 import { BubbleMenu } from '@tiptap/vue-3/menus';
 import { Extension } from '@tiptap/core';
 import { FloatingMenu } from './FloatingMenu';
@@ -165,7 +167,7 @@ import { availableButtons, addButtonHtml } from '../bard/buttons';
 import readTimeEstimate from 'read-time-estimate';
 import { common, createLowlight } from 'lowlight';
 import 'highlight.js/styles/github.css';
-import importTiptap from '@statamic/util/tiptap.js';
+import importTiptap from '@/util/tiptap.js';
 import { computed } from 'vue';
 
 const lowlight = createLowlight(common);
@@ -204,6 +206,7 @@ export default {
             provide: {
                 bard: this.makeBardProvide(),
                 bardSets: this.config.sets,
+                showReplicatorFieldPreviews: this.config.previews,
             },
             errorsById: {},
         };
@@ -276,7 +279,7 @@ export default {
         },
 
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
+            if (!this.showFieldPreviews) return;
             const stack = [...this.value];
             let text = '';
             while (stack.length) {
@@ -320,7 +323,7 @@ export default {
             return [
                 {
                     title: __('Expand All Sets'),
-                    icon: 'ui/expand',
+                    icon: 'expand',
                     quick: true,
                     visibleWhenReadOnly: true,
                     run: this.expandAll,
@@ -328,7 +331,7 @@ export default {
                 },
                 {
                     title: __('Collapse All Sets'),
-                    icon: 'ui/collapse',
+                    icon: 'collapse',
                     quick: true,
                     visibleWhenReadOnly: true,
                     run: this.collapseAll,
@@ -336,7 +339,7 @@ export default {
                 },
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => (vm.fullScreenMode ? 'ui/collapse-all' : 'ui/expand-all'),
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'collapse-all' : 'expand-all'),
                     quick: true,
                     run: this.toggleFullscreen,
                     visibleWhenReadOnly: true,
@@ -344,6 +347,11 @@ export default {
                 },
             ];
         },
+    },
+
+    created() {
+        Statamic.$components.register('NodeViewWrapper', NodeViewWrapper);
+        Statamic.$components.register('NodeViewContent', NodeViewContent);
     },
 
     async mounted() {
@@ -354,8 +362,6 @@ export default {
 
         this.json = this.editor.getJSON().content;
         this.html = this.editor.getHTML();
-
-        this.escBinding = this.$keys.bind('esc', this.closeFullscreen);
 
         this.$nextTick(() => {
             this.mounted = true;
@@ -375,8 +381,8 @@ export default {
     },
 
     beforeUnmount() {
-        this.editor.destroy();
-        this.escBinding.destroy();
+        this.editor?.destroy();
+        this.escBinding?.destroy();
     },
 
     watch: {
@@ -408,8 +414,14 @@ export default {
             this.updateMeta(meta);
         },
 
-        fullScreenMode() {
+        fullScreenMode(fullScreenMode) {
             this.initEditor();
+
+            if (fullScreenMode) {
+                this.escBinding = this.$keys.bindGlobal('esc', this.closeFullscreen);
+            } else {
+                this.escBinding?.destroy();
+            }
         },
 
         'publishContainer.errors': {
@@ -814,7 +826,11 @@ export default {
                             const { view, state } = this.editor;
 
                             if (this.options.allowed({ view, state})) {
-                                this.options.openSetPicker();
+                                if (this.options.setConfigs.length === 1) {
+                                    this.options.addSet(this.options.setConfigs[0].handle);
+                                } else {
+                                    this.options.openSetPicker();
+                                }
                                 return true; // Prevent inserting a slash.
                             }
 
@@ -832,6 +848,8 @@ export default {
                     shown: computed(() => this.showAddSetButton),
                     allowed: this.suitableToShowSetButton,
                     openSetPicker: this.openSetPicker,
+                    setConfigs: this.setConfigs,
+                    addSet: this.addSet,
                 }),
                 Dropcursor,
                 Gapcursor,

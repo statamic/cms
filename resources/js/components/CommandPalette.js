@@ -14,8 +14,8 @@ class Command {
         this.url = command.url;
         this.openNewTab = command.openNewTab ?? false;
         this.action = command.action;
+        this.keys = command.keys;
         this.prioritize = command.prioritize ?? false;
-        this.type = command.type ?? (command.action ? 'action' : 'link');
         this.trackRecent = command.trackRecent ?? false;
 
         this.#validate();

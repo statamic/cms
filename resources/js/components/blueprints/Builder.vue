@@ -3,18 +3,25 @@
         <ui-header :title="__('Edit Blueprint')" icon="blueprints">
             <template #actions>
                 <slot name="actions"></slot>
-                <ui-button type="submit" variant="primary" @click.prevent="save" v-text="__('Save')" />
+                <ui-command-palette-item
+                    :category="$commandPalette.category.Actions"
+                    :text="__('Save')"
+                    icon="save"
+                    :action="save"
+                    prioritize
+                    v-slot="{ text, action }"
+                >
+                    <ui-button type="submit" variant="primary" @click.prevent="action" v-text="text" />
+                </ui-command-palette-item>
             </template>
         </ui-header>
 
         <ui-panel v-if="showTitle" :heading="__('Settings')">
-            <ui-card>
-                <ui-field :label="__('Title')" :instructions="__('messages.blueprints_title_instructions')" :errors="errors.title">
+            <ui-card class="p-0! divide-y divide-gray-200 dark:divide-gray-800">
+                <ui-field as-config :label="__('Title')" :instructions="__('messages.blueprints_title_instructions')" :errors="errors?.title">
                     <ui-input v-model="blueprint.title" />
                 </ui-field>
-            </ui-card>
-            <ui-card class="mt-2">
-                <ui-field :label="__('Hidden')" :instructions="__('messages.blueprints_hidden_instructions')" :error="errors.hidden" variant="inline">
+                <ui-field as-config :label="__('Hidden')" :instructions="__('messages.blueprints_hidden_instructions')" :error="errors?.hidden" variant="inline">
                     <ui-switch v-model="blueprint.hidden" />
                 </ui-field>
             </ui-card>
@@ -24,7 +31,7 @@
             class="mt-8"
             :single-tab="!useTabs"
             :initial-tabs="tabs"
-            :errors="errors.tabs"
+            :errors="errors?.tabs"
             :can-define-localizable="canDefineLocalizable"
             @updated="tabsUpdated"
         />
@@ -70,9 +77,19 @@ export default {
             this.save();
         });
 
+        // Listen for root-form-save events from child components
+        // This also happens on the fieldset builder.
+        this.$events.$on('root-form-save', () => {
+            this.save();
+        });
+
         if (this.isFormBlueprint) {
             Statamic.$config.set('isFormBlueprint', true);
         }
+    },
+
+    beforeUnmount() {
+        this.$events.$off('root-form-save');
     },
 
     watch: {
@@ -98,10 +115,10 @@ export default {
         },
 
         save() {
-            // this.$axios[this.method](this.action, this.fieldset)
             this.$axios['patch'](this.action, this.blueprint)
                 .then((response) => this.saved(response))
                 .catch((e) => {
+                    console.error('Blueprint save failed:', e);
                     this.$toast.error(e.response.data.message);
                     this.errors = e.response.data.errors;
                 });

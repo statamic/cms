@@ -1,11 +1,10 @@
 <script setup>
 import Container from './Container.vue';
 import Tabs from './Tabs.vue';
-import { Header, Button } from '@statamic/ui';
+import { Header, Button } from '@ui';
 import uniqid from 'uniqid';
 import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
-import { SavePipeline } from '@statamic/exports.js';
-const { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks } = SavePipeline;
+import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks } from '@ui/Publish/SavePipeline.js';
 
 const props = defineProps({
     icon: {
@@ -63,7 +62,7 @@ function save() {
             new AfterSaveHooks('entry'),
         ])
         .then((response) => {
-            Statamic.$toast.success('Saved');
+            Statamic.$toast.success(__('Saved'));
 
             if (response.data.redirect) {
                 window.location = response.data.redirect;
@@ -85,7 +84,7 @@ onUnmounted(() => saveKeyBinding.destroy());
 
 <template>
     <Header :title="title" :icon="icon">
-        <Button v-if="!readOnly" variant="primary" text="Save" @click="save" :disabled="saving" />
+        <Button v-if="!readOnly" variant="primary" :text="__('Save')" @click="save" :disabled="saving" />
     </Header>
     <Container
         ref="container"

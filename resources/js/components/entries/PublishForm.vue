@@ -7,6 +7,7 @@
             </template>
 
             <ItemActions
+                ref="actions"
                 v-if="!isCreating && hasItemActions"
                 :item="values.id"
                 :url="itemActionUrl"
@@ -18,7 +19,7 @@
             >
                 <Dropdown v-if="canEditBlueprint || hasItemActions">
                     <template #trigger>
-                        <Button icon="ui/dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
+                        <Button icon="dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
                     </template>
                     <DropdownMenu>
                         <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :href="actions.editBlueprint" />
@@ -37,7 +38,7 @@
 
             <ui-badge icon="padlock-locked" :text="__('Read Only')" variant="flat" v-if="readOnly" />
 
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 sm:gap-3">
                 <save-button-options
                     v-if="!readOnly"
                     :show-options="!revisionsEnabled && !isInline"
@@ -99,7 +100,7 @@
                         <div class="space-y-6">
                             <!-- Live Preview / Visit URL Buttons -->
                             <div v-if="collectionHasRoutes">
-                                <div class="flex flex-wrap gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
+                                <div class="flex flex-wrap gap-3 lg:gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
                                     <Button
                                         :text="__('Live Preview')"
                                         class="flex-1"
@@ -119,7 +120,7 @@
                             </div>
 
                             <!-- Published Switch -->
-                            <Panel class="flex justify-between px-5 py-3" v-if="!revisionsEnabled">
+                            <Panel class="flex justify-between px-5! py-3! dark:bg-gray-800!" v-if="!revisionsEnabled">
                                 <Heading :text="__('Published')" />
                                 <Switch
                                     :model-value="published"
@@ -137,7 +138,6 @@
                                         icon="history"
                                         :text="__('View History')"
                                         size="xs"
-                                        class="-me-4"
                                     />
                                 </PanelHeader>
                                 <Card class="space-y-2">
@@ -229,11 +229,9 @@
             @confirm="createLocalization(localizing)"
         >
             <div class="publish-fields">
-                <div class="form-group publish-field field-w-full">
-                    <label v-text="__('Origin')" />
-                    <ui-description class="mt-2" :text="__('messages.entry_origin_instructions')" />
+                <ui-field class="form-group field-w-100" :label="__('Origin')" :instructions="__('messages.entry_origin_instructions')">
                     <Select class="w-full" v-model="selectedOrigin" :options="originOptions" placeholder="" />
-                </div>
+                </ui-field>
             </div>
         </confirmation-modal>
 
@@ -246,16 +244,6 @@
             @confirm="confirmSwitchLocalization"
             @cancel="pendingLocalization = null"
         />
-
-        <confirmation-modal
-            v-if="syncingField"
-            :title="__('Sync Field')"
-            :body-text="__('Are you sure? This field\'s value will be replaced by the value in the original entry.')"
-            :button-text="__('Sync Field')"
-            :danger="true"
-            @confirm="confirmSyncField"
-            @cancel="syncingField = null"
-        />
     </div>
 </template>
 
@@ -267,7 +255,7 @@ import RevisionHistory from '../revision-history/History.vue';
 import HasPreferences from '../data-list/HasPreferences';
 import HasActions from '../publish/HasActions';
 import striptags from 'striptags';
-import clone from '@statamic/util/clone.js';
+import clone from '@/util/clone.js';
 import {
     Button,
     Card,
@@ -285,16 +273,16 @@ import {
     Subheading,
     Switch,
     Select,
-} from '@statamic/ui';
-import PublishContainer from '@statamic/components/ui/Publish/Container.vue';
-import PublishTabs from '@statamic/components/ui/Publish/Tabs.vue';
-import PublishComponents from '@statamic/components/ui/Publish/Components.vue';
-import LocalizationsCard from '@statamic/components/ui/Publish/Localizations.vue';
-import LivePreview from '@statamic/components/ui/LivePreview/LivePreview.vue';
-import resetValuesFromResponse from '@statamic/util/resetValuesFromResponse.js';
-import { SavePipeline } from '@statamic/exports.js';
+    PublishContainer,
+    PublishTabs,
+    PublishComponents,
+    PublishLocalizations as LocalizationsCard,
+    LivePreview,
+} from '@ui';
+import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
 import { computed, ref } from 'vue';
-const { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } = SavePipeline;
+import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';
+import { router } from '@inertiajs/vue3';
 
 let saving = ref(false);
 let errors = ref({});
@@ -408,7 +396,6 @@ export default {
             autosaveIntervalInstance: null,
             syncFieldConfirmationText: __('messages.sync_entry_field_confirmation_text'),
             pendingLocalization: null,
-            syncingField: null,
         };
     },
 
@@ -584,12 +571,12 @@ export default {
 
                     // If the user has opted to create another entry, redirect them to create page.
                     if (!this.isInline && nextAction === 'create_another') {
-                        window.location = this.createAnotherUrl;
+                        this.redirectTo(this.createAnotherUrl);
                     }
 
                     // If the user has opted to go to listing (default/null option), redirect them there.
                     else if (!this.isInline && nextAction === null) {
-                        window.location = this.listingUrl;
+                        this.redirectTo(this.listingUrl);
                     }
 
                     // Otherwise, leave them on the edit form and emit an event. We need to wait until after
@@ -689,12 +676,11 @@ export default {
             });
         },
 
-        createLocalization(localizationHandle) {
+        createLocalization(localization) {
             this.selectingOrigin = false;
-            const localization = this.localizations.find((e) => e.handle === localizationHandle);
 
             if (this.isCreating) {
-                this.$nextTick(() => (window.location = localization.url));
+                this.$nextTick(() => this.redirectTo(localization.url));
                 return;
             }
 
@@ -753,12 +739,12 @@ export default {
 
             // If the user has opted to create another entry, redirect them to create page.
             if (!this.isInline && nextAction === 'create_another') {
-                window.location = this.createAnotherUrl;
+                this.redirectTo(this.createAnotherUrl);
             }
 
             // If the user has opted to go to listing (default/null option), redirect them there.
             else if (!this.isInline && nextAction === null) {
-                window.location = this.listingUrl;
+                this.redirectTo(this.listingUrl);
             }
 
             // Otherwise, leave them on the edit form and emit an event. We need to wait until after
@@ -784,30 +770,9 @@ export default {
         },
 
         setFieldValue(handle, value) {
-            if (this.hasOrigin) this.desyncField(handle);
+            if (this.hasOrigin) this.$refs.container.desyncField(handle);
 
             this.$refs.container.setFieldValue(handle, value);
-        },
-
-        syncField(handle) {
-            this.syncingField = handle;
-        },
-
-        confirmSyncField() {
-            const handle = this.syncingField;
-            this.localizedFields = this.localizedFields.filter((field) => field !== handle);
-            this.$refs.container.setFieldValue(handle, this.originValues[handle]);
-
-            // Update the meta for this field. For instance, a relationship field would have its data preloaded into it.
-            // If you sync the field, the preloaded data would be outdated and an ID would show instead of the titles.
-            this.meta[handle] = this.originMeta[handle];
-            this.syncingField = null;
-        },
-
-        desyncField(handle) {
-            if (!this.localizedFields.includes(handle)) this.localizedFields.push(handle);
-
-            this.$refs.container.dirty();
         },
 
         setAutosaveInterval() {
@@ -833,6 +798,35 @@ export default {
                 this.itemActions = response.data.itemActions;
             }
         },
+
+        addToCommandPalette() {
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: this.saveText,
+                icon: 'save',
+                action: () => this.save(),
+                prioritize: true,
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Edit Blueprint'),
+                icon: 'blueprint-edit',
+                when: () => this.canEditBlueprint,
+                url: this.actions.editBlueprint,
+            });
+
+            this.$refs.actions?.preparedActions.forEach(action => Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: action.title,
+                icon: action.icon,
+                action: action.run,
+            }));
+        },
+
+        redirectTo(location) {
+            router.get(location);
+        }
     },
 
     mounted() {
@@ -852,6 +846,8 @@ export default {
         if (typeof this.autosaveInterval === 'number') {
             this.setAutosaveInterval();
         }
+
+        this.addToCommandPalette();
     },
 
     created() {
@@ -865,15 +861,12 @@ export default {
         container = computed(() => this.$refs.container);
     },
 
-    unmounted() {
-        clearTimeout(this.trackDirtyStateTimeout);
-    },
-
     beforeUnmount() {
         if (this.autosaveIntervalInstance) clearInterval(this.autosaveIntervalInstance);
     },
 
     unmounted() {
+        clearTimeout(this.trackDirtyStateTimeout);
         this.saveKeyBinding.destroy();
         this.quickSaveKeyBinding.destroy();
     },

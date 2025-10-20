@@ -5,7 +5,7 @@
     }">
         <div class="page-move w-6" />
         <div class="flex flex-1 items-center p-1.5 text-xs leading-normal">
-            <div class="flex gap-3 grow items-center" :class="{ 'opacity-50': isHidden || isInHiddenSection }">
+            <div class="flex gap-2 sm:gap-3 grow items-center" :class="{ 'opacity-50': isHidden || isInHiddenSection }">
                 <template v-if="!isSection && !isChild">
                     <i v-if="isAlreadySvg" class="size-4" v-html="icon"></i>
                     <Icon v-else class="size-4" :name="icon" />
@@ -20,7 +20,7 @@
                 <Button
                     v-if="hasChildren && !isSection"
                     class="transition duration-100 [&_svg]:size-4! -mx-1.5"
-                    icon="ui/chevron-down"
+                    icon="chevron-down"
                     size="xs"
                     round
                     variant="ghost"
@@ -29,7 +29,7 @@
                 />
             </div>
 
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 sm:gap-3">
                 <slot name="branch-icon" :branch="item" />
                 <ui-icon
                     v-if="isRenamedSection"
@@ -92,7 +92,7 @@
 
 <script>
 import { data_get } from '../../bootstrap/globals.js';
-import { Icon, Dropdown, DropdownMenu, Button } from '@statamic/ui';
+import { Icon, Dropdown, DropdownMenu, Button } from '@/components/ui';
 
 export default {
     components: {

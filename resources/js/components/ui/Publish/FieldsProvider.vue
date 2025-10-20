@@ -1,5 +1,5 @@
 <script>
-import createContext from '@statamic/util/createContext.js';
+import createContext from '@/util/createContext.js';
 
 export const [injectFieldsContext, provideFieldsContext] = createContext('PublishFields');
 </script>
@@ -17,7 +17,11 @@ const props = defineProps({
     },
     metaPathPrefix: {
         type: String,
-        default: (props) => props.pathPrefix,
+        default: (props) => props.fieldPathPrefix,
+    },
+    readOnly: {
+        type: Boolean,
+        default: false,
     },
 });
 
@@ -25,6 +29,7 @@ provideFieldsContext({
     fields: toRef(() => props.fields),
     fieldPathPrefix: toRef(() => props.fieldPathPrefix),
     metaPathPrefix: toRef(() => props.metaPathPrefix),
+    readOnly: toRef(() => props.readOnly),
 });
 </script>
 

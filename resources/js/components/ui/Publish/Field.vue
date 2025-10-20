@@ -1,15 +1,26 @@
 <script setup>
-import { computed, useTemplateRef, watch, ref } from 'vue';
+import { computed, useTemplateRef, watch, ref, inject } from 'vue';
 import { injectContainerContext } from './Container.vue';
 import { injectFieldsContext } from './FieldsProvider.vue';
-import { Field, Icon, Tooltip, Label } from '@statamic/ui';
-import FieldActions from '@statamic/components/field-actions/FieldActions.vue';
-import ShowField from '@statamic/components/field-conditions/ShowField.js';
+import {
+    Field,
+    Icon,
+    Tooltip,
+    Label,
+} from '@ui';
+import FieldActions from '@/components/field-actions/FieldActions.vue';
+import ShowField from '@/components/field-conditions/ShowField.js';
 
 const props = defineProps({
     config: {
         type: Object,
         required: true,
+    },
+    fieldPathPrefix: {
+        type: String,
+    },
+    metaPathPrefix: {
+        type: String,
     },
 });
 
@@ -17,6 +28,7 @@ const {
     values: containerValues,
     extraValues: containerExtraValues,
     visibleValues: containerVisibleValues,
+    revealerValues,
     meta: containerMeta,
     syncField,
     desyncField,
@@ -30,10 +42,16 @@ const {
     setFieldValue,
     setFieldMeta,
     hiddenFields,
-    revealerFields,
     setHiddenField,
+    container,
 } = injectContainerContext();
-const { fieldPathPrefix, metaPathPrefix } = injectFieldsContext();
+const {
+    fieldPathPrefix: injectedFieldPathPrefix,
+    metaPathPrefix: injectedMetaPathPrefix,
+    readOnly: fieldsProviderReadOnly,
+} = injectFieldsContext();
+const fieldPathPrefix = computed(() => props.fieldPathPrefix || injectedFieldPathPrefix.value);
+const metaPathPrefix = computed(() => props.metaPathPrefix || injectedMetaPathPrefix.value);
 const handle = props.config.handle;
 
 const fieldtypeComponent = computed(() => {
@@ -112,9 +130,10 @@ const shouldShowField = computed(() => {
         visibleValues.value,
         extraValues.value,
         containerVisibleValues.value,
+        revealerValues.value,
         hiddenFields.value,
-        revealerFields.value,
-        setHiddenField
+        setHiddenField,
+        { container },
     ).showField(props.config, fullPath.value);
 });
 
@@ -127,10 +146,17 @@ const shouldShowLabel = computed(
         isSyncable.value, // Need to see the icon
 );
 
+const shouldShowFieldPreviews = computed(() => {
+    if (! props.config.replicator_preview) return false;
+
+    return inject('showReplicatorFieldPreviews', false);
+});
+
 const isLocalizable = computed(() => props.config.localizable);
 
 const isReadOnly = computed(() => {
     if (containerReadOnly.value) return true;
+    if (fieldsProviderReadOnly.value) return true;
 
     if (isTrackingOriginValues.value && isSyncable.value && !isLocalizable.value) return true;
 
@@ -149,12 +175,6 @@ const isSyncable = computed(() => {
 
 const isSynced = computed(() => isSyncable.value && !localizedFields.value.includes(fullPath.value));
 const isNested = computed(() => fullPath.value.includes('.'));
-const wrapperComponent = computed(() => {
-    // Todo: Find a way to not need to hard code this.
-    if (props.config.type === 'dictionary_fields') return 'div';
-
-    return asConfig.value && !isNested.value ? 'card' : 'div';
-});
 
 function sync() {
     syncField(fullPath.value);
@@ -174,7 +194,7 @@ const fieldtypeComponentProps = computed(() => ({
     fieldPathPrefix: fieldPathPrefix.value,
     metaPathPrefix: metaPathPrefix.value,
     readOnly: isReadOnly.value,
-    showFieldPreviews: true
+    showFieldPreviews: shouldShowFieldPreviews.value,
 }));
 
 const fieldtypeComponentEvents = computed(() => ({
@@ -191,6 +211,7 @@ const fieldtypeComponentEvents = computed(() => ({
         :fieldtypeComponent="fieldtypeComponent"
         :fieldtypeComponentProps="fieldtypeComponentProps"
         :fieldtypeComponentEvents="fieldtypeComponentEvents"
+        :shouldShowField="shouldShowField"
     >
         <Field
             v-show="shouldShowField"
@@ -201,14 +222,14 @@ const fieldtypeComponentEvents = computed(() => ({
             :required="isRequired"
             :errors="errors"
             :read-only="isReadOnly"
-            :as="wrapperComponent"
             :variant="config.variant"
+            :full-width-setting="config.full_width_setting"
             v-bind="$attrs"
         >
             <template #label v-if="shouldShowLabel">
                 <Label :for="fieldId" :required="isRequired">
                     <template v-if="shouldShowLabelText">
-                        <Tooltip :text="config.handle" :delay="1000">
+                        <Tooltip :text="config.handle" :delay="1000" as="span">
                             {{ __(config.display) }}
                         </Tooltip>
                     </template>
@@ -219,7 +240,7 @@ const fieldtypeComponentEvents = computed(() => ({
             <template #actions v-if="shouldShowFieldActions">
                 <FieldActions :actions="fieldActions" />
             </template>
-            <div class="text-xs text-red-500" v-if="!fieldtypeComponentExists">
+            <div class="text-xs text-red-600" v-if="!fieldtypeComponentExists">
                 Component <code v-text="fieldtypeComponent"></code> does not exist.
             </div>
             <Component

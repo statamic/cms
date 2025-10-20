@@ -3,13 +3,14 @@ import { onUnmounted } from 'vue';
 
 const props = defineProps({
     category: { type: String },
-    type: { type: String },
     icon: { type: String },
     when: { type: Function },
     text: { type: [String, Array] },
     url: { type: String },
     action: { type: Function },
     openNewTab: { type: Boolean },
+    badge: { type: String },
+    keys: { type: String },
     trackRecent: { type: Boolean },
     prioritize: { type: Boolean },
 });
@@ -22,11 +23,12 @@ onUnmounted(() => command.remove());
 <template>
     <slot
         :category="category"
-        :type="type"
         :icon="icon"
         :when="when"
         :text="text"
         :url="url"
         :action="action"
+        :badge="badge"
+        :keys="keys"
     />
 </template>

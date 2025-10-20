@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue';
-import { DropdownItem, Listing } from '@statamic/ui';
+import { DropdownItem, Listing } from '@/components/ui';
+import { Link } from '@inertiajs/vue3';
 
 const props = defineProps({
     initialRows: Array,
@@ -33,7 +34,7 @@ function removeRow(row) {
         @refreshing="reloadPage"
     >
         <template #cell-title="{ row: group }">
-            <a :href="group.show_url">{{ __(group.title) }}</a>
+            <Link :href="group.show_url">{{ __(group.title) }}</Link>
             <resource-deleter :ref="`deleter_${group.id}`" :resource="group" @deleted="removeRow(group)" />
         </template>
         <template #cell-handle="{ value: handle }">

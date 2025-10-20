@@ -1,19 +1,21 @@
 <template>
-    <div class="h-full overflow-auto bg-white dark:bg-gray-800 p-3 rounded-l-xl">
+    <div class="h-full overflow-auto bg-white dark:bg-gray-800 focus-none p-3 pt-0">
         <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
             <Icon name="loading" />
         </div>
 
-        <header v-if="!loading" class="flex items-center justify-between pl-3">
-            <Heading :text="__(values.display) || __(config.display) || config.handle" size="lg" :icon="fieldtype.icon.startsWith('<svg') ? fieldtype.icon : `fieldtype-${fieldtype.icon}`" />
+        <header v-if="!loading" class="flex flex-wrap items-center justify-between pl-3 pt-3 pb-4 -mb-4 sticky top-0 z-1 bg-gradient-to-b from-white from-75% dark:from-gray-800">
+            <Heading :text=" __(fieldtype.title + ' ' + 'Field')" size="lg" :icon="fieldtype.icon" />
             <div class="flex items-center gap-3">
                 <Button variant="ghost" :text="__('Cancel')" @click.prevent="close" />
-                <Button variant="primary" @click.prevent="commit()" :text="__('Apply')" />
-                <Button v-if="isInsideSet || isInsideConfigFields" variant="primary" @click.prevent="commit(true)" :text="__('Apply & Close All')" />
+                <Button variant="default" @click.prevent="commit()" :text="__('Apply')" />
+                <Button v-if="!(isInsideSet || isInsideConfigFields)" variant="primary" @click.prevent="commitAndSave()" icon="save" :text="__('Apply & Save')" />
+                <Button v-if="isInsideSet || isInsideConfigFields" variant="default" @click.prevent="commit(true)" :text="__('Apply & Close All')" />
+                <Button v-if="isInsideSet || isInsideConfigFields" variant="primary" @click.prevent="commitAndSaveAndCloseAll()" icon="save" :text="__('Save & Close All')" />
             </div>
         </header>
 
-        <section v-if="!loading" class="isolate px-3 py-4">
+        <section v-if="!loading" class="isolate lg:px-3 py-4">
             <Tabs v-model:modelValue="activeTab">
                 <TabList class="mb-6">
                     <TabTrigger name="settings" :text="__('Settings')" />
@@ -61,7 +63,7 @@
 <script>
 import { FieldConditionsBuilder, FIELD_CONDITIONS_KEYS } from '../field-conditions/FieldConditions.js';
 import FieldValidationBuilder from '../field-validation/Builder.vue';
-import { Heading, Button, Tabs, TabList, TabTrigger, TabContent, CardPanel, Icon } from '@statamic/ui';
+import { Heading, Button, Tabs, TabList, TabTrigger, TabContent, CardPanel, Icon } from '@/components/ui';
 
 export default {
     components: {
@@ -124,6 +126,7 @@ export default {
             fieldtype: null,
             loading: true,
             blueprint: null,
+            isSaving: false, // Prevent multiple simultaneous saves
         };
     },
 
@@ -187,6 +190,23 @@ export default {
 
     created() {
         this.load();
+
+        // Add keyboard shortcut for Cmd+S / Ctrl+S only when this component is focused
+        this.saveBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
+            // Only handle if this component is currently visible/focused
+            if (this.$el && this.$el.offsetParent !== null) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.handleSaveShortcut();
+            }
+        });
+    },
+
+    beforeUnmount() {
+        // Clean up keyboard binding
+        if (this.saveBinding) {
+            this.saveBinding.destroy();
+        }
     },
 
     methods: {
@@ -252,6 +272,79 @@ export default {
                     }
                 })
                 .catch((e) => this.handleAxiosError(e));
+        },
+
+        commitAndSave() {
+            this.clearErrors();
+
+            this.$axios
+                .post(cp_url('fields/update'), {
+                    id: this.id,
+                    type: this.type,
+                    values: this.values,
+                    fields: this.fields,
+                    isInsideSet: this.isInsideSet,
+                })
+                .then((response) => {
+                    this.$refs.container?.clearDirtyState();
+                    this.$emit('committed', response.data, this.editedFields);
+
+                    this.saveRootForm();
+                    this.close();
+                })
+                .catch((e) => this.handleAxiosError(e));
+        },
+
+        saveRootForm() {
+            // The "root form" could be the blueprint or fieldset forms.
+            this.$events.$emit('root-form-save');
+        },
+
+        handleSaveShortcut() {
+            if (this.isInsideSet || this.isInsideConfigFields) {
+                this.commitAndSaveAndCloseAll();
+            } else {
+                this.commitAndSave();
+            }
+        },
+
+        commitAndSaveAndCloseAll() {
+            if (this.isSaving) {
+                return;
+            }
+
+            this.isSaving = true;
+
+            this.clearErrors();
+
+            this.$axios
+                .post(cp_url('fields/update'), {
+                    id: this.id,
+                    type: this.type,
+                    values: this.values,
+                    fields: this.fields,
+                    isInsideSet: this.isInsideSet,
+                })
+                .then((response) => {
+                    this.$refs.container?.clearDirtyState();
+                    this.$emit('committed', response.data, this.editedFields);
+
+                    // Close all stacks first
+                    this.close();
+                    if (this.commitParentField) {
+                        this.commitParentField(true);
+                    }
+
+                    // Wait a bit for the field changes to be fully processed, then save the blueprint
+                    setTimeout(() => {
+                        this.saveRootForm();
+                        this.isSaving = false;
+                    }, 100);
+                })
+                .catch((e) => {
+                    this.handleAxiosError(e);
+                    this.isSaving = false;
+                });
         },
 
         handleAxiosError(e) {

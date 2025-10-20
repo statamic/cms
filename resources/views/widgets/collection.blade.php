@@ -6,6 +6,7 @@
 <collection-widget
     collection="{{ $collection->handle() }}"
     title="{{ $title }}"
+    listing-url="{{ cp_route('collections.show', $collection) }}"
     :additional-columns="{{ $columns->toJson() }}"
     :filters="{{ $filters->toJson() }}"
     initial-sort-column="{{ $sortColumn }}"
@@ -16,7 +17,6 @@
         <template #actions>
             <create-entry-button
                 text="{{ $button }}"
-                url="{{ $collection->createEntryUrl(Site::selected()) }}"
                 size="sm"
                 variant="default"
                 :blueprints="{{ $blueprints->toJson() }}"

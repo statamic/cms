@@ -15,13 +15,12 @@
                         <td
                             class="sortable-handle table-drag-handle"
                             v-if="!isReadOnly"
-                            :class="{ 'rounded-tl': index === 0 }"
                         ></td>
                         <td>
-                            <input
+                            <ui-input
                                 type="text"
                                 ref="listItem"
-                                class="input-text"
+                                class="!inset-shadow-none focus:!inset-shadow-none"
                                 v-model="element.value"
                                 :readonly="isReadOnly"
                                 @blur="focused = false"
@@ -54,7 +53,7 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import { SortableList, SortableHelpers } from '../sortable/Sortable';
-import { Button } from 'statamic';
+import { Button } from '@/components/ui';
 
 export default {
     mixins: [Fieldtype, SortableHelpers],

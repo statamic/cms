@@ -3,9 +3,9 @@
    ========================================================================== */
 
 .portal-targets {
-    /* position on top of global header (z-index 3) but ignore clicks */
+    /* position on top of global header but ignore clicks */
     @apply pointer-events-none fixed inset-0;
-    z-index: 4;
+    z-index: var(--z-index-portal);
 
     .vue-portal-target {
         @apply pointer-events-auto;
@@ -25,15 +25,7 @@
     }
 
     .stack-overlay {
-        @apply absolute inset-0 bg-black;
-        opacity: 0.2;
-        pointer-events: none;
-        transition: all 0.3s ease;
-
-        &.stack-overlay-fade-enter,
-        &.stack-overlay-fade-leave-to {
-            opacity: 0;
-        }
+        @apply pointer-events-none;
     }
 
     .stack-hit-area {
@@ -41,25 +33,39 @@
     }
 
     .stack-content {
-        @apply relative h-full shadow-lg;
-        transition: all 0.2s ease;
+        @apply relative h-[calc(100svh-1rem)];
+    }
 
-        &.stack-slide-enter,
-        &.stack-slide-leave-to {
-            transform: translateX(10px);
-            opacity: 0;
+    .stack-overlay-fade-enter-active,
+    .stack-overlay-fade-leave-active {
+        transition: opacity 250ms ease;
+    }
 
-            [dir='rtl'] & {
-                transform: translateX(-10px);
-            }
+    .stack-overlay-fade-enter-from,
+    .stack-overlay-fade-leave-to {
+        opacity: 0;
+    }
+
+    .stack-slide-enter-active,
+    .stack-slide-leave-active {
+        transition: transform 250ms ease, opacity 250ms ease;
+    }
+
+    .stack-slide-enter-from {
+        transform: translateX(10%);
+        opacity: 0;
+
+        [dir='rtl'] & {
+            transform: translateX(-10%);
         }
     }
 
-    .hovering .stack-content {
-        transform: translateX(-16px);
+    .stack-slide-leave-to {
+        transform: translateX(10%);
+        opacity: 0;
 
         [dir='rtl'] & {
-            transform: translateX(16px);
+            transform: translateX(-10%);
         }
     }
 }

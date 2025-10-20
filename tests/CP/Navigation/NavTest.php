@@ -82,7 +82,7 @@ class NavTest extends TestCase
             ->url('/human-cyborg-relations')
             ->view('cp.nav.importer')
             ->can('index', DroidsClass::class)
-            ->attributes(['target' => '_blank', 'class' => 'red']);
+            ->attributes($attrs = ['target' => '_blank', 'class' => 'red']);
 
         $item = $this->build()->get('Droids')->first();
 
@@ -93,7 +93,7 @@ class NavTest extends TestCase
         $this->assertEquals('cp.nav.importer', $item->view());
         $this->assertEquals('index', $item->authorization()->ability);
         $this->assertEquals(DroidsClass::class, $item->authorization()->arguments);
-        $this->assertEquals(' target="_blank" class="red"', $item->attributes());
+        $this->assertEquals($attrs, $item->attributes());
     }
 
     #[Test]
@@ -218,7 +218,7 @@ class NavTest extends TestCase
     #[Test]
     public function it_sets_parent_icon_on_children()
     {
-        File::put($svg = statamic_path('resources/svg/icons/droid.svg'), '<svg>droid</svg>');
+        File::put($svg = statamic_path('packages/ui/icons/droid.svg'), '<svg>droid</svg>');
 
         $this->actingAs(tap(User::make()->makeSuper())->save());
 

@@ -22,6 +22,7 @@ use Statamic\Http\Controllers\User\TwoFactorAuthenticationController;
 use Statamic\Http\Controllers\User\TwoFactorRecoveryCodesController;
 use Statamic\Http\Middleware\AuthGuard;
 use Statamic\Http\Middleware\CP\AuthGuard as CPAuthGuard;
+use Statamic\Http\Middleware\CP\HandleInertiaRequests;
 use Statamic\Http\Middleware\RedirectIfTwoFactorSetupIncomplete;
 use Statamic\Statamic;
 use Statamic\StaticCaching\NoCache\CsrfTokenController;
@@ -32,7 +33,7 @@ Route::name('statamic.')->group(function () {
     Route::group(['prefix' => config('statamic.routes.action')], function () {
         Route::post('forms/{form}', [FormController::class, 'submit'])->middleware([HandlePrecognitiveRequests::class])->name('forms.submit');
 
-        Route::get('protect/password', [PasswordProtectController::class, 'show'])->name('protect.password.show');
+        Route::get('protect/password', [PasswordProtectController::class, 'show'])->name('protect.password.show')->middleware([HandleInertiaRequests::class]);
         Route::post('protect/password', [PasswordProtectController::class, 'store'])->name('protect.password.store');
 
         Route::group(['prefix' => 'auth', 'middleware' => [AuthGuard::class]], function () {

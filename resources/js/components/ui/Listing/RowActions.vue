@@ -1,7 +1,12 @@
 <script setup>
-import { Dropdown, DropdownItem, DropdownMenu, DropdownSeparator } from '@statamic/ui';
-import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
-import ItemActions from '@statamic/components/actions/ItemActions.vue';
+import {
+    Dropdown,
+    DropdownItem,
+    DropdownMenu,
+    DropdownSeparator,
+} from '@ui';
+import { injectListingContext } from '../Listing/Listing.vue';
+import ItemActions from '@/components/actions/ItemActions.vue';
 import { computed, ref, watch } from 'vue';
 
 const props = defineProps({
@@ -32,7 +37,9 @@ function actionCompleted(successful = null, response = {}) {
 }
 
 function actionSuccess(response) {
-    Statamic.$toast.success(response.message || __('Action completed'));
+    if (response.message !== false) {
+        Statamic.$toast.success(response.message || __('Action completed'));
+    }
     refresh();
 }
 

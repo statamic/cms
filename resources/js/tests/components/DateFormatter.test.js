@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test } from 'vitest';
-import DateFormatter from '@statamic/components/DateFormatter.js';
+import DateFormatter from '@/components/DateFormatter.js';
 
 function setNavigatorLanguage(lang) {
     Object.defineProperty(navigator, 'language', {

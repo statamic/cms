@@ -1,7 +1,7 @@
 import { translate, translateChoice } from '../translations/translator';
 import uid from 'uniqid';
 import PreviewHtml from '../components/fieldtypes/replicator/PreviewHtml';
-import renderMarkdown from '@statamic/util/markdown.js';
+import renderMarkdown from '@/util/markdown.js';
 
 export function cp_url(url) {
     url = Statamic.$config.get('cpUrl') + '/' + url;

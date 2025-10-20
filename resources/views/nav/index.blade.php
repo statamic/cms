@@ -8,10 +8,10 @@
 @section('content')
     <ui-header title="{{ __('CP Nav Preferences') }}"></ui-header>
 
-    <section class="space-y-6">
+    <section class="space-y-6" v-cloak>
         <ui-card-panel heading="{{ __('Global Preferences') }}">
             <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 sm:gap-3">
                     <ui-icon name="globals" />
                     <a href="{{ cp_route('preferences.nav.default.edit') }}">{{ __('Default') }}</a>
                 </div>
@@ -26,7 +26,7 @@
             <ui-card-panel heading="{{ __('Preferences by Role') }}">
                 @foreach (Statamic\Facades\Role::all() as $role)
                     <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-2 sm:gap-3">
                             <ui-icon name="permissions" />
                             <a href="{{ cp_route('preferences.nav.role.edit', [$role->handle()]) }}">
                                 {{ __($role->title()) }}
@@ -42,7 +42,7 @@
 
         <ui-card-panel heading="{{ __('User Preferences') }}">
             <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 sm:gap-3">
                     <ui-icon name="avatar" />
                     <a href="{{ cp_route('preferences.nav.user.edit') }}">{{ __('My Nav') }}</a>
                 </div>

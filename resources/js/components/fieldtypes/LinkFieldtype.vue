@@ -1,5 +1,5 @@
 <template>
-    <div class="flex gap-3">
+    <div class="flex gap-2 sm:gap-3">
         <!-- Link type selector -->
         <div class="w-fit">
             <Select :options v-model="option"  />
@@ -11,14 +11,15 @@
 
             <!-- Entry select -->
             <relationship-fieldtype
-                v-if="option === 'entry'"
-                ref="entries"
-                handle="entry"
-                :value="selectedEntries"
                 :config="meta.entry.config"
                 :meta="meta.entry.meta"
-                @update:value="entriesSelected"
+                :value="selectedEntries"
                 @update:meta="meta.entry.meta = $event"
+                @update:value="entriesSelected"
+                button-size="base"
+                handle="entry"
+                ref="entries"
+                v-if="option === 'entry'"
             />
 
             <!-- Asset select -->
@@ -36,15 +37,9 @@
     </div>
 </template>
 
-<style scoped>
-    /* :deep(.relationship-input) > div:first-child {
-        @apply h-full;
-    } */
-</style>
-
 <script>
 import Fieldtype from './Fieldtype.vue';
-import { Input, Select } from '@statamic/ui';
+import { Input, Select } from '@/components/ui';
 
 export default {
     components: { Input, Text, Select },
@@ -75,7 +70,7 @@ export default {
         },
 
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
+            if (!this.showFieldPreviews) return;
 
             switch (this.option) {
                 case 'url':

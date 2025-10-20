@@ -17,10 +17,9 @@
 </template>
 
 <script setup>
-import { Fieldtype } from 'statamic';
-import { Switch, Heading, Button } from '@/components/ui';
+import Fieldtype from '@/components/fieldtypes/fieldtype.js';
+import { Switch, Heading, Button, injectPublishContext as injectContainerContext } from '@ui';
 import { onMounted, onBeforeUnmount, watch, nextTick, computed } from 'vue';
-import { injectContainerContext } from '@statamic/components/ui/Publish/Container.vue';
 
 const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);

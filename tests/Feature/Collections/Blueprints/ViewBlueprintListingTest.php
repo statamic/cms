@@ -34,8 +34,9 @@ class ViewBlueprintListingTest extends TestCase
             ->actingAs($user)
             ->get(cp_route('blueprints.collections.index', 'test'))
             ->assertSuccessful()
-            ->assertViewHas('blueprints', collect([
-                [
+            ->assertInertia(fn ($page) => $page
+                ->has('blueprints', 2)
+                ->where('blueprints.0', [
                     'id' => 'foo',
                     'handle' => 'foo',
                     'title' => 'Foo',
@@ -44,8 +45,8 @@ class ViewBlueprintListingTest extends TestCase
                     'hidden' => false,
                     'edit_url' => 'http://localhost/cp/fields/blueprints/collections/test/foo/edit',
                     'delete_url' => 'http://localhost/cp/fields/blueprints/collections/test/foo',
-                ],
-                [
+                ])
+                ->where('blueprints.1', [
                     'id' => 'bar',
                     'handle' => 'bar',
                     'title' => 'Bar',
@@ -54,9 +55,8 @@ class ViewBlueprintListingTest extends TestCase
                     'hidden' => false,
                     'edit_url' => 'http://localhost/cp/fields/blueprints/collections/test/bar/edit',
                     'delete_url' => 'http://localhost/cp/fields/blueprints/collections/test/bar',
-                ],
-            ]))
-            ->assertDontSee('no-results');
+                ])
+            );
     }
 
     #[Test]

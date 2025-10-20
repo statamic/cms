@@ -12,7 +12,7 @@
                 <!-- Header -->
                 <header id="asset-editor-header" class="relative flex w-full justify-between px-2">
                     <button
-                        class="group flex items-center gap-3 p-4"
+                        class="group flex items-center gap-2 sm:gap-3 p-4"
                         @click="open"
                         v-tooltip.right="__('Open in a new window')"
                         :aria-label="__('Open in a new window')"
@@ -25,11 +25,11 @@
                     <ui-button variant="ghost" icon="x" class="absolute top-1.5 end-1.5" round @click="confirmClose(close)" :aria-label="__('Close Editor')" />
                 </header>
 
-                <div class="flex flex-1 grow flex-col overflow-scroll md:flex-row md:justify-between">
+                <div class="flex flex-1 grow flex-col overflow-auto md:flex-row md:justify-between">
                     <!-- Visual Area -->
                     <div class="editor-preview md:min-h-auto flex min-h-[45vh] w-full flex-1 flex-col justify-between bg-gray-800 shadow-[inset_0px_4px_3px_0px_black] dark:bg-gray-900 md:w-1/2 md:flex-auto md:grow lg:w-2/3 md:ltr:rounded-se-md">
                         <!-- Toolbar -->
-                        <div v-if="isToolbarVisible" class="@container/toolbar dark flex items-center justify-center gap-2 px-2 py-4">
+                        <div v-if="isToolbarVisible" class="@container/toolbar dark flex flex-wrap items-center justify-center gap-2 px-2 py-4">
                             <ItemActions
                                 :item="id"
                                 :url="actionUrl"
@@ -38,13 +38,14 @@
                                 @completed="actionCompleted"
                                 v-slot="{ actions }"
                             >
-                                <ui-button v-if="isImage && isFocalPointEditorEnabled" @click.prevent="openFocalPointEditor" icon="focus" variant="filled" v-tooltip="__('Focal Point')" />
-                                <ui-button v-if="canRunAction('rename_asset')" @click.prevent="runAction(actions, 'rename_asset')" icon="rename" variant="filled" v-tooltip="__('Rename')" />
-                                <ui-button v-if="canRunAction('move_asset')" @click.prevent="runAction(actions, 'move_asset')" icon="move-folder" variant="filled" v-tooltip="__('Move to Folder')" />
-                                <ui-button v-if="canRunAction('replace_asset')" @click.prevent="runAction(actions, 'replace_asset')" icon="replace" variant="filled" v-tooltip="__('Replace')" />
-                                <ui-button v-if="canRunAction('reupload_asset')" @click.prevent="runAction(actions, 'reupload_asset')" icon="upload-cloud" variant="filled" v-tooltip="__('Reupload')" />
-                                <ui-button v-if="asset.allowDownloading" @click="download" icon="download" variant="filled" v-tooltip="__('Download')" />
-                                <ui-button v-if="allowDeleting && canRunAction('delete')" @click="runAction(actions, 'delete')" icon="trash" variant="filled" v-tooltip="__('Delete')" />
+                                <ui-button inset size="sm" v-if="isImage && isFocalPointEditorEnabled" @click.prevent="openFocalPointEditor" icon="focus" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Focal Point')" />
+                                <ui-button inset size="sm" v-if="canRunAction('rename_asset')" @click.prevent="runAction(actions, 'rename_asset')" icon="rename" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Rename')" />
+                                <ui-button inset size="sm" v-if="canRunAction('move_asset')" @click.prevent="runAction(actions, 'move_asset')" icon="move-folder" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Move to Folder')" />
+                                <ui-button inset size="sm" v-if="canRunAction('replace_asset')" @click.prevent="runAction(actions, 'replace_asset')" icon="replace" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Replace')" />
+                                <ui-button inset size="sm" v-if="canRunAction('reupload_asset')" @click.prevent="runAction(actions, 'reupload_asset')" icon="upload-cloud" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Reupload')" />
+                                <ui-button inset size="sm" @click="download" icon="download" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Download')" />
+                                <ui-button inset size="sm" v-if="allowDeleting && canRunAction('delete')" @click="runAction(actions, 'delete')" icon="trash" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Delete')" />
+
                                 <Dropdown class="me-4">
                                     <DropdownMenu>
                                         <DropdownItem
@@ -60,42 +61,44 @@
                             </ItemActions>
                         </div>
 
-                        <!-- Image Preview -->
+                        <!-- Asset Preview Area -->
                         <div
-                            v-if="asset.isImage || asset.isSvg || asset.isAudio || asset.isVideo"
-                            class="editor-preview-image"
+                            v-if="asset.isImage || asset.isSvg || asset.isAudio || asset.isVideo || asset.preview"
+                            class="flex flex-1 flex-col justify-center items-center p-8 h-full min-h-0"
                         >
-                            <div class="image-wrapper">
-                                <!-- Image -->
-                                <img v-if="asset.isImage" :src="asset.preview" class="asset-thumb" />
+                            <!-- Image -->
+                            <img v-if="asset.isImage" :src="asset.preview" class="asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
 
-                                <!-- SVG -->
-                                <div v-else-if="asset.isSvg" class="flex h-full w-full flex-col">
-                                    <div class="grid grid-cols-3 gap-1">
-                                        <div class="bg-checkerboard flex items-center justify-center p-3 aspect-square">
-                                            <img :src="asset.url" class="asset-thumb relative z-10 size-4" />
-                                        </div>
-                                        <div class="bg-checkerboard flex items-center justify-center p-3 aspect-square">
-                                            <img :src="asset.url" class="asset-thumb relative z-10 size-12" />
-                                        </div>
-                                        <div class="bg-checkerboard flex items-center justify-center p-3 aspect-square">
-                                            <img :src="asset.url" class="asset-thumb relative z-10 size-24" />
-                                        </div>
+                            <!-- SVG -->
+                            <div v-else-if="asset.isSvg" class="flex h-full w-full flex-col shadow-ui-xl">
+                                <div class="grid grid-cols-3 gap-1">
+                                    <div class="bg-checkerboard flex items-center justify-center p-3 aspect-square">
+                                        <img :src="asset.url" class="asset-thumb relative z-10 size-4" />
                                     </div>
-                                    <div class="bg-checkerboard h-full min-h-0 mt-1 flex items-center justify-center p-3 aspect-square">
-                                        <img :src="asset.url" class="asset-thumb relative z-10 max-h-full w-2/3 max-w-full" />
+                                    <div class="bg-checkerboard flex items-center justify-center p-3 aspect-square">
+                                        <img :src="asset.url" class="asset-thumb relative z-10 size-12" />
+                                    </div>
+                                    <div class="bg-checkerboard flex items-center justify-center p-3 aspect-square">
+                                        <img :src="asset.url" class="asset-thumb relative z-10 size-24" />
                                     </div>
                                 </div>
-
-                                <!-- Audio -->
-                                <div class="w-full shadow-none" v-else-if="asset.isAudio">
-                                    <audio :src="asset.url" class="w-full" controls preload="auto" />
+                                <div class="bg-checkerboard h-full min-h-0 mt-1 flex items-center justify-center p-3 aspect-square">
+                                    <img :src="asset.url" class="asset-thumb relative z-10 max-h-full w-2/3 max-w-full" />
                                 </div>
-
-                                <!-- Video -->
-                                <video :src="asset.url" controls v-else-if="asset.isVideo" />
                             </div>
+
+                            <!-- Audio -->
+                            <div class="w-full shadow-none" v-else-if="asset.isAudio">
+                                <audio :src="asset.url" class="w-full" controls preload="auto" />
+                            </div>
+
+                            <!-- Video -->
+                            <video :src="asset.url" class="max-w-full max-h-full object-contain" controls v-else-if="asset.isVideo" />
+
+                            <!-- Other thumbnail -->
+                            <img v-else-if="asset.preview" :src="asset.preview" class="asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
                         </div>
+
 
                         <div class="h-full" v-else-if="asset.isPdf">
                             <pdf-viewer :src="asset.pdfUrl" />
@@ -114,6 +117,7 @@
                     <PublishContainer
                         v-if="fields"
                         ref="container"
+                        :read-only="readOnly"
                         :name="publishContainer"
                         :reference="id"
                         :blueprint="fieldset"
@@ -121,7 +125,7 @@
                         :extra-values="extraValues"
                         :meta="meta"
                         :errors="errors"
-                        @update:model-value="values = { ...$event, focus: values.focus }"
+                        @update:model-value="updateValues"
                     >
                         <div class="h-1/2 w-full overflow-scroll sm:p-4 md:h-full md:w-1/3 md:grow md:pt-px">
                             <div v-if="saving" class="loading">
@@ -134,14 +138,14 @@
                 </div>
 
                 <div class="flex w-full items-center justify-end rounded-b border-t dark:border-gray-700 bg-gray-100 dark:bg-gray-900 px-4 py-3">
-                    <div class="hidden h-full flex-1 gap-3 py-1 sm:flex">
+                    <div class="hidden h-full flex-1 gap-2 sm:gap-3 py-1 sm:flex">
                         <ui-badge v-if="isImage" icon="assets" :text="__('messages.width_x_height', { width: asset.width, height: asset.height })" />
                         <ui-badge icon="memory" :text="asset.size" />
                         <ui-badge icon="fingerprint" :text="asset.lastModifiedRelative" />
                     </div>
                     <div class="flex items-center space-x-3 rtl:space-x-reverse">
-                        <ui-button icon="ui/chevron-left" @click="navigateToPreviousAsset" v-tooltip="__('Previous Asset')" />
-                        <ui-button icon="ui/chevron-right" @click="navigateToNextAsset" v-tooltip="__('Next Asset')" />
+                        <ui-button icon="chevron-left" @click="navigateToPreviousAsset" v-tooltip="__('Previous Asset')" />
+                        <ui-button icon="chevron-right" @click="navigateToNextAsset" v-tooltip="__('Next Asset')" />
                         <ui-button variant="primary" icon="save" @click="saveAndClose" v-if="!readOnly" :text="__('Save')" />
                     </div>
                 </div>
@@ -172,8 +176,15 @@
 import FocalPointEditor from './FocalPointEditor.vue';
 import PdfViewer from './PdfViewer.vue';
 import { pick, flatten } from 'lodash-es';
-import { Dropdown, DropdownMenu, DropdownItem, PublishContainer, PublishTabs, Icon } from '@statamic/ui';
-import ItemActions from '@statamic/components/actions/ItemActions.vue';
+import {
+    Dropdown,
+    DropdownMenu,
+    DropdownItem,
+    PublishContainer,
+    PublishTabs,
+    Icon,
+} from '@ui';
+import ItemActions from '@/components/actions/ItemActions.vue';
 
 export default {
     emits: ['previous', 'next', 'saved', 'closed', 'action-started', 'action-completed'],
@@ -193,9 +204,6 @@ export default {
     props: {
         id: {
             required: true,
-        },
-        readOnly: {
-            type: Boolean,
         },
         showToolbar: {
             type: Boolean,
@@ -229,6 +237,10 @@ export default {
     },
 
     computed: {
+        readOnly() {
+            return !this.asset.isEditable;
+        },
+
         isImage() {
             if (!this.asset) return false;
 
@@ -358,6 +370,16 @@ export default {
             this.$dirty.add(this.publishContainer);
         },
 
+        updateValues(values) {
+            let updated = { ...event, focus: values.focus };
+
+            if (JSON.stringify(values) === JSON.stringify(updated)) {
+                return
+            }
+
+            values = updated;
+        },
+
         save() {
             this.saving = true;
             const url = cp_url(`assets/${utf8btoa(this.id)}`);
@@ -369,6 +391,7 @@ export default {
                     this.$toast.success(__('Saved'));
                     this.saving = false;
                     this.clearErrors();
+                    this.$nextTick(() => this.$refs.container.clearDirtyState());
                 })
                 .catch((e) => {
                     this.saving = false;
@@ -412,6 +435,7 @@ export default {
 
         confirmCloseWithChanges() {
             this.closingWithChanges = false;
+            this.$refs.container.clearDirtyState();
             this.$emit('closed');
         },
 

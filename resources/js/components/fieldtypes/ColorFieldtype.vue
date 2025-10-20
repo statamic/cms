@@ -81,11 +81,17 @@ export default {
         value(value) {
             this.customColor = value;
         },
+
+        popoverOpen(isOpen) {
+            if (!isOpen && this.customColor !== this.value) {
+                this.commitCustomColor();
+            }
+        },
     },
 
     computed: {
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
+            if (!this.showFieldPreviews) return;
 
             return this.value
                 ? replicatorPreviewHtml(`<span class="little-dot" style="background-color:${this.value}"></span>`)

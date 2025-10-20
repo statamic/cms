@@ -7,7 +7,7 @@
             </template>
         </ui-header>
 
-        <ui-card v-if="gettingChangelog" class="text-center">
+        <ui-card v-if="gettingChangelog" class="text-center starting-style-transition" v-cloak>
             <Icon name="loading" />
         </ui-card>
 
@@ -47,7 +47,7 @@
 
 <script>
 import Release from './Release.vue';
-import { Icon } from '@statamic/ui';
+import { Icon } from '@/components/ui';
 
 export default {
     components: {

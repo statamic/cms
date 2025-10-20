@@ -142,7 +142,7 @@ export default {
         },
 
         destroySortableList() {
-            this.sortable.destroy();
+            this.sortable?.destroy();
         },
     },
 

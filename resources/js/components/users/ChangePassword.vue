@@ -1,7 +1,7 @@
 <template>
     <Modal v-model:open="open" :title="__('Change Password')">
         <template #trigger>
-            <Button v-text="__('Change Password')" />
+            <Button v-text="__('Change Password')" ref="trigger" />
         </template>
 
         <div class="publish-fields">
@@ -42,8 +42,8 @@
 </template>
 
 <script>
-import { Button, Modal, ModalClose, Switch, Field, Input } from '@statamic/ui';
-import { requireElevatedSessionIf } from '@statamic/components/elevated-sessions';
+import { Button, Modal, ModalClose, Switch, Field, Input } from '@/components/ui';
+import { requireElevatedSessionIf } from '@/components/elevated-sessions';
 
 export default {
     components: {
@@ -69,6 +69,10 @@ export default {
             confirmation: null,
             open: false,
         };
+    },
+
+    mounted() {
+        this.addToCommandPalette();
     },
 
     methods: {
@@ -111,6 +115,15 @@ export default {
                         this.saving = false;
                     }
                 });
+        },
+
+        addToCommandPalette() {
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Change Password'),
+                icon: 'key',
+                action: () => this.$refs.trigger.$el.click(),
+            });
         },
     },
 };

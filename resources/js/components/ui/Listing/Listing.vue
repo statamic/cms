@@ -1,12 +1,17 @@
 <script>
-import createContext from '@statamic/util/createContext.js';
+import createContext from '@/util/createContext.js';
 
 export const [injectListingContext, provideListingContext] = createContext('Listing');
 </script>
 
 <script setup>
 import { ref, toRef, computed, watch, nextTick, onMounted, onBeforeUnmount, useSlots } from 'vue';
-import { Icon, Panel, PanelFooter } from '@statamic/ui';
+import useSkeletonDelay from '@/composables/skeleton-delay.js';
+import {
+    Icon,
+    Panel,
+    PanelFooter,
+} from '@ui';
 import axios from 'axios';
 import BulkActions from './BulkActions.vue';
 import uniqid from 'uniqid';
@@ -156,6 +161,7 @@ const hasActions = computed(() => !!props.actionUrl);
 const hasFilters = computed(() => props.filters && props.filters.length > 0);
 const showPresets = computed(() => props.allowPresets && props.preferencesPrefix);
 const showBulkActions = computed(() => props.allowBulkActions && hasActions.value);
+const shouldShowSkeleton = useSkeletonDelay(initializing);
 
 const items = computed({
     get() {
@@ -194,6 +200,17 @@ watch(
     (items) => rawItems.value = items,
 );
 
+watch(
+    () => props.selections,
+    () => {
+        if (JSON.stringify(props.selections) === JSON.stringify(selections.value)) {
+            return;
+        }
+
+        selections.value = props.selections || [];
+    }
+);
+
 const rawParameters = computed(() => ({
     page: currentPage.value,
     perPage: perPage.value,
@@ -219,17 +236,31 @@ const forwardedTableCellSlots = computed(() => {
         }, {});
 });
 
+const activeFilterBadgeCount = computed(() => {
+    let count = Object.keys(activeFilterBadges.value).length;
+
+    if (activeFilterBadges.value.hasOwnProperty('fields')) {
+        count = count + Object.keys(activeFilterBadges.value.fields).length - 1;
+    }
+
+    return count;
+});
+
 function setParameters(params) {
-    currentPage.value = parseInt(params.page);
-    perPage.value = parseInt(params.perPage);
-    sortColumn.value = params.sort;
-    sortDirection.value = params.order;
-    searchQuery.value = params.search;
-    columns.value = columns.value.map((column) => ({
-        ...column,
-        visible: params.columns.split(',').includes(column.field),
-    }));
-    activeFilters.value = params.filters ? JSON.parse(utf8atob(params.filters)) : {};
+    if (params.hasOwnProperty('page')) currentPage.value = parseInt(params.page);
+    if (params.hasOwnProperty('perPage')) perPage.value = parseInt(params.perPage);
+    if (params.hasOwnProperty('sort')) sortColumn.value = params.sort;
+    if (params.hasOwnProperty('order')) sortDirection.value = params.order;
+    if (params.hasOwnProperty('search')) searchQuery.value = params.search;
+    if (params.hasOwnProperty('columns')) {
+        columns.value = columns.value.map((column) => ({
+            ...column,
+            visible: params.columns.split(',').includes(column.field),
+        }));
+    }
+    if (params.hasOwnProperty('filters')) {
+        activeFilters.value = params.filters ? JSON.parse(utf8atob(params.filters)) : {};
+    }
 }
 
 const parameters = computed(() => {
@@ -593,6 +624,7 @@ provideListingContext({
     filters: toRef(() => props.filters),
     activeFilters,
     activeFilterBadges,
+    activeFilterBadgeCount,
     setFilter,
     setFilters,
     clearFilters,
@@ -638,13 +670,22 @@ autoApplyState();
 </script>
 
 <template>
-    <slot name="initializing" v-if="initializing">
-        <Icon name="loading" />
+    <slot name="initializing" v-if="shouldShowSkeleton">
+        <div class="flex flex-col gap-4 justify-between mt-3 starting-style-transition starting-style-transition--delay">
+            <ui-skeleton class="h-5 w-48" />
+            <div class="flex gap-2 sm:gap-3">
+                <ui-skeleton class="h-9 w-96" />
+                <ui-skeleton class="h-9 w-24" />
+                <div class="flex-1" />
+                <ui-skeleton class="size-10" />
+            </div>
+            <ui-skeleton class="h-48 w-full" />
+        </div>
     </slot>
     <slot v-if="!initializing" :items="items" :is-column-visible="isColumnVisible" :loading="loading">
         <Presets v-if="showPresets" />
-        <div v-if="allowSearch || hasFilters || allowCustomizingColumns" class="relative flex items-center gap-3 min-h-16">
-            <div class="flex flex-1 items-center gap-3 w-full">
+        <div v-if="allowSearch || hasFilters || allowCustomizingColumns" class="relative flex items-center gap-2 sm:gap-3 min-h-16 starting-style-transition starting-style-transition--siblings">
+            <div class="flex flex-1 items-center gap-2 sm:gap-3 w-full">
                 <Search v-if="allowSearch" />
                 <Filters v-if="hasFilters" />
             </div>
@@ -653,11 +694,11 @@ autoApplyState();
 
         <div
             v-if="!items.length"
-            class="rounded-lg border border-dashed border-gray-300 p-6 text-center text-gray-500"
+            class="rounded-lg border border-dashed border-gray-300 dark:border-gray-700 p-6 text-center text-gray-500"
             v-text="__('No results')"
         />
 
-        <Panel v-else class="relative overflow-x-auto overscroll-x-contain">
+        <Panel v-else class="relative overflow-x-auto overscroll-x-contain" style="container-type: scroll-state;">
             <Table>
                 <template v-for="(slot, slotName) in forwardedTableCellSlots" :key="slotName" #[slotName]="slotProps">
                     <component :is="slot" v-bind="slotProps" />

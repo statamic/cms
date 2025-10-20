@@ -1,6 +1,6 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
-import { Modal, ModalClose, Button, Icon } from '@statamic/ui';
+import { Modal, ModalClose, Button, Icon } from '@/components/ui';
 
 const emit = defineEmits(['opened', 'confirm', 'cancel']);
 
@@ -19,9 +19,13 @@ const props = defineProps({
         type: Boolean,
         default: true,
     },
+    submittable: {
+        type: Boolean,
+        default: true,
+    },
     cancelText: {
         type: String,
-        default: 'Cancel',
+        default: () => __('Cancel'),
     },
     danger: {
         type: Boolean,
@@ -72,7 +76,7 @@ function submit() {
             <p>{{ __('Are you sure?') }}</p>
         </slot>
 
-        <template #footer>
+        <template v-if="cancellable || submittable" #footer>
             <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
                 <ModalClose asChild>
                     <Button
@@ -83,6 +87,7 @@ function submit() {
                     />
                 </ModalClose>
                 <Button
+                    v-if="submittable"
                     type="submit"
                     :variant="danger ? 'danger' : 'primary'"
                     :disabled="disabled || busy"

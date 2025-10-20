@@ -6,11 +6,10 @@
     display: grid;
     --grid-columns: 12;
     grid-template-columns: repeat(var(--grid-columns), 1fr);
-    @apply gap-3 lg:gap-8;
+    @apply gap-x-3 gap-6 @lg/panel:gap-8;
 
     aside & {
-        /* Decrease */
-        @apply gap-x-2 gap-y-3 lg:gap-y-6;
+        @apply gap-x-2 gap-y-6;
     }
 
     .form-group {
@@ -18,7 +17,7 @@
     }
 }
 
-@variant lg {
+@variant @lg/panel {
     .field-w-25  { --col-span: calc(var(--grid-columns) * 0.25); }
     .field-w-33  { --col-span: calc(var(--grid-columns) * 0.333); }
     .field-w-50  { --col-span: calc(var(--grid-columns) * 0.5); }
@@ -51,7 +50,7 @@ Here flexbox is much better suited to create a layout that grows to fill space. 
     }
 
     @variant lg {
-    /* Here we have to cut short the proper width very slightly to account for the gap value. Because we're using flex-grow it should be pretty unnoticeable */
+        /* Here we have to cut short the proper width very slightly to account for the gap value. Because we're using flex-grow it should be pretty unnoticeable */
         .field-w-25  { flex-basis: 24.5%; }
         .field-w-33  { flex-basis: 32.5%; }
         .field-w-50  { flex-basis: 49.4%; }
@@ -61,14 +60,24 @@ Here flexbox is much better suited to create a layout that grows to fill space. 
     }
 }
 
+.publish-fields-fluid--xl-only {
+    /* A modifier that prevents the fields from being fluid on smaller screens to help legibility, for example on the Blueprints builder */
+    @media (width < 1400px) {
+        [class*="field-w-"] {
+            flex-basis: 100%;
+        }
+    }
+}
+
 
 /* GROUP PUBLISH COMPONENT / FIELD
 =================================================== */
 .publish-field {
+    border: 1px solid red;
     position: relative;
     .read-only-overlay {
         @apply absolute inset-0 cursor-not-allowed bg-white/25;
-        z-index: 100;
+        z-index: var(--z-index-portal);
     }
 
     .has-field-dropdown {
@@ -124,5 +133,5 @@ Here flexbox is much better suited to create a layout that grows to fill space. 
 .sneak-peek-editing .publish-tabs {
     position: sticky;
     top: 0;
-    z-index: 1000;
+    z-index: var(--z-index-portal);
 }

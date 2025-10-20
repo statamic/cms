@@ -152,17 +152,31 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(\Statamic\Fields\BlueprintRepository::class, function () {
             return (new \Statamic\Fields\BlueprintRepository)
-                ->setDirectory(resource_path('blueprints'))
+                ->setDirectories(config('statamic.system.blueprints_path'))
                 ->setFallback('default', function () {
-                    return \Statamic\Facades\Blueprint::makeFromFields([
-                        'content' => ['type' => 'markdown', 'localizable' => true],
+                    return \Statamic\Facades\Blueprint::make()->setContents([
+                        'tabs' => [
+                            'main' => [
+                                'sections' => [
+                                    [
+                                        'display' => __('Content'),
+                                        'fields' => [
+                                            [
+                                                'handle' => 'content',
+                                                'field' => ['type' => 'markdown', 'localizable' => true],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
                     ]);
                 });
         });
 
         $this->app->singleton(\Statamic\Fields\FieldsetRepository::class, function () {
             return (new \Statamic\Fields\FieldsetRepository)
-                ->setDirectory(resource_path('fieldsets'));
+                ->setDirectory(config('statamic.system.fieldsets_path'));
         });
 
         $this->app->singleton(FieldsetRecursionStack::class);

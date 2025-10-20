@@ -10,27 +10,26 @@ class AssetFolderPolicy
 {
     public function before($user)
     {
-        if (User::fromUser($user)->isSuper()) {
+        $user = User::fromUser($user);
+
+        if ($user->isSuper() || $user->hasPermission('configure asset containers')) {
             return true;
         }
     }
 
     public function create($user, $assetContainer)
     {
-        $user = User::fromUser($user);
-
-        if (! $user->hasPermission("upload {$assetContainer->handle()} assets")) {
-            return false;
-        }
-
-        return $assetContainer->createFolders();
+        return User::fromUser($user)->hasPermission("edit {$assetContainer->handle()} folders");
     }
 
     public function move($user, $assetFolder)
     {
         $user = User::fromUser($user);
 
-        if (! $user->hasPermission("move {$assetFolder->container()->handle()} assets")) {
+        $hasPermission = $user->hasPermission("edit {$assetFolder->container()->handle()} folders")
+            && $user->hasPermission("move {$assetFolder->container()->handle()} assets");
+
+        if (! $hasPermission) {
             return false;
         }
 
@@ -41,14 +40,17 @@ class AssetFolderPolicy
                 ->isEmpty();
         }
 
-        return $assetFolder->container()->allowMoving();
+        return true;
     }
 
     public function rename($user, $assetFolder)
     {
         $user = User::fromUser($user);
 
-        if (! $user->hasPermission("rename {$assetFolder->container()->handle()} assets")) {
+        $hasPermission = $user->hasPermission("edit {$assetFolder->container()->handle()} folders")
+            && $user->hasPermission("rename {$assetFolder->container()->handle()} assets");
+
+        if (! $hasPermission) {
             return false;
         }
 
@@ -59,14 +61,17 @@ class AssetFolderPolicy
                 ->isEmpty();
         }
 
-        return $assetFolder->container()->allowRenaming();
+        return true;
     }
 
     public function delete($user, $assetFolder)
     {
         $user = User::fromUser($user);
 
-        if (! $user->hasPermission("delete {$assetFolder->container()->handle()} assets")) {
+        $hasPermission = $user->hasPermission("edit {$assetFolder->container()->handle()} folders")
+            && $user->hasPermission("delete {$assetFolder->container()->handle()} assets");
+
+        if (! $hasPermission) {
             return false;
         }
 

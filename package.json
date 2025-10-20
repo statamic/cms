@@ -11,17 +11,18 @@
     "test-watch": "npm run test -- --watch --notify",
     "frontend-dev": "vite -c vite-frontend.config.js",
     "frontend-build": "vite build -c vite-frontend.config.js",
-    "knip": "knip"
+    "knip": "knip",
+    "types": "cd packages/ui && npm run types && cd ../cms && npm run types"
   },
   "dependencies": {
     "@davidenke/marked-text-renderer": "^3.0.0",
     "@floating-ui/dom": "^1.6.0",
-    "@he-tree/vue": "^2.8.2",
+    "@he-tree/vue": "^2.10.0-beta.2",
     "@hoppscotch/vue-toasted": "^0.1.0",
+    "@inertiajs/vue3": "^2.1.11",
     "@internationalized/date": "^3.7.0",
     "@shopify/draggable": "^1.0.0-beta.12",
     "@tiptap/core": "^3.0.0",
-    "@tiptap/extensions": "^3.0.0",
     "@tiptap/extension-blockquote": "^3.0.0",
     "@tiptap/extension-bold": "^3.0.0",
     "@tiptap/extension-bullet-list": "^3.0.0",
@@ -47,11 +48,12 @@
     "@tiptap/extension-text-align": "^3.0.0",
     "@tiptap/extension-typography": "^3.0.0",
     "@tiptap/extension-underline": "^3.0.0",
+    "@tiptap/extensions": "^3.0.0",
     "@tiptap/pm": "^3.0.0",
     "@tiptap/vue-3": "^3.0.0",
     "alpinejs": "^3.1.1",
     "autosize": "~6.0.1",
-    "axios": "^1.8.2",
+    "axios": "^1.12.1",
     "body-scroll-lock": "^4.0.0-beta.0",
     "clsx": "^2.1.1",
     "codemirror": "5.65.12",
@@ -92,8 +94,6 @@
     "vue3-click-away": "^1.2.4"
   },
   "devDependencies": {
-    "@rollup/plugin-inject": "^5.0.3",
-    "@tailwindcss/typography": "^0.5.10",
     "@tailwindcss/vite": "^4.1.8",
     "@vitejs/plugin-vue": "^6.0.0",
     "@vue/test-utils": "^2.4.6",
@@ -102,8 +102,10 @@
     "laravel-vite-plugin": "^2.0.0",
     "rollup-plugin-visualizer": "^5.14.0",
     "tailwindcss": "^4.1.8",
+    "typescript": "^5.9.2",
     "vite": "^7.0.4",
     "vitest": "^3.2.0",
-    "vue-component-debug": "^0.1.0"
+    "vue-component-debug": "^0.1.0",
+    "vue-tsc": "^3.0.5"
   }
 }

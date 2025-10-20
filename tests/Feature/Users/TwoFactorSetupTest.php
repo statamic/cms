@@ -1,6 +1,6 @@
 <?php
 
-namespace Feature\Users;
+namespace Tests\Feature\Users;
 
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\Group;
@@ -22,7 +22,7 @@ class TwoFactorSetupTest extends TestCase
         $this
             ->actingAs($this->user())
             ->get(cp_route('two-factor-setup'))
-            ->assertViewIs('statamic::auth.two-factor.setup');
+            ->assertInertia(fn ($page) => $page->component('auth/two-factor/Setup'));
     }
 
     #[Test]
@@ -42,7 +42,7 @@ class TwoFactorSetupTest extends TestCase
             ->get(cp_route('two-factor-setup', [
                 'referer' => 'http://localhost/cp/collections',
             ]))
-            ->assertViewHas('redirect', 'http://localhost/cp/collections');
+            ->assertInertia(fn ($page) => $page->where('redirect', 'http://localhost/cp/collections'));
     }
 
     private function user()

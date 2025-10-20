@@ -10,9 +10,9 @@
         :filters="filters"
     >
         <template #cell-datestamp="{ row: submission, value }">
-            <a :href="submission.url">
+            <Link :href="submission.url">
                 <date-time :of="value" />
-            </a>
+            </Link>
         </template>
         <template #prepended-row-actions="{ row: submission }">
             <DropdownItem :text="__('View')" :href="submission.url" icon="eye" />
@@ -21,10 +21,11 @@
 </template>
 
 <script>
-import { Listing, DropdownItem } from '@statamic/ui';
+import { Listing, DropdownItem } from '@/components/ui';
+import { Link } from '@inertiajs/vue3';
 
 export default {
-    components: { DropdownItem, Listing },
+    components: { Link, DropdownItem, Listing },
 
     props: {
         form: String,

@@ -1,5 +1,5 @@
 <script setup>
-import DateFormatter from '@statamic/components/DateFormatter.js';
+import DateFormatter from '@/components/DateFormatter.js';
 import { computed } from 'vue';
 import {
     Widget,
@@ -8,12 +8,13 @@ import {
     ListingTableHead as TableHead,
     ListingTableBody as TableBody,
     ListingPagination as Pagination,
-} from '@statamic/ui';
+} from '@/components/ui';
 
 const props = defineProps({
     form: { type: String, required: true },
     fields: { type: Array, default: () => [] },
     title: { type: String },
+    submissionsUrl: { type: String },
     initialPerPage: { type: Number, default: 5 },
 });
 
@@ -27,6 +28,7 @@ const cols = computed(() => [
 const widgetProps = computed(() => ({
     title: props.title,
     icon: 'forms',
+    href: props.submissionsUrl,
 }));
 
 function formatDate(value) {
@@ -44,7 +46,11 @@ function formatDate(value) {
         :show-pagination-per-page-selector="false"
     >
         <template #initializing>
-            <Widget v-bind="widgetProps"><Icon name="loading" /></Widget>
+            <Widget v-bind="widgetProps">
+                <div class="flex flex-col justify-between px-4 py-3">
+                    <ui-skeleton v-for="i in initialPerPage" class="h-[1.25rem] mb-[0.25rem] w-full" />
+                </div>
+            </Widget>
         </template>
         <template #default="{ items }">
             <Widget v-bind="widgetProps">

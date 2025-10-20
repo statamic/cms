@@ -1,7 +1,7 @@
 <script setup>
-import { Button, Modal, Tooltip } from '@statamic/ui';
-import { SortableList } from '@statamic/components/sortable/Sortable.js';
-import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
+import { Button, Modal, Tooltip } from '@ui';
+import { SortableList } from '@/components/sortable/Sortable.js';
+import { injectListingContext } from '../Listing/Listing.vue';
 import { computed, ref } from 'vue';
 
 const { preferencesPrefix, columns, visibleColumns, hiddenColumns, setColumns, reorderable } = injectListingContext();
@@ -80,7 +80,7 @@ function reset() {
                     <div class="flex w-1/2 flex-col text-start">
                         <ui-heading :text="__('Available Columns')" class="py-2 px-3 border-b dark:border-gray-900" />
                         <div class="flex flex-1 flex-col space-y-1 overflow-y-auto h-full px-3 py-2 select-none bg-gray-100 dark:bg-gray-900 rounded-bs-lg">
-                            <ui-checkbox-item
+                            <ui-checkbox
                                 v-model="column.visible"
                                 :label="column.label"
                                 v-for="column in sortedHiddenColumns"
@@ -106,14 +106,14 @@ function reset() {
                             >
                                 <div class="space-y-1.5 p-3 select-none">
                                     <div
-                                        class="item sortable cursor-grab py-2 px-2.5 gap-3 relative rounded-lg bg-white dark:bg-gray-700 flex items-center justify-between text-xs shadow"
+                                        class="item sortable cursor-grab py-2 px-2.5 gap-2 sm:gap-3 relative rounded-lg bg-white dark:bg-gray-700 flex items-center justify-between text-xs shadow"
                                         v-for="column in selectedColumns"
                                         :key="column.field"
                                         tabindex="-1"
                                     >
                                         <ui-drag-handle class="item-move" />
                                         <div class="flex flex-1 items-center">
-                                            <ui-checkbox-item
+                                            <ui-checkbox
                                                 v-model="column.visible"
                                                 :label="column.label"
                                                 :disabled="selectedColumns.length === 1 || column.required"

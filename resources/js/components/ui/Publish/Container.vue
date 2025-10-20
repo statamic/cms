@@ -1,19 +1,18 @@
 <script>
-import createContext from '@statamic/util/createContext.js';
+import createContext from '@/util/createContext.js';
 
 export const [injectContainerContext, provideContainerContext, containerContextKey] = createContext('PublishContainer');
 </script>
 
 <script setup>
 import uniqid from 'uniqid';
-import { watch, provide, getCurrentInstance, ref, computed, toRef } from 'vue';
-import Component from '@statamic/components/Component.js';
+import { watch, ref, computed, toRef } from 'vue';
+import Component from '@/components/Component.js';
 import Tabs from './Tabs.vue';
-import Values from '@statamic/components/publish/Values.js';
+import Values from '@/components/publish/Values.js';
+import { data_get } from '@/bootstrap/globals.js';
 
 const emit = defineEmits(['update:modelValue', 'update:visibleValues', 'update:modifiedFields']);
-
-const container = getCurrentInstance();
 
 const props = defineProps({
     name: {
@@ -89,6 +88,13 @@ const visibleValues = computed(() => {
     return new Values(values.value).except(omittable);
 });
 
+const revealerValues = computed(() => {
+    return revealerFields.value.reduce((obj, field) => {
+        obj[field] = data_get(values.value, field);
+        return obj;
+    }, {});
+});
+
 const setHiddenField = (field) => {
     hiddenFields.value[field.dottedKey] = {
         hidden: field.hidden,
@@ -125,7 +131,7 @@ watch(
 watch(
     values,
     (values) => {
-        if (props.trackDirtyState) dirty();
+        dirty();
         emit('update:modelValue', values);
     },
     { deep: true },
@@ -144,11 +150,11 @@ watch(
 );
 
 function dirty() {
-    Statamic.$dirty.add(props.name);
+    if (props.trackDirtyState) Statamic.$dirty.add(props.name);
 }
 
 function clearDirtyState() {
-    Statamic.$dirty.remove(props.name);
+    if (props.trackDirtyState) Statamic.$dirty.remove(props.name);
 }
 
 function setValues(newValues) {
@@ -195,7 +201,7 @@ function pushComponent(name, { props }) {
     return component;
 }
 
-provideContainerContext({
+const provided = {
     name: toRef(() => props.name),
     parentContainer,
     blueprint: toRef(() => props.blueprint),
@@ -206,6 +212,7 @@ provideContainerContext({
     originValues: toRef(() => props.originValues),
     hiddenFields,
     revealerFields,
+    revealerValues,
     localizedFields,
     meta,
     site: toRef(() => props.site),
@@ -214,7 +221,6 @@ provideContainerContext({
     previews,
     syncField,
     desyncField,
-    container,
     components,
     asConfig: toRef(() => props.asConfig),
     isTrackingOriginValues: computed(() => !!props.originValues),
@@ -225,7 +231,9 @@ provideContainerContext({
     setRevealerField,
     unsetRevealerField,
     setHiddenField,
-});
+};
+
+provideContainerContext({ ...provided, container: provided });
 
 defineExpose({
     name: props.name,
@@ -234,15 +242,13 @@ defineExpose({
     saved,
     revealerFields,
     setFieldValue,
+    desyncField,
     clearDirtyState,
     pushComponent,
     visibleValues,
     setValues,
     setExtraValues,
 });
-
-// Backwards compatibility.
-provide('publishContainer', getCurrentInstance()); // temporarily used by ShowField.js
 
 // The following are shims to make things temporarily work.
 function saving() {}

@@ -118,7 +118,7 @@ class NavItem
         return $this
             ->fluentlyGetOrSet('url')
             ->setter(function ($url) {
-                if (Str::startsWith($url, ['http://', 'https://'])) {
+                if (URL::isAbsolute($url)) {
                     return $url;
                 }
 
@@ -221,9 +221,6 @@ class NavItem
     {
         return $this
             ->fluentlyGetOrSet('attributes')
-            ->setter(function ($value) {
-                return is_array($value) ? Html::attributes($value) : $value;
-            })
             ->value($attrs);
     }
 

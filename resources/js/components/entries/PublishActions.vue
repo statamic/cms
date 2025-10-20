@@ -37,9 +37,9 @@
                             <Subheading size="sm" class="flex-1" :text="actionInfoText" />
                         </div>
 
-                        <div class="flex text-red-500" v-if="action === 'schedule'">
+                        <div class="flex text-red-600" v-if="action === 'schedule'">
                             <Icon name="info" class="size-4 shrink-0 me-2" />
-                            <Subheading size="sm" class="flex-1 text-red-500" :text="__('messages.publish_actions_current_becomes_draft_because_scheduled')" />
+                            <Subheading size="sm" class="flex-1 text-red-600" :text="__('messages.publish_actions_current_becomes_draft_because_scheduled')" />
                         </div>
                     </template>
                 </div>
@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import { Heading, Button, Select, DatePicker, Textarea, Icon, Subheading } from '@statamic/ui';
+import { Heading, Button, Select, DatePicker, Textarea, Icon, Subheading } from '@/components/ui';
 
 export default {
     components: { Heading, Button, Select, DatePicker, Textarea, Icon, Subheading },

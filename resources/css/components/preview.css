@@ -3,15 +3,11 @@
 }
 
 .live-preview-header {
-    @apply relative flex h-13 items-center justify-between py-2 shadow-md ltr:pl-6 ltr:pr-4 rtl:pl-4 rtl:pr-6;
-    background: linear-gradient(180deg, #fff, #f9fafb);
-    border-bottom: 1px solid #c4cdd6;
+    @apply 
+        relative flex h-13 items-center justify-between py-2 shadow-md ltr:pl-6 ltr:pr-4 rtl:pl-4 rtl:pr-6
+        bg-white dark:bg-dark-800 border-b border-gray-300 dark:border-gray-700
+    ;
     z-index: 2;
-
-    .dark & {
-        background: linear-gradient(180deg, var(--color-dark-500), var(--color-dark-550));
-        border-color: var(--color-dark-900);
-    }
 }
 
 .live-preview-main {
@@ -20,7 +16,7 @@
 }
 
 .live-preview-editor {
-    @apply relative flex h-full bg-gray-200 dark:bg-dark-800;
+    @apply relative flex h-full bg-white dark:bg-dark-800;
     z-index: 3;
 }
 
@@ -74,10 +70,10 @@
 }
 
 .live-preview-resizer {
-    @apply w-4 border-gray-400 shadow-sm dark:bg-gray-800 dark:border-gray-600 border-s;
+    @apply w-4 border-gray-200 shadow-sm dark:bg-gray-800 dark:border-gray-600 border-s;
     z-index: 1;
     cursor: ew-resize;
-    background-image: url('../../svg/ui/drag-dots.svg');
+    background-image: url('../../svg/drag-dots.svg');
     background-repeat: no-repeat;
     background-position: center center;
     background-size: 7px 17px;

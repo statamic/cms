@@ -7,7 +7,7 @@
             content: '';
             position: absolute;
             inset: -8px -8px -8px -20px;
-            z-index: -1;
+            z-index: var(--z-index-below);
         }
         button,
         a {
@@ -23,10 +23,10 @@
 
     button.warning,
     a.warning {
-        @apply text-red-500;
+        @apply text-red-600;
 
         &:hover {
-            @apply bg-red-500 text-white;
+            @apply bg-red-600 text-white;
         }
     }
 

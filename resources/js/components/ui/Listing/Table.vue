@@ -1,7 +1,7 @@
 <script setup>
-import { Panel, PanelFooter } from '@statamic/ui';
+import { Panel, PanelFooter } from '@ui';
 import { ref, computed, useTemplateRef, useSlots } from 'vue';
-import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
+import { injectListingContext } from '../Listing/Listing.vue';
 import Pagination from './Pagination.vue';
 import TableHead from './TableHead.vue';
 import TableBody from './TableBody.vue';
@@ -47,7 +47,7 @@ const forwardedTableCellSlots = computed(() => {
         :class="{
             'select-none': shifting,
             'data-table': !unstyled,
-            contained: contained,
+            'data-table--contained': contained,
             'opacity-50': loading,
         }"
         data-table
@@ -68,7 +68,7 @@ const forwardedTableCellSlots = computed(() => {
         </TableBody>
     </table>
     <div v-if="items.length === 0">
-        <div class="text-center text-gray-500 text-sm pt-4">
+        <div class="text-center text-gray-500 text-sm py-4">
             {{ __('No items found') }}
         </div>
     </div>

@@ -13,10 +13,10 @@
             push-query
         >
             <template #cell-email="{ row: user }">
-                <a class="title-index-field" :href="user.edit_url" @click.stop>
-                    <avatar :user="user" class="h-8 w-8 rounded-full ltr:mr-2 rtl:ml-2" />
+                <Link class="title-index-field" :href="user.edit_url" @click.stop>
+                    <ui-avatar :user="user" class="size-8 text-xs ltr:mr-2 rtl:ml-2" />
                     <span v-text="user.email" />
-                </a>
+                </Link>
             </template>
             <template #cell-roles="{ row: user, value: roles }">
                 <div class="role-index-field">
@@ -47,10 +47,12 @@
 </template>
 
 <script>
-import { Listing } from '@statamic/ui';
+import { Listing } from '@/components/ui';
+import { Link } from '@inertiajs/vue3';
 
 export default {
     components: {
+        Link,
         Listing,
     },
 

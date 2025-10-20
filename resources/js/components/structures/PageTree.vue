@@ -1,10 +1,10 @@
 <template>
     <div>
-        <div v-if="!loading && pages.length == 0" class="no-results flex w-full items-center">
+        <div v-if="!loading && treeData.length == 0" class="no-results flex w-full items-center">
             <slot name="empty" />
         </div>
 
-        <ui-panel v-show="pages.length">
+        <ui-panel v-show="treeData.length">
             <div class="loading card" v-if="loading">
                 <Icon name="loading" />
             </div>
@@ -12,7 +12,7 @@
             <ui-panel-header>
                 <div class="page-tree-header font-medium text-sm items-center flex justify-between">
                     <div v-text="__('Tree Structure')" />
-                    <div class="flex gap-2 -me-3">
+                    <div class="flex gap-2">
                         <ui-button size="sm" icon="tree-collapse" :text="__('Collapse')" @click="collapseAll" />
                         <ui-button size="sm" icon="tree-expand" :text="__('Expand')" @click="expandAll" />
                     </div>
@@ -27,6 +27,7 @@
                     :indent="24"
                     :dir="direction"
                     :node-key="(stat) => stat.data.id"
+                    :dragOverThrottleInterval="30"
                     :each-droppable="eachDroppable"
                     :root-droppable="rootDroppable"
                     :max-level="maxDepth"
@@ -90,7 +91,8 @@
 <script>
 import { dragContext, Draggable, walkTreeData } from '@he-tree/vue';
 import TreeBranch from './Branch.vue';
-import { PanelHeader, Panel, Icon } from '@statamic/ui';
+import { PanelHeader, Panel, Icon } from '@/components/ui';
+import { clone } from '@/bootstrap/globals.js';
 
 export default {
     components: {
@@ -160,7 +162,7 @@ export default {
         this.collapsedState = this.getCollapsedState();
 
         this.getPages().then(() => {
-            this.initialPages = this.pages;
+            this.initialPages = clone(this.pages);
         });
 
         this.$keys.bindGlobal(['mod+s'], (e) => {
@@ -186,12 +188,13 @@ export default {
                 this.pages = response.data.pages;
                 this.updateTreeData();
                 this.loading = false;
+                this.$emit('loaded', this.pages);
             });
         },
 
         treeUpdated() {
             this.pages = this.$refs.tree.getData();
-            this.$emit('changed');
+            this.$emit('changed', this.pages);
         },
 
         cleanPagesForSubmission(pages) {
@@ -301,7 +304,7 @@ export default {
                 return true;
             }
 
-            return dragContext.dragNode.children.length === 0;
+            return true;
         },
 
         eachDroppable(targetStat) {
@@ -319,10 +322,16 @@ export default {
 
         expandAll() {
             this.$refs.tree.openAll();
+            this.collapsedState = [];
         },
 
         collapseAll() {
             this.$refs.tree.closeAll();
+            // Get all node IDs to mark them as collapsed
+            this.collapsedState = [];
+            walkTreeData(this.treeData, (node) => {
+                this.collapsedState.push(node.id);
+            });
         },
 
         getNodeByBranchId(id) {

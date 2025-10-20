@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue';
-import { DropdownItem, Listing } from '@statamic/ui';
+import { DropdownItem, Listing } from '@/components/ui';
+import { Link } from '@inertiajs/vue3';
 
 const props = defineProps(['initialRows', 'initialColumns']);
 const rows = ref(props.initialRows);
@@ -25,7 +26,7 @@ function removeRow(row) {
         @refreshing="reloadPage"
     >
         <template #cell-title="{ row: role, index }">
-            <a :href="role.edit_url">{{ __(role.title) }}</a>
+            <Link :href="role.edit_url">{{ __(role.title) }}</Link>
 
             <resource-deleter
                 :ref="`deleter_${role.id}`"

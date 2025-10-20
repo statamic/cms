@@ -8,6 +8,7 @@
             <ui-modal :title="__('Update to :version', { version: release.version })">
                 <template #trigger>
                     <ui-button
+                        ref="getCommandButton"
                         v-if="showActions"
                         icon="clipboard"
                         size="sm"
@@ -29,7 +30,7 @@
 </template>
 
 <script>
-import DateFormatter from '@statamic/components/DateFormatter.js';
+import DateFormatter from '@/components/DateFormatter.js';
 
 export default {
     props: {
@@ -96,6 +97,29 @@ export default {
                     link: `<a href="https://statamic.dev/updating" target="_blank" class="font-medium underline text-blue-500 dark:text-blue-400">${__('updating Statamic')}</a>`,
                 }) + '.'
             );
+        },
+    },
+
+    mounted() {
+        this.addToCommandPalette();
+    },
+
+    methods: {
+        addToCommandPalette() {
+            if (!this.release.latest) {
+                return;
+            }
+
+            if (this.release.type === 'current') {
+                return;
+            }
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: [__('Update to Latest'), __('Get Command')],
+                icon: 'clipboard',
+                action: () => this.$refs.getCommandButton.$el.click(),
+            });
         },
     },
 };

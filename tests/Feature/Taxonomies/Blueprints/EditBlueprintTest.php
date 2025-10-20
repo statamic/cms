@@ -42,6 +42,6 @@ class EditBlueprintTest extends TestCase
             ->actingAs($user)
             ->get(cp_route('blueprints.taxonomies.edit', [$collection, $blueprint]))
             ->assertStatus(200)
-            ->assertViewHas('blueprint', $blueprint);
+            ->assertInertia(fn ($page) => $page->where('blueprint.handle', $blueprint->handle()));
     }
 }

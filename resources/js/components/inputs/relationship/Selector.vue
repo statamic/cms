@@ -8,6 +8,7 @@
                 :max-selections="maxSelections"
                 :sort-column="sortColumn"
                 :sort-direction="sortDirection"
+                :additional-parameters="additionalParameters"
                 v-model:selections="selections"
             >
                 <template #initializing>
@@ -19,8 +20,8 @@
                 </template>
 
                 <div class="flex flex-1 flex-col gap-4 overflow-auto p-4">
-                    <div class="flex items-center gap-3">
-                        <div class="flex flex-1 items-center gap-3">
+                    <div class="flex items-center gap-2 sm:gap-3">
+                        <div class="flex flex-1 items-center gap-2 sm:gap-3">
                             <Search />
                             <Filters v-if="filters && filters.length" />
                         </div>
@@ -34,7 +35,7 @@
                     <Panel class="relative mb-0! overflow-x-auto overscroll-x-contain">
                         <Table>
                             <template #cell-title="{ row: entry, isColumnVisible }">
-                                <a class="title-index-field" :href="entry.edit_url" @click.stop>
+                                <a class="title-index-field" :href="entry.edit_url" @click.prevent="toggleSelection(entry.id)">
                                     <StatusIndicator v-if="!isColumnVisible('status')" :status="entry.status" />
                                     <span v-text="entry.title" />
                                 </a>
@@ -70,7 +71,7 @@
                             :site="site"
                             :preferences-prefix="`selector-field.${name}`"
                             :editable="false"
-                            @branch-clicked="$refs[`tree-branch-${$event.id}`].click()"
+                            @branch-clicked="toggleSelection($event.id)"
                         >
                             <template #branch-action="{ branch, index }">
                                 <div>
@@ -122,7 +123,7 @@
 
 <script>
 import { defineAsyncComponent } from 'vue';
-import clone from '@statamic/util/clone.js';
+import clone from '@/util/clone.js';
 import {
     Button,
     ButtonGroup,
@@ -138,7 +139,7 @@ import {
     Checkbox,
     Icon,
     StatusIndicator,
-} from '@statamic/ui';
+} from '@/components/ui';
 
 export default {
     components: {
@@ -168,7 +169,7 @@ export default {
         initialSortColumn: String,
         initialSortDirection: String,
         maxSelections: Number,
-        site: String, // todo: this should be sent to the request.
+        site: String,
         type: String, // todo: this controls the extra column that is commented out in the new table at the moment.
         name: String,
         initialColumns: {
@@ -216,6 +217,12 @@ export default {
 
         viewLocalStorageKey() {
             return `statamic.selector.field.${this.name}`;
+        },
+
+        additionalParameters() {
+            return {
+                site: this.site,
+            }
         },
     },
 
@@ -287,8 +294,8 @@ export default {
         getCheckboxLabel(row) {
             const rowTitle = this.getRowTitle(row);
             return this.isSelected(row.id)
-                ? __('deselect_title', { title: rowTitle })
-                : __('select_title', { title: rowTitle });
+                ? __('Deselect :title', { title: rowTitle })
+                : __('Select :title', { title: rowTitle });
         },
 
         getCheckboxDescription(row) {
@@ -296,12 +303,12 @@ export default {
             const isDisabled = this.reachedSelectionLimit && !this.singleSelect && !this.isSelected(row.id);
 
             if (isDisabled) {
-                return __('selection_limit_reached', { title: rowTitle });
+                return __('messages.selections_limit_reached', { title: rowTitle });
             }
 
             return this.isSelected(row.id)
-                ? __('item_selected_description', { title: rowTitle })
-                : __('item_not_selected_description', { title: rowTitle });
+                ? __('messages.selections_item_selected', { title: rowTitle })
+                : __('messages.selections_item_unselected', { title: rowTitle });
         },
 
         getRowTitle(row) {

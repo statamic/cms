@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import { requireElevatedSessionIf } from '@statamic/components/elevated-sessions/index.js';
+import { requireElevatedSessionIf } from '@/components/elevated-sessions/index.js';
 
 export default {
     props: {

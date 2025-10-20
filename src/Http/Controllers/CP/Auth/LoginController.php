@@ -4,11 +4,14 @@ namespace Statamic\Http\Controllers\CP\Auth;
 
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Facades\OAuth;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\Concerns\HandlesLogins;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\CP\RedirectIfAuthorized;
+use Statamic\OAuth\Provider;
+use Statamic\Statamic;
 use Statamic\Support\Str;
 
 use function Statamic\trans as __;
@@ -27,29 +30,28 @@ class LoginController extends CpController
         $this->middleware(RedirectIfAuthorized::class)->except('logout');
     }
 
-    /**
-     * Show the application's login form.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function showLoginForm(Request $request)
     {
-        $data = [
+        return Inertia::render('auth/Login', [
             'title' => __('Log in'),
-            'oauth' => $enabled = OAuth::enabled(),
+            'oauthEnabled' => $enabled = OAuth::enabled(),
             'emailLoginEnabled' => $enabled ? config('statamic.oauth.email_login_enabled') : true,
-            'providers' => $enabled ? OAuth::providers() : [],
+            'providers' => $enabled ? $this->oauthProviders() : [],
             'referer' => $this->getReferrer($request),
-            'hasError' => $this->hasError(),
-        ];
+            'forgotPasswordUrl' => cp_route('password.request'),
+            'submitUrl' => cp_route('login'),
+        ]);
+    }
 
-        $view = view('statamic::auth.login', $data);
+    private function oauthProviders()
+    {
+        $redirect = parse_url(cp_route('index'))['path'];
 
-        if ($request->expired) {
-            return $view->withErrors(__('Session Expired'));
-        }
-
-        return $view;
+        return OAuth::providers()->map(fn (Provider $provider) => [
+            'name' => $provider->name(),
+            'icon' => Statamic::svg('oauth/'.$provider->name()),
+            'url' => $provider->loginUrl().'?redirect='.$redirect,
+        ]);
     }
 
     public function login(Request $request)
@@ -139,19 +141,5 @@ class LoginController extends CpController
     public function username()
     {
         return 'email';
-    }
-
-    private function hasError()
-    {
-        return function ($field) {
-            if (! $error = optional(session('errors'))->first($field)) {
-                return false;
-            }
-
-            return ! in_array($error, [
-                __('auth.failed'),
-                __('statamic::validation.required'),
-            ]);
-        };
     }
 }

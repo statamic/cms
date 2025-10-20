@@ -442,7 +442,7 @@ class Field implements Arrayable
             $type = ['type' => $type];
         }
 
-        if ($this->isRequired() && ! $this->hasSometimesRule()) {
+        if ($this->isRequired() && ! $this->hasSometimesRule() && $this->type() !== 'assets') {
             $type['type'] = GraphQL::nonNull($type['type']);
         }
 
@@ -537,7 +537,7 @@ class Field implements Arrayable
                     'inline' => __('Side by Side'),
                 ],
                 'default' => 'block',
-                'width' => 33,
+                'width' => 50,
             ],
             'listable' => [
                 'display' => __('Listable'),
@@ -553,7 +553,7 @@ class Field implements Arrayable
                 'unless' => [
                     'type' => 'section',
                 ],
-                'width' => 33,
+                'width' => 50,
             ],
             'visibility' => [
                 'display' => __('Visibility'),
@@ -566,7 +566,7 @@ class Field implements Arrayable
                 ],
                 'default' => 'visible',
                 'type' => 'select',
-                'width' => 33,
+                'width' => 50,
             ],
             'sortable' => [
                 'display' => __('Sortable'),
@@ -576,7 +576,7 @@ class Field implements Arrayable
                 'unless' => [
                     'visibility' => 'equals computed',
                 ],
-                'width' => 25,
+                'width' => 50,
             ],
             'replicator_preview' => [
                 'display' => __('Preview'),
@@ -584,7 +584,7 @@ class Field implements Arrayable
                 'type' => 'toggle',
                 'validate' => 'boolean',
                 'default' => true,
-                'width' => 25,
+                'width' => 50,
             ],
             'duplicate' => [
                 'display' => __('Duplicate'),
@@ -592,7 +592,7 @@ class Field implements Arrayable
                 'type' => 'toggle',
                 'validate' => 'boolean',
                 'default' => true,
-                'width' => 25,
+                'width' => 50,
 
             ],
             'actions' => [
@@ -600,7 +600,7 @@ class Field implements Arrayable
                 'instructions' => __('statamic::messages.fields_actions_instructions'),
                 'type' => 'toggle',
                 'default' => true,
-                'width' => 25,
+                'width' => 50,
 
             ],
         ])->map(fn ($field, $handle) => compact('handle', 'field'))->values()->all();

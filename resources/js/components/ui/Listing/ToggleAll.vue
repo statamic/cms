@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue';
-import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
-import { Checkbox } from '@statamic/ui';
+import { injectListingContext } from '../Listing/Listing.vue';
+import { Checkbox } from '@ui';
 
 const { items, selections, maxSelections, clearSelections, reorderable } = injectListingContext();
 const anyItemsChecked = computed(() => selections.value.length > 0);
@@ -19,9 +19,10 @@ function checkMaximumAmountOfItems() {
 
 function getAriaLabel() {
     if (indeterminate.value) {
-        return __('select_all_items');
+        return __('Select all items');
     }
-    return anyItemsChecked.value ? __('deselect_all_items') : __('select_all_items');
+
+    return anyItemsChecked.value ? __('Deselect all items') : __('Select all items');
 }
 
 function getScreenReaderText() {
@@ -29,14 +30,14 @@ function getScreenReaderText() {
     const selectedItems = selections.value.length;
 
     if (indeterminate.value) {
-        return __('items_selected_count', { selected: selectedItems, total: totalItems });
+        return __('messages.selections_select_all', { selected: selectedItems, total: totalItems });
     }
 
     if (anyItemsChecked.value) {
-        return __('all_items_selected', { total: totalItems });
+        return __('messages.selections_click_to_deselect_all', { total: totalItems });
     }
 
-    return __('no_items_selected', { total: totalItems });
+    return __('messages.selections_click_to_select_all', { total: totalItems });
 }
 </script>
 

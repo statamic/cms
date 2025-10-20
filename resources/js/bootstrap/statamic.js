@@ -1,46 +1,52 @@
-import { createApp, ref, markRaw } from 'vue';
+import { createApp, h } from 'vue';
 import App from './App.vue';
 import { createPinia, defineStore } from 'pinia';
 import axios from 'axios';
-import Config from '../components/Config';
-import Preferences from '../components/Preference';
 import registerGlobalComponents from './components.js';
 import registerGlobalCommandPalette from './commands.js';
 import registerUiComponents from './ui.js';
 import registerFieldtypes from './fieldtypes.js';
-import useGlobalEventBus from '../composables/global-event-bus';
-import useProgressBar from '../composables/progress-bar';
-import useDirtyState from '../composables/dirty-state';
 import VueClickAway from 'vue3-click-away';
 import FloatingVue from 'floating-vue';
 import 'floating-vue/dist/style.css';
-import Toasts from '../components/Toasts';
+import { createInertiaApp } from '@inertiajs/vue3';
+import { router } from '@inertiajs/vue3';
 import PortalVue from 'portal-vue';
-import Keys from '../components/keys/Keys';
-import FieldActions from '../components/field-actions/FieldActions.js';
-import Callbacks from '../components/Callbacks';
-import Slugs from '../components/slugs/Manager';
-import Portals from '../components/portals/Portals';
-import Stacks from '../components/stacks/Stacks';
-import Hooks from '../components/Hooks';
-import Bard from '../components/Bard';
-import Components from '../components/Components';
-import Theme from '../components/Theme.js';
-import Contrast from '../components/Contrast.js';
-import FieldConditions from '../components/FieldConditions';
-import Reveal from '../components/Reveal';
-import Echo from '../components/Echo';
-import Permission from '../components/Permission';
 import autosize from 'autosize';
-import DateFormatter from '@statamic/components/DateFormatter.js';
-import wait from '@statamic/util/wait.js';
-import markdown from '@statamic/util/markdown.js';
+import wait from '@/util/wait.js';
+import markdown from '@/util/markdown.js';
 import VueComponentDebug from 'vue-component-debug';
-import CommandPalette from '../components/CommandPalette.js';
+import { registerIconSetFromStrings } from '@ui';
+import Layout from '@/pages/layout/Layout.vue';
+import {
+    keys,
+    components,
+    events,
+    progress,
+    fieldActions,
+    conditions,
+    callbacks,
+    dirty,
+    slug,
+    hooks,
+    bard,
+    reveal,
+    echo,
+    permissions,
+    dateFormatter,
+    commandPalette,
+    theme,
+    contrast,
+    config,
+    preferences,
+    toast,
+    portals,
+    stacks,
+    inertia,
+} from '@api';
 
 let bootingCallbacks = [];
 let bootedCallbacks = [];
-let components;
 
 export default {
     booting(callback) {
@@ -52,39 +58,39 @@ export default {
     },
 
     get $config() {
-        return this.$app.config.globalProperties.$config;
+        return config;
     },
 
     get $preferences() {
-        return this.$app.config.globalProperties.$preferences;
+        return preferences;
     },
 
     get $callbacks() {
-        return this.$app.config.globalProperties.$callbacks;
+        return callbacks;
     },
 
     get $hooks() {
-        return this.$app.config.globalProperties.$hooks;
+        return hooks;
     },
 
     get $toast() {
-        return this.$app.config.globalProperties.$toast;
+        return toast;
     },
 
     get $conditions() {
-        return this.$app.config.globalProperties.$conditions;
+        return conditions;
     },
 
     get $slug() {
-        return this.$app.config.globalProperties.$slug;
+        return slug;
     },
 
     get $bard() {
-        return this.$app.config.globalProperties.$bard;
+        return bard;
     },
 
     get $echo() {
-        return this.$app.config.globalProperties.$echo;
+        return echo;
     },
 
     get $pinia() {
@@ -92,47 +98,51 @@ export default {
     },
 
     get $keys() {
-        return this.$app.config.globalProperties.$keys;
+        return keys;
     },
 
     get $permissions() {
-        return this.$app.config.globalProperties.$permissions;
+        return permissions;
     },
 
     get $components() {
         return components;
     },
 
+    get $inertia() {
+        return inertia;
+    },
+
     get $date() {
-        return this.$app.config.globalProperties.$date;
+        return dateFormatter;
     },
 
     get $progress() {
-        return this.$app.config.globalProperties.$progress;
+        return progress;
     },
 
     get $theme() {
-        return this.$app.config.globalProperties.$theme;
+        return theme;
     },
 
     get $contrast() {
-        return this.$app.config.globalProperties.$contrast;
+        return contrast;
     },
 
     get $fieldActions() {
-        return this.$app.config.globalProperties.$fieldActions;
+        return fieldActions;
     },
 
     get $dirty() {
-        return this.$app.config.globalProperties.$dirty;
+        return dirty;
     },
 
     get $events() {
-        return this.$app.config.globalProperties.$events;
+        return events;
     },
 
     get $commandPalette() {
-        return this.$app.config.globalProperties.$commandPalette;
+        return commandPalette;
     },
 
     get user() {
@@ -148,7 +158,72 @@ export default {
     },
 
     async start() {
-        this.$app = createApp(App);
+        bootingCallbacks.forEach((callback) => callback(this));
+        bootingCallbacks = [];
+
+        const el = document.getElementById('statamic');
+        const titleEl = document.getElementById('blade-title');
+        const bladeTitle = titleEl.dataset.title;
+        const bladeContent = el?.innerHTML || '';
+        const _this = this;
+
+        await createInertiaApp({
+            id: 'statamic',
+            resolve: name => {
+                if (name === 'NonInertiaPage') {
+                    return {
+                        default: {
+                            layout: Layout,
+                            template: `<div>${bladeContent}</div>`,
+                        }
+                    }
+                }
+
+                // Resolve core pages
+                const pages = import.meta.glob('../pages/**/*.vue', { eager: true });
+                let page = pages[`../pages/${name}.vue`];
+
+                // Resolve addon pages
+                if (!page) {
+                    const addonPage = inertia.get(name);
+                    if (addonPage) page = { default: addonPage };
+                }
+
+                if (!page) {
+                    let message = `Couldn't find Inertia component for the [${name}] page. `;
+                    message += name.endsWith('.vue')
+                        ? 'You do not need to include the .vue extension when referencing a page.'
+                        : 'Did you you register a [Pages/${name}] component?';
+                    throw new Error(message);
+                }
+
+                page.default.layout = page.default.layout || Layout;
+                return page;
+            },
+            async setup({ el, App: InertiaApp, props, plugin }) {
+                const app = await _this.configureApp(InertiaApp, props);
+                app.use(plugin).mount(el);
+            },
+            title: (title) => title || bladeTitle
+        })
+
+        // Handle non-Inertia responses with full page reload
+        router.on('invalid', (event) => {
+            if (event.detail.response.status === 200) {
+                event.preventDefault();
+                window.location.href = event.detail.response.request.responseURL;
+            }
+        });
+
+        bootedCallbacks.forEach((callback) => callback(this));
+        bootedCallbacks = [];
+    },
+
+    async configureApp(InertiaApp, props, el) {
+        this.$app = createApp({
+            ...App,
+            render: () => h(InertiaApp, props),
+        });
 
         this.$app.config.silent = false;
         this.$app.config.devtools = true;
@@ -159,40 +234,36 @@ export default {
         this.$app.use(FloatingVue, { disposeTimeout: 30000, distance: 10 });
         this.$app.use(VueComponentDebug, { enabled: import.meta.env.VITE_VUE_COMPONENT_DEBUG === 'true' });
 
-        const portals = markRaw(new Portals());
-
-        components = new Components(this.$app);
-
-        Object.assign(this.$app.config.globalProperties, {
-            $config: new Config(this.initialConfig),
-        });
+        config.initialize(this.initialConfig);
+        theme.initialize(this.initialConfig.user?.theme);
+        contrast.initialize(this.initialConfig.user?.preferences?.strict_accessibility);
+        preferences.initialize(this.initialConfig.user?.preferences, this.initialConfig.defaultPreferences);
+        toast.initialize(this.$app);
 
         Object.assign(this.$app.config.globalProperties, {
+            $config: config,
             $axios: axios,
-            $events: useGlobalEventBus(),
-            $preferences: new Preferences(),
-            $progress: useProgressBar(),
-            $keys: new Keys(),
-            $fieldActions: new FieldActions(),
-            $conditions: new FieldConditions(),
-            $callbacks: new Callbacks(),
-            $dirty: useDirtyState(),
-            $slug: new Slugs(),
+            $events: events,
+            $preferences: preferences,
+            $progress: progress,
+            $keys: keys,
+            $fieldActions: fieldActions,
+            $conditions: conditions,
+            $callbacks: callbacks,
+            $dirty: dirty,
+            $slug: slug,
             $portals: portals,
-            $stacks: new Stacks(portals),
-            $hooks: new Hooks(),
-            $toast: new Toasts(this.$app),
-            $bard: new Bard(),
-            $reveal: new Reveal(),
-            $echo: new Echo(),
-            $permissions: new Permission(),
-            $date: new DateFormatter(),
-            $commandPalette: new CommandPalette(),
-        });
-
-        Object.assign(this.$app.config.globalProperties, {
-            $theme: new Theme(this.initialConfig.user?.theme),
-            $contrast: new Contrast(this.initialConfig.user?.preferences?.strict_accessibility),
+            $stacks: stacks,
+            $hooks: hooks,
+            $toast: toast,
+            $bard: bard,
+            $reveal: reveal,
+            $echo: echo,
+            $permissions: permissions,
+            $date: dateFormatter,
+            $commandPalette: commandPalette,
+            $theme: theme,
+            $contrast: contrast,
         });
 
         Object.assign(this.$app.config.globalProperties, {
@@ -229,6 +300,8 @@ export default {
         registerGlobalComponents(this.$app);
         registerGlobalCommandPalette();
         registerFieldtypes(this.$app);
+        registerIconSets(this.initialConfig);
+        components.boot(this.$app);
 
         // Suppress the translation warnings
         this.$app.config.warnHandler = (msg, vm, trace) => {
@@ -241,12 +314,14 @@ export default {
         axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
         axios.defaults.headers.common['X-CSRF-TOKEN'] = Statamic.$config.get('csrfToken');
 
-        bootingCallbacks.forEach((callback) => callback(this));
-        bootingCallbacks = [];
-
-        this.$app.mount('#statamic');
-
-        bootedCallbacks.forEach((callback) => callback(this));
-        bootedCallbacks = [];
+        return this.$app;
     },
 };
+
+function registerIconSets(config) {
+    const sets = config.customSvgIcons;
+
+    for (const name in sets) {
+        registerIconSetFromStrings(name, sets[name]);
+    }
+}

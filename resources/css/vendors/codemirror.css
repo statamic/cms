@@ -2,7 +2,7 @@
    CODEMIRROR
    ========================================================================== */
 
-.CodeMirror {
+   .CodeMirror {
     /* Set height, width, borders, and global font properties here */
     @apply text-gray-900 dark:text-gray-300 leading-normal min-h-20;
 }
@@ -177,7 +177,7 @@
 }
 .cm-s-default .cm-string {
     color: #a11;
-    @apply dark:text-red-500;
+    @apply dark:text-red-600;
 }
 .cm-s-default .cm-string-2 {
     color: #f50;
@@ -437,16 +437,6 @@ div.CodeMirror-dragcursors {
 }
 .CodeMirror-crosshair {
     cursor: crosshair;
-}
-.CodeMirror-line::selection,
-.CodeMirror-line > span::selection,
-.CodeMirror-line > span > span::selection {
-    background: #d7d4f0;
-}
-.CodeMirror-line::-moz-selection,
-.CodeMirror-line > span::-moz-selection,
-.CodeMirror-line > span > span::-moz-selection {
-    background: #d7d4f0;
 }
 
 .cm-searching {

@@ -1,14 +1,19 @@
 <script setup>
-import { Tabs, TabList, TabTrigger, TabContent } from '@statamic/ui';
-import TabProvider from './TabProvider.vue';
+import {
+    Tabs,
+    TabList,
+    TabTrigger,
+    TabContent,
+    TabProvider,
+} from '@ui';
 import { injectContainerContext } from './Container.vue';
-import Sections from '@statamic/components/ui/Publish/Sections.vue';
+import Sections from './Sections.vue';
 import { ref, computed, useSlots, onMounted, watch } from 'vue';
-import ElementContainer from '@statamic/components/ElementContainer.vue';
-import ShowField from '@statamic/components/field-conditions/ShowField.js';
+import ElementContainer from '@/components/ElementContainer.vue';
+import ShowField from '@/components/field-conditions/ShowField.js';
 
 const slots = useSlots();
-const { blueprint, visibleValues, extraValues, errors, hiddenFields, revealerFields, setHiddenField } = injectContainerContext();
+const { blueprint, visibleValues, extraValues, revealerValues, errors, hiddenFields, setHiddenField, container } = injectContainerContext();
 const tabs = ref(blueprint.value.tabs);
 const width = ref(null);
 const sidebarTab = computed(() => tabs.value.find((tab) => tab.handle === 'sidebar'));
@@ -23,9 +28,10 @@ const visibleMainTabs = computed(() => {
                     visibleValues.value,
                     extraValues.value,
                     visibleValues.value,
+                    revealerValues.value,
                     hiddenFields.value,
-                    revealerFields.value,
-                    setHiddenField
+                    setHiddenField,
+                    { container }
                 ).showField(field, field.handle);
             });
         });
@@ -92,7 +98,7 @@ function tabHasError(tab) {
                     :key="tab.handle"
                     :name="tab.handle"
                     :text="__(tab.display)"
-                    :class="{ '!text-red-500': tabHasError(tab) }"
+                    :class="{ '!text-red-600': tabHasError(tab) }"
                 />
             </TabList>
 
@@ -102,6 +108,8 @@ function tabHasError(tab) {
                         <slot :tab="tab">
                             <Sections />
                         </slot>
+
+                        <slot v-if="!shouldShowSidebar" name="actions" />
                     </TabProvider>
                 </TabContent>
 
@@ -113,7 +121,7 @@ function tabHasError(tab) {
                     </TabProvider>
                 </template>
 
-                <aside class="space-y-6" v-if="shouldShowSidebar">
+                <aside class="space-y-6 starting-style-transition-children" v-if="shouldShowSidebar">
                     <slot name="actions" />
                     <TabProvider v-if="sidebarTab" :tab="sidebarTab">
                         <Sections />

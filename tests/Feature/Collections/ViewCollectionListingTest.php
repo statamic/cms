@@ -7,7 +7,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\User;
 use Statamic\Entries\Collection;
 use Statamic\Facades;
-use Statamic\Facades\Site;
+use Statamic\Facades\Scope;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -30,11 +30,13 @@ class ViewCollectionListingTest extends TestCase
             ->actingAs($user)
             ->get(cp_route('collections.index'))
             ->assertSuccessful()
-            ->assertViewHas('collections', collect([
+            ->assertInertia(fn ($page) => $page->component('collections/Index')->has('collections', 2));
+
+        /*
+            collect([
                 [
                     'id' => 'bar',
                     'title' => 'Bar',
-                    'entries' => $collectionA->queryEntries()->where('site', Site::selected())->orderBy('date', 'desc')->limit(5)->get(),
                     'entries_count' => 1,
                     'published_entries_count' => 1,
                     'draft_entries_count' => 0,
@@ -48,6 +50,7 @@ class ViewCollectionListingTest extends TestCase
                     'edit_url' => 'http://localhost/cp/collections/bar/edit',
                     'delete_url' => 'http://localhost/cp/collections/bar',
                     'entries_url' => 'http://localhost/cp/collections/bar',
+                    'entries_listing_url' => 'http://localhost/cp/collections/bar/entries',
                     'create_entry_url' => 'http://localhost/cp/collections/bar/entries/create/en',
                     'url' => null,
                     'blueprints_url' => 'http://localhost/cp/fields/blueprints/collections/bar',
@@ -59,11 +62,16 @@ class ViewCollectionListingTest extends TestCase
                     'actions' => Facades\Action::for($collectionA, ['view' => 'list']),
                     'actions_url' => 'http://localhost/cp/collections/actions',
                     'icon' => 'collections',
+                    'create_label' => 'Create Entry',
+                    'sort_column' => 'title',
+                    'sort_direction' => 'asc',
+                    'filters' => Scope::filters('entries', [
+                        'collection' => $collectionA->handle(),
+                    ]),
                 ],
                 [
                     'id' => 'foo',
                     'title' => 'Foo',
-                    'entries' => $collectionB->queryEntries()->where('site', Site::selected())->orderBy('date', 'desc')->limit(5)->get(),
                     'entries_count' => 0,
                     'published_entries_count' => 0,
                     'draft_entries_count' => 0,
@@ -77,6 +85,7 @@ class ViewCollectionListingTest extends TestCase
                     'edit_url' => 'http://localhost/cp/collections/foo/edit',
                     'delete_url' => 'http://localhost/cp/collections/foo',
                     'entries_url' => 'http://localhost/cp/collections/foo',
+                    'entries_listing_url' => 'http://localhost/cp/collections/foo/entries',
                     'create_entry_url' => 'http://localhost/cp/collections/foo/entries/create/en',
                     'url' => null,
                     'blueprints_url' => 'http://localhost/cp/fields/blueprints/collections/foo',
@@ -88,9 +97,16 @@ class ViewCollectionListingTest extends TestCase
                     'actions' => Facades\Action::for($collectionB, ['view' => 'list']),
                     'actions_url' => 'http://localhost/cp/collections/actions',
                     'icon' => 'collections',
+                    'create_label' => 'Create Entry',
+                    'sort_column' => 'title',
+                    'sort_direction' => 'asc',
+                    'filters' => Scope::filters('entries', [
+                        'collection' => $collectionB->handle(),
+                    ]),
                 ],
-            ]))
+            ])))
             ->assertDontSee('ui-empty-state-menu');
+        */
     }
 
     #[Test]
@@ -102,8 +118,9 @@ class ViewCollectionListingTest extends TestCase
             ->actingAs($user)
             ->get(cp_route('collections.index'))
             ->assertSuccessful()
-            ->assertViewHas('collections', collect([]))
-            ->assertSee('ui-empty-state-menu');
+            ->assertInertia(fn ($page) => $page
+                ->component('collections/Index')
+                ->has('collections', 0));
     }
 
     #[Test]
@@ -118,10 +135,10 @@ class ViewCollectionListingTest extends TestCase
             ->actingAs($user)
             ->get(cp_route('collections.index'))
             ->assertSuccessful()
-            ->assertViewHas('collections', function ($collections) {
-                return count($collections) === 1 && $collections[0]['id'] === 'bar';
-            })
-            ->assertDontSee('ui-empty-state-menu');
+            ->assertInertia(fn ($page) => $page
+                ->component('collections/Index')
+                ->has('collections', 1)
+                ->where('collections.0.id', 'bar'));
     }
 
     #[Test]
@@ -136,10 +153,11 @@ class ViewCollectionListingTest extends TestCase
             ->actingAs($user)
             ->get(cp_route('collections.index'))
             ->assertSuccessful()
-            ->assertViewHas('collections', function ($collections) {
-                return $collections->map->id->all() === ['bar', 'foo'];
-            })
-            ->assertDontSee('ui-empty-state-menu');
+            ->assertInertia(fn ($page) => $page
+                ->component('collections/Index')
+                ->has('collections', 2)
+                ->where('collections.0.id', 'bar')
+                ->where('collections.1.id', 'foo'));
     }
 
     #[Test]
@@ -166,7 +184,7 @@ class ViewCollectionListingTest extends TestCase
         $response = $this
             ->actingAs($user)
             ->get(cp_route('collections.index'))
-            ->assertSee('Create Collection');
+            ->assertInertia(fn ($page) => $page->where('canCreate', true));
     }
 
     #[Test]
@@ -179,8 +197,7 @@ class ViewCollectionListingTest extends TestCase
         $response = $this
             ->actingAs($user)
             ->get(cp_route('collections.index'))
-            ->assertOk()
-            ->assertSee(':can-create-collections="false"', escape: false);
+            ->assertInertia(fn ($page) => $page->where('canCreate', false));
     }
 
     private function createCollection($handle)

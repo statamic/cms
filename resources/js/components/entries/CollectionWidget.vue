@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue';
-import DateFormatter from '@statamic/components/DateFormatter.js';
+import DateFormatter from '@/components/DateFormatter.js';
 import {
     Widget,
     StatusIndicator,
@@ -9,12 +9,14 @@ import {
     ListingTableBody as TableBody,
     ListingPagination as Pagination,
     Icon,
-} from '@statamic/ui';
+} from '@/components/ui';
+import { Link } from '@inertiajs/vue3';
 
 const props = defineProps({
     additionalColumns: Array,
     collection: String,
     title: String,
+    listingUrl: String,
     initialPerPage: {
         type: Number,
         default: 5,
@@ -34,6 +36,7 @@ const cols = computed(() => [{ label: 'Title', field: 'title', visible: true }, 
 const widgetProps = computed(() => ({
     title: props.title,
     icon: 'collections',
+    href: props.listingUrl,
 }));
 
 function formatDate(value) {
@@ -53,7 +56,11 @@ function formatDate(value) {
         :sort-direction="initialSortDirection"
     >
         <template #initializing>
-            <Widget v-bind="widgetProps"><Icon name="loading" /></Widget>
+            <Widget v-bind="widgetProps">
+                <div class="flex flex-col justify-between px-4 py-3">
+                    <ui-skeleton v-for="i in initialPerPage" class="h-[1.25rem] mb-[0.375rem] w-full" />
+                </div>
+            </Widget>
         </template>
         <template #default="{ items, loading }">
             <Widget v-bind="widgetProps">
@@ -67,15 +74,15 @@ function formatDate(value) {
                             <template #cell-title="{ row: entry, isColumnVisible }">
                                 <div class="flex items-center gap-2">
                                     <StatusIndicator v-if="!isColumnVisible('status')" :status="entry.status" />
-                                    <a :href="entry.edit_url" class="line-clamp-1 overflow-hidden text-ellipsis">{{
+                                    <Link :href="entry.edit_url" class="line-clamp-1 overflow-hidden text-ellipsis">{{
                                         entry.title
-                                    }}</a>
+                                    }}</Link>
                                 </div>
                             </template>
                             <template #cell-date="{ row: entry, isColumnVisible }">
                                 <div
                                     class="text-end font-mono text-xs whitespace-nowrap text-gray-500 antialiased px-2"
-                                    v-html="formatDate(entry.datestamp)"
+                                    v-html="formatDate(entry.date.date)"
                                     v-if="isColumnVisible('date')"
                                 />
                             </template>

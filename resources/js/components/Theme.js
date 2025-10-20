@@ -4,8 +4,9 @@ export default class Theme {
     #preference;
     #theme = ref(null);
 
-    constructor(preference) {
+    initialize(preference) {
         this.#preference = ref(preference);
+        this.#setTheme(preference);
         this.#watchPreferences();
         this.#watchTheme();
         this.#listenForColorSchemeChange();
@@ -26,8 +27,7 @@ export default class Theme {
             (preference) => {
                 this.#setTheme(preference);
                 this.#savePreference(preference);
-            },
-            { immediate: true },
+            }
         );
     }
 
@@ -61,13 +61,13 @@ export default class Theme {
 
     #savePreference(preference) {
         if (preference === 'auto') {
-            if (Statamic.$preferences.has('theme')) {
+            if (Statamic.$config.get('user') && Statamic.$preferences.has('theme')) {
                 Statamic.$preferences.remove('theme');
             }
 
             localStorage.removeItem('statamic.theme');
         } else {
-            if (Statamic.$preferences.get('theme') !== preference) {
+            if (Statamic.$config.get('user') && Statamic.$preferences.get('theme') !== preference) {
                 Statamic.$preferences.set('theme', preference);
             }
 

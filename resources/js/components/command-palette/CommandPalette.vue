@@ -1,40 +1,60 @@
 <script setup>
 import { ref, computed, watch } from 'vue';
 import CommandPaletteItem from './Item.vue';
+import CommandPaletteLoadingItem from './LoadingItem.vue';
 import axios from 'axios';
-import debounce from '@statamic/util/debounce';
+import debounce from '@/util/debounce';
 import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, DialogTrigger, DialogDescription, VisuallyHidden } from 'reka-ui';
 import { ComboboxContent, ComboboxEmpty, ComboboxGroup, ComboboxLabel, ComboboxInput, ComboboxItem, ComboboxRoot, ComboboxViewport } from 'reka-ui';
 import fuzzysort from 'fuzzysort';
 import { each, groupBy, orderBy, find, uniq } from 'lodash-es';
 import { motion } from 'motion-v';
 import { cva } from 'cva';
-import { Icon, Subheading } from '@statamic/ui';
+import { Icon, Subheading } from '@/components/ui';
 
+let metaPressed = ref(false);
 let open = ref(false);
 let query = ref('');
-let serverItems = ref([]);
+let serverCategories = Statamic.$config.get('commandPaletteCategories');
+let serverPreloadedItems = Statamic.$config.get('commandPalettePreloadedItems');
+let serverItems = ref(setServerLoadingItems());
+let serverItemsLoaded = ref(false);
 let searchResults = ref([]);
 let selected = ref(null);
 let recentItems = ref(getRecentItems());
+let keyboardBindings = ref([]);
 
 Statamic.$keys.bindGlobal(['mod+k'], (e) => {
     e.preventDefault();
     open.value = true;
 });
 
-each({
-    esc: () => open.value = false,
-    'ctrl+n': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' })),
-    'ctrl+p': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp' })),
-}, (callback, binding) => {
-    Statamic.$keys.bindGlobal([binding], (e) => {
-        if (open.value) {
-            e.preventDefault();
-            callback();
-        }
+function bindKeyboardShortcuts() {
+    each({
+        esc: () => open.value = false,
+        'ctrl+n': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' })),
+        'ctrl+p': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp' })),
+        mod: () => metaPressed.value = true,
+    }, (callback, binding) => {
+        keyboardBindings.value.push(Statamic.$keys.bindGlobal([binding], (e) => {
+            if (open.value) {
+                e.preventDefault();
+                callback();
+            }
+        }));
     });
-});
+
+    keyboardBindings.value.push(Statamic.$keys.bind('mod+keyup', () => metaPressed.value = false));
+}
+
+watch(
+    () => open.value,
+    (isOpen) => {
+        isOpen
+            ? bindKeyboardShortcuts()
+            : keyboardBindings.value.forEach((binding) => binding.destroy());
+    }
+)
 
 const actionItems = computed(() => {
     return sortJsInjectedItems(Statamic.$commandPalette.actions().filter(item => item.when()));
@@ -47,6 +67,7 @@ const miscItems = computed(() => {
 const aggregatedItems = computed(() => [
     ...(actionItems.value || []),
     ...(recentItems.value || []),
+    ...(serverPreloadedItems || []),
     ...(serverItems.value || []),
     ...(miscItems.value || []),
     ...(searchResults.value || []),
@@ -68,8 +89,6 @@ const results = computed(() => {
                 ...result.obj,
             };
         });
-
-    let serverCategories = Statamic.$config.get('commandPaletteCategories');
 
     let categoryOrder = query.value
         ? uniq(filtered.map(item => item.category))
@@ -109,7 +128,28 @@ function normalizeItem(item) {
         item.text = item.text.join(' » ');
     }
 
+    if (typeof item.keys === 'string') {
+        item.keys = renderKeys(item.keys);
+    }
+
     return item;
+}
+
+function renderKeys(keys) {
+    return keys.toLowerCase().split('+').map(key => {
+        switch(key) {
+            case "command":
+            case "cmd":
+                return "⌘";
+            case "control":
+            case "ctrl":
+                return "^";
+            case "mod":
+                return "⌘"; // TODO: handle normalizing 'mod' cross platform
+            default:
+                return key;
+        }
+    }).map(key => key.toUpperCase());
 }
 
 watch(selected, (item) => {
@@ -130,16 +170,24 @@ watch(open, (isOpen) => {
     reset();
 });
 
-function getServerItems() {
-    if (serverItems.value.length) return;
+function setServerLoadingItems() {
+    return [
+        { category: 'Navigation', loading: true },
+        { category: 'Fields', loading: true },
+    ];
+}
 
-    axios.get('/cp/command-palette').then((response) => {
+function getServerItems() {
+    if (serverItemsLoaded.value) return;
+
+    axios.get(cp_url('command-palette')).then((response) => {
+        serverItemsLoaded.value = true;
         serverItems.value = response.data;
     });
 }
 
 function searchContent() {
-    axios.get('/cp/command-palette/search', { params: { q: query.value } }).then((response) => {
+    axios.get(cp_url('command-palette/search'), { params: { q: query.value } }).then((response) => {
         searchResults.value = response.data;
     });
 }
@@ -210,7 +258,7 @@ function keydownTab(e) {
 
 const modalClasses = cva({
     base: [
-        'fixed outline-hidden left-1/2 top-[100px] z-50 w-full max-w-3xl -translate-x-1/2 ',
+        'fixed outline-hidden left-1/2 top-[100px] z-50 w-full max-w-[min(90vw,48rem)] -translate-x-1/2 ',
         'backdrop-blur-[2px] rounded-2xl',
         'shadow-[0_8px_5px_-6px_rgba(0,0,0,0.12),_0_3px_8px_0_rgba(0,0,0,0.02),_0_30px_22px_-22px_rgba(39,39,42,0.35)]',
         'dark:shadow-[0_5px_20px_rgba(0,0,0,.5)]',
@@ -226,13 +274,7 @@ const modalClasses = cva({
 <template>
     <DialogRoot v-model:open="open" :modal="true">
         <DialogTrigger>
-            <div class="data-[focus-visible]:outline-focus hover flex cursor-text items-center gap-x-2 rounded-md [button:has(>&)]:rounded-md bg-gray-900 text-xs text-gray-400 shadow-[0_-1px_rgba(255,255,255,0.06),0_4px_8px_rgba(0,0,0,0.05),0_1px_6px_-4px_#000] ring-1 ring-gray-900/10 outline-none hover:ring-white/10 md:w-32 md:py-[calc(5/16*1rem)] md:ps-2 md:pe-1.5 md:shadow-[0_1px_5px_-4px_rgba(19,19,22,0.4),0_2px_5px_rgba(32,42,54,0.06)]">
-                <Icon name="magnifying-glass" class="size-5 flex-none text-gray-600" />
-                <span class="sr-only leading-none md:not-sr-only st-text-trim-cap">Search</span>
-                <kbd class="ml-auto hidden self-center rounded bg-white/5 px-[0.3125rem] py-[0.0625rem] text-[0.625rem]/4 font-medium text-gray-400 ring-1 ring-white/7.5 [word-spacing:-0.15em] ring-inset md:block">
-                    <kbd class="font-sans">⌘ </kbd><kbd class="font-sans">K</kbd>
-                </kbd>
-            </div>
+            <slot />
         </DialogTrigger>
         <DialogPortal>
             <DialogOverlay class="fixed inset-0 z-30 bg-gray-800/20 backdrop-blur-[2px] dark:bg-gray-800/50" />
@@ -244,7 +286,7 @@ const modalClasses = cva({
                     <DialogDescription>{{ __('Search for content, navigate, and run actions.') }}</DialogDescription>
                 </VisuallyHidden>
                 <motion.div
-                    class="relative rounded-xl border-b border-gray-200/80 bg-white shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:border-gray-950 dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/15"
+                    class="relative rounded-xl border-b border-gray-200/80 bg-white shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:border-gray-950 dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/10"
                     :initial="{ scale: 1.0 }"
                     :whilePress="{ scale: 0.985 }"
                     :transition="{ duration: 0.1 }"
@@ -290,12 +332,16 @@ const modalClasses = cva({
                                         :value="item.text"
                                         :text-value="item.text"
                                         :as-child="true"
+                                        :disabled="item.loading"
                                     >
+                                        <CommandPaletteLoadingItem class="rounded-lg px-2 py-1.5 w-full opacity-20" v-if="item.loading" />
                                         <CommandPaletteItem
+                                            v-else
                                             :icon="item.icon"
                                             :href="item.url"
-                                            :open-new-tab="item.openNewTab"
-                                            :badge="item.keys || item.badge"
+                                            :open-new-tab="metaPressed || item.openNewTab"
+                                            :badge="item.badge"
+                                            :keys="item.keys"
                                             :removable="isRecentItem(item)"
                                             @remove="removeRecentItem"
                                         >
@@ -308,11 +354,11 @@ const modalClasses = cva({
                                 <div class="flex items-center gap-1.5">
                                     <Icon name="up-square" class="size-4 text-gray-500" />
                                     <Icon name="down-square" class="size-4 text-gray-500" />
-                                    <span class="text-sm text-gray-600 dark:text-gray-500">Navigate</span>
+                                    <span class="text-sm text-gray-600 dark:text-gray-500">{{ __('Navigate') }}</span>
                                 </div>
                                 <div class="flex items-center gap-1.5">
                                     <Icon name="return-square" class="size-4 text-gray-500" />
-                                    <span class="text-sm text-gray-600 dark:text-gray-500">Select</span>
+                                    <span class="text-sm text-gray-600 dark:text-gray-500">{{ __('Select') }}</span>
                                 </div>
                             </footer>
                         </ComboboxContent>

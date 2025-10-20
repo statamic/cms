@@ -2,7 +2,7 @@
     <CardList :heading="__('Title')">
         <CardListItem v-for="global in globals" :key="global.id">
             <Tooltip :text="global.handle" :delay="1000">
-                <a :href="global.edit_url">{{ __(global.title) }}</a>
+                <Link class="text-sm" :href="global.edit_url">{{ __(global.title) }}</Link>
             </Tooltip>
             <Dropdown>
                 <DropdownMenu>
@@ -17,10 +17,11 @@
 </template>
 
 <script>
-import { CardList, CardListItem, Tooltip, Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
+import { CardList, CardListItem, Tooltip, Dropdown, DropdownMenu, DropdownItem } from '@/components/ui';
+import { Link } from '@inertiajs/vue3';
 
 export default {
-    components: { CardList, CardListItem, Tooltip, Dropdown, DropdownMenu, DropdownItem },
+    components: { Link, CardList, CardListItem, Tooltip, Dropdown, DropdownMenu, DropdownItem },
 
     props: {
         initialGlobals: { type: Array, required: true },

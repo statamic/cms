@@ -1,14 +1,22 @@
 <template>
     <div class="max-w-5xl mx-auto">
         <Header :title="__(initialTitle) || __('Create Role')" icon="permissions">
-            <Button type="submit" variant="primary" @click="save" :text="__('Save')" />
+            <ui-command-palette-item
+                :category="$commandPalette.category.Actions"
+                :text="__('Save')"
+                icon="save"
+                :action="save"
+                prioritize
+                v-slot="{ text, action }"
+            >
+                <Button type="submit" variant="primary" @click="action" :text="text" />
+            </ui-command-palette-item>
         </Header>
 
-        <Panel>
-            <div class="publish-fields-fluid">
+        <Panel :heading="__('Settings')">
+            <Card class="p-0! divide-y divide-gray-200 dark:divide-gray-800">
                 <Field
-                    as="card"
-                    class="field-w-50"
+                    as-config
                     :label="__('Title')"
                     :instructions="__('messages.role_title_instructions')"
                     :errors="errors.title"
@@ -18,8 +26,7 @@
                 </Field>
 
                 <Field
-                    as="card"
-                    class="field-w-50"
+                    as-config
                     :label="__('Handle')"
                     :instructions="__('messages.role_handle_instructions')"
                     :errors="handleErrors"
@@ -29,15 +36,16 @@
                 </Field>
 
                 <Field
-                    as="card"
+                    as-config
                     v-if="canAssignSuper"
                     :label="__('permissions.super')"
                     :instructions="__('permissions.super_desc')"
+                    variant="inline"
                     id="role-super"
                 >
                     <Switch v-model="isSuper" id="role-super" />
                 </Field>
-            </div>
+            </Card>
         </Panel>
 
         <div v-if="!isSuper" class="space-y-6 mt-6">
@@ -49,9 +57,9 @@
 </template>
 
 <script>
-import { Header, Button, CardPanel, Panel, PanelHeader, Heading, Card, Switch, Field, Input } from '@statamic/ui';
-import { requireElevatedSession } from '@statamic/components/elevated-sessions';
-import PermissionTree from '@statamic/components/roles/PermissionTree.vue';
+import { Header, Button, CardPanel, Panel, PanelHeader, Heading, Card, Switch, Field, Input } from '@/components/ui';
+import { requireElevatedSession } from '@/components/elevated-sessions';
+import PermissionTree from '@/components/roles/PermissionTree.vue';
 
 const checked = function (permissions) {
     return permissions.reduce((carry, permission) => {
@@ -72,7 +80,7 @@ export default {
         Card,
         Switch,
         Field,
-        Input,
+        Input
     },
 
     props: {

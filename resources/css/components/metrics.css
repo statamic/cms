@@ -32,7 +32,7 @@
         @apply bg-green-600;
     }
     &.red {
-        @apply bg-red-500;
+        @apply bg-red-600;
     }
 }
 

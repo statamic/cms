@@ -1,7 +1,7 @@
 <template>
-    <div class="flex flex-wrap">
+    <div class="flex flex-wrap gap-y-4">
         <div v-for="(part, index) in pathParts" :key="index" class="flex items-center">
-            <ui-icon name="ui/chevron-right" class="size-4 text-gray-500" v-if="index !== 0" />
+            <ui-icon name="chevron-right" class="size-4 text-gray-500" v-if="index !== 0" />
             <ui-button
                 variant="ghost"
                 :icon="isHomeFolder(part) ? 'home' : !isLastFolder(index) ? 'folder' : 'folder-open'"

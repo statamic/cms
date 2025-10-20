@@ -1,7 +1,14 @@
 <script setup>
-import { Label, Combobox, Badge, Card, Panel, Icon } from '@statamic/ui';
+import {
+    Label,
+    Combobox,
+    Badge,
+    Card,
+    Panel,
+    Icon,
+} from '@ui';
 import { computed } from 'vue';
-import Localization from '@statamic/components/ui/Publish/Localization.vue';
+import Localization from './Localization.vue';
 
 const props = defineProps({
     localizations: {
@@ -33,7 +40,7 @@ const activeLocalization = computed(() => {
                     option-value="handle"
                     option-label="name"
                     :model-value="activeLocalization?.handle"
-                    @update:modelValue="$emit('selected', $event)"
+                    @update:modelValue="$emit('selected', localizations.find(l => l.handle === $event))"
                 >
                     <template #option="option">
                         <Localization :localization="option" :localizing />

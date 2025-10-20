@@ -4,9 +4,11 @@ namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades\Action;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
@@ -91,6 +93,7 @@ class EntriesController extends CpController
 
         $entry = $entry->fromWorkingCopy();
 
+        Blink::forget("entry-{$entry->id()}-blueprint");
         $blueprint = $entry->blueprint();
 
         if (! $blueprint) {
@@ -169,9 +172,13 @@ class EntriesController extends CpController
             session()->now('success', __('Entry created'));
         }
 
-        return view('statamic::entries.edit', array_merge($viewData, [
-            'entry' => $entry,
-        ]));
+        return Inertia::render('entries/Edit', [
+            ...$viewData,
+            'canEditBlueprint' => User::current()->can('configure fields'),
+            'createAnotherUrl' => cp_route('collections.entries.create', [$viewData['collection'], $viewData['locale']]),
+            'initialListingUrl' => cp_route('collections.show', $viewData['collection']),
+            'itemActionUrl' => cp_route('collections.entries.actions.run', $viewData['collection']),
+        ]);
     }
 
     public function update(Request $request, $collection, $entry)
@@ -281,6 +288,10 @@ class EntriesController extends CpController
 
         $values = Entry::make()->collection($collection)->values()->all();
 
+        if ($request->values) {
+            $values = [...$values, ...$request->values];
+        }
+
         $fields = $blueprint
             ->fields()
             ->addValues($values)
@@ -331,7 +342,12 @@ class EntriesController extends CpController
             return collect($viewData);
         }
 
-        return view('statamic::entries.create', $viewData);
+        return Inertia::render('entries/Create', [
+            ...$viewData,
+            'canEditBlueprint' => User::current()->can('configure fields'),
+            'createAnotherUrl' => cp_route('collections.entries.create', [$collection, $site->handle(), 'blueprint' => $blueprint['handle'], 'parent' => $values['parent'] ?? null]),
+            'initialListingUrl' => cp_route('collections.show', $collection),
+        ]);
     }
 
     public function store(Request $request, $collection, $site)
