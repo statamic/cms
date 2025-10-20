@@ -21,7 +21,7 @@ class Collection extends Widget
         $collection = CollectionAPI::findByHandle($collection);
 
         if (! User::current()->can('view', $collection)) {
-            return null;
+            return;
         }
 
         [$sortColumn, $sortDirection] = $this->parseSort($collection);
