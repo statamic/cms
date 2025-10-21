@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Auth;
 
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Statamic\Facades\OAuth;
 use Statamic\Facades\User;
@@ -40,6 +41,10 @@ class LoginController extends CpController
             'referer' => $this->getReferrer($request),
             'forgotPasswordUrl' => cp_route('password.request'),
             'submitUrl' => cp_route('login'),
+            'passkeysEnabled' => config('statamic.webauthn.enabled'),
+            'passkeyOptionsUrl' => cp_route('webauthn.verify-options'),
+            'passkeyVerifyUrl' => cp_route('webauthn.verify'),
+
         ]);
     }
 
@@ -60,6 +65,8 @@ class LoginController extends CpController
             $this->username() => 'required|string',
             'password' => 'required|string',
         ]);
+
+        $this->checkPasskeyEnforcement($request);
 
         $this->handleTooManyLoginAttempts($request);
 
@@ -141,5 +148,18 @@ class LoginController extends CpController
     public function username()
     {
         return 'email';
+    }
+
+    private function checkPasskeyEnforcement(Request $request)
+    {
+        if (config('statamic.webauthn.enabled', false) && ! config('statamic.webauthn.allow_password_login_with_passkey', true)) {
+            if ($user = User::findByEmail($request->get($this->username()))) {
+                if ($user->passkeys()->isNotEmpty()) {
+                    throw ValidationException::withMessages([
+                        $this->username() => [trans('statamic::messages.password_passkeys_only')],
+                    ]);
+                }
+            }
+        }
     }
 }

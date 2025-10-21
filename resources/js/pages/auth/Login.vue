@@ -4,12 +4,18 @@ import Outside from '@/pages/layout/Outside.vue';
 import { AuthCard, Input, Field, Button, Separator, Checkbox } from '@ui';
 import { Link, router } from '@inertiajs/vue3';
 import { computed, ref, watch } from 'vue';
+import { startAuthentication, browserSupportsWebAuthn } from '@simplewebauthn/browser';
+import Error from '@/pages/errors/Error.vue';
+import { ErrorMessage } from '@statamic/ui';
 
 defineOptions({ layout: Outside });
 
 const props = defineProps([
     'errors',
     'emailLoginEnabled',
+    'passkeysEnabled',
+    'passkeyOptionsUrl',
+    'passkeyVerifyUrl',
     'oauthEnabled',
     'providers',
     'referer',
@@ -40,6 +46,38 @@ const submit = () => {
         onSuccess: () => window.location.href = props.referer,
         onError: () => processing.value = false
     });
+}
+
+const passkeyError = ref(null);
+
+const showPasskeyLogin = computed(() => {
+    return props.passkeysEnabled && browserSupportsWebAuthn();
+})
+
+async function loginWithPasskey() {
+    const authOptionsResponse = await fetch(props.passkeyOptionsUrl);
+    const startAuthResponse = await startAuthentication(await authOptionsResponse.json());
+
+    axios.post(props.passkeyVerifyUrl, startAuthResponse)
+        .then(response => {
+            if (response && response.data.redirect) {
+                router.get(response.data.redirect);
+                return;
+            }
+
+            passkeyError.value = response.data.message;
+        }).catch(e => handleAxiosError(e));
+}
+
+
+function handleAxiosError(e) {
+    if (e.response) {
+        const { message, errors } = e.response.data;
+        passkeyError.value = message;
+        return;
+    }
+
+    passkeyError.value = __('Something went wrong');
 }
 </script>
 
@@ -77,6 +115,11 @@ const submit = () => {
 
                 <Button type="submit" variant="primary" :disabled="processing" :text="__('Continue')" tabindex="5" />
             </form>
+
+            <template v-if="showPasskeyLogin">
+                <Button :text="__('Login with Passkey')" icon="key" @click="loginWithPasskey"/>
+                <ErrorMessage v-if="passkeyError" :text="passkeyError" />
+            </template>
 
             <template v-if="oauthEnabled">
                 <Separator v-if="emailLoginEnabled" variant="dots" :text="__('Or sign in with')" class="py-3" />

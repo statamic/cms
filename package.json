@@ -22,6 +22,7 @@
     "@inertiajs/vue3": "^2.1.11",
     "@internationalized/date": "^3.7.0",
     "@shopify/draggable": "^1.0.0-beta.12",
+    "@simplewebauthn/browser": "^13.2.2",
     "@tiptap/core": "^3.0.0",
     "@tiptap/extension-blockquote": "^3.0.0",
     "@tiptap/extension-bold": "^3.0.0",

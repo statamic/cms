@@ -38,6 +38,12 @@ const isImpersonating = computed((() => user.is_impersonating));
                 :text="__('Manage profile')"
             />
             <DropdownItem
+                v-if="passkeysEnabled"
+                :href="cp_url('webauthn')"
+                icon="avatar"
+                :text="__('Manage profile')"
+            />
+            <DropdownItem
                 :href="cp_url('preferences/edit')"
                 icon="cog"
                 :text="__('Preferences')"
