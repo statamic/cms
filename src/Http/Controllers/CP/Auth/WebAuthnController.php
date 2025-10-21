@@ -71,7 +71,6 @@ class WebAuthnController
         }
 
         $passkey = app(Passkey::class)
-            ->setId($publicKeyCredential->id)
             ->setUser($user)
             ->setCredential($publicKeyCredentialSource);
 
