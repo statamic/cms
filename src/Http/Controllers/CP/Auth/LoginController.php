@@ -56,7 +56,7 @@ class LoginController extends CpController
             'name' => $provider->name(),
             'icon' => Statamic::svg('oauth/'.$provider->name()),
             'url' => $provider->loginUrl().'?redirect='.$redirect,
-        ]);
+        ])->values();
     }
 
     public function login(Request $request)

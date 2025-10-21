@@ -5,7 +5,6 @@ import { AuthCard, Input, Field, Button, Separator, Checkbox } from '@ui';
 import { Link, router } from '@inertiajs/vue3';
 import { computed, ref, watch } from 'vue';
 import { startAuthentication, browserSupportsWebAuthn } from '@simplewebauthn/browser';
-import Error from '@/pages/errors/Error.vue';
 import { ErrorMessage } from '@statamic/ui';
 
 defineOptions({ layout: Outside });
@@ -31,6 +30,7 @@ const password = ref('');
 const remember = ref(false);
 const processing = ref(false);
 const shaking = computed(() => Object.keys(errors.value).length ? 'animation-shake' : '');
+const showOAuth = computed(() => props.oauthEnabled && props.providers.length > 0);
 
 const submit = () => {
     processing.value = true;
@@ -49,14 +49,26 @@ const submit = () => {
 }
 
 const passkeyError = ref(null);
+const passkeyWaiting = ref(false);
 
 const showPasskeyLogin = computed(() => {
     return props.passkeysEnabled && browserSupportsWebAuthn();
 })
 
 async function loginWithPasskey() {
+    passkeyWaiting.value = true;
     const authOptionsResponse = await fetch(props.passkeyOptionsUrl);
-    const startAuthResponse = await startAuthentication(await authOptionsResponse.json());
+    const authOptionsJson = await authOptionsResponse.json();
+
+    let startAuthResponse;
+    try {
+        startAuthResponse = await startAuthentication(authOptionsJson);
+    } catch (e) {
+        console.error(e);
+        passkeyError.value = __('Authentication failed.');
+        passkeyWaiting.value = false;
+        return;
+    }
 
     axios.post(props.passkeyVerifyUrl, startAuthResponse)
         .then(response => {
@@ -66,7 +78,8 @@ async function loginWithPasskey() {
             }
 
             passkeyError.value = response.data.message;
-        }).catch(e => handleAxiosError(e));
+        }).catch(e => handleAxiosError(e))
+        .finally(() => passkeyWaiting.value = false);
 }
 
 
@@ -116,22 +129,30 @@ function handleAxiosError(e) {
                 <Button type="submit" variant="primary" :disabled="processing" :text="__('Continue')" tabindex="5" />
             </form>
 
-            <template v-if="showPasskeyLogin">
-                <Button :text="__('Login with Passkey')" icon="key" @click="loginWithPasskey"/>
-                <ErrorMessage v-if="passkeyError" :text="passkeyError" />
-            </template>
-
-            <template v-if="oauthEnabled">
+            <template v-if="showAuth || showPasskeyLogin">
                 <Separator v-if="emailLoginEnabled" variant="dots" :text="__('Or sign in with')" class="py-3" />
-                <div class="flex gap-4 justify-center items-center">
-                    <Button
-                        v-for="provider in providers"
-                        :key="provider.name"
-                        as="href"
-                        class="flex-1"
-                        :href="provider.url"
-                        :icon="provider.icon"
-                    />
+                <div class="flex flex-col gap-y-4">
+                    <template v-if="showPasskeyLogin">
+                        <Button
+                            :text="__('Passkey')"
+                            class="w-full"
+                            :icon="passkeyWaiting ? null : 'key'"
+                            :disabled="passkeyWaiting"
+                            :loading="passkeyWaiting"
+                            @click="loginWithPasskey"
+                        />
+                        <ErrorMessage v-if="passkeyError" :text="passkeyError" />
+                    </template>
+                    <div v-if="showOAuth" class="flex gap-4 justify-center items-center">
+                        <Button
+                            v-for="provider in providers"
+                            :key="provider.name"
+                            as="href"
+                            class="flex-1"
+                            :href="provider.url"
+                            :icon="provider.icon"
+                        />
+                    </div>
                 </div>
             </template>
         </div>
