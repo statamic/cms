@@ -132,7 +132,8 @@ class WebAuthnController
         $user = User::find($publicKeyCredential->response->userHandle);
 
         // get from passkey repository
-        if (! $passkey = $user->passkeys()->firstWhere(fn ($key) => $key->id() == $publicKeyCredential->id)) {
+        /* @var Passkey $passkey */
+        if (! $passkey = $user->passkeys()->firstWhere(fn (Passkey $key) => $key->id() == $publicKeyCredential->rawId)) {
             throw new Exception(__('No matching passkey found'));
         }
 
