@@ -9,6 +9,7 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 use Statamic\Contracts\Auth\Passkey;
 use Statamic\Facades\User;
 use Statamic\Support\Str;
@@ -171,13 +172,16 @@ class WebAuthnController
 
     public function view()
     {
-        return view('statamic::users.webauthn', [
-            'passkeys' => User::current()->passkeys(),
-            'routes' => [
-                'options' => route('statamic.cp.webauthn.create-options'),
-                'verify' => route('statamic.cp.webauthn.create'),
-                'delete' => substr(route('statamic.cp.webauthn.delete', ['id' => 0]), 0, -1),
-            ],
+        return Inertia::render('users/Passkeys', [
+            'passkeys' => User::current()->passkeys()->map(function ($passkey) {
+                return [
+                    'id' => $passkey->id(),
+                    'last_login' => ($login = $passkey->lastLogin()) ? $login->toAtomString() : null,
+                ];
+            }),
+            'optionsUrl' => cp_route('webauthn.create-options'),
+            'verifyUrl' => cp_route('webauthn.create'),
+            'deleteUrl' => substr(cp_route('webauthn.delete', ['id' => 0]), 0, -1),
         ]);
     }
 
@@ -199,8 +203,8 @@ class WebAuthnController
     private function rpEntity(): Webauthn\PublicKeyCredentialRpEntity
     {
         return Webauthn\PublicKeyCredentialRpEntity::create(
-            name: config('statamic.webauthn.rp_entity.name', config('app.name')),
-            id: config('statamic.webauthn.rp_entity.id', null),
+            name: config('statamic.webauthn.rp_entity.name') ?? config('app.name'),
+            id: config('statamic.webauthn.rp_entity.id'),
         );
     }
 

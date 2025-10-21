@@ -1,11 +1,11 @@
 <script setup>
 import Head from '@/pages/layout/Head.vue';
 import Outside from '@/pages/layout/Outside.vue';
-import { AuthCard, Input, Field, Button, Separator, Checkbox } from '@ui';
+import { AuthCard, Input, Field, Button, Separator, Checkbox, ErrorMessage } from '@ui';
 import { Link, router } from '@inertiajs/vue3';
 import { computed, ref, watch } from 'vue';
 import { startAuthentication, browserSupportsWebAuthn } from '@simplewebauthn/browser';
-import { ErrorMessage } from '@statamic/ui';
+import axios from 'axios';
 
 defineOptions({ layout: Outside });
 
