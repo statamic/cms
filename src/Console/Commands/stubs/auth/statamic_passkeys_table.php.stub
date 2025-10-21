@@ -16,6 +16,7 @@ class StatamicPasskeysTable extends Migration
         Schema::create('PASSKEYS_TABLE', function (Blueprint $table) {
             $table->id();
             $table->string('user_id');
+            $table->string('name');
             $table->json('credential')->nullable();
             $table->datetime('last_login')->nullable();
             $table->timestamps();

@@ -11,7 +11,7 @@ import { toggleArchitecturalBackground } from '@/pages/layout/architectural-back
 const props = defineProps([
     'passkeys',
     'optionsUrl',
-    'verifyUrl',
+    'createUrl',
     'deleteUrl',
 ])
 
@@ -27,7 +27,7 @@ const showWebAuthn = browserSupportsWebAuthn();
 const passkeyWaiting = ref(false);
 
 const columns = [
-    { label: __('Name'), field: 'id' },
+    { label: __('Name'), field: 'name' },
     { label: __('Last Login'), field: 'last_login' },
 ];
 
@@ -39,6 +39,8 @@ function deletePasskey(id) {
 
 async function createPasskey() {
     passkeyWaiting.value = true;
+
+    const name = prompt(__('Enter a passkey name')) || `${__('Passkey')} ${props.passkeys.length + 1}`;
     const authOptionsResponse = await fetch(props.optionsUrl);
 
     let startRegistrationResponse;
@@ -50,7 +52,7 @@ async function createPasskey() {
         return;
     }
 
-    axios.post(props.verifyUrl, startRegistrationResponse)
+    axios.post(props.createUrl, { ...startRegistrationResponse, name })
         .then(response => {
             if (response && response.data.verified) {
                 router.reload();

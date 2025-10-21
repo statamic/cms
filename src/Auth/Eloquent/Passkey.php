@@ -17,6 +17,7 @@ class Passkey extends BasePasskey
     public function setModel(Model $model): self
     {
         $this
+            ->setName($model->name)
             ->setUser($model->user_id)
             ->setLastLogin($model->last_login)
             ->setCredential($model->credential);
@@ -30,6 +31,7 @@ class Passkey extends BasePasskey
     {
         $model = $this->model() ?? app(config('statamic.webauthn.model'))::newModelInstance();
         $model->user_id = $this->user()->id();
+        $model->name = $this->name();
         $model->last_login = $this->lastLogin();
         $model->credential = $this->credential();
 

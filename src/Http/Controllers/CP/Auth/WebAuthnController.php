@@ -72,6 +72,7 @@ class WebAuthnController
 
         $passkey = app(Passkey::class)
             ->setUser($user)
+            ->setName($request->name)
             ->setCredential($publicKeyCredentialSource);
 
         $passkey->save();
@@ -173,14 +174,14 @@ class WebAuthnController
     public function view()
     {
         return Inertia::render('users/Passkeys', [
-            'passkeys' => User::current()->passkeys()->map(function ($passkey) {
+            'passkeys' => User::current()->passkeys()->map(function (Passkey $passkey) {
                 return [
-                    'id' => $passkey->id(),
+                    'name' => $passkey->name(),
                     'last_login' => ($login = $passkey->lastLogin()) ? $login->toAtomString() : null,
                 ];
             }),
             'optionsUrl' => cp_route('webauthn.create-options'),
-            'verifyUrl' => cp_route('webauthn.create'),
+            'createUrl' => cp_route('webauthn.create'),
             'deleteUrl' => substr(cp_route('webauthn.delete', ['id' => 0]), 0, -1),
         ]);
     }
