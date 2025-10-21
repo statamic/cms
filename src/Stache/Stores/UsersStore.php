@@ -56,9 +56,10 @@ class UsersStore extends BasicStore
         $user->passkeys(collect(Arr::pull($data, 'passkeys', []))
             ->map(function ($keydata) use ($user) {
                 return app(Passkey::class)
-                    ->id($keydata['id'])
-                    ->data(Arr::except($keydata, ['id']))
-                    ->user($user);
+                    ->setUser($user)
+                    ->setId($keydata['id'])
+                    ->setLastLogin($keydata['last_login'])
+                    ->setCredential($keydata['credential']);
             }));
 
         if (Arr::get($data, 'password') || isset($idGenerated)) {

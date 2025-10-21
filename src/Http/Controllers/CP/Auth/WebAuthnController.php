@@ -71,9 +71,9 @@ class WebAuthnController
         }
 
         $passkey = app(Passkey::class)
-            ->id($publicKeyCredential->id)
-            ->user($user)
-            ->data($publicKeyCredentialSource->jsonSerialize());
+            ->setId($publicKeyCredential->id)
+            ->setUser($user)
+            ->setCredential($publicKeyCredentialSource);
 
         $passkey->save();
 
@@ -146,7 +146,7 @@ class WebAuthnController
         );
 
         $publicKeyCredentialSource = $responseValidator->check(
-            $passkey->toPublicKeyCredentialSource(),
+            $passkey->credential(),
             $publicKeyCredential->response,
             $this->verifyOptions(session()->pull('webauthn.challenge')),
             $request->getHost(),
@@ -155,8 +155,9 @@ class WebAuthnController
         );
 
         // update passkey with latest data
-        $passkey->data($publicKeyCredentialSource->jsonSerialize());
-        $passkey->set('last_login', now()->timestamp);
+        $passkey
+            ->setCredential($publicKeyCredentialSource)
+            ->setLastLogin(now());
         $passkey->save();
 
         Auth::login($passkey->user(), config('statamic.webauthn.remember_me', true));

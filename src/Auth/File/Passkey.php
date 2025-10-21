@@ -2,89 +2,40 @@
 
 namespace Statamic\Auth\File;
 
-use Carbon\Carbon;
-use Statamic\Contracts\Auth\Passkey as PasskeyContract;
-use Statamic\Contracts\Auth\User as UserContract;
-use Statamic\Data\ContainsData;
-use Statamic\Facades;
-use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Webauthn\PublicKeyCredentialSource;
+use Statamic\Auth\Passkey as BasePasskey;
 
-class Passkey implements PasskeyContract
+class Passkey extends BasePasskey
 {
-    use ContainsData, FluentlyGetsAndSets;
-
-    protected $id;
-    protected $user;
-
-    public function __construct()
+    public function delete(): bool
     {
-        $this->data = collect();
-        $this->supplements = collect();
-    }
-
-    public function id($id = null)
-    {
-        return $this->fluentlyGetOrSet('id')->args(func_get_args());
-    }
-
-    public function user($user = null)
-    {
-        return $this
-            ->fluentlyGetOrSet('user')
-            ->setter(function ($user) {
-                return $user instanceof UserContract ? $user->id() : $user;
-            })
-            ->getter(function ($id) {
-                return Facades\User::find($id);
-            })
-            ->args(func_get_args());
-    }
-
-    public function delete()
-    {
-        if (! $user = $this->user()) {
-            return;
-        }
+        $user = $this->user();
 
         $user->passkeys($user->passkeys()->reject(fn ($key) => $key->id() == $this->id()));
 
         $user->save();
+
+        return true;
     }
 
-    public function save()
+    public function save(): bool
     {
-        if (! $user = $this->user()) {
-            return;
-        }
+        $user = $this->user();
 
         $passkeys = $user->passkeys()->reject(fn ($key) => $key->id() == $this->id());
 
         $user->passkeys($passkeys->push($this));
 
         $user->save();
+
+        return true;
     }
 
     public function fileData()
     {
-        return $this->data()->merge([
-            'id' => (string) $this->id(),
-        ])->all();
-    }
-
-    public function lastLogin()
-    {
-        return ($login = $this->get('last_login')) ? Carbon::createFromTimestamp($login) : null;
-    }
-
-    public function toPublicKeyCredentialSource()
-    {
-        $data = $this->data()->all();
-
-        $data['trustPath'] = [
-            'type' => \Webauthn\TrustPath\EmptyTrustPath::class,
+        return [
+            'id' => $this->id(),
+            'last_login' => $this->lastLogin()?->timestamp ?? null,
+            'credential' => $this->credential()->jsonSerialize(),
         ];
-
-        return PublicKeyCredentialSource::createFromArray($data);
     }
 }

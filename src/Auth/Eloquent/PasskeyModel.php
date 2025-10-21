@@ -15,9 +15,8 @@ class PasskeyModel extends Eloquent
     protected $table = 'user_passkeys';
 
     protected $casts = [
-        'data' => 'json',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
+        'credential' => 'json',
+        'last_login' => 'datetime',
     ];
 
     public function __construct(array $attributes = [])

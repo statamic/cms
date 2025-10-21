@@ -3,43 +3,47 @@
 namespace Statamic\Auth\Eloquent;
 
 use Illuminate\Database\Eloquent\Model;
-use Statamic\Auth\File\Passkey as BasePasskey;
-use Statamic\Support\Arr;
+use Statamic\Auth\Passkey as BasePasskey;
 
 class Passkey extends BasePasskey
 {
-    protected $model;
+    private ?Model $model = null;
 
-    public function model(?Model $model = null)
+    public function model(): ?Model
     {
-        if (is_null($model)) {
-            return $this->model;
-        }
+        return $this->model;
+    }
+
+    public function setModel(Model $model): self
+    {
+        $this
+            ->setId($model->id)
+            ->setUser($model->user_id)
+            ->setLastLogin($model->last_login)
+            ->setCredential($model->credential);
 
         $this->model = $model;
-
-        if ($model->id) {
-            $this->id($model->id);
-            $this->user($model->user_id);
-            $this->data($model->data, ['id']);
-        }
 
         return $this;
     }
 
-    public function save()
+    public function save(): bool
     {
         $model = $this->model() ?? app(config('statamic.webauthn.model'))::findOrNew($this->id());
         $model->id = $this->id();
         $model->user_id = $this->user()?->getKey();
-        $model->data = Arr::except($this->fileData(), ['id']);
-        $model->save();
+        $model->last_login = $this->lastLogin();
+        $model->credential = $this->credential();
 
-        $this->model($model);
+        $result = $model->save();
+
+        $this->setModel($model);
+
+        return $result;
     }
 
-    public function delete()
+    public function delete(): bool
     {
-        $this->model()?->delete();
+        return $this->model()->delete();
     }
 }

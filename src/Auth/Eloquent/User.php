@@ -409,7 +409,7 @@ class User extends BaseUser
         if (func_num_args() === 0) {
             return app(config('statamic.webauthn.model'))::where('user_id', $this->id())
                 ->get()
-                ->map(fn ($model) => app(Passkey::class)->model($model));
+                ->map(fn ($model) => app(Passkey::class)->setModel($model));
         }
 
         $this->passkeys = $passkeys;
