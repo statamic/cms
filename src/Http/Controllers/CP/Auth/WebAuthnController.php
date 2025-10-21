@@ -60,7 +60,7 @@ class WebAuthnController
             $publicKeyCredential->response,
             $this->createOptions(session()->pull('webauthn.challenge')),
             $request->getHost(),
-            ($rpEntityId = config('statamic.webauthn.rrp_entity.id')) ? [$rpEntityId] : []
+            ($rpEntityId = config('statamic.webauthn.rp_entity.id')) ? [$rpEntityId] : []
         );
 
         session()->forget('webauthn.challenge');
@@ -150,7 +150,7 @@ class WebAuthnController
             $this->verifyOptions(session()->pull('webauthn.challenge')),
             $request->getHost(),
             null,
-            ($rpEntityId = config('statamic.webauthn.rrp_entity.id')) ? [$rpEntityId] : []
+            ($rpEntityId = config('statamic.webauthn.rp_entity.id')) ? [$rpEntityId] : []
         );
 
         // update passkey with latest data
@@ -199,8 +199,8 @@ class WebAuthnController
     private function rpEntity(): Webauthn\PublicKeyCredentialRpEntity
     {
         return Webauthn\PublicKeyCredentialRpEntity::create(
-            name: config('statamic.webauthn.rrp_entity.name', config('app.name')),
-            id: config('statamic.webauthn.rrp_entity.id', null),
+            name: config('statamic.webauthn.rp_entity.name', config('app.name')),
+            id: config('statamic.webauthn.rp_entity.id', null),
         );
     }
 
