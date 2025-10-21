@@ -15,7 +15,7 @@ use Statamic\Facades\User;
 use Statamic\Support\Str;
 use Webauthn;
 
-class WebAuthnController
+class PasskeyController
 {
     public function createOptions($challenge = false)
     {
@@ -83,7 +83,7 @@ class WebAuthnController
             ], 200);
         }
 
-        return redirect()->to(route('statamic.cp.webauthn.view'));
+        return redirect()->to(route('statamic.cp.passkeys.view'));
     }
 
     public function delete(Request $request, $id)
@@ -183,9 +183,9 @@ class WebAuthnController
                     'last_login' => ($login = $passkey->lastLogin()) ? $login->toAtomString() : null,
                 ];
             }),
-            'optionsUrl' => cp_route('webauthn.create-options'),
-            'createUrl' => cp_route('webauthn.create'),
-            'deleteUrl' => substr(cp_route('webauthn.delete', ['id' => 0]), 0, -1),
+            'optionsUrl' => cp_route('passkeys.create-options'),
+            'createUrl' => cp_route('passkeys.create'),
+            'deleteUrl' => substr(cp_route('passkeys.delete', ['id' => 0]), 0, -1),
         ]);
     }
 

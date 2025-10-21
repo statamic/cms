@@ -22,11 +22,11 @@ use Statamic\Http\Controllers\CP\Auth\ExtendSessionController;
 use Statamic\Http\Controllers\CP\Auth\ForgotPasswordController;
 use Statamic\Http\Controllers\CP\Auth\ImpersonationController;
 use Statamic\Http\Controllers\CP\Auth\LoginController;
+use Statamic\Http\Controllers\CP\Auth\PasskeyController;
 use Statamic\Http\Controllers\CP\Auth\ResetPasswordController;
 use Statamic\Http\Controllers\CP\Auth\TwoFactorChallengeController;
 use Statamic\Http\Controllers\CP\Auth\TwoFactorSetupController;
 use Statamic\Http\Controllers\CP\Auth\UnauthorizedController;
-use Statamic\Http\Controllers\CP\Auth\WebAuthnController;
 use Statamic\Http\Controllers\CP\Collections\CollectionActionController;
 use Statamic\Http\Controllers\CP\Collections\CollectionBlueprintsController;
 use Statamic\Http\Controllers\CP\Collections\CollectionsController;
@@ -140,9 +140,9 @@ Route::group(['prefix' => 'auth'], function () {
 
     Route::get('stop-impersonating', [ImpersonationController::class, 'stop'])->name('impersonation.stop');
 
-    Route::group(['prefix' => 'webauthn'], function () {
-        Route::get('verify', [WebAuthnController::class, 'verifyOptions'])->name('webauthn.verify-options');
-        Route::post('verify', [WebAuthnController::class, 'verify'])->name('webauthn.verify');
+    Route::group(['prefix' => 'passkeys'], function () {
+        Route::get('verify', [PasskeyController::class, 'verifyOptions'])->name('passkeys.verify-options');
+        Route::post('verify', [PasskeyController::class, 'verify'])->name('passkeys.verify');
     });
 });
 
@@ -421,11 +421,11 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         });
     });
 
-    Route::group(['prefix' => 'webauthn'], function () {
-        Route::get('/', [WebAuthnController::class, 'view'])->name('webauthn.view');
-        Route::get('create', [WebAuthnController::class, 'createOptions'])->name('webauthn.create-options');
-        Route::post('create', [WebAuthnController::class, 'create'])->name('webauthn.create');
-        Route::delete('delete/{id}', [WebAuthnController::class, 'delete'])->name('webauthn.delete');
+    Route::group(['prefix' => 'passkeys'], function () {
+        Route::get('/', [PasskeyController::class, 'view'])->name('passkeys.view');
+        Route::get('create', [PasskeyController::class, 'createOptions'])->name('passkeys.create-options');
+        Route::post('create', [PasskeyController::class, 'create'])->name('passkeys.create');
+        Route::delete('delete/{id}', [PasskeyController::class, 'delete'])->name('passkeys.delete');
     });
 
     Route::post('slug', SlugController::class);

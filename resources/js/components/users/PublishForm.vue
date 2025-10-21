@@ -18,7 +18,7 @@
                     </template>
                     <DropdownMenu>
                         <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :href="actions.editBlueprint" />
-                        <DropdownItem :text="__('Passkeys')" icon="key" :href="cp_url('webauthn')" />
+                        <DropdownItem :text="__('Passkeys')" icon="key" :href="cp_url('passkeys')" />
                         <DropdownSeparator v-if="canEditBlueprint && itemActions.length" />
                         <DropdownItem
                             v-for="action in itemActions"
