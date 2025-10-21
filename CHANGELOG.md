@@ -1,5 +1,38 @@
 # Release Notes
 
+## 6.0.0-alpha.14 (2025-10-21)
+
+### What's fixed
+- Default content bg [#12769](https://github.com/statamic/cms/issues/12769) by @JayGeorge
+- Fix failing test [#12802](https://github.com/statamic/cms/issues/12802) by @duncanmcclean
+- "Visit URL" link should open in a new tab [#12797](https://github.com/statamic/cms/issues/12797) by @duncanmcclean
+- Replace `<a>` tags with Inertia's `<Link>` component [#12796](https://github.com/statamic/cms/issues/12796) by @duncanmcclean
+- Inertia-fy empty dashboard [#12793](https://github.com/statamic/cms/issues/12793) by @jasonvarga
+- Fix missing props on entry create form [#12794](https://github.com/statamic/cms/issues/12794) by @duncanmcclean
+- Make widget titles linkable [#12799](https://github.com/statamic/cms/issues/12799) by @duncanmcclean
+- Handle dirty state in the user wizard [#12792](https://github.com/statamic/cms/issues/12792) by @duncanmcclean
+- Configuration screen fixes [#12800](https://github.com/statamic/cms/issues/12800) by @JayGeorge
+- Contain overscroll in calendar posts [#12786](https://github.com/statamic/cms/issues/12786) by @JayGeorge
+- Stack fixes [#12783](https://github.com/statamic/cms/issues/12783) by @JayGeorge
+- Fix duplicate impersonating badges in user dropdown [#12789](https://github.com/statamic/cms/issues/12789) by @duncanmcclean
+- Fix inactive tab text color legibility [#12784](https://github.com/statamic/cms/issues/12784) by @JayGeorge
+- Fix calendar cell aspect ratio in safari [#12787](https://github.com/statamic/cms/issues/12787) by @JayGeorge
+- Fix missing validation errors & redirects in production [#12795](https://github.com/statamic/cms/issues/12795) by @duncanmcclean
+- Delete unused Blade views [#12785](https://github.com/statamic/cms/issues/12785) by @duncanmcclean
+- Calendar narrow rows only for higher viewports [#12788](https://github.com/statamic/cms/issues/12788) by @JayGeorge
+- French translations [#12807](https://github.com/statamic/cms/issues/12807) by @ebeauchamps
+- Fix stack inset [#12812](https://github.com/statamic/cms/issues/12812) by @JayGeorge
+- Fix x position [#12814](https://github.com/statamic/cms/issues/12814) by @JayGeorge
+- `AddonTestCase` should load Inertia's `ServiceProvider` [#12815](https://github.com/statamic/cms/issues/12815) by @duncanmcclean
+- Improve sidebar nav performance [#12816](https://github.com/statamic/cms/issues/12816) by @JayGeorge
+- CP Nav Customisation - Add missing show item icon [#12818](https://github.com/statamic/cms/issues/12818) by @JayGeorge
+- List fieldtype border radius [#12817](https://github.com/statamic/cms/issues/12817) by @JayGeorge
+- Calendar entries dark mode [#12811](https://github.com/statamic/cms/issues/12811) by @JayGeorge
+- Fix column layout for publish fields [#12813](https://github.com/statamic/cms/issues/12813) by @JayGeorge
+- Decouple CSRF token from nocache script [#11014](https://github.com/statamic/cms/issues/11014) by @aerni
+
+
+
 ## 6.0.0-alpha.13 (2025-10-16)
 
 ### What's new
