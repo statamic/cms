@@ -105,6 +105,6 @@ class AuthMigration extends Command
 
         File::put($to, $contents);
 
-        $this->line("<info>Created Passkeys Migration:</info> {$file}");
+        $this->components->info("Migration [$file] created successfully.");
     }
 }
