@@ -73,7 +73,7 @@ async function loginWithPasskey() {
     axios.post(props.passkeyVerifyUrl, startAuthResponse)
         .then(response => {
             if (response && response.data.redirect) {
-                router.get(response.data.redirect);
+                window.location = response.data.redirect;
                 return;
             }
 
