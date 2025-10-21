@@ -92,6 +92,7 @@ class PasskeyController
             abort(403);
         }
 
+        /* @var Passkey $passkey */
         $passkey = $user->passkeys()->firstWhere(fn ($key) => $key->id() == $id);
 
         if (! $passkey) {
