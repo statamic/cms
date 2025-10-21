@@ -77,13 +77,7 @@ class PasskeyController
 
         $passkey->save();
 
-        if ($request->wantsJson()) {
-            return new JsonResponse([
-                'verified' => true,
-            ], 200);
-        }
-
-        return redirect()->to(route('statamic.cp.passkeys.view'));
+        return ['verified' => true];
     }
 
     public function delete(Request $request, $id)
