@@ -33,7 +33,6 @@ class Passkey extends BasePasskey
     public function fileData()
     {
         return [
-            'id' => $this->id(),
             'last_login' => $this->lastLogin()?->timestamp ?? null,
             'credential' => $this->credential()->jsonSerialize(),
         ];

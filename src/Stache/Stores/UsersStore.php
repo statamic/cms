@@ -57,7 +57,6 @@ class UsersStore extends BasicStore
             ->map(function ($keydata) use ($user) {
                 return app(Passkey::class)
                     ->setUser($user)
-                    ->setId($keydata['id'])
                     ->setLastLogin($keydata['last_login'])
                     ->setCredential($keydata['credential']);
             }));

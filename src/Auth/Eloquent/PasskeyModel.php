@@ -7,11 +7,6 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
 class PasskeyModel extends Eloquent
 {
     protected $guarded = [];
-
-    protected $keyType = 'string';
-
-    public $incrementing = false;
-
     protected $table = 'user_passkeys';
 
     protected $casts = [

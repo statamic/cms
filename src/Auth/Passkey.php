@@ -11,21 +11,13 @@ use Webauthn\TrustPath\EmptyTrustPath;
 
 abstract class Passkey implements Contract
 {
-    private string $id;
     private string $user;
     private PublicKeyCredentialSource $credential;
     private ?Carbon $lastLogin = null;
 
     public function id(): string
     {
-        return $this->id;
-    }
-
-    public function setId(string $id): self
-    {
-        $this->id = $id;
-
-        return $this;
+        return $this->credential()->publicKeyCredentialId;
     }
 
     public function setUser(string|UserContract $user): self
@@ -75,7 +67,6 @@ abstract class Passkey implements Contract
     public function __serialize(): array
     {
         return [
-            'id' => $this->id,
             'user' => $this->user,
             'credential' => $this->credential->jsonSerialize(),
             'last_login' => $this->lastLogin?->timestamp,
@@ -84,7 +75,6 @@ abstract class Passkey implements Contract
 
     public function __unserialize(array $data): void
     {
-        $this->id = $data['id'];
         $this->user = $data['user'];
         $this->credential = $this->credentialFromArray($data['credential']);
         $this->lastLogin = $data['last_login'] ? Carbon::createFromTimestamp($data['last_login']) : null;
