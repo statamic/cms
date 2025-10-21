@@ -161,6 +161,8 @@ class WebAuthnController
         $passkey->save();
 
         Auth::login($passkey->user(), config('statamic.webauthn.remember_me', true));
+        session()->elevate();
+        session()->regenerate();
 
         if ($request->wantsJson()) {
             return new JsonResponse([
