@@ -3,6 +3,7 @@
 namespace Tests\Auth;
 
 use Illuminate\Support\Facades\Hash;
+use ParagonIE\ConstantTime\Base64UrlSafe;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\File\Passkey;
@@ -16,6 +17,7 @@ use Statamic\Facades\UserGroup as UserGroupAPI;
 use Statamic\Support\Arr;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
+use Webauthn\PublicKeyCredentialSource;
 
 #[Group('user')]
 #[Group('2fa')]
@@ -129,50 +131,6 @@ class FileUserTest extends TestCase
     }
 
     #[Test]
-    public function it_saves_a_passkey()
-    {
-        $user = $this->createPermissible();
-        $user->save();
-
-        $this->assertCount(0, $user->passkeys());
-
-        $passkey = (new Passkey)
-            ->id('testing')
-            ->data([
-                'foo' => 'bar',
-            ])
-            ->user($user);
-
-        $passkey->save();
-
-        $this->assertCount(1, $user->passkeys());
-        $this->assertSame($user->passkeys()->first(), $passkey);
-    }
-
-    #[Test]
-    public function it_deletes_a_passkey()
-    {
-        $user = $this->createPermissible();
-        $user->save();
-
-        $passkey = (new Passkey)
-            ->id('testing')
-            ->data([
-                'foo' => 'bar',
-            ])
-            ->user($user);
-
-        $passkey->save();
-
-        $this->assertCount(1, $user->passkeys());
-        $this->assertSame($user->passkeys()->first(), $passkey);
-
-        $passkey->delete();
-
-        $this->assertCount(0, $user->fresh()->passkeys());
-    }
-
-    #[Test]
     public function it_prevents_saving_duplicate_roles()
     {
         $roleA = (new \Statamic\Auth\File\Role)->handle('a');
@@ -231,5 +189,29 @@ class FileUserTest extends TestCase
 
         $this->assertEquals('A', $user->getSupplement('bar'));
         $this->assertEquals('B', $clone->getSupplement('bar'));
+    }
+
+    #[Test]
+    #[Group('passkeys')]
+    public function it_gets_passkeys()
+    {
+        $user = $this->user();
+        $this->assertCount(0, $user->passkeys());
+
+        $mockCredentialA = \Mockery::mock(PublicKeyCredentialSource::class);
+        $mockCredentialA->publicKeyCredentialId = 'key-a';
+        $mockCredentialB = \Mockery::mock(PublicKeyCredentialSource::class);
+        $mockCredentialB->publicKeyCredentialId = 'key-b';
+
+        $user->setPasskeys(collect([
+            $passkeyA = (new Passkey)->setCredential($mockCredentialA),
+            $passkeyB = (new Passkey)->setCredential($mockCredentialB),
+        ]));
+
+        $this->assertCount(2, $passkeys = $user->passkeys());
+        $this->assertEquals([
+            Base64UrlSafe::encodeUnpadded('key-a') => $passkeyA,
+            Base64UrlSafe::encodeUnpadded('key-b') => $passkeyB,
+        ], $passkeys->all());
     }
 }
