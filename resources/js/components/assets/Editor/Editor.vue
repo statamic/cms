@@ -139,9 +139,9 @@
 
                 <div class="flex w-full items-center justify-end rounded-b border-t dark:border-gray-700 bg-gray-100 dark:bg-gray-900 px-4 py-3">
                     <div class="hidden h-full flex-1 gap-2 sm:gap-3 py-1 sm:flex">
-                        <ui-badge pill variant="flat" v-if="isImage" icon="assets" :text="__('messages.width_x_height', { width: asset.width, height: asset.height })" />
-                        <ui-badge pill variant="flat" icon="memory" :text="asset.size" />
-                        <ui-badge pill variant="flat" icon="fingerprint" :text="asset.lastModifiedRelative" />
+                        <ui-badge pill v-if="isImage" icon="assets" :text="__('messages.width_x_height', { width: asset.width, height: asset.height })" />
+                        <ui-badge pill icon="memory" :text="asset.size" />
+                        <ui-badge pill icon="fingerprint" :text="asset.lastModifiedRelative" />
                     </div>
                     <div class="flex items-center space-x-3 rtl:space-x-reverse">
                         <ui-button icon="chevron-left" @click="navigateToPreviousAsset" v-tooltip="__('Previous Asset')" />
