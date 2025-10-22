@@ -175,8 +175,8 @@ body:has(.stack) [data-reka-popper-content-wrapper] {
     z-index: var(--z-index-portal)!important;
 }
 
-/* We can't use a direct descendant selector because the modal is inside a portal, so instead we'll check to see if there is a dismissable layer present. */
-body:has([data-dismissable-layer]) [data-reka-popper-content-wrapper] {
+/* When there's a modal present, we need to ensure the popper content is above it. We can't use a direct descendant selector because the modal is inside a portal, so instead we'll check to see if there is modal content present. */
+body:has([data-ui-modal-content]) [data-reka-popper-content-wrapper] {
     z-index: var(--z-index-modal)!important;
 }
 </style>
