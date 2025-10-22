@@ -42,7 +42,7 @@ const badgeClasses = computed(() => {
                 black: 'bg-gray-900 dark:bg-gray-300/6 border-black dark:border-black/25 text-white dark:text-gray-300 [a]:hover:bg-black/90 [button]:hover:bg-black/90 dark:[button]:hover:bg-black/9',
                 blue: 'bg-blue-100/80 dark:bg-blue-300/6 border-blue-300 dark:border-blue-300/25 text-blue-700 dark:text-blue-300 [a]:hover:bg-blue-200/60 [button]:hover:bg-blue-200/60 dark:[button]:hover:bg-blue-200/9',
                 cyan: 'bg-cyan-100/80 dark:bg-cyan-300/6 border-cyan-400 dark:border-cyan-400/25 text-cyan-700 dark:text-cyan-300 [a]:hover:bg-cyan-200/60 [button]:hover:bg-cyan-200/60 dark:[button]:hover:bg-cyan-200/9',
-                default: 'bg-gray-800/5 dark:bg-gray-800 border-gray-300 dark:border-gray-300/25 dark:text-gray-100 text-gray-700 [a]:hover:bg-gray-200/50 dark:[a]:hover:bg-gray-700/50 [button]:hover:bg-gray-200/50 dark:[button]:hover:bg-gray-200/9',
+                default: 'bg-gray-800/5 dark:bg-gray-800 border-gray-300 dark:border-gray-300/25 dark:text-gray-100 text-gray-700 [a]:hover:bg-gray-800/10 dark:[a]:hover:bg-gray-700/50 [button]:hover:bg-gray-200/50 dark:[button]:hover:bg-gray-200/9',
                 emerald: 'bg-emerald-100/80 border-emerald-400 dark:border-emerald-400/25 text-emerald-700 dark:bg-emerald-300/6 dark:text-emerald-300 [a]:hover:bg-emerald-200/60 [button]:hover:bg-emerald-200/60 dark:[button]:hover:bg-emerald-200/9',
                 fuchsia: 'bg-fuchsia-100/80 dark:bg-fuschia-300/6 border-fuchsia-300 dark:border-fuchsia-300/25 text-fuchsia-700 dark:text-fuschia-300 [a]:hover:bg-fuchsia-200/60 dark:[a]:hover:bg-fuchsia-300/15 [button]:hover:bg-fuchsia-200/60 dark:[button]:hover:bg-fuchsia-200/9',
                 green: 'bg-green-100/80 border-green-400 dark:border-green-400/25 text-green-700 dark:bg-green-300/6 dark:text-green-300 [a]:hover:bg-green-200/60 dark:[a]:hover:bg-green-300/15 [button]:hover:bg-green-200/60 dark:[button]:hover:bg-green-200/9',
@@ -60,9 +60,12 @@ const badgeClasses = computed(() => {
                 yellow: 'bg-yellow-100 dark:bg-yellow-300/6 border-yellow-400 dark:border-yellow-400/25 text-yellow-700 dark:text-yellow-300 [a]:hover:bg-yellow-200/80 dark:[a]:hover:bg-yellow-300/15 [button]:hover:bg-yellow-200/80 dark:[button]:hover:bg-yellow-200/9',
             },
             pill: { true: 'rounded-full' },
-            href: { true: 'shadow-ui-sm' }
+            asButton: { true: 'shadow-ui-sm no-underline!' }
         },
-    })({ ...props });
+    })({
+        ...props,
+        asButton: props.href ?? props.as == 'button' ? true : false,
+    });
 
     return twMerge(classes);
 });
