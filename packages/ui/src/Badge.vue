@@ -17,7 +17,6 @@ const props = defineProps({
     prepend: { type: [String, Number, Boolean, null], default: null },
     size: { type: String, default: 'default' },
     text: { type: [String, Number, Boolean, null], default: null },
-    variant: { type: String, default: 'default' },
 });
 
 const slots = useSlots();
@@ -31,7 +30,7 @@ const tag = computed(() => {
 
 const badgeClasses = computed(() => {
     const classes = cva({
-        base: 'relative inline-flex items-center justify-center gap-1 font-normal antialiased whitespace-nowrap no-underline not-prose [button]:cursor-pointer group [&_svg]:opacity-60 [&_svg]:group-hover:opacity-80 dark:[&_svg]:group-hover:opacity-70',
+        base: 'relative inline-flex items-center justify-center gap-1 border dark:border-none dark:pb-0.25 font-normal antialiased whitespace-nowrap no-underline not-prose [button]:cursor-pointer group [&_svg]:opacity-60 [&_svg]:group-hover:opacity-80 dark:[&_svg]:group-hover:opacity-70',
         variants: {
             size: {
                 sm: 'text-2xs leading-normal px-1.25 rounded-[0.1875rem] [&_svg]:size-2.5',
@@ -59,9 +58,6 @@ const badgeClasses = computed(() => {
                 violet: 'bg-violet-100/80 dark:bg-violet-300/6 border-violet-300 dark:border-violet-300/25 text-violet-700 dark:text-violet-300 [a]:hover:bg-violet-200/60 [button]:hover:bg-violet-200/60 dark:[a]:hover:bg-violet-300/15 dark:[button]:hover:bg-violet-200/9',
                 white: 'bg-white border-gray-300 dark:border-gray-300/25 text-gray-700 dark:bg-gray-300/6 dark:text-gray-300 [a]:hover:bg-gray-200/30 [button]:hover:bg-gray-200/30 dark:[a]:hover:bg-gray-300/15 dark:[button]:hover:bg-gray-200/9',
                 yellow: 'bg-yellow-100 dark:bg-yellow-300/6 border-yellow-400 dark:border-yellow-400/25 text-yellow-700 dark:text-yellow-300 [a]:hover:bg-yellow-200/80 dark:[a]:hover:bg-yellow-300/15 [button]:hover:bg-yellow-200/80 dark:[button]:hover:bg-yellow-200/9',
-            },
-            variant: {
-                default: 'border dark:border-none dark:pb-0.25',
             },
             pill: { true: 'rounded-full' },
             href: { true: 'shadow-ui-sm' }
