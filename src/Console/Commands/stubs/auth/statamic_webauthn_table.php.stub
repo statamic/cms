@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class StatamicPasskeysTable extends Migration
+class StatamicWebauthnTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class StatamicPasskeysTable extends Migration
      */
     public function up()
     {
-        Schema::create('PASSKEYS_TABLE', function (Blueprint $table) {
+        Schema::create('WEBAUTHN_TABLE', function (Blueprint $table) {
             $table->string('id')->primary();
             $table->string('user_id');
             $table->string('name');
@@ -28,6 +28,6 @@ class StatamicPasskeysTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('PASSKEYS_TABLE');
+        Schema::dropIfExists('WEBAUTHN_TABLE');
     }
 }

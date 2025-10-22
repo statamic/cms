@@ -42,6 +42,7 @@ return [
     | When using eloquent passkeys you can specify the model you want to use
     |
     */
-    'model' => \Statamic\Auth\Eloquent\PasskeyModel::class,
+
+    'model' => \Statamic\Auth\Eloquent\WebAuthnModel::class,
 
 ];

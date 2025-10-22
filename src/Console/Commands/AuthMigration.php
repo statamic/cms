@@ -48,7 +48,7 @@ class AuthMigration extends Command
         $this->createGroupsTable();
         $this->createRolesTable();
 
-        $this->createPasskeysTable();
+        $this->createWebauthTable();
 
         $this->composer->dumpAutoloads();
     }
@@ -92,16 +92,16 @@ class AuthMigration extends Command
         $this->components->info("Migration [$file] created successfully.");
     }
 
-    private function createPasskeysTable()
+    private function createWebauthTable()
     {
-        $from = __DIR__.'/stubs/auth/statamic_passkeys_table.php.stub';
-        $file = Carbon::now()->format('Y_m_d_His').'_statamic_passkeys_table';
+        $from = __DIR__.'/stubs/auth/statamic_webauthn_table.php.stub';
+        $file = Carbon::now()->format('Y_m_d_His').'_statamic_webauthn_table';
 
         $to = ($path = $this->option('path')) ? $path."/{$file}.php" : database_path("migrations/{$file}.php");
 
         $contents = File::get($from);
 
-        $contents = str_replace('PASSKEYS_TABLE', config('statamic.users.tables.passkeys', 'user_passkeys'), $contents);
+        $contents = str_replace('WEBAUTHN_TABLE', config('statamic.users.tables.webauthn', 'webauthn'), $contents);
 
         File::put($to, $contents);
 
