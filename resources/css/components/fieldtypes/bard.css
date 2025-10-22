@@ -124,42 +124,6 @@
                 border-top-right-radius: 0!important;
             }
         }
-
-        /* While the fixed toolbar is "stuck", mask the focus state of the editor to prevent blue focus lines appearing around the side of the toolbar while scrolling */
-        container-type: scroll-state;
-        @container scroll-state(stuck: top) {
-            > * {
-                position: relative;
-                &::after {
-                    content: '';
-                    position: absolute;
-                    inset: -4px -8px;
-                    box-shadow:
-                        /* Left Mask */
-                        -1px 0px 0px var(--color-gray-300),
-                        /* Right Mask */
-                        1px 0px 0px var(--color-gray-300),
-                        /* Bottom "Shadow" */
-                        0 4px 5px -3px hsl(0deg 0% 85%)
-                    ;
-                    border-inline-width: 2px;
-                    border-inline-color: var(--color-gray-50);
-                }
-                :is(.dark) & {
-                    &::after {
-                        box-shadow:
-                            /* Left Mask */
-                            -1px 0px 0px var(--color-gray-700),
-                            /* Right Mask */
-                            1px 0px 0px var(--color-gray-700),
-                            /* Bottom "Shadow" */
-                            0 4px 5px -3px hsl(0deg 0% 10%)
-                        ;
-                        border-inline-color: var(--color-gray-850);
-                    }
-                }
-            }
-        }
     }
 
     /* Only top-level Bard fields should have a sticky header */
@@ -569,3 +533,13 @@
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
