@@ -3,6 +3,7 @@
 namespace Statamic\Auth;
 
 use Carbon\Carbon;
+use ParagonIE\ConstantTime\Base64UrlSafe;
 use Statamic\Auth\WebAuthn\Serializer;
 use Statamic\Contracts\Auth\Passkey as Contract;
 use Statamic\Contracts\Auth\User as UserContract;
@@ -18,7 +19,7 @@ abstract class Passkey implements Contract
 
     public function id(): string
     {
-        return $this->credential()->publicKeyCredentialId;
+        return Base64UrlSafe::encodeUnpadded($this->credential()->publicKeyCredentialId);
     }
 
     public function name(): string

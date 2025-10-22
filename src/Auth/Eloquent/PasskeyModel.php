@@ -8,6 +8,8 @@ class PasskeyModel extends Eloquent
 {
     protected $guarded = [];
     protected $table = 'user_passkeys';
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     protected $casts = [
         'credential' => 'json',

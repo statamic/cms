@@ -384,7 +384,7 @@ class User extends BaseUser
     {
         return $this->fluentlyGetOrSet('passkeys')
             ->getter(function ($passkeys) {
-                return collect($passkeys ?? []);
+                return collect($passkeys ?? [])->keyBy(fn ($passkey) => $passkey->id());
             })
             ->args(func_get_args());
     }

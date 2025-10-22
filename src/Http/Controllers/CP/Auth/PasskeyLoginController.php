@@ -53,7 +53,7 @@ class PasskeyLoginController
 
         // get from passkey repository
         /* @var Passkey $passkey */
-        if (! $passkey = $user->passkeys()->firstWhere(fn (Passkey $key) => $key->id() == $publicKeyCredential->rawId)) {
+        if (! $passkey = $user->passkeys()->firstWhere(fn (Passkey $key) => $key->credential()->publicKeyCredentialId === $publicKeyCredential->rawId)) {
             throw new Exception(__('No matching passkey found'));
         }
 

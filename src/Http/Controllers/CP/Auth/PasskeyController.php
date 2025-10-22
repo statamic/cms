@@ -98,7 +98,7 @@ class PasskeyController
         }
 
         /* @var Passkey $passkey */
-        $passkey = $user->passkeys()->firstWhere(fn ($key) => $key->id() == $id);
+        $passkey = $user->passkeys()->get($id);
 
         if (! $passkey) {
             abort(403);
@@ -122,7 +122,7 @@ class PasskeyController
                     'last_login' => ($login = $passkey->lastLogin()) ? $login->toAtomString() : null,
                     'delete_url' => cp_route('passkeys.destroy', ['id' => $passkey->id()]),
                 ];
-            }),
+            })->values(),
             'createUrl' => cp_route('passkeys.create'),
             'storeUrl' => cp_route('passkeys.store'),
         ]);

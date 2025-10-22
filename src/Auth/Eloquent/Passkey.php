@@ -30,6 +30,7 @@ class Passkey extends BasePasskey
     public function save(): bool
     {
         $model = $this->model() ?? app(config('statamic.webauthn.model'))::newModelInstance();
+        $model->id = $this->id();
         $model->user_id = $this->user()->id();
         $model->name = $this->name();
         $model->last_login = $this->lastLogin();
