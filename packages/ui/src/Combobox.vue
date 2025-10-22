@@ -437,7 +437,7 @@ defineExpose({
     </div>
 </template>
 
-<style>
+<style scoped>
     /* We can't use a direct descendant selector because the stack is inside a portal, so instead we'll check to see if there is a stack present. */
     body:has(.stack) [data-reka-popper-content-wrapper] {
         z-index: var(--z-index-portal)!important;
