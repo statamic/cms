@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
 use Statamic\Facades\File;
 use Statamic\Http\Controllers\CP\CpController;
@@ -13,7 +14,10 @@ class ScaffoldCollectionController extends CpController
     {
         $this->authorize('store', CollectionContract::class, __('You are not authorized to scaffold resources.'));
 
-        return view('statamic::collections.scaffold', compact('collection'));
+        return Inertia::render('collections/Scaffold', [
+            'collection' => $collection,
+            'route' => cp_route('collections.scaffold.create', $collection),
+        ]);
     }
 
     public function create(Request $request, $collection)
