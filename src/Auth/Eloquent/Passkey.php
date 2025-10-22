@@ -4,6 +4,7 @@ namespace Statamic\Auth\Eloquent;
 
 use Illuminate\Database\Eloquent\Model;
 use Statamic\Auth\Passkey as BasePasskey;
+use Statamic\Auth\WebAuthn\Serializer;
 
 class Passkey extends BasePasskey
 {
@@ -34,7 +35,7 @@ class Passkey extends BasePasskey
         $model->user_id = $this->user()->id();
         $model->name = $this->name();
         $model->last_login = $this->lastLogin();
-        $model->credential = $this->credential();
+        $model->credential = app(Serializer::class)->normalize($this->credential());
 
         $result = $model->save();
 
