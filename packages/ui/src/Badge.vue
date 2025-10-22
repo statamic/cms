@@ -15,7 +15,6 @@ const props = defineProps({
     iconAppend: { type: String, default: null },
     pill: { type: Boolean, default: false },
     prepend: { type: [String, Number, Boolean, null], default: null },
-    shadow: { type: [Boolean, String], default: true },
     size: { type: String, default: 'default' },
     text: { type: [String, Number, Boolean, null], default: null },
     variant: { type: String, default: 'default' },
