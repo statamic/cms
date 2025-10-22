@@ -404,17 +404,11 @@ class User extends BaseUser
         ], $this->model()->attributesToArray());
     }
 
-    public function passkeys($passkeys = null)
+    public function passkeys(): Collection
     {
-        if (func_num_args() === 0) {
-            return app(config('statamic.webauthn.model'))::where('user_id', $this->id())
-                ->get()
-                ->map(fn ($model) => app(Passkey::class)->setModel($model))
-                ->keyBy(fn ($passkey) => $passkey->id());
-        }
-
-        $this->passkeys = $passkeys;
-
-        return $this;
+        return app(config('statamic.webauthn.model'))::where('user_id', $this->id())
+            ->get()
+            ->map(fn ($model) => app(Passkey::class)->setModel($model))
+            ->keyBy(fn ($passkey) => $passkey->id());
     }
 }

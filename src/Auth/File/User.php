@@ -30,7 +30,7 @@ class User extends BaseUser
 
     protected $id;
     protected $email;
-    protected $passkeys;
+    protected Collection $passkeys;
     protected $password;
     protected $permissions;
 
@@ -38,6 +38,7 @@ class User extends BaseUser
     {
         $this->data = collect();
         $this->supplements = collect();
+        $this->passkeys = collect();
     }
 
     public function __clone()
@@ -380,12 +381,14 @@ class User extends BaseUser
         ], $this->data()->toArray());
     }
 
-    public function passkeys($passkeys = null)
+    public function passkeys(): Collection
     {
-        return $this->fluentlyGetOrSet('passkeys')
-            ->getter(function ($passkeys) {
-                return collect($passkeys ?? [])->keyBy(fn ($passkey) => $passkey->id());
-            })
-            ->args(func_get_args());
+        return $this->passkeys;
+
+    }
+
+    public function setPasskeys(Collection $passkeys)
+    {
+        $this->passkeys = $passkeys->keyBy(fn ($passkey) => $passkey->id());
     }
 }

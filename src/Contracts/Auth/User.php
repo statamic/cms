@@ -49,7 +49,7 @@ interface User
     public function makeSuper();
 
     /**
-     * @return self|Collection<string, Passkey>
+     * @return Collection<string, Passkey>
      */
-    public function passkeys($passkeys = null);
+    public function passkeys(): Collection;
 }

@@ -46,6 +46,7 @@ class UsersStore extends BasicStore
             $id = app('stache')->generateId();
         }
 
+        /** @var \Statamic\Auth\File\User $user */
         $user = User::make()
             ->id($id)
             ->initialPath($path)
@@ -53,7 +54,7 @@ class UsersStore extends BasicStore
             ->preferences(Arr::pull($data, 'preferences', []))
             ->data($data);
 
-        $user->passkeys(collect(Arr::pull($data, 'passkeys', []))
+        $user->setPasskeys(collect(Arr::pull($data, 'passkeys', []))
             ->map(function ($keydata) use ($user) {
                 return app(Passkey::class)
                     ->setUser($user)

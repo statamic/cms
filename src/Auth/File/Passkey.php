@@ -9,9 +9,10 @@ class Passkey extends BasePasskey
 {
     public function delete(): bool
     {
+        /** @var User $user */
         $user = $this->user();
 
-        $user->passkeys($user->passkeys()->reject(fn ($key) => $key->id() == $this->id()));
+        $user->setPasskeys($user->passkeys()->except($this->id()));
 
         $user->save();
 
@@ -20,11 +21,12 @@ class Passkey extends BasePasskey
 
     public function save(): bool
     {
+        /** @var User $user */
         $user = $this->user();
 
-        $passkeys = $user->passkeys()->reject(fn ($key) => $key->id() == $this->id());
+        $passkeys = $user->passkeys()->except($this->id())->push($this);
 
-        $user->passkeys($passkeys->push($this));
+        $user->setPasskeys($passkeys);
 
         $user->save();
 
