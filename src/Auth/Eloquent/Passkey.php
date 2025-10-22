@@ -3,7 +3,7 @@
 namespace Statamic\Auth\Eloquent;
 
 use Illuminate\Database\Eloquent\Model;
-use Statamic\Auth\Passkey as BasePasskey;
+use Statamic\Auth\WebAuthn\Passkey as BasePasskey;
 use Statamic\Auth\WebAuthn\Serializer;
 
 class Passkey extends BasePasskey

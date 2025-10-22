@@ -1,10 +1,9 @@
 <?php
 
-namespace Statamic\Auth;
+namespace Statamic\Auth\WebAuthn;
 
 use Carbon\Carbon;
 use ParagonIE\ConstantTime\Base64UrlSafe;
-use Statamic\Auth\WebAuthn\Serializer;
 use Statamic\Contracts\Auth\Passkey as Contract;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Facades\User;

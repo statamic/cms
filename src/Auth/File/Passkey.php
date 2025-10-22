@@ -2,7 +2,7 @@
 
 namespace Statamic\Auth\File;
 
-use Statamic\Auth\Passkey as BasePasskey;
+use Statamic\Auth\WebAuthn\Passkey as BasePasskey;
 use Statamic\Auth\WebAuthn\Serializer;
 
 class Passkey extends BasePasskey
