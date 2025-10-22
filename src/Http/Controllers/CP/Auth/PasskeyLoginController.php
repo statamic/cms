@@ -51,8 +51,6 @@ class PasskeyLoginController
 
         $user = User::find($publicKeyCredential->response->userHandle);
 
-        // get from passkey repository
-        /* @var Passkey $passkey */
         if (! $passkey = $user->passkeys()->firstWhere(fn (Passkey $key) => $key->credential()->publicKeyCredentialId === $publicKeyCredential->rawId)) {
             throw new Exception(__('No matching passkey found'));
         }

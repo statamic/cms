@@ -47,4 +47,9 @@ interface User
     public function isSuper();
 
     public function makeSuper();
+
+    /**
+     * @return self|Collection<string, Passkey>
+     */
+    public function passkeys($passkeys = null);
 }
