@@ -120,11 +120,11 @@ class PasskeyController
                 return [
                     'name' => $passkey->name(),
                     'last_login' => ($login = $passkey->lastLogin()) ? $login->toAtomString() : null,
+                    'delete_url' => cp_route('passkeys.destroy', ['id' => $passkey->id()]),
                 ];
             }),
             'createUrl' => cp_route('passkeys.create'),
             'storeUrl' => cp_route('passkeys.store'),
-            'deleteUrl' => substr(cp_route('passkeys.destroy', ['id' => 0]), 0, -1),
         ]);
     }
 }

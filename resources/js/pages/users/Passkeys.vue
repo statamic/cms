@@ -31,9 +31,9 @@ const columns = [
     { label: __('Last Login'), field: 'last_login' },
 ];
 
-function deletePasskey(id) {
+function deletePasskey(passkey) {
     if (confirm(__('Are you sure?'))) {
-        axios.delete(props.deleteUrl + id).then(() => router.reload());
+        axios.delete(passkey.delete_url).then(() => router.reload());
     }
 }
 
@@ -108,7 +108,7 @@ function handleAxiosError(e) {
         </template>
         <template #prepended-row-actions="{ row: passkey }">
             <DropdownItem
-                @click="deletePasskey(passkey.id)"
+                @click="deletePasskey(passkey)"
                 :text="__('Delete')"
                 icon="trash"
                 variant="destructive"
