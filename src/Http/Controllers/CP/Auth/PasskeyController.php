@@ -2,9 +2,6 @@
 
 namespace Statamic\Http\Controllers\CP\Auth;
 
-use Cose\Algorithm\Manager;
-use Cose\Algorithm\Signature\ECDSA\ES256;
-use Cose\Algorithm\Signature\RSA\RS256;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -13,7 +10,12 @@ use Inertia\Inertia;
 use Statamic\Contracts\Auth\Passkey;
 use Statamic\Facades\User;
 use Statamic\Support\Str;
+use Symfony\Component\Serializer\SerializerInterface;
 use Webauthn;
+use Webauthn\CeremonyStep\CeremonyStepManagerFactory;
+use Webauthn\PublicKeyCredentialCreationOptions;
+use Webauthn\PublicKeyCredentialRequestOptions;
+use Webauthn\PublicKeyCredentialRpEntity;
 
 class PasskeyController
 {
@@ -23,6 +25,13 @@ class PasskeyController
             throw new Exception('You must be logged in');
         }
 
+        $options = $this->publicKeyCredentialCreationOptions($user, $challenge);
+
+        return app(SerializerInterface::class)->normalize($options);
+    }
+
+    private function publicKeyCredentialCreationOptions($user, $challenge = false): PublicKeyCredentialCreationOptions
+    {
         if (! $challenge) {
             $challenge = random_bytes(16);
             session()->put('webauthn.challenge', $challenge);
@@ -34,8 +43,8 @@ class PasskeyController
             $user->name()
         );
 
-        return Webauthn\PublicKeyCredentialCreationOptions::create(
-            $this->rpEntity(),
+        return PublicKeyCredentialCreationOptions::create(
+            app(PublicKeyCredentialRpEntity::class),
             $userEntity,
             $challenge,
         );
@@ -44,24 +53,29 @@ class PasskeyController
     public function create(Request $request)
     {
         // https://webauthn-doc.spomky-labs.com/pure-php/authenticator-registration#creation-response
-        $publicKeyCredential = $this->credentialLoader()->loadArray($request->all());
+        $publicKeyCredential = app(SerializerInterface::class)->deserialize(
+            json_encode($request->all()),
+            Webauthn\PublicKeyCredential::class,
+            'json'
+        );
 
         if (! $publicKeyCredential->response instanceof Webauthn\AuthenticatorAttestationResponse) {
             throw new Exception(__('Invalid credentials'));
         }
 
         $responseValidator = Webauthn\AuthenticatorAttestationResponseValidator::create(
-            $this->attestationSupportManager(),
-            null,
-            null,
-            Webauthn\AuthenticationExtensions\ExtensionOutputCheckerHandler::create()
+            app(CeremonyStepManagerFactory::class)->creationCeremony()
+        );
+
+        $options = $this->publicKeyCredentialCreationOptions(
+            User::current(),
+            session()->pull('webauthn.challenge')
         );
 
         $publicKeyCredentialSource = $responseValidator->check(
             $publicKeyCredential->response,
-            $this->createOptions(session()->pull('webauthn.challenge')),
-            $request->getHost(),
-            ($rpEntityId = config('statamic.webauthn.rp_entity.id')) ? [$rpEntityId] : []
+            $options,
+            $request->getHost()
         );
 
         session()->forget('webauthn.challenge');
@@ -104,21 +118,32 @@ class PasskeyController
 
     public function verifyOptions($challenge = false)
     {
+        $options = $this->publicKeyCredentialRequestOptions($challenge);
+
+        return app(SerializerInterface::class)->normalize($options);
+    }
+
+    private function publicKeyCredentialRequestOptions($challenge = false): PublicKeyCredentialRequestOptions
+    {
         if (! $challenge) {
             $challenge = random_bytes(32);
             session()->put('webauthn.challenge', $challenge);
         }
 
-        return Webauthn\PublicKeyCredentialRequestOptions::create(
+        return PublicKeyCredentialRequestOptions::create(
             $challenge,
-            userVerification: Webauthn\PublicKeyCredentialRequestOptions::USER_VERIFICATION_REQUIREMENT_REQUIRED
+            userVerification: PublicKeyCredentialRequestOptions::USER_VERIFICATION_REQUIREMENT_REQUIRED
         );
     }
 
     public function verify(Request $request)
     {
         // https://webauthn-doc.spomky-labs.com/pure-php/authenticate-your-users#response-verification
-        $publicKeyCredential = $this->credentialLoader()->load($request->getContent());
+        $publicKeyCredential = app(SerializerInterface::class)->deserialize(
+            $request->getContent(),
+            Webauthn\PublicKeyCredential::class,
+            'json'
+        );
 
         if (! $publicKeyCredential->response instanceof Webauthn\AuthenticatorAssertionResponse) {
             throw new Exception(__('Invalid credentials'));
@@ -132,22 +157,20 @@ class PasskeyController
             throw new Exception(__('No matching passkey found'));
         }
 
-        $algorithmManager = Manager::create()->add(ES256::create(), RS256::create());
-
         $responseValidator = Webauthn\AuthenticatorAssertionResponseValidator::create(
-            null,
-            null,
-            Webauthn\AuthenticationExtensions\ExtensionOutputCheckerHandler::create(),
-            $algorithmManager
+            app(CeremonyStepManagerFactory::class)->requestCeremony()
+        );
+
+        $options = $this->publicKeyCredentialRequestOptions(
+            session()->pull('webauthn.challenge')
         );
 
         $publicKeyCredentialSource = $responseValidator->check(
             $passkey->credential(),
             $publicKeyCredential->response,
-            $this->verifyOptions(session()->pull('webauthn.challenge')),
+            $options,
             $request->getHost(),
-            null,
-            ($rpEntityId = config('statamic.webauthn.rp_entity.id')) ? [$rpEntityId] : []
+            $user->id()
         );
 
         // update passkey with latest data
@@ -182,29 +205,6 @@ class PasskeyController
             'createUrl' => cp_route('passkeys.create'),
             'deleteUrl' => substr(cp_route('passkeys.delete', ['id' => 0]), 0, -1),
         ]);
-    }
-
-    private function attestationSupportManager(): Webauthn\AttestationStatement\AttestationStatementSupportManager
-    {
-        $attestationStatementSupportManager = Webauthn\AttestationStatement\AttestationStatementSupportManager::create();
-        $attestationStatementSupportManager->add(Webauthn\AttestationStatement\NoneAttestationStatementSupport::create());
-
-        return $attestationStatementSupportManager;
-    }
-
-    private function credentialLoader(): Webauthn\PublicKeyCredentialLoader
-    {
-        $attestationObjectLoader = Webauthn\AttestationStatement\AttestationObjectLoader::create($this->attestationSupportManager());
-
-        return Webauthn\PublicKeyCredentialLoader::create($attestationObjectLoader);
-    }
-
-    private function rpEntity(): Webauthn\PublicKeyCredentialRpEntity
-    {
-        return Webauthn\PublicKeyCredentialRpEntity::create(
-            name: config('statamic.webauthn.rp_entity.name') ?? config('app.name'),
-            id: config('statamic.webauthn.rp_entity.id'),
-        );
     }
 
     private function successRedirectUrl()

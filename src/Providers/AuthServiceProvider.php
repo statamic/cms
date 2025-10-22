@@ -22,6 +22,12 @@ use Statamic\Contracts\Auth\UserRepository;
 use Statamic\Facades\Permission;
 use Statamic\Facades\User;
 use Statamic\Policies;
+use Symfony\Component\Serializer\SerializerInterface;
+use Webauthn\AttestationStatement\AttestationStatementSupportManager;
+use Webauthn\AttestationStatement\NoneAttestationStatementSupport;
+use Webauthn\CeremonyStep\CeremonyStepManagerFactory;
+use Webauthn\Denormalizer\WebauthnSerializerFactory;
+use Webauthn\PublicKeyCredentialRpEntity;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -85,6 +91,28 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(TwoFactorAuthenticationProviderContract::class, TwoFactorAuthenticationProvider::class);
+
+        $this->app->singleton(AttestationStatementSupportManager::class, function () {
+            $manager = AttestationStatementSupportManager::create();
+            $manager->add(NoneAttestationStatementSupport::create());
+
+            return $manager;
+        });
+
+        $this->app->singleton(
+            SerializerInterface::class,
+            fn ($app) => (new WebauthnSerializerFactory($app[AttestationStatementSupportManager::class]))->create()
+        );
+
+        $this->app->bind(
+            PublicKeyCredentialRpEntity::class,
+            fn ($app) => new PublicKeyCredentialRpEntity(
+                name: $app['config']->get('app.name'),
+                id: $app->make('request')->host(),
+            )
+        );
+
+        $this->app->singleton(CeremonyStepManagerFactory::class, fn () => new CeremonyStepManagerFactory);
     }
 
     public function boot()

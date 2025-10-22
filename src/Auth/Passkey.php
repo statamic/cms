@@ -6,8 +6,8 @@ use Carbon\Carbon;
 use Statamic\Contracts\Auth\Passkey as Contract;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Facades\User;
+use Symfony\Component\Serializer\SerializerInterface;
 use Webauthn\PublicKeyCredentialSource;
-use Webauthn\TrustPath\EmptyTrustPath;
 
 abstract class Passkey implements Contract
 {
@@ -82,7 +82,7 @@ abstract class Passkey implements Contract
         return [
             'name' => $this->name,
             'user' => $this->user,
-            'credential' => $this->credential->jsonSerialize(),
+            'credential' => $this->credentialToArray($this->credential),
             'last_login' => $this->lastLogin?->timestamp,
         ];
     }
@@ -95,11 +95,15 @@ abstract class Passkey implements Contract
         $this->lastLogin = $data['last_login'] ? Carbon::createFromTimestamp($data['last_login']) : null;
     }
 
+    private function credentialToArray(PublicKeyCredentialSource $credential): array
+    {
+        $json = app(SerializerInterface::class)->serialize($credential, 'json');
+
+        return json_decode($json, true);
+    }
+
     private function credentialFromArray(array $array): PublicKeyCredentialSource
     {
-        return PublicKeyCredentialSource::createFromArray([
-            ...$array,
-            'trustPath' => ['type' => EmptyTrustPath::class],
-        ]);
+        return app(SerializerInterface::class)->deserialize(json_encode($array), PublicKeyCredentialSource::class, 'json');
     }
 }
