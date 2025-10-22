@@ -482,9 +482,12 @@
                 .selectedCell {
                     @apply relative;
 
-                    &:after {
-                        @apply pointer-events-none absolute inset-0 bg-gray-400 opacity-25 dark:bg-gray-600;
+                    &::after {
+                        @apply pointer-events-none absolute inset-0 bg-gray-400 opacity-25;
                         content: '';
+                    }
+                    :is(.dark) &::after {
+                        @apply bg-gray-600;
                     }
                 }
 
@@ -518,8 +521,11 @@
 ========================================================================== */
 @layer ui {
     .bard-fieldtype .ProseMirror > p.is-editor-empty:first-child::before {
-        @apply text-gray-600 dark:text-gray-400 float-start h-0 pointer-events-none;
+        @apply text-gray-600 float-start h-0 pointer-events-none;
         content: attr(data-placeholder);
+    }
+    .dark .bard-fieldtype .ProseMirror > p.is-editor-empty:first-child::before {
+        @apply text-gray-400;
     }
 }
 
