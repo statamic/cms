@@ -42,9 +42,8 @@ class LoginController extends CpController
             'forgotPasswordUrl' => cp_route('password.request'),
             'submitUrl' => cp_route('login'),
             'passkeysEnabled' => config('statamic.webauthn.enabled'),
-            'passkeyOptionsUrl' => cp_route('passkeys.verify-options'),
-            'passkeyVerifyUrl' => cp_route('passkeys.verify'),
-
+            'passkeyOptionsUrl' => cp_route('passkeys.auth.options'),
+            'passkeyVerifyUrl' => cp_route('passkeys.auth'),
         ]);
     }
 

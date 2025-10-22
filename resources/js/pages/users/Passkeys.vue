@@ -10,8 +10,8 @@ import { toggleArchitecturalBackground } from '@/pages/layout/architectural-back
 
 const props = defineProps([
     'passkeys',
-    'optionsUrl',
     'createUrl',
+    'storeUrl',
     'deleteUrl',
 ])
 
@@ -41,7 +41,7 @@ async function createPasskey() {
     passkeyWaiting.value = true;
 
     const name = prompt(__('Enter a passkey name')) || `${__('Passkey')} ${props.passkeys.length + 1}`;
-    const authOptionsResponse = await fetch(props.optionsUrl);
+    const authOptionsResponse = await fetch(props.createUrl);
 
     let startRegistrationResponse;
     try {
@@ -52,7 +52,7 @@ async function createPasskey() {
         return;
     }
 
-    axios.post(props.createUrl, { ...startRegistrationResponse, name })
+    axios.post(props.storeUrl, { ...startRegistrationResponse, name })
         .then(response => {
             if (response && response.data.verified) {
                 router.reload();

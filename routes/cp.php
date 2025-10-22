@@ -23,6 +23,7 @@ use Statamic\Http\Controllers\CP\Auth\ForgotPasswordController;
 use Statamic\Http\Controllers\CP\Auth\ImpersonationController;
 use Statamic\Http\Controllers\CP\Auth\LoginController;
 use Statamic\Http\Controllers\CP\Auth\PasskeyController;
+use Statamic\Http\Controllers\CP\Auth\PasskeyLoginController;
 use Statamic\Http\Controllers\CP\Auth\ResetPasswordController;
 use Statamic\Http\Controllers\CP\Auth\TwoFactorChallengeController;
 use Statamic\Http\Controllers\CP\Auth\TwoFactorSetupController;
@@ -141,8 +142,8 @@ Route::group(['prefix' => 'auth'], function () {
     Route::get('stop-impersonating', [ImpersonationController::class, 'stop'])->name('impersonation.stop');
 
     Route::group(['prefix' => 'passkeys'], function () {
-        Route::get('verify', [PasskeyController::class, 'verifyOptions'])->name('passkeys.verify-options');
-        Route::post('verify', [PasskeyController::class, 'verify'])->name('passkeys.verify');
+        Route::post('/', [PasskeyLoginController::class, 'login'])->name('passkeys.auth');
+        Route::get('options', [PasskeyLoginController::class, 'options'])->name('passkeys.auth.options');
     });
 });
 
@@ -422,10 +423,10 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     });
 
     Route::group(['prefix' => 'passkeys'], function () {
-        Route::get('/', [PasskeyController::class, 'view'])->name('passkeys.view');
-        Route::get('create', [PasskeyController::class, 'createOptions'])->name('passkeys.create-options');
-        Route::post('create', [PasskeyController::class, 'create'])->name('passkeys.create');
-        Route::delete('delete/{id}', [PasskeyController::class, 'delete'])->name('passkeys.delete');
+        Route::get('/', [PasskeyController::class, 'index'])->name('passkeys.view');
+        Route::get('create', [PasskeyController::class, 'create'])->name('passkeys.create');
+        Route::post('/', [PasskeyController::class, 'store'])->name('passkeys.store');
+        Route::delete('{id}', [PasskeyController::class, 'destroy'])->name('passkeys.destroy');
     });
 
     Route::post('slug', SlugController::class);
