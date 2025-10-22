@@ -945,6 +945,7 @@ export default {
 
 <style>
 @layer ui {
+    /* This container query is inline because it breaks Vite's CSS compilation. Possibly because of the container query syntax and nesting */
     .bard-fixed-toolbar {
         /* While the fixed toolbar is "stuck", mask the focus state of the editor to prevent blue focus lines appearing around the side of the toolbar while scrolling */
         container-type: scroll-state;
