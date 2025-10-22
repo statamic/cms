@@ -3,10 +3,10 @@
 namespace Statamic\Auth;
 
 use Carbon\Carbon;
+use Statamic\Auth\WebAuthn\Serializer;
 use Statamic\Contracts\Auth\Passkey as Contract;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Facades\User;
-use Symfony\Component\Serializer\SerializerInterface;
 use Webauthn\PublicKeyCredentialSource;
 
 abstract class Passkey implements Contract
@@ -97,13 +97,13 @@ abstract class Passkey implements Contract
 
     private function credentialToArray(PublicKeyCredentialSource $credential): array
     {
-        $json = app(SerializerInterface::class)->serialize($credential, 'json');
+        $json = app(Serializer::class)->serialize($credential, 'json');
 
         return json_decode($json, true);
     }
 
     private function credentialFromArray(array $array): PublicKeyCredentialSource
     {
-        return app(SerializerInterface::class)->deserialize(json_encode($array), PublicKeyCredentialSource::class, 'json');
+        return app(Serializer::class)->deserialize(json_encode($array), PublicKeyCredentialSource::class, 'json');
     }
 }

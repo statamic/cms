@@ -15,6 +15,7 @@ use Statamic\Auth\Protect\ProtectorManager;
 use Statamic\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 use Statamic\Auth\UserProvider;
 use Statamic\Auth\UserRepositoryManager;
+use Statamic\Auth\WebAuthn\Serializer;
 use Statamic\Contracts\Auth\RoleRepository;
 use Statamic\Contracts\Auth\TwoFactor\TwoFactorAuthenticationProvider as TwoFactorAuthenticationProviderContract;
 use Statamic\Contracts\Auth\UserGroupRepository;
@@ -22,7 +23,6 @@ use Statamic\Contracts\Auth\UserRepository;
 use Statamic\Facades\Permission;
 use Statamic\Facades\User;
 use Statamic\Policies;
-use Symfony\Component\Serializer\SerializerInterface;
 use Webauthn\AttestationStatement\AttestationStatementSupportManager;
 use Webauthn\AttestationStatement\NoneAttestationStatementSupport;
 use Webauthn\CeremonyStep\CeremonyStepManagerFactory;
@@ -100,8 +100,10 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(
-            SerializerInterface::class,
-            fn ($app) => (new WebauthnSerializerFactory($app[AttestationStatementSupportManager::class]))->create()
+            Serializer::class,
+            fn ($app) => new Serializer(
+                (new WebauthnSerializerFactory($app[AttestationStatementSupportManager::class]))->create()
+            )
         );
 
         $this->app->bind(

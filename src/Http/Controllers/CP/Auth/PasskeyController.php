@@ -7,10 +7,10 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Statamic\Auth\WebAuthn\Serializer;
 use Statamic\Contracts\Auth\Passkey;
 use Statamic\Facades\User;
 use Statamic\Support\Str;
-use Symfony\Component\Serializer\SerializerInterface;
 use Webauthn;
 use Webauthn\CeremonyStep\CeremonyStepManagerFactory;
 use Webauthn\PublicKeyCredentialCreationOptions;
@@ -27,7 +27,7 @@ class PasskeyController
 
         $options = $this->publicKeyCredentialCreationOptions($user, $challenge);
 
-        return app(SerializerInterface::class)->normalize($options);
+        return app(Serializer::class)->normalize($options);
     }
 
     private function publicKeyCredentialCreationOptions($user, $challenge = false): PublicKeyCredentialCreationOptions
@@ -53,7 +53,7 @@ class PasskeyController
     public function create(Request $request)
     {
         // https://webauthn-doc.spomky-labs.com/pure-php/authenticator-registration#creation-response
-        $publicKeyCredential = app(SerializerInterface::class)->deserialize(
+        $publicKeyCredential = app(Serializer::class)->deserialize(
             json_encode($request->all()),
             Webauthn\PublicKeyCredential::class,
             'json'
@@ -120,7 +120,7 @@ class PasskeyController
     {
         $options = $this->publicKeyCredentialRequestOptions($challenge);
 
-        return app(SerializerInterface::class)->normalize($options);
+        return app(Serializer::class)->normalize($options);
     }
 
     private function publicKeyCredentialRequestOptions($challenge = false): PublicKeyCredentialRequestOptions
@@ -139,7 +139,7 @@ class PasskeyController
     public function verify(Request $request)
     {
         // https://webauthn-doc.spomky-labs.com/pure-php/authenticate-your-users#response-verification
-        $publicKeyCredential = app(SerializerInterface::class)->deserialize(
+        $publicKeyCredential = app(Serializer::class)->deserialize(
             $request->getContent(),
             Webauthn\PublicKeyCredential::class,
             'json'

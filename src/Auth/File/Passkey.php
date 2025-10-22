@@ -3,7 +3,7 @@
 namespace Statamic\Auth\File;
 
 use Statamic\Auth\Passkey as BasePasskey;
-use Symfony\Component\Serializer\SerializerInterface;
+use Statamic\Auth\WebAuthn\Serializer;
 
 class Passkey extends BasePasskey
 {
@@ -36,7 +36,7 @@ class Passkey extends BasePasskey
         return [
             'name' => $this->name(),
             'last_login' => $this->lastLogin()?->timestamp ?? null,
-            'credential' => app(SerializerInterface::class)->normalize($this->credential()),
+            'credential' => app(Serializer::class)->normalize($this->credential()),
         ];
     }
 }
