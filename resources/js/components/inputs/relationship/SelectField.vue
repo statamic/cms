@@ -23,7 +23,7 @@
                         <StatusIndicator v-if="status" class="me-2" :status="status" />
                         <div v-text="title" class="truncate" />
                     </div>
-                    <ui-badge v-if="hint" size="sm" variant="flat" v-text="hint" />
+                    <ui-badge v-if="hint" size="sm" v-text="hint" />
                 </div>
             </template>
             <template #no-options>
