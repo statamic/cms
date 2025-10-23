@@ -43,7 +43,7 @@ class PasskeyController
         return ['verified' => true];
     }
 
-    public function destroy(Request $request, $id)
+    public function destroy($id)
     {
         if (! $passkey = User::current()->passkeys()->get($id)) {
             abort(403);
