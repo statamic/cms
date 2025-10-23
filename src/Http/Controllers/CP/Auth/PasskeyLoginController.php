@@ -2,92 +2,41 @@
 
 namespace Statamic\Http\Controllers\CP\Auth;
 
-use Exception;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Statamic\Auth\WebAuthn\Serializer;
-use Statamic\Contracts\Auth\Passkey;
-use Statamic\Facades\User;
+use Statamic\Contracts\Auth\User as UserContract;
+use Statamic\Facades\WebAuthn;
 use Statamic\Support\Str;
-use Webauthn;
-use Webauthn\CeremonyStep\CeremonyStepManagerFactory;
-use Webauthn\PublicKeyCredentialRequestOptions;
 
 class PasskeyLoginController
 {
-    public function options($challenge = false)
+    public function options()
     {
-        $options = $this->publicKeyCredentialRequestOptions($challenge);
+        $options = WebAuthn::prepareAssertion();
 
         return app(Serializer::class)->normalize($options);
     }
 
-    private function publicKeyCredentialRequestOptions($challenge = false): PublicKeyCredentialRequestOptions
-    {
-        if (! $challenge) {
-            $challenge = random_bytes(32);
-            session()->put('webauthn.challenge', $challenge);
-        }
-
-        return PublicKeyCredentialRequestOptions::create(
-            $challenge,
-            userVerification: PublicKeyCredentialRequestOptions::USER_VERIFICATION_REQUIREMENT_REQUIRED
-        );
-    }
-
     public function login(Request $request)
     {
-        // https://webauthn-doc.spomky-labs.com/pure-php/authenticate-your-users#response-verification
-        $publicKeyCredential = app(Serializer::class)->deserialize(
-            $request->getContent(),
-            Webauthn\PublicKeyCredential::class,
-            'json'
-        );
+        $credentials = $request->only(['id', 'rawId', 'response', 'type']);
 
-        if (! $publicKeyCredential->response instanceof Webauthn\AuthenticatorAssertionResponse) {
-            throw new Exception(__('Invalid credentials'));
-        }
+        $user = WebAuthn::getUserFromCredentials($credentials);
 
-        $user = User::find($publicKeyCredential->response->userHandle);
+        WebAuthn::validateAssertion($user, $credentials);
 
-        if (! $passkey = $user->passkeys()->firstWhere(fn (Passkey $key) => $key->credential()->publicKeyCredentialId === $publicKeyCredential->rawId)) {
-            throw new Exception(__('No matching passkey found'));
-        }
+        $this->authenticate($user);
 
-        $responseValidator = Webauthn\AuthenticatorAssertionResponseValidator::create(
-            app(CeremonyStepManagerFactory::class)->requestCeremony()
-        );
+        return ['redirect' => $this->successRedirectUrl()];
+    }
 
-        $options = $this->publicKeyCredentialRequestOptions(
-            session()->pull('webauthn.challenge')
-        );
+    private function authenticate(UserContract $user): void
+    {
+        Auth::login($user, config('statamic.webauthn.remember_me', true));
 
-        $publicKeyCredentialSource = $responseValidator->check(
-            $passkey->credential(),
-            $publicKeyCredential->response,
-            $options,
-            $request->getHost(),
-            $user->id()
-        );
-
-        // update passkey with latest data
-        $passkey
-            ->setCredential($publicKeyCredentialSource)
-            ->setLastLogin(now());
-        $passkey->save();
-
-        Auth::login($passkey->user(), config('statamic.webauthn.remember_me', true));
         session()->elevate();
         session()->regenerate();
-
-        if ($request->wantsJson()) {
-            return new JsonResponse([
-                'redirect' => $this->successRedirectUrl(),
-            ], 200);
-        }
-
-        return redirect()->to($this->successRedirectUrl());
     }
 
     private function successRedirectUrl()

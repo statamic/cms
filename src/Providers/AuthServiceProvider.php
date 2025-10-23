@@ -25,6 +25,7 @@ use Statamic\Facades\User;
 use Statamic\Policies;
 use Webauthn\AttestationStatement\AttestationStatementSupportManager;
 use Webauthn\AttestationStatement\NoneAttestationStatementSupport;
+use Webauthn\AuthenticatorAssertionResponseValidator;
 use Webauthn\CeremonyStep\CeremonyStepManagerFactory;
 use Webauthn\Denormalizer\WebauthnSerializerFactory;
 use Webauthn\PublicKeyCredentialRpEntity;
@@ -115,6 +116,13 @@ class AuthServiceProvider extends ServiceProvider
         );
 
         $this->app->singleton(CeremonyStepManagerFactory::class, fn () => new CeremonyStepManagerFactory);
+
+        $this->app->bind(
+            AuthenticatorAssertionResponseValidator::class,
+            fn ($app) => AuthenticatorAssertionResponseValidator::create(
+                $app[CeremonyStepManagerFactory::class]->requestCeremony()
+            )
+        );
     }
 
     public function boot()
