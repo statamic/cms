@@ -33,15 +33,19 @@ class LoginController extends CpController
 
     public function showLoginForm(Request $request)
     {
+        $oauthEnabled = OAuth::enabled();
+        $emailLoginEnabled = $oauthEnabled ? config('statamic.oauth.email_login_enabled') : true;
+        $passkeysEnabled = $emailLoginEnabled && config('statamic.webauthn.enabled');
+
         return Inertia::render('auth/Login', [
             'title' => __('Log in'),
-            'oauthEnabled' => $enabled = OAuth::enabled(),
-            'emailLoginEnabled' => $enabled ? config('statamic.oauth.email_login_enabled') : true,
-            'providers' => $enabled ? $this->oauthProviders() : [],
+            'oauthEnabled' => $oauthEnabled,
+            'emailLoginEnabled' => $emailLoginEnabled,
+            'providers' => $oauthEnabled ? $this->oauthProviders() : [],
             'referer' => $this->getReferrer($request),
             'forgotPasswordUrl' => cp_route('password.request'),
             'submitUrl' => cp_route('login'),
-            'passkeysEnabled' => config('statamic.webauthn.enabled'),
+            'passkeysEnabled' => $passkeysEnabled,
             'passkeyOptionsUrl' => cp_route('passkeys.auth.options'),
             'passkeyVerifyUrl' => cp_route('passkeys.auth'),
         ]);
