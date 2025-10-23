@@ -310,7 +310,7 @@ defineExpose({
                             </button>
 
                             <button type="button" v-else class="w-full text-start bg-transparent flex items-center gap-2 cursor-pointer focus-none" @keydown.space="openDropdown" data-ui-combobox-selected-option>
-                                <slot name="selected-option" v-bind="{ option: selectedOption }">
+                                <slot v-if="selectedOption" name="selected-option" v-bind="{ option: selectedOption }">
                                     <div v-if="icon" class="size-4">
                                         <Icon :name="icon" class="text-white/85 dark:text-white dark:opacity-50" />
                                     </div>
