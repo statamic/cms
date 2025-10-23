@@ -8,9 +8,13 @@
             <div
                 v-if="variant === 'between'"
                 class="flex justify-center relative group py-3"
-                :class="isFirst ? '-mt-2' : ''"
+                :class="{ '-mt-2': isFirst }"
             >
-                <div v-if="showConnector" class="absolute opacity-100 group-hover:opacity-0 transition-opacity delay-10 duration-250 inset-y-0 h-full left-3.5 border-l-1 border-gray-400 dark:border-gray-600 border-dashed z-0 dark:bg-dark-700" />
+                <div
+                    v-if="showConnector"
+                    class="absolute opacity-100 group-hover:opacity-0 transition-opacity delay-10 duration-250 inset-y-0 left-3.5 border-l-1 border-gray-400 dark:border-gray-600 border-dashed z-0 dark:bg-dark-700"
+                    :class="isFirst ? 'h-[70%] top-[30%]' : 'h-full'"
+                />
                 <button class="w-full absolute inset-0 h-full opacity-0 group-hover:opacity-100 transition-opacity delay-10 duration-250 cursor-pointer">
                     <div class="h-full flex flex-col justify-center">
                         <div class="rounded-full bg-gray-200 dark:bg-gray-700 h-2" />
