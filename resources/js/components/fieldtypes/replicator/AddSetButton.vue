@@ -13,7 +13,7 @@
                 <div
                     v-if="showConnector"
                     class="absolute group-hover:opacity-0 transition-opacity delay-10 duration-250 inset-y-0 left-3.5 border-l-1 border-gray-400 dark:border-gray-600 border-dashed z-0 dark:bg-dark-700"
-                    :class="isFirst ? 'h-[55%] top-[45%] opacity-75' : 'h-full opacity-100'"
+                    :class="isFirst ? 'h-[50%] top-[50%] opacity-50' : 'h-full opacity-100'"
                 />
                 <button class="w-full absolute inset-0 h-full opacity-0 group-hover:opacity-100 transition-opacity delay-10 duration-250 cursor-pointer">
                     <div class="h-full flex flex-col justify-center">
