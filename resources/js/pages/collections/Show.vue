@@ -371,7 +371,6 @@ export default {
 
             // Fallback logic
             if (this.canUseStructureTree) return 'tree';
-            if (this.canUseCalendar) return 'calendar';
             return 'list';
         },
 
