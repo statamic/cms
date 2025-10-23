@@ -94,6 +94,11 @@ class AuthServiceProvider extends ServiceProvider
 
         $this->app->singleton(TwoFactorAuthenticationProviderContract::class, TwoFactorAuthenticationProvider::class);
 
+        $this->registerWebauthnBindings();
+    }
+
+    private function registerWebAuthnBindings()
+    {
         $this->app->singleton(AttestationStatementSupportManager::class, function () {
             $manager = AttestationStatementSupportManager::create();
             $manager->add(NoneAttestationStatementSupport::create());
