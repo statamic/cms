@@ -4,11 +4,6 @@ return [
 
     'enabled' => env('STATAMIC_WEBAUTHN_ENABLED', true),
 
-    'rp_entity' => [
-        'name' => null, // defaults to app.name
-        'id' => null, // defaults to app.url
-    ],
-
     /*
     |--------------------------------------------------------------------------
     | Allow password logins to be used when user has a passkey
