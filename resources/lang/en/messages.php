@@ -172,6 +172,7 @@ return [
     'licensing_utility_description' => 'View and resolve licensing details.',
     'max_depth_instructions' => 'Set the max page nesting level.',
     'max_items_instructions' => 'Set a maximum number of selectable items.',
+    'passkeys_configure_intro' => 'Passkeys allow for a more secure, password-less authentication experience.',
     'plus_count_more' => '+ :count more',
     'navigation_configure_blueprint_instructions' => 'Choose from existing blueprints or create a new one.',
     'navigation_configure_collections_instructions' => 'Enable linking to entries in these collections.',
