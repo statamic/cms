@@ -100,7 +100,7 @@ const previewText = computed(() => {
 
             return escapeHtml(JSON.stringify(value));
         })
-        .join(' / ');
+        .join(' <span class="text-gray-400 dark:text-gray-600">/</span> ');
 });
 
 function toggleEnabledState() {
