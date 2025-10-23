@@ -7,7 +7,8 @@
             </div>
             <div
                 v-if="variant === 'between'"
-                class="flex justify-center py-3 relative group"
+                class="flex justify-center relative group py-3"
+                :class="isFirst ? '-mt-2' : ''"
             >
                 <div v-if="showConnector" class="absolute opacity-100 group-hover:opacity-0 transition-opacity delay-10 duration-250 inset-y-0 h-full left-3.5 border-l-1 border-gray-400 dark:border-gray-600 border-dashed z-0 dark:bg-dark-700" />
                 <button class="w-full absolute inset-0 h-full opacity-0 group-hover:opacity-100 transition-opacity delay-10 duration-250 cursor-pointer">
@@ -36,6 +37,7 @@ const props = defineProps({
     label: { type: String },
     showConnector: { type: Boolean, default: true },
     variant: { type: String, default: 'button' },
+    isFirst: { type: Boolean, default: false },
 });
 
 const label = computed(() => props.label ? __(props.label) : __('Add Block'));

@@ -59,6 +59,7 @@
                                             :sets="setConfigs"
                                             :index="index"
                                             :enabled="canAddSet"
+                                            :is-first="index === 0"
                                             @added="addSet"
                                         />
                                     </template>
