@@ -16,11 +16,8 @@ const classes = cva({
             lg: 'text-base',
             xl: 'text-lg',
         },
-        icon: {
-            true: 'flex items-center gap-2',
-        },
     },
-})({ ...props, icon: props.icon ? true : false });
+})({ ...props });
 </script>
 
 <template>
