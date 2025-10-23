@@ -8,7 +8,6 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\WebAuthn\Serializer;
 use Statamic\Auth\WebAuthn\WebAuthn;
 use Statamic\Contracts\Auth\Passkey;
-use Statamic\Facades\User as UserFacade;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 use Webauthn\AuthenticatorAssertionResponse;
@@ -20,7 +19,6 @@ use Webauthn\PublicKeyCredential;
 use Webauthn\PublicKeyCredentialRequestOptions;
 use Webauthn\PublicKeyCredentialRpEntity;
 use Webauthn\PublicKeyCredentialSource;
-use Webauthn\TrustPath\EmptyTrustPath;
 
 #[Group('passkeys')]
 class WebAuthnTest extends TestCase
