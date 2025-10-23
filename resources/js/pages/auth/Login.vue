@@ -11,7 +11,6 @@ defineOptions({ layout: Outside });
 const props = defineProps([
     'errors',
     'emailLoginEnabled',
-    'passkeysEnabled',
     'passkeyOptionsUrl',
     'passkeyVerifyUrl',
     'oauthEnabled',
@@ -50,7 +49,7 @@ const submit = () => {
 const passkey = usePasskey();
 
 const showPasskeyLogin = computed(() => {
-    return props.passkeysEnabled && passkey.supported;
+    return props.emailLoginEnabled && passkey.supported;
 })
 
 async function loginWithPasskey() {

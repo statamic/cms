@@ -35,7 +35,6 @@ class LoginController extends CpController
     {
         $oauthEnabled = OAuth::enabled();
         $emailLoginEnabled = $oauthEnabled ? config('statamic.oauth.email_login_enabled') : true;
-        $passkeysEnabled = $emailLoginEnabled && config('statamic.webauthn.enabled');
 
         return Inertia::render('auth/Login', [
             'title' => __('Log in'),
@@ -45,7 +44,6 @@ class LoginController extends CpController
             'referer' => $this->getReferrer($request),
             'forgotPasswordUrl' => cp_route('password.request'),
             'submitUrl' => cp_route('login'),
-            'passkeysEnabled' => $passkeysEnabled,
             'passkeyOptionsUrl' => cp_route('passkeys.auth.options'),
             'passkeyVerifyUrl' => cp_route('passkeys.auth'),
         ]);
@@ -155,7 +153,7 @@ class LoginController extends CpController
 
     private function checkPasskeyEnforcement(Request $request)
     {
-        if (config('statamic.webauthn.enabled', false) && ! config('statamic.webauthn.allow_password_login_with_passkey', true)) {
+        if (! config('statamic.webauthn.allow_password_login_with_passkey', true)) {
             if ($user = User::findByEmail($request->get($this->username()))) {
                 if ($user->passkeys()->isNotEmpty()) {
                     throw ValidationException::withMessages([

@@ -2,8 +2,6 @@
 
 return [
 
-    'enabled' => env('STATAMIC_WEBAUTHN_ENABLED', true),
-
     /*
     |--------------------------------------------------------------------------
     | Allow password logins to be used when user has a passkey
