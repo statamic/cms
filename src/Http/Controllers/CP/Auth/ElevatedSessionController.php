@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
+use Statamic\Auth\WebAuthn\Serializer;
 use Statamic\Facades\User;
+use Statamic\Facades\WebAuthn;
 
 class ElevatedSessionController
 {
@@ -27,6 +29,13 @@ class ElevatedSessionController
         return $response;
     }
 
+    public function options()
+    {
+        $options = WebAuthn::prepareAssertion();
+
+        return app(Serializer::class)->normalize($options);
+    }
+
     public function showForm()
     {
         $user = User::current();
@@ -38,8 +47,10 @@ class ElevatedSessionController
         return Inertia::render('auth/ConfirmPassword', [
             'method' => $method,
             'status' => session('status'),
+            'allowPasskey' => $method !== 'verification_code' && $user->passkeys()->isNotEmpty(),
             'submitUrl' => cp_route('elevated-session.confirm'),
             'resendUrl' => cp_route('elevated-session.resend-code'),
+            'passkeyOptionsUrl' => cp_route('elevated-session.passkey-options'),
         ]);
     }
 
@@ -48,11 +59,13 @@ class ElevatedSessionController
         $user = User::current();
 
         $request->validate([
-            'password' => 'required_without:verification_code',
-            'verification_code' => 'required_without:password',
+            'password' => 'required_without_all:verification_code,id',
+            'verification_code' => 'required_without_all:password,id',
+            'id' => 'required_without_all:password,verification_code',
         ], [
-            'password.required_without' => __('statamic::validation.required'),
-            'verification_code.required_without' => __('statamic::validation.required'),
+            'password.required_without_all' => __('statamic::validation.required'),
+            'verification_code.required_without_all' => __('statamic::validation.required'),
+            'id.required_without_all' => __('statamic::validation.required'),
         ]);
 
         if ($request->password && ! Hash::check($request->password, $user->password())) {
@@ -67,11 +80,18 @@ class ElevatedSessionController
             ]);
         }
 
+        if ($request->id) {
+            $credentials = $request->only(['id', 'rawId', 'response', 'type']);
+            WebAuthn::validateAssertion($user, $credentials);
+        }
+
         session()->elevate();
 
+        $redirect = redirect()->intended(cp_route('index'));
+
         return $request->wantsJson()
-            ? $this->status($request)
-            : redirect()->intended(cp_route('index'))->with('success', $user->getElevatedSessionMethod() === 'password_confirmation' ? __('Password confirmed') : __('Code verified'));
+            ? array_merge($this->status($request), ['redirect' => $redirect->getTargetUrl()])
+            : $redirect->with('success', $user->getElevatedSessionMethod() === 'password_confirmation' ? __('Password confirmed') : __('Code verified'));
     }
 
     public function resendCode()

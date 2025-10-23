@@ -4,8 +4,7 @@ import Outside from '@/pages/layout/Outside.vue';
 import { AuthCard, Input, Field, Button, Separator, Checkbox, ErrorMessage } from '@ui';
 import { Link, router } from '@inertiajs/vue3';
 import { computed, ref, watch } from 'vue';
-import { startAuthentication, browserSupportsWebAuthn } from '@simplewebauthn/browser';
-import axios from 'axios';
+import { usePasskey } from '@/composables/passkey';
 
 defineOptions({ layout: Outside });
 
@@ -48,49 +47,22 @@ const submit = () => {
     });
 }
 
-const passkeyError = ref(null);
-const passkeyWaiting = ref(false);
+const passkey = usePasskey();
 
 const showPasskeyLogin = computed(() => {
-    return props.passkeysEnabled && browserSupportsWebAuthn();
+    return props.passkeysEnabled && passkey.supported;
 })
 
 async function loginWithPasskey() {
-    passkeyWaiting.value = true;
-    const authOptionsResponse = await fetch(props.passkeyOptionsUrl);
-    const authOptionsJson = await authOptionsResponse.json();
-
-    let startAuthResponse;
-    try {
-        startAuthResponse = await startAuthentication(authOptionsJson);
-    } catch (e) {
-        console.error(e);
-        passkeyError.value = __('Authentication failed.');
-        passkeyWaiting.value = false;
-        return;
-    }
-
-    axios.post(props.passkeyVerifyUrl, startAuthResponse)
-        .then(response => {
-            if (response && response.data.redirect) {
-                window.location = response.data.redirect;
-                return;
+    await passkey.authenticate(
+        props.passkeyOptionsUrl,
+        props.passkeyVerifyUrl,
+        (data) => {
+            if (data.redirect) {
+                window.location = data.redirect;
             }
-
-            passkeyError.value = response.data.message;
-        }).catch(e => handleAxiosError(e))
-        .finally(() => passkeyWaiting.value = false);
-}
-
-
-function handleAxiosError(e) {
-    if (e.response) {
-        const { message, errors } = e.response.data;
-        passkeyError.value = message;
-        return;
-    }
-
-    passkeyError.value = __('Something went wrong');
+        }
+    );
 }
 </script>
 
@@ -129,19 +101,19 @@ function handleAxiosError(e) {
                 <Button type="submit" variant="primary" :disabled="processing" :text="__('Continue')" tabindex="5" />
             </form>
 
-            <template v-if="showAuth || showPasskeyLogin">
+            <template v-if="showOAuth || showPasskeyLogin">
                 <Separator v-if="emailLoginEnabled" variant="dots" :text="__('Or sign in with')" class="py-3" />
                 <div class="flex flex-col gap-y-4">
                     <template v-if="showPasskeyLogin">
                         <Button
                             :text="__('Passkey')"
                             class="w-full"
-                            :icon="passkeyWaiting ? null : 'key'"
-                            :disabled="passkeyWaiting"
-                            :loading="passkeyWaiting"
+                            :icon="passkey.waiting.value ? null : 'key'"
+                            :disabled="passkey.waiting.value"
+                            :loading="passkey.waiting.value"
                             @click="loginWithPasskey"
                         />
-                        <ErrorMessage v-if="passkeyError" :text="passkeyError" />
+                        <ErrorMessage v-if="passkey.error.value" :text="passkey.error.value" />
                     </template>
                     <div v-if="showOAuth" class="flex gap-4 justify-center items-center">
                         <Button

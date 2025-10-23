@@ -435,6 +435,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::get('auth/confirm-password', [ElevatedSessionController::class, 'showForm'])->name('confirm-password');
     Route::get('elevated-session', [ElevatedSessionController::class, 'status'])->name('elevated-session.status');
+    Route::get('elevated-session/passkey-options', [ElevatedSessionController::class, 'options'])->name('elevated-session.passkey-options');
     Route::post('elevated-session', [ElevatedSessionController::class, 'confirm'])->name('elevated-session.confirm');
     Route::get('elevated-session/resend-code', [ElevatedSessionController::class, 'resendCode'])->name('elevated-session.resend-code')->middleware('throttle:send-elevated-session-code');
 
