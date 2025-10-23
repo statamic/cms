@@ -23,7 +23,6 @@ watch(
 
 const error = ref(null);
 const showErrorModal = computed(() => !!error.value);
-const showWebAuthn = browserSupportsWebAuthn();
 const passkeyWaiting = ref(false);
 
 const columns = [
@@ -38,6 +37,11 @@ function deletePasskey(passkey) {
 }
 
 async function createPasskey() {
+    if (! browserSupportsWebAuthn()) {
+        alert(__('statamic::messages.passkeys_browser_unsupported'));
+        return;
+    }
+
     passkeyWaiting.value = true;
 
     const name = prompt(__('Enter a passkey name')) || `${__('Passkey')} ${props.passkeys.length + 1}`;
@@ -90,10 +94,6 @@ function handleAxiosError(e) {
             />
         </template>
     </Header>
-
-    <div v-if="!showWebAuthn">
-        {{ __('statamic::messages.passkeys_browser_unsupported') }}
-    </div>
 
     <Listing
         v-if="passkeys.length"
