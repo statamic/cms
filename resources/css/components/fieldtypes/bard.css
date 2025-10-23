@@ -227,7 +227,7 @@
     }
 
     .bard-footer-toolbar {
-        @apply flex items-center justify-between rounded-b border-t bg-white p-2 text-xs text-gray-700 shadow-none dark:border-dark-300 dark:bg-dark-550 dark:text-dark-175;
+        @apply flex items-center justify-between rounded-b border-t bg-white p-2 text-xs text-gray-700 shadow-none dark:border-dark-300 dark:bg-dark-800 dark:text-dark-175;
         padding: 8px 12px;
 
         .bard-fullscreen & {
