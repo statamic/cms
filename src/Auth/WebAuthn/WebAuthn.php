@@ -8,14 +8,21 @@ use Statamic\Contracts\Auth\User;
 use Statamic\Facades\User as UserFacade;
 use Webauthn\AuthenticatorAssertionResponse;
 use Webauthn\AuthenticatorAssertionResponseValidator;
+use Webauthn\AuthenticatorAttestationResponse;
+use Webauthn\AuthenticatorAttestationResponseValidator;
 use Webauthn\PublicKeyCredential;
+use Webauthn\PublicKeyCredentialCreationOptions;
 use Webauthn\PublicKeyCredentialRequestOptions;
+use Webauthn\PublicKeyCredentialRpEntity;
+use Webauthn\PublicKeyCredentialUserEntity;
 
 class WebAuthn
 {
     public function __construct(
-        private AuthenticatorAssertionResponseValidator $responseValidator,
-        private Serializer $serializer
+        private AuthenticatorAssertionResponseValidator $assertionResponseValidator,
+        private AuthenticatorAttestationResponseValidator $attestationResponseValidator,
+        private Serializer $serializer,
+        private PublicKeyCredentialRpEntity $rpEntity
     ) {
         //
     }
@@ -37,7 +44,7 @@ class WebAuthn
 
         $options = $this->getRequestOptions(session()->pull('webauthn.challenge'));
 
-        $publicKeyCredentialSource = $this->responseValidator->check(
+        $publicKeyCredentialSource = $this->assertionResponseValidator->check(
             $passkey->credential(),
             $publicKeyCredential->response,
             $options,
@@ -68,6 +75,41 @@ class WebAuthn
         return $user;
     }
 
+    public function prepareAttestation(User $user): PublicKeyCredentialCreationOptions
+    {
+        $challenge = random_bytes(16);
+
+        session()->put('webauthn.challenge', $challenge);
+
+        return $this->getCreationOptions($user, $challenge);
+    }
+
+    public function validateAttestation(User $user, array $credentials, string $name): Passkey
+    {
+        $publicKeyCredential = $this->getPublicKeyCredential($credentials);
+
+        if (! $publicKeyCredential->response instanceof AuthenticatorAttestationResponse) {
+            throw new Exception(__('Invalid credentials'));
+        }
+
+        $options = $this->getCreationOptions($user, session()->pull('webauthn.challenge'));
+
+        $publicKeyCredentialSource = $this->attestationResponseValidator->check(
+            $publicKeyCredential->response,
+            $options,
+            request()->getHost()
+        );
+
+        $passkey = app(Passkey::class)
+            ->setUser($user)
+            ->setName($name)
+            ->setCredential($publicKeyCredentialSource);
+
+        $passkey->save();
+
+        return $passkey;
+    }
+
     private function getRequestOptions(?string $challenge): PublicKeyCredentialRequestOptions
     {
         return PublicKeyCredentialRequestOptions::create(
@@ -95,6 +137,21 @@ class WebAuthn
             json_encode($credentials),
             PublicKeyCredential::class,
             'json'
+        );
+    }
+
+    private function getCreationOptions(User $user, string $challenge): PublicKeyCredentialCreationOptions
+    {
+        $userEntity = PublicKeyCredentialUserEntity::create(
+            $user->email(),
+            $user->id(),
+            $user->name()
+        );
+
+        return PublicKeyCredentialCreationOptions::create(
+            $this->rpEntity,
+            $userEntity,
+            $challenge
         );
     }
 }

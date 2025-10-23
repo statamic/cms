@@ -13,10 +13,12 @@ use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 use Webauthn\AuthenticatorAssertionResponse;
 use Webauthn\AuthenticatorAssertionResponseValidator;
+use Webauthn\AuthenticatorAttestationResponseValidator;
 use Webauthn\AuthenticatorData;
 use Webauthn\CollectedClientData;
 use Webauthn\PublicKeyCredential;
 use Webauthn\PublicKeyCredentialRequestOptions;
+use Webauthn\PublicKeyCredentialRpEntity;
 use Webauthn\PublicKeyCredentialSource;
 use Webauthn\TrustPath\EmptyTrustPath;
 
@@ -25,17 +27,26 @@ class WebAuthnTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    private AuthenticatorAssertionResponseValidator $mockValidator;
+    private AuthenticatorAssertionResponseValidator $mockAssertionValidator;
+    private AuthenticatorAttestationResponseValidator $mockAttestationValidator;
     private Serializer $mockSerializer;
+    private PublicKeyCredentialRpEntity $mockRpEntity;
     private WebAuthn $webauthn;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->mockValidator = Mockery::mock(AuthenticatorAssertionResponseValidator::class);
+        $this->mockAssertionValidator = Mockery::mock(AuthenticatorAssertionResponseValidator::class);
+        $this->mockAttestationValidator = Mockery::mock(AuthenticatorAttestationResponseValidator::class);
         $this->mockSerializer = Mockery::mock(Serializer::class);
-        $this->webauthn = new WebAuthn($this->mockValidator, $this->mockSerializer);
+        $this->mockRpEntity = PublicKeyCredentialRpEntity::create('localhost');
+        $this->webauthn = new WebAuthn(
+            $this->mockAssertionValidator,
+            $this->mockAttestationValidator,
+            $this->mockSerializer,
+            $this->mockRpEntity
+        );
     }
 
     #[Test]
@@ -207,7 +218,7 @@ class WebAuthnTest extends TestCase
             ->once()
             ->andReturn($publicKeyCredential);
 
-        $this->mockValidator
+        $this->mockAssertionValidator
             ->shouldReceive('check')
             ->once()
             ->andReturn($updatedCredentialSource);
