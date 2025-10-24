@@ -263,12 +263,13 @@
             &::after {
                 --height: 1px;
                 --line-color: hsl(0deg 0% 95%);
+                --border-slice: 0;
                 content: '';
                 pointer-events: none;
                 position: absolute;
                 inset: 0;
                 height: var(--height);
-                border-image: conic-gradient(var(--line-color) 0 0) fill 0//0 100vw;
+                border-image: conic-gradient(var(--line-color) 0 0) fill var(--border-slice) / var(--border-slice) / 100vw;
                 top: calc(50% - var(--height));
             }
             .dark &::after {
