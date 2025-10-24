@@ -158,6 +158,11 @@ export default {
     },
 
     async start() {
+        config.initialize(this.initialConfig);
+        theme.initialize(this.initialConfig.user?.theme);
+        contrast.initialize(this.initialConfig.user?.preferences?.strict_accessibility);
+        preferences.initialize(this.initialConfig.user?.preferences, this.initialConfig.defaultPreferences);
+
         bootingCallbacks.forEach((callback) => callback(this));
         bootingCallbacks = [];
 
@@ -233,11 +238,6 @@ export default {
         this.$app.use(VueClickAway);
         this.$app.use(FloatingVue, { disposeTimeout: 30000, distance: 10 });
         this.$app.use(VueComponentDebug, { enabled: import.meta.env.VITE_VUE_COMPONENT_DEBUG === 'true' });
-
-        config.initialize(this.initialConfig);
-        theme.initialize(this.initialConfig.user?.theme);
-        contrast.initialize(this.initialConfig.user?.preferences?.strict_accessibility);
-        preferences.initialize(this.initialConfig.user?.preferences, this.initialConfig.defaultPreferences);
         toast.initialize(this.$app);
 
         Object.assign(this.$app.config.globalProperties, {
