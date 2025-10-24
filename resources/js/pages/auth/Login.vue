@@ -1,15 +1,18 @@
 <script setup>
 import Head from '@/pages/layout/Head.vue';
 import Outside from '@/pages/layout/Outside.vue';
-import { AuthCard, Input, Field, Button, Separator, Checkbox } from '@ui';
+import { AuthCard, Input, Field, Button, Separator, Checkbox, ErrorMessage } from '@ui';
 import { Link, router } from '@inertiajs/vue3';
 import { computed, ref, watch } from 'vue';
+import { usePasskey } from '@/composables/passkey';
 
 defineOptions({ layout: Outside });
 
 const props = defineProps([
     'errors',
     'emailLoginEnabled',
+    'passkeyOptionsUrl',
+    'passkeyVerifyUrl',
     'oauthEnabled',
     'providers',
     'referer',
@@ -25,6 +28,7 @@ const password = ref('');
 const remember = ref(false);
 const processing = ref(false);
 const shaking = computed(() => Object.keys(errors.value).length ? 'animation-shake' : '');
+const showOAuth = computed(() => props.oauthEnabled && props.providers.length > 0);
 
 const submit = () => {
     processing.value = true;
@@ -40,6 +44,24 @@ const submit = () => {
         onSuccess: () => window.location.href = props.referer,
         onError: () => processing.value = false
     });
+}
+
+const passkey = usePasskey();
+
+const showPasskeyLogin = computed(() => {
+    return props.emailLoginEnabled && passkey.supported;
+})
+
+async function loginWithPasskey() {
+    await passkey.authenticate(
+        props.passkeyOptionsUrl,
+        props.passkeyVerifyUrl,
+        (data) => {
+            if (data.redirect) {
+                window.location = data.redirect;
+            }
+        }
+    );
 }
 </script>
 
@@ -78,17 +100,30 @@ const submit = () => {
                 <Button type="submit" variant="primary" :disabled="processing" :text="__('Continue')" tabindex="5" />
             </form>
 
-            <template v-if="oauthEnabled">
+            <template v-if="showOAuth || showPasskeyLogin">
                 <Separator v-if="emailLoginEnabled" variant="dots" :text="__('Or sign in with')" class="py-3" />
-                <div class="flex gap-4 justify-center items-center">
-                    <Button
-                        v-for="provider in providers"
-                        :key="provider.name"
-                        as="href"
-                        class="flex-1"
-                        :href="provider.url"
-                        :icon="provider.icon"
-                    />
+                <div class="flex flex-col gap-y-4">
+                    <template v-if="showPasskeyLogin">
+                        <Button
+                            :text="__('Passkey')"
+                            class="w-full"
+                            :icon="passkey.waiting.value ? null : 'key'"
+                            :disabled="passkey.waiting.value"
+                            :loading="passkey.waiting.value"
+                            @click="loginWithPasskey"
+                        />
+                        <ErrorMessage v-if="passkey.error.value" :text="passkey.error.value" />
+                    </template>
+                    <div v-if="showOAuth" class="flex gap-4 justify-center items-center">
+                        <Button
+                            v-for="provider in providers"
+                            :key="provider.name"
+                            as="href"
+                            class="flex-1"
+                            :href="provider.url"
+                            :icon="provider.icon"
+                        />
+                    </div>
                 </div>
             </template>
         </div>

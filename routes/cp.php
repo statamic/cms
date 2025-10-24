@@ -22,6 +22,8 @@ use Statamic\Http\Controllers\CP\Auth\ExtendSessionController;
 use Statamic\Http\Controllers\CP\Auth\ForgotPasswordController;
 use Statamic\Http\Controllers\CP\Auth\ImpersonationController;
 use Statamic\Http\Controllers\CP\Auth\LoginController;
+use Statamic\Http\Controllers\CP\Auth\PasskeyController;
+use Statamic\Http\Controllers\CP\Auth\PasskeyLoginController;
 use Statamic\Http\Controllers\CP\Auth\ResetPasswordController;
 use Statamic\Http\Controllers\CP\Auth\TwoFactorChallengeController;
 use Statamic\Http\Controllers\CP\Auth\TwoFactorSetupController;
@@ -138,6 +140,11 @@ Route::group(['prefix' => 'auth'], function () {
     Route::get('unauthorized', UnauthorizedController::class)->name('unauthorized');
 
     Route::get('stop-impersonating', [ImpersonationController::class, 'stop'])->name('impersonation.stop');
+
+    Route::group(['prefix' => 'passkeys'], function () {
+        Route::post('/', [PasskeyLoginController::class, 'login'])->name('passkeys.auth');
+        Route::get('options', [PasskeyLoginController::class, 'options'])->name('passkeys.auth.options');
+    });
 });
 
 Route::middleware('statamic.cp.authenticated')->group(function () {
@@ -415,11 +422,20 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         });
     });
 
+    Route::group(['prefix' => 'passkeys'], function () {
+        Route::get('/', [PasskeyController::class, 'index'])->name('passkeys.view');
+        Route::get('create', [PasskeyController::class, 'create'])->name('passkeys.create');
+        Route::post('/', [PasskeyController::class, 'store'])->name('passkeys.store');
+        Route::delete('{id}', [PasskeyController::class, 'destroy'])->name('passkeys.destroy');
+    });
+
     Route::post('slug', SlugController::class);
+
     Route::get('session-timeout', SessionTimeoutController::class)->name('session.timeout');
 
     Route::get('auth/confirm-password', [ElevatedSessionController::class, 'showForm'])->name('confirm-password');
     Route::get('elevated-session', [ElevatedSessionController::class, 'status'])->name('elevated-session.status');
+    Route::get('elevated-session/passkey-options', [ElevatedSessionController::class, 'options'])->name('elevated-session.passkey-options');
     Route::post('elevated-session', [ElevatedSessionController::class, 'confirm'])->name('elevated-session.confirm');
     Route::get('elevated-session/resend-code', [ElevatedSessionController::class, 'resendCode'])->name('elevated-session.resend-code')->middleware('throttle:send-elevated-session-code');
 

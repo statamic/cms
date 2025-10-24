@@ -449,6 +449,10 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
 
     public function getElevatedSessionMethod(): string
     {
+        if (! config('statamic.webauthn.allow_password_login_with_passkey', true) && $this->passkeys()->isNotEmpty()) {
+            return 'passkey';
+        }
+
         return $this->password() ? 'password_confirmation' : 'verification_code';
     }
 
