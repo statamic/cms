@@ -16,7 +16,9 @@ class Widget extends BaseWidget
         $form = Form::find($handle = $this->config('form'));
 
         if (! $form) {
-            return "Error: Form [$handle] doesn't exist.";
+            return VueComponent::render('dynamic-html-renderer', [
+                'html' => "Error: Form [$handle] doesn't exist.",
+            ]);
         }
 
         if (! User::current()->can('view', $form)) {

@@ -15,7 +15,9 @@ class Collection extends Widget
         $collection = $this->config('collection');
 
         if (! CollectionAPI::handleExists($collection)) {
-            return "Error: Collection [$collection] doesn't exist.";
+            return VueComponent::render('dynamic-html-renderer', [
+                'html' => "Error: Collection [$collection] doesn't exist.",
+            ]);
         }
 
         $collection = CollectionAPI::findByHandle($collection);
