@@ -11,8 +11,8 @@ class ActivateAccountController extends ResetPasswordController
 {
     public function __construct()
     {
-        $this->middleware(RedirectIfAuthorized::class);
         $this->middleware(HandleInertiaRequests::class);
+        $this->middleware(RedirectIfAuthorized::class);
     }
 
     protected function resetFormAction()

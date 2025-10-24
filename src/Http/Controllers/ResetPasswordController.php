@@ -18,8 +18,8 @@ class ResetPasswordController extends Controller
 
     public function __construct()
     {
-        $this->middleware(RedirectIfAuthorized::class);
         $this->middleware(HandleInertiaRequests::class);
+        $this->middleware(RedirectIfAuthorized::class);
     }
 
     public function showResetForm(Request $request, $token = null)
