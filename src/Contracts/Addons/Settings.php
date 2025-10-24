@@ -14,7 +14,7 @@ interface Settings
 
     public function get(string $key, $default = null);
 
-    public function set(string $key, $value): self;
+    public function set(string|array $key, mixed $value = null): self;
 
     public function save(): bool;
 
