@@ -9,6 +9,7 @@ use Inertia\Inertia;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Auth\ResetsPasswords;
 use Statamic\Contracts\Auth\User;
+use Statamic\Http\Middleware\CP\HandleInertiaRequests;
 use Statamic\Http\Middleware\CP\RedirectIfAuthorized;
 
 class ResetPasswordController extends Controller
@@ -18,6 +19,7 @@ class ResetPasswordController extends Controller
     public function __construct()
     {
         $this->middleware(RedirectIfAuthorized::class);
+        $this->middleware(HandleInertiaRequests::class);
     }
 
     public function showResetForm(Request $request, $token = null)

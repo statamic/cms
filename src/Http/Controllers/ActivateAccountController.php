@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers;
 
 use Illuminate\Support\Facades\Password;
 use Statamic\Auth\Passwords\PasswordReset;
+use Statamic\Http\Middleware\CP\HandleInertiaRequests;
 use Statamic\Http\Middleware\CP\RedirectIfAuthorized;
 
 class ActivateAccountController extends ResetPasswordController
@@ -11,6 +12,7 @@ class ActivateAccountController extends ResetPasswordController
     public function __construct()
     {
         $this->middleware(RedirectIfAuthorized::class);
+        $this->middleware(HandleInertiaRequests::class);
     }
 
     protected function resetFormAction()
