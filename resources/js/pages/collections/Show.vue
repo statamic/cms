@@ -359,20 +359,15 @@ export default {
         },
 
         initialView() {
-            // Get from preferences instead of localStorage
             const savedView = this.$preferences.get(`collections.${this.handle}.view`);
 
-            // If we have a saved view, validate it's available and return it
             if (savedView) {
                 if (savedView === 'tree' && this.canUseStructureTree) return 'tree';
                 if (savedView === 'calendar' && this.canUseCalendar) return 'calendar';
                 if (savedView === 'list') return 'list';
             }
 
-            // Fallback logic
-            if (this.canUseStructureTree) return 'tree';
-            if (this.canUseCalendar) return 'calendar';
-            return 'list';
+            return this.canUseStructureTree ? 'tree' : 'list';
         },
 
         deleteTreeBranch(branch, removeFromUi) {
