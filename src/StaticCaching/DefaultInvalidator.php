@@ -34,8 +34,6 @@ class DefaultInvalidator implements Invalidator
             return;
         }
 
-        $urls = collect();
-
         if ($item instanceof Entry) {
             $urls = $this->getEntryUrls($item);
         } elseif ($item instanceof LocalizedTerm) {
@@ -54,6 +52,8 @@ class DefaultInvalidator implements Invalidator
             $urls = $this->getAssetUrls($item);
         } elseif ($item instanceof Form) {
             $urls = $this->getFormUrls($item);
+        } else {
+            $urls = [];
         }
 
         collect($urls)
@@ -71,8 +71,6 @@ class DefaultInvalidator implements Invalidator
         if (! config('statamic.static_caching.background_recache', false)) {
             return $this->invalidate($item);
         }
-
-        $urls = [];
 
         if ($this->rules === 'all') {
             $this->recacheUrls($this->cacher->getUrls());
@@ -98,6 +96,8 @@ class DefaultInvalidator implements Invalidator
             $urls = $this->getAssetUrls($item);
         } elseif ($item instanceof Form) {
             $urls = $this->getFormUrls($item);
+        } else {
+            $urls = [];
         }
 
         $this->cacher->recacheUrls($urls);
