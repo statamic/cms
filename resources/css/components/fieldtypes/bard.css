@@ -28,6 +28,11 @@
         p, ol, li {
             @apply st-text-legibility;
         }
+        &:has(.bard-content *:focus) {
+            /* When we're focused on something else inside the .bard-editor, remove the outline on the .bard-editor, otherwise we have two focus outlines.
+            E.g. If you have Bard > Replicator > Text field, when you focus on the internal text field, the outside .bard-editor should lose its outline */
+            outline: none;
+        }
     }
 }
 /* BARD / MODES
@@ -388,7 +393,7 @@
         h4,
         h5,
         h6 {
-            @apply mt-3.5 mb-2 font-bold text-gray-900 dark:text-gray-100;
+            @apply mt-5 mb-2.5 font-bold text-gray-900 dark:text-gray-100;
 
             b,
             strong {
