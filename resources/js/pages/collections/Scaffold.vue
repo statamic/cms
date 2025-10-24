@@ -36,7 +36,7 @@ const files = computed(() => {
 });
 
 const submit = () => {
-    router.post(props.route, props.files);
+    router.post(props.route, files.value);
 };
 
 let submitKeyBinding;
