@@ -11,7 +11,7 @@
                 </DropdownMenu>
             </Dropdown>
 
-            <ui-badge icon="padlock-locked" :text="__('Read Only')" variant="flat" v-if="!canEdit" />
+            <ui-badge icon="padlock-locked" :text="__('Read Only')" v-if="!canEdit" />
 
             <SiteSelector
                 v-if="showLocalizationSelector"

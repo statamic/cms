@@ -55,11 +55,11 @@
                                     <template v-slot:picker>
                                         <add-set-button
                                             variant="between"
-                                            v-if="index !== 0"
                                             :groups="groupConfigs"
                                             :sets="setConfigs"
                                             :index="index"
                                             :enabled="canAddSet"
+                                            :is-first="index === 0"
                                             @added="addSet"
                                         />
                                     </template>

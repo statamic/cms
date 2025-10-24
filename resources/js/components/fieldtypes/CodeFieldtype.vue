@@ -11,6 +11,7 @@
         :line-numbers="config.line_numbers"
         :line-wrapping="config.line_wrapping"
         :allow-mode-selection="config.mode_selectable"
+        :show-mode-label="config.show_mode_label"
         :mode="mode"
         :model-value="value.code"
         :title="config.display"

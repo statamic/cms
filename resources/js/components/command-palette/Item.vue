@@ -64,8 +64,8 @@ function click(event) {
             <slot v-if="hasDefaultSlot" />
             <template v-else>{{ text }}</template>
         </div>
-        <Badge v-if="badge" :text="badge" variant="flat" />
-        <Badge v-if="keys" v-for="key in keys" :key="key" :text="key" variant="flat" />
+        <Badge v-if="badge" :text="badge" />
+        <Badge v-if="keys" v-for="key in keys" :key="key" :text="key" />
         <Icon
             v-if="removable"
             name="x"

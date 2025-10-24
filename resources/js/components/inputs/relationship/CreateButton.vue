@@ -24,7 +24,7 @@
                 >
                     <div class="flex items-center justify-between">
                         <span>{{ creatable.blueprint }}</span>
-                        <ui-badge size="sm" variant="flat">{{ creatable.parent_title }}</ui-badge>
+                        <ui-badge size="sm">{{ creatable.parent_title }}</ui-badge>
                     </div>
                 </ui-dropdown-item>
             </ui-dropdown-menu>

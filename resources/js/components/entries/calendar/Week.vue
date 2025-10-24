@@ -63,7 +63,7 @@ const selectDate = (date) => {
 function getHourLabel(hour) {
     const date = new Date
     date.setHours(hour, 0, 0, 0);
-    return DateFormatter.format(date, { hour: 'numeric', hour12: true });
+    return DateFormatter.format(date, { hour: 'numeric' });
 }
 </script>
 
