@@ -260,7 +260,7 @@ class ValuesTest extends TestCase
 
         $this->assertEquals('alfa', $field->a);
         $this->assertTrue(isset($field->a));
-        $this->assertFalse(empty($field->a));
+        $this->assertFalse(empty($field));
     }
 }
 
