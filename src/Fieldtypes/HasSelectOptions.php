@@ -54,7 +54,7 @@ trait HasSelectOptions
 
         // NOTE: Null-coalescing into `[null]` as that matches old behaviour.
         return collect($values ?? [null])->map(function ($value) {
-            return $this->getLabel($value);
+            return $this->getLabel($this->normalizeAugmentableValue($value));
         })->all();
     }
 
@@ -136,7 +136,7 @@ trait HasSelectOptions
             $value = $this->castFromBoolean($value);
         }
 
-        $option = collect($this->getOptions())->filter(fn ($option) => (string) $option['value'] === $value)->first();
+        $option = collect($this->getOptions())->filter(fn ($option) => $option['value'] === $value)->first();
 
         return $option ? $option['label'] : $actualValue;
     }
