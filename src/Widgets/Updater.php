@@ -9,12 +9,7 @@ use Statamic\Facades\User;
 
 class Updater extends Widget
 {
-    /**
-     * The HTML that should be shown in the widget.
-     *
-     * @return \Illuminate\View\View
-     */
-    public function html()
+    public function component()
     {
         if (! User::current()->can('view updates')) {
             return;
@@ -40,6 +35,8 @@ class Updater extends Widget
             ]);
         }
 
-        return view('statamic::widgets.updater', compact('items'));
+        return VueComponent::render('updater-widget', [
+            'items' => $items,
+        ]);
     }
 }

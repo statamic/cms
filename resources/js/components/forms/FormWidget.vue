@@ -8,6 +8,7 @@ import {
     ListingTableHead as TableHead,
     ListingTableBody as TableBody,
     ListingPagination as Pagination,
+    Button,
 } from '@/components/ui';
 
 const props = defineProps({
@@ -80,7 +81,9 @@ function formatDate(value) {
                 </div>
                 <template #actions>
                     <Pagination />
-                    <slot name="actions" />
+                    <Button :href="submissionsUrl" size="sm">
+                        {{ __('View All') }}
+                    </Button>
                 </template>
             </Widget>
         </template>

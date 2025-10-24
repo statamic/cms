@@ -43,12 +43,14 @@ import BulkActions from '../components/actions/BulkActions.vue';
 
 import { defineAsyncComponent } from 'vue';
 import { Link } from '@inertiajs/vue3';
+import DynamicHtmlRenderer from '@/components/DynamicHtmlRenderer.vue';
 
 export default function registerGlobalComponents(app) {
     // Core
     app.component('asset-browser', Browser);
     app.component('updates-badge', UpdatesBadge);
     app.component('inertia-link', Link);
+    app.component('dynamic-html-renderer', DynamicHtmlRenderer);
 
     // Publish
     app.component('publish-field-meta', FieldMeta);
