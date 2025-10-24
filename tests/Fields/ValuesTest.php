@@ -254,10 +254,13 @@ class ValuesTest extends TestCase
     }
 
     #[Test]
-    public function it_can_check_isset_on_properties()
+    public function it_can_check_empty_on_properties()
     {
-        $field = [new Values(['a' => 'alfa'])];
+        $field = new Values(['a' => 'alfa']);
+
+        $this->assertEquals('alfa', $field->a);
         $this->assertTrue(isset($field->a));
+        $this->assertFalse(empty($field->a));
     }
 }
 
