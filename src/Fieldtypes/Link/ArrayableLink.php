@@ -19,6 +19,14 @@ class ArrayableLink extends ArrayableString
             : ['url' => $this->url()];
     }
 
+    #[\ReturnTypeWillChange]
+    public function jsonSerialize()
+    {
+        return is_object($this->value)
+            ? $this->value->toShallowAugmentedArray()
+            : ['url' => $this->url()];
+    }
+
     public function url()
     {
         if (! is_object($this->value)) {
