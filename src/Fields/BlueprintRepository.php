@@ -299,7 +299,8 @@ class BlueprintRepository
 
             $files = File::withAbsolutePaths()
                 ->getFilesByType($directory, 'yaml')
-                ->mapWithKeys(fn ($path) => [Str::after($path, $directory.'/') => $path]);
+                ->mapWithKeys(fn ($path) => [Str::after($path, $directory.'/') => $path])
+                ->reject(fn ($path) => Str::endsWith($path, 'settings.yaml'));
 
             if (File::exists($directory = $this->directory().'/vendor/'.$namespaceDir)) {
                 $overrides = File::withAbsolutePaths()
