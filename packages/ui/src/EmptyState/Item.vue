@@ -1,5 +1,5 @@
 <script setup>
-import CardPanel from '../Card/Panel.vue';
+import { Link } from '@inertiajs/vue3';
 import Icon from '../Icon/Icon.vue';
 import { useSlots } from 'vue';
 
@@ -29,7 +29,7 @@ const hasSlot = !!slots.default;
 <template>
     <li class="w-full">
         <component
-            :is="hasSlot ? 'div' : (href ? 'a' : 'button')"
+            :is="hasSlot ? 'div' : (href ? Link : 'button')"
             :href="href"
             class="w-full flex gap-2 px-3 pt-4 pb-5.5 items-start hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md group cursor-pointer"
         >
