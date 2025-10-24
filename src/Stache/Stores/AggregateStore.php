@@ -94,5 +94,18 @@ abstract class AggregateStore extends Store
         });
     }
 
+    public function getItemsFromFiles()
+    {
+        if ($this->shouldCacheFileItems && $this->fileItems) {
+            return $this->fileItems;
+        }
+
+        return $this->fileItems = $this->discoverStores()->flatMap(function ($store) {
+            return $store->paths()->mapWithKeys(function ($path, $key) use ($store) {
+                return ["{$store->key()}::{$key}" => $this->getItem("{$store->key()}::{$key}")];
+            });
+        });
+    }
+
     abstract public function discoverStores();
 }

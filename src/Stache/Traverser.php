@@ -27,6 +27,64 @@ class Traverser
             return collect();
         }
 
+        // Use RecursiveDirectoryIterator for better performance
+        // This is more memory efficient than allFiles() for large directories
+        return $this->traverseWithIterator($dir, $store);
+    }
+
+    protected function traverseWithIterator($dir, $store)
+    {
+        try {
+            $directoryIterator = new \RecursiveDirectoryIterator(
+                $dir,
+                \RecursiveDirectoryIterator::SKIP_DOTS
+            );
+
+            $filterIterator = new \RecursiveCallbackFilterIterator(
+                $directoryIterator,
+                function (\SplFileInfo $current, $key, \RecursiveDirectoryIterator $iterator) {
+                    // Skip hidden files and directories
+                    if (\str_starts_with($current->getFilename(), '.')) {
+                        return false;
+                    }
+
+                    // Allow directories to be traversed
+                    if ($current->isDir()) {
+                        return true;
+                    }
+
+                    // For files, apply the custom filter if it exists
+                    if ($this->filter) {
+                        return call_user_func($this->filter, new \Symfony\Component\Finder\SplFileInfo(
+                            $current->getPathname(),
+                            $current->getPath(),
+                            $current->getFilename()
+                        ));
+                    }
+
+                    return true;
+                }
+            );
+
+            $iterator = new \RecursiveIteratorIterator(
+                $filterIterator,
+                \RecursiveIteratorIterator::LEAVES_ONLY
+            );
+
+        } catch (\Exception $e) {
+            return $this->traverseWithAllFiles($dir);
+        }
+
+        return collect(iterator_to_array($iterator))
+            ->mapWithKeys(function ($file) {
+                $path = Path::tidy($file->getPathname());
+                return [$path => $file->getMTime()];
+            })
+            ->sort();
+    }
+
+    protected function traverseWithAllFiles($dir)
+    {
         $files = collect($this->filesystem->allFiles($dir));
 
         if ($this->filter) {
