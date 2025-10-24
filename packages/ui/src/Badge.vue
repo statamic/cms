@@ -15,10 +15,8 @@ const props = defineProps({
     iconAppend: { type: String, default: null },
     pill: { type: Boolean, default: false },
     prepend: { type: [String, Number, Boolean, null], default: null },
-    shadow: { type: [Boolean, String], default: true },
     size: { type: String, default: 'default' },
     text: { type: [String, Number, Boolean, null], default: null },
-    variant: { type: String, default: 'default' },
 });
 
 const slots = useSlots();
@@ -32,7 +30,7 @@ const tag = computed(() => {
 
 const badgeClasses = computed(() => {
     const classes = cva({
-        base: 'relative inline-flex items-center justify-center gap-1 font-normal antialiased whitespace-nowrap no-underline not-prose [button]:cursor-pointer group [&_svg]:opacity-60 [&_svg]:group-hover:opacity-80 dark:[&_svg]:group-hover:opacity-70',
+        base: 'relative inline-flex items-center justify-center gap-1 border dark:border-none dark:pb-0.25 font-normal antialiased whitespace-nowrap no-underline not-prose [button]:cursor-pointer group [&_svg]:opacity-60 [&_svg]:group-hover:opacity-80 dark:[&_svg]:group-hover:opacity-70',
         variants: {
             size: {
                 sm: 'text-2xs leading-normal px-1.25 rounded-[0.1875rem] [&_svg]:size-2.5',
@@ -44,7 +42,7 @@ const badgeClasses = computed(() => {
                 black: 'bg-gray-900 dark:bg-gray-300/6 border-black dark:border-black/25 text-white dark:text-gray-300 [a]:hover:bg-black/90 [button]:hover:bg-black/90 dark:[button]:hover:bg-black/9',
                 blue: 'bg-blue-100/80 dark:bg-blue-300/6 border-blue-300 dark:border-blue-300/25 text-blue-700 dark:text-blue-300 [a]:hover:bg-blue-200/60 [button]:hover:bg-blue-200/60 dark:[button]:hover:bg-blue-200/9',
                 cyan: 'bg-cyan-100/80 dark:bg-cyan-300/6 border-cyan-400 dark:border-cyan-400/25 text-cyan-700 dark:text-cyan-300 [a]:hover:bg-cyan-200/60 [button]:hover:bg-cyan-200/60 dark:[button]:hover:bg-cyan-200/9',
-                default: 'bg-gray-100/80 dark:bg-gray-800 border-gray-300 dark:border-gray-300/25 dark:text-gray-100 text-gray-700 [a]:hover:bg-gray-200/50 dark:[a]:hover:bg-gray-700/50 [button]:hover:bg-gray-200/50 dark:[button]:hover:bg-gray-200/9',
+                default: 'bg-gray-800/5 dark:bg-gray-800 border-gray-300 dark:border-gray-300/25 dark:text-gray-100 text-gray-700 [a]:hover:bg-gray-800/10 dark:[a]:hover:bg-gray-700/50 [button]:hover:bg-gray-200/50 dark:[button]:hover:bg-gray-200/9',
                 emerald: 'bg-emerald-100/80 border-emerald-400 dark:border-emerald-400/25 text-emerald-700 dark:bg-emerald-300/6 dark:text-emerald-300 [a]:hover:bg-emerald-200/60 [button]:hover:bg-emerald-200/60 dark:[button]:hover:bg-emerald-200/9',
                 fuchsia: 'bg-fuchsia-100/80 dark:bg-fuschia-300/6 border-fuchsia-300 dark:border-fuchsia-300/25 text-fuchsia-700 dark:text-fuschia-300 [a]:hover:bg-fuchsia-200/60 dark:[a]:hover:bg-fuchsia-300/15 [button]:hover:bg-fuchsia-200/60 dark:[button]:hover:bg-fuchsia-200/9',
                 green: 'bg-green-100/80 border-green-400 dark:border-green-400/25 text-green-700 dark:bg-green-300/6 dark:text-green-300 [a]:hover:bg-green-200/60 dark:[a]:hover:bg-green-300/15 [button]:hover:bg-green-200/60 dark:[button]:hover:bg-green-200/9',
@@ -61,17 +59,13 @@ const badgeClasses = computed(() => {
                 white: 'bg-white border-gray-300 dark:border-gray-300/25 text-gray-700 dark:bg-gray-300/6 dark:text-gray-300 [a]:hover:bg-gray-200/30 [button]:hover:bg-gray-200/30 dark:[a]:hover:bg-gray-300/15 dark:[button]:hover:bg-gray-200/9',
                 yellow: 'bg-yellow-100 dark:bg-yellow-300/6 border-yellow-400 dark:border-yellow-400/25 text-yellow-700 dark:text-yellow-300 [a]:hover:bg-yellow-200/80 dark:[a]:hover:bg-yellow-300/15 [button]:hover:bg-yellow-200/80 dark:[button]:hover:bg-yellow-200/9',
             },
-            variant: {
-                default: 'border dark:border-none shadow-ui-sm dark:pb-0.25',
-                flat: 'border-0 shadow-none!',
-            },
             pill: { true: 'rounded-full' },
-            shadow: {
-                false: 'shadow-none!',
-                true: 'shadow-ui-sm'
-            }
+            asButton: { true: 'shadow-ui-sm no-underline!' }
         },
-    })({ ...props });
+    })({
+        ...props,
+        asButton: props.href ?? props.as == 'button' ? true : false,
+    });
 
     return twMerge(classes);
 });

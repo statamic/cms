@@ -88,7 +88,7 @@ const previewText = computed(() => {
             return config.replicator_preview === undefined ? props.showFieldPreviews : config.replicator_preview;
         })
         .map(([handle, value]) => value)
-        .filter((value) => (['null', '[]', '{}', ''].includes(JSON.stringify(value)) ? null : value))
+        .filter((value) => !['null', '[]', '{}', ''].includes(JSON.stringify(value)))
         .map((value) => {
             if (value instanceof PreviewHtml) return value.html;
 
@@ -100,7 +100,8 @@ const previewText = computed(() => {
 
             return escapeHtml(JSON.stringify(value));
         })
-        .join(' / ');
+        .filter((html) => html && html.trim() !== '')
+        .join(' <span class="text-gray-400 dark:text-gray-600">/</span> ');
 });
 
 function toggleEnabledState() {
@@ -147,7 +148,7 @@ function destroy() {
                     v-if="!readOnly"
                 />
                 <button type="button" class="flex flex-1 items-center gap-4 p-2 py-1.75 min-w-0 cursor-pointer" @click="toggleCollapsedState">
-                    <Badge size="lg" pill="true" color="white" shadow="false" class="px-3">
+                    <Badge size="lg" pill="true" color="white" class="px-3">
                         <span v-if="isSetGroupVisible" class="flex items-center gap-2">
                             {{ __(setGroup.display) }}
                             <Icon name="chevron-right" class="relative top-px size-3" />

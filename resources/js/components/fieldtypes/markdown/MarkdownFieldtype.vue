@@ -143,15 +143,15 @@
                     />
                 </stack>
 
-                <stack name="markdownCheatSheet" v-if="showCheatsheet" @closed="showCheatsheet = false">
+                <stack narrow name="markdownCheatSheet" v-if="showCheatsheet" @closed="showCheatsheet = false">
                     <div class="relative h-full overflow-auto bg-white p-6 dark:bg-gray-800 rounded-l-2xl">
                         <Button
                             icon="x"
                             variant="ghost"
-                            class="absolute top-4 end-4"
+                            class="sticky top-0 left-[100%] translate-x-[15%] translate-y-[-20%] bg-white dark:bg-gray-800"
                             @click="showCheatsheet = false"
                         />
-                        <div class="prose prose-zinc prose-headings:font-medium prose-pre:prose-code:!text-white mx-auto my-8 max-w-3xl">
+                        <div class="prose prose-zinc prose-headings:font-medium prose-pre:prose-code:!text-white mx-auto max-w-3xl">
                             <h2 v-text="__('Markdown Cheatsheet')"></h2>
                             <div v-html="__('markdown.cheatsheet')"></div>
                         </div>

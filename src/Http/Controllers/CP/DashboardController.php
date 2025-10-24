@@ -73,6 +73,7 @@ class DashboardController extends CpController
             })
             ->reject(function ($widget) {
                 return empty($widget['component']) && empty($widget['html']);
-            });
+            })
+            ->values();
     }
 }
