@@ -129,6 +129,11 @@ watch(
 );
 
 watch(
+    () => props.modifiedFields,
+    (modifiedFields) => localizedFields.value = modifiedFields || [],
+);
+
+watch(
     values,
     (values) => {
         dirty();
