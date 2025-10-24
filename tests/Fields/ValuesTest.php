@@ -252,6 +252,27 @@ class ValuesTest extends TestCase
 
         $this->assertEquals('{"foo":"bar","baz":"qux"}', json_encode($values));
     }
+
+    #[Test]
+    public function it_can_check_isset_on_properties()
+    {
+        $class = new class
+        {
+            private $field;
+
+            public function __construct()
+            {
+                $this->field = [new Values(['a' => 'alfa'])];
+            }
+
+            public function __get(string $key)
+            {
+                return $this->$key;
+            }
+        };
+
+        $this->assertFalse(empty($class->field));
+    }
 }
 
 class FakeFieldtypeThatAugmentsToMockedBuilder extends Fieldtype
@@ -274,6 +295,7 @@ class FakeFieldtypeThatAugmentsToMockedBuilder extends Fieldtype
 class TestAugmentableObject implements Augmentable
 {
     use HasAugmentedData;
+
     protected $data = [];
 
     public function __construct($data)
