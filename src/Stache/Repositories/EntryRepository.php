@@ -98,13 +98,22 @@ class EntryRepository implements RepositoryContract
 
     public function whereInId($ids): EntryCollection
     {
+        if (empty($ids)) {
+            return EntryCollection::make();
+        }
+
         $entries = $this->query()->whereIn('id', $ids)->get();
+
+        if ($entries->isEmpty()) {
+            return EntryCollection::make();
+        }
+
         $entriesById = $entries->keyBy->id();
 
         $ordered = collect($ids)
             ->map(fn ($id) => $entriesById->get($id))
             ->filter()
-            ->values();
+            ->all();
 
         return EntryCollection::make($ordered);
     }
@@ -175,6 +184,10 @@ class EntryRepository implements RepositoryContract
 
     public function applySubstitutions($items)
     {
+        if (empty($this->substitutionsById)) {
+            return $items;
+        }
+
         return $items->map(function ($item) {
             return $this->substitutionsById[$item->id()] ?? $item;
         });
