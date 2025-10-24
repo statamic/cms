@@ -29,24 +29,24 @@ class Invalidate implements ShouldQueue
     protected $invalidator;
 
     protected $events = [
-        AssetSaved::class => 'invalidateAsset',
+        AssetSaved::class => 'invalidateAndRecacheAsset',
         AssetDeleted::class => 'invalidateAsset',
-        EntrySaved::class => 'invalidateEntry',
+        EntrySaved::class => 'invalidateAndRecacheEntry',
         EntryDeleting::class => 'invalidateEntry',
         EntryScheduleReached::class => 'invalidateEntry',
         LocalizedTermSaved::class => 'invalidateTerm',
         LocalizedTermDeleted::class => 'invalidateTerm',
-        GlobalVariablesSaved::class => 'invalidateGlobalVariables',
+        GlobalVariablesSaved::class => 'invalidateAndRecacheGlobalVariables',
         GlobalVariablesDeleted::class => 'invalidateGlobalVariables',
-        NavSaved::class => 'invalidateNav',
+        NavSaved::class => 'invalidateAndRecacheNav',
         NavDeleted::class => 'invalidateNav',
-        FormSaved::class => 'invalidateForm',
+        FormSaved::class => 'invalidateAndRecacheForm',
         FormDeleted::class => 'invalidateForm',
         CollectionTreeSaved::class => 'invalidateCollectionByTree',
         CollectionTreeDeleted::class => 'invalidateCollectionByTree',
-        NavTreeSaved::class => 'invalidateNavByTree',
+        NavTreeSaved::class => 'invalidateAndRecacheNavByTree',
         NavTreeDeleted::class => 'invalidateNavByTree',
-        BlueprintSaved::class => 'invalidateByBlueprint',
+        BlueprintSaved::class => 'invalidateAndRecacheByBlueprint',
         BlueprintDeleted::class => 'invalidateByBlueprint',
     ];
 
@@ -67,9 +67,19 @@ class Invalidate implements ShouldQueue
         $this->invalidator->invalidate($event->asset);
     }
 
+    public function invalidateAndRecacheAsset($event)
+    {
+        $this->invalidator->invalidateAndRecache($event->asset);
+    }
+
     public function invalidateEntry($event)
     {
         $this->invalidator->invalidate($event->entry);
+    }
+
+    public function invalidateAndRecacheEntry($event)
+    {
+        $this->invalidator->invalidateAndRecache($event->entry);
     }
 
     public function invalidateTerm($event)
@@ -77,9 +87,19 @@ class Invalidate implements ShouldQueue
         $this->invalidator->invalidate($event->term);
     }
 
+    public function invalidateAndRecacheTerm($event)
+    {
+        $this->invalidator->invalidateAndRecache($event->term);
+    }
+
     public function invalidateGlobalVariables($event)
     {
         $this->invalidator->invalidate($event->variables);
+    }
+
+    public function invalidateAndRecacheGlobalVariables($event)
+    {
+        $this->invalidator->invalidateAndRecache($event->variables);
     }
 
     public function invalidateNav($event)
@@ -87,9 +107,19 @@ class Invalidate implements ShouldQueue
         $this->invalidator->invalidate($event->nav);
     }
 
+    public function invalidateAndRecacheNav($event)
+    {
+        $this->invalidator->invalidateAndRecache($event->nav);
+    }
+
     public function invalidateForm($event)
     {
         $this->invalidator->invalidate($event->form);
+    }
+
+    public function invalidateAndRecacheForm($event)
+    {
+        $this->invalidator->invalidateAndRecache($event->form);
     }
 
     public function invalidateCollectionByTree($event)
@@ -97,9 +127,19 @@ class Invalidate implements ShouldQueue
         $this->invalidator->invalidate($event->tree);
     }
 
+    public function invalidateAndRecacheCollectionByTree($event)
+    {
+        $this->invalidator->invalidateAndRecache($event->tree->collection());
+    }
+
     public function invalidateNavByTree($event)
     {
         $this->invalidator->invalidate($event->tree);
+    }
+
+    public function invalidateAndRecacheNavByTree($event)
+    {
+        $this->invalidator->invalidateAndRecache($event->tree->structure());
     }
 
     public function invalidateByBlueprint($event)
@@ -107,6 +147,15 @@ class Invalidate implements ShouldQueue
         if ($event->blueprint->namespace() === 'forms') {
             if ($form = Form::find($event->blueprint->handle())) {
                 $this->invalidator->invalidate($form);
+            }
+        }
+    }
+
+    public function invalidateAndRecacheByBlueprint($event)
+    {
+        if ($event->blueprint->namespace() === 'forms') {
+            if ($form = Form::find($event->blueprint->handle())) {
+                $this->invalidator->invalidateAndRecache($form);
             }
         }
     }

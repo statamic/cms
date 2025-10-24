@@ -12,6 +12,7 @@ use Illuminate\Console\Command;
 use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Hash;
 use Statamic\Console\EnhancesCommands;
 use Statamic\Console\RunsInPlease;
 use Statamic\Entries\Collection as EntriesCollection;
@@ -171,6 +172,14 @@ class StaticWarm extends Command
         $headers = $this->parseHeaders($this->option('header'));
 
         return $this->uris()->map(function ($uri) use ($headers) {
+            if (config('statamic.static_caching.background_recache', false)) {
+                if (substr_count($uri, '/') == 2) {
+                    $uri .= '/';
+                }
+
+                $uri .= '?__recache='.Hash::make($uri);
+            }
+
             return new Request('GET', $uri, $headers);
         })->all();
     }
