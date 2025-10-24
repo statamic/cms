@@ -32,6 +32,7 @@ class StatamicServiceProvider extends AggregateServiceProvider
         RouteServiceProvider::class,
         BroadcastServiceProvider::class,
         \Statamic\API\ServiceProvider::class,
+        \Statamic\CommandPalette\ServiceProvider::class,
         \Statamic\Git\ServiceProvider::class,
         \Statamic\GraphQL\ServiceProvider::class,
         BardServiceProvider::class,

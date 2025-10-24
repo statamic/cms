@@ -3,7 +3,9 @@
 namespace Statamic\Http\Controllers\CP\Navigation;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Contracts\Structures\Nav as NavContract;
+use Statamic\CP\PublishForm;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Nav;
 use Statamic\Facades\Site;
@@ -33,7 +35,11 @@ class NavigationController extends CpController
             ];
         })->values();
 
-        return view('statamic::navigation.index', compact('navs'));
+        return Inertia::render('navigation/Index', [
+            'navs' => $navs->all(),
+            'canCreate' => User::current()->can('create', NavContract::class),
+            'createUrl' => cp_route('navigation.create'),
+        ]);
     }
 
     public function edit($nav)
@@ -52,17 +58,11 @@ class NavigationController extends CpController
             'select_across_sites' => $nav->canSelectAcrossSites(),
         ];
 
-        $fields = ($blueprint = $this->editFormBlueprint($nav))
-            ->fields()
-            ->addValues($values)
-            ->preProcess();
-
-        return view('statamic::navigation.edit', [
-            'blueprint' => $blueprint->toPublishArray(),
-            'values' => $fields->values(),
-            'meta' => $fields->meta(),
-            'nav' => $nav,
-        ]);
+        return PublishForm::make($this->editFormBlueprint($nav))
+            ->title(__('Configure Navigation'))
+            ->values($values)
+            ->asConfig()
+            ->submittingTo($nav->showUrl());
     }
 
     public function show(Request $request, $nav)
@@ -81,11 +81,14 @@ class NavigationController extends CpController
 
         $this->authorize('view', $nav->in($site), __('You are not authorized to view navs.'));
 
-        return view('statamic::navigation.show', [
+        return Inertia::render('navigation/Show', [
+            'title' => $nav->title(),
+            'handle' => $nav->handle(),
+            'pagesUrl' => cp_route('navigation.tree.index', $nav->handle()),
+            'submitUrl' => cp_route('navigation.tree.update', $nav->handle()),
+            'editUrl' => $nav->editUrl(),
+            'blueprintUrl' => cp_route('blueprints.navigation.edit', $nav->handle()),
             'site' => $site,
-            'nav' => $nav,
-            'expectsRoot' => $nav->expectsRoot(),
-            'collections' => $nav->collections()->map->handle()->all(),
             'sites' => $this->getAuthorizedTreesForNav($nav)->map(function ($tree) {
                 return [
                     'handle' => $tree->locale(),
@@ -93,7 +96,13 @@ class NavigationController extends CpController
                     'url' => $tree->showUrl(),
                 ];
             })->values()->all(),
+            'collections' => $nav->collections()->map->handle()->all(),
+            'maxDepth' => $nav->maxDepth(),
+            'expectsRoot' => $nav->expectsRoot(),
             'blueprint' => $nav->blueprint()->toPublishArray(),
+            'canEdit' => User::current()->can('edit', $nav),
+            'canSelectAcrossSites' => $nav->canSelectAcrossSites(),
+            'canEditBlueprint' => User::current()->can('configure fields'),
         ]);
     }
 
@@ -199,12 +208,16 @@ class NavigationController extends CpController
                 'display' => __('Options'),
                 'fields' => [
                     'blueprint' => [
-                        'type' => 'html',
+                        'display' => __('Blueprint'),
                         'instructions' => __('statamic::messages.navigation_configure_blueprint_instructions'),
-                        'html' => ''.
-                            '<div class="text-xs">'.
-                            '   <a href="'.cp_route('navigation.blueprint.edit', $nav->handle()).'" class="text-blue">'.__('Edit').'</a>'.
-                            '</div>',
+                        'type' => 'blueprints',
+                        'options' => [
+                            [
+                                'handle' => 'default',
+                                'title' => __('Edit Blueprint'),
+                                'edit_url' => cp_route('blueprints.navigation.edit', $nav->handle()),
+                            ],
+                        ],
                     ],
                     'collections' => [
                         'display' => __('Collections'),
@@ -242,7 +255,23 @@ class NavigationController extends CpController
             ];
         }
 
-        return Blueprint::makeFromTabs($contents);
+        return Blueprint::make()->setContents(collect([
+            'tabs' => [
+                'main' => [
+                    'sections' => collect($contents)->map(function ($section) {
+                        return [
+                            'display' => $section['display'],
+                            'fields' => collect($section['fields'])->map(function ($field, $handle) {
+                                return [
+                                    'handle' => $handle,
+                                    'field' => $field,
+                                ];
+                            })->values()->all(),
+                        ];
+                    })->values()->all(),
+                ],
+            ],
+        ])->all());
     }
 
     public function destroy($nav)

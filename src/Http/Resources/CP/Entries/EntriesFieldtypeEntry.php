@@ -3,6 +3,7 @@
 namespace Statamic\Http\Resources\CP\Entries;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Statamic\Facades\User;
 use Statamic\Fieldtypes\Entries as EntriesFieldtype;
 
 class EntriesFieldtypeEntry extends JsonResource
@@ -20,9 +21,11 @@ class EntriesFieldtypeEntry extends JsonResource
     {
         $data = [
             'id' => $this->resource->id(),
+            'reference' => $this->resource->reference(),
             'title' => $this->resource->value('title'),
             'status' => $this->resource->status(),
             'edit_url' => $this->resource->editUrl(),
+            'editable' => User::current()->can('edit', $this->resource),
             'hint' => $this->fieldtype->getItemHint($this->resource),
         ];
 

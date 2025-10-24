@@ -146,6 +146,10 @@ return [
     'unique_user_value' => 'این مقدار قبلا انتخاب شده است.',
     'unique_uri' => 'این مسیر (URI) قبلا انتخاب شده است.',
     'time' => 'زمان معتبری نیست.',
+    'asset_current_filename' => 'این نام فایل فعلی است.',
+    'asset_file_exists' => 'یک فایل از قبل با این نام وجود دارد.',
+    'asset_file_exists_same_content' => 'یک فایل از قبل با این نام وجود دارد و محتوای یکسانی دارد. ممکن است بخواهید به جای تغییر نام آن را حذف کنید.',
+    'asset_file_exists_different_content' => 'یک فایل از قبل با این نام وجود دارد اما محتوای متفاوتی دارد. ممکن است بخواهید به جای آن فایل دیگر را با این یکی جایگزین کنید.',
     'custom.attribute-name.rule-name' => 'custom-message',
     'attributes' => [],
 ];

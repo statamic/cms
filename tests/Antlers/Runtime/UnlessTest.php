@@ -2,6 +2,7 @@
 
 namespace Tests\Antlers\Runtime;
 
+use Illuminate\Support\Str;
 use Tests\Antlers\ParserTestCase;
 
 class UnlessTest extends ParserTestCase
@@ -16,5 +17,20 @@ EOT;
             'first' => false,
             'last' => false,
         ]));
+    }
+
+    public function test_unless_with_vars()
+    {
+        $template = <<<'EOT'
+{{ the_var = 1 }}
+
+{{ unless {the_var} }}true{{ else }}false{{ /unless }}
+{{ if ! {the_var} }}true{{ else }}false{{ /if }}
+EOT;
+
+        $this->assertSame(
+            'false false',
+            Str::squish($this->renderString($template))
+        );
     }
 }

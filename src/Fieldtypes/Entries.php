@@ -27,11 +27,14 @@ use Statamic\Search\Index;
 use Statamic\Search\Result;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class Entries extends Relationship
 {
     use QueriesFilters;
 
     protected $categories = ['relationship'];
+    protected $keywords = ['entry'];
     protected $canEdit = true;
     protected $canCreate = true;
     protected $canSearch = true;
@@ -45,6 +48,7 @@ class Entries extends Relationship
         'initialReference' => 'reference',
         'initialFieldset' => 'blueprint',
         'initialValues' => 'values',
+        'initialExtraValues' => 'extraValues',
         'initialLocalizedFields' => 'localizedFields',
         'initialMeta' => 'meta',
         'initialPermalink' => 'permalink',
@@ -54,10 +58,8 @@ class Entries extends Relationship
         'initialOriginMeta' => 'originMeta',
         'initialSite' => 'locale',
         'initialIsWorkingCopy' => 'hasWorkingCopy',
-        'initialIsRoot' => 'isRoot',
         'initialReadOnly' => 'readOnly',
         'revisionsEnabled' => 'revisionsEnabled',
-        'breadcrumbs' => 'breadcrumbs',
         'collectionHandle' => 'collection',
         'canManagePublishState' => 'canManagePublishState',
         'collectionHasRoutes' => 'collectionHasRoutes',
@@ -67,14 +69,32 @@ class Entries extends Relationship
     {
         return [
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Input Behavior'),
                 'fields' => [
-                    'max_items' => [
-                        'display' => __('Max Items'),
-                        'instructions' => __('statamic::messages.max_items_instructions'),
-                        'min' => 1,
-                        'type' => 'integer',
+                    'collections' => [
+                        'display' => __('Collections'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.collections'),
+                        'type' => 'collections',
+                        'mode' => 'select',
+                        'width' => 50,
                     ],
+                    'search_index' => [
+                        'display' => __('Search Index'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.search_index'),
+                        'type' => 'text',
+                        'width' => 50,
+                    ],
+                    'select_across_sites' => [
+                        'display' => __('Select Across Sites'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.select_across_sites'),
+                        'type' => 'toggle',
+                        'width' => 50,
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Appearance'),
+                'fields' => [
                     'mode' => [
                         'display' => __('UI Mode'),
                         'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
@@ -85,24 +105,34 @@ class Entries extends Relationship
                             'select' => __('Select Dropdown'),
                             'typeahead' => __('Typeahead Field'),
                         ],
+                        'width' => 50,
                     ],
                     'create' => [
                         'display' => __('Allow Creating'),
                         'instructions' => __('statamic::fieldtypes.entries.config.create'),
                         'type' => 'toggle',
                         'default' => true,
+                        'if' => [
+                            'mode' => 'default',
+                        ],
+                        'width' => 50,
                     ],
-                    'collections' => [
-                        'display' => __('Collections'),
-                        'instructions' => __('statamic::fieldtypes.entries.config.collections'),
-                        'type' => 'collections',
-                        'mode' => 'select',
+                ],
+            ],
+            [
+                'display' => __('Boundaries & Limits'),
+                'fields' => [
+                    'max_items' => [
+                        'display' => __('Max Items'),
+                        'instructions' => __('statamic::messages.max_items_instructions'),
+                        'min' => 1,
+                        'type' => 'integer',
                     ],
-                    'search_index' => [
-                        'display' => __('Search Index'),
-                        'instructions' => __('statamic::fieldtypes.entries.config.search_index'),
-                        'type' => 'text',
-                    ],
+                ],
+            ],
+            [
+                'display' => __('Advanced'),
+                'fields' => [
                     'query_scopes' => [
                         'display' => __('Query Scopes'),
                         'instructions' => __('statamic::fieldtypes.entries.config.query_scopes'),
@@ -112,11 +142,6 @@ class Entries extends Relationship
                             ->map->handle()
                             ->values()
                             ->all(),
-                    ],
-                    'select_across_sites' => [
-                        'display' => __('Select Across Sites'),
-                        'instructions' => __('statamic::fieldtypes.entries.config.select_across_sites'),
-                        'type' => 'toggle',
                     ],
                 ],
             ],
@@ -175,7 +200,11 @@ class Entries extends Relationship
             $collections = $this->getConfiguredCollections();
         }
 
-        return Collection::findByHandle(Arr::first($collections));
+        $collection = Collection::findByHandle($collectionHandle = Arr::first($collections));
+
+        throw_if(! $collection, new CollectionNotFoundException($collectionHandle));
+
+        return $collection;
     }
 
     public function getSortColumn($request)
@@ -284,7 +313,7 @@ class Entries extends Relationship
 
         $user = User::current();
 
-        return collect($collections)->flatMap(function ($collectionHandle) use ($collections, $user) {
+        return collect($collections)->flatMap(function ($collectionHandle) use ($user) {
             $collection = Collection::findByHandle($collectionHandle);
 
             throw_if(! $collection, new CollectionNotFoundException($collectionHandle));
@@ -297,26 +326,15 @@ class Entries extends Relationship
 
             return $blueprints
                 ->reject->hidden()
-                ->map(function ($blueprint) use ($collection, $collections, $blueprints) {
+                ->map(function ($blueprint) use ($collection) {
                     return [
-                        'title' => $this->getCreatableTitle($collection, $blueprint, count($collections), $blueprints->count()),
+                        'parent_title' => $collection->title(),
+                        'blueprint' => $blueprint->title(),
+                        'handle' => $blueprint->handle(),
                         'url' => $collection->createEntryUrl(Site::selected()->handle()).'?blueprint='.$blueprint->handle(),
                     ];
                 });
         })->all();
-    }
-
-    private function getCreatableTitle($collection, $blueprint, $collectionCount, $blueprintCount)
-    {
-        if ($collectionCount > 1 && $blueprintCount === 1) {
-            return $collection->title();
-        }
-
-        if ($collectionCount > 1 && $blueprintCount > 1) {
-            return $collection->title().': '.$blueprint->title();
-        }
-
-        return $blueprint->title();
     }
 
     protected function toItemArray($id)
@@ -368,7 +386,9 @@ class Entries extends Relationship
 
         $query = $this->queryBuilder($values);
 
-        return $single ? Blink::once($key, fn () => $query->first()) : $query;
+        return $single && ! config('statamic.system.always_augment_to_query', false)
+            ? Blink::once($key, fn () => $query->first())
+            : $query;
     }
 
     public function shallowAugment($values)

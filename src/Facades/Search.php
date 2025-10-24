@@ -15,7 +15,7 @@ use Statamic\Contracts\Search\Searchable;
  * @method static void deleteFromIndexes(Searchable $searchable)
  *
  * @see \Statamic\Search\Search
- * @see \Statamic\Search\Index
+ * @link \Statamic\Search\Index
  */
 class Search extends Facade
 {

@@ -14,14 +14,14 @@ use Statamic\Events\EntrySaved;
 use Statamic\Events\EntryScheduleReached;
 use Statamic\Events\FormDeleted;
 use Statamic\Events\FormSaved;
-use Statamic\Events\GlobalSetDeleted;
-use Statamic\Events\GlobalSetSaved;
+use Statamic\Events\GlobalVariablesDeleted;
+use Statamic\Events\GlobalVariablesSaved;
+use Statamic\Events\LocalizedTermDeleted;
+use Statamic\Events\LocalizedTermSaved;
 use Statamic\Events\NavDeleted;
 use Statamic\Events\NavSaved;
 use Statamic\Events\NavTreeDeleted;
 use Statamic\Events\NavTreeSaved;
-use Statamic\Events\TermDeleted;
-use Statamic\Events\TermSaved;
 use Statamic\Facades\Form;
 
 class Invalidate implements ShouldQueue
@@ -34,15 +34,15 @@ class Invalidate implements ShouldQueue
         EntrySaved::class => 'invalidateAndRecacheEntry',
         EntryDeleting::class => 'invalidateEntry',
         EntryScheduleReached::class => 'invalidateEntry',
-        TermSaved::class => 'invalidateTerm',
-        TermDeleted::class => 'invalidateTerm',
-        GlobalSetSaved::class => 'invalidateAndRecacheGlobalSet',
-        GlobalSetDeleted::class => 'invalidateGlobalSet',
+        LocalizedTermSaved::class => 'invalidateTerm',
+        LocalizedTermDeleted::class => 'invalidateTerm',
+        GlobalVariablesSaved::class => 'invalidateAndRecacheGlobalVariables',
+        GlobalVariablesDeleted::class => 'invalidateGlobalVariables',
         NavSaved::class => 'invalidateAndRecacheNav',
         NavDeleted::class => 'invalidateNav',
         FormSaved::class => 'invalidateAndRecacheForm',
         FormDeleted::class => 'invalidateForm',
-        CollectionTreeSaved::class => 'invalidateAndRecacheCollectionByTree',
+        CollectionTreeSaved::class => 'invalidateCollectionByTree',
         CollectionTreeDeleted::class => 'invalidateCollectionByTree',
         NavTreeSaved::class => 'invalidateAndRecacheNavByTree',
         NavTreeDeleted::class => 'invalidateNavByTree',
@@ -92,14 +92,14 @@ class Invalidate implements ShouldQueue
         $this->invalidator->invalidateAndRecache($event->term);
     }
 
-    public function invalidateGlobalSet($event)
+    public function invalidateGlobalVariables($event)
     {
-        $this->invalidator->invalidate($event->globals);
+        $this->invalidator->invalidate($event->variables);
     }
 
-    public function invalidateAndRecacheGlobalSet($event)
+    public function invalidateAndRecacheGlobalVariables($event)
     {
-        $this->invalidator->invalidateAndRecache($event->globals);
+        $this->invalidator->invalidateAndRecache($event->variables);
     }
 
     public function invalidateNav($event)
@@ -124,7 +124,7 @@ class Invalidate implements ShouldQueue
 
     public function invalidateCollectionByTree($event)
     {
-        $this->invalidator->invalidate($event->tree->collection());
+        $this->invalidator->invalidate($event->tree);
     }
 
     public function invalidateAndRecacheCollectionByTree($event)
@@ -134,7 +134,7 @@ class Invalidate implements ShouldQueue
 
     public function invalidateNavByTree($event)
     {
-        $this->invalidator->invalidate($event->tree->structure());
+        $this->invalidator->invalidate($event->tree);
     }
 
     public function invalidateAndRecacheNavByTree($event)

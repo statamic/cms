@@ -212,6 +212,56 @@ class ImageGeneratorTest extends TestCase
     }
 
     #[Test]
+    public function it_generates_an_image_by_external_url_with_query_string()
+    {
+        Event::fake();
+
+        $cacheKey = 'url::https://example.com/foo/hoff.jpg?query=david::4dbc41d8e3ba1ccd302641e509b48768';
+        $this->assertNull(Glide::cacheStore()->get($cacheKey));
+
+        $this->assertCount(0, $this->generatedImagePaths());
+
+        $this->app->bind('statamic.imaging.guzzle', function () {
+            $file = UploadedFile::fake()->image('', 30, 60);
+            $contents = file_get_contents($file->getPathname());
+
+            $response = new Response(200, [], $contents);
+
+            // Glide, Flysystem, or the Guzzle adapter will try to perform the requests
+            // at different points to check if the file exists or to get the content
+            // of it. Here we'll just mock the same response multiple times.
+            return new Client(['handler' => new MockHandler([
+                $response, $response, $response,
+            ])]);
+        });
+
+        // Generate the image twice to make sure it's cached.
+        foreach (range(1, 2) as $i) {
+            $path = $this->makeGenerator()->generateByUrl(
+                'https://example.com/foo/hoff.jpg?query=david',
+                $userParams = ['w' => 100, 'h' => 100]
+            );
+        }
+
+        $qsHash = md5('query=david');
+
+        // Since we can't really mock the server, we'll generate the md5 hash the same
+        // way it does. It will not include the fit parameter since it's not an asset.
+        $md5 = $this->getGlideMd5("foo/hoff-{$qsHash}.jpg", $userParams);
+
+        // While writing this test I noticed that we don't include the domain in the
+        // cache path, so the same file path on two different domains will conflict.
+        // TODO: Fix this.
+        $expectedPath = "http/foo/hoff-{$qsHash}.jpg/{$md5}/hoff-{$qsHash}.jpg";
+
+        $this->assertEquals($expectedPath, $path);
+        $this->assertCount(1, $paths = $this->generatedImagePaths());
+        $this->assertContains($expectedPath, $paths);
+        $this->assertEquals($expectedPath, Glide::cacheStore()->get($cacheKey));
+        Event::assertDispatchedTimes(GlideImageGenerated::class, 1);
+    }
+
+    #[Test]
     public function the_watermark_disk_is_the_public_directory_by_default()
     {
         $generator = $this->makeGenerator();

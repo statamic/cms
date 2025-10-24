@@ -8,6 +8,7 @@ class Countries extends BasicDictionary
 {
     protected string $valueKey = 'iso3';
     protected array $searchable = ['name', 'iso3'];
+    protected array $keywords = ['countries', 'country'];
     private array $regions;
     private array $subregions;
 
@@ -64,13 +65,16 @@ class Countries extends BasicDictionary
                 'display' => __('Region'),
                 'instructions' => __('statamic::messages.dictionaries_countries_region_instructions'),
                 'type' => 'select',
+                'clearable' => true,
                 'options' => $this->regions,
+                'width' => 50,
             ],
             'emojis' => [
                 'display' => __('Emojis'),
                 'instructions' => __('statamic::messages.dictionaries_countries_emojis_instructions'),
                 'type' => 'toggle',
                 'default' => true,
+                'width' => 50,
             ],
         ];
     }

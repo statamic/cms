@@ -1,3 +1,4 @@
+import { test, expect } from 'vitest';
 import Values from '../components/publish/Values.js';
 
 test('it gets values at top level', () => {
@@ -30,7 +31,7 @@ test('it gets nested values', () => {
                     {
                         name: 'Lando',
                         type: 'Man',
-                    }
+                    },
                 ],
             },
         ],
@@ -39,7 +40,7 @@ test('it gets nested values', () => {
     expect(values.get('ship.name')).toEqual('Falcon');
     expect(values.get('bffs.0.name')).toEqual('Chewy');
     expect(values.get('bffs.1.name')).toEqual('Leia');
-    expect(values.get('bffs.1.crush')).toEqual([{name: 'Lando', type: 'Man'}]);
+    expect(values.get('bffs.1.crush')).toEqual([{ name: 'Lando', type: 'Man' }]);
     expect(values.get('bffs.1.crush.0.name')).toEqual('Lando');
 });
 
@@ -59,7 +60,7 @@ test('it gets nested json field values', () => {
                     {
                         name: 'Lando',
                         type: 'Man',
-                    }
+                    },
                 ]),
             },
         ]),
@@ -74,7 +75,7 @@ test('it gets nested json field values', () => {
 
     expect(encodedValues.get('bffs.0.name')).toEqual('Chewy');
     expect(encodedValues.get('bffs.1.name')).toEqual('Leia');
-    expect(encodedValues.get('bffs.1.crush')).toEqual([{name: 'Lando', type: 'Man'}]);
+    expect(encodedValues.get('bffs.1.crush')).toEqual([{ name: 'Lando', type: 'Man' }]);
     expect(encodedValues.get('bffs.1.crush.0.name')).toEqual('Lando');
     expect(encodedValues.get('bffs.1.crush.0.name')).toEqual('Lando');
 
@@ -99,9 +100,7 @@ test('it sets values at top level', () => {
         new_object: {
             key: 'new_object_value',
         },
-        new_array: [
-            'new_array_element',
-        ],
+        new_array: ['new_array_element'],
     };
 
     expect(values.all()).toEqual(expected);
@@ -123,7 +122,7 @@ test('it sets nested values', () => {
                     {
                         name: 'Lando',
                         type: 'Man',
-                    }
+                    },
                 ],
             },
         ],
@@ -132,7 +131,7 @@ test('it sets nested values', () => {
     values.set('nickname', 'Falcon');
     values.set('bffs.0.type', 'Beast');
     values.set('bffs.1.crush.0.type', 'Scoundrel');
-    values.set('bffs.1.crush.1', {name: 'Tarkin', type: 'Evil Man'});
+    values.set('bffs.1.crush.1', { name: 'Tarkin', type: 'Evil Man' });
     values.set('some.nested.new_object.key', 'new_object_value');
     values.set('some.nested.new_array.0', 'new_array_element');
 
@@ -156,7 +155,7 @@ test('it sets nested values', () => {
                     {
                         name: 'Tarkin',
                         type: 'Evil Man',
-                    }
+                    },
                 ],
             },
         ],
@@ -165,9 +164,7 @@ test('it sets nested values', () => {
                 new_object: {
                     key: 'new_object_value',
                 },
-                new_array: [
-                    'new_array_element',
-                ],
+                new_array: ['new_array_element'],
             },
         },
     };
@@ -191,7 +188,7 @@ test('it sets nested json field values', () => {
                     {
                         name: 'Lando',
                         type: 'Man',
-                    }
+                    },
                 ]),
             },
         ]),
@@ -207,7 +204,7 @@ test('it sets nested json field values', () => {
     encodedValues.set('nickname', 'Falcon');
     encodedValues.set('bffs.0.type', 'Beast');
     encodedValues.set('bffs.1.crush.0.type', 'Scoundrel');
-    encodedValues.set('bffs.1.crush.1', {name: 'Tarkin', type: 'Evil Man'});
+    encodedValues.set('bffs.1.crush.1', { name: 'Tarkin', type: 'Evil Man' });
 
     let expected = {
         first_name: 'Han',
@@ -229,7 +226,7 @@ test('it sets nested json field values', () => {
                     {
                         name: 'Tarkin',
                         type: 'Evil Man',
-                    }
+                    },
                 ]),
             },
         ]),
@@ -246,10 +243,7 @@ test('it rejects values at top level', () => {
         bff: 'Chewy',
     };
 
-    let rejected = new Values(values).except([
-        'last_name',
-        'bff',
-    ]);
+    let rejected = new Values(values).except(['last_name', 'bff']);
 
     let expected = {
         first_name: 'Han',
@@ -280,29 +274,29 @@ test('it rejects nested values', () => {
                     {
                         name: 'Lando',
                         type: 'Man',
-                    }
+                    },
                 ],
             },
         ],
         foo123: [
             {
                 hello: 'alfa',
-                world: 'bravo'
+                world: 'bravo',
             },
             {
                 hello: 'charlie',
-                world: 'delta'
-            }
+                world: 'delta',
+            },
         ],
         foo123bar: [
             {
                 hello: 'alfa',
-                world: 'bravo'
+                world: 'bravo',
             },
             {
                 hello: 'charlie',
-                world: 'delta'
-            }
+                world: 'delta',
+            },
         ],
     };
 
@@ -331,27 +325,27 @@ test('it rejects nested values', () => {
                 crush: [
                     {
                         type: 'Man',
-                    }
+                    },
                 ],
             },
         ],
         foo123: [
             {
-                world: 'bravo'
+                world: 'bravo',
             },
             {
                 hello: 'charlie',
-                world: 'delta'
-            }
+                world: 'delta',
+            },
         ],
         foo123bar: [
             {
-                world: 'bravo'
+                world: 'bravo',
             },
             {
                 hello: 'charlie',
-                world: 'delta'
-            }
+                world: 'delta',
+            },
         ],
     };
 
@@ -430,10 +424,7 @@ test('it rejects null values', () => {
         bff: null, // this is null, but should still get removed
     };
 
-    let rejected = new Values(values).except([
-        'last_name',
-        'bff',
-    ]);
+    let rejected = new Values(values).except(['last_name', 'bff']);
 
     let expected = {
         first_name: 'Han',
@@ -457,17 +448,17 @@ test('it gracefully handles errors', () => {
 
     let jsonFields = [
         'bffs',
-        'bffs',         // duplicate field
-        'middle_name',  // non-existent field
+        'bffs', // duplicate field
+        'middle_name', // non-existent field
         'bffs.0.crush', // non-existent field
     ];
 
     let rejected = new Values(values, jsonFields).except([
         'last_name',
-        'middle_name',  // non-existent field
+        'middle_name', // non-existent field
         'bffs.0.name',
-        'bffs.0.name',  // duplicate field
-        'bffs.1.name',  // non-existent field
+        'bffs.0.name', // duplicate field
+        'bffs.1.name', // non-existent field
         'bffs.0.crush', // non-existent field
         'bffs.0.crush.0.name', // non-existent field
     ]);
@@ -494,7 +485,7 @@ test('it properly rejects keys that javascript considers having numeric separato
         },
         '123_key': {
             '456_key': {
-                'title': 'Y-Wing',
+                title: 'Y-Wing',
                 '404_text': JSON.stringify('Y-Wings are the BOMB!'),
             },
         },
@@ -506,10 +497,7 @@ test('it properly rejects keys that javascript considers having numeric separato
         '123_key.456_key.404_text',
     ];
 
-    let rejected = new Values(values, jsonFields).except([
-        '404_text',
-        '123_key.456_key.404_text',
-    ]);
+    let rejected = new Values(values, jsonFields).except(['404_text', '123_key.456_key.404_text']);
 
     let expected = {
         title: 'Millenium Falcon',
@@ -519,7 +507,7 @@ test('it properly rejects keys that javascript considers having numeric separato
         },
         '123_key': {
             '456_key': {
-                'title': 'Y-Wing',
+                title: 'Y-Wing',
             },
         },
     };
@@ -537,7 +525,7 @@ test('it properly sets keys that javascript considers having numeric separators'
         },
         '123_key': {
             '456_key': {
-                'title': 'Y-Wing',
+                title: 'Y-Wing',
                 '404_text': JSON.stringify('Y-Wings are the BOMB!'),
             },
         },
@@ -565,7 +553,7 @@ test('it properly sets keys that javascript considers having numeric separators'
         },
         '123_key': {
             '456_key': {
-                'title': 'Y-Wing',
+                title: 'Y-Wing',
                 '404_text': JSON.stringify('X-Wings are the BOMB!'),
                 '403_text': 'Unauthorized!',
             },

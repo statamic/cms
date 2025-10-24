@@ -2,12 +2,94 @@
    ========================================================================== */
 .animation-shake {
     animation-name: shake;
-    animation-duration: .5s;
+    animation-duration: 0.5s;
     animation-fill-mode: both;
 }
 
 @keyframes shake {
-    from, to { transform: translate3d(0, 0, 0); }
-    10%, 30%, 50%, 70%, 90% { transform: translate3d(-10px, 0, 0); }
-    20%, 40%, 60%, 80% { transform: translate3d(10px, 0, 0); }
+    from,
+    to {
+        transform: translate3d(0, 0, 0);
+    }
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+        transform: translate3d(-10px, 0, 0);
+    }
+    20%,
+    40%,
+    60%,
+    80% {
+        transform: translate3d(10px, 0, 0);
+    }
+}
+
+@keyframes rotate {
+    100% {
+        transform: rotate(1turn);
+    }
+}
+
+.animate-radar {
+    @apply relative z-0;
+
+    &::after {
+        @apply absolute bg-transparent bg-no-repeat;
+        content: '';
+        z-index: var(--z-index-above);
+        left: -50%;
+        top: -50%;
+        width: 200%;
+        height: 200%;
+        background-size:
+            50% 50%,
+            50% 50%;
+        background-position:
+            0 0,
+            100% 0,
+            100% 100%,
+            0 100%;
+        background-image: linear-gradient(transparent, rgba(255, 255, 255, 0.7), transparent);
+        animation: rotate 4s linear infinite;
+    }
+}
+
+/* STARTING STYLE TRANSITIONS
+=================================================== */
+/* Notes...
+
+    What does it do?
+    ----------------
+    - Soft-animates an element on page load using @starting-style
+    - These should be almost-instant otherwise they'll get annoying
+
+*/
+@media (prefers-reduced-motion: no-preference) {
+    .starting-style-transition,
+    .starting-style-transition-children > *,
+    .publish-fields > *,
+    .publish-fields-fluid > *  {
+        transition: opacity var(--starting-style-transition-duration);
+        @starting-style {
+            opacity: 0;
+        }
+    }
+
+    .starting-style-transition--quick {
+        transition: opacity calc(var(--starting-style-transition-duration) / 2);
+    }
+
+    .starting-style-transition--delay {
+        transition-delay: calc(var(--starting-style-transition-duration) * 5);
+    }
+
+    .starting-style-transition--siblings,
+    /* Assume that when we're animating children we want a sibling delay */
+    .starting-style-transition-children > *,
+    .publish-fields > *,
+    .publish-fields-fluid > * {
+        transition-delay: calc(sibling-index() * var(--starting-style-sibling-delay));
+    }
 }

@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Auth\Protect\ProtectorManager;
+use Statamic\Auth\Protect\Protectors\Protector;
 use Statamic\Events\ResponseCreated;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Cascade;
@@ -367,10 +369,49 @@ class FrontendTest extends TestCase
         $page->set('protect', 'logged_in')->save();
 
         $this
-            ->actingAs(User::make())
+            ->actingAs(tap(User::make())->save())
             ->get('/about')
             ->assertOk()
             ->assertHeader('X-Statamic-Protected', true);
+    }
+
+    #[Test]
+    public function header_is_not_added_to_cacheable_protected_responses()
+    {
+        // config(['statamic.protect.default' => 'test']);
+        config(['statamic.protect.schemes.test' => [
+            'driver' => 'test',
+        ]]);
+
+        app(ProtectorManager::class)->extend('test', function ($app) {
+            return new class() extends Protector
+            {
+                public function protect()
+                {
+                    //
+                }
+
+                public function cacheable()
+                {
+                    return true;
+                }
+            };
+        });
+
+        $page = $this->createPage('about');
+
+        $this
+            ->get('/about')
+            ->assertOk()
+            ->assertHeaderMissing('X-Statamic-Protected');
+
+        $page->set('protect', 'test')->save();
+
+        $this
+            ->actingAs(User::make()->save())
+            ->get('/about')
+            ->assertOk()
+            ->assertHeaderMissing('X-Statamic-Protected');
     }
 
     #[Test]
@@ -544,23 +585,6 @@ class FrontendTest extends TestCase
         $this->createPage('about');
 
         $this->get('about')->assertHeaderMissing('X-Powered-By', 'Statamic');
-    }
-
-    #[Test]
-    public function disables_floc_through_header_by_default()
-    {
-        $this->createPage('about');
-
-        $this->get('about')->assertHeader('Permissions-Policy', 'interest-cohort=()');
-    }
-
-    #[Test]
-    public function doesnt_disable_floc_through_header_if_disabled()
-    {
-        config(['statamic.system.disable_floc' => false]);
-        $this->createPage('about');
-
-        $this->get('about')->assertHeaderMissing('Permissions-Policy', 'interest-cohort=()');
     }
 
     #[Test]
@@ -1019,7 +1043,7 @@ class FrontendTest extends TestCase
         $this->get('/does-not-exist')->assertRedirect('/login?redirect=http://localhost/does-not-exist');
 
         $this
-            ->actingAs(User::make())
+            ->actingAs(tap(User::make())->save())
             ->get('/does-not-exist')
             ->assertStatus(404);
     }

@@ -6,11 +6,8 @@ use Statamic\Contracts\Git\ProvidesCommitMessage;
 
 class AssetFolderSaved extends Event implements ProvidesCommitMessage
 {
-    public $folder;
-
-    public function __construct($folder)
+    public function __construct(public $folder)
     {
-        $this->folder = $folder;
     }
 
     public function commitMessage()

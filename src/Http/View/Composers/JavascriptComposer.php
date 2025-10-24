@@ -5,11 +5,15 @@ namespace Statamic\Http\View\Composers;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
+use Statamic\CommandPalette\Category;
+use Statamic\Facades\CommandPalette;
 use Statamic\Facades\CP\Toast;
+use Statamic\Facades\Icon;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
-use Statamic\Fieldtypes\Icon;
+use Statamic\Fieldtypes\Sets;
+use Statamic\Icons\IconSet;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 use voku\helper\ASCII;
@@ -51,7 +55,6 @@ class JavascriptComposer
     private function protectedVariables()
     {
         $user = User::current();
-        $licenses = app('Statamic\Licensing\LicenseManager');
 
         return [
             'version' => Statamic::version(),
@@ -67,11 +70,15 @@ class JavascriptComposer
             'multisiteEnabled' => Site::multiEnabled(),
             'sites' => $this->sites(),
             'selectedSite' => Site::selected()->handle(),
+            'supportUrl' => config('statamic.cp.support_url'),
             'preloadableFieldtypes' => FieldtypeRepository::preloadable()->keys(),
             'livePreview' => config('statamic.live_preview'),
             'permissions' => $this->permissions($user),
-            'hasLicenseBanner' => $licenses->invalid() || $licenses->requestFailed(),
-            'customSvgIcons' => Icon::getCustomSvgIcons(),
+            'customSvgIcons' => $this->icons(),
+            'commandPaletteCategories' => Category::order(),
+            'commandPalettePreloadedItems' => CommandPalette::getPreloadedItems(),
+            'setPreviewImages' => Sets::previewImageConfig(),
+            'linkToDocs' => config('statamic.cp.link_to_docs'),
         ];
     }
 
@@ -102,6 +109,8 @@ class JavascriptComposer
         return $user->toAugmentedCollection()->merge([
             'preferences' => Preference::all(),
             'permissions' => $user->permissions()->all(),
+            'theme' => $user->preferredTheme(),
+            'is_impersonating' => session()->has('statamic_impersonated_by'),
         ])->toArray();
     }
 
@@ -111,5 +120,12 @@ class JavascriptComposer
         $fallbackTranslations = tap(app('translator'))->setLocale(app('translator')->getFallback())->toJson();
 
         return array_merge($fallbackTranslations, $translations);
+    }
+
+    private function icons()
+    {
+        return Icon::sets()->mapWithKeys(fn (IconSet $set) => [
+            $set->name() => $set->contents(),
+        ]);
     }
 }

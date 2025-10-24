@@ -31,6 +31,8 @@ use Statamic\Statamic;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
+use function Statamic\trans as __;
+
 class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract, Responsable
 {
     use ContainsCascadingData, ContainsSupplementalData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData;
@@ -89,6 +91,11 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
     public function deleteUrl()
     {
         return cp_route('taxonomies.destroy', $this->handle());
+    }
+
+    public function editBlueprintUrl($blueprint)
+    {
+        return cp_route('blueprints.taxonomies.edit', [$this, $blueprint]);
     }
 
     public function path()
@@ -381,6 +388,10 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
             throw new NotFoundHttpException;
         }
 
+        if ($this->collection() && ! $this->collections()->contains($this->collection())) {
+            throw new NotFoundHttpException;
+        }
+
         return (new \Statamic\Http\Responses\DataResponse($this))
             ->with([
                 'terms' => $termQuery = $this->queryTerms()->where('site', $site),
@@ -436,9 +447,22 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
         return $this
             ->fluentlyGetOrSet('layout')
             ->getter(function ($layout) {
-                return $layout ?? 'layout';
+                return $layout ?? config('statamic.system.layout', 'layout');
             })
             ->args(func_get_args());
+    }
+
+    public function createLabel()
+    {
+        $key = "statamic::messages.{$this->handle()}_taxonomy_create_term";
+
+        $translation = __($key);
+
+        if ($translation === $key) {
+            return __('Create Term');
+        }
+
+        return $translation;
     }
 
     public function searchIndex($index = null)
@@ -552,5 +576,17 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
     public function hasCustomTermTemplate()
     {
         return $this->termTemplate !== null;
+    }
+
+    public function termBlueprintCommandPaletteLinks()
+    {
+        $text = [__('Taxonomies'), __($this->title())];
+
+        return $this
+            ->termBlueprints()
+            ->map(fn ($blueprint) => $blueprint->commandPaletteLink(
+                type: $text,
+                url: $this->editBlueprintUrl($blueprint),
+            ));
     }
 }

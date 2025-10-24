@@ -57,9 +57,9 @@ EOT
     {
         $output = $this->tag(<<<'EOT'
 {{ form:contact js="custom_driver" }}
-    {{ fields }}
+    {{ form:fields }}
         <script>{{ custom_field_js }}</script>
-    {{ /fields }}
+    {{ /form:fields }}
 {{ /form:contact }}
 EOT
         );
@@ -74,14 +74,14 @@ EOT
     {
         $output = $this->normalizeHtml($this->tag(<<<'EOT'
 {{ form:contact js="custom_driver" }}
-    {{ fields }}
+    {{ form:fields }}
         {{ field }}
-    {{ /fields }}
+    {{ /form:fields }}
 {{ /form:contact }}
 EOT
         ));
 
-        $expected = '<input type="email" name="email" value="" z-unless="Statamic.$conditions.showField(\'email\', __zData)" z-gnarley="true" required>';
+        $expected = '<input id="contact-form-email-field" type="email" name="email" value="" z-unless="Statamic.$conditions.showField(\'email\', __zData)" z-gnarley="true" required>';
         $this->assertStringContainsString($expected, $output);
     }
 
@@ -100,9 +100,9 @@ EOT
     {
         $output = $this->tag(<<<'EOT'
 {{ form:contact js="custom_driver" }}
-    {{ fields }}
+    {{ form:fields }}
         <script>{{ show_field }}</script>
-    {{ /fields }}
+    {{ /form:fields }}
 {{ /form:contact }}
 EOT
         );

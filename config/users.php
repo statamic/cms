@@ -134,6 +134,7 @@ return [
         'roles' => false,
         'group_user' => 'group_user',
         'groups' => false,
+        'webauthn' => 'webauthn',
     ],
 
     /*
@@ -166,6 +167,32 @@ return [
         'enabled' => env('STATAMIC_IMPERSONATE_ENABLED', true),
         'redirect' => env('STATAMIC_IMPERSONATE_REDIRECT', null),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Elevated Sessions
+    |--------------------------------------------------------------------------
+    |
+    | Users may be required to reauthorize before performing certain
+    | sensitive actions. This is called an elevated session. Here
+    | you may configure the duration of the session in minutes.
+    |
+    */
+
+    'elevated_session_duration' => 15,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Enforce Two-Factor Authentication
+    |--------------------------------------------------------------------------
+    |
+    | Specify which user roles should be required to enable two-factor
+    | authentication. Use "*" to enforce 2FA for all users, or "super_users"
+    | to enforce it for super users.
+    |
+    */
+
+    'two_factor_enforced_roles' => [],
 
     /*
     |--------------------------------------------------------------------------

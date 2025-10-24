@@ -1,8 +1,14 @@
 <select
-    name="{{ handle }}{{ multiple ?= "[]" }}"
+    id="{{ id }}"
+    name="{{ name }}{{ multiple ?= "[]" }}"
     {{ if js_driver }}{{ js_attributes }}{{ /if }}
     {{ if multiple }}multiple{{ /if }}
     {{ if validate|contains:required }}required{{ /if }}
+    {{ if error }}
+        aria-invalid="true" aria-describedby="{{ id }}-error"
+    {{ elseif instructions }}
+        aria-describedby="{{ id }}-instructions"
+    {{ /if }}
 >
     {{ unless multiple }}
         <option value>

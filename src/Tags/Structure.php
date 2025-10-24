@@ -32,12 +32,8 @@ class Structure extends Tags
 
     public function wildcard($tag)
     {
-        $handle = $this->context->value($tag, $tag);
-
         // Allow {{ structure:collection:pages }} rather than needing to use the double colon.
-        if (is_string($handle)) {
-            $handle = str_replace(':', '::', $tag);
-        }
+        $handle = str_replace(':', '::', $tag);
 
         return $this->structure($handle);
     }
@@ -64,7 +60,13 @@ class Structure extends Tags
             'max_depth' => $this->params->get('max_depth'),
         ]);
 
-        return $this->toArray($tree);
+        $value = $this->toArray($tree);
+
+        if ($this->parser && ($as = $this->params->get('as'))) {
+            return [$as => $value];
+        }
+
+        return $value;
     }
 
     protected function ensureStructureExists(string $handle): void
@@ -130,16 +132,15 @@ class Structure extends Tags
 
             return array_merge($data, [
                 'children' => $children,
-                'parent' => $parent,
                 'depth' => $depth,
                 'index' => $index,
                 'count' => $index + 1,
                 'first' => $index === 0,
                 'last' => $index === count($tree) - 1,
-                'is_current' => ! is_null($url) && rtrim($url, '/') === rtrim($this->currentUrl, '/'),
+                'is_current' => ! is_null($url) && $url === $this->currentUrl,
                 'is_parent' => ! is_null($url) && $this->siteAbsoluteUrl !== $absoluteUrl && URL::isAncestorOf($this->currentUrl, $url),
                 'is_external' => URL::isExternal((string) $absoluteUrl),
-            ]);
+            ], $this->params->bool('include_parents', true) ? ['parent' => $parent] : []);
         })->filter()->values();
 
         $this->updateIsParent($pages);

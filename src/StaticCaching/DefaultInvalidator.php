@@ -6,10 +6,14 @@ use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Forms\Form;
-use Statamic\Contracts\Globals\GlobalSet;
+use Statamic\Contracts\Globals\Variables;
 use Statamic\Contracts\Structures\Nav;
-use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Contracts\Structures\NavTree;
+use Statamic\Facades\Site;
+use Statamic\Facades\URL;
+use Statamic\Structures\CollectionTree;
 use Statamic\Support\Arr;
+use Statamic\Taxonomies\LocalizedTerm;
 
 class DefaultInvalidator implements Invalidator
 {
@@ -25,21 +29,27 @@ class DefaultInvalidator implements Invalidator
     public function invalidate($item)
     {
         if ($this->rules === 'all') {
-            return $this->cacher->flush();
+            $this->cacher->flush();
+
+            return;
         }
 
         $urls = collect();
 
         if ($item instanceof Entry) {
             $urls = $this->getEntryUrls($item);
-        } elseif ($item instanceof Term) {
+        } elseif ($item instanceof LocalizedTerm) {
             $urls = $this->getTermUrls($item);
         } elseif ($item instanceof Nav) {
             $urls = $this->getNavUrls($item);
-        } elseif ($item instanceof GlobalSet) {
+        } elseif ($item instanceof NavTree) {
+            $urls = $this->getNavTreeUrls($item);
+        } elseif ($item instanceof Variables) {
             $urls = $this->getGlobalUrls($item);
         } elseif ($item instanceof Collection) {
             $urls = $this->getCollectionUrls($item);
+        } elseif ($item instanceof CollectionTree) {
+            $urls = $this->getCollectionTreeUrls($item);
         } elseif ($item instanceof Asset) {
             $urls = $this->getAssetUrls($item);
         } elseif ($item instanceof Form) {
@@ -72,14 +82,18 @@ class DefaultInvalidator implements Invalidator
 
         if ($item instanceof Entry) {
             $urls = $this->getEntryUrls($item);
-        } elseif ($item instanceof Term) {
+        } elseif ($item instanceof LocalizedTerm) {
             $urls = $this->getTermUrls($item);
         } elseif ($item instanceof Nav) {
             $urls = $this->getNavUrls($item);
-        } elseif ($item instanceof GlobalSet) {
+        } elseif ($item instanceof NavTree) {
+            $urls = $this->getNavTreeUrls($item);
+        } elseif ($item instanceof Variables) {
             $urls = $this->getGlobalUrls($item);
         } elseif ($item instanceof Collection) {
             $urls = $this->getCollectionUrls($item);
+        } elseif ($item instanceof CollectionTree) {
+            $urls = $this->getCollectionTreeUrls($item);
         } elseif ($item instanceof Asset) {
             $urls = $this->getAssetUrls($item);
         } elseif ($item instanceof Form) {
@@ -89,70 +103,179 @@ class DefaultInvalidator implements Invalidator
         $this->cacher->recacheUrls($urls);
     }
 
-    private function getFormUrls($form)
+    protected function getFormUrls($form)
     {
-        return Arr::get($this->rules, "forms.{$form->handle()}.urls");
+        $rules = collect(Arr::get($this->rules, "forms.{$form->handle()}.urls"));
+
+        $absoluteUrls = $rules->filter(fn (string $rule) => URL::isAbsolute($rule))->all();
+
+        $prefixedRelativeUrls = Site::all()->map(function ($site) use ($rules) {
+            return $rules
+                ->reject(fn (string $rule) => URL::isAbsolute($rule))
+                ->map(fn (string $rule) => URL::tidy($site->url().'/'.$rule, withTrailingSlash: false));
+        })->flatten()->all();
+
+        return [
+            ...$absoluteUrls,
+            ...$prefixedRelativeUrls,
+        ];
     }
 
     protected function getAssetUrls($asset)
     {
-        return Arr::get($this->rules, "assets.{$asset->container()->handle()}.urls");
+        $rules = collect(Arr::get($this->rules, "assets.{$asset->container()->handle()}.urls"));
+
+        $absoluteUrls = $rules->filter(fn (string $rule) => URL::isAbsolute($rule))->all();
+
+        $prefixedRelativeUrls = Site::all()->map(function ($site) use ($rules) {
+            return $rules
+                ->reject(fn (string $rule) => URL::isAbsolute($rule))
+                ->map(fn (string $rule) => URL::tidy($site->url().'/'.$rule, withTrailingSlash: false));
+        })->flatten()->all();
+
+        return [
+            ...$absoluteUrls,
+            ...$prefixedRelativeUrls,
+        ];
     }
 
     protected function getEntryUrls($entry)
     {
-        $urls = $entry->descendants()->merge([$entry])->map(function ($entry) {
-            if (! $entry->isRedirect() && $url = $entry->absoluteUrl()) {
-                return $this->splitUrlAndDomain($url);
-            }
-        })->filter();
+        $rules = collect(Arr::get($this->rules, "collections.{$entry->collectionHandle()}.urls"));
 
-        return $urls->merge(Arr::get($this->rules, "collections.{$entry->collectionHandle()}.urls"))->all();
+        $urls = $entry->descendants()
+            ->merge([$entry])
+            ->reject(fn ($entry) => $entry->isRedirect())
+            ->map->absoluteUrl()
+            ->all();
+
+        $absoluteUrls = $rules->filter(fn (string $rule) => URL::isAbsolute($rule))->all();
+
+        $prefixedRelativeUrls = $rules
+            ->reject(fn (string $rule) => URL::isAbsolute($rule))
+            ->map(fn (string $rule) => URL::tidy($entry->site()->url().'/'.$rule, withTrailingSlash: false))
+            ->all();
+
+        return [
+            ...$urls,
+            ...$absoluteUrls,
+            ...$prefixedRelativeUrls,
+        ];
     }
 
     protected function getTermUrls($term)
     {
-        $urls = collect();
-        if ($url = $term->absoluteUrl()) {
-            $urls = $urls->push($this->splitUrlAndDomain($url));
+        $rules = collect(Arr::get($this->rules, "taxonomies.{$term->taxonomyHandle()}.urls"));
 
-            $urls = $urls->merge($term->taxonomy()->collections()->map(function ($collection) use ($term) {
-                if ($url = $term->collection($collection)->absoluteUrl()) {
-                    return $this->splitUrlAndDomain($url);
-                }
-            }))->filter();
+        if ($url = $term->absoluteUrl()) {
+            $urls = $term->taxonomy()->collections()
+                ->map(fn ($collection) => $term->collection($collection)->absoluteUrl())
+                ->filter()
+                ->prepend($url)
+                ->all();
         }
 
-        return $urls->merge(Arr::get($this->rules, "taxonomies.{$term->taxonomyHandle()}.urls"))->all();
+        $absoluteUrls = $rules->filter(fn (string $rule) => URL::isAbsolute($rule))->all();
+
+        $prefixedRelativeUrls = $rules
+            ->reject(fn (string $rule) => URL::isAbsolute($rule))
+            ->map(fn (string $rule) => URL::tidy($term->site()->url().'/'.$rule, withTrailingSlash: false))
+            ->all();
+
+        return [
+            ...$urls ?? [],
+            ...$absoluteUrls,
+            ...$prefixedRelativeUrls,
+        ];
     }
 
     protected function getNavUrls($nav)
     {
-        return Arr::get($this->rules, "navigation.{$nav->handle()}.urls");
+        $rules = collect(Arr::get($this->rules, "navigation.{$nav->handle()}.urls"));
+
+        $absoluteUrls = $rules->filter(fn (string $rule) => URL::isAbsolute($rule))->all();
+
+        $prefixedRelativeUrls = $nav->sites()->map(function ($site) use ($rules) {
+            return $rules
+                ->reject(fn (string $rule) => URL::isAbsolute($rule))
+                ->map(fn (string $rule) => URL::tidy(Site::get($site)->url().'/'.$rule, withTrailingSlash: false));
+        })->flatten()->all();
+
+        return [
+            ...$absoluteUrls,
+            ...$prefixedRelativeUrls,
+        ];
     }
 
-    protected function getGlobalUrls($set)
+    protected function getNavTreeUrls($tree)
     {
-        return Arr::get($this->rules, "globals.{$set->handle()}.urls");
+        $rules = collect(Arr::get($this->rules, "navigation.{$tree->structure()->handle()}.urls"));
+
+        $absoluteUrls = $rules->filter(fn (string $rule) => URL::isAbsolute($rule))->all();
+
+        $prefixedRelativeUrls = $rules
+            ->reject(fn (string $rule) => URL::isAbsolute($rule))
+            ->map(fn (string $rule) => URL::tidy($tree->site()->url().'/'.$rule, withTrailingSlash: false))
+            ->all();
+
+        return [
+            ...$absoluteUrls,
+            ...$prefixedRelativeUrls,
+        ];
+    }
+
+    protected function getGlobalUrls($variables)
+    {
+        $rules = collect(Arr::get($this->rules, "globals.{$variables->globalSet()->handle()}.urls"));
+
+        $absoluteUrls = $rules->filter(fn (string $rule) => URL::isAbsolute($rule))->all();
+
+        $prefixedRelativeUrls = $rules
+            ->reject(fn (string $rule) => URL::isAbsolute($rule))
+            ->map(fn (string $rule) => URL::tidy($variables->site()->url().'/'.$rule, withTrailingSlash: false))
+            ->all();
+
+        return [
+            ...$absoluteUrls,
+            ...$prefixedRelativeUrls,
+        ];
     }
 
     protected function getCollectionUrls($collection)
     {
-        $urls = [];
-        if ($url = $collection->absoluteUrl()) {
-            $urls[] = $this->splitUrlAndDomain($url);
-        }
+        $rules = collect(Arr::get($this->rules, "collections.{$collection->handle()}.urls"));
 
-        return array_merge($urls, Arr::get($this->rules, "collections.{$collection->handle()}.urls"));
-    }
+        $urls = $collection->sites()->map(fn ($site) => $collection->absoluteUrl($site))->filter()->all();
 
-    private function splitUrlAndDomain(string $url)
-    {
-        $parsed = parse_url($url);
+        $absoluteUrls = $rules->filter(fn (string $rule) => URL::isAbsolute($rule))->all();
+
+        $prefixedRelativeUrls = $collection->sites()->map(function ($site) use ($rules) {
+            return $rules
+                ->reject(fn (string $rule) => URL::isAbsolute($rule))
+                ->map(fn (string $rule) => URL::tidy(Site::get($site)->url().'/'.$rule, withTrailingSlash: false));
+        })->flatten()->all();
 
         return [
-            Arr::get($parsed, 'path', '/'),
-            $parsed['scheme'].'://'.$parsed['host'],
+            ...$urls,
+            ...$absoluteUrls,
+            ...$prefixedRelativeUrls,
+        ];
+    }
+
+    protected function getCollectionTreeUrls($tree)
+    {
+        $rules = collect(Arr::get($this->rules, "collections.{$tree->collection()->handle()}.urls"));
+
+        $absoluteUrls = $rules->filter(fn (string $rule) => URL::isAbsolute($rule))->all();
+
+        $prefixedRelativeUrls = $rules
+            ->reject(fn (string $rule) => URL::isAbsolute($rule))
+            ->map(fn (string $rule) => URL::tidy($tree->site()->url().'/'.$rule, withTrailingSlash: false))
+            ->all();
+
+        return [
+            ...$absoluteUrls,
+            ...$prefixedRelativeUrls,
         ];
     }
 }

@@ -2,8 +2,8 @@ import FieldConditions from './components/FieldConditions.js';
 
 class Statamic {
     constructor() {
-        this.$conditions = new FieldConditions;
+        this.$conditions = new FieldConditions();
     }
 }
 
-window.Statamic = new Statamic;
+window.Statamic = new Statamic();

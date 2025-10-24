@@ -708,6 +708,56 @@ class UpdateAssetReferencesTest extends TestCase
     }
 
     #[Test]
+    public function it_updates_nested_asset_fields_within_group_fields()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'group_field',
+                    'field' => [
+                        'type' => 'group',
+                        'fields' => [
+                            [
+                                'handle' => 'product',
+                                'field' => [
+                                    'type' => 'assets',
+                                    'container' => 'test_container',
+                                    'max_files' => 1,
+                                ],
+                            ],
+                            [
+                                'handle' => 'pics',
+                                'field' => [
+                                    'type' => 'assets',
+                                    'container' => 'test_container',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'group_field' => [
+                'product' => 'hoff.jpg',
+                'pics' => ['hoff.jpg', 'norris.jpg', 'lee.jpg'],
+            ],
+        ]))->save();
+
+        $this->assertEquals('hoff.jpg', Arr::get($entry->data(), 'group_field.product'));
+        $this->assertEquals(['hoff.jpg', 'norris.jpg', 'lee.jpg'], Arr::get($entry->data(), 'group_field.pics'));
+
+        $this->assetNorris->path('content/norris.jpg')->save();
+        $this->assetHoff->delete();
+
+        $this->assertFalse(Arr::has($entry->fresh()->data(), 'group_field.product'));
+        $this->assertEquals(['content/norris.jpg', 'lee.jpg'], Arr::get($entry->fresh()->data(), 'group_field.pics'));
+    }
+
+    #[Test]
     public function it_updates_nested_asset_fields_within_bard_fields()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -1665,12 +1715,10 @@ EOT;
     #[Test]
     public function it_updates_global_sets()
     {
-        $set = Facades\GlobalSet::make('default');
+        $set = Facades\GlobalSet::make('default')->sites(['en', 'fr'])->save();
 
-        $set->addLocalization($set->makeLocalization('en')->data(['pic' => 'norris.jpg']));
-        $set->addLocalization($set->makeLocalization('fr')->data(['pic' => 'hoff.jpg']));
-
-        $set->save();
+        $set->in('en')->data(['pic' => 'norris.jpg'])->save();
+        $set->in('fr')->data(['pic' => 'hoff.jpg'])->save();
 
         $this->setSingleBlueprint('globals.default', [
             'fields' => [

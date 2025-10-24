@@ -43,7 +43,7 @@ class FormRepositoryTest extends TestCase
         $this->repo->findOrFail('does-not-exist');
     }
 
-    /** @test */
+    #[Test]
     public function it_registers_config()
     {
         $this->repo->appendConfigFields('test_form', 'Test Config', [

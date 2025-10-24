@@ -9,6 +9,8 @@ use Statamic\Exceptions\ValidationException;
 
 class ReuploadAsset extends Action
 {
+    protected $icon = 'upload-cloud';
+
     public static function title()
     {
         return __('Reupload');

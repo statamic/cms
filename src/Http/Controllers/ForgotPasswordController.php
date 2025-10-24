@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
+use Inertia\Inertia;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Auth\SendsPasswordResetEmails;
 use Statamic\Facades\URL;
@@ -22,8 +23,9 @@ class ForgotPasswordController extends Controller
 
     public function showLinkRequestForm()
     {
-        return view('statamic::auth.passwords.email')->with([
-            'title' => __('Forgot Your Password?'),
+        return Inertia::render('auth/passwords/Email', [
+            'action' => cp_route('password.email'),
+            'loginUrl' => cp_route('login'),
         ]);
     }
 
