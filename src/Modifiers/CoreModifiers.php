@@ -283,6 +283,7 @@ class CoreModifiers extends Modifier
         }
 
         $text = '';
+
         while (count($value)) {
             $item = array_shift($value);
 
@@ -291,8 +292,13 @@ class CoreModifiers extends Modifier
             }
 
             if ($item['type'] === 'text') {
-                $text .= ' '.($item['text'] ?? '');
+                $text .= ($item['text'] ?? '');
             }
+
+            if ($item['type'] === 'paragraph' && $text !== '') {
+                $text .= ' ';
+            }
+
             array_unshift($value, ...($item['content'] ?? []));
         }
 
