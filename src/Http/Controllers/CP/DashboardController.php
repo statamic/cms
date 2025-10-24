@@ -68,10 +68,12 @@ class DashboardController extends CpController
                     'classes' => $widget->config('classes'),
                     'width' => $widget->config('width', 100),
                     'html' => (string) $widget->html(),
+                    'component' => $widget->component(),
                 ];
             })
             ->reject(function ($widget) {
-                return empty($widget['html']);
-            });
+                return empty($widget['component']) && empty($widget['html']);
+            })
+            ->values();
     }
 }

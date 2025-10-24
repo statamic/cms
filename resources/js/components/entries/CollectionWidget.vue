@@ -27,6 +27,9 @@ const props = defineProps({
     initialSortDirection: {
         type: String,
     },
+    canCreate: Boolean,
+    createLabel: String,
+    blueprints: Array,
 });
 
 const requestUrl = cp_url(`collections/${props.collection}/entries`);
@@ -94,7 +97,13 @@ function formatDate(value) {
                 </div>
                 <template #actions>
                     <Pagination />
-                    <slot name="actions" />
+                    <create-entry-button
+                        v-if="canCreate"
+                        :text="createLabel"
+                        size="sm"
+                        variant="default"
+                        :blueprints
+                    />
                 </template>
             </Widget>
         </template>

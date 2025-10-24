@@ -62,6 +62,7 @@ return [
     'code.config.mode_selectable' => 'Whether the mode can be changed by the user.',
     'code.config.rulers' => 'Configure vertical rulers to help with indentation.',
     'code.config.rulers_value_header' => 'Line Style (dashed or solid)',
+    'code.config.show_mode_label' => 'Whether the mode label should be shown.',
     'code.config.theme' => 'Choose your preferred theme.',
     'code.title' => 'Code',
     'collections.title' => 'Collections',

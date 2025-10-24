@@ -55,7 +55,7 @@ return [
     */
 
     'widgets' => [
-        'getting_started',
+        //
     ],
 
     /*
