@@ -89,6 +89,7 @@
 
 .dark {
     @theme inline {
+        --color-primary-hover: color-mix(in oklch, var(--color-primary) 100%, white 30%);
         --color-success: var(--color-green-500);
         --color-gray-950: hsl(240deg 7% 8%);
     }

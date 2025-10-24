@@ -17,7 +17,7 @@ const props = defineProps({
             <Heading v-html="heading" />
             <Subheading v-if="subheading" v-html="subheading" />
         </PanelHeader>
-        <Card inset class="divide-y divide-gray-200 dark:divide-gray-950">
+        <Card inset class="divide-y dark:divide-y-[0.75px] divide-gray-200 dark:divide-gray-700">
             <slot />
         </Card>
     </Panel>
