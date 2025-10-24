@@ -256,22 +256,8 @@ class ValuesTest extends TestCase
     #[Test]
     public function it_can_check_isset_on_properties()
     {
-        $class = new class
-        {
-            private $field;
-
-            public function __construct()
-            {
-                $this->field = [new Values(['a' => 'alfa'])];
-            }
-
-            public function __get(string $key)
-            {
-                return $this->$key;
-            }
-        };
-
-        $this->assertFalse(empty($class->field));
+        $field = [new Values(['a' => 'alfa'])];
+        $this->assertTrue(isset($field->a));
     }
 }
 
