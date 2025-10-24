@@ -16,7 +16,7 @@
             :push-tags="config.push_tags"
             :multiple="config.multiple"
             :reset-on-options-change="resetOnOptionsChange"
-            :close-on-select="true"
+            :close-on-select="!config.multiple"
             :value="selectedOptions"
             :create-option="(value) => ({ value, label: value })"
             @input="vueSelectUpdated"
