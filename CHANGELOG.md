@@ -1,5 +1,39 @@
 # Release Notes
 
+## 6.0.0-alpha.15 (2025-10-24)
+
+### What's new
+- Passkeys [#9239](https://github.com/statamic/cms/issues/9239) by @ryanmitchell
+- Bladeless widgets [#12801](https://github.com/statamic/cms/issues/12801) by @duncanmcclean
+
+### What's fixed
+- Flatten badges by default [#12834](https://github.com/statamic/cms/issues/12834) by @jackmcdade
+- Fix badge button style when used as link or button [9566dcec4](https://github.com/statamic/cms/commit/9566dcec4) by @jackmcdade
+- Fix week hour format [#12844](https://github.com/statamic/cms/issues/12844) by @jasonvarga
+- Improve replicator preview [#12841](https://github.com/statamic/cms/issues/12841) by @JayGeorge
+- Remove `getting_started` widget from `cp` config [#12852](https://github.com/statamic/cms/issues/12852) by @duncanmcclean
+- Add `HandleInertiaRequests` middleware to frontend auth routes [#12854](https://github.com/statamic/cms/issues/12854) by @duncanmcclean
+- Fix empty dashboard [#12851](https://github.com/statamic/cms/issues/12851) by @duncanmcclean
+- Convert collection create page to Inertia [#12853](https://github.com/statamic/cms/issues/12853) by @duncanmcclean
+- Bard tweaks [#12850](https://github.com/statamic/cms/issues/12850) by @JayGeorge
+- Fix text bottom margin in table cell [#12849](https://github.com/statamic/cms/issues/12849) by @JayGeorge
+- Add `show_mode_label` option to code fieldtype [#12848](https://github.com/statamic/cms/issues/12848) by @duncanmcclean
+- Dark mode tweaks [#12843](https://github.com/statamic/cms/issues/12843) by @JayGeorge
+- Move JS initialization earlier [#12856](https://github.com/statamic/cms/issues/12856) by @jasonvarga
+- Combobox: Only render `selected-option` slot when there's a selected option [#12847](https://github.com/statamic/cms/issues/12847) by @duncanmcclean
+- Set the default dated collections view to list [#12839](https://github.com/statamic/cms/issues/12839) by @JayGeorge
+- Add replicator set above first set [#12838](https://github.com/statamic/cms/issues/12838) by @JayGeorge
+- Bard sets fix inset pseudo content from blocking pointer events [#12837](https://github.com/statamic/cms/issues/12837) by @JayGeorge
+- Publish Container should watch changes to `modifiedFields` prop [#12830](https://github.com/statamic/cms/issues/12830) by @duncanmcclean
+- Fix combobox z-index in modals [#12829](https://github.com/statamic/cms/issues/12829) by @JayGeorge
+- Bard reading time [#12836](https://github.com/statamic/cms/issues/12836) by @JayGeorge
+- Fix css compilation issues [#12833](https://github.com/statamic/cms/issues/12833) by @JayGeorge
+- Persistent sidebar collapse icon [#12846](https://github.com/statamic/cms/issues/12846) by @JayGeorge
+- Fix css border-image compilation clash [3257369f3](https://github.com/statamic/cms/commit/3257369f3) by @jackmcdade
+- Convert collection scaffold page to Inertia [#12826](https://github.com/statamic/cms/issues/12826) by @duncanmcclean
+
+
+
 ## 6.0.0-alpha.14 (2025-10-21)
 
 ### What's fixed
