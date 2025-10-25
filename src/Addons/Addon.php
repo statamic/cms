@@ -348,6 +348,11 @@ final class Addon
         return config($this->handle());
     }
 
+    public function useContentLayoutForSettings(): bool
+    {
+        return app()->bound("statamic.addons.{$this->slug()}.use_content_layout");
+    }
+
     public function hasSettingsBlueprint(): bool
     {
         return $this->settingsBlueprint() !== null;

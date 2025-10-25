@@ -69,9 +69,9 @@ class PublishForm implements Responsable
         return $this;
     }
 
-    public function asConfig()
+    public function asConfig($asConfig = true)
     {
-        $this->asConfig = true;
+        $this->asConfig = $asConfig;
 
         return $this;
     }
