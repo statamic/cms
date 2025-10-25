@@ -27,7 +27,7 @@
                 />
             </div>
         </header>
-        <div class="px-4 py-3">
+        <div :class="{ 'px-4 py-3': !asConfig }">
             <FieldsProvider
                 :fields="fields"
                 :field-path-prefix="`${fieldPathPrefix}.${index}`"
@@ -38,6 +38,12 @@
         </div>
     </div>
 </template>
+
+<script setup>
+import { injectPublishContext as injectContainerContext } from '@ui';
+
+const { asConfig } = injectContainerContext();
+</script>
 
 <script>
 import Row from './Row.vue';
