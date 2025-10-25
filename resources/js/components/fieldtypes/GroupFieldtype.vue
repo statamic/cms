@@ -16,7 +16,7 @@
                             :field-path-prefix="fieldPathPrefix ? `${fieldPathPrefix}.${handle}` : handle"
                             :meta-path-prefix="metaPathPrefix ? `${metaPathPrefix}.${handle}` : handle"
                         >
-                            <Fields class="p-4" />
+                            <Fields :class="{ 'p-4': !asConfig }" />
                         </FieldsProvider>
                     </div>
                 </section>
@@ -24,6 +24,12 @@
         </element-container>
     </portal>
 </template>
+
+<script setup>
+import { injectPublishContext as injectContainerContext } from '@ui';
+
+const { asConfig } = injectContainerContext();
+</script>
 
 <script>
 import Fieldtype from './Fieldtype.vue';
