@@ -22,7 +22,7 @@ class AddonSettingsController extends CpController
         $this->authorize('editSettings', $addon);
 
         return PublishForm::make($addon->settingsBlueprint())
-            ->asConfig()
+            ->asConfig(! $addon->useContentLayoutForSettings())
             ->icon('cog')
             ->title($addon->name())
             ->values($addon->settings()->raw())

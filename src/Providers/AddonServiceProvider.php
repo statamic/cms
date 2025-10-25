@@ -811,6 +811,13 @@ abstract class AddonServiceProvider extends ServiceProvider
         return $this;
     }
 
+    protected function useContentLayoutForSettings(): self
+    {
+        $this->app->bind("statamic.addons.{$this->getAddon()->slug()}.use_content_layout", fn () => true);
+
+        return $this;
+    }
+
     protected function bootSettingsBlueprint()
     {
         if (! $this->shouldBootRootItems()) {
