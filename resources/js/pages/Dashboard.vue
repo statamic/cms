@@ -55,7 +55,7 @@ function tailwindWidthClass(width) {
                 :class="classes(widget)"
             >
                 <component v-if="widget.component" :is="widget.component.name" v-bind="widget.component.props" />
-                <DynamicHtmlRenderer :html="widget.html" />
+                <DynamicHtmlRenderer v-else :html="widget.html" />
             </div>
         </div>
     </template>
