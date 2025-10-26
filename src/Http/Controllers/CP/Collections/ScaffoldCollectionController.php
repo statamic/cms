@@ -5,8 +5,8 @@ namespace Statamic\Http\Controllers\CP\Collections;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
-use Statamic\Facades\File;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\View\Scaffolding\TemplateGenerator;
 
 class ScaffoldCollectionController extends CpController
 {
@@ -24,31 +24,32 @@ class ScaffoldCollectionController extends CpController
     {
         $this->authorize('store', CollectionContract::class, __('You are not authorized to scaffold resources.'));
 
+        $generator = TemplateGenerator::make();
+
         // Make the index template
-        if ($index = $this->request->get('index')) {
-            $this->makeTemplate($index);
+        if ($indexPath = $this->request->get('index')) {
+            $generator
+                ->scaffold('collection.index', [
+                    'collection' => $collection,
+                ])
+                ->save($indexPath);
+
+            $collection->template($indexPath)->save();
         }
 
         // Make the show template
-        if ($show = $this->request->get('show')) {
-            $this->makeTemplate($show);
+        if ($showPath = $this->request->get('show')) {
+            $generator
+                ->scaffold('collection.show', [
+                    'collection' => $collection,
+                ])
+                ->save($showPath);
+
+            $collection->template($showPath)->save();
         }
 
         session()->flash('success', __('Views created successfully'));
 
         return redirect()->route('statamic.cp.collections.show', $request->collection->handle());
-    }
-
-    private function makeTemplate($filename)
-    {
-        $file = resource_path("views/{$filename}.antlers.html");
-
-        // Don't overwrite existing
-        if (! File::get($file)) {
-            File::put($file, '');
-        }
-
-        // Set the template
-        $this->request->collection->template($filename)->save();
     }
 }
