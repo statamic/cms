@@ -79,6 +79,10 @@ class AppServiceProvider extends ServiceProvider
             "{$this->root}/resources/views/extend/forms" => resource_path('views/vendor/statamic/forms'),
         ], 'statamic-forms');
 
+        $this->publishes([
+            "{$this->root}/resources/views/extend/scaffolding" => resource_path('views/vendor/statamic/scaffolding'),
+        ], 'statamic-scaffolding');
+
         $this->app['redirect']->macro('cpRoute', function ($route, $parameters = []) {
             return $this->to(cp_route($route, $parameters));
         });
