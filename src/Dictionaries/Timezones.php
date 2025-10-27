@@ -2,10 +2,12 @@
 
 namespace Statamic\Dictionaries;
 
+use DateTimeZone;
+use Illuminate\Support\Carbon;
+
 class Timezones extends BasicDictionary
 {
     protected string $valueKey = 'name';
-
     protected array $keywords = ['timezone', 'tz', 'zone', 'time', 'date'];
 
     protected function getItemLabel(array $item): string
@@ -15,23 +17,16 @@ class Timezones extends BasicDictionary
 
     protected function getItems(): array
     {
-        return collect(timezone_abbreviations_list())
-            ->flatMap(fn (array $timezones, string $abbreviation) => collect($timezones)
-                ->map(fn (array $data) => $this->tzData($data, $abbreviation))
-            )->all();
+        return collect(DateTimeZone::listIdentifiers())
+            ->map(fn ($tz) => ['name' => $tz, 'offset' => $this->getOffset($tz)])
+            ->all();
     }
 
-    private function tzData(array $data, string $abbreviation): array
+    private function getOffset(string $tz): string
     {
-        return [
-            'abbreviation' => $abbreviation,
-            'name' => $data['timezone_id'],
-            'offset' => $this->getOffset($data['offset']),
-        ];
-    }
-
-    private function getOffset(int $offsetInSecs): string
-    {
+        $tz = new DateTimeZone($tz);
+        $utcTime = Carbon::now('UTC');
+        $offsetInSecs = $tz->getOffset($utcTime);
         $hoursAndSec = gmdate('H:i', abs($offsetInSecs));
 
         return stripos($offsetInSecs, '-') === false ? "+{$hoursAndSec}" : "-{$hoursAndSec}";
