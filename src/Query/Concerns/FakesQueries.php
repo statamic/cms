@@ -78,7 +78,7 @@ trait FakesQueries
         return $this;
     }
 
-    protected function dumper(): Dumper
+    private function dumper(): Dumper
     {
         return new Dumper($this);
     }
