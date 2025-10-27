@@ -48,10 +48,6 @@ async function createPasskey() {
         return;
     }
 
-    // Hitting enter submits twice to due to attribute binding issue on
-    // the Input component. This guard can be removed once it's fixed.
-    if (passkeyWaiting.value) return;
-
     passkeyWaiting.value = true;
     const name = passkeyName.value || `${__('Passkey')} ${props.passkeys.length + 1}`;
     showCreateModal.value = false;
