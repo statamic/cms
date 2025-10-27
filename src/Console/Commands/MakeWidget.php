@@ -64,9 +64,6 @@ class MakeWidget extends GeneratorCommand
             return false;
         }
 
-        // todo: tests
-        // todo: docs
-
         $this->option('blade')
             ? $this->generateWidgetView()
             : $this->generateVueComponent();
