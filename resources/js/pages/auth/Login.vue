@@ -52,6 +52,18 @@ const showPasskeyLogin = computed(() => {
     return props.emailLoginEnabled && passkey.supported;
 })
 
+const emailAutocomplete = computed(() => {
+    let tokens = 'username';
+    if (showPasskeyLogin.value) tokens += ' webauthn';
+    return tokens;
+});
+
+const passwordAutocomplete = computed(() => {
+    let tokens = 'current-password';
+    if (showPasskeyLogin.value) tokens += ' webauthn';
+    return tokens;
+});
+
 async function loginWithPasskey() {
     await passkey.authenticate(
         props.passkeyOptionsUrl,
@@ -80,11 +92,11 @@ async function loginWithPasskey() {
                 class="flex flex-col gap-6"
             >
                 <Field :label="__('Email')" :error="errors?.email">
-                    <Input v-model="email" name="email" autofocus tabindex="1" :autocomplete="'username' + (showPasskeyLogin ? ' webauthn' : '')" />
+                    <Input v-model="email" name="email" autofocus tabindex="1" :autocomplete="emailAutocomplete" />
                 </Field>
 
                 <Field :label="__('Password')" :error="errors?.password">
-                    <Input v-model="password" name="password" type="password" :autocomplete="'current-password' + (showPasskeyLogin ? ' webauthn' : '')" tabindex="2" />
+                    <Input v-model="password" name="password" type="password" :autocomplete="passwordAutocomplete" tabindex="2" />
                     <template #actions>
                         <Link
                             :href="forgotPasswordUrl"
