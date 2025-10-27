@@ -173,7 +173,7 @@ return [
     'taggable.config.placeholder' => 'Skriv och tryck på ↩ Enter',
     'taggable.title' => 'Etikett',
     'taxonomies.title' => 'Taxonomier',
-    'template.config.blueprint' => 'Lägger till ett &quot;karta till ritning&quot;-alternativ. Läs mer i [dokumentationen](https://statamic.dev/views#inferring-templates-from-entry-blueprints).',
+    'template.config.blueprint' => 'Lägger till ett &quot;karta till ritning&quot;-alternativ. Läs mer i [dokumentationen](https://statamic.dev/views#map-templates-to-entry-blueprints).',
     'template.config.folder' => 'Visa endast mallar i den här mappen.',
     'template.config.hide_partials' => 'Partialer är sällan avsedda att användas som mallar.',
     'template.title' => 'Mall',
