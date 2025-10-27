@@ -80,11 +80,11 @@ async function loginWithPasskey() {
                 class="flex flex-col gap-6"
             >
                 <Field :label="__('Email')" :error="errors?.email">
-                    <Input v-model="email" name="email" autofocus tabindex="1" />
+                    <Input v-model="email" name="email" autofocus tabindex="1" :autocomplete="'username' + (showPasskeyLogin ? ' webauthn' : '')" />
                 </Field>
 
                 <Field :label="__('Password')" :error="errors?.password">
-                    <Input v-model="password" name="password" type="password" tabindex="2" />
+                    <Input v-model="password" name="password" type="password" :autocomplete="'current-password' + (showPasskeyLogin ? ' webauthn' : '')" tabindex="2" />
                     <template #actions>
                         <Link
                             :href="forgotPasswordUrl"
