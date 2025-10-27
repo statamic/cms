@@ -4,7 +4,7 @@ import { startRegistration, browserSupportsWebAuthn } from '@simplewebauthn/brow
 import { router } from '@inertiajs/vue3';
 import axios from 'axios'
 import Head from '@/pages/layout/Head.vue';
-import { Header, Button, EmptyStateMenu, EmptyStateItem, Listing, DropdownItem } from '@ui';
+import { Header, Button, EmptyStateMenu, EmptyStateItem, Listing, DropdownItem, Modal, Input, ModalClose, Field } from '@ui';
 import ConfirmationModal from '@/components/modals/ConfirmationModal.vue';
 import { toggleArchitecturalBackground } from '@/pages/layout/architectural-background.js';
 
@@ -22,8 +22,14 @@ watch(
 );
 
 const error = ref(null);
+const showCreateModal = ref(false);
 const showErrorModal = computed(() => !!error.value);
 const passkeyWaiting = ref(false);
+const passkeyName = ref('');
+
+watch(showCreateModal, (opened) => {
+    if (!opened) passkeyName.value = '';
+});
 
 const columns = [
     { label: __('Name'), field: 'name' },
@@ -43,8 +49,8 @@ async function createPasskey() {
     }
 
     passkeyWaiting.value = true;
-
-    const name = prompt(__('Enter a passkey name')) || `${__('Passkey')} ${props.passkeys.length + 1}`;
+    const name = passkeyName.value || `${__('Passkey')} ${props.passkeys.length + 1}`;
+    showCreateModal.value = false;
     const authOptionsResponse = await fetch(props.createUrl);
 
     let startRegistrationResponse;
@@ -88,7 +94,7 @@ function handleAxiosError(e) {
             <Button
                 variant="primary"
                 :text="__('Create Passkey')"
-                @click="createPasskey"
+                @click="showCreateModal = true"
                 :disabled="passkeyWaiting"
                 :loading="passkeyWaiting"
             />
@@ -118,7 +124,7 @@ function handleAxiosError(e) {
 
     <EmptyStateMenu v-else :heading="__('statamic::messages.passkeys_configure_intro')">
         <EmptyStateItem
-            @click="createPasskey"
+            @click="showCreateModal = true"
             icon="key"
             :heading="__('Create a Passkey')"
             :description="__('Get started by creating your first passkey.')"
@@ -133,5 +139,29 @@ function handleAxiosError(e) {
         :button-text="__('OK')"
     />
 
+    <Modal
+        :title="__('Create a Passkey')"
+        v-model:open="showCreateModal"
+    >
+        <Field :label="__('Name')">
+            <Input
+                v-model="passkeyName"
+                @keyup.enter="createPasskey"
+            />
+        </Field>
+
+        <template #footer>
+            <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
+                <ModalClose>
+                    <Button variant="ghost" :text="__('Cancel')" />
+                </ModalClose>
+                <Button
+                    variant="primary"
+                    :text="__('Create')"
+                    @click="createPasskey"
+                />
+            </div>
+        </template>
+    </Modal>
 
 </template>

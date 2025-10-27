@@ -65,7 +65,7 @@ class WebAuthn
         $publicKey = $this->getPublicKeyCredential($credentials);
 
         if (! $publicKey->response instanceof AuthenticatorAssertionResponse) {
-            throw new Exception(__('Invalid credentials'));
+            throw new Exception(__('Invalid credentials.'));
         }
 
         if (! $user = UserFacade::find($publicKey->response->userHandle)) {
@@ -89,7 +89,7 @@ class WebAuthn
         $publicKeyCredential = $this->getPublicKeyCredential($credentials);
 
         if (! $publicKeyCredential->response instanceof AuthenticatorAttestationResponse) {
-            throw new Exception(__('Invalid credentials'));
+            throw new Exception(__('Invalid credentials.'));
         }
 
         $options = $this->getCreationOptions($user, session()->pull('webauthn.challenge'));

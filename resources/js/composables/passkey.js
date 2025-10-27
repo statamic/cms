@@ -7,21 +7,21 @@ export function usePasskey() {
     const waiting = ref(false);
     const supported = browserSupportsWebAuthn();
 
-    async function authenticate(optionsUrl, verifyUrl, onSuccess) {
-        waiting.value = true;
+    async function authenticate(optionsUrl, verifyUrl, onSuccess, useBrowserAutofill = false) {
+        if (!useBrowserAutofill) waiting.value = true;
         error.value = null;
 
         try {
             const authOptionsResponse = await fetch(optionsUrl);
-            const authOptionsJson = await authOptionsResponse.json();
+            const optionsJSON = await authOptionsResponse.json();
 
             let startAuthResponse;
             try {
-                startAuthResponse = await startAuthentication(authOptionsJson);
+                startAuthResponse = await startAuthentication({ optionsJSON, useBrowserAutofill });
             } catch (e) {
                 console.error(e);
                 error.value = __('Authentication failed.');
-                waiting.value = false;
+                if (!useBrowserAutofill) waiting.value = false;
                 return;
             }
 
@@ -33,7 +33,7 @@ export function usePasskey() {
         } catch (e) {
             handleError(e);
         } finally {
-            waiting.value = false;
+            if (!useBrowserAutofill) waiting.value = false;
         }
     }
 

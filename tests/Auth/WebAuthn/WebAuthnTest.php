@@ -167,7 +167,7 @@ class WebAuthnTest extends TestCase
             ->andReturn($publicKeyCredential);
 
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Invalid credentials');
+        $this->expectExceptionMessage('Invalid credentials.');
 
         $this->webauthn->getUserFromCredentials($credentials);
     }
