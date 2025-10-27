@@ -38,20 +38,6 @@ class TemplateGenerator
         return '.antlers.html';
     }
 
-    public static function make(): TemplateGenerator
-    {
-        /** @var TemplateGenerator $generator */
-        $generator = app(TemplateGenerator::class);
-
-        return $generator
-            ->withCoreGenerators()
-            ->templateLanguage(config('statamic.templates.language', 'antlers'))
-            ->indentType(config('statamic.templates.style.indent_type', 'space'))
-            ->indentSize(config('statamic.templates.style.indent_size', 4))
-            ->finalNewline(config('statamic.templates.style.final_newline', false))
-            ->preferComponentSyntax(config('statamic.templates.antlers.use_components', false));
-    }
-
     public function addGenerator(string $handle, callable $generator)
     {
         $this->generators[$handle] = $generator;

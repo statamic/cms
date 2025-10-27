@@ -20,11 +20,9 @@ class ScaffoldCollectionController extends CpController
         ]);
     }
 
-    public function create(Request $request, $collection)
+    public function create(Request $request, TemplateGenerator $generator, $collection)
     {
         $this->authorize('store', CollectionContract::class, __('You are not authorized to scaffold resources.'));
-
-        $generator = TemplateGenerator::make();
 
         // Make the index template
         if ($indexPath = $this->request->get('index')) {
