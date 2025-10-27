@@ -27,6 +27,10 @@ const showErrorModal = computed(() => !!error.value);
 const passkeyWaiting = ref(false);
 const passkeyName = ref('');
 
+watch(showCreateModal, (opened) => {
+    if (!opened) passkeyName.value = '';
+});
+
 const columns = [
     { label: __('Name'), field: 'name' },
     { label: __('Last Login'), field: 'last_login' },
@@ -44,11 +48,13 @@ async function createPasskey() {
         return;
     }
 
-    showCreateModal.value = false;
+    // Hitting enter submits twice to due to attribute binding issue on
+    // the Input component. This guard can be removed once it's fixed.
+    if (passkeyWaiting.value) return;
 
     passkeyWaiting.value = true;
-
     const name = passkeyName.value || `${__('Passkey')} ${props.passkeys.length + 1}`;
+    showCreateModal.value = false;
     const authOptionsResponse = await fetch(props.createUrl);
 
     let startRegistrationResponse;
@@ -144,19 +150,16 @@ function handleAxiosError(e) {
         <Field :label="__('Name')">
             <Input
                 v-model="passkeyName"
+                @keyup.enter="createPasskey"
             />
         </Field>
 
         <template #footer>
             <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
-                <ModalClose asChild>
-                    <Button
-                        variant="ghost"
-                        :text="__('Cancel')"
-                    />
+                <ModalClose>
+                    <Button variant="ghost" :text="__('Cancel')" />
                 </ModalClose>
                 <Button
-                    type="submit"
                     variant="primary"
                     :text="__('Create')"
                     @click="createPasskey"
