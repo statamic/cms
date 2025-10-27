@@ -1,0 +1,11 @@
+<script setup>
+import { Widget } from '@statamic/cms/ui';
+</script>
+
+<template>
+    <Widget title="DummyName">
+        <div class="px-4 py-3">
+            <p>👋 Hello world!</p>
+        </div>
+    </Widget>
+</template>

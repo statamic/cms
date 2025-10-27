@@ -2,17 +2,13 @@
 
 namespace DummyNamespace;
 
+use Statamic\Widgets\VueComponent;
 use Statamic\Widgets\Widget;
 
 class DummyClass extends Widget
 {
-    /**
-     * The HTML that should be shown in the widget.
-     *
-     * @return string|\Illuminate\View\View
-     */
-    public function html()
+    public function component()
     {
-        return view('widget_view');
+        return VueComponent::render('DummyComponent');
     }
 }
