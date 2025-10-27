@@ -2,13 +2,9 @@
 
 namespace Statamic\Console\Commands;
 
-use Archetype\Facades\PHPFile;
 use Statamic\Console\Commands\Concerns\MakesVueComponents;
 use Statamic\Console\RunsInPlease;
-use Statamic\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
-
-use function Laravel\Prompts\confirm;
 
 class MakeFieldtype extends GeneratorCommand
 {
