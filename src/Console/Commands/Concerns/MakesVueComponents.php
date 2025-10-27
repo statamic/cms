@@ -38,7 +38,6 @@ trait MakesVueComponents
 
     private function buildVueComponent(string $name): string
     {
-        // TODO: Replace this with $this->makeFromStub()
         $component = $this->files->get($this->getStub($this->vueComponentStub));
 
         $component = str_replace('DummyName', $name, $component);
