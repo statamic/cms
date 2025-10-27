@@ -1106,6 +1106,54 @@ class AssetTest extends TestCase
     }
 
     #[Test]
+    public function it_can_be_moved_to_another_folder_quietly()
+    {
+        Storage::fake('local');
+        $disk = Storage::disk('local');
+        $disk->put('old/asset.txt', 'The asset contents');
+        $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('save')->with($container);
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        $asset = $container->makeAsset('old/asset.txt')->data(['foo' => 'bar']);
+        $asset->save();
+        $oldMeta = $disk->get('old/.meta/asset.txt.yaml');
+        $disk->assertExists('old/asset.txt');
+        $disk->assertExists('old/.meta/asset.txt.yaml');
+        $this->assertEquals([
+            'old/asset.txt',
+        ], $container->files()->all());
+        $this->assertEquals([
+            'old/asset.txt' => ['foo' => 'bar'],
+        ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
+            return $item->data()->all();
+        })->all());
+
+        Event::fake();
+        $return = $asset->moveQuietly('new');
+
+        $this->assertEquals($asset, $return);
+        $disk->assertMissing('old/asset.txt');
+        $disk->assertMissing('old/.meta/asset.txt.yaml');
+        $disk->assertExists('new/asset.txt');
+        $disk->assertExists('new/.meta/asset.txt.yaml');
+        $this->assertEquals($oldMeta, $disk->get('new/.meta/asset.txt.yaml'));
+        $this->assertEquals([
+            'new/asset.txt',
+        ], $container->files()->all());
+        $this->assertEquals([
+            'new/asset.txt' => ['foo' => 'bar'],
+        ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
+            return $item->data()->all();
+        })->all());
+        $this->assertEquals([
+            'old', // the empty directory doesnt actually get deleted
+            'new',
+            'new/asset.txt',
+        ], $container->contents()->cached()->keys()->all());
+        Event::assertNotDispatched(AssetSaved::class);
+    }
+
+    #[Test]
     public function it_can_be_moved_to_another_folder_with_a_new_filename()
     {
         Storage::fake('local');
@@ -2017,7 +2065,7 @@ class AssetTest extends TestCase
     public function it_appends_timestamp_to_uploaded_files_filename_if_it_already_exists()
     {
         Event::fake();
-        Carbon::setTestNow(Carbon::createFromTimestamp(1549914700));
+        Carbon::setTestNow(Carbon::createFromTimestamp(1549914700, config('app.timezone')));
         $asset = $this->container->makeAsset('path/to/asset.jpg');
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
         Storage::disk('test')->put('path/to/asset.jpg', '');
@@ -2638,5 +2686,41 @@ YAML;
         $this->assertFalse($return);
         Facades\Asset::shouldNotHaveReceived('delete');
         Event::assertNotDispatched(AssetDeleted::class);
+    }
+
+    #[Test]
+    public function it_uses_a_custom_cache_store()
+    {
+        config([
+            'cache.stores.asset_meta' => [
+                'driver' => 'file',
+                'path' => storage_path('statamic/asset-meta'),
+            ],
+        ]);
+
+        Storage::fake('local');
+
+        $store = (new Asset)->cacheStore();
+
+        // ideally we would have checked the store name, but laravel 10 doesnt give us a way to do that
+        $this->assertStringContainsString('asset-meta', $store->getStore()->getDirectory());
+    }
+
+    #[Test]
+    public function it_clones_internal_collections()
+    {
+        $asset = (new Asset)->container($this->container)->path('foo/test.txt');
+        $asset->set('foo', 'A');
+        $asset->setSupplement('bar', 'A');
+
+        $clone = clone $asset;
+        $clone->set('foo', 'B');
+        $clone->setSupplement('bar', 'B');
+
+        $this->assertEquals('A', $asset->get('foo'));
+        $this->assertEquals('B', $clone->get('foo'));
+
+        $this->assertEquals('A', $asset->getSupplement('bar'));
+        $this->assertEquals('B', $clone->getSupplement('bar'));
     }
 }

@@ -52,6 +52,12 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
         $this->supplements = collect();
     }
 
+    public function __clone()
+    {
+        $this->term = clone $this->term;
+        $this->supplements = clone $this->supplements;
+    }
+
     public function get($key, $fallback = null)
     {
         return $this->data()->get($key, $fallback);
@@ -485,7 +491,7 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
     public function lastModified()
     {
         return $this->has('updated_at')
-            ? Carbon::createFromTimestamp($this->get('updated_at'))
+            ? Carbon::createFromTimestamp($this->get('updated_at'), config('app.timezone'))
             : $this->term->fileLastModified();
     }
 

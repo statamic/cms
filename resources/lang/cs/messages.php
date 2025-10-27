@@ -178,7 +178,7 @@ return [
     'outpost_error_422' => 'Chyba v komunikaci se statamic.com.',
     'outpost_error_429' => 'Příliš mnoho požadavků. Zkuste to znovu později.',
     'outpost_issue_try_later' => 'Při komunikaci se službou statamic.com došlo k problému. Zkuste to prosím později.',
-    'outpost_license_key_error' => 'Statamicu se nepodařilo dešifrovat poskytnutý soubor licenčního klíče. Prosím stáhněte znovu ze statmic.com.',
+    'outpost_license_key_error' => 'Statamicu se nepodařilo dešifrovat poskytnutý soubor licenčního klíče. Prosím stáhněte znovu ze statamic.com.',
     'password_protect_enter_password' => 'Zadejte heslo',
     'password_protect_incorrect_password' => 'Heslo není správné',
     'password_protect_token_invalid' => 'Token není platný',

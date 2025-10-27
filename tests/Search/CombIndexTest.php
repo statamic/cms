@@ -35,8 +35,8 @@ class CombIndexTest extends TestCase
             ->andReturn('[[]]');
     }
 
-    public function getIndex()
+    public function getIndexClass()
     {
-        return app(Index::class);
+        return Index::class;
     }
 }

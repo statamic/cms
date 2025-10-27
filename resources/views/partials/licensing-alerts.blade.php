@@ -1,7 +1,9 @@
 @php use function Statamic\trans as __; @endphp
 @inject('licenses', 'Statamic\Licensing\LicenseManager')
 
-@if ($licenses->requestFailed())
+@if ($licenses->outpostIsOffline())
+    {{-- Do nothing. --}}
+@elseif ($licenses->requestFailed())
     <div class="p-2 w-full fixed bottom-0 z-20">
         <div class="py-3 px-4 text-sm w-full rounded-md bg-yellow border border-yellow-dark dark:bg-dark-blue-100 dark:border-none">
         @if ($licenses->usingLicenseKeyFile())

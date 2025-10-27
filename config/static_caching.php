@@ -142,6 +142,8 @@ return [
 
     'nocache' => 'cache',
 
+    'nocache_db_connection' => env('STATAMIC_NOCACHE_DB_CONNECTION'),
+
     'nocache_js_position' => 'body',
 
     /*
@@ -165,13 +167,16 @@ return [
     |--------------------------------------------------------------------------
     |
     | Here you may define the queue name and connection
-    | that will be used when warming the static cache.
+    | that will be used when warming the static cache and
+    | optionally set the "--insecure" flag by default.
     |
     */
 
     'warm_queue' => env('STATAMIC_STATIC_WARM_QUEUE'),
 
     'warm_queue_connection' => env('STATAMIC_STATIC_WARM_QUEUE_CONNECTION'),
+
+    'warm_insecure' => env('STATAMIC_STATIC_WARM_INSECURE', false),
 
     /*
     |--------------------------------------------------------------------------

@@ -82,11 +82,14 @@ class Value implements ArrayAccess, IteratorAggregate, JsonSerializable
             $raw = $this->fieldtype->field()?->defaultValue() ?? null;
         }
 
-        $value = $this->shallow
+        return $this->getAugmentedValue($raw);
+    }
+
+    private function getAugmentedValue($raw)
+    {
+        return $this->shallow
             ? $this->fieldtype->shallowAugment($raw)
             : $this->fieldtype->augment($raw);
-
-        return $value;
     }
 
     private function iteratorValue()
@@ -150,9 +153,19 @@ class Value implements ArrayAccess, IteratorAggregate, JsonSerializable
         }
 
         if ($shouldParseAntlers) {
+            if ($parseFromRawString = $this->fieldtype?->shouldParseAntlersFromRawString()) {
+                $value = $this->raw();
+            }
+
             $value = (new DocumentTransformer())->correct($value);
 
-            return $parser->parse($value, $variables);
+            $parsed = $parser->parse($value, $variables);
+
+            if (! $parseFromRawString) {
+                return $parsed;
+            }
+
+            return $this->getAugmentedValue($parsed);
         }
 
         if (Str::contains($value, '{')) {
@@ -222,6 +235,11 @@ class Value implements ArrayAccess, IteratorAggregate, JsonSerializable
     public function __call(string $name, array $arguments)
     {
         return $this->value()->{$name}(...$arguments);
+    }
+
+    public function __isset($key)
+    {
+        return isset($this->value()?->{$key});
     }
 
     public function __get($key)

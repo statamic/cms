@@ -7,6 +7,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
+use Illuminate\Support\Str;
 use Statamic\Facades\Cascade;
 use Statamic\StaticCaching\NoCache\DatabaseSession;
 use Statamic\StaticCaching\NoCache\Session;
@@ -41,6 +42,10 @@ class ServiceProvider extends LaravelServiceProvider
 
             if (config('statamic.static_caching.ignore_query_strings', false)) {
                 $uri = explode('?', $uri)[0];
+            }
+
+            if (Str::contains($uri, '?')) {
+                $uri = Str::before($uri, '?').'?'.Request::normalizeQueryString(Str::after($uri, '?'));
             }
 
             return match ($driver = config('statamic.static_caching.nocache', 'cache')) {

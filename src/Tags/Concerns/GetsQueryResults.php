@@ -44,7 +44,7 @@ trait GetsQueryResults
 
     protected function preventIncompatiblePaginationParameters()
     {
-        if ($this->params->int('paginate') && $this->params->has('limit')) {
+        if ($this->params->int('paginate') && $this->params->int('limit')) {
             throw new \Exception('Cannot use [paginate] integer in combination with [limit] param.');
         }
 
