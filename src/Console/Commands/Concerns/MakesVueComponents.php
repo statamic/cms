@@ -83,6 +83,8 @@ trait MakesVueComponents
         Process::path(base_path())->run('npm install', function (string $type, string $buffer) {
             echo $buffer;
         });
+
+        $this->configureViteInAddonServiceProvider();
     }
 
     private function cpJsExists(): bool

@@ -66,10 +66,6 @@ class MakeFieldtype extends GeneratorCommand
         if (! $this->option('php')) {
             $this->generateVueComponent();
         }
-
-        if (! $this->option('php') && $this->argument('addon')) {
-            $this->configureViteInAddonServiceProvider();
-        }
     }
 
     /**
