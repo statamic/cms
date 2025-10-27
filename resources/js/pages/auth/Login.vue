@@ -3,7 +3,7 @@ import Head from '@/pages/layout/Head.vue';
 import Outside from '@/pages/layout/Outside.vue';
 import { AuthCard, Input, Field, Button, Separator, Checkbox, ErrorMessage } from '@ui';
 import { Link, router } from '@inertiajs/vue3';
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { usePasskey } from '@/composables/passkey';
 
 defineOptions({ layout: Outside });
@@ -64,7 +64,7 @@ const passwordAutocomplete = computed(() => {
     return tokens;
 });
 
-async function loginWithPasskey() {
+async function loginWithPasskey(useBrowserAutofill = false) {
     await passkey.authenticate(
         props.passkeyOptionsUrl,
         props.passkeyVerifyUrl,
@@ -72,9 +72,14 @@ async function loginWithPasskey() {
             if (data.redirect) {
                 window.location = data.redirect;
             }
-        }
+        },
+        useBrowserAutofill
     );
 }
+
+onMounted(() => {
+    if (showPasskeyLogin.value) loginWithPasskey(true);
+});
 </script>
 
 <template>
