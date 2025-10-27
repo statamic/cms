@@ -35,4 +35,11 @@ class FakesQueriesTest extends TestCase
         $query = User::query()->where('name', 'Jack');
         $this->assertIsCallable([$query, 'ddRawSql']);
     }
+
+    #[Test]
+    public function it_supports_ray()
+    {
+        $query = User::query()->where('name', 'Jack');
+        $this->assertIsCallable([$query, 'ray']);
+    }
 }

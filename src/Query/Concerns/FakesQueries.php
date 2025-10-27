@@ -69,6 +69,15 @@ trait FakesQueries
         dd($this->toRawSql());
     }
 
+    public function ray(): static
+    {
+        throw_unless(function_exists('ray'), new \Exception('Ray is not installed. Run `composer require spatie/laravel-ray --dev`'));
+
+        ray($this->toRawSql());
+
+        return $this;
+    }
+
     protected function dumper(): Dumper
     {
         return new Dumper($this);
