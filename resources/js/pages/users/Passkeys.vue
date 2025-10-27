@@ -152,14 +152,12 @@ function handleAxiosError(e) {
                 <ModalClose asChild>
                     <Button
                         variant="ghost"
-                        :disabled="busy"
                         :text="__('Cancel')"
                     />
                 </ModalClose>
                 <Button
                     type="submit"
-                    :variant="danger ? 'danger' : 'primary'"
-                    :disabled="disabled || busy"
+                    variant="primary"
                     :text="__('Create')"
                     @click="createPasskey"
                 />
