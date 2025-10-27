@@ -5,6 +5,7 @@ namespace Statamic\Console\Commands\Concerns;
 use Archetype\Facades\PHPFile;
 use Illuminate\Support\Facades\Process;
 use Statamic\Support\Str;
+
 use function Laravel\Prompts\confirm;
 
 trait MakesVueComponents
