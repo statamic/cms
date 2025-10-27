@@ -1,12 +1,15 @@
 <script setup>
-import { computed, useSlots, ref, useId, useTemplateRef, onMounted, nextTick } from 'vue';
+import { computed, useSlots, useAttrs, ref, useId, useTemplateRef, onMounted, nextTick } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
 import Icon from '../Icon/Icon.vue';
 import Button from '../Button/Button.vue';
 import CharacterCounter from '../CharacterCounter.vue';
 
+defineOptions({ inheritAttrs: false });
+
 const slots = useSlots();
+const attrs = useAttrs();
 
 const props = defineProps({
     append: { type: String, default: null },
@@ -31,6 +34,29 @@ const props = defineProps({
     variant: { type: String, default: 'default' },
     viewable: { type: Boolean, default: false },
     focus: { type: Boolean, default: false },
+});
+
+const inputAttributeKeys = [
+    'accept', 'autocomplete', 'autofocus', 'capture', 'checked', 'dirname', 'form',
+    'formaction', 'formenctype', 'formmethod', 'formnovalidate', 'formtarget',
+    'list', 'max', 'maxlength', 'min', 'minlength', 'multiple', 'name', 'pattern',
+    'readonly', 'required', 'size', 'src', 'step', 'value'
+];
+
+const outerAttrs = computed(() => {
+    const result = {};
+    for (const key in attrs) {
+        if (!inputAttributeKeys.includes(key.toLowerCase())) result[key] = attrs[key];
+    }
+    return result;
+});
+
+const inputAttrs = computed(() => {
+    const result = {};
+    for (const key in attrs) {
+        if (inputAttributeKeys.includes(key.toLowerCase())) result[key] = attrs[key];
+    }
+    return result;
 });
 
 const hasPrependedIcon = computed(() => !!props.iconPrepend || !!props.icon || !!slots.prepend);
@@ -137,7 +163,7 @@ defineExpose({ focus });
 </script>
 
 <template>
-    <ui-input-group>
+    <ui-input-group v-bind="outerAttrs">
         <ui-input-group-prepend v-if="prepend" v-text="prepend" />
         <div class="group/input relative block w-full st-text-legibility focus-outline-discrete" data-ui-input>
             <div v-if="hasPrependedIcon" :class="iconClasses">
@@ -157,7 +183,7 @@ defineExpose({ focus });
                 :tabindex="tabindex"
                 data-ui-control
                 data-ui-group-target
-                v-bind="$attrs"
+                v-bind="inputAttrs"
                 @input="$emit('update:modelValue', $event.target.value)"
             />
             <div v-if="hasAppendedIcon" :class="iconClasses">
