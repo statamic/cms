@@ -9,7 +9,7 @@ use function Laravel\Prompts\confirm;
 
 trait MakesVueComponents
 {
-    protected function generateVueComponent(): void
+    private function generateVueComponent(): void
     {
         $name = $this->getNameInput();
         $directory = Str::of($this->type)->lower()->plural();
@@ -36,7 +36,7 @@ trait MakesVueComponents
         $this->newLine();
     }
 
-    protected function buildVueComponent(string $name): string
+    private function buildVueComponent(string $name): string
     {
         // TODO: Replace this with $this->makeFromStub()
         $component = $this->files->get($this->getStub($this->vueComponentStub));
@@ -47,7 +47,7 @@ trait MakesVueComponents
         return $component;
     }
 
-    protected function wireUpAppJs(): void
+    private function wireUpAppJs(): void
     {
         if (! $this->cpJsExists()) {
             if (confirm(
@@ -59,7 +59,7 @@ trait MakesVueComponents
         }
     }
 
-    protected function wireUpAddonJs(string $addon): void
+    private function wireUpAddonJs(string $addon): void
     {
         $addonPath = $this->getAddonPath($addon);
 
@@ -86,7 +86,7 @@ trait MakesVueComponents
         });
     }
 
-    protected function cpJsExists(): bool
+    private function cpJsExists(): bool
     {
         if ($addon = $this->argument('addon')) {
             return $this->files->exists($this->getAddonPath($addon).'/resources/js/cp.js')
@@ -96,7 +96,7 @@ trait MakesVueComponents
         return $this->files->exists(base_path('resources/js/cp.js'));
     }
 
-    protected function configureViteInAddonServiceProvider(): void
+    private function configureViteInAddonServiceProvider(): void
     {
         try {
             PHPFile::load("addons/{$this->package}/src/ServiceProvider.php")
