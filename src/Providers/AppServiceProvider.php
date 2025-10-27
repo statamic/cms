@@ -27,7 +27,7 @@ class AppServiceProvider extends ServiceProvider
 
     protected $configFiles = [
         'antlers', 'api', 'assets', 'autosave', 'cp', 'editions', 'forms', 'git', 'graphql', 'live_preview', 'markdown', 'oauth', 'protect', 'revisions',
-        'routes', 'search', 'static_caching', 'stache', 'system', 'users', 'webauthn',
+        'routes', 'search', 'static_caching', 'stache', 'system', 'templates', 'users', 'webauthn',
     ];
 
     public function boot()
