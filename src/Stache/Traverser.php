@@ -75,13 +75,14 @@ class Traverser
             return $this->traverseWithAllFiles($dir);
         }
 
-        return collect(iterator_to_array($iterator))
-            ->mapWithKeys(function ($file) {
-                $path = Path::tidy($file->getPathname());
+        $paths = [];
+        /** @var \SplFileInfo $file */
+        foreach ($iterator as $file) {
+            $path = Path::tidy($file->getPathname());
+            $paths[$path] = $file->getMTime();
+        }
 
-                return [$path => $file->getMTime()];
-            })
-            ->sort();
+        return collect($paths)->sort();
     }
 
     protected function traverseWithAllFiles($dir)
