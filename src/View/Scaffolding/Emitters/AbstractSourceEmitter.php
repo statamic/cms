@@ -21,30 +21,13 @@ abstract class AbstractSourceEmitter implements Stringable
 
     protected int $indentSize = 4;
 
-    protected string $lineEnding = "\n";
+    protected string $lineEnding = PHP_EOL;
 
     protected string $indentChar = ' ';
 
     protected bool $finalNewline = false;
 
     protected bool $preferComponentSyntax = false;
-
-    public function __construct()
-    {
-        $this->loadStyleConfig();
-    }
-
-    protected function loadStyleConfig(): void
-    {
-        $style = config('statamic.templates.style', []);
-
-        $this
-            ->setNewline($style['line_ending'] ?? 'auto')
-            ->setIndentType($style['indent_type'] ?? '')
-            ->setIndentSize($style['indent_size'] ?? 4)
-            ->setFinalNewline($style['final_newline'] ?? false)
-            ->setPreferComponentSyntax(config('statamic.templates.antlers.use_components', false));
-    }
 
     public function setPreferComponentSyntax(bool $preferComponentSyntax): static
     {
