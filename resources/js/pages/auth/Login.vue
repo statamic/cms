@@ -105,7 +105,7 @@ onMounted(() => {
                     <template #actions>
                         <Link
                             :href="forgotPasswordUrl"
-                            class="text-blue-400 text-sm hover:text-blue-600"
+                            class="text-ui-accent text-sm hover:text-ui-accent/80 dark:text-dark-ui-accent dark:hover:text-dark-ui-accent/80"
                             tabindex="6"
                             v-text="__('Forgot password?')"
                         />
