@@ -11,22 +11,15 @@ use Stringable;
 abstract class AbstractSourceEmitter implements Stringable
 {
     protected static array $blueprintStack = [];
-
     protected array $specialLoopVariables = [
         'key',
         'value',
     ];
-
     protected string $content = '';
-
     protected int $indentSize = 4;
-
     protected string $lineEnding = PHP_EOL;
-
     protected string $indentChar = ' ';
-
     protected bool $finalNewline = false;
-
     protected bool $preferComponentSyntax = false;
 
     public function setPreferComponentSyntax(bool $preferComponentSyntax): static
@@ -127,21 +120,11 @@ abstract class AbstractSourceEmitter implements Stringable
         return $generator;
     }
 
-    protected function lineEndingToString(): string
-    {
-        return match ($this->lineEnding) {
-            "\n" => 'LF',
-            "\r\n" => 'CRLF',
-            "\r" => 'CR',
-            default => 'auto',
-        };
-    }
-
     abstract public function varName(string $variable): string;
 
     abstract protected function getConditionBuilder(): ConditionBuilder;
 
-    public function makeLoopVariableName(string $handle, ?string $fallback = null)
+    public function makeLoopVariableName(string $handle, ?string $fallback = null): string
     {
         if (in_array($handle, $this->specialLoopVariables)) {
             return $handle;

@@ -10,13 +10,9 @@ use Statamic\Fields\Blueprint;
 class AntlersSourceEmitter extends AbstractSourceEmitter
 {
     protected static array $variableStack = [];
-
     protected static ?string $currentIterationVar = null;
-
     protected static array $variableCounters = [];
-
     protected static array $stackHistory = [];
-
     protected static bool $ignoreStack = false;
 
     public function append(string $text): static
