@@ -62,9 +62,9 @@ function complete() {
                 <div>
                     <ui-description class="mb-6">{{ __('statamic::messages.two_factor_setup_instructions') }}</ui-description>
 
-                    <div class="flex justify-center space-x-6">
+                    <div class="flex space-x-6">
                         <div class="bg-white" v-html="qrCode"></div>
-                        <div class="space-y-6">
+                        <div class="space-y-6 w-full">
                             <ui-field :label="__('Setup Key')">
                                 <ui-input copyable readonly :value="secretKey" />
                             </ui-field>
