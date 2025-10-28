@@ -1,5 +1,5 @@
 <template>
-    <div class="flex items-center gap-2" :class="{ 'h-full justify-end': publishContainer.asConfig }">
+    <div class="flex items-center gap-2" :class="{ 'h-full': publishContainer.asConfig }">
         <Switch
             @update:model-value="update"
             :disabled="config.disabled || isReadOnly"
