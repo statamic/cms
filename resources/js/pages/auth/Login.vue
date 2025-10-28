@@ -3,7 +3,7 @@ import Head from '@/pages/layout/Head.vue';
 import Outside from '@/pages/layout/Outside.vue';
 import { AuthCard, Input, Field, Button, Separator, Checkbox, ErrorMessage } from '@ui';
 import { Link, router } from '@inertiajs/vue3';
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { usePasskey } from '@/composables/passkey';
 
 defineOptions({ layout: Outside });
@@ -52,7 +52,19 @@ const showPasskeyLogin = computed(() => {
     return props.emailLoginEnabled && passkey.supported;
 })
 
-async function loginWithPasskey() {
+const emailAutocomplete = computed(() => {
+    let tokens = 'username';
+    if (showPasskeyLogin.value) tokens += ' webauthn';
+    return tokens;
+});
+
+const passwordAutocomplete = computed(() => {
+    let tokens = 'current-password';
+    if (showPasskeyLogin.value) tokens += ' webauthn';
+    return tokens;
+});
+
+async function loginWithPasskey(useBrowserAutofill = false) {
     await passkey.authenticate(
         props.passkeyOptionsUrl,
         props.passkeyVerifyUrl,
@@ -60,9 +72,14 @@ async function loginWithPasskey() {
             if (data.redirect) {
                 window.location = data.redirect;
             }
-        }
+        },
+        useBrowserAutofill
     );
 }
+
+onMounted(() => {
+    if (showPasskeyLogin.value) loginWithPasskey(true);
+});
 </script>
 
 <template>
@@ -80,11 +97,11 @@ async function loginWithPasskey() {
                 class="flex flex-col gap-6"
             >
                 <Field :label="__('Email')" :error="errors?.email">
-                    <Input v-model="email" name="email" autofocus tabindex="1" />
+                    <Input v-model="email" name="email" autofocus tabindex="1" :autocomplete="emailAutocomplete" />
                 </Field>
 
                 <Field :label="__('Password')" :error="errors?.password">
-                    <Input v-model="password" name="password" type="password" tabindex="2" />
+                    <Input v-model="password" name="password" type="password" :autocomplete="passwordAutocomplete" tabindex="2" />
                     <template #actions>
                         <Link
                             :href="forgotPasswordUrl"

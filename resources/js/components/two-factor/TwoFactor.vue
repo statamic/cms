@@ -75,7 +75,7 @@ function disable() {
         </template>
         <template v-if="!isSetup">
             <div>
-                <p class="mb-4 text-sm text-gray">{{ __('statamic::messages.two_factor_enable_introduction') }}</p>
+                <p class="mb-4 text-sm text-gray-500 dark:text-gray-400">{{ __('statamic::messages.two_factor_enable_introduction') }}</p>
 
                 <div class="flex space-x-2">
                     <Button @click="openSetupModal">
@@ -86,7 +86,7 @@ function disable() {
         </template>
 
         <template v-else>
-            <p class="mb-4 text-sm text-gray">{{ __('statamic::messages.two_factor_enabled') }}</p>
+            <p class="mb-4 text-sm text-gray-500 dark:text-gray-400">{{ __('statamic::messages.two_factor_enabled') }}</p>
 
             <div class="flex items-center space-x-4">
                 <Button @click="openRecoveryCodesModal">
