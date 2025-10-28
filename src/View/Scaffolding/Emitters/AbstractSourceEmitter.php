@@ -4,6 +4,8 @@ namespace Statamic\View\Scaffolding\Emitters;
 
 use Closure;
 use Illuminate\Support\Str;
+use Statamic\Facades\Blueprint as Blueprints;
+use Statamic\Fields\Blueprint;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Scaffolding\TemplateGenerator;
 use Stringable;
@@ -101,6 +103,43 @@ abstract class AbstractSourceEmitter implements Stringable
         $instance->preferComponentSyntax = $this->preferComponentSyntax;
 
         return $instance;
+    }
+
+    public function blueprint(Blueprint|string|null $blueprint, ?Closure $fallback = null): static
+    {
+        if (! $blueprint) {
+            return $this;
+        }
+
+        if (is_string($blueprint)) {
+            $blueprintHandle = $blueprint;
+            $blueprint = Blueprints::find($blueprint);
+        } else {
+            $blueprintHandle = $blueprint->handle();
+        }
+
+        if (! $blueprint) {
+            return $this;
+        }
+
+        if (in_array($blueprintHandle, AbstractSourceEmitter::$blueprintStack)) {
+            if ($fallback) {
+                $this->content .= $fallback($this->createInstance());
+            }
+
+            return $this;
+        }
+
+        AbstractSourceEmitter::$blueprintStack[] = $blueprintHandle;
+
+        try {
+            $this->optionalNewline();
+            $this->content .= $this->generator()->scaffoldBlueprint($blueprint);
+        } finally {
+            array_pop(AbstractSourceEmitter::$blueprintStack);
+        }
+
+        return $this;
     }
 
     protected function generator(): TemplateGenerator
@@ -317,6 +356,34 @@ abstract class AbstractSourceEmitter implements Stringable
                     }
                 }
             }
+        }
+    }
+
+    public function withCountedVariable(string|array $baseName, Closure $callback): mixed
+    {
+        if (is_array($baseName)) {
+            $varNames = [];
+            $baseNames = $baseName;
+
+            foreach ($baseNames as $name) {
+                $varNames[] = $this->getCountedVariable($name);
+            }
+
+            try {
+                return $callback(...$varNames);
+            } finally {
+                foreach (array_reverse($baseNames) as $name) {
+                    $this->releaseCountedVariable($name);
+                }
+            }
+        }
+
+        $varName = $this->getCountedVariable($baseName);
+
+        try {
+            return $callback($varName);
+        } finally {
+            $this->releaseCountedVariable($baseName);
         }
     }
 }
