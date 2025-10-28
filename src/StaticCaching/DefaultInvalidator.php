@@ -46,7 +46,7 @@ class DefaultInvalidator implements Invalidator
         }
 
         if ($this->rules === 'all') {
-            $this->recacheUrls($this->cacher->getUrls());
+            $this->cacher->recacheUrls($this->cacher->getUrls()->all());
 
             return;
         }
