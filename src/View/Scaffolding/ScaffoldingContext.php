@@ -5,37 +5,28 @@ namespace Statamic\View\Scaffolding;
 use Statamic\Fields\Field;
 use Statamic\View\Scaffolding\Emitters\AbstractSourceEmitter;
 
+/**
+ * @template TEmitter of AbstractSourceEmitter
+ *
+ * @property TEmitter $emit
+ */
 abstract class ScaffoldingContext
 {
-    public Field $field;
-
-    public string $handle;
-
-    public string $variable;
-
-    public TemplateGenerator $generator;
-
     public array $config;
 
-    public array $extra;
-
+    /**
+     * @param  TEmitter  $emit
+     */
     public function __construct(
-        AbstractSourceEmitter $emit,
-        Field $field,
-        string $handle,
-        string $variable,
-        TemplateGenerator $generator,
-        array $extra = []
+        public AbstractSourceEmitter $emit,
+        public Field $field,
+        public string $handle,
+        public string $variable,
+        public TemplateGenerator $generator,
+        public array $extra = []
     ) {
-        $this->field = $field;
-        $this->handle = $handle;
-        $this->variable = $variable;
-        $this->generator = $generator;
         $this->config = $field->config();
-        $this->extra = $extra;
     }
-
-    abstract public function emit(): AbstractSourceEmitter;
 
     public function get(string $key, mixed $default = null): mixed
     {
