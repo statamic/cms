@@ -56,14 +56,7 @@ class DefaultInvalidator implements Invalidator
             $urls = [];
         }
 
-        collect($urls)
-            ->filter(fn ($url) => is_array($url))
-            ->each(fn ($url) => $this->cacher->invalidateUrl(...$url));
-
-        $urls = collect($urls)->filter(fn ($url) => ! is_array($url));
-        if ($urls->isNotEmpty()) {
-            $this->cacher->invalidateUrls($urls->values()->all());
-        }
+        $this->cacher->invalidateUrls($urls);
     }
 
     public function invalidateAndRecache($item)

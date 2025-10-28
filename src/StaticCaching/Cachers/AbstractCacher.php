@@ -7,9 +7,9 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Hash;
 use Statamic\Console\Commands\StaticWarmJob;
 use Statamic\Facades\Site;
+use Statamic\Facades\StaticCache;
 use Statamic\Facades\URL;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\UrlExcluder;
@@ -242,19 +242,13 @@ abstract class AbstractCacher implements Cacher
      */
     public function recacheUrls($urls)
     {
-        collect($urls)
-            ->map(fn ($url) => is_array($url) ? $url : [$url, null])
-            ->each(function ($parts) {
-                [$path, $domain] = $parts;
-
-                if (Str::contains($path, '*')) {
-                    $this->recacheWildcardUrl($path, $domain);
-
-                    return;
-                }
-
-                $this->recacheUrl($path, $domain);
-            });
+        collect($urls)->each(function ($url) {
+            if (Str::contains($url, '*')) {
+                $this->recacheWildcardUrl($url);
+            } else {
+                $this->recacheUrl(...$this->getPathAndDomain($url));
+            }
+        });
     }
 
     /**
@@ -289,16 +283,13 @@ abstract class AbstractCacher implements Cacher
      * Recache a wildcard URL.
      *
      * @param  string  $wildcard
-     * @param  string|null  $domain
      */
-    protected function recacheWildcardUrl($wildcard, $domain = null)
+    protected function recacheWildcardUrl($wildcard)
     {
         // Remove the asterisk
         $wildcard = substr($wildcard, 0, -1);
 
-        if (! $domain) {
-            [$wildcard, $domain] = $this->getPathAndDomain($wildcard);
-        }
+        [$wildcard, $domain] = $this->getPathAndDomain($wildcard);
 
         $this->getUrls($domain)->filter(function ($url) use ($wildcard) {
             return Str::startsWith($url, $wildcard);
