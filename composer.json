@@ -41,6 +41,7 @@
         "wilderborn/partyline": "^1.0"
     },
     "require-dev": {
+        "algolia/algoliasearch-client-php": "^4.32",
         "doctrine/dbal": "^3.6",
         "fakerphp/faker": "~1.10",
         "google/cloud-translate": "^1.6",
@@ -49,6 +50,12 @@
         "orchestra/testbench": "^9.2 || ^10.0",
         "phpunit/phpunit": "^11.5.3",
         "spatie/laravel-ray": "^1.37"
+    },
+    "conflict": {
+        "algolia/algoliasearch-client-php": "<4.32"
+    },
+    "suggest": {
+        "algolia/algoliasearch-client-php": "Required to use Algolia search driver (^4.32)"
     },
     "config": {
         "optimize-autoloader": true,
