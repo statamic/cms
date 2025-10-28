@@ -6,14 +6,13 @@ class DictionaryVariables
 {
     private static array $defaults = ['label', 'value'];
 
-    protected array $dictionaryVariables = [];
-
-    public function register(string $name, array $variables): static
-    {
-        $this->dictionaryVariables[$name] = $variables;
-
-        return $this;
-    }
+    protected array $dictionaryVariables = [
+        'countries' => ['name', 'iso3', 'iso2', 'region', 'subregion', 'emoji'],
+        'currencies' => ['code', 'name', 'symbol', 'decimals'],
+        'languages' => ['code', 'name'],
+        'locales' => ['name'],
+        'timezones' => ['name', 'offset'],
+    ];
 
     public function resolve(string $dictionaryType): array
     {
