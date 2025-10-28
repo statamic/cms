@@ -171,6 +171,8 @@ return [
 
     'background_recache' => env('STATAMIC_BACKGROUND_RECACHE', false),
 
+    'recache_token' => env('STATAMIC_RECACHE_TOKEN'),
+
     /*
     |--------------------------------------------------------------------------
     | Shared Error Pages

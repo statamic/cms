@@ -275,7 +275,7 @@ abstract class AbstractCacher implements Cacher
                 $url = Str::removeRight($url, '?');
             }
 
-            $url .= (str_contains($url, '?') ? '&' : '?').'__recache='.Hash::make($url);
+            $url .= (str_contains($url, '?') ? '&' : '?').'__recache='.StaticCache::recacheToken();
 
             $request = new GuzzleRequest('GET', $url);
 

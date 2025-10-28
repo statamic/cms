@@ -12,7 +12,6 @@ use Illuminate\Console\Command;
 use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Hash;
 use Statamic\Console\EnhancesCommands;
 use Statamic\Console\RunsInPlease;
 use Statamic\Entries\Collection as EntriesCollection;
@@ -177,7 +176,7 @@ class StaticWarm extends Command
                     $uri .= '/';
                 }
 
-                $uri .= '?__recache='.Hash::make($uri);
+                $uri .= '?__recache='.Facades\StaticCache::recacheToken();
             }
 
             return new Request('GET', $uri, $headers);
