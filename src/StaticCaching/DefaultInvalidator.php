@@ -42,7 +42,9 @@ class DefaultInvalidator implements Invalidator
     public function invalidateAndRecache($item)
     {
         if (! config('statamic.static_caching.background_recache', false)) {
-            return $this->invalidate($item);
+            $this->invalidate($item);
+
+            return;
         }
 
         if ($this->rules === 'all') {
