@@ -113,7 +113,7 @@ class EntryRepository implements RepositoryContract
         $ordered = collect($ids)
             ->map(fn ($id) => $entriesById->get($id))
             ->filter()
-            ->all();
+            ->values();
 
         return EntryCollection::make($ordered);
     }
