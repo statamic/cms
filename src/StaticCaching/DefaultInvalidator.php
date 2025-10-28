@@ -34,27 +34,7 @@ class DefaultInvalidator implements Invalidator
             return;
         }
 
-        if ($item instanceof Entry) {
-            $urls = $this->getEntryUrls($item);
-        } elseif ($item instanceof LocalizedTerm) {
-            $urls = $this->getTermUrls($item);
-        } elseif ($item instanceof Nav) {
-            $urls = $this->getNavUrls($item);
-        } elseif ($item instanceof NavTree) {
-            $urls = $this->getNavTreeUrls($item);
-        } elseif ($item instanceof Variables) {
-            $urls = $this->getGlobalUrls($item);
-        } elseif ($item instanceof Collection) {
-            $urls = $this->getCollectionUrls($item);
-        } elseif ($item instanceof CollectionTree) {
-            $urls = $this->getCollectionTreeUrls($item);
-        } elseif ($item instanceof Asset) {
-            $urls = $this->getAssetUrls($item);
-        } elseif ($item instanceof Form) {
-            $urls = $this->getFormUrls($item);
-        } else {
-            $urls = [];
-        }
+        $urls = $this->getItemUrls($item);
 
         $this->cacher->invalidateUrls($urls);
     }
@@ -71,6 +51,13 @@ class DefaultInvalidator implements Invalidator
             return;
         }
 
+        $urls = $this->getItemUrls($item);
+
+        $this->cacher->recacheUrls($urls);
+    }
+
+    protected function getItemUrls($item)
+    {
         if ($item instanceof Entry) {
             $urls = $this->getEntryUrls($item);
         } elseif ($item instanceof LocalizedTerm) {
@@ -93,7 +80,7 @@ class DefaultInvalidator implements Invalidator
             $urls = [];
         }
 
-        $this->cacher->recacheUrls($urls);
+        return $urls;
     }
 
     protected function getFormUrls($form)
