@@ -20,6 +20,7 @@ use Statamic\Jobs\HandleEntrySchedule;
 use Statamic\Sites\Sites;
 use Statamic\Statamic;
 use Statamic\Tokens\Handlers\LivePreview;
+use Statamic\View\Scaffolding\TemplateGenerator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -199,6 +200,16 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind('statamic.imaging.guzzle', function () {
             return new \GuzzleHttp\Client;
+        });
+
+        $this->app->bind(TemplateGenerator::class, function () {
+            return (new TemplateGenerator)
+                ->withCoreGenerators()
+                ->templateLanguage(config('statamic.templates.language', 'antlers'))
+                ->indentType(config('statamic.templates.style.indent_type', 'space'))
+                ->indentSize(config('statamic.templates.style.indent_size', 4))
+                ->finalNewline(config('statamic.templates.style.final_newline', false))
+                ->preferComponentSyntax(config('statamic.templates.antlers.use_components', false));
         });
     }
 
