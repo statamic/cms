@@ -20,28 +20,13 @@ class ScaffoldingServiceProvider extends ServiceProvider
                 ->preferComponentSyntax(config('statamic.templates.antlers.use_components', false));
         });
 
-        $this->app->singleton(DictionaryVariables::class);
-
-        $hasLoaded = false;
-
-        $this->app->afterResolving(DictionaryVariables::class, function (DictionaryVariables $variables) use (&$hasLoaded) {
-            if ($hasLoaded) {
-                return;
-            }
-
-            $variables->register('countries', [
-                'name', 'iso3', 'iso2', 'region', 'subregion', 'emoji',
-            ])->register('currencies', [
-                'code', 'name', 'symbol', 'decimals',
-            ])->register('languages', [
-                'code', 'name',
-            ])->register('locales', [
-                'name',
-            ])->register('timezones', [
-                'name', 'offset',
-            ]);
-
-            $hasLoaded = true;
+        $this->app->singleton(DictionaryVariables::class, function () {
+            return (new DictionaryVariables)
+                ->register('countries', ['name', 'iso3', 'iso2', 'region', 'subregion', 'emoji'])
+                ->register('currencies', ['code', 'name', 'symbol', 'decimals'])
+                ->register('languages', ['code', 'name'])
+                ->register('locales', ['name'])
+                ->register('timezones', ['name', 'offset']);
         });
     }
 }
