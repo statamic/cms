@@ -8,10 +8,13 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\View\Scaffolding\ScaffoldingTestCase;
 
 class AssetsFieldtypeScaffoldingTest extends ScaffoldingTestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     protected array $field = [
         'type' => 'assets',
         'container' => 'assets',
