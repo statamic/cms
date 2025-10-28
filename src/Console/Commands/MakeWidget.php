@@ -2,12 +2,14 @@
 
 namespace Statamic\Console\Commands;
 
+use Statamic\Console\Commands\Concerns\MakesVueComponents;
 use Statamic\Console\RunsInPlease;
 use Statamic\Support\Str;
+use Symfony\Component\Console\Input\InputOption;
 
 class MakeWidget extends GeneratorCommand
 {
-    use RunsInPlease;
+    use MakesVueComponents, RunsInPlease;
 
     /**
      * The name of the console command.
@@ -38,6 +40,20 @@ class MakeWidget extends GeneratorCommand
     protected $stub = 'widget.php.stub';
 
     /**
+     * The stub to be used for generating the Vue component.
+     *
+     * @var string
+     */
+    protected $vueComponentStub = 'widget.vue.stub';
+
+    /**
+     * The URL to the documentation for Vue components.
+     *
+     * @var string
+     */
+    protected $vueComponentDocsUrl = 'https://statamic.dev/widgets#vue-components';
+
+    /**
      * Execute the console command.
      *
      * @return bool|null
@@ -48,7 +64,9 @@ class MakeWidget extends GeneratorCommand
             return false;
         }
 
-        $this->generateWidgetView();
+        $this->option('blade')
+            ? $this->generateWidgetView()
+            : $this->generateVueComponent();
     }
 
     /**
@@ -82,17 +100,36 @@ class MakeWidget extends GeneratorCommand
      */
     protected function buildClass($name)
     {
-        $class = parent::buildClass($name);
+        if ($this->option('blade')) {
+            $stub = $this->files->get($this->getStub('blade_widget.php.stub'));
+            $class = $this->replaceNamespace($stub, $name)->replaceClass($stub, $name);
 
-        $name = Str::slug(Str::snake($this->getNameInput()));
-        $viewPath = 'widgets.'.$name;
+            $name = Str::slug(Str::snake($this->getNameInput()));
+            $viewPath = 'widgets.'.$name;
 
-        if ($this->argument('addon')) {
-            $viewPath = $name.'::'.$viewPath;
+            if ($this->argument('addon')) {
+                $viewPath = $name.'::'.$viewPath;
+            }
+
+            return str_replace('widget_view', $viewPath, $class);
         }
 
-        $class = str_replace('widget_view', $viewPath, $class);
+        $class = parent::buildClass($name);
+
+        $class = str_replace('DummyComponent', $this->getNameInput(), $class);
 
         return $class;
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return array_merge(parent::getOptions(), [
+            ['blade', '', InputOption::VALUE_NONE, 'Create a Blade view for the widget instead of a Vue component'],
+        ]);
     }
 }
