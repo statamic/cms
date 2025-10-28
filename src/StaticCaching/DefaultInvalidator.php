@@ -39,7 +39,7 @@ class DefaultInvalidator implements Invalidator
         $this->cacher->invalidateUrls($urls);
     }
 
-    public function invalidateAndRecache($item)
+    public function refresh($item)
     {
         if (! config('statamic.static_caching.background_recache', false)) {
             $this->invalidate($item);
@@ -48,14 +48,14 @@ class DefaultInvalidator implements Invalidator
         }
 
         if ($this->rules === 'all') {
-            $this->cacher->recacheUrls($this->cacher->getUrls()->all());
+            $this->cacher->refreshUrls($this->cacher->getUrls()->all());
 
             return;
         }
 
         $urls = $this->getItemUrls($item);
 
-        $this->cacher->recacheUrls($urls);
+        $this->cacher->refreshUrls($urls);
     }
 
     protected function getItemUrls($item)

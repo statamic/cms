@@ -29,24 +29,24 @@ class Invalidate implements ShouldQueue
     protected $invalidator;
 
     protected $events = [
-        AssetSaved::class => 'invalidateAndRecacheAsset',
+        AssetSaved::class => 'refreshAsset',
         AssetDeleted::class => 'invalidateAsset',
-        EntrySaved::class => 'invalidateAndRecacheEntry',
+        EntrySaved::class => 'refreshEntry',
         EntryDeleting::class => 'invalidateEntry',
         EntryScheduleReached::class => 'invalidateEntry',
         LocalizedTermSaved::class => 'invalidateTerm',
         LocalizedTermDeleted::class => 'invalidateTerm',
-        GlobalVariablesSaved::class => 'invalidateAndRecacheGlobalVariables',
+        GlobalVariablesSaved::class => 'refreshGlobalVariables',
         GlobalVariablesDeleted::class => 'invalidateGlobalVariables',
-        NavSaved::class => 'invalidateAndRecacheNav',
+        NavSaved::class => 'refreshNav',
         NavDeleted::class => 'invalidateNav',
-        FormSaved::class => 'invalidateAndRecacheForm',
+        FormSaved::class => 'refreshForm',
         FormDeleted::class => 'invalidateForm',
         CollectionTreeSaved::class => 'invalidateCollectionByTree',
         CollectionTreeDeleted::class => 'invalidateCollectionByTree',
-        NavTreeSaved::class => 'invalidateAndRecacheNavByTree',
+        NavTreeSaved::class => 'refreshNavByTree',
         NavTreeDeleted::class => 'invalidateNavByTree',
-        BlueprintSaved::class => 'invalidateAndRecacheByBlueprint',
+        BlueprintSaved::class => 'refreshByBlueprint',
         BlueprintDeleted::class => 'invalidateByBlueprint',
     ];
 
@@ -67,9 +67,9 @@ class Invalidate implements ShouldQueue
         $this->invalidator->invalidate($event->asset);
     }
 
-    public function invalidateAndRecacheAsset($event)
+    public function refreshAsset($event)
     {
-        $this->invalidator->invalidateAndRecache($event->asset);
+        $this->invalidator->refresh($event->asset);
     }
 
     public function invalidateEntry($event)
@@ -77,9 +77,9 @@ class Invalidate implements ShouldQueue
         $this->invalidator->invalidate($event->entry);
     }
 
-    public function invalidateAndRecacheEntry($event)
+    public function refreshEntry($event)
     {
-        $this->invalidator->invalidateAndRecache($event->entry);
+        $this->invalidator->refresh($event->entry);
     }
 
     public function invalidateTerm($event)
@@ -87,9 +87,9 @@ class Invalidate implements ShouldQueue
         $this->invalidator->invalidate($event->term);
     }
 
-    public function invalidateAndRecacheTerm($event)
+    public function refreshTerm($event)
     {
-        $this->invalidator->invalidateAndRecache($event->term);
+        $this->invalidator->refresh($event->term);
     }
 
     public function invalidateGlobalVariables($event)
@@ -97,9 +97,9 @@ class Invalidate implements ShouldQueue
         $this->invalidator->invalidate($event->variables);
     }
 
-    public function invalidateAndRecacheGlobalVariables($event)
+    public function refreshGlobalVariables($event)
     {
-        $this->invalidator->invalidateAndRecache($event->variables);
+        $this->invalidator->refresh($event->variables);
     }
 
     public function invalidateNav($event)
@@ -107,9 +107,9 @@ class Invalidate implements ShouldQueue
         $this->invalidator->invalidate($event->nav);
     }
 
-    public function invalidateAndRecacheNav($event)
+    public function refreshNav($event)
     {
-        $this->invalidator->invalidateAndRecache($event->nav);
+        $this->invalidator->refresh($event->nav);
     }
 
     public function invalidateForm($event)
@@ -117,9 +117,9 @@ class Invalidate implements ShouldQueue
         $this->invalidator->invalidate($event->form);
     }
 
-    public function invalidateAndRecacheForm($event)
+    public function refreshForm($event)
     {
-        $this->invalidator->invalidateAndRecache($event->form);
+        $this->invalidator->refresh($event->form);
     }
 
     public function invalidateCollectionByTree($event)
@@ -127,9 +127,9 @@ class Invalidate implements ShouldQueue
         $this->invalidator->invalidate($event->tree);
     }
 
-    public function invalidateAndRecacheCollectionByTree($event)
+    public function refreshCollectionByTree($event)
     {
-        $this->invalidator->invalidateAndRecache($event->tree->collection());
+        $this->invalidator->refresh($event->tree->collection());
     }
 
     public function invalidateNavByTree($event)
@@ -137,9 +137,9 @@ class Invalidate implements ShouldQueue
         $this->invalidator->invalidate($event->tree);
     }
 
-    public function invalidateAndRecacheNavByTree($event)
+    public function refreshNavByTree($event)
     {
-        $this->invalidator->invalidateAndRecache($event->tree->structure());
+        $this->invalidator->refresh($event->tree->structure());
     }
 
     public function invalidateByBlueprint($event)
@@ -151,11 +151,11 @@ class Invalidate implements ShouldQueue
         }
     }
 
-    public function invalidateAndRecacheByBlueprint($event)
+    public function refreshByBlueprint($event)
     {
         if ($event->blueprint->namespace() === 'forms') {
             if ($form = Form::find($event->blueprint->handle())) {
-                $this->invalidator->invalidateAndRecache($form);
+                $this->invalidator->refresh($form);
             }
         }
     }

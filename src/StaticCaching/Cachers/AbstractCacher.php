@@ -235,30 +235,30 @@ abstract class AbstractCacher implements Cacher
     }
 
     /**
-     * Recache multiple URLs.
+     * Refresh multiple URLs.
      *
      * @param  array  $urls
      * @return void
      */
-    public function recacheUrls($urls)
+    public function refreshUrls($urls)
     {
         collect($urls)->each(function ($url) {
             if (Str::contains($url, '*')) {
-                $this->recacheWildcardUrl($url);
+                $this->refreshWildcardUrl($url);
             } else {
-                $this->recacheUrl(...$this->getPathAndDomain($url));
+                $this->refreshUrl(...$this->getPathAndDomain($url));
             }
         });
     }
 
     /**
-     * Recache an individual URL.
+     * Refresh an individual URL.
      *
      * @param  string  $path
      * @param  string|null  $domain
      * @return void
      */
-    public function recacheUrl($url, $domain = null)
+    public function refreshUrl($url, $domain = null)
     {
         $this->getUrls($domain)->filter(function ($value) use ($url) {
             return $value === $url || Str::startsWith($value, $url.'?');
@@ -280,11 +280,11 @@ abstract class AbstractCacher implements Cacher
     }
 
     /**
-     * Recache a wildcard URL.
+     * Refresh a wildcard URL.
      *
      * @param  string  $wildcard
      */
-    protected function recacheWildcardUrl($wildcard)
+    protected function refreshWildcardUrl($wildcard)
     {
         // Remove the asterisk
         $wildcard = substr($wildcard, 0, -1);
@@ -294,7 +294,7 @@ abstract class AbstractCacher implements Cacher
         $this->getUrls($domain)->filter(function ($url) use ($wildcard) {
             return Str::startsWith($url, $wildcard);
         })->each(function ($url) use ($domain) {
-            $this->recacheUrl($url, $domain);
+            $this->refreshUrl($url, $domain);
         });
     }
 

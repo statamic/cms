@@ -769,7 +769,7 @@ class DefaultInvalidatorTest extends TestCase
     public function it_doesnt_recache_when_background_recache_token_is_disabled()
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
-            $cacher->shouldReceive('recacheUrls')->never();
+            $cacher->shouldReceive('refreshUrls')->never();
             $cacher->shouldReceive('invalidateUrls')->once()->with([
                 'http://localhost/blog/one',
                 'http://localhost/blog/two',
@@ -795,7 +795,7 @@ class DefaultInvalidatorTest extends TestCase
             ],
         ]);
 
-        $this->assertNull($invalidator->invalidateAndRecache($entry));
+        $this->assertNull($invalidator->refresh($entry));
     }
 
     #[Test]
@@ -805,7 +805,7 @@ class DefaultInvalidatorTest extends TestCase
 
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
             $cacher->shouldReceive('invalidateUrls')->never();
-            $cacher->shouldReceive('recacheUrls')->once()->with([
+            $cacher->shouldReceive('refreshUrls')->once()->with([
                 'http://localhost/blog/one',
                 'http://localhost/blog/two',
             ]);
@@ -830,6 +830,6 @@ class DefaultInvalidatorTest extends TestCase
             ],
         ]);
 
-        $this->assertNull($invalidator->invalidateAndRecache($entry));
+        $this->assertNull($invalidator->refresh($entry));
     }
 }

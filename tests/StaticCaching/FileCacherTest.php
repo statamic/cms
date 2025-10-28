@@ -362,7 +362,7 @@ class FileCacherTest extends TestCase
             'two' => '/two',
         ]);
 
-        $cacher->recacheUrl('/one', 'http://example.com');
+        $cacher->refreshUrl('/one', 'http://example.com');
 
         Queue::assertPushed(\Statamic\Console\Commands\StaticWarmJob::class);
     }

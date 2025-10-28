@@ -6,5 +6,5 @@ interface Invalidator
 {
     public function invalidate($item);
 
-    public function invalidateAndRecache($item);
+    public function refresh($item);
 }

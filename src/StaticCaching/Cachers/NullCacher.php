@@ -42,12 +42,12 @@ class NullCacher implements Cacher
         //
     }
 
-    public function recacheUrls($urls)
+    public function refreshUrls($urls)
     {
         //
     }
 
-    public function recacheUrl($url)
+    public function refreshUrl($url)
     {
         //
     }
