@@ -78,6 +78,7 @@ class Traverser
         return collect(iterator_to_array($iterator))
             ->mapWithKeys(function ($file) {
                 $path = Path::tidy($file->getPathname());
+
                 return [$path => $file->getMTime()];
             })
             ->sort();

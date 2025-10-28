@@ -260,6 +260,7 @@ class Stache
         $cacheDriver = config('statamic.stache.cache_store', config('cache.default'));
         if ($cacheDriver === 'redis') {
             \Log::info('Parallel warming disabled due to Redis cache driver');
+
             return false;
         }
 
@@ -289,7 +290,7 @@ class Stache
 
             Concurrency::driver($driver)->run($closures);
         } catch (\Exception $e) {
-            \Log::warning('Parallel warming failed, falling back to sequential: ' . $e->getMessage());
+            \Log::warning('Parallel warming failed, falling back to sequential: '.$e->getMessage());
             $stores->each->warm();
         }
     }
