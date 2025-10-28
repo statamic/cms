@@ -16,17 +16,11 @@ use Stringable;
 class TemplateGenerator
 {
     protected array $generators = [];
-
     protected string $templateLanguage = 'antlers';
-
     protected ?string $lineEnding = null;
-
     protected ?string $indentType = null;
-
     protected ?int $indentSize = null;
-
     protected ?bool $finalNewline = null;
-
     protected ?bool $preferComponentSyntax = null;
 
     public function extension(): string
