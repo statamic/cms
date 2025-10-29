@@ -12,6 +12,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\StaticCache;
 use Statamic\Facades\URL;
 use Statamic\StaticCaching\Cacher;
+use Statamic\StaticCaching\RemoveRecacheToken;
 use Statamic\StaticCaching\UrlExcluder;
 use Statamic\Support\Str;
 
@@ -346,27 +347,18 @@ abstract class AbstractCacher implements Cacher
         ];
     }
 
-    protected function removeBackgroundRecacheTokenFromUrl(Request $request, string $url): string
+    protected function removeBackgroundRecacheTokenFromUrl(string $url): string
     {
         if (! config('statamic.static_caching.background_recache', false)) {
             return $url;
         }
 
-        if (! $recache = $request->input('__recache')) {
-            return $url;
-        }
-
-        $url = str_replace('__recache='.urlencode($recache), '', $url);
-        if (substr($url, -1, 1) == '?') {
-            $url = substr($url, 0, -1);
-        }
-
-        return $url;
+        return (new RemoveRecacheToken)($url);
     }
 
     public function getUrl(Request $request)
     {
-        $url = $this->removeBackgroundRecacheTokenFromUrl($request, $request->getUri());
+        $url = $this->removeBackgroundRecacheTokenFromUrl($request->getUri());
 
         if ($this->isExcluded($url)) {
             return $url;

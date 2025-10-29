@@ -348,7 +348,7 @@ EOT;
 
     public function getUrl(Request $request)
     {
-        $url = $this->removeBackgroundRecacheTokenFromUrl($request, $request->getUri());
+        $url = $this->removeBackgroundRecacheTokenFromUrl($request->getUri());
 
         if ($this->isExcluded($url)) {
             return $url;
@@ -370,6 +370,6 @@ EOT;
 
         $qs = HeaderUtils::parseQuery($qs);
 
-        return $url.'?'.$this->removeBackgroundRecacheTokenFromUrl($request, http_build_query($qs, '', '&', \PHP_QUERY_RFC3986));
+        return $url.'?'.$this->removeBackgroundRecacheTokenFromUrl(http_build_query($qs, '', '&', \PHP_QUERY_RFC3986));
     }
 }
