@@ -869,6 +869,7 @@ class BlueprintTest extends TestCase
                     [
                         'fields' => [
                             ['handle' => 'the_field', 'field' => 'the_partial.the_field', 'config' => ['type' => 'text', 'do_not_touch_other_config' => true]],
+                            ['handle' => 'imported_field_without_config_key', 'field' => 'the_partial.the_field'],
                         ],
                     ],
                 ],
@@ -878,6 +879,7 @@ class BlueprintTest extends TestCase
         $fields = $blueprint
             ->ensureFieldHasConfig('author', ['visibility' => 'read_only'])
             ->ensureFieldHasConfig('the_field', ['visibility' => 'read_only'])
+            ->ensureFieldHasConfig('imported_field_without_config_key', ['visibility' => 'read_only'])
             ->fields();
 
         $this->assertEquals(['type' => 'text'], $fields->get('title')->config());
@@ -891,6 +893,7 @@ class BlueprintTest extends TestCase
 
         $this->assertEquals($expectedConfig, $fields->get('author')->config());
         $this->assertEquals($expectedConfig, $fields->get('the_field')->config());
+        $this->assertEquals($expectedConfig, $fields->get('imported_field_without_config_key')->config());
     }
 
     // todo: duplicate or tweak above test but make the target field not in the first section.
