@@ -10,7 +10,7 @@ class VueComponent implements Arrayable
     {
     }
 
-    public static function render($name, $props)
+    public static function render($name, $props = [])
     {
         return new static($name, $props);
     }

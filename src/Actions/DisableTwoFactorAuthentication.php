@@ -7,6 +7,7 @@ use Statamic\Contracts\Auth\User;
 class DisableTwoFactorAuthentication extends Action
 {
     protected $dangerous = true;
+    protected $icon = 'padlock-unlocked';
 
     public function requiresElevatedSession(): bool
     {

@@ -119,7 +119,7 @@ class Code extends Fieldtype
                         'width' => '50',
                     ],
                     'show_mode_label' => [
-                        'display' => __('Show Mode Label?'),
+                        'display' => __('Show Mode Label'),
                         'instructions' => __('statamic::fieldtypes.code.config.show_mode_label'),
                         'type' => 'toggle',
                         'default' => true,

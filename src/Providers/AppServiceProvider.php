@@ -20,6 +20,7 @@ use Statamic\Jobs\HandleEntrySchedule;
 use Statamic\Sites\Sites;
 use Statamic\Statamic;
 use Statamic\Tokens\Handlers\LivePreview;
+use Statamic\View\Scaffolding\TemplateGenerator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,7 +28,7 @@ class AppServiceProvider extends ServiceProvider
 
     protected $configFiles = [
         'antlers', 'api', 'assets', 'autosave', 'cp', 'editions', 'forms', 'git', 'graphql', 'live_preview', 'markdown', 'oauth', 'protect', 'revisions',
-        'routes', 'search', 'static_caching', 'stache', 'system', 'users', 'webauthn',
+        'routes', 'search', 'static_caching', 'stache', 'system', 'templates', 'users', 'webauthn',
     ];
 
     public function boot()
@@ -78,6 +79,10 @@ class AppServiceProvider extends ServiceProvider
         $this->publishes([
             "{$this->root}/resources/views/extend/forms" => resource_path('views/vendor/statamic/forms'),
         ], 'statamic-forms');
+
+        $this->publishes([
+            "{$this->root}/resources/views/extend/scaffolding" => resource_path('views/vendor/statamic/scaffolding'),
+        ], 'statamic-scaffolding');
 
         $this->app['redirect']->macro('cpRoute', function ($route, $parameters = []) {
             return $this->to(cp_route($route, $parameters));
@@ -195,6 +200,16 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind('statamic.imaging.guzzle', function () {
             return new \GuzzleHttp\Client;
+        });
+
+        $this->app->bind(TemplateGenerator::class, function () {
+            return (new TemplateGenerator)
+                ->withCoreGenerators()
+                ->templateLanguage(config('statamic.templates.language', 'antlers'))
+                ->indentType(config('statamic.templates.style.indent_type', 'space'))
+                ->indentSize(config('statamic.templates.style.indent_size', 4))
+                ->finalNewline(config('statamic.templates.style.final_newline', false))
+                ->preferComponentSyntax(config('statamic.templates.antlers.use_components', false));
         });
     }
 
