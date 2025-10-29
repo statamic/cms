@@ -370,6 +370,6 @@ EOT;
 
         $qs = HeaderUtils::parseQuery($qs);
 
-        return $url.'?'.$this->removeBackgroundRecacheTokenFromUrl(http_build_query($qs, '', '&', \PHP_QUERY_RFC3986));
+        return $this->removeBackgroundRecacheTokenFromUrl($url.'?'.http_build_query($qs, '', '&', \PHP_QUERY_RFC3986));
     }
 }
