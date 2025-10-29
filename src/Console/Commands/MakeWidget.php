@@ -77,19 +77,18 @@ class MakeWidget extends GeneratorCommand
     protected function generateWidgetView()
     {
         $addon = $this->argument('addon');
-        $path = $addon ? $this->getAddonPath($addon) : base_path();
+        $basePath = $addon ? $this->getAddonPath($addon) : base_path();
 
         $data = [
             'name' => $this->getNameInput(),
         ];
 
         $filename = Str::slug(Str::snake($this->getNameInput()));
+        $path = "resources/views/widgets/{$filename}.blade.php";
 
-        $this->createFromStub(
-            'widget.blade.php.stub',
-            $path."/resources/views/widgets/{$filename}.blade.php",
-            $data
-        );
+        $this->createFromStub('widget.blade.php.stub', $basePath.'/'.$path, $data);
+
+        $this->components->info(sprintf('View [%s] created successfully.', $path));
     }
 
     /**
