@@ -84,11 +84,11 @@ class MakeWidget extends GeneratorCommand
         ];
 
         $filename = Str::slug(Str::snake($this->getNameInput()));
-        $path = "resources/views/widgets/{$filename}.blade.php";
+        $relativePath = "resources/views/widgets/{$filename}.blade.php";
 
-        $this->createFromStub('widget.blade.php.stub', $basePath.'/'.$path, $data);
+        $this->createFromStub('widget.blade.php.stub', $basePath.'/'.$relativePath, $data);
 
-        $this->components->info(sprintf('View [%s] created successfully.', $path));
+        $this->components->info(sprintf('View [%s] created successfully.', $relativePath));
     }
 
     /**
