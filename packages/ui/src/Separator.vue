@@ -12,7 +12,7 @@ const classes = cva({
         text: { true: 'before:me-4 after:ms-4 antialiased' },
         vertical: {
             true: 'inline-block h-full bg-gray-300 dark:bg-gray-600 self-center w-px',
-            false: 'flex w-full items-center text-center text-gray-400 dark:text-gray-500 text-sm my-4 before:flex-1 after:flex-1',
+            false: 'flex w-full items-center text-center text-gray-500 dark:text-gray-400 text-sm my-4 before:flex-1 after:flex-1',
         },
         variant: {
             line: 'before:bg-gray-300 after:bg-gray-300 before:h-px after:h-px dark:before:bg-gray-600 dark:after:bg-gray-600',
