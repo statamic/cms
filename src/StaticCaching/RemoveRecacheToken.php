@@ -2,6 +2,8 @@
 
 namespace Statamic\StaticCaching;
 
+use Statamic\Facades\StaticCache;
+
 class RemoveRecacheToken
 {
     public function __invoke($url)
@@ -13,7 +15,7 @@ class RemoveRecacheToken
         }
 
         parse_str($parts['query'], $params);
-        unset($params['__recache']);
+        unset($params[StaticCache::recacheTokenParameter()]);
 
         $query = http_build_query($params);
 

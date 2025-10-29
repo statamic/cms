@@ -4,8 +4,8 @@ namespace Tests\StaticCaching;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
 use Statamic\StaticCaching\RemoveRecacheToken;
+use Tests\TestCase;
 
 class RemoveRecacheTokenTest extends TestCase
 {

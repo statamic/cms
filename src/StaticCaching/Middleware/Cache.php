@@ -208,7 +208,7 @@ class Cache
 
     private function hasValidRecacheToken($request)
     {
-        if (! $token = $request->input('__recache')) {
+        if (! $token = $request->input(StaticCache::recacheTokenParameter())) {
             return false;
         }
 

@@ -173,6 +173,8 @@ return [
 
     'recache_token' => env('STATAMIC_RECACHE_TOKEN'),
 
+    'recache_token_parameter' => '__recache',
+
     /*
     |--------------------------------------------------------------------------
     | Shared Error Pages

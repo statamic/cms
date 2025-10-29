@@ -176,7 +176,7 @@ class StaticWarm extends Command
                     $uri .= '/';
                 }
 
-                $uri .= '?__recache='.Facades\StaticCache::recacheToken();
+                $uri .= '?'.Facades\StaticCache::recacheTokenParameter().'='.Facades\StaticCache::recacheToken();
             }
 
             return new Request('GET', $uri, $headers);

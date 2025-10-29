@@ -126,6 +126,11 @@ class StaticCacheManager extends Manager
         return ($driver = $this->driver()) instanceof FileCacher ? $driver : optional();
     }
 
+    public function recacheTokenParameter()
+    {
+        return config('statamic.static_caching.recache_token_parameter', '__recache');
+    }
+
     public function recacheToken()
     {
         return config('statamic.static_caching.recache_token')
