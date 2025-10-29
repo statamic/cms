@@ -141,23 +141,6 @@ abstract class Index
         return (new \Statamic\Query\ResolveValue)($item, $this->name);
     }
 
-    public function updateFromItems($items)
-    {
-        if (! Stache::shouldUpdateIndexes()) {
-            return $this;
-        }
-
-        debugbar()->addMessage("Updating index from items: {$this->store->key()}/{$this->name}", 'stache');
-
-        $this->items = $items->mapWithKeys(
-            fn ($item, $key) => [$key => $this->getItemValue($item)]
-        )->all();
-
-        $this->cache();
-
-        return $this;
-    }
-
     public function cacheKey()
     {
         $searches = ['.', '/'];

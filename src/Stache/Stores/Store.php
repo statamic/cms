@@ -3,7 +3,6 @@
 namespace Statamic\Stache\Stores;
 
 use Facades\Statamic\Stache\Traverser;
-use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\Stache;
@@ -26,7 +25,6 @@ abstract class Store
     protected $paths;
     protected $fileItems;
     protected $shouldCacheFileItems = false;
-    protected $itemsFromPathsResolution;
     protected $modified;
     protected $keys;
 
@@ -71,20 +69,9 @@ abstract class Store
             return $this->fileItems;
         }
 
-        // If we just resolved paths and have items, reuse them
-        if ($this->itemsFromPathsResolution) {
-            return tap($this->itemsFromPathsResolution, function ($items) {
-                $this->itemsFromPathsResolution = null;
-
-                if ($this->shouldCacheFileItems) {
-                    $this->fileItems = $items;
-                }
-            });
-        }
-
-        return $this->fileItems = $this->paths()->map(
-            fn ($path, $key) => $this->getItem($key)
-        );
+        return $this->fileItems = $this->paths()->map(function ($path, $key) {
+            return $this->getItem($key);
+        });
     }
 
     public function getItemKey($item)
@@ -334,10 +321,6 @@ abstract class Store
 
         $paths = $items->pluck('path', 'key');
 
-        // Cache the items for potential reuse in getItemsFromFiles()
-        // This eliminates double-parsing during warming
-        $this->itemsFromPathsResolution = $items->pluck('item', 'key');
-
         $this->cachePaths($paths);
 
         $this->keys()->cache();
@@ -414,12 +397,7 @@ abstract class Store
     {
         $this->shouldCacheFileItems = true;
 
-        $items = $this->getItemsFromFiles();
-
-        // Update all indexes from the same item collection
-        $this->resolveIndexes()->each(function ($index) use ($items) {
-            $index->updateFromItems($items);
-        });
+        $this->resolveIndexes()->each->update();
 
         $this->shouldCacheFileItems = false;
         $this->fileItems = null;
