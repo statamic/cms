@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Statamic\Console\Commands\StaticWarmJob;
 use Statamic\Facades\Site;
-use Statamic\Facades\StaticCache;
 use Statamic\Facades\URL;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\RecacheToken;
@@ -266,11 +265,7 @@ abstract class AbstractCacher implements Cacher
         })->each(function ($url) use ($domain) {
             $url = ($domain ?: $this->getBaseUrl()).$url;
 
-            if (Str::endsWith($url, '?')) {
-                $url = Str::removeRight($url, '?');
-            }
-
-            $url .= (str_contains($url, '?') ? '&' : '?').StaticCache::recacheTokenParameter().'='.StaticCache::recacheToken();
+            $url = RecacheToken::addToUrl($url);
 
             $request = new GuzzleRequest('GET', $url);
 

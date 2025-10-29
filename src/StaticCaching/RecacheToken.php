@@ -31,4 +31,11 @@ class RecacheToken
 
         return $result;
     }
+
+    public static function addToUrl($url)
+    {
+        $separator = str_contains($url, '?') ? '&' : '?';
+
+        return $url.$separator.StaticCache::recacheTokenParameter().'='.StaticCache::recacheToken();
+    }
 }

@@ -21,6 +21,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Http\Controllers\FrontendController;
 use Statamic\StaticCaching\Cacher as StaticCacher;
+use Statamic\StaticCaching\RecacheToken;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\Hookable;
 use Statamic\Taxonomies\LocalizedTerm;
@@ -176,7 +177,7 @@ class StaticWarm extends Command
                     $uri .= '/';
                 }
 
-                $uri .= '?'.Facades\StaticCache::recacheTokenParameter().'='.Facades\StaticCache::recacheToken();
+                $uri = RecacheToken::addToUrl($uri);
             }
 
             return new Request('GET', $uri, $headers);

@@ -9,13 +9,13 @@ use Tests\TestCase;
 
 class RecacheTokenTest extends TestCase
 {
-    #[Test, DataProvider('urlProvider')]
+    #[Test, DataProvider('removeFromUrlProvider')]
     public function it_removes_recache_token($url, $expected)
     {
         $this->assertSame($expected, RecacheToken::removeFromUrl($url));
     }
 
-    public static function urlProvider()
+    public static function removeFromUrlProvider()
     {
         return [
             // Root without trailing slash
@@ -49,6 +49,35 @@ class RecacheTokenTest extends TestCase
             ['http://example.com/page/?__recache=test-token&foo=bar&bar=baz', 'http://example.com/page/?foo=bar&bar=baz'],
             ['http://example.com/page/?foo=bar&__recache=test-token', 'http://example.com/page/?foo=bar'],
             ['http://example.com/page/?foo=bar&__recache=test-token&bar=baz', 'http://example.com/page/?foo=bar&bar=baz'],
+        ];
+    }
+
+    #[Test, DataProvider('addToUrlProvider')]
+    public function it_adds_recache_token($url, $expected)
+    {
+        config(['statamic.static_caching.recache_token' => 'test-token']);
+
+        $this->assertSame($expected, RecacheToken::addToUrl($url));
+    }
+
+    public static function addToUrlProvider()
+    {
+        return [
+            // Root without trailing slash
+            ['http://example.com', 'http://example.com?__recache=test-token'],
+            ['http://example.com?foo=bar', 'http://example.com?foo=bar&__recache=test-token'],
+
+            // Root with trailing slash
+            ['http://example.com/', 'http://example.com/?__recache=test-token'],
+            ['http://example.com/?foo=bar', 'http://example.com/?foo=bar&__recache=test-token'],
+
+            // Sub-page without trailing slash
+            ['http://example.com/page', 'http://example.com/page?__recache=test-token'],
+            ['http://example.com/page?foo=bar', 'http://example.com/page?foo=bar&__recache=test-token'],
+
+            // Sub-page with trailing slash
+            ['http://example.com/page/', 'http://example.com/page/?__recache=test-token'],
+            ['http://example.com/page/?foo=bar', 'http://example.com/page/?foo=bar&__recache=test-token'],
         ];
     }
 }
