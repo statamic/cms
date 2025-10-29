@@ -28,4 +28,14 @@ class ToggleTest extends TestCase
         $this->assertFalse($field->process(false));
         $this->assertNull($field->process(null));
     }
+
+    #[Test]
+    public function queryable_value_is_a_boolean()
+    {
+        $field = (new Toggle)->setField(new Field('test', ['type' => 'toggle']));
+
+        $this->assertTrue($field->toQueryableValue(true));
+        $this->assertFalse($field->toQueryableValue(false));
+        $this->assertFalse($field->toQueryableValue(null));
+    }
 }

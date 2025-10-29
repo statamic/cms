@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\UrlInvalidated;
+use Statamic\Facades\File;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\StaticCaching\Cachers\Writer;
@@ -295,6 +296,32 @@ class FileCacherTest extends TestCase
         $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/two', 'de'));
         $this->assertEquals(['two' => '/two', 'un' => '/fr/un'], $cacher->getUrls('http://domain.com')->all());
         $this->assertEquals(['one' => '/one'], $cacher->getUrls('http://domain.de')->all());
+    }
+
+    #[Test]
+    public function invalidating_a_url_deletes_the_file_even_if_it_is_not_in_application_cache()
+    {
+        $writer = \Mockery::spy(Writer::class);
+        $cache = app(Repository::class);
+        $cacher = $this->fileCacher([
+            'path' => public_path('static'),
+        ], $writer, $cache);
+
+        File::put($cacher->getFilePath('/one'), '');
+        File::put($cacher->getFilePath('/one?foo=bar'), '');
+        File::put($cacher->getFilePath('/onemore'), '');
+        File::put($cacher->getFilePath('/two'), '');
+
+        $cacher->invalidateUrl('/one', 'http://example.com');
+
+        File::delete($cacher->getFilePath('/one'));
+        File::delete($cacher->getFilePath('/one?foo=bar'));
+        File::delete($cacher->getFilePath('/onemore'));
+        File::delete($cacher->getFilePath('/two'));
+
+        $writer->shouldHaveReceived('delete')->times(2);
+        $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/one'))->once();
+        $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/one?foo=bar'))->once();
     }
 
     #[Test]

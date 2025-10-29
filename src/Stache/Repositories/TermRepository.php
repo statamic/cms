@@ -102,6 +102,10 @@ class TermRepository implements RepositoryContract
             return null;
         }
 
+        if ($term->uri() !== '/'.$uri) {
+            return null;
+        }
+
         return $term->collection($collection);
     }
 

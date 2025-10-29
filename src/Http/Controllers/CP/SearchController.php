@@ -5,13 +5,14 @@ namespace Statamic\Http\Controllers\CP;
 use Illuminate\Http\Request;
 use Statamic\Contracts\Search\Result;
 use Statamic\Facades\Search;
+use Statamic\Facades\Site;
 use Statamic\Facades\User;
 
 class SearchController extends CpController
 {
     public function __invoke(Request $request)
     {
-        return Search::index()
+        return Search::index(locale: Site::selected()->handle())
             ->ensureExists()
             ->search($request->query('q'))
             ->get()

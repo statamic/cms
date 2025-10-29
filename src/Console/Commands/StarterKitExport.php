@@ -3,6 +3,7 @@
 namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
+use Statamic\Console\Commands\Concerns\MigratesLegacyStarterKitConfig;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
@@ -13,7 +14,7 @@ use function Laravel\Prompts\confirm;
 
 class StarterKitExport extends Command
 {
-    use RunsInPlease;
+    use MigratesLegacyStarterKitConfig, RunsInPlease;
 
     /**
      * The name and signature of the console command.
@@ -36,11 +37,11 @@ class StarterKitExport extends Command
      */
     public function handle()
     {
-        if (! File::exists(base_path('starter-kit.yaml'))) {
-            return $this->askToStubStarterKitConfig();
-        }
+        $path = $this->getAbsolutePath();
 
-        if (! File::exists($path = $this->getAbsolutePath())) {
+        $this->migrateLegacyConfig($path);
+
+        if (! File::exists($path)) {
             $this->askToCreateExportPath($path);
         }
 
@@ -55,27 +56,11 @@ class StarterKitExport extends Command
             return 1;
         }
 
-        $this->components->info("Starter kit was successfully exported to [$path].");
-    }
-
-    /**
-     * Ask to stub out starter kit config.
-     */
-    protected function askToStubStarterKitConfig(): void
-    {
-        $stubPath = __DIR__.'/stubs/starter-kits/starter-kit.yaml.stub';
-        $newPath = base_path($config = 'starter-kit.yaml');
-
-        if ($this->input->isInteractive()) {
-            if (! confirm("Config [{$config}] does not exist. Would you like to create it now?", true)) {
-                return;
-            }
+        if (version_compare(app()->version(), '11', '<')) {
+            return $this->components->info("Starter kit was successfully exported to [$path].");
         }
 
-        File::copy($stubPath, $newPath);
-
-        $this->comment("A new config has been created at [{$config}].");
-        $this->comment('Please configure your `export_paths` and re-run to begin your export!');
+        $this->components->success("Starter kit was successfully exported to [$path].");
     }
 
     /**

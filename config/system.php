@@ -47,6 +47,28 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Blueprints Path
+    |--------------------------------------------------------------------------
+    |
+    | Where your blueprint YAML files are stored.
+    |
+    */
+
+    'blueprints_path' => resource_path('blueprints'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fieldsets Path
+    |--------------------------------------------------------------------------
+    |
+    | Where your fieldset YAML files are stored.
+    |
+    */
+
+    'fieldsets_path' => resource_path('fieldsets'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Send the Powered-By Header
     |--------------------------------------------------------------------------
     |
@@ -167,6 +189,19 @@ return [
     */
 
     'update_references' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Always Augment to Query
+    |--------------------------------------------------------------------------
+    |
+    | By default, Statamic will augment relationship fields with max_items: 1
+    | to the result of a query, for example an Entry instance. Setting this
+    | to true will augment to the query builder instead of the result.
+    |
+    */
+
+    'always_augment_to_query' => false,
 
     /*
     |--------------------------------------------------------------------------

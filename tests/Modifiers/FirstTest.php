@@ -45,6 +45,27 @@ class FirstTest extends TestCase
         ];
     }
 
+    #[Test]
+    #[DataProvider('collectionProvider')]
+    public function it_gets_the_first_value_of_a_collection($value, $expected)
+    {
+        $this->assertEquals($expected, $this->modify($value));
+    }
+
+    public static function collectionProvider()
+    {
+        return [
+            'list' => [
+                collect(['alfa', 'bravo', 'charlie']),
+                'alfa',
+            ],
+            'associative' => [
+                collect(['alfa' => 'bravo', 'charlie' => 'delta']),
+                'bravo',
+            ],
+        ];
+    }
+
     private function modify($value, $arg = null)
     {
         return Modify::value($value)->first($arg)->fetch();

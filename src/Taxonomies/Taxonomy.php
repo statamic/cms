@@ -31,6 +31,8 @@ use Statamic\Statamic;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
+use function Statamic\trans as __;
+
 class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract, Responsable
 {
     use ContainsCascadingData, ContainsSupplementalData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData;
@@ -79,6 +81,14 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
     public function showUrl()
     {
         return cp_route('taxonomies.show', $this->handle());
+    }
+
+    public function breadcrumbUrl()
+    {
+        $referer = request()->header('referer');
+        $showUrl = $this->showUrl();
+
+        return $referer && Str::before($referer, '?') === $showUrl ? $referer : $showUrl;
     }
 
     public function editUrl()
@@ -378,6 +388,10 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
         }
 
         if ($this->collection() && ! $this->collection()->sites()->contains($site)) {
+            throw new NotFoundHttpException;
+        }
+
+        if ($this->collection() && ! $this->collections()->contains($this->collection())) {
             throw new NotFoundHttpException;
         }
 

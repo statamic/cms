@@ -25,6 +25,9 @@ class CollectionType extends \Rebing\GraphQL\Support\Type
             'structure' => [
                 'type' => GraphQL::type(CollectionStructureType::NAME),
             ],
+            'mount' => [
+                'type' => GraphQL::type(EntryInterface::NAME),
+            ],
         ])->merge(collect(GraphQL::getExtraTypeFields($this->name))->map(function ($closure) {
             return $closure();
         }))->map(function (array $arr) {
@@ -39,6 +42,10 @@ class CollectionType extends \Rebing\GraphQL\Support\Type
         return function ($collection, $args, $context, $info) {
             if ($info->fieldName === 'structure') {
                 return $collection->structure();
+            }
+
+            if ($info->fieldName === 'mount') {
+                return $collection->mount();
             }
 
             $value = $collection->augmentedValue($info->fieldName);

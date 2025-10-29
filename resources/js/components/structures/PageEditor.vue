@@ -74,7 +74,13 @@
 </template>
 
 <script>
+import HasHiddenFields from "../publish/HasHiddenFields";
+
 export default {
+
+    mixins: [
+        HasHiddenFields,
+    ],
 
     props: {
         id: String,
@@ -186,9 +192,9 @@ export default {
 
             this.$axios.post(postUrl, {
                 type: this.type,
-                values: this.values
+                values: this.visibleValues
             }).then(response => {
-                this.$emit('submitted', this.values);
+                this.$emit('submitted', this.visibleValues);
             }).catch(e => {
                 this.validating = false;
                 if (e.response && e.response.status === 422) {

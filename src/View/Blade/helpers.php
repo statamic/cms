@@ -2,6 +2,7 @@
 
 namespace Statamic\View\Blade;
 
+use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
 use Statamic\Modifiers\Modify;
@@ -11,7 +12,7 @@ use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 
 function value(mixed $value): mixed
 {
-    if ($value instanceof Value) {
+    if ($value instanceof Value || $value instanceof ArrayableString) {
         $value = $value->value();
     } elseif ($value instanceof Values) {
         $value = $value->all();

@@ -198,4 +198,9 @@ class Markdown extends Fieldtype
             'previewUrl' => cp_route('markdown.preview'),
         ];
     }
+
+    public function shouldParseAntlersFromRawString(): bool
+    {
+        return $this->config('smartypants', false);
+    }
 }

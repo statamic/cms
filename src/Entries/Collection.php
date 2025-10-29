@@ -33,6 +33,8 @@ use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
+use function Statamic\trans as __;
+
 class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contract
 {
     use ContainsCascadingData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData, HasDirtyState;
@@ -264,6 +266,14 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
     public function showUrl()
     {
         return cp_route('collections.show', $this->handle());
+    }
+
+    public function breadcrumbUrl()
+    {
+        $referer = request()->header('referer');
+        $showUrl = $this->showUrl();
+
+        return $referer && Str::before($referer, '?') === $showUrl ? $referer : $showUrl;
     }
 
     public function editUrl()

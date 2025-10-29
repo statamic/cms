@@ -279,6 +279,10 @@ class Glide extends Tags
             return $item;
         }
 
+        if (Str::startsWith($item, config('app.url'))) {
+            $item = Str::after($item, config('app.url'));
+        }
+
         // External URLs are already fine as-is.
         if (Str::startsWith($item, ['http://', 'https://'])) {
             return $item;

@@ -4,11 +4,8 @@ namespace Statamic\Events;
 
 class TermCreating extends Event
 {
-    public $term;
-
-    public function __construct($term)
+    public function __construct(public $term)
     {
-        $this->term = $term;
     }
 
     /**

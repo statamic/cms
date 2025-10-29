@@ -6,11 +6,8 @@ use Statamic\Contracts\Git\ProvidesCommitMessage;
 
 class NavSaved extends Event implements ProvidesCommitMessage
 {
-    public $nav;
-
-    public function __construct($nav)
+    public function __construct(public $nav)
     {
-        $this->nav = $nav;
     }
 
     public function commitMessage()

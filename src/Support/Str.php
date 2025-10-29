@@ -298,6 +298,16 @@ class Str
         return IlluminateStr::finish($string, $cap);
     }
 
+    public static function toBase64Url($url): string
+    {
+        return rtrim(strtr(base64_encode($url), '+/', '-_'), '=');
+    }
+
+    public static function fromBase64Url($url, $strict = false)
+    {
+        return base64_decode(strtr($url, '-_', '+/'), $strict);
+    }
+
     /**
      * Implicitly defer all other method calls to either \Stringy\StaticStringy or \Illuminate\Support\Str.
      *
