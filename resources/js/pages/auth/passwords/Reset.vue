@@ -68,7 +68,7 @@ const submit = () => {
     <div class="mt-4 w-full text-center dark:mt-6">
         <Link
             :href="loginUrl"
-            class="text-blue-400 text-sm hover:text-blue-600"
+            class="text-ui-accent text-sm hover:text-ui-accent/80 dark:text-dark-ui-accent dark:hover:text-dark-ui-accent/80"
             v-text="__('Back to login')"
         />
     </div>
