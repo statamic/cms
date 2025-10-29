@@ -12,7 +12,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\StaticCache;
 use Statamic\Facades\URL;
 use Statamic\StaticCaching\Cacher;
-use Statamic\StaticCaching\RemoveRecacheToken;
+use Statamic\StaticCaching\RecacheToken;
 use Statamic\StaticCaching\UrlExcluder;
 use Statamic\Support\Str;
 
@@ -353,7 +353,7 @@ abstract class AbstractCacher implements Cacher
             return $url;
         }
 
-        return (new RemoveRecacheToken)($url);
+        return RecacheToken::removeFromUrl($url);
     }
 
     public function getUrl(Request $request)

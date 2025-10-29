@@ -4,15 +4,15 @@ namespace Tests\StaticCaching;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\StaticCaching\RemoveRecacheToken;
+use Statamic\StaticCaching\RecacheToken;
 use Tests\TestCase;
 
-class RemoveRecacheTokenTest extends TestCase
+class RecacheTokenTest extends TestCase
 {
     #[Test, DataProvider('urlProvider')]
     public function it_removes_recache_token($url, $expected)
     {
-        $this->assertSame($expected, (new RemoveRecacheToken())($url));
+        $this->assertSame($expected, RecacheToken::removeFromUrl($url));
     }
 
     public static function urlProvider()

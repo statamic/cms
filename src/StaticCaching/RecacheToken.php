@@ -4,9 +4,9 @@ namespace Statamic\StaticCaching;
 
 use Statamic\Facades\StaticCache;
 
-class RemoveRecacheToken
+class RecacheToken
 {
-    public function __invoke($url)
+    public static function removeFromUrl($url)
     {
         $parts = parse_url($url);
 
