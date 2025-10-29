@@ -1,13 +1,13 @@
 <script setup>
 import { Widget } from '@statamic/cms/ui';
 
-defineProps(['name']);
+defineProps(['message']);
 </script>
 
 <template>
     <Widget title="DummyName">
         <div class="px-4 py-3">
-            <p>👋 Hello {{ name }}!</p>
+            <p>👋 {{ message }}!</p>
         </div>
     </Widget>
 </template>
