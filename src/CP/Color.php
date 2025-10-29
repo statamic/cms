@@ -392,7 +392,7 @@ class Color
             'dark-global-header-bg' => self::Zinc[800],
             'progress-bar' => self::Indigo[700],
             'ui-accent' => self::Indigo[700],
-            'dark-ui-accent' => self::Indigo[700],
+            'dark-ui-accent' => self::Indigo[400],
             'switch-bg' => 'var(--theme-color-ui-accent)',
             'dark-switch-bg' => 'var(--theme-color-dark-ui-accent)',
         ];
