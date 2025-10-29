@@ -647,7 +647,8 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 
         $field = $this->contents['tabs'][$tab]['sections'][$sectionKey]['fields'][$fieldKey];
 
-        $isImportedField = Arr::has($field, 'config');
+        $fieldValue = Arr::get($field, 'field');
+        $isImportedField = is_string($fieldValue);
 
         if ($isImportedField) {
             $existingConfig = Arr::get($field, 'config', []);
