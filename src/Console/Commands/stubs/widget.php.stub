@@ -9,6 +9,6 @@ class DummyClass extends Widget
 {
     public function component()
     {
-        return VueComponent::render('DummyComponent', ['name' => 'World']);
+        return VueComponent::render('DummyComponent', ['message' => 'Hello World!']);
     }
 }
