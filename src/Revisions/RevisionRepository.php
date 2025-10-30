@@ -16,7 +16,7 @@ class RevisionRepository implements Contract
     public function __construct(Stache $stache)
     {
         $this->stache = $stache;
-        $this->store = $stache->store('revisions')->directory($this->directory());
+        $this->store = $stache->store('revisions');
     }
 
     public function directory()
