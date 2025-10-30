@@ -3,6 +3,7 @@
         <Combobox
             class="w-full"
             searchable
+            discrete-focus-outline
             :disabled="config.disabled"
             :ignore-filter="typeahead"
             :max-selections="maxSelections"
