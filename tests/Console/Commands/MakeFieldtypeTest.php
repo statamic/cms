@@ -19,6 +19,7 @@ class MakeFieldtypeTest extends TestCase
     {
         parent::setUp();
 
+        Process::fake();
         $this->files = app(Filesystem::class);
         $this->fakeSuccessfulComposerRequire();
     }
@@ -63,8 +64,6 @@ class MakeFieldtypeTest extends TestCase
     #[Test]
     public function it_can_generate_a_fieldtype_and_run_setup_cp_vite()
     {
-        Process::fake();
-
         $this->assertFileDoesNotExist(base_path('app/Fieldtypes/KnightRider.php'));
         $this->assertFileDoesNotExist(resource_path('js/components/fieldtypes/KnightRider.vue'));
 
@@ -155,8 +154,6 @@ PHP
     #[Test]
     public function it_can_make_a_fieldtype_into_an_addon()
     {
-        Process::fake();
-
         $path = base_path('addons/yoda/bag-odah');
 
         $this->artisan('statamic:make:addon', ['addon' => 'yoda/bag-odah']);
