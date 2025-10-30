@@ -27,7 +27,7 @@
                             <a class="group flex cursor-pointer items-center" @click="selectFolder(folder.path)">
                                 <file-icon
                                     extension="folder"
-                                    class="me-2 inline-block size-8 text-ui-accent-bg group-hover:text-ui-accent-bg dark:text-dark-ui-accent-bg dark:group-hover:text-dark-ui-accent-bg"
+                                    class="me-2 inline-block size-8 text-blue-400/90 group-hover:text-blue-400"
                                 />
                                 {{ folder.basename }}
                             </a>
