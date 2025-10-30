@@ -23,6 +23,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    asConfig: {
+        type: Boolean,
+        default: undefined,
+    },
 });
 
 provideFieldsContext({
@@ -30,6 +34,7 @@ provideFieldsContext({
     fieldPathPrefix: toRef(() => props.fieldPathPrefix),
     metaPathPrefix: toRef(() => props.metaPathPrefix),
     readOnly: toRef(() => props.readOnly),
+    asConfig: toRef(() => props.asConfig),
 });
 </script>
 

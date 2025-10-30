@@ -2,9 +2,12 @@
 import { injectContainerContext } from './Container.vue';
 import { injectFieldsContext } from './FieldsProvider.vue';
 import Field from './Field.vue';
+import { computed } from 'vue';
 
-const { asConfig } = injectContainerContext();
-const { fields, fieldPathPrefix } = injectFieldsContext();
+const { asConfig: containerAsConfig } = injectContainerContext();
+const { fields, asConfig: fieldsAsConfig } = injectFieldsContext();
+
+const asConfig = computed(() => fieldsAsConfig.value !== undefined ? fieldsAsConfig.value : containerAsConfig.value);
 </script>
 
 <template>
