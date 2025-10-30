@@ -31,6 +31,14 @@ class RepositoryTest extends TestCase
     }
 
     #[Test]
+    public function it_can_call_to_array_on_a_revision_collection()
+    {
+        $revisions = $this->repo->whereKey('123');
+
+        $this->assertIsArray($revisions->toArray());
+    }
+
+    #[Test]
     public function it_returns_a_query_builder()
     {
         $builder = $this->repo->query();

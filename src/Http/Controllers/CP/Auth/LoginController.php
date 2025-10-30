@@ -2,18 +2,24 @@
 
 namespace Statamic\Http\Controllers\CP\Auth;
 
+use Illuminate\Auth\Events\Failed;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
-use Statamic\Auth\ThrottlesLogins;
+use Inertia\Inertia;
 use Statamic\Facades\OAuth;
+use Statamic\Facades\User;
+use Statamic\Http\Controllers\Concerns\HandlesLogins;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\CP\RedirectIfAuthorized;
+use Statamic\OAuth\Provider;
+use Statamic\Statamic;
 use Statamic\Support\Str;
+
+use function Statamic\trans as __;
 
 class LoginController extends CpController
 {
-    use ThrottlesLogins;
+    use HandlesLogins;
 
     /**
      * Create a new controller instance.
@@ -25,29 +31,33 @@ class LoginController extends CpController
         $this->middleware(RedirectIfAuthorized::class)->except('logout');
     }
 
-    /**
-     * Show the application's login form.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function showLoginForm(Request $request)
     {
-        $data = [
+        $oauthEnabled = OAuth::enabled();
+        $emailLoginEnabled = $oauthEnabled ? config('statamic.oauth.email_login_enabled') : true;
+
+        return Inertia::render('auth/Login', [
             'title' => __('Log in'),
-            'oauth' => $enabled = OAuth::enabled(),
-            'emailLoginEnabled' => $enabled ? config('statamic.oauth.email_login_enabled') : true,
-            'providers' => $enabled ? OAuth::providers() : [],
+            'oauthEnabled' => $oauthEnabled,
+            'emailLoginEnabled' => $emailLoginEnabled,
+            'providers' => $oauthEnabled ? $this->oauthProviders() : [],
             'referer' => $this->getReferrer($request),
-            'hasError' => $this->hasError(),
-        ];
+            'forgotPasswordUrl' => cp_route('password.request'),
+            'submitUrl' => cp_route('login'),
+            'passkeyOptionsUrl' => cp_route('passkeys.auth.options'),
+            'passkeyVerifyUrl' => cp_route('passkeys.auth'),
+        ]);
+    }
 
-        $view = view('statamic::auth.login', $data);
+    private function oauthProviders()
+    {
+        $redirect = parse_url(cp_route('index'))['path'];
 
-        if ($request->expired) {
-            return $view->withErrors(__('Session Expired'));
-        }
-
-        return $view;
+        return OAuth::providers()->map(fn (Provider $provider) => [
+            'name' => $provider->name(),
+            'icon' => Statamic::svg('oauth/'.$provider->name()),
+            'url' => $provider->loginUrl().'?redirect='.$redirect,
+        ])->values();
     }
 
     public function login(Request $request)
@@ -57,53 +67,48 @@ class LoginController extends CpController
             'password' => 'required|string',
         ]);
 
-        if ($this->hasTooManyLoginAttempts($request)) {
-            $this->fireLockoutEvent($request);
+        $this->checkPasskeyEnforcement($request);
 
-            return $this->sendLockoutResponse($request);
+        $this->handleTooManyLoginAttempts($request);
+
+        $user = User::fromUser($this->validateCredentials($request));
+
+        if ($user->hasEnabledTwoFactorAuthentication()) {
+            return $this->twoFactorChallengeResponse($request, $user);
         }
 
-        if ($this->attemptLogin($request)) {
-            return $this->sendLoginResponse($request);
-        }
-
-        $this->incrementLoginAttempts($request);
-
-        return $this->sendFailedLoginResponse($request);
-    }
-
-    protected function attemptLogin(Request $request)
-    {
-        return $this->guard()->attempt(
-            $this->credentials($request),
-            $request->filled('remember')
-        );
-    }
-
-    protected function sendLoginResponse(Request $request)
-    {
-        $request->session()->regenerate();
+        $this->authenticate($request, $user);
 
         return $this->authenticated($request, $this->guard()->user());
     }
 
-    protected function sendFailedLoginResponse(Request $request)
+    protected function twoFactorChallengeRedirect(): string
     {
-        throw ValidationException::withMessages([
-            $this->username() => [trans('auth.failed')],
-        ]);
+        return cp_route('two-factor-challenge');
     }
 
-    protected function guard()
+    /**
+     * Fire the failed authentication attempt event with the given arguments.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
+     * @return void
+     */
+    protected function fireFailedEvent($request, $user = null)
     {
-        return Auth::guard();
+        event(new Failed($this->guard()?->name, $user, [
+            $this->username() => $request->{$this->username()},
+            'password' => $request->password,
+        ]));
     }
 
     public function redirectPath()
     {
+        $cp = cp_route('index');
         $referer = request('referer');
+        $referredFromCp = Str::startsWith($referer, $cp) && ! Str::startsWith($referer, $cp.'/auth/');
 
-        return Str::contains($referer, '/'.config('statamic.cp.route')) ? $referer : cp_route('index');
+        return $referredFromCp ? $referer : $cp;
     }
 
     protected function authenticated(Request $request, $user)
@@ -146,17 +151,16 @@ class LoginController extends CpController
         return 'email';
     }
 
-    private function hasError()
+    private function checkPasskeyEnforcement(Request $request)
     {
-        return function ($field) {
-            if (! $error = optional(session('errors'))->first($field)) {
-                return false;
+        if (! config('statamic.webauthn.allow_password_login_with_passkey', true)) {
+            if ($user = User::findByEmail($request->get($this->username()))) {
+                if ($user->passkeys()->isNotEmpty()) {
+                    throw ValidationException::withMessages([
+                        $this->username() => [trans('statamic::messages.password_passkeys_only')],
+                    ]);
+                }
             }
-
-            return ! in_array($error, [
-                __('auth.failed'),
-                __('statamic::validation.required'),
-            ]);
-        };
+        }
     }
 }

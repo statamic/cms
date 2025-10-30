@@ -28,7 +28,12 @@ trait RendersAttributes
                     ? ($value ? 'true' : 'false')
                     : $value;
 
-                return sprintf('%s="%s"', $attribute, $value);
+                $format = '%s="%s"';
+                if (str_contains($value, '"')) {
+                    $format = '%s=\'%s\'';
+                }
+
+                return sprintf($format, $attribute, $value);
             })
             ->filter()
             ->implode(' ');

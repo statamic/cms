@@ -2,13 +2,13 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\Query\Scopes\Filters\Fields\Floatval as FloatFilter;
 
 class Floatval extends Fieldtype
 {
     protected $categories = ['number'];
-    protected $icon = 'float';
     protected $rules = ['numeric'];
     protected static $handle = 'float';
 
@@ -19,6 +19,18 @@ class Floatval extends Fieldtype
                 'display' => __('Default Value'),
                 'instructions' => __('statamic::messages.fields_default_instructions'),
                 'type' => 'text',
+            ],
+            'prepend' => [
+                'display' => __('Prepend'),
+                'instructions' => __('statamic::fieldtypes.text.config.prepend'),
+                'type' => 'text',
+                'width' => '50',
+            ],
+            'append' => [
+                'display' => __('Append'),
+                'instructions' => __('statamic::fieldtypes.text.config.append'),
+                'type' => 'text',
+                'width' => '50',
             ],
         ];
     }
@@ -55,5 +67,10 @@ class Floatval extends Fieldtype
     public function filter()
     {
         return new FloatFilter($this);
+    }
+
+    public function toGqlType()
+    {
+        return GraphQL::type(GraphQL::float());
     }
 }

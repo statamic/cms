@@ -4,21 +4,28 @@ namespace Statamic\Http\Controllers\CP\Utilities;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
+use Inertia\Inertia;
 use League\Glide\Server;
 use Statamic\Facades\Stache;
+use Statamic\Facades\StaticCache;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\StaticCaching\Cacher as StaticCacher;
 use Statamic\Support\Str;
 
 class CacheController extends CpController
 {
     public function index()
     {
-        return view('statamic::utilities.cache', [
+        return Inertia::render('utilities/Cache', [
             'stache' => $this->getStacheStats(),
             'cache' => $this->getApplicationCacheStats(),
             'static' => $this->getStaticCacheStats(),
             'images' => $this->getImageCacheStats(),
+            'clearAllUrl' => cp_route('utilities.cache.clear', 'all'),
+            'clearStacheUrl' => cp_route('utilities.cache.clear', 'stache'),
+            'warmStacheUrl' => cp_route('utilities.cache.warm', 'stache'),
+            'clearStaticUrl' => cp_route('utilities.cache.clear', 'static'),
+            'clearApplicationUrl' => cp_route('utilities.cache.clear', 'application'),
+            'clearImageUrl' => cp_route('utilities.cache.clear', 'image'),
         ]);
     }
 
@@ -66,7 +73,7 @@ class CacheController extends CpController
         return [
             'enabled' => (bool) $strategy,
             'strategy' => $strategy ?? __('Disabled'),
-            'count' => app(StaticCacher::class)->getUrls()->count(),
+            'count' => StaticCache::driver()->getUrls()->count(),
         ];
     }
 
@@ -96,7 +103,7 @@ class CacheController extends CpController
 
     protected function clearStaticCache()
     {
-        app(StaticCacher::class)->flush();
+        StaticCache::flush();
 
         return back()->withSuccess(__('Static page cache cleared.'));
     }

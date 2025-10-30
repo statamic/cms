@@ -2,16 +2,25 @@
 
 namespace Tests\Support\Concerns;
 
+use ArrayIterator;
 use ArrayObject;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\ItemNotFoundException;
+use Illuminate\Support\MultipleItemsFoundException;
 use InvalidArgumentException;
-use PHPUnit\Framework\Attributes\Test;
+use IteratorAggregate;
+use JsonSerializable;
 use Statamic\Support\Arr;
 use stdClass;
+use Traversable;
+use WeakMap;
 
 /**
- * These tests are copied over from laravel/framework (v10.1.4), so that we can better detect
+ * These tests are copied over from laravel/framework (v12.22.1), so that we can better detect
  * via CI when there are changes to Illuminate\Support\Arr which might affect our users.
  *
  * Note: We're testing this functionality through Statamic\Support\Arr, which
@@ -19,7 +28,7 @@ use stdClass;
  */
 trait TestsIlluminateArr
 {
-    public function testAccessible()
+    public function testAccessible(): void
     {
         $this->assertTrue(Arr::accessible([]));
         $this->assertTrue(Arr::accessible([1, 2]));
@@ -30,6 +39,34 @@ trait TestsIlluminateArr
         $this->assertFalse(Arr::accessible('abc'));
         $this->assertFalse(Arr::accessible(new stdClass));
         $this->assertFalse(Arr::accessible((object) ['a' => 1, 'b' => 2]));
+        $this->assertFalse(Arr::accessible(123));
+        $this->assertFalse(Arr::accessible(12.34));
+        $this->assertFalse(Arr::accessible(true));
+        $this->assertFalse(Arr::accessible(new \DateTime));
+        $this->assertFalse(Arr::accessible(static fn () => null));
+    }
+
+    public function testArrayable(): void
+    {
+        if (version_compare(Application::VERSION, '12.14.0', '<')) {
+            $this->markTestSkipped('These tests require Laravel 12.14.0 or higher.');
+        }
+
+        $this->assertTrue(Arr::arrayable([]));
+        $this->assertTrue(Arr::arrayable(new TestArrayableObject));
+        $this->assertTrue(Arr::arrayable(new TestJsonableObject));
+        $this->assertTrue(Arr::arrayable(new TestJsonSerializeObject));
+        $this->assertTrue(Arr::arrayable(new TestTraversableAndJsonSerializableObject));
+
+        $this->assertFalse(Arr::arrayable(null));
+        $this->assertFalse(Arr::arrayable('abc'));
+        $this->assertFalse(Arr::arrayable(new stdClass));
+        $this->assertFalse(Arr::arrayable((object) ['a' => 1, 'b' => 2]));
+        $this->assertFalse(Arr::arrayable(123));
+        $this->assertFalse(Arr::arrayable(12.34));
+        $this->assertFalse(Arr::arrayable(true));
+        $this->assertFalse(Arr::arrayable(new \DateTime));
+        $this->assertFalse(Arr::arrayable(static fn () => null));
     }
 
     public function testAdd()
@@ -41,15 +78,34 @@ trait TestsIlluminateArr
         $this->assertEquals(['developer' => ['name' => 'Ferid']], Arr::add([], 'developer.name', 'Ferid'));
         $this->assertEquals([1 => 'hAz'], Arr::add([], 1, 'hAz'));
         $this->assertEquals([1 => [1 => 'hAz']], Arr::add([], 1.1, 'hAz'));
+
+        // Case where the key already exists
+        $this->assertEquals(['type' => 'Table'], Arr::add(['type' => 'Table'], 'type', 'Chair'));
+        $this->assertEquals(['category' => ['type' => 'Table']], Arr::add(['category' => ['type' => 'Table']], 'category.type', 'Chair'));
     }
 
     public function testCollapse()
     {
+        // Normal case: a two-dimensional array with different elements
         $data = [['foo', 'bar'], ['baz']];
         $this->assertEquals(['foo', 'bar', 'baz'], Arr::collapse($data));
 
-        $array = [[1], [2], [3], ['foo', 'bar'], collect(['baz', 'boom'])];
-        $this->assertEquals([1, 2, 3, 'foo', 'bar', 'baz', 'boom'], Arr::collapse($array));
+        // Case including numeric and string elements
+        $array = [[1], [2], [3], ['foo', 'bar']];
+        $this->assertEquals([1, 2, 3, 'foo', 'bar'], Arr::collapse($array));
+
+        // Case with empty two-dimensional arrays
+        $emptyArray = [[], [], []];
+        $this->assertEquals([], Arr::collapse($emptyArray));
+
+        // Case with both empty arrays and arrays with elements
+        $mixedArray = [[], [1, 2], [], ['foo', 'bar']];
+        $this->assertEquals([1, 2, 'foo', 'bar'], Arr::collapse($mixedArray));
+
+        // Case including collections and arrays
+        $collection = collect(['baz', 'boom']);
+        $mixedArray = [[1], [2], [3], ['foo', 'bar'], $collection];
+        $this->assertEquals([1, 2, 3, 'foo', 'bar', 'baz', 'boom'], Arr::collapse($mixedArray));
     }
 
     public function testCrossJoin()
@@ -97,29 +153,89 @@ trait TestsIlluminateArr
         $this->assertSame([[]], Arr::crossJoin());
     }
 
-    public function testDivide()
+    public function testDivide(): void
     {
+        // Test dividing an empty array
+        [$keys, $values] = Arr::divide([]);
+        $this->assertEquals([], $keys);
+        $this->assertEquals([], $values);
+
+        // Test dividing an array with a single key-value pair
         [$keys, $values] = Arr::divide(['name' => 'Desk']);
         $this->assertEquals(['name'], $keys);
         $this->assertEquals(['Desk'], $values);
+
+        // Test dividing an array with multiple key-value pairs
+        [$keys, $values] = Arr::divide(['name' => 'Desk', 'price' => 100, 'available' => true]);
+        $this->assertEquals(['name', 'price', 'available'], $keys);
+        $this->assertEquals(['Desk', 100, true], $values);
+
+        // Test dividing an array with numeric keys
+        [$keys, $values] = Arr::divide([0 => 'first', 1 => 'second']);
+        $this->assertEquals([0, 1], $keys);
+        $this->assertEquals(['first', 'second'], $values);
+
+        // Test dividing an array with null key
+        [$keys, $values] = Arr::divide([null => 'Null', 1 => 'one']);
+        $this->assertEquals([null, 1], $keys);
+        $this->assertEquals(['Null', 'one'], $values);
+
+        // Test dividing an array where the keys are arrays
+        [$keys, $values] = Arr::divide([['one' => 1, 2 => 'second'], 1 => 'one']);
+        $this->assertEquals([0, 1], $keys);
+        $this->assertEquals([['one' => 1, 2 => 'second'], 'one'], $values);
+
+        // Test dividing an array where the values are arrays
+        [$keys, $values] = Arr::divide([null => ['one' => 1, 2 => 'second'], 1 => 'one']);
+        $this->assertEquals([null, 1], $keys);
+        $this->assertEquals([['one' => 1, 2 => 'second'], 'one'], $values);
     }
 
     public function testDot()
     {
         $array = Arr::dot(['foo' => ['bar' => 'baz']]);
-        $this->assertEquals(['foo.bar' => 'baz'], $array);
+        $this->assertSame(['foo.bar' => 'baz'], $array);
+
+        $array = Arr::dot([10 => 100]);
+        $this->assertSame([10 => 100], $array);
+
+        $array = Arr::dot(['foo' => [10 => 100]]);
+        $this->assertSame(['foo.10' => 100], $array);
 
         $array = Arr::dot([]);
-        $this->assertEquals([], $array);
+        $this->assertSame([], $array);
 
         $array = Arr::dot(['foo' => []]);
-        $this->assertEquals(['foo' => []], $array);
+        $this->assertSame(['foo' => []], $array);
 
         $array = Arr::dot(['foo' => ['bar' => []]]);
-        $this->assertEquals(['foo.bar' => []], $array);
+        $this->assertSame(['foo.bar' => []], $array);
 
         $array = Arr::dot(['name' => 'taylor', 'languages' => ['php' => true]]);
-        $this->assertEquals(['name' => 'taylor', 'languages.php' => true], $array);
+        $this->assertSame(['name' => 'taylor', 'languages.php' => true], $array);
+
+        $array = Arr::dot(['user' => ['name' => 'Taylor', 'age' => 25, 'languages' => ['PHP', 'C#']]]);
+        $this->assertSame([
+            'user.name' => 'Taylor',
+            'user.age' => 25,
+            'user.languages.0' => 'PHP',
+            'user.languages.1' => 'C#',
+        ], $array);
+
+        $array = Arr::dot(['foo', 'foo' => ['bar' => 'baz', 'baz' => ['a' => 'b']]]);
+        $this->assertSame([
+            'foo',
+            'foo.bar' => 'baz',
+            'foo.baz.a' => 'b',
+        ], $array);
+
+        $array = Arr::dot(['foo' => 'bar', 'empty_array' => [], 'user' => ['name' => 'Taylor'], 'key' => 'value']);
+        $this->assertSame([
+            'foo' => 'bar',
+            'empty_array' => [],
+            'user.name' => 'Taylor',
+            'key' => 'value',
+        ], $array);
     }
 
     public function testUndot()
@@ -176,10 +292,22 @@ trait TestsIlluminateArr
         $this->assertFalse(Arr::exists(new Collection(['a' => null]), 'b'));
     }
 
-    public function testWhereNotNull()
+    public function testWhereNotNull(): void
     {
         $array = array_values(Arr::whereNotNull([null, 0, false, '', null, []]));
         $this->assertEquals([0, false, '', []], $array);
+
+        $array = array_values(Arr::whereNotNull([1, 2, 3]));
+        $this->assertEquals([1, 2, 3], $array);
+
+        $array = array_values(Arr::whereNotNull([null, null, null]));
+        $this->assertEquals([], $array);
+
+        $array = array_values(Arr::whereNotNull(['a', null, 'b', null, 'c']));
+        $this->assertEquals(['a', 'b', 'c'], $array);
+
+        $array = array_values(Arr::whereNotNull([null, 1, 'string', 0.0, false, [], $class = new stdClass(), $function = fn () => null]));
+        $this->assertEquals([1, 'string', 0.0, false, [], $class, $function], $array);
     }
 
     public function testFirst()
@@ -214,9 +342,20 @@ trait TestsIlluminateArr
         }, function () {
             return 'baz';
         });
+        $value5 = Arr::first($array, function ($value, $key) {
+            return $key < 2;
+        });
         $this->assertNull($value2);
         $this->assertSame('bar', $value3);
         $this->assertSame('baz', $value4);
+        $this->assertEquals(100, $value5);
+
+        $cursor = (function () {
+            while (false) {
+                yield 1;
+            }
+        })();
+        $this->assertNull(Arr::first($cursor));
     }
 
     public function testJoin()
@@ -236,17 +375,41 @@ trait TestsIlluminateArr
     {
         $array = [100, 200, 300];
 
-        $last = Arr::last($array, function ($value) {
+        // Callback is null and array is empty
+        $this->assertNull(Arr::last([], null));
+        $this->assertSame('foo', Arr::last([], null, 'foo'));
+        $this->assertSame('bar', Arr::last([], null, function () {
+            return 'bar';
+        }));
+
+        // Callback is null and array is not empty
+        $this->assertEquals(300, Arr::last($array));
+
+        // Callback is not null and array is not empty
+        $value = Arr::last($array, function ($value) {
             return $value < 250;
         });
-        $this->assertEquals(200, $last);
+        $this->assertEquals(200, $value);
 
-        $last = Arr::last($array, function ($value, $key) {
+        // Callback is not null, array is not empty but no satisfied item
+        $value2 = Arr::last($array, function ($value) {
+            return $value > 300;
+        });
+        $value3 = Arr::last($array, function ($value) {
+            return $value > 300;
+        }, 'bar');
+        $value4 = Arr::last($array, function ($value) {
+            return $value > 300;
+        }, function () {
+            return 'baz';
+        });
+        $value5 = Arr::last($array, function ($value, $key) {
             return $key < 2;
         });
-        $this->assertEquals(200, $last);
-
-        $this->assertEquals(300, Arr::last($array));
+        $this->assertNull($value2);
+        $this->assertSame('bar', $value3);
+        $this->assertSame('baz', $value4);
+        $this->assertEquals(200, $value5);
     }
 
     public function testFlatten()
@@ -384,6 +547,130 @@ trait TestsIlluminateArr
         $this->assertSame('dayle', Arr::get($array, 'names.otherDeveloper', function () {
             return 'dayle';
         }));
+
+        // Test array has a null key
+        $this->assertSame('bar', Arr::get(['' => 'bar'], ''));
+        $this->assertSame('bar', Arr::get(['' => ['' => 'bar']], '.'));
+    }
+
+    public function testItGetsAString()
+    {
+        if (version_compare(Application::VERSION, '12.11.0', '<')) {
+            $this->markTestSkipped('These tests require Laravel 12.11.0 or higher.');
+        }
+
+        $test_array = ['string' => 'foo bar', 'integer' => 1234];
+
+        // Test string values are returned as strings
+        $this->assertSame(
+            'foo bar', Arr::string($test_array, 'string')
+        );
+
+        // Test that default string values are returned for missing keys
+        $this->assertSame(
+            'default', Arr::string($test_array, 'missing_key', 'default')
+        );
+
+        // Test that an exception is raised if the value is not a string
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#^Array value for key \[integer\] must be a string, (.*) found.#');
+        Arr::string($test_array, 'integer');
+    }
+
+    public function testItGetsAnInteger()
+    {
+        if (version_compare(Application::VERSION, '12.11.0', '<')) {
+            $this->markTestSkipped('These tests require Laravel 12.11.0 or higher.');
+        }
+
+        $test_array = ['string' => 'foo bar', 'integer' => 1234];
+
+        // Test integer values are returned as integers
+        $this->assertSame(
+            1234, Arr::integer($test_array, 'integer')
+        );
+
+        // Test that default integer values are returned for missing keys
+        $this->assertSame(
+            999, Arr::integer($test_array, 'missing_key', 999)
+        );
+
+        // Test that an exception is raised if the value is not an integer
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#^Array value for key \[string\] must be an integer, (.*) found.#');
+        Arr::integer($test_array, 'string');
+    }
+
+    public function testItGetsAFloat()
+    {
+        if (version_compare(Application::VERSION, '12.11.0', '<')) {
+            $this->markTestSkipped('These tests require Laravel 12.11.0 or higher.');
+        }
+
+        $test_array = ['string' => 'foo bar', 'float' => 12.34];
+
+        // Test float values are returned as floats
+        $this->assertSame(
+            12.34, Arr::float($test_array, 'float')
+        );
+
+        // Test that default float values are returned for missing keys
+        $this->assertSame(
+            56.78, Arr::float($test_array, 'missing_key', 56.78)
+        );
+
+        // Test that an exception is raised if the value is not a float
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#^Array value for key \[string\] must be a float, (.*) found.#');
+        Arr::float($test_array, 'string');
+    }
+
+    public function testItGetsABoolean()
+    {
+        if (version_compare(Application::VERSION, '12.11.0', '<')) {
+            $this->markTestSkipped('These tests require Laravel 12.11.0 or higher.');
+        }
+
+        $test_array = ['string' => 'foo bar',  'boolean' => true];
+
+        // Test boolean values are returned as booleans
+        $this->assertSame(
+            true, Arr::boolean($test_array, 'boolean')
+        );
+
+        // Test that default boolean values are returned for missing keys
+        $this->assertSame(
+            true, Arr::boolean($test_array, 'missing_key', true)
+        );
+
+        // Test that an exception is raised if the value is not a boolean
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#^Array value for key \[string\] must be a boolean, (.*) found.#');
+        Arr::boolean($test_array, 'string');
+    }
+
+    public function testItGetsAnArray()
+    {
+        if (version_compare(Application::VERSION, '12.11.0', '<')) {
+            $this->markTestSkipped('These tests require Laravel 12.11.0 or higher.');
+        }
+
+        $test_array = ['string' => 'foo bar', 'array' => ['foo', 'bar']];
+
+        // Test array values are returned as arrays
+        $this->assertSame(
+            ['foo', 'bar'], Arr::array($test_array, 'array')
+        );
+
+        // Test that default array values are returned for missing keys
+        $this->assertSame(
+            [1, 'two'], Arr::array($test_array, 'missing_key', [1, 'two'])
+        );
+
+        // Test that an exception is raised if the value is not an array
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#^Array value for key \[string\] must be an array, (.*) found.#');
+        Arr::array($test_array, 'string');
     }
 
     public function testHas()
@@ -449,6 +736,33 @@ trait TestsIlluminateArr
         $this->assertFalse(Arr::has([], ['']));
     }
 
+    public function testHasAllMethod()
+    {
+        if (version_compare(Application::VERSION, '12.16.0', '<')) {
+            $this->markTestSkipped('These tests require Laravel 12.16.0 or higher.');
+        }
+
+        $array = ['name' => 'Taylor', 'age' => '', 'city' => null];
+        $this->assertTrue(Arr::hasAll($array, 'name'));
+        $this->assertTrue(Arr::hasAll($array, 'age'));
+        $this->assertFalse(Arr::hasAll($array, ['age', 'car']));
+        $this->assertTrue(Arr::hasAll($array, 'city'));
+        $this->assertFalse(Arr::hasAll($array, ['city', 'some']));
+        $this->assertTrue(Arr::hasAll($array, ['name', 'age', 'city']));
+        $this->assertFalse(Arr::hasAll($array, ['name', 'age', 'city', 'country']));
+
+        $array = ['user' => ['name' => 'Taylor']];
+        $this->assertTrue(Arr::hasAll($array, 'user.name'));
+        $this->assertFalse(Arr::hasAll($array, 'user.age'));
+
+        $array = ['name' => 'Taylor', 'age' => '', 'city' => null];
+        $this->assertFalse(Arr::hasAll($array, 'foo'));
+        $this->assertFalse(Arr::hasAll($array, 'bar'));
+        $this->assertFalse(Arr::hasAll($array, 'baz'));
+        $this->assertFalse(Arr::hasAll($array, 'bah'));
+        $this->assertFalse(Arr::hasAll($array, ['foo', 'bar', 'baz', 'bar']));
+    }
+
     public function testHasAnyMethod()
     {
         $array = ['name' => 'Taylor', 'age' => '', 'city' => null];
@@ -469,6 +783,28 @@ trait TestsIlluminateArr
         $this->assertTrue(Arr::hasAny($array, 'foo.baz'));
         $this->assertFalse(Arr::hasAny($array, 'foo.bax'));
         $this->assertTrue(Arr::hasAny($array, ['foo.bax', 'foo.baz']));
+    }
+
+    public function testEvery()
+    {
+        if (version_compare(Application::VERSION, '12.22.0', '<')) {
+            $this->markTestSkipped('These tests require Laravel 12.22.0 or higher.');
+        }
+
+        $this->assertFalse(Arr::every([1, 2], fn ($value, $key) => is_string($value)));
+        $this->assertFalse(Arr::every(['foo', 2], fn ($value, $key) => is_string($value)));
+        $this->assertTrue(Arr::every(['foo', 'bar'], fn ($value, $key) => is_string($value)));
+    }
+
+    public function testSome()
+    {
+        if (version_compare(Application::VERSION, '12.22.0', '<')) {
+            $this->markTestSkipped('These tests require Laravel 12.22.0 or higher.');
+        }
+
+        $this->assertFalse(Arr::some([1, 2], fn ($value, $key) => is_string($value)));
+        $this->assertTrue(Arr::some(['foo', 2], fn ($value, $key) => is_string($value)));
+        $this->assertTrue(Arr::some(['foo', 'bar'], fn ($value, $key) => is_string($value)));
     }
 
     public function testIsAssoc()
@@ -499,6 +835,8 @@ trait TestsIlluminateArr
         $this->assertTrue(Arr::isList([0 => 'foo', 'bar']));
         $this->assertTrue(Arr::isList([0 => 'foo', 1 => 'bar']));
 
+        $this->assertFalse(Arr::isList([-1 => 1]));
+        $this->assertFalse(Arr::isList([-1 => 1, 0 => 2]));
         $this->assertFalse(Arr::isList([1 => 'foo', 'bar']));
         $this->assertFalse(Arr::isList([1 => 'foo', 0 => 'bar']));
         $this->assertFalse(Arr::isList([0 => 'foo', 'bar' => 'baz']));
@@ -512,6 +850,17 @@ trait TestsIlluminateArr
         $array = Arr::only($array, ['name', 'price']);
         $this->assertEquals(['name' => 'Desk', 'price' => 100], $array);
         $this->assertEmpty(Arr::only($array, ['nonExistingKey']));
+
+        $this->assertEmpty(Arr::only($array, null));
+
+        // Test with array having numeric keys
+        $this->assertEquals(['foo'], Arr::only(['foo', 'bar', 'baz'], 0));
+        $this->assertEquals([1 => 'bar', 2 => 'baz'], Arr::only(['foo', 'bar', 'baz'], [1, 2]));
+        $this->assertEmpty(Arr::only(['foo', 'bar', 'baz'], [3]));
+
+        // Test with array having numeric key and string key
+        $this->assertEquals(['foo'], Arr::only(['foo', 'bar' => 'baz'], 0));
+        $this->assertEquals(['bar' => 'baz'], Arr::only(['foo', 'bar' => 'baz'], 'bar'));
     }
 
     public function testPluck()
@@ -649,6 +998,41 @@ trait TestsIlluminateArr
         $this->assertEquals(['first' => 'taylor', 'last' => 'otwell'], $data);
     }
 
+    public function testMapWithEmptyArray()
+    {
+        $mapped = Arr::map([], static function ($value, $key) {
+            return $key.'-'.$value;
+        });
+        $this->assertEquals([], $mapped);
+    }
+
+    public function testMapNullValues()
+    {
+        $data = ['first' => 'taylor', 'last' => null];
+        $mapped = Arr::map($data, static function ($value, $key) {
+            return $key.'-'.$value;
+        });
+        $this->assertEquals(['first' => 'first-taylor', 'last' => 'last-'], $mapped);
+    }
+
+    public function testMapWithKeys()
+    {
+        $data = [
+            ['name' => 'Blastoise', 'type' => 'Water', 'idx' => 9],
+            ['name' => 'Charmander', 'type' => 'Fire', 'idx' => 4],
+            ['name' => 'Dragonair', 'type' => 'Dragon', 'idx' => 148],
+        ];
+
+        $data = Arr::mapWithKeys($data, function ($pokemon) {
+            return [$pokemon['name'] => $pokemon['type']];
+        });
+
+        $this->assertEquals(
+            ['Blastoise' => 'Water', 'Charmander' => 'Fire', 'Dragonair' => 'Dragon'],
+            $data
+        );
+    }
+
     public function testMapByReference()
     {
         $data = ['first' => 'taylor', 'last' => 'otwell'];
@@ -656,6 +1040,21 @@ trait TestsIlluminateArr
 
         $this->assertEquals(['first' => 'rolyat', 'last' => 'llewto'], $mapped);
         $this->assertEquals(['first' => 'taylor', 'last' => 'otwell'], $data);
+    }
+
+    public function testMapSpread()
+    {
+        $c = [[1, 'a'], [2, 'b']];
+
+        $result = Arr::mapSpread($c, function ($number, $character) {
+            return "{$number}-{$character}";
+        });
+        $this->assertEquals(['1-a', '2-b'], $result);
+
+        $result = Arr::mapSpread($c, function ($number, $character, $key) {
+            return "{$number}-{$character}-{$key}";
+        });
+        $this->assertEquals(['1-a-0', '2-b-1'], $result);
     }
 
     public function testPrepend()
@@ -668,6 +1067,21 @@ trait TestsIlluminateArr
 
         $array = Arr::prepend(['one' => 1, 'two' => 2], 0, null);
         $this->assertEquals([null => 0, 'one' => 1, 'two' => 2], $array);
+
+        $array = Arr::prepend(['one', 'two'], null, '');
+        $this->assertEquals(['' => null, 'one', 'two'], $array);
+
+        $array = Arr::prepend([], 'zero');
+        $this->assertEquals(['zero'], $array);
+
+        $array = Arr::prepend([''], 'zero');
+        $this->assertEquals(['zero', ''], $array);
+
+        $array = Arr::prepend(['one', 'two'], ['zero']);
+        $this->assertEquals([['zero'], 'one', 'two'], $array);
+
+        $array = Arr::prepend(['one', 'two'], ['zero'], 'key');
+        $this->assertEquals(['key' => ['zero'], 'one', 'two'], $array);
     }
 
     public function testPull()
@@ -771,19 +1185,19 @@ trait TestsIlluminateArr
 
         try {
             Arr::random([]);
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException) {
             $exceptions++;
         }
 
         try {
             Arr::random([], 1);
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException) {
             $exceptions++;
         }
 
         try {
             Arr::random([], 2);
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException) {
             $exceptions++;
         }
 
@@ -859,6 +1273,47 @@ trait TestsIlluminateArr
         sort($shuffled);
 
         $this->assertEquals($input, $shuffled);
+    }
+
+    public function testSoleReturnsFirstItemInCollectionIfOnlyOneExists()
+    {
+        if (version_compare(Application::VERSION, '12.4.0', '<')) {
+            $this->markTestSkipped('These tests require Laravel 12.4.0 or higher.');
+        }
+
+        $this->assertSame('foo', Arr::sole(['foo']));
+
+        $array = [
+            ['name' => 'foo'],
+            ['name' => 'bar'],
+        ];
+
+        $this->assertSame(
+            ['name' => 'foo'],
+            Arr::sole($array, fn (array $value) => $value['name'] === 'foo')
+        );
+    }
+
+    public function testSoleThrowsExceptionIfNoItemsExist()
+    {
+        if (version_compare(Application::VERSION, '12.4.0', '<')) {
+            $this->markTestSkipped('These tests require Laravel 12.4.0 or higher.');
+        }
+
+        $this->expectException(ItemNotFoundException::class);
+
+        Arr::sole(['foo'], fn (string $value) => $value === 'baz');
+    }
+
+    public function testSoleThrowsExceptionIfMoreThanOneItemExists()
+    {
+        if (version_compare(Application::VERSION, '12.4.0', '<')) {
+            $this->markTestSkipped('These tests require Laravel 12.4.0 or higher.');
+        }
+
+        $this->expectExceptionObject(new MultipleItemsFoundException(2));
+
+        Arr::sole(['baz', 'foo', 'baz'], fn (string $value) => $value === 'baz');
     }
 
     public function testEmptyShuffle()
@@ -974,6 +1429,61 @@ trait TestsIlluminateArr
         ];
 
         $this->assertEquals($expect, Arr::sortRecursive($array));
+    }
+
+    public function testSortRecursiveDesc()
+    {
+        $array = [
+            'empty' => [],
+            'nested' => [
+                'level1' => [
+                    'level2' => [
+                        'level3' => [2, 3, 1],
+                    ],
+                    'values' => [4, 5, 6],
+                ],
+            ],
+            'mixed' => [
+                'a' => 1,
+                2 => 'b',
+                'c' => 3,
+                1 => 'd',
+            ],
+            'numbered_index' => [
+                1 => 'e',
+                3 => 'c',
+                4 => 'b',
+                5 => 'a',
+                2 => 'd',
+            ],
+        ];
+
+        $expect = [
+            'empty' => [],
+            'mixed' => [
+                'c' => 3,
+                'a' => 1,
+                2 => 'b',
+                1 => 'd',
+            ],
+            'nested' => [
+                'level1' => [
+                    'values' => [6, 5, 4],
+                    'level2' => [
+                        'level3' => [3, 2, 1],
+                    ],
+                ],
+            ],
+            'numbered_index' => [
+                5 => 'a',
+                4 => 'b',
+                3 => 'c',
+                2 => 'd',
+                1 => 'e',
+            ],
+        ];
+
+        $this->assertEquals($expect, Arr::sortRecursiveDesc($array));
     }
 
     public function testToCssClasses()
@@ -1093,6 +1603,38 @@ trait TestsIlluminateArr
         $this->assertEquals([2 => [1 => 'products']], $array);
     }
 
+    public function testFrom()
+    {
+        if (version_compare(Application::VERSION, '12.14.0', '<')) {
+            $this->markTestSkipped('These tests require Laravel 12.14.0 or higher.');
+        }
+
+        $this->assertSame(['foo' => 'bar'], Arr::from(['foo' => 'bar']));
+        $this->assertSame(['foo' => 'bar'], Arr::from((object) ['foo' => 'bar']));
+        $this->assertSame(['foo' => 'bar'], Arr::from(new TestArrayableObject));
+        $this->assertSame(['foo' => 'bar'], Arr::from(new TestJsonableObject));
+        $this->assertSame(['foo' => 'bar'], Arr::from(new TestJsonSerializeObject));
+        $this->assertSame(['foo'], Arr::from(new TestJsonSerializeWithScalarValueObject));
+
+        $this->assertSame(['name' => 'A'], Arr::from(TestEnum::A));
+        $this->assertSame(['name' => 'A', 'value' => 1], Arr::from(TestBackedEnum::A));
+        $this->assertSame(['name' => 'A', 'value' => 'A'], Arr::from(TestStringBackedEnum::A));
+
+        $subject = [new stdClass, new stdClass];
+        $items = new TestTraversableAndJsonSerializableObject($subject);
+        $this->assertSame($subject, Arr::from($items));
+
+        $items = new WeakMap;
+        $items[$temp = new class
+        {
+        }] = 'bar';
+        $this->assertSame(['bar'], Arr::from($items));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Items cannot be represented by a scalar value.');
+        Arr::from(123);
+    }
+
     public function testWrap()
     {
         $string = 'a';
@@ -1206,4 +1748,184 @@ trait TestsIlluminateArr
             ],
         ], Arr::prependKeysWith($array, 'test.'));
     }
+
+    public function testTake(): void
+    {
+        $array = [1, 2, 3, 4, 5, 6];
+
+        // Test with a positive limit, should return the first 'limit' elements.
+        $this->assertEquals([1, 2, 3], Arr::take($array, 3));
+
+        // Test with a negative limit, should return the last 'abs(limit)' elements.
+        $this->assertEquals([4, 5, 6], Arr::take($array, -3));
+
+        // Test with zero limit, should return an empty array.
+        $this->assertEquals([], Arr::take($array, 0));
+
+        // Test with a limit greater than the array size, should return the entire array.
+        $this->assertEquals([1, 2, 3, 4, 5, 6], Arr::take($array, 10));
+
+        // Test with a negative limit greater than the array size, should return the entire array.
+        $this->assertEquals([1, 2, 3, 4, 5, 6], Arr::take($array, -10));
+    }
+
+    public function testSelect()
+    {
+        $array = [
+            [
+                'name' => 'Taylor',
+                'role' => 'Developer',
+                'age' => 1,
+            ],
+            [
+                'name' => 'Abigail',
+                'role' => 'Infrastructure',
+                'age' => 2,
+            ],
+        ];
+
+        $this->assertEquals([
+            [
+                'name' => 'Taylor',
+                'age' => 1,
+            ],
+            [
+                'name' => 'Abigail',
+                'age' => 2,
+            ],
+        ], Arr::select($array, ['name', 'age']));
+
+        $this->assertEquals([
+            [
+                'name' => 'Taylor',
+            ],
+            [
+                'name' => 'Abigail',
+            ],
+        ], Arr::select($array, 'name'));
+
+        $this->assertEquals([
+            [],
+            [],
+        ], Arr::select($array, 'nonExistingKey'));
+
+        $this->assertEquals([
+            [],
+            [],
+        ], Arr::select($array, null));
+    }
+
+    public function testReject()
+    {
+        if (version_compare(Application::VERSION, '11.43', '<')) {
+            $this->markTestSkipped('These tests require Laravel 11.43 or higher.');
+        }
+
+        $array = [1, 2, 3, 4, 5, 6];
+
+        // Test rejection behavior (removing even numbers)
+        $result = Arr::reject($array, function ($value) {
+            return $value % 2 === 0;
+        });
+
+        $this->assertEquals([
+            0 => 1,
+            2 => 3,
+            4 => 5,
+        ], $result);
+
+        // Test key preservation with associative array
+        $assocArray = ['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4];
+
+        $result = Arr::reject($assocArray, function ($value) {
+            return $value > 2;
+        });
+
+        $this->assertEquals([
+            'a' => 1,
+            'b' => 2,
+        ], $result);
+    }
+
+    public function testPartition()
+    {
+        if (version_compare(Application::VERSION, '12.1.0', '<')) {
+            $this->markTestSkipped('These tests require Laravel 12.1.0 or higher.');
+        }
+
+        $array = ['John', 'Jane', 'Greg'];
+
+        $result = Arr::partition($array, fn (string $value) => str_contains($value, 'J'));
+
+        $this->assertEquals([[0 => 'John', 1 => 'Jane'], [2 => 'Greg']], $result);
+    }
+}
+
+class TestArrayableObject implements Arrayable
+{
+    public function toArray()
+    {
+        return ['foo' => 'bar'];
+    }
+}
+
+class TestJsonableObject implements Jsonable
+{
+    public function toJson($options = 0)
+    {
+        return '{"foo":"bar"}';
+    }
+}
+
+class TestJsonSerializeObject implements JsonSerializable
+{
+    public function jsonSerialize(): array
+    {
+        return ['foo' => 'bar'];
+    }
+}
+
+class TestJsonSerializeWithScalarValueObject implements JsonSerializable
+{
+    public function jsonSerialize(): string
+    {
+        return 'foo';
+    }
+}
+
+class TestTraversableAndJsonSerializableObject implements IteratorAggregate, JsonSerializable
+{
+    public $items;
+
+    public function __construct($items = [])
+    {
+        $this->items = $items;
+    }
+
+    public function getIterator(): Traversable
+    {
+        return new ArrayIterator($this->items);
+    }
+
+    public function jsonSerialize(): array
+    {
+        return json_decode(json_encode($this->items), true);
+    }
+}
+
+enum TestEnum
+{
+    case A;
+}
+
+enum TestBackedEnum: int
+{
+    case A = 1;
+    case B = 2;
+}
+
+enum TestStringBackedEnum: string
+{
+    case A = 'A';
+    case B = 'B';
 }

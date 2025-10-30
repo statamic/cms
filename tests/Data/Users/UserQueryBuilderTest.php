@@ -2,10 +2,14 @@
 
 namespace Tests\Data\Users;
 
+use Facades\Tests\Factories\EntryFactory;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
+use Statamic\Query\Scopes\Scope;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -213,6 +217,93 @@ class UserQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function users_are_found_using_where_has_when_max_items_1()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $blueprint = Blueprint::makeFromFields(['entries_field' => ['type' => 'entries', 'max_items' => 1]]);
+        Blueprint::shouldReceive('find')->with('user')->andReturn($blueprint);
+
+        User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf', 'entries_field' => 2])->save();
+        User::make()->email('smeagol@precious.com')->data(['name' => 'Smeagol'])->save();
+        User::make()->email('frodo@precious.com')->data(['name' => 'Frodo', 'entries_field' => 1])->save();
+
+        $entries = User::query()->whereHas('entries_field', function ($subquery) {
+            $subquery->where('title', 'Post 2');
+        })
+            ->get();
+
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Gandalf'], $entries->map->name->all());
+
+        $entries = User::query()->whereDoesntHave('entries_field', function ($subquery) {
+            $subquery->where('title', 'Post 2');
+        })
+            ->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Smeagol', 'Frodo'], $entries->map->name->all());
+    }
+
+    #[Test]
+    public function users_are_found_using_where_has_when_max_items_not_1()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $blueprint = Blueprint::makeFromFields(['entries_field' => ['type' => 'entries']]);
+        Blueprint::shouldReceive('find')->with('user')->andReturn($blueprint);
+
+        User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf', 'entries_field' => [2, 1]])->save();
+        User::make()->email('smeagol@precious.com')->data(['name' => 'Smeagol'])->save();
+        User::make()->email('frodo@precious.com')->data(['name' => 'Frodo', 'entries_field' => [1, 2]])->save();
+
+        $users = User::query()->whereHas('entries_field', function ($subquery) {
+            $subquery->where('title', 'Post 2');
+        })
+            ->get();
+
+        $this->assertCount(2, $users);
+        $this->assertEquals(['Gandalf', 'Frodo'], $users->map->name->all());
+
+        $users = User::query()->whereDoesntHave('entries_field', function ($subquery) {
+            $subquery->where('title', 'Post 2');
+        })
+            ->get();
+
+        $this->assertCount(1, $users);
+        $this->assertEquals(['Smeagol'], $users->map->name->all());
+    }
+
+    #[Test]
+    public function users_are_found_using_where_relation()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $blueprint = Blueprint::makeFromFields(['entries_field' => ['type' => 'entries']]);
+        Blueprint::shouldReceive('find')->with('user')->andReturn($blueprint);
+
+        User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf', 'entries_field' => [2, 1]])->save();
+        User::make()->email('smeagol@precious.com')->data(['name' => 'Smeagol'])->save();
+        User::make()->email('frodo@precious.com')->data(['name' => 'Frodo', 'entries_field' => [1, 2]])->save();
+
+        $users = User::query()->whereRelation('entries_field', 'title', 'Post 2')->get();
+
+        $this->assertCount(2, $users);
+        $this->assertEquals(['Gandalf', 'Frodo'], $users->map->name->all());
+    }
+
+    private function createDummyCollectionAndEntries()
+    {
+        Collection::make('posts')->save();
+
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'author' => 'John Doe'])->create();
+        $entry = EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'author' => 'John Doe'])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'author' => 'John Doe'])->create();
+
+        return $entry;
+    }
+
+    #[Test]
     public function users_are_found_using_where_group()
     {
         $groupOne = tap(UserGroup::make()->handle('one'))->save();
@@ -390,5 +481,27 @@ class UserQueryBuilderTest extends TestCase
             'Smeagol',
             'Frodo',
         ], User::query()->where('type', 'b')->pluck('name')->all());
+    }
+
+    /** @test **/
+    public function users_are_found_using_scopes()
+    {
+        CustomScope::register();
+        User::allowQueryScope(CustomScope::class);
+        User::allowQueryScope(CustomScope::class, 'whereCustom');
+
+        User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf'])->save();
+        User::make()->email('smeagol@precious.com')->data(['name' => 'Smeagol'])->save();
+
+        $this->assertCount(1, User::query()->customScope(['email' => 'gandalf@precious.com'])->get());
+        $this->assertCount(1, User::query()->whereCustom(['email' => 'gandalf@precious.com'])->get());
+    }
+}
+
+class CustomScope extends Scope
+{
+    public function apply($query, $params)
+    {
+        $query->where('email', $params['email']);
     }
 }

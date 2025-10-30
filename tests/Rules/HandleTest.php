@@ -22,6 +22,7 @@ class HandleTest extends TestCase
         $this->assertPasses('foo1');
         $this->assertPasses('foo123');
         $this->assertPasses('foo123_20bar');
+        $this->assertPasses('FooBar');
 
         $this->assertFails('foo-bar');
         $this->assertFails('_foo');
@@ -41,5 +42,11 @@ class HandleTest extends TestCase
     public function it_outputs_helpful_validation_error()
     {
         $this->assertValidationErrorOutput(trans('statamic::validation.handle'), '_bad_input');
+    }
+
+    #[Test]
+    public function it_outputs_helpful_validation_error_when_string_starts_with_number()
+    {
+        $this->assertValidationErrorOutput(trans('statamic::validation.handle_starts_with_number'), '1bad_input');
     }
 }

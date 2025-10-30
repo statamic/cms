@@ -53,6 +53,59 @@ class WhereTest extends TestCase
         $this->assertEquals($expected, Arr::pluck($modified, 'title'));
     }
 
+    #[Test]
+    public function it_accepts_zero_as_a_parameter()
+    {
+        $data = [
+            [
+                'name' => 'Fluffy McSparkles',
+                'whimsy_level' => 42,
+            ],
+            [
+                'name' => 'Sir Bubblesworth',
+                'whimsy_level' => 0,
+            ],
+            [
+                'name' => 'Captain Fuzzybeard',
+                'whimsy_level' => 13,
+            ],
+            [
+                'name' => 'Professor Whiskerbottom',
+                'whimsy_level' => 0,
+            ],
+            [
+                'name' => 'Duchess Snugglefluff',
+                'whimsy_level' => 76,
+            ],
+        ];
+
+        $expected = [
+            'Fluffy McSparkles',
+            'Captain Fuzzybeard',
+            'Duchess Snugglefluff',
+        ];
+
+        $modified = $this->modify($data, ['whimsy_level', '!=', 0]);
+        $this->assertEquals($expected, Arr::pluck($modified, 'name'));
+
+        $modified = $this->modify($data, ['whimsy_level', '!=', '0']);
+        $this->assertEquals($expected, Arr::pluck($modified, 'name'));
+
+        $modified = $this->modify($data, ['whimsy_level', '!==', '0']);
+        $this->assertEquals($data, $modified);
+
+        $expected = [
+            'Sir Bubblesworth',
+            'Professor Whiskerbottom',
+        ];
+
+        $modified = $this->modify($data, ['whimsy_level', 0]);
+        $this->assertEquals($expected, Arr::pluck($modified, 'name'));
+
+        $modified = $this->modify($data, ['whimsy_level', '==', 0]);
+        $this->assertEquals($expected, Arr::pluck($modified, 'name'));
+    }
+
     private function modify($value, array $params)
     {
         return Modify::value($value)->where($params)->fetch();

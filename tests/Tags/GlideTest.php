@@ -67,6 +67,20 @@ EOT;
         $this->assertStringStartsWith('data:image/jpeg;base64', (string) Parse::template($tag, ['foo' => 'bar.jpg']));
     }
 
+    #[Test]
+    #[DefineEnvironment('absoluteHttpRouteUrlWithoutCache')]
+    /**
+     * https://github.com/statamic/cms/pull/11839
+     */
+    public function it_treats_assets_urls_starting_with_the_app_url_as_internal_assets()
+    {
+        $this->createImageInPublicDirectory();
+
+        $result = (string) Parse::template('{{ glide:foo width="100" }}', ['foo' => 'http://localhost/glide/bar.jpg']);
+
+        $this->assertStringStartsWith('/img/glide/bar.jpg', $result);
+    }
+
     public function relativeRouteUrl($app)
     {
         $this->configureGlideCacheDiskWithUrl($app, '/glide');
@@ -77,12 +91,17 @@ EOT;
         $this->configureGlideCacheDiskWithUrl($app, 'http://localhost/glide');
     }
 
+    public function absoluteHttpRouteUrlWithoutCache($app)
+    {
+        $this->configureGlideCacheDiskWithUrl($app, 'http://localhost/glide', false);
+    }
+
     public function absoluteHttpsRouteUrl($app)
     {
         $this->configureGlideCacheDiskWithUrl($app, 'https://localhost/glide');
     }
 
-    private function configureGlideCacheDiskWithUrl($app, $url)
+    private function configureGlideCacheDiskWithUrl($app, $url, $cache = 'glide')
     {
         $app['config']->set('filesystems.disks.glide', [
             'driver' => 'local',
@@ -90,7 +109,7 @@ EOT;
             'url' => $url,
             'visibility' => 'public',
         ]);
-        $app['config']->set('statamic.assets.image_manipulation.cache', 'glide');
+        $app['config']->set('statamic.assets.image_manipulation.cache', $cache);
     }
 
     private function createImageInPublicDirectory()

@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 class RadioTest extends TestCase
 {
-    use CastsBooleansTests, LabeledValueTests;
+    use CastsBooleansTests, HasSelectOptionsTests, LabeledValueTests;
 
     private function field($config)
     {

@@ -4,6 +4,8 @@ namespace Statamic\Stache;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Statamic\Events\StacheCleared;
+use Statamic\Events\StacheWarmed;
 use Statamic\Extensions\FileStore;
 use Statamic\Facades\File;
 use Statamic\Stache\Stores\Store;
@@ -20,6 +22,7 @@ class Stache
     protected $lockFactory;
     protected $locks = [];
     protected $duplicates;
+    protected $exclude = [];
 
     public function __construct()
     {
@@ -58,6 +61,13 @@ class Stache
         return $this;
     }
 
+    public function exclude(string $store)
+    {
+        $this->exclude[] = $store;
+
+        return $this;
+    }
+
     public function stores()
     {
         return $this->stores;
@@ -86,11 +96,13 @@ class Stache
 
     public function clear()
     {
-        $this->stores()->reverse()->each->clear();
+        $this->stores()->except($this->exclude)->reverse()->each->clear();
 
         $this->duplicates()->clear();
 
         $this->cacheStore()->forget('stache::timing');
+
+        StacheCleared::dispatch();
 
         return $this;
     }
@@ -106,11 +118,13 @@ class Stache
 
         $this->startTimer();
 
-        $this->stores()->each->warm();
+        $this->stores()->except($this->exclude)->each->warm();
 
         $this->stopTimer();
 
         $lock->release();
+
+        StacheWarmed::dispatch();
     }
 
     public function instance()
@@ -170,7 +184,7 @@ class Stache
             return null;
         }
 
-        return Carbon::createFromTimestamp($cache['date']);
+        return Carbon::createFromTimestamp($cache['date'], config('app.timezone'));
     }
 
     public function disableUpdatingIndexes()

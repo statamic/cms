@@ -13,6 +13,50 @@ class AssetFolder extends Relationship
     protected $canCreate = false;
     protected $selectable = false;
 
+    protected function configFieldItems(): array
+    {
+        return [
+            [
+                'display' => __('Input Behavior'),
+                'fields' => [
+                    'container' => [
+                        'display' => __('Container'),
+                        'instructions' => __('statamic::fieldtypes.asset_folders.config.container'),
+                        'type' => 'asset_container',
+                        'max_items' => 1,
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Appearance'),
+                'fields' => [
+                    'mode' => [
+                        'display' => __('UI Mode'),
+                        'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
+                        'type' => 'radio',
+                        'default' => 'default',
+                        'options' => [
+                            'default' => __('Stack Selector'),
+                            'select' => __('Select Dropdown'),
+                            'typeahead' => __('Typeahead Field'),
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Boundaries & Limits'),
+                'fields' => [
+                    'max_items' => [
+                        'display' => __('Max Items'),
+                        'instructions' => __('statamic::messages.max_items_instructions'),
+                        'min' => 1,
+                        'type' => 'integer',
+                    ],
+                ],
+            ],
+        ];
+    }
+
     protected function toItemArray($id, $site = null)
     {
         return ['title' => $id, 'id' => $id];

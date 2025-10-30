@@ -83,7 +83,7 @@ class RevisionRepository implements Contract
             ->key($key)
             ->action($data['action'] ?? false)
             ->id($date = $data['date'])
-            ->date(Carbon::createFromTimestamp($date))
+            ->date(Carbon::createFromTimestamp($date, config('app.timezone')))
             ->user($data['user'] ?? false)
             ->message($data['message'] ?? false)
             ->attributes($data['attributes']);

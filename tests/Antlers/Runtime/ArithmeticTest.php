@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests\Antlers\Runtime;
+
 use Tests\Antlers\ParserTestCase;
 
 class ArithmeticTest extends ParserTestCase

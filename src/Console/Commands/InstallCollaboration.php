@@ -4,7 +4,6 @@ namespace Statamic\Console\Commands;
 
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Console\Command;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
@@ -51,18 +50,12 @@ class InstallCollaboration extends Command
         }
 
         $this->enableBroadcasting();
+        $this->warnAboutLegacyBroadcastDriverKey();
         $this->installBroadcastingDriver();
     }
 
     protected function enableBroadcasting(): void
     {
-        if (version_compare(app()->version(), '11', '<')) {
-            $this->enableBroadcastServiceProvider();
-            $this->components->info('Broadcasting enabled successfully.');
-
-            return;
-        }
-
         if (File::exists(config_path('broadcasting.php'))) {
             $this->components->warn('Broadcasting is already enabled.');
 
@@ -81,8 +74,14 @@ class InstallCollaboration extends Command
             },
             message: 'Enabling broadcasting...'
         );
-
         $this->components->info('Broadcasting enabled successfully.');
+    }
+
+    protected function warnAboutLegacyBroadcastDriverKey(): void
+    {
+        if (Str::contains(File::get(app()->environmentFile()), 'BROADCAST_DRIVER')) {
+            $this->components->warn('The BROADCAST_DRIVER environment variable has been renamed to BROADCAST_CONNECTION in Laravel 11. You should update your .env file.');
+        }
     }
 
     protected function installBroadcastingDriver(): void
@@ -125,25 +124,6 @@ class InstallCollaboration extends Command
 
         if ($driver === 'Other') {
             $this->components->warn("You'll need to install and configure your own broadcasting driver.");
-        }
-    }
-
-    /**
-     * Uncomment the "BroadcastServiceProvider" in the application configuration.
-     * Copied from Laravel's BroadcastingInstallCommand to support Laravel 10 applications.
-     *
-     * @return void
-     */
-    protected function enableBroadcastServiceProvider()
-    {
-        $config = ($filesystem = new Filesystem)->get(app()->configPath('app.php'));
-
-        if (str_contains($config, '// App\Providers\BroadcastServiceProvider::class')) {
-            $filesystem->replaceInFile(
-                '// App\Providers\BroadcastServiceProvider::class',
-                'App\Providers\BroadcastServiceProvider::class',
-                app()->configPath('app.php'),
-            );
         }
     }
 

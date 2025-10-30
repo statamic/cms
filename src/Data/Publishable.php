@@ -23,7 +23,11 @@ trait Publishable
             return $this->publishWorkingCopy($options);
         }
 
-        $this->published(true)->save();
+        $saved = $this->published(true)->save();
+
+        if (! $saved) {
+            return false;
+        }
 
         return $this;
     }

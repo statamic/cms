@@ -1,5 +1,8 @@
 <?php
 
+namespace Tests\Routing;
+
+use Closure;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Contracts\Routing\BindingRegistrar;
 use Illuminate\Routing\Middleware\SubstituteBindings;
@@ -212,9 +215,8 @@ class RouteBindingTest extends TestCase
         Storage::disk('files')->put('foo/bar.txt', '');
         Storage::disk('files')->put('foo/.meta/bar.txt.yaml', "data:\n  alt: 'the alt text'");
 
-        $set = Facades\GlobalSet::make('seo')->title('SEO Settings');
-        $set->addLocalization($set->makeLocalization('en'));
-        $set->save();
+        $set = Facades\GlobalSet::make('seo')->title('SEO Settings')->save();
+        $set->in('en')->save();
 
         Facades\Form::make('contact')->title('Contact Us')->save();
     }

@@ -7,6 +7,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Statamic\Auth\User as BaseUser;
+use Statamic\Contracts\Auth\Passkey;
 use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Data\ContainsSupplementalData;
 use Statamic\Facades\Role;
@@ -105,7 +106,7 @@ class User extends BaseUser
         return $this->roles = $this->roles
             ?? (new Roles($this))->all()->map(function ($row) {
                 return Role::find($row->role_id);
-            })->keyBy->handle();
+            })->filter()->keyBy->handle();
     }
 
     protected function saveRoles()
@@ -282,6 +283,12 @@ class User extends BaseUser
             $value = Hash::make($value);
         }
 
+        if ($value === null) {
+            unset($this->model()->$key);
+
+            return $this;
+        }
+
         $this->model()->$key = $value;
 
         return $this;
@@ -296,7 +303,7 @@ class User extends BaseUser
 
     public function merge($data)
     {
-        $this->data($this->data()->merge($data));
+        $this->data($this->data()->merge(collect($data)->filter(fn ($v) => $v !== null)->all()));
 
         return $this;
     }
@@ -314,6 +321,24 @@ class User extends BaseUser
     public function getRememberTokenName()
     {
         return $this->model()->getRememberTokenName();
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        if (method_exists($this->model(), 'sendPasswordResetNotification')) {
+            return $this->model()->sendPasswordResetNotification($token);
+        }
+
+        parent::sendPasswordResetNotification($token);
+    }
+
+    public function sendActivateAccountNotification($token)
+    {
+        if (method_exists($this->model(), 'sendActivateAccountNotification')) {
+            return $this->model()->sendActivateAccountNotification($token);
+        }
+
+        parent::sendActivateAccountNotification($token);
     }
 
     public function lastLogin()
@@ -377,5 +402,13 @@ class User extends BaseUser
         return array_merge([
             'email' => $this->email(),
         ], $this->model()->attributesToArray());
+    }
+
+    public function passkeys(): Collection
+    {
+        return app(config('statamic.webauthn.model'))::where('user_id', $this->id())
+            ->get()
+            ->map(fn ($model) => app(Passkey::class)->setModel($model))
+            ->keyBy(fn ($passkey) => $passkey->id());
     }
 }

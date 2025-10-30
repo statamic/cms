@@ -1,35 +1,48 @@
-@php use function Statamic\trans as __; @endphp
+@php
+    use function Statamic\trans as __;
+@endphp
 
 @extends('statamic::layout')
 @section('title', Statamic::crumb($group->title(), 'User Group'))
-@section('wrapper_class', 'max-w-full')
 
 @section('content')
+    <ui-header title="{{ __($group->title()) }}" icon="groups" v-cloak>
+        @can('delete', $group)
+            <ui-command-palette-item
+                category="{{ Statamic\CommandPalette\Category::Actions }}"
+                text="{{ __('Delete Group') }}"
+                :action="() => $refs.deleter.confirm()"
+                icon="trash"
+            >
+                <ui-button @click="$refs.deleter.confirm()">
+                    {{ __('Delete Group') }}
+                    <resource-deleter
+                        ref="deleter"
+                        resource-title="{{ $group->title() }}"
+                        route="{{ cp_route('user-groups.destroy', $group->handle()) }}"
+                        redirect="{{ cp_route('user-groups.index') }}"
+                    ></resource-deleter>
+                </ui-button>
+            </ui-command-palette-item>
+        @endcan
 
-<header class="mb-6">
-        @include('statamic::partials.breadcrumb', [
-            'url' => cp_route('user-groups.index'),
-            'title' => __('User Groups')
-        ])
-        <div class="flex items-center">
-            <h1 class="flex-1">{{ __($group->title()) }}</h1>
-            <dropdown-list class="rtl:ml-2 ltr:mr-2">
-                @can('edit', $group)
-                    <dropdown-item :text="__('Edit User Group')" redirect="{{ $group->editUrl() }}"></dropdown-item>
-                @endcan
-                @can('delete', $group)
-                    <dropdown-item :text="__('Delete User Group')" class="warning" @click="$refs.deleter.confirm()">
-                        <resource-deleter
-                            ref="deleter"
-                            resource-title="{{ $group->title() }}"
-                            route="{{ cp_route('user-groups.destroy', $group->handle()) }}"
-                            redirect="{{ cp_route('user-groups.index') }}"
-                        ></resource-deleter>
-                    </dropdown-item>
-                @endcan
-            </dropdown-list>
-        </div>
-    </header>
+        @can('edit', $group)
+            <ui-command-palette-item
+                category="{{ Statamic\CommandPalette\Category::Actions }}"
+                text="{{ __('Edit Group') }}"
+                url="{{ $group->editUrl() }}"
+                icon="groups"
+                prioritize
+                v-slot="{ text, url }"
+            >
+                <ui-button
+                    :text="text"
+                    :href="url"
+                    variant="primary"
+                ></ui-button>
+            </ui-command-palette-item>
+        @endcan
+    </ui-header>
 
     <user-listing
         listing-key="usergroup-users"
@@ -38,5 +51,4 @@
         :allow-filter-presets="false"
         action-url="{{ cp_route('users.actions.run') }}"
     ></user-listing>
-
 @endsection

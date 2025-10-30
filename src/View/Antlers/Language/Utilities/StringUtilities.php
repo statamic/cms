@@ -3,6 +3,7 @@
 namespace Statamic\View\Antlers\Language\Utilities;
 
 use Exception;
+use Illuminate\Support\Str;
 use Statamic\View\Antlers\Language\Parser\DocumentParser;
 
 class StringUtilities
@@ -81,10 +82,11 @@ class StringUtilities
         $text = str_replace('<?php', '&lt;?php', $text);
 
         // Also replace short tags if they're enabled.
-        // If they're disabled (which is the common default), you can use <?xml tags right in your template. How nice!
-        // If they're enabled, we want to make sure it doesn't run PHP. You'll need to use {{ xml_header }}.
         if (ini_get('short_open_tag')) {
+            $xmlPlaceholder = '__XML_PLACEHOLDER'.Str::uuid();
+            $text = str_replace('<?xml', $xmlPlaceholder, $text);
             $text = str_replace('<?', '&lt;?', $text);
+            $text = str_replace($xmlPlaceholder, '<?xml', $text);
         }
 
         return $text;

@@ -1,19 +1,8 @@
 <?php
 
 return [
-
-    /*
-    |--------------------------------------------------------------------------
-    | Validation Language Lines
-    |--------------------------------------------------------------------------
-    |
-    | The following language lines contain the default error messages used by
-    | the validator class. Some of these rules have multiple versions such
-    | as the size rules. Feel free to tweak each of these messages here.
-    |
-    */
-
     'accepted' => 'Mesti diterima.',
+    'accepted_if' => 'Mesti diterima apabila :other ialah :value .',
     'active_url' => 'Ini bukan URL yang sah.',
     'after' => 'Mesti tarikh selepas :date.',
     'after_or_equal' => 'Mestilah tarikh selepas atau sama dengan :date.',
@@ -21,40 +10,44 @@ return [
     'alpha_dash' => 'Hanya boleh mengandungi huruf, nombor, sempang dan garis bawah.',
     'alpha_num' => 'Hanya boleh mengandungi huruf dan nombor.',
     'array' => 'Mestilah array.',
+    'ascii' => 'Mesti mengandungi aksara dan simbol alfanumerik bait tunggal sahaja.',
     'before' => 'Mesti tarikh sebelum :date.',
     'before_or_equal' => 'Mestilah tarikh sebelum atau sama dengan :date.',
-    'between' => [
-        'numeric' => 'Mesti antara :min dan :max.',
-        'file' => 'Mesti antara :min dan :max kilobait.',
-        'string' => 'Mesti antara :min dan :max aksara.',
-        'array' => 'Mesti ada antara :min dan :max item.',
-    ],
+    'between.array' => 'Mesti ada antara :min dan :max item.',
+    'between.file' => 'Mesti antara :min dan :max kilobait.',
+    'between.numeric' => 'Mesti antara :min dan :max .',
+    'between.string' => 'Mesti antara :min dan :max aksara.',
     'boolean' => 'Mesti betul atau salah.',
+    'can' => 'Mengandungi nilai yang tidak dibenarkan.',
     'confirmed' => 'Pengesahan tidak sepadan dengan e-mel',
     'current_password' => 'Katalaluan anda adalah salah.',
     'date' => 'Bukan tarikh yang sah.',
+    'date_equals' => 'Mestilah tarikh bersamaan dengan :date .',
     'date_format' => 'Tidak sepadan dengan format :format.',
+    'decimal' => 'Mesti mempunyai :decimal tempat perpuluhan.',
+    'declined' => 'Mesti ditolak.',
+    'declined_if' => 'Mesti ditolak apabila :other ialah :value .',
     'different' => 'Bidang ini dan :other mestilah berbeza.',
     'digits' => 'Mestilah :digits digit.',
     'digits_between' => 'Mesti antara :min dan :max digit.',
     'dimensions' => 'Dimensi imej tidak sah.',
     'distinct' => 'Bidang ini mempunyai nilai pendua.',
+    'doesnt_end_with' => 'Tidak boleh berakhir dengan salah satu daripada yang berikut: :values .',
+    'doesnt_start_with' => 'Tidak boleh bermula dengan salah satu daripada yang berikut: :values .',
     'email' => 'Mesti alamat e-mel yang sah.',
+    'ends_with' => 'Mesti diakhiri dengan :values',
+    'enum' => ':attribute yang dipilih tidak sah.',
     'exists' => 'Ini tidak sah.',
     'file' => 'Mestilah fail.',
     'filled' => 'Mesti ada nilai.',
-    'gt' => [
-        'numeric' => 'Mesti lebih besar daripada :value.',
-        'file' => 'Mesti lebih besar daripada :value kilobait.',
-        'string' => 'Mesti lebih besar daripada aksara :value.',
-        'array' => 'Mesti mempunyai lebih daripada :value item.',
-    ],
-    'gte' => [
-        'numeric' => 'Mesti lebih besar daripada atau sama dengan :value.',
-        'file' => 'Mesti lebih besar daripada atau sama dengan :value kilobait.',
-        'string' => 'Mesti lebih besar daripada atau sama dengan aksara :value.',
-        'array' => 'Mesti mempunyai :value item atau lebih.',
-    ],
+    'gt.array' => 'Mesti mempunyai lebih daripada :value .',
+    'gt.file' => 'Mesti lebih besar daripada :value kilobait.',
+    'gt.numeric' => 'Mesti lebih besar daripada :value .',
+    'gt.string' => 'Mesti lebih besar daripada aksara :value .',
+    'gte.array' => 'Mesti mempunyai :value atau lebih.',
+    'gte.file' => 'Mesti lebih besar daripada atau sama :value kilobait.',
+    'gte.numeric' => 'Mesti lebih besar daripada atau sama :value .',
+    'gte.string' => 'Mesti lebih besar daripada atau sama dengan aksara :value .',
     'image' => 'Mestilah gambar.',
     'in' => 'Ini tidak sah.',
     'in_array' => 'Bidang ini tidak wujud dalam :other.',
@@ -63,104 +56,100 @@ return [
     'ipv4' => 'Mestilah alamat IPv4 yang sah.',
     'ipv6' => 'Mestilah alamat IPv6 yang sah.',
     'json' => 'Mestilah rentetan JSON yang sah.',
-    'lt' => [
-        'numeric' => 'Mesti kurang daripada :value.',
-        'file' => 'Mesti kurang daripada :value kilobait.',
-        'string' => 'Mesti kurang daripada :value aksara.',
-        'array' => 'Mesti mempunyai kurang daripada :value item.',
-    ],
-    'lte' => [
-        'numeric' => 'Mesti kurang daripada atau sama dengan :value.',
-        'file' => 'Mesti kurang daripada atau sama :value kilobait.',
-        'string' => 'Mesti kurang daripada atau sama dengan aksara :value.',
-        'array' => 'Tidak boleh mempunyai lebih daripada :value item.',
-    ],
-    'max' => [
-        'numeric' => 'Tidak boleh lebih besar daripada :max.',
-        'file' => 'Tidak boleh lebih besar daripada :max kilobait.',
-        'string' => 'Tidak boleh lebih besar daripada :max aksara.',
-        'array' => 'Tidak boleh mempunyai lebih daripada :max item.',
-    ],
+    'lowercase' => 'Mesti huruf kecil.',
+    'lt.array' => 'Mesti mempunyai kurang daripada :value .',
+    'lt.file' => 'Mesti kurang daripada :value kilobait.',
+    'lt.numeric' => 'Mesti kurang daripada :value .',
+    'lt.string' => 'Mesti kurang daripada :value aksara.',
+    'lte.array' => 'Tidak boleh mempunyai lebih daripada :value .',
+    'lte.file' => 'Mesti kurang daripada atau sama dengan :value kilobait.',
+    'lte.numeric' => 'Mesti kurang daripada atau sama :value .',
+    'lte.string' => 'Mesti kurang daripada atau sama dengan aksara :value .',
+    'mac_address' => 'Mestilah alamat MAC yang sah.',
+    'max.array' => 'Tidak boleh mempunyai lebih daripada :max item.',
+    'max.file' => 'Tidak boleh lebih besar daripada :max kilobait.',
+    'max.numeric' => 'Tidak boleh lebih besar daripada :max .',
+    'max.string' => 'Tidak boleh lebih besar daripada :max aksara.',
+    'max_digits' => 'Tidak boleh mempunyai lebih daripada :max .',
     'mimes' => 'Mestilah fail jenis: :values.',
     'mimetypes' => 'Mestilah fail jenis: :values.',
-    'min' => [
-        'numeric' => 'Mesti sekurang-kurangnya :min.',
-        'file' => 'Mesti sekurang-kurangnya :min kilobait.',
-        'string' => 'Mesti sekurang-kurangnya :min aksara.',
-        'array' => 'Mesti mempunyai sekurang-kurangnya :min item.',
-    ],
+    'min.array' => 'Mesti mempunyai sekurang-kurangnya :min item.',
+    'min.file' => 'Mesti sekurang-kurangnya :min kilobait.',
+    'min.numeric' => 'Mesti sekurang-kurangnya :min .',
+    'min.string' => 'Mesti sekurang-kurangnya :min aksara.',
+    'min_digits' => 'Mesti mempunyai sekurang-kurangnya :min digit.',
+    'missing' => 'Mesti hilang.',
+    'missing_if' => 'Mesti tiada apabila :other ialah :value .',
+    'missing_unless' => 'Mesti tiada melainkan :other ialah :value .',
+    'missing_with' => 'Mesti tiada apabila :values hadir.',
+    'missing_with_all' => 'Mesti tiada apabila :values hadir.',
+    'multiple_of' => 'Mestilah gandaan :value .',
     'not_in' => 'Ini tidak sah.',
     'not_regex' => 'Format tidak sah.',
     'numeric' => 'Mesti nombor.',
     'present' => 'Mesti wujud.',
+    'prohibited' => 'dilarang.',
+    'prohibited_if' => 'Dilarang apabila :other ialah :value .',
+    'prohibited_unless' => 'Dilarang melainkan :other ada dalam :values .',
+    'prohibits' => 'Melarang :other daripada hadir.',
     'regex' => 'Format tidak sah.',
     'required' => 'Bidang ini diperlukan.',
+    'required_array_keys' => 'Mesti mengandungi entri untuk: :values .',
     'required_if' => 'Bidang ini diperlukan apabila :other ialah :value.',
+    'required_if_accepted' => 'Medan ini diperlukan apabila :other diterima.',
     'required_unless' => 'Bidang ini diperlukan melainkan :other berada dalam :values.',
     'required_with' => 'Bidang ini diperlukan apabila :values ​​wujud.',
     'required_with_all' => 'Bidang ini diperlukan apabila :values ​​wujud.',
     'required_without' => 'Bidang ini diperlukan apabila :values ​​tidak ada.',
     'required_without_all' => 'Bidang ini diperlukan apabila tiada :values ​​wujud.',
     'same' => 'Bidang ini dan :other mesti sepadan.',
-    'size' => [
-        'numeric' => 'Mestilah :size.',
-        'file' => 'Mestilah :size kilobait.',
-        'string' => 'Mestilah :size aksara.',
-        'array' => 'Mesti mengandungi :size item.',
-    ],
+    'size.array' => 'Mesti mengandungi :size .',
+    'size.file' => 'Mestilah :size kilobait.',
+    'size.numeric' => 'Mestilah :size .',
+    'size.string' => 'Mesti :size .',
+    'starts_with' => 'Mesti bermula dengan :values',
     'string' => 'Mesti rentetan.',
     'timezone' => 'Mesti zon yang sah.',
+    'ulid' => 'Mestilah ULID yang sah.',
     'unique' => 'Nilai ini telah pun diambil.',
     'uploaded' => 'Gagal memuat naik.',
+    'uppercase' => 'Mesti huruf besar.',
     'url' => 'Format tidak sah.',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Custom Statamic Validation Language Lines
-    |--------------------------------------------------------------------------
-    |
-    | Here you may validation messages for the custom rules provided by Statamic.
-    |
-    */
-
+    'uuid' => 'Mestilah UUID yang sah.',
+    'arr_fieldtype' => 'Ini tidak sah.',
+    'handle' => 'Mesti mengandungi hanya huruf kecil dan nombor dengan garis bawah sebagai pemisah.',
+    'slug' => 'Mesti mengandungi hanya huruf dan nombor dengan sempang atau garis bawah sebagai pemisah.',
+    'code_fieldtype_rulers' => 'Ini tidak sah.',
+    'composer_package' => 'Mestilah nama pakej komposer yang sah (cth. hasselhoff/kung-fury).',
+    'date_fieldtype_date_required' => 'Tarikh diperlukan.',
+    'date_fieldtype_end_date_invalid' => 'Bukan tarikh tamat yang sah.',
+    'date_fieldtype_end_date_required' => 'Tarikh tamat diperlukan.',
+    'date_fieldtype_only_single_mode_allowed' => 'Anda hanya boleh menggunakan mod &quot;Tunggal&quot; apabila pemegang medan ialah tarikh.',
+    'date_fieldtype_start_date_invalid' => 'Bukan tarikh mula yang sah.',
+    'date_fieldtype_start_date_required' => 'Tarikh mula diperlukan.',
+    'date_fieldtype_time_required' => 'Masa diperlukan.',
+    'duplicate_field_handle' => 'Bidang dengan pemegang :handle tidak boleh digunakan lebih daripada sekali.',
+    'duplicate_uri' => 'URI pendua :value',
+    'email_available' => 'Pengguna dengan e-mel ini sudah wujud.',
+    'fieldset_imported_recursively' => 'Fieldset :handle sedang diimport secara rekursif.',
+    'one_site_without_origin' => 'Sekurang-kurangnya satu tapak mestilah tidak mempunyai asal.',
+    'options_require_keys' => 'Semua pilihan mesti mempunyai kunci.',
+    'origin_cannot_be_disabled' => 'Tidak boleh memilih asal yang dilumpuhkan.',
+    'parent_cannot_be_itself' => 'Tidak boleh menjadi ibu bapanya sendiri.',
+    'parent_causes_root_children' => 'Ini akan menyebabkan halaman akar mempunyai anak.',
+    'parent_exceeds_max_depth' => 'Ini akan melebihi kedalaman maksimum.',
+    'reserved' => 'Ini adalah perkataan terpelihara.',
+    'reserved_field_handle' => 'Medan dengan pemegang :handle ialah perkataan terpelihara.',
     'unique_entry_value' => 'Nilai ini telah pun diambil.',
+    'unique_form_handle' => 'Nilai ini telah pun diambil.',
     'unique_term_value' => 'Nilai ini telah pun diambil.',
     'unique_user_value' => 'Nilai ini telah pun diambil.',
-    'duplicate_field_handle' => 'Bidang dengan pemegang :handle tidak boleh digunakan lebih daripada sekali.',
-    'one_site_without_origin' => 'Sekurang-kurangnya satu tapak mestilah tidak mempunyai asal.',
-    'origin_cannot_be_disabled' => 'Tidak boleh memilih asal yang dilumpuhkan.',
     'unique_uri' => 'URI ini telah pun diambil.',
-    'duplicate_uri' => 'URI pendua :value',
-    'reserved' => 'Ini adalah perkataan terpelihara.',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Custom Validation Language Lines
-    |--------------------------------------------------------------------------
-    |
-    | Here you may specify custom validation messages for attributes using the
-    | convention "attribute.rule" to name the lines. This makes it quick to
-    | specify a specific custom language line for a given attribute rule.
-    |
-    */
-
-    'custom' => [
-        'attribute-name' => [
-            'rule-name' => 'custom-message',
-        ],
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Custom Validation Attributes
-    |--------------------------------------------------------------------------
-    |
-    | The following language lines are used to swap attribute place-holders
-    | with something more reader friendly such as E-Mail Address instead
-    | of "email". This simply helps us make messages a little cleaner.
-    |
-    */
-
+    'time' => 'Bukan masa yang sah.',
+    'asset_current_filename' => 'Ini ialah nama fail semasa.',
+    'asset_file_exists' => 'Fail sudah wujud dengan nama ini.',
+    'asset_file_exists_same_content' => 'Fail sudah wujud dengan nama ini dan mempunyai kandungan yang sama. Anda mungkin mahu memadamkannya daripada menamakan semula.',
+    'asset_file_exists_different_content' => 'Fail sudah wujud dengan nama ini tetapi mempunyai kandungan yang berbeza. Anda mungkin mahu menggantikan fail lain dengan yang ini sebaliknya.',
+    'custom.attribute-name.rule-name' => 'pesanan tersuai',
     'attributes' => [],
-
 ];

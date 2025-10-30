@@ -33,13 +33,21 @@ class FormTest extends TestCase
 
         $form = Form::make('contact_us')
             ->title('Contact Us')
-            ->honeypot('winnie');
+            ->honeypot('winnie')
+            ->data([
+                'foo' => 'bar',
+                'roo' => 'rar',
+            ]);
 
         $form->save();
 
         $this->assertEquals('contact_us', $form->handle());
         $this->assertEquals('Contact Us', $form->title());
         $this->assertEquals('winnie', $form->honeypot());
+        $this->assertEquals([
+            'foo' => 'bar',
+            'roo' => 'rar',
+        ], $form->data()->all());
 
         Event::assertDispatched(FormCreating::class, function ($event) use ($form) {
             return $event->form === $form;
@@ -241,5 +249,23 @@ class FormTest extends TestCase
         Event::assertNotDispatched(FormDeleted::class);
 
         $this->assertTrue($return);
+    }
+
+    #[Test]
+    public function it_clones_internal_collections()
+    {
+        $form = Form::make('contact_us');
+        $form->set('foo', 'A');
+        $form->setSupplement('bar', 'A');
+
+        $clone = clone $form;
+        $clone->set('foo', 'B');
+        $clone->setSupplement('bar', 'B');
+
+        $this->assertEquals('A', $form->get('foo'));
+        $this->assertEquals('B', $clone->get('foo'));
+
+        $this->assertEquals('A', $form->getSupplement('bar'));
+        $this->assertEquals('B', $clone->getSupplement('bar'));
     }
 }

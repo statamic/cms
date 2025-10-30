@@ -6,13 +6,15 @@ use Illuminate\Support\Facades\Facade;
 use Statamic\CP\Utilities\UtilityRepository;
 
 /**
- * @method static mixed|null make($handle)
+ * @method static self boot()
+ * @method static void extend(\Closure $callback)
+ * @method static \Statamic\CP\Utilities\Utility make(string $handle)
  * @method static \Statamic\CP\Utilities\Utility register($utility)
- * @method static mixed all()
- * @method static mixed authorized()
- * @method static mixed find($handle)
+ * @method static array all()
+ * @method static \Illuminate\Support\Collection authorized()
+ * @method static mixed find(string $handle)
+ * @method static mixed findBySlug(string $handle)
  * @method static void routes()
- * @method static void extend(\Closure $closure)
  *
  * @see \Statamic\CP\Utilities\UtilityRepository
  */

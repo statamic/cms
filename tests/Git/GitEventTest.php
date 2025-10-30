@@ -291,11 +291,28 @@ class GitEventTest extends TestCase
         Git::shouldReceive('dispatchCommit')->with('Global Set saved')->once();
         Git::shouldReceive('dispatchCommit')->with('Global Set deleted')->once();
 
+        // These events get dispatched when saving/deleting sets, because of the "variable syncing" that happens.
+        Git::shouldReceive('dispatchCommit')->with('Global variables saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Global variables deleted')->once();
+
         $set = Facades\GlobalSet::make('main');
-        $set->addLocalization($set->makeLocalization(Facades\Site::default()->handle()));
 
         $set->save();
         $set->delete();
+    }
+
+    #[Test]
+    public function it_commits_when_global_variable_is_saved_and_deleted()
+    {
+        Git::shouldReceive('dispatchCommit')->with('Global Set saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Global variables saved')->twice(); // Called when the set is saved, then when the variable is saved.
+        Git::shouldReceive('dispatchCommit')->with('Global variables deleted')->once();
+
+        $set = Facades\GlobalSet::make('main')->save();
+        $variables = $set->in('en')->data(['foo' => 'bar']);
+
+        $variables->save();
+        $variables->delete();
     }
 
     #[Test]
@@ -374,6 +391,31 @@ class GitEventTest extends TestCase
         Facades\Preference::default()->set('foo', 'bar')->save();
 
         Facades\File::delete(resource_path('preferences.yaml'));
+    }
+
+    #[Test]
+    public function it_commits_when_site_is_saved_and_deleted()
+    {
+        // Ensure we have one `en` site to start
+        Facades\File::put(resource_path('sites.yaml'), Facades\YAML::dump([
+            'en' => [
+                'name' => 'English',
+                'url' => 'http://localhost/',
+                'locale' => 'en_US',
+            ],
+        ]));
+
+        Git::shouldReceive('dispatchCommit')->with('Site saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Site deleted')->once();
+
+        // Delete the `en` site and save a new `fr` site
+        Facades\Site::setSites([
+            'fr' => [
+                'name' => 'French',
+                'url' => 'http://localhost/',
+                'locale' => 'fr_FR',
+            ],
+        ])->save();
     }
 
     #[Test]

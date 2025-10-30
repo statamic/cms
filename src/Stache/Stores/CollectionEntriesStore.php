@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Stores;
 
+use Illuminate\Support\Carbon;
 use Statamic\Entries\GetDateFromPath;
 use Statamic\Entries\GetSlugFromPath;
 use Statamic\Entries\GetSuffixFromPath;
@@ -96,7 +97,7 @@ class CollectionEntriesStore extends ChildStore
         // }
 
         if ($collection->dated()) {
-            $entry->date((new GetDateFromPath)($path));
+            $entry->date($this->getDateFromPath($path));
         }
 
         // Blink the entry so that it can be used when building the URI. If it's not
@@ -160,7 +161,7 @@ class CollectionEntriesStore extends ChildStore
         $indexes = collect([
             'slug',
             'uri',
-            'collection',
+            'collectionHandle',
             'published',
             'title',
             'site' => Indexes\Site::class,
@@ -250,5 +251,65 @@ class CollectionEntriesStore extends ChildStore
         $this->shouldBlinkEntryUris = true;
 
         return $return;
+    }
+
+    public function updateUris($ids = null)
+    {
+        $this->updateEntriesWithinIndex($this->index('uri'), $ids);
+        $this->updateEntriesWithinStore($ids);
+    }
+
+    public function updateOrders($ids = null)
+    {
+        $this->updateEntriesWithinIndex($this->index('order'), $ids);
+    }
+
+    public function updateParents($ids = null)
+    {
+        $this->updateEntriesWithinIndex($this->index('parent'), $ids);
+    }
+
+    private function updateEntriesWithinIndex($index, $ids)
+    {
+        if (empty($ids)) {
+            return $index->update();
+        }
+
+        collect($ids)
+            ->map(fn ($id) => Entry::find($id))
+            ->filter()
+            ->each(fn ($entry) => $index->updateItem($entry));
+    }
+
+    private function updateEntriesWithinStore($ids)
+    {
+        if (empty($ids)) {
+            $ids = $this->paths()->keys();
+        }
+
+        $entries = $this->withoutBlinkingEntryUris(fn () => collect($ids)->map(fn ($id) => Entry::find($id))->filter());
+
+        $entries->each(fn ($entry) => $this->cacheItem($entry));
+    }
+
+    private function getDateFromPath($path)
+    {
+        if (! $date = (new GetDateFromPath)($path)) {
+            return null;
+        }
+
+        $format = match (strlen($date)) {
+            10 => 'Y-m-d',
+            15 => 'Y-m-d-Hi',
+            17 => 'Y-m-d-His',
+        };
+
+        $carbon = Carbon::createFromFormat($format, $date, config('app.timezone'));
+
+        if (strlen($date) === 10) {
+            $carbon->startOfDay();
+        }
+
+        return $carbon->utc();
     }
 }

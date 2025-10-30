@@ -3,13 +3,13 @@ If you discover a security vulnerability in Statamic, please review the followin
 ## Guidelines
 While working to identify potential security vulnerabilities in Statamic, we ask that you:
 
-- **Privately** share any issues that you discover with us via statamic.com/support as soon as possible.
+- **Privately** share any issues that you discover with us via support@statamic.com as soon as possible.
 - Give us a reasonable amount of time to address any reported issues before publicizing them.
 - Only report issues that are in scope.
 - Provide a quality report with precise explanations and concrete attack scenarios.
 
 ## Scope
-We are only interested in vulnerabilities that affect Statamic itself, tested against **your own local installation** of the software, running the latest version. You can install a local copy of Statamic by following these [installation instructions](https://statamic.dev/installing). Do not test against any Statamic installation that you don’t own, including [statamic.com](https:/statamic.com) or [statamic.dev](https://statamic.dev).
+We are only interested in vulnerabilities that affect Statamic itself, tested against **your own local installation** of the software, running the latest version. You can install a local copy of Statamic by following these [installation instructions](https://statamic.dev/installing). Do not test against any Statamic installation that you don’t own, including [statamic.com](https:/statamic.com), [statamic.dev](https://statamic.dev), and [demo.statamic.com](https://demo.statamic.com).
 
 ### Potentially Qualifying Vulnerabilities
 

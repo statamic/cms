@@ -6,7 +6,7 @@ Please take 30 seconds to read the following so we can be as efficient as possib
 
 2️⃣ Please make sure to create a new branch for your PR.
 
-3️⃣ Typically you should target the branch of the most current release, e.g. `4.x`, unless your PR includes a breaking change, in which case you should target the `master` branch for the next major release.
+3️⃣ Typically you should target the branch of the most current release, e.g. `5.x`, unless your PR includes a breaking change, in which case you should target the `master` branch for the next major release.
 
 4️⃣ We _really_ appreciate it if your PR includes tests. This makes it much easier for us to review, merge, and release. A PR with tests is usually reviewed and merged 5x-10x faster.
 

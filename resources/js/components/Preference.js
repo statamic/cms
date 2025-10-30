@@ -1,13 +1,19 @@
-import Vue from 'vue';
+import axios from 'axios';
+import { ref } from 'vue';
 
-class Preference {
-    constructor(instance) {
-        this.instance = instance;
-        this.url = cp_url('preferences/js');
+export default class Preference {
+    #url;
+    #preferences;
+    #defaults;
+
+    initialize(preferences, defaults) {
+        this.#url = cp_url('preferences/js');
+        this.#preferences = ref(preferences);
+        this.#defaults = defaults;
     }
 
     all() {
-        return this.instance.$store.state.statamic.config.user.preferences;
+        return this.#preferences.value;
     }
 
     get(key, fallback) {
@@ -15,21 +21,19 @@ class Preference {
     }
 
     set(key, value) {
-        return this.commitOnSuccessAndReturnPromise(
-            this.instance.$axios.post(this.url, {key, value})
-        );
+        return this.commitOnSuccessAndReturnPromise(axios.post(this.#url, { key, value }));
     }
 
     append(key, value) {
-        return this.commitOnSuccessAndReturnPromise(
-            this.instance.$axios.post(this.url, {key, value, append: true})
-        );
+        return this.commitOnSuccessAndReturnPromise(axios.post(this.#url, { key, value, append: true }));
     }
 
-    remove(key, value=null, cleanup=true) {
-        return this.commitOnSuccessAndReturnPromise(
-            this.instance.$axios.delete(`${this.url}/${key}`, { data: { value, cleanup } })
-        );
+    has(key) {
+        return this.all().hasOwnProperty(key);
+    }
+
+    remove(key, value = null, cleanup = true) {
+        return this.commitOnSuccessAndReturnPromise(axios.delete(`${this.#url}/${key}`, { data: { value, cleanup } }));
     }
 
     removeValue(key, value) {
@@ -37,15 +41,15 @@ class Preference {
     }
 
     commitOnSuccessAndReturnPromise(promise) {
-        promise.then(response => {
-            this.instance.$store.commit('statamic/preferences', response.data);
+        promise.then((response) => {
+            this.#preferences.value = response.data;
         });
 
         return promise;
     }
 
     defaults() {
-        return Statamic.$config.get('defaultPreferences');
+        return this.#defaults;
     }
 
     getDefault(key, fallback) {
@@ -56,11 +60,3 @@ class Preference {
         return this.getDefault(key) !== null;
     }
 }
-
-Object.defineProperties(Vue.prototype, {
-    $preferences: {
-        get() {
-            return new Preference(this);
-        }
-    }
-});

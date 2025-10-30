@@ -42,6 +42,12 @@ class DataResponse implements Responsable
             ->make($this->contents())
             ->withHeaders($this->headers);
 
+        if ($content = $response->getContent()) {
+            $response
+                ->setEtag(md5($content))
+                ->isNotModified($request);
+        }
+
         ResponseCreated::dispatch($response, $this->data);
 
         return $response;
@@ -91,9 +97,13 @@ class DataResponse implements Responsable
 
     protected function protect()
     {
-        app(Protection::class)
-            ->setData($this->data)
-            ->protect();
+        $protection = app(Protection::class)->setData($this->data);
+
+        $protection->protect();
+
+        if ($protection->scheme() && ! $protection->cacheable()) {
+            $this->headers['X-Statamic-Protected'] = true;
+        }
 
         return $this;
     }
@@ -145,7 +155,7 @@ class DataResponse implements Responsable
     {
         $contents = $this->view()->render();
 
-        if ($this->request->isLivePreview()) {
+        if ($this->request->isLivePreview() && config('statamic.live_preview.force_reload_js_modules', true)) {
             $contents = $this->versionJavascriptModules($contents);
         }
 

@@ -12,6 +12,8 @@ use Statamic\GraphQL\Types\FormType;
 use Statamic\Query\ItemQueryBuilder;
 use Statamic\Query\Scopes\Filter;
 
+use function Statamic\trans as __;
+
 class Fieldtype extends Relationship
 {
     protected static $handle = 'form';
@@ -23,38 +25,53 @@ class Fieldtype extends Relationship
     protected function configFieldItems(): array
     {
         return [
-            'placeholder' => [
-                'display' => __('Placeholder'),
-                'instructions' => __('statamic::fieldtypes.text.config.placeholder'),
-                'type' => 'text',
-            ],
-            'max_items' => [
-                'type' => 'integer',
-                'display' => __('Max Items'),
-                'default' => 1,
-                'instructions' => __('statamic::fieldtypes.form.config.max_items'),
-                'force_in_config' => true,
-            ],
-            'mode' => [
-                'display' => __('UI Mode'),
-                'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
-                'type' => 'radio',
-                'default' => 'default',
-                'options' => [
-                    'default' => __('Stack Selector'),
-                    'select' => __('Select Dropdown'),
-                    'typeahead' => __('Typeahead Field'),
+            [
+                'display' => __('Appearance'),
+                'fields' => [
+                    'placeholder' => [
+                        'display' => __('Placeholder'),
+                        'instructions' => __('statamic::fieldtypes.text.config.placeholder'),
+                        'type' => 'text',
+                    ],
+                    'mode' => [
+                        'display' => __('UI Mode'),
+                        'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
+                        'type' => 'radio',
+                        'default' => 'default',
+                        'options' => [
+                            'default' => __('Stack Selector'),
+                            'select' => __('Select Dropdown'),
+                            'typeahead' => __('Typeahead Field'),
+                        ],
+                    ],
                 ],
             ],
-            'query_scopes' => [
-                'display' => __('Query Scopes'),
-                'instructions' => __('statamic::fieldtypes.form.config.query_scopes'),
-                'type' => 'taggable',
-                'options' => Scope::all()
-                    ->reject(fn ($scope) => $scope instanceof Filter)
-                    ->map->handle()
-                    ->values()
-                    ->all(),
+            [
+                'display' => __('Boundaries & Limits'),
+                'fields' => [
+                    'max_items' => [
+                        'type' => 'integer',
+                        'display' => __('Max Items'),
+                        'default' => 1,
+                        'instructions' => __('statamic::fieldtypes.form.config.max_items'),
+                        'force_in_config' => true,
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Advanced'),
+                'fields' => [
+                    'query_scopes' => [
+                        'display' => __('Query Scopes'),
+                        'instructions' => __('statamic::fieldtypes.form.config.query_scopes'),
+                        'type' => 'taggable',
+                        'options' => Scope::all()
+                            ->reject(fn ($scope) => $scope instanceof Filter)
+                            ->map->handle()
+                            ->values()
+                            ->all(),
+                    ],
+                ],
             ],
         ];
     }

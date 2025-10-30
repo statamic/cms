@@ -1,84 +1,52 @@
 <template>
-
     <div>
-        <v-select
-            ref="input"
-            label="title"
-            append-to-body
-            :calculate-position="positionOptions"
-            :close-on-select="true"
-            :disabled="readOnly"
-            :multiple="multiple"
-            :options="options"
-            :get-option-key="(option) => option.id"
-            :get-option-label="(option) => __(option.title)"
-            :create-option="(value) => ({ title: value, id: value })"
+        <Combobox
+            class="w-full"
+            searchable
+            :disabled="config.disabled"
+            :ignore-filter="typeahead"
+            :max-selections="maxSelections"
+            :model-value="items.map((item) => item.id)"
+            :multiple
+            :options
             :placeholder="__(config.placeholder) || __('Choose...')"
-            :searchable="true"
+            :read-only="readOnly"
             :taggable="isTaggable"
-            :value="items"
-            @input="input"
+            option-label="title"
+            option-value="id"
+            @update:modelValue="itemsSelected"
             @search="search"
-            @search:focus="$emit('focus')"
-            @search:blur="$emit('blur')"
         >
-            <template #selected-option-container v-if="multiple"><i class="hidden"></i></template>
-            <template #search="{ events, attributes }" v-if="multiple">
-                <input
-                    :placeholder="__(config.placeholder) || __('Choose...')"
-                    class="vs__search"
-                    type="search"
-                    v-on="events"
-                    v-bind="attributes"
-                >
-            </template>
-             <template #no-options>
-                <div class="text-sm text-gray-700 rtl:text-right ltr:text-left py-2 px-4" v-text="__('No options to choose from.')" />
-            </template>
-            <template #footer="{ deselect }" v-if="multiple">
-                <sortable-list
-                    item-class="sortable-item"
-                    handle-class="sortable-item"
-                    :value="items"
-                    :distance="5"
-                    :mirror="false"
-                    @input="input"
-                >
-                    <div class="vs__selected-options-outside flex flex-wrap">
-                        <span v-for="item in items" :key="item.id" class="vs__selected mt-2" :class="{ 'sortable-item': !readOnly }">
-                            {{ __(item.title) }}
-                            <button v-if="!readOnly" @click="deselect(item)" type="button" :aria-label="__('Deselect option')" class="vs__deselect">
-                                <span>×</span>
-                            </button>
-                            <button v-else type="button" class="vs__deselect">
-                                <span class="opacity-50">×</span>
-                            </button>
-                        </span>
+            <template #option="{ title, hint, status }">
+                <div class="flex w-full items-center justify-between">
+                    <div class="flex items-center">
+                        <StatusIndicator v-if="status" class="me-2" :status="status" />
+                        <div v-text="title" class="truncate" />
                     </div>
-                </sortable-list>
+                    <ui-badge v-if="hint" size="sm" v-text="hint" />
+                </div>
             </template>
-        </v-select>
+            <template #no-options>
+                <div v-text="noOptionsText" />
+            </template>
+            <template #selected-option>
+                <span v-if="items.length === 1" v-text="items[0].title"></span>
+            </template>
+            <template #selected-options>
+                <!-- We don't want to display the selected options here. The RelationshipInput component does that for us. -->
+                <div></div>
+            </template>
+        </Combobox>
     </div>
-
 </template>
 
-<style scoped>
-    .draggable-source--is-dragging {
-        @apply opacity-75 bg-transparent border-dashed
-    }
-</style>
-
 <script>
-import PositionsSelectOptions from '../../../mixins/PositionsSelectOptions';
-import { SortableList, SortableItem } from '../../sortable/Sortable';
+import { Combobox, StatusIndicator } from '@/components/ui';
 
 export default {
-
-    mixins: [PositionsSelectOptions],
-
     components: {
-        SortableList,
-        SortableItem,
+        StatusIndicator,
+        Combobox,
     },
 
     props: {
@@ -87,6 +55,7 @@ export default {
         typeahead: Boolean,
         multiple: Boolean,
         taggable: Boolean,
+        maxSelections: Number,
         config: Object,
         readOnly: Boolean,
         site: String,
@@ -94,9 +63,12 @@ export default {
 
     data() {
         return {
+            requested: false,
             options: [],
-        }
+        };
     },
+
+    emits: ['input'],
 
     computed: {
         isTaggable() {
@@ -110,50 +82,64 @@ export default {
                 site: this.site,
                 paginate: false,
                 columns: 'title,id',
-            }
-        }
+            };
+        },
+
+        noOptionsText() {
+            return this.typeahead && !this.requested ? __('Start typing to search.') : __('No options to choose from.');
+        },
     },
 
     created() {
         // Get the items via ajax.
         // TODO: To save on requests, this should probably be done in the preload step and sent via meta.
-        if (! this.typeahead) this.request();
+        if (!this.typeahead) this.request();
     },
 
     watch: {
         parameters(params) {
-            if (! this.typeahead) this.request();
-        }
+            if (!this.typeahead) this.request();
+        },
     },
 
     methods: {
-
         request(params = {}) {
-            params = {...this.parameters, ...params};
+            params = { ...this.parameters, ...params };
 
-            return this.$axios.get(this.url, { params }).then(response => {
+            return this.$axios.get(this.url, { params }).then((response) => {
                 this.options = response.data.data;
+                this.requested = true;
                 return Promise.resolve(response);
             });
         },
 
         search(search, loading) {
-            if (! this.typeahead) return;
+            if (!this.typeahead) return;
 
             loading(true);
 
-            this.request({ search }).then(response => loading(false));
+            this.request({ search }).then((response) => loading(false));
         },
 
-        input(items) {
-            if (! this.multiple) {
+        itemsSelected(items) {
+            if (!this.multiple) {
                 items = items === null ? [] : [items];
             }
+
+            items = items.map((id) => {
+                let option = this.options.find((option) => option.id === id);
+                let existing = this.items.find((item) => item.id === id);
+
+                return existing || option || { id: value, title: value };
+            });
 
             this.$emit('input', items);
         },
 
-    }
-
-}
+        createOption(value) {
+            const existing = this.options.find((option) => option.title === value);
+            return existing || { id: value, title: value };
+        },
+    },
+};
 </script>

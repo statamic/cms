@@ -97,11 +97,13 @@ return [
     'paths' => [
         base_path('content'),
         base_path('users'),
+        resource_path('addons'),
         resource_path('blueprints'),
         resource_path('fieldsets'),
         resource_path('forms'),
         resource_path('users'),
         resource_path('preferences.yaml'),
+        resource_path('sites.yaml'),
         storage_path('forms'),
         public_path('assets'),
     ],

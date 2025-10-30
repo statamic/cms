@@ -15,7 +15,7 @@ class SvgTagTest extends TestCase
     {
         parent::setUp();
 
-        File::copy(__DIR__.'/../../resources/svg/icons/light/users.svg', resource_path('users.svg'));
+        File::copy(statamic_path('packages/ui/icons/users.svg'), resource_path('users.svg'));
     }
 
     private function tag($tag, $variables = [])
@@ -33,7 +33,7 @@ class SvgTagTest extends TestCase
     #[Test]
     public function it_renders_svg_with_additional_params()
     {
-        $this->assertStringStartsWith('<svg class="mb-2" xmlns="', $this->tag('{{ svg src="users" sanitize="false" class="mb-2" }}'));
+        $this->assertStringStartsWith('<svg class="mb-2" viewBox="', $this->tag('{{ svg src="users" sanitize="false" class="mb-2" }}'));
     }
 
     #[Test]
@@ -81,6 +81,12 @@ SVG);
         File::put(resource_path('xmltag.svg'), $svg);
 
         $this->assertEquals($svg, $this->tag('{{ svg src="xmltag" }}'));
+    }
+
+    #[Test]
+    public function sanitizing_doesnt_remove_additional_params()
+    {
+        $this->assertStringStartsWith('<svg x-ref="svg" xmlns="', $this->tag('{{ svg src="users" x-ref="svg" }}'));
     }
 
     #[Test]

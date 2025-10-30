@@ -119,7 +119,7 @@ class Glide extends Tags
      *
      * Generates the image and makes variables available within the pair.
      *
-     * @return string
+     * @return string|array
      */
     public function generate($items = null)
     {
@@ -131,7 +131,7 @@ class Glide extends Tags
 
         $items = is_iterable($items) ? collect($items) : collect([$items]);
 
-        return $items->map(function ($item) {
+        $items = $items->map(function ($item) {
             try {
                 $data = ['url' => $this->generateGlideUrl($item)];
 
@@ -150,6 +150,14 @@ class Glide extends Tags
                 \Log::error($e->getMessage());
             }
         })->filter()->all();
+
+        if ($alias = $this->params->get('as')) {
+            return [
+                $alias => $items,
+            ];
+        }
+
+        return $items;
     }
 
     /**
@@ -164,7 +172,7 @@ class Glide extends Tags
         $params = $this->getGlideParams($item);
 
         if (is_string($item) && Str::isUrl($item)) {
-            return Str::startsWith($item, ['http://', 'https://'])
+            return URL::isAbsolute($item)
                 ? $this->getGenerator()->generateByUrl($item, $params)
                 : $this->getGenerator()->generateByPath($item, $params);
         }
@@ -271,8 +279,12 @@ class Glide extends Tags
             return $item;
         }
 
+        if (Str::startsWith($item, config('app.url'))) {
+            $item = Str::after($item, config('app.url'));
+        }
+
         // External URLs are already fine as-is.
-        if (Str::startsWith($item, ['http://', 'https://'])) {
+        if (URL::isAbsolute($item)) {
             return $item;
         }
 
@@ -304,7 +316,7 @@ class Glide extends Tags
     {
         $params = collect();
 
-        foreach ($this->params as $param => $value) {
+        foreach (collect($this->params)->except('as') as $param => $value) {
             if (! in_array($param, ['src', 'id', 'path', 'tag', 'alt', 'absolute'])) {
                 $params->put($param, $value);
             }
@@ -346,10 +358,10 @@ class Glide extends Tags
 
     private function useAbsoluteUrls(string $url): bool
     {
-        if (! $this->isValidExtension($url) && Str::startsWith($url, ['http://', 'https://'])) {
+        if (! $this->isValidExtension($url) && URL::isAbsolute($url)) {
             return true;
         }
 
-        return Str::startsWith(GlideManager::url(), ['http://', 'https://']);
+        return URL::isAbsolute(GlideManager::url());
     }
 }

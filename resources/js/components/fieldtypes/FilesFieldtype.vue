@@ -1,62 +1,68 @@
 <template>
-
-    <div class="assets-fieldtype">
-
+    <div class="@container relative">
         <uploader
             ref="uploader"
             :url="meta.uploadUrl"
+            :extra-data="{ config: configParameter }"
             :container="config.container"
             @updated="uploadsUpdated"
             @upload-complete="uploadComplete"
             @error="uploadError"
+            v-slot="{ dragging }"
         >
-            <div slot-scope="{ dragging }" class="assets-fieldtype-drag-container">
-
-                <div class="drag-notification" v-show="dragging">
-                    <svg-icon name="upload" class="h-8 w-8 rtl:ml-6 ltr:mr-6" />
-                    <span>{{ __('Drop File to Upload') }}</span>
+            <div>
+                <div
+                    v-show="dragging"
+                    class="absolute inset-0 flex  gap-2 items-center justify-center bg-white/80 backdrop-blur-sm border border-gray-400 border-dashed rounded-lg"
+                >
+                    <ui-icon name="upload-cloud" class="size-5 text-gray-500" />
+                    <div class="text-sm text-gray-600 dark:text-gray-400">{{ __('Drop to Upload') }}</div>
                 </div>
 
-                <div class="assets-fieldtype-picker py-4" :class="{ 'is-expanded': value?.length }">
-                    <p class="asset-upload-control text-xs text-gray-600 rtl:mr-0 ltr:ml-0">
-                        <button type="button" class="upload-text-button" @click.prevent="uploadFile">
-                            {{ __('Upload file') }}
+                <div class="border border-gray-400 dark:border-gray-700 border-dashed rounded-xl p-4 flex flex-col @2xs:flex-row items-center gap-4" :class="{ 'rounded-b-none': value.length }">
+                    <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center flex-1 justify-center">
+                        <ui-icon name="upload-cloud" class="size-5 text-gray-500 me-2" />
+                        <span v-text="`${__('Drag & drop here or')}&nbsp;`" />
+                        <button type="button" class="underline underline-offset-2 cursor-pointer hover:text-black dark:hover:text-gray-200" @click.prevent="uploadFile">
+                            {{ __('choose a file') }}
                         </button>
-                        <span class="drag-drop-text" v-text="__('or drag & drop here.')"></span>
-                    </p>
+                        <span>.</span>
+                    </div>
                 </div>
 
-                <uploads
-                    v-if="uploads.length"
-                    :uploads="uploads"
-                />
+                <div v-if="uploads.length" class="border-gray-300 border-l border-r">
+                    <uploads :uploads="uploads" />
+                </div>
 
-                <div v-if="value?.length" class="asset-table-listing">
-                    <table class="table-fixed">
+                <div v-if="value.length" class="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700 border-t-0! rounded-t-none">
+                    <table class="w-full">
                         <tbody>
                             <tr
                                 v-for="(file, i) in value"
                                 :key="file"
-                                class="asset-row bg-white hover:bg-gray-100"
+                                class="asset-row bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-900"
                             >
-                                <td class="flex items-center">
+                                <td class="flex gap-2 sm:gap-3 h-full items-center p-3">
                                     <div
-                                        class="w-7 h-7 cursor-pointer whitespace-nowrap flex items-center justify-center"
+                                        class="flex size-7 cursor-pointer items-center justify-center whitespace-nowrap"
                                     >
-                                        <file-icon :extension="getExtension(file)" />
+                                        <file-icon :extension="getExtension(file)" class="size-7" />
                                     </div>
                                     <div
-                                        class="flex items-center flex-1 rtl:mr-2 ltr:ml-2 text-xs rtl:text-right ltr:text-left truncate"
-                                        v-text="file.slice(11)"
+                                        class="flex w-full flex-1 items-center truncate text-sm text-gray-600 dark:text-gray-400 text-start"
+                                        v-text="file"
                                     />
                                 </td>
-                                <td class="p-0 w-8 rtl:text-left ltr:text-right align-middle">
-                                    <button
+                                <td class="p-3 align-middle text-end">
+                                    <ui-button
                                         @click="remove(i)"
-                                        class="flex items-center p-2 w-full h-full text-gray-600 hover:text-gray-900"
-                                    >
-                                        <svg-icon name="micro/trash" class="w-6 h-6" />
-                                    </button>
+                                        icon="x"
+                                        round
+                                        size="xs"
+                                        variant="ghost"
+                                        :aria-label="__('Remove Asset')"
+                                        :title="__('Remove')"
+                                    />
                                 </td>
                             </tr>
                         </tbody>
@@ -65,34 +71,40 @@
             </div>
         </uploader>
     </div>
-
 </template>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
 import Uploader from '../assets/Uploader.vue';
 import Uploads from '../assets/Uploads.vue';
+import { Button } from '@/components/ui';
 
 export default {
-
     mixins: [Fieldtype],
 
     components: {
+        Button,
         Uploader,
-        Uploads
+        Uploads,
     },
 
     data() {
         return {
             uploads: [],
-        }
+        };
+    },
+
+    computed: {
+        configParameter() {
+            return utf8btoa(JSON.stringify(this.config));
+        },
     },
 
     methods: {
-
         /**
          * When the uploader component has finished uploading a file.
          */
-         uploadComplete(file) {
+        uploadComplete(file) {
             this.value.push(file.id);
         },
 
@@ -124,7 +136,7 @@ export default {
 
         remove(index) {
             this.update([...this.value.slice(0, index), ...this.value.slice(index + 1)]);
-        }
-    }
-}
+        },
+    },
+};
 </script>

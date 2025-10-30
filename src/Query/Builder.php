@@ -2,6 +2,7 @@
 
 namespace Statamic\Query;
 
+use BadMethodCallException;
 use Closure;
 use DateTimeInterface;
 use Illuminate\Pagination\Paginator;
@@ -13,10 +14,14 @@ use Statamic\Contracts\Query\Builder as Contract;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Pattern;
 use Statamic\Query\Concerns\FakesQueries;
+use Statamic\Query\Concerns\QueriesRelationships;
+use Statamic\Query\Exceptions\MultipleRecordsFoundException;
+use Statamic\Query\Exceptions\RecordsNotFoundException;
+use Statamic\Query\Scopes\AppliesScopes;
 
 abstract class Builder implements Contract
 {
-    use FakesQueries;
+    use AppliesScopes, FakesQueries, QueriesRelationships;
 
     protected $columns;
     protected $limit;
@@ -37,6 +42,19 @@ abstract class Builder implements Contract
         '>=' => 'GreaterThanOrEqualTo',
         '<=' => 'LessThanOrEqualTo',
     ];
+
+    public function __call($method, $args)
+    {
+        if ($this->canApplyScope($method)) {
+            $this->applyScope($method, $args[0] ?? []);
+
+            return $this;
+        }
+
+        throw new BadMethodCallException(sprintf(
+            'Call to undefined method %s::%s()', static::class, $method
+        ));
+    }
 
     public function select($columns = ['*'])
     {
@@ -81,6 +99,17 @@ abstract class Builder implements Contract
     public function orderByDesc($column)
     {
         return $this->orderBy($column, 'desc');
+    }
+
+    public function reorder($column = null, $direction = 'asc')
+    {
+        $this->orderBys = [];
+
+        if ($column) {
+            return $this->orderBy($column, $direction);
+        }
+
+        return $this;
     }
 
     abstract public function inRandomOrder();
@@ -286,6 +315,48 @@ abstract class Builder implements Contract
     public function orWhereJsonLength($column, $operator, $value = null)
     {
         return $this->whereJsonLength($column, $operator, $value, 'or');
+    }
+
+    public function whereJsonOverlaps($column, $values, $boolean = 'and')
+    {
+        if (! is_array($values)) {
+            $values = [$values];
+        }
+
+        $this->wheres[] = [
+            'type' => 'JsonOverlaps',
+            'column' => $column,
+            'values' => $values,
+            'boolean' => $boolean,
+        ];
+
+        return $this;
+    }
+
+    public function orWhereJsonOverlaps($column, $values)
+    {
+        return $this->whereJsonOverlaps($column, $values, 'or');
+    }
+
+    public function whereJsonDoesntOverlap($column, $values, $boolean = 'and')
+    {
+        if (! is_array($values)) {
+            $values = [$values];
+        }
+
+        $this->wheres[] = [
+            'type' => 'JsonDoesntOverlap',
+            'column' => $column,
+            'values' => $values,
+            'boolean' => $boolean,
+        ];
+
+        return $this;
+    }
+
+    public function orWhereJsonDoesntOverlap($column, $values)
+    {
+        return $this->whereJsonDoesntOverlap($column, $values, 'or');
     }
 
     public function whereNull($column, $boolean = 'and', $not = false)
@@ -539,6 +610,52 @@ abstract class Builder implements Contract
         return $this->get()->first();
     }
 
+    public function firstOrFail($columns = ['*'])
+    {
+        if (! is_null($item = $this->select($columns)->first())) {
+            return $item;
+        }
+
+        throw new RecordsNotFoundException();
+    }
+
+    public function firstOr($columns = ['*'], ?Closure $callback = null)
+    {
+        if ($columns instanceof Closure) {
+            $callback = $columns;
+
+            $columns = ['*'];
+        }
+
+        if (! is_null($model = $this->select($columns)->first())) {
+            return $model;
+        }
+
+        return $callback();
+    }
+
+    public function sole($columns = ['*'])
+    {
+        $result = $this->get($columns);
+
+        $count = $result->count();
+
+        if ($count === 0) {
+            throw new RecordsNotFoundException();
+        }
+
+        if ($count > 1) {
+            throw new MultipleRecordsFoundException($count);
+        }
+
+        return $result->first();
+    }
+
+    public function exists()
+    {
+        return $this->count() >= 1;
+    }
+
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
@@ -673,7 +790,7 @@ abstract class Builder implements Contract
 
     protected function filterTestLikeRegex($item, $pattern)
     {
-        return preg_match("/{$pattern}/im", $item);
+        return preg_match("/{$pattern}/im", (string) $item);
     }
 
     protected function filterTestNotLikeRegex($item, $pattern)
@@ -696,13 +813,21 @@ abstract class Builder implements Contract
      */
     public function chunk($count, callable $callback)
     {
+        $skip = $this->offset;
+        $remaining = $this->limit;
+
         $page = 1;
 
         do {
-            // We'll execute the query for the given page and get the results. If there are
-            // no results we can just break and return from here. When there are results
-            // we will call the callback with the current chunk of these results here.
-            $results = $this->forPage($page, $count)->get();
+            $offset = (($page - 1) * $count) + intval($skip);
+
+            $limit = is_null($remaining) ? $count : min($count, $remaining);
+
+            if ($limit == 0) {
+                break;
+            }
+
+            $results = $this->offset($offset)->limit($limit)->get();
 
             $countResults = $results->count();
 
@@ -710,9 +835,10 @@ abstract class Builder implements Contract
                 break;
             }
 
-            // On each chunk result set, we will pass them to the callback and then let the
-            // developer take care of everything within the callback, which allows us to
-            // keep the memory low for spinning through large result sets for working.
+            if (! is_null($remaining)) {
+                $remaining = max($remaining - $countResults, 0);
+            }
+
             if ($callback($results, $page) === false) {
                 return false;
             }

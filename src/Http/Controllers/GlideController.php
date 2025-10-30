@@ -35,11 +35,11 @@ class GlideController extends Controller
     /**
      * GlideController constructor.
      */
-    public function __construct(Server $server, Request $request)
+    public function __construct(Server $server, Request $request, ImageGenerator $generator)
     {
         $this->server = $server;
         $this->request = $request;
-        $this->generator = new ImageGenerator($server);
+        $this->generator = $generator;
     }
 
     /**
@@ -73,7 +73,7 @@ class GlideController extends Controller
     {
         $this->validateSignature();
 
-        $url = base64_decode($url);
+        $url = Str::fromBase64Url($url);
 
         return $this->createResponse($this->generateBy('url', $url));
     }
@@ -90,7 +90,7 @@ class GlideController extends Controller
     {
         $this->validateSignature();
 
-        $decoded = base64_decode($encoded);
+        $decoded = Str::fromBase64Url($encoded);
 
         // The string before the first slash is the container
         [$container, $path] = explode('/', $decoded, 2);

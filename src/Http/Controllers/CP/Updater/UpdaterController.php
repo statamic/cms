@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Updater;
 use Facades\Statamic\Marketplace\Marketplace;
 use Facades\Statamic\Updater\UpdatesOverview;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Facades\Addon;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Licensing\LicenseManager as Licenses;
@@ -19,17 +20,26 @@ class UpdaterController extends CpController
     {
         $this->authorize('view updates');
 
-        $addons = $this->getUpdatableAddons();
+        $addons = Addon::all();
 
         if ($addons->isEmpty()) {
             return redirect()->route('statamic.cp.updater.product', Statamic::CORE_SLUG);
         }
 
-        return view('statamic::updater.index', [
+        $changelog = Marketplace::statamic()->changelog();
+
+        return Inertia::render('updater/Index', [
             'requestError' => $licenses->requestFailed(),
-            'statamic' => Marketplace::statamic()->changelog(),
-            'addons' => Addon::all()->filter->existsOnMarketplace(),
-            'unlistedAddons' => Addon::all()->reject->existsOnMarketplace(),
+            'statamic' => [
+                'currentVersion' => $changelog->currentVersion(),
+                'availableUpdatesCount' => $changelog->availableUpdatesCount(),
+            ],
+            'addons' => $addons->filter->existsOnMarketplace()->map(fn ($addon) => [
+                'name' => $addon->name(),
+                'slug' => $addon->slug(),
+                'version' => $addon->version(),
+                'availableUpdatesCount' => $addon->changelog()->availableUpdatesCount(),
+            ])->values()->all(),
         ]);
     }
 
@@ -41,15 +51,5 @@ class UpdaterController extends CpController
         $this->authorize('view updates');
 
         return UpdatesOverview::count();
-    }
-
-    /**
-     * Get updatable addons.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    private function getUpdatableAddons()
-    {
-        return Addon::all()->filter->marketplaceSlug();
     }
 }

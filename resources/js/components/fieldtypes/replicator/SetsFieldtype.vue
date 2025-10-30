@@ -1,7 +1,5 @@
 <template>
-
     <div>
-
         <tabs
             :initial-tabs="tabs"
             :require-section="config.require_set"
@@ -14,42 +12,42 @@
             :new-section-text="__('New Set')"
             show-tab-instructions-field
             show-section-handle-field
+            show-section-hide-field
             @updated="tabsUpdated"
         />
-
     </div>
-
 </template>
 
 <script>
+import Fieldtype from '../Fieldtype.vue';
 import SuggestsConditionalFields from '../../blueprints/SuggestsConditionalFields';
 import Tabs from '../../blueprints/Tabs.vue';
 
 export default {
-
     mixins: [Fieldtype, SuggestsConditionalFields],
 
     components: {
-        Tabs
+        Tabs,
     },
 
     data() {
         return {
-            tabs: this.value
-        }
+            tabs: this.value,
+        };
+    },
+
+    provide: {
+        isInsideSet: true,
     },
 
     methods: {
-
         tabsUpdated(tabs) {
             this.update(tabs);
         },
 
         getSectionFieldsForConditionSuggestions(vm = null) {
             return vm.section.fields;
-        }
-
-    }
-
-}
+        },
+    },
+};
 </script>

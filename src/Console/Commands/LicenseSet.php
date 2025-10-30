@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Statamic\Console\EnhancesCommands;
 use Statamic\Console\RunsInPlease;
+use Statamic\Events\LicenseSet as LicenseSetEvent;
 
 class LicenseSet extends Command
 {
@@ -41,6 +42,8 @@ class LicenseSet extends Command
         }
 
         $this->laravel['config']['statamic.system.license_key'] = $key;
+
+        LicenseSetEvent::dispatch();
 
         $this->checkInfo('Statamic license key set successfully.');
     }
