@@ -59,6 +59,7 @@ return [
     'code.config.mode_selectable' => 'Benutzer:in darf Modus ändern.',
     'code.config.rulers' => 'Vertikale Hilfslinien für die Einrückung festlegen.',
     'code.config.rulers_value_header' => 'Linienstil (gestrichelt oder durchgezogen)',
+    'code.config.show_mode_label' => 'Legt fest, ob die Modus-Beschriftung angezeigt wird.',
     'code.config.theme' => 'Bevorzugtes Design auswählen.',
     'code.title' => 'Code',
     'collections.title' => 'Sammlungen',
