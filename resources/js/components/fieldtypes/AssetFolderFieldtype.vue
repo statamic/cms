@@ -19,11 +19,7 @@ export default {
 
     computed: {
         container() {
-            if (this.config.container) {
-                 return this.config.container;
-            }
-
-            return this.publishContainer.values?.container[0];
+            return this.publishContainer.values?.container?.[0] ?? this.config.container;
         },
 
         relationshipMeta() {
