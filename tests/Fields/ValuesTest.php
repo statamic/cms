@@ -149,7 +149,9 @@ class ValuesTest extends TestCase
         ]);
 
         $this->assertTrue(isset($values->alfa));
+        $this->assertFalse(empty($values->alfa));
         $this->assertFalse(isset($values->missing));
+        $this->assertTrue(empty($values->missing));
         $this->assertEquals('bravo', $values->alfa);
         $this->assertEquals('delta (augmented)', $values->charlie);
         $this->assertIsString($values->charlie);
