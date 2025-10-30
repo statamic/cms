@@ -19,6 +19,7 @@ class MakeWidgetTest extends TestCase
     {
         parent::setUp();
 
+        Process::fake();
         $this->files = app(Filesystem::class);
         $this->fakeSuccessfulComposerRequire();
     }
@@ -73,8 +74,6 @@ class MakeWidgetTest extends TestCase
     #[Test]
     public function it_can_make_a_widget_and_run_setup_cp_vite()
     {
-        Process::fake();
-
         $this->assertFileDoesNotExist($widget = base_path('app/Widgets/Sloth.php'));
         $this->assertFileDoesNotExist($vueComponent = resource_path('js/components/widgets/Sloth.vue'));
 
