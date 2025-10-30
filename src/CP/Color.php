@@ -391,10 +391,12 @@ class Color
             'global-header-bg' => self::Zinc[800],
             'dark-global-header-bg' => self::Zinc[800],
             'progress-bar' => self::Indigo[700],
-            'ui-accent' => self::Indigo[700],
-            'dark-ui-accent' => self::Indigo[400],
-            'switch-bg' => 'var(--theme-color-ui-accent)',
-            'dark-switch-bg' => 'var(--theme-color-dark-ui-accent)',
+            'ui-accent-bg' => self::Indigo[700],
+            'ui-accent-text' => 'var(--theme-color-ui-accent-bg)',
+            'dark-ui-accent-bg' => self::Indigo[700],
+            'dark-ui-accent-text' => self::Indigo[400],
+            'switch-bg' => 'var(--theme-color-ui-accent-bg)',
+            'dark-switch-bg' => 'var(--theme-color-dark-ui-accent-bg)',
         ];
     }
 

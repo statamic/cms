@@ -27,7 +27,7 @@
                             <a class="group flex cursor-pointer items-center" @click="selectFolder(folder.path)">
                                 <file-icon
                                     extension="folder"
-                                    class="me-2 inline-block size-8 text-ui-accent group-hover:text-ui-accent dark:text-dark-ui-accent dark:group-hover:text-dark-ui-accent"
+                                    class="me-2 inline-block size-8 text-blue-400/90 group-hover:text-blue-400"
                                 />
                                 {{ folder.basename }}
                             </a>
@@ -63,7 +63,7 @@
                         <a class="group flex cursor-pointer items-center">
                             <file-icon
                                 extension="folder"
-                                class="me-2 inline-block size-8 text-ui-accent group-hover:text-ui-accent/80 dark:text-dark-ui-accent dark:group-hover:text-dark-ui-accent/80"
+                                class="me-2 inline-block size-8 text-ui-accent-text group-hover:text-ui-accent-text/80 dark:text-dark-ui-accent-text dark:group-hover:text-dark-ui-accent-text/80"
                             />
                             <Editable
                                 ref="newFolderInput"
@@ -100,7 +100,7 @@
                         @click.native.stop="$emit('edit-asset', asset)"
                     />
                     <button
-                        class="cursor-pointer normal-nums select-none group-hover:text-ui-accent/80 dark:group-hover:text-dark-ui-accent/80 text-start"
+                        class="cursor-pointer normal-nums select-none group-hover:text-ui-accent-text/80 dark:group-hover:text-dark-ui-accent-text text-start"
                         @click="$emit('edit-asset', asset)"
                     >
                         {{ isSearching ? asset.path : asset.basename }}

@@ -34,9 +34,9 @@ const checkboxClasses = computed(() => {
         base: [
             'shadow-ui-xs mt-0.5 cursor-default rounded-sm border border-gray-400/75 bg-white',
             'dark:bg-gray-500 dark:border-gray-900',
-            'data-[state=checked]:border-ui-accent data-[state=checked]:bg-ui-accent',
-            'dark:border-none dark:data-[state=checked]:bg-dark-ui-accent dark:data-[state=checked]:border-dark-ui-accent',
-            'dark:data-[disabled]:bg-dark-ui-accent/60 dark:data-[disabled]:border-dark-ui-accent/70',
+            'data-[state=checked]:border-ui-accent-bg data-[state=checked]:bg-ui-accent-bg',
+            'dark:border-none dark:data-[state=checked]:bg-dark-ui-accent-bg dark:data-[state=checked]:border-dark-ui-accent-bg',
+            'dark:data-[disabled]:bg-dark-ui-accent-bg/60 dark:data-[disabled]:border-dark-ui-accent-bg/70',
             'dark:data-[disabled]:text-gray-400 dark:data-[disabled]:cursor-not-allowed',
             'shrink-0'
         ],
