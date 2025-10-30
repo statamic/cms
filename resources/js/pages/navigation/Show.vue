@@ -102,7 +102,7 @@ export default {
         },
 
         maxPagesSelection() {
-            if (this.fields.filter((field) => field.validate?.includes('required')).length > 0) {
+            if (this.fields.filter((field) => field.required).length > 0) {
                 return 1;
             }
 

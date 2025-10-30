@@ -90,7 +90,6 @@ class NestedFieldsTest extends TestCase
                 'max_files' => 2,
                 'container' => 'main',
                 'foo' => 'bar',
-                'validate' => 'required',
                 'component' => 'assets',
                 'prefix' => null,
                 'required' => true,
