@@ -37,9 +37,9 @@
                 <div v-if="page.collection && editable" class="flex items-center gap-2">
                     <Icon name="navigation" class="size-3.5 text-gray-500" />
                     <div>
-                        <Link :href="page.collection.create_url" v-text="__('Add')" class="hover:text-ui-accent/80 dark:hover:text-dark-ui-accent/80" />
+                        <Link :href="page.collection.create_url" v-text="__('Add')" class="hover:text-ui-accent-bg/80 dark:hover:text-dark-ui-accent-bg/80" />
                         <span class="mx-1 text-gray-400 dark:text-gray-500">/</span>
-                        <Link :href="page.collection.edit_url" v-text="__('Edit')" class="hover:text-ui-accent/80 dark:hover:text-dark-ui-accent/80" />
+                        <Link :href="page.collection.edit_url" v-text="__('Edit')" class="hover:text-ui-accent-bg/80 dark:hover:text-dark-ui-accent-bg/80" />
                     </div>
                 </div>
             </div>

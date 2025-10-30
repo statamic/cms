@@ -45,7 +45,7 @@ const headerClasses = (date) => ({
 const dateNumberClasses = (date) => ({
     'text-blue-600 dark:text-blue-400': isSelectedDate(date),
     'text-gray-900 dark:text-white': !isSelectedDate(date),
-    'rounded-full text-white bg-ui-accent': isToday(date)
+    'rounded-full text-white bg-ui-accent-bg': isToday(date)
 });
 
 const hourCellClasses = (date, hour) => ({
