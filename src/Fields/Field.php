@@ -278,7 +278,7 @@ class Field implements Arrayable
             'always_save' => $this->alwaysSave(),
         ]);
 
-//        unset($array['validate']);
+        unset($array['validate']);
 
         return $array;
     }
