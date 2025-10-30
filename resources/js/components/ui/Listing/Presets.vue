@@ -160,7 +160,7 @@ function deletePreset() {
 
 <template>
     <div
-        class="relative flex shrink-0 space-x-2 px-2 sm:px-0 border-b border-gray-200 text-sm text-gray-500 dark:border-gray-700/50 dark:text-gray-500 starting-style-transition"
+        class="relative flex shrink-0 space-x-2 px-2 -mt-2 sm:px-0 border-b border-gray-200 text-sm text-gray-500 dark:border-gray-700/50 dark:text-gray-500 starting-style-transition"
     >
         <PresetTrigger :active="!activePreset" @click="viewAll" :text="__('All')" />
         <PresetTrigger
