@@ -393,7 +393,8 @@ class Color
             'progress-bar' => self::Indigo[700],
             'ui-accent-bg' => self::Indigo[700],
             'ui-accent-text' => 'var(--theme-color-ui-accent-bg)',
-            'dark-ui-accent-bg' => self::Indigo[400],
+            'dark-ui-accent-bg' => self::Indigo[700],
+            'dark-ui-accent-text' => self::Indigo[400],
             'switch-bg' => 'var(--theme-color-ui-accent-bg)',
             'dark-switch-bg' => 'var(--theme-color-dark-ui-accent-bg)',
         ];
