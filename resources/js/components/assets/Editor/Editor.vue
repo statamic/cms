@@ -17,8 +17,8 @@
                         v-tooltip.right="__('Open in a new window')"
                         :aria-label="__('Open in a new window')"
                     >
-                        <ui-icon name="folder-photos" class="size-5 group-hover:text-ui-accent-bg/80 dark:group-hover:text-dark-ui-accent-bg/80" />
-                        <span class="text-sm group-hover:text-ui-accent-bg/80 dark:text-gray-400 dark:group-hover:text-gray-200">
+                        <ui-icon name="folder-photos" class="size-5 group-hover:text-ui-accent-text/80 dark:group-hover:text-dark-ui-accent-text/80" />
+                        <span class="text-sm group-hover:text-ui-accent-text/80 dark:text-gray-400 dark:group-hover:text-gray-200">
                             {{ asset.path }}
                         </span>
                     </button>

@@ -50,7 +50,7 @@ const dateNumberClasses = (weekDate, selected, today, outsideView) => ({
     'text-gray-400 dark:text-gray-600': outsideView,
     'text-gray-900 dark:text-white': !outsideView,
     'text-white bg-blue-600': props.selectedDate && props.selectedDate.toString() === weekDate.toString(),
-    'text-ui-accent-bg': today
+    'text-ui-accent-text': today
 });
 
 const entryStatusClasses = (status) => ({
