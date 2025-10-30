@@ -60,10 +60,6 @@ class Tags extends BaseTags
             return;
         }
 
-        if (count($sites) === 1) {
-            $query->where('site', $sites[0]);
-        } else {
-            $query->whereIn('site', $sites);
-        }
+        $query->whereIn('site', $sites);
     }
 }
