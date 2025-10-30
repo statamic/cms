@@ -113,7 +113,9 @@ return [
         // 'danger' => Color::Red[600],
 
         // 'ui-accent-bg' => Color::Zinc[800],
+        // 'ui-accent-text' => Color::Zinc[800],
         // 'dark-ui-accent-bg' => Color::Zinc[200],
+        // 'dark-ui-accent-text' => Color::Zinc[400],
 
         // 'body-bg' => Color::Zinc[100],
         // 'body-border' => Color::Transparent,
