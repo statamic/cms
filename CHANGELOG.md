@@ -1,5 +1,26 @@
 # Release Notes
 
+## 5.68.0 (2025-10-30)
+
+### What's new
+- Add support for `whereHas()` etc to query builders [#8476](https://github.com/statamic/cms/issues/8476) by @ryanmitchell
+- Support whereHas etc in eloquent builder [#12773](https://github.com/statamic/cms/issues/12773) by @ryanmitchell
+- Add missing Stache Fake Query methods [#12885](https://github.com/statamic/cms/issues/12885) by @marcorieser
+- Set etags [#11441](https://github.com/statamic/cms/issues/11441) by @indykoning
+
+### What's fixed
+- Use attributes on term query builder tests, not comments [#12774](https://github.com/statamic/cms/issues/12774) by @ryanmitchell
+- Update `updated_at` and `updated_by` when duplicating an entry [#12777](https://github.com/statamic/cms/issues/12777) by @aerni
+- Fix edit form errors after change of term slug [#11056](https://github.com/statamic/cms/issues/11056) by @daun
+- Fix `bard_text` modifier adding unwanted spaces [#12855](https://github.com/statamic/cms/issues/12855) by @aerni
+- Detect imported fields by checking field value instead of config key [#12905](https://github.com/statamic/cms/issues/12905) by @el-schneider
+- Allow Cache Tags for POST requests [#12910](https://github.com/statamic/cms/issues/12910) by @marcorieser
+- Update entry URIs when collection route is changed [#11150](https://github.com/statamic/cms/issues/11150) by @duncanmcclean
+- Fix field config overrides being lost when ensuring referenced fields [#12915](https://github.com/statamic/cms/issues/12915) by @el-schneider
+- Bump validator from 13.9.0 to 13.15.20 [#12896](https://github.com/statamic/cms/issues/12896) by @dependabot
+
+
+
 ## 5.67.0 (2025-10-16)
 
 ### What's new
