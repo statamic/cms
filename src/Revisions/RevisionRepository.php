@@ -28,7 +28,7 @@ class RevisionRepository implements Contract
 
     public function make(): RevisionContract
     {
-        return new Revision;
+        return app(Revision::class);
     }
 
     public function whereKey($key)
@@ -92,6 +92,7 @@ class RevisionRepository implements Contract
     public static function bindings(): array
     {
         return [
+            RevisionContract::class => Revision::class,
             RevisionQueryBuilder::class => \Statamic\Stache\Query\RevisionQueryBuilder::class,
         ];
     }
