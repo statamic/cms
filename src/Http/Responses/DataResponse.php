@@ -42,6 +42,12 @@ class DataResponse implements Responsable
             ->make($this->contents())
             ->withHeaders($this->headers);
 
+        if ($content = $response->getContent()) {
+            $response
+                ->setEtag(md5($content))
+                ->isNotModified($request);
+        }
+
         ResponseCreated::dispatch($response, $this->data);
 
         return $response;

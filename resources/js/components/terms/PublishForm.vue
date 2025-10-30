@@ -363,6 +363,11 @@ export default {
                         window.location = this.listingUrl;
                     }
 
+                    // If the edit URL was changed (i.e. the term slug was updated), redirect them there.
+                    else if (window.location.href !== response.data.data.edit_url) {
+                        window.location = response.data.data.edit_url;
+                    }
+
                     // Otherwise, leave them on the edit form and emit an event. We need to wait until after
                     // the hooks are resolved because if this form is being shown in a stack, we only
                     // want to close it once everything's done.

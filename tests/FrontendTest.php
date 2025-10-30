@@ -1047,4 +1047,32 @@ class FrontendTest extends TestCase
             ->get('/does-not-exist')
             ->assertStatus(404);
     }
+
+    #[Test]
+    public function it_sets_etag_header_and_returns_304_when_content_matches()
+    {
+        $this->withStandardBlueprints();
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('default', '<h1>Test Page</h1>');
+
+        $this->createPage('about');
+
+        $response = $this->get('/about');
+        $response->assertStatus(200);
+
+        $content = trim($response->content());
+        $this->assertEquals('<h1>Test Page</h1>', $content);
+
+        $etag = $response->headers->get('ETag');
+        $this->assertEquals('"'.md5($content).'"', $etag); // Per spec, the quotes need to be in the string.
+
+        $response = $this->get('/about', ['If-None-Match' => $etag]);
+        $response->assertStatus(304);
+        $this->assertEmpty($response->content());
+
+        $response = $this->get('/about', ['If-None-Match' => '"wrong-etag"']);
+        $response->assertStatus(200);
+        $this->assertEquals('<h1>Test Page</h1>', trim($response->content()));
+    }
 }
