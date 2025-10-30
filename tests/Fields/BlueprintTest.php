@@ -1042,6 +1042,55 @@ class BlueprintTest extends TestCase
     }
 
     #[Test]
+    public function it_merges_configs_in_correct_priority_order_when_ensuring_a_referenced_field_with_overrides()
+    {
+        FieldsetRepository::shouldReceive('find')->with('the_partial')->andReturn(
+            (new Fieldset)->setContents(['fields' => [
+                [
+                    'handle' => 'the_field',
+                    'field' => ['type' => 'text', 'display' => 'The Field'],
+                ],
+            ]])
+        );
+
+        $blueprint = (new Blueprint)->setContents(['tabs' => [
+            'tab_one' => [
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['handle' => 'from_partial', 'field' => 'the_partial.the_field', 'config' => ['visibility' => 'read_only', 'validate' => 'max:543']],
+                        ],
+                    ],
+                ],
+            ],
+        ]]);
+
+        $blueprint->ensureField('from_partial', ['validate' => 'max:200', 'required' => true]);
+
+        $this->assertEquals(['tabs' => [
+            'tab_one' => [
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['handle' => 'from_partial', 'field' => 'the_partial.the_field', 'config' => ['visibility' => 'read_only', 'validate' => 'max:543', 'required' => true]],
+                        ],
+                    ],
+                ],
+            ],
+        ]], $blueprint->contents());
+
+        $fieldConfig = $blueprint->fields()->get('from_partial')->config();
+
+        $this->assertEquals(true, $fieldConfig['required']);
+
+        $this->assertEquals('text', $fieldConfig['type']);
+        $this->assertEquals('The Field', $fieldConfig['display']);
+
+        $this->assertEquals('max:543', $fieldConfig['validate']);
+        $this->assertEquals('read_only', $fieldConfig['visibility']);
+    }
+
+    #[Test]
     public function it_merges_undefined_config_overrides_when_ensuring_a_field_that_already_exists_inside_an_imported_fieldset()
     {
         FieldsetRepository::shouldReceive('find')->with('the_partial')->andReturn(
