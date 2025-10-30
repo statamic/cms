@@ -148,6 +148,8 @@ class ValuesTest extends TestCase
             'charlie' => new Value('delta', null, $this->fieldtype),
         ]);
 
+        $this->assertTrue(isset($values->alfa));
+        $this->assertFalse(isset($values->missing));
         $this->assertEquals('bravo', $values->alfa);
         $this->assertEquals('delta (augmented)', $values->charlie);
         $this->assertIsString($values->charlie);
@@ -251,14 +253,6 @@ class ValuesTest extends TestCase
         $values = new Values(['foo' => 'bar', 'baz' => 'qux']);
 
         $this->assertEquals('{"foo":"bar","baz":"qux"}', json_encode($values));
-    }
-
-    #[Test]
-    public function it_can_check_isset_on_values()
-    {
-        $field = new Values(['a' => 'alfa']);
-
-        $this->assertTrue(isset($field->a));
     }
 }
 
