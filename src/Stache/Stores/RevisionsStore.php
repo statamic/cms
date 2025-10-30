@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Stores;
 
+use Illuminate\Support\Carbon;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\Revision;
@@ -33,7 +34,14 @@ class RevisionsStore extends BasicStore
         $yaml = YAML::parse(File::get($path));
         $key = (string) Str::of(Path::tidy($path))->beforeLast('/')->after(Path::tidy($this->directory()));
 
-        return Revision::makeRevisionFromArray($key, $yaml);
+        return Revision::make()
+            ->key($key)
+            ->action($yaml['action'] ?? false)
+            ->id($date = $yaml['date'])
+            ->date(Carbon::createFromTimestamp($date, config('app.timezone')))
+            ->user($yaml['user'] ?? false)
+            ->message($yaml['message'] ?? false)
+            ->attributes($yaml['attributes']);
     }
 
     public function save($item)
