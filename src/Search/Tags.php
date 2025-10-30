@@ -60,6 +60,6 @@ class Tags extends BaseTags
             return;
         }
 
-        $query->whereIn('site', $sites);
+        return $query->whereIn('site', $sites);
     }
 }
