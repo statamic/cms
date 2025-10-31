@@ -6,7 +6,7 @@
             class="flex-1"
             append-to-body
             searchable
-            close-on-select
+            :close-on-select="!multiple"
             :calculate-position="positionOptions"
             :name="name"
             :disabled="config.disabled || isReadOnly || (multiple && limitReached)"
