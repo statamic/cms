@@ -13,6 +13,6 @@ return [
     'relativeTime.past' => 'il y a %s',
     'relativeTime.s' => 'quelques secondes',
     'relativeTime.ss' => '%d secondes',
-   'relativeTime.y' => 'un an',
+    'relativeTime.y' => 'un an',
     'relativeTime.yy' => '%d années',
 ];
