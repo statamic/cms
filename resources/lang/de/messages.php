@@ -79,7 +79,7 @@ return [
     'elevated_session_verification_code_sent' => 'Der Authentifizierungscode wurde an deine E-Mail-Adresse gesendet.',
     'email_utility_configuration_description' => 'Die E-Mail-Einstellungen werden in <code>:path</code> konfiguriert.',
     'email_utility_description' => 'Überprüfe die E-Mail-Konfiguration und sende Test-E-Mails.',
-    'entry_count' => ':count Einträge',
+    'entry_count' => ':count Eintrag|:count Einträge',
     'entry_origin_instructions' => 'Die neue Lokalisierung übernimmt die Werte vom Eintrag der ausgewählten Website.',
     'expect_root_instructions' => 'Die erste Seite im Seitenbaum als Root oder Startseite behandeln.',
     'field_conditions_always_save_instructions' => 'Wert dieses Feldes immer speichern, auch wenn es ausgeblendet ist.',
