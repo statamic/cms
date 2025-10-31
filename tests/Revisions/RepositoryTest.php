@@ -65,19 +65,21 @@ class RepositoryTest extends TestCase
         $builder = $this->repo->query();
 
         $revisions = $builder->get();
+        $this->assertInstanceOf(Collection::class, $revisions);
+        $this->assertCount(5, $revisions);
+        $this->assertContainsOnlyInstancesOf(Revision::class, $revisions);
 
+        $revisions = $builder->where('key', '123')->get();
         $this->assertInstanceOf(Collection::class, $revisions);
         $this->assertCount(3, $revisions);
         $this->assertContainsOnlyInstancesOf(Revision::class, $revisions);
 
-        $revisions = $builder->where('key', '123')->get();
-
+        $revisions = $builder->where('key', '123')->where('action', '!=', 'working')->get();
         $this->assertInstanceOf(Collection::class, $revisions);
         $this->assertCount(2, $revisions);
         $this->assertContainsOnlyInstancesOf(Revision::class, $revisions);
 
         $revisions = $builder->where('key', '1234')->get();
-
         $this->assertInstanceOf(Collection::class, $revisions);
         $this->assertCount(0, $revisions);
     }

@@ -34,6 +34,7 @@ class RevisionRepository implements Contract
     {
         return $this->query()
             ->where('key', $key)
+            ->where('action', '!=', 'working')
             ->get()
             ->keyBy(function ($revision) {
                 return $revision->date()->timestamp;

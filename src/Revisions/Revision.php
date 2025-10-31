@@ -30,7 +30,10 @@ class Revision implements Arrayable, Contract
 
     public function id($id = null)
     {
-        return $this->fluentlyGetOrSet('id')->value($id);
+        return $this
+            ->fluentlyGetOrSet('id')
+            ->getter(fn ($id) => $this->action === 'working' ? 'working' : $id)
+            ->args(func_get_args());
     }
 
     public function user($user = null)
@@ -55,17 +58,17 @@ class Revision implements Arrayable, Contract
 
     public function action($action = null)
     {
-        return $this->fluentlyGetOrSet('action')->value($action);
+        return $this->fluentlyGetOrSet('action')->args(func_get_args());
     }
 
     public function message($message = null)
     {
-        return $this->fluentlyGetOrSet('message')->value($message);
+        return $this->fluentlyGetOrSet('message')->args(func_get_args());
     }
 
     public function attributes($attributes = null)
     {
-        return $this->fluentlyGetOrSet('attributes')->value($attributes);
+        return $this->fluentlyGetOrSet('attributes')->args(func_get_args());
     }
 
     public function attribute(string $key, $value = null)
@@ -81,12 +84,12 @@ class Revision implements Arrayable, Contract
 
     public function key($key = null)
     {
-        return $this->fluentlyGetOrSet('key')->value($key);
+        return $this->fluentlyGetOrSet('key')->args(func_get_args());
     }
 
     public function date($date = null)
     {
-        return $this->fluentlyGetOrSet('date')->value($date);
+        return $this->fluentlyGetOrSet('date')->args(func_get_args());
     }
 
     public function path()
@@ -94,7 +97,7 @@ class Revision implements Arrayable, Contract
         return vsprintf('%s/%s/%s.yaml', [
             Revisions::directory(),
             $this->key(),
-            $this->date()->timestamp,
+            $this->action === 'working' ? 'working' : $this->date()->timestamp,
         ]);
     }
 
@@ -149,5 +152,17 @@ class Revision implements Arrayable, Contract
         Revisions::delete($this);
 
         RevisionDeleted::dispatch($this);
+    }
+
+    public function toWorkingCopy()
+    {
+        return (new self)
+            ->id($this->id() ?? false)
+            ->action('working')
+            ->key($this->key())
+            ->date($this->date())
+            ->user($this->user() ?? false)
+            ->message($this->message() ?? false)
+            ->attributes($this->attributes());
     }
 }

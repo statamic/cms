@@ -7,21 +7,18 @@ use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\Revision;
 use Statamic\Facades\YAML;
-use Statamic\Revisions\WorkingCopy;
 use Statamic\Support\Str;
-use Symfony\Component\Finder\SplFileInfo;
 
 class RevisionsStore extends BasicStore
 {
-    public function getItemFilter(SplFileInfo $file)
+    public function save($item)
     {
-        $path = Path::tidy($file->getPathname());
+        parent::save($item);
+    }
 
-        if (Str::endsWith($path, 'working.yaml')) {
-            return false;
-        }
-
-        return $file->getExtension() === 'yaml';
+    public function getItemKey($item)
+    {
+        return $item->key().'/'.$item->id();
     }
 
     public function key()
@@ -34,35 +31,18 @@ class RevisionsStore extends BasicStore
         $yaml = YAML::parse(File::get($path));
         $key = (string) Str::of(Path::tidy($path))->beforeLast('/')->after(Path::tidy($this->directory()));
 
+        if (str_ends_with($path, 'working.yaml')) {
+            $yaml['action'] = 'working';
+        }
+
         return Revision::make()
+            ->initialPath($path)
             ->key($key)
             ->action($yaml['action'] ?? false)
-            ->id($date = $yaml['date'])
-            ->date(Carbon::createFromTimestamp($date, config('app.timezone')))
+            ->id(($date = $yaml['date'] ?? null))
+            ->date($date ? Carbon::createFromTimestamp($date, config('app.timezone')) : null)
             ->user($yaml['user'] ?? false)
             ->message($yaml['message'] ?? false)
-            ->attributes($yaml['attributes']);
-    }
-
-    public function save($item)
-    {
-        if ($item instanceof WorkingCopy) {
-            $this->writeItemToDisk($item);
-
-            return;
-        }
-
-        return parent::save($item);
-    }
-
-    public function delete($item)
-    {
-        if ($item instanceof WorkingCopy) {
-            File::delete($item->path()); // windows fix - deleteItemFromDisk didnt work
-
-            return;
-        }
-
-        return parent::delete($item);
+            ->attributes($yaml['attributes'] ?? []);
     }
 }

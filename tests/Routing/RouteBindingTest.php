@@ -203,6 +203,7 @@ class RouteBindingTest extends TestCase
         Facades\Collection::make('blog')->title('The Blog')->save();
         $entry = EntryFactory::id('123')->slug('alfa')->collection('blog')->create();
         $entryRevision = $entry->makeRevision()->id('1');
+        Facades\Revision::shouldReceive('make')->andReturn(new \Statamic\Revisions\Revision);
         Facades\Revision::shouldReceive('whereKey')->with('collections/blog/en/123')->andReturn(collect(['1' => $entryRevision]));
 
         Facades\Taxonomy::make('tags')->title('Product Tags')->save();
