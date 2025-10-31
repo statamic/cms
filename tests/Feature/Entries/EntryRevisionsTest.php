@@ -30,7 +30,6 @@ class EntryRevisionsTest extends TestCase
         parent::setUp();
         $this->dir = __DIR__.'/tmp';
         config(['statamic.revisions.enabled' => true]);
-        config(['statamic.revisions.path' => $this->dir]);
         $this->collection = tap(Collection::make('blog')->revisionsEnabled(true)->dated(true))->save();
     }
 

@@ -7,6 +7,7 @@ use Statamic\Contracts\Revisions\RevisionQueryBuilder;
 use Statamic\Contracts\Revisions\RevisionRepository as Contract;
 use Statamic\Facades\File;
 use Statamic\Stache\Stache;
+use Statamic\Support\Str;
 
 class RevisionRepository implements Contract
 {
@@ -21,7 +22,7 @@ class RevisionRepository implements Contract
 
     public function directory()
     {
-        return config('statamic.revisions.path');
+        return Str::removeRight($this->store->directory(), '/');
     }
 
     public function make(): RevisionContract
