@@ -14,6 +14,11 @@ export default defineConfig(({ mode, command }) => {
 
     return {
         base: './',
+        server: {
+            watch: {
+                ignored: ['**/tests/**', '**/vendor/**']
+            }
+        },
         plugins: [
             tailwindcss(),
             laravel({
