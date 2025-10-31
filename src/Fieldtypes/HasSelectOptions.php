@@ -54,7 +54,7 @@ trait HasSelectOptions
 
         // NOTE: Null-coalescing into `[null]` as that matches old behaviour.
         return collect($values ?? [null])->map(function ($value) {
-            return $this->getLabel($value);
+            return $this->getLabel($this->normalizeAugmentableValue($value));
         })->all();
     }
 
