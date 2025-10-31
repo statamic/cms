@@ -70,9 +70,6 @@ const triggerClasses = cva({
             sm: 'px-3 h-8 text-[0.8125rem] rounded-lg',
             xs: 'px-2 h-6 text-xs rounded-md',
         },
-        'discrete-focus-outline': {
-            true: 'focus-outline-discrete',
-        },
         readOnly: {
             true: 'border-dashed',
         },
