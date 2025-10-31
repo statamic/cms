@@ -58,8 +58,11 @@ abstract class BasicDictionary extends Dictionary
     {
         $query = strtolower($query);
 
+        // Pre-compute searchable lookup for O(1) access instead of O(n) in_array()
+        $searchableLookup = empty($this->searchable) ? null : array_flip($this->searchable);
+
         foreach ($item->extra() as $key => $value) {
-            if (! empty($this->searchable) && ! in_array($key, $this->searchable)) {
+            if ($searchableLookup !== null && ! isset($searchableLookup[$key])) {
                 continue;
             }
 

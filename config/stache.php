@@ -140,4 +140,27 @@ return [
         'timeout' => 30,
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Warming Optimization
+    |--------------------------------------------------------------------------
+    |
+    | These options control performance optimizations during Stache warming.
+    |
+    */
+
+    'warming' => [
+        // Enable parallel store processing for faster warming on multi-core systems
+        'parallel_processing' => env('STATAMIC_STACHE_PARALLEL_WARMING', false),
+
+        // Maximum number of parallel processes (0 = auto-detect CPU cores)
+        'max_processes' => env('STATAMIC_STACHE_MAX_PROCESSES', 0),
+
+        // Minimum number of stores required to enable parallel processing
+        'min_stores_for_parallel' => env('STATAMIC_STACHE_MIN_STORES_PARALLEL', 3),
+
+        // Concurrency driver: 'process', 'fork', or 'sync'
+        'concurrency_driver' => env('STATAMIC_STACHE_CONCURRENCY_DRIVER', 'process'),
+    ],
+
 ];
