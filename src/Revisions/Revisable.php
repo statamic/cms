@@ -26,7 +26,7 @@ trait Revisable
 
     public function makeRevision()
     {
-        return (new Revision)
+        return Revisions::make()
             ->date(Carbon::now())
             ->key($this->revisionKey())
             ->attributes($this->revisionAttributes());
@@ -34,7 +34,8 @@ trait Revisable
 
     public function makeWorkingCopy()
     {
-        return (new WorkingCopy)
+        return Revisions::make()
+            ->action('working')
             ->date(Carbon::now())
             ->key($this->revisionKey())
             ->attributes($this->revisionAttributes());
@@ -60,7 +61,7 @@ trait Revisable
             return null;
         }
 
-        return WorkingCopy::fromRevision($revision);
+        return $revision->toWorkingCopy();
     }
 
     public function deleteWorkingCopy()

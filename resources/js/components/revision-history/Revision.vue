@@ -2,7 +2,7 @@
     <div
         class="block cursor-pointer space-y-2 px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-900"
         :class="{
-            'status-working-copy': revision.working,
+            'status-working-copy': revision.action === 'working',
             'status-published': revision.attributes.published,
         }"
         @click="open"
@@ -26,7 +26,7 @@
                     <Badge
                         size="sm"
                         :color="
-                            revision.working
+                            revision.action === 'working'
                                 ? 'gray'
                                 : {
                                       publish: 'green',
@@ -36,7 +36,7 @@
                                   }[revision.action]
                         "
                         :text="
-                            revision.working
+                            revision.action === 'working'
                                 ? __('Working Copy')
                                 : {
                                       publish: __('Published'),
@@ -126,7 +126,7 @@ export default {
 
     methods: {
         open() {
-            if (this.revision.working) {
+            if (this.revision.action === 'working') {
                 this.$emit('working-copy-selected');
                 return;
             }

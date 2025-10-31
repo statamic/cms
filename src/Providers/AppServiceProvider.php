@@ -18,6 +18,7 @@ use Statamic\Facades\Token;
 use Statamic\Fields\FieldsetRecursionStack;
 use Statamic\Jobs\HandleEntrySchedule;
 use Statamic\Sites\Sites;
+use Statamic\Stache\Query\RevisionQueryBuilder;
 use Statamic\Statamic;
 use Statamic\Tokens\Handlers\LivePreview;
 use Statamic\View\Scaffolding\TemplateGenerator;
@@ -138,6 +139,7 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Contracts\Forms\SubmissionRepository::class => \Statamic\Stache\Repositories\SubmissionRepository::class,
             \Statamic\Contracts\Tokens\TokenRepository::class => \Statamic\Tokens\FileTokenRepository::class,
             \Statamic\Contracts\Addons\SettingsRepository::class => \Statamic\Addons\FileSettingsRepository::class,
+            \Statamic\Contracts\Revisions\RevisionRepository::class => \Statamic\Revisions\RevisionRepository::class,
         ])->each(function ($concrete, $abstract) {
             if (! $this->app->bound($abstract)) {
                 Statamic::repository($abstract, $concrete);
@@ -185,6 +187,10 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(FieldsetRecursionStack::class);
+
+        $this->app->bind(RevisionQueryBuilder::class, function ($app) {
+            return new RevisionQueryBuilder($app['stache']->store('revisions'));
+        });
 
         collect([
             'entries' => fn () => Facades\Entry::query(),
