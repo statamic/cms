@@ -81,7 +81,7 @@ return [
     'elevated_session_verification_code_sent' => 'Le code de vérification a été envoyé à votre adresse e-mail.',
     'email_utility_configuration_description' => 'Les paramètres de messagerie sont configurés dans <code>:path</code>',
     'email_utility_description' => 'Vérifiez les paramètres de messagerie et envoyez des e-mails de test.',
-    'entry_count' => ':count entrées',
+    'entry_count' => ':count entrée|:count entrées',
     'entry_origin_instructions' => 'La nouvelle traduction héritera des valeurs qu’a l’entrée dans le site sélectionné.',
     'expect_root_instructions' => 'Considérer la première page de l’arborescence comme une page "racine" ou "d’accueil".',
     'field_conditions_always_save_instructions' => 'Toujours enregistrer la valeur du champ, quelle que soit la façon dont les conditions du champ sont évaluées.',
