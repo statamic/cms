@@ -9,6 +9,7 @@ use Statamic\Query\Scopes\Filters\Fields\Integer as IntegerFilter;
 class Integer extends Fieldtype
 {
     protected $categories = ['number'];
+
     protected $selectableInForms = true;
 
     protected function configFieldItems(): array
@@ -21,6 +22,21 @@ class Integer extends Fieldtype
                         'display' => __('Placeholder'),
                         'instructions' => __('statamic::fieldtypes.text.config.placeholder'),
                         'type' => 'text',
+                    ],
+                    'min' => [
+                        'display' => __('Minimum Value'),
+                        'instructions' => __('The minimum allowed value.'),
+                        'type' => 'integer',
+                    ],
+                    'max' => [
+                        'display' => __('Maximum Value'),
+                        'instructions' => __('The maximum allowed value.'),
+                        'type' => 'integer',
+                    ],
+                    'step' => [
+                        'display' => __('Step'),
+                        'instructions' => __('The interval between valid numbers.'),
+                        'type' => 'integer',
                     ],
                     'default' => [
                         'display' => __('Default Value'),
@@ -45,6 +61,15 @@ class Integer extends Fieldtype
 
                 ],
             ],
+        ];
+    }
+
+    public function viewData($data)
+    {
+        return [
+            'min' => $this->config('min'),
+            'max' => $this->config('max'),
+            'step' => $this->config('step'),
         ];
     }
 
@@ -82,6 +107,14 @@ class Integer extends Fieldtype
 
         if ($min = $this->config('min')) {
             $rules[] = 'min:'.$min;
+        }
+
+        if ($max = $this->config('max')) {
+            $rules[] = 'max:'.$max;
+        }
+
+        if ($step = $this->config('step')) {
+            $rules[] = 'multiple_of:'.$step;
         }
 
         return $rules;
