@@ -267,7 +267,7 @@ class FileCacher extends AbstractCacher
 
         const regions = data.regions;
         for (var key in regions) {
-            if (map[key]) map[key].outerHTML = regions[key];
+            if (map[key]) map[key].setHTMLUnsafe(regions[key]);
         }
 
         for (const input of document.querySelectorAll('input[value="$csrfPlaceholder"]')) {
