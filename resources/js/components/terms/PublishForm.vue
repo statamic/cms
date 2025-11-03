@@ -157,7 +157,6 @@ import ItemActions from '@/components/actions/ItemActions.vue';
 
 let saving = ref(false);
 let errors = ref({});
-let container = null;
 
 export default {
     mixins: [HasPreferences, HasActions],
@@ -330,7 +329,7 @@ export default {
             }
 
             new Pipeline()
-                .provide({ container, errors, saving })
+                .provide({ container: computed(() => this.$refs.container), errors, saving })
                 .through([
                     new BeforeSaveHooks('entry', {
                         taxonomy: this.taxonomyHandle,
@@ -501,8 +500,6 @@ export default {
 
     created() {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
-
-        container = computed(() => this.$refs.container);
     },
 
     unmounted() {

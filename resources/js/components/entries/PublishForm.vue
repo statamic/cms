@@ -286,7 +286,6 @@ import { router } from '@inertiajs/vue3';
 
 let saving = ref(false);
 let errors = ref({});
-let container = null;
 
 export default {
     mixins: [HasPreferences, HasActions],
@@ -534,7 +533,7 @@ export default {
             }
 
             new Pipeline()
-                .provide({ container, errors, saving })
+                .provide({ container: computed(() => this.$refs.container), errors, saving })
                 .through([
                     new BeforeSaveHooks('entry', {
                         collection: this.collectionHandle,
@@ -857,8 +856,6 @@ export default {
             this.originBehavior === 'active'
                 ? this.localizations.find((l) => l.active)?.handle
                 : this.localizations.find((l) => l.root)?.handle;
-
-        container = computed(() => this.$refs.container);
     },
 
     beforeUnmount() {

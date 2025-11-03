@@ -74,7 +74,6 @@ import { clone } from '@/bootstrap/globals.js';
 
 let saving = ref(false);
 let errors = ref({});
-let container = null;
 
 export default {
     emits: ['closed', 'submitted', 'publish-info-updated', 'localized-fields-updated'],
@@ -206,7 +205,7 @@ export default {
             const values = container.value.visibleValues;
 
             new Pipeline()
-                .provide({ container, errors, saving })
+                .provide({ container: computed(() => this.$refs.container), errors, saving })
                 .through([new Request(postUrl, 'POST', {
                     type: this.type,
                     values,
@@ -291,8 +290,6 @@ export default {
         });
 
         this.getPageValues();
-
-        container = computed(() => this.$refs.container);
     },
 
     unmounted() {

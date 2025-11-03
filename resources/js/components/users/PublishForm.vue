@@ -92,7 +92,6 @@ import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } f
 
 let saving = ref(false);
 let errors = ref({});
-let container = null;
 
 export default {
     mixins: [HasActions],
@@ -146,7 +145,7 @@ export default {
     methods: {
         save() {
             new Pipeline()
-                .provide({ container, errors, saving })
+                .provide({ container: computed(() => this.$refs.container), errors, saving })
                 .through([
                     new BeforeSaveHooks('user', {
                         values: this.values,
@@ -187,10 +186,6 @@ export default {
                 action: action.run,
             }));
         },
-    },
-
-    created() {
-        container = computed(() => this.$refs.container);
     },
 
     mounted() {

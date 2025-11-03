@@ -75,7 +75,6 @@ import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } f
 
 let saving = ref(false);
 let errors = ref({});
-let container = null;
 
 export default {
     components: {
@@ -186,7 +185,7 @@ export default {
             if (!this.canSave) return;
 
             new Pipeline()
-                .provide({ container, errors, saving })
+                .provide({ container: computed(() => this.$refs.container), errors, saving })
                 .through([
                     new BeforeSaveHooks('global-set', {
                         globalSet: this.initialHandle,
@@ -299,8 +298,6 @@ export default {
 
     created() {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
-
-        container = computed(() => this.$refs.container);
     },
 };
 </script>
