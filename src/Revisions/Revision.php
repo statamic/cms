@@ -4,6 +4,7 @@ namespace Statamic\Revisions;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Contracts\Auth\User;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Revisions\Revision as Contract;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\TracksQueriedColumns;
@@ -15,7 +16,7 @@ use Statamic\Facades;
 use Statamic\Facades\Revision as Revisions;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Revision implements Arrayable, Contract
+class Revision implements Arrayable, ContainsQueryableValues, Contract
 {
     use ExistsAsFile, FluentlyGetsAndSets, TracksQueriedColumns, TracksQueriedRelations;
 
@@ -159,5 +160,18 @@ class Revision implements Arrayable, Contract
             ->user($this->user() ?? false)
             ->message($this->message() ?? false)
             ->attributes($this->attributes());
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        return match ($field) {
+            'id' => $this->id(),
+            'key' => $this->key(),
+            'action' => $this->action(),
+            'date' => $this->date(),
+            'user' => $this->userId,
+            'message' => $this->message(),
+            default => throw new \Exception('Field ['.$field.'] is not queryable on Revision.'),
+        };
     }
 }
