@@ -11,11 +11,6 @@ use Statamic\Support\Str;
 
 class RevisionsStore extends BasicStore
 {
-    public function save($item)
-    {
-        parent::save($item);
-    }
-
     public function key()
     {
         return 'revisions';
