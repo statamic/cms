@@ -72,9 +72,6 @@ import { computed, ref } from 'vue';
 import { Pipeline, Request } from '@ui/Publish/SavePipeline.js';
 import { clone } from '@/bootstrap/globals.js';
 
-let saving = ref(false);
-let errors = ref({});
-
 export default {
     emits: ['closed', 'submitted', 'publish-info-updated', 'localized-fields-updated'],
 
@@ -97,13 +94,6 @@ export default {
         readOnly: Boolean,
     },
 
-    setup() {
-        return {
-            saving,
-            errors,
-        }
-    },
-
     data() {
         return {
             type: this.entry ? 'entry' : 'url',
@@ -117,10 +107,24 @@ export default {
             saveKeyBinding: null,
             publishContainer: 'tree-page',
             closingWithChanges: false,
+            savingRef: ref(false),
+            errorsRef: ref({}),
         };
     },
 
     computed: {
+        containerRef() {
+            return computed(() => this.$refs.container);
+        },
+
+        saving() {
+            return this.savingRef.value;
+        },
+
+        errors() {
+            return this.errorsRef.value;
+        },
+
         headerText() {
             return this.entry ? __('Link to Entry') : __('Nav Item');
         },
@@ -205,7 +209,11 @@ export default {
             const values = container.value.visibleValues;
 
             new Pipeline()
-                .provide({ container: computed(() => this.$refs.container), errors, saving })
+                .provide({
+                    container: this.containerRef,
+                    errors: this.errorsRef,
+                    saving: this.savingRef,
+                })
                 .through([new Request(postUrl, 'POST', {
                     type: this.type,
                     values,
