@@ -113,7 +113,9 @@ class TaxonomiesController extends CpController
     {
         $this->authorize('create', TaxonomyContract::class, __('You are not authorized to create taxonomies.'));
 
-        return view('statamic::taxonomies.create');
+        return Inertia::render('taxonomies/Create', [
+            'submitUrl' => cp_route('taxonomies.store'),
+        ]);
     }
 
     public function store(Request $request)
