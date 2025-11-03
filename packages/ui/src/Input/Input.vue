@@ -34,6 +34,8 @@ const props = defineProps({
     variant: { type: String, default: 'default' },
     viewable: { type: Boolean, default: false },
     focus: { type: Boolean, default: false },
+    inputAttrs: { type: [Object, String], default: () => ({}) },
+    inputClass: { type: String, default: '' },
 });
 
 const inputAttributeKeys = [
@@ -51,12 +53,22 @@ const outerAttrs = computed(() => {
     return result;
 });
 
+const normalizedInputAttrs = computed(() => {
+    if (typeof props.inputAttrs === 'string') {
+        return props.inputAttrs
+            .split(' ')
+            .filter(attr => attr.length > 0)
+            .reduce((acc, attr) => ({ ...acc, [attr]: true }), {});
+    }
+    return props.inputAttrs;
+});
+
 const inputAttrs = computed(() => {
     const result = {};
     for (const key in attrs) {
         if (inputAttributeKeys.includes(key.toLowerCase())) result[key] = attrs[key];
     }
-    return result;
+    return { ...result, ...normalizedInputAttrs.value };
 });
 
 const hasPrependedIcon = computed(() => !!props.iconPrepend || !!props.icon || !!slots.prepend);
@@ -100,7 +112,7 @@ const inputClasses = computed(() => {
         hasLimit: !!props.limit,
     });
 
-    return twMerge(classes);
+    return twMerge(classes, props.inputClass);
 });
 
 const iconClasses = computed(() => {
