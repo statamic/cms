@@ -1,7 +1,7 @@
 <template>
     <div class="m-2 flex h-full flex-col rounded-xl bg-white dark:bg-gray-800">
         <header
-            class="flex items-center justify-between rounded-t-xl border-b border-gray-300 bg-gray-50 px-4 py-2 dark:border-gray-950 dark:bg-gray-900"
+            class="flex items-center justify-between rounded-t-xl border-b border-gray-300 px-4 mb-3 py-2 dark:border-gray-950 dark:bg-gray-800"
         >
             <Heading size="lg">{{ __('Revision History') }}</Heading>
             <Button icon="x" variant="ghost" class="-me-2" @click="close" />
