@@ -157,7 +157,9 @@ class NavigationController extends CpController
     {
         $this->authorize('create', NavContract::class, __('You are not authorized to configure navs.'));
 
-        return view('statamic::navigation.create');
+        return Inertia::render('navigation/Create', [
+            'submitUrl' => cp_route('navigation.store'),
+        ]);
     }
 
     public function store(Request $request)
