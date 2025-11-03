@@ -32,7 +32,6 @@ import FormSubmissionListing from '../components/forms/SubmissionListing.vue';
 import UserWizard from '../components/users/Wizard.vue';
 import RoleListing from '../components/roles/Listing.vue';
 import RolePublishForm from '../components/roles/PublishForm.vue';
-import UserGroupListing from '../components/user-groups/Listing.vue';
 import UserGroupPublishForm from '../components/user-groups/PublishForm.vue';
 import ItemActions from '../components/actions/ItemActions.vue';
 import BulkActions from '../components/actions/BulkActions.vue';
@@ -95,7 +94,6 @@ export default function registerGlobalComponents(app) {
     app.component('UserWizard', UserWizard);
     app.component('RoleListing', RoleListing);
     app.component('RolePublishForm', RolePublishForm);
-    app.component('UserGroupListing', UserGroupListing);
     app.component('UserGroupPublishForm', UserGroupPublishForm);
     app.component('NavBuilder', defineAsyncComponent(() => import('../components/nav/Builder.vue')));
     app.component('ItemActions', ItemActions);
