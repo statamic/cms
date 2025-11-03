@@ -290,13 +290,16 @@ class EntriesController extends CpController
 
         $entry = Entry::make()->collection($collection);
 
-        $this->runHooks('creating-entry', $entry);
-
         $values = $entry->values()->all();
 
         if ($request->values) {
             $values = [...$values, ...$request->values];
         }
+
+        $values = $this->runHooksWith('creating-entry', [
+            'entry' => $entry,
+            'values' => $values,
+        ]);
 
         $fields = $blueprint
             ->fields()
