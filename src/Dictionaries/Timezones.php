@@ -2,12 +2,14 @@
 
 namespace Statamic\Dictionaries;
 
+use DateTime;
 use DateTimeZone;
 use Illuminate\Support\Carbon;
 
 class Timezones extends BasicDictionary
 {
     protected string $valueKey = 'name';
+
     protected array $keywords = ['timezone', 'tz', 'zone', 'time', 'date'];
 
     protected function getItemLabel(array $item): string
@@ -18,8 +20,16 @@ class Timezones extends BasicDictionary
     protected function getItems(): array
     {
         return collect(DateTimeZone::listIdentifiers())
-            ->map(fn ($tz) => ['name' => $tz, 'offset' => $this->getOffset($tz)])
-            ->all();
+            ->map(fn ($tz) => [
+                'abbreviation' => $this->getAbbreviation($tz),
+                'name' => $tz,
+                'offset' => $this->getOffset($tz),
+            ])->all();
+    }
+
+    private function getAbbreviation(string $tz): string
+    {
+        return (new DateTime($tz))->format('T');
     }
 
     private function getOffset(string $tz): string
