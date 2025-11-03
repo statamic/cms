@@ -1,17 +1,12 @@
-@php
-    use function Statamic\trans as __;
-    use Illuminate\Support\Facades\File;
+<script setup>
+import Head from '@/pages/layout/Head.vue';
 
-    $icons = collect(File::files(statamic_path('packages/ui/icons')))->map(function ($file) {
-        return $file->getFilenameWithoutExtension();
-    })->all();
+defineProps(['icons']);
+</script>
 
-@endphp
+<template>
+    <Head :title="__('Playground')" />
 
-@extends('statamic::layout')
-@section('title', __('Playground'))
-
-@section('content')
     <ui-header title="Playground" icon="playground" class="starting-style-transition" v-cloak>
         <ui-subheading>A collection of components to test and play with.</ui-subheading>
     </ui-header>
@@ -36,7 +31,7 @@
                 <li>First item in unordered list</li>
                 <li>Second item with <strong>bold text</strong></li>
                 <li>
-                    Third item with nested list: 
+                    Third item with nested list:
                     <ul>
                         <li>Nested item 1</li>
                         <li>Nested item 2</li>
@@ -49,7 +44,7 @@
                 <li>First numbered item</li>
                 <li>Second numbered item</li>
                 <li>
-                    Third item with nested ordered list: 
+                    Third item with nested ordered list:
                     <ol>
                         <li>Nested numbered item 1</li>
                         <li>Nested numbered item 2</li>
@@ -92,32 +87,32 @@
             <h2>Tables</h2>
             <table>
                 <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Age</th>
-                        <th>City</th>
-                        <th>Occupation</th>
-                    </tr>
+                <tr>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>City</th>
+                    <th>Occupation</th>
+                </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>John Doe</td>
-                        <td>28</td>
-                        <td>New York</td>
-                        <td>Software Developer</td>
-                    </tr>
-                    <tr>
-                        <td>Jane Smith</td>
-                        <td>32</td>
-                        <td>San Francisco</td>
-                        <td>UX Designer</td>
-                    </tr>
-                    <tr>
-                        <td>Bob Johnson</td>
-                        <td>45</td>
-                        <td>Chicago</td>
-                        <td>Project Manager</td>
-                    </tr>
+                <tr>
+                    <td>John Doe</td>
+                    <td>28</td>
+                    <td>New York</td>
+                    <td>Software Developer</td>
+                </tr>
+                <tr>
+                    <td>Jane Smith</td>
+                    <td>32</td>
+                    <td>San Francisco</td>
+                    <td>UX Designer</td>
+                </tr>
+                <tr>
+                    <td>Bob Johnson</td>
+                    <td>45</td>
+                    <td>Chicago</td>
+                    <td>Project Manager</td>
+                </tr>
                 </tbody>
             </table>
             <h2>Images and Media</h2>
@@ -139,7 +134,7 @@
                 <ol>
                     <li>First item with <strong>bold</strong> and <em>italic</em> text</li>
                     <li>
-                        Second item containing a blockquote: 
+                        Second item containing a blockquote:
                         <blockquote>
                             <p>Nested blockquote within a list item.</p>
                         </blockquote>
@@ -228,18 +223,18 @@
             <section class="space-y-4">
                 <ui-heading size="lg">Card</ui-heading>
                 <div class="flex items-center justify-center bg-gray-50 rounded-xl border border-gray-200 p-12">
-                <ui-card class="w-80 space-y-6">
-                    <header>
-                        <ui-heading size="lg">Create a new account</ui-heading>
-                        <ui-subheading>Welcome to the thing! You're gonna love it here.</ui-subheading>
-                    </header>
-                    <ui-input label="Name" placeholder="Your name" />
-                    <ui-input label="Email" type="email" placeholder="Your email" />
-                    <div class="space-y-2 pt-6">
-                        <ui-button variant="primary" class="w-full" text="Continue" type="submit" />
-                        <ui-button variant="ghost" class="w-full">Already have an account? Go sign in</ui-button>
-                    </div>
-                </ui-card>
+                    <ui-card class="w-80 space-y-6">
+                        <header>
+                            <ui-heading size="lg">Create a new account</ui-heading>
+                            <ui-subheading>Welcome to the thing! You're gonna love it here.</ui-subheading>
+                        </header>
+                        <ui-input label="Name" placeholder="Your name" />
+                        <ui-input label="Email" type="email" placeholder="Your email" />
+                        <div class="space-y-2 pt-6">
+                            <ui-button variant="primary" class="w-full" text="Continue" type="submit" />
+                            <ui-button variant="ghost" class="w-full">Already have an account? Go sign in</ui-button>
+                        </div>
+                    </ui-card>
                 </div>
             </section>
 
@@ -277,12 +272,12 @@
                         <template #trigger>
                             <ui-button text="Do a Action" variant="filled" icon-append="chevron-vertical" class="[&_svg]:size-2" />
                         </template>
-                    <ui-dropdown-menu>
-                        <ui-dropdown-item text="Bake a food" />
-                        <ui-dropdown-item text="Write that book" />
-                        <ui-dropdown-item text="Eat this meal" />
-                        <ui-dropdown-item text="Lie about larceny" />
-                        <ui-dropdown-item text="Save some bird" />
+                        <ui-dropdown-menu>
+                            <ui-dropdown-item text="Bake a food" />
+                            <ui-dropdown-item text="Write that book" />
+                            <ui-dropdown-item text="Eat this meal" />
+                            <ui-dropdown-item text="Lie about larceny" />
+                            <ui-dropdown-item text="Save some bird" />
                         </ui-dropdown-menu>
                     </ui-dropdown>
                 </div>
@@ -291,12 +286,10 @@
             <section class="space-y-4">
                 <ui-heading size="lg">Icons</ui-heading>
                 <div class="grid grid-cols-4 md:grid-cols-6 2xl:grid-cols-10 gap-4">
-                    @foreach ($icons as $icon)
-                        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg py-6 px-2 flex flex-col items-center gap-2 sm:gap-3">
-                            <ui-icon name="{{ $icon }}" class="size-6" />
-                            <span class="text-xs text-gray-500">{{ $icon }}</span>
-                        </div>
-                    @endforeach
+                    <div v-for="icon in icons" class="bg-gray-50 dark:bg-gray-800 rounded-lg py-6 px-2 flex flex-col items-center gap-2 sm:gap-3">
+                        <ui-icon :name="icon" class="size-6" />
+                        <span class="text-xs text-gray-500">{{ icon }}</span>
+                    </div>
                 </div>
             </section>
 
@@ -368,8 +361,8 @@
                             description="The morning meal. Should include eggs."
                             value="breakfast"
                             checked
-                    />
-                    <ui-radio label="Lunch" description="The mid-day meal. Should be protein heavy." value="lunch" />
+                        />
+                        <ui-radio label="Lunch" description="The mid-day meal. Should be protein heavy." value="lunch" />
                         <ui-radio label="Dinner" description="The evening meal Should be delicious." value="dinner" />
                     </ui-radio-group>
                 </div>
@@ -416,10 +409,10 @@
                     <ui-splitter-group>
                         <ui-splitter-panel class="flex h-24 items-center justify-center rounded-xl bg-white">
                             Left
-                    </ui-splitter-panel>
-                    <ui-splitter-resize-handle class="w-3" />
-                    <ui-splitter-panel class="flex h-24 items-center justify-center rounded-xl bg-white">
-                        Right
+                        </ui-splitter-panel>
+                        <ui-splitter-resize-handle class="w-3" />
+                        <ui-splitter-panel class="flex h-24 items-center justify-center rounded-xl bg-white">
+                            Right
                         </ui-splitter-panel>
                     </ui-splitter-group>
                 </div>
@@ -440,31 +433,31 @@
                     <ui-table>
                         <ui-table-columns>
                             <ui-table-column>Product</ui-table-column>
-                        <ui-table-column>Stock</ui-table-column>
-                        <ui-table-column class="text-right">Price</ui-table-column>
-                    </ui-table-columns>
-                    <ui-table-rows>
-                        <ui-table-row>
-                            <ui-table-cell>Mechanical Keyboard</ui-table-cell>
-                            <ui-table-cell>
-                                <ui-badge color="green" pill>In Stock</ui-badge>
-                            </ui-table-cell>
-                            <ui-table-cell class="text-right font-semibold text-black">$159.00</ui-table-cell>
-                        </ui-table-row>
-                        <ui-table-row>
-                            <ui-table-cell>Ergonomic Mouse</ui-table-cell>
-                            <ui-table-cell>
-                                <ui-badge color="red" pill>Out of Stock</ui-badge>
-                            </ui-table-cell>
-                            <ui-table-cell class="text-right font-semibold text-black">$89.00</ui-table-cell>
-                        </ui-table-row>
-                        <ui-table-row>
-                            <ui-table-cell>4K Monitor</ui-table-cell>
-                            <ui-table-cell>
-                                <ui-badge color="yellow" pill>Low Stock</ui-badge>
-                            </ui-table-cell>
-                            <ui-table-cell class="text-right font-semibold text-black">$349.00</ui-table-cell>
-                        </ui-table-row>
+                            <ui-table-column>Stock</ui-table-column>
+                            <ui-table-column class="text-right">Price</ui-table-column>
+                        </ui-table-columns>
+                        <ui-table-rows>
+                            <ui-table-row>
+                                <ui-table-cell>Mechanical Keyboard</ui-table-cell>
+                                <ui-table-cell>
+                                    <ui-badge color="green" pill>In Stock</ui-badge>
+                                </ui-table-cell>
+                                <ui-table-cell class="text-right font-semibold text-black">$159.00</ui-table-cell>
+                            </ui-table-row>
+                            <ui-table-row>
+                                <ui-table-cell>Ergonomic Mouse</ui-table-cell>
+                                <ui-table-cell>
+                                    <ui-badge color="red" pill>Out of Stock</ui-badge>
+                                </ui-table-cell>
+                                <ui-table-cell class="text-right font-semibold text-black">$89.00</ui-table-cell>
+                            </ui-table-row>
+                            <ui-table-row>
+                                <ui-table-cell>4K Monitor</ui-table-cell>
+                                <ui-table-cell>
+                                    <ui-badge color="yellow" pill>Low Stock</ui-badge>
+                                </ui-table-cell>
+                                <ui-table-cell class="text-right font-semibold text-black">$349.00</ui-table-cell>
+                            </ui-table-row>
                         </ui-table-rows>
                     </ui-table>
                 </div>
@@ -510,4 +503,4 @@
 
         </div>
     </div>
-@endsection
+</template>
