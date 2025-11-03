@@ -23,7 +23,7 @@
                 <ui-input
                     :placeholder="__('Search Sets')"
                     class="[&_svg]:size-5"
-                    :input-attrs="{ 'data-set-picker-search-input': true }"
+                    input-attrs="data-set-picker-search-input"
                     icon-prepend="magnifying-glass"
                     ref="search"
                     size="sm"
@@ -95,7 +95,7 @@
                 <ui-input
                     :placeholder="__('Search Sets')"
                     class="[&_svg]:size-5"
-                    :input-attrs="{ 'data-set-picker-search-input': true }"
+                    input-attrs="data-set-picker-search-input"
                     icon-prepend="magnifying-glass"
                     ref="search"
                     size="sm"
