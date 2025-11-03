@@ -299,7 +299,7 @@ class EntriesController extends CpController
         $values = $this->runHooksWith('creating-entry', [
             'entry' => $entry,
             'values' => $values,
-        ]);
+        ])->values ?? $values;
 
         $fields = $blueprint
             ->fields()
