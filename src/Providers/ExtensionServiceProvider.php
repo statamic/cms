@@ -253,6 +253,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Updates\RemoveParentField::class,
         Updates\UpdateGlobalVariables::class,
         Updates\PublishMigrationForTwoFactorColumns::class,
+        Updates\PublishMigrationForWebauthnTable::class,
         Updates\AddAddonSettingsToGitConfig::class,
     ];
 
