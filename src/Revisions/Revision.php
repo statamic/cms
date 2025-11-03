@@ -171,6 +171,7 @@ class Revision implements Arrayable, ContainsQueryableValues, Contract
             'date' => $this->date(),
             'user' => $this->userId,
             'message' => $this->message(),
+            'path' => $this->path(),
             default => throw new \Exception('Field ['.$field.'] is not queryable on Revision.'),
         };
     }
