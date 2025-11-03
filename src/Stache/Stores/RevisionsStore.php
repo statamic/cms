@@ -16,11 +16,6 @@ class RevisionsStore extends BasicStore
         parent::save($item);
     }
 
-    public function getItemKey($item)
-    {
-        return $item->key().'/'.$item->id();
-    }
-
     public function key()
     {
         return 'revisions';
@@ -39,8 +34,7 @@ class RevisionsStore extends BasicStore
             ->initialPath($path)
             ->key($key)
             ->action($yaml['action'] ?? false)
-            ->id(($date = $yaml['date'] ?? null))
-            ->date($date ? Carbon::createFromTimestamp($date, config('app.timezone')) : null)
+            ->date(($date = $yaml['date'] ?? null) ? Carbon::createFromTimestamp($date, config('app.timezone')) : null)
             ->user($yaml['user'] ?? false)
             ->message($yaml['message'] ?? false)
             ->attributes($yaml['attributes'] ?? []);

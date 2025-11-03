@@ -202,14 +202,14 @@ class RouteBindingTest extends TestCase
     {
         Facades\Collection::make('blog')->title('The Blog')->save();
         $entry = EntryFactory::id('123')->slug('alfa')->collection('blog')->create();
-        $entryRevision = $entry->makeRevision()->id('1');
+        $entryRevision = \Mockery::mock(Revision::class)->shouldReceive('id')->andReturn('1')->getMock();
         Facades\Revision::shouldReceive('make')->andReturn(new \Statamic\Revisions\Revision);
-        Facades\Revision::shouldReceive('whereKey')->with('collections/blog/en/123')->andReturn(collect(['1' => $entryRevision]));
+        Facades\Revision::shouldReceive('whereKey')->with('collections/blog/en/123')->andReturn(collect(['timestamp1' => $entryRevision]));
 
         Facades\Taxonomy::make('tags')->title('Product Tags')->save();
         $term = tap(Facades\Term::make()->taxonomy('tags')->inDefaultLocale()->slug('bravo')->data([]))->save();
-        $termRevision = $term->inDefaultLocale()->makeRevision()->id('2');
-        Facades\Revision::shouldReceive('whereKey')->with('taxonomies/tags/en/bravo')->andReturn(collect(['2' => $termRevision]));
+        $termRevision = \Mockery::mock(Revision::class)->shouldReceive('id')->andReturn('2')->getMock();
+        Facades\Revision::shouldReceive('whereKey')->with('taxonomies/tags/en/bravo')->andReturn(collect(['timestamp2' => $termRevision]));
 
         Facades\AssetContainer::make('files')->disk('files')->title('The Files')->save();
         Storage::fake('files');
@@ -446,7 +446,7 @@ class RouteBindingTest extends TestCase
             // revisions
 
             'cp entry revision' => [
-                'cp/custom/entries/blog/123/revisions/1',
+                'cp/custom/entries/blog/123/revisions/timestamp1',
                 function (Collection $collection, Entry $entry, Revision $revision) {
                     return $collection->handle() === 'blog' && $entry->id() === '123' && $revision->id() === '1';
                 },
@@ -457,7 +457,7 @@ class RouteBindingTest extends TestCase
             ],
 
             'cp term revision' => [
-                'cp/custom/terms/tags/bravo/revisions/2',
+                'cp/custom/terms/tags/bravo/revisions/timestamp2',
                 function (Taxonomy $taxonomy, Term $term, Revision $revision) {
                     return $taxonomy->handle() === 'tags' && $term->id() === 'tags::bravo' && $revision->id() === '2';
                 },
@@ -834,12 +834,12 @@ class RouteBindingTest extends TestCase
             // revisions
 
             'entry revision' => [
-                'custom/entries/blog/123/revisions/1',
+                'custom/entries/blog/123/revisions/timestamp1',
                 function (Collection $collection, Entry $entry, Revision $revision) {
                     return $collection->handle() === 'blog' && $entry->id() === '123' && $revision->id() === '1';
                 },
                 function (string $collection, string $entry, string $revision) {
-                    return $collection === 'blog' && $entry === '123' && $revision === '1';
+                    return $collection === 'blog' && $entry === '123' && $revision === 'timestamp1';
                 },
             ],
 
@@ -852,12 +852,12 @@ class RouteBindingTest extends TestCase
             ],
 
             'term revision' => [
-                'custom/terms/tags/bravo/revisions/2',
+                'custom/terms/tags/bravo/revisions/timestamp2',
                 function (Taxonomy $taxonomy, Term $term, Revision $revision) {
                     return $taxonomy->handle() === 'tags' && $term->id() === 'tags::bravo' && $revision->id() === '2';
                 },
                 function (string $taxonomy, string $term, string $revision) {
-                    return $taxonomy === 'tags' && $term === 'bravo' && $revision === '2';
+                    return $taxonomy === 'tags' && $term === 'bravo' && $revision === 'timestamp2';
                 },
             ],
 

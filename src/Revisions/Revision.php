@@ -19,7 +19,6 @@ class Revision implements Arrayable, Contract
 {
     use ExistsAsFile, FluentlyGetsAndSets, TracksQueriedColumns, TracksQueriedRelations;
 
-    protected $id;
     protected $key;
     protected $date;
     protected $user;
@@ -28,12 +27,9 @@ class Revision implements Arrayable, Contract
     protected $action = 'revision';
     protected $attributes = [];
 
-    public function id($id = null)
+    public function id()
     {
-        return $this
-            ->fluentlyGetOrSet('id')
-            ->getter(fn ($id) => $this->action === 'working' ? 'working' : $id)
-            ->args(func_get_args());
+        return $this->key.'/'.($this->action === 'working' ? 'working' : $this->date()->timestamp);
     }
 
     public function user($user = null)
@@ -125,7 +121,7 @@ class Revision implements Arrayable, Contract
         }
 
         return [
-            'id' => $this->id,
+            'id' => $this->id(),
             'action' => $this->action,
             'date' => $this->date()->timestamp,
             'user' => $user,
@@ -157,7 +153,6 @@ class Revision implements Arrayable, Contract
     public function toWorkingCopy()
     {
         return (new self)
-            ->id($this->id() ?? false)
             ->action('working')
             ->key($this->key())
             ->date($this->date())

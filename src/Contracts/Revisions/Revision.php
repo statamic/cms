@@ -4,7 +4,7 @@ namespace Statamic\Contracts\Revisions;
 
 interface Revision
 {
-    public function id($id = null);
+    public function id();
 
     public function message($message = null);
 
