@@ -82,6 +82,8 @@ class CorePreferences
             'vi' => 'Vietnamese',
             'zh_CN' => 'Chinese (China)',
             'zh_TW' => 'Chinese (Taiwan)',
+            'ko' => 'korean',
+
         ])->when(extension_loaded('intl'), fn ($locales) => $locales
             ->map(fn ($label, $locale) => [
                 'label' => Locale::getDisplayName($locale, $current),
