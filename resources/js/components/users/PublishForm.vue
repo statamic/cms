@@ -90,10 +90,6 @@ import ItemActions from '@/components/actions/ItemActions.vue';
 import { computed, ref } from 'vue';
 import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';
 
-let saving = ref(false);
-let errors = ref({});
-let container = null;
-
 export default {
     mixins: [HasActions],
 
@@ -132,12 +128,25 @@ export default {
             values: clone(this.initialValues),
             meta: clone(this.initialMeta),
             error: null,
-            errors: {},
             title: this.initialTitle,
+            savingRef: ref(false),
+            errorsRef: ref({}),
         };
     },
 
     computed: {
+        containerRef() {
+            return computed(() => this.$refs.container);
+        },
+
+        saving() {
+            return this.savingRef.value;
+        },
+
+        errors() {
+            return this.errorsRef.value;
+        },
+
         isDirty() {
             return this.$dirty.has(this.publishContainer);
         },
@@ -146,7 +155,11 @@ export default {
     methods: {
         save() {
             new Pipeline()
-                .provide({ container, errors, saving })
+                .provide({
+                    container: this.containerRef,
+                    errors: this.errorsRef,
+                    saving: this.savingRef,
+                })
                 .through([
                     new BeforeSaveHooks('user', {
                         values: this.values,
@@ -187,10 +200,6 @@ export default {
                 action: action.run,
             }));
         },
-    },
-
-    created() {
-        container = computed(() => this.$refs.container);
     },
 
     mounted() {
