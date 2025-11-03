@@ -41,4 +41,9 @@ class AddonRepository
     {
         return $this->all()->get($id);
     }
+
+    public function getByNamespace(string $namespace): ?Addon
+    {
+        return $this->all()->first->hasNamespace($namespace);
+    }
 }

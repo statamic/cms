@@ -210,6 +210,11 @@ final class Addon
         return $this->id;
     }
 
+    public function hasNamespace(string $namespace): bool
+    {
+        return $this->namespace == $namespace;
+    }
+
     /**
      * The composer package string
      * eg. statamic/trapper-keeper.
