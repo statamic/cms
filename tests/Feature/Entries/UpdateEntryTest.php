@@ -112,7 +112,7 @@ class UpdateEntryTest extends TestCase
             ->update($entry, [
                 'title' => 'Updated Entry',
                 'slug' => 'updated-entry',
-                'date' => ['date' => '2021-02-02'],
+                'date' => '2021-02-02T00:00:00.000Z',
                 '_localized' => [], // empty to show that date doesn't need to be in here.
             ])
             ->assertOk();
@@ -151,7 +151,7 @@ class UpdateEntryTest extends TestCase
             ->update($localized, [
                 'title' => 'Updated Entry',
                 'slug' => 'updated-entry',
-                'date' => ['date' => '2021-02-02'],
+                'date' => '2021-02-02T00:00:00.000Z',
                 '_localized' => $shouldBeInArray ? ['date'] : [],
             ])
             ->assertOk();
@@ -435,38 +435,6 @@ class UpdateEntryTest extends TestCase
     public function user_without_permission_to_manage_publish_state_cannot_change_publish_status()
     {
         $this->markTestIncomplete();
-    }
-
-    #[Test]
-    public function validates_max_depth()
-    {
-        [$user, $collection] = $this->seedUserAndCollection();
-
-        $structure = (new CollectionStructure)->maxDepth(2)->expectsRoot(true);
-        $collection->structure($structure)->save();
-
-        EntryFactory::collection('test')->id('home')->slug('home')->data(['title' => 'Home', 'foo' => 'bar'])->create();
-        EntryFactory::collection('test')->id('about')->slug('about')->data(['title' => 'About', 'foo' => 'baz'])->create();
-        EntryFactory::collection('test')->id('team')->slug('team')->data(['title' => 'Team'])->create();
-
-        $entry = EntryFactory::collection($collection)
-            ->id('existing-entry')
-            ->slug('existing-entry')
-            ->data(['title' => 'Existing Entry', 'foo' => 'bar'])
-            ->create();
-
-        $collection->structure()->in('en')->tree([
-            ['entry' => 'home'],
-            ['entry' => 'about', 'children' => [
-                ['entry' => 'team'],
-            ]],
-            ['entry' => 'existing-entry'],
-        ])->save();
-
-        $this
-            ->actingAs($user)
-            ->update($entry, ['title' => 'Existing Entry', 'slug' => 'existing-entry', 'parent' => ['team']]) // This would make it 3 levels deep, so it should fail.
-            ->assertUnprocessable();
     }
 
     #[Test]

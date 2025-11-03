@@ -6,7 +6,6 @@
 import { defineAsyncComponent } from 'vue';
 
 export default {
-
     props: {
         extension: String,
     },
@@ -81,6 +80,7 @@ export default {
                     return 'video';
                 case 'xml':
                     return 'xml';
+                case 'avif':
                 case 'bmp':
                 case 'gif':
                 case 'ico':
@@ -90,6 +90,7 @@ export default {
                 case 'raw':
                 case 'nef':
                 case 'tiff':
+                case 'webp':
                     return 'image';
                 default:
                     return 'generic';
@@ -98,7 +99,7 @@ export default {
 
         icon() {
             return defineAsyncComponent(() => import(`./../../svg/filetypes/${this.name}.svg`));
-        }
-    }
-}
+        },
+    },
+};
 </script>

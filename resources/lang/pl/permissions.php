@@ -6,6 +6,8 @@ return [
     'group_cp' => 'Panel kontrolny',
     'access_cp' => 'Dostęp do panelu sterowania',
     'access_cp_desc' => 'Umożliwia dostęp do panelu sterowania, lecz sam dostęp nie gwarantuje możliwości wykonywania operacji',
+    'configure_sites' => 'Konfiguruj witryny',
+    'configure_sites_desc' => 'Możliwość konfiguracji witryn przy włączonej obsłudze wielu witryn.',
     'configure_fields' => 'Konfiguracja pól',
     'configure_fields_desc' => 'Pozwala na edytowanie schematów, zestawów pól oraz indywidualnych pól',
     'configure_addons' => 'Konfiguracja rozszerzeń',

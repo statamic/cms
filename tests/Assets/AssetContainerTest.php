@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use League\Flysystem\DirectoryAttributes;
 use League\Flysystem\DirectoryListing;
 use League\Flysystem\FileAttributes;
+use League\Flysystem\PathTraversalDetected;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\Asset;
@@ -175,66 +176,6 @@ class AssetContainerTest extends TestCase
     }
 
     #[Test]
-    public function it_gets_and_sets_whether_uploads_are_allowed()
-    {
-        $container = new AssetContainer;
-        $this->assertTrue($container->allowUploads());
-
-        $return = $container->allowUploads(false);
-
-        $this->assertEquals($container, $return);
-        $this->assertFalse($container->allowUploads());
-    }
-
-    #[Test]
-    public function it_gets_and_sets_whether_folders_can_be_created()
-    {
-        $container = new AssetContainer;
-        $this->assertTrue($container->createFolders());
-
-        $return = $container->createFolders(false);
-
-        $this->assertEquals($container, $return);
-        $this->assertFalse($container->createFolders());
-    }
-
-    #[Test]
-    public function it_gets_and_sets_whether_renaming_is_allowed()
-    {
-        $container = new AssetContainer;
-        $this->assertTrue($container->allowRenaming());
-
-        $return = $container->allowRenaming(false);
-
-        $this->assertEquals($container, $return);
-        $this->assertFalse($container->allowRenaming());
-    }
-
-    #[Test]
-    public function it_gets_and_sets_whether_moving_is_allowed()
-    {
-        $container = new AssetContainer;
-        $this->assertTrue($container->allowMoving());
-
-        $return = $container->allowMoving(false);
-
-        $this->assertEquals($container, $return);
-        $this->assertFalse($container->allowMoving());
-    }
-
-    #[Test]
-    public function it_gets_and_sets_whether_downloading_is_allowed()
-    {
-        $container = new AssetContainer;
-        $this->assertTrue($container->allowDownloading());
-
-        $return = $container->allowDownloading(false);
-
-        $this->assertEquals($container, $return);
-        $this->assertFalse($container->allowDownloading());
-    }
-
-    #[Test]
     public function it_gets_and_sets_the_validation_rules()
     {
         $container = new AssetContainer;
@@ -288,6 +229,28 @@ class AssetContainerTest extends TestCase
             'no source, presets false' => [null, false, false, []],
             'with source, presets false' => ['max', false, false, []],
         ];
+    }
+
+    #[Test]
+    public function custom_manipulation_presets_are_included_in_warm_presets()
+    {
+        config(['statamic.assets.image_manipulation.presets' => [
+            'small' => ['w' => '15', 'h' => '15'],
+            'medium' => ['w' => '500', 'h' => '500'],
+            'large' => ['w' => '1000', 'h' => '1000'],
+            'max' => ['w' => '3000', 'h' => '3000', 'mark' => 'watermark.jpg'],
+        ]]);
+
+        Facades\Image::registerCustomManipulationPresets([
+            'og_image' => ['w' => 1146, 'h' => 600],
+            'twitter_image' => ['w' => 1200, 'h' => 600],
+        ]);
+
+        $container = (new AssetContainer);
+
+        $this->assertEquals([
+            'small', 'medium', 'large', 'max', 'og_image', 'twitter_image',
+        ], $container->warmPresets());
     }
 
     #[Test]
@@ -809,6 +772,16 @@ class AssetContainerTest extends TestCase
         $this->assertInstanceOf(Asset::class, $asset);
         $this->assertEquals($container, $asset->container());
         $this->assertEquals('path/to/test.txt', $asset->path());
+    }
+
+    #[Test]
+    public function it_cannot_make_an_asset_using_path_traversal()
+    {
+        $this->expectException(PathTraversalDetected::class);
+        $this->expectExceptionMessage('Path traversal detected: foo/../test.txt');
+
+        $container = $this->containerWithDisk();
+        $container->makeAsset('foo/../test.txt');
     }
 
     #[Test]

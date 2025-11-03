@@ -4,14 +4,11 @@ namespace Statamic\Http\Controllers\CP;
 
 use Illuminate\Auth\Access\AuthorizationException as LaravelAuthException;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Exceptions\AuthorizationException;
-use Statamic\Facades\File;
-use Statamic\Facades\Folder;
-use Statamic\Facades\YAML;
+use Statamic\Exceptions\ElevatedSessionAuthorizationException;
 use Statamic\Http\Controllers\Controller;
 use Statamic\Statamic;
-use Statamic\Support\Arr;
-use Statamic\Support\Str;
 
 /**
  * The base control panel controller.
@@ -32,48 +29,13 @@ class CpController extends Controller
     }
 
     /**
-     * Get all the template names from the current theme.
-     *
-     * @return array
-     */
-    public function templates()
-    {
-        $templates = [];
-
-        foreach (Folder::disk('resources')->getFilesByTypeRecursively('templates', 'html') as $path) {
-            $parts = explode('/', $path);
-            array_shift($parts);
-            $templates[] = Str::removeRight(implode('/', $parts), '.html');
-        }
-
-        return $templates;
-    }
-
-    public function themes()
-    {
-        $themes = [];
-
-        foreach (Folder::disk('themes')->getFolders('/') as $folder) {
-            $name = $folder;
-
-            // Get the name if one exists in a meta file
-            if (File::disk('themes')->exists($folder.'/meta.yaml')) {
-                $meta = YAML::parse(File::disk('themes')->get($folder.'/meta.yaml'));
-                $name = Arr::get($meta, 'name', $folder);
-            }
-
-            $themes[] = compact('folder', 'name');
-        }
-
-        return $themes;
-    }
-
-    /**
      * 404.
      */
     public function pageNotFound()
     {
-        return response()->view('statamic::errors.404', [], 404);
+        return Inertia::render('errors/404')
+            ->toResponse(request())
+            ->setStatusCode(404);
     }
 
     public function authorize($ability, $args = [], $message = null)
@@ -105,6 +67,13 @@ class CpController extends Controller
     {
         if ($condition) {
             return $this->authorizePro();
+        }
+    }
+
+    public function requireElevatedSession(): void
+    {
+        if (! request()->hasElevatedSession()) {
+            throw new ElevatedSessionAuthorizationException;
         }
     }
 }

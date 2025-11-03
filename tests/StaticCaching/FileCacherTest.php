@@ -5,9 +5,11 @@ namespace Tests\StaticCaching;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Queue;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\UrlInvalidated;
+use Statamic\Facades\File;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\StaticCaching\Cachers\Writer;
@@ -298,6 +300,32 @@ class FileCacherTest extends TestCase
     }
 
     #[Test]
+    public function invalidating_a_url_deletes_the_file_even_if_it_is_not_in_application_cache()
+    {
+        $writer = \Mockery::spy(Writer::class);
+        $cache = app(Repository::class);
+        $cacher = $this->fileCacher([
+            'path' => public_path('static'),
+        ], $writer, $cache);
+
+        File::put($cacher->getFilePath('/one'), '');
+        File::put($cacher->getFilePath('/one?foo=bar'), '');
+        File::put($cacher->getFilePath('/onemore'), '');
+        File::put($cacher->getFilePath('/two'), '');
+
+        $cacher->invalidateUrl('/one', 'http://example.com');
+
+        File::delete($cacher->getFilePath('/one'));
+        File::delete($cacher->getFilePath('/one?foo=bar'));
+        File::delete($cacher->getFilePath('/onemore'));
+        File::delete($cacher->getFilePath('/two'));
+
+        $writer->shouldHaveReceived('delete')->times(2);
+        $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/one'))->once();
+        $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/one?foo=bar'))->once();
+    }
+
+    #[Test]
     #[DataProvider('invalidateEventProvider')]
     public function invalidating_a_url_dispatches_event($domain, $expectedUrl)
     {
@@ -315,6 +343,28 @@ class FileCacherTest extends TestCase
         Event::assertDispatched(UrlInvalidated::class, function ($event) use ($expectedUrl) {
             return $event->url === $expectedUrl;
         });
+    }
+
+    #[Test]
+    public function recaching_a_url_will_trigger_a_recache_job()
+    {
+        Queue::fake();
+
+        $writer = \Mockery::spy(Writer::class);
+        $cache = app(Repository::class);
+        $cacher = $this->fileCacher(['base_url' => 'http://base.com'], $writer, $cache);
+
+        $this->instance(Cacher::class, $cacher);
+
+        $cache->forever($this->cacheKey('http://example.com'), [
+            'one' => '/one',
+            'onemore' => '/onemore',
+            'two' => '/two',
+        ]);
+
+        $cacher->refreshUrl('/one', 'http://example.com');
+
+        Queue::assertPushed(\Statamic\Console\Commands\StaticWarmJob::class);
     }
 
     public static function invalidateEventProvider()

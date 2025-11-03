@@ -10,6 +10,8 @@ use Statamic\Statamic;
 
 class DuplicateForm extends Action
 {
+    protected $icon = 'duplicate';
+
     public static function title()
     {
         return __('Duplicate');
@@ -52,7 +54,8 @@ class DuplicateForm extends Action
                 ->title($values['title'])
                 ->honeypot($original->honeypot())
                 ->store($original->store())
-                ->email($original->email());
+                ->email($original->email())
+                ->data($original->data());
 
             $form->save();
 

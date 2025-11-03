@@ -36,6 +36,17 @@ class AmbersandListTest extends TestCase
     }
 
     #[Test]
+    public function it_creates_an_list_from_collection(): void
+    {
+        $modified = $this->modify(collect([
+            'apples',
+            'bananas',
+            'jerky',
+        ]));
+        $this->assertEquals('apples, bananas & jerky', $modified);
+    }
+
+    #[Test]
     public function it_creates_an_list_with_custom_glue(): void
     {
         $modified = $this->modify([

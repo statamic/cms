@@ -2,6 +2,8 @@
 
 namespace Statamic\Tags;
 
+use Illuminate\Support\HtmlString;
+
 class Partial extends Tags
 {
     public function wildcard($tag)
@@ -21,12 +23,23 @@ class Partial extends Tags
 
         $variables = array_merge($this->context->all(), $this->params->all(), [
             '__frontmatter' => $this->params->all(),
-            'slot' => $this->isPair ? trim($this->parse()) : null,
+            'slot' => $this->isPair ? $this->getSlotContent() : null,
         ]);
 
         return view($this->viewName($partial), $variables)
             ->withoutExtractions()
             ->render();
+    }
+
+    private function getSlotContent()
+    {
+        $content = trim($this->parse());
+
+        if ($this->isAntlersBladeComponent()) {
+            return new HtmlString($content);
+        }
+
+        return $content;
     }
 
     protected function shouldRender(): bool

@@ -1,63 +1,52 @@
 <template>
-
-    <div class="replicator-set-picker">
-        <set-picker :enabled="enabled" :sets="groups" @added="addSet">
-            <template #trigger>
-                <div class="replicator-set-picker-button-wrapper flex items-center ">
-                    <button
-                        v-if="enabled"
-                        class="btn-round flex items-center justify-center"
-                        :class="{
-                            'h-5 w-5': ! last,
-                            'mr-2': label?.length > 0,
-                        }"
-                        @click="addSetButtonClicked"
-                    >
-                        <svg-icon name="micro/plus"
-                            :class="{
-                                'w-3 h-3 text-gray-800 dark:text-dark-175 group-hover:text-black dark:group-hover:dark-text-100': last,
-                                'w-2 h-2 text-gray-700 dark:text-dark-200 group-hover:text-black dark:group-hover:dark-text-100 transition duration-150': !last
-                            }" />
-                    </button>
-                    <span class="text-sm dark:text-dark-175">{{ __(label) }}</span>
-                </div>
-            </template>
-        </set-picker>
-    </div>
-
+    <set-picker :enabled="enabled" :sets="groups" :align="variant === 'between' ? 'center' : 'start'" @added="addSet">
+        <template #trigger>
+            <div class="flex relative pt-2" :class="{ 'pt-6': showConnector }" v-if="variant === 'button'">
+                <div v-if="showConnector" class="absolute group-hover:opacity-0 transition-opacity delay-25 duration-125 inset-y-0 h-full left-3.5 border-l-1 border-gray-400 dark:border-gray-600 border-dashed z-0 dark:bg-dark-700" />
+                <Button v-if="enabled" size="sm" :text="label" icon="plus" class="relative z-2" />
+            </div>
+            <div
+                v-if="variant === 'between'"
+                class="flex justify-center relative group py-3"
+                :class="{ '-mt-3': isFirst }"
+            >
+                <div
+                    v-if="showConnector"
+                    class="absolute group-hover:opacity-0 transition-opacity delay-10 duration-250 inset-y-0 left-3.5 border-l-1 border-gray-400 dark:border-gray-600 border-dashed z-0 dark:bg-dark-700"
+                    :class="isFirst ? 'h-[50%] top-[50%] opacity-50' : 'h-full opacity-100'"
+                />
+                <button class="w-full absolute inset-0 h-full opacity-0 group-hover:opacity-100 transition-opacity delay-10 duration-250 cursor-pointer">
+                    <div class="h-full flex flex-col justify-center">
+                        <div class="rounded-full bg-gray-200 dark:bg-gray-700 h-2" />
+                    </div>
+                </button>
+                <Button v-if="enabled" round icon="plus" size="sm" class="-my-4 z-3 opacity-0 group-hover:opacity-100 transition-opacity delay-10 duration-250" />
+            </div>
+        </template>
+    </set-picker>
 </template>
 
-<script>
+<script setup>
 import SetPicker from './SetPicker.vue';
+import { Button } from '@/components/ui';
+import { computed } from 'vue';
 
-export default {
+const emit = defineEmits(['added']);
 
-    components: {
-        SetPicker,
-    },
+const props = defineProps({
+    sets: Array,
+    groups: Array,
+    index: Number,
+    enabled: { type: Boolean, default: true },
+    label: { type: String },
+    showConnector: { type: Boolean, default: true },
+    variant: { type: String, default: 'button' },
+    isFirst: { type: Boolean, default: false },
+});
 
-    props: {
-        sets: Array,
-        groups: Array,
-        index: Number,
-        last: Boolean,
-        enabled: { type: Boolean, default: true },
-        label: String,
-    },
+const label = computed(() => props.label ? __(props.label) : __('Add Block'));
 
-    methods: {
-
-        addSet(handle) {
-            this.$emit('added', handle, this.index);
-        },
-
-        addSetButtonClicked() {
-            if (this.sets.length === 1) {
-                this.addSet(this.sets[0].handle);
-            }
-        }
-
-    }
-
+function addSet(handle) {
+    emit('added', handle, props.index);
 }
 </script>

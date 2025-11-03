@@ -167,6 +167,10 @@ class Cache
             return false;
         }
 
+        if ($this->hasValidRecacheToken($request)) {
+            return false;
+        }
+
         return true;
     }
 
@@ -179,8 +183,13 @@ class Cache
             return false;
         }
 
-        // Draft and private pages should not be cached.
-        if ($response->headers->has('X-Statamic-Draft') || $response->headers->has('X-Statamic-Private')) {
+        // Draft, private and protected pages should not be cached.
+        if (
+            $response->headers->has('X-Statamic-Draft')
+            || $response->headers->has('X-Statamic-Private')
+            || $response->headers->has('X-Statamic-Protected')
+            || $response->headers->has('X-Statamic-Uncacheable')
+        ) {
             return false;
         }
 
@@ -195,6 +204,15 @@ class Cache
         }
 
         return true;
+    }
+
+    private function hasValidRecacheToken($request)
+    {
+        if (! $token = $request->input(StaticCache::recacheTokenParameter())) {
+            return false;
+        }
+
+        return StaticCache::checkRecacheToken($token);
     }
 
     private function createLock($request): Lock

@@ -1,302 +1,513 @@
-@php use function Statamic\trans as __; @endphp
+@php
+    use function Statamic\trans as __;
+    use Illuminate\Support\Facades\File;
+
+    $icons = collect(File::files(statamic_path('packages/ui/icons')))->map(function ($file) {
+        return $file->getFilenameWithoutExtension();
+    })->all();
+
+@endphp
 
 @extends('statamic::layout')
-@section('wrapper_class', 'max-w-7xl')
-
-@section('nontent')
-
-    <collection-wizard
-        :steps="['Naming', 'Ordering', 'Behavior', 'Content Model', 'Front-End']">
-    </collection-wizard>
-
-@stop
+@section('title', __('Playground'))
 
 @section('content')
+    <ui-header title="Playground" icon="playground" class="starting-style-transition" v-cloak>
+        <ui-subheading>A collection of components to test and play with.</ui-subheading>
+    </ui-header>
 
-    <div class="flex mb-10">
-        <h1>{{ __('The Statamic Playground') }}</h1>
-    </div>
+    <div v-cloak>
+        <div class="space-y-12 prose starting-style-transition starting-style-transition-children">
+            <h1>Typography <strong>Test</strong> Document</h1>
+            <p class="lead">This comprehensive document tests all typography elements supported by both tw-prose and @tailwindcss/typography plugins.</p>
+            <h2>Headings</h2>
+            <h1>Heading Level 1</h1>
+            <h2>Heading Level 2</h2>
+            <h3>Heading Level 3</h3>
+            <h4>Heading Level 4</h4>
+            <h5>Heading Level 5</h5>
+            <h6>Heading Level 6</h6>
+            <h2>Paragraphs and Text Formatting</h2>
+            <p>This is a regular paragraph with <strong>bold text</strong>, <em>italic text</em>, <u>underlined text</u>, and <mark>highlighted text</mark>. You can also have <small>small text</small> and text with <sup>superscript</sup> and <sub>subscript</sub>.</p>
+            <p>Here's a paragraph with a <a href="#test">link to test</a> the link styling. Links should have proper hover states and visual distinction from regular text.</p>
+            <h2>Lists</h2>
+            <h3>Unordered List</h3>
+            <ul>
+                <li>First item in unordered list</li>
+                <li>Second item with <strong>bold text</strong></li>
+                <li>
+                    Third item with nested list: 
+                    <ul>
+                        <li>Nested item 1</li>
+                        <li>Nested item 2</li>
+                    </ul>
+                </li>
+                <li>Fourth item</li>
+            </ul>
+            <h3>Ordered List</h3>
+            <ol>
+                <li>First numbered item</li>
+                <li>Second numbered item</li>
+                <li>
+                    Third item with nested ordered list: 
+                    <ol>
+                        <li>Nested numbered item 1</li>
+                        <li>Nested numbered item 2</li>
+                    </ol>
+                </li>
+                <li>Fourth numbered item</li>
+            </ol>
+            <h3>Definition List</h3>
+            <dl>
+                <dt>Term 1</dt>
+                <dd>Definition for term 1 with detailed explanation.</dd>
+                <dt>Term 2</dt>
+                <dd>Definition for term 2.</dd>
+                <dt>Term 3</dt>
+                <dd>Another definition with <em>emphasized text</em>.</dd>
+            </dl>
+            <h2>Blockquotes</h2>
+            <blockquote>
+                <p>This is a blockquote with a single paragraph. Blockquotes are used to highlight quoted text or important information.</p>
+            </blockquote>
+            <blockquote>
+                <p>This is a blockquote with multiple paragraphs. The first paragraph introduces the quote.</p>
+                <p>The second paragraph continues the quoted content and shows how multiple paragraphs are handled within blockquotes.</p>
+                <cite>— Author Name, Source Title</cite>
+            </blockquote>
+            <h2>Code Examples</h2>
+            <p>Inline code can be written using <code>console.log('Hello, World!')</code> for JavaScript or <code>printf("Hello, World!")</code> for C.</p>
+            <h3>Code Blocks</h3>
+            <pre>
+                <code>function fibonacci(n) {
+                if (n &lt;= 1) return n;
+                return fibonacci(n - 1) + fibonacci(n - 2);
+                }
 
-    <h2 class="mb-2">
-        Form Inputs
-    </h2>
-
-    <div class="shadow bg-white p-8 rounded-lg mb-16">
-        <div class="mb-4">
-            <input type="text" placeholder="unstyled">
-        </div>
-        <div class="mb-4 flex">
-            <input type="text" class="input-text" placeholder="v3 style">
-            <select class="rtl:mr-2 ltr:ml-2" name="" id="">
-                <option value="">Oh hai Mark</option>
-            </select>
-        </div>
-        <div class="mb-4 flex">
-            <input type="text" class="input-text" placeholder="v3 style">
-            <button class="btn rtl:mr-2 ltr:ml-2">Default Button</button>
-            <button class="btn-primary rtl:mr-2 ltr:ml-2">Primary Button</button>
-        </div>
-        <div class="mb-4">
-            <textarea name="" class="input-text" placeholder="v3 style"></textarea>
-        </div>
-        <div class="mb-4">
-            <div class="select-input-container w-64">
-                <select class="select-input">
-                    <option value="">Oh hai Mark</option>
-                    <option value="">I did not do it i did not</option>
-                </select>
-                <div class="select-input-toggle">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                 </div>
-            </div>
-        </div>
-        <div class="mb-4">
-            <v-select :multiple="true" :options="['Nintendo 64', 'Super Nintendo', 'Nintendo Gameboy', 'Sega Genesis', 'Sega Game Gear', 'Atari 2600']"></v-select>
-        </div>
-    </div>
-
-    <h2 class="mb-2">Typography</h2>
-    <div class="shadow bg-white p-8 rounded-lg overflow-hidden mb-16">
-        <h1 class="mb-4">This is first level heading</h1>
-        <h2 class="mb-4">This is a second level heading</h2>
-        <h3 class="mb-4">This is a third level heading</h3>
-        <h4 class="mb-4">This is a fourth level heading</h4>
-        <h5 class="mb-4">This is a fifth level heading</h5>
-        <h6 class="mb-4">This is a sixth level heading</h6>
-        <p>Paragraph text. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quam error tempore veritatis, laborum, et assumenda? Necessitatibus excepturi enim quidem maxime! Temporibus dolorum fugit aspernatur.
-    </div>
-
-    <h2 class="mb-2">Buttons</h2>
-    <div class="shadow bg-white p-8 rounded-lg mb-16">
-        <h6 class="mb-4">Flavors</h6>
-        <div class="mb-8 flex">
-            <button class="rtl:ml-4 ltr:mr-4 btn">Default Button</button>
-            <button class="rtl:ml-4 ltr:mr-4 btn-primary">Primary Button</button>
-            <button class="rtl:ml-4 ltr:mr-4 btn-danger">Danger Button</button>
-            <button class="btn-flat">Flat Button</button>
-        </div>
-        <h6 class="mb-4">With Dropdowns</h6>
-        <div class="mb-8 flex">
-            <div class="btn-group rtl:ml-4 ltr:mr-4">
-                <button class="btn">Default Button</button>
-                <dropdown-list>
-                    <template v-slot:trigger>
-                        <button class="btn">
-                            <svg-icon name="micro/chevron-down-xs" class="w-2" />
-                        </button>
-                    </template>
+                // Usage example
+                console.log(fibonacci(10)); // Output: 55</code>
+            </pre>
+            <h3>Keyboard Input</h3>
+            <p>To save a file, press <kbd>Ctrl</kbd> + <kbd>S</kbd> on Windows or <kbd>Cmd</kbd> + <kbd>S</kbd> on Mac.</p>
+            <h2>Tables</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Age</th>
+                        <th>City</th>
+                        <th>Occupation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>John Doe</td>
+                        <td>28</td>
+                        <td>New York</td>
+                        <td>Software Developer</td>
+                    </tr>
+                    <tr>
+                        <td>Jane Smith</td>
+                        <td>32</td>
+                        <td>San Francisco</td>
+                        <td>UX Designer</td>
+                    </tr>
+                    <tr>
+                        <td>Bob Johnson</td>
+                        <td>45</td>
+                        <td>Chicago</td>
+                        <td>Project Manager</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h2>Images and Media</h2>
+            <figure>
+                <img src="https://picsum.photos/600/300" alt="Sample image for testing">
+                <figcaption>Figure 1: A sample image with caption to test image styling and figure elements.</figcaption>
+            </figure>
+            <h2>Horizontal Rules</h2>
+            <p>Content above the horizontal rule.</p>
+            <hr>
+            <p>Content below the horizontal rule.</p>
+            <h2>Additional Text Elements</h2>
+            <p>This paragraph tests various inline elements: <abbr title="HyperText Markup Language">HTML</abbr> abbreviation, <span class="time-element">January 1, 2024</span> time element, and <span>generic span element</span>.</p>
+            <address> Contact Information:<br> John Developer<br> 123 Code Street<br> Tech City, TC 12345<br> Email: john@example.com </address>
+            <h2>Complex Nested Content</h2>
+            <div>
+                <h3>Nested Structure Test</h3>
+                <p>This section tests how nested content is handled:</p>
+                <ol>
+                    <li>First item with <strong>bold</strong> and <em>italic</em> text</li>
                     <li>
-                        <dropdown-item text="Item 1" redirect="https://example.com"></dropdown-item>
-                        <dropdown-item text="Item 2" redirect="https://example2.com"></dropdown-item>
+                        Second item containing a blockquote: 
+                        <blockquote>
+                            <p>Nested blockquote within a list item.</p>
+                        </blockquote>
                     </li>
-                </dropdown-list>
+                    <li>Third item with code: <code>nested.code.example()</code></li>
+                </ol>
+                <p>Final paragraph to close the nested structure test.</p>
             </div>
-            <div class="btn-group rtl:ml-4 ltr:mr-4">
-                <button class="btn-primary">Default Button</button>
-                <dropdown-list>
-                    <template v-slot:trigger>
-                        <button class="btn-primary">
-                            <svg-icon name="micro/chevron-down-xs" class="w-2" />
-                        </button>
-                    </template>
-                    <li>
-                        <dropdown-item text="Item 1" redirect="https://example.com"></dropdown-item>
-                        <dropdown-item text="Item 2" redirect="https://example2.com"></dropdown-item>
-                    </li>
-                </dropdown-list>
-            </div>
-            <div class="btn-group rtl:ml-4 ltr:mr-4">
-                <button class="btn-danger">Default Button</button>
-                <dropdown-list>
-                    <template v-slot:trigger>
-                        <button class="btn-danger">
-                            <svg-icon name="micro/chevron-down-xs" class="w-2" />
-                        </button>
-                    </template>
-                    <li>
-                        <dropdown-item text="Item 1" redirect="https://example.com"></dropdown-item>
-                        <dropdown-item text="Item 2" redirect="https://example2.com"></dropdown-item>
-                    </li>
-                </dropdown-list>
-            </div>
-            <div class="btn-group rtl:ml-4 ltr:mr-4">
-                <button class="btn-flat">Default Button</button>
-                <dropdown-list>
-                    <template v-slot:trigger>
-                        <button class="btn-flat">
-                            <svg-icon name="micro/chevron-down-xs" class="w-2" />
-                        </button>
-                    </template>
-                    <li>
-                        <dropdown-item text="Item 1" redirect="https://example.com"></dropdown-item>
-                        <dropdown-item text="Item 2" redirect="https://example2.com"></dropdown-item>
-                    </li>
-                </dropdown-list>
-            </div>
+            <h2>Long Form Content</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+            <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
         </div>
-        <h6 class="mb-4">Disabled States</h6>
-        <div class="mb-8 flex">
-            <button disabled class="rtl:ml-4 ltr:mr-4 btn disabled">Default Button</button>
-            <button disabled class="rtl:ml-4 ltr:mr-4 btn-primary disabled">Primary Button</button>
-            <button disabled class="rtl:ml-4 ltr:mr-4 btn-danger disabled">Danger Button</button>
-            <button disabled class="btn-flat disabled">Flat Button</button>
+        <div class="space-y-12 prose">
+            <section class="space-y-4">
+                <p>This is some <code>code</code> in a paragraph.</p>
+                <pre>
+                    <code>$this is some code in a pre tag.
+                    with another line.
+                    </code>
+                </pre>
+            </section>
+            <section class="space-y-4 prose">
+                <p>This is some <code>code</code> in a paragraph.</p>
+                <pre>
+                    <code>$this is some code in a pre tag.
+                    with another line.
+                    </code>
+                </pre>
+            </section>
         </div>
 
-        <h6 class="mb-4">Large</h6>
-        <div class="mb-8 flex">
-            <button class="rtl:ml-4 ltr:mr-4 btn btn-lg">Default Button</button>
-            <button class="rtl:ml-4 ltr:mr-4 btn-primary btn-lg">Primary Button</button>
-            <button class="rtl:ml-4 ltr:mr-4 btn-danger btn-lg">Danger Button</button>
-            <button class="btn-flat btn-lg">Flat Button</button>
-        </div>
+        <div class="space-y-12">
+            <section class="space-y-4">
+                <ui-heading size="lg">Badges</ui-heading>
+                <div class="mb-4 flex gap-2 sm:gap-3 items-end">
+                    <ui-badge size="lg" text="Green" color="green" />
+                    <ui-badge size="lg" text="Red" color="red" />
+                    <ui-badge size="lg" text="Black" color="black" />
+                    <ui-badge text="Blue" color="blue" />
+                    <ui-badge text="Amber" color="amber" />
+                    <ui-badge text="Pink" color="pink" />
+                    <ui-badge size="sm" text="Cyan" color="cyan" />
+                    <ui-badge size="sm" text="Purple" color="purple" />
+                    <ui-badge size="sm" text="Gray" color="gray" />
+                </div>
+            </section>
 
-        <h6 class="mb-4">Small</h6>
-        <div class="flex">
-            <button class="rtl:ml-4 ltr:mr-4 btn btn-xs">Default Button</button>
-            <button class="rtl:ml-4 ltr:mr-4 btn-primary btn-xs">Primary Button</button>
-            <button class="rtl:ml-4 ltr:mr-4 btn-danger btn-xs">Danger Button</button>
-            <button class="btn-flat btn-xs">Flat Button</button>
+            <section class="space-y-4">
+                <ui-heading size="lg">Buttons</ui-heading>
+                <div class="mb-4 flex gap-2 sm:gap-3 items-end">
+                    <ui-button text="Default" />
+                    <ui-button text="Primary" variant="primary" />
+                    <ui-button text="Filled" variant="filled" />
+                    <ui-button text="Ghost" variant="ghost" />
+                    <ui-button text="Subtle" variant="subtle" />
+                </div>
+                <div class="mb-4 flex gap-2 sm:gap-3 items-end">
+                    <ui-button icon="save" text="Default" />
+                    <ui-button icon="save" text="Primary" variant="primary" />
+                    <ui-button icon="save" text="Filled" variant="filled" />
+                    <ui-button icon="save" text="Ghost" variant="ghost" />
+                    <ui-button icon="save" text="Subtle" variant="subtle" />
+                </div>
+                <div class="mb-4 flex gap-2 sm:gap-3 items-end">
+                    <ui-button icon="save" />
+                    <ui-button icon="save" variant="primary" />
+                    <ui-button icon="save" variant="filled" />
+                    <ui-button icon="save" variant="ghost" />
+                    <ui-button icon="save" variant="subtle" />
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <ui-heading size="lg">Calendar</ui-heading>
+                <div class="flex gap-6">
+                    <ui-card>
+                        <ui-calendar />
+                    </ui-card>
+                    <ui-card>
+                        <ui-calendar :number-of-months="2" />
+                    </ui-card>
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <ui-heading size="lg">Card</ui-heading>
+                <div class="flex items-center justify-center bg-gray-50 rounded-xl border border-gray-200 p-12">
+                <ui-card class="w-80 space-y-6">
+                    <header>
+                        <ui-heading size="lg">Create a new account</ui-heading>
+                        <ui-subheading>Welcome to the thing! You're gonna love it here.</ui-subheading>
+                    </header>
+                    <ui-input label="Name" placeholder="Your name" />
+                    <ui-input label="Email" type="email" placeholder="Your email" />
+                    <div class="space-y-2 pt-6">
+                        <ui-button variant="primary" class="w-full" text="Continue" type="submit" />
+                        <ui-button variant="ghost" class="w-full">Already have an account? Go sign in</ui-button>
+                    </div>
+                </ui-card>
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <ui-heading size="lg">Card Panel</ui-heading>
+                <ui-card-panel heading="Card Panel">This is a card panel.</ui-card-panel>
+            </section>
+
+            <section class="space-y-4">
+                <ui-heading size="lg">Checkboxes</ui-heading>
+                <div class="flex">
+                    <ui-checkbox-group name="meals" label="Select your favorite meals">
+                        <ui-checkbox
+                            label="Breakfast"
+                            description="The morning meal. Should include eggs."
+                            value="breakfast"
+                        />
+                        <ui-checkbox label="Lunch" description="The mid-day meal. Should be protein heavy." value="lunch" />
+                        <ui-checkbox label="Dinner" description="The evening meal. Should be delicious." value="dinner" />
+                    </ui-checkbox-group>
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <ui-heading size="lg">Datepicker</ui-heading>
+                <div class="flex">
+                    <ui-date-picker />
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <ui-heading size="lg">Dropdown</ui-heading>
+                <div class="flex">
+                    <ui-dropdown>
+                        <template #trigger>
+                            <ui-button text="Do a Action" variant="filled" icon-append="chevron-vertical" class="[&_svg]:size-2" />
+                        </template>
+                    <ui-dropdown-menu>
+                        <ui-dropdown-item text="Bake a food" />
+                        <ui-dropdown-item text="Write that book" />
+                        <ui-dropdown-item text="Eat this meal" />
+                        <ui-dropdown-item text="Lie about larceny" />
+                        <ui-dropdown-item text="Save some bird" />
+                        </ui-dropdown-menu>
+                    </ui-dropdown>
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <ui-heading size="lg">Icons</ui-heading>
+                <div class="grid grid-cols-4 md:grid-cols-6 2xl:grid-cols-10 gap-4">
+                    @foreach ($icons as $icon)
+                        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg py-6 px-2 flex flex-col items-center gap-2 sm:gap-3">
+                            <ui-icon name="{{ $icon }}" class="size-6" />
+                            <span class="text-xs text-gray-500">{{ $icon }}</span>
+                        </div>
+                    @endforeach
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <ui-heading size="lg">Input</ui-heading>
+                <div class="flex gap-2">
+                    <ui-input
+                        name="email"
+                        type="email"
+                        required
+                        label="Email"
+                        value="Edit me"
+                    />
+                    <ui-input
+                        name="email"
+                        type="email"
+                        required
+                        label="Email"
+                        read-only
+                        value="Read only. Tab, select, but not edit."
+                    />
+                    <ui-input
+                        name="email"
+                        type="email"
+                        required
+                        label="Email"
+                        disabled
+                        value="Disabled. Cant touch me."
+                    />
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <ui-heading size="lg">Modal</ui-heading>
+                <div class="flex">
+                    <ui-modal title="That's Pretty Neat">
+                        <template #trigger>
+                            <ui-button text="How neat is that?" />
+                        </template>
+                    </ui-modal>
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <ui-heading size="lg">Popover</ui-heading>
+                <div class="flex">
+                    <ui-popover>
+                        <template #trigger>
+                            <ui-button text="Open Popover" />
+                        </template>
+
+                        <div class="flex flex-col gap-2.5">
+                            <ui-heading text="Provide Feedback" />
+                            <ui-textarea placeholder="How we can make this component better?" elastic />
+                            <div class="flex flex-col sm:flex-row sm:justify-end">
+                                <ui-button variant="primary" size="sm" text="Submit" />
+                            </div>
+                        </div>
+                    </ui-popover>
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <ui-heading size="lg">Radio Group</ui-heading>
+                <div class="flex">
+                    <ui-radio-group name="favorite" label="Choose your favorite meal">
+                        <ui-radio
+                            label="Breakfast"
+                            description="The morning meal. Should include eggs."
+                            value="breakfast"
+                            checked
+                    />
+                    <ui-radio label="Lunch" description="The mid-day meal. Should be protein heavy." value="lunch" />
+                        <ui-radio label="Dinner" description="The evening meal Should be delicious." value="dinner" />
+                    </ui-radio-group>
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <ui-heading size="lg">Disabled Radio Items</ui-heading>
+                <ui-radio-group name="favorite" label="Choose your favorite Star Wars movie">
+                    <ui-radio-item label="A New Hope" value="ep4"/>
+                    <ui-radio-item label="Empire Strikes Back" value="ep5" />
+                    <ui-radio-item label="Return of the Jedi" value="ep6" />
+                    <ui-radio-item disabled label="the Force Awakens" value="ep7" />
+                    <ui-radio-item disabled label="The Last Jedi" value="ep8" />
+                    <ui-radio-item disabled label="The Rise of Skywalker" value="ep9" />
+                </ui-radio-group>
+            </section>
+
+            <section class="space-y-4">
+                <ui-heading size="lg">Select</ui-heading>
+                <div class="flex">
+                    <ui-select
+                        icon="money-bag-dollar"
+                        class="w-full"
+                        label="Favorite band"
+                        :options="[
+                            { label: 'The Midnight', value: 'the_midnight' },
+                            { label: 'The 1975', value: 'the_1975' },
+                            { label: 'Sunglasses Kid', value: 'sunglasses_kid' }
+                        ]"
+                    />
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <ui-heading size="lg">Separator</ui-heading>
+                <div class="flex">
+                    <ui-separator text="vs" />
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <ui-heading size="lg">Splitter</ui-heading>
+                <div class="flex bg-gray-50 rounded-xl p-4 border border-gray-200">
+                    <ui-splitter-group>
+                        <ui-splitter-panel class="flex h-24 items-center justify-center rounded-xl bg-white">
+                            Left
+                    </ui-splitter-panel>
+                    <ui-splitter-resize-handle class="w-3" />
+                    <ui-splitter-panel class="flex h-24 items-center justify-center rounded-xl bg-white">
+                        Right
+                        </ui-splitter-panel>
+                    </ui-splitter-group>
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <ui-heading size="lg">Switch</ui-heading>
+                <div class="flex items-center gap-2">
+                    <ui-switch size="sm" />
+                    <ui-switch  />
+                    <ui-switch size="lg" />
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <ui-heading size="lg">Table</ui-heading>
+                <div class="flex">
+                    <ui-table>
+                        <ui-table-columns>
+                            <ui-table-column>Product</ui-table-column>
+                        <ui-table-column>Stock</ui-table-column>
+                        <ui-table-column class="text-right">Price</ui-table-column>
+                    </ui-table-columns>
+                    <ui-table-rows>
+                        <ui-table-row>
+                            <ui-table-cell>Mechanical Keyboard</ui-table-cell>
+                            <ui-table-cell>
+                                <ui-badge color="green" pill>In Stock</ui-badge>
+                            </ui-table-cell>
+                            <ui-table-cell class="text-right font-semibold text-black">$159.00</ui-table-cell>
+                        </ui-table-row>
+                        <ui-table-row>
+                            <ui-table-cell>Ergonomic Mouse</ui-table-cell>
+                            <ui-table-cell>
+                                <ui-badge color="red" pill>Out of Stock</ui-badge>
+                            </ui-table-cell>
+                            <ui-table-cell class="text-right font-semibold text-black">$89.00</ui-table-cell>
+                        </ui-table-row>
+                        <ui-table-row>
+                            <ui-table-cell>4K Monitor</ui-table-cell>
+                            <ui-table-cell>
+                                <ui-badge color="yellow" pill>Low Stock</ui-badge>
+                            </ui-table-cell>
+                            <ui-table-cell class="text-right font-semibold text-black">$349.00</ui-table-cell>
+                        </ui-table-row>
+                        </ui-table-rows>
+                    </ui-table>
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <ui-heading size="lg">Tabs</ui-heading>
+                <div class="flex">
+                    <ui-tabs default-tab="tab1" class="w-full">
+                        <ui-tab-list>
+                            <ui-tab-trigger text="Shiny" name="tab1" />
+                            <ui-tab-trigger text="Happy" name="tab2" />
+                            <ui-tab-trigger text="People" name="tab3" />
+                        </ui-tab-list>
+                        <ui-tab-content name="tab1">
+                            <p class="py-8">Tab 1 content</p>
+                        </ui-tab-content>
+                        <ui-tab-content name="tab2">
+                            <p class="py-8">Tab 2 content</p>
+                        </ui-tab-content>
+                        <ui-tab-content name="tab3">
+                            <p class="py-8">Tab 3 content</p>
+                        </ui-tab-content>
+                    </ui-tabs>
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <ui-heading size="lg">Textarea</ui-heading>
+                <div class="flex">
+                    <ui-textarea label="Message" />
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <ui-heading size="lg">Tooltip</ui-heading>
+                <div class="flex">
+                    <ui-tooltip text="Never gonna give you up">
+                        <ui-button text="Hover me" />
+                    </ui-tooltip>
+                </div>
+            </section>
+
         </div>
     </div>
-
-    <h2 class="mb-2">Colors</h2>
-    <div class="bg-white dark:bg-black p-10 shadow rounded-lg overflow-hidden mb-16">
-
-        <h6 class="mb-4">grays</h6>
-        {{-- <div class="p-4" style="background: #48606f"></div> --}}
-        <div class="flex flex-row-reverse text-sm text-center mb-8">
-            <div class="text-black bg-blue-100 p-4 flex-1">100</div>
-            <div class="text-black bg-blue-200 p-4 flex-1">200</div>
-            <div class="text-black bg-blue-300 p-4 flex-1">300</div>
-            <div class="text-black bg-blue-400 p-4 flex-1">400</div>
-            <div class="text-black bg-blue p-4 flex-1">def</div>
-            <div class="text-black bg-blue-500 p-4 flex-1">500</div>
-            <div class="text-black bg-blue-600 p-4 flex-1">600</div>
-            <div class="text-black bg-blue-700 p-4 flex-1">700</div>
-            <div class="text-white bg-blue-800 p-4 flex-1">800</div>
-            <div class="text-white bg-blue-900 p-4 flex-1">900</div>
-        </div>
-        <div class="flex flex-row-reverse text-sm text-center mb-8">
-            <div class="text-black bg-white p-4 flex-1">White</div>
-            <div class="text-black bg-gray-100 p-4 flex-1">100</div>
-            <div class="text-black bg-gray-200 p-4 flex-1">200</div>
-            <div class="text-black bg-gray-300 p-4 flex-1">300</div>
-            <div class="text-black bg-gray-400 p-4 flex-1">400</div>
-            <div class="text-black bg-gray-500 p-4 flex-1">500</div>
-            <div class="text-black bg-gray-600 p-4 flex-1">600</div>
-            <div class="text-black bg-gray-700 p-4 flex-1">700</div>
-            <div class="text-white bg-gray-800 p-4 flex-1">800</div>
-            <div class="text-white bg-gray-900 p-4 flex-1">900</div>
-            {{-- <div class="text-white bg-gray-950 p-4 flex-1">950</div> --}}
-            <div class="text-white bg-black p-4 flex-1">Black</div>
-        </div>
-
-        <div class="flex flex-row-reverse text-sm text-center mb-8">
-            <div class="text-black bg-white p-4 flex-1">White</div>
-            <div class="text-black bg-slate-100 p-4 flex-1">100</div>
-            <div class="text-black bg-slate-200 p-4 flex-1">200</div>
-            <div class="text-black bg-slate-300 p-4 flex-1">300</div>
-            <div class="text-black bg-slate-400 p-4 flex-1">400</div>
-            <div class="text-black bg-slate-500 p-4 flex-1">500</div>
-            <div class="text-black bg-slate-600 p-4 flex-1">600</div>
-            <div class="text-black bg-slate-700 p-4 flex-1">700</div>
-            <div class="text-white bg-slate-800 p-4 flex-1">800</div>
-            <div class="text-white bg-slate-900 p-4 flex-1">900</div>
-            <div class="text-white bg-black p-4 flex-1">Black</div>
-        </div>
-
-         <h6 class="mb-4">dark mode</h6>
-        <div class="flex flex-row-reverse overflow-x-auto text-sm text-center mb-8">
-            <div class="text-black bg-white p-4 flex-1">White</div>
-            <div class="text-black bg-dark-100 p-4 flex-1">100</div>
-            <div class="text-black bg-dark-150 p-4 flex-1">150</div>
-            <div class="text-black bg-dark-175 p-4 flex-1">175</div>
-            <div class="text-black bg-dark-200 p-4 flex-1">200</div>
-            <div class="text-black bg-dark-250 p-4 flex-1">250</div>
-            <div class="text-black bg-dark-275 p-4 flex-1">275</div>
-            <div class="text-black bg-dark-300 p-4 flex-1">300</div>
-            <div class="text-black bg-dark-350 p-4 flex-1">350</div>
-            <div class="text-black bg-dark-400 p-4 flex-1">400</div>
-            <div class="text-black bg-dark-500 p-4 flex-1">500</div>
-            <div class="text-black bg-dark-550 p-4 flex-1">550</div>
-            <div class="text-black bg-dark-575 p-4 flex-1">575</div>
-            <div class="text-black bg-dark-600 p-4 flex-1">600</div>
-            <div class="text-black bg-dark-650 p-4 flex-1">650</div>
-            <div class="text-black bg-dark-700 p-4 flex-1">700</div>
-            <div class="text-black bg-dark-750 p-4 flex-1">750</div>
-            <div class="text-white bg-dark-800 p-4 flex-1">800</div>
-            <div class="text-white bg-dark-900 p-4 flex-1">900</div>
-            <div class="text-white bg-dark-950 p-4 flex-1">950</div>
-            <div class="text-white bg-dark-975 p-4 flex-1">975</div>
-            <div class="text-white bg-black p-4 flex-1">Black</div>
-        </div>
-
-        <h6 class="mb-4">Other Colors (needs simplifying)</h6>
-        <div class="flex text-sm text-center">
-            <div class="text-black bg-blue p-6 flex-1">Blue</div>
-            <div class="text-black bg-green-600 p-6 flex-1">Green</div>
-            <div class="text-black bg-orange-light border border-orange p-6 m-1 flex-1">Orange</div>
-            <div class="text-black bg-yellow border border-yellow-dark p-6 m-1 flex-1">Yellow</div>
-            <div class="text-black bg-yellow-dark p-6 m-1 flex-1">Yellow Dark</div>
-            <div class="text-black bg-pink border border-pink-dark m-1 p-6 flex-1">Pink</div>
-            <div class="text-black bg-purple-light border border-purple p-6 flex-1">Purple</div>
-        </div>
-
-        <h6 class="my-4">Reds</h6>
-        <div class="flex text-sm text-center space-x-1 rtl:space-x-reverse">
-            <div class="text-black bg-red-100 border border-red-200 p-6 flex-1">Red Lighter</div>
-            <div class="text-black bg-red-400 p-6 flex-1">Red Light</div>
-            <div class="text-black bg-red-500 p-6 flex-1">Red</div>
-            <div class="text-black bg-red-700 p-6 flex-1">Red Dark</div>
-        </div>
-    </div>
-
-    <h2 class="mb-2">Widgets</h2>
-    <div class="flex flex-wrap -mx-4 mb-8">
-        <div class="w-1/3 px-4">
-            <div class="card px-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="font-bold text-gray">New Users</h3>
-                    <select class="text-xs" name="" id="">
-                        <option value="">30 Days</option>
-                    </select>
-                </div>
-                <div class="text-4xl mb-4">89</div>
-                <div class="flex items-center ">
-                    <span class="w-4 h-4 text-green-500 rtl:ml-2 ltr:mr-2">@cp_svg('icons/light/performance-increase')</span>
-                    <span class="leading-none text-sm">8.54% Increase</span>
-                </div>
-            </div>
-        </div>
-        <div class="w-1/3 px-4">
-            <div class="card px-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="font-bold text-gray">Form Submissions</h3>
-                    <select class="text-xs" name="" id="">
-                        <option value="">7 Days</option>
-                    </select>
-                </div>
-                <div class="text-4xl mb-4">35</div>
-                <div class="flex items-center ">
-                    <span class="w-4 h-4 text-green-500 rtl:ml-2 ltr:mr-2">@cp_svg('icons/light/performance-increase')</span>
-                    <span class="leading-none text-sm">2.15% Increase</span>
-                </div>
-            </div>
-        </div>
-        <div class="w-1/3 px-4">
-            <div class="card bg-gray-900 px-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="font-bold text-gray-400">New Users</h3>
-                    <select class="text-xs" name="" id="" class="bg-gray-800 border-gray-800 text-gray-400">
-                        <option value="">30 Days</option>
-                    </select>
-                </div>
-                <div class="text-4xl mb-4 text-gray-400">251</div>
-                <div class="flex items-center ">
-                    <span class="w-4 h-4 text-green-500 rtl:ml-2 ltr:mr-2">@cp_svg('icons/light/performance-increase')</span>
-                    <span class="leading-none text-gray-400 text-sm">8.54% Increase</span>
-                </div>
-            </div>
-        </div>
-    </div>
-@stop
+@endsection

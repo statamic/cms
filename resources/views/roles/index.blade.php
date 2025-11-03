@@ -1,37 +1,35 @@
-@php use function Statamic\trans as __; @endphp
+@php
+    use function Statamic\trans as __;
+@endphp
 
 @extends('statamic::layout')
-@section('title', __('Roles'))
+@section('title', __('Roles & Permissions'))
 
 @section('content')
+    <ui-header title="{{ __('Roles & Permissions') }}" icon="permissions">
+        <ui-command-palette-item
+            category="{{ Statamic\CommandPalette\Category::Actions }}"
+            text="{{ __('Create Role') }}"
+            url="{{ cp_route('roles.create') }}"
+            icon="permissions"
+            prioritize
+            v-slot="{ text, url }"
+        >
+            <ui-button
+                :text="text"
+                :href="url"
+                variant="primary"
+            ></ui-button>
+        </ui-command-palette-item>
+    </ui-header>
 
-    @unless($roles->isEmpty())
+    <role-listing
+        :initial-rows="{{ json_encode($roles) }}"
+        :initial-columns="{{ json_encode($columns) }}"
+    ></role-listing>
 
-        <header class="flex items-center justify-between mb-6">
-            <h1>{{ __('Roles & Permissions') }}</h1>
-            <a href="{{ cp_route('roles.create') }}" class="btn-primary">{{ __('Create Role') }}</a>
-        </header>
-
-        <role-listing
-            :initial-rows="{{ json_encode($roles) }}"
-            :initial-columns="{{ json_encode($columns) }}">
-        </role-listing>
-
-    @else
-
-        @include('statamic::partials.empty-state', [
-            'title' => __('Roles & Permissions'),
-            'description' => __('statamic::messages.role_intro'),
-            'svg' => 'empty/users',
-            'button_text' => __('Create Role'),
-            'button_url' => cp_route('roles.create'),
-        ])
-
-    @endunless
-
-    @include('statamic::partials.docs-callout', [
-        'topic' => __('Roles & Permissions'),
-        'url' => Statamic::docsUrl('users#permissions')
-    ])
-
+    <x-statamic::docs-callout
+        :topic="__('Roles & Permissions')"
+        :url="Statamic::docsUrl('users#permissions')"
+    />
 @endsection

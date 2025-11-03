@@ -2,12 +2,16 @@
 
 namespace Statamic\Events;
 
-class GlobalVariablesDeleted extends Event
-{
-    public $variables;
+use Statamic\Contracts\Git\ProvidesCommitMessage;
 
-    public function __construct($variables)
+class GlobalVariablesDeleted extends Event implements ProvidesCommitMessage
+{
+    public function __construct(public $variables)
     {
-        $this->variables = $variables;
+    }
+
+    public function commitMessage()
+    {
+        return __('Global variables deleted', [], config('statamic.git.locale'));
     }
 }

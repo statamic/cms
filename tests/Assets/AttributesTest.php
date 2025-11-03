@@ -6,6 +6,7 @@ use Facades\Statamic\Assets\ExtractInfo;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\Asset;
 use Statamic\Assets\Attributes;
@@ -78,23 +79,37 @@ class AttributesTest extends TestCase
     }
 
     #[Test]
-    public function it_gets_the_attributes_of_video_file()
+    #[DataProvider('videoProvider')]
+    public function it_gets_the_attributes_of_video_file($playtimeSeconds, $resolutionX, $resolutionY, $rotate, $expected)
     {
         $asset = (new Asset)
             ->container(AssetContainer::make('test-container')->disk('test'))
             ->path('path/to/asset.mp4');
 
         ExtractInfo::shouldReceive('fromAsset')->with($asset)->andReturn([
-            'playtime_seconds' => 13,
+            'playtime_seconds' => $playtimeSeconds,
             'video' => [
-                'resolution_x' => 1920,
-                'resolution_y' => 1080,
+                'resolution_x' => $resolutionX,
+                'resolution_y' => $resolutionY,
+                'rotate' => $rotate,
             ],
         ]);
 
         $attributes = $this->attributes->asset($asset);
 
-        $this->assertEquals(['duration' => 13, 'width' => 1920, 'height' => 1080], $attributes->get());
+        $this->assertEquals($expected, $attributes->get());
+    }
+
+    public static function videoProvider()
+    {
+        return [
+            'not rotated' => [13, 1920, 1080, null, ['duration' => 13, 'width' => 1920, 'height' => 1080]],
+            'rotated 90' => [13, 1920, 1080, 90, ['duration' => 13, 'width' => 1080, 'height' => 1920]],
+            'rotated -90' => [13, 1920, 1080, -90, ['duration' => 13, 'width' => 1080, 'height' => 1920]],
+            'rotated 270' => [13, 1920, 1080, 270, ['duration' => 13, 'width' => 1080, 'height' => 1920]],
+            'rotated -270' => [13, 1920, 1080, -270, ['duration' => 13, 'width' => 1080, 'height' => 1920]],
+            'rotated 180' => [13, 1920, 1080, 180, ['duration' => 13, 'width' => 1920, 'height' => 1080]],
+        ];
     }
 
     #[Test]

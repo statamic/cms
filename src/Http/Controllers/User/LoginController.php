@@ -2,32 +2,66 @@
 
 namespace Statamic\Http\Controllers\User;
 
+use Illuminate\Auth\Events\Failed;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Statamic\Auth\ThrottlesLogins;
+use Statamic\Facades\User;
+use Statamic\Http\Controllers\Concerns\HandlesLogins;
 use Statamic\Http\Controllers\Controller;
 use Statamic\Http\Requests\UserLoginRequest;
 
 class LoginController extends Controller
 {
-    use ThrottlesLogins;
+    use HandlesLogins;
 
     public function login(UserLoginRequest $request)
     {
-        if ($this->hasTooManyLoginAttempts($request)) {
-            $this->fireLockoutEvent($request);
+        $this->handleTooManyLoginAttempts($request);
 
-            return $this->sendLockoutResponse($request);
+        $user = User::fromUser($this->validateCredentials($request));
+
+        if ($user->hasEnabledTwoFactorAuthentication()) {
+            return $this->twoFactorChallengeResponse($request, $user);
         }
 
-        if (Auth::attempt($request->only('email', 'password'), $request->has('remember'))) {
-            return redirect($request->input('_redirect', '/'))->withSuccess(__('Login successful.'));
-        }
+        $this->authenticate($request, $user);
 
-        $this->incrementLoginAttempts($request);
+        return redirect($request->input('_redirect', '/'))->withSuccess(__('Login successful.'));
+    }
 
+    protected function twoFactorChallengeRedirect(): string
+    {
+        return route('statamic.two-factor-challenge');
+    }
+
+    /**
+     * Throw a failed authentication validation exception.
+     *
+     * @return void
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    protected function throwFailedAuthenticationException(Request $request)
+    {
         $errorResponse = $request->has('_error_redirect') ? redirect($request->input('_error_redirect')) : back();
 
-        return $errorResponse->withInput()->withErrors(__('Invalid credentials.'));
+        throw new HttpResponseException($errorResponse->withInput()->withErrors(__('Invalid credentials.')));
+    }
+
+    /**
+     * Fire the failed authentication attempt event with the given arguments.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
+     * @return void
+     */
+    protected function fireFailedEvent($request, $user = null)
+    {
+        event(new Failed(Auth::getName(), $user, [
+            $this->username() => $request->{$this->username()},
+            'password' => $request->password,
+        ]));
     }
 
     public function logout()

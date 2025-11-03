@@ -4,13 +4,16 @@ namespace Statamic\Forms;
 
 use DebugBar\DataCollector\ConfigCollector;
 use DebugBar\DebugBarException;
+use Illuminate\Support\Collection;
 use Statamic\Contracts\Forms\Form as FormContract;
+use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\URL;
 use Statamic\Forms\JsDrivers\JsDriver;
 use Statamic\Support\Arr;
+use Statamic\Support\Html;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags as BaseTags;
@@ -51,7 +54,7 @@ class Tags extends BaseTags
     {
         $this->context['form'] = $this->params->get(static::HANDLE_PARAM);
 
-        return [];
+        return $this->parse();
     }
 
     /**
@@ -103,6 +106,8 @@ class Tags extends BaseTags
             $attrs = array_merge($attrs, $jsDriver->addToFormAttributes($form));
         }
 
+        $attrs = $this->runHooks('attrs', ['attrs' => $attrs, 'data' => $data])['attrs'];
+
         $params = [];
 
         if ($redirect = $this->getRedirectUrl()) {
@@ -113,7 +118,7 @@ class Tags extends BaseTags
             $params['error_redirect'] = $this->parseRedirect($errorRedirect);
         }
 
-        if (! $this->parser) {
+        if (! $this->canParseContents()) {
             return array_merge([
                 'attrs' => $this->formAttrs($action, $method, $knownParams, $attrs),
                 'params' => $this->formMetaPrefix($this->formParams($method, $params)),
@@ -121,11 +126,13 @@ class Tags extends BaseTags
         }
 
         $html = $this->formOpen($action, $method, $knownParams, $attrs);
+        $html = $this->runHooks('after-open', ['html' => $html, 'data' => $data])['html'];
 
         $html .= $this->formMetaFields($params);
 
         $html .= $this->parse($data);
 
+        $html = $this->runHooks('before-close', ['html' => $html, 'data' => $data])['html'];
         $html .= $this->formClose();
 
         if ($jsDriver) {
@@ -133,6 +140,51 @@ class Tags extends BaseTags
         }
 
         return $html;
+    }
+
+    /**
+     * Maps to {{ form:fields }}.
+     *
+     * @return string
+     */
+    public function fields()
+    {
+        $isBlade = $this->isAntlersBladeComponent();
+
+        $scope = $this->params->get('scope');
+
+        $slot = new RenderableFieldSlot(
+            html: $this->content,
+            scope: $scope,
+            isBlade: $isBlade,
+        );
+
+        collect($this->context['fields'])
+            ->each(fn ($field) => $field['field']->slot($slot));
+
+        $context = $this->context->all();
+
+        $fields = Arr::get($context, 'fields', []);
+
+        if ($handle = $this->params->get('get')) {
+            $context['fields'] = $this->dottedContextFields($fields, recursive: true)->only($handle)->values()->all();
+        } elseif ($only = $this->params->get('only')) {
+            $context['fields'] = $this->dottedContextFields($fields)->only(explode('|', $only))->values()->all();
+        } elseif ($except = $this->params->get('except')) {
+            $context['fields'] = $this->dottedContextFields($fields)->except(explode('|', $except))->values()->all();
+        }
+
+        if ($isBlade) {
+            return $this->tagRenderer->render('@foreach($fields as $field)'.$this->content.'@endforeach', $context);
+        }
+
+        $params = '';
+
+        if ($scope) {
+            $params = Html::attributes(['scope' => $scope]);
+        }
+
+        return Antlers::parse('{{ fields '.$params.' }}'.$this->content.'{{ /fields }}', $context);
     }
 
     /**
@@ -164,9 +216,13 @@ class Tags extends BaseTags
     public function success()
     {
         $sessionHandle = $this->sessionHandle();
+        $successMessage = $this->getFromFormSession($sessionHandle, 'success');
 
-        // TODO: Should probably output success string instead of `true` boolean for consistency.
-        return $this->getFromFormSession($sessionHandle, 'success');
+        if ($this->isAntlersBladeComponent() && $this->isPair) {
+            return str($successMessage)->length() > 0;
+        }
+
+        return $successMessage;
     }
 
     /**
@@ -177,7 +233,7 @@ class Tags extends BaseTags
     public function submission()
     {
         if ($this->success()) {
-            return session('submission')->toArray();
+            return $this->aliasedResult(session('submission')->toArray());
         }
     }
 
@@ -383,5 +439,18 @@ class Tags extends BaseTags
         return URL::prependSiteUrl(
             config('statamic.routes.action').'/form/'.$url
         );
+    }
+
+    private function dottedContextFields(array $fields, $recursive = false, array &$dotted = []): Collection
+    {
+        foreach ($fields as $field) {
+            $dotted[$field['handle']] = $field;
+
+            if ($recursive && $fields = Arr::get($field, 'fields')) {
+                $this->dottedContextFields($fields, $recursive, $dotted);
+            }
+        }
+
+        return collect($dotted);
     }
 }

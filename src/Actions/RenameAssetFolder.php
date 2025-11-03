@@ -7,9 +7,11 @@ use Statamic\Rules\AlphaDashSpace;
 
 class RenameAssetFolder extends Action
 {
+    protected $icon = 'folder-edit';
+
     public static function title()
     {
-        return __('Rename Folder');
+        return __('Rename');
     }
 
     public function visibleTo($item)
@@ -47,7 +49,10 @@ class RenameAssetFolder extends Action
                 'validate' => ['required', 'string', new AlphaDashSpace],
                 'classes' => 'mousetrap',
                 'focus' => true,
+                'default' => $value = $this->items->containsOneItem() ? $this->items->first()->basename() : null,
+                'placeholder' => $value,
                 'debounce' => false,
+                'autoselect' => true,
             ],
         ];
     }

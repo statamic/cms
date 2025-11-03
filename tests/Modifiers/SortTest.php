@@ -4,6 +4,7 @@ namespace Tests\Modifiers;
 
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\Query\Builder;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -107,11 +108,29 @@ class SortTest extends TestCase
         $this->assertNotCount(1, $combinations);
     }
 
-    public function modify($arr, $args = [])
+    #[Test]
+    public function it_sorts_builders(): void
     {
-        $modified = Modify::value($arr)->sort($args)->fetch();
+        $query = \Mockery::mock(Builder::class);
+
+        $query->shouldReceive('inRandomOrder')->once()->andReturnSelf();
+        $limited = $this->modify($query, 'random');
+        $this->assertSame($query, $limited);
+
+        $query->shouldReceive('orderBy')->with('title', 'asc')->once()->andReturnSelf();
+        $limited = $this->modify($query, 'title');
+        $this->assertSame($query, $limited);
+
+        $query->shouldReceive('orderBy')->with('title', 'desc')->once()->andReturnSelf();
+        $limited = $this->modify($query, ['title', 'desc']);
+        $this->assertSame($query, $limited);
+    }
+
+    public function modify($value, $args = [])
+    {
+        $modified = Modify::value($value)->sort($args)->fetch();
 
         // It gets modified to a Collection, but it's easier to write tests as arrays.
-        return $modified->all();
+        return $value instanceof Builder ? $modified : $modified->all();
     }
 }

@@ -32,16 +32,8 @@ class ExportableModule extends Module
     {
         $this
             ->exportPaths()
-            ->each(fn ($path) => $this->exportPath(
+            ->each(fn ($path) => $this->exportRelativePath(
                 from: $path,
-                starterKitPath: $starterKitPath,
-            ));
-
-        $this
-            ->exportAsPaths()
-            ->each(fn ($to, $from) => $this->exportPath(
-                from: $from,
-                to: $to,
                 starterKitPath: $starterKitPath,
             ));
     }
@@ -105,15 +97,14 @@ class ExportableModule extends Module
      */
     protected function ensureNotExportingComposerJson(): self
     {
-        // Here we'll ensure both `export_as` values and keys are included,
-        // because we want to make sure `composer.json` is referenced on either end.
-        $flattenedExportPaths = $this
-            ->exportPaths()
-            ->merge($this->exportAsPaths())
-            ->merge($this->exportAsPaths()->keys());
+        $paths = $this->exportPaths();
 
-        if ($flattenedExportPaths->contains('composer.json')) {
-            throw new StarterKitException('Cannot export [composer.json]. Please use `dependencies` array!');
+        if ($paths->contains('starter-kit.yaml')) {
+            throw new StarterKitException('Cannot export [starter-kit.yaml] config.');
+        }
+
+        if ($paths->contains('composer.json')) {
+            throw new StarterKitException('Cannot export [composer.json]. Please use `dependencies` array.');
         }
 
         return $this;
@@ -128,10 +119,9 @@ class ExportableModule extends Module
     {
         $this
             ->exportPaths()
-            ->merge($this->exportAsPaths()->keys())
             ->reject(fn ($path) => $this->files->exists(base_path($path)))
             ->each(function ($path) {
-                throw new StarterKitException("Cannot export [{$path}], because it does not exist in your app!");
+                throw new StarterKitException("Cannot export [{$path}], because it does not exist in your app.");
             });
 
         return $this;
@@ -153,7 +143,7 @@ class ExportableModule extends Module
             ->exportableDependencies()
             ->reject(fn ($dependency) => $installedDependencies->contains($dependency))
             ->each(function ($dependency) {
-                throw new StarterKitException("Cannot export [{$dependency}], because it does not exist in your composer.json!");
+                throw new StarterKitException("Cannot export [{$dependency}], because it does not exist in your composer.json.");
             });
 
         return $this;

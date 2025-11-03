@@ -174,7 +174,7 @@ class ThumbnailController extends Controller
     /**
      * If an image is deemed too large for thumbnail generation, we'll give it a placeholder icon.
      *
-     * @return \Illuminate\Http\RedirectResponse|null
+     * @return \Illuminate\Http\Response
      */
     private function getPlaceholderResponse()
     {
@@ -185,6 +185,6 @@ class ThumbnailController extends Controller
             return;
         }
 
-        return redirect(Statamic::cpAssetUrl('svg/filetypes/picture.svg'));
+        return response(Statamic::svg('filetypes/picture'))->header('Content-Type', 'image/svg+xml');
     }
 }

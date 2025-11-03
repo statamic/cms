@@ -7,6 +7,8 @@ use Statamic\Facades;
 
 class ReplaceAsset extends Action
 {
+    protected $icon = 'replace';
+
     public static function title()
     {
         return __('Replace');
@@ -59,7 +61,7 @@ class ReplaceAsset extends Action
                 'display' => __('New Asset'),
                 'type' => 'assets',
                 'container' => $this->context['container'],
-                'folder' => $this->context['folder'],
+                'folder' => $this->context['folder'] ?? null,
                 'max_files' => 1,
                 'validate' => 'required',
                 'mode' => 'list',
