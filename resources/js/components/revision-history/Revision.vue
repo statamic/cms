@@ -4,69 +4,66 @@
         :class="{
             'status-working-copy': revision.working,
             'status-published': revision.attributes.published,
+            'bg-ui-accent-bg/5 hover:bg-ui-accent-bg/5 hover:[&_.revision-message]:underline border border-ui-accent-bg rounded-lg': revision.attributes.current,
         }"
         @click="open"
     >
-        <div v-if="revision.message" class="revision-item-note truncate" v-text="revision.message" />
+        <div class="flex gap-3">
+            <Avatar v-if="revision.user && revision.user.avatar" :user="revision.user" class="size-6 shrink-0 mt-1" />
 
-        <div class="flex items-center gap-2">
-            <Avatar v-if="revision.user && revision.user.avatar" :user="revision.user" class="size-6 shrink-0" />
-
-            <div class="revision-item-content flex w-full">
-                <div class="flex-1">
-                    <Subheading>
-                        <template v-if="revision.user">
-                            {{ revision.user.name || revision.user.email }} &ndash;
-                        </template>
-                        {{ time }}
-                    </Subheading>
-                </div>
-
-                <div class="flex items-center gap-1">
-                    <Badge
-                        size="sm"
-                        :color="
-                            revision.working
-                                ? 'gray'
-                                : {
-                                      publish: 'green',
-                                      revision: 'gray',
-                                      restore: 'gray',
-                                      unpublish: 'red',
-                                  }[revision.action]
-                        "
-                        :text="
-                            revision.working
-                                ? __('Working Copy')
-                                : {
-                                      publish: __('Published'),
-                                      revision: __('Revision'),
-                                      restore: __('Restored'),
-                                      unpublish: __('Unpublished'),
-                                  }[revision.action]
-                        "
-                    />
-                    <Badge size="sm" color="orange" v-if="revision.attributes.current" v-text="__('Current')" />
-                </div>
-
-                <revision-preview
-                    v-if="showDetails"
-                    :revision="revision"
-                    component="entry-publish-form"
-                    :component-props="componentProps"
-                    @closed="showDetails = false"
-                >
-                    <template #action-buttons-right>
-                        <restore-revision
-                            v-if="canRestoreRevisions"
-                            :revision="revision"
-                            :url="restoreUrl"
-                            :reference="reference"
-                            class="ltr:ml-4 rtl:mr-4"
-                        />
+            <div class="grid gap-1">
+                <div v-if="revision.message" class="revision-message font-medium" v-text="revision.message" />
+                <Subheading class="text-xs text-gray-500">
+                    {{ time }}
+                    <template v-if="revision.user">
+                        by {{ revision.user.name || revision.user.email }}
                     </template>
-                </revision-preview>
+                </Subheading>
             </div>
+
+            <div class="flex items-center gap-1 ml-auto">
+                <Badge
+                    size="sm"
+                    :color="
+                        revision.working
+                            ? 'gray'
+                            : {
+                                  publish: 'green',
+                                  revision: 'gray',
+                                  restore: 'gray',
+                                  unpublish: 'red',
+                              }[revision.action]
+                    "
+                    :text="
+                        revision.working
+                            ? __('Working Copy')
+                            : {
+                                  publish: __('Published'),
+                                  revision: __('Revision'),
+                                  restore: __('Restored'),
+                                  unpublish: __('Unpublished'),
+                              }[revision.action]
+                    "
+                />
+            </div>
+
+            <revision-preview
+                v-if="showDetails"
+                :revision="revision"
+                component="entry-publish-form"
+                :component-props="componentProps"
+                @closed="showDetails = false"
+            >
+                <template #action-buttons-right>
+                    <restore-revision
+                        v-if="canRestoreRevisions"
+                        :revision="revision"
+                        :url="restoreUrl"
+                        :reference="reference"
+                        class="ltr:ml-4 rtl:mr-4"
+                    />
+                </template>
+            </revision-preview>
         </div>
     </div>
 </template>

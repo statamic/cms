@@ -17,8 +17,8 @@
             </Heading>
 
             <div v-for="group in revisions" :key="group.day">
-                <Heading size="sm" class="p-3" v-text="formatRelativeDate(group.day)" />
-                <div class="divide-y divide-gray-200 dark:divide-gray-900">
+                <Heading size="sm" class="p-3 text-gray-600" v-text="formatRelativeDate(group.day)" />
+                <div class="grid gap-3">
                     <revision
                         v-for="revision in group.revisions"
                         :key="revision.date"
