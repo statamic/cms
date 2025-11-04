@@ -1,11 +1,12 @@
 <template>
     <div
-        class="relative block cursor-pointer space-y-2 px-3 py-2 text-sm hover:[&_.revision-message]:underline"
+        class="relative block cursor-pointer space-y-2 px-3 py-2 text-sm hover:[&_.revision-message]:underline last:bg-white dark:last:bg-gray-800"
         :class="{
             'status-working-copy': revision.working,
             'status-published': revision.attributes.published,
-            'bg-ui-accent-bg/5 hover:bg-ui-accent-bg/5 border border-ui-accent-bg rounded-lg': revision.attributes.current,
+            'border border-ui-accent-bg rounded-lg py-2.5': revision.attributes.current,
         }"
+        :style="revision.attributes.current ? { background: 'hsl(from var(--theme-color-ui-accent-bg) h s 97)' } : {}"
         @click="open"
     >
         <div class="flex gap-3">
@@ -13,7 +14,7 @@
 
             <div class="grid gap-1">
                 <div v-if="revision.message" class="revision-message font-medium" v-text="revision.message" />
-                <Subheading class="text-xs text-gray-500">
+                <Subheading class="text-xs text-gray-500!" :class="{ 'text-gray-700!': revision.attributes.current }">
                     {{ time }}
                     <template v-if="revision.user">
                         by {{ revision.user.name || revision.user.email }}
