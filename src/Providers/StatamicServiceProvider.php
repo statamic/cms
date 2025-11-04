@@ -27,7 +27,6 @@ class StatamicServiceProvider extends AggregateServiceProvider
         MarkdownServiceProvider::class,
         \Statamic\Search\ServiceProvider::class,
         \Statamic\StaticCaching\ServiceProvider::class,
-        \Statamic\Revisions\ServiceProvider::class,
         CpServiceProvider::class,
         RouteServiceProvider::class,
         BroadcastServiceProvider::class,
