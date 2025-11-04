@@ -6,6 +6,7 @@
             'status-published': revision.attributes.published,
             'border border-ui-accent-bg dark:border-dark-ui-accent-bg/90 rounded-lg py-2.5 bg-[hsl(from_var(--theme-color-ui-accent-bg)_h_s_97)] dark:bg-[hsl(from_var(--theme-color-dark-ui-accent-bg)_h_40_20)]': revision.attributes.current,
         }"
+        v-tooltip="revision.attributes.current ? __('Current Revision') : null"
         @click="open"
     >
         <div class="flex gap-3">
