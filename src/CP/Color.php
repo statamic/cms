@@ -431,10 +431,6 @@ class Color
 
     public static function cssVariables(): string
     {
-        if (is_string(static::theme())) {
-            return File::get(resource_path('themes/'.static::theme().'.css'));
-        }
-
         return collect(static::theme())
             ->map(fn ($color, $name) => "--theme-color-{$name}: {$color};")
             ->implode("\n");
