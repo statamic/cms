@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Users;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Exceptions\NotFoundHttpException;
@@ -39,10 +40,17 @@ class UsersController extends CpController
             return $this->json($request);
         }
 
-        return view('statamic::users.index', [
+        return Inertia::render('users/Index', [
             'filters' => Scope::filters('users', $context = [
                 'blueprints' => ['user'],
             ]),
+            'sortColumn' => config('statamic.users.sort_field', 'email'),
+            'sortDirection' => config('statamic.users.sort_direction', 'asc'),
+            'actionUrl' => cp_route('users.actions.run'),
+            'createUrl' => cp_route('users.create'),
+            'editBlueprintUrl' => cp_route('blueprints.users.edit'),
+            'canCreate' => User::current()->can('create', UserContract::class),
+            'canConfigureFields' => User::current()->can('configure fields'),
         ]);
     }
 
@@ -159,7 +167,15 @@ class UsersController extends CpController
             return $viewData;
         }
 
-        return view('statamic::users.create', $viewData);
+        return Inertia::render('users/Create', array_merge($viewData, [
+            'route' => cp_route('users.store'),
+            'usersIndexUrl' => cp_route('users.index'),
+            'usersCreateUrl' => cp_route('users.create'),
+            'canCreateSupers' => User::current()->isSuper(),
+            'canAssignRoles' => User::current()->can('assign roles'),
+            'canAssignGroups' => User::current()->can('assign user groups'),
+            'activationExpiry' => $expiry,
+        ]));
     }
 
     public function store(Request $request)
@@ -257,6 +273,7 @@ class UsersController extends CpController
                 'password' => cp_route('users.password.update', $user->id()),
                 'editBlueprint' => cp_route('blueprints.users.edit'),
             ],
+            'canEditBlueprint' => User::current()->can('configure fields'),
             'canEditPassword' => User::fromUser($request->user())->can('editPassword', $user),
             'requiresCurrentPassword' => $isCurrentUser = $request->user()->id === $user->id(),
             'itemActions' => Action::for($user, ['view' => 'form']),
@@ -279,7 +296,9 @@ class UsersController extends CpController
             return $viewData;
         }
 
-        return view('statamic::users.edit', $viewData);
+        return Inertia::render('users/Edit', array_merge($viewData, [
+            'itemActionUrl' => cp_route('users.actions.run'),
+        ]));
     }
 
     public function update(Request $request, $user)

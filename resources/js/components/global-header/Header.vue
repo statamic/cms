@@ -7,8 +7,6 @@ import ViewSiteButton from './ViewSiteButton.vue';
 import UserDropdown from './UserDropdown.vue';
 import { Badge, Tooltip } from '@statamic/ui';
 import { useReactiveStatamicPageProps } from '@/composables/page-props.js';
-
-const { isInertia } = useReactiveStatamicPageProps();
 </script>
 
 <template>
@@ -25,9 +23,6 @@ const { isInertia } = useReactiveStatamicPageProps();
         </div>
 
         <div class="dark flex-1 flex gap-1 md:gap-2 lg:gap-2 sm:gap-3 items-center justify-end shrink-0">
-            <Tooltip text="This page is rendered using a traditional Blade view, not Inertia. This badge is temporary.">
-                <Badge v-if="!isInertia" text="Blade" color="yellow" class="cursor-help" />
-            </Tooltip>
             <SiteSelector />
             <div class="flex items-center">
                 <Search />

@@ -3,7 +3,7 @@ import { Link } from '@inertiajs/vue3';
 import Head from '@/pages/layout/Head.vue';
 import { Header, CardPanel, Icon, Badge, DocsCallout } from '@ui';
 
-const props = defineProps([
+defineProps([
     'defaultPreferences',
     'defaultPreferencesUrl',
     'roles',

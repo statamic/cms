@@ -42,18 +42,23 @@
                     <ui-icon name="x" class="size-3 text-gray-400 dark:text-gray-600" v-else />
                 </div>
             </template>
+            <template #prepended-row-actions="{ row: user }">
+                <DropdownItem :text="__('Edit')" :href="user.edit_url" icon="edit" v-if="user.editable" />
+                <DropdownItem :text="__('View')" :href="user.edit_url" icon="eye" v-else />
+            </template>
         </Listing>
     </div>
 </template>
 
 <script>
-import { Listing } from '@/components/ui';
+import { Listing, DropdownItem } from '@/components/ui';
 import { Link } from '@inertiajs/vue3';
 
 export default {
     components: {
         Link,
         Listing,
+        DropdownItem,
     },
 
     props: {

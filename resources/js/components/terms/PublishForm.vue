@@ -2,12 +2,7 @@
     <div>
         <Header>
             <template #title>
-                <span
-                    v-if="!isCreating"
-                    class="little-dot -top-1"
-                    :class="activeLocalization.published ? 'published' : 'draft'"
-                    v-tooltip="__(activeLocalization.status)"
-                />
+                <StatusIndicator v-if="!isCreating" :status="activeLocalization.status" />
                 {{ formattedTitle }}
             </template>
 
@@ -149,16 +144,19 @@ import {
     PublishComponents,
     PublishLocalizations as LocalizationsCard,
     LivePreview,
+    StatusIndicator,
 } from '@ui';
 import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
 import { ref, computed } from 'vue';
 import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';
 import ItemActions from '@/components/actions/ItemActions.vue';
+import { router } from '@inertiajs/vue3';
 
 export default {
     mixins: [HasPreferences, HasActions],
 
     components: {
+        StatusIndicator,
         ItemActions,
         Header,
         Badge,
@@ -362,17 +360,17 @@ export default {
 
                     // If the user has opted to create another entry, redirect them to create page.
                     if (!this.isInline && this.afterSaveOption === 'create_another') {
-                        window.location = this.createAnotherUrl;
+                        this.redirectTo(this.createAnotherUrl);
                     }
 
                     // If the user has opted to go to listing (default/null option), redirect them there.
                     else if (!this.isInline && nextAction === null) {
-                        window.location = this.listingUrl;
+                        this.redirectTo(this.listingUrl);
                     }
 
                     // If the edit URL was changed (i.e. the term slug was updated), redirect them there.
                     else if (window.location.href !== response.data.data.edit_url) {
-                        window.location = response.data.data.edit_url;
+                        this.redirectTo(response.data.data.edit_url);
                     }
 
                     // Otherwise, leave them on the edit form and emit an event. We need to wait until after
@@ -489,6 +487,10 @@ export default {
                 action: action.run,
             }));
         },
+
+        redirectTo(location) {
+            router.get(location);
+        }
     },
 
     mounted() {
