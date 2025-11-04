@@ -1,10 +1,10 @@
 <template>
     <div
-        class="block cursor-pointer space-y-2 px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-900"
+        class="relative block cursor-pointer space-y-2 px-3 py-2 text-sm hover:[&_.revision-message]:underline"
         :class="{
             'status-working-copy': revision.working,
             'status-published': revision.attributes.published,
-            'bg-ui-accent-bg/5 hover:bg-ui-accent-bg/5 hover:[&_.revision-message]:underline border border-ui-accent-bg rounded-lg': revision.attributes.current,
+            'bg-ui-accent-bg/5 hover:bg-ui-accent-bg/5 border border-ui-accent-bg rounded-lg': revision.attributes.current,
         }"
         @click="open"
     >
