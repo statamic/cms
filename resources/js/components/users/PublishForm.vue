@@ -40,7 +40,7 @@
                 :requires-current-password="requiresCurrentPassword"
             />
 
-            <ui-command-palette-item
+            <CommandPaletteItem
                 :category="$commandPalette.category.Actions"
                 :text="__('Save')"
                 icon="save"
@@ -50,7 +50,7 @@
                 v-slot="{ text, action }"
             >
                 <Button variant="primary" @click.prevent="action" :text="text" />
-            </ui-command-palette-item>
+            </CommandPaletteItem>
 
             <slot name="action-buttons-right" />
         </Header>
@@ -85,6 +85,7 @@ import {
     PublishContainer,
     PublishTabs,
     Header,
+    CommandPaletteItem
 } from '@/components/ui';
 import ItemActions from '@/components/actions/ItemActions.vue';
 import { computed, ref } from 'vue';
@@ -105,6 +106,7 @@ export default {
         PublishContainer,
         PublishTabs,
         Header,
+        CommandPaletteItem
     },
 
     props: {

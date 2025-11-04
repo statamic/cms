@@ -9,7 +9,7 @@
                 </DropdownMenu>
             </Dropdown>
 
-            <ui-command-palette-item
+            <CommandPaletteItem
                 v-if="isDirty"
                 :category="$commandPalette.category.Actions"
                 :text="__('Discard changes')"
@@ -22,7 +22,7 @@
                     :text="__('Discard changes')"
                     @click="action"
                 />
-            </ui-command-palette-item>
+            </CommandPaletteItem>
 
             <Dropdown placement="left-start">
                 <template #trigger>
@@ -35,7 +35,7 @@
             </Dropdown>
 
             <ButtonGroup>
-                <ui-command-palette-item
+                <CommandPaletteItem
                     :category="$commandPalette.category.Actions"
                     :text="__('Save')"
                     icon="save"
@@ -44,7 +44,7 @@
                     v-slot="{ text, action }"
                 >
                     <Button type="submit" variant="primary" :disabled="!changed" :text="text" @click="action" />
-                </ui-command-palette-item>
+                </CommandPaletteItem>
 
                 <Dropdown align="end" v-if="hasSaveAsOptions">
                     <template #trigger>
@@ -208,7 +208,7 @@ import TopLevelSectionBranch from '@/components/nav/TopLevelSectionBranch.vue';
 import ItemEditor from '@/components/nav/ItemEditor.vue';
 import SectionEditor from '@/components/nav/SectionEditor.vue';
 import { data_get } from '@/bootstrap/globals.js';
-import { Header, Button, ButtonGroup, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, DropdownLabel, Panel, PanelHeader, Icon } from '@/components/ui';
+import { Header, Button, ButtonGroup, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, DropdownLabel, Panel, PanelHeader, Icon, CommandPaletteItem } from '@/components/ui';
 import { router } from '@inertiajs/vue3';
 
 export default {
@@ -230,6 +230,7 @@ export default {
         Panel,
         PanelHeader,
         Icon,
+        CommandPaletteItem,
     },
 
     props: {
