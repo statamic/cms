@@ -10,7 +10,7 @@
         <div v-if="revision.message" class="revision-item-note truncate" v-text="revision.message" />
 
         <div class="flex items-center gap-2">
-            <avatar v-if="revision.user && revision.user.avatar" :user="revision.user" class="size-6 shrink-0" />
+            <Avatar v-if="revision.user && revision.user.avatar" :user="revision.user" class="size-6 shrink-0" />
 
             <div class="revision-item-content flex w-full">
                 <div class="flex-1">
@@ -75,7 +75,7 @@
 import RestoreRevision from './Restore.vue';
 import RevisionPreview from './Preview.vue';
 import DateFormatter from '@/components/DateFormatter.js';
-import { Subheading, Badge } from '@/components/ui';
+import { Subheading, Badge, Avatar } from '@/components/ui';
 
 export default {
     components: {
@@ -83,6 +83,7 @@ export default {
         RestoreRevision,
         Subheading,
         Badge,
+        Avatar,
     },
 
     props: {
