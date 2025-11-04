@@ -156,9 +156,9 @@ class Revision implements Arrayable, ContainsQueryableValues, Contract
         return $this->action === 'working';
     }
 
-    public function toWorkingCopy()
+    public function toWorkingCopy(): Revision
     {
-        return (new self)
+        return (new static)
             ->action('working')
             ->key($this->key())
             ->date($this->date())
