@@ -93,7 +93,6 @@ export default function registerGlobalComponents(app) {
     app.component('UserWizard', UserWizard);
     app.component('RolePublishForm', RolePublishForm);
     app.component('UserGroupPublishForm', UserGroupPublishForm);
-    app.component('NavBuilder', defineAsyncComponent(() => import('../components/nav/Builder.vue')));
     app.component('ItemActions', ItemActions);
     app.component('BulkActions', BulkActions);
 }
