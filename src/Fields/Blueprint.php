@@ -28,6 +28,8 @@ use Statamic\Facades\Path;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 {
     use ExistsAsFile, HasAugmentedData;
@@ -136,9 +138,8 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
             $namespace = 'vendor/'.$namespace;
         }
 
-        return Path::tidy(vsprintf('%s/%s/%s.yaml', [
-            Facades\Blueprint::directory(),
-            $namespace,
+        return Path::tidy(vsprintf('%s/%s.yaml', [
+            Facades\Blueprint::namespaceDirectory($namespace),
             $this->handle(),
         ]));
     }
@@ -257,7 +258,9 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
                 // override array, but only keys that don't already exist in the actual partial field's config.
                 $referencedField = FieldRepository::find($existingField['field']);
                 $referencedFieldConfig = $referencedField->config();
-                $config = array_merge($config, $referencedFieldConfig);
+                $fieldOverrides = $existingField['config'] ?? [];
+
+                $config = array_merge($config, $referencedFieldConfig, $fieldOverrides);
                 $config = Arr::except($config, array_keys($referencedFieldConfig));
                 $field = ['handle' => $handle, 'field' => $existingField['field'], 'config' => $config];
             } else {
@@ -626,7 +629,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
     private function getTabFields($tab)
     {
         return collect($this->contents['tabs'][$tab]['sections'])->flatMap(function ($section, $sectionIndex) {
-            return collect($section['fields'])->map(function ($field, $fieldIndex) use ($sectionIndex) {
+            return collect($section['fields'] ?? [])->map(function ($field, $fieldIndex) use ($sectionIndex) {
                 return $field + ['fieldIndex' => $fieldIndex, 'sectionIndex' => $sectionIndex];
             });
         })->keyBy('handle');
@@ -646,7 +649,8 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 
         $field = $this->contents['tabs'][$tab]['sections'][$sectionKey]['fields'][$fieldKey];
 
-        $isImportedField = Arr::has($field, 'config');
+        $fieldValue = Arr::get($field, 'field');
+        $isImportedField = is_string($fieldValue);
 
         if ($isImportedField) {
             $existingConfig = Arr::get($field, 'config', []);

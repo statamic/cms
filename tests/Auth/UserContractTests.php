@@ -94,6 +94,15 @@ trait UserContractTests
             return $user->name().'\'s balance is $25 owing.';
         });
 
+        Facades\User::computed([
+            'ocupation' => function ($user) {
+                return 'Smuggler';
+            },
+            'vehicle' => function ($user) {
+                return 'Millennium Falcon';
+            },
+        ]);
+
         $user = $this->makeUser()->data(['name' => 'Han Solo']);
 
         $expectedData = [
@@ -102,6 +111,8 @@ trait UserContractTests
 
         $expectedComputedData = [
             'balance' => 'Han Solo\'s balance is $25 owing.',
+            'ocupation' => 'Smuggler',
+            'vehicle' => 'Millennium Falcon',
         ];
 
         $expectedValues = array_merge($expectedData, $expectedComputedData);

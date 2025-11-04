@@ -191,6 +191,27 @@ class EntryRepositoryTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('entriesByIdsProvider')]
+    public function it_gets_entries_by_ids($ids, $expected)
+    {
+        $actual = $this->repo->whereInId($ids);
+
+        $this->assertInstanceOf(EntryCollection::class, $actual);
+        $this->assertEquals($expected, $actual->map->get('title')->all());
+    }
+
+    public static function entriesByIdsProvider()
+    {
+        return [
+            'no ids' => [[], []],
+            'single' => [['numeric-one'], ['One']],
+            'multiple' => [['numeric-one', 'numeric-two', 'numeric-three'], ['One', 'Two', 'Three']],
+            'missing' => [['numeric-one', 'unknown', 'numeric-three'], ['One', 'Three']],
+            'ordered' => [['numeric-three', 'numeric-one', 'numeric-two'], ['Three', 'One', 'Two']],
+        ];
+    }
+
+    #[Test]
     public function it_saves_an_entry_to_the_stache_and_to_a_file()
     {
         $entry = EntryAPI::make()

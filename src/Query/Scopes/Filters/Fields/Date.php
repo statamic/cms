@@ -17,6 +17,8 @@ class Date extends FieldtypeFilter
                     '<' => __('Before'),
                     '>' => __('After'),
                     'between' => __('Between'),
+                    'null' => __('Empty'),
+                    'not-null' => __('Not empty'),
                 ],
             ],
             'value' => [
@@ -54,7 +56,11 @@ class Date extends FieldtypeFilter
 
         $value = Carbon::parse($values['value']);
 
-        $query->where($handle, $operator, $value);
+        match ($operator) {
+            'null' => $query->whereNull($handle),
+            'not-null' => $query->whereNotNull($handle),
+            default => $query->where($handle, $operator, $value),
+        };
     }
 
     public function badge($values)
