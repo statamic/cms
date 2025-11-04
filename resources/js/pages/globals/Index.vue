@@ -1,7 +1,7 @@
 <script setup>
 import Head from '@/pages/layout/Head.vue';
-import Listing from '@/components/globals/Listing.vue';
-import { Header, CommandPaletteItem, Button, Icon, EmptyStateMenu, EmptyStateItem, DocsCallout } from '@ui';
+import { Link, router } from '@inertiajs/vue3';
+import { Header, CommandPaletteItem, Button, Icon, EmptyStateMenu, EmptyStateItem, CardList, CardListItem, Tooltip, Dropdown, DropdownMenu, DropdownItem, DocsCallout } from '@ui';
 import useArchitecturalBackground from '@/pages/layout/architectural-background.js';
 
 const props = defineProps({
@@ -35,7 +35,21 @@ if (props.globals.length === 0) useArchitecturalBackground();
             </CommandPaletteItem>
         </Header>
 
-        <Listing :initial-globals="globals" />
+        <CardList :heading="__('Title')">
+            <CardListItem v-for="global in globals" :key="global.id">
+                <Tooltip :text="global.handle" :delay="1000">
+                    <Link class="text-sm" :href="global.edit_url">{{ __(global.title) }}</Link>
+                </Tooltip>
+                <Dropdown>
+                    <DropdownMenu>
+                        <DropdownItem :text="__('Edit')" icon="edit" :href="global.edit_url" />
+                        <DropdownItem v-if="global.configurable" :text="__('Configure')" icon="cog" :href="global.configure_url" />
+                        <DropdownItem v-if="global.deleteable" :text="__('Delete')" icon="trash" variant="destructive" @click="$refs[`deleter_${global.id}`][0].confirm()" />
+                    </DropdownMenu>
+                </Dropdown>
+                <resource-deleter :ref="`deleter_${global.id}`" :resource="global" @deleted="() => router.reload()" />
+            </CardListItem>
+        </CardList>
     </template>
 
     <template v-else>

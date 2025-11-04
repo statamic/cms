@@ -24,7 +24,6 @@ import GitStatus from '../components/GitStatus.vue';
 import DateTime from '../components/DateTime.vue';
 import UpdaterWidget from '../components/updater/UpdaterWidget.vue';
 
-import BaseTermCreateForm from '../components/terms/BaseCreateForm.vue';
 import CreateTermButton from '../components/terms/CreateTermButton.vue';
 import BlueprintListing from '../components/blueprints/Listing.vue';
 import BlueprintBuilder from '../components/blueprints/Builder.vue';
@@ -85,7 +84,6 @@ export default function registerGlobalComponents(app) {
     // Temporarily global during intertia migration
     // These are no longer used at the top level since there's now a layout component.
     // Eventually they will be moved into their respective pages.
-    app.component('BaseTermCreateForm', BaseTermCreateForm);
     app.component('CreateTermButton', CreateTermButton);
     app.component('BlueprintListing', BlueprintListing);
     app.component('BlueprintBuilder', BlueprintBuilder);
