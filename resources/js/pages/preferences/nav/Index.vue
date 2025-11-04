@@ -14,9 +14,9 @@ defineProps([
 
 <template>
     <div class="max-w-5xl mx-auto">
-        <Head :title="__('Preferences')" />
+        <Head :title="__('CP Nav Preferences')" />
 
-        <Header :title="__('Preferences')" icon="preferences" />
+        <Header :title="__('CP Nav Preferences')" icon="preferences" />
 
         <section class="space-y-6">
             <CardPanel :heading="__('Global Preferences')">
@@ -44,7 +44,7 @@ defineProps([
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2 sm:gap-3">
                         <Icon name="avatar" />
-                        <Link :href="userPreferencesUrl">{{ __('My Preferences') }}</Link>
+                        <Link :href="userPreferencesUrl">{{ __('My Nav') }}</Link>
                     </div>
 
                     <Badge v-if="Object.keys(userPreferences).length" color="green">{{ __('Modified') }}</Badge>
@@ -52,6 +52,6 @@ defineProps([
             </CardPanel>
         </section>
 
-        <DocsCallout :topic="__('Preferences')" url="preferences" />
+        <DocsCallout :topic="__('Customizing the Control Panel Nav')" url="customizing-the-cp-nav" />
     </div>
 </template>
