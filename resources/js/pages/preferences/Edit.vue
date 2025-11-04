@@ -83,7 +83,6 @@
 <script>
 import { Header, Button, ButtonGroup, Dropdown, DropdownMenu, DropdownItem, DropdownLabel, PublishContainer, PublishTabs, CommandPaletteItem } from '@/components/ui';
 import Head from '@/pages/layout/Head.vue';
-import { router } from '@inertiajs/vue3';
 
 export default {
     components: {
@@ -149,7 +148,7 @@ export default {
                 .patch(url, this.currentValues)
                 .then(() => {
                     this.$refs.container.saved();
-                    this.$nextTick(() => router.reload());
+                    this.$nextTick(() => location.reload());
                 })
                 .catch((e) => this.handleAxiosError(e));
         },
