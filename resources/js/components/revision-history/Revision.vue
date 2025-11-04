@@ -4,7 +4,7 @@
         :class="{
             'status-working-copy': revision.working,
             'status-published': revision.attributes.published,
-            'border border-ui-accent-bg rounded-lg py-2.5 bg-[hsl(from_var(--theme-color-dark-ui-accent-bg)_h_s_97)] dark:bg-[hsl(from_var(--theme-color-dark-ui-accent-bg)_h_40_20)]': revision.attributes.current,
+            'border border-ui-accent-bg rounded-lg py-2.5 bg-[hsl(from_var(--theme-color-ui-accent-bg)_h_s_97)] dark:bg-[hsl(from_var(--theme-color-dark-ui-accent-bg)_h_40_20)]': revision.attributes.current,
         }"
         @click="open"
     >
