@@ -2,12 +2,7 @@
     <div>
         <Header>
             <template #title>
-                <span
-                    v-if="!isCreating"
-                    class="little-dot -top-1"
-                    :class="activeLocalization.published ? 'published' : 'draft'"
-                    v-tooltip="__(activeLocalization.status)"
-                />
+                <StatusIndicator v-if="!isCreating" :status="activeLocalization.status" />
                 {{ formattedTitle }}
             </template>
 
@@ -149,6 +144,7 @@ import {
     PublishComponents,
     PublishLocalizations as LocalizationsCard,
     LivePreview,
+    StatusIndicator,
 } from '@ui';
 import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
 import { ref, computed } from 'vue';
@@ -163,6 +159,7 @@ export default {
     mixins: [HasPreferences, HasActions],
 
     components: {
+        StatusIndicator,
         ItemActions,
         Header,
         Badge,
