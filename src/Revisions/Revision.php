@@ -35,7 +35,7 @@ class Revision implements Arrayable, ContainsQueryableValues, Contract
 
     public function user($user = null)
     {
-        if (is_null($user)) {
+        if (func_num_args() === 0) {
             if ($this->user) {
                 return $this->user;
             }
@@ -162,8 +162,8 @@ class Revision implements Arrayable, ContainsQueryableValues, Contract
             ->action('working')
             ->key($this->key())
             ->date($this->date())
-            ->user($this->user() ?? false)
-            ->message($this->message() ?? false)
+            ->user($this->user() ?? null)
+            ->message($this->message() ?? null)
             ->attributes($this->attributes());
     }
 

@@ -85,7 +85,7 @@ class EntryRevisionsTest extends TestCase
             ->assertJsonPath('0.revisions.0.attributes.item_url', 'http://localhost/cp/collections/blog/entries/1/revisions/'.Carbon::parse('2017-02-01')->timestamp)
 
             ->assertJsonPath('1.revisions.0.action', 'working')
-            ->assertJsonPath('1.revisions.0.message', false)
+            ->assertJsonPath('1.revisions.0.message', null)
             ->assertJsonPath('1.revisions.0.attributes.data.title', 'Title modified in working copy')
             ->assertJsonPath('1.revisions.0.attributes.item_url', null)
 
