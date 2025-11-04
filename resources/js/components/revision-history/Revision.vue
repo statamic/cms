@@ -4,9 +4,8 @@
         :class="{
             'status-working-copy': revision.working,
             'status-published': revision.attributes.published,
-            'border border-ui-accent-bg rounded-lg py-2.5': revision.attributes.current,
+            'border border-ui-accent-bg rounded-lg py-2.5 bg-[hsl(from_var(--theme-color-dark-ui-accent-bg)_h_s_97)] dark:bg-[hsl(from_var(--theme-color-dark-ui-accent-bg)_h_40_20)]': revision.attributes.current,
         }"
-        :style="revision.attributes.current ? { background: 'hsl(from var(--theme-color-ui-accent-bg) h s 97)' } : {}"
         @click="open"
     >
         <div class="flex gap-3">
@@ -14,7 +13,7 @@
 
             <div class="grid gap-1">
                 <div v-if="revision.message" class="revision-message font-medium" v-text="revision.message" />
-                <Subheading class="text-xs text-gray-500!" :class="{ 'text-gray-700!': revision.attributes.current }">
+                <Subheading class="text-xs text-gray-500! dark:text-gray-300!" :class="{ 'text-gray-800! dark:text-white!': revision.attributes.current }">
                     {{ time }}
                     <template v-if="revision.user">
                         by {{ revision.user.name || revision.user.email }}
