@@ -2,15 +2,14 @@
 
 namespace Tests\Feature\Globals;
 
+use Inertia\Testing\AssertableInertia as Assert;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
-use Statamic\Support\Arr;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
-use Inertia\Testing\AssertableInertia as Assert;
 
 class ViewGlobalsListingTest extends TestCase
 {

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Users;
 
+use Inertia\Testing\AssertableInertia as Assert;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
@@ -9,7 +10,6 @@ use Tests\ElevatesSessions;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
-use Inertia\Testing\AssertableInertia as Assert;
 
 #[Group('2fa')]
 #[Group('elevated-session')]
