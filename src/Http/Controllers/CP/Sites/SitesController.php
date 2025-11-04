@@ -25,7 +25,7 @@ class SitesController extends CpController
 
         return Inertia::render('sites/Edit', [
             'blueprint' => $blueprint->toPublishArray(),
-            'values' => $fields->values(),
+            'initialValues' => $fields->values(),
             'meta' => $fields->meta(),
             'updateUrl' => cp_route('sites.update'),
         ]);
