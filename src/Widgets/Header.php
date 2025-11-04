@@ -4,13 +4,16 @@ namespace Statamic\Widgets;
 
 class Header extends Widget
 {
-    public function component()
+    /**
+     * The HTML that should be shown in the widget.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function html()
     {
         $classes = $this->config('classes', 'w-full');
         $text = $this->config('text');
 
-        return VueComponent::render('dynamic-html-renderer', [
-            'html' => "<h2 class=\"{$classes}\">{$text}</h2>",
-        ]);
+        return view('statamic::widgets.header', compact('classes', 'text'));
     }
 }
