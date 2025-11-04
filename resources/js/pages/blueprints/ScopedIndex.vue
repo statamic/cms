@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, watch } from 'vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 import Head from '@/pages/layout/Head.vue';
 import { Header, Button, DocsCallout, DropdownItem, Listing } from '@ui';
 import axios from 'axios';
@@ -42,7 +42,7 @@ function saveOrder() {
 }
 
 function reloadPage() {
-    window.location.reload();
+    router.reload();
 }
 
 function removeRow(row) {

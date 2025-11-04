@@ -209,6 +209,7 @@ import ItemEditor from '@/components/nav/ItemEditor.vue';
 import SectionEditor from '@/components/nav/SectionEditor.vue';
 import { data_get } from '@/bootstrap/globals.js';
 import { Header, Button, ButtonGroup, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, DropdownLabel, Panel, PanelHeader, Icon } from '@/components/ui';
+import { router } from '@inertiajs/vue3';
 
 export default {
     components: {
@@ -691,7 +692,7 @@ export default {
         reset() {
             this.$axios
                 .delete(this.destroyUrl)
-                .then(() => window.location.reload())
+                .then(() => router.reload())
                 .catch(() => this.$toast.error(__('Something went wrong')));
         },
 
@@ -708,7 +709,7 @@ export default {
 
             this.$axios
                 .patch(url, { tree })
-                .then(() => location.reload())
+                .then(() => router.reload())
                 .catch(() => this.$toast.error(__('Something went wrong')));
         },
 

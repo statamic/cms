@@ -2,6 +2,7 @@
 import { Modal, Description, Button } from '@/components/ui';
 import { computed, ref } from 'vue';
 import useStatamicPageProps from '@/composables/page-props.js';
+import { router } from '@inertiajs/vue3';
 
 const { licensing } = useStatamicPageProps();
 const { alert } = licensing;
@@ -20,7 +21,7 @@ function snooze() {
 
 function manageLicenses() {
     snooze();
-    window.location = manageUrl.value;
+    router.get(manageUrl.value);
 }
 </script>
 

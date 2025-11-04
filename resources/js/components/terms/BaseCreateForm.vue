@@ -23,6 +23,8 @@
 </template>
 
 <script>
+import { router } from '@inertiajs/vue3';
+
 export default {
     props: [
         'actions',
@@ -42,7 +44,7 @@ export default {
 
     methods: {
         saved(response) {
-            window.location = response.data.data.edit_url + '?created=true';
+            router.get(response.data.data.edit_url + '?created=true');
         },
     },
 };

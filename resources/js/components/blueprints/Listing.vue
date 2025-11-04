@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watch } from 'vue';
 import { DropdownItem, Listing } from '@/components/ui';
+import { router } from '@inertiajs/vue3';
 
 defineEmits(['reordered']);
 
@@ -21,7 +22,7 @@ watch(
 );
 
 function reloadPage() {
-    window.location.reload();
+    router.reload();
 }
 
 function removeRow(row) {

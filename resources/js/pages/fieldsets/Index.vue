@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 import Head from '@/pages/layout/Head.vue';
 import { Header, Button, DocsCallout, Listing, DropdownItem, CommandPaletteItem, Subheading } from '@ui';
 import FieldsetDeleter from '@/components/fieldsets/FieldsetDeleter.vue';
@@ -18,7 +18,7 @@ const columns = ref([
 ]);
 
 function reloadPage() {
-    window.location.reload();
+    router.reload();
 }
 
 function removeRow(rows, row) {

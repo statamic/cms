@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import Head from '@/pages/layout/Head.vue';
 import { Header, Button, CommandPaletteItem, EmptyStateMenu, EmptyStateItem, DocsCallout, Icon, Listing, DropdownItem } from '@ui';
 import useStatamicPageProps from '@/composables/page-props.js';
-import { Link } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 
 const props = defineProps([
     'forms',
@@ -18,7 +18,7 @@ const { isPro } = useStatamicPageProps();
 const isEmpty = computed(() => props.forms.length === 0);
 
 function refresh() {
-    window.location.reload();
+    router.reload();
 }
 </script>
 

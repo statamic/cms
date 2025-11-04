@@ -194,6 +194,7 @@ import { defineAsyncComponent } from 'vue';
 import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator, Header, Button, ToggleGroup, ToggleItem } from '@/components/ui';
 import ItemActions from '@/components/actions/ItemActions.vue';
 import Head from '@/pages/layout/Head.vue';
+import { router } from '@inertiajs/vue3';
 
 export default {
     components: {
@@ -400,16 +401,16 @@ export default {
         createEntry(blueprint, parent) {
             let url = `${this.createUrl}?blueprint=${blueprint}`;
             if (parent) url += '&parent=' + parent;
-            window.location = url;
+            router.get(url);
         },
 
         editPage(page, $event) {
             const url = page.edit_url;
-            $event.metaKey ? window.open(url) : (window.location = url);
+            $event.metaKey ? window.open(url) : router.get(url);
         },
 
         afterActionSuccessfullyCompleted(response) {
-            if (!response.redirect) window.location.reload();
+            if (!response.redirect) router.reload();
         },
 
         addToCommandPalette() {
