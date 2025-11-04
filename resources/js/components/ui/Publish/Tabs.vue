@@ -107,7 +107,7 @@ function tabHasError(tab) {
                     v-for="tab in mainTabs"
                     :key="tab.handle"
                     :name="tab.handle"
-                    :is="visibleMainTabs.length > 1 ? TabContent : 'template'"
+                    :is="visibleMainTabs.length > 1 ? TabContent : 'div'"
                 >
                     <TabProvider :tab="tab">
                         <slot :tab="tab">
