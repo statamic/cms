@@ -103,7 +103,12 @@ function tabHasError(tab) {
             </TabList>
 
             <div :class="{ 'grid grid-cols-[1fr_320px] gap-8': shouldShowSidebar }">
-                <TabContent v-if="visibleMainTabs.length > 1" v-for="tab in mainTabs" :key="tab.handle" :name="tab.handle">
+                <component
+                    v-for="tab in mainTabs"
+                    :key="tab.handle"
+                    :name="tab.handle"
+                    :is="visibleMainTabs.length > 1 ? TabContent : 'div'"
+                >
                     <TabProvider :tab="tab">
                         <slot :tab="tab">
                             <Sections />
@@ -111,15 +116,7 @@ function tabHasError(tab) {
 
                         <slot v-if="!shouldShowSidebar" name="actions" />
                     </TabProvider>
-                </TabContent>
-
-                <template v-else>
-                    <TabProvider :tab="visibleMainTabs[0]">
-                        <slot :tab="visibleMainTabs[0]">
-                            <Sections />
-                        </slot>
-                    </TabProvider>
-                </template>
+                </component>
 
                 <aside class="space-y-6 starting-style-transition-children" v-if="shouldShowSidebar">
                     <slot name="actions" />
