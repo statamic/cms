@@ -1,6 +1,6 @@
 <template>
     <div
-        class="relative block cursor-pointer space-y-2 px-3 py-2 text-sm hover:[&_.revision-message]:underline last:bg-white dark:last:bg-gray-800"
+        class="relative block cursor-pointer space-y-2 px-3 py-2 last:pt-1 last:mt-1 text-sm hover:[&_.revision-message]:underline last:bg-white dark:last:bg-gray-800"
         :class="{
             'status-working-copy': revision.working,
             'status-published': revision.attributes.published,
