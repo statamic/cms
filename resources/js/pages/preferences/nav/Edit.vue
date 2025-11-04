@@ -693,7 +693,10 @@ export default {
         reset() {
             this.$axios
                 .delete(this.destroyUrl)
-                .then(() => router.reload())
+                .then(() => {
+                    router.reload();
+                    this.confirmingReset = false;
+                })
                 .catch(() => this.$toast.error(__('Something went wrong')));
         },
 
@@ -710,7 +713,10 @@ export default {
 
             this.$axios
                 .patch(url, { tree })
-                .then(() => router.reload())
+                .then(() => {
+                    router.reload();
+                    this.changed = false;
+                })
                 .catch(() => this.$toast.error(__('Something went wrong')));
         },
 
