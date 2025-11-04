@@ -21,14 +21,7 @@ watch(
     { deep: true },
 );
 
-function reloadPage() {
-    router.reload();
-}
-
-function removeRow(row) {
-    const i = rows.value.findIndex((r) => r.id === row.id);
-    rows.value.splice(i, 1);
-}
+const reloadPage = () => router.reload();
 </script>
 
 <template>
@@ -51,7 +44,7 @@ function removeRow(row) {
                 <resource-deleter
                     :ref="`deleter_${blueprint.id}`"
                     :resource="blueprint"
-                    @deleted="removeRow(blueprint)"
+                    reload
                 />
             </div>
         </template>

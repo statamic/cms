@@ -17,9 +17,7 @@ const props = defineProps([
 const { isPro } = useStatamicPageProps();
 const isEmpty = computed(() => props.forms.length === 0);
 
-function refresh() {
-    router.reload();
-}
+const reloadPage = () => router.reload();
 </script>
 
 <template>
@@ -66,7 +64,7 @@ function refresh() {
             </CommandPaletteItem>
         </Header>
 
-        <Listing :items="forms" :columns="initialColumns" :action-url="actionUrl" @refreshing="refresh">
+        <Listing :items="forms" :columns="initialColumns" :action-url="actionUrl" @refreshing="refreshing">
             <template #cell-title="{ row: form }">
                 <Link :href="form.show_url">{{ form.title }}</Link>
             </template>

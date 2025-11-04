@@ -23,8 +23,6 @@ const props = defineProps({
     canConfigureFields: Boolean,
 });
 
-const rows = ref(props.groups);
-
 if (props.groups.length === 0) useArchitecturalBackground();
 
 const columns = ref([
@@ -35,11 +33,6 @@ const columns = ref([
 ]);
 
 const reloadPage = () => router.reload();
-
-const removeRow = (row) => {
-    const i = rows.value.findIndex((r) => r.id === row.id);
-    rows.value.splice(i, 1);
-};
 </script>
 
 <template>
@@ -72,7 +65,7 @@ const removeRow = (row) => {
         </Header>
 
         <Listing
-            :items="rows"
+            :items="groups"
             :columns="columns"
             :allow-search="false"
             :allow-customizing-columns="false"
@@ -80,7 +73,7 @@ const removeRow = (row) => {
         >
             <template #cell-title="{ row: group }">
                 <Link :href="group.show_url">{{ __(group.title) }}</Link>
-                <resource-deleter :ref="`deleter_${group.id}`" :resource="group" @deleted="removeRow(group)" />
+                <resource-deleter :ref="`deleter_${group.id}`" :resource="group" reload />
             </template>
             <template #cell-handle="{ value: handle }">
                 <span class="font-mono text-xs">{{ handle }}</span>

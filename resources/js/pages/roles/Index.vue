@@ -8,6 +8,8 @@ defineProps({
     columns: Array,
     createUrl: String,
 });
+
+const reloadPage = () => router.reload();
 </script>
 
 <template>
@@ -35,7 +37,7 @@ defineProps({
         :columns="columns"
         :allow-search="false"
         :allow-customizing-columns="false"
-        @refreshing="() => router.reload()"
+        @refreshing="reloadPage"
     >
         <template #cell-title="{ row: role, index }">
             <Link :href="role.edit_url">{{ __(role.title) }}</Link>
@@ -44,7 +46,7 @@ defineProps({
                 :ref="`deleter_${role.id}`"
                 :resource="role"
                 requires-elevated-session
-                @deleted="() => router.reload()"
+                reload
             />
         </template>
         <template #cell-handle="{ value: handle }">

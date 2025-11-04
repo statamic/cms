@@ -1,6 +1,6 @@
 <script setup>
 import Head from '@/pages/layout/Head.vue';
-import { Link, router } from '@inertiajs/vue3';
+import { Link } from '@inertiajs/vue3';
 import { Header, CommandPaletteItem, Button, Icon, EmptyStateMenu, EmptyStateItem, CardList, CardListItem, Tooltip, Dropdown, DropdownMenu, DropdownItem, DocsCallout } from '@ui';
 import useArchitecturalBackground from '@/pages/layout/architectural-background.js';
 
@@ -47,7 +47,7 @@ if (props.globals.length === 0) useArchitecturalBackground();
                         <DropdownItem v-if="global.deleteable" :text="__('Delete')" icon="trash" variant="destructive" @click="$refs[`deleter_${global.id}`][0].confirm()" />
                     </DropdownMenu>
                 </Dropdown>
-                <resource-deleter :ref="`deleter_${global.id}`" :resource="global" @deleted="() => router.reload()" />
+                <resource-deleter :ref="`deleter_${global.id}`" :resource="global" reload />
             </CardListItem>
         </CardList>
     </template>

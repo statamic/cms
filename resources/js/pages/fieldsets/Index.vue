@@ -17,14 +17,7 @@ const columns = ref([
     { label: __('Fields'), field: 'fields', width: '15%' },
 ]);
 
-function reloadPage() {
-    router.reload();
-}
-
-function removeRow(rows, row) {
-    const i = rows.findIndex((r) => r.id === row.id);
-    rows.splice(i, 1);
-}
+const reloadPage = () => router.reload();
 </script>
 
 <template>
@@ -55,8 +48,8 @@ function removeRow(rows, row) {
             >
                 <template #cell-title="{ row: fieldset }">
                     <Link :href="fieldset.edit_url" v-text="__(fieldset.title)" />
-                    <fieldset-resetter :ref="el => resetters[fieldset.id] = el" :resource="fieldset" :reload="true" />
-                    <fieldset-deleter :ref="el => deleters[fieldset.id] = el" :resource="fieldset" @deleted="removeRow(rows, fieldset)" />
+                    <fieldset-resetter :ref="el => resetters[fieldset.id] = el" :resource="fieldset" reload />
+                    <fieldset-deleter :ref="el => deleters[fieldset.id] = el" :resource="fieldset" reload />
                 </template>
                 <template #cell-handle="{ value }">
                     <span class="font-mono text-xs" v-text="value" />
