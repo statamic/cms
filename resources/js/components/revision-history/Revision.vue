@@ -10,7 +10,7 @@
         <div v-if="revision.message" class="revision-item-note truncate" v-text="revision.message" />
 
         <div class="flex items-center gap-2">
-            <avatar v-if="revision.user" :user="revision.user" class="size-6 shrink-0" />
+            <avatar v-if="revision.user && revision.user.avatar" :user="revision.user" class="size-6 shrink-0" />
 
             <div class="revision-item-content flex w-full">
                 <div class="flex-1">
