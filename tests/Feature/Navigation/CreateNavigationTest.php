@@ -7,6 +7,7 @@ use Statamic\Facades\User;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
+use Inertia\Testing\AssertableInertia as Assert;
 
 class CreateNavigationTest extends TestCase
 {
@@ -24,8 +25,7 @@ class CreateNavigationTest extends TestCase
             ->actingAs($user)
             ->visitCreatePage()
             ->assertOk()
-            ->assertViewIs('statamic::navigation.create')
-            ->assertSee('Create Navigation');
+            ->assertInertia(fn (Assert $page) => $page->component('navigation/Create'));
     }
 
     #[Test]

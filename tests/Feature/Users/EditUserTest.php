@@ -9,6 +9,7 @@ use Tests\ElevatesSessions;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
+use Inertia\Testing\AssertableInertia as Assert;
 
 #[Group('2fa')]
 #[Group('elevated-session')]
@@ -29,7 +30,10 @@ class EditUserTest extends TestCase
             ->actingAsWithElevatedSession($me)
             ->get($user->editUrl())
             ->assertOk()
-            ->assertViewHas('title', 'test@domain.com');
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('users/Edit')
+                ->where('title', 'test@domain.com')
+            );
     }
 
     #[Test]
@@ -55,15 +59,18 @@ class EditUserTest extends TestCase
             ->actingAsWithElevatedSession($me)
             ->get($me->editUrl())
             ->assertOk()
-            ->assertViewHasAll([
-                'twoFactor.isEnforced',
-                'twoFactor.wasSetup',
-                'twoFactor.routes.enable',
-                'twoFactor.routes.disable',
-                'twoFactor.routes.recoveryCodes.show',
-                'twoFactor.routes.recoveryCodes.generate',
-                'twoFactor.routes.recoveryCodes.download',
-            ]);
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('users/Edit')
+                ->hasAll([
+                    'twoFactor.isEnforced',
+                    'twoFactor.wasSetup',
+                    'twoFactor.routes.enable',
+                    'twoFactor.routes.disable',
+                    'twoFactor.routes.recoveryCodes.show',
+                    'twoFactor.routes.recoveryCodes.generate',
+                    'twoFactor.routes.recoveryCodes.download',
+                ])
+            );
     }
 
     #[Test]

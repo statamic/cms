@@ -10,6 +10,7 @@ use Statamic\Support\Arr;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
+use Inertia\Testing\AssertableInertia as Assert;
 
 class ViewGlobalsListingTest extends TestCase
 {
@@ -33,12 +34,13 @@ class ViewGlobalsListingTest extends TestCase
         $this->actingAs($user)
             ->get(cp_route('globals.index'))
             ->assertOk()
-            ->assertViewHas('globals', function ($globals) {
-                return Arr::get($globals, '0.handle') === 'test_one'
-                    && Arr::get($globals, '0.edit_url') === url('/cp/globals/test_one')
-                    && Arr::get($globals, '1.handle') === 'test_three'
-                    && Arr::get($globals, '1.edit_url') === url('/cp/globals/test_three');
-            });
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('globals/Index')
+                ->where('globals.0.handle', 'test_one')
+                ->where('globals.0.edit_url', url('/cp/globals/test_one'))
+                ->where('globals.1.handle', 'test_three')
+                ->where('globals.1.edit_url', url('/cp/globals/test_three'))
+            );
     }
 
     #[Test]
@@ -66,13 +68,12 @@ class ViewGlobalsListingTest extends TestCase
         $this->actingAs($user)
             ->get(cp_route('globals.index'))
             ->assertOk()
-            ->assertViewHas('globals', function ($globals) {
-                return $globals->count() === 1;
-            })
-            ->assertViewHas('globals', function ($globals) {
-                return Arr::get($globals, '0.handle') === 'test_one'
-                    && Arr::get($globals, '0.edit_url') === url('/cp/globals/test_one?site=fr');
-            });
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('globals/Index')
+                ->has('globals', 1)
+                ->where('globals.0.handle', 'test_one')
+                ->where('globals.0.edit_url', url('/cp/globals/test_one?site=fr'))
+            );
     }
 
     #[Test]
@@ -97,14 +98,11 @@ class ViewGlobalsListingTest extends TestCase
         $this->actingAs($user)
             ->get(cp_route('globals.index'))
             ->assertOk()
-            ->assertViewHas('globals', function ($globals) {
-                return $globals->count() === 1;
-            })
-            ->assertViewHas('globals', function ($globals) {
-                $sorted = $globals->sortBy('handle')->values();
-
-                return (Arr::get($sorted, '0.handle') == 'fr') &&
-                       (Arr::get($sorted, '0.edit_url') == url('/cp/globals/fr?site=fr'));
-            });
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('globals/Index')
+                ->has('globals', 1)
+                ->where('globals.0.handle', 'fr')
+                ->where('globals.0.edit_url', url('/cp/globals/fr?site=fr'))
+            );
     }
 }
