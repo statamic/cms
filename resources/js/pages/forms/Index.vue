@@ -64,7 +64,7 @@ const reloadPage = () => router.reload();
             </CommandPaletteItem>
         </Header>
 
-        <Listing :items="forms" :columns="initialColumns" :action-url="actionUrl" @refreshing="refreshing">
+        <Listing :items="forms" :columns="initialColumns" :action-url="actionUrl" @refreshing="reloadPage">
             <template #cell-title="{ row: form }">
                 <Link :href="form.show_url">{{ form.title }}</Link>
             </template>
