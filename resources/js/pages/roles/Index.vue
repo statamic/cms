@@ -1,7 +1,7 @@
 <script setup>
 import Head from '@/pages/layout/Head.vue';
-import Listing from '@/components/roles/Listing.vue';
-import { Header, CommandPaletteItem, Button, DocsCallout } from '@ui';
+import { Header, CommandPaletteItem, Button, DocsCallout, DropdownItem, Listing } from '@ui';
+import { Link, router } from '@inertiajs/vue3';
 
 defineProps({
     roles: Array,
@@ -30,7 +30,36 @@ defineProps({
         </CommandPaletteItem>
     </Header>
 
-    <Listing :initial-rows="roles" :initial-columns="columns" />
+    <Listing
+        :items="roles"
+        :columns="columns"
+        :allow-search="false"
+        :allow-customizing-columns="false"
+        @refreshing="() => router.reload()"
+    >
+        <template #cell-title="{ row: role, index }">
+            <Link :href="role.edit_url">{{ __(role.title) }}</Link>
+
+            <resource-deleter
+                :ref="`deleter_${role.id}`"
+                :resource="role"
+                requires-elevated-session
+                @deleted="() => router.reload()"
+            />
+        </template>
+        <template #cell-handle="{ value: handle }">
+            <span class="font-mono text-xs">{{ handle }}</span>
+        </template>
+        <template #prepended-row-actions="{ row: role }">
+            <DropdownItem :text="__('Configure')" icon="cog" :href="role.edit_url" />
+            <DropdownItem
+                :text="__('Delete')"
+                icon="trash"
+                variant="destructive"
+                @click="$refs[`deleter_${role.id}`].confirm()"
+            />
+        </template>
+    </Listing>
 
     <DocsCallout :topic="__('Roles & Permissions')" url="users#permissions" />
 </template>
