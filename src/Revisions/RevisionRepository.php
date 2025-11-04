@@ -49,8 +49,6 @@ class RevisionRepository implements Contract
 
     public function save(RevisionContract $revision)
     {
-        $revision->id($revision->date()->timestamp);
-
         $this->store->save($revision);
     }
 
