@@ -2,6 +2,8 @@
 
 namespace Statamic\CP;
 
+use Statamic\Facades\File;
+
 class Color
 {
     public const Slate = [
@@ -400,9 +402,13 @@ class Color
         ];
     }
 
-    public static function theme(): array
+    public static function theme(): array|string
     {
         $config = config('statamic.cp.theme', []);
+
+        if (is_string($config) && File::exists(resource_path('themes/'.$config.'.css'))) {
+            return $config;
+        }
 
         foreach ($config['grays'] ?? [] as $shade => $value) {
             $config["gray-{$shade}"] = $value;
@@ -413,8 +419,22 @@ class Color
             ->all();
     }
 
+    public static function isUsingThemeFile(): bool
+    {
+        return is_string(static::theme()) && File::exists(resource_path('themes/'.static::theme().'.css'));
+    }
+
+    public static function themeCss(): string
+    {
+        return File::get(resource_path('themes/'.static::theme().'.css'));
+    }
+
     public static function cssVariables(): string
     {
+        if (is_string(static::theme())) {
+            return File::get(resource_path('themes/'.static::theme().'.css'));
+        }
+
         return collect(static::theme())
             ->map(fn ($color, $name) => "--theme-color-{$name}: {$color};")
             ->implode("\n");
