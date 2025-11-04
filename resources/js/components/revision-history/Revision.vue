@@ -10,7 +10,7 @@
         @click="open"
     >
         <div class="flex gap-3">
-            <Avatar v-if="revision.user && revision.user.avatar" :user="revision.user" class="size-6 shrink-0 mt-1" />
+            <Avatar v-if="revision.user" :user="revision.user" class="size-6 shrink-0 mt-1" />
 
             <div class="grid gap-1">
                 <div v-if="revision.message" class="revision-message font-medium" v-text="revision.message" />
