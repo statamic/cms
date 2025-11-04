@@ -33,7 +33,7 @@ defineProps([
 <template>
     <Head :title />
 
-    <term-publish-form
+    <TermPublishForm
         publish-container="base"
         :initial-actions="actions"
         method="patch"

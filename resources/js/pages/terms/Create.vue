@@ -27,7 +27,7 @@ function saved(response) {
 <template>
     <Head :title="taxonomyCreateLabel" />
 
-    <term-publish-form
+    <TermPublishForm
         :is-creating="true"
         publish-container="base"
         :initial-actions="actions"
