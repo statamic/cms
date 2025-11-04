@@ -60,6 +60,7 @@
 import { Header, Button, CardPanel, Panel, PanelHeader, Heading, Card, Switch, Field, Input } from '@/components/ui';
 import { requireElevatedSession } from '@/components/elevated-sessions';
 import PermissionTree from '@/components/roles/PermissionTree.vue';
+import { router } from '@inertiajs/vue3';
 
 const checked = function (permissions) {
     return permissions.reduce((carry, permission) => {
@@ -155,7 +156,7 @@ export default {
 
             this.$axios[this.method](this.action, this.payload)
                 .then((response) => {
-                    window.location = response.data.redirect;
+                    router.get(response.data.redirect);
                 })
                 .catch((e) => {
                     if (e.response && e.response.status === 422) {
