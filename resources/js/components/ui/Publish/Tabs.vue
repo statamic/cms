@@ -92,7 +92,7 @@ function tabHasError(tab) {
 <template>
     <ElementContainer @resized="width = $event.width">
         <div>
-            <Tabs v-if="width || true" v-model:modelValue="tab">
+            <Tabs v-if="width" v-model:modelValue="tab">
                 <TabList v-if="visibleMainTabs.length > 1" class="-mt-2 mb-6">
                     <TabTrigger
                         v-for="tab in visibleMainTabs"
