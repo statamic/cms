@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Taxonomies;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Facades\Action;
 use Statamic\Facades\Site;
@@ -150,9 +151,13 @@ class TermsController extends CpController
             session()->now('success', __('Term created'));
         }
 
-        return view('statamic::terms.edit', array_merge($viewData, [
-            'term' => $term,
-        ]));
+        return Inertia::render('terms/Edit', [
+            ...$viewData,
+            'canEditBlueprint' => User::current()->can('configure fields'),
+            'createAnotherUrl' => cp_route('taxonomies.terms.create', [$taxonomy->handle(), $term->locale()]),
+            'listingUrl' => cp_route('taxonomies.show', $taxonomy->handle()),
+            'itemActionUrl' => cp_route('taxonomies.terms.actions.run', $taxonomy->handle()),
+        ]);
     }
 
     public function update(Request $request, $taxonomy, $term, $site)
@@ -265,7 +270,12 @@ class TermsController extends CpController
             return $viewData;
         }
 
-        return view('statamic::terms.create', $viewData);
+        return Inertia::render('terms/Create', [
+            ...$viewData,
+            'canEditBlueprint' => User::current()->can('configure fields'),
+            'createAnotherUrl' => cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site->handle()]),
+            'listingUrl' => cp_route('taxonomies.show', $taxonomy->handle()),
+        ]);
     }
 
     public function store(Request $request, $taxonomy, $site)
