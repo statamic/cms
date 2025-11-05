@@ -9,6 +9,8 @@ use Statamic\Exceptions\TermNotFoundException;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Taxonomy;
+use Statamic\Facades\URL;
+use Statamic\Query\Scopes\AllowsScopes;
 use Statamic\Stache\Query\TermQueryBuilder;
 use Statamic\Stache\Stache;
 use Statamic\Support\Str;
@@ -17,6 +19,8 @@ use Statamic\Taxonomies\TermCollection;
 
 class TermRepository implements RepositoryContract
 {
+    use AllowsScopes;
+
     protected $stache;
     protected $store;
     protected $substitutionsById = [];
@@ -96,6 +100,10 @@ class TermRepository implements RepositoryContract
             ->first();
 
         if (! $term) {
+            return null;
+        }
+
+        if ($term->uri() !== '/'.$uri) {
             return null;
         }
 
@@ -181,7 +189,7 @@ class TermRepository implements RepositoryContract
 
     private function findTaxonomyHandleByUri($uri)
     {
-        return $this->stache->store('taxonomies')->index('uri')->items()->flip()->get(Str::ensureLeft($uri, '/'));
+        return $this->stache->store('taxonomies')->index('uri')->items()->flip()->get(URL::tidy($uri));
     }
 
     public function substitute($item)

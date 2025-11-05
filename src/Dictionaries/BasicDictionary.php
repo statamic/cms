@@ -17,10 +17,16 @@ abstract class BasicDictionary extends Dictionary
 
     public function options(?string $search = null): array
     {
+        return collect($this->optionItems($search))
+            ->mapWithKeys(fn (Item $item) => [$item->value() => $item->label()])
+            ->all();
+    }
+
+    public function optionItems(?string $search = null): array
+    {
         return $this
             ->getFilteredItems()
             ->when($search, fn ($collection) => $collection->filter(fn ($item) => $this->matchesSearchQuery($search, $item)))
-            ->mapWithKeys(fn (Item $item) => [$item->value() => $item->label()])
             ->all();
     }
 
@@ -52,7 +58,7 @@ abstract class BasicDictionary extends Dictionary
     {
         $query = strtolower($query);
 
-        foreach ($item->data() as $key => $value) {
+        foreach ($item->extra() as $key => $value) {
             if (! empty($this->searchable) && ! in_array($key, $this->searchable)) {
                 continue;
             }

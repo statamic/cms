@@ -6,6 +6,7 @@ use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\GraphQL\CastableToValidationString;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -121,8 +122,8 @@ GQL;
                 'invalid' => 'This isnt in the fieldtypes config fields so it shouldnt be output',
                 'width' => 50,
             ],
-            'subject' => ['type' => 'select', 'options' => ['disco' => 'Disco', 'house' => 'House']],
-            'message' => ['type' => 'textarea', 'width' => 33],
+            'subject' => ['type' => 'select', 'options' => ['disco' => 'Disco', 'house' => 'House'], 'if' => ['name' => 'not empty']],
+            'message' => ['type' => 'textarea', 'width' => 33, 'unless' => ['subject' => 'equals spam']],
         ]);
 
         BlueprintRepository::shouldReceive('find')->with('forms.contact')->andReturn($blueprint);
@@ -137,6 +138,8 @@ GQL;
             instructions
             width
             config
+            if
+            unless
         }
     }
 }
@@ -158,6 +161,8 @@ GQL;
                             'config' => [
                                 'placeholder' => 'Type here...',
                             ],
+                            'if' => null,
+                            'unless' => null,
                         ],
                         [
                             'handle' => 'subject',
@@ -168,6 +173,8 @@ GQL;
                             'config' => [
                                 'options' => ['disco' => 'Disco', 'house' => 'House'],
                             ],
+                            'if' => ['name' => 'not empty'],
+                            'unless' => null,
                         ],
                         [
                             'handle' => 'message',
@@ -176,6 +183,8 @@ GQL;
                             'instructions' => null,
                             'width' => 33,
                             'config' => [],
+                            'if' => null,
+                            'unless' => ['subject' => 'equals spam'],
                         ],
                     ],
                 ],
@@ -217,4 +226,161 @@ GQL;
                 ],
             ]]);
     }
+
+    #[Test]
+    public function it_queries_the_sections()
+    {
+        Form::make('contact')->title('Contact Us')->save();
+
+        $blueprint = Blueprint::makeFromFields([
+            'name' => [
+                'type' => 'text',
+                'display' => 'Your Name',
+                'instructions' => 'Enter your name',
+                'placeholder' => 'Type here...',
+                'invalid' => 'This isnt in the fieldtypes config fields so it shouldnt be output',
+                'width' => 50,
+            ],
+            'subject' => ['type' => 'select', 'options' => ['disco' => 'Disco', 'house' => 'House']],
+            'message' => ['type' => 'textarea', 'width' => 33],
+        ]);
+
+        // Set section display and instructions. You wouldn't really do this for a form blueprint,
+        // but this is just to test the section type which doesn't get tested anywhere else.
+        $contents = $blueprint->contents();
+        $contents['tabs']['main']['sections'][0]['display'] = 'My Section';
+        $contents['tabs']['main']['sections'][0]['instructions'] = 'The section instructions';
+        $blueprint->setContents($contents);
+
+        BlueprintRepository::shouldReceive('find')->with('forms.contact')->andReturn($blueprint);
+
+        $query = <<<'GQL'
+{
+    form(handle: "contact") {
+        sections {
+            display
+            instructions
+            fields {
+                handle
+                type
+                display
+                instructions
+                width
+                config
+            }
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'form' => [
+                    'sections' => [
+                        [
+                            'display' => 'My Section',
+                            'instructions' => 'The section instructions',
+                            'fields' => [
+                                [
+                                    'handle' => 'name',
+                                    'type' => 'text',
+                                    'display' => 'Your Name',
+                                    'instructions' => 'Enter your name',
+                                    'width' => 50,
+                                    'config' => [
+                                        'placeholder' => 'Type here...',
+                                    ],
+                                ],
+                                [
+                                    'handle' => 'subject',
+                                    'type' => 'select',
+                                    'display' => 'Subject',
+                                    'instructions' => null,
+                                    'width' => 100,
+                                    'config' => [
+                                        'options' => ['disco' => 'Disco', 'house' => 'House'],
+                                    ],
+                                ],
+                                [
+                                    'handle' => 'message',
+                                    'type' => 'textarea',
+                                    'display' => 'Message',
+                                    'instructions' => null,
+                                    'width' => 33,
+                                    'config' => [],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]]);
+    }
+
+    #[Test]
+    public function it_returns_string_based_validation_rules_for_mimes_mimetypes_dimension_size_and_image()
+    {
+        Form::make('contact')->title('Contact Us')->save();
+
+        $blueprint = Blueprint::makeFromFields([
+            'name' => [
+                'type' => 'assets',
+                'display' => 'Asset',
+                'validate' => [
+                    'mimes:image/jpeg,image/png',
+                    'mimetypes:image/jpeg,image/png',
+                    'dimensions:1024',
+                    'size:1000',
+                    'image:jpeg',
+                    'new Tests\Feature\GraphQL\TestValidationRuleWithToString',
+                    'new Tests\Feature\GraphQL\TestValidationRuleWithoutToString',
+                ],
+            ],
+        ]);
+
+        BlueprintRepository::shouldReceive('find')->with('forms.contact')->andReturn($blueprint);
+
+        $query = <<<'GQL'
+{
+    form(handle: "contact") {
+        rules
+    }
+}
+GQL;
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'form' => [
+                    'rules' => [
+                        'name' => [
+                            'mimes:image/jpeg,image/png',
+                            'mimetypes:image/jpeg,image/png',
+                            'dimensions:1024',
+                            'size:1000',
+                            'image:jpeg',
+                            'thevalidationrule:foo,bar',
+                            'Tests\\Feature\\GraphQL\\TestValidationRuleWithoutToString::class',
+                            'array',
+                            'nullable',
+                        ],
+                    ],
+                ],
+            ]]);
+    }
+}
+
+class TestValidationRuleWithToString implements CastableToValidationString
+{
+    public function toGqlValidationString(): string
+    {
+        return 'thevalidationrule:foo,bar';
+    }
+}
+
+class TestValidationRuleWithoutToString
+{
 }

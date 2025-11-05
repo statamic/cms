@@ -125,6 +125,8 @@ return [
 
     'nocache' => 'cache',
 
+    'nocache_db_connection' => env('STATAMIC_NOCACHE_DB_CONNECTION'),
+
     /*
     |--------------------------------------------------------------------------
     | Replacers
@@ -146,13 +148,32 @@ return [
     |--------------------------------------------------------------------------
     |
     | Here you may define the queue name and connection
-    | that will be used when warming the static cache.
+    | that will be used when warming the static cache and
+    | optionally set the "--insecure" flag by default.
     |
     */
 
     'warm_queue' => env('STATAMIC_STATIC_WARM_QUEUE'),
 
     'warm_queue_connection' => env('STATAMIC_STATIC_WARM_QUEUE_CONNECTION'),
+
+    'warm_insecure' => env('STATAMIC_STATIC_WARM_INSECURE', false),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Background Re-cache
+    |--------------------------------------------------------------------------
+    |
+    | When this enabled, Statamic will re-cache URLs in the background,
+    | overwriting the existing cache, without removing it first.
+    |
+    */
+
+    'background_recache' => env('STATAMIC_BACKGROUND_RECACHE', false),
+
+    'recache_token' => env('STATAMIC_RECACHE_TOKEN'),
+
+    'recache_token_parameter' => '__recache',
 
     /*
     |--------------------------------------------------------------------------

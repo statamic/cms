@@ -1,0 +1,78 @@
+/* =Jay. Tailwind already uses "Cascade Layers" internally. Here we are just adding an extra layer (to their internal layers) to manage states--particulary with complex fields like Bard--where specificity is much easier to handle with layers. */
+@layer addon-theme, addon-utilities, base, components, utilities, ui, ui-states;
+
+/* =Jay. Map layers to Tailwind's internal layers so that we can inject custom layers as needed */
+@layer base {
+  @tailwind base;
+}
+
+@layer components {
+  @tailwind components;
+}
+
+@layer utilities {
+  @tailwind utilities;
+}
+
+@import 'tailwindcss';
+@import '@statamic/ui/ui.css';
+@import './cp.css';
+@import './core/utilities.css';
+@import './dark.css';
+@import './tailwind-animate.css';
+
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-300, currentColor);
+  }
+  .dark {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-700, currentColor);
+    }
+  }
+}
+
+.popoverAnimation {
+    @apply duration-100 will-change-[transform,opacity];
+    @apply data-[state=open]:animate-in data-[state=closed]:animate-out;
+    @apply data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0;
+    @apply data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95;
+    @apply data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2;
+    @apply data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2;
+}
+
+@layer components {
+    .content-card {
+        @apply min-h-full px-2 sm:px-6 md:px-12 pb-6 border dark:bg-dark-content-bg dark:border-y-0 dark:border-r-0 border-content-border dark:border-dark-content-border sm:rounded-2xl sm:rounded-r-xl sm:dark:rounded-none;
+        background: var(--theme-color-content-bg);
+        .nav-closed & {
+            @apply sm:rounded-xl;
+            .dark & {
+              border: 0;
+            }
+        }
+    }
+    .dark .content-card {
+        background: var(--theme-color-dark-content-bg);
+    }
+}

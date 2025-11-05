@@ -15,6 +15,7 @@ use Statamic\Facades\StaticCache;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Cachers\ApplicationCacher;
+use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\StaticCaching\Cachers\NullCacher;
 use Statamic\StaticCaching\NoCache\RegionNotFound;
 use Statamic\StaticCaching\NoCache\Session;
@@ -49,12 +50,8 @@ class Cache
      */
     public function handle($request, Closure $next)
     {
-        try {
-            if ($response = $this->attemptToGetCachedResponse($request)) {
-                return $response;
-            }
-        } catch (RegionNotFound $e) {
-            Log::debug("Static cache region [{$e->getRegion()}] not found on [{$request->fullUrl()}]. Serving uncached response.");
+        if ($response = $this->attemptToServeCachedResponse($request)) {
+            return $response;
         }
 
         $lock = $this->createLock($request);
@@ -68,6 +65,17 @@ class Cache
 
     private function handleRequest($request, Closure $next)
     {
+        // When the file driver loads a cached page, it logs a debug message explaining
+        // that it's being serving via PHP and rewrite rules are not set up correctly.
+        // Since we're intentionally doing it here, we should prevent that warning.
+        if ($this->cacher instanceof FileCacher) {
+            $this->cacher->preventLoggingRewriteWarning();
+        }
+
+        if ($response = $this->attemptToServeCachedResponse($request)) {
+            return $response;
+        }
+
         $response = $next($request);
 
         if ($this->shouldBeCached($request, $response)) {
@@ -105,6 +113,17 @@ class Cache
 
         if (! $this->cacher->hasCachedPage($request)) {
             $this->cacher->cachePage($request, $response);
+        }
+    }
+
+    private function attemptToServeCachedResponse($request)
+    {
+        try {
+            if ($response = $this->attemptToGetCachedResponse($request)) {
+                return $response;
+            }
+        } catch (RegionNotFound $e) {
+            Log::debug("Static cache region [{$e->getRegion()}] not found on [{$request->fullUrl()}]. Serving uncached response.");
         }
     }
 
@@ -159,6 +178,10 @@ class Cache
             return false;
         }
 
+        if ($this->hasValidRecacheToken($request)) {
+            return false;
+        }
+
         return true;
     }
 
@@ -171,8 +194,13 @@ class Cache
             return false;
         }
 
-        // Draft and private pages should not be cached.
-        if ($response->headers->has('X-Statamic-Draft') || $response->headers->has('X-Statamic-Private')) {
+        // Draft, private and protected pages should not be cached.
+        if (
+            $response->headers->has('X-Statamic-Draft')
+            || $response->headers->has('X-Statamic-Private')
+            || $response->headers->has('X-Statamic-Protected')
+            || $response->headers->has('X-Statamic-Uncacheable')
+        ) {
             return false;
         }
 
@@ -187,6 +215,15 @@ class Cache
         }
 
         return true;
+    }
+
+    private function hasValidRecacheToken($request)
+    {
+        if (! $token = $request->input(StaticCache::recacheTokenParameter())) {
+            return false;
+        }
+
+        return StaticCache::checkRecacheToken($token);
     }
 
     private function createLock($request): Lock

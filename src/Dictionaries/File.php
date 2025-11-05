@@ -7,6 +7,8 @@ use Statamic\Facades\YAML;
 
 class File extends BasicDictionary
 {
+    protected array $keywords = ['files', 'file', 'json', 'csv', 'yaml', 'yml'];
+
     protected function fieldItems()
     {
         return [

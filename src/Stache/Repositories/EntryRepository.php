@@ -10,6 +10,7 @@ use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Exceptions\EntryNotFoundException;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
+use Statamic\Query\Scopes\AllowsScopes;
 use Statamic\Rules\Slug;
 use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Stache\Stache;
@@ -17,6 +18,8 @@ use Statamic\Support\Arr;
 
 class EntryRepository implements RepositoryContract
 {
+    use AllowsScopes;
+
     protected $stache;
     protected $store;
     protected $substitutionsById = [];
@@ -91,6 +94,19 @@ class EntryRepository implements RepositoryContract
         return $entry->hasStructure()
             ? $entry->structure()->in($site)->find($entry->id())
             : $entry;
+    }
+
+    public function whereInId($ids): EntryCollection
+    {
+        $entries = $this->query()->whereIn('id', $ids)->get();
+        $entriesById = $entries->keyBy->id();
+
+        $ordered = collect($ids)
+            ->map(fn ($id) => $entriesById->get($id))
+            ->filter()
+            ->values();
+
+        return EntryCollection::make($ordered);
     }
 
     public function save($entry)

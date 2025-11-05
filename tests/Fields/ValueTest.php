@@ -8,6 +8,9 @@ use Statamic\Facades\Blueprint;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
+use Statamic\Fields\Values;
+use Statamic\Query\Builder;
+use Statamic\View\Antlers\AntlersString;
 use Tests\TestCase;
 
 class ValueTest extends TestCase
@@ -212,6 +215,215 @@ class ValueTest extends TestCase
         tap(new Value(null, null, $fieldtype), function ($value) {
             $this->assertSame(false, $value->value());
         });
+    }
+
+    #[Test]
+    public function it_uses_array_access_with_string()
+    {
+        $val = new Value('foo');
+
+        $this->assertFalse(isset($val['something']));
+        $this->assertEquals('nope', $val['something'] ?? 'nope');
+    }
+
+    #[Test]
+    public function it_uses_array_access_with_array()
+    {
+        $val = new Value([
+            'a' => 'alfa',
+            'b' => 'bravo',
+        ]);
+
+        $this->assertTrue(isset($val['a']));
+        $this->assertFalse(isset($val['c']));
+        $this->assertEquals('alfa', $val['a'] ?? 'nope');
+        $this->assertEquals('nope', $val['c'] ?? 'nope');
+    }
+
+    #[Test]
+    public function it_can_iterate_over_array()
+    {
+        $val = new Value([
+            'a' => 'alfa',
+            'b' => 'bravo',
+        ]);
+
+        $arr = [];
+
+        foreach ($val as $key => $value) {
+            $arr[$key] = $value;
+        }
+
+        $this->assertEquals([
+            'a' => 'alfa',
+            'b' => 'bravo',
+        ], $arr);
+    }
+
+    #[Test]
+    public function it_can_iterate_over_collection()
+    {
+        $val = new Value(collect([
+            'a' => 'alfa',
+            'b' => 'bravo',
+        ]));
+
+        $arr = [];
+
+        foreach ($val as $key => $value) {
+            $arr[$key] = $value;
+        }
+
+        $this->assertEquals([
+            'a' => 'alfa',
+            'b' => 'bravo',
+        ], $arr);
+    }
+
+    #[Test]
+    public function it_can_iterate_over_query_builder()
+    {
+        $builder = \Mockery::mock(Builder::class);
+        $builder->shouldReceive('get')->andReturn(collect([
+            'a' => 'alfa',
+            'b' => 'bravo',
+        ]));
+
+        $val = new Value($builder);
+
+        $arr = [];
+
+        foreach ($val as $key => $value) {
+            $arr[$key] = $value;
+        }
+
+        $this->assertEquals([
+            'a' => 'alfa',
+            'b' => 'bravo',
+        ], $arr);
+    }
+
+    #[Test]
+    public function it_can_iterate_over_values()
+    {
+        $val = new Value(new Values([
+            'a' => 'alfa',
+            'b' => 'bravo',
+        ]));
+
+        $arr = [];
+
+        foreach ($val as $key => $value) {
+            $arr[$key] = $value;
+        }
+
+        $this->assertEquals([
+            'a' => 'alfa',
+            'b' => 'bravo',
+        ], $arr);
+    }
+
+    #[Test]
+    public function it_can_check_isset_on_properties()
+    {
+        $val = new Value((object) [
+            'a' => 'alfa',
+            'b' => '',
+            'c' => null,
+        ]);
+
+        $this->assertTrue(isset($val->a));
+        $this->assertTrue(isset($val->b));
+        $this->assertFalse(isset($val->c));
+        $this->assertFalse(isset($val->d));
+    }
+
+    #[Test]
+    public function it_can_check_emptiness_on_properties()
+    {
+        $val = new Value((object) [
+            'a' => 'alfa',
+            'b' => '',
+            'c' => null,
+        ]);
+
+        $this->assertFalse(empty($val->a));
+        $this->assertTrue(empty($val->b));
+        $this->assertTrue(empty($val->c));
+        $this->assertTrue(empty($val->d));
+    }
+
+    #[Test]
+    public function it_can_proxy_methods_to_value()
+    {
+        // This is useful when the value is an object like an Entry, you could
+        // do $value->slug(). Or for a LabeledValue you could do $value->label().
+
+        $object = new class
+        {
+            public function bar()
+            {
+                return 'foo';
+            }
+        };
+
+        $value = new Value($object);
+
+        $this->assertEquals('foo', $value->bar());
+    }
+
+    #[Test]
+    public function it_can_proxy_property_access_to_value()
+    {
+        // This is useful when the value is an object like an Entry, you could
+        // do $value->slug.
+
+        $object = new class
+        {
+            public $bar = 'foo';
+        };
+
+        $value = new Value($object);
+
+        $this->assertEquals('foo', $value->bar);
+        $this->assertEquals('nope', $value->baz ?? 'nope');
+    }
+
+    #[Test]
+    public function it_parses_from_raw_string()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            public function augment($data)
+            {
+                // if we are being asked to augment an already parsed antlers string
+                // then we return the correct value
+                if ($data instanceof AntlersString) {
+                    return 'augmented_value';
+                }
+
+                return 'not_augmented_value';
+            }
+
+            public function config(?string $key = null, $fallback = null)
+            {
+                if ($key == 'antlers') {
+                    return true;
+                }
+
+                return parent::config($key, $fallback);
+            }
+
+            public function shouldParseAntlersFromRawString(): bool
+            {
+                return true;
+            }
+        };
+
+        $value = new Value('raw_value', null, $fieldtype);
+        $value = $value->antlersValue(app(\Statamic\Contracts\View\Antlers\Parser::class), []);
+
+        $this->assertEquals('augmented_value', (string) $value);
     }
 }
 

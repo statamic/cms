@@ -62,6 +62,19 @@ class GetContentTagTest extends TestCase
     }
 
     #[Test]
+    public function it_maintains_order_of_multiple_items()
+    {
+        $this->assertParseEquals(
+            '<First><Second>',
+            '{{ get_content from="123|456" }}<{{ title }}>{{ /get_content }}'
+        );
+        $this->assertParseEquals(
+            '<Second><First>',
+            '{{ get_content from="456|123" }}<{{ title }}>{{ /get_content }}'
+        );
+    }
+
+    #[Test]
     public function it_gets_multiple_items_by_pipe_delimited_uris()
     {
         $this->assertParseEquals(

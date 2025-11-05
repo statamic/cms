@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Users;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Exceptions\NotFoundHttpException;
@@ -39,10 +40,17 @@ class UsersController extends CpController
             return $this->json($request);
         }
 
-        return view('statamic::users.index', [
+        return Inertia::render('users/Index', [
             'filters' => Scope::filters('users', $context = [
                 'blueprints' => ['user'],
             ]),
+            'sortColumn' => config('statamic.users.sort_field', 'email'),
+            'sortDirection' => config('statamic.users.sort_direction', 'asc'),
+            'actionUrl' => cp_route('users.actions.run'),
+            'createUrl' => cp_route('users.create'),
+            'editBlueprintUrl' => cp_route('blueprints.users.edit'),
+            'canCreate' => User::current()->can('create', UserContract::class),
+            'canConfigureFields' => User::current()->can('configure fields'),
         ]);
     }
 
@@ -130,6 +138,8 @@ class UsersController extends CpController
         $this->authorizePro();
         $this->authorize('create', UserContract::class);
 
+        $this->requireElevatedSession();
+
         $blueprint = User::blueprint();
         $blueprint->ensureFieldHasConfig('email', ['validate' => 'required']);
 
@@ -140,11 +150,12 @@ class UsersController extends CpController
 
         $additional = $fields->all()
             ->reject(fn ($field) => in_array($field->handle(), ['roles', 'groups', 'super']))
+            ->reject(fn ($field) => in_array($field->visibility(), ['read_only', 'computed']))
             ->keys();
 
         $viewData = [
             'values' => (object) $fields->values()->only($additional)->all(),
-            'meta' => (object) $fields->meta()->only($additional)->all(),
+            'meta' => (object) $fields->meta()->all(),
             'fields' => collect($blueprint->fields()->toPublishArray())->filter(fn ($field) => $additional->contains($field['handle']))->values()->all(),
             'blueprint' => $blueprint->toPublishArray(),
             'expiry' => $expiry,
@@ -156,13 +167,23 @@ class UsersController extends CpController
             return $viewData;
         }
 
-        return view('statamic::users.create', $viewData);
+        return Inertia::render('users/Create', array_merge($viewData, [
+            'route' => cp_route('users.store'),
+            'usersIndexUrl' => cp_route('users.index'),
+            'usersCreateUrl' => cp_route('users.create'),
+            'canCreateSupers' => User::current()->isSuper(),
+            'canAssignRoles' => User::current()->can('assign roles'),
+            'canAssignGroups' => User::current()->can('assign user groups'),
+            'activationExpiry' => $expiry,
+        ]));
     }
 
     public function store(Request $request)
     {
         $this->authorizePro();
         $this->authorize('create', UserContract::class);
+
+        $this->requireElevatedSession();
 
         $blueprint = User::blueprint();
 
@@ -223,14 +244,16 @@ class UsersController extends CpController
 
         $this->authorize('edit', $user);
 
+        $this->requireElevatedSession();
+
         $blueprint = $user->blueprint();
 
         if (! User::current()->can('assign roles')) {
-            $blueprint->ensureField('roles', ['visibility' => 'read_only']);
+            $blueprint->ensureFieldHasConfig('roles', ['visibility' => 'hidden']);
         }
 
         if (! User::current()->can('assign user groups')) {
-            $blueprint->ensureField('groups', ['visibility' => 'read_only']);
+            $blueprint->ensureFieldHasConfig('groups', ['visibility' => 'hidden']);
         }
 
         if (User::current()->isSuper() && User::current()->id() !== $user->id()) {
@@ -248,18 +271,34 @@ class UsersController extends CpController
             'actions' => [
                 'save' => $user->updateUrl(),
                 'password' => cp_route('users.password.update', $user->id()),
-                'editBlueprint' => cp_route('users.blueprint.edit'),
+                'editBlueprint' => cp_route('blueprints.users.edit'),
             ],
+            'canEditBlueprint' => User::current()->can('configure fields'),
             'canEditPassword' => User::fromUser($request->user())->can('editPassword', $user),
-            'requiresCurrentPassword' => $request->user()->id === $user->id(),
+            'requiresCurrentPassword' => $isCurrentUser = $request->user()->id === $user->id(),
             'itemActions' => Action::for($user, ['view' => 'form']),
+            'twoFactor' => $isCurrentUser ? [
+                'isEnforced' => $user->isTwoFactorAuthenticationRequired(),
+                'wasSetup' => $user->hasEnabledTwoFactorAuthentication(),
+                'routes' => [
+                    'enable' => cp_route('users.two-factor.enable'),
+                    'disable' => cp_route('users.two-factor.disable'),
+                    'recoveryCodes' => [
+                        'show' => cp_route('users.two-factor.recovery-codes.show'),
+                        'generate' => cp_route('users.two-factor.recovery-codes.generate'),
+                        'download' => cp_route('users.two-factor.recovery-codes.download'),
+                    ],
+                ],
+            ] : null,
         ];
 
         if ($request->wantsJson()) {
             return $viewData;
         }
 
-        return view('statamic::users.edit', $viewData);
+        return Inertia::render('users/Edit', array_merge($viewData, [
+            'itemActionUrl' => cp_route('users.actions.run'),
+        ]));
     }
 
     public function update(Request $request, $user)
@@ -267,6 +306,8 @@ class UsersController extends CpController
         throw_unless($user = User::find($user), new NotFoundHttpException);
 
         $this->authorize('edit', $user);
+
+        $this->requireElevatedSession();
 
         $fields = $user->blueprint()->fields()->except(['password'])->addValues($request->except('id'));
 

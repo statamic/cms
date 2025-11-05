@@ -3,13 +3,18 @@
 namespace Statamic\Fieldtypes\Assets;
 
 use Illuminate\Support\Collection;
+use Statamic\Actions\RenameAssetFolder;
 use Statamic\Assets\OrderedQueryBuilder;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\CP\Column;
 use Statamic\Exceptions\AssetContainerNotFoundException;
+use Statamic\Facades\Action;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blink;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Scope;
+use Statamic\Facades\User;
 use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Types\AssetInterface;
 use Statamic\Http\Resources\CP\Assets\Asset as AssetResource;
@@ -20,36 +25,15 @@ use Statamic\Support\Str;
 class Assets extends Fieldtype
 {
     protected $categories = ['media', 'relationship'];
+    protected $keywords = ['file', 'files', 'image', 'images', 'video', 'videos', 'audio', 'upload'];
     protected $selectableInForms = true;
 
     protected function configFieldItems(): array
     {
         return [
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Input Behavior'),
                 'fields' => [
-                    'max_files' => [
-                        'display' => __('Max Files'),
-                        'instructions' => __('statamic::fieldtypes.assets.config.max_files'),
-                        'min' => 1,
-                        'type' => 'integer',
-                    ],
-                    'min_files' => [
-                        'display' => __('Min Files'),
-                        'instructions' => __('statamic::fieldtypes.assets.config.min_files'),
-                        'min' => 1,
-                        'type' => 'integer',
-                    ],
-                    'mode' => [
-                        'display' => __('UI Mode'),
-                        'instructions' => __('statamic::fieldtypes.assets.config.mode'),
-                        'type' => 'select',
-                        'default' => 'list',
-                        'options' => [
-                            'grid' => __('Grid'),
-                            'list' => __('List'),
-                        ],
-                    ],
                     'container' => [
                         'display' => __('Container'),
                         'instructions' => __('statamic::fieldtypes.assets.config.container'),
@@ -59,15 +43,41 @@ class Assets extends Fieldtype
                         'required' => true,
                         'default' => AssetContainer::all()->count() == 1 ? AssetContainer::all()->first()->handle() : null,
                         'force_in_config' => true,
+                        'width' => '50',
+                    ],
+                    'allow_uploads' => [
+                        'display' => __('Allow Uploads'),
+                        'instructions' => __('statamic::fieldtypes.assets.config.allow_uploads'),
+                        'type' => 'toggle',
+                        'default' => true,
+                        'width' => '50',
                     ],
                     'folder' => [
                         'display' => __('Folder'),
                         'instructions' => __('statamic::fieldtypes.assets.config.folder'),
                         'type' => 'asset_folder',
                         'max_items' => 1,
+                        'mode' => 'select',
                         'if' => [
                             'container' => 'not empty',
                         ],
+                        'width' => '50',
+                    ],
+                    'dynamic' => [
+                        'display' => __('Dynamic Folder'),
+                        'instructions' => __('statamic::fieldtypes.assets.config.dynamic'),
+                        'type' => 'select',
+                        'clearable' => true,
+                        'options' => [
+                            'id' => __('ID'),
+                            'slug' => __('Slug'),
+                            'author' => __('Author'),
+                        ],
+                        'validate' => 'in:id,slug,author',
+                        'if' => [
+                            'container' => 'not empty',
+                        ],
+                        'width' => '50',
                     ],
                     'restrict' => [
                         'display' => __('Restrict to Folder'),
@@ -75,26 +85,64 @@ class Assets extends Fieldtype
                         'type' => 'toggle',
                         'if' => [
                             'container' => 'not empty',
+                            'dynamic' => 'not true',
                         ],
+                        'width' => '50',
                     ],
-                    'allow_uploads' => [
-                        'display' => __('Allow Uploads'),
-                        'instructions' => __('statamic::fieldtypes.assets.config.allow_uploads'),
-                        'type' => 'toggle',
-                        'default' => true,
+                ],
+            ],
+            [
+                'display' => __('Appearance'),
+                'fields' => [
+                    'mode' => [
+                        'display' => __('UI Mode'),
+                        'instructions' => __('statamic::fieldtypes.assets.config.mode'),
+                        'type' => 'select',
+                        'default' => 'list',
+                        'options' => [
+                            'grid' => __('Grid'),
+                            'list' => __('List'),
+                        ],
+                        'width' => '50',
                     ],
                     'show_filename' => [
                         'display' => __('Show Filename'),
                         'instructions' => __('statamic::fieldtypes.assets.config.show_filename'),
                         'type' => 'toggle',
                         'default' => true,
+                        'width' => '50',
                     ],
                     'show_set_alt' => [
                         'display' => __('Show Set Alt'),
                         'instructions' => __('statamic::fieldtypes.assets.config.show_set_alt'),
                         'type' => 'toggle',
                         'default' => true,
+                        'width' => '50',
                     ],
+                ],
+            ],
+            [
+                'display' => __('Boundaries & Limits'),
+                'fields' => [
+                    'max_files' => [
+                        'display' => __('Max Files'),
+                        'instructions' => __('statamic::fieldtypes.assets.config.max_files'),
+                        'min' => 1,
+                        'type' => 'integer',
+                        'width' => '50',
+                    ],
+                    'min_files' => [
+                        'display' => __('Min Files'),
+                        'instructions' => __('statamic::fieldtypes.assets.config.min_files'),
+                        'min' => 1,
+                        'type' => 'integer',
+                        'width' => '50',
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Advanced'),
+                'fields' => [
                     'query_scopes' => [
                         'display' => __('Query Scopes'),
                         'instructions' => __('statamic::fieldtypes.assets.config.query_scopes'),
@@ -140,7 +188,7 @@ class Assets extends Fieldtype
         $max_files = (int) $this->config('max_files');
 
         $values = collect($data)->map(function ($id) {
-            return Asset::find($id)->path();
+            return Asset::findOrFail($id)->path();
         });
 
         return $this->config('max_files') === 1 ? $values->first() : $values->all();
@@ -148,9 +196,121 @@ class Assets extends Fieldtype
 
     public function preload()
     {
+        $container = $this->container();
+
         return [
             'data' => $this->getItemData($this->field->value() ?? $this->defaultValue),
-            'container' => $this->container()->handle(),
+            'container' => [
+                'id' => $container->id(),
+                'title' => $container->title(),
+                'edit_url' => $container->editUrl(),
+                'delete_url' => $container->deleteUrl(),
+                'blueprint_url' => cp_route('blueprints.asset-containers.edit', $container->handle()),
+                'can_view' => User::current()->can('view', $container),
+                'can_upload' => User::current()->can('store', [\Statamic\Contracts\Assets\Asset::class, $container]),
+                'can_edit' => User::current()->can('edit', $container),
+                'can_delete' => User::current()->can('delete', $container),
+                'sort_field' => $container->sortField(),
+                'sort_direction' => $container->sortDirection(),
+            ],
+            'dynamicFolder' => $dynamicFolder = $this->dynamicFolder(),
+            'rename_folder' => $this->renameFolderAction($dynamicFolder),
+            'columns' => $this->getColumns(),
+        ];
+    }
+
+    protected function getColumns()
+    {
+        $columns = $this->container()->blueprint()->columns()->map(fn ($column) => clone $column);
+
+        $basename = Column::make('basename')
+            ->label(__('File'))
+            ->visible(true)
+            ->defaultVisibility(true)
+            ->sortable(true)
+            ->required(true);
+
+        $size = Column::make('size')
+            ->label(__('Size'))
+            ->value('size_formatted')
+            ->visible(true)
+            ->defaultVisibility(true)
+            ->sortable(true);
+
+        $lastModified = Column::make('last_modified')
+            ->label(__('Last Modified'))
+            ->value('last_modified_relative')
+            ->visible(true)
+            ->defaultVisibility(true)
+            ->sortable(true);
+
+        $columns->put('basename', $basename);
+        $columns->put('size', $size);
+        $columns->put('last_modified', $lastModified);
+
+        $columns->setPreferred("assets.{$this->container()->handle()}.columns");
+
+        return $columns->rejectUnlisted()->values();
+    }
+
+    private function dynamicFolder()
+    {
+        if (! $this->config('dynamic')) {
+            return null;
+        }
+
+        // If there's already a value, get the folder from the first asset.
+        // The user may have renamed the directory to differ from the entry slug.
+        if (! empty($value = $this->field->value())) {
+            $folder = ($folder = $this->config('folder')) ? $folder.'/' : '';
+            $prefix = $this->container()->handle().'::'.$folder;
+            $file = Str::after($value[0], $prefix);
+
+            return Str::beforeLast($file, '/');
+        }
+
+        // Otherwise, use a given field's value as the folder.
+        if (! in_array($field = $this->config('dynamic'), ['id', 'slug', 'author'])) {
+            throw new \Exception("Dynamic folder field [$field] is invalid. Must be one of: id, slug, author");
+        }
+
+        $parent = $this->field->parent();
+
+        if ($parent instanceof Entry) {
+            $value = $parent->$field;
+
+            // If the author field doesn't have a max_items of 1, it'll be a collection, so grab the first one.
+            if ($value instanceof Collection) {
+                $value = $value->first();
+            }
+
+            // If the author field had max_items 1 it would be a user, or since we got it above, use its id.
+            if (is_object($value)) {
+                $value = $value->id();
+            }
+
+            return $value;
+        }
+    }
+
+    private function renameFolderAction($dynamicFolder)
+    {
+        if (! $dynamicFolder) {
+            return null;
+        }
+
+        $container = $this->container();
+        $folder = (($folder = $this->config('folder')) ? $folder.'/' : '').$dynamicFolder;
+        $assetFolder = $container->assetFolder($folder);
+
+        $action = Action::for($assetFolder, [
+            'container' => $container->handle(),
+            'folder' => $folder,
+        ])->first(fn ($action) => get_class($action) === RenameAssetFolder::class)?->toArray();
+
+        return [
+            'url' => cp_route('assets.folders.actions.run', $container),
+            'action' => $action,
         ];
     }
 
@@ -181,7 +341,9 @@ class Assets extends Fieldtype
 
         $query = new OrderedQueryBuilder($query, $ids);
 
-        return $single ? Blink::once($key, fn () => $query->first()) : $query;
+        return $single && ! config('statamic.system.always_augment_to_query', false)
+            ? Blink::once($key, fn () => $query->first())
+            : $query;
     }
 
     public function shallowAugment($values)

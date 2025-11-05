@@ -3,14 +3,15 @@
 namespace Statamic\Http\Controllers\CP\Globals;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Contracts\Globals\GlobalSet as GlobalSetContract;
+use Statamic\CP\PublishForm;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Rules\Handle;
-use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class GlobalsController extends CpController
@@ -33,13 +34,17 @@ class GlobalsController extends CpController
                 'handle' => $set->handle(),
                 'title' => $set->title(),
                 'deleteable' => User::current()->can('delete', $set),
+                'configurable' => User::current()->can('edit', $set),
                 'edit_url' => $localized ? $localized->editUrl() : $set->editUrl(),
+                'configure_url' => $set->editUrl(),
                 'delete_url' => $set->deleteUrl(),
             ];
         })->filter()->values();
 
-        return view('statamic::globals.index', [
+        return Inertia::render('globals/Index', [
             'globals' => $globals,
+            'createUrl' => cp_route('globals.create'),
+            'canCreate' => User::current()->can('create', GlobalSetContract::class),
         ]);
     }
 
@@ -58,39 +63,17 @@ class GlobalsController extends CpController
                 return [
                     'name' => $site->name(),
                     'handle' => $site->handle(),
-                    'enabled' => $enabled = $set->existsIn($site->handle()),
-                    'origin' => $enabled ? optional($set->in($site->handle())->origin())->locale() : null,
+                    'enabled' => $set->sites()->contains($site->handle()),
+                    'origin' => $set->origins()->get($site->handle()),
                 ];
             })->values(),
         ];
 
-        $fields = ($blueprint = $this->editFormBlueprint($set))
-            ->fields()
-            ->addValues($values)
-            ->preProcess();
-
-        return view('statamic::globals.configure', [
-            'blueprint' => $blueprint->toPublishArray(),
-            'values' => $fields->values(),
-            'meta' => $fields->meta(),
-            'set' => $set,
-            'breadcrumb' => $this->breadcrumb($set),
-        ]);
-    }
-
-    private function breadcrumb(GlobalSetContract $set)
-    {
-        if ($localized = $set->inSelectedSite()) {
-            return [
-                'title' => $localized->title(),
-                'url' => $localized->editUrl(),
-            ];
-        }
-
-        return [
-            'title' => __('Globals'),
-            'url' => cp_route('globals.index'),
-        ];
+        return PublishForm::make($this->editFormBlueprint($set))
+            ->title(__('Configure Global Set'))
+            ->values($values)
+            ->asConfig()
+            ->submittingTo(cp_route('globals.update', $set->handle()));
     }
 
     public function update(Request $request, $set)
@@ -112,19 +95,11 @@ class GlobalsController extends CpController
             ->blueprint($values['blueprint']);
 
         if (Site::multiEnabled()) {
-            $sites = collect(Arr::get($values, 'sites'));
+            $sites = collect($values['sites'])
+                ->filter(fn ($site) => $site['enabled'])
+                ->mapWithKeys(fn ($site) => [$site['handle'] => $site['origin']]);
 
-            foreach ($sites->filter->enabled as $site) {
-                $vars = $set->in($site['handle']) ?? $set->makeLocalization($site['handle']);
-                $vars->origin($site['origin']);
-                $set->addLocalization($vars);
-            }
-
-            foreach ($sites->reject->enabled as $site) {
-                if ($set->existsIn($site['handle'])) {
-                    $set->removeLocalization($set->in($site['handle']));
-                }
-            }
+            $set->sites($sites);
         }
 
         $set->save();
@@ -136,7 +111,9 @@ class GlobalsController extends CpController
     {
         $this->authorize('create', GlobalSetContract::class);
 
-        return view('statamic::globals.create');
+        return Inertia::render('globals/Create', [
+            'submitUrl' => cp_route('globals.store'),
+        ]);
     }
 
     public function store(Request $request)
@@ -161,10 +138,9 @@ class GlobalsController extends CpController
         }
 
         $global = GlobalSet::make($handle)->title($data['title']);
-
-        $global->addLocalization($global->makeLocalization(Site::default()->handle()));
-
         $global->save();
+
+        $global->in(Site::default()->handle())->save();
 
         session()->flash('message', __('Global Set created'));
 
@@ -201,12 +177,16 @@ class GlobalsController extends CpController
                 'display' => __('Content Model'),
                 'fields' => [
                     'blueprint' => [
-                        'type' => 'html',
+                        'display' => __('Blueprint'),
                         'instructions' => __('statamic::messages.globals_blueprint_instructions'),
-                        'html' => ''.
-                            '<div class="text-xs">'.
-                            '   <a href="'.cp_route('globals.blueprint.edit', $set->handle()).'" class="text-blue">'.__('Edit').'</a>'.
-                            '</div>',
+                        'type' => 'blueprints',
+                        'options' => [
+                            [
+                                'handle' => 'default',
+                                'title' => __('Edit Blueprint'),
+                                'edit_url' => cp_route('blueprints.globals.edit', $set->handle()),
+                            ],
+                        ],
                     ],
                 ],
             ],
@@ -218,13 +198,28 @@ class GlobalsController extends CpController
                 'fields' => [
                     'sites' => [
                         'type' => 'global_set_sites',
-                        'mode' => 'select',
                         'required' => true,
                     ],
                 ],
             ];
         }
 
-        return Blueprint::makeFromTabs($fields);
+        return Blueprint::make()->setContents(collect([
+            'tabs' => [
+                'main' => [
+                    'sections' => collect($fields)->map(function ($section) {
+                        return [
+                            'display' => $section['display'],
+                            'fields' => collect($section['fields'])->map(function ($field, $handle) {
+                                return [
+                                    'handle' => $handle,
+                                    'field' => $field,
+                                ];
+                            })->values()->all(),
+                        ];
+                    })->values()->all(),
+                ],
+            ],
+        ])->all());
     }
 }

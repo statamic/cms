@@ -12,31 +12,36 @@
 </template>
 
 <script>
-export default {
+import { requireElevatedSessionIf } from '@/components/elevated-sessions/index.js';
+import { router } from '@inertiajs/vue3';
 
+export default {
     props: {
         resource: {
-            type: Object
+            type: Object,
         },
         resourceTitle: {
-            type: String
+            type: String,
         },
         route: {
             type: String,
         },
         redirect: {
-            type: String
+            type: String,
         },
         reload: {
-            type: Boolean
-        }
+            type: Boolean,
+        },
+        requiresElevatedSession: {
+            type: Boolean,
+        },
     },
 
     data() {
         return {
             deleting: false,
             redirectFromServer: null,
-        }
+        };
     },
 
     computed: {
@@ -45,7 +50,7 @@ export default {
         },
 
         modalTitle() {
-            return __('Delete :resource', {resource: __(this.title)});
+            return __('Delete :resource', { resource: __(this.title) });
         },
 
         modalBody() {
@@ -54,7 +59,7 @@ export default {
 
         deleteUrl() {
             let url = data_get(this.resource, 'delete_url', this.route);
-            if (! url) console.error('ResourceDeleter cannot find delete url');
+            if (!url) console.error('ResourceDeleter cannot find delete url');
             return url;
         },
 
@@ -65,12 +70,15 @@ export default {
 
     methods: {
         confirm() {
-            this.deleting = true;
+            requireElevatedSessionIf(this.requiresElevatedSession)
+                .then(() => (this.deleting = true))
+                .catch(() => Statamic.$toast.error(__('statamic::messages.elevated_session_required')));
         },
 
         confirmed() {
-            this.$axios.delete(this.deleteUrl)
-                .then(response => {
+            this.$axios
+                .delete(this.deleteUrl)
+                .then((response) => {
                     this.redirectFromServer = data_get(response, 'data.redirect');
                     this.success();
                 })
@@ -81,12 +89,12 @@ export default {
 
         success() {
             if (this.redirectUrl) {
-                location.href = this.redirectUrl;
+                router.get(this.redirectUrl);
                 return;
             }
 
             if (this.reload) {
-                location.reload();
+                router.reload();
                 return;
             }
 
@@ -96,7 +104,7 @@ export default {
 
         cancel() {
             this.deleting = false;
-        }
-    }
-}
+        },
+    },
+};
 </script>

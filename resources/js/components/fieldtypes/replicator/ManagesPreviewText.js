@@ -1,20 +1,18 @@
-import PreviewHtml from "./PreviewHtml";
+import PreviewHtml from './PreviewHtml';
 
 export default {
-
     computed: {
         previewText() {
-            const previews = _(this.previews).filter((value, handle) => {
-                const config = _.findWhere(this.config.fields, { handle }) || {};
-                return config.replicator_preview === undefined ? this.showFieldPreviews : config.replicator_preview;
-            });
-
-            return Object.values(previews)
-                .filter(value => {
-                    if (['null', '[]', '{}', ''].includes(JSON.stringify(value))) return null;
-                    return value;
+            return Object.entries(this.previews)
+                .filter(([handle, value]) => {
+                    if (!handle.endsWith('_')) return false;
+                    handle = handle.substr(0, handle.length - 1); // Remove the trailing underscore.
+                    const config = this.config.fields.find((f) => f.handle === handle) || {};
+                    return config.replicator_preview === undefined ? this.showFieldPreviews : config.replicator_preview;
                 })
-                .map(value => {
+                .map(([handle, value]) => value)
+                .filter((value) => (['null', '[]', '{}', ''].includes(JSON.stringify(value)) ? null : value))
+                .map((value) => {
                     if (value instanceof PreviewHtml) return value.html;
 
                     if (typeof value === 'string') return escapeHtml(value);
@@ -26,7 +24,6 @@ export default {
                     return escapeHtml(JSON.stringify(value));
                 })
                 .join(' / ');
-        }
-    }
-
-}
+        },
+    },
+};

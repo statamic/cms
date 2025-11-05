@@ -146,6 +146,10 @@ return [
     'unique_user_value' => 'Bu dəyər artıq götürülüb.',
     'unique_uri' => 'Bu URI artıq götürülüb.',
     'time' => 'Keçərli bir vaxt deyil.',
-    'custom.attribute-name.rule-name' => '',
+    'asset_current_filename' => 'Bu, cari fayl adıdır.',
+    'asset_file_exists' => 'Bu adda fayl artıq mövcuddur.',
+    'asset_file_exists_same_content' => 'Bu adda fayl artıq mövcuddur və eyni məzmuna malikdir. Adını dəyişmək əvəzinə onu silmək istəyə bilərsiniz.',
+    'asset_file_exists_different_content' => 'Bu adda fayl artıq mövcuddur, lakin fərqli məzmuna malikdir. Bunun əvəzinə digər faylı bu faylla əvəz etmək istəyə bilərsiniz.',
+    'custom.attribute-name.rule-name' => 'xüsusi mesaj',
     'attributes' => [],
 ];

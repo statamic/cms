@@ -11,6 +11,8 @@ use Statamic\Facades\User;
 
 class Impersonate extends Action
 {
+    public $icon = 'mask';
+
     public static function title()
     {
         return __('Start Impersonating');
@@ -51,6 +53,7 @@ class Impersonate extends Action
 
             $guard->login($users->first());
             session()->put('statamic_impersonated_by', $impersonator->getKey());
+            session()->forget('statamic_elevated_session');
             Toast::success(__('You are now impersonating').' '.$impersonated->name());
 
             ImpersonationStarted::dispatch($impersonator, $impersonated);
@@ -83,6 +86,11 @@ class Impersonate extends Action
     }
 
     public function bypassesDirtyWarning(): bool
+    {
+        return true;
+    }
+
+    public function requiresElevatedSession(): bool
     {
         return true;
     }

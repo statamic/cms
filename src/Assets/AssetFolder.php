@@ -3,6 +3,7 @@
 namespace Statamic\Assets;
 
 use Illuminate\Contracts\Support\Arrayable;
+use League\Flysystem\PathTraversalDetected;
 use Statamic\Assets\AssetUploader as Uploader;
 use Statamic\Contracts\Assets\AssetFolder as Contract;
 use Statamic\Events\AssetFolderDeleted;
@@ -35,7 +36,15 @@ class AssetFolder implements Arrayable, Contract
 
     public function path($path = null)
     {
-        return $this->fluentlyGetOrSet('path')->args(func_get_args());
+        return $this->fluentlyGetOrSet('path')
+            ->setter(function ($path) {
+                if (str_contains($path, '..')) {
+                    throw PathTraversalDetected::forPath($path);
+                }
+
+                return $path;
+            })
+            ->args(func_get_args());
     }
 
     public function basename()
@@ -97,6 +106,17 @@ class AssetFolder implements Arrayable, Contract
         return $date;
     }
 
+    public function size()
+    {
+        $size = 0;
+
+        foreach ($this->assets() as $asset) {
+            $size += $asset->size();
+        }
+
+        return $size;
+    }
+
     public function save()
     {
         $this->disk()->put($this->path().'/.gitkeep', '');
@@ -133,7 +153,7 @@ class AssetFolder implements Arrayable, Contract
         });
         $cache->save();
 
-        AssetFolderDeleted::dispatch($this);
+        AssetFolderDeleted::dispatch(clone $this);
 
         return $this;
     }
@@ -182,6 +202,8 @@ class AssetFolder implements Arrayable, Contract
         $this->container()->assetFolders($oldPath)->each->move($newPath);
         $this->container()->assets($oldPath)->each->move($newPath);
         $this->delete();
+
+        $this->path($newPath);
 
         return $folder;
     }

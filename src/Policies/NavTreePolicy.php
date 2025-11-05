@@ -8,6 +8,13 @@ class NavTreePolicy extends NavPolicy
 {
     use Concerns\HasMultisitePolicy;
 
+    public function before($user)
+    {
+        if (User::fromUser($user)->isSuper()) {
+            return true;
+        }
+    }
+
     public function view($user, $nav)
     {
         $user = User::fromUser($user);

@@ -51,10 +51,11 @@ class NavigationTreeController extends CpController
 
         $tree = $this->reorderTree($request->pages);
 
-        $nav->in($request->site)->tree($tree)->save();
+        $saved = $nav->in($request->site)->tree($tree)->save();
 
         return [
             'generatedIds' => $this->generatedIds,
+            'saved' => $saved,
         ];
     }
 
