@@ -77,4 +77,3 @@ export { default as Textarea } from './Textarea.vue';
 export { default as TimePicker } from './TimePicker/TimePicker.vue';
 export { default as ToggleGroup } from './Toggle/Group.vue';
 export { default as ToggleItem } from './Toggle/Item.vue';
-export { default as Tooltip } from './Tooltip.vue';
