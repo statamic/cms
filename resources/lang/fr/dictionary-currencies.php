@@ -114,6 +114,6 @@ return [
     'XOF' => 'Franc CFA (UEMOA)',
     'YER' => 'Rial yéménite',
     'ZAR' => 'Rand sud-africain',
-    'ZiG' => 'Or zimbabwéen'
+    'ZiG' => 'Or zimbabwéen',
     'ZMK' => 'Kwacha zambien'
 ];
