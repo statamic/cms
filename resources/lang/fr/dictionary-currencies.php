@@ -32,6 +32,7 @@ return [
     'DKK' => 'Couronne danoise',
     'DOP' => 'Peso dominicain',
     'DZD' => 'Dinar algérien',
+    'EEK' => 'Couronne estonienne',
     'EGP' => 'Livre égyptienne',
     'ERN' => 'Nakfa érythréen',
     'ETB' => 'Birr éthiopien',
@@ -43,6 +44,7 @@ return [
     'GTQ' => 'Quetzal guatémaltèque',
     'HKD' => 'Dollar de Hong Kong',
     'HNL' => 'Lempira hondurien',
+    'HRK' => 'Kuna croate',
     'HUF' => 'Forint hongrois',
     'IDR' => 'Roupie indonésienne',
     'ILS' => 'Shekel israélien',
@@ -61,6 +63,8 @@ return [
     'KZT' => 'Tenge kazakh',
     'LBP' => 'Livre libanaise',
     'LKR' => 'Roupie srilankaise',
+    'LTL' => 'Litas lituanien',
+    'LVL' => 'Lats lettons',
     'LYD' => 'Dinar libyen',
     'MAD' => 'Dirham marocain',
     'MDL' => 'Leu moldave',
@@ -114,6 +118,6 @@ return [
     'XOF' => 'Franc CFA (UEMOA)',
     'YER' => 'Rial yéménite',
     'ZAR' => 'Rand sud-africain',
-    'ZiG' => 'Or zimbabwéen',
-    'ZMK' => 'Kwacha zambien'
+    'ZMK' => 'Kwacha zambien',
+    'ZWL' => 'Dollar zimbabwéen',
 ];
