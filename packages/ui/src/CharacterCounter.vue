@@ -1,7 +1,6 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 import { cva } from 'cva';
-import Tooltip from './Tooltip.vue';
 
 const emit = defineEmits(['update:text']);
 
@@ -64,43 +63,41 @@ const circleClasses = cva({
 </script>
 
 <template>
-    <Tooltip :text="tooltipText" position="top" delay-duration="0">
-        <div class="relative flex size-6 items-center justify-center" :class="{ 'animate-pop': isAnimating }">
-            <svg :class="circleClasses({ color: 'gray' })" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" stroke-width="8" />
-            </svg>
-            <svg
-                :class="
-                    circleClasses({
-                        color: isOverLimit
-                            ? 'red'
-                            : circleFillPercentage < 70
-                              ? 'green'
-                              : circleFillPercentage < 90
-                                ? 'amber'
-                                : 'red',
-                    }) + ' -rotate-90'
-                "
-                viewBox="0 0 100 100"
-            >
-                <circle
-                    cx="50"
-                    cy="50"
-                    r="40"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="8"
-                    stroke-dasharray="251.2"
-                    :stroke-dashoffset="251.2 - (251.2 * circleFillPercentage) / 100"
-                    stroke-linecap="round"
-                />
-                <line v-if="isOverLimit" x1="20" y1="20" x2="80" y2="80" stroke="currentColor" stroke-width="8" />
-            </svg>
-            <span v-if="isNearLimit" class="text-2xs absolute z-10 text-red-600">
-                {{ charsRemaining }}
-            </span>
-        </div>
-    </Tooltip>
+    <div class="relative flex size-6 items-center justify-center" :class="{ 'animate-pop': isAnimating }" v-tooltip="tooltipText">
+        <svg :class="circleClasses({ color: 'gray' })" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" stroke-width="8" />
+        </svg>
+        <svg
+            :class="
+                `${circleClasses({
+                    color: isOverLimit
+                        ? 'red'
+                        : circleFillPercentage < 70
+                          ? 'green'
+                          : circleFillPercentage < 90
+                            ? 'amber'
+                            : 'red',
+                })} -rotate-90`
+            "
+            viewBox="0 0 100 100"
+        >
+            <circle
+                cx="50"
+                cy="50"
+                r="40"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="8"
+                stroke-dasharray="251.2"
+                :stroke-dashoffset="251.2 - (251.2 * circleFillPercentage) / 100"
+                stroke-linecap="round"
+            />
+            <line v-if="isOverLimit" x1="20" y1="20" x2="80" y2="80" stroke="currentColor" stroke-width="8" />
+        </svg>
+        <span v-if="isNearLimit" class="text-2xs absolute z-10 text-red-600">
+            {{ charsRemaining }}
+        </span>
+    </div>
 </template>
 
 <style scoped>

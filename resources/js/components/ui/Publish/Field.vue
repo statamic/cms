@@ -5,7 +5,6 @@ import { injectFieldsContext } from './FieldsProvider.vue';
 import {
     Field,
     Icon,
-    Tooltip,
     Label,
 } from '@ui';
 import FieldActions from '@/components/field-actions/FieldActions.vue';
@@ -229,9 +228,9 @@ const fieldtypeComponentEvents = computed(() => ({
             <template #label v-if="shouldShowLabel">
                 <Label :for="fieldId" :required="isRequired">
                     <template v-if="shouldShowLabelText">
-                        <Tooltip :text="config.handle" :delay="1000" as="span">
+                        <span v-tooltip="config.handle">
                             {{ __(config.display) }}
-                        </Tooltip>
+                        </span>
                     </template>
                     <ui-button size="xs" inset icon="synced" variant="ghost" v-tooltip="__('messages.field_synced_with_origin')" v-if="!isReadOnly && isSyncable" v-show="isSynced" @click="desync" />
                     <ui-button size="xs" inset icon="unsynced" variant="ghost" v-tooltip="__('messages.field_desynced_from_origin')" v-if="!isReadOnly && isSyncable" v-show="!isSynced" @click="sync" />

@@ -1,6 +1,6 @@
 <script setup>
 import Head from '@/pages/layout/Head.vue';
-import { Header, Button, Tooltip, Card, CardPanel, Panel, Heading, Table, TableRow, TableCell, Badge, DocsCallout } from '@ui';
+import { Header, Button, Card, CardPanel, Panel, Heading, Table, TableRow, TableCell, Badge, DocsCallout } from '@ui';
 
 const props = defineProps([
     'requestError',
@@ -30,13 +30,12 @@ const props = defineProps([
             target="_blank"
             :text="__('Buy Licenses')"
         />
-        <Tooltip side="bottom" :text="__('statamic::messages.licensing_sync_instructions')">
-            <Button
-                :href="refreshUrl"
-                variant="primary"
-                :text="__('Sync')"
-            />
-        </Tooltip>
+        <Button
+            :href="refreshUrl"
+            variant="primary"
+            :text="__('Sync')"
+            v-tooltip="__('statamic::messages.licensing_sync_instructions')"
+        />
     </Header>
 
     <Card v-if="requestError" class="w-full space-y-4 flex items-center justify-between">
