@@ -29,7 +29,9 @@ class ShowRegularCollectionTest extends ShowCollectionTestCase
             ->actingAs($user)
             ->get($collection->showUrl())
             ->assertOk()
-            ->assertViewIs('statamic::collections.show')
-            ->assertViewHas('collection', $collection);
+            ->assertInertia(fn ($page) => $page
+                ->component('collections/Show')
+                ->where('handle', 'test')
+            );
     }
 }

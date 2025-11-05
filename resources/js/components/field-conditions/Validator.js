@@ -1,34 +1,44 @@
 import Converter from './Converter.js';
+import ParentResolver from './ParentResolver.js';
 import { KEYS } from './Constants.js';
-import { data_get } from  '../../bootstrap/globals.js'
-import isString from 'underscore/modules/isString.js'
-import isObject from 'underscore/modules/isObject.js'
-import isEmpty from 'underscore/modules/isEmpty.js'
-import intersection from 'underscore/modules/intersection.js'
-import map from 'underscore/modules/map.js'
-import each from 'underscore/modules/each.js'
-import filter from 'underscore/modules/filter.js'
-import reject from 'underscore/modules/reject.js'
-import first from 'underscore/modules/first.js'
-import chain from 'underscore/modules/chain.js'
-import chainable from 'underscore/modules/mixin.js'
+import { data_get } from '../../bootstrap/globals.js';
+import { isObject, intersection } from 'lodash-es';
 
-chainable({ chain, map, each, filter, reject, first, isEmpty });
+const NUMBER_SPECIFIC_COMPARISONS = ['>', '>=', '<', '<='];
 
-const NUMBER_SPECIFIC_COMPARISONS = [
-    '>', '>=', '<', '<='
-];
+const isEmpty = (value) => {
+    if (value === null || value === undefined) return true;
+
+    return Array.isArray(value) ? value.length === 0 : Object.keys(value).length === 0;
+};
+
+const isString = (str) => str != null && typeof str.valueOf() === 'string';
 
 export default class {
-    constructor(field, values, store, storeName) {
+    constructor(field, values, rootValues, currentFieldPath, revealerFields, extraPayload) {
         this.field = field;
         this.values = values;
-        this.rootValues = store ? store.state.publish[storeName].values : false;
-        this.store = store;
-        this.storeName = storeName;
+        this.currentFieldPath = currentFieldPath;
+        this.revealerFields = revealerFields;
+        this.extraPayload = extraPayload;
+        this.rootValues = rootValues || false;
         this.passOnAny = false;
         this.showOnPass = true;
-        this.converter = new Converter;
+        this.converter = new Converter();
+    }
+
+    usingRootValues() {
+        if (!this.currentFieldPath) {
+            throw new Error('[currentFieldPath] constructor param required for `usingRootValues()`');
+        }
+
+        this.rootValues = this.values;
+
+        if (this.currentFieldPath.includes('.')) {
+            return this.scopeValuesToParent();
+        }
+
+        return this;
     }
 
     passesConditions(specificConditions) {
@@ -40,20 +50,15 @@ export default class {
             return this.passesCustomCondition(this.prepareCondition(conditions));
         }
 
-        let passes = this.passOnAny
-            ? this.passesAnyConditions(conditions)
-            : this.passesAllConditions(conditions);
+        let passes = this.passOnAny ? this.passesAnyConditions(conditions) : this.passesAllConditions(conditions);
 
-        return this.showOnPass ? passes : ! passes;
+        return this.showOnPass ? passes : !passes;
     }
 
     getConditions() {
-        let key = chain(KEYS)
-            .filter(key => this.field[key])
-            .first()
-            .value();
+        let key = KEYS.filter((key) => this.field[key])[0];
 
-        if (! key) {
+        if (!key) {
             return undefined;
         }
 
@@ -77,19 +82,19 @@ export default class {
     }
 
     passesAllConditions(conditions) {
-        return chain(conditions)
-            .map(condition => this.prepareCondition(condition))
-            .reject(condition => this.passesCondition(condition))
-            .isEmpty()
-            .value();
+        return isEmpty(
+            conditions
+                .map((condition) => this.prepareCondition(condition))
+                .filter((condition) => !this.passesCondition(condition)),
+        );
     }
 
     passesAnyConditions(conditions) {
-        return ! chain(conditions)
-            .map(condition => this.prepareCondition(condition))
-            .filter(condition => this.passesCondition(condition))
-            .isEmpty()
-            .value();
+        return !isEmpty(
+            conditions
+                .map((condition) => this.prepareCondition(condition))
+                .filter((condition) => this.passesCondition(condition)),
+        );
     }
 
     prepareCondition(condition) {
@@ -101,7 +106,7 @@ export default class {
         let lhs = this.prepareLhs(condition.field, operator);
         let rhs = this.prepareRhs(condition.value, operator);
 
-        return {lhs, operator, rhs};
+        return { lhs, operator, rhs };
     }
 
     prepareOperator(operator) {
@@ -135,7 +140,7 @@ export default class {
         }
 
         // When performing lhs.includes(), if lhs is not an object or array, cast to string.
-        if (operator === 'includes' && ! isObject(lhs)) {
+        if (operator === 'includes' && !isObject(lhs)) {
             return lhs ? lhs.toString() : '';
         }
 
@@ -145,9 +150,7 @@ export default class {
         }
 
         // Prepare for eval() and return.
-        return isString(lhs)
-            ? JSON.stringify(lhs.trim())
-            : lhs;
+        return isString(lhs) ? JSON.stringify(lhs.trim()) : lhs;
     }
 
     prepareRhs(rhs, operator) {
@@ -172,41 +175,39 @@ export default class {
         }
 
         // Prepare for eval() and return.
-        return isString(rhs)
-            ? JSON.stringify(rhs.trim())
-            : rhs;
+        return isString(rhs) ? JSON.stringify(rhs.trim()) : rhs;
     }
 
     prepareCustomCondition(condition) {
         let functionName = this.prepareFunctionName(condition.value || condition);
         let params = this.prepareParams(condition.value || condition);
 
-        let target = condition.field
-            ? this.getFieldValue(condition.field)
-            : null;
+        let target = condition.field ? this.getFieldValue(condition.field) : null;
         let targetHandle = condition.field;
 
-        return {functionName, params, target, targetHandle};
+        return { functionName, params, target, targetHandle };
     }
 
     prepareFunctionName(condition) {
-        return condition
-            .replace(new RegExp('^custom '), '')
-            .split(':')[0];
+        return condition.replace(new RegExp('^custom '), '').split(':')[0];
     }
 
     prepareParams(condition) {
         let params = condition.split(':')[1];
 
-        return params
-            ? params.split(',').map(string => string.trim())
-            : [];
+        return params ? params.split(',').map((string) => string.trim()) : [];
     }
 
     getFieldValue(field) {
-        return field.startsWith('root.')
-            ?  data_get(this.rootValues, field.replace(new RegExp('^root.'), ''))
-            :  data_get(this.values, field);
+        if (field.startsWith('$parent.')) {
+            field = new ParentResolver(this.currentFieldPath).resolve(field);
+        }
+
+        if (field.startsWith('$root.') || field.startsWith('root.')) {
+            return data_get(this.rootValues, field.replace(new RegExp('^\\$?root\\.'), ''));
+        }
+
+        return data_get(this.values, field);
     }
 
     passesCondition(condition) {
@@ -239,7 +240,7 @@ export default class {
     }
 
     passesIncludesAnyCondition(condition) {
-        let values = condition.rhs.split(',').map(string => string.trim());
+        let values = condition.rhs.split(',').map((string) => string.trim());
 
         if (Array.isArray(condition.lhs)) {
             return intersection(condition.lhs, values).length;
@@ -249,7 +250,7 @@ export default class {
     }
 
     passesCustomCondition(condition) {
-        let customFunction = data_get(this.store.state.statamic.conditions, condition.functionName);
+        let customFunction = Statamic.$conditions.get(condition.functionName);
 
         if (typeof customFunction !== 'function') {
             console.error(`Statamic field condition [${condition.functionName}] was not properly defined.`);
@@ -262,11 +263,11 @@ export default class {
             targetHandle: condition.targetHandle,
             values: this.values,
             root: this.rootValues,
-            store: this.store,
-            storeName: this.storeName,
+            fieldPath: this.currentFieldPath,
+            ...this.extraPayload,
         });
 
-        return this.showOnPass ? passes : ! passes;
+        return this.showOnPass ? passes : !passes;
     }
 
     passesNonRevealerConditions(dottedPrefix) {
@@ -276,22 +277,32 @@ export default class {
             return this.passesConditions(conditions);
         }
 
-        let revealerFields = data_get(this.store.state.publish[this.storeName], 'revealerFields', []);
+        let revealerFields = this.revealerFields || [];
 
-        let nonRevealerConditions = chain(this.getConditions())
-            .reject(condition => revealerFields.includes(this.relativeLhsToAbsoluteFieldPath(condition.field, dottedPrefix)))
-            .value();
+        let nonRevealerConditions = (this.getConditions() ?? []).filter(
+            (condition) => !revealerFields.includes(this.relativeLhsToAbsoluteFieldPath(condition.field, dottedPrefix)),
+        );
 
         return this.passesConditions(nonRevealerConditions);
     }
 
     relativeLhsToAbsoluteFieldPath(lhs, dottedPrefix) {
-        if (! dottedPrefix) {
-            return lhs;
+        if (lhs.startsWith('$parent.')) {
+            lhs = new ParentResolver(this.currentFieldPath).resolve(lhs);
         }
 
-        return lhs.startsWith('root.')
-            ? lhs.replace(/^root\./, '')
-            : dottedPrefix + '.' + lhs;
+        if (lhs.startsWith('$root.') || lhs.startsWith('root.')) {
+            return lhs.replace(new RegExp('^\\$?root\\.'), '');
+        }
+
+        return dottedPrefix ? dottedPrefix + '.' + lhs : lhs;
+    }
+
+    scopeValuesToParent() {
+        let scope = this.currentFieldPath.replace(new RegExp('\.[^\.]+$'), '');
+
+        this.values = data_get(this.rootValues, scope);
+
+        return this;
     }
 }

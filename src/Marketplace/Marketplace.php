@@ -11,19 +11,18 @@ use Statamic\Statamic;
 
 class Marketplace
 {
-    public function package($package, $version = null, $edition = null)
+    public function packages(array $packages)
     {
-        $uri = "packages/$package/$version";
+        $uri = 'packages';
+        $hash = md5(json_encode($packages));
 
-        if ($edition) {
-            $uri .= "?edition=$edition";
-        }
-
-        return Cache::rememberWithExpiration("marketplace-$uri", function () use ($uri) {
+        return Cache::rememberWithExpiration("marketplace-$uri-$hash", function () use ($uri, $packages) {
             try {
-                return [60 => Client::get($uri)['data']];
+                $response = Client::post($uri, ['packages' => $packages]);
+
+                return [60 => collect($response['data'])];
             } catch (RequestException $e) {
-                return [5 => null];
+                return [5 => collect()];
             }
         });
     }
@@ -33,10 +32,16 @@ class Marketplace
         $uri = "packages/$package/releases";
 
         return Cache::rememberWithExpiration("marketplace-$uri", function () use ($uri) {
+            $fallback = [5 => collect()];
+
             try {
-                return [60 => collect(Client::get($uri)['data'])];
+                if (! $response = Client::get($uri)) {
+                    return $fallback;
+                }
+
+                return [60 => collect($response['data'])];
             } catch (RequestException $e) {
-                return [5 => collect()];
+                return $fallback;
             }
         });
     }

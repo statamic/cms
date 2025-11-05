@@ -413,7 +413,7 @@ class BardTest extends TestCase
                 'content' => [
                     ['type' => 'text', 'text' => 'Second '],
                     ['type' => 'text', 'text' => 'paragraph', 'marks' => [
-                        ['type' => 'link', 'attrs' => ['href' => 'entry::foo']],
+                        ['type' => 'link', 'attrs' => ['href' => 'statamic://entry::foo']],
                     ]],
                     ['type' => 'text', 'text' => '. '],
                     ['type' => 'image', 'attrs' => [
@@ -939,6 +939,25 @@ EOT;
     }
 
     #[Test]
+    public function it_preprocesses_inline_value_with_break()
+    {
+        $data = [
+            ['type' => 'hardBreak'],
+            ['type' => 'text', 'text' => 'This is inline text.'],
+        ];
+
+        $expected = [[
+            'type' => 'paragraph',
+            'content' => [
+                ['type' => 'hardBreak'],
+                ['type' => 'text', 'text' => 'This is inline text.'],
+            ],
+        ]];
+
+        $this->assertEquals($expected, $this->bard(['inline' => 'break', 'sets' => null])->preProcess($data));
+    }
+
+    #[Test]
     public function it_preprocesses_inline_value_to_block_value()
     {
         $data = [
@@ -948,6 +967,25 @@ EOT;
         $expected = [[
             'type' => 'paragraph',
             'content' => [
+                ['type' => 'text', 'text' => 'This is inline text.'],
+            ],
+        ]];
+
+        $this->assertEquals($expected, $this->bard(['input_mode' => 'block', 'sets' => null])->preProcess($data));
+    }
+
+    #[Test]
+    public function it_preprocesses_inline_value_with_break_to_block_value()
+    {
+        $data = [
+            ['type' => 'hardBreak'],
+            ['type' => 'text', 'text' => 'This is inline text.'],
+        ];
+
+        $expected = [[
+            'type' => 'paragraph',
+            'content' => [
+                ['type' => 'hardBreak'],
                 ['type' => 'text', 'text' => 'This is inline text.'],
             ],
         ]];
@@ -1298,6 +1336,54 @@ EOT;
         $this->assertArrayHasKey('customData', $bard->preload($data));
         $this->assertArrayHasKey('custom_field', $bard->extraRules($data));
         $this->assertArrayHasKey('custom_field', $bard->extraValidationAttributes($data));
+    }
+
+    #[Test]
+    public function it_localizes_when_select_across_sites_setting_is_disabled()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]);
+
+        Facades\Site::setCurrent('fr');
+
+        tap(Facades\Collection::make('blog')->routes('blog/{slug}'))->sites(['en', 'fr'])->save();
+
+        EntryFactory::id('parent')->collection('blog')->slug('theparent')->id(123)->locale('en')->create();
+        EntryFactory::id('123-fr')->origin('123')->locale('fr')->collection('blog')->slug('one-fr')->data(['title' => 'Le One', 'test' => ['type' => 'link', 'attrs' => ['href' => 'statamic://entry::123-fr']]])->create();
+
+        $field = (new Bard)->setField(new Field('test', array_merge(['type' => 'bard'], ['select_across_sites' => false])));
+
+        $augmented = $field->augment([
+            ['type' => 'text', 'marks' => [['type' => 'link', 'attrs' => ['href' => 'statamic://entry::123-fr']]], 'text' => 'The One'],
+        ]);
+
+        $this->assertEquals('<a href="/fr/blog/one-fr">The One</a>', $augmented);
+    }
+
+    #[Test]
+    public function it_doesnt_localize_when_select_across_sites_setting_is_enabled()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]);
+
+        Facades\Site::setCurrent('en');
+
+        tap(Facades\Collection::make('blog')->routes('blog/{slug}'))->sites(['en', 'fr'])->save();
+
+        EntryFactory::id('parent')->collection('blog')->slug('theparent')->id(123)->locale('en')->create();
+        EntryFactory::id('123-fr')->origin('123')->locale('fr')->collection('blog')->slug('one-fr')->data(['title' => 'Le One', 'test' => ['type' => 'link', 'attrs' => ['href' => 'statamic://entry::123-fr']]])->create();
+
+        $field = (new Bard)->setField(new Field('test', array_merge(['type' => 'bard'], ['select_across_sites' => true])));
+
+        $augmented = $field->augment([
+            ['type' => 'text', 'marks' => [['type' => 'link', 'attrs' => ['href' => 'statamic://entry::123-fr']]], 'text' => 'The One'],
+        ]);
+
+        $this->assertEquals('<a href="http://localhost/fr/blog/one-fr">The One</a>', $augmented);
     }
 
     private function bard($config = [])

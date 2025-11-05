@@ -7,6 +7,8 @@ use Statamic\Contracts\Forms\Form;
 use Statamic\Facades\File;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
+use function Statamic\trans as __;
+
 abstract class Exporter
 {
     protected static string $title;

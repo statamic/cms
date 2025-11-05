@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Updater;
 
 use Facades\Statamic\Marketplace\Marketplace;
+use Inertia\Inertia;
 use Statamic\Http\Controllers\CP\CpController;
 
 class UpdateProductController extends CpController
@@ -20,7 +21,7 @@ class UpdateProductController extends CpController
             return $this->pageNotFound();
         }
 
-        return view('statamic::updater.show', [
+        return Inertia::render('updater/Show', [
             'slug' => $marketplaceProductSlug,
             'package' => $product->package(),
             'name' => $product->name(),

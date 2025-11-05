@@ -26,7 +26,7 @@ trait Revisable
 
     public function makeRevision()
     {
-        return (new Revision)
+        return Revisions::make()
             ->date(Carbon::now())
             ->key($this->revisionKey())
             ->attributes($this->revisionAttributes());
@@ -34,7 +34,8 @@ trait Revisable
 
     public function makeWorkingCopy()
     {
-        return (new WorkingCopy)
+        return Revisions::make()
+            ->action('working')
             ->date(Carbon::now())
             ->key($this->revisionKey())
             ->attributes($this->revisionAttributes());
@@ -60,7 +61,7 @@ trait Revisable
             return null;
         }
 
-        return WorkingCopy::fromRevision($revision);
+        return $revision->toWorkingCopy();
     }
 
     public function deleteWorkingCopy()
@@ -72,41 +73,27 @@ trait Revisable
     {
         $item = $this->fromWorkingCopy();
 
-        if ($item instanceof Entry) {
-            $parent = $item->get('parent');
-
-            $item->remove('parent');
-        }
-
         $saved = $item
             ->published(true)
-            ->updateLastModified($user = $options['user'] ?? false)
+            ->updateLastModified($user = $options['user'] ?? null)
             ->save();
 
         if (! $saved) {
             return false;
         }
 
-        if ($item instanceof Entry && $item->collection()->hasStructure() && $parent) {
-            $tree = $item->collection()->structure()->in($item->locale());
-
-            if (optional($tree->find($parent))->isRoot()) {
-                $parent = null;
-            }
-
-            $tree
-                ->move($this->id(), $parent)
-                ->save();
-        }
-
         $item
             ->makeRevision()
             ->user($user)
-            ->message($options['message'] ?? false)
+            ->message($options['message'] ?? null)
             ->action('publish')
             ->save();
 
         $item->deleteWorkingCopy();
+
+        if ($item instanceof Entry) {
+            $item->blueprint()->setParent($item);
+        }
 
         return $item;
     }
@@ -117,7 +104,7 @@ trait Revisable
 
         $saved = $item
             ->published(false)
-            ->updateLastModified($user = $options['user'] ?? false)
+            ->updateLastModified($user = $options['user'] ?? null)
             ->save();
 
         if (! $saved) {
@@ -127,11 +114,15 @@ trait Revisable
         $item
             ->makeRevision()
             ->user($user)
-            ->message($options['message'] ?? false)
+            ->message($options['message'] ?? null)
             ->action('unpublish')
             ->save();
 
         $item->deleteWorkingCopy();
+
+        if ($item instanceof Entry) {
+            $item->blueprint()->setParent($item);
+        }
 
         return $item;
     }
@@ -140,14 +131,14 @@ trait Revisable
     {
         $return = $this
             ->published(false)
-            ->updateLastModified($user = $options['user'] ?? false)
+            ->updateLastModified($user = $options['user'] ?? null)
             ->save();
 
         if ($this->revisionsEnabled()) {
             $return = $this
                 ->makeRevision()
                 ->user($user)
-                ->message($options['message'] ?? false)
+                ->message($options['message'] ?? null)
                 ->save();
         }
 
@@ -159,8 +150,8 @@ trait Revisable
         $this
             ->fromWorkingCopy()
             ->makeRevision()
-            ->user($options['user'] ?? false)
-            ->message($options['message'] ?? false)
+            ->user($options['user'] ?? null)
+            ->message($options['message'] ?? null)
             ->save();
     }
 

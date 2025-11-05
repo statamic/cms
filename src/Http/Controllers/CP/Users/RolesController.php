@@ -3,20 +3,25 @@
 namespace Statamic\Http\Controllers\CP\Users;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\CP\Column;
 use Statamic\Facades\Permission;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Middleware\CP\RequireElevatedSession;
 use Statamic\Http\Middleware\RequireStatamicPro;
 use Statamic\Rules\Handle;
 use Statamic\Support\Str;
+
+use function Statamic\trans as __;
 
 class RolesController extends CpController
 {
     public function __construct()
     {
         $this->middleware(RequireStatamicPro::class);
+        $this->middleware(RequireElevatedSession::class)->except('index');
     }
 
     public function index(Request $request)
@@ -38,13 +43,20 @@ class RolesController extends CpController
             return $roles;
         }
 
-        return view('statamic::roles.index', [
+        if ($roles->count() === 0) {
+            return Inertia::render('roles/Empty', [
+                'createUrl' => cp_route('roles.create'),
+            ]);
+        }
+
+        return Inertia::render('roles/Index', [
             'roles' => $roles,
             'columns' => [
                 Column::make('title')->label(__('Title')),
                 Column::make('handle')->label(__('Handle')),
                 Column::make('permissions')->label(__('Permissions')),
             ],
+            'createUrl' => cp_route('roles.create'),
         ]);
     }
 
@@ -52,8 +64,11 @@ class RolesController extends CpController
     {
         $this->authorize('edit roles');
 
-        return view('statamic::roles.create', [
+        return Inertia::render('roles/Create', [
             'permissions' => $this->updateTree(Permission::tree()),
+            'canAssignSuper' => User::current()->isSuper(),
+            'action' => cp_route('roles.store'),
+            'indexUrl' => cp_route('roles.index'),
         ]);
     }
 
@@ -105,15 +120,22 @@ class RolesController extends CpController
             return $this->pageNotFound();
         }
 
-        return view('statamic::roles.edit', [
-            'role' => $role,
+        return Inertia::render('roles/Edit', [
+            'role' => [
+                'handle' => $role->handle(),
+                'title' => $role->title(),
+            ],
             'super' => $role->isSuper(),
             'permissions' => $this->updateTree(Permission::tree(), $role),
+            'canAssignSuper' => User::current()->isSuper(),
+            'action' => cp_route('roles.update', $role->handle()),
         ]);
     }
 
     public function update(Request $request, $role)
     {
+        $this->requireElevatedSession();
+
         $this->authorize('edit roles');
 
         if (! $role = Role::find($role)) {

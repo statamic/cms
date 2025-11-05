@@ -269,4 +269,15 @@ class ResolveRedirectTest extends TestCase
         $this->assertEquals('/test', $resolver($arr));
         $this->assertEquals('/test', $resolver->item($arr));
     }
+
+    #[Test]
+    public function it_can_resolve_an_arrayable_link()
+    {
+        $resolver = new ResolveRedirect;
+
+        $arrayableLink = Mockery::mock(ArrayableLink::class)->shouldReceive('url')->times(2)->andReturns('/test', null)->getMock();
+
+        $this->assertEquals('/test', $resolver($arrayableLink));
+        $this->assertEquals(404, $resolver($arrayableLink));
+    }
 }

@@ -1,0 +1,121 @@
+/* VARIABLES
+=================================================== */
+:root {
+    /* For animating height */
+    interpolate-size: allow-keywords;
+
+    --focus-outline-width: 2px;
+    /* Here we typically need a negative outline-offset because of the inner shadow on inputs */
+    --focus-outline-offset: -1px;
+    --focus-within-outline-offset: 0px;
+    --focus-outline-color: var(--color-blue-400);
+    --focus-outline-style: solid;
+
+    /* The outline-offset value used for buttons */
+    --outline-offset-button: 6px;
+
+    --z-index-below: -1;
+    --z-index-above: 1;
+    --z-index-global-header: 2;
+    --z-index-portal: 3;
+    --z-index-draggable: 4;
+    --z-index-modal: 5;
+    --z-index-max: 6;
+
+    /* Used for entry animations */
+    --starting-style-transition-duration: 0.125s;
+    --starting-style-sibling-delay: 0.01s;
+}
+
+/* FOCUS STATES
+=================================================== */
+/* Use a base layer where we don't need the specificity */
+@layer base {
+    /* Explicitly show focus without needing to tab */
+    .show-focus:focus,
+    /* Explicitly show focus without needing to tab for buttons inside modals, e.g. Assets > cancel button on delete modal */
+    [data-dismissable-layer] button:focus,
+    /* and then a global selector for focus-visible everywhere else (except where the focus-within class will handle the focus outline target instead). Use a direct descendant here so we don't affect things like the focus state of Bard field > Replicator > then another Bard field. */
+    :not([class*='focus-within'] > *) {
+        :focus-visible& {
+            outline-width: var(--focus-outline-width);
+            outline-offset: var(--focus-outline-offset);
+            outline-color: var(--focus-outline-color, currentColor);
+            outline-style: var(--focus-outline-style, solid);
+            border-radius: inherit;
+        }
+    }
+
+    a {
+        cursor: pointer;
+    }
+
+    ::placeholder {
+        @apply text-gray-500;
+    }
+    :where(.dark, .dark *)::placeholder {
+        @apply text-gray-400;
+    }
+
+    [type="checkbox"] {
+        /* To effectively hide border radius clash with focus state */
+        --focus-outline-offset: -1.85px;
+    }
+}
+
+/* Use a utility layer only when we need higher specificity */
+@layer utilities {
+    /* When we have a focus state within a focus state, only the inner-most focused container should _have_ focus. e.g. if we're focusing on a Bard field within a Bard field, only the inner Bard field should receive the focus outline. */
+    [class*="focus-within"]:has([class*="focus-within"]:focus-within) {
+        outline: none;
+    }
+
+    [data-ui-dropdown-item] {
+        &:focus-visible {
+            outline-width: var(--focus-outline-width);
+            outline-offset: var(--focus-outline-offset);
+            outline-color: var(--focus-outline-color, currentColor);
+            outline-style: var(--focus-outline-style, solid);
+        }
+    }
+
+    /* e.g. >> /cp/collections, when you tab to the title, and /cp/collections/pages when tabbing through the tree text. Avoid elements where border-radius has already been set, e.g. "Create Entry" button */
+    .main-content a:not([class*="rounded"]),
+    /* e.g. >> /cp/collections/pages, tabbing through the home icon. Be careful not to carpet bomb this e.g. don't want to affect Bard buttons. */
+    .page-tree .v-popper--has-tooltip {
+        &:focus-visible {
+            --focus-outline-offset: 4px;
+            @apply rounded-xs;
+        }
+    }
+
+    /* Fix "flicker" the transition causes when tabbing to disclosure e.g. >> /cp/collections/pages */
+    button:focus-visible {
+        transition: unset;
+    }
+
+    .group\/button button:focus {
+        /* Pull the focus state above any adjacent buttons e.g. >> /cp/collections/articles/entries - save button alongside the dropdown arrow */
+        z-index: var(--z-index-above);
+    }
+}
+
+/* Prevent tailwind typography from adding backticks around code elements */
+@utility prose {
+    code {
+        &::before,
+        &::after {
+            content: none;
+        }
+    }
+}
+
+code:not(pre *) {
+    /* Take the UI accent for code color/background. Use relative colors to 1) Make sure the text color is not too bright and 2) Create a light background */
+    color: hsl(from var(--theme-color-ui-accent-bg) h s 30);
+    background: hsl(from var(--theme-color-ui-accent-bg) h s l / 0.08);
+    &:where(.dark, .dark *) {
+        color: hsl(from var(--theme-color-dark-ui-accent-bg) h s 90);
+        background: hsl(from var(--theme-color-dark-ui-accent-bg) h s 10 / 0.5);
+    }
+}

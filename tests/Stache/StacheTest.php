@@ -6,10 +6,12 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Stache\NullLockStore;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\ChildStore;
 use Statamic\Stache\Stores\CollectionsStore;
 use Statamic\Stache\Stores\EntriesStore;
+use Symfony\Component\Lock\LockFactory;
 use Tests\TestCase;
 
 class StacheTest extends TestCase
@@ -59,6 +61,29 @@ class StacheTest extends TestCase
             $this->assertInstanceOf(CollectionsStore::class, $stores->first());
             $this->assertInstanceOf(CollectionsStore::class, $this->stache->store('collections'));
         });
+    }
+
+    #[Test]
+    public function stores_can_be_excluded_from_warming_and_clearing()
+    {
+        $this->stache->sites(['en']); // store expects the stache to have site(s)
+        $this->assertTrue($this->stache->stores()->isEmpty());
+
+        $mockStore = $this->mock(CollectionsStore::class, function ($mock) {
+            $mock->shouldReceive('warm')->never();
+            $mock->shouldReceive('clear')->never();
+            $mock->shouldReceive('key')->andReturn('collections');
+        });
+
+        $this->stache->registerStore($mockStore);
+
+        $return = $this->stache->exclude('collections');
+
+        $this->assertEquals($this->stache, $return);
+
+        $this->stache->setLockFactory(new LockFactory(new NullLockStore()));
+        $this->stache->warm();
+        $this->stache->clear();
     }
 
     #[Test]

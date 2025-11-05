@@ -2,6 +2,7 @@
 
 namespace Statamic\Auth\Protect\Protectors\Password;
 
+use Inertia\Inertia;
 use Statamic\Auth\Protect\ProtectorManager;
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
@@ -17,11 +18,20 @@ class Controller extends BaseController
     {
         if ($this->tokenData = session('statamic:protect:password.tokens.'.request('token'))) {
             $site = Site::findByUrl($this->getUrl());
+            $data = Data::find($this->tokenData['reference']);
 
             app()->setLocale($site->lang());
         }
 
-        return View::make('statamic::auth.protect.password');
+        // If a user has a custom view, make sure to use theirs instead of Inertia.
+        if (view()->exists('statamic::auth.protect.password')) {
+            return View::make('statamic::auth.protect.password')->cascadeContent($data ?? null);
+        }
+
+        return Inertia::render('auth/protect/Password', [
+            'token' => request('token'),
+            'submitUrl' => route('statamic.protect.password.store'),
+        ]);
     }
 
     public function store()
@@ -33,7 +43,7 @@ class Controller extends BaseController
             return back()->withErrors(['token' => __('statamic::messages.password_protect_token_invalid')], 'passwordProtect');
         }
 
-        if (! $this->driver()->isValidPassword($this->password)) {
+        if (is_null($this->password) || ! $this->driver()->isValidPassword($this->password)) {
             return back()->withErrors(['password' => __('statamic::messages.password_protect_incorrect_password')], 'passwordProtect');
         }
 

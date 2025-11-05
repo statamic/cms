@@ -3,9 +3,9 @@
 namespace Statamic\Exceptions;
 
 use Exception;
-use Spatie\Ignition\Contracts\ProvidesSolution;
-use Spatie\Ignition\Contracts\Solution;
-use Statamic\Ignition\Solutions\EnableStatamicPro;
+use Spatie\ErrorSolutions\Contracts\ProvidesSolution;
+use Spatie\ErrorSolutions\Contracts\Solution;
+use Statamic\ErrorSolutions\Solutions\EnableStatamicPro;
 
 class StatamicProRequiredException extends Exception implements ProvidesSolution
 {
