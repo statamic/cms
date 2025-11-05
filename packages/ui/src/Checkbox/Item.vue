@@ -95,7 +95,7 @@ const conditionalProps = computed(() => {
             :tabindex="tabindex"
         >
             <CheckboxIndicator class="relative flex h-full w-full items-center justify-center text-white">
-                <svg viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg" class="size-2.5" aria-hidden="true"><path d="M9 1L3.5 6.5L1 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                <svg viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg" class="size-2.5 shrink-0" aria-hidden="true"><path d="M9 1L3.5 6.5L1 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
             </CheckboxIndicator>
             <span class="sr-only">
                 {{ modelValue ? 'Checked' : 'Unchecked' }}
