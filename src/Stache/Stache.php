@@ -301,6 +301,12 @@ class Stache
             return 1;
         }
 
-        return max(1, (int) shell_exec('nproc 2>/dev/null || echo 1'));
+        $command = match (PHP_OS_FAMILY) {
+            'Windows' => 'echo %NUMBER_OF_PROCESSORS%',
+            'Darwin' => 'sysctl -n hw.ncpu 2>/dev/null || echo 1',
+            default => 'nproc 2>/dev/null || echo 1',
+        };
+
+        return max(1, (int) shell_exec($command));
     }
 }
