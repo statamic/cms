@@ -115,5 +115,5 @@ return [
     'YER' => 'Rial yéménite',
     'ZAR' => 'Rand sud-africain',
     'ZiG' => 'Or zimbabwéen'
-    'ZMK' => 'Kwacha zambien',
+    'ZMK' => 'Kwacha zambien'
 ];
