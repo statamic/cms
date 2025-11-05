@@ -1,10 +1,11 @@
 <template>
     <div
-        class="relative block cursor-pointer space-y-2 px-3 py-2 last:pt-1 last:mt-1 text-sm hover:[&_.revision-message]:underline last:bg-white dark:last:bg-gray-800"
+        class="relative block cursor-pointer space-y-2 px-3 py-2 text-sm hover:[&_.revision-message]:underline"
         :class="{
             'status-working-copy': revision.action === 'working',
             'status-published': revision.attributes.published,
             'border border-ui-accent-bg dark:border-dark-ui-accent-bg/90 rounded-lg py-2.5 bg-[hsl(from_var(--theme-color-ui-accent-bg)_h_s_97)] dark:bg-[hsl(from_var(--theme-color-dark-ui-accent-bg)_h_40_20)]': revision.attributes.current,
+            'bg-white dark:bg-gray-800 -mt-1': isLast,
         }"
         v-tooltip="revision.attributes.current ? __('Current Revision') : null"
         @click="open"
@@ -89,6 +90,7 @@ export default {
         restoreUrl: String,
         reference: String,
         canRestoreRevisions: Boolean,
+        isLast: Boolean,
     },
 
     data() {

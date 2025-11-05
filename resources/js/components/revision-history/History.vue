@@ -21,12 +21,13 @@
                 <div class="relative grid gap-3">
                     <div class="absolute inset-y-0 left-6 border-l-1 border-gray-400 dark:border-gray-600 border-dashed" />
                     <revision
-                        v-for="revision in group.revisions"
+                        v-for="(revision, index) in group.revisions"
                         :key="revision.date"
                         :revision="revision"
                         :restore-url="restoreUrl"
                         :reference="reference"
                         :can-restore-revisions="canRestoreRevisions"
+                        :is-last="index === group.revisions.length - 1"
                         @working-copy-selected="close"
                     />
                 </div>
