@@ -44,9 +44,7 @@
                     />
                 </button>
                 <div class="flex items-center gap-2" v-if="!isReadOnly">
-                    <Tooltip :text="enabled ? __('Included in output') : __('Hidden from output')" as="span">
-                        <Switch size="xs" v-model="enabled" />
-                    </Tooltip>
+                    <Switch size="xs" v-model="enabled" v-tooltip="enabled ? __('Included in output') : __('Hidden from output')" />
 
                     <Dropdown>
                         <template #trigger>
@@ -112,7 +110,6 @@ import {
     Icon,
     Subheading,
     Switch,
-    Tooltip,
     PublishFieldsProvider as FieldsProvider,
     PublishFields as Fields
 } from '@ui';
@@ -130,7 +127,6 @@ export default {
         Fields,
         FieldsProvider,
         Switch,
-        Tooltip,
         Subheading,
         Badge,
         Icon,

@@ -5,8 +5,6 @@ import SiteSelector from './SiteSelector.vue';
 import Search from './Search.vue';
 import ViewSiteButton from './ViewSiteButton.vue';
 import UserDropdown from './UserDropdown.vue';
-import { Badge, Tooltip } from '@statamic/ui';
-import { useReactiveStatamicPageProps } from '@/composables/page-props.js';
 </script>
 
 <template>

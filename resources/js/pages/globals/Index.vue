@@ -1,7 +1,7 @@
 <script setup>
 import Head from '@/pages/layout/Head.vue';
 import { Link } from '@inertiajs/vue3';
-import { Header, CommandPaletteItem, Button, Icon, EmptyStateMenu, EmptyStateItem, CardList, CardListItem, Tooltip, Dropdown, DropdownMenu, DropdownItem, DocsCallout } from '@ui';
+import { Header, CommandPaletteItem, Button, Icon, EmptyStateMenu, EmptyStateItem, CardList, CardListItem, Dropdown, DropdownMenu, DropdownItem, DocsCallout } from '@ui';
 import useArchitecturalBackground from '@/pages/layout/architectural-background.js';
 
 const props = defineProps({
@@ -37,9 +37,7 @@ if (props.globals.length === 0) useArchitecturalBackground();
 
         <CardList :heading="__('Title')">
             <CardListItem v-for="global in globals" :key="global.id">
-                <Tooltip :text="global.handle" :delay="1000">
-                    <Link class="text-sm" :href="global.edit_url">{{ __(global.title) }}</Link>
-                </Tooltip>
+                <Link class="text-sm" :href="global.edit_url" v-tooltip="global.handle">{{ __(global.title) }}</Link>
                 <Dropdown>
                     <DropdownMenu>
                         <DropdownItem :text="__('Edit')" icon="edit" :href="global.edit_url" />

@@ -1,6 +1,6 @@
 <script setup>
 import { Link, usePage } from '@inertiajs/vue3';
-import { Badge, Icon, Tooltip } from '@ui';
+import { Badge, Icon } from '@ui';
 import useNavigation from './navigation.js';
 import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import DynamicHtmlRenderer from '@/components/DynamicHtmlRenderer.vue';

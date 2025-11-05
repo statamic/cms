@@ -1,5 +1,5 @@
 <script setup>
-import { Widget, Badge, Listing, Icon, Tooltip } from '@/components/ui';
+import { Widget, Badge, Listing, Icon } from '@/components/ui';
 import { ref } from 'vue';
 import { Link } from '@inertiajs/vue3';
 
@@ -18,11 +18,9 @@ defineProps({
                     </td>
                     <td>
                         <Badge pill :color="update.critical ? 'red' : 'green'" :text="update.count" />
-                        <Tooltip :text="__('Critical')">
-                            <div class="inline-flex">
-                                <Icon v-if="update.critical" name="warning-diamond" color="red" />
-                            </div>
-                        </Tooltip>
+                        <div class="inline-flex" v-tooltip="__('Critical')">
+                            <Icon v-if="update.critical" name="warning-diamond" color="red" />
+                        </div>
                     </td>
                 </tr>
             </table>

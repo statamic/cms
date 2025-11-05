@@ -1,5 +1,5 @@
 <script setup>
-import { Badge, Tooltip } from '@ui';
+import { Badge } from '@ui';
 import { computed } from 'vue';
 import useStatamicPageProps from '@/composables/page-props.js';
 
@@ -18,12 +18,7 @@ const problemBadgeColor = computed(() => {
 <template>
     <Badge v-if="licensing.valid" :text="__('Pro')" size="sm" class="bg-white/15!" />
 
-    <Tooltip
-        v-else
-        :text="licensing.requestFailureMessage"
-    >
-        <Badge :color="problemBadgeColor" class="max-[500px]:hidden">
-            {{ __('Pro') }} – {{ licensing.isOnPublicDomain ? __('statamic::messages.licensing_error_unlicensed') : __('Trial Mode') }}
-        </Badge>
-    </Tooltip>
+    <Badge v-else :color="problemBadgeColor" class="max-[500px]:hidden" foo="bar" v-tooltip="licensing.requestFailureMessage">
+        {{ __('Pro') }} – {{ licensing.isOnPublicDomain ? __('statamic::messages.licensing_error_unlicensed') : __('Trial Mode') }}
+    </Badge>
 </template>

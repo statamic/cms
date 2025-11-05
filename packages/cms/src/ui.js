@@ -108,7 +108,6 @@ export const {
     TimePicker,
     ToggleGroup,
     ToggleItem,
-    Tooltip,
     Widget,
     registerIconSet,
     registerIconSetFromStrings,

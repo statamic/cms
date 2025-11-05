@@ -495,9 +495,7 @@ defineProps(['icons']);
             <section class="space-y-4">
                 <ui-heading size="lg">Tooltip</ui-heading>
                 <div class="flex">
-                    <ui-tooltip text="Never gonna give you up">
-                        <ui-button text="Hover me" />
-                    </ui-tooltip>
+                    <ui-button text="Hover me" v-tooltip="'Never gonna give you up'" />
                 </div>
             </section>
 
