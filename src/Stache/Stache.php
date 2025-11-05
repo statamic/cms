@@ -297,7 +297,7 @@ class Stache
 
     protected function getCpuCoreCount(): int
     {
-        if (! function_exists('proc_open')) {
+        if (! function_exists('shell_exec')) {
             return 1;
         }
 
