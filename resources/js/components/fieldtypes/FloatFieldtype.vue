@@ -1,12 +1,15 @@
 <template>
     <text-input
-        type="text"
+        type="number"
         tabindex="0"
         :name="name"
         :focus="focus"
         :value="value"
         :is-read-only="isReadOnly"
         :id="fieldId"
+        :min="config.min"
+        :max="config.max"
+        :step="config.step"
         @input="updateDebounced"
         @focus="$emit('focus')"
         @blur="$emit('blur')"
