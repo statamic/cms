@@ -350,8 +350,13 @@ export default {
     },
 
     created() {
-        Statamic.$components.register('NodeViewWrapper', NodeViewWrapper);
-        Statamic.$components.register('NodeViewContent', NodeViewContent);
+        if (! Statamic.$components.has('NodeViewWrapper')) {
+            Statamic.$components.register('NodeViewWrapper', NodeViewWrapper);
+        }
+
+        if (! Statamic.$components.has('NodeViewContent')) {
+            Statamic.$components.register('NodeViewContent', NodeViewContent);
+        }
     },
 
     async mounted() {
