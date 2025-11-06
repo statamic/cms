@@ -208,6 +208,7 @@ defineProps(['icons']);
                 <div class="mb-4 flex gap-2 sm:gap-3 items-end">
                     <ui-button icon="save" text="Default" />
                     <ui-button icon="save" text="Primary" variant="primary" />
+                    <ui-button icon="save" text="Danger" variant="danger" />
                     <ui-button icon="save" text="Filled" variant="filled" />
                     <ui-button icon="save" text="Ghost" variant="ghost" />
                     <ui-button icon="save" text="Subtle" variant="subtle" />
@@ -224,6 +225,7 @@ defineProps(['icons']);
                         <ui-button variant="default">Oldest</ui-button>
                         <ui-button variant="default">Newest</ui-button>
                         <ui-button variant="default">Top</ui-button>
+                        <ui-button variant="danger">Danger</ui-button>
                     </ui-button-group>
                 </div>
             </section>

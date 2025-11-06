@@ -24,22 +24,12 @@
             border-inline-start: 0;
         }
 
-        /* Split button groups apart into individual buttons on small screens */
+        /* Account for button groups being split apart on small screens */
         [data-floating-toolbar] & {
             @media (width >= 1024px) {
                 &:not(:first-child) {
                     border-inline-start: 0;
                 }
-            }
-        }
-
-        &.btn-danger {
-            box-shadow: none;
-            color: var(--color-red-600);
-            .dark & {
-                color: var(--color-red-500);
-                background-color: var(--color-gray-850);
-                border-color: var(--color-gray-700);
             }
         }
     }
