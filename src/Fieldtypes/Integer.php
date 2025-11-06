@@ -24,18 +24,18 @@ class Integer extends Fieldtype
                         'type' => 'text',
                     ],
                     'min' => [
-                        'display' => __('Minimum Value'),
-                        'instructions' => __('The minimum allowed value.'),
+                        'display' => __('Min'),
+                        'instructions' => __('statamic::fieldtypes.integer.config.min'),
                         'type' => 'integer',
                     ],
                     'max' => [
-                        'display' => __('Maximum Value'),
-                        'instructions' => __('The maximum allowed value.'),
+                        'display' => __('Max'),
+                        'instructions' => __('statamic::fieldtypes.integer.config.max'),
                         'type' => 'integer',
                     ],
                     'step' => [
                         'display' => __('Step'),
-                        'instructions' => __('The interval between valid numbers.'),
+                        'instructions' => __('statamic::fieldtypes.integer.config.step'),
                         'type' => 'integer',
                     ],
                     'default' => [
