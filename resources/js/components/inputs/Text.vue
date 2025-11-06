@@ -21,6 +21,7 @@
                 :autocomplete="autocomplete"
                 :autofocus="focus"
                 :min="min"
+                :max="max"
                 :dir="direction"
                 @input="$emit('input', $event.target.value)"
                 @keydown="$emit('keydown', $event)"
@@ -60,6 +61,7 @@ export default {
         autocomplete: { default: null },
         autoselect: { type: Boolean },
         min: { type: Number, default: undefined },
+        max: { type: Number, default: undefined },
         direction: { type: String }
     },
     mounted() {
