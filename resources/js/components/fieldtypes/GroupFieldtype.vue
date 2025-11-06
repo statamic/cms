@@ -1,43 +1,24 @@
 <template>
-    <portal
-        name="group-fullscreen"
-        :disabled="!fullScreenMode"
-        :provide="provide"
-    >
+    <portal name="group-fullscreen" :disabled="!fullScreenMode" :provide="provide">
         <element-container @resized="containerWidth = $event.width">
-            <div
-                class="group-fieldtype-container"
-                :class="{ 'grid-fullscreen bg-white': fullScreenMode }"
-            >
+            <div :class="{ '@apply fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-100 dark:bg-gray-900 z-998': fullScreenMode }">
                 <publish-field-fullscreen-header
                     v-if="fullScreenMode"
                     :title="config.display"
                     :field-actions="fieldActions"
-                    @close="toggleFullscreen">
+                    @close="toggleFullscreen"
+                >
                 </publish-field-fullscreen-header>
                 <section :class="{ 'mt-14 p-4': fullScreenMode }">
-                    <div :class="{ 'border dark:border-dark-900 rounded shadow-sm replicator-set': config.border }">
-                        <div class="publish-fields @container" :class="{ 'replicator-set-body': config.border, '-mx-4': !config.border }">
-                            <set-field
-                                v-for="field in fields"
-                                :key="field.handle"
-                                v-show="showField(field, fieldPath(field.handle))"
-                                :field="field"
-                                :meta="meta[field.handle]"
-                                :value="value[field.handle]"
-                                :parent-name="name"
-                                :set-index="0"
-                                :errors="errors(field.handle)"
-                                :field-path="fieldPath(field.handle)"
-                                :read-only="isReadOnly"
-                                :show-field-previews="config.replicator_preview"
-                                @updated="updated(field.handle, $event)"
-                                @meta-updated="updateMeta(field.handle, $event)"
-                                @focus="$emit('focus')"
-                                @blur="$emit('blur')"
-                                @replicator-preview-updated="previewUpdated(field.handle, $event)"
-                            />
-                        </div>
+                    <div :class="{ 'bg-white dark:bg-gray-800 dark:border-dark-900 rounded-lg border': config.border }">
+                        <FieldsProvider
+                            :fields="fields"
+                            :as-config="false"
+                            :field-path-prefix="fieldPathPrefix ? `${fieldPathPrefix}.${handle}` : handle"
+                            :meta-path-prefix="metaPathPrefix ? `${metaPathPrefix}.${handle}` : handle"
+                        >
+                            <Fields class="p-4" />
+                        </FieldsProvider>
                     </div>
                 </section>
             </div>
@@ -45,51 +26,39 @@
     </portal>
 </template>
 
-<style>
-    .group-fieldtype-button-wrapper {
-        @apply flex rtl:left-6 ltr:right-6 absolute top-5 sm:top-7;
-    }
-
-    .replicator-set .group-fieldtype-button-wrapper {
-        @apply top-5 rtl:left-4 ltr:right-4;
-    }
-</style>
-
 <script>
 import Fieldtype from './Fieldtype.vue';
-import SetField from './replicator/Field.vue';
-import { ValidatesFieldConditions } from '../field-conditions/FieldConditions.js';
-import ManagesPreviewText from "./replicator/ManagesPreviewText";
+import ManagesPreviewText from './replicator/ManagesPreviewText';
+import { PublishFields as Fields, PublishFieldsProvider as FieldsProvider } from '@ui';
 
 export default {
-    mixins: [
-        Fieldtype,
-        ValidatesFieldConditions,
-        ManagesPreviewText,
-    ],
-    components: { SetField },
+    mixins: [Fieldtype, ManagesPreviewText],
+    components: { Fields, FieldsProvider },
     data() {
         return {
             containerWidth: null,
-            focused: false,
+            isFocused: false,
             fullScreenMode: false,
-            previews: {},
             provide: {
                 group: this.makeGroupProvide(),
-                storeName: this.storeName,
             },
         };
     },
-    inject: ['storeName'],
     computed: {
         values() {
             return this.value;
         },
+        extraValues() {
+            return {};
+        },
         fields() {
             return this.config.fields;
         },
+        previews() {
+            return data_get(this.publishContainer.previews, this.fieldPathPrefix ? `${this.fieldPathPrefix}.${this.handle}` : this.handle) || {};
+        },
         replicatorPreview() {
-            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+            if (!this.showFieldPreviews) return;
 
             return replicatorPreviewHtml(this.previewText);
         },
@@ -97,7 +66,7 @@ export default {
             return [
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => vm.fullScreenMode ? 'shrink-all' : 'expand-bold',
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'collapse-all' : 'expand-all'),
                     quick: true,
                     run: this.toggleFullscreen,
                     visible: this.config.fullscreen,
@@ -110,7 +79,7 @@ export default {
         blurred() {
             setTimeout(() => {
                 if (!this.$el.contains(document.activeElement)) {
-                    this.focused = false;
+                    this.isFocused = false;
                 }
             }, 1);
         },
@@ -155,18 +124,8 @@ export default {
             this.$emit('meta-updated', { ...this.meta, [handle]: value });
         },
 
-        previewUpdated(handle, value) {
-            this.previews = { ...this.previews, [handle]: value };
-        },
-
         fieldPath(handle) {
             return (this.fieldPathPrefix || this.handle) + '.' + handle;
-        },
-
-        errors(handle) {
-            const state = this.$store.state.publish[this.storeName];
-            if (!state) return [];
-            return state.errors[this.fieldPath(handle)] || [];
         },
 
         toggleFullscreen() {

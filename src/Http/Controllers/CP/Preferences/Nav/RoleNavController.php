@@ -29,9 +29,10 @@ class RoleNavController extends Controller
 
         $preferences = $role->getPreference('nav') ?? Preference::default()->get('nav');
 
-        $nav = $preferences
-            ? Nav::build($preferences, true)
-            : Nav::buildWithoutPreferences(true);
+        $nav = Nav::build(
+            preferences: $preferences ?: false,
+            editing: true,
+        );
 
         return $this->navBuilder($nav, [
             'title' => __($role->title()),

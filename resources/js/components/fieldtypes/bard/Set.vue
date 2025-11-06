@@ -1,104 +1,148 @@
 <template>
-
-    <node-view-wrapper>
-        <div class="bard-set whitespace-normal my-6 rounded bg-white dark:bg-dark-500 border dark:border-dark-900 shadow-md"
-            :class="{ 'border-blue-400 dark:border-dark-blue-100': selected || withinSelection, 'has-error': hasError }"
+    <node-view-wrapper class="my-4">
+        <div
+            class="shadow-ui-sm relative z-2 w-full rounded-lg border border-gray-300 bg-white text-base dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
+            :class="{
+                // We’re styling a Set so that it shows a “selection outline” when selected with the mouse or keyboard.
+                // The extra `&:not(:has(:focus-within))` rule turns that outline off if any element inside the Set has focus (e.g. when editing inside a Bard field).
+                // This prevents the outer selection outline from showing while the user is actively working inside the Set.
+                '[&:not(:has(:focus-within))]:border-blue-300! [&:not(:has(:focus-within))]:dark:border-blue-400! [&:not(:has(:focus-within))]:before:content-[\'\'] [&:not(:has(:focus-within))]:before:absolute [&:not(:has(:focus-within))]:before:inset-[-1px] [&:not(:has(:focus-within))]:before:pointer-events-none [&:not(:has(:focus-within))]:before:border-2 [&:not(:has(:focus-within))]:before:border-blue-300 [&:not(:has(:focus-within))]:dark:before:border-blue-400 [&:not(:has(:focus-within))]:before:rounded-lg': selected || withinSelection,
+                'border-red-500': hasError,
+            }"
             :data-type="config.handle"
-            contenteditable="false" @copy.stop @paste.stop @cut.stop
+            contenteditable="false"
+            @copy.stop
+            @paste.stop
+            @cut.stop
         >
             <div ref="content" hidden />
-            <div class="replicator-set-header" :class="{'collapsed': collapsed, 'invalid': isInvalid }">
-                <div class="item-move sortable-handle" data-drag-handle />
-                <div class="flex items-center flex-1 p-2 replicator-set-header-inner cursor-pointer" :class="{'flex items-center': collapsed}" @click="toggleCollapsedState">
-                    <label class="text-xs rtl:ml-2 ltr:mr-2">
-                        <span v-if="isSetGroupVisible">
+            <header
+                class="group/header animate-border-color flex items-center rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 hover:bg-gray-100 dark:hover:bg-gray-950 border-gray-300 dark:shadow-md border-b-1 border-b-transparent"
+                :class="{
+                    'bg-gray-200/50 dark:bg-gray-950 rounded-b-none border-b-gray-300! dark:border-b-white/10!': !collapsed
+                }"
+            >
+                <Icon data-drag-handle name="handles" class="size-4 cursor-grab text-gray-400" v-if="!isReadOnly" />
+                <button type="button" class="flex flex-1 items-center gap-4 p-2 min-w-0 cursor-pointer [&:focus-visible]:outline-none [&:focus-visible]:[&_[data-ui-badge]]:focus-outline" @click="toggleCollapsedState">
+                    <Badge size="lg" pill="true" color="white" class="px-3">
+                        <span v-if="isSetGroupVisible" class="flex items-center gap-2">
                             {{ __(setGroup.display) }}
-                            <svg-icon name="micro/chevron-right" class="w-4" />
+                            <Icon name="chevron-right" class="relative top-px size-3" />
                         </span>
-                        {{ display || config.handle }}
-                    </label>
-                    <div class="flex items-center" v-if="config.instructions && !collapsed">
-                        <svg-icon name="micro/circle-help" class="text-gray-700 dark:text-dark-175 hover:text-gray-800 dark:hover:text-dark-100 h-3 w-3 text-xs" v-tooltip="{ content: $options.filters.markdown(__(config.instructions)), html:true }" />
-                    </div>
-                    <div v-show="collapsed" class="flex-1 min-w-0 w-1 rtl:pl-8 ltr:pr-8">
-                        <div
-                            v-html="previewText"
-                            class="help-block mb-0 whitespace-nowrap overflow-hidden text-ellipsis" />
-                    </div>
+                        {{ __(config.display) || config.handle }}
+                    </Badge>
+                    <Icon
+                        v-if="config.instructions && !collapsed"
+                        name="info-square"
+                        class="size-3.5! text-gray-500"
+                        v-tooltip="{ content: $markdown(__(config.instructions)), html: true }"
+                    />
+                    <Subheading
+                        v-show="collapsed"
+                        v-html="previewText"
+                        class="overflow-hidden text-ellipsis whitespace-nowrap"
+                    />
+                </button>
+                <div class="flex items-center gap-2" v-if="!isReadOnly">
+                    <Switch size="xs" v-model="enabled" v-tooltip="enabled ? __('Included in output') : __('Hidden from output')" />
+
+                    <Dropdown>
+                        <template #trigger>
+                            <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
+                        </template>
+                        <DropdownMenu>
+                            <DropdownItem
+                                v-if="fieldActions.length"
+                                v-for="action in fieldActions"
+                                :text="action.title"
+                                :variant="action.dangerous ? 'destructive' : 'default'"
+                                @click="action.run(action)"
+                            />
+                            <DropdownSeparator v-if="fieldActions.length" />
+                            <DropdownItem
+                                :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))"
+                                @click="toggleCollapsedState"
+                            />
+                            <DropdownItem :text="__('Duplicate Set')" @click="duplicate" />
+                            <DropdownItem
+                                :text="__('Delete Set')"
+                                variant="destructive"
+                                @click="deleteNode"
+                            />
+                        </DropdownMenu>
+                    </Dropdown>
                 </div>
-                <div class="replicator-set-controls">
-                    <toggle-fieldtype
-                        handle="set-enabled"
-                        class="toggle-sm rtl:ml-4 ltr:mr-4"
-                        v-model="enabled"
-                        v-tooltip.top="(enabled) ? __('Included in output') : __('Hidden from output')" />
-                    <dropdown-list>
-                        <dropdown-actions :actions="fieldActions" v-if="fieldActions.length" />
-                        <div class="divider" />
-                        <dropdown-item :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))" @click="toggleCollapsedState" />
-                        <dropdown-item :text="__('Duplicate Set')" @click="duplicate" />
-                        <dropdown-item :text="__('Delete Set')" class="warning" @click="deleteNode" />
-                    </dropdown-list>
-                </div>
-            </div>
-            <div class="replicator-set-body publish-fields @container" v-show="!collapsed" v-if="index !== undefined">
-                <set-field
-                    v-for="field in fields"
-                    v-show="showField(field, fieldPath(field))"
-                    :key="field.handle"
-                    :field="field"
-                    :value="values[field.handle]"
-                    :meta="meta[field.handle]"
-                    :parent-name="parentName"
-                    :set-index="index"
-                    :field-path="fieldPath(field)"
-                    :read-only="isReadOnly"
-                    :show-field-previews="showFieldPreviews"
-                    @updated="updated(field.handle, $event)"
-                    @meta-updated="metaUpdated(field.handle, $event)"
-                    @focus="focused"
-                    @blur="blurred"
-                    @replicator-preview-updated="previewUpdated(field.handle, $event)"
-                />
-            </div>
+            </header>
+
+            <Motion
+                layout
+                v-if="index !== undefined"
+                class="contain-paint"
+                :initial="{ height: collapsed ? '0px' : 'auto' }"
+                :animate="{ height: collapsed ? '0px' : 'auto' }"
+                :transition="{ duration: 0.25, type: 'tween' }"
+            >
+                <FieldsProvider
+                    :fields="fields"
+                    :as-config="false"
+                    :field-path-prefix="fieldPathPrefix"
+                    :meta-path-prefix="metaPathPrefix"
+                >
+                    <Fields class="p-4" />
+                </FieldsProvider>
+            </Motion>
         </div>
     </node-view-wrapper>
-
 </template>
 
 <script>
-import { NodeViewWrapper } from '@tiptap/vue-2';
-import SetField from '../replicator/Field.vue';
+import { NodeViewWrapper, nodeViewProps } from '@tiptap/vue-3';
 import ManagesPreviewText from '../replicator/ManagesPreviewText';
-import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
 import HasFieldActions from '../../field-actions/HasFieldActions.js';
-import DropdownActions from '../../field-actions/DropdownActions.vue';
+import { Motion } from 'motion-v';
+import {
+    Badge,
+    Button,
+    Dropdown,
+    DropdownMenu,
+    DropdownItem,
+    DropdownSeparator,
+    Icon,
+    Subheading,
+    Switch,
+    PublishFieldsProvider as FieldsProvider,
+    PublishFields as Fields
+} from '@ui';
+import { containerContextKey } from '@/components/ui/Publish/Container.vue';
 
 export default {
+    props: nodeViewProps,
 
-    props: [
-        'editor', // the editor instance
-        'node', // access the current node
-        'decorations', // an array of decorations
-        'selected', // true when there is a NodeSelection at the current node view
-        'extension', // access to the node extension, for example to get options
-        'getPos', // get the document position of the current node
-        'updateAttributes', // update attributes of the current node.
-        'deleteNode', // delete the current node
-    ],
+    components: {
+        Button,
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
+        DropdownSeparator,
+        Fields,
+        FieldsProvider,
+        Switch,
+        Subheading,
+        Badge,
+        Icon,
+        NodeViewWrapper,
+        Motion,
+    },
 
-    components: { NodeViewWrapper, SetField, DropdownActions },
+    mixins: [ManagesPreviewText, HasFieldActions],
 
-    mixins: [
-        ValidatesFieldConditions,
-        ManagesPreviewText, 
-        HasFieldActions,
-    ],
-
-    inject: ['bard', 'bardSets', 'storeName'],
+    inject: {
+        bard: {},
+        bardSets: {},
+        publishContainer: { from: containerContextKey },
+    },
 
     computed: {
-
         fields() {
             return this.config.fields;
         },
@@ -111,12 +155,16 @@ export default {
             return this.node.attrs.values;
         },
 
+        extraValues() {
+            return {};
+        },
+
         meta() {
             return this.extension.options.bard.meta.existing[this.node.attrs.id] || {};
         },
 
         previews() {
-            return this.extension.options.bard.meta.previews[this.node.attrs.id] || {};
+            return data_get(this.publishContainer.previews.value, this.fieldPathPrefix) || {};
         },
 
         collapsed() {
@@ -124,7 +172,7 @@ export default {
         },
 
         config() {
-            return _.findWhere(this.setConfigs, { handle: this.values.type }) || {};
+            return this.setConfigs.find((c) => c.handle === this.values.type) || {};
         },
 
         setConfigs() {
@@ -152,8 +200,8 @@ export default {
                 return this.node.attrs.enabled;
             },
             set(enabled) {
-                return this.updateAttributes({ enabled })
-            }
+                return this.updateAttributes({ enabled });
+            },
         },
 
         parentName() {
@@ -164,12 +212,28 @@ export default {
             return this.extension.options.bard.setIndexes[this.node.attrs.id];
         },
 
+        fieldPathPrefix() {
+            const fpf = this.extension.options.bard.fieldPathPrefix;
+            const handle = this.extension.options.bard.handle;
+            const prefix = fpf ? `${fpf}.${handle}` : handle;
+
+            return `${prefix}.${this.index}.attrs.values`;
+        },
+
+        metaPathPrefix() {
+            const mpp = this.extension.options.bard.metaPathPrefix;
+            const handle = this.extension.options.bard.handle;
+            const prefix = mpp ? `${mpp}.${handle}` : handle;
+
+            return `${prefix}.existing.${this.node.attrs.id}`;
+        },
+
         instructions() {
             return this.config.instructions ? markdown(__(this.config.instructions)) : null;
         },
 
         hasError() {
-            return this.extension.options.bard.setsWithErrors.includes(this.index);
+            return this.extension.options.bard.setHasError(this.node.attrs.id);
         },
 
         showFieldPreviews() {
@@ -189,47 +253,32 @@ export default {
         },
 
         fieldVm() {
-            return this.extension.options.bard
+            return this.extension.options.bard;
         },
 
         fieldActionPayload() {
             return {
-                vm: this,
-                fieldVm: this.fieldVm,
-                fieldPathPrefix: this.fieldVm.fieldPathPrefix || this.fieldVm.handle,
+                // vm: this,
+                // fieldVm: this.fieldVm,
+                // fieldPathPrefix: this.fieldVm.fieldPathPrefix || this.fieldVm.handle,
                 index: this.index,
                 values: this.values,
                 config: this.config,
-                meta: this.meta,
-                update: (handle, value) => this.updated(handle, value),
-                updateMeta: (handle, value) => this.metaUpdated(handle, value),
+                // meta: this.meta,
+                update: (handle, value) =>
+                    this.publishContainer.setFieldValue(`${this.fieldPathPrefix}.${handle}`, value),
+                updateMeta: (handle, value) =>
+                    this.publishContainer.setFieldMeta(`${this.metaPathPrefix}.${handle}`, value),
                 isReadOnly: this.isReadOnly,
-                store: this.$store,
-                storeName: this.storeName,
             };
         },
 
+        fieldActionBinding() {
+            return 'bard-fieldtype-set';
+        }
     },
 
     methods: {
-
-        updated(handle, value) {
-            let values = Object.assign({}, this.values);
-            values.type = this.config.handle;
-            values[handle] = value;
-            this.updateAttributes({ values });
-        },
-
-        metaUpdated(handle, value) {
-            let meta = clone(this.meta);
-            meta[handle] = value;
-            this.extension.options.bard.updateSetMeta(this.node.attrs.id, meta);
-        },
-
-        previewUpdated(handle, value) {
-            this.extension.options.bard.updateSetPreviews(this.node.attrs.id, { ...this.previews, [handle]: value });
-        },
-
         focused() {
             this.extension.options.bard.$emit('focus');
         },
@@ -263,20 +312,18 @@ export default {
 
         duplicate() {
             // this.$events.$emit('duplicated', this.node.attrs.id);
-            this.extension.options.bard.duplicateSet(this.node.attrs.id, this.node.attrs, this.getPos() + this.node.nodeSize);
+            this.extension.options.bard.duplicateSet(
+                this.node.attrs.id,
+                this.node.attrs,
+                this.getPos() + this.node.nodeSize,
+            );
         },
-
-        fieldPath(field) {
-            let prefix = this.extension.options.bard.fieldPathPrefix || this.extension.options.bard.handle;
-            return `${prefix}.${this.index}.attrs.values.${field.handle}`;
-        },
-
     },
 
     updated() {
         // This is a workaround to avoid Firefox's inability to select inputs/textareas when the
         // parent element is set to draggable: https://bugzilla.mozilla.org/show_bug.cgi?id=739071
         this.$el.setAttribute('draggable', false);
-    }
-}
+    },
+};
 </script>

@@ -105,6 +105,11 @@ return [
             'directory' => storage_path('forms'),
         ],
 
+        'revisions' => [
+            'class' => Stores\RevisionsStore::class,
+            'directory' => env('STATAMIC_REVISIONS_PATH', config('statamic.revisions.path', storage_path('statamic/revisions'))),
+        ],
+
     ],
 
     /*

@@ -10,6 +10,7 @@ use Statamic\Contracts\Entries\Collection as Contract;
 use Statamic\Data\ContainsCascadingData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Data\HasDirtyState;
 use Statamic\Events\CollectionCreated;
 use Statamic\Events\CollectionCreating;
 use Statamic\Events\CollectionDeleted;
@@ -36,13 +37,14 @@ use function Statamic\trans as __;
 
 class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contract
 {
-    use ContainsCascadingData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData;
+    use ContainsCascadingData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData, HasDirtyState;
 
     protected $handle;
     protected $routes = [];
     private $cachedRoutes = null;
     protected $mount;
     protected $title;
+    protected $icon;
     protected $template;
     protected $layout;
     protected $sites;
@@ -229,6 +231,16 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             ->args(func_get_args());
     }
 
+    public function icon($icon = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('icon')
+            ->getter(function ($icon) {
+                return $icon ?? 'collections';
+            })
+            ->args(func_get_args());
+    }
+
     public function absoluteUrl($site = null)
     {
         if (! $mount = $this->mount()) {
@@ -267,14 +279,6 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         return cp_route('collections.show', $this->handle());
     }
 
-    public function breadcrumbUrl()
-    {
-        $referer = request()->header('referer');
-        $showUrl = $this->showUrl();
-
-        return $referer && Str::before($referer, '?') === $showUrl ? $referer : $showUrl;
-    }
-
     public function editUrl()
     {
         return cp_route('collections.edit', $this->handle());
@@ -290,6 +294,11 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         $site = $site ?? $this->sites()->first();
 
         return cp_route('collections.entries.create', [$this->handle(), $site]);
+    }
+
+    public function editBlueprintUrl($blueprint)
+    {
+        return cp_route('blueprints.collections.edit', [$this, $blueprint]);
     }
 
     public function queryEntries()
@@ -386,16 +395,6 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             $blueprint->ensureField('date', ['type' => 'date', 'required' => true, 'default' => 'now'], 'sidebar');
         }
 
-        if ($this->hasStructure() && ! $this->orderable()) {
-            $blueprint->ensureField('parent', [
-                'type' => 'entries',
-                'collections' => [$this->handle()],
-                'max_items' => 1,
-                'listable' => false,
-                'localizable' => true,
-            ], 'sidebar');
-        }
-
         foreach ($this->taxonomies() as $taxonomy) {
             if ($blueprint->hasField($taxonomy->handle())) {
                 continue;
@@ -459,7 +458,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
     public function createLabel()
     {
-        $key = "messages.{$this->handle()}_collection_create_entry";
+        $key = "statamic::messages.{$this->handle()}_collection_create_entry";
 
         $translation = __($key);
 
@@ -496,6 +495,10 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
         Facades\Collection::save($this);
 
+        if ($this->isDirty('route')) {
+            Facades\Entry::updateUris($this);
+        }
+
         Blink::forget('collection-handles');
         Blink::forget('mounted-collections');
         Blink::flushStartingWith("collection-{$this->id()}");
@@ -507,6 +510,8 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
             CollectionSaved::dispatch($this);
         }
+
+        $this->syncOriginal();
 
         return $this;
     }
@@ -560,6 +565,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         $formerlyToArray = [
             'title' => $this->title,
             'handle' => $this->handle,
+            'icon' => $this->icon,
             'routes' => $this->routes,
             'dated' => $this->dated,
             'past_date_behavior' => $this->pastDateBehavior(),
@@ -921,6 +927,18 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         File::delete(dirname($this->path()).'/'.$this->handle);
     }
 
+    public function entryBlueprintCommandPaletteLinks()
+    {
+        $text = [__('Collections'), __($this->title())];
+
+        return $this
+            ->entryBlueprints()
+            ->map(fn ($blueprint) => $blueprint->commandPaletteLink(
+                type: $text,
+                url: $this->editBlueprintUrl($blueprint),
+            ));
+    }
+
     public static function __callStatic($method, $parameters)
     {
         return Facades\Collection::{$method}(...$parameters);
@@ -937,5 +955,10 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             'title' => $this->title(),
             'handle' => $this->handle(),
         ];
+    }
+
+    public function getCurrentDirtyStateAttributes(): array
+    {
+        return $this->fileData();
     }
 }

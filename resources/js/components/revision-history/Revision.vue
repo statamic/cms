@@ -1,60 +1,88 @@
 <template>
-
-    <div class="revision-item"
+    <div
+        class="relative block cursor-pointer space-y-2 px-3 py-2 text-sm hover:[&_.revision-message]:underline"
         :class="{
-            'status-working-copy': revision.working,
-            'status-published': revision.attributes.published
+            'status-working-copy': revision.action === 'working',
+            'status-published': revision.attributes.published,
+            'border border-ui-accent-bg dark:border-dark-ui-accent-bg/90 rounded-lg py-2.5 bg-[hsl(from_var(--theme-color-ui-accent-bg)_h_s_97)] dark:bg-[hsl(from_var(--theme-color-dark-ui-accent-bg)_h_40_20)]': revision.attributes.current,
+            'bg-gradient-to-b from-transparent from-60% to-white dark:to-gray-800 -mt-1': isLast,
         }"
+        v-tooltip="revision.attributes.current ? __('Current Revision') : null"
         @click="open"
     >
-        <div v-if="revision.message" class="revision-item-note truncate" v-text="revision.message" />
+        <div class="flex gap-3">
+            <Avatar v-if="revision.user" :user="revision.user" class="size-6 shrink-0 mt-1" />
 
-        <div class="flex items-center">
-            <avatar v-if="revision.user" :user="revision.user" class="shrink-0 rtl:ml-2 ltr:mr-2 w-6" />
-
-            <div class="revision-item-content w-full flex">
-                <div class="flex-1">
-                    <div class="revision-author text-gray-700 dark:text-dark-150 text-2xs">
-                        <template v-if="revision.user">{{ revision.user.name || revision.user.email }} &ndash;</template>
-                        {{ date.toDate().toLocaleTimeString($config.get('locale').replace('_', '-'), { hour: 'numeric', minute: '2-digit' }) }}
-                    </div>
-                </div>
-
-                <span class="badge" v-if="revision.working" v-text="__('Working Copy')" />
-                <span class="badge" :class="revision.action" v-else v-text="__(revision.action)" />
-                <span class="badge bg-orange" v-if="revision.attributes.current" v-text="__('Current')" />
-
-                <revision-preview
-                    v-if="showDetails"
-                    :revision="revision"
-                    component="entry-publish-form"
-                    :component-props="componentProps"
-                    @closed="showDetails = false"
-                >
-                    <template slot="action-buttons-right">
-                        <restore-revision
-                            v-if="canRestoreRevisions"
-                            :revision="revision"
-                            :url="restoreUrl"
-                            :reference="reference"
-                            class="rtl:mr-4 ltr:ml-4" />
+            <div class="grid gap-1">
+                <div v-if="revision.message" class="revision-message font-medium" v-text="revision.message" />
+                <Subheading class="text-xs text-gray-500! dark:text-gray-400!" :class="{ 'text-gray-800! dark:text-white!': revision.attributes.current }">
+                    {{ time }}
+                    <template v-if="revision.user">
+                        by {{ revision.user.name || revision.user.email }}
                     </template>
-                </revision-preview>
+                </Subheading>
             </div>
+
+            <div class="flex items-center gap-1 ml-auto">
+                <Badge
+                    size="sm"
+                    :color="
+                        revision.action === 'working'
+                            ? 'gray'
+                            : {
+                                  publish: 'green',
+                                  revision: 'gray',
+                                  restore: 'gray',
+                                  unpublish: 'red',
+                              }[revision.action]
+                    "
+                    :text="
+                        revision.action === 'working'
+                            ? __('Working Copy')
+                            : {
+                                  publish: __('Published'),
+                                  revision: __('Revision'),
+                                  restore: __('Restored'),
+                                  unpublish: __('Unpublished'),
+                              }[revision.action]
+                    "
+                />
+            </div>
+
+            <revision-preview
+                v-if="showDetails"
+                :revision="revision"
+                component="entry-publish-form"
+                :component-props="componentProps"
+                @closed="showDetails = false"
+            >
+                <template #action-buttons-right>
+                    <restore-revision
+                        v-if="canRestoreRevisions"
+                        :revision="revision"
+                        :url="restoreUrl"
+                        :reference="reference"
+                        class="ltr:ml-4 rtl:mr-4"
+                    />
+                </template>
+            </revision-preview>
         </div>
     </div>
-
 </template>
 
 <script>
 import RestoreRevision from './Restore.vue';
 import RevisionPreview from './Preview.vue';
+import DateFormatter from '@/components/DateFormatter.js';
+import { Subheading, Badge, Avatar } from '@/components/ui';
 
 export default {
-
     components: {
         RevisionPreview,
         RestoreRevision,
+        Subheading,
+        Badge,
+        Avatar,
     },
 
     props: {
@@ -62,6 +90,7 @@ export default {
         restoreUrl: String,
         reference: String,
         canRestoreRevisions: Boolean,
+        isLast: Boolean,
     },
 
     data() {
@@ -85,32 +114,26 @@ export default {
                 initialOriginMeta: 'originMeta',
                 initialSite: 'locale',
                 initialIsWorkingCopy: 'hasWorkingCopy',
-                initialIsRoot: 'isRoot',
                 initialReadOnly: 'readOnly',
-            }
-        }
+            },
+        };
     },
 
     computed: {
-
-        date() {
-            return moment.unix(this.revision.date);
-        }
-
+        time() {
+            return DateFormatter.format(this.revision.date * 1000, 'time');
+        },
     },
 
     methods: {
-
         open() {
-            if (this.revision.working) {
+            if (this.revision.action === 'working') {
                 this.$emit('working-copy-selected');
                 return;
             }
 
             this.showDetails = true;
-        }
-
-    }
-
-}
+        },
+    },
+};
 </script>

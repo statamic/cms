@@ -8,6 +8,7 @@ use Statamic\Assets\AssetUploader;
 use Statamic\Contracts\Assets\AssetFolder;
 use Statamic\Facades\Path;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Resources\CP\Assets\Folder;
 use Statamic\Rules\AlphaDashSpace;
 
 class FoldersController extends CpController
@@ -35,11 +36,15 @@ class FoldersController extends CpController
             $path = strtolower($path);
         }
 
-        return $container->assetFolder($path)->save();
+        $folder = $container->assetFolder($path)->save();
+
+        return (new Folder($folder))->resolve();
     }
 
     public function update(Request $request, $container, $folder)
     {
-        return $container->assetFolder($folder)->save();
+        $folder = $container->assetFolder($folder)->save();
+
+        return (new Folder($folder))->resolve();
     }
 }

@@ -764,4 +764,72 @@ class DefaultInvalidatorTest extends TestCase
 
         $this->assertNull($invalidator->invalidate($form));
     }
+
+    #[Test]
+    public function it_doesnt_recache_when_background_recache_token_is_disabled()
+    {
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('refreshUrls')->never();
+            $cacher->shouldReceive('invalidateUrls')->once()->with([
+                'http://localhost/blog/one',
+                'http://localhost/blog/two',
+            ]);
+        });
+
+        $entry = tap(Mockery::mock(Entry::class), function ($m) {
+            $m->shouldReceive('isRedirect')->andReturn(true);
+            $m->shouldReceive('absoluteUrl')->andReturn('http://test.com/my/test/entry');
+            $m->shouldReceive('collectionHandle')->andReturn('blog');
+            $m->shouldReceive('descendants')->andReturn(collect());
+            $m->shouldReceive('site')->andReturn(Site::default());
+        });
+
+        $invalidator = new Invalidator($cacher, [
+            'collections' => [
+                'blog' => [
+                    'urls' => [
+                        '/blog/one',
+                        '/blog/two',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertNull($invalidator->refresh($entry));
+    }
+
+    #[Test]
+    public function it_recaches_when_background_recache_token_is_enabled()
+    {
+        config()->set('statamic.static_caching.background_recache', true);
+
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrls')->never();
+            $cacher->shouldReceive('refreshUrls')->once()->with([
+                'http://localhost/blog/one',
+                'http://localhost/blog/two',
+            ]);
+        });
+
+        $entry = tap(Mockery::mock(Entry::class), function ($m) {
+            $m->shouldReceive('isRedirect')->andReturn(true);
+            $m->shouldReceive('absoluteUrl')->andReturn('http://test.com/my/test/entry');
+            $m->shouldReceive('collectionHandle')->andReturn('blog');
+            $m->shouldReceive('descendants')->andReturn(collect());
+            $m->shouldReceive('site')->andReturn(Site::default());
+        });
+
+        $invalidator = new Invalidator($cacher, [
+            'collections' => [
+                'blog' => [
+                    'urls' => [
+                        '/blog/one',
+                        '/blog/two',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertNull($invalidator->refresh($entry));
+    }
 }

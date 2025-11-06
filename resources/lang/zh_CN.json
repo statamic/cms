@@ -858,7 +858,7 @@
     "Seller": "商家",
     "Send Email Invitation": "发送电子邮件邀请",
     "Send Password Reset": "发送重设密码",
-    "Send password reset email to this user?|Send password reset email to these :count users?": "要发送密码重置电子邮件给该用户吗？|将密码重置电子邮件发送给这些 :count 个用户？",
+    "Would you like to email a reset link to this user?|Would you like to email a reset link to these :count users?": "要发送密码重置电子邮件给该用户吗？|将密码重置电子邮件发送给这些 :count 个用户？",
     "Send Test Email": "发送测试邮件",
     "Sender": "发件人",
     "Sendmail": "发送邮件",

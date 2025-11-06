@@ -401,10 +401,10 @@ class EntryQueryBuilderTest extends TestCase
         EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->create();
         EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'test_taxonomy' => ['taxonomy-5']])->create();
 
-        $entries = Entry::query()->whereJsonContains('test_taxonomy', ['taxonomy-1', 'taxonomy-5'])->get();
+        $entries = Entry::query()->whereJsonContains('test_taxonomy', ['taxonomy-1', 'taxonomy-3'])->get();
 
-        $this->assertCount(3, $entries);
-        $this->assertEquals(['Post 1', 'Post 3', 'Post 5'], $entries->map->title->all());
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 3'], $entries->map->title->all());
 
         $entries = Entry::query()->whereJsonContains('test_taxonomy', 'taxonomy-1')->get();
 
@@ -769,6 +769,116 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function entries_are_found_using_where_has_when_max_items_1()
+    {
+        $blueprint = Blueprint::makeFromFields(['entries_field' => ['type' => 'entries', 'max_items' => 1]]);
+        Blueprint::shouldReceive('in')->with('collections/posts')->andReturn(collect(['posts' => $blueprint]));
+
+        $this->createDummyCollectionAndEntries();
+
+        Entry::find('id-1')
+            ->merge([
+                'entries_field' => 'id-2',
+            ])
+            ->save();
+
+        Entry::find('id-3')
+            ->merge([
+                'entries_field' => 'id-1',
+            ])
+            ->save();
+
+        $entries = Entry::query()->whereHas('entries_field')->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+
+        $entries = Entry::query()->whereHas('entries_field', function ($subquery) {
+            $subquery->where('title', 'Post 2');
+        })
+            ->get();
+
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 1'], $entries->map->title->all());
+
+        $entries = Entry::query()->whereDoesntHave('entries_field', function ($subquery) {
+            $subquery->where('title', 'Post 2');
+        })
+            ->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 2', 'Post 3'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_where_has_when_max_items_not_1()
+    {
+        $blueprint = Blueprint::makeFromFields(['entries_field' => ['type' => 'entries']]);
+        Blueprint::shouldReceive('in')->with('collections/posts')->andReturn(collect(['posts' => $blueprint]));
+
+        $this->createDummyCollectionAndEntries();
+
+        Entry::find('id-1')
+            ->merge([
+                'entries_field' => ['id-2', 'id-1'],
+            ])
+            ->save();
+
+        Entry::find('id-3')
+            ->merge([
+                'entries_field' => ['id-1', 'id-2'],
+            ])
+            ->save();
+
+        $entries = Entry::query()->whereHas('entries_field')->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+
+        $entries = Entry::query()->whereHas('entries_field', function ($subquery) {
+            $subquery->where('title', 'Post 2');
+        })
+            ->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+
+        $entries = Entry::query()->whereDoesntHave('entries_field', function ($subquery) {
+            $subquery->where('title', 'Post 2');
+        })
+            ->get();
+
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 2'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_where_relation()
+    {
+        $blueprint = Blueprint::makeFromFields(['entries_field' => ['type' => 'entries']]);
+        Blueprint::shouldReceive('in')->with('collections/posts')->andReturn(collect(['posts' => $blueprint]));
+
+        $this->createDummyCollectionAndEntries();
+
+        Entry::find('id-1')
+            ->merge([
+                'entries_field' => ['id-2', 'id-1'],
+            ])
+            ->save();
+
+        Entry::find('id-3')
+            ->merge([
+                'entries_field' => ['id-1', 'id-2'],
+            ])
+            ->save();
+
+        $entries = Entry::query()->whereRelation('entries_field', 'title', 'Post 2')->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+    }
+
+    #[Test]
     #[DataProvider('likeProvider')]
     public function entries_are_found_using_like($like, $expected)
     {
@@ -838,10 +948,131 @@ class EntryQueryBuilderTest extends TestCase
     {
         $this->createDummyCollectionAndEntries();
 
-        $count = 0;
-        Entry::query()->chunk(2, function ($entries) use (&$count) {
-            $this->assertCount($count++ == 0 ? 2 : 1, $entries);
+        $chunks = 0;
+
+        Entry::query()->chunk(2, function ($entries, $page) use (&$chunks) {
+            if ($page === 1) {
+                $this->assertCount(2, $entries);
+                $this->assertEquals(['Post 1', 'Post 2'], $entries->map->title->all());
+            } else {
+                $this->assertCount(1, $entries);
+                $this->assertEquals(['Post 3'], $entries->map->title->all());
+            }
+
+            $chunks++;
         });
+
+        $this->assertEquals(2, $chunks);
+    }
+
+    #[Test]
+    public function entries_are_found_using_chunk_with_limits_where_limit_is_less_than_total()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $chunks = 0;
+
+        Entry::query()->limit(2)->chunk(1, function ($entries, $page) use (&$chunks) {
+            if ($page === 1) {
+                $this->assertCount(1, $entries);
+                $this->assertEquals(['Post 1'], $entries->map->title->all());
+            } else {
+                $this->assertCount(1, $entries);
+                $this->assertEquals(['Post 2'], $entries->map->title->all());
+            }
+
+            $chunks++;
+        });
+
+        $this->assertEquals(2, $chunks);
+    }
+
+    #[Test]
+    public function entries_are_found_using_chunk_with_limits_where_limit_is_more_than_total()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $chunks = 0;
+
+        Entry::query()->limit(10)->chunk(2, function ($entries, $page) use (&$chunks) {
+            if ($page === 1) {
+                $this->assertCount(2, $entries);
+                $this->assertEquals(['Post 1', 'Post 2'], $entries->map->title->all());
+            } elseif ($page === 2) {
+                $this->assertCount(1, $entries);
+                $this->assertEquals(['Post 3'], $entries->map->title->all());
+            } else {
+                $this->fail('Should have had two pages.');
+            }
+
+            $chunks++;
+        });
+
+        $this->assertEquals(2, $chunks);
+    }
+
+    #[Test]
+    public function entries_are_found_using_chunk_with_offset()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $chunks = 0;
+
+        Entry::query()->offset(1)->chunk(2, function ($entries, $page) use (&$chunks) {
+            if ($page === 1) {
+                $this->assertCount(2, $entries);
+                $this->assertEquals(['Post 2', 'Post 3'], $entries->map->title->all());
+            } else {
+                $this->fail('Should only have had one page.');
+            }
+
+            $chunks++;
+        });
+
+        $this->assertEquals(1, $chunks);
+    }
+
+    #[Test]
+    public function entries_are_found_using_chunk_with_offset_where_more_than_total()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $chunks = 0;
+
+        Entry::query()->offset(3)->chunk(2, function ($entries, $page) use (&$chunks) {
+            $chunks++;
+        });
+
+        $this->assertEquals(0, $chunks);
+    }
+
+    #[Test]
+    public function entries_are_found_using_chunk_with_limits_and_offsets()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        EntryFactory::id('id-4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4'])->create();
+        EntryFactory::id('id-5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5'])->create();
+        EntryFactory::id('id-6')->slug('post-6')->collection('posts')->data(['title' => 'Post 6'])->create();
+        EntryFactory::id('id-7')->slug('post-7')->collection('posts')->data(['title' => 'Post 7'])->create();
+
+        $chunks = 0;
+
+        Entry::query()->orderBy('id', 'asc')->offset(2)->limit(3)->chunk(2, function ($entries, $page) use (&$chunks) {
+            if ($page === 1) {
+                $this->assertCount(2, $entries);
+                $this->assertEquals(['Post 3', 'Post 4'], $entries->map->title->all());
+            } elseif ($page === 2) {
+                $this->assertCount(1, $entries);
+                $this->assertEquals(['Post 5'], $entries->map->title->all());
+            } else {
+                $this->fail('Should only have had two pages.');
+            }
+
+            $chunks++;
+        });
+
+        $this->assertEquals(2, $chunks);
     }
 
     #[Test]

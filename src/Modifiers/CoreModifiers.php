@@ -8,6 +8,7 @@ use Countable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
+use Illuminate\View\ComponentSlot;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades\Antlers;
@@ -27,6 +28,7 @@ use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Bard;
 use Statamic\Fieldtypes\Bard\Augmentor;
 use Statamic\Fieldtypes\Link\ArrayableLink;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Dumper;
 use Statamic\Support\Html;
@@ -283,6 +285,7 @@ class CoreModifiers extends Modifier
         }
 
         $text = '';
+
         while (count($value)) {
             $item = array_shift($value);
 
@@ -291,8 +294,13 @@ class CoreModifiers extends Modifier
             }
 
             if ($item['type'] === 'text') {
-                $text .= ' '.($item['text'] ?? '');
+                $text .= ($item['text'] ?? '');
             }
+
+            if ($item['type'] === 'paragraph' && $text !== '') {
+                $text .= ' ';
+            }
+
             array_unshift($value, ...($item['content'] ?? []));
         }
 
@@ -546,7 +554,7 @@ class CoreModifiers extends Modifier
      */
     public function daysAgo($value, $params)
     {
-        return (int) abs($this->carbon($value)->diffInDays(Arr::get($params, 0)));
+        return $this->carbon($value)->diffInDays(Arr::get($params, 0));
     }
 
     /**
@@ -1078,6 +1086,11 @@ class CoreModifiers extends Modifier
         return $headline;
     }
 
+    public function hasActualContent($value)
+    {
+        return (new ComponentSlot($value))->hasActualContent();
+    }
+
     /**
      * Converts a hex color to rgb values.
      *
@@ -1103,7 +1116,7 @@ class CoreModifiers extends Modifier
      */
     public function hoursAgo($value, $params)
     {
-        return (int) abs($this->carbon($value)->diffInHours(Arr::get($params, 0)));
+        return $this->carbon($value)->diffInHours(Arr::get($params, 0));
     }
 
     /**
@@ -1351,6 +1364,11 @@ class CoreModifiers extends Modifier
     public function isPast($value)
     {
         return $this->carbon($value)->isPast();
+    }
+
+    public function isString($value)
+    {
+        return is_string($value);
     }
 
     /**
@@ -1665,7 +1683,7 @@ class CoreModifiers extends Modifier
      */
     public function minutesAgo($value, $params)
     {
-        return (int) abs($this->carbon($value)->diffInMinutes(Arr::get($params, 0)));
+        return $this->carbon($value)->diffInMinutes(Arr::get($params, 0));
     }
 
     /**
@@ -1700,7 +1718,7 @@ class CoreModifiers extends Modifier
      */
     public function monthsAgo($value, $params)
     {
-        return (int) abs($this->carbon($value)->diffInMonths(Arr::get($params, 0)));
+        return $this->carbon($value)->diffInMonths(Arr::get($params, 0));
     }
 
     /**
@@ -1977,6 +1995,16 @@ class CoreModifiers extends Modifier
      * @return string
      */
     public function rawurlencode($value)
+    {
+        return rawurlencode($value);
+    }
+
+    /**
+     * URL-encode according to RFC 3986, but allowing slashes to persist
+     *
+     * @return string
+     */
+    public function rawurlencode_except_slashes($value)
     {
         return implode('/', array_map('rawurlencode', explode('/', $value)));
     }
@@ -2280,14 +2308,8 @@ class CoreModifiers extends Modifier
             $segment = $this->getFromContext($context, $params);
         }
 
-        $url = parse_url($value);
-
-        // Get everything after a possible domain
-        // and make sure it starts with a /
-        $uris = Stringy::ensureLeft(Arr::get($url, 'path'), '/');
-
-        //Boom
-        $segments = explode('/', $uris);
+        // Explode segments
+        $segments = explode('/', URL::makeRelative($value));
 
         return Arr::get($segments, $segment);
     }
@@ -2300,7 +2322,7 @@ class CoreModifiers extends Modifier
      */
     public function secondsAgo($value, $params)
     {
-        return (int) abs($this->carbon($value)->diffInSeconds(Arr::get($params, 0)));
+        return $this->carbon($value)->diffInSeconds(Arr::get($params, 0));
     }
 
     /**
@@ -2857,9 +2879,9 @@ class CoreModifiers extends Modifier
      */
     public function timezone($value, $params)
     {
-        $timezone = Arr::get($params, 0, Config::get('app.timezone'));
+        $timezone = Arr::get($params, 0, Statamic::displayTimezone());
 
-        return $this->carbon($value)->tz($timezone);
+        return $this->carbon($value)->clone()->tz($timezone);
     }
 
     public function typeOf($value)
@@ -2905,6 +2927,16 @@ class CoreModifiers extends Modifier
      * @return string
      */
     public function urlencode($value)
+    {
+        return urlencode($value);
+    }
+
+    /**
+     * URL-encodes string, but allowing slashes to persist
+     *
+     * @return string
+     */
+    public function urlencode_except_slashes($value)
     {
         return implode('/', array_map('urlencode', explode('/', $value)));
     }
@@ -2999,7 +3031,7 @@ class CoreModifiers extends Modifier
      */
     public function weeksAgo($value, $params)
     {
-        return (int) abs($this->carbon($value)->diffInWeeks(Arr::get($params, 0)));
+        return $this->carbon($value)->diffInWeeks(Arr::get($params, 0));
     }
 
     /**
@@ -3277,6 +3309,10 @@ class CoreModifiers extends Modifier
     {
         if (! $value instanceof Carbon) {
             $value = (is_numeric($value)) ? Date::createFromTimestamp($value, config('app.timezone')) : Date::parse($value);
+        }
+
+        if (config('statamic.system.localize_dates_in_modifiers')) {
+            $value->setTimezone(Statamic::displayTimezone());
         }
 
         return $value;

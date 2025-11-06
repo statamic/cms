@@ -104,7 +104,7 @@
 }
 
 .antlers-trace-editor-link:hover {
-    color: #FF269E !important;
+    color: #ff269e !important;
 }
 
 .antlers-trace-editor-link svg {
@@ -161,12 +161,12 @@
 
 .antlers-trace-property-key {
     font-weight: bold !important;
-    display:inline-block;
+    display: inline-block;
 }
 
 .antlers-trace-property-value {
-    display:block !important;
-    margin-top:5px !important;
+    display: block !important;
+    margin-top: 5px !important;
 }
 
 .antlers-trace-property-desc {

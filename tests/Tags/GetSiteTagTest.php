@@ -13,10 +13,10 @@ class GetSiteTagTest extends TestCase
     {
         parent::setUp();
 
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'english' => ['name' => 'English', 'locale' => 'en_US', 'url' => '/en'],
             'french' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => '/fr'],
-        ]]);
+        ]);
     }
 
     #[Test]

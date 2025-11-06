@@ -7,6 +7,8 @@ use Statamic\Facades\User;
 
 class Unpublish extends Action
 {
+    protected $icon = 'eye-slash';
+
     public function visibleTo($item)
     {
         return $this->context['view'] === 'list' && $item instanceof Entry && $item->published();

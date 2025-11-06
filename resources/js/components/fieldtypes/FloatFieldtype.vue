@@ -1,28 +1,33 @@
 <template>
-    <text-input
+    <Input
         type="number"
-        tabindex="0"
+        :tabindex="0"
         :name="name"
         :focus="focus"
-        :value="value"
-        :is-read-only="isReadOnly"
+        :model-value="value"
+        :read-only="isReadOnly"
+        :disabled="config.disabled"
         :id="fieldId"
+        :prepend="__(config.prepend)"
+        :append="__(config.append)"
         :min="config.min"
         :max="config.max"
         :step="config.step"
-        @input="updateDebounced"
+        @update:model-value="updateDebounced"
         @focus="$emit('focus')"
         @blur="$emit('blur')"
     />
 </template>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
+import { Input } from '@/components/ui';
 
 export default {
-
     mixins: [Fieldtype],
 
-    props: ['focus']
+    components: { Input },
 
+    props: ['focus'],
 };
 </script>

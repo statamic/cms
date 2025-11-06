@@ -858,7 +858,7 @@
     "Seller": "فروشنده",
     "Send Email Invitation": "ارسال ایمیل دعوت",
     "Send Password Reset": "ارسال بازسازی گذرواژه",
-    "Send password reset email to this user?|Send password reset email to these :count users?": "ارسال ایمیل بازسازی گذروژاه برای این کاربر؟|ارسال ایمیل بازسازی گذرواژه برای :count کاربر؟",
+    "Would you like to email a reset link to this user?|Would you like to email a reset link to these :count users?": "ارسال ایمیل بازسازی گذروژاه برای این کاربر؟|ارسال ایمیل بازسازی گذرواژه برای :count کاربر؟",
     "Send Test Email": "ارسال ایمیل تستی",
     "Sender": "فرستنده",
     "Sendmail": "ارسال ایمیل (Sendmail)",
