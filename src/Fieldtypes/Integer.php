@@ -99,10 +99,6 @@ class Integer extends Fieldtype
             $rules[] = 'max:'.$max;
         }
 
-        if ($step = $this->config('step')) {
-            $rules[] = 'multiple_of:'.$step;
-        }
-
         return $rules;
     }
 
