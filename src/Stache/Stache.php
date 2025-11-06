@@ -282,11 +282,17 @@ class Stache
             $chunkSize = (int) ceil($stores->count() / $maxProcesses);
             $chunks = $stores->chunk($chunkSize);
 
-            $closures = $chunks->map(
-                fn ($chunk) => fn () => $chunk->each->warm()->keys()->all()
-            )->all();
+            $closures = $chunks->map(function ($chunk) {
+                return function () use ($chunk) {
+                    return $chunk->each->warm()->keys()->all();
+                };
+            })->all();
 
             $driver = $config['concurrency_driver'] ?? 'process';
+
+            if (empty($closures)) {
+                \Log::info('Closures are empty, skipping parallel warming');
+            }
 
             Concurrency::driver($driver)->run($closures);
         } catch (\Exception $e) {
