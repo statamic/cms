@@ -2554,7 +2554,7 @@ YAML;
 
         $container = Facades\AssetContainer::make('test')->disk('test');
         $container = Mockery::mock($container)->makePartial();
-        $container->shouldReceive('warmPresets')->andReturn(['one', 'two']);
+        $container->shouldReceive('warmPresetsForPath')->andReturn(['one', 'two']);
 
         $asset = (new Asset)->container($container)->path($filename);
 

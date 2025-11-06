@@ -215,19 +215,28 @@ class AssetContainerTest extends TestCase
             ->warmPresets($presets);
 
         $this->assertEquals($expectedIntelligent, $container->warmsPresetsIntelligently());
-        $this->assertEquals($expectedWarm, $container->warmPresets());
+
+        // Get presets from warmPresetsPerPathWithDefaults which handles intelligent warming
+        $perPath = $container->warmPresetsPerPathWithDefaults();
+        $actualPresets = [];
+        foreach ($perPath as $config) {
+            $actualPresets = array_merge($actualPresets, $config['presets'] ?? []);
+        }
+        $actualPresets = array_values(array_unique($actualPresets));
+
+        $this->assertEquals($expectedWarm, $actualPresets);
     }
 
     public static function warmPresetProvider()
     {
         return [
             'no source, no presets' => [null, null, true, ['small', 'medium', 'large', 'max']],
-            'no source, with presets' => [null, ['small', 'medium'], false, ['small', 'medium']],
+            'no source, with presets' => [null, ['small', 'medium'], false, ['small', 'medium']], // warmPresets is set, so intelligent is disabled
             'with source, no presets' => ['max', null, true, ['small', 'medium', 'large']],
-            'with source, with presets' => ['max', ['small'], false, ['small']],
-            'with source, with presets, including source' => ['max', ['small', 'max'], false, ['small', 'max']],
-            'no source, presets false' => [null, false, false, []],
-            'with source, presets false' => ['max', false, false, []],
+            'with source, with presets' => ['max', ['small'], false, ['small']], // warmPresets is set, so intelligent is disabled
+            'with source, with presets, including source' => ['max', ['small', 'max'], false, ['small', 'max']], // warmPresets is set
+            'no source, presets false' => [null, false, false, []], // warmPresets is explicitly false, so intelligent is disabled
+            'with source, presets false' => ['max', false, false, []], // warmPresets is explicitly false
         ];
     }
 
@@ -248,9 +257,152 @@ class AssetContainerTest extends TestCase
 
         $container = (new AssetContainer);
 
+        // Get presets from warmPresetsPerPathWithDefaults which handles intelligent warming
+        $perPath = $container->warmPresetsPerPathWithDefaults();
+        $actualPresets = [];
+        foreach ($perPath as $config) {
+            $actualPresets = array_merge($actualPresets, $config['presets'] ?? []);
+        }
+        $actualPresets = array_values(array_unique($actualPresets));
+
         $this->assertEquals([
             'small', 'medium', 'large', 'max', 'og_image', 'twitter_image',
-        ], $container->warmPresets());
+        ], $actualPresets);
+    }
+
+    #[Test]
+    #[DataProvider('warmPresetsPerPathProvider')]
+    public function it_returns_presets_for_specific_paths($presetsPerPath, $assetPath, $expectedPresets)
+    {
+        $container = (new AssetContainer)->warmPresetsPerPath($presetsPerPath);
+
+        $this->assertEquals($expectedPresets, $container->warmPresetsForPath($assetPath));
+    }
+
+    public static function warmPresetsPerPathProvider()
+    {
+        return [
+            'root path matches everything' => [
+                [['paths' => ['/'], 'presets' => ['small', 'medium']]],
+                'images/photo.jpg',
+                ['small', 'medium'],
+            ],
+            'specific folder match' => [
+                [['paths' => ['images'], 'presets' => ['large']]],
+                'images/photo.jpg',
+                ['large'],
+            ],
+            'specific folder with subfolder' => [
+                [['paths' => ['images'], 'presets' => ['large']]],
+                'images/subfolder/photo.jpg',
+                ['large'],
+            ],
+            'no match returns empty' => [
+                [['paths' => ['images'], 'presets' => ['large']]],
+                'documents/file.pdf',
+                [],
+            ],
+            'multiple path patterns' => [
+                [['paths' => ['images', 'photos'], 'presets' => ['large']]],
+                'photos/vacation.jpg',
+                ['large'],
+            ],
+            'multiple configs, multiple matches' => [
+                [
+                    ['paths' => ['/'], 'presets' => ['small']],
+                    ['paths' => ['images'], 'presets' => ['large', 'medium']],
+                ],
+                'images/photo.jpg',
+                ['small', 'large', 'medium'],
+            ],
+            'deep folder path' => [
+                [['paths' => ['documents/reports'], 'presets' => ['thumbnail']]],
+                'documents/reports/2024/annual.pdf',
+                ['thumbnail'],
+            ],
+            'exact path match' => [
+                [['paths' => ['images/photo.jpg'], 'presets' => ['special']]],
+                'images/photo.jpg',
+                ['special'],
+            ],
+        ];
+    }
+
+    #[Test]
+    public function it_migrates_warm_presets_to_warm_presets_per_path()
+    {
+        $container = (new AssetContainer)->warmPresets(['small', 'medium']);
+
+        $perPath = $container->warmPresetsPerPath();
+
+        $this->assertCount(1, $perPath);
+        $this->assertEquals(['/'], $perPath[0]['paths']);
+        $this->assertEquals(['small', 'medium'], $perPath[0]['presets']);
+    }
+
+    #[Test]
+    public function it_combines_warm_presets_with_warm_presets_per_path()
+    {
+        $container = (new AssetContainer)
+            ->warmPresets(['small'])
+            ->warmPresetsPerPath([
+                ['paths' => ['images'], 'presets' => ['large']],
+            ]);
+
+        $perPath = $container->warmPresetsPerPath();
+
+        $this->assertCount(2, $perPath);
+        $this->assertEquals(['/'], $perPath[0]['paths']);
+        $this->assertEquals(['small'], $perPath[0]['presets']);
+        $this->assertEquals(['images'], $perPath[1]['paths']);
+        $this->assertEquals(['large'], $perPath[1]['presets']);
+    }
+
+    #[Test]
+    public function it_uses_intelligent_warming_when_nothing_configured()
+    {
+        config(['statamic.assets.image_manipulation.presets' => [
+            'small' => ['w' => '15', 'h' => '15'],
+            'medium' => ['w' => '500', 'h' => '500'],
+        ]]);
+
+        $container = new AssetContainer;
+
+        $this->assertTrue($container->warmsPresetsIntelligently());
+        $this->assertNull($container->warmPresetsPerPath());
+
+        $perPath = $container->warmPresetsPerPathWithDefaults();
+
+        $this->assertCount(1, $perPath);
+        $this->assertEquals(['/'], $perPath[0]['paths']);
+        $this->assertEquals(['small', 'medium'], $perPath[0]['presets']);
+    }
+
+    #[Test]
+    public function it_disables_intelligent_warming_when_warm_presets_per_path_configured()
+    {
+        $container = (new AssetContainer)->warmPresetsPerPath([
+            ['paths' => ['images'], 'presets' => ['large']],
+        ]);
+
+        $this->assertFalse($container->warmsPresetsIntelligently());
+    }
+
+    #[Test]
+    public function it_disables_intelligent_warming_when_deprecated_warm_presets_configured()
+    {
+        // The old warm_presets field DOES disable intelligent warming
+        // because it feeds into warmPresetsPerPath via migration
+        $container = (new AssetContainer)->warmPresets(['small']);
+
+        // Not intelligent because warmPresets has a value that gets migrated
+        $this->assertFalse($container->warmsPresetsIntelligently());
+
+        // The old warm_presets are available via migration
+        $perPath = $container->warmPresetsPerPath();
+        $this->assertCount(1, $perPath);
+        $this->assertEquals(['/'], $perPath[0]['paths']);
+        $this->assertEquals(['small'], $perPath[0]['presets']);
     }
 
     #[Test]
