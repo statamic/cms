@@ -54,11 +54,6 @@ class Floatval extends Fieldtype
         return floatval($data);
     }
 
-    public function preProcessConfig($data)
-    {
-        return floatval($data);
-    }
-
     public function process($data)
     {
         if ($data === null || $data === '') {

@@ -73,11 +73,6 @@ class Integer extends Fieldtype
         return (int) $data;
     }
 
-    public function preProcessConfig($data)
-    {
-        return (int) $data;
-    }
-
     public function process($data)
     {
         if ($data === null || $data === '') {
