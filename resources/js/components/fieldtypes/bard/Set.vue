@@ -114,6 +114,7 @@ import {
     PublishFields as Fields
 } from '@ui';
 import { containerContextKey } from '@/components/ui/Publish/Container.vue';
+import { watch } from 'vue';
 
 export default {
     props: nodeViewProps,
@@ -318,6 +319,16 @@ export default {
                 this.getPos() + this.node.nodeSize,
             );
         },
+    },
+
+    mounted() {
+        watch(
+            () => data_get(this.publishContainer.values.value, this.fieldPathPrefix),
+            (values) => {
+                this.updateAttributes({ values });
+            },
+            { deep: true }
+        );
     },
 
     updated() {
