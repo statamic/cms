@@ -62,8 +62,8 @@ const buttonClasses = computed(() => {
             },
             groupBorder: {
                 danger: [
-                    'in-data-ui-button-group:text-red-500! in-data-ui-button-group:bg-linear-to-b in-data-ui-button-group:from-white in-data-ui-button-group:to-red-50 in-data-ui-button-group:hover:to-gray-100 in-data-ui-button-group:hover:bg-gray-50 in-data-ui-button-group:text-gray-900 in-data-ui-button-group:border in-data-ui-button-group:border-gray-300 in-data-ui-button-group:shadow-ui-sm in-data-ui-button-group:inset-shadow-none',
-                    'dark:in-data-ui-button-group:text-red-500! dark:in-data-ui-button-group:from-gray-850 dark:in-data-ui-button-group:to-red-900/10 dark:in-data-ui-button-group:hover:to-gray-850 dark:in-data-ui-button-group:hover:bg-gray-900 dark:in-data-ui-button-group:border-gray-700/80 dark:in-data-ui-button-group:text-gray-300 dark:in-data-ui-button-group:shadow-ui-md',
+                    'in-data-ui-button-group:text-red-500 in-data-ui-button-group:bg-linear-to-b in-data-ui-button-group:from-white in-data-ui-button-group:to-red-50 in-data-ui-button-group:hover:to-gray-100 in-data-ui-button-group:hover:bg-gray-50 in-data-ui-button-group:border in-data-ui-button-group:border-gray-300 in-data-ui-button-group:shadow-ui-sm in-data-ui-button-group:inset-shadow-none',
+                    'dark:in-data-ui-button-group:text-red-500 dark:in-data-ui-button-group:from-gray-850 dark:in-data-ui-button-group:to-red-900/10 dark:in-data-ui-button-group:hover:to-gray-850 dark:in-data-ui-button-group:hover:bg-gray-900 dark:in-data-ui-button-group:border-gray-700/80 dark:in-data-ui-button-group:shadow-ui-md',
                 ],
                 ghost: '',
                 pressed: 'in-data-ui-button-group:border-s-0 [:is([data-ui-button-group]>&:first-child,_[data-ui-button-group]_:first-child>&)]:border-s-[1px]',
