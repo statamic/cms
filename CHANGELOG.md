@@ -1,5 +1,26 @@
 # Release Notes
 
+## 5.69.0 (2025-11-06)
+
+### What's new
+- Support multiple sites on the search tag [#12923](https://github.com/statamic/cms/issues/12923) by @jasonvarga
+- Keep selects open if multiple is enabled [#12772](https://github.com/statamic/cms/issues/12772) by @godismyjudge95
+
+### What's fixed
+- Update currencies dictionary [#12960](https://github.com/statamic/cms/issues/12960) by @jasonvarga
+- Fix error when visiting expired LivePreview url [#12609](https://github.com/statamic/cms/issues/12609) by @waldemar-p
+- Fix term reference updates after slug change [#11058](https://github.com/statamic/cms/issues/11058) by @daun
+- Fix localized terms being returned incorrectly in the REST API [#11362](https://github.com/statamic/cms/issues/11362) by @duncanmcclean
+- Delete .babelrc [#12939](https://github.com/statamic/cms/issues/12939) by @duncanmcclean
+- Fix declarative shadow root elements inside nocache tags [#12929](https://github.com/statamic/cms/issues/12929) by @duncanmcclean
+- Revert "CP nav reordering fixes" [#12926](https://github.com/statamic/cms/issues/12926) by @duncanmcclean
+- Fix isset and empty on Values [#12865](https://github.com/statamic/cms/issues/12865) by @edalzell
+- Fix translations for `Regards` [#12969](https://github.com/statamic/cms/issues/12969) by @marcorieser
+- French translations [#12930](https://github.com/statamic/cms/issues/12930) by @ebeauchamps
+- French translations [#12959](https://github.com/statamic/cms/issues/12959) by @ebeauchamps
+
+
+
 ## 5.68.0 (2025-10-30)
 
 ### What's new
