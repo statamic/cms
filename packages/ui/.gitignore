@@ -2,3 +2,6 @@ dist
 package-lock.json
 node_modules
 types
+
+*storybook.log
+storybook-static
