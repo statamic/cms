@@ -395,8 +395,8 @@ export default {
             if (!this.mounted) return;
 
             if (json === oldJson) return;
-
-            this.updateDebounced(json);
+            
+            this.update(json);
         },
 
         value(value, oldValue) {
