@@ -4,9 +4,13 @@
     [data-ui-button-group] {
         /* Base styles for all buttons in groups */
         [data-ui-group-target] {
-            /* Only the first child gets a left border on higher MQs */
+            /* Only the first child gets a left border. Exclude the floating toolbar from this, because we handle things slightly differently for that */
+            &:not(:first-child, [data-floating-toolbar] *) {
+                border-inline-start: 0;
+            }
+            /* With the floating toolbar, we instead only group buttons at higher MQs. At lower MQs the buttons are separated and have borders on all sides */
             @media (width >= 1024px) {
-                &:not(:first-child) {
+                [data-floating-toolbar] &:not(:first-child) {
                     border-inline-start: 0;
                 }
             }
