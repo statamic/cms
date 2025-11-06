@@ -801,7 +801,7 @@ export default {
         getExtensions() {
             let modeExts = this.inputIsInline ? [DocumentInline] : [DocumentBlock, HardBreak];
 
-            if (this.config.inline === 'break') {
+            if (this.inputIsInline && this.config.inline_hard_breaks) {
                 modeExts.push(
                     HardBreak.extend({
                         addKeyboardShortcuts() {
