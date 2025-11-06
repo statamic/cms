@@ -90,7 +90,7 @@ function handleChildClick(item, child) {
     }
 }
 
-Statamic.$keys.bind(['command+\\'], (e) => {
+Statamic.$keys.bind(['command+\\', ['[']], (e) => {
     e.preventDefault();
     toggle();
 });
