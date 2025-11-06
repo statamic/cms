@@ -209,6 +209,7 @@ export default {
                 showReplicatorFieldPreviews: this.config.previews,
             },
             errorsById: {},
+            debounceNextUpdate: true,
         };
     },
 
@@ -395,8 +396,12 @@ export default {
             if (!this.mounted) return;
 
             if (json === oldJson) return;
-            
-            this.update(json);
+
+            this.debounceNextUpdate
+                ? this.updateDebounced(json)
+                : this.update(json);
+
+            this.debounceNextUpdate = true;
         },
 
         value(value, oldValue) {
@@ -461,6 +466,8 @@ export default {
 
             const { $head } = this.editor.view.state.selection;
             const { nodeBefore } = $head;
+
+            this.debounceNextUpdate = false;
 
             // Perform this in nextTick because the meta data won't be ready until then.
             this.$nextTick(() => {
