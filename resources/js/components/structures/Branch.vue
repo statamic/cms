@@ -7,8 +7,7 @@
             <div class="flex gap-2 sm:gap-3 grow items-center" @click="$emit('branch-clicked', page)">
                 <ui-status-indicator :status="page.status" v-tooltip="getStatusTooltip()" />
                 <ui-icon v-if="isRoot" name="home" class="size-4" v-tooltip="__('This is the root page')" />
-                <component
-                    :is="page.edit_url ? 'Link' : 'a'"
+                <a
                     @click.prevent="$emit('edit', $event)"
                     :class="{ 'text-sm font-medium is-top-level-branch': isTopLevelBranch }"
                     :href="page.edit_url"
