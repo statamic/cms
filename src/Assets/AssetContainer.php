@@ -537,7 +537,18 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
                     return [];
                 }
 
-                return $presets;
+                if ($presets !== null) {
+                    return $presets;
+                }
+
+                $presets = [
+                    ...Image::userManipulationPresets(),
+                    ...Image::customManipulationPresets(),
+                ];
+
+                $presets = Arr::except($presets, $this->sourcePreset);
+
+                return array_keys($presets);
             })
             ->setter(function ($presets) {
                 return $presets === [] ? false : $presets;
@@ -547,9 +558,8 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
 
     public function warmsPresetsIntelligently()
     {
-        // Intelligent warming is disabled when warmPresetsPerPath is configured
-        // This includes when warmPresets (deprecated) has a value since it gets migrated
-        return $this->warmPresetsPerPath() === null;
+        // Intelligent warming is enabled when neither warmPresetsPerPath nor warmPresets are explicitly configured
+        return $this->warmPresetsPerPath === null && ($this->warmPresets === null || ! isset($this->warmPresets));
     }
 
     /**
@@ -563,53 +573,38 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
         return $this
             ->fluentlyGetOrSet('warmPresetsPerPath')
             ->getter(function ($presetsPerPath) {
-                // Migration: If warm_presets is set (not false), add it to the beginning with path '/'
-                if (! empty($this->warmPresets) && $this->warmPresets !== false) {
-                    $result = $presetsPerPath ?? [];
-                    array_unshift($result, [
-                        'paths' => ['/'],
-                        'presets' => $this->warmPresets,
-                    ]);
-
-                    return $result;
-                }
-
-                // If warmPresets is explicitly false, return empty array to disable intelligent warming
-                if ($this->warmPresets === false) {
+                if ($presetsPerPath === false || $this->warmPresets === false) {
                     return [];
                 }
 
-                // Return the explicitly configured value (could be null, array, or empty array)
-                return $presetsPerPath;
+                // Migration from warmPresets to warmPresetsPerPath
+                if (! empty($this->warmPresets) && $this->warmPresets !== false) {
+                    $presetsPerPath = $presetsPerPath ?? [];
+                    array_unshift($presetsPerPath, [
+                        'paths' => ['/'],
+                        'presets' => $this->warmPresets,
+                    ]);
+                }
+
+                if ($presetsPerPath !== null) {
+                    return $presetsPerPath;
+                }
+
+                // Nothing configured - return intelligent defaults - all presets except source preset
+                return [[
+                    'paths' => ['/'],
+                    'presets' => collect()
+                        ->merge(Image::userManipulationPresets())
+                        ->merge(Image::customManipulationPresets())
+                        ->except($this->sourcePreset)
+                        ->keys()
+                        ->all(),
+                ]];
+            })
+            ->setter(function ($presetsPerPath) {
+                return $presetsPerPath === [] ? false : $presetsPerPath;
             })
             ->args(func_get_args());
-    }
-
-    /**
-     * Get the warm presets per path with intelligent defaults applied.
-     *
-     * @return array
-     */
-    public function warmPresetsPerPathWithDefaults()
-    {
-        $presetsPerPath = $this->warmPresetsPerPath();
-
-        // If nothing is configured, use intelligent warming defaults
-        if ($presetsPerPath === null) {
-            $presets = [
-                ...Image::userManipulationPresets(),
-                ...Image::customManipulationPresets(),
-            ];
-
-            $presets = Arr::except($presets, $this->sourcePreset);
-
-            return [[
-                'paths' => ['/'],
-                'presets' => array_keys($presets),
-            ]];
-        }
-
-        return $presetsPerPath;
     }
 
     /**
@@ -620,7 +615,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
      */
     public function warmPresetsForPath($assetPath)
     {
-        $presetsPerPath = $this->warmPresetsPerPathWithDefaults();
+        $presetsPerPath = $this->warmPresetsPerPath();
 
         $matchedPresets = [];
 

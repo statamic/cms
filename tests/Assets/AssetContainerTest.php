@@ -216,8 +216,8 @@ class AssetContainerTest extends TestCase
 
         $this->assertEquals($expectedIntelligent, $container->warmsPresetsIntelligently());
 
-        // Get presets from warmPresetsPerPathWithDefaults which handles intelligent warming
-        $perPath = $container->warmPresetsPerPathWithDefaults();
+        // Get presets from warmPresetsPerPath which handles intelligent warming
+        $perPath = $container->warmPresetsPerPath();
         $actualPresets = [];
         foreach ($perPath as $config) {
             $actualPresets = array_merge($actualPresets, $config['presets'] ?? []);
@@ -257,8 +257,8 @@ class AssetContainerTest extends TestCase
 
         $container = (new AssetContainer);
 
-        // Get presets from warmPresetsPerPathWithDefaults which handles intelligent warming
-        $perPath = $container->warmPresetsPerPathWithDefaults();
+        // Get presets from warmPresetsPerPath which handles intelligent warming
+        $perPath = $container->warmPresetsPerPath();
         $actualPresets = [];
         foreach ($perPath as $config) {
             $actualPresets = array_merge($actualPresets, $config['presets'] ?? []);
@@ -369,9 +369,8 @@ class AssetContainerTest extends TestCase
         $container = new AssetContainer;
 
         $this->assertTrue($container->warmsPresetsIntelligently());
-        $this->assertNull($container->warmPresetsPerPath());
 
-        $perPath = $container->warmPresetsPerPathWithDefaults();
+        $perPath = $container->warmPresetsPerPath();
 
         $this->assertCount(1, $perPath);
         $this->assertEquals(['/'], $perPath[0]['paths']);
