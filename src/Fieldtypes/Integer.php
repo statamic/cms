@@ -40,6 +40,21 @@ class Integer extends Fieldtype
             [
                 'display' => __('Data & Format'),
                 'fields' => [
+                    'min' => [
+                        'display' => __('Min'),
+                        'instructions' => __('statamic::fieldtypes.integer.config.min'),
+                        'type' => 'integer',
+                    ],
+                    'max' => [
+                        'display' => __('Max'),
+                        'instructions' => __('statamic::fieldtypes.integer.config.max'),
+                        'type' => 'integer',
+                    ],
+                    'step' => [
+                        'display' => __('Step'),
+                        'instructions' => __('statamic::fieldtypes.integer.config.step'),
+                        'type' => 'integer',
+                    ],
                     'default' => [
                         'display' => __('Default Value'),
                         'instructions' => __('statamic::messages.fields_default_instructions'),
@@ -56,11 +71,6 @@ class Integer extends Fieldtype
             return null;
         }
 
-        return (int) $data;
-    }
-
-    public function preProcessConfig($data)
-    {
         return (int) $data;
     }
 
@@ -84,6 +94,10 @@ class Integer extends Fieldtype
 
         if ($min = $this->config('min')) {
             $rules[] = 'min:'.$min;
+        }
+
+        if ($max = $this->config('max')) {
+            $rules[] = 'max:'.$max;
         }
 
         return $rules;
