@@ -136,11 +136,6 @@ abstract class Index
 
     abstract public function getItems();
 
-    public function getItemValue($item)
-    {
-        return (new \Statamic\Query\ResolveValue)($item, $this->name);
-    }
-
     public function cacheKey()
     {
         $searches = ['.', '/'];
