@@ -64,15 +64,6 @@ class Integer extends Fieldtype
         ];
     }
 
-    public function viewData($data)
-    {
-        return [
-            'min' => $this->config('min'),
-            'max' => $this->config('max'),
-            'step' => $this->config('step'),
-        ];
-    }
-
     public function preProcess($data)
     {
         if ($data === null) {
