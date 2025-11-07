@@ -9,7 +9,7 @@ const hasTabIndicatorComponent = hasComponent('TabsIndicator');
     <TabsList
         class="relative flex shrink-0 mx-2 lg:mx-0 space-x-2 lg:space-x-4 border-b border-gray-200 text-sm text-gray-500 
         dark:border-gray-700
-        [.live-preview_&]:px-4 [.live-preview_&]:py-2 [.live-preview_&]:mb-3"
+        [.live-preview_&]:px-1 [.live-preview_&]:py-2 [.live-preview_&]:mb-3"
         data-ui-tabs-list
     >
         <TabsIndicator
