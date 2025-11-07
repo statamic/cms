@@ -53,4 +53,12 @@ class NocacheRouteTest extends TestCase
                 ],
             ]);
     }
+
+    #[Test]
+    public function it_handles_null_url_in_route()
+    {
+        $this
+            ->postJson('/!/nocache')
+            ->assertOk();
+    }
 }
