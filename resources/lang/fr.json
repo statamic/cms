@@ -353,7 +353,7 @@
     "Delete|Delete :count items?": "Supprimer|Supprimer :count éléments ?",
     "Descending": "Décroissant",
     "Description of the image": "Description de l'image",
-    "Deselect :count item|Deselect all :count items": "Désélectionner :count élément(s)|Désélectionner tous les :count éléments",
+    "Deselect :count item|Deselect all :count items": "Désélectionner :count élément|Désélectionner les :count éléments",
     "Deselect :title": "Désélectionner :title",
     "Deselect all items": "Désélectionner tous les éléments",
     "Deselect option": "Désélectionner l'option",
