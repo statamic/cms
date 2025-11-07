@@ -109,6 +109,7 @@ function tabHasError(tab) {
                         :key="tab.handle"
                         :name="tab.handle"
                         :is="visibleMainTabs.length > 1 ? TabContent : 'div'"
+                        :force-mount="true"
                     >
                         <TabProvider :tab="tab">
                             <slot :tab="tab">
