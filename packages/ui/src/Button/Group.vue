@@ -16,3 +16,21 @@
         <slot />
     </div>
 </template>
+
+<style>
+    [data-ui-button-group] [data-ui-group-target] {
+
+        &:not(:first-child):not([data-floating-toolbar] &) {
+            border-inline-start: 0;
+        }
+
+        /* Account for button groups being split apart on small screens */
+        [data-floating-toolbar] & {
+            @media (width >= 1024px) {
+                &:not(:first-child) {
+                    border-inline-start: 0;
+                }
+            }
+        }
+    }
+</style>
