@@ -243,6 +243,8 @@
         }
         .dark &::before {
             filter: invert(100%);
+            /* The negative margin is to compensate for the lack of a "raised panel" in dark mode */
+            @apply -mt-2;
         }
         /* Central horizontal line */
         [data-ui-panel] {
