@@ -206,7 +206,7 @@ export default {
     methods: {
         submit() {
             const postUrl = cp_url(`navigation/${this.handle}/pages`);
-            const values = container.value.visibleValues;
+            const values = this.containerRef.value.visibleValues;
 
             new Pipeline()
                 .provide({
