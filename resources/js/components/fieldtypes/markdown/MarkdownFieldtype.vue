@@ -1,6 +1,6 @@
 <template>
     <portal name="markdown-fullscreen" :disabled="!fullScreenMode" target-class="markdown-fieldtype">
-        <element-container @resized="refresh">
+        <div>
             <div
                 class="
                     @container/markdown w-full block bg-white dark:bg-gray-900! rounded-lg relative
@@ -158,7 +158,7 @@
                     </div>
                 </stack>
             </div>
-        </element-container>
+        </div>
     </portal>
 </template>
 
@@ -687,12 +687,6 @@ export default {
             });
 
             this.trackHeightUpdates();
-        },
-
-        refresh() {
-            this.$nextTick(function () {
-                this.codemirror.refresh();
-            });
         },
 
         initToolbarButtons() {
