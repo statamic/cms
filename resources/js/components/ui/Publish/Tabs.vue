@@ -37,6 +37,7 @@ const visibleMainTabs = computed(() => {
         });
     });
 });
+const hasMultipleVisibleMainTabs = computed(() => visibleMainTabs.value.length > 1);
 const shouldShowSidebar = computed(() => (slots.sidebar || sidebarTab.value) && width.value > 920);
 const activeTab = ref(visibleMainTabs.value[0].handle);
 
@@ -93,7 +94,7 @@ function tabHasError(tab) {
     <ElementContainer @resized="width = $event.width">
         <div>
             <Tabs v-if="width" v-model:modelValue="activeTab">
-                <TabList v-if="visibleMainTabs.length > 1" class="-mt-2 mb-6">
+                <TabList v-if="hasMultipleVisibleMainTabs" class="-mt-2 mb-6">
                     <TabTrigger
                         v-for="tab in visibleMainTabs"
                         :key="tab.handle"
@@ -108,7 +109,7 @@ function tabHasError(tab) {
                         v-for="tab in mainTabs"
                         :key="tab.handle"
                         :name="tab.handle"
-                        :is="visibleMainTabs.length > 1 ? TabContent : 'div'"
+                        :is="hasMultipleVisibleMainTabs ? TabContent : 'div'"
                         force-mount
                         :class="{ 'hidden': tab.handle !== activeTab }"
                     >
