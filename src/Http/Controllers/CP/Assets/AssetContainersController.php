@@ -28,7 +28,7 @@ class AssetContainersController extends CpController
             'source_preset' => $container->sourcePreset(),
             'warm_intelligent' => $intelligent = $container->warmsPresetsIntelligently(),
             'warm_presets' => $intelligent ? [] : $container->warmPresets(),
-            'warm_presets_per_path' => $intelligent ? [] : $container->warmPresetsPerPath(),
+            'warm_presets_per_path' => $container->warmPresetsPerPath(),
             'validation' => $container->validationRules(),
         ];
 
@@ -226,8 +226,7 @@ class AssetContainersController extends CpController
                     'warm_presets_per_path' => [
                         'type' => 'grid',
                         'display' => __('Warm Presets Per Path'),
-                        // TODO: Add translation string
-                        'instructions' => __('Enter a path and hit enter to add paths. Select the presets to warm for each set of path(s).'),
+                        'instructions' => __('TODO: Enter a path and hit enter to add paths. Select the presets to warm for each set of path(s).'),
                         'mode' => 'stacked',
                         'reorderable' => true,
                         'fullscreen' => false,
