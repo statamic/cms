@@ -63,7 +63,8 @@
                         <a class="group flex cursor-pointer items-center">
                             <file-icon
                                 extension="folder"
-                                class="me-2 inline-block size-8 text-ui-accent-text group-hover:text-ui-accent-text/80 dark:text-dark-ui-accent-text dark:group-hover:text-dark-ui-accent-text/80"
+                                class="me-2 inline-block size-8 text-blue-400/90 group-hover:text-blue-400
+                                dark:text-blue-400/90 dark:group-hover:text-blue-400"
                             />
                             <Editable
                                 ref="newFolderInput"
