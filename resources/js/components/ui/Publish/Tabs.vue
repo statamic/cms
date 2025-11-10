@@ -110,7 +110,7 @@ function tabHasError(tab) {
                         :key="tab.handle"
                         :name="tab.handle"
                         :is="hasMultipleVisibleMainTabs ? TabContent : 'div'"
-                        force-mount
+                        :force-mount="hasMultipleVisibleMainTabs ? true : null"
                         :class="{ 'hidden': tab.handle !== activeTab }"
                     >
                         <TabProvider :tab="tab">
