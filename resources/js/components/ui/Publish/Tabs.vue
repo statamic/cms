@@ -38,7 +38,7 @@ const visibleMainTabs = computed(() => {
     });
 });
 const shouldShowSidebar = computed(() => (slots.sidebar || sidebarTab.value) && width.value > 920);
-const tab = ref(visibleMainTabs.value[0].handle);
+const activeTab = ref(visibleMainTabs.value[0].handle);
 
 onMounted(() => setActiveTabFromHash());
 
@@ -48,14 +48,14 @@ function setActiveTabFromHash() {
     const handle = window.location.hash.substr(1);
 
     if (visibleMainTabs.value.some((tab) => tab.handle === handle)) {
-        tab.value = handle;
+        activeTab.value = handle;
     } else {
-        tab.value = visibleMainTabs.value[0].handle;
+        activeTab.value = visibleMainTabs.value[0].handle;
     }
 }
 
 watch(
-    () => tab.value,
+    () => activeTab.value,
     (tab) => window.location.hash = tab,
 );
 
@@ -92,7 +92,7 @@ function tabHasError(tab) {
 <template>
     <ElementContainer @resized="width = $event.width">
         <div>
-            <Tabs v-if="width" v-model:modelValue="tab">
+            <Tabs v-if="width" v-model:modelValue="activeTab">
                 <TabList v-if="visibleMainTabs.length > 1" class="-mt-2 mb-6">
                     <TabTrigger
                         v-for="tab in visibleMainTabs"
@@ -110,6 +110,7 @@ function tabHasError(tab) {
                         :name="tab.handle"
                         :is="visibleMainTabs.length > 1 ? TabContent : 'div'"
                         :force-mount="true"
+                        :class="{ 'hidden': tab.handle != activeTab }"
                     >
                         <TabProvider :tab="tab">
                             <slot :tab="tab">
