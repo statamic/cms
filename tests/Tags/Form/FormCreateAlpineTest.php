@@ -838,6 +838,45 @@ EOT
         $this->assertSame($expected, $js[1]);
     }
 
+    #[Test]
+    public function it_renders_precognition_x_data_on_form_tag()
+    {
+        $output = $this->tag('{{ form:contact js="alpine_precognition" }}{{ /form:contact }}');
+
+        $expectedXData = $this->jsonEncode([
+            'name' => null,
+            'email' => null,
+            'message' => null,
+            'likes_animals' => false,
+            'my_favourites' => [
+                'favourite_animals' => [],
+                'non_favourite_animals' => [],
+                'favourite_colour' => null,
+                'favourite_subject' => null,
+            ],
+            'winnie' => null,
+        ]);
+
+        $expectedXDataFull = "{form: \$form('post', 'http://localhost/!/forms/contact', {$expectedXData})}";
+
+        $expected = '<form method="POST" action="http://localhost/!/forms/contact" x-data="'.$expectedXDataFull.'">';
+
+        $this->assertStringContainsString($expected, $output);
+    }
+
+    #[Test]
+    public function it_dynamically_renders_precognition_text_field_x_on_change()
+    {
+        $config = [
+            'handle' => 'name',
+            'field' => [
+                'type' => 'text',
+            ],
+        ];
+
+        $this->assertFieldRendersHtml(['<input id="[[form-handle]]-form-name-field" type="text" name="name" value="" x-model="form.name" @change="form.validate(\'name\')">'], $config, [], ['js' => 'alpine_precognition']);
+    }
+
     private function jsonEncode($data)
     {
         return Statamic::modify($data)->toJson()->entities();
