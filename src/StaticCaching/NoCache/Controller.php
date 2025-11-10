@@ -10,7 +10,9 @@ class Controller
 {
     public function __invoke(Request $request, Session $session)
     {
-        $url = $request->input('url', '');
+        $request->validate(['url' => 'required|string']);
+
+        $url = $request->input('url');
 
         if (config('statamic.static_caching.ignore_query_strings', false)) {
             $url = explode('?', $url)[0];

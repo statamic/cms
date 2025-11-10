@@ -55,10 +55,10 @@ class NocacheRouteTest extends TestCase
     }
 
     #[Test]
-    public function it_handles_null_url_in_route()
+    public function url_is_required()
     {
         $this
             ->postJson('/!/nocache')
-            ->assertOk();
+            ->assertJsonValidationErrorFor('url');
     }
 }
