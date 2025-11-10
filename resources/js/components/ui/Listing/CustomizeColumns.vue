@@ -1,5 +1,5 @@
 <script setup>
-import { Button, Modal, Tooltip } from '@ui';
+import { Button, Modal } from '@ui';
 import { SortableList } from '@/components/sortable/Sortable.js';
 import { injectListingContext } from '../Listing/Listing.vue';
 import { computed, ref } from 'vue';
@@ -70,9 +70,7 @@ function reset() {
 
 <template>
     <div data-ui-column-customizer class="absolute right-0 mask-bg mask-bg--left">
-        <Tooltip :text="__('Customize Columns')">
-            <Button icon="sliders-vertical" :disabled="reorderable" @click="open = true" :aria-label="__('Customize Columns')" />
-        </Tooltip>
+        <Button icon="sliders-vertical" :disabled="reorderable" @click="open = true" :aria-label="__('Customize Columns')" v-tooltip="__('Customize Columns')" />
         <Modal :title="__('Customize Columns')" v-model:open="open">
             <div class="border rounded-lg dark:border-gray-900">
                 <div class="flex">
@@ -106,7 +104,7 @@ function reset() {
                             >
                                 <div class="space-y-1.5 p-3 select-none">
                                     <div
-                                        class="item sortable cursor-grab py-2 px-2.5 gap-3 relative rounded-lg bg-white dark:bg-gray-700 flex items-center justify-between text-xs shadow"
+                                        class="item sortable cursor-grab py-2 px-2.5 gap-2 sm:gap-3 relative rounded-lg bg-white dark:bg-gray-800 flex items-center justify-between text-xs shadow"
                                         v-for="column in selectedColumns"
                                         :key="column.field"
                                         tabindex="-1"

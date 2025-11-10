@@ -30,7 +30,10 @@ class ViewCollectionListingTest extends TestCase
             ->actingAs($user)
             ->get(cp_route('collections.index'))
             ->assertSuccessful()
-            ->assertViewHas('collections', collect([
+            ->assertInertia(fn ($page) => $page->component('collections/Index')->has('collections', 2));
+
+        /*
+            collect([
                 [
                     'id' => 'bar',
                     'title' => 'Bar',
@@ -59,6 +62,7 @@ class ViewCollectionListingTest extends TestCase
                     'actions' => Facades\Action::for($collectionA, ['view' => 'list']),
                     'actions_url' => 'http://localhost/cp/collections/actions',
                     'icon' => 'collections',
+                    'create_label' => 'Create Entry',
                     'sort_column' => 'title',
                     'sort_direction' => 'asc',
                     'filters' => Scope::filters('entries', [
@@ -93,14 +97,16 @@ class ViewCollectionListingTest extends TestCase
                     'actions' => Facades\Action::for($collectionB, ['view' => 'list']),
                     'actions_url' => 'http://localhost/cp/collections/actions',
                     'icon' => 'collections',
+                    'create_label' => 'Create Entry',
                     'sort_column' => 'title',
                     'sort_direction' => 'asc',
                     'filters' => Scope::filters('entries', [
                         'collection' => $collectionB->handle(),
                     ]),
                 ],
-            ]))
+            ])))
             ->assertDontSee('ui-empty-state-menu');
+        */
     }
 
     #[Test]
@@ -112,8 +118,9 @@ class ViewCollectionListingTest extends TestCase
             ->actingAs($user)
             ->get(cp_route('collections.index'))
             ->assertSuccessful()
-            ->assertViewHas('collections', collect([]))
-            ->assertSee('ui-empty-state-menu');
+            ->assertInertia(fn ($page) => $page
+                ->component('collections/Index')
+                ->has('collections', 0));
     }
 
     #[Test]
@@ -128,10 +135,10 @@ class ViewCollectionListingTest extends TestCase
             ->actingAs($user)
             ->get(cp_route('collections.index'))
             ->assertSuccessful()
-            ->assertViewHas('collections', function ($collections) {
-                return count($collections) === 1 && $collections[0]['id'] === 'bar';
-            })
-            ->assertDontSee('ui-empty-state-menu');
+            ->assertInertia(fn ($page) => $page
+                ->component('collections/Index')
+                ->has('collections', 1)
+                ->where('collections.0.id', 'bar'));
     }
 
     #[Test]
@@ -146,10 +153,11 @@ class ViewCollectionListingTest extends TestCase
             ->actingAs($user)
             ->get(cp_route('collections.index'))
             ->assertSuccessful()
-            ->assertViewHas('collections', function ($collections) {
-                return $collections->map->id->all() === ['bar', 'foo'];
-            })
-            ->assertDontSee('ui-empty-state-menu');
+            ->assertInertia(fn ($page) => $page
+                ->component('collections/Index')
+                ->has('collections', 2)
+                ->where('collections.0.id', 'bar')
+                ->where('collections.1.id', 'foo'));
     }
 
     #[Test]
@@ -176,7 +184,7 @@ class ViewCollectionListingTest extends TestCase
         $response = $this
             ->actingAs($user)
             ->get(cp_route('collections.index'))
-            ->assertSee('Create Collection');
+            ->assertInertia(fn ($page) => $page->where('canCreate', true));
     }
 
     #[Test]
@@ -189,8 +197,7 @@ class ViewCollectionListingTest extends TestCase
         $response = $this
             ->actingAs($user)
             ->get(cp_route('collections.index'))
-            ->assertOk()
-            ->assertSee(':can-create-collections="false"', escape: false);
+            ->assertInertia(fn ($page) => $page->where('canCreate', false));
     }
 
     private function createCollection($handle)

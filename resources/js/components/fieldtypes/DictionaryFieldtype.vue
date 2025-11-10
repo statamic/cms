@@ -4,6 +4,7 @@
         searchable
         ignore-filter
         :disabled="config.disabled"
+        :clearable="config.clearable"
         :max-selections="config.max_items"
         :model-value="value"
         :multiple
@@ -17,14 +18,14 @@
             This slot is *basically* exactly the same as the default selected-options slot in Combobox. We're just looping
             through the Dictionary Fieldtype's selectedOptions state, rather than the one maintained by the Combobox component.
         -->
-        <template #selected-options="{ disabled, getOptionLabel, getOptionValue, labelHtml, deselect }">
+        <template #selected-options="{ disabled, readOnly, getOptionLabel, getOptionValue, labelHtml, deselect }">
             <sortable-list
                 v-if="multiple"
                 item-class="sortable-item"
                 handle-class="sortable-item"
                 :distance="5"
                 :mirror="false"
-                :disabled
+                :disabled="disabled || readOnly"
                 :model-value="value"
                 @update:modelValue="comboboxUpdated"
             >
@@ -39,7 +40,7 @@
                             <div v-else>{{ __(getOptionLabel(option)) }}</div>
 
                             <button
-                                v-if="!disabled"
+                                v-if="!disabled && !readOnly"
                                 type="button"
                                 class="-mx-3 cursor-pointer px-3 text-gray-400 hover:text-gray-700"
                                 :aria-label="__('Deselect option')"

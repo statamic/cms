@@ -19,10 +19,11 @@
     "@floating-ui/dom": "^1.6.0",
     "@he-tree/vue": "^2.10.0-beta.2",
     "@hoppscotch/vue-toasted": "^0.1.0",
+    "@inertiajs/vue3": "^2.1.11",
     "@internationalized/date": "^3.7.0",
     "@shopify/draggable": "^1.0.0-beta.12",
+    "@simplewebauthn/browser": "^13.2.2",
     "@tiptap/core": "^3.0.0",
-    "@tiptap/extensions": "^3.0.0",
     "@tiptap/extension-blockquote": "^3.0.0",
     "@tiptap/extension-bold": "^3.0.0",
     "@tiptap/extension-bullet-list": "^3.0.0",
@@ -48,6 +49,7 @@
     "@tiptap/extension-text-align": "^3.0.0",
     "@tiptap/extension-typography": "^3.0.0",
     "@tiptap/extension-underline": "^3.0.0",
+    "@tiptap/extensions": "^3.0.0",
     "@tiptap/pm": "^3.0.0",
     "@tiptap/vue-3": "^3.0.0",
     "alpinejs": "^3.1.1",
@@ -93,7 +95,6 @@
     "vue3-click-away": "^1.2.4"
   },
   "devDependencies": {
-    "@tailwindcss/typography": "^0.5.10",
     "@tailwindcss/vite": "^4.1.8",
     "@vitejs/plugin-vue": "^6.0.0",
     "@vue/test-utils": "^2.4.6",

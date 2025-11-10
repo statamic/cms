@@ -5,7 +5,7 @@
 .asset-modal {
     .saving {
         @apply absolute inset-0 flex items-center rounded-xs bg-white/90;
-        z-index: 200;
+        z-index: var(--z-index-modal);
 
         .inner {
             text-align: center;
@@ -29,7 +29,7 @@
     @apply absolute inset-0 flex items-center justify-center rounded-sm p-1 text-center text-xs leading-tight @sm:text-lg;
     border: 1px dashed var(--color-gray-600);
     pointer-events: none;
-    z-index: 1049;
+    z-index: var(--z-index-draggable);
     background: rgba(255, 255, 255, 0.9);
 
     .dark & {
@@ -105,11 +105,11 @@
   ========================================================================== */
 
 .asset-grid-listing {
-    @apply relative grid gap-6 xl:gap-10;
+    @apply relative grid gap-5 md:gap-6 xl:gap-10;
 }
 
 .folder-grid-listing {
-    @apply relative grid gap-7;
+    @apply relative grid gap-5 md:gap-7;
     grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
 }
 
@@ -134,9 +134,12 @@
 }
 
 .asset-filename {
-    @apply font-mono text-xs text-gray-500 mt-2 whitespace-nowrap text-center;
+    @apply font-mono text-xs text-gray-500 dark:text-gray-300 mt-2 whitespace-nowrap text-center;
     .selected & {
         @apply text-blue-500;
+        .dark & {
+            @apply text-blue-400;
+        }
     }
 }
 
@@ -144,34 +147,10 @@
   ========================================================================== */
 
 .asset-editor {
-    .editor-preview {
-        .editor-preview-image {
-            @apply flex flex-1 flex-col p-8;
-        }
-
-        .image-wrapper {
-            flex: 1 1 auto;
-            position: relative;
-
-            > * {
-                @apply absolute h-auto max-h-full w-auto max-w-full;
-                left: 50%;
-                [dir='rtl'] & {
-                    left: auto;
-                    right: 50%;
-                }
-                top: 50%;
-                transform: translate(-50%, -50%);
-                [dir='rtl'] & {
-                    transform: translate(50%, -50%);
-                }
-                box-shadow: 0 0 32px rgba(0, 0, 0, 0.35);
-            }
-        }
-    }
 
     .loading {
-        @apply absolute inset-0 z-10 flex items-center justify-center rounded-sm bg-white/70;
+        @apply absolute inset-0 flex items-center justify-center rounded-sm bg-white/70;
+        z-index: var(--z-index-portal);
     }
 
     .publish-fields {

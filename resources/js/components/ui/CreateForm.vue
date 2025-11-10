@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, watch, onMounted, getCurrentInstance } from 'vue';
+import { router } from '@inertiajs/vue3';
 
 const props = defineProps({
     title: { type: String, required: true },
@@ -19,6 +20,7 @@ const { $slug, $axios, $toast, $keys } = instance.appContext.config.globalProper
 const title = ref(null);
 const handle = ref(null);
 const slug = $slug.separatedBy('_');
+const errors = ref({});
 
 const canSubmit = computed(() => {
     return title.value && (props.withoutHandle || handle.value);
@@ -40,10 +42,11 @@ const submit = () => {
     $axios
         .post(props.route, payload)
         .then((response) => {
-            window.location = response.data.redirect;
+            router.get(response.data.redirect);
         })
         .catch((error) => {
             $toast.error(error.response.data.message);
+            errors.value = error.response.data.errors;
         });
 };
 
@@ -73,6 +76,7 @@ onMounted(() => {
                         :label="__('Title')"
                         :instructions="titleInstructions"
                         :instructions-below="true"
+                        :errors="errors.title"
                     >
                         <ui-input v-model="title" autofocus />
                     </ui-field>
@@ -81,6 +85,7 @@ onMounted(() => {
                         :label="__('Handle')"
                         :instructions="handleInstructions"
                         :instructions-below="true"
+                        :errors="errors.handle"
                     >
                         <ui-input v-model="handle" :loading="slug.busy" />
                     </ui-field>

@@ -1,5 +1,6 @@
 export * from '../../../../packages/ui/src/index.js';
 
+export { default as Avatar } from "./Avatar.vue";
 export { default as CreateForm } from "./CreateForm.vue";
 export { default as LivePreview } from "./LivePreview/LivePreview.vue";
 import { default as LivePreviewPopout } from "./LivePreview/Popout.vue";
@@ -33,3 +34,4 @@ export { default as ListingTableBody } from "./Listing/TableBody.vue";
 export { default as ListingTableHead } from "./Listing/TableHead.vue";
 export { default as ListingToggleAll } from "./Listing/ToggleAll.vue";
 export { default as CommandPaletteItem } from "./CommandPalette/Item.vue";
+export { default as DocsCallout } from "./DocsCallout.vue";

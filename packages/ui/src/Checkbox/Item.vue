@@ -14,21 +14,29 @@ const props = defineProps({
     size: { type: String, default: 'base' },
     solo: { type: Boolean, default: false },
     tabindex: { type: Number, default: null },
-    value: { type: [String, Number, Boolean], required: true },
+    value: { type: [String, Number, Boolean] },
 });
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue', 'keydown']);
 
 const id = useId();
+
+const handleKeydown = (event) => {
+    emit('keydown', event);
+
+    if (event.key === 'Enter' && !event.defaultPrevented) {
+        event.target.closest('form')?.requestSubmit();
+    }
+};
 
 const checkboxClasses = computed(() => {
     return cva({
         base: [
             'shadow-ui-xs mt-0.5 cursor-default rounded-sm border border-gray-400/75 bg-white',
-            'dark:bg-gray-400 dark:border-gray-900',
-            'data-[state=checked]:border-ui-accent data-[state=checked]:bg-ui-accent',
-            'dark:border-none dark:data-[state=checked]:bg-dark-ui-accent dark:data-[state=checked]:border-dark-ui-accent',
-            'dark:data-[disabled]:bg-dark-ui-accent/60 dark:data-[disabled]:border-dark-ui-accent/70',
+            'dark:bg-gray-500 dark:border-gray-900',
+            'data-[state=checked]:border-ui-accent-bg data-[state=checked]:bg-ui-accent-bg',
+            'dark:border-none dark:data-[state=checked]:bg-dark-ui-accent-bg dark:data-[state=checked]:border-dark-ui-accent-bg',
+            'dark:data-[disabled]:bg-dark-ui-accent-bg/60 dark:data-[disabled]:border-dark-ui-accent-bg/70',
             'dark:data-[disabled]:text-gray-400 dark:data-[disabled]:cursor-not-allowed',
             'shrink-0'
         ],
@@ -82,18 +90,19 @@ const conditionalProps = computed(() => {
             :value="value"
             v-bind="conditionalProps"
             @update:modelValue="emit('update:modelValue', $event)"
+            @keydown="handleKeydown"
             :class="checkboxClasses"
             :tabindex="tabindex"
         >
             <CheckboxIndicator class="relative flex h-full w-full items-center justify-center text-white">
-                <svg viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg" class="size-2.5" aria-hidden="true"><path d="M9 1L3.5 6.5L1 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                <svg viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg" class="size-2.5 shrink-0" aria-hidden="true"><path d="M9 1L3.5 6.5L1 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
             </CheckboxIndicator>
             <span class="sr-only">
                 {{ modelValue ? 'Checked' : 'Unchecked' }}
             </span>
         </CheckboxRoot>
         <div class="flex flex-col" v-if="!solo">
-            <label class="text-sm font-normal antialiased" :for="id">
+            <label class="text-sm font-normal antialiased dark:text-gray-200" :for="id">
                 <slot>{{ label || value }}</slot>
             </label>
             <p v-if="description" :id="`${id}-description`" class="mt-0.5 block text-xs leading-snug text-gray-500 dark:text-gray-200">{{ description }}</p>

@@ -26,6 +26,7 @@
                     <Select
                         class="w-full"
                         :options="siteOriginOptions(site)"
+                        :clearable="true"
                         :model-value="site.origin"
                         @update:model-value="site.origin = $event"
                     />

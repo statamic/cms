@@ -292,7 +292,10 @@ abstract class Fieldtype implements Arrayable
 
     protected function extraConfigFieldItems(): array
     {
-        return self::$extraConfigFields[static::class] ?? [];
+        return array_merge(
+            self::$extraConfigFields[static::class] ?? [],
+            Fieldtype::$extraConfigFields[Fieldtype::class] ?? [],
+        );
     }
 
     public static function appendConfigFields(array $config): void
@@ -384,6 +387,16 @@ abstract class Fieldtype implements Arrayable
     public function isRelationship(): bool
     {
         return $this->relationship;
+    }
+
+    public function relationshipQueryBuilder()
+    {
+        return false;
+    }
+
+    public function relationshipQueryIdMapFn(): ?\Closure
+    {
+        return null;
     }
 
     public function toQueryableValue($value)

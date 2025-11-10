@@ -5,6 +5,7 @@ import { Header, Button } from '@ui';
 import uniqid from 'uniqid';
 import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
 import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks } from '@ui/Publish/SavePipeline.js';
+import { router } from '@inertiajs/vue3';
 
 const props = defineProps({
     icon: {
@@ -62,10 +63,10 @@ function save() {
             new AfterSaveHooks('entry'),
         ])
         .then((response) => {
-            Statamic.$toast.success('Saved');
+            Statamic.$toast.success(__('Saved'));
 
             if (response.data.redirect) {
-                window.location = response.data.redirect;
+                router.get(response.data.redirect);
             }
         });
 }

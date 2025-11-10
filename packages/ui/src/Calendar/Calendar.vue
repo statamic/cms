@@ -109,7 +109,7 @@ const gridStyle = computed(() => {
                 class="w-full border-collapse space-y-1 select-none"
             >
                 <Component :is="components.CalendarGridHead">
-                    <ui-badge variant="flat" class="mb-2" v-if="inline && numberOfMonths > 1">
+                    <ui-badge class="mb-2" v-if="inline && numberOfMonths > 1">
                         {{ new Date(month.value.toString()).toLocaleString($date.locale, { month: 'long' }) }}
                     </ui-badge>
                     <Component :is="components.CalendarGridRow" class="mb-1 grid w-full grid-cols-7">

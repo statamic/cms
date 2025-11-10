@@ -64,6 +64,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     {
         return [
             \Statamic\Providers\StatamicServiceProvider::class,
+            \Inertia\ServiceProvider::class,
             \Rebing\GraphQL\GraphQLServiceProvider::class,
             \Wilderborn\Partyline\ServiceProvider::class,
             \Archetype\ServiceProvider::class,
@@ -92,6 +93,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     protected function getEnvironmentSetUp($app)
     {
+        $app['config']->set('inertia.testing.page_paths', [statamic_path('resources/js/pages')]);
+
         $app['config']->set('auth.providers.users.driver', 'statamic');
         $app['config']->set('statamic.stache.watcher', false);
         $app['config']->set('statamic.users.repository', 'file');
@@ -111,6 +114,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $app['config']->set('statamic.stache.stores.nav-trees.directory', __DIR__.'/__fixtures__/content/structures/navigation');
         $app['config']->set('statamic.stache.stores.collection-trees.directory', __DIR__.'/__fixtures__/content/structures/collections');
         $app['config']->set('statamic.stache.stores.form-submissions.directory', __DIR__.'/__fixtures__/content/submissions');
+        $app['config']->set('statamic.stache.stores.revisions.directory', __DIR__.'/__fixtures__/revisions');
 
         $app['config']->set('statamic.api.enabled', true);
         $app['config']->set('statamic.graphql.enabled', true);

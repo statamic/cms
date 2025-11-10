@@ -2,13 +2,18 @@ import axios from 'axios';
 import { ref } from 'vue';
 
 export default class Preference {
-    constructor() {
-        this.url = cp_url('preferences/js');
-        this.preferences = ref(Statamic.$config.get('user.preferences'));
+    #url;
+    #preferences;
+    #defaults;
+
+    initialize(preferences, defaults) {
+        this.#url = cp_url('preferences/js');
+        this.#preferences = ref(preferences);
+        this.#defaults = defaults;
     }
 
     all() {
-        return this.preferences.value;
+        return this.#preferences.value;
     }
 
     get(key, fallback) {
@@ -16,11 +21,11 @@ export default class Preference {
     }
 
     set(key, value) {
-        return this.commitOnSuccessAndReturnPromise(axios.post(this.url, { key, value }));
+        return this.commitOnSuccessAndReturnPromise(axios.post(this.#url, { key, value }));
     }
 
     append(key, value) {
-        return this.commitOnSuccessAndReturnPromise(axios.post(this.url, { key, value, append: true }));
+        return this.commitOnSuccessAndReturnPromise(axios.post(this.#url, { key, value, append: true }));
     }
 
     has(key) {
@@ -28,7 +33,7 @@ export default class Preference {
     }
 
     remove(key, value = null, cleanup = true) {
-        return this.commitOnSuccessAndReturnPromise(axios.delete(`${this.url}/${key}`, { data: { value, cleanup } }));
+        return this.commitOnSuccessAndReturnPromise(axios.delete(`${this.#url}/${key}`, { data: { value, cleanup } }));
     }
 
     removeValue(key, value) {
@@ -37,14 +42,14 @@ export default class Preference {
 
     commitOnSuccessAndReturnPromise(promise) {
         promise.then((response) => {
-            this.preferences.value = response.data;
+            this.#preferences.value = response.data;
         });
 
         return promise;
     }
 
     defaults() {
-        return Statamic.$config.get('defaultPreferences');
+        return this.#defaults;
     }
 
     getDefault(key, fallback) {

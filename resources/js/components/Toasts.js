@@ -1,8 +1,10 @@
+import { router } from '@inertiajs/vue3';
+
 export default class Toasts {
     #app;
     #plugin;
 
-    constructor(app) {
+    initialize(app) {
         this.#app = app;
     }
 
@@ -20,6 +22,13 @@ export default class Toasts {
             promise.then((json) => this.#displayToasts(json._toasts ?? []));
 
             return response;
+        });
+
+        router.on('success', (event) => {
+            const toasts = event.detail.page.props._toasts;
+            if (toasts && Array.isArray(toasts)) {
+                this.#displayToasts(toasts);
+            }
         });
     }
 

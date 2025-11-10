@@ -4,6 +4,7 @@ import {
     PublishContainer,
     PublishFieldsProvider as FieldsProvider,
     PublishFields,
+    Description,
 } from '@ui';
 import { requireElevatedSessionIf } from '@/components/elevated-sessions/index.js';
 
@@ -19,7 +20,7 @@ const emit = defineEmits(['confirmed']);
 let confirming = ref(false);
 let running = ref(false);
 let fieldset = ref({ tabs: [{ fields: props.action.fields }] });
-let values = ref(props.action.values);
+let values = ref(clone(props.action.values));
 
 let confirmationText = computed(() => {
     if (!props.action.confirmationText) return;
@@ -89,30 +90,40 @@ defineExpose({
         v-if="confirming"
         :title="action.title"
         :danger="action.dangerous"
+        :submittable="action.runnable"
         :buttonText="runButtonText"
         :busy="running"
         @confirm="confirmed"
         @cancel="reset"
     >
-        <div
-            v-if="confirmationText"
-            v-text="confirmationText"
-            :class="{ 'mb-4': warningText || showDirtyWarning || action.fields.length }"
+        <component
+            v-if="action.component"
+            :is="action.component"
+            :action="action"
+            :values="values"
         />
 
-        <div
-            v-if="warningText"
-            v-text="warningText"
-            class="text-red-600"
-            :class="{ 'mb-4': showDirtyWarning || action.fields.length }"
-        />
+        <template v-else>
+            <Description
+                v-if="confirmationText"
+                :text="confirmationText"
+                :class="{ 'mb-4': warningText || showDirtyWarning || action.fields.length }"
+            />
 
-        <div
-            v-if="showDirtyWarning"
-            v-text="dirtyText"
-            class="text-red-600"
-            :class="{ 'mb-4': action.fields.length }"
-        />
+            <div
+                v-if="warningText"
+                v-text="warningText"
+                class="text-red-600"
+                :class="{ 'mb-4': showDirtyWarning || action.fields.length }"
+            />
+
+            <div
+                v-if="showDirtyWarning"
+                v-text="dirtyText"
+                class="text-red-600"
+                :class="{ 'mb-4': action.fields.length }"
+            />
+        </template>
 
         <PublishContainer
             v-if="action.fields.length"

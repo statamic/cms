@@ -12,6 +12,7 @@ use Statamic\Facades\Icon;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Statamic\Fieldtypes\Sets;
 use Statamic\Icons\IconSet;
 use Statamic\Statamic;
 use Statamic\Support\Str;
@@ -54,7 +55,6 @@ class JavascriptComposer
     private function protectedVariables()
     {
         $user = User::current();
-        $licenses = app('Statamic\Licensing\LicenseManager');
 
         return [
             'version' => Statamic::version(),
@@ -70,12 +70,15 @@ class JavascriptComposer
             'multisiteEnabled' => Site::multiEnabled(),
             'sites' => $this->sites(),
             'selectedSite' => Site::selected()->handle(),
+            'supportUrl' => config('statamic.cp.support_url'),
             'preloadableFieldtypes' => FieldtypeRepository::preloadable()->keys(),
             'livePreview' => config('statamic.live_preview'),
             'permissions' => $this->permissions($user),
             'customSvgIcons' => $this->icons(),
             'commandPaletteCategories' => Category::order(),
             'commandPalettePreloadedItems' => CommandPalette::getPreloadedItems(),
+            'setPreviewImages' => Sets::previewImageConfig(),
+            'linkToDocs' => config('statamic.cp.link_to_docs'),
         ];
     }
 
@@ -107,6 +110,7 @@ class JavascriptComposer
             'preferences' => Preference::all(),
             'permissions' => $user->permissions()->all(),
             'theme' => $user->preferredTheme(),
+            'is_impersonating' => session()->has('statamic_impersonated_by'),
         ])->toArray();
     }
 

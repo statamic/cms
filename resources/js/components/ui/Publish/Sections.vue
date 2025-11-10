@@ -1,6 +1,7 @@
 <script setup>
 import { injectTabContext } from './TabProvider.vue';
 import {
+    Button,
     Panel,
     PanelHeader,
     Heading,
@@ -53,36 +54,38 @@ function toggleSection(id) {
             v-for="(section, i) in visibleSections"
             :key="i"
             :class="[
-                asConfig ? 'mb-12' : 'mb-6',
+                'mb-6',
                 { 'pb-0': section.collapsed }
             ]"
         >
-            <PanelHeader v-if="section.display || section.collapsible" @click="toggleSection(i)" class="flex justify-between">
+            <PanelHeader v-if="section.display || section.collapsible" class="flex items-center justify-between">
                 <div>
                     <Heading :text="__(section.display)" />
                     <Subheading v-if="section.instructions" :text="renderInstructions(section.instructions)" />
                 </div>
-                <Icon
+                <Button
+                    @click="toggleSection(i)"
                     v-if="section.collapsible"
-                    name="chevron-down"
-                    class="size-5 text-gray-400"
-                    :class="section.collapsed ? 'rotate-270' : 'rotate-0'"
+                    class="[&_svg]:size-5 rounded-xl"
+                    icon="chevron-down"
+                    size="sm"
+                    variant="ghost"
+                    :aria-label="__('Toggle section visibility')"
+                    :class="section.collapsed ? '[&_svg]:rotate-270' : '[&_svg]:rotate-0'"
                 />
             </PanelHeader>
             <div
                 style="--tw-ease: ease;"
-                class="h-auto overflow-clip visible transition-[height,visibility] duration-[250ms,2s]"
-                :class="{ 'h-0! visibility-hidden': section.collapsed }"
+                class="h-auto visible transition-[height,visibility] duration-[250ms,2s]"
+                :class="{ 'h-0! visibility-hidden overflow-clip': section.collapsed }"
             >
-                <div class="p-px">
-                    <Primitive :as="asConfig ? 'div' : Card">
-                        <FieldsProvider :fields="section.fields">
-                            <slot :section="section">
-                                <Fields />
-                            </slot>
-                        </FieldsProvider>
-                    </Primitive>
-                </div>
+                <Card :class="{ 'p-0!': asConfig }">
+                    <FieldsProvider :fields="section.fields">
+                        <slot :section="section">
+                            <Fields />
+                        </slot>
+                    </FieldsProvider>
+                </Card>
             </div>
         </Panel>
     </div>

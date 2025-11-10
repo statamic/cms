@@ -70,8 +70,10 @@ class ViewAddonListingTest extends TestCase
             ->actingAs(User::make()->makeSuper()->save())
             ->get(cp_route('addons.index'))
             ->assertOk()
-            ->assertViewHas('addons', [
-                [
+            ->assertInertia(fn ($page) => $page
+                ->component('addons/Index')
+                ->has('addons', 3)
+                ->where('addons.0', [
                     'name' => 'SEO Pro',
                     'version' => '6.7.0',
                     'developer' => 'Statamic',
@@ -79,8 +81,8 @@ class ViewAddonListingTest extends TestCase
                     'marketplace_url' => 'https://statamic.com/addons/statamic/seo-pro',
                     'updates_url' => cp_route('updater.product', 'seo-pro'),
                     'settings_url' => cp_route('addons.settings.edit', 'seo-pro'),
-                ],
-                [
+                ])
+                ->where('addons.1', [
                     'name' => 'Importer',
                     'version' => '1.8.4',
                     'developer' => 'Statamic',
@@ -88,8 +90,8 @@ class ViewAddonListingTest extends TestCase
                     'marketplace_url' => 'https://statamic.com/addons/statamic/importer',
                     'updates_url' => cp_route('updater.product', 'importer'),
                     'settings_url' => null,
-                ],
-                [
+                ])
+                ->where('addons.2', [
                     'name' => 'Test Addon',
                     'version' => 'dev-main',
                     'developer' => 'Test Developer LLC',
@@ -97,8 +99,8 @@ class ViewAddonListingTest extends TestCase
                     'marketplace_url' => null,
                     'updates_url' => null,
                     'settings_url' => null,
-                ],
-            ]);
+                ])
+            );
     }
 
     #[Test]

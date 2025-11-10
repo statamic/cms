@@ -14,6 +14,11 @@ export default defineConfig(({ mode, command }) => {
 
     return {
         base: './',
+        server: {
+            watch: {
+                ignored: ['**/tests/**', '**/vendor/**']
+            }
+        },
         plugins: [
             tailwindcss(),
             laravel({
@@ -34,6 +39,7 @@ export default defineConfig(({ mode, command }) => {
                 vue: 'vue/dist/vue.esm-bundler.js',
                 '@': path.resolve(__dirname, 'resources/js'),
                 '@ui': path.resolve(__dirname, 'resources/js/components/ui'),
+                '@api': path.resolve(__dirname, 'resources/js/api.js'),
                 '@statamic/ui': path.resolve(__dirname, 'packages/ui/src'),
                 '@statamic/cms': path.resolve(__dirname, 'packages/cms/src'),
             },

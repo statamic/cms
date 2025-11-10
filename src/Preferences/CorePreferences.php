@@ -85,7 +85,7 @@ class CorePreferences
                 ['label' => $label, 'native' => $native] = $item;
 
                 if ($locale !== $current && $label !== $native) {
-                    $label .= '<span class="ms-4 text-gray-600">'.$native.'</span>';
+                    $label .= '<span class="ms-4 text-gray-500 dark:text-gray-400">'.$native.'</span>';
                 }
 
                 return $label;

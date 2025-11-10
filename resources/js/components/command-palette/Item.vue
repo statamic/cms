@@ -1,6 +1,7 @@
 <script setup>
-import { useSlots, shallowRef, onMounted } from 'vue';
+import { useSlots, shallowRef, onMounted, computed } from 'vue';
 import { Icon, Badge } from '@/components/ui';
+import { Link } from '@inertiajs/vue3';
 
 const props = defineProps({
     href: { type: String, default: null },
@@ -18,6 +19,14 @@ const slots = useSlots();
 const hasDefaultSlot = !!slots.default;
 const iconComponent = shallowRef(null);
 
+const component = computed(() => {
+    if (!props.href) return 'div';
+    if (! props.href.startsWith('http')) return Link;
+    const hostOfCurrentUrl = window.location.host;
+    const hostOfHref = (new URL(props.href)).host;
+    return hostOfHref === hostOfCurrentUrl ? Link : 'a';
+});
+
 onMounted(() => {
     if (props.icon) {
         iconComponent.value = true;
@@ -32,7 +41,8 @@ function click(event) {
 </script>
 
 <template>
-    <a
+    <Component
+        :is="component"
         :class="[
             'flex items-center gap-2 border-0',
             'rounded-lg px-2 py-1.5 text-sm antialiased',
@@ -42,7 +52,6 @@ function click(event) {
             'outline-hidden focus-visible:bg-gray-100 dark:focus-visible:bg-gray-900',
         ]"
         data-command-palette-item
-        :as="href ? 'a' : 'div'"
         :href="href"
         :target="openNewTab ? '_blank' : '_self'"
         @click="click"
@@ -55,13 +64,13 @@ function click(event) {
             <slot v-if="hasDefaultSlot" />
             <template v-else>{{ text }}</template>
         </div>
-        <Badge v-if="badge" :text="badge" variant="flat" />
-        <Badge v-if="keys" v-for="key in keys" :key="key" :text="key" variant="flat" />
+        <Badge v-if="badge" :text="badge" />
+        <Badge v-if="keys" v-for="key in keys" :key="key" :text="key" />
         <Icon
             v-if="removable"
             name="x"
             class="size-4 opacity-30 hover:opacity-70"
             @click.prevent.stop="$emit('remove', href)"
         />
-    </a>
+    </Component>
 </template>

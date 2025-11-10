@@ -258,7 +258,7 @@ function keydownTab(e) {
 
 const modalClasses = cva({
     base: [
-        'fixed outline-hidden left-1/2 top-[100px] z-50 w-full max-w-3xl -translate-x-1/2 ',
+        'fixed outline-hidden left-1/2 top-[100px] z-50 w-full max-w-[min(90vw,48rem)] -translate-x-1/2 ',
         'backdrop-blur-[2px] rounded-2xl',
         'shadow-[0_8px_5px_-6px_rgba(0,0,0,0.12),_0_3px_8px_0_rgba(0,0,0,0.02),_0_30px_22px_-22px_rgba(39,39,42,0.35)]',
         'dark:shadow-[0_5px_20px_rgba(0,0,0,.5)]',
@@ -274,19 +274,7 @@ const modalClasses = cva({
 <template>
     <DialogRoot v-model:open="open" :modal="true">
         <DialogTrigger>
-            <div class="
-                data-[focus-visible]:outline-focus hover flex cursor-text items-center gap-x-1.5 group h-8
-                rounded-lg [button:has(>&)]:rounded-md bg-black/40 text-xs text-white/60 outline-none
-                border-b border-b-white/20 inset-shadow-sm inset-shadow-black/20
-                md:w-32 md:py-[calc(5/16*1rem)] md:px-2
-                hover:bg-black/45 hover:text-white/70
-            ">
-                <Icon name="magnifying-glass" class="size-5 flex-none text-white/50 group-hover:text-white/70" />
-                <span class="sr-only leading-none md:not-sr-only st-text-trim-cap">{{ __('Search') }}</span>
-                <kbd class="ml-auto hidden self-center rounded bg-white/5 px-[0.3125rem] py-[0.0625rem] text-[0.625rem]/4 font-medium text-white/60 group-hover:text-white/70 ring-1 ring-white/7.5 [word-spacing:-0.15em] ring-inset md:block">
-                    <kbd class="font-sans">⌘ </kbd><kbd class="font-sans">K</kbd>
-                </kbd>
-            </div>
+            <slot />
         </DialogTrigger>
         <DialogPortal>
             <DialogOverlay class="fixed inset-0 z-30 bg-gray-800/20 backdrop-blur-[2px] dark:bg-gray-800/50" />
@@ -298,7 +286,7 @@ const modalClasses = cva({
                     <DialogDescription>{{ __('Search for content, navigate, and run actions.') }}</DialogDescription>
                 </VisuallyHidden>
                 <motion.div
-                    class="relative rounded-xl border-b border-gray-200/80 bg-white shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:border-gray-950 dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/15"
+                    class="relative rounded-xl border-b border-gray-200/80 bg-white shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:border-gray-950 dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/10"
                     :initial="{ scale: 1.0 }"
                     :whilePress="{ scale: 0.985 }"
                     :transition="{ duration: 0.1 }"

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Assets;
 
+use Inertia\Testing\AssertableInertia as Assert;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\User;
@@ -38,7 +39,7 @@ class AssetIndexTest extends TestCase
             ->actingAs($user)
             ->get(cp_route('assets.index'))
             ->assertSuccessful()
-            ->assertSee('Create Asset Container');
+            ->assertInertia(fn (Assert $page) => $page->component('assets/Empty'));
     }
 
     #[Test]
