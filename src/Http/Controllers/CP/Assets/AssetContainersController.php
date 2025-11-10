@@ -28,7 +28,6 @@ class AssetContainersController extends CpController
             'source_preset' => $container->sourcePreset(),
             'warm_intelligent' => $intelligent = $container->warmsPresetsIntelligently(),
             'warm_presets' => $intelligent ? [] : $container->warmPresets(),
-            'warm_presets_per_path' => $container->warmPresetsPerPath(),
             'validation' => $container->validationRules(),
         ];
 
@@ -54,7 +53,6 @@ class AssetContainersController extends CpController
             ->disk($values['disk'])
             ->sourcePreset($values['source_preset'])
             ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets'])
-            ->warmPresetsPerPath($values['warm_intelligent'] ? null : $values['warm_presets_per_path'])
             ->validationRules($values['validation'] ?? null);
 
         $container->save();
@@ -93,8 +91,7 @@ class AssetContainersController extends CpController
             ->title($values['title'])
             ->disk($values['disk'])
             ->sourcePreset($values['source_preset'])
-            ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets'])
-            ->warmPresetsPerPath($values['warm_intelligent'] ? null : $values['warm_presets_per_path']);
+            ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets']);
 
         $container->save();
 
@@ -221,38 +218,6 @@ class AssetContainersController extends CpController
                         'options' => $this->expandedGlidePresetOptions(),
                         'if' => [
                             'warm_intelligent' => false,
-                        ],
-                    ],
-                    'warm_presets_per_path' => [
-                        'type' => 'grid',
-                        'display' => __('Warm Presets Per Path'),
-                        'instructions' => __('TODO: Enter a path and hit enter to add paths. Select the presets to warm for each set of path(s).'),
-                        'mode' => 'stacked',
-                        'reorderable' => true,
-                        'fullscreen' => false,
-                        'if' => [
-                            'warm_intelligent' => false,
-                        ],
-                        'fields' => [
-                            'paths' => [
-                                'handle' => 'paths',
-                                'field' => [
-                                    'type' => 'taggable',
-                                    'display' => __('Paths'),
-                                    'placeholder' => __('e.g. images/uploads'),
-                                    'validate' => 'required',
-                                ],
-                            ],
-                            'presets' => [
-                                'handle' => 'presets',
-                                'field' => [
-                                    'type' => 'select',
-                                    'label_html' => true,
-                                    'options' => $this->expandedGlidePresetOptions(),
-                                    'multiple' => true,
-                                    'validate' => 'required',
-                                ],
-                            ],
                         ],
                     ],
                 ],

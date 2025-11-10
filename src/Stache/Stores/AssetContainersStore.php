@@ -23,7 +23,6 @@ class AssetContainersStore extends BasicStore
             ->title(Arr::get($data, 'title'))
             ->sourcePreset(Arr::get($data, 'source_preset'))
             ->warmPresets(Arr::get($data, 'warm_presets'))
-            ->warmPresetsPerPath(Arr::get($data, 'warm_presets_per_path'))
             ->searchIndex(Arr::get($data, 'search_index'))
             ->sortField(Arr::get($data, 'sort_by'))
             ->sortDirection(Arr::get($data, 'sort_dir'))

@@ -1140,7 +1140,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             'cp_thumbnail_small_'.$this->orientation(),
         ] : [];
 
-        return array_merge($this->container->warmPresetsForPath($this->path()), $cpPresets);
+        return array_merge($this->container->warmPresets(), $cpPresets);
     }
 
     public function cacheStore()

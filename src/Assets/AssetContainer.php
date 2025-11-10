@@ -39,7 +39,6 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     protected $private;
     protected $sourcePreset;
     protected $warmPresets;
-    protected $warmPresetsPerPath;
     protected $searchIndex;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
@@ -537,7 +536,18 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
                     return [];
                 }
 
-                return $presets;
+                if ($presets !== null) {
+                    return $presets;
+                }
+
+                $presets = [
+                    ...Image::userManipulationPresets(),
+                    ...Image::customManipulationPresets(),
+                ];
+
+                $presets = Arr::except($presets, $this->sourcePreset);
+
+                return array_keys($presets);
             })
             ->setter(function ($presets) {
                 return $presets === [] ? false : $presets;
@@ -547,128 +557,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
 
     public function warmsPresetsIntelligently()
     {
-        // Intelligent warming is disabled when warmPresetsPerPath is configured
-        // This includes when warmPresets (deprecated) has a value since it gets migrated
-        return $this->warmPresetsPerPath() === null;
-    }
-
-    /**
-     * The specific glide presets to be used per path when warming glide image cache on upload.
-     *
-     * @param  array|null  $presetsPerPath
-     * @return array|null|$this
-     */
-    public function warmPresetsPerPath($presetsPerPath = null)
-    {
-        return $this
-            ->fluentlyGetOrSet('warmPresetsPerPath')
-            ->getter(function ($presetsPerPath) {
-                // Migration: If warm_presets is set (not false), add it to the beginning with path '/'
-                if (! empty($this->warmPresets) && $this->warmPresets !== false) {
-                    $result = $presetsPerPath ?? [];
-                    array_unshift($result, [
-                        'paths' => ['/'],
-                        'presets' => $this->warmPresets,
-                    ]);
-
-                    return $result;
-                }
-
-                // If warmPresets is explicitly false, return empty array to disable intelligent warming
-                if ($this->warmPresets === false) {
-                    return [];
-                }
-
-                // Return the explicitly configured value (could be null, array, or empty array)
-                return $presetsPerPath;
-            })
-            ->args(func_get_args());
-    }
-
-    /**
-     * Get the warm presets per path with intelligent defaults applied.
-     *
-     * @return array
-     */
-    public function warmPresetsPerPathWithDefaults()
-    {
-        $presetsPerPath = $this->warmPresetsPerPath();
-
-        // If nothing is configured, use intelligent warming defaults
-        if ($presetsPerPath === null) {
-            $presets = [
-                ...Image::userManipulationPresets(),
-                ...Image::customManipulationPresets(),
-            ];
-
-            $presets = Arr::except($presets, $this->sourcePreset);
-
-            return [[
-                'paths' => ['/'],
-                'presets' => array_keys($presets),
-            ]];
-        }
-
-        return $presetsPerPath;
-    }
-
-    /**
-     * Get the warm presets for a specific asset path.
-     *
-     * @param  string  $assetPath
-     * @return array
-     */
-    public function warmPresetsForPath($assetPath)
-    {
-        $presetsPerPath = $this->warmPresetsPerPathWithDefaults();
-
-        $matchedPresets = [];
-
-        foreach ($presetsPerPath as $config) {
-            $paths = $config['paths'] ?? [];
-            $presets = $config['presets'] ?? [];
-
-            foreach ($paths as $pathPattern) {
-                if ($this->pathMatches($assetPath, $pathPattern)) {
-                    $matchedPresets = array_merge($matchedPresets, $presets);
-                }
-            }
-        }
-
-        // Return unique presets
-        return array_values(array_unique($matchedPresets));
-    }
-
-    /**
-     * Check if an asset path matches a path pattern.
-     *
-     * @param  string  $assetPath
-     * @param  string  $pattern
-     * @return bool
-     */
-    protected function pathMatches($assetPath, $pattern)
-    {
-        // Normalize paths
-        $assetPath = '/'.ltrim($assetPath, '/');
-        $pattern = '/'.ltrim($pattern, '/');
-
-        // Root pattern matches everything
-        if ($pattern === '/') {
-            return true;
-        }
-
-        // Exact match
-        if ($assetPath === $pattern) {
-            return true;
-        }
-
-        // Check if asset path starts with pattern (folder matching)
-        // Pattern 'images' should match 'images/photo.jpg' and 'images/subfolder/photo.jpg'
-        if (str_starts_with($assetPath, rtrim($pattern, '/').'/')) {
-            return true;
-        }
-
-        return false;
+        return $this->warmPresets === null;
     }
 
     public function fileData()
@@ -679,7 +568,6 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
             'search_index' => $this->searchIndex,
             'source_preset' => $this->sourcePreset,
             'warm_presets' => $this->warmPresets,
-            'warm_presets_per_path' => $this->warmPresetsPerPath,
             'validate' => $this->validation,
         ];
 
