@@ -66,9 +66,9 @@ const triggerClasses = cva({
         size: {
             xl: 'px-5 h-12 text-lg rounded-lg',
             lg: 'px-4 h-12 text-base rounded-lg',
-            base: 'px-4 h-10 text-sm rounded-lg',
-            sm: 'px-3 h-8 text-[0.8125rem] rounded-lg',
-            xs: 'px-2 h-6 text-xs rounded-md',
+            base: 'px-4 h-10 text-md rounded-lg',
+            sm: 'px-3 h-8 text-sm rounded-lg',
+            xs: 'px-2 h-6 text-[0.8125rem] rounded-md',
         },
         readOnly: {
             true: 'border-dashed',
