@@ -50,7 +50,7 @@ if (props.navs.length === 0) useArchitecturalBackground();
     </template>
 
     <template v-else>
-        <header class="py-8 mt-8 text-center">
+        <header class="py-8 pt-16 text-center">
             <h1 class="text-[25px] font-medium antialiased flex justify-center items-center gap-2 sm:gap-3">
                 <Icon name="navigation" class="size-5 text-gray-500" />
                 {{ __('Navigation') }}
