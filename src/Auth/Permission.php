@@ -49,9 +49,13 @@ class Permission
             return $this;
         }
 
-        $label = $this->label ?? str_replace('{'.$this->placeholder.'}', ':'.$this->placeholder, $this->value);
+        if ($this->placeholder) {
+            $label = str_replace('{'.$this->placeholder.'}', ':'.$this->placeholder, $this->value);
 
-        return __($label, [$this->placeholder => $this->placeholderLabel]);
+            return __($label, [$this->placeholder => $this->placeholderLabel]);
+        }
+
+        return __($this->label);
     }
 
     public function placeholder(?string $placeholder = null)
