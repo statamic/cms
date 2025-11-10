@@ -1143,12 +1143,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
         $presets = array_merge($this->container->warmPresets(), $cpPresets);
 
-        $hook = $this->runHooksWith('warm-presets', [
-            'asset' => $this,
-            'presets' => collect($presets),
-        ]);
-
-        return $hook->presets->all();
+        return $this->runHooks('warm-presets', $presets);
     }
 
     public function cacheStore()
