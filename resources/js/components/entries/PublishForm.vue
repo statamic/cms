@@ -558,6 +558,11 @@ export default {
                     }),
                 ])
                 .then((response) => {
+                    this.title = response.data.data.title;
+                    this.isWorkingCopy = true;
+                    if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
+                    if (!this.isCreating && !this.isAutosave) this.$toast.success(__('Saved'));
+
                     // If revisions are enabled, just emit event.
                     if (this.revisionsEnabled) {
                         clearTimeout(this.trackDirtyStateTimeout);
@@ -568,11 +573,6 @@ export default {
                         this.$nextTick(() => this.$emit('saved', response));
                         return;
                     }
-
-                    this.title = response.data.data.title;
-                    this.isWorkingCopy = true;
-                    if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
-                    if (!this.isCreating && !this.isAutosave) this.$toast.success(__('Saved'));
 
                     let nextAction = this.quickSave || this.isAutosave ? 'continue_editing' : this.afterSaveOption;
 
