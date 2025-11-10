@@ -60,6 +60,7 @@
                     >
                         <bubble-menu
                             :editor="editor"
+                            :key="`bubble-menu-${fullScreenMode}`"
                             :options="{ placement: 'bottom', offset: [0, 10] }"
                             v-if="editor && toolbarIsFloating && !readOnly"
                         >
