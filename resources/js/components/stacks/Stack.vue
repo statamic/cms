@@ -70,6 +70,7 @@ export default {
             visible: false,
             isHovering: false,
             escBinding: null,
+            windowInnerWidth: window.innerWidth,
         };
     },
 
@@ -88,9 +89,9 @@ export default {
 
         offset() {
             if (this.isTopStack && this.narrow) {
-                return window.innerWidth - 450;
+                return this.windowInnerWidth - 450;
             } else if (this.isTopStack && this.half) {
-                return window.innerWidth / 2;
+                return this.windowInnerWidth / 2;
             }
 
             // max of 200px, min of 80px
@@ -128,6 +129,8 @@ export default {
         this.$events.$on(`stacks.${this.depth}.hit-area-mouseenter`, () => (this.isHovering = true));
         this.$events.$on(`stacks.${this.depth}.hit-area-mouseout`, () => (this.isHovering = false));
         this.escBinding = this.$keys.bindGlobal('esc', this.close);
+
+        window.addEventListener('resize', this.handleResize);
     },
 
     unmounted() {
@@ -135,6 +138,8 @@ export default {
         this.$events.$off(`stacks.${this.depth}.hit-area-mouseenter`);
         this.$events.$off(`stacks.${this.depth}.hit-area-mouseout`);
         this.escBinding.destroy();
+
+        window.removeEventListener('resize', this.handleResize);
     },
 
     methods: {
@@ -176,6 +181,10 @@ export default {
                 this.mounted = false;
                 this.$emit('closed');
             });
+        },
+
+        handleResize() {
+            this.windowInnerWidth = window.innerWidth;
         },
     },
 
