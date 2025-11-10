@@ -110,7 +110,7 @@ function tabHasError(tab) {
                         :name="tab.handle"
                         :is="visibleMainTabs.length > 1 ? TabContent : 'div'"
                         :force-mount="true"
-                        :class="{ 'hidden': tab.handle != activeTab }"
+                        :class="{ 'hidden': tab.handle !== activeTab }"
                     >
                         <TabProvider :tab="tab">
                             <slot :tab="tab">
