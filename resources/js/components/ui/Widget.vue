@@ -20,7 +20,7 @@ const hasHeader = computed(() => Boolean(props.title || props.icon || slots.head
             <slot name="header" v-if="hasHeader">
                 <header class="flex items-center min-h-[49px] justify-between border-b border-gray-200 px-4.5 py-2 dark:border-gray-700">
                     <component :is="href ? Link : 'div'" class="flex items-center gap-2 sm:gap-3" :href>
-                        <Icon :name="icon" class="hidden! size-5 text-gray-500 @xs/widget:block!" />
+                        <Icon v-if="icon" :name="icon" class="hidden! size-5 text-gray-500 @xs/widget:block!" />
                         <span v-text="title" />
                     </component>
                     <div class="flex items-center gap-4 -mr-2.5">
