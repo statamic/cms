@@ -60,7 +60,7 @@
                     >
                         <bubble-menu
                             :editor="editor"
-                            :options="{ placement: 'top', offset: [0, 10] }"
+                            :options="{ placement: 'bottom', offset: [0, 10] }"
                             v-if="editor && toolbarIsFloating && !readOnly"
                         >
                         <div class="bard-floating-toolbar">
