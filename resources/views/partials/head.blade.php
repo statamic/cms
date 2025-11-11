@@ -50,7 +50,7 @@
     :root {
         {{ \Statamic\CP\Color::cssVariables() }}
 
-        body:where(.dark, .dark *) {
+        &.dark {
             {{ \Statamic\CP\Color::cssVariables(darkVariant: true) }}
         }
     }
