@@ -18,7 +18,7 @@
 @endif
 
 <script>
-    (function () {
+    (function() {
         let theme = {!! ($userTheme = $user?->preferredTheme()) ? "'" . $userTheme . "'" : 'null' !!};
         if (!theme) theme = localStorage.getItem('statamic.theme') ?? 'auto';
         if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) theme = 'dark';
@@ -47,9 +47,13 @@
 @endforeach
 
 <style>
-:root {
-    {{ \Statamic\CP\Color::cssVariables() }}
-}
+    :root {
+        {{ \Statamic\CP\Color::cssVariables() }}
+
+        body:where(.dark, .dark *) {
+            {{ \Statamic\CP\Color::cssVariables(darkVariant: true) }}
+        }
+    }
 </style>
 
 @stack('head')

@@ -365,6 +365,7 @@ class Color
     {
         return [
             'primary' => self::Indigo[700],
+            'dark-primary' => self::Indigo[700],
             'gray-50' => self::Zinc[50],
             'gray-100' => self::Zinc[100],
             'gray-200' => self::Zinc[200],
@@ -378,8 +379,23 @@ class Color
             'gray-900' => self::Zinc[900],
             'gray-925' => self::Zinc[925],
             'gray-950' => self::Zinc[950],
+            'dark-gray-50' => self::Zinc[50],
+            'dark-gray-100' => self::Zinc[100],
+            'dark-gray-200' => self::Zinc[200],
+            'dark-gray-300' => self::Zinc[300],
+            'dark-gray-400' => self::Zinc[400],
+            'dark-gray-500' => self::Zinc[500],
+            'dark-gray-600' => self::Zinc[600],
+            'dark-gray-700' => self::Zinc[700],
+            'dark-gray-800' => self::Zinc[800],
+            'dark-gray-850' => self::Zinc[850],
+            'dark-gray-900' => self::Zinc[900],
+            'dark-gray-925' => self::Zinc[925],
+            'dark-gray-950' => self::Zinc[950],
             'success' => self::Green[400],
+            'dark-success' => self::Green[400],
             'danger' => self::Red[600],
+            'dark-danger' => self::Red[600],
             'body-bg' => self::Zinc[100],
             'body-border' => self::Transparent,
             'dark-body-bg' => self::Zinc[900],
@@ -391,6 +407,7 @@ class Color
             'global-header-bg' => self::Zinc[800],
             'dark-global-header-bg' => self::Zinc[800],
             'progress-bar' => self::Indigo[700],
+            'dark-progress-bar' => self::Indigo[700],
             'ui-accent-bg' => self::Indigo[700],
             'ui-accent-text' => 'var(--theme-color-ui-accent-bg)',
             'dark-ui-accent-bg' => self::Indigo[700],
@@ -400,23 +417,28 @@ class Color
         ];
     }
 
-    public static function theme(): array
+    public static function theme(bool $darkVariant = false): array
     {
         $config = config('statamic.cp.theme', []);
 
-        foreach ($config['grays'] ?? [] as $shade => $value) {
+        foreach ($config[$darkVariant ? 'dark-grays' : 'grays'] ?? [] as $shade => $value) {
             $config["gray-{$shade}"] = $value;
         }
 
         return collect(static::defaults())
+            ->filter(fn ($color, $name) => str($name)->startsWith('dark-') ? $darkVariant : ! $darkVariant)
             ->map(fn ($color, $name) => $config[$name] ?? $color)
             ->all();
     }
 
-    public static function cssVariables(): string
+    public static function cssVariables(bool $darkVariant = false): string
     {
-        return collect(static::theme())
-            ->map(fn ($color, $name) => "--theme-color-{$name}: {$color};")
+        return collect(static::theme($darkVariant))
+            ->map(function ($color, $name) use ($darkVariant) {
+                $name = $darkVariant ? str($name)->remove('dark-')->__toString() : $name;
+
+                return "--theme-color-{$name}: {$color};";
+            })
             ->implode("\n");
     }
 }
