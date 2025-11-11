@@ -361,9 +361,9 @@ class Color
     public const Transparent = 'transparent';
     public const Volt = 'oklch(93.86% 0.2018 122.24)';
 
-    public static function defaults(): array
+    public static function defaults(bool $darkVariant = false): array
     {
-        return [
+        return collect([
             'primary' => self::Indigo[700],
             'dark-primary' => self::Indigo[700],
             'gray-50' => self::Zinc[50],
@@ -414,7 +414,9 @@ class Color
             'dark-ui-accent-text' => self::Indigo[400],
             'switch-bg' => 'var(--theme-color-ui-accent-bg)',
             'dark-switch-bg' => 'var(--theme-color-dark-ui-accent-bg)',
-        ];
+        ])
+            ->filter(fn ($color, $name) => str($name)->startsWith('dark-') ? $darkVariant : ! $darkVariant)
+            ->all();
     }
 
     public static function theme(bool $darkVariant = false): array
@@ -422,10 +424,11 @@ class Color
         $config = config('statamic.cp.theme', []);
 
         foreach ($config[$darkVariant ? 'dark-grays' : 'grays'] ?? [] as $shade => $value) {
-            $config["gray-{$shade}"] = $value;
+            $colorHandle = $darkVariant ? 'dark-gray' : 'gray';
+            $config["{$colorHandle}-{$shade}"] = $value;
         }
 
-        return collect(static::defaults())
+        return collect(static::defaults($darkVariant))
             ->filter(fn ($color, $name) => str($name)->startsWith('dark-') ? $darkVariant : ! $darkVariant)
             ->map(fn ($color, $name) => $config[$name] ?? $color)
             ->all();
