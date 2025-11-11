@@ -84,6 +84,7 @@
     transition: all 0.3s ease;
 }
 .live-preview-header-slide-enter,
+.live-preview-header-slide-enter-from,
 .live-preview-header-slide-leave-to {
     transform: translateY(-100px);
 }
@@ -93,6 +94,7 @@
     transition: all 0.3s ease;
 }
 .live-preview-editor-slide-enter,
+.live-preview-editor-slide-enter-from,
 .live-preview-editor-slide-leave-to {
     transform: translateX(-50px);
     opacity: 0;
@@ -103,6 +105,7 @@
     transition: all 0.3s ease;
 }
 .live-preview-contents-slide-enter,
+.live-preview-contents-slide-enter-from,
 .live-preview-contents-slide-leave-to {
     transform: translateX(50px);
     opacity: 0;
