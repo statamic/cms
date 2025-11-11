@@ -141,7 +141,9 @@
                     <div class="hidden h-full flex-1 gap-2 sm:gap-3 py-1 sm:flex">
                         <ui-badge pill v-if="isImage" icon="assets" :text="__('messages.width_x_height', { width: asset.width, height: asset.height })" />
                         <ui-badge pill icon="memory" :text="asset.size" />
-                        <ui-badge pill icon="fingerprint" :text="asset.lastModifiedRelative" />
+                        <ui-badge pill icon="fingerprint">
+                            <time :datetime="lastModified" v-tooltip="DateFormatter.format(lastModified, 'datetime')">{{ asset.lastModifiedRelative }}</time>
+                        </ui-badge>
                     </div>
                     <div class="flex items-center space-x-3 rtl:space-x-reverse">
                         <ui-button icon="chevron-left" @click="navigateToPreviousAsset" v-tooltip="__('Previous Asset')" />
@@ -173,6 +175,7 @@
 </template>
 
 <script>
+import DateFormatter from '@/components/DateFormatter.js';
 import FocalPointEditor from './FocalPointEditor.vue';
 import PdfViewer from './PdfViewer.vue';
 import { pick, flatten } from 'lodash-es';
