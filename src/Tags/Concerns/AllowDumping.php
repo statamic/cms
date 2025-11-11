@@ -6,6 +6,6 @@ trait AllowDumping
 {
     private function allowDumping()
     {
-        return config('app.debug') || $this->params->get('force');
+        return app()->hasDebugModeEnabled() || $this->params->get('force');
     }
 }
