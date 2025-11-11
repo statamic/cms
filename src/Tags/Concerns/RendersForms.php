@@ -3,8 +3,11 @@
 namespace Statamic\Tags\Concerns;
 
 use Closure;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\MessageBag;
 use Statamic\Fields\Field;
+use Statamic\Forms\RenderableField;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 trait RendersForms
@@ -142,39 +145,37 @@ trait RendersForms
             ->filter()->all();
 
         $formHandle = $field->form()?->handle() ?? Str::slug($errorBag);
+
         $data = array_merge($configDefaults, $field->toArray(), [
+            'handle' => $field->handle(),
+            'name' => $this->convertDottedHandleToInputName($field->handle()),
             'id' => $this->generateFieldId($field->handle(), $formHandle),
             'instructions' => $field->instructions(),
             'error' => $errors->first($field->handle()) ?: null,
-            'default' => $field->value() ?? $field->defaultValue(),
+            'default' => $default,
             'old' => old($field->handle()),
             'value' => $value,
         ], $field->fieldtype()->extraRenderableFieldData());
+
+        $data = $field
+            ->fieldtype()
+            ->preProcessTagRenderable($data, fn ($child) => $this->getRenderableField(
+                $child,
+                $errorBag,
+                $manipulateDataCallback,
+            ));
 
         if ($manipulateDataCallback instanceof Closure) {
             $data = $manipulateDataCallback($data, $field);
         }
 
-        $data['field'] = $this->minifyFieldHtml(view($field->fieldtype()->view(), $data)->render());
+        if ($showField = Arr::get($data, 'show_field')) {
+            $data['show_field'] = new HtmlString($showField);
+        }
+
+        $data['field'] = new RenderableField($field, $data);
 
         return $data;
-    }
-
-    /**
-     * Minify field html.
-     *
-     * @param  string  $html
-     * @return string
-     */
-    protected function minifyFieldHtml($html)
-    {
-        // Leave whitespace around these html elements.
-        $ignoredHtmlElements = collect(['a', 'span'])->implode('|');
-
-        // Trim whitespace between all other html elements.
-        $html = preg_replace('/\s*(<(?!\/*('.$ignoredHtmlElements.'))[^>]+>)\s*/', '$1', $html);
-
-        return $html;
     }
 
     /**
@@ -182,6 +183,22 @@ trait RendersForms
      */
     private function generateFieldId(string $fieldHandle, ?string $formName = null): string
     {
-        return ($formName ?? 'default').'-form-'.$fieldHandle.'-field';
+        $formName ??= 'default';
+
+        return str_replace(['.', '_'], '-', "{$formName}-form-{$fieldHandle}-field");
+    }
+
+    /**
+     * Convert dotted handle to input name that can be submitted as array value in form html.
+     */
+    protected function convertDottedHandleToInputName(string $handle): string
+    {
+        $parts = collect(explode('.', $handle));
+
+        $first = $parts->pull(0);
+
+        return $first.$parts
+            ->map(fn ($part) => '['.$part.']')
+            ->join('');
     }
 }

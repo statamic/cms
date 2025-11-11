@@ -46,13 +46,14 @@ use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
+use Statamic\Support\Traits\Hookable;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mime\MimeTypes;
 
 class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, ContainsQueryableValues, ResolvesValuesContract, SearchableContract
 {
     use ContainsData, FluentlyGetsAndSets, HasAugmentedInstance, HasDirtyState,
-        Searchable,
+        Hookable, Searchable,
         TracksQueriedColumns, TracksQueriedRelations {
             set as traitSet;
             get as traitGet;
@@ -794,13 +795,13 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         // until after the `AssetReplaced` event is fired. We still want to fire events
         // like `AssetDeleted` and `AssetSaved` though, so that other listeners will
         // get triggered (for cache invalidation, clearing of glide cache, etc.)
-        UpdateAssetReferencesSubscriber::disable();
+        app(UpdateAssetReferencesSubscriber::class)::disable();
 
         if ($deleteOriginal) {
             $originalAsset->delete();
         }
 
-        UpdateAssetReferencesSubscriber::enable();
+        app(UpdateAssetReferencesSubscriber::class)::enable();
 
         AssetReplaced::dispatch($originalAsset, $this);
 
@@ -1140,7 +1141,9 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             'cp_thumbnail_small_'.$this->orientation(),
         ] : [];
 
-        return array_merge($this->container->warmPresets(), $cpPresets);
+        $presets = array_merge($this->container->warmPresets(), $cpPresets);
+
+        return $this->runHooks('warm-presets', $presets);
     }
 
     public function cacheStore()

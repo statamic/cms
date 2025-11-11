@@ -1,5 +1,4 @@
 class Component {
-
     constructor(id, name, props) {
         this.id = id;
         this.name = name;
@@ -12,13 +11,12 @@ class Component {
     }
 
     on(event, handler) {
-        Vue.set(this.events, event, handler);
+        this.events[event] = handler;
     }
 
     destroy() {
         Statamic.$components.destroy(this.id);
     }
-
 }
 
 export default Component;

@@ -1,0 +1,46 @@
+{
+    "name": "@statamic/cms",
+    "type": "module",
+    "version": "0.0.0",
+    "scripts": {
+        "types": "rm -rf types && vue-tsc --declaration --emitDeclarationOnly || true"
+    },
+    "dependencies": {
+        "@vitejs/plugin-vue": "^6.0.0"
+    },
+    "exports": {
+        ".": {
+            "types": "./types/resources/js/bootstrap/cms/index.d.ts",
+            "default": "./src/index.js"
+        },
+        "./ui": {
+            "types": "./types/resources/js/bootstrap/cms/ui.d.ts",
+            "default": "./src/ui.js"
+        },
+        "./api": {
+            "types": "./types/resources/js/bootstrap/cms/api.d.ts",
+            "default": "./src/api.js"
+        },
+        "./ui.css": "./src/ui.css",
+        "./tailwind.css": "./src/tailwind.css",
+        "./bard": {
+            "types": "./types/resources/js/bootstrap/cms/bard.d.ts",
+            "default": "./src/bard.js"
+        },
+        "./save-pipeline": {
+            "types": "./types/resources/js/bootstrap/cms/save-pipeline.d.ts",
+            "default": "./src/save-pipeline.js"
+        },
+        "./inertia": {
+            "types": "./types/resources/js/bootstrap/cms/inertia.d.ts",
+            "default": "./src/inertia.js"
+        },
+        "./temporary": {
+            "types": "./types/resources/js/bootstrap/cms/temporary.d.ts",
+            "default": "./src/temporary.js"
+        },
+        "./vite-plugin": {
+            "default": "./src/vite-plugin/index.js"
+        }
+    }
+}

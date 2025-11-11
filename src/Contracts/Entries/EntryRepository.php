@@ -12,6 +12,8 @@ interface EntryRepository
 
     public function whereInCollection(array $handles);
 
+    // public function whereInId(array $ids);
+
     public function find($id);
 
     public function findOrFail($id);

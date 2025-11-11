@@ -15,7 +15,7 @@ class OAuthController
 {
     public function redirectToProvider(Request $request, string $provider)
     {
-        $referer = $request->headers->get('referer');
+        $referer = $request->headers->get('referer') ?? '';
         $guard = config('statamic.users.guards.web', 'web');
 
         if (! OAuth::providers()->has($provider)) {
@@ -58,6 +58,8 @@ class OAuthController
 
             Auth::guard($request->session()->get('statamic.oauth.guard'))
                 ->login($user, config('statamic.oauth.remember_me', true));
+
+            session()->elevate();
 
             return redirect()->to($this->successRedirectUrl());
         }

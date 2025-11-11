@@ -97,6 +97,19 @@ class EntryRepository implements RepositoryContract
             : $entry;
     }
 
+    public function whereInId($ids): EntryCollection
+    {
+        $entries = $this->query()->whereIn('id', $ids)->get();
+        $entriesById = $entries->keyBy->id();
+
+        $ordered = collect($ids)
+            ->map(fn ($id) => $entriesById->get($id))
+            ->filter()
+            ->values();
+
+        return EntryCollection::make($ordered);
+    }
+
     public function findOrNew($id)
     {
         return $this->query()->findOrNew($id);

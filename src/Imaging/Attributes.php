@@ -41,7 +41,19 @@ class Attributes
 
     private function imageAttributes(string $path)
     {
-        [$width, $height] = getimagesize($this->prefixPath($path));
+        $fullPath = $this->prefixPath($path);
+
+        if (! file_exists($fullPath)) {
+            return ['width' => 0, 'height' => 0];
+        }
+
+        $size = @getimagesize($fullPath);
+
+        if ($size === false) {
+            return ['width' => 0, 'height' => 0];
+        }
+
+        [$width, $height] = $size;
 
         return compact('width', 'height');
     }

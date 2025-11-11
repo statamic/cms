@@ -6,8 +6,8 @@ use Facades\Statamic\Version;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use ReflectionClass;
+use Statamic\Addons\Manifest;
 use Statamic\Console\Processes\Composer;
-use Statamic\Extend\Manifest;
 use Statamic\Providers\StatamicServiceProvider;
 use Statamic\Statamic;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
@@ -54,6 +54,7 @@ abstract class AddonTestCase extends OrchestraTestCase
     {
         $serviceProviders = [
             StatamicServiceProvider::class,
+            \Inertia\ServiceProvider::class,
             $this->addonServiceProvider,
         ];
 
@@ -95,6 +96,9 @@ abstract class AddonTestCase extends OrchestraTestCase
                 'provider' => $this->addonServiceProvider,
             ],
         ];
+
+        $app['config']->set('inertia.testing.ensure_pages_exist', false);
+        $app['config']->set('inertia.testing.page_paths', [$directory.'/../resources/js/pages']);
 
         $app['config']->set('statamic.users.repository', 'file');
 

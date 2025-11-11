@@ -34,7 +34,7 @@ class Grid extends Fieldtype
                 ],
             ],
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Appearance'),
                 'fields' => [
                     'mode' => [
                         'display' => __('UI Mode'),
@@ -45,33 +45,44 @@ class Grid extends Fieldtype
                             'stacked' => __('Stacked'),
                         ],
                         'default' => 'table',
-                    ],
-                    'max_rows' => [
-                        'display' => __('Maximum Rows'),
-                        'instructions' => __('statamic::fieldtypes.grid.config.max_rows'),
-                        'type' => 'integer',
-                    ],
-                    'min_rows' => [
-                        'display' => __('Minimum Rows'),
-                        'instructions' => __('statamic::fieldtypes.grid.config.min_rows'),
-                        'type' => 'integer',
+                        'width' => 50,
                     ],
                     'add_row' => [
                         'display' => __('Add Row Label'),
                         'instructions' => __('statamic::fieldtypes.grid.config.add_row'),
                         'type' => 'text',
+                        'width' => 50,
                     ],
                     'reorderable' => [
                         'display' => __('Reorderable'),
                         'instructions' => __('statamic::fieldtypes.grid.config.reorderable'),
                         'type' => 'toggle',
                         'default' => true,
+                        'width' => 50,
                     ],
                     'fullscreen' => [
                         'display' => __('Allow Fullscreen Mode'),
                         'instructions' => __('statamic::fieldtypes.grid.config.fullscreen'),
                         'type' => 'toggle',
                         'default' => true,
+                        'width' => 50,
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Boundaries & Limits'),
+                'fields' => [
+                    'max_rows' => [
+                        'display' => __('Maximum Rows'),
+                        'instructions' => __('statamic::fieldtypes.grid.config.max_rows'),
+                        'type' => 'integer',
+                        'width' => 50,
+                    ],
+                    'min_rows' => [
+                        'display' => __('Minimum Rows'),
+                        'instructions' => __('statamic::fieldtypes.grid.config.min_rows'),
+                        'type' => 'integer',
+                        'width' => 50,
                     ],
                 ],
             ],

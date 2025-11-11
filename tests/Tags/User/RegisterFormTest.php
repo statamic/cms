@@ -72,7 +72,7 @@ EOT
         $expected = [
             '<label>Email Address</label><input id="userregister-form-email-field" type="email" name="email" value="">',
             '<label>Password</label><input id="userregister-form-password-field" type="password" name="password" value="">',
-            '<label>Password Confirmation</label><input id="userregister-form-password_confirmation-field" type="password" name="password_confirmation" value="">',
+            '<label>Password Confirmation</label><input id="userregister-form-password-confirmation-field" type="password" name="password_confirmation" value="">',
             '<label>Name</label><input id="userregister-form-name-field" type="text" name="name" value="">',
         ];
 
@@ -98,7 +98,7 @@ EOT
         $expected = [
             '<label>Email Address</label><input id="userregister-form-email-field" type="email" name="email" value="">',
             '<label>Password</label><input id="userregister-form-password-field" type="password" name="password" value="">',
-            '<label>Password Confirmation</label><input id="userregister-form-password_confirmation-field" type="password" name="password_confirmation" value="">',
+            '<label>Password Confirmation</label><input id="userregister-form-password-confirmation-field" type="password" name="password_confirmation" value="">',
             '<label>Full Name</label><input id="userregister-form-name-field" type="text" name="name" value="">',
             '<label>Phone Number</label><input id="userregister-form-phone-field" type="text" name="phone" value="">',
             '<label>Over 18 years of age?</label><input id="userregister-form-age-field" type="text" name="age" value="" required>',
