@@ -22,7 +22,7 @@
 import Fieldtype from './Fieldtype.vue';
 import DateFormatter from '@/components/DateFormatter.js';
 import { DatePicker, DateRangePicker, Button } from '@/components/ui';
-import { parseAbsoluteToLocal, toTimeZone, toZoned } from '@internationalized/date';
+import { getLocalTimeZone, parseAbsoluteToLocal, toTimeZone, toZoned } from '@internationalized/date';
 
 export default {
     components: {
@@ -100,10 +100,6 @@ export default {
 
     created() {
         this.$events.$on(`container.${this.publishContainer.name}.saving`, this.triggerChangeOnFocusedField);
-
-        if ((this.hasDate || this.isInline) && !this.value) {
-            this.addDate();
-        }
     },
 
     unmounted() {
@@ -120,6 +116,12 @@ export default {
         datePickerUpdated(value) {
             if (!value) {
                 return this.update(null);
+            }
+
+            // Sometimes, we'll get a CalendarDateTime object, which doesn't include timezone
+            // information. In that case, we need to convert it to a ZonedDateTime object.
+            if (!this.isRange && !value.offset && !value.timeZone) {
+                value = toZoned(value, getLocalTimeZone());
             }
 
             // The date picker will give us CalendarDateTimes in the local time zone.
