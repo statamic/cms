@@ -12,7 +12,7 @@ class Dd extends Tags
 
     public function index()
     {
-        if (! $this->allowDumping()) {
+        if (! $this->dumpingAllowed()) {
             return;
         }
 

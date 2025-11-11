@@ -6,7 +6,7 @@ use Statamic\Tags\Parameters;
 
 trait ChecksDumpability
 {
-    private function allowDumping()
+    protected function dumpingAllowed()
     {
         if (app()->hasDebugModeEnabled()) {
             return true;

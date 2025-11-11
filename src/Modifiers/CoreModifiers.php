@@ -565,7 +565,7 @@ class CoreModifiers extends Modifier
      */
     public function ddd($value, $params)
     {
-        if (! $this->allowDumping() && (Arr::get($params, 0) !== 'force')) {
+        if (! $this->dumpingAllowed() && (Arr::get($params, 0) !== 'force')) {
             return;
         }
 
@@ -626,7 +626,7 @@ class CoreModifiers extends Modifier
      */
     public function dd($value, $params)
     {
-        if (! $this->allowDumping() && (Arr::get($params, 0) !== 'force')) {
+        if (! $this->dumpingAllowed() && (Arr::get($params, 0) !== 'force')) {
             return;
         }
 
@@ -638,7 +638,7 @@ class CoreModifiers extends Modifier
      */
     public function dump($value, $params)
     {
-        if (! $this->allowDumping() && (Arr::get($params, 0) !== 'force')) {
+        if (! $this->dumpingAllowed() && (Arr::get($params, 0) !== 'force')) {
             return;
         }
 

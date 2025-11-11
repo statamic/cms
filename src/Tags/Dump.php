@@ -14,7 +14,7 @@ class Dump extends Tags
      */
     public function index()
     {
-        if (! $this->allowDumping()) {
+        if (! $this->dumpingAllowed()) {
             return;
         }
 
@@ -28,7 +28,7 @@ class Dump extends Tags
      */
     public function wildcard($var)
     {
-        if (! $this->allowDumping()) {
+        if (! $this->dumpingAllowed()) {
             return;
         }
 
