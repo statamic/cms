@@ -4,7 +4,7 @@ namespace Statamic\Support\Traits;
 
 use Statamic\Tags\Parameters;
 
-trait AllowDumping
+trait ChecksDumpability
 {
     private function allowDumping()
     {

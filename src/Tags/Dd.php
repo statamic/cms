@@ -2,11 +2,11 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Support\Traits\AllowDumping;
+use Statamic\Support\Traits\ChecksDumpability;
 
 class Dd extends Tags
 {
-    use AllowDumping;
+    use ChecksDumpability;
 
     protected static $aliases = ['ddd'];
 

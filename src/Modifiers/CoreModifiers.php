@@ -33,12 +33,12 @@ use Statamic\Support\Arr;
 use Statamic\Support\Dumper;
 use Statamic\Support\Html;
 use Statamic\Support\Str;
-use Statamic\Support\Traits\AllowDumping;
+use Statamic\Support\Traits\ChecksDumpability;
 use Stringy\StaticStringy as Stringy;
 
 class CoreModifiers extends Modifier
 {
-    use AllowDumping;
+    use ChecksDumpability;
 
     /**
      * Adds values together with science. Context aware.

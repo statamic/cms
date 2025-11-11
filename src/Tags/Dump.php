@@ -3,11 +3,11 @@
 namespace Statamic\Tags;
 
 use Statamic\Support\Dumper;
-use Statamic\Support\Traits\AllowDumping;
+use Statamic\Support\Traits\ChecksDumpability;
 
 class Dump extends Tags
 {
-    use AllowDumping;
+    use ChecksDumpability;
 
     /**
      * {{ dump }}.
