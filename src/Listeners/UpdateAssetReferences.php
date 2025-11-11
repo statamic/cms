@@ -9,6 +9,14 @@ use Statamic\Events\AssetReferencesUpdated;
 use Statamic\Events\AssetReplaced;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\Subscriber;
+use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Form;
+use Statamic\Facades\GlobalSet;
+use Statamic\Facades\Nav;
+use Statamic\Facades\Taxonomy;
+use Statamic\Support\Arr;
 
 class UpdateAssetReferences extends Subscriber implements ShouldQueue
 {
@@ -99,8 +107,81 @@ class UpdateAssetReferences extends Subscriber implements ShouldQueue
                 }
             });
 
+        $this
+            ->getBlueprintsContainingData()
+            ->each(function ($blueprint) use ($originalPath, $newPath) {
+                $hasUpdatedBlueprint = false;
+
+                $contents = $blueprint->contents();
+                $fieldtypes = ['bard', 'replicator'];
+                $bigArrayOfFields = [];
+
+                foreach ($contents as $key => $value) {
+                    $this->findFields($value, $fieldtypes, $key, $bigArrayOfFields);
+                }
+
+                foreach ($bigArrayOfFields as $path) {
+                    $fieldContents = Arr::get($contents, $path);
+
+                    $fieldContents['sets'] = collect($fieldContents['sets'])
+                        ->map(function ($setGroup) use ($originalPath, $newPath, &$hasUpdatedBlueprint) {
+                            $setGroup['sets'] = collect($setGroup['sets'])
+                                ->map(function ($set) use ($originalPath, $newPath, &$hasUpdatedBlueprint) {
+                                    if ($set['image'] === $originalPath) {
+                                        $set['image'] = $newPath;
+                                        $hasUpdatedBlueprint = true;
+                                    }
+
+                                    return $set;
+                                })
+                                ->all();
+
+                            return $setGroup;
+                        })
+                        ->all();
+
+                    Arr::set($contents, $path, $fieldContents);
+                }
+
+                if ($hasUpdatedBlueprint) {
+                    $blueprint->setContents($contents)->save();
+                }
+            });
+
         if ($hasUpdatedItems) {
             AssetReferencesUpdated::dispatch($asset);
         }
+    }
+
+    protected function findFields(array $array, array $fieldtypes, string $dottedPrefix, array &$bigArrayOfFields)
+    {
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $this->findFields($value, $fieldtypes, "$dottedPrefix.$key", $bigArrayOfFields);
+            } elseif (is_string($value)) {
+                if ($key === 'type' && in_array($value, $fieldtypes)) {
+                    $bigArrayOfFields[] = $dottedPrefix;
+                }
+            }
+        }
+    }
+
+    protected function getBlueprintsContainingData()
+    {
+        //        $additionalBlueprints = Blueprint::getAdditionalNamespaces()
+        //            ->keys()
+        //            ->map(fn ($namespace) => Blueprint::in($namespace))
+        //            ->all();
+
+        $additionalBlueprints = [];
+
+        return collect()
+            ->merge(Collection::all()->flatMap->entryBlueprints())
+            ->merge(Taxonomy::all()->flatMap->termBlueprints())
+            ->merge(Nav::all()->map->blueprint())
+            ->merge(AssetContainer::all()->map->blueprint())
+            ->merge(GlobalSet::all()->map->blueprint())
+            ->merge(Form::all()->map->blueprint())
+            ->merge($additionalBlueprints);
     }
 }
