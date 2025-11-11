@@ -24,6 +24,6 @@ const props = defineProps({
             <template v-else>{{ text }}</template>
             <span v-if="required" class="relative -top-px ms-0.5 text-red-600">*</span>
         </div>
-        <Badge v-if="badge" :text="badge" variant="flat" />
+        <Badge v-if="badge" :text="badge" />
     </label>
 </template>

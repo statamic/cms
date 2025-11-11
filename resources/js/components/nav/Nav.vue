@@ -1,6 +1,6 @@
 <script setup>
 import { Link, usePage } from '@inertiajs/vue3';
-import { Badge, Icon, Tooltip } from '@ui';
+import { Badge, Icon } from '@ui';
 import useNavigation from './navigation.js';
 import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import DynamicHtmlRenderer from '@/components/DynamicHtmlRenderer.vue';
@@ -39,6 +39,15 @@ onMounted(() => {
             }
         }, { immediate: true });
     });
+
+    // Mark page as fully loaded after all resources are loaded
+    if (document.readyState === 'complete') {
+        document.documentElement.classList.add('page-fully-loaded');
+    } else {
+        window.addEventListener('load', () => {
+            document.documentElement.classList.add('page-fully-loaded');
+        });
+    }
 
     // Close nav when clicking outside (only on mobile)
     document.addEventListener('click', handleClickOutside);
@@ -81,7 +90,7 @@ function handleChildClick(item, child) {
     }
 }
 
-Statamic.$keys.bind(['command+\\'], (e) => {
+Statamic.$keys.bind(['command+\\', ['[']], (e) => {
     e.preventDefault();
     toggle();
 });

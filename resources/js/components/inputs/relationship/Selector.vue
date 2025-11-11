@@ -127,7 +127,6 @@ import clone from '@/util/clone.js';
 import {
     Button,
     ButtonGroup,
-    Tooltip,
     Listing,
     ListingTable as Table,
     ListingSearch as Search,
@@ -146,7 +145,6 @@ export default {
         PageTree: defineAsyncComponent(() => import('../../structures/PageTree.vue')),
         Button,
         ButtonGroup,
-        Tooltip,
         Listing,
         Table,
         Search,

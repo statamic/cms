@@ -228,7 +228,6 @@ class ExtensionServiceProvider extends ServiceProvider
 
     protected $widgets = [
         Widgets\Collection::class,
-        Widgets\Header::class,
         Widgets\Template::class,
         Widgets\Updater::class,
         \Statamic\Forms\Widget::class,
@@ -253,6 +252,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Updates\RemoveParentField::class,
         Updates\UpdateGlobalVariables::class,
         Updates\PublishMigrationForTwoFactorColumns::class,
+        Updates\PublishMigrationForWebauthnTable::class,
         Updates\AddAddonSettingsToGitConfig::class,
     ];
 

@@ -473,7 +473,6 @@ class Statamic
     public static function nonInertiaPageData()
     {
         $props = Inertia::getShared();
-        $props['_statamic']['isInertia'] = false;
 
         return [
             'url' => '/'.request()->path(),

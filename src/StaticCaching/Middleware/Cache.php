@@ -167,6 +167,10 @@ class Cache
             return false;
         }
 
+        if ($this->hasValidRecacheToken($request)) {
+            return false;
+        }
+
         return true;
     }
 
@@ -200,6 +204,15 @@ class Cache
         }
 
         return true;
+    }
+
+    private function hasValidRecacheToken($request)
+    {
+        if (! $token = $request->input(StaticCache::recacheTokenParameter())) {
+            return false;
+        }
+
+        return StaticCache::checkRecacheToken($token);
     }
 
     private function createLock($request): Lock

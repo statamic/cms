@@ -86,7 +86,8 @@ class DuplicateEntry extends Action
             ->blueprint($original->blueprint()->handle())
             ->published(false)
             ->data($data)
-            ->origin($origin);
+            ->origin($origin)
+            ->updateLastModified(User::current());
 
         if ($original->collection()->requiresSlugs()) {
             $entry->slug($slug);

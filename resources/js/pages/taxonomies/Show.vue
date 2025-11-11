@@ -1,9 +1,11 @@
 <script>
 import Head from '@/pages/layout/Head.vue';
 import { Header, Dropdown, DropdownMenu, DropdownItem, Listing } from '@ui';
+import { Link } from '@inertiajs/vue3';
 
 export default {
     components: {
+        Link,
         Head,
         Header,
         Dropdown,
@@ -130,7 +132,7 @@ export default {
         >
             <template #cell-title="{ row: term }">
                 <div class="flex items-center">
-                    <a :href="term.edit_url">{{ term.title }}</a>
+                    <Link :href="term.edit_url">{{ term.title }}</Link>
                 </div>
             </template>
             <template #cell-slug="{ row: term }">

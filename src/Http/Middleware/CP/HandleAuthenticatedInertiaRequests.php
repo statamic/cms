@@ -71,7 +71,9 @@ class HandleAuthenticatedInertiaRequests
         return [
             'valid' => $licenses->valid(),
             'requestFailed' => $licenses->requestFailed(),
-            'requestFailureMessage' => $licenses->requestFailureMessage(),
+            'requestFailureMessage' => $licenses->requestFailed()
+                ? $licenses->requestFailureMessage()
+                : null,
             'isOnPublicDomain' => $licenses->isOnPublicDomain(),
             'alert' => ($alert = $licenses->licensingAlert()) ? [
                 ...$alert,

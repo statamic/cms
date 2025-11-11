@@ -265,7 +265,9 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
                 // override array, but only keys that don't already exist in the actual partial field's config.
                 $referencedField = FieldRepository::find($existingField['field']);
                 $referencedFieldConfig = $referencedField->config();
-                $config = array_merge($config, $referencedFieldConfig);
+                $fieldOverrides = $existingField['config'] ?? [];
+
+                $config = array_merge($config, $referencedFieldConfig, $fieldOverrides);
                 $config = Arr::except($config, array_keys($referencedFieldConfig));
                 $field = ['handle' => $handle, 'field' => $existingField['field'], 'config' => $config];
             } else {
@@ -659,7 +661,8 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 
         $field = $this->contents['tabs'][$tab]['sections'][$sectionKey]['fields'][$fieldKey];
 
-        $isImportedField = Arr::has($field, 'config');
+        $fieldValue = Arr::get($field, 'field');
+        $isImportedField = is_string($fieldValue);
 
         if ($isImportedField) {
             $existingConfig = Arr::get($field, 'config', []);

@@ -11,7 +11,7 @@
                 </DropdownMenu>
             </Dropdown>
 
-            <ui-badge icon="padlock-locked" :text="__('Read Only')" variant="flat" v-if="!canEdit" />
+            <ui-badge icon="padlock-locked" :text="__('Read Only')" v-if="!canEdit" />
 
             <SiteSelector
                 v-if="showLocalizationSelector"
@@ -73,10 +73,6 @@ import { Button, Dropdown, DropdownItem, DropdownMenu, Header, PublishContainer,
 import { computed, ref } from 'vue';
 import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';
 
-let saving = ref(false);
-let errors = ref({});
-let container = null;
-
 export default {
     components: {
         PublishComponents,
@@ -134,16 +130,23 @@ export default {
             readOnly: this.initialReadOnly,
             syncFieldConfirmationText: __('messages.sync_entry_field_confirmation_text'),
             pendingLocalization: null,
+
+            savingRef: ref(false),
+            errorsRef: ref({}),
         };
     },
 
     computed: {
+        containerRef() {
+            return computed(() => this.$refs.container);
+        },
+
         saving() {
-            return saving.value;
+            return this.savingRef.value;
         },
 
         errors() {
-            return errors.value;
+            return this.errorsRef.value;
         },
 
         somethingIsLoading() {
@@ -186,7 +189,11 @@ export default {
             if (!this.canSave) return;
 
             new Pipeline()
-                .provide({ container, errors, saving })
+                .provide({
+                    container: this.containerRef,
+                    errors: this.errorsRef,
+                    saving: this.savingRef,
+                })
                 .through([
                     new BeforeSaveHooks('global-set', {
                         globalSet: this.initialHandle,
@@ -299,8 +306,6 @@ export default {
 
     created() {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
-
-        container = computed(() => this.$refs.container);
     },
 };
 </script>

@@ -6,10 +6,10 @@
                     <ui-icon name="handles" class="blueprint-drag-handle size-4 cursor-grab text-gray-300 dark:text-gray-600" />
                     <div class="flex flex-1 items-center justify-between">
                         <div class="flex flex-1 items-center py-2">
-                            <ui-icon class="size-4 me-2 text-blue-600" name="fieldsets" />
+                            <ui-icon class="size-4 me-2 text-ui-accent-text/80 dark:text-dark-ui-accent-text/80" name="fieldsets" />
                             <div class="flex items-center gap-2">
                             <!-- @TODO: Show fieldset.title -->
-                                <button class="cursor-pointer overflow-hidden text-ellipsis text-sm text-blue-600 hover:text-blue-600" v-text="field.fieldset" @click="$emit('edit')" />
+                                <button class="cursor-pointer overflow-hidden text-ellipsis text-sm text-ui-accent-text hover:text-ui-accent-text/80 dark:text-dark-ui-accent-text dark:hover:text-dark-ui-accent-text/80" v-text="field.fieldset" @click="$emit('edit')" />
                                 <ui-icon name="link" class="text-gray-400" />
                                 <span class="text-gray-500 font-mono text-2xs" v-text="__('fieldset')" />
                             </div>

@@ -66,12 +66,9 @@ const triggerClasses = cva({
         size: {
             xl: 'px-5 h-12 text-lg rounded-lg',
             lg: 'px-4 h-12 text-base rounded-lg',
-            base: 'px-4 h-10 text-sm rounded-lg',
-            sm: 'px-3 h-8 text-[0.8125rem] rounded-lg',
-            xs: 'px-2 h-6 text-xs rounded-md',
-        },
-        'discrete-focus-outline': {
-            true: 'focus-outline-discrete',
+            base: 'px-4 h-10 text-md rounded-lg',
+            sm: 'px-3 h-8 text-sm rounded-lg',
+            xs: 'px-2 h-6 text-[0.8125rem] rounded-md',
         },
         readOnly: {
             true: 'border-dashed',
@@ -310,7 +307,7 @@ defineExpose({
                             </button>
 
                             <button type="button" v-else class="w-full text-start bg-transparent flex items-center gap-2 cursor-pointer focus-none" @keydown.space="openDropdown" data-ui-combobox-selected-option>
-                                <slot name="selected-option" v-bind="{ option: selectedOption }">
+                                <slot v-if="selectedOption" name="selected-option" v-bind="{ option: selectedOption }">
                                     <div v-if="icon" class="size-4">
                                         <Icon :name="icon" class="text-white/85 dark:text-white dark:opacity-50" />
                                     </div>
@@ -436,3 +433,15 @@ defineExpose({
         </slot>
     </div>
 </template>
+
+<style scoped>
+    /* Override the hardcoded z-index of Reka's popper content wrapper. We can't use a direct descendant selector because the stack is inside a portal, so instead we'll check to see if there is a stack present. */
+    body:has(.stack, .live-preview) [data-reka-popper-content-wrapper] {
+        z-index: var(--z-index-portal)!important;
+    }
+
+    /* Override the hardcoded z-index of Reka's popper content wrapper. When there's a modal present, we need to ensure the popper content is above it. We can't use a direct descendant selector because the modal is inside a portal, so instead we'll check to see if there is modal content present. */
+    body:has([data-ui-modal-content]) [data-reka-popper-content-wrapper] {
+        z-index: var(--z-index-modal)!important;
+    }
+</style>

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Globals;
 
+use Inertia\Testing\AssertableInertia as Assert;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\GlobalSet;
@@ -49,7 +50,13 @@ class EditGlobalVariablesTest extends TestCase
             ->actingAs($user)
             ->get($global->in('en')->editUrl())
             ->assertSuccessful()
-            ->assertViewHas('values', ['foo' => 'bar', 'unused' => null]);
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('globals/Edit')
+                ->has('values', fn (Assert $page) => $page
+                    ->where('foo', 'bar')
+                    ->where('unused', null)
+                )
+            );
     }
 
     #[Test]
@@ -70,7 +77,13 @@ class EditGlobalVariablesTest extends TestCase
             ->actingAs($user)
             ->get($global->in('en')->editUrl())
             ->assertSuccessful()
-            ->assertViewHas('values', ['foo' => null, 'unused' => null]);
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('globals/Edit')
+                ->has('values', fn (Assert $page) => $page
+                    ->where('foo', null)
+                    ->where('unused', null)
+                )
+            );
     }
 
     #[Test]

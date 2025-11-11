@@ -3,6 +3,8 @@
 namespace Statamic\Exceptions\Concerns;
 
 use Illuminate\Auth\Access\AuthorizationException as IlluminateAuthException;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Statamic\Statamic;
 
@@ -16,7 +18,7 @@ trait RendersControlPanelExceptions
 
         $response = parent::render($request, $e);
 
-        if (app()->isProduction()) {
+        if ($this->shouldRenderErrorPage($response)) {
             Statamic::$isRenderingCpException = true;
 
             return Inertia::render('errors/Error', ['status' => $response->getStatusCode()])
@@ -48,5 +50,14 @@ trait RendersControlPanelExceptions
         }
 
         return $target;
+    }
+
+    private function shouldRenderErrorPage($response): bool
+    {
+        if ($response instanceof JsonResponse || $response instanceof RedirectResponse) {
+            return false;
+        }
+
+        return app()->isProduction();
     }
 }

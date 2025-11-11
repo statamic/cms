@@ -37,9 +37,9 @@
                 <div v-if="page.collection && editable" class="flex items-center gap-2">
                     <Icon name="navigation" class="size-3.5 text-gray-500" />
                     <div>
-                        <a :href="page.collection.create_url" v-text="__('Add')" class="hover:text-blue-600" />
+                        <Link :href="page.collection.create_url" v-text="__('Add')" class="hover:text-ui-accent-text dark:hover:text-dark-ui-accent-text" />
                         <span class="mx-1 text-gray-400 dark:text-gray-500">/</span>
-                        <a :href="page.collection.edit_url" v-text="__('Edit')" class="hover:text-blue-600" />
+                        <Link :href="page.collection.edit_url" v-text="__('Edit')" class="hover:text-ui-accent-text dark:hover:text-dark-ui-accent-text" />
                     </div>
                 </div>
             </div>
@@ -72,9 +72,10 @@
 
 <script>
 import { Dropdown, DropdownMenu, Icon } from '@/components/ui';
+import { Link } from '@inertiajs/vue3';
 
 export default {
-    components: { Dropdown, DropdownMenu, Icon },
+    components: { Link, Dropdown, DropdownMenu, Icon },
     props: {
         page: Object,
         depth: Number,

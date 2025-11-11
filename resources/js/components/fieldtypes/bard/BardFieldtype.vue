@@ -6,7 +6,7 @@
         <div :class="{ 'publish-fields': fullScreenMode }">
             <div :class="fullScreenMode && wrapperClasses">
                 <div
-                    class="bard-fieldtype antialiased with-contrast:border-gray-500 shadow-ui-sm focus-outline-discrete"
+                    class="bard-fieldtype antialiased with-contrast:border-gray-500 shadow-ui-sm"
                     :class="{ 'bard-fullscreen': fullScreenMode }"
                     ref="container"
                     @dragstart.stop="ignorePageHeader(true)"
@@ -209,6 +209,7 @@ export default {
                 showReplicatorFieldPreviews: this.config.previews,
             },
             errorsById: {},
+            debounceNextUpdate: true,
         };
     },
 
@@ -350,8 +351,13 @@ export default {
     },
 
     created() {
-        Statamic.$components.register('NodeViewWrapper', NodeViewWrapper);
-        Statamic.$components.register('NodeViewContent', NodeViewContent);
+        if (! Statamic.$components.has('NodeViewWrapper')) {
+            Statamic.$components.register('NodeViewWrapper', NodeViewWrapper);
+        }
+
+        if (! Statamic.$components.has('NodeViewContent')) {
+            Statamic.$components.register('NodeViewContent', NodeViewContent);
+        }
     },
 
     async mounted() {
@@ -391,7 +397,11 @@ export default {
 
             if (json === oldJson) return;
 
-            this.updateDebounced(json);
+            this.debounceNextUpdate
+                ? this.updateDebounced(json)
+                : this.update(json);
+
+            this.debounceNextUpdate = true;
         },
 
         value(value, oldValue) {
@@ -456,6 +466,8 @@ export default {
 
             const { $head } = this.editor.view.state.selection;
             const { nodeBefore } = $head;
+
+            this.debounceNextUpdate = false;
 
             // Perform this in nextTick because the meta data won't be ready until then.
             this.$nextTick(() => {
@@ -789,7 +801,7 @@ export default {
         getExtensions() {
             let modeExts = this.inputIsInline ? [DocumentInline] : [DocumentBlock, HardBreak];
 
-            if (this.config.inline === 'break') {
+            if (this.inputIsInline && this.config.inline_hard_breaks) {
                 modeExts.push(
                     HardBreak.extend({
                         addKeyboardShortcuts() {
@@ -942,3 +954,47 @@ export default {
     },
 };
 </script>
+
+<style>
+@layer ui {
+    /* This container query is inline because it breaks Vite's CSS compilation. Possibly because of the container query syntax and nesting */
+    .bard-fixed-toolbar {
+        /* While the fixed toolbar is "stuck", mask the focus state of the editor to prevent blue focus lines appearing around the side of the toolbar while scrolling */
+        container-type: scroll-state;
+        @container scroll-state(stuck: top) {
+            > * {
+                position: relative;
+                &::after {
+                    content: '';
+                    position: absolute;
+                    inset: -4px -8px;
+                    box-shadow:
+                        /* Left Mask */
+                        -1px 0px 0px var(--color-gray-300),
+                        /* Right Mask */
+                        1px 0px 0px var(--color-gray-300),
+                        /* Bottom "Shadow" */
+                        0 4px 5px -3px hsl(0deg 0% 85%)
+                    ;
+                    border-inline-width: 2px;
+                    border-inline-color: var(--color-gray-50);
+                }
+                :is(.dark) & {
+                    &::after {
+                        box-shadow:
+                            /* Left Mask */
+                            -1px 0px 0px var(--color-gray-700),
+                            /* Right Mask */
+                            1px 0px 0px var(--color-gray-700),
+                            /* Bottom "Shadow" */
+                            0 4px 5px -3px hsl(0deg 0% 10%)
+                        ;
+                        border-inline-color: var(--color-gray-850);
+                    }
+                }
+            }
+        }
+    }
+}
+</style>
+

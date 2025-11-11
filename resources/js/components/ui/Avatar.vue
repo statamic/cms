@@ -168,7 +168,7 @@ const meshGradientStyle = computed(() => {
 
 const avatarClasses = computed(() => {
     const classes = cva({
-        base: 'size-7 rounded-xl [button:has(&)]:rounded-xl shape-squircle',
+        base: 'size-7 rounded-xl [button:has(&)]:rounded-xl shape-squircle object-cover',
         variants: {
             type: {
                 avatar: '',

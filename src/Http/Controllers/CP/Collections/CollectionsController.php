@@ -223,7 +223,9 @@ class CollectionsController extends CpController
     {
         $this->authorize('create', CollectionContract::class, __('You are not authorized to create collections.'));
 
-        return view('statamic::collections.create');
+        return Inertia::render('collections/Create', [
+            'submitUrl' => cp_route('collections.store'),
+        ]);
     }
 
     public function fresh($collection)
@@ -650,6 +652,7 @@ class CollectionsController extends CpController
                         'display' => __('Preview Targets'),
                         'instructions' => __('statamic::messages.collections_preview_targets_instructions'),
                         'type' => 'grid',
+                        'full_width_setting' => true,
                         'fields' => [
                             [
                                 'handle' => 'label',

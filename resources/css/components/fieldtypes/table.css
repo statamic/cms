@@ -50,13 +50,13 @@ Table Fieldtype
         }
     }
 
-    /* If the table has no header, top left and top right corners of the first row should be rounded */
-    tbody:not(:has(th)):first-child td {
+    /* If the table has no header, top left and top right corners of the first row should be rounded. E.g. a list fieldtype but not a table fieldtype. */
+    &:not(:has(th)) tbody tr:first-child td {
         &:first-child {
-            @apply rounded-tl-lg;
+            @apply rounded-tl-[calc(var(--radius-lg)-1px)];
         }
         &:last-child {
-            @apply rounded-tr-lg;
+            @apply rounded-tr-[calc(var(--radius-lg)-1px)];
         }
     }
 

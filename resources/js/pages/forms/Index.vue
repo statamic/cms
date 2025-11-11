@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import Head from '@/pages/layout/Head.vue';
 import { Header, Button, CommandPaletteItem, EmptyStateMenu, EmptyStateItem, DocsCallout, Icon, Listing, DropdownItem } from '@ui';
 import useStatamicPageProps from '@/composables/page-props.js';
-import { Link } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 
 const props = defineProps([
     'forms',
@@ -17,9 +17,7 @@ const props = defineProps([
 const { isPro } = useStatamicPageProps();
 const isEmpty = computed(() => props.forms.length === 0);
 
-function refresh() {
-    window.location.reload();
-}
+const reloadPage = () => router.reload();
 </script>
 
 <template>
@@ -66,7 +64,7 @@ function refresh() {
             </CommandPaletteItem>
         </Header>
 
-        <Listing :items="forms" :columns="initialColumns" :action-url="actionUrl" @refreshing="refresh">
+        <Listing :items="forms" :columns="initialColumns" :action-url="actionUrl" @refreshing="reloadPage">
             <template #cell-title="{ row: form }">
                 <Link :href="form.show_url">{{ form.title }}</Link>
             </template>

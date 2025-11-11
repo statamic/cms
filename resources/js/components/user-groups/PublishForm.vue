@@ -2,6 +2,7 @@
 import { Header, Button, Dropdown, DropdownMenu, DropdownItem, PublishContainer } from '@/components/ui';
 import { ref, useTemplateRef } from 'vue';
 import { Pipeline, Request } from '@ui/Publish/SavePipeline.js';
+import { router } from '@inertiajs/vue3';
 
 let saving = ref(false);
 let errors = ref({});
@@ -30,7 +31,7 @@ function save() {
         .provide({ container, errors, saving })
         .through([new Request(props.actions.save, props.method)])
         .then((response) => {
-            if (props.isCreating) window.location = response.data.redirect;
+            if (props.isCreating) router.get(response.data.redirect);
             Statamic.$toast.success(__('Saved'));
             title.value = response.data.title;
         });

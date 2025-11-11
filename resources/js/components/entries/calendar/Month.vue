@@ -43,14 +43,14 @@ const weekHasEntries = (weekDates) => {
 const cellClasses = (weekDate, monthValue) => ({
     'bg-gray-100 dark:bg-gray-800 ring-1 ring-gray-200 dark:ring-gray-700': weekDate.month !== monthValue.month,
     'bg-white dark:bg-gray-900': weekDate.month === monthValue.month,
-    'bg-ui-accent/10! border border-ui-accent!': isToday(weekDate),
+    'bg-ui-accent-bg/10! border border-ui-accent-bg!': isToday(weekDate),
 });
 
 const dateNumberClasses = (weekDate, selected, today, outsideView) => ({
     'text-gray-400 dark:text-gray-600': outsideView,
     'text-gray-900 dark:text-white': !outsideView,
     'text-white bg-blue-600': props.selectedDate && props.selectedDate.toString() === weekDate.toString(),
-    'text-ui-accent': today
+    'text-ui-accent-text dark:text-dark-ui-accent-text': today
 });
 
 const entryStatusClasses = (status) => ({
@@ -77,7 +77,7 @@ const selectDate = (date) => {
                     <div class="flex items-center justify-center gap-1">
                         <div
                             v-if="isCurrentDay(index)"
-                            class="w-1.5 h-1.5 mr-1 bg-ui-accent rounded-full"
+                            class="w-1.5 h-1.5 mr-1 bg-ui-accent-bg rounded-full"
                         ></div>
                         <span class="@4xl:hidden" v-text="day.slice(0, 2)" />
                         <span class="hidden @4xl:block" v-text="day" />
@@ -106,7 +106,7 @@ const selectDate = (date) => {
                         <CalendarCellTrigger
                             :day="weekDate"
                             :month="month.value"
-                            class="w-full h-full flex flex-col items-center justify-center @3xl:items-start @3xl:justify-start"
+                            class="max-w-full max-h-full aspect-square flex flex-col items-center justify-center @3xl:items-start @3xl:justify-start"
                             v-slot="{ dayValue, selected, today, outsideView }"
                             @click="selectDate(weekDate)"
                         >
@@ -127,7 +127,7 @@ const selectDate = (date) => {
                                 </div>
                             </div>
 
-                            <div class="space-y-1.5 flex-1 overflow-scroll h-full w-full hidden @3xl:block">
+                            <div class="space-y-1.5 flex-1 overflow-scroll overscroll-contain h-full w-full hidden @3xl:block">
                                 <CalendarEntry
                                     v-for="entry in getEntriesForDate(weekDate)"
                                     :key="entry.id"
@@ -156,7 +156,7 @@ const selectDate = (date) => {
 </template>
 
 <style scoped>
-@media (max-height: 999px) {
+@media (height < 1000px) and (width >= 1200px) {
     .calendar-grid {
         tr:not([data-week-has-entries="true"]) td {
             aspect-ratio: 2 / 1;

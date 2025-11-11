@@ -6,6 +6,7 @@ use Inertia\Inertia;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Widgets\Loader;
 
@@ -20,12 +21,12 @@ class DashboardController extends CpController
     {
         $widgets = $this->getDisplayableWidgets($loader);
 
-        if ($widgets->isEmpty()) {
-            return view('statamic::dashboard.empty');
-        }
-
         return Inertia::render('Dashboard', [
             'widgets' => $widgets,
+            'pro' => Statamic::pro(),
+            'blueprintsUrl' => cp_route('blueprints.index'),
+            'collectionsCreateUrl' => cp_route('collections.create'),
+            'navigationCreateUrl' => cp_route('navigation.create'),
         ]);
     }
 
@@ -67,10 +68,12 @@ class DashboardController extends CpController
                     'classes' => $widget->config('classes'),
                     'width' => $widget->config('width', 100),
                     'html' => (string) $widget->html(),
+                    'component' => $widget->component(),
                 ];
             })
             ->reject(function ($widget) {
-                return empty($widget['html']);
-            });
+                return empty($widget['component']) && empty($widget['html']);
+            })
+            ->values();
     }
 }

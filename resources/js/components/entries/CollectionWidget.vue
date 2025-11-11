@@ -16,6 +16,7 @@ const props = defineProps({
     additionalColumns: Array,
     collection: String,
     title: String,
+    listingUrl: String,
     initialPerPage: {
         type: Number,
         default: 5,
@@ -26,6 +27,9 @@ const props = defineProps({
     initialSortDirection: {
         type: String,
     },
+    canCreate: Boolean,
+    createLabel: String,
+    blueprints: Array,
 });
 
 const requestUrl = cp_url(`collections/${props.collection}/entries`);
@@ -35,6 +39,7 @@ const cols = computed(() => [{ label: 'Title', field: 'title', visible: true }, 
 const widgetProps = computed(() => ({
     title: props.title,
     icon: 'collections',
+    href: props.listingUrl,
 }));
 
 function formatDate(value) {
@@ -92,7 +97,13 @@ function formatDate(value) {
                 </div>
                 <template #actions>
                     <Pagination />
-                    <slot name="actions" />
+                    <create-entry-button
+                        v-if="canCreate"
+                        :text="createLabel"
+                        size="sm"
+                        variant="default"
+                        :blueprints
+                    />
                 </template>
             </Widget>
         </template>

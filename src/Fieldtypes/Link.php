@@ -12,6 +12,7 @@ use Statamic\Facades\Site;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes\Link\ArrayableLink;
+use Statamic\GraphQL\Types\LinkValueType;
 use Statamic\Support\Str;
 
 class Link extends Fieldtype
@@ -189,18 +190,7 @@ class Link extends Fieldtype
 
     public function toGqlType()
     {
-        return [
-            'type' => GraphQL::string(),
-            'resolve' => function ($item, $args, $context, $info) {
-                if (! $augmented = $item->resolveGqlValue($info->fieldName)) {
-                    return null;
-                }
-
-                $item = $augmented->value();
-
-                return is_object($item) ? $item->url() : $item;
-            },
-        ];
+        return GraphQL::type(LinkValueType::NAME);
     }
 
     protected function getConfiguredCollections()

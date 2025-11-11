@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Globals;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Contracts\Globals\GlobalSet as GlobalSetContract;
 use Statamic\CP\PublishForm;
 use Statamic\Facades\Blueprint;
@@ -40,12 +41,10 @@ class GlobalsController extends CpController
             ];
         })->filter()->values();
 
-        if ($globals->isEmpty()) {
-            return view('statamic::globals.empty');
-        }
-
-        return view('statamic::globals.index', [
+        return Inertia::render('globals/Index', [
             'globals' => $globals,
+            'createUrl' => cp_route('globals.create'),
+            'canCreate' => User::current()->can('create', GlobalSetContract::class),
         ]);
     }
 
@@ -112,7 +111,9 @@ class GlobalsController extends CpController
     {
         $this->authorize('create', GlobalSetContract::class);
 
-        return view('statamic::globals.create');
+        return Inertia::render('globals/Create', [
+            'submitUrl' => cp_route('globals.store'),
+        ]);
     }
 
     public function store(Request $request)

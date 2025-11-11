@@ -43,6 +43,10 @@ class Components {
         if (appended) return appended;
     }
 
+    has(name) {
+        return this.app.component(name) !== undefined;
+    }
+
     getAppended(id) {
         return this.components.value.find((c) => c.id === id);
     }

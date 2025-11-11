@@ -41,9 +41,9 @@
 
             <div
                 v-if="!loading && (!readOnly || type === 'entry')"
-                class="flex flex-row-reverse items-center justify-between border-t bg-gray-200 p-4 dark:border-dark-900 dark:bg-dark-600"
+                class="flex flex-wrap flex-row-reverse gap-2 items-end justify-between border-t bg-gray-200 p-4 dark:border-dark-900 dark:bg-dark-600"
             >
-                <div v-if="!readOnly">
+                <div class="flex flex-wrap justify-end" v-if="!readOnly">
                     <Button variant="ghost" class="me-2" :text="__('Cancel')" @click="confirmClose(close)" />
                     <Button variant="primary" :text="__('Apply')" @click="submit" />
                 </div>
@@ -72,10 +72,6 @@ import { computed, ref } from 'vue';
 import { Pipeline, Request } from '@ui/Publish/SavePipeline.js';
 import { clone } from '@/bootstrap/globals.js';
 
-let saving = ref(false);
-let errors = ref({});
-let container = null;
-
 export default {
     emits: ['closed', 'submitted', 'publish-info-updated', 'localized-fields-updated'],
 
@@ -98,13 +94,6 @@ export default {
         readOnly: Boolean,
     },
 
-    setup() {
-        return {
-            saving,
-            errors,
-        }
-    },
-
     data() {
         return {
             type: this.entry ? 'entry' : 'url',
@@ -118,10 +107,24 @@ export default {
             saveKeyBinding: null,
             publishContainer: 'tree-page',
             closingWithChanges: false,
+            savingRef: ref(false),
+            errorsRef: ref({}),
         };
     },
 
     computed: {
+        containerRef() {
+            return computed(() => this.$refs.container);
+        },
+
+        saving() {
+            return this.savingRef.value;
+        },
+
+        errors() {
+            return this.errorsRef.value;
+        },
+
         headerText() {
             return this.entry ? __('Link to Entry') : __('Nav Item');
         },
@@ -206,7 +209,11 @@ export default {
             const values = container.value.visibleValues;
 
             new Pipeline()
-                .provide({ container, errors, saving })
+                .provide({
+                    container: this.containerRef,
+                    errors: this.errorsRef,
+                    saving: this.savingRef,
+                })
                 .through([new Request(postUrl, 'POST', {
                     type: this.type,
                     values,
@@ -291,8 +298,6 @@ export default {
         });
 
         this.getPageValues();
-
-        container = computed(() => this.$refs.container);
     },
 
     unmounted() {

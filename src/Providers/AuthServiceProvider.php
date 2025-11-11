@@ -15,6 +15,7 @@ use Statamic\Auth\Protect\ProtectorManager;
 use Statamic\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 use Statamic\Auth\UserProvider;
 use Statamic\Auth\UserRepositoryManager;
+use Statamic\Auth\WebAuthn\Serializer;
 use Statamic\Contracts\Auth\RoleRepository;
 use Statamic\Contracts\Auth\TwoFactor\TwoFactorAuthenticationProvider as TwoFactorAuthenticationProviderContract;
 use Statamic\Contracts\Auth\UserGroupRepository;
@@ -22,6 +23,13 @@ use Statamic\Contracts\Auth\UserRepository;
 use Statamic\Facades\Permission;
 use Statamic\Facades\User;
 use Statamic\Policies;
+use Webauthn\AttestationStatement\AttestationStatementSupportManager;
+use Webauthn\AttestationStatement\NoneAttestationStatementSupport;
+use Webauthn\AuthenticatorAssertionResponseValidator;
+use Webauthn\AuthenticatorAttestationResponseValidator;
+use Webauthn\CeremonyStep\CeremonyStepManagerFactory;
+use Webauthn\Denormalizer\WebauthnSerializerFactory;
+use Webauthn\PublicKeyCredentialRpEntity;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -85,6 +93,49 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(TwoFactorAuthenticationProviderContract::class, TwoFactorAuthenticationProvider::class);
+
+        $this->registerWebauthnBindings();
+    }
+
+    private function registerWebAuthnBindings()
+    {
+        $this->app->singleton(AttestationStatementSupportManager::class, function () {
+            $manager = AttestationStatementSupportManager::create();
+            $manager->add(NoneAttestationStatementSupport::create());
+
+            return $manager;
+        });
+
+        $this->app->singleton(
+            Serializer::class,
+            fn ($app) => new Serializer(
+                (new WebauthnSerializerFactory($app[AttestationStatementSupportManager::class]))->create()
+            )
+        );
+
+        $this->app->bind(
+            PublicKeyCredentialRpEntity::class,
+            fn ($app) => new PublicKeyCredentialRpEntity(
+                name: $app['config']->get('app.name'),
+                id: $app->make('request')->host(),
+            )
+        );
+
+        $this->app->singleton(CeremonyStepManagerFactory::class, fn () => new CeremonyStepManagerFactory);
+
+        $this->app->bind(
+            AuthenticatorAssertionResponseValidator::class,
+            fn ($app) => AuthenticatorAssertionResponseValidator::create(
+                $app[CeremonyStepManagerFactory::class]->requestCeremony()
+            )
+        );
+
+        $this->app->bind(
+            AuthenticatorAttestationResponseValidator::class,
+            fn ($app) => AuthenticatorAttestationResponseValidator::create(
+                $app[CeremonyStepManagerFactory::class]->creationCeremony()
+            )
+        );
     }
 
     public function boot()

@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, provide } from 'vue';
 import Head from '@/pages/layout/Head.vue';
 import { PublishForm } from '@ui';
 import { dateFormatter } from '@api';
@@ -15,6 +15,8 @@ const props = defineProps([
 
 const formattedDate = computed(() => dateFormatter.format(props.date));
 const title = computed(() => `${__('Form Submission')} ${props.id}`);
+
+provide('isFormSubmission', true);
 </script>
 
 <template>

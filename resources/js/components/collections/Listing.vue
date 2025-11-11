@@ -18,7 +18,7 @@
                     <div class="flex items-center gap-1.5">
                         <ui-heading size="lg" :text="__(collection.title)" :href="collection.available_in_selected_site ? collection.entries_url : collection.edit_url" />
                         <span v-if="collection.available_in_selected_site" class="text-sm text-gray-600">
-                            ({{ __('messages.entry_count', { count: collection.entries_count }) }})
+                            ({{ __n('messages.entry_count', collection.entries_count, { count: collection.entries_count }) }})
                         </span>
                     </div>
                     <aside class="flex items-center gap-2">
@@ -107,15 +107,15 @@
 
                 <ui-panel-footer v-if="collection.available_in_selected_site" class="flex items-center gap-6 text-sm text-gray-600">
                     <div class="flex items-center gap-2">
-                        <ui-badge variant="flat" :text="String(collection.published_entries_count)" pill class="bg-gray-200 dark:bg-gray-700" />
+                        <ui-badge :text="String(collection.published_entries_count)" pill class="bg-gray-200 dark:bg-gray-700" />
                         <span>{{ __('Published') }}</span>
                     </div>
                     <div class="flex items-center gap-2 text-sm" v-if="collection.scheduled_entries_count > 0">
-                        <ui-badge variant="flat" :text="String(collection.scheduled_entries_count)" pill class="bg-gray-200 dark:" />
+                        <ui-badge :text="String(collection.scheduled_entries_count)" pill class="bg-gray-200 dark:" />
                         <span>{{ __('Scheduled') }}</span>
                     </div>
                     <div class="flex items-center gap-2 text-sm" v-if="collection.draft_entries_count > 0">
-                        <ui-badge variant="flat" :text="String(collection.draft_entries_count)" pill class="bg-gray-200 dark:" />
+                        <ui-badge :text="String(collection.draft_entries_count)" pill class="bg-gray-200 dark:" />
                         <span>{{ __('Drafts') }}</span>
                     </div>
                 </ui-panel-footer>

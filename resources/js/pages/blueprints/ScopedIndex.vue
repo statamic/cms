@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, watch } from 'vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 import Head from '@/pages/layout/Head.vue';
 import { Header, Button, DocsCallout, DropdownItem, Listing } from '@ui';
 import axios from 'axios';
@@ -41,14 +41,7 @@ function saveOrder() {
         .catch(() => Statamic.$toast.error(__('Something went wrong')));
 }
 
-function reloadPage() {
-    window.location.reload();
-}
-
-function removeRow(row) {
-    const i = rows.value.findIndex((r) => r.id === row.id);
-    rows.value.splice(i, 1);
-}
+const reloadPage = () => router.reload();
 </script>
 
 <template>
@@ -81,7 +74,7 @@ function removeRow(row) {
                 <resource-deleter
                     :ref="`deleter_${blueprint.id}`"
                     :resource="blueprint"
-                    @deleted="removeRow(blueprint)"
+                    reload
                 />
             </div>
         </template>

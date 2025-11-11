@@ -9,6 +9,7 @@ import RemovePageConfirmation from '@/components/navigation/RemovePageConfirmati
 import SiteSelector from '@/components/SiteSelector.vue';
 import { Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, Button, EmptyStateMenu, EmptyStateItem, Header } from '@ui';
 import { toggleArchitecturalBackground } from '@/pages/layout/architectural-background.js';
+import { router } from '@inertiajs/vue3';
 
 export default {
     components: {
@@ -102,7 +103,7 @@ export default {
         },
 
         maxPagesSelection() {
-            if (this.fields.filter((field) => field.validate?.includes('required')).length > 0) {
+            if (this.fields.filter((field) => field.required).length > 0) {
                 return 1;
             }
 
@@ -238,7 +239,7 @@ export default {
         },
 
         siteSelected(site) {
-            window.location = this.sites.find((s) => s.handle === site).url;
+            router.get(this.sites.find((s) => s.handle === site).url);
         },
 
         updatePublishInfo(info) {

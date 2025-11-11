@@ -55,7 +55,7 @@ return [
     */
 
     'widgets' => [
-        'getting_started',
+        //
     ],
 
     /*
@@ -112,8 +112,10 @@ return [
         // 'success' => Color::Green[400],
         // 'danger' => Color::Red[600],
 
-        // 'ui-accent' => Color::Zinc[800],
-        // 'dark-ui-accent' => Color::Zinc[200],
+        // 'ui-accent-bg' => Color::Zinc[800],
+        // 'ui-accent-text' => Color::Zinc[800],
+        // 'dark-ui-accent-bg' => Color::Zinc[950],
+        // 'dark-ui-accent-text' => Color::Zinc[400],
 
         // 'body-bg' => Color::Zinc[100],
         // 'body-border' => Color::Transparent,

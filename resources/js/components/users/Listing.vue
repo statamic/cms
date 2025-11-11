@@ -13,10 +13,10 @@
             push-query
         >
             <template #cell-email="{ row: user }">
-                <a class="title-index-field" :href="user.edit_url" @click.stop>
+                <Link class="title-index-field" :href="user.edit_url" @click.stop>
                     <ui-avatar :user="user" class="size-8 text-xs ltr:mr-2 rtl:ml-2" />
                     <span v-text="user.email" />
-                </a>
+                </Link>
             </template>
             <template #cell-roles="{ row: user, value: roles }">
                 <div class="role-index-field">
@@ -42,16 +42,23 @@
                     <ui-icon name="x" class="size-3 text-gray-400 dark:text-gray-600" v-else />
                 </div>
             </template>
+            <template #prepended-row-actions="{ row: user }">
+                <DropdownItem :text="__('Edit')" :href="user.edit_url" icon="edit" v-if="user.editable" />
+                <DropdownItem :text="__('View')" :href="user.edit_url" icon="eye" v-else />
+            </template>
         </Listing>
     </div>
 </template>
 
 <script>
-import { Listing } from '@/components/ui';
+import { Listing, DropdownItem } from '@/components/ui';
+import { Link } from '@inertiajs/vue3';
 
 export default {
     components: {
+        Link,
         Listing,
+        DropdownItem,
     },
 
     props: {

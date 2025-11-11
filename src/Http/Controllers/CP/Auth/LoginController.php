@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Auth;
 
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Statamic\Facades\OAuth;
 use Statamic\Facades\User;
@@ -32,14 +33,19 @@ class LoginController extends CpController
 
     public function showLoginForm(Request $request)
     {
+        $oauthEnabled = OAuth::enabled();
+        $emailLoginEnabled = $oauthEnabled ? config('statamic.oauth.email_login_enabled') : true;
+
         return Inertia::render('auth/Login', [
             'title' => __('Log in'),
-            'oauthEnabled' => $enabled = OAuth::enabled(),
-            'emailLoginEnabled' => $enabled ? config('statamic.oauth.email_login_enabled') : true,
-            'providers' => $enabled ? $this->oauthProviders() : [],
+            'oauthEnabled' => $oauthEnabled,
+            'emailLoginEnabled' => $emailLoginEnabled,
+            'providers' => $oauthEnabled ? $this->oauthProviders() : [],
             'referer' => $this->getReferrer($request),
             'forgotPasswordUrl' => cp_route('password.request'),
             'submitUrl' => cp_route('login'),
+            'passkeyOptionsUrl' => cp_route('passkeys.auth.options'),
+            'passkeyVerifyUrl' => cp_route('passkeys.auth'),
         ]);
     }
 
@@ -51,7 +57,7 @@ class LoginController extends CpController
             'name' => $provider->name(),
             'icon' => Statamic::svg('oauth/'.$provider->name()),
             'url' => $provider->loginUrl().'?redirect='.$redirect,
-        ]);
+        ])->values();
     }
 
     public function login(Request $request)
@@ -60,6 +66,8 @@ class LoginController extends CpController
             $this->username() => 'required|string',
             'password' => 'required|string',
         ]);
+
+        $this->checkPasskeyEnforcement($request);
 
         $this->handleTooManyLoginAttempts($request);
 
@@ -141,5 +149,18 @@ class LoginController extends CpController
     public function username()
     {
         return 'email';
+    }
+
+    private function checkPasskeyEnforcement(Request $request)
+    {
+        if (! config('statamic.webauthn.allow_password_login_with_passkey', true)) {
+            if ($user = User::findByEmail($request->get($this->username()))) {
+                if ($user->passkeys()->isNotEmpty()) {
+                    throw ValidationException::withMessages([
+                        $this->username() => [trans('statamic::messages.password_passkeys_only')],
+                    ]);
+                }
+            }
+        }
     }
 }

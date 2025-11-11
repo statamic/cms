@@ -21,10 +21,12 @@ use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\Support\Traits\Hookable;
 
 class EntriesController extends CpController
 {
     use ExtractsFromEntryFields,
+        Hookable,
         QueriesFilters;
 
     public function index(FilteredRequest $request, $collection)
@@ -179,10 +181,6 @@ class EntriesController extends CpController
             'initialListingUrl' => cp_route('collections.show', $viewData['collection']),
             'itemActionUrl' => cp_route('collections.entries.actions.run', $viewData['collection']),
         ]);
-
-        return view('statamic::entries.edit', array_merge($viewData, [
-            'entry' => $entry,
-        ]));
     }
 
     public function update(Request $request, $collection, $entry)
@@ -290,11 +288,18 @@ class EntriesController extends CpController
             $blueprint->ensureFieldHasConfig('author', ['visibility' => 'read_only']);
         }
 
-        $values = Entry::make()->collection($collection)->values()->all();
+        $entry = Entry::make()->collection($collection);
+
+        $values = $entry->values()->all();
 
         if ($request->values) {
             $values = [...$values, ...$request->values];
         }
+
+        $values = $this->runHooksWith('creating-entry', [
+            'entry' => $entry,
+            'values' => $values,
+        ])->values ?? $values;
 
         $fields = $blueprint
             ->fields()
@@ -348,6 +353,9 @@ class EntriesController extends CpController
 
         return Inertia::render('entries/Create', [
             ...$viewData,
+            'canEditBlueprint' => User::current()->can('configure fields'),
+            'createAnotherUrl' => cp_route('collections.entries.create', [$collection, $site->handle(), 'blueprint' => $blueprint['handle'], 'parent' => $values['parent'] ?? null]),
+            'initialListingUrl' => cp_route('collections.show', $collection),
         ]);
     }
 

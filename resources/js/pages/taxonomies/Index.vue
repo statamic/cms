@@ -8,19 +8,12 @@ import useArchitecturalBackground from '@/pages/layout/architectural-background.
 const props = defineProps(['taxonomies', 'columns', 'canCreate', 'createUrl']);
 
 if (props.taxonomies.length === 0) useArchitecturalBackground();
-
-const rows = ref(props.taxonomies);
-
-function removeRow(row) {
-    const i = rows.value.findIndex((r) => r.id === row.id);
-    rows.value.splice(i, 1);
-}
 </script>
 
 <template>
     <Head :title="__('Taxonomies')" />
 
-    <Header :title="__('Taxonomies')" icon="taxonomies">
+    <Header v-if="taxonomies.length" :title="__('Taxonomies')" icon="taxonomies">
         <CommandPaletteItem
             v-if="canCreate"
             category="Actions"
@@ -39,11 +32,11 @@ function removeRow(row) {
     </Header>
 
     <template v-if="taxonomies.length">
-        <Listing :items="rows" :columns="columns" :allow-search="false" :allow-customizing-columns="false">
+        <Listing :items="taxonomies" :columns="columns" :allow-search="false" :allow-customizing-columns="false">
             <template #cell-title="{ row: taxonomy }">
                 <Link :href="taxonomy.terms_url">{{ __(taxonomy.title) }}</Link>
 
-                <resource-deleter :ref="`deleter_${taxonomy.id}`" :resource="taxonomy" @deleted="removeRow(taxonomy)" />
+                <resource-deleter :ref="`deleter_${taxonomy.id}`" :resource="taxonomy" reload />
             </template>
 
             <template #prepended-row-actions="{ row: taxonomy, index }">
