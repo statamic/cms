@@ -27,7 +27,7 @@
 
                 <div class="flex flex-1 grow flex-col overflow-auto md:flex-row md:justify-between">
                     <!-- Visual Area -->
-                    <div class="editor-preview md:min-h-auto flex min-h-[45vh] w-full flex-1 flex-col justify-between bg-gray-800 shadow-[inset_0px_4px_3px_0px_black] dark:bg-gray-900 md:w-1/2 md:flex-auto md:grow lg:w-2/3 md:ltr:rounded-se-md">
+                    <div class="editor-preview md:min-h-auto flex min-h-[45vh] w-full flex-1 flex-col justify-between bg-gray-800 shadow-[inset_0px_4px_3px_0px_black] dark:bg-gray-900 md:w-1/2 md:flex-auto md:grow lg:w-2/3 md:ltr:rounded-se-xl">
                         <!-- Toolbar -->
                         <div v-if="isToolbarVisible" class="@container/toolbar dark flex flex-wrap items-center justify-center gap-2 px-2 py-4">
                             <ItemActions
