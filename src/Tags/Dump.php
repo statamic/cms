@@ -3,7 +3,7 @@
 namespace Statamic\Tags;
 
 use Statamic\Support\Dumper;
-use Statamic\Tags\Concerns\AllowDumping;
+use Statamic\Support\Traits\AllowDumping;
 
 class Dump extends Tags
 {

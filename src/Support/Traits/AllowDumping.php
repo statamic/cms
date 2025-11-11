@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Tags\Concerns;
+namespace Statamic\Support\Traits;
 
 use Statamic\Tags\Parameters;
 

@@ -33,7 +33,7 @@ use Statamic\Support\Arr;
 use Statamic\Support\Dumper;
 use Statamic\Support\Html;
 use Statamic\Support\Str;
-use Statamic\Tags\Concerns\AllowDumping;
+use Statamic\Support\Traits\AllowDumping;
 use Stringy\StaticStringy as Stringy;
 
 class CoreModifiers extends Modifier
