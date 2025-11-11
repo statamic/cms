@@ -624,8 +624,12 @@ class CoreModifiers extends Modifier
     /**
      * Dump and die the output of a variable.
      */
-    public function dd($value)
+    public function dd($value, $params)
     {
+        if (! $this->allowDumping() && (Arr::get($params, 0) !== 'force')) {
+            return;
+        }
+
         dd(Dumper::resolve($value));
     }
 
