@@ -1850,6 +1850,137 @@ EOT;
         $this->assetHoff->path('hoff-new.jpg')->save();
     }
 
+    #[Test]
+    public function it_updates_references_in_bard_and_replicator_fields_in_blueprints()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+        $blueprint = $collection->entryBlueprint();
+
+        $blueprint->setContents([
+            'fields' => [
+                [
+                    'handle' => 'content',
+                    'field' => [
+                        'type' => 'bard',
+                        'sets' => [
+                            'set_group' => [
+                                'sets' => [
+                                    'first_set' => [
+                                        'image' => $this->assetHoff->path(),
+                                        'fields' => [['handle' => 'foo', 'field' => ['type' => 'text']]],
+                                    ],
+                                    'second_set' => [
+                                        'image' => 'marty.png',
+                                        'fields' => [['handle' => 'bar', 'field' => ['type' => 'text']]],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'handle' => 'page_builder',
+                    'field' => [
+                        'type' => 'replicator',
+                        'sets' => [
+                            'set_group' => [
+                                'sets' => [
+                                    'first_set' => [
+                                        'image' => $this->assetHoff->path(),
+                                        'fields' => [['handle' => 'foo', 'field' => ['type' => 'text']]],
+                                    ],
+                                    'second_set' => [
+                                        'image' => 'marty.png',
+                                        'fields' => [['handle' => 'bar', 'field' => ['type' => 'text']]],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $blueprint = Facades\Blueprint::find($blueprint->fullyQualifiedHandle());
+        $this->assertEquals('hoff.jpg', Arr::get($blueprint->contents(), 'tabs.main.sections.0.fields.1.field.sets.set_group.sets.first_set.image'));
+        $this->assertEquals('marty.png', Arr::get($blueprint->contents(), 'tabs.main.sections.0.fields.1.field.sets.set_group.sets.second_set.image'));
+        $this->assertEquals('hoff.jpg', Arr::get($blueprint->contents(), 'tabs.main.sections.0.fields.2.field.sets.set_group.sets.first_set.image'));
+        $this->assertEquals('marty.png', Arr::get($blueprint->contents(), 'tabs.main.sections.0.fields.2.field.sets.set_group.sets.second_set.image'));
+
+        $this->assetHoff->path('destination/hoff.jpg')->save();
+
+        $blueprint = Facades\Blueprint::find($blueprint->fullyQualifiedHandle());
+        $this->assertEquals('destination/hoff.jpg', Arr::get($blueprint->contents(), 'tabs.main.sections.0.fields.1.field.sets.set_group.sets.first_set.image')); // changed
+        $this->assertEquals('marty.png', Arr::get($blueprint->contents(), 'tabs.main.sections.0.fields.1.field.sets.set_group.sets.second_set.image'));
+        $this->assertEquals('destination/hoff.jpg', Arr::get($blueprint->contents(), 'tabs.main.sections.0.fields.2.field.sets.set_group.sets.first_set.image')); // changed
+        $this->assertEquals('marty.png', Arr::get($blueprint->contents(), 'tabs.main.sections.0.fields.2.field.sets.set_group.sets.second_set.image'));
+    }
+
+    #[Test]
+    public function it_updates_references_in_bard_and_replicator_fields_in_fieldsets()
+    {
+        $fieldset = Facades\Fieldset::make('stuff');
+
+        $fieldset->setContents([
+            'fields' => [
+                [
+                    'handle' => 'content',
+                    'field' => [
+                        'type' => 'bard',
+                        'sets' => [
+                            'set_group' => [
+                                'sets' => [
+                                    'first_set' => [
+                                        'image' => $this->assetHoff->path(),
+                                        'fields' => [['handle' => 'foo', 'field' => ['type' => 'text']]],
+                                    ],
+                                    'second_set' => [
+                                        'image' => 'marty.png',
+                                        'fields' => [['handle' => 'bar', 'field' => ['type' => 'text']]],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'handle' => 'page_builder',
+                    'field' => [
+                        'type' => 'replicator',
+                        'sets' => [
+                            'set_group' => [
+                                'sets' => [
+                                    'first_set' => [
+                                        'image' => $this->assetHoff->path(),
+                                        'fields' => [['handle' => 'foo', 'field' => ['type' => 'text']]],
+                                    ],
+                                    'second_set' => [
+                                        'image' => 'marty.png',
+                                        'fields' => [['handle' => 'bar', 'field' => ['type' => 'text']]],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $fieldset = Facades\Fieldset::find('stuff');
+        $this->assertEquals('hoff.jpg', Arr::get($fieldset->contents(), 'fields.0.field.sets.set_group.sets.first_set.image'));
+        $this->assertEquals('marty.png', Arr::get($fieldset->contents(), 'fields.0.field.sets.set_group.sets.second_set.image'));
+        $this->assertEquals('hoff.jpg', Arr::get($fieldset->contents(), 'fields.1.field.sets.set_group.sets.first_set.image'));
+        $this->assertEquals('marty.png', Arr::get($fieldset->contents(), 'fields.1.field.sets.set_group.sets.second_set.image'));
+
+        $this->assetHoff->path('destination/hoff.jpg')->save();
+
+        $fieldset = Facades\Fieldset::find('stuff');
+        $this->assertEquals('destination/hoff.jpg', Arr::get($fieldset->contents(), 'fields.0.field.sets.set_group.sets.first_set.image')); // changed
+        $this->assertEquals('marty.png', Arr::get($fieldset->contents(), 'fields.0.field.sets.set_group.sets.second_set.image'));
+        $this->assertEquals('destination/hoff.jpg', Arr::get($fieldset->contents(), 'fields.1.field.sets.set_group.sets.first_set.image')); // changed
+        $this->assertEquals('marty.png', Arr::get($fieldset->contents(), 'fields.1.field.sets.set_group.sets.second_set.image'));
+    }
+
     protected function setSingleBlueprint($namespace, $blueprintContents)
     {
         $blueprint = tap(Facades\Blueprint::make('single-blueprint')->setContents($blueprintContents))->save();
