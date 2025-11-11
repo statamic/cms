@@ -142,7 +142,7 @@
                         <ui-badge pill v-if="isImage" icon="assets" :text="__('messages.width_x_height', { width: asset.width, height: asset.height })" />
                         <ui-badge pill icon="memory" :text="asset.size" />
                         <ui-badge pill icon="fingerprint">
-                            <time :datetime="lastModified" v-tooltip="DateFormatter.format(lastModified, 'datetime')">{{ asset.lastModifiedRelative }}</time>
+                            <time :datetime="asset.lastModified" v-tooltip="formatDate(asset.lastModified)">{{ asset.lastModifiedRelative }}</time>
                         </ui-badge>
                     </div>
                     <div class="flex items-center space-x-3 rtl:space-x-reverse">
@@ -486,7 +486,11 @@ export default {
             ];
 
             return actions.filter((action) => !buttonActions.includes(action.handle));
-        }
+        },
+
+        formatDate(date) {
+            return DateFormatter.format(date, 'datetime');
+        },
     },
 };
 </script>
