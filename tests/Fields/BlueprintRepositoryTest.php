@@ -10,10 +10,13 @@ use Statamic\Facades\File;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\BlueprintRepository;
 use Statamic\Support\FileCollection;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class BlueprintRepositoryTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     private $repo;
 
     public function setUp(): void
@@ -24,6 +27,29 @@ class BlueprintRepositoryTest extends TestCase
             ->setDirectories('/path/to/resources/blueprints');
 
         Facades\Blueprint::swap($this->repo);
+    }
+
+    #[Test]
+    public function it_gets_all_blueprints()
+    {
+        Facades\Form::all()->each->delete();
+
+        Facades\Collection::make('test')->save();
+        Facades\Taxonomy::make('test')->save();
+        Facades\Nav::make('test')->save();
+        Facades\AssetContainer::make('test')->save();
+        Facades\Form::make('test')->save();
+
+        $all = $this->repo->all();
+
+        $this->assertEveryItemIsInstanceOf(Blueprint::class, $all);
+        $this->assertEquals([
+            'collections.test.test',
+            'taxonomies.test.test',
+            'navigation.test',
+            'assets.test',
+            'forms.test',
+        ], $all->map->fullyQualifiedHandle()->all());
     }
 
     #[Test]

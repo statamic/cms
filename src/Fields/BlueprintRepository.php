@@ -12,6 +12,7 @@ use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\Facades;
 
 class BlueprintRepository
 {
@@ -22,6 +23,24 @@ class BlueprintRepository
     protected $directories = ['default' => null];
     protected $fallbacks = [];
     protected $additionalNamespaces = [];
+
+    public function all()
+    {
+        $additionalBlueprints = Blueprint::getAdditionalNamespaces()
+            ->keys()
+            ->flatMap(fn ($namespace) => Blueprint::in($namespace)->values());
+
+        return collect()
+            ->merge(Facades\Collection::all()->flatMap->entryBlueprints())
+            ->merge(Facades\Taxonomy::all()->flatMap->termBlueprints())
+            ->merge(Facades\Nav::all()->map->blueprint())
+            ->merge(Facades\AssetContainer::all()->map->blueprint())
+            ->merge(Facades\GlobalSet::all()->map->blueprint())
+            ->merge(Facades\Form::all()->map->blueprint())
+            ->merge($additionalBlueprints)
+            ->filter()
+            ->values();
+    }
 
     public function setDirectories(string|array $directories)
     {

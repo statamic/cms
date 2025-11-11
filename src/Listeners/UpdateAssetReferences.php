@@ -10,6 +10,7 @@ use Statamic\Events\AssetReplaced;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\Subscriber;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Fieldset;
 use Statamic\Facades\Form;
@@ -106,8 +107,7 @@ class UpdateAssetReferences extends Subscriber implements ShouldQueue
                 }
             });
 
-        $this
-            ->getBlueprintsContainingData()
+        Blueprint::all()
             ->each(function ($blueprint) use ($originalPath, $newPath, &$hasUpdatedItems) {
                 $updated = AssetReferenceUpdater::item($blueprint)
                     ->updateReferences($originalPath, $newPath);
@@ -143,24 +143,5 @@ class UpdateAssetReferences extends Subscriber implements ShouldQueue
                 }
             }
         }
-    }
-
-    protected function getBlueprintsContainingData()
-    {
-        //        $additionalBlueprints = Blueprint::getAdditionalNamespaces()
-        //            ->keys()
-        //            ->map(fn ($namespace) => Blueprint::in($namespace))
-        //            ->all();
-
-        $additionalBlueprints = [];
-
-        return collect()
-            ->merge(Collection::all()->flatMap->entryBlueprints())
-            ->merge(Taxonomy::all()->flatMap->termBlueprints())
-            ->merge(Nav::all()->map->blueprint())
-            ->merge(AssetContainer::all()->map->blueprint())
-            ->merge(GlobalSet::all()->map->blueprint())
-            ->merge(Form::all()->map->blueprint())
-            ->merge($additionalBlueprints);
     }
 }
