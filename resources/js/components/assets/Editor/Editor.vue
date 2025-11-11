@@ -178,7 +178,6 @@
 </template>
 
 <script>
-import DateFormatter from '@/components/DateFormatter.js';
 import FocalPointEditor from './FocalPointEditor.vue';
 import PdfViewer from './PdfViewer.vue';
 import { pick, flatten } from 'lodash-es';
@@ -489,7 +488,7 @@ export default {
             ];
 
             return actions.filter((action) => !buttonActions.includes(action.handle));
-        },
+        }
     },
 };
 </script>
