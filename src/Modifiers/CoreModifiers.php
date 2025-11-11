@@ -563,7 +563,7 @@ class CoreModifiers extends Modifier
     /**
      * Dump, Die, and Debug using Ignition.
      */
-    public function ddd($value)
+    public function ddd($value, $params)
     {
         if (! $this->allowDumping() && (Arr::get($params, 0) !== 'force')) {
             return;
@@ -632,7 +632,7 @@ class CoreModifiers extends Modifier
     /**
      * Dump a variable.
      */
-    public function dump($value)
+    public function dump($value, $params)
     {
         if (! $this->allowDumping() && (Arr::get($params, 0) !== 'force')) {
             return;
