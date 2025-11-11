@@ -38,7 +38,9 @@ use Stringy\StaticStringy as Stringy;
 
 class CoreModifiers extends Modifier
 {
-    use ChecksDumpability;
+    use ChecksDumpability {
+        dumpingAllowed as traitDumpingAllowed;
+    }
 
     /**
      * Adds values together with science. Context aware.
@@ -565,7 +567,7 @@ class CoreModifiers extends Modifier
      */
     public function ddd($value, $params)
     {
-        if (! $this->dumpingAllowed() && (Arr::get($params, 0) !== 'force')) {
+        if (! $this->dumpingAllowed($params)) {
             return;
         }
 
@@ -626,7 +628,7 @@ class CoreModifiers extends Modifier
      */
     public function dd($value, $params)
     {
-        if (! $this->dumpingAllowed() && (Arr::get($params, 0) !== 'force')) {
+        if (! $this->dumpingAllowed($params)) {
             return;
         }
 
@@ -638,7 +640,7 @@ class CoreModifiers extends Modifier
      */
     public function dump($value, $params)
     {
-        if (! $this->dumpingAllowed() && (Arr::get($params, 0) !== 'force')) {
+        if (! $this->dumpingAllowed($params)) {
             return;
         }
 
@@ -3364,5 +3366,10 @@ class CoreModifiers extends Modifier
         }
 
         return [$url, $hash];
+    }
+
+    private function dumpingAllowed(array $params): bool
+    {
+        return $this->traitDumpingAllowed() || (Arr::get($params, 0) === 'force');
     }
 }
