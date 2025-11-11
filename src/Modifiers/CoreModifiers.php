@@ -33,10 +33,13 @@ use Statamic\Support\Arr;
 use Statamic\Support\Dumper;
 use Statamic\Support\Html;
 use Statamic\Support\Str;
+use Statamic\Tags\Concerns\AllowDumping;
 use Stringy\StaticStringy as Stringy;
 
 class CoreModifiers extends Modifier
 {
+    use AllowDumping;
+
     /**
      * Adds values together with science. Context aware.
      *
@@ -562,6 +565,10 @@ class CoreModifiers extends Modifier
      */
     public function ddd($value)
     {
+        if (! $this->allowDumping() && (Arr::get($params, 0) !== 'force')) {
+            return;
+        }
+
         ddd(Dumper::resolve($value));
     }
 
@@ -627,6 +634,10 @@ class CoreModifiers extends Modifier
      */
     public function dump($value)
     {
+        if (! $this->allowDumping() && (Arr::get($params, 0) !== 'force')) {
+            return;
+        }
+
         dump(Dumper::resolve($value));
     }
 
