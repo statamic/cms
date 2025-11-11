@@ -2710,7 +2710,7 @@ class EntryTest extends TestCase
     #[Test]
     public function creates_custom_entry_class()
     {
-        $collection = tap(Collection::make('custom')->class(CustomEntry::class))->save();
+        $collection = tap(Collection::make('custom')->entryClass(CustomEntry::class))->save();
 
         $one = Facades\Entry::make()->slug('one')->collection($collection);
         $two = Facades\Entry::make()->collection($collection)->slug('two');

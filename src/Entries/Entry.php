@@ -151,10 +151,10 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
         if ($collection instanceof \Statamic\Contracts\Entries\Collection) {
             $this->collection = $collection->handle();
-            $customClass = $collection->class();
+            $customClass = $collection->entryClass();
         } else {
             $this->collection = $collection;
-            $customClass = Collection::findByHandle($this->collection)->class();
+            $customClass = Collection::findByHandle($this->collection)->entryClass();
         }
 
         if (is_null($customClass)) {

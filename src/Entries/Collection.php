@@ -69,7 +69,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
     protected $autosave;
     protected $withEvents = true;
 
-    protected $class;
+    protected $entryClass;
 
     public function __construct()
     {
@@ -121,9 +121,9 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         return $this->fluentlyGetOrSet('requiresSlugs')->args(func_get_args());
     }
 
-    public function class($class = null)
+    public function entryClass($class = null)
     {
-        return $this->fluentlyGetOrSet('class')->args(func_get_args());
+        return $this->fluentlyGetOrSet('entryClass')->args(func_get_args());
     }
 
     public function titleFormats($formats = null)
@@ -592,7 +592,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             'revisions' => $this->revisions,
             'title_format' => $this->titleFormats,
             'autosave' => $this->autosave,
-            'class' => $this->class,
+            'entry_class' => $this->entryClass,
         ];
 
         $array = Arr::except($formerlyToArray, [
