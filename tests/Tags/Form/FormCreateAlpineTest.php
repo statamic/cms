@@ -207,6 +207,34 @@ class FormCreateAlpineTest extends FormTestCase
     }
 
     #[Test]
+    public function it_renders_scoped_component_x_data_on_form_tag()
+    {
+        $output = $this->tag('{{ form:contact js="alpine:my_form:my_component" }}{{ /form:contact }}');
+
+        $expectedXData = $this->jsonEncode([
+            'my_form' => [
+                'name' => null,
+                'email' => null,
+                'message' => null,
+                'likes_animals' => false,
+                'my_favourites' => [
+                    'favourite_animals' => [],
+                    'non_favourite_animals' => [],
+                    'favourite_colour' => null,
+                    'favourite_subject' => null,
+                ],
+                'winnie' => null,
+            ],
+        ]);
+
+        $expectedXDataCall = "my_component({$expectedXData})";
+
+        $expected = '<form method="POST" action="http://localhost/!/forms/contact" x-data="'.$expectedXDataCall.'">';
+
+        $this->assertStringContainsString($expected, $output);
+    }
+
+    #[Test]
     public function it_renders_x_data_with_old_data_on_form_tag_when_only_one_nested_field_is_submitted()
     {
         $this
@@ -857,9 +885,36 @@ EOT
             'winnie' => null,
         ]);
 
-        $expectedXDataFull = "{form: \$form('post', 'http://localhost/!/forms/contact', {$expectedXData})}";
+        $expectedXDataForm = "{form: \$form('post', 'http://localhost/!/forms/contact', {$expectedXData})}";
 
-        $expected = '<form method="POST" action="http://localhost/!/forms/contact" x-data="'.$expectedXDataFull.'">';
+        $expected = '<form method="POST" action="http://localhost/!/forms/contact" x-data="'.$expectedXDataForm.'">';
+
+        $this->assertStringContainsString($expected, $output);
+    }
+
+    #[Test]
+    public function it_renders_precognition_component_x_data_on_form_tag()
+    {
+        $output = $this->tag('{{ form:contact js="alpine_precognition:form:my_component" }}{{ /form:contact }}');
+
+        $expectedXData = $this->jsonEncode([
+            'name' => null,
+            'email' => null,
+            'message' => null,
+            'likes_animals' => false,
+            'my_favourites' => [
+                'favourite_animals' => [],
+                'non_favourite_animals' => [],
+                'favourite_colour' => null,
+                'favourite_subject' => null,
+            ],
+            'winnie' => null,
+        ]);
+
+        $expectedXDataForm = "{form: \$form('post', 'http://localhost/!/forms/contact', {$expectedXData})}";
+        $expectedXDataCall = "my_component({$expectedXDataForm})";
+
+        $expected = '<form method="POST" action="http://localhost/!/forms/contact" x-data="'.$expectedXDataCall.'">';
 
         $this->assertStringContainsString($expected, $output);
     }

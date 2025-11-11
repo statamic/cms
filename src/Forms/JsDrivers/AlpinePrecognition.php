@@ -9,21 +9,27 @@ class AlpinePrecognition extends Alpine
     protected function parseOptions($options)
     {
         $this->scope = $options[0] ?? 'form';
+        $this->component = $options[1] ?? null;
     }
 
-    protected function renderAlpineXData($data, $alpineScope)
+    protected function renderAlpineXData($xData, $alpineScope)
     {
         $action = $this->form->actionUrl();
-        $data = Statamic::modify($data)->toJson()->entities();
-        $call = "\$form('post', '{$action}', {$data})";
+        $xData = Statamic::modify($xData)->toJson()->entities();
+        $xData = "\$form('post', '{$action}', {$xData})";
 
         $errors = $this->getInitialFormErrors();
         if ($errors?->count()) {
             $errors = Statamic::modify($errors)->toJson()->entities();
-            $call .= ".setErrors({$errors})";
+            $xData .= ".setErrors({$errors})";
         }
 
-        return "{{$alpineScope}: {$call}}";
+        $xData = "{{$alpineScope}: {$xData}}";
+        if ($this->component) {
+            $xData = "{$this->component}({$xData})";
+        }
+
+        return $xData;
     }
 
     public function addToRenderableFieldAttributes($field)
