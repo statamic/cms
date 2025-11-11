@@ -249,5 +249,5 @@ return [
     'user_wizard_roles_groups_intro' => 'A felhasználók szerepekhez rendelhetők. Így könnyen személyre szabhatjuk a felhasználók hozzáféréseit a Vezérlőpult részeihez.',
     'user_wizard_super_admin_instructions' => 'A Szuper Adminisztrátorok teljes körű hozzáféréssel rendelkeznek mindenhez a Vezérlőpulton. Ügyeljen, kinek adja ezt a szerepet!',
     'view_more_count' => 'Nézd meg :count többet',
-    'width_x_height' => ':width x :height',
+    'width_x_height' => ':width × :height',
 ];

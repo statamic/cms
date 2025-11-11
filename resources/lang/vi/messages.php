@@ -249,5 +249,5 @@ return [
     'user_wizard_roles_groups_intro' => 'Người dùng có thể được gán vai trò để tùy chỉnh quyền, quyền truy cập và khả năng trong Bảng Điều Khiển.',
     'user_wizard_super_admin_instructions' => 'Super admin có quyền kiểm soát hoàn toàn và truy cập tất cả mọi thứ trong bảng điều khiển. Chỉ cấp vai trò này khi cần thiết.',
     'view_more_count' => 'Xem thêm :count',
-    'width_x_height' => ':width x :height',
+    'width_x_height' => ':width × :height',
 ];

@@ -249,5 +249,5 @@ return [
     'user_wizard_roles_groups_intro' => 'يمكن تعيين المستخدمين إلى أدوار تخصص أذوناتهم، وصولهم، وقدراتهم في لوحة التحكم.',
     'user_wizard_super_admin_instructions' => 'يمنح المستخدم سوبر أدمن وصولاً غير محدود إلى كل شيء في لوحة التحكم. يرجى توخي الحذر عند منح هذا الدور.',
     'view_more_count' => 'عرض :count المزيد',
-    'width_x_height' => ':width x :height',
+    'width_x_height' => ':width × :height',
 ];
