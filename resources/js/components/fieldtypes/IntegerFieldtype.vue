@@ -9,6 +9,8 @@
         :disabled="config.disabled"
         :id="fieldId"
         :min="config.min"
+        :max="config.max"
+        :step="config.step"
         :prepend="__(config.prepend)"
         :append="__(config.append)"
         :placeholder="__(config.placeholder)"

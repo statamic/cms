@@ -21,6 +21,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Http\Controllers\FrontendController;
 use Statamic\StaticCaching\Cacher as StaticCacher;
+use Statamic\StaticCaching\RecacheToken;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\Hookable;
 use Statamic\Taxonomies\LocalizedTerm;
@@ -171,6 +172,14 @@ class StaticWarm extends Command
         $headers = $this->parseHeaders($this->option('header'));
 
         return $this->uris()->map(function ($uri) use ($headers) {
+            if (config('statamic.static_caching.background_recache', false)) {
+                if (substr_count($uri, '/') == 2) {
+                    $uri .= '/';
+                }
+
+                $uri = RecacheToken::addToUrl($uri);
+            }
+
             return new Request('GET', $uri, $headers);
         })->all();
     }

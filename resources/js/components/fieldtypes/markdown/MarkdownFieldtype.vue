@@ -1,6 +1,6 @@
 <template>
     <portal name="markdown-fullscreen" :disabled="!fullScreenMode" target-class="markdown-fieldtype">
-        <element-container @resized="refresh">
+        <div>
             <div
                 class="
                     @container/markdown w-full block bg-white dark:bg-gray-900! rounded-lg relative
@@ -72,7 +72,7 @@
                                 @drop="draggingFile = false"
                                 @keydown="shortcut"
                             >
-                                <div class="editor relative z-6 st-text-legibility focus-within:focus-outline focus-outline-discrete" ref="codemirror">
+                                <div class="editor relative top-[0.5px] z-(--z-index-above) st-text-legibility focus-within:focus-outline" ref="codemirror">
                                     <div
                                         v-if="showFloatingToolbar && toolbarIsFloating && !isReadOnly"
                                         class="markdown-floating-toolbar absolute z-50 flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-2 py-1 shadow-lg dark:border-white/10 dark:bg-gray-900"
@@ -95,7 +95,7 @@
                                 <!-- Hidden input for label association -->
                                 <input v-if="id" :id="id" type="text" class="sr-only" @focus="focusCodeMirror" tabindex="-1" />
 
-                                <footer class="flex items-center justify-between bg-gray-50 dark:bg-gray-950 rounded-b-lg border-t border-gray-200 dark:border-white/10 p-1 text-sm w-full" :class="{ 'absolute inset-x-0 bottom-0 rounded-': fullScreenMode }">
+                                <footer class="flex items-center justify-between bg-gray-50 dark:bg-gray-900 rounded-b-[calc(var(--radius-lg)-1px)] border-t border-gray-300 dark:border-white/10 p-1 text-sm w-full" :class="{ 'absolute inset-x-0 bottom-0 rounded-': fullScreenMode }">
                                     <div class="markdown-cheatsheet-helper">
                                         <Button
                                             icon="markdown"
@@ -106,7 +106,7 @@
                                             :text="__('Markdown Cheatsheet')"
                                         />
                                     </div>
-                                    <div v-if="fullScreenMode" class="flex items-center pe-2 gap-3 text-xs">
+                                    <div v-if="fullScreenMode" class="flex items-center pe-2 gap-2 sm:gap-3 text-xs">
                                         <div class="whitespace-nowrap">
                                             <span v-text="count.words" /> {{ __('Words') }}
                                         </div>
@@ -143,22 +143,22 @@
                     />
                 </stack>
 
-                <stack name="markdownCheatSheet" v-if="showCheatsheet" @closed="showCheatsheet = false">
+                <stack narrow name="markdownCheatSheet" v-if="showCheatsheet" @closed="showCheatsheet = false">
                     <div class="relative h-full overflow-auto bg-white p-6 dark:bg-gray-800 rounded-l-2xl">
                         <Button
                             icon="x"
                             variant="ghost"
-                            class="absolute top-4 end-4"
+                            class="sticky top-0 left-[100%] translate-x-[15%] translate-y-[-20%] bg-white dark:bg-gray-800"
                             @click="showCheatsheet = false"
                         />
-                        <div class="prose dark:prose-invert prose-zinc prose-headings:font-medium prose-pre:prose-code:!text-white mx-auto my-8 max-w-3xl">
+                        <div class="prose prose-zinc prose-headings:font-medium prose-pre:prose-code:!text-white mx-auto max-w-3xl">
                             <h2 v-text="__('Markdown Cheatsheet')"></h2>
                             <div v-html="__('markdown.cheatsheet')"></div>
                         </div>
                     </div>
                 </stack>
             </div>
-        </element-container>
+        </div>
     </portal>
 </template>
 
@@ -687,12 +687,6 @@ export default {
             });
 
             this.trackHeightUpdates();
-        },
-
-        refresh() {
-            this.$nextTick(function () {
-                this.codemirror.refresh();
-            });
         },
 
         initToolbarButtons() {

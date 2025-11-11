@@ -345,7 +345,6 @@ class FieldTest extends TestCase
             'duplicate' => true,
             'actions' => true,
             'type' => 'example',
-            'validate' => 'required',
             'foo' => 'bar',
             'a_config_field_with_pre_processing' => 'foo preprocessed',
             'a_config_field_without_pre_processing' => 'foo',

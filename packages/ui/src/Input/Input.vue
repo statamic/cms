@@ -1,12 +1,15 @@
 <script setup>
-import { computed, useSlots, ref, useId, useTemplateRef, onMounted, nextTick } from 'vue';
+import { computed, useSlots, useAttrs, ref, useId, useTemplateRef, onMounted, nextTick } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
 import Icon from '../Icon/Icon.vue';
 import Button from '../Button/Button.vue';
 import CharacterCounter from '../CharacterCounter.vue';
 
+defineOptions({ inheritAttrs: false });
+
 const slots = useSlots();
+const attrs = useAttrs();
 
 const props = defineProps({
     append: { type: String, default: null },
@@ -31,6 +34,41 @@ const props = defineProps({
     variant: { type: String, default: 'default' },
     viewable: { type: Boolean, default: false },
     focus: { type: Boolean, default: false },
+    inputAttrs: { type: [Object, String], default: () => ({}) },
+    inputClass: { type: String, default: '' },
+});
+
+const inputAttributeKeys = [
+    'accept', 'autocomplete', 'autofocus', 'capture', 'checked', 'dirname', 'form',
+    'formaction', 'formenctype', 'formmethod', 'formnovalidate', 'formtarget',
+    'list', 'max', 'maxlength', 'min', 'minlength', 'multiple', 'name', 'pattern',
+    'readonly', 'required', 'size', 'src', 'step', 'value'
+];
+
+const outerAttrs = computed(() => {
+    const result = {};
+    for (const key in attrs) {
+        if (!inputAttributeKeys.includes(key.toLowerCase())) result[key] = attrs[key];
+    }
+    return result;
+});
+
+const normalizedInputAttrs = computed(() => {
+    if (typeof props.inputAttrs === 'string') {
+        return props.inputAttrs
+            .split(' ')
+            .filter(attr => attr.length > 0)
+            .reduce((acc, attr) => ({ ...acc, [attr]: true }), {});
+    }
+    return props.inputAttrs;
+});
+
+const inputAttrs = computed(() => {
+    const result = {};
+    for (const key in attrs) {
+        if (inputAttributeKeys.includes(key.toLowerCase())) result[key] = attrs[key];
+    }
+    return { ...result, ...normalizedInputAttrs.value };
 });
 
 const hasPrependedIcon = computed(() => !!props.iconPrepend || !!props.icon || !!slots.prepend);
@@ -39,9 +77,9 @@ const hasAppendedIcon = computed(() => !!props.iconAppend || !!slots.append || p
 const inputClasses = computed(() => {
     const classes = cva({
         base: [
-            'w-full block bg-white dark:bg-gray-950',
-            'border border-gray-300 with-contrast:border-gray-500 dark:border-white/15 dark:inset-shadow-2xs dark:inset-shadow-black',
-            'text-gray-950 dark:text-gray-300 placeholder:text-gray-500 dark:placeholder:text-gray-400/75',
+            'w-full block bg-white dark:bg-gray-900',
+            'border border-gray-300 with-contrast:border-gray-500 dark:border-gray-700 dark:inset-shadow-2xs dark:inset-shadow-black',
+            'text-gray-950 dark:text-gray-300 placeholder:text-gray-500 dark:placeholder:text-gray-400/85',
             'appearance-none antialiased shadow-ui-sm disabled:shadow-none disabled:opacity-50 read-only:border-dashed not-prose',
         ],
         variants: {
@@ -53,6 +91,7 @@ const inputClasses = computed(() => {
             variant: {
                 default: '',
                 light: 'dark:bg-gray-800/20',
+                ghost: 'bg-transparent border-none shadow-none! inset-shadow-none!',
             },
             hasLimit: {
                 true: 'pe-9',
@@ -73,12 +112,12 @@ const inputClasses = computed(() => {
         hasLimit: !!props.limit,
     });
 
-    return twMerge(classes);
+    return twMerge(classes, props.inputClass);
 });
 
 const iconClasses = computed(() => {
     const classes = cva({
-        base: 'absolute top-0 bottom-0 flex items-center justify-center text-xs text-gray-400',
+        base: 'absolute top-0 bottom-0 flex items-center justify-center text-xs text-gray-400 dark:text-gray-500',
         variants: {
             size: {
                 base: '[&_svg]:size-4',
@@ -136,9 +175,9 @@ defineExpose({ focus });
 </script>
 
 <template>
-    <ui-input-group>
+    <ui-input-group v-bind="outerAttrs">
         <ui-input-group-prepend v-if="prepend" v-text="prepend" />
-        <div class="group/input relative block w-full st-text-legibility focus-outline-discrete" data-ui-input>
+        <div class="group/input relative block w-full st-text-legibility" data-ui-input>
             <div v-if="hasPrependedIcon" :class="iconClasses">
                 <slot name="prepend">
                     <Icon :name="iconPrepend || icon" />
@@ -156,7 +195,7 @@ defineExpose({ focus });
                 :tabindex="tabindex"
                 data-ui-control
                 data-ui-group-target
-                v-bind="$attrs"
+                v-bind="inputAttrs"
                 @input="$emit('update:modelValue', $event.target.value)"
             />
             <div v-if="hasAppendedIcon" :class="iconClasses">

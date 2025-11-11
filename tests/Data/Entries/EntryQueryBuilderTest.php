@@ -401,10 +401,10 @@ class EntryQueryBuilderTest extends TestCase
         EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->create();
         EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'test_taxonomy' => ['taxonomy-5']])->create();
 
-        $entries = Entry::query()->whereJsonContains('test_taxonomy', ['taxonomy-1', 'taxonomy-5'])->get();
+        $entries = Entry::query()->whereJsonContains('test_taxonomy', ['taxonomy-1', 'taxonomy-3'])->get();
 
-        $this->assertCount(3, $entries);
-        $this->assertEquals(['Post 1', 'Post 3', 'Post 5'], $entries->map->title->all());
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 3'], $entries->map->title->all());
 
         $entries = Entry::query()->whereJsonContains('test_taxonomy', 'taxonomy-1')->get();
 
@@ -766,6 +766,116 @@ class EntryQueryBuilderTest extends TestCase
 
         $this->assertCount(2, $entries);
         $this->assertEquals(['Post 2', 'Post 3'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_where_has_when_max_items_1()
+    {
+        $blueprint = Blueprint::makeFromFields(['entries_field' => ['type' => 'entries', 'max_items' => 1]]);
+        Blueprint::shouldReceive('in')->with('collections/posts')->andReturn(collect(['posts' => $blueprint]));
+
+        $this->createDummyCollectionAndEntries();
+
+        Entry::find('id-1')
+            ->merge([
+                'entries_field' => 'id-2',
+            ])
+            ->save();
+
+        Entry::find('id-3')
+            ->merge([
+                'entries_field' => 'id-1',
+            ])
+            ->save();
+
+        $entries = Entry::query()->whereHas('entries_field')->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+
+        $entries = Entry::query()->whereHas('entries_field', function ($subquery) {
+            $subquery->where('title', 'Post 2');
+        })
+            ->get();
+
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 1'], $entries->map->title->all());
+
+        $entries = Entry::query()->whereDoesntHave('entries_field', function ($subquery) {
+            $subquery->where('title', 'Post 2');
+        })
+            ->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 2', 'Post 3'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_where_has_when_max_items_not_1()
+    {
+        $blueprint = Blueprint::makeFromFields(['entries_field' => ['type' => 'entries']]);
+        Blueprint::shouldReceive('in')->with('collections/posts')->andReturn(collect(['posts' => $blueprint]));
+
+        $this->createDummyCollectionAndEntries();
+
+        Entry::find('id-1')
+            ->merge([
+                'entries_field' => ['id-2', 'id-1'],
+            ])
+            ->save();
+
+        Entry::find('id-3')
+            ->merge([
+                'entries_field' => ['id-1', 'id-2'],
+            ])
+            ->save();
+
+        $entries = Entry::query()->whereHas('entries_field')->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+
+        $entries = Entry::query()->whereHas('entries_field', function ($subquery) {
+            $subquery->where('title', 'Post 2');
+        })
+            ->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+
+        $entries = Entry::query()->whereDoesntHave('entries_field', function ($subquery) {
+            $subquery->where('title', 'Post 2');
+        })
+            ->get();
+
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 2'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_where_relation()
+    {
+        $blueprint = Blueprint::makeFromFields(['entries_field' => ['type' => 'entries']]);
+        Blueprint::shouldReceive('in')->with('collections/posts')->andReturn(collect(['posts' => $blueprint]));
+
+        $this->createDummyCollectionAndEntries();
+
+        Entry::find('id-1')
+            ->merge([
+                'entries_field' => ['id-2', 'id-1'],
+            ])
+            ->save();
+
+        Entry::find('id-3')
+            ->merge([
+                'entries_field' => ['id-1', 'id-2'],
+            ])
+            ->save();
+
+        $entries = Entry::query()->whereRelation('entries_field', 'title', 'Post 2')->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
     }
 
     #[Test]

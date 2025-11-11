@@ -2,9 +2,11 @@
 import { cva } from 'cva';
 import { computed, useSlots } from 'vue';
 import Icon from './Icon/Icon.vue';
+import { Link } from '@inertiajs/vue3';
 
 const props = defineProps({
     href: { type: [String, null], default: null },
+    target: { type: String, default: null },
     icon: { type: [String, null], default: null },
     level: { type: [Number, null], default: null },
     size: { type: String, default: 'base' },
@@ -16,7 +18,7 @@ const hasDefaultSlot = !!slots.default;
 
 const tag = computed(() => {
     if (props.level) return `h${props.level}`;
-    if (props.href) return 'a';
+    if (props.href) return props.target === '_blank' ? 'a' : Link;
     return 'div';
 });
 

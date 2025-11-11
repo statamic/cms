@@ -8,6 +8,7 @@ use Countable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
+use Illuminate\View\ComponentSlot;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades\Antlers;
@@ -284,6 +285,7 @@ class CoreModifiers extends Modifier
         }
 
         $text = '';
+
         while (count($value)) {
             $item = array_shift($value);
 
@@ -292,8 +294,13 @@ class CoreModifiers extends Modifier
             }
 
             if ($item['type'] === 'text') {
-                $text .= ' '.($item['text'] ?? '');
+                $text .= ($item['text'] ?? '');
             }
+
+            if ($item['type'] === 'paragraph' && $text !== '') {
+                $text .= ' ';
+            }
+
             array_unshift($value, ...($item['content'] ?? []));
         }
 
@@ -1079,6 +1086,11 @@ class CoreModifiers extends Modifier
         return $headline;
     }
 
+    public function hasActualContent($value)
+    {
+        return (new ComponentSlot($value))->hasActualContent();
+    }
+
     /**
      * Converts a hex color to rgb values.
      *
@@ -1352,6 +1364,11 @@ class CoreModifiers extends Modifier
     public function isPast($value)
     {
         return $this->carbon($value)->isPast();
+    }
+
+    public function isString($value)
+    {
+        return is_string($value);
     }
 
     /**

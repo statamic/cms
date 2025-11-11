@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Forms;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\CP\Column;
 use Statamic\CP\PublishForm;
@@ -45,14 +46,13 @@ class FormsController extends CpController
             })
             ->values();
 
-        if ($forms->count() === 0) {
-            return view('statamic::forms.empty');
-        }
-
-        return view('statamic::forms.index', [
+        return Inertia::render('forms/Index', [
             'forms' => $forms,
             'initialColumns' => $columns,
             'actionUrl' => cp_route('forms.actions.run'),
+            'canCreate' => User::current()->can('create', FormContract::class),
+            'createUrl' => cp_route('forms.create'),
+            'configureEmailUrl' => cp_route('utilities.email'),
         ]);
     }
 
@@ -68,15 +68,28 @@ class FormsController extends CpController
             ->rejectUnlisted()
             ->values();
 
-        $viewData = [
-            'form' => $form,
+        return Inertia::render('forms/Show', [
+            'form' => [
+                'title' => __($form->title()),
+                'handle' => $form->handle(),
+                'editUrl' => $form->editUrl(),
+                'deleteUrl' => $form->deleteUrl(),
+                'blueprintUrl' => cp_route('blueprints.forms.edit', $form->handle()),
+                'canEdit' => User::current()->can('edit', $form),
+                'canDelete' => User::current()->can('delete', $form),
+                'canConfigureFields' => User::current()->can('configure form fields'),
+            ],
             'columns' => $columns,
             'filters' => Scope::filters('form-submissions', [
                 'form' => $form->handle(),
             ]),
-        ];
-
-        return view('statamic::forms.show', $viewData);
+            'actionUrl' => cp_route('forms.submissions.actions.run', $form->handle()),
+            'exporters' => $form->exporters()->map(fn ($exporter) => [
+                'title' => $exporter->title(),
+                'downloadUrl' => $exporter->downloadUrl(),
+            ])->values(),
+            'redirectUrl' => cp_route('forms.index'),
+        ]);
     }
 
     /**
@@ -115,7 +128,9 @@ class FormsController extends CpController
 
         $this->authorize('create', FormContract::class);
 
-        return view('statamic::forms.create');
+        return Inertia::render('forms/Create', [
+            'submitUrl' => cp_route('forms.store'),
+        ]);
     }
 
     public function store(Request $request)

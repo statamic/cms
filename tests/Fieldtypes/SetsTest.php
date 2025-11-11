@@ -61,6 +61,7 @@ class SetsTest extends TestCase
                         'display' => 'One',
                         'instructions' => 'One instructions',
                         'icon' => 'one-icon',
+                        'image' => null,
                         'hide' => true,
                         'fields' => [
                             [
@@ -92,6 +93,7 @@ class SetsTest extends TestCase
                         'display' => null,
                         'instructions' => null,
                         'icon' => null,
+                        'image' => null,
                         'hide' => null,
                         'fields' => [
                             [
@@ -143,6 +145,7 @@ class SetsTest extends TestCase
                         'display' => 'One',
                         'instructions' => 'One instructions',
                         'icon' => 'one-icon',
+                        'image' => null,
                         'hide' => null,
                         'fields' => [
                             [
@@ -233,7 +236,7 @@ class SetsTest extends TestCase
                                 'actions' => true,
                                 'type' => 'text',
                                 'input_type' => 'text',
-                                'character_limit' => 0,
+                                'character_limit' => null,
                                 'autocomplete' => null,
                                 'placeholder' => null,
                                 'prepend' => null,
@@ -249,6 +252,7 @@ class SetsTest extends TestCase
                         ],
                         'handle' => 'one',
                         'id' => 'one',
+                        'image' => null,
                     ],
                 ],
                 'handle' => 'alfa',
@@ -272,7 +276,7 @@ class SetsTest extends TestCase
                                 'actions' => true,
                                 'type' => 'text',
                                 'input_type' => 'text',
-                                'character_limit' => 0,
+                                'character_limit' => null,
                                 'autocomplete' => null,
                                 'placeholder' => null,
                                 'prepend' => null,
@@ -288,6 +292,7 @@ class SetsTest extends TestCase
                         ],
                         'handle' => 'two',
                         'id' => 'two',
+                        'image' => null,
                     ],
                 ],
                 'handle' => 'bravo',
@@ -334,7 +339,7 @@ class SetsTest extends TestCase
                                 'actions' => true,
                                 'type' => 'text',
                                 'input_type' => 'text',
-                                'character_limit' => 0,
+                                'character_limit' => null,
                                 'autocomplete' => null,
                                 'placeholder' => null,
                                 'prepend' => null,
@@ -350,6 +355,7 @@ class SetsTest extends TestCase
                         ],
                         'handle' => 'one',
                         'id' => 'one',
+                        'image' => null,
                     ],
                 ],
                 'handle' => 'main',
@@ -410,6 +416,7 @@ class SetsTest extends TestCase
                         'display' => 'One',
                         'instructions' => 'One Instructions',
                         'icon' => 'one-icon',
+                        'image' => null,
                         'hide' => false,
                         'fields' => [
                             [

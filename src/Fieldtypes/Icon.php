@@ -52,6 +52,10 @@ class Icon extends Fieldtype
 
     public function augment($value)
     {
+        if (! $value) {
+            return null;
+        }
+
         return $this->iconSet()->get($value);
     }
 

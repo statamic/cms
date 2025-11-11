@@ -1,7 +1,19 @@
 <script setup>
 import { cva } from 'cva';
-import { ComboboxAnchor, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxRoot, ComboboxTrigger, ComboboxPortal, ComboboxViewport, FocusScope } from 'reka-ui';
-import { computed, nextTick, onMounted, ref, useAttrs, useSlots, useTemplateRef, watch } from 'vue';
+import {
+    ComboboxAnchor,
+    ComboboxContent,
+    ComboboxEmpty,
+    ComboboxInput,
+    ComboboxItem,
+    ComboboxRoot,
+    ComboboxTrigger,
+    ComboboxPortal,
+    ComboboxViewport,
+    ComboboxVirtualizer,
+    FocusScope
+} from 'reka-ui';
+import { computed, nextTick, ref, useAttrs, useTemplateRef, watch } from 'vue';
 import Button from './Button/Button.vue';
 import Icon from './Icon/Icon.vue';
 import Badge from './Badge.vue';
@@ -23,7 +35,7 @@ const props = defineProps({
     modelValue: { type: [Object, String, Number], default: null },
     multiple: { type: Boolean, default: false },
     optionLabel: { type: String, default: 'label' },
-    options: { type: Array, default: null },
+    options: { type: Array, default: [] },
     optionValue: { type: String, default: 'value' },
     placeholder: { type: String, default: () => __('Select...') },
     readOnly: { type: Boolean, default: false },
@@ -48,17 +60,15 @@ const triggerClasses = cva({
                 'dark:from-gray-850 dark:to-gray-900 dark:border-gray-700 dark:text-gray-300 dark:shadow-ui-md',
             ],
             filled: 'bg-black/5 hover:bg-black/10 text-gray-900 border-none dark:bg-white/15 dark:hover:bg-white/20 dark:text-white focus-within:focus-outline dark:placeholder:text-red-500/60',
-            ghost: 'bg-transparent hover:bg-gray-400/10 text-gray-900 border-none dark:text-gray-300 dark:hover:bg-white/15 dark:hover:text-gray-200 focus-within:focus-outline',
-            subtle: 'bg-transparent hover:bg-gray-400/10 text-gray-500 hover:text-gray-700 border-none dark:text-gray-300 dark:hover:bg-white/15 dark:hover:text-gray-200 focus-within:focus-outline',
+            ghost: 'bg-transparent hover:bg-gray-400/10 text-gray-900 border-none dark:text-gray-300 dark:hover:bg-white/7 dark:hover:text-gray-200 focus-within:focus-outline',
+            subtle: 'bg-transparent hover:bg-gray-400/10 text-gray-500 hover:text-gray-700 border-none dark:text-gray-300 dark:hover:bg-white/7 dark:hover:text-gray-200 focus-within:focus-outline',
         },
         size: {
-            lg: 'px-6 h-12 text-base rounded-lg',
-            base: 'px-4 h-10 text-sm rounded-lg',
-            sm: 'px-3 h-8 text-[0.8125rem] rounded-lg',
-            xs: 'px-2 h-6 text-xs rounded-md',
-        },
-        'discrete-focus-outline': {
-            true: 'focus-outline-discrete',
+            xl: 'px-5 h-12 text-lg rounded-lg',
+            lg: 'px-4 h-12 text-base rounded-lg',
+            base: 'px-4 h-10 text-md rounded-lg',
+            sm: 'px-3 h-8 text-sm rounded-lg',
+            xs: 'px-2 h-6 text-[0.8125rem] rounded-md',
         },
         readOnly: {
             true: 'border-dashed',
@@ -117,6 +127,13 @@ const selectedOption = computed(() => {
 const getOptionLabel = (option) => option?.[props.optionLabel];
 const getOptionValue = (option) => option?.[props.optionValue];
 const isSelected = (option) => selectedOptions.value.filter((item) => getOptionValue(item) === getOptionValue(option)).length > 0;
+
+const isOptionDisabled = (option) => {
+    if (isSelected(option)) return false;
+    if (props.multiple && limitReached.value) return true;
+
+    return false;
+};
 
 const limitReached = computed(() => {
     if (! props.maxSelections) return false;
@@ -184,6 +201,8 @@ const dropdownOpen = ref(false);
 const closeOnSelect = computed(() => props.closeOnSelect || !props.multiple);
 
 function updateDropdownOpen(open) {
+    if (props.disabled) return;
+
     // Prevent dropdown from opening when it's a taggable combobox with no options.
     if (props.taggable && props.options.length === 0) {
         return;
@@ -232,32 +251,13 @@ function pushTaggableOption(e) {
     }
 }
 
-function openOnSpace(e) {
-	const target = e && e.target ? e.target : null;
-	const tag = (target && target.tagName ? target.tagName : '').toLowerCase();
-	const isEditable = target && (tag === 'input' || tag === 'textarea' || target.isContentEditable);
+function openDropdown(e) {
+    if (dropdownOpen.value) return;
+    if (typeof e.preventDefault === 'function') e.preventDefault();
 
-	// If already open, do nothing so Space behaves normally
-	if (dropdownOpen.value) return;
+    updateDropdownOpen(true);
 
-	// If focused element is editable but dropdown is closed, intercept to open
-	if (isEditable) {
-		if (e && typeof e.preventDefault === 'function') e.preventDefault();
-		updateDropdownOpen(true);
-		nextTick(() => {
-			const inputEl = searchInputRef?.value?.$el || searchInputRef?.value;
-			if (inputEl && typeof inputEl.focus === 'function') inputEl.focus();
-		});
-		return;
-	}
-
-	// Non-editable target and closed: open
-	if (e && typeof e.preventDefault === 'function') e.preventDefault();
-	updateDropdownOpen(true);
-	nextTick(() => {
-		const inputEl = searchInputRef?.value?.$el || searchInputRef?.value;
-		if (inputEl && typeof inputEl.focus === 'function') inputEl.focus();
-	});
+    nextTick(() => searchInputRef?.value?.$el?.focus());
 }
 
 defineExpose({
@@ -270,7 +270,7 @@ defineExpose({
     <div>
         <div class="flex">
             <ComboboxRoot
-                :disabled="disabled || (multiple && limitReached) || readOnly"
+                :disabled="disabled || readOnly"
                 :model-value="modelValue"
                 :multiple
                 :open="dropdownOpen"
@@ -283,8 +283,8 @@ defineExpose({
                 ignore-filter
                 v-bind="attrs"
             >
-                <ComboboxAnchor :class="[$attrs.class]" data-ui-combobox-anchor>
-                    <ComboboxTrigger as="div" ref="trigger" :class="triggerClasses" @keydown.space="openOnSpace" data-ui-combobox-trigger>
+                <ComboboxAnchor  data-ui-combobox-anchor>
+                    <ComboboxTrigger as="div" ref="trigger" :class="triggerClasses" @keydown.enter="openDropdown" @keydown.space="openDropdown" data-ui-combobox-trigger>
                         <div class="flex-1 min-w-0">
                             <ComboboxInput
                                 v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"
@@ -298,26 +298,28 @@ defineExpose({
                                 @paste.prevent="onPaste"
                                 @keydown.enter.prevent="pushTaggableOption"
                                 @blur="pushTaggableOption"
-                                @keydown.space="openOnSpace"
+                                @keydown.space="openDropdown"
                             />
 
-                            <button type="button" class="w-full text-start truncate flex items-center gap-2 bg-transparent cursor-pointer focus:outline-none" v-else-if="!searchable && (dropdownOpen || !modelValue)" @keydown.space="openOnSpace" data-ui-combobox-placeholder>
-                            <Icon v-if="icon" :name="icon" class="text-gray-400 dark:text-white dark:opacity-50" />
-                                <span class="text-gray-400 dark:text-gray-500" v-text="placeholder" />
+                            <button type="button" class="w-full text-start flex items-center gap-2 bg-transparent cursor-pointer focus:outline-none" v-else-if="!searchable && (dropdownOpen || !modelValue)" @keydown.space="openDropdown" data-ui-combobox-placeholder>
+                            <Icon v-if="icon" :name="icon" class="text-gray-500 dark:text-white dark:opacity-50" />
+                                <span class="block truncate text-gray-500 dark:text-gray-400" v-text="placeholder" />
                             </button>
 
-                            <button type="button" v-else class="w-full text-start bg-transparent truncate flex items-center gap-2 cursor-pointer focus:outline-none" @keydown.space="openOnSpace" data-ui-combobox-selected-option>
-                                <slot name="selected-option" v-bind="{ option: selectedOption }">
-                                    <Icon v-if="icon" :name="icon" class="text-white/85 dark:text-white dark:opacity-50" />
-                                    <span v-if="labelHtml" v-html="getOptionLabel(selectedOption)" />
-                                    <span v-else v-text="getOptionLabel(selectedOption)" />
+                            <button type="button" v-else class="w-full text-start bg-transparent flex items-center gap-2 cursor-pointer focus-none" @keydown.space="openDropdown" data-ui-combobox-selected-option>
+                                <slot v-if="selectedOption" name="selected-option" v-bind="{ option: selectedOption }">
+                                    <div v-if="icon" class="size-4">
+                                        <Icon :name="icon" class="text-white/85 dark:text-white dark:opacity-50" />
+                                    </div>
+                                    <span v-if="labelHtml" v-html="getOptionLabel(selectedOption)" class="block truncate" />
+                                    <span v-else v-text="getOptionLabel(selectedOption)" class="block truncate" />
                                 </slot>
                             </button>
                         </div>
 
-                        <div class="flex gap-1.5 items-center shrink-0 ms-1.5">
+                        <div v-if="(clearable && modelValue) || (options.length || ignoreFilter)" class="flex gap-1.5 items-center ms-1.5 -me-2">
                             <Button v-if="clearable && modelValue" icon="x" variant="ghost" size="xs" round @click="clear" data-ui-combobox-clear-button />
-                            <Icon v-if="options.length || ignoreFilter" name="chevron-down" class="text-gray-400 dark:text-white/40" data-ui-combobox-chevron />
+                            <Icon v-if="options.length || ignoreFilter" name="chevron-down" class="text-gray-400 dark:text-white/40 size-4" data-ui-combobox-chevron />
                         </div>
                     </ComboboxTrigger>
                 </ComboboxAnchor>
@@ -327,15 +329,15 @@ defineExpose({
                         position="popper"
                         :side-offset="5"
                         :class="[
-                            'shadow-ui-sm z-100 rounded-lg border border-gray-200 bg-white p-2 dark:border-white/10 dark:bg-gray-800',
+                            'shadow-ui-sm z-(--z-index-above) rounded-lg border border-gray-200 bg-white p-2 dark:border-white/10 dark:bg-gray-800',
                             'max-h-[var(--reka-combobox-content-available-height)] w-[var(--reka-combobox-trigger-width)] min-w-fit',
-                            '[&_[data-reka-combobox-viewport]]:grid [&_[data-reka-combobox-viewport]]:gap-1'
+                            'overflow-hidden'
                         ]"
                         @escape-key-down="nextTick(() => $refs.trigger.$el.focus())"
                         data-ui-combobox-content
                     >
                         <FocusScope
-                            trapped
+                            :trapped="!searchable"
                             @mount-auto-focus.prevent
                             @unmount-auto-focus="(event) => {
                                 if (event.defaultPrevented) return;
@@ -343,33 +345,42 @@ defineExpose({
                                 event.preventDefault();
                             }"
                         >
-                            <ComboboxViewport>
+                            <ComboboxViewport class="max-h-[700px] overflow-y-auto">
                                 <ComboboxEmpty class="p-2 text-sm" data-ui-combobox-empty>
                                     <slot name="no-options" v-bind="{ searchQuery }">
                                         {{ __('No options available.') }}
                                     </slot>
                                 </ComboboxEmpty>
 
-                                <ComboboxItem
+                                <ComboboxVirtualizer
                                     v-if="filteredOptions"
-                                    v-for="(option, index) in filteredOptions"
-                                    :key="index"
-                                    :value="getOptionValue(option)"
-                                    :text-value="getOptionLabel(option)"
-                                    :class="itemClasses({ size: size, selected: isSelected(option) })"
-                                    as="button"
-                                    data-ui-combobox-item
-                                    @select="() => {
+                                    v-slot="{ option, virtualItem }"
+                                    :options="filteredOptions"
+                                    :estimate-size="37"
+                                    :text-content="(opt) => getOptionLabel(opt)"
+                                >
+                                    <div class="py-1 w-full">
+                                        <ComboboxItem
+                                            :key="virtualItem.index + JSON.stringify(modelValue)"
+                                            :value="getOptionValue(option)"
+                                            :text-value="getOptionLabel(option)"
+                                            :disabled="isOptionDisabled(option)"
+                                            :class="itemClasses({ size: size, selected: isSelected(option) })"
+                                            as="button"
+                                            :data-ui-combobox-item="getOptionValue(option)"
+                                            @select="() => {
                                         dropdownOpen = !closeOnSelect;
                                         if (closeOnSelect) $refs.trigger.$el.focus();
                                     }"
-                                >
-                                    <slot name="option" v-bind="option">
-                                        <img v-if="option.image" :src="option.image" class="size-5 rounded-full" />
-                                        <span v-if="labelHtml" v-html="getOptionLabel(option)" />
-                                        <span v-else>{{ __(getOptionLabel(option)) }}</span>
-                                    </slot>
-                                </ComboboxItem>
+                                        >
+                                            <slot name="option" v-bind="option">
+                                                <img v-if="option.image" :src="option.image" class="size-5 rounded-full" />
+                                                <span v-if="labelHtml" v-html="getOptionLabel(option)" />
+                                                <span v-else>{{ __(getOptionLabel(option)) }}</span>
+                                            </slot>
+                                        </ComboboxItem>
+                                    </div>
+                                </ComboboxVirtualizer>
                             </ComboboxViewport>
                         </FocusScope>
                     </ComboboxContent>
@@ -389,7 +400,7 @@ defineExpose({
                 handle-class="sortable-item"
                 :distance="5"
                 :mirror="false"
-                :disabled
+                :disabled="disabled || readOnly"
                 :model-value="modelValue"
                 @update:modelValue="updateModelValue"
             >
@@ -404,7 +415,7 @@ defineExpose({
                             <div v-else>{{ __(getOptionLabel(option)) }}</div>
 
                             <button
-                                v-if="!disabled"
+                                v-if="!disabled && !readOnly"
                                 type="button"
                                 class="opacity-75 hover:opacity-100 cursor-pointer"
                                 :aria-label="__('Deselect option')"
@@ -422,3 +433,15 @@ defineExpose({
         </slot>
     </div>
 </template>
+
+<style scoped>
+    /* Override the hardcoded z-index of Reka's popper content wrapper. We can't use a direct descendant selector because the stack is inside a portal, so instead we'll check to see if there is a stack present. */
+    body:has(.stack, .live-preview) [data-reka-popper-content-wrapper] {
+        z-index: var(--z-index-portal)!important;
+    }
+
+    /* Override the hardcoded z-index of Reka's popper content wrapper. When there's a modal present, we need to ensure the popper content is above it. We can't use a direct descendant selector because the modal is inside a portal, so instead we'll check to see if there is modal content present. */
+    body:has([data-ui-modal-content]) [data-reka-popper-content-wrapper] {
+        z-index: var(--z-index-modal)!important;
+    }
+</style>

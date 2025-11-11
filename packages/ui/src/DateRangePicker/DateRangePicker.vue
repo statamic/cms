@@ -68,7 +68,21 @@ const calendarBindings = computed(() => ({
 const placeholder = parseAbsoluteToLocal(new Date().toISOString());
 
 const calendarEvents = computed(() => ({
-    'update:model-value': (event) => emit('update:modelValue', event),
+    'update:model-value': (event) => {
+        if (props.granularity === 'day') {
+            event.start.hour = 0;
+            event.start.minute = 0;
+            event.start.second = 0;
+            event.start.millisecond = 0;
+
+            event.end.hour = 0;
+            event.end.minute = 0;
+            event.end.second = 0;
+            event.end.millisecond = 0;
+        }
+
+        emit('update:modelValue', event)
+    },
 }));
 </script>
 
@@ -154,9 +168,3 @@ const calendarEvents = computed(() => ({
         </DateRangePickerRoot>
     </div>
 </template>
-
-<style>
-[data-reka-popper-content-wrapper] {
-    @apply z-100!;
-}
-</style>

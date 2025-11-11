@@ -13,6 +13,7 @@
                     <div :class="{ 'bg-white dark:bg-gray-800 dark:border-dark-900 rounded-lg border': config.border }">
                         <FieldsProvider
                             :fields="fields"
+                            :as-config="false"
                             :field-path-prefix="fieldPathPrefix ? `${fieldPathPrefix}.${handle}` : handle"
                             :meta-path-prefix="metaPathPrefix ? `${metaPathPrefix}.${handle}` : handle"
                         >

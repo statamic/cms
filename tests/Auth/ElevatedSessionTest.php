@@ -5,9 +5,12 @@ namespace Tests\Auth;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
+use Mockery;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\Auth\Passkey;
 use Statamic\Facades\User;
+use Statamic\Facades\WebAuthn;
 use Statamic\Http\Middleware\CP\RequireElevatedSession;
 use Statamic\Notifications\ElevatedSessionVerificationCode;
 use Tests\ElevatesSessions;
@@ -334,5 +337,151 @@ class ElevatedSessionTest extends TestCase
             ->assertSessionMissing('statamic_elevated_session_verification_code');
 
         Notification::assertNothingSent();
+    }
+
+    #[Test]
+    public function it_returns_passkey_method_when_config_is_false_and_user_has_passkeys()
+    {
+        config(['statamic.webauthn.allow_password_login_with_passkey' => false]);
+
+        $mockPasskey = Mockery::mock(Passkey::class);
+        $mockCollection = collect(['passkey-123' => $mockPasskey]);
+
+        $user = tap(User::make()->email('foo@bar.com')->makeSuper()->password('secret'))->save();
+
+        // Use reflection to set the passkeys property
+        $reflection = new \ReflectionClass($user);
+        $property = $reflection->getProperty('passkeys');
+        $property->setAccessible(true);
+        $property->setValue($user, $mockCollection);
+
+        $this->assertEquals('passkey', $user->getElevatedSessionMethod());
+    }
+
+    #[Test]
+    public function it_returns_password_confirmation_method_when_config_is_true_even_with_passkeys()
+    {
+        config(['statamic.webauthn.allow_password_login_with_passkey' => true]);
+
+        $mockPasskey = Mockery::mock(Passkey::class);
+        $mockCollection = collect(['passkey-123' => $mockPasskey]);
+
+        $user = tap(User::make()->email('foo@bar.com')->makeSuper()->password('secret'))->save();
+
+        // Use reflection to set the passkeys property
+        $reflection = new \ReflectionClass($user);
+        $property = $reflection->getProperty('passkeys');
+        $property->setAccessible(true);
+        $property->setValue($user, $mockCollection);
+
+        $this->assertEquals('password_confirmation', $user->getElevatedSessionMethod());
+    }
+
+    #[Test]
+    public function it_returns_password_confirmation_when_user_has_no_passkeys_regardless_of_config()
+    {
+        config(['statamic.webauthn.allow_password_login_with_passkey' => false]);
+
+        $this->assertEquals('password_confirmation', $this->user->getElevatedSessionMethod());
+    }
+
+    #[Test]
+    public function it_returns_verification_code_when_no_password_and_no_passkeys()
+    {
+        config(['statamic.webauthn.allow_password_login_with_passkey' => false]);
+
+        $user = tap(User::make()->email('foo@bar.com')->makeSuper())->save();
+
+        $this->assertEquals('verification_code', $user->getElevatedSessionMethod());
+    }
+
+    #[Test]
+    public function it_can_get_passkey_options_for_elevated_session()
+    {
+        config(['statamic.webauthn.allow_password_login_with_passkey' => false]);
+
+        $mockPasskey = Mockery::mock(Passkey::class);
+        $mockCollection = collect(['passkey-123' => $mockPasskey]);
+
+        $user = $this->user;
+
+        // Use reflection to set the passkeys property
+        $reflection = new \ReflectionClass($user);
+        $property = $reflection->getProperty('passkeys');
+        $property->setAccessible(true);
+        $property->setValue($user, $mockCollection);
+
+        $response = $this
+            ->actingAs($user)
+            ->get(cp_route('elevated-session.passkey-options'))
+            ->assertOk();
+
+        $data = $response->json();
+
+        $this->assertArrayHasKey('challenge', $data);
+        $this->assertNotNull(session('webauthn.challenge'));
+    }
+
+    #[Test]
+    public function it_can_start_elevated_session_with_passkey()
+    {
+        config(['statamic.webauthn.allow_password_login_with_passkey' => false]);
+
+        $mockPasskey = Mockery::mock(Passkey::class);
+        $mockCollection = collect(['passkey-123' => $mockPasskey]);
+
+        $user = $this->user;
+
+        // Use reflection to set the passkeys property
+        $reflection = new \ReflectionClass($user);
+        $property = $reflection->getProperty('passkeys');
+        $property->setAccessible(true);
+        $property->setValue($user, $mockCollection);
+
+        $credentials = [
+            'id' => 'credential-id',
+            'rawId' => 'raw-id',
+            'response' => [],
+            'type' => 'public-key',
+        ];
+
+        WebAuthn::shouldReceive('validateAssertion')
+            ->once()
+            ->with($user, $credentials)
+            ->andReturnTrue();
+
+        $this
+            ->actingAs($user)
+            ->postJson('/cp/elevated-session', $credentials)
+            ->assertOk()
+            ->assertJsonStructure(['elevated', 'expiry'])
+            ->assertSessionHas('statamic_elevated_session', now()->timestamp);
+    }
+
+    #[Test]
+    public function status_endpoint_returns_passkey_method()
+    {
+        config(['statamic.webauthn.allow_password_login_with_passkey' => false]);
+
+        $mockPasskey = Mockery::mock(Passkey::class);
+        $mockCollection = collect(['passkey-123' => $mockPasskey]);
+
+        $user = $this->user;
+
+        // Use reflection to set the passkeys property
+        $reflection = new \ReflectionClass($user);
+        $property = $reflection->getProperty('passkeys');
+        $property->setAccessible(true);
+        $property->setValue($user, $mockCollection);
+
+        $this
+            ->actingAs($user)
+            ->get('/cp/elevated-session')
+            ->assertOk()
+            ->assertJson([
+                'elevated' => false,
+                'expiry' => null,
+                'method' => 'passkey',
+            ]);
     }
 }

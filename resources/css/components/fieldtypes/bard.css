@@ -1,15 +1,18 @@
 /* BARD
 =================================================== */
 @layer ui {
-    .bard-fieldtype:not(.form-group) {
-        @apply relative rounded-lg border outline-hidden dark:border-gray-600;
+    /* .grid-cell, [data-ui-input-group] are exceptions for Bard fieldtypes inside a Grid fieldtype, since these cause double borders */
+    .bard-fieldtype:not(.form-group, .grid-cell, [data-ui-input-group]) {
+        @apply relative rounded-lg border outline-hidden dark:border-gray-700;
     }
 }
 /* BARD / EDITOR
 =================================================== */
 @layer ui {
     .bard-editor {
-        @apply relative rounded-b-lg p-0 text-gray-900 dark:bg-gray-900 dark:text-gray-100;
+        /* We need a transparent border inside Bard to properly see the focus outline. Without this border, the focus outline is hairline-thin */
+        border: 1px solid transparent;
+        @apply relative rounded-lg p-0 text-gray-900 dark:bg-gray-900 dark:text-gray-100;
         /* The focus state inherits this */
         > * {
             @apply rounded-b-lg;
@@ -24,6 +27,21 @@
         }
         p, ol, li {
             @apply st-text-legibility;
+        }
+        &:has(.bard-content *:focus) {
+            /* When we're focused on something else inside the .bard-editor, remove the outline on the .bard-editor, otherwise we have two focus outlines.
+            E.g. If you have Bard > Replicator > Text field, when you focus on the internal text field, the outside .bard-editor should lose its outline */
+            outline: none;
+        }
+    }
+}
+/* BARD / FOOTER TOOLBAR
+=================================================== */
+@layer ui {
+    .bard-fieldtype:has(.bard-footer-toolbar) {
+        .bard-editor {
+            /* Remove the border-radius from the main container when we have the bottom toolbar (e.g. Reading Time) since it's no longer the last container in the vertical stack; instead the footer toolbar is now rounded */
+            border-radius: 0;
         }
     }
 }
@@ -50,31 +68,32 @@
 =================================================== */
 @layer ui {
     .bard-fixed-toolbar {
-        @apply top-0 z-5 flex items-start justify-between rounded-t-xl border-b border-gray-300 bg-gray-50 p-1 text-sm shadow-none px-2 py-1 dark:border-white/10 dark:bg-gray-900;
+        @apply top-0 flex items-start justify-between rounded-t-[calc(var(--radius-lg)-1px)] border-b border-gray-300 bg-gray-50 p-1 text-sm shadow-none px-2 py-1 dark:border-white/10 dark:bg-gray-925;
 
         .bard-toolbar-button {
             @apply m-0 flex size-8 items-center justify-center rounded-sm px-1 text-center text-base text-gray-900 dark:text-gray-100;
+
             svg {
                 @apply h-4 w-auto;
             }
-        }
 
-        .bard-toolbar-button:hover {
-            @apply bg-gray-200 dark:bg-gray-600;
-        }
-
-        .bard-toolbar-button.active {
-            @apply bg-gray-300 text-black dark:bg-gray-600 dark:text-white;
-        }
-
-        .bard-toolbar-button:focus {
-            @apply focus-outline;
-        }
-
-        .bard-toolbar-button:disabled {
-            @apply opacity-50;
             &:hover {
-                @apply text-gray-900 dark:text-gray-100;
+                @apply bg-gray-200 dark:bg-gray-600;
+            }
+
+            &:focus {
+                @apply focus-outline;
+            }
+
+            &.active {
+                @apply bg-gray-300 text-black dark:bg-gray-600 dark:text-white;
+            }
+
+            &:disabled {
+                @apply opacity-50;
+                &:hover {
+                    @apply text-gray-900 dark:text-gray-100;
+                }
             }
         }
 
@@ -82,6 +101,9 @@
             @apply button-active;
             svg {
                 @apply text-black;
+                :where(.dark) & {
+                    @apply text-white;
+                }
             }
         }
 
@@ -91,30 +113,63 @@
 
             button {
                 @apply mx-0.5 my-0 flex size-8 items-center justify-center rounded-sm bg-transparent px-1 text-center text-base text-gray-500;
+
                 svg {
                     @apply h-4 w-auto;
+
+                    .active & {
+                        @apply text-white;
+                    }
                 }
             }
+        }
 
-            button.active svg {
-                @apply text-white;
+        &.bard-toolbar-setting {
+            @apply grid grid-cols-[repeat(auto-fit,minmax(--spacing(8),1fr))] rounded-[--spacing(5)];
+
+            button {
+                @apply justify-self-center;
+            }
+        }
+
+        /* When there's a fixed toolbar the the bard editor should have square radius in the top corners to but up against the bottom of the toolbar */
+        .bard-fieldtype:has(> &) {
+            .bard-editor:focus-within {
+                border-top-left-radius: 0!important;
+                border-top-right-radius: 0!important;
             }
         }
     }
 
     /* Only top-level Bard fields should have a sticky header */
+    /* =Jay. I don't think we have the "workspace" class anymore, in which case this should be removed */
     .workspace .publish-fields:not(.replicator-set-body) > .bard-fieldtype .bard-fixed-toolbar,
     .live-preview .publish-fields:not(.replicator-set-body) > .bard-fieldtype .bard-fixed-toolbar {
         @apply sticky;
     }
 
-    /*  Fixed toolbar inside another bard field */
-    .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar {
-        z-index: 4;
-        top: 40px;
+    .bard-fixed-toolbar {
+        z-index: var(--z-index-portal);
+        position: sticky;
+        @apply -top-2;
+        /* Prevent the sticky toolbar from hitting the very end of container, which causes it to overlap the container's border-radius */
+        margin-block-end: 8px;
+        /* Pull the subsequent element up to compensate for this */
+        + * {
+            margin-block-start: -8px;
+        }
     }
 
-    /*  Fixed toolbar inside a stack */
+    /* Bard field with a fixed toolbar > then another fixed toolbar inside this */
+    .bard-fieldtype:has(> .bard-fixed-toolbar) .bard-content .bard-fixed-toolbar {
+        @apply top-8;
+    }
+    /* Bard > Grid > Bard */
+    .bard-content .grid-fieldtype .bard-fixed-toolbar {
+        @apply top-16;
+    }
+
+    /* Fixed toolbar inside a stack */
     .stack-content .bard-fixed-toolbar {
         top: -24px;
     }
@@ -123,15 +178,10 @@
     @media (width >= theme(--breakpoint-md)) {
         /*  Fixed toolbar below fixed global header */
         .bard-fixed-toolbar {
-            top: 52px;
-        }
-        .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar {
-            top: 92px;
-        }
-
-        /*  Fixed toolbar inside a stack */
-        .stack-content .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar {
-            top: 16px;
+            /* Fixed toolbar inside a stack */
+            .stack-content .bard-fieldtype .bard-fieldtype & {
+                top: 16px;
+            }
         }
 
         /* We don't need the `top` when in Live Preview */
@@ -149,14 +199,14 @@
         &:before {
             @apply border-t-black top-full start-1/2 absolute -ml-[3px] content-none border-6 border-transparent;
         }
-    }
 
-    .bard-add-set-button {
-        @apply absolute top-[-6px] z-1 flex items-center justify-center -start-4;
+        button svg {
+            @apply text-white opacity-100;
+        }
     }
 
     .bard-footer-toolbar {
-        @apply flex items-center justify-between rounded-b border-t bg-white p-2 text-xs text-gray-700 shadow-none dark:border-dark-300 dark:bg-dark-550 dark:text-dark-175;
+        @apply flex items-center justify-between rounded-b-lg border-t bg-white p-2 text-xs text-gray-700 shadow-none dark:border-dark-300 dark:bg-dark-800 dark:text-dark-175;
         padding: 8px 12px;
 
         .bard-fullscreen & {
@@ -191,10 +241,6 @@
                 left: auto;
             }
         }
-    }
-
-    .set-picker .popover .popover-content {
-        min-width: 320px !important;
     }
 }
 /* Fullscreen mode
@@ -259,13 +305,17 @@
     }
 
     .bard-fieldtype .bard-content {
-        @apply text-gray-900 dark:text-gray-300 bg-white dark:bg-gray-950 rounded-b-lg;
+        @apply text-gray-900 dark:text-gray-300 bg-white dark:bg-gray-900 rounded-lg;
         blockquote,
         ol,
         p,
         ul {
             margin-top: 0;
             margin-bottom: 0.85em;
+            table &:last-child {
+                /* If you type a single line of text in a table fieldtype cell you don't want it to have a bottom margin */
+                margin-block-end: 0;
+            }
 
             b,
             strong {
@@ -278,7 +328,7 @@
             }
 
             a {
-                @apply break-words text-blue-600 underline dark:text-blue-100;
+                @apply break-words text-blue-600 underline dark:text-blue-400;
             }
 
             a:active,
@@ -295,8 +345,7 @@
         }
 
         blockquote,
-        blockquote ol li,
-        blockquote ul li,
+        blockquote :is(ol li, ul li),
         ol li,
         ul li {
             > p {
@@ -306,16 +355,14 @@
 
         hr {
             @apply bg-gray-200 dark:bg-gray-500 h-0.75 border-0 my-8;
-        }
-
-        hr:after,
-        hr:before {
-            display: table;
-            content: ' ';
-        }
-
-        hr:after {
-            clear: both;
+            &::after,
+            &::before {
+                display: table;
+                content: ' ';
+            }
+            &:after {
+                clear: both;
+            }
         }
 
         h1,
@@ -324,7 +371,7 @@
         h4,
         h5,
         h6 {
-            @apply mt-3.5 mb-2 font-bold text-gray-900 dark:text-gray-100;
+            @apply mt-5 mb-2.5 font-bold text-gray-900 dark:text-gray-100;
 
             b,
             strong {
@@ -341,6 +388,10 @@
                 outline: 0;
                 text-decoration: underline;
             }
+
+            &:first-child {
+                margin-top: 0;
+            }
         }
 
         h1 { @apply text-3xl; }
@@ -349,15 +400,6 @@
         h4 { @apply text-base; }
         h5 { @apply text-sm; }
         h6 { @apply text-2xs uppercase text-gray-800 dark:text-gray-500 tracking-wider; }
-
-        h1:first-child,
-        h2:first-child,
-        h3:first-child,
-        h4:first-child,
-        h5:first-child,
-        h6:first-child {
-            margin-top: 0;
-        }
 
         ul,
         blockquote ul,
@@ -373,85 +415,75 @@
 
         ol,
         ul,
-        blockquote ol,
-        blockquote ul {
+        blockquote :is(ol, ul) {
             @apply ms-4 ps-4;
         }
 
-        .tableWrapper table ol,
-        .tableWrapper table ul {
+        .tableWrapper table :is(ol, ul) {
             @apply ms-4 ps-4;
         }
 
-        ol ol,
-        ol ul,
-        ul ol,
-        ul ul {
+        :is(ol, ul) :is(ol, ul) {
             @apply ms-4 ps-4 my-0;
         }
 
-        ul ul {
-            list-style-type: circle;
-        }
-
-        ol ol {
-            list-style-type: decimal;
-        }
-
-        ul ol {
-            list-style-type: decimal;
-        }
-
-        ol ul {
-            list-style-type: circle;
+        :is(ol, ul) {
+            ul {
+                list-style-type: circle;
+            }
+            ol {
+                list-style-type: decimal;
+            }
         }
 
         blockquote {
             @apply border-gray-900 dark:border-gray-100 px-4 text-gray-900 dark:text-gray-100 border-s-4 ms-1;
-        }
-
-        blockquote:first-child {
-            margin-top: 0;
-        }
-
-        blockquote:last-child {
-            margin-bottom: 0;
-        }
-
-        .tableWrapper table,
-        blockquote > .tableWrapper table,
-        ol li > .tableWrapper table,
-        ul li > .tableWrapper table {
-            @apply m-0 mb-4 w-full overflow-hidden bg-white text-sm dark:bg-dark-500 border-collapse table-fixed;
-
-            th {
-                @apply bg-gray-200 font-bold dark:bg-gray-600 text-start;
+            &:first-child {
+                margin-top: 0;
             }
-
-            td,
-            th {
-                @apply relative border px-2 py-1 align-top dark:border-gray-600;
-                min-width: 1em;
+            &:last-child {
+                margin-bottom: 0;
             }
+        }
 
-            .selectedCell {
-                @apply relative;
+        table {
+            .tableWrapper &,
+            blockquote > .tableWrapper &,
+            :is(ol, ul) li > .tableWrapper & {
+                @apply m-0 mb-4 w-full overflow-hidden bg-white text-sm dark:bg-dark-500 border-collapse table-fixed;
 
-                &:after {
-                    @apply pointer-events-none absolute inset-0 bg-gray-400 opacity-25 dark:bg-gray-600;
-                    content: '';
+                th {
+                    @apply bg-gray-200 font-bold dark:bg-gray-600 text-start;
                 }
-            }
 
-            a {
-                @apply break-words text-blue-700 underline dark:text-blue-100;
-            }
+                td,
+                th {
+                    @apply relative border px-2 py-1 align-top dark:border-gray-600;
+                    min-width: 1em;
+                }
 
-            a:active,
-            a:focus,
-            a:hover {
-                outline: 0;
-                text-decoration: underline;
+                .selectedCell {
+                    @apply relative;
+
+                    &::after {
+                        @apply pointer-events-none absolute inset-0 bg-gray-400 opacity-25;
+                        content: '';
+                    }
+                    :is(.dark) &::after {
+                        @apply bg-gray-600;
+                    }
+                }
+
+                a {
+                    @apply break-words text-blue-700 underline dark:text-blue-100;
+                }
+
+                a:active,
+                a:focus,
+                a:hover {
+                    outline: 0;
+                    text-decoration: underline;
+                }
             }
         }
 
@@ -461,10 +493,9 @@
 
         pre {
             @apply mb-2;
-        }
-
-        pre code {
-            @apply block w-full rounded-lg bg-gray-200 p-4 font-mono text-xs dark:bg-black dark:text-gray-100 leading-normal mb-4;
+            code {
+                @apply block w-full rounded-lg bg-gray-200 p-4 font-mono text-xs dark:bg-black dark:text-gray-100 leading-normal mb-4;
+            }
         }
     }
 }
@@ -473,8 +504,11 @@
 ========================================================================== */
 @layer ui {
     .bard-fieldtype .ProseMirror > p.is-editor-empty:first-child::before {
-        @apply text-gray-600 dark:text-gray-400 float-start h-0 pointer-events-none;
+        @apply text-gray-600 float-start h-0 pointer-events-none;
         content: attr(data-placeholder);
+    }
+    .dark .bard-fieldtype .ProseMirror > p.is-editor-empty:first-child::before {
+        @apply text-gray-400;
     }
 }
 
@@ -518,3 +552,13 @@
         }
     }
 }
+
+
+
+
+
+
+
+
+
+

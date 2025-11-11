@@ -1,7 +1,7 @@
 import { ref } from 'vue';
 
 export default class Config {
-    constructor(initialConfig) {
+    initialize(initialConfig) {
         this.config = ref(initialConfig);
     }
 
