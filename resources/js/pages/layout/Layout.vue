@@ -9,7 +9,7 @@ import { provide, watch, ref } from 'vue';
 import useBodyClasses from './body-classes.js';
 import useStatamicPageProps from '@/composables/page-props.js';
 
-useBodyClasses('bg-global-header-bg dark:bg-dark-global-header-bg font-sans leading-normal text-gray-900 dark:text-white');
+useBodyClasses('bg-global-header-bg font-sans leading-normal text-gray-900 dark:text-white');
 
 const props = defineProps({
     additionalBreadcrumbs: { type: Array, default: () => [] },
