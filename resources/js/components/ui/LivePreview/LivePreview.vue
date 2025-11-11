@@ -321,7 +321,7 @@ Statamic.$events.$on(`live-preview.${name.value}.refresh`, () => {
                         class="live-preview-editor @container/live-preview"
                         :style="{ width: poppedOut ? '100%' : `${editorWidth}px` }"
                     >
-                        <div class="live-preview-fields h-full flex-1 overflow-scroll">
+                        <div class="live-preview-fields h-full flex-1 overflow-scroll px-4 pt-2">
                             <portal-target :name="livePreviewFieldsPortal" />
                         </div>
 
