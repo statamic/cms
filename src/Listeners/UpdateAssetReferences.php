@@ -10,13 +10,12 @@ use Statamic\Events\AssetReplaced;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\Subscriber;
 use Statamic\Facades\AssetContainer;
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Fieldset;
 use Statamic\Facades\Form;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Nav;
 use Statamic\Facades\Taxonomy;
-use Statamic\Support\Arr;
 
 class UpdateAssetReferences extends Subscriber implements ShouldQueue
 {
@@ -109,42 +108,22 @@ class UpdateAssetReferences extends Subscriber implements ShouldQueue
 
         $this
             ->getBlueprintsContainingData()
-            ->each(function ($blueprint) use ($originalPath, $newPath) {
-                $hasUpdatedBlueprint = false;
+            ->each(function ($blueprint) use ($originalPath, $newPath, &$hasUpdatedItems) {
+                $updated = AssetReferenceUpdater::item($blueprint)
+                    ->updateReferences($originalPath, $newPath);
 
-                $contents = $blueprint->contents();
-                $fieldtypes = ['bard', 'replicator'];
-                $bigArrayOfFields = [];
-
-                foreach ($contents as $key => $value) {
-                    $this->findFields($value, $fieldtypes, $key, $bigArrayOfFields);
+                if ($updated) {
+                    $hasUpdatedItems = true;
                 }
+            });
 
-                foreach ($bigArrayOfFields as $path) {
-                    $fieldContents = Arr::get($contents, $path);
+        Fieldset::all()
+            ->each(function ($fieldset) use ($originalPath, $newPath, &$hasUpdatedItems) {
+                $updated = AssetReferenceUpdater::item($fieldset)
+                    ->updateReferences($originalPath, $newPath);
 
-                    $fieldContents['sets'] = collect($fieldContents['sets'])
-                        ->map(function ($setGroup) use ($originalPath, $newPath, &$hasUpdatedBlueprint) {
-                            $setGroup['sets'] = collect($setGroup['sets'])
-                                ->map(function ($set) use ($originalPath, $newPath, &$hasUpdatedBlueprint) {
-                                    if ($set['image'] === $originalPath) {
-                                        $set['image'] = $newPath;
-                                        $hasUpdatedBlueprint = true;
-                                    }
-
-                                    return $set;
-                                })
-                                ->all();
-
-                            return $setGroup;
-                        })
-                        ->all();
-
-                    Arr::set($contents, $path, $fieldContents);
-                }
-
-                if ($hasUpdatedBlueprint) {
-                    $blueprint->setContents($contents)->save();
+                if ($updated) {
+                    $hasUpdatedItems = true;
                 }
             });
 

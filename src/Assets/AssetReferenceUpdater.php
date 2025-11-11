@@ -333,4 +333,41 @@ class AssetReferenceUpdater extends DataReferenceUpdater
 
         $this->updated = true;
     }
+
+    /**
+     * Update fields in blueprints and fieldsets.
+     *
+     * @return void
+     */
+    protected function updateBlueprintFields()
+    {
+        $contents = $this->item->contents();
+
+        $fieldPaths = $this->findFieldsInBlueprintContents($contents, fieldtypes: ['bard', 'replicator']);
+
+        foreach ($fieldPaths as $fieldPath) {
+            $fieldContents = Arr::get($contents, $fieldPath);
+
+            $fieldContents['sets'] = collect($fieldContents['sets'])
+                ->map(function ($setGroup) {
+                    $setGroup['sets'] = collect($setGroup['sets'])
+                        ->map(function ($set) {
+                            if (isset($set['image']) && $set['image'] === $this->originalValue) {
+                                $set['image'] = $this->newValue;
+                                $this->updated = true;
+                            }
+
+                            return $set;
+                        })
+                        ->all();
+
+                    return $setGroup;
+                })
+                ->all();
+
+            Arr::set($contents, $fieldPath, $fieldContents);
+        }
+
+        $this->item->setContents($contents);
+    }
 }

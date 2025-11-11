@@ -2,7 +2,9 @@
 
 namespace Statamic\Data;
 
+use Statamic\Fields\Blueprint;
 use Statamic\Fields\Fields;
+use Statamic\Fields\Fieldset;
 use Statamic\Git\Subscriber as GitSubscriber;
 use Statamic\Support\Arr;
 
@@ -60,7 +62,11 @@ abstract class DataReferenceUpdater
         $this->originalValue = $originalValue;
         $this->newValue = $newValue;
 
-        $this->recursivelyUpdateFields($this->getTopLevelFields());
+        if ($this->item instanceof Blueprint || $this->item instanceof Fieldset) {
+            $this->updateBlueprintFields();
+        } else {
+            $this->recursivelyUpdateFields($this->getTopLevelFields());
+        }
 
         if ($this->updated) {
             $this->saveItem();
@@ -315,6 +321,39 @@ abstract class DataReferenceUpdater
         $this->item->data($data);
 
         $this->updated = true;
+    }
+
+    /**
+     * Update fields in blueprints and fieldsets.
+     *
+     * @return void
+     */
+    abstract protected function updateBlueprintFields();
+
+    /**
+     * Finds fields of a given type in the contents of a blueprint.
+     * Returns dot-notation paths to the fields.
+     *
+     * @param  array  $array
+     * @param  array  $fieldtypes
+     * @param  string|null  $dottedPrefix
+     * @param  array  $fieldPaths
+     * @return array
+     */
+    protected function findFieldsInBlueprintContents($array, $fieldtypes, $dottedPrefix = '', &$fieldPaths = [])
+    {
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $fieldPath = $dottedPrefix ? "$dottedPrefix.$key" : $key;
+                $this->findFieldsInBlueprintContents($value, $fieldtypes, $fieldPath, $fieldPaths);
+            }
+
+            if (is_string($value) && $key === 'type' && in_array($value, $fieldtypes)) {
+                $fieldPaths[] = $dottedPrefix;
+            }
+        }
+
+        return $fieldPaths;
     }
 
     /**

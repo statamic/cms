@@ -112,4 +112,14 @@ class TermReferenceUpdater extends DataReferenceUpdater
     {
         return $this->scope.$this->newValue;
     }
+
+    /**
+     * Update fields in blueprints and fieldsets.
+     *
+     * @return void
+     */
+    protected function updateBlueprintFields()
+    {
+        //
+    }
 }
