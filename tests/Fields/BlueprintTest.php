@@ -434,20 +434,21 @@ class BlueprintTest extends TestCase
                                     'handle' => 'one',
                                     'instructions' => 'One instructions',
                                     'instructions_position' => 'above',
+                                    'variant' => 'block',
                                     'listable' => 'hidden',
-                                    'sortable' => true,
                                     'visibility' => 'visible',
+                                    'sortable' => true,
                                     'replicator_preview' => true,
                                     'duplicate' => true,
+                                    'actions' => true,
                                     'type' => 'text',
-                                    'validate' => 'required|min:2',
                                     'input_type' => 'text',
-                                    'placeholder' => null,
-                                    'default' => null,
-                                    'character_limit' => 0,
+                                    'character_limit' => null,
                                     'autocomplete' => null,
+                                    'placeholder' => null,
                                     'prepend' => null,
                                     'append' => null,
+                                    'default' => null,
                                     'antlers' => false,
                                     'component' => 'text',
                                     'prefix' => null,
@@ -472,15 +473,16 @@ class BlueprintTest extends TestCase
                                     'handle' => 'two',
                                     'instructions' => 'Two instructions',
                                     'instructions_position' => 'above',
+                                    'variant' => 'block',
                                     'listable' => 'hidden',
-                                    'sortable' => true,
                                     'visibility' => 'visible',
+                                    'sortable' => true,
                                     'replicator_preview' => true,
                                     'duplicate' => true,
+                                    'actions' => true,
                                     'type' => 'textarea',
                                     'placeholder' => null,
-                                    'validate' => 'min:2',
-                                    'character_limit' => 0,
+                                    'character_limit' => null,
                                     'default' => null,
                                     'antlers' => false,
                                     'component' => 'textarea',
@@ -561,19 +563,21 @@ class BlueprintTest extends TestCase
                                     'handle' => 'nested_one',
                                     'instructions' => null,
                                     'instructions_position' => 'above',
+                                    'variant' => 'block',
                                     'listable' => 'hidden',
-                                    'sortable' => true,
                                     'visibility' => 'visible',
+                                    'sortable' => true,
                                     'replicator_preview' => true,
                                     'duplicate' => true,
+                                    'actions' => true,
                                     'type' => 'text',
                                     'input_type' => 'text',
-                                    'placeholder' => null,
-                                    'default' => null,
-                                    'character_limit' => 0,
+                                    'character_limit' => null,
                                     'autocomplete' => null,
+                                    'placeholder' => null,
                                     'prepend' => null,
                                     'append' => null,
+                                    'default' => null,
                                     'antlers' => false,
                                     'component' => 'text',
                                     'prefix' => 'nested_',
@@ -587,19 +591,21 @@ class BlueprintTest extends TestCase
                                     'handle' => 'nested_deeper_two',
                                     'instructions' => null,
                                     'instructions_position' => 'above',
+                                    'variant' => 'block',
                                     'listable' => 'hidden',
-                                    'sortable' => true,
                                     'visibility' => 'visible',
+                                    'sortable' => true,
                                     'replicator_preview' => true,
                                     'duplicate' => true,
+                                    'actions' => true,
                                     'type' => 'text',
                                     'input_type' => 'text',
-                                    'placeholder' => null,
-                                    'default' => null,
-                                    'character_limit' => 0,
+                                    'character_limit' => null,
                                     'autocomplete' => null,
+                                    'placeholder' => null,
                                     'prepend' => null,
                                     'append' => null,
+                                    'default' => null,
                                     'antlers' => false,
                                     'component' => 'text',
                                     'prefix' => 'nested_deeper_',
@@ -900,6 +906,41 @@ class BlueprintTest extends TestCase
     }
 
     // todo: duplicate or tweak above test but make the target field not in the first section.
+
+    #[Test]
+    public function it_can_ensure_an_deferred_ensured_field_has_specific_config()
+    {
+        $blueprint = (new Blueprint)->setContents(['tabs' => [
+            'tab_one' => [
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['handle' => 'title', 'field' => ['type' => 'text']],
+                        ],
+                    ],
+                ],
+            ],
+        ]]);
+
+        // Let's say somewhere else in the code ensures an `author` field
+        $blueprint->ensureField('author', ['type' => 'text', 'do_not_touch_other_config' => true, 'foo' => 'bar']);
+
+        // Then later, we try to ensure that `author` field has config, we should be able to successfully modify that deferred field
+        $fields = $blueprint
+            ->ensureFieldHasConfig('author', ['foo' => 'baz', 'visibility' => 'read_only'])
+            ->fields();
+
+        $this->assertEquals(['type' => 'text'], $fields->get('title')->config());
+
+        $expectedConfig = [
+            'type' => 'text',
+            'do_not_touch_other_config' => true,
+            'foo' => 'baz',
+            'visibility' => 'read_only',
+        ];
+
+        $this->assertEquals($expectedConfig, $fields->get('author')->config());
+    }
 
     #[Test]
     public function it_merges_previously_undefined_keys_into_the_config_when_ensuring_a_field_exists_and_it_already_exists()

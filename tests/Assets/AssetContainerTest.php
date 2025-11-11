@@ -176,66 +176,6 @@ class AssetContainerTest extends TestCase
     }
 
     #[Test]
-    public function it_gets_and_sets_whether_uploads_are_allowed()
-    {
-        $container = new AssetContainer;
-        $this->assertTrue($container->allowUploads());
-
-        $return = $container->allowUploads(false);
-
-        $this->assertEquals($container, $return);
-        $this->assertFalse($container->allowUploads());
-    }
-
-    #[Test]
-    public function it_gets_and_sets_whether_folders_can_be_created()
-    {
-        $container = new AssetContainer;
-        $this->assertTrue($container->createFolders());
-
-        $return = $container->createFolders(false);
-
-        $this->assertEquals($container, $return);
-        $this->assertFalse($container->createFolders());
-    }
-
-    #[Test]
-    public function it_gets_and_sets_whether_renaming_is_allowed()
-    {
-        $container = new AssetContainer;
-        $this->assertTrue($container->allowRenaming());
-
-        $return = $container->allowRenaming(false);
-
-        $this->assertEquals($container, $return);
-        $this->assertFalse($container->allowRenaming());
-    }
-
-    #[Test]
-    public function it_gets_and_sets_whether_moving_is_allowed()
-    {
-        $container = new AssetContainer;
-        $this->assertTrue($container->allowMoving());
-
-        $return = $container->allowMoving(false);
-
-        $this->assertEquals($container, $return);
-        $this->assertFalse($container->allowMoving());
-    }
-
-    #[Test]
-    public function it_gets_and_sets_whether_downloading_is_allowed()
-    {
-        $container = new AssetContainer;
-        $this->assertTrue($container->allowDownloading());
-
-        $return = $container->allowDownloading(false);
-
-        $this->assertEquals($container, $return);
-        $this->assertFalse($container->allowDownloading());
-    }
-
-    #[Test]
     public function it_gets_and_sets_the_validation_rules()
     {
         $container = new AssetContainer;

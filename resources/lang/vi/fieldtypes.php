@@ -22,7 +22,6 @@ return [
     'assets.dynamic_folder_pending_field' => 'Trường này sẽ khả dụng sau khi :field được thiết lập.',
     'assets.dynamic_folder_pending_save' => 'Trường này sẽ có sẵn sau khi lưu.',
     'assets.title' => 'Tài sản',
-    'bard.config.allow_source' => 'Kích hoạt để xem mã nguồn HTML trong khi viết.',
     'bard.config.always_show_set_button' => 'Luôn hiển thị nút "Thêm Set".',
     'bard.config.buttons' => 'Chọn các nút hiển thị trong thanh công cụ.',
     'bard.config.container' => 'Chọn container tài sản cho trường này.',

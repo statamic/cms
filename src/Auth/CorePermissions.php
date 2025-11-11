@@ -2,6 +2,7 @@
 
 namespace Statamic\Auth;
 
+use Statamic\Facades\Addon;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Form;
@@ -23,7 +24,6 @@ class CorePermissions
             $this->register('configure sites');
             $this->register('configure fields');
             $this->register('configure form fields');
-            $this->register('configure addons');
             $this->register('manage preferences');
         });
 
@@ -61,6 +61,10 @@ class CorePermissions
 
         $this->group('forms', function () {
             $this->registerForms();
+        });
+
+        $this->group('addons', function () {
+            $this->registerAddons();
         });
 
         $this->group('utilities', function () {
@@ -161,20 +165,15 @@ class CorePermissions
         $this->register('configure asset containers');
 
         $this->register('view {container} assets', function ($permission) {
-            $childPermissions = [
+            $this->permission($permission)->children([
                 $this->permission('upload {container} assets'),
+                $this->permission('edit {container} folders'),
                 $this->permission('edit {container} assets')->children([
                     $this->permission('move {container} assets'),
                     $this->permission('rename {container} assets'),
                     $this->permission('delete {container} assets'),
                 ]),
-            ];
-
-            if (config('statamic.assets.v6_permissions')) {
-                $childPermissions[] = $this->permission('edit {container} folders');
-            }
-
-            $this->permission($permission)->children($childPermissions)->replacements('container', function () {
+            ])->replacements('container', function () {
                 return AssetContainer::all()->map(function ($container) {
                     return ['value' => $container->handle(), 'label' => __($container->title())];
                 });
@@ -219,6 +218,20 @@ class CorePermissions
                 });
             });
         });
+    }
+
+    protected function registerAddons()
+    {
+        $this->register('configure addons');
+
+        Addon::all()
+            ->filter->hasSettingsBlueprint()
+            ->each(function ($addon) {
+                Permission::register("edit {$addon->slug()} settings", function ($permission) use ($addon) {
+                    return $permission
+                        ->label(__('statamic::permissions.edit_addon_settings', ['addon' => __($addon->name())]));
+                });
+            });
     }
 
     protected function registerUtilities()

@@ -1,62 +1,194 @@
 <template>
+    <template v-if="!hasMultipleSets">
+        <Primitive @click="singleButtonClicked">
+            <slot name="trigger" />
+        </Primitive>
+    </template>
 
-    <popover
-        ref="popover"
-        class="set-picker select-none"
-        placement="bottom-start"
-        :disabled="!enabled || !hasMultipleSets"
-        @opened="opened"
-        @closed="closed"
-        @click="triggerWasClicked"
-        @clicked-away="$emit('clicked-away', $event)"
+    <!-- Modal for Grid Mode -->
+    <ui-modal
+        :blur="false"
+        :open="isOpen"
+        :title="__('Add Set')"
+        @update:open="isOpen = $event"
+        v-else-if="shouldUseModal"
+        class="xl:max-w-3xl 2xl:max-w-5xl"
     >
         <template #trigger>
             <slot name="trigger" />
         </template>
+
         <template #default>
-            <div class="set-picker-header p-3 border-b dark:border-dark-900 text-xs flex items-center">
-                <input ref="search" type="text" class="input-text text-xs h-auto py-1 px-2 border rounded w-full dark:bg-dark-650 dark:border-gray-900" :placeholder="__('Search Sets')" v-show="showSearch" v-model="search" />
-                <div v-if="showGroupBreadcrumb" class="flex items-center text-gray-700 dark:text-gray-600 font-medium">
-                    <button @click="unselectGroup" class="hover:text-gray-900 dark:hover:text-gray-500 rtl:mr-2.5 ltr:ml-2.5 rounded">
-                        {{ __('Groups') }}
-                    </button>
-                    <svg-icon name="micro/chevron-right" class="w-4 h-4" />
-                    <span>{{ selectedGroupDisplayText }}</span>
-                </div>
+            <div class="flex items-center p-1.5 gap-1.5">
+                <ui-input
+                    :placeholder="__('Search Sets')"
+                    class="[&_svg]:size-5"
+                    input-attrs="data-set-picker-search-input"
+                    icon-prepend="magnifying-glass"
+                    ref="search"
+                    size="sm"
+                    type="text"
+                    v-model="search"
+                    :variant="mode === 'list' ? 'ghost' : 'default'"
+                />
+
+                <ui-toggle-group v-model="mode" size="sm">
+                    <ui-toggle-item icon="layout-list" value="list" :aria-label="__('List view')" />
+                    <ui-toggle-item icon="layout-grid" value="grid" :aria-label="__('Grid view')" />
+                </ui-toggle-group>
             </div>
-            <div class="p-1 max-h-[21rem] overflow-auto">
-                <div v-for="(item, i) in items" :key="item.handle" class="cursor-pointer rounded" :class="{ 'bg-gray-200 dark:bg-dark-600': selectionIndex === i }" @mouseover="selectionIndex = i">
-                    <div v-if="item.type === 'group'" @click="selectGroup(item.handle)" class="flex items-center group px-2 py-1.5 rounded-md">
-                        <svg-icon :name="groupIconName(item.icon)" :directory="iconBaseDirectory" class="h-9 w-9 rounded bg-white dark:bg-dark-650 border border-gray-600 dark:border-dark-800 rtl:ml-2 ltr:mr-2 p-2 text-gray-800 dark:text-dark-175" />
-                        <div class="flex-1">
-                            <div class="text-md font-medium text-gray-800 dark:text-dark-175 truncate w-52">{{ __(item.display || item.handle) }}</div>
-                            <div v-if="item.instructions" class="text-2xs text-gray-700 dark:text-dark-175 truncate w-52">{{ __(item.instructions) }}</div>
+
+            <!-- Tabs for Grid Mode -->
+            <ui-tabs default-tab="all" v-model="selectedTab" class="w-full" v-if="mode === 'grid'">
+                <ui-tab-list class="px-2">
+                    <ui-tab-trigger :text="group.display" :name="group.handle" v-for="group in groupedItems" :key="group.handle" />
+                </ui-tab-list>
+                <ui-tab-content :name="group.handle" v-for="group in groupedItems" :key="group.handle">
+                    <div class="p-3 grid grid-cols-2 md:grid-cols-3 gap-6">
+                        <div
+                            v-for="(item, i) in group.items"
+                            :key="item.handle"
+                            class="cursor-pointer rounded-lg"
+                            :class="{ 'bg-gray-100 dark:bg-gray-900': selectionIndex === i }"
+                            @mouseover="selectionIndex = i"
+                            :title="__(item.instructions)"
+                        >
+                            <div @click="addSet(item.handle)" class="p-2.5">
+                                <div class="h-40 w-full flex items-center justify-center">
+                                    <img :src="item.image" class="rounded-lg h-40 object-contain bg-gray-50 dark:bg-gray-850" v-if="item.image" />
+                                    <ui-icon :name="item.icon || 'add-section'" :set="iconSet" class="size-8 text-gray-600 dark:text-gray-300" v-else />
+                                </div>
+                                <div class="line-clamp-1 text-base mt-1 text-center text-gray-900 dark:text-gray-200">
+                                    {{ __(item.display || item.handle) }}
+                                </div>
+                                <ui-description v-if="item.instructions" class="text-center mb-2">
+                                    {{ __(item.instructions) }}
+                                </ui-description>
+                            </div>
                         </div>
-                        <svg-icon name="micro/chevron-right-thin" class="text-gray-600 group-hover:text-dark-800 dark:group-hover:text-dark-175" />
+                        <div v-if="group.items.length === 0" class="p-3 text-center text-xs text-gray-600">
+                            {{ search ? __('No results') : __('No sets available') }}
+                        </div>
                     </div>
-                    <div v-if="item.type === 'set'" @click="addSet(item.handle)" class="flex items-center group px-2 py-1.5 rounded-md">
-                        <svg-icon :name="setIconName(item.icon)" :directory="iconBaseDirectory" class="h-9 w-9 rounded bg-white dark:bg-dark-650 border border-gray-600 dark:border-dark-800 rtl:ml-2 ltr:mr-2 p-2 text-gray-800 dark:text-dark-175" />
+                </ui-tab-content>
+            </ui-tabs>
+        </template>
+    </ui-modal>
+
+    <!-- Use Popover for list mode when content fits -->
+    <ui-popover
+        v-else
+        :align="align"
+        :open="isOpen"
+        @clicked-away="$emit('clicked-away', $event)"
+        @update:open="isOpen = $event"
+        class="set-picker select-none w-72"
+        inset
+    >
+        <template #trigger>
+            <slot name="trigger" />
+        </template>
+
+        <template #default>
+            <!-- Popover content with toggle group -->
+            <div class="flex items-center border-b border-gray-200 dark:border-gray-600 p-1.5 gap-1.5">
+                <ui-input
+                    :placeholder="__('Search Sets')"
+                    class="[&_svg]:size-5"
+                    input-attrs="data-set-picker-search-input"
+                    icon-prepend="magnifying-glass"
+                    ref="search"
+                    size="sm"
+                    type="text"
+                    v-model="search"
+                    variant="ghost"
+                />
+
+                <ui-toggle-group v-model="mode" size="sm">
+                    <ui-toggle-item icon="layout-list" value="list" aria-label="List view" />
+                    <ui-toggle-item icon="layout-grid" value="grid" aria-label="Grid view" />
+                </ui-toggle-group>
+            </div>
+
+            <!-- Breadcrumbs for List Mode -->
+            <div v-if="showGroupBreadcrumb" class="flex items-center p-1.5 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-600">
+                <ui-button @click="unselectGroup" size="xs" variant="ghost">
+                    {{ __('Groups') }}
+                </ui-button>
+                <ui-icon name="chevron-right" class="size-3! mt-[1px]" />
+                <span class="text-gray-700 dark:text-gray-300 text-xs px-2">
+                    {{ selectedGroupDisplayText }}
+                </span>
+            </div>
+
+            <!-- List Mode -->
+            <div class="max-h-[21rem] overflow-auto p-1.5">
+                <div
+                    v-for="(item, i) in items"
+                    :key="item.handle"
+                    class="cursor-pointer rounded-lg"
+                    :class="{ 'bg-gray-100 dark:bg-gray-900': selectionIndex === i }"
+                    @mouseover="selectionIndex = i"
+                    :title="__(item.instructions)"
+                >
+                    <div v-if="item.type === 'group'" @click="selectGroup(item.handle)" class="group flex items-center rounded-lg p-2 gap-2 sm:gap-3">
+                        <ui-icon :name="item.icon || 'folder'" :set="iconSet" class="size-4 text-gray-600 dark:text-gray-300" />
                         <div class="flex-1">
-                            <div class="text-md font-medium text-gray-800 dark:text-dark-175 truncate w-52">{{ __(item.display || item.handle) }}</div>
-                            <div v-if="item.instructions" class="text-2xs text-gray-700 dark:text-dark-175 truncate w-52">{{ __(item.instructions) }}</div>
+                            <div class="line-clamp-1 text-sm text-gray-900 dark:text-gray-200">
+                                {{ __(item.display || item.handle) }}
+                            </div>
+                            <ui-description v-if="item.instructions" class="w-48 truncate text-2xs">
+                                {{ __(item.instructions) }}
+                            </ui-description>
                         </div>
+                        <ui-icon name="chevron-right" class="me-1 size-2" />
+                    </div>
+                    <div v-if="item.type === 'set'" @click="addSet(item.handle)" class="group flex items-center rounded-xl p-2.5 gap-2 sm:gap-3">
+                        <ui-icon :name="item.icon || 'plus'" :set="iconSet" class="size-4 text-gray-600 dark:text-gray-300" />
+                        <ui-hover-card :delay="0" :open="selectionIndex === i">
+                            <template #trigger>
+                                <div class="flex-1">
+                                    <div class="line-clamp-1 text-sm text-gray-900 dark:text-gray-200">
+                                        {{ __(item.display || item.handle) }}
+                                    </div>
+                                    <ui-description v-if="item.instructions" class="w-56 truncate text-2xs">
+                                        {{ __(item.instructions) }}
+                                    </ui-description>
+                                </div>
+                            </template>
+                            <template #default v-if="item.image">
+                                <div class="max-w-96 max-h-[calc(80vh)] screen-fit">
+                                    <p v-if="item.instructions" class="text-gray-800 dark:text-gray-200 mb-2">
+                                        {{ __(item.instructions) }}
+                                    </p>
+                                    <img :src="item.image" class="rounded-lg" />
+                                </div>
+                            </template>
+                        </ui-hover-card>
                     </div>
                 </div>
-                <div v-if="noSearchResults" class="text-center text-gray-600 text-xs p-3">
+                <div v-if="noSearchResults" class="p-3 text-center text-xs text-gray-600">
                     {{ __('No results') }}
                 </div>
             </div>
         </template>
-    </popover>
-
+    </ui-popover>
 </template>
 
 <script>
+import { Primitive } from 'reka-ui';
+
 export default {
+    emits: ['added', 'clicked-away'],
+
+    components: {
+        Primitive,
+    },
 
     props: {
         sets: Array,
         enabled: { type: Boolean, default: true },
+        align: { type: String, default: 'start' },
     },
 
     data() {
@@ -65,11 +197,13 @@ export default {
             search: null,
             selectionIndex: 0,
             keybindings: [],
-        }
+            isOpen: false,
+            mode: this.getStoredMode(),
+            selectedTab: 'all',
+        };
     },
 
     computed: {
-
         showSearch() {
             return !this.hasMultipleGroups || !this.selectedGroup;
         },
@@ -83,9 +217,11 @@ export default {
         },
 
         hasMultipleSets() {
-            return this.sets.reduce((count, group) => {
-                return count + group.sets.length;
-            }, 0) > 1;
+            return (
+                this.sets.reduce((count, group) => {
+                    return count + group.sets.length;
+                }, 0) > 1
+            );
         },
 
         hasMultipleGroups() {
@@ -93,7 +229,7 @@ export default {
         },
 
         selectedGroup() {
-            return this.sets.find(group => group.handle === this.selectedGroupHandle);
+            return this.sets.find((group) => group.handle === this.selectedGroupHandle);
         },
 
         selectedGroupDisplayText() {
@@ -103,79 +239,131 @@ export default {
         visibleSets() {
             if (!this.selectedGroup && !this.search) return [];
 
-            let sets = this.selectedGroup ? this.selectedGroup.sets : this.sets.reduce((sets, group) => {
-                return sets.concat(group.sets);
-            }, []);
+            let sets = this.selectedGroup
+                ? this.selectedGroup.sets
+                : this.sets.reduce((sets, group) => {
+                      return sets.concat(group.sets);
+                  }, []);
 
             if (this.search) {
                 return sets
-                    .filter(set => !set.hide)
-                    .filter(set => {
-                        return __(set.display).toLowerCase().includes(this.search.toLowerCase())
-                            || set.handle.toLowerCase().includes(this.search.toLowerCase());
+                    .filter((set) => !set.hide)
+                    .filter((set) => {
+                        return (
+                            __(set.display).toLowerCase().includes(this.search.toLowerCase()) ||
+                            set.handle.toLowerCase().includes(this.search.toLowerCase())
+                        );
                     });
             }
 
-            return sets.filter(set => !set.hide);
+            return sets.filter((set) => !set.hide);
         },
 
         items() {
             let items = [];
 
             if (this.showGroups) {
-                this.sets.forEach(group => {
+                this.sets.forEach((group) => {
                     items.push({ ...group, type: 'group' });
                 });
             }
 
-            this.visibleSets.forEach(set => {
+            this.visibleSets.forEach((set) => {
                 items.push({ ...set, type: 'set' });
             });
 
             return items;
-
         },
 
         noSearchResults() {
             return this.search && this.visibleSets.length === 0;
         },
 
-        iconBaseDirectory() {
-            return this.$config.get('setIconsDirectory');
+        iconSet() {
+            return this.$config.get('replicatorSetIcons') || undefined;
         },
 
-        iconSubFolder() {
-            return this.$config.get('setIconsFolder');
+        // For Grid Mode - groups items into tabs
+        groupedItems() {
+            const groups = {};
+
+            // Add all sets to 'all' group
+            groups.all = {
+                display: __('All'),
+                handle: 'all',
+                items: []
+            };
+
+            // Group sets by their parent group
+            this.sets.forEach(group => {
+                let filteredSets = group.sets.filter(set => !set.hide);
+
+                // Apply search filter if there's a search term
+                if (this.search) {
+                    filteredSets = filteredSets.filter(set => {
+                        return (
+                            __(set.display).toLowerCase().includes(this.search.toLowerCase()) ||
+                            set.handle.toLowerCase().includes(this.search.toLowerCase())
+                        );
+                    });
+                }
+
+                groups[group.handle] = {
+                    display: group.display || group.handle,
+                    handle: group.handle,
+                    items: filteredSets
+                };
+
+                // Add filtered sets to 'all' group
+                groups.all.items = groups.all.items.concat(filteredSets);
+            });
+
+            return groups;
         },
 
-        iconDirectory() {
-            let iconDirectory = this.$config.get('setIconsDirectory');
-            let iconFolder = this.$config.get('setIconsFolder');
+        // Get items for the currently selected tab
+        currentTabItems() {
+            if (this.mode !== 'grid') return [];
 
-            if (iconFolder) {
-                iconDirectory = iconDirectory+'/'+iconFolder;
-            }
-
-            return iconDirectory;
+            const group = this.groupedItems[this.selectedTab];
+            return group ? group.items : [];
         },
 
+        // Determine whether to use Modal or Popover
+        shouldUseModal() {
+            // Modal for grid mode, Popover for list mode
+            return this.mode === 'grid';
+        },
     },
 
     watch: {
-
+        isOpen(isOpen) {
+            if (isOpen) {
+                if (this.sets.length === 1) {
+                    this.selectedGroupHandle = this.sets[0].handle;
+                }
+                this.bindKeys();
+            } else {
+                this.unbindKeys();
+            }
+        },
         search() {
             this.selectionIndex = 0;
-        }
-
+        },
+        selectedTab() {
+            this.selectionIndex = 0;
+        },
+        mode() {
+            this.saveMode();
+        },
     },
 
     methods: {
-
         addSet(handle) {
             this.$emit('added', handle);
             this.unselectGroup();
             this.search = null;
-            this.$refs.popover.close();
+            this.isOpen = false;
         },
 
         selectGroup(handle) {
@@ -187,77 +375,78 @@ export default {
             this.selectedGroupHandle = null;
         },
 
-        opened() {
-            // setTimeout(() => this.$refs.search.focus(), 150);
-            this.$refs.search.focus();
-
-            if (this.sets.length === 1) {
-                this.selectedGroupHandle = this.sets[0].handle;
-            }
-
-            this.bindKeys();
-        },
-
-        closed() {
-            this.unbindKeys();
-        },
-
         bindKeys() {
             this.keybindings = [
-                this.$keys.bindGlobal('up', e => this.keypressUp(e)),
-                this.$keys.bindGlobal('down', e => this.keypressDown(e)),
-                this.$keys.bindGlobal('enter', e => this.keypressEnter(e)),
+                this.$keys.bindGlobal('up', (e) => this.keypressUp(e)),
+                this.$keys.bindGlobal('down', (e) => this.keypressDown(e)),
+                this.$keys.bindGlobal('enter', (e) => this.keypressEnter(e)),
+                this.$keys.bindGlobal('right', (e) => this.keypressRight(e)),
+                this.$keys.bindGlobal('left', (e) => this.keypressLeft(e)),
             ];
         },
 
         unbindKeys() {
-            this.keybindings.forEach(binding => binding.destroy());
+            this.keybindings.forEach((binding) => binding.destroy());
             this.keybindings = [];
         },
 
         keypressUp(e) {
             e.preventDefault();
-            this.selectionIndex = this.selectionIndex === 0 ? this.items.length - 1 : this.selectionIndex - 1;
+            const items = this.mode === 'grid' ? this.currentTabItems : this.items;
+            this.selectionIndex = this.selectionIndex === 0 ? items.length - 1 : this.selectionIndex - 1;
         },
 
         keypressDown(e) {
             e.preventDefault();
-            this.selectionIndex = this.selectionIndex === this.items.length-1 ? 0 : this.selectionIndex + 1;
+            const items = this.mode === 'grid' ? this.currentTabItems : this.items;
+            this.selectionIndex = this.selectionIndex === items.length - 1 ? 0 : this.selectionIndex + 1;
+        },
+
+        keypressRight(e) {
+            e.preventDefault();
+            if (this.selectedGroup || this.search) return; // Pressing right to select a set feels awkward.
+            this.keypressEnter(e);
+        },
+
+        keypressLeft(e) {
+            e.preventDefault();
+            this.unselectGroup();
         },
 
         keypressEnter(e) {
             e.preventDefault();
-            const item = this.items[this.selectionIndex];
-            if (item.type === 'group') {
+            const items = this.mode === 'grid' ? this.currentTabItems : this.items;
+            const item = items[this.selectionIndex];
+            if (item && item.type === 'group') {
                 this.selectGroup(item.handle);
-            } else {
+            } else if (item) {
                 this.addSet(item.handle);
             }
         },
 
-        triggerWasClicked() {
-            if (! this.hasMultipleSets) {
-                this.addSet(this.sets[0].sets[0].handle);
+        singleButtonClicked() {
+            this.addSet(this.sets[0].sets[0].handle);
+        },
+
+        open() {
+            this.isOpen = true;
+        },
+
+        getStoredMode() {
+            try {
+                return localStorage.getItem('statamic.replicator.setPicker.mode') || 'list';
+            } catch (e) {
+                return 'list';
             }
         },
 
-        groupIconName(name) {
-            if (! name) return 'folder-generic';
-
-            return this.iconSubFolder
-                ? this.iconSubFolder+'/'+name
-                : name;
+        saveMode() {
+            try {
+                localStorage.setItem('statamic.replicator.setPicker.mode', this.mode);
+            } catch (e) {
+                // Ignore localStorage errors
+            }
         },
-
-        setIconName(name) {
-            if (! name) return 'light/add';
-
-            return this.iconSubFolder
-                ? this.iconSubFolder+'/'+name
-                : name;
-        },
-
-    }
-
-}
+    },
+};
 </script>

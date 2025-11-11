@@ -31,6 +31,11 @@ class FileCacher extends AbstractCacher
     /**
      * @var string
      */
+    private $csrfTokenJs;
+
+    /**
+     * @var string
+     */
     private $nocacheJs;
 
     /**
@@ -230,16 +235,59 @@ class FileCacher extends AbstractCacher
         return Str::contains($path, '_lqs_');
     }
 
+    public function setCsrfTokenJs(string $js)
+    {
+        $this->csrfTokenJs = $js;
+    }
+
     public function setNocacheJs(string $js)
     {
         $this->nocacheJs = $js;
     }
 
-    public function getNocacheJs(): string
+    public function getCsrfTokenJs(): string
     {
         $csrfPlaceholder = CsrfTokenReplacer::REPLACEMENT;
 
         $default = <<<EOT
+(function() {
+    fetch('/!/csrf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .then((response) => response.json())
+    .then((data) => {
+        for (const input of document.querySelectorAll('input[value="$csrfPlaceholder"]')) {
+            input.value = data.csrf;
+        }
+
+        for (const meta of document.querySelectorAll('meta[content="$csrfPlaceholder"]')) {
+            meta.content = data.csrf;
+        }
+
+        for (const input of document.querySelectorAll('script[data-csrf="$csrfPlaceholder"]')) {
+            input.setAttribute('data-csrf', data.csrf);
+        }
+
+        if (window.hasOwnProperty('livewire_token')) {
+            window.livewire_token = data.csrf
+        }
+
+        if (window.hasOwnProperty('livewireScriptConfig')) {
+            window.livewireScriptConfig.csrf = data.csrf
+        }
+
+        document.dispatchEvent(new CustomEvent('statamic:csrf.replaced', { detail: data }));
+    });
+})();
+EOT;
+
+        return $this->csrfTokenJs ?? $default;
+    }
+
+    public function getNocacheJs(): string
+    {
+        $default = <<<'EOT'
 (function() {
     function createMap() {
         var map = {};
@@ -268,26 +316,6 @@ class FileCacher extends AbstractCacher
         const regions = data.regions;
         for (var key in regions) {
             if (map[key]) map[key].setHTMLUnsafe(regions[key]);
-        }
-
-        for (const input of document.querySelectorAll('input[value="$csrfPlaceholder"]')) {
-            input.value = data.csrf;
-        }
-
-        for (const meta of document.querySelectorAll('meta[content="$csrfPlaceholder"]')) {
-            meta.content = data.csrf;
-        }
-
-        for (const input of document.querySelectorAll('script[data-csrf="$csrfPlaceholder"]')) {
-            input.setAttribute('data-csrf', data.csrf);
-        }
-
-        if (window.hasOwnProperty('livewire_token')) {
-            window.livewire_token = data.csrf
-        }
-
-        if (window.hasOwnProperty('livewireScriptConfig')) {
-            window.livewireScriptConfig.csrf = data.csrf
         }
 
         document.dispatchEvent(new CustomEvent('statamic:nocache.replaced', { detail: data }));
@@ -320,7 +348,7 @@ EOT;
 
     public function getUrl(Request $request)
     {
-        $url = $request->getUri();
+        $url = $this->removeBackgroundRecacheTokenFromUrl($request->getUri());
 
         if ($this->isExcluded($url)) {
             return $url;
@@ -342,6 +370,6 @@ EOT;
 
         $qs = HeaderUtils::parseQuery($qs);
 
-        return $url.'?'.http_build_query($qs, '', '&', \PHP_QUERY_RFC3986);
+        return $this->removeBackgroundRecacheTokenFromUrl($url.'?'.http_build_query($qs, '', '&', \PHP_QUERY_RFC3986));
     }
 }

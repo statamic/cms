@@ -6,18 +6,20 @@ use Closure;
 use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Reflector;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Actions\Action;
+use Statamic\Addons\Manifest;
 use Statamic\Dictionaries\Dictionary;
 use Statamic\Exceptions\NotBootedException;
-use Statamic\Extend\Manifest;
 use Statamic\Facades\Addon;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Fieldset;
 use Statamic\Facades\Path;
+use Statamic\Facades\YAML;
 use Statamic\Fields\Fieldtype;
 use Statamic\Forms\JsDrivers\JsDriver;
 use Statamic\Modifiers\Modifier;
@@ -220,6 +222,7 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootBlueprints()
                 ->bootFieldsets()
                 ->bootPublishAfterInstall()
+                ->bootSettingsBlueprint()
                 ->bootAddon();
 
             $this->bootedAddons()->push($this->getAddon()->id());
@@ -797,6 +800,26 @@ abstract class AddonServiceProvider extends ServiceProvider
             $this->fieldsetNamespace ?? $this->getAddon()->slug(),
             $path
         );
+
+        return $this;
+    }
+
+    protected function registerSettingsBlueprint(array $blueprint): self
+    {
+        $this->app->bind("statamic.addons.{$this->getAddon()->slug()}.settings_blueprint", fn () => $blueprint);
+
+        return $this;
+    }
+
+    protected function bootSettingsBlueprint()
+    {
+        if (! $this->shouldBootRootItems()) {
+            return $this;
+        }
+
+        if (file_exists($path = "{$this->getAddon()->directory()}resources/blueprints/settings.yaml")) {
+            $this->registerSettingsBlueprint(YAML::file($path)->parse());
+        }
 
         return $this;
     }

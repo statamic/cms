@@ -25,26 +25,19 @@ class CorePreferences
             'instructions' => __('statamic::messages.preference_start_page_instructions'),
         ]);
 
-        Preference::register('favorites', [
-            'type' => 'grid',
-            'display' => __('Favorites'),
-            'instructions' => __('statamic::messages.preference_favorites_instructions'),
-            'fields' => [
-                [
-                    'handle' => 'name',
-                    'field' => [
-                        'type' => 'text',
-                        'width' => 33,
-                    ],
-                ],
-                [
-                    'handle' => 'url',
-                    'field' => [
-                        'display' => __('URL'),
-                        'type' => 'text',
-                    ],
-                ],
-            ],
+        Preference::register('strict_accessibility', [
+            'type' => 'toggle',
+            'display' => __('Stricter WCAG 2.2 Mode'),
+            'instructions' => __('statamic::messages.preference_strict_accessibility_instructions'),
+            'variant' => 'inline',
+        ]);
+
+        Preference::register('confirm_dirty_navigation', [
+            'type' => 'toggle',
+            'default' => true,
+            'display' => __('Confirm Dirty Navigation'),
+            'instructions' => __('statamic::messages.preference_confirm_dirty_navigation_instructions'),
+            'variant' => 'inline',
         ]);
     }
 
@@ -92,7 +85,7 @@ class CorePreferences
                 ['label' => $label, 'native' => $native] = $item;
 
                 if ($locale !== $current && $label !== $native) {
-                    $label .= '<span class="ltr:ml-4 rtl:mr-4 text-gray-600">'.$native.'</span>';
+                    $label .= '<span class="ms-4 text-gray-500 dark:text-gray-400">'.$native.'</span>';
                 }
 
                 return $label;

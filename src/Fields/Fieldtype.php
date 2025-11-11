@@ -160,6 +160,11 @@ abstract class Fieldtype implements Arrayable
         return $value;
     }
 
+    public function preProcessTagRenderable($data, $recursiveCallback)
+    {
+        return $data;
+    }
+
     public function defaultValue()
     {
         return $this->defaultValue;
@@ -287,7 +292,10 @@ abstract class Fieldtype implements Arrayable
 
     protected function extraConfigFieldItems(): array
     {
-        return self::$extraConfigFields[static::class] ?? [];
+        return array_merge(
+            self::$extraConfigFields[static::class] ?? [],
+            Fieldtype::$extraConfigFields[Fieldtype::class] ?? [],
+        );
     }
 
     public static function appendConfigFields(array $config): void
@@ -304,7 +312,7 @@ abstract class Fieldtype implements Arrayable
 
     public function icon()
     {
-        return $this->icon ?? $this->handle();
+        return $this->icon ?? "fieldtype-{$this->handle()}";
     }
 
     public function process($data)
@@ -399,6 +407,11 @@ abstract class Fieldtype implements Arrayable
     public function extraRenderableFieldData(): array
     {
         return [];
+    }
+
+    public function hasJsDriverDataBinding(): bool
+    {
+        return true;
     }
 
     public function shouldParseAntlersFromRawString(): bool

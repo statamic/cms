@@ -2,8 +2,8 @@
 
 namespace Statamic\Search\Algolia;
 
+use Algolia\AlgoliaSearch\Api\SearchClient;
 use Algolia\AlgoliaSearch\Exceptions\AlgoliaException;
-use Algolia\AlgoliaSearch\SearchClient;
 use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Support\Arr;
 use Statamic\Search\Documents;
@@ -14,13 +14,24 @@ use Statamic\Support\Str;
 
 class Index extends BaseIndex
 {
-    protected $client;
+    private SearchClient $client;
+    private bool $settingsInitialized = false;
 
     public function __construct(SearchClient $client, $name, $config, $locale)
     {
         $this->client = $client;
 
         parent::__construct($name, $config, $locale);
+    }
+
+    protected function client(): SearchClient
+    {
+        if (! $this->settingsInitialized && isset($this->config['settings']) && ! $this->exists()) {
+            $this->client->setSettings($this->name, $this->config['settings']);
+            $this->settingsInitialized = true;
+        }
+
+        return $this->client;
     }
 
     public function search($query)
@@ -37,7 +48,7 @@ class Index extends BaseIndex
         })->values();
 
         try {
-            $this->getIndex()->saveObjects($documents);
+            $this->client()->saveObjects($this->name, $documents->all());
         } catch (ConnectException $e) {
             throw new \Exception('Error connecting to Algolia. Check your API credentials.', 0, $e);
         }
@@ -45,21 +56,20 @@ class Index extends BaseIndex
 
     public function delete($document)
     {
-        $this->getIndex()->deleteObject($document->getSearchReference());
+        $this->client()->deleteObject($this->name, $document->getSearchReference());
     }
 
     public function deleteIndex()
     {
-        $this->getIndex()->delete();
+        $this->client()->deleteIndex($this->name);
     }
 
     public function update()
     {
-        $index = $this->getIndex();
-        $index->clearObjects();
+        $this->client()->clearObjects($this->name);
 
         if (isset($this->config['settings'])) {
-            $index->setSettings($this->config['settings']);
+            $this->client()->setSettings($this->name, $this->config['settings']);
         }
 
         $this->searchables()->lazy()->each(fn ($searchables) => $this->insertMultiple($searchables));
@@ -67,28 +77,16 @@ class Index extends BaseIndex
         return $this;
     }
 
-    public function getIndex()
-    {
-        $indexExisted = $this->exists();
-        $index = $this->client->initIndex($this->name);
-
-        if (! $indexExisted && isset($this->config['settings'])) {
-            $index->setSettings($this->config['settings']);
-        }
-
-        return $index;
-    }
-
     public function searchUsingApi($query, $fields = null)
     {
-        $arguments = [];
+        $arguments = ['query' => $query];
 
         if ($fields) {
             $arguments['restrictSearchableAttributes'] = implode(',', Arr::wrap($fields));
         }
 
         try {
-            $response = $this->getIndex()->search($query, $arguments);
+            $response = $this->client()->searchSingleIndex($this->name, $arguments);
         } catch (AlgoliaException $e) {
             $this->handleAlgoliaException($e);
         }

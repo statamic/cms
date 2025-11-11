@@ -4,6 +4,7 @@ namespace Statamic\Fields;
 
 use Closure;
 use Exception;
+use Illuminate\Support\Collection;
 use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades\Blink;
 use Statamic\Facades\File;
@@ -259,6 +260,32 @@ class BlueprintRepository
         return collect($this->additionalNamespaces);
     }
 
+    public function getRenderableAdditionalNamespaces(): Collection
+    {
+        return $this
+            ->getAdditionalNamespaces()
+            ->keys()
+            ->map(fn ($namespace) => Blueprint::in($namespace))
+            ->reject(fn ($blueprints) => $blueprints->isEmpty())
+            ->map(function ($blueprints) {
+                return [
+                    'title' => $type = $blueprints->first()->renderableNamespace(),
+                    'blueprints' => $blueprints
+                        ->map(fn ($blueprint) => [
+                            'handle' => $blueprint->handle(),
+                            'namespace' => $blueprint->namespace(),
+                            'title' => $blueprint->title(),
+                            'reset_url' => $blueprint->resetAdditionalBlueprintUrl(),
+                            'is_resettable' => $blueprint->isResettable(),
+                            'command_palette_link' => $blueprint->commandPaletteLink($type, $blueprint->editAdditionalBlueprintUrl()),
+                        ])
+                        ->sortBy('title')
+                        ->values(),
+                ];
+            })
+            ->sortBy('title');
+    }
+
     protected function filesIn($namespace)
     {
         return Blink::store(self::BLINK_NAMESPACE_PATHS)->once($namespace, function () use ($namespace) {
@@ -272,7 +299,10 @@ class BlueprintRepository
 
             $files = File::withAbsolutePaths()
                 ->getFilesByType($directory, 'yaml')
-                ->mapWithKeys(fn ($path) => [Str::after($path, $directory.'/') => $path]);
+                ->mapWithKeys(fn ($path) => [Str::after($path, $directory.'/') => $path])
+                ->when(isset($this->additionalNamespaces[$namespace]), function ($files) {
+                    return $files->reject(fn ($path) => Str::endsWith($path, Path::tidy('/settings.yaml')));
+                });
 
             if (File::exists($directory = $this->directory().'/vendor/'.$namespaceDir)) {
                 $overrides = File::withAbsolutePaths()
@@ -282,7 +312,7 @@ class BlueprintRepository
                 $files = $files->merge($overrides)->values();
             }
 
-            return $files;
+            return $files->collect();
         });
     }
 

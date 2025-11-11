@@ -6,6 +6,8 @@ use Statamic\Contracts\Auth\User as UserContract;
 
 class SendPasswordReset extends Action
 {
+    public $icon = 'mail';
+
     public static function title()
     {
         return __('Send Password Reset');
@@ -24,7 +26,7 @@ class SendPasswordReset extends Action
     public function confirmationText()
     {
         /** @translation */
-        return 'Send password reset email to this user?|Send password reset email to these :count users?';
+        return 'Would you like to email a reset link to this user?|Would you like to email a reset link to these :count users?';
     }
 
     public function dirtyWarningText()

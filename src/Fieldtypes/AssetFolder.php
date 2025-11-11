@@ -17,14 +17,19 @@ class AssetFolder extends Relationship
     {
         return [
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Input Behavior'),
                 'fields' => [
-                    'max_items' => [
-                        'display' => __('Max Items'),
-                        'instructions' => __('statamic::messages.max_items_instructions'),
-                        'min' => 1,
-                        'type' => 'integer',
+                    'container' => [
+                        'display' => __('Container'),
+                        'instructions' => __('statamic::fieldtypes.asset_folders.config.container'),
+                        'type' => 'asset_container',
+                        'max_items' => 1,
                     ],
+                ],
+            ],
+            [
+                'display' => __('Appearance'),
+                'fields' => [
                     'mode' => [
                         'display' => __('UI Mode'),
                         'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
@@ -36,11 +41,16 @@ class AssetFolder extends Relationship
                             'typeahead' => __('Typeahead Field'),
                         ],
                     ],
-                    'container' => [
-                        'display' => __('Container'),
-                        'instructions' => __('statamic::fieldtypes.asset_folders.config.container'),
-                        'type' => 'asset_container',
-                        'max_items' => 1,
+                ],
+            ],
+            [
+                'display' => __('Boundaries & Limits'),
+                'fields' => [
+                    'max_items' => [
+                        'display' => __('Max Items'),
+                        'instructions' => __('statamic::messages.max_items_instructions'),
+                        'min' => 1,
+                        'type' => 'integer',
                     ],
                 ],
             ],

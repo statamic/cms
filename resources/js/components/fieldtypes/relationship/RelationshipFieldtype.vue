@@ -1,5 +1,4 @@
 <template>
-
     <relationship-input
         ref="input"
         :name="name"
@@ -33,30 +32,22 @@
         @input="update"
         @item-data-updated="itemDataUpdated"
     />
-
 </template>
 
 <script>
+import Fieldtype from '../Fieldtype.vue';
 import qs from 'qs';
 
 export default {
-
     mixins: [Fieldtype],
 
     data() {
         return {
             //
-        }
-    },
-
-    inject: {
-        storeName: {
-            default: null
-        }
+        };
     },
 
     computed: {
-
         maxItems() {
             return this.config.max_items || Infinity;
         },
@@ -78,10 +69,14 @@ export default {
         },
 
         selectionsUrl() {
-            return this.baseSelectionsUrl + '?' + qs.stringify({
-                config: this.configParameter,
-                ...this.meta.getBaseSelectionsUrlParameters,
-            });
+            return (
+                this.baseSelectionsUrl +
+                '?' +
+                qs.stringify({
+                    config: this.configParameter,
+                    ...this.meta.getBaseSelectionsUrlParameters,
+                })
+            );
         },
 
         baseSelectionsUrl() {
@@ -93,11 +88,7 @@ export default {
         },
 
         site() {
-            if (this.storeName) {
-                return this.$store.state.publish[this.storeName].site || this.$config.get('selectedSite');
-            }
-
-            return this.$config.get('selectedSite');
+            return this.publishContainer.site ?? this.$config.get('selectedSite');
         },
 
         canEdit() {
@@ -141,10 +132,10 @@ export default {
         },
 
         replicatorPreview() {
-            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+            if (!this.showFieldPreviews) return;
 
-            return this.value.map(id => {
-                const item = _.findWhere(this.meta.data, { id });
+            return this.value.map((id) => {
+                const item = this.meta.data.find((d) => d.id === id);
                 return item ? item.title : id;
             });
         },
@@ -159,12 +150,9 @@ export default {
                 },
             ];
         },
-
     },
 
-
     methods: {
-
         itemDataUpdated(data) {
             const meta = clone(this.meta);
             meta.data = data;
@@ -172,18 +160,16 @@ export default {
         },
 
         linkExistingItem() {
-            this.$refs.input.$refs.existing.click();
+            this.$refs.input.$refs.existing.$el.click();
         },
 
         unlinkAll() {
             this.update([]);
             this.updateMeta({
                 ...this.meta,
-                data: [], 
+                data: [],
             });
         },
-
-    }
-
-}
+    },
+};
 </script>

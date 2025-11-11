@@ -13,24 +13,25 @@
 </template>
 
 <script>
-export default {
+import { router } from '@inertiajs/vue3';
 
+export default {
     props: {
         resource: {
-            type: Object
+            type: Object,
         },
         resourceTitle: {
-            type: String
+            type: String,
         },
         route: {
             type: String,
         },
         redirect: {
-            type: String
+            type: String,
         },
         reload: {
-            type: Boolean
-        }
+            type: Boolean,
+        },
     },
 
     data() {
@@ -38,7 +39,7 @@ export default {
             resetting: false,
             redirectFromServer: null,
             submitting: false,
-        }
+        };
     },
 
     computed: {
@@ -47,7 +48,7 @@ export default {
         },
 
         modalTitle() {
-            return __('Reset :resource', {resource: this.title});
+            return __('Reset :resource', { resource: this.title });
         },
 
         modalBody() {
@@ -56,7 +57,7 @@ export default {
 
         resetUrl() {
             let url = data_get(this.resource, 'reset_url', this.route);
-            if (! url) console.error('BlueprintResetter cannot find reset url');
+            if (!url) console.error('BlueprintResetter cannot find reset url');
             return url;
         },
 
@@ -73,8 +74,9 @@ export default {
         confirmed() {
             this.submitting = true;
 
-            this.$axios.delete(this.resetUrl)
-                .then(response => {
+            this.$axios
+                .delete(this.resetUrl)
+                .then((response) => {
                     this.redirectFromServer = data_get(response, 'data.redirect');
                     this.success();
                 })
@@ -86,12 +88,12 @@ export default {
 
         success() {
             if (this.redirectUrl) {
-                location.href = this.redirectUrl;
+                router.get(this.redirectUrl);
                 return;
             }
 
             if (this.reload) {
-                location.reload();
+                router.reload();
                 return;
             }
 
@@ -102,7 +104,7 @@ export default {
 
         cancel() {
             this.resetting = false;
-        }
-    }
-}
+        },
+    },
+};
 </script>

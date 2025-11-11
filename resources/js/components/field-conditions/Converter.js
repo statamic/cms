@@ -1,33 +1,25 @@
 import { OPERATORS, ALIASES } from './Constants.js';
-import map from 'underscore/modules/map.js'
-import each from 'underscore/modules/each.js'
-import filter from 'underscore/modules/filter.js'
-import chain from 'underscore/modules/chain.js'
-import chainable from 'underscore/modules/mixin.js'
-
-chainable({ chain, filter, each });
 
 export default class {
-
-    fromBlueprint(conditions, prefix=null) {
-        return map(conditions, (condition, field) => this.splitRhs(field, condition, prefix));
+    fromBlueprint(conditions, prefix = null) {
+        return Object.entries(conditions).map(([field, condition]) => this.splitRhs(field, condition, prefix));
     }
 
     toBlueprint(conditions) {
         let converted = {};
 
-        each(conditions, condition => {
+        conditions.forEach((condition) => {
             converted[condition.field] = this.combineRhs(condition);
         });
 
         return converted;
     }
 
-    splitRhs(field, condition, prefix=null) {
+    splitRhs(field, condition, prefix = null) {
         return {
-            'field': this.getScopedFieldHandle(field, prefix),
-            'operator': this.getOperatorFromRhs(condition),
-            'value': this.getValueFromRhs(condition)
+            field: this.getScopedFieldHandle(field, prefix),
+            operator: this.getOperatorFromRhs(condition),
+            value: this.getValueFromRhs(condition),
         };
     }
 
@@ -40,33 +32,29 @@ export default class {
             return field;
         }
 
-        return prefix
-            ? prefix + field
-            : field;
+        return prefix ? prefix + field : field;
     }
 
     getOperatorFromRhs(condition) {
         let operator = '==';
 
-        chain(this.getOperatorsAndAliases())
-            .filter(value => new RegExp(`^${value} [^=]`).test(this.normalizeConditionString(condition)))
-            .each(value => operator = value);
+        this.getOperatorsAndAliases()
+            .filter((value) => new RegExp(`^${value} [^=]`).test(this.normalizeConditionString(condition)))
+            .forEach((value) => (operator = value));
 
         return this.normalizeOperator(operator);
     }
 
     normalizeOperator(operator) {
-        return ALIASES[operator]
-            ? ALIASES[operator]
-            : operator;
+        return ALIASES[operator] ? ALIASES[operator] : operator;
     }
 
     getValueFromRhs(condition) {
         let rhs = this.normalizeConditionString(condition);
 
-        chain(this.getOperatorsAndAliases())
-            .filter(value => new RegExp(`^${value} [^=]`).test(rhs))
-            .each(value => rhs = rhs.replace(new RegExp(`^${value}[ ]*`), ''));
+        this.getOperatorsAndAliases()
+            .filter((value) => new RegExp(`^${value} [^=]`).test(rhs))
+            .forEach((value) => (rhs = rhs.replace(new RegExp(`^${value}[ ]*`), '')));
 
         return rhs;
     }

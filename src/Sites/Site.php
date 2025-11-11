@@ -4,6 +4,7 @@ namespace Statamic\Sites;
 
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Facades\URL;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\TextDirection;
@@ -33,7 +34,7 @@ class Site implements Augmentable
 
     public function name()
     {
-        return $this->config['name'];
+        return $this->config['name'] ?? $this->handle();
     }
 
     public function locale()
@@ -53,13 +54,7 @@ class Site implements Augmentable
 
     public function url()
     {
-        $url = $this->config['url'];
-
-        if ($url === '/') {
-            return '/';
-        }
-
-        return Str::removeRight($url, '/');
+        return URL::tidy($this->config['url'], true);
     }
 
     public function direction()
@@ -79,22 +74,12 @@ class Site implements Augmentable
 
     public function absoluteUrl()
     {
-        if (Str::startsWith($url = $this->url(), '/')) {
-            $url = Str::ensureLeft($url, request()->getSchemeAndHttpHost());
-        }
-
-        return Str::removeRight($url, '/');
+        return URL::makeAbsolute($this->url());
     }
 
     public function relativePath($url)
     {
-        $url = Str::ensureRight($url, '/');
-
-        $path = Str::removeLeft($url, $this->absoluteUrl());
-
-        $path = Str::removeRight(Str::ensureLeft($path, '/'), '/');
-
-        return $path === '' ? '/' : $path;
+        return URL::makeRelative(Str::removeLeft($url, $this->absoluteUrl()));
     }
 
     public function isDefault()

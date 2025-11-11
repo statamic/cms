@@ -116,12 +116,11 @@ class UpdatesOverview
      */
     protected function checkForAddonUpdates()
     {
-        Addon::all()
+        $this->addons = Addon::all()
             ->reject->isLatestVersion()
-            ->each(function ($addon) {
-                $this->addons[$addon->marketplaceSlug()] = $addon->name();
-                $this->count++;
-            });
+            ->map->id()
+            ->values()
+            ->all();
 
         return $this;
     }
