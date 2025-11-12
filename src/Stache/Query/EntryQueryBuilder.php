@@ -2,13 +2,11 @@
 
 namespace Statamic\Stache\Query;
 
-use Closure;
 use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Entry;
 use Statamic\Support\Arr;
 
 class EntryQueryBuilder extends Builder implements QueryBuilder
@@ -229,71 +227,5 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
         }
 
         return $data;
-    }
-
-    public function findOrNew($id)
-    {
-        if (! is_null($entry = $this->find($id))) {
-            return $entry;
-        }
-
-        return Entry::make();
-    }
-
-    public function findOr($id, Closure $callback)
-    {
-        if (! is_null($entry = $this->find($id))) {
-            return $entry;
-        }
-
-        return $callback();
-    }
-
-    public function firstOrNew(array $attributes = [], array $values = [])
-    {
-        if (! is_null($instance = $this->where($attributes)->first())) {
-            return $instance;
-        }
-
-        $data = array_merge($attributes, $values);
-
-        if (($this->collections && count($this->collections) > 1) && ! isset($data['collection'])) {
-            throw new \Exception('Please specify a collection.');
-        }
-
-        return Entry::make()
-            ->collection($this->collections[0] ?? $data['collection'])
-            ->slug($data['slug'] ?? (isset($data['title']) ? Str::slug($data['title']) : null))
-            ->data(Arr::except($data, ['collection', 'slug']));
-    }
-
-    public function firstOrCreate(array $attributes = [], array $values = [])
-    {
-        $entry = $this->firstOrNew($attributes, $values);
-
-        // When the entry is dirty, it means it's new and should be saved.
-        if ($entry->isDirty()) {
-            $entry->save();
-        }
-
-        return $entry;
-    }
-
-    public function updateOrCreate(array $attributes, array $values = [])
-    {
-        $entry = $this->firstOrNew($attributes, $values);
-
-        // When the entry is clean, it means it's existing and should be updated.
-        if ($entry->isClean()) {
-            if ($slug = Arr::get($values, 'slug')) {
-                $entry->slug($slug);
-            }
-
-            $entry->merge(Arr::except($values, ['slug']));
-        }
-
-        $entry->save();
-
-        return $entry;
     }
 }

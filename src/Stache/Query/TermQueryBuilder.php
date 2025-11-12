@@ -2,13 +2,9 @@
 
 namespace Statamic\Stache\Query;
 
-use Closure;
 use Statamic\Facades;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Term;
 use Statamic\Support\Arr;
-use Statamic\Support\Str;
-use Statamic\Taxonomies\LocalizedTerm;
 use Statamic\Taxonomies\TermCollection;
 
 class TermQueryBuilder extends Builder
@@ -222,71 +218,5 @@ class TermQueryBuilder extends Builder
         }
 
         return $data;
-    }
-
-    public function findOrNew($id)
-    {
-        if (! is_null($term = $this->find($id))) {
-            return $term;
-        }
-
-        return Term::make();
-    }
-
-    public function findOr($id, Closure $callback)
-    {
-        if (! is_null($term = $this->find($id))) {
-            return $term;
-        }
-
-        return $callback();
-    }
-
-    public function firstOrNew(array $attributes = [], array $values = [])
-    {
-        if (! is_null($instance = $this->where($attributes)->first())) {
-            return $instance;
-        }
-
-        $data = array_merge($attributes, $values);
-
-        if (($this->taxonomies && count($this->taxonomies) > 1) && ! isset($data['taxonomy'])) {
-            throw new \Exception('Please specify a taxonomy.');
-        }
-
-        return Term::make()
-            ->taxonomy($this->taxonomies[0] ?? $data['taxonomy'])
-            ->slug($data['slug'] ?? (isset($data['title']) ? Str::slug($data['title']) : null))
-            ->data(Arr::except($data, ['taxonomy', 'slug']));
-    }
-
-    public function firstOrCreate(array $attributes = [], array $values = [])
-    {
-        $term = $this->firstOrNew($attributes, $values);
-
-        // When the term is not a LocalizedTerm, it means it's newe and should be saved.
-        if (! $term instanceof LocalizedTerm) {
-            $term->save();
-        }
-
-        return $term;
-    }
-
-    public function updateOrCreate(array $attributes, array $values = [])
-    {
-        $term = $this->firstOrNew($attributes, $values);
-
-        // When the term is a LocalizedTerm, it means it's existing and should be updated.
-        if ($term instanceof LocalizedTerm) {
-            if ($slug = Arr::get($values, 'slug')) {
-                $term->slug($slug);
-            }
-
-            $term->merge($values);
-        }
-
-        $term->save();
-
-        return $term;
     }
 }

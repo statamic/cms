@@ -122,29 +122,14 @@ class TermRepository implements RepositoryContract
         return $term;
     }
 
-    public function findOrNew($id)
+    public function findOrMake($id)
     {
-        return $this->query()->findOrNew($id);
+        return $this->find($id) ?? $this->make();
     }
 
     public function findOr($id, Closure $callback)
     {
-        return $this->query()->findOr($id, $callback);
-    }
-
-    public function firstOrNew(array $attributes, array $values = [])
-    {
-        return $this->query()->firstOrNew($attributes, $values);
-    }
-
-    public function firstOrCreate(array $attributes, array $values = [])
-    {
-        return $this->query()->firstOrCreate($attributes, $values);
-    }
-
-    public function updateOrCreate(array $attributes, array $values = [])
-    {
-        return $this->query()->updateOrCreate($attributes, $values);
+        return $this->find($id) ?? $callback();
     }
 
     public function save($term)

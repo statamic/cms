@@ -18,15 +18,9 @@ interface TermRepository
 
     public function findOrFail($id);
 
-    public function findOrNew($id);
+    public function findOrMake($id);
 
     public function findOr($id, Closure $callback);
-
-    public function firstOrNew(array $attributes, array $values = []);
-
-    public function firstOrCreate(array $attributes, array $values = []);
-
-    public function updateOrCreate(array $attributes, array $values = []);
 
     public function make(?string $slug = null);
 
