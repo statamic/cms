@@ -249,5 +249,5 @@ return [
     'user_wizard_roles_groups_intro' => 'ユーザーは、コントロール パネル全体で権限、アクセス、機能をカスタマイズする役割に割り当てることができます。',
     'user_wizard_super_admin_instructions' => 'スーパー管理者は、コントロール パネル内のすべてを完全に制御し、アクセスできます。この役割を賢明に与えてください。',
     'view_more_count' => '表示:count',
-    'width_x_height' => ':width x :height',
+    'width_x_height' => ':width × :height',
 ];

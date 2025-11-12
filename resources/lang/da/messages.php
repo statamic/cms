@@ -249,5 +249,5 @@ return [
     'user_wizard_roles_groups_intro' => 'Brugere kan tildeles roller, der tilpasser deres tilladelser, adgang og muligheder i hele kontrolpanelet.',
     'user_wizard_super_admin_instructions' => 'Superadministratorer har fuld kontrol og adgang til alt i kontrolpanelet. Vær forsigtig med at tildele denne rolle.',
     'view_more_count' => 'Se :count mere',
-    'width_x_height' => ':width x :height',
+    'width_x_height' => ':width × :height',
 ];

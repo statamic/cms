@@ -249,5 +249,5 @@ return [
     'user_wizard_roles_groups_intro' => 'Pengguna dapat diberikan peran yang menyesuaikan izin, akses, dan kemampuannya di seluruh Panel Kontrol.',
     'user_wizard_super_admin_instructions' => 'Admin super memiliki kontrol penuh dan akses ke semua yang ada di panel kontrol. Berikan peran ini dengan bijak.',
     'view_more_count' => 'Lihat :count lebih banyak',
-    'width_x_height' => ':width x :height',
+    'width_x_height' => ':width × :height',
 ];
