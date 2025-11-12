@@ -612,6 +612,7 @@ class GitEventTest extends TestCase
                 ],
             ]);
 
+        BlueprintRepository::shouldReceive('all')->andReturn(collect([$blueprint]));
         BlueprintRepository::shouldReceive('in')->with('collections/pages')->andReturn(collect([$blueprint]));
 
         foreach (range(1, 3) as $i) {

@@ -1985,6 +1985,7 @@ EOT;
     {
         $blueprint = tap(Facades\Blueprint::make('single-blueprint')->setContents($blueprintContents))->save();
 
+        Facades\Blueprint::shouldReceive('all')->andReturn(collect([$blueprint]));
         Facades\Blueprint::shouldReceive('find')->with($namespace)->andReturn($blueprint);
     }
 
@@ -1992,6 +1993,7 @@ EOT;
     {
         $blueprint = tap(Facades\Blueprint::make('set-in-blueprints')->setContents($blueprintContents))->save();
 
+        Facades\Blueprint::shouldReceive('all')->andReturn(collect([$blueprint]));
         Facades\Blueprint::shouldReceive('in')->with($namespace)->andReturn(collect([$blueprint]));
     }
 
