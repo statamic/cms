@@ -32,18 +32,16 @@ function enableWarning() {
     }
 
     // For Inertia navigation (e.g. through Link component)
-    if (! inertiaWarningListener) {
-        inertiaWarningListener = router.on('before', event => {
-            const confirmed = confirm(__('statamic::messages.dirty_navigation_warning'));
-            if (confirmed) {
-                // Clear state so subsequent navigations don't prompt again
-                router.on('success', () => clear());
-                // Disable the browser warning so the user doesn't get double prompts
-                disableWarning();
-            }
-            return confirmed;
-        });
-    }
+    inertiaWarningListener ??= router.on('before', event => {
+        const confirmed = confirm(__('statamic::messages.dirty_navigation_warning'));
+        if (confirmed) {
+            // Clear state so subsequent navigations don't prompt again
+            router.on('success', () => clear());
+            // Disable the browser warning so the user doesn't get double prompts
+            disableWarning();
+        }
+        return confirmed;
+    });
 
     // For browser navigation (e.g. back button, refresh, closing tab)
     window.onbeforeunload = () => '';
@@ -52,7 +50,6 @@ function enableWarning() {
 function disableWarning() {
     window.onbeforeunload = null;
     inertiaWarningListener && inertiaWarningListener();
-    inertiaWarningListener = null;
 }
 
 function state(name, state) {
