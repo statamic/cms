@@ -64,7 +64,7 @@ Table Fieldtype
         @apply outline-hidden dark:bg-gray-900;
 
         th {
-            @apply bg-gray-50 p-2 text-sm font-medium text-gray-700 text-start border-r border-b border-gray-200 dark:border-dark-900 dark:bg-gray-700 dark:text-gray-100 overflow-hidden;
+            @apply bg-gray-50 p-2 text-sm font-medium text-gray-700 text-start border-r border-b border-gray-300 dark:border-dark-600 dark:bg-gray-925 dark:text-gray-100 overflow-hidden;
 
             tr:first-child & {
                 @apply rounded-tl-lg;
@@ -79,6 +79,10 @@ Table Fieldtype
 
             &:first-child td {
                 @apply overflow-hidden;
+                &:last-child {
+                    /* e.g. the first row of an array fieldtype, keyed type, in dark mode */
+                    @apply rounded-tr-lg;
+                }
             }
 
             &:last-child td {
