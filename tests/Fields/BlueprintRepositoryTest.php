@@ -32,13 +32,25 @@ class BlueprintRepositoryTest extends TestCase
     #[Test]
     public function it_gets_all_blueprints()
     {
-        Facades\Form::all()->each->delete();
+        $this->repo->setDirectories($this->fakeStacheDirectory . '/dev-null/blueprints');
 
-        Facades\Collection::make('test')->save();
-        Facades\Taxonomy::make('test')->save();
-        Facades\Nav::make('test')->save();
-        Facades\AssetContainer::make('test')->save();
-        Facades\Form::make('test')->save();
+        $collection = tap(Facades\Collection::make('test'))->save();
+        $collection->entryBlueprint()->save();
+
+        $taxonomy = tap(Facades\Taxonomy::make('test'))->save();
+        $taxonomy->termBlueprint()->save();
+
+        $nav = tap(Facades\Nav::make('test'))->save();
+        $nav->blueprint()->save();
+
+        $assetContainer = tap(Facades\AssetContainer::make('test'))->save();
+        $assetContainer->blueprint()->save();
+
+        Facades\GlobalSet::make('test')->save();
+        $this->repo->make('test')->setNamespace('globals')->save();
+
+        $form = tap(Facades\Form::make('test'))->save();
+        $form->blueprint()->save();
 
         $all = $this->repo->all();
 
@@ -48,6 +60,7 @@ class BlueprintRepositoryTest extends TestCase
             'taxonomies.test.test',
             'navigation.test',
             'assets.test',
+            'globals.test',
             'forms.test',
         ], $all->map->fullyQualifiedHandle()->all());
     }
