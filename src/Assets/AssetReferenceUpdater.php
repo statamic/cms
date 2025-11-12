@@ -348,8 +348,16 @@ class AssetReferenceUpdater extends DataReferenceUpdater
         foreach ($fieldPaths as $fieldPath) {
             $fieldContents = Arr::get($contents, $fieldPath);
 
+            if (! isset($fieldContents['sets'])) {
+                continue;
+            }
+
             $fieldContents['sets'] = collect($fieldContents['sets'])
                 ->map(function ($setGroup) {
+                    if (! isset($setGroup['sets'])) {
+                        return $setGroup;
+                    }
+
                     $setGroup['sets'] = collect($setGroup['sets'])
                         ->map(function ($set) {
                             if (isset($set['image']) && $set['image'] === $this->originalValue) {
