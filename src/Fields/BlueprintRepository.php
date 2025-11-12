@@ -6,13 +6,13 @@ use Closure;
 use Exception;
 use Illuminate\Support\Collection;
 use Statamic\Exceptions\BlueprintNotFoundException;
+use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
-use Statamic\Facades;
 
 class BlueprintRepository
 {

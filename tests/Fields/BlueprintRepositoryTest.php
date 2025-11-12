@@ -32,7 +32,7 @@ class BlueprintRepositoryTest extends TestCase
     #[Test]
     public function it_gets_all_blueprints()
     {
-        $this->repo->setDirectories($this->fakeStacheDirectory . '/dev-null/blueprints');
+        $this->repo->setDirectories($this->fakeStacheDirectory.'/dev-null/blueprints');
 
         $collection = tap(Facades\Collection::make('test'))->save();
         $collection->entryBlueprint()->save();
