@@ -9,14 +9,8 @@ use Statamic\Events\AssetReferencesUpdated;
 use Statamic\Events\AssetReplaced;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\Subscriber;
-use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
-use Statamic\Facades\Collection;
 use Statamic\Facades\Fieldset;
-use Statamic\Facades\Form;
-use Statamic\Facades\GlobalSet;
-use Statamic\Facades\Nav;
-use Statamic\Facades\Taxonomy;
 
 class UpdateAssetReferences extends Subscriber implements ShouldQueue
 {
@@ -129,19 +123,6 @@ class UpdateAssetReferences extends Subscriber implements ShouldQueue
 
         if ($hasUpdatedItems) {
             AssetReferencesUpdated::dispatch($asset);
-        }
-    }
-
-    protected function findFields(array $array, array $fieldtypes, string $dottedPrefix, array &$bigArrayOfFields)
-    {
-        foreach ($array as $key => $value) {
-            if (is_array($value)) {
-                $this->findFields($value, $fieldtypes, "$dottedPrefix.$key", $bigArrayOfFields);
-            } elseif (is_string($value)) {
-                if ($key === 'type' && in_array($value, $fieldtypes)) {
-                    $bigArrayOfFields[] = $dottedPrefix;
-                }
-            }
         }
     }
 }
