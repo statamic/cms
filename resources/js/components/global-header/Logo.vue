@@ -28,7 +28,7 @@ function toggleNav() {
                 </div>
                 <img v-if="customLogoImage" :src="customLogoImage" :alt="cmsName" class="max-w-[260px] max-h-8">
             </button>
-            <Link v-if="customLogoText && !customLogoImage" :href="cp_url('/')" class="mr-2 text-white text-medium whitespace-nowrap" style="--focus-outline-offset: var(--outline-offset-button);">
+            <Link v-if="customLogoText && !customLogoImage" :href="cp_url('/')" class="mr-2 font-medium text-white whitespace-nowrap" style="--focus-outline-offset: var(--outline-offset-button);">
                 {{ customLogoText }}
             </Link>
         </div>
