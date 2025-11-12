@@ -26,20 +26,14 @@ class BlueprintRepository
 
     public function all()
     {
-        $additionalBlueprints = Blueprint::getAdditionalNamespaces()
-            ->keys()
-            ->flatMap(fn ($namespace) => Blueprint::in($namespace)->values());
+        $namespaces = [
+            ...Facades\Collection::all()->map(fn ($collection) => "collections/{$collection->handle()}")->all(),
+            ...Facades\Taxonomy::all()->map(fn ($taxonomy) => "taxonomies/{$taxonomy->handle()}")->all(),
+            'navigation', 'assets', 'globals', 'forms',
+            ...$this->getAdditionalNamespaces()->keys()->all(),
+        ];
 
-        return collect()
-            ->merge(Facades\Collection::all()->flatMap->entryBlueprints())
-            ->merge(Facades\Taxonomy::all()->flatMap->termBlueprints())
-            ->merge(Facades\Nav::all()->map->blueprint())
-            ->merge(Facades\AssetContainer::all()->map->blueprint())
-            ->merge(Facades\GlobalSet::all()->map->blueprint())
-            ->merge(Facades\Form::all()->map->blueprint())
-            ->merge($additionalBlueprints)
-            ->filter()
-            ->values();
+        return collect($namespaces)->flatMap(fn ($namespace) => $this->in($namespace)->values());
     }
 
     public function setDirectories(string|array $directories)
