@@ -23,7 +23,7 @@ function toggleNav() {
             <div class="p-1 max-sm:ps-2 mr-2 size-5 flex items-center justify-center lg:inset-0">
                 <Icon name="burger-menu-no-border" class="size-3.5! sm:size-3.25! opacity-75 hover:opacity-100" />
             </div>
-            <img :src="customLogo" :alt="cmsName" class="max-w-[260px] max-h-9">
+            <img :src="customLogo" :alt="cmsName" class="max-w-[260px] max-h-8">
         </button>
     </template>
     <template v-else>
