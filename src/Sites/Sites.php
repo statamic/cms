@@ -210,7 +210,7 @@ class Sites
                     'instructions' => __('statamic::messages.site_configure_locale_instructions'),
                     'options' => [
                         '{{ config:app.locale }}' => '{{ config:app.locale }}',
-                        ...Dictionary::find('locales')->options()
+                        ...Dictionary::find('locales')->options(),
                     ],
                     'taggable' => true,
                     'searchable' => true,
