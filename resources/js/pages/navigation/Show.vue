@@ -237,6 +237,7 @@ export default {
                 removeFromUi(shouldDeleteChildren);
                 this.showPageDeletionConfirmation = false;
                 this.pageBeingDeleted = branch;
+                delete this.publishInfo[branch.id];
             };
         },
 
