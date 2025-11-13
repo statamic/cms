@@ -4,7 +4,7 @@
             <slot name="empty" />
         </div>
 
-        <ui-panel v-show="treeData.length">
+        <ui-panel v-show="treeData.length" :class="panelClass">
             <div class="loading card" v-if="loading">
                 <Icon name="loading" />
             </div>
@@ -117,6 +117,7 @@ export default {
         preferencesPrefix: { type: String },
         editable: { type: Boolean, default: true },
         blueprints: { type: Array },
+        panelClass: { type: [String, Array, Object], default: null },
     },
 
     data() {

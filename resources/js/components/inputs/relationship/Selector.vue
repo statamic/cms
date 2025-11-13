@@ -63,6 +63,7 @@
                 <div class="mx-4 flex-1 overflow-auto">
                     <Panel>
                         <page-tree
+                            panel-class="px-0"
                             ref="tree"
                             :pages-url="tree.url"
                             :show-slugs="tree.showSlugs"
