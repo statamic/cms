@@ -215,6 +215,7 @@ export default {
                 title: values.title,
                 url: values.url,
                 status: null,
+                children: [],
             };
 
             this.publishInfo[page.id] = {
