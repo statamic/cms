@@ -39,6 +39,7 @@ class Color
     public const Zinc = [
         50 => 'oklch(0.985 0 0)',
         100 => 'oklch(0.967 0.001 286.375)',
+        150 => 'oklch(0.956 0.0022 286.32)',
         200 => 'oklch(0.92 0.004 286.32)',
         300 => 'oklch(0.871 0.006 286.286)',
         400 => 'oklch(0.705 0.015 286.067)',
@@ -367,6 +368,7 @@ class Color
             'primary' => self::Indigo[700],
             'gray-50' => self::Zinc[50],
             'gray-100' => self::Zinc[100],
+            'gray-150' => self::Zinc[150],
             'gray-200' => self::Zinc[200],
             'gray-300' => self::Zinc[300],
             'gray-400' => self::Zinc[400],
