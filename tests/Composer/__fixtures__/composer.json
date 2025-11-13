@@ -29,5 +29,15 @@
                 "symlink": false
             }
         }
-    ]
+    ],
+    "config": {
+        "audit": {
+            "ignore": [
+                "PKSA-b8f7-zn44-r4gz",
+                "PKSA-s25b-vbmp-jvhh",
+                "PKSA-jn72-4kr8-gj3h",
+                "PKSA-m1ph-vmbx-2xd3"
+            ]
+        }
+    }
 }
