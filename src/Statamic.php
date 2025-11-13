@@ -20,7 +20,6 @@ use Statamic\Support\Svg;
 use Statamic\Support\TextDirection;
 use Statamic\Tags\FluentTag;
 
-//
 class Statamic
 {
     const CORE_SLUG = 'statamic';
