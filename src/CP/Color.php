@@ -442,6 +442,6 @@ class Color
 
                 return "--theme-color-{$name}: {$color};";
             })
-            ->implode(PHP_EOL.'    ');
+            ->implode(PHP_EOL.($darkVariant ? "\t\t\t" : "\t\t"));
     }
 }
