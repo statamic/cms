@@ -45,6 +45,10 @@ function save() {
         ])
         .then((response) => {
             Statamic.$toast.success(__('Saved'));
+
+            if (Statamic.$config.get('multisiteEnabled')) {
+                window.location.reload();
+            }
         });
 }
 
