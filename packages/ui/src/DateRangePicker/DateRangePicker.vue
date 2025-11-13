@@ -155,7 +155,8 @@ const calendarEvents = computed(() => ({
             <DateRangePickerContent
                 v-if="!inline"
                 align="start"
-                :side-offset="4"
+                :align-offset="-12"
+                :side-offset="14"
                 class="data-[state=open]:data-[side=top]:animate-slideDownAndFade data-[state=open]:data-[side=right]:animate-slideLeftAndFade data-[state=open]:data-[side=bottom]:animate-slideUpAndFade data-[state=open]:data-[side=left]:animate-slideRightAndFade will-change-[transform,opacity]"
             >
                 <Card class="w-[20rem]">
