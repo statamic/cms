@@ -129,7 +129,7 @@ class TaxonomyBlueprintsController extends CpController
 
         Breadcrumbs::push(new Breadcrumb(
             text: $taxonomy->title(),
-            url: request()->url(),
+            url: cp_route('blueprints.taxonomies.index', $taxonomy),
             icon: 'taxonomies',
             links: Taxonomy::all()
                 ->reject(fn ($t) => $t->handle() === $taxonomy->handle())
