@@ -1,21 +1,3 @@
 /* ==========================================================================
    REPLICATOR FIELDTYPE
    ========================================================================== */
-
-@scope (.replicator-droppable) to (.replicator-fieldtype) {
-    :scope {
-        cursor: auto;
-    }
-    * {
-        pointer-events: auto;
-    }
-}
-
-@scope (.replicator-not-droppable) to (.replicator-fieldtype) {
-    :scope {
-        cursor: not-allowed;
-    }
-    * {
-        pointer-events: none;
-    }
-}

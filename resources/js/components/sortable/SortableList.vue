@@ -1,5 +1,6 @@
 <script>
 import { Sortable, Plugins, Draggable } from '@shopify/draggable';
+import uniqid from 'uniqid';
 
 const groups = {};
 const lists = {};
