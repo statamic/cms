@@ -11,7 +11,7 @@
                             <!-- @TODO: Show fieldset.title -->
                                 <button class="cursor-pointer overflow-hidden text-ellipsis text-sm text-ui-accent-text hover:text-ui-accent-text/80" v-text="field.fieldset" @click="$emit('edit')" />
                                 <ui-icon name="link" class="text-gray-400" />
-                                <span class="text-gray-500 font-mono text-2xs" v-text="__('fieldset')" />
+                                <span class="text-gray-500 font-mono text-2xs" v-text="__('Fieldset')" />
                             </div>
                         </div>
                         <div class="flex items-center gap-2">

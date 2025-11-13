@@ -12,7 +12,7 @@
                     <div class="flex items-center gap-2">
                         <button class="cursor-pointer overflow-hidden text-ellipsis text-sm hover:text-ui-accent-text text-start" type="button" v-text="__(labelText)" @click="$emit('edit')" />
                         <ui-icon v-if="isReferenceField" name="link" class="text-gray-400" />
-                        <span v-if="isReferenceField" class="text-gray-500 font-mono text-2xs cursor-help" v-text="__('field')" v-tooltip="__('Imported from: :reference', { reference: field.field_reference })" />
+                        <span v-if="isReferenceField" class="text-gray-500 font-mono text-2xs cursor-help" v-text="__('Field')" v-tooltip="__('Imported from: :reference', { reference: field.field_reference })" />
                     </div>
                 </div>
                 <div class="flex items-center gap-2">

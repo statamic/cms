@@ -156,17 +156,17 @@ export default {
 
         operatorOptions() {
             return this.normalizeInputOptions({
-                equals: __('equals'),
-                not: __('not'),
-                contains: __('contains'),
-                contains_any: __('contains any'),
+                equals: __('Equals'),
+                not: __('Not'),
+                contains: __('Contains'),
+                contains_any: __('Contains Any'),
                 '===': '===',
                 '!==': '!==',
                 '>': '>',
                 '>=': '>=',
                 '<': '<',
                 '<=': '<=',
-                custom: __('custom'),
+                custom: __('Custom'),
             });
         },
     },
