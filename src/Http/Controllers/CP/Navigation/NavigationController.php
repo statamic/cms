@@ -97,7 +97,7 @@ class NavigationController extends CpController
                 ];
             })->values()->all(),
             'collections' => $nav->collections()->map->handle()->all(),
-            'maxDepth' => $nav->maxDepth(),
+            'initialMaxDepth' => $nav->maxDepth(),
             'expectsRoot' => $nav->expectsRoot(),
             'blueprint' => $nav->blueprint()->toPublishArray(),
             'canEdit' => User::current()->can('edit', $nav),
