@@ -155,7 +155,7 @@
                                     </Subheading>
                                     <Subheading v-if="isDirty" class="flex items-center gap-2 text-yellow-600">
                                         <Icon name="warning-diamond" />
-                                        {{ __('Unsaved changes') }}
+                                        {{ __('Unsaved Changes') }}
                                     </Subheading>
                                 </Card>
                             </Panel>
