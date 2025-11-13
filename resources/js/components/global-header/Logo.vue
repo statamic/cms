@@ -7,10 +7,12 @@ import { Link } from '@inertiajs/vue3';
 import useStatamicPageProps from '@/composables/page-props.js';
 
 const { logos, isPro, cmsName } = useStatamicPageProps();
-const customLogo = computed(() => {
+const customLogoImage = computed(() => {
     if (! logos) return null
     return logos.dark.nav ?? logos.light.nav;
 });
+const customLogoText = computed(() => logos?.text);
+const customLogo = computed(() => customLogoImage.value || customLogoText.value);
 
 function toggleNav() {
     Statamic.$events.$emit('nav.toggle');
@@ -19,12 +21,17 @@ function toggleNav() {
 
 <template>
     <template v-if="customLogo">
-        <button class="flex items-center group rounded-xs cursor-pointer" type="button" @click="toggleNav" :aria-label="__('Toggle Nav')" style="--focus-outline-offset: 0.2rem;">
-            <div class="p-1 max-sm:ps-2 mr-2 size-5 flex items-center justify-center lg:inset-0">
-                <Icon name="burger-menu-no-border" class="size-3.5! sm:size-3.25! opacity-75 hover:opacity-100" />
-            </div>
-            <img :src="customLogo" :alt="cmsName" class="max-w-[260px] max-h-9">
-        </button>
+        <div class="flex items-center gap-1 relative">
+            <button class="flex items-center group rounded-xs cursor-pointer" type="button" @click="toggleNav" :aria-label="__('Toggle Nav')" style="--focus-outline-offset: 0.2rem;">
+                <div class="p-1 max-sm:ps-2 mr-2 size-5 flex items-center justify-center lg:inset-0">
+                    <Icon name="burger-menu-no-border" class="size-3.5! sm:size-3.25! opacity-75 hover:opacity-100" />
+                </div>
+                <img v-if="customLogoImage" :src="customLogoImage" :alt="cmsName" class="max-w-[260px] max-h-8">
+            </button>
+            <Link v-if="customLogoText && !customLogoImage" :href="cp_url('/')" class="mr-2 font-medium text-white whitespace-nowrap" style="--focus-outline-offset: var(--outline-offset-button);">
+                {{ customLogoText }}
+            </Link>
+        </div>
     </template>
     <template v-else>
         <div class="flex items-center gap-1.5 sm:gap-2 relative">
