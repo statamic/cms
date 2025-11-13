@@ -61,7 +61,6 @@
                 </div>
 
                 <div class="mx-4 flex-1 overflow-auto">
-                    <Panel>
                         <page-tree
                             ref="tree"
                             :pages-url="tree.url"
@@ -94,7 +93,6 @@
                                 <ui-icon name="external-link" v-if="isRedirectBranch(branch)" v-tooltip="__('Redirect')" />
                             </template>
                         </page-tree>
-                    </Panel>
                 </div>
             </template>
 
