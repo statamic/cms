@@ -417,6 +417,6 @@ class Color
     {
         return collect(static::theme())
             ->map(fn ($color, $name) => "--theme-color-{$name}: {$color};")
-            ->implode("\n");
+            ->implode(PHP_EOL.'    ');
     }
 }
