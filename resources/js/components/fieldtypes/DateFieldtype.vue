@@ -105,15 +105,8 @@ export default {
 
     mounted() {
         if (this.value === 'now') {
-            let originalNames = Statamic.$dirty.names();
-
             this.addDate();
-
-            this.$nextTick(() => {
-                Statamic.$dirty.names()
-                    .filter((name) => !originalNames.includes(name))
-                    .forEach((name) => Statamic.$dirty.remove(name));
-            });
+            this.$nextTick(() => this.injectedPublishContainer.clearDirtyState());
         }
 
         this.mounted = true;
