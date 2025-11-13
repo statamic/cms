@@ -1,6 +1,6 @@
 <?php
 
-namespace Query;
+namespace Tests\Query;
 
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
