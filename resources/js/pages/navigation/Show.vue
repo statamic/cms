@@ -365,7 +365,7 @@ export default {
             <ui-button
                 v-if="isDirty"
                 variant="filled"
-                :text="__('Discard changes')"
+                :text="__('Discard Changes')"
                 @click="$refs.tree.cancel"
             />
 

@@ -98,7 +98,7 @@ return [
     'SYP' => 'Syrisches Pfund',
     'THB' => 'Thailändischer Baht',
     'TND' => 'Tunesischer Dinar',
-    'TOP' => 'Tonganischer Pa\u02bbanga',
+    'TOP' => 'Tonganischer Paʻanga',
     'TRY' => 'Türkische Lira',
     'TTD' => 'Trinidad und Tobago-Dollar',
     'TWD' => 'Neuer Taiwan-Dollar',
