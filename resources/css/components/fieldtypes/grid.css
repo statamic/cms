@@ -50,17 +50,16 @@
         }
 
         /* Assets fieldtype in a grid fieldtype */
-        .assets-fieldtype:not(:has([data-asset-picker])) {
-            :has(> table) {
-                /* border-top: 1px solid red!important; */
-                /* border-top-width: 10px!important; */
-                /* @apply border-t-1!; */
-                /* @apply border-t-1!; */
+        .grid-cell.assets-fieldtype:not(:has([data-asset-picker])) > * {
+            /* Wrap a border around the container instead of dealing with complex nested table elements */
+            @apply border-gray-300 border-1 rounded-lg;
+            /* Prevent the descended table elements from inheriting this, such as the img thumbnail and the delete button */
+            *:not(button, button *) {
+                @apply rounded-lg border-none;
             }
-            table {
-                td {
-                    @apply border-t-1;
-                }
+            /* When a grid field has at least 3 columns, including the menu control, change the presentation so it fits in with the other grid cells */
+            tr:has(> :nth-child(3)) & {
+                @apply shadow-ui-sm;
             }
         }
 
