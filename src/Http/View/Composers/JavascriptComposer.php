@@ -89,6 +89,7 @@ class JavascriptComposer
                 'name' => $site->name(),
                 'handle' => $site->handle(),
                 'lang' => $site->lang(),
+                'direction' => $site->direction(),
             ];
         })->values();
     }

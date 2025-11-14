@@ -249,5 +249,5 @@ return [
     'user_wizard_roles_groups_intro' => 'Användare kan tilldelas roller som anpassar deras behörigheter, åtkomst och förmågor i hela kontrollpanelen.',
     'user_wizard_super_admin_instructions' => 'Superadmins har fullständig kontroll och tillgång till allt i kontrollpanelen. Ge denna roll klokt.',
     'view_more_count' => 'Visa :count till',
-    'width_x_height' => ':width x :height',
+    'width_x_height' => ':width × :height',
 ];

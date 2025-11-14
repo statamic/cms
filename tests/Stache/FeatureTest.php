@@ -47,7 +47,7 @@ class FeatureTest extends TestCase
     #[Test]
     public function it_gets_all_collections()
     {
-        $this->assertEquals(4, Collection::all()->count());
+        $this->assertEquals(5, Collection::all()->count());
     }
 
     #[Test]

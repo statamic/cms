@@ -249,5 +249,5 @@ return [
     'user_wizard_roles_groups_intro' => 'İstifadəçilərə İdarəetmə Panelində icazələrini, girişlərini və bacarıqlarını fərdiləşdirən rollar təyin edilə bilər.',
     'user_wizard_super_admin_instructions' => 'Super administratorlar idarə panelində hər şeyə tam nəzarət və giriş imkanı verir. Bu rolu ağılla verin.',
     'view_more_count' => ':count daha çoxunu göstər',
-    'width_x_height' => ':width x :height',
+    'width_x_height' => ':width × :height',
 ];

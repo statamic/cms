@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Statamic\Contracts\Structures\Nav as NavContract;
 use Statamic\CP\PublishForm;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Nav;
 use Statamic\Facades\Site;
@@ -67,7 +68,7 @@ class NavigationController extends CpController
 
     public function show(Request $request, $nav)
     {
-        abort_if(! $nav = Nav::find($nav), 404);
+        throw_unless($nav = Nav::find($nav), NotFoundHttpException::class);
 
         $site = $request->site ?? Site::selected()->handle();
 
@@ -97,7 +98,7 @@ class NavigationController extends CpController
                 ];
             })->values()->all(),
             'collections' => $nav->collections()->map->handle()->all(),
-            'maxDepth' => $nav->maxDepth(),
+            'initialMaxDepth' => $nav->maxDepth(),
             'expectsRoot' => $nav->expectsRoot(),
             'blueprint' => $nav->blueprint()->toPublishArray(),
             'canEdit' => User::current()->can('edit', $nav),

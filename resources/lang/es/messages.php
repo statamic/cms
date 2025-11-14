@@ -249,5 +249,5 @@ return [
     'user_wizard_roles_groups_intro' => 'Los usuarios pueden ser asignados a roles que personalizan sus permisos, acceso y habilidades en todo el Panel de Control.',
     'user_wizard_super_admin_instructions' => 'Los super-administradores tienen control y acceso completos a todo en el Panel de Control. Concede este rol sabiamente.',
     'view_more_count' => 'Ver :count más',
-    'width_x_height' => ':width x :height',
+    'width_x_height' => ':width × :height',
 ];
