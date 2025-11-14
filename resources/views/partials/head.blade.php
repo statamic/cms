@@ -1,4 +1,5 @@
 @php
+    use Statamic\CP\Color;
     use function Statamic\trans as __;
 @endphp
 
@@ -47,14 +48,14 @@
 @endforeach
 
 <style>
-@if (\Statamic\CP\Color::isUsingThemeFile())
-    {{ \Statamic\CP\Color::themeCss() }}
+@if (Color::isUsingThemeFile())
+    {{ Color::themeCss() }}
 @else
     :root {
-        {{ \Statamic\CP\Color::cssVariables() }}
+        {{ Color::cssVariables() }}
 
         &.dark {
-            {{ \Statamic\CP\Color::cssVariables(dark: true) }}
+            {{ Color::cssVariables(dark: true) }}
         }
     }
 @endif
