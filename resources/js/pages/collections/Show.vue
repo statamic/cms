@@ -435,6 +435,30 @@ export default {
                 url: this.scaffoldUrl,
             });
 
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Toggle List Layout'),
+                icon: 'layout-list',
+                when: () => this.view !== 'list',
+                action: () => this.view = 'list',
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Toggle Calendar Layout'),
+                icon: 'calendar',
+                when: () => this.canUseCalendar && this.view !== 'calendar',
+                action: () => this.view = 'calendar',
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Toggle Tree Layout'),
+                icon: 'navigation',
+                when: () => this.canUseStructureTree && this.view !== 'tree',
+                action: () => this.view = 'tree',
+            });
+
             this.$refs.actions?.preparedActions.forEach(action => Statamic.$commandPalette.add({
                 category: Statamic.$commandPalette.category.Actions,
                 text: [__('Collection'), action.title],
