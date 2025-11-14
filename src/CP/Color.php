@@ -430,7 +430,6 @@ class Color
         }
 
         return collect(static::defaults($dark))
-            ->filter(fn ($color, $name) => str($name)->startsWith('dark-') ? $dark : ! $dark)
             ->map(fn ($color, $name) => $config[$name] ?? $color)
             ->all();
     }
