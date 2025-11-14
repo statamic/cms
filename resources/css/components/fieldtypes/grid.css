@@ -49,6 +49,20 @@
             @apply top-16;
         }
 
+        /* Assets fieldtype in a grid fieldtype */
+        .assets-fieldtype:not(:has([data-asset-picker])) {
+            :has(> table) {
+                /* border-top: 1px solid red!important; */
+                /* border-top-width: 10px!important; */
+                /* @apply border-t-1!; */
+                /* @apply border-t-1!; */
+            }
+            table {
+                @apply border-t-1;
+                /* border-collapse: separate; */
+            }
+        }
+
         > tbody {
             @apply outline-hidden;
 
