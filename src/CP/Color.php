@@ -365,7 +365,6 @@ class Color
     {
         return collect([
             'primary' => self::Indigo[700],
-            'dark-primary' => self::Indigo[700],
             'gray-50' => self::Zinc[50],
             'gray-100' => self::Zinc[100],
             'gray-200' => self::Zinc[200],
@@ -393,9 +392,7 @@ class Color
             'dark-gray-925' => self::Zinc[925],
             'dark-gray-950' => self::Zinc[950],
             'success' => self::Green[400],
-            'dark-success' => self::Green[400],
             'danger' => self::Red[600],
-            'dark-danger' => self::Red[600],
             'body-bg' => self::Zinc[100],
             'body-border' => self::Transparent,
             'dark-body-bg' => self::Zinc[900],
@@ -405,16 +402,12 @@ class Color
             'dark-content-bg' => self::Zinc[900],
             'dark-content-border' => self::Zinc[950],
             'global-header-bg' => self::Zinc[800],
-            'dark-global-header-bg' => self::Zinc[800],
             'progress-bar' => self::Indigo[700],
-            'dark-progress-bar' => self::Indigo[700],
             'focus-outline' => self::Blue[400],
             'ui-accent-bg' => self::Indigo[700],
             'ui-accent-text' => 'var(--theme-color-ui-accent-bg)',
-            'dark-ui-accent-bg' => self::Indigo[700],
             'dark-ui-accent-text' => self::Indigo[400],
             'switch-bg' => 'var(--theme-color-ui-accent-bg)',
-            'dark-switch-bg' => 'var(--theme-color-dark-ui-accent-bg)',
         ])
             ->filter(fn ($color, $name) => str($name)->startsWith('dark-') ? $dark : ! $dark)
             ->all();
