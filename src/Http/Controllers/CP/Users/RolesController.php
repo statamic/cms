@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Users;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\CP\Column;
 use Statamic\Facades\Permission;
 use Statamic\Facades\Role;
@@ -43,16 +44,19 @@ class RolesController extends CpController
         }
 
         if ($roles->count() === 0) {
-            return view('statamic::roles.empty');
+            return Inertia::render('roles/Empty', [
+                'createUrl' => cp_route('roles.create'),
+            ]);
         }
 
-        return view('statamic::roles.index', [
+        return Inertia::render('roles/Index', [
             'roles' => $roles,
             'columns' => [
                 Column::make('title')->label(__('Title')),
                 Column::make('handle')->label(__('Handle')),
                 Column::make('permissions')->label(__('Permissions')),
             ],
+            'createUrl' => cp_route('roles.create'),
         ]);
     }
 
@@ -60,8 +64,11 @@ class RolesController extends CpController
     {
         $this->authorize('edit roles');
 
-        return view('statamic::roles.create', [
+        return Inertia::render('roles/Create', [
             'permissions' => $this->updateTree(Permission::tree()),
+            'canAssignSuper' => User::current()->isSuper(),
+            'action' => cp_route('roles.store'),
+            'indexUrl' => cp_route('roles.index'),
         ]);
     }
 
@@ -113,10 +120,15 @@ class RolesController extends CpController
             return $this->pageNotFound();
         }
 
-        return view('statamic::roles.edit', [
-            'role' => $role,
+        return Inertia::render('roles/Edit', [
+            'role' => [
+                'handle' => $role->handle(),
+                'title' => $role->title(),
+            ],
             'super' => $role->isSuper(),
             'permissions' => $this->updateTree(Permission::tree(), $role),
+            'canAssignSuper' => User::current()->isSuper(),
+            'action' => cp_route('roles.update', $role->handle()),
         ]);
     }
 

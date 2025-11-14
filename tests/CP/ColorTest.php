@@ -51,6 +51,7 @@ class ColorTest extends TestCase
             'gray-800' => Color::Slate[800],
             'gray-850' => Color::Slate[850],
             'gray-900' => Color::Slate[900],
+            'gray-925' => Color::Slate[925],
             'gray-950' => Color::Slate[950],
         ], Color::theme());
     }

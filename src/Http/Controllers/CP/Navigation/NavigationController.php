@@ -3,8 +3,10 @@
 namespace Statamic\Http\Controllers\CP\Navigation;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Contracts\Structures\Nav as NavContract;
 use Statamic\CP\PublishForm;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Nav;
 use Statamic\Facades\Site;
@@ -34,11 +36,11 @@ class NavigationController extends CpController
             ];
         })->values();
 
-        if ($navs->isEmpty()) {
-            return view('statamic::navigation.empty');
-        }
-
-        return view('statamic::navigation.index', compact('navs'));
+        return Inertia::render('navigation/Index', [
+            'navs' => $navs->all(),
+            'canCreate' => User::current()->can('create', NavContract::class),
+            'createUrl' => cp_route('navigation.create'),
+        ]);
     }
 
     public function edit($nav)
@@ -66,7 +68,7 @@ class NavigationController extends CpController
 
     public function show(Request $request, $nav)
     {
-        abort_if(! $nav = Nav::find($nav), 404);
+        throw_unless($nav = Nav::find($nav), NotFoundHttpException::class);
 
         $site = $request->site ?? Site::selected()->handle();
 
@@ -80,11 +82,14 @@ class NavigationController extends CpController
 
         $this->authorize('view', $nav->in($site), __('You are not authorized to view navs.'));
 
-        return view('statamic::navigation.show', [
+        return Inertia::render('navigation/Show', [
+            'title' => $nav->title(),
+            'handle' => $nav->handle(),
+            'pagesUrl' => cp_route('navigation.tree.index', $nav->handle()),
+            'submitUrl' => cp_route('navigation.tree.update', $nav->handle()),
+            'editUrl' => $nav->editUrl(),
+            'blueprintUrl' => cp_route('blueprints.navigation.edit', $nav->handle()),
             'site' => $site,
-            'nav' => $nav,
-            'expectsRoot' => $nav->expectsRoot(),
-            'collections' => $nav->collections()->map->handle()->all(),
             'sites' => $this->getAuthorizedTreesForNav($nav)->map(function ($tree) {
                 return [
                     'handle' => $tree->locale(),
@@ -92,7 +97,13 @@ class NavigationController extends CpController
                     'url' => $tree->showUrl(),
                 ];
             })->values()->all(),
+            'collections' => $nav->collections()->map->handle()->all(),
+            'initialMaxDepth' => $nav->maxDepth(),
+            'expectsRoot' => $nav->expectsRoot(),
             'blueprint' => $nav->blueprint()->toPublishArray(),
+            'canEdit' => User::current()->can('edit', $nav),
+            'canSelectAcrossSites' => $nav->canSelectAcrossSites(),
+            'canEditBlueprint' => User::current()->can('configure fields'),
         ]);
     }
 
@@ -147,7 +158,9 @@ class NavigationController extends CpController
     {
         $this->authorize('create', NavContract::class, __('You are not authorized to configure navs.'));
 
-        return view('statamic::navigation.create');
+        return Inertia::render('navigation/Create', [
+            'submitUrl' => cp_route('navigation.store'),
+        ]);
     }
 
     public function store(Request $request)

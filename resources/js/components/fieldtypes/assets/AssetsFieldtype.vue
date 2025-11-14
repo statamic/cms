@@ -1,5 +1,5 @@
 <template>
-    <div class="@container relative w-full bg-gray-50 dark:bg-transparent">
+    <div class="@container relative w-full bg-gray-50 dark:bg-transparent rounded-xl">
         <div
             v-if="hasPendingDynamicFolder"
             class="w-full rounded-md border border-dashed px-4 py-3 text-sm text-gray-700 dark:border-gray-300 dark:text-gray-200"
@@ -28,7 +28,7 @@
 
                 <div
                     v-if="!isReadOnly && showPicker"
-                    class="not-[.link-fieldtype_&]:p-2 not-[.link-fieldtype_&]:border border-gray-300 dark:border-gray-700 dark:bg-gray-850 rounded-xl flex flex-col @2xs:flex-row items-center gap-4 gap-y-3"
+                    class="not-[.link-fieldtype_&]:p-2 not-[.link-fieldtype_&]:border border-gray-300 dark:border-gray-700 dark:bg-gray-850 rounded-xl flex flex-col @2xs:flex-row items-center gap-2 sm:gap-3 gap-y-3"
                     :class="{
                         'rounded-b-none': expanded,
                         'bard-drag-handle': isInBardField,
@@ -44,7 +44,7 @@
                         @keyup.space.enter="openSelector"
                     />
 
-                    <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center flex-1 gap-1" v-if="canUpload">
+                    <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center flex-1 gap-1 ms-1" v-if="canUpload">
                         <ui-icon name="upload-cloud" class="size-5 text-gray-500 me-2" />
                         <div class="text-xs">
                             <span class="leading-tight" v-text="`${__('Drag & drop here or')}&nbsp;`" />

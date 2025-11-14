@@ -15,7 +15,7 @@ class CurrenciesTest extends TestCase
     {
         $options = (new Currencies)->options();
 
-        $this->assertCount(119, $options);
+        $this->assertCount(115, $options);
         $option = $options['USD'];
         $this->assertEquals('US Dollar (USD)', $option);
     }
@@ -51,7 +51,6 @@ class CurrenciesTest extends TestCase
                     'USD' => 'US Dollar (USD)',
                     'BND' => 'Brunei Dollar (BND)',
                     'TWD' => 'New Taiwan Dollar (TWD)',
-                    'ZWL' => 'Zimbabwean Dollar (ZWL)',
                 ],
             ],
             'dollar symbol' => [
@@ -72,15 +71,15 @@ class CurrenciesTest extends TestCase
                     'MOP' => 'Macanese Pataca (MOP)',
                     'MXN' => 'Mexican Peso (MXN)',
                     'NAD' => 'Namibian Dollar (NAD)',
-                    'NIO' => "Nicaraguan C\u00f3rdoba (NIO)",
+                    'NIO' => 'Nicaraguan Córdoba (NIO)',
                     'NZD' => 'New Zealand Dollar (NZD)',
                     'SGD' => 'Singapore Dollar (SGD)',
-                    'TOP' => "Tongan Pa\u02bbanga (TOP)",
+                    'TOP' => 'Tongan Paʻanga (TOP)',
                     'TTD' => 'Trinidad and Tobago Dollar (TTD)',
                     'TWD' => 'New Taiwan Dollar (TWD)',
                     'USD' => 'US Dollar (USD)',
                     'UYU' => 'Uruguayan Peso (UYU)',
-                    'ZWL' => 'Zimbabwean Dollar (ZWL)',
+                    'ZWG' => 'Zimbabwe Gold (ZWG)',
                 ],
             ],
             'pound symbol' => [

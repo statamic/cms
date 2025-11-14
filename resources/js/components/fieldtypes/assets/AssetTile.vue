@@ -1,6 +1,6 @@
 <template>
     <div
-        class="asset-tile"
+        class="asset-tile asset-thumb-container"
         :class="{
             'is-image': isImage && !canShowSvg,
             'is-svg': canShowSvg,
@@ -59,10 +59,10 @@
         </div>
 
         <div class="flex items-center justify-between w-full px-1" v-if="showFilename">
-            <div class="truncate w-18 text-xs text-gray-500 flex-1 px-2 py-1" v-tooltip="label" :class="{ 'text-center': !needsAlt }">
+            <div class="truncate w-18 text-xs text-gray-600 dark:text-gray-400 flex-1 px-2 py-1" v-tooltip="label" :class="{ 'text-center': !needsAlt }">
                 {{ label }}
             </div>
-            <ui-badge as="button" size="sm" color="blue" variant="flat" @click="editOrOpen" v-if="asset.isEditable && showSetAlt && needsAlt" :text="asset.values.alt ? '✅' : __('Set Alt')" />
+            <ui-badge as="button" size="sm" color="blue"  @click="editOrOpen" v-if="asset.isEditable && showSetAlt && needsAlt" :text="asset.values.alt ? '✅' : __('Set Alt')" />
         </div>
     </div>
 </template>

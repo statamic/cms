@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
 use Statamic\CP\Breadcrumbs\Breadcrumb;
 use Statamic\CP\Breadcrumbs\Breadcrumbs;
@@ -26,7 +27,11 @@ class CollectionBlueprintsController extends CpController
 
         $blueprints = $this->indexItems($collection->entryBlueprints(), $collection);
 
-        return view('statamic::collections.blueprints.index', compact('collection', 'blueprints'));
+        return Inertia::render('blueprints/ScopedIndex', [
+            'blueprints' => $blueprints,
+            'reorderUrl' => cp_route('blueprints.collections.reorder', $collection),
+            'createUrl' => cp_route('blueprints.collections.create', $collection),
+        ]);
     }
 
     private function editUrl($collection, $blueprint)
@@ -63,10 +68,10 @@ class CollectionBlueprintsController extends CpController
             createUrl: cp_route('blueprints.collections.create', $collection),
         ));
 
-        return view('statamic::collections.blueprints.edit', [
-            'collection' => $collection,
-            'blueprint' => $blueprint,
-            'blueprintVueObject' => $this->toVueObject($blueprint),
+        return $this->renderEditPage([
+            'blueprint' => $this->toVueObject($blueprint),
+            'action' => cp_route('blueprints.collections.update', [$collection, $blueprint]),
+            'showTitle' => true,
         ]);
     }
 
@@ -84,8 +89,9 @@ class CollectionBlueprintsController extends CpController
     {
         $this->pushCollectionBreadcrumbs($collection);
 
-        return view('statamic::collections.blueprints.create', [
-            'action' => cp_route('blueprints.collections.store', $collection),
+        return Inertia::render('blueprints/Create', [
+            'route' => cp_route('blueprints.collections.store', $collection),
+            'icon' => 'collections',
         ]);
     }
 
@@ -123,7 +129,7 @@ class CollectionBlueprintsController extends CpController
 
         Breadcrumbs::push(new Breadcrumb(
             text: $collection->title(),
-            url: request()->url(),
+            url: cp_route('blueprints.collections.index', $collection),
             icon: 'collections',
             links: Collection::all()
                 ->reject(fn ($c) => $c->handle() === $collection->handle())

@@ -8,6 +8,7 @@ use Statamic\Events\SiteCreated;
 use Statamic\Events\SiteDeleted;
 use Statamic\Events\SiteSaved;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Dictionary;
 use Statamic\Facades\File;
 use Statamic\Facades\User;
 use Statamic\Facades\YAML;
@@ -204,10 +205,15 @@ class Sites
             [
                 'handle' => 'locale',
                 'field' => [
-                    'type' => 'dictionary',
+                    'type' => 'select',
                     'display' => __('Locale'),
                     'instructions' => __('statamic::messages.site_configure_locale_instructions'),
-                    'dictionary' => 'locales',
+                    'options' => [
+                        '{{ config:app.locale }}' => '{{ config:app.locale }}',
+                        ...Dictionary::find('locales')->options(),
+                    ],
+                    'taggable' => true,
+                    'searchable' => true,
                     'max_items' => 1,
                     'required' => true,
                     'width' => 33,
@@ -224,6 +230,7 @@ class Sites
                     'max_items' => 1,
                     'width' => 33,
                     'direction' => 'ltr',
+                    'clearable' => true,
                 ],
             ],
             [
@@ -273,7 +280,9 @@ class Sites
 
     protected function hydrateConfig($config): Collection
     {
-        return collect($config)->map(fn ($site, $handle) => new Site($handle, $site));
+        $defaultSiteHandle = collect($config)->keys()->first();
+
+        return collect($config)->map(fn ($site, $handle) => new Site($handle, $site, $handle === $defaultSiteHandle));
     }
 
     protected function getNewSites(): Collection

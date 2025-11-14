@@ -6,7 +6,6 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Str;
-use Statamic\Addons\Manifest;
 use Statamic\Console\RunsInPlease;
 
 use function Laravel\Prompts\spin;
@@ -20,7 +19,7 @@ class SetupCpVite extends Command
      *
      * @var string
      */
-    protected $signature = 'statamic:setup-cp-vite';
+    protected $signature = 'statamic:setup-cp-vite {--only-necessary : Only configure the necessary parts for Vite to work with the Control Panel}';
 
     /**
      * The console command description.
@@ -34,7 +33,7 @@ class SetupCpVite extends Command
      *
      * @return mixed
      */
-    public function handle(Manifest $manifest): void
+    public function handle(): void
     {
         $this
             ->installDependencies()
@@ -63,7 +62,9 @@ class SetupCpVite extends Command
 
                 File::put($packageJsonPath, json_encode($contents, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
-                Process::path(base_path())->tty()->run('npm install');
+                Process::path(base_path())->run('npm install', function (string $type, string $buffer) {
+                    echo $buffer;
+                });
             },
             message: 'Installing dependencies...'
         );
@@ -123,10 +124,13 @@ class SetupCpVite extends Command
             File::put(resource_path('js/cp.js'), File::get(__DIR__.'/stubs/app/cp.js.stub'));
         }
 
-        if (! File::exists(resource_path('js/components/fieldtypes/ExampleFieldtype.vue'))) {
+        if (
+            ! File::exists(resource_path('js/components/fieldtypes/ExampleFieldtype.vue'))
+            && ! $this->option('only-necessary')
+        ) {
             File::ensureDirectoryExists(resource_path('js/components/fieldtypes'));
 
-            File::put(resource_path('js/components/fieldtypes/ExampleFieldtype.vue'), File::get(__DIR__.'/stubs/app/ExampleFieldtype.vue.stub'));
+            File::put(resource_path('js/components/fieldtypes/ExampleFieldtype.vue'), File::get(__DIR__.'/stubs/fieldtype.vue.stub'));
         }
 
         $this->components->info('Published stubs for Control Panel CSS & JavaScript.');
@@ -152,6 +156,8 @@ PHP);
             },
             message: 'Adding Statamic::vite() snippet to AppServiceProvider...'
         );
+
+        $this->components->info('Added Statamic::vite() snippet to AppServiceProvider.');
 
         return $this;
     }

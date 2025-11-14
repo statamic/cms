@@ -1,8 +1,17 @@
 /* GROUP PAGE TREE
 =================================================== */
 .page-tree {
+    /* e.g. >> /cp/nav/default/edit. @container/panel usually has an inset shadow for dark mode. */
+    .dark .\@container\/panel:has(&) {
+        box-shadow: none;
+    }
     .tree-node {
         @apply dark:pb-0.25;
+        transition: opacity var(--starting-style-transition-duration);
+        transition-delay: calc(sibling-index() * var(--starting-style-sibling-delay));
+        @starting-style {
+            opacity: 0;
+        }
     }
     .page-tree-branch {
         @apply relative rounded-xl bg-white text-xs shadow;
@@ -37,12 +46,12 @@
 .nav-builder {
     background: none;
     .tree-node {
-        @apply bg-gray-100 dark:bg-gray-700/75;
+        @apply bg-gray-200/45 dark:bg-gray-950;
         .tree-node-inner {
             @apply px-1;
         }
         &:has(.is-section) {
-            @apply mt-8 pt-1 bg-gray-100 dark:bg-gray-700/75 rounded-t-2xl;
+            @apply mt-8 pt-1 bg-gray-200/45 dark:bg-gray-950 rounded-t-2xl;
         }
         &:has(+ .tree-node .is-section),
         &:last-child {
@@ -68,6 +77,10 @@
     }
     .page-tree-branch {
         margin-top: 0;
+    }
+    /* Hide empty first branch nodes if they're empty, otherwise we get a weird border or dark mode for the first node. */
+    .tree-node:has(.first-branch:empty) {
+        display: none;
     }
     .tree-node:has(.first-branch) + .tree-node {
         @apply pt-1 rounded-t-2xl;

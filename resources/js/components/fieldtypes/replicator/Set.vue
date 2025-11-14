@@ -5,7 +5,6 @@ import {
     Switch,
     Subheading,
     Badge,
-    Tooltip,
     Dropdown,
     DropdownItem,
     DropdownSeparator,
@@ -88,7 +87,7 @@ const previewText = computed(() => {
             return config.replicator_preview === undefined ? props.showFieldPreviews : config.replicator_preview;
         })
         .map(([handle, value]) => value)
-        .filter((value) => (['null', '[]', '{}', ''].includes(JSON.stringify(value)) ? null : value))
+        .filter((value) => !['null', '[]', '{}', ''].includes(JSON.stringify(value)))
         .map((value) => {
             if (value instanceof PreviewHtml) return value.html;
 
@@ -100,7 +99,8 @@ const previewText = computed(() => {
 
             return escapeHtml(JSON.stringify(value));
         })
-        .join(' / ');
+        .filter((html) => html && html.trim() !== '')
+        .join(' <span class="text-gray-400 dark:text-gray-600">/</span> ');
 });
 
 function toggleEnabledState() {
@@ -135,9 +135,9 @@ function destroy() {
             :data-type="config.handle"
         >
             <header
-                class="group/header animate-border-color flex items-center rounded-lg px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-950 hover:bg-gray-100 dark:hover:bg-gray-950 border-gray-300 border-b-1 border-b-transparent"
+                class="group/header animate-border-color flex items-center rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 hover:bg-gray-100 dark:hover:bg-gray-950 border-gray-300 dark:shadow-md border-b-1 border-b-transparent"
                 :class="{
-                    'bg-gray-200/50 rounded-b-none border-b-gray-300! dark:border-b-white/10!': !collapsed
+                    'bg-gray-200/50 dark:bg-gray-950 rounded-b-none border-b-gray-300! dark:border-b-white/10!': !collapsed
                 }"
             >
                 <Icon
@@ -147,7 +147,7 @@ function destroy() {
                     v-if="!readOnly"
                 />
                 <button type="button" class="flex flex-1 items-center gap-4 p-2 py-1.75 min-w-0 cursor-pointer" @click="toggleCollapsedState">
-                    <Badge size="lg" pill="true" color="white" shadow="false" class="px-3">
+                    <Badge size="lg" pill="true" color="white" class="px-3">
                         <span v-if="isSetGroupVisible" class="flex items-center gap-2">
                             {{ __(setGroup.display) }}
                             <Icon name="chevron-right" class="relative top-px size-3" />
@@ -197,13 +197,14 @@ function destroy() {
             </header>
 
             <Motion
-                class="overflow-hidden"
+                class="contain-paint"
                 :initial="{ height: collapsed ? '0px' : 'auto' }"
                 :animate="{ height: collapsed ? '0px' : 'auto' }"
                 :transition="{ duration: 0.25, type: 'tween' }"
             >
                 <FieldsProvider
                     :fields="config.fields"
+                    :as-config="false"
                     :field-path-prefix="fieldPathPrefix"
                     :meta-path-prefix="metaPathPrefix"
                 >

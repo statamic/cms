@@ -2,23 +2,26 @@
    THE MAIN NAV (LEFT SIDEBAR)
    ========================================================================== */
 .nav-main {
-    @apply flex flex-col gap-6 py-6 px-3 text-sm antialiased select-none;
+    @apply flex flex-col gap-6 py-6 px-2 sm:px-3 text-sm antialiased select-none;
     /* Same as the main element, accounting for the header with a class of h-14, which is the same as 3.5rem */
     @apply h-[calc(100vh-3.5rem)];
     @apply overflow-y-auto fixed top-14 start-0 w-48;
     @apply [&_svg]:text-gray-500 dark:[&_svg]:text-gray-500/85;
-    /* Only inset because we don't wand to transition the color when we switch between light/dark mode */
-    transition: inset 0.3s ease-in-out;
+    /* Wait for the full page to load before allowing this transition otherwise you see the Sidebar animate in/out on load in Firefox (and sometimes Safari) */
+    .page-fully-loaded & {
+        /* Only certain properties because we don't want to inadvertently transition the color when we switch between light/dark mode */
+        transition: inset 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    }
     /* On mobile, hide by default and overlay on top */
-    @apply md:flex;
-    @apply z-50;
+    z-index: var(--z-index-draggable);
+    @apply lg:flex;
 
     ul {
         @apply flex flex-col gap-0;
     }
 
     ul li a {
-        @apply flex items-center gap-3 text-gray-700 hover:bg-gray-400/15 px-2 py-1 rounded-md dark:text-gray-400 hover:text-black dark:hover:text-gray-200 hover:[&_svg]:text-gray-700 dark:hover:[&_svg]:text-gray-200;
+        @apply flex items-center gap-2 sm:gap-3 text-gray-700 hover:bg-gray-400/15 px-2 py-1 rounded-md dark:text-gray-400 hover:text-black dark:hover:text-gray-200 hover:[&_svg]:text-gray-700 dark:hover:[&_svg]:text-gray-200;
     }
 
     ul li a.active {
@@ -44,38 +47,37 @@
 
 
 /* Mobile nav behavior */
-@media (max-width: theme(--breakpoint-md)) {
+@media (max-width: theme(--breakpoint-lg)) {
     .nav-main {
         /* Always visible but off-screen by default */
         @apply flex;
-        /* Start off-screen to the left */
-        @apply -start-46;
+        @apply bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700;
     }
 
     .nav-open .nav-main {
-        @apply bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-2xl;
         /* Slide in from the left */
-        @apply start-0;
+        @apply start-0 shadow-2xl;
     }
 }
 
 
 main {
-    @apply ps-0 md:ps-46;
-    /* Only padding because we don't wand to transition the color when we switch between light/dark mode */
-    transition: padding 0.3s ease-in-out;
-}
-
-.nav-closed main {
-    @apply ps-0;
+    @apply ps-0 lg:ps-46;
+    /* Wait for the full page to load before allowing this transition otherwise you see the Sidebar animate in/out on load in Firefox (and sometimes Safari) */
+    .page-fully-loaded & {
+        /* Only padding because we don't wand to transition the color when we switch between light/dark mode */
+        transition: padding 0.3s ease-in-out;
+    }
 }
 
 .nav-closed .nav-main {
-    @apply -start-46;
+    /* Start off-screen to the left */
+    @apply -start-50;
 }
 
-.nav-closed main {
-    @apply md:ps-0;
+main.nav-closed {
+    @apply ps-0;
+    @apply lg:ps-0;
 }
 
 /* ==========================================================================
@@ -84,7 +86,7 @@ main {
 
 .draggable-mirror {
     position: relative;
-    z-index: 1000;
+    z-index: var(--z-index-modal);
 }
 
 .draggable-source--is-dragging {
@@ -93,5 +95,5 @@ main {
 
 /* Mirrors that have been appended to the body should appear on top of everything. (Portals are 4) */
 body > .draggable-mirror {
-    z-index: 5;
+    z-index: var(--z-index-draggable);
 }

@@ -93,6 +93,7 @@ import { dragContext, Draggable, walkTreeData } from '@he-tree/vue';
 import TreeBranch from './Branch.vue';
 import { PanelHeader, Panel, Icon } from '@/components/ui';
 import { clone } from '@/bootstrap/globals.js';
+import { router } from '@inertiajs/vue3';
 
 export default {
     components: {
@@ -188,12 +189,13 @@ export default {
                 this.pages = response.data.pages;
                 this.updateTreeData();
                 this.loading = false;
+                this.$emit('loaded', this.pages);
             });
         },
 
         treeUpdated() {
             this.pages = this.$refs.tree.getData();
-            this.$emit('changed');
+            this.$emit('changed', this.pages);
         },
 
         cleanPagesForSubmission(pages) {
@@ -280,7 +282,7 @@ export default {
         },
 
         editLocalization(localization) {
-            window.location = localization.url;
+            router.get(localization.url);
         },
 
         createLocalization(localization) {
@@ -303,7 +305,7 @@ export default {
                 return true;
             }
 
-            return dragContext.dragNode.children.length === 0;
+            return true;
         },
 
         eachDroppable(targetStat) {
@@ -316,7 +318,7 @@ export default {
 
         pageUpdated() {
             this.pages = this.$refs.tree.getData();
-            this.$emit('changed');
+            this.$emit('changed', this.pages);
         },
 
         expandAll() {

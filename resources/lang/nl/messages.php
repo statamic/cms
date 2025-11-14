@@ -84,7 +84,7 @@ return [
     'email_utility_configuration_description' => 'E-mailsettings worden geconfigureerd in <code>:path</code>',
     'email_utility_description' => 'Bekijk e-mailconfiguratiesettings and verstuur testmails.',
     'entry_origin_instructions' => 'De nieuwe lokalisatie neemt waarden over van het item op de geselecteerde site.',
-    'entry_count' => ':count entries',
+    'entry_count' => ':count entry|:count entries',
     'expect_root_instructions' => 'Beschouwd de eerste pagina in een boomstructuur als "root" of "home" -pagina.',
     'field_conditions_always_save_instructions' => 'Sla de veldwaarde altijd op, onafhankelijk van veldcondities',
     'field_conditions_field_instructions' => 'Je mag hier elke veld handle invoeren. Je bent niet gebonden aan de opties in de dropdown.',
@@ -294,5 +294,5 @@ return [
     'user_wizard_roles_groups_intro' => 'Aan gebruikers kunnen rollen toegewezen worden die hun bevoegdheden, toegang en mogelijkheden in het Control Panel aanpassen.',
     'user_wizard_super_admin_instructions' => 'Super admins hebben volledige controle over het Control Panel en kunnen alles wijzigen. Ga hier verstandig mee om.',
     'view_more_count' => 'Bekijk :count meer',
-    'width_x_height' => ':width x :height',
+    'width_x_height' => ':width × :height',
 ];

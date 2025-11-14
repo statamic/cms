@@ -44,6 +44,7 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\StarterKitRunPostInstall::class,
         Commands\StaticClear::class,
         Commands\StaticWarm::class,
+        Commands\StaticRecacheToken::class,
         // Commands\MakeUserMigration::class,
         Commands\SupportDetails::class,
         Commands\SupportZipBlueprint::class,

@@ -671,9 +671,9 @@ autoApplyState();
 
 <template>
     <slot name="initializing" v-if="shouldShowSkeleton">
-        <div class="flex flex-col gap-4 justify-between mt-3 starting-style-transition starting-style-transition--slow">
+        <div class="flex flex-col gap-4 justify-between mt-3 starting-style-transition starting-style-transition--delay">
             <ui-skeleton class="h-5 w-48" />
-            <div class="flex gap-3">
+            <div class="flex gap-2 sm:gap-3">
                 <ui-skeleton class="h-9 w-96" />
                 <ui-skeleton class="h-9 w-24" />
                 <div class="flex-1" />
@@ -684,8 +684,8 @@ autoApplyState();
     </slot>
     <slot v-if="!initializing" :items="items" :is-column-visible="isColumnVisible" :loading="loading">
         <Presets v-if="showPresets" />
-        <div v-if="allowSearch || hasFilters || allowCustomizingColumns" class="relative flex items-center gap-3 min-h-16 starting-style-transition starting-style-transition--siblings">
-            <div class="flex flex-1 items-center gap-3 w-full">
+        <div v-if="allowSearch || hasFilters || allowCustomizingColumns" class="relative flex items-center gap-2 sm:gap-3 min-h-16 starting-style-transition starting-style-transition--siblings">
+            <div class="flex flex-1 items-center gap-2 sm:gap-3 w-full">
                 <Search v-if="allowSearch" />
                 <Filters v-if="hasFilters" />
             </div>
@@ -698,7 +698,7 @@ autoApplyState();
             v-text="__('No results')"
         />
 
-        <Panel v-else class="relative overflow-x-auto overscroll-x-contain">
+        <Panel v-else class="relative overflow-x-auto overscroll-x-contain" style="container-type: scroll-state;">
             <Table>
                 <template v-for="(slot, slotName) in forwardedTableCellSlots" :key="slotName" #[slotName]="slotProps">
                     <component :is="slot" v-bind="slotProps" />

@@ -22,7 +22,7 @@
                 <a :href="laravelDocsLink" target="_blank">{{ __('Learn more') }}</a>
                 <span v-if="helpBlock" class="italic text-gray-500 ltr:float-right rtl:float-left">
                     {{ __('Example') }}:
-                    <span class="italic text-blue-400">{{ helpBlock }}</span>
+                    <span class="italic text-ui-accent-text dark:text-dark-ui-accent-text">{{ helpBlock }}</span>
                 </span>
             </Description>
 
@@ -97,6 +97,7 @@ import { SortableList } from '../sortable/Sortable';
 import { sortBy } from 'lodash-es';
 import { Description, Field, Input, Badge, Button, Switch, Combobox } from '@ui';
 import { ComboboxInput } from 'reka-ui';
+import { usePage } from '@inertiajs/vue3';
 
 export default {
     components: {
@@ -149,7 +150,8 @@ export default {
         },
 
         extensionRules() {
-            return clone(Statamic.$config.get('extensionRules')).map((rule) => {
+            const { extensionRules } = usePage().props;
+            return clone(extensionRules).map((rule) => {
                 return this.prepareRenderableRule(rule);
             });
         },

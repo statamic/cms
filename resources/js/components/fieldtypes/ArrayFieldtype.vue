@@ -20,7 +20,7 @@
                 <ui-input
                     v-if="element.key === selectedKey"
                     v-model="data[index].value"
-                    class="border-l-0"
+                    input-class="border-l-0"
                     :key="element._id"
                     :id="fieldId + '__' + element.key"
                     :readonly="isReadOnly"

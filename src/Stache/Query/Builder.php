@@ -157,16 +157,20 @@ abstract class Builder extends BaseBuilder
 
     protected function filterWhereIn($values, $where)
     {
-        return $values->filter(function ($value) use ($where) {
-            return in_array($value, $where['values']);
-        });
+        $lookup = array_flip($where['values']);
+
+        return $values->filter(
+            fn ($value) => isset($lookup[$value])
+        );
     }
 
     protected function filterWhereNotIn($values, $where)
     {
-        return $values->filter(function ($value) use ($where) {
-            return ! in_array($value, $where['values']);
-        });
+        $lookup = array_flip($where['values']);
+
+        return $values->filter(
+            fn ($value) => ! isset($lookup[$value])
+        );
     }
 
     protected function filterWhereNull($values, $where)
@@ -301,7 +305,7 @@ abstract class Builder extends BaseBuilder
                 return false;
             }
 
-            return ! empty(array_intersect($value, $where['values']));
+            return count(array_intersect($value, $where['values'])) == count($where['values']);
         });
     }
 
@@ -312,7 +316,7 @@ abstract class Builder extends BaseBuilder
                 return true;
             }
 
-            return empty(array_intersect($value, $where['values']));
+            return count(array_intersect($value, $where['values'])) != count($where['values']);
         });
     }
 

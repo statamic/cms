@@ -284,7 +284,7 @@ class Field implements Arrayable
 
     public function toPublishArray()
     {
-        return array_merge($this->preProcessedConfig(), [
+        $array = array_merge($this->preProcessedConfig(), [
             'handle' => $this->handle,
             'prefix' => $this->prefix,
             'type' => $this->type(),
@@ -295,6 +295,10 @@ class Field implements Arrayable
             'read_only' => $this->visibility() === 'read_only', // Deprecated: Addon fieldtypes should now reference new `visibility` state.
             'always_save' => $this->alwaysSave(),
         ]);
+
+        unset($array['validate']);
+
+        return $array;
     }
 
     public function setValue($value)
@@ -460,7 +464,7 @@ class Field implements Arrayable
             $type = ['type' => $type];
         }
 
-        if ($this->isRequired() && ! $this->hasSometimesRule()) {
+        if ($this->isRequired() && ! $this->hasSometimesRule() && $this->type() !== 'assets') {
             $type['type'] = GraphQL::nonNull($type['type']);
         }
 

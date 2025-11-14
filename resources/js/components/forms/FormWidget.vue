@@ -8,12 +8,14 @@ import {
     ListingTableHead as TableHead,
     ListingTableBody as TableBody,
     ListingPagination as Pagination,
+    Button,
 } from '@/components/ui';
 
 const props = defineProps({
     form: { type: String, required: true },
     fields: { type: Array, default: () => [] },
     title: { type: String },
+    submissionsUrl: { type: String },
     initialPerPage: { type: Number, default: 5 },
 });
 
@@ -27,6 +29,7 @@ const cols = computed(() => [
 const widgetProps = computed(() => ({
     title: props.title,
     icon: 'forms',
+    href: props.submissionsUrl,
 }));
 
 function formatDate(value) {
@@ -78,7 +81,9 @@ function formatDate(value) {
                 </div>
                 <template #actions>
                     <Pagination />
-                    <slot name="actions" />
+                    <Button :href="submissionsUrl" size="sm">
+                        {{ __('View All') }}
+                    </Button>
                 </template>
             </Widget>
         </template>

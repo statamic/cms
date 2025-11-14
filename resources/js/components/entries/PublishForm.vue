@@ -36,9 +36,9 @@
                 </Dropdown>
             </ItemActions>
 
-            <ui-badge icon="padlock-locked" :text="__('Read Only')" variant="flat" v-if="readOnly" />
+            <ui-badge icon="padlock-locked" :text="__('Read Only')" v-if="readOnly" />
 
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 sm:gap-3">
                 <save-button-options
                     v-if="!readOnly"
                     :show-options="!revisionsEnabled && !isInline"
@@ -100,7 +100,7 @@
                         <div class="space-y-6">
                             <!-- Live Preview / Visit URL Buttons -->
                             <div v-if="collectionHasRoutes">
-                                <div class="flex flex-wrap gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
+                                <div class="flex flex-wrap gap-3 lg:gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
                                     <Button
                                         :text="__('Live Preview')"
                                         class="flex-1"
@@ -120,7 +120,7 @@
                             </div>
 
                             <!-- Published Switch -->
-                            <Panel class="flex justify-between px-5 py-3 dark:bg-gray-800!" v-if="!revisionsEnabled">
+                            <Panel class="flex justify-between px-5! py-3! dark:bg-gray-800!" v-if="!revisionsEnabled">
                                 <Heading :text="__('Published')" />
                                 <Switch
                                     :model-value="published"
@@ -155,7 +155,7 @@
                                     </Subheading>
                                     <Subheading v-if="isDirty" class="flex items-center gap-2 text-yellow-600">
                                         <Icon name="warning-diamond" />
-                                        {{ __('Unsaved changes') }}
+                                        {{ __('Unsaved Changes') }}
                                     </Subheading>
                                 </Card>
                             </Panel>
@@ -282,10 +282,7 @@ import {
 import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
 import { computed, ref } from 'vue';
 import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';
-
-let saving = ref(false);
-let errors = ref({});
-let container = null;
+import { router } from '@inertiajs/vue3';
 
 export default {
     mixins: [HasPreferences, HasActions],
@@ -395,16 +392,23 @@ export default {
             autosaveIntervalInstance: null,
             syncFieldConfirmationText: __('messages.sync_entry_field_confirmation_text'),
             pendingLocalization: null,
+
+            savingRef: ref(false),
+            errorsRef: ref({}),
         };
     },
 
     computed: {
+        containerRef() {
+            return computed(() => this.$refs.container);
+        },
+
         saving() {
-            return saving.value;
+            return this.savingRef.value;
         },
 
         errors() {
-            return errors.value;
+            return this.errorsRef.value;
         },
 
         formattedTitle() {
@@ -533,7 +537,11 @@ export default {
             }
 
             new Pipeline()
-                .provide({ container, errors, saving })
+                .provide({
+                    container: this.containerRef,
+                    errors: this.errorsRef,
+                    saving: this.savingRef,
+                })
                 .through([
                     new BeforeSaveHooks('entry', {
                         collection: this.collectionHandle,
@@ -550,6 +558,11 @@ export default {
                     }),
                 ])
                 .then((response) => {
+                    this.title = response.data.data.title;
+                    this.isWorkingCopy = true;
+                    if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
+                    if (!this.isCreating && !this.isAutosave) this.$toast.success(__('Saved'));
+
                     // If revisions are enabled, just emit event.
                     if (this.revisionsEnabled) {
                         clearTimeout(this.trackDirtyStateTimeout);
@@ -561,21 +574,16 @@ export default {
                         return;
                     }
 
-                    this.title = response.data.data.title;
-                    this.isWorkingCopy = true;
-                    if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
-                    if (!this.isCreating && !this.isAutosave) this.$toast.success(__('Saved'));
-
                     let nextAction = this.quickSave || this.isAutosave ? 'continue_editing' : this.afterSaveOption;
 
                     // If the user has opted to create another entry, redirect them to create page.
                     if (!this.isInline && nextAction === 'create_another') {
-                        window.location = this.createAnotherUrl;
+                        this.redirectTo(this.createAnotherUrl);
                     }
 
                     // If the user has opted to go to listing (default/null option), redirect them there.
                     else if (!this.isInline && nextAction === null) {
-                        window.location = this.listingUrl;
+                        this.redirectTo(this.listingUrl);
                     }
 
                     // Otherwise, leave them on the edit form and emit an event. We need to wait until after
@@ -679,7 +687,7 @@ export default {
             this.selectingOrigin = false;
 
             if (this.isCreating) {
-                this.$nextTick(() => (window.location = localization.url));
+                this.$nextTick(() => this.redirectTo(localization.url));
                 return;
             }
 
@@ -738,12 +746,12 @@ export default {
 
             // If the user has opted to create another entry, redirect them to create page.
             if (!this.isInline && nextAction === 'create_another') {
-                window.location = this.createAnotherUrl;
+                this.redirectTo(this.createAnotherUrl);
             }
 
             // If the user has opted to go to listing (default/null option), redirect them there.
             else if (!this.isInline && nextAction === null) {
-                window.location = this.listingUrl;
+                this.redirectTo(this.listingUrl);
             }
 
             // Otherwise, leave them on the edit form and emit an event. We need to wait until after
@@ -822,6 +830,10 @@ export default {
                 action: action.run,
             }));
         },
+
+        redirectTo(location) {
+            router.get(location);
+        }
     },
 
     mounted() {
@@ -852,8 +864,6 @@ export default {
             this.originBehavior === 'active'
                 ? this.localizations.find((l) => l.active)?.handle
                 : this.localizations.find((l) => l.root)?.handle;
-
-        container = computed(() => this.$refs.container);
     },
 
     beforeUnmount() {

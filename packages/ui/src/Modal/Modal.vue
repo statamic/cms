@@ -5,9 +5,10 @@ import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, Di
 import { computed, getCurrentInstance, ref, watch } from 'vue';
 import Icon from '../Icon/Icon.vue';
 
-const emit = defineEmits(['update:open']);
+const emit = defineEmits(['update:open', 'dismissed']);
 
 const props = defineProps({
+    blur: { type: Boolean, default: true },
     title: { type: String, default: '' },
     icon: { type: [String, null], default: null },
     open: { type: Boolean, default: false },
@@ -16,9 +17,18 @@ const props = defineProps({
 
 const hasModalTitleComponent = hasComponent('ModalTitle');
 
+const overlayClasses = cva({
+    base: 'data-[state=open]:show fixed inset-0 z-(--z-index-portal) bg-gray-800/20 dark:bg-gray-800/50',
+    variants: {
+        blur: {
+            true: 'backdrop-blur-[2px]',
+        },
+    },
+})({ ...props });
+
 const modalClasses = cva({
     base: [
-        'fixed outline-hidden left-1/2 top-1/6 z-50 w-full max-w-2xl -translate-x-1/2',
+        'fixed outline-hidden left-1/2 top-1/6 z-(--z-index-modal) w-full max-w-2xl -translate-x-1/2',
         'bg-white/80 dark:bg-gray-850 backdrop-blur-[2px] rounded-2xl p-2',
         'shadow-[0_8px_5px_-6px_rgba(0,0,0,0.12),_0_3px_8px_0_rgba(0,0,0,0.02),_0_30px_22px_-22px_rgba(39,39,42,0.35)]',
         'dark:shadow-[0_5px_20px_rgba(0,0,0,.5)]',
@@ -54,6 +64,8 @@ function updateOpen(value) {
 
 function preventIfNotDismissible(event) {
     if (!props.dismissible) event.preventDefault();
+
+    emit('dismissed');
 }
 </script>
 
@@ -63,7 +75,7 @@ function preventIfNotDismissible(event) {
             <slot name="trigger" />
         </DialogTrigger>
         <DialogPortal>
-            <DialogOverlay class="data-[state=open]:show fixed inset-0 z-30 bg-gray-800/20 backdrop-blur-[2px] dark:bg-gray-800/50" />
+            <DialogOverlay :class="overlayClasses" />
             <DialogContent
                 :class="[modalClasses, $attrs.class]"
                 data-ui-modal-content
@@ -71,7 +83,7 @@ function preventIfNotDismissible(event) {
                 @pointer-down-outside="preventIfNotDismissible"
                 @escape-key-down="preventIfNotDismissible"
             >
-                <div class="relative space-y-3 rounded-xl border border-gray-400/60 bg-white p-4 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:border-none dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/15" >
+                <div class="relative space-y-3 rounded-xl overflow-auto max-h-[60vh] border border-gray-400/60 bg-white p-4 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:border-none dark:bg-gray-800 dark:shadow-[0_1px_16px_-2px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/10" >
                     <DialogTitle v-if="!hasModalTitleComponent" data-ui-modal-title class="flex items-center gap-2">
                         <Icon :name="icon" v-if="icon" class="size-4" />
                         <ui-heading :text="title" size="lg" class="font-medium" />

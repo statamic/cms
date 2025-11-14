@@ -4,7 +4,7 @@ export default class Contrast {
     #preference;
     #contrast = ref(null);
 
-    constructor(preference) {
+    initialize(preference) {
         this.#preference = ref(preference ? 'increased' : 'auto');
         this.#setContrast(this.#preference.value);
         this.#watchContrast();

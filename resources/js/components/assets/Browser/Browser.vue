@@ -29,12 +29,8 @@
                     v-model:search-query="searchQuery"
                     @request-completed="listingRequestCompleted"
                     @update:selections="$emit('selections-updated', $event)"
+                    class="starting-style-transition"
                 >
-                    <template #initializing>
-                        <slot name="initializing">
-                            <Icon name="loading" />
-                        </slot>
-                    </template>
                     <template #default="{ items }">
                         <slot name="header" v-bind="{ canUpload, openFileBrowser, canCreateFolders, startCreatingFolder, mode, modeChanged }">
                             <Header :title="__(container.title)" icon="assets">
@@ -83,8 +79,8 @@
                                 </ToggleGroup>
                             </Header>
 
-                            <div class="flex items-center gap-3 py-3 relative">
-                                <div class="flex flex-1 items-center gap-3">
+                            <div class="flex items-center gap-2 sm:gap-3 py-3 relative">
+                                <div class="flex flex-1 items-center gap-2 sm:gap-3">
                                     <ListingSearch />
                                 </div>
                                 <ListingCustomizeColumns v-if="mode === 'table'" />

@@ -47,7 +47,7 @@ const forwardedTableCellSlots = computed(() => {
         :class="{
             'select-none': shifting,
             'data-table': !unstyled,
-            contained: contained,
+            'data-table--contained': contained,
             'opacity-50': loading,
         }"
         data-table

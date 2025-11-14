@@ -13,6 +13,7 @@
 
 <script>
 import { requireElevatedSessionIf } from '@/components/elevated-sessions/index.js';
+import { router } from '@inertiajs/vue3';
 
 export default {
     props: {
@@ -88,12 +89,12 @@ export default {
 
         success() {
             if (this.redirectUrl) {
-                location.href = this.redirectUrl;
+                router.get(this.redirectUrl);
                 return;
             }
 
             if (this.reload) {
-                location.reload();
+                router.reload();
                 return;
             }
 

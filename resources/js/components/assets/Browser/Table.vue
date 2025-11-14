@@ -1,5 +1,5 @@
 <template>
-    <Card inset>
+    <Card inset variant="flat">
         <ListingTable contained>
             <template #tbody-start>
                 <tr
@@ -27,7 +27,7 @@
                             <a class="group flex cursor-pointer items-center" @click="selectFolder(folder.path)">
                                 <file-icon
                                     extension="folder"
-                                    class="me-2 inline-block size-8 text-blue-400 group-hover:text-blue-400"
+                                    class="me-2 inline-block size-8 text-blue-400/90 group-hover:text-blue-400"
                                 />
                                 {{ folder.basename }}
                             </a>
@@ -63,14 +63,16 @@
                         <a class="group flex cursor-pointer items-center">
                             <file-icon
                                 extension="folder"
-                                class="me-2 inline-block size-8 text-blue-400 group-hover:text-blue-600"
+                                class="me-2 inline-block size-8 text-blue-400/90 group-hover:text-blue-400
+                                dark:text-blue-400/90 dark:group-hover:text-blue-400"
                             />
                             <Editable
                                 ref="newFolderInput"
                                 v-model:modelValue="newFolderName"
                                 :start-with-edit-mode="true"
                                 submit-mode="enter"
-                                :placeholder="__('new-folder')"
+                                :placeholder="__('Name')"
+                                class="placeholder:lowercase"
                                 @submit="$emit('create-folder', newFolderName)"
                                 @cancel="
                                     () => {
@@ -86,7 +88,7 @@
 
             <template #cell-basename="{ row: asset, checkboxId }">
                 <div
-                    class="group flex w-fit items-center gap-3"
+                    class="group flex w-fit items-center gap-2 sm:gap-3"
                     :draggable="true"
                     @dragover.prevent
                     @dragstart="draggingAsset = asset.id"
@@ -99,7 +101,7 @@
                         @click.native.stop="$emit('edit-asset', asset)"
                     />
                     <button
-                        class="cursor-pointer normal-nums select-none group-hover:text-blue-600 text-start"
+                        class="cursor-pointer normal-nums select-none group-hover:text-ui-accent-text/80 dark:group-hover:text-dark-ui-accent-text text-start"
                         @click="$emit('edit-asset', asset)"
                     >
                         {{ isSearching ? asset.path : asset.basename }}

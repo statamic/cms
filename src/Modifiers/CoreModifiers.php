@@ -8,6 +8,7 @@ use Countable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
+use Illuminate\View\ComponentSlot;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades\Antlers;
@@ -32,10 +33,15 @@ use Statamic\Support\Arr;
 use Statamic\Support\Dumper;
 use Statamic\Support\Html;
 use Statamic\Support\Str;
+use Statamic\Support\Traits\ChecksDumpability;
 use Stringy\StaticStringy as Stringy;
 
 class CoreModifiers extends Modifier
 {
+    use ChecksDumpability {
+        dumpingAllowed as traitDumpingAllowed;
+    }
+
     /**
      * Adds values together with science. Context aware.
      *
@@ -284,6 +290,7 @@ class CoreModifiers extends Modifier
         }
 
         $text = '';
+
         while (count($value)) {
             $item = array_shift($value);
 
@@ -292,8 +299,13 @@ class CoreModifiers extends Modifier
             }
 
             if ($item['type'] === 'text') {
-                $text .= ' '.($item['text'] ?? '');
+                $text .= ($item['text'] ?? '');
             }
+
+            if ($item['type'] === 'paragraph' && $text !== '') {
+                $text .= ' ';
+            }
+
             array_unshift($value, ...($item['content'] ?? []));
         }
 
@@ -553,8 +565,12 @@ class CoreModifiers extends Modifier
     /**
      * Dump, Die, and Debug using Ignition.
      */
-    public function ddd($value)
+    public function ddd($value, $params)
     {
+        if (! $this->dumpingAllowed($params)) {
+            return;
+        }
+
         ddd(Dumper::resolve($value));
     }
 
@@ -610,16 +626,24 @@ class CoreModifiers extends Modifier
     /**
      * Dump and die the output of a variable.
      */
-    public function dd($value)
+    public function dd($value, $params)
     {
+        if (! $this->dumpingAllowed($params)) {
+            return;
+        }
+
         dd(Dumper::resolve($value));
     }
 
     /**
      * Dump a variable.
      */
-    public function dump($value)
+    public function dump($value, $params)
     {
+        if (! $this->dumpingAllowed($params)) {
+            return;
+        }
+
         dump(Dumper::resolve($value));
     }
 
@@ -1079,6 +1103,11 @@ class CoreModifiers extends Modifier
         return $headline;
     }
 
+    public function hasActualContent($value)
+    {
+        return (new ComponentSlot($value))->hasActualContent();
+    }
+
     /**
      * Converts a hex color to rgb values.
      *
@@ -1352,6 +1381,11 @@ class CoreModifiers extends Modifier
     public function isPast($value)
     {
         return $this->carbon($value)->isPast();
+    }
+
+    public function isString($value)
+    {
+        return is_string($value);
     }
 
     /**
@@ -3332,5 +3366,10 @@ class CoreModifiers extends Modifier
         }
 
         return [$url, $hash];
+    }
+
+    private function dumpingAllowed(array $params): bool
+    {
+        return $this->traitDumpingAllowed() || (Arr::get($params, 0) === 'force');
     }
 }

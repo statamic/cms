@@ -118,6 +118,16 @@ class Code extends Fieldtype
                         'default' => true,
                         'width' => '50',
                     ],
+                    'show_mode_label' => [
+                        'display' => __('Show Mode Label'),
+                        'instructions' => __('statamic::fieldtypes.code.config.show_mode_label'),
+                        'type' => 'toggle',
+                        'default' => true,
+                        'width' => '50',
+                        'if' => [
+                            'mode_selectable' => 'equals false',
+                        ],
+                    ],
                     'rulers' => [
                         'display' => __('Rulers'),
                         'instructions' => __('statamic::fieldtypes.code.config.rulers'),

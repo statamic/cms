@@ -249,5 +249,5 @@ return [
     'user_wizard_roles_groups_intro' => '可以将用户分配给在整个控制面板中自定义其权限，访问和功能的角色。',
     'user_wizard_super_admin_instructions' => '超级管理员可以完全控制并访问控制面板中的所有内容。明智地授予这个角色。',
     'view_more_count' => '查看:count更多',
-    'width_x_height' => ':width x :height',
+    'width_x_height' => ':width × :height',
 ];

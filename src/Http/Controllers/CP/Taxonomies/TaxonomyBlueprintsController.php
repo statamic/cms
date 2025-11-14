@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Taxonomies;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Contracts\Taxonomies\Taxonomy as TaxonomyContract;
 use Statamic\CP\Breadcrumbs\Breadcrumb;
 use Statamic\CP\Breadcrumbs\Breadcrumbs;
@@ -26,7 +27,11 @@ class TaxonomyBlueprintsController extends CpController
 
         $blueprints = $this->indexItems($taxonomy->termBlueprints(), $taxonomy);
 
-        return view('statamic::taxonomies.blueprints.index', compact('taxonomy', 'blueprints'));
+        return Inertia::render('blueprints/ScopedIndex', [
+            'blueprints' => $blueprints,
+            'reorderUrl' => cp_route('blueprints.taxonomies.reorder', $taxonomy),
+            'createUrl' => cp_route('blueprints.taxonomies.create', $taxonomy),
+        ]);
     }
 
     private function editUrl($taxonomy, $blueprint)
@@ -63,10 +68,10 @@ class TaxonomyBlueprintsController extends CpController
             createUrl: cp_route('blueprints.taxonomies.create', $taxonomy),
         ));
 
-        return view('statamic::taxonomies.blueprints.edit', [
-            'taxonomy' => $taxonomy,
-            'blueprint' => $blueprint,
-            'blueprintVueObject' => $this->toVueObject($blueprint),
+        return $this->renderEditPage([
+            'blueprint' => $this->toVueObject($blueprint),
+            'action' => cp_route('blueprints.taxonomies.update', [$taxonomy, $blueprint]),
+            'showTitle' => true,
         ]);
     }
 
@@ -84,8 +89,9 @@ class TaxonomyBlueprintsController extends CpController
     {
         $this->pushTaxonomyBreadcrumbs($taxonomy);
 
-        return view('statamic::taxonomies.blueprints.create', [
-            'action' => cp_route('blueprints.taxonomies.store', $taxonomy),
+        return Inertia::render('blueprints/Create', [
+            'route' => cp_route('blueprints.taxonomies.store', $taxonomy),
+            'icon' => 'taxonomies',
         ]);
     }
 
@@ -123,7 +129,7 @@ class TaxonomyBlueprintsController extends CpController
 
         Breadcrumbs::push(new Breadcrumb(
             text: $taxonomy->title(),
-            url: request()->url(),
+            url: cp_route('blueprints.taxonomies.index', $taxonomy),
             icon: 'taxonomies',
             links: Taxonomy::all()
                 ->reject(fn ($t) => $t->handle() === $taxonomy->handle())
