@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="max-w-5xl mx-auto" v-cloak>
         <Head :title="__('Edit Fieldset')" />
 
         <Header :title="__('Edit Fieldset')" icon="fieldsets">
