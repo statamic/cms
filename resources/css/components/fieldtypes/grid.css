@@ -51,7 +51,7 @@
 
         /* Assets fieldtype in a grid fieldtype */
         .grid-cell.assets-fieldtype:not(:has([data-asset-picker])) > * {
-            /* Wrap a border around the container instead of dealing with complex nested table elements */
+            /* Wrap a border around the container instead of dealing with complex nested table elements, because borders and border-radius don't work as expected with nested table elements */
             @apply border-gray-300 border-1 rounded-lg;
             /* Prevent the descended table elements from inheriting this, such as the img thumbnail and the delete button */
             *:not(button, button *) {
