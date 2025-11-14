@@ -228,7 +228,6 @@ class ExtensionServiceProvider extends ServiceProvider
 
     protected $widgets = [
         Widgets\Collection::class,
-        Widgets\Header::class,
         Widgets\Template::class,
         Widgets\Updater::class,
         \Statamic\Forms\Widget::class,
@@ -236,6 +235,7 @@ class ExtensionServiceProvider extends ServiceProvider
 
     protected $formJsDrivers = [
         JsDrivers\Alpine::class,
+        JsDrivers\AlpinePrecognition::class,
     ];
 
     protected $updateScripts = [

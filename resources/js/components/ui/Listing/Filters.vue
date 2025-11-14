@@ -154,6 +154,7 @@ function handleStackClosed() {
                             />
                         </Card>
                     </Panel>
+                    <Button variant="primary" :text="__('Done')" @click="handleStackClosed" />
                 </div>
             </div>
         </stack>

@@ -71,7 +71,7 @@ function disable() {
 <template>
     <Popover side="bottom" class="min-w-lg !size-min" v-model:open="popoverOpen">
         <template #trigger>
-            <Button v-text="__('Two Factor Authentication')" />
+            <Button v-text="__('Two-Factor Authentication')" />
         </template>
         <template v-if="!isSetup">
             <div>

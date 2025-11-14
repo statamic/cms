@@ -249,5 +249,5 @@ return [
     'user_wizard_roles_groups_intro' => 'Użytkownikom można przypisywać role, które dostosowują ich uprawnienia, dostęp i możliwości w całym Panelu Kontrolnym.',
     'user_wizard_super_admin_instructions' => 'Superadministratorzy mają pełną kontrolę i dostęp do wszystkiego w panelu kontrolnym. Przydziel tę rolę z rozwagą.',
     'view_more_count' => 'Zobacz więcej :count',
-    'width_x_height' => ':width x :height',
+    'width_x_height' => ':width × :height',
 ];

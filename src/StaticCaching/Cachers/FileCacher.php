@@ -315,7 +315,7 @@ EOT;
 
         const regions = data.regions;
         for (var key in regions) {
-            if (map[key]) map[key].outerHTML = regions[key];
+            if (map[key]) map[key].setHTMLUnsafe(regions[key]);
         }
 
         document.dispatchEvent(new CustomEvent('statamic:nocache.replaced', { detail: data }));

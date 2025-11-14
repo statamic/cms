@@ -11,10 +11,10 @@
         :errors="errors"
         as-config
     >
-        <div>
+        <div class="max-w-5xl mx-auto">
             <Header :title="title" icon="preferences">
                 <ButtonGroup role="group" aria-label="Save options">
-                    <ui-command-palette-item
+                    <CommandPaletteItem
                         :category="$commandPalette.category.Actions"
                         :text="__('Save')"
                         icon="save"
@@ -29,7 +29,7 @@
                             @click="action"
                             :aria-describedby="hasSaveAsOptions ? 'save-options-description' : undefined"
                         />
-                    </ui-command-palette-item>
+                    </CommandPaletteItem>
 
                     <Dropdown
                         align="end"
@@ -81,7 +81,7 @@
 </template>
 
 <script>
-import { Header, Button, ButtonGroup, Dropdown, DropdownMenu, DropdownItem, DropdownLabel, PublishContainer, PublishTabs } from '@/components/ui';
+import { Header, Button, ButtonGroup, Dropdown, DropdownMenu, DropdownItem, DropdownLabel, PublishContainer, PublishTabs, CommandPaletteItem } from '@/components/ui';
 import Head from '@/pages/layout/Head.vue';
 
 export default {
@@ -96,6 +96,7 @@ export default {
         DropdownLabel,
         PublishContainer,
         PublishTabs,
+        CommandPaletteItem,
     },
 
     props: {

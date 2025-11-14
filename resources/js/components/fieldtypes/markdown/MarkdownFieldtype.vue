@@ -1,6 +1,6 @@
 <template>
     <portal name="markdown-fullscreen" :disabled="!fullScreenMode" target-class="markdown-fieldtype">
-        <element-container @resized="refresh">
+        <div>
             <div
                 class="
                     @container/markdown w-full block bg-white dark:bg-gray-900! rounded-lg relative
@@ -72,7 +72,7 @@
                                 @drop="draggingFile = false"
                                 @keydown="shortcut"
                             >
-                                <div class="editor relative top-[0.5px] z-6 st-text-legibility focus-within:focus-outline" ref="codemirror">
+                                <div class="editor relative top-[0.5px] z-(--z-index-above) st-text-legibility focus-within:focus-outline" ref="codemirror">
                                     <div
                                         v-if="showFloatingToolbar && toolbarIsFloating && !isReadOnly"
                                         class="markdown-floating-toolbar absolute z-50 flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-2 py-1 shadow-lg dark:border-white/10 dark:bg-gray-900"
@@ -158,7 +158,7 @@
                     </div>
                 </stack>
             </div>
-        </element-container>
+        </div>
     </portal>
 </template>
 
@@ -687,12 +687,6 @@ export default {
             });
 
             this.trackHeightUpdates();
-        },
-
-        refresh() {
-            this.$nextTick(function () {
-                this.codemirror.refresh();
-            });
         },
 
         initToolbarButtons() {

@@ -73,6 +73,7 @@ use Statamic\Http\Controllers\CP\Navigation\NavigationBlueprintController;
 use Statamic\Http\Controllers\CP\Navigation\NavigationController;
 use Statamic\Http\Controllers\CP\Navigation\NavigationPagesController;
 use Statamic\Http\Controllers\CP\Navigation\NavigationTreeController;
+use Statamic\Http\Controllers\CP\PlaygroundController;
 use Statamic\Http\Controllers\CP\Preferences\DefaultPreferenceController;
 use Statamic\Http\Controllers\CP\Preferences\Nav\DefaultNavController;
 use Statamic\Http\Controllers\CP\Preferences\Nav\NavController;
@@ -439,7 +440,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::post('elevated-session', [ElevatedSessionController::class, 'confirm'])->name('elevated-session.confirm');
     Route::get('elevated-session/resend-code', [ElevatedSessionController::class, 'resendCode'])->name('elevated-session.resend-code')->middleware('throttle:send-elevated-session-code');
 
-    Route::view('/playground', 'statamic::playground')->name('playground');
+    Route::get('playground', PlaygroundController::class)->name('playground');
 
     Route::get('edit/{id}', EditRedirectController::class);
 

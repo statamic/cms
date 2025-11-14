@@ -9,6 +9,7 @@ import RemovePageConfirmation from '@/components/navigation/RemovePageConfirmati
 import SiteSelector from '@/components/SiteSelector.vue';
 import { Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, Button, EmptyStateMenu, EmptyStateItem, Header } from '@ui';
 import { toggleArchitecturalBackground } from '@/pages/layout/architectural-background.js';
+import { router } from '@inertiajs/vue3';
 
 export default {
     components: {
@@ -36,7 +37,7 @@ export default {
         blueprintUrl: { type: String, required: true },
         pagesUrl: { type: String, required: true },
         submitUrl: { type: String, required: true },
-        maxDepth: { type: Number, default: Infinity },
+        initialMaxDepth: { type: Number, default: null },
         expectsRoot: { type: Boolean, required: true },
         site: { type: String, required: true },
         sites: { type: Array, required: true },
@@ -50,6 +51,7 @@ export default {
         return {
             mounted: false,
             changed: false,
+            maxDepth: this.initialMaxDepth || Infinity,
             creatingPage: false,
             editingPage: false,
             targetParent: null,
@@ -213,6 +215,7 @@ export default {
                 title: values.title,
                 url: values.url,
                 status: null,
+                children: [],
             };
 
             this.publishInfo[page.id] = {
@@ -234,11 +237,12 @@ export default {
                 removeFromUi(shouldDeleteChildren);
                 this.showPageDeletionConfirmation = false;
                 this.pageBeingDeleted = branch;
+                delete this.publishInfo[branch.id];
             };
         },
 
         siteSelected(site) {
-            window.location = this.sites.find((s) => s.handle === site).url;
+            router.get(this.sites.find((s) => s.handle === site).url);
         },
 
         updatePublishInfo(info) {
@@ -361,7 +365,7 @@ export default {
             <ui-button
                 v-if="isDirty"
                 variant="filled"
-                :text="__('Discard changes')"
+                :text="__('Discard Changes')"
                 @click="$refs.tree.cancel"
             />
 

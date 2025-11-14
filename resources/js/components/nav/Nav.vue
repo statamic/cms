@@ -1,6 +1,6 @@
 <script setup>
 import { Link, usePage } from '@inertiajs/vue3';
-import { Badge, Icon, Tooltip } from '@ui';
+import { Badge, Icon } from '@ui';
 import useNavigation from './navigation.js';
 import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import DynamicHtmlRenderer from '@/components/DynamicHtmlRenderer.vue';
@@ -72,8 +72,12 @@ function toggle() {
     localStorage.setItem(localStorageKey, isOpen.value ? 'open' : 'closed');
 }
 
-function handleParentClick(item) {
+function handleParentClick(event, item) {
+    // Prevent opening in a new tab from updating the active state.
+    if (event.ctrlKey || event.metaKey || event.which === 2) return;
+
     setParentActive(item);
+
     // Close nav on mobile when clicking a nav item
     if (isMobile.value) {
         isOpen.value = false;
@@ -81,8 +85,12 @@ function handleParentClick(item) {
     }
 }
 
-function handleChildClick(item, child) {
+function handleChildClick(event, item, child) {
+    // Prevent opening in a new tab from updating the active state.
+    if (event.ctrlKey || event.metaKey || event.which === 2) return;
+
     setChildActive(item, child);
+
     // Close nav on mobile when clicking a child nav item
     if (isMobile.value) {
         isOpen.value = false;
@@ -90,7 +98,7 @@ function handleChildClick(item, child) {
     }
 }
 
-Statamic.$keys.bind(['command+\\'], (e) => {
+Statamic.$keys.bind(['command+\\', ['[']], (e) => {
     e.preventDefault();
     toggle();
 });
@@ -115,7 +123,7 @@ Statamic.$events.$on('nav.toggle', toggle);
                             :href="item.url"
                             v-bind="item.attributes"
                             :class="{ 'active': item.active }"
-                            @click="handleParentClick(item)"
+                            @click="handleParentClick($event, item)"
                         >
                             <Icon :name="item.icon" />
                             <span v-text="__(item.display)" />
@@ -128,7 +136,7 @@ Statamic.$events.$on('nav.toggle', toggle);
                                     v-bind="child.attributes"
                                     v-text="__(child.display)"
                                     :class="{ 'active': child.active }"
-                                    @click="handleChildClick(item, child)"
+                                    @click="handleChildClick($event, item, child)"
                                 />
                             </li>
                         </ul>

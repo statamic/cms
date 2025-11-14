@@ -283,7 +283,7 @@ export default {
 
             Statamic.$commandPalette.add({
                 category: Statamic.$commandPalette.category.Actions,
-                text: __('Toggle Grid Layout'),
+                text: __('Switch to Grid Layout'),
                 icon: 'layout-grid',
                 when: () => this.mode === 'list',
                 action: () => this.mode = 'grid',
@@ -291,7 +291,7 @@ export default {
 
             Statamic.$commandPalette.add({
                 category: Statamic.$commandPalette.category.Actions,
-                text: __('Toggle List Layout'),
+                text: __('Switch to List Layout'),
                 icon: 'layout-list',
                 when: () => this.mode === 'grid',
                 action: () => this.mode = 'list',

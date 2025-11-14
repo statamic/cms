@@ -11,7 +11,7 @@ const props = defineProps(['phpinfo', 'version']);
     <Header :title="__('PHP Info')" icon="info" />
 
     <section class="space-y-6">
-        <CardPanel :heading="__('PHP version')">
+        <CardPanel :heading="__('PHP Version')">
             <Table>
                 <TableRow>
                     <TableCell width="30%">{{ __('PHP Version') }}</TableCell>

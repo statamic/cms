@@ -60,6 +60,7 @@
                     >
                         <bubble-menu
                             :editor="editor"
+                            :key="`bubble-menu-${fullScreenMode}`"
                             :options="{ placement: 'top', offset: [0, 10] }"
                             v-if="editor && toolbarIsFloating && !readOnly"
                         >
@@ -209,6 +210,7 @@ export default {
                 showReplicatorFieldPreviews: this.config.previews,
             },
             errorsById: {},
+            debounceNextUpdate: true,
         };
     },
 
@@ -350,8 +352,13 @@ export default {
     },
 
     created() {
-        Statamic.$components.register('NodeViewWrapper', NodeViewWrapper);
-        Statamic.$components.register('NodeViewContent', NodeViewContent);
+        if (! Statamic.$components.has('NodeViewWrapper')) {
+            Statamic.$components.register('NodeViewWrapper', NodeViewWrapper);
+        }
+
+        if (! Statamic.$components.has('NodeViewContent')) {
+            Statamic.$components.register('NodeViewContent', NodeViewContent);
+        }
     },
 
     async mounted() {
@@ -391,7 +398,11 @@ export default {
 
             if (json === oldJson) return;
 
-            this.updateDebounced(json);
+            this.debounceNextUpdate
+                ? this.updateDebounced(json)
+                : this.update(json);
+
+            this.debounceNextUpdate = true;
         },
 
         value(value, oldValue) {
@@ -456,6 +467,8 @@ export default {
 
             const { $head } = this.editor.view.state.selection;
             const { nodeBefore } = $head;
+
+            this.debounceNextUpdate = false;
 
             // Perform this in nextTick because the meta data won't be ready until then.
             this.$nextTick(() => {
@@ -789,7 +802,7 @@ export default {
         getExtensions() {
             let modeExts = this.inputIsInline ? [DocumentInline] : [DocumentBlock, HardBreak];
 
-            if (this.config.inline === 'break') {
+            if (this.inputIsInline && this.config.inline_hard_breaks) {
                 modeExts.push(
                     HardBreak.extend({
                         addKeyboardShortcuts() {

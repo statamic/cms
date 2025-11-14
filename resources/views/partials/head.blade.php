@@ -52,6 +52,10 @@
 @else
     :root {
         {{ \Statamic\CP\Color::cssVariables() }}
+
+        &.dark {
+            {{ \Statamic\CP\Color::cssVariables(dark: true) }}
+        }
     }
 @endif
 </style>

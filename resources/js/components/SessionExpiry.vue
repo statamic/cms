@@ -1,8 +1,8 @@
 <template>
     <div class="session-expiry">
         <Modal
-            v-if="isWarning && !isShowingLogin"
-            :open="isWarning && !isShowingLogin"
+            v-if="isWarning && !isShowingLogin && !isShowingTwoFactorChallenge"
+            :open="isWarning && !isShowingLogin && !isShowingTwoFactorChallenge"
             :title="__('Your Session is Expiring')"
             class="max-w-[500px]!"
             :dismissible="false"

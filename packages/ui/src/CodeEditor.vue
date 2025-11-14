@@ -1,7 +1,6 @@
 <script setup>
 import CodeMirror from 'codemirror';
 import { computed, markRaw, nextTick, onMounted, ref, useAttrs, useTemplateRef, watch } from 'vue';
-import ElementContainer from '@/components/ElementContainer.vue';
 import Select from './Select/Select.vue';
 
 // Addons
@@ -93,7 +92,6 @@ defineOptions({
 });
 
 defineExpose({
-    refresh,
     toggleFullscreen,
     fullScreenMode,
 });
@@ -128,14 +126,6 @@ function initCodeMirror() {
 
     codemirror.value.on('focus', () => emit('focus'));
     codemirror.value.on('blur', () => emit('blur'));
-
-    // Refresh to ensure CodeMirror visible and the proper size
-    // Most applicable when loaded by another field like Bard
-    refresh();
-}
-
-function refresh() {
-    nextTick(() => codemirror.value?.refresh());
 }
 
 watch(
@@ -263,9 +253,7 @@ watch(
                     <span v-else v-text="modeLabel" class="font-mono text-xs text-gray-700 dark:text-gray-300" />
                 </div>
             </div>
-            <ElementContainer @resized="refresh">
-                <div ref="codemirrorElement" class="font-mono text-sm dark:border dark:border-white/10 dark:bg-gray-900 rounded-lg [&_.CodeMirror]:rounded-lg" :class="{ 'dark:border-t-0 rounded-t-none [&_.CodeMirror]:rounded-t-none': showToolbar }"></div>
-            </ElementContainer>
+            <div ref="codemirrorElement" class="font-mono text-sm dark:border dark:border-white/10 dark:bg-gray-900 rounded-lg [&_.CodeMirror]:rounded-lg" :class="{ 'dark:border-t-0 rounded-t-none [&_.CodeMirror]:rounded-t-none': showToolbar }"></div>
         </div>
     </portal>
 </template>

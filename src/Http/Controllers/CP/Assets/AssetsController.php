@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Assets;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
 use Statamic\Assets\AssetUploader;
 use Statamic\Assets\UploadedReplacementFile;
 use Statamic\Contracts\Assets\Asset as AssetContract;
@@ -28,7 +29,9 @@ class AssetsController extends CpController
         $this->redirectToFirstContainer();
 
         if (User::current()->can('create', AssetContainerContract::class)) {
-            return view('statamic::assets.index');
+            return Inertia::render('assets/Empty', [
+                'createUrl' => cp_route('asset-containers.create'),
+            ]);
         }
 
         throw new AuthorizationException;

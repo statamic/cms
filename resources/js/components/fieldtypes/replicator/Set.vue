@@ -5,7 +5,6 @@ import {
     Switch,
     Subheading,
     Badge,
-    Tooltip,
     Dropdown,
     DropdownItem,
     DropdownSeparator,

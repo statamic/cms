@@ -7,7 +7,7 @@
             <div class="flex gap-2 sm:gap-3 grow items-center" @click="$emit('branch-clicked', page)">
                 <ui-status-indicator :status="page.status" v-tooltip="getStatusTooltip()" />
                 <ui-icon v-if="isRoot" name="home" class="size-4" v-tooltip="__('This is the root page')" />
-                <Link
+                <a
                     @click.prevent="$emit('edit', $event)"
                     :class="{ 'text-sm font-medium is-top-level-branch': isTopLevelBranch }"
                     :href="page.edit_url"
@@ -37,9 +37,9 @@
                 <div v-if="page.collection && editable" class="flex items-center gap-2">
                     <Icon name="navigation" class="size-3.5 text-gray-500" />
                     <div>
-                        <Link :href="page.collection.create_url" v-text="__('Add')" class="hover:text-ui-accent-text dark:hover:text-dark-ui-accent-text" />
+                        <Link :href="page.collection.create_url" v-text="__('Add')" class="hover:text-ui-accent-text" />
                         <span class="mx-1 text-gray-400 dark:text-gray-500">/</span>
-                        <Link :href="page.collection.edit_url" v-text="__('Edit')" class="hover:text-ui-accent-text dark:hover:text-dark-ui-accent-text" />
+                        <Link :href="page.collection.edit_url" v-text="__('Edit')" class="hover:text-ui-accent-text" />
                     </div>
                 </div>
             </div>
