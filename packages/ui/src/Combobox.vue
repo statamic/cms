@@ -14,6 +14,7 @@ import {
     FocusScope
 } from 'reka-ui';
 import { computed, nextTick, ref, useAttrs, useTemplateRef, watch } from 'vue';
+import { twMerge } from 'tailwind-merge';
 import Button from './Button/Button.vue';
 import Icon from './Icon/Icon.vue';
 import Badge from './Badge.vue';
@@ -50,6 +51,12 @@ defineOptions({
 });
 
 const attrs = useAttrs();
+
+const wrapperClasses = computed(() => twMerge('w-full', attrs.class));
+const wrapperAttrs = computed(() => {
+    const { class: _, ...rest } = attrs;
+    return rest;
+});
 
 const triggerClasses = cva({
     base: 'w-full flex items-center justify-between antialiased cursor-pointer',
@@ -267,8 +274,8 @@ defineExpose({
 </script>
 
 <template>
-    <div>
-        <div class="flex">
+    <div :class="wrapperClasses" v-bind="wrapperAttrs">
+        <div class="flex w-full">
             <ComboboxRoot
                 :disabled="disabled || readOnly"
                 :model-value="modelValue"
@@ -278,10 +285,9 @@ defineExpose({
                 :reset-search-term-on-select="false"
                 @update:model-value="updateModelValue"
                 @update:open="updateDropdownOpen"
-                class="cursor-pointer w-full"
+                class="cursor-pointer flex-1"
                 data-ui-combobox
                 ignore-filter
-                v-bind="attrs"
             >
                 <ComboboxAnchor  data-ui-combobox-anchor>
                     <ComboboxTrigger as="div" ref="trigger" :class="triggerClasses" @keydown.enter="openDropdown" @keydown.space="openDropdown" data-ui-combobox-trigger>

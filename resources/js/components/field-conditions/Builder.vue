@@ -5,13 +5,9 @@
             :instructions="__('messages.field_conditions_instructions')"
         >
             <div class="mb-6 flex items-center gap-x-4">
-                <Select v-model="when" :options="whenOptions" />
+                <Select v-model="when" :options="whenOptions" class="w-40" />
 
-                <Select
-                    v-if="hasConditions"
-                    v-model="type"
-                    :options="typeOptions"
-                />
+                <Select v-if="hasConditions" v-model="type" :options="typeOptions" class="w-64" />
 
                 <Input v-if="hasConditions && isCustom" v-model="customMethod" class="flex-1" />
             </div>
