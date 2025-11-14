@@ -28,7 +28,6 @@
 
             <Combobox
                 v-if="!customRule"
-                class="w-full"
                 ref="rulesSelect"
                 :options="allRules"
                 :placeholder="__('Add Rule')"

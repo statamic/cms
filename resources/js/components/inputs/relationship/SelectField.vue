@@ -1,7 +1,6 @@
 <template>
     <div>
         <Combobox
-            class="w-full"
             searchable
             :disabled="config.disabled"
             :ignore-filter="typeahead"

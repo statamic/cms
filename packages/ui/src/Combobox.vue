@@ -278,7 +278,7 @@ defineExpose({
                 :reset-search-term-on-select="false"
                 @update:model-value="updateModelValue"
                 @update:open="updateDropdownOpen"
-                class="cursor-pointer"
+                class="cursor-pointer w-full"
                 data-ui-combobox
                 ignore-filter
                 v-bind="attrs"
