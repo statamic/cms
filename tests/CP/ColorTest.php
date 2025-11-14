@@ -105,6 +105,19 @@ class ColorTest extends TestCase
     }
 
     #[Test]
+    public function dark_mode_variable_can_be_overridden_even_if_it_doesnt_exist_in_the_default()
+    {
+        config(['statamic.cp.theme' => [
+            'dark-focus-outline' => 'purple',
+        ]]);
+
+        $this->assertEquals([
+            ...Color::defaults(dark: true),
+            'dark-focus-outline' => 'purple',
+        ], Color::theme(dark: true));
+    }
+
+    #[Test]
     public function it_outputs_css_variables()
     {
         config(['statamic.cp.theme' => [

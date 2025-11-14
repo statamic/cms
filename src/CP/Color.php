@@ -429,8 +429,19 @@ class Color
             $config["{$colorHandle}-{$shade}"] = $value;
         }
 
-        return collect(static::defaults($dark))
-            ->map(fn ($color, $name) => $config[$name] ?? $color)
+        $darkColors = static::defaults(dark: true);
+
+        return collect(static::defaults())
+            ->mapWithKeys(function ($color, $name) use ($config, $dark, $darkColors) {
+                $key = $dark ? "dark-{$name}" : $name;
+
+                $value = $dark
+                    ? $config[$key] ?? $darkColors[$key] ?? null
+                    : $config[$key] ?? $color;
+
+                return [$key => $value];
+            })
+            ->filter()
             ->all();
     }
 
