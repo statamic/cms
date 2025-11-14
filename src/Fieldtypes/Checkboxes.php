@@ -40,7 +40,7 @@ class Checkboxes extends Fieldtype
                     'default' => [
                         'display' => __('Default Value'),
                         'instructions' => __('statamic::messages.fields_default_instructions'),
-                        'type' => 'text',
+                        'type' => 'taggable',
                     ],
                 ],
             ],
