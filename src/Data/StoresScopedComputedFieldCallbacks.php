@@ -16,7 +16,7 @@ trait StoresScopedComputedFieldCallbacks
      * @param  string|array  $scopes
      * @param  string|array  $field
      */
-    public function computed($scopes, $field, ?Closure $callback = null)
+    public function computed($scopes, $field, ?callable $callback = null)
     {
         foreach (Arr::wrap($scopes) as $scope) {
             if (is_array($field)) {
