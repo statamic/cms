@@ -438,7 +438,7 @@ class Color
     {
         return collect(static::theme($dark))
             ->map(function ($color, $name) use ($dark) {
-                $name = $dark ? str($name)->__toString() : $name;
+                $name = $dark ? str($name)->remove('dark-')->__toString() : $name;
 
                 return "--theme-color-{$name}: {$color};";
             })
