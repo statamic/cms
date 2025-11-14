@@ -12,6 +12,7 @@ class ColorTest extends TestCase
     public function theme_has_defaults()
     {
         $this->assertEquals(Color::defaults(), Color::theme());
+        $this->assertEquals(Color::defaults(dark: true), Color::theme(dark: true));
     }
 
     #[Test]
@@ -20,6 +21,7 @@ class ColorTest extends TestCase
         config(['statamic.cp.theme' => 'rad']);
 
         $this->assertEquals(Color::defaults(), Color::theme());
+        $this->assertEquals(Color::defaults(dark: true), Color::theme(dark: true));
     }
 
     #[Test]
@@ -31,6 +33,8 @@ class ColorTest extends TestCase
             ...Color::defaults(),
             'primary' => Color::Sky[500],
         ], Color::theme());
+
+        $this->assertEquals(Color::defaults(dark: true), Color::theme(dark: true));
     }
 
     #[Test]
@@ -42,6 +46,8 @@ class ColorTest extends TestCase
             ...Color::defaults(dark: true),
             'dark-primary' => Color::Sky[700],
         ], Color::theme(dark: true));
+
+        $this->assertEquals(Color::defaults(), Color::theme());
     }
 
     #[Test]
@@ -49,7 +55,6 @@ class ColorTest extends TestCase
     {
         config(['statamic.cp.theme' => [
             'grays' => Color::Slate,
-            'dark-grays' => Color::Stone,
         ]]);
 
         $this->assertEquals([
@@ -68,13 +73,14 @@ class ColorTest extends TestCase
             'gray-925' => Color::Slate[925],
             'gray-950' => Color::Slate[950],
         ], Color::theme());
+
+        $this->assertEquals(Color::defaults(dark: true), Color::theme(dark: true));
     }
 
     #[Test]
     public function grays_can_be_set_together_dark_mode()
     {
         config(['statamic.cp.theme' => [
-            'grays' => Color::Slate,
             'dark-grays' => Color::Stone,
         ]]);
 
@@ -94,5 +100,7 @@ class ColorTest extends TestCase
             'dark-gray-925' => Color::Stone[925],
             'dark-gray-950' => Color::Stone[950],
         ], Color::theme(dark: true));
+
+        $this->assertEquals(Color::defaults(), Color::theme());
     }
 }
