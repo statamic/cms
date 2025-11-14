@@ -39,9 +39,9 @@ class ColorTest extends TestCase
         config(['statamic.cp.theme' => ['dark-primary' => Color::Sky[700]]]);
 
         $this->assertEquals([
-            ...Color::defaults(darkVariant: true),
+            ...Color::defaults(dark: true),
             'dark-primary' => Color::Sky[700],
-        ], Color::theme(darkVariant: true));
+        ], Color::theme(dark: true));
     }
 
     #[Test]
@@ -79,7 +79,7 @@ class ColorTest extends TestCase
         ]]);
 
         $this->assertEquals([
-            ...Color::defaults(darkVariant: true),
+            ...Color::defaults(dark: true),
             'dark-gray-50' => Color::Stone[50],
             'dark-gray-100' => Color::Stone[100],
             'dark-gray-200' => Color::Stone[200],
@@ -93,6 +93,6 @@ class ColorTest extends TestCase
             'dark-gray-900' => Color::Stone[900],
             'dark-gray-925' => Color::Stone[925],
             'dark-gray-950' => Color::Stone[950],
-        ], Color::theme(darkVariant: true));
+        ], Color::theme(dark: true));
     }
 }

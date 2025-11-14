@@ -361,7 +361,7 @@ class Color
     public const Transparent = 'transparent';
     public const Volt = 'oklch(93.86% 0.2018 122.24)';
 
-    public static function defaults(bool $darkVariant = false): array
+    public static function defaults(bool $dark = false): array
     {
         return collect([
             'primary' => self::Indigo[700],
@@ -416,33 +416,33 @@ class Color
             'switch-bg' => 'var(--theme-color-ui-accent-bg)',
             'dark-switch-bg' => 'var(--theme-color-dark-ui-accent-bg)',
         ])
-            ->filter(fn ($color, $name) => str($name)->startsWith('dark-') ? $darkVariant : ! $darkVariant)
+            ->filter(fn ($color, $name) => str($name)->startsWith('dark-') ? $dark : ! $dark)
             ->all();
     }
 
-    public static function theme(bool $darkVariant = false): array
+    public static function theme(bool $dark = false): array
     {
         $config = config('statamic.cp.theme', []);
 
-        foreach ($config[$darkVariant ? 'dark-grays' : 'grays'] ?? [] as $shade => $value) {
-            $colorHandle = $darkVariant ? 'dark-gray' : 'gray';
+        foreach ($config[$dark ? 'dark-grays' : 'grays'] ?? [] as $shade => $value) {
+            $colorHandle = $dark ? 'dark-gray' : 'gray';
             $config["{$colorHandle}-{$shade}"] = $value;
         }
 
-        return collect(static::defaults($darkVariant))
-            ->filter(fn ($color, $name) => str($name)->startsWith('dark-') ? $darkVariant : ! $darkVariant)
+        return collect(static::defaults($dark))
+            ->filter(fn ($color, $name) => str($name)->startsWith('dark-') ? $dark : ! $dark)
             ->map(fn ($color, $name) => $config[$name] ?? $color)
             ->all();
     }
 
-    public static function cssVariables(bool $darkVariant = false): string
+    public static function cssVariables(bool $dark = false): string
     {
-        return collect(static::theme($darkVariant))
-            ->map(function ($color, $name) use ($darkVariant) {
-                $name = $darkVariant ? str($name)->remove('dark-')->__toString() : $name;
+        return collect(static::theme($dark))
+            ->map(function ($color, $name) use ($dark) {
+                $name = $dark ? str($name)->__toString() : $name;
 
                 return "--theme-color-{$name}: {$color};";
             })
-            ->implode(PHP_EOL.($darkVariant ? "\t\t\t" : "\t\t"));
+            ->implode(PHP_EOL.($dark ? "\t\t\t" : "\t\t"));
     }
 }

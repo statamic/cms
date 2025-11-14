@@ -51,7 +51,7 @@
         {{ \Statamic\CP\Color::cssVariables() }}
 
         &.dark {
-            {{ \Statamic\CP\Color::cssVariables(darkVariant: true) }}
+            {{ \Statamic\CP\Color::cssVariables(dark: true) }}
         }
     }
 </style>
