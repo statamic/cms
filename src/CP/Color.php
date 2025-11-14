@@ -403,6 +403,7 @@ class Color
             'gray-950' => self::Zinc[950],
             'dark-gray-50' => self::Zinc[50],
             'dark-gray-100' => self::Zinc[100],
+            'dark-gray-150' => self::Zinc[150],
             'dark-gray-200' => self::Zinc[200],
             'dark-gray-300' => self::Zinc[300],
             'dark-gray-400' => self::Zinc[400],
