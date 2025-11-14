@@ -8,7 +8,7 @@
     /* Here we typically need a negative outline-offset because of the inner shadow on inputs */
     --focus-outline-offset: -1px;
     --focus-within-outline-offset: 0px;
-    --focus-outline-color: var(--color-blue-400);
+    --focus-outline-color: var(--theme-color-focus-outline, var(--color-blue-400));
     --focus-outline-style: solid;
 
     /* The outline-offset value used for buttons */
