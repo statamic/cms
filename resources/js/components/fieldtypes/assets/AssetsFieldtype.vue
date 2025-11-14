@@ -27,7 +27,7 @@
                 </div>
 
                 <div
-                    v-if="hasPickerPanel"
+                    v-if="!isReadOnly && showPicker"
                     class="not-[.link-fieldtype_&]:p-2 not-[.link-fieldtype_&]:border border-gray-300 dark:border-gray-700 dark:bg-gray-850 rounded-xl flex flex-col @2xs:flex-row items-center gap-2 sm:gap-3 gap-y-3"
                     :class="{
                         'rounded-b-none': expanded,
@@ -102,8 +102,8 @@
                         @dragstart="$emit('focus')"
                     >
                         <div
-                            class="bg-white relative grid gap-4 2xl:gap-10 p-3 relative rounded-xl border border-gray-300 dark:bg-gray-850 dark:border-dark-500"
-                            :class="assetGridBodyClasses"
+                            class="bg-white relative grid gap-4 2xl:gap-10 p-3 relative rounded-xl border border-gray-300 border-t-0 rounded-t-none dark:bg-gray-850 dark:border-dark-500"
+                            :class="{ 'rounded-t-none': !isReadOnly && (showPicker || uploads.length) }"
                             ref="assets"
                             style="grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));"
                         >
@@ -122,11 +122,7 @@
                         </div>
                     </sortable-list>
 
-                    <div
-                        class="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700"
-                        :class="assetListWrapperClasses"
-                        v-if="displayMode === 'list'"
-                    >
+                    <div class="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700 not-[.link-fieldtype_&]:border-t-0! not-[.link-fieldtype_&]:rounded-t-none" v-if="displayMode === 'list'">
                         <table class="table-fixed w-full">
                             <thead>
                                 <tr>
@@ -388,34 +384,6 @@ export default {
             if (this.maxFilesReached && (this.isInGridField || this.isInLinkField)) return false;
 
             return true;
-        },
-
-        hasPickerPanel() {
-            return !this.isReadOnly && this.showPicker;
-        },
-
-        hasTopAttachment() {
-            if (this.uploads.length) return true;
-
-            return this.hasPickerPanel;
-        },
-
-        assetGridBodyClasses() {
-            return {
-                'border-t-0 rounded-t-none': this.hasTopAttachment,
-            };
-        },
-
-        assetListWrapperClasses() {
-            if (!this.hasTopAttachment) {
-                return [];
-            }
-
-            return [
-                'border-t-0 rounded-t-none',
-                'not-[.link-fieldtype_&]:border-t-0!',
-                'not-[.link-fieldtype_&]:rounded-t-none',
-            ];
         },
 
         showSetAlt() {
