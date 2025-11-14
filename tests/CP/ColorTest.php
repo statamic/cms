@@ -103,4 +103,19 @@ class ColorTest extends TestCase
 
         $this->assertEquals(Color::defaults(), Color::theme());
     }
+
+    #[Test]
+    public function it_outputs_css_variables()
+    {
+        config(['statamic.cp.theme' => [
+            'primary' => 'lightfoo',
+            'dark-primary' => 'darkfoo',
+        ]]);
+
+        $this->assertStringContainsString('--theme-color-primary: lightfoo;', Color::cssVariables());
+        $this->assertStringNotContainsString('--theme-color-primary: darkfoo', Color::cssVariables());
+
+        $this->assertStringContainsString('--theme-color-primary: darkfoo;', Color::cssVariables(dark: true));
+        $this->assertStringNotContainsString('--theme-color-primary: lightfoo', Color::cssVariables(dark: true));
+    }
 }
