@@ -52,7 +52,7 @@ defineOptions({
 
 const attrs = useAttrs();
 
-const wrapperClasses = computed(() => twMerge('w-full', attrs.class));
+const wrapperClasses = computed(() => twMerge('w-full min-w-0', attrs.class));
 const wrapperAttrs = computed(() => {
     const { class: _, ...rest } = attrs;
     return rest;
@@ -275,7 +275,7 @@ defineExpose({
 
 <template>
     <div :class="wrapperClasses" v-bind="wrapperAttrs">
-        <div class="flex w-full">
+        <div class="flex w-full min-w-0">
             <ComboboxRoot
                 :disabled="disabled || readOnly"
                 :model-value="modelValue"
@@ -285,11 +285,11 @@ defineExpose({
                 :reset-search-term-on-select="false"
                 @update:model-value="updateModelValue"
                 @update:open="updateDropdownOpen"
-                class="cursor-pointer flex-1"
+                class="cursor-pointer flex-1 min-w-0"
                 data-ui-combobox
                 ignore-filter
             >
-                <ComboboxAnchor  data-ui-combobox-anchor>
+                <ComboboxAnchor class="block w-full" data-ui-combobox-anchor>
                     <ComboboxTrigger as="div" ref="trigger" :class="triggerClasses" @keydown.enter="openDropdown" @keydown.space="openDropdown" data-ui-combobox-trigger>
                         <div class="flex-1 min-w-0">
                             <!-- Dropdown open: search input -->
