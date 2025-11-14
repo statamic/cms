@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use League\Glide\ServerFactory;
+use Statamic\Events\GlideAssetCacheCleared;
 use Statamic\Facades\Config;
 use Statamic\Facades\Image;
 use Statamic\Imaging\ResponseFactory as LaravelResponseFactory;
@@ -137,6 +138,8 @@ class GlideManager
 
         // Clear manifest itself from cache store.
         $this->cacheStore()->forget($manifestKey);
+
+        GlideAssetCacheCleared::dispatch($asset);
     }
 
     public function normalizeParameters($params)

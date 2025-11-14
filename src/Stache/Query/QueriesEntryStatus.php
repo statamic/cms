@@ -6,8 +6,12 @@ use Illuminate\Support\Collection;
 
 trait QueriesEntryStatus
 {
+    private $queriedByStatus = false;
+
     public function whereStatus(string $status)
     {
+        $this->queriedByStatus = true;
+
         if ($status === 'any') {
             return $this;
         }

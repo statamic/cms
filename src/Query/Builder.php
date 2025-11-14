@@ -14,13 +14,14 @@ use Statamic\Contracts\Query\Builder as Contract;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Pattern;
 use Statamic\Query\Concerns\FakesQueries;
+use Statamic\Query\Concerns\QueriesRelationships;
 use Statamic\Query\Exceptions\MultipleRecordsFoundException;
 use Statamic\Query\Exceptions\RecordsNotFoundException;
 use Statamic\Query\Scopes\AppliesScopes;
 
 abstract class Builder implements Contract
 {
-    use AppliesScopes, FakesQueries;
+    use AppliesScopes, FakesQueries, QueriesRelationships;
 
     protected $columns;
     protected $limit;
@@ -314,6 +315,48 @@ abstract class Builder implements Contract
     public function orWhereJsonLength($column, $operator, $value = null)
     {
         return $this->whereJsonLength($column, $operator, $value, 'or');
+    }
+
+    public function whereJsonOverlaps($column, $values, $boolean = 'and')
+    {
+        if (! is_array($values)) {
+            $values = [$values];
+        }
+
+        $this->wheres[] = [
+            'type' => 'JsonOverlaps',
+            'column' => $column,
+            'values' => $values,
+            'boolean' => $boolean,
+        ];
+
+        return $this;
+    }
+
+    public function orWhereJsonOverlaps($column, $values)
+    {
+        return $this->whereJsonOverlaps($column, $values, 'or');
+    }
+
+    public function whereJsonDoesntOverlap($column, $values, $boolean = 'and')
+    {
+        if (! is_array($values)) {
+            $values = [$values];
+        }
+
+        $this->wheres[] = [
+            'type' => 'JsonDoesntOverlap',
+            'column' => $column,
+            'values' => $values,
+            'boolean' => $boolean,
+        ];
+
+        return $this;
+    }
+
+    public function orWhereJsonDoesntOverlap($column, $values)
+    {
+        return $this->whereJsonDoesntOverlap($column, $values, 'or');
     }
 
     public function whereNull($column, $boolean = 'and', $not = false)

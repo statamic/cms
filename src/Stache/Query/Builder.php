@@ -157,16 +157,20 @@ abstract class Builder extends BaseBuilder
 
     protected function filterWhereIn($values, $where)
     {
-        return $values->filter(function ($value) use ($where) {
-            return in_array($value, $where['values']);
-        });
+        $lookup = array_flip($where['values']);
+
+        return $values->filter(
+            fn ($value) => isset($lookup[$value])
+        );
     }
 
     protected function filterWhereNotIn($values, $where)
     {
-        return $values->filter(function ($value) use ($where) {
-            return ! in_array($value, $where['values']);
-        });
+        $lookup = array_flip($where['values']);
+
+        return $values->filter(
+            fn ($value) => ! isset($lookup[$value])
+        );
     }
 
     protected function filterWhereNull($values, $where)
@@ -326,6 +330,36 @@ abstract class Builder extends BaseBuilder
             }
 
             return $this->{$method}(count($value), $where['value']);
+        });
+    }
+
+    protected function filterWhereJsonOverlaps($values, $where)
+    {
+        return $values->filter(function ($value) use ($where) {
+            if (is_null($value) || is_null($where['values'])) {
+                return false;
+            }
+
+            if (! is_array($value) && ! is_array($where['values'])) {
+                return $value === $where['values'];
+            }
+
+            return ! empty(array_intersect(Arr::wrap($value), $where['values']));
+        });
+    }
+
+    protected function filterWhereJsonDoesntOverlap($values, $where)
+    {
+        return $values->filter(function ($value) use ($where) {
+            if (is_null($value) || is_null($where['values'])) {
+                return true;
+            }
+
+            if (! is_array($value) && ! is_array($where['values'])) {
+                return $value !== $where['values'];
+            }
+
+            return empty(array_intersect(Arr::wrap($value), $where['values']));
         });
     }
 
