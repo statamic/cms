@@ -286,6 +286,7 @@ defineExpose({
                 <ComboboxAnchor  data-ui-combobox-anchor>
                     <ComboboxTrigger as="div" ref="trigger" :class="triggerClasses" @keydown.enter="openDropdown" @keydown.space="openDropdown" data-ui-combobox-trigger>
                         <div class="flex-1 min-w-0">
+                            <!-- Dropdown open: search input -->
                             <ComboboxInput
                                 v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"
                                 ref="search"
@@ -301,12 +302,26 @@ defineExpose({
                                 @keydown.space="openDropdown"
                             />
 
-                            <button type="button" class="w-full text-start flex items-center gap-2 bg-transparent cursor-pointer focus:outline-none" v-else-if="!searchable && (dropdownOpen || !modelValue)" @keydown.space="openDropdown" data-ui-combobox-placeholder>
-                            <Icon v-if="icon" :name="icon" class="text-gray-500 dark:text-white dark:opacity-50" />
+                            <!-- Dropdown open: placeholder -->
+                            <button
+                                v-else-if="!searchable && (dropdownOpen || !modelValue)"
+                                type="button"
+                                class="w-full text-start flex items-center gap-2 bg-transparent cursor-pointer focus:outline-none"
+                                data-ui-combobox-placeholder
+                                @keydown.space="openDropdown"
+                            >
+                                <Icon v-if="icon" :name="icon" class="text-gray-500 dark:text-white dark:opacity-50" />
                                 <span class="block truncate text-gray-500 dark:text-gray-400" v-text="placeholder" />
                             </button>
 
-                            <button type="button" v-else class="w-full text-start bg-transparent flex items-center gap-2 cursor-pointer focus-none" @keydown.space="openDropdown" data-ui-combobox-selected-option>
+                            <!-- Dropdown closed: selected option -->
+                            <button
+                                v-else
+                                type="button"
+                                class="w-full text-start bg-transparent flex items-center gap-2 cursor-pointer focus-none"
+                                data-ui-combobox-selected-option
+                                @keydown.space="openDropdown"
+                            >
                                 <slot v-if="selectedOption" name="selected-option" v-bind="{ option: selectedOption }">
                                     <div v-if="icon" class="size-4">
                                         <Icon :name="icon" class="text-white/85 dark:text-white dark:opacity-50" />
@@ -333,8 +348,8 @@ defineExpose({
                             'max-h-[var(--reka-combobox-content-available-height)] w-[var(--reka-combobox-trigger-width)] min-w-fit',
                             'overflow-hidden'
                         ]"
-                        @escape-key-down="nextTick(() => $refs.trigger.$el.focus())"
                         data-ui-combobox-content
+                        @escape-key-down="nextTick(() => $refs.trigger.$el.focus())"
                     >
                         <FocusScope
                             :trapped="!searchable"
