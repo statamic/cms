@@ -11,6 +11,7 @@ import { each, groupBy, orderBy, find, uniq } from 'lodash-es';
 import { motion } from 'motion-v';
 import { cva } from 'cva';
 import { Icon, Subheading } from '@/components/ui';
+import { router } from '@inertiajs/vue3';
 
 let metaPressed = ref(false);
 let open = ref(false);
@@ -269,6 +270,8 @@ const modalClasses = cva({
         'slide-in-from-top-2',
     ],
 })({});
+
+router.on('start', () => Statamic.$commandPalette.clear());
 </script>
 
 <template>
