@@ -391,6 +391,7 @@ class Color
             'global-header-bg' => self::Zinc[800],
             'dark-global-header-bg' => self::Zinc[800],
             'progress-bar' => self::Indigo[700],
+            'focus-outline' => self::Blue[400],
             'ui-accent-bg' => self::Indigo[700],
             'ui-accent-text' => 'var(--theme-color-ui-accent-bg)',
             'dark-ui-accent-bg' => self::Indigo[700],
