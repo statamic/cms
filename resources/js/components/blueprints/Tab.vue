@@ -27,7 +27,7 @@
         <stack
             narrow
             v-if="editing"
-            @opened="$refs.title?.focus()"
+            @opened="() => $nextTick(() => $refs.title.focus())"
             @closed="editCancelled"
         >
             <div class="h-full overflow-scroll overflow-x-auto bg-white px-6 dark:bg-dark-800">
@@ -41,7 +41,7 @@
                 </header>
                 <div class="space-y-6">
                     <Field :label="__('Title')" class="form-group field-w-100">
-                        <Input ref="title" autofocus :model-value="display" @update:model-value="fieldUpdated('display', $event)" />
+                        <Input ref="title" :model-value="display" @update:model-value="fieldUpdated('display', $event)" />
                     </Field>
                     <Field :label="__('Handle')" class="form-group field-w-100">
                         <Input class="font-mono" :model-value="handle" @update:model-value="fieldUpdated('handle', $event)" />
