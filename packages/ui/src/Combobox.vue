@@ -395,9 +395,9 @@ defineExpose({
                                     }"
                                         >
                                             <slot name="option" v-bind="option">
-                                                <img v-if="option.image" :src="option.image" class="size-5 rounded-full" />
-                                                <span v-if="labelHtml" v-html="getOptionLabel(option)" />
-                                                <span v-else>{{ __(getOptionLabel(option)) }}</span>
+                                                <img v-if="option.image" :src="option.image" class="size-5 rounded-full flex-shrink-0" />
+                                                <span v-if="labelHtml" v-html="getOptionLabel(option)" class="truncate" />
+                                                <span v-else class="truncate">{{ __(getOptionLabel(option)) }}</span>
                                             </slot>
                                         </ComboboxItem>
                                     </div>
