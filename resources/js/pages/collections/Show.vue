@@ -437,7 +437,7 @@ export default {
 
             Statamic.$commandPalette.add({
                 category: Statamic.$commandPalette.category.Actions,
-                text: __('Toggle List Layout'),
+                text: __('Switch to List Layout'),
                 icon: 'layout-list',
                 when: () => this.view !== 'list',
                 action: () => this.view = 'list',
@@ -445,7 +445,7 @@ export default {
 
             Statamic.$commandPalette.add({
                 category: Statamic.$commandPalette.category.Actions,
-                text: __('Toggle Calendar Layout'),
+                text: __('Switch to Calendar Layout'),
                 icon: 'calendar',
                 when: () => this.canUseCalendar && this.view !== 'calendar',
                 action: () => this.view = 'calendar',
@@ -453,7 +453,7 @@ export default {
 
             Statamic.$commandPalette.add({
                 category: Statamic.$commandPalette.category.Actions,
-                text: __('Toggle Tree Layout'),
+                text: __('Switch to Tree Layout'),
                 icon: 'navigation',
                 when: () => this.canUseStructureTree && this.view !== 'tree',
                 action: () => this.view = 'tree',
