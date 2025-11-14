@@ -115,7 +115,7 @@ code:not(pre *) {
     color: hsl(from var(--theme-color-ui-accent-bg) h s 30);
     background: hsl(from var(--theme-color-ui-accent-bg) h s l / 0.08);
     &:where(.dark, .dark *) {
-        color: hsl(from var(--theme-color-dark-ui-accent-bg) h s 90);
-        background: hsl(from var(--theme-color-dark-ui-accent-bg) h s 10 / 0.5);
+        color: hsl(from var(--theme-color-ui-accent-bg) h s 90);
+        background: hsl(from var(--theme-color-ui-accent-bg) h s 10 / 0.5);
     }
 }
