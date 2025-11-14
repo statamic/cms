@@ -12,54 +12,55 @@ const resetters = ref({});
 <template>
     <Head :title="__('Blueprints')" />
 
-    <Header :title="__('Blueprints')" icon="blueprints">
-        <Dropdown align="end">
-            <template #trigger>
-                <Button
-                    :text="__('Create Blueprint')"
-                    icon-append="chevron-down"
-                    variant="primary"
-                />
-            </template>
-
-            <DropdownMenu>
-                <template v-if="collections.length">
-                    <DropdownLabel :text="__('Collections')" />
-                    <DropdownItem
-                        v-for="collection in collections"
-                        :key="collection.handle"
-                        :href="collection.create_url"
-                        icon="collections"
-                        :text="__(collection.title)"
+    <div class="max-w-5xl mx-auto">
+        <Header :title="__('Blueprints')" icon="blueprints">
+            <Dropdown align="end">
+                <template #trigger>
+                    <Button
+                        :text="__('Create Blueprint')"
+                        icon-append="chevron-down"
+                        variant="primary"
                     />
                 </template>
 
-                <template v-if="taxonomies.length">
-                    <DropdownLabel :text="__('Taxonomies')" />
-                    <DropdownItem
-                        v-for="taxonomy in taxonomies"
-                        :key="taxonomy.handle"
-                        :href="taxonomy.create_url"
-                        icon="taxonomies"
-                        :text="__(taxonomy.title)"
-                    />
-                </template>
-            </DropdownMenu>
-        </Dropdown>
-    </Header>
+                <DropdownMenu>
+                    <template v-if="collections.length">
+                        <DropdownLabel :text="__('Collections')" />
+                        <DropdownItem
+                            v-for="collection in collections"
+                            :key="collection.handle"
+                            :href="collection.create_url"
+                            icon="collections"
+                            :text="__(collection.title)"
+                        />
+                    </template>
 
-    <section class="space-y-6 starting-style-transition-children">
-        <template v-if="collections.length">
-            <Subheading size="lg" class="mb-2" :text="__('Collections')" />
-            <Panel>
-                <table class="data-table">
-                    <thead>
+                    <template v-if="taxonomies.length">
+                        <DropdownLabel :text="__('Taxonomies')" />
+                        <DropdownItem
+                            v-for="taxonomy in taxonomies"
+                            :key="taxonomy.handle"
+                            :href="taxonomy.create_url"
+                            icon="taxonomies"
+                            :text="__(taxonomy.title)"
+                        />
+                    </template>
+                </DropdownMenu>
+            </Dropdown>
+        </Header>
+
+        <section class="space-y-6 starting-style-transition-children">
+            <template v-if="collections.length">
+                <Subheading size="lg" class="mb-2" :text="__('Collections')" />
+                <Panel>
+                    <table class="data-table">
+                        <thead>
                         <tr>
                             <th>{{ __('Blueprint') }}</th>
                             <th class="text-end!" scope="col">{{ __('Collection') }}</th>
                         </tr>
-                    </thead>
-                    <tbody>
+                        </thead>
+                        <tbody>
                         <template v-for="collection in collections" :key="collection.handle">
                             <tr v-for="blueprint in collection.blueprints" :key="blueprint.handle">
                                 <td>
@@ -74,22 +75,22 @@ const resetters = ref({});
                                 </td>
                             </tr>
                         </template>
-                    </tbody>
-                </table>
-            </Panel>
-        </template>
+                        </tbody>
+                    </table>
+                </Panel>
+            </template>
 
-        <template v-if="taxonomies.length">
-            <Subheading size="lg" class="mb-2" :text="__('Taxonomies')" />
-            <Panel>
-                <table class="data-table">
-                    <thead>
+            <template v-if="taxonomies.length">
+                <Subheading size="lg" class="mb-2" :text="__('Taxonomies')" />
+                <Panel>
+                    <table class="data-table">
+                        <thead>
                         <tr>
                             <th>{{ __('Blueprint') }}</th>
                             <th class="text-end!">{{ __('Taxonomy') }}</th>
                         </tr>
-                    </thead>
-                    <tbody>
+                        </thead>
+                        <tbody>
                         <template v-for="taxonomy in taxonomies" :key="taxonomy.handle">
                             <tr v-for="blueprint in taxonomy.blueprints" :key="blueprint.handle">
                                 <td>
@@ -104,21 +105,21 @@ const resetters = ref({});
                                 </td>
                             </tr>
                         </template>
-                    </tbody>
-                </table>
-            </Panel>
-        </template>
+                        </tbody>
+                    </table>
+                </Panel>
+            </template>
 
-        <template v-if="navs.length">
-            <Subheading size="lg" class="mb-2" :text="__('Navigation')" />
-            <Panel>
-                <table class="data-table">
-                    <thead>
+            <template v-if="navs.length">
+                <Subheading size="lg" class="mb-2" :text="__('Navigation')" />
+                <Panel>
+                    <table class="data-table">
+                        <thead>
                         <tr>
                             <th class="text-start!">{{ __('Blueprint') }}</th>
                         </tr>
-                    </thead>
-                    <tbody>
+                        </thead>
+                        <tbody>
                         <tr v-for="nav in navs" :key="nav.handle">
                             <td>
                                 <div class="flex items-center gap-2">
@@ -127,21 +128,21 @@ const resetters = ref({});
                                 </div>
                             </td>
                         </tr>
-                    </tbody>
-                </table>
-            </Panel>
-        </template>
+                        </tbody>
+                    </table>
+                </Panel>
+            </template>
 
-        <template v-if="assetContainers.length">
-            <Subheading size="lg" class="mb-2" :text="__('Asset Containers')" />
-            <Panel>
-                <table class="data-table">
-                    <thead>
+            <template v-if="assetContainers.length">
+                <Subheading size="lg" class="mb-2" :text="__('Asset Containers')" />
+                <Panel>
+                    <table class="data-table">
+                        <thead>
                         <tr>
                             <th class="text-start!">{{ __('Blueprint') }}</th>
                         </tr>
-                    </thead>
-                    <tbody>
+                        </thead>
+                        <tbody>
                         <tr v-for="container in assetContainers" :key="container.handle">
                             <td>
                                 <div class="flex items-center gap-2">
@@ -150,21 +151,21 @@ const resetters = ref({});
                                 </div>
                             </td>
                         </tr>
-                    </tbody>
-                </table>
-            </Panel>
-        </template>
+                        </tbody>
+                    </table>
+                </Panel>
+            </template>
 
-        <template v-if="globals.length">
-            <Subheading size="lg" class="mb-2" :text="__('Globals')" />
-            <Panel>
-                <table class="data-table">
-                    <thead>
+            <template v-if="globals.length">
+                <Subheading size="lg" class="mb-2" :text="__('Globals')" />
+                <Panel>
+                    <table class="data-table">
+                        <thead>
                         <tr>
                             <th class="text-start!">{{ __('Blueprint') }}</th>
                         </tr>
-                    </thead>
-                    <tbody>
+                        </thead>
+                        <tbody>
                         <tr v-for="global in globals" :key="global.handle">
                             <td>
                                 <div class="flex items-center gap-2">
@@ -173,21 +174,21 @@ const resetters = ref({});
                                 </div>
                             </td>
                         </tr>
-                    </tbody>
-                </table>
-            </Panel>
-        </template>
+                        </tbody>
+                    </table>
+                </Panel>
+            </template>
 
-        <template v-if="forms.length">
-            <Subheading size="lg" class="mb-2" :text="__('Forms')" />
-            <Panel>
-                <table class="data-table">
-                    <thead>
+            <template v-if="forms.length">
+                <Subheading size="lg" class="mb-2" :text="__('Forms')" />
+                <Panel>
+                    <table class="data-table">
+                        <thead>
                         <tr>
                             <th class="text-start!">{{ __('Blueprint') }}</th>
                         </tr>
-                    </thead>
-                    <tbody>
+                        </thead>
+                        <tbody>
                         <tr v-for="form in forms" :key="form.handle">
                             <td>
                                 <div class="flex items-center gap-2">
@@ -196,20 +197,20 @@ const resetters = ref({});
                                 </div>
                             </td>
                         </tr>
-                    </tbody>
-                </table>
-            </Panel>
-        </template>
+                        </tbody>
+                    </table>
+                </Panel>
+            </template>
 
-        <Subheading size="lg" class="mb-2" :text="__('Users')" />
-        <Panel>
-            <table class="data-table">
-                <thead>
+            <Subheading size="lg" class="mb-2" :text="__('Users')" />
+            <Panel>
+                <table class="data-table">
+                    <thead>
                     <tr>
                         <th class="text-start!">{{ __('Blueprint') }}</th>
                     </tr>
-                </thead>
-                <tbody>
+                    </thead>
+                    <tbody>
                     <tr>
                         <td>
                             <div class="flex items-center gap-2">
@@ -226,21 +227,21 @@ const resetters = ref({});
                             </div>
                         </td>
                     </tr>
-                </tbody>
-            </table>
-        </Panel>
+                    </tbody>
+                </table>
+            </Panel>
 
-        <template v-for="namespace in additional" :key="namespace.namespace">
-            <Subheading size="lg" class="mb-2" :text="namespace.title" />
-            <Panel>
-                <table class="data-table">
-                    <thead>
+            <template v-for="namespace in additional" :key="namespace.namespace">
+                <Subheading size="lg" class="mb-2" :text="namespace.title" />
+                <Panel>
+                    <table class="data-table">
+                        <thead>
                         <tr>
                             <th class="text-start!">{{ __('Blueprint') }}</th>
                             <th scope="col" class="actions-column"></th>
                         </tr>
-                    </thead>
-                    <tbody>
+                        </thead>
+                        <tbody>
                         <tr v-for="blueprint in namespace.blueprints" :key="blueprint.handle">
                             <td>
                                 <div class="flex items-center gap-2">
@@ -267,11 +268,12 @@ const resetters = ref({});
                                 </template>
                             </td>
                         </tr>
-                    </tbody>
-                </table>
-            </Panel>
-        </template>
-    </section>
+                        </tbody>
+                    </table>
+                </Panel>
+            </template>
+        </section>
 
-    <DocsCallout :topic="__('Blueprints')" url="blueprints" />
+        <DocsCallout :topic="__('Blueprints')" url="blueprints" />
+    </div>
 </template>
