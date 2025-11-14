@@ -31,7 +31,7 @@
                 <ui-button
                     v-if="treeIsDirty"
                     variant="filled"
-                    :text="__('Discard changes')"
+                    :text="__('Discard Changes')"
                     @click="cancelTreeProgress"
                 />
 

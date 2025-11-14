@@ -18,7 +18,7 @@ class Color
         850 => 'oklch(0.236 0.041 263.801)',
         900 => 'oklch(0.208 0.042 265.755)',
         925 => 'oklch(0.1945 0.042 265.573)',
-        950 => 'oklch(0.129 0.042 264.695)',
+        950 => 'oklch(0.169 0.042 264.695)',
     ];
 
     public const Gray = [
@@ -35,7 +35,7 @@ class Color
         850 => 'oklch(0.236 0.033 260.201)',
         900 => 'oklch(0.21 0.034 264.665)',
         925 => 'oklch(0.1963 0.0330 264.157)',
-        950 => 'oklch(0.13 0.028 261.692)',
+        950 => 'oklch(0.18 0.028 261.692)',
     ];
 
     public const Zinc = [
@@ -86,7 +86,7 @@ class Color
         850 => 'oklch(0.236 0.006 48.043)',
         900 => 'oklch(0.216 0.006 56.043)',
         925 => 'oklch(0.2042 0.0057 55.203)',
-        950 => 'oklch(0.147 0.004 49.25)',
+        950 => 'oklch(0.187 0.004 49.25)',
     ];
 
     public const Red = [
@@ -103,7 +103,7 @@ class Color
         850 => 'oklch(0.42 0.159 26.311)',
         900 => 'oklch(0.396 0.141 25.723)',
         925 => 'oklch(0.3724 0.1326 25.778)',
-        950 => 'oklch(0.258 0.092 26.042)',
+        950 => 'oklch(0.318 0.092 26.042)',
     ];
 
     public const Orange = [
@@ -120,7 +120,7 @@ class Color
         850 => 'oklch(0.439 0.14 37.738)',
         900 => 'oklch(0.408 0.123 38.172)',
         925 => 'oklch(0.3837 0.1155 37.845)',
-        950 => 'oklch(0.266 0.079 36.259)',
+        950 => 'oklch(0.306 0.079 36.259)',
     ];
 
     public const Amber = [
@@ -137,7 +137,7 @@ class Color
         850 => 'oklch(0.444 0.125 46.053)',
         900 => 'oklch(0.414 0.112 45.904)',
         925 => 'oklch(0.3909 0.1060 45.858)',
-        950 => 'oklch(0.279 0.077 45.635)',
+        950 => 'oklch(0.319 0.077 45.635)',
     ];
 
     public const Yellow = [
@@ -154,7 +154,7 @@ class Color
         850 => 'oklch(0.449 0.105 59.808)',
         900 => 'oklch(0.421 0.095 57.708)',
         925 => 'oklch(0.3979 0.0900 57.042)',
-        950 => 'oklch(0.286 0.066 53.813)',
+        950 => 'oklch(0.326 0.066 53.813)',
     ];
 
     public const Lime = [
@@ -171,7 +171,7 @@ class Color
         850 => 'oklch(0.429 0.113 131.296)',
         900 => 'oklch(0.405 0.101 131.063)',
         925 => 'oklch(0.3826 0.0960 131.242)',
-        950 => 'oklch(0.274 0.072 132.109)',
+        950 => 'oklch(0.314 0.072 132.109)',
     ];
 
     public const Green = [
@@ -188,7 +188,7 @@ class Color
         850 => 'oklch(0.421 0.107 151.932)',
         900 => 'oklch(0.393 0.095 152.535)',
         925 => 'oklch(0.3713 0.0899 152.603)',
-        950 => 'oklch(0.266 0.065 152.934)',
+        950 => 'oklch(0.306 0.065 152.934)',
     ];
 
     public const Emerald = [
@@ -205,7 +205,7 @@ class Color
         850 => 'oklch(0.405 0.086 167.427)',
         900 => 'oklch(0.378 0.077 168.94)',
         925 => 'oklch(0.3582 0.0726 169.341)',
-        950 => 'oklch(0.262 0.051 172.552)',
+        950 => 'oklch(0.302 0.051 172.552)',
     ];
 
     public const Teal = [
@@ -222,7 +222,7 @@ class Color
         850 => 'oklch(0.412 0.071 189.308)',
         900 => 'oklch(0.386 0.063 188.416)',
         925 => 'oklch(0.3674 0.0601 188.891)',
-        950 => 'oklch(0.277 0.046 192.524)',
+        950 => 'oklch(0.317 0.046 192.524)',
     ];
 
     public const Cyan = [
@@ -239,7 +239,7 @@ class Color
         850 => 'oklch(0.424 0.078 225.706)',
         900 => 'oklch(0.398 0.07 227.392)',
         925 => 'oklch(0.3816 0.0676 227.696)',
-        950 => 'oklch(0.302 0.056 229.695)',
+        950 => 'oklch(0.342 0.056 229.695)',
     ];
 
     public const Sky = [
@@ -256,7 +256,7 @@ class Color
         850 => 'oklch(0.417 0.1 240.833)',
         900 => 'oklch(0.391 0.09 240.876)',
         925 => 'oklch(0.3743 0.0859 241.124)',
-        950 => 'oklch(0.293 0.066 243.157)',
+        950 => 'oklch(0.333 0.066 243.157)',
     ];
 
     public const Blue = [
@@ -273,7 +273,7 @@ class Color
         850 => 'oklch(0.402 0.173 265.587)',
         900 => 'oklch(0.379 0.146 265.522)',
         925 => 'oklch(0.3624 0.1366 265.935)',
-        950 => 'oklch(0.282 0.091 267.935)',
+        950 => 'oklch(0.322 0.091 267.935)',
     ];
 
     public const Indigo = [
@@ -290,7 +290,7 @@ class Color
         850 => 'oklch(0.379 0.17 277.532)',
         900 => 'oklch(0.359 0.144 278.697)',
         925 => 'oklch(0.3416 0.1348 279.158)',
-        950 => 'oklch(0.257 0.09 281.288)',
+        950 => 'oklch(0.297 0.09 281.288)',
     ];
 
     public const Violet = [
@@ -307,7 +307,7 @@ class Color
         850 => 'oklch(0.406 0.211 293.252)',
         900 => 'oklch(0.38 0.189 293.745)',
         925 => 'oklch(0.3634 0.1808 293.291)',
-        950 => 'oklch(0.283 0.141 291.089)',
+        950 => 'oklch(0.323 0.141 291.089)',
     ];
 
     public const Purple = [
@@ -324,7 +324,7 @@ class Color
         850 => 'oklch(0.41 0.197 304.356)',
         900 => 'oklch(0.381 0.176 304.987)',
         925 => 'oklch(0.3656 0.1714 304.599)',
-        950 => 'oklch(0.291 0.149 302.717)',
+        950 => 'oklch(0.331 0.149 302.717)',
     ];
 
     public const Fuchsia = [
@@ -341,7 +341,7 @@ class Color
         850 => 'oklch(0.427 0.191 325.102)',
         900 => 'oklch(0.401 0.17 325.612)',
         925 => 'oklch(0.3825 0.1642 325.620)',
-        950 => 'oklch(0.293 0.136 325.661)',
+        950 => 'oklch(0.333 0.136 325.661)',
     ];
 
     public const Pink = [
@@ -358,7 +358,7 @@ class Color
         850 => 'oklch(0.434 0.17 3.114)',
         900 => 'oklch(0.408 0.153 2.432)',
         925 => 'oklch(0.3868 0.1455 2.557)',
-        950 => 'oklch(0.284 0.109 3.907)',
+        950 => 'oklch(0.324 0.109 3.907)',
     ];
 
     public const Rose = [
@@ -375,7 +375,7 @@ class Color
         850 => 'oklch(0.433 0.174 11.985)',
         900 => 'oklch(0.41 0.159 10.272)',
         925 => 'oklch(0.3862 0.1498 10.413)',
-        950 => 'oklch(0.271 0.105 12.094)',
+        950 => 'oklch(0.311 0.105 12.094)',
     ];
 
     public const White = '#fff';
@@ -383,9 +383,9 @@ class Color
     public const Transparent = 'transparent';
     public const Volt = 'oklch(93.86% 0.2018 122.24)';
 
-    public static function defaults(): array
+    public static function defaults(bool $dark = false): array
     {
-        return [
+        return collect([
             'primary' => self::Indigo[700],
             'gray-50' => self::Zinc[50],
             'gray-100' => self::Zinc[100],
@@ -401,6 +401,19 @@ class Color
             'gray-900' => self::Zinc[900],
             'gray-925' => self::Zinc[925],
             'gray-950' => self::Zinc[950],
+            'dark-gray-50' => self::Zinc[50],
+            'dark-gray-100' => self::Zinc[100],
+            'dark-gray-200' => self::Zinc[200],
+            'dark-gray-300' => self::Zinc[300],
+            'dark-gray-400' => self::Zinc[400],
+            'dark-gray-500' => self::Zinc[500],
+            'dark-gray-600' => self::Zinc[600],
+            'dark-gray-700' => self::Zinc[700],
+            'dark-gray-800' => self::Zinc[800],
+            'dark-gray-850' => self::Zinc[850],
+            'dark-gray-900' => self::Zinc[900],
+            'dark-gray-925' => self::Zinc[925],
+            'dark-gray-950' => self::Zinc[950],
             'success' => self::Green[400],
             'danger' => self::Red[600],
             'body-bg' => self::Zinc[100],
@@ -412,34 +425,50 @@ class Color
             'dark-content-bg' => self::Zinc[900],
             'dark-content-border' => self::Zinc[950],
             'global-header-bg' => self::Zinc[800],
-            'dark-global-header-bg' => self::Zinc[800],
             'progress-bar' => self::Indigo[700],
+            'focus-outline' => self::Blue[400],
             'ui-accent-bg' => self::Indigo[700],
             'ui-accent-text' => 'var(--theme-color-ui-accent-bg)',
-            'dark-ui-accent-bg' => self::Indigo[700],
             'dark-ui-accent-text' => self::Indigo[400],
             'switch-bg' => 'var(--theme-color-ui-accent-bg)',
-            'dark-switch-bg' => 'var(--theme-color-dark-ui-accent-bg)',
-        ];
-    }
-
-    public static function theme(): array
-    {
-        $config = config('statamic.cp.theme', []);
-
-        foreach ($config['grays'] ?? [] as $shade => $value) {
-            $config["gray-{$shade}"] = $value;
-        }
-
-        return collect(static::defaults())
-            ->map(fn ($color, $name) => $config[$name] ?? $color)
+        ])
+            ->filter(fn ($color, $name) => str($name)->startsWith('dark-') ? $dark : ! $dark)
             ->all();
     }
 
-    public static function cssVariables(): string
+    public static function theme(bool $dark = false): array
     {
-        return collect(static::theme())
-            ->map(fn ($color, $name) => "--theme-color-{$name}: {$color};")
-            ->implode("\n");
+        $config = config('statamic.cp.theme', []);
+
+        foreach ($config[$dark ? 'dark-grays' : 'grays'] ?? [] as $shade => $value) {
+            $colorHandle = $dark ? 'dark-gray' : 'gray';
+            $config["{$colorHandle}-{$shade}"] = $value;
+        }
+
+        $darkColors = static::defaults(dark: true);
+
+        return collect(static::defaults())
+            ->mapWithKeys(function ($color, $name) use ($config, $dark, $darkColors) {
+                $key = $dark ? "dark-{$name}" : $name;
+
+                $value = $dark
+                    ? $config[$key] ?? $darkColors[$key] ?? null
+                    : $config[$key] ?? $color;
+
+                return [$key => $value];
+            })
+            ->filter()
+            ->all();
+    }
+
+    public static function cssVariables(bool $dark = false): string
+    {
+        return collect(static::theme($dark))
+            ->map(function ($color, $name) use ($dark) {
+                $name = $dark ? str($name)->remove('dark-') : $name;
+
+                return "--theme-color-{$name}: {$color};";
+            })
+            ->implode(PHP_EOL.($dark ? "\t\t\t" : "\t\t"));
     }
 }
