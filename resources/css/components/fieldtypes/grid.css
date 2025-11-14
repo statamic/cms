@@ -119,3 +119,24 @@
         @apply flex cursor-move items-center justify-between border-b bg-gray-200 px-4 py-2 text-sm outline-hidden;
     }
 }
+
+/* Assets fieldtype in a grid fieldtype */
+/* Table UI mode */
+.grid-table .grid-cell.assets-fieldtype:not(:has([data-asset-picker])) > *,
+/* Stacked UI mode */
+.grid-stacked [data-asset-browser]:not(:has([data-asset-picker])) {
+    /* Wrap a border around the container instead of dealing with complex nested table elements, because borders and border-radius don't work as expected with nested table elements */
+    @apply border-gray-300 border-1 rounded-lg;
+    /* Prevent the descended table elements from inheriting this, such as the img thumbnail and the delete button */
+    *:not(button, button *) {
+        @apply rounded-lg border-none;
+    }
+    /* When a grid field has at least 3 columns, including the menu control, change the presentation so it fits in with the other grid cells */
+    tr:has(> :nth-child(3)) & {
+        @apply shadow-ui-sm;
+        /* Compress the padding to fit in with the other grid cells */
+        td {
+            padding: 0.3125rem;
+        }
+    }
+}
