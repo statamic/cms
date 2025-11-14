@@ -66,7 +66,7 @@ function submit() {
     <Modal ref="modal" :title="__(title)" :open="modalOpen" @update:open="updateModalOpen">
         <div
             v-if="busy"
-            class="pointer-events-none absolute inset-0 flex select-none items-center justify-center bg-white bg-opacity-75 dark:bg-dark-700"
+            class="pointer-events-none absolute inset-0 flex select-none items-center justify-center bg-white bg-opacity-75 dark:bg-gray-850"
         >
             <Icon name="loading" />
         </div>

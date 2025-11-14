@@ -47,9 +47,13 @@
 @endforeach
 
 <style>
-:root {
-    {{ \Statamic\CP\Color::cssVariables() }}
-}
+    :root {
+        {{ \Statamic\CP\Color::cssVariables() }}
+
+        &.dark {
+            {{ \Statamic\CP\Color::cssVariables(dark: true) }}
+        }
+    }
 </style>
 
 @stack('head')

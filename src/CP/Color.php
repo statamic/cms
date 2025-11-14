@@ -361,9 +361,9 @@ class Color
     public const Transparent = 'transparent';
     public const Volt = 'oklch(93.86% 0.2018 122.24)';
 
-    public static function defaults(): array
+    public static function defaults(bool $dark = false): array
     {
-        return [
+        return collect([
             'primary' => self::Indigo[700],
             'gray-50' => self::Zinc[50],
             'gray-100' => self::Zinc[100],
@@ -378,6 +378,19 @@ class Color
             'gray-900' => self::Zinc[900],
             'gray-925' => self::Zinc[925],
             'gray-950' => self::Zinc[950],
+            'dark-gray-50' => self::Zinc[50],
+            'dark-gray-100' => self::Zinc[100],
+            'dark-gray-200' => self::Zinc[200],
+            'dark-gray-300' => self::Zinc[300],
+            'dark-gray-400' => self::Zinc[400],
+            'dark-gray-500' => self::Zinc[500],
+            'dark-gray-600' => self::Zinc[600],
+            'dark-gray-700' => self::Zinc[700],
+            'dark-gray-800' => self::Zinc[800],
+            'dark-gray-850' => self::Zinc[850],
+            'dark-gray-900' => self::Zinc[900],
+            'dark-gray-925' => self::Zinc[925],
+            'dark-gray-950' => self::Zinc[950],
             'success' => self::Green[400],
             'danger' => self::Red[600],
             'body-bg' => self::Zinc[100],
@@ -389,34 +402,50 @@ class Color
             'dark-content-bg' => self::Zinc[900],
             'dark-content-border' => self::Zinc[950],
             'global-header-bg' => self::Zinc[800],
-            'dark-global-header-bg' => self::Zinc[800],
             'progress-bar' => self::Indigo[700],
+            'focus-outline' => self::Blue[400],
             'ui-accent-bg' => self::Indigo[700],
             'ui-accent-text' => 'var(--theme-color-ui-accent-bg)',
-            'dark-ui-accent-bg' => self::Indigo[700],
             'dark-ui-accent-text' => self::Indigo[400],
             'switch-bg' => 'var(--theme-color-ui-accent-bg)',
-            'dark-switch-bg' => 'var(--theme-color-dark-ui-accent-bg)',
-        ];
-    }
-
-    public static function theme(): array
-    {
-        $config = config('statamic.cp.theme', []);
-
-        foreach ($config['grays'] ?? [] as $shade => $value) {
-            $config["gray-{$shade}"] = $value;
-        }
-
-        return collect(static::defaults())
-            ->map(fn ($color, $name) => $config[$name] ?? $color)
+        ])
+            ->filter(fn ($color, $name) => str($name)->startsWith('dark-') ? $dark : ! $dark)
             ->all();
     }
 
-    public static function cssVariables(): string
+    public static function theme(bool $dark = false): array
     {
-        return collect(static::theme())
-            ->map(fn ($color, $name) => "--theme-color-{$name}: {$color};")
-            ->implode(PHP_EOL.'    ');
+        $config = config('statamic.cp.theme', []);
+
+        foreach ($config[$dark ? 'dark-grays' : 'grays'] ?? [] as $shade => $value) {
+            $colorHandle = $dark ? 'dark-gray' : 'gray';
+            $config["{$colorHandle}-{$shade}"] = $value;
+        }
+
+        $darkColors = static::defaults(dark: true);
+
+        return collect(static::defaults())
+            ->mapWithKeys(function ($color, $name) use ($config, $dark, $darkColors) {
+                $key = $dark ? "dark-{$name}" : $name;
+
+                $value = $dark
+                    ? $config[$key] ?? $darkColors[$key] ?? null
+                    : $config[$key] ?? $color;
+
+                return [$key => $value];
+            })
+            ->filter()
+            ->all();
+    }
+
+    public static function cssVariables(bool $dark = false): string
+    {
+        return collect(static::theme($dark))
+            ->map(function ($color, $name) use ($dark) {
+                $name = $dark ? str($name)->remove('dark-') : $name;
+
+                return "--theme-color-{$name}: {$color};";
+            })
+            ->implode(PHP_EOL.($dark ? "\t\t\t" : "\t\t"));
     }
 }

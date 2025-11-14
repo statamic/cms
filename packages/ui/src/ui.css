@@ -21,20 +21,13 @@
 
     --color-body-bg: var(--theme-color-body-bg);
     --color-body-border: var(--theme-color-body-border);
-    --color-dark-body-bg: var(--theme-color-dark-body-bg);
-    --color-dark-body-border: var(--theme-color-dark-body-border);
     --color-content-border: var(--theme-color-content-border);
-    --color-dark-content-bg: var(--theme-color-dark-content-bg);
-    --color-dark-content-border: var(--theme-color-dark-content-border);
     --color-global-header-bg: var(--theme-color-global-header-bg);
-    --color-dark-global-header-bg: var(--theme-color-dark-global-header-bg);
     --color-progress-bar: var(--theme-color-progress-bar);
+    --color-focus-outline: var(--theme-color-focus-outline);
     --color-ui-accent-bg: var(--theme-color-ui-accent-bg);
     --color-ui-accent-text: var(--theme-color-ui-accent-text);
-    --color-dark-ui-accent-bg: var(--theme-color-dark-ui-accent-bg);
-    --color-dark-ui-accent-text: var(--theme-color-dark-ui-accent-text);
     --color-switch-bg: var(--theme-color-switch-bg);
-    --color-dark-switch-bg: var(--theme-color-dark-switch-bg);
 
     /* Temp */
     --color-dark-100: #dfe1e5;
