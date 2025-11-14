@@ -60,6 +60,10 @@
             /* When a grid field has at least 3 columns, including the menu control, change the presentation so it fits in with the other grid cells */
             tr:has(> :nth-child(3)) & {
                 @apply shadow-ui-sm;
+                /* Compress the padding to fit in with the other grid cells */
+                td {
+                    padding: 0.3125rem;
+                }
             }
         }
 
