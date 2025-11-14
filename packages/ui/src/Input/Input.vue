@@ -72,7 +72,7 @@ const inputAttrs = computed(() => {
 });
 
 const hasPrependedIcon = computed(() => !!props.iconPrepend || !!props.icon || !!slots.prepend);
-const hasAppendedIcon = computed(() => !!props.iconAppend || !!slots.append || props.clearable || props.viewable || copyable.value || props.loading);
+const hasAppendedIcon = computed(() => !!props.iconAppend || !!slots.append || clearable.value || props.viewable || copyable.value || props.loading);
 
 const inputClasses = computed(() => {
     const classes = cva({
@@ -161,6 +161,8 @@ const copy = () => {
     copied.value = true;
     setTimeout(() => (copied.value = false), 1000);
 };
+
+const clearable = computed(() => props.clearable && !props.readOnly && !props.disabled && !!props.modelValue);
 
 const input = useTemplateRef('input');
 const focus = () => input.value.focus();
