@@ -37,7 +37,7 @@
         <stack
             narrow
             v-if="editingSection"
-            @opened="$refs.displayInput?.select()"
+            @opened="() => $nextTick(() => $refs.displayInput.focus())"
             @closed="editCancelled"
         >
             <div class="h-full overflow-scroll overflow-x-auto bg-white px-6 dark:bg-dark-800">

@@ -41,7 +41,7 @@
 
 <script>
 export default {
-    emits: ['closed'],
+    emits: ['closed', 'opened'],
 
     props: {
         name: {
@@ -192,6 +192,7 @@ export default {
         this.mounted = true;
         this.$nextTick(() => {
             this.visible = true;
+            this.$emit('opened');
         });
     },
 };
