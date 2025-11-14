@@ -58,8 +58,9 @@
                 /* @apply border-t-1!; */
             }
             table {
-                @apply border-t-1;
-                /* border-collapse: separate; */
+                td {
+                    @apply border-t-1;
+                }
             }
         }
 
