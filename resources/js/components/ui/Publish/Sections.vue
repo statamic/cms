@@ -77,7 +77,7 @@ function toggleSection(id) {
             <div
                 style="--tw-ease: ease;"
                 class="h-auto visible transition-[height,visibility] duration-[250ms,2s]"
-                :class="{ 'h-0! visibility-hidden overflow-clip': section.collapsed }"
+                :class="{ 'h-0! invisible! overflow-clip': section.collapsed }"
             >
                 <Card :class="{ 'p-0!': asConfig }">
                     <FieldsProvider :fields="section.fields">
