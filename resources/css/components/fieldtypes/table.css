@@ -79,19 +79,15 @@ Table Fieldtype
 
             &:first-child td {
                 @apply overflow-hidden;
-                &:last-child {
-                    /* e.g. the first row of an array fieldtype, keyed type, in dark mode */
-                    @apply rounded-tr-lg;
-                }
             }
 
             &:last-child td {
                 @apply border-b-0 overflow-hidden;
                 &:first-child {
-                    @apply rounded-bl-lg;
+                    @apply rounded-bl-[calc(var(--radius-lg)-1px)];
                 }
                 &:last-child {
-                    @apply rounded-br-lg;
+                    @apply rounded-br-[calc(var(--radius-lg)-1px)];
                 }
             }
 
