@@ -79,10 +79,6 @@ Table Fieldtype
 
             &:first-child td {
                 @apply overflow-hidden;
-                &:last-child {
-                    /* e.g. the first row of an array fieldtype, keyed type, in dark mode */
-                    @apply rounded-tr-lg;
-                }
             }
 
             &:last-child td {
