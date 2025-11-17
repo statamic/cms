@@ -1,6 +1,6 @@
 <template>
     <stack narrow name="page-tree-linker" :before-close="shouldClose" @closed="$emit('closed')" v-slot="{ close }">
-        <div class="flex h-full flex-col bg-gray-100 dark:bg-dark-700">
+        <div class="flex h-full flex-col bg-gray-100 dark:bg-gray-850">
             <header
                 class="flex items-center justify-between border-b bg-white py-2 text-lg font-medium shadow-md dark:border-dark-950 dark:bg-dark-600 ltr:pl-6 ltr:pr-3 rtl:pl-3 rtl:pr-6"
             >
@@ -10,7 +10,7 @@
 
             <div v-if="loading" class="relative flex-1 overflow-auto">
                 <div
-                    class="absolute inset-0 z-10 flex items-center justify-center bg-white bg-opacity-75 text-center dark:bg-dark-700"
+                    class="absolute inset-0 z-10 flex items-center justify-center bg-white bg-opacity-75 text-center dark:bg-gray-850"
                 >
                     <Icon name="loading" />
                 </div>

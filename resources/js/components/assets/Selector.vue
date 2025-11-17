@@ -44,7 +44,7 @@
                 </AssetBrowser>
             </div>
 
-            <div class="flex items-center justify-between border-t bg-gray-100 dark:bg-dark-700 dark:border-dark-600 px-4 py-2 sm:p-4">
+            <div class="flex items-center justify-between border-t bg-gray-100 dark:bg-gray-850 dark:border-gray-700 px-4 py-2 sm:p-4">
                 <div
                     class="dark:text-gray-200 text-sm text-gray-700"
                     v-text="
