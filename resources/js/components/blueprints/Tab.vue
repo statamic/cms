@@ -24,52 +24,58 @@
             </DropdownMenu>
         </Dropdown>
 
-        <confirmation-modal
+        <stack
+            narrow
             v-if="editing"
-            :title="editText"
-            @opened="() => {
-                this.$nextTick(() => {
-                    this.$refs.title.focus()
-                });
-            }"
-            @confirm="editConfirmed"
-            @cancel="editCancelled"
+            @opened="() => $nextTick(() => $refs.title.focus())"
+            @closed="editCancelled"
         >
-            <div class="publish-fields">
-                <Field :label="__('Title')" class="form-group field-w-100">
-                    <Input ref="title" autofocus :model-value="display" @update:model-value="fieldUpdated('display', $event)" />
-                </Field>
-
-                <Field :label="__('Handle')" class="form-group field-w-100">
-                    <Input class="font-mono" :model-value="handle" @update:model-value="fieldUpdated('handle', $event)" />
-                </Field>
-
-                <Field v-if="showInstructions" :label="__('Instructions')" class="form-group field-w-100">
-                    <Input :model-value="instructions" @update:model-value="fieldUpdated('instructions', $event)" />
-                </Field>
-
-                <Field v-if="showInstructions" :label="__('Icon')" class="form-group field-w-100">
-                    <publish-field-meta
-                        :config="{
+            <div class="h-full overflow-scroll overflow-x-auto bg-white px-6 dark:bg-dark-800">
+                <header class="py-2">
+                    <div class="flex items-center justify-between">
+                        <ui-heading size="lg">
+                            {{ editText }}
+                        </ui-heading>
+                        <ui-button icon="x" variant="ghost" class="-me-2" @click="editCancelled" />
+                    </div>
+                </header>
+                <div class="space-y-6">
+                    <Field :label="__('Title')" class="form-group field-w-100">
+                        <Input ref="title" :model-value="display" @update:model-value="fieldUpdated('display', $event)" />
+                    </Field>
+                    <Field :label="__('Handle')" class="form-group field-w-100">
+                        <Input class="font-mono" :model-value="handle" @update:model-value="fieldUpdated('handle', $event)" />
+                    </Field>
+                    <Field v-if="showInstructions" :label="__('Instructions')" class="form-group field-w-100">
+                        <Input :model-value="instructions" @update:model-value="fieldUpdated('instructions', $event)" />
+                    </Field>
+                    <Field v-if="showInstructions" :label="__('Icon')" class="form-group field-w-100">
+                        <publish-field-meta
+                            :config="{
                             handle: 'icon',
                             type: 'icon',
                             set: iconSet,
                         }"
-                        :initial-value="icon"
-                        v-slot="{ meta, value, loading, config }"
-                    >
-                        <icon-fieldtype
-                            v-if="!loading"
-                            handle="icon"
-                            :config="config"
-                            :meta="meta"
-                            :value="value"
-                            @update:value="fieldUpdated('icon', $event)"
-                        />
-                    </publish-field-meta>
-                </Field>
+                            :initial-value="icon"
+                            v-slot="{ meta, value, loading, config }"
+                        >
+                            <icon-fieldtype
+                                v-if="!loading"
+                                handle="icon"
+                                :config="config"
+                                :meta="meta"
+                                :value="value"
+                                @update:value="fieldUpdated('icon', $event)"
+                            />
+                        </publish-field-meta>
+                    </Field>
+                    <div class="py-4 space-x-2">
+                        <ui-button :text="__('Confirm')" @click="editConfirmed" variant="primary" />
+                        <ui-button :text="__('Cancel')" @click="editCancelled" variant="ghost" />
+                    </div>
+                </div>
             </div>
-        </confirmation-modal>
+        </stack>
     </TabTrigger>
 </template>
 
