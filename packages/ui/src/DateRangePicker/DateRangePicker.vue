@@ -154,7 +154,9 @@ const calendarEvents = computed(() => ({
 
             <DateRangePickerContent
                 v-if="!inline"
-                :side-offset="4"
+                align="start"
+                :align-offset="-12"
+                :side-offset="14"
                 class="data-[state=open]:data-[side=top]:animate-slideDownAndFade data-[state=open]:data-[side=right]:animate-slideLeftAndFade data-[state=open]:data-[side=bottom]:animate-slideUpAndFade data-[state=open]:data-[side=left]:animate-slideRightAndFade will-change-[transform,opacity]"
             >
                 <Card class="w-[20rem]">
@@ -168,14 +170,3 @@ const calendarEvents = computed(() => ({
         </DateRangePickerRoot>
     </div>
 </template>
-
-<style>
-/* Reka inlines a z-index of 50. We need to override it to fall inline with our z-index system and ensure it's at least above the global header. */
-[data-reka-popper-content-wrapper] {
-    z-index: var(--z-index-global-header)!important;
-}
-/* We can't use a direct descendant selector because the stack is inside a portal, so instead we'll check to see if there is a stack present. */
-body:has(.stack) [data-reka-popper-content-wrapper] {
-    z-index: var(--z-index-portal)!important;
-}
-</style>

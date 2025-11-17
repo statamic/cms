@@ -1,12 +1,15 @@
 <script setup>
-import { computed, useSlots, ref, useId, useTemplateRef, onMounted, nextTick } from 'vue';
+import { computed, useSlots, useAttrs, ref, useId, useTemplateRef, onMounted, nextTick } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
 import Icon from '../Icon/Icon.vue';
 import Button from '../Button/Button.vue';
 import CharacterCounter from '../CharacterCounter.vue';
 
+defineOptions({ inheritAttrs: false });
+
 const slots = useSlots();
+const attrs = useAttrs();
 
 const props = defineProps({
     append: { type: String, default: null },
@@ -31,10 +34,45 @@ const props = defineProps({
     variant: { type: String, default: 'default' },
     viewable: { type: Boolean, default: false },
     focus: { type: Boolean, default: false },
+    inputAttrs: { type: [Object, String], default: () => ({}) },
+    inputClass: { type: String, default: '' },
+});
+
+const inputAttributeKeys = [
+    'accept', 'autocomplete', 'autofocus', 'capture', 'checked', 'dirname', 'form',
+    'formaction', 'formenctype', 'formmethod', 'formnovalidate', 'formtarget',
+    'list', 'max', 'maxlength', 'min', 'minlength', 'multiple', 'name', 'pattern',
+    'readonly', 'required', 'size', 'src', 'step', 'value'
+];
+
+const outerAttrs = computed(() => {
+    const result = {};
+    for (const key in attrs) {
+        if (!inputAttributeKeys.includes(key.toLowerCase())) result[key] = attrs[key];
+    }
+    return result;
+});
+
+const normalizedInputAttrs = computed(() => {
+    if (typeof props.inputAttrs === 'string') {
+        return props.inputAttrs
+            .split(' ')
+            .filter(attr => attr.length > 0)
+            .reduce((acc, attr) => ({ ...acc, [attr]: true }), {});
+    }
+    return props.inputAttrs;
+});
+
+const inputAttrs = computed(() => {
+    const result = {};
+    for (const key in attrs) {
+        if (inputAttributeKeys.includes(key.toLowerCase())) result[key] = attrs[key];
+    }
+    return { ...result, ...normalizedInputAttrs.value };
 });
 
 const hasPrependedIcon = computed(() => !!props.iconPrepend || !!props.icon || !!slots.prepend);
-const hasAppendedIcon = computed(() => !!props.iconAppend || !!slots.append || props.clearable || props.viewable || copyable.value || props.loading);
+const hasAppendedIcon = computed(() => !!props.iconAppend || !!slots.append || clearable.value || props.viewable || copyable.value || props.loading);
 
 const inputClasses = computed(() => {
     const classes = cva({
@@ -74,7 +112,7 @@ const inputClasses = computed(() => {
         hasLimit: !!props.limit,
     });
 
-    return twMerge(classes);
+    return twMerge(classes, props.inputClass);
 });
 
 const iconClasses = computed(() => {
@@ -87,21 +125,39 @@ const iconClasses = computed(() => {
                 xs: '[&_svg]:size-3',
             },
         },
-        compoundVariants: [
-            { size: 'base', hasPrependedIcon: true, class: 'ps-3 has-[button]:ps-1 start-0' },
-            { size: 'sm', hasPrependedIcon: true, class: 'ps-2 has-[button]:ps-1 start-0' },
-            { size: 'xs', hasPrependedIcon: true, class: 'ps-1.5 has-[button]:ps-0 start-0' },
-            { size: 'base', hasAppendedIcon: true, class: 'pe-3 has-[button]:pe-1 end-0' },
-            { size: 'sm', hasAppendedIcon: true, class: 'pe-2 has-[button]:pe-1 end-0' },
-            { size: 'xs', hasAppendedIcon: true, class: 'pe-1.5 has-[button]:pe-0 end-0' },
-        ],
-    })({
-        ...props,
-        hasPrependedIcon: hasPrependedIcon.value,
-        hasAppendedIcon: hasAppendedIcon.value,
-    });
+    })({ ...props });
 
     return twMerge(classes);
+});
+
+const prependedIconClasses = computed(() => {
+    const classes = cva({
+        base: 'start-0',
+        variants: {
+            size: {
+                base: 'ps-3 has-[button]:ps-1',
+                sm: 'ps-2 has-[button]:ps-1',
+                xs: 'ps-1.5 has-[button]:ps-0',
+            },
+        },
+    })({ ...props });
+
+    return twMerge(iconClasses.value, classes);
+});
+
+const appendedIconClasses = computed(() => {
+    const classes = cva({
+        base: 'end-0',
+        variants: {
+            size: {
+                base: 'pe-3 has-[button]:pe-1',
+                sm: 'pe-2 has-[button]:pe-1',
+                xs: 'pe-1.5 has-[button]:pe-0',
+            },
+        },
+    })({ ...props });
+
+    return twMerge(iconClasses.value, classes);
 });
 
 const emit = defineEmits(['update:modelValue']);
@@ -124,6 +180,8 @@ const copy = () => {
     setTimeout(() => (copied.value = false), 1000);
 };
 
+const clearable = computed(() => props.clearable && !props.readOnly && !props.disabled && !!props.modelValue);
+
 const input = useTemplateRef('input');
 const focus = () => input.value.focus();
 
@@ -137,10 +195,10 @@ defineExpose({ focus });
 </script>
 
 <template>
-    <ui-input-group>
+    <ui-input-group v-bind="outerAttrs">
         <ui-input-group-prepend v-if="prepend" v-text="prepend" />
-        <div class="group/input relative block w-full st-text-legibility focus-outline-discrete" data-ui-input>
-            <div v-if="hasPrependedIcon" :class="iconClasses">
+        <div class="group/input relative block w-full st-text-legibility" data-ui-input>
+            <div v-if="hasPrependedIcon" :class="prependedIconClasses">
                 <slot name="prepend">
                     <Icon :name="iconPrepend || icon" />
                 </slot>
@@ -157,10 +215,10 @@ defineExpose({ focus });
                 :tabindex="tabindex"
                 data-ui-control
                 data-ui-group-target
-                v-bind="$attrs"
+                v-bind="inputAttrs"
                 @input="$emit('update:modelValue', $event.target.value)"
             />
-            <div v-if="hasAppendedIcon" :class="iconClasses">
+            <div v-if="hasAppendedIcon" :class="appendedIconClasses">
                 <slot name="append">
                     <Button size="sm" icon="x" variant="ghost" v-if="clearable" @click="clear" />
                     <Button

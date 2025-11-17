@@ -10,11 +10,7 @@
 .focal-point-toolbox {
     position: absolute;
     top: 20px;
-    left: 20px;
-    [dir='rtl'] & {
-        left: auto;
-        right: 20px;
-    }
+    inset-inline-start: 20px;
     z-index: var(--z-index-above);
     width: 380px;
     overflow-y: auto;
@@ -54,25 +50,17 @@
         background: white;
         border-radius: 50%;
         top: 50%;
-        left: 50%;
-        [dir='rtl'] & {
-            left: auto;
-            right: 50%;
-        }
-        margin: -4px 0 0 -4px;
-        [dir='rtl'] & {
-            margin: -4px -4px 0 0;
-        }
+        inset-inline-start: 50%;
+        margin-block-start: -4px;
+        margin-inline-start: -4px;
         box-shadow: 0 0 4px rgba(0, 0, 0, 0.75);
     }
 }
 
 .focal-point .frame {
     position: absolute;
-    margin: -5px 0 0 -5px;
-    [dir='rtl'] & {
-        margin: -5px -5px 0 0;
-    }
+    margin-block-start: -5px;
+    margin-inline-start: -5px;
     border: 10px solid #394045;
     box-sizing: content-box;
     overflow: hidden;
@@ -89,31 +77,19 @@
     .frame-1,
     .frame-4,
     .frame-7 {
-        left: 0;
-        [dir='rtl'] & {
-            left: auto;
-            right: 0;
-        }
+        inset-inline-start: 0;
         width: 66.6666667%;
     }
     .frame-2,
     .frame-5,
     .frame-8 {
-        left: 66.6666667%;
-        [dir='rtl'] & {
-            left: auto;
-            right: 66.6666667%;
-        }
+        inset-inline-start: 66.6666667%;
         width: 22.2222222%;
     }
     .frame-3,
     .frame-6,
     .frame-9 {
-        left: 88.8888889%;
-        [dir='rtl'] & {
-            left: auto;
-            right: 88.8888889%;
-        }
+        inset-inline-start: 88.8888889%;
         width: 11.1111111%;
     }
     .frame-1,

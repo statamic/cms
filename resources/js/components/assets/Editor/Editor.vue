@@ -17,8 +17,8 @@
                         v-tooltip.right="__('Open in a new window')"
                         :aria-label="__('Open in a new window')"
                     >
-                        <ui-icon name="folder-photos" class="size-5 group-hover:text-blue-600" />
-                        <span class="text-sm group-hover:text-blue-600 dark:text-gray-400 dark:group-hover:text-gray-200">
+                        <ui-icon name="folder-photos" class="size-5 group-hover:text-ui-accent-text/80" />
+                        <span class="text-sm group-hover:text-ui-accent-text/80 dark:text-gray-400 dark:group-hover:text-gray-200">
                             {{ asset.path }}
                         </span>
                     </button>
@@ -27,7 +27,7 @@
 
                 <div class="flex flex-1 grow flex-col overflow-auto md:flex-row md:justify-between">
                     <!-- Visual Area -->
-                    <div class="editor-preview md:min-h-auto flex min-h-[45vh] w-full flex-1 flex-col justify-between bg-gray-800 shadow-[inset_0px_4px_3px_0px_black] dark:bg-gray-900 md:w-1/2 md:flex-auto md:grow lg:w-2/3 md:ltr:rounded-se-md">
+                    <div class="editor-preview md:min-h-auto flex min-h-[45vh] w-full flex-1 flex-col justify-between bg-gray-800 shadow-[inset_0px_4px_3px_0px_black] dark:bg-gray-900 md:w-1/2 md:flex-auto md:grow lg:w-2/3 md:ltr:rounded-se-xl">
                         <!-- Toolbar -->
                         <div v-if="isToolbarVisible" class="@container/toolbar dark flex flex-wrap items-center justify-center gap-2 px-2 py-4">
                             <ItemActions
@@ -139,9 +139,14 @@
 
                 <div class="flex w-full items-center justify-end rounded-b border-t dark:border-gray-700 bg-gray-100 dark:bg-gray-900 px-4 py-3">
                     <div class="hidden h-full flex-1 gap-2 sm:gap-3 py-1 sm:flex">
-                        <ui-badge v-if="isImage" icon="assets" :text="__('messages.width_x_height', { width: asset.width, height: asset.height })" />
-                        <ui-badge icon="memory" :text="asset.size" />
-                        <ui-badge icon="fingerprint" :text="asset.lastModifiedRelative" />
+                        <ui-badge pill v-if="isImage" icon="assets" :text="__('messages.width_x_height', { width: asset.width, height: asset.height })" />
+                        <ui-badge pill icon="memory" :text="asset.size" />
+                        <ui-badge pill icon="fingerprint">
+                            <time
+                                :datetime="asset.lastModified"
+                                v-tooltip="$date.format(asset.lastModified)"
+                                v-text="asset.lastModifiedRelative" />
+                        </ui-badge>
                     </div>
                     <div class="flex items-center space-x-3 rtl:space-x-reverse">
                         <ui-button icon="chevron-left" @click="navigateToPreviousAsset" v-tooltip="__('Previous Asset')" />

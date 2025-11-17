@@ -5,14 +5,10 @@ import SiteSelector from './SiteSelector.vue';
 import Search from './Search.vue';
 import ViewSiteButton from './ViewSiteButton.vue';
 import UserDropdown from './UserDropdown.vue';
-import { Badge, Tooltip } from '@statamic/ui';
-import { useReactiveStatamicPageProps } from '@/composables/page-props.js';
-
-const { isInertia } = useReactiveStatamicPageProps();
 </script>
 
 <template>
-    <header class="h-14 bg-global-header-bg dark:bg-dark-global-header-bg flex justify-between space-x-2 items-center text-white px-2 lg:px-4 fixed overflow-x-auto top-0 inset-x-0 z-(--z-index-global-header)">
+    <header class="h-14 bg-global-header-bg flex justify-between space-x-2 items-center text-white px-2 lg:px-4 fixed overflow-x-auto top-0 inset-x-0 z-(--z-index-global-header)">
         <a class="c-skip-link z-(--z-index-global-header) px-4 py-2 bg-blue-800 text-sm top-2.5 left-2.25 fixed opacity-0 -translate-y-24 focus:translate-y-0 focus:opacity-100 rounded-md" href="#main">
             {{ __('Skip to sidebar') }}
         </a>
@@ -25,9 +21,6 @@ const { isInertia } = useReactiveStatamicPageProps();
         </div>
 
         <div class="dark flex-1 flex gap-1 md:gap-2 lg:gap-2 sm:gap-3 items-center justify-end shrink-0">
-            <Tooltip text="This page is rendered using a traditional Blade view, not Inertia. This badge is temporary.">
-                <Badge v-if="!isInertia" text="Blade" color="yellow" class="cursor-help" />
-            </Tooltip>
             <SiteSelector />
             <div class="flex items-center">
                 <Search />

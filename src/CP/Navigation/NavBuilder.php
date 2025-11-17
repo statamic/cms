@@ -3,7 +3,6 @@
 namespace Statamic\CP\Navigation;
 
 use Exception;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Preference;
@@ -266,8 +265,8 @@ class NavBuilder
             ->each(fn ($overrides) => $this->createPendingItemsForSection($overrides))
             ->each(fn ($overrides) => $this->applyPreferenceOverridesForSection($overrides));
 
-        if ($reorder = $navPreferencesConfig['reorder']) {
-            $this->setSectionOrder($reorder);
+        if ($navPreferencesConfig['reorder']) {
+            $this->setSectionOrder($sections);
         }
 
         return $this;
@@ -332,8 +331,8 @@ class NavBuilder
             ->filter()
             ->each(fn ($item) => $item->isChild(false));
 
-        if ($reorder = $sectionNav['reorder']) {
-            $this->setSectionItemOrder($section, $sectionNav['items'], $reorder);
+        if ($sectionNav['reorder']) {
+            $this->setSectionItemOrder($section, $sectionNav['items']);
         }
     }
 
@@ -456,33 +455,23 @@ class NavBuilder
 
     /**
      * Set section order.
+     *
+     * @param  array  $sections
      */
-    protected function setSectionOrder(array $reorder): void
+    protected function setSectionOrder($sections)
     {
-        // Get unconfigured core sections...
+        // Get conconfigured core sections...
         $unconfiguredCoreSections = $this->sections;
 
         // Get unconfigured sections...
-        $unconfiguredRegisteredSections = collect($this->items)
-            ->mapWithKeys(fn ($item) => [NavItem::snakeCase($item->section()) => $item->section()])
-            ->filter()
-            ->unique();
+        $unconfiguredRegisteredSections = collect($this->items)->map->section()->filter()->unique();
 
-        // Get merged unique list of sections...
-        $order = collect()
-            ->merge($unconfiguredCoreSections)
+        // Merge unconfigured sections onto the end of the list and map their order...
+        $this->sectionsOrder = collect($sections)
+            ->pluck('display')
             ->merge($unconfiguredRegisteredSections)
-            ->unique();
-
-        // Reorder to match `$reorder` config...
-        collect($reorder)
-            ->reverse()
-            ->each(fn ($key) => $order->prepend($order->pull($key), $key));
-
-        // Ensure `top_level` is always first...
-        $order->prepend($order->pull('top_level'), 'top_level');
-
-        $this->sectionsOrder = $order
+            ->merge($unconfiguredCoreSections)
+            ->unique()
             ->values()
             ->mapWithKeys(fn ($section, $index) => [$section => $index + 1])
             ->all();
@@ -490,17 +479,14 @@ class NavBuilder
 
     /**
      * Set section item order.
+     *
+     * @param  string  $section
+     * @param  array  $items
      */
-    protected function setSectionItemOrder(string $section, array $items, array $reorder): void
+    protected function setSectionItemOrder($section, $items)
     {
-        // Get unconfigured item IDs...
-        $unconfiguredItemIds = collect($this->items)
-            ->filter(fn ($item) => $item->section() === $section)
-            ->map
-            ->id();
-
         // Generate IDs for newly created items...
-        $createdItemIds = collect($items)
+        $itemIds = collect($items)
             ->map(function ($item, $id) use ($section, $items) {
                 return $items[$id]['action'] === '@create'
                     ? $this->generateNewItemId($section, $items[$id]['display'])
@@ -508,24 +494,23 @@ class NavBuilder
             })
             ->values();
 
-        // Merge unconfigured items into the end of the list...
-        $itemIds = collect()
-            ->merge($unconfiguredItemIds)
-            ->merge($createdItemIds)
-            ->unique()
-            ->flip();
+        // Get unconfigured item IDs...
+        $unconfiguredItemIds = collect($this->items)
+            ->filter(fn ($item) => $item->section() === $section)
+            ->map
+            ->id();
 
-        // Reorder to match `$reorder` config...
-        collect($reorder)
-            ->reverse()
-            ->each(fn ($key) => $itemIds->prepend($itemIds->pull($key), $key));
+        // Merge unconfigured items into the end of the list...
+        $itemIds = $itemIds
+            ->values()
+            ->merge($unconfiguredItemIds)
+            ->unique()
+            ->values();
 
         // Set an explicit order value on each item...
         $itemIds
-            ->flip()
             ->map(fn ($id) => $this->findItem($id, false))
             ->filter()
-            ->values()
             ->each(fn ($item, $index) => $item->order($index + 1));
 
         // Inform builder that section items should be ordered...
@@ -697,11 +682,8 @@ class NavBuilder
             ->reject(fn ($value, $setter) => in_array($setter, ['children', 'reorder']))
             ->each(fn ($value, $setter) => $item->{$setter}($value));
 
-        $childrenConfig = $config->get('children');
-        $reorder = $config->get('reorder');
-
-        if ($childrenConfig || $reorder) {
-            $this->userModifyItemChildren($item, $childrenConfig, $section, $reorder);
+        if ($children = $config->get('children')) {
+            $this->userModifyItemChildren($item, $children, $section, $config->get('reorder'));
         }
 
         return $item;
@@ -709,17 +691,20 @@ class NavBuilder
 
     /**
      * Modify NavItem children.
+     *
+     * @param  \Statamic\CP\Navigation\NavItem  $item
+     * @param  array  $childrenOverrides
+     * @param  string  $section
+     * @return \Illuminate\Support\Collection
      */
-    protected function userModifyItemChildren(NavItem $item, ?array $childrenConfig, string $section, ?array $reorder): void
+    protected function userModifyItemChildren($item, $childrenOverrides, $section, $reorder)
     {
-        // Get original item children...
         $itemChildren = collect($item->original()->resolveChildren()->children())
             ->each(fn ($item, $index) => $item->order($index + 1000))
             ->keyBy
             ->id();
 
-        // Apply children preferences from config...
-        collect($childrenConfig)
+        collect($childrenOverrides)
             ->map(fn ($config, $key) => $this->userModifyChild($config, $section, $key, $item))
             ->each(function ($item, $key) use (&$itemChildren) {
                 $item
@@ -730,25 +715,18 @@ class NavBuilder
             ->values()
             ->each(fn ($item, $index) => $item->order($index + 1));
 
-        // Reorder to match `$reorder` config...
-        if ($reorder) {
-            collect($reorder)
-                ->reverse()
-                ->each(fn ($key) => $itemChildren->prepend($itemChildren->pull($key), $key));
-        }
+        $newChildren = $reorder
+            ? $itemChildren->sortBy(fn ($item) => $item->order())->values()
+            : $itemChildren->values();
 
-        // Update final `order`...
-        $itemChildren
-            ->sortBy(fn ($item) => $item->order())->values()
-            ->values()
-            ->each(fn ($item, $index) => $item->order($index + 1));
-
-        $item->children($itemChildren, false);
+        $newChildren->each(fn ($item, $index) => $item->order($index + 1));
 
         $item->children(
-            items: $itemChildren,
+            items: $newChildren,
             generateNewIds: false,
         );
+
+        return $newChildren;
     }
 
     /**

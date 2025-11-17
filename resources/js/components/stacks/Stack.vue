@@ -27,7 +27,7 @@
                         v-if="visible"
                         class="stack-content fixed flex flex-col sm:end-1.5 overflow-auto bg-white dark:bg-gray-850 rounded-xl shadow-[0_8px_5px_-6px_rgba(0,0,0,0.1),_0_3px_8px_0_rgba(0,0,0,0.02),_0_30px_22px_-22px_rgba(39,39,42,0.15)] dark:shadow-[0_5px_20px_rgba(0,0,0,.5)] transition-transform duration-150 ease-out"
                         :class="[
-                            full ? 'inset-2' : 'inset-y-2',
+                            full ? 'inset-2 w-[calc(100svw-1rem)]' : 'inset-y-2',
                             { '-translate-x-4 rtl:translate-x-4': isHovering }
                         ]"
                     >
@@ -41,7 +41,7 @@
 
 <script>
 export default {
-    emits: ['closed'],
+    emits: ['closed', 'opened'],
 
     props: {
         name: {
@@ -70,6 +70,7 @@ export default {
             visible: false,
             isHovering: false,
             escBinding: null,
+            windowInnerWidth: window.innerWidth,
         };
     },
 
@@ -88,9 +89,9 @@ export default {
 
         offset() {
             if (this.isTopStack && this.narrow) {
-                return window.innerWidth - 450;
+                return this.windowInnerWidth - 450;
             } else if (this.isTopStack && this.half) {
-                return window.innerWidth / 2;
+                return this.windowInnerWidth / 2;
             }
 
             // max of 200px, min of 80px
@@ -128,6 +129,8 @@ export default {
         this.$events.$on(`stacks.${this.depth}.hit-area-mouseenter`, () => (this.isHovering = true));
         this.$events.$on(`stacks.${this.depth}.hit-area-mouseout`, () => (this.isHovering = false));
         this.escBinding = this.$keys.bindGlobal('esc', this.close);
+
+        window.addEventListener('resize', this.handleResize);
     },
 
     unmounted() {
@@ -135,6 +138,8 @@ export default {
         this.$events.$off(`stacks.${this.depth}.hit-area-mouseenter`);
         this.$events.$off(`stacks.${this.depth}.hit-area-mouseout`);
         this.escBinding.destroy();
+
+        window.removeEventListener('resize', this.handleResize);
     },
 
     methods: {
@@ -177,12 +182,17 @@ export default {
                 this.$emit('closed');
             });
         },
+
+        handleResize() {
+            this.windowInnerWidth = window.innerWidth;
+        },
     },
 
     mounted() {
         this.mounted = true;
         this.$nextTick(() => {
             this.visible = true;
+            this.$emit('opened');
         });
     },
 };

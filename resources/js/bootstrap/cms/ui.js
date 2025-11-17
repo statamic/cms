@@ -108,7 +108,6 @@ export {
     TimePicker,
     ToggleGroup,
     ToggleItem,
-    Tooltip,
     Widget,
     registerIconSet,
     registerIconSetFromStrings,

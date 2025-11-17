@@ -1,6 +1,6 @@
 <template>
     <stack narrow name="page-tree-linker" :before-close="shouldClose" @closed="$emit('closed')" v-slot="{ close }">
-        <div class="flex h-full flex-col bg-gray-100 dark:bg-dark-700">
+        <div class="flex h-full flex-col bg-gray-100 dark:bg-gray-850">
             <header
                 class="flex items-center justify-between border-b bg-white py-2 text-lg font-medium shadow-md dark:border-dark-950 dark:bg-dark-600 ltr:pl-6 ltr:pr-3 rtl:pl-3 rtl:pr-6"
             >
@@ -10,7 +10,7 @@
 
             <div v-if="loading" class="relative flex-1 overflow-auto">
                 <div
-                    class="absolute inset-0 z-10 flex items-center justify-center bg-white bg-opacity-75 text-center dark:bg-dark-700"
+                    class="absolute inset-0 z-10 flex items-center justify-center bg-white bg-opacity-75 text-center dark:bg-gray-850"
                 >
                     <Icon name="loading" />
                 </div>
@@ -72,10 +72,6 @@ import { computed, ref } from 'vue';
 import { Pipeline, Request } from '@ui/Publish/SavePipeline.js';
 import { clone } from '@/bootstrap/globals.js';
 
-let saving = ref(false);
-let errors = ref({});
-let container = null;
-
 export default {
     emits: ['closed', 'submitted', 'publish-info-updated', 'localized-fields-updated'],
 
@@ -98,13 +94,6 @@ export default {
         readOnly: Boolean,
     },
 
-    setup() {
-        return {
-            saving,
-            errors,
-        }
-    },
-
     data() {
         return {
             type: this.entry ? 'entry' : 'url',
@@ -118,10 +107,24 @@ export default {
             saveKeyBinding: null,
             publishContainer: 'tree-page',
             closingWithChanges: false,
+            savingRef: ref(false),
+            errorsRef: ref({}),
         };
     },
 
     computed: {
+        containerRef() {
+            return computed(() => this.$refs.container);
+        },
+
+        saving() {
+            return this.savingRef.value;
+        },
+
+        errors() {
+            return this.errorsRef.value;
+        },
+
         headerText() {
             return this.entry ? __('Link to Entry') : __('Nav Item');
         },
@@ -203,10 +206,14 @@ export default {
     methods: {
         submit() {
             const postUrl = cp_url(`navigation/${this.handle}/pages`);
-            const values = container.value.visibleValues;
+            const values = this.containerRef.value.visibleValues;
 
             new Pipeline()
-                .provide({ container, errors, saving })
+                .provide({
+                    container: this.containerRef,
+                    errors: this.errorsRef,
+                    saving: this.savingRef,
+                })
                 .through([new Request(postUrl, 'POST', {
                     type: this.type,
                     values,
@@ -291,8 +298,6 @@ export default {
         });
 
         this.getPageValues();
-
-        container = computed(() => this.$refs.container);
     },
 
     unmounted() {

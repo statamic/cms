@@ -54,13 +54,14 @@ function tailwindWidthClass(width) {
                 class="min-h-54 px-3 starting-style-transition starting-style-transition--siblings"
                 :class="classes(widget)"
             >
-                <DynamicHtmlRenderer :html="widget.html" />
+                <component v-if="widget.component" :is="widget.component.name" v-bind="widget.component.props" />
+                <DynamicHtmlRenderer v-else :html="widget.html" />
             </div>
         </div>
     </template>
 
     <template v-else>
-        <header class="py-8 mt-8 text-center">
+        <header class="py-8 pt-16 text-center">
             <h1 class="text-[25px] font-medium antialiased flex justify-center items-center gap-2 sm:gap-3">
                 <Icon name="dashboard" class="size-5 text-gray-500" />
                 {{ __('Dashboard') }}

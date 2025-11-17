@@ -43,14 +43,14 @@ const weekHasEntries = (weekDates) => {
 const cellClasses = (weekDate, monthValue) => ({
     'bg-gray-100 dark:bg-gray-800 ring-1 ring-gray-200 dark:ring-gray-700': weekDate.month !== monthValue.month,
     'bg-white dark:bg-gray-900': weekDate.month === monthValue.month,
-    'bg-ui-accent/10! border border-ui-accent!': isToday(weekDate),
+    'bg-ui-accent-bg/10! border border-ui-accent-bg!': isToday(weekDate),
 });
 
 const dateNumberClasses = (weekDate, selected, today, outsideView) => ({
     'text-gray-400 dark:text-gray-600': outsideView,
     'text-gray-900 dark:text-white': !outsideView,
     'text-white bg-blue-600': props.selectedDate && props.selectedDate.toString() === weekDate.toString(),
-    'text-ui-accent': today
+    'text-ui-accent-text': today
 });
 
 const entryStatusClasses = (status) => ({
@@ -77,7 +77,7 @@ const selectDate = (date) => {
                     <div class="flex items-center justify-center gap-1">
                         <div
                             v-if="isCurrentDay(index)"
-                            class="w-1.5 h-1.5 mr-1 bg-ui-accent rounded-full"
+                            class="w-1.5 h-1.5 mr-1 bg-ui-accent-bg rounded-full"
                         ></div>
                         <span class="@4xl:hidden" v-text="day.slice(0, 2)" />
                         <span class="hidden @4xl:block" v-text="day" />

@@ -18,6 +18,7 @@ trait CleansUpGeneratedPaths
             base_path('app/Tags'),
             base_path('app/Widgets'),
             resource_path('js/components'),
+            resource_path('views/widgets'),
             base_path('vendor'),
         ];
 

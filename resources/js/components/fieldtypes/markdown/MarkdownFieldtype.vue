@@ -1,6 +1,6 @@
 <template>
     <portal name="markdown-fullscreen" :disabled="!fullScreenMode" target-class="markdown-fieldtype">
-        <element-container @resized="refresh">
+        <div>
             <div
                 class="
                     @container/markdown w-full block bg-white dark:bg-gray-900! rounded-lg relative
@@ -72,7 +72,7 @@
                                 @drop="draggingFile = false"
                                 @keydown="shortcut"
                             >
-                                <div class="editor relative z-6 st-text-legibility focus-within:focus-outline focus-outline-discrete" ref="codemirror">
+                                <div class="editor relative top-[0.5px] z-(--z-index-above) st-text-legibility focus-within:focus-outline" ref="codemirror">
                                     <div
                                         v-if="showFloatingToolbar && toolbarIsFloating && !isReadOnly"
                                         class="markdown-floating-toolbar absolute z-50 flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-2 py-1 shadow-lg dark:border-white/10 dark:bg-gray-900"
@@ -143,22 +143,22 @@
                     />
                 </stack>
 
-                <stack name="markdownCheatSheet" v-if="showCheatsheet" @closed="showCheatsheet = false">
+                <stack narrow name="markdownCheatSheet" v-if="showCheatsheet" @closed="showCheatsheet = false">
                     <div class="relative h-full overflow-auto bg-white p-6 dark:bg-gray-800 rounded-l-2xl">
                         <Button
                             icon="x"
                             variant="ghost"
-                            class="absolute top-4 end-4"
+                            class="sticky top-0 left-[100%] translate-x-[15%] translate-y-[-20%] bg-white dark:bg-gray-800"
                             @click="showCheatsheet = false"
                         />
-                        <div class="prose prose-zinc prose-headings:font-medium prose-pre:prose-code:!text-white mx-auto my-8 max-w-3xl">
+                        <div class="prose prose-zinc prose-headings:font-medium prose-pre:prose-code:!text-white mx-auto max-w-3xl">
                             <h2 v-text="__('Markdown Cheatsheet')"></h2>
                             <div v-html="__('markdown.cheatsheet')"></div>
                         </div>
                     </div>
                 </stack>
             </div>
-        </element-container>
+        </div>
     </portal>
 </template>
 
@@ -687,12 +687,6 @@ export default {
             });
 
             this.trackHeightUpdates();
-        },
-
-        refresh() {
-            this.$nextTick(function () {
-                this.codemirror.refresh();
-            });
         },
 
         initToolbarButtons() {

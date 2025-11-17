@@ -20,6 +20,7 @@ use Statamic\Events\BlueprintDeleting;
 use Statamic\Events\BlueprintSaved;
 use Statamic\Events\BlueprintSaving;
 use Statamic\Facades;
+use Statamic\Facades\Collection as StatamicCollection;
 use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Field;
@@ -30,6 +31,8 @@ use Tests\TestCase;
 
 class BlueprintTest extends TestCase
 {
+    use \Tests\PreventSavingStacheItemsToDisk;
+
     #[Test]
     public function it_gets_the_handle()
     {
@@ -439,9 +442,8 @@ class BlueprintTest extends TestCase
                                     'duplicate' => true,
                                     'actions' => true,
                                     'type' => 'text',
-                                    'validate' => 'required|min:2',
                                     'input_type' => 'text',
-                                    'character_limit' => 0,
+                                    'character_limit' => null,
                                     'autocomplete' => null,
                                     'placeholder' => null,
                                     'prepend' => null,
@@ -480,8 +482,7 @@ class BlueprintTest extends TestCase
                                     'actions' => true,
                                     'type' => 'textarea',
                                     'placeholder' => null,
-                                    'validate' => 'min:2',
-                                    'character_limit' => 0,
+                                    'character_limit' => null,
                                     'default' => null,
                                     'antlers' => false,
                                     'component' => 'textarea',
@@ -571,7 +572,7 @@ class BlueprintTest extends TestCase
                                     'actions' => true,
                                     'type' => 'text',
                                     'input_type' => 'text',
-                                    'character_limit' => 0,
+                                    'character_limit' => null,
                                     'autocomplete' => null,
                                     'placeholder' => null,
                                     'prepend' => null,
@@ -599,7 +600,7 @@ class BlueprintTest extends TestCase
                                     'actions' => true,
                                     'type' => 'text',
                                     'input_type' => 'text',
-                                    'character_limit' => 0,
+                                    'character_limit' => null,
                                     'autocomplete' => null,
                                     'placeholder' => null,
                                     'prepend' => null,
@@ -825,7 +826,7 @@ class BlueprintTest extends TestCase
             ->setHandle('blueprint_one');
 
         $entry = (new Entry)
-            ->collection('collection_one')
+            ->collection(tap(StatamicCollection::make('collection_one'))->save())
             ->blueprint($blueprint);
 
         $blueprint->setParent($entry);
@@ -877,6 +878,7 @@ class BlueprintTest extends TestCase
                     [
                         'fields' => [
                             ['handle' => 'the_field', 'field' => 'the_partial.the_field', 'config' => ['type' => 'text', 'do_not_touch_other_config' => true]],
+                            ['handle' => 'imported_field_without_config_key', 'field' => 'the_partial.the_field'],
                         ],
                     ],
                 ],
@@ -886,6 +888,7 @@ class BlueprintTest extends TestCase
         $fields = $blueprint
             ->ensureFieldHasConfig('author', ['visibility' => 'read_only'])
             ->ensureFieldHasConfig('the_field', ['visibility' => 'read_only'])
+            ->ensureFieldHasConfig('imported_field_without_config_key', ['visibility' => 'read_only'])
             ->fields();
 
         $this->assertEquals(['type' => 'text'], $fields->get('title')->config());
@@ -899,6 +902,7 @@ class BlueprintTest extends TestCase
 
         $this->assertEquals($expectedConfig, $fields->get('author')->config());
         $this->assertEquals($expectedConfig, $fields->get('the_field')->config());
+        $this->assertEquals($expectedConfig, $fields->get('imported_field_without_config_key')->config());
     }
 
     // todo: duplicate or tweak above test but make the target field not in the first section.
@@ -1079,6 +1083,55 @@ class BlueprintTest extends TestCase
             ],
         ]], $blueprint->contents());
         $this->assertEquals(['type' => 'text', 'foo' => 'bar'], $blueprint->fields()->get('from_partial')->config());
+    }
+
+    #[Test]
+    public function it_merges_configs_in_correct_priority_order_when_ensuring_a_referenced_field_with_overrides()
+    {
+        FieldsetRepository::shouldReceive('find')->with('the_partial')->andReturn(
+            (new Fieldset)->setContents(['fields' => [
+                [
+                    'handle' => 'the_field',
+                    'field' => ['type' => 'text', 'display' => 'The Field'],
+                ],
+            ]])
+        );
+
+        $blueprint = (new Blueprint)->setContents(['tabs' => [
+            'tab_one' => [
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['handle' => 'from_partial', 'field' => 'the_partial.the_field', 'config' => ['visibility' => 'read_only', 'validate' => 'max:543']],
+                        ],
+                    ],
+                ],
+            ],
+        ]]);
+
+        $blueprint->ensureField('from_partial', ['validate' => 'max:200', 'required' => true]);
+
+        $this->assertEquals(['tabs' => [
+            'tab_one' => [
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['handle' => 'from_partial', 'field' => 'the_partial.the_field', 'config' => ['visibility' => 'read_only', 'validate' => 'max:543', 'required' => true]],
+                        ],
+                    ],
+                ],
+            ],
+        ]], $blueprint->contents());
+
+        $fieldConfig = $blueprint->fields()->get('from_partial')->config();
+
+        $this->assertEquals(true, $fieldConfig['required']);
+
+        $this->assertEquals('text', $fieldConfig['type']);
+        $this->assertEquals('The Field', $fieldConfig['display']);
+
+        $this->assertEquals('max:543', $fieldConfig['validate']);
+        $this->assertEquals('read_only', $fieldConfig['visibility']);
     }
 
     #[Test]

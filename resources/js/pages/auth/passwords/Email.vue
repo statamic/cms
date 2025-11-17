@@ -47,7 +47,7 @@ defineProps(['action', 'loginUrl']);
     <div class="mt-4 w-full text-center dark:mt-6">
         <Link
             :href="loginUrl"
-            class="text-blue-400 text-sm hover:text-blue-600"
+            class="text-ui-accent-text text-sm hover:text-ui-accent-text/80"
             v-text="__('I remember my password')"
         />
     </div>

@@ -28,6 +28,21 @@
         p, ol, li {
             @apply st-text-legibility;
         }
+        &:has(.bard-content *:focus) {
+            /* When we're focused on something else inside the .bard-editor, remove the outline on the .bard-editor, otherwise we have two focus outlines.
+            E.g. If you have Bard > Replicator > Text field, when you focus on the internal text field, the outside .bard-editor should lose its outline */
+            outline: none;
+        }
+    }
+}
+/* BARD / FOOTER TOOLBAR
+=================================================== */
+@layer ui {
+    .bard-fieldtype:has(.bard-footer-toolbar) {
+        .bard-editor {
+            /* Remove the border-radius from the main container when we have the bottom toolbar (e.g. Reading Time) since it's no longer the last container in the vertical stack; instead the footer toolbar is now rounded */
+            border-radius: 0;
+        }
     }
 }
 /* BARD / MODES
@@ -124,42 +139,6 @@
                 border-top-right-radius: 0!important;
             }
         }
-
-        /* While the fixed toolbar is "stuck", mask the focus state of the editor to prevent blue focus lines appearing around the side of the toolbar while scrolling */
-        container-type: scroll-state;
-        @container scroll-state(stuck: top) {
-            > * {
-                position: relative;
-                &::after {
-                    content: '';
-                    position: absolute;
-                    inset: -4px -8px;
-                    box-shadow:
-                        /* Left Mask */
-                        -1px 0px 0px var(--color-gray-300),
-                        /* Right Mask */
-                        1px 0px 0px var(--color-gray-300),
-                        /* Bottom "Shadow" */
-                        0 4px 5px -3px hsl(0deg 0% 85%)
-                    ;
-                    border-inline-width: 2px;
-                    border-inline-color: var(--color-gray-50);
-                }
-                :is(.dark) & {
-                    &::after {
-                        box-shadow:
-                            /* Left Mask */
-                            -1px 0px 0px var(--color-gray-700),
-                            /* Right Mask */
-                            1px 0px 0px var(--color-gray-700),
-                            /* Bottom "Shadow" */
-                            0 4px 5px -3px hsl(0deg 0% 10%)
-                        ;
-                        border-inline-color: var(--color-gray-850);
-                    }
-                }
-            }
-        }
     }
 
     /* Only top-level Bard fields should have a sticky header */
@@ -175,9 +154,10 @@
         @apply -top-2;
         /* Prevent the sticky toolbar from hitting the very end of container, which causes it to overlap the container's border-radius */
         margin-block-end: 8px;
-        /* Pull the subsequent element up to compensate for this */
+        /* Pull the subsequent element up to compensate for this. The focus ring adjustment here keeps the focus ring from disappearing into the toolbar, which would make the focus ring appear bottom heavy. */
         + * {
-            margin-block-start: -8px;
+            --focus-ring-adjustment: 0.7px;
+            margin-block-start: calc(-8px + var(--focus-ring-adjustment));
         }
     }
 
@@ -227,7 +207,7 @@
     }
 
     .bard-footer-toolbar {
-        @apply flex items-center justify-between rounded-b border-t bg-white p-2 text-xs text-gray-700 shadow-none dark:border-dark-300 dark:bg-dark-550 dark:text-dark-175;
+        @apply flex items-center justify-between rounded-b-lg border-t bg-white p-2 text-xs text-gray-700 shadow-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400;
         padding: 8px 12px;
 
         .bard-fullscreen & {
@@ -333,6 +313,10 @@
         ul {
             margin-top: 0;
             margin-bottom: 0.85em;
+            table &:last-child {
+                /* If you type a single line of text in a table fieldtype cell you don't want it to have a bottom margin */
+                margin-block-end: 0;
+            }
 
             b,
             strong {
@@ -388,7 +372,7 @@
         h4,
         h5,
         h6 {
-            @apply mt-3.5 mb-2 font-bold text-gray-900 dark:text-gray-100;
+            @apply mt-5 mb-2.5 font-bold text-gray-900 dark:text-gray-100;
 
             b,
             strong {
@@ -482,9 +466,12 @@
                 .selectedCell {
                     @apply relative;
 
-                    &:after {
-                        @apply pointer-events-none absolute inset-0 bg-gray-400 opacity-25 dark:bg-gray-600;
+                    &::after {
+                        @apply pointer-events-none absolute inset-0 bg-gray-400 opacity-25;
                         content: '';
+                    }
+                    :is(.dark) &::after {
+                        @apply bg-gray-600;
                     }
                 }
 
@@ -518,8 +505,11 @@
 ========================================================================== */
 @layer ui {
     .bard-fieldtype .ProseMirror > p.is-editor-empty:first-child::before {
-        @apply text-gray-600 dark:text-gray-400 float-start h-0 pointer-events-none;
+        @apply text-gray-600 float-start h-0 pointer-events-none;
         content: attr(data-placeholder);
+    }
+    .dark .bard-fieldtype .ProseMirror > p.is-editor-empty:first-child::before {
+        @apply text-gray-400;
     }
 }
 
@@ -563,3 +553,13 @@
         }
     }
 }
+
+
+
+
+
+
+
+
+
+

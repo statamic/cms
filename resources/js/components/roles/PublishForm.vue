@@ -1,7 +1,7 @@
 <template>
     <div class="max-w-5xl mx-auto">
         <Header :title="__(initialTitle) || __('Create Role')" icon="permissions">
-            <ui-command-palette-item
+            <CommandPaletteItem
                 :category="$commandPalette.category.Actions"
                 :text="__('Save')"
                 icon="save"
@@ -10,7 +10,7 @@
                 v-slot="{ text, action }"
             >
                 <Button type="submit" variant="primary" @click="action" :text="text" />
-            </ui-command-palette-item>
+            </CommandPaletteItem>
         </Header>
 
         <Panel :heading="__('Settings')">
@@ -57,9 +57,10 @@
 </template>
 
 <script>
-import { Header, Button, CardPanel, Panel, PanelHeader, Heading, Card, Switch, Field, Input } from '@/components/ui';
+import { Header, Button, CardPanel, Panel, PanelHeader, Heading, Card, Switch, Field, Input, CommandPaletteItem } from '@/components/ui';
 import { requireElevatedSession } from '@/components/elevated-sessions';
 import PermissionTree from '@/components/roles/PermissionTree.vue';
+import { router } from '@inertiajs/vue3';
 
 const checked = function (permissions) {
     return permissions.reduce((carry, permission) => {
@@ -80,7 +81,8 @@ export default {
         Card,
         Switch,
         Field,
-        Input
+        Input,
+        CommandPaletteItem,
     },
 
     props: {
@@ -155,7 +157,7 @@ export default {
 
             this.$axios[this.method](this.action, this.payload)
                 .then((response) => {
-                    window.location = response.data.redirect;
+                    router.get(response.data.redirect);
                 })
                 .catch((e) => {
                     if (e.response && e.response.status === 422) {

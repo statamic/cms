@@ -8,7 +8,7 @@ const props = defineProps({
 });
 
 const classes = cva({
-    base: 'text-gray-600 text-pretty tracking-tight dark:text-gray-400 [&_code]:text-xs [&_code]:bg-gray-600/10 [&_code]:rounded-sm [&_code]:px-1 [&_code]:py-0.5',
+    base: 'flex items-center gap-2 text-gray-600 text-pretty tracking-tight dark:text-gray-400 [&_a]:underline [&_a:hover]:text-gray-800 dark:[&_a:hover]:text-gray-200 [&_code]:text-xs [&_code]:bg-gray-600/10 [&_code]:rounded-sm [&_code]:px-1 [&_code]:py-0.5',
     variants: {
         size: {
             sm: 'text-xs',
@@ -16,11 +16,8 @@ const classes = cva({
             lg: 'text-base',
             xl: 'text-lg',
         },
-        icon: {
-            true: 'flex items-center gap-2',
-        },
     },
-})({ ...props, icon: props.icon ? true : false });
+})({ ...props });
 </script>
 
 <template>

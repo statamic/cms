@@ -11,7 +11,6 @@ use Statamic\Fields\Blueprint;
 use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Rules\Handle;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -47,7 +46,8 @@ class FieldsetController extends CpController
                         'title' => $fieldset->title(),
                     ],
                 ];
-            });
+            })
+            ->sortBy(fn ($value, $key) => $key === __('My Fieldsets') ? '0' : $key);
 
         if ($request->wantsJson()) {
             return $fieldsets;
@@ -158,7 +158,7 @@ class FieldsetController extends CpController
     {
         $request->validate([
             'title' => 'required',
-            'handle' => ['required', new Handle],
+            'handle' => ['required', 'regex:/^[a-zA-Z0-9._-]+$/'],
         ]);
 
         if (Facades\Fieldset::find($request->handle)) {
@@ -207,6 +207,14 @@ class FieldsetController extends CpController
 
     private function groupKey(Fieldset $fieldset): string
     {
-        return $fieldset->isNamespaced() ? Str::of($fieldset->namespace())->replace('_', ' ')->title() : __('My Fieldsets');
+        if ($fieldset->isNamespaced()) {
+            return Str::of($fieldset->namespace())->replace('_', ' ')->title();
+        }
+
+        if (str_contains($fieldset->handle(), '.')) {
+            return Str::of($fieldset->handle())->beforeLast('.')->title();
+        }
+
+        return __('My Fieldsets');
     }
 }

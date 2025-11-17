@@ -184,7 +184,6 @@ it('exports ui', async () => {
         'TimePicker',
         'ToggleGroup',
         'ToggleItem',
-        'Tooltip',
         'registerIconSet',
         'registerIconSetFromStrings',
     ].toSorted();

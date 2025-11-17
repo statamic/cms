@@ -68,8 +68,7 @@ class Cache extends Tags implements CachesOutput
             return false;
         }
 
-        // Only GET requests.
-        return request()->method() === 'GET';
+        return true;
     }
 
     private function getCacheKey()

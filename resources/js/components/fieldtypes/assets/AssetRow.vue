@@ -36,7 +36,6 @@
                 v-if="showSetAlt && needsAlt"
                 as="button"
                 color="sky"
-                variant="flat"
                 :text="__('Set Alt')"
                 @click="editOrOpen"
             />

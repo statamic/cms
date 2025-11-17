@@ -61,40 +61,38 @@
                 </div>
 
                 <div class="mx-4 flex-1 overflow-auto">
-                    <Panel>
-                        <page-tree
-                            ref="tree"
-                            :pages-url="tree.url"
-                            :show-slugs="tree.showSlugs"
-                            :blueprints="tree.blueprints"
-                            :expects-root="tree.expectsRoot"
-                            :site="site"
-                            :preferences-prefix="`selector-field.${name}`"
-                            :editable="false"
-                            @branch-clicked="toggleSelection($event.id)"
-                        >
-                            <template #branch-action="{ branch, index }">
-                                <div>
-                                    <Checkbox
-                                        :ref="`tree-branch-${branch.id}`"
-                                        class="mt-3 mx-3"
-                                        :value="branch.id"
-                                        :model-value="isSelected(branch.id)"
-                                        :disabled="reachedSelectionLimit && !singleSelect && !isSelected(branch.id)"
-                                        :label="getCheckboxLabel(branch)"
-                                        :description="getCheckboxDescription(branch)"
-                                        size="sm"
-                                        solo
-                                        @update:model-value="toggleSelection(branch.id)"
-                                    />
-                                </div>
-                            </template>
+                    <page-tree
+                        ref="tree"
+                        :pages-url="tree.url"
+                        :show-slugs="tree.showSlugs"
+                        :blueprints="tree.blueprints"
+                        :expects-root="tree.expectsRoot"
+                        :site="site"
+                        :preferences-prefix="`selector-field.${name}`"
+                        :editable="false"
+                        @branch-clicked="toggleSelection($event.id)"
+                    >
+                        <template #branch-action="{ branch, index }">
+                            <div>
+                                <Checkbox
+                                    :ref="`tree-branch-${branch.id}`"
+                                    class="mt-3 mx-3"
+                                    :value="branch.id"
+                                    :model-value="isSelected(branch.id)"
+                                    :disabled="reachedSelectionLimit && !singleSelect && !isSelected(branch.id)"
+                                    :label="getCheckboxLabel(branch)"
+                                    :description="getCheckboxDescription(branch)"
+                                    size="sm"
+                                    solo
+                                    @update:model-value="toggleSelection(branch.id)"
+                                />
+                            </div>
+                        </template>
 
-                            <template #branch-icon="{ branch }">
-                                <ui-icon name="external-link" v-if="isRedirectBranch(branch)" v-tooltip="__('Redirect')" />
-                            </template>
-                        </page-tree>
-                    </Panel>
+                        <template #branch-icon="{ branch }">
+                            <ui-icon name="external-link" v-if="isRedirectBranch(branch)" v-tooltip="__('Redirect')" />
+                        </template>
+                    </page-tree>
                 </div>
             </template>
 
@@ -127,7 +125,6 @@ import clone from '@/util/clone.js';
 import {
     Button,
     ButtonGroup,
-    Tooltip,
     Listing,
     ListingTable as Table,
     ListingSearch as Search,
@@ -146,7 +143,6 @@ export default {
         PageTree: defineAsyncComponent(() => import('../../structures/PageTree.vue')),
         Button,
         ButtonGroup,
-        Tooltip,
         Listing,
         Table,
         Search,

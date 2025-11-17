@@ -210,6 +210,7 @@
 
 import isEmail from 'validator/lib/isEmail';
 import HasWizardSteps from '../HasWizardSteps.js';
+import { router } from '@inertiajs/vue3';
 
 export default {
     mixins: [HasWizardSteps],
@@ -347,7 +348,7 @@ export default {
                     this.$dirty.remove('user-wizard');
 
                     if (this.invitation.send) {
-                        this.$nextTick(() => (window.location = response.data.redirect));
+                        this.$nextTick(() => router.get(response.data.redirect));
                     } else {
                         this.completed = true;
                         this.editUrl = response.data.redirect;

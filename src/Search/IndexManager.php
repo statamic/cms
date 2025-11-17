@@ -2,7 +2,7 @@
 
 namespace Statamic\Search;
 
-use Algolia\AlgoliaSearch\SearchClient;
+use Algolia\AlgoliaSearch\Api\SearchClient;
 use InvalidArgumentException;
 use Statamic\Facades\Site;
 use Statamic\Search\Algolia\Index as AlgoliaIndex;

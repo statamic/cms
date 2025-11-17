@@ -249,5 +249,5 @@ return [
     'user_wizard_roles_groups_intro' => 'Користувачам можна призначати ролі, які налаштовують їхні дозволи, доступ і можливості по всій Панелі керування.',
     'user_wizard_super_admin_instructions' => 'Суперадміністратори мають повний контроль та доступ до всього в панелі керування. Надавайте цю роль обережно.',
     'view_more_count' => 'Переглянути ще :count',
-    'width_x_height' => ':width x :height',
+    'width_x_height' => ':width × :height',
 ];

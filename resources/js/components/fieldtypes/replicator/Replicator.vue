@@ -16,7 +16,7 @@
                         @close="toggleFullscreen"
                     />
 
-                    <section :class="{ 'dark:bg-dark-700 mt-14 bg-gray-200 p-4': fullScreenMode }">
+                    <section :class="{ 'dark:bg-gray-850 mt-14 bg-gray-200 p-4': fullScreenMode }">
                         <sortable-list
                             :model-value="value"
                             :vertical="true"
@@ -55,11 +55,11 @@
                                     <template v-slot:picker>
                                         <add-set-button
                                             variant="between"
-                                            v-if="index !== 0"
                                             :groups="groupConfigs"
                                             :sets="setConfigs"
                                             :index="index"
                                             :enabled="canAddSet"
+                                            :is-first="index === 0"
                                             @added="addSet"
                                         />
                                     </template>

@@ -31,7 +31,7 @@ function saved(response) {
 <template>
     <Head :title="collectionCreateLabel" />
 
-    <entry-publish-form
+    <EntryPublishForm
         :is-creating="true"
         publish-container="base"
         :initial-actions="actions"
@@ -55,5 +55,5 @@ function saved(response) {
         :initial-listing-url="initialListingUrl"
         :preview-targets="previewTargets"
         @saved="saved"
-    ></entry-publish-form>
+    />
 </template>

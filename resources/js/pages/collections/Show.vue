@@ -31,7 +31,7 @@
                 <ui-button
                     v-if="treeIsDirty"
                     variant="filled"
-                    :text="__('Discard changes')"
+                    :text="__('Discard Changes')"
                     @click="cancelTreeProgress"
                 />
 
@@ -194,6 +194,7 @@ import { defineAsyncComponent } from 'vue';
 import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator, Header, Button, ToggleGroup, ToggleItem } from '@/components/ui';
 import ItemActions from '@/components/actions/ItemActions.vue';
 import Head from '@/pages/layout/Head.vue';
+import { router } from '@inertiajs/vue3';
 
 export default {
     components: {
@@ -359,20 +360,15 @@ export default {
         },
 
         initialView() {
-            // Get from preferences instead of localStorage
             const savedView = this.$preferences.get(`collections.${this.handle}.view`);
 
-            // If we have a saved view, validate it's available and return it
             if (savedView) {
                 if (savedView === 'tree' && this.canUseStructureTree) return 'tree';
                 if (savedView === 'calendar' && this.canUseCalendar) return 'calendar';
                 if (savedView === 'list') return 'list';
             }
 
-            // Fallback logic
-            if (this.canUseStructureTree) return 'tree';
-            if (this.canUseCalendar) return 'calendar';
-            return 'list';
+            return this.canUseStructureTree ? 'tree' : 'list';
         },
 
         deleteTreeBranch(branch, removeFromUi) {
@@ -405,16 +401,16 @@ export default {
         createEntry(blueprint, parent) {
             let url = `${this.createUrl}?blueprint=${blueprint}`;
             if (parent) url += '&parent=' + parent;
-            window.location = url;
+            router.get(url);
         },
 
         editPage(page, $event) {
             const url = page.edit_url;
-            $event.metaKey ? window.open(url) : (window.location = url);
+            $event.metaKey ? window.open(url) : router.get(url);
         },
 
         afterActionSuccessfullyCompleted(response) {
-            if (!response.redirect) window.location.reload();
+            if (!response.redirect) router.reload();
         },
 
         addToCommandPalette() {
@@ -437,6 +433,30 @@ export default {
                 text: [__('Collection'), __('Scaffold Views')],
                 icon: 'scaffold',
                 url: this.scaffoldUrl,
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Switch to List Layout'),
+                icon: 'layout-list',
+                when: () => this.view !== 'list',
+                action: () => this.view = 'list',
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Switch to Calendar Layout'),
+                icon: 'calendar',
+                when: () => this.canUseCalendar && this.view !== 'calendar',
+                action: () => this.view = 'calendar',
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Switch to Tree Layout'),
+                icon: 'navigation',
+                when: () => this.canUseStructureTree && this.view !== 'tree',
+                action: () => this.view = 'tree',
             });
 
             this.$refs.actions?.preparedActions.forEach(action => Statamic.$commandPalette.add({
