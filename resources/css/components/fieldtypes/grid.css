@@ -131,12 +131,21 @@
     *:not(button, button *) {
         @apply rounded-lg border-none;
     }
-    /* When a grid field has at least 3 columns, including the menu control, change the presentation so it fits in with the other grid cells */
+    /* Table UI Mode */
+    /* When a grid field has at least 2 columns (so 3 including the menu control) change the presentation so it fits in with the other grid cells */
     tr:has(> :nth-child(3)) & {
         @apply shadow-ui-sm;
         /* Compress the padding to fit in with the other grid cells */
         td {
             padding: 0.3125rem;
         }
+    }
+}
+
+/* Stacked UI mode */
+.grid-stacked:not(:has([data-asset-picker])) .publish-fields:has(> :nth-child(3)) .assets-fieldtype {
+    /* Compress the padding to fit in with the other grid cells */
+    td {
+        padding: 0.3125rem;
     }
 }
