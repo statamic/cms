@@ -50,8 +50,8 @@ const buttonClasses = computed(() => {
                 'ghost-pressed': 'bg-transparent hover:bg-gray-400/10 text-black dark:text-white dark:hover:bg-white/7 dark:hover:text-white [&_svg]:opacity-100',
                 subtle: 'bg-transparent hover:bg-gray-400/10 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-white/7 dark:hover:text-gray-200 [&_svg]:opacity-35',
                 pressed: [
-                    'bg-linear-to-b from-gray-100 to-gray-100 text-gray-900 border border-gray-300 inset-shadow-sm/10',
-                    'dark:from-gray-950 dark:to-gray-950 dark:text-white dark:border-white/10',
+                    'bg-linear-to-b from-gray-200 to-gray-150 text-gray-900 border border-gray-300 inset-shadow-sm/10',
+                    'dark:from-black dark:to-black dark:text-white dark:border-gray-700/80',
                 ],
             },
             size: {
