@@ -1,5 +1,5 @@
 <template>
-    <div v-text="formatted"></div>
+    <div v-text="formatted" class="tabular-nums"></div>
 </template>
 
 <script setup>
