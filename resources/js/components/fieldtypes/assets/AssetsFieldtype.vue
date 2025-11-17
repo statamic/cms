@@ -125,10 +125,10 @@
 
                     <div class="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700 not-[.link-fieldtype_&]:border-t-0! not-[.link-fieldtype_&]:rounded-t-none" v-if="displayMode === 'list'">
                         <table class="table-fixed w-full">
-                            <thead>
+                            <thead class="sr-only">
                                 <tr>
-                                    <th class="sr-only">Asset</th>
-                                    <th class="sr-only">Actions</th>
+                                    <th>Asset</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <sortable-list
