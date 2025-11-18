@@ -161,7 +161,7 @@
 
 .table-drag-handle {
     @apply h-full cursor-grab hover:bg-gray-100 dark:hover:bg-gray-700 dark:opacity-75;
-    background-image: url('../../svg/drag-dots.svg');
+    background-image: url('../../../packages/ui/src/icons/drag-dots.svg');
     background-repeat: no-repeat;
     background-position: center center;
     background-size: 7px 17px;

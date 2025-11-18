@@ -110,11 +110,10 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import { SortableList, SortableHelpers } from '../sortable/Sortable';
-import { Button } from '@/components/ui';
+import { Button, SortableList, SortableMixin } from '@/components/ui';
 
 export default {
-    mixins: [Fieldtype, SortableHelpers],
+    mixins: [Fieldtype, SortableMixin],
 
     components: {
         SortableList,

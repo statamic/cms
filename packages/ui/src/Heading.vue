@@ -2,7 +2,7 @@
 import { cva } from 'cva';
 import { computed, useSlots } from 'vue';
 import Icon from './Icon/Icon.vue';
-import { Link } from '@inertiajs/vue3';
+import Link from './Link.vue';
 
 const props = defineProps({
     href: { type: [String, null], default: null },

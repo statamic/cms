@@ -20,6 +20,7 @@ const {
         :show-totals="showPaginationTotals"
         :show-page-links="showPaginationPageLinks"
         :show-per-page-selector="showPaginationPerPageSelector"
+        :per-page-selector-options="$config.get('paginationSizeOptions')"
         @page-selected="setCurrentPage"
         @per-page-changed="setPerPage"
     />

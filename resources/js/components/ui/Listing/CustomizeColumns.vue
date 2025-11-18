@@ -1,6 +1,5 @@
 <script setup>
-import { Button, Modal } from '@ui';
-import { SortableList } from '@/components/sortable/Sortable.js';
+import { Button, Modal, SortableList } from '@ui';
 import { injectListingContext } from '../Listing/Listing.vue';
 import { computed, ref } from 'vue';
 

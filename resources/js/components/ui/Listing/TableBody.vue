@@ -1,10 +1,9 @@
 <script setup>
 import TableField from '@/components/data-list/TableField.vue';
 import RowActions from '../Listing/RowActions.vue';
-import SortableList from '@/components/sortable/SortableList.vue';
 import { injectListingContext } from '../Listing/Listing.vue';
 import { computed, ref, watch } from 'vue';
-import { Checkbox } from '@ui';
+import { Checkbox, SortableList } from '@ui';
 
 const {
     items,

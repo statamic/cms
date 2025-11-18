@@ -18,7 +18,7 @@ import Button from './Button/Button.vue';
 import Icon from './Icon/Icon.vue';
 import Badge from './Badge.vue';
 import fuzzysort from 'fuzzysort';
-import { SortableList } from '@/components/sortable/Sortable.js';
+import SortableList from './Sortable/SortableList.vue';
 
 const emit = defineEmits(['update:modelValue', 'search', 'selected', 'added']);
 

@@ -87,6 +87,8 @@ export const {
     Separator,
     Slider,
     Skeleton,
+    SortableList,
+    SortableMixin,
     SplitterGroup,
     SplitterPanel,
     SplitterResizeHandle,

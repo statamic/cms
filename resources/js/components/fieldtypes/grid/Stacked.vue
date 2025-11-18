@@ -47,7 +47,7 @@
 <script>
 import View from './View.vue';
 import StackedRow from './StackedRow.vue';
-import { SortableList } from '../../sortable/Sortable';
+import { SortableList } from '@ui';
 
 export default {
     mixins: [View],

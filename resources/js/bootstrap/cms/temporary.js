@@ -5,7 +5,6 @@ export { default as ConfirmationModal } from '../../components/modals/Confirmati
 export { default as RevisionHistory } from '../../components/revision-history/History.vue';
 export { default as RestoreRevision } from '../../components/revision-history/Restore.vue';
 export { default as RevisionPreview } from '../../components/revision-history/Preview.vue';
-export { default as SortableList } from '../../components/sortable/SortableList.vue';
 export { default as SaveButtonOptions } from '../../components/publish/SaveButtonOptions.vue';
 export { default as HasPreferences } from '../../components/data-list/HasPreferences.js';
 export { default as HasActions } from '../../components/publish/HasActions.js';

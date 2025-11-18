@@ -1,5 +1,5 @@
 <script setup>
-import DragDots from '@/../svg/drag-dots.svg';
+import DragDots from './icons/drag-dots.svg';
 </script>
 
 <template>

@@ -1,5 +1,5 @@
 <script setup>
-import { Link } from '@inertiajs/vue3';
+import Link from '../Link.vue';
 import Icon from '../Icon/Icon.vue';
 import { useSlots } from 'vue';
 

@@ -4,7 +4,7 @@ import { computed } from 'vue';
 import Description from './Description.vue';
 import Label from './Label.vue';
 import ErrorMessage from './ErrorMessage.vue';
-import markdown from '@/util/markdown.js';
+import markdown from './util/markdown.js';
 
 defineOptions({
     inheritAttrs: false,

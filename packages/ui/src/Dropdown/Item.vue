@@ -3,7 +3,7 @@ import { DropdownMenuItem } from 'reka-ui';
 import { computed, useSlots } from 'vue';
 import Icon from '../Icon/Icon.vue';
 import { cva } from 'cva';
-import { Link } from '@inertiajs/vue3';
+import Link from '../Link.vue';
 
 const props = defineProps({
     as: { type: String, default: null },

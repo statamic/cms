@@ -1,3 +1,5 @@
+export { default as StatamicUI } from './plugin.js';
+
 export { default as AuthCard } from './AuthCard.vue';
 export { default as Badge } from './Badge.vue';
 export { default as Button } from './Button/Button.vue';
@@ -58,6 +60,8 @@ export { default as Select } from './Select/Select.vue';
 export { default as Separator } from './Separator.vue';
 export { default as Slider } from './Slider/Slider.vue';
 export { default as Skeleton } from './Skeleton.vue';
+export { default as SortableList } from './Sortable/SortableList.vue';
+export { default as SortableMixin } from './Sortable/SortableMixin.js';
 export { default as SplitterGroup } from './Splitter/Group.vue';
 export { default as SplitterPanel } from './Splitter/Panel.vue';
 export { default as SplitterResizeHandle } from './Splitter/ResizeHandle.vue';

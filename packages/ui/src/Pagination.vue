@@ -1,7 +1,6 @@
 <script setup>
-import HasInputOptions from '@/components/fieldtypes/HasInputOptions.js';
-const normalizeInputOptions = HasInputOptions.methods.normalizeInputOptions;
-import { flatten, sortBy, range } from 'lodash-es';
+import { normalizeInputOptions } from './util/normalize-input-options.js';
+import { flatten, range, sortBy } from 'lodash-es';
 import Select from './Select/Select.vue';
 import Button from './Button/Button.vue';
 import { computed } from 'vue';
@@ -15,6 +14,7 @@ const props = defineProps({
     scrollToTop: { type: Boolean, default: true },
     showPageLinks: { type: Boolean, default: true },
     showPerPageSelector: { type: Boolean, default: true },
+    perPageSelectorOptions: { type: Array, default: () => [10, 25, 50, 100, 500] },
 });
 
 const onEachSide = 3;
@@ -56,15 +56,7 @@ const hasPrevious = computed(() => currentPage.value > 1);
 const hasNext = computed(() => currentPage.value < totalPages.value);
 
 const perPageOptions = computed(() => {
-    let defaultPaginationSize = Statamic.$config.get('paginationSize');
-    let defaultOptions = Statamic.$config.get('paginationSizeOptions').filter((size) => size !== defaultPaginationSize);
-    let options = normalizeInputOptions(defaultOptions);
-
-    options.push({
-        value: defaultPaginationSize,
-        label: `${defaultPaginationSize}`,
-    });
-
+    let options = normalizeInputOptions(props.perPageSelectorOptions);
     return sortBy(options, 'value');
 });
 

@@ -7,7 +7,6 @@ export const {
     RestoreRevision,
     RevisionPreview,
     SaveButtonOptions,
-    SortableList,
     HasPreferences,
     HasActions,
     resetValuesFromResponse,

@@ -185,9 +185,8 @@ import AssetTile from './AssetTile.vue';
 import Selector from '../../assets/Selector.vue';
 import Uploader from '../../assets/Uploader.vue';
 import Uploads from '../../assets/Uploads.vue';
-import { SortableList } from '../../sortable/Sortable';
 import { isEqual } from 'lodash-es';
-import { Button, Dropdown, DropdownMenu, DropdownItem } from '@/components/ui';
+import { Button, Dropdown, DropdownMenu, DropdownItem, SortableList } from '@/components/ui';
 import ItemActions from '@/components/actions/ItemActions.vue';
 
 export default {

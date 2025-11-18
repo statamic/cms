@@ -93,9 +93,8 @@
 <script>
 import RULES from './Rules.js';
 import SemVer from 'semver';
-import { SortableList } from '../sortable/Sortable';
 import { sortBy } from 'lodash-es';
-import { Description, Field, Input, Badge, Button, Switch, Combobox } from '@ui';
+import { Description, Field, Input, Badge, Button, Switch, Combobox, SortableList } from '@ui';
 import { ComboboxInput } from 'reka-ui';
 import { usePage } from '@inertiajs/vue3';
 

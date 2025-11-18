@@ -66,9 +66,8 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import HasInputOptions from './HasInputOptions.js';
-import { SortableList } from '../sortable/Sortable';
 import debounce from '@/util/debounce.js';
-import { Badge, Combobox } from '@/components/ui';
+import { Badge, Combobox, SortableList } from '@/components/ui';
 
 export default {
     mixins: [Fieldtype, HasInputOptions],

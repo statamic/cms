@@ -11,9 +11,17 @@
   },
   "peerDependencies": {
     "vue": "^3.4.0",
-    "tailwindcss": "^4.0.0"
+    "tailwindcss": "^4.0.0",
+    "@inertiajs/vue3": "^2.0.0",
+    "floating-vue": "^5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@inertiajs/vue3": {
+      "optional": true
+    }
   },
   "dependencies": {
+    "@internationalized/date": "^3.6.0",
     "@shopify/draggable": "^1.0.0-beta.12",
     "autosize": "~6.0.1",
     "codemirror": "5.65.12",

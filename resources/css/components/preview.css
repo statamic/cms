@@ -73,7 +73,7 @@
     @apply w-4 border-gray-200 shadow-sm dark:bg-gray-800 dark:border-gray-600 border-s;
     z-index: 1;
     cursor: ew-resize;
-    background-image: url('../../svg/drag-dots.svg');
+    background-image: url('../../../packages/ui/src/icons/drag-dots.svg');
     background-repeat: no-repeat;
     background-position: center center;
     background-size: 7px 17px;

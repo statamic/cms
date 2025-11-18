@@ -3,7 +3,7 @@ import { computed, useSlots } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
 import Icon from '../Icon/Icon.vue';
-import { Link } from '@inertiajs/vue3';
+import Link from '../Link.vue';
 
 const props = defineProps({
     as: { type: String, default: null },
