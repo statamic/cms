@@ -164,16 +164,16 @@ const getInputLabel = (part) => {
                                 </DatePickerInput>
                             </template>
                         </div>
-                        <button
+                        <Button
                             v-if="clearable && !readOnly"
                             @click="emit('update:modelValue', null)"
+                            variant="subtle"
+                            size="sm"
+                            icon="x"
+                            class="-my-1.25 -me-2"
                             :disabled="disabled"
-                            type="button"
-                            class="flex items-center justify-center rounded-lg p-2 -me-1 text-gray-300 outline-hidden hover:bg-gray-100 hover:text-gray-400 focus:bg-red-50 focus:text-red-400 active:text-gray-400 dark:hover:bg-gray-800 dark:focus:bg-red-950"
-                            :aria-label="__('Clear date')"
-                        >
-                            <Icon name="x" class="size-3" />
-                        </button>
+                            v-tooltip="__('Clear date')"
+                        />
                     </div>
                 </DatePickerAnchor>
             </DatePickerField>
