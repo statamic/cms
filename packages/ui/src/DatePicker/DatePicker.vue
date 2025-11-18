@@ -137,7 +137,7 @@ const getInputLabel = (part) => {
                     >
                         <DatePickerTrigger
                             v-if="!inline"
-                            class="flex items-center justify-center rounded-lg p-2 -ms-1 text-gray-400 outline-hidden hover:bg-gray-100 focus:bg-gray-100 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
+                            class="flex items-center justify-center rounded-lg p-2 -ms-1 text-gray-500 dark:text-gray-400 outline-hidden hover:bg-gray-100 focus:bg-gray-100 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
                             :aria-label="__('Open calendar')"
                         >
                             <Icon name="calendar" class="size-4" />
