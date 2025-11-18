@@ -1162,6 +1162,7 @@ class AssetTest extends TestCase
         $disk->put('old/asset.txt', 'The asset contents');
         $container = Facades\AssetContainer::make('test')->disk('local');
         Facades\AssetContainer::shouldReceive('save')->with($container);
+        Facades\AssetContainer::shouldReceive('find')->with('assets')->andReturnNull();
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
         $asset = $container->makeAsset('old/asset.txt')->data(['foo' => 'bar']);
         $asset->save();
@@ -1202,6 +1203,7 @@ class AssetTest extends TestCase
         $disk->put('old/asset.txt', 'The asset contents');
         $container = Facades\AssetContainer::make('test')->disk('local');
         Facades\AssetContainer::shouldReceive('save')->with($container);
+        Facades\AssetContainer::shouldReceive('find')->with('assets')->andReturnNull();
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
         $asset = $container->makeAsset('old/asset.txt');
         $asset->save();
@@ -1225,6 +1227,7 @@ class AssetTest extends TestCase
         $disk->put('old/asset.txt', 'The asset contents');
         $container = Facades\AssetContainer::make('test')->disk('local');
         Facades\AssetContainer::shouldReceive('save')->with($container);
+        Facades\AssetContainer::shouldReceive('find')->with('assets')->andReturnNull();
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
         $asset = $container->makeAsset('old/asset.txt');
         $asset->save();
