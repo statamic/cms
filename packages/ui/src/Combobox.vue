@@ -252,8 +252,7 @@ function measureOptionWidths() {
     });
 
     // Add ComboboxContent padding (p-2 = 0.5rem * 2 = 16px on each side = 32px total)
-    // Add some buffer for scrollbar and safety margin
-    optionWidth.value = Math.ceil(maxWidth + 32 + 20);
+    optionWidth.value = Math.ceil(maxWidth + 32);
 }
 
 function updateModelValue(value) {
@@ -360,7 +359,7 @@ defineExpose({
                                 @keydown.space="openDropdown"
                             >
                                 <Icon v-if="icon" :name="icon" class="text-gray-500 dark:text-white dark:opacity-50" />
-                                <span class="block truncate text-gray-500 dark:text-gray-400" v-text="placeholder" />
+                                <span class="block truncate text-gray-500 dark:text-gray-400 select-none" v-text="placeholder" />
                             </button>
 
                             <!-- Dropdown closed: selected option -->
@@ -425,7 +424,7 @@ defineExpose({
                                     :estimate-size="37"
                                     :text-content="(opt) => getOptionLabel(opt)"
                                 >
-                                    <div class="py-1 w-full">
+                                    <div class="py-1 w-full overflow-x-hidden">
                                         <ComboboxItem
                                             :key="virtualItem.index + JSON.stringify(modelValue)"
                                             :value="getOptionValue(option)"
