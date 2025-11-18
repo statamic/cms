@@ -14,6 +14,8 @@ use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Rules\Handle;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class FormsController extends CpController
 {
     public function index(Request $request)
@@ -359,7 +361,7 @@ class FormsController extends CpController
         foreach (Form::extraConfigFor($form->handle()) as $handle => $config) {
             $merged = false;
             foreach ($fields as $sectionHandle => $section) {
-                if ($section['display'] == $config['display']) {
+                if ($section['display'] == __($config['display'])) {
                     $fields[$sectionHandle]['fields'] += $config['fields'];
                     $merged = true;
                 }

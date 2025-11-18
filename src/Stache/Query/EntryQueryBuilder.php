@@ -18,6 +18,8 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
         if ($column === 'collection') {
+            $this->verifyCollectionBeforeStatus();
+
             $this->collections[] = $operator;
 
             return $this;
@@ -33,6 +35,8 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
     public function whereIn($column, $values, $boolean = 'and')
     {
         if (in_array($column, ['collection', 'collections'])) {
+            $this->verifyCollectionBeforeStatus();
+
             $this->collections = array_merge($this->collections ?? [], $values);
 
             return $this;
@@ -43,6 +47,13 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
         }
 
         return parent::whereIn($column, $values, $boolean);
+    }
+
+    private function verifyCollectionBeforeStatus()
+    {
+        if ($this->queriedByStatus) {
+            throw new \LogicException('The collection clause must come before the status clause.');
+        }
     }
 
     protected function collect($items = [])
@@ -141,6 +152,23 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
         return collect($collections)->flatMap(function ($collection) use ($column) {
             return $this->getWhereColumnKeysFromStore($collection, ['column' => $column]);
         });
+    }
+
+    protected function getBlueprintsForRelations()
+    {
+        $collections = empty($this->collections)
+            ? Facades\Collection::all()
+            : $this->collections;
+
+        return collect($collections)->flatMap(function ($collection) {
+            if (is_string($collection)) {
+                $collection = Facades\Collection::find($collection);
+            }
+
+            return $collection ? $collection->entryBlueprints() : false;
+        })
+            ->filter()
+            ->unique();
     }
 
     private function ensureCollectionsAreQueriedForStatusQuery(): void

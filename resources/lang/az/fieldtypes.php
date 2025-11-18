@@ -173,7 +173,7 @@ return [
     'taggable.config.placeholder' => 'Yazın və ↩ Enter düyməsini basın.',
     'taggable.title' => 'Etiketlənə bilən',
     'taxonomies.title' => 'Taksonomiyalar',
-    'template.config.blueprint' => '"Plan-a xəritə əlavə et" seçimini əlavə edir. Daha çox məlumat üçün [sənədi](https://statamic.dev/views#inferring-templates-from-entry-blueprints) oxuyun.',
+    'template.config.blueprint' => '"Plan-a xəritə əlavə et" seçimini əlavə edir. Daha çox məlumat üçün [sənədi](https://statamic.dev/views#map-templates-to-entry-blueprints) oxuyun.',
     'template.config.folder' => 'Yalnız bu qovluqdakı şablonları göstərin.',
     'template.config.hide_partials' => 'Parçalar nadir hallarda şablon kimi istifadə olunmaq üçün nəzərdə tutulur.',
     'template.title' => 'Şablon',

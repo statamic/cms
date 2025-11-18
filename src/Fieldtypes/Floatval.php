@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\Query\Scopes\Filters\Fields\Floatval as FloatFilter;
 
@@ -55,5 +56,10 @@ class Floatval extends Fieldtype
     public function filter()
     {
         return new FloatFilter($this);
+    }
+
+    public function toGqlType()
+    {
+        return GraphQL::type(GraphQL::float());
     }
 }

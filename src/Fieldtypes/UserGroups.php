@@ -7,6 +7,8 @@ use Statamic\Facades\Scope;
 use Statamic\Facades\UserGroup;
 use Statamic\GraphQL\Types\UserGroupType;
 
+use function Statamic\trans as __;
+
 class UserGroups extends Relationship
 {
     protected $canEdit = false;

@@ -216,6 +216,7 @@ class GlobalRuntimeState
 
     public static function resetGlobalState()
     {
+        self::$templateFileStack = [];
         self::$shareVariablesTemplateTrigger = '';
         self::$layoutVariables = [];
         self::$containsLayout = false;
@@ -229,6 +230,7 @@ class GlobalRuntimeState
         StackReplacementManager::clearStackState();
         LiteralReplacementManager::resetLiteralState();
         RecursiveNodeManager::resetRecursiveNodeState();
+        RuntimeParser::clearRenderNodeCache();
     }
 
     public static function createIndicatorVariable($indicator)

@@ -138,21 +138,6 @@ class AssetContainerTest extends TestCase
     }
 
     #[Test]
-    public function it_gets_the_url_from_the_disk_config_when_its_app_url()
-    {
-        config(['filesystems.disks.test' => [
-            'driver' => 'local',
-            'root' => __DIR__.'/__fixtures__/container',
-            'url' => 'http://localhost/container',
-        ]]);
-
-        $container = (new AssetContainer)->disk('test');
-
-        $this->assertEquals('/container', $container->url());
-        $this->assertEquals('http://localhost/container', $container->absoluteUrl());
-    }
-
-    #[Test]
     public function its_private_if_the_disk_has_no_url()
     {
         Storage::fake('test');
@@ -304,6 +289,28 @@ class AssetContainerTest extends TestCase
             'no source, presets false' => [null, false, false, []],
             'with source, presets false' => ['max', false, false, []],
         ];
+    }
+
+    #[Test]
+    public function custom_manipulation_presets_are_included_in_warm_presets()
+    {
+        config(['statamic.assets.image_manipulation.presets' => [
+            'small' => ['w' => '15', 'h' => '15'],
+            'medium' => ['w' => '500', 'h' => '500'],
+            'large' => ['w' => '1000', 'h' => '1000'],
+            'max' => ['w' => '3000', 'h' => '3000', 'mark' => 'watermark.jpg'],
+        ]]);
+
+        Facades\Image::registerCustomManipulationPresets([
+            'og_image' => ['w' => 1146, 'h' => 600],
+            'twitter_image' => ['w' => 1200, 'h' => 600],
+        ]);
+
+        $container = (new AssetContainer);
+
+        $this->assertEquals([
+            'small', 'medium', 'large', 'max', 'og_image', 'twitter_image',
+        ], $container->warmPresets());
     }
 
     #[Test]

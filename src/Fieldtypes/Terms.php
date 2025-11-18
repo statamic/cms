@@ -26,6 +26,8 @@ use Statamic\Query\Scopes\Filters\Fields\Terms as TermsFilter;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class Terms extends Relationship
 {
     protected $canEdit = true;
@@ -117,7 +119,15 @@ class Terms extends Relationship
     {
         $single = $this->config('max_items') === 1;
 
-        if ($single && Blink::has($key = 'terms-augment-'.json_encode($values))) {
+        // The parent is the item this terms fieldtype exists on. Most commonly an
+        // entry, but could also be something else, like another taxonomy term.
+        $parent = $this->field->parent();
+
+        $site = $parent && $parent instanceof Localization
+            ? $parent->locale()
+            : Site::current()->handle(); // Use the "current" site so this will get localized appropriately on the front-end.
+
+        if ($single && Blink::has($key = 'terms-augment-'.$site.'-'.json_encode($values))) {
             return Blink::get($key);
         }
 
@@ -371,6 +381,7 @@ class Terms extends Relationship
             'published' => $term->published(),
             'private' => $term->private(),
             'edit_url' => $term->editUrl(),
+            'editable' => User::current()->can('edit', $term),
             'hint' => $this->getItemHint($term),
         ];
     }
@@ -481,6 +492,21 @@ class Terms extends Relationship
         }
 
         return $this->config('max_items') === 1 ? collect([$augmented]) : $augmented->get();
+    }
+
+    public function relationshipQueryBuilder()
+    {
+        $taxonomies = $this->taxonomies();
+
+        return Term::query()
+            ->when($taxonomies, fn ($query) => $query->whereIn('taxonomy', $taxonomies));
+    }
+
+    public function relationshipQueryIdMapFn(): ?\Closure
+    {
+        return $this->usingSingleTaxonomy()
+            ? fn ($term) => Str::after($term->id(), '::')
+            : null;
     }
 
     public function getItemHint($item): ?string
