@@ -275,6 +275,7 @@ class BlueprintRepository
                             'handle' => $blueprint->handle(),
                             'namespace' => $blueprint->namespace(),
                             'title' => $blueprint->title(),
+                            'edit_url' => $blueprint->editAdditionalBlueprintUrl(),
                             'reset_url' => $blueprint->resetAdditionalBlueprintUrl(),
                             'is_resettable' => $blueprint->isResettable(),
                             'command_palette_link' => $blueprint->commandPaletteLink($type, $blueprint->editAdditionalBlueprintUrl()),
