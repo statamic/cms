@@ -111,6 +111,7 @@ export default {
             icon: this.tab.icon,
             editing: false,
             handleSyncedWithDisplay: false,
+            saveKeyBinding: null,
         };
     },
 
@@ -129,6 +130,28 @@ export default {
 
         iconSet() {
             return this.$config.get('replicatorSetIcons') || undefined;
+        },
+    },
+
+    watch: {
+        editing: {
+            handler(isEditing) {
+                if (isEditing) {
+                    // Bind Cmd+S to trigger confirm when a narrow stack is open
+                    this.saveKeyBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.editConfirmed();
+                    });
+                } else {
+                    // Unbind when stack is closed
+                    if (this.saveKeyBinding) {
+                        this.saveKeyBinding.destroy();
+                        this.saveKeyBinding = null;
+                    }
+                }
+            },
+            immediate: false,
         },
     },
 
@@ -174,6 +197,12 @@ export default {
         remove() {
             this.$emit('removed');
         },
+    },
+
+    beforeUnmount() {
+        if (this.saveKeyBinding) {
+            this.saveKeyBinding.destroy();
+        }
     },
 };
 </script>
