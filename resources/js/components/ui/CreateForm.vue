@@ -73,21 +73,23 @@ onMounted(() => {
             <ui-card-panel :heading="__('Details')">
                 <div class="space-y-8">
                     <ui-field
+                        id="title"
                         :label="__('Title')"
                         :instructions="titleInstructions"
                         :instructions-below="true"
                         :errors="errors.title"
                     >
-                        <ui-input v-model="title" autofocus />
+                        <ui-input id="title" v-model="title" autofocus />
                     </ui-field>
                     <ui-field
                         v-if="!withoutHandle"
+                        id="handle"
                         :label="__('Handle')"
                         :instructions="handleInstructions"
                         :instructions-below="true"
                         :errors="errors.handle"
                     >
-                        <ui-input v-model="handle" :loading="slug.busy" />
+                        <ui-input id="handle" v-model="handle" :loading="slug.busy" />
                     </ui-field>
                 </div>
             </ui-card-panel>

@@ -1,5 +1,15 @@
 <script setup>
-import { computed, nextTick, ref, watch, useTemplateRef, onBeforeUnmount, onUnmounted, onBeforeMount } from 'vue';
+import {
+    computed,
+    nextTick,
+    ref,
+    watch,
+    useTemplateRef,
+    onBeforeUnmount,
+    onUnmounted,
+    onBeforeMount,
+    toRaw,
+} from 'vue';
 import Resizer from './Resizer.vue';
 import {
     Select,
@@ -107,7 +117,7 @@ const update = debounce(() => {
         .then((response) => {
             token.value = response.data.token;
             const url = response.data.url;
-            const tgt = props.targets[target.value];
+            const tgt = toRaw(props.targets[target.value]);
             const payload = { token: token.value, reference: props.reference };
             poppedOut.value
                 ? channel.value.postMessage({ event: 'updated', url, target: tgt, payload })

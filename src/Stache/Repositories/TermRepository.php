@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Repositories;
 
+use Closure;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Contracts\Taxonomies\TermRepository as RepositoryContract;
 use Statamic\Exceptions\TaxonomyNotFoundException;
@@ -48,6 +49,10 @@ class TermRepository implements RepositoryContract
 
     public function whereInTaxonomy(array $handles): TermCollection
     {
+        if (empty($handles)) {
+            return TermCollection::make();
+        }
+
         collect($handles)
             ->reject(fn ($taxonomy) => Taxonomy::find($taxonomy))
             ->each(fn ($taxonomy) => throw new TaxonomyNotFoundException($taxonomy));
@@ -119,6 +124,16 @@ class TermRepository implements RepositoryContract
         }
 
         return $term;
+    }
+
+    public function findOrMake($id)
+    {
+        return $this->find($id) ?? $this->make();
+    }
+
+    public function findOr($id, Closure $callback)
+    {
+        return $this->find($id) ?? $callback();
     }
 
     public function save($term)
@@ -200,6 +215,10 @@ class TermRepository implements RepositoryContract
 
     public function applySubstitutions($items)
     {
+        if (empty($this->substitutionsById)) {
+            return $items;
+        }
+
         return $items->map(function ($item) {
             return $this->substitutionsById[$item->id()] ?? $item;
         });

@@ -28,7 +28,7 @@ const id = useId();
                 class="
                     relative flex h-full w-full items-center justify-center rounded-[50%]
                     border border-ui-accent-bg after:block after:h-[0.5rem] after:w-[0.5rem] after:rounded-[50%]
-                    after:bg-ui-accent-bg after:content-[''] dark:border-none dark:after:bg-dark-ui-accent-bg
+                    after:bg-ui-accent-bg after:content-[''] dark:border-none
                 "
             />
         </RadioGroupItem>

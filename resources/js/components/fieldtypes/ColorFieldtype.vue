@@ -2,7 +2,15 @@
     <div class="flex items-center">
         <!-- <div class="input-group w-auto" :class="{ 'max-w-[130px]': config.allow_any }"> -->
         <div class="flex items-center rounded-full relative border shadow-ui-sm">
-            <ui-popover ref="colorPopover" name="swatches" direction="bottom" class="md:w-[320px]" :open="popoverOpen" @update:open="popoverOpen = $event">
+            <ui-popover
+                ref="colorPopover"
+                name="swatches"
+                direction="bottom"
+                align="start"
+                class="md:w-[320px]"
+                :open="popoverOpen"
+                @update:open="popoverOpen = $event"
+            >
                 <template #trigger>
                     <button type="button" class="cursor-pointer size-9 border rounded-full flex items-center justify-center" :aria-label="__('Pick Color')">
                         <div

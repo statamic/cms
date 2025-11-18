@@ -2,7 +2,7 @@
     <set-picker :enabled="enabled" :sets="groups" :align="variant === 'between' ? 'center' : 'start'" @added="addSet">
         <template #trigger>
             <div class="flex relative pt-2" :class="{ 'pt-6': showConnector }" v-if="variant === 'button'">
-                <div v-if="showConnector" class="absolute group-hover:opacity-0 transition-opacity delay-25 duration-125 inset-y-0 h-full left-3.5 border-l-1 border-gray-400 dark:border-gray-600 border-dashed z-0 dark:bg-dark-700" />
+                <div v-if="showConnector" class="absolute group-hover:opacity-0 transition-opacity delay-25 duration-125 inset-y-0 h-full left-3.5 border-l-1 border-gray-400 dark:border-gray-600 border-dashed z-0 dark:bg-gray-850" />
                 <Button v-if="enabled" size="sm" :text="label" icon="plus" class="relative z-2" />
             </div>
             <div
@@ -12,7 +12,7 @@
             >
                 <div
                     v-if="showConnector"
-                    class="absolute group-hover:opacity-0 transition-opacity delay-10 duration-250 inset-y-0 left-3.5 border-l-1 border-gray-400 dark:border-gray-600 border-dashed z-0 dark:bg-dark-700"
+                    class="absolute group-hover:opacity-0 transition-opacity delay-10 duration-250 inset-y-0 left-3.5 border-l-1 border-gray-400 dark:border-gray-600 border-dashed z-0 dark:bg-gray-850"
                     :class="isFirst ? 'h-[50%] top-[50%] opacity-50' : 'h-full opacity-100'"
                 />
                 <button class="w-full absolute inset-0 h-full opacity-0 group-hover:opacity-100 transition-opacity delay-10 duration-250 cursor-pointer">

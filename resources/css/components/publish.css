@@ -111,7 +111,7 @@ Here flexbox is much better suited to create a layout that grows to fill space. 
 }
 
 .publish-section-header {
-    @apply rounded-t-lg border-b border-gray-400 bg-gray-100 dark:border-dark-900 dark:bg-dark-700;
+    @apply rounded-t-lg border-b border-gray-400 bg-gray-100 dark:border-dark-900 dark:bg-gray-850;
 }
 
 .publish-section-header-inner {

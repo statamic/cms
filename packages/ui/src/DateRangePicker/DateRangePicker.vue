@@ -102,17 +102,17 @@ const calendarEvents = computed(() => ({
             <DateRangePickerField v-slot="{ segments }" class="w-full">
                 <div
                     :class="[
-                        'flex w-full bg-white dark:bg-gray-900',
+                        'flex items-center w-full bg-white dark:bg-gray-900',
                         'border border-gray-300 dark:border-x-0 dark:border-t-0 dark:border-white/10 dark:inset-shadow-2xs dark:inset-shadow-black',
                         'leading-[1.375rem] text-gray-600 dark:text-gray-300',
-                        'shadow-ui-sm not-prose h-10 rounded-lg py-2 px-3 disabled:shadow-none',
+                        'shadow-ui-sm not-prose h-10 rounded-lg py-2 px-2.5 disabled:shadow-none',
                         'data-invalid:border-red-500',
                         'disabled:shadow-none disabled:opacity-50',
                         readOnly ? 'border-dashed' : '',
                     ]"
                 >
                     <DateRangePickerTrigger v-if="!inline">
-                        <Button as="div" variant="ghost" size="sm" icon="calendar" class="-my-1.25 -ms-2" />
+                        <Button as="div" variant="ghost" size="sm" icon="calendar" class="-ms-2" />
                     </DateRangePickerTrigger>
                     <template v-for="item in segments.start" :key="item.part">
                         <DateRangePickerInput v-if="item.part === 'literal'" :part="item.part" type="start">
@@ -121,16 +121,16 @@ const calendarEvents = computed(() => ({
                         <DateRangePickerInput
                             v-else
                             :part="item.part"
-                            class="rounded-sm px-0.25 py-0.5 focus:bg-gray-50 focus:outline-hidden data-placeholder:text-gray-600 dark:focus:bg-gray-800 dark:data-placeholder:text-gray-400"
+                            class="rounded-sm py-0.5 focus:bg-blue-100 focus:outline-hidden data-placeholder:text-gray-600 dark:focus:bg-gray-800 dark:data-placeholder:text-gray-400"
                             :class="{
-                                'px-0.5!': item.part === 'month' || item.part === 'year' || item.part === 'day',
+                                'px-0.25!': item.part === 'month' || item.part === 'year' || item.part === 'day',
                             }"
                             type="start"
                         >
                             {{ item.value }}
                         </DateRangePickerInput>
                     </template>
-                    <span class="mx-1.5 text-gray-400 dark:text-gray-600">&ndash;</span>
+                    <span class="mx-0.75 text-gray-400 dark:text-gray-600">&ndash;</span>
                     <template v-for="item in segments.end" :key="item.part">
                         <DateRangePickerInput v-if="item.part === 'literal'" :part="item.part" type="end">
                             {{ item.value }}
@@ -138,9 +138,9 @@ const calendarEvents = computed(() => ({
                         <DateRangePickerInput
                             v-else
                             :part="item.part"
-                            class="rounded-sm px-0.25 py-0.5 focus:bg-gray-50 focus:outline-hidden data-placeholder:text-gray-600 dark:focus:bg-gray-800 dark:data-placeholder:text-gray-400"
+                            class="rounded-sm py-0.5 focus:bg-blue-100 focus:outline-hidden data-placeholder:text-gray-600 dark:focus:bg-gray-800 dark:data-placeholder:text-gray-400"
                             :class="{
-                                'px-0.5!': item.part === 'month' || item.part === 'year' || item.part === 'day',
+                                'px-0.25!': item.part === 'month' || item.part === 'year' || item.part === 'day',
                             }"
                             type="end"
                         >
@@ -148,13 +148,15 @@ const calendarEvents = computed(() => ({
                         </DateRangePickerInput>
                     </template>
                     <div class="flex-1" />
-                    <Button v-if="!readOnly" @click="emit('update:modelValue', null)" variant="ghost" size="sm" icon="x" class="-my-1.25 -me-2" :disabled="disabled" />
+                    <Button v-if="!readOnly" @click="emit('update:modelValue', null)" variant="subtle" size="sm" icon="x" class="-me-2" :disabled="disabled" />
                 </div>
             </DateRangePickerField>
 
             <DateRangePickerContent
                 v-if="!inline"
-                :side-offset="4"
+                align="start"
+                :align-offset="-12"
+                :side-offset="14"
                 class="data-[state=open]:data-[side=top]:animate-slideDownAndFade data-[state=open]:data-[side=right]:animate-slideLeftAndFade data-[state=open]:data-[side=bottom]:animate-slideUpAndFade data-[state=open]:data-[side=left]:animate-slideRightAndFade will-change-[transform,opacity]"
             >
                 <Card class="w-[20rem]">
