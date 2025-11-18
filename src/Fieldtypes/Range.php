@@ -18,19 +18,22 @@ class Range extends Fieldtype
                     'min' => [
                         'display' => __('Min'),
                         'instructions' => __('statamic::fieldtypes.range.config.min'),
-                        'type' => 'integer',
+                        'type' => 'text',
+                        'input_type' => 'number',
                         'default' => 0,
                     ],
                     'max' => [
                         'display' => __('Max'),
                         'instructions' => __('statamic::fieldtypes.range.config.max'),
-                        'type' => 'integer',
+                        'type' => 'text',
+                        'input_type' => 'number',
                         'default' => 100,
                     ],
                     'step' => [
                         'display' => __('Step'),
                         'instructions' => __('statamic::fieldtypes.range.config.step'),
-                        'type' => 'integer',
+                        'type' => 'text',
+                        'input_type' => 'number',
                         'default' => 1,
                     ],
                     'default' => [
@@ -62,11 +65,33 @@ class Range extends Fieldtype
 
     public function process($data)
     {
+        if ($this->usesDecimals()) {
+            return (float) $data;
+        }
+
         return (int) $data;
+    }
+
+    protected function usesDecimals(): bool
+    {
+        $step = $this->config('step', 1);
+        $min = $this->config('min', 0);
+        $max = $this->config('max', 100);
+
+        return $this->isDecimal($step) || $this->isDecimal($min) || $this->isDecimal($max);
+    }
+
+    protected function isDecimal($value): bool
+    {
+        if (! is_numeric($value)) {
+            return false;
+        }
+
+        return floor((float) $value) != (float) $value;
     }
 
     public function toGqlType()
     {
-        return GraphQL::int();
+        return $this->usesDecimals() ? GraphQL::float() : GraphQL::int();
     }
 }
