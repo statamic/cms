@@ -62,6 +62,7 @@ export {
     ListingTableHead,
     ListingToggleAll,
     LivePreview,
+    LivePreviewPopout,
     Modal,
     ModalClose,
     ModalTitle,
