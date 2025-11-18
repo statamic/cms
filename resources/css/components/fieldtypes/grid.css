@@ -1,6 +1,5 @@
-/* ==========================================================================
-   Grid Fieldtype
-   ========================================================================== */
+/* GRID FIELDTYPE 
+=================================================== */
 @layer ui {
     .grid-table {
         @apply bg-white dark:bg-gray-900 relative w-full rounded-lg border shadow-ui-sm outline-hidden dark:border-gray-700 dark:text-dark-150 text-start;
@@ -100,4 +99,32 @@
     .grid-item-header {
         @apply flex cursor-move items-center justify-between border-b bg-gray-200 px-4 py-2 text-sm outline-hidden;
     }
+}
+
+/* GRID FIELDTYPE / Assets fieldtype in a grid fieldtype
+=================================================== */
+/* Table UI mode */
+.grid-table .grid-cell.assets-fieldtype:not(:has([data-asset-picker])) > *,
+/* Stacked UI mode */
+.grid-stacked [data-asset-browser]:not(:has([data-asset-picker])) {
+    /* Wrap a border around the container instead of dealing with complex nested table elements, because borders and border-radius don't work as expected with nested table elements */
+    @apply border-gray-300 dark:border-gray-700 border-1 rounded-lg;
+    /* Prevent the descended table elements from inheriting this, such as the img thumbnail and the delete button */
+    *:not(button, button *) {
+        @apply rounded-lg border-none;
+    }
+}
+/* GRID FIELDTYPE / Assets fieldtype in a grid fieldtype / Row Compression
+=================================================== */
+/* When a grid field has at least 2 columns (so 3 including the menu control) change the presentation and compress the padding so it fits in with the other grid cells */
+/* Table UI Mode */
+.grid-table tr:has(> :nth-child(3)) .grid-cell.assets-fieldtype:not(:has([data-asset-picker])) > * {
+    @apply shadow-ui-sm;
+    td {
+        padding: 0.3125rem;
+    }
+}
+/* Stacked UI mode */
+.grid-stacked:not(:has([data-asset-picker])) .publish-fields:has(> :nth-child(3)) .assets-fieldtype td {
+    padding: 0.3125rem;
 }
