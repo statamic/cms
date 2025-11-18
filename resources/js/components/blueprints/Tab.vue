@@ -70,7 +70,7 @@
                         </publish-field-meta>
                     </Field>
                     <div class="py-4 space-x-2">
-                        <ui-button :text="__('Confirm')" @click="editConfirmed" variant="primary" />
+                        <ui-button :text="__('Save')" @click="editAndSave" variant="primary" />
                         <ui-button :text="__('Cancel')" @click="editCancelled" variant="ghost" />
                     </div>
                 </div>
@@ -137,11 +137,11 @@ export default {
         editing: {
             handler(isEditing) {
                 if (isEditing) {
-                    // Bind Cmd+S to trigger confirm when a narrow stack is open
+                    // Bind Cmd+S to trigger save when a narrow stack is open
                     this.saveKeyBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        this.editConfirmed();
+                        this.editAndSave();
                     });
                 } else {
                     // Unbind when stack is closed
@@ -174,6 +174,16 @@ export default {
             });
 
             this.editing = false;
+        },
+
+        editAndSave() {
+            // First confirm the tab changes
+            this.editConfirmed();
+            
+            // Then trigger the blueprint save
+            this.$nextTick(() => {
+                this.$events.$emit('root-form-save');
+            });
         },
 
         editCancelled() {
