@@ -4,7 +4,10 @@ namespace Statamic\Assets;
 
 use Statamic\Data\DataReferenceUpdater;
 use Statamic\Facades\AssetContainer;
+use Statamic\Fieldtypes\Sets;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
+use Statamic\Tags\Set;
 
 class AssetReferenceUpdater extends DataReferenceUpdater
 {
@@ -341,6 +344,13 @@ class AssetReferenceUpdater extends DataReferenceUpdater
      */
     protected function updateBlueprintFields()
     {
+        if (
+            ! Sets::previewImageConfig()
+            || ! Str::startsWith($this->originalValue, Sets::previewImageConfig()['folder'].'/')
+        ) {
+            return;
+        }
+
         $contents = $this->item->contents();
 
         $fieldPaths = $this->findFieldsInBlueprintContents($contents, fieldtypes: ['bard', 'replicator']);
@@ -360,9 +370,13 @@ class AssetReferenceUpdater extends DataReferenceUpdater
 
                     $setGroup['sets'] = collect($setGroup['sets'])
                         ->map(function ($set) {
-                            if (isset($set['image']) && $set['image'] === $this->originalValue) {
-                                $set['image'] = $this->newValue;
-                                $this->updated = true;
+                            if (isset($set['image'])) {
+                                $fullPath = Sets::previewImageConfig()['folder'].'/'.$set['image'];
+
+                                if ($fullPath === $this->originalValue) {
+                                    $set['image'] = Str::after($this->newValue, Sets::previewImageConfig()['folder'].'/');
+                                    $this->updated = true;
+                                }
                             }
 
                             return $set;
@@ -376,6 +390,8 @@ class AssetReferenceUpdater extends DataReferenceUpdater
             Arr::set($contents, $fieldPath, $fieldContents);
         }
 
-        $this->item->setContents($contents);
+        if ($this->updated) {
+            $this->item->setContents($contents);
+        }
     }
 }
