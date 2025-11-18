@@ -112,7 +112,7 @@ const calendarEvents = computed(() => ({
                     ]"
                 >
                     <DateRangePickerTrigger v-if="!inline">
-                        <Button as="div" variant="ghost" size="sm" icon="calendar" class="-my-1.25 -ms-2" />
+                        <Button as="div" variant="ghost" size="sm" icon="calendar" class="-ms-2" />
                     </DateRangePickerTrigger>
                     <template v-for="item in segments.start" :key="item.part">
                         <DateRangePickerInput v-if="item.part === 'literal'" :part="item.part" type="start">
@@ -148,7 +148,7 @@ const calendarEvents = computed(() => ({
                         </DateRangePickerInput>
                     </template>
                     <div class="flex-1" />
-                    <Button v-if="!readOnly" @click="emit('update:modelValue', null)" variant="ghost" size="sm" icon="x" class="-my-1.25 -me-2" :disabled="disabled" />
+                    <Button v-if="!readOnly" @click="emit('update:modelValue', null)" variant="ghost" size="sm" icon="x" class="-me-2" :disabled="disabled" />
                 </div>
             </DateRangePickerField>
 
