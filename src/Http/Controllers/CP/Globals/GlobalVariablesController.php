@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Globals;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Statamic\Facades\Action;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -63,6 +64,8 @@ class GlobalVariablesController extends CpController
             'canConfigure' => $user->can('configure', $variables),
             'configureUrl' => $set->editUrl(),
             'canDelete' => $user->can('delete', $variables),
+            'itemActions' => Action::for($set, ['view' => 'form']),
+            'actionUrl' => cp_route('globals.actions.run'),
         ];
 
         if ($request->wantsJson()) {

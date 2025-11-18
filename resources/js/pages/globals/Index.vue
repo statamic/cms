@@ -1,13 +1,15 @@
 <script setup>
 import Head from '@/pages/layout/Head.vue';
 import { Link } from '@inertiajs/vue3';
-import { Header, CommandPaletteItem, Button, Icon, EmptyStateMenu, EmptyStateItem, CardList, CardListItem, Dropdown, DropdownMenu, DropdownItem, DocsCallout } from '@ui';
+import { Header, CommandPaletteItem, Button, Icon, EmptyStateMenu, EmptyStateItem, DocsCallout, Listing, DropdownItem } from '@ui';
 import useArchitecturalBackground from '@/pages/layout/architectural-background.js';
 
 const props = defineProps({
     globals: Array,
+    columns: Array,
     createUrl: String,
     canCreate: Boolean,
+    actionUrl: String,
 });
 
 if (props.globals.length === 0) useArchitecturalBackground();
@@ -17,38 +19,46 @@ if (props.globals.length === 0) useArchitecturalBackground();
     <Head :title="__('Global Sets')" />
 
     <div class="max-w-5xl mx-auto">
-        <template v-if="globals.length">
-            <Header :title="__('Globals')" icon="globals">
-                <CommandPaletteItem
-                    v-if="canCreate"
-                    category="Actions"
-                    prioritize
-                    :text="__('Create Global Set')"
-                    :url="createUrl"
-                    icon="globals"
-                    v-slot="{ text, url }"
-                >
-                    <Button
-                        :text="text"
-                        :href="url"
-                        variant="primary"
-                    />
-                </CommandPaletteItem>
-            </Header>
+        <Header v-if="globals.length" :title="__('Globals')" icon="globals">
+            <CommandPaletteItem
+                v-if="canCreate"
+                category="Actions"
+                prioritize
+                :text="__('Create Global Set')"
+                :url="createUrl"
+                icon="globals"
+                v-slot="{ text, url }"
+            >
+                <Button
+                    :text="text"
+                    :href="url"
+                    variant="primary"
+                />
+            </CommandPaletteItem>
+        </Header>
 
-            <CardList :heading="__('Title')">
-                <CardListItem v-for="global in globals" :key="global.id">
-                    <Link class="text-sm" :href="global.edit_url" v-tooltip="global.handle">{{ __(global.title) }}</Link>
-                    <Dropdown>
-                        <DropdownMenu>
-                            <DropdownItem :text="__('Edit')" icon="edit" :href="global.edit_url" />
-                            <DropdownItem v-if="global.configurable" :text="__('Configure')" icon="cog" :href="global.configure_url" />
-                            <DropdownItem v-if="global.deleteable" :text="__('Delete')" icon="trash" variant="destructive" @click="$refs[`deleter_${global.id}`][0].confirm()" />
-                        </DropdownMenu>
-                    </Dropdown>
+        <template v-if="globals.length">
+            <Listing
+                :items="globals"
+                :columns="columns"
+                :action-url="actionUrl"
+                :allow-search="false"
+                :allow-customizing-columns="false"
+            >
+                <template #cell-title="{ row: global }">
+                    <Link :href="global.edit_url" v-tooltip="global.handle">{{ __(global.title) }}</Link>
+
                     <resource-deleter :ref="`deleter_${global.id}`" :resource="global" reload />
-                </CardListItem>
-            </CardList>
+                </template>
+                <template #cell-handle="{ row: global }">
+                    <span class="font-mono text-2xs">{{ global.handle }}</span>
+                </template>
+                <template #prepended-row-actions="{ row: global }">
+                    <DropdownItem :text="__('Edit')" icon="edit" :href="global.edit_url" />
+                    <DropdownItem v-if="global.configurable" :text="__('Configure')" icon="cog" :href="global.configure_url" />
+                    <DropdownItem v-if="global.deleteable" :text="__('Delete')" icon="trash" variant="destructive" @click="$refs[`deleter_${global.id}`].confirm()" />
+                </template>
+            </Listing>
         </template>
 
         <template v-else>

@@ -5,8 +5,10 @@ namespace Statamic\Http\Controllers\CP\Navigation;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Statamic\Contracts\Structures\Nav as NavContract;
+use Statamic\CP\Column;
 use Statamic\CP\PublishForm;
 use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Action;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Nav;
 use Statamic\Facades\Site;
@@ -21,6 +23,10 @@ class NavigationController extends CpController
     {
         $this->authorize('index', NavContract::class, __('You are not authorized to view navs.'));
 
+        $columns = [
+            Column::make('title')->label(__('Title')),
+        ];
+
         $navs = Nav::all()->filter(function ($nav) {
             return User::current()->can('configure navs')
                 || ($nav->sites()->contains(Site::selected()->handle()) && User::current()->can('view', $nav));
@@ -33,11 +39,16 @@ class NavigationController extends CpController
                 'delete_url' => $structure->deleteUrl(),
                 'deleteable' => User::current()->can('delete', $structure),
                 'available_in_selected_site' => $structure->sites()->contains(Site::selected()->handle()),
+                'actions' => Action::for($structure, ['view' => 'list']),
             ];
         })->values();
 
+        $hasActions = $navs->flatMap->actions->isNotEmpty();
+
         return Inertia::render('navigation/Index', [
             'navs' => $navs->all(),
+            'columns' => $columns,
+            'actionUrl' => $hasActions ? cp_route('navigation.actions.run') : null,
             'canCreate' => User::current()->can('create', NavContract::class),
             'createUrl' => cp_route('navigation.create'),
         ]);
@@ -101,6 +112,8 @@ class NavigationController extends CpController
             'initialMaxDepth' => $nav->maxDepth(),
             'expectsRoot' => $nav->expectsRoot(),
             'blueprint' => $nav->blueprint()->toPublishArray(),
+            'itemActions' => Action::for($nav, ['view' => 'form']),
+            'actionUrl' => cp_route('navigation.actions.run'),
             'canEdit' => User::current()->can('edit', $nav),
             'canSelectAcrossSites' => $nav->canSelectAcrossSites(),
             'canEditBlueprint' => User::current()->can('configure fields'),

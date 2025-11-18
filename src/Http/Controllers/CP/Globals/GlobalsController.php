@@ -5,7 +5,9 @@ namespace Statamic\Http\Controllers\CP\Globals;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Statamic\Contracts\Globals\GlobalSet as GlobalSetContract;
+use Statamic\CP\Column;
 use Statamic\CP\PublishForm;
+use Statamic\Facades\Action;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
@@ -18,6 +20,11 @@ class GlobalsController extends CpController
 {
     public function index()
     {
+        $columns = [
+            Column::make('title')->label(__('Title')),
+            Column::make('handle')->label(__('Handle')),
+        ];
+
         $globals = GlobalSet::all()->filter(function ($set) {
             return User::current()->can('view', $set);
         })->tap(function ($globals) {
@@ -38,11 +45,16 @@ class GlobalsController extends CpController
                 'edit_url' => $localized ? $localized->editUrl() : $set->editUrl(),
                 'configure_url' => $set->editUrl(),
                 'delete_url' => $set->deleteUrl(),
+                'actions' => Action::for($set, ['view' => 'list']),
             ];
         })->filter()->sortBy('title')->values();
 
+        $hasActions = $globals->flatMap->actions->isNotEmpty();
+
         return Inertia::render('globals/Index', [
             'globals' => $globals,
+            'columns' => $columns,
+            'actionUrl' => $hasActions ? cp_route('globals.actions.run') : null,
             'createUrl' => cp_route('globals.create'),
             'canCreate' => User::current()->can('create', GlobalSetContract::class),
         ]);
