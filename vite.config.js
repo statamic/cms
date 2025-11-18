@@ -46,6 +46,14 @@ export default defineConfig(({ mode, command }) => {
         },
         build: {
             rollupOptions: {
+                onwarn(warning, warn) {
+                    // Suppress warning about dynamic imports mixed with static imports for inertia. UI package dynamically
+                    // imports Inertia to make it optional, while the main CMS app statically imports it since it's required.
+                    if (warning.message && warning.message.includes('@inertiajs/vue3') && warning.message.includes('dynamically imported')) {
+                        return;
+                    }
+                    warn(warning);
+                },
                 output: {
                     plugins: [visualizer({ filename: 'bundle-stats.html' })]
                 },
