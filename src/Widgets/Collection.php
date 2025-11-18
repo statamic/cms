@@ -8,6 +8,7 @@ use Statamic\Facades\Collection as CollectionAPI;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+
 use function Statamic\trans as __;
 
 class Collection extends Widget
