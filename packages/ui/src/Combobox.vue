@@ -206,6 +206,7 @@ function deselect(option) {
 
 const dropdownOpen = ref(false);
 const closeOnSelect = computed(() => props.closeOnSelect || !props.multiple);
+const optionWidth = ref(null);
 
 function updateDropdownOpen(open) {
     if (props.disabled) return;
@@ -216,6 +217,42 @@ function updateDropdownOpen(open) {
     }
 
     dropdownOpen.value = open;
+
+    if (open) {
+        nextTick(() => measureOptionWidths());
+    }
+}
+
+function measureOptionWidths() {
+    if (!filteredOptions.value || filteredOptions.value.length === 0) return;
+
+    let maxWidth = 0;
+    const measurementCanvas = document.createElement('canvas');
+    const context = measurementCanvas.getContext('2d');
+
+    // Get computed font from a rendered item or use a reasonable default
+    // This matches the itemClasses styling
+    context.font = '14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
+    // Measure all options to find the widest
+    filteredOptions.value.forEach(option => {
+        const label = getOptionLabel(option);
+        const metrics = context.measureText(label);
+        const textWidth = metrics.width;
+
+        // Add padding and icon space
+        // py-1.5 px-2 = 0.375rem top/bottom, 0.5rem left/right = 8px left/right = 16px total
+        // gap-2 = 0.5rem = 8px for icon/text gap
+        // icon size-4 = 1rem = 16px
+        let totalWidth = textWidth + 32; // Base padding
+
+        if (option.image) totalWidth += 20; // icon (20px) + gap (8px)
+        if (totalWidth > maxWidth) maxWidth = totalWidth;
+    });
+
+    // Add ComboboxContent padding (p-2 = 0.5rem * 2 = 16px on each side = 32px total)
+    // Add some buffer for scrollbar and safety margin
+    optionWidth.value = Math.ceil(maxWidth + 32 + 20);
 }
 
 function updateModelValue(value) {
@@ -349,11 +386,13 @@ defineExpose({
                     <ComboboxContent
                         position="popper"
                         :side-offset="5"
+                        align="start"
                         :class="[
                             'shadow-ui-sm z-(--z-index-above) rounded-lg border border-gray-200 bg-white p-2 dark:border-white/10 dark:bg-gray-800',
-                            'max-h-[var(--reka-combobox-content-available-height)] w-[var(--reka-combobox-trigger-width)] min-w-fit',
+                            'max-h-[var(--reka-combobox-content-available-height)] min-w-[var(--reka-combobox-trigger-width)]',
                             'overflow-hidden'
                         ]"
+                        :style="optionWidth ? { width: `${optionWidth}px` } : {}"
                         data-ui-combobox-content
                         @escape-key-down="nextTick(() => $refs.trigger.$el.focus())"
                     >
