@@ -11,7 +11,7 @@ const props = defineProps({
 </script>
 
 <template>
-    <div class="text-sm font-normal text-gray-600 dark:text-gray-400 st-text-trim-start [&_a]:underline [&_a:hover]:text-gray-700 dark:[&_a:hover]:text-gray-300 [&_code]:px-0.5 [&_code]:rounded-sm" data-ui-description>
+    <div class="text-sm font-normal text-gray-600/90 dark:text-gray-400 st-text-trim-start [&_a]:underline [&_a:hover]:text-gray-700 dark:[&_a:hover]:text-gray-300 [&_code]:px-0.5 [&_code]:rounded-sm" data-ui-description>
         <slot v-if="hasDefaultSlot" />
         <span v-else v-html="text" />
     </div>
