@@ -716,7 +716,7 @@ class CoreModifiers extends Modifier
      */
     public function explode($value, $params)
     {
-        return explode(Arr::get($params, 0), $value);
+        return explode(Arr::get($params, 0), $value, Arr::get($params, 1, PHP_INT_MAX));
     }
 
     /**
