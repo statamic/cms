@@ -10,7 +10,7 @@ const props = defineProps({
 </script>
 
 <template>
-    <div class="text-sm font-normal text-red-600 st-text-trim-start [[data-ui-panel-header]_&]:text-red-600 [&_a]:underline [&_a:hover]:text-red-700 dark:[&_a:hover]:text-red-300" data-ui-error-message>
+    <div class="text-sm font-normal text-red-600 st-text-trim-start text-pretty @5xl/panel:text-balance [[data-ui-panel-header]_&]:text-red-600 [&_a]:underline [&_a:hover]:text-red-700 dark:[&_a:hover]:text-red-300" data-ui-error-message>
         <slot v-if="hasDefaultSlot" />
         <span v-else v-html="text" />
     </div>

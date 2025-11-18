@@ -246,7 +246,7 @@ const resetters = ref({});
                             <td>
                                 <div class="flex items-center gap-2">
                                     <Icon name="blueprints" class="text-gray-500 me-1" />
-                                    <Link :href="cp_url(`blueprints/additional/${blueprint.namespace}/${blueprint.handle}/edit`)" v-text="__(blueprint.title)" />
+                                    <Link :href="blueprint.edit_url" v-text="__(blueprint.title)" />
                                 </div>
                             </td>
                             <td class="actions-column">
