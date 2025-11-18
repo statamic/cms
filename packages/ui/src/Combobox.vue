@@ -164,6 +164,7 @@ const limitIndicatorColor = computed(() => {
     return 'text-gray';
 });
 
+const triggerRef = useTemplateRef('trigger');
 const searchQuery = ref('');
 const searchInputRef = useTemplateRef('search');
 
@@ -304,6 +305,11 @@ function openDropdown(e) {
     nextTick(() => searchInputRef?.value?.$el?.focus());
 }
 
+function selectOption(option) {
+    dropdownOpen.value = !closeOnSelect.value;
+    if (closeOnSelect.value) triggerRef.value.$el.focus();
+}
+
 defineExpose({
     searchQuery,
     filteredOptions,
@@ -428,10 +434,7 @@ defineExpose({
                                             :class="itemClasses({ size: size, selected: isSelected(option) })"
                                             as="button"
                                             :data-ui-combobox-item="getOptionValue(option)"
-                                            @select="() => {
-                                        dropdownOpen = !closeOnSelect;
-                                        if (closeOnSelect) $refs.trigger.$el.focus();
-                                    }"
+                                            @select="selectOption(option)"
                                         >
                                             <slot name="option" v-bind="option">
                                                 <img v-if="option.image" :src="option.image" class="size-5 rounded-full flex-shrink-0" />
