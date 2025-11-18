@@ -130,7 +130,7 @@ const calendarEvents = computed(() => ({
                             {{ item.value }}
                         </DateRangePickerInput>
                     </template>
-                    <span class="mx-0.5 text-gray-400 dark:text-gray-600">&ndash;</span>
+                    <span class="mx-0.75 text-gray-400 dark:text-gray-600">&ndash;</span>
                     <template v-for="item in segments.end" :key="item.part">
                         <DateRangePickerInput v-if="item.part === 'literal'" :part="item.part" type="end">
                             {{ item.value }}
