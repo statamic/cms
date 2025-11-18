@@ -34,12 +34,10 @@ class Collection extends Widget
         $blueprints = $collection
             ->entryBlueprints()
             ->reject->hidden()
-            ->map(function ($blueprint) {
-                return [
-                    'handle' => $blueprint->handle(),
-                    'title' => __($blueprint->title()),
-                ];
-            })->values();
+            ->map(fn ($blueprint) => [
+                'handle' => $blueprint->handle(),
+                'title' => __($blueprint->title()),
+            ])->values();
 
         $blueprint = $collection->entryBlueprint();
 
