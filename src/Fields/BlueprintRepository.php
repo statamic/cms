@@ -347,7 +347,7 @@ class BlueprintRepository
                 ->setInitialPath($path)
                 ->setNamespace($namespace ?? null)
                 ->setContents($contents);
-        });
+        })->setParent(null);
     }
 
     protected function getNamespaceAndHandle($blueprint)
