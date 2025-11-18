@@ -6,7 +6,9 @@ use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Column;
 use Statamic\Facades\Collection as CollectionAPI;
 use Statamic\Facades\Scope;
+use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use function Statamic\trans as __;
 
 class Collection extends Widget
 {
@@ -28,7 +30,18 @@ class Collection extends Widget
 
         [$sortColumn, $sortDirection] = $this->parseSort($collection);
 
+        $blueprints = $collection
+            ->entryBlueprints()
+            ->reject->hidden()
+            ->map(function ($blueprint) {
+                return [
+                    'handle' => $blueprint->handle(),
+                    'title' => __($blueprint->title()),
+                ];
+            })->values();
+
         $blueprint = $collection->entryBlueprint();
+
         $columns = $blueprint
             ->columns()
             ->put('status', Column::make('status')
@@ -52,7 +65,10 @@ class Collection extends Widget
             'initialPerPage' => $this->config('limit', 5),
             'canCreate' => User::current()->can('create', [EntryContract::class, $collection]) && $collection->hasVisibleEntryBlueprint(),
             'createLabel' => $collection->createLabel(),
-            'blueprints' => $collection->entryBlueprints()->reject->hidden()->values(),
+            'blueprints' => $blueprints->map(fn ($blueprint) => [
+                ...$blueprint,
+                'createEntryUrl' => cp_route('collections.entries.create', [$collection->handle(), Site::selected(), 'blueprint' => $blueprint['handle']]),
+            ])->all(),
             'listingUrl' => cp_route('collections.show', $collection),
         ]);
     }
