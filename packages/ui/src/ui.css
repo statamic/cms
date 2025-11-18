@@ -96,6 +96,7 @@
     --text-3xs: 0.5rem;
     --text-2xs: 0.7rem;
     --text-xs: 0.825rem;
+    --text-md: 0.925rem;
 
     --tracking-tight: -0.01em;
 
@@ -110,6 +111,8 @@
     --shadow-ui-xl: 0px 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
 
     --animate-wiggle: wiggle 200ms ease-in-out infinite;
+
+    --font-sans: 'Inter', system-ui, sans-serif;
 
     @keyframes wiggle {
         0%,
