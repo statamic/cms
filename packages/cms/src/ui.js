@@ -92,6 +92,7 @@ export const {
     SplitterGroup,
     SplitterPanel,
     SplitterResizeHandle,
+    StatamicUI,
     StatusIndicator,
     Subheading,
     Switch,
