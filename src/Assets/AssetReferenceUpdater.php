@@ -373,10 +373,17 @@ class AssetReferenceUpdater extends DataReferenceUpdater
                             if (isset($set['image'])) {
                                 $fullPath = Sets::previewImageConfig()['folder'].'/'.$set['image'];
 
-                                if ($fullPath === $this->originalValue) {
-                                    $set['image'] = Str::after($this->newValue, Sets::previewImageConfig()['folder'].'/');
-                                    $this->updated = true;
+                                if ($fullPath !== $this->originalValue) {
+                                    return $set;
                                 }
+
+                                if (Str::startsWith($this->newValue, Sets::previewImageConfig()['folder'].'/')) {
+                                    $set['image'] = Str::after($this->newValue, Sets::previewImageConfig()['folder'].'/');
+                                } else {
+                                    unset($set['image']);
+                                }
+
+                                $this->updated = true;
                             }
 
                             return $set;

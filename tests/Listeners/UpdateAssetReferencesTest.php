@@ -1996,6 +1996,92 @@ EOT;
     }
 
     #[Test]
+    public function it_removes_preview_image_from_set_config_when_asset_is_moved_out_of_configured_folder()
+    {
+        $this->assetHoff->path('set-previews/hoff.jpg')->save();
+
+        config()->set('statamic.assets.set_preview_images', [
+            'container' => 'test_container',
+            'folder' => 'set-previews',
+        ]);
+
+        $collection = tap(Facades\Collection::make('articles'))->save();
+        $blueprint = $collection->entryBlueprint();
+
+        $blueprint->setContents([
+            'fields' => [
+                [
+                    'handle' => 'content',
+                    'field' => [
+                        'type' => 'bard',
+                        'sets' => [
+                            'set_group' => [
+                                'sets' => [
+                                    'first_set' => [
+                                        'image' => 'hoff.jpg',
+                                        'fields' => [['handle' => 'foo', 'field' => ['type' => 'text']]],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $blueprint = Facades\Blueprint::find($blueprint->fullyQualifiedHandle());
+        $this->assertEquals('hoff.jpg', Arr::get($blueprint->contents(), 'tabs.main.sections.0.fields.1.field.sets.set_group.sets.first_set.image'));
+
+        $this->assetHoff->path('other-folder/hoff.jpg')->save();
+
+        $blueprint = Facades\Blueprint::find($blueprint->fullyQualifiedHandle());
+        $this->assertFalse(Arr::has($blueprint->contents(), 'tabs.main.sections.0.fields.1.field.sets.set_group.sets.first_set.image'));
+    }
+
+    #[Test]
+    public function it_removes_preview_image_from_set_config_when_asset_is_deleted()
+    {
+        $this->assetHoff->path('set-previews/hoff.jpg')->save();
+
+        config()->set('statamic.assets.set_preview_images', [
+            'container' => 'test_container',
+            'folder' => 'set-previews',
+        ]);
+
+        $collection = tap(Facades\Collection::make('articles'))->save();
+        $blueprint = $collection->entryBlueprint();
+
+        $blueprint->setContents([
+            'fields' => [
+                [
+                    'handle' => 'content',
+                    'field' => [
+                        'type' => 'bard',
+                        'sets' => [
+                            'set_group' => [
+                                'sets' => [
+                                    'first_set' => [
+                                        'image' => 'hoff.jpg',
+                                        'fields' => [['handle' => 'foo', 'field' => ['type' => 'text']]],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $blueprint = Facades\Blueprint::find($blueprint->fullyQualifiedHandle());
+        $this->assertEquals('hoff.jpg', Arr::get($blueprint->contents(), 'tabs.main.sections.0.fields.1.field.sets.set_group.sets.first_set.image'));
+
+        $this->assetHoff->delete();
+
+        $blueprint = Facades\Blueprint::find($blueprint->fullyQualifiedHandle());
+        $this->assertFalse(Arr::has($blueprint->contents(), 'tabs.main.sections.0.fields.1.field.sets.set_group.sets.first_set.image'));
+    }
+
+    #[Test]
     public function it_doesnt_update_references_in_set_configs_unless_path_contains_set_preview_images_folder()
     {
         config()->set('statamic.assets.set_preview_images', [
