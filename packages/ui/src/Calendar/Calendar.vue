@@ -16,6 +16,7 @@ import {
 } from 'reka-ui';
 import { parseAbsolute } from '@internationalized/date';
 import Icon from '../Icon/Icon.vue';
+import $date from '../util/DateFormatter';
 
 defineOptions({ name: 'Calendar' });
 
