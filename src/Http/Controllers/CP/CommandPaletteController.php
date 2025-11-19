@@ -20,7 +20,7 @@ class CommandPaletteController extends CpController
 
     public function search(Request $request)
     {
-        return Search::index(locale: Site::selected()->handle())
+        return Search::index(index: 'cp', locale: Site::selected()->handle())
             ->ensureExists()
             ->search($request->query('q'))
             ->get()

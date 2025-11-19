@@ -73,6 +73,7 @@ class Update extends Command
 
         // They might have entered a name as it appears in the config, but if it
         // should be localized we'll get all of the localized versions.
+        // todo: do we need to do anything here to make our cp index work?
         if (collect(config('statamic.search.indexes'))->has($arg)) {
             return $this->indexes()->filter(fn ($index) => Str::startsWith($index->name(), $arg))->all();
         }
