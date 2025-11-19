@@ -34,13 +34,14 @@ class Searchables
             throw new AllSearchablesNotSupported("'searchables' => 'all' is no longer supported. Please see the upgrade guide for more information: https://statamic.dev/getting-started/upgrade-guide/5-to-6");
         }
 
-        if ($providers->contains('content')) {
-            return $manager->providers()
-                ->filter(fn ($_, $key) => in_array($key, ['collection', 'taxonomy', 'assets']))
-                ->map(fn ($_, $key) => $manager->make($key, $this->index, ['*']));
-        }
-
         return $providers
+            ->flatMap(function ($key) {
+                if ($key === 'content') {
+                    return ['collection:*', 'taxonomy:*', 'assets:*'];
+                }
+
+                return [$key];
+            })
             ->map(fn ($key) => ['provider' => Str::before($key, ':'), 'key' => Str::after($key, ':')])
             ->groupBy('provider')
             ->map(fn ($items, $provider) => $manager->make($provider, $this->index, $items->map->key->all()));
