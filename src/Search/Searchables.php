@@ -7,6 +7,7 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use Statamic\Contracts\Search\Searchable;
+use Statamic\Exceptions\AllSearchablesNotSupported;
 use Statamic\Search\Searchables\Providers;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -28,6 +29,10 @@ class Searchables
         $manager = app(Providers::class);
 
         $providers = collect(Arr::wrap($this->index->config()['searchables'] ?? []));
+
+        if ($providers->contains('all')) {
+            throw new AllSearchablesNotSupported("'searchables' => 'all' is no longer supported. Please see the upgrade guide for more information: https://statamic.dev/getting-started/upgrade-guide/5-to-6");
+        }
 
         if ($providers->contains('content')) {
             return $manager->providers()->map(fn ($_, $key) => $manager->make($key, $this->index, ['*']));

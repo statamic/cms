@@ -9,6 +9,7 @@ use Mockery;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\Exceptions\AllSearchablesNotSupported;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Entry;
@@ -42,6 +43,14 @@ class SearchablesTest extends TestCase
         AssetContainer::make('images')->disk('images')->save();
         AssetContainer::make('documents')->disk('documents')->save();
         AssetContainer::make('audio')->disk('audio')->save();
+    }
+
+    #[Test]
+    public function it_throws_an_exception_when_all_searchables_are_configured()
+    {
+        $this->expectException(AllSearchablesNotSupported::class);
+
+        $this->makeSearchables(['searchables' => 'all']);
     }
 
     #[Test]
