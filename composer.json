@@ -16,7 +16,7 @@
         "guzzlehttp/guzzle": "^6.3 || ^7.0",
         "inertiajs/inertia-laravel": "^2.0",
         "james-heinrich/getid3": "^1.9.21",
-        "laravel/framework": "^12.1.1",
+        "laravel/framework": "^12.22.0",
         "laravel/prompts": "^0.3.0",
         "league/commonmark": "^2.2",
         "league/csv": "^9.0",
