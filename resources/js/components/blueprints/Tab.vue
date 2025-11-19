@@ -70,7 +70,7 @@
                         </publish-field-meta>
                     </Field>
                     <div class="py-4 space-x-2">
-                        <ui-button :text="__('Save')" @click="editAndSave" variant="primary" />
+                        <ui-button :text="isSoloNarrowStack ? __('Save') : __('Confirm')" @click="handleSaveOrConfirm" variant="primary" />
                         <ui-button :text="__('Cancel')" @click="editCancelled" variant="ghost" />
                     </div>
                 </div>
@@ -131,17 +131,22 @@ export default {
         iconSet() {
             return this.$config.get('replicatorSetIcons') || undefined;
         },
+
+        isSoloNarrowStack() {
+            const stacks = this.$stacks.stacks();
+            return stacks.length === 1 && stacks[0]?.data?.vm?.narrow === true;
+        },
     },
 
     watch: {
         editing: {
             handler(isEditing) {
                 if (isEditing) {
-                    // Bind Cmd+S to trigger save when a narrow stack is open
+                    // Bind Cmd+S to trigger save or confirm based on stack type
                     this.saveKeyBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        this.editAndSave();
+                        this.handleSaveOrConfirm();
                     });
                 } else {
                     // Unbind when stack is closed
@@ -174,6 +179,14 @@ export default {
             });
 
             this.editing = false;
+        },
+
+        handleSaveOrConfirm() {
+            if (this.isSoloNarrowStack) {
+                this.editAndSave();
+            } else {
+                this.editConfirmed();
+            }
         },
 
         editAndSave() {
