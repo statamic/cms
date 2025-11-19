@@ -121,6 +121,32 @@ class SearchablesTest extends TestCase
     }
 
     #[Test]
+    public function can_add_content_searchable()
+    {
+        app(Providers::class)->register($entries = Mockery::mock(Entries::class)->makePartial());
+        app(Providers::class)->register($terms = Mockery::mock(Terms::class)->makePartial());
+        app(Providers::class)->register($assets = Mockery::mock(Assets::class)->makePartial());
+
+        $entries->shouldReceive('provide')->andReturn(collect([$entry = Entry::make()]));
+        $terms->shouldReceive('provide')->andReturn(collect([$term = Term::make()]));
+        $assets->shouldReceive('provide')->andReturn(collect([$asset = Asset::make()]));
+
+        $a = new TestCustomSearchable(['title' => 'Custom 1']);
+        $b = new TestCustomSearchable(['title' => 'Custom 2']);
+        app()->instance('all-custom-searchables', collect([$a, $b]));
+
+        Search::registerSearchableProvider(TestCustomSearchables::class);
+
+        $searchables = $this->makeSearchables(['searchables' => 'content']);
+        $this->assertEquals([$entry, $term, $asset], $searchables->all()->all());
+
+        Search::addContentSearchable(TestCustomSearchables::class);
+
+        $searchables = $this->makeSearchables(['searchables' => 'content']);
+        $this->assertEquals([$entry, $term, $asset, $a, $b], $searchables->all()->all());
+    }
+
+    #[Test]
     public function can_add_cp_searchable()
     {
         $a = new TestCustomSearchable(['title' => 'Custom 1']);

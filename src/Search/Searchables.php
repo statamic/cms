@@ -19,6 +19,7 @@ class Searchables
     protected $providers;
     protected $manager;
     protected static array $cpSearchables = [];
+    protected static array $contentSearchables = [];
 
     public function __construct(Index $index)
     {
@@ -35,6 +36,15 @@ class Searchables
         static::$cpSearchables[] = $searchable;
     }
 
+    public static function addContentSearchable($searchable)
+    {
+        if (method_exists($searchable, 'handle')) {
+            $searchable = $searchable::handle();
+        }
+
+        static::$contentSearchables[] = $searchable;
+    }
+
     private function makeProviders()
     {
         $manager = app(Providers::class);
@@ -48,7 +58,7 @@ class Searchables
         return $providers
             ->flatMap(function ($key) {
                 if ($key === 'content') {
-                    return ['collection:*', 'taxonomy:*', 'assets:*'];
+                    return ['collection:*', 'taxonomy:*', 'assets:*', ...static::$contentSearchables];
                 }
 
                 if ($key === 'addons') {
