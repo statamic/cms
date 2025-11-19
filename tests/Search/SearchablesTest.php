@@ -121,6 +121,24 @@ class SearchablesTest extends TestCase
     }
 
     #[Test]
+    public function can_add_cp_searchable()
+    {
+        $a = new TestCustomSearchable(['title' => 'Custom 1']);
+        $b = new TestCustomSearchable(['title' => 'Custom 2']);
+        app()->instance('all-custom-searchables', collect([$a, $b]));
+
+        Search::registerSearchableProvider(TestCustomSearchables::class);
+
+        $searchables = $this->makeSearchables(['searchables' => 'addons']);
+        $this->assertEquals([], $searchables->all()->all());
+
+        Search::addCpSearchable(TestCustomSearchables::class);
+
+        $searchables = $this->makeSearchables(['searchables' => 'addons']);
+        $this->assertEquals([$a, $b], $searchables->all()->all());
+    }
+
+    #[Test]
     public function it_gets_searchables_from_specific_providers()
     {
         app(Providers::class)->register($entries = Mockery::mock(Entries::class)->makePartial());

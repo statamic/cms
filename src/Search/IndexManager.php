@@ -134,7 +134,7 @@ class IndexManager extends Manager
         if (! $config->has('cp')) {
             $config->put('cp', [
                 'driver' => 'local',
-                'searchables' => ['content', 'users'],
+                'searchables' => ['content', 'users', 'addons'],
                 'fields' => ['title'],
             ]);
         }

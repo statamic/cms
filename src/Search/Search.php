@@ -3,6 +3,7 @@
 namespace Statamic\Search;
 
 use Statamic\Contracts\Search\Searchable;
+use Statamic\Search\Searchables\Provider;
 use Statamic\Search\Searchables\Providers;
 
 class Search
@@ -37,6 +38,11 @@ class Search
     public function registerSearchableProvider($class)
     {
         app(Providers::class)->register($class);
+    }
+
+    public function addCpSearchable($searchable)
+    {
+        Searchables::addCpSearchable($searchable);
     }
 
     public function __call($method, $parameters)
