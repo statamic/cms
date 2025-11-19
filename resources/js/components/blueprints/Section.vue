@@ -159,6 +159,7 @@ export default {
             editingSection: false,
             editingField: null,
             handleSyncedWithDisplay: false,
+            saveKeyBinding: null,
         };
     },
 
@@ -192,6 +193,26 @@ export default {
             if (this.editingSection && this.handleSyncedWithDisplay) {
                 this.editingSection.handle = snake_case(display);
             }
+        },
+
+        editingSection: {
+            handler(isEditing) {
+                if (isEditing) {
+                    // Bind Cmd+S to trigger confirm when a narrow stack is open
+                    this.saveKeyBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.editConfirmed();
+                    });
+                } else {
+                    // Unbind when stack is closed
+                    if (this.saveKeyBinding) {
+                        this.saveKeyBinding.destroy();
+                        this.saveKeyBinding = null;
+                    }
+                }
+            },
+            immediate: false,
         },
     },
 
@@ -250,6 +271,12 @@ export default {
         editCancelled() {
             this.editingSection = false;
         },
+    },
+
+    beforeUnmount() {
+        if (this.saveKeyBinding) {
+            this.saveKeyBinding.destroy();
+        }
     },
 };
 </script>
