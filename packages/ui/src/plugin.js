@@ -1,4 +1,5 @@
 import FloatingVue from 'floating-vue';
+import { translate, setTranslateFn } from './util/translate';
 
 export default {
     install(app, options = {}) {
@@ -8,19 +9,13 @@ export default {
 };
 
 function installTranslations(app, options) {
-    const translate = options.translate || fallbackTranslate;
-    app.config.globalProperties.__ = translate;
-    window.__ = translate;
-}
-
-function fallbackTranslate(key, replacements) {
-    let message = key;
-
-    for (let replace in replacements) {
-        message = message.split(':' + replace).join(replacements[replace]);
+    if (options.translate) {
+        setTranslateFn(options.translate);
     }
 
-    return message;
+    const translateFn = options.translate || translate;
+    app.config.globalProperties.__ = translateFn;
+    window.__ = translateFn;
 }
 
 function installFloatingVue(app, options) {

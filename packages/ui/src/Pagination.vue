@@ -1,5 +1,5 @@
 <script setup>
-import { normalizeInputOptions } from './util/normalize-input-options.js';
+import normalizeInputOptions from './util/normalize-input-options.js';
 import { flatten, range, sortBy } from 'lodash-es';
 import Select from './Select/Select.vue';
 import Button from './Button/Button.vue';

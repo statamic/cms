@@ -1,4 +1,6 @@
-export function normalizeInputOptions(options) {
+import { translate as __ } from './translate';
+
+export default function normalizeInputOptions(options) {
     if (!Array.isArray(options)) {
         return Object.entries(options).map(([key, value]) => {
             return {

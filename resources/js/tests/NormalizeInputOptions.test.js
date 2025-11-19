@@ -1,6 +1,10 @@
 import { it, expect } from 'vitest';
 import hasInputOptions from '../components/fieldtypes/HasInputOptions';
 const normalizeInputOptions = hasInputOptions.methods.normalizeInputOptions;
+import { setTranslateFn } from '@statamic/ui/util/translate';
+import {__} from '@/bootstrap/globals.js';
+
+setTranslateFn(__);
 
 const config = {
     translations: {
