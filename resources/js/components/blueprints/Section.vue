@@ -41,7 +41,7 @@
             @closed="editCancelled"
         >
             <div class="h-full overflow-scroll overflow-x-auto bg-white px-6 dark:bg-dark-800">
-                <header class="py-2 -mx-6 px-6 border-b border-gray-200 dark:border-gray-800 mb-5">
+                <header class="py-2 -mx-6 px-6 border-b border-gray-200 dark:border-gray-700 mb-5">
                     <div class="flex items-center justify-between">
                         <ui-heading size="lg">
                             {{ editText }}
@@ -118,7 +118,7 @@
                     <ui-field :label="__('Hidden')" v-if="showHideField">
                         <ui-switch v-model="editingSection.hide" />
                     </ui-field>
-                    <div class="py-6 space-x-2 -mx-6 px-6 border-t border-gray-200 dark:border-gray-800">
+                    <div class="py-6 space-x-2 -mx-6 px-6 border-t border-gray-200 dark:border-gray-700">
                         <ui-button :text="__('Confirm')" @click="editConfirmed" variant="primary" />
                         <ui-button :text="__('Cancel')" @click="editCancelled" variant="ghost" />
                     </div>
