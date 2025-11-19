@@ -35,7 +35,9 @@ class Searchables
         }
 
         if ($providers->contains('content')) {
-            return $manager->providers()->map(fn ($_, $key) => $manager->make($key, $this->index, ['*']));
+            return $manager->providers()
+                ->filter(fn ($_, $key) => in_array($key, ['collection', 'taxonomy', 'assets']))
+                ->map(fn ($_, $key) => $manager->make($key, $this->index, ['*']));
         }
 
         return $providers
