@@ -8,7 +8,9 @@ export default {
 };
 
 function installTranslations(app, options) {
-    app.config.globalProperties.__ = options.translate || fallbackTranslate;
+    const translate = options.translate || fallbackTranslate;
+    app.config.globalProperties.__ = translate;
+    window.__ = translate;
 }
 
 function fallbackTranslate(key, replacements) {
