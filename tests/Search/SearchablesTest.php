@@ -45,7 +45,7 @@ class SearchablesTest extends TestCase
     }
 
     #[Test]
-    public function it_checks_all_providers_for_whether_an_item_is_searchable()
+    public function it_checks_content_providers_for_whether_an_item_is_searchable()
     {
         app(Providers::class)->register($entries = Mockery::mock(Entries::class)->makePartial());
         app(Providers::class)->register($terms = Mockery::mock(Terms::class)->makePartial());
@@ -53,7 +53,7 @@ class SearchablesTest extends TestCase
         app(Providers::class)->register($users = Mockery::mock(Users::class)->makePartial());
 
         $searchable = Mockery::mock();
-        $searchables = $this->makeSearchables(['searchables' => 'all']);
+        $searchables = $this->makeSearchables(['searchables' => 'content']);
 
         // Check twice.
         // First time they'll all return false, so contains() will return false.
@@ -69,7 +69,7 @@ class SearchablesTest extends TestCase
     }
 
     #[Test]
-    public function all_searchables_include_entries_terms_assets_and_users()
+    public function content_searchables_include_entries_terms_assets_and_users()
     {
         app(Providers::class)->register($entries = Mockery::mock(Entries::class)->makePartial());
         app(Providers::class)->register($terms = Mockery::mock(Terms::class)->makePartial());
@@ -81,7 +81,7 @@ class SearchablesTest extends TestCase
         $assets->shouldReceive('provide')->andReturn(collect([$assetA = Asset::make(), $assetB = Asset::make()]));
         $users->shouldReceive('provide')->andReturn(collect([$userA = User::make(), $userB = User::make()]));
 
-        $searchables = $this->makeSearchables(['searchables' => 'all']);
+        $searchables = $this->makeSearchables(['searchables' => 'content']);
 
         $everything = [
             $entryA,
