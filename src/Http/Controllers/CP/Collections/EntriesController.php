@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Breadcrumbs;
+use Statamic\Entries\Entry as EntriesEntry;
 use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades\Action;
 use Statamic\Facades\Asset;
@@ -14,6 +15,7 @@ use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\User;
+use Statamic\Fields\Field;
 use Statamic\Hooks\CP\EntriesIndexQuery;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
@@ -266,6 +268,9 @@ class EntriesController extends CpController
                 ->makeWorkingCopy()
                 ->user(User::current())
                 ->save();
+
+            // have to save in case there are non-revisable fields
+            $this->saveNonRevisableFields($entry);
 
             // catch any changes through RevisionSaving event
             $entry = $entry->fromWorkingCopy();
@@ -569,5 +574,17 @@ class EntriesController extends CpController
         if (Site::multiEnabled() && ! $collection->sites()->contains($site->handle())) {
             return redirect()->back()->with('error', __('Collection is not available on site ":handle".', ['handle' => $site->handle]));
         }
+    }
+
+    private function saveNonRevisableFields(EntriesEntry $entry): void
+    {
+        /** @var EntriesEntry */
+        $savedVersion = $entry->fresh();
+
+        $entry->blueprint()->fields()->all()
+            ->reject(fn (Field $field) => $field->isRevisable())
+            ->each(fn ($ignore, string $fieldHandle) => $savedVersion->set($fieldHandle, $entry->{$fieldHandle}));
+
+        $savedVersion->save();
     }
 }
