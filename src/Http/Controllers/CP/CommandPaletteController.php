@@ -33,7 +33,7 @@ class CommandPaletteController extends CpController
                     ->url($result->getCpUrl())
                     ->badge($result->getCpBadge())
                     ->reference($result->getReference())
-                    // ->icon() // TODO: Make dynamic for entries/terms/users?
+                    ->icon($result->getCpIcon())
                     ->toArray();
             })
             ->values();
