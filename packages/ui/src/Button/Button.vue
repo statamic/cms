@@ -50,8 +50,8 @@ const buttonClasses = computed(() => {
                 'ghost-pressed': 'bg-transparent hover:bg-gray-400/10 text-black dark:text-white dark:hover:bg-white/7 dark:hover:text-white [&_svg]:opacity-100',
                 subtle: 'bg-transparent hover:bg-gray-400/10 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-white/7 dark:hover:text-gray-200 [&_svg]:opacity-35',
                 pressed: [
-                    'bg-linear-to-b from-gray-100 to-gray-100 text-gray-900 border border-gray-300 inset-shadow-sm/10',
-                    'dark:from-gray-950 dark:to-gray-950 dark:text-white dark:border-white/10',
+                    'bg-linear-to-b from-gray-200 to-gray-150 text-gray-900 border border-gray-300 inset-shadow-sm/10',
+                    'dark:from-black dark:to-black dark:text-white dark:border-gray-700/80',
                 ],
             },
             size: {
@@ -68,7 +68,7 @@ const buttonClasses = computed(() => {
                 ghost: '',
                 pressed: 'in-data-ui-button-group:border-s-0 [:is([data-ui-button-group]>&:first-child,_[data-ui-button-group]_:first-child>&)]:border-s-[1px]',
             },
-            iconOnly: { true: 'px-0 gap-0' },
+            iconOnly: { true: 'px-0 gap-0 hover:[&_svg]:opacity-70' },
             round: { true: 'rounded-full' },
         },
         compoundVariants: [
@@ -76,6 +76,7 @@ const buttonClasses = computed(() => {
             { iconOnly: true, size: 'base', class: 'w-10 [&_svg]:size-4.5' },
             { iconOnly: true, size: 'sm', class: 'w-8 [&_svg]:size-3.5' },
             { iconOnly: true, size: 'xs', class: 'w-6.5 h-6.5 [&_svg]:size-3' },
+            { iconOnly: true, variant: 'pressed', class: '[&_svg]:!opacity-70 dark:[&_svg]:!opacity-100' },
             { iconOnly: false, iconAppend: true, class: '[&_svg]:-me-1' },
             { iconOnly: false, iconPrepend: true, class: '[&_svg]:-ms-0.5' },
             { inset: true, size: 'lg', class: '-m-1.5' },

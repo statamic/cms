@@ -194,10 +194,6 @@ trait TestsIlluminateStr
 
     public function testDoesntStartWith()
     {
-        if (version_compare(app()->version(), '12.20.0', '<')) {
-            $this->markTestSkipped('This test requires Laravel 12.20.0 or higher.');
-        }
-
         $this->assertFalse(Str::doesntStartWith('jason', 'jas'));
         $this->assertFalse(Str::doesntStartWith('jason', 'jason'));
         $this->assertFalse(Str::doesntStartWith('jason', ['jas']));
@@ -266,10 +262,6 @@ trait TestsIlluminateStr
 
     public function testDoesntEndWith()
     {
-        if (version_compare(app()->version(), '12.20.0', '<')) {
-            $this->markTestSkipped('This test requires Laravel 12.20.0 or higher.');
-        }
-
         $this->assertFalse(Str::doesntEndWith('jason', 'on'));
         $this->assertFalse(Str::doesntEndWith('jason', 'jason'));
         $this->assertFalse(Str::doesntEndWith('jason', ['on']));
@@ -496,10 +488,7 @@ trait TestsIlluminateStr
         $this->assertSame('what', Str::deduplicate('whaaat', 'a'));
         $this->assertSame('/some/odd/path/', Str::deduplicate('/some//odd//path/', '/'));
         $this->assertSame('ムだム', Str::deduplicate('ムだだム', 'だ'));
-
-        if (version_compare(app()->version(), '12.22.0', '>=')) {
-            $this->assertSame(' laravel forever ', Str::deduplicate(' laravell    foreverrr  ', [' ', 'l', 'r']));
-        }
+        $this->assertSame(' laravel forever ', Str::deduplicate(' laravell    foreverrr  ', [' ', 'l', 'r']));
     }
 
     public function testParseCallback()
@@ -603,16 +592,13 @@ trait TestsIlluminateStr
         $this->assertFalse(Str::is('A', 'a'));
 
         // is not case sensitive
-        if (version_compare(app()->version(), '11.37.0', '>=')) {
-            // the ignoreCase param was added in Laravel 11.37.0
-            $this->assertTrue(Str::is('A', 'a', true));
-            $this->assertTrue(Str::is('*BAZ*', 'foo/bar/baz', true));
-            $this->assertTrue(Str::is(['A*', 'B*'], 'a/', true));
-            $this->assertFalse(Str::is(['A*', 'B*'], 'f/', true));
-            $this->assertTrue(Str::is('FOO', 'foo', true));
-            $this->assertTrue(Str::is('*FOO*', 'foo/bar/baz', true));
-            $this->assertTrue(Str::is('foo/*', 'FOO/bar', true));
-        }
+        $this->assertTrue(Str::is('A', 'a', true));
+        $this->assertTrue(Str::is('*BAZ*', 'foo/bar/baz', true));
+        $this->assertTrue(Str::is(['A*', 'B*'], 'a/', true));
+        $this->assertFalse(Str::is(['A*', 'B*'], 'f/', true));
+        $this->assertTrue(Str::is('FOO', 'foo', true));
+        $this->assertTrue(Str::is('*FOO*', 'foo/bar/baz', true));
+        $this->assertTrue(Str::is('foo/*', 'FOO/bar', true));
 
         // Accepts array of patterns
         $this->assertTrue(Str::is(['a*', 'b*'], 'a/'));
@@ -641,10 +627,6 @@ trait TestsIlluminateStr
 
     public function testIsWithMultilineStrings()
     {
-        if (version_compare(app()->version(), '12.0.0', '<')) {
-            $this->markTestSkipped('This test requires Laravel 12.0.0 or higher.');
-        }
-
         $this->assertFalse(Str::is('/', "/\n"));
         $this->assertTrue(Str::is('/*', "/\n"));
         $this->assertTrue(Str::is('*/*', "/\n"));
@@ -711,10 +693,6 @@ trait TestsIlluminateStr
     #[DataProvider('uuidVersionList')]
     public function testIsUuidWithVersion($uuid, $version, $passes)
     {
-        if (version_compare(app()->version(), '12.0.0', '<')) {
-            $this->markTestSkipped('This test requires Laravel 12.0.0 or higher.');
-        }
-
         $this->assertSame(Str::isUuid($uuid, $version), $passes);
     }
 
@@ -1148,10 +1126,6 @@ trait TestsIlluminateStr
 
     public function testPascal()
     {
-        if (version_compare(app()->version(), '11.43.0', '<')) {
-            $this->markTestSkipped('This test requires Laravel 11.43.0 or higher.');
-        }
-
         $this->assertSame('LaravelPhpFramework', Str::pascal('laravel_php_framework'));
         $this->assertSame('LaravelPhpFramework', Str::pascal('laravel-php-framework'));
         $this->assertSame('LaravelPhpFramework', Str::pascal('laravel  -_-  php   -_-   framework   '));
@@ -1904,10 +1878,6 @@ trait TestsIlluminateStr
 
     public function testPluralPascal(): void
     {
-        if (version_compare(app()->version(), '11.43.0', '<')) {
-            $this->markTestSkipped('This test requires Laravel 11.43.0 or higher.');
-        }
-
         // Test basic functionality with default count
         $this->assertSame('UserGroups', Str::pluralPascal('UserGroup'));
         $this->assertSame('ProductCategories', Str::pluralPascal('ProductCategory'));

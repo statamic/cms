@@ -62,6 +62,7 @@ export const {
     ListingTableHead,
     ListingToggleAll,
     LivePreview,
+    LivePreviewPopout,
     Modal,
     ModalClose,
     ModalTitle,

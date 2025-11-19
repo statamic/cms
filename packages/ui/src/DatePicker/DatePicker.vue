@@ -137,7 +137,7 @@ const getInputLabel = (part) => {
                     >
                         <DatePickerTrigger
                             v-if="!inline"
-                            class="flex items-center justify-center rounded-lg p-2 -ms-1 text-gray-400 outline-hidden hover:bg-gray-100 focus:bg-gray-100 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
+                            class="flex items-center justify-center rounded-lg p-2 -ms-1 text-gray-500 dark:text-gray-400 outline-hidden hover:bg-gray-100 focus:bg-gray-100 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
                             :aria-label="__('Open calendar')"
                         >
                             <Icon name="calendar" class="size-4" />
@@ -154,7 +154,7 @@ const getInputLabel = (part) => {
                                 <DatePickerInput
                                     v-else
                                     :part="item.part"
-                                    class="rounded-sm px-0.25 py-0.5 focus:bg-gray-100 focus:outline-hidden data-placeholder:text-gray-600 dark:focus:bg-gray-800 dark:data-placeholder:text-gray-400"
+                                    class="rounded-sm px-0.25 py-0.5 focus:bg-blue-100 focus:outline-hidden data-placeholder:text-gray-600 dark:focus:bg-blue-900 dark:data-placeholder:text-gray-400"
                                     :class="{
                                         'px-0.5!': item.part === 'month' || item.part === 'year' || item.part === 'day',
                                     }"
@@ -164,16 +164,16 @@ const getInputLabel = (part) => {
                                 </DatePickerInput>
                             </template>
                         </div>
-                        <button
+                        <Button
                             v-if="clearable && !readOnly"
                             @click="emit('update:modelValue', null)"
+                            variant="subtle"
+                            size="sm"
+                            icon="x"
+                            class="-my-1.25 -me-2"
                             :disabled="disabled"
-                            type="button"
-                            class="flex items-center justify-center rounded-lg p-2 -me-1 text-gray-300 outline-hidden hover:bg-gray-100 focus:bg-gray-100 active:text-gray-400 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
-                            :aria-label="__('Clear date')"
-                        >
-                            <Icon name="x" class="size-3" />
-                        </button>
+                            v-tooltip="__('Clear date')"
+                        />
                     </div>
                 </DatePickerAnchor>
             </DatePickerField>

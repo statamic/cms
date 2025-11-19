@@ -163,7 +163,7 @@ return [
     'date_fieldtype_date_required' => 'Date is required.',
     'date_fieldtype_end_date_invalid' => 'Not a valid end date.',
     'date_fieldtype_end_date_required' => 'End date is required.',
-    'date_fieldtype_only_single_mode_allowed' => 'You can only use "Single" mode when the field handle is date.',
+    'date_fieldtype_only_single_mode_allowed' => 'You can’t use the Range UI Mode when the field’s handle is "date". To use the Range UI Mode, change the handle to anything other than "date".',
     'date_fieldtype_start_date_invalid' => 'Not a valid start date.',
     'date_fieldtype_start_date_required' => 'Start date is required.',
     'date_fieldtype_time_required' => 'Time is required.',

@@ -210,6 +210,7 @@ class Assets extends Fieldtype
                 'can_upload' => User::current()->can('store', [\Statamic\Contracts\Assets\Asset::class, $container]),
                 'can_edit' => User::current()->can('edit', $container),
                 'can_delete' => User::current()->can('delete', $container),
+                'can_create_folders' => User::current()->can('create', [\Statamic\Contracts\Assets\AssetFolder::class, $container]),
                 'sort_field' => $container->sortField(),
                 'sort_direction' => $container->sortDirection(),
             ],

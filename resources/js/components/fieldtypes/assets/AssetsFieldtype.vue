@@ -1,5 +1,5 @@
 <template>
-    <div class="@container relative w-full bg-gray-50 dark:bg-transparent rounded-xl">
+    <div data-asset-browser class="@container relative w-full bg-gray-50 dark:bg-transparent rounded-xl">
         <div
             v-if="hasPendingDynamicFolder"
             class="w-full rounded-md border border-dashed px-4 py-3 text-sm text-gray-700 dark:border-gray-300 dark:text-gray-200"
@@ -28,6 +28,7 @@
 
                 <div
                     v-if="!isReadOnly && showPicker"
+                    data-asset-picker
                     class="not-[.link-fieldtype_&]:p-2 not-[.link-fieldtype_&]:border border-gray-300 dark:border-gray-700 dark:bg-gray-850 rounded-xl flex flex-col @2xs:flex-row items-center gap-2 sm:gap-3 gap-y-3"
                     :class="{
                         'rounded-b-none': expanded,
@@ -124,10 +125,10 @@
 
                     <div class="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700 not-[.link-fieldtype_&]:border-t-0! not-[.link-fieldtype_&]:rounded-t-none" v-if="displayMode === 'list'">
                         <table class="table-fixed w-full">
-                            <thead>
+                            <thead class="sr-only">
                                 <tr>
-                                    <th class="sr-only">Asset</th>
-                                    <th class="sr-only">Actions</th>
+                                    <th>Asset</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <sortable-list
@@ -370,10 +371,10 @@ export default {
                 this.assets
                     .map((asset) => {
                         return asset.isImage || asset.isSvg
-                            ? `<img src="${asset.thumbnail}" width="20" class="max-w-5 max-h-5" height="20" title="${asset.basename}" />`
+                            ? `<img src="${asset.thumbnail}" width="20" class="max-w-5 max-h-5 rounded-sm mr-1 object-cover" height="20" title="${asset.basename}" />`
                             : asset.basename;
                     })
-                    .join(', '),
+                    .join(' '),
             );
         },
 

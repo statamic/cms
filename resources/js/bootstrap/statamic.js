@@ -167,7 +167,7 @@ export default {
 
         const el = document.getElementById('statamic');
         const titleEl = document.getElementById('blade-title');
-        const bladeTitle = titleEl.dataset.title;
+        const bladeTitle = titleEl?.dataset.title;
         const bladeContent = el?.innerHTML || '';
         const _this = this;
 

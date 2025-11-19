@@ -39,7 +39,7 @@ class GlobalsController extends CpController
                 'configure_url' => $set->editUrl(),
                 'delete_url' => $set->deleteUrl(),
             ];
-        })->filter()->values();
+        })->filter()->sortBy('title')->values();
 
         return Inertia::render('globals/Index', [
             'globals' => $globals,

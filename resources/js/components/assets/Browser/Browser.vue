@@ -703,13 +703,15 @@ export default {
                 action: () => this.mode = 'table',
             });
 
-            Statamic.$commandPalette.add({
-                when: () => this.canCreateContainers,
-                category: Statamic.$commandPalette.category.Actions,
-                text: __('Create Container'),
-                icon: 'container-add',
-                url: this.createContainerUrl,
-            });
+            if (this.createContainerUrl) {
+                Statamic.$commandPalette.add({
+                    when: () => this.canCreateContainers,
+                    category: Statamic.$commandPalette.category.Actions,
+                    text: __('Create Container'),
+                    icon: 'container-add',
+                    url: this.createContainerUrl,
+                });
+            }
 
             Statamic.$commandPalette.add({
                 when: () => this.container.can_edit,

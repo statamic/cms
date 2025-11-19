@@ -211,6 +211,7 @@ it('exports ui', async () => {
         'ListingTableHead',
         'ListingToggleAll',
         'LivePreview',
+        'LivePreviewPopout',
         'PublishComponents',
         'PublishContainer',
         'PublishField',

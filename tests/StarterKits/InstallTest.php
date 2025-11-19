@@ -1087,18 +1087,12 @@ EOT;
 
         $command = $this->installCoolRunningsModules();
 
-        // Some fixes to `expectsChoice()` were merged for us, but are not available on 11.20.0 and below
-        // See: https://github.com/laravel/framework/pull/52408
-        if (version_compare(app()->version(), '11.20.0', '>')) {
-            $command->expectsChoice('Want one of these fancy JS options?', 'skip_module', [
-                'skip_module' => 'No',
-                'react' => 'React JS',
-                'vue' => 'Vue JS',
-                'svelte' => 'Svelte',
-            ]);
-        } else {
-            $command->expectsQuestion('Want one of these fancy JS options?', 'skip_module');
-        }
+        $command->expectsChoice('Want one of these fancy JS options?', 'skip_module', [
+            'skip_module' => 'No',
+            'react' => 'React JS',
+            'vue' => 'Vue JS',
+            'svelte' => 'Svelte',
+        ]);
 
         $command->run();
 
@@ -1144,18 +1138,12 @@ EOT;
 
         $command = $this->installCoolRunningsModules();
 
-        // Some fixes to `expectsChoice()` were merged for us, but are not available on 11.20.0 and below
-        // See: https://github.com/laravel/framework/pull/52408
-        if (version_compare(app()->version(), '11.20.0', '>')) {
-            $command->expectsChoice('Want one of these fancy JS options?', 'svelte', [
-                // 'skip_module' => 'No', // This should not be here anymore, because of `skip_option: false`
-                'react' => 'React JS',
-                'vue' => 'Vue JS',
-                'svelte' => 'Svelte',
-            ]);
-        } else {
-            $command->expectsQuestion('Want one of these fancy JS options?', 'svelte');
-        }
+        $command->expectsChoice('Want one of these fancy JS options?', 'svelte', [
+            // 'skip_module' => 'No', // This should not be here anymore, because of `skip_option: false`
+            'react' => 'React JS',
+            'vue' => 'Vue JS',
+            'svelte' => 'Svelte',
+        ]);
 
         $command->run();
 
@@ -1210,18 +1198,12 @@ EOT;
             ->installCoolRunningsModules()
             ->expectsConfirmation('Want some extra SEO magic?', 'yes');
 
-        // Some fixes to `expectsChoice()` were merged for us, but are not available on 11.20.0 and below
-        // See: https://github.com/laravel/framework/pull/52408
-        if (version_compare(app()->version(), '11.20.0', '>')) {
-            $command->expectsChoice('Want one of these fancy JS options?', 'svelte', [
-                'skip_module' => 'No, thank you!',
-                'react' => 'React JS',
-                'vue' => 'Vue JS',
-                'svelte' => 'Svelte',
-            ]);
-        } else {
-            $command->expectsQuestion('Want one of these fancy JS options?', 'svelte');
-        }
+        $command->expectsChoice('Want one of these fancy JS options?', 'svelte', [
+            'skip_module' => 'No, thank you!',
+            'react' => 'React JS',
+            'vue' => 'Vue JS',
+            'svelte' => 'Svelte',
+        ]);
 
         $command->run();
 
