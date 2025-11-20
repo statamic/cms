@@ -297,7 +297,6 @@ defineExpose({
                                 autocomplete="off"
                                 @paste.prevent="onPaste"
                                 @keydown.enter.prevent="pushTaggableOption"
-                                @blur="pushTaggableOption"
                                 @keydown.space="openDropdown"
                             />
 
