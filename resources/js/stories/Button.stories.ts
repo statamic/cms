@@ -4,7 +4,6 @@ import Button from '@statamic/ui/Button/Button.vue';
 const meta = {
   title: 'Components/Button',
   component: Button,
-  tags: ['autodocs'],
   argTypes: {
     variant: {
       control: 'select',

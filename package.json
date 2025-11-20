@@ -14,6 +14,7 @@
     "knip": "knip",
     "types": "cd packages/ui && npm run types && cd ../cms && npm run types",
     "storybook": "storybook dev -p 6006",
+    "storybook-docs": "storybook dev --docs -p 6006",
     "build-storybook": "storybook build",
     "build-storybook-docs": "storybook build --docs"
   },
