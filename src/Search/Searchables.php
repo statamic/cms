@@ -8,7 +8,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use Statamic\Contracts\Search\Searchable;
 use Statamic\Exceptions\AllSearchablesNotSupported;
-use Statamic\Search\Searchables\Provider;
 use Statamic\Search\Searchables\Providers;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;

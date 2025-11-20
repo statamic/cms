@@ -3,7 +3,6 @@
 namespace Statamic\Search;
 
 use Statamic\Contracts\Search\Searchable;
-use Statamic\Search\Searchables\Provider;
 use Statamic\Search\Searchables\Providers;
 
 class Search
