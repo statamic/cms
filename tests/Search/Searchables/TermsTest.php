@@ -157,9 +157,9 @@ class TermsTest extends TestCase
                 ],
             ],
 
-            'all, french' => [
+            'content, french' => [
                 'fr',
-                ['searchables' => 'all'],
+                ['searchables' => 'content'],
                 [
                     'term::tags::alfa::fr',
                     'term::tags::bravo::fr',
