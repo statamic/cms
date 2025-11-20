@@ -8,6 +8,6 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* Import UI component styles */
-@import "../src/ui.css";
-@source "../src";
+@import "../packages/ui/src/ui.css";
+@source "../packages/ui/src";
 
