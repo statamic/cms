@@ -36,6 +36,11 @@ class Searchables
         static::$cpSearchables[] = $searchable;
     }
 
+    public static function clearCpSearchables()
+    {
+        static::$cpSearchables = [];
+    }
+
     public static function addContentSearchable($searchable)
     {
         if (method_exists($searchable, 'handle')) {
@@ -43,6 +48,11 @@ class Searchables
         }
 
         static::$contentSearchables[] = $searchable;
+    }
+
+    public static function clearContentSearchables()
+    {
+        static::$contentSearchables = [];
     }
 
     private function makeProviders()

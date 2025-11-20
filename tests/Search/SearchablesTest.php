@@ -45,6 +45,14 @@ class SearchablesTest extends TestCase
         AssetContainer::make('audio')->disk('audio')->save();
     }
 
+    public function tearDown(): void
+    {
+        Searchables::clearCpSearchables();
+        Searchables::clearContentSearchables();
+
+        parent::tearDown();
+    }
+
     #[Test]
     public function it_throws_an_exception_when_all_searchables_are_configured()
     {
