@@ -13,10 +13,8 @@ const config: StorybookConfig = {
     "../resources/js/stories/**/*.stories.@(js|jsx|mjs|ts|tsx)"
   ],
   addons: [
-    "@chromatic-com/storybook",
     "@storybook/addon-docs",
-    "@storybook/addon-a11y",
-    "@storybook/addon-vitest"
+    "@storybook/addon-a11y"
   ],
   framework: {
     name: "@storybook/vue3-vite",
