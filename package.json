@@ -105,7 +105,7 @@
     "tailwindcss": "^4.1.8",
     "typescript": "^5.9.2",
     "vite": "^7.0.4",
-    "vitest": "^3.2.0",
+    "vitest": "^4.0.12",
     "vue-component-debug": "^0.1.0",
     "vue-tsc": "^3.0.5"
   }
