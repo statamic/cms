@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
 import { ref } from 'vue';
-import Select from '../Select/Select.vue';
+import Select from '@statamic/ui/Select/Select.vue';
 
 const meta = {
   title: 'Components/Select',

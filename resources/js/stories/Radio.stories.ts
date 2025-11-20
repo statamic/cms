@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
 import { ref } from 'vue';
-import Radio from '../Radio/Item.vue';
-import RadioGroup from '../Radio/Group.vue';
+import Radio from '@statamic/ui/Radio/Item.vue';
+import RadioGroup from '@statamic/ui/Radio/Group.vue';
 
 const meta = {
   title: 'Components/Radio',

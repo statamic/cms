@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
 import { ref } from 'vue';
-import Switch from '../Switch.vue';
+import Switch from '@statamic/ui/Switch.vue';
 
 const meta = {
   title: 'Components/Switch',

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
-import Panel from '../Panel/Panel.vue';
-import PanelHeader from '../Panel/Header.vue';
-import PanelFooter from '../Panel/Footer.vue';
-import Button from '../Button/Button.vue';
-import Input from '../Input/Input.vue';
+import Panel from '@statamic/ui/Panel/Panel.vue';
+import PanelHeader from '@statamic/ui/Panel/Header.vue';
+import PanelFooter from '@statamic/ui/Panel/Footer.vue';
+import Button from '@statamic/ui/Button/Button.vue';
+import Input from '@statamic/ui/Input/Input.vue';
 import { ref } from 'vue';
 
 const meta = {

@@ -28,22 +28,6 @@
     "uniqid": "^5.2.0"
   },
   "scripts": {
-    "types": "rm -rf types && vue-tsc --declaration --emitDeclarationOnly || true",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
-  },
-  "devDependencies": {
-    "@chromatic-com/storybook": "^4.1.2",
-    "@storybook/addon-a11y": "^10.0.5",
-    "@storybook/addon-docs": "^10.0.5",
-    "@storybook/addon-onboarding": "^10.0.5",
-    "@storybook/addon-vitest": "^10.0.5",
-    "@storybook/vue3-vite": "^10.0.5",
-    "@tailwindcss/vite": "^4.1.17",
-    "@vitejs/plugin-vue": "^6.0.1",
-    "@vitest/browser-playwright": "^4.0.7",
-    "@vitest/coverage-v8": "^4.0.7",
-    "playwright": "^1.56.1",
-    "storybook": "^10.0.5"
+    "types": "rm -rf types && vue-tsc --declaration --emitDeclarationOnly || true"
   }
 }

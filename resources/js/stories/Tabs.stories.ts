@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
 import { ref } from 'vue';
-import Tabs from '../Tabs/Tabs.vue';
-import TabList from '../Tabs/List.vue';
-import TabTrigger from '../Tabs/Trigger.vue';
-import TabContent from '../Tabs/Content.vue';
+import Tabs from '@statamic/ui/Tabs/Tabs.vue';
+import TabList from '@statamic/ui/Tabs/List.vue';
+import TabTrigger from '@statamic/ui/Tabs/Trigger.vue';
+import TabContent from '@statamic/ui/Tabs/Content.vue';
 
 const meta = {
   title: 'Components/Tabs',

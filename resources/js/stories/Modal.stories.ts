@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
 import { ref } from 'vue';
-import Modal from '../Modal/Modal.vue';
-import Button from '../Button/Button.vue';
+import Modal from '@statamic/ui/Modal/Modal.vue';
+import Button from '@statamic/ui/Button/Button.vue';
 
 const meta = {
   title: 'Components/Modal',

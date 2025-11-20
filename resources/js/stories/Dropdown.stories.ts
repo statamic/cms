@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
-import Dropdown from '../Dropdown/Dropdown.vue';
-import DropdownMenu from '../Dropdown/Menu.vue';
-import DropdownItem from '../Dropdown/Item.vue';
-import DropdownLabel from '../Dropdown/Label.vue';
-import DropdownSeparator from '../Dropdown/Separator.vue';
-import Button from '../Button/Button.vue';
+import Dropdown from '@statamic/ui/Dropdown/Dropdown.vue';
+import DropdownMenu from '@statamic/ui/Dropdown/Menu.vue';
+import DropdownItem from '@statamic/ui/Dropdown/Item.vue';
+import DropdownLabel from '@statamic/ui/Dropdown/Label.vue';
+import DropdownSeparator from '@statamic/ui/Dropdown/Separator.vue';
+import Button from '@statamic/ui/Button/Button.vue';
 
 const meta = {
   title: 'Components/Dropdown',

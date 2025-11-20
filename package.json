@@ -12,7 +12,10 @@
     "frontend-dev": "vite -c vite-frontend.config.js",
     "frontend-build": "vite build -c vite-frontend.config.js",
     "knip": "knip",
-    "types": "cd packages/ui && npm run types && cd ../cms && npm run types"
+    "types": "cd packages/ui && npm run types && cd ../cms && npm run types",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "build-storybook-docs": "storybook build --docs"
   },
   "dependencies": {
     "@davidenke/marked-text-renderer": "^3.0.0",
@@ -95,6 +98,11 @@
     "vue3-click-away": "^1.2.4"
   },
   "devDependencies": {
+    "@chromatic-com/storybook": "^4.1.3",
+    "@storybook/addon-a11y": "^10.0.8",
+    "@storybook/addon-docs": "^10.0.8",
+    "@storybook/addon-vitest": "^10.0.8",
+    "@storybook/vue3-vite": "^10.0.8",
     "@tailwindcss/vite": "^4.1.8",
     "@vitejs/plugin-vue": "^6.0.0",
     "@vue/test-utils": "^2.4.6",
@@ -102,6 +110,7 @@
     "knip": "^5.43.6",
     "laravel-vite-plugin": "^2.0.0",
     "rollup-plugin-visualizer": "^5.14.0",
+    "storybook": "^10.0.8",
     "tailwindcss": "^4.1.8",
     "typescript": "^5.9.2",
     "vite": "^7.0.4",

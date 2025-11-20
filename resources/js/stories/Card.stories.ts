@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
-import Card from '../Card/Card.vue';
-import Button from '../Button/Button.vue';
+import Card from '@statamic/ui/Card/Card.vue';
+import Button from '@statamic/ui/Button/Button.vue';
 
 const meta = {
   title: 'Components/Card',

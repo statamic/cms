@@ -9,8 +9,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const config: StorybookConfig = {
   stories: [
-    "../src/**/*.mdx",
-    "../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"
+    "../resources/js/stories/**/*.mdx",
+    "../resources/js/stories/**/*.stories.@(js|jsx|mjs|ts|tsx)"
   ],
   addons: [
     "@chromatic-com/storybook",
@@ -31,10 +31,10 @@ const config: StorybookConfig = {
     return mergeConfig(config, {
       resolve: {
         alias: {
-          '@statamic/ui': path.resolve(__dirname, '../src'),
+          '@statamic/ui': path.resolve(__dirname, '../packages/ui/src'),
           '@/composables/has-component.js': path.resolve(__dirname, './composables-mock.js'),
           '@/composables/has-component': path.resolve(__dirname, './composables-mock.js'),
-          '@': path.resolve(__dirname, '../../../resources/js'),
+          '@': path.resolve(__dirname, '../resources/js'),
           '@inertiajs/vue3': path.resolve(__dirname, './inertia-mock.js'),
         },
       },
