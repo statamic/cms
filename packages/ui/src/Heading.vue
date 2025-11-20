@@ -35,7 +35,7 @@ const classes = cva({
 })({ ...props });
 
 const iconClasses = cva({
-    base: 'text-gray-500 dark:text-gray-600',
+    base: 'text-gray-500 dark:text-gray-500',
     variants: {
         size: {
             base: 'size-4',
