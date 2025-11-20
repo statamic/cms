@@ -1,6 +1,5 @@
 import type { StorybookConfig } from '@storybook/vue3-vite';
 import { mergeConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
 import tailwindcss from '@tailwindcss/vite';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -21,9 +20,7 @@ const config: StorybookConfig = {
     options: {}
   },
   async viteFinal(config) {
-    // Ensure Vue plugin is first
     config.plugins = config.plugins || [];
-    config.plugins.unshift(vue());
     config.plugins.push(tailwindcss());
 
     return mergeConfig(config, {
