@@ -61,7 +61,7 @@ class Searchables
         $providers = collect(Arr::wrap($this->index->config()['searchables'] ?? []));
 
         if ($providers->contains('all')) {
-            throw new AllSearchablesNotSupported("'searchables' => 'all' is no longer supported. Please see the upgrade guide for more information: https://statamic.dev/getting-started/upgrade-guide/5-to-6");
+            throw new AllSearchablesNotSupported();
         }
 
         return $providers
