@@ -43,6 +43,7 @@ const {
     hiddenFields,
     setHiddenField,
     container,
+    direction,
 } = injectContainerContext();
 const {
     fieldPathPrefix: injectedFieldPathPrefix,
@@ -242,12 +243,14 @@ const fieldtypeComponentEvents = computed(() => ({
             <div class="text-xs text-red-600" v-if="!fieldtypeComponentExists">
                 Component <code v-text="fieldtypeComponent"></code> does not exist.
             </div>
-            <Component
-                ref="fieldtype"
-                :is="fieldtypeComponent"
-                v-bind="fieldtypeComponentProps"
-                v-on="fieldtypeComponentEvents"
-            />
+            <div :dir="direction">
+                <Component
+                    ref="fieldtype"
+                    :is="fieldtypeComponent"
+                    v-bind="fieldtypeComponentProps"
+                    v-on="fieldtypeComponentEvents"
+                />
+            </div>
         </Field>
     </slot>
 </template>

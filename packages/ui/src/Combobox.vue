@@ -66,9 +66,9 @@ const triggerClasses = cva({
         size: {
             xl: 'px-5 h-12 text-lg rounded-lg',
             lg: 'px-4 h-12 text-base rounded-lg',
-            base: 'px-4 h-10 text-sm rounded-lg',
-            sm: 'px-3 h-8 text-[0.8125rem] rounded-lg',
-            xs: 'px-2 h-6 text-xs rounded-md',
+            base: 'px-4 h-10 text-md rounded-lg',
+            sm: 'px-3 h-8 text-sm rounded-lg',
+            xs: 'px-2 h-6 text-[0.8125rem] rounded-md',
         },
         readOnly: {
             true: 'border-dashed',
@@ -435,12 +435,12 @@ defineExpose({
 </template>
 
 <style scoped>
-    /* We can't use a direct descendant selector because the stack is inside a portal, so instead we'll check to see if there is a stack present. */
-    body:has(.stack) [data-reka-popper-content-wrapper] {
+    /* Override the hardcoded z-index of Reka's popper content wrapper. We can't use a direct descendant selector because the stack is inside a portal, so instead we'll check to see if there is a stack present. */
+    body:has(.stack, .live-preview) [data-reka-popper-content-wrapper] {
         z-index: var(--z-index-portal)!important;
     }
 
-    /* When there's a modal present, we need to ensure the popper content is above it. We can't use a direct descendant selector because the modal is inside a portal, so instead we'll check to see if there is modal content present. */
+    /* Override the hardcoded z-index of Reka's popper content wrapper. When there's a modal present, we need to ensure the popper content is above it. We can't use a direct descendant selector because the modal is inside a portal, so instead we'll check to see if there is modal content present. */
     body:has([data-ui-modal-content]) [data-reka-popper-content-wrapper] {
         z-index: var(--z-index-modal)!important;
     }

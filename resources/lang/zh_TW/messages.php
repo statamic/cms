@@ -249,5 +249,5 @@ return [
     'user_wizard_roles_groups_intro' => '可為使用者指派角色以自定其在控制面板的權限、存取、與能力。',
     'user_wizard_super_admin_instructions' => '超級管理員對於控制面板有完整的控制與存取權限。請妥善給予此權限。',
     'view_more_count' => '查看:count更多',
-    'width_x_height' => ':width x :height',
+    'width_x_height' => ':width × :height',
 ];

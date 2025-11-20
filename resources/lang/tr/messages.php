@@ -249,5 +249,5 @@ return [
     'user_wizard_roles_groups_intro' => 'Kullanıcılara Denetim Masası üzerinden izinlerini, erişimlerini ve yeteneklerini özelleştiren roller atanabilir.',
     'user_wizard_super_admin_instructions' => 'Süper yöneticiler, kontrol panelindeki her şeye tam kontrol ve erişime sahiptir. Bu rolü akıllıca verin.',
     'view_more_count' => ':count daha fazlasını görüntüle',
-    'width_x_height' => ':width x :height',
+    'width_x_height' => ':width × :height',
 ];

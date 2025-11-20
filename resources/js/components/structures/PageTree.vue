@@ -318,7 +318,7 @@ export default {
 
         pageUpdated() {
             this.pages = this.$refs.tree.getData();
-            this.$emit('changed');
+            this.$emit('changed', this.pages);
         },
 
         expandAll() {

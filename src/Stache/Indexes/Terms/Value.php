@@ -10,6 +10,7 @@ class Value extends Index
     public function getItems()
     {
         $associatedItems = $this->store->index('associations')->items()
+            ->filter()
             ->mapWithKeys(function ($association) {
                 $term = Term::make($value = $association['slug'])
                     ->taxonomy($this->store->childKey())

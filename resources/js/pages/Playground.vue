@@ -11,6 +11,19 @@ defineProps(['icons']);
         <ui-subheading>A collection of components to test and play with.</ui-subheading>
     </ui-header>
 
+    <ui-dropdown>
+    <template #trigger>
+        <ui-button text="My Account" icon-append="ui/chevron-vertical" class="[&_svg]:size-2" />
+    </template>
+    <ui-dropdown-header text="My Account" icon="avatar" />
+    <ui-dropdown-menu>
+        <ui-dropdown-item text="Photos" icon="assets" />
+        <ui-dropdown-item text="Email" icon="mail" />
+        <ui-dropdown-item text="Sales" icon="taxonomies" />
+    </ui-dropdown-menu>
+    <ui-dropdown-footer text="Logout" icon="arrow-right" />
+</ui-dropdown>
+
     <div v-cloak>
         <div class="space-y-12 prose starting-style-transition starting-style-transition-children">
             <h1>Typography <strong>Test</strong> Document</h1>
@@ -195,6 +208,7 @@ defineProps(['icons']);
                 <div class="mb-4 flex gap-2 sm:gap-3 items-end">
                     <ui-button icon="save" text="Default" />
                     <ui-button icon="save" text="Primary" variant="primary" />
+                    <ui-button icon="save" text="Danger" variant="danger" />
                     <ui-button icon="save" text="Filled" variant="filled" />
                     <ui-button icon="save" text="Ghost" variant="ghost" />
                     <ui-button icon="save" text="Subtle" variant="subtle" />
@@ -205,6 +219,14 @@ defineProps(['icons']);
                     <ui-button icon="save" variant="filled" />
                     <ui-button icon="save" variant="ghost" />
                     <ui-button icon="save" variant="subtle" />
+                </div>
+                <div class="mb-4 flex gap-2 sm:gap-3 items-end">
+                    <ui-button-group>
+                        <ui-button variant="default">Oldest</ui-button>
+                        <ui-button variant="default">Newest</ui-button>
+                        <ui-button variant="default">Top</ui-button>
+                        <ui-button variant="danger">Danger</ui-button>
+                    </ui-button-group>
                 </div>
             </section>
 

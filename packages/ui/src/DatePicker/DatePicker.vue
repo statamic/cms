@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue';
 import {
+    DatePickerAnchor,
     DatePickerContent,
     DatePickerField,
     DatePickerInput,
@@ -119,64 +120,67 @@ const getInputLabel = (part) => {
             :aria-required="required"
         >
             <DatePickerField v-slot="{ segments }" class="w-full">
-                <div
-                    :class="[
-                        'flex w-full items-center bg-white uppercase dark:bg-gray-900',
-                        'border border-gray-300 dark:border-x-0 dark:border-t-0 dark:border-white/10 dark:inset-shadow-2xs dark:inset-shadow-black',
-                        'text-gray-600 dark:text-gray-300',
-                        'shadow-ui-sm not-prose h-10 rounded-lg px-2 disabled:shadow-none',
-                        'data-invalid:border-red-500',
-                        'disabled:shadow-none disabled:opacity-50',
-                        readOnly ? 'border-dashed' : '',
-                    ]"
-                    :aria-invalid="isInvalid"
-                    role="textbox"
-                    :aria-label="__('Select date')"
-                >
-                    <DatePickerTrigger
-                        v-if="!inline"
-                        class="flex items-center justify-center rounded-lg p-2 -ms-1 text-gray-400 outline-hidden hover:bg-gray-100 focus:bg-gray-100 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
-                        :aria-label="__('Open calendar')"
+                <DatePickerAnchor as-child>
+                    <div
+                        :class="[
+                            'flex w-full items-center bg-white uppercase dark:bg-gray-900',
+                            'border border-gray-300 dark:border-x-0 dark:border-t-0 dark:border-white/10 dark:inset-shadow-2xs dark:inset-shadow-black',
+                            'text-gray-600 dark:text-gray-300',
+                            'shadow-ui-sm not-prose h-10 rounded-lg px-2 disabled:shadow-none',
+                            'data-invalid:border-red-500',
+                            'disabled:shadow-none disabled:opacity-50',
+                            readOnly ? 'border-dashed' : '',
+                        ]"
+                        :aria-invalid="isInvalid"
+                        role="textbox"
+                        :aria-label="__('Select date')"
                     >
-                        <Icon name="calendar" class="size-4" />
-                    </DatePickerTrigger>
-                    <div class="flex items-center flex-1">
-                        <template v-for="item in segments" :key="item.part">
-                            <DatePickerInput
-                                v-if="item.part === 'literal'"
-                                :part="item.part"
-                                :class="{ 'text-sm text-gray-600 dark:text-gray-400 antialiased': !item.contenteditable }"
-                            >
-                                {{ item.value }}
-                            </DatePickerInput>
-                            <DatePickerInput
-                                v-else
-                                :part="item.part"
-                                class="rounded-sm px-0.25 py-0.5 focus:bg-gray-100 focus:outline-hidden data-placeholder:text-gray-600 dark:focus:bg-gray-800 dark:data-placeholder:text-gray-400"
-                                :class="{
-                                    'px-0.5!': item.part === 'month' || item.part === 'year' || item.part === 'day',
-                                }"
-                                :aria-label="getInputLabel(item.part)"
-                            >
-                                {{ item.value }}
-                            </DatePickerInput>
-                        </template>
+                        <DatePickerTrigger
+                            v-if="!inline"
+                            class="flex items-center justify-center rounded-lg p-2 -ms-1 text-gray-500 dark:text-gray-400 outline-hidden hover:bg-gray-100 focus:bg-gray-100 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
+                            :aria-label="__('Open calendar')"
+                        >
+                            <Icon name="calendar" class="size-4" />
+                        </DatePickerTrigger>
+                        <div class="flex items-center flex-1">
+                            <template v-for="item in segments" :key="item.part">
+                                <DatePickerInput
+                                    v-if="item.part === 'literal'"
+                                    :part="item.part"
+                                    :class="{ 'text-sm text-gray-600 dark:text-gray-400 antialiased': !item.contenteditable }"
+                                >
+                                    {{ item.value }}
+                                </DatePickerInput>
+                                <DatePickerInput
+                                    v-else
+                                    :part="item.part"
+                                    class="rounded-sm px-0.25 py-0.5 focus:bg-blue-100 focus:outline-hidden data-placeholder:text-gray-600 dark:focus:bg-blue-900 dark:data-placeholder:text-gray-400"
+                                    :class="{
+                                        'px-0.5!': item.part === 'month' || item.part === 'year' || item.part === 'day',
+                                    }"
+                                    :aria-label="getInputLabel(item.part)"
+                                >
+                                    {{ item.value }}
+                                </DatePickerInput>
+                            </template>
+                        </div>
+                        <Button
+                            v-if="clearable && !readOnly"
+                            @click="emit('update:modelValue', null)"
+                            variant="subtle"
+                            size="sm"
+                            icon="x"
+                            class="-my-1.25 -me-2"
+                            :disabled="disabled"
+                            v-tooltip="__('Clear date')"
+                        />
                     </div>
-                    <button
-                        v-if="clearable && !readOnly"
-                        @click="emit('update:modelValue', null)"
-                        :disabled="disabled"
-                        type="button"
-                        class="flex items-center justify-center rounded-lg p-2 -me-1 text-gray-300 outline-hidden hover:bg-gray-100 focus:bg-gray-100 active:text-gray-400 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
-                        :aria-label="__('Clear date')"
-                    >
-                        <Icon name="x" class="size-3" />
-                    </button>
-                </div>
+                </DatePickerAnchor>
             </DatePickerField>
 
             <DatePickerContent
                 v-if="!inline"
+                align="start"
                 :side-offset="4"
                 class="data-[state=open]:data-[side=top]:animate-slideDownAndFade data-[state=open]:data-[side=right]:animate-slideLeftAndFade data-[state=open]:data-[side=bottom]:animate-slideUpAndFade data-[state=open]:data-[side=left]:animate-slideRightAndFade will-change-[transform,opacity]"
             >

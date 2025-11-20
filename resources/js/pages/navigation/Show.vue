@@ -37,7 +37,7 @@ export default {
         blueprintUrl: { type: String, required: true },
         pagesUrl: { type: String, required: true },
         submitUrl: { type: String, required: true },
-        maxDepth: { type: Number, default: Infinity },
+        initialMaxDepth: { type: Number, default: null },
         expectsRoot: { type: Boolean, required: true },
         site: { type: String, required: true },
         sites: { type: Array, required: true },
@@ -51,6 +51,7 @@ export default {
         return {
             mounted: false,
             changed: false,
+            maxDepth: this.initialMaxDepth || Infinity,
             creatingPage: false,
             editingPage: false,
             targetParent: null,
@@ -214,6 +215,7 @@ export default {
                 title: values.title,
                 url: values.url,
                 status: null,
+                children: [],
             };
 
             this.publishInfo[page.id] = {
@@ -235,6 +237,7 @@ export default {
                 removeFromUi(shouldDeleteChildren);
                 this.showPageDeletionConfirmation = false;
                 this.pageBeingDeleted = branch;
+                delete this.publishInfo[branch.id];
             };
         },
 
@@ -362,7 +365,7 @@ export default {
             <ui-button
                 v-if="isDirty"
                 variant="filled"
-                :text="__('Discard changes')"
+                :text="__('Discard Changes')"
                 @click="$refs.tree.cancel"
             />
 

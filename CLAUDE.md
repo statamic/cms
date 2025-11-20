@@ -25,7 +25,7 @@ This is the **Statamic CMS Core Package** - a Laravel-powered, flat-file (by def
 ```
 
 ## Technology Stack
-- **Backend**: Laravel 11+ / PHP 8+
+- **Backend**: Laravel 12+ / PHP 8+
 - **Control Panel Frontend**: Vue 3 + TypeScript + Vite
 - **Control Panel CSS**: Tailwind CSS 4
 - **Database**: File-based "Stache" out of the box, but eloquent supported through the statamic/eloquent-driver composer package

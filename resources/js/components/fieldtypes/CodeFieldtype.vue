@@ -54,11 +54,6 @@ export default {
         },
     },
 
-    mounted() {
-        // CodeMirror needs to be manually refreshed when made visible in the DOM.
-        this.$events.$on('tab-switched', () => this.$refs.codeEditor?.refresh());
-    },
-
     methods: {
         modeUpdated(mode) {
             this.updateDebounced({ code: this.value.code, mode });
