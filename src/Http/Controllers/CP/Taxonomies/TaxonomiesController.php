@@ -306,6 +306,7 @@ class TaxonomiesController extends CpController
                         'display' => __('Preview Targets'),
                         'instructions' => __('statamic::messages.taxonomies_preview_targets_instructions'),
                         'type' => 'grid',
+                        'full_width_setting' => true,
                         'fields' => [
                             [
                                 'handle' => 'label',
