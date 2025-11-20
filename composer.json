@@ -47,7 +47,7 @@
         "orchestra/testbench": "^8.14 || ^9.2 || ^10.0",
         "phpunit/phpunit": "^10.5.35 || ^11.5.3",
         "spatie/laravel-ray": "^1.37",
-        "sebastian/recursion-context": "^6.0.3"
+        "sebastian/recursion-context": "^5.0.1 || ^6.0.3"
     },
     "config": {
         "optimize-autoloader": true,
