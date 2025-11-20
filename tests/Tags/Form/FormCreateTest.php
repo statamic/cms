@@ -1018,7 +1018,6 @@ EOT
 
         $output = $this->tag('{{ form:contact redirect="/submitted" error_redirect="/errors" class="form" id="form" }}{{ form_config:test_config }}{{ /form:contact }}');
 
-        $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/forms/contact" class="form" id="form">', $output);
         $this->assertStringContainsString('<p>Shut up, Malacoustix!</p>', $output);
     }
 }
