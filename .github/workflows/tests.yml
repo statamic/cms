@@ -126,6 +126,10 @@ jobs:
         if: steps.should-run-tests.outputs.result == 'true'
         run: npm ci
 
+      - name: Install Playwright browsers
+        if: steps.should-run-tests.outputs.result == 'true'
+        run: npx playwright install chromium
+
       - name: Execute tests
         if: steps.should-run-tests.outputs.result == 'true'
         run: npm run test
