@@ -1,7 +1,7 @@
 <script setup>
 import Head from '@/pages/layout/Head.vue';
 import Outside from '@/pages/layout/Outside.vue';
-import { AuthCard, Field, Input, Button } from '@statamic/ui';
+import { AuthCard, Field, Input, Button } from '@ui';
 import { computed, ref, watch } from 'vue';
 import { router } from '@inertiajs/vue3';
 

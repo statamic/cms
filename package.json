@@ -12,7 +12,7 @@
     "frontend-dev": "vite -c vite-frontend.config.js",
     "frontend-build": "vite build -c vite-frontend.config.js",
     "knip": "knip",
-    "types": "cd packages/ui && npm run types && cd ../cms && npm run types"
+    "types": "cd packages/cms && npm run types"
   },
   "dependencies": {
     "@davidenke/marked-text-renderer": "^3.0.0",
@@ -97,6 +97,7 @@
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.8",
     "@vitejs/plugin-vue": "^6.0.0",
+    "@vitest/browser-playwright": "^4.0.12",
     "@vue/test-utils": "^2.4.6",
     "jsdom": "^26.0.0",
     "knip": "^5.43.6",
@@ -105,7 +106,9 @@
     "tailwindcss": "^4.1.8",
     "typescript": "^5.9.2",
     "vite": "^7.0.4",
-    "vitest": "^3.2.0",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^4.0.12",
+    "vitest-browser-vue": "^2.0.1",
     "vue-component-debug": "^0.1.0",
     "vue-tsc": "^3.0.5"
   }
