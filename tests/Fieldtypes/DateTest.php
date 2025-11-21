@@ -239,7 +239,7 @@ class DateTest extends TestCase
                 'UTC',
                 [],
                 'now', // this would happen if the value was null, but default was "now"
-                '2010-12-25T13:43:00.000Z', // current date
+                'now', // handled on the frontend
             ],
             'date without time' => [
                 'UTC',
