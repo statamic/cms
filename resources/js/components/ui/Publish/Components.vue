@@ -1,5 +1,5 @@
 <script setup>
-import { injectContainerContext } from './container-context.js';
+import { injectContainerContext } from './container-context';
 
 const { components } = injectContainerContext();
 </script>

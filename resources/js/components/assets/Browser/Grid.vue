@@ -192,7 +192,7 @@ import {
     DropdownItem,
     DropdownSeparator
 } from '@ui';
-import { injectListingContext } from '@/components/ui/Listing/listing-context.js';
+import { injectListingContext } from '@/components/ui/Listing/listing-context';
 import ItemActions from '@/components/actions/ItemActions.vue';
 import FolderSvg from '@/../svg/folder.svg';
 

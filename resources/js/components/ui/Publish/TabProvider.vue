@@ -1,5 +1,5 @@
 <script setup>
-import { provideTabContext } from './tab-context.js';
+import { provideTabContext } from './tab-context';
 
 const props = defineProps({
     tab: {

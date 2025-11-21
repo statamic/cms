@@ -1,6 +1,6 @@
 <script setup>
 import { Motion } from 'motion-v';
-import { injectListingContext } from './listing-context.js';
+import { injectListingContext } from './listing-context';
 import { computed, ref, watch } from 'vue';
 import { Button, ButtonGroup } from '@ui';
 import BulkActions from '@/components/actions/BulkActions.vue';

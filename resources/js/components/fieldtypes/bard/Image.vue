@@ -70,7 +70,7 @@ import Asset from '../assets/Asset';
 import { NodeViewWrapper } from '@tiptap/vue-3';
 import Selector from '../../assets/Selector.vue';
 import { Input, Button } from '@ui';
-import { containerContextKey } from '@ui/Publish/container-context.js';
+import { containerContextKey } from '@ui/Publish/container-context';
 
 export default {
     mixins: [Asset],

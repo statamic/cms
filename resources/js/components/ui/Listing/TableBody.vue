@@ -2,7 +2,7 @@
 import TableField from '@/components/data-list/TableField.vue';
 import RowActions from '../Listing/RowActions.vue';
 import SortableList from '@/components/sortable/SortableList.vue';
-import { injectListingContext } from './listing-context.js';
+import { injectListingContext } from './listing-context';
 import { computed, ref, watch } from 'vue';
 import { Checkbox } from '@ui';
 

@@ -1,5 +1,5 @@
 <script setup>
-import { injectTabContext } from './tab-context.js';
+import { injectTabContext } from './tab-context';
 import {
     Button,
     Panel,
@@ -12,7 +12,7 @@ import {
 import FieldsProvider from './FieldsProvider.vue';
 import Fields from './Fields.vue';
 import ShowField from '@/components/field-conditions/ShowField.js';
-import { injectContainerContext } from './container-context.js';
+import { injectContainerContext } from './container-context';
 import markdown from '@/util/markdown.js';
 import { computed } from 'vue';
 import { Primitive } from 'reka-ui';

@@ -1,7 +1,7 @@
 <script setup>
 import { computed, useTemplateRef, watch, ref, inject } from 'vue';
-import { injectContainerContext } from './container-context.js';
-import { injectFieldsContext } from './fields-context.js';
+import { injectContainerContext } from './container-context';
+import { injectFieldsContext } from './fields-context';
 import {
     Field,
     Icon,

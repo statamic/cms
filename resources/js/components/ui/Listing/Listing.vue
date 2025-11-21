@@ -1,7 +1,7 @@
 <script setup>
 import { ref, toRef, computed, watch, nextTick, onMounted, onBeforeUnmount, useSlots } from 'vue';
 import useSkeletonDelay from '@/composables/skeleton-delay.js';
-import { provideListingContext } from './listing-context.js';
+import { provideListingContext } from './listing-context';
 import {
     Icon,
     Panel,
