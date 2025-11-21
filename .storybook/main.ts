@@ -25,11 +25,6 @@ const config: StorybookConfig = {
     config.plugins.push(tailwindcss());
 
     return mergeConfig(config, {
-      resolve: {
-        alias: {
-          '@inertiajs/vue3': path.resolve(__dirname, './inertia-mock.js'),
-        },
-      },
       optimizeDeps: {
         include: ['reka-ui', 'cva', 'tailwind-merge', '@storybook/blocks'],
       },

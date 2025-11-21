@@ -10,13 +10,6 @@ export const $date = {
   locale: 'en',
 };
 
-// Mock Inertia Link component
-export const Link = {
-  name: 'InertiaLink',
-  props: ['href', 'as'],
-  template: '<a :href="href"><slot /></a>',
-};
-
 // Mock custom elements (web components used in some UI components)
 export const mockComponents = {
   'ui-input-group': {

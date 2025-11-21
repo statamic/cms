@@ -1,9 +1,16 @@
 import type { Preview } from "@storybook/vue3-vite";
 import { setup } from '@storybook/vue3';
 import { create } from 'storybook/theming';
+import { router } from '@inertiajs/vue3';
 import './storybook.css';
 import './theme.css';
-import { __, $date, Link, mockComponents } from './mocks';
+import { __, $date, mockComponents } from './mocks';
+
+// Intercept Inertia navigation and show alert instead.
+router.on('before', (event) => {
+  alert(`Navigating to: ${event.detail.visit.url}`);
+  return false;
+});
 
 const docsTheme = create({
   base: 'light',
@@ -16,9 +23,6 @@ setup((app) => {
   // Mock global functions
   app.config.globalProperties.__ = __;
   app.config.globalProperties.$date = $date;
-
-  // Register mock components
-  app.component('Link', Link);
 
   // Register custom element mocks
   Object.entries(mockComponents).forEach(([name, component]) => {
