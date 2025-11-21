@@ -1,17 +1,6 @@
-/* Tailwind CSS v4 setup for Storybook */
-@layer theme, base, components, utilities;
-@import "tailwindcss/theme.css" layer(theme);
-@import "tailwindcss/preflight.css" layer(base);
-@import "tailwindcss/utilities.css" layer(utilities);
-
-/* Custom dark mode variant */
+@import 'tailwindcss';
+@import '../resources/css/ui.css';
 @custom-variant dark (&:where(.dark, .dark *));
-
-/* Import UI component styles */
-@import "../packages/ui/src/ui.css";
-@source "../packages/ui/src";
-
-
 
 .sbdocs h1,
 .sbdocs h2,
