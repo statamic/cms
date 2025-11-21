@@ -6,6 +6,7 @@ import { visualizer } from 'rollup-plugin-visualizer';
 import svgLoader from 'vite-svg-loader';
 import path from 'path';
 import { playwright } from '@vitest/browser-playwright';
+import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig(({ mode, command }) => {
     const env = loadEnv(mode, process.cwd(), '');
@@ -21,6 +22,7 @@ export default defineConfig(({ mode, command }) => {
             }
         },
         plugins: [
+            tsconfigPaths(),
             tailwindcss(),
             laravel({
                 valetTls: env.VALET_TLS,
@@ -38,10 +40,6 @@ export default defineConfig(({ mode, command }) => {
         resolve: {
             alias: {
                 vue: 'vue/dist/vue.esm-bundler.js',
-                '@': path.resolve(__dirname, 'resources/js'),
-                '@ui': path.resolve(__dirname, 'resources/js/components/ui'),
-                '@api': path.resolve(__dirname, 'resources/js/api.js'),
-                '@statamic/cms': path.resolve(__dirname, 'packages/cms/src'),
             },
         },
         build: {

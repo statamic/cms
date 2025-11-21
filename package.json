@@ -114,6 +114,7 @@
     "tailwindcss": "^4.1.8",
     "typescript": "^5.9.2",
     "vite": "^7.0.4",
+    "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^4.0.12",
     "vitest-browser-vue": "^2.0.1",
     "vue-component-debug": "^0.1.0",
