@@ -1,15 +1,9 @@
 <script>
 import { Sortable, Plugins, Draggable } from '@shopify/draggable';
+import uniqid from 'uniqid';
 
-function move(items, oldIndex, newIndex) {
-    const itemRemovedArray = [...items.slice(0, oldIndex), ...items.slice(oldIndex + 1, items.length)];
-
-    return [
-        ...itemRemovedArray.slice(0, newIndex),
-        items[oldIndex],
-        ...itemRemovedArray.slice(newIndex, itemRemovedArray.length),
-    ];
-}
+const groups = {};
+const lists = {};
 
 export default {
     emits: ['dragstart', 'dragend', 'update:model-value'],
@@ -17,6 +11,15 @@ export default {
     props: {
         modelValue: {
             required: true,
+        },
+        owner: {
+            default: null,
+        },
+        group: {
+            default: null,
+        },
+        groupValidator: {
+            default: null,
         },
         itemClass: {
             default: 'sortable-item',
@@ -61,6 +64,8 @@ export default {
     data() {
         return {
             sortable: null,
+            groupId: this.group || uniqid(),
+            listId: uniqid(),
         };
     },
 
@@ -127,22 +132,74 @@ export default {
 
     methods: {
         setupSortableList() {
-            this.sortable = new Sortable(this.$el, this.computedOptions);
-
+            this.sortable = this.connectSortable();
             this.sortable.on('drag:start', () => this.$emit('dragstart'));
             this.sortable.on('drag:stop', () => this.$emit('dragend'));
-
-            this.sortable.on('sortable:stop', ({ oldIndex, newIndex }) => {
-                this.$emit('update:model-value', move(this.modelValue, oldIndex, newIndex));
+            this.sortable.on('sortable:stop', (event) => {
+                const { oldIndex, newIndex, oldContainer, newContainer } = event;
+                if (!this.group) {
+                    this.$emit('update:model-value', arrayMove(this.value, oldIndex, newIndex));
+                    return;           
+                }
+                const payload = { oldIndex, newIndex };
+                if (newContainer === this.$el && oldContainer === this.$el) {
+                    this.$emit('update:model-value', { operation: 'move', oldList: this, newList: this, ...payload });
+                } else if (newContainer === this.$el) {
+                    this.$emit('update:model-value', { operation: 'add', oldList: lists[oldContainer.dataset.listId], newList: this, ...payload });
+                } else if (oldContainer === this.$el) {
+                    this.$emit('update:model-value', { operation: 'remove', oldList: this, newList: lists[newContainer.dataset.listId], ...payload });
+                }
             });
-
+            if (this.group && this.groupValidator) {
+                this.sortable.on('sortable:sort', (event) => {
+                    const { dragEvent } = event;
+                    const { sourceContainer, overContainer, source } = dragEvent;
+                    if (overContainer !== this.$el || sourceContainer === this.$el) {
+                        return;
+                    }
+                    if (!this.groupValidator({ source })) {
+                        event.cancel();
+                    }
+                });
+                this.sortable.on('sortable:start', (event) => {
+                    const { dragEvent } = event;
+                    const { source } = dragEvent;
+                    const valid = this.groupValidator({ source });
+                    this.$emit('groupstart', { valid });
+                });
+                this.sortable.on('sortable:stop', () => {
+                    this.$emit('groupend');
+                });
+            }
             if (this.mirror === false) {
                 this.sortable.on('mirror:create', (e) => e.cancel());
             }
         },
 
         destroySortableList() {
-            this.sortable?.destroy();
+            this.disconnectSortable();
+        },
+
+        connectSortable() {
+            this.$el.dataset.listId = this.listId;
+            lists[this.listId] = this;
+            if (!groups[this.groupId]) {
+                groups[this.groupId] = new Sortable(this.$el, this.computedOptions);
+            } else {
+                groups[this.groupId].addContainer(this.$el);
+            }
+            return groups[this.groupId];
+        },
+
+        disconnectSortable() {
+            delete lists[this.listId];
+            if (groups[this.groupId]) {
+                groups[this.groupId].removeContainer(this.$el);
+                if (groups[this.groupId].containers.length === 0) {
+                    groups[this.groupId].destroy();
+                    delete groups[this.groupId];
+                }
+            }
         },
     },
 

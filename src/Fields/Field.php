@@ -20,6 +20,7 @@ class Field implements Arrayable
     protected $handle;
     protected $prefix;
     protected $config;
+    protected $configHash;
     protected $value;
     protected $parent;
     protected $parentField;
@@ -468,6 +469,15 @@ class Field implements Arrayable
     public function form(): ?Form
     {
         return $this->form;
+    }
+
+    public function configHash(): string
+    {
+        if (! isset($this->configHash)) {
+            $this->configHash = md5($this->handle.json_encode($this->config));
+        }
+
+        return $this->configHash;
     }
 
     public static function commonFieldOptions(): Fields

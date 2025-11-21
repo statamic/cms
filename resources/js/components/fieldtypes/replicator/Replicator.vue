@@ -20,11 +20,17 @@
                         <sortable-list
                             :model-value="value"
                             :vertical="true"
-                            :item-class="sortableItemClass"
-                            :handle-class="sortableHandleClass"
+                            :owner="this"
+                            group="replicator-fieldtype"
+                            :group-validator="sortableGroupValidator"
+                            class="min-h-px"
+                            item-class="replicator-sortable-item"
+                            handle-class="replicator-sortable-handle"
                             append-to="body"
                             constrain-dimensions
                             @update:model-value="sorted($event)"
+                            @groupstart="sortableGroupStart"
+                            @groupend="sortableGroupEnd"
                             @dragstart="$emit('focus')"
                             @dragend="$emit('blur')"
                             v-slot="{}"
@@ -39,8 +45,9 @@
                                     :meta-path="setMetaPathPrefix"
                                     :values="set"
                                     :config="setConfig(set.type)"
-                                    :sortable-item-class="sortableItemClass"
-                                    :sortable-handle-class="sortableHandleClass"
+                                    :config-hash="setConfigHash(set.type)"
+                                    sortable-item-class="replicator-sortable-item"
+                                    sortable-handle-class="replicator-sortable-handle"
                                     :collapsed="collapsed.includes(set._id)"
                                     :enabled="set.enabled"
                                     :read-only
@@ -105,6 +112,7 @@ export default {
             focused: false,
             collapsed: clone(this.meta.collapsed),
             fullScreenMode: false,
+            canDropSet: null,
             provide: {
                 replicatorSets: this.config.sets,
                 showReplicatorFieldPreviews: this.config.previews,
@@ -132,6 +140,10 @@ export default {
             return this.groupConfigs.reduce((sets, group) => {
                 return sets.concat(group.sets);
             }, []);
+        },
+
+        setConfigHashes() {
+            return this.meta.setConfigHashes;
         },
 
         groupConfigs() {
@@ -184,6 +196,10 @@ export default {
             return this.setConfigs.find((c) => c.handle === handle) || {};
         },
 
+        setConfigHash(handle) {
+            return this.setConfigHashes[handle];
+        },
+
         updated(index, set) {
             this.update([...this.value.slice(0, index), set, ...this.value.slice(index + 1)]);
         },
@@ -194,9 +210,31 @@ export default {
             this.update([...this.value.slice(0, index), ...this.value.slice(index + 1)]);
         },
 
-        sorted(value) {
-            this.update(value);
-        },
+        sorted({ operation, oldIndex, newIndex, oldList }) {
+            if (operation === 'move') {
+                // Move set within this replicator
+                this.update(arrayMove(this.value, oldIndex, newIndex));
+            } else if (operation === 'add') {
+                // Add set to this replicator
+                const oldReplicator = oldList.owner;
+                const set = oldReplicator.value[oldIndex];
+                const meta = oldReplicator.meta.existing[set._id];
+                this.updateSetMeta(set._id, meta);
+                this.update(arrayAdd(this.value, set, newIndex));
+                if (oldReplicator.collapsed.includes(set._id)) {
+                    this.collapseSet(set._id);
+                } else {
+                    this.expandSet(set._id);
+                }
+                // Remove set from old replicator
+                // Do this from the target replicator in order to avoid race conditions with nested
+                // replicators both trying to update their parent's value at the same time.
+                this.$nextTick(() => {
+                    oldReplicator.removeSetMeta(set._id);
+                    oldReplicator.update(arrayRemove(oldReplicator.value, oldIndex)); 
+                });
+            }
+        },        
 
         addSet(handle, index) {
             const set = {
@@ -273,6 +311,20 @@ export default {
 
             return this.errorsById.hasOwnProperty(id) && this.errorsById[id].length > 0;
         },
+
+        sortableGroupValidator({ source }) {
+            this.canDropSet = this.canAddSet && Object.values(this.setConfigHashes).includes(source.dataset.configHash);
+            return this.canDropSet;
+        },
+
+        sortableGroupStart({ valid }) {
+            this.canDropSet = valid;
+        },
+        
+        sortableGroupEnd() {
+            this.canDropSet = null;
+        },
+
     },
 
     mounted() {

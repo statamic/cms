@@ -25,6 +25,7 @@ const replicatorSets = inject('replicatorSets');
 
 const props = defineProps({
     config: Object,
+    configHash: String,
     id: String,
     fieldPath: String,
     metaPath: String,
@@ -120,7 +121,7 @@ function destroy() {
 </script>
 
 <template>
-    <div :class="sortableItemClass">
+    <div :class="sortableItemClass" :data-config-hash="configHash">
         <slot name="picker" />
         <div
             layout
