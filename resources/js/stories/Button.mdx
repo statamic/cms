@@ -1,0 +1,22 @@
+import { Canvas, Meta, Controls } from '@storybook/addon-docs/blocks';
+import * as ButtonStories from './Button.stories';
+
+<Meta of={ButtonStories} />
+
+# Button
+
+Buttons are used to trigger actions. They come in many sizes and flavors.
+
+<Canvas of={ButtonStories.Default} />
+
+## Variants
+
+Use the `variant` prop to change the appearance of the button.
+
+<Canvas of={ButtonStories.Variants} />
+
+## Sizes
+
+Use the `size` prop to change the size of the button.
+
+<Canvas of={ButtonStories.Sizes} />
