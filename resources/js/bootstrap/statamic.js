@@ -18,6 +18,7 @@ import markdown from '@/util/markdown.js';
 import VueComponentDebug from 'vue-component-debug';
 import { registerIconSetFromStrings } from '@ui';
 import Layout from '@/pages/layout/Layout.vue';
+import { setTranslations, setLocale } from '@/translations/translator.js';
 import {
     keys,
     components,
@@ -239,6 +240,9 @@ export default {
         this.$app.use(FloatingVue, { disposeTimeout: 30000, distance: 10 });
         this.$app.use(VueComponentDebug, { enabled: import.meta.env.VITE_VUE_COMPONENT_DEBUG === 'true' });
         toast.initialize(this.$app);
+
+        setTranslations(this.initialConfig.translations);
+        setLocale(this.initialConfig.translationLocale);
 
         Object.assign(this.$app.config.globalProperties, {
             $config: config,

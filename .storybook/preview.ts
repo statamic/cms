@@ -4,7 +4,9 @@ import { create } from 'storybook/theming';
 import { router } from '@inertiajs/vue3';
 import './storybook.css';
 import './theme.css';
-import { __, $date, mockComponents } from './mocks';
+import { translate } from '@/translations/translator';
+import registerUiComponents from '@/bootstrap/ui';
+import DateFormatter from '@/components/DateFormatter';
 
 // Intercept Inertia navigation and show alert instead.
 router.on('before', (event) => {
@@ -19,15 +21,10 @@ const docsTheme = create({
 });
 
 // Setup global mocks
-setup((app) => {
-  // Mock global functions
-  app.config.globalProperties.__ = __;
-  app.config.globalProperties.$date = $date;
-
-  // Register custom element mocks
-  Object.entries(mockComponents).forEach(([name, component]) => {
-    app.component(name, component);
-  });
+setup(async (app) => {
+  app.config.globalProperties.__ = translate;
+  app.config.globalProperties.$date = new DateFormatter;
+  await registerUiComponents(app);
 });
 
 const preview: Preview = {
