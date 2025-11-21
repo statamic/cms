@@ -1,6 +1,6 @@
 <script setup>
 import { Pagination } from '@ui';
-import { injectListingContext } from '../Listing/Listing.vue';
+import { injectListingContext } from './listingContext.js';
 
 const {
     meta,

@@ -113,7 +113,7 @@ import {
     PublishFieldsProvider as FieldsProvider,
     PublishFields as Fields
 } from '@ui';
-import { containerContextKey } from '@/components/ui/Publish/Container.vue';
+import { containerContextKey } from '@/components/ui/Publish/containerContext.js';
 import { watch } from 'vue';
 
 export default {

@@ -1,5 +1,5 @@
 <script setup>
-import { injectContainerContext } from './Container.vue';
+import { injectContainerContext } from './containerContext.js';
 
 const { components } = injectContainerContext();
 </script>

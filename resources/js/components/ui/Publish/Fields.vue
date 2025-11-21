@@ -1,6 +1,6 @@
 <script setup>
-import { injectContainerContext } from './Container.vue';
-import { injectFieldsContext } from './FieldsProvider.vue';
+import { injectContainerContext } from './containerContext.js';
+import { injectFieldsContext } from './fieldsContext.js';
 import Field from './Field.vue';
 import { computed, inject } from 'vue';
 

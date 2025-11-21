@@ -8,7 +8,7 @@ import {
     DropdownMenu,
     DropdownSeparator,
 } from '@ui';
-import { injectListingContext } from '../Listing/Listing.vue';
+import { injectListingContext } from './listingContext.js';
 import { computed, ref, watch } from 'vue';
 
 const { preferencesPrefix, activeFilters, searchQuery, setFilters, clearFilters, setSearchQuery, clearSearchQuery } =

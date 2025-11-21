@@ -1,12 +1,7 @@
-<script>
-import createContext from '@/util/createContext.js';
-
-export const [injectListingContext, provideListingContext] = createContext('Listing');
-</script>
-
 <script setup>
 import { ref, toRef, computed, watch, nextTick, onMounted, onBeforeUnmount, useSlots } from 'vue';
 import useSkeletonDelay from '@/composables/skeleton-delay.js';
+import { provideListingContext } from './listingContext.js';
 import {
     Icon,
     Panel,

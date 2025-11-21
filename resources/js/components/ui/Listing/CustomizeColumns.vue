@@ -1,7 +1,7 @@
 <script setup>
 import { Button, Modal } from '@ui';
 import { SortableList } from '@/components/sortable/Sortable.js';
-import { injectListingContext } from '../Listing/Listing.vue';
+import { injectListingContext } from './listingContext.js';
 import { computed, ref } from 'vue';
 
 const { preferencesPrefix, columns, visibleColumns, hiddenColumns, setColumns, reorderable } = injectListingContext();

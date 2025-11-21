@@ -1,11 +1,6 @@
-<script>
-import createContext from '@/util/createContext.js';
-
-export const [injectFieldsContext, provideFieldsContext] = createContext('PublishFields');
-</script>
-
 <script setup>
 import { toRef } from 'vue';
+import { provideFieldsContext } from './fieldsContext.js';
 
 const props = defineProps({
     fields: {
