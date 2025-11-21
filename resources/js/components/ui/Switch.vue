@@ -17,7 +17,7 @@ const switchRootClasses = cva({
         'relative flex rounded-full shrink-0 border-2',
         'transition-colors cursor-pointer',
         'data-[state=checked]:shadow-inner data-[state=checked]:border-switch-bg data-[state=checked]:bg-switch-bg',
-        'data-[state=unchecked]:border-transparent dark:[.publish-fields_&]:data-[state=checked]:border-gray-800',
+        'data-[state=unchecked]:border-transparent',
         'data-[state=unchecked]:bg-gray-200 dark:data-[state=unchecked]:bg-gray-700'
     ],
     variants: {
