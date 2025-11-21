@@ -6,6 +6,8 @@
         "strict": false,
         "skipLibCheck": true,
         "allowJs": true,
+        "noEmit": true,
+        "isolatedModules": true,
         "baseUrl": ".",
         "paths": {
             "@/*": ["resources/js/*"],
@@ -13,5 +15,7 @@
             "@ui/*": ["resources/js/components/ui/*"],
             "@api": ["resources/js/api.js"]
         }
-    }
+    },
+    "include": ["resources/js/**/*"],
+    "exclude": ["node_modules", "resources/dist", "resources/dist-dev"]
 }
