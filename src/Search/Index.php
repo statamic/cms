@@ -4,7 +4,6 @@ namespace Statamic\Search;
 
 use Closure;
 use Statamic\Contracts\Search\Searchable;
-use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 abstract class Index
