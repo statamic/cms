@@ -83,8 +83,8 @@ export { default as CreateForm } from "./CreateForm.vue";
 export { default as LivePreview } from "./LivePreview/LivePreview.vue";
 export { default as LivePreviewPopout } from "./LivePreview/Popout.vue";
 export { default as PublishComponents } from "./Publish/Components.vue";
+export { default as PublishContainer } from "./Publish/Container.vue";
 export {
-    default as PublishContainer,
     containerContextKey as publishContextKey,
     injectContainerContext as injectPublishContext
 } from "./Publish/Container.vue";

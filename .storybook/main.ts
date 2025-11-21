@@ -12,7 +12,9 @@ const config: StorybookConfig = {
     staticDirs: ['./public'],
     framework: {
         name: '@storybook/vue3-vite',
-        options: {}
+        options: {
+            docgen: 'vue-component-meta'
+        }
     },
 };
 
