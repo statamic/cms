@@ -41,12 +41,12 @@ class AssetsTest extends TestCase
         $provider = $this->makeProvider($locale, $config);
 
         // Check if it provides the expected assets.
-        $this->assertEquals($expected, $provider->provide()->map->filename()->all());
+        $this->assertEquals($expected, $provider->provide()->all());
 
         // Check if the assets are contained by the provider or not.
         foreach (Asset::all() as $asset) {
             $this->assertEquals(
-                $shouldBeIn = in_array($asset->filename(), $expected),
+                $shouldBeIn = in_array($asset->reference(), $expected),
                 $provider->contains($asset),
                 "Asset {$asset->filename()} should ".($shouldBeIn ? '' : 'not ').'be contained in the provider.'
             );
@@ -59,64 +59,64 @@ class AssetsTest extends TestCase
             'all' => [
                 null,
                 ['searchables' => 'all'],
-                ['a', 'b', 'y', 'z'],
+                ['asset::images::a.jpg', 'asset::images::b.jpg', 'asset::documents::y.txt', 'asset::documents::z.txt'],
             ],
             'all containers' => [
                 null,
                 ['searchables' => ['assets:*']],
-                ['a', 'b', 'y', 'z'],
+                ['asset::images::a.jpg', 'asset::images::b.jpg', 'asset::documents::y.txt', 'asset::documents::z.txt'],
             ],
             'images' => [
                 null,
                 ['searchables' => ['assets:images']],
-                ['a', 'b'],
+                ['asset::images::a.jpg', 'asset::images::b.jpg'],
             ],
             'documents' => [
                 null,
                 ['searchables' => ['assets:documents']],
-                ['y', 'z'],
+                ['asset::documents::y.txt', 'asset::documents::z.txt'],
             ],
 
             'all, english' => [
                 'en',
                 ['searchables' => 'all'],
-                ['a', 'b', 'y', 'z'],
+                ['asset::images::a.jpg', 'asset::images::b.jpg', 'asset::documents::y.txt', 'asset::documents::z.txt'],
             ],
             'all containers, english' => [
                 'en',
                 ['searchables' => ['assets:*']],
-                ['a', 'b', 'y', 'z'],
+                ['asset::images::a.jpg', 'asset::images::b.jpg', 'asset::documents::y.txt', 'asset::documents::z.txt'],
             ],
             'images, english' => [
                 'en',
                 ['searchables' => ['assets:images']],
-                ['a', 'b'],
+                ['asset::images::a.jpg', 'asset::images::b.jpg'],
             ],
             'documents, english' => [
                 'en',
                 ['searchables' => ['assets:documents']],
-                ['y', 'z'],
+                ['asset::documents::y.txt', 'asset::documents::z.txt'],
             ],
 
             'all, french' => [
                 'fr',
                 ['searchables' => 'all'],
-                ['a', 'b', 'y', 'z'],
+                ['asset::images::a.jpg', 'asset::images::b.jpg', 'asset::documents::y.txt', 'asset::documents::z.txt'],
             ],
             'all containers, french' => [
                 'fr',
                 ['searchables' => ['assets:*']],
-                ['a', 'b', 'y', 'z'],
+                ['asset::images::a.jpg', 'asset::images::b.jpg', 'asset::documents::y.txt', 'asset::documents::z.txt'],
             ],
             'images, french' => [
                 'fr',
                 ['searchables' => ['assets:images']],
-                ['a', 'b'],
+                ['asset::images::a.jpg', 'asset::images::b.jpg'],
             ],
             'documents, french' => [
                 'fr',
                 ['searchables' => ['assets:documents']],
-                ['y', 'z'],
+                ['asset::documents::y.txt', 'asset::documents::z.txt'],
             ],
         ];
     }
@@ -142,7 +142,10 @@ class AssetsTest extends TestCase
             'filter' => $filter,
         ]);
 
-        $this->assertEquals(['a', 'c', 'd'], $provider->provide()->map->filename()->all());
+        $this->assertEquals(
+            ['asset::images::a.jpg', 'asset::images::c.jpg', 'asset::images::d.jpg'],
+            $provider->provide()->all()
+        );
 
         $this->assertTrue($provider->contains($a));
         $this->assertFalse($provider->contains($b));
@@ -161,6 +164,8 @@ class AssetsTest extends TestCase
             ],
         ];
     }
+
+    // TODO: query scope support?
 
     private function makeProvider($locale, $config)
     {

@@ -20,7 +20,7 @@ abstract class Index
 
     abstract public function exists();
 
-    abstract protected function insertDocuments(Documents $documents);
+    abstract public function insertDocuments(Documents $documents);
 
     abstract protected function deleteIndex();
 
@@ -89,13 +89,20 @@ abstract class Index
 
     public function insertMultiple($documents)
     {
-        $documents = (new Documents($documents))->mapWithKeys(function (Searchable $item) {
-            return [$item->getSearchReference() => $this->searchables()->fields($item)];
-        });
-
-        $this->insertDocuments($documents);
+        $documents
+            ->chunk(config('statamic.search.chunk_size'))
+            ->each(fn ($documents) => InsertMultipleJob::dispatch(
+                name: Str::beforeLast($this->name, '_'),
+                locale: $this->locale,
+                documents: $documents
+            ));
 
         return $this;
+    }
+
+    public function fields(Searchable $searchable)
+    {
+        return $this->searchables()->fields($searchable);
     }
 
     public function shouldIndex($searchable)
