@@ -6,7 +6,6 @@
             <Combobox
                 ref="fieldSelect"
                 :model-value="condition.field"
-                class="w-full"
                 :options="fieldOptions"
                 :placeholder="__('Field')"
                 :taggable="true"
