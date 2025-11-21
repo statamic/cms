@@ -1,6 +1,6 @@
-import type { Preview } from "@storybook/vue3-vite";
+import type { Preview } from '@storybook/vue3-vite';
 import { setup } from '@storybook/vue3';
-import { create } from 'storybook/theming';
+import { create as createTheme } from 'storybook/theming';
 import { router } from '@inertiajs/vue3';
 import './storybook.css';
 import './theme.css';
@@ -14,13 +14,6 @@ router.on('before', (event) => {
   return false;
 });
 
-const docsTheme = create({
-  base: 'light',
-  fontBase: '"Lexend", sans-serif',
-  fontCode: '"Source Code Pro", monospace',
-});
-
-// Setup global mocks
 setup(async (app) => {
   app.config.globalProperties.__ = translate;
   app.config.globalProperties.$date = new DateFormatter;
@@ -39,7 +32,11 @@ const preview: Preview = {
         },
 
         docs: {
-            theme: docsTheme,
+            theme: createTheme({
+                base: 'light',
+                fontBase: '"Lexend", sans-serif',
+                fontCode: '"Source Code Pro", monospace',
+            }),
         },
 
         a11y: {
