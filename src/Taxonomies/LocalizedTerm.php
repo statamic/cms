@@ -557,6 +557,11 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
         return $this->taxonomy()->title();
     }
 
+    public function getCpSearchResultIcon()
+    {
+        return 'taxonomies';
+    }
+
     public function getBulkAugmentationReferenceKey(): ?string
     {
         if ($this->augmentationReferenceKey) {

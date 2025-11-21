@@ -447,6 +447,11 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
         return __('User');
     }
 
+    public function getCpSearchResultIcon(): string
+    {
+        return 'users';
+    }
+
     public function getElevatedSessionMethod(): string
     {
         if (! config('statamic.webauthn.allow_password_login_with_passkey', true) && $this->passkeys()->isNotEmpty()) {
