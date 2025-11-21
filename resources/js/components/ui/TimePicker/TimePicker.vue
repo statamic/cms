@@ -44,7 +44,7 @@ const setToNow = () => {
                 <TimeFieldInput
                     v-else
                     :part="item.part"
-                    class="rounded-sm px-0.25 py-0.5 focus:bg-gray-100 focus:outline-hidden data-placeholder:text-gray-600 dark:focus:bg-gray-800 dark:data-placeholder:text-gray-400"
+                    class="rounded-sm px-0.25 py-0.5 focus:bg-blue-100 focus:outline-hidden data-placeholder:text-gray-600 dark:focus:bg-blue-900 dark:data-placeholder:text-gray-400"
                 >
                     {{ item.value }}
                 </TimeFieldInput>
