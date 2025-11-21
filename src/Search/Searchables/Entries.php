@@ -31,7 +31,19 @@ class Entries extends Provider
             $query->where('site', $site);
         }
 
-        return $query->lazy(100)->filter($this->filter())->values();
+        $this->applyQueryScope($query);
+
+        if ($this->hasFilter()) {
+            return $query
+                ->lazy(config('statamic.search.chunk_size'))
+                ->filter($this->filter())
+                ->values()
+                ->map->reference();
+        }
+
+        $query->where('status', 'published');
+
+        return $query->pluck('reference');
     }
 
     public function contains($searchable): bool
@@ -48,7 +60,17 @@ class Entries extends Provider
             return false;
         }
 
-        return $this->filter()($searchable);
+        if ($this->hasFilter()) {
+            return $this->filter()($searchable);
+        }
+
+        $query = Entry::query()
+            ->where('status', 'published')
+            ->where('id', $searchable->id());
+
+        $this->applyQueryScope($query);
+
+        return $query->exists();
     }
 
     public function find(array $ids): Collection

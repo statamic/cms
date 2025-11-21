@@ -2,9 +2,11 @@
 
 namespace Statamic\Search\Searchables;
 
+use Statamic\Facades\Scope;
 use Statamic\Facades\Search;
 use Statamic\Search\Index;
 use Statamic\Search\ProvidesSearchables;
+use Statamic\Support\Arr;
 
 abstract class Provider implements ProvidesSearchables
 {
@@ -53,6 +55,20 @@ abstract class Provider implements ProvidesSearchables
     protected function usesWildcard()
     {
         return in_array('*', $this->keys);
+    }
+
+    protected function applyQueryScope($query)
+    {
+        if (! $scope = $this->index->config()['query_scope'] ?? null) {
+            return;
+        }
+
+        Scope::find($scope)->apply($query, []);
+    }
+
+    protected function hasFilter()
+    {
+        return Arr::has($this->index->config(), 'filter');
     }
 
     protected function filter()

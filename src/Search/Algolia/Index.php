@@ -39,7 +39,7 @@ class Index extends BaseIndex
         return (new Query($this))->query($query);
     }
 
-    protected function insertDocuments(Documents $documents)
+    public function insertDocuments(Documents $documents)
     {
         $documents = $documents->map(function ($item, $id) {
             $item['objectID'] = $id;
