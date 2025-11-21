@@ -2,15 +2,16 @@ import type { Preview } from '@storybook/vue3-vite';
 import { setup } from '@storybook/vue3';
 import { create as createTheme } from 'storybook/theming';
 import { router } from '@inertiajs/vue3';
+import { action } from 'storybook/actions';
 import './storybook.css';
 import './theme.css';
 import { translate } from '@/translations/translator';
 import registerUiComponents from '@/bootstrap/ui';
 import DateFormatter from '@/components/DateFormatter';
 
-// Intercept Inertia navigation and show alert instead.
+// Intercept Inertia navigation and log to Actions tab.
 router.on('before', (event) => {
-  alert(`Navigating to: ${event.detail.visit.url}`);
+  action('inertia navigate')(event.detail.visit.url);
   return false;
 });
 
