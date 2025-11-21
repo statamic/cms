@@ -15,7 +15,6 @@
                         :instructions="__('Changes to this field in the fieldset will stay in sync.')"
                     >
                         <Combobox
-                            class="w-full"
                             :placeholder="__('Fields')"
                             :options="fieldSuggestions"
                             searchable
@@ -60,7 +59,6 @@
                         :instructions="__('Changes to this fieldset will stay in sync.')"
                     >
                         <Combobox
-                            class="w-full"
                             :placeholder="__('Fieldsets')"
                             :options="fieldsetSuggestions"
                             searchable
