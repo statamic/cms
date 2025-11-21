@@ -1,10 +1,4 @@
 import type { StorybookConfig } from '@storybook/vue3-vite';
-import { mergeConfig } from 'vite';
-import tailwindcss from '@tailwindcss/vite';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const config: StorybookConfig = {
   stories: [
@@ -20,15 +14,6 @@ const config: StorybookConfig = {
     name: "@storybook/vue3-vite",
     options: {}
   },
-  async viteFinal(config) {
-    config.plugins = config.plugins || [];
-    config.plugins.push(tailwindcss());
-
-    return mergeConfig(config, {
-      optimizeDeps: {
-        include: ['reka-ui', 'cva', 'tailwind-merge', '@storybook/blocks'],
-      },
-    });
-  },
 };
+
 export default config;
