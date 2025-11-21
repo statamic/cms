@@ -46,7 +46,6 @@
     font-size: 1rem;
 }
 
-/* Add padding to docs content area */
-.sbdocs-wrapper {
-    padding: 2rem 4rem !important;
+.sbdocs.sbdocs-wrapper {
+    padding: 2rem 4rem;
 }
