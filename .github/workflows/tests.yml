@@ -16,15 +16,11 @@ jobs:
 
     strategy:
       matrix:
-        php: [8.2, 8.3, 8.4]
-        laravel: [11.*, 12.*]
+        php: [8.3, 8.4]
+        laravel: [12.*]
         stability: [prefer-lowest, prefer-stable]
         os: [ubuntu-latest]
         include:
-          - os: windows-latest
-            php: 8.4
-            laravel: 11.*
-            stability: prefer-stable
           - os: windows-latest
             php: 8.4
             laravel: 12.*
@@ -129,6 +125,10 @@ jobs:
       - name: Install dependencies
         if: steps.should-run-tests.outputs.result == 'true'
         run: npm ci
+
+      - name: Install Playwright browsers
+        if: steps.should-run-tests.outputs.result == 'true'
+        run: npx playwright install chromium
 
       - name: Execute tests
         if: steps.should-run-tests.outputs.result == 'true'

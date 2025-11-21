@@ -5,6 +5,7 @@ import vue from '@vitejs/plugin-vue';
 import { visualizer } from 'rollup-plugin-visualizer';
 import svgLoader from 'vite-svg-loader';
 import path from 'path';
+import { playwright } from '@vitest/browser-playwright';
 
 export default defineConfig(({ mode, command }) => {
     const env = loadEnv(mode, process.cwd(), '');
@@ -40,7 +41,6 @@ export default defineConfig(({ mode, command }) => {
                 '@': path.resolve(__dirname, 'resources/js'),
                 '@ui': path.resolve(__dirname, 'resources/js/components/ui'),
                 '@api': path.resolve(__dirname, 'resources/js/api.js'),
-                '@statamic/ui': path.resolve(__dirname, 'packages/ui/src'),
                 '@statamic/cms': path.resolve(__dirname, 'packages/cms/src'),
             },
         },
@@ -52,7 +52,33 @@ export default defineConfig(({ mode, command }) => {
             },
             minify: isProdBuild
         },
-        test: { environment: 'jsdom', setupFiles: 'resources/js/tests/setup.js' },
+        test: {
+            projects: [
+                {
+                    extends: true,
+                    test: {
+                        name: 'unit',
+                        environment: 'jsdom',
+                        setupFiles: 'resources/js/tests/setup.js',
+                        include: ['resources/js/tests/**/*.test.js'],
+                        exclude: ['resources/js/tests/browser/**'],
+                    },
+                },
+                {
+                    extends: true,
+                    test: {
+                        name: 'browser',
+                        setupFiles: 'resources/js/tests/setup.js',
+                        include: ['resources/js/tests/browser/**/*.test.js'],
+                        browser: {
+                            enabled: true,
+                            provider: playwright(),
+                            instances: [{ browser: 'chromium' }],
+                        },
+                    },
+                },
+            ],
+        },
         define: {
             __VUE_PROD_DEVTOOLS__: isProdDevBuild,
         }
