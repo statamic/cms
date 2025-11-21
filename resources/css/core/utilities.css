@@ -42,6 +42,9 @@
     /* =Jay. Sometimes this is handy e.g. the text inside the command palette searchbox */
     text-box: cap alphabetic;
 }
+@utility st-text-trim-ex-alphabetic {
+    text-box: ex alphabetic;
+}
 
 @utility placeholder-xs {
     /* =Jay. The default of 1em on field inputs feels a bit clumsy/big */
