@@ -27,10 +27,6 @@ const config: StorybookConfig = {
     return mergeConfig(config, {
       resolve: {
         alias: {
-          '@statamic/ui': path.resolve(__dirname, '../packages/ui/src'),
-          '@/composables/has-component.js': path.resolve(__dirname, './composables-mock.js'),
-          '@/composables/has-component': path.resolve(__dirname, './composables-mock.js'),
-          '@': path.resolve(__dirname, '../resources/js'),
           '@inertiajs/vue3': path.resolve(__dirname, './inertia-mock.js'),
         },
       },
