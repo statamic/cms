@@ -1,6 +1,6 @@
 <script setup>
 import { toRef } from 'vue';
-import { provideFieldsContext } from './fieldsContext.js';
+import { provideFieldsContext } from './fields-context.js';
 
 const props = defineProps({
     fields: {

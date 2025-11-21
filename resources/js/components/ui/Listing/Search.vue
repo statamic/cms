@@ -1,5 +1,5 @@
 <script setup>
-import { injectListingContext } from './listingContext.js';
+import { injectListingContext } from './listing-context.js';
 import { Input } from '@ui';
 import debounce from '@/util/debounce.js';
 import { useTemplateRef } from 'vue';

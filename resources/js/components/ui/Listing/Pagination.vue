@@ -1,6 +1,6 @@
 <script setup>
 import { Pagination } from '@ui';
-import { injectListingContext } from './listingContext.js';
+import { injectListingContext } from './listing-context.js';
 
 const {
     meta,

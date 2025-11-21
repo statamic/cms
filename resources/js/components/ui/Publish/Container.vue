@@ -5,7 +5,7 @@ import Component from '@/components/Component.js';
 import Tabs from './Tabs.vue';
 import Values from '@/components/publish/Values.js';
 import { data_get } from '@/bootstrap/globals.js';
-import { injectContainerContext, provideContainerContext, containerContextKey } from './containerContext.js';
+import { injectContainerContext, provideContainerContext, containerContextKey } from './container-context.js';
 
 const emit = defineEmits(['update:modelValue', 'update:visibleValues', 'update:modifiedFields']);
 

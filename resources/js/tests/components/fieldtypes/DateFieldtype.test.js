@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils';
 import { test, expect } from 'vitest';
 import DateFieldtype from '@/components/fieldtypes/DateFieldtype.vue';
 import DateFormatter from '@/components/DateFormatter.js';
-import { containerContextKey } from '@ui/Publish/containerContext.js';
+import { containerContextKey } from '@ui/Publish/container-context.js';
 
 window.__ = (key) => key;
 

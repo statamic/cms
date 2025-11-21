@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue';
-import { injectListingContext } from './listingContext.js';
+import { injectListingContext } from './listing-context.js';
 import { Checkbox } from '@ui';
 
 const { items, selections, maxSelections, clearSelections, reorderable } = injectListingContext();

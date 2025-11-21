@@ -5,7 +5,7 @@ import {
     DropdownMenu,
     DropdownSeparator,
 } from '@ui';
-import { injectListingContext } from './listingContext.js';
+import { injectListingContext } from './listing-context.js';
 import ItemActions from '@/components/actions/ItemActions.vue';
 import { computed, ref, watch } from 'vue';
 

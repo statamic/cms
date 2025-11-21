@@ -84,7 +84,7 @@ export { default as LivePreview } from "./LivePreview/LivePreview.vue";
 export { default as LivePreviewPopout } from "./LivePreview/Popout.vue";
 export { default as PublishComponents } from "./Publish/Components.vue";
 export { default as PublishContainer } from "./Publish/Container.vue";
-export { containerContextKey as publishContextKey, injectContainerContext as injectPublishContext } from "./Publish/containerContext.js";
+export { containerContextKey as publishContextKey, injectContainerContext as injectPublishContext } from "./Publish/container-context.js";
 export { default as PublishField } from "./Publish/Field.vue";
 export { default as PublishFields } from "./Publish/Fields.vue";
 export { default as PublishFieldsProvider } from "./Publish/FieldsProvider.vue";

@@ -1,6 +1,6 @@
 <script setup>
 import { Button } from '@ui';
-import { injectListingContext } from './listingContext.js';
+import { injectListingContext } from './listing-context.js';
 import { computed } from 'vue';
 
 const props = defineProps({

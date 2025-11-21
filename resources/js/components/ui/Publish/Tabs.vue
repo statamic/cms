@@ -6,7 +6,7 @@ import {
     TabContent,
     TabProvider,
 } from '@ui';
-import { injectContainerContext } from './containerContext.js';
+import { injectContainerContext } from './container-context.js';
 import Sections from './Sections.vue';
 import { ref, computed, useSlots, onMounted, watch } from 'vue';
 import ElementContainer from '@/components/ElementContainer.vue';

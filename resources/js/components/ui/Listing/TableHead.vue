@@ -1,7 +1,7 @@
 <script setup>
 import HeaderCell from '../Listing/HeaderCell.vue';
 import ToggleAll from '../Listing/ToggleAll.vue';
-import { injectListingContext } from './listingContext.js';
+import { injectListingContext } from './listing-context.js';
 import { computed } from 'vue';
 
 const { allowsSelections, reorderable, hasActions, visibleColumns, allowsMultipleSelections } = injectListingContext();

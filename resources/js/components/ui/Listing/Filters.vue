@@ -7,7 +7,7 @@ import {
     Card,
     Heading,
 } from '@ui';
-import { injectListingContext } from './listingContext.js';
+import { injectListingContext } from './listing-context.js';
 import { computed, ref, watch, nextTick } from 'vue';
 import FieldFilter from './FieldFilter.vue';
 import DataListFilter from './Filter.vue';
