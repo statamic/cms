@@ -47,6 +47,9 @@
 @endforeach
 
 <style>
+@if (\Statamic\CP\Color::isUsingThemeFile())
+    {{ \Statamic\CP\Color::themeCss() }}
+@else
     :root {
         {{ \Statamic\CP\Color::cssVariables() }}
 
@@ -54,6 +57,7 @@
             {{ \Statamic\CP\Color::cssVariables(dark: true) }}
         }
     }
+@endif
 </style>
 
 @stack('head')
