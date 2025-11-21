@@ -108,15 +108,15 @@
                 <ui-panel-footer v-if="collection.available_in_selected_site" class="flex items-center gap-6 text-sm text-gray-600">
                     <div class="flex items-center gap-2">
                         <ui-badge :text="String(collection.published_entries_count)" pill class="bg-gray-200 dark:bg-gray-700" />
-                        <span>{{ __('Published') }}</span>
+                        <span>{{ __n('Published|Published', collection.published_entries_count) }}</span>
                     </div>
                     <div class="flex items-center gap-2 text-sm" v-if="collection.scheduled_entries_count > 0">
                         <ui-badge :text="String(collection.scheduled_entries_count)" pill class="bg-gray-200 dark:" />
-                        <span>{{ __('Scheduled') }}</span>
+                        <span>{{ __n('Scheduled|Scheduled', collection.scheduled_entries_count) }}</span>
                     </div>
                     <div class="flex items-center gap-2 text-sm" v-if="collection.draft_entries_count > 0">
                         <ui-badge :text="String(collection.draft_entries_count)" pill class="bg-gray-200 dark:" />
-                        <span>{{ __('Drafts') }}</span>
+                        <span>{{ __n('Draft|Drafts', collection.draft_entries_count) }}</span>
                     </div>
                 </ui-panel-footer>
             </ui-panel>
@@ -143,20 +143,20 @@
                 <ui-badge
                     v-if="collection.published_entries_count > 0"
                     color="green"
-                    :text="__('Published')"
+                    :text="__n('Published|Published', collection.published_entries_count)"
                     :append="collection.published_entries_count"
                     pill
                 />
                 <ui-badge
                     v-if="collection.scheduled_entries_count > 0"
                     color="yellow"
-                    :text="__('Scheduled')"
+                    :text="__n('Scheduled|Scheduled', collection.scheduled_entries_count)"
                     :append="collection.scheduled_entries_count"
                     pill
                 />
                 <ui-badge
                     v-if="collection.draft_entries_count > 0"
-                    :text="__('Drafts')"
+                    :text="__n('Draft|Drafts', collection.draft_entries_count)"
                     :append="collection.draft_entries_count"
                     pill
                 />
