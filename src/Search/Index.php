@@ -84,7 +84,7 @@ abstract class Index
 
     public function insert($document)
     {
-        return $this->insertMultiple(Arr::wrap($document));
+        return $this->insertMultiple(collect($document));
     }
 
     public function insertMultiple($documents)

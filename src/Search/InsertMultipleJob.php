@@ -9,6 +9,7 @@ use Illuminate\Support\LazyCollection;
 use Statamic\Contracts\Search\Searchable;
 use Statamic\Facades\Search;
 use Statamic\Search\Searchables\Providers;
+use Statamic\Support\Str;
 
 class InsertMultipleJob implements ShouldQueue
 {
@@ -20,7 +21,7 @@ class InsertMultipleJob implements ShouldQueue
     public function __construct(
         public string $name,
         public ?string $locale,
-        public LazyCollection|Collection $documents,
+        public Collection|LazyCollection $documents,
     ) {
         $this->onConnection($connection = config('statamic.search.queue_connection', config('queue.default')));
         $this->onQueue(config('statamic.search.queue', config("queue.connections.{$connection}.queue")));
@@ -39,13 +40,12 @@ class InsertMultipleJob implements ShouldQueue
             ->flatMap(function ($documents, $prefix) use ($providers) {
                 return $providers
                     ->getByPrefix($prefix)
-                    ->find($documents->map(fn ($reference) => explode('::', $reference)[1])->all())
+                    ->find($documents->map(fn ($reference) => Str::after($reference, '::'))->all())
                     ->all();
             })
             ->mapWithKeys(function (Searchable $item) use ($index) {
                 return [$item->getSearchReference() => $index->fields($item)];
-            })
-            ->values();
+            });
 
         $index->insertDocuments(new Documents($documents));
     }
