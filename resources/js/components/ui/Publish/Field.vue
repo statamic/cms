@@ -105,6 +105,12 @@ function replicatorPreviewUpdated(value) {
     setFieldPreviewValue(fullPath.value, value);
 }
 
+watch(
+    () => fullPath.value,
+    () => setFieldPreviewValue(fullPath.value, fieldtype.value?.replicatorPreview),
+    { immediate: true }
+);
+
 function focused() {
     // todo
 }
