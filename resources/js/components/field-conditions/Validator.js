@@ -122,7 +122,6 @@ export default class {
                 return 'includes';
             case 'includes_any':
             case 'contains_any':
-                return 'includes_any';
         }
 
         return operator;
@@ -137,7 +136,7 @@ export default class {
         }
 
         // When performing lhs.includes(), if lhs is not an object or array, cast to string.
-        if (operator === 'includes' && ! isObject(lhs)) {
+        if ((operator === 'includes' || operator == 'includes_any') && ! isObject(lhs)) {
             return lhs ? lhs.toString() : '';
         }
 
@@ -169,8 +168,13 @@ export default class {
         }
 
         // When performing a comparison that cannot be eval()'d, return rhs as is.
-        if (rhs === 'empty' || operator === 'includes' || operator === 'includes_any') {
+        if (rhs === 'empty' || operator === 'includes') {
             return rhs;
+        }
+
+        // Comparisons with _any operators need to be arrayed
+        if (operator === 'contains_any' || operator === 'includes_any') {
+            return rhs.split(',').map(string => string.trim());
         }
 
         // Prepare for eval() and return.
@@ -222,6 +226,10 @@ export default class {
             return this.passesCustomCondition(condition);
         }
 
+        if (condition.operator === 'contains_any') {
+            return this.passesContainsAnyCondition(condition);
+        }
+
         if (condition.operator === 'includes') {
             return this.passesIncludesCondition(condition);
         }
@@ -247,13 +255,19 @@ export default class {
     }
 
     passesIncludesAnyCondition(condition) {
-        let values = condition.rhs.split(',').map(string => string.trim());
-
         if (Array.isArray(condition.lhs)) {
-            return intersection(condition.lhs, values).length;
+            return intersection(condition.lhs, condition.rhs).length;
         }
 
-        return new RegExp(values.join('|')).test(condition.lhs);
+        return condition.rhs.includes(condition.lhs);
+    }
+
+    passesContainsAnyCondition(condition) {
+        if (Array.isArray(condition.lhs)) {
+            return intersection(condition.lhs, condition.rhs).length;
+        }
+
+        return new RegExp(condition.rhs.join('|')).test(condition.lhs);
     }
 
     passesCustomCondition(condition) {
