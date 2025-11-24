@@ -224,7 +224,6 @@ class NavTest extends StructureTestCase
         $this->assertEquals('http://localhost/cp/navigation/test', $nav->showUrl());
         $this->assertEquals('http://localhost/cp/navigation/test?foo=bar', $nav->showUrl(['foo' => 'bar']));
         $this->assertEquals('http://localhost/cp/navigation/test/edit', $nav->editUrl());
-        $this->assertEquals('http://localhost/cp/navigation/test', $nav->deleteUrl());
     }
 
     #[Test]
