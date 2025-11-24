@@ -24,7 +24,7 @@
                     </div>
                 </template>
                 <template #selected-option="{ option }">
-                    <span v-text="__(field?.config.display) || option.value"></span>
+                    <span class="block truncate" v-text="__(field?.config.display) || option.value"></span>
                 </template>
             </Combobox>
         </div>
