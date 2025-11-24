@@ -23,7 +23,7 @@
                             <Fields class="p-4" />
                         </FieldsProvider>
                     </div>
-                    <div v-if="config.collapse && isCollapsed">
+                    <div v-if="config.collapse && isCollapsed && !fullScreenMode">
                         <Button @click.prevent="toggleCollapsed" size="xs">{{ __('Expand') }} {{ config.display }}</Button>
                     </div>
                 </section>
