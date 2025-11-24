@@ -23,8 +23,8 @@
                         />
                     </div>
                 </template>
-                <template #selected-option>
-                    <span v-text=" __(field.config.display) || field.handle"></span>
+                <template #selected-option="{ option }">
+                    <div class="truncate" v-text="__(field?.config.display) || option.value" />
                 </template>
             </Combobox>
         </div>

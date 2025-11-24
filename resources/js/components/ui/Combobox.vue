@@ -332,7 +332,14 @@ defineExpose({
                 ignore-filter
             >
                 <ComboboxAnchor class="block w-full" data-ui-combobox-anchor>
-                    <ComboboxTrigger as="div" ref="trigger" :class="triggerClasses" @keydown.enter="openDropdown" @keydown.space="openDropdown" data-ui-combobox-trigger>
+                    <ComboboxTrigger
+                        as="div"
+                        ref="trigger"
+                        :class="triggerClasses"
+                        @keydown.enter="openDropdown"
+                        @keydown.space="openDropdown"
+                        data-ui-combobox-trigger
+                    >
                         <div class="flex-1 min-w-0">
                             <!-- Dropdown open: search input -->
                             <ComboboxInput
