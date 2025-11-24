@@ -117,10 +117,14 @@ function destroy() {
     deletingSet.value = false;
     emit('removed');
 }
+
+defineExpose({
+    expand: () => emit('expanded'),
+});
 </script>
 
 <template>
-    <div :class="sortableItemClass">
+    <div :class="sortableItemClass" data-replicator-set>
         <slot name="picker" />
         <div
             layout

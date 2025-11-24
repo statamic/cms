@@ -43,16 +43,18 @@ const activeTab = ref(visibleMainTabs.value[0].handle);
 
 onMounted(() => setActiveTabFromHash());
 
-function setActiveTabFromHash() {
-    if (window.location.hash.length === 0) return;
-
-    const handle = window.location.hash.substr(1);
-
-    if (visibleMainTabs.value.some((tab) => tab.handle === handle)) {
-        activeTab.value = handle;
+function setActive(tab) {
+    if (visibleMainTabs.value.some((t) => t.handle === tab)) {
+        activeTab.value = tab;
     } else {
         activeTab.value = visibleMainTabs.value[0].handle;
     }
+}
+
+function setActiveTabFromHash() {
+    if (window.location.hash.length === 0) return;
+
+    setActive(window.location.hash.substr(1));
 }
 
 watch(
@@ -88,6 +90,10 @@ const tabsWithErrors = computed(() => {
 function tabHasError(tab) {
     return tabsWithErrors.value.includes(tab.handle);
 }
+
+defineExpose({
+    setActive,
+});
 </script>
 
 <template>
@@ -112,6 +118,7 @@ function tabHasError(tab) {
                         :is="hasMultipleVisibleMainTabs ? TabContent : 'div'"
                         :force-mount="hasMultipleVisibleMainTabs ? true : null"
                         :class="{ 'hidden': tab.handle !== activeTab }"
+                        :data-publish-tab="tab.handle"
                     >
                         <TabProvider :tab="tab">
                             <slot :tab="tab">

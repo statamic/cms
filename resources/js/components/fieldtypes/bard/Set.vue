@@ -10,6 +10,7 @@
                 'border-red-500': hasError,
             }"
             :data-type="config.handle"
+            data-bard-set
             contenteditable="false"
             @copy.stop
             @paste.stop
@@ -117,6 +118,8 @@ import { containerContextKey } from '@/components/ui/Publish/Container.vue';
 import { watch } from 'vue';
 
 export default {
+    name: 'BardSet',
+
     props: nodeViewProps,
 
     components: {

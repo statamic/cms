@@ -139,15 +139,29 @@ export function replicatorPreviewHtml(html) {
 
 export function closestVm(el, name) {
     let parent = el;
+
     while (parent) {
-        if (parent.__vue__) break;
+        if (parent.__vueParentComponent) break;
         parent = parent.parentElement;
     }
-    let vm = parent.__vue__;
-    while (vm !== vm.$root) {
-        if (!name || name === vm.$options.name) return vm;
-        vm = vm.$parent;
+
+    if (!parent) return null;
+
+    let instance = parent.__vueParentComponent;
+
+    while (instance) {
+        const componentName = instance.type.name
+            || instance.type.__name
+            || instance.type.extends?.name;
+
+        if (!name || name === componentName) {
+            return instance;
+        }
+
+        instance = instance.parent;
     }
+
+    return null;
 }
 
 export function str_slug(string) {

@@ -86,6 +86,7 @@ export class Request extends Step {
                         const { errors: messages, message } = e.response.data;
                         if (errors) errors.value = messages;
                         Statamic.$toast.error(message);
+                        Statamic.$reveal.invalid();
                         e = new PipelineStopped();
                     } else if (e.response && e.response.data.message) {
                         Statamic.$toast.error(e.response.data.message);
