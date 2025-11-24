@@ -353,9 +353,9 @@ class EntriesTest extends TestCase
 
         $this->assertCount(1, $this->getEntries()); // defaults to 'published'
         $this->assertCount(1, $this->getEntries(['status:is' => 'published']));
-//        $this->assertCount(3, $this->getEntries(['status:not' => 'published']));
-//        $this->assertCount(3, $this->getEntries(['status:in' => 'published|draft']));
-//        $this->assertCount(4, $this->getEntries(['status:is' => 'any']));
+        $this->assertCount(3, $this->getEntries(['status:not' => 'published']));
+        $this->assertCount(3, $this->getEntries(['status:in' => 'published|draft']));
+        $this->assertCount(4, $this->getEntries(['status:is' => 'any']));
     }
 
     #[Test]
