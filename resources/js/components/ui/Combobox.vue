@@ -336,7 +336,7 @@ defineExpose({
                         <div class="flex-1 min-w-0">
                             <!-- Dropdown open: search input -->
                             <ComboboxInput
-                                v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"
+                                v-if="searchable && dropdownOpen"
                                 ref="search"
                                 class="w-full bg-transparent text-gray-900 dark:text-gray-300 opacity-100 focus:outline-none placeholder-gray-500 dark:placeholder-gray-400 [&::-webkit-search-cancel-button]:hidden"
                                 type="search"
@@ -349,9 +349,9 @@ defineExpose({
                                 @keydown.space="openDropdown"
                             />
 
-                            <!-- Dropdown open: placeholder -->
+                            <!-- Dropdown closed: placeholder (when no value selected) -->
                             <button
-                                v-else-if="!searchable && (dropdownOpen || !modelValue)"
+                                v-else-if="!dropdownOpen && !modelValue"
                                 type="button"
                                 class="w-full text-start flex items-center gap-2 bg-transparent cursor-pointer focus:outline-none"
                                 data-ui-combobox-placeholder
