@@ -1,7 +1,5 @@
-/* ==========================================================================
-Table Fieldtype
-========================================================================== */
-
+/* TABLE FIELDTYPE
+=================================================== */
 .table-contained {
     @apply relative mb-4 w-full rounded-lg border text-gray shadow-ui-sm outline-hidden dark:border-gray-700 dark:text-dark-150 text-start;
     border-collapse: separate;
@@ -134,21 +132,16 @@ Table Fieldtype
                 @apply outline-hidden ring-0;
             }
         }
-        /* Red delete controls */
-        &:has([aria-label*="Delete"]) {
-            &:focus-within {
-                @apply bg-red-500/5;
-                svg {
-                    @apply text-red-500 opacity-100;
-                }
-            }
-            &:hover {
-                button {
-                    @apply bg-red-500/5;
-                }
-                svg {
-                    @apply text-red-500 opacity-100;
-                }
+    }
+
+    /* TABLE FIELDTYPE / RED DELETE CONTROLS (RED)
+    =================================================== */
+    th,
+    .row-controls {
+        &:has([aria-label*="Delete"]):focus-within {
+            @apply bg-red-500/5;
+            svg {
+                @apply text-red-500 opacity-100;
             }
         }
     }
