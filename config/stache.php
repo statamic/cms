@@ -140,4 +140,19 @@ return [
         'timeout' => 30,
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Parallelism
+    |--------------------------------------------------------------------------
+    |
+    | Configure parallel processing for stache operations. When enabled,
+    | stores will be processed concurrently to improve performance.
+    |
+    */
+
+    'parallelism' => [
+        'enabled' => env('STATAMIC_STACHE_PARALLELISM_ENABLED', false),
+        'max_processes' => env('STATAMIC_STACHE_PARALLELISM_MAX_PROCESSES', 4),
+    ],
+
 ];

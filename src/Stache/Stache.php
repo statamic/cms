@@ -110,13 +110,51 @@ class Stache
 
         $this->startTimer();
 
-        $this->stores()->each->warm();
+        if (config('statamic.stache.parallelism.enabled')) {
+            $this->warmParallel();
+        } else {
+            $this->stores()->each->warm();
+        }
 
         $this->stopTimer();
 
         $lock->release();
 
         StacheWarmed::dispatch();
+    }
+
+    protected function warmParallel()
+    {
+        $maxProcesses = config('statamic.stache.parallelism.max_processes', 4);
+        $stores = $this->stores()->values();
+        $chunks = $stores->chunk(max(1, ceil($stores->count() / $maxProcesses)));
+
+        $pids = [];
+
+        foreach ($chunks as $chunk) {
+            $pid = pcntl_fork();
+
+            if ($pid == -1) {
+                throw new \RuntimeException('Could not fork process');
+            } elseif ($pid == 0) {
+                // Child process - reconnect to avoid shared connections
+                try {
+                    app('db')->reconnect();
+                    $chunk->each->warm();
+                } catch (\Exception $e) {
+                    // Silently handle errors in child processes to avoid breaking parent
+                }
+                exit(0);
+            } else {
+                // Parent process
+                $pids[] = $pid;
+            }
+        }
+
+        // Wait for all child processes to complete
+        foreach ($pids as $pid) {
+            pcntl_waitpid($pid, $status);
+        }
     }
 
     public function instance()
