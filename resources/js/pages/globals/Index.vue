@@ -3,6 +3,7 @@ import Head from '@/pages/layout/Head.vue';
 import { Link } from '@inertiajs/vue3';
 import { Header, CommandPaletteItem, Button, Icon, EmptyStateMenu, EmptyStateItem, DocsCallout, Listing, DropdownItem } from '@ui';
 import useArchitecturalBackground from '@/pages/layout/architectural-background.js';
+import { computed } from 'vue';
 
 const props = defineProps({
     globals: Array,
@@ -13,6 +14,12 @@ const props = defineProps({
 });
 
 if (props.globals.length === 0) useArchitecturalBackground();
+
+const actionContext = computed(() => {
+    return {
+        site: Statamic.$config.get('selectedSite'),
+    }
+})
 </script>
 
 <template>
@@ -42,6 +49,7 @@ if (props.globals.length === 0) useArchitecturalBackground();
                 :items="globals"
                 :columns="columns"
                 :action-url="actionUrl"
+                :action-context="actionContext"
                 :allow-search="false"
                 :allow-customizing-columns="false"
             >
