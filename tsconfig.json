@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "moduleResolution": "bundler",
+        "target": "ESNext",
+        "module": "ESNext",
+        "strict": false,
+        "skipLibCheck": true,
+        "allowJs": true,
+        "noEmit": true,
+        "isolatedModules": true,
+        "baseUrl": ".",
+        "paths": {
+            "@/*": ["resources/js/*"],
+            "@ui": ["resources/js/components/ui"],
+            "@ui/*": ["resources/js/components/ui/*"],
+            "@api": ["resources/js/api.js"],
+            "@statamic/cms/*": ["packages/cms/src/*"]
+        }
+    },
+    "include": ["resources/js/**/*"],
+    "exclude": ["node_modules", "resources/dist", "resources/dist-dev"]
+}

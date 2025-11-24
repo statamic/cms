@@ -8,10 +8,10 @@
             <Heading :text=" __(fieldtype.title + ' ' + 'Field')" size="lg" :icon="fieldtype.icon" />
             <div class="flex items-center gap-3">
                 <Button variant="ghost" :text="__('Cancel')" @click.prevent="close" />
-                <Button variant="default" @click.prevent="commit()" :text="__('Apply')" />
-                <Button v-if="!(isInsideSet || isInsideConfigFields)" variant="primary" @click.prevent="commitAndSave()" icon="save" :text="__('Apply & Save')" />
-                <Button v-if="isInsideSet || isInsideConfigFields" variant="default" @click.prevent="commit(true)" :text="__('Apply & Close All')" />
-                <Button v-if="isInsideSet || isInsideConfigFields" variant="primary" @click.prevent="commitAndSaveAndCloseAll()" icon="save" :text="__('Save & Close All')" />
+                <Button variant="default" @click.prevent="commit" :text="__('Apply')" />
+                <Button v-if="!(isNestedField)" variant="primary" @click.prevent="commitAndSave" icon="save" :text="__('Apply & Save')" />
+                <Button v-if="isNestedField" variant="default" @click.prevent="commitAndCloseAll" :text="__('Apply & Close All')" />
+                <Button v-if="isNestedField" variant="primary" @click.prevent="commitAndSaveAll" icon="save" :text="__('Save & Close All')" />
             </div>
         </header>
 
@@ -186,6 +186,10 @@ export default {
 
             return this.fieldtypeConfig;
         },
+
+        isNestedField() {
+            return this.isInsideSet || this.isInsideConfigFields;
+        },
     },
 
     created() {
@@ -251,7 +255,9 @@ export default {
             }
         },
 
-        commit(shouldCommitParent = false) {
+        commit(params = {}) {
+            let { shouldCommitParent, shouldSaveRoot } = params;
+
             this.clearErrors();
 
             this.$axios
@@ -265,34 +271,43 @@ export default {
                 .then((response) => {
                     this.$refs.container?.clearDirtyState();
                     this.$emit('committed', response.data, this.editedFields);
-                    this.close();
 
                     if (shouldCommitParent && this.commitParentField) {
-                        this.commitParentField(true);
+                        this.commitParentField(params);
+                        this.close();
+
+                        return;
                     }
+
+                    if (shouldSaveRoot) {
+                        this.saveRootForm();
+                    }
+
+                    this.close();
                 })
                 .catch((e) => this.handleAxiosError(e));
         },
 
+        // Top-level field: saves the current field and the blueprint/fieldset.
         commitAndSave() {
-            this.clearErrors();
+            this.commit({
+                shouldSaveRoot: true,
+            });
+        },
 
-            this.$axios
-                .post(cp_url('fields/update'), {
-                    id: this.id,
-                    type: this.type,
-                    values: this.values,
-                    fields: this.fields,
-                    isInsideSet: this.isInsideSet,
-                })
-                .then((response) => {
-                    this.$refs.container?.clearDirtyState();
-                    this.$emit('committed', response.data, this.editedFields);
+        // Nested field: saves the current field and any parents.
+        commitAndCloseAll() {
+            this.commit({
+                shouldCommitParent: true,
+            });
+        },
 
-                    this.saveRootForm();
-                    this.close();
-                })
-                .catch((e) => this.handleAxiosError(e));
+        // Nested field: saves the current field and the blueprint/fieldset.
+        commitAndSaveAll() {
+            this.commit({
+                shouldCommitParent: true,
+                shouldSaveRoot: true,
+            });
         },
 
         saveRootForm() {
@@ -301,50 +316,9 @@ export default {
         },
 
         handleSaveShortcut() {
-            if (this.isInsideSet || this.isInsideConfigFields) {
-                this.commitAndSaveAndCloseAll();
-            } else {
-                this.commitAndSave();
-            }
-        },
-
-        commitAndSaveAndCloseAll() {
-            if (this.isSaving) {
-                return;
-            }
-
-            this.isSaving = true;
-
-            this.clearErrors();
-
-            this.$axios
-                .post(cp_url('fields/update'), {
-                    id: this.id,
-                    type: this.type,
-                    values: this.values,
-                    fields: this.fields,
-                    isInsideSet: this.isInsideSet,
-                })
-                .then((response) => {
-                    this.$refs.container?.clearDirtyState();
-                    this.$emit('committed', response.data, this.editedFields);
-
-                    // Close all stacks first
-                    this.close();
-                    if (this.commitParentField) {
-                        this.commitParentField(true);
-                    }
-
-                    // Wait a bit for the field changes to be fully processed, then save the blueprint
-                    setTimeout(() => {
-                        this.saveRootForm();
-                        this.isSaving = false;
-                    }, 100);
-                })
-                .catch((e) => {
-                    this.handleAxiosError(e);
-                    this.isSaving = false;
-                });
+            this.isNestedField
+                ? this.commitAndSaveAll()
+                : this.commitAndSave();
         },
 
         handleAxiosError(e) {

@@ -136,6 +136,11 @@ abstract class Action implements Arrayable
         return false;
     }
 
+    public function triggersFullPageRefresh(): bool
+    {
+        return false;
+    }
+
     public function requiresElevatedSession(): bool
     {
         return false;

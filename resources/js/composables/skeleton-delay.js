@@ -1,6 +1,6 @@
 import { ref, watch } from 'vue';
 
-export default function useSkeletonDelay(isLoading, delay = 300) {
+export default function useSkeletonDelay(isLoading, delay = 400) {
     const shouldShowSkeleton = ref(false);
 
     const timer = setTimeout(() => shouldShowSkeleton.value = isLoading.value, delay);

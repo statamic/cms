@@ -121,7 +121,7 @@ const calendarEvents = computed(() => ({
                         <DateRangePickerInput
                             v-else
                             :part="item.part"
-                            class="rounded-sm py-0.5 focus:bg-blue-100 focus:outline-hidden data-placeholder:text-gray-600 dark:focus:bg-gray-800 dark:data-placeholder:text-gray-400"
+                            class="rounded-sm py-0.5 focus:bg-blue-100 focus:outline-hidden data-placeholder:text-gray-600 dark:focus:bg-blue-900 dark:data-placeholder:text-gray-400"
                             :class="{
                                 'px-0.25!': item.part === 'month' || item.part === 'year' || item.part === 'day',
                             }"

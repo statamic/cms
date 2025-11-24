@@ -44,15 +44,15 @@ const setToNow = () => {
                 <TimeFieldInput
                     v-else
                     :part="item.part"
-                    class="rounded-sm px-0.25 py-0.5 focus:bg-gray-100 focus:outline-hidden data-placeholder:text-gray-600 dark:focus:bg-gray-800 dark:data-placeholder:text-gray-400"
+                    class="rounded-sm px-0.25 py-0.5 focus:bg-blue-100 focus:outline-hidden data-placeholder:text-gray-600 dark:focus:bg-blue-900 dark:data-placeholder:text-gray-400"
                 >
                     {{ item.value }}
                 </TimeFieldInput>
             </template>
         </div>
         <div class="flex items-center gap-1">
-            <Button v-if="clearable" @click="setToNow" type="button" class="" size="xs" v-tooltip="__('Set to now')" icon="time-now" />
-            <Button v-if="clearable" @click="emit('update:modelValue', null)" type="button" class="" v-tooltip="__('Clear')" icon="x" size="xs" />
+            <Button v-if="clearable" @click="setToNow" type="button" class="[&_svg]:opacity-80! dark:[&_svg]:opacity-70! hover:[&_svg]:opacity-100!" size="xs" v-tooltip="__('Set to now')" icon="time-now" />
+            <Button v-if="clearable" @click="emit('update:modelValue', null)" type="button" class="[&_svg]:opacity-80! dark:[&_svg]:opacity-70! hover:[&_svg]:opacity-100!" v-tooltip="__('Clear')" icon="x" size="xs" />
         </div>
     </TimeFieldRoot>
 

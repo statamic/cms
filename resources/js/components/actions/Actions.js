@@ -63,6 +63,12 @@ export default function useActions() {
 
             if (data.redirect) {
                 if (data.bypassesDirtyWarning) Statamic.$dirty.disableWarning();
+
+                if (data.triggersFullPageRefresh) {
+                    window.location = data.redirect;
+                    return;
+                }
+
                 router.get(data.redirect);
             }
 

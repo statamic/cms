@@ -1,6 +1,5 @@
 <template>
     <Combobox
-        class="w-full"
         searchable
         ignore-filter
         :disabled="config.disabled"
