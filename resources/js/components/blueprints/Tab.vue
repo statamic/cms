@@ -31,7 +31,7 @@
             @closed="editCancelled"
         >
             <div class="h-full overflow-scroll overflow-x-auto bg-white px-6 dark:bg-dark-800">
-                <header class="py-2">
+                <header class="py-2 -mx-6 px-6 border-b border-gray-200 dark:border-gray-700 mb-5">
                     <div class="flex items-center justify-between">
                         <ui-heading size="lg">
                             {{ editText }}
@@ -69,7 +69,7 @@
                             />
                         </publish-field-meta>
                     </Field>
-                    <div class="py-4 space-x-2">
+                    <div class="py-6 space-x-2 -mx-6 px-6 border-t border-gray-200 dark:border-gray-700">
                         <ui-button :text="isSoloNarrowStack ? __('Save') : __('Confirm')" @click="handleSaveOrConfirm" variant="primary" />
                         <ui-button :text="__('Cancel')" @click="editCancelled" variant="ghost" />
                     </div>
