@@ -39,16 +39,13 @@ class NavigationController extends CpController
                 'delete_url' => $structure->deleteUrl(),
                 'deleteable' => User::current()->can('delete', $structure),
                 'available_in_selected_site' => $structure->sites()->contains(Site::selected()->handle()),
-                'actions' => Action::for($structure, ['view' => 'list']),
             ];
         })->values();
-
-        $hasActions = $navs->flatMap->actions->isNotEmpty();
 
         return Inertia::render('navigation/Index', [
             'navs' => $navs->all(),
             'columns' => $columns,
-            'actionUrl' => $hasActions ? cp_route('navigation.actions.run') : null,
+            'actionUrl' => cp_route('navigation.actions.run'),
             'canCreate' => User::current()->can('create', NavContract::class),
             'createUrl' => cp_route('navigation.create'),
         ]);

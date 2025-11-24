@@ -7,7 +7,6 @@ use Inertia\Inertia;
 use Statamic\Contracts\Globals\GlobalSet as GlobalSetContract;
 use Statamic\CP\Column;
 use Statamic\CP\PublishForm;
-use Statamic\Facades\Action;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
@@ -45,16 +44,13 @@ class GlobalsController extends CpController
                 'edit_url' => $localized ? $localized->editUrl() : $set->editUrl(),
                 'configure_url' => $set->editUrl(),
                 'delete_url' => $set->deleteUrl(),
-                'actions' => Action::for($localized, ['view' => 'list']),
             ];
         })->filter()->sortBy('title')->values();
-
-        $hasActions = $globals->flatMap->actions->isNotEmpty();
 
         return Inertia::render('globals/Index', [
             'globals' => $globals,
             'columns' => $columns,
-            'actionUrl' => $hasActions ? cp_route('globals.actions.run') : null,
+            'actionUrl' => cp_route('globals.actions.run'),
             'createUrl' => cp_route('globals.create'),
             'canCreate' => User::current()->can('create', GlobalSetContract::class),
         ]);
