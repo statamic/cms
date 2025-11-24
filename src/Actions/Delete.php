@@ -106,6 +106,10 @@ class Delete extends Action
                 return cp_route('taxonomies.show', $item->taxonomy()->handle());
             case $item instanceof Contracts\Auth\User:
                 return cp_route('users.index');
+            case $item instanceof Contracts\Structures\Nav:
+                return cp_route('navigation.index');
+            case $item instanceof Contracts\Globals\GlobalSet:
+                return cp_route('globals.index');
         }
     }
 }
