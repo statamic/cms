@@ -104,6 +104,8 @@ return [
     'grid.config.reorderable' => 'Enable the ability to reorder rows.',
     'grid.title' => 'Grid',
     'group.config.fields' => 'Configure fields to be nested inside this group.',
+    'group.config.collapse' => 'Can this group be collapsed?',
+    'group.config.collapsed' => 'The default state for this collapsible group.',
     'group.title' => 'Group',
     'hidden.title' => 'Hidden',
     'html.config.html_instruct' => 'Manage the HTML to be displayed in the publish form. This is for display purposes only, the HTML will not be saved.',

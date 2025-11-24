@@ -10,7 +10,10 @@
                 >
                 </publish-field-fullscreen-header>
                 <section :class="{ 'mt-14 p-4': fullScreenMode }">
-                    <div :class="{ 'bg-white dark:bg-gray-800 dark:border-dark-900 rounded-lg border': config.border }">
+                    <div :class="{
+                        'bg-white dark:bg-gray-800 dark:border-dark-900 rounded-lg border': config.border,
+                        'hidden' : isCollapsed && !fullScreenMode
+                    }">
                         <FieldsProvider
                             :fields="fields"
                             :as-config="false"
@@ -37,6 +40,7 @@ export default {
     data() {
         return {
             containerWidth: null,
+            isCollapsed: (this.config.collapse ? this.config.collapsed : false),
             isFocused: false,
             fullScreenMode: false,
             provide: {
@@ -65,6 +69,22 @@ export default {
         internalFieldActions() {
             return [
                 {
+                    title: __('Expand'),
+                    icon: 'expand-vertical',
+                    quick: true,
+                    run: this.toggleCollapsed,
+                    visible: this.config.collapse && this.isCollapsed && !this.fullScreenMode,
+                    visibleWhenReadOnly: true,
+                },
+                {
+                    title: __('Collapse'),
+                    icon: 'collapse',
+                    quick: true,
+                    run: this.toggleCollapsed,
+                    visible: this.config.collapse && !this.isCollapsed && !this.fullScreenMode,
+                    visibleWhenReadOnly: true,
+                },
+                {
                     title: __('Toggle Fullscreen Mode'),
                     icon: ({ vm }) => (vm.fullScreenMode ? 'collapse-all' : 'expand-all'),
                     quick: true,
@@ -82,6 +102,10 @@ export default {
                     this.isFocused = false;
                 }
             }, 1);
+        },
+
+        toggleCollapsed() {
+            this.isCollapsed = !this.isCollapsed;
         },
 
         toggleFullScreen() {
