@@ -23,8 +23,8 @@
                         />
                     </div>
                 </template>
-                <template #selected-option>
-                    <span v-text=" __(field.config.display) || field.handle"></span>
+                <template #selected-option="{ option }">
+                    <span v-text="__(field?.config.display) || option.value"></span>
                 </template>
             </Combobox>
         </div>
