@@ -134,6 +134,23 @@ Table Fieldtype
                 @apply outline-hidden ring-0;
             }
         }
+        /* Red delete controls */
+        &:has([aria-label*="Delete"]) {
+            &:focus-within {
+                @apply bg-red-500/5;
+                svg {
+                    @apply text-red-500 opacity-100;
+                }
+            }
+            &:hover {
+                button {
+                    @apply bg-red-500/5;
+                }
+                svg {
+                    @apply text-red-500 opacity-100;
+                }
+            }
+        }
     }
 }
 
