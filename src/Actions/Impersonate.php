@@ -73,6 +73,11 @@ class Impersonate extends Action
         return $users->first()->can('access cp') ? cp_route('index') : '/';
     }
 
+    public function triggersFullPageRefresh(): bool
+    {
+        return true;
+    }
+
     public function confirmationText()
     {
         /** @translation */
