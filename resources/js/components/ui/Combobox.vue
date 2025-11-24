@@ -336,7 +336,7 @@ defineExpose({
                         <div class="flex-1 min-w-0">
                             <!-- Dropdown open: search input -->
                             <ComboboxInput
-                                v-if="searchable && dropdownOpen"
+                                v-if="searchable && (dropdownOpen || taggable)"
                                 ref="search"
                                 class="w-full bg-transparent text-gray-900 dark:text-gray-300 opacity-100 focus:outline-none placeholder-gray-500 dark:placeholder-gray-400 [&::-webkit-search-cancel-button]:hidden"
                                 type="search"
@@ -346,12 +346,13 @@ defineExpose({
                                 autocomplete="off"
                                 @paste.prevent="onPaste"
                                 @keydown.enter.prevent="pushTaggableOption"
+                                @blur="pushTaggableOption"
                                 @keydown.space="openDropdown"
                             />
 
-                            <!-- Dropdown closed: placeholder (when no value selected) -->
+                            <!-- Dropdown closed: placeholder (when no value selected and not taggable) -->
                             <button
-                                v-else-if="!dropdownOpen && !modelValue"
+                                v-else-if="!dropdownOpen && !modelValue && !taggable"
                                 type="button"
                                 class="w-full text-start flex items-center gap-2 bg-transparent cursor-pointer focus:outline-none"
                                 data-ui-combobox-placeholder
@@ -361,9 +362,9 @@ defineExpose({
                                 <span class="block truncate text-gray-500 dark:text-gray-400 select-none" v-text="placeholder" />
                             </button>
 
-                            <!-- Dropdown closed: selected option -->
+                            <!-- Dropdown closed: selected option (when not taggable) -->
                             <button
-                                v-else
+                                v-else-if="!taggable"
                                 type="button"
                                 class="w-full text-start bg-transparent flex items-center gap-2 cursor-pointer focus-none"
                                 data-ui-combobox-selected-option
