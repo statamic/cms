@@ -9,8 +9,6 @@ class NavigationActionController extends ActionController
 {
     protected function getSelectedItems($items, $context)
     {
-        return $items->map(function ($item) {
-            return Nav::find($item);
-        });
+        return $items->map(fn ($item) => Nav::find($item));
     }
 }

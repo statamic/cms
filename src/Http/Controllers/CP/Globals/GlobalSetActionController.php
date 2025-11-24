@@ -9,8 +9,6 @@ class GlobalSetActionController extends ActionController
 {
     protected function getSelectedItems($items, $context)
     {
-        return $items->map(function ($item) {
-            return GlobalSet::find($item);
-        });
+        return $items->map(fn ($item) => GlobalSet::find($item));
     }
 }
