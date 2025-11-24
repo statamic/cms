@@ -1,7 +1,7 @@
 <script setup>
 import Head from '@/pages/layout/Head.vue';
 import { Header, Button, DocsCallout, CommandPaletteItem, Icon, EmptyStateMenu, EmptyStateItem, Listing, DropdownItem } from '@ui';
-import { Link } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 import useArchitecturalBackground from '@/pages/layout/architectural-background.js';
 
 const props = defineProps(['navs', 'columns', 'canCreate', 'createUrl', 'actionUrl']);
@@ -38,6 +38,7 @@ if (props.navs.length === 0) useArchitecturalBackground();
                 :action-url="actionUrl"
                 :allow-search="false"
                 :allow-customizing-columns="false"
+                @refreshing="() => router.reload()"
             >
                 <template #cell-title="{ row: item }">
                     <Link

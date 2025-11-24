@@ -1,6 +1,6 @@
 <script setup>
 import Head from '@/pages/layout/Head.vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 import { Header, CommandPaletteItem, Button, Icon, EmptyStateMenu, EmptyStateItem, DocsCallout, Listing, DropdownItem } from '@ui';
 import useArchitecturalBackground from '@/pages/layout/architectural-background.js';
 import { computed } from 'vue';
@@ -52,6 +52,7 @@ const actionContext = computed(() => {
                 :action-context="actionContext"
                 :allow-search="false"
                 :allow-customizing-columns="false"
+                @refreshing="() => router.reload()"
             >
                 <template #cell-title="{ row: global }">
                     <Link :href="global.edit_url" v-tooltip="global.handle">{{ __(global.title) }}</Link>
