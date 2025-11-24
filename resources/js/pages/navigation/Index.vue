@@ -45,12 +45,9 @@ if (props.navs.length === 0) useArchitecturalBackground();
                         :href="item.available_in_selected_site ? item.show_url : item.edit_url"
                         v-text="__(item.title)"
                     />
-
-                    <resource-deleter :ref="`deleter_${item.id}`" :resource="item" reload />
                 </template>
                 <template #prepended-row-actions="{ row: item }">
                     <DropdownItem :text="__('Configure')" icon="cog" :href="item.edit_url" />
-                    <DropdownItem v-if="item.deleteable" :text="__('Delete')" icon="trash" variant="destructive" @click="$refs[`deleter_${item.id}`].confirm()" />
                 </template>
             </Listing>
         </template>

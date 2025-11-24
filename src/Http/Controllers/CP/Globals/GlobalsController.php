@@ -39,11 +39,9 @@ class GlobalsController extends CpController
                 'id' => $set->id(),
                 'handle' => $set->handle(),
                 'title' => $set->title(),
-                'deleteable' => User::current()->can('delete', $set),
                 'configurable' => User::current()->can('edit', $set),
                 'edit_url' => $localized ? $localized->editUrl() : $set->editUrl(),
                 'configure_url' => $set->editUrl(),
-                'delete_url' => $set->deleteUrl(),
             ];
         })->filter()->sortBy('title')->values();
 
@@ -153,19 +151,6 @@ class GlobalsController extends CpController
         session()->flash('message', __('Global Set created'));
 
         return ['redirect' => $global->editUrl()];
-    }
-
-    public function destroy($set)
-    {
-        if (! $set = GlobalSet::find($set)) {
-            return $this->pageNotFound();
-        }
-
-        $this->authorize('delete', $set);
-
-        $set->delete();
-
-        return response('', 204);
     }
 
     protected function editFormBlueprint($set)

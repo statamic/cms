@@ -56,8 +56,6 @@ const actionContext = computed(() => {
             >
                 <template #cell-title="{ row: global }">
                     <Link :href="global.edit_url" v-tooltip="global.handle">{{ __(global.title) }}</Link>
-
-                    <resource-deleter :ref="`deleter_${global.id}`" :resource="global" reload />
                 </template>
                 <template #cell-handle="{ row: global }">
                     <span class="font-mono text-2xs">{{ global.handle }}</span>
@@ -65,7 +63,6 @@ const actionContext = computed(() => {
                 <template #prepended-row-actions="{ row: global }">
                     <DropdownItem :text="__('Edit')" icon="edit" :href="global.edit_url" />
                     <DropdownItem v-if="global.configurable" :text="__('Configure')" icon="cog" :href="global.configure_url" />
-                    <DropdownItem v-if="global.deleteable" :text="__('Delete')" icon="trash" variant="destructive" @click="$refs[`deleter_${global.id}`].confirm()" />
                 </template>
             </Listing>
         </template>

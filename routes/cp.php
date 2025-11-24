@@ -158,7 +158,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::get('select-site/{handle}', [SelectSiteController::class, 'select']);
 
-    Route::resource('navigation', NavigationController::class);
+    Route::resource('navigation', NavigationController::class)->except('destroy');
     Route::get('navigation/{navigation}/tree', [NavigationTreeController::class, 'index'])->name('navigation.tree.index');
     Route::patch('navigation/{navigation}/tree', [NavigationTreeController::class, 'update'])->name('navigation.tree.update');
     Route::post('navigation/{navigation}/pages', [NavigationPagesController::class, 'update'])->name('navigation.pages.update');
@@ -240,7 +240,6 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::post('globals', [GlobalsController::class, 'store'])->name('globals.store');
     Route::get('globals/{global_set}/edit', [GlobalsController::class, 'edit'])->name('globals.edit');
     Route::patch('globals/{global_set}', [GlobalsController::class, 'update'])->name('globals.update');
-    Route::delete('globals/{global_set}', [GlobalsController::class, 'destroy'])->name('globals.destroy');
     Route::post('globals/actions', [GlobalSetActionController::class, 'run'])->name('globals.actions.run');
     Route::post('globals/actions/list', [GlobalSetActionController::class, 'bulkActions'])->name('globals.actions.bulk');
 

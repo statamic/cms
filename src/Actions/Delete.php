@@ -28,6 +28,8 @@ class Delete extends Action
             case $item instanceof Contracts\Forms\Form:
             case $item instanceof Contracts\Forms\Submission:
             case $item instanceof Contracts\Auth\User:
+            case $item instanceof Contracts\Structures\Nav:
+            case $item instanceof Contracts\Globals\GlobalSet:
                 return true;
             default:
                 return false;

@@ -36,8 +36,6 @@ class NavigationController extends CpController
                 'title' => $structure->title(),
                 'show_url' => $structure->showUrl(),
                 'edit_url' => $structure->editUrl(),
-                'delete_url' => $structure->deleteUrl(),
-                'deleteable' => User::current()->can('delete', $structure),
                 'available_in_selected_site' => $structure->sites()->contains(Site::selected()->handle()),
             ];
         })->values();
@@ -285,14 +283,5 @@ class NavigationController extends CpController
                 ],
             ],
         ])->all());
-    }
-
-    public function destroy($nav)
-    {
-        $nav = Nav::findByHandle($nav);
-
-        $this->authorize('delete', $nav, __('You are not authorized to delete navs.'));
-
-        $nav->delete();
     }
 }
