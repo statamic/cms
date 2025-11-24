@@ -37,6 +37,7 @@ class StaticWarm extends Command
         {--queue : Queue the requests}
         {--u|user= : HTTP authentication user}
         {--p|password= : HTTP authentication password}
+        {--base_uri= : Base URI to use for all requests}
         {--insecure : Skip SSL verification}
         {--uncached : Only warm uncached URLs}
         {--max-depth= : Maximum depth of URLs to warm}
@@ -131,6 +132,7 @@ class StaticWarm extends Command
     private function clientConfig(): array
     {
         return [
+            'base_uri' => $this->option('base_uri') ?: config('app.url'),
             'verify' => $this->shouldVerifySsl(),
             'auth' => $this->option('user') && $this->option('password')
                 ? [$this->option('user'), $this->option('password')]
