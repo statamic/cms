@@ -45,7 +45,7 @@ class GlobalsController extends CpController
                 'edit_url' => $localized ? $localized->editUrl() : $set->editUrl(),
                 'configure_url' => $set->editUrl(),
                 'delete_url' => $set->deleteUrl(),
-                'actions' => Action::for($set, ['view' => 'list']),
+                'actions' => Action::for($localized, ['view' => 'list']),
             ];
         })->filter()->sortBy('title')->values();
 

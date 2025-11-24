@@ -64,7 +64,7 @@ class GlobalVariablesController extends CpController
             'canConfigure' => $user->can('configure', $variables),
             'configureUrl' => $set->editUrl(),
             'canDelete' => $user->can('delete', $variables),
-            'itemActions' => Action::for($set, ['view' => 'form']),
+            'itemActions' => Action::for($variables, ['view' => 'form']),
             'actionUrl' => cp_route('globals.actions.run'),
         ];
 
