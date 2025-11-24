@@ -23,6 +23,9 @@
                             <Fields class="p-4" />
                         </FieldsProvider>
                     </div>
+                    <div v-if="config.collapse && isCollapsed">
+                        <Button @click.prevent="toggleCollapsed" size="xs">{{ __('Expand') }} {{ config.display }}</Button>
+                    </div>
                 </section>
             </div>
         </element-container>
@@ -32,11 +35,11 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import ManagesPreviewText from './replicator/ManagesPreviewText';
-import { PublishFields as Fields, PublishFieldsProvider as FieldsProvider } from '@ui';
+import {Button, PublishFields as Fields, PublishFieldsProvider as FieldsProvider} from '@ui';
 
 export default {
     mixins: [Fieldtype, ManagesPreviewText],
-    components: { Fields, FieldsProvider },
+    components: {Button, Fields, FieldsProvider },
     data() {
         return {
             containerWidth: null,
