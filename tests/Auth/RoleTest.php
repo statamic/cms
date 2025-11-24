@@ -95,6 +95,45 @@ class RoleTest extends TestCase
     }
 
     #[Test]
+    public function it_checks_wildcard_permission_with_asterisk_at_beginning()
+    {
+        $role = (new Role)->addPermission('* blog entries');
+
+        $this->assertTrue($role->hasPermission('view blog entries'));
+        $this->assertTrue($role->hasPermission('edit blog entries'));
+        $this->assertTrue($role->hasPermission('delete blog entries'));
+        $this->assertFalse($role->hasPermission('view news entries'));
+        $this->assertFalse($role->hasPermission('view blog posts'));
+    }
+
+    #[Test]
+    public function it_checks_wildcard_permission_with_asterisk_in_middle()
+    {
+        $role = (new Role)->addPermission('view * entries');
+
+        $this->assertTrue($role->hasPermission('view blog entries'));
+        $this->assertTrue($role->hasPermission('view news entries'));
+        $this->assertTrue($role->hasPermission('view products entries'));
+        $this->assertFalse($role->hasPermission('edit blog entries'));
+        $this->assertFalse($role->hasPermission('view blog posts'));
+    }
+
+    #[Test]
+    public function it_checks_multiple_wildcard_permissions()
+    {
+        $role = (new Role)
+            ->addPermission('view * entries')
+            ->addPermission('* blog entries');
+
+        $this->assertTrue($role->hasPermission('view blog entries'));
+        $this->assertTrue($role->hasPermission('view news entries'));
+        $this->assertTrue($role->hasPermission('edit blog entries'));
+        $this->assertTrue($role->hasPermission('delete blog entries'));
+        $this->assertFalse($role->hasPermission('delete news entries'));
+        $this->assertFalse($role->hasPermission('view blog posts'));
+    }
+
+    #[Test]
     public function it_checks_if_it_has_super_permissions()
     {
         $superRole = (new Role)->addPermission('super');
