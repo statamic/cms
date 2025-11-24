@@ -1098,7 +1098,7 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
-    public function filtering_using_where_status_column_writes_deprecation_log()
+    public function filtering_using_where_status_column_throws_exception()
     {
         $this->withoutDeprecationHandling();
         $this->expectException(StatusFilterNotSupportedException::class);
@@ -1110,7 +1110,7 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
-    public function filtering_using_whereIn_status_column_writes_deprecation_log()
+    public function filtering_using_whereIn_status_column_throws_exception()
     {
         $this->withoutDeprecationHandling();
         $this->expectException(StatusFilterNotSupportedException::class);
