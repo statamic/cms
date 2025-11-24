@@ -21,6 +21,7 @@
 @import './dark.css';
 @import './tailwind-animate.css';
 
+@source '../js';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
