@@ -124,7 +124,7 @@ reveal.use(rootEl, () => emit('expanded'));
 </script>
 
 <template>
-    <div ref="rootEl" :class="sortableItemClass" data-replicator-set>
+    <div ref="rootEl" :class="sortableItemClass">
         <slot name="picker" />
         <div
             layout

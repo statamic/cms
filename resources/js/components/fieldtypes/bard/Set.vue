@@ -11,7 +11,6 @@
                 'border-red-500': hasError,
             }"
             :data-type="config.handle"
-            data-bard-set
             contenteditable="false"
             @copy.stop
             @paste.stop
