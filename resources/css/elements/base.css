@@ -61,6 +61,13 @@
         /* To effectively hide border radius clash with focus state */
         --focus-outline-offset: -1.85px;
     }
+
+    /* Delete buttons */
+    /* e.g. Tags fieldtype, deleting tags */
+    button[aria-label*="Deselect"]:focus {
+        --focus-outline-color: var(--color-red-500);
+        --focus-outline-offset: 5px;
+    }
 }
 
 /* Use a utility layer only when we need higher specificity */
