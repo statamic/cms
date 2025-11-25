@@ -3,7 +3,6 @@
 namespace Statamic\Http\Resources\CP\Taxonomies;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Statamic\CP\Column;
 use Statamic\Http\Resources\CP\Concerns\HasRequestedColumns;
 
 class Terms extends ResourceCollection
