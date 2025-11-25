@@ -68,7 +68,11 @@ const props = defineProps({
     asConfig: {
         type: Boolean,
         default: false,
-    }
+    },
+    isInline: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const parentContainer = injectContainerContext(containerContextKey);
@@ -230,6 +234,7 @@ const provided = {
     desyncField,
     components,
     asConfig: toRef(() => props.asConfig),
+    isInline: toRef(() => props.isInline),
     isTrackingOriginValues: computed(() => !!props.originValues),
     setValues,
     setFieldValue,

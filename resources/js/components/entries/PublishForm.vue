@@ -74,6 +74,7 @@
             ref="container"
             :name="publishContainer"
             :reference="initialReference"
+            :is-inline="isInline"
             :blueprint="fieldset"
             v-model="values"
             :extra-values="extraValues"

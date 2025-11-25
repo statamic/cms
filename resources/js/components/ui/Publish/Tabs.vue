@@ -13,7 +13,7 @@ import ElementContainer from '@/components/ElementContainer.vue';
 import ShowField from '@/components/field-conditions/ShowField.js';
 
 const slots = useSlots();
-const { blueprint, visibleValues, extraValues, revealerValues, errors, hiddenFields, setHiddenField, container, name } = injectContainerContext();
+const { blueprint, visibleValues, extraValues, revealerValues, errors, hiddenFields, setHiddenField, container, isInline } = injectContainerContext();
 const tabs = ref(blueprint.value.tabs);
 const width = ref(null);
 const sidebarTab = computed(() => tabs.value.find((tab) => tab.handle === 'sidebar'));
@@ -52,8 +52,7 @@ function setActive(tab) {
 }
 
 function setActiveTabFromHash() {
-    if (name.value.includes('relate-fieldtype-inline')) return;
-
+    if (isInline.value) return;
     if (window.location.hash.length === 0) return;
 
     setActive(window.location.hash.substr(1));
