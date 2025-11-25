@@ -495,7 +495,7 @@ defineExpose({
                                 :aria-label="__('Deselect option')"
                                 @click="deselect(option.value)"
                             >
-                                &times;
+                                <span class="relative">&times;</span>
                             </button>
                             <button v-else type="button" class="opacity-75">
                                 &times;

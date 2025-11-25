@@ -172,6 +172,7 @@ const getInputLabel = (part) => {
                             icon="x"
                             class="-my-1.25 -me-2"
                             :disabled="disabled"
+                            :aria-label="__('Clear date')"
                             v-tooltip="__('Clear date')"
                         />
                     </div>
