@@ -6,6 +6,7 @@ export default class FieldAction {
     #visible;
     #visibleWhenReadOnly;
     #icon;
+    #permanent;
     #quick;
     #dangerous;
     #confirm;
@@ -17,6 +18,7 @@ export default class FieldAction {
         this.#visible = action.visible ?? true;
         this.#visibleWhenReadOnly = action.visibleWhenReadOnly ?? false;
         this.#icon = action.icon ?? 'image';
+        this.#permanent = action.permanent ?? false;
         this.#quick = action.quick ?? false;
         this.#dangerous = action.dangerous ?? false;
         this.title = action.title;
@@ -28,6 +30,10 @@ export default class FieldAction {
         }
 
         return typeof this.#visible === 'function' ? this.#visible(this.#payload) : this.#visible;
+    }
+
+    get permanent() {
+        return typeof this.#permanent === 'function' ? this.#permanent(this.#payload) : this.#permanent;
     }
 
     get quick() {
