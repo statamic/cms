@@ -86,12 +86,17 @@ export default {
                 case 'avif':
                 case 'bmp':
                 case 'gif':
+                case 'heic':
+                case 'heif':
                 case 'ico':
                 case 'jpg':
                 case 'jpeg':
                 case 'png':
+                case 'apng':
                 case 'raw':
+                case 'dng':
                 case 'nef':
+                case 'tif':
                 case 'tiff':
                 case 'webp':
                     return 'image';
