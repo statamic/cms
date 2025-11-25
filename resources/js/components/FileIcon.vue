@@ -19,7 +19,7 @@ export default {
                 case 'pkg':
                 case 'rar':
                 case 'tar':
-                case 'tar.zg':
+                case 'gz':
                 case 'z':
                 case 'zip':
                     return 'archive';
