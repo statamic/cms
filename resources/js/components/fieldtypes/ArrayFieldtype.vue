@@ -80,7 +80,7 @@
                             />
                         </td>
                         <td class="row-controls" v-if="!isReadOnly">
-                            <ui-button icon="x" variant="subtle" size="xs" round @click="deleteOrConfirm(index)" :aria-label="__('Delete Value')" v-tooltip="__('Delete Value')" />
+                            <ui-button icon="x" variant="subtle" size="xs" round @click="deleteOrConfirm(index)" :aria-label="__('Delete Row')" v-tooltip="__('Delete Row')" />
                         </td>
                     </tr>
                 </tbody>
@@ -93,8 +93,8 @@
 
         <confirmation-modal
             v-if="deleting !== false"
-            :title="__('Delete Value')"
-            :bodyText="__('Are you sure you want to delete this value?')"
+            :title="__('Delete Row')"
+            :bodyText="__('Are you sure you want to delete this row?')"
             :buttonText="__('Delete')"
             :danger="true"
             @confirm="deleteValue(deleting)"
