@@ -31,7 +31,7 @@ class Reveal {
 
     invalid() {
         nextTick(() => {
-            const el = document.querySelector('[data-ui-field-has-errors="true"]:not(:has([data-ui-field-has-errors="true"]))');
+            const el = document.querySelector('[data-ui-field-has-errors]:not(:has([data-ui-field-has-errors]))');
             if (!el) return;
             this.element(el);
         });
