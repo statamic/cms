@@ -47,11 +47,14 @@ export default {
                     return 'excel';
                 case 'json':
                     return 'json';
+                case 'af':
                 case 'ai':
                 case 'eps':
                 case 'fig':
                 case 'indb':
+                case 'indd':
                 case 'psd':
+                case 'psb':
                 case 'sketch':
                     return 'layered';
                 case 'pdf':
