@@ -114,7 +114,6 @@ function tabHasError(tab) {
                         :is="hasMultipleVisibleMainTabs ? TabContent : 'div'"
                         :force-mount="hasMultipleVisibleMainTabs ? true : null"
                         :class="{ 'hidden': tab.handle !== activeTab }"
-                        :data-publish-tab="tab.handle"
                         @revealed="setActive(tab.handle)"
                     >
                         <TabProvider :tab="tab">
