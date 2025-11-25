@@ -108,14 +108,17 @@
     button[aria-label*="Deselect"],
     button[aria-label*="Delete"],
     button[aria-label*="Clear"] {
-        &:hover,
-        &:focus {
-            --focus-outline-color: var(--color-warning);
-            background: var(--color-warning-bg);
-            border-radius: 100%;
-            svg {
-                color: var(--color-warning);
-                opacity: 1;
+        /* For example, we don't want switches such as Select fieldtype > Clearable to get caught by this. */
+        &:not([role="switch"]) {
+            &:hover,
+            &:focus {
+                --focus-outline-color: var(--color-warning);
+                background: var(--color-warning-bg);
+                border-radius: 100%;
+                svg {
+                    color: var(--color-warning);
+                    opacity: 1;
+                }
             }
         }
     }
