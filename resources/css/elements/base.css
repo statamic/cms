@@ -61,13 +61,6 @@
         /* To effectively hide border radius clash with focus state */
         --focus-outline-offset: -1.85px;
     }
-
-    /* Delete buttons */
-    /* e.g. Tags fieldtype, deleting tags */
-    button[aria-label*="Deselect"]:focus {
-        --focus-outline-color: var(--color-red-500);
-        --focus-outline-offset: 5px;
-    }
 }
 
 /* Use a utility layer only when we need higher specificity */
@@ -104,6 +97,31 @@
     .group\/button button:focus {
         /* Pull the focus state above any adjacent buttons e.g. >> /cp/collections/articles/entries - save button alongside the dropdown arrow */
         z-index: var(--z-index-above);
+    }
+}
+
+/* DELETE STATES
+=================================================== */
+@layer utilities {
+    /* Delete buttons */
+    /* e.g. Tags fieldtype, deleting tags */
+    button[aria-label*="Deselect"],
+    button[aria-label*="Delete"],
+    button[aria-label*="Clear"] {
+        &:hover,
+        &:focus {
+            --focus-outline-color: var(--color-warning);
+            background: var(--color-warning-bg);
+            border-radius: 100%;
+            svg {
+                color: var(--color-warning);
+                opacity: 1;
+            }
+        }
+    }
+    /* e.g. Tags fieldtype, deleting tags */
+    button[aria-label*="Deselect"]:focus {
+        --focus-outline-offset: 7px;
     }
 }
 
