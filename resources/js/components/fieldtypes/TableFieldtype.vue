@@ -45,6 +45,7 @@
                                         v-model="row.value.cells[cellIndex]"
                                         class="input-text"
                                         :readonly="isReadOnly"
+                                        data-ui-control
                                         @focus="$emit('focus')"
                                         @blur="$emit('blur')"
                                     />
