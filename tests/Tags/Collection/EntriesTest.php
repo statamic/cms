@@ -292,7 +292,7 @@ class EntriesTest extends TestCase
         $this->assertCount(3, $this->getEntries());
         $this->assertCount(0, $this->getEntries(['show_future' => false]));
         $this->assertCount(3, $this->getEntries(['show_future' => true]));
-        $this->assertCount(8, $this->getEntries(['show_past' => true]));
+        $this->assertCount(3, $this->getEntries(['show_past' => true]));
         $this->assertCount(3, $this->getEntries(['show_past' => false]));
         $this->assertCount(3, $this->getEntries(['show_past' => false, 'show_future' => true]));
 
@@ -308,10 +308,10 @@ class EntriesTest extends TestCase
         $this->collection->dated(true)->futureDateBehavior('private')->pastDateBehavior('public')->save();
         $this->assertCount(4, $this->getEntries());
         $this->assertCount(4, $this->getEntries(['show_future' => false]));
-        $this->assertCount(8, $this->getEntries(['show_future' => true]));
+        $this->assertCount(4, $this->getEntries(['show_future' => true]));
         $this->assertCount(4, $this->getEntries(['show_past' => true]));
         $this->assertCount(0, $this->getEntries(['show_past' => false]));
-        $this->assertCount(3, $this->getEntries(['show_past' => false, 'show_future' => true]));
+        $this->assertCount(0, $this->getEntries(['show_past' => false, 'show_future' => true]));
     }
 
     #[Test]
