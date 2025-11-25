@@ -129,7 +129,7 @@
         &:focus-within {
             @apply bg-gray-100 dark:bg-gray-700;
             button {
-                @apply outline-hidden ring-0;
+                @apply ring-0;
             }
         }
     }
@@ -139,7 +139,8 @@
     th,
     .row-controls {
         &:has([aria-label*="Delete"]):focus-within {
-            @apply bg-red-500/5;
+            --focus-outline-color: var(--color-red-500);
+            @apply bg-red-500/6;
             svg {
                 @apply text-red-500 opacity-100;
             }
