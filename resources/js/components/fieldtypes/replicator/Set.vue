@@ -118,13 +118,12 @@ function destroy() {
     emit('removed');
 }
 
-defineExpose({
-    expand: () => emit('expanded'),
-});
+const rootEl = ref();
+Statamic.$reveal.use(rootEl, () => emit('expanded'));
 </script>
 
 <template>
-    <div :class="sortableItemClass" data-replicator-set>
+    <div ref="rootEl" :class="sortableItemClass" data-replicator-set>
         <slot name="picker" />
         <div
             layout

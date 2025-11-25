@@ -1,25 +1,27 @@
-import { closestVm } from '../bootstrap/globals';
-import { nextTick } from 'vue';
+import { nextTick, onMounted, onBeforeUnmount } from 'vue';
+
+const registry = new WeakMap();
 
 class Reveal {
-    element(el) {
-        if (!el) return;
-        let parent = el;
-        while (parent) {
-            if (parent.matches('[data-publish-tab]')) {
-                let rekaTabsPrimitive = closestVm(parent, 'Tabs');
-                let publishTabsComponent = closestVm(rekaTabsPrimitive.parent.vnode.el, 'Tabs');
+    use(ref, callback) {
+        onMounted(() => this.mount(ref.value, callback));
+    }
 
-                publishTabsComponent?.exposed.setActive(parent.dataset.publishTab);
-            }
-            if (parent.matches('[data-replicator-set]')) {
-                closestVm(parent, 'Set').exposed.expand();
-            }
-            if (parent.matches('[data-bard-set]')) {
-                closestVm(parent, 'BardSet').ctx.expand();
-            }
+    mount(el, callback) {
+        registry.set(el, callback);
+
+        onBeforeUnmount(() => registry.delete(el));
+    }
+
+    element(el) {
+        let parent = el;
+
+        while (parent) {
+            const callback = registry.get(parent);
+            if (callback) callback(parent);
             parent = parent.parentElement;
         }
+
         nextTick(() => {
             el.scrollIntoView({
                 block: 'center',

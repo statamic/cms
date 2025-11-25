@@ -3,9 +3,9 @@ import {
     Tabs,
     TabList,
     TabTrigger,
-    TabContent,
     TabProvider,
 } from '@ui';
+import TabContent from './TabContent.vue';
 import { injectContainerContext } from './Container.vue';
 import Sections from './Sections.vue';
 import { ref, computed, useSlots, onMounted, watch } from 'vue';
@@ -90,10 +90,6 @@ const tabsWithErrors = computed(() => {
 function tabHasError(tab) {
     return tabsWithErrors.value.includes(tab.handle);
 }
-
-defineExpose({
-    setActive,
-});
 </script>
 
 <template>
@@ -119,6 +115,7 @@ defineExpose({
                         :force-mount="hasMultipleVisibleMainTabs ? true : null"
                         :class="{ 'hidden': tab.handle !== activeTab }"
                         :data-publish-tab="tab.handle"
+                        @revealed="setActive(tab.handle)"
                     >
                         <TabProvider :tab="tab">
                             <slot :tab="tab">
