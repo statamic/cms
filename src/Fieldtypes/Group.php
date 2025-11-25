@@ -33,9 +33,9 @@ class Group extends Fieldtype
             [
                 'display' => __('Behaviour'),
                 'fields' => [
-                    'collapse' => [
+                    'collapsible' => [
                         'display' => __('Collapsible'),
-                        'instructions' => __('statamic::fieldtypes.group.config.collapse'),
+                        'instructions' => __('statamic::fieldtypes.group.config.collapsible'),
                         'type' => 'toggle',
                         'default' => true,
                         'width' => 50,
@@ -48,7 +48,7 @@ class Group extends Fieldtype
                         'width' => 50,
                         'always_save' => false,
                         'if' => [
-                            'collapse' => 'equals true',
+                            'collapsible' => 'equals true',
                         ],
                     ],
                 ],

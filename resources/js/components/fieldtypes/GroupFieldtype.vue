@@ -23,7 +23,7 @@
                             <Fields class="p-4" />
                         </FieldsProvider>
                     </div>
-                    <div v-if="config.collapse && isCollapsed && !fullScreenMode">
+                    <div v-if="config.collapsible && isCollapsed && !fullScreenMode">
                         <Button @click.prevent="toggleCollapsed" size="xs">{{ __('Expand') }} {{ config.display }}</Button>
                     </div>
                 </section>
@@ -43,7 +43,7 @@ export default {
     data() {
         return {
             containerWidth: null,
-            isCollapsed: (this.config.collapse ? this.config.collapsed : false),
+            isCollapsed: (this.config.collapsible ? this.config.collapsed : false),
             isFocused: false,
             fullScreenMode: false,
             provide: {
@@ -76,7 +76,7 @@ export default {
                     icon: 'expand-vertical',
                     quick: true,
                     run: this.toggleCollapsed,
-                    visible: this.config.collapse && this.isCollapsed && !this.fullScreenMode,
+                    visible: this.config.collapsible && this.isCollapsed && !this.fullScreenMode,
                     visibleWhenReadOnly: true,
                 },
                 {
@@ -84,7 +84,7 @@ export default {
                     icon: 'collapse',
                     quick: true,
                     run: this.toggleCollapsed,
-                    visible: this.config.collapse && !this.isCollapsed && !this.fullScreenMode,
+                    visible: this.config.collapsible && !this.isCollapsed && !this.fullScreenMode,
                     visibleWhenReadOnly: true,
                 },
                 {
