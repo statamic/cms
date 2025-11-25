@@ -140,9 +140,10 @@
     .row-controls {
         &:has([aria-label*="Delete"]):focus-within {
             --focus-outline-color: var(--color-red-500);
-            @apply bg-red-500/6;
+            background-color: var(--color-delete-bg);
             svg {
-                @apply text-red-500 opacity-100;
+                color: var(--color-delete);
+                opacity: 1;
             }
         }
     }

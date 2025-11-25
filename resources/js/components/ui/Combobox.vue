@@ -489,8 +489,8 @@ defineExpose({
                                 class="
                                     cursor-pointer relative opacity-75 size-2
                                     before:absolute before:content-[''] before:-inset-2.25 before:rounded-full 
-                                    hover:opacity-100 hover:text-red-500 hover:before:bg-red-500/6
-                                    focus:opacity-100 focus:text-red-500 focus:before:bg-red-500/6 focus:before:-inset-1.5
+                                    hover:opacity-100 hover:text-[var(--color-delete)] hover:before:bg-[var(--color-delete-bg)]
+                                    focus:opacity-100 focus:text-[var(--color-delete)] focus:before:bg-[var(--color-delete-bg)] focus:before:-inset-1.5
                                 "
                                 :aria-label="__('Deselect option')"
                                 @click="deselect(option.value)"
