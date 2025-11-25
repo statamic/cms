@@ -30,6 +30,11 @@
     --color-ui-accent-text: var(--theme-color-ui-accent-text);
     --color-switch-bg: var(--theme-color-switch-bg);
 
+    --color-warning-bg: oklch(from var(--color-red-500) l c h / 6%);
+    --color-warning: var(--color-red-600);
+    --color-success-bg: oklch(from var(--color-green-500) l c h / 6%);
+    --color-success: var(--color-green-600);
+
     /* Temp */
     --color-dark-100: #dfe1e5;
     --color-dark-150: #bbbdc0;

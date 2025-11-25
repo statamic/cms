@@ -11,12 +11,6 @@
     --focus-outline-color: var(--theme-color-focus-outline, var(--color-blue-400));
     --focus-outline-style: solid;
 
-    --color-delete-bg: oklch(from var(--color-red-500) l c h / 6%);
-    --color-delete: var(--color-red-500);
-    :where(.dark, .dark *) {
-        --color-delete: var(--color-red-600);
-    }
-
     /* The outline-offset value used for buttons */
     --outline-offset-button: 6px;
 
