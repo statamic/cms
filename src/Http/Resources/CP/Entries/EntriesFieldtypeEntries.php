@@ -3,6 +3,7 @@
 namespace Statamic\Http\Resources\CP\Entries;
 
 use Illuminate\Pagination\AbstractPaginator;
+use Statamic\CP\Column;
 use Statamic\Fieldtypes\Entries as EntriesFieldtype;
 
 class EntriesFieldtypeEntries extends Entries
@@ -28,5 +29,24 @@ class EntriesFieldtypeEntries extends Entries
         }
 
         return $collection;
+    }
+
+    protected function setColumns()
+    {
+        parent::setColumns();
+
+        $columns = $this->columns;
+
+        $collection = Column::make('collection')
+            ->label(__('Collection'))
+            ->listable(true)
+            ->defaultVisibility(true)
+            ->visible(true)
+            ->sortable(true)
+            ->defaultOrder($columns->count() + 1);
+
+        $columns->put('collection', $collection);
+
+        $this->columns = $columns->rejectUnlisted()->values();
     }
 }

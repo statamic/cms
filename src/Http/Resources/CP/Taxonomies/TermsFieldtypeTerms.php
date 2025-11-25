@@ -3,6 +3,7 @@
 namespace Statamic\Http\Resources\CP\Taxonomies;
 
 use Illuminate\Pagination\AbstractPaginator;
+use Statamic\CP\Column;
 use Statamic\Fieldtypes\Terms as TermsFieldtype;
 
 class TermsFieldtypeTerms extends Terms
@@ -28,5 +29,24 @@ class TermsFieldtypeTerms extends Terms
         }
 
         return $collection;
+    }
+
+    protected function setColumns()
+    {
+        parent::setColumns();
+
+        $columns = $this->columns;
+
+        $taxonomy = Column::make('taxonomy')
+            ->label(__('Taxonomy'))
+            ->listable(true)
+            ->defaultVisibility(true)
+            ->visible(true)
+            ->sortable(true)
+            ->defaultOrder($columns->count() + 1);
+
+        $columns->put('taxonomy', $taxonomy);
+
+        $this->columns = $columns->rejectUnlisted()->values();
     }
 }
