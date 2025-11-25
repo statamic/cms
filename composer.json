@@ -14,7 +14,7 @@
         "composer/semver": "^3.4",
         "guzzlehttp/guzzle": "^6.3 || ^7.0",
         "james-heinrich/getid3": "^1.9.21",
-        "laravel/framework": "^10.48.29 || ^11.44.1 || ^12.1.1",
+        "laravel/framework": "^10.48.29 || ^11.44.1 || ^12.40.0",
         "laravel/prompts": "^0.1.16 || ^0.2.0 || ^0.3.0",
         "league/commonmark": "^2.2",
         "league/csv": "^9.0",
@@ -44,8 +44,8 @@
         "google/cloud-translate": "^1.6",
         "laravel/pint": "1.16.0",
         "mockery/mockery": "^1.6.10",
-        "phpunit/phpunit": "^10.5.35 || ^11.5.3",
         "orchestra/testbench": "^8.36 || ^9.15 || ^10.8",
+        "phpunit/phpunit": "^10.5.35 || ^11.5.3",
         "spatie/laravel-ray": "^1.37",
         "sebastian/recursion-context": "^5.0.1 || ^6.0.3"
     },
