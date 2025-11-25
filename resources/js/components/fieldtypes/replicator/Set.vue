@@ -18,6 +18,7 @@ import { Motion } from 'motion-v';
 import PreviewHtml from '@/components/fieldtypes/replicator/PreviewHtml.js';
 import FieldAction from '@/components/field-actions/FieldAction.js';
 import toFieldActions from '@/components/field-actions/toFieldActions.js';
+import { reveal } from '@api';
 
 const emit = defineEmits(['collapsed', 'expanded', 'duplicated', 'removed']);
 
@@ -117,10 +118,13 @@ function destroy() {
     deletingSet.value = false;
     emit('removed');
 }
+
+const rootEl = ref();
+reveal.use(rootEl, () => emit('expanded'));
 </script>
 
 <template>
-    <div :class="sortableItemClass">
+    <div ref="rootEl" :class="sortableItemClass">
         <slot name="picker" />
         <div
             layout
