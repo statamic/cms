@@ -388,8 +388,8 @@ defineExpose({
                         </div>
 
                         <div v-if="(clearable && modelValue) || (options.length || ignoreFilter)" class="flex gap-1.5 items-center ms-1.5 -me-2">
-                            <Button v-if="clearable && modelValue" icon="x" variant="ghost" size="xs" round @click="clear" data-ui-combobox-clear-button />
-                            <Icon v-if="options.length || ignoreFilter" name="chevron-down" class="text-gray-400 dark:text-white/40 size-4" data-ui-combobox-chevron />
+                            <Button v-if="clearable && modelValue" icon="x" variant="ghost" size="xs" round @click="clear" :aria-label="__('Clear selection')" v-tooltip="__('Clear selection')" data-ui-combobox-clear-button />
+                            <Icon v-if="options.length || ignoreFilter" name="chevron-down" class="text-gray-400 dark:text-white/40 size-4" aria-hidden="true" data-ui-combobox-chevron />
                         </div>
                     </ComboboxTrigger>
                 </ComboboxAnchor>
