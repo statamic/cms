@@ -37,7 +37,7 @@ class EntriesFieldtypeEntries extends Entries
 
         $columns = $this->columns;
 
-        $collection = Column::make('collection')
+        $type = Column::make('type')
             ->label(__('Collection'))
             ->listable(true)
             ->defaultVisibility(true)
@@ -45,7 +45,7 @@ class EntriesFieldtypeEntries extends Entries
             ->sortable(true)
             ->defaultOrder($columns->count() + 1);
 
-        $columns->put('collection', $collection);
+        $columns->put('type', $type);
 
         $this->columns = $columns->rejectUnlisted()->values();
     }

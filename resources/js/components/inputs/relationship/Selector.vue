@@ -43,10 +43,7 @@
                             <template #cell-status="{ row: entry }">
                                 <StatusIndicator :status="entry.status" show-label :show-dot="false" />
                             </template>
-                            <template #cell-collection="{ value }">
-                                <Badge :text="value" />
-                            </template>
-                            <template #cell-taxonomy="{ value }">
+                            <template #cell-type="{ value }">
                                 <Badge :text="value" />
                             </template>
                         </Table>

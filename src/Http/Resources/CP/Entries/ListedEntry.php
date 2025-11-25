@@ -54,7 +54,7 @@ class ListedEntry extends JsonResource
             $key = $column->field;
             $field = $this->blueprint->field($key);
 
-            if ($key === 'collection') {
+            if ($key === 'type') {
                 return [$key => $this->resource->collection()->title()];
             } elseif ($key === 'site') {
                 $value = $this->resource->locale();

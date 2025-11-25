@@ -37,7 +37,7 @@ class TermsFieldtypeTerms extends Terms
 
         $columns = $this->columns;
 
-        $taxonomy = Column::make('taxonomy')
+        $type = Column::make('type')
             ->label(__('Taxonomy'))
             ->listable(true)
             ->defaultVisibility(true)
@@ -45,7 +45,7 @@ class TermsFieldtypeTerms extends Terms
             ->sortable(true)
             ->defaultOrder($columns->count() + 1);
 
-        $columns->put('taxonomy', $taxonomy);
+        $columns->put('type', $type);
 
         $this->columns = $columns->rejectUnlisted()->values();
     }
