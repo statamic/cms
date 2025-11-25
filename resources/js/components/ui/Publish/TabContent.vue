@@ -1,12 +1,13 @@
 <script setup>
 import { ref } from 'vue';
 import { TabContent } from '@ui';
+import { reveal } from '@api';
 
 const emit = defineEmits(['revealed']);
 
 const wrapper = ref();
 
-Statamic.$reveal.use(wrapper, () => emit('revealed'));
+reveal.use(wrapper, () => emit('revealed'));
 </script>
 
 <template>

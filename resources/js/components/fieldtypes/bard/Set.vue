@@ -117,6 +117,7 @@ import {
 } from '@ui';
 import { containerContextKey } from '@/components/ui/Publish/Container.vue';
 import { watch } from 'vue';
+import { reveal } from '@api';
 
 export default {
     props: nodeViewProps,
@@ -332,7 +333,7 @@ export default {
             { deep: true }
         );
 
-        Statamic.$reveal.mount(this.$refs.container, this.expand);
+        reveal.mount(this.$refs.container, this.expand);
     },
 
     updated() {
