@@ -115,6 +115,7 @@
             &:hover,
             &:hover::before,
             &:focus {
+                /* Delete states - use outline state instead so we don't have to worry about overriding borders, or adding borders to pseudo elements */
                 outline: var(--focus-outline-width) var(--focus-outline-style) var(--focus-outline-color);
                 outline-offset: var(--focus-outline-offset);
                 background: var(--color-warning-bg);
