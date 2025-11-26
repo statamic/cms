@@ -121,6 +121,7 @@ function handleStackClosed() {
                     size="sm"
                     class="absolute! top-1.75 right-3 z-(--z-index-above) [&_svg]:size-4"
                     @click="handleStackClosed"
+                    aria-label="Close filters"
                 />
                 <Heading size="lg" :text="__('Filters')" class="mb-4 px-1.5 pr-12 [&_svg]:size-4" icon="sliders-horizontal" />
                 <div class="space-y-4">
@@ -166,7 +167,7 @@ function handleStackClosed() {
             :icon-append="reorderable ? null : 'x'"
             :text="badge"
             :disabled="reorderable"
-            class="last:me-12"
+            class="last:me-12 hover:bg-danger-bg! hover:text-danger! hover:[&_svg]:text-danger hover:outline hover:outline-danger hover:-outline-offset-1"
             @click="removeFieldFilter(handle)"
         />
         <Button

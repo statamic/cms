@@ -37,9 +37,9 @@
     --color-ui-accent-text: var(--theme-color-ui-accent-text);
     --color-switch-bg: var(--theme-color-switch-bg);
 
-    --color-danger-bg: oklch(from var(--theme-color-danger) 99% 11% h);
+    --color-danger-bg: oklch(from var(--theme-color-danger) 99% 5% h);
     --color-danger: var(--theme-color-danger);
-    --color-success-bg: oklch(from var(--theme-color-success) 99% 11% h);
+    --color-success-bg: oklch(from var(--theme-color-success) 99% 5% h);
     --color-success: var(--theme-color-success);
 
     /* Temp */
@@ -97,7 +97,7 @@
 
 .dark {
     /* This is for automatic switching, without needing the dark: prefix */
-    --color-danger-bg: oklch(from var(--theme-color-danger) 20% 0% h);
+    --color-danger-bg: oklch(from var(--theme-color-danger) 20% 2% h);
     --color-danger: oklch(from var(--theme-color-danger) 70% 50% h);
     --color-success-bg: oklch(from var(--theme-color-success) 20% 0% h);
     --color-success: oklch(from var(--theme-color-success) 70% 50% h);
