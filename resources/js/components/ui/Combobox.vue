@@ -156,7 +156,7 @@ const limitExceeded = computed(() => {
 
 const limitIndicatorColor = computed(() => {
     if (limitExceeded.value) {
-        return 'text-warning';
+        return 'text-danger';
     } else if (limitReached.value) {
         return 'text-success';
     }
