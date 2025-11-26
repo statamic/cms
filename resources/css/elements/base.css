@@ -108,8 +108,8 @@
     button[aria-label*="Deselect"],
     button[aria-label*="Delete"],
     button[aria-label*="Clear"] {
-        /* For example, we don't want switches such as Select fieldtype > Clearable to get caught by this. */
-        &:not([role="switch"]) {
+        /* For example, we don't want switches such as Select fieldtype > Clearable to get caught by this. For badges we'll do something different */
+        &:not([role="switch"], [data-ui-badge] &) {
             --focus-outline-color: var(--color-warning);
             --focus-outline-width: 1px;
             &:hover,
@@ -129,9 +129,15 @@
             }
         }
     }
-    /* e.g. Tags fieldtype, deleting tags */
-    button[aria-label*="Deselect"]:focus {
-        --focus-outline-offset: 7px;
+    /* DELETE STATES / BADGES
+    =================================================== */
+    /* When a badge "x" is hovered, the whole badge lights up red. */
+    [data-ui-badge]:has(button[aria-label*="Deselect"]:hover) {
+        --focus-outline-color: var(--color-warning);
+        --focus-outline-width: 1px;
+        background: var(--color-warning-bg);
+        outline: var(--focus-outline-width) var(--focus-outline-style) var(--focus-outline-color);
+        color: var(--color-warning);
     }
 }
 
