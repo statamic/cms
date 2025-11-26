@@ -121,7 +121,8 @@
                 background: var(--color-danger-bg);
                 svg {
                     color: var(--color-danger);
-                    opacity: 1;
+                    /* Need !important to override dark mode */
+                    opacity: 1!important;
                 }
             }
             &.bg-transparent {
@@ -132,13 +133,17 @@
     /* DELETE STATES / BADGES
     =================================================== */
     /* When a badge "x" is hovered, the whole badge lights up red. */
-    [data-ui-badge]:has(button[aria-label*="Deselect"]:hover) {
+    [data-ui-badge]:has(button[aria-label*="Deselect"]:is(:hover, :focus)) {
         --focus-outline-color: var(--color-danger);
         --focus-outline-width: 1px;
         background: var(--color-danger-bg);
         outline: var(--focus-outline-width) var(--focus-outline-style) var(--focus-outline-color);
         outline-offset: var(--focus-outline-offset);
         color: var(--color-danger);
+        /* Cancel the outline on the actual button since we're highlighting the entire badge */
+        button {
+            outline: none;
+        }
     }
 }
 
