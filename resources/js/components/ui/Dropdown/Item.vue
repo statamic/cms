@@ -27,7 +27,7 @@ const classes = cva({
     variants: {
         variant: {
             default: 'text-gray-700 dark:text-gray-300',
-            destructive: 'text-danger hover:not-data-disabled:bg-danger-bg',
+            destructive: 'text-danger! hover:not-data-disabled:bg-danger-bg!',
         },
     },
 })({ variant: props.variant });
