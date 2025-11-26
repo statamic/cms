@@ -33,7 +33,7 @@
             <ui-button icon="add-circle" :text="__('Create Field')" @click="createField" />
         </div>
 
-        <stack
+        <ui-stack
             name="fieldtype-selector"
             v-if="isSelectingNewFieldtype"
             @closed="isSelectingNewFieldtype = false"
@@ -42,7 +42,7 @@
             <fieldtype-selector @closed="close" @selected="fieldtypeSelected" />
         </stack>
 
-        <stack
+        <ui-stack
             name="field-settings"
             v-if="pendingCreatedField != null"
             @closed="pendingCreatedField = null"

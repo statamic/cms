@@ -73,7 +73,7 @@
                 </div>
             </div>
 
-            <stack name="item-selector" v-if="isSelecting" @closed="isSelecting = false" v-slot="{ close }">
+            <ui-stack name="item-selector" v-if="isSelecting" @closed="isSelecting = false" v-slot="{ close }">
                 <ItemSelector
                     :name="name"
                     :filters-url="filtersUrl"

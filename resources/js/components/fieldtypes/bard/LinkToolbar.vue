@@ -148,7 +148,7 @@
             @item-data-updated="entrySelected"
         />
 
-        <stack v-if="showAssetSelector" name="asset-selector" @closed="closeAssetSelector">
+        <ui-stack v-if="showAssetSelector" name="asset-selector" @closed="closeAssetSelector">
             <asset-selector
                 :container="config.container"
                 :folder="config.folder || '/'"

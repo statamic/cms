@@ -34,7 +34,7 @@
             </Fields>
         </ui-panel>
 
-        <stack
+        <ui-stack
             narrow
             v-if="editingSection"
             @opened="() => $nextTick(() => $refs.displayInput.focus())"

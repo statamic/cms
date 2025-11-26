@@ -1,6 +1,6 @@
 <template>
     <div>
-        <stack
+        <ui-stack
             name="inline-editor"
             :before-close="shouldClose"
             :narrow="stackSize === 'narrow'"

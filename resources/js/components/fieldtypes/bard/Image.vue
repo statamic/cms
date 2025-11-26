@@ -37,7 +37,7 @@
                 />
             </div>
 
-            <stack v-if="showingSelector" name="asset-selector" @closed="closeSelector">
+            <ui-stack v-if="showingSelector" name="asset-selector" @closed="closeSelector">
                 <selector
                     :container="extension.options.bard.meta.assets.container"
                     :folder="extension.options.bard.config.folder || '/'"
