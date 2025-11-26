@@ -110,7 +110,7 @@
     button[aria-label*="Clear"] {
         /* For example, we don't want switches such as Select fieldtype > Clearable to get caught by this. For badges we'll do something different */
         &:not([role="switch"], [data-ui-badge] &) {
-            --focus-outline-color: var(--color-warning);
+            --focus-outline-color: var(--color-danger);
             --focus-outline-width: 1px;
             &:hover,
             &:hover::before,
@@ -118,9 +118,9 @@
                 /* Delete states - use outline state instead so we don't have to worry about overriding borders, or adding borders to pseudo elements */
                 outline: var(--focus-outline-width) var(--focus-outline-style) var(--focus-outline-color);
                 outline-offset: var(--focus-outline-offset);
-                background: var(--color-warning-bg);
+                background: var(--color-danger-bg);
                 svg {
-                    color: var(--color-warning);
+                    color: var(--color-danger);
                     opacity: 1;
                 }
             }
@@ -133,12 +133,12 @@
     =================================================== */
     /* When a badge "x" is hovered, the whole badge lights up red. */
     [data-ui-badge]:has(button[aria-label*="Deselect"]:hover) {
-        --focus-outline-color: var(--color-warning);
+        --focus-outline-color: var(--color-danger);
         --focus-outline-width: 1px;
-        background: var(--color-warning-bg);
+        background: var(--color-danger-bg);
         outline: var(--focus-outline-width) var(--focus-outline-style) var(--focus-outline-color);
         outline-offset: var(--focus-outline-offset);
-        color: var(--color-warning);
+        color: var(--color-danger);
     }
 }
 

@@ -139,10 +139,10 @@
     th,
     .row-controls {
         &:has([aria-label*="Delete"]):focus-within {
-            --focus-outline-color: var(--color-warning);
-            background-color: var(--color-warning-bg);
+            --focus-outline-color: var(--color-danger);
+            background-color: var(--color-danger-bg);
             svg {
-                color: var(--color-warning);
+                color: var(--color-danger);
                 opacity: 1;
             }
         }
