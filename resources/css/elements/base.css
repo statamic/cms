@@ -110,15 +110,21 @@
     button[aria-label*="Clear"] {
         /* For example, we don't want switches such as Select fieldtype > Clearable to get caught by this. */
         &:not([role="switch"]) {
+            --focus-outline-color: var(--color-warning);
+            --focus-outline-width: 1px;
             &:hover,
+            &:hover::before,
             &:focus {
-                --focus-outline-color: var(--color-warning);
+                outline: var(--focus-outline-width) var(--focus-outline-style) var(--focus-outline-color);
+                outline-offset: var(--focus-outline-offset);
                 background: var(--color-warning-bg);
-                border-radius: 100%;
                 svg {
                     color: var(--color-warning);
                     opacity: 1;
                 }
+            }
+            &.bg-transparent {
+                border-radius: 100%;
             }
         }
     }
