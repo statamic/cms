@@ -22,7 +22,7 @@ const props = defineProps({
         <div>
             <slot v-if="hasDefaultSlot" />
             <template v-else>{{ text }}</template>
-            <span v-if="required" class="relative -top-px ms-0.5 text-red-600">*</span>
+            <span v-if="required" class="relative -top-px ms-0.5 text-danger">*</span>
         </div>
         <Badge v-if="badge" :text="badge" />
     </label>

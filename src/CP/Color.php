@@ -401,8 +401,6 @@ class Color
             'gray-900' => self::Zinc[900],
             'gray-925' => self::Zinc[925],
             'gray-950' => self::Zinc[950],
-            'success' => self::Green[400],
-            'danger' => self::Red[600],
             'body-bg' => self::Zinc[100],
             'body-border' => self::Transparent,
             'dark-body-bg' => self::Zinc[900],
@@ -418,6 +416,8 @@ class Color
             'ui-accent-text' => 'var(--theme-color-ui-accent-bg)',
             'dark-ui-accent-text' => self::Indigo[400],
             'switch-bg' => 'var(--theme-color-ui-accent-bg)',
+            'success' => self::Green[700],
+            'danger' => self::Red[700],
         ])
             ->filter(fn ($color, $name) => str($name)->startsWith('dark-') ? $dark : ! $dark)
             ->all();
