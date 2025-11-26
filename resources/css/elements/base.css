@@ -107,7 +107,8 @@
     /* e.g. Tags fieldtype, deleting tags */
     button[aria-label*="Deselect"],
     button[aria-label*="Delete"],
-    button[aria-label*="Clear"] {
+    button[aria-label*="Clear"],
+    button[aria-label*="Reset"] {
         /* For example, we don't want switches such as Select fieldtype > Clearable to get caught by this. For badges we'll do something different */
         &:not([role="switch"], [data-ui-badge] &) {
             --focus-outline-color: var(--color-danger);
