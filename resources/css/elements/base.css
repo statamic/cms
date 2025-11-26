@@ -137,6 +137,7 @@
         --focus-outline-width: 1px;
         background: var(--color-warning-bg);
         outline: var(--focus-outline-width) var(--focus-outline-style) var(--focus-outline-color);
+        outline-offset: var(--focus-outline-offset);
         color: var(--color-warning);
     }
 }
