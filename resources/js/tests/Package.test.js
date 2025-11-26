@@ -70,6 +70,8 @@ it('exports inertia', async () => {
         'Head',
         'Link',
         'router',
+        'toggleArchitecturalBackground',
+        'useArchitecturalBackground',
         'useForm',
         'usePoll',
     ];
