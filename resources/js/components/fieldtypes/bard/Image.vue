@@ -49,7 +49,7 @@
                     @closed="closeSelector"
                 >
                 </selector>
-            </stack>
+            </ui-stack>
 
             <asset-editor
                 v-if="editing"

@@ -141,7 +141,7 @@
                         @selected="assetsSelected"
                         @closed="closeAssetSelector"
                     />
-                </stack>
+                </ui-stack>
 
                 <ui-stack narrow name="markdownCheatSheet" v-if="showCheatsheet" @closed="showCheatsheet = false">
                     <div class="relative h-full overflow-auto bg-white p-6 dark:bg-gray-800 rounded-l-2xl">
@@ -156,7 +156,7 @@
                             <div v-html="__('markdown.cheatsheet')"></div>
                         </div>
                     </div>
-                </stack>
+                </ui-stack>
             </div>
         </div>
     </portal>

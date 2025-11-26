@@ -62,7 +62,7 @@
             @confirm="confirmCloseWithChanges"
             @cancel="closingWithChanges = false"
         />
-    </stack>
+    </ui-stack>
 </template>
 
 <script>

@@ -40,7 +40,7 @@
             v-slot="{ close }"
         >
             <fieldtype-selector @closed="close" @selected="fieldtypeSelected" />
-        </stack>
+        </ui-stack>
 
         <ui-stack
             name="field-settings"
@@ -59,7 +59,7 @@
                 @committed="fieldCreated"
                 @closed="close"
             />
-        </stack>
+        </ui-stack>
     </div>
 </template>
 

@@ -205,7 +205,7 @@
                 :can-restore-revisions="!readOnly"
                 @closed="close"
             />
-        </stack>
+        </ui-stack>
 
         <publish-actions
             v-if="confirmingPublish"

@@ -27,7 +27,7 @@
                                     @committed="settingsUpdated"
                                     @closed="editorClosed"
                                 />
-                            </stack>
+                            </ui-stack>
                         </div>
                     </div>
                 </div>

@@ -30,7 +30,7 @@
                     </template>
                 </component>
             </div>
-        </stack>
+        </ui-stack>
 
         <confirmation-modal
             v-if="closingWithChanges"

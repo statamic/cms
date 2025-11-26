@@ -45,7 +45,7 @@
                 </div>
             </div>
         </div>
-    </stack>
+    </ui-stack>
 </template>
 
 <script>

@@ -75,7 +75,7 @@
                     </div>
                 </div>
             </div>
-        </stack>
+        </ui-stack>
     </TabTrigger>
 </template>
 

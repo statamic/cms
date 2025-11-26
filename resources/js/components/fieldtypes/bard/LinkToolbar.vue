@@ -158,7 +158,7 @@
                 @selected="assetSelected"
                 @closed="closeAssetSelector"
             />
-        </stack>
+        </ui-stack>
     </div>
 </template>
 

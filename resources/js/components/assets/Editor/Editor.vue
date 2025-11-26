@@ -174,7 +174,7 @@
             @cancel="closingWithChanges = false"
         />
         </div>
-    </stack>
+    </ui-stack>
 </template>
 
 <script>

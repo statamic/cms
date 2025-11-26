@@ -124,7 +124,7 @@
                     </div>
                 </div>
             </div>
-        </stack>
+        </ui-stack>
     </div>
 </template>
 

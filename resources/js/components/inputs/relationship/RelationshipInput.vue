@@ -91,7 +91,7 @@
                     @selected="selectionsUpdated"
                     @closed="close"
                 />
-            </stack>
+            </ui-stack>
 
             <input v-if="name" type="hidden" :name="name" :value="JSON.stringify(value)" />
         </template>
