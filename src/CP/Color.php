@@ -419,11 +419,12 @@ class Color
             'switch-bg' => 'var(--theme-color-ui-accent-bg)',
             'danger' => self::Red[700],
             'danger-bg' => self::Red[50],
-            'success-bg' => self::Green[50],
-            'dark-danger-bg' => self::Red[950],
-            'dark-success-bg' => self::Green[950],
             'dark-danger' => self::Red[400],
+            'dark-danger-bg' => self::Red[950],
+            'success' => self::Green[700],
+            'success-bg' => self::Green[50],
             'dark-success' => self::Green[400],
+            'dark-success-bg' => self::Green[950],
         ])
             ->filter(fn ($color, $name) => str($name)->startsWith('dark-') ? $dark : ! $dark)
             ->all();

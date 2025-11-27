@@ -42,7 +42,9 @@
     --color-switch-bg: var(--theme-color-switch-bg);
 
     --color-danger: var(--theme-color-danger);
+    --color-danger-bg: var(--theme-color-danger-bg);
     --color-success: var(--theme-color-success);
+    --color-success-bg: var(--theme-color-success-bg);
 
     /* Temp */
     --color-dark-100: #dfe1e5;
