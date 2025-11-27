@@ -14,6 +14,7 @@ use Statamic\StaticCaching\Page;
 use Statamic\StaticCaching\Replacers\CsrfTokenReplacer;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\Facades\URL;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 
 class FileCacher extends AbstractCacher
@@ -238,6 +239,7 @@ class FileCacher extends AbstractCacher
     public function getNocacheJs(): string
     {
         $csrfPlaceholder = CsrfTokenReplacer::REPLACEMENT;
+         $nocacheUrl = URL::prependSiteUrl(config('statamic.routes.action').'/nocache');
 
         $default = <<<EOT
 (function() {
@@ -253,7 +255,7 @@ class FileCacher extends AbstractCacher
 
     var map = createMap();
 
-    fetch('/!/nocache', {
+    fetch('{$nocacheUrl}', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
