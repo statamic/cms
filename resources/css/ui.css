@@ -3,6 +3,15 @@
 
     /* Custom value because gray-100 is too light and gray-200 is too dark, e.g. Bard active buttons */
     --color-button-active: hsl(from var(--color-gray-300) h s l / 0.45);
+
+    &.dark {
+        --color-danger-bg: oklch(from var(--theme-color-danger) 20% 2% h);
+        --color-danger: oklch(from var(--theme-color-danger) 70% 50% h);
+        --color-success-bg: oklch(from var(--theme-color-success) 20% 0% h);
+        --color-success: oklch(from var(--theme-color-success) 70% 50% h);
+
+        --color-button-active: hsl(from var(--color-gray-700) h s l / 0.45);
+    }
 }
 
 @theme inline {
@@ -96,14 +105,6 @@
 }
 
 .dark {
-    /* This is for automatic switching, without needing the dark: prefix */
-    --color-danger-bg: oklch(from var(--theme-color-danger) 20% 2% h);
-    --color-danger: oklch(from var(--theme-color-danger) 70% 50% h);
-    --color-success-bg: oklch(from var(--theme-color-success) 20% 0% h);
-    --color-success: oklch(from var(--theme-color-success) 70% 50% h);
-
-    --color-button-active: hsl(from var(--color-gray-700) h s l / 0.45);
-    /* This is for when you use the syntax dark:bg-gray-950 */
     @theme inline {
         --color-primary-hover: color-mix(in oklch, var(--color-primary) 100%, white 30%);
         --color-gray-950: hsl(240deg 7% 8%);
