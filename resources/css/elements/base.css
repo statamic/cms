@@ -10,6 +10,7 @@
     --focus-within-outline-offset: 0px;
     --focus-outline-color: var(--theme-color-focus-outline, var(--color-blue-400));
     --focus-outline-style: solid;
+    --danger-outline-color: oklch(from var(--color-danger) l c h / 0.5);
 
     /* The outline-offset value used for buttons */
     --outline-offset-button: 6px;
@@ -114,7 +115,7 @@
     ) {
         /* For example, we don't want switches such as Select fieldtype > Clearable to get caught by this. For badges we'll do something different */
         &:not([role="switch"], [data-ui-badge] &) {
-            --focus-outline-color: oklch(from var(--color-danger) l c h / 0.5);
+            --focus-outline-color: var(--danger-outline-color);
             --focus-outline-width: 1px;
             &:hover,
             &:hover::before,
@@ -138,7 +139,7 @@
     =================================================== */
     /* When a badge "x" is hovered, the whole badge lights up red. */
     [data-ui-badge]:has(button[aria-label*="Deselect"]:is(:hover, :focus)) {
-        --focus-outline-color: oklch(from var(--color-danger) l c h / 0.5);
+        --focus-outline-color: var(--danger-outline-color);
         --focus-outline-width: 1px;
         background: var(--color-danger-bg);
         outline: var(--focus-outline-width) var(--focus-outline-style) var(--focus-outline-color);

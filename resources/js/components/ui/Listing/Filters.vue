@@ -167,7 +167,7 @@ function handleStackClosed() {
             :icon-append="reorderable ? null : 'x'"
             :text="badge"
             :disabled="reorderable"
-            class="last:me-12 hover:bg-danger-bg! hover:text-danger! hover:[&_svg]:text-danger hover:outline hover:outline-danger hover:-outline-offset-1"
+            class="last:me-12 hover:bg-danger-bg! hover:text-danger! hover:[&_svg]:text-danger hover:outline hover:outline-(--danger-outline-color)! hover:-outline-offset-1"
             @click="removeFieldFilter(handle)"
         />
         <Button
