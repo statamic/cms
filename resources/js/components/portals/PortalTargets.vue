@@ -1,5 +1,5 @@
 <template>
-    <div class="portal-targets" :class="{ 'stacks-on-stacks': hasStacks }">
+    <div class="portal-targets" :class="{ 'stacks-on-stacks': hasStacks, 'modals-on-modals': hasModals }">
         <div v-for="(portal, i) in portals" :id="`portal-target-${portal.id}`" />
     </div>
 </template>
@@ -16,11 +16,19 @@ export default {
         hasStacks() {
             return this.$stacks.count() > 0;
         },
+
+        hasModals() {
+            return this.$modals.count() > 0;
+        },
     },
 
     watch: {
         hasStacks(hasStacks) {
             hasStacks ? this.initStacks() : this.destroyStacks();
+        },
+
+        hasModals(hasModals) {
+            hasModals ? this.initModals() : this.destroyModals();
         },
     },
 
@@ -48,6 +56,23 @@ export default {
 
         destroyStacks() {
             this.$events.$off('stacks.hit-area-clicked');
+            enableBodyScroll(this.$el);
+        },
+
+        initModals() {
+            disableBodyScroll(this.$el, {
+                allowTouchMove: (el) => {
+                    while (el && el !== document.body) {
+                        if (el.classList.contains('overflow-scroll')) {
+                            return true;
+                        }
+                        el = el.parentElement;
+                    }
+                },
+            });
+        },
+
+        destroyModals() {
             enableBodyScroll(this.$el);
         },
     },
