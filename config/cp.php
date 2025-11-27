@@ -135,8 +135,12 @@ return [
 
         // 'success' => Color::Green[700],
         // 'success-bg' => Color::Green[50],
+        // 'dark-success' => Color::Green[400],
+        // 'dark-success-bg' => Color::Green[950],
         // 'danger' => Color::Red[700],
         // 'danger-bg' => Color::Red[50],
+        // 'dark-danger' => Color::Red[400],
+        // 'dark-danger-bg' => Color::Red[950],
     ],
 
     /*
