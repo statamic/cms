@@ -10,11 +10,11 @@ use Statamic\Events\UrlInvalidated;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\StaticCaching\Page;
 use Statamic\StaticCaching\Replacers\CsrfTokenReplacer;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
-use Statamic\Facades\URL;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 
 class FileCacher extends AbstractCacher
