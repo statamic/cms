@@ -1,8 +1,6 @@
 <script setup>
-import { Panel, PanelFooter } from '@ui';
-import { ref, computed, useTemplateRef, useSlots } from 'vue';
+import { ref, computed, useSlots, watch, onMounted, Comment, Fragment } from 'vue';
 import { injectListingContext } from '../Listing/Listing.vue';
-import Pagination from './Pagination.vue';
 import TableHead from './TableHead.vue';
 import TableBody from './TableBody.vue';
 
@@ -38,11 +36,53 @@ const forwardedTableCellSlots = computed(() => {
             return acc;
         }, {});
 });
+
+const hasTbodyStartContent = ref(false);
+
+const checkSlotContent = () => {
+	if (!slots['tbody-start']) {
+		hasTbodyStartContent.value = false;
+		return;
+	}
+
+	const slotContent = slots['tbody-start']();
+
+	const hasRealContent = (vnodes) => {
+		if (!vnodes || vnodes.length === 0) return false;
+
+		return vnodes.some(vnode => {
+			// Skip comments
+			if (vnode.type === Comment) return false;
+
+			// Skip empty text nodes
+			if (typeof vnode.children === 'string' && !vnode.children.trim()) return false;
+
+			// Handle fragments (like from v-for)
+			if (vnode.type === Fragment) {
+				return hasRealContent(vnode.children);
+			}
+
+			// If it has array children, recursively check them
+			if (Array.isArray(vnode.children)) {
+				return hasRealContent(vnode.children);
+			}
+
+			// Otherwise it's real content
+			return true;
+		})
+	}
+
+	hasTbodyStartContent.value = hasRealContent(slotContent)
+}
+
+watch(items, () => checkSlotContent(), { immediate: true, deep: true });
+
+onMounted(checkSlotContent);
 </script>
 
 <template>
     <table
-        v-if="items.length > 0"
+        v-if="items.length > 0 || hasTbodyStartContent"
         :data-size="relativeColumnsSize"
         :class="{
             'select-none': shifting,
@@ -67,7 +107,7 @@ const forwardedTableCellSlots = computed(() => {
             </template>
         </TableBody>
     </table>
-    <div v-if="items.length === 0">
+    <div v-if="items.length === 0 && !hasTbodyStartContent">
         <div class="text-center text-gray-500 text-sm py-4">
             {{ __('No items found') }}
         </div>
