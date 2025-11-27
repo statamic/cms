@@ -49,6 +49,7 @@ it('exports api', async () => {
         'hooks',
         'inertia',
         'keys',
+        'modals',
         'permissions',
         'portals',
         'preferences',
