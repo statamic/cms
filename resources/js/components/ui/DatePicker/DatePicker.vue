@@ -64,6 +64,17 @@ const calendarBindings = computed(() => ({
     },
 }));
 
+const inputEvents = computed(() => ({
+	focusout: (event) => {
+		if (props.modelValue?.year.toString().length === 2) {
+			let value = props.modelValue;
+			value.year = '20' + value.year;
+
+			emit('update:modelValue', value);
+		}
+	},
+}));
+
 const calendarEvents = computed(() => ({
     'update:model-value': (event) => {
         if (props.granularity === 'day') {
@@ -159,6 +170,7 @@ const getInputLabel = (part) => {
                                         'px-0.5!': item.part === 'month' || item.part === 'year' || item.part === 'day',
                                     }"
                                     :aria-label="getInputLabel(item.part)"
+                                    v-on="inputEvents"
                                 >
                                     {{ item.value }}
                                 </DatePickerInput>
