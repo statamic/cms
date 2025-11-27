@@ -7,7 +7,8 @@ import {
 } from '@ui';
 import { injectListingContext } from '../Listing/Listing.vue';
 import ItemActions from '@/components/actions/ItemActions.vue';
-import { computed, ref, watch, useSlots, Comment, Fragment } from 'vue';
+import { hasSlotContent } from '@/composables/has-slot-content';
+import { computed, ref, watch } from 'vue';
 
 const props = defineProps({
     row: {
@@ -16,43 +17,10 @@ const props = defineProps({
     },
 });
 
-const slots = useSlots();
 const { actionUrl, actionContext, refresh, reorderable, allowActionsWhileReordering } = injectListingContext();
 const busy = ref(false);
 
-const hasPrependedActionsContent = computed(() => {
-    if (!slots['prepended-actions']) return false;
-
-    // Call the slot with the row prop to get the actual vnodes
-    const slotContent = slots['prepended-actions']({ row: props.row });
-
-    const hasRealContent = (vnodes) => {
-        if (!vnodes || vnodes.length === 0) return false;
-
-        return vnodes.some(vnode => {
-            // Skip comments
-            if (vnode.type === Comment) return false;
-
-            // Skip empty text nodes
-            if (typeof vnode.children === 'string' && !vnode.children.trim()) return false;
-
-            // Handle fragments (like from v-for)
-            if (vnode.type === Fragment) {
-                return hasRealContent(vnode.children);
-            }
-
-            // If it has array children, recursively check them
-            if (Array.isArray(vnode.children)) {
-                return hasRealContent(vnode.children);
-            }
-
-            // Otherwise it's real content
-            return true;
-        });
-    };
-
-    return hasRealContent(slotContent);
-});
+const hasPrependedActionsContent = hasSlotContent('prepended-actions', computed(() => ({ row: props.row })));
 
 const shouldShowActions = computed(() => {
     if (reorderable.value && !allowActionsWhileReordering.value) return false;

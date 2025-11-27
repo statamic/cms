@@ -1,6 +1,7 @@
 <script setup>
-import { ref, computed, useSlots, watch, onMounted, Comment, Fragment } from 'vue';
+import { ref, computed, useSlots } from 'vue';
 import { injectListingContext } from '../Listing/Listing.vue';
+import { hasSlotContent } from '@/composables/has-slot-content';
 import TableHead from './TableHead.vue';
 import TableBody from './TableBody.vue';
 
@@ -37,47 +38,7 @@ const forwardedTableCellSlots = computed(() => {
         }, {});
 });
 
-const hasTbodyStartContent = ref(false);
-
-const checkSlotContent = () => {
-	if (!slots['tbody-start']) {
-		hasTbodyStartContent.value = false;
-		return;
-	}
-
-	const slotContent = slots['tbody-start']();
-
-	const hasRealContent = (vnodes) => {
-		if (!vnodes || vnodes.length === 0) return false;
-
-		return vnodes.some(vnode => {
-			// Skip comments
-			if (vnode.type === Comment) return false;
-
-			// Skip empty text nodes
-			if (typeof vnode.children === 'string' && !vnode.children.trim()) return false;
-
-			// Handle fragments (like from v-for)
-			if (vnode.type === Fragment) {
-				return hasRealContent(vnode.children);
-			}
-
-			// If it has array children, recursively check them
-			if (Array.isArray(vnode.children)) {
-				return hasRealContent(vnode.children);
-			}
-
-			// Otherwise it's real content
-			return true;
-		})
-	}
-
-	hasTbodyStartContent.value = hasRealContent(slotContent)
-}
-
-watch(items, () => checkSlotContent(), { immediate: true, deep: true });
-
-onMounted(checkSlotContent);
+const hasTbodyStartContent = hasSlotContent('tbody-start');
 </script>
 
 <template>
