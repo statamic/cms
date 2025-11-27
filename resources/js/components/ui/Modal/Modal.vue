@@ -46,7 +46,7 @@ const isUsingOpenProp = computed(() => instance?.vnode.props?.hasOwnProperty('op
 const instance = getCurrentInstance();
 const { $modals, $keys, $wait } = instance.appContext.config.globalProperties;
 
-const modal = ref($modals ? $modals.add(instance) : null);
+const modal = ref(null);
 const mounted = ref(false);
 const visible = ref(false);
 const escBinding = ref(null);
@@ -54,10 +54,10 @@ const escBinding = ref(null);
 const portal = computed(() => modal.value ? `#portal-target-${modal.value.id}` : null);
 
 function open() {
-	modal.value = $modals.add(instance);
+	if (!modal.value) modal.value = $modals.add(instance);
 
 	mounted.value = true;
-
+		
 	nextTick(() => {
 		visible.value = true;
 		escBinding.value = $keys.bindGlobal('esc', dismiss);
@@ -98,7 +98,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-	modal.value.destroy();
+	modal.value?.destroy();
 	escBinding.value?.destroy();
 });
 
