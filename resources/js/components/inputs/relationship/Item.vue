@@ -52,11 +52,13 @@
                                 v-if="editable"
                                 :text="__('Edit')"
                                 @click="edit"
+                                :aria-label="__('Edit')"
                             />
                             <DropdownItem
                                 :text="__('Unlink')"
                                 variant="destructive"
                                 @click="$emit('removed')"
+                                :aria-label="__('Unlink')"
                             />
                         </DropdownMenu>
                     </Dropdown>

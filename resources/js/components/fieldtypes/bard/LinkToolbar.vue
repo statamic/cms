@@ -109,18 +109,21 @@
                 <ui-button
                     @click="$emit('canceled')"
                     :text="__('Cancel')"
+                    :aria-label="__('Cancel')"
                     size="sm"
                     inset
                     variant="ghost"
                 />
                 <ui-button
                     :text="__('Remove Link')"
+                    :aria-label="__('Remove Link')"
                     @click="remove"
                     size="sm"
                     inset
                 />
                 <ui-button
                     :text="__('Apply Link')"
+                    :aria-label="__('Apply Link')"
                     :disabled="!canCommit"
                     @click="commit"
                     size="sm"

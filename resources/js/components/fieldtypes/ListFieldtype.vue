@@ -35,6 +35,7 @@
                             <button
                                 @click="deleteValue(index)"
                                 class="inline text-lg antialiased opacity-25 hover:opacity-75 cursor-pointer"
+                                :aria-label="__('Delete Value')"
                             >
                                 &times;
                             </button>
