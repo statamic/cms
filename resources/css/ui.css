@@ -5,11 +5,6 @@
     --color-button-active: hsl(from var(--color-gray-300) h s l / 0.45);
 
     &.dark {
-        --color-danger-bg: oklch(from var(--theme-color-danger) 20% 2% h);
-        --color-danger: oklch(from var(--theme-color-danger) 70% 50% h);
-        --color-success-bg: oklch(from var(--theme-color-success) 20% 0% h);
-        --color-success: oklch(from var(--theme-color-success) 70% 50% h);
-
         --color-button-active: hsl(from var(--color-gray-700) h s l / 0.45);
     }
 }
@@ -46,9 +41,7 @@
     --color-ui-accent-text: var(--theme-color-ui-accent-text);
     --color-switch-bg: var(--theme-color-switch-bg);
 
-    --color-danger-bg: oklch(from var(--theme-color-danger) 99% 5% h);
     --color-danger: var(--theme-color-danger);
-    --color-success-bg: oklch(from var(--theme-color-success) 99% 5% h);
     --color-success: var(--theme-color-success);
 
     /* Temp */
@@ -104,10 +97,9 @@
     --color-dark-gray: #404040;
 }
 
-.dark {
+&:where(.dark, .dark *) {
     @theme inline {
         --color-primary-hover: color-mix(in oklch, var(--color-primary) 100%, white 30%);
-        --color-gray-950: hsl(240deg 7% 8%);
     }
 }
 
