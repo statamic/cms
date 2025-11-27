@@ -159,6 +159,7 @@ const getInputLabel = (part) => {
                                     v-if="item.part === 'literal'"
                                     :part="item.part"
                                     :class="{ 'text-sm text-gray-600 dark:text-gray-400 antialiased': !item.contenteditable }"
+                                    v-on="inputEvents"
                                 >
                                     {{ item.value }}
                                 </DatePickerInput>
