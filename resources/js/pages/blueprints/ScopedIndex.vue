@@ -69,7 +69,7 @@ const reloadPage = () => router.reload();
         >
             <template #cell-title="{ row: blueprint }">
                 <div class="flex items-center">
-                    <div class="little-dot me-2" :class="[blueprint.hidden ? 'hollow' : 'bg-green-600']" />
+                    <div class="little-dot me-2" :class="[blueprint.hidden ? 'hollow' : 'bg-green-500']" />
                     <Link :href="blueprint.edit_url" v-text="__(blueprint.title)" />
 
                     <resource-deleter
