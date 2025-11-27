@@ -1,7 +1,11 @@
 <script setup>
 import { router } from '@inertiajs/vue3';
 import Head from '@/pages/layout/Head.vue';
-import { Header, Button, Panel, PanelHeader, Heading, Card, Description, Badge, DocsCallout, CommandPaletteItem } from '@ui';
+import {
+	Header, Button, Panel, PanelHeader, Heading, Card, Description, Badge, DocsCallout, CommandPaletteItem,
+	Dropdown, DropdownMenu, DropdownItem, Textarea, Modal, ModalClose
+} from '@ui';
+import {ref} from "vue";
 
 const props = defineProps([
     'stache',
@@ -16,6 +20,10 @@ const props = defineProps([
     'clearImageUrl',
 ]);
 
+const staticUrls = ref(null);
+const staticUrlsModal = ref(false);
+const isInvalidatingStaticCache = ref(false);
+
 function clearAll() {
     router.post(props.clearAllUrl);
 }
@@ -28,8 +36,22 @@ function warmStache() {
     router.post(props.warmStacheUrl);
 }
 
-function clearStatic() {
-    router.post(props.clearStaticUrl);
+function invalidateStatic() {
+	isInvalidatingStaticCache.value = true;
+
+    router.post(
+		props.clearStaticUrl,
+	    {
+			urls: staticUrls.value?.split('\n'),
+	    },
+	    {
+			onSuccess: () => {
+				staticUrls.value = null;
+				staticUrlsModal.value = false;
+			},
+		    onFinish: () => isInvalidatingStaticCache.value = false,
+        },
+	);
 }
 
 function clearApplication() {
@@ -102,14 +124,40 @@ function clearImage() {
                 <PanelHeader class="flex items-center justify-between min-h-10">
                     <Heading>{{ __('Static Page Cache') }}</Heading>
                     <div v-if="static.enabled" class="flex gap-2">
-                        <CommandPaletteItem
-                            category="Actions"
-                            :text="[__('Clear'), __('Static Page Stache')]"
-                            icon="live-preview"
-                            :action="clearStatic"
-                        >
-                            <Button :text="__('Clear')" size="sm" @click="clearStatic" />
-                        </CommandPaletteItem>
+	                    <CommandPaletteItem
+		                    category="Actions"
+		                    :text="[__('Clear'), __('Static Page Stache')]"
+		                    icon="live-preview"
+		                    :action="invalidateStatic"
+	                    >
+		                    <Dropdown align="end">
+			                    <template #trigger>
+			                        <Button :text="__('Invalidate')" size="sm" icon-append="chevron-down" />
+			                    </template>
+			                    <DropdownMenu>
+				                    <DropdownItem :text="__('Everything')" icon="layers-stacks" @click="invalidateStatic" />
+				                    <DropdownItem :text="__('Specific URLs')" icon="link" @click="staticUrlsModal = true" />
+			                    </DropdownMenu>
+		                    </Dropdown>
+	                    </CommandPaletteItem>
+
+	                    <Modal :title="__('Invalidate Static Cache')" v-model:open="staticUrlsModal">
+		                    <p>{{ __('Specify the URLs you want to invalidate. One line per URL.') }}</p>
+		                    <Textarea class="font-mono" v-model="staticUrls" :disabled="isInvalidatingStaticCache" />
+
+		                    <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
+			                    <ModalClose asChild>
+				                    <Button variant="ghost" :disabled="isInvalidatingStaticCache" :text="__('Cancel')" />
+			                    </ModalClose>
+			                    <Button
+				                    type="submit"
+				                    variant="primary"
+				                    :disabled="isInvalidatingStaticCache"
+				                    :text="__('Invalidate URLs')"
+				                    @click="invalidateStatic"
+			                    />
+		                    </div>
+	                    </Modal>
                     </div>
                 </PanelHeader>
                 <Card class="flex-1">
