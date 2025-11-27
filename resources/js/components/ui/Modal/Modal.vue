@@ -80,7 +80,6 @@ function dismiss() {
 	close();
 }
 
-// TODO: Provide close function to slots instead of this.
 provide('closeModal', close);
 
 function updateOpen(value) {
@@ -100,7 +99,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
 	modal.value.destroy();
-	escBinding.value.destroy();
+	escBinding.value?.destroy();
 });
 
 defineExpose({
