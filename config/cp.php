@@ -134,7 +134,9 @@ return [
         // 'dark-switch-bg' => Color::Green[600],
 
         // 'success' => Color::Green[700],
+        // 'success-bg' => Color::Green[50],
         // 'danger' => Color::Red[700],
+        // 'danger-bg' => Color::Red[50],
     ],
 
     /*

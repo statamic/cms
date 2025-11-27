@@ -8,6 +8,7 @@
         --color-button-active: hsl(from var(--color-gray-700) h s l / 0.45);
         /* Make the danger background slightly darker/more subtle in dark mode */
         --color-danger-bg-opacity: 0.2;
+        --color-success-bg-opacity: 0.2;
     }
 }
 
@@ -46,7 +47,7 @@
     --color-danger: var(--theme-color-danger);
     --color-danger-bg: oklch(from var(--theme-color-danger-bg) l c h / var(--color-danger-bg-opacity, 1));
     --color-success: var(--theme-color-success);
-    --color-success-bg: var(--theme-color-success-bg);
+    --color-success-bg: oklch(from var(--theme-color-success-bg) l c h / var(--color-success-bg-opacity, 1));
 
     /* Temp */
     --color-dark-100: #dfe1e5;
