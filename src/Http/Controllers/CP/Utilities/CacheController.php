@@ -6,9 +6,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Inertia\Inertia;
 use League\Glide\Server;
+use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\StaticCache;
+use Statamic\Facades\URL;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\StaticCaching\Cacher;
 use Statamic\Support\Str;
 
 class CacheController extends CpController
@@ -81,10 +84,10 @@ class CacheController extends CpController
     {
         $method = 'clear'.ucfirst($cache).'Cache';
 
-        return $this->$method();
+        return $this->$method($request);
     }
 
-    protected function clearAllCache()
+    protected function clearAllCache(Request $request)
     {
         $this->clearStacheCache();
         $this->clearStaticCache();
@@ -94,21 +97,41 @@ class CacheController extends CpController
         return back()->withSuccess(__('All caches cleared.'));
     }
 
-    protected function clearStacheCache()
+    protected function clearStacheCache(Request $request)
     {
         Stache::refresh();
 
         return back()->withSuccess(__('Stache cleared.'));
     }
 
-    protected function clearStaticCache()
+    protected function clearStaticCache(Request $request)
     {
+        if ($request->urls) {
+            $urls = $request->collect('urls');
+
+            $absoluteUrls = $urls->filter(fn (string $rule) => URL::isAbsolute($rule))->all();
+
+            $prefixedRelativeUrls = $urls
+                ->reject(fn (string $rule) => URL::isAbsolute($rule))
+                ->map(fn (string $rule) => URL::tidy(Site::selected()->url().'/'.$rule, withTrailingSlash: false))
+                ->all();
+
+            $urls = [
+                ...$absoluteUrls,
+                ...$prefixedRelativeUrls,
+            ];
+
+            app(Cacher::class)->invalidateUrls($urls);
+
+            return back()->withSuccess(__('Invalidated URLs.'));
+        }
+
         StaticCache::flush();
 
         return back()->withSuccess(__('Static page cache cleared.'));
     }
 
-    protected function clearApplicationCache()
+    protected function clearApplicationCache(Request $request)
     {
         Artisan::call('cache:clear');
 
@@ -118,7 +141,7 @@ class CacheController extends CpController
         return back()->withSuccess(__('Application cache cleared.'));
     }
 
-    protected function clearImageCache()
+    protected function clearImageCache(Request $request)
     {
         Artisan::call('statamic:glide:clear');
 
