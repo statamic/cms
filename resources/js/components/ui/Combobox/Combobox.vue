@@ -15,11 +15,12 @@ import {
 } from 'reka-ui';
 import { computed, nextTick, ref, useAttrs, useTemplateRef, watch } from 'vue';
 import { twMerge } from 'tailwind-merge';
-import Button from './Button/Button.vue';
-import Icon from './Icon/Icon.vue';
-import Badge from './Badge.vue';
+import Button from '../Button/Button.vue';
+import Icon from '../Icon/Icon.vue';
+import Badge from '../Badge.vue';
 import fuzzysort from 'fuzzysort';
 import { SortableList } from '@/components/sortable/Sortable.js';
+import Scrollbar from "@ui/Combobox/Scrollbar.vue";
 
 const emit = defineEmits(['update:modelValue', 'search', 'selected', 'added']);
 
@@ -165,6 +166,8 @@ const limitIndicatorColor = computed(() => {
 });
 
 const triggerRef = useTemplateRef('trigger');
+const viewportRef = useTemplateRef('viewport');
+const scrollbarRef = useTemplateRef('scrollbar');
 const searchQuery = ref('');
 const searchInputRef = useTemplateRef('search');
 
@@ -197,7 +200,7 @@ const filteredOptions = computed(() => {
 });
 
 watch(filteredOptions, () => {
-    nextTick(() => updateScrollbar());
+	nextTick(() => scrollbarRef.value.update());
 });
 
 function clear() {
@@ -226,7 +229,7 @@ function updateDropdownOpen(open) {
     if (open) {
         nextTick(() => {
             measureOptionWidths();
-            updateScrollbar();
+	        scrollbarRef.value.update()
         });
     }
 }
@@ -314,34 +317,6 @@ function openDropdown(e) {
 function selectOption(option) {
     dropdownOpen.value = !closeOnSelect.value;
     if (closeOnSelect.value) triggerRef.value.$el.focus();
-}
-
-const viewportRef = useTemplateRef('viewport');
-const scrollbarVisible = ref(false);
-const scrollbarThumbHeight = ref(0);
-const scrollbarThumbTop = ref(0);
-
-function updateScrollbar() {
-    const viewport = viewportRef.value?.$el;
-    if (!viewport) return;
-
-    const scrollHeight = viewport.scrollHeight;
-    const clientHeight = viewport.clientHeight;
-    const scrollTop = viewport.scrollTop;
-
-    scrollbarVisible.value = scrollHeight > clientHeight;
-
-    if (scrollbarVisible.value) {
-        // Calculate thumb height as a percentage of visible area
-        const thumbHeightPercent = (clientHeight / scrollHeight) * 100;
-        scrollbarThumbHeight.value = Math.max(thumbHeightPercent, 10); // Minimum 10%
-
-        // Calculate thumb position
-        const maxScroll = scrollHeight - clientHeight;
-        const scrollPercent = maxScroll > 0 ? scrollTop / maxScroll : 0;
-        const maxThumbTop = 100 - scrollbarThumbHeight.value;
-        scrollbarThumbTop.value = scrollPercent * maxThumbTop;
-    }
 }
 
 defineExpose({
@@ -457,7 +432,6 @@ defineExpose({
                                     ref="viewport"
                                     class="max-h-[calc(var(--reka-combobox-content-available-height)-1rem)] overflow-y-scroll" 
                                     data-ui-combobox-viewport
-                                    @scroll="updateScrollbar"
                                 >
                                     <ComboboxEmpty class="p-2 text-sm" data-ui-combobox-empty>
                                     <slot name="no-options" v-bind="{ searchQuery }">
@@ -497,15 +471,7 @@ defineExpose({
 	                            Custom Scrollbar
 	                            (we can't use the browser's scrollbar here because of virtualization, so we need to create our own).
 	                        -->
-                            <div v-if="scrollbarVisible" class="absolute top-0 right-0 w-3 p-0.5 h-full pointer-events-none">
-                                <div 
-                                    class="absolute right-0 w-1.5 rounded-full bg-black/25 dark:bg-white/25 transition-opacity"
-                                    :style="{
-                                        height: `${scrollbarThumbHeight}%`,
-                                        top: `${scrollbarThumbTop}%`
-                                    }"
-                                />
-                            </div>
+	                       <Scrollbar ref="scrollbar" :viewport="viewportRef" />
                         </div>
                         </FocusScope>
                     </ComboboxContent>
