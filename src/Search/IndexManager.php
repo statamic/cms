@@ -20,7 +20,7 @@ class IndexManager extends Manager
 
     public function all()
     {
-        return collect($this->app['config']['statamic.search.indexes'])->flatMap(function ($config, $name) {
+        return $this->indexesConfig()->flatMap(function ($config, $name) {
             $sites = $config['sites'] ?? null;
 
             if ($sites === 'all') {
@@ -127,11 +127,26 @@ class IndexManager extends Manager
         return $this->customCreators[$config['driver']]($this->app, $config, $name, $locale);
     }
 
+    private function indexesConfig()
+    {
+        $config = collect($this->app['config']['statamic.search.indexes']);
+
+        if (! $config->has('cp')) {
+            $config->put('cp', [
+                'driver' => 'local',
+                'searchables' => ['content', 'users', 'addons'],
+                'fields' => ['title'],
+            ]);
+        }
+
+        return $config;
+    }
+
     protected function getConfig($name)
     {
         $config = $this->app['config'];
 
-        if (! $index = $config["statamic.search.indexes.$name"]) {
+        if (! $index = $this->indexesConfig()->get($name)) {
             return null;
         }
 

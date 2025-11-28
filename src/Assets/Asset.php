@@ -1131,6 +1131,11 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         return $this->container()->title();
     }
 
+    public function getCpSearchResultIcon()
+    {
+        return 'assets';
+    }
+
     public function warmPresets()
     {
         if (! $this->isImage()) {

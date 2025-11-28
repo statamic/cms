@@ -56,9 +56,9 @@ class EntriesTest extends TestCase
     public static function entriesProvider()
     {
         return [
-            'all' => [
+            'content' => [
                 null,
-                ['searchables' => 'all'],
+                ['searchables' => 'content'],
                 ['alfa', 'charlie', 'delta', 'foxtrot', 'xray', 'zulu'],
             ],
             'all collections' => [
@@ -77,9 +77,9 @@ class EntriesTest extends TestCase
                 ['xray', 'zulu'],
             ],
 
-            'all, english' => [
+            'content, english' => [
                 'en',
-                ['searchables' => 'all'],
+                ['searchables' => 'content'],
                 ['alfa', 'charlie', 'xray', 'zulu'],
             ],
             'all collections, english' => [
@@ -98,9 +98,9 @@ class EntriesTest extends TestCase
                 ['xray', 'zulu'],
             ],
 
-            'all, french' => [
+            'content, french' => [
                 'fr',
-                ['searchables' => 'all'],
+                ['searchables' => 'content'],
                 ['delta', 'foxtrot'],
             ],
             'all collections, french' => [
@@ -133,7 +133,7 @@ class EntriesTest extends TestCase
         $e = EntryFactory::collection('blog')->slug('e')->create();
 
         $provider = $this->makeProvider(null, [
-            'searchables' => 'all',
+            'searchables' => 'content',
             'filter' => $filter,
         ]);
 
@@ -181,7 +181,7 @@ class EntriesTest extends TestCase
     {
         // a bit of duplicated implementation logic.
         // but it makes the test look more like the real thing.
-        return collect($keys === 'all' ? ['*'] : $keys)
+        return collect($keys === 'content' ? ['*'] : $keys)
             ->map(fn ($key) => str_replace('collection:', '', $key))
             ->all();
     }

@@ -56,9 +56,9 @@ class AssetsTest extends TestCase
     public static function assetsProvider()
     {
         return [
-            'all' => [
+            'content' => [
                 null,
-                ['searchables' => 'all'],
+                ['searchables' => 'content'],
                 ['a', 'b', 'y', 'z'],
             ],
             'all containers' => [
@@ -77,9 +77,9 @@ class AssetsTest extends TestCase
                 ['y', 'z'],
             ],
 
-            'all, english' => [
+            'content, english' => [
                 'en',
-                ['searchables' => 'all'],
+                ['searchables' => 'content'],
                 ['a', 'b', 'y', 'z'],
             ],
             'all containers, english' => [
@@ -98,9 +98,9 @@ class AssetsTest extends TestCase
                 ['y', 'z'],
             ],
 
-            'all, french' => [
+            'content, french' => [
                 'fr',
-                ['searchables' => 'all'],
+                ['searchables' => 'content'],
                 ['a', 'b', 'y', 'z'],
             ],
             'all containers, french' => [
@@ -138,7 +138,7 @@ class AssetsTest extends TestCase
         $d = tap(Asset::make()->container('images')->path('d.jpg'))->save();
 
         $provider = $this->makeProvider(null, [
-            'searchables' => 'all',
+            'searchables' => 'content',
             'filter' => $filter,
         ]);
 
@@ -185,7 +185,7 @@ class AssetsTest extends TestCase
     {
         // a bit of duplicated implementation logic.
         // but it makes the test look more like the real thing.
-        return collect($keys === 'all' ? ['*'] : $keys)
+        return collect($keys === 'content' ? ['*'] : $keys)
             ->map(fn ($key) => str_replace('assets:', '', $key))
             ->all();
     }

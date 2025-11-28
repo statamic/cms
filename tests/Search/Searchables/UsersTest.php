@@ -43,9 +43,9 @@ class UsersTest extends TestCase
     public static function usersProvider()
     {
         return [
-            'all' => [
+            'content' => [
                 null,
-                ['searchables' => 'all'],
+                ['searchables' => 'content'],
                 ['alfa@test.com', 'bravo@test.com'],
             ],
             'all users' => [
@@ -54,9 +54,9 @@ class UsersTest extends TestCase
                 ['alfa@test.com', 'bravo@test.com'],
             ],
 
-            'all, english' => [
+            'content, english' => [
                 'en',
-                ['searchables' => 'all'],
+                ['searchables' => 'content'],
                 ['alfa@test.com', 'bravo@test.com'],
             ],
             'all users, english' => [
@@ -65,9 +65,9 @@ class UsersTest extends TestCase
                 ['alfa@test.com', 'bravo@test.com'],
             ],
 
-            'all, french' => [
+            'content, french' => [
                 'fr',
-                ['searchables' => 'all'],
+                ['searchables' => 'content'],
                 ['alfa@test.com', 'bravo@test.com'],
             ],
             'all users, french' => [
@@ -88,7 +88,7 @@ class UsersTest extends TestCase
         $d = tap(User::make()->email('d@test.com'))->save();
 
         $provider = $this->makeProvider(null, [
-            'searchables' => 'all',
+            'searchables' => 'content',
             'filter' => $filter,
         ]);
 
@@ -135,7 +135,7 @@ class UsersTest extends TestCase
     {
         // a bit of duplicated implementation logic.
         // but it makes the test look more like the real thing.
-        return collect($keys === 'all' ? ['*'] : $keys)
+        return collect($keys === 'content' ? ['*'] : $keys)
             ->map(fn ($key) => str_replace('users:', '', $key))
             ->all();
     }
