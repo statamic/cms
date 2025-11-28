@@ -417,7 +417,7 @@ defineExpose({
                                 event.preventDefault();
                             }"
                         >
-                            <ComboboxViewport class="max-h-[700px] overflow-y-auto">
+                            <ComboboxViewport style="max-height: calc(var(--reka-combobox-content-available-height) - 1rem)" class="overflow-y-auto">
                                 <ComboboxEmpty class="p-2 text-sm" data-ui-combobox-empty>
                                     <slot name="no-options" v-bind="{ searchQuery }">
                                         {{ __('No options available.') }}
@@ -428,7 +428,7 @@ defineExpose({
                                     v-if="filteredOptions"
                                     v-slot="{ option, virtualItem }"
                                     :options="filteredOptions"
-                                    :estimate-size="37"
+                                    :estimate-size="40"
                                     :text-content="(opt) => getOptionLabel(opt)"
                                 >
                                     <div class="py-1 w-full overflow-x-hidden">
