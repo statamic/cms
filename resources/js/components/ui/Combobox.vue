@@ -196,6 +196,10 @@ const filteredOptions = computed(() => {
     return results;
 });
 
+watch(filteredOptions, () => {
+    nextTick(() => updateScrollbar());
+});
+
 function clear() {
     searchQuery.value = '';
     emit('update:modelValue', null);
@@ -220,7 +224,10 @@ function updateDropdownOpen(open) {
     dropdownOpen.value = open;
 
     if (open) {
-        nextTick(() => measureOptionWidths());
+        nextTick(() => {
+            measureOptionWidths();
+            updateScrollbar();
+        });
     }
 }
 
@@ -307,6 +314,34 @@ function openDropdown(e) {
 function selectOption(option) {
     dropdownOpen.value = !closeOnSelect.value;
     if (closeOnSelect.value) triggerRef.value.$el.focus();
+}
+
+const viewportRef = useTemplateRef('viewport');
+const scrollbarVisible = ref(false);
+const scrollbarThumbHeight = ref(0);
+const scrollbarThumbTop = ref(0);
+
+function updateScrollbar() {
+    const viewport = viewportRef.value?.$el;
+    if (!viewport) return;
+
+    const scrollHeight = viewport.scrollHeight;
+    const clientHeight = viewport.clientHeight;
+    const scrollTop = viewport.scrollTop;
+
+    scrollbarVisible.value = scrollHeight > clientHeight;
+
+    if (scrollbarVisible.value) {
+        // Calculate thumb height as a percentage of visible area
+        const thumbHeightPercent = (clientHeight / scrollHeight) * 100;
+        scrollbarThumbHeight.value = Math.max(thumbHeightPercent, 10); // Minimum 10%
+
+        // Calculate thumb position
+        const maxScroll = scrollHeight - clientHeight;
+        const scrollPercent = maxScroll > 0 ? scrollTop / maxScroll : 0;
+        const maxThumbTop = 100 - scrollbarThumbHeight.value;
+        scrollbarThumbTop.value = scrollPercent * maxThumbTop;
+    }
 }
 
 defineExpose({
@@ -417,8 +452,14 @@ defineExpose({
                                 event.preventDefault();
                             }"
                         >
-                            <ComboboxViewport style="max-height: calc(var(--reka-combobox-content-available-height) - 1rem)" class="overflow-y-auto">
-                                <ComboboxEmpty class="p-2 text-sm" data-ui-combobox-empty>
+                            <div class="relative">
+                                <ComboboxViewport 
+                                    ref="viewport"
+                                    class="max-h-[calc(var(--reka-combobox-content-available-height)-1rem)] overflow-y-scroll" 
+                                    data-ui-combobox-viewport
+                                    @scroll="updateScrollbar"
+                                >
+                                    <ComboboxEmpty class="p-2 text-sm" data-ui-combobox-empty>
                                     <slot name="no-options" v-bind="{ searchQuery }">
                                         {{ __('No options available.') }}
                                     </slot>
@@ -451,6 +492,21 @@ defineExpose({
                                     </div>
                                 </ComboboxVirtualizer>
                             </ComboboxViewport>
+
+	                        <!--
+	                            Custom Scrollbar
+	                            (we can't use the browser's scrollbar here because of virtualization, so we need to create our own).
+	                        -->
+                            <div v-if="scrollbarVisible" class="absolute top-0 right-0 w-3 p-0.5 h-full pointer-events-none">
+                                <div 
+                                    class="absolute right-0 w-1.5 rounded-full bg-black/25 dark:bg-white/25 transition-opacity"
+                                    :style="{
+                                        height: `${scrollbarThumbHeight}%`,
+                                        top: `${scrollbarThumbTop}%`
+                                    }"
+                                />
+                            </div>
+                        </div>
                         </FocusScope>
                     </ComboboxContent>
                 </ComboboxPortal>
