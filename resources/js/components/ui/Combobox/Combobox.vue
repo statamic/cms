@@ -200,7 +200,7 @@ const filteredOptions = computed(() => {
 });
 
 watch(filteredOptions, () => {
-	nextTick(() => scrollbarRef.value.update());
+	nextTick(() => scrollbarRef.value?.update());
 });
 
 function clear() {
@@ -229,7 +229,7 @@ function updateDropdownOpen(open) {
     if (open) {
         nextTick(() => {
             measureOptionWidths();
-	        scrollbarRef.value.update()
+	        scrollbarRef.value?.update();
         });
     }
 }
