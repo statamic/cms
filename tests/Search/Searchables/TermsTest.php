@@ -6,6 +6,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
+use Statamic\Query\Scopes\Scope;
 use Statamic\Search\Searchables\Terms;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -62,7 +63,7 @@ class TermsTest extends TestCase
         $provider = $this->makeProvider($locale, $config);
 
         // Check if it provides the expected entries.
-        $this->assertEquals($expected, $provider->provide()->map->reference()->all());
+        $this->assertEquals($expected, $provider->provide()->all());
 
         // Check if the entries are contained by the provider or not.
         foreach (Term::all() as $term) {
@@ -204,7 +205,10 @@ class TermsTest extends TestCase
             'filter' => $filter,
         ]);
 
-        $this->assertEquals(['a', 'c', 'd'], $provider->provide()->map->slug()->all());
+        $this->assertEquals(
+            ['term::tags::a::en', 'term::tags::c::en', 'term::tags::d::en'],
+            $provider->provide()->all()
+        );
 
         $this->assertTrue($provider->contains($a->in('en')));
         $this->assertFalse($provider->contains($b->in('en')));
@@ -222,6 +226,33 @@ class TermsTest extends TestCase
                 },
             ],
         ];
+    }
+
+    #[Test]
+    public function it_can_use_a_query_scope()
+    {
+        CustomTermsScope::register();
+
+        Taxonomy::make('tags')->sites(['en'])->save();
+        $a = tap(Term::make('a')->taxonomy('tags')->dataForLocale('en', []))->save();
+        $b = tap(Term::make('b')->taxonomy('tags')->dataForLocale('en', ['is_searchable' => false]))->save();
+        $c = tap(Term::make('c')->taxonomy('tags')->dataForLocale('en', ['is_searchable' => true]))->save();
+        $d = tap(Term::make('d')->taxonomy('tags')->dataForLocale('en', []))->save();
+
+        $provider = $this->makeProvider(null, [
+            'searchables' => 'all',
+            'query_scope' => 'custom_terms_scope',
+        ]);
+
+        $this->assertEquals(
+            ['term::tags::a::en', 'term::tags::c::en', 'term::tags::d::en'],
+            $provider->provide()->all()
+        );
+
+        $this->assertTrue($provider->contains($a->in('en')));
+        $this->assertFalse($provider->contains($b->in('en')));
+        $this->assertTrue($provider->contains($c->in('en')));
+        $this->assertTrue($provider->contains($d->in('en')));
     }
 
     private function makeProvider($locale, $config)
@@ -258,5 +289,13 @@ class TestSearchableTermsFilter
     public function handle($item)
     {
         return $item->get('is_searchable') !== false;
+    }
+}
+
+class CustomTermsScope extends Scope
+{
+    public function apply($query, $params)
+    {
+        $query->where('is_searchable', '!=', false);
     }
 }
