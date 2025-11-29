@@ -35,7 +35,7 @@
         "ueberdosis/tiptap-php": "^1.4",
         "voku/portable-ascii": "^2.0.2",
         "wilderborn/partyline": "^1.0",
-        "symfony/http-foundation": "^6.4.29 || ^7.3.7",
+        "symfony/http-foundation": "^6.4.29 || ^7.4",
         "symfony/process": "^6.4.14 || ^7.1.7"
     },
     "require-dev": {

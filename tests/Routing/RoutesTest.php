@@ -486,7 +486,7 @@ class RoutesTest extends TestCase
 
         $response = $this
             ->get('/xml')
-            ->assertHeader('Content-Type', 'text/xml; charset=UTF-8');
+            ->assertHeader('Content-Type', 'text/xml; charset=utf-8');
 
         $this->assertEquals('<?xml ?><foo></foo>', $response->getContent());
     }
@@ -500,7 +500,7 @@ class RoutesTest extends TestCase
 
         $response = $this
             ->get('/xml')
-            ->assertHeader('Content-Type', 'text/xml; charset=UTF-8');
+            ->assertHeader('Content-Type', 'text/xml; charset=utf-8');
 
         $this->assertEquals('<foo></foo>', $response->getContent());
     }
@@ -514,7 +514,7 @@ class RoutesTest extends TestCase
 
         $response = $this
             ->get('/xml')
-            ->assertHeader('Content-Type', 'text/xml; charset=UTF-8');
+            ->assertHeader('Content-Type', 'text/xml; charset=utf-8');
 
         $this->assertEquals('<?xml ?><foo></foo>', $response->getContent());
     }
