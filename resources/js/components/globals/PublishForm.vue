@@ -76,9 +76,11 @@
             :blueprint="fieldset"
             v-model="values"
             :meta="meta"
+            :origin-values="originValues"
+            :origin-meta="originMeta"
             :errors="errors"
             :site="site"
-            :localized-fields="localizedFields"
+            v-model:modified-fields="localizedFields"
             :sync-field-confirmation-text="syncFieldConfirmationText"
         />
 
