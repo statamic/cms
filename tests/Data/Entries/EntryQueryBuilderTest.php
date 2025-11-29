@@ -6,6 +6,7 @@ use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Exceptions\StatusFilterNotSupportedException;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -1097,11 +1098,11 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
-    public function filtering_using_where_status_column_writes_deprecation_log()
+    public function filtering_using_where_status_column_throws_exception()
     {
         $this->withoutDeprecationHandling();
-        $this->expectException(\ErrorException::class);
-        $this->expectExceptionMessage('Filtering by status is deprecated. Use whereStatus() instead.');
+        $this->expectException(StatusFilterNotSupportedException::class);
+        $this->expectExceptionMessage('Filtering by status is not supported. Use whereStatus() instead.');
 
         $this->createDummyCollectionAndEntries();
 
@@ -1109,11 +1110,11 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
-    public function filtering_using_whereIn_status_column_writes_deprecation_log()
+    public function filtering_using_whereIn_status_column_throws_exception()
     {
         $this->withoutDeprecationHandling();
-        $this->expectException(\ErrorException::class);
-        $this->expectExceptionMessage('Filtering by status is deprecated. Use whereStatus() instead.');
+        $this->expectException(StatusFilterNotSupportedException::class);
+        $this->expectExceptionMessage('Filtering by status is not supported. Use whereStatus() instead.');
 
         $this->createDummyCollectionAndEntries();
 
