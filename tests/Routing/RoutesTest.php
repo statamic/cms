@@ -530,7 +530,7 @@ class RoutesTest extends TestCase
 
         $response = $this
             ->get('/xml')
-            ->assertHeader('Content-Type', 'text/html; charset=UTF-8');
+            ->assertHeader('Content-Type', 'text/html; charset=utf-8');
 
         $this->assertEquals('<foo></foo>', $response->getContent());
     }
