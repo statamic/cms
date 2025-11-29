@@ -15,7 +15,7 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-2">
-                            <ui-button size="sm" icon="trash" variant="subtle" @click.prevent="$emit('deleted')" v-tooltip="__('Remove')" />
+                            <ui-button size="sm" icon="trash" variant="subtle" @click.prevent="$emit('deleted')" :aria-label="__('Remove')" v-tooltip="__('Remove')" />
                             <stack name="field-settings" v-if="isEditing" @closed="editorClosed">
                                 <field-settings
                                     ref="settings"

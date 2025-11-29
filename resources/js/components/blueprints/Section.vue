@@ -7,8 +7,8 @@
                     <ui-icon :name="section.icon" :set="iconSet" v-if="section.icon" />
                     <ui-heading v-text="__(section.display ?? 'Section')" />
                 </div>
-                <ui-button icon="pencil-line" size="sm" variant="ghost" @click="edit" />
-                <ui-button icon="trash" size="sm" variant="ghost" @click.prevent="$emit('deleted')" />
+                <ui-button icon="pencil-line" size="sm" variant="ghost" @click="edit" :aria-label="__('Edit Section')" v-tooltip="__('Edit Section')" />
+                <ui-button icon="trash" size="sm" variant="ghost" @click.prevent="$emit('deleted')" :aria-label="__('Delete Section')" v-tooltip="__('Delete Section')" />
             </ui-panel-header>
 
             <Fields

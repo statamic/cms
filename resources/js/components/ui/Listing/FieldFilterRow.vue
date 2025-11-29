@@ -69,7 +69,7 @@ defineExpose({
                             />
                         </PublishField>
                     </div>
-                    <Button @click="$emit('removed')" icon="x" size="sm" variant="ghost" inset />
+                    <Button @click="$emit('removed')" icon="x" size="sm" variant="ghost" inset aria-label="Remove filter" />
                 </div>
             </PublishFieldsProvider>
         </PublishContainer>

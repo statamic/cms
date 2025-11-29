@@ -26,7 +26,7 @@
                 >
                     <template #action-buttons-right>
                         <slot name="action-buttons-right" />
-                        <Button icon="x" size="sm" variant="ghost" class="-me-2" @click="close" />
+                        <Button icon="x" size="sm" variant="ghost" class="-me-2" :aria-label="__('Close')" @click="close" />
                     </template>
                 </component>
             </div>
@@ -38,6 +38,7 @@
             :body-text="__('Are you sure? Unsaved changes will be lost.')"
             :button-text="__('Discard Changes')"
             :danger="true"
+            :aria-label="__('Discard Changes')"
             @confirm="confirmCloseWithChanges"
             @cancel="closingWithChanges = false"
         />
