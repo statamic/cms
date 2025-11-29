@@ -474,7 +474,7 @@ class FrontendTest extends TestCase
         $this->createPage('about', ['with' => ['content_type' => 'atom']]);
 
         // Laravel adds utf-8 if the content-type starts with text/
-        $this->get('about')->assertHeader('Content-Type', 'application/atom+xml; charset=UTF-8');
+        $this->get('about')->assertHeader('Content-Type', 'application/atom+xml; charset=utf-8');
     }
 
     #[Test]
