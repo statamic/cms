@@ -1,3 +1,8 @@
+/* Dropdown triggers should be pulled above by default, for example when you have a dropdown very close to a long horizontal replicator "plus" button, the dropdown should take precedence. */
+[data-ui-dropdown-trigger] {
+    z-index: var(--z-index-above);
+}
+
 .quick-list {
     @apply relative;
 
