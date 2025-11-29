@@ -3,7 +3,7 @@ Table Fieldtype
 ========================================================================== */
 
 .table-contained {
-    @apply relative mb-4 w-full rounded-lg border text-gray shadow-ui-sm outline-hidden dark:border-gray-700 dark:text-dark-150 text-start;
+    @apply relative mb-4 w-full rounded-lg border shadow-ui-sm outline-hidden dark:border-gray-700 text-start;
     border-collapse: separate;
     border-spacing: 0;
     table-layout: fixed;
@@ -119,10 +119,7 @@ Table Fieldtype
 
     [data-ui-control] {
         @apply block w-full max-w-full rounded-none appearance-none border p-2;
-        @apply border-none bg-white dark:bg-gray-900 text-sm shadow-none outline-hidden;
-        &:focus {
-            @apply bg-gray-100 inset-shadow-xs ring-0 dark:bg-gray-800;
-        }
+        @apply border-none bg-white dark:bg-gray-900 text-sm shadow-none;
     }
 
     .row-controls {
