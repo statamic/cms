@@ -24,7 +24,7 @@
             </DropdownMenu>
         </Dropdown>
 
-        <stack
+        <ui-stack
             narrow
             v-if="editing"
             @opened="() => $nextTick(() => $refs.title.focus())"
@@ -75,7 +75,7 @@
                     </div>
                 </div>
             </div>
-        </stack>
+        </ui-stack>
     </TabTrigger>
 </template>
 

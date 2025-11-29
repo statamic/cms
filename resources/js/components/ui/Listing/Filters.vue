@@ -113,7 +113,7 @@ function handleStackClosed() {
             </Button>
         </div>
 
-        <stack half name="filters" v-if="open" @closed="handleStackClosed">
+        <ui-stack half name="filters" v-if="open" @closed="handleStackClosed">
             <div ref="stackContentRef" class="flex-1 p-3 bg-white dark:bg-gray-800 h-full overflow-auto rounded-l-2xl relative">
                 <Button
                     icon="x"
@@ -157,7 +157,7 @@ function handleStackClosed() {
                     <Button variant="primary" :text="__('Done')" @click="handleStackClosed" />
                 </div>
             </div>
-        </stack>
+        </ui-stack>
 
         <Button
             v-for="(badge, handle, index) in fieldFilterBadges"

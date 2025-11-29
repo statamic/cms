@@ -16,7 +16,7 @@
                         </div>
                         <div class="flex items-center gap-2">
                             <ui-button size="sm" icon="trash" variant="subtle" @click.prevent="$emit('deleted')" v-tooltip="__('Remove')" />
-                            <stack name="field-settings" v-if="isEditing" @closed="editorClosed">
+                            <ui-stack name="field-settings" v-if="isEditing" @closed="editorClosed">
                                 <field-settings
                                     ref="settings"
                                     :id="field._id"
@@ -27,7 +27,7 @@
                                     @committed="settingsUpdated"
                                     @closed="editorClosed"
                                 />
-                            </stack>
+                            </ui-stack>
                         </div>
                     </div>
                 </div>

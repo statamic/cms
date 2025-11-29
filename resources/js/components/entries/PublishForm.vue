@@ -191,7 +191,7 @@
             </LivePreview>
         </PublishContainer>
 
-        <stack
+        <ui-stack
             name="revision-history"
             v-if="showRevisionHistory"
             @closed="showRevisionHistory = false"
@@ -205,7 +205,7 @@
                 :can-restore-revisions="!readOnly"
                 @closed="close"
             />
-        </stack>
+        </ui-stack>
 
         <publish-actions
             v-if="confirmingPublish"

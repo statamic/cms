@@ -95,6 +95,7 @@ export {
     Subheading,
     Switch,
     TabContent,
+    Stack,
     Table,
     TableCell,
     TableColumn,

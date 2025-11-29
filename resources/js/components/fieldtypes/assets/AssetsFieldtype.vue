@@ -163,7 +163,7 @@
             </div>
         </uploader>
 
-        <stack v-if="showSelector" name="asset-selector" @closed="closeSelector">
+        <ui-stack v-if="showSelector" name="asset-selector" @closed="closeSelector">
             <Selector
                 :container="container"
                 :folder="folder"
@@ -175,7 +175,7 @@
                 @selected="assetsSelected"
                 @closed="closeSelector"
             />
-        </stack>
+        </ui-stack>
     </div>
 </template>
 

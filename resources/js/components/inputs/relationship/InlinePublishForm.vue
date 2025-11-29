@@ -1,6 +1,6 @@
 <template>
     <div>
-        <stack
+        <ui-stack
             name="inline-editor"
             :before-close="shouldClose"
             :narrow="stackSize === 'narrow'"
@@ -30,7 +30,7 @@
                     </template>
                 </component>
             </div>
-        </stack>
+        </ui-stack>
 
         <confirmation-modal
             v-if="closingWithChanges"
