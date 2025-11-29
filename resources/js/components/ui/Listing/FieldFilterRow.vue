@@ -18,15 +18,12 @@ const props = defineProps({
 
 const fieldContainer = ref(null);
 
-const focusFirstField = async () => {
-    await nextTick();
-    if (fieldContainer.value) {
-        // Look for the first input, textarea, or select element
+const focusFirstField = () => {
+    setTimeout(() => {
         const firstInput = fieldContainer.value.querySelector('input:not([readonly]), textarea, select, [contenteditable="true"]');
-        if (firstInput) {
-            firstInput.focus();
-        }
-    }
+
+        firstInput?.focus();
+    }, 10);
 };
 
 const handleKeydown = (event) => {
