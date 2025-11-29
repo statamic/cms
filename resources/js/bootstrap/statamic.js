@@ -42,6 +42,7 @@ import {
     toast,
     portals,
     stacks,
+    modals,
     inertia,
 } from '@api';
 
@@ -258,6 +259,7 @@ export default {
             $slug: slug,
             $portals: portals,
             $stacks: stacks,
+            $modals: modals,
             $hooks: hooks,
             $toast: toast,
             $bard: bard,
