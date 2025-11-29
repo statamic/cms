@@ -251,6 +251,19 @@ class FileCacher extends AbstractCacher
         return map;
     }
 
+    function replaceElement(el, html) {
+        const tmp = document.createElement('div');
+        const fragment = document.createDocumentFragment();
+
+        tmp.setHTMLUnsafe(html);
+
+        while (tmp.firstChild) {
+            fragment.appendChild(tmp.firstChild);
+        }
+
+        el.replaceWith(fragment);
+    }
+
     var map = createMap();
 
     fetch('/!/nocache', {
@@ -267,7 +280,7 @@ class FileCacher extends AbstractCacher
 
         const regions = data.regions;
         for (var key in regions) {
-            if (map[key]) map[key].setHTMLUnsafe(regions[key]);
+            if (map[key]) replaceElement(map[key], regions[key]);
         }
 
         for (const input of document.querySelectorAll('input[value="$csrfPlaceholder"]')) {
