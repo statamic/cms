@@ -1,0 +1,29 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        DB::transaction(function () {
+            DB::connection(config('statamic.static_caching.nocache_db_connection'))
+                ->table('nocache_regions')
+                ->whereLike('url', 'http%')
+                ->orderBy('key')
+                ->chunk(100, function ($regions) {
+                    foreach ($regions as $region) {
+                        DB::connection(config('statamic.static_caching.nocache_db_connection'))
+                            ->table('nocache_regions')
+                            ->where('key', $region->key)
+                            ->where('url', $region->url)
+                            ->update(['url' => md5($region->url)]);
+                    }
+                });
+        });
+    }
+};
