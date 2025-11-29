@@ -1,36 +1,53 @@
 <template>
-    <div class="field-dropdown relative -top-0.5">
-        <div class="quick-list">
-            <div class="quick-list-content">
-                <Button
-                    v-for="(action, index) in actions.filter((a) => a.quick)"
-                    :key="index"
-                    @click="action.run()"
-                    v-tooltip="action.title"
-                    :icon-only="true"
-                    size="xs"
-                    variant="ghost"
-                    :aria-label="action.title"
-                    tabindex="-1"
-                >
-                    <ui-icon :name="action.icon" class="size-3.5" />
-                </Button>
-            </div>
-            <Dropdown>
-                <template #trigger>
-                    <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
-                </template>
-                <DropdownMenu>
-                    <DropdownItem
-                        v-for="action in actions"
-                        :key="action.handle || action.title"
-                        :text="action.title"
-                        :variant="action.dangerous ? 'destructive' : 'default'"
+    <div class="flex">
+        <div class="relative -top-0.5">
+            <Button
+                v-for="(action, index) in actions.filter((a) => a.permanent)"
+                :key="index"
+                @click="action.run()"
+                v-tooltip="action.title"
+                :icon-only="true"
+                size="xs"
+                variant="ghost"
+                :aria-label="action.title"
+                tabindex="-1"
+            >
+                <ui-icon :name="action.icon" class="size-3.5" />
+            </Button>
+        </div>
+        <div v-if="permanentActions.length" class="field-dropdown relative -top-0.5">
+            <div class="quick-list">
+                <div class="quick-list-content">
+                    <Button
+                        v-for="(action, index) in actions.filter((a) => a.quick)"
+                        :key="index"
+                        @click="action.run()"
+                        v-tooltip="action.title"
+                        :icon-only="true"
+                        size="xs"
+                        variant="ghost"
                         :aria-label="action.title"
-                        @click="action.run(action)"
-                    />
-                </DropdownMenu>
-            </Dropdown>
+                        tabindex="-1"
+                    >
+                        <ui-icon :name="action.icon" class="size-3.5" />
+                    </Button>
+                </div>
+                <Dropdown>
+                    <template #trigger>
+                        <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
+                    </template>
+                    <DropdownMenu>
+                        <DropdownItem
+                            v-for="action in permanentActions"
+                            :key="action.handle || action.title"
+                            :text="action.title"
+                            :variant="action.dangerous ? 'destructive' : 'default'"
+                            :aria-label="action.title"
+                            @click="action.run(action)"
+                        />
+                    </DropdownMenu>
+                </Dropdown>
+            </div>
         </div>
     </div>
 </template>
@@ -51,5 +68,11 @@ export default {
             type: Array,
         },
     },
+
+    computed: {
+        permanentActions() {
+            return this.actions.filter((a) => !a.permanent);
+        }
+    }
 };
 </script>
