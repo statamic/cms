@@ -1,5 +1,5 @@
 <template>
-    <div class="portal-targets" :class="{ 'stacks-on-stacks': hasStacks }">
+    <div class="portal-targets" :class="{ 'stacks-on-stacks': hasStacks, 'solo-narrow-stack': isSoloNarrowStack }">
         <div v-for="(portal, i) in portals" :id="`portal-target-${portal.id}`" />
     </div>
 </template>
@@ -15,6 +15,11 @@ export default {
 
         hasStacks() {
             return this.$stacks.count() > 0;
+        },
+
+        isSoloNarrowStack() {
+            const stacks = this.$stacks.stacks();
+            return stacks.length === 1 && stacks[0]?.data?.vm?.narrow === true;
         },
     },
 
