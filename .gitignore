@@ -16,3 +16,4 @@ composer.lock
 .env
 bundle-stats.html
 .claude
+storybook-static
