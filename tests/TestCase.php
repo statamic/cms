@@ -2,12 +2,14 @@
 
 namespace Tests;
 
+use Composer\InstalledVersions;
 use Illuminate\Testing\Assert as IlluminateAssert;
 use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\Assert;
 use Statamic\Facades\Config;
 use Statamic\Facades\Site;
 use Statamic\Http\Middleware\CP\AuthenticateSession;
+use Statamic\Support\Str;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
@@ -235,6 +237,20 @@ YAML);
                 collect($json['errors'])->map->message->contains('Unauthorized'),
                 'No unauthorized error message in response'
             );
+
+            return $this;
+        });
+
+        TestResponse::macro('assertContentType', function (string $contentType) {
+            $symfonyVersion = Str::after(InstalledVersions::getVersion('symfony/http-foundation'), 'v');
+
+            // Symfony 7.4.0 changed "UTF-8" to "utf-8". However, we still need to support older versions.
+            // https://github.com/symfony/symfony/pull/60685
+            if (Str::contains($contentType, 'charset=utf-8') && version_compare($symfonyVersion, '7.4.0', '<')) {
+                $contentType = str_replace('charset=utf-8', 'charset=UTF-8', $contentType);
+            }
+
+            $this->assertHeader('Content-Type', $contentType);
 
             return $this;
         });
