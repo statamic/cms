@@ -38,6 +38,7 @@ class FolderAsset extends JsonResource
             'url' => $this->absoluteUrl(),
             'width' => $this->width(),
             'height' => $this->height(),
+            'duration_formatted' => $this->duration() ? Str::durationForHumans($this->duration()) : null,
             'size_formatted' => Str::fileSizeForHumans($this->size(), 0),
             'last_modified_relative' => $this->lastModified()->diffForHumans(),
             'editable' => User::current()->can('edit', $this->resource),
