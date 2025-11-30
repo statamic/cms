@@ -137,6 +137,10 @@ jobs:
           CI: true
           LARAVEL_BYPASS_ENV_CHECK: 1
 
+      - name: Verify build succeeds
+        if: steps.should-run-tests.outputs.result == 'true'
+        run: npm run build
+
   slack:
     name: Slack Notification
     runs-on: ubuntu-latest
