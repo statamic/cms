@@ -4,7 +4,6 @@ namespace Tests;
 
 use Illuminate\Testing\Assert as IlluminateAssert;
 use Illuminate\Testing\TestResponse;
-use Illuminate\Testing\TestResponseAssert as PHPUnit;
 use PHPUnit\Framework\Assert;
 use Statamic\Facades\Config;
 use Statamic\Facades\Site;
@@ -247,14 +246,14 @@ YAML);
         TestResponse::macro('assertContentType', function (string $value) {
             $headerName = 'Content-Type';
 
-            PHPUnit::withResponse($this)->assertTrue(
+            Assert::assertTrue(
                 $this->headers->has($headerName), "Header [{$headerName}] not present on response."
             );
 
             $actual = $this->headers->get($headerName);
 
             if (! is_null($value)) {
-                PHPUnit::withResponse($this)->assertEquals(
+                Assert::assertEquals(
                     strtolower($value), strtolower($this->headers->get($headerName)),
                     "Header [{$headerName}] was found, but value [{$actual}] does not match [{$value}]."
                 );
