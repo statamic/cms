@@ -307,7 +307,7 @@ export default {
 
 <style scoped>
     @supports(text-box: cap alphabetic) {
-        [data-ui-badge] {
+        [data-ui-panel-footer] [data-ui-badge] {
             padding-block: calc(var(--spacing) * 1.5);
         }
     }
