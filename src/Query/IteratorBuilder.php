@@ -2,6 +2,7 @@
 
 namespace Statamic\Query;
 
+use Generator;
 use Statamic\Support\Arr;
 
 abstract class IteratorBuilder extends Builder
@@ -39,11 +40,66 @@ abstract class IteratorBuilder extends Builder
 
     protected function getFilteredItems()
     {
-        $items = $this->getBaseItems();
+        // Can't optimize: no limit, has orderBy, or randomize
+        // These require all items to be loaded first
+        if (! $this->limit || $this->orderBys || $this->randomize) {
+            $items = $this->getBaseItems();
 
-        $items = $this->filterWheres($items);
+            return $this->filterWheres($items);
+        }
 
-        return $items;
+        // No wheres - just get limited items directly
+        if (empty($this->wheres)) {
+            return $this->getBaseItemsLimited();
+        }
+
+        // Has limit AND wheres - batch hydrate until we have enough
+        return $this->getFilteredItemsInBatches();
+    }
+
+    protected function getBaseItemsLimited()
+    {
+        $needed = ($this->offset ?? 0) + $this->limit;
+        $collected = collect();
+
+        foreach ($this->getBaseItemsLazy() as $item) {
+            $collected->push($item);
+            if ($collected->count() >= $needed) {
+                break;
+            }
+        }
+
+        return $collected;
+    }
+
+    protected function getFilteredItemsInBatches()
+    {
+        $needed = ($this->offset ?? 0) + $this->limit;
+        $batchSize = max(50, $this->limit * 2);
+        $collected = collect();
+        $batch = collect();
+
+        foreach ($this->getBaseItemsLazy() as $item) {
+            $batch->push($item);
+
+            if ($batch->count() >= $batchSize) {
+                $filtered = $this->filterWheres($batch);
+                $collected = $collected->concat($filtered);
+                $batch = collect();
+
+                if ($collected->count() >= $needed) {
+                    break;
+                }
+            }
+        }
+
+        // Process remaining items in final partial batch
+        if ($batch->isNotEmpty() && $collected->count() < $needed) {
+            $filtered = $this->filterWheres($batch);
+            $collected = $collected->concat($filtered);
+        }
+
+        return $collected;
     }
 
     protected function getFilteredAndLimitedItems()
@@ -361,6 +417,8 @@ abstract class IteratorBuilder extends Builder
     }
 
     abstract protected function getBaseItems();
+
+    abstract protected function getBaseItemsLazy(): Generator;
 
     public function inRandomOrder()
     {
