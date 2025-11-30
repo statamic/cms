@@ -2,14 +2,13 @@
 
 namespace Tests;
 
-use Composer\InstalledVersions;
 use Illuminate\Testing\Assert as IlluminateAssert;
 use Illuminate\Testing\TestResponse;
+use Illuminate\Testing\TestResponseAssert as PHPUnit;
 use PHPUnit\Framework\Assert;
 use Statamic\Facades\Config;
 use Statamic\Facades\Site;
 use Statamic\Http\Middleware\CP\AuthenticateSession;
-use Statamic\Support\Str;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
@@ -241,16 +240,25 @@ YAML);
             return $this;
         });
 
-        TestResponse::macro('assertContentType', function (string $contentType) {
-            $symfonyVersion = Str::after(InstalledVersions::getVersion('symfony/http-foundation'), 'v');
+        // Symfony 7.4.0 changed "UTF-8" to "utf-8".
+        // https://github.com/symfony/symfony/pull/60685
+        // While we continue to support lower versions, we'll do a case-insensitive check.
+        // This macro is essentially assertHeader but with case-insensitive value check.
+        TestResponse::macro('assertContentType', function (string $value) {
+            $headerName = 'Content-Type';
 
-            // Symfony 7.4.0 changed "UTF-8" to "utf-8". However, we still need to support older versions.
-            // https://github.com/symfony/symfony/pull/60685
-            if (Str::contains($contentType, 'charset=utf-8') && version_compare($symfonyVersion, '7.4.0', '<')) {
-                $contentType = str_replace('charset=utf-8', 'charset=UTF-8', $contentType);
+            PHPUnit::withResponse($this)->assertTrue(
+                $this->headers->has($headerName), "Header [{$headerName}] not present on response."
+            );
+
+            $actual = $this->headers->get($headerName);
+
+            if (! is_null($value)) {
+                PHPUnit::withResponse($this)->assertEquals(
+                    strtolower($value), strtolower($this->headers->get($headerName)),
+                    "Header [{$headerName}] was found, but value [{$actual}] does not match [{$value}]."
+                );
             }
-
-            $this->assertHeader('Content-Type', $contentType);
 
             return $this;
         });
