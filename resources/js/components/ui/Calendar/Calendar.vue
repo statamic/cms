@@ -151,7 +151,7 @@ const gridStyle = computed(() => {
                                     'data-disabled:text-gray-400 dark:data-disabled:text-gray-600',
                                     'data-unavailable:pointer-events-none data-unavailable:text-black/30 data-unavailable:line-through',
                                     'before:absolute before:top-[3px] before:hidden before:h-1 before:w-1 before:rounded-lg before:bg-white',
-                                    'data-today:before:block data-today:before:bg-green-600',
+                                    'data-today:before:block data-today:before:bg-green-500',
                                 ]"
                             />
                         </Component>

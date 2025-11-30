@@ -38,7 +38,7 @@ const visibleMainTabs = computed(() => {
     });
 });
 const hasMultipleVisibleMainTabs = computed(() => visibleMainTabs.value.length > 1);
-const shouldShowSidebar = computed(() => (slots.sidebar || sidebarTab.value) && width.value > 920);
+const shouldShowSidebar = computed(() => (slots.actions || sidebarTab.value) && width.value > 920);
 const activeTab = ref(visibleMainTabs.value[0].handle);
 
 onMounted(() => setActiveTabFromHash());

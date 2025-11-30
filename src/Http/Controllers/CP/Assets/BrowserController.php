@@ -9,6 +9,7 @@ use Statamic\Assets\AssetFolder;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\CP\Column;
 use Statamic\Exceptions\AuthorizationException;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Scope;
 use Statamic\Facades\User;
@@ -54,7 +55,7 @@ class BrowserController extends CpController
 
         $asset = Asset::find("{$containerHandle}::{$path}");
 
-        abort_unless($container && $asset, 404);
+        throw_unless($container && $asset, new NotFoundHttpException);
 
         $this->authorize('view', $asset);
 
