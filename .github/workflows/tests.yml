@@ -72,7 +72,12 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           extensions: fileinfo, exif, gd, pdo, sqlite, pdo_sqlite
-          ini-values: short_open_tag=on
+          ini-values: |
+            short_open_tag=on
+            opcache.enable_cli=1
+            opcache.jit_buffer_size=256M
+            realpath_cache_size=4096K
+            realpath_cache_ttl=600
           coverage: none
 
       - name: Install dependencies
@@ -89,9 +94,23 @@ jobs:
         if: steps.should-run-tests.outputs.result == 'true'
         run: composer show -D
 
+      - name: Optimize Windows file I/O
+        if: steps.should-run-tests.outputs.result == 'true' && matrix.os == 'windows-latest'
+        shell: powershell
+        run: |
+          # Create temp directory on D: drive
+          New-Item -ItemType Directory -Force -Path D:\Temp
+          # Disable Windows Defender real-time scanning
+          Set-MpPreference -DisableRealtimeMonitoring $true
+          # Exclude workspace from scanning
+          Add-MpPreference -ExclusionPath "${{ github.workspace }}"
+
       - name: Execute tests
         if: steps.should-run-tests.outputs.result == 'true'
         run: vendor/bin/phpunit
+        env:
+          TEMP: ${{ matrix.os == 'windows-latest' && 'D:\Temp' || '' }}
+          TMP: ${{ matrix.os == 'windows-latest' && 'D:\Temp' || '' }}
 
   js-tests:
     runs-on: ubuntu-latest
