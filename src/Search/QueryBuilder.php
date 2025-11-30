@@ -72,7 +72,11 @@ abstract class QueryBuilder extends BaseQueryBuilder
         }
 
         // With data mode - batch hydrate to reduce database queries
-        $batchSize = 50;
+        // Use smaller batches when we know the limit and don't need filtering
+        $batchSize = $this->limit && empty($this->wheres) && empty($this->orderBys) && ! $this->randomize
+            ? ($this->offset ?? 0) + $this->limit
+            : 50;
+
         foreach ($this->collect($results)->chunk($batchSize) as $batch) {
             $hydrated = $this->transformResults($batch);
             foreach ($hydrated as $item) {
