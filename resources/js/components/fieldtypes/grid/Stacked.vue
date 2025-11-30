@@ -19,7 +19,7 @@
                     // 'mt-4': !hideDisplay,
                 }"
             >
-                <ui-stacked-row
+                <stacked-row
                     v-for="(row, index) in rows"
                     :key="`row-${row._id}`"
                     :index="index"
