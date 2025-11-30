@@ -74,8 +74,6 @@ jobs:
           extensions: fileinfo, exif, gd, pdo, sqlite, pdo_sqlite
           ini-values: |
             short_open_tag=on
-            opcache.enable_cli=1
-            opcache.jit_buffer_size=256M
             realpath_cache_size=4096K
             realpath_cache_ttl=600
           coverage: none
