@@ -78,7 +78,7 @@ class Terms extends Relationship
                         'default' => true,
                         'width' => '50',
                         'if' => [
-                            'mode' => 'default'
+                            'mode' => 'default',
                         ],
                     ],
                 ],
