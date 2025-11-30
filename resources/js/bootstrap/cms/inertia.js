@@ -8,4 +8,7 @@ export {
 
 export { default as Head } from '../../pages/layout/Head.vue';
 
-export { useArchitecturalBackground, toggleArchitecturalBackground } from '../../pages/layout/architectural-background.js';
+export {
+    default as useArchitecturalBackground,
+    toggleArchitecturalBackground
+} from '../../pages/layout/architectural-background.js';
