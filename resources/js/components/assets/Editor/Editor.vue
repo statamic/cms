@@ -1,5 +1,5 @@
 <template>
-    <stack name="asset-editor" :before-close="shouldClose" :full="true" @closed="$emit('closed')" v-slot="{ close }">
+    <ui-stack name="asset-editor" :before-close="shouldClose" :full="true" @closed="$emit('closed')" v-slot="{ close }">
         <div
             class="asset-editor relative flex h-full flex-col rounded-sm bg-gray-100 dark:bg-dark-800"
             :class="isImage ? 'is-image' : 'is-file'"
@@ -174,7 +174,7 @@
             @cancel="closingWithChanges = false"
         />
         </div>
-    </stack>
+    </ui-stack>
 </template>
 
 <script>
