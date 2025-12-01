@@ -3324,6 +3324,10 @@ class CoreModifiers extends Modifier
 
     private function carbon($value)
     {
+        if (! $value) {
+            return optional();
+        }
+
         if (! $value instanceof Carbon) {
             $value = (is_numeric($value)) ? Date::createFromTimestamp($value, config('app.timezone')) : Date::parse($value);
         }

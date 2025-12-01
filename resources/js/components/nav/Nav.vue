@@ -73,6 +73,8 @@ function toggle() {
 }
 
 function handleParentClick(event, item) {
+	if (event.defaultPrevented) return;
+
     // Prevent opening in a new tab from updating the active state.
     if (event.ctrlKey || event.metaKey || event.which === 2) return;
 
@@ -86,6 +88,8 @@ function handleParentClick(event, item) {
 }
 
 function handleChildClick(event, item, child) {
+	if (event.defaultPrevented) return;
+
     // Prevent opening in a new tab from updating the active state.
     if (event.ctrlKey || event.metaKey || event.which === 2) return;
 
