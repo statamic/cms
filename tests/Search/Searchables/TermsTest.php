@@ -240,7 +240,7 @@ class TermsTest extends TestCase
         $d = tap(Term::make('d')->taxonomy('tags')->dataForLocale('en', []))->save();
 
         $provider = $this->makeProvider(null, [
-            'searchables' => 'all',
+            'searchables' => 'content',
             'query_scope' => 'custom_terms_scope',
         ]);
 

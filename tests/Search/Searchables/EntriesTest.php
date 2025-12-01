@@ -175,7 +175,7 @@ class EntriesTest extends TestCase
         $e = EntryFactory::collection('blog')->id('e')->create();
 
         $provider = $this->makeProvider(null, [
-            'searchables' => 'all',
+            'searchables' => 'content',
             'query_scope' => 'custom_entries_scope',
         ]);
 
