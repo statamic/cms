@@ -26,7 +26,9 @@ class Assets extends Provider
             : AssetCollection::make($this->keys)
                 ->flatMap(fn ($key) => Asset::whereContainer($key));
 
-        return $assets->filter($this->filter())->values();
+        // TODO: query scope support?
+
+        return $assets->filter($this->filter())->values()->map->reference();
     }
 
     public function contains($searchable): bool
