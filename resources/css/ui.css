@@ -33,7 +33,7 @@
     --color-danger-bg: var(--theme-color-danger-bg);
     --color-success-bg: var(--theme-color-success-bg);
     --color-success: var(--theme-color-success);
-    --color-success-bg: oklch(from var(--theme-color-success-bg) l c h / var(--color-success-bg-opacity, 1));
+    --color-danger: var(--theme-color-danger);
 
     /* Temp */
     --color-dark-100: #dfe1e5;
