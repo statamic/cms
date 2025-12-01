@@ -41,7 +41,7 @@ class Entries extends Provider
                 ->map->reference();
         }
 
-        $query->where('status', 'published');
+        $query->whereStatus('published');
 
         return $query->pluck('reference');
     }
@@ -65,7 +65,7 @@ class Entries extends Provider
         }
 
         $query = Entry::query()
-            ->where('status', 'published')
+            ->whereStatus('published')
             ->where('id', $searchable->id());
 
         $this->applyQueryScope($query);
