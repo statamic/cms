@@ -121,9 +121,6 @@
                 opacity: 1!important;
             }
         }
-        &.bg-transparent {
-            /* border-radius: 100%; */
-        }
     }
     /* DELETE STATES / BADGES
     =================================================== */
