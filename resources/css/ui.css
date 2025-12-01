@@ -30,6 +30,11 @@
     --color-ui-accent-text: var(--theme-color-ui-accent-text);
     --color-switch-bg: var(--theme-color-switch-bg);
 
+    --color-danger-bg: var(--theme-color-danger-bg);
+    --color-success-bg: var(--theme-color-success-bg);
+    --color-success: var(--theme-color-success);
+    --color-success-bg: oklch(from var(--theme-color-success-bg) l c h / var(--color-success-bg-opacity, 1));
+
     /* Temp */
     --color-dark-100: #dfe1e5;
     --color-dark-150: #bbbdc0;
@@ -88,6 +93,13 @@
 
     /* Custom value because gray-100 is too light and gray-200 is too dark, e.g. Bard active buttons */
     --color-button-active: hsl(from var(--color-gray-300) h s l / 0.45);
+
+    &.dark, .dark * {
+        --color-button-active: hsl(from var(--color-gray-700) h s l / 0.45);
+        --color-danger: var(--theme-color-danger);
+        /* Make the danger background slightly darker/more subtle in dark mode */
+        --color-danger-bg: oklch(from var(--theme-color-danger-bg) l c h / 0.2);
+    }
 }
 
 @theme {
