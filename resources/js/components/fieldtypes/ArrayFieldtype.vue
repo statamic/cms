@@ -80,7 +80,7 @@
                             />
                         </td>
                         <td class="row-controls" v-if="!isReadOnly">
-                            <ui-button icon="x" variant="subtle" size="xs" round @click="deleteOrConfirm(index)" :aria-label="__('Delete Row')" v-tooltip="__('Delete Row')" />
+                            <ui-button icon="x" variant="subtle" size="xs" round delete-action @click="deleteOrConfirm(index)" :aria-label="__('Delete Row')" v-tooltip="__('Delete Row')" />
                         </td>
                     </tr>
                 </tbody>
