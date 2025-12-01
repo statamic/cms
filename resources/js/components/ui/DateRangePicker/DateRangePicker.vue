@@ -158,6 +158,7 @@ const calendarEvents = computed(() => ({
                         :disabled="disabled" 
                         :aria-label="__('Clear date range')"
                         v-tooltip="__('Clear date range')"
+                        delete-action
                     />
                 </div>
             </DateRangePickerField>

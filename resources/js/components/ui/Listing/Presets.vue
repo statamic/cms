@@ -191,6 +191,7 @@ function deletePreset() {
                             variant="warning"
                             :aria-label="__('Delete Preset')"
                             @click="isConfirmingDeletion = true"
+                            data-delete-action
                         />
                     </DropdownMenu>
                 </Dropdown>

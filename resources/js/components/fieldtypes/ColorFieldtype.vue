@@ -69,7 +69,7 @@
             />
         </div>
 
-        <ui-button v-if="value" icon="x" :aria-label="__('Reset')" @click="resetColor" round inset size="sm" variant="ghost" class="ms-1" />
+        <ui-button v-if="value" icon="x" :aria-label="__('Reset')" @click="resetColor" round inset size="sm" variant="ghost" class="ms-1" delete-action />
     </div>
 </template>
 

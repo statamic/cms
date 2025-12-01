@@ -78,6 +78,7 @@
                                 class="opacity-75 hover:opacity-100 cursor-pointer"
                                 :aria-label="__('Remove Validation Rule')"
                                 @click="remove(rule)"
+                                data-delete-action
                             >
                                 &times;
                             </button>

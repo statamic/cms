@@ -19,7 +19,7 @@
                 <Button v-if="src" size="sm" icon="edit" :text="__('Edit Image')" @click="edit" />
                 <Button v-if="src" size="sm" icon="rename" :text="__('Override Alt')" :class="{ active: showingAltEdit }" @click="toggleAltEditor" />
                 <Button v-if="src" size="sm" icon="replace" :text="__('Replace')" @click="openSelector" />
-                <Button v-if="src" size="sm" icon="trash" :text="__('Remove')" :aria-label="__('Remove')" v-tooltip="__('Remove')" @click="deleteNode" />
+                <Button v-if="src" size="sm" icon="trash" :text="__('Remove')" :aria-label="__('Remove')" v-tooltip="__('Remove')" @click="deleteNode" delete-action />
             </div>
 
             <div
