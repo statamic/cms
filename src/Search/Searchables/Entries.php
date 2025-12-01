@@ -33,15 +33,15 @@ class Entries extends Provider
 
         $this->applyQueryScope($query);
 
-        if ($this->hasFilter()) {
+        if ($filter = $this->filter()) {
             return $query
                 ->lazy(config('statamic.search.chunk_size'))
-                ->filter($this->filter())
+                ->filter($filter)
                 ->values()
                 ->map->reference();
         }
 
-        $query->where('status', 'published');
+        $query->whereStatus('published');
 
         return $query->pluck('reference');
     }
@@ -60,12 +60,12 @@ class Entries extends Provider
             return false;
         }
 
-        if ($this->hasFilter()) {
-            return $this->filter()($searchable);
+        if ($filter = $this->filter()) {
+            return $filter($searchable);
         }
 
         $query = Entry::query()
-            ->where('status', 'published')
+            ->whereStatus('published')
             ->where('id', $searchable->id());
 
         $this->applyQueryScope($query);
@@ -76,10 +76,5 @@ class Entries extends Provider
     public function find(array $ids): Collection
     {
         return Entry::query()->whereIn('id', $ids)->get();
-    }
-
-    protected function defaultFilter()
-    {
-        return fn ($item) => $item->status() === 'published';
     }
 }

@@ -6,7 +6,6 @@ use Statamic\Facades\Scope;
 use Statamic\Facades\Search;
 use Statamic\Search\Index;
 use Statamic\Search\ProvidesSearchables;
-use Statamic\Support\Arr;
 
 abstract class Provider implements ProvidesSearchables
 {
@@ -66,11 +65,6 @@ abstract class Provider implements ProvidesSearchables
         Scope::find($scope)->apply($query, []);
     }
 
-    protected function hasFilter()
-    {
-        return Arr::has($this->index->config(), 'filter');
-    }
-
     protected function filter()
     {
         $filter = $this->index->config()['filter'] ?? null;
@@ -84,6 +78,6 @@ abstract class Provider implements ProvidesSearchables
 
     protected function defaultFilter()
     {
-        return fn () => true;
+        return null;
     }
 }

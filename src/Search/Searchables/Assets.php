@@ -28,7 +28,11 @@ class Assets extends Provider
 
         // TODO: query scope support?
 
-        return $assets->filter($this->filter())->values()->map->reference();
+        if ($filter = $this->filter()) {
+            $assets = $assets->filter($filter);
+        }
+
+        return $assets->values()->map->reference();
     }
 
     public function contains($searchable): bool
@@ -41,7 +45,9 @@ class Assets extends Provider
             return false;
         }
 
-        return $this->filter()($searchable);
+        return ($filter = $this->filter())
+            ? $filter($searchable)
+            : true;
     }
 
     public function find(array $keys): Collection

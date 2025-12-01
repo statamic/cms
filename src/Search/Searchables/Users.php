@@ -25,10 +25,10 @@ class Users extends Provider
 
         $this->applyQueryScope($query);
 
-        if ($this->hasFilter()) {
+        if ($filter = $this->filter()) {
             return $query
                 ->lazy(config('statamic.search.chunk_size'))
-                ->filter($this->filter())
+                ->filter($filter)
                 ->values()
                 ->map->reference();
         }
@@ -42,8 +42,8 @@ class Users extends Provider
             return false;
         }
 
-        if ($this->hasFilter()) {
-            return $this->filter()($searchable);
+        if ($filter = $this->filter()) {
+            return $filter($searchable);
         }
 
         $query = User::query()->where('id', $searchable->id());
