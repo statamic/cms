@@ -21,7 +21,7 @@
                     v-if="canDelete"
                     @click="$emit('removed', index)"
                     :aria-label="__('Delete Row')"
-                    delete-action
+                    destructive
                     v-tooltip="__('Delete Row')"
                     icon="trash"
                     variant="ghost"

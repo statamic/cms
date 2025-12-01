@@ -62,7 +62,7 @@
                                         variant="ghost"
                                         :aria-label="__('Remove Asset')"
                                         :title="__('Remove')"
-                                        delete-action
+                                        destructive
                                     />
                                 </td>
                             </tr>

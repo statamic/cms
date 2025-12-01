@@ -65,7 +65,7 @@
             @update:model-value="valueUpdated"
         />
 
-        <Button variant="ghost" size="sm" icon="trash" :aria-label="__('Remove Condition')" @click="remove" delete-action />
+        <Button variant="ghost" size="sm" icon="trash" :aria-label="__('Remove Condition')" @click="remove" destructive />
     </div>
 </template>
 

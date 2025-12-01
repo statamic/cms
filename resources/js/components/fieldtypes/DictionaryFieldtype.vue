@@ -43,7 +43,7 @@
                                 type="button"
                                 class="-mx-3 cursor-pointer px-3 text-gray-400 hover:text-gray-700"
                                 :aria-label="__('Deselect option')"
-                                data-delete-action
+                                data-destructive
                                 @click="deselect(option.value)"
                             >
                                 <span>&times;</span>

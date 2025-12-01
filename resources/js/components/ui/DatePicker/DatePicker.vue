@@ -174,7 +174,7 @@ const getInputLabel = (part) => {
                             :disabled="disabled"
                             :aria-label="__('Clear date')"
                             v-tooltip="__('Clear date')"
-                            delete-action
+                            destructive
                         />
                     </div>
                 </DatePickerAnchor>

@@ -119,7 +119,7 @@
                     :aria-label="__('Remove Link')"
                     @click="remove"
                     size="sm"
-                    delete-action
+                    destructive
                     inset
                 />
                 <ui-button

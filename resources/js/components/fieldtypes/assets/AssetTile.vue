@@ -38,7 +38,7 @@
                 <div class="flex items-center justify-center gap-2">
                     <template v-if="!readOnly">
                         <ui-button size="sm" @click="editOrOpen" :icon="asset.isEditable ? 'pencil' : 'eye'" aria-label="__('Edit')" v-if="asset.isViewable" />
-                        <ui-button size="sm" @click="remove" icon="x" aria-label="__('Remove')" delete-action />
+                        <ui-button size="sm" @click="remove" icon="x" aria-label="__('Remove')" destructive />
                     </template>
 
                     <template v-else>

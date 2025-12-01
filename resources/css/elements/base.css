@@ -101,11 +101,11 @@
     }
 }
 
-/* DELETE STATES
+/* DESTRUCTIVE STATES
 =================================================== */
 @layer utilities {
-    /* Delete buttons */
-    [data-delete-action]:not([data-ui-badge] *) {
+    /* Destructive buttons */
+    [data-destructive]:not([data-ui-badge] *) {
         --focus-outline-color: var(--danger-outline-color);
         --focus-outline-width: 1px;
         &:hover,
@@ -122,10 +122,10 @@
             }
         }
     }
-    /* DELETE STATES / BADGES
+    /* DESTRUCTIVE STATES / BADGES
     =================================================== */
     /* When a badge "x" is hovered, the whole badge lights up red. */
-    [data-ui-badge]:has([data-delete-action]:is(:hover, :focus)) {
+    [data-ui-badge]:has([data-destructive]:is(:hover, :focus)) {
         --focus-outline-color: var(--danger-outline-color);
         --focus-outline-width: 1px;
         background: var(--color-danger-bg);

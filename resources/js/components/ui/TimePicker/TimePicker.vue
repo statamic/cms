@@ -52,7 +52,7 @@ const setToNow = () => {
         </div>
         <div class="flex items-center gap-1">
             <Button v-if="clearable" @click="setToNow" type="button" class="[&_svg]:opacity-80! dark:[&_svg]:opacity-70! hover:[&_svg]:opacity-100!" size="xs" v-tooltip="__('Set to now')" :aria-label="__('Set to now')" icon="time-now" />
-            <Button v-if="clearable" @click="emit('update:modelValue', null)" type="button" class="[&_svg]:opacity-80! dark:[&_svg]:opacity-70! hover:[&_svg]:opacity-100!" v-tooltip="__('Clear')" :aria-label="__('Clear')" icon="x" size="xs" delete-action />
+            <Button v-if="clearable" @click="emit('update:modelValue', null)" type="button" class="[&_svg]:opacity-80! dark:[&_svg]:opacity-70! hover:[&_svg]:opacity-100!" v-tooltip="__('Clear')" :aria-label="__('Clear')" icon="x" size="xs" destructive />
         </div>
     </TimeFieldRoot>
 
