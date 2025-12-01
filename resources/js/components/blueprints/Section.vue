@@ -119,7 +119,7 @@
                         <ui-switch v-model="editingSection.hide" />
                     </ui-field>
                     <div class="py-6 space-x-2 -mx-6 px-6 border-t border-gray-200 dark:border-gray-700">
-                        <ui-button :text="__('Confirm')" @click="editConfirmed" variant="primary" />
+                        <ui-button :text="isSoloNarrowStack ? __('Save') : __('Confirm')" @click="handleSaveOrConfirm" variant="primary" />
                         <ui-button :text="__('Cancel')" @click="editCancelled" variant="ghost" />
                     </div>
                 </div>
@@ -179,6 +179,11 @@ export default {
         previewImageFolder() {
             return this.$config.get('setPreviewImages.folder') || null;
         },
+
+        isSoloNarrowStack() {
+            const stacks = this.$stacks.stacks();
+            return stacks.length === 1 && stacks[0]?.data?.vm?.narrow === true;
+        },
     },
 
     watch: {
@@ -198,11 +203,11 @@ export default {
         editingSection: {
             handler(isEditing) {
                 if (isEditing) {
-                    // Bind Cmd+S to trigger confirm when a narrow stack is open
+                    // Bind Cmd+S to trigger save or confirm based on stack type
                     this.saveKeyBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        this.editConfirmed();
+                        this.handleSaveOrConfirm();
                     });
                 } else {
                     // Unbind when stack is closed
@@ -266,6 +271,21 @@ export default {
 
             this.$emit('updated', { ...this.section, ...this.editingSection });
             this.editingSection = false;
+        },
+
+        handleSaveOrConfirm() {
+            if (this.isSoloNarrowStack) {
+                this.editAndSave();
+            } else {
+                this.editConfirmed();
+            }
+        },
+
+        editAndSave() {
+            this.editConfirmed();
+            this.$nextTick(() => {
+                this.$events.$emit('root-form-save');
+            });
         },
 
         editCancelled() {
