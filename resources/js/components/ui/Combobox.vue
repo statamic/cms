@@ -490,6 +490,7 @@ defineExpose({
                                     cursor-pointer relative opacity-75 size-2
                                 "
                                 :aria-label="__('Deselect option')"
+                                data-delete-action
                                 @click="deselect(option.value)"
                             >
                                 <span class="relative">&times;</span>

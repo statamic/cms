@@ -105,7 +105,7 @@
 =================================================== */
 @layer utilities {
     /* Delete buttons */
-    [data-delete-action] {
+    [data-delete-action]:not([data-ui-badge] *) {
         --focus-outline-color: var(--danger-outline-color);
         --focus-outline-width: 1px;
         &:hover,
@@ -125,13 +125,15 @@
     /* DELETE STATES / BADGES
     =================================================== */
     /* When a badge "x" is hovered, the whole badge lights up red. */
-    [data-ui-badge]:has(button[aria-label*="Deselect"]:is(:hover, :focus)) {
+    [data-ui-badge]:has([data-delete-action]:is(:hover, :focus)) {
         --focus-outline-color: var(--danger-outline-color);
         --focus-outline-width: 1px;
         background: var(--color-danger-bg);
         outline: var(--focus-outline-width) var(--focus-outline-style) var(--focus-outline-color);
         outline-offset: var(--focus-outline-offset);
-        color: var(--color-danger);
+        &, button {
+            color: var(--color-danger);
+        }
         /* Cancel the outline on the actual button since we're highlighting the entire badge */
         button {
             outline: none;
