@@ -19,7 +19,7 @@
                     :class="isFirst ? 'w-[50%] translate-x-[50%]' : 'w-full'"
                 >
                     <div class="h-full flex flex-col justify-center">
-                        <div class="rounded-full bg-gray-200 dark:bg-gray-700 h-2" />
+                        <div class="rounded-full bg-[linear-gradient(90deg,theme(colors.gray.100)_0%,theme(colors.gray.200)_50%,theme(colors.gray.100)_100%)] h-2" />
                     </div>
                 </button>
                 <Button v-if="enabled" round icon="plus" size="sm" class="-my-4 z-3 opacity-0 group-hover:opacity-100 transition-opacity delay-10 duration-250" />
