@@ -57,9 +57,9 @@ class EntriesTest extends TestCase
     public static function entriesProvider()
     {
         return [
-            'all' => [
+            'content' => [
                 null,
-                ['searchables' => 'all'],
+                ['searchables' => 'content'],
                 ['entry::alfa', 'entry::charlie', 'entry::delta', 'entry::foxtrot', 'entry::xray', 'entry::zulu'],
             ],
             'all collections' => [
@@ -78,9 +78,9 @@ class EntriesTest extends TestCase
                 ['entry::xray', 'entry::zulu'],
             ],
 
-            'all, english' => [
+            'content, english' => [
                 'en',
-                ['searchables' => 'all'],
+                ['searchables' => 'content'],
                 ['entry::alfa', 'entry::charlie', 'entry::xray', 'entry::zulu'],
             ],
             'all collections, english' => [
@@ -99,9 +99,9 @@ class EntriesTest extends TestCase
                 ['entry::xray', 'entry::zulu'],
             ],
 
-            'all, french' => [
+            'content, french' => [
                 'fr',
-                ['searchables' => 'all'],
+                ['searchables' => 'content'],
                 ['entry::delta', 'entry::foxtrot'],
             ],
             'all collections, french' => [
@@ -134,7 +134,7 @@ class EntriesTest extends TestCase
         $e = EntryFactory::collection('blog')->id('e')->create();
 
         $provider = $this->makeProvider(null, [
-            'searchables' => 'all',
+            'searchables' => 'content',
             'filter' => $filter,
         ]);
 
@@ -175,7 +175,7 @@ class EntriesTest extends TestCase
         $e = EntryFactory::collection('blog')->id('e')->create();
 
         $provider = $this->makeProvider(null, [
-            'searchables' => 'all',
+            'searchables' => 'content',
             'query_scope' => 'custom_entries_scope',
         ]);
 
@@ -214,7 +214,7 @@ class EntriesTest extends TestCase
     {
         // a bit of duplicated implementation logic.
         // but it makes the test look more like the real thing.
-        return collect($keys === 'all' ? ['*'] : $keys)
+        return collect($keys === 'content' ? ['*'] : $keys)
             ->map(fn ($key) => str_replace('collection:', '', $key))
             ->all();
     }

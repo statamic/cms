@@ -78,9 +78,9 @@ class TermsTest extends TestCase
     public static function termsProvider()
     {
         return [
-            'all' => [
+            'content' => [
                 null,
-                ['searchables' => 'all'],
+                ['searchables' => 'content'],
                 [
                     'term::tags::alfa::en',
                     'term::tags::alfa::fr',
@@ -121,9 +121,9 @@ class TermsTest extends TestCase
                 ],
             ],
 
-            'all, english' => [
+            'content, english' => [
                 'en',
-                ['searchables' => 'all'],
+                ['searchables' => 'content'],
                 [
                     'term::tags::alfa::en',
                     'term::tags::bravo::en',
@@ -158,9 +158,9 @@ class TermsTest extends TestCase
                 ],
             ],
 
-            'all, french' => [
+            'content, french' => [
                 'fr',
-                ['searchables' => 'all'],
+                ['searchables' => 'content'],
                 [
                     'term::tags::alfa::fr',
                     'term::tags::bravo::fr',
@@ -201,7 +201,7 @@ class TermsTest extends TestCase
         $d = tap(Term::make('d')->taxonomy('tags')->dataForLocale('en', []))->save();
 
         $provider = $this->makeProvider(null, [
-            'searchables' => 'all',
+            'searchables' => 'content',
             'filter' => $filter,
         ]);
 
@@ -240,7 +240,7 @@ class TermsTest extends TestCase
         $d = tap(Term::make('d')->taxonomy('tags')->dataForLocale('en', []))->save();
 
         $provider = $this->makeProvider(null, [
-            'searchables' => 'all',
+            'searchables' => 'content',
             'query_scope' => 'custom_terms_scope',
         ]);
 
@@ -278,7 +278,7 @@ class TermsTest extends TestCase
     {
         // a bit of duplicated implementation logic.
         // but it makes the test look more like the real thing.
-        return collect($keys === 'all' ? ['*'] : $keys)
+        return collect($keys === 'content' ? ['*'] : $keys)
             ->map(fn ($key) => str_replace('taxonomy:', '', $key))
             ->all();
     }
