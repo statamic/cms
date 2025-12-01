@@ -115,8 +115,6 @@ class CollectionBlueprintsController extends CpController
     {
         $blueprint = $collection->entryBlueprint($blueprint);
 
-        $this->authorize('delete', $blueprint);
-
         $blueprint->delete();
     }
 

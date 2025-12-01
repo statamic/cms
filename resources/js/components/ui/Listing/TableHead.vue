@@ -15,7 +15,7 @@ const props = defineProps({
 
 const hasVisibleHeader = computed(() => {
     if (props.srOnly) return false;
-    return allowsSelections.value || visibleColumns.value.length > 1;
+    return allowsSelections.value || visibleColumns.value.length >= 1;
 })
 </script>
 

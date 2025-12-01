@@ -22,6 +22,8 @@ defineProps([
     'configureUrl',
     'canEdit',
     'canEditBlueprint',
+    'itemActions',
+    'actionUrl',
 ]);
 </script>
 
@@ -50,5 +52,7 @@ defineProps([
         :configure-url="configureUrl"
         :can-edit="canEdit"
         :can-edit-blueprint="canEditBlueprint"
+        :initial-item-actions="itemActions"
+        :item-action-url="actionUrl"
     />
 </template>

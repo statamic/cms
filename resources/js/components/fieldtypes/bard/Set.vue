@@ -1,6 +1,7 @@
 <template>
     <node-view-wrapper class="my-4">
         <div
+            ref="container"
             class="shadow-ui-sm relative z-2 w-full rounded-lg border border-gray-300 bg-white text-base dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
             :class="{
                 // We’re styling a Set so that it shows a “selection outline” when selected with the mouse or keyboard.
@@ -115,6 +116,7 @@ import {
 } from '@ui';
 import { containerContextKey } from '@/components/ui/Publish/Container.vue';
 import { watch } from 'vue';
+import { reveal } from '@api';
 
 export default {
     props: nodeViewProps,
@@ -329,6 +331,8 @@ export default {
             },
             { deep: true }
         );
+
+        reveal.mount(this.$refs.container, this.expand);
     },
 
     updated() {

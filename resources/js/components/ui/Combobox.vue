@@ -332,7 +332,14 @@ defineExpose({
                 ignore-filter
             >
                 <ComboboxAnchor class="block w-full" data-ui-combobox-anchor>
-                    <ComboboxTrigger as="div" ref="trigger" :class="triggerClasses" @keydown.enter="openDropdown" @keydown.space="openDropdown" data-ui-combobox-trigger>
+                    <ComboboxTrigger
+                        as="div"
+                        ref="trigger"
+                        :class="triggerClasses"
+                        @keydown.enter="openDropdown"
+                        @keydown.space="openDropdown"
+                        data-ui-combobox-trigger
+                    >
                         <div class="flex-1 min-w-0">
                             <!-- Dropdown open: search input -->
                             <ComboboxInput
@@ -472,7 +479,7 @@ defineExpose({
                         :key="getOptionValue(option)"
                         class="sortable-item mt-2"
                     >
-                        <Badge pill size="lg">
+                        <Badge pill size="lg" class="[&>*]:st-text-trim-ex-alphabetic">
                             <div v-if="labelHtml" v-html="getOptionLabel(option)"></div>
                             <div v-else>{{ __(getOptionLabel(option)) }}</div>
 
@@ -500,6 +507,12 @@ defineExpose({
     /* Override the hardcoded z-index of Reka's popper content wrapper. We can't use a direct descendant selector because the stack is inside a portal, so instead we'll check to see if there is a stack present. */
     body:has(.stack, .live-preview) [data-reka-popper-content-wrapper] {
         z-index: var(--z-index-portal)!important;
+    }
+
+    @supports(text-box: ex alphabetic) {
+        [data-ui-badge] {
+            padding-block: 0.65rem;
+        }
     }
 
     /* Override the hardcoded z-index of Reka's popper content wrapper. When there's a modal present, we need to ensure the popper content is above it. We can't use a direct descendant selector because the modal is inside a portal, so instead we'll check to see if there is modal content present. */
