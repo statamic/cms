@@ -104,7 +104,7 @@ function clearImage() {
                     <div v-if="static.enabled" class="flex gap-2">
                         <CommandPaletteItem
                             category="Actions"
-                            :text="[__('Clear'), __('Static Page Stache')]"
+                            :text="[__('Clear'), __('Static Page Cache')]"
                             icon="live-preview"
                             :action="clearStatic"
                         >

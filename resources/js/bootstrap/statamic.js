@@ -141,6 +141,10 @@ export default {
         return events;
     },
 
+    get $reveal() {
+        return reveal;
+    },
+
     get $commandPalette() {
         return commandPalette;
     },

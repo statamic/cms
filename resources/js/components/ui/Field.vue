@@ -104,7 +104,7 @@ const hasErrors = computed(() => {
 </script>
 
 <template>
-    <div :class="[rootClasses, $attrs.class]" data-ui-input-group>
+    <div :class="[rootClasses, $attrs.class]" data-ui-input-group :data-ui-field-has-errors="hasErrors ? '' : null">
         <div v-if="label || (instructions && !instructionsBelow) || $slots.label || $slots.actions">
             <div
                 v-if="$slots.actions"

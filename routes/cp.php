@@ -67,8 +67,10 @@ use Statamic\Http\Controllers\CP\Forms\FormSubmissionsController;
 use Statamic\Http\Controllers\CP\Forms\SubmissionActionController;
 use Statamic\Http\Controllers\CP\Globals\GlobalsBlueprintController;
 use Statamic\Http\Controllers\CP\Globals\GlobalsController;
+use Statamic\Http\Controllers\CP\Globals\GlobalSetActionController;
 use Statamic\Http\Controllers\CP\Globals\GlobalVariablesController;
 use Statamic\Http\Controllers\CP\GraphQLController;
+use Statamic\Http\Controllers\CP\Navigation\NavigationActionController;
 use Statamic\Http\Controllers\CP\Navigation\NavigationBlueprintController;
 use Statamic\Http\Controllers\CP\Navigation\NavigationController;
 use Statamic\Http\Controllers\CP\Navigation\NavigationPagesController;
@@ -156,12 +158,14 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::get('select-site/{handle}', [SelectSiteController::class, 'select']);
 
-    Route::resource('navigation', NavigationController::class);
+    Route::resource('navigation', NavigationController::class)->except('destroy');
     Route::get('navigation/{navigation}/tree', [NavigationTreeController::class, 'index'])->name('navigation.tree.index');
     Route::patch('navigation/{navigation}/tree', [NavigationTreeController::class, 'update'])->name('navigation.tree.update');
     Route::post('navigation/{navigation}/pages', [NavigationPagesController::class, 'update'])->name('navigation.pages.update');
     Route::get('navigation/{navigation}/pages/create', [NavigationPagesController::class, 'create'])->name('navigation.pages.create');
     Route::get('navigation/{navigation}/pages/{edit}/edit', [NavigationPagesController::class, 'edit'])->name('navigation.pages.edit');
+    Route::post('navigation/actions', [NavigationActionController::class, 'run'])->name('navigation.actions.run');
+    Route::post('navigation/actions/list', [NavigationActionController::class, 'bulkActions'])->name('navigation.actions.bulk');
 
     Route::resource('collections', CollectionsController::class);
     Route::post('collections/actions', [CollectionActionController::class, 'run'])->name('collections.actions.run');
@@ -236,7 +240,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::post('globals', [GlobalsController::class, 'store'])->name('globals.store');
     Route::get('globals/{global_set}/edit', [GlobalsController::class, 'edit'])->name('globals.edit');
     Route::patch('globals/{global_set}', [GlobalsController::class, 'update'])->name('globals.update');
-    Route::delete('globals/{global_set}', [GlobalsController::class, 'destroy'])->name('globals.destroy');
+    Route::post('globals/actions', [GlobalSetActionController::class, 'run'])->name('globals.actions.run');
+    Route::post('globals/actions/list', [GlobalSetActionController::class, 'bulkActions'])->name('globals.actions.bulk');
 
     Route::get('globals/{global_set}', [GlobalVariablesController::class, 'edit'])->name('globals.variables.edit');
     Route::patch('globals/{global_set}/variables', [GlobalVariablesController::class, 'update'])->name('globals.variables.update');
