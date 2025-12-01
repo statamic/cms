@@ -73,7 +73,7 @@
                 </div>
             </div>
 
-            <stack name="item-selector" v-if="isSelecting" @closed="isSelecting = false" v-slot="{ close }">
+            <ui-stack name="item-selector" v-if="isSelecting" @closed="isSelecting = false" v-slot="{ close }">
                 <ItemSelector
                     :name="name"
                     :filters-url="filtersUrl"
@@ -91,7 +91,7 @@
                     @selected="selectionsUpdated"
                     @closed="close"
                 />
-            </stack>
+            </ui-stack>
 
             <input v-if="name" type="hidden" :name="name" :value="JSON.stringify(value)" />
         </template>
