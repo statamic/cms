@@ -1,10 +1,10 @@
 <script setup>
 import Head from '@/pages/layout/Head.vue';
-import { Header, Button, DocsCallout, CommandPaletteItem, Icon, EmptyStateMenu, EmptyStateItem, CardList, CardListItem, Dropdown, DropdownMenu, DropdownItem } from '@ui';
-import { Link } from '@inertiajs/vue3';
+import { Header, Button, DocsCallout, CommandPaletteItem, Icon, EmptyStateMenu, EmptyStateItem, Listing, DropdownItem } from '@ui';
+import { Link, router } from '@inertiajs/vue3';
 import useArchitecturalBackground from '@/pages/layout/architectural-background.js';
 
-const props = defineProps(['navs', 'canCreate', 'createUrl']);
+const props = defineProps(['navs', 'columns', 'canCreate', 'createUrl', 'actionUrl']);
 
 if (props.navs.length === 0) useArchitecturalBackground();
 </script>
@@ -13,7 +13,7 @@ if (props.navs.length === 0) useArchitecturalBackground();
     <Head :title="__('Navigation')" />
 
     <div class="max-w-5xl mx-auto">
-        <Header :title="__('Navigation')" icon="navigation">
+        <Header v-if="navs.length" :title="__('Navigation')" icon="navigation">
             <CommandPaletteItem
                 v-if="canCreate"
                 category="Actions"
@@ -32,22 +32,24 @@ if (props.navs.length === 0) useArchitecturalBackground();
         </Header>
 
         <template v-if="navs.length">
-            <CardList :heading="__('Title')">
-                <CardListItem v-for="item in navs" :key="item.id">
+            <Listing
+                :items="navs"
+                :columns="columns"
+                :action-url="actionUrl"
+                :allow-search="false"
+                :allow-customizing-columns="false"
+                @refreshing="() => router.reload()"
+            >
+                <template #cell-title="{ row: item }">
                     <Link
                         :href="item.available_in_selected_site ? item.show_url : item.edit_url"
                         v-text="__(item.title)"
                     />
-                    <Dropdown placement="left-start">
-                        <DropdownMenu>
-                            <DropdownItem :text="__('Configure')" icon="cog" :href="item.edit_url" />
-                            <DropdownItem v-if="item.deleteable" :text="__('Delete')" icon="trash" variant="destructive" @click="$refs[`deleter_${item.id}`][0].confirm()" />
-                        </DropdownMenu>
-                    </Dropdown>
-
-                    <resource-deleter :ref="`deleter_${item.id}`" :resource="item" reload />
-                </CardListItem>
-            </CardList>
+                </template>
+                <template #prepended-row-actions="{ row: item }">
+                    <DropdownItem :text="__('Configure')" icon="cog" :href="item.edit_url" />
+                </template>
+            </Listing>
         </template>
 
         <template v-else>

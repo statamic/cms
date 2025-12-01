@@ -3,9 +3,9 @@ import {
     Tabs,
     TabList,
     TabTrigger,
-    TabContent,
     TabProvider,
 } from '@ui';
+import TabContent from './TabContent.vue';
 import { injectContainerContext } from './Container.vue';
 import Sections from './Sections.vue';
 import { ref, computed, useSlots, onMounted, watch } from 'vue';
@@ -38,21 +38,23 @@ const visibleMainTabs = computed(() => {
     });
 });
 const hasMultipleVisibleMainTabs = computed(() => visibleMainTabs.value.length > 1);
-const shouldShowSidebar = computed(() => (slots.sidebar || sidebarTab.value) && width.value > 920);
+const shouldShowSidebar = computed(() => (slots.actions || sidebarTab.value) && width.value > 920);
 const activeTab = ref(visibleMainTabs.value[0].handle);
 
 onMounted(() => setActiveTabFromHash());
 
-function setActiveTabFromHash() {
-    if (window.location.hash.length === 0) return;
-
-    const handle = window.location.hash.substr(1);
-
-    if (visibleMainTabs.value.some((tab) => tab.handle === handle)) {
-        activeTab.value = handle;
+function setActive(tab) {
+    if (visibleMainTabs.value.some((t) => t.handle === tab)) {
+        activeTab.value = tab;
     } else {
         activeTab.value = visibleMainTabs.value[0].handle;
     }
+}
+
+function setActiveTabFromHash() {
+    if (window.location.hash.length === 0) return;
+
+    setActive(window.location.hash.substr(1));
 }
 
 watch(
@@ -112,6 +114,7 @@ function tabHasError(tab) {
                         :is="hasMultipleVisibleMainTabs ? TabContent : 'div'"
                         :force-mount="hasMultipleVisibleMainTabs ? true : null"
                         :class="{ 'hidden': tab.handle !== activeTab }"
+                        @revealed="setActive(tab.handle)"
                     >
                         <TabProvider :tab="tab">
                             <slot :tab="tab">

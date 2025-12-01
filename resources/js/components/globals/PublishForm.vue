@@ -1,7 +1,35 @@
 <template>
     <div>
         <Header :title="__(title)" icon="globals">
-            <Dropdown v-if="canConfigure || canEditBlueprint">
+            <ItemActions
+                v-if="hasItemActions"
+                :url="itemActionUrl"
+                :actions="itemActions"
+                :item="initialHandle"
+                @started="actionStarted"
+                @completed="actionCompleted"
+                v-slot="{ actions: preparedActions }"
+            >
+                <Dropdown v-if="canConfigure || canEditBlueprint || hasItemActions">
+                    <template #trigger>
+                        <Button icon="dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
+                    </template>
+                    <DropdownMenu>
+                        <DropdownItem :text="__('Configure')" icon="cog" v-if="canConfigure" :href="configureUrl" />
+                        <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :href="actions.editBlueprint" />
+                        <DropdownSeparator v-if="hasItemActions && (canConfigure || canEditBlueprint)" />
+                        <DropdownItem
+                            v-for="action in preparedActions"
+                            :key="action.handle"
+                            :text="__(action.title)"
+                            :icon="action.icon"
+                            :variant="action.dangerous ? 'destructive' : 'default'"
+                            @click="action.run"
+                        />
+                    </DropdownMenu>
+                </Dropdown>
+            </ItemActions>
+            <Dropdown v-else-if="canConfigure || canEditBlueprint">
                 <template #trigger>
                     <Button icon="dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
                 </template>
@@ -48,9 +76,11 @@
             :blueprint="fieldset"
             v-model="values"
             :meta="meta"
+            :origin-values="originValues"
+            :origin-meta="originMeta"
             :errors="errors"
             :site="site"
-            :localized-fields="localizedFields"
+            v-model:modified-fields="localizedFields"
             :sync-field-confirmation-text="syncFieldConfirmationText"
         />
 
@@ -68,22 +98,28 @@
 
 <script>
 import SiteSelector from '../SiteSelector.vue';
+import HasActions from '../publish/HasActions';
 import clone from '@/util/clone.js';
-import { Button, Dropdown, DropdownItem, DropdownMenu, Header, PublishContainer, PublishTabs, PublishComponents } from '@ui';
+import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownSeparator, Header, PublishContainer, PublishTabs, PublishComponents } from '@ui';
 import { computed, ref } from 'vue';
 import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';
+import ItemActions from '@/components/actions/ItemActions.vue';
 
 export default {
+    mixins: [HasActions],
+
     components: {
         PublishComponents,
         PublishContainer,
         PublishTabs,
         Dropdown,
         DropdownItem,
+        DropdownSeparator,
         Button,
         DropdownMenu,
         Header,
         SiteSelector,
+        ItemActions,
     },
 
     props: {
@@ -130,11 +166,18 @@ export default {
             readOnly: this.initialReadOnly,
             syncFieldConfirmationText: __('messages.sync_entry_field_confirmation_text'),
             pendingLocalization: null,
-
-            savingRef: ref(false),
-            errorsRef: ref({}),
         };
     },
+
+	setup() {
+		const savingRef = ref(false);
+		const errorsRef = ref({});
+
+		return {
+			savingRef: computed(() => savingRef),
+			errorsRef: computed(() => errorsRef),
+		};
+	},
 
     computed: {
         containerRef() {
@@ -258,6 +301,7 @@ export default {
                 this.fieldset = data.blueprint;
                 this.site = localization.handle;
                 this.localizing = false;
+                this.afterActionSuccessfullyCompleted(data);
                 this.$nextTick(() => this.$refs.container.clearDirtyState());
             });
         },
@@ -292,6 +336,12 @@ export default {
                 when: () => this.canEditBlueprint,
                 url: this.actions.editBlueprint,
             });
+        },
+
+        afterActionSuccessfullyCompleted(response) {
+            if (response.itemActions) {
+                this.itemActions = response.itemActions;
+            }
         },
     },
 

@@ -37,6 +37,14 @@ beforeEach(() => {
         escape: (str) => str.replace(/[!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, '\\$&')
     };
 
+    // Mock Canvas API for text measurement (needed for Combobox width calculation)
+    HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
+        font: '',
+        measureText: vi.fn((text) => ({
+            width: text.length * 8 // Rough estimate: 8px per character
+        }))
+    }));
+
     document.body.innerHTML = '';
 });
 

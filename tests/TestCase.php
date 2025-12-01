@@ -251,6 +251,29 @@ YAML);
 
             return $this;
         });
+
+        // Symfony 7.4.0 changed "UTF-8" to "utf-8".
+        // https://github.com/symfony/symfony/pull/60685
+        // While we continue to support lower versions, we'll do a case-insensitive check.
+        // This macro is essentially assertHeader but with case-insensitive value check.
+        TestResponse::macro('assertContentType', function (string $value) {
+            $headerName = 'Content-Type';
+
+            Assert::assertTrue(
+                $this->headers->has($headerName), "Header [{$headerName}] not present on response."
+            );
+
+            $actual = $this->headers->get($headerName);
+
+            if (! is_null($value)) {
+                Assert::assertEquals(
+                    strtolower($value), strtolower($this->headers->get($headerName)),
+                    "Header [{$headerName}] was found, but value [{$actual}] does not match [{$value}]."
+                );
+            }
+
+            return $this;
+        });
     }
 
     public function __call($name, $arguments)

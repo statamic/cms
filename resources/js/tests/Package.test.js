@@ -1,7 +1,6 @@
 import { it, expect } from 'vitest';
 import * as modules from '@/bootstrap/cms/index.js';
-import * as uiComponentLibrary from '../../../packages/ui/src/index.js';
-import * as internalUiComponents from '@/components/ui/index.js';
+import * as uiComponents from '@/components/ui/index.js';
 
 global.__STATAMIC__ = modules;
 
@@ -71,6 +70,8 @@ it('exports inertia', async () => {
         'Head',
         'Link',
         'router',
+        'toggleArchitecturalBackground',
+        'useArchitecturalBackground',
         'useForm',
         'usePoll',
     ];
@@ -105,7 +106,7 @@ it('exports ui', async () => {
     // The multiple sets of exports is admittedly messy, so this test ensures that if you add
     // a component to one place that you don't forget to add it to the other places.
 
-    const expectedUiPackageExports = [
+    const expectedCmsPackageExports = [
         'AuthCard',
         'Badge',
         'Button',
@@ -173,6 +174,7 @@ it('exports ui', async () => {
         'TabContent',
         'TabList',
         'TabTrigger',
+        'Stack',
         'Table',
         'TableCell',
         'TableColumn',
@@ -186,10 +188,6 @@ it('exports ui', async () => {
         'ToggleItem',
         'registerIconSet',
         'registerIconSetFromStrings',
-    ].toSorted();
-
-    const expectedCmsPackageExports = [
-        ...expectedUiPackageExports,
         'Avatar',
         'CommandPaletteItem',
         'CreateForm',
@@ -225,15 +223,9 @@ it('exports ui', async () => {
         'publishContextKey',
     ].toSorted();
 
-    // The UI components package contains a subset of all the UI components. It only contains
-    // the more generic components that might be used outside the control panel.
-    // Defined in packages/ui/index.js.
-    expect(Object.keys(uiComponentLibrary).toSorted()).toEqual(expectedUiPackageExports);
-
-    // Internally, we use `import { Something } from @ui`.
-    // This is a merge of the UI component library and additional CP-specific components.
+    // UI components.
     // Defined in resources/js/components/ui/index.js.
-    expect(Object.keys(internalUiComponents).toSorted()).toEqual(expectedCmsPackageExports);
+    expect(Object.keys(uiComponents).toSorted()).toEqual(expectedCmsPackageExports);
 
     // The @statamic/cms package has a UI module that exposes the same set of components.
     // It will expect it to be exposed to window.__STATAMIC__.ui.

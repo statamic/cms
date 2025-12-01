@@ -61,7 +61,7 @@ class Search
             $exists = $index->exists();
 
             if ($shouldIndex && $exists) {
-                $index->insert($searchable);
+                $index->insert($searchable->getSearchReference());
             } elseif ($shouldIndex && ! $exists) {
                 $index->update();
             } elseif ($exists) {

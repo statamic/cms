@@ -4,6 +4,7 @@ namespace Statamic\Stache\Query;
 
 use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Entries\EntryCollection;
+use Statamic\Exceptions\StatusFilterNotSupportedException;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
@@ -26,7 +27,7 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
         }
 
         if ($column === 'status') {
-            trigger_error('Filtering by status is deprecated. Use whereStatus() instead.', E_USER_DEPRECATED);
+            throw new StatusFilterNotSupportedException('Filtering by status is not supported. Use whereStatus() instead.');
         }
 
         return parent::where($column, $operator, $value, $boolean);
@@ -43,7 +44,7 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
         }
 
         if ($column === 'status') {
-            trigger_error('Filtering by status is deprecated. Use whereStatus() instead.', E_USER_DEPRECATED);
+            throw new StatusFilterNotSupportedException('Filtering by status is not supported. Use whereStatus() instead.');
         }
 
         return parent::whereIn($column, $values, $boolean);

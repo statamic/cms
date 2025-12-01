@@ -126,12 +126,20 @@ jobs:
         if: steps.should-run-tests.outputs.result == 'true'
         run: npm ci
 
+      - name: Install Playwright browsers
+        if: steps.should-run-tests.outputs.result == 'true'
+        run: npx playwright install chromium
+
       - name: Execute tests
         if: steps.should-run-tests.outputs.result == 'true'
         run: npm run test
         env:
           CI: true
           LARAVEL_BYPASS_ENV_CHECK: 1
+
+      - name: Verify build succeeds
+        if: steps.should-run-tests.outputs.result == 'true'
+        run: npm run build
 
   slack:
     name: Slack Notification
