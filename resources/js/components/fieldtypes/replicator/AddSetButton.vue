@@ -1,12 +1,17 @@
 <template>
-    <set-picker :enabled="enabled" :sets="groups" :align="variant === 'between' ? 'center' : 'start'" @added="addSet">
+    <div class="inline-block" v-if="variant === 'button'">
+        <set-picker :enabled="enabled" :sets="groups" align="start" @added="addSet">
+            <template #trigger>
+                <div class="inline-flex relative pt-2" :class="{ 'pt-6': showConnector }">
+                    <div v-if="showConnector" class="absolute group-hover:opacity-0 transition-opacity delay-25 duration-125 inset-y-0 h-full left-3.5 border-l-1 border-gray-400 dark:border-gray-600 border-dashed z-0 dark:bg-gray-850" />
+                    <Button v-if="enabled" size="sm" :text="label" icon="plus" class="relative z-2" />
+                </div>
+            </template>
+        </set-picker>
+    </div>
+    <set-picker v-else :enabled="enabled" :sets="groups" align="center" @added="addSet">
         <template #trigger>
-            <div class="flex relative pt-2" :class="{ 'pt-6': showConnector }" v-if="variant === 'button'">
-                <div v-if="showConnector" class="absolute group-hover:opacity-0 transition-opacity delay-25 duration-125 inset-y-0 h-full left-3.5 border-l-1 border-gray-400 dark:border-gray-600 border-dashed z-0 dark:bg-gray-850" />
-                <Button v-if="enabled" size="sm" :text="label" icon="plus" class="relative z-2" />
-            </div>
             <div
-                v-if="variant === 'between'"
                 class="flex justify-center relative group py-3"
                 :class="{ '-mt-5': isFirst }"
             >
