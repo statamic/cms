@@ -10,6 +10,7 @@ use Statamic\Events\UrlInvalidated;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\StaticCaching\Page;
 use Statamic\StaticCaching\Replacers\CsrfTokenReplacer;
 use Statamic\Support\Arr;
@@ -238,6 +239,7 @@ class FileCacher extends AbstractCacher
     public function getNocacheJs(): string
     {
         $csrfPlaceholder = CsrfTokenReplacer::REPLACEMENT;
+        $nocacheUrl = URL::makeRelative(route('statamic.nocache'));
 
         $default = <<<EOT
 (function() {
@@ -266,7 +268,7 @@ class FileCacher extends AbstractCacher
 
     var map = createMap();
 
-    fetch('/!/nocache', {
+    fetch('{$nocacheUrl}', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
