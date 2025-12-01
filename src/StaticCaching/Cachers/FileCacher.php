@@ -239,7 +239,7 @@ class FileCacher extends AbstractCacher
     public function getNocacheJs(): string
     {
         $csrfPlaceholder = CsrfTokenReplacer::REPLACEMENT;
-        $nocacheUrl = URL::prependSiteUrl(config('statamic.routes.action').'/nocache');
+        $nocacheUrl = URL::makeRelative(route('statamic.nocache'));
 
         $default = <<<EOT
 (function() {
