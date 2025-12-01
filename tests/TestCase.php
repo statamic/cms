@@ -126,6 +126,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         ]);
 
         $app['config']->set('statamic.search.indexes.default.driver', 'null');
+        $app['config']->set('statamic.search.indexes.cp', ['driver' => 'null']);
 
         $viewPaths = $app['config']->get('view.paths');
         $viewPaths[] = __DIR__.'/__fixtures__/views/';
