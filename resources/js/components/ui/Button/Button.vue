@@ -19,6 +19,7 @@ const props = defineProps({
     text: { type: [String, Number, Boolean, null], default: null },
     type: { type: String, default: 'button' },
     variant: { type: String, default: 'default' },
+    deleteAction: { type: Boolean, default: false },
 });
 
 const slots = useSlots();
@@ -102,6 +103,7 @@ const buttonClasses = computed(() => {
         :class="buttonClasses"
         :disabled="loading"
         :data-ui-group-target="['subtle', 'ghost'].includes(props.variant) ? null : true"
+        :data-delete-action="deleteAction || undefined"
         :href
         :target
         :type="props.href ? null : type"

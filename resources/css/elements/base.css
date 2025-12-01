@@ -105,34 +105,24 @@
 =================================================== */
 @layer utilities {
     /* Delete buttons */
-    button:is(
-        /* Not Deselect because it's used for bulk actions e.g. selecting/deselecting entries */
-        /* [aria-label*="Deselect"], */
-        [aria-label*="Delete"],
-        [aria-label*="Clear"],
-        [aria-label*="Remove"],
-        [aria-label*="Reset"]
-    ) {
-        /* For example, we don't want switches such as Select fieldtype > Clearable to get caught by this. For badges we'll do something different */
-        &:not([role="switch"], [data-ui-badge] &) {
-            --focus-outline-color: var(--danger-outline-color);
-            --focus-outline-width: 1px;
-            &:hover,
-            &:hover::before,
-            &:focus {
-                /* Delete states - use outline state instead so we don't have to worry about overriding borders, or adding borders to pseudo elements */
-                outline: var(--focus-outline-width) var(--focus-outline-style) var(--focus-outline-color);
-                outline-offset: var(--focus-outline-offset);
-                background: var(--color-danger-bg);
-                svg {
-                    color: var(--color-danger);
-                    /* Need !important to override dark mode */
-                    opacity: 1!important;
-                }
+    [data-delete-action] {
+        --focus-outline-color: var(--danger-outline-color);
+        --focus-outline-width: 1px;
+        &:hover,
+        &:hover::before,
+        &:focus {
+            /* Delete states - use outline state instead so we don't have to worry about overriding borders, or adding borders to pseudo elements */
+            outline: var(--focus-outline-width) var(--focus-outline-style) var(--focus-outline-color);
+            outline-offset: var(--focus-outline-offset);
+            background: var(--color-danger-bg);
+            svg {
+                color: var(--color-danger);
+                /* Need !important to override dark mode */
+                opacity: 1!important;
             }
-            &.bg-transparent {
-                border-radius: 100%;
-            }
+        }
+        &.bg-transparent {
+            /* border-radius: 100%; */
         }
     }
     /* DELETE STATES / BADGES
