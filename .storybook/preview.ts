@@ -8,6 +8,7 @@ import './theme.css';
 import { translate } from '@/translations/translator';
 import registerUiComponents from '@/bootstrap/ui';
 import DateFormatter from '@/components/DateFormatter';
+import cleanCodeSnippet from './clean-code-snippet';
 
 // Intercept Inertia navigation and log to Actions tab.
 router.on('before', (event) => {
@@ -38,6 +39,9 @@ const preview: Preview = {
                 fontBase: '"Lexend", sans-serif',
                 fontCode: '"Source Code Pro", monospace',
             }),
+            source: {
+                transform: (code: string) => cleanCodeSnippet(code),
+            },
         },
 
         a11y: {
