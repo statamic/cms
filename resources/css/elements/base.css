@@ -10,7 +10,7 @@
     --focus-within-outline-offset: 0px;
     --focus-outline-color: var(--theme-color-focus-outline, var(--color-blue-400));
     --focus-outline-style: solid;
-    --danger-outline-color: oklch(from var(--color-danger) l c h / 0.5);
+    --danger-outline-color: oklch(from var(--theme-color-danger) l c h / 0.5);
 
     /* The outline-offset value used for buttons */
     --outline-offset-button: 6px;
@@ -26,6 +26,16 @@
     /* Used for entry animations */
     --starting-style-transition-duration: 0.125s;
     --starting-style-sibling-delay: 0.01s;
+
+    --color-danger-bg: var(--theme-color-danger-bg);
+    --color-success-bg: var(--theme-color-success-bg);
+}
+
+:root.dark, .dark * {
+    --color-button-active: hsl(from var(--color-gray-700) h s l / 0.45);
+    --color-danger: var(--theme-color-danger);
+    /* Make the danger background slightly darker/more subtle in dark mode */
+    --color-danger-bg: oklch(from var(--theme-color-danger-bg) l c h / 0.2);
 }
 
 /* FOCUS STATES
