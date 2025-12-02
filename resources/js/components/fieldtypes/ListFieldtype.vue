@@ -37,7 +37,7 @@
                                 variant="subtle"
                                 size="xs"
                                 round
-                                delete-action
+                                destructive
                                 @click="deleteValue(index)"
                                 :aria-label="__('Delete Item')"
                                 v-tooltip="__('Delete Item')"
