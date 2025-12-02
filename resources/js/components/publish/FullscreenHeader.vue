@@ -4,7 +4,7 @@
         <div class="flex min-w-max items-center gap-4">
             <slot />
         </div>
-        <div class="flex items-center justify-end py-2.5">
+        <div class="flex items-center justify-end gap-2 py-2.5">
             <Dropdown class="mr-2">
                 <template #trigger>
                     <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
@@ -19,25 +19,29 @@
                     />
                 </DropdownMenu>
             </Dropdown>
-            <button
-                class="btn-quick-action"
-                v-for="(action, index) in fieldActions.filter((a) => a.quick)"
-                :key="index"
-                v-tooltip="action.title"
-                @click="action.run()"
-            >
-                <ui-icon :name="action.icon" class="size-3.5 text-gray-400 dark:text-gray-600" />
-            </button>
+            <ButtonGroup>
+                <Button
+                    v-for="(action, index) in fieldActions.filter((a) => a.quick)"
+                    :key="index"
+                    v-tooltip="action.title"
+                    @click="action.run()"
+                    size="xs"
+                    :icon="action.icon"
+                    :aria-label="action.title"
+                    tabindex="-1"
+                />
+            </ButtonGroup>
         </div>
     </header>
 </template>
 
 <script>
-import { Button, Dropdown, DropdownMenu, DropdownItem } from '@/components/ui';
+import { Button, ButtonGroup, Dropdown, DropdownMenu, DropdownItem } from '@/components/ui';
 
 export default {
     components: {
         Button,
+        ButtonGroup,
         Dropdown,
         DropdownMenu,
         DropdownItem,
