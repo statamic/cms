@@ -41,7 +41,7 @@ class Group extends Fieldtype
                         'width' => 50,
                     ],
                     'collapsed' => [
-                        'display' => __('Collapsed by default?'),
+                        'display' => __('Collapsed by default'),
                         'instructions' => __('statamic::fieldtypes.group.config.collapsed'),
                         'type' => 'toggle',
                         'default' => false,
