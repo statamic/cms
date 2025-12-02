@@ -37,7 +37,7 @@ class Group extends Fieldtype
                         'display' => __('Collapsible'),
                         'instructions' => __('statamic::fieldtypes.group.config.collapsible'),
                         'type' => 'toggle',
-                        'default' => true,
+                        'default' => false,
                         'width' => 50,
                     ],
                     'collapsed' => [
