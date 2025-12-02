@@ -13,7 +13,7 @@
         <template #trigger>
             <div
                 class="flex justify-center relative group py-3"
-                :class="isFirst && !instructionsAbove ? '-mt-5' : (isFirst ? '-mt-3' : '')"
+                :class="isFirst && (!instructionsAbove || !instructions) ? '-mt-5.5' : (isFirst ? '-mt-3' : '')"
             >
                 <div
                     v-if="showConnector && !isFirst"
@@ -21,7 +21,7 @@
                 />
                 <button
                     class="absolute inset-0 h-full opacity-0 group-hover:opacity-100 transition-opacity delay-10 duration-250 cursor-pointer"
-                    :class="isFirst ? 'w-[20%] left-[40%]' : 'w-full'"
+                    :class="instructionsAbove && instructions ? 'w-full' : (isFirst) ? 'w-[30%] left-[35%]' : 'w-full'"
                 >
                     <div class="h-full flex flex-col justify-center">
                         <div class="rounded-full bg-[linear-gradient(90deg,theme(colors.gray.100)_0%,theme(colors.gray.200)_50%,theme(colors.gray.100)_100%)] h-2" />
@@ -50,6 +50,7 @@ const props = defineProps({
     variant: { type: String, default: 'button' },
     isFirst: { type: Boolean, default: false },
     instructionsAbove: { type: Boolean, default: false },
+    instructions: { type: String, default: '' },
 });
 
 const label = computed(() => props.label ? __(props.label) : __('Add Block'));
