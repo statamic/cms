@@ -36,7 +36,7 @@ const props = defineProps({
     modelValue: { type: [Object, String, Number], default: null },
     multiple: { type: Boolean, default: false },
     optionLabel: { type: String, default: 'label' },
-    options: { type: Array, default: [] },
+    options: { type: Array, default: () => [] },
     optionValue: { type: String, default: 'value' },
     placeholder: { type: String, default: () => __('Select...') },
     readOnly: { type: Boolean, default: false },
