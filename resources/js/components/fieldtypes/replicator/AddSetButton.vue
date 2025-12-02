@@ -16,8 +16,9 @@
                 :class="{ '-mt-2': isFirst }"
             >
                 <div
-                    v-if="showConnector && !isFirst"
-                    class="absolute group-hover:opacity-0 transition-opacity delay-10 duration-250 inset-y-0 left-3.5 border-l-1 border-gray-400 dark:border-gray-600 border-dashed z-0 dark:bg-gray-850 h-full opacity-100"
+                    v-if="showConnector"
+                    class="absolute group-hover:opacity-0 transition-opacity delay-10 duration-250 inset-y-0 left-3.5 border-l-1 border-gray-400 dark:border-gray-600 border-dashed z-0 dark:bg-gray-850"
+                    :class="isFirst ? 'h-[65%] top-[35%] opacity-50' : 'h-full opacity-100'"
                 />
                 <button
                     class="absolute inset-0 h-full w-full opacity-0 group-hover:opacity-100 transition-opacity delay-10 duration-250 cursor-pointer"
