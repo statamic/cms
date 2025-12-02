@@ -9,6 +9,7 @@ use Statamic\Assets\AssetFolder;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\CP\Column;
 use Statamic\Exceptions\AuthorizationException;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Scope;
 use Statamic\Facades\User;
@@ -54,7 +55,7 @@ class BrowserController extends CpController
 
         $asset = Asset::find("{$containerHandle}::{$path}");
 
-        abort_unless($container && $asset, 404);
+        throw_unless($container && $asset, new NotFoundHttpException);
 
         $this->authorize('view', $asset);
 
@@ -230,9 +231,25 @@ class BrowserController extends CpController
             ->defaultVisibility(true)
             ->sortable(true);
 
+        $width = Column::make('width')
+            ->label(__('Width'))
+            ->value('width')
+            ->visible(true)
+            ->defaultVisibility(false)
+            ->sortable(true);
+
+        $height = Column::make('height')
+            ->label(__('Height'))
+            ->value('height')
+            ->visible(true)
+            ->defaultVisibility(false)
+            ->sortable(true);
+
         $columns->put('basename', $basename);
         $columns->put('size', $size);
         $columns->put('last_modified', $lastModified);
+        $columns->put('width', $width);
+        $columns->put('height', $height);
 
         $columns->setPreferred("assets.{$container->handle()}.columns");
 

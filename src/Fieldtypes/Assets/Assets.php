@@ -245,9 +245,25 @@ class Assets extends Fieldtype
             ->defaultVisibility(true)
             ->sortable(true);
 
+        $width = Column::make('width')
+            ->label(__('Width'))
+            ->value('width')
+            ->visible(true)
+            ->defaultVisibility(false)
+            ->sortable(true);
+
+        $height = Column::make('height')
+            ->label(__('Height'))
+            ->value('height')
+            ->visible(true)
+            ->defaultVisibility(false)
+            ->sortable(true);
+
         $columns->put('basename', $basename);
         $columns->put('size', $size);
         $columns->put('last_modified', $lastModified);
+        $columns->put('width', $width);
+        $columns->put('height', $height);
 
         $columns->setPreferred("assets.{$this->container()->handle()}.columns");
 
