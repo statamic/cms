@@ -42,10 +42,6 @@ const preview: Preview = {
             },
         },
 
-        a11y: {
-            test: "todo",
-        },
-
         backgrounds: {
             disabled: true
         },
