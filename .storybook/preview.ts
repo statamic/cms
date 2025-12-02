@@ -43,7 +43,7 @@ const preview: Preview = {
         },
 
         backgrounds: {
-            disabled: true
+            disable: true
         },
 
         options: {
