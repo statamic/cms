@@ -38,3 +38,9 @@
 .sbdocs.sbdocs-wrapper {
     padding: 2rem 4rem;
 }
+
+.dark,
+.dark body,
+.dark .sbdocs-preview {
+    background: var(--theme-color-content-bg);
+}

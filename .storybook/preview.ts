@@ -52,6 +52,38 @@ const preview: Preview = {
             },
         },
     },
+
+    globalTypes: {
+        theme: {
+            description: 'Theme selector',
+            defaultValue: 'light',
+            toolbar: {
+                title: 'Theme',
+                icon: 'circlehollow',
+                items: [
+                    { value: 'light', icon: 'sun', title: 'Light' },
+                    { value: 'dark', icon: 'moon', title: 'Dark' },
+                ],
+                dynamicTitle: true,
+            },
+        },
+    },
+
+    decorators: [
+        (story, context) => {
+            const theme = context.globals.theme || 'light';
+
+            if (typeof document !== 'undefined') {
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            }
+
+            return story();
+        },
+    ],
 };
 
 export default preview;
