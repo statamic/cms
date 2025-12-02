@@ -60,8 +60,6 @@
                                             :index="index"
                                             :enabled="canAddSet"
                                             :is-first="index === 0"
-                                            :instructions-above="instructionsAbove"
-                                            :instructions="config.instructions"
                                             @added="addSet"
                                         />
                                     </template>
@@ -77,8 +75,6 @@
                             :index="value.length"
                             :label="config.button_label"
                             :is-first="value.length === 0"
-                            :instructions-above="instructionsAbove"
-                            :instructions="config.instructions"
                             @added="addSet"
                         />
                     </section>

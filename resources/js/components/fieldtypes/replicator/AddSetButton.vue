@@ -13,15 +13,14 @@
         <template #trigger>
             <div
                 class="flex justify-center relative group py-3"
-                :class="isFirst && (!instructionsAbove || !instructions) ? '-mt-5.5' : (isFirst ? '-mt-3' : '')"
+                :class="{ '-mt-2': isFirst }"
             >
                 <div
                     v-if="showConnector && !isFirst"
                     class="absolute group-hover:opacity-0 transition-opacity delay-10 duration-250 inset-y-0 left-3.5 border-l-1 border-gray-400 dark:border-gray-600 border-dashed z-0 dark:bg-gray-850 h-full opacity-100"
                 />
                 <button
-                    class="absolute inset-0 h-full opacity-0 group-hover:opacity-100 transition-opacity delay-10 duration-250 cursor-pointer"
-                    :class="instructionsAbove && instructions ? 'w-full' : (isFirst) ? 'w-[30%] left-[35%]' : 'w-full'"
+                    class="absolute inset-0 h-full w-full opacity-0 group-hover:opacity-100 transition-opacity delay-10 duration-250 cursor-pointer"
                 >
                     <div class="h-full flex flex-col justify-center">
                         <div class="rounded-full bg-[linear-gradient(90deg,theme(colors.gray.100)_0%,theme(colors.gray.200)_50%,theme(colors.gray.100)_100%)] h-2" />
@@ -49,8 +48,6 @@ const props = defineProps({
     showConnector: { type: Boolean, default: true },
     variant: { type: String, default: 'button' },
     isFirst: { type: Boolean, default: false },
-    instructionsAbove: { type: Boolean, default: false },
-    instructions: { type: String, default: '' },
 });
 
 const label = computed(() => props.label ? __(props.label) : __('Add Block'));
