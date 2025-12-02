@@ -17,6 +17,7 @@ router.on('before', (event) => {
 });
 
 setup(async (app) => {
+  window.__ = translate;
   app.config.globalProperties.__ = translate;
   app.config.globalProperties.$date = new DateFormatter;
   await registerUiComponents(app);
