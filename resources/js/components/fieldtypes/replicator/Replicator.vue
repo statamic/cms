@@ -158,7 +158,7 @@ export default {
                     title: __('Expand All Sets'),
                     icon: 'expand',
                     quick: true,
-                    visible: () => this.collapsed.length !== 0,
+                    visible: () => this.collapsed.length !== 0 && this.config.collapse !== 'accordion',
                     visibleWhenReadOnly: true,
                     run: this.expandAll,
                 },
