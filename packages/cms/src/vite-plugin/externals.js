@@ -28,26 +28,6 @@ export default function() {
             return null;
         },
 
-        config(config, { command }) {
-            // Ensure rollupOptions exists
-            config.build = config.build || {};
-            config.build.rollupOptions = config.build.rollupOptions || {};
-
-            // Add Vue as external
-            config.build.rollupOptions.external = [
-                ...(config.build.rollupOptions.external ?? []),
-                'vue'
-            ];
-
-            config.build.rollupOptions.output = config.build.rollupOptions.output || {};
-            config.build.rollupOptions.output.globals = {
-                ...(config.build.rollupOptions.output.globals ?? {}),
-                'vue': 'window.Vue'
-            };
-
-            return config;
-        },
-
         configResolved(resolvedConfig) {
             resolvedConfig.build.rollupOptions.plugins = resolvedConfig.build.rollupOptions.plugins || [];
             resolvedConfig.build.rollupOptions.plugins.push({
