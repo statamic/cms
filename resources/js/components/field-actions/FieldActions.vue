@@ -15,7 +15,7 @@
                 />
             </DropdownMenu>
         </Dropdown>
-        <ButtonGroup>
+        <ButtonGroup class="mr-0.75 -mt-0.5">
             <Button
                 v-for="(action, index) in actions.filter((a) => a.quick)"
                 :key="index"
