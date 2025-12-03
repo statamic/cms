@@ -166,7 +166,7 @@ export default {
                     title: __('Collapse All Sets'),
                     icon: 'collapse',
                     quick: true,
-                    visible: () => this.collapsed.length === 0,
+                    visible: () => this.collapsed.length !== this.value.length,
                     visibleWhenReadOnly: true,
                     run: this.collapseAll,
                 },
