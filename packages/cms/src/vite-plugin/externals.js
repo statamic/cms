@@ -58,18 +58,6 @@ export default function() {
             config.resolve = config.resolve || {};
             config.resolve.alias = config.resolve.alias || {};
 
-            if (!Array.isArray(config.resolve.alias)) {
-                config.resolve.alias = {
-                    ...config.resolve.alias,
-                    'vue': VIRTUAL_MODULE_ID
-                };
-            } else {
-                config.resolve.alias.push({
-                    find: 'vue',
-                    replacement: VIRTUAL_MODULE_ID
-                });
-            }
-
             if (command === 'build') {
                 config.build = config.build || {};
                 config.build.rollupOptions = config.build.rollupOptions || {};
