@@ -1,0 +1,23 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as SplitterStories from '../Splitter.stories';
+
+<Meta of={SplitterStories} />
+
+# Splitter
+Splitter is a component that allows you to split content into multiple, resizable panes.
+<Canvas of={SplitterStories._DocsIntro} sourceState={'shown'} />
+
+## Default Size
+You can set the default size of a panel by using the `default-size` prop.
+<Canvas of={SplitterStories._DefaultSize} sourceState={'shown'} />
+
+## Collapsible
+Splitters can be collapsible to reduce the amount of space they take up, or to hide them completely. Use the `collapsible` prop to make the splitter collapsible and control the minimum size of the panel with the `min-size` prop.
+<Canvas of={SplitterStories._Collapsible} sourceState={'shown'} />
+
+## Nested Splitters
+Splitters can be nested to create more complex layouts.
+<Canvas of={SplitterStories._Nested} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={SplitterStories} />

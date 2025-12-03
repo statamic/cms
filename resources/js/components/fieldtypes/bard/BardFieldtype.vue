@@ -341,7 +341,7 @@ export default {
                 },
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => (vm.fullScreenMode ? 'collapse-all' : 'expand-all'),
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'fullscreen-close' : 'fullscreen-open'),
                     quick: true,
                     run: this.toggleFullscreen,
                     visibleWhenReadOnly: true,
@@ -745,7 +745,23 @@ export default {
                     }, 1);
                 },
                 onUpdate: () => {
-                    this.json = clone(this.editor.getJSON().content);
+                    const oldJson = this.json;
+                    const newJson = clone(this.editor.getJSON().content);
+
+                    const countNodes = (nodes) => {
+                        if (!nodes || !Array.isArray(nodes)) return 0;
+                        let count = nodes.length;
+                        nodes.forEach(node => {
+                            if (node.content) {
+                                count += countNodes(node.content);
+                            }
+                        });
+                        return count;
+                    };
+
+                    if (countNodes(oldJson) !== countNodes(newJson)) this.debounceNextUpdate = false;
+
+                    this.json = newJson;
                     this.html = this.editor.getHTML();
                 },
                 onCreate: ({ editor }) => {
