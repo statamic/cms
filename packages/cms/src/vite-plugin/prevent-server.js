@@ -5,6 +5,7 @@ export default function() {
         name: 'statamic-prevent-server',
 
         config(config, { command }) {
+            return;
             if (command !== 'serve' || process.env.STATAMIC_FORCE_SERVE) return;
 
             console.log('\x1b[33m[Statamic] Vite dev server current not supported. Automatically running "vite build --watch" instead...\x1b[0m');
