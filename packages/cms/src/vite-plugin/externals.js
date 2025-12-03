@@ -1,6 +1,9 @@
+import * as Vue from 'vue';
+
 export default function() {
     const VIRTUAL_MODULE_ID = 'vue';
     const RESOLVED_VIRTUAL_MODULE_ID = '\0vue-external';
+    const vueExports = Object.keys(Vue).filter(key => key !== 'default');
 
     return {
         name: 'statamic-externals',
@@ -15,40 +18,11 @@ export default function() {
 
         load(id) {
             if (id === RESOLVED_VIRTUAL_MODULE_ID) {
+                const exportsList = vueExports.join(', ');
                 return `
                     const Vue = window.Vue;
                     export default Vue;
-                    export const {
-                        createApp,
-                        ref,
-                        reactive,
-                        computed,
-                        watch,
-                        watchEffect,
-                        onMounted,
-                        onUnmounted,
-                        onBeforeMount,
-                        onBeforeUnmount,
-                        onUpdated,
-                        onBeforeUpdate,
-                        nextTick,
-                        defineComponent,
-                        defineAsyncComponent,
-                        h,
-                        toRefs,
-                        toRef,
-                        unref,
-                        isRef,
-                        resolveComponent,
-                        createElementBlock,
-                        openBlock,
-                        createTextVNode,
-                        createVNode,
-                        toDisplayString,
-                        withCtx,
-                    } = Vue;
-
-                    export const __VUE_HMR_RUNTIME__ = window.__VUE_HMR_RUNTIME__;
+                    export const { ${exportsList} } = Vue;
                 `;
             }
             return null;
