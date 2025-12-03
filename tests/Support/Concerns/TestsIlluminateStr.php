@@ -1370,6 +1370,12 @@ trait TestsIlluminateStr
 
     public function testWordCount()
     {
+        // Laravel Herd has an issue with locale handling on Mac.
+        // See: https://github.com/beyondcode/herd-community/issues/1282
+        if (str_word_count('мама') !== 0) {
+            $this->markTestSkipped();
+        }
+
         $this->assertEquals(2, Str::wordCount('Hello, world!'));
         $this->assertEquals(10, Str::wordCount('Hi, this is my first contribution to the Laravel framework.'));
 

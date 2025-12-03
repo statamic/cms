@@ -21,7 +21,7 @@ import Config from './components/Config.js';
 import Preferences from './components/Preference.js';
 import Toasts from './components/Toasts.js';
 import Portals from './components/portals/Portals.js';
-import Stacks from './components/stacks/Stacks.js';
+import Stacks from './components/ui/Stack/Stacks.js';
 import Inertia from './components/Inertia';
 
 export const keys = new Keys();

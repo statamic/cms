@@ -64,6 +64,7 @@ export { default as SplitterResizeHandle } from './Splitter/ResizeHandle.vue';
 export { default as Subheading } from './Subheading.vue';
 export { default as Switch } from './Switch.vue';
 export { default as TabContent } from './Tabs/Content.vue';
+export { default as Stack } from './Stack/Stack.vue';
 export { default as Table } from './Table/Table.vue';
 export { default as TableCell } from './Table/Cell.vue';
 export { default as TableColumn } from './Table/Column.vue';
@@ -83,8 +84,8 @@ export { default as CreateForm } from "./CreateForm.vue";
 export { default as LivePreview } from "./LivePreview/LivePreview.vue";
 export { default as LivePreviewPopout } from "./LivePreview/Popout.vue";
 export { default as PublishComponents } from "./Publish/Components.vue";
+export { default as PublishContainer } from "./Publish/Container.vue";
 export {
-    default as PublishContainer,
     containerContextKey as publishContextKey,
     injectContainerContext as injectPublishContext
 } from "./Publish/Container.vue";
