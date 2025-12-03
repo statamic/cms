@@ -3,7 +3,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "rm -rf resources/dist/build && vite",
+    "dev": "rm -rf resources/dist/build && rm -rf resources/dist-dev/build && vite",
     "build": "vite build",
     "build-dev": "vite build --mode development",
     "svgo": "svgo -f ./resources/svg/  -r",
