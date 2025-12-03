@@ -7,6 +7,7 @@ import {
 } from '@ui';
 import { injectListingContext } from '../Listing/Listing.vue';
 import ItemActions from '@/components/actions/ItemActions.vue';
+import { hasSlotContent } from '@/composables/has-slot-content';
 import { computed, ref, watch } from 'vue';
 
 const props = defineProps({
@@ -19,10 +20,12 @@ const props = defineProps({
 const { actionUrl, actionContext, refresh, reorderable, allowActionsWhileReordering } = injectListingContext();
 const busy = ref(false);
 
+const hasPrependedActionsContent = hasSlotContent('prepended-actions', computed(() => ({ row: props.row })));
+
 const shouldShowActions = computed(() => {
     if (reorderable.value && !allowActionsWhileReordering.value) return false;
 
-    return true;
+    return hasPrependedActionsContent.value || props.row.actions?.length > 0;
 });
 
 watch(busy, (busy) => Statamic.$progress.loading('action', busy));
