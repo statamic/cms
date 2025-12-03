@@ -40,6 +40,7 @@
                                 :is-fullscreen="true"
                                 @toggle-dark-mode="toggleDarkMode"
                                 @button-click="handleButtonClick"
+                                :class="fullScreenMode ? 'sticky z-(--z-index-global-header) -top-2' : 'mb-2 [&~*]:-mt-2'"
                             />
                         </publish-field-fullscreen-header>
 
@@ -95,7 +96,7 @@
                                 <!-- Hidden input for label association -->
                                 <input v-if="id" :id="id" type="text" class="sr-only" @focus="focusCodeMirror" tabindex="-1" />
 
-                                <footer class="flex items-center justify-between bg-gray-50 dark:bg-gray-900 rounded-b-[calc(var(--radius-lg)-1px)] border-t border-gray-300 dark:border-white/10 p-1 text-sm w-full" :class="{ 'absolute inset-x-0 bottom-0 rounded-': fullScreenMode }">
+                                <footer class="flex items-center justify-between bg-gray-50 dark:bg-gray-900 rounded-b-[calc(var(--radius-lg)-1px)] border-t border-gray-300 dark:border-white/10 p-1 text-sm w-full" :class="{ 'absolute inset-x-0 bottom-0 rounded-none z-(--z-index-global-header)': fullScreenMode }">
                                     <div class="markdown-cheatsheet-helper">
                                         <Button
                                             icon="markdown"

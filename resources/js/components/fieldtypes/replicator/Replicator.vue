@@ -7,7 +7,7 @@
             <div :class="{ wrapperClasses: fullScreenMode }">
                 <div
                     class="replicator-fieldtype-container"
-                    :class="{ 'replicator-fullscreen fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-200 dark:bg-gray-800': fullScreenMode }"
+                    :class="{ 'replicator-fullscreen fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-100 dark:bg-gray-800': fullScreenMode }"
                 >
                     <publish-field-fullscreen-header
                         v-if="fullScreenMode"
@@ -16,7 +16,7 @@
                         @close="toggleFullscreen"
                     />
 
-                    <section :class="{ 'dark:bg-gray-850 mt-14 bg-gray-200 p-4': fullScreenMode }">
+                    <section :class="{ 'mt-8 p-4': fullScreenMode }">
                         <sortable-list
                             :model-value="value"
                             :vertical="true"
