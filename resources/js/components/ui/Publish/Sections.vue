@@ -66,12 +66,11 @@ function toggleSection(id) {
                 <Button
                     @click="toggleSection(i)"
                     v-if="section.collapsible"
-                    class="static! [&_svg]:size-5 rounded-xl after:content-[''] after:absolute after:inset-0"
-                    icon="chevron-down"
+                    class="static! [&_svg]:size-4.5 rounded-xl after:content-[''] after:absolute after:inset-0"
+                    :icon="section.collapsed ? 'expand' : 'collapse'"
                     size="sm"
                     variant="ghost"
                     :aria-label="__('Toggle section visibility')"
-                    :class="section.collapsed ? '[&_svg]:rotate-270' : '[&_svg]:rotate-0'"
                 />
             </PanelHeader>
             <div

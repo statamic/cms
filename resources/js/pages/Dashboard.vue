@@ -51,7 +51,7 @@ function tailwindWidthClass(width) {
         <div class="widgets @container/widgets flex flex-wrap gap-y-6 -mx-2 sm:-mx-3">
             <div
                 v-for="widget in widgets"
-                class="min-h-54 px-3 starting-style-transition starting-style-transition--siblings"
+                class="px-3 starting-style-transition starting-style-transition--siblings"
                 :class="classes(widget)"
             >
                 <component v-if="widget.component" :is="widget.component.name" v-bind="widget.component.props" />
