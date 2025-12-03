@@ -88,7 +88,7 @@ const previewText = computed(() => {
             return config.replicator_preview === undefined ? props.showFieldPreviews : config.replicator_preview;
         })
         .map(([handle, value]) => value)
-        .filter((value) => !['null', '[]', '{}', ''].includes(JSON.stringify(value)))
+        .filter((value) => !['null', '[]', '{}', '', undefined].includes(JSON.stringify(value)))
         .map((value) => {
             if (value instanceof PreviewHtml) return value.html;
 
