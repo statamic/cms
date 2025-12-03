@@ -79,7 +79,7 @@ export default defineConfig(({ mode, command }) => {
         },
         define: {
             __VUE_PROD_DEVTOOLS__: isProdDevBuild,
-            'process.env.NODE_ENV': isProdDevBuild ? '"development"' : '"production"',
+            ...(isRunningBuild && { 'process.env.NODE_ENV': isProdDevBuild ? '"development"' : '"production"' }),
         }
     };
 });
