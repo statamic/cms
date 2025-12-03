@@ -29,9 +29,11 @@ export default function() {
         },
 
         config(config, { command }) {
+            // Ensure rollupOptions exists
             config.build = config.build || {};
             config.build.rollupOptions = config.build.rollupOptions || {};
 
+            // Add Vue as external
             config.build.rollupOptions.external = [
                 ...(config.build.rollupOptions.external ?? []),
                 'vue'
@@ -62,7 +64,7 @@ export default function() {
                         /import\s+(.+?)\s+from\s+['"]vue['"];?/g,
                         'const $1 = window.Vue;'
                     );
-                },
+                }
             });
         }
     };
