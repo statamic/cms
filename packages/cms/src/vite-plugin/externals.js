@@ -1,7 +1,6 @@
 import * as Vue from 'vue';
 
 export default function() {
-    const VIRTUAL_MODULE_ID = 'vue';
     const RESOLVED_VIRTUAL_MODULE_ID = '\0vue-external';
     const vueExports = Object.keys(Vue).filter(key => key !== 'default');
 
