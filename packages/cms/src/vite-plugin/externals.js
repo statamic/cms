@@ -52,25 +52,21 @@ export default function() {
         },
 
         configResolved(resolvedConfig) {
-            if (resolvedConfig.command === 'build') {
-                resolvedConfig.build.rollupOptions.plugins = resolvedConfig.build.rollupOptions.plugins || [];
-                resolvedConfig.build.rollupOptions.plugins.push({
-                    name: 'statamic-externals-transform',
-                    renderChunk(code) {
-                        code = code.replace(
-                            /import\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*,\s*(\{[^}]+\})\s+from\s+['"]vue['"];?/g,
-                            'const $1 = window.Vue;\nconst $2 = window.Vue;'
-                        );
-
-                        code = code.replace(
-                            /import\s+(.+?)\s+from\s+['"]vue['"];?/g,
-                            'const $1 = window.Vue;'
-                        );
-
-                        return code;
-                    }
-                });
-            }
+            resolvedConfig.build.rollupOptions.plugins = resolvedConfig.build.rollupOptions.plugins || [];
+            resolvedConfig.build.rollupOptions.plugins.push({
+                name: 'statamic-externals-transform',
+                renderChunk(code) {
+                    code = code.replace(
+                        /import\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*,\s*(\{[^}]+\})\s+from\s+['"]vue['"];?/g,
+                        'const $1 = window.Vue;\nconst $2 = window.Vue;',
+                    );
+                    code = code.replace(
+                        /import\s+(.+?)\s+from\s+['"]vue['"];?/g,
+                        'const $1 = window.Vue;',
+                    );
+                    return code;
+                },
+            });
         }
     };
 }
