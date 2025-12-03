@@ -54,17 +54,19 @@ export default function() {
         configResolved(resolvedConfig) {
             resolvedConfig.build.rollupOptions.plugins = resolvedConfig.build.rollupOptions.plugins || [];
             resolvedConfig.build.rollupOptions.plugins.push({
-                name: 'statamic-externals-transform',
-                renderChunk(code) {
+                name: 'statamic-externals',
+                renderChunk(code, chunk) {
+                    // Handle mixed imports: import Default, { named } from 'vue'
                     code = code.replace(
                         /import\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*,\s*(\{[^}]+\})\s+from\s+['"]vue['"];?/g,
-                        'const $1 = window.Vue;\nconst $2 = window.Vue;',
+                        'const $1 = window.Vue;\nconst $2 = window.Vue;'
                     );
-                    code = code.replace(
+
+                    // Handle remaining imports (default or named only)
+                    return code.replace(
                         /import\s+(.+?)\s+from\s+['"]vue['"];?/g,
-                        'const $1 = window.Vue;',
+                        'const $1 = window.Vue;'
                     );
-                    return code;
                 },
             });
         }
