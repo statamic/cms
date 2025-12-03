@@ -1,5 +1,29 @@
 # Release Notes
 
+## 5.70.0 (2025-12-03)
+
+### What's new
+- Pass original upload filename into `AssetUploaded` event [#11423](https://github.com/statamic/cms/issues/11423) by @daun
+- Allow statamic URLs to use fragments or query strings [#13085](https://github.com/statamic/cms/issues/13085) by @miicah
+- Add Glide Asset Cleared Event [#13004](https://github.com/statamic/cms/issues/13004) by @infabo
+
+### What's fixed
+- Performance Optimizations for Stache and Query Operations [#12894](https://github.com/statamic/cms/issues/12894) by @hastinbe
+- Avoid hardcoded nocache url in js [#13199](https://github.com/statamic/cms/issues/13199) by @JorisOrangeStudio
+- Fix nocache tag not replacing element correctly [#13177](https://github.com/statamic/cms/issues/13177) by @duncanmcclean
+- Date modifiers shouldn't return anything when value is empty [#13178](https://github.com/statamic/cms/issues/13178) by @duncanmcclean
+- Terms fieldtype: Only show "Allow Creating" option when using stack selector [#13151](https://github.com/statamic/cms/issues/13151) by @duncanmcclean
+- Ensure updated_at and updated_by is not null in TracksLastModified [#13099](https://github.com/statamic/cms/issues/13099) by @simonerd
+- Correct namespace in `FakesQueriesTest` [#13029](https://github.com/statamic/cms/issues/13029) by @duncanmcclean
+- Require url in nocache request [#12975](https://github.com/statamic/cms/issues/12975) by @Jade-GG
+- Fix HTML entities in currency translations [#12982](https://github.com/statamic/cms/issues/12982) by @duncanmcclean
+- Fix failing tests due to lowercase `utf-8` charset [#13213](https://github.com/statamic/cms/issues/13213) by @duncanmcclean
+- French translations [#13136](https://github.com/statamic/cms/issues/13136) by @ebeauchamps
+- Bump lowest composer constraints [#13037](https://github.com/statamic/cms/issues/13037) by @jasonvarga
+- Bump js-yaml from 3.14.1 to 3.14.2 [#13097](https://github.com/statamic/cms/issues/13097) by @dependabot
+
+
+
 ## 5.69.0 (2025-11-06)
 
 ### What's new
