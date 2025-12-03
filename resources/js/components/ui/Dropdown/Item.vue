@@ -27,7 +27,7 @@ const classes = cva({
     variants: {
         variant: {
             default: 'text-gray-700 dark:text-gray-300',
-            destructive: 'text-red-600 dark:text-red-500',
+            destructive: 'text-danger! hover:not-data-disabled:bg-danger-bg!',
         },
     },
 })({ variant: props.variant });
@@ -37,7 +37,7 @@ const iconClasses = cva({
         base: 'size-3.5!',
         variant: {
             default: 'text-gray-500',
-            destructive: 'text-red-500!',
+            destructive: 'text-danger!',
         },
     },
 })({ variant: props.variant });

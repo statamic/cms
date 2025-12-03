@@ -3,7 +3,7 @@
     --color-primary-border: color-mix(in oklch, var(--color-primary) 100%, black 20%);
     --color-primary-hover: color-mix(in oklch, var(--color-primary) 100%, black 30%);
     --color-primary-gap: color-mix(in oklch, var(--color-primary) 100%, black 50%);
-    --color-success: var(--theme-color-success);
+
     --color-gray-50: var(--theme-color-gray-50);
     --color-gray-100: var(--theme-color-gray-100);
     --color-gray-150: var(--theme-color-gray-150);
@@ -17,7 +17,7 @@
     --color-gray-850: var(--theme-color-gray-850);
     --color-gray-900: var(--theme-color-gray-900);
     --color-gray-925: var(--theme-color-gray-925);
-    --color-gray-950: var(--theme-color-zinc-950);
+    --color-gray-950: var(--theme-color-gray-950);
     --color-volt: oklch(93.86% 0.2018 122.24);
 
     --color-body-bg: var(--theme-color-body-bg);
@@ -29,6 +29,11 @@
     --color-ui-accent-bg: var(--theme-color-ui-accent-bg);
     --color-ui-accent-text: var(--theme-color-ui-accent-text);
     --color-switch-bg: var(--theme-color-switch-bg);
+
+    --color-danger-bg: var(--theme-color-danger-bg);
+    --color-success-bg: var(--theme-color-success-bg);
+    --color-success: var(--theme-color-success);
+    --color-danger: var(--theme-color-danger);
 
     /* Temp */
     --color-dark-100: #dfe1e5;
@@ -83,11 +88,17 @@
     --color-dark-gray: #404040;
 }
 
-.dark {
-    @theme inline {
-        --color-primary-hover: color-mix(in oklch, var(--color-primary) 100%, white 30%);
-        --color-success: var(--color-green-500);
-        --color-gray-950: hsl(240deg 7% 8%);
+:root {
+    --animation-timing-function-fast-out-slow-in: cubic-bezier(.4,0,.2,1);
+
+    /* Custom value because gray-100 is too light and gray-200 is too dark, e.g. Bard active buttons */
+    --color-button-active: hsl(from var(--color-gray-300) h s l / 0.45);
+
+    &.dark, .dark * {
+        --color-button-active: hsl(from var(--color-gray-700) h s l / 0.45);
+        --color-danger: var(--theme-color-danger);
+        /* Make the danger background slightly darker/more subtle in dark mode */
+        --color-danger-bg: oklch(from var(--theme-color-danger-bg) l c h / 0.2);
     }
 }
 
@@ -120,17 +131,6 @@
             transform: rotate(3deg);
         }
     }
-}
-
-:root {
-    --animation-timing-function-fast-out-slow-in: cubic-bezier(.4,0,.2,1);
-
-    /* Custom value because gray-100 is too light and gray-200 is too dark, e.g. Bard active buttons */
-    --color-button-active: hsl(from var(--color-gray-300) h s l / 0.45);
-}
-
-.dark {
-    --color-button-active: hsl(from var(--color-gray-700) h s l / 0.45);
 }
 
 @custom-variant with-contrast (&:where([data-contrast="increased"] *));
