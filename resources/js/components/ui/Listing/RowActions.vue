@@ -25,7 +25,7 @@ const hasPrependedActionsContent = hasSlotContent('prepended-actions', computed(
 const shouldShowActions = computed(() => {
     if (reorderable.value && !allowActionsWhileReordering.value) return false;
 
-    return hasPrependedActionsContent.value;
+    return hasPrependedActionsContent.value || props.row.actions?.length > 0;
 });
 
 watch(busy, (busy) => Statamic.$progress.loading('action', busy));
