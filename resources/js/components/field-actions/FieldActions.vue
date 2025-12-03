@@ -22,6 +22,7 @@
                 @click="action.run()"
                 v-tooltip="action.title"
                 size="2xs"
+                :disabled="action.disabled"
                 :icon-only="true"
                 :aria-label="action.title"
                 tabindex="-1"
