@@ -29,6 +29,14 @@ class CoreUtilities
             ->routes(function ($router) {
                 $router->post('cache/{cache}', [CacheController::class, 'clear'])->name('clear');
                 $router->post('cache/{cache}/warm', [CacheController::class, 'warm'])->name('warm');
+
+                $router->post('clear-all', [CacheController::class, 'clearAll'])->name('clear-all');
+                $router->post('clear-stache', [CacheController::class, 'clearStacheCache'])->name('clear-stache');
+                $router->post('warm-stache', [CacheController::class, 'warmStacheCache'])->name('warm-stache');
+                $router->post('clear-static', [CacheController::class, 'clearStaticCache'])->name('clear-static');
+                $router->post('invalidate-static-pages', [CacheController::class, 'invalidateStaticUrls'])->name('invalidate-static-pages');
+                $router->post('clear-application-cache', [CacheController::class, 'clearApplicationCache'])->name('clear-application-cache');
+                $router->post('clear-image-cache', [CacheController::class, 'clearImageCache'])->name('clear-image-cache');
             });
 
         Utility::register('phpinfo')

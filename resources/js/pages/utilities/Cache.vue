@@ -3,7 +3,7 @@ import { router } from '@inertiajs/vue3';
 import Head from '@/pages/layout/Head.vue';
 import {
 	Header, Button, Panel, PanelHeader, Heading, Card, Description, Badge, DocsCallout, CommandPaletteItem,
-	Dropdown, DropdownMenu, DropdownItem, Textarea, Modal, ModalClose
+	Dropdown, DropdownMenu, DropdownItem, Textarea, ErrorMessage, Modal, ModalClose
 } from '@ui';
 import {ref} from "vue";
 
@@ -16,13 +16,10 @@ const props = defineProps([
     'clearStacheUrl',
     'warmStacheUrl',
     'clearStaticUrl',
+	'invalidatePagesUrl',
     'clearApplicationUrl',
     'clearImageUrl',
 ]);
-
-const staticUrls = ref(null);
-const staticUrlsModal = ref(false);
-const isInvalidatingStaticCache = ref(false);
 
 function clearAll() {
     router.post(props.clearAllUrl);
@@ -36,22 +33,8 @@ function warmStache() {
     router.post(props.warmStacheUrl);
 }
 
-function invalidateStatic() {
-	isInvalidatingStaticCache.value = true;
-
-    router.post(
-		props.clearStaticUrl,
-	    {
-			urls: staticUrls.value?.split('\n'),
-	    },
-	    {
-			onSuccess: () => {
-				staticUrls.value = null;
-				staticUrlsModal.value = false;
-			},
-		    onFinish: () => isInvalidatingStaticCache.value = false,
-        },
-	);
+function clearStatic() {
+	router.post(props.clearStaticUrl);
 }
 
 function clearApplication() {
@@ -60,6 +43,31 @@ function clearApplication() {
 
 function clearImage() {
     router.post(props.clearImageUrl);
+}
+
+const staticUrls = ref(null);
+const invalidateStaticUrlsModal = ref(false);
+const isInvalidatingStaticUrls = ref(false);
+const invalidateStaticUrlsError = ref(null);
+
+function invalidateStaticUrls() {
+	isInvalidatingStaticUrls.value = true;
+	invalidateStaticUrlsError.value = null;
+
+	router.post(
+		props.invalidatePagesUrl, // todo: rename this to match the method?
+		{
+			urls: staticUrls.value?.split('\n'),
+		},
+		{
+			onSuccess: () => {
+				staticUrls.value = null;
+				invalidateStaticUrlsModal.value = false;
+			},
+			onError: (errors) => invalidateStaticUrlsError.value = errors.urls,
+			onFinish: () => isInvalidatingStaticUrls.value = false,
+		},
+	);
 }
 </script>
 
@@ -128,33 +136,34 @@ function clearImage() {
 		                    category="Actions"
 		                    :text="[__('Clear'), __('Static Page Cache')]"
 		                    icon="live-preview"
-		                    :action="invalidateStatic"
+		                    :action="invalidateStaticUrls"
 	                    >
 		                    <Dropdown align="end">
 			                    <template #trigger>
 			                        <Button :text="__('Invalidate')" size="sm" icon-append="chevron-down" />
 			                    </template>
 			                    <DropdownMenu>
-				                    <DropdownItem :text="__('Everything')" icon="layers-stacks" @click="invalidateStatic" />
-				                    <DropdownItem :text="__('Specific URLs')" icon="link" @click="staticUrlsModal = true" />
+				                    <DropdownItem :text="__('Everything')" icon="layers-stacks" @click="clearStatic" />
+				                    <DropdownItem :text="__('Specific URLs')" icon="link" @click="invalidateStaticUrlsModal = true" />
 			                    </DropdownMenu>
 		                    </Dropdown>
 	                    </CommandPaletteItem>
 
-	                    <Modal :title="__('Invalidate Static Cache')" v-model:open="staticUrlsModal">
+	                    <Modal :title="__('Invalidate Static Cache')" v-model:open="invalidateStaticUrlsModal">
 		                    <p>{{ __('Specify the URLs you want to invalidate. One line per URL.') }}</p>
-		                    <Textarea class="font-mono" v-model="staticUrls" :disabled="isInvalidatingStaticCache" />
+		                    <Textarea class="font-mono" v-model="staticUrls" :disabled="isInvalidatingStaticUrls" />
+		                    <ErrorMessage v-if="invalidateStaticUrlsError" :text="invalidateStaticUrlsError" class="mt-2" />
 
 		                    <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
 			                    <ModalClose asChild>
-				                    <Button variant="ghost" :disabled="isInvalidatingStaticCache" :text="__('Cancel')" />
+				                    <Button variant="ghost" :disabled="isInvalidatingStaticUrls" :text="__('Cancel')" />
 			                    </ModalClose>
 			                    <Button
 				                    type="submit"
 				                    variant="primary"
-				                    :disabled="isInvalidatingStaticCache"
+				                    :disabled="isInvalidatingStaticUrls"
 				                    :text="__('Invalidate URLs')"
-				                    @click="invalidateStatic"
+				                    @click="invalidateStaticUrls"
 			                    />
 		                    </div>
 	                    </Modal>
