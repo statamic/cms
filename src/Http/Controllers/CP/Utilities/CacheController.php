@@ -89,10 +89,10 @@ class CacheController extends CpController
 
     protected function clearAllCache(Request $request)
     {
-        $this->clearStacheCache();
-        $this->clearStaticCache();
-        $this->clearApplicationCache();
-        $this->clearImageCache();
+        $this->clearStacheCache($request);
+        $this->clearStaticCache($request);
+        $this->clearApplicationCache($request);
+        $this->clearImageCache($request);
 
         return back()->withSuccess(__('All caches cleared.'));
     }
