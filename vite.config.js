@@ -79,12 +79,7 @@ export default defineConfig(({ mode, command }) => {
         },
         define: {
             __VUE_PROD_DEVTOOLS__: isProdDevBuild,
-            // These are important for HMR in prod dev builds
-            __VUE_OPTIONS_API__: true,
-            __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: isProdDevBuild,
-            // This is the key one - tells Vue to include HMR runtime
             'process.env.NODE_ENV': isProdDevBuild ? '"development"' : '"production"',
-
         }
     };
 });
