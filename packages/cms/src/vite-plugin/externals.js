@@ -29,24 +29,19 @@ export default function() {
         },
 
         config(config, { command }) {
-            config.resolve = config.resolve || {};
-            config.resolve.alias = config.resolve.alias || {};
+            config.build = config.build || {};
+            config.build.rollupOptions = config.build.rollupOptions || {};
 
-            if (command === 'build') {
-                config.build = config.build || {};
-                config.build.rollupOptions = config.build.rollupOptions || {};
+            config.build.rollupOptions.external = [
+                ...(config.build.rollupOptions.external ?? []),
+                'vue'
+            ];
 
-                config.build.rollupOptions.external = [
-                    ...(config.build.rollupOptions.external ?? []),
-                    'vue'
-                ];
-
-                config.build.rollupOptions.output = config.build.rollupOptions.output || {};
-                config.build.rollupOptions.output.globals = {
-                    ...(config.build.rollupOptions.output.globals ?? {}),
-                    'vue': 'window.Vue'
-                };
-            }
+            config.build.rollupOptions.output = config.build.rollupOptions.output || {};
+            config.build.rollupOptions.output.globals = {
+                ...(config.build.rollupOptions.output.globals ?? {}),
+                'vue': 'window.Vue'
+            };
 
             return config;
         },
