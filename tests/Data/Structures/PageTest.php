@@ -554,7 +554,10 @@ class PageTest extends TestCase
         $page->setId($blogPageEntry->id()); // In reality the tree would set this.
         $this->assertEquals('blog', $page->mountedCollection()->handle());
         $this->assertEquals('pages', $page->collection->handle());
-        $this->assertEquals('pages', $page->collection()->handle());
+
+        // This should be "pages" but cannot be fixed without being a breaking change.
+        // This will change in v6.
+        $this->assertEquals('blog', $page->collection()->handle());
     }
 
     protected function newTree()
