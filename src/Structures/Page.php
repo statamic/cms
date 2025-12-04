@@ -471,9 +471,11 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
         }
     }
 
-    public function collection()
+    public function mountedCollection()
     {
-        return Collection::findByMount($this);
+        return ($entry = $this->entry())
+            ? Collection::findByMount($entry)
+            : null;
     }
 
     public function getProtectionScheme()
