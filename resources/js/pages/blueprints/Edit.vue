@@ -10,10 +10,7 @@ defineProps({
 	canDefineLocalizable: Boolean,
 	resetRoute: String,
 	isResettable: Boolean,
-	isFormBlueprint: {
-		type: Boolean,
-		default: false,
-	},
+	isFormBlueprint: Boolean,
 });
 </script>
 
