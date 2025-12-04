@@ -10,6 +10,7 @@
             '[&>*:last-child:not(:first-child)_[data-ui-group-target]]:rounded-s-none',
             'dark:[&_button]:ring-0',
             'max-lg:[[data-floating-toolbar]_&_button]:rounded-md!',
+            'shadow-ui-sm rounded-lg'
         ]"
         data-ui-button-group
     >
@@ -19,6 +20,8 @@
 
 <style>
     [data-ui-button-group] [data-ui-group-target] {
+
+        @apply shadow-none;
 
         &:not(:first-child):not([data-floating-toolbar] &) {
             border-inline-start: 0;
