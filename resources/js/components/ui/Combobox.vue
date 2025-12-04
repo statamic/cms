@@ -36,7 +36,7 @@ const props = defineProps({
     modelValue: { type: [Object, String, Number], default: null },
     multiple: { type: Boolean, default: false },
     optionLabel: { type: String, default: 'label' },
-    options: { type: Array, default: [] },
+    options: { type: Array, default: () => [] },
     optionValue: { type: String, default: 'value' },
     placeholder: { type: String, default: () => __('Select...') },
     readOnly: { type: Boolean, default: false },
@@ -387,7 +387,7 @@ defineExpose({
                             </button>
                         </div>
 
-                        <div v-if="(clearable && modelValue) || (options.length || ignoreFilter)" class="flex gap-1.5 items-center ms-1.5 -me-2">
+                        <div v-if="(clearable && modelValue) || (options.length || ignoreFilter)" class="flex gap-1.5 items-center ms-1.5 -me-1">
                             <Button v-if="clearable && modelValue" icon="x" variant="ghost" size="xs" round @click="clear" data-ui-combobox-clear-button />
                             <Icon v-if="options.length || ignoreFilter" name="chevron-down" class="text-gray-400 dark:text-white/40 size-4" data-ui-combobox-chevron />
                         </div>

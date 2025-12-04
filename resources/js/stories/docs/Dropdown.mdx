@@ -1,0 +1,29 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as DropdownStories from '../Dropdown.stories';
+
+<Meta of={DropdownStories} />
+
+# Dropdown
+Displays a menu to the user—such as a set of actions or functions—triggered by a button, with full keyboard navigation support.
+
+## Overview
+The dropdown component has a `<template #trigger>` slot to contain the button that will trigger the dropdown.
+<Canvas of={DropdownStories._DocsIntro} sourceState={'shown'} />
+
+## Icons
+<Canvas of={DropdownStories._Icons} sourceState={'shown'} />
+
+## Headers and Footers
+Headers and footers can be added to the dropdown by using the `DropdownHeader` and `DropdownFooter` components.
+<Canvas of={DropdownStories._HeadersFooters} sourceState={'shown'} />
+
+## Destructive Variant
+Items can have a `destructive` variant to indicate the action it performs will delete, destroy, or otherwise remove something from the site.
+<Canvas of={DropdownStories._Destructive} sourceState={'shown'} />
+
+## Disabled Items
+Items can be disabled by using the `disabled` prop.
+<Canvas of={DropdownStories._Disabled} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={DropdownStories} />
