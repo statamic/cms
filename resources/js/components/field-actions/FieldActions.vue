@@ -1,5 +1,5 @@
 <template>
-    <div class="flex relative items-center gap-1 -top-0.5">
+    <div class="flex relative items-center gap-1 -top-1">
         <Dropdown v-if="hasNonQuickActions">
             <template #trigger>
                 <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
