@@ -1,7 +1,7 @@
 <template>
     <template v-if="!hasMultipleSets">
         <Primitive @click="singleButtonClicked">
-            <slot name="trigger" />
+            <slot name="trigger" :is-open="false" />
         </Primitive>
     </template>
 
@@ -15,7 +15,7 @@
         class="xl:max-w-3xl 2xl:max-w-5xl"
     >
         <template #trigger>
-            <slot name="trigger" />
+            <slot name="trigger" :is-open="isOpen" />
         </template>
 
         <template #default>
@@ -83,10 +83,11 @@
         @clicked-away="$emit('clicked-away', $event)"
         @update:open="isOpen = $event"
         class="set-picker select-none w-72"
+        :class="{ 'popover-open': isOpen }"
         inset
     >
         <template #trigger>
-            <slot name="trigger" />
+            <slot name="trigger" :is-open="isOpen" />
         </template>
 
         <template #default>
