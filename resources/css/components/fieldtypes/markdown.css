@@ -93,11 +93,11 @@
     will-change: transform;
 
     .mode-wrap {
-        height: calc(100vh - 88px); /*  sans toolbars */
+        height: calc(100vh - 80px); /*  sans toolbars */
         overflow-y: scroll;
         cursor: text;
         &.mode-preview {
-            height: calc(100vh - 52px); /*  no footer toolbar */
+            height: calc(100vh - 44px); /*  no footer toolbar */
         }
     }
 

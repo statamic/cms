@@ -16,7 +16,7 @@
                         @close="toggleFullscreen"
                     />
 
-                    <section :class="{ 'mt-8 p-4': fullScreenMode }">
+                    <section :class="{ 'mt-12 p-4': fullScreenMode }">
                         <sortable-list
                             :model-value="value"
                             :vertical="true"
