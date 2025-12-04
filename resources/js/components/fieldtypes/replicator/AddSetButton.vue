@@ -8,7 +8,7 @@
             <div
                 v-if="variant === 'between'"
                 class="flex justify-center relative group py-3"
-                :class="{ '-mt-3': isFirst, 'popover-trigger-open': isOpen }"
+                :class="{ '-mt-3': isFirst }"
             >
                 <div
                     v-if="showConnector"
