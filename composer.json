@@ -16,7 +16,7 @@
         "guzzlehttp/guzzle": "^6.3 || ^7.0",
         "inertiajs/inertia-laravel": "^2.0",
         "james-heinrich/getid3": "^1.9.21",
-        "laravel/framework": "^12.22.0",
+        "laravel/framework": "^12.40.0",
         "laravel/prompts": "^0.3.0",
         "league/commonmark": "^2.2",
         "league/csv": "^9.0",
@@ -48,9 +48,9 @@
         "google/cloud-translate": "^1.6",
         "laravel/pint": "1.16.0",
         "mockery/mockery": "^1.6.10",
-        "orchestra/testbench": "^10.0",
+        "orchestra/testbench": "^10.8",
         "phpunit/phpunit": "^11.5.3",
-        "spatie/laravel-ray": "^1.37"
+        "spatie/laravel-ray": "^1.42"
     },
     "conflict": {
         "algolia/algoliasearch-client-php": "<4.32"
