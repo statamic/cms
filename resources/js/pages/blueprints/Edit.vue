@@ -2,15 +2,19 @@
 import Head from '@/pages/layout/Head.vue';
 import { DocsCallout } from '@ui';
 
-defineProps([
-    'blueprint',
-    'action',
-    'showTitle',
-    'useTabs',
-    'canDefineLocalizable',
-    'resetRoute',
-    'isResettable',
-]);
+defineProps({
+	blueprint: Object,
+	action: String,
+	showTitle: Boolean,
+	useTabs: Boolean,
+	canDefineLocalizable: Boolean,
+	resetRoute: String,
+	isResettable: Boolean,
+	isFormBlueprint: {
+		type: Boolean,
+		default: false,
+	},
+});
 </script>
 
 <template>
@@ -23,6 +27,7 @@ defineProps([
             :initial-blueprint="blueprint"
             :use-tabs="useTabs"
             :can-define-localizable="canDefineLocalizable"
+            :is-form-blueprint="isFormBlueprint"
         >
             <template v-if="isResettable" #actions>
                 <ui-dropdown>
