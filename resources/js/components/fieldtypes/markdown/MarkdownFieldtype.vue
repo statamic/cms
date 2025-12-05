@@ -54,7 +54,7 @@
                             :is-fullscreen="false"
                             @toggle-dark-mode="toggleDarkMode"
                             @button-click="handleButtonClick"
-                            class="mb-2 [&~*]:-mt-2'"
+                            class="mb-2 [&~*]:-mt-2"
                         />
 
                         <div class="drag-notification" v-show="dragging">
