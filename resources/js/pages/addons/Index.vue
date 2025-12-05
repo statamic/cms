@@ -12,13 +12,15 @@ const rows = ref(props.addons);
 
 onMounted(() => {
     props.addons.forEach(addon => {
-        Statamic.$commandPalette.add({
-            category: Statamic.$commandPalette.category.Actions,
-            text: [__('Browse the Marketplace'), addon.name],
-            icon: 'external-link',
-            url: addon.marketplace_url,
-            openNewTab: true,
-        });
+		if (addon.marketplace_url) {
+			Statamic.$commandPalette.add({
+				category: Statamic.$commandPalette.category.Actions,
+				text: [__('Browse the Marketplace'), addon.name],
+				icon: 'external-link',
+				url: addon.marketplace_url,
+				openNewTab: true,
+			});
+		}
     });
 });
 </script>

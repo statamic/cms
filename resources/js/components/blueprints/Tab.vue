@@ -24,7 +24,7 @@
             </DropdownMenu>
         </Dropdown>
 
-        <stack
+        <ui-stack
             narrow
             v-if="editing"
             @opened="() => $nextTick(() => $refs.title.focus())"
@@ -70,12 +70,12 @@
                         </publish-field-meta>
                     </Field>
                     <div class="py-6 space-x-2 -mx-6 px-6 border-t border-gray-200 dark:border-gray-700">
-                        <ui-button :text="__('Confirm')" @click="editConfirmed" variant="primary" />
+                        <ui-button :text="isSoloNarrowStack ? __('Save') : __('Confirm')" @click="handleSaveOrConfirm" variant="primary" />
                         <ui-button :text="__('Cancel')" @click="editCancelled" variant="ghost" />
                     </div>
                 </div>
             </div>
-        </stack>
+        </ui-stack>
     </TabTrigger>
 </template>
 
@@ -111,6 +111,7 @@ export default {
             icon: this.tab.icon,
             editing: false,
             handleSyncedWithDisplay: false,
+            saveKeyBinding: null,
         };
     },
 
@@ -129,6 +130,33 @@ export default {
 
         iconSet() {
             return this.$config.get('replicatorSetIcons') || undefined;
+        },
+
+        isSoloNarrowStack() {
+            const stacks = this.$stacks.stacks();
+            return stacks.length === 1 && stacks[0]?.data?.vm?.narrow === true;
+        },
+    },
+
+    watch: {
+        editing: {
+            handler(isEditing) {
+                if (isEditing) {
+                    // Bind Cmd+S to trigger save or confirm based on stack type
+                    this.saveKeyBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.handleSaveOrConfirm();
+                    });
+                } else {
+                    // Unbind when stack is closed
+                    if (this.saveKeyBinding) {
+                        this.saveKeyBinding.destroy();
+                        this.saveKeyBinding = null;
+                    }
+                }
+            },
+            immediate: false,
         },
     },
 
@@ -153,6 +181,24 @@ export default {
             this.editing = false;
         },
 
+        handleSaveOrConfirm() {
+            if (this.isSoloNarrowStack) {
+                this.editAndSave();
+            } else {
+                this.editConfirmed();
+            }
+        },
+
+        editAndSave() {
+            // First confirm the tab changes
+            this.editConfirmed();
+            
+            // Then trigger the blueprint save
+            this.$nextTick(() => {
+                this.$events.$emit('root-form-save');
+            });
+        },
+
         editCancelled() {
             this.editing = false;
             this.handle = this.tab.handle;
@@ -174,6 +220,12 @@ export default {
         remove() {
             this.$emit('removed');
         },
+    },
+
+    beforeUnmount() {
+        if (this.saveKeyBinding) {
+            this.saveKeyBinding.destroy();
+        }
     },
 };
 </script>

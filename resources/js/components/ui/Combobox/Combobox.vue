@@ -15,11 +15,12 @@ import {
 } from 'reka-ui';
 import { computed, nextTick, ref, useAttrs, useTemplateRef, watch } from 'vue';
 import { twMerge } from 'tailwind-merge';
-import Button from './Button/Button.vue';
-import Icon from './Icon/Icon.vue';
-import Badge from './Badge.vue';
+import Button from '../Button/Button.vue';
+import Icon from '../Icon/Icon.vue';
+import Badge from '../Badge.vue';
 import fuzzysort from 'fuzzysort';
 import { SortableList } from '@/components/sortable/Sortable.js';
+import Scrollbar from "@ui/Combobox/Scrollbar.vue";
 
 const emit = defineEmits(['update:modelValue', 'search', 'selected', 'added']);
 
@@ -36,7 +37,7 @@ const props = defineProps({
     modelValue: { type: [Object, String, Number], default: null },
     multiple: { type: Boolean, default: false },
     optionLabel: { type: String, default: 'label' },
-    options: { type: Array, default: [] },
+    options: { type: Array, default: () => [] },
     optionValue: { type: String, default: 'value' },
     placeholder: { type: String, default: () => __('Select...') },
     readOnly: { type: Boolean, default: false },
@@ -165,6 +166,8 @@ const limitIndicatorColor = computed(() => {
 });
 
 const triggerRef = useTemplateRef('trigger');
+const viewportRef = useTemplateRef('viewport');
+const scrollbarRef = useTemplateRef('scrollbar');
 const searchQuery = ref('');
 const searchInputRef = useTemplateRef('search');
 
@@ -196,6 +199,10 @@ const filteredOptions = computed(() => {
     return results;
 });
 
+watch(filteredOptions, () => {
+	nextTick(() => scrollbarRef.value?.update());
+});
+
 function clear() {
     searchQuery.value = '';
     emit('update:modelValue', null);
@@ -220,7 +227,10 @@ function updateDropdownOpen(open) {
     dropdownOpen.value = open;
 
     if (open) {
-        nextTick(() => measureOptionWidths());
+        nextTick(() => {
+            measureOptionWidths();
+	        scrollbarRef.value?.update();
+        });
     }
 }
 
@@ -387,7 +397,7 @@ defineExpose({
                             </button>
                         </div>
 
-                        <div v-if="(clearable && modelValue) || (options.length || ignoreFilter)" class="flex gap-1.5 items-center ms-1.5 -me-2">
+                        <div v-if="(clearable && modelValue) || (options.length || ignoreFilter)" class="flex gap-1.5 items-center ms-1.5 -me-1">
                             <Button v-if="clearable && modelValue" icon="x" variant="ghost" size="xs" round @click="clear" data-ui-combobox-clear-button />
                             <Icon v-if="options.length || ignoreFilter" name="chevron-down" class="text-gray-400 dark:text-white/40 size-4" data-ui-combobox-chevron />
                         </div>
@@ -417,8 +427,13 @@ defineExpose({
                                 event.preventDefault();
                             }"
                         >
-                            <ComboboxViewport class="max-h-[700px] overflow-y-auto">
-                                <ComboboxEmpty class="p-2 text-sm" data-ui-combobox-empty>
+                            <div class="relative">
+                                <ComboboxViewport
+                                    ref="viewport"
+                                    class="max-h-[calc(var(--reka-combobox-content-available-height)-5rem)] overflow-y-scroll"
+                                    data-ui-combobox-viewport
+                                >
+                                    <ComboboxEmpty class="p-2 text-sm" data-ui-combobox-empty>
                                     <slot name="no-options" v-bind="{ searchQuery }">
                                         {{ __('No options available.') }}
                                     </slot>
@@ -428,7 +443,7 @@ defineExpose({
                                     v-if="filteredOptions"
                                     v-slot="{ option, virtualItem }"
                                     :options="filteredOptions"
-                                    :estimate-size="37"
+                                    :estimate-size="40"
                                     :text-content="(opt) => getOptionLabel(opt)"
                                 >
                                     <div class="py-1 w-full overflow-x-hidden">
@@ -451,6 +466,13 @@ defineExpose({
                                     </div>
                                 </ComboboxVirtualizer>
                             </ComboboxViewport>
+
+	                        <!--
+	                            Custom Scrollbar
+	                            (we can't use the browser's scrollbar here because of virtualization, so we need to create our own).
+	                        -->
+	                       <Scrollbar ref="scrollbar" :viewport="viewportRef" />
+                        </div>
                         </FocusScope>
                     </ComboboxContent>
                 </ComboboxPortal>

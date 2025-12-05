@@ -40,13 +40,9 @@
                             <tr class="sortable-row" v-for="(row, rowIndex) in data" :key="row._id">
                                 <td class="table-drag-handle" v-if="!isReadOnly"></td>
                                 <td v-for="(cell, cellIndex) in row.value.cells">
-                                    <input
-                                        type="text"
+                                    <ui-input
                                         v-model="row.value.cells[cellIndex]"
-                                        class="input-text"
                                         :readonly="isReadOnly"
-                                        @focus="$emit('focus')"
-                                        @blur="$emit('blur')"
                                     />
                                 </td>
                                 <td class="row-controls" v-if="canDeleteRows">
@@ -179,7 +175,7 @@ export default {
             return [
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => (vm.fullScreenMode ? 'collapse-all' : 'expand-all'),
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'fullscreen-close' : 'fullscreen-open'),
                     quick: true,
                     visibleWhenReadOnly: true,
                     run: this.toggleFullscreen,

@@ -51,13 +51,7 @@
 ========================================================================== */
 [data-markdown-toolbar] {
     @apply flex items-center justify-between rounded-t-[calc(var(--radius-lg)-1px)] bg-gray-50 px-2 py-1 overflow-x-auto;
-    @apply sticky z-(--z-index-global-header) -top-2 border-b border-gray-300 dark:border-white/20 dark:border-b-white/10 dark:bg-gray-925;
-    /* Prevent the sticky toolbar from hitting the very end of container, which causes it to overlap the container's border-radius */
-    margin-block-end: 8px;
-    /* Pull the subsequent element up to compensate for this */
-    ~ * {
-        margin-block-start: -8px;
-    }
+    @apply border-b border-gray-300 dark:border-white/20 dark:border-b-white/10 dark:bg-gray-925;
 }
 
 .grid-cell [data-markdown-toolbar] {
@@ -95,15 +89,15 @@
 }
 
 .markdown-fullscreen {
-    @apply fixed inset-0 min-h-screen overflow-scroll rounded-none border-0 bg-gray-100 pt-14;
+    @apply fixed inset-0 min-h-screen overflow-scroll rounded-none border-0 bg-gray-100 pt-12;
     will-change: transform;
 
     .mode-wrap {
-        height: calc(100vh - 88px); /*  sans toolbars */
+        height: calc(100vh - 80px); /*  sans toolbars */
         overflow-y: scroll;
         cursor: text;
         &.mode-preview {
-            height: calc(100vh - 52px); /*  no footer toolbar */
+            height: calc(100vh - 44px); /*  no footer toolbar */
         }
     }
 

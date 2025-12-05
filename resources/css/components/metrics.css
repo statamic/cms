@@ -29,10 +29,10 @@
         @apply bg-blue;
     }
     &.green {
-        @apply bg-green-600;
+        @apply bg-green-500;
     }
     &.red {
-        @apply bg-red-600;
+        @apply bg-red-500;
     }
 }
 

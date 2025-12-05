@@ -192,7 +192,7 @@
             </LivePreview>
         </PublishContainer>
 
-        <stack
+        <ui-stack
             name="revision-history"
             v-if="showRevisionHistory"
             @closed="showRevisionHistory = false"
@@ -206,7 +206,7 @@
                 :can-restore-revisions="!readOnly"
                 @closed="close"
             />
-        </stack>
+        </ui-stack>
 
         <publish-actions
             v-if="confirmingPublish"
@@ -393,11 +393,18 @@ export default {
             autosaveIntervalInstance: null,
             syncFieldConfirmationText: __('messages.sync_entry_field_confirmation_text'),
             pendingLocalization: null,
-
-            savingRef: ref(false),
-            errorsRef: ref({}),
         };
     },
+
+	setup() {
+		const savingRef = ref(false);
+		const errorsRef = ref({});
+
+		return {
+			savingRef: computed(() => savingRef),
+			errorsRef: computed(() => errorsRef),
+		};
+	},
 
     computed: {
         containerRef() {
