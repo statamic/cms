@@ -36,7 +36,9 @@ class NavigationController extends CpController
                 'title' => $structure->title(),
                 'show_url' => $structure->showUrl(),
                 'edit_url' => $structure->editUrl(),
-                'available_in_selected_site' => $structure->sites()->contains(Site::selected()->handle()),
+                'available_in_selected_site' => Site::hasMultiple()
+                    ? $structure->sites()->contains(Site::selected()->handle())
+                    : true,
             ];
         })->values();
 
