@@ -6,7 +6,7 @@ defineProps({
 	blueprint: Object,
 	action: String,
 	showTitle: Boolean,
-	useTabs: Boolean,
+	useTabs: { type: Boolean, default: true },
 	canDefineLocalizable: Boolean,
 	resetRoute: String,
 	isResettable: Boolean,
