@@ -14,6 +14,7 @@ export const OPERATORS = [
     'not',
     'contains',
     'contains_any',
+    'includes_any',
     '===',
     '!==',
     '>',
@@ -29,5 +30,4 @@ export const ALIASES = {
     'isnt': 'not',
     '!=': 'not',
     'includes': 'contains',
-    'includes_any': 'contains_any',
 };
