@@ -17,7 +17,6 @@ use Statamic\Facades\Stache;
 use Statamic\Facades\User;
 use Statamic\Stache\Repositories\UserRepository as FileRepository;
 use Statamic\Stache\Stores\UsersStore;
-use Statamic\Support\Arr;
 
 use function Laravel\Prompts\error;
 use function Laravel\Prompts\info;
@@ -117,7 +116,7 @@ class ImportUsers extends Command
                 $eloquentUser->saveToDatabase();
 
                 if (count($data->get('passkeys', [])) > 0) {
-                    collect(Arr::pull($data, 'passkeys', []))
+                    collect($data->get('passkeys', []))
                         ->each(function (array $keydata) use ($eloquentUser) {
                             app(EloquentPasskey::class)
                                 ->setUser($eloquentUser)
