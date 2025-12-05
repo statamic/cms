@@ -61,7 +61,8 @@ export default {
         },
         meta: {
             type: Object,
-            required: true
+            required: true,
+            default: () => ({})
         },
         name: {
             type: String,
