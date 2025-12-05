@@ -30,6 +30,12 @@ export default {
 
     components: { CodeEditor },
 
+    data() {
+        return {
+            escBinding: null,
+        };
+    },
+
     computed: {
         mode() {
             return this.value.mode || this.config.mode;
@@ -48,13 +54,27 @@ export default {
                     icon: ({ vm }) => (vm.$refs.codeEditor.fullScreenMode ? 'fullscreen-close' : 'fullscreen-open'),
                     quick: true,
                     visibleWhenReadOnly: true,
-                    run: ({ vm }) => vm.$refs.codeEditor.toggleFullscreen(),
+                    run: ({ vm }) => vm.toggleFullscreen(),
                 },
             ];
         },
     },
 
     methods: {
+        toggleFullscreen() {
+            const wasFullscreen = this.$refs.codeEditor.fullScreenMode;
+            this.$refs.codeEditor.toggleFullscreen();
+
+            if (wasFullscreen) {
+                if (this.escBinding) {
+                    this.escBinding.destroy();
+                    this.escBinding = null;
+                }
+            } else {
+                this.escBinding = this.$keys.bindGlobal('esc', this.toggleFullscreen);
+            }
+        },
+
         modeUpdated(mode) {
             this.updateDebounced({ code: this.value.code, mode });
         },
