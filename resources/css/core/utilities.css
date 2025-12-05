@@ -196,9 +196,6 @@
         background: radial-gradient(circle at center, var(--theme-color-content-bg) 0%,transparent 80%);
         border-radius: 1.5rem 0 0 1.5rem;
     }
-    .dark &::before {
-        background: radial-gradient(circle at center, hsl(240deg 6% 10%) 0%, transparent 80%);
-    }
 }
 @utility mask-bg--left {
     &::before {
