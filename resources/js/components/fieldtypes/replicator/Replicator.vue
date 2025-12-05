@@ -105,6 +105,7 @@ export default {
             focused: false,
             collapsed: clone(this.meta.collapsed),
             fullScreenMode: false,
+            escBinding: null,
             provide: {
                 replicatorSets: this.config.sets,
                 showReplicatorFieldPreviews: this.config.previews,
@@ -256,6 +257,15 @@ export default {
 
         toggleFullscreen() {
             this.fullScreenMode = !this.fullScreenMode;
+
+            if (this.fullScreenMode) {
+                this.escBinding = this.$keys.bindGlobal('esc', this.toggleFullscreen);
+            } else {
+                if (this.escBinding) {
+                    this.escBinding.destroy();
+                    this.escBinding = null;
+                }
+            }
         },
 
         blurred() {
