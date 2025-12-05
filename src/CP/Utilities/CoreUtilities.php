@@ -27,9 +27,6 @@ class CoreUtilities
             ->description(__('statamic::messages.cache_utility_description'))
             ->docsUrl(Statamic::docsUrl('utilities/cache-manager'))
             ->routes(function ($router) {
-                $router->post('cache/{cache}', [CacheController::class, 'clear'])->name('clear');
-                $router->post('cache/{cache}/warm', [CacheController::class, 'warm'])->name('warm');
-
                 $router->post('clear-all', [CacheController::class, 'clearAll'])->name('clear-all');
                 $router->post('clear-stache', [CacheController::class, 'clearStacheCache'])->name('clear-stache');
                 $router->post('warm-stache', [CacheController::class, 'warmStacheCache'])->name('warm-stache');
