@@ -66,6 +66,7 @@
             :site="site"
             :localized-fields="localizedFields"
             :sync-field-confirmation-text="syncFieldConfirmationText"
+            :remember-tab="!isInline"
         >
             <LivePreview
                 :enabled="isPreviewing"
