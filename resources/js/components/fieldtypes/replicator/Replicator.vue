@@ -74,6 +74,7 @@
                             :show-connector="value.length > 0"
                             :index="value.length"
                             :label="config.button_label"
+                            :is-first="value.length === 0"
                             @added="addSet"
                         />
                     </section>
@@ -151,6 +152,10 @@ export default {
             if (!this.showFieldPreviews) return;
 
             return `${__(this.config.display)}: ${__n(':count set|:count sets', this.value.length)}`;
+        },
+
+        instructionsAbove() {
+            return this.config.instructions_position !== 'below';
         },
 
         internalFieldActions() {
