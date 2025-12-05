@@ -74,7 +74,6 @@
             ref="container"
             :name="publishContainer"
             :reference="initialReference"
-            :is-inline="isInline"
             :blueprint="fieldset"
             v-model="values"
             :extra-values="extraValues"
@@ -86,6 +85,7 @@
             v-model:modified-fields="localizedFields"
             :track-dirty-state="trackDirtyState"
             :sync-field-confirmation-text="syncFieldConfirmationText"
+            :remember-tab="!isInline"
         >
             <LivePreview
                 :enabled="isPreviewing"

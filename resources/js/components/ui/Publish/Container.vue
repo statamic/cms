@@ -69,7 +69,7 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
-    isInline: {
+    rememberTab: {
         type: Boolean,
         default: false,
     },
@@ -234,7 +234,7 @@ const provided = {
     desyncField,
     components,
     asConfig: toRef(() => props.asConfig),
-    isInline: toRef(() => props.isInline),
+    rememberTab: toRef(() => props.rememberTab),
     isTrackingOriginValues: computed(() => !!props.originValues),
     setValues,
     setFieldValue,
