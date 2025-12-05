@@ -34,7 +34,7 @@ function warmStache() {
 }
 
 function clearStatic() {
-	router.post(props.clearStaticUrl);
+    router.post(props.clearStaticUrl);
 }
 
 function clearApplication() {
