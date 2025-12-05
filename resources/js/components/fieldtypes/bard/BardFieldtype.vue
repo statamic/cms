@@ -990,6 +990,7 @@ export default {
                 &::after {
                     content: '';
                     position: absolute;
+                    z-index: var(--z-index-below);
                     inset: -4px -8px;
                     box-shadow:
                         /* Left Mask */
