@@ -363,4 +363,85 @@ trait PermissibleContractTests
             'c' => 'c',
         ], $user->groups()->map->handle()->all());
     }
+
+    #[Test]
+    public function it_checks_wildcard_permission_with_asterisk_at_beginning()
+    {
+        $role = RoleAPI::make('test')->addPermission('* blog entries');
+        RoleAPI::shouldReceive('find')->with('test')->andReturn($role);
+        RoleAPI::shouldReceive('all')->andReturn(collect([$role]));
+
+        $user = $this->createPermissible()->assignRole($role);
+        $user->save();
+
+        $this->assertTrue($user->hasPermission('view blog entries'));
+        $this->assertTrue($user->hasPermission('edit blog entries'));
+        $this->assertTrue($user->hasPermission('delete blog entries'));
+        $this->assertFalse($user->hasPermission('view news entries'));
+        $this->assertFalse($user->hasPermission('view blog posts'));
+    }
+
+    #[Test]
+    public function it_checks_wildcard_permission_with_asterisk_in_middle()
+    {
+        $role = RoleAPI::make('test')->addPermission('view * entries');
+        RoleAPI::shouldReceive('find')->with('test')->andReturn($role);
+        RoleAPI::shouldReceive('all')->andReturn(collect([$role]));
+
+        $user = $this->createPermissible()->assignRole($role);
+        $user->save();
+
+        $this->assertTrue($user->hasPermission('view blog entries'));
+        $this->assertTrue($user->hasPermission('view news entries'));
+        $this->assertTrue($user->hasPermission('view products entries'));
+        $this->assertFalse($user->hasPermission('edit blog entries'));
+        $this->assertFalse($user->hasPermission('view blog posts'));
+    }
+
+    #[Test]
+    public function it_checks_wildcard_permission_through_user_group()
+    {
+        $role = RoleAPI::make('test')->addPermission('view * entries');
+        $userGroup = (new UserGroup)->handle('testgroup')->assignRole($role);
+
+        RoleAPI::shouldReceive('find')->with('test')->andReturn($role);
+        RoleAPI::shouldReceive('all')->andReturn(collect([$role]));
+        UserGroupAPI::shouldReceive('find')->with('testgroup')->andReturn($userGroup);
+        UserGroupAPI::shouldReceive('all')->andReturn(collect([$userGroup]));
+
+        $user = $this->createPermissible()->addToGroup($userGroup);
+        $user->save();
+
+        $this->assertTrue($user->hasPermission('view blog entries'));
+        $this->assertTrue($user->hasPermission('view news entries'));
+        $this->assertTrue($user->hasPermission('view products entries'));
+        $this->assertFalse($user->hasPermission('edit blog entries'));
+        $this->assertFalse($user->hasPermission('view blog posts'));
+    }
+
+    #[Test]
+    public function it_checks_multiple_wildcard_permissions_from_different_sources()
+    {
+        $directRole = RoleAPI::make('direct')->addPermission('view * entries');
+        $groupRole = RoleAPI::make('grouprole')->addPermission('* blog entries');
+        $userGroup = (new UserGroup)->handle('testgroup')->assignRole($groupRole);
+
+        RoleAPI::shouldReceive('find')->with('direct')->andReturn($directRole);
+        RoleAPI::shouldReceive('find')->with('grouprole')->andReturn($groupRole);
+        RoleAPI::shouldReceive('all')->andReturn(collect([$directRole, $groupRole]));
+        UserGroupAPI::shouldReceive('find')->with('testgroup')->andReturn($userGroup);
+        UserGroupAPI::shouldReceive('all')->andReturn(collect([$userGroup]));
+
+        $user = $this->createPermissible()
+            ->assignRole($directRole)
+            ->addToGroup($userGroup);
+        $user->save();
+
+        $this->assertTrue($user->hasPermission('view blog entries'));
+        $this->assertTrue($user->hasPermission('view news entries'));
+        $this->assertTrue($user->hasPermission('edit blog entries'));
+        $this->assertTrue($user->hasPermission('delete blog entries'));
+        $this->assertFalse($user->hasPermission('delete news entries'));
+        $this->assertFalse($user->hasPermission('view blog posts'));
+    }
 }
