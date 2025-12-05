@@ -20,7 +20,7 @@
                             :field-path-prefix="fieldPathPrefix ? `${fieldPathPrefix}.${handle}` : handle"
                             :meta-path-prefix="metaPathPrefix ? `${metaPathPrefix}.${handle}` : handle"
                         >
-                            <Fields class="p-4" />
+                            <Fields class="pt-4" :class="{ 'px-4 py-4': config.border }"/>
                         </FieldsProvider>
                     </div>
                 </section>
