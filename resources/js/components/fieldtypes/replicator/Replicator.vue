@@ -7,7 +7,7 @@
             <div :class="{ wrapperClasses: fullScreenMode }">
                 <div
                     class="replicator-fieldtype-container"
-                    :class="{ 'replicator-fullscreen fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-200 dark:bg-gray-800': fullScreenMode }"
+                    :class="{ 'replicator-fullscreen fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-100 dark:bg-gray-800': fullScreenMode }"
                 >
                     <publish-field-fullscreen-header
                         v-if="fullScreenMode"
@@ -16,7 +16,7 @@
                         @close="toggleFullscreen"
                     />
 
-                    <section :class="{ 'dark:bg-gray-850 mt-14 bg-gray-200 p-4': fullScreenMode }">
+                    <section :class="{ 'mt-12 p-4': fullScreenMode }">
                         <sortable-list
                             :model-value="value"
                             :vertical="true"
@@ -105,6 +105,7 @@ export default {
             focused: false,
             collapsed: clone(this.meta.collapsed),
             fullScreenMode: false,
+            escBinding: null,
             provide: {
                 replicatorSets: this.config.sets,
                 showReplicatorFieldPreviews: this.config.previews,
@@ -256,6 +257,15 @@ export default {
 
         toggleFullscreen() {
             this.fullScreenMode = !this.fullScreenMode;
+
+            if (this.fullScreenMode) {
+                this.escBinding = this.$keys.bindGlobal('esc', this.toggleFullscreen);
+            } else {
+                if (this.escBinding) {
+                    this.escBinding.destroy();
+                    this.escBinding = null;
+                }
+            }
         },
 
         blurred() {
