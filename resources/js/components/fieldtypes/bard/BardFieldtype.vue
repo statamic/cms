@@ -311,6 +311,10 @@ export default {
             return `form-group publish-field publish-field__${this.handle} bard-fieldtype`;
         },
 
+        hasSets() {
+            return this.value.some(item => item.type === 'set')
+        },
+
         setConfigs() {
             return this.groupConfigs.reduce((sets, group) => {
                 return sets.concat(group.sets);
@@ -327,17 +331,19 @@ export default {
                     title: __('Expand All Sets'),
                     icon: 'expand',
                     quick: true,
+                    disabled: () => this.collapsed.length === 0,
                     visibleWhenReadOnly: true,
                     run: this.expandAll,
-                    visible: this.setConfigs.length > 0,
+                    visible: this.setConfigs.length > 0 && this.hasSets,
                 },
                 {
                     title: __('Collapse All Sets'),
                     icon: 'collapse',
                     quick: true,
+                    disabled: () => this.collapsed.length > 0,
                     visibleWhenReadOnly: true,
                     run: this.collapseAll,
-                    visible: this.setConfigs.length > 0,
+                    visible: this.setConfigs.length > 0 && this.hasSets,
                 },
                 {
                     title: __('Toggle Fullscreen Mode'),
