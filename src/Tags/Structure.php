@@ -154,7 +154,9 @@ class Structure extends Tags
             return false;
         }
 
-        // todo: just a fragment
+        if ($url === '#') {
+            return false;
+        }
 
         if ($this->siteAbsoluteUrl === $absoluteUrl) {
             return false;
