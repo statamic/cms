@@ -40,7 +40,7 @@
                                 :is-fullscreen="true"
                                 @toggle-dark-mode="toggleDarkMode"
                                 @button-click="handleButtonClick"
-                                :class="fullScreenMode ? 'sticky z-(--z-index-global-header) -top-2' : 'mb-2 [&~*]:-mt-2'"
+                                class="sticky z-(--z-index-global-header) -top-2"
                             />
                         </publish-field-fullscreen-header>
 
@@ -54,6 +54,7 @@
                             :is-fullscreen="false"
                             @toggle-dark-mode="toggleDarkMode"
                             @button-click="handleButtonClick"
+                            class="mb-2 [&~*]:-mt-2'"
                         />
 
                         <div class="drag-notification" v-show="dragging">
