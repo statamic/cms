@@ -329,8 +329,11 @@ export default {
         },
 
         toggleFullscreen() {
-            this.fullScreenMode = !this.fullScreenMode;
-            this.trackHeightUpdates();
+            if (this.fullScreenMode) {
+                this.closeFullScreen();
+            } else {
+                this.openFullScreen();
+            }
         },
 
         toggleDarkMode() {
