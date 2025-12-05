@@ -11,7 +11,7 @@ export { default as CharacterCounter } from './CharacterCounter.vue';
 export { default as Checkbox } from './Checkbox/Item.vue';
 export { default as CheckboxGroup } from './Checkbox/Group.vue';
 export { default as CodeEditor } from './CodeEditor.vue';
-export { default as Combobox } from './Combobox.vue';
+export { default as Combobox } from './Combobox/Combobox.vue';
 export { default as Context } from './Context/Context.vue';
 export { default as ContextFooter } from './Context/Footer.vue';
 export { default as ContextItem } from './Context/Item.vue';
