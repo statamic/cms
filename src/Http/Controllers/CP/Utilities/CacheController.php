@@ -109,8 +109,6 @@ class CacheController extends CpController
     {
         $request->validate([
             'urls' => ['required', 'array'],
-        ], [
-            'urls.required' => __('You must specify at least one URL.'),
         ]);
 
         $urls = $request->collect('urls');
