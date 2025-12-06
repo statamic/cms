@@ -35,7 +35,7 @@ class Alpine extends AbstractJsDriver
         }
 
         return [
-            'x-data' => $this->renderAlpineXData(collect($this->getInitialFormData())->merge($extraData)->all(), $this->scope),
+            'x-data' => $this->renderAlpineXData(collect($this->getInitialFormData())->mergeRecursive($extraData)->all(), $this->scope),
         ];
     }
 
