@@ -84,7 +84,7 @@ EOT;
 
         $expected = <<<'EOT'
 <One>
-</blog/tags/rad:rad></blog/tags/test:test></blog/tags/test-two:test-two>
+</tags/rad:rad></tags/test:test></tags/test-two:test-two>
 
 
 <total_pages:4>
