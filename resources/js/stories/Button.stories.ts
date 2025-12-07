@@ -171,10 +171,9 @@ export const Round: Story = {
         docs: {
             source: {
                 code: `
-                    <Button size="lg" text="Large" />
-                    <Button size="base" text="Base" />
-                    <Button size="sm" text="Small" />
-                    <Button size="xs" text="Extra Small" />
+                    <Button round icon="plus" />
+                    <Button round icon="plus" text="Add" />
+                    <Button round text="Add" />
                 `,
             },
         },
