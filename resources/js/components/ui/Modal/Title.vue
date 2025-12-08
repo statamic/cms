@@ -1,13 +1,11 @@
 <script setup>
-import { DialogTitle } from 'reka-ui';
-
 defineOptions({
     name: 'ModalTitle',
 });
 </script>
 
 <template>
-    <DialogTitle data-ui-modal-title>
+    <div data-ui-modal-title>
         <slot />
-    </DialogTitle>
+    </div>
 </template>
