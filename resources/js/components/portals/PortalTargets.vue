@@ -5,8 +5,6 @@
 </template>
 
 <script>
-import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
-
 export default {
     computed: {
         portals() {
@@ -15,10 +13,6 @@ export default {
 
         hasStacks() {
             return this.$stacks.count() > 0;
-        },
-
-        hasModals() {
-            return this.$modals.count() > 0;
         },
 
         isSoloNarrowStack() {
@@ -31,10 +25,6 @@ export default {
         hasStacks(hasStacks) {
             hasStacks ? this.initStacks() : this.destroyStacks();
         },
-
-        hasModals(hasModals) {
-            hasModals ? this.initModals() : this.destroyModals();
-        },
     },
 
     methods: {
@@ -46,39 +36,10 @@ export default {
                     }
                 }
             });
-
-            disableBodyScroll(this.$el, {
-                allowTouchMove: (el) => {
-                    while (el && el !== document.body) {
-                        if (el.classList.contains('overflow-scroll')) {
-                            return true;
-                        }
-                        el = el.parentElement;
-                    }
-                },
-            });
         },
 
         destroyStacks() {
             this.$events.$off('stacks.hit-area-clicked');
-            enableBodyScroll(this.$el);
-        },
-
-        initModals() {
-            disableBodyScroll(this.$el, {
-                allowTouchMove: (el) => {
-                    while (el && el !== document.body) {
-                        if (el.classList.contains('overflow-scroll')) {
-                            return true;
-                        }
-                        el = el.parentElement;
-                    }
-                },
-            });
-        },
-
-        destroyModals() {
-            enableBodyScroll(this.$el);
         },
     },
 };
