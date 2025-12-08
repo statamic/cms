@@ -5,14 +5,14 @@
             <slot />
         </div>
         <div class="flex items-center justify-end gap-2 py-2.5">
-            <Dropdown class="mr-2">
+            <Dropdown v-if="hasNonQuickActions" class="mr-2">
                 <template #trigger>
                     <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
                 </template>
                 <DropdownMenu>
                     <DropdownItem
                         v-if="fieldActions.length"
-                        v-for="action in fieldActions"
+                        v-for="action in fieldActions.filter((a) => !a.quick)"
                         :text="action.title"
                         :variant="action.dangerous ? 'destructive' : 'default'"
                         @click="action.run(action)"
@@ -26,6 +26,7 @@
                     v-tooltip="action.title"
                     @click="action.run()"
                     size="xs"
+                    :disabled="action.disabled"
                     :icon="action.icon"
                     :aria-label="action.title"
                     tabindex="-1"
@@ -57,5 +58,11 @@ export default {
             default: () => [],
         },
     },
+
+    computed: {
+        hasNonQuickActions() {
+            return this.fieldActions.filter((a) => !a.quick).length > 0;
+        },
+    }
 };
 </script>
