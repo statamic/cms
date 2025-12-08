@@ -129,7 +129,7 @@ export default {
                 let option = this.options.find((option) => option.id === id);
                 let existing = this.items.find((item) => item.id === id);
 
-                return existing || option || { id: value, title: value };
+                return existing || option || { id: id, title: id };
             });
 
             this.$emit('input', items);
