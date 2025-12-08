@@ -102,6 +102,8 @@ return [
     'grid.config.mode' => 'Choisissez votre disposition préférée.',
     'grid.config.reorderable' => 'Activez cette option pour autoriser la réorganisation des rangées.',
     'grid.title' => 'Grid',
+    'group.config.collapsed' => 'Réduire ce groupe par défaut.',
+    'group.config.collapsible' => 'Autoriser la réduction de ce groupe.',
     'group.config.fields' => 'Configurez les champs qui seront nichés au sein de ce groupe.',
     'group.title' => 'Group',
     'hidden.title' => 'Hidden',
