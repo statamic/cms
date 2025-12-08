@@ -22,7 +22,6 @@ import Preferences from './components/Preference.js';
 import Toasts from './components/Toasts.js';
 import Portals from './components/portals/Portals.js';
 import Stacks from './components/ui/Stack/Stacks.js';
-import Modals from './components/ui/Modal/Modals.js';
 import Inertia from './components/Inertia';
 
 export const keys = new Keys();
@@ -48,5 +47,4 @@ export const preferences = new Preferences();
 export const toast = new Toasts();
 export const portals = markRaw(new Portals());
 export const stacks = new Stacks(portals);
-export const modals = new Modals(portals);
 export const inertia = new Inertia();

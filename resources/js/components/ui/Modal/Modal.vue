@@ -44,7 +44,7 @@ const hasModalTitleComponent = hasComponent('ModalTitle');
 const isUsingOpenProp = computed(() => instance?.vnode.props?.hasOwnProperty('open'));
 
 const instance = getCurrentInstance();
-const { $modals, $keys, $wait } = instance.appContext.config.globalProperties;
+const { $portals, $keys, $wait } = instance.appContext.config.globalProperties;
 
 const modal = ref(null);
 const mounted = ref(false);
@@ -54,10 +54,10 @@ const escBinding = ref(null);
 const portal = computed(() => modal.value ? `#portal-target-${modal.value.id}` : null);
 
 function open() {
-	if (!modal.value) modal.value = $modals.add(instance);
+	if (!modal.value) modal.value = $portals.create('modal');
 
 	mounted.value = true;
-		
+
 	nextTick(() => {
 		visible.value = true;
 		escBinding.value = $keys.bindGlobal('esc', dismiss);
