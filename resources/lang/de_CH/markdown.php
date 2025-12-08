@@ -2,7 +2,7 @@
 
 return [
     'cheatsheet' => '
-<p>Markdown ist eine Text-zu-HTML-Auszeichnungssyntax für Webautoren. Mit Markdown kannst du in einem einfachen, reinen Textformat schreiben, welches leicht zu lesen ist und in korrektes HTML konvertiert wird.</p>
+<p>Markdown ist eine Text-zu-HTML-Auszeichnungssyntax für Webautoren. Mit Markdown kannst du in einem einfachen, reinen Textformat schreiben, das leicht zu lesen ist und in korrektes HTML konvertiert wird.</p>
 <h3>Überschriften</h3>
 <pre class="language-markdown"><code># Dies ist eine H1
 ## Dies ist eine H2
@@ -11,13 +11,13 @@ return [
 
 
 <h3>Fett &amp; Kursiv</h3>
-<pre class="language-markdown"><code>Du kannst Wörter *kursiv*, **fett**, oder _**beides**_ machen.</code></pre>
+<pre class="language-markdown"><code>Du kannst Wörter *kursiv*, **fett**, oder _**beides**_ formatieren.</code></pre>
 
 <h3>Links</h3>
 <pre class="language-markdown"><code>Dies ist ein [Beispiel-Link](http://example.com).</code></pre>
 
 <h3>Code</h3>
-<p>Umschliesse deinen Code mit drei Backticks (<code>```</code>) auf der Zeile davor und danach.</p>
+<p>Umschliesse deinen Code mit drei Backticks (<code>```</code>) – jeweils auf einer eigenen Zeile davor und danach.</p>
 
 <pre class="language-markdown"><code>```
 dies: \'ist etwas YAML\'
