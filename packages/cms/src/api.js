@@ -14,7 +14,6 @@ export const {
     hooks,
     inertia,
     keys,
-    modals,
     permissions,
     portals,
     preferences,
