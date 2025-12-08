@@ -55,52 +55,53 @@ const escBinding = ref(null);
 const portal = computed(() => modal.value ? `#portal-target-${modal.value.id}` : null);
 
 function open() {
-	if (!modal.value) modal.value = portals.create('modal');
+    if (!modal.value) modal.value = portals.create('modal');
 
-	mounted.value = true;
+    escBinding.value = keys.bindGlobal('esc', dismiss);
 
-	nextTick(() => {
-		visible.value = true;
-		escBinding.value = keys.bindGlobal('esc', dismiss);
-	});
+    nextTick(() => {
+        mounted.value = true;
+
+        nextTick(() => visible.value = true);
+    });
 }
 
 function close() {
     visible.value = false;
 
-	wait(300).then(() => {
-		mounted.value = false;
-		updateOpen(false);
-	});
+    wait(300).then(() => {
+        mounted.value = false;
+        updateOpen(false);
+    });
 }
 
 function dismiss() {
-	if (!props.dismissible) return;
+    if (!props.dismissible) return;
 
-	emit('dismissed');
-	close();
+    emit('dismissed');
+    close();
 }
 
 provide('closeModal', close);
 
 function updateOpen(value) {
-	if (isUsingOpenProp.value) {
-		emit('update:open', value);
-	}
+    if (isUsingOpenProp.value) {
+        emit('update:open', value);
+    }
 }
 
 watch(
-	() => props.open,
-	(value) => value ? open() : close(),
+    () => props.open,
+    (value) => value ? open() : close(),
 );
 
 onMounted(() => {
-	if (props.open) open();
+    if (props.open) open();
 });
 
 onBeforeUnmount(() => {
-	modal.value?.destroy();
-	escBinding.value?.destroy();
+    modal.value?.destroy();
+    escBinding.value?.destroy();
 });
 
 defineExpose({
