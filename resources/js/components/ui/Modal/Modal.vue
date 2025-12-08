@@ -57,13 +57,12 @@ const portal = computed(() => modal.value ? `#portal-target-${modal.value.id}` :
 function open() {
 	if (!modal.value) modal.value = portals.create('modal');
 
+    escBinding.value = keys.bindGlobal('esc', dismiss);
+
 	nextTick(() => {
         mounted.value = true;
 
-        nextTick(() => {
-            visible.value = true;
-            escBinding.value = keys.bindGlobal('esc', dismiss);
-        });
+        nextTick(() => visible.value = true);
     });
 }
 
