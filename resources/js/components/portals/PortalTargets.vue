@@ -1,5 +1,5 @@
 <template>
-    <div class="portal-targets" :class="{ 'stacks-on-stacks': hasStacks, 'solo-narrow-stack': isSoloNarrowStack, 'modals-on-modals': hasModals }">
+    <div class="portal-targets" :class="{ 'stacks-on-stacks': hasStacks, 'solo-narrow-stack': isSoloNarrowStack }">
         <div v-for="(portal, i) in portals" :id="`portal-target-${portal.id}`" />
     </div>
 </template>
