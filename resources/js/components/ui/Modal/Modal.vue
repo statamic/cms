@@ -4,6 +4,8 @@ import { hasComponent } from '@/composables/has-component.js';
 import { computed, getCurrentInstance, nextTick, onBeforeUnmount, onMounted, provide, ref, useAttrs, useSlots, watch } from 'vue';
 import Icon from '../Icon/Icon.vue';
 import Heading from '../Heading.vue';
+import { portals, keys } from '@api';
+import wait from '@/util/wait';
 
 defineOptions({
     inheritAttrs: false,
@@ -44,7 +46,6 @@ const hasModalTitleComponent = hasComponent('ModalTitle');
 const isUsingOpenProp = computed(() => instance?.vnode.props?.hasOwnProperty('open'));
 
 const instance = getCurrentInstance();
-const { $portals, $keys, $wait } = instance.appContext.config.globalProperties;
 
 const modal = ref(null);
 const mounted = ref(false);
@@ -54,20 +55,20 @@ const escBinding = ref(null);
 const portal = computed(() => modal.value ? `#portal-target-${modal.value.id}` : null);
 
 function open() {
-	if (!modal.value) modal.value = $portals.create('modal');
+	if (!modal.value) modal.value = portals.create('modal');
 
 	mounted.value = true;
 
 	nextTick(() => {
 		visible.value = true;
-		escBinding.value = $keys.bindGlobal('esc', dismiss);
+		escBinding.value = keys.bindGlobal('esc', dismiss);
 	});
 }
 
 function close() {
     visible.value = false;
 
-	$wait(300).then(() => {
+	wait(300).then(() => {
 		mounted.value = false;
 		updateOpen(false);
 	});
