@@ -154,10 +154,6 @@ export default {
             return `${__(this.config.display)}: ${__n(':count set|:count sets', this.value.length)}`;
         },
 
-        instructionsAbove() {
-            return this.config.instructions_position !== 'below';
-        },
-
         internalFieldActions() {
             return [
                 {
