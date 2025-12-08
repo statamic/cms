@@ -138,6 +138,18 @@ JSON, $this->files->get(base_path('package.json')));
     }
 
     #[Test]
+    public function it_publishes_dev_build()
+    {
+        $this->assertDirectoryDoesNotExist(public_path('vendor/statamic/cp-dev'));
+
+        $this
+            ->artisan('statamic:setup-cp-vite', ['--only-necessary' => true])
+            ->expectsOutputToContain('Publishing [statamic-cp-dev] assets.');
+
+        $this->assertDirectoryExists(public_path('vendor/statamic/cp-dev'));
+    }
+
+    #[Test]
     public function it_appends_vite_snippet_to_app_service_provider()
     {
         $this->assertStringNotContainsString("Statamic::vite('app', [", $this->files->get(app_path('Providers/AppServiceProvider.php')));
