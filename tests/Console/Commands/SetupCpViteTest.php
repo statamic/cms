@@ -204,5 +204,7 @@ class AppServiceProvider extends ServiceProvider
 PHP);
 
         $this->files->put(base_path('package.json'), json_encode([]));
+
+        $this->files->makeDirectory(__DIR__.'/../../../resources/dist-dev', 0755, true, true);
     }
 }

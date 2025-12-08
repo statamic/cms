@@ -21,6 +21,7 @@ class MakeFieldtypeTest extends TestCase
 
         Process::fake();
         $this->files = app(Filesystem::class);
+        $this->files->makeDirectory(__DIR__.'/../../../resources/dist-dev', 0755, true, true);
         $this->fakeSuccessfulComposerRequire();
     }
 
