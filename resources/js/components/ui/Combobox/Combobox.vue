@@ -15,11 +15,12 @@ import {
 } from 'reka-ui';
 import { computed, nextTick, ref, useAttrs, useTemplateRef, watch } from 'vue';
 import { twMerge } from 'tailwind-merge';
-import Button from './Button/Button.vue';
-import Icon from './Icon/Icon.vue';
-import Badge from './Badge.vue';
+import Button from '../Button/Button.vue';
+import Icon from '../Icon/Icon.vue';
+import Badge from '../Badge.vue';
 import fuzzysort from 'fuzzysort';
 import { SortableList } from '@/components/sortable/Sortable.js';
+import Scrollbar from "@ui/Combobox/Scrollbar.vue";
 
 const emit = defineEmits(['update:modelValue', 'search', 'selected', 'added']);
 
@@ -165,6 +166,8 @@ const limitIndicatorColor = computed(() => {
 });
 
 const triggerRef = useTemplateRef('trigger');
+const viewportRef = useTemplateRef('viewport');
+const scrollbarRef = useTemplateRef('scrollbar');
 const searchQuery = ref('');
 const searchInputRef = useTemplateRef('search');
 
@@ -196,6 +199,10 @@ const filteredOptions = computed(() => {
     return results;
 });
 
+watch(filteredOptions, () => {
+	nextTick(() => scrollbarRef.value?.update());
+});
+
 function clear() {
     searchQuery.value = '';
     emit('update:modelValue', null);
@@ -220,7 +227,10 @@ function updateDropdownOpen(open) {
     dropdownOpen.value = open;
 
     if (open) {
-        nextTick(() => measureOptionWidths());
+        nextTick(() => {
+            measureOptionWidths();
+	        scrollbarRef.value?.update();
+        });
     }
 }
 
@@ -417,8 +427,13 @@ defineExpose({
                                 event.preventDefault();
                             }"
                         >
-                            <ComboboxViewport class="max-h-[700px] overflow-y-auto">
-                                <ComboboxEmpty class="p-2 text-sm" data-ui-combobox-empty>
+                            <div class="relative">
+                                <ComboboxViewport
+                                    ref="viewport"
+                                    class="max-h-[calc(var(--reka-combobox-content-available-height)-5rem)] overflow-y-scroll"
+                                    data-ui-combobox-viewport
+                                >
+                                    <ComboboxEmpty class="p-2 text-sm" data-ui-combobox-empty>
                                     <slot name="no-options" v-bind="{ searchQuery }">
                                         {{ __('No options available.') }}
                                     </slot>
@@ -428,7 +443,7 @@ defineExpose({
                                     v-if="filteredOptions"
                                     v-slot="{ option, virtualItem }"
                                     :options="filteredOptions"
-                                    :estimate-size="37"
+                                    :estimate-size="40"
                                     :text-content="(opt) => getOptionLabel(opt)"
                                 >
                                     <div class="py-1 w-full overflow-x-hidden">
@@ -451,6 +466,13 @@ defineExpose({
                                     </div>
                                 </ComboboxVirtualizer>
                             </ComboboxViewport>
+
+	                        <!--
+	                            Custom Scrollbar
+	                            (we can't use the browser's scrollbar here because of virtualization, so we need to create our own).
+	                        -->
+	                       <Scrollbar ref="scrollbar" :viewport="viewportRef" />
+                        </div>
                         </FocusScope>
                     </ComboboxContent>
                 </ComboboxPortal>

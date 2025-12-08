@@ -40,6 +40,7 @@ class SetupCpVite extends Command
             ->addScriptsToPackageJson()
             ->publishViteConfig()
             ->publishStubs()
+            ->publishDevBuild()
             ->appendViteSnippetToAppServiceProvider();
     }
 
@@ -134,6 +135,13 @@ class SetupCpVite extends Command
         }
 
         $this->components->info('Published stubs for Control Panel CSS & JavaScript.');
+
+        return $this;
+    }
+
+    private function publishDevBuild(): self
+    {
+        $this->call('vendor:publish', ['--tag' => 'statamic-cp-dev']);
 
         return $this;
     }
