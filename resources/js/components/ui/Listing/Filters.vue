@@ -100,7 +100,7 @@ function handleStackClosed() {
 <template>
     <div class="flex flex-1 items-center gap-2 sm:gap-3 overflow-x-auto py-3 rounded-r-4xl">
 
-        <div ref="filtersButtonWrapperRef" class="sticky left-0 ps-[1px] rounded-r-lg bg-white dark:bg-gray-900 mask-bg mask-bg--left mask-bg--left-small">
+        <div ref="filtersButtonWrapperRef" class="sticky left-0 ps-[1px] rounded-r-lg mask-bg mask-bg--left mask-bg--left-small">
             <Button icon="sliders-horizontal" class="[&_svg]:size-3.5" :disabled="reorderable" @click="open = true">
                 {{ __('Filters') }}
                 <Badge
@@ -113,7 +113,7 @@ function handleStackClosed() {
             </Button>
         </div>
 
-        <stack half name="filters" v-if="open" @closed="handleStackClosed">
+        <ui-stack half name="filters" v-if="open" @closed="handleStackClosed">
             <div ref="stackContentRef" class="flex-1 p-3 bg-white dark:bg-gray-800 h-full overflow-auto rounded-l-2xl relative">
                 <Button
                     icon="x"
@@ -157,7 +157,7 @@ function handleStackClosed() {
                     <Button variant="primary" :text="__('Done')" @click="handleStackClosed" />
                 </div>
             </div>
-        </stack>
+        </ui-stack>
 
         <Button
             v-for="(badge, handle, index) in fieldFilterBadges"

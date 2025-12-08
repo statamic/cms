@@ -79,3 +79,8 @@ jobs:
           asset_path: ./resources/dist-package.tar.gz
           asset_name: dist-package.tar.gz
           asset_content_type: application/tar+gz
+
+      - name: Deploy Storybook to Forge
+        continue-on-error: true
+        run: |
+          curl -X POST "${{ secrets.FORGE_STORYBOOK_WEBHOOK }}"

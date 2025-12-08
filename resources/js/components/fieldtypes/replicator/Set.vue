@@ -88,7 +88,7 @@ const previewText = computed(() => {
             return config.replicator_preview === undefined ? props.showFieldPreviews : config.replicator_preview;
         })
         .map(([handle, value]) => value)
-        .filter((value) => !['null', '[]', '{}', ''].includes(JSON.stringify(value)))
+        .filter((value) => !['null', '[]', '{}', '', undefined].includes(JSON.stringify(value)))
         .map((value) => {
             if (value instanceof PreviewHtml) return value.html;
 
@@ -128,7 +128,8 @@ reveal.use(rootEl, () => emit('expanded'));
         <slot name="picker" />
         <div
             layout
-            class="relative z-2 w-full rounded-lg border border-gray-300 text-base dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black shadow-ui-sm dark:[&_[data-ui-switch]]:border-gray-600 dark:[&_[data-ui-switch]]:border-1"
+            data-replicator-set
+            class="relative z-2 w-full rounded-lg border border-gray-300 text-base dark:border-white/10 bg-white dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black shadow-ui-sm dark:[&_[data-ui-switch]]:border-gray-600 dark:[&_[data-ui-switch]]:border-1"
             :class="{
                 'border-red-500': hasError
             }"
@@ -151,7 +152,7 @@ reveal.use(rootEl, () => emit('expanded'));
                     v-if="!readOnly"
                 />
                 <button type="button" class="flex flex-1 items-center gap-4 p-2 py-1.75 min-w-0 cursor-pointer" @click="toggleCollapsedState">
-                    <Badge size="lg" pill="true" color="white" class="px-3">
+                    <Badge size="lg" pill color="white" class="px-3">
                         <span v-if="isSetGroupVisible" class="flex items-center gap-2">
                             {{ __(setGroup.display) }}
                             <Icon name="chevron-right" class="relative top-px size-3" />

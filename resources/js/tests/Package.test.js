@@ -71,6 +71,8 @@ it('exports inertia', async () => {
         'Head',
         'Link',
         'router',
+        'toggleArchitecturalBackground',
+        'useArchitecturalBackground',
         'useForm',
         'usePoll',
     ];
@@ -173,6 +175,7 @@ it('exports ui', async () => {
         'TabContent',
         'TabList',
         'TabTrigger',
+        'Stack',
         'Table',
         'TableCell',
         'TableColumn',
