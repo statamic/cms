@@ -7,15 +7,20 @@ import { Theme, PredefinedTheme } from './types';
 import { applyTheme, applyDefaultTheme } from './utils';
 import { translate as __ } from '@/translations/translator';
 
+export type Tab = 'themes' | 'custom';
+
 const props = defineProps<{
     modelValue?: Theme;
+    tab: Tab
 }>();
 
 const emit = defineEmits<{
     (e: 'update:modelValue', theme: Theme): void;
+    (e: 'update:tab', tab: Tab): void;
 }>();
 
-const tab = ref<'themes' | 'custom'>('themes');
+const activeTab = ref<Tab>(props.tab);
+watch(activeTab, (newTab) => emit('update:tab', newTab));
 
 function themeSelected(theme: PredefinedTheme) {
     emit('update:modelValue', theme);
@@ -33,7 +38,7 @@ watch(
 </script>
 
 <template>
-    <Tabs v-model="tab">
+    <Tabs v-model="activeTab">
         <TabList>
             <TabTrigger name="themes" :text="__('Themes')" />
             <TabTrigger name="custom" :text="__('Custom')" />

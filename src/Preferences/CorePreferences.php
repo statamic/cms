@@ -14,6 +14,7 @@ class CorePreferences
             'type' => 'theme',
             'display' => __('Theme'),
             'instructions' => __('statamic::messages.preference_theme_instructions'),
+            'full_width_setting' => true,
         ]);
 
         Preference::register('locale', [

@@ -39,7 +39,7 @@ function isActive(theme: PredefinedTheme): boolean {
 </script>
 
 <template>
-    <div class="grid grid-cols-3 gap-6">
+    <div class="grid grid-cols-5 gap-6">
         <div
             v-for="theme in themes"
             :key="theme.id"
