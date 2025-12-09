@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Input, Description, Table, TableRows, TableRow, TableCell, TableColumns, TableColumn, Card } from '@ui';
+import { Button, Description, Input, Table, TableCell, TableColumn, TableColumns, TableRow, TableRows } from '@ui';
 import { computed } from 'vue';
-import { PartialTheme, Theme } from './types';
+import { ColorVariableName, Theme, ThemeColors } from './types';
 import colors from './colors';
 import Preview from './Preview.vue';
 import { getDefaultTheme } from '@/components/themes/utils';
@@ -12,7 +12,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (e: 'update:modelValue', theme: PartialTheme): void;
+    (e: 'update:modelValue', theme: Theme): void;
 }>();
 
 const theme = computed<Theme>(() => {
@@ -28,7 +28,7 @@ const theme = computed<Theme>(() => {
     };
 });
 
-function updateColor(colorName: string, value: string, isDark: boolean = false) {
+function updateColor(colorName: ColorVariableName, value: string, isDark: boolean = false) {
     const colors = { ...theme.value.colors };
     const darkColors = { ...theme.value.darkColors };
 
@@ -38,14 +38,31 @@ function updateColor(colorName: string, value: string, isDark: boolean = false) 
         colors[colorName] = value;
     }
 
-    const newTheme = {
+    updateColors(colors, darkColors);
+}
+
+function hasDarkColor(colorName: ColorVariableName): boolean {
+    return Boolean(props.modelValue.darkColors?.[colorName]);
+}
+
+function clearDarkColor(colorName: ColorVariableName) {
+    const { [colorName]: _, ...darkColors } = theme.value.darkColors;
+    updateColors(theme.value.colors, darkColors);
+}
+
+function addDarkColor(colorName: ColorVariableName) {
+    updateColors(theme.value.colors, {
+        ...theme.value.darkColors, [colorName]: theme.value.colors[colorName]
+    });
+}
+
+function updateColors(colors: ThemeColors, darkColors: ThemeColors) {
+    emit('update:modelValue', {
         id: 'custom',
         name: 'Custom',
         colors,
         darkColors
-    };
-
-    emit('update:modelValue', newTheme);
+    });
 }
 </script>
 
@@ -72,12 +89,29 @@ function updateColor(colorName: string, value: string, isDark: boolean = false) 
                            />
                         </TableCell>
                         <TableCell>
-                            <Input
-                                type="color"
-                                size="sm"
-                                :model-value="theme.darkColors?.[color.name]"
-                                @update:model-value="updateColor(color.name, $event, true)"
-                            />
+                            <div class="flex items-center">
+                                <Input
+                                    v-if="hasDarkColor(color.name)"
+                                    type="color"
+                                    size="sm"
+                                    :model-value="theme.darkColors?.[color.name]"
+                                    @update:model-value="updateColor(color.name, $event, true)"
+                                />
+                                <Button
+                                    v-if="hasDarkColor(color.name)"
+                                    icon="x"
+                                    variant="ghost"
+                                    size="sm"
+                                    @click="clearDarkColor(color.name)"
+                                />
+                                <Button
+                                    v-else
+                                    icon="plus"
+                                    variant="ghost"
+                                    size="sm"
+                                    @click="addDarkColor(color.name)"
+                                />
+                            </div>
                         </TableCell>
                     </TableRow>
                 </TableRows>
