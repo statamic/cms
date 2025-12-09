@@ -5,8 +5,6 @@
 </template>
 
 <script>
-import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
-
 export default {
     computed: {
         portals() {
@@ -38,22 +36,10 @@ export default {
                     }
                 }
             });
-
-            disableBodyScroll(this.$el, {
-                allowTouchMove: (el) => {
-                    while (el && el !== document.body) {
-                        if (el.classList.contains('overflow-scroll')) {
-                            return true;
-                        }
-                        el = el.parentElement;
-                    }
-                },
-            });
         },
 
         destroyStacks() {
             this.$events.$off('stacks.hit-area-clicked');
-            enableBodyScroll(this.$el);
         },
     },
 };

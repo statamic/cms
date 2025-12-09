@@ -64,8 +64,9 @@
             :origin-meta="originMeta"
             :errors="errors"
             :site="site"
-            :localized-fields="localizedFields"
+            v-model:modified-fields="localizedFields"
             :sync-field-confirmation-text="syncFieldConfirmationText"
+            :remember-tab="!isInline"
         >
             <LivePreview
                 :enabled="isPreviewing"

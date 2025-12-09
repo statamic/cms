@@ -3,7 +3,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "rm -rf resources/dist/build && vite",
+    "dev": "rm -rf resources/dist/build && rm -rf resources/dist-dev/build && vite",
     "build": "vite build",
     "build-dev": "vite build --mode development",
     "svgo": "svgo -f ./resources/svg/  -r",
@@ -12,7 +12,11 @@
     "frontend-dev": "vite -c vite-frontend.config.js",
     "frontend-build": "vite build -c vite-frontend.config.js",
     "knip": "knip",
-    "types": "cd packages/cms && npm run types"
+    "types": "cd packages/cms && npm run types",
+    "storybook": "storybook dev -p 6006 --no-open",
+    "storybook-docs": "storybook dev --docs -p 6006",
+    "build-storybook": "storybook build",
+    "build-storybook-docs": "storybook build --docs"
   },
   "dependencies": {
     "@davidenke/marked-text-renderer": "^3.0.0",
@@ -55,7 +59,6 @@
     "alpinejs": "^3.1.1",
     "autosize": "~6.0.1",
     "axios": "^1.12.1",
-    "body-scroll-lock": "^4.0.0-beta.0",
     "clsx": "^2.1.1",
     "codemirror": "5.65.12",
     "cookies-js": "^1.2.2",
@@ -87,7 +90,7 @@
     "tiny-emitter": "^2.1.0",
     "uniqid": "^5.2.0",
     "upload": "^1.3.2",
-    "validator": "^13.7.0",
+    "validator": "^13.15.22",
     "vite-svg-loader": "^5.1.0",
     "vue": "^3.4.27",
     "vue-final-modal": "^4.5.4",
@@ -95,6 +98,9 @@
     "vue3-click-away": "^1.2.4"
   },
   "devDependencies": {
+    "@storybook/addon-a11y": "^10.1.2",
+    "@storybook/addon-docs": "^10.1.2",
+    "@storybook/vue3-vite": "^10.1.2",
     "@tailwindcss/vite": "^4.1.8",
     "@vitejs/plugin-vue": "^6.0.0",
     "@vitest/browser-playwright": "^4.0.12",
@@ -103,6 +109,7 @@
     "knip": "^5.43.6",
     "laravel-vite-plugin": "^2.0.0",
     "rollup-plugin-visualizer": "^5.14.0",
+    "storybook": "^10.1.2",
     "tailwindcss": "^4.1.8",
     "typescript": "^5.9.2",
     "vite": "^7.0.4",
