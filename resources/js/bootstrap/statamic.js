@@ -312,12 +312,12 @@ export default {
         components.boot(this.$app);
 
         // Suppress the translation warnings
-        // this.$app.config.warnHandler = (msg, vm, trace) => {
-        //     if (msg.includes('Property "__" should not start with _ which is a reserved prefix for Vue internals')) {
-        //         return;
-        //     }
-        //     console.warn(msg, vm, trace);
-        // };
+        this.$app.config.warnHandler = (msg, vm, trace) => {
+            if (msg.includes('Property "__" should not start with _ which is a reserved prefix for Vue internals')) {
+                return;
+            }
+            console.warn(msg, vm, trace);
+        };
 
         axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
         axios.defaults.headers.common['X-CSRF-TOKEN'] = Statamic.$config.get('csrfToken');
