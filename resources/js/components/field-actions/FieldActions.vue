@@ -25,7 +25,6 @@
                 :disabled="action.disabled"
                 :icon-only="true"
                 :aria-label="action.title"
-                tabindex="-1"
             >
                 <ui-icon :name="action.icon" class="size-3.5" />
             </Button>
