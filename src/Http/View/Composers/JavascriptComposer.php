@@ -112,7 +112,7 @@ class JavascriptComposer
         return $user->toAugmentedCollection()->merge([
             'preferences' => Preference::all(),
             'permissions' => $user->permissions()->all(),
-            'appearance' => $user->preferredAppearance(),
+            'color_mode' => $user->preferredColorMode(),
             'is_impersonating' => session()->has('statamic_impersonated_by'),
         ])->toArray();
     }

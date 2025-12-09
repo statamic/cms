@@ -121,6 +121,18 @@ function destroy() {
 
 const rootEl = ref();
 reveal.use(rootEl, () => emit('expanded'));
+
+const shouldClipOverflow = ref(false);
+
+function onAnimationStart() {
+    shouldClipOverflow.value = true;
+}
+
+function onAnimationComplete() {
+    if (!props.collapsed) {
+        shouldClipOverflow.value = false;
+    }
+}
 </script>
 
 <template>
@@ -202,10 +214,12 @@ reveal.use(rootEl, () => emit('expanded'));
             </header>
 
             <Motion
-                class="contain-paint"
+                :class="{ 'overflow-clip': shouldClipOverflow }"
                 :initial="{ height: collapsed ? '0px' : 'auto' }"
                 :animate="{ height: collapsed ? '0px' : 'auto' }"
                 :transition="{ duration: 0.25, type: 'tween' }"
+                @animation-start="onAnimationStart"
+                @animation-complete="onAnimationComplete"
             >
                 <FieldsProvider
                     :fields="config.fields"
