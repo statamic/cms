@@ -6,9 +6,9 @@ use Statamic\Events\AssetContainerCreated;
 use Statamic\Events\CollectionCreated;
 use Statamic\Events\GlobalSetCreated;
 use Statamic\Events\NavCreated;
+use Statamic\Events\Subscriber;
 use Statamic\Events\TaxonomyCreated;
 use Statamic\Facades\CP\Nav;
-use Statamic\Events\Subscriber;
 
 class InvalidateNavCache extends Subscriber
 {
