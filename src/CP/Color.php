@@ -428,7 +428,9 @@ class Color
     public static function theme(bool $dark = false): array
     {
         if ($config = Preference::get('theme')) {
-            $config = $config['colors'];
+            $config = is_string($config)
+                ? null // If it's a string, it may be the v5 theme, e.g. "dark", so ignore it.
+                : $config['colors'];
         }
 
         $config = $config ?? config('statamic.cp.theme') ?? [];
