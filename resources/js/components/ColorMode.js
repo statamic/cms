@@ -2,13 +2,13 @@ import { watch, ref } from 'vue';
 
 export default class ColorMode {
     #preference;
-    #theme = ref(null);
+    #mode = ref(null);
 
     initialize(preference) {
         this.#preference = ref(preference);
-        this.#setTheme(preference);
+        this.#setMode(preference);
         this.#watchPreferences();
-        this.#watchTheme();
+        this.#watchMode();
         this.#listenForColorSchemeChange();
         this.#registerCommands();
     }
@@ -25,17 +25,17 @@ export default class ColorMode {
         watch(
             this.#preference,
             (preference) => {
-                this.#setTheme(preference);
+                this.#setMode(preference);
                 this.#savePreference(preference);
             }
         );
     }
 
-    #watchTheme() {
+    #watchMode() {
         watch(
-            this.#theme,
-            (theme) => {
-                document.documentElement.classList.toggle('dark', theme === 'dark');
+            this.#mode,
+            (mode) => {
+                document.documentElement.classList.toggle('dark', mode === 'dark');
             },
             { immediate: true },
         );
@@ -43,16 +43,16 @@ export default class ColorMode {
 
     #listenForColorSchemeChange() {
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-            if (this.#preference.value === 'auto') this.#theme.value = e.matches ? 'dark' : 'light';
+            if (this.#preference.value === 'auto') this.#mode.value = e.matches ? 'dark' : 'light';
         });
 
         window.addEventListener('storage', (e) => {
-            if (e.key === 'statamic.color_mode') this.#theme.value = e.newValue;
+            if (e.key === 'statamic.color_mode') this.#mode.value = e.newValue;
         });
     }
 
-    #setTheme(preference) {
-        this.#theme.value =
+    #setMode(preference) {
+        this.#mode.value =
             preference === 'dark' ||
             (preference === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches)
                 ? 'dark'
