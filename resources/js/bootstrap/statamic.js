@@ -36,7 +36,7 @@ import {
     permissions,
     dateFormatter,
     commandPalette,
-    theme,
+    colorMode,
     contrast,
     config,
     preferences,
@@ -122,8 +122,8 @@ export default {
         return progress;
     },
 
-    get $theme() {
-        return theme;
+    get $colorMode() {
+        return colorMode;
     },
 
     get $contrast() {
@@ -164,7 +164,7 @@ export default {
 
     async start() {
         config.initialize(this.initialConfig);
-        theme.initialize(this.initialConfig.user?.theme);
+        colorMode.initialize(this.initialConfig.user?.color_mode);
         contrast.initialize(this.initialConfig.user?.preferences?.strict_accessibility);
         preferences.initialize(this.initialConfig.user?.preferences, this.initialConfig.defaultPreferences);
 
@@ -270,7 +270,7 @@ export default {
             $permissions: permissions,
             $date: dateFormatter,
             $commandPalette: commandPalette,
-            $theme: theme,
+            $colorMode: colorMode,
             $contrast: contrast,
         });
 
