@@ -26,7 +26,7 @@ export function valueToTheme(value: ThemeValue): Theme {
     });
 
     return {
-        id: value.id,
+        id: value.id ?? 'custom',
         name: value.name,
         colors,
         darkColors,
