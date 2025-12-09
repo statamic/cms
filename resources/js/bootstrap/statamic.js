@@ -164,7 +164,7 @@ export default {
 
     async start() {
         config.initialize(this.initialConfig);
-        theme.initialize(this.initialConfig.user?.theme);
+        theme.initialize(this.initialConfig.user?.appearance);
         contrast.initialize(this.initialConfig.user?.preferences?.strict_accessibility);
         preferences.initialize(this.initialConfig.user?.preferences, this.initialConfig.defaultPreferences);
 

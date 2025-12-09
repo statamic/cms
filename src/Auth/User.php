@@ -356,9 +356,9 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
         return $this->setPreference('locale', $locale);
     }
 
-    public function preferredTheme()
+    public function preferredAppearance()
     {
-        return $this->getPreference('theme') ?? 'auto';
+        return $this->getPreference('appearance') ?? 'auto';
     }
 
     public function isTwoFactorAuthenticationRequired(): bool

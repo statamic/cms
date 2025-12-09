@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 <meta name="viewport" content="width=device-width" />
 <meta name="robots" content="noindex,nofollow" />
-<meta name="color-scheme" content="{{ $user?->preferredTheme() ?? 'auto' }}">
+<meta name="color-scheme" content="{{ $user?->preferredAppearance() ?? 'auto' }}">
 
 @if (Statamic::pro() && config('statamic.cp.custom_favicon_url'))
     @include('statamic::partials.favicon', ['favicon_url' => config('statamic.cp.custom_favicon_url')])
@@ -19,7 +19,7 @@
 
 <script>
     (function () {
-        let theme = {!! ($userTheme = $user?->preferredTheme()) ? "'" . $userTheme . "'" : 'null' !!};
+        let theme = {!! ($userTheme = $user?->preferredAppearance()) ? "'" . $userTheme . "'" : 'null' !!};
         if (!theme) theme = localStorage.getItem('statamic.theme') ?? 'auto';
         if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) theme = 'dark';
         if (theme === 'dark') document.documentElement.classList.add('dark');
@@ -46,7 +46,7 @@
     @endforeach
 @endforeach
 
-<style>
+<style id="theme-colors">
     :root {
         {{ \Statamic\CP\Color::cssVariables() }}
 

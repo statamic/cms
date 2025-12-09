@@ -10,6 +10,12 @@ class CorePreferences
 {
     public function boot()
     {
+        Preference::register('theme', [
+            'type' => 'theme',
+            'display' => __('Theme'),
+            'instructions' => __('statamic::messages.preference_theme_instructions'),
+        ]);
+
         Preference::register('locale', [
             'type' => 'select',
             'display' => __('Locale'),
