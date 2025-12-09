@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
 import Preview from './Preview.vue';
 import type { PredefinedTheme, Theme } from './types';
 import { applyTheme } from './utils';
-import { nativeThemes, marketplaceThemes } from './themes';
+import { nativeThemes } from './themes';
 import { Description } from '@ui';
+import { cp_url } from '@/bootstrap/globals';
 
 const emit = defineEmits<{
     (e: 'update:modelValue', theme: PredefinedTheme): void;
@@ -19,10 +21,16 @@ const selectTheme = (theme: PredefinedTheme) => {
     emit('update:modelValue', theme);
 };
 
-const themes = ref<PredefinedTheme[]>([
-    ...nativeThemes,
-    ...marketplaceThemes
-]);
+const themes = ref<PredefinedTheme[]>(nativeThemes);
+
+onMounted(async () => {
+    try {
+        const { data: marketplaceThemes } = await axios.get(cp_url('themes'));
+        themes.value = [...nativeThemes, ...marketplaceThemes];
+    } catch (error) {
+        console.error('Failed to load marketplace themes:', error);
+    }
+});
 
 function isActive(theme: PredefinedTheme): boolean {
     const activeThemeId = props.modelValue?.id || 'default';
@@ -40,7 +48,7 @@ function isActive(theme: PredefinedTheme): boolean {
         >
             <Preview :theme="theme" />
             <div class="text-center pt-2">
-                <Description :text="theme.name" />
+                <Description :text="`${theme.name} by ${theme.author}`" />
             </div>
         </div>
     </div>

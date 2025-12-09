@@ -65,4 +65,20 @@ class Marketplace
     {
         return new Core;
     }
+
+    public function themes()
+    {
+        $uri = 'cp-themes';
+
+        return Cache::rememberWithExpiration("marketplace-$uri", function () use ($uri) {
+            try {
+                $response = Client::get($uri);
+
+                return [60 => collect($response['data'])];
+            } catch (RequestException $e) {
+
+                return [5 => collect()];
+            }
+        });
+    }
 }
