@@ -6,6 +6,7 @@ import colors from './colors';
 import Preview from './Preview.vue';
 import { getDefaultTheme } from '@/components/themes/utils';
 import { translate as __ } from '@/translations/translator';
+import ColorPicker from '@/components/themes/ColorPicker.vue';
 
 const props = defineProps<{
     modelValue?: Theme;
@@ -42,7 +43,7 @@ function updateColor(colorName: ColorVariableName, value: string, isDark: boolea
 }
 
 function hasDarkColor(colorName: ColorVariableName): boolean {
-    return Boolean(props.modelValue.darkColors?.[colorName]);
+    return Boolean(props.modelValue?.darkColors?.[colorName]);
 }
 
 function clearDarkColor(colorName: ColorVariableName) {
@@ -81,20 +82,17 @@ function updateColors(colors: ThemeColors, darkColors: ThemeColors) {
                             <Description :text="color.label" class="flex-1" />
                         </TableCell>
                         <TableCell>
-                            <Input
-                                type="color"
-                                size="sm"
+                            <ColorPicker
                                 :model-value="theme.colors[color.name]"
-                                @update:model-value="updateColor(color.name, $event)"
-                           />
+                                @update:model-value="updateColor(color.name, $event, false)"
+                            />
+
                         </TableCell>
                         <TableCell>
                             <div class="flex items-center">
-                                <Input
+                                <ColorPicker
                                     v-if="hasDarkColor(color.name)"
-                                    type="color"
-                                    size="sm"
-                                    :model-value="theme.darkColors?.[color.name]"
+                                    :model-value="theme.darkColors[color.name]"
                                     @update:model-value="updateColor(color.name, $event, true)"
                                 />
                                 <Button

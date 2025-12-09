@@ -2,6 +2,7 @@
    POPOVERS
    ========================================================================== */
 
+[data-reka-popper-content-wrapper] {z-index: var(--z-index-portal) !important;}
 .popover {
     pointer-events: none;
     visibility: hidden;

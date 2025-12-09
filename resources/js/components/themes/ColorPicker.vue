@@ -1,0 +1,506 @@
+<script setup lang="ts">
+import { Popover, Description } from '@ui';
+import { computed } from 'vue';
+
+const props = defineProps<{
+    modelValue?: string;
+}>();
+
+const emit = defineEmits<{
+    (e: 'update:modelValue', value: string): void;
+}>();
+
+const colors = {
+    slate: {
+        50: 'oklch(0.984 0.003 247.858)',
+        100: 'oklch(0.968 0.007 247.896)',
+        150: 'oklch(0.9485 0.01 251.702)',
+        200: 'oklch(0.929 0.013 255.508)',
+        300: 'oklch(0.869 0.022 252.894)',
+        400: 'oklch(0.704 0.04 256.788)',
+        500: 'oklch(0.554 0.046 257.417)',
+        600: 'oklch(0.446 0.043 257.281)',
+        700: 'oklch(0.372 0.044 257.287)',
+        800: 'oklch(0.279 0.041 260.031)',
+        850: 'oklch(0.236 0.041 263.801)',
+        900: 'oklch(0.208 0.042 265.755)',
+        925: 'oklch(0.1945 0.042 265.573)',
+        950: 'oklch(0.169 0.042 264.695)',
+    },
+    gray: {
+        50: 'oklch(0.985 0.002 247.839)',
+        100: 'oklch(0.967 0.003 264.542)',
+        150: 'oklch(0.9475 0.0045 264.536)',
+        200: 'oklch(0.928 0.006 264.531)',
+        300: 'oklch(0.872 0.01 258.338)',
+        400: 'oklch(0.707 0.022 261.325)',
+        500: 'oklch(0.551 0.027 264.364)',
+        600: 'oklch(0.446 0.03 256.802)',
+        700: 'oklch(0.373 0.034 259.733)',
+        800: 'oklch(0.278 0.033 256.848)',
+        850: 'oklch(0.236 0.033 260.201)',
+        900: 'oklch(0.21 0.034 264.665)',
+        925: 'oklch(0.1963 0.0330 264.157)',
+        950: 'oklch(0.18 0.028 261.692)',
+    },
+    zinc: {
+        50: 'oklch(0.985 0 0)',
+        100: 'oklch(0.967 0.001 286.375)',
+        150: 'oklch(0.956 0.0022 286.32)',
+        200: 'oklch(0.92 0.004 286.32)',
+        300: 'oklch(0.871 0.006 286.286)',
+        400: 'oklch(0.705 0.015 286.067)',
+        500: 'oklch(0.552 0.016 285.938)',
+        600: 'oklch(0.442 0.017 285.786)',
+        700: 'oklch(0.37 0.013 285.805)',
+        800: 'oklch(0.274 0.006 286.033)',
+        850: 'oklch(0.236 0.006 286.015)',
+        900: 'oklch(0.21 0.006 285.885)',
+        925: 'oklch(0.1982 0.0042 285.73)',
+        950: 'oklch(0.141 0.005 285.823)',
+    },
+    neutral: {
+        50: 'oklch(0.985 0 0)',
+        100: 'oklch(0.97 0 0)',
+        150: 'oklch(0.946 0 0)',
+        200: 'oklch(0.922 0 0)',
+        300: 'oklch(0.87 0 0)',
+        400: 'oklch(0.708 0 0)',
+        500: 'oklch(0.556 0 0)',
+        600: 'oklch(0.439 0 0)',
+        700: 'oklch(0.371 0 0)',
+        800: 'oklch(0.269 0 0)',
+        850: 'oklch(0.236 0 0)',
+        900: 'oklch(0.205 0 0)',
+        925: 'oklch(0.1947 0 0)',
+        950: 'oklch(0.145 0 0)',
+    },
+    stone: {
+        50: 'oklch(0.985 0.001 106.423)',
+        100: 'oklch(0.97 0.001 106.424)',
+        150: 'oklch(0.9465 0.002 77.571)',
+        200: 'oklch(0.923 0.003 48.717)',
+        300: 'oklch(0.869 0.005 56.366)',
+        400: 'oklch(0.709 0.01 56.259)',
+        500: 'oklch(0.553 0.013 58.071)',
+        600: 'oklch(0.444 0.011 73.639)',
+        700: 'oklch(0.374 0.01 67.558)',
+        800: 'oklch(0.268 0.007 34.298)',
+        850: 'oklch(0.236 0.006 48.043)',
+        900: 'oklch(0.216 0.006 56.043)',
+        925: 'oklch(0.2042 0.0057 55.203)',
+        950: 'oklch(0.187 0.004 49.25)',
+    },
+    red: {
+        50: 'oklch(0.971 0.013 17.38)',
+        100: 'oklch(0.936 0.032 17.717)',
+        150: 'oklch(0.9105 0.047 18.026)',
+        200: 'oklch(0.885 0.062 18.334)',
+        300: 'oklch(0.808 0.114 19.571)',
+        400: 'oklch(0.704 0.191 22.216)',
+        500: 'oklch(0.637 0.237 25.331)',
+        600: 'oklch(0.577 0.245 27.325)',
+        700: 'oklch(0.505 0.213 27.518)',
+        800: 'oklch(0.444 0.177 26.899)',
+        850: 'oklch(0.42 0.159 26.311)',
+        900: 'oklch(0.396 0.141 25.723)',
+        925: 'oklch(0.3724 0.1326 25.778)',
+        950: 'oklch(0.318 0.092 26.042)',
+    },
+    orange: {
+        50: 'oklch(0.98 0.016 73.684)',
+        100: 'oklch(0.954 0.038 75.164)',
+        150: 'oklch(0.9275 0.057 72.931)',
+        200: 'oklch(0.901 0.076 70.697)',
+        300: 'oklch(0.837 0.128 66.29)',
+        400: 'oklch(0.75 0.183 55.934)',
+        500: 'oklch(0.705 0.213 47.604)',
+        600: 'oklch(0.646 0.222 41.116)',
+        700: 'oklch(0.553 0.195 38.402)',
+        800: 'oklch(0.47 0.157 37.304)',
+        850: 'oklch(0.439 0.14 37.738)',
+        900: 'oklch(0.408 0.123 38.172)',
+        925: 'oklch(0.3837 0.1155 37.845)',
+        950: 'oklch(0.306 0.079 36.259)',
+    },
+    amber: {
+        50: 'oklch(0.987 0.022 95.277)',
+        100: 'oklch(0.962 0.059 95.617)',
+        150: 'oklch(0.943 0.0895 95.682)',
+        200: 'oklch(0.924 0.12 95.746)',
+        300: 'oklch(0.879 0.169 91.605)',
+        400: 'oklch(0.828 0.189 84.429)',
+        500: 'oklch(0.769 0.188 70.08)',
+        600: 'oklch(0.666 0.179 58.318)',
+        700: 'oklch(0.555 0.163 48.998)',
+        800: 'oklch(0.473 0.137 46.201)',
+        850: 'oklch(0.444 0.125 46.053)',
+        900: 'oklch(0.414 0.112 45.904)',
+        925: 'oklch(0.3909 0.1060 45.858)',
+        950: 'oklch(0.319 0.077 45.635)',
+    },
+    yellow: {
+        50: 'oklch(0.987 0.026 102.212)',
+        100: 'oklch(0.973 0.071 103.193)',
+        150: 'oklch(0.959 0.1 102.367)',
+        200: 'oklch(0.945 0.129 101.54)',
+        300: 'oklch(0.905 0.182 98.111)',
+        400: 'oklch(0.852 0.199 91.936)',
+        500: 'oklch(0.795 0.184 86.047)',
+        600: 'oklch(0.681 0.162 75.834)',
+        700: 'oklch(0.554 0.135 66.442)',
+        800: 'oklch(0.476 0.114 61.907)',
+        850: 'oklch(0.449 0.105 59.808)',
+        900: 'oklch(0.421 0.095 57.708)',
+        925: 'oklch(0.3979 0.0900 57.042)',
+        950: 'oklch(0.326 0.066 53.813)',
+    },
+    lime: {
+        50: 'oklch(0.986 0.031 120.757)',
+        100: 'oklch(0.967 0.067 122.328)',
+        150: 'oklch(0.9525 0.097 123.325)',
+        200: 'oklch(0.938 0.127 124.321)',
+        300: 'oklch(0.897 0.196 126.665)',
+        400: 'oklch(0.841 0.238 128.85)',
+        500: 'oklch(0.768 0.233 130.85)',
+        600: 'oklch(0.648 0.2 131.684)',
+        700: 'oklch(0.532 0.157 131.589)',
+        800: 'oklch(0.453 0.124 130.933)',
+        850: 'oklch(0.429 0.113 131.296)',
+        900: 'oklch(0.405 0.101 131.063)',
+        925: 'oklch(0.3826 0.0960 131.242)',
+        950: 'oklch(0.314 0.072 132.109)',
+    },
+    green: {
+        50: 'oklch(0.982 0.018 155.826)',
+        100: 'oklch(0.962 0.044 156.743)',
+        150: 'oklch(0.9435 0.064 156.369)',
+        200: 'oklch(0.925 0.084 155.995)',
+        300: 'oklch(0.871 0.15 154.449)',
+        400: 'oklch(0.792 0.209 151.711)',
+        500: 'oklch(0.723 0.219 149.579)',
+        600: 'oklch(0.627 0.194 149.214)',
+        700: 'oklch(0.527 0.154 150.069)',
+        800: 'oklch(0.448 0.119 151.328)',
+        850: 'oklch(0.421 0.107 151.932)',
+        900: 'oklch(0.393 0.095 152.535)',
+        925: 'oklch(0.3713 0.0899 152.603)',
+        950: 'oklch(0.306 0.065 152.934)',
+    },
+    emerald: {
+        50: 'oklch(0.979 0.021 166.113)',
+        100: 'oklch(0.95 0.052 163.051)',
+        150: 'oklch(0.9275 0.0725 163.601)',
+        200: 'oklch(0.905 0.093 164.15)',
+        300: 'oklch(0.845 0.143 164.978)',
+        400: 'oklch(0.765 0.177 163.223)',
+        500: 'oklch(0.696 0.17 162.48)',
+        600: 'oklch(0.596 0.145 163.225)',
+        700: 'oklch(0.508 0.118 165.612)',
+        800: 'oklch(0.432 0.095 166.913)',
+        850: 'oklch(0.405 0.086 167.427)',
+        900: 'oklch(0.378 0.077 168.94)',
+        925: 'oklch(0.3582 0.0726 169.341)',
+        950: 'oklch(0.302 0.051 172.552)',
+    },
+    teal: {
+        50: 'oklch(0.984 0.014 180.72)',
+        100: 'oklch(0.953 0.051 180.801)',
+        150: 'oklch(0.9315 0.0735 180.614)',
+        200: 'oklch(0.91 0.096 180.426)',
+        300: 'oklch(0.855 0.138 181.071)',
+        400: 'oklch(0.777 0.152 181.912)',
+        500: 'oklch(0.704 0.14 182.503)',
+        600: 'oklch(0.6 0.118 184.704)',
+        700: 'oklch(0.511 0.096 186.391)',
+        800: 'oklch(0.437 0.078 188.216)',
+        850: 'oklch(0.412 0.071 189.308)',
+        900: 'oklch(0.386 0.063 188.416)',
+        925: 'oklch(0.3674 0.0601 188.891)',
+        950: 'oklch(0.317 0.046 192.524)',
+    },
+    cyan: {
+        50: 'oklch(0.984 0.019 200.873)',
+        100: 'oklch(0.956 0.045 203.388)',
+        150: 'oklch(0.9365 0.0625 204.215)',
+        200: 'oklch(0.917 0.08 205.041)',
+        300: 'oklch(0.865 0.127 207.078)',
+        400: 'oklch(0.789 0.154 211.53)',
+        500: 'oklch(0.715 0.143 215.221)',
+        600: 'oklch(0.609 0.126 221.723)',
+        700: 'oklch(0.52 0.105 223.128)',
+        800: 'oklch(0.45 0.085 224.283)',
+        850: 'oklch(0.424 0.078 225.706)',
+        900: 'oklch(0.398 0.07 227.392)',
+        925: 'oklch(0.3816 0.0676 227.696)',
+        950: 'oklch(0.342 0.056 229.695)',
+    },
+    sky: {
+        50: 'oklch(0.977 0.013 236.62)',
+        100: 'oklch(0.951 0.026 236.824)',
+        150: 'oklch(0.926 0.042 233.863)',
+        200: 'oklch(0.901 0.058 230.902)',
+        300: 'oklch(0.828 0.111 230.318)',
+        400: 'oklch(0.746 0.16 232.661)',
+        500: 'oklch(0.685 0.169 237.323)',
+        600: 'oklch(0.588 0.158 241.966)',
+        700: 'oklch(0.5 0.134 242.749)',
+        800: 'oklch(0.443 0.11 240.79)',
+        850: 'oklch(0.417 0.1 240.833)',
+        900: 'oklch(0.391 0.09 240.876)',
+        925: 'oklch(0.3743 0.0859 241.124)',
+        950: 'oklch(0.333 0.066 243.157)',
+    },
+    blue: {
+        50: 'oklch(0.97 0.014 254.604)',
+        100: 'oklch(0.932 0.032 255.585)',
+        150: 'oklch(0.907 0.0455 254.857)',
+        200: 'oklch(0.882 0.059 254.128)',
+        300: 'oklch(0.809 0.105 251.813)',
+        400: 'oklch(0.707 0.165 254.624)',
+        500: 'oklch(0.623 0.214 259.815)',
+        600: 'oklch(0.546 0.245 262.881)',
+        700: 'oklch(0.488 0.243 264.376)',
+        800: 'oklch(0.424 0.199 265.638)',
+        850: 'oklch(0.402 0.173 265.587)',
+        900: 'oklch(0.379 0.146 265.522)',
+        925: 'oklch(0.3624 0.1366 265.935)',
+        950: 'oklch(0.322 0.091 267.935)',
+    },
+    indigo: {
+        50: 'oklch(0.962 0.018 272.314)',
+        100: 'oklch(0.93 0.034 272.788)',
+        150: 'oklch(0.9 0.0495 273.414)',
+        200: 'oklch(0.87 0.065 274.039)',
+        300: 'oklch(0.785 0.115 274.713)',
+        400: 'oklch(0.673 0.182 276.935)',
+        500: 'oklch(0.585 0.233 277.117)',
+        600: 'oklch(0.511 0.262 276.966)',
+        700: 'oklch(0.457 0.24 277.023)',
+        800: 'oklch(0.398 0.195 277.366)',
+        850: 'oklch(0.379 0.17 277.532)',
+        900: 'oklch(0.359 0.144 278.697)',
+        925: 'oklch(0.3416 0.1348 279.158)',
+        950: 'oklch(0.297 0.09 281.288)',
+    },
+    violet: {
+        50: 'oklch(0.969 0.016 293.756)',
+        100: 'oklch(0.943 0.029 294.588)',
+        150: 'oklch(0.9185 0.043 293.936)',
+        200: 'oklch(0.894 0.057 293.283)',
+        300: 'oklch(0.811 0.111 293.571)',
+        400: 'oklch(0.702 0.183 293.541)',
+        500: 'oklch(0.606 0.25 292.717)',
+        600: 'oklch(0.541 0.281 293.009)',
+        700: 'oklch(0.491 0.27 292.581)',
+        800: 'oklch(0.432 0.232 292.759)',
+        850: 'oklch(0.406 0.211 293.252)',
+        900: 'oklch(0.38 0.189 293.745)',
+        925: 'oklch(0.3634 0.1808 293.291)',
+        950: 'oklch(0.323 0.141 291.089)',
+    },
+    purple: {
+        50: 'oklch(0.977 0.014 308.299)',
+        100: 'oklch(0.946 0.033 307.174)',
+        150: 'oklch(0.924 0.048 306.939)',
+        200: 'oklch(0.902 0.063 306.703)',
+        300: 'oklch(0.827 0.119 306.383)',
+        400: 'oklch(0.714 0.203 305.504)',
+        500: 'oklch(0.627 0.265 303.9)',
+        600: 'oklch(0.558 0.288 302.321)',
+        700: 'oklch(0.496 0.265 301.924)',
+        800: 'oklch(0.438 0.218 303.724)',
+        850: 'oklch(0.41 0.197 304.356)',
+        900: 'oklch(0.381 0.176 304.987)',
+        925: 'oklch(0.3656 0.1714 304.599)',
+        950: 'oklch(0.331 0.149 302.717)',
+    },
+    fuchsia: {
+        50: 'oklch(0.977 0.017 320.058)',
+        100: 'oklch(0.952 0.037 318.852)',
+        150: 'oklch(0.9275 0.0565 319.236)',
+        200: 'oklch(0.903 0.076 319.62)',
+        300: 'oklch(0.833 0.145 321.434)',
+        400: 'oklch(0.74 0.238 322.16)',
+        500: 'oklch(0.667 0.295 322.15)',
+        600: 'oklch(0.591 0.293 322.896)',
+        700: 'oklch(0.518 0.253 323.949)',
+        800: 'oklch(0.452 0.211 324.591)',
+        850: 'oklch(0.427 0.191 325.102)',
+        900: 'oklch(0.401 0.17 325.612)',
+        925: 'oklch(0.3825 0.1642 325.620)',
+        950: 'oklch(0.333 0.136 325.661)',
+    },
+    pink: {
+        50: 'oklch(0.971 0.014 343.198)',
+        100: 'oklch(0.948 0.028 342.258)',
+        150: 'oklch(0.9235 0.0445 342.745)',
+        200: 'oklch(0.899 0.061 343.231)',
+        300: 'oklch(0.823 0.12 346.018)',
+        400: 'oklch(0.718 0.202 349.761)',
+        500: 'oklch(0.656 0.241 354.308)',
+        600: 'oklch(0.592 0.249 0.584)',
+        700: 'oklch(0.525 0.223 3.958)',
+        800: 'oklch(0.459 0.187 3.815)',
+        850: 'oklch(0.434 0.17 3.114)',
+        900: 'oklch(0.408 0.153 2.432)',
+        925: 'oklch(0.3868 0.1455 2.557)',
+        950: 'oklch(0.324 0.109 3.907)',
+    },
+    rose: {
+        50: 'oklch(0.969 0.015 12.422)',
+        100: 'oklch(0.941 0.03 12.58)',
+        150: 'oklch(0.9165 0.044 11.291)',
+        200: 'oklch(0.892 0.058 10.001)',
+        300: 'oklch(0.81 0.117 11.638)',
+        400: 'oklch(0.712 0.194 13.428)',
+        500: 'oklch(0.645 0.246 16.439)',
+        600: 'oklch(0.586 0.253 17.585)',
+        700: 'oklch(0.514 0.222 16.935)',
+        800: 'oklch(0.455 0.188 13.697)',
+        850: 'oklch(0.433 0.174 11.985)',
+        900: 'oklch(0.41 0.159 10.272)',
+        925: 'oklch(0.3862 0.1498 10.413)',
+        950: 'oklch(0.311 0.105 12.094)',
+    },
+};
+
+const specialColors = {
+    volt: { name: 'Volt', value: 'oklch(93.86% 0.2018 122.24)' },
+    white: { name: 'White', value: '#fff' },
+    transparent: { name: 'Transparent', value: 'transparent' },
+};
+
+const colorFamilies = [
+    { name: 'Red', key: 'red' },
+    { name: 'Orange', key: 'orange' },
+    { name: 'Amber', key: 'amber' },
+    { name: 'Yellow', key: 'yellow' },
+    { name: 'Lime', key: 'lime' },
+    { name: 'Green', key: 'green' },
+    { name: 'Emerald', key: 'emerald' },
+    { name: 'Teal', key: 'teal' },
+    { name: 'Cyan', key: 'cyan' },
+    { name: 'Sky', key: 'sky' },
+    { name: 'Blue', key: 'blue' },
+    { name: 'Indigo', key: 'indigo' },
+    { name: 'Violet', key: 'violet' },
+    { name: 'Purple', key: 'purple' },
+    { name: 'Fuchsia', key: 'fuchsia' },
+    { name: 'Pink', key: 'pink' },
+    { name: 'Rose', key: 'rose' },
+    { name: 'Slate', key: 'slate' },
+    { name: 'Gray', key: 'gray' },
+    { name: 'Zinc', key: 'zinc' },
+    { name: 'Neutral', key: 'neutral' },
+    { name: 'Stone', key: 'stone' },
+];
+
+const shades = [50, 100, 150, 200, 300, 400, 500, 600, 700, 800, 850, 900, 925, 950];
+
+function selectColor(color: string, shade?: number) {
+    if (shade !== undefined) {
+        emit('update:modelValue', colors[color]?.[shade]);
+    } else {
+        emit('update:modelValue', specialColors[color]?.value);
+    }
+}
+
+function isSelected(color: string, shade?: number) {
+    if (shade !== undefined) {
+        const oklchValue = colors[color]?.[shade];
+        return props.modelValue === oklchValue;
+    } else {
+        return props.modelValue === specialColors[color]?.value;
+    }
+}
+
+const selectedColor = computed(() => {
+    if (!props.modelValue) return '';
+
+    for (const [key, special] of Object.entries(specialColors)) {
+        if (special.value === props.modelValue) {
+            return special.name;
+        }
+    }
+
+    for (const [familyKey, shades] of Object.entries(colors)) {
+        for (const [shade, oklchValue] of Object.entries(shades)) {
+            if (oklchValue === props.modelValue) {
+                const familyName = colorFamilies.find(f => f.key === familyKey)?.name || familyKey;
+                return `${familyName} ${shade}`;
+            }
+        }
+    }
+
+    return props.modelValue;
+});
+</script>
+
+<template>
+    <Popover arrow inset class="w-full!">
+        <template #trigger>
+            <button
+                type="button"
+                class="w-8 h-8 rounded border-2 border-gray-300 hover:border-gray-400 transition-all"
+                :style="{
+                    backgroundColor: modelValue || 'transparent',
+                }"
+                v-tooltip="selectedColor"
+            />
+        </template>
+        <div class="p-2">
+            <div class="mb-2 text-center">
+                <Description :text="selectedColor" />
+            </div>
+            <div class="grid grid-cols-23">
+                <div v-for="family in colorFamilies" :key="family.key" :data-family="family.key" class="flex flex-col">
+                    <button
+                        v-for="shade in shades" :key="shade" :data-shade="shade"
+                        type="button"
+                        :class="[
+                            `bg-${family.key}-${shade}`,
+                            'w-4 h-4 cursor-pointer hover:scale-150 hover:rounded',
+                            isSelected(family.key, shade) ? 'ring-2 ring-blue-500 z-1' : ''
+                        ]"
+                        :title="`${family.key}-${shade}`"
+                        @click="selectColor(family.key, shade)"
+                    />
+                </div>
+                <div class="flex flex-col">
+                    <button
+                        :class="[
+                            `bg-white border border-gray-300`,
+                            'w-4 h-4 cursor-pointer hover:scale-150 hover:rounded relative',
+                            isSelected('transparent') ? 'ring-2 ring-blue-500 z-1' : ''
+                        ]"
+                        title="Transparent"
+                        @click="selectColor('transparent')"
+                    >
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="w-full h-[1px] bg-red-500 rotate-45 origin-center"></div>
+                        </div>
+                    </button>
+                    <button
+                        :class="[
+                            `bg-white border`,
+                            'w-4 h-4 cursor-pointer hover:scale-150 hover:rounded',
+                            isSelected('white') ? 'ring-2 ring-blue-500 z-1' : ''
+                        ]"
+                        title="White"
+                        @click="selectColor('white')"
+                    ></button>
+                    <button
+                        :class="[
+                            `bg-volt`,
+                            'w-4 h-4 cursor-pointer hover:scale-150 hover:rounded',
+                            isSelected('volt') ? 'ring-2 ring-blue-500 z-1' : ''
+                        ]"
+                        title="Volt"
+                        @click="selectColor('volt')"
+                    ></button>
+                </div>
+            </div>
+        </div>
+    </Popover>
+</template>
