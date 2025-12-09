@@ -1,6 +1,6 @@
 import { watch, ref } from 'vue';
 
-export default class Theme {
+export default class ColorMode {
     #preference;
     #theme = ref(null);
 
@@ -47,7 +47,7 @@ export default class Theme {
         });
 
         window.addEventListener('storage', (e) => {
-            if (e.key === 'statamic.theme') this.#theme.value = e.newValue;
+            if (e.key === 'statamic.color_mode') this.#theme.value = e.newValue;
         });
     }
 
@@ -61,23 +61,23 @@ export default class Theme {
 
     #savePreference(preference) {
         if (preference === 'auto') {
-            if (Statamic.$config.get('user') && Statamic.$preferences.has('theme')) {
-                Statamic.$preferences.remove('theme');
+            if (Statamic.$config.get('user') && Statamic.$preferences.has('color_mode')) {
+                Statamic.$preferences.remove('color_mode');
             }
 
-            localStorage.removeItem('statamic.theme');
+            localStorage.removeItem('statamic.color_mode');
         } else {
-            if (Statamic.$config.get('user') && Statamic.$preferences.get('theme') !== preference) {
-                Statamic.$preferences.set('theme', preference);
+            if (Statamic.$config.get('user') && Statamic.$preferences.get('color_mode') !== preference) {
+                Statamic.$preferences.set('color_mode', preference);
             }
 
-            localStorage.setItem('statamic.theme', preference);
+            localStorage.setItem('statamic.color_mode', preference);
         }
     }
 
     #registerCommands() {
         Statamic.$commandPalette.add({
-            text: [__('Toggle Theme'), __('Light')],
+            text: [__('Toggle Color Mode'), __('Light')],
             icon: 'sun',
             action: () => {
                 this.preference = 'light';
@@ -86,7 +86,7 @@ export default class Theme {
         });
 
         Statamic.$commandPalette.add({
-            text: [__('Toggle Theme'), __('Dark')],
+            text: [__('Toggle Color Mode'), __('Dark')],
             icon: 'moon',
             action: () => {
                 this.preference = 'dark';
@@ -95,7 +95,7 @@ export default class Theme {
         });
 
         Statamic.$commandPalette.add({
-            text: [__('Toggle Theme'), __('System')],
+            text: [__('Toggle Color Mode'), __('System')],
             icon: 'monitor',
             action: () => {
                 this.preference = 'auto';

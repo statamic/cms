@@ -56,7 +56,7 @@ it('exports api', async () => {
         'reveal',
         'slug',
         'stacks',
-        'theme',
+        'colorMode',
         'toast',
     ];
 

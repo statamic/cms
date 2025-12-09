@@ -36,7 +36,7 @@ import {
     permissions,
     dateFormatter,
     commandPalette,
-    theme,
+    colorMode,
     contrast,
     config,
     preferences,
@@ -122,8 +122,8 @@ export default {
         return progress;
     },
 
-    get $theme() {
-        return theme;
+    get $colorMode() {
+        return colorMode;
     },
 
     get $contrast() {
@@ -164,7 +164,7 @@ export default {
 
     async start() {
         config.initialize(this.initialConfig);
-        theme.initialize(this.initialConfig.user?.theme);
+        colorMode.initialize(this.initialConfig.user?.color_mode);
         contrast.initialize(this.initialConfig.user?.preferences?.strict_accessibility);
         preferences.initialize(this.initialConfig.user?.preferences, this.initialConfig.defaultPreferences);
 
@@ -270,7 +270,7 @@ export default {
             $permissions: permissions,
             $date: dateFormatter,
             $commandPalette: commandPalette,
-            $theme: theme,
+            $colorMode: colorMode,
             $contrast: contrast,
         });
 
@@ -312,12 +312,12 @@ export default {
         components.boot(this.$app);
 
         // Suppress the translation warnings
-        this.$app.config.warnHandler = (msg, vm, trace) => {
-            if (msg.includes('Property "__" should not start with _ which is a reserved prefix for Vue internals')) {
-                return;
-            }
-            console.warn(msg, vm, trace);
-        };
+        // this.$app.config.warnHandler = (msg, vm, trace) => {
+        //     if (msg.includes('Property "__" should not start with _ which is a reserved prefix for Vue internals')) {
+        //         return;
+        //     }
+        //     console.warn(msg, vm, trace);
+        // };
 
         axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
         axios.defaults.headers.common['X-CSRF-TOKEN'] = Statamic.$config.get('csrfToken');
