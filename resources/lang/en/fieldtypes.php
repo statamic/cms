@@ -103,6 +103,8 @@ return [
     'grid.config.mode' => 'Choose your preferred layout style.',
     'grid.config.reorderable' => 'Enable the ability to reorder rows.',
     'grid.title' => 'Grid',
+    'group.config.collapsed' => 'Collapse this group by default.',
+    'group.config.collapsible' => 'Allow this group to be collapsed.',
     'group.config.fields' => 'Configure fields to be nested inside this group.',
     'group.title' => 'Group',
     'hidden.title' => 'Hidden',

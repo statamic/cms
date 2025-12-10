@@ -1,0 +1,27 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as ModalStories from '../Modal.stories';
+
+<Meta of={ModalStories} />
+
+# Modal
+Display content in a layer above the main page. Ideal for confirmations, alerts, and forms.
+<Canvas of={ModalStories._DocsIntro} sourceState={'shown'} />
+
+## Title
+Titles are required for accessibility, but you don't have to use the `title` prop if you want to style it differently. You have full control of the style and content by using the `ModalTitle` component.
+<Canvas of={ModalStories._CustomTitle} sourceState={'shown'} />
+
+## Close Button
+You can use the `ModalClose` component to close the modal.
+<Canvas of={ModalStories._CloseButton} sourceState={'shown'} />
+
+## Icon
+You can add an icon to the title by passing the `icon` prop.
+<Canvas of={ModalStories._WithIcon} sourceState={'shown'} />
+
+## Footer
+You can use a custom footer by using the `#footer` slot.
+<Canvas of={ModalStories._WithFooter} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={ModalStories} />

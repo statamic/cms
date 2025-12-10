@@ -1,0 +1,34 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as SelectStories from '../Select.stories';
+
+<Meta of={SelectStories} />
+
+# Select
+Displays a list of options for the user to pick from—triggered by an input style button.
+<Canvas of={SelectStories._DocsIntro} sourceState={'shown'} />
+
+## Data Format
+Pass data into the select with the `options` prop as an array of objects. The objects must contain a `value` and a `label`, but can contain any other day you would like as well.
+
+## Sizes
+Use the `size` prop to control the input's height and type scale. The scales match the button sizes to make sure everything lines up nicely.
+<Canvas of={SelectStories._Sizes} sourceState={'shown'} />
+
+## Variants
+Use the `variant` prop to change the appearance of the select.
+<Canvas of={SelectStories._Variants} sourceState={'shown'} />
+
+## Clearable
+Add a clear button to your select by setting the `clearable` prop.
+<Canvas of={SelectStories._Clearable} sourceState={'shown'} />
+
+## Icon
+Adds an icon to your select box.
+<Canvas of={SelectStories._Icon} sourceState={'shown'} />
+
+## Custom List Items
+You can customize the markup and display of the list items inside of an `#options` slot, with full access to whatever data is passed into the select.
+<Canvas of={SelectStories._CustomListItems} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={SelectStories} />

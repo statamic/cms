@@ -16,13 +16,13 @@ jobs:
 
     strategy:
       matrix:
-        php: [8.3, 8.4]
+        php: [8.3, 8.4, 8.5]
         laravel: [12.*]
         stability: [prefer-lowest, prefer-stable]
         os: [ubuntu-latest]
         include:
           - os: windows-latest
-            php: 8.4
+            php: 8.5
             laravel: 12.*
             stability: prefer-stable
 
@@ -136,6 +136,10 @@ jobs:
         env:
           CI: true
           LARAVEL_BYPASS_ENV_CHECK: 1
+
+      - name: Verify build succeeds
+        if: steps.should-run-tests.outputs.result == 'true'
+        run: npm run build
 
   slack:
     name: Slack Notification

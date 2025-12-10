@@ -28,6 +28,20 @@ vi.mock('reka-ui', async () => {
     };
 });
 
+// Mock the Scrollbar component since it relies on DOM APIs not available in tests
+vi.mock('@ui/Combobox/Scrollbar.vue', () => ({
+    default: {
+        name: 'Scrollbar',
+        props: ['viewport'],
+        setup() {
+            return {
+                update: vi.fn()
+            };
+        },
+        template: '<div />'
+    }
+}));
+
 beforeEach(() => {
     Element.prototype.scrollIntoView = vi.fn();
 

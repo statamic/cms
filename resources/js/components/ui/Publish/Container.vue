@@ -68,7 +68,11 @@ const props = defineProps({
     asConfig: {
         type: Boolean,
         default: false,
-    }
+    },
+    rememberTab: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const parentContainer = injectContainerContext(containerContextKey);
@@ -230,6 +234,7 @@ const provided = {
     desyncField,
     components,
     asConfig: toRef(() => props.asConfig),
+    rememberTab: toRef(() => props.rememberTab),
     isTrackingOriginValues: computed(() => !!props.originValues),
     setValues,
     setFieldValue,

@@ -1,0 +1,42 @@
+/*
+These variables are copied from what gets output into the <head>
+of the control panel. Since they are defined in PHP we have to
+manually copy them here.
+*/
+:root {
+    --theme-color-primary: oklch(0.457 0.24 277.023);
+    --theme-color-gray-50: oklch(0.985 0 0);
+    --theme-color-gray-100: oklch(0.967 0.001 286.375);
+    --theme-color-gray-150: oklch(0.956 0.0022 286.32);
+    --theme-color-gray-200: oklch(0.92 0.004 286.32);
+    --theme-color-gray-300: oklch(0.871 0.006 286.286);
+    --theme-color-gray-400: oklch(0.705 0.015 286.067);
+    --theme-color-gray-500: oklch(0.552 0.016 285.938);
+    --theme-color-gray-600: oklch(0.442 0.017 285.786);
+    --theme-color-gray-700: oklch(0.37 0.013 285.805);
+    --theme-color-gray-800: oklch(0.274 0.006 286.033);
+    --theme-color-gray-850: oklch(0.236 0.006 286.015);
+    --theme-color-gray-900: oklch(0.21 0.006 285.885);
+    --theme-color-gray-925: oklch(0.1982 0.0042 285.73);
+    --theme-color-gray-950: oklch(0.141 0.005 285.823);
+    --theme-color-success: oklch(0.792 0.209 151.711);
+    --theme-color-danger: oklch(0.577 0.245 27.325);
+    --theme-color-body-bg: oklch(0.967 0.001 286.375);
+    --theme-color-body-border: transparent;
+    --theme-color-content-bg: white;
+    --theme-color-content-border: oklch(0.92 0.004 286.32);
+    --theme-color-global-header-bg: oklch(0.274 0.006 286.033);
+    --theme-color-progress-bar: oklch(0.457 0.24 277.023);
+    --theme-color-focus-outline: oklch(0.707 0.165 254.624);
+    --theme-color-ui-accent-bg: oklch(0.457 0.24 277.023);
+    --theme-color-ui-accent-text: var(--theme-color-ui-accent-bg);
+    --theme-color-switch-bg: var(--theme-color-ui-accent-bg);
+
+    &.dark {
+        --theme-color-body-bg: oklch(0.21 0.006 285.885);
+        --theme-color-body-border: oklch(0.141 0.005 285.823);
+        --theme-color-content-bg: oklch(0.21 0.006 285.885);
+        --theme-color-content-border: oklch(0.141 0.005 285.823);
+        --theme-color-ui-accent-text: oklch(0.673 0.182 276.935);
+    }
+}

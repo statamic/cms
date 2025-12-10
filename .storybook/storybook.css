@@ -1,0 +1,46 @@
+@import 'tailwindcss';
+@import '../resources/css/ui.css';
+@custom-variant dark (&:where(.dark, .dark *));
+
+.sbdocs h1,
+.sbdocs h2,
+.sbdocs h3,
+.sbdocs h4,
+.sbdocs h5,
+.sbdocs h6 {
+    font-family: p22-mackinac-pro, serif;
+}
+
+.sbdocs h1 {
+    font-size: 2.5rem;
+}
+
+.sbdocs h2 {
+    font-size: 1.75rem;
+    font-weight: 600;
+}
+
+.sbdocs h3 {
+    font-size: 1.25rem;
+}
+
+.sbdocs p,
+.sbdocs li {
+    font-size: 1rem;
+    line-height: 1.6;
+    font-weight: 350;
+}
+
+.prismjs {
+    font-size: 1rem;
+}
+
+.sbdocs.sbdocs-wrapper {
+    padding: 2rem 4rem;
+}
+
+.dark,
+.dark body,
+.dark .sbdocs-preview {
+    background: var(--theme-color-content-bg);
+}
