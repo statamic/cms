@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 import Preview from './Preview.vue';
 import type { PredefinedTheme, Theme } from './types';
@@ -7,6 +7,7 @@ import { applyTheme } from './utils';
 import { nativeThemes } from './themes';
 import { Button, Description, Input } from '@ui';
 import { cp_url } from '@/bootstrap/globals';
+import fuzzysort from 'fuzzysort';
 
 const emit = defineEmits<{
     (e: 'update:modelValue', theme: PredefinedTheme): void;
@@ -23,6 +24,15 @@ const selectTheme = (theme: PredefinedTheme) => {
 
 const themes = ref<PredefinedTheme[]>(nativeThemes);
 const busy = ref<boolean>(true);
+const search = ref<string>('');
+
+const results = computed(() => {
+    return search.value
+        ? fuzzysort
+            .go(search.value, themes.value, { keys: ['name', 'author'] })
+            .map(result => result.obj)
+        : themes.value;
+});
 
 onMounted(() => load());
 
@@ -54,6 +64,13 @@ defineExpose({
 
 <template>
     <div class="mb-6 flex items-center gap-4">
+        <Input
+            size="sm"
+            v-model="search"
+            :placeholder="__('Search...')"
+            clearable
+            @keydown.esc="search = ''"
+        />
         <Button
             size="sm"
             variant="filled"
@@ -65,7 +82,7 @@ defineExpose({
 
     <div class="grid grid-cols-4 gap-6">
         <div
-            v-for="theme in themes"
+            v-for="theme in results"
             :key="theme.id"
             :class="{ '[&_[data-preview]]:ring-2 [&_[data-preview]]:ring-blue-400 [&_[data-preview]]:rounded': isActive(theme) }"
             @click="selectTheme(theme)"
