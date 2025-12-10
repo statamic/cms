@@ -23,7 +23,7 @@ const attrs = useAttrs();
 const classes = computed(() => {
     return twMerge([
         `bg-${props.color}`,
-        'w-4 h-4 cursor-pointer hover:scale-150 hover:rounded relative',
+        'size-4 cursor-pointer hover:scale-150 relative hover:rounded hover:z-10 hover:shadow-sm',
         props.isSelected ? 'ring-2 ring-blue-500 z-1' : '',
         attrs.class as string,
     ]);
