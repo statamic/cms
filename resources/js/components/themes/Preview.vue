@@ -56,60 +56,76 @@ const dynamicStyles = computed(() => {
 <template>
     <div :class="appearanceClass">
         <component is="style">{{ dynamicStyles }}</component>
-        <div data-preview :id="uniqueId" class="border border-gray-800 shadow-md rounded-lg overflow-hidden text-3xs">
-            <div class="bg-global-header-bg">
-                <header class="bg-global-header-bg px-2 py-1 flex items-center justify-between">
-                    <div class="flex items-center gap-1.5">
-                        <div class="flex flex-col gap-[1px]">
-                            <div class="bg-white/85 h-[1px] w-1.5"></div>
-                            <div class="bg-white/85 h-[1px] w-1.5"></div>
-                            <div class="bg-white/85 h-[1px] w-1.5"></div>
+        <div data-preview :id="uniqueId" class="w-full aspect-video border border-gray-800 shadow-md rounded-lg overflow-hidden text-[clamp(0.625rem,1.5vw,0.875rem)]">
+            <div class="h-full flex flex-col bg-global-header-bg">
+                <header class="bg-global-header-bg px-2 py-1.5 flex items-center justify-between flex-shrink-0">
+                    <div class="flex items-center gap-2">
+                        <div class="flex flex-col gap-0.5">
+                            <div class="bg-white/85 h-0.5 w-2"></div>
+                            <div class="bg-white/85 h-0.5 w-2"></div>
+                            <div class="bg-white/85 h-0.5 w-2"></div>
                         </div>
-                        <div class="size-2 shape-squircle bg-volt rounded-sm"></div>
-                        <div class="p-crumb h-[3px] w-6 rounded bg-white/85"></div>
-                        <div class="p-crumb h-[3px] w-6 rounded bg-white/85"></div>
-                        <div class="p-crumb h-[3px] w-6 rounded bg-white/85"></div>
+                        <div class="size-2.5 shape-squircle bg-volt rounded-sm"></div>
+                        <div class="p-crumb h-1.5 w-10 rounded bg-white/85"></div>
+                        <div class="p-crumb h-1.5 w-10 rounded bg-white/85"></div>
+                        <div class="p-crumb h-1.5 w-10 rounded bg-white/85"></div>
                     </div>
                     <div>
-                        <div class="size-2 shape-squircle bg-white rounded-full"></div>
+                        <div class="size-2.5 shape-squircle bg-white rounded-full"></div>
                     </div>
                 </header>
-                <div class="bg-[var(--theme-color-body-bg)] grid grid-cols-[1fr_5fr] gap-2 p-2 rounded-t-md overflow-hidden">
-                    <div class="p-nav flex flex-col gap-1 pt-2 pr-2">
-                        <div class="bg-[var(--theme-color-gray-700)] opacity-50 h-[2px] w-1/3"></div>
-                        <div class="bg-[var(--theme-color-gray-700)] opacity-50 h-[2px]"></div>
-                        <div class="bg-[var(--theme-color-gray-700)] opacity-50 h-[2px]"></div>
-                        <div class="bg-[var(--theme-color-gray-700)] opacity-50 h-[2px]"></div>
-                        <div class="bg-[var(--theme-color-gray-700)] opacity-50 h-[2px]"></div>
-                        <div class="bg-[var(--theme-color-gray-700)] opacity-50 h-[2px] w-1/3 mt-2"></div>
-                        <div class="bg-[var(--theme-color-gray-700)] opacity-50 h-[2px]"></div>
-                        <div class="bg-[var(--theme-color-gray-700)] opacity-50 h-[2px]"></div>
-                        <div class="bg-[var(--theme-color-gray-700)] opacity-50 h-[2px]"></div>
-                        <div class="bg-[var(--theme-color-gray-700)] opacity-50 h-[2px] w-1/3 mt-2"></div>
-                        <div class="bg-[var(--theme-color-gray-700)] opacity-50 h-[2px]"></div>
-                        <div class="bg-[var(--theme-color-gray-700)] opacity-50 h-[2px]"></div>
+                <div class="flex-1 bg-[var(--theme-color-body-bg)] grid grid-cols-[1.5fr_4.5fr] gap-3 p-3 rounded-t-md overflow-hidden min-h-0">
+                    <div class="p-nav flex flex-col gap-1.5 pt-3 pr-3">
+                        <div class="bg-[var(--theme-color-gray-700)] opacity-50 h-1 w-1/3"></div>
+                        <div class="bg-[var(--theme-color-gray-700)] opacity-50 h-1"></div>
+                        <div class="bg-[var(--theme-color-gray-700)] opacity-50 h-1"></div>
+                        <div class="bg-[var(--theme-color-gray-700)] opacity-50 h-1"></div>
+                        <div class="bg-[var(--theme-color-gray-700)] opacity-50 h-1"></div>
+                        <div class="bg-[var(--theme-color-gray-700)] opacity-50 h-1 w-1/3 mt-3"></div>
+                        <div class="bg-[var(--theme-color-gray-700)] opacity-50 h-1"></div>
+                        <div class="bg-[var(--theme-color-gray-700)] opacity-50 h-1"></div>
+                        <div class="bg-[var(--theme-color-gray-700)] opacity-50 h-1"></div>
+                        <div class="bg-[var(--theme-color-gray-700)] opacity-50 h-1"></div>
+                        <div class="bg-[var(--theme-color-gray-700)] opacity-50 h-1 w-1/3 mt-3"></div>
+                        <div class="bg-[var(--theme-color-gray-700)] opacity-50 h-1"></div>
+                        <div class="bg-[var(--theme-color-gray-700)] opacity-50 h-1"></div>
+                        <div class="bg-[var(--theme-color-gray-700)] opacity-50 h-1"></div>
+                        <div class="bg-[var(--theme-color-gray-700)] opacity-50 h-1"></div>
                     </div>
-                    <div class="bg-[var(--theme-color-content-bg)] rounded p-2">
+                    <div class="bg-[var(--theme-color-content-bg)] rounded p-3 flex flex-col gap-3">
                         <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-1">
-                                <div class="bg-[var(--preview-color-text)] h-1 w-1" />
-                                <div class="bg-[var(--preview-color-text)] h-1 w-10" />
+                            <div class="flex items-center gap-1.5">
+                                <div class="bg-[var(--preview-color-text)] h-1.5 w-1.5 rounded-full"></div>
+                                <div class="bg-[var(--preview-color-text)] h-1.5 w-16"></div>
                             </div>
-                            <div class="bg-[var(--theme-color-primary)] w-8 h-3 rounded-sm flex items-center justify-center">
-                                <div class="bg-white/85 h-1 w-2/3 rounded-sm"></div>
+                            <div class="bg-[var(--theme-color-primary)] w-10 h-4 rounded-sm flex items-center justify-center">
+                                <div class="bg-white/85 h-1.5 w-2/3 rounded-sm"></div>
                             </div>
                         </div>
-                        <div class="mt-2 bg-[var(--preview-color-card-panel-border)] p-1 rounded-md">
-                            <div class=" bg-[var(--preview-color-card-panel)] p-2 rounded-sm shadow-sm flex items-center justify-between">
-                                <div class="flex flex-col gap-1">
-                                    <div class="bg-[var(--preview-color-text)] h-1 w-4" />
-                                    <div class="bg-[var(--preview-color-text)] h-1 w-12" />
+                        <div class="bg-[var(--preview-color-card-panel-border)] p-1.5 rounded-md">
+                            <div class="bg-[var(--preview-color-card-panel)] p-3 rounded-sm shadow-sm flex items-center justify-between">
+                                <div class="flex flex-col gap-1.5">
+                                    <div class="bg-[var(--preview-color-text)] h-1.5 w-8"></div>
+                                    <div class="bg-[var(--preview-color-text)] h-1.5 w-20"></div>
                                 </div>
-
-                                <div class="bg-[var(--theme-color-switch-bg)] w-5 rounded-full">
-                                    <div class="p-[3px] size-3 flex">
+                                <div class="bg-[var(--theme-color-switch-bg)] w-6 rounded-full">
+                                    <div class="p-0.5 size-4 flex">
                                         <div class="rounded-full h-full w-full bg-white"></div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 mt-1">
+                            <div class="bg-[var(--preview-color-card-panel-border)] p-2 rounded-md">
+                                <div class="bg-[var(--preview-color-card-panel)] p-2 rounded-sm">
+                                    <div class="bg-[var(--preview-color-text)] h-1.5 w-3/4 mb-1.5"></div>
+                                    <div class="bg-[var(--preview-color-text)] h-1.5 w-full opacity-60"></div>
+                                </div>
+                            </div>
+                            <div class="bg-[var(--preview-color-card-panel-border)] p-2 rounded-md">
+                                <div class="bg-[var(--preview-color-card-panel)] p-2 rounded-sm">
+                                    <div class="bg-[var(--preview-color-text)] h-1.5 w-2/3 mb-1.5"></div>
+                                    <div class="bg-[var(--preview-color-text)] h-1.5 w-full opacity-60"></div>
                                 </div>
                             </div>
                         </div>
