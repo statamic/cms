@@ -47,6 +47,13 @@ function updateOpen(value) {
     emit('update:open', value);
     open.value = value;
 }
+
+function focusOutside(event) {
+	if (event.target.hasAttribute('data-ui-combobox-item')) {
+		event.stopPropagation();
+		event.preventDefault();
+	}
+}
 </script>
 
 <template>
@@ -61,6 +68,7 @@ function updateOpen(value) {
                 :align
                 :sideOffset="offset"
                 :side
+                @focus-outside="focusOutside"
             >
                 <slot v-bind="slotProps" />
                 <PopoverClose as-child>
