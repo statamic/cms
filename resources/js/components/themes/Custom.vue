@@ -93,7 +93,7 @@ const sharable = computed(() => theme.value.id === 'custom');
 
                         </TableCell>
                         <TableCell>
-                            <div class="flex items-center">
+                            <div class="flex items-center w-16">
                                 <ColorPicker
                                     v-if="hasDarkColor(color.name)"
                                     :model-value="theme.darkColors[color.name]"
