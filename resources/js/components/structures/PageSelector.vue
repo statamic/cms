@@ -86,7 +86,7 @@ export default {
 
     methods: {
         linkExistingItem() {
-            this.$refs.input.$refs.existing.$el.click();
+            this.$refs.input.openSelector();
         },
 
         itemDataUpdated(data) {

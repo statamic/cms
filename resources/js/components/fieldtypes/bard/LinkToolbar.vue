@@ -413,7 +413,7 @@ export default {
         },
 
         openEntrySelector() {
-            this.$refs.relationshipInput.$refs.existing.click();
+            this.$refs.relationshipInput.openSelector();
         },
 
         openAssetSelector() {
