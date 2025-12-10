@@ -7,6 +7,7 @@ import Preview from './Preview.vue';
 import { getDefaultTheme } from '@/components/themes/utils';
 import { translate as __ } from '@/translations/translator';
 import ColorPicker from '@/components/themes/color-picker/ColorPicker.vue';
+import Share from '@/components/themes/Share.vue';
 
 const props = defineProps<{
     modelValue?: Theme;
@@ -14,6 +15,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
     (e: 'update:modelValue', theme: Theme): void;
+    (e: 'shared'): void;
 }>();
 
 const theme = computed<Theme>(() => {
@@ -65,6 +67,8 @@ function updateColors(colors: ThemeColors, darkColors: ThemeColors) {
         darkColors
     });
 }
+
+const sharable = computed(() => theme.value.id === 'custom');
 </script>
 
 <template>
@@ -118,6 +122,8 @@ function updateColors(colors: ThemeColors, darkColors: ThemeColors) {
         <div class="sticky top-0 self-start space-y-4">
             <Preview :theme="theme" appearance="light" />
             <Preview :theme="theme" appearance="dark" />
+
+            <Share v-if="sharable" :theme="theme" @shared="emit('shared')" />
         </div>
     </div>
 </template>

@@ -81,4 +81,10 @@ class Marketplace
             }
         });
     }
+
+    public function clearThemesCache()
+    {
+        Cache::forget('marketplace-cp-themes');
+        Client::clearCache('cp-themes');
+    }
 }

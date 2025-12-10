@@ -19,12 +19,24 @@ const emit = defineEmits<{
     (e: 'update:tab', tab: Tab): void;
 }>();
 
+const themes = ref<InstanceType<typeof Themes>>();
+
 const activeTab = ref<Tab>(props.tab);
-watch(activeTab, (newTab) => emit('update:tab', newTab));
+
+watch(activeTab, (newTab) => {
+    emit('update:tab', newTab);
+
+    if (newTab === 'themes' && customWasShared.value) {
+        themes.value.refresh();
+        customWasShared.value = false;
+    }
+});
 
 function themeSelected(theme: PredefinedTheme) {
     emit('update:modelValue', theme);
 }
+
+const customWasShared = ref(false);
 
 function customUpdated(theme: Theme) {
     emit('update:modelValue', theme);
@@ -38,7 +50,7 @@ watch(
 </script>
 
 <template>
-    <Tabs v-model="activeTab">
+    <Tabs v-model="activeTab" :unmount-on-hide="false">
         <TabList>
             <TabTrigger name="themes" :text="__('Themes')" />
             <TabTrigger name="custom" :text="__('Custom')" />
@@ -46,6 +58,7 @@ watch(
         <TabContent name="themes">
             <div class="py-4">
                 <Themes
+                    ref="themes"
                     :model-value="modelValue"
                     @update:model-value="themeSelected"
                 />
@@ -56,6 +69,7 @@ watch(
                 <Custom
                     :model-value="modelValue"
                     @update:model-value="customUpdated"
+                    @shared="customWasShared = true"
                 />
             </div>
         </TabContent>

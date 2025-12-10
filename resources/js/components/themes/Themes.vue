@@ -23,19 +23,29 @@ const selectTheme = (theme: PredefinedTheme) => {
 
 const themes = ref<PredefinedTheme[]>(nativeThemes);
 
-onMounted(async () => {
+onMounted(() => load());
+
+async function load() {
     try {
         const { data: marketplaceThemes } = await axios.get(cp_url('themes'));
         themes.value = [...nativeThemes, ...marketplaceThemes];
     } catch (error) {
         console.error('Failed to load marketplace themes:', error);
     }
-});
+}
 
 function isActive(theme: PredefinedTheme): boolean {
     const activeThemeId = props.modelValue?.id || 'default';
     return activeThemeId === theme.id;
 }
+
+function refresh() {
+    axios.get(cp_url('themes/refresh')).then(() => load());
+}
+
+defineExpose({
+    refresh
+})
 </script>
 
 <template>
