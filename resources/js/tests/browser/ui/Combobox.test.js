@@ -1,7 +1,7 @@
 import { expect, test, describe } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-vue';
-import { Combobox } from '@/components/ui';
+import { Combobox } from '@ui';
 
 test('can select option', async () => {
     let currentValue = null;

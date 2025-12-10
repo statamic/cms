@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 import { render } from 'vitest-browser-vue';
-import { Button } from '@/components/ui';
+import { Button } from '@ui';
 
 test('renders button with text prop', async () => {
     const screen = render(Button, {
