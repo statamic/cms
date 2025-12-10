@@ -61,7 +61,7 @@ const selectedColor = computed(() => {
         <template #trigger>
             <button
                 type="button"
-                class="w-8 h-8 rounded border-2 border-gray-300 hover:border-gray-400 transition-all"
+                class="size-8 shape-squircle rounded-full border-2 border-gray-300 hover:border-gray-400 transition-all"
                 :style="{
                     backgroundColor: modelValue || 'transparent',
                 }"
