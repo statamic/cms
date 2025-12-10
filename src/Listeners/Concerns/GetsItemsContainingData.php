@@ -34,7 +34,7 @@ trait GetsItemsContainingData
                 yield from User::query()->lazy();
             }),
             LazyCollection::make(function () {
-                yield from $this->runHooks('additional');
+                yield from ($this->runHooks('additional') ?? LazyCollection::make());
             }),
         ];
 
