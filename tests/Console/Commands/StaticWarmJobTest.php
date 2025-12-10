@@ -65,4 +65,29 @@ class StaticWarmJobTest extends TestCase
                 && $job->request->getUri()->getQuery() === 'page=3';
         });
     }
+
+    #[Test]
+    public function subsequent_paginated_pages_dont_dispatch_static_warm_jobs()
+    {
+        Queue::fake();
+
+        $mock = new MockHandler([
+            (new Response(200))->withHeader('X-Statamic-Pagination', [
+                'current' => 2,
+                'total' => 3,
+                'name' => 'page',
+            ]),
+        ]);
+
+        $handlerStack = HandlerStack::create($mock);
+
+        $job = new StaticWarmJob(new Request('GET', '/blog?page=2'), ['handler' => $handlerStack]);
+
+        $job->handle();
+
+        $this->assertEquals('/blog', $mock->getLastRequest()->getUri()->getPath());
+
+        // The first page is responsible for dispatchin jobs. Not subsequent pages.
+        Queue::assertNothingPushed();
+    }
 }

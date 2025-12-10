@@ -9,7 +9,7 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
-use Statamic\StaticCaching\RecacheToken;
+use Psr\Http\Message\ResponseInterface;
 
 class StaticWarmJob implements ShouldBeUnique, ShouldQueue
 {
@@ -27,7 +27,7 @@ class StaticWarmJob implements ShouldBeUnique, ShouldQueue
     {
         $response = (new Client($this->clientConfig))->send($this->request);
 
-        if ($response->hasHeader('X-Statamic-Pagination')) {
+        if ($this->shouldWarmPaginatedPages($response)) {
             [$currentPage, $totalPages, $pageName] = $response->getHeader('X-Statamic-Pagination');
 
             collect(range($currentPage, $totalPages))
@@ -40,9 +40,21 @@ class StaticWarmJob implements ShouldBeUnique, ShouldQueue
                         "{$pageName}={$page}",
                     ]);
                 })
-                ->each(function (string $uri) {
-                    StaticWarmJob::dispatch(new Request('GET', $uri), $this->clientConfig);
-                });
+                ->each(fn (string $uri) => StaticWarmJob::dispatch(
+                    new Request('GET', $uri),
+                    $this->clientConfig
+                ));
         }
+    }
+
+    private function shouldWarmPaginatedPages(ResponseInterface $response): bool
+    {
+        if (! $response->hasHeader('X-Statamic-Pagination')) {
+            return false;
+        }
+
+        [$currentPage, $totalPages, $pageName] = $response->getHeader('X-Statamic-Pagination');
+
+        return ! str_contains($this->request->getUri()->getQuery(), "{$pageName}=");
     }
 }
