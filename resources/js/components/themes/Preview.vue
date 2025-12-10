@@ -56,7 +56,7 @@ const dynamicStyles = computed(() => {
 <template>
     <div :class="appearanceClass">
         <component is="style">{{ dynamicStyles }}</component>
-        <div data-preview :id="uniqueId" class="w-full aspect-video border border-gray-800 shadow-md rounded-lg overflow-hidden text-3xs">
+        <div data-preview :id="uniqueId" class="w-full aspect-video border border-gray-800 dark:border-gray-700 shadow-md rounded-lg overflow-hidden text-3xs">
             <div class="h-full flex flex-col bg-global-header-bg">
                 <header class="bg-global-header-bg px-2 py-1 flex items-center justify-between flex-shrink-0">
                     <div class="flex items-center gap-1.5">

@@ -80,17 +80,18 @@ defineExpose({
         />
     </div>
 
-    <div class="grid grid-cols-4 gap-6">
-        <div
+    <div class="grid grid-cols-4 gap-4">
+        <button
             v-for="theme in results"
             :key="theme.id"
-            :class="{ '[&_[data-preview]]:ring-2 [&_[data-preview]]:ring-blue-400 [&_[data-preview]]:rounded': isActive(theme) }"
+            class="p-1 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900"
+            :class="{ 'bg-blue-400! dark:bg-blue-500!': isActive(theme) }"
             @click="selectTheme(theme)"
         >
             <Preview :theme="theme" />
-            <div class="text-center pt-2">
-                <Description :text="`${theme.name} <span class='opacity-70 text-2xs'>by</span> ${theme.author}`" />
+            <div class="text-center pb-1 py-1.5">
+                <Description :text="`${theme.name} <span class='opacity-70 text-2xs'>by</span> ${theme.author}`" :class="{ 'text-white!': isActive(theme) }" />
             </div>
-        </div>
+        </button>
     </div>
 </template>
