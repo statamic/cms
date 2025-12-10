@@ -39,7 +39,7 @@ function isActive(theme: PredefinedTheme): boolean {
 </script>
 
 <template>
-    <div class="grid grid-cols-5 gap-6">
+    <div class="grid grid-cols-4 gap-6">
         <div
             v-for="theme in themes"
             :key="theme.id"
@@ -48,7 +48,7 @@ function isActive(theme: PredefinedTheme): boolean {
         >
             <Preview :theme="theme" />
             <div class="text-center pt-2">
-                <Description :text="`${theme.name} by ${theme.author}`" />
+                <Description :text="`${theme.name} <span class='opacity-70 text-2xs'>by</span> ${theme.author}`" />
             </div>
         </div>
     </div>

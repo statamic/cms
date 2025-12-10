@@ -56,24 +56,24 @@ const dynamicStyles = computed(() => {
 <template>
     <div :class="appearanceClass">
         <component is="style">{{ dynamicStyles }}</component>
-        <div data-preview :id="uniqueId" class="border shadow-md rounded-lg overflow-hidden text-3xs">
+        <div data-preview :id="uniqueId" class="border border-gray-800 shadow-md rounded-lg overflow-hidden text-3xs">
             <div class="bg-global-header-bg">
-                <div class="bg-global-header-bg p-2 flex items-center justify-between">
-                    <div class="flex items-center gap-1">
+                <header class="bg-global-header-bg px-2 py-1 flex items-center justify-between">
+                    <div class="flex items-center gap-1.5">
                         <div class="flex flex-col gap-[1px]">
-                            <div class="bg-white/85 h-[1px] w-2"></div>
-                            <div class="bg-white/85 h-[1px] w-2"></div>
-                            <div class="bg-white/85 h-[1px] w-2"></div>
+                            <div class="bg-white/85 h-[1px] w-1.5"></div>
+                            <div class="bg-white/85 h-[1px] w-1.5"></div>
+                            <div class="bg-white/85 h-[1px] w-1.5"></div>
                         </div>
-                        <div class="w-3 h-3 bg-volt rounded-sm"></div>
+                        <div class="size-2 shape-squircle bg-volt rounded-sm"></div>
                         <div class="p-crumb h-[3px] w-6 rounded bg-white/85"></div>
                         <div class="p-crumb h-[3px] w-6 rounded bg-white/85"></div>
                         <div class="p-crumb h-[3px] w-6 rounded bg-white/85"></div>
                     </div>
                     <div>
-                        <div class="w-3 h-3 bg-white rounded-full"></div>
+                        <div class="size-2 shape-squircle bg-white rounded-full"></div>
                     </div>
-                </div>
+                </header>
                 <div class="bg-[var(--theme-color-body-bg)] grid grid-cols-[1fr_5fr] gap-2 p-2 rounded-t-md overflow-hidden">
                     <div class="p-nav flex flex-col gap-1 pt-2 pr-2">
                         <div class="bg-[var(--theme-color-gray-700)] opacity-50 h-[2px] w-1/3"></div>
@@ -96,18 +96,18 @@ const dynamicStyles = computed(() => {
                                 <div class="bg-[var(--preview-color-text)] h-1 w-10" />
                             </div>
                             <div class="bg-[var(--theme-color-primary)] w-8 h-3 rounded-sm flex items-center justify-center">
-                                <div class="bg-white/85 h-1 w-1/2 rounded-sm"></div>
+                                <div class="bg-white/85 h-1 w-2/3 rounded-sm"></div>
                             </div>
                         </div>
                         <div class="mt-2 bg-[var(--preview-color-card-panel-border)] p-1 rounded-md">
-                            <div class=" bg-[var(--preview-color-card-panel)] p-2 rounded-md shadow-sm flex items-center justify-between">
+                            <div class=" bg-[var(--preview-color-card-panel)] p-2 rounded-sm shadow-sm flex items-center justify-between">
                                 <div class="flex flex-col gap-1">
                                     <div class="bg-[var(--preview-color-text)] h-1 w-4" />
                                     <div class="bg-[var(--preview-color-text)] h-1 w-12" />
                                 </div>
 
                                 <div class="bg-[var(--theme-color-switch-bg)] w-5 rounded-full">
-                                    <div class="p-[3px] w-3 h-3 flex">
+                                    <div class="p-[3px] size-3 flex">
                                         <div class="rounded-full h-full w-full bg-white"></div>
                                     </div>
                                 </div>
