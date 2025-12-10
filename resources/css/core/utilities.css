@@ -1,3 +1,12 @@
+/* UTILITIES / EXTENDED TAILWIND CLASSES
+=================================================== */
+/* Here we extend Tailwind's classes to add additional functionality where we're sure it won't break anything. */
+
+/* If the next sibling is hidden (by a Vue conditional), remove the bottom border. For example, /cp/asset-containers/assets/edit, the Image Manipulation toggle. */
+.divide-y > *:has(+[style*="display: none"]) {
+    border-block-end: none;
+}
+
 /* UTILITIES / LAYOUT
 =================================================== */
 [v-cloak],
@@ -32,6 +41,9 @@
 @utility st-text-trim-cap {
     /* =Jay. Sometimes this is handy e.g. the text inside the command palette searchbox */
     text-box: cap alphabetic;
+}
+@utility st-text-trim-ex-alphabetic {
+    text-box: ex alphabetic;
 }
 
 @utility placeholder-xs {
@@ -181,11 +193,8 @@
         width: calc(150% + var(--cover));
         height: calc(100% + var(--height-offset) * 2);
         top: calc(0% - var(--height-offset));
-        background: radial-gradient(circle at center, white 0%,transparent 80%);
+        background: radial-gradient(circle at center, var(--theme-color-content-bg) 0%,transparent 80%);
         border-radius: 1.5rem 0 0 1.5rem;
-    }
-    .dark &::before {
-        background: radial-gradient(circle at center, hsl(240deg 6% 10%) 0%, transparent 80%);
     }
 }
 @utility mask-bg--left {
@@ -243,6 +252,8 @@
         }
         .dark &::before {
             filter: invert(100%);
+            /* The negative margin is to compensate for the lack of a "raised panel" in dark mode */
+            @apply -mt-2;
         }
         /* Central horizontal line */
         [data-ui-panel] {

@@ -8,6 +8,7 @@ use Statamic\Statamic;
 class Alpine extends AbstractJsDriver
 {
     protected $scope;
+    protected $component;
 
     /**
      * Parse driver options.
@@ -17,6 +18,7 @@ class Alpine extends AbstractJsDriver
     protected function parseOptions($options)
     {
         $this->scope = $options[0] ?? null;
+        $this->component = $options[1] ?? null;
     }
 
     /**
@@ -33,7 +35,7 @@ class Alpine extends AbstractJsDriver
         }
 
         return [
-            'x-data' => $this->renderAlpineXData(collect($this->getInitialFormData())->merge($extraData)->all(), $this->scope),
+            'x-data' => $this->renderAlpineXData(collect($this->getInitialFormData())->mergeRecursive($extraData)->all(), $this->scope),
         ];
     }
 
@@ -83,7 +85,12 @@ class Alpine extends AbstractJsDriver
             ];
         }
 
-        return Statamic::modify($xData)->toJson()->entities();
+        $xData = Statamic::modify($xData)->toJson()->entities();
+        if ($this->component) {
+            $xData = "{$this->component}({$xData})";
+        }
+
+        return $xData;
     }
 
     /**

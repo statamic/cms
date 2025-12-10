@@ -85,6 +85,7 @@
             v-model:modified-fields="localizedFields"
             :track-dirty-state="trackDirtyState"
             :sync-field-confirmation-text="syncFieldConfirmationText"
+            :remember-tab="!isInline"
         >
             <LivePreview
                 :enabled="isPreviewing"
@@ -155,7 +156,7 @@
                                     </Subheading>
                                     <Subheading v-if="isDirty" class="flex items-center gap-2 text-yellow-600">
                                         <Icon name="warning-diamond" />
-                                        {{ __('Unsaved changes') }}
+                                        {{ __('Unsaved Changes') }}
                                     </Subheading>
                                 </Card>
                             </Panel>
@@ -191,7 +192,7 @@
             </LivePreview>
         </PublishContainer>
 
-        <stack
+        <ui-stack
             name="revision-history"
             v-if="showRevisionHistory"
             @closed="showRevisionHistory = false"
@@ -205,7 +206,7 @@
                 :can-restore-revisions="!readOnly"
                 @closed="close"
             />
-        </stack>
+        </ui-stack>
 
         <publish-actions
             v-if="confirmingPublish"
@@ -392,11 +393,18 @@ export default {
             autosaveIntervalInstance: null,
             syncFieldConfirmationText: __('messages.sync_entry_field_confirmation_text'),
             pendingLocalization: null,
-
-            savingRef: ref(false),
-            errorsRef: ref({}),
         };
     },
+
+	setup() {
+		const savingRef = ref(false);
+		const errorsRef = ref({});
+
+		return {
+			savingRef: computed(() => savingRef),
+			errorsRef: computed(() => errorsRef),
+		};
+	},
 
     computed: {
         containerRef() {
@@ -558,6 +566,11 @@ export default {
                     }),
                 ])
                 .then((response) => {
+                    this.title = response.data.data.title;
+                    this.isWorkingCopy = true;
+                    if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
+                    if (!this.isCreating && !this.isAutosave) this.$toast.success(__('Saved'));
+
                     // If revisions are enabled, just emit event.
                     if (this.revisionsEnabled) {
                         clearTimeout(this.trackDirtyStateTimeout);
@@ -568,11 +581,6 @@ export default {
                         this.$nextTick(() => this.$emit('saved', response));
                         return;
                     }
-
-                    this.title = response.data.data.title;
-                    this.isWorkingCopy = true;
-                    if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
-                    if (!this.isCreating && !this.isAutosave) this.$toast.success(__('Saved'));
 
                     let nextAction = this.quickSave || this.isAutosave ? 'continue_editing' : this.afterSaveOption;
 

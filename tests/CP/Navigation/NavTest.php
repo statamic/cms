@@ -218,7 +218,7 @@ class NavTest extends TestCase
     #[Test]
     public function it_sets_parent_icon_on_children()
     {
-        File::put($svg = statamic_path('packages/ui/icons/droid.svg'), '<svg>droid</svg>');
+        File::put($svg = statamic_path('resources/svg/icons/droid.svg'), '<svg>droid</svg>');
 
         $this->actingAs(tap(User::make()->makeSuper())->save());
 

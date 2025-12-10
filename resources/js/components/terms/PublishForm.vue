@@ -64,8 +64,9 @@
             :origin-meta="originMeta"
             :errors="errors"
             :site="site"
-            :localized-fields="localizedFields"
+            v-model:modified-fields="localizedFields"
             :sync-field-confirmation-text="syncFieldConfirmationText"
+            :remember-tab="!isInline"
         >
             <LivePreview
                 :enabled="isPreviewing"
@@ -228,11 +229,18 @@ export default {
             quickSave: false,
             syncFieldConfirmationText: __('messages.sync_term_field_confirmation_text'),
             pendingLocalization: null,
-
-            savingRef: ref(false),
-            errorsRef: ref({}),
         };
     },
+
+	setup() {
+		const savingRef = ref(false);
+		const errorsRef = ref({});
+
+		return {
+			savingRef: computed(() => savingRef),
+			errorsRef: computed(() => errorsRef),
+		};
+	},
 
     computed: {
         containerRef() {
@@ -369,7 +377,7 @@ export default {
                     }
 
                     // If the edit URL was changed (i.e. the term slug was updated), redirect them there.
-                    else if (window.location.href !== response.data.data.edit_url) {
+                    else if (!this.isInline && window.location.href !== response.data.data.edit_url) {
                         this.redirectTo(response.data.data.edit_url);
                     }
 

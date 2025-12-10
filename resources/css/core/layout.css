@@ -9,8 +9,8 @@
     @apply [&_svg]:text-gray-500 dark:[&_svg]:text-gray-500/85;
     /* Wait for the full page to load before allowing this transition otherwise you see the Sidebar animate in/out on load in Firefox (and sometimes Safari) */
     .page-fully-loaded & {
-        /* Only inset because we don't wand to transition the color when we switch between light/dark mode */
-        transition: inset 0.3s ease-in-out;
+        /* Only certain properties because we don't want to inadvertently transition the color when we switch between light/dark mode */
+        transition: inset 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
     }
     /* On mobile, hide by default and overlay on top */
     z-index: var(--z-index-draggable);
@@ -51,12 +51,12 @@
     .nav-main {
         /* Always visible but off-screen by default */
         @apply flex;
-        @apply bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-2xl;
+        @apply bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700;
     }
 
     .nav-open .nav-main {
         /* Slide in from the left */
-        @apply start-0;
+        @apply start-0 shadow-2xl;
     }
 }
 

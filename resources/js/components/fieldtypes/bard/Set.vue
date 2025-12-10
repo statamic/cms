@@ -1,6 +1,7 @@
 <template>
     <node-view-wrapper class="my-4">
         <div
+            ref="container"
             class="shadow-ui-sm relative z-2 w-full rounded-lg border border-gray-300 bg-white text-base dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
             :class="{
                 // We’re styling a Set so that it shows a “selection outline” when selected with the mouse or keyboard.
@@ -24,7 +25,7 @@
             >
                 <Icon data-drag-handle name="handles" class="size-4 cursor-grab text-gray-400" v-if="!isReadOnly" />
                 <button type="button" class="flex flex-1 items-center gap-4 p-2 min-w-0 cursor-pointer [&:focus-visible]:outline-none [&:focus-visible]:[&_[data-ui-badge]]:focus-outline" @click="toggleCollapsedState">
-                    <Badge size="lg" pill="true" color="white" class="px-3">
+                    <Badge size="lg" :pill="true" color="white" class="px-3">
                         <span v-if="isSetGroupVisible" class="flex items-center gap-2">
                             {{ __(setGroup.display) }}
                             <Icon name="chevron-right" class="relative top-px size-3" />
@@ -44,9 +45,7 @@
                     />
                 </button>
                 <div class="flex items-center gap-2" v-if="!isReadOnly">
-                    <Tooltip :text="enabled ? __('Included in output') : __('Hidden from output')" as="span">
-                        <Switch size="xs" v-model="enabled" />
-                    </Tooltip>
+                    <Switch size="xs" v-model="enabled" v-tooltip="enabled ? __('Included in output') : __('Hidden from output')" />
 
                     <Dropdown>
                         <template #trigger>
@@ -112,11 +111,12 @@ import {
     Icon,
     Subheading,
     Switch,
-    Tooltip,
     PublishFieldsProvider as FieldsProvider,
     PublishFields as Fields
 } from '@ui';
 import { containerContextKey } from '@/components/ui/Publish/Container.vue';
+import { watch } from 'vue';
+import { reveal } from '@api';
 
 export default {
     props: nodeViewProps,
@@ -130,7 +130,6 @@ export default {
         Fields,
         FieldsProvider,
         Switch,
-        Tooltip,
         Subheading,
         Badge,
         Icon,
@@ -322,6 +321,18 @@ export default {
                 this.getPos() + this.node.nodeSize,
             );
         },
+    },
+
+    mounted() {
+        watch(
+            () => data_get(this.publishContainer.values.value, this.fieldPathPrefix),
+            (values) => {
+                this.updateAttributes({ values });
+            },
+            { deep: true }
+        );
+
+        reveal.mount(this.$refs.container, this.expand);
     },
 
     updated() {

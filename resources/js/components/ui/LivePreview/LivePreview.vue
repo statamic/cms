@@ -1,5 +1,15 @@
 <script setup>
-import { computed, nextTick, ref, watch, useTemplateRef, onBeforeUnmount, onUnmounted, onBeforeMount } from 'vue';
+import {
+    computed,
+    nextTick,
+    ref,
+    watch,
+    useTemplateRef,
+    onBeforeUnmount,
+    onUnmounted,
+    onBeforeMount,
+    toRaw,
+} from 'vue';
 import Resizer from './Resizer.vue';
 import {
     Select,
@@ -107,7 +117,7 @@ const update = debounce(() => {
         .then((response) => {
             token.value = response.data.token;
             const url = response.data.url;
-            const tgt = props.targets[target.value];
+            const tgt = toRaw(props.targets[target.value]);
             const payload = { token: token.value, reference: props.reference };
             poppedOut.value
                 ? channel.value.postMessage({ event: 'updated', url, target: tgt, payload })
@@ -321,7 +331,7 @@ Statamic.$events.$on(`live-preview.${name.value}.refresh`, () => {
                         class="live-preview-editor @container/live-preview"
                         :style="{ width: poppedOut ? '100%' : `${editorWidth}px` }"
                     >
-                        <div class="live-preview-fields h-full flex-1 overflow-scroll">
+                        <div class="live-preview-fields h-full flex-1 overflow-scroll px-4 pt-2">
                             <portal-target :name="livePreviewFieldsPortal" />
                         </div>
 

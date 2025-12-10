@@ -260,6 +260,14 @@ class Bard extends Replicator
                         'default' => false,
                         'width' => 50,
                     ],
+                    'inline_hard_breaks' => [
+                        'display' => __('Allow Line Breaks'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.inline_hard_breaks'),
+                        'type' => 'toggle',
+                        'default' => false,
+                        'width' => 50,
+                        'if' => ['inline' => 'equals true'],
+                    ],
                     'antlers' => [
                         'display' => 'Antlers',
                         'instructions' => __('statamic::fieldtypes.any.config.antlers'),

@@ -1,4 +1,5 @@
-import { CalendarDate, CalendarDateTime, fromDate, getLocalTimeZone } from '@internationalized/date';
+import { CalendarDate, CalendarDateTime, fromDate, getLocalTimeZone, startOfWeek, endOfWeek } from '@internationalized/date';
+import DateFormatter from '@/components/DateFormatter.js';
 
 export function formatDateString(date) {
     return new Date(date.year, date.month - 1, date.day).toISOString().split('T')[0];
@@ -9,16 +10,11 @@ export function getWeekDates(currentDate) {
         throw new Error('getWeekDates called with undefined currentDate');
     }
 
-    const currentWeekStart = new Date(currentDate.year, currentDate.month - 1, currentDate.day);
-    const dayOfWeek = currentWeekStart.getDay();
-    const startOfWeek = new Date(currentWeekStart);
-    startOfWeek.setDate(currentWeekStart.getDate() - dayOfWeek);
+    const weekStart = startOfWeek(currentDate, new DateFormatter().locale);
 
     const weekDates = [];
     for (let i = 0; i < 7; i++) {
-        const date = new Date(startOfWeek);
-        date.setDate(startOfWeek.getDate() + i);
-        weekDates.push(new CalendarDate(date.getFullYear(), date.getMonth() + 1, date.getDate()));
+        weekDates.push(weekStart.add({ days: i }));
     }
     return weekDates;
 }
@@ -48,20 +44,22 @@ function getWeekDateRange(date) {
 
 function getMonthDateRange(date) {
     // Get the visible date range including days from adjacent months
-    const firstDayOfMonth = new Date(date.year, date.month - 1, 1);
-    const lastDayOfMonth = new Date(date.year, date.month, 0);
+    const locale = new DateFormatter().locale;
+
+    // Get the first and last day of the month
+    const firstDayOfMonth = new CalendarDate(date.year, date.month, 1);
+    const lastDayOfMonth = new CalendarDate(date.year, date.month, date.calendar.getDaysInMonth(date));
 
     // Calculate the first visible day (start of the week containing the 1st)
-    const dayOfWeek = firstDayOfMonth.getDay();
-    const startDate = new Date(firstDayOfMonth);
-    startDate.setDate(firstDayOfMonth.getDate() - dayOfWeek);
+    const weekStartOfFirst = startOfWeek(firstDayOfMonth, locale);
 
     // Calculate the last visible day (end of the week containing the last day)
-    const lastDayOfWeek = lastDayOfMonth.getDay();
-    const endDate = new Date(lastDayOfMonth);
-    endDate.setDate(lastDayOfMonth.getDate() + (6 - lastDayOfWeek));
+    const weekEndOfLast = endOfWeek(lastDayOfMonth, locale);
 
-    return { startDate, endDate };
+    return {
+        startDate: new Date(weekStartOfFirst.year, weekStartOfFirst.month - 1, weekStartOfFirst.day),
+        endDate: new Date(weekEndOfLast.year, weekEndOfLast.month - 1, weekEndOfLast.day)
+    };
 }
 
 export function getCreateUrlDateParam(date, hour) {

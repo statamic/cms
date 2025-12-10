@@ -68,7 +68,11 @@ const props = defineProps({
     asConfig: {
         type: Boolean,
         default: false,
-    }
+    },
+    rememberTab: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const parentContainer = injectContainerContext(containerContextKey);
@@ -80,6 +84,7 @@ const meta = ref(props.meta);
 const previews = ref({});
 const localizedFields = ref(props.modifiedFields || []);
 const components = ref([]);
+const direction = computed(() => Statamic.$config.get('sites').find(s => s.handle === props.site)?.direction ?? document.documentElement.dir ?? 'ltr');
 
 const visibleValues = computed(() => {
     const omittable = Object.keys(hiddenFields.value).filter(
@@ -221,6 +226,7 @@ const provided = {
     localizedFields,
     meta,
     site: toRef(() => props.site),
+    direction,
     errors: toRef(() => props.errors),
     readOnly: toRef(() => props.readOnly),
     previews,
@@ -228,6 +234,7 @@ const provided = {
     desyncField,
     components,
     asConfig: toRef(() => props.asConfig),
+    rememberTab: toRef(() => props.rememberTab),
     isTrackingOriginValues: computed(() => !!props.originValues),
     setValues,
     setFieldValue,

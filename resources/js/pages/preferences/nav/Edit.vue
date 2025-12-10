@@ -12,14 +12,14 @@
             <CommandPaletteItem
                 v-if="isDirty"
                 :category="$commandPalette.category.Actions"
-                :text="__('Discard changes')"
+                :text="__('Discard Changes')"
                 icon="trash"
                 :action="discardChanges"
                 v-slot="{ text, action }"
             >
                 <Button
                     variant="filled"
-                    :text="__('Discard changes')"
+                    :text="__('Discard Changes')"
                     @click="action"
                 />
             </CommandPaletteItem>

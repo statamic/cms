@@ -11,6 +11,7 @@ defineEmits(['update:modelValue']);
 
 <template>
     <Select
+        class="w-36"
         :options="sites"
         option-label="name"
         option-value="handle"

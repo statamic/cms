@@ -15,6 +15,21 @@ class Floatval extends Fieldtype
     protected function configFieldItems(): array
     {
         return [
+            'min' => [
+                'display' => __('Min'),
+                'instructions' => __('statamic::fieldtypes.integer.config.min'),
+                'type' => 'float',
+            ],
+            'max' => [
+                'display' => __('Max'),
+                'instructions' => __('statamic::fieldtypes.integer.config.max'),
+                'type' => 'float',
+            ],
+            'step' => [
+                'display' => __('Step'),
+                'instructions' => __('statamic::fieldtypes.integer.config.step'),
+                'type' => 'float',
+            ],
             'default' => [
                 'display' => __('Default Value'),
                 'instructions' => __('statamic::messages.fields_default_instructions'),
@@ -50,11 +65,6 @@ class Floatval extends Fieldtype
         return floatval($data);
     }
 
-    public function preProcessConfig($data)
-    {
-        return floatval($data);
-    }
-
     public function process($data)
     {
         if ($data === null || $data === '') {
@@ -72,5 +82,20 @@ class Floatval extends Fieldtype
     public function toGqlType()
     {
         return GraphQL::type(GraphQL::float());
+    }
+
+    public function rules(): array
+    {
+        $rules = ['numeric'];
+
+        if ($min = $this->config('min')) {
+            $rules[] = 'min:'.$min;
+        }
+
+        if ($max = $this->config('max')) {
+            $rules[] = 'max:'.$max;
+        }
+
+        return $rules;
     }
 }

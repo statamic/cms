@@ -13,12 +13,12 @@ const shouldDeleteChildren = ref(false);
 </script>
 
 <template>
-    <Modal :title="__('Remove Page')" v-model:open="modalOpen" @dismissed="$emit('cancel')">
-        <p class="mb-4" v-text="__('Are you sure you want to remove this page?')" />
+    <Modal :title="__('Remove Item')" v-model:open="modalOpen" @dismissed="$emit('cancel')">
+        <p class="mb-4" v-text="__('Are you sure you want to remove this item?')" />
         <p class="mb-4" v-text="__('Only the references will be removed. Entries will not be deleted.')" />
         <label class="flex items-center" v-if="children">
             <input type="checkbox" class="ltr:mr-2 rtl:ml-2" v-model="shouldDeleteChildren" />
-            {{ __n('Remove child page|Remove :count child pages', children) }}
+            {{ __n('Remove child item|Remove :count child items', children) }}
         </label>
 
         <template #footer>

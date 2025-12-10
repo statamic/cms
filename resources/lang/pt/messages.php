@@ -249,5 +249,5 @@ return [
     'user_wizard_roles_groups_intro' => 'Os utilizadores podem ser atribuídos a funções que personalizam as suas permissões, acesso e habilidades em todo o Painel de Controlo.',
     'user_wizard_super_admin_instructions' => 'Os super administradores têm controlo completo e acesso a tudo no painel de controlo. <b>Use com cuidado</b>.',
     'view_more_count' => 'Ver :count mais',
-    'width_x_height' => ':width x :height',
+    'width_x_height' => ':width × :height',
 ];

@@ -294,5 +294,5 @@ return [
     'user_wizard_roles_groups_intro' => 'Aan gebruikers kunnen rollen toegewezen worden die hun bevoegdheden, toegang en mogelijkheden in het Control Panel aanpassen.',
     'user_wizard_super_admin_instructions' => 'Super admins hebben volledige controle over het Control Panel en kunnen alles wijzigen. Ga hier verstandig mee om.',
     'view_more_count' => 'Bekijk :count meer',
-    'width_x_height' => ':width x :height',
+    'width_x_height' => ':width × :height',
 ];

@@ -249,5 +249,5 @@ return [
     'user_wizard_roles_groups_intro' => 'Uživatelům lze přidělit role, které přizpůsobí jejich oprávnění, přístup a možnosti v celém ovládacím panelu.',
     'user_wizard_super_admin_instructions' => 'Superadministrátoři mají úplnou kontrolu a přístup ke všemu v ovládacím panelu. Tuto roli přidělujte s rozmyslem.',
     'view_more_count' => 'Zobrazit :count více',
-    'width_x_height' => ':width x :height',
+    'width_x_height' => ':width × :height',
 ];

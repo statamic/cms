@@ -13,6 +13,7 @@
             :model-value="datePickerValue"
             :number-of-months="config.number_of_months"
             :read-only="isReadOnly"
+            :clearable="config.clearable"
             @update:model-value="datePickerUpdated"
         />
     </div>
@@ -22,7 +23,7 @@
 import Fieldtype from './Fieldtype.vue';
 import DateFormatter from '@/components/DateFormatter.js';
 import { DatePicker, DateRangePicker, Button } from '@/components/ui';
-import { parseAbsoluteToLocal, toTimeZone, toZoned } from '@internationalized/date';
+import { getLocalTimeZone, parseAbsoluteToLocal, toTimeZone, toZoned } from '@internationalized/date';
 
 export default {
     components: {
@@ -116,6 +117,12 @@ export default {
         datePickerUpdated(value) {
             if (!value) {
                 return this.update(null);
+            }
+
+            // Sometimes, we'll get a CalendarDateTime object, which doesn't include timezone
+            // information. In that case, we need to convert it to a ZonedDateTime object.
+            if (!this.isRange && !value.offset && !value.timeZone) {
+                value = toZoned(value, getLocalTimeZone());
             }
 
             // The date picker will give us CalendarDateTimes in the local time zone.

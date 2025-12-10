@@ -3,9 +3,9 @@ import {
     Tabs,
     TabList,
     TabTrigger,
-    TabContent,
     TabProvider,
 } from '@ui';
+import TabContent from './TabContent.vue';
 import { injectContainerContext } from './Container.vue';
 import Sections from './Sections.vue';
 import { ref, computed, useSlots, onMounted, watch } from 'vue';
@@ -13,7 +13,7 @@ import ElementContainer from '@/components/ElementContainer.vue';
 import ShowField from '@/components/field-conditions/ShowField.js';
 
 const slots = useSlots();
-const { blueprint, visibleValues, extraValues, revealerValues, errors, hiddenFields, setHiddenField, container } = injectContainerContext();
+const { blueprint, visibleValues, extraValues, revealerValues, errors, hiddenFields, setHiddenField, container, rememberTab } = injectContainerContext();
 const tabs = ref(blueprint.value.tabs);
 const width = ref(null);
 const sidebarTab = computed(() => tabs.value.find((tab) => tab.handle === 'sidebar'));
@@ -37,26 +37,33 @@ const visibleMainTabs = computed(() => {
         });
     });
 });
-const shouldShowSidebar = computed(() => (slots.sidebar || sidebarTab.value) && width.value > 920);
-const tab = ref(visibleMainTabs.value[0].handle);
+const hasMultipleVisibleMainTabs = computed(() => visibleMainTabs.value.length > 1);
+const shouldShowSidebar = computed(() => (slots.actions || sidebarTab.value) && width.value > 920);
+const activeTab = ref(visibleMainTabs.value[0].handle);
 
 onMounted(() => setActiveTabFromHash());
 
-function setActiveTabFromHash() {
-    if (window.location.hash.length === 0) return;
-
-    const handle = window.location.hash.substr(1);
-
-    if (visibleMainTabs.value.some((tab) => tab.handle === handle)) {
-        tab.value = handle;
+function setActive(tab) {
+    if (visibleMainTabs.value.some((t) => t.handle === tab)) {
+        activeTab.value = tab;
     } else {
-        tab.value = visibleMainTabs.value[0].handle;
+        activeTab.value = visibleMainTabs.value[0].handle;
     }
 }
 
+function setActiveTabFromHash() {
+    if (!rememberTab.value) return;
+
+    if (window.location.hash.length === 0) return;
+
+    setActive(window.location.hash.substr(1));
+}
+
 watch(
-    () => tab.value,
-    (tab) => window.location.hash = tab,
+    () => activeTab.value,
+    (tab) => {
+        if (rememberTab.value) window.location.hash = tab
+    }
 );
 
 const fieldTabMap = computed(() => {
@@ -92,8 +99,8 @@ function tabHasError(tab) {
 <template>
     <ElementContainer @resized="width = $event.width">
         <div>
-            <Tabs v-if="width" v-model:modelValue="tab">
-                <TabList v-if="visibleMainTabs.length > 1" class="-mt-2 mb-6">
+            <Tabs v-if="width" v-model:modelValue="activeTab">
+                <TabList v-if="hasMultipleVisibleMainTabs" class="-mt-2 mb-6">
                     <TabTrigger
                         v-for="tab in visibleMainTabs"
                         :key="tab.handle"
@@ -108,7 +115,10 @@ function tabHasError(tab) {
                         v-for="tab in mainTabs"
                         :key="tab.handle"
                         :name="tab.handle"
-                        :is="visibleMainTabs.length > 1 ? TabContent : 'div'"
+                        :is="hasMultipleVisibleMainTabs ? TabContent : 'div'"
+                        :force-mount="hasMultipleVisibleMainTabs ? true : null"
+                        :class="{ 'hidden': tab.handle !== activeTab }"
+                        @revealed="setActive(tab.handle)"
                     >
                         <TabProvider :tab="tab">
                             <slot :tab="tab">

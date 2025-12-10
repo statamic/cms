@@ -154,9 +154,10 @@
         @apply -top-2;
         /* Prevent the sticky toolbar from hitting the very end of container, which causes it to overlap the container's border-radius */
         margin-block-end: 8px;
-        /* Pull the subsequent element up to compensate for this */
+        /* Pull the subsequent element up to compensate for this. The focus ring adjustment here keeps the focus ring from disappearing into the toolbar, which would make the focus ring appear bottom heavy. */
         + * {
-            margin-block-start: -8px;
+            --focus-ring-adjustment: 0.7px;
+            margin-block-start: calc(-8px + var(--focus-ring-adjustment));
         }
     }
 
@@ -194,7 +195,7 @@
 =================================================== */
 @layer ui {
     .bard-floating-toolbar {
-        @apply flex rounded-full bg-black px-2 shadow-lg whitespace-nowrap;
+        @apply flex rounded-full bg-black px-2 shadow-lg whitespace-nowrap z-(--z-index-portal) relative;
 
         &:before {
             @apply border-t-black top-full start-1/2 absolute -ml-[3px] content-none border-6 border-transparent;
@@ -206,7 +207,7 @@
     }
 
     .bard-footer-toolbar {
-        @apply flex items-center justify-between rounded-b-lg border-t bg-white p-2 text-xs text-gray-700 shadow-none dark:border-dark-300 dark:bg-dark-800 dark:text-dark-175;
+        @apply flex items-center justify-between rounded-b-lg border-t bg-white p-2 text-xs text-gray-700 shadow-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400;
         padding: 8px 12px;
 
         .bard-fullscreen & {

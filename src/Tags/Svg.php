@@ -30,7 +30,7 @@ class Svg extends Tags
             resource_path(),
             public_path('svg'),
             public_path(),
-            statamic_path('packages/ui/icons'),
+            statamic_path('resources/svg/icons'),
         ];
 
         $svg = null;

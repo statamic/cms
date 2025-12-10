@@ -1,12 +1,10 @@
 <template>
-    <div class="portal-targets" :class="{ 'stacks-on-stacks': hasStacks }">
+    <div class="portal-targets" :class="{ 'stacks-on-stacks': hasStacks, 'solo-narrow-stack': isSoloNarrowStack }">
         <div v-for="(portal, i) in portals" :id="`portal-target-${portal.id}`" />
     </div>
 </template>
 
 <script>
-import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
-
 export default {
     computed: {
         portals() {
@@ -15,6 +13,11 @@ export default {
 
         hasStacks() {
             return this.$stacks.count() > 0;
+        },
+
+        isSoloNarrowStack() {
+            const stacks = this.$stacks.stacks();
+            return stacks.length === 1 && stacks[0]?.data?.vm?.narrow === true;
         },
     },
 
@@ -33,22 +36,10 @@ export default {
                     }
                 }
             });
-
-            disableBodyScroll(this.$el, {
-                allowTouchMove: (el) => {
-                    while (el && el !== document.body) {
-                        if (el.classList.contains('overflow-scroll')) {
-                            return true;
-                        }
-                        el = el.parentElement;
-                    }
-                },
-            });
         },
 
         destroyStacks() {
             this.$events.$off('stacks.hit-area-clicked');
-            enableBodyScroll(this.$el);
         },
     },
 };

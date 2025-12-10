@@ -24,6 +24,7 @@ class Date extends FieldtypeFilter
             'value' => [
                 'type' => 'date',
                 'full_width' => true,
+                'clearable' => false,
                 'if' => [
                     'operator' => 'contains_any >, <',
                 ],
@@ -32,6 +33,7 @@ class Date extends FieldtypeFilter
                 'type' => 'date',
                 'mode' => 'range',
                 'full_width' => true,
+                'clearable' => false,
                 'if' => [
                     'operator' => 'between',
                 ],

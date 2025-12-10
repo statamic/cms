@@ -356,9 +356,9 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
         return $this->setPreference('locale', $locale);
     }
 
-    public function preferredTheme()
+    public function preferredColorMode()
     {
-        return $this->getPreference('theme') ?? 'auto';
+        return $this->getPreference('color_mode') ?? 'auto';
     }
 
     public function isTwoFactorAuthenticationRequired(): bool
@@ -445,6 +445,11 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
     public function getCpSearchResultBadge(): string
     {
         return __('User');
+    }
+
+    public function getCpSearchResultIcon(): string
+    {
+        return 'users';
     }
 
     public function getElevatedSessionMethod(): string

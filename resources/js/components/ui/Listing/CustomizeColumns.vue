@@ -1,5 +1,5 @@
 <script setup>
-import { Button, Modal, Tooltip } from '@ui';
+import { Button, Modal } from '@ui';
 import { SortableList } from '@/components/sortable/Sortable.js';
 import { injectListingContext } from '../Listing/Listing.vue';
 import { computed, ref } from 'vue';
@@ -70,16 +70,14 @@ function reset() {
 
 <template>
     <div data-ui-column-customizer class="absolute right-0 mask-bg mask-bg--left">
-        <Tooltip :text="__('Customize Columns')">
-            <Button icon="sliders-vertical" :disabled="reorderable" @click="open = true" :aria-label="__('Customize Columns')" />
-        </Tooltip>
+        <Button icon="sliders-vertical" :disabled="reorderable" @click="open = true" :aria-label="__('Customize Columns')" v-tooltip="__('Customize Columns')" />
         <Modal :title="__('Customize Columns')" v-model:open="open">
-            <div class="border rounded-lg dark:border-gray-900">
+            <div class="border rounded-lg dark:border-gray-700">
                 <div class="flex">
                     <!-- Available Columns -->
                     <div class="flex w-1/2 flex-col text-start">
-                        <ui-heading :text="__('Available Columns')" class="py-2 px-3 border-b dark:border-gray-900" />
-                        <div class="flex flex-1 flex-col space-y-1 overflow-y-auto h-full px-3 py-2 select-none bg-gray-100 dark:bg-gray-900 rounded-bs-lg">
+                        <ui-heading :text="__('Available Columns')" class="py-2 px-3 border-b dark:border-gray-700" />
+                        <div class="flex flex-1 flex-col space-y-1 overflow-y-auto h-full px-3 py-2 select-none bg-gray-100 dark:bg-gray-900 rounded-es-[calc(var(--radius-lg)-1px)]">
                             <ui-checkbox
                                 v-model="column.visible"
                                 :label="column.label"
@@ -92,8 +90,8 @@ function reset() {
 
                     <!-- Displayed Columns -->
                     <div class="flex w-1/2 flex-col text-start border-l dark:border-gray-700">
-                        <ui-heading :text="__('Displayed Columns')" class="py-2 px-3 border-b dark:border-gray-900" />
-                        <div class="overflow-y-auto bg-gray-100 dark:bg-gray-900 rounded-be-lg h-full">
+                        <ui-heading :text="__('Displayed Columns')" class="py-2 px-3 border-b dark:border-gray-700" />
+                        <div class="overflow-y-auto bg-gray-100 dark:bg-gray-900 rounded-ee-[calc(var(--radius-lg)-1px)] h-full">
                             <sortable-list
                                 v-model="selectedColumns"
                                 :distance="5"

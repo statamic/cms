@@ -18,6 +18,7 @@ import markdown from '@/util/markdown.js';
 import VueComponentDebug from 'vue-component-debug';
 import { registerIconSetFromStrings } from '@ui';
 import Layout from '@/pages/layout/Layout.vue';
+import { setTranslations, setLocale } from '@/translations/translator.js';
 import {
     keys,
     components,
@@ -35,7 +36,7 @@ import {
     permissions,
     dateFormatter,
     commandPalette,
-    theme,
+    colorMode,
     contrast,
     config,
     preferences,
@@ -121,8 +122,8 @@ export default {
         return progress;
     },
 
-    get $theme() {
-        return theme;
+    get $colorMode() {
+        return colorMode;
     },
 
     get $contrast() {
@@ -139,6 +140,10 @@ export default {
 
     get $events() {
         return events;
+    },
+
+    get $reveal() {
+        return reveal;
     },
 
     get $commandPalette() {
@@ -159,7 +164,7 @@ export default {
 
     async start() {
         config.initialize(this.initialConfig);
-        theme.initialize(this.initialConfig.user?.theme);
+        colorMode.initialize(this.initialConfig.user?.color_mode);
         contrast.initialize(this.initialConfig.user?.preferences?.strict_accessibility);
         preferences.initialize(this.initialConfig.user?.preferences, this.initialConfig.defaultPreferences);
 
@@ -168,7 +173,7 @@ export default {
 
         const el = document.getElementById('statamic');
         const titleEl = document.getElementById('blade-title');
-        const bladeTitle = titleEl.dataset.title;
+        const bladeTitle = titleEl?.dataset.title;
         const bladeContent = el?.innerHTML || '';
         const _this = this;
 
@@ -240,6 +245,9 @@ export default {
         this.$app.use(VueComponentDebug, { enabled: import.meta.env.VITE_VUE_COMPONENT_DEBUG === 'true' });
         toast.initialize(this.$app);
 
+        setTranslations(this.initialConfig.translations);
+        setLocale(this.initialConfig.translationLocale);
+
         Object.assign(this.$app.config.globalProperties, {
             $config: config,
             $axios: axios,
@@ -262,7 +270,7 @@ export default {
             $permissions: permissions,
             $date: dateFormatter,
             $commandPalette: commandPalette,
-            $theme: theme,
+            $colorMode: colorMode,
             $contrast: contrast,
         });
 

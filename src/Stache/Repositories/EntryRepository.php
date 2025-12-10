@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Repositories;
 
+use Closure;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Entries\EntryRepository as RepositoryContract;
 use Statamic\Contracts\Entries\QueryBuilder;
@@ -70,6 +71,16 @@ class EntryRepository implements RepositoryContract
         return $entry;
     }
 
+    public function findOrMake($id)
+    {
+        return $this->find($id) ?? $this->make();
+    }
+
+    public function findOr($id, Closure $callback)
+    {
+        return $this->find($id) ?? $callback();
+    }
+
     public function findByUri(string $uri, ?string $site = null): ?Entry
     {
         $site = $site ?? $this->stache->sites()->first();
@@ -98,7 +109,16 @@ class EntryRepository implements RepositoryContract
 
     public function whereInId($ids): EntryCollection
     {
+        if (empty($ids)) {
+            return EntryCollection::make();
+        }
+
         $entries = $this->query()->whereIn('id', $ids)->get();
+
+        if ($entries->isEmpty()) {
+            return EntryCollection::make();
+        }
+
         $entriesById = $entries->keyBy->id();
 
         $ordered = collect($ids)
@@ -175,6 +195,10 @@ class EntryRepository implements RepositoryContract
 
     public function applySubstitutions($items)
     {
+        if (empty($this->substitutionsById)) {
+            return $items;
+        }
+
         return $items->map(function ($item) {
             return $this->substitutionsById[$item->id()] ?? $item;
         });

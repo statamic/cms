@@ -89,6 +89,7 @@ class JavascriptComposer
                 'name' => $site->name(),
                 'handle' => $site->handle(),
                 'lang' => $site->lang(),
+                'direction' => $site->direction(),
             ];
         })->values();
     }
@@ -109,7 +110,7 @@ class JavascriptComposer
         return $user->toAugmentedCollection()->merge([
             'preferences' => Preference::all(),
             'permissions' => $user->permissions()->all(),
-            'theme' => $user->preferredTheme(),
+            'color_mode' => $user->preferredColorMode(),
             'is_impersonating' => session()->has('statamic_impersonated_by'),
         ])->toArray();
     }

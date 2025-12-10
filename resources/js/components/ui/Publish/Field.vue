@@ -5,7 +5,6 @@ import { injectFieldsContext } from './FieldsProvider.vue';
 import {
     Field,
     Icon,
-    Tooltip,
     Label,
 } from '@ui';
 import FieldActions from '@/components/field-actions/FieldActions.vue';
@@ -44,6 +43,7 @@ const {
     hiddenFields,
     setHiddenField,
     container,
+    direction,
 } = injectContainerContext();
 const {
     fieldPathPrefix: injectedFieldPathPrefix,
@@ -104,6 +104,12 @@ function metaUpdated(value) {
 function replicatorPreviewUpdated(value) {
     setFieldPreviewValue(fullPath.value, value);
 }
+
+watch(
+    () => fullPath.value,
+    () => setFieldPreviewValue(fullPath.value, fieldtype.value?.replicatorPreview),
+    { immediate: true }
+);
 
 function focused() {
     // todo
@@ -229,9 +235,9 @@ const fieldtypeComponentEvents = computed(() => ({
             <template #label v-if="shouldShowLabel">
                 <Label :for="fieldId" :required="isRequired">
                     <template v-if="shouldShowLabelText">
-                        <Tooltip :text="config.handle" :delay="1000" as="span">
+                        <span v-tooltip="config.handle">
                             {{ __(config.display) }}
-                        </Tooltip>
+                        </span>
                     </template>
                     <ui-button size="xs" inset icon="synced" variant="ghost" v-tooltip="__('messages.field_synced_with_origin')" v-if="!isReadOnly && isSyncable" v-show="isSynced" @click="desync" />
                     <ui-button size="xs" inset icon="unsynced" variant="ghost" v-tooltip="__('messages.field_desynced_from_origin')" v-if="!isReadOnly && isSyncable" v-show="!isSynced" @click="sync" />
@@ -243,12 +249,14 @@ const fieldtypeComponentEvents = computed(() => ({
             <div class="text-xs text-red-600" v-if="!fieldtypeComponentExists">
                 Component <code v-text="fieldtypeComponent"></code> does not exist.
             </div>
-            <Component
-                ref="fieldtype"
-                :is="fieldtypeComponent"
-                v-bind="fieldtypeComponentProps"
-                v-on="fieldtypeComponentEvents"
-            />
+            <div :dir="direction">
+                <Component
+                    ref="fieldtype"
+                    :is="fieldtypeComponent"
+                    v-bind="fieldtypeComponentProps"
+                    v-on="fieldtypeComponentEvents"
+                />
+            </div>
         </Field>
     </slot>
 </template>

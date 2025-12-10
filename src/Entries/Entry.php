@@ -148,9 +148,38 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         }
 
         $this->computedCallbackCache = null;
-        $this->collection = $collection instanceof \Statamic\Contracts\Entries\Collection ? $collection->handle() : $collection;
 
-        return $this;
+        if ($collection instanceof \Statamic\Contracts\Entries\Collection) {
+            $this->collection = $collection->handle();
+            $customClass = $collection->entryClass();
+        } else {
+            $this->collection = $collection;
+            $customClass = Collection::findByHandle($this->collection)->entryClass();
+        }
+
+        if (is_null($customClass)) {
+            return $this;
+        }
+
+        if ($this instanceof $customClass) {
+            return $this;
+        }
+
+        $entry = app($customClass)
+            ->blueprint($this->blueprint())
+            ->collection($this->collection())
+            ->data($this->data())
+            ->id($this->id())
+            ->origin($this->origin())
+            ->locale($this->site())
+            ->published($this->published())
+            ->slug($this->slug());
+
+        if ($this->hasDate()) {
+            $entry->date($this->date());
+        }
+
+        return $entry;
     }
 
     public function blueprint($blueprint = null)

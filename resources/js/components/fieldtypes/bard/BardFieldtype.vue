@@ -60,6 +60,7 @@
                     >
                         <bubble-menu
                             :editor="editor"
+                            :key="`bubble-menu-${fullScreenMode}`"
                             :options="{ placement: 'top', offset: [0, 10] }"
                             v-if="editor && toolbarIsFloating && !readOnly"
                         >
@@ -102,7 +103,11 @@
                                             :aria-label="__('Add Set')"
                                             v-tooltip="__('Add Set')"
                                         />
-                                        <ui-description v-if="!$refs.setPicker?.isOpen" :text="__('Type \'/\' to insert a set')" />
+                                        <ui-description
+                                            v-if="!$refs.setPicker?.isOpen"
+                                            :text="__('Type \'/\' to insert a set')"
+                                            :class="{'ps-9': fullScreenMode}"
+                                        />
                                     </div>
                                 </template>
                             </set-picker>
@@ -209,6 +214,7 @@ export default {
                 showReplicatorFieldPreviews: this.config.previews,
             },
             errorsById: {},
+            debounceNextUpdate: true,
         };
     },
 
@@ -309,6 +315,10 @@ export default {
             return `form-group publish-field publish-field__${this.handle} bard-fieldtype`;
         },
 
+        hasSets() {
+            return this.value.some(item => item.type === 'set')
+        },
+
         setConfigs() {
             return this.groupConfigs.reduce((sets, group) => {
                 return sets.concat(group.sets);
@@ -325,21 +335,23 @@ export default {
                     title: __('Expand All Sets'),
                     icon: 'expand',
                     quick: true,
+                    disabled: () => this.collapsed.length === 0,
                     visibleWhenReadOnly: true,
                     run: this.expandAll,
-                    visible: this.setConfigs.length > 0,
+                    visible: this.setConfigs.length > 0 && this.hasSets,
                 },
                 {
                     title: __('Collapse All Sets'),
                     icon: 'collapse',
                     quick: true,
+                    disabled: () => this.collapsed.length > 0,
                     visibleWhenReadOnly: true,
                     run: this.collapseAll,
-                    visible: this.setConfigs.length > 0,
+                    visible: this.setConfigs.length > 0 && this.hasSets,
                 },
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => (vm.fullScreenMode ? 'collapse-all' : 'expand-all'),
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'fullscreen-close' : 'fullscreen-open'),
                     quick: true,
                     run: this.toggleFullscreen,
                     visibleWhenReadOnly: true,
@@ -350,8 +362,13 @@ export default {
     },
 
     created() {
-        Statamic.$components.register('NodeViewWrapper', NodeViewWrapper);
-        Statamic.$components.register('NodeViewContent', NodeViewContent);
+        if (! Statamic.$components.has('NodeViewWrapper')) {
+            Statamic.$components.register('NodeViewWrapper', NodeViewWrapper);
+        }
+
+        if (! Statamic.$components.has('NodeViewContent')) {
+            Statamic.$components.register('NodeViewContent', NodeViewContent);
+        }
     },
 
     async mounted() {
@@ -391,7 +408,11 @@ export default {
 
             if (json === oldJson) return;
 
-            this.updateDebounced(json);
+            this.debounceNextUpdate
+                ? this.updateDebounced(json)
+                : this.update(json);
+
+            this.debounceNextUpdate = true;
         },
 
         value(value, oldValue) {
@@ -456,6 +477,8 @@ export default {
 
             const { $head } = this.editor.view.state.selection;
             const { nodeBefore } = $head;
+
+            this.debounceNextUpdate = false;
 
             // Perform this in nextTick because the meta data won't be ready until then.
             this.$nextTick(() => {
@@ -732,7 +755,23 @@ export default {
                     }, 1);
                 },
                 onUpdate: () => {
-                    this.json = clone(this.editor.getJSON().content);
+                    const oldJson = this.json;
+                    const newJson = clone(this.editor.getJSON().content);
+
+                    const countNodes = (nodes) => {
+                        if (!nodes || !Array.isArray(nodes)) return 0;
+                        let count = nodes.length;
+                        nodes.forEach(node => {
+                            if (node.content) {
+                                count += countNodes(node.content);
+                            }
+                        });
+                        return count;
+                    };
+
+                    if (countNodes(oldJson) !== countNodes(newJson)) this.debounceNextUpdate = false;
+
+                    this.json = newJson;
                     this.html = this.editor.getHTML();
                 },
                 onCreate: ({ editor }) => {
@@ -789,7 +828,7 @@ export default {
         getExtensions() {
             let modeExts = this.inputIsInline ? [DocumentInline] : [DocumentBlock, HardBreak];
 
-            if (this.config.inline === 'break') {
+            if (this.inputIsInline && this.config.inline_hard_breaks) {
                 modeExts.push(
                     HardBreak.extend({
                         addKeyboardShortcuts() {
@@ -955,6 +994,7 @@ export default {
                 &::after {
                     content: '';
                     position: absolute;
+                    z-index: var(--z-index-below);
                     inset: -4px -8px;
                     box-shadow:
                         /* Left Mask */

@@ -51,7 +51,7 @@ function tailwindWidthClass(width) {
         <div class="widgets @container/widgets flex flex-wrap gap-y-6 -mx-2 sm:-mx-3">
             <div
                 v-for="widget in widgets"
-                class="min-h-54 px-3 starting-style-transition starting-style-transition--siblings"
+                class="px-3 starting-style-transition starting-style-transition--siblings"
                 :class="classes(widget)"
             >
                 <component v-if="widget.component" :is="widget.component.name" v-bind="widget.component.props" />
@@ -61,7 +61,7 @@ function tailwindWidthClass(width) {
     </template>
 
     <template v-else>
-        <header class="py-8 mt-8 text-center">
+        <header class="py-8 pt-16 text-center">
             <h1 class="text-[25px] font-medium antialiased flex justify-center items-center gap-2 sm:gap-3">
                 <Icon name="dashboard" class="size-5 text-gray-500" />
                 {{ __('Dashboard') }}

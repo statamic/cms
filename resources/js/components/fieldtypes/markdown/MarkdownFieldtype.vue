@@ -1,6 +1,6 @@
 <template>
     <portal name="markdown-fullscreen" :disabled="!fullScreenMode" target-class="markdown-fieldtype">
-        <element-container @resized="refresh">
+        <div>
             <div
                 class="
                     @container/markdown w-full block bg-white dark:bg-gray-900! rounded-lg relative
@@ -53,6 +53,7 @@
                             :is-fullscreen="false"
                             @toggle-dark-mode="toggleDarkMode"
                             @button-click="handleButtonClick"
+                            class="sticky z-(--z-index-global-header) -top-2 mb-2 [&~*]:-mt-2"
                         />
 
                         <div class="drag-notification" v-show="dragging">
@@ -72,7 +73,7 @@
                                 @drop="draggingFile = false"
                                 @keydown="shortcut"
                             >
-                                <div class="editor relative top-[0.5px] z-6 st-text-legibility focus-within:focus-outline" ref="codemirror">
+                                <div class="editor relative top-[0.5px] z-(--z-index-above) st-text-legibility focus-within:focus-outline" ref="codemirror">
                                     <div
                                         v-if="showFloatingToolbar && toolbarIsFloating && !isReadOnly"
                                         class="markdown-floating-toolbar absolute z-50 flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-2 py-1 shadow-lg dark:border-white/10 dark:bg-gray-900"
@@ -95,7 +96,7 @@
                                 <!-- Hidden input for label association -->
                                 <input v-if="id" :id="id" type="text" class="sr-only" @focus="focusCodeMirror" tabindex="-1" />
 
-                                <footer class="flex items-center justify-between bg-gray-50 dark:bg-gray-900 rounded-b-[calc(var(--radius-lg)-1px)] border-t border-gray-300 dark:border-white/10 p-1 text-sm w-full" :class="{ 'absolute inset-x-0 bottom-0 rounded-': fullScreenMode }">
+                                <footer class="flex items-center justify-between bg-gray-50 dark:bg-gray-900 rounded-b-[calc(var(--radius-lg)-1px)] border-t border-gray-300 dark:border-white/10 p-1 text-sm w-full" :class="{ 'absolute inset-x-0 bottom-0 rounded-none z-(--z-index-global-header)': fullScreenMode }">
                                     <div class="markdown-cheatsheet-helper">
                                         <Button
                                             icon="markdown"
@@ -131,7 +132,7 @@
                     </div>
                 </uploader>
 
-                <stack v-if="showAssetSelector && !isReadOnly" name="markdown-asset-selector" @closed="closeAssetSelector">
+                <ui-stack v-if="showAssetSelector && !isReadOnly" name="markdown-asset-selector" @closed="closeAssetSelector">
                     <asset-selector
                         :container="container"
                         :folder="folder"
@@ -141,9 +142,9 @@
                         @selected="assetsSelected"
                         @closed="closeAssetSelector"
                     />
-                </stack>
+                </ui-stack>
 
-                <stack narrow name="markdownCheatSheet" v-if="showCheatsheet" @closed="showCheatsheet = false">
+                <ui-stack narrow name="markdownCheatSheet" v-if="showCheatsheet" @closed="showCheatsheet = false">
                     <div class="relative h-full overflow-auto bg-white p-6 dark:bg-gray-800 rounded-l-2xl">
                         <Button
                             icon="x"
@@ -156,9 +157,9 @@
                             <div v-html="__('markdown.cheatsheet')"></div>
                         </div>
                     </div>
-                </stack>
+                </ui-stack>
             </div>
-        </element-container>
+        </div>
     </portal>
 </template>
 
@@ -327,8 +328,11 @@ export default {
         },
 
         toggleFullscreen() {
-            this.fullScreenMode = !this.fullScreenMode;
-            this.trackHeightUpdates();
+            if (this.fullScreenMode) {
+                this.closeFullScreen();
+            } else {
+                this.openFullScreen();
+            }
         },
 
         toggleDarkMode() {
@@ -689,12 +693,6 @@ export default {
             this.trackHeightUpdates();
         },
 
-        refresh() {
-            this.$nextTick(function () {
-                this.codemirror.refresh();
-            });
-        },
-
         initToolbarButtons() {
             let buttons = this.config.buttons.map((button) => {
                 return availableButtons().find((b) => b.name === button.toLowerCase()) || button;
@@ -806,7 +804,7 @@ export default {
             return [
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => (vm.fullScreenMode ? 'collapse-all' : 'expand-all'),
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'fullscreen-close' : 'fullscreen-open'),
                     quick: true,
                     visibleWhenReadOnly: true,
                     run: this.toggleFullscreen,

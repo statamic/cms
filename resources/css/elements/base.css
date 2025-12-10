@@ -8,7 +8,7 @@
     /* Here we typically need a negative outline-offset because of the inner shadow on inputs */
     --focus-outline-offset: -1px;
     --focus-within-outline-offset: 0px;
-    --focus-outline-color: var(--color-blue-400);
+    --focus-outline-color: var(--theme-color-focus-outline, var(--color-blue-400));
     --focus-outline-style: solid;
 
     /* The outline-offset value used for buttons */
@@ -115,7 +115,7 @@ code:not(pre *) {
     color: hsl(from var(--theme-color-ui-accent-bg) h s 30);
     background: hsl(from var(--theme-color-ui-accent-bg) h s l / 0.08);
     &:where(.dark, .dark *) {
-        color: hsl(from var(--theme-color-dark-ui-accent-bg) h s 90);
-        background: hsl(from var(--theme-color-dark-ui-accent-bg) h s 10 / 0.5);
+        color: hsl(from var(--theme-color-ui-accent-bg) h s 90);
+        background: hsl(from var(--theme-color-ui-accent-bg) h s 10 / 0.5);
     }
 }

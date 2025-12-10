@@ -64,9 +64,9 @@ class CollectionsController extends CpController
                 'id' => $collection->handle(),
                 'title' => $collection->title(),
                 'entries_count' => $collection->queryEntries()->where('site', Site::selected())->count(),
-                'published_entries_count' => $collection->queryEntries()->where('site', Site::selected())->where('status', 'published')->count(),
-                'draft_entries_count' => $collection->queryEntries()->where('site', Site::selected())->where('status', 'draft')->count(),
-                'scheduled_entries_count' => $collection->queryEntries()->where('site', Site::selected())->where('status', 'scheduled')->count(),
+                'published_entries_count' => $collection->queryEntries()->where('site', Site::selected())->whereStatus('published')->count(),
+                'draft_entries_count' => $collection->queryEntries()->where('site', Site::selected())->whereStatus('draft')->count(),
+                'scheduled_entries_count' => $collection->queryEntries()->where('site', Site::selected())->whereStatus('scheduled')->count(),
                 'blueprints' => $collection->entryBlueprints()->reject->hidden()
                     ->map(fn ($blueprint) => [
                         ...$blueprint->toArray(),

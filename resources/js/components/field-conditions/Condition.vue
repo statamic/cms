@@ -6,7 +6,6 @@
             <Combobox
                 ref="fieldSelect"
                 :model-value="condition.field"
-                class="w-full"
                 :options="fieldOptions"
                 :placeholder="__('Field')"
                 :taggable="true"
@@ -24,8 +23,8 @@
                         />
                     </div>
                 </template>
-                <template #selected-option>
-                    <span v-text=" __(field.config.display) || field.handle"></span>
+                <template #selected-option="{ option }">
+                    <div class="truncate" v-text="__(field?.config.display) || option.value" />
                 </template>
             </Combobox>
         </div>
@@ -156,17 +155,17 @@ export default {
 
         operatorOptions() {
             return this.normalizeInputOptions({
-                equals: __('equals'),
-                not: __('not'),
-                contains: __('contains'),
-                contains_any: __('contains any'),
+                equals: __('Equals'),
+                not: __('Not'),
+                contains: __('Contains'),
+                contains_any: __('Contains Any'),
                 '===': '===',
                 '!==': '!==',
                 '>': '>',
                 '>=': '>=',
                 '<': '<',
                 '<=': '<=',
-                custom: __('custom'),
+                custom: __('Custom'),
             });
         },
     },

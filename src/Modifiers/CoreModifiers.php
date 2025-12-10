@@ -33,10 +33,15 @@ use Statamic\Support\Arr;
 use Statamic\Support\Dumper;
 use Statamic\Support\Html;
 use Statamic\Support\Str;
+use Statamic\Support\Traits\ChecksDumpability;
 use Stringy\StaticStringy as Stringy;
 
 class CoreModifiers extends Modifier
 {
+    use ChecksDumpability {
+        dumpingAllowed as traitDumpingAllowed;
+    }
+
     /**
      * Adds values together with science. Context aware.
      *
@@ -560,8 +565,12 @@ class CoreModifiers extends Modifier
     /**
      * Dump, Die, and Debug using Ignition.
      */
-    public function ddd($value)
+    public function ddd($value, $params)
     {
+        if (! $this->dumpingAllowed($params)) {
+            return;
+        }
+
         ddd(Dumper::resolve($value));
     }
 
@@ -617,16 +626,24 @@ class CoreModifiers extends Modifier
     /**
      * Dump and die the output of a variable.
      */
-    public function dd($value)
+    public function dd($value, $params)
     {
+        if (! $this->dumpingAllowed($params)) {
+            return;
+        }
+
         dd(Dumper::resolve($value));
     }
 
     /**
      * Dump a variable.
      */
-    public function dump($value)
+    public function dump($value, $params)
     {
+        if (! $this->dumpingAllowed($params)) {
+            return;
+        }
+
         dump(Dumper::resolve($value));
     }
 
@@ -699,7 +716,7 @@ class CoreModifiers extends Modifier
      */
     public function explode($value, $params)
     {
-        return explode(Arr::get($params, 0), $value);
+        return explode(Arr::get($params, 0), $value, Arr::get($params, 1, PHP_INT_MAX));
     }
 
     /**
@@ -3307,6 +3324,10 @@ class CoreModifiers extends Modifier
 
     private function carbon($value)
     {
+        if (! $value) {
+            return optional();
+        }
+
         if (! $value instanceof Carbon) {
             $value = (is_numeric($value)) ? Date::createFromTimestamp($value, config('app.timezone')) : Date::parse($value);
         }
@@ -3349,5 +3370,10 @@ class CoreModifiers extends Modifier
         }
 
         return [$url, $hash];
+    }
+
+    private function dumpingAllowed(array $params): bool
+    {
+        return $this->traitDumpingAllowed() || (Arr::get($params, 0) === 'force');
     }
 }
