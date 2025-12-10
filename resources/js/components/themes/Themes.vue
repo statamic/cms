@@ -5,7 +5,7 @@ import Preview from './Preview.vue';
 import type { PredefinedTheme, Theme } from './types';
 import { applyTheme } from './utils';
 import { nativeThemes } from './themes';
-import { Description } from '@ui';
+import { Button, Description, Input } from '@ui';
 import { cp_url } from '@/bootstrap/globals';
 
 const emit = defineEmits<{
@@ -22,6 +22,7 @@ const selectTheme = (theme: PredefinedTheme) => {
 };
 
 const themes = ref<PredefinedTheme[]>(nativeThemes);
+const busy = ref<boolean>(true);
 
 onMounted(() => load());
 
@@ -31,6 +32,8 @@ async function load() {
         themes.value = [...nativeThemes, ...marketplaceThemes];
     } catch (error) {
         console.error('Failed to load marketplace themes:', error);
+    } finally {
+        busy.value = false;
     }
 }
 
@@ -40,6 +43,7 @@ function isActive(theme: PredefinedTheme): boolean {
 }
 
 function refresh() {
+    busy.value = true;
     axios.get(cp_url('themes/refresh')).then(() => load());
 }
 
@@ -49,6 +53,16 @@ defineExpose({
 </script>
 
 <template>
+    <div class="mb-6 flex items-center gap-4">
+        <Button
+            size="sm"
+            variant="filled"
+            @click="refresh"
+            :disabled="busy"
+            :icon="busy ? 'loading' : 'live-preview'"
+        />
+    </div>
+
     <div class="grid grid-cols-4 gap-6">
         <div
             v-for="theme in themes"
