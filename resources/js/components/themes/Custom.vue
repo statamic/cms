@@ -6,7 +6,7 @@ import colors from './colors';
 import Preview from './Preview.vue';
 import { getDefaultTheme } from '@/components/themes/utils';
 import { translate as __ } from '@/translations/translator';
-import ColorPicker from '@/components/themes/ColorPicker.vue';
+import ColorPicker from '@/components/themes/color-picker/ColorPicker.vue';
 
 const props = defineProps<{
     modelValue?: Theme;

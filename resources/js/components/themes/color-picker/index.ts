@@ -1,16 +1,4 @@
-<script setup lang="ts">
-import { Popover, Description } from '@ui';
-import { computed } from 'vue';
-
-const props = defineProps<{
-    modelValue?: string;
-}>();
-
-const emit = defineEmits<{
-    (e: 'update:modelValue', value: string): void;
-}>();
-
-const colors = {
+export const colors = {
     slate: {
         50: 'oklch(0.984 0.003 247.858)',
         100: 'oklch(0.968 0.007 247.896)',
@@ -365,13 +353,13 @@ const colors = {
     },
 };
 
-const specialColors = {
+export const specialColors = {
     volt: { name: 'Volt', value: 'oklch(93.86% 0.2018 122.24)' },
     white: { name: 'White', value: '#fff' },
     transparent: { name: 'Transparent', value: 'transparent' },
 };
 
-const colorFamilies = [
+export const colorFamilies = [
     { name: 'Red', key: 'red' },
     { name: 'Orange', key: 'orange' },
     { name: 'Amber', key: 'amber' },
@@ -396,111 +384,4 @@ const colorFamilies = [
     { name: 'Stone', key: 'stone' },
 ];
 
-const shades = [50, 100, 150, 200, 300, 400, 500, 600, 700, 800, 850, 900, 925, 950];
-
-function selectColor(color: string, shade?: number) {
-    if (shade !== undefined) {
-        emit('update:modelValue', colors[color]?.[shade]);
-    } else {
-        emit('update:modelValue', specialColors[color]?.value);
-    }
-}
-
-function isSelected(color: string, shade?: number) {
-    if (shade !== undefined) {
-        const oklchValue = colors[color]?.[shade];
-        return props.modelValue === oklchValue;
-    } else {
-        return props.modelValue === specialColors[color]?.value;
-    }
-}
-
-const selectedColor = computed(() => {
-    if (!props.modelValue) return '';
-
-    for (const [key, special] of Object.entries(specialColors)) {
-        if (special.value === props.modelValue) {
-            return special.name;
-        }
-    }
-
-    for (const [familyKey, shades] of Object.entries(colors)) {
-        for (const [shade, oklchValue] of Object.entries(shades)) {
-            if (oklchValue === props.modelValue) {
-                const familyName = colorFamilies.find(f => f.key === familyKey)?.name || familyKey;
-                return `${familyName} ${shade}`;
-            }
-        }
-    }
-
-    return props.modelValue;
-});
-</script>
-
-<template>
-    <Popover arrow inset class="w-full!">
-        <template #trigger>
-            <button
-                type="button"
-                class="w-8 h-8 rounded border-2 border-gray-300 hover:border-gray-400 transition-all"
-                :style="{
-                    backgroundColor: modelValue || 'transparent',
-                }"
-                v-tooltip="selectedColor"
-            />
-        </template>
-        <div class="p-2">
-            <div class="mb-2 text-center">
-                <Description :text="selectedColor" />
-            </div>
-            <div class="grid grid-cols-23">
-                <div v-for="family in colorFamilies" :key="family.key" :data-family="family.key" class="flex flex-col">
-                    <button
-                        v-for="shade in shades" :key="shade" :data-shade="shade"
-                        type="button"
-                        :class="[
-                            `bg-${family.key}-${shade}`,
-                            'w-4 h-4 cursor-pointer hover:scale-150 hover:rounded',
-                            isSelected(family.key, shade) ? 'ring-2 ring-blue-500 z-1' : ''
-                        ]"
-                        :title="`${family.key}-${shade}`"
-                        @click="selectColor(family.key, shade)"
-                    />
-                </div>
-                <div class="flex flex-col">
-                    <button
-                        :class="[
-                            `bg-white border border-gray-300`,
-                            'w-4 h-4 cursor-pointer hover:scale-150 hover:rounded relative',
-                            isSelected('transparent') ? 'ring-2 ring-blue-500 z-1' : ''
-                        ]"
-                        title="Transparent"
-                        @click="selectColor('transparent')"
-                    >
-                        <div class="absolute inset-0 flex items-center justify-center">
-                            <div class="w-full h-[1px] bg-red-500 rotate-45 origin-center"></div>
-                        </div>
-                    </button>
-                    <button
-                        :class="[
-                            `bg-white border`,
-                            'w-4 h-4 cursor-pointer hover:scale-150 hover:rounded',
-                            isSelected('white') ? 'ring-2 ring-blue-500 z-1' : ''
-                        ]"
-                        title="White"
-                        @click="selectColor('white')"
-                    ></button>
-                    <button
-                        :class="[
-                            `bg-volt`,
-                            'w-4 h-4 cursor-pointer hover:scale-150 hover:rounded',
-                            isSelected('volt') ? 'ring-2 ring-blue-500 z-1' : ''
-                        ]"
-                        title="Volt"
-                        @click="selectColor('volt')"
-                    ></button>
-                </div>
-            </div>
-        </div>
-    </Popover>
-</template>
+export const shades = [50, 100, 150, 200, 300, 400, 500, 600, 700, 800, 850, 900, 925, 950];
