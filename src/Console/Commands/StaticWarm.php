@@ -122,7 +122,13 @@ class StaticWarm extends Command
     private function warmPaginatedPages(string $url, int $currentPage, int $totalPages, string $pageName): void
     {
         $urls = collect(range($currentPage, $totalPages))->map(function ($page) use ($url, $pageName) {
-            return "{$url}?{$pageName}={$page}";
+            $url = "{$url}?{$pageName}={$page}";
+
+            if (config('statamic.static_caching.background_recache', false)) {
+                $url = RecacheToken::addToUrl($url);
+            }
+
+            return $url;
         });
 
         $requests = $urls->map(fn (string $url) => new Request('GET', $url))->all();

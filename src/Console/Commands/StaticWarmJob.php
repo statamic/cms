@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Statamic\StaticCaching\RecacheToken;
 
 class StaticWarmJob implements ShouldBeUnique, ShouldQueue
 {
@@ -30,8 +31,14 @@ class StaticWarmJob implements ShouldBeUnique, ShouldQueue
             [$currentPage, $totalPages, $pageName] = $response->getHeader('X-Statamic-Pagination');
 
             collect(range($currentPage, $totalPages))
-                ->map(function (int $page) use ($pageName) {
-                    return "{$this->request->getUri()}?{$pageName}={$page}";
+                ->map(function (int $page) use ($pageName): string {
+                    $url = $this->request->getUri();
+
+                    return implode('', [
+                        $url,
+                        str_contains($url, '?') ? '&' : '?',
+                        "{$pageName}={$page}",
+                    ]);
                 })
                 ->each(function (string $uri) {
                     StaticWarmJob::dispatch(new Request('GET', $uri), $this->clientConfig);
