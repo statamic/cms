@@ -423,7 +423,7 @@ defineExpose({
                             @mount-auto-focus.prevent
                             @unmount-auto-focus="(event) => {
                                 if (event.defaultPrevented) return;
-                                $refs.trigger.$el.focus();
+                                $refs.trigger?.$el?.focus();
                                 event.preventDefault();
                             }"
                         >

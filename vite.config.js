@@ -66,7 +66,7 @@ export default defineConfig(({ mode, command }) => {
                     extends: true,
                     test: {
                         name: 'browser',
-                        setupFiles: 'resources/js/tests/setup.js',
+                        setupFiles: ['resources/js/tests/browser/setup.js', 'vitest-browser-vue'],
                         include: ['resources/js/tests/browser/**/*.test.js'],
                         browser: {
                             enabled: true,
