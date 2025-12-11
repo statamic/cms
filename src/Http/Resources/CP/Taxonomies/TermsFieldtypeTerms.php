@@ -42,7 +42,7 @@ class TermsFieldtypeTerms extends Terms
             ->listable(true)
             ->defaultVisibility(true)
             ->visible(true)
-            ->sortable(true)
+            ->sortable(false)
             ->defaultOrder($columns->count() + 1);
 
         $columns->put('type', $type);
