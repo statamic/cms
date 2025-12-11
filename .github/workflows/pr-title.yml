@@ -52,41 +52,12 @@ jobs:
           echo "PR Title: $PR_TITLE"
           echo "Base Branch: $BASE_BRANCH"
           echo "Default Branch: $DEFAULT_BRANCH"
-          echo ""
-          echo "=== TESTING SCENARIOS ==="
 
-          # Test cases
-          declare -a test_cases=(
-            "5.x|[5.x] Fix bug"
-            "5.x|[4.x] Fix bug"
-            "5.x|[6.x] Fix bug"
-            "master|[6.x] New feature"
-            "master|[5.x] New feature"
-            "master|[7.x] New feature"
-            "feature-branch|[5.x] Something"
-            "feature-branch|[99.x] Something"
-            "feature-branch|No prefix"
-          )
-
-          for test_case in "${test_cases[@]}"; do
-            IFS='|' read -r test_branch test_title <<< "$test_case"
-            error=$(validate_pr_title "$test_branch" "$test_title" "$DEFAULT_BRANCH")
-
-            if [[ -z $error ]]; then
-              echo "✅ PASS: $test_branch -> '$test_title'"
-            else
-              echo "❌ FAIL: $test_branch -> '$test_title'"
-              echo "   Error: $error"
-            fi
-          done
-
-          echo "========================="
-          echo ""
-
-          # Actual validation
           ERROR=$(validate_pr_title "$BASE_BRANCH" "$PR_TITLE" "$DEFAULT_BRANCH")
 
           if [[ -n $ERROR ]]; then
             echo $ERROR
             exit 1
           fi
+
+          echo "PR title validation passed"
