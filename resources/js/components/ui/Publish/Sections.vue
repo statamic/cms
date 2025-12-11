@@ -42,10 +42,8 @@ function renderInstructions(instructions) {
 }
 
 function toggleSection(section) {
-	let index = sections.findIndex((s) => s === section);
-
-    if (sections[index].collapsible) {
-        sections[index].collapsed = !sections[index].collapsed;
+    if (section.collapsible) {
+        section.collapsed = !section.collapsed;
     }
 }
 </script>
