@@ -4,6 +4,7 @@ import { Input, Button, CardPanel } from '@ui';
 import { computed, ref } from 'vue';
 import axios from 'axios';
 import { cp_url } from '@/bootstrap/globals';
+import { translate as __ } from '@/translations/translator';
 import { toast } from '@api';
 
 const emit = defineEmits<{
@@ -39,10 +40,10 @@ function share() {
 
 <template>
     <CardPanel
-        heading="Publish"
-        subheading="Publish this theme through your statamic.com account to make it available to others."
+        :heading="__('Publish')"
+        :subheading="__('messages.theme_share_instructions')"
     >
         <Input v-model="name" />
-        <Button text="Publish..." @click="share" class="w-full" />
+        <Button :text="`${__('Publish')}...`" @click="share" class="w-full" />
     </CardPanel>
 </template>
