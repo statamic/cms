@@ -517,7 +517,7 @@ export default {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
     },
 
-    unmounted() {
+	beforeUnmount() {
         this.saveKeyBinding.destroy();
         this.quickSaveKeyBinding.destroy();
     },

@@ -62,6 +62,7 @@ export default {
         return {
             blueprint: this.initializeBlueprint(),
             errors: {},
+	        saveKeyBinding: null,
         };
     },
 
@@ -72,7 +73,7 @@ export default {
     },
 
     created() {
-        this.$keys.bindGlobal(['mod+s'], (e) => {
+        this.saveKeyBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
             e.preventDefault();
             this.save();
         });
@@ -90,6 +91,8 @@ export default {
 
     beforeUnmount() {
         this.$events.$off('root-form-save');
+
+		this.saveKeyBinding.destroy();
     },
 
     watch: {
