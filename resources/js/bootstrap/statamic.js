@@ -163,6 +163,9 @@ export default {
     },
 
     async start() {
+        setTranslations(this.initialConfig.translations);
+        setLocale(this.initialConfig.translationLocale);
+
         config.initialize(this.initialConfig);
         colorMode.initialize(this.initialConfig.user?.color_mode);
         contrast.initialize(this.initialConfig.user?.preferences?.strict_accessibility);
@@ -244,9 +247,6 @@ export default {
         this.$app.use(FloatingVue, { disposeTimeout: 30000, distance: 10 });
         this.$app.use(VueComponentDebug, { enabled: import.meta.env.VITE_VUE_COMPONENT_DEBUG === 'true' });
         toast.initialize(this.$app);
-
-        setTranslations(this.initialConfig.translations);
-        setLocale(this.initialConfig.translationLocale);
 
         Object.assign(this.$app.config.globalProperties, {
             $config: config,
