@@ -6,6 +6,7 @@ use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 use Statamic\CommandPalette\Category;
+use Statamic\CP\Color;
 use Statamic\Facades\CommandPalette;
 use Statamic\Facades\CP\Toast;
 use Statamic\Facades\Icon;
@@ -79,6 +80,7 @@ class JavascriptComposer
             'commandPalettePreloadedItems' => CommandPalette::getPreloadedItems(),
             'setPreviewImages' => Sets::previewImageConfig(),
             'linkToDocs' => config('statamic.cp.link_to_docs'),
+            'defaultTheme' => ['light' => Color::defaults(), 'dark' => Color::defaults(dark: true)],
         ];
     }
 

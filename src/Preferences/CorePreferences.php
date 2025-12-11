@@ -39,6 +39,13 @@ class CorePreferences
             'instructions' => __('statamic::messages.preference_confirm_dirty_navigation_instructions'),
             'variant' => 'inline',
         ]);
+
+        Preference::register('theme', [
+            'type' => 'theme',
+            'display' => __('Theme'),
+            'instructions' => __('statamic::messages.preference_theme_instructions'),
+            'full_width_setting' => true,
+        ]);
     }
 
     private function localeOptions(): array
