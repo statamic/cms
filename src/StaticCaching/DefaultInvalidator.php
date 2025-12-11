@@ -277,11 +277,22 @@ class DefaultInvalidator implements Invalidator
         ];
     }
 
-    private function parseInvalidationRules(array $rules, array $data): IlluminateCollection
+    private function parseInvalidationRules(array $rules, array $context): IlluminateCollection
     {
         return collect($rules)
-            ->map(fn (string $rule) => $this->convertToAntlers($rule))
-            ->map(fn (string $rule) => (string) Antlers::parse($rule, $data))
+            ->map(fn (string $rule): string => $this->convertToAntlers($rule))
+            ->filter(function (string $rule) use ($context): bool {
+                // We only want to parse the Antlers string if we have enough data to fulfill it.
+                // We want to avoid returning half-built URLs (eg. "/test/{test}" becoming "/test").
+                if (Str::contains($rule, '{{')) {
+                    $identifiers = Antlers::identifiers($rule);
+
+                    return collect($identifiers)->intersect($context)->isNotEmpty();
+                }
+
+                return true;
+            })
+            ->map(fn (string $rule) => (string) Antlers::parse($rule, $context))
             ->filter();
     }
 
