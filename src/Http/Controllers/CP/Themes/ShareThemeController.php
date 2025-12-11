@@ -16,12 +16,10 @@ class ShareThemeController extends CpController
             'darkColors' => 'required|array',
         ]);
 
-        $response = Http::post('http://statamic.com.test/api/v1/marketplace/cp-themes', [
+        $response = Http::post('https://statamic.com/api/v1/marketplace/cp-themes', [
             'name' => $request->name,
             'colors' => $request->colors,
             'darkColors' => $request->darkColors,
-            //            'key' => config('statamic.system.license_key'),
-            //            'key' => '6kqv84g63gn5d1yx',
         ]);
 
         return $response->json();
