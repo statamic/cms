@@ -41,9 +41,11 @@ function renderInstructions(instructions) {
     return instructions ? markdown(__(instructions), { openLinksInNewTabs: true }) : '';
 }
 
-function toggleSection(id) {
-    if (sections[id].collapsible) {
-        sections[id].collapsed = !sections[id].collapsed;
+function toggleSection(section) {
+	let index = sections.findIndex((s) => s === section);
+
+    if (sections[index].collapsible) {
+        sections[index].collapsed = !sections[index].collapsed;
     }
 }
 </script>
@@ -64,7 +66,7 @@ function toggleSection(id) {
                     <Subheading v-if="section.instructions" :text="renderInstructions(section.instructions)" />
                 </div>
                 <Button
-                    @click="toggleSection(i)"
+                    @click="toggleSection(section)"
                     v-if="section.collapsible"
                     class="static! [&_svg]:size-4.5 rounded-xl after:content-[''] after:absolute after:inset-0"
                     :icon="section.collapsed ? 'expand' : 'collapse'"
