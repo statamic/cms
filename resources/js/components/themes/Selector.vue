@@ -27,7 +27,7 @@ watch(activeTab, (newTab) => {
     emit('update:tab', newTab);
 
     if (newTab === 'themes' && customWasShared.value) {
-        themes.value.refresh();
+        themes.value?.refresh();
         customWasShared.value = false;
     }
 });
