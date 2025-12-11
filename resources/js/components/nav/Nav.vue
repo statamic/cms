@@ -129,7 +129,7 @@ Statamic.$events.$on('nav.toggle', toggle);
                             :class="{ 'active': item.active }"
                             @click="handleParentClick($event, item)"
                         >
-                            <Icon :name="item.icon" />
+                            <Icon :name="item.icon ?? 'fieldtype-spacer'" />
                             <span v-text="__(item.display)" />
                         </component>
                         <ul v-if="item.children.length && item.active">
