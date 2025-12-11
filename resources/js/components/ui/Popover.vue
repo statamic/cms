@@ -16,6 +16,7 @@ const props = defineProps({
     offset: { type: Number, default: 5 },
     side: { type: String, default: 'bottom' },
     open: { type: Boolean, default: false },
+	closeOnOutsideClick: { type: Boolean, default: true },
 });
 
 const popoverContentClasses = cva({
@@ -48,8 +49,8 @@ function updateOpen(value) {
     open.value = value;
 }
 
-function focusOutside(event) {
-	if (event.target.hasAttribute('data-ui-combobox-item')) {
+function interactOutside(event) {
+	if (!props.closeOnOutsideClick) {
 		event.stopPropagation();
 		event.preventDefault();
 	}
@@ -68,7 +69,7 @@ function focusOutside(event) {
                 :align
                 :sideOffset="offset"
                 :side
-                @focus-outside="focusOutside"
+                @interact-outside="interactOutside"
             >
                 <slot v-bind="slotProps" />
                 <PopoverClose as-child>
