@@ -87,9 +87,6 @@ jobs:
           ERROR=$(validate_pr_title "$BASE_BRANCH" "$PR_TITLE" "$DEFAULT_BRANCH")
 
           if [[ -n $ERROR ]]; then
-            echo "❌ Error: $ERROR"
-            echo "   Your title: $PR_TITLE"
+            echo $ERROR
             exit 1
           fi
-
-          echo "✅ PR title validation passed"
