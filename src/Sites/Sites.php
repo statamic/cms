@@ -8,6 +8,7 @@ use Statamic\Events\SiteCreated;
 use Statamic\Events\SiteDeleted;
 use Statamic\Events\SiteSaved;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Dictionary;
 use Statamic\Facades\File;
 use Statamic\Facades\User;
 use Statamic\Facades\YAML;
@@ -127,17 +128,20 @@ class Sites
 
     protected function getSavedSites()
     {
-        $default = [
+        return File::exists($sitesPath = $this->path())
+            ? YAML::file($sitesPath)->parse()
+            : $this->getFallbackConfig();
+    }
+
+    protected function getFallbackConfig()
+    {
+        return [
             'default' => [
                 'name' => '{{ config:app:name }}',
                 'url' => '/',
-                'locale' => 'en_US',
+                'locale' => '{{ config:app:locale }}',
             ],
         ];
-
-        return File::exists($sitesPath = $this->path())
-            ? YAML::file($sitesPath)->parse()
-            : $default;
     }
 
     public function save()
@@ -146,8 +150,8 @@ class Sites
         $newSites = $this->getNewSites();
         $deletedSites = $this->getDeletedSites();
 
-        // Save to file
-        File::put($this->path(), YAML::dump($this->config()));
+        // Save sites to store
+        $this->saveToStore();
 
         // Dispatch our tracked `SiteCreated` and `SiteDeleted` events
         $newSites->each(fn ($site) => SiteCreated::dispatch($site));
@@ -155,6 +159,11 @@ class Sites
 
         // Dispatch `SiteSaved` events
         $this->sites->each(fn ($site) => SiteSaved::dispatch($site));
+    }
+
+    protected function saveToStore()
+    {
+        File::put($this->path(), YAML::dump($this->config()));
     }
 
     public function blueprint()
@@ -196,9 +205,16 @@ class Sites
             [
                 'handle' => 'locale',
                 'field' => [
-                    'type' => 'text',
+                    'type' => 'select',
                     'display' => __('Locale'),
                     'instructions' => __('statamic::messages.site_configure_locale_instructions'),
+                    'options' => [
+                        '{{ config:app.locale }}' => '{{ config:app.locale }}',
+                        ...Dictionary::find('locales')->options(),
+                    ],
+                    'taggable' => true,
+                    'searchable' => true,
+                    'max_items' => 1,
                     'required' => true,
                     'width' => 33,
                     'direction' => 'ltr',
@@ -207,11 +223,14 @@ class Sites
             [
                 'handle' => 'lang',
                 'field' => [
-                    'type' => 'text',
+                    'type' => 'dictionary',
                     'display' => __('Language'),
                     'instructions' => __('statamic::messages.site_configure_lang_instructions'),
+                    'dictionary' => 'languages',
+                    'max_items' => 1,
                     'width' => 33,
                     'direction' => 'ltr',
+                    'clearable' => true,
                 ],
             ],
             [
@@ -233,6 +252,7 @@ class Sites
                     'field' => [
                         'type' => 'grid',
                         'hide_display' => true,
+                        'actions' => false,
                         'fullscreen' => false,
                         'mode' => 'stacked',
                         'add_row' => __('Add Site'),
@@ -260,7 +280,9 @@ class Sites
 
     protected function hydrateConfig($config): Collection
     {
-        return collect($config)->map(fn ($site, $handle) => new Site($handle, $site));
+        $defaultSiteHandle = collect($config)->keys()->first();
+
+        return collect($config)->map(fn ($site, $handle) => new Site($handle, $site, $handle === $defaultSiteHandle));
     }
 
     protected function getNewSites(): Collection
@@ -281,27 +303,5 @@ class Sites
         return $this->hydrateConfig(
             collect($currentSites)->diffKeys($newSites)
         );
-    }
-
-    /**
-     * Deprecated! This is being replaced by `setSites()` and `setSiteValue()`.
-     *
-     * Though Statamic sites can be updated for this breaking change,
-     * this gives time for addons to follow suit, and allows said
-     * addons to continue working across versions for a while.
-     *
-     * @deprecated
-     */
-    public function setConfig($key, $value = null)
-    {
-        if (is_null($value)) {
-            $this->setSites($key['sites']);
-
-            return;
-        }
-
-        $keyParts = explode('.', $key);
-
-        $this->setSiteValue($keyParts[1], $keyParts[2], $value);
     }
 }

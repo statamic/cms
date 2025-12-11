@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Utilities;
 
 use Illuminate\Http\Request;
+use Statamic\Events\SearchIndexUpdated;
 use Statamic\Facades\Search;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Str;
@@ -17,10 +18,15 @@ class UpdateSearchController extends CpController
 
         $indexes->each(function ($index) {
             [$name, $locale] = explode('::', $index);
+
             if ($locale) {
                 $name = Str::before($name, '_'.$locale);
             }
-            Search::index($name, $locale ?: null)->update();
+
+            $index = Search::index($name, $locale ?: null);
+            $index->update();
+
+            SearchIndexUpdated::dispatch($index);
         });
 
         return back()->withSuccess(__('Update successful.'));

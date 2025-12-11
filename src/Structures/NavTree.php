@@ -7,6 +7,7 @@ use Statamic\Contracts\Structures\NavTree as TreeContract;
 use Statamic\Contracts\Structures\NavTreeRepository;
 use Statamic\Events\NavTreeDeleted;
 use Statamic\Events\NavTreeSaved;
+use Statamic\Events\NavTreeSaving;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Nav;
 use Statamic\Facades\Site;
@@ -41,6 +42,11 @@ class NavTree extends Tree implements TreeContract
     protected function dispatchSavedEvent()
     {
         NavTreeSaved::dispatch($this);
+    }
+
+    protected function dispatchSavingEvent()
+    {
+        return NavTreeSaving::dispatch($this);
     }
 
     protected function dispatchDeletedEvent()

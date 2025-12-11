@@ -1,51 +1,27 @@
-<!doctype html>
-<html lang="{{ Statamic::cpLocale() }}" dir="{{ Statamic::cpDirection() }}" class="{{ $user->preferredTheme() === 'dark' ? 'dark' : '' }}">
-<head>
-    @include('statamic::partials.head')
-</head>
+<!DOCTYPE html>
+<html
+    lang="{{ Statamic::cpLocale() }}"
+    dir="{{ Statamic::cpDirection() }}"
+>
+    <head>
+        @include('statamic::partials.head')
+    </head>
 
-<body>
-    <div id="statamic">
-
-        @include('statamic::partials.session-expiry')
-        @include('statamic::partials.licensing-alerts')
-        @include('statamic::partials.global-header')
-
-        <div id="main"
-            class="@yield('content-class')"
-            :class="{
-                'nav-closed': ! navOpen,
-                'nav-mobile-open': mobileNavOpen,
-                'showing-license-banner': showBanner
-            }"
+    <body
+        @if ($user && $user->getPreference('strict_accessibility')) data-contrast="increased" @endif
+    >
+        <div
+            id="statamic"
+            data-page="{{ json_encode($page ?? Statamic::nonInertiaPageData()) }}"
         >
-            @include('statamic::partials.nav-main')
-            @include('statamic::partials.nav-mobile')
-
-            <div class="workspace">
-                <div class="page-wrapper" :class="wrapperClass">
-                    @yield('content')
-                </div>
-            </div>
-
+            <div id="blade-title" data-title="
+                @yield('title', $title ?? __('Here')) {{ Statamic::cpDirection() === 'ltr' ? '‹' : '›' }}
+                {{ __(Statamic::pro() ? config('statamic.cp.custom_cms_name', 'Statamic') : 'Statamic') }}
+            "></div>
+            @yield('content')
         </div>
 
-        <component
-            v-for="component in appendedComponents"
-            :key="component.id"
-            :is="component.name"
-            v-bind="component.props"
-            v-on="component.events"
-        ></component>
-
-        <keyboard-shortcuts-modal></keyboard-shortcuts-modal>
-
-        <portal-targets></portal-targets>
-
-    </div>
-
-    @include('statamic::partials.scripts')
-    @yield('scripts')
-
-</body>
+        @include('statamic::partials.scripts')
+        @yield('scripts')
+    </body>
 </html>

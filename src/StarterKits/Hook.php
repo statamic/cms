@@ -4,7 +4,7 @@ namespace Statamic\StarterKits;
 
 class Hook
 {
-    public function find($path)
+    public function find(string $path): mixed
     {
         if (app('files')->exists($path)) {
             require_once $path;

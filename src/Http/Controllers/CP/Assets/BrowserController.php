@@ -4,8 +4,12 @@ namespace Statamic\Http\Controllers\CP\Assets;
 
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
+use Inertia\Inertia;
+use Statamic\Assets\AssetFolder;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
+use Statamic\CP\Column;
 use Statamic\Exceptions\AuthorizationException;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Scope;
 use Statamic\Facades\User;
@@ -13,11 +17,14 @@ use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Resources\CP\Assets\Folder;
 use Statamic\Http\Resources\CP\Assets\FolderAsset;
 use Statamic\Http\Resources\CP\Assets\SearchedAssetsCollection;
+use Statamic\Http\Resources\CP\Concerns\HasRequestedColumns;
 use Statamic\Support\Arr;
 
 class BrowserController extends CpController
 {
-    use RedirectsToFirstAssetContainer;
+    use HasRequestedColumns, RedirectsToFirstAssetContainer;
+
+    private $columns;
 
     public function index()
     {
@@ -34,19 +41,11 @@ class BrowserController extends CpController
     {
         $this->authorize('view', $container);
 
-        return view('statamic::assets.browse', [
-            'container' => [
-                'id' => $container->id(),
-                'title' => $container->title(),
-                'edit_url' => $container->editUrl(),
-                'delete_url' => $container->deleteUrl(),
-                'blueprint_url' => cp_route('asset-containers.blueprint.edit', $container->handle()),
-                'can_edit' => User::current()->can('edit', $container),
-                'can_delete' => User::current()->can('delete', $container),
-                'sort_field' => $container->sortField(),
-                'sort_direction' => $container->sortDirection(),
-            ],
-            'folder' => $path,
+        $this->setColumns($container);
+
+        return Inertia::render('assets/Browse', [
+            ...$this->browseData($container, $path),
+            'editing' => null,
         ]);
     }
 
@@ -56,19 +55,39 @@ class BrowserController extends CpController
 
         $asset = Asset::find("{$containerHandle}::{$path}");
 
-        abort_unless($container && $asset, 404);
+        throw_unless($container && $asset, new NotFoundHttpException);
 
         $this->authorize('view', $asset);
 
-        return view('statamic::assets.browse', [
+        $this->setColumns($container);
+
+        return Inertia::render('assets/Browse', [
+            ...$this->browseData($container, $asset->folder()),
+            'editing' => $asset->id(),
+        ]);
+    }
+
+    protected function browseData($container, $path)
+    {
+        return [
             'container' => [
                 'id' => $container->id(),
                 'title' => $container->title(),
                 'edit_url' => $container->editUrl(),
+                'delete_url' => $container->deleteUrl(),
+                'blueprint_url' => cp_route('blueprints.asset-containers.edit', $container->handle()),
+                'can_edit' => User::current()->can('edit', $container),
+                'can_delete' => User::current()->can('delete', $container),
+                'can_upload' => User::current()->can('store', [\Statamic\Contracts\Assets\Asset::class, $container]),
+                'can_create_folders' => User::current()->can('create', [\Statamic\Contracts\Assets\AssetFolder::class, $container]),
+                'sort_field' => $container->sortField(),
+                'sort_direction' => $container->sortDirection(),
             ],
-            'folder' => $asset->folder(),
-            'editing' => $asset->id(),
-        ]);
+            'folder' => $path,
+            'columns' => $this->columns,
+            'canCreateContainers' => User::current()->can('create', \Statamic\Contracts\Assets\AssetContainer::class),
+            'createContainerUrl' => cp_route('asset-containers.create'),
+        ];
     }
 
     public function folder(Request $request, $container, $path = '/')
@@ -81,21 +100,30 @@ class BrowserController extends CpController
 
         $folders = $folder->assetFolders();
         $totalFolders = $folders->count();
-        $folders = $folders->slice(($page - 1) * $perPage, $perPage);
         $lastFolderPage = (int) ceil($totalFolders / $perPage) ?: 1;
 
         $totalAssets = $folder->queryAssets()->count();
         $totalItems = $totalAssets + $totalFolders;
 
+        if ($request->sort) {
+            $sort = $request->sort;
+            $order = $request->order ?? 'asc';
+        } else {
+            $sort = $container->sortField();
+            $order = $container->sortDirection();
+        }
+
+        $sortByMethod = $order === 'desc' ? 'sortByDesc' : 'sortBy';
+
+        $folders = $folders->$sortByMethod(
+            fn (AssetFolder $folder) => method_exists($folder, $sort) ? $folder->$sort() : $folder->basename()
+        );
+
+        $folders = $folders->slice(($page - 1) * $perPage, $perPage);
+
         if ($page >= $lastFolderPage) {
             $query = $folder->queryAssets();
-
-            if ($request->sort) {
-                $query->orderBy($request->sort, $request->order ?? 'asc');
-            } else {
-                $query->orderBy($container->sortField(), $container->sortDirection());
-            }
-
+            $query->orderBy($sort, $order);
             $this->applyQueryScopes($query, $request->all());
 
             $offset = $page === $lastFolderPage
@@ -108,13 +136,17 @@ class BrowserController extends CpController
                 ->get();
         }
 
+        $this->setColumns($container);
+        $columns = $this->visibleColumns();
+
         return [
-            'data' => [
-                'assets' => FolderAsset::collection($assets ?? collect())->resolve(),
-                'folder' => array_merge((new Folder($folder))->resolve(), [
-                    'folders' => $folders->values(),
-                ]),
-            ],
+            'data' => collect($assets ?? [])
+                ->map(fn ($asset) => (new FolderAsset($asset))
+                    ->blueprint($container->blueprint())
+                    ->columns($columns)
+                    ->resolve()
+                )
+                ->all(),
             'links' => [
                 'asset_action' => cp_route('assets.actions.run'),
                 'folder_action' => cp_route('assets.folders.actions.run', $container->id()),
@@ -127,6 +159,10 @@ class BrowserController extends CpController
                 'per_page' => $perPage,
                 'to' => $totalItems > 0 ? $page * $perPage : null,
                 'total' => $totalItems,
+                'columns' => $columns,
+                'folder' => array_merge((new Folder($folder))->resolve(), [
+                    'folders' => Folder::collection($folders->values()),
+                ]),
             ],
         ];
     }
@@ -143,6 +179,10 @@ class BrowserController extends CpController
             $query->where('folder', $path);
         }
 
+        if ($request->sort) {
+            $query->orderBy($request->sort, $request->order ?? 'asc');
+        }
+
         $this->applyQueryScopes($query, $request->all());
 
         $assets = $query->paginate(request('perPage'));
@@ -151,7 +191,9 @@ class BrowserController extends CpController
             $assets->setCollection($assets->getCollection()->map->getSearchable());
         }
 
-        return new SearchedAssetsCollection($assets);
+        return (new SearchedAssetsCollection($assets))
+            ->blueprint($container->blueprint())
+            ->columnPreferenceKey("assets.{$container->handle()}.columns");
     }
 
     protected function applyQueryScopes($query, $params)
@@ -160,5 +202,57 @@ class BrowserController extends CpController
             ->map(fn ($handle) => Scope::find($handle))
             ->filter()
             ->each(fn ($scope) => $scope->apply($query, $params));
+    }
+
+    public function setColumns($container)
+    {
+        $blueprint = $container->blueprint();
+
+        $columns = $blueprint->columns();
+
+        $basename = Column::make('basename')
+            ->label(__('File'))
+            ->visible(true)
+            ->defaultVisibility(true)
+            ->sortable(true)
+            ->required(true);
+
+        $size = Column::make('size')
+            ->label(__('Size'))
+            ->value('size_formatted')
+            ->visible(true)
+            ->defaultVisibility(true)
+            ->sortable(true);
+
+        $lastModified = Column::make('last_modified')
+            ->label(__('Last Modified'))
+            ->value('last_modified_relative')
+            ->visible(true)
+            ->defaultVisibility(true)
+            ->sortable(true);
+
+        $width = Column::make('width')
+            ->label(__('Width'))
+            ->value('width')
+            ->visible(true)
+            ->defaultVisibility(false)
+            ->sortable(true);
+
+        $height = Column::make('height')
+            ->label(__('Height'))
+            ->value('height')
+            ->visible(true)
+            ->defaultVisibility(false)
+            ->sortable(true);
+
+        $columns->put('basename', $basename);
+        $columns->put('size', $size);
+        $columns->put('last_modified', $lastModified);
+        $columns->put('width', $width);
+        $columns->put('height', $height);
+
+        $columns->setPreferred("assets.{$container->handle()}.columns");
+
+        $this->columns = $columns->rejectUnlisted()->values();
     }
 }

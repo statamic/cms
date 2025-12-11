@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Repositories;
 
+use Closure;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Entries\EntryRepository as RepositoryContract;
 use Statamic\Contracts\Entries\QueryBuilder;
@@ -10,6 +11,7 @@ use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Exceptions\EntryNotFoundException;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
+use Statamic\Query\Scopes\AllowsScopes;
 use Statamic\Rules\Slug;
 use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Stache\Stache;
@@ -17,6 +19,8 @@ use Statamic\Support\Arr;
 
 class EntryRepository implements RepositoryContract
 {
+    use AllowsScopes;
+
     protected $stache;
     protected $store;
     protected $substitutionsById = [];
@@ -67,6 +71,16 @@ class EntryRepository implements RepositoryContract
         return $entry;
     }
 
+    public function findOrMake($id)
+    {
+        return $this->find($id) ?? $this->make();
+    }
+
+    public function findOr($id, Closure $callback)
+    {
+        return $this->find($id) ?? $callback();
+    }
+
     public function findByUri(string $uri, ?string $site = null): ?Entry
     {
         $site = $site ?? $this->stache->sites()->first();
@@ -91,6 +105,28 @@ class EntryRepository implements RepositoryContract
         return $entry->hasStructure()
             ? $entry->structure()->in($site)->find($entry->id())
             : $entry;
+    }
+
+    public function whereInId($ids): EntryCollection
+    {
+        if (empty($ids)) {
+            return EntryCollection::make();
+        }
+
+        $entries = $this->query()->whereIn('id', $ids)->get();
+
+        if ($entries->isEmpty()) {
+            return EntryCollection::make();
+        }
+
+        $entriesById = $entries->keyBy->id();
+
+        $ordered = collect($ids)
+            ->map(fn ($id) => $entriesById->get($id))
+            ->filter()
+            ->values();
+
+        return EntryCollection::make($ordered);
     }
 
     public function save($entry)
@@ -159,6 +195,10 @@ class EntryRepository implements RepositoryContract
 
     public function applySubstitutions($items)
     {
+        if (empty($this->substitutionsById)) {
+            return $items;
+        }
+
         return $items->map(function ($item) {
             return $this->substitutionsById[$item->id()] ?? $item;
         });

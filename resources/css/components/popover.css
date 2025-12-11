@@ -20,8 +20,8 @@
         transform-origin: 50% 10%;
         animation-fill-mode: forwards;
         opacity: 0;
-        transform: scale(.85);
-        transition: all .05s ease-in;
+        transform: scale(0.85);
+        transition: all 0.05s ease-in;
         will-change: transform, opacity;
         background-clip: padding-box;
     }
@@ -51,13 +51,13 @@
 /*  Supporting elements */
 .rotating-dots {
     @apply relative cursor-pointer;
-    transition: .12s ease-out;
+    transition: 0.12s ease-out;
 }
 
 .rotating-dots-button {
-    @apply text-gray-700 dark:text-dark-150 rounded-full flex items-center justify-center;
-    height: 24px;
-    width: 24px;
+    @apply flex items-center justify-center rounded-full text-gray-700 dark:text-dark-150;
+    height: 20px;
+    width: 20px;
 
     &:hover {
         @apply text-gray-950 dark:text-dark-100;

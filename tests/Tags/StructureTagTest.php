@@ -82,6 +82,79 @@ EOT;
     }
 
     #[Test]
+    public function it_renders_a_nav_with_selected_fields()
+    {
+        $this->createCollectionAndNav();
+
+        // The html uses <i> tags (could be any tag, but i is short) to prevent whitespace comparison issues in the assertion.
+        $template = <<<'EOT'
+<ul>
+{{ nav:test select="title" }}
+    <li>
+        <i>{{ title }} {{ foo }}</i>
+        {{ if children }}
+        <ul>
+            {{ *recursive children* }}
+        </ul>
+        {{ /if }}
+    </li>
+{{ /nav:test }}
+</ul>
+EOT;
+
+        $expected = <<<'EOT'
+<ul>
+    <li>
+        <i>One bar</i>
+        <ul>
+            <li>
+                <i>One One bar</i>
+            </li>
+            <li>
+                <i>URL and title bar</i>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <i>Two bar</i>
+    </li>
+    <li>
+        <i>Three bar</i>
+        <ul>
+            <li>
+                <i>Three One bar</i>
+            </li>
+            <li>
+                <i>Three Two bar</i>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <i>Title only bar</i>
+        <ul>
+            <li>
+                <i>URL only bar</i>
+           </li>
+        </ul>
+    </li>
+</ul>
+EOT;
+
+        $parsed = (string) Antlers::parse($template, [
+            'foo' => 'bar', // to test that cascade is inherited.
+            'title' => 'outer title', // to test that cascade the page's data takes precedence over the cascading data.
+        ]);
+
+        // This is really what we're interested in testing. The "Two" entry has a foo value
+        // of "notbar", but we're only selecting the title, so we shouldn't get the real value.
+        if (str_contains($parsed, 'Two notbar')) {
+            $this->fail('The "Two" entry\'s "foo" value was included.');
+        }
+
+        $this->assertXmlStringEqualsXmlString($expected, $parsed);
+    }
+
+    #[Test]
     public function it_renders_a_nav_with_scope()
     {
         $this->createCollectionAndNav();
@@ -148,6 +221,48 @@ EOT;
     }
 
     #[Test]
+    public function it_renders_a_nav_with_as()
+    {
+        $this->createCollectionAndNav();
+
+        // The html uses <i> tags (could be any tag, but i is short) to prevent whitespace comparison issues in the assertion.
+        $template = <<<'EOT'
+<ul>
+{{ nav:test as="navtastic" }}
+    <li>Something before the loop</li>
+    {{ navtastic }}
+    <li>
+        <i>{{ nav_title or title }} {{ foo }}</i>
+    </li>
+    {{ /navtastic }}
+{{ /nav:test }}
+</ul>
+EOT;
+
+        $expected = <<<'EOT'
+<ul>
+    <li>Something before the loop</li>
+    <li>
+        <i>Navtitle One bar</i>
+    </li>
+    <li>
+        <i>Two notbar</i>
+    </li>
+    <li>
+        <i>Three bar</i>
+    </li>
+    <li>
+        <i>Title only bar</i>
+    </li>
+</ul>
+EOT;
+
+        $this->assertXmlStringEqualsXmlString($expected, (string) Antlers::parse($template, [
+            'foo' => 'bar', // to test that cascade is inherited.
+        ]));
+    }
+
+    #[Test]
     public function it_hides_unpublished_entries_by_default()
     {
         $this->createCollectionAndNav();
@@ -210,7 +325,9 @@ EOT;
         \Statamic\Facades\URL::swap($mock);
 
         $this->makeNav([
-            ['id' => 'home', 'title' => 'Home', 'url' => '/'],
+            ['id' => 'home', 'title' => 'Home', 'url' => '/', 'children' => [
+                ['id' => 'home-1', 'title' => 'home-1', 'url' => '/foo'],
+            ]],
             ['id' => '1', 'title' => '1', 'url' => '/1', 'children' => [
                 ['id' => '1-1', 'title' => '1.1', 'url' => '/1/1', 'children' => [
                     ['id' => '1-1-1', 'title' => '1.1.1', 'url' => '/1/1/1', 'children' => [
@@ -224,31 +341,35 @@ EOT;
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/1');
         $result = (string) Antlers::parse($template);
-        $this->assertEquals('[home=parent][1=current][1-1][1-1-1][1-1-1-1][2][3]', $result);
+        $this->assertEquals('[home][home-1][1=current][1-1][1-1-1][1-1-1-1][2][3]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1');
         $result = (string) Antlers::parse($template);
-        $this->assertEquals('[home=parent][1=parent][1-1=current][1-1-1][1-1-1-1][2][3]', $result);
+        $this->assertEquals('[home][home-1][1=parent][1-1=current][1-1-1][1-1-1-1][2][3]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1/1');
         $result = (string) Antlers::parse($template);
-        $this->assertEquals('[home=parent][1=parent][1-1=parent][1-1-1=current][1-1-1-1][2][3]', $result);
+        $this->assertEquals('[home][home-1][1=parent][1-1=parent][1-1-1=current][1-1-1-1][2][3]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1/1/1');
         $result = (string) Antlers::parse($template);
-        $this->assertEquals('[home=parent][1=parent][1-1=parent][1-1-1=parent][1-1-1-1=current][2][3]', $result);
+        $this->assertEquals('[home][home-1][1=parent][1-1=parent][1-1-1=parent][1-1-1-1=current][2][3]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/2');
         $result = (string) Antlers::parse($template);
-        $this->assertEquals('[home=parent][1][1-1][1-1-1][1-1-1-1][2=current][3]', $result);
+        $this->assertEquals('[home][home-1][1][1-1][1-1-1][1-1-1-1][2=current][3]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/');
         $result = (string) Antlers::parse($template);
-        $this->assertEquals('[home=current][1][1-1][1-1-1][1-1-1-1][2][3]', $result);
+        $this->assertEquals('[home=current][home-1][1][1-1][1-1-1][1-1-1-1][2][3]', $result);
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/foo');
+        $result = (string) Antlers::parse($template);
+        $this->assertEquals('[home=parent][home-1=current][1][1-1][1-1-1][1-1-1-1][2][3]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/other');
         $result = (string) Antlers::parse($template);
-        $this->assertEquals('[home=parent][1][1-1][1-1-1][1-1-1-1][2][3]', $result);
+        $this->assertEquals('[home][home-1][1][1-1][1-1-1][1-1-1-1][2][3]', $result);
 
         // Only the last child has an URL.
         $this->makeNav([
@@ -295,6 +416,43 @@ EOT;
         $mock->shouldReceive('getCurrent')->once()->andReturn('/other');
         $result = (string) Antlers::parse($template);
         $this->assertEquals('[1][1-1][1-1-1][1-1-1-1]', $result);
+    }
+
+    #[Test]
+    public function it_sets_is_current_and_is_parent_for_a_nav_when_home_is_an_entry()
+    {
+        tap(Collection::make('pages')->routes('{slug}')->structureContents(['expects_root' => true]))->save();
+        $home = EntryFactory::collection('pages')->id('home')->data(['title' => 'One'])->create();
+
+        $template = '{{ nav:test }}[{{ id }}{{ if is_parent }}=parent{{ /if }}{{ if is_current }}=current{{ /if }}]{{ if children }}{{ *recursive children* }}{{ /if }}{{ /nav:test }}';
+
+        $mock = \Mockery::mock(\Statamic\Facades\URL::getFacadeRoot())->makePartial();
+        \Statamic\Facades\URL::swap($mock);
+
+        $this->makeNav([
+            ['id' => 'home', 'title' => 'Home', 'entry' => $home],
+            ['id' => '1', 'title' => '1', 'url' => '/1', 'children' => [
+                ['id' => '1-1', 'title' => '1.1', 'url' => '/1/1', 'children' => [
+                    ['id' => '1-1-1', 'title' => '1.1.1', 'url' => '/1/1/1', 'children' => [
+                        ['id' => '1-1-1-1', 'title' => '1.1.1.1', 'url' => '/1/1/1/1'],
+                    ]],
+                ]],
+            ]],
+            ['id' => '2', 'title' => '2', 'url' => '/2'],
+            ['id' => '3', 'title' => '3'],
+        ]);
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/');
+        $result = (string) Antlers::parse($template);
+        $this->assertEquals('[home=current][1][1-1][1-1-1][1-1-1-1][2][3]', $result);
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/1');
+        $result = (string) Antlers::parse($template);
+        $this->assertEquals('[home][1=current][1-1][1-1-1][1-1-1-1][2][3]', $result);
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1/1');
+        $result = (string) Antlers::parse($template);
+        $this->assertEquals('[home][1=parent][1-1=parent][1-1-1=current][1-1-1-1][2][3]', $result);
     }
 
     #[Test]
@@ -381,6 +539,41 @@ EOT;
         $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1/1/1');
         $result = (string) Antlers::parse($template);
         $this->assertEquals('[1=parent][1-1=parent][1-1-1=parent][1-1-1-1=current][2]', $result);
+    }
+
+    #[Test]
+    public function it_doesnt_render_anything_when_nav_from_is_invalid()
+    {
+        $this->createCollectionAndNav();
+        Entry::shouldReceive('findByUri')->andReturn(null);
+
+        // The html uses <i> tags (could be any tag, but i is short) to prevent whitespace comparison issues in the assertion.
+        $template = <<<'EOT'
+<ul>
+{{ nav from="something-invalid" }}
+    <li>
+        <i>{{ title }}</i>
+        {{ if children }}
+        <ul>
+            {{ *recursive children* }}
+        </ul>
+        {{ /if }}
+    </li>
+{{ /nav }}
+</ul>
+EOT;
+
+        $expected = <<<'EOT'
+<ul>
+    <li>
+        <i>outer title</i>
+    </li>
+</ul>
+EOT;
+
+        $this->assertXmlStringEqualsXmlString($expected, (string) Antlers::parse($template, [
+            'title' => 'outer title', // to test that cascade the page's data takes precedence over the cascading data.
+        ]));
     }
 
     private function makeNav($tree)

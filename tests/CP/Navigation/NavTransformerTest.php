@@ -515,13 +515,7 @@ class NavTransformerTest extends TestCase
                                 'manipulations' => [
                                     'action' => '@modify',
                                     'url' => '/modified-articles-url',
-                                ],
-                            ],
-                            [
-                                'id' => 'content::globals',
-                                'manipulations' => [
-                                    'action' => '@modify',
-                                    'icon' => 'custom-svg',
+                                    'icon' => 'custom-svg', // This should get stripped out, because icons cannot be on children
                                 ],
                             ],
                         ],
@@ -542,10 +536,6 @@ class NavTransformerTest extends TestCase
                         'content::collections::articles' => [
                             'action' => '@modify',
                             'url' => '/modified-articles-url',
-                        ],
-                        'content::globals' => [
-                            'action' => '@modify',
-                            'icon' => 'custom-svg',
                         ],
                     ],
                 ],
@@ -621,6 +611,7 @@ class NavTransformerTest extends TestCase
                                 'manipulations' => [
                                     'action' => '@move',
                                     'url' => '/modified-fieldsets-url',
+                                    'icon' => 'custom-svg', // This should get stripped out, because icons cannot be on children
                                 ],
                             ],
                         ],
@@ -716,6 +707,7 @@ class NavTransformerTest extends TestCase
                                 'manipulations' => [
                                     'action' => '@alias',
                                     'url' => '/modified-fieldsets-url',
+                                    'icon' => 'custom-svg', // This should get stripped out, because icons cannot be on children
                                 ],
                             ],
                         ],
@@ -828,13 +820,12 @@ class NavTransformerTest extends TestCase
 
         $expected = [
             'content' => [
-                'reorder' => true,
-                'items' => [
-                    'content::navigation' => '@inherit',
-                    'content::taxonomies' => '@inherit',
-                    'content::assets' => '@inherit',
+                'reorder' => [
+                    'content::navigation',
+                    'content::taxonomies',
+                    'content::assets',
+                    // 'Collections' and 'Globals' items are omitted because they are redundant in this case
                 ],
-                // 'Collections' and 'Globals' items are omitted because they are redundant in this case
             ],
         ];
 
@@ -872,16 +863,18 @@ class NavTransformerTest extends TestCase
 
         $expected = [
             'content' => [
-                'reorder' => true,
+                'reorder' => [
+                    'content::navigation',
+                    'content::taxonomies',
+                    'content::assets',
+                    'content::collections',
+                    'content::globals',
+                ],
                 'items' => [
-                    'content::navigation' => '@inherit',
                     'content::taxonomies' => [
                         'action' => '@modify',
                         'display' => 'Favourite Taxonomies',
                     ],
-                    'content::assets' => '@inherit',
-                    'content::collections' => '@inherit',
-                    'content::globals' => '@inherit',
                     'content::custom_item' => [
                         'action' => '@create',
                         'display' => 'Custom Item',
@@ -1047,11 +1040,10 @@ class NavTransformerTest extends TestCase
         ]);
 
         $expected = [
-            'reorder' => true,
-            'sections' => [
-                'top_level' => '@inherit',
-                'fields' => '@inherit',
-                'tools' => '@inherit',
+            'reorder' => [
+                // 'Top Level' is omitted because it'll always be top level
+                'fields',
+                'tools',
                 // 'Content', 'Settings', and 'Users' sections are omitted because they are redundant in this case
             ],
         ];
@@ -1093,15 +1085,16 @@ class NavTransformerTest extends TestCase
         ]);
 
         $expected = [
-            'reorder' => true,
+            'reorder' => [
+                'fields',
+                'tools',
+                'content',
+                'users',
+            ],
             'sections' => [
-                'top_level' => '@inherit',
                 'fields' => [
                     'content::collections' => '@alias',
                 ],
-                'tools' => '@inherit',
-                'content' => '@inherit',
-                'users' => '@inherit',
                 'custom_section' => [
                     'display' => 'Custom Section',
                     'action' => '@create',
@@ -1255,7 +1248,11 @@ class NavTransformerTest extends TestCase
         $transformed = $this->transform(json_decode('[{"display":"Top Level","display_original":"Top Level","action":false,"items":[{"id":"top_level::dashboard","manipulations":[],"children":[]},{"id":"content::collections::posts","manipulations":{"action":"@alias"},"children":[]},{"id":"tools::updates","manipulations":{"action":"@move"},"children":[]},{"id":"new_top_level_item","manipulations":{"action":"@create","display":"New Top Level Item","url":"\/new-top-level-item"},"children":[{"id":"new_child_item","manipulations":{"action":"@create","display":"New Child Item","url":"\/new-child-item"},"children":[]}]}]},{"display":"Fields","display_original":"Fields","action":false,"items":[{"id":"fields::blueprints","manipulations":{"display":"Blueprints Renamed","action":"@modify"},"children":[]},{"id":"fields::fieldsets","manipulations":[],"children":[]}]},{"display":"Content Renamed","display_original":"Content","action":false,"items":[{"id":"content::collections::pages","manipulations":{"action":"@move"},"children":[]},{"id":"content::collections","manipulations":{"action":"@modify"},"children":[{"id":"content::collections::posts","manipulations":{"display":"Posterinos","action":"@modify"},"children":[]}]},{"id":"content::navigation","manipulations":[],"children":[{"id":"content::navigation::nav_test","manipulations":[],"children":[]}]},{"id":"content::taxonomies","manipulations":[],"children":[]},{"id":"content::assets","manipulations":[],"children":[{"id":"content::assets::assets","manipulations":[],"children":[]},{"id":"content::assets::essthree","manipulations":[],"children":[]}]}]},{"display":"Custom Section","display_original":"Custom Section","action":"@create","items":[{"id":"custom_section::new_item","manipulations":{"action":"@create","display":"New Item","url":"\/new-item"},"children":[]},{"id":"content::taxonomies::tags","manipulations":{"action":"@move"},"children":[]},{"id":"content::globals","manipulations":{"action":"@move"},"children":[{"id":"content::globals::global","manipulations":[],"children":[]}]}]},{"display":"Tools","display_original":"Tools","action":false,"items":[{"id":"tools::forms","manipulations":[],"children":[{"id":"tools::forms::test","manipulations":[],"children":[]}]},{"id":"tools::addons","manipulations":[],"children":[]},{"id":"tools::utilities","manipulations":[],"children":[{"id":"tools::utilities::cache","manipulations":[],"children":[]},{"id":"tools::utilities::email","manipulations":[],"children":[]},{"id":"tools::utilities::licensing","manipulations":[],"children":[]},{"id":"tools::utilities::php_info","manipulations":[],"children":[]},{"id":"tools::utilities::search","manipulations":[],"children":[]}]}]},{"display":"Users","display_original":"Users","action":false,"items":[{"id":"users::users","manipulations":[],"children":[]},{"id":"users::groups","manipulations":[],"children":[]},{"id":"users::permissions","manipulations":[],"children":[{"id":"users::permissions::author","manipulations":[],"children":[]},{"id":"users::permissions::not_social_media_manager","manipulations":[],"children":[]},{"id":"users::permissions::social_media_manager","manipulations":[],"children":[]}]}]}]', true));
 
         $expected = [
-            'reorder' => true,
+            'reorder' => [
+                'fields',
+                'content',
+                'custom_section',
+            ],
             'sections' => [
                 'top_level' => [
                     'content::collections::posts' => '@alias',
@@ -1281,7 +1278,12 @@ class NavTransformerTest extends TestCase
                 ],
                 'content' => [
                     'display' => 'Content Renamed',
-                    'reorder' => true,
+                    'reorder' => [
+                        'content::collections::pages',
+                        'content::collections',
+                        'content::navigation',
+                        'content::taxonomies',
+                    ],
                     'items' => [
                         'content::collections::pages' => '@move',
                         'content::collections' => [
@@ -1293,8 +1295,6 @@ class NavTransformerTest extends TestCase
                                 ],
                             ],
                         ],
-                        'content::navigation' => '@inherit',
-                        'content::taxonomies' => '@inherit',
                     ],
                 ],
                 'custom_section' => [

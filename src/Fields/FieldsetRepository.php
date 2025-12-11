@@ -116,7 +116,7 @@ class FieldsetRepository
         return "{$this->hints[$namespace]}/{$path}.yaml";
     }
 
-    private function overriddenNamespacedFieldsetPath(string $handle)
+    public function overriddenNamespacedFieldsetPath(string $handle)
     {
         [$namespace, $handle] = explode('::', $handle);
         $handle = str_replace('/', '.', $handle);
@@ -180,7 +180,16 @@ class FieldsetRepository
             throw new \Exception('Namespaced fieldsets cannot be deleted');
         }
 
-        File::delete("{$this->directory}/{$fieldset->handle()}.yaml");
+        File::delete($fieldset->path());
+    }
+
+    public function reset(Fieldset $fieldset)
+    {
+        if (! $fieldset->isNamespaced()) {
+            throw new \Exception('Non-namespaced fieldsets cannot be reset');
+        }
+
+        File::delete($this->overriddenNamespacedFieldsetPath($fieldset->handle()));
     }
 
     public function addNamespace(string $namespace, string $directory): void
@@ -211,6 +220,7 @@ class FieldsetRepository
                     ->initialPath($file)
                     ->setContents(YAML::file($file)->parse());
             })
-            ->keyBy->handle();
+            ->keyBy->handle()
+            ->collect();
     }
 }

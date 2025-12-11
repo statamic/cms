@@ -2,11 +2,13 @@
 
 namespace Statamic\Forms\JsDrivers;
 
+use Statamic\Fields\Field;
 use Statamic\Statamic;
 
 class Alpine extends AbstractJsDriver
 {
     protected $scope;
+    protected $component;
 
     /**
      * Parse driver options.
@@ -16,6 +18,7 @@ class Alpine extends AbstractJsDriver
     protected function parseOptions($options)
     {
         $this->scope = $options[0] ?? null;
+        $this->component = $options[1] ?? null;
     }
 
     /**
@@ -32,7 +35,7 @@ class Alpine extends AbstractJsDriver
         }
 
         return [
-            'x-data' => $this->renderAlpineXData(collect($this->getInitialFormData())->merge($extraData)->all(), $this->scope),
+            'x-data' => $this->renderAlpineXData(collect($this->getInitialFormData())->mergeRecursive($extraData)->all(), $this->scope),
         ];
     }
 
@@ -46,7 +49,7 @@ class Alpine extends AbstractJsDriver
     public function addToRenderableFieldData($field, $data)
     {
         return [
-            'show_field' => $this->renderAlpineShowFieldJs($field->conditions(), $this->scope),
+            'show_field' => $this->renderAlpineShowFieldJs($field, $this->scope),
         ];
     }
 
@@ -58,9 +61,13 @@ class Alpine extends AbstractJsDriver
      */
     public function addToRenderableFieldAttributes($field)
     {
-        return [
-            'x-model' => $this->getAlpineXDataKey($field->handle(), $this->scope),
-        ];
+        $attributes = [];
+
+        if ($field->fieldtype()->hasJsDriverDataBinding()) {
+            $attributes['x-model'] = $this->getAlpineXDataKey($field->handle(), $this->scope);
+        }
+
+        return $attributes;
     }
 
     /**
@@ -78,7 +85,12 @@ class Alpine extends AbstractJsDriver
             ];
         }
 
-        return Statamic::modify($xData)->toJson()->entities();
+        $xData = Statamic::modify($xData)->toJson()->entities();
+        if ($this->component) {
+            $xData = "{$this->component}({$xData})";
+        }
+
+        return $xData;
     }
 
     /**
@@ -97,14 +109,10 @@ class Alpine extends AbstractJsDriver
 
     /**
      * Render alpine `x-if` show field JS logic.
-     *
-     * @param  array  $conditions
-     * @param  string  $alpineScope
-     * @return string
      */
-    protected function renderAlpineShowFieldJs($conditions, $alpineScope)
+    protected function renderAlpineShowFieldJs(Field $field, ?string $alpineScope): string
     {
-        $conditionsObject = Statamic::modify($conditions)->toJson()->entities();
+        $conditionsObject = Statamic::modify($field->conditions())->toJson()->entities();
 
         $dataObject = '$data';
 
@@ -112,6 +120,8 @@ class Alpine extends AbstractJsDriver
             $dataObject .= ".{$alpineScope}";
         }
 
-        return 'Statamic.$conditions.showField('.$conditionsObject.', '.$dataObject.')';
+        $currentFieldPath = $field->handle();
+
+        return "Statamic.\$conditions.showField({$conditionsObject}, {$dataObject}, '{$currentFieldPath}')";
     }
 }

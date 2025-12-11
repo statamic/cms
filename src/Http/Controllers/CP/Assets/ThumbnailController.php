@@ -3,7 +3,9 @@
 namespace Statamic\Http\Controllers\CP\Assets;
 
 use Illuminate\Support\Facades\Cache;
+use League\Flysystem\UnableToReadFile;
 use League\Glide\Server;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Config;
 use Statamic\Facades\Image;
@@ -110,6 +112,8 @@ class ThumbnailController extends Controller
                 $this->asset,
                 $preset ? ['p' => $preset] : []
             );
+        } catch (UnableToReadFile $e) {
+            throw new NotFoundHttpException;
         } finally {
             Cache::forget($this->mutex());
         }
@@ -170,7 +174,7 @@ class ThumbnailController extends Controller
     /**
      * If an image is deemed too large for thumbnail generation, we'll give it a placeholder icon.
      *
-     * @return \Illuminate\Http\RedirectResponse|null
+     * @return \Illuminate\Http\Response
      */
     private function getPlaceholderResponse()
     {
@@ -181,6 +185,6 @@ class ThumbnailController extends Controller
             return;
         }
 
-        return redirect(Statamic::cpAssetUrl('svg/filetypes/picture.svg'));
+        return response(Statamic::svg('filetypes/picture'))->header('Content-Type', 'image/svg+xml');
     }
 }

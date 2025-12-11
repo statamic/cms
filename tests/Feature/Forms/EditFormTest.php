@@ -32,7 +32,7 @@ class EditFormTest extends TestCase
             ->actingAs($user)
             ->get(cp_route('forms.edit', $form->handle()))
             ->assertSuccessful()
-            ->assertViewHas('form', $form);
+            ->assertSee('Configure Form');
     }
 
     #[Test]
@@ -48,5 +48,38 @@ class EditFormTest extends TestCase
             ->get(cp_route('forms.edit', $form->handle()))
             ->assertRedirect('/original')
             ->assertSessionHas('error');
+    }
+
+    #[Test]
+    public function fields_can_be_added()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test'))->save();
+
+        Form::appendConfigFields('*', 'Fields', [
+            'a' => ['type' => 'text', 'display' => 'First injected into fields section'],
+            'b' => ['type' => 'text', 'display' => 'Second injected into fields section'],
+        ]);
+        Form::appendConfigFields('*', 'Additional Section', [
+            'c' => ['type' => 'text', 'display' => 'First injected into additional section'],
+            'd' => ['type' => 'text', 'display' => 'Second injected into additional section'],
+        ]);
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('forms.edit', $form->handle()))
+            ->assertSuccessful()
+            ->assertSeeInOrder([
+                'Title',
+                'Blueprint',
+                'Honeypot',
+                'First injected into fields section',
+                'Second injected into fields section',
+                'Store Submissions',
+                'Additional Section',
+                'First injected into additional section',
+                'Second injected into additional section',
+            ]);
     }
 }

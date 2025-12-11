@@ -37,6 +37,7 @@ class NavigationStore extends BasicStore
             ->maxDepth($data['max_depth'] ?? null)
             ->collections($data['collections'] ?? null)
             ->expectsRoot($data['root'] ?? false)
+            ->canSelectAcrossSites($data['select_across_sites'] ?? false)
             ->initialPath($path);
     }
 

@@ -12,6 +12,8 @@ use Statamic\Query\Scopes\Filters\Fields\FieldtypeFilter;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 abstract class Fieldtype implements Arrayable
 {
     use HasHandle, RegistersItself {
@@ -29,6 +31,7 @@ abstract class Fieldtype implements Arrayable
     protected $selectableInForms = false;
     protected $relationship = false;
     protected $categories = [];
+    protected $keywords = [];
     protected $rules = [];
     protected $extraRules = [];
     protected $defaultValue;
@@ -100,7 +103,11 @@ abstract class Fieldtype implements Arrayable
 
     public function selectableInForms(): bool
     {
-        return $this->selectableInForms ?: FieldtypeRepository::hasBeenMadeSelectableInForms($this->handle());
+        if (FieldtypeRepository::selectableInFormIsOverriden($this->handle())) {
+            return FieldtypeRepository::hasBeenMadeSelectableInForms($this->handle());
+        }
+
+        return $this->selectableInForms;
     }
 
     public static function makeSelectableInForms()
@@ -108,9 +115,19 @@ abstract class Fieldtype implements Arrayable
         FieldtypeRepository::makeSelectableInForms(self::handle());
     }
 
+    public static function makeUnselectableInForms()
+    {
+        FieldtypeRepository::makeUnselectableInForms(self::handle());
+    }
+
     public function categories(): array
     {
         return $this->categories;
+    }
+
+    public function keywords(): array
+    {
+        return $this->keywords;
     }
 
     public function filter()
@@ -143,6 +160,11 @@ abstract class Fieldtype implements Arrayable
         return $value;
     }
 
+    public function preProcessTagRenderable($data, $recursiveCallback)
+    {
+        return $data;
+    }
+
     public function defaultValue()
     {
         return $this->defaultValue;
@@ -167,6 +189,7 @@ abstract class Fieldtype implements Arrayable
             'validatable' => $this->validatable(),
             'defaultable' => $this->defaultable(),
             'categories' => $this->categories(),
+            'keywords' => $this->keywords(),
             'icon' => $this->icon(),
             'config' => $this->configFields()->toPublishArray(),
         ];
@@ -269,7 +292,10 @@ abstract class Fieldtype implements Arrayable
 
     protected function extraConfigFieldItems(): array
     {
-        return self::$extraConfigFields[static::class] ?? [];
+        return array_merge(
+            self::$extraConfigFields[static::class] ?? [],
+            Fieldtype::$extraConfigFields[Fieldtype::class] ?? [],
+        );
     }
 
     public static function appendConfigFields(array $config): void
@@ -286,7 +312,7 @@ abstract class Fieldtype implements Arrayable
 
     public function icon()
     {
-        return $this->icon ?? $this->handle();
+        return $this->icon ?? "fieldtype-{$this->handle()}";
     }
 
     public function process($data)
@@ -363,6 +389,16 @@ abstract class Fieldtype implements Arrayable
         return $this->relationship;
     }
 
+    public function relationshipQueryBuilder()
+    {
+        return false;
+    }
+
+    public function relationshipQueryIdMapFn(): ?\Closure
+    {
+        return null;
+    }
+
     public function toQueryableValue($value)
     {
         return $value;
@@ -371,5 +407,15 @@ abstract class Fieldtype implements Arrayable
     public function extraRenderableFieldData(): array
     {
         return [];
+    }
+
+    public function hasJsDriverDataBinding(): bool
+    {
+        return true;
+    }
+
+    public function shouldParseAntlersFromRawString(): bool
+    {
+        return false;
     }
 }

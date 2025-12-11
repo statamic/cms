@@ -9,6 +9,8 @@ class DownloadAsset extends Action
 {
     use MakesZips;
 
+    protected $icon = 'download';
+
     protected $confirm = false;
 
     public static function title()

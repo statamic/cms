@@ -26,19 +26,14 @@ abstract class Relationship extends Fieldtype
     protected $formComponentProps = [
         '_' => '_', // forces an object in js
     ];
+    protected $formStackSize;
 
     protected function configFieldItems(): array
     {
         return [
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Appearance'),
                 'fields' => [
-                    'max_items' => [
-                        'display' => __('Max Items'),
-                        'instructions' => __('statamic::messages.max_items_instructions'),
-                        'min' => 1,
-                        'type' => 'integer',
-                    ],
                     'mode' => [
                         'display' => __('UI Mode'),
                         'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
@@ -49,6 +44,17 @@ abstract class Relationship extends Fieldtype
                             'select' => __('Select Dropdown'),
                             'typeahead' => __('Typeahead Field'),
                         ],
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Boundaries & Limits'),
+                'fields' => [
+                    'max_items' => [
+                        'display' => __('Max Items'),
+                        'instructions' => __('statamic::messages.max_items_instructions'),
+                        'min' => 1,
+                        'type' => 'integer',
                     ],
                 ],
             ],
@@ -74,7 +80,7 @@ abstract class Relationship extends Fieldtype
                 'id' => method_exists($item, 'id') ? $item->id() : $item->handle(),
                 'title' => method_exists($item, 'title') ? $item->title() : $item->value('title'),
                 'edit_url' => $item->editUrl(),
-                'published' => $this->statusIcons() ? $item->published() : null,
+                'status' => $this->statusIcons() ? $item->status() : null,
             ];
         });
     }
@@ -130,9 +136,10 @@ abstract class Relationship extends Fieldtype
             'canCreate' => $this->canCreate(),
             'canSearch' => $this->canSearch(),
             'statusIcons' => $this->statusIcons(),
-            'creatables' => $this->getCreatables(),
+            'creatables' => $this->canCreate() ? $this->getCreatables() : [],
             'formComponent' => $this->getFormComponent(),
             'formComponentProps' => $this->getFormComponentProps(),
+            'formStackSize' => $this->getFormStackSize(),
             'taggable' => $this->getTaggable(),
             'initialSortColumn' => $this->initialSortColumn(),
             'initialSortDirection' => $this->initialSortDirection(),
@@ -182,6 +189,11 @@ abstract class Relationship extends Fieldtype
         return $this->formComponentProps;
     }
 
+    protected function getFormStackSize()
+    {
+        return $this->formStackSize;
+    }
+
     protected function getColumns()
     {
         return [
@@ -229,6 +241,11 @@ abstract class Relationship extends Fieldtype
         return collect($values)->map(function ($id) {
             return $this->toItemArray($id);
         })->values();
+    }
+
+    public function getItemHint($item): ?string
+    {
+        return null;
     }
 
     abstract protected function toItemArray($id);

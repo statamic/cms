@@ -1,86 +1,100 @@
-<template>
-    <modal name="confirmation-modal" @opened="$emit('opened')">
-        <div class="confirmation-modal flex flex-col h-full">
-            <header v-if="title" class="text-lg font-semibold px-5 py-3 bg-gray-200 dark:bg-dark-550 rounded-t-lg flex items-center justify-between border-b dark:border-dark-900">
-                {{ __(title) }}
-            </header>
-            <div class="flex-1 px-5 py-6 text-gray dark:text-dark-150">
-                <slot name="body">
-                    <p v-if="bodyText" v-text="bodyText" />
-                    <slot v-else>
-                        <p>{{ __('Are you sure?') }}</p>
-                    </slot>
-                </slot>
-            </div>
-            <div class="px-5 py-3 bg-gray-200 dark:bg-dark-550 rounded-b-lg border-t dark:border-dark-900 flex items-center justify-end text-sm">
-                <button class="text-gray dark:text-dark-150 hover:text-gray-900 dark:hover:text-dark-100" @click="$emit('cancel')" v-text="__(cancelText)" v-if="cancellable" />
-                <button class="rtl:mr-4 ltr:ml-4" :class="buttonClass" :disabled="disabled" v-text="__(buttonText)" @click="$emit('confirm')" />
-            </div>
-        </div>
-    </modal>
-</template>
+<script setup>
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { Modal, ModalClose, Button, Icon } from '@/components/ui';
 
-<script>
-export default {
-    props: {
-        title: {
-            type: String
-        },
-        bodyText: {
-            type: String
-        },
-        buttonText: {
-            type: String,
-            default: 'Confirm'
-        },
-        cancellable: {
-            type: Boolean,
-            default: true
-        },
-        cancelText: {
-            type: String,
-            default: 'Cancel'
-        },
-        danger: {
-            type: Boolean,
-            default: false
-        },
-        disabled: {
-            type: Boolean,
-            default: false,
-        }
-    },
+const emit = defineEmits(['opened', 'confirm', 'cancel']);
 
-    data() {
-        return {
-            escBinding: null,
-            enterBinding: null,
-        }
+const props = defineProps({
+    title: {
+        type: String,
     },
+    bodyText: {
+        type: String,
+    },
+    buttonText: {
+        type: String,
+        default: 'Confirm',
+    },
+    cancellable: {
+        type: Boolean,
+        default: true,
+    },
+    submittable: {
+        type: Boolean,
+        default: true,
+    },
+    cancelText: {
+        type: String,
+        default: () => __('Cancel'),
+    },
+    danger: {
+        type: Boolean,
+        default: false,
+    },
+    disabled: {
+        type: Boolean,
+        default: false,
+    },
+    busy: {
+        type: Boolean,
+        default: false,
+    },
+});
 
-    computed: {
-        buttonClass() {
-            return this.danger ? 'btn-danger' : 'btn-primary';
-        }
-    },
+onMounted(() => emit('opened'));
 
-    methods: {
-        dismiss() {
-            this.$emit('cancel')
-        },
-        submit() {
-            this.$emit('confirm')
-        }
-    },
+const modalOpen = ref(true);
 
-    created() {
-        this.escBinding = this.$keys.bind('esc', this.dismiss)
-        this.enterBinding = this.$keys.bind('enter', this.submit)
-    },
+function updateModalOpen(open) {
+    if (! open && props.busy) {
+        return;
+    }
 
-     beforeDestroy() {
-        this.escBinding.destroy()
-        this.enterBinding.destroy()
-    },
+    modalOpen.value = open;
+
+    if (! open) emit('cancel');
+}
+
+function submit() {
+    if (props.busy) return;
+
+    emit('confirm');
 }
 </script>
+
+<template>
+    <Modal ref="modal" :title="__(title)" :open="modalOpen" @update:open="updateModalOpen">
+        <div
+            v-if="busy"
+            class="pointer-events-none absolute inset-0 flex select-none items-center justify-center bg-white bg-opacity-75 dark:bg-gray-850"
+        >
+            <Icon name="loading" />
+        </div>
+
+        <p v-if="bodyText" v-text="bodyText" />
+        <slot v-else>
+            <p>{{ __('Are you sure?') }}</p>
+        </slot>
+
+        <template v-if="cancellable || submittable" #footer>
+            <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
+                <ModalClose asChild>
+                    <Button
+                        v-if="cancellable"
+                        variant="ghost"
+                        :disabled="busy"
+                        :text="__(cancelText)"
+                    />
+                </ModalClose>
+                <Button
+                    v-if="submittable"
+                    type="submit"
+                    :variant="danger ? 'danger' : 'primary'"
+                    :disabled="disabled || busy"
+                    :text="__(buttonText)"
+                    @click="submit"
+                />
+            </div>
+        </template>
+    </Modal>
+</template>

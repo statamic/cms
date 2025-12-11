@@ -3,9 +3,10 @@
 namespace Statamic\Http\Controllers\CP\Forms;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\CP\Column;
-use Statamic\Facades\Action;
+use Statamic\CP\PublishForm;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\Scope;
@@ -13,6 +14,8 @@ use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Rules\Handle;
 use Statamic\Support\Str;
+
+use function Statamic\trans as __;
 
 class FormsController extends CpController
 {
@@ -33,31 +36,23 @@ class FormsController extends CpController
                 return [
                     'id' => $form->handle(),
                     'title' => __($form->title()),
-                    'submissions' => $form->submissions()->count(),
+                    'submissions' => $form->querySubmissions()->count(),
                     'show_url' => $form->showUrl(),
                     'edit_url' => $form->editUrl(),
-                    'blueprint_url' => cp_route('forms.blueprint.edit', $form->handle()),
+                    'blueprint_url' => cp_route('blueprints.forms.edit', $form->handle()),
                     'can_edit' => User::current()->can('edit', $form),
                     'can_edit_blueprint' => User::current()->can('configure form fields', $form),
-                    'actions' => Action::for($form),
                 ];
             })
             ->values();
 
-        if ($request->wantsJson()) {
-            return [
-                'meta' => [
-                    'columns' => $columns,
-                    'activeFilterBadges' => [],
-                ],
-                'data' => $forms,
-            ];
-        }
-
-        return view('statamic::forms.index', [
+        return Inertia::render('forms/Index', [
             'forms' => $forms,
             'initialColumns' => $columns,
             'actionUrl' => cp_route('forms.actions.run'),
+            'canCreate' => User::current()->can('create', FormContract::class),
+            'createUrl' => cp_route('forms.create'),
+            'configureEmailUrl' => cp_route('utilities.email'),
         ]);
     }
 
@@ -73,15 +68,28 @@ class FormsController extends CpController
             ->rejectUnlisted()
             ->values();
 
-        $viewData = [
-            'form' => $form,
+        return Inertia::render('forms/Show', [
+            'form' => [
+                'title' => __($form->title()),
+                'handle' => $form->handle(),
+                'editUrl' => $form->editUrl(),
+                'deleteUrl' => $form->deleteUrl(),
+                'blueprintUrl' => cp_route('blueprints.forms.edit', $form->handle()),
+                'canEdit' => User::current()->can('edit', $form),
+                'canDelete' => User::current()->can('delete', $form),
+                'canConfigureFields' => User::current()->can('configure form fields'),
+            ],
             'columns' => $columns,
             'filters' => Scope::filters('form-submissions', [
                 'form' => $form->handle(),
             ]),
-        ];
-
-        return view('statamic::forms.show', $viewData);
+            'actionUrl' => cp_route('forms.submissions.actions.run', $form->handle()),
+            'exporters' => $form->exporters()->map(fn ($exporter) => [
+                'title' => $exporter->title(),
+                'downloadUrl' => $exporter->downloadUrl(),
+            ])->values(),
+            'redirectUrl' => cp_route('forms.index'),
+        ]);
     }
 
     /**
@@ -120,7 +128,9 @@ class FormsController extends CpController
 
         $this->authorize('create', FormContract::class);
 
-        return view('statamic::forms.create');
+        return Inertia::render('forms/Create', [
+            'submitUrl' => cp_route('forms.store'),
+        ]);
     }
 
     public function store(Request $request)
@@ -151,25 +161,19 @@ class FormsController extends CpController
     {
         $this->authorize('edit', $form);
 
-        $values = [
+        $values = array_merge($form->data()->all(), [
             'handle' => $form->handle(),
             'title' => __($form->title()),
             'honeypot' => $form->honeypot(),
             'store' => $form->store(),
             'email' => $form->email(),
-        ];
-
-        $fields = ($blueprint = $this->editFormBlueprint($form))
-            ->fields()
-            ->addValues($values)
-            ->preProcess();
-
-        return view('statamic::forms.edit', [
-            'blueprint' => $blueprint->toPublishArray(),
-            'values' => $fields->values(),
-            'meta' => $fields->meta(),
-            'form' => $form,
         ]);
+
+        return PublishForm::make($this->editFormBlueprint($form))
+            ->title(__('Configure Form'))
+            ->values($values)
+            ->asConfig()
+            ->submittingTo(cp_route('forms.update', $form->handle()));
     }
 
     public function update($form, Request $request)
@@ -182,11 +186,14 @@ class FormsController extends CpController
 
         $values = $fields->process()->values()->all();
 
+        $data = collect($values)->except(['title', 'honeypot', 'store', 'email']);
+
         $form
             ->title($values['title'])
             ->honeypot($values['honeypot'])
             ->store($values['store'])
-            ->email($values['email']);
+            ->email($values['email'])
+            ->merge($data);
 
         $form->save();
 
@@ -202,7 +209,7 @@ class FormsController extends CpController
 
     protected function editFormBlueprint($form)
     {
-        return Blueprint::makeFromTabs([
+        $fields = [
             'name' => [
                 'display' => __('Name'),
                 'fields' => [
@@ -217,12 +224,16 @@ class FormsController extends CpController
                 'display' => __('Fields'),
                 'fields' => [
                     'blueprint' => [
-                        'type' => 'html',
+                        'display' => __('Blueprint'),
                         'instructions' => __('statamic::messages.form_configure_blueprint_instructions'),
-                        'html' => ''.
-                            '<div class="text-xs">'.
-                            '   <a href="'.cp_route('forms.blueprint.edit', $form->handle()).'" class="text-blue">'.__('Edit').'</a>'.
-                            '</div>',
+                        'type' => 'blueprints',
+                        'options' => [
+                            [
+                                'handle' => 'default',
+                                'title' => __('Edit Blueprint'),
+                                'edit_url' => cp_route('blueprints.forms.edit', $form->handle()),
+                            ],
+                        ],
                     ],
                     'honeypot' => [
                         'type' => 'text',
@@ -349,6 +360,41 @@ class FormsController extends CpController
             ],
 
             // metrics
-        ]);
+            // ...
+
+        ];
+
+        foreach (Form::extraConfigFor($form->handle()) as $handle => $config) {
+            $merged = false;
+            foreach ($fields as $sectionHandle => $section) {
+                if ($section['display'] == __($config['display'])) {
+                    $fields[$sectionHandle]['fields'] += $config['fields'];
+                    $merged = true;
+                }
+            }
+
+            if (! $merged) {
+                $fields[$handle] = $config;
+            }
+        }
+
+        return Blueprint::make()->setContents(collect([
+            'tabs' => [
+                'main' => [
+                    'sections' => collect($fields)->map(function ($section) {
+                        return [
+                            'display' => $section['display'],
+                            'fields' => collect($section['fields'])->map(function ($field, $handle) {
+                                return [
+                                    'handle' => $handle,
+                                    'field' => $field,
+                                ];
+                            })->values()->all(),
+                        ];
+                    })->values()->all(),
+                ],
+            ],
+        ])->all());
+
     }
 }

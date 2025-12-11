@@ -1,0 +1,19 @@
+name: Lint code style issues
+
+on:
+  pull_request:
+
+jobs:
+  lint-code-styling:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check PHP code style issues
+        uses: aglipanci/laravel-pint-action@v2
+        with:
+          testMode: true
+          verboseMode: true
+          pintVersion: 1.16.0

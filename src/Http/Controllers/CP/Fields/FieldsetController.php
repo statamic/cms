@@ -3,17 +3,23 @@
 namespace Statamic\Http\Controllers\CP\Fields;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Statamic\CP\Breadcrumbs\Breadcrumb;
+use Statamic\CP\Breadcrumbs\Breadcrumbs;
 use Statamic\Facades;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Rules\Handle;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class FieldsetController extends CpController
 {
+    use ManagesFields;
+
     public function __construct()
     {
         $this->middleware(\Illuminate\Auth\Middleware\Authorize::class.':configure fields');
@@ -30,21 +36,33 @@ class FieldsetController extends CpController
                         'id' => $fieldset->handle(),
                         'delete_url' => $fieldset->deleteUrl(),
                         'edit_url' => $fieldset->editUrl(),
+                        'reset_url' => $fieldset->resetUrl(),
                         'fields' => $fieldset->fields()->all()->count(),
                         'imported_by' => collect($fieldset->importedBy())->flatten(1)->mapToGroups(function ($item) {
                             return [$this->group($item) => ['handle' => $item->handle(), 'title' => $item->title()]];
                         }),
                         'is_deletable' => $fieldset->isDeletable(),
+                        'is_resettable' => $fieldset->isResettable(),
                         'title' => $fieldset->title(),
                     ],
                 ];
-            });
+            })
+            ->sortBy(fn ($value, $key) => $key === __('My Fieldsets') ? '0' : $key);
 
         if ($request->wantsJson()) {
             return $fieldsets;
         }
 
-        return view('statamic::fieldsets.index', compact('fieldsets'));
+        if ($fieldsets->count() === 0) {
+            return Inertia::render('fieldsets/Empty', [
+                'createUrl' => cp_route('fieldsets.create'),
+            ]);
+        }
+
+        return Inertia::render('fieldsets/Index', [
+            'fieldsets' => $fieldsets,
+            'createUrl' => cp_route('fieldsets.create'),
+        ]);
     }
 
     private function group(Blueprint|Fieldset $item)
@@ -74,6 +92,21 @@ class FieldsetController extends CpController
     {
         $fieldset = Facades\Fieldset::find($fieldset);
 
+        Breadcrumbs::push(new Breadcrumb(
+            text: $fieldset->title(),
+            url: request()->url(),
+            icon: 'fieldsets',
+            links: Facades\Fieldset::all()
+                ->reject(fn ($f) => $f->handle() === $fieldset->handle())
+                ->map(fn ($f) => [
+                    'text' => $f->title(),
+                    'icon' => 'fieldsets',
+                    'url' => $f->editUrl(),
+                ])
+                ->values()
+                ->all(),
+        ));
+
         $fieldset->validateRecursion();
 
         $vue = [
@@ -84,9 +117,10 @@ class FieldsetController extends CpController
             })->all(),
         ];
 
-        return view('statamic::fieldsets.edit', [
-            'fieldset' => $fieldset,
-            'fieldsetVueObject' => $vue,
+        return Inertia::render('fieldsets/Edit', [
+            'initialFieldset' => $vue,
+            'action' => cp_route('fieldsets.update', $fieldset->handle()),
+            ...$this->fieldProps(),
         ]);
     }
 
@@ -115,14 +149,16 @@ class FieldsetController extends CpController
 
     public function create()
     {
-        return view('statamic::fieldsets.create');
+        return Inertia::render('fieldsets/Create', [
+            'route' => cp_route('fieldsets.store'),
+        ]);
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'title' => 'required',
-            'handle' => ['required', new Handle],
+            'handle' => ['required', 'regex:/^[a-zA-Z0-9._-]+$/'],
         ]);
 
         if (Facades\Fieldset::find($request->handle)) {
@@ -158,8 +194,27 @@ class FieldsetController extends CpController
         return response('');
     }
 
+    public function reset($fieldset)
+    {
+        $fieldset = Facades\Fieldset::find($fieldset);
+
+        $this->authorize('delete', $fieldset);
+
+        $fieldset->reset();
+
+        return response('');
+    }
+
     private function groupKey(Fieldset $fieldset): string
     {
-        return $fieldset->isNamespaced() ? Str::of($fieldset->namespace())->replace('_', ' ')->title() : __('My Fieldsets');
+        if ($fieldset->isNamespaced()) {
+            return Str::of($fieldset->namespace())->replace('_', ' ')->title();
+        }
+
+        if (str_contains($fieldset->handle(), '.')) {
+            return Str::of($fieldset->handle())->beforeLast('.')->title();
+        }
+
+        return __('My Fieldsets');
     }
 }

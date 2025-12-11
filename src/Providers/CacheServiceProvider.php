@@ -37,14 +37,11 @@ class CacheServiceProvider extends ServiceProvider
     private function extendFileStore()
     {
         $this->app->booting(function () {
-            /** @deprecated */
-            Cache::extend('statamic', function () {
-                return Cache::repository(new FileStore(
-                    $this->app['files'],
-                    $this->app['config']['cache.stores.file']['path'],
-                    $this->app['config']['cache.stores.file']['permission'] ?? null
-                ), $this->app['config']['cache.stores.file']);
-            });
+            // Don't extend the file store if it's already being extended.
+            $creators = (fn () => $this->customCreators)->call(Cache::getFacadeRoot());
+            if (isset($creators['file'])) {
+                return;
+            }
 
             Cache::extend('file', function ($app, $config) {
                 return Cache::repository(
@@ -70,7 +67,7 @@ class CacheServiceProvider extends ServiceProvider
 
             $keyValuePair = $callback();
             $value = reset($keyValuePair);
-            $expiration = Carbon::now()->addMinutes(key($keyValuePair));
+            $expiration = Carbon::now()->addMinutes((int) key($keyValuePair));
 
             return Cache::remember($cacheKey, $expiration, function () use ($value) {
                 return $value;

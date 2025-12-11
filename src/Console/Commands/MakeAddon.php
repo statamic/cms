@@ -258,7 +258,7 @@ class MakeAddon extends GeneratorCommand
         spin(
             function () {
                 try {
-                    Composer::withoutQueue()->throwOnFailure()->require($this->package);
+                    Composer::withoutQueue()->throwOnFailure()->require($this->package, '*@dev');
                 } catch (ProcessException $exception) {
                     $this->line($exception->getMessage());
                     throw new \Exception('An error was encountered while installing your addon.');

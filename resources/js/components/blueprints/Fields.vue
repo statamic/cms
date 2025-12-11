@@ -1,9 +1,7 @@
 <template>
-
-    <div class="flex flex-col text-sm">
-
-        <div class="blueprint-section-draggable-zone -mx-1"
-            :class="{ 'flex flex-wrap flex-1': fields.length }"
+    <div>
+        <div
+            class="blueprint-section-draggable-zone field-grid gap-2! mb-4 starting-style-transition-children"
             :data-tab="tabId"
             :data-section="sectionId"
         >
@@ -26,46 +24,43 @@
             />
         </div>
 
-        <div class="blueprint-section-field-actions flex mt-2 -mx-1">
-            <div class="px-1">
-                <link-fields
-                    :exclude-fieldset="excludeFieldset"
-                    @linked="$emit('field-linked', $event)" />
-            </div>
-            <div class="px-1">
-                <button class="btn w-full flex justify-center items-center" @click="isSelectingNewFieldtype = true;">
-                    <svg-icon name="light/wireframe" class="rtl:ml-2 ltr:mr-2 w-4 h-4" />
-                    {{ __('Create Field') }}
-                </button>
-            </div>
+        <div class="blueprint-section-field-actions flex gap-2">
+            <LinkFields
+                :exclude-fieldset="excludeFieldset"
+                :with-command-palette="withCommandPalette"
+                @linked="$emit('field-linked', $event)"
+            />
+            <ui-button icon="add-circle" :text="__('Create Field')" @click="createField" />
         </div>
 
-        <stack name="fieldtype-selector"
+        <ui-stack
+            name="fieldtype-selector"
             v-if="isSelectingNewFieldtype"
             @closed="isSelectingNewFieldtype = false"
+            v-slot="{ close }"
         >
-            <fieldtype-selector slot-scope="{ close }" @closed="close" @selected="fieldtypeSelected" />
-        </stack>
+            <fieldtype-selector @closed="close" @selected="fieldtypeSelected" />
+        </ui-stack>
 
-        <stack name="field-settings"
+        <ui-stack
+            name="field-settings"
             v-if="pendingCreatedField != null"
             @closed="pendingCreatedField = null"
+            v-slot="{ close }"
         >
             <field-settings
-                slot-scope="{ close }"
                 ref="settings"
                 :type="pendingCreatedField.config.type"
                 :root="true"
                 :fields="fields"
                 :config="pendingCreatedField.config"
                 :suggestable-condition-fields="suggestableConditionFields"
+                :is-inside-set="isInsideSet"
                 @committed="fieldCreated"
                 @closed="close"
             />
-        </stack>
-
+        </ui-stack>
     </div>
-
 </template>
 
 <script>
@@ -78,7 +73,6 @@ import FieldSettings from '../fields/Settings.vue';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';
 
 export default {
-
     mixins: [CanDefineLocalizable],
 
     components: {
@@ -96,19 +90,29 @@ export default {
         editingField: {},
         suggestableConditionFields: Array,
         excludeFieldset: String,
+        withCommandPalette: Boolean,
+    },
+
+    inject: {
+        isInsideSet: { default: false },
     },
 
     data() {
         return {
             isSelectingNewFieldtype: false,
             pendingCreatedField: null,
+        };
+    },
+
+    mounted() {
+        if (this.withCommandPalette) {
+            this.addToCommandPalette();
         }
     },
 
     methods: {
-
         fieldComponent(field) {
-            return (field.type === 'import') ? 'ImportField' : 'RegularField';
+            return field.type === 'import' ? 'ImportField' : 'RegularField';
         },
 
         fieldtypeSelected(field) {
@@ -122,10 +126,14 @@ export default {
                 config: {
                     ...field,
                     isNew: true,
-                }
+                },
             };
 
-            this.$nextTick(() => this.pendingCreatedField = pending);
+            this.$nextTick(() => (this.pendingCreatedField = pending));
+        },
+
+        createField() {
+            this.isSelectingNewFieldtype = true;
         },
 
         fieldCreated(created) {
@@ -136,7 +144,7 @@ export default {
             let field = {
                 ...this.pendingCreatedField,
                 ...{ handle },
-                config: created
+                config: created,
             };
 
             this.$emit('field-created', field);
@@ -156,13 +164,24 @@ export default {
                 config: {
                     ...field.config,
                     display,
-                }
+                },
             };
 
-            this.$nextTick(() => this.pendingCreatedField = pending);
+            this.$nextTick(() => (this.pendingCreatedField = pending));
         },
 
-    }
+        addToCommandPalette() {
+            if (!this.withCommandPalette) {
+                return;
+            }
 
-}
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Create Field'),
+                icon: 'add-circle',
+                action: this.createField,
+            });
+        },
+    },
+};
 </script>

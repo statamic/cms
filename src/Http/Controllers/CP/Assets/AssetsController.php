@@ -3,8 +3,14 @@
 namespace Statamic\Http\Controllers\CP\Assets;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
+use Statamic\Assets\AssetUploader;
+use Statamic\Assets\UploadedReplacementFile;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
+use Statamic\Contracts\Assets\AssetFolder;
 use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
@@ -12,6 +18,7 @@ use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Resources\CP\Assets\Asset as AssetResource;
 use Statamic\Rules\AllowedFile;
+use Statamic\Rules\UploadableAssetPath;
 
 class AssetsController extends CpController
 {
@@ -22,7 +29,9 @@ class AssetsController extends CpController
         $this->redirectToFirstContainer();
 
         if (User::current()->can('create', AssetContainerContract::class)) {
-            return view('statamic::assets.index');
+            return Inertia::render('assets/Empty', [
+                'createUrl' => cp_route('asset-containers.create'),
+            ]);
         }
 
         throw new AuthorizationException;
@@ -73,7 +82,6 @@ class AssetsController extends CpController
 
         $container = AssetContainer::find($request->container);
 
-        abort_unless($container->allowUploads(), 403);
         $this->authorize('store', [AssetContract::class, $container]);
 
         $request->validate([
@@ -81,9 +89,36 @@ class AssetsController extends CpController
         ]);
 
         $file = $request->file('file');
-        $path = ltrim($request->folder.'/'.$file->getClientOriginalName(), '/');
+        $folder = $request->folder;
 
-        $asset = $container->makeAsset($path)->upload($file);
+        // Append relative path as subfolder when upload was part of a folder and user is allowed to create folders
+        if (User::current()->can('create', [AssetFolder::class, $container]) && ($relativePath = AssetUploader::getSafePath($request->relativePath))) {
+            $folder = rtrim($folder, '/').'/'.$relativePath;
+        }
+
+        $basename = $request->option === 'rename' && $request->filename
+            ? $request->filename.'.'.$file->getClientOriginalExtension()
+            : $file->getClientOriginalName();
+
+        $basename = AssetUploader::getSafeFilename($basename);
+
+        $path = ltrim($folder.'/'.$basename, '/');
+
+        $validator = Validator::make(['path' => $path], ['path' => new UploadableAssetPath($container)]);
+
+        if (! in_array($request->option, ['timestamp', 'overwrite'])) {
+            try {
+                $validator->validate();
+            } catch (ValidationException $e) {
+                throw $e->status(409);
+            }
+        }
+
+        $asset = $container->asset($path) ?? $container->makeAsset($path);
+
+        $asset = $request->option === 'overwrite'
+            ? $asset->reupload(new UploadedReplacementFile($file))
+            : $asset->upload($file);
 
         return new AssetResource($asset);
     }

@@ -7,6 +7,7 @@ use Facades\Statamic\Assets\Attributes;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use League\Flysystem\PathTraversalDetected;
 use Statamic\Assets\AssetUploader as Uploader;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
@@ -45,13 +46,14 @@ use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
+use Statamic\Support\Traits\Hookable;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mime\MimeTypes;
 
 class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, ContainsQueryableValues, ResolvesValuesContract, SearchableContract
 {
     use ContainsData, FluentlyGetsAndSets, HasAugmentedInstance, HasDirtyState,
-        Searchable,
+        Hookable, Searchable,
         TracksQueriedColumns, TracksQueriedRelations {
             set as traitSet;
             get as traitGet;
@@ -113,6 +115,12 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     {
         $this->data = collect();
         $this->supplements = collect();
+    }
+
+    public function __clone()
+    {
+        $this->data = clone $this->data;
+        $this->supplements = clone $this->supplements;
     }
 
     public function id($id = null)
@@ -247,7 +255,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             return $meta;
         }
 
-        return $this->meta = Cache::rememberForever($this->metaCacheKey(), function () {
+        return $this->meta = $this->cacheStore()->rememberForever($this->metaCacheKey(), function () {
             if ($contents = $this->disk()->get($path = $this->metaPath())) {
                 return YAML::file($path)->parse($contents);
             }
@@ -266,7 +274,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             return $value;
         }
 
-        Cache::forget($this->metaCacheKey());
+        $this->cacheStore()->forget($this->metaCacheKey());
 
         $this->writeMeta($meta = $this->generateMeta());
 
@@ -367,6 +375,13 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     {
         return $this
             ->fluentlyGetOrSet('path')
+            ->setter(function ($path) {
+                if (str_contains($path, '../')) {
+                    throw PathTraversalDetected::forPath($path);
+                }
+
+                return $path;
+            })
             ->getter(function ($path) {
                 return $path ? ltrim($path, '/') : null;
             })
@@ -488,7 +503,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function isImage()
     {
-        return $this->extensionIsOneOf(['jpg', 'jpeg', 'png', 'gif', 'webp']);
+        return $this->extensionIsOneOf(['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif']);
     }
 
     /**
@@ -581,7 +596,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function lastModified()
     {
-        return Carbon::createFromTimestamp($this->meta('last_modified'));
+        return Carbon::createFromTimestamp($this->meta('last_modified'), config('app.timezone'));
     }
 
     /**
@@ -681,7 +696,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     protected function clearCaches()
     {
         $this->meta = null;
-        Cache::forget($this->metaCacheKey());
+        $this->cacheStore()->forget($this->metaCacheKey());
     }
 
     /**
@@ -761,6 +776,13 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         return $this;
     }
 
+    public function moveQuietly($folder, $filename = null)
+    {
+        $this->withEvents = false;
+
+        return $this->move(...func_get_args());
+    }
+
     /**
      * Replace an asset and/or its references where necessary.
      *
@@ -773,13 +795,13 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         // until after the `AssetReplaced` event is fired. We still want to fire events
         // like `AssetDeleted` and `AssetSaved` though, so that other listeners will
         // get triggered (for cache invalidation, clearing of glide cache, etc.)
-        UpdateAssetReferencesSubscriber::disable();
+        app(UpdateAssetReferencesSubscriber::class)::disable();
 
         if ($deleteOriginal) {
             $originalAsset->delete();
         }
 
-        UpdateAssetReferencesSubscriber::enable();
+        app(UpdateAssetReferencesSubscriber::class)::enable();
 
         AssetReplaced::dispatch($originalAsset, $this);
 
@@ -909,7 +931,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             ->syncOriginal()
             ->save();
 
-        AssetUploaded::dispatch($this);
+        AssetUploaded::dispatch($this, $file->getClientOriginalName());
 
         AssetCreated::dispatch($this);
 
@@ -927,7 +949,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         $this->clearCaches();
         $this->writeMeta($this->generateMeta());
 
-        AssetReuploaded::dispatch($this);
+        AssetReuploaded::dispatch($this, $file->basename());
 
         return $this;
     }
@@ -1071,12 +1093,12 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         return $this->selectedQueryRelations;
     }
 
-    private function hasDimensions()
+    public function hasDimensions()
     {
         return $this->isImage() || $this->isSvg() || $this->isVideo();
     }
 
-    private function hasDuration()
+    public function hasDuration()
     {
         return $this->isAudio() || $this->isVideo();
     }
@@ -1109,6 +1131,11 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         return $this->container()->title();
     }
 
+    public function getCpSearchResultIcon()
+    {
+        return 'assets';
+    }
+
     public function warmPresets()
     {
         if (! $this->isImage()) {
@@ -1119,6 +1146,18 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             'cp_thumbnail_small_'.$this->orientation(),
         ] : [];
 
-        return array_merge($this->container->warmPresets(), $cpPresets);
+        $presets = array_merge($this->container->warmPresets(), $cpPresets);
+
+        return $this->runHooks('warm-presets', $presets);
+    }
+
+    public function cacheStore()
+    {
+        return Cache::store($this->hasCustomStore() ? 'asset_meta' : null);
+    }
+
+    private function hasCustomStore(): bool
+    {
+        return config()->has('cache.stores.asset_meta');
     }
 }

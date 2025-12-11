@@ -1,78 +1,98 @@
-<template>
-    <div class="flex icon-fieldtype-wrapper">
-        <v-select
-            ref="input"
-            class="w-full"
-            append-to-body
-            :calculate-position="positionOptions"
-            clearable
-            :name="name"
-            :disabled="config.disabled || isReadOnly"
-            :options="options"
-            :placeholder="__(config.placeholder || 'Search...')"
-            :searchable="true"
-            :multiple="false"
-            :close-on-select="true"
-            :value="selectedOption"
-            :create-option="(value) => ({ value, label: value })"
-            @input="vueSelectUpdated"
-            @search:focus="$emit('focus')"
-            @search:blur="$emit('blur')">
-            <template slot="option" slot-scope="option">
-                <div class="flex items-center">
-                    <svg-icon v-if="!option.html" :name="`${meta.set}/${option.label}`" class="w-5 h-5" />
-                    <div v-if="option.html" v-html="option.html" class="w-5 h-5" />
-                    <span class="text-xs rtl:mr-4 ltr:ml-4 text-gray-800 dark:text-dark-150 truncate">{{ __(option.label) }}</span>
-                </div>
-            </template>
-            <template slot="selected-option" slot-scope="option">
-                <div class="flex items-center">
-                    <svg-icon v-if="!option.html" :name="`${meta.set}/${option.label}`" class="w-5 h-5 flex items-center" />
-                    <div v-if="option.html" v-html="option.html" class="w-5 h-5" />
-                    <span class="text-xs rtl:mr-4 ltr:ml-4 text-gray-800 dark:text-dark-150 truncate">{{ __(option.label) }}</span>
-                </div>
-            </template>
-        </v-select>
-    </div>
-</template>
+<script setup>
+import axios from 'axios';
+import Fieldtype from '@/components/fieldtypes/fieldtype.js';
+import { computed, ref, watch } from 'vue';
+import { Combobox, Icon } from '@/components/ui';
 
-<script>
-import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
+const emit = defineEmits(Fieldtype.emits);
+const props = defineProps(Fieldtype.props);
+const { isReadOnly, update } = Fieldtype.use(emit, props);
 
-export default {
+const icons = ref([]);
+const loading = ref(true);
+const loaders = ref({});
+const iconsCache = ref({});
+const cacheKey = computed(() => props.config.set ?? '__default__');
 
-    mixins: [Fieldtype, PositionsSelectOptions],
+const options = computed(() => {
+    let options = [];
 
-    computed: {
-        options() {
-            let options = [];
-            for (let [name, html] of Object.entries(this.meta.icons)) {
-                options.push({
-                    value: name,
-                    label: name,
-                    html
-                });
-            }
-            return options;
-        },
-
-        selectedOption() {
-            return this.options.find(option => option.value === this.value);
-        }
-    },
-
-    methods: {
-        focus() {
-            this.$refs.input.focus();
-        },
-
-        vueSelectUpdated(value) {
-            if (value) {
-                this.update(value.value)
-            } else {
-                this.update(null);
-            }
-        },
+    for (let [name, html] of Object.entries(icons.value)) {
+        options.push({
+            value: name,
+            label: name,
+            html,
+        });
     }
-};
+
+    return options;
+});
+
+function request() {
+    if (loaders.value[cacheKey.value]) return;
+
+    loaders.value = { ...loaders.value, [cacheKey.value]: true };
+
+    axios
+        .post(props.meta.url, {
+            config: utf8btoa(JSON.stringify(props.config)),
+        })
+        .then((response) => {
+            icons.value = response.data.icons;
+            iconsCache.value = { ...iconsCache.value, [cacheKey.value]: response.data.icons };
+        })
+        .finally(() => {
+            loaders.value = { ...loaders.value, [cacheKey.value]: false };
+        });
+}
+
+function comboboxUpdated(value) {
+    update(value || null);
+}
+
+watch(
+    () => loaders.value[cacheKey.value],
+    (loadingState) => {
+        icons.value = iconsCache.value[cacheKey.value];
+        loading.value = loadingState;
+    }
+);
+
+request();
 </script>
+
+<template>
+    <Combobox
+        v-if="!loading"
+        clearable
+        :disabled="config.disabled"
+        :model-value="value"
+        :multiple="false"
+        :options="options"
+        :placeholder="__(config.placeholder || 'Search...')"
+        :read-only="isReadOnly"
+        :searchable="true"
+        @update:modelValue="comboboxUpdated"
+    >
+        <template #option="option">
+            <div class="flex items-center">
+                <div class="size-4">
+                    <Icon v-if="!option.html" :name="option.label" class="size-4" />
+                    <div v-if="option.html" v-html="option.html" class="[&>svg]:size-4" />
+                </div>
+                <span class="ms-3 truncate">
+                    {{ __(option.label) }}
+                </span>
+            </div>
+        </template>
+        <template #selected-option="{ option }">
+            <div class="flex items-center">
+                <Icon v-if="!option.html" :name="option.label" class="flex size-4 items-center" />
+                <div v-if="option.html" v-html="option.html" class="[&>svg]:size-4" />
+                <span class="ms-3 truncate text-sm text-gray-900 dark:text-gray-200">
+                    {{ __(option.label) }}
+                </span>
+            </div>
+        </template>
+    </Combobox>
+</template>

@@ -2,22 +2,26 @@
 
 namespace Statamic\Facades;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Facade;
+use Statamic\Sites\Site;
 
 /**
- * @method static mixed content()
- * @method static void data($data)
- * @method static mixed get($key)
- * @method static array getViewData($view)
- * @method static \Statamic\View\Cascade hydrate($callback)
- * @method static \Statamic\View\Cascade hydrated($callback)
- * @method static \Statamic\View\Cascade instance()
- * @method static mixed sections()
- * @method static void set($key, $value)
+ * @method static self instance()
  * @method static array toArray()
- * @method static \Statamic\View\Cascade withRequest($request)
- * @method static \Statamic\View\Cascade withSite($site)
- * @method static \Statamic\View\Cascade withContent($content)
+ * @method static self withRequest(Request $request)
+ * @method static self withSite(Site $site)
+ * @method static self withContent($content)
+ * @method static mixed content()
+ * @method static mixed get(string $key)
+ * @method static void set(string $key, $value)
+ * @method static void data(array $data)
+ * @method static self hydrated(Closure $callback)
+ * @method static self hydrate()
+ * @method static array getViewData(string $view)
+ * @method static Collection sections()
+ * @method static self clearSections()
  *
  * @see \Statamic\View\Cascade
  */

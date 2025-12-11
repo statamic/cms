@@ -3,6 +3,8 @@
 namespace Statamic\Http\Controllers\CP\Globals;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Statamic\Facades\Action;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -19,7 +21,7 @@ class GlobalVariablesController extends CpController
         }
 
         if (! $variables = $set->in($site)) {
-            return abort(404);
+            return $this->pageNotFound();
         }
 
         $this->authorize('edit', $variables);
@@ -39,14 +41,13 @@ class GlobalVariablesController extends CpController
             'editing' => true,
             'actions' => [
                 'save' => $variables->updateUrl(),
-                'editBlueprint' => cp_route('globals.blueprint.edit', $set->handle()),
+                'editBlueprint' => cp_route('blueprints.globals.edit', $set->handle()),
             ],
             'values' => $values,
             'meta' => $meta,
             'blueprint' => $blueprint->toPublishArray(),
             'locale' => $variables->locale(),
             'localizedFields' => $variables->data()->keys()->all(),
-            'isRoot' => $variables->isRoot(),
             'hasOrigin' => $hasOrigin,
             'originValues' => $originValues ?? null,
             'originMeta' => $originMeta ?? null,
@@ -61,7 +62,10 @@ class GlobalVariablesController extends CpController
             })->values()->all(),
             'canEdit' => $user->can('edit', $variables),
             'canConfigure' => $user->can('configure', $variables),
+            'configureUrl' => $set->editUrl(),
             'canDelete' => $user->can('delete', $variables),
+            'itemActions' => Action::for($set, ['view' => 'form', 'site' => $site]),
+            'actionUrl' => cp_route('globals.actions.run'),
         ];
 
         if ($request->wantsJson()) {
@@ -72,9 +76,12 @@ class GlobalVariablesController extends CpController
             session()->now('success', __('Global Set created'));
         }
 
-        return view('statamic::globals.edit', array_merge($viewData, [
-            'set' => $set,
-            'variables' => $variables,
+        return Inertia::render('globals/Edit', array_merge($viewData, [
+            'globalsUrl' => cp_route('globals.index'),
+            'title' => $variables->title(),
+            'handle' => $variables->handle(),
+            'blueprintHandle' => $variables->blueprint()->handle(),
+            'canEditBlueprint' => $viewData['actions']['editBlueprint'] ? User::current()->can('configure fields') : false,
         ]));
     }
 
@@ -87,7 +94,7 @@ class GlobalVariablesController extends CpController
         }
 
         if (! $set = $set->in($site)) {
-            abort(404);
+            return $this->pageNotFound();
         }
 
         $this->authorize('edit', $set);
@@ -104,7 +111,7 @@ class GlobalVariablesController extends CpController
 
         $set->data($values);
 
-        $save = $set->globalSet()->addLocalization($set)->save();
+        $save = $set->save();
 
         return response()->json([
             'saved' => is_bool($save) ? $save : true,

@@ -1,22 +1,28 @@
-import { closestVm } from '../bootstrap/globals';
+import { nextTick, onMounted, onBeforeUnmount } from 'vue';
+
+const registry = new WeakMap();
 
 class Reveal {
+    use(ref, callback) {
+        onMounted(() => this.mount(ref.value, callback));
+    }
+
+    mount(el, callback) {
+        registry.set(el, callback);
+
+        onBeforeUnmount(() => registry.delete(el));
+    }
+
     element(el) {
-        if (!el) return;
         let parent = el;
+
         while (parent) {
-            if (parent.matches('.tab-panel')) {
-                closestVm(parent, 'publish-tabs').setActive(parent.dataset.tabHandle);
-            }
-            if (parent.matches('.replicator-set')) {
-                closestVm(parent, 'replicator-fieldtype-set').expand();
-            }
-            if (parent.matches('.bard-set')) {
-                closestVm(parent, 'bard-fieldtype-set').expand();
-            }
+            const callback = registry.get(parent);
+            if (callback) callback(parent);
             parent = parent.parentElement;
         }
-        Vue.nextTick(() => {
+
+        nextTick(() => {
             el.scrollIntoView({
                 block: 'center',
             });
@@ -24,8 +30,8 @@ class Reveal {
     }
 
     invalid() {
-        Vue.nextTick(() => {
-            const el = document.querySelector('.publish-field.has-error:not(:has(.publish-field.has-error))');
+        nextTick(() => {
+            const el = document.querySelector('[data-ui-field-has-errors]:not(:has([data-ui-field-has-errors]))');
             if (!el) return;
             this.element(el);
         });

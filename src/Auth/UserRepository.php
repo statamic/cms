@@ -9,11 +9,12 @@ use Statamic\Events\UserBlueprintFound;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\OAuth\Provider;
+use Statamic\Query\Scopes\AllowsScopes;
 use Statamic\Statamic;
 
 abstract class UserRepository implements RepositoryContract
 {
-    use StoresComputedFieldCallbacks;
+    use AllowsScopes, StoresComputedFieldCallbacks;
 
     public function create()
     {
@@ -82,6 +83,14 @@ abstract class UserRepository implements RepositoryContract
         UserBlueprintFound::dispatch($blueprint);
 
         return $blueprint;
+    }
+
+    public function blueprintCommandPaletteLink()
+    {
+        return $this->blueprint()?->commandPaletteLink(
+            type: 'Users',
+            url: cp_route('blueprints.users.edit'),
+        );
     }
 
     public function findByOAuthId(Provider $provider, string $id): ?User

@@ -26,7 +26,7 @@ class ParentTags extends Tags
     {
         $var_name = Stringy::removeLeft($this->tag, 'parent:');
 
-        return Arr::get($this->getParent(), $var_name)->value();
+        return Arr::get($this->getParent(), $var_name)?->value();
     }
 
     /**
@@ -60,10 +60,8 @@ class ParentTags extends Tags
 
     /**
      * Get the parent data.
-     *
-     * @return string
      */
-    private function getParent()
+    private function getParent(): ?array
     {
         $segments = explode('/', Str::start(Str::after(URL::getCurrent(), Site::current()->url()), '/'));
         $segment_count = count($segments);
@@ -85,7 +83,7 @@ class ParentTags extends Tags
         // Find the parent by stripping away URL segments
         foreach ($segment_urls as $segment_url) {
             if ($content = Entry::findByUri($segment_url, Site::current())) {
-                return $content->toAugmentedArray();
+                return $this->aliasedResult($content->toAugmentedArray());
             }
         }
 

@@ -4,8 +4,11 @@ namespace Statamic\Search\Commands;
 
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
+use Statamic\Events\SearchIndexUpdated;
 use Statamic\Facades\Search;
 use Statamic\Support\Str;
+
+use function Laravel\Prompts\select;
 
 class Update extends Command
 {
@@ -23,7 +26,10 @@ class Update extends Command
     {
         foreach ($this->getIndexes() as $index) {
             $index->update();
-            $this->info("Index <comment>{$index->name()}</comment> updated.");
+
+            SearchIndexUpdated::dispatch($index);
+
+            $this->components->info("Index <comment>{$index->name()}</comment> updated.");
         }
     }
 
@@ -41,13 +47,13 @@ class Update extends Command
             return $this->indexes();
         }
 
-        $selection = $this->choice(
-            'Select an index to update',
-            collect(['all'])->merge($this->indexes()->keys())->all(),
-            0
+        $selection = select(
+            label: 'Which search index would you like to update?',
+            options: collect(['All'])->merge($this->indexes()->keys())->all(),
+            default: 'All'
         );
 
-        return ($selection == 'all') ? $this->indexes() : [$this->indexes()->get($selection)];
+        return ($selection == 'All') ? $this->indexes() : [$this->indexes()->get($selection)];
     }
 
     private function indexes()
@@ -67,7 +73,7 @@ class Update extends Command
 
         // They might have entered a name as it appears in the config, but if it
         // should be localized we'll get all of the localized versions.
-        if (collect(config('statamic.search.indexes'))->has($arg)) {
+        if (collect(config('statamic.search.indexes'))->put('cp', [])->has($arg)) {
             return $this->indexes()->filter(fn ($index) => Str::startsWith($index->name(), $arg))->all();
         }
 

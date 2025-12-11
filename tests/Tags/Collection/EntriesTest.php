@@ -10,6 +10,7 @@ use InvalidArgumentException;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Query\Builder;
+use Statamic\Exceptions\StatusFilterNotSupportedException;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Site;
@@ -140,6 +141,19 @@ class EntriesTest extends TestCase
         $this->expectExceptionMessage('Cannot use [paginate] integer in combination with [limit] param.');
 
         $this->assertCount(3, $this->getEntries(['paginate' => 3, 'limit' => 4]));
+    }
+
+    #[Test]
+    public function it_should_not_throw_exception_if_trying_to_paginate_or_limit_and_the_other_is_null()
+    {
+        $this->makeEntry('a')->save();
+        $this->makeEntry('b')->save();
+        $this->makeEntry('c')->save();
+        $this->makeEntry('d')->save();
+        $this->makeEntry('e')->save();
+
+        $this->assertCount(3, $this->getEntries(['paginate' => 3, 'limit' => null]));
+        $this->assertCount(3, $this->getEntries(['paginate' => null, 'limit' => 3]));
     }
 
     #[Test]
@@ -278,7 +292,7 @@ class EntriesTest extends TestCase
         $this->assertCount(3, $this->getEntries());
         $this->assertCount(0, $this->getEntries(['show_future' => false]));
         $this->assertCount(3, $this->getEntries(['show_future' => true]));
-        $this->assertCount(8, $this->getEntries(['show_past' => true]));
+        $this->assertCount(3, $this->getEntries(['show_past' => true]));
         $this->assertCount(3, $this->getEntries(['show_past' => false]));
         $this->assertCount(3, $this->getEntries(['show_past' => false, 'show_future' => true]));
 
@@ -294,10 +308,10 @@ class EntriesTest extends TestCase
         $this->collection->dated(true)->futureDateBehavior('private')->pastDateBehavior('public')->save();
         $this->assertCount(4, $this->getEntries());
         $this->assertCount(4, $this->getEntries(['show_future' => false]));
-        $this->assertCount(8, $this->getEntries(['show_future' => true]));
+        $this->assertCount(4, $this->getEntries(['show_future' => true]));
         $this->assertCount(4, $this->getEntries(['show_past' => true]));
         $this->assertCount(0, $this->getEntries(['show_past' => false]));
-        $this->assertCount(3, $this->getEntries(['show_past' => false, 'show_future' => true]));
+        $this->assertCount(0, $this->getEntries(['show_past' => false, 'show_future' => true]));
     }
 
     #[Test]
@@ -340,8 +354,25 @@ class EntriesTest extends TestCase
 
         $this->assertCount(1, $this->getEntries()); // defaults to 'published'
         $this->assertCount(1, $this->getEntries(['status:is' => 'published']));
-        $this->assertCount(3, $this->getEntries(['status:not' => 'published']));
-        $this->assertCount(3, $this->getEntries(['status:in' => 'published|draft']));
+        $this->assertCount(4, $this->getEntries(['status:is' => 'any']));
+    }
+
+    #[Test]
+    public function it_throws_an_exception_when_filtering_by_status_with_not_operator()
+    {
+        $this->expectException(StatusFilterNotSupportedException::class);
+        $this->expectExceptionMessage('Filtering by status is not supported. Use whereStatus() instead.');
+
+        $this->getEntries(['status:not' => 'published']);
+    }
+
+    #[Test]
+    public function it_throws_an_exception_when_filtering_by_status_with_in_operator()
+    {
+        $this->expectException(StatusFilterNotSupportedException::class);
+        $this->expectExceptionMessage('Filtering by status is not supported. Use whereStatus() instead.');
+
+        $this->getEntries(['status:in' => 'published|draft']);
     }
 
     #[Test]

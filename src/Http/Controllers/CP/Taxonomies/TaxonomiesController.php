@@ -3,9 +3,12 @@
 namespace Statamic\Http\Controllers\CP\Taxonomies;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Contracts\Taxonomies\Taxonomy as TaxonomyContract;
+use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Contracts\Taxonomies\TermRepository;
 use Statamic\CP\Column;
+use Statamic\CP\PublishForm;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Scope;
@@ -19,6 +22,8 @@ use Statamic\Stache\Repositories\TermRepository as StacheTermRepository;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class TaxonomiesController extends CpController
 {
     public function index()
@@ -31,21 +36,23 @@ class TaxonomiesController extends CpController
             return [
                 'id' => $taxonomy->handle(),
                 'title' => $taxonomy->title(),
-                'terms' => $taxonomy->queryTerms()->count(),
+                'terms' => $taxonomy->queryTerms()->pluck('slug')->unique()->count(),
                 'edit_url' => $taxonomy->editUrl(),
                 'delete_url' => $taxonomy->deleteUrl(),
                 'terms_url' => cp_route('taxonomies.show', $taxonomy->handle()),
-                'blueprints_url' => cp_route('taxonomies.blueprints.index', $taxonomy->handle()),
+                'blueprints_url' => cp_route('blueprints.taxonomies.index', $taxonomy->handle()),
                 'deleteable' => User::current()->can('delete', $taxonomy),
             ];
         })->values();
 
-        return view('statamic::taxonomies.index', [
-            'taxonomies' => $taxonomies,
+        return Inertia::render('taxonomies/Index', [
+            'taxonomies' => $taxonomies->all(),
             'columns' => [
                 Column::make('title')->label(__('Title')),
                 Column::make('terms')->label(__('Terms'))->numeric(true),
             ],
+            'canCreate' => User::current()->can('create', TaxonomyContract::class),
+            'createUrl' => cp_route('taxonomies.create'),
         ]);
     }
 
@@ -71,8 +78,8 @@ class TaxonomiesController extends CpController
             ->values();
 
         $viewData = [
-            'taxonomy' => $taxonomy,
-            'hasTerms' => true, // todo $taxonomy->queryTerms()->count(),
+            'taxonomy' => $taxonomy->handle(),
+            'taxonomyTitle' => $taxonomy->title(),
             'blueprints' => $blueprints,
             'site' => Site::selected()->handle(),
             'columns' => $columns,
@@ -80,20 +87,35 @@ class TaxonomiesController extends CpController
                 'taxonomy' => $taxonomy->handle(),
                 'blueprints' => $blueprints->pluck('handle')->all(),
             ]),
+            'canCreate' => User::current()->can('create', [TermContract::class, $taxonomy]) && $taxonomy->hasVisibleTermBlueprint(),
+            'createUrl' => cp_route('taxonomies.terms.create', [$taxonomy->handle(), Site::selected()->handle()]),
+            'taxonomyEditUrl' => cp_route('taxonomies.edit', $taxonomy->handle()),
+            'taxonomyBlueprintsUrl' => cp_route('blueprints.taxonomies.index', $taxonomy),
+            'canEdit' => User::current()->can('edit', $taxonomy),
+            'canConfigureFields' => User::current()->can('configure fields'),
         ];
 
         if ($taxonomy->queryTerms()->count() === 0) {
-            return view('statamic::taxonomies.empty', $viewData);
+            return Inertia::render('taxonomies/Empty', $viewData);
         }
 
-        return view('statamic::taxonomies.show', $viewData);
+        return Inertia::render('taxonomies/Show', array_merge($viewData, [
+            'actionUrl' => cp_route('taxonomies.terms.actions.run', $taxonomy->handle()),
+            'sortColumn' => $taxonomy->sortField(),
+            'sortDirection' => $taxonomy->sortDirection(),
+            'canDelete' => User::current()->can('delete', $taxonomy),
+            'deleteUrl' => cp_route('taxonomies.destroy', $taxonomy->handle()),
+            'createLabel' => $taxonomy->createLabel(),
+        ]));
     }
 
     public function create()
     {
         $this->authorize('create', TaxonomyContract::class, __('You are not authorized to create taxonomies.'));
 
-        return view('statamic::taxonomies.create');
+        return Inertia::render('taxonomies/Create', [
+            'submitUrl' => cp_route('taxonomies.store'),
+        ]);
     }
 
     public function store(Request $request)
@@ -141,17 +163,11 @@ class TaxonomiesController extends CpController
             'layout' => $taxonomy->layout(),
         ];
 
-        $fields = ($blueprint = $this->editFormBlueprint($taxonomy))
-            ->fields()
-            ->addValues($values)
-            ->preProcess();
-
-        return view('statamic::taxonomies.edit', [
-            'blueprint' => $blueprint->toPublishArray(),
-            'values' => $fields->values(),
-            'meta' => $fields->meta(),
-            'taxonomy' => $taxonomy,
-        ]);
+        return PublishForm::make($this->editFormBlueprint($taxonomy))
+            ->title(__('Configure Taxonomy'))
+            ->values($values)
+            ->asConfig()
+            ->submittingTo(cp_route('taxonomies.update', $taxonomy->handle()));
     }
 
     public function update(Request $request, $taxonomy)
@@ -251,12 +267,13 @@ class TaxonomiesController extends CpController
                     'blueprints' => [
                         'display' => __('Blueprints'),
                         'instructions' => __('statamic::messages.taxonomies_blueprints_instructions'),
-                        'type' => 'html',
-                        'html' => ''.
-                            '<div class="text-xs">'.
-                            '   <span class="rtl:ml-4 ltr:mr-4">'.$taxonomy->termBlueprints()->map(fn ($bp) => __($bp->title()))->join(', ').'</span>'.
-                            '   <a href="'.cp_route('taxonomies.blueprints.index', $taxonomy).'" class="text-blue">'.__('Edit').'</a>'.
-                            '</div>',
+                        'type' => 'blueprints',
+                        'options' => $taxonomy->termBlueprints()->map(fn ($bp) => [
+                            'handle' => $bp->handle(),
+                            'title' => __($bp->title()),
+                            'edit_url' => cp_route('blueprints.taxonomies.edit', [$taxonomy->handle(), $bp->handle()]),
+                        ])->values()->all(),
+                        'all_blueprints_url' => cp_route('blueprints.taxonomies.index', $taxonomy->handle()),
                     ],
                     'collections' => [
                         'display' => __('Collections'),
@@ -289,6 +306,7 @@ class TaxonomiesController extends CpController
                         'display' => __('Preview Targets'),
                         'instructions' => __('statamic::messages.taxonomies_preview_targets_instructions'),
                         'type' => 'grid',
+                        'full_width_setting' => true,
                         'fields' => [
                             [
                                 'handle' => 'label',
@@ -325,22 +343,41 @@ class TaxonomiesController extends CpController
                         'instructions' => __('statamic::messages.taxonomy_configure_template_instructions'),
                         'type' => 'template',
                         'placeholder' => __('System default'),
+                        'clearable' => true,
                     ],
                     'term_template' => [
                         'display' => __('Term Template'),
                         'instructions' => __('statamic::messages.taxonomy_configure_term_template_instructions'),
                         'type' => 'template',
                         'placeholder' => __('System default'),
+                        'clearable' => true,
                     ],
                     'layout' => [
                         'display' => __('Layout'),
                         'instructions' => __('statamic::messages.taxonomy_configure_layout_instructions'),
                         'type' => 'template',
+                        'clearable' => true,
                     ],
                 ],
             ],
         ]);
 
-        return Blueprint::makeFromTabs($fields);
+        return Blueprint::make()->setContents(collect([
+            'tabs' => [
+                'main' => [
+                    'sections' => collect($fields)->map(function ($section) {
+                        return [
+                            'display' => $section['display'],
+                            'fields' => collect($section['fields'])->map(function ($field, $handle) {
+                                return [
+                                    'handle' => $handle,
+                                    'field' => $field,
+                                ];
+                            })->values()->all(),
+                        ];
+                    })->values()->all(),
+                ],
+            ],
+        ])->all());
     }
 }

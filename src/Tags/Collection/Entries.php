@@ -190,8 +190,8 @@ class Entries
         $this->queryTaxonomies($query);
         $this->queryRedirects($query);
         $this->queryConditions($query);
-        $this->queryScopes($query);
         $this->queryOrderBys($query);
+        $this->queryScopes($query);
 
         return $query;
     }
@@ -276,7 +276,7 @@ class Entries
             return;
         }
 
-        return $query->where('published', true);
+        return $query->whereStatus('published');
     }
 
     protected function queryPastFuture($query)

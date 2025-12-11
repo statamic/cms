@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Illuminate\Support\Collection;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\LabeledValue;
 use Statamic\GraphQL\Types\LabeledValueType;
@@ -14,13 +15,45 @@ trait HasSelectOptions
         return $this->config('multiple');
     }
 
+    public function preload(): array
+    {
+        return [
+            'options' => $this->getOptions(),
+        ];
+    }
+
+    protected function getOptions(): array
+    {
+        $options = $this->config('options') ?? [];
+
+        if ($options instanceof Collection) {
+            $options = $options->all();
+        }
+
+        if (array_is_list($options) && ! is_array(Arr::first($options))) {
+            $options = collect($options)
+                ->map(fn ($value) => ['key' => $value, 'value' => $value])
+                ->all();
+        }
+
+        if (Arr::isAssoc($options)) {
+            $options = collect($options)
+                ->map(fn ($value, $key) => ['key' => $key, 'value' => $value])
+                ->all();
+        }
+
+        return collect($options)
+            ->map(fn ($item) => ['value' => $item['key'], 'label' => $item['value']])
+            ->values()
+            ->all();
+    }
+
     public function preProcessIndex($value)
     {
         $values = $this->preProcess($value);
 
-        $values = collect(is_array($values) ? $values : [$values]);
-
-        return $values->map(function ($value) {
+        // NOTE: Null-coalescing into `[null]` as that matches old behaviour.
+        return collect($values ?? [null])->map(function ($value) {
             return $this->getLabel($value);
         })->all();
     }
@@ -33,9 +66,8 @@ trait HasSelectOptions
             return [];
         }
 
-        $value = is_array($value) ? $value : [$value];
-
-        $values = collect($value)->map(function ($value) {
+        // NOTE: Null-coalescing into `[null]` as that matches old behaviour.
+        $values = collect($value ?? [null])->map(function ($value) {
             return $this->config('cast_booleans') ? $this->castFromBoolean($value) : $value;
         });
 
@@ -104,16 +136,9 @@ trait HasSelectOptions
             $value = $this->castFromBoolean($value);
         }
 
-        return $this->isOption($value)
-            ? __(Arr::get($this->config('options'), $value) ?? $value)
-            : $actualValue;
-    }
+        $option = collect($this->getOptions())->filter(fn ($option) => $option['value'] === $value)->first();
 
-    private function isOption($value)
-    {
-        return Arr::isAssoc($options = $this->config('options') ?? [])
-            ? in_array($value, array_keys($options), true)
-            : in_array($value, $options, true);
+        return $option ? $option['label'] : $actualValue;
     }
 
     private function castToBoolean($value)
@@ -122,8 +147,6 @@ trait HasSelectOptions
             return true;
         } elseif ($value === 'false') {
             return false;
-        } elseif ($value === 'null') {
-            return null;
         }
 
         return $value;
@@ -135,8 +158,6 @@ trait HasSelectOptions
             return 'true';
         } elseif ($value === false) {
             return 'false';
-        } elseif ($value === null) {
-            return 'null';
         }
 
         return $value;
@@ -176,6 +197,15 @@ trait HasSelectOptions
                     return new LabeledValue($item['value'], $item['label']);
                 })->all();
             },
+        ];
+    }
+
+    public function extraRenderableFieldData(): array
+    {
+        return [
+            'options' => collect($this->getOptions())
+                ->mapWithKeys(fn ($option) => [$option['value'] => $option['label']])
+                ->all(),
         ];
     }
 }
