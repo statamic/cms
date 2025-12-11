@@ -968,7 +968,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             ->syncOriginal()
             ->save();
 
-        AssetUploaded::dispatch($this);
+        AssetUploaded::dispatch($this, $file->getClientOriginalName());
 
         AssetCreated::dispatch($this);
 
@@ -986,7 +986,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         $this->clearCaches();
         $this->writeMeta($this->generateMeta());
 
-        AssetReuploaded::dispatch($this);
+        AssetReuploaded::dispatch($this, $file->basename());
 
         return $this;
     }

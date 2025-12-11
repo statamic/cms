@@ -10,6 +10,7 @@ use Statamic\Events\UrlInvalidated;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\StaticCaching\Page;
 use Statamic\StaticCaching\Replacers\CsrfTokenReplacer;
 use Statamic\Support\Arr;
@@ -238,6 +239,7 @@ class FileCacher extends AbstractCacher
     public function getNocacheJs(): string
     {
         $csrfPlaceholder = CsrfTokenReplacer::REPLACEMENT;
+        $nocacheUrl = URL::makeRelative(route('statamic.nocache'));
 
         $default = <<<EOT
 (function() {
@@ -251,9 +253,22 @@ class FileCacher extends AbstractCacher
         return map;
     }
 
+    function replaceElement(el, html) {
+        const tmp = document.createElement('div');
+        const fragment = document.createDocumentFragment();
+
+        tmp.setHTMLUnsafe(html);
+
+        while (tmp.firstChild) {
+            fragment.appendChild(tmp.firstChild);
+        }
+
+        el.replaceWith(fragment);
+    }
+
     var map = createMap();
 
-    fetch('/!/nocache', {
+    fetch('{$nocacheUrl}', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -267,7 +282,7 @@ class FileCacher extends AbstractCacher
 
         const regions = data.regions;
         for (var key in regions) {
-            if (map[key]) map[key].setHTMLUnsafe(regions[key]);
+            if (map[key]) replaceElement(map[key], regions[key]);
         }
 
         for (const input of document.querySelectorAll('input[value="$csrfPlaceholder"]')) {
