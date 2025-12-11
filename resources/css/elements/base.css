@@ -16,11 +16,10 @@
 
     --z-index-below: -1;
     --z-index-above: 1;
-    --z-index-global-header: 2;
-    --z-index-portal: 3;
-    --z-index-draggable: 4;
-    --z-index-modal: 5;
-    --z-index-max: 6;
+    --z-index-portal: 2;
+    --z-index-draggable: 3;
+    --z-index-modal: 4;
+    --z-index-max: 5;
 
     /* Used for entry animations */
     --starting-style-transition-duration: 0.125s;
