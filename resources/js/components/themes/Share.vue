@@ -43,6 +43,6 @@ function share() {
         subheading="Publish this theme through your statamic.com account to make it available to others."
     >
         <Input v-model="name" />
-        <Button variant="primary" text="Publish..." @click="share" class="w-full" />
+        <Button text="Publish..." @click="share" class="w-full" />
     </CardPanel>
 </template>
