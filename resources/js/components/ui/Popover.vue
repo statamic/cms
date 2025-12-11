@@ -16,6 +16,7 @@ const props = defineProps({
     offset: { type: Number, default: 5 },
     side: { type: String, default: 'bottom' },
     open: { type: Boolean, default: false },
+	closeOnOutsideClick: { type: Boolean, default: true },
 });
 
 const popoverContentClasses = cva({
@@ -47,6 +48,13 @@ function updateOpen(value) {
     emit('update:open', value);
     open.value = value;
 }
+
+function interactOutside(event) {
+	if (!props.closeOnOutsideClick) {
+		event.stopPropagation();
+		event.preventDefault();
+	}
+}
 </script>
 
 <template>
@@ -61,6 +69,7 @@ function updateOpen(value) {
                 :align
                 :sideOffset="offset"
                 :side
+                @interact-outside="interactOutside"
             >
                 <slot v-bind="slotProps" />
                 <PopoverClose as-child>
