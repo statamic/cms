@@ -2,22 +2,21 @@
 
 namespace Statamic\StaticCaching;
 
+use Illuminate\Support\Collection as IlluminateCollection;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Globals\Variables;
 use Statamic\Contracts\Structures\Nav;
-use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Facades\Antlers;
-use Statamic\Support\Arr;
-use Statamic\Support\Str;
 use Statamic\Contracts\Structures\NavTree;
+use Statamic\Facades\Antlers;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Structures\CollectionTree;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Statamic\Taxonomies\LocalizedTerm;
-use Illuminate\Support\Collection as IlluminateCollection;
 
 class DefaultInvalidator implements Invalidator
 {
@@ -204,7 +203,10 @@ class DefaultInvalidator implements Invalidator
 
     protected function getNavTreeUrls($tree)
     {
-        $rules = collect(Arr::get($this->rules, "navigation.{$tree->structure()->handle()}.urls"));
+        $rules = $this->parseInvalidationRules(
+            Arr::get($this->rules, "navigation.{$tree->structure()->handle()}.urls"),
+            $tree->structure()->toAugmentedCollection()->all()
+        );
 
         $absoluteUrls = $rules->filter(fn (string $rule) => URL::isAbsolute($rule))->all();
 
@@ -241,7 +243,7 @@ class DefaultInvalidator implements Invalidator
 
     protected function getCollectionUrls($collection)
     {
-        $rules = collect(Arr::get($this->rules, "collections.{$collection->handle()}.urls"));
+        $rules = $this->parseInvalidationRules(Arr::get($this->rules, "collections.{$collection->handle()}.urls"));
 
         $urls = $collection->sites()->map(fn ($site) => $collection->absoluteUrl($site))->filter()->all();
 
@@ -262,7 +264,7 @@ class DefaultInvalidator implements Invalidator
 
     protected function getCollectionTreeUrls($tree)
     {
-        $rules = collect(Arr::get($this->rules, "collections.{$tree->collection()->handle()}.urls"));
+        $rules = $this->parseInvalidationRules(Arr::get($this->rules, "collections.{$tree->collection()->handle()}.urls"));
 
         $absoluteUrls = $rules->filter(fn (string $rule) => URL::isAbsolute($rule))->all();
 
@@ -277,7 +279,7 @@ class DefaultInvalidator implements Invalidator
         ];
     }
 
-    private function parseInvalidationRules(array $rules, array $context): IlluminateCollection
+    private function parseInvalidationRules(array $rules, array $context = []): IlluminateCollection
     {
         return collect($rules)
             ->map(fn (string $rule): string => $this->convertToAntlers($rule))
