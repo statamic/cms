@@ -2,7 +2,7 @@
     <div>
         <ui-button icon="link" @click="open = true" :text="__('Link Existing')" />
 
-        <stack narrow v-if="open" @closed="open = false" name="field-linker" v-slot="{ close }">
+        <ui-stack narrow v-if="open" @closed="open = false" name="field-linker" v-slot="{ close }">
             <div class="h-full overflow-auto bg-white dark:bg-gray-800 p-3 rounded-l-xl">
                 <header class="flex items-center justify-between pl-3">
                     <Heading :text="__('Link Fields')" size="lg" icon="fieldsets" />
@@ -15,7 +15,6 @@
                         :instructions="__('Changes to this field in the fieldset will stay in sync.')"
                     >
                         <Combobox
-                            class="w-full"
                             :placeholder="__('Fields')"
                             :options="fieldSuggestions"
                             searchable
@@ -60,7 +59,6 @@
                         :instructions="__('Changes to this fieldset will stay in sync.')"
                     >
                         <Combobox
-                            class="w-full"
                             :placeholder="__('Fieldsets')"
                             :options="fieldsetSuggestions"
                             searchable
@@ -92,7 +90,7 @@
                     />
                 </div>
             </div>
-        </stack>
+        </ui-stack>
     </div>
 </template>
 

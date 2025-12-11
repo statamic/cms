@@ -49,8 +49,8 @@ class CollectionRepository implements RepositoryContract
 
         return Blink::once('mounted-collections', fn () => $this
             ->all()
-            ->keyBy(fn ($collection) => $collection->mount()?->id())
-            ->filter()
+            ->keyBy(fn ($collection) => $collection->mount()?->id() ?? '__nomount')
+            ->filter(fn ($collection, $mountId) => $mountId !== '__nomount')
         )->get($mount->id());
     }
 

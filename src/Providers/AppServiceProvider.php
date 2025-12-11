@@ -35,9 +35,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->app->booted(function () {
+            $this->registerMiddlewareGroup();
             Statamic::runBootedCallbacks();
             $this->loadRoutesFrom("{$this->root}/routes/routes.php");
-            $this->registerMiddlewareGroup();
         });
 
         $this->app[\Illuminate\Contracts\Http\Kernel::class]

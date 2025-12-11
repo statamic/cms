@@ -5,7 +5,7 @@ import debounce from '@/util/debounce.js';
 import { useTemplateRef } from 'vue';
 
 const { activeFilterBadgeCount, searchQuery, setSearchQuery, reorderable } = injectListingContext();
-const searchQueryUpdated = debounce((event) => setSearchQuery(event.target.value), 300);
+const searchQueryUpdated = debounce((value) => setSearchQuery(value), 300);
 
 const input = useTemplateRef('input');
 const focus = () => input.value.focus();
@@ -22,10 +22,11 @@ defineExpose({ focus });
             icon="magnifying-glass"
             id="listings-search"
             variant="light"
+            clearable
             :placeholder="__('Search...')"
-            :value="searchQuery"
+            :model-value="searchQuery"
             :disabled="reorderable"
-            @input="searchQueryUpdated"
+            @update:model-value="searchQueryUpdated"
             @keyup.esc="setSearchQuery(null)"
         />
     </div>

@@ -30,6 +30,7 @@ trait ExtractsFromEntryFields
         }
 
         $fields = $blueprint
+            ->setParent($entry)
             ->fields()
             ->addValues($values)
             ->preProcess();

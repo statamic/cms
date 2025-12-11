@@ -5,6 +5,7 @@ import Alpine from 'alpinejs';
 import * as Globals from './bootstrap/globals';
 import Cookies from 'cookies-js';
 import * as cms from './bootstrap/cms/index.js';
+import hmr from './bootstrap/hmr';
 
 import.meta.glob(['../img/**']);
 
@@ -19,5 +20,6 @@ window.Cookies = Cookies;
 window.Alpine = Alpine;
 window.Statamic = Statamic;
 window.__STATAMIC__ = cms;
+window.__VUE_HMR_RUNTIME__ ??= hmr;
 
 Alpine.start();

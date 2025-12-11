@@ -7,6 +7,7 @@ class Color
     public const Slate = [
         50 => 'oklch(0.984 0.003 247.858)',
         100 => 'oklch(0.968 0.007 247.896)',
+        150 => 'oklch(0.9485 0.01 251.702)',
         200 => 'oklch(0.929 0.013 255.508)',
         300 => 'oklch(0.869 0.022 252.894)',
         400 => 'oklch(0.704 0.04 256.788)',
@@ -23,6 +24,7 @@ class Color
     public const Gray = [
         50 => 'oklch(0.985 0.002 247.839)',
         100 => 'oklch(0.967 0.003 264.542)',
+        150 => 'oklch(0.9475 0.0045 264.536)',
         200 => 'oklch(0.928 0.006 264.531)',
         300 => 'oklch(0.872 0.01 258.338)',
         400 => 'oklch(0.707 0.022 261.325)',
@@ -39,6 +41,7 @@ class Color
     public const Zinc = [
         50 => 'oklch(0.985 0 0)',
         100 => 'oklch(0.967 0.001 286.375)',
+        150 => 'oklch(0.956 0.0022 286.32)',
         200 => 'oklch(0.92 0.004 286.32)',
         300 => 'oklch(0.871 0.006 286.286)',
         400 => 'oklch(0.705 0.015 286.067)',
@@ -55,6 +58,7 @@ class Color
     public const Neutral = [
         50 => 'oklch(0.985 0 0)',
         100 => 'oklch(0.97 0 0)',
+        150 => 'oklch(0.946 0 0)',
         200 => 'oklch(0.922 0 0)',
         300 => 'oklch(0.87 0 0)',
         400 => 'oklch(0.708 0 0)',
@@ -71,6 +75,7 @@ class Color
     public const Stone = [
         50 => 'oklch(0.985 0.001 106.423)',
         100 => 'oklch(0.97 0.001 106.424)',
+        150 => 'oklch(0.9465 0.002 77.571)',
         200 => 'oklch(0.923 0.003 48.717)',
         300 => 'oklch(0.869 0.005 56.366)',
         400 => 'oklch(0.709 0.01 56.259)',
@@ -87,6 +92,7 @@ class Color
     public const Red = [
         50 => 'oklch(0.971 0.013 17.38)',
         100 => 'oklch(0.936 0.032 17.717)',
+        150 => 'oklch(0.9105 0.047 18.026)',
         200 => 'oklch(0.885 0.062 18.334)',
         300 => 'oklch(0.808 0.114 19.571)',
         400 => 'oklch(0.704 0.191 22.216)',
@@ -103,6 +109,7 @@ class Color
     public const Orange = [
         50 => 'oklch(0.98 0.016 73.684)',
         100 => 'oklch(0.954 0.038 75.164)',
+        150 => 'oklch(0.9275 0.057 72.931)',
         200 => 'oklch(0.901 0.076 70.697)',
         300 => 'oklch(0.837 0.128 66.29)',
         400 => 'oklch(0.75 0.183 55.934)',
@@ -119,6 +126,7 @@ class Color
     public const Amber = [
         50 => 'oklch(0.987 0.022 95.277)',
         100 => 'oklch(0.962 0.059 95.617)',
+        150 => 'oklch(0.943 0.0895 95.682)',
         200 => 'oklch(0.924 0.12 95.746)',
         300 => 'oklch(0.879 0.169 91.605)',
         400 => 'oklch(0.828 0.189 84.429)',
@@ -135,6 +143,7 @@ class Color
     public const Yellow = [
         50 => 'oklch(0.987 0.026 102.212)',
         100 => 'oklch(0.973 0.071 103.193)',
+        150 => 'oklch(0.959 0.1 102.367)',
         200 => 'oklch(0.945 0.129 101.54)',
         300 => 'oklch(0.905 0.182 98.111)',
         400 => 'oklch(0.852 0.199 91.936)',
@@ -151,6 +160,7 @@ class Color
     public const Lime = [
         50 => 'oklch(0.986 0.031 120.757)',
         100 => 'oklch(0.967 0.067 122.328)',
+        150 => 'oklch(0.9525 0.097 123.325)',
         200 => 'oklch(0.938 0.127 124.321)',
         300 => 'oklch(0.897 0.196 126.665)',
         400 => 'oklch(0.841 0.238 128.85)',
@@ -167,6 +177,7 @@ class Color
     public const Green = [
         50 => 'oklch(0.982 0.018 155.826)',
         100 => 'oklch(0.962 0.044 156.743)',
+        150 => 'oklch(0.9435 0.064 156.369)',
         200 => 'oklch(0.925 0.084 155.995)',
         300 => 'oklch(0.871 0.15 154.449)',
         400 => 'oklch(0.792 0.209 151.711)',
@@ -183,6 +194,7 @@ class Color
     public const Emerald = [
         50 => 'oklch(0.979 0.021 166.113)',
         100 => 'oklch(0.95 0.052 163.051)',
+        150 => 'oklch(0.9275 0.0725 163.601)',
         200 => 'oklch(0.905 0.093 164.15)',
         300 => 'oklch(0.845 0.143 164.978)',
         400 => 'oklch(0.765 0.177 163.223)',
@@ -199,6 +211,7 @@ class Color
     public const Teal = [
         50 => 'oklch(0.984 0.014 180.72)',
         100 => 'oklch(0.953 0.051 180.801)',
+        150 => 'oklch(0.9315 0.0735 180.614)',
         200 => 'oklch(0.91 0.096 180.426)',
         300 => 'oklch(0.855 0.138 181.071)',
         400 => 'oklch(0.777 0.152 181.912)',
@@ -215,6 +228,7 @@ class Color
     public const Cyan = [
         50 => 'oklch(0.984 0.019 200.873)',
         100 => 'oklch(0.956 0.045 203.388)',
+        150 => 'oklch(0.9365 0.0625 204.215)',
         200 => 'oklch(0.917 0.08 205.041)',
         300 => 'oklch(0.865 0.127 207.078)',
         400 => 'oklch(0.789 0.154 211.53)',
@@ -231,6 +245,7 @@ class Color
     public const Sky = [
         50 => 'oklch(0.977 0.013 236.62)',
         100 => 'oklch(0.951 0.026 236.824)',
+        150 => 'oklch(0.926 0.042 233.863)',
         200 => 'oklch(0.901 0.058 230.902)',
         300 => 'oklch(0.828 0.111 230.318)',
         400 => 'oklch(0.746 0.16 232.661)',
@@ -247,6 +262,7 @@ class Color
     public const Blue = [
         50 => 'oklch(0.97 0.014 254.604)',
         100 => 'oklch(0.932 0.032 255.585)',
+        150 => 'oklch(0.907 0.0455 254.857)',
         200 => 'oklch(0.882 0.059 254.128)',
         300 => 'oklch(0.809 0.105 251.813)',
         400 => 'oklch(0.707 0.165 254.624)',
@@ -263,6 +279,7 @@ class Color
     public const Indigo = [
         50 => 'oklch(0.962 0.018 272.314)',
         100 => 'oklch(0.93 0.034 272.788)',
+        150 => 'oklch(0.9 0.0495 273.414)',
         200 => 'oklch(0.87 0.065 274.039)',
         300 => 'oklch(0.785 0.115 274.713)',
         400 => 'oklch(0.673 0.182 276.935)',
@@ -279,6 +296,7 @@ class Color
     public const Violet = [
         50 => 'oklch(0.969 0.016 293.756)',
         100 => 'oklch(0.943 0.029 294.588)',
+        150 => 'oklch(0.9185 0.043 293.936)',
         200 => 'oklch(0.894 0.057 293.283)',
         300 => 'oklch(0.811 0.111 293.571)',
         400 => 'oklch(0.702 0.183 293.541)',
@@ -295,6 +313,7 @@ class Color
     public const Purple = [
         50 => 'oklch(0.977 0.014 308.299)',
         100 => 'oklch(0.946 0.033 307.174)',
+        150 => 'oklch(0.924 0.048 306.939)',
         200 => 'oklch(0.902 0.063 306.703)',
         300 => 'oklch(0.827 0.119 306.383)',
         400 => 'oklch(0.714 0.203 305.504)',
@@ -311,6 +330,7 @@ class Color
     public const Fuchsia = [
         50 => 'oklch(0.977 0.017 320.058)',
         100 => 'oklch(0.952 0.037 318.852)',
+        150 => 'oklch(0.9275 0.0565 319.236)',
         200 => 'oklch(0.903 0.076 319.62)',
         300 => 'oklch(0.833 0.145 321.434)',
         400 => 'oklch(0.74 0.238 322.16)',
@@ -327,6 +347,7 @@ class Color
     public const Pink = [
         50 => 'oklch(0.971 0.014 343.198)',
         100 => 'oklch(0.948 0.028 342.258)',
+        150 => 'oklch(0.9235 0.0445 342.745)',
         200 => 'oklch(0.899 0.061 343.231)',
         300 => 'oklch(0.823 0.12 346.018)',
         400 => 'oklch(0.718 0.202 349.761)',
@@ -343,6 +364,7 @@ class Color
     public const Rose = [
         50 => 'oklch(0.969 0.015 12.422)',
         100 => 'oklch(0.941 0.03 12.58)',
+        150 => 'oklch(0.9165 0.044 11.291)',
         200 => 'oklch(0.892 0.058 10.001)',
         300 => 'oklch(0.81 0.117 11.638)',
         400 => 'oklch(0.712 0.194 13.428)',
@@ -361,12 +383,13 @@ class Color
     public const Transparent = 'transparent';
     public const Volt = 'oklch(93.86% 0.2018 122.24)';
 
-    public static function defaults(): array
+    public static function defaults(bool $dark = false): array
     {
-        return [
+        return collect([
             'primary' => self::Indigo[700],
             'gray-50' => self::Zinc[50],
             'gray-100' => self::Zinc[100],
+            'gray-150' => self::Zinc[150],
             'gray-200' => self::Zinc[200],
             'gray-300' => self::Zinc[300],
             'gray-400' => self::Zinc[400],
@@ -389,34 +412,50 @@ class Color
             'dark-content-bg' => self::Zinc[900],
             'dark-content-border' => self::Zinc[950],
             'global-header-bg' => self::Zinc[800],
-            'dark-global-header-bg' => self::Zinc[800],
             'progress-bar' => self::Indigo[700],
+            'focus-outline' => self::Blue[400],
             'ui-accent-bg' => self::Indigo[700],
             'ui-accent-text' => 'var(--theme-color-ui-accent-bg)',
-            'dark-ui-accent-bg' => self::Indigo[700],
             'dark-ui-accent-text' => self::Indigo[400],
             'switch-bg' => 'var(--theme-color-ui-accent-bg)',
-            'dark-switch-bg' => 'var(--theme-color-dark-ui-accent-bg)',
-        ];
-    }
-
-    public static function theme(): array
-    {
-        $config = config('statamic.cp.theme', []);
-
-        foreach ($config['grays'] ?? [] as $shade => $value) {
-            $config["gray-{$shade}"] = $value;
-        }
-
-        return collect(static::defaults())
-            ->map(fn ($color, $name) => $config[$name] ?? $color)
+        ])
+            ->filter(fn ($color, $name) => str($name)->startsWith('dark-') ? $dark : ! $dark)
             ->all();
     }
 
-    public static function cssVariables(): string
+    public static function theme(bool $dark = false): array
     {
-        return collect(static::theme())
-            ->map(fn ($color, $name) => "--theme-color-{$name}: {$color};")
-            ->implode(PHP_EOL.'    ');
+        $config = config('statamic.cp.theme', []);
+
+        foreach ($config[$dark ? 'dark-grays' : 'grays'] ?? [] as $shade => $value) {
+            $colorHandle = $dark ? 'dark-gray' : 'gray';
+            $config["{$colorHandle}-{$shade}"] = $value;
+        }
+
+        $darkColors = static::defaults(dark: true);
+
+        return collect(static::defaults())
+            ->mapWithKeys(function ($color, $name) use ($config, $dark, $darkColors) {
+                $key = $dark ? "dark-{$name}" : $name;
+
+                $value = $dark
+                    ? $config[$key] ?? $darkColors[$key] ?? null
+                    : $config[$key] ?? $color;
+
+                return [$key => $value];
+            })
+            ->filter()
+            ->all();
+    }
+
+    public static function cssVariables(bool $dark = false): string
+    {
+        return collect(static::theme($dark))
+            ->map(function ($color, $name) use ($dark) {
+                $name = $dark ? str($name)->remove('dark-') : $name;
+
+                return "--theme-color-{$name}: {$color};";
+            })
+            ->implode(PHP_EOL.($dark ? "\t\t\t" : "\t\t"));
     }
 }

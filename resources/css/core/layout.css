@@ -47,7 +47,7 @@
 
 
 /* Mobile nav behavior */
-@media (max-width: theme(--breakpoint-lg)) {
+@media (width < theme(--breakpoint-lg)) {
     .nav-main {
         /* Always visible but off-screen by default */
         @apply flex;

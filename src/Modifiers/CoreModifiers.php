@@ -716,7 +716,7 @@ class CoreModifiers extends Modifier
      */
     public function explode($value, $params)
     {
-        return explode(Arr::get($params, 0), $value);
+        return explode(Arr::get($params, 0), $value, Arr::get($params, 1, PHP_INT_MAX));
     }
 
     /**
@@ -3324,6 +3324,10 @@ class CoreModifiers extends Modifier
 
     private function carbon($value)
     {
+        if (! $value) {
+            return optional();
+        }
+
         if (! $value instanceof Carbon) {
             $value = (is_numeric($value)) ? Date::createFromTimestamp($value, config('app.timezone')) : Date::parse($value);
         }

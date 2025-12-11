@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch, onMounted, getCurrentInstance } from 'vue';
+import { ref, computed, watch, onMounted, onBeforeUnmount, getCurrentInstance } from 'vue';
 import { router } from '@inertiajs/vue3';
 
 const props = defineProps({
@@ -21,6 +21,7 @@ const title = ref(null);
 const handle = ref(null);
 const slug = $slug.separatedBy('_');
 const errors = ref({});
+const saveBinding = ref(null);
 
 const canSubmit = computed(() => {
     return title.value && (props.withoutHandle || handle.value);
@@ -51,7 +52,7 @@ const submit = () => {
 };
 
 onMounted(() => {
-    $keys.bindGlobal(['return', 'mod+s'], (e) => {
+    saveBinding.value = $keys.bindGlobal(['return', 'mod+s'], (e) => {
         e.preventDefault();
 
         if (canSubmit.value) {
@@ -59,6 +60,8 @@ onMounted(() => {
         }
     });
 });
+
+onBeforeUnmount(() => saveBinding.value?.destroy());
 </script>
 
 <template>
@@ -73,21 +76,23 @@ onMounted(() => {
             <ui-card-panel :heading="__('Details')">
                 <div class="space-y-8">
                     <ui-field
+                        id="title"
                         :label="__('Title')"
                         :instructions="titleInstructions"
                         :instructions-below="true"
                         :errors="errors.title"
                     >
-                        <ui-input v-model="title" autofocus />
+                        <ui-input id="title" v-model="title" autofocus />
                     </ui-field>
                     <ui-field
                         v-if="!withoutHandle"
+                        id="handle"
                         :label="__('Handle')"
                         :instructions="handleInstructions"
                         :instructions-below="true"
                         :errors="errors.handle"
                     >
-                        <ui-input v-model="handle" :loading="slug.busy" />
+                        <ui-input id="handle" v-model="handle" :loading="slug.busy" />
                     </ui-field>
                 </div>
             </ui-card-panel>

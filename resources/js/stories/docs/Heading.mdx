@@ -1,0 +1,27 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as HeadingStories from '../Heading.stories';
+
+<Meta of={HeadingStories} />
+
+# Heading
+Clean and consistent headings and subheadings.
+<Canvas of={HeadingStories._DocsIntro} sourceState={'shown'} />
+
+## Sizes
+Headings come in three sizes. If that feels too restrictive, that's okay — you'll get used to it. Less is more. Trust us.
+<Canvas of={HeadingStories._Sizes} sourceState={'shown'} />
+
+## Heading Level
+Control the heading level (`h1`, `h2`, etc) with the `level` prop. Without it, the heading will use a `div`.
+<Canvas of={HeadingStories._HeadingLevel} sourceState={'shown'} />
+
+## Icon
+Add an appropriately sized icon to your heading with the `icon` prop.
+<Canvas of={HeadingStories._Icon} sourceState={'shown'} />
+
+## As a Link
+Headings can have a link set with an `href` prop.
+<Canvas of={HeadingStories._AsLink} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={HeadingStories} />
