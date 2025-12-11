@@ -1,5 +1,5 @@
 <template>
-    <ButtonGroup ref="buttonGroup">
+    <ButtonGroup orientation="auto" ref="buttonGroup">
         <Button
             v-for="(option, $index) in options"
             ref="button"
