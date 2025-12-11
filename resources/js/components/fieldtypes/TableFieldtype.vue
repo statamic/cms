@@ -20,7 +20,7 @@
                             <th v-for="(column, index) in columnCount" :key="index">
                                 <div class="flex h-6 items-center justify-between">
                                     <span class="column-count">{{ index + 1 }}</span>
-                                    <ui-button icon="x" variant="subtle" size="xs" round @click="confirmDeleteColumn(index)" :aria-label="__('Delete Column')" v-tooltip="__('Delete Column')" class="-me-1" />
+                                    <ui-button icon="x" variant="subtle" size="xs" destructive round @click="confirmDeleteColumn(index)" :aria-label="__('Delete Column')" v-tooltip="__('Delete Column')" class="-me-1" />
                                 </div>
                             </th>
                             <th class="row-controls"></th>
@@ -46,7 +46,7 @@
                                     />
                                 </td>
                                 <td class="row-controls" v-if="canDeleteRows">
-                                    <ui-button icon="x" variant="subtle" size="xs" round @click="confirmDeleteRow(rowIndex)" :aria-label="__('Delete Row')" v-tooltip="__('Delete Row')" />
+                                    <ui-button icon="x" variant="subtle" destructive size="xs" round @click="confirmDeleteRow(rowIndex)" :aria-label="__('Delete Row')" v-tooltip="__('Delete Row')" />
                                 </td>
                             </tr>
                         </tbody>

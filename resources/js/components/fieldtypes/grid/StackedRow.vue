@@ -10,6 +10,7 @@
                 <ui-button
                     v-if="canAddRows"
                     @click="$emit('duplicate', index)"
+                    :aria-label="__('Duplicate Row')"
                     v-tooltip="__('Duplicate Row')"
                     icon="duplicate"
                     variant="ghost"
@@ -19,6 +20,8 @@
                 <ui-button
                     v-if="canDelete"
                     @click="$emit('removed', index)"
+                    :aria-label="__('Delete Row')"
+                    destructive
                     v-tooltip="__('Delete Row')"
                     icon="trash"
                     variant="ghost"

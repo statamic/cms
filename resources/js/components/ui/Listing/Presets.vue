@@ -189,7 +189,9 @@ function deletePreset() {
                             :text="__('Delete')"
                             icon="delete"
                             variant="warning"
+                            :aria-label="__('Delete Preset')"
                             @click="isConfirmingDeletion = true"
+                            data-destructive
                         />
                     </DropdownMenu>
                 </Dropdown>

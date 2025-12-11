@@ -109,8 +109,6 @@ return [
         // 'grays' => Color::Zinc,
 
         // 'primary' => Color::Zinc[800],
-        // 'success' => Color::Green[400],
-        // 'danger' => Color::Red[600],
 
         // 'ui-accent-bg' => Color::Zinc[800],
         // 'ui-accent-text' => Color::Zinc[800],
@@ -134,6 +132,15 @@ return [
 
         // 'switch-bg' => Color::Green[500],
         // 'dark-switch-bg' => Color::Green[600],
+
+        // 'success' => Color::Green[700],
+        // 'success-bg' => Color::Green[50],
+        // 'dark-success' => Color::Green[400],
+        // 'dark-success-bg' => Color::Green[950],
+        // 'danger' => Color::Red[700],
+        // 'danger-bg' => Color::Red[50],
+        // 'dark-danger' => Color::Red[400],
+        // 'dark-danger-bg' => Color::Red[950],
     ],
 
     /*
