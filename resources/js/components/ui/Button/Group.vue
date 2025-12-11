@@ -2,15 +2,26 @@
     <div
         :class="[
             'group/button flex flex-wrap relative [[data-floating-toolbar]_&]:justify-center [[data-floating-toolbar]_&]:gap-1 [[data-floating-toolbar]_&]:lg:gap-x-0',
-            '[&>[data-ui-group-target]:not(:first-child):not(:last-child)]:rounded-none',
-            '[&>[data-ui-group-target]:first-child:not(:last-child)]:rounded-e-none',
-            '[&>[data-ui-group-target]:last-child:not(:first-child)]:rounded-s-none',
-            '[&>*:not(:first-child):not(:last-child):not(:only-child)_[data-ui-group-target]]:rounded-none',
-            '[&>*:first-child:not(:last-child)_[data-ui-group-target]]:rounded-e-none',
-            '[&>*:last-child:not(:first-child)_[data-ui-group-target]]:rounded-s-none',
             'dark:[&_button]:ring-0',
             'max-lg:[[data-floating-toolbar]_&_button]:rounded-md!',
             'shadow-ui-sm rounded-lg',
+
+            // Horizontal orientation
+            '[&[data-orientation=horizontal]>[data-ui-group-target]:not(:first-child):not(:last-child)]:rounded-none',
+            '[&[data-orientation=horizontal]>[data-ui-group-target]:first-child:not(:last-child)]:rounded-e-none',
+            '[&[data-orientation=horizontal]>[data-ui-group-target]:last-child:not(:first-child)]:rounded-s-none',
+            '[&[data-orientation=horizontal]>*:not(:first-child):not(:last-child):not(:only-child)_[data-ui-group-target]]:rounded-none',
+            '[&[data-orientation=horizontal]>*:first-child:not(:last-child)_[data-ui-group-target]]:rounded-e-none',
+            '[&[data-orientation=horizontal]>*:last-child:not(:first-child)_[data-ui-group-target]]:rounded-s-none',
+
+            // Vertical orientation
+            '[&[data-orientation=vertical]]:flex-col',
+            '[&[data-orientation=vertical]>[data-ui-group-target]:not(:first-child):not(:last-child)]:rounded-none',
+            '[&[data-orientation=vertical]>[data-ui-group-target]:first-child:not(:last-child)]:rounded-b-none',
+            '[&[data-orientation=vertical]>[data-ui-group-target]:last-child:not(:first-child)]:rounded-t-none',
+            '[&[data-orientation=vertical]>*:not(:first-child):not(:last-child):not(:only-child)_[data-ui-group-target]]:rounded-none',
+            '[&[data-orientation=vertical]>*:first-child:not(:last-child)_[data-ui-group-target]]:rounded-b-none',
+            '[&[data-orientation=vertical]>*:last-child:not(:first-child)_[data-ui-group-target]]:rounded-t-none',
         ]"
         data-ui-button-group
     >
@@ -87,7 +98,9 @@ export default {
         }
     }
 
-    [data-ui-button-group][data-orientation='vertical'] {
-        @apply flex! flex-col;
+    /* Vertical orientation border handling */
+    [data-ui-button-group][data-orientation='vertical'] [data-ui-group-target]:not(:first-child) {
+        border-inline-start-width: 1px;
+        border-top: 0;
     }
 </style>
