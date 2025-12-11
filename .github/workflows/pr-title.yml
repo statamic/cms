@@ -31,19 +31,11 @@ jobs:
 
             # Check if target branch is master (next major version)
             elif [[ $target_branch == "master" ]]; then
-              if [[ $default_branch =~ ^([0-9]+)\.x$ ]]; then
-                local current_version="${BASH_REMATCH[1]}"
-                local next_version=$((current_version + 1))
-                if [[ ! $pr_title =~ ^\[$next_version\.x\][[:space:]] ]]; then
-                  echo "PR targeting 'master' must have title starting with '[$next_version.x] '"
-                  return
-                fi
-              else
-                # Fallback: just check for any version prefix
-                if [[ ! $pr_title =~ ^\[[0-9]+\.x\][[:space:]] ]]; then
-                  echo "PR title must start with a version prefix like '[6.x] '"
-                  return
-                fi
+              local current_version="${default_branch//\.x/}"
+              local next_version=$((current_version + 1))
+              if [[ ! $pr_title =~ ^\[$next_version\.x\][[:space:]] ]]; then
+                echo "PR targeting 'master' must have title starting with '[$next_version.x] '"
+                return
               fi
 
             # For other branches, just enforce that there's a version prefix
