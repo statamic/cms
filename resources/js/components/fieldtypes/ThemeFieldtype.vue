@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Fieldtype from '@/components/fieldtypes/fieldtype';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import type { Tab } from '../themes/Selector.vue';
 import Selector from '../themes/Selector.vue';
 import { Theme, ThemeValue } from '@/components/themes/types';
@@ -10,9 +10,9 @@ const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
 const { update, expose } = Fieldtype.use(emit, props);
 
-const selectedTheme = ref<Theme | null>(
-    props.value ? valueToTheme(props.value as ThemeValue) : null
-);
+const toTheme = (value: unknown) => valueToTheme(value as ThemeValue | null);
+const selectedTheme = ref<Theme | null>(toTheme(props.value));
+watch(() => props.value, (newValue) => selectedTheme.value = toTheme(newValue));
 
 const tab = ref<Tab>((() => {
     const theme = selectedTheme.value;

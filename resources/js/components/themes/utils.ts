@@ -12,7 +12,9 @@ export function getDefaultTheme(): Theme {
     }
 }
 
-export function valueToTheme(value: ThemeValue): Theme {
+export function valueToTheme(value: ThemeValue | null): Theme | null {
+    if (!value) return null;
+
     const colors: ThemeColors = {};
     const darkColors: ThemeColors = {};
 
