@@ -596,6 +596,7 @@ provideListingContext({
     isColumnVisible,
     hiddenColumns,
     sortColumn,
+    sortDirection,
     setSortColumn,
     selections,
     maxSelections: toRef(() => props.maxSelections),
