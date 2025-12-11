@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Themes;
 
+use Facades\Statamic\Marketplace\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Statamic\Http\Controllers\CP\CpController;
@@ -16,7 +17,9 @@ class ShareThemeController extends CpController
             'darkColors' => 'required|array',
         ]);
 
-        $response = Http::post('https://statamic.com/api/v1/marketplace/cp-themes', [
+        $url = Client::requestEndpoint('cp-themes');
+
+        $response = Http::post($url, [
             'name' => $request->name,
             'colors' => $request->colors,
             'darkColors' => $request->darkColors,

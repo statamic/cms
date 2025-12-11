@@ -85,7 +85,7 @@ class Client
         }
     }
 
-    private function requestEndpoint(string $endpoint): string
+    public function requestEndpoint(string $endpoint): string
     {
         return collect([$this->domain, self::API_PREFIX, $endpoint])->implode('/');
     }
