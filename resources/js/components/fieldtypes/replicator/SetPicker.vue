@@ -8,9 +8,8 @@
     <!-- Modal for Grid Mode -->
     <ui-modal
         :blur="false"
-        :open="isOpen"
         :title="__('Add Set')"
-        @update:open="isOpen = $event"
+        v-model:open="isOpen"
         v-else-if="shouldUseModal"
         class="xl:max-w-3xl 2xl:max-w-5xl"
     >

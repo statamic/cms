@@ -63,6 +63,8 @@ function open() {
         mounted.value = true;
 
         nextTick(() => visible.value = true);
+
+	    updateOpen(true);
     });
 }
 
