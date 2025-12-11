@@ -103,7 +103,11 @@
                                             :aria-label="__('Add Set')"
                                             v-tooltip="__('Add Set')"
                                         />
-                                        <ui-description v-if="!$refs.setPicker?.isOpen" :text="__('Type \'/\' to insert a set')" />
+                                        <ui-description
+                                            v-if="!$refs.setPicker?.isOpen"
+                                            :text="__('Type \'/\' to insert a set')"
+                                            :class="{'ps-9': fullScreenMode}"
+                                        />
                                     </div>
                                 </template>
                             </set-picker>
