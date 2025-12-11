@@ -81,26 +81,21 @@ export default {
 
 <style>
     [data-ui-button-group] [data-ui-group-target] {
-
         @apply shadow-none;
-
-        &:not(:first-child):not([data-floating-toolbar] &) {
-            border-inline-start: 0;
-        }
-
-        /* Account for button groups being split apart on small screens */
-        [data-floating-toolbar] & {
-            @media (width >= 1024px) {
-                &:not(:first-child) {
-                    border-inline-start: 0;
-                }
-            }
-        }
     }
 
-    /* Vertical orientation border handling */
+    [data-ui-button-group][data-orientation='horizontal'] [data-ui-group-target]:not(:first-child) {
+        border-inline-start: 0;
+    }
+
     [data-ui-button-group][data-orientation='vertical'] [data-ui-group-target]:not(:first-child) {
-        border-inline-start-width: 1px;
-        border-top: 0;
+        border-block-start: 0;
+    }
+
+    /* Floating toolbar on small screens: items are split apart, keep borders */
+    @media (width < 1024px) {
+        [data-floating-toolbar] [data-ui-button-group] [data-ui-group-target]:not(:first-child) {
+            border-inline-start: 1px;
+        }
     }
 </style>
