@@ -61,12 +61,16 @@ const selectedColor = computed(() => {
         <template #trigger>
             <button
                 type="button"
-                class="size-8 shape-squircle rounded-full border-2 border-gray-300 hover:border-gray-400 transition-all"
+                class="relative size-8 shape-squircle rounded-full border-2 border-gray-300 hover:border-gray-400 transition-all"
                 :style="{
                     backgroundColor: modelValue || 'transparent',
                 }"
                 v-tooltip="selectedColor"
-            />
+            >
+                <div v-if="modelValue === 'transparent'" class="absolute inset-0 flex items-center justify-center">
+                    <div class="w-full h-[1px] bg-red-500 rotate-45 origin-center"></div>
+                </div>
+            </button>
         </template>
         <div class="p-2">
             <div class="mb-2 text-center">
@@ -86,7 +90,7 @@ const selectedColor = computed(() => {
                 </div>
                 <div class="flex flex-col">
                     <Swatch
-                        color="white"
+                        color="transparent"
                         color-name="Transparent"
                         :is-selected="isSelected('transparent')"
                         @selected="colorSelected"
