@@ -69,10 +69,6 @@ const groupClasses = computed(() => {
             justify: {
                 center: 'justify-center',
             },
-            gap: {
-                true: 'gap-1',
-                false: [groupBordersgapNone],
-            },
         },
         compoundVariants: [
             { orientation: 'auto', hasOverflow: false, class: collapseHorizontally },
