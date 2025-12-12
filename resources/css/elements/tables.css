@@ -140,7 +140,7 @@
     }
 
     tbody .checkbox-column {
-        @apply px-3 -start-px sticky -left-1.5;
+        @apply px-3 -start-px sticky -left-1.75;
         container-type: scroll-state;
         .data-table--contained & {
             @apply sticky ps-4;
