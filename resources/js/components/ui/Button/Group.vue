@@ -1,5 +1,6 @@
 <template>
     <div
+        ref="el"
         :class="[
             'group/button flex flex-wrap relative [[data-floating-toolbar]_&]:justify-center [[data-floating-toolbar]_&]:gap-1 [[data-floating-toolbar]_&]:lg:gap-x-0',
             'dark:[&_button]:ring-0',
@@ -29,54 +30,58 @@
     </div>
 </template>
 
-<script>
-export default {
-    props: {
-        orientation: {
-            type: String,
-            default: 'horizontal',
-        },
+<script setup>
+import { ref, nextTick, onMounted, onBeforeUnmount } from 'vue';
+
+const props = defineProps({
+    orientation: {
+        type: String,
+        default: 'horizontal',
     },
+});
 
-    data() {
-        return {
-            resizeObserver: null,
-        };
-    },
+const el = ref(null);
+let resizeObserver = null;
 
-    mounted() {
-        this.$el.dataset.orientation = this.orientation;
-        if (this.orientation === 'auto') {
-            this.observeOrientation();
-        }
-    },
+function observeOrientation() {
+    resizeObserver = new ResizeObserver(() => checkOrientation());
+    resizeObserver.observe(el.value);
+}
 
-    beforeUnmount() {
-        this.unobserveOrientation();
-    },
+function unobserveOrientation() {
+    resizeObserver?.disconnect();
+}
 
-    methods: {
-        observeOrientation() {
-            this.resizeObserver = new ResizeObserver(() => this.checkOrientation(this.$el));
-            this.resizeObserver.observe(this.$el);
-        },
+async function checkOrientation() {
+    const node = el.value;
+    if (!node) return;
 
-        unobserveOrientation() {
-            this.resizeObserver?.disconnect();
-        },
+    // 1) Remove orientation to allow natural layout (grow + wrap)
+    delete node.dataset.orientation;
 
-        checkOrientation(node) {
-            delete node.dataset.orientation;
+    // 2) Wait for Vue to commit DOM updates
+    await nextTick();
 
-            const child = node.lastElementChild;
-            if (!child) return;
+    // 3) Force reflow and measure
+    const child = node.lastElementChild;
+    const orientation = child && child.offsetTop > node.clientTop
+        ? 'vertical'
+        : 'horizontal';
 
-            node.dataset.orientation = child.offsetTop > node.clientTop
-                ? 'vertical'
-                : 'horizontal';
-        },
-    },
-};
+    // 4) Apply the final orientation
+    node.dataset.orientation = orientation;
+}
+
+onMounted(() => {
+    el.value.dataset.orientation = props.orientation;
+    if (props.orientation === 'auto') {
+        observeOrientation();
+    }
+});
+
+onBeforeUnmount(() => {
+    unobserveOrientation();
+});
 </script>
 
 <style>
