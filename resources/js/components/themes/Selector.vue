@@ -3,7 +3,7 @@ import { Tabs, TabList, TabTrigger, TabContent } from '@ui';
 import { ref, watch } from 'vue';
 import Themes from './Themes.vue';
 import Custom from './Custom.vue';
-import { Theme, PredefinedTheme } from './types';
+import { Theme } from './types';
 import { applyTheme, applyDefaultTheme } from '.';
 import { translate as __ } from '@/translations/translator';
 
@@ -32,7 +32,7 @@ watch(activeTab, (newTab) => {
     }
 });
 
-function themeSelected(theme: PredefinedTheme) {
+function themeSelected(theme: Theme) {
     emit('update:modelValue', theme);
 
     if (theme.id === 'custom') activeTab.value = 'custom';

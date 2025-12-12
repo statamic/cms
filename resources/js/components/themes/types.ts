@@ -29,7 +29,7 @@ export type ColorVariableName =
 
 export type ColorValue = string;
 
-export interface ColorDefinition {
+export type ColorDefinition = {
     name: ColorVariableName;
     label: string;
 }
@@ -38,22 +38,19 @@ export type ThemeColors = {
     [K in ColorVariableName]?: ColorValue;
 };
 
-export interface Theme {
+export type Theme = {
     id: string;
     name: string;
-    colors: ThemeColors;
-    darkColors?: Partial<ThemeColors>;
-}
-
-export interface PredefinedTheme extends Theme {
     description?: string;
     author?: string;
-}
-
-export type PartialTheme = {
     colors?: Partial<ThemeColors>;
     darkColors?: Partial<ThemeColors>;
-};
+}
+
+export type CompleteTheme = Omit<Theme, 'colors' | 'darkColors'> & {
+    colors: ThemeColors;
+    darkColors: ThemeColors;
+}
 
 export type ThemeValue = {
     id?: string;

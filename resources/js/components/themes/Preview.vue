@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { PredefinedTheme } from './types';
+import type { Theme } from './types';
 import { computed } from 'vue';
 import { getDefaultTheme, getCssVariables } from '.';
 import uniqid from 'uniqid';
 
 const props = withDefaults(defineProps<{
-    theme: PredefinedTheme;
+    theme: Theme;
     appearance?: 'auto' | 'light' | 'dark';
 }>(), {
     appearance: 'auto'

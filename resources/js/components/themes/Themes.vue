@@ -2,26 +2,26 @@
 import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 import Preview from './Preview.vue';
-import type { PredefinedTheme, Theme } from './types';
+import type { Theme } from './types';
 import { applyTheme, defaultTheme } from '.';
 import { Button, Description, Input } from '@ui';
 import { cp_url } from '@/bootstrap/globals';
 import fuzzysort from 'fuzzysort';
 
 const emit = defineEmits<{
-    (e: 'update:modelValue', theme: PredefinedTheme): void;
+    (e: 'update:modelValue', theme: Theme): void;
 }>();
 
 const props = defineProps<{
     modelValue?: Theme;
 }>();
 
-const selectTheme = (theme: PredefinedTheme) => {
+const selectTheme = (theme: Theme) => {
     applyTheme(theme);
     emit('update:modelValue', theme);
 };
 
-const localThemes = computed<PredefinedTheme[]>(() => {
+const localThemes = computed<Theme[]>(() => {
     const themes = [defaultTheme];
 
     if (props.modelValue?.id === 'custom') {
@@ -38,8 +38,8 @@ const localThemes = computed<PredefinedTheme[]>(() => {
     return themes;
 });
 
-const marketplaceThemes = ref<PredefinedTheme[]>([]);
-const themes = computed<PredefinedTheme[]>(() => [...localThemes.value, ...marketplaceThemes.value]);
+const marketplaceThemes = ref<Theme[]>([]);
+const themes = computed<Theme[]>(() => [...localThemes.value, ...marketplaceThemes.value]);
 const busy = ref<boolean>(true);
 const search = ref<string>('');
 
@@ -64,7 +64,7 @@ async function load() {
     }
 }
 
-function isActive(theme: PredefinedTheme): boolean {
+function isActive(theme: Theme): boolean {
     const activeThemeId = props.modelValue?.id || 'default';
     return activeThemeId === theme.id;
 }
@@ -74,7 +74,7 @@ function refresh() {
     axios.get(cp_url('themes/refresh')).then(() => load());
 }
 
-function themeDescription(theme: PredefinedTheme): string {
+function themeDescription(theme: Theme): string {
     let description = theme.name;
     if (theme.author) description += ` <span class='opacity-70 text-2xs'>by</span> ${theme.author}`;
     return description;

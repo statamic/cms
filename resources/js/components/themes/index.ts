@@ -1,4 +1,4 @@
-import type { Theme, ThemeValue, ThemeColors, ColorVariableName, ColorDefinition, PredefinedTheme } from './types';
+import type { CompleteTheme, ThemeValue, ThemeColors, ColorVariableName, ColorDefinition, Theme } from './types';
 import { config } from '@api';
 
 export const defaultTheme = {
@@ -9,9 +9,9 @@ export const defaultTheme = {
         'primary': 'oklch(0.457 0.24 277.023)',
         'ui-accent-bg': 'oklch(0.457 0.24 277.023)',
     }
-} as PredefinedTheme;
+} as Theme;
 
-export function getDefaultTheme(): Theme {
+export function getDefaultTheme(): CompleteTheme {
     const defaultTheme = config.get('defaultTheme');
 
     return {

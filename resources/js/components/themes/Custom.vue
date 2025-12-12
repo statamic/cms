@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Button, Description, Input, Table, TableCell, TableColumn, TableColumns, TableRow, TableRows } from '@ui';
 import { computed } from 'vue';
-import { ColorVariableName, Theme, ThemeColors } from './types';
+import { ColorVariableName, Theme, CompleteTheme, ThemeColors } from './types';
 import Preview from './Preview.vue';
 import { getDefaultTheme, colors } from '.';
 import { translate as __ } from '@/translations/translator';
@@ -17,7 +17,7 @@ const emit = defineEmits<{
     (e: 'shared'): void;
 }>();
 
-const theme = computed<Theme>(() => {
+const theme = computed<CompleteTheme>(() => {
     const defaultTheme = getDefaultTheme();
 
     if (!props.modelValue) return defaultTheme;
