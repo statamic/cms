@@ -6,10 +6,12 @@ use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Contracts\Auth\User;
 use Statamic\Contracts\Revisions\Revision as Contract;
 use Statamic\Data\ExistsAsFile;
+use Statamic\Entries\Entry;
 use Statamic\Events\RevisionDeleted;
 use Statamic\Events\RevisionSaved;
 use Statamic\Events\RevisionSaving;
 use Statamic\Facades;
+use Statamic\Facades\Entry as EntryFacade;
 use Statamic\Facades\Revision as Revisions;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -18,13 +20,27 @@ class Revision implements Arrayable, Contract
     use ExistsAsFile, FluentlyGetsAndSets;
 
     protected $id;
+
     protected $key;
+
     protected $date;
+
     protected $user;
+
     protected $userId;
+
     protected $message;
+
+    protected $publishAt;
+
     protected $action = 'revision';
+
     protected $attributes = [];
+
+    public function entry(): Entry
+    {
+        return EntryFacade::find($this->attribute('id'));
+    }
 
     public function id($id = null)
     {
@@ -59,6 +75,11 @@ class Revision implements Arrayable, Contract
     public function message($message = null)
     {
         return $this->fluentlyGetOrSet('message')->value($message);
+    }
+
+    public function publishAt($dateTime = null)
+    {
+        return $this->fluentlyGetOrSet('publishAt')->args(func_get_args());
     }
 
     public function attributes($attributes = null)
@@ -103,6 +124,7 @@ class Revision implements Arrayable, Contract
             'date' => $this->date->timestamp,
             'user' => $this->userId ?: null,
             'message' => $this->message ?: null,
+            'publish_at' => $this->publishAt?->timestamp,
             'attributes' => $this->attributes,
         ];
     }
@@ -125,6 +147,7 @@ class Revision implements Arrayable, Contract
             'date' => $this->date()->timestamp,
             'user' => $user,
             'message' => $this->message,
+            'publish_at' => $this->publishAt,
             'attributes' => $this->attributes,
         ];
     }
