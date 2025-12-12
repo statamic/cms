@@ -136,7 +136,7 @@ onMounted(() => {
                             v-for="provider in providers"
                             :key="provider.name"
                             as="href"
-                            class="flex-1"
+                            class="flex-1 [&_svg]:opacity-100!"
                             :href="provider.url"
                             :icon="provider.icon"
                         />
