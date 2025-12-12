@@ -4,7 +4,7 @@ import { ref, watch } from 'vue';
 import Themes from './Themes.vue';
 import Custom from './Custom.vue';
 import { Theme, PredefinedTheme } from './types';
-import { applyTheme, applyDefaultTheme } from './utils';
+import { applyTheme, applyDefaultTheme } from '.';
 import { translate as __ } from '@/translations/translator';
 
 export type Tab = 'themes' | 'custom';

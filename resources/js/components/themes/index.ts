@@ -1,5 +1,15 @@
-import type { Theme, ThemeValue, ThemeColors, ColorVariableName } from './types';
+import type { Theme, ThemeValue, ThemeColors, ColorVariableName, ColorDefinition, PredefinedTheme } from './types';
 import { config } from '@api';
+
+export const defaultTheme = {
+    id: 'default',
+    name: 'Default',
+    author: 'Statamic',
+    colors: {
+        'primary': 'oklch(0.457 0.24 277.023)',
+        'ui-accent-bg': 'oklch(0.457 0.24 277.023)',
+    }
+} as PredefinedTheme;
 
 export function getDefaultTheme(): Theme {
     const defaultTheme = config.get('defaultTheme');
@@ -72,3 +82,33 @@ export function getCssVariables(colors: ThemeColors, darkColors: ThemeColors): {
 
     return { light, dark };
 }
+
+export const colors = [
+    { name: 'primary', label: 'Primary', },
+    { name: 'global-header-bg', label: 'Global Header Background', },
+    { name: 'body-bg', label: 'Body Background', },
+    { name: 'body-border', label: 'Body Border', },
+    { name: 'content-bg', label: 'Content Background', },
+    { name: 'content-border', label: 'Content Border', },
+    { name: 'progress-bar', label: 'Progress Bar', },
+    { name: 'focus-outline', label: 'Focus Outline', },
+    { name: 'ui-accent-bg', label: 'Accent Background', },
+    { name: 'ui-accent-text', label: 'Accent Text', },
+    { name: 'switch-bg', label: 'Switch Background', },
+    { name: 'success', label: 'Success', },
+    { name: 'danger', label: 'Danger', },
+    { name: 'gray-50', label: 'Gray 50', },
+    { name: 'gray-100', label: 'Gray 100', },
+    { name: 'gray-150', label: 'Gray 150', },
+    { name: 'gray-200', label: 'Gray 200', },
+    { name: 'gray-300', label: 'Gray 300', },
+    { name: 'gray-400', label: 'Gray 400', },
+    { name: 'gray-500', label: 'Gray 500', },
+    { name: 'gray-600', label: 'Gray 600', },
+    { name: 'gray-700', label: 'Gray 700', },
+    { name: 'gray-800', label: 'Gray 800', },
+    { name: 'gray-850', label: 'Gray 850', },
+    { name: 'gray-900', label: 'Gray 900', },
+    { name: 'gray-925', label: 'Gray 925', },
+    { name: 'gray-950', label: 'Gray 950', },
+] as ColorDefinition[];

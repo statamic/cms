@@ -2,9 +2,8 @@
 import { Button, Description, Input, Table, TableCell, TableColumn, TableColumns, TableRow, TableRows } from '@ui';
 import { computed } from 'vue';
 import { ColorVariableName, Theme, ThemeColors } from './types';
-import colors from './colors';
 import Preview from './Preview.vue';
-import { getDefaultTheme } from '@/components/themes/utils';
+import { getDefaultTheme, colors } from '.';
 import { translate as __ } from '@/translations/translator';
 import ColorPicker from '@/components/themes/color-picker/ColorPicker.vue';
 import Share from '@/components/themes/Share.vue';

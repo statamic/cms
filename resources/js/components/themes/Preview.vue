@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { PredefinedTheme } from './types';
 import { computed } from 'vue';
-import { getDefaultTheme, getCssVariables } from './utils';
+import { getDefaultTheme, getCssVariables } from '.';
 import uniqid from 'uniqid';
 
 const props = withDefaults(defineProps<{

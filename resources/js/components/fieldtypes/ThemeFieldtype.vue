@@ -4,7 +4,7 @@ import { ref, watch } from 'vue';
 import type { Tab } from '../themes/Selector.vue';
 import Selector from '../themes/Selector.vue';
 import { Theme, ThemeValue } from '@/components/themes/types';
-import { valueToTheme } from '@/components/themes/utils';
+import { valueToTheme } from '@/components/themes';
 
 const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
