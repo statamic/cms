@@ -34,6 +34,8 @@ watch(activeTab, (newTab) => {
 
 function themeSelected(theme: PredefinedTheme) {
     emit('update:modelValue', theme);
+
+    if (theme.id === 'custom') activeTab.value = 'custom';
 }
 
 const customWasShared = ref(false);

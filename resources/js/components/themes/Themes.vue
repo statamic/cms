@@ -21,7 +21,25 @@ const selectTheme = (theme: PredefinedTheme) => {
     emit('update:modelValue', theme);
 };
 
-const themes = ref<PredefinedTheme[]>([defaultTheme]);
+const localThemes = computed<PredefinedTheme[]>(() => {
+    const themes = [defaultTheme];
+
+    if (props.modelValue?.id === 'custom') {
+        themes.push(props.modelValue);
+    } else {
+        themes.push({
+            ...(props.modelValue ?? defaultTheme),
+            id: 'custom',
+            name: 'Custom',
+            author: null,
+        });
+    }
+
+    return themes;
+});
+
+const marketplaceThemes = ref<PredefinedTheme[]>([]);
+const themes = computed<PredefinedTheme[]>(() => [...localThemes.value, ...marketplaceThemes.value]);
 const busy = ref<boolean>(true);
 const search = ref<string>('');
 
@@ -37,8 +55,8 @@ onMounted(() => load());
 
 async function load() {
     try {
-        const { data: marketplaceThemes } = await axios.get(cp_url('themes'));
-        themes.value = [defaultTheme, ...marketplaceThemes];
+        const { data } = await axios.get(cp_url('themes'));
+        marketplaceThemes.value = data;
     } catch (error) {
         console.error('Failed to load marketplace themes:', error);
     } finally {
@@ -54,6 +72,12 @@ function isActive(theme: PredefinedTheme): boolean {
 function refresh() {
     busy.value = true;
     axios.get(cp_url('themes/refresh')).then(() => load());
+}
+
+function themeDescription(theme: PredefinedTheme): string {
+    let description = theme.name;
+    if (theme.author) description += ` <span class='opacity-70 text-2xs'>by</span> ${theme.author}`;
+    return description;
 }
 
 defineExpose({
@@ -90,7 +114,7 @@ defineExpose({
             >
                 <Preview :theme="theme" />
                 <div class="text-center pb-1 py-1.5">
-                    <Description :text="`${theme.name} <span class='opacity-70 text-2xs'>by</span> ${theme.author}`" :class="{ 'text-white!': isActive(theme) }" />
+                    <Description :text="themeDescription(theme)" :class="{ 'text-white!': isActive(theme) }" />
                 </div>
             </button>
         </div>
