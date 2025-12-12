@@ -690,7 +690,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             'slug' => $this->slug(),
             'published' => $this->published(),
             'date' => $this->collection()->dated() ? $this->date()->timestamp : null,
-            'data' => $this->data()->except(['updated_by', 'updated_at'])->all(),
+            'data' => $this->data()->except(['updated_by', 'updated_at', ...$this->nonRevisableFields()])->all(),
         ];
     }
 
@@ -706,7 +706,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
         $entry
             ->published($attrs['published'])
-            ->data($attrs['data'])
+            ->data($this->data()->merge($attrs['data']))
             ->slug($attrs['slug']);
 
         if ($this->collection()->dated() && ($date = Arr::get($attrs, 'date'))) {
