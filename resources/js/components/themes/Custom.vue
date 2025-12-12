@@ -78,7 +78,8 @@ function updateColors(colors: ThemeColors, darkColors: ThemeColors) {
     });
 }
 
-const sharable = computed(() => theme.value.id === 'custom');
+const sharable = computed(() => theme.value.id === 'custom'
+    && (Object.keys(props.modelValue.colors).length || Object.keys(props.modelValue.darkColors).length));
 </script>
 
 <template>
