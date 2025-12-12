@@ -73,6 +73,7 @@ const groupClasses = computed(() => {
         compoundVariants: [
             { orientation: 'auto', hasOverflow: false, class: collapseHorizontally },
             { orientation: 'auto', hasOverflow: true, class: collapseVertically },
+            { orientation: 'horizontal', gap: false, class: collapseHorizontally },
             { orientation: 'horizontal', gap: 'auto', hasOverflow: true, class: 'gap-1' },
             { orientation: 'horizontal', gap: 'auto', hasOverflow: false, class: collapseHorizontally },
         ],
