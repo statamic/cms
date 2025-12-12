@@ -1,5 +1,5 @@
 <template>
-    <ButtonGroup ref="buttonGroup">
+    <ButtonGroup orientation="auto" ref="buttonGroup">
         <Button
             v-for="(option, $index) in options"
             ref="button"
@@ -18,7 +18,6 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import HasInputOptions from './HasInputOptions.js';
-import ResizeObserver from 'resize-observer-polyfill';
 import { Button, ButtonGroup } from '@/components/ui';
 
 export default {
@@ -26,20 +25,6 @@ export default {
     components: {
         Button,
         ButtonGroup
-    },
-
-    data() {
-        return {
-            resizeObserver: null,
-        };
-    },
-
-    mounted() {
-        this.setupResizeObserver();
-    },
-
-    beforeUnmount() {
-        this.resizeObserver.disconnect();
     },
 
     computed: {
@@ -58,25 +43,6 @@ export default {
     methods: {
         updateSelectedOption(newValue) {
             this.update(this.value == newValue && this.config.clearable ? null : newValue);
-        },
-
-        setupResizeObserver() {
-            this.resizeObserver = new ResizeObserver(() => {
-                this.handleWrappingOfNode(this.$refs.buttonGroup.$el);
-            });
-            this.resizeObserver.observe(this.$refs.buttonGroup.$el);
-        },
-
-        handleWrappingOfNode(node) {
-            const lastEl = node.lastChild;
-
-            if (!lastEl) return;
-
-            node.classList.remove('btn-vertical');
-
-            if (lastEl.offsetTop > node.clientTop) {
-                node.classList.add('btn-vertical');
-            }
         },
 
         focus() {
