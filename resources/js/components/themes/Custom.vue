@@ -43,8 +43,19 @@ function updateColor(colorName: ColorVariableName, value: string, isDark: boolea
     updateColors(colors, darkColors);
 }
 
+function hasLightColor(colorName: ColorVariableName): boolean {
+    const defaultTheme = getDefaultTheme();
+    return theme.value.colors[colorName] !== defaultTheme.colors[colorName];
+}
+
 function hasDarkColor(colorName: ColorVariableName): boolean {
     return Boolean(props.modelValue?.darkColors?.[colorName]);
+}
+
+function clearLightColor(colorName: ColorVariableName) {
+    const defaultTheme = getDefaultTheme();
+    const colors = { ...theme.value.colors, [colorName]: defaultTheme.colors[colorName] };
+    updateColors(colors, theme.value.darkColors);
 }
 
 function clearDarkColor(colorName: ColorVariableName) {
@@ -85,11 +96,19 @@ const sharable = computed(() => theme.value.id === 'custom');
                             <Description :text="color.label" class="flex-1" />
                         </TableCell>
                         <TableCell>
-                            <ColorPicker
-                                :model-value="theme.colors[color.name]"
-                                @update:model-value="updateColor(color.name, $event, false)"
-                            />
-
+                            <div class="flex items-center w-16">
+                                <ColorPicker
+                                    :model-value="theme.colors[color.name]"
+                                    @update:model-value="updateColor(color.name, $event, false)"
+                                />
+                                <Button
+                                    v-if="hasLightColor(color.name)"
+                                    icon="x"
+                                    variant="ghost"
+                                    size="sm"
+                                    @click="clearLightColor(color.name)"
+                                />
+                            </div>
                         </TableCell>
                         <TableCell>
                             <div class="flex items-center w-16">
