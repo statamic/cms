@@ -4,7 +4,7 @@ import axios from 'axios';
 import Preview from './Preview.vue';
 import type { PredefinedTheme, Theme } from './types';
 import { applyTheme } from './utils';
-import { nativeThemes } from './themes';
+import defaultTheme from './default-theme';
 import { Button, Description, Input } from '@ui';
 import { cp_url } from '@/bootstrap/globals';
 import fuzzysort from 'fuzzysort';
@@ -22,7 +22,7 @@ const selectTheme = (theme: PredefinedTheme) => {
     emit('update:modelValue', theme);
 };
 
-const themes = ref<PredefinedTheme[]>(nativeThemes);
+const themes = ref<PredefinedTheme[]>([defaultTheme]);
 const busy = ref<boolean>(true);
 const search = ref<string>('');
 
@@ -39,7 +39,7 @@ onMounted(() => load());
 async function load() {
     try {
         const { data: marketplaceThemes } = await axios.get(cp_url('themes'));
-        themes.value = [...nativeThemes, ...marketplaceThemes];
+        themes.value = [defaultTheme, ...marketplaceThemes];
     } catch (error) {
         console.error('Failed to load marketplace themes:', error);
     } finally {
