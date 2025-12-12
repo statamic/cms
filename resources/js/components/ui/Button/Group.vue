@@ -1,35 +1,6 @@
 <template>
     <div ref="wrapper">
-        <div
-            ref="group"
-            :class="[
-                'group/button flex flex-wrap relative [[data-floating-toolbar]_&]:justify-center [[data-floating-toolbar]_&]:gap-1 [[data-floating-toolbar]_&]:lg:gap-x-0',
-                'dark:[&_button]:ring-0',
-                'max-lg:[[data-floating-toolbar]_&_button]:rounded-md!',
-                'shadow-ui-sm rounded-lg',
-
-                // Orientation determined: limit width to ensure shadow hugs content
-                '[&[data-orientation]]:inline-flex',
-
-                // Horizontal orientation
-                '[&[data-orientation=horizontal]>[data-ui-group-target]:not(:first-child):not(:last-child)]:rounded-none',
-                '[&[data-orientation=horizontal]>[data-ui-group-target]:first-child:not(:last-child)]:rounded-e-none',
-                '[&[data-orientation=horizontal]>[data-ui-group-target]:last-child:not(:first-child)]:rounded-s-none',
-                '[&[data-orientation=horizontal]>*:not(:first-child):not(:last-child):not(:only-child)_[data-ui-group-target]]:rounded-none',
-                '[&[data-orientation=horizontal]>*:first-child:not(:last-child)_[data-ui-group-target]]:rounded-e-none',
-                '[&[data-orientation=horizontal]>*:last-child:not(:first-child)_[data-ui-group-target]]:rounded-s-none',
-
-                // Vertical orientation
-                '[&[data-orientation=vertical]]:flex-col',
-                '[&[data-orientation=vertical]>[data-ui-group-target]:not(:first-child):not(:last-child)]:rounded-none',
-                '[&[data-orientation=vertical]>[data-ui-group-target]:first-child:not(:last-child)]:rounded-b-none',
-                '[&[data-orientation=vertical]>[data-ui-group-target]:last-child:not(:first-child)]:rounded-t-none',
-                '[&[data-orientation=vertical]>*:not(:first-child):not(:last-child):not(:only-child)_[data-ui-group-target]]:rounded-none',
-                '[&[data-orientation=vertical]>*:first-child:not(:last-child)_[data-ui-group-target]]:rounded-b-none',
-                '[&[data-orientation=vertical]>*:last-child:not(:first-child)_[data-ui-group-target]]:rounded-t-none',
-            ]"
-            data-ui-button-group
-        >
+        <div ref="group" :class="groupClasses" data-ui-button-group>
             <slot />
         </div>
     </div>
@@ -37,6 +8,7 @@
 
 <script setup>
 import { ref, nextTick, onMounted, onBeforeUnmount } from 'vue';
+import { cva } from 'cva'
 
 import debounce from '@/util/debounce';
 
@@ -45,61 +17,76 @@ const props = defineProps({
         type: String,
         default: 'horizontal',
     },
+    gap: {
+        type: [String, Boolean],
+        default: false,
+    },
+    justify: {
+        type: String,
+        default: 'start',
+    },
 });
+
+const hasOverflow = ref(false);
+
+const groupClasses = computed(() => cva({
+    base: [
+        'group/button flex flex-wrap relative',
+        'dark:[&_button]:ring-0',
+    ],
+    variants: {
+        orientation: {
+            vertical: 'flex-col',
+        },
+        justify: {
+            center: 'justify-center',
+        },
+        gap: {
+            false: 'rounded-lg shadow-ui-sm [&_[data-ui-group-target]]:shadow-none',
+            true: 'gap-1',
+        },
+    },
+    compoundVariants: [
+        { orientation: 'auto', hasOverflow: true, class: 'flex-col' },
+        { gap: 'auto', hasOverflow: false, class: 'rounded-lg shadow-ui-sm [&_[data-ui-group-target]]:shadow-none' },
+        { gap: 'auto', hasOverflow: true, class: [
+            '[>[data-ui-group-target]:not(:first-child):not(:last-child)]:rounded-none',
+            '[>:not(:first-child):not(:last-child)_[data-ui-group-target]]:rounded-none',
+        ] },
+    ],
+})({
+    gap: props.gap,
+    justify: props.justify,
+    orientation: props.orientation,
+    hasOverflow: hasOverflow.value,
+}))
 
 const wrapper = ref(null);
 const group = ref(null);
 let resizeObserver = null;
 
-function observeOrientation() {
-    resizeObserver = new ResizeObserver(() => checkOrientationDebounced());
-    resizeObserver.observe(wrapper.value);
-}
+function checkOverflow() {
+    // Allow natural layout (grow + wrap)
+    // ???
 
-function unobserveOrientation() {
-    resizeObserver?.disconnect();
-}
-
-function checkOrientation() {
-    // 1) Remove orientation to allow natural layout (grow + wrap)
-    setOrientation(null);
-
-    // 2) Force reflow and measure
+    // Force reflow and measure
     const child = group.value.lastElementChild;
-    const vertical = child && child.offsetTop > group.value.clientTop;
-
-    // 3) Apply the final orientation
-    setOrientation(vertical ? 'vertical' : 'horizontal');
-}
-
-const checkOrientationDebounced = debounce(checkOrientation, 50);
-
-function setOrientation(value) {
-    if (value) {
-        group.value.dataset.orientation = value;
-    } else {
-        delete group.value.dataset.orientation;
-    }
+    hasOverflow.value = child && child.offsetTop > group.value.clientTop;
 }
 
 onMounted(() => {
-    if (props.orientation === 'auto') {
-        observeOrientation();
-    } else {
-        setOrientation(props.orientation);
+    if (props.orientation === 'auto' || props.gap === 'auto') {
+        resizeObserver = new ResizeObserver(debounce(checkOverflow, 100));
+        resizeObserver.observe(wrapper.value);
     }
 });
 
 onBeforeUnmount(() => {
-    unobserveOrientation();
+    resizeObserver?.disconnect();
 });
 </script>
 
 <style>
-    [data-ui-button-group] [data-ui-group-target] {
-        @apply shadow-none;
-    }
-
     [data-ui-button-group][data-orientation='horizontal'] [data-ui-group-target]:not(:first-child) {
         border-inline-start: 0;
     }
