@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Http;
+use Statamic\Licensing\Outpost;
 
 class ReportThemeUsage implements ShouldQueue
 {
@@ -16,8 +17,12 @@ class ReportThemeUsage implements ShouldQueue
     {
     }
 
-    public function handle(): void
+    public function handle(Outpost $outpost): void
     {
+        if ($outpost->usingLicenseKeyFile()) {
+            return;
+        }
+
         $oldThemeId = $this->themeId($this->oldTheme);
         $newThemeId = $this->themeId($this->newTheme);
 
