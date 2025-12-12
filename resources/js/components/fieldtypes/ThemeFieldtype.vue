@@ -20,10 +20,10 @@ const tab = ref<Tab>((() => {
     return theme.id === 'custom' ? 'custom' : 'themes';
 })());
 
-function selected(theme: Theme) {
+function selected(theme: Theme | null) {
     selectedTheme.value = theme;
 
-    if (theme.id === 'default') {
+    if (! theme) {
         update(null);
         return;
     }

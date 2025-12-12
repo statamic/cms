@@ -4,7 +4,7 @@ import { ref, watch } from 'vue';
 import Themes from './Themes.vue';
 import Custom from './Custom.vue';
 import { Theme } from './types';
-import { applyTheme, applyDefaultTheme } from '.';
+import { applyTheme, applyDefaultTheme, removeDefaults, toSelectionValue } from '.';
 import { translate as __ } from '@/translations/translator';
 
 export type Tab = 'themes' | 'custom';
@@ -32,8 +32,8 @@ watch(activeTab, (newTab) => {
     }
 });
 
-function themeSelected(theme: Theme) {
-    emit('update:modelValue', theme);
+function themeSelected(theme: Theme | null) {
+    emit('update:modelValue', toSelectionValue(theme));
 
     if (theme.id === 'custom') activeTab.value = 'custom';
 }
@@ -41,7 +41,7 @@ function themeSelected(theme: Theme) {
 const customWasShared = ref(false);
 
 function customUpdated(theme: Theme) {
-    emit('update:modelValue', theme);
+    emit('update:modelValue', toSelectionValue(theme));
 }
 
 watch(

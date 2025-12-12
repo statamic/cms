@@ -5,10 +5,6 @@ export const defaultTheme = {
     id: 'default',
     name: 'Default',
     author: 'Statamic',
-    colors: {
-        'primary': 'oklch(0.457 0.24 277.023)',
-        'ui-accent-bg': 'oklch(0.457 0.24 277.023)',
-    }
 } as Theme;
 
 export function getDefaultTheme(): CompleteTheme {
@@ -43,6 +39,16 @@ export function valueToTheme(value: ThemeValue | null): Theme | null {
         colors,
         darkColors,
     };
+}
+
+export function toSelectionValue(theme: Theme): Theme | null {
+    const cleanedTheme = removeDefaults(theme);
+
+    if (Object.keys(cleanedTheme.colors).length === 0 && Object.keys(cleanedTheme.darkColors).length === 0) {
+        return null;
+    }
+
+    return cleanedTheme;
 }
 
 export function applyTheme(theme: Theme): void {
@@ -81,6 +87,30 @@ export function getCssVariables(colors: ThemeColors, darkColors: ThemeColors): {
         .join('\n');
 
     return { light, dark };
+}
+
+export function removeDefaults(theme: Theme): Theme {
+    const defaultTheme = getDefaultTheme();
+    const colors: ThemeColors = {};
+    const darkColors: ThemeColors = {};
+
+    for (const [colorName, colorValue] of Object.entries(theme.colors || {})) {
+        if (colorValue !== defaultTheme.colors[colorName]) {
+            colors[colorName] = colorValue;
+        }
+    }
+
+    for (const [colorName, colorValue] of Object.entries(theme.darkColors || {})) {
+        if (colorValue !== defaultTheme.darkColors[colorName]) {
+            darkColors[colorName] = colorValue;
+        }
+    }
+
+    return {
+        ...theme,
+        colors,
+        darkColors,
+    };
 }
 
 export const colors = [
