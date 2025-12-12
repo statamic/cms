@@ -59,7 +59,7 @@ const groupClasses = computed(() => {
 
     return cva({
         base: [
-            'group/button flex flex-wrap relative',
+            'group/button inline-flex flex-wrap relative',
             'dark:[&_button]:ring-0',
         ],
         variants: {
@@ -122,7 +122,6 @@ onBeforeUnmount(() => {
 <style>
     /* Force horizontal wrap layout during measurement to detect overflow */
     [data-ui-button-group][data-measuring] {
-        flex-direction: row !important;
-        flex-wrap: wrap !important;
+        @apply flex! flex-row!;
     }
 </style>
