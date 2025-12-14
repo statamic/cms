@@ -83,9 +83,7 @@ class Values implements Arrayable, ArrayAccess, IteratorAggregate, JsonSerializa
     {
         return
             $this->getIterator()
-                ->mapWithKeys(function ($value, $key) {
-                    return [$key => $value instanceof Value ? $value->raw() : $value];
-                })
+                ->mapWithKeys(fn ($value, $key) => [$key => $value instanceof Value ? $value->raw() : $value])
                 ->toArray();
     }
 
