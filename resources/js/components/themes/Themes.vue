@@ -53,15 +53,11 @@ const results = computed(() => {
 
 onMounted(() => load());
 
-async function load() {
-    try {
-        const { data } = await axios.get(cp_url('themes'));
-        marketplaceThemes.value = data;
-    } catch (error) {
-        console.error('Failed to load marketplace themes:', error);
-    } finally {
-        busy.value = false;
-    }
+function load() {
+    return axios.get(cp_url('themes'))
+        .then(({ data }) => marketplaceThemes.value = data)
+        .catch(error => console.error('Failed to load marketplace themes:', error))
+        .finally(() => busy.value = false);
 }
 
 function isActive(theme: Theme): boolean {
@@ -71,7 +67,7 @@ function isActive(theme: Theme): boolean {
 
 function refresh() {
     busy.value = true;
-    axios.get(cp_url('themes/refresh')).then(() => load());
+    return axios.get(cp_url('themes/refresh')).then(() => load());
 }
 
 function themeDescription(theme: Theme): string {
@@ -81,7 +77,8 @@ function themeDescription(theme: Theme): string {
 }
 
 defineExpose({
-    refresh
+    refresh,
+    marketplaceThemes
 })
 </script>
 

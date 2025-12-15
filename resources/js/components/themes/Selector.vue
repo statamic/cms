@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { Tabs, TabList, TabTrigger, TabContent } from '@ui';
+import { TabContent, TabList, Tabs, TabTrigger } from '@ui';
 import { ref, watch } from 'vue';
 import Themes from './Themes.vue';
 import Custom from './Custom.vue';
 import { Theme } from './types';
-import { applyTheme, applyDefaultTheme, removeDefaults, toSelectionValue } from '.';
+import { applyDefaultTheme, applyTheme, removeDefaults, toSelectionValue } from '.';
 import { translate as __ } from '@/translations/translator';
 
 export type Tab = 'themes' | 'custom';
@@ -28,7 +28,7 @@ watch(activeTab, (newTab) => {
     emit('update:tab', newTab);
 
     if (newTab === 'themes' && customWasShared.value) {
-        themes.value?.refresh();
+        themes.value?.refresh().then(() => selectNewlyPublishedTheme());
         customWasShared.value = false;
     }
 });
@@ -54,6 +54,34 @@ watch(
     (newValue) => newValue ? applyTheme(newValue) : applyDefaultTheme(),
     { immediate: true }
 )
+
+function selectNewlyPublishedTheme() {
+    if (!props.modelValue || props.modelValue.id !== 'custom') return;
+    if (!themes.value?.marketplaceThemes) return;
+
+    const currentColors = props.modelValue.colors || {};
+    const currentDarkColors = props.modelValue.darkColors || {};
+    const recentThemes = themes.value.marketplaceThemes.slice(-5).reverse();
+
+    for (let theme of recentThemes) {
+        theme = removeDefaults(theme);
+        const colorsMatch = objectsMatch(currentColors, theme.colors || {});
+        const darkColorsMatch = objectsMatch(currentDarkColors, theme.darkColors || {});
+        if (colorsMatch && darkColorsMatch) {
+            themeSelected(theme);
+            return;
+        }
+    }
+}
+
+function objectsMatch(a: object, b: object): boolean {
+    const keysA = Object.keys(a);
+    const keysB = Object.keys(b);
+
+    if (keysA.length !== keysB.length) return false;
+
+    return keysA.every(key => a[key] === b[key]);
+}
 </script>
 
 <template>
