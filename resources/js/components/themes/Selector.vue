@@ -20,6 +20,7 @@ const emit = defineEmits<{
 }>();
 
 const themes = ref<InstanceType<typeof Themes>>();
+const origin = ref<Theme | null>(null);
 
 const activeTab = ref<Tab>(props.tab);
 
@@ -35,7 +36,11 @@ watch(activeTab, (newTab) => {
 function themeSelected(theme: Theme | null) {
     emit('update:modelValue', toSelectionValue(theme));
 
-    if (theme.id === 'custom') activeTab.value = 'custom';
+    if (theme.id === 'custom') {
+        activeTab.value = 'custom';
+    } else {
+        origin.value = theme;
+    }
 }
 
 const customWasShared = ref(false);
@@ -69,6 +74,7 @@ watch(
         <TabContent name="custom">
             <div class="py-4">
                 <Custom
+                    :origin="origin"
                     :model-value="modelValue"
                     @update:model-value="customUpdated"
                     @shared="customWasShared = true"

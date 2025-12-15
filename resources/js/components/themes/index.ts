@@ -113,6 +113,34 @@ export function removeDefaults(theme: Theme): Theme {
     };
 }
 
+export function addDefaults(theme: Theme): CompleteTheme {
+    const defaultTheme = getDefaultTheme();
+
+    return {
+        ...theme,
+        colors: { ...defaultTheme.colors, ...theme.colors },
+        darkColors: { ...defaultTheme.darkColors, ...theme.darkColors },
+    };
+}
+
+export function themesDeviate(themeA: Theme, themeB: Theme): boolean {
+    themeA = addDefaults(themeA);
+    themeB = addDefaults(themeB);
+
+    return objectsDiffer(themeA.colors ?? {}, themeB.colors ?? {})
+        || objectsDiffer(themeA.darkColors ?? {}, themeB.darkColors ?? {});
+}
+
+function objectsDiffer(a: object, b: object): boolean {
+    const allKeys = new Set([...Object.keys(a), ...Object.keys(b)]);
+    for (const key of allKeys) {
+        if (a[key] !== b[key]) {
+            return true;
+        }
+    }
+    return false;
+}
+
 export const colors = [
     { name: 'primary', label: 'Primary', },
     { name: 'global-header-bg', label: 'Global Header Background', },

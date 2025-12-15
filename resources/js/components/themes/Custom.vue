@@ -3,13 +3,14 @@ import { Button, Description, Input, Table, TableCell, TableColumn, TableColumns
 import { computed } from 'vue';
 import { ColorVariableName, Theme, CompleteTheme, ThemeColors } from './types';
 import Preview from './Preview.vue';
-import { getDefaultTheme, colors } from '.';
+import { getDefaultTheme, colors, removeDefaults, addDefaults, themesDeviate } from '.';
 import { translate as __ } from '@/translations/translator';
 import ColorPicker from '@/components/themes/color-picker/ColorPicker.vue';
 import Share from '@/components/themes/Share.vue';
 
 const props = defineProps<{
     modelValue?: Theme;
+    origin?: Theme;
 }>();
 
 const emit = defineEmits<{
@@ -22,12 +23,12 @@ const theme = computed<CompleteTheme>(() => {
 
     if (!props.modelValue) return defaultTheme;
 
-    return {
+    return addDefaults({
         id: props.modelValue.id,
         name: props.modelValue.name,
-        colors: { ...defaultTheme.colors, ...props.modelValue.colors },
-        darkColors: { ...defaultTheme.darkColors, ...props.modelValue.darkColors }
-    };
+        colors: props.modelValue.colors,
+        darkColors: props.modelValue.darkColors,
+    });
 });
 
 function updateColor(colorName: ColorVariableName, value: string, isDark: boolean = false) {
@@ -70,16 +71,18 @@ function addDarkColor(colorName: ColorVariableName) {
 }
 
 function updateColors(colors: ThemeColors, darkColors: ThemeColors) {
-    emit('update:modelValue', {
+    emit('update:modelValue', removeDefaults({
         id: 'custom',
         name: 'Custom',
         colors,
         darkColors
-    });
+    }));
 }
 
 const sharable = computed(() => theme.value.id === 'custom'
-    && (Object.keys(props.modelValue.colors).length || Object.keys(props.modelValue.darkColors).length));
+    && themesDeviate(theme.value, props.origin ?? getDefaultTheme())
+);
+
 </script>
 
 <template>
