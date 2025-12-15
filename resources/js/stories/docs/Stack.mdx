@@ -1,0 +1,23 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as StackStories from '../Stack.stories';
+
+<Meta of={StackStories} />
+
+# Stack
+Stacks are a good way of adding a layer of UX to the Control Panel. Ideal for short forms or editing related content.
+<Canvas of={StackStories._DocsIntro} sourceState={'shown'} />
+
+## Title
+Titles are required for accessibility, but you don't have to use the `title` prop if you want to style it differently. You have full control of the style and content by using the `StackTitle` component.
+<Canvas of={StackStories._CustomTitle} sourceState={'shown'} />
+
+## Close Button
+You can use the `StackClose` component to close the stack.
+<Canvas of={StackStories._CloseButton} sourceState={'shown'} />
+
+## Icon
+You can add an icon to the title by passing the `icon` prop.
+<Canvas of={StackStories._WithIcon} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={StackStories} />
