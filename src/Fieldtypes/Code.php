@@ -17,9 +17,9 @@ class Code extends Fieldtype
             [
                 'display' => __('Appearance'),
                 'fields' => [
-                    'theme' => [
+                    'color_mode' => [
                         'display' => __('Theme'),
-                        'instructions' => __('statamic::fieldtypes.code.config.theme'),
+                        'instructions' => __('statamic::fieldtypes.code.config.color_mode'),
                         'type' => 'select',
                         'default' => 'material',
                         'options' => [
