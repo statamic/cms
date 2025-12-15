@@ -74,8 +74,8 @@ const direction = computed(() => config.get('direction', 'ltr'));
 
 const clickedHitArea = () => {
 	if (!visible.value) return;
+	if (!runCloseCallback()) return;
 
-	events.$emit(`stacks.hit-area-clicked`, depth.value - 1);
 	events.$emit(`stacks.${depth.value - 1}.hit-area-mouseout`);
 };
 

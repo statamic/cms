@@ -20,27 +20,5 @@ export default {
             return stacks.length === 1 && stacks[0]?.data?.vm?.narrow === true;
         },
     },
-
-    watch: {
-        hasStacks(hasStacks) {
-            hasStacks ? this.initStacks() : this.destroyStacks();
-        },
-    },
-
-    methods: {
-        initStacks() {
-            this.$events.$on('stacks.hit-area-clicked', (depth) => {
-                for (let count = this.$stacks.count(); count > depth; count--) {
-                    if (!this.$stacks.stacks()[count - 1].data.vm?.$.exposed.runCloseCallback()) {
-                        return;
-                    }
-                }
-            });
-        },
-
-        destroyStacks() {
-            this.$events.$off('stacks.hit-area-clicked');
-        },
-    },
 };
 </script>
