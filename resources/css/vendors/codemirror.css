@@ -118,6 +118,18 @@
 
 /* DEFAULT THEME */
 
+.cm-s-default {
+    /* Explicitly set some colors rather than inherit from the body, because we could have a dark cp > light code field, which would result in pale text on a white background, etc. */
+    &.CodeMirror pre.CodeMirror-line,
+    &.CodeMirror pre.CodeMirror-line-like {
+        @apply text-gray-900;
+    }
+
+    .CodeMirror-gutters {
+        @apply border-r-gray-300;
+    }
+}
+
 .cm-s-default .cm-header {
     color: blue;
 }
