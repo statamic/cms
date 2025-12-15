@@ -10,7 +10,7 @@ import {
 	onBeforeUnmount,
 	provide
 } from 'vue';
-import { stacks, events, keys, config } from '@/api';
+import { stacks, portals, events, keys, config } from '@/api';
 import wait from '@/util/wait.js';
 import {hasComponent} from "@/composables/has-component.js";
 import { Button, Heading } from "@ui";
@@ -116,6 +116,12 @@ function close() {
 	events.$off(`stacks.${depth.value}.hit-area-mouseout`);
 
 	window.removeEventListener('resize', windowResized);
+
+	stack.value?.destroy();
+	stack.value = null;
+
+	escBinding.value?.destroy();
+	escBinding.value = null;
 
 	wait(300).then(() => {
 		mounted.value = false;
