@@ -155,6 +155,19 @@ watch(
     { immediate: true },
 );
 
+watch(
+    () => props.theme,
+    () => {
+        if (codemirror.value) {
+            codemirror.value.setOption('theme', exactTheme.value);
+            // Update ruler colors when theme changes
+            if (props.rulers) {
+                codemirror.value.setOption('rulers', rulers.value);
+            }
+        }
+    },
+);
+
 const modeLabel = computed(() => {
     return modes.value.find((m) => m.value === props.mode)?.label || props.mode;
 });
