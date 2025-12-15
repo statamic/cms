@@ -41,7 +41,7 @@ const instance = getCurrentInstance();
 // const hasModalTitleComponent = hasComponent('ModalTitle');
 const isUsingOpenProp = computed(() => instance?.vnode.props?.hasOwnProperty('open'));
 const portal = computed(() => stack.value ? `#portal-target-${stack.value.id}` : null);
-const depth = computed(() => stack.value.data.depth);
+const depth = computed(() => stack.value?.data.depth);
 const isTopStack = computed(() => stacks.count() === depth.value);
 
 const offset = computed(() => {
