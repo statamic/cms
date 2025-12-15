@@ -1,3 +1,138 @@
+<script setup>
+import {ref, computed, onMounted, onUnmounted, nextTick, getCurrentInstance} from 'vue';
+import { stacks, events, keys, config } from '@/api';
+import wait from '@/util/wait.js';
+
+const emit = defineEmits(['closed', 'opened']);
+
+const props = defineProps({
+	// todo: add open state
+
+	// todo: don't require a name?
+	name: { type: String, required: true },
+
+	// todo: should this exist on the Modal too?
+	beforeClose: { type: Function, default: () => true },
+
+	// todo: should these not be variants?
+	narrow: { type: Boolean },
+	half: { type: Boolean },
+	full: { type: Boolean },
+});
+
+const stack = ref(null);
+const mounted = ref(false);
+const visible = ref(false);
+const isHovering = ref(false);
+const escBinding = ref(null);
+const windowInnerWidth = ref(window.innerWidth);
+
+const instance = getCurrentInstance();
+const portal = computed(() => stack.value ? `#portal-target-${stack.value.id}` : null);
+const depth = computed(() => stack.value.data.depth);
+const isTopStack = computed(() => stacks.count() === depth.value);
+
+const offset = computed(() => {
+	if (isTopStack.value && props.narrow) {
+		return windowInnerWidth.value - 450;
+	} else if (isTopStack.value && props.half) {
+		return windowInnerWidth.value / 2;
+	}
+
+	// max of 200px, min of 80px
+	return Math.max(450 / (stacks.count() + 1), 80);
+});
+
+const leftOffset = computed(() => {
+	if (props.full) {
+		return 0;
+	}
+
+	if (isTopStack.value && (props.narrow || props.half)) {
+		return offset.value;
+	}
+
+	return offset.value * depth.value;
+});
+
+const hasChild = computed(() => stacks.count() > depth.value);
+const direction = computed(() => config.get('direction', 'ltr'));
+
+const clickedHitArea = () => {
+	if (!visible.value) {
+		return;
+	}
+	events.$emit(`stacks.hit-area-clicked`, depth.value - 1);
+	events.$emit(`stacks.${depth.value - 1}.hit-area-mouseout`);
+};
+
+const mouseEnterHitArea = () => {
+	if (!visible.value) {
+		return;
+	}
+	events.$emit(`stacks.${depth.value - 1}.hit-area-mouseenter`);
+};
+
+const mouseOutHitArea = () => {
+	if (!visible.value) {
+		return;
+	}
+	events.$emit(`stacks.${depth.value - 1}.hit-area-mouseout`);
+};
+
+const runCloseCallback = () => {
+	const shouldClose = props.beforeClose();
+
+	if (!shouldClose) return false;
+
+	close();
+
+	return true;
+};
+
+const close = () => {
+	visible.value = false;
+	wait(300).then(() => {
+		mounted.value = false;
+		emit('closed');
+	});
+};
+
+const handleResize = () => {
+	windowInnerWidth.value = window.innerWidth;
+};
+
+onMounted(() => {
+	stack.value = stacks.add(instance.proxy);
+
+	events.$on(`stacks.${depth.value}.hit-area-mouseenter`, () => (isHovering.value = true));
+	events.$on(`stacks.${depth.value}.hit-area-mouseout`, () => (isHovering.value = false));
+	escBinding.value = keys.bindGlobal('esc', close);
+
+	window.addEventListener('resize', handleResize);
+
+	mounted.value = true;
+	nextTick(() => {
+		visible.value = true;
+		emit('opened');
+	});
+});
+
+onUnmounted(() => {
+	stack.value.destroy();
+	events.$off(`stacks.${depth.value}.hit-area-mouseenter`);
+	events.$off(`stacks.${depth.value}.hit-area-mouseout`);
+	escBinding.value.destroy();
+
+	window.removeEventListener('resize', handleResize);
+});
+
+defineExpose({
+	close,
+	runCloseCallback,
+});
+</script>
+
 <template>
     <teleport :to="portal" :order="depth" v-if="mounted">
         <div class="vue-portal-target stack">
@@ -38,162 +173,3 @@
         </div>
     </teleport>
 </template>
-
-<script>
-export default {
-    emits: ['closed', 'opened'],
-
-    props: {
-        name: {
-            type: String,
-            required: true,
-        },
-        beforeClose: {
-            type: Function,
-            default: () => true,
-        },
-        narrow: {
-            type: Boolean,
-        },
-        half: {
-            type: Boolean,
-        },
-        full: {
-            type: Boolean,
-        },
-    },
-
-    data() {
-        return {
-            stack: null,
-            mounted: false,
-            visible: false,
-            isHovering: false,
-            escBinding: null,
-            windowInnerWidth: window.innerWidth,
-        };
-    },
-
-    computed: {
-        portal() {
-            return this.stack ? `#portal-target-${this.stack.id}` : null;
-        },
-
-        depth() {
-            return this.stack.data.depth;
-        },
-
-        id() {
-            return `${this.name}-${this.$.uid}`;
-        },
-
-        offset() {
-            if (this.isTopStack && this.narrow) {
-                return this.windowInnerWidth - 450;
-            } else if (this.isTopStack && this.half) {
-                return this.windowInnerWidth / 2;
-            }
-
-            // max of 200px, min of 80px
-            return Math.max(450 / (this.$stacks.count() + 1), 80);
-        },
-
-        leftOffset() {
-            if (this.full) {
-                return 0;
-            }
-
-            if (this.isTopStack && (this.narrow || this.half)) {
-                return this.offset;
-            }
-
-            return this.offset * this.depth;
-        },
-
-        hasChild() {
-            return this.$stacks.count() > this.depth;
-        },
-
-        isTopStack() {
-            return this.$stacks.count() === this.depth;
-        },
-
-        direction() {
-            return this.$config.get('direction', 'ltr');
-        },
-    },
-
-    created() {
-        this.stack = this.$stacks.add(this);
-
-        this.$events.$on(`stacks.${this.depth}.hit-area-mouseenter`, () => (this.isHovering = true));
-        this.$events.$on(`stacks.${this.depth}.hit-area-mouseout`, () => (this.isHovering = false));
-        this.escBinding = this.$keys.bindGlobal('esc', this.close);
-
-        window.addEventListener('resize', this.handleResize);
-    },
-
-    unmounted() {
-        this.stack.destroy();
-        this.$events.$off(`stacks.${this.depth}.hit-area-mouseenter`);
-        this.$events.$off(`stacks.${this.depth}.hit-area-mouseout`);
-        this.escBinding.destroy();
-
-        window.removeEventListener('resize', this.handleResize);
-    },
-
-    methods: {
-        clickedHitArea() {
-            if (!this.visible) {
-                return;
-            }
-            this.$events.$emit(`stacks.hit-area-clicked`, this.depth - 1);
-            this.$events.$emit(`stacks.${this.depth - 1}.hit-area-mouseout`);
-        },
-
-        mouseEnterHitArea() {
-            if (!this.visible) {
-                return;
-            }
-            this.$events.$emit(`stacks.${this.depth - 1}.hit-area-mouseenter`);
-        },
-
-        mouseOutHitArea() {
-            if (!this.visible) {
-                return;
-            }
-            this.$events.$emit(`stacks.${this.depth - 1}.hit-area-mouseout`);
-        },
-
-        runCloseCallback() {
-            const shouldClose = this.beforeClose();
-
-            if (!shouldClose) return false;
-
-            this.close();
-
-            return true;
-        },
-
-        close() {
-            this.visible = false;
-            this.$wait(300).then(() => {
-                this.mounted = false;
-                this.$emit('closed');
-            });
-        },
-
-        handleResize() {
-            this.windowInnerWidth = window.innerWidth;
-        },
-    },
-
-    mounted() {
-        this.mounted = true;
-        this.$nextTick(() => {
-            this.visible = true;
-            this.$emit('opened');
-        });
-    },
-};
-</script>
