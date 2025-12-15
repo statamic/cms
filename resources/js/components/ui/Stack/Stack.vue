@@ -1,17 +1,31 @@
 <script setup>
-import {ref, computed, onMounted, onUnmounted, nextTick, getCurrentInstance} from 'vue';
+import {
+	ref,
+	computed,
+	onMounted,
+	onUnmounted,
+	nextTick,
+	getCurrentInstance,
+	useSlots,
+	watch,
+	onBeforeUnmount, provide
+} from 'vue';
 import { stacks, events, keys, config } from '@/api';
 import wait from '@/util/wait.js';
+import {hasComponent} from "@/composables/has-component.js";
 
-const emit = defineEmits(['closed', 'opened']);
+// todo: use CVA for this component instead of CSS classes
+
+const slots = useSlots();
+const emit = defineEmits(['update:open']);
 
 const props = defineProps({
-	// todo: add open state
+	// title: { type: String, default: '' },
+	// icon: { type: [String, null], default: null },
 
-	// todo: don't require a name?
-	name: { type: String, required: true },
+	open: { type: Boolean, default: false },
 
-	// todo: should this exist on the Modal too?
+	// todo: refactor where we use this
 	beforeClose: { type: Function, default: () => true },
 
 	// todo: should these not be variants?
@@ -28,6 +42,8 @@ const escBinding = ref(null);
 const windowInnerWidth = ref(window.innerWidth);
 
 const instance = getCurrentInstance();
+// const hasModalTitleComponent = hasComponent('ModalTitle');
+const isUsingOpenProp = computed(() => instance?.vnode.props?.hasOwnProperty('open'));
 const portal = computed(() => stack.value ? `#portal-target-${stack.value.id}` : null);
 const depth = computed(() => stack.value.data.depth);
 const isTopStack = computed(() => stacks.count() === depth.value);
@@ -59,26 +75,25 @@ const hasChild = computed(() => stacks.count() > depth.value);
 const direction = computed(() => config.get('direction', 'ltr'));
 
 const clickedHitArea = () => {
-	if (!visible.value) {
-		return;
-	}
+	if (!visible.value) return;
+
 	events.$emit(`stacks.hit-area-clicked`, depth.value - 1);
 	events.$emit(`stacks.${depth.value - 1}.hit-area-mouseout`);
 };
 
 const mouseEnterHitArea = () => {
-	if (!visible.value) {
-		return;
-	}
+	if (!visible.value) return;
+
 	events.$emit(`stacks.${depth.value - 1}.hit-area-mouseenter`);
 };
 
 const mouseOutHitArea = () => {
-	if (!visible.value) {
-		return;
-	}
+	if (!visible.value) return;
+
 	events.$emit(`stacks.${depth.value - 1}.hit-area-mouseout`);
 };
+
+const windowResized = () => windowInnerWidth.value = window.innerWidth;
 
 const runCloseCallback = () => {
 	const shouldClose = props.beforeClose();
@@ -90,50 +105,75 @@ const runCloseCallback = () => {
 	return true;
 };
 
-const close = () => {
-	visible.value = false;
-	wait(300).then(() => {
-		mounted.value = false;
-		emit('closed');
-	});
-};
-
-const handleResize = () => {
-	windowInnerWidth.value = window.innerWidth;
-};
-
-onMounted(() => {
-	stack.value = stacks.add(instance.proxy);
+function open() {
+	if (!stack.value) stack.value = stacks.add(instance.proxy);
 
 	events.$on(`stacks.${depth.value}.hit-area-mouseenter`, () => (isHovering.value = true));
 	events.$on(`stacks.${depth.value}.hit-area-mouseout`, () => (isHovering.value = false));
+
 	escBinding.value = keys.bindGlobal('esc', close);
 
-	window.addEventListener('resize', handleResize);
+	window.addEventListener('resize', windowResized);
 
-	mounted.value = true;
 	nextTick(() => {
-		visible.value = true;
-		emit('opened');
+		mounted.value = true;
+		nextTick(() => visible.value = true);
+		updateOpen(true);
 	});
-});
+}
 
-onUnmounted(() => {
-	stack.value.destroy();
+function close() {
+	visible.value = false;
+
 	events.$off(`stacks.${depth.value}.hit-area-mouseenter`);
 	events.$off(`stacks.${depth.value}.hit-area-mouseout`);
-	escBinding.value.destroy();
 
-	window.removeEventListener('resize', handleResize);
+	window.removeEventListener('resize', windowResized);
+
+	wait(300).then(() => {
+		mounted.value = false;
+		updateOpen(false);
+	});
+}
+
+function updateOpen(value) {
+	if (isUsingOpenProp.value) {
+		emit('update:open', value);
+	}
+}
+
+watch(
+	() => props.open,
+	(value) => value ? open() : close(),
+);
+
+onMounted(() => {
+	if (props.open) open();
+});
+
+onBeforeUnmount(() => {
+	events.$off(`stacks.${depth.value}.hit-area-mouseenter`);
+	events.$off(`stacks.${depth.value}.hit-area-mouseout`);
+
+	window.removeEventListener('resize', windowResized);
+
+	stack.value?.destroy();
+	escBinding.value?.destroy();
 });
 
 defineExpose({
+	open,
 	close,
 	runCloseCallback,
 });
+
+provide('closeStack', close);
 </script>
 
 <template>
+	<div v-if="slots.trigger" @click="open">
+		<slot name="trigger" />
+	</div>
     <teleport :to="portal" :order="depth" v-if="mounted">
         <div class="vue-portal-target stack">
             <div

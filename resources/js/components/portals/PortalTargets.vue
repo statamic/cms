@@ -31,7 +31,7 @@ export default {
         initStacks() {
             this.$events.$on('stacks.hit-area-clicked', (depth) => {
                 for (let count = this.$stacks.count(); count > depth; count--) {
-                    if (!this.$stacks.stacks()[count - 1].data.vm.runCloseCallback()) {
+                    if (!this.$stacks.stacks()[count - 1].data.vm?.$.exposed.runCloseCallback()) {
                         return;
                     }
                 }
