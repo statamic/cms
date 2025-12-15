@@ -15,7 +15,7 @@ import wait from '@/util/wait.js';
 import {hasComponent} from "@/composables/has-component.js";
 
 const slots = useSlots();
-const emit = defineEmits(['update:open']);
+const emit = defineEmits(['update:open', 'opened']);
 
 const props = defineProps({
 	// title: { type: String, default: '' },
@@ -103,8 +103,12 @@ function open() {
 
 	nextTick(() => {
 		mounted.value = true;
-		nextTick(() => visible.value = true);
 		updateOpen(true);
+
+		nextTick(() => {
+			visible.value = true;
+			emit('opened');
+		});
 	});
 }
 

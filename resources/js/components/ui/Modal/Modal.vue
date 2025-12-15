@@ -13,7 +13,7 @@ defineOptions({
 
 const attrs = useAttrs();
 const slots = useSlots();
-const emit = defineEmits(['update:open', 'dismissed']);
+const emit = defineEmits(['update:open', 'opened', 'dismissed']);
 
 const props = defineProps({
     blur: { type: Boolean, default: true },
@@ -60,8 +60,12 @@ function open() {
 
     nextTick(() => {
         mounted.value = true;
-        nextTick(() => visible.value = true);
 	    updateOpen(true);
+
+	    nextTick(() => {
+		    visible.value = true;
+			emit('opened');
+	    });
     });
 }
 
