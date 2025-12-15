@@ -144,7 +144,7 @@
                     />
                 </Stack>
 
-                <Stack narrow v-model:open="showCheatsheet">
+                <Stack size="narrow" v-model:open="showCheatsheet">
                     <div class="relative h-full overflow-auto bg-white p-6 dark:bg-gray-800 rounded-l-2xl">
 	                    <StackClose>
 	                        <Button

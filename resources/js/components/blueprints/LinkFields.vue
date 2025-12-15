@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Stack narrow v-model:open="open">
+        <Stack size="narrow" v-model:open="open">
 	        <template #trigger>
 		        <Button icon="link" :text="__('Link Existing')" />
 	        </template>

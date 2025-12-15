@@ -23,11 +23,7 @@ const props = defineProps({
 
 	open: { type: Boolean, default: false },
 	beforeClose: { type: Function, default: () => true },
-
-	// todo: should these not be variants?
-	narrow: { type: Boolean },
-	half: { type: Boolean },
-	full: { type: Boolean },
+	size: { type: String, default: 'full' },
 });
 
 const stack = ref(null);
@@ -45,9 +41,9 @@ const depth = computed(() => stack.value?.data.depth);
 const isTopStack = computed(() => stacks.count() === depth.value);
 
 const offset = computed(() => {
-	if (isTopStack.value && props.narrow) {
+	if (isTopStack.value && props.size === 'narrow') {
 		return windowInnerWidth.value - 450;
-	} else if (isTopStack.value && props.half) {
+	} else if (isTopStack.value && props.size === 'half') {
 		return windowInnerWidth.value / 2;
 	}
 
@@ -56,11 +52,11 @@ const offset = computed(() => {
 });
 
 const leftOffset = computed(() => {
-	if (props.full) {
+	if (props.size === 'full') {
 		return 0;
 	}
 
-	if (isTopStack.value && (props.narrow || props.half)) {
+	if (isTopStack.value && (props.size === 'narrow' || props.size === 'half')) {
 		return offset.value;
 	}
 
@@ -202,7 +198,7 @@ provide('closeStack', close);
                         v-if="visible"
                         class="stack-content fixed flex flex-col sm:end-1.5 overflow-auto bg-white dark:bg-gray-850 rounded-xl shadow-[0_8px_5px_-6px_rgba(0,0,0,0.1),_0_3px_8px_0_rgba(0,0,0,0.02),_0_30px_22px_-22px_rgba(39,39,42,0.15)] dark:shadow-[0_5px_20px_rgba(0,0,0,.5)] transition-transform duration-150 ease-out"
                         :class="[
-                            full ? 'inset-2 w-[calc(100svw-1rem)]' : 'inset-y-2',
+                            size === 'full' ? 'inset-2 w-[calc(100svw-1rem)]' : 'inset-y-2',
                             { '-translate-x-4 rtl:translate-x-4': isHovering }
                         ]"
                     >

@@ -1,5 +1,5 @@
 <template>
-    <Stack narrow open @closed="$emit('closed')" v-slot="{ close }">
+    <Stack size="narrow" open @closed="$emit('closed')" v-slot="{ close }">
         <div class="m-2 flex h-full flex-col rounded-xl bg-white dark:bg-gray-800">
             <div
                 class="flex items-center justify-between rounded-t-xl border-b border-gray-300 px-4 mb-3 py-2 dark:border-gray-950 dark:bg-gray-800"

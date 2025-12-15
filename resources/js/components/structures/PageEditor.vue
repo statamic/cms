@@ -1,7 +1,7 @@
 <template>
     <Stack
 	    ref="stack"
-	    narrow
+	    size="narrow"
 	    open
 	    :before-close="shouldClose"
 	    @update:open="$emit('closed')"

@@ -25,7 +25,7 @@
         </Dropdown>
 
         <Stack
-            narrow
+	        size="narrow"
             :open="editing"
             @opened="() => $nextTick(() => $refs.title.focus())"
             @update:open="editCancelled"
@@ -136,7 +136,7 @@ export default {
 
         isSoloNarrowStack() {
             const stacks = this.$stacks.stacks();
-            return stacks.length === 1 && stacks[0]?.data?.vm?.narrow === true;
+            return stacks.length === 1 && stacks[0]?.data?.vm?.size === 'narrow';
         },
     },
 

@@ -115,7 +115,7 @@ function handleStackClosed() {
             </Button>
         </div>
 
-        <Stack half :open="open" @update:open="handleStackClosed">
+        <Stack size="half" :open="open" @update:open="handleStackClosed">
             <div ref="stackContentRef" class="flex-1 p-3 bg-white dark:bg-gray-800 h-full overflow-auto rounded-l-2xl relative">
                 <Button
                     icon="x"
