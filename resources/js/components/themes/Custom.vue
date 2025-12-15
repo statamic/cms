@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Button, Description, Select, Table, TableCell, TableColumn, TableColumns, TableRow, TableRows } from '@ui';
+import { Button, Description, Table, TableCell, TableColumn, TableColumns, TableRow, TableRows } from '@ui';
 import { computed, ref, watch } from 'vue';
 import { ColorVariableName, CompleteTheme, GrayPalette, Theme, ThemeColors } from './types';
 import Preview from './Preview.vue';
@@ -7,6 +7,7 @@ import { addDefaults, colors, getDefaultTheme, grayPalettes, removeDefaults, the
 import { translate as __ } from '@/translations/translator';
 import ColorPicker from '@/components/themes/color-picker/ColorPicker.vue';
 import Share from '@/components/themes/Share.vue';
+import GrayPicker from './GrayPicker.vue';
 
 const props = defineProps<{
     modelValue?: Theme;
@@ -86,14 +87,6 @@ const sharable = computed(() => theme.value.id === 'custom'
 const manuallyToggledIndividualGrays = ref(false);
 const grayColors = computed(() => colors.filter(c => c.name.startsWith('gray-')));
 const nonGrayColors = computed(() => colors.filter(c => !c.name.startsWith('gray-')));
-
-const graySelectOptions = [
-    { label: __('Slate'), value: 'slate' },
-    { label: __('Gray'), value: 'gray' },
-    { label: __('Zinc'), value: 'zinc' },
-    { label: __('Neutral'), value: 'neutral' },
-    { label: __('Stone'), value: 'stone' },
-];
 
 const selectedLightGrayPalette = computed(() => {
     for (const [paletteName, palette] of Object.entries(grayPalettes)) {
@@ -254,10 +247,8 @@ function collapseGrays() {
                             </div>
                         </TableCell>
                         <TableCell>
-                            <div class="flex items-center gap-2">
-                                <Select
-                                    class="w-30"
-                                    :options="graySelectOptions"
+                            <div class="flex items-center">
+                                <GrayPicker
                                     :model-value="selectedLightGrayPalette"
                                     @update:model-value="applyLightGrayPalette"
                                 />
@@ -271,10 +262,8 @@ function collapseGrays() {
                             </div>
                         </TableCell>
                         <TableCell>
-                            <div class="flex items-center gap-2">
-                                <Select
-                                    class="w-30"
-                                    :options="graySelectOptions"
+                            <div class="flex items-center">
+                                <GrayPicker
                                     :model-value="selectedDarkGrayPalette"
                                     @update:model-value="applyDarkGrayPalette"
                                 />
