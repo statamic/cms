@@ -215,7 +215,7 @@ provide('closeStack', close);
 		                    <Button icon="x" variant="ghost" class="-me-2" @click="close" />
 	                    </div>
 
-                        <slot :depth="depth" />
+                        <slot />
                     </div>
                 </transition>
             </div>
