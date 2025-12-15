@@ -14,8 +14,6 @@ import { stacks, events, keys, config } from '@/api';
 import wait from '@/util/wait.js';
 import {hasComponent} from "@/composables/has-component.js";
 
-// todo: use CVA for this component instead of CSS classes
-
 const slots = useSlots();
 const emit = defineEmits(['update:open']);
 
