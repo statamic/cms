@@ -6,7 +6,7 @@
             :narrow="stackSize === 'narrow'"
             :half="stackSize === 'half'"
             :full="stackSize === 'full'"
-            @closed="close"
+            @update:open="close"
         >
             <div class="h-full overflow-scroll overflow-x-auto bg-white px-6 rounded-l-xl dark:bg-dark-800">
                 <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
