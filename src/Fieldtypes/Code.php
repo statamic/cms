@@ -21,7 +21,7 @@ class Code extends Fieldtype
                         'display' => __('Color Mode'),
                         'instructions' => __('statamic::fieldtypes.code.config.color_mode'),
                         'type' => 'select',
-                        'default' => 'material',
+                        'default' => 'system',
                         'options' => [
                             'material' => __('Dark'),
                             'light' => __('Light'),

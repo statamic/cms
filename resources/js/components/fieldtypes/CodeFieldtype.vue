@@ -43,7 +43,7 @@ export default {
         },
 
         resolvedColorMode() {
-            const colorMode = this.config.color_mode || 'material';
+            const colorMode = this.config.color_mode || 'system';
             
             if (colorMode === 'system') {
                 return this.isDark ? 'material' : 'light';
@@ -74,7 +74,8 @@ export default {
     mounted() {
         // Watch for dark class changes on document element (ColorMode already manages this)
         this.mutationObserver = new MutationObserver(() => {
-            if (this.config.color_mode === 'system') {
+            const colorMode = this.config.color_mode || 'system';
+            if (colorMode === 'system') {
                 this.isDark = document.documentElement.classList.contains('dark');
             }
         });
