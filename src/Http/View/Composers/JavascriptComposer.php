@@ -80,7 +80,7 @@ class JavascriptComposer
             'commandPalettePreloadedItems' => CommandPalette::getPreloadedItems(),
             'setPreviewImages' => Sets::previewImageConfig(),
             'linkToDocs' => config('statamic.cp.link_to_docs'),
-            'defaultTheme' => ['light' => Color::defaults(), 'dark' => Color::defaults(dark: true)],
+            'defaultTheme' => $this->defaultTheme(),
         ];
     }
 
@@ -130,5 +130,15 @@ class JavascriptComposer
         return Icon::sets()->mapWithKeys(fn (IconSet $set) => [
             $set->name() => $set->contents(),
         ]);
+    }
+
+    private function defaultTheme()
+    {
+        return [
+            'light' => Color::defaults(),
+            'dark' => collect(Color::defaults(dark: true))
+                ->keyBy(fn ($value, $key) => str($key)->after('dark-'))
+                ->all(),
+        ];
     }
 }
