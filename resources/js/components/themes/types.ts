@@ -1,3 +1,7 @@
+import { grayPalettes } from '.';
+
+export type GrayPalette = keyof typeof grayPalettes;
+
 export type ColorVariableName =
     | 'primary'
     | 'success'
