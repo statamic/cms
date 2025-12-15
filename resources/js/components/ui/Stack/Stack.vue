@@ -202,7 +202,7 @@ provide('closeStack', close);
                             { '-translate-x-4 rtl:translate-x-4': isHovering }
                         ]"
                     >
-                        <slot name="default" :depth="depth" :close="close" />
+                        <slot :depth="depth" />
                     </div>
                 </transition>
             </div>

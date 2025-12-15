@@ -96,6 +96,7 @@ export {
     Switch,
     TabContent,
     Stack,
+    StackClose,
     Table,
     TableCell,
     TableColumn,
