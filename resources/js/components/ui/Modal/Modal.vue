@@ -83,7 +83,7 @@ function dismiss() {
 }
 
 function updateOpen(value) {
-    if (isUsingOpenProp.value) {
+	if (isUsingOpenProp.value && props.open !== value) {
         emit('update:open', value);
     }
 }
