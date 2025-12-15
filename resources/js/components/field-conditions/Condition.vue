@@ -29,7 +29,7 @@
             </Combobox>
         </div>
 
-        <div class="w-32">
+        <div class="w-auto min-w-32">
             <Select
                 class="w-full"
                 :model-value="condition.operator"

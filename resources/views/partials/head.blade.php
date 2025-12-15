@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 <meta name="viewport" content="width=device-width" />
 <meta name="robots" content="noindex,nofollow" />
-<meta name="color-scheme" content="{{ $user?->preferredTheme() ?? 'auto' }}">
+<meta name="color-scheme" content="{{ $user?->preferredColorMode() ?? 'auto' }}">
 
 @if (Statamic::pro() && config('statamic.cp.custom_favicon_url'))
     @include('statamic::partials.favicon', ['favicon_url' => config('statamic.cp.custom_favicon_url')])
@@ -19,10 +19,10 @@
 
 <script>
     (function () {
-        let theme = {!! ($userTheme = $user?->preferredTheme()) ? "'" . $userTheme . "'" : 'null' !!};
-        if (!theme) theme = localStorage.getItem('statamic.theme') ?? 'auto';
-        if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) theme = 'dark';
-        if (theme === 'dark') document.documentElement.classList.add('dark');
+        let mode = {!! ($userMode = $user?->preferredColorMode()) ? "'" . $userMode . "'" : 'null' !!};
+        if (!mode) mode = localStorage.getItem('statamic.color_mode') ?? 'auto';
+        if (mode === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) mode = 'dark';
+        if (mode === 'dark') document.documentElement.classList.add('dark');
 
         let contrast = {!! $user?->getPreference('strict_accessibility') ? "'increased'" : "'auto'" !!};
         if (contrast === 'auto' && window.matchMedia('(prefers-contrast: more)').matches) contrast = 'increased';
