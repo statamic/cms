@@ -263,16 +263,24 @@ function collapseGrays() {
                         </TableCell>
                         <TableCell>
                             <div class="flex items-center">
-                                <GrayPicker
-                                    :model-value="selectedDarkGrayPalette"
-                                    @update:model-value="applyDarkGrayPalette"
-                                />
+                                <template v-if="selectedDarkGrayPalette !== null">
+                                    <GrayPicker
+                                        :model-value="selectedDarkGrayPalette"
+                                        @update:model-value="applyDarkGrayPalette"
+                                    />
+                                    <Button
+                                        icon="x"
+                                        variant="ghost"
+                                        size="sm"
+                                        @click="applyDarkGrayPalette(null)"
+                                    />
+                                </template>
                                 <Button
-                                    v-if="selectedDarkGrayPalette !== 'zinc'"
-                                    icon="x"
+                                    v-else
+                                    icon="plus"
                                     variant="ghost"
                                     size="sm"
-                                    @click="applyDarkGrayPalette(null)"
+                                    @click="applyDarkGrayPalette('slate')"
                                 />
                             </div>
                         </TableCell>
