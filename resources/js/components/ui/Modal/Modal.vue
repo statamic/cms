@@ -50,7 +50,6 @@ const escBinding = ref(null);
 const instance = getCurrentInstance();
 const hasModalTitleComponent = hasComponent('ModalTitle');
 const isUsingOpenProp = computed(() => instance?.vnode.props?.hasOwnProperty('open'));
-
 const portal = computed(() => modal.value ? `#portal-target-${modal.value.id}` : null);
 
 function open() {
@@ -81,8 +80,6 @@ function dismiss() {
     close();
 }
 
-provide('closeModal', close);
-
 function updateOpen(value) {
     if (isUsingOpenProp.value) {
         emit('update:open', value);
@@ -107,6 +104,8 @@ defineExpose({
     open,
     close,
 });
+
+provide('closeModal', close);
 </script>
 
 <template>
