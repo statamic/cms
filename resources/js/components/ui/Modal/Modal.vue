@@ -42,15 +42,14 @@ const modalClasses = cva({
     ],
 })({});
 
-const hasModalTitleComponent = hasComponent('ModalTitle');
-const isUsingOpenProp = computed(() => instance?.vnode.props?.hasOwnProperty('open'));
-
-const instance = getCurrentInstance();
-
 const modal = ref(null);
 const mounted = ref(false);
 const visible = ref(false);
 const escBinding = ref(null);
+
+const instance = getCurrentInstance();
+const hasModalTitleComponent = hasComponent('ModalTitle');
+const isUsingOpenProp = computed(() => instance?.vnode.props?.hasOwnProperty('open'));
 
 const portal = computed(() => modal.value ? `#portal-target-${modal.value.id}` : null);
 
@@ -61,9 +60,7 @@ function open() {
 
     nextTick(() => {
         mounted.value = true;
-
         nextTick(() => visible.value = true);
-
 	    updateOpen(true);
     });
 }
