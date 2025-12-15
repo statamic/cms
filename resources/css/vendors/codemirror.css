@@ -479,7 +479,7 @@ span.CodeMirror-selectedtext {
 }
 
 .CodeMirror-fullscreen {
-    @apply fixed inset-0 h-auto rounded-none pt-13;
+    @apply fixed inset-0 h-auto rounded-none pt-12;
 }
 
 .CodeMirror-rulers {
