@@ -24,8 +24,6 @@ const props = defineProps({
 	// icon: { type: [String, null], default: null },
 
 	open: { type: Boolean, default: false },
-
-	// todo: refactor where we use this
 	beforeClose: { type: Function, default: () => true },
 
 	// todo: should these not be variants?
@@ -95,16 +93,6 @@ const mouseOutHitArea = () => {
 
 const windowResized = () => windowInnerWidth.value = window.innerWidth;
 
-const runCloseCallback = () => {
-	const shouldClose = props.beforeClose();
-
-	if (!shouldClose) return false;
-
-	close();
-
-	return true;
-};
-
 function open() {
 	if (!stack.value) stack.value = stacks.add(instance.proxy);
 
@@ -140,6 +128,16 @@ function updateOpen(value) {
 	if (isUsingOpenProp.value) {
 		emit('update:open', value);
 	}
+}
+
+function runCloseCallback() {
+	const shouldClose = props.beforeClose();
+
+	if (!shouldClose) return false;
+
+	close();
+
+	return true;
 }
 
 watch(

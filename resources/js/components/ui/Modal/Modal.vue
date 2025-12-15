@@ -20,6 +20,7 @@ const props = defineProps({
     title: { type: String, default: '' },
     icon: { type: [String, null], default: null },
     open: { type: Boolean, default: false },
+	beforeClose: { type: Function, default: () => true },
     dismissible: { type: Boolean, default: true },
 });
 
@@ -75,6 +76,7 @@ function close() {
 
 function dismiss() {
     if (!props.dismissible) return;
+	if (!runCloseCallback()) return;
 
     emit('dismissed');
     close();
@@ -84,6 +86,16 @@ function updateOpen(value) {
     if (isUsingOpenProp.value) {
         emit('update:open', value);
     }
+}
+
+function runCloseCallback() {
+	const shouldClose = props.beforeClose();
+
+	if (!shouldClose) return false;
+
+	close();
+
+	return true;
 }
 
 watch(
@@ -103,6 +115,7 @@ onBeforeUnmount(() => {
 defineExpose({
     open,
     close,
+	runCloseCallback,
 });
 
 provide('closeModal', close);
