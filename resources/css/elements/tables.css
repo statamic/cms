@@ -11,6 +11,9 @@
 
     &.data-table--contained {
         @apply rounded-xl;
+        /* When we have overflow e.g. /cp/assets on mobile with lots of columns */
+        background: inherit;
+        box-shadow: inherit;
     }
 
     thead {
