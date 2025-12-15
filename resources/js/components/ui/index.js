@@ -66,6 +66,7 @@ export { default as Switch } from './Switch.vue';
 export { default as TabContent } from './Tabs/Content.vue';
 export { default as Stack } from './Stack/Stack.vue';
 export { default as StackClose } from './Stack/Close.vue';
+export { default as StackTitle } from './Stack/Title.vue';
 export { default as Table } from './Table/Table.vue';
 export { default as TableCell } from './Table/Cell.vue';
 export { default as TableColumn } from './Table/Column.vue';

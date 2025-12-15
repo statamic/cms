@@ -97,6 +97,7 @@ export const {
     TabContent,
     Stack,
     StackClose,
+    StackTitle,
     Table,
     TableCell,
     TableColumn,

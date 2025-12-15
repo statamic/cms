@@ -192,7 +192,12 @@
             </LivePreview>
         </PublishContainer>
 
-        <Stack ref="revisionHistoryStack" size="narrow" v-model:open="showRevisionHistory">
+        <Stack
+	        ref="revisionHistoryStack"
+	        size="narrow"
+	        :title="__('Revision History')"
+	        v-model:open="showRevisionHistory"
+        >
             <revision-history
                 :index-url="actions.revisions"
                 :restore-url="actions.restore"

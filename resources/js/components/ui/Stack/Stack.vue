@@ -3,24 +3,25 @@ import {
 	ref,
 	computed,
 	onMounted,
-	onUnmounted,
 	nextTick,
 	getCurrentInstance,
 	useSlots,
 	watch,
-	onBeforeUnmount, provide
+	onBeforeUnmount,
+	provide
 } from 'vue';
 import { stacks, events, keys, config } from '@/api';
 import wait from '@/util/wait.js';
 import {hasComponent} from "@/composables/has-component.js";
+import { Button, Heading } from "@ui";
+import Icon from "@ui/Icon/Icon.vue";
 
 const slots = useSlots();
 const emit = defineEmits(['update:open', 'opened']);
 
 const props = defineProps({
-	// title: { type: String, default: '' },
-	// icon: { type: [String, null], default: null },
-
+	title: { type: String, default: '' },
+	icon: { type: [String, null], default: null },
 	open: { type: Boolean, default: false },
 	beforeClose: { type: Function, default: () => true },
 	size: { type: String, default: null },
@@ -34,14 +35,15 @@ const escBinding = ref(null);
 const windowInnerWidth = ref(window.innerWidth);
 
 const instance = getCurrentInstance();
-// const hasModalTitleComponent = hasComponent('ModalTitle');
+const hasStackTitleComponent = hasComponent('StackTitle');
 const isUsingOpenProp = computed(() => instance?.vnode.props?.hasOwnProperty('open'));
 const portal = computed(() => stack.value ? `#portal-target-${stack.value.id}` : null);
 const depth = computed(() => stack.value?.data.depth);
 const isTopStack = computed(() => stacks.count() === depth.value);
 
 const offset = computed(() => {
-	if (isTopStack.value && props.size === 'narrow') {		return windowInnerWidth.value - 450;
+	if (isTopStack.value && props.size === 'narrow') {
+		return windowInnerWidth.value - 450;
 	} else if (isTopStack.value && props.size === 'half') {
 		return windowInnerWidth.value / 2;
 	}
@@ -201,6 +203,18 @@ provide('closeStack', close);
                             { '-translate-x-4 rtl:translate-x-4': isHovering }
                         ]"
                     >
+	                    <div
+		                    v-if="!hasStackTitleComponent && (title || icon)"
+		                    data-ui-stack-title
+		                    class="flex items-center justify-between rounded-t-xl border-b border-gray-300 px-4 mb-3 py-2 dark:border-gray-950 dark:bg-gray-800"
+	                    >
+		                    <div class="flex items-center gap-2">
+			                    <Icon :name="icon" v-if="icon" class="size-4" />
+			                    <Heading size="lg" :text="title" />
+		                    </div>
+		                    <Button icon="x" variant="ghost" class="-me-2" @click="close" />
+	                    </div>
+
                         <slot :depth="depth" />
                     </div>
                 </transition>
