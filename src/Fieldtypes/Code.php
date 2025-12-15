@@ -25,6 +25,7 @@ class Code extends Fieldtype
                         'options' => [
                             'material' => __('Dark'),
                             'light' => __('Light'),
+                            'system' => __('System'),
                         ],
                         'width' => '50',
                     ],
