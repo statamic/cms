@@ -137,7 +137,6 @@
     .row-controls {
         &:has([aria-label*="Delete"]:is(:hover, :focus)) {
             --focus-outline-color: var(--color-danger);
-            background-color: var(--color-danger-bg);
             svg {
                 color: var(--color-danger);
                 opacity: 1;
