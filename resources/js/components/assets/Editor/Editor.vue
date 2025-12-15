@@ -1,5 +1,5 @@
 <template>
-    <Stack full open ref="stack" :before-close="shouldClose" @update:open="$emit('closed')">
+    <Stack size="full" open ref="stack" :before-close="shouldClose" @update:open="$emit('closed')">
         <div
             class="asset-editor relative flex h-full flex-col rounded-sm bg-gray-100 dark:bg-dark-800"
             :class="isImage ? 'is-image' : 'is-file'"

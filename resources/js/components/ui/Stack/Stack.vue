@@ -23,7 +23,7 @@ const props = defineProps({
 
 	open: { type: Boolean, default: false },
 	beforeClose: { type: Function, default: () => true },
-	size: { type: String, default: 'full' },
+	size: { type: String, default: null },
 });
 
 const stack = ref(null);
@@ -41,8 +41,7 @@ const depth = computed(() => stack.value?.data.depth);
 const isTopStack = computed(() => stacks.count() === depth.value);
 
 const offset = computed(() => {
-	if (isTopStack.value && props.size === 'narrow') {
-		return windowInnerWidth.value - 450;
+	if (isTopStack.value && props.size === 'narrow') {		return windowInnerWidth.value - 450;
 	} else if (isTopStack.value && props.size === 'half') {
 		return windowInnerWidth.value / 2;
 	}
