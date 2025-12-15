@@ -1,11 +1,13 @@
 <template>
-    <ui-stack narrow name="publish-options" @closed="$emit('closed')" v-slot="{ close }">
+    <Stack narrow open @update:open="$emit('closed')">
         <div class="m-2 flex h-full flex-col rounded-xl bg-white dark:bg-gray-800">
             <header
                 class="flex items-center justify-between rounded-t-xl border-b border-gray-300 px-4 mb-3 py-2 dark:border-gray-950 dark:bg-gray-800"
             >
                 <Heading size="lg">{{ __('Publish') }}</Heading>
-                <Button icon="x" variant="ghost" class="-me-2" @click="close" />
+	            <StackClose>
+                    <Button icon="x" variant="ghost" class="-me-2" />
+	            </StackClose>
             </header>
 
             <div class="flex-1 overflow-auto">
@@ -45,14 +47,14 @@
                 </div>
             </div>
         </div>
-    </ui-stack>
+    </Stack>
 </template>
 
 <script>
-import { Heading, Button, Select, DatePicker, Textarea, Icon, Subheading } from '@/components/ui';
+import { Heading, Button, Select, DatePicker, Textarea, Icon, Subheading, Stack, StackClose } from '@/components/ui';
 
 export default {
-    components: { Heading, Button, Select, DatePicker, Textarea, Icon, Subheading },
+    components: { Heading, Button, Select, DatePicker, Textarea, Icon, Subheading, Stack, StackClose },
 
     props: {
         actions: Object,

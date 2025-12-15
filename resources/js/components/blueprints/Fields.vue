@@ -33,21 +33,11 @@
             <ui-button icon="add-circle" :text="__('Create Field')" @click="createField" />
         </div>
 
-        <ui-stack
-            name="fieldtype-selector"
-            v-if="isSelectingNewFieldtype"
-            @closed="isSelectingNewFieldtype = false"
-            v-slot="{ close }"
-        >
-            <fieldtype-selector @closed="close" @selected="fieldtypeSelected" />
-        </ui-stack>
+        <Stack v-model:open="isSelectingNewFieldtype">
+            <fieldtype-selector @closed="isSelectingNewFieldtype = false" @selected="fieldtypeSelected" />
+        </Stack>
 
-        <ui-stack
-            name="field-settings"
-            v-if="pendingCreatedField != null"
-            @closed="pendingCreatedField = null"
-            v-slot="{ close }"
-        >
+        <Stack :open="pendingCreatedField != null" @update:open="pendingCreatedField = null">
             <field-settings
                 ref="settings"
                 :type="pendingCreatedField.config.type"
@@ -57,9 +47,9 @@
                 :suggestable-condition-fields="suggestableConditionFields"
                 :is-inside-set="isInsideSet"
                 @committed="fieldCreated"
-                @closed="close"
+                @closed="pendingCreatedField = null"
             />
-        </ui-stack>
+        </Stack>
     </div>
 </template>
 
@@ -71,6 +61,7 @@ import LinkFields from './LinkFields.vue';
 import FieldtypeSelector from '../fields/FieldtypeSelector.vue';
 import FieldSettings from '../fields/Settings.vue';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';
+import { Stack } from '@/components/ui';
 
 export default {
     mixins: [CanDefineLocalizable],
@@ -81,6 +72,7 @@ export default {
         LinkFields,
         FieldtypeSelector,
         FieldSettings,
+	    Stack,
     },
 
     props: {

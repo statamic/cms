@@ -192,21 +192,15 @@
             </LivePreview>
         </PublishContainer>
 
-        <ui-stack
-            name="revision-history"
-            v-if="showRevisionHistory"
-            @closed="showRevisionHistory = false"
-            :narrow="true"
-            v-slot="{ close }"
-        >
+        <Stack ref="revisionHistoryStack" narrow v-model:open="showRevisionHistory">
             <revision-history
                 :index-url="actions.revisions"
                 :restore-url="actions.restore"
                 :reference="initialReference"
                 :can-restore-revisions="!readOnly"
-                @closed="close"
+                @closed="$refs.revisionHistoryStack.close()"
             />
-        </ui-stack>
+        </Stack>
 
         <publish-actions
             v-if="confirmingPublish"
@@ -279,6 +273,7 @@ import {
     PublishComponents,
     PublishLocalizations as LocalizationsCard,
     LivePreview,
+	Stack,
 } from '@ui';
 import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
 import { computed, ref } from 'vue';
@@ -314,6 +309,7 @@ export default {
         Subheading,
         Switch,
         Select,
+	    Stack,
     },
 
     props: {

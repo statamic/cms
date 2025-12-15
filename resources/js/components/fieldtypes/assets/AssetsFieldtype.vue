@@ -163,7 +163,7 @@
             </div>
         </uploader>
 
-        <ui-stack v-if="showSelector" name="asset-selector" @closed="closeSelector">
+        <Stack v-model:open="showSelector">
             <Selector
                 :container="container"
                 :folder="folder"
@@ -173,9 +173,9 @@
                 :query-scopes="queryScopes"
                 :columns="columns"
                 @selected="assetsSelected"
-                @closed="closeSelector"
+                @closed="showSelector = false"
             />
-        </ui-stack>
+        </Stack>
     </div>
 </template>
 
@@ -188,7 +188,7 @@ import Uploader from '../../assets/Uploader.vue';
 import Uploads from '../../assets/Uploads.vue';
 import { SortableList } from '../../sortable/Sortable';
 import { isEqual } from 'lodash-es';
-import { Button, Dropdown, DropdownMenu, DropdownItem } from '@/components/ui';
+import { Button, Dropdown, DropdownMenu, DropdownItem, Stack } from '@/components/ui';
 import ItemActions from '@/components/actions/ItemActions.vue';
 
 export default {
@@ -204,6 +204,7 @@ export default {
         DropdownMenu,
         DropdownItem,
         ItemActions,
+	    Stack,
     },
 
     mixins: [Fieldtype],
@@ -427,7 +428,7 @@ export default {
 
     events: {
         'close-selector'() {
-            this.closeSelector();
+            this.showSelector = false;
         },
     },
 
@@ -487,13 +488,6 @@ export default {
          */
         openSelector() {
             this.showSelector = true;
-        },
-
-        /**
-         * Close the asset selector modal
-         */
-        closeSelector() {
-            this.showSelector = false;
         },
 
         /**

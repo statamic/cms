@@ -1,12 +1,16 @@
 <template>
     <div>
-        <ui-button icon="link" @click="open = true" :text="__('Link Existing')" />
+        <Stack narrow v-model:open="open">
+	        <template #trigger>
+		        <Button icon="link" :text="__('Link Existing')" />
+	        </template>
 
-        <ui-stack narrow v-if="open" @closed="open = false" name="field-linker" v-slot="{ close }">
             <div class="h-full overflow-auto bg-white dark:bg-gray-800 p-3 rounded-l-xl">
                 <header class="flex items-center justify-between pl-3">
                     <Heading :text="__('Link Fields')" size="lg" icon="fieldsets" />
-                    <Button type="button" icon="x" variant="subtle" @click="close" />
+	                <StackClose>
+		                <Button type="button" icon="x" variant="subtle" />
+	                </StackClose>
                 </header>
 
                 <div class="flex-1 overflow-auto px-3 py-4">
@@ -90,17 +94,17 @@
                     />
                 </div>
             </div>
-        </ui-stack>
+        </Stack>
     </div>
 </template>
 
 <script>
 import uniqid from 'uniqid';
-import { Combobox, Button, Input, Heading, Field } from '@/components/ui';
+import { Combobox, Button, Input, Heading, Field, Stack, StackClose } from '@/components/ui';
 import { usePage } from '@inertiajs/vue3';
 
 export default {
-    components: { Heading, Combobox, Button, Input, Field },
+    components: { Heading, Combobox, Button, Input, Field, Stack, StackClose },
 
     props: {
         excludeFieldset: String,

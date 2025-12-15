@@ -1,7 +1,7 @@
 <template>
     <div>
-        <ui-stack
-            name="inline-editor"
+        <Stack
+	        open
             :before-close="shouldClose"
             :narrow="stackSize === 'narrow'"
             :half="stackSize === 'half'"
@@ -30,7 +30,7 @@
                     </template>
                 </component>
             </div>
-        </ui-stack>
+        </Stack>
 
         <confirmation-modal
             v-if="closingWithChanges"
@@ -45,13 +45,15 @@
 </template>
 
 <script>
-import { Button, Icon } from '@/components/ui';
+import { Button, Icon, Stack } from '@/components/ui';
 
 export default {
     components: {
         Button,
         Icon,
+	    Stack,
     },
+
     props: {
         component: String,
         componentProps: Object,

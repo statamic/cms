@@ -1,11 +1,19 @@
 <template>
-    <ui-stack narrow name="page-tree-linker" :before-close="shouldClose" @closed="$emit('closed')" v-slot="{ close }">
+    <Stack
+	    ref="stack"
+	    narrow
+	    open
+	    :before-close="shouldClose"
+	    @update:open="$emit('closed')"
+    >
         <div class="flex h-full flex-col bg-gray-100 dark:bg-gray-850">
             <header
                 class="flex items-center justify-between border-b bg-white py-2 text-lg font-medium shadow-md dark:border-dark-950 dark:bg-dark-600 ltr:pl-6 ltr:pr-3 rtl:pl-3 rtl:pr-6"
             >
                 <Heading size="lg">{{ headerText }}</Heading>
-                <Button icon="x" variant="ghost" @click="close" />
+	            <StackClose>
+		            <Button icon="x" variant="ghost" />
+	            </StackClose>
             </header>
 
             <div v-if="loading" class="relative flex-1 overflow-auto">
@@ -44,7 +52,7 @@
                 class="flex flex-wrap flex-row-reverse gap-2 items-end justify-between border-t bg-gray-200 p-4 dark:border-dark-900 dark:bg-dark-600"
             >
                 <div class="flex flex-wrap justify-end" v-if="!readOnly">
-                    <Button variant="ghost" class="me-2" :text="__('Cancel')" @click="confirmClose(close)" />
+                    <Button variant="ghost" class="me-2" :text="__('Cancel')" @click="confirmClose" />
                     <Button variant="primary" :text="__('Apply')" @click="submit" />
                 </div>
                 <div v-if="type === 'entry'">
@@ -62,11 +70,11 @@
             @confirm="confirmCloseWithChanges"
             @cancel="closingWithChanges = false"
         />
-    </ui-stack>
+    </Stack>
 </template>
 
 <script>
-import { Heading, Button, PublishContainer, Icon } from '@/components/ui';
+import { Heading, Button, PublishContainer, Icon, Stack, StackClose } from '@/components/ui';
 import { flatten } from 'lodash-es';
 import { computed, ref } from 'vue';
 import { Pipeline, Request } from '@ui/Publish/SavePipeline.js';
@@ -80,6 +88,8 @@ export default {
         Button,
         PublishContainer,
         Icon,
+	    Stack,
+	    StackClose,
     },
 
     props: {
@@ -239,7 +249,7 @@ export default {
         },
 
         confirmClose(close) {
-            if (this.shouldClose()) close();
+            if (this.shouldClose()) this.$refs.stack.close();
         },
 
         confirmCloseWithChanges() {
