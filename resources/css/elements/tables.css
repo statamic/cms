@@ -154,8 +154,8 @@
 
 /* Row Selection */
 .data-table[data-has-selections] {
-    tbody tr[data-row="unselected"] td {
-        @apply text-gray-500! dark:text-gray-400!;
+    tbody tr[data-row="selected"] td {
+        @apply bg-gray-100 dark:bg-gray-950;
     }
 }
 
