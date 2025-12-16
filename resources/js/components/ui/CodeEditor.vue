@@ -181,7 +181,7 @@ const rulers = computed(() => {
         return [];
     }
 
-    let rulerColor = colorMode.value === 'light' ? '#d1d5db' : '#546e7a';
+    let rulerColor = colorMode.value === 'light' ? 'var(--theme-color-gray-300)' : 'var(--theme-color-gray-700)';
 
     return Object.entries(props.rulers).map(([column, style]) => {
         let lineStyle = style === 'dashed' ? 'dashed' : 'solid';
