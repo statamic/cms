@@ -1,5 +1,5 @@
 <script setup>
-import { Link, usePage } from '@inertiajs/vue3';
+import { Link, usePage, router } from '@inertiajs/vue3';
 import { Badge, Icon } from '@ui';
 import useNavigation from './navigation.js';
 import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
@@ -11,6 +11,7 @@ const isOpen = ref(localStorage.getItem(localStorageKey) !== 'closed');
 const navRef = ref(null);
 const isMobile = ref(false);
 let clickListenerActive = false;
+let navigateEventListener = null;
 
 onMounted(() => {
     // Check if screen is less than lg breakpoint (1024px)
@@ -52,9 +53,20 @@ onMounted(() => {
     // Close nav when clicking outside (only on mobile)
     document.addEventListener('click', handleClickOutside);
     
+    // Close nav on mobile when navigating to a different page
+    navigateEventListener = router.on('navigate', () => {
+        if (isMobile.value && isOpen.value) {
+            isOpen.value = false;
+            localStorage.setItem(localStorageKey, 'closed');
+        }
+    });
+    
     onUnmounted(() => {
         document.removeEventListener('click', handleClickOutside);
         mediaQuery.removeEventListener('change', handleMediaChange);
+        if (navigateEventListener) {
+            navigateEventListener();
+        }
     });
 });
 
