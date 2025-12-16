@@ -17,7 +17,7 @@ defineExpose({ focus });
     <div class="flex-1 max-w-sm" :class="{ 'max-w-60!': activeFilterBadgeCount > 2 }">
         <label for="listings-search" class="sr-only">{{ __('Search entries') }}</label>
         <Input
-            autofocus
+            :focus="true"
             ref="input"
             icon="magnifying-glass"
             id="listings-search"
