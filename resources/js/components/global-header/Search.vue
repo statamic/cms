@@ -7,7 +7,7 @@ import { Icon } from '@ui';
     <CommandPalette>
         <div class="
             data-[focus-visible]:outline-focus hover flex cursor-pointer justify-center sm:justify-start items-center gap-x-1.5 group h-8
-            rounded-xl [button:has(>&)]:rounded-md bg-black/40 text-xs text-white/60 outline-none
+            rounded-xl [button:has(>&)]:rounded-xl bg-black/40 text-xs text-white/60 outline-none
             ring-1 ring-white/10
             w-8 sm:w-32 sm:px-2 md:py-[calc(5/16*1rem)]
             hover:bg-black/45 hover:text-white/70
