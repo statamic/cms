@@ -24,6 +24,7 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import { CodeEditor } from '@/components/ui';
+import { colorMode } from '@api';
 
 export default {
     mixins: [Fieldtype],
@@ -33,22 +34,25 @@ export default {
     data() {
         return {
             escBinding: null,
-            isDark: document.documentElement.classList.contains('dark'),
         };
     },
 
     computed: {
+        isDark() {
+            return colorMode.mode.value === 'dark';
+        },
+
         mode() {
             return this.value.mode || this.config.mode;
         },
 
         resolvedColorMode() {
             const colorMode = this.config.color_mode || 'system';
-            
+
             if (colorMode === 'system') {
                 return this.isDark ? 'material' : 'light';
             }
-            
+
             return colorMode;
         },
 
@@ -69,27 +73,6 @@ export default {
                 },
             ];
         },
-    },
-
-    mounted() {
-        // Watch for dark class changes on document element (ColorMode already manages this)
-        this.mutationObserver = new MutationObserver(() => {
-            const colorMode = this.config.color_mode || 'system';
-            if (colorMode === 'system') {
-                this.isDark = document.documentElement.classList.contains('dark');
-            }
-        });
-
-        this.mutationObserver.observe(document.documentElement, {
-            attributes: true,
-            attributeFilter: ['class'],
-        });
-    },
-
-    beforeUnmount() {
-        if (this.mutationObserver) {
-            this.mutationObserver.disconnect();
-        }
     },
 
     methods: {
