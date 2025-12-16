@@ -117,7 +117,7 @@ function initCodeMirror() {
             readOnly: props.readOnly || props.disabled ? 'nocursor' : false,
             theme: theme.value,
             inputStyle: 'contenteditable',
-            rulers: rulers,
+            rulers: rulers.value,
         }),
     );
 
