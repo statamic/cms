@@ -24,7 +24,6 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import { CodeEditor } from '@/components/ui';
-import { colorMode } from '@api';
 
 export default {
     mixins: [Fieldtype],
