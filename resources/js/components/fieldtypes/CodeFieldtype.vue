@@ -1,7 +1,7 @@
 <template>
     <CodeEditor
         ref="codeEditor"
-        :theme="resolvedColorMode"
+        :color-mode="config.color_mode"
         :rulers="config.rulers"
         :disabled="config.disabled"
         :read-only="config.read_only"
@@ -38,22 +38,8 @@ export default {
     },
 
     computed: {
-        isDark() {
-            return colorMode.mode.value === 'dark';
-        },
-
         mode() {
             return this.value.mode || this.config.mode;
-        },
-
-        resolvedColorMode() {
-            const colorMode = this.config.color_mode || 'system';
-
-            if (colorMode === 'system') {
-                return this.isDark ? 'material' : 'light';
-            }
-
-            return colorMode;
         },
 
         replicatorPreview() {

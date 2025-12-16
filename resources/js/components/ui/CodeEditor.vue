@@ -2,6 +2,7 @@
 import CodeMirror from 'codemirror';
 import { computed, markRaw, nextTick, onMounted, ref, useAttrs, useTemplateRef, watch } from 'vue';
 import Select from './Select/Select.vue';
+import { colorMode as colorModeApi } from '@api';
 
 // Addons
 import 'codemirror/addon/edit/matchbrackets';
@@ -51,7 +52,7 @@ const props = defineProps({
     rulers: { type: Object, default: () => {} },
     showModeLabel: { type: Boolean, default: true },
     tabSize: { type: Number, required: false },
-    theme: { type: String, default: 'material' },
+    colorMode: { type: String, default: 'system' },
     title: { type: String, default: () => __('Code Editor') },
 });
 
@@ -114,7 +115,7 @@ function initCodeMirror() {
             lineWrapping: props.lineWrapping,
             matchBrackets: true,
             readOnly: props.readOnly || props.disabled ? 'nocursor' : false,
-            theme: exactTheme.value,
+            theme: theme.value,
             inputStyle: 'contenteditable',
             rulers: rulers,
         }),
@@ -155,29 +156,24 @@ watch(
     { immediate: true },
 );
 
-watch(
-    () => props.theme,
-    () => {
-        if (codemirror.value) {
-            codemirror.value.setOption('theme', exactTheme.value);
-            // Update ruler colors when theme changes
-            if (props.rulers) {
-                codemirror.value.setOption('rulers', rulers.value);
-            }
-        }
-    },
-);
-
 const modeLabel = computed(() => {
     return modes.value.find((m) => m.value === props.mode)?.label || props.mode;
 });
 
-const exactTheme = computed(() => {
-    return props.theme === 'light' ? 'default' : 'material';
+const colorMode = computed(() => {
+    if (props.colorMode === 'system') {
+        return colorModeApi.mode.value === 'dark' ? 'dark' : 'light';
+    }
+
+    return props.colorMode;
+});
+
+const theme = computed(() => {
+    return colorMode.value === 'light' ? 'default' : 'material';
 });
 
 const themeClass = computed(() => {
-    return `theme-${props.theme}`;
+    return `theme-${colorMode.value}`;
 });
 
 const rulers = computed(() => {
@@ -185,7 +181,7 @@ const rulers = computed(() => {
         return [];
     }
 
-    let rulerColor = props.theme === 'light' ? '#d1d5db' : '#546e7a';
+    let rulerColor = colorMode.value === 'light' ? '#d1d5db' : '#546e7a';
 
     return Object.entries(props.rulers).map(([column, style]) => {
         let lineStyle = style === 'dashed' ? 'dashed' : 'solid';
@@ -197,6 +193,9 @@ const rulers = computed(() => {
         };
     });
 });
+
+watch(theme, (newTheme) => codemirror.value.setOption('theme', newTheme));
+watch(rulers, (newRulers) => codemirror.value.setOption('rulers', newRulers));
 
 const showToolbar = computed(() => {
     return props.allowModeSelection || props.showModeLabel;
