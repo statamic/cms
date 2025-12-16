@@ -1,15 +1,58 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
-import { Modal, ModalClose, ModalTitle, Button, Field, Input } from '@ui';
+import type {Meta, StoryObj} from '@storybook/vue3';
+import {Button, Field, Input, Modal, ModalClose, ModalTitle} from '@ui';
 
 const meta = {
     title: 'Components/Modal',
     component: Modal,
     argTypes: {
-        title: { control: 'text' },
-        icon: { control: 'text' },
-        blur: { control: 'boolean' },
-        dismissible: { control: 'boolean' },
-        open: { control: 'boolean' },
+        title: {
+            control: 'text',
+            description: 'Title displayed at the top of the modal.',
+        },
+        icon: {
+            control: 'text',
+            description: 'Icon displayed at the top of the modal, next to the title. [See list of available icons](/?path=/docs/components-icon--docs#available-icons).',
+        },
+        open: {
+            control: 'boolean',
+            description: 'Controls the open state of the modal.',
+        },
+        beforeClose: {
+            control: 'boolean',
+            description: 'Callback that fires before the modal closes.',
+        },
+        blur: {
+            control: 'boolean',
+            description: 'Whether the backdrop of the modal should be blurred.',
+        },
+        dismissible: {
+            control: 'boolean',
+            description: 'Whether the modal can be dismissed by the user.',
+        },
+        'update:open': {
+            action: 'update:open',
+            description: 'Event handler called when the open state changes.',
+            table: {
+                category: 'Events',
+                type: { summary: '(value: boolean) => void' },
+            }
+        },
+        'opened': {
+            action: 'opened',
+            description: 'Event handler called after the modal has opened.',
+            table: {
+                category: 'Events',
+                type: { summary: '() => void' },
+            }
+        },
+        'dismissed': {
+            action: 'dismissed',
+            description: 'Event handler called after the modal has been dismissed.',
+            table: {
+                category: 'Events',
+                type: { summary: '() => void' },
+            }
+        },
     },
 } satisfies Meta<typeof Modal>;
 
@@ -17,7 +60,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const defaultCode = `
-<Modal title="That's Pretty Neat">
+<Modal v-model:open="isOpen" title="That's Pretty Neat">
     <template #trigger>
         <Button text="How neat is that?" />
     </template>
@@ -33,12 +76,15 @@ export const _DocsIntro: Story = {
     },
     render: () => ({
         components: { Modal, Button },
+        data: () => {
+            return { isOpen: false }
+        },
         template: defaultCode,
     }),
 };
 
 const customTitleCode = `
-<Modal>
+<Modal v-model:open="isOpen">
     <template #trigger>
         <Button text="How neat is that?" />
     </template>
@@ -59,12 +105,15 @@ export const _CustomTitle: Story = {
     },
     render: () => ({
         components: { Modal, ModalTitle, Button },
+        data: () => {
+            return { isOpen: false }
+        },
         template: customTitleCode,
     }),
 };
 
 const closeButtonCode = `
-<Modal title="Hey look a close button" class="text-center">
+<Modal v-model:open="isOpen" title="Hey look a close button" class="text-center">
     <template #trigger>
         <Button text="Open Says Me" />
     </template>
@@ -83,12 +132,15 @@ export const _CloseButton: Story = {
     },
     render: () => ({
         components: { Modal, ModalClose, Button },
+        data: () => {
+            return { isOpen: false }
+        },
         template: closeButtonCode,
     }),
 };
 
 const iconCode = `
-<Modal title="That's Pretty Neat" icon="fire-flame-burn-hot">
+<Modal v-model:open="isOpen" title="That's Pretty Neat" icon="fire-flame-burn-hot">
     <template #trigger>
         <Button text="How neat is that?" />
     </template>
@@ -104,12 +156,15 @@ export const _WithIcon: Story = {
     },
     render: () => ({
         components: { Modal, Button },
+        data: () => {
+            return { isOpen: false }
+        },
         template: iconCode,
     }),
 };
 
 const footerCode = `
-<Modal title="Create new user">
+<Modal v-model:open="isOpen" title="Create new user">
     <template #trigger>
         <Button text="Create User" variant="primary" />
     </template>
@@ -149,6 +204,9 @@ export const _WithFooter: Story = {
     },
     render: () => ({
         components: { Modal, ModalClose, Button, Field, Input },
+        data: () => {
+            return { isOpen: false }
+        },
         template: footerCode,
     }),
 };
