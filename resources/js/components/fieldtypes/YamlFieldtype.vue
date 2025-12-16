@@ -9,7 +9,7 @@
         :read-only="isReadOnly"
         :show-mode-label="false"
         :tab-size="2"
-        :theme="config.theme"
+        :theme="config.color_mode"
         @update:model-value="update"
     />
 </template>

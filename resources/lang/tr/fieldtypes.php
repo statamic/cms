@@ -57,7 +57,7 @@ return [
     'code.config.mode' => 'Sözdizimi vurgulaması için dili seçin.',
     'code.config.mode_selectable' => 'Modun kullanıcı tarafından değiştirilip değiştirilemeyeceği.',
     'code.config.rulers' => 'Girintilere yardımcı olmak için dikey cetvelleri yapılandırın.',
-    'code.config.theme' => 'Tercih ettiğiniz temayı seçin.',
+    'code.config.color_mode' => 'Tercih ettiğiniz temayı seçin.',
     'code.title' => 'Kod',
     'collections.title' => 'Koleksiyon',
     'color.config.allow_any' => 'Renk seçici veya hex kodu ile herhangi bir renk değeri girmeye izin ver.',

@@ -58,7 +58,7 @@ return [
     'code.config.mode' => 'Scegli il linguaggio per l\'evidenziazione della sintassi.',
     'code.config.mode_selectable' => 'Specifica se la modalità può essere modificata dall\'utente.',
     'code.config.rulers' => 'Configura i righelli verticali per facilitare l\'indentazione.',
-    'code.config.theme' => 'Scegli il tuo tema preferito.',
+    'code.config.color_mode' => 'Scegli il tuo tema preferito.',
     'code.title' => 'Codice',
     'collections.title' => 'Raccolte',
     'color.config.allow_any' => 'Consenti l\'immissione di qualsiasi valore di colore tramite il selettore o codice esadecimale.',

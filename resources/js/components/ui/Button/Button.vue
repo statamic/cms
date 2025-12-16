@@ -42,9 +42,9 @@ const buttonClasses = computed(() => {
                     'dark:from-gray-850 dark:to-gray-900 dark:hover:to-gray-850 dark:hover:bg-gray-900 dark:border-gray-700/80 dark:text-gray-300 dark:shadow-ui-md',
                 ],
                 primary: [
-                    'bg-linear-to-b from-primary/90 to-primary hover:bg-primary-hover text-white disabled:text-white/60 dark:disabled:text-white/50 border border-primary-border shadow-ui-md inset-shadow-2xs inset-shadow-white/25 [&_svg]:text-white [&_svg]:opacity-60',
+                    'bg-linear-to-b from-primary/90 to-primary hover:bg-primary-hover text-white disabled:opacity-60 disabled:text-white dark:disabled:text-white border border-primary-border shadow-ui-md inset-shadow-2xs inset-shadow-white/25 disabled:inset-shadow-none dark:disabled:inset-shadow-none [&_svg]:text-white [&_svg]:opacity-60',
                 ],
-                danger: 'bg-linear-to-b from-red-700/90 to-red-700 hover:bg-red-700/90 text-white border border-red-700 inset-shadow-xs inset-shadow-red-300 [&_svg]:text-red-200 disabled:text-red-200',
+                danger: 'bg-linear-to-b from-red-700/90 to-red-700 hover:bg-red-700/90 text-white border border-red-700 inset-shadow-xs inset-shadow-red-300 [&_svg]:text-red-200 disabled:text-white disabled:opacity-60 disabled:inset-shadow-none',
                 filled: 'bg-black/5 hover:bg-black/10 hover:text-gray-900 dark:hover:text-white dark:bg-white/15 dark:hover:bg-white/20 [&_svg]:opacity-70',
                 ghost: 'bg-transparent hover:bg-gray-400/10 text-gray-900 dark:text-gray-300 dark:hover:bg-white/7 dark:hover:text-gray-200',
                 'ghost-pressed': 'bg-transparent hover:bg-gray-400/10 text-black dark:text-white dark:hover:bg-white/7 dark:hover:text-white [&_svg]:opacity-100',
