@@ -41,7 +41,7 @@
                     <TabContent name="conditions">
                         <CardPanel :heading="__('Conditions')">
                             <FieldConditionsBuilder
-                                :config="config"
+                                :config="values"
                                 :suggestable-fields="suggestableConditionFields"
                                 @updated="updateFieldConditions"
                                 @updated-always-save="updateAlwaysSave"
@@ -51,7 +51,7 @@
 
                     <TabContent name="validation">
                         <CardPanel :heading="__('Validation')">
-                            <FieldValidationBuilder :config="config" @updated="updateField('validate', $event)" />
+                            <FieldValidationBuilder :config="values" @updated="updateField('validate', $event)" />
                         </CardPanel>
                     </TabContent>
                 </div>
