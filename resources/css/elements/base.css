@@ -69,6 +69,28 @@
         outline: none;
     }
 
+    /* Notes...
+    
+        - Sometimes we want to show a focus outline on a container when it has focus-within, e.g. in Replicator sets where we want to show a focus outline on the set header when it has focus on the button inside the header, whose shape is not as neat.
+
+        - Here we set a specific target for the focus outline
+
+        <div class="show-focus-within"> <-- This shows a focus outline when only the target button inside has focus.
+            <button class="show-focus-within_target">
+                Focus me
+            </button>
+        </div>
+
+    s*/
+    .show-focus-within:has(.show-focus-within_target:focus-visible) {
+        /* Stop the transition ruining the focus outline quickly appearing. */
+        transition: none;
+        outline-width: var(--focus-outline-width);
+        outline-offset: var(--focus-outline-offset);
+        outline-color: var(--focus-outline-color, currentColor);
+        outline-style: var(--focus-outline-style, solid);
+    }
+
     [data-ui-dropdown-item] {
         &:focus-visible {
             outline-width: var(--focus-outline-width);
