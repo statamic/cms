@@ -249,7 +249,6 @@ class FileCacher extends AbstractCacher
     public function getCsrfTokenJs(): string
     {
         $csrfPlaceholder = CsrfTokenReplacer::REPLACEMENT;
-        $nocacheUrl = URL::makeRelative(route('statamic.nocache'));
 
         $default = <<<EOT
 (function() {
@@ -289,7 +288,9 @@ EOT;
 
     public function getNocacheJs(): string
     {
-        $default = <<<'EOT'
+        $nocacheUrl = URL::makeRelative(route('statamic.nocache'));
+
+        $default = <<<EOT
 (function() {
     function createMap() {
         var map = {};
