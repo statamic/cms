@@ -433,8 +433,6 @@ class Color
                 : $config['colors'];
         }
 
-        $config = $config ?? config('statamic.cp.theme') ?? [];
-
         foreach ($config[$dark ? 'dark-grays' : 'grays'] ?? [] as $shade => $value) {
             $colorHandle = $dark ? 'dark-gray' : 'gray';
             $config["{$colorHandle}-{$shade}"] = $value;

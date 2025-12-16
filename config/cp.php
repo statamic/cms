@@ -1,7 +1,5 @@
 <?php
 
-use Statamic\CP\Color;
-
 return [
 
     /*
@@ -94,47 +92,6 @@ return [
     */
 
     'support_url' => env('STATAMIC_SUPPORT_URL', 'https://statamic.com/support'),
-
-    /*
-    |--------------------------------------------------------------------------
-    | Theme
-    |--------------------------------------------------------------------------
-    |
-    | Adjust the colors used in the Control Panel. Use the Color class
-    | to easily access the Tailwind CSS color palette.
-    |
-    */
-
-    'theme' => [
-        // 'grays' => Color::Zinc,
-
-        // 'primary' => Color::Zinc[800],
-        // 'success' => Color::Green[400],
-        // 'danger' => Color::Red[600],
-
-        // 'ui-accent-bg' => Color::Zinc[800],
-        // 'ui-accent-text' => Color::Zinc[800],
-        // 'dark-ui-accent-bg' => Color::Zinc[950],
-        // 'dark-ui-accent-text' => Color::Zinc[400],
-
-        // 'body-bg' => Color::Zinc[100],
-        // 'body-border' => Color::Transparent,
-        // 'dark-body-bg' => Color::Zinc[900],
-        // 'dark-body-border' => Color::Zinc[950],
-
-        // 'global-header-bg' => Color::Zinc[800],
-        // 'dark-global-header-bg' => Color::Zinc[800],
-
-        // 'content-bg' => "linear-gradient(to right, hsl(0,0%,99%), #ffffff)",
-        // 'content-border' => Color::Zinc[200],
-        // 'dark-content-bg' => Color::Zinc[900],
-        // 'dark-content-border' => Color::Zinc[950],
-
-        // 'progress-bar' => Color::Volt,
-
-        // 'switch-bg' => Color::Green[500],
-        // 'dark-switch-bg' => Color::Green[600],
-    ],
 
     /*
     |--------------------------------------------------------------------------
