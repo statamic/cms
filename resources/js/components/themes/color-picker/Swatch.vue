@@ -29,6 +29,11 @@ const classes = computed(() => {
     ]);
 });
 
+const attrsBinding = computed(() => {
+    const { class: _class, ...rest } = attrs;
+    return rest;
+});
+
 const colorName = computed(() => {
    return props.colorName || props.color;
 });
@@ -54,6 +59,7 @@ function select() {
         type="button"
         :class="classes"
         :title="colorName"
+        v-bind="attrsBinding"
         @click="select"
         @mouseover="emit('mouseover', colorName)"
     >

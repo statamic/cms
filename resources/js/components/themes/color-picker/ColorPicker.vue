@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { Popover, Description } from '@ui';
+import { Description, Popover } from '@ui';
 import { computed, ref } from 'vue';
-import { colors, specialColors, colorFamilies, shades } from '.';
+import { colorFamilies, colors, shades, specialColors } from '.';
 import Swatch from './Swatch.vue';
+import { translate as __ } from '@/translations/translator';
 
 const props = defineProps<{
     modelValue?: string;
@@ -30,10 +31,11 @@ function isSelected(color: string, shade?: number) {
     }
 }
 
+const colorLabel = computed(() => {
+    return hoveredColor.value ? hoveredColor.value : selectedColor.value;
+});
+
 const selectedColor = computed(() => {
-    if (hoveredColor.value) {
-        return hoveredColor.value;
-    }
 
     if (!props.modelValue) return '';
 
@@ -54,6 +56,23 @@ const selectedColor = computed(() => {
 
     return props.modelValue;
 });
+
+const customSwatchBackground = computed(() => {
+    return isCustomSelected.value
+        ? props.modelValue
+        : 'linear-gradient(to bottom right, red, orange, yellow, green, blue, indigo, violet)';
+});
+
+const isCustomSelected = computed(() => {
+    if (!props.modelValue) return false;
+    return selectedColor.value === props.modelValue;
+});
+
+function customSelected() {
+    const value = prompt(__('Enter a color value'));
+
+    if (value) colorSelected(value);
+}
 </script>
 
 <template>
@@ -74,7 +93,7 @@ const selectedColor = computed(() => {
         </template>
         <div class="p-2">
             <div class="mb-2 text-center">
-                <Description :text="selectedColor" />
+                <Description :text="colorLabel" />
             </div>
             <div class="grid grid-cols-23" @mouseleave="hoveredColor = null">
                 <div v-for="family in colorFamilies" :key="family.key" :data-family="family.key" class="flex flex-col">
@@ -111,6 +130,14 @@ const selectedColor = computed(() => {
                         color="volt"
                         :is-selected="isSelected('volt')"
                         @selected="colorSelected"
+                        @mouseover="colorHovered"
+                    />
+                    <Swatch
+                        color="transparent"
+                        color-name="Custom"
+                        :style="{ background: `${customSwatchBackground}` }"
+                        :is-selected="isCustomSelected"
+                        @selected="customSelected"
                         @mouseover="colorHovered"
                     />
                 </div>
