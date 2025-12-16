@@ -221,14 +221,16 @@ function onAnimationComplete() {
                 @animation-start="onAnimationStart"
                 @animation-complete="onAnimationComplete"
             >
-                <FieldsProvider
-                    :fields="config.fields"
-                    :as-config="false"
-                    :field-path-prefix="fieldPathPrefix"
-                    :meta-path-prefix="metaPathPrefix"
-                >
-                    <Fields class="p-4" />
-                </FieldsProvider>
+                <div :tabindex="collapsed ? -1 : undefined" :inert="collapsed">
+                    <FieldsProvider
+                        :fields="config.fields"
+                        :as-config="false"
+                        :field-path-prefix="fieldPathPrefix"
+                        :meta-path-prefix="metaPathPrefix"
+                    >
+                        <Fields class="p-4" />
+                    </FieldsProvider>
+                </div>
             </Motion>
         </div>
 
