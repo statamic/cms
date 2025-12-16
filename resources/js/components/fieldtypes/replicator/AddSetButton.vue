@@ -21,13 +21,13 @@
                     :class="isFirst ? 'h-[65%] top-[30%] opacity-60' : 'h-full opacity-100'"
                 />
                 <button
-                    class="absolute inset-0 h-full w-full opacity-0 group-hover:opacity-100 transition-opacity delay-10 duration-250 cursor-pointer"
+                    class="absolute inset-0 h-full w-full opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity delay-10 duration-250 cursor-pointer"
                 >
                     <div class="h-full flex flex-col justify-center">
                         <div class="rounded-full bg-[linear-gradient(90deg,theme(colors.gray.100)_0%,theme(colors.gray.200)_50%,theme(colors.gray.100)_100%)] dark:bg-[linear-gradient(90deg,theme(colors.gray.800)_0%,theme(colors.gray.700)_50%,theme(colors.gray.800)_100%)] h-2" />
                     </div>
                 </button>
-                <Button v-if="enabled" round icon="plus" size="sm" class="-my-4 z-3 opacity-0 group-hover:opacity-100 transition-opacity delay-10 duration-250" />
+                <Button v-if="enabled" round icon="plus" size="sm" class="-my-4 z-3 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity delay-10 duration-250" tabindex="-1" />
             </div>
         </template>
     </set-picker>
