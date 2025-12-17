@@ -49,6 +49,7 @@
                     variant="ghost"
                     :aria-label="__('Remove Asset')"
                     :title="__('Remove')"
+                    destructive
                 />
 
                 <asset-editor

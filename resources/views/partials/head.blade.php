@@ -50,7 +50,7 @@
     :root {
         {{ \Statamic\CP\Color::cssVariables() }}
 
-        &.dark {
+        &.dark, .dark {
             {{ \Statamic\CP\Color::cssVariables(dark: true) }}
         }
     }

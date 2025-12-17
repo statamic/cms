@@ -19,6 +19,7 @@ const props = defineProps({
     text: { type: [String, Number, Boolean, null], default: null },
     type: { type: String, default: 'button' },
     variant: { type: String, default: 'default' },
+    destructive: { type: Boolean, default: false },
 });
 
 const slots = useSlots();
@@ -48,7 +49,7 @@ const buttonClasses = computed(() => {
                 filled: 'bg-black/5 hover:bg-black/10 hover:text-gray-900 dark:hover:text-white dark:bg-white/15 dark:hover:bg-white/20 [&_svg]:opacity-70',
                 ghost: 'bg-transparent hover:bg-gray-400/10 text-gray-900 dark:text-gray-300 dark:hover:bg-white/7 dark:hover:text-gray-200',
                 'ghost-pressed': 'bg-transparent hover:bg-gray-400/10 text-black dark:text-white dark:hover:bg-white/7 dark:hover:text-white [&_svg]:opacity-100',
-                subtle: 'bg-transparent hover:bg-gray-400/10 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-white/7 dark:hover:text-gray-200 [&_svg]:opacity-35',
+                subtle: 'bg-transparent hover:bg-gray-400/10 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-white/7 dark:hover:text-gray-200',
                 pressed: [
                     'bg-linear-to-b from-gray-200 to-gray-150 text-gray-900 border border-gray-300 inset-shadow-sm/10',
                     'dark:from-black dark:to-black dark:text-white dark:border-gray-700/80',
@@ -63,8 +64,8 @@ const buttonClasses = computed(() => {
             },
             groupBorder: {
                 danger: [
-                    'in-data-ui-button-group:text-red-500 in-data-ui-button-group:bg-linear-to-b in-data-ui-button-group:from-white in-data-ui-button-group:to-red-50 in-data-ui-button-group:hover:to-gray-100 in-data-ui-button-group:hover:bg-gray-50 in-data-ui-button-group:border in-data-ui-button-group:border-gray-300 in-data-ui-button-group:shadow-ui-sm in-data-ui-button-group:inset-shadow-none',
-                    'dark:in-data-ui-button-group:text-red-500 dark:in-data-ui-button-group:from-gray-850 dark:in-data-ui-button-group:to-red-900/10 dark:in-data-ui-button-group:hover:to-gray-850 dark:in-data-ui-button-group:hover:bg-gray-900 dark:in-data-ui-button-group:border-gray-700/80 dark:in-data-ui-button-group:shadow-ui-md',
+                    'in-data-ui-button-group:text-danger in-data-ui-button-group:bg-linear-to-b in-data-ui-button-group:from-white in-data-ui-button-group:to-red-50 in-data-ui-button-group:hover:to-gray-100 in-data-ui-button-group:hover:bg-gray-50 in-data-ui-button-group:border in-data-ui-button-group:border-gray-300 in-data-ui-button-group:shadow-ui-sm in-data-ui-button-group:inset-shadow-none',
+                    'dark:in-data-ui-button-group:text-danger dark:in-data-ui-button-group:from-gray-850 dark:in-data-ui-button-group:to-red-900/10 dark:in-data-ui-button-group:hover:to-gray-850 dark:in-data-ui-button-group:hover:bg-gray-900 dark:in-data-ui-button-group:border-gray-700/80 dark:in-data-ui-button-group:shadow-ui-md',
                 ],
                 ghost: '',
                 pressed: 'in-data-ui-button-group:border-s-0 [:is([data-ui-button-group]>&:first-child,_[data-ui-button-group]_:first-child>&)]:border-s-[1px]',
@@ -105,6 +106,7 @@ const buttonClasses = computed(() => {
         :class="buttonClasses"
         :disabled="loading"
         :data-ui-group-target="['subtle', 'ghost'].includes(props.variant) ? null : true"
+        :data-destructive="destructive || undefined"
         :href
         :target
         :type="props.href ? null : type"

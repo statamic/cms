@@ -10,6 +10,7 @@
     --focus-within-outline-offset: 0px;
     --focus-outline-color: var(--theme-color-focus-outline, var(--color-blue-400));
     --focus-outline-style: solid;
+    --danger-outline-color: oklch(from var(--theme-color-danger) l c h / 0.5);
 
     /* The outline-offset value used for buttons */
     --outline-offset-button: 6px;
@@ -118,6 +119,46 @@
     .group\/button button:focus {
         /* Pull the focus state above any adjacent buttons e.g. >> /cp/collections/articles/entries - save button alongside the dropdown arrow */
         z-index: var(--z-index-above);
+    }
+}
+
+/* DESTRUCTIVE STATES
+=================================================== */
+@layer utilities {
+    /* Destructive buttons */
+    [data-destructive]:not([data-ui-badge] *) {
+        --focus-outline-color: var(--danger-outline-color);
+        --focus-outline-width: 1px;
+        &:hover,
+        &:hover::before,
+        &:focus {
+            /* Delete states - use outline state instead so we don't have to worry about overriding borders, or adding borders to pseudo elements */
+            outline: var(--focus-outline-width) var(--focus-outline-style) var(--focus-outline-color);
+            outline-offset: var(--focus-outline-offset);
+            background: var(--color-danger-bg);
+            svg {
+                color: var(--color-danger);
+                /* Need !important to override dark mode */
+                opacity: 1!important;
+            }
+        }
+    }
+    /* DESTRUCTIVE STATES / BADGES
+    =================================================== */
+    /* When a badge "x" is hovered, the whole badge lights up red. */
+    [data-ui-badge]:has([data-destructive]:is(:hover, :focus)) {
+        --focus-outline-color: var(--danger-outline-color);
+        --focus-outline-width: 1px;
+        background: var(--color-danger-bg);
+        outline: var(--focus-outline-width) var(--focus-outline-style) var(--focus-outline-color);
+        outline-offset: var(--focus-outline-offset);
+        &, button {
+            color: var(--color-danger);
+        }
+        /* Cancel the outline on the actual button since we're highlighting the entire badge */
+        button {
+            outline: none;
+        }
     }
 }
 

@@ -148,7 +148,18 @@ const calendarEvents = computed(() => ({
                         </DateRangePickerInput>
                     </template>
                     <div class="flex-1" />
-                    <Button v-if="!readOnly" @click="emit('update:modelValue', null)" variant="subtle" size="sm" icon="x" class="-me-2" :disabled="disabled" />
+                    <Button 
+                        v-if="!readOnly" 
+                        @click="emit('update:modelValue', null)" 
+                        variant="subtle" 
+                        size="sm" 
+                        icon="x" 
+                        class="-me-2" 
+                        :disabled="disabled" 
+                        :aria-label="__('Clear date range')"
+                        v-tooltip="__('Clear date range')"
+                        destructive
+                    />
                 </div>
             </DateRangePickerField>
 
