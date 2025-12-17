@@ -1,5 +1,5 @@
 <template>
-    <div ref="browser" @keydown.shift="shiftDown" @keyup="clearShift">
+    <div ref="browser" class="h-full" @keydown.shift="shiftDown" @keyup="clearShift">
         <Uploader
             ref="uploader"
             :container="container.id"
