@@ -52,7 +52,6 @@ function customUpdated(theme: Theme) {
 watch(
     () => props.modelValue,
     (newValue) => newValue ? applyTheme(newValue) : applyDefaultTheme(),
-    { immediate: true }
 )
 
 function selectNewlyPublishedTheme() {
