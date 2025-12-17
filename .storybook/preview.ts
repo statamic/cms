@@ -1,11 +1,11 @@
-import type { Preview } from '@storybook/vue3-vite';
-import { setup } from '@storybook/vue3';
-import { create as createTheme } from 'storybook/theming';
-import { router } from '@inertiajs/vue3';
-import { action } from 'storybook/actions';
+import type {Preview} from '@storybook/vue3-vite';
+import {setup} from '@storybook/vue3';
+import {create as createTheme} from 'storybook/theming';
+import {router} from '@inertiajs/vue3';
+import {action} from 'storybook/actions';
 import './storybook.css';
 import './theme.css';
-import { translate } from '@/translations/translator';
+import {translate} from '@/translations/translator';
 import registerUiComponents from '@/bootstrap/ui';
 import DateFormatter from '@/components/DateFormatter';
 import cleanCodeSnippet from './clean-code-snippet';
@@ -18,6 +18,22 @@ router.on('before', (event) => {
 
 setup(async (app) => {
   window.__ = translate;
+  window.Statamic = {
+      $config: {
+          get(key) {
+              const config = {
+                  linkToDocs: true,
+              };
+
+              return config[key] ?? null;
+          }
+      },
+      $commandPalette: {
+          add(command) {
+              //
+          }
+      }
+  };
   app.config.globalProperties.__ = translate;
   app.config.globalProperties.$date = new DateFormatter;
   await registerUiComponents(app);
@@ -55,6 +71,7 @@ const preview: Preview = {
                     '*',
                     'Components'
                 ],
+                method: 'alphabetical',
             },
         },
     },
