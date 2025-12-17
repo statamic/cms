@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { TabContent, TabList, Tabs, TabTrigger } from '@ui';
-import { ref, watch } from 'vue';
+import { onUnmounted, ref, watch } from 'vue';
 import Themes from './Themes.vue';
 import Custom from './Custom.vue';
 import { Theme } from './types';
@@ -53,6 +53,9 @@ watch(
     () => props.modelValue,
     (newValue) => newValue ? applyTheme(newValue) : applyDefaultTheme(),
 )
+
+const originalTheme = props.modelValue;
+onUnmounted(() => applyTheme(originalTheme));
 
 function selectNewlyPublishedTheme() {
     if (!props.modelValue || props.modelValue.id !== 'custom') return;
