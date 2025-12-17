@@ -2,8 +2,6 @@
 import { computed, ref, watch } from 'vue';
 import { cva } from 'cva';
 
-const emit = defineEmits(['update:text']);
-
 const props = defineProps({
     text: { type: String, default: '' },
     limit: { type: Number, default: null },
