@@ -39,6 +39,13 @@ trait ManagesPreferences
         $fields->validate();
 
         $fields->all()->each(function ($field) use ($item) {
+            // Theme-specific workaround for lack of fallback logic.
+            if ($field->handle() === 'theme') {
+                $item->setPreference('theme', $field->value());
+
+                return;
+            }
+
             if ($field->value() === $field->defaultValue()) {
                 $item->removePreference($field->handle());
             } else {
