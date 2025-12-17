@@ -877,12 +877,9 @@ export default {
 
     beforeUnmount() {
         if (this.autosaveIntervalInstance) clearInterval(this.autosaveIntervalInstance);
-    },
-
-    unmounted() {
-        clearTimeout(this.trackDirtyStateTimeout);
-        this.saveKeyBinding.destroy();
-        this.quickSaveKeyBinding.destroy();
+	    clearTimeout(this.trackDirtyStateTimeout);
+	    this.saveKeyBinding.destroy();
+	    this.quickSaveKeyBinding.destroy();
     },
 };
 </script>

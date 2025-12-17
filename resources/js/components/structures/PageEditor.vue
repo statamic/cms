@@ -318,7 +318,7 @@ export default {
         this.getPageValues();
     },
 
-    unmounted() {
+    beforeUnmount() {
         this.saveKeyBinding.destroy();
     },
 };

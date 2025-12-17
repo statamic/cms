@@ -53,7 +53,7 @@ export default {
         });
     },
 
-    unmounted() {
+	beforeUnmount() {
         this.saveKeyBinding.destroy();
     },
 

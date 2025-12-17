@@ -61,7 +61,7 @@ return [
     'code.config.rulers' => 'Configurez des règles verticales pour vous aider avec l’indentation.',
     'code.config.rulers_value_header' => 'Style de ligne (pointillé ou continu)',
     'code.config.show_mode_label' => 'Si l’étiquette du mode doit être affichée.',
-    'code.config.theme' => 'Choisissez votre thème préféré.',
+    'code.config.color_mode' => 'Choisissez votre thème préféré.',
     'code.title' => 'Code',
     'collections.title' => 'Collections',
     'color.config.allow_any' => 'Autorisez la sélection de n’importe quelle couleur via le sélecteur ou la saisie d’un code hex.',

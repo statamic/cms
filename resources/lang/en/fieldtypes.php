@@ -62,7 +62,7 @@ return [
     'code.config.rulers' => 'Configure vertical rulers to help with indentation.',
     'code.config.rulers_value_header' => 'Line Style (dashed or solid)',
     'code.config.show_mode_label' => 'Whether the mode label should be shown.',
-    'code.config.theme' => 'Choose your preferred theme.',
+    'code.config.color_mode' => 'Choose your preferred color mode.',
     'code.title' => 'Code',
     'collections.title' => 'Collections',
     'color.config.allow_any' => 'Allow entering any color value via picker or hex code.',
