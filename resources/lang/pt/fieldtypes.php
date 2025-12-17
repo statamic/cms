@@ -57,7 +57,7 @@ return [
     'code.config.mode' => 'Escolha a língua para destacar a sintaxe.',
     'code.config.mode_selectable' => 'Se o modo pode ser alterado pelo usuário.',
     'code.config.rulers' => 'Configure réguas verticais para ajudar no recuo.',
-    'code.config.theme' => 'Escolha o seu tema preferido.',
+    'code.config.color_mode' => 'Escolha o seu tema preferido.',
     'code.title' => 'Code',
     'collections.title' => 'Collections',
     'color.config.allow_any' => 'Permite inserir qualquer valor de cor por meio de seletor ou código hexadecimal.',

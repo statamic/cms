@@ -57,7 +57,7 @@ return [
     'code.config.mode' => '構文強調表示の言語を選択します。',
     'code.config.mode_selectable' => 'ユーザーがモードを変更できるかどうか。',
     'code.config.rulers' => 'インデントしやすいように垂直ルーラーを構成します。',
-    'code.config.theme' => '好みのテーマを選択してください。',
+    'code.config.color_mode' => '好みのテーマを選択してください。',
     'code.title' => 'コード',
     'collections.title' => 'コレクション',
     'color.config.allow_any' => 'ピッカーまたは 16 進コードを介して任意の色の値を入力できるようにします。',

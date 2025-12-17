@@ -57,7 +57,7 @@ return [
     'code.config.mode' => 'Wybierz język dla podświetlania składni.',
     'code.config.mode_selectable' => 'Czy użytkownik może zmienić tryb.',
     'code.config.rulers' => 'Skonfiguruj pionowe linijki pomagające w wcięciach.',
-    'code.config.theme' => 'Wybierz preferowany motyw.',
+    'code.config.color_mode' => 'Wybierz preferowany motyw.',
     'code.title' => 'Kod',
     'collections.title' => 'Kolekcje',
     'color.config.allow_any' => 'Zezwól na wprowadzanie dowolnej wartości koloru za pomocą selektora lub kodu szesnastkowego.',

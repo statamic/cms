@@ -36,6 +36,7 @@ it('exports api', async () => {
     const expected = [
         'bard',
         'callbacks',
+        'colorMode',
         'commandPalette',
         'components',
         'conditions',
@@ -56,7 +57,6 @@ it('exports api', async () => {
         'reveal',
         'slug',
         'stacks',
-        'theme',
         'toast',
     ];
 
@@ -70,6 +70,8 @@ it('exports inertia', async () => {
         'Head',
         'Link',
         'router',
+        'toggleArchitecturalBackground',
+        'useArchitecturalBackground',
         'useForm',
         'usePoll',
     ];
@@ -172,6 +174,7 @@ it('exports ui', async () => {
         'TabContent',
         'TabList',
         'TabTrigger',
+        'Stack',
         'Table',
         'TableCell',
         'TableColumn',

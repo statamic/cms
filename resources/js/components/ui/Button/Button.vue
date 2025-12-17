@@ -42,9 +42,9 @@ const buttonClasses = computed(() => {
                     'dark:from-gray-850 dark:to-gray-900 dark:hover:to-gray-850 dark:hover:bg-gray-900 dark:border-gray-700/80 dark:text-gray-300 dark:shadow-ui-md',
                 ],
                 primary: [
-                    'bg-linear-to-b from-primary/90 to-primary hover:bg-primary-hover text-white disabled:text-white/60 dark:disabled:text-white/50 border border-primary-border shadow-ui-md inset-shadow-2xs inset-shadow-white/25 [&_svg]:text-white [&_svg]:opacity-60',
+                    'bg-linear-to-b from-primary/90 to-primary hover:bg-primary-hover text-white disabled:opacity-60 disabled:text-white dark:disabled:text-white border border-primary-border shadow-ui-md inset-shadow-2xs inset-shadow-white/25 disabled:inset-shadow-none dark:disabled:inset-shadow-none [&_svg]:text-white [&_svg]:opacity-60',
                 ],
-                danger: 'bg-linear-to-b from-red-700/90 to-red-700 hover:bg-red-700/90 text-white border border-red-700 inset-shadow-xs inset-shadow-red-300 [&_svg]:text-red-200 disabled:text-red-200',
+                danger: 'bg-linear-to-b from-red-700/90 to-red-700 hover:bg-red-700/90 text-white border border-red-700 inset-shadow-xs inset-shadow-red-300 [&_svg]:text-red-200 disabled:text-white disabled:opacity-60 disabled:inset-shadow-none',
                 filled: 'bg-black/5 hover:bg-black/10 hover:text-gray-900 dark:hover:text-white dark:bg-white/15 dark:hover:bg-white/20 [&_svg]:opacity-70',
                 ghost: 'bg-transparent hover:bg-gray-400/10 text-gray-900 dark:text-gray-300 dark:hover:bg-white/7 dark:hover:text-gray-200',
                 'ghost-pressed': 'bg-transparent hover:bg-gray-400/10 text-black dark:text-white dark:hover:bg-white/7 dark:hover:text-white [&_svg]:opacity-100',
@@ -59,6 +59,7 @@ const buttonClasses = computed(() => {
                 base: 'px-4 h-10 text-sm gap-2 rounded-lg',
                 sm: 'px-3 h-8 text-[0.8125rem] leading-tight gap-2 rounded-lg [&_svg]:size-3',
                 xs: 'px-2 h-6 text-xs gap-1.5 rounded-md [&_svg]:size-2.5',
+                '2xs': 'px-1.5 h-5 text-xs gap-1 rounded-md [&_svg]:size-2',
             },
             groupBorder: {
                 danger: [
@@ -75,7 +76,8 @@ const buttonClasses = computed(() => {
             { iconOnly: true, size: 'lg', class: 'w-12 [&_svg]:size-5' },
             { iconOnly: true, size: 'base', class: 'w-10 [&_svg]:size-4.5' },
             { iconOnly: true, size: 'sm', class: 'w-8 [&_svg]:size-3.5' },
-            { iconOnly: true, size: 'xs', class: 'w-6.5 h-6.5 [&_svg]:size-3' },
+            { iconOnly: true, size: 'xs', class: 'size-6.5 [&_svg]:size-3' },
+            { iconOnly: true, size: '2xs', class: 'size-5 [&_svg]:size-2.5' },
             { iconOnly: true, variant: 'pressed', class: '[&_svg]:!opacity-70 dark:[&_svg]:!opacity-100' },
             { iconOnly: false, iconAppend: true, class: '[&_svg]:-me-1' },
             { iconOnly: false, iconPrepend: true, class: '[&_svg]:-ms-0.5' },
@@ -83,6 +85,7 @@ const buttonClasses = computed(() => {
             { inset: true, size: 'base', class: '-m-1' },
             { inset: true, size: 'sm', class: '-m-0.75' },
             { inset: true, size: 'xs', class: '-m-0.25' },
+            { inset: true, size: '2xs', class: '-m-0.125' },
         ],
     })({
         ...props,

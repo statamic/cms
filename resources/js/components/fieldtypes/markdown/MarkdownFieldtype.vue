@@ -53,6 +53,7 @@
                             :is-fullscreen="false"
                             @toggle-dark-mode="toggleDarkMode"
                             @button-click="handleButtonClick"
+                            class="sticky z-(--z-index-above) -top-2 mb-2 [&~*]:-mt-2"
                         />
 
                         <div class="drag-notification" v-show="dragging">
@@ -95,7 +96,7 @@
                                 <!-- Hidden input for label association -->
                                 <input v-if="id" :id="id" type="text" class="sr-only" @focus="focusCodeMirror" tabindex="-1" />
 
-                                <footer class="flex items-center justify-between bg-gray-50 dark:bg-gray-900 rounded-b-[calc(var(--radius-lg)-1px)] border-t border-gray-300 dark:border-white/10 p-1 text-sm w-full" :class="{ 'absolute inset-x-0 bottom-0 rounded-': fullScreenMode }">
+                                <footer class="flex items-center justify-between bg-gray-50 dark:bg-gray-900 rounded-b-[calc(var(--radius-lg)-1px)] border-t border-gray-300 dark:border-white/10 p-1 text-sm w-full" :class="{ 'absolute inset-x-0 bottom-0 rounded-none z-(--z-index-above)': fullScreenMode }">
                                     <div class="markdown-cheatsheet-helper">
                                         <Button
                                             icon="markdown"
@@ -131,7 +132,7 @@
                     </div>
                 </uploader>
 
-                <stack v-if="showAssetSelector && !isReadOnly" name="markdown-asset-selector" @closed="closeAssetSelector">
+                <ui-stack v-if="showAssetSelector && !isReadOnly" name="markdown-asset-selector" @closed="closeAssetSelector">
                     <asset-selector
                         :container="container"
                         :folder="folder"
@@ -141,9 +142,9 @@
                         @selected="assetsSelected"
                         @closed="closeAssetSelector"
                     />
-                </stack>
+                </ui-stack>
 
-                <stack narrow name="markdownCheatSheet" v-if="showCheatsheet" @closed="showCheatsheet = false">
+                <ui-stack narrow name="markdownCheatSheet" v-if="showCheatsheet" @closed="showCheatsheet = false">
                     <div class="relative h-full overflow-auto bg-white p-6 dark:bg-gray-800 rounded-l-2xl">
                         <Button
                             icon="x"
@@ -156,7 +157,7 @@
                             <div v-html="__('markdown.cheatsheet')"></div>
                         </div>
                     </div>
-                </stack>
+                </ui-stack>
             </div>
         </div>
     </portal>
@@ -327,8 +328,11 @@ export default {
         },
 
         toggleFullscreen() {
-            this.fullScreenMode = !this.fullScreenMode;
-            this.trackHeightUpdates();
+            if (this.fullScreenMode) {
+                this.closeFullScreen();
+            } else {
+                this.openFullScreen();
+            }
         },
 
         toggleDarkMode() {
@@ -800,7 +804,7 @@ export default {
             return [
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => (vm.fullScreenMode ? 'collapse-all' : 'expand-all'),
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'fullscreen-close' : 'fullscreen-open'),
                     quick: true,
                     visibleWhenReadOnly: true,
                     run: this.toggleFullscreen,

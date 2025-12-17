@@ -195,7 +195,7 @@
 =================================================== */
 @layer ui {
     .bard-floating-toolbar {
-        @apply flex rounded-full bg-black px-2 shadow-lg whitespace-nowrap;
+        @apply flex rounded-full bg-black px-2 shadow-lg whitespace-nowrap z-(--z-index-portal) relative;
 
         &:before {
             @apply border-t-black top-full start-1/2 absolute -ml-[3px] content-none border-6 border-transparent;
@@ -244,18 +244,22 @@
         }
     }
 }
-/* Fullscreen mode
-   ========================================================================== */
+/* BARD / FULL SCREEN
+=================================================== */
 @layer ui-states {
     .bard-fullscreen {
-        @apply fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-100 pt-14 dark:bg-gray-900;
+        @apply fixed inset-0 min-h-screen overflow-scroll border-none rounded-none bg-gray-100 pt-14 dark:bg-gray-850;
 
         & > .bard-editor {
-            @apply relative mx-auto my-6 max-w-5xl rounded-lg bg-white px-8 shadow-ui-md dark:bg-gray-800 dark:shadow-lg;
+            @apply relative mx-auto my-6 max-w-5xl rounded-lg bg-white px-8 shadow-ui-md dark:bg-gray-950 dark:shadow-lg;
+        }
+        .bard-content {
+            @apply dark:bg-gray-950;
         }
 
         .bard-fixed-toolbar {
             padding: 7px 8px;
+            margin-block-end: 0;
             top: 0;
             background: unset;
             border: unset;

@@ -80,26 +80,21 @@
                             />
                         </td>
                         <td class="row-controls" v-if="!isReadOnly">
-                            <button
-                                @click="deleteOrConfirm(index)"
-                                class="inline text-lg antialiased opacity-25 hover:opacity-75 cursor-pointer"
-                            >
-                                &times;
-                            </button>
+                            <ui-button icon="x" variant="subtle" size="xs" round delete-action @click="deleteOrConfirm(index)" :aria-label="__('Delete Row')" v-tooltip="__('Delete Row')" />
                         </td>
                     </tr>
                 </tbody>
             </sortable-list>
         </table>
 
-        <Button @click="addValue" icon="plus" size="sm" :disabled="atMax" v-if="!isReadOnly && !isSingle && !isKeyed">
-            {{ addButton }}
-        </Button>
+        <div class="flex gap-2">
+            <ui-button @click="addValue" :disabled="atMax" v-if="!isReadOnly && !isSingle && !isKeyed" :text="addButton" size="sm" />
+        </div>
 
         <confirmation-modal
             v-if="deleting !== false"
-            :title="__('Delete Value')"
-            :bodyText="__('Are you sure you want to delete this value?')"
+            :title="__('Delete Row')"
+            :bodyText="__('Are you sure you want to delete this row?')"
             :buttonText="__('Delete')"
             :danger="true"
             @confirm="deleteValue(deleting)"

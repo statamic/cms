@@ -1,22 +1,30 @@
-import path from 'path';
-import fs from 'fs';
+import * as Vue from 'vue';
 
 export default function() {
+    const RESOLVED_VIRTUAL_MODULE_ID = '\0vue-external';
+    const vueExports = Object.keys(Vue).filter(key => key !== 'default');
+
     return {
         name: 'statamic-externals',
+        enforce: 'pre',
 
-        config(config, { command }) {
-            // Ensure rollupOptions exists
-            config.build = config.build || {};
-            config.build.rollupOptions = config.build.rollupOptions || {};
+        resolveId(id) {
+            if (id === 'vue') {
+                return RESOLVED_VIRTUAL_MODULE_ID;
+            }
+            return null;
+        },
 
-            // Add Vue as external
-            config.build.rollupOptions.external = [
-                ...(config.build.rollupOptions.external ?? []),
-                'vue'
-            ];
-
-            return config;
+        load(id) {
+            if (id === RESOLVED_VIRTUAL_MODULE_ID) {
+                const exportsList = vueExports.join(', ');
+                return `
+                    const Vue = window.Vue;
+                    export default Vue;
+                    export const { ${exportsList} } = Vue;
+                `;
+            }
+            return null;
         },
 
         configResolved(resolvedConfig) {

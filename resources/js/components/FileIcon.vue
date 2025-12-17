@@ -19,7 +19,7 @@ export default {
                 case 'pkg':
                 case 'rar':
                 case 'tar':
-                case 'tar.zg':
+                case 'gz':
                 case 'z':
                 case 'zip':
                     return 'archive';
@@ -47,11 +47,14 @@ export default {
                     return 'excel';
                 case 'json':
                     return 'json';
+                case 'af':
                 case 'ai':
                 case 'eps':
                 case 'fig':
                 case 'indb':
+                case 'indd':
                 case 'psd':
+                case 'psb':
                 case 'sketch':
                     return 'layered';
                 case 'pdf':
@@ -83,12 +86,17 @@ export default {
                 case 'avif':
                 case 'bmp':
                 case 'gif':
+                case 'heic':
+                case 'heif':
                 case 'ico':
                 case 'jpg':
                 case 'jpeg':
                 case 'png':
+                case 'apng':
                 case 'raw':
+                case 'dng':
                 case 'nef':
+                case 'tif':
                 case 'tiff':
                 case 'webp':
                     return 'image';
