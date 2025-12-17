@@ -1,6 +1,6 @@
 <?php
 
-namespace Feature\Users;
+namespace Tests\Feature\Users;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
@@ -43,7 +43,7 @@ class TwoFactorChallengeTest extends TestCase
         $this
             ->session(['login.id' => $user->id()])
             ->get(cp_route('two-factor-challenge'))
-            ->assertViewIs('statamic::auth.two-factor.challenge');
+            ->assertInertia(fn ($page) => $page->component('auth/two-factor/Challenge'));
     }
 
     #[Test]

@@ -1,8 +1,8 @@
 <template>
-    <stack narrow name="page-tree-linker" :before-close="shouldClose" @closed="$emit('closed')" v-slot="{ close }">
-        <div class="flex h-full flex-col bg-gray-100 dark:bg-dark-700">
+    <ui-stack narrow name="page-tree-linker" :before-close="shouldClose" @closed="$emit('closed')" v-slot="{ close }">
+        <div class="flex h-full flex-col bg-gray-100 dark:bg-gray-850">
             <header
-                class="mb-4 flex items-center justify-between border-b bg-white py-2 text-lg font-medium shadow-md dark:border-dark-950 dark:bg-dark-550 ltr:pl-6 ltr:pr-3 rtl:pl-3 rtl:pr-6"
+                class="flex items-center justify-between border-b bg-white py-2 text-lg font-medium shadow-md dark:border-dark-950 dark:bg-dark-600 ltr:pl-6 ltr:pr-3 rtl:pl-3 rtl:pr-6"
             >
                 <Heading size="lg">{{ headerText }}</Heading>
                 <Button icon="x" variant="ghost" @click="close" />
@@ -10,13 +10,13 @@
 
             <div v-if="loading" class="relative flex-1 overflow-auto">
                 <div
-                    class="absolute inset-0 z-10 flex items-center justify-center bg-white bg-opacity-75 text-center dark:bg-dark-700"
+                    class="absolute inset-0 z-10 flex items-center justify-center bg-white bg-opacity-75 text-center dark:bg-gray-850"
                 >
                     <Icon name="loading" />
                 </div>
             </div>
 
-            <div v-if="!loading" class="flex-1 overflow-auto px-1">
+            <div v-if="!loading" class="flex-1 overflow-auto px-1 pt-4">
                 <div
                     v-if="saving"
                     class="absolute inset-0 z-10 flex items-center justify-center bg-white bg-opacity-75 dark:bg-dark-500"
@@ -41,11 +41,11 @@
 
             <div
                 v-if="!loading && (!readOnly || type === 'entry')"
-                class="flex flex-row-reverse items-center justify-between border-t bg-gray-200 p-4 dark:border-dark-900 dark:bg-dark-500"
+                class="flex flex-wrap flex-row-reverse gap-2 items-end justify-between border-t bg-gray-200 p-4 dark:border-dark-900 dark:bg-dark-600"
             >
-                <div v-if="!readOnly">
+                <div class="flex flex-wrap justify-end" v-if="!readOnly">
                     <Button variant="ghost" class="me-2" :text="__('Cancel')" @click="confirmClose(close)" />
-                    <Button variant="primary" :text="__('Submit')" @click="submit" />
+                    <Button variant="primary" :text="__('Apply')" @click="submit" />
                 </div>
                 <div v-if="type === 'entry'">
                     <Button icon="external-link" variant="ghost" :text="__('Edit Entry')" :href="editEntryUrl" target="_blank" />
@@ -62,18 +62,15 @@
             @confirm="confirmCloseWithChanges"
             @cancel="closingWithChanges = false"
         />
-    </stack>
+    </ui-stack>
 </template>
 
 <script>
 import { Heading, Button, PublishContainer, Icon } from '@/components/ui';
 import { flatten } from 'lodash-es';
 import { computed, ref } from 'vue';
-import { Pipeline, Request } from '@/components/ui/Publish/SavePipeline.js';
-
-let saving = ref(false);
-let errors = ref({});
-let container = null;
+import { Pipeline, Request } from '@ui/Publish/SavePipeline.js';
+import { clone } from '@/bootstrap/globals.js';
 
 export default {
     emits: ['closed', 'submitted', 'publish-info-updated', 'localized-fields-updated'],
@@ -97,13 +94,6 @@ export default {
         readOnly: Boolean,
     },
 
-    setup() {
-        return {
-            saving,
-            errors,
-        }
-    },
-
     data() {
         return {
             type: this.entry ? 'entry' : 'url',
@@ -120,7 +110,29 @@ export default {
         };
     },
 
+	setup() {
+		const savingRef = ref(false);
+		const errorsRef = ref({});
+
+		return {
+			savingRef: computed(() => savingRef),
+			errorsRef: computed(() => errorsRef),
+		};
+	},
+
     computed: {
+        containerRef() {
+            return computed(() => this.$refs.container);
+        },
+
+        saving() {
+            return this.savingRef.value;
+        },
+
+        errors() {
+            return this.errorsRef.value;
+        },
+
         headerText() {
             return this.entry ? __('Link to Entry') : __('Nav Item');
         },
@@ -202,10 +214,14 @@ export default {
     methods: {
         submit() {
             const postUrl = cp_url(`navigation/${this.handle}/pages`);
-            const values = container.value.visibleValues;
+            const values = this.containerRef.value.visibleValues;
 
             new Pipeline()
-                .provide({ container, errors, saving })
+                .provide({
+                    container: this.containerRef,
+                    errors: this.errorsRef,
+                    saving: this.savingRef,
+                })
                 .through([new Request(postUrl, 'POST', {
                     type: this.type,
                     values,
@@ -270,7 +286,7 @@ export default {
         },
 
         emitPublishInfoUpdated(isNew) {
-            this.$emit('publish-info-updated', {
+            this.$emit('publish-info-updated', clone({
                 values: this.values,
                 originValues: this.originValues,
                 meta: this.meta,
@@ -279,7 +295,7 @@ export default {
                 localizedFields: this.localizedFields,
                 entry: this.entry,
                 new: isNew,
-            });
+            }));
         },
     },
 
@@ -290,11 +306,9 @@ export default {
         });
 
         this.getPageValues();
-
-        container = computed(() => this.$refs.container);
     },
 
-    unmounted() {
+    beforeUnmount() {
         this.saveKeyBinding.destroy();
     },
 };

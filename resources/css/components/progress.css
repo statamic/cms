@@ -3,10 +3,11 @@
     pointer-events: none;
 }
 
-#nprogress .bar {
+#nprogress .bar.bar {
     @apply fixed top-0 w-full bg-progress-bar start-0;
-    height: 1px;
-    z-index: 10000; /*  above global-header */
+    height: 2px;
+    /* above global-header */
+    z-index: var(--z-index-portal);
 }
 
 .nprogress-custom-parent {

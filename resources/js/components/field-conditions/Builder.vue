@@ -5,14 +5,8 @@
             :instructions="__('messages.field_conditions_instructions')"
         >
             <div class="mb-6 flex items-center gap-x-4">
-                <Select v-model="when" :options="whenOptions" />
-
-                <Select
-                    v-if="hasConditions"
-                    v-model="type"
-                    :options="typeOptions"
-                />
-
+                <Select v-model="when" :options="whenOptions" class="w-auto min-w-40" />
+                <Select v-if="hasConditions" v-model="type" :options="typeOptions" class="w-auto min-w-80" />
                 <Input v-if="hasConditions && isCustom" v-model="customMethod" class="flex-1" />
             </div>
         </Field>
@@ -53,8 +47,7 @@ import { KEYS, OPERATORS } from '../field-conditions/Constants.js';
 import Condition from './Condition.vue';
 import { __ } from '../../bootstrap/globals';
 import { Field, Input, Button } from '@/components/ui';
-import Select from '@/components/ui/Select/Select.vue';
-import Switch from '@/components/ui/Switch.vue';
+import { Select, Switch } from '@ui';
 
 export default {
     mixins: [HasInputOptions],

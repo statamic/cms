@@ -20,29 +20,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Generate types
-        run: npm run types
-
-      - name: Compile assets
-        run: npm run build
-
-      - name: Compile dev assets
-        run: npm run build-dev
-
-      - name: Compile frontend assets
-        run: npm run frontend-build
-
-      - name: Create dist zip
-        run: cd resources && tar -czvf dist.tar.gz dist
-
-      - name: Create dist-dev zip
-        run: cd resources && tar -czvf dist-dev.tar.gz dist-dev
-
-      - name: Create dist-frontend zip
-        run: cd resources && tar -czvf dist-frontend.tar.gz dist-frontend
-
-      - name: Create dist-package zip
-        run: cd resources/js/package && tar -czvf ../../dist-package.tar.gz *
+      - name: Build release assets
+        run: bash ./scripts/build-release.sh
 
       - name: Get Changelog
         id: changelog
@@ -100,3 +79,8 @@ jobs:
           asset_path: ./resources/dist-package.tar.gz
           asset_name: dist-package.tar.gz
           asset_content_type: application/tar+gz
+
+      - name: Deploy Storybook to Forge
+        continue-on-error: true
+        run: |
+          curl -X POST "${{ secrets.FORGE_STORYBOOK_WEBHOOK }}"

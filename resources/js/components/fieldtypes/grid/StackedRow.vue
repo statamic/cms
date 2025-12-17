@@ -30,6 +30,7 @@
         <div class="px-4 py-3">
             <FieldsProvider
                 :fields="fields"
+                :as-config="false"
                 :field-path-prefix="`${fieldPathPrefix}.${index}`"
                 :meta-path-prefix="`${metaPathPrefix}.existing.${values._id}`"
             >
@@ -41,8 +42,7 @@
 
 <script>
 import Row from './Row.vue';
-import { default as PublishFields } from '@/components/ui/Publish/Fields.vue';
-import FieldsProvider from '@/components/ui/Publish/FieldsProvider.vue';
+import { PublishFields, PublishFieldsProvider as FieldsProvider } from '@ui';
 
 export default {
     mixins: [Row],

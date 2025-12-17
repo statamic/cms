@@ -1,6 +1,14 @@
 <script setup>
 import { injectTabContext } from './TabProvider.vue';
-import { Panel, PanelHeader, Heading, Subheading, Card, Icon } from '@/components/ui';
+import {
+    Button,
+    Panel,
+    PanelHeader,
+    Heading,
+    Subheading,
+    Card,
+    Icon,
+} from '@ui';
 import FieldsProvider from './FieldsProvider.vue';
 import Fields from './Fields.vue';
 import ShowField from '@/components/field-conditions/ShowField.js';
@@ -33,9 +41,9 @@ function renderInstructions(instructions) {
     return instructions ? markdown(__(instructions), { openLinksInNewTabs: true }) : '';
 }
 
-function toggleSection(id) {
-    if (sections[id].collapsible) {
-        sections[id].collapsed = !sections[id].collapsed;
+function toggleSection(section) {
+    if (section.collapsible) {
+        section.collapsed = !section.collapsed;
     }
 }
 </script>
@@ -46,36 +54,37 @@ function toggleSection(id) {
             v-for="(section, i) in visibleSections"
             :key="i"
             :class="[
-                asConfig ? 'mb-12' : 'mb-6',
+                'mb-6',
                 { 'pb-0': section.collapsed }
             ]"
         >
-            <PanelHeader v-if="section.display || section.collapsible" @click="toggleSection(i)" class="flex justify-between">
-                <div>
+            <PanelHeader v-if="section.display || section.collapsible" class="relative flex items-center justify-between">
+                <div class="[&_a]:relative [&_a]:z-(--z-index-above)">
                     <Heading :text="__(section.display)" />
                     <Subheading v-if="section.instructions" :text="renderInstructions(section.instructions)" />
                 </div>
-                <Icon
+                <Button
+                    @click="toggleSection(section)"
                     v-if="section.collapsible"
-                    name="ui/chevron-down"
-                    class="size-5 text-gray-400"
-                    :class="section.collapsed ? 'rotate-270' : 'rotate-0'"
+                    class="static! [&_svg]:size-4.5 rounded-xl after:content-[''] after:absolute after:inset-0"
+                    :icon="section.collapsed ? 'expand' : 'collapse'"
+                    size="sm"
+                    variant="ghost"
+                    :aria-label="__('Toggle section visibility')"
                 />
             </PanelHeader>
             <div
                 style="--tw-ease: ease;"
-                class="h-auto overflow-clip visible transition-[height,visibility] duration-[250ms,2s]"
-                :class="{ 'h-0! visibility-hidden': section.collapsed }"
+                class="h-auto visible transition-[height,visibility] duration-[250ms,2s]"
+                :class="{ 'h-0! invisible! overflow-clip': section.collapsed }"
             >
-                <div class="p-px">
-                    <Primitive :as="asConfig ? 'div' : Card">
-                        <FieldsProvider :fields="section.fields">
-                            <slot :section="section">
-                                <Fields />
-                            </slot>
-                        </FieldsProvider>
-                    </Primitive>
-                </div>
+                <Card :class="{ 'p-0!': asConfig }">
+                    <FieldsProvider :fields="section.fields">
+                        <slot :section="section">
+                            <Fields />
+                        </slot>
+                    </FieldsProvider>
+                </Card>
             </div>
         </Panel>
     </div>

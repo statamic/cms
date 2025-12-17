@@ -1,5 +1,6 @@
 import { sortBy, keyBy } from 'lodash-es';
 import axios from 'axios';
+import { router } from '@inertiajs/vue3';
 
 export default function useActions() {
     function prepareActions(actions, confirmableActions) {
@@ -62,7 +63,13 @@ export default function useActions() {
 
             if (data.redirect) {
                 if (data.bypassesDirtyWarning) Statamic.$dirty.disableWarning();
-                window.location = data.redirect;
+
+                if (data.triggersFullPageRefresh) {
+                    window.location = data.redirect;
+                    return;
+                }
+
+                router.get(data.redirect);
             }
 
             if (data.callback) {

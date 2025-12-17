@@ -8,6 +8,7 @@ use Statamic\CommandPalette\ContentSearchResult;
 use Statamic\Contracts\Search\Result;
 use Statamic\Facades\CommandPalette;
 use Statamic\Facades\Search;
+use Statamic\Facades\Site;
 use Statamic\Facades\User;
 
 class CommandPaletteController extends CpController
@@ -19,7 +20,7 @@ class CommandPaletteController extends CpController
 
     public function search(Request $request)
     {
-        return Search::index()
+        return Search::index(index: 'cp', locale: Site::selected()->handle())
             ->ensureExists()
             ->search($request->query('q'))
             ->get()
@@ -32,7 +33,7 @@ class CommandPaletteController extends CpController
                     ->url($result->getCpUrl())
                     ->badge($result->getCpBadge())
                     ->reference($result->getReference())
-                    // ->icon() // TODO: Make dynamic for entries/terms/users?
+                    ->icon($result->getCpIcon())
                     ->toArray();
             })
             ->values();

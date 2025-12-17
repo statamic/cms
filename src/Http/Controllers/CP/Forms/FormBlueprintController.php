@@ -41,10 +41,10 @@ class FormBlueprintController extends CpController
                 ->all(),
         ));
 
-        return view('statamic::forms.blueprints.edit', [
-            'form' => $form,
-            'blueprint' => $blueprint,
-            'blueprintVueObject' => $this->toVueObject($blueprint),
+        return $this->renderEditPage([
+            'blueprint' => $this->toVueObject($blueprint),
+            'action' => cp_route('blueprints.forms.update', $form->handle()),
+            'isFormBlueprint' => true,
         ]);
     }
 

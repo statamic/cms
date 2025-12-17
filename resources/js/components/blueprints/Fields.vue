@@ -1,7 +1,7 @@
 <template>
     <div>
         <div
-            class="blueprint-section-draggable-zone field-grid gap-2! mb-4"
+            class="blueprint-section-draggable-zone field-grid gap-2! mb-4 starting-style-transition-children"
             :data-tab="tabId"
             :data-section="sectionId"
         >
@@ -33,16 +33,16 @@
             <ui-button icon="add-circle" :text="__('Create Field')" @click="createField" />
         </div>
 
-        <stack
+        <ui-stack
             name="fieldtype-selector"
             v-if="isSelectingNewFieldtype"
             @closed="isSelectingNewFieldtype = false"
             v-slot="{ close }"
         >
             <fieldtype-selector @closed="close" @selected="fieldtypeSelected" />
-        </stack>
+        </ui-stack>
 
-        <stack
+        <ui-stack
             name="field-settings"
             v-if="pendingCreatedField != null"
             @closed="pendingCreatedField = null"
@@ -59,7 +59,7 @@
                 @committed="fieldCreated"
                 @closed="close"
             />
-        </stack>
+        </ui-stack>
     </div>
 </template>
 

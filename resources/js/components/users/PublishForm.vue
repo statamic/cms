@@ -14,10 +14,11 @@
             >
                 <Dropdown>
                     <template #trigger>
-                        <Button icon="ui/dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
+                        <Button icon="dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
                     </template>
                     <DropdownMenu>
                         <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :href="actions.editBlueprint" />
+                        <DropdownItem :text="__('Passkeys')" icon="key" :href="cp_url('passkeys')" />
                         <DropdownSeparator v-if="canEditBlueprint && itemActions.length" />
                         <DropdownItem
                             v-for="action in itemActions"
@@ -39,16 +40,17 @@
                 :requires-current-password="requiresCurrentPassword"
             />
 
-            <ui-command-palette-item
+            <CommandPaletteItem
                 :category="$commandPalette.category.Actions"
                 :text="__('Save')"
                 icon="save"
                 :action="save"
+                keys="mod+s"
                 prioritize
                 v-slot="{ text, action }"
             >
                 <Button variant="primary" @click.prevent="action" :text="text" />
-            </ui-command-palette-item>
+            </CommandPaletteItem>
 
             <slot name="action-buttons-right" />
         </Header>
@@ -83,14 +85,11 @@ import {
     PublishContainer,
     PublishTabs,
     Header,
+    CommandPaletteItem
 } from '@/components/ui';
 import ItemActions from '@/components/actions/ItemActions.vue';
 import { computed, ref } from 'vue';
-import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@/components/ui/Publish/SavePipeline.js';
-
-let saving = ref(false);
-let errors = ref({});
-let container = null;
+import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';
 
 export default {
     mixins: [HasActions],
@@ -107,6 +106,7 @@ export default {
         PublishContainer,
         PublishTabs,
         Header,
+        CommandPaletteItem
     },
 
     props: {
@@ -130,12 +130,33 @@ export default {
             values: clone(this.initialValues),
             meta: clone(this.initialMeta),
             error: null,
-            errors: {},
             title: this.initialTitle,
         };
     },
 
+	setup() {
+		const savingRef = ref(false);
+		const errorsRef = ref({});
+
+		return {
+			savingRef: computed(() => savingRef),
+			errorsRef: computed(() => errorsRef),
+		};
+	},
+
     computed: {
+        containerRef() {
+            return computed(() => this.$refs.container);
+        },
+
+        saving() {
+            return this.savingRef.value;
+        },
+
+        errors() {
+            return this.errorsRef.value;
+        },
+
         isDirty() {
             return this.$dirty.has(this.publishContainer);
         },
@@ -144,7 +165,11 @@ export default {
     methods: {
         save() {
             new Pipeline()
-                .provide({ container, errors, saving })
+                .provide({
+                    container: this.containerRef,
+                    errors: this.errorsRef,
+                    saving: this.savingRef,
+                })
                 .through([
                     new BeforeSaveHooks('user', {
                         values: this.values,
@@ -155,7 +180,7 @@ export default {
                     }),
                 ])
                 .then((response) => {
-                    Statamic.$toast.success('Saved');
+                    Statamic.$toast.success(__('Saved'));
 
                     this.title = response.data.title;
 
@@ -185,10 +210,6 @@ export default {
                 action: action.run,
             }));
         },
-    },
-
-    created() {
-        container = computed(() => this.$refs.container);
     },
 
     mounted() {

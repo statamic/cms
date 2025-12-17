@@ -1,5 +1,5 @@
 <template>
-    <div class="relationship-input @container w-full h-full" :class="{ 'relationship-input-empty': items.length == 0 }">
+    <div class="relationship-input @container w-full" :class="{ 'relationship-input-empty': items.length == 0 }">
         <RelationshipSelectField
             v-if="!initializing && usesSelectField"
             :config="config"
@@ -42,8 +42,8 @@
                 />
             </div>
 
-            <div class="text-gray py-2 text-xs" v-if="maxItemsReached && maxItems != 1">
-                <span>{{ __('Maximum items selected:') }}</span>
+            <div class="ml-1 text-gray py-2 text-xs" v-if="maxItemsReached && maxItems != 1">
+                <span class="mr-1">{{ __('Maximum items selected:') }}</span>
                 <span>{{ maxItems }}/{{ maxItems }}</span>
             </div>
             <div
@@ -66,14 +66,14 @@
                     <Button
                         ref="existing"
                         icon="link"
-                        size="sm"
+                        :size="buttonSize"
                         :text="linkLabel"
                         @click.prevent="isSelecting = true"
                     />
                 </div>
             </div>
 
-            <stack name="item-selector" v-if="isSelecting" @closed="isSelecting = false" v-slot="{ close }">
+            <ui-stack name="item-selector" v-if="isSelecting" @closed="isSelecting = false" v-slot="{ close }">
                 <ItemSelector
                     :name="name"
                     :filters-url="filtersUrl"
@@ -91,7 +91,7 @@
                     @selected="selectionsUpdated"
                     @closed="close"
                 />
-            </stack>
+            </ui-stack>
 
             <input v-if="name" type="hidden" :name="name" :value="JSON.stringify(value)" />
         </template>
@@ -108,48 +108,34 @@ import { Button, Icon } from '@/components/ui';
 
 export default {
     props: {
-        name: String,
+        canCreate: { type: Boolean },
+        canEdit: { type: Boolean },
+        canReorder: { type: Boolean },
+        columns: { type: Array, default: () => [] },
+        config: { type: Object },
+        creatables: { type: Array },
+        data: { type: Array },
+        exclusions: { type: Array },
+        filtersUrl: { type: String },
+        formComponent: { type: String },
+        formComponentProps: { type: Object },
+        formStackSize: { type: String },
+        initialSortColumn: { type: String, default: 'title' },
+        initialSortDirection: { type: String, default: 'asc' },
+        itemComponent: { type: String, default: 'RelatedItem' },
+        itemDataUrl: { type: String },
+        maxItems: { type: Number },
+        mode: { type: String, default: 'default' },
+        name: { type: String },
+        readOnly: { type: Boolean },
+        search: { type: Boolean },
+        selectionsUrl: { type: String },
+        site: { type: String },
+        buttonSize: { type: String, default: 'sm' },
+        statusIcons: { type: Boolean },
+        taggable: { type: Boolean },
+        tree: { type: Object },
         value: { required: true },
-        config: Object,
-        data: Array,
-        maxItems: Number,
-        itemComponent: {
-            type: String,
-            default: 'RelatedItem',
-        },
-        itemDataUrl: String,
-        filtersUrl: String,
-        selectionsUrl: String,
-        statusIcons: Boolean,
-        site: String,
-        search: Boolean,
-        canEdit: Boolean,
-        canCreate: Boolean,
-        canReorder: Boolean,
-        readOnly: Boolean,
-        exclusions: Array,
-        creatables: Array,
-        formComponent: String,
-        formComponentProps: Object,
-        formStackSize: String,
-        mode: {
-            type: String,
-            default: 'default',
-        },
-        taggable: Boolean,
-        columns: {
-            type: Array,
-            default: () => [],
-        },
-        tree: Object,
-        initialSortColumn: {
-            type: String,
-            default: 'title',
-        },
-        initialSortDirection: {
-            type: String,
-            default: 'asc',
-        },
     },
 
     emits: ['input', 'focus', 'blur', 'item-data-updated', 'loading'],
@@ -328,6 +314,8 @@ export default {
         },
 
         makeSortable() {
+            if (! this.$refs.items) return;
+
             this.sortable = new Sortable(this.$refs.items, {
                 draggable: '.related-item',
                 handle: '.item-move',

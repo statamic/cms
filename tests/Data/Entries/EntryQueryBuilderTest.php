@@ -6,6 +6,7 @@ use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Exceptions\StatusFilterNotSupportedException;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -89,6 +90,36 @@ class EntryQueryBuilderTest extends TestCase
 
         $this->assertCount(2, $entries);
         $this->assertEquals(['Post 3', 'Post 4'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_where_in_with_null()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'category' => 'news'])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'category' => 'blog'])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3'])->create(); // category is null
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'category' => 'news'])->create();
+        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5'])->create(); // category is null
+
+        $entries = Entry::query()->whereIn('category', ['news', null])->get();
+
+        $this->assertCount(4, $entries);
+        $this->assertEquals(['Post 1', 'Post 3', 'Post 4', 'Post 5'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_where_not_in_with_null()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'category' => 'news'])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'category' => 'blog'])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3'])->create(); // category is null
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'category' => 'news'])->create();
+        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5'])->create(); // category is null
+
+        $entries = Entry::query()->whereNotIn('category', ['news', null])->get();
+
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 2'], $entries->map->title->all());
     }
 
     #[Test]
@@ -401,10 +432,10 @@ class EntryQueryBuilderTest extends TestCase
         EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->create();
         EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'test_taxonomy' => ['taxonomy-5']])->create();
 
-        $entries = Entry::query()->whereJsonContains('test_taxonomy', ['taxonomy-1', 'taxonomy-5'])->get();
+        $entries = Entry::query()->whereJsonContains('test_taxonomy', ['taxonomy-1', 'taxonomy-3'])->get();
 
-        $this->assertCount(3, $entries);
-        $this->assertEquals(['Post 1', 'Post 3', 'Post 5'], $entries->map->title->all());
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 3'], $entries->map->title->all());
 
         $entries = Entry::query()->whereJsonContains('test_taxonomy', 'taxonomy-1')->get();
 
@@ -769,6 +800,116 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function entries_are_found_using_where_has_when_max_items_1()
+    {
+        $blueprint = Blueprint::makeFromFields(['entries_field' => ['type' => 'entries', 'max_items' => 1]]);
+        Blueprint::shouldReceive('in')->with('collections/posts')->andReturn(collect(['posts' => $blueprint]));
+
+        $this->createDummyCollectionAndEntries();
+
+        Entry::find('id-1')
+            ->merge([
+                'entries_field' => 'id-2',
+            ])
+            ->save();
+
+        Entry::find('id-3')
+            ->merge([
+                'entries_field' => 'id-1',
+            ])
+            ->save();
+
+        $entries = Entry::query()->whereHas('entries_field')->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+
+        $entries = Entry::query()->whereHas('entries_field', function ($subquery) {
+            $subquery->where('title', 'Post 2');
+        })
+            ->get();
+
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 1'], $entries->map->title->all());
+
+        $entries = Entry::query()->whereDoesntHave('entries_field', function ($subquery) {
+            $subquery->where('title', 'Post 2');
+        })
+            ->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 2', 'Post 3'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_where_has_when_max_items_not_1()
+    {
+        $blueprint = Blueprint::makeFromFields(['entries_field' => ['type' => 'entries']]);
+        Blueprint::shouldReceive('in')->with('collections/posts')->andReturn(collect(['posts' => $blueprint]));
+
+        $this->createDummyCollectionAndEntries();
+
+        Entry::find('id-1')
+            ->merge([
+                'entries_field' => ['id-2', 'id-1'],
+            ])
+            ->save();
+
+        Entry::find('id-3')
+            ->merge([
+                'entries_field' => ['id-1', 'id-2'],
+            ])
+            ->save();
+
+        $entries = Entry::query()->whereHas('entries_field')->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+
+        $entries = Entry::query()->whereHas('entries_field', function ($subquery) {
+            $subquery->where('title', 'Post 2');
+        })
+            ->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+
+        $entries = Entry::query()->whereDoesntHave('entries_field', function ($subquery) {
+            $subquery->where('title', 'Post 2');
+        })
+            ->get();
+
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 2'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_where_relation()
+    {
+        $blueprint = Blueprint::makeFromFields(['entries_field' => ['type' => 'entries']]);
+        Blueprint::shouldReceive('in')->with('collections/posts')->andReturn(collect(['posts' => $blueprint]));
+
+        $this->createDummyCollectionAndEntries();
+
+        Entry::find('id-1')
+            ->merge([
+                'entries_field' => ['id-2', 'id-1'],
+            ])
+            ->save();
+
+        Entry::find('id-3')
+            ->merge([
+                'entries_field' => ['id-1', 'id-2'],
+            ])
+            ->save();
+
+        $entries = Entry::query()->whereRelation('entries_field', 'title', 'Post 2')->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+    }
+
+    #[Test]
     #[DataProvider('likeProvider')]
     public function entries_are_found_using_like($like, $expected)
     {
@@ -987,11 +1128,11 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
-    public function filtering_using_where_status_column_writes_deprecation_log()
+    public function filtering_using_where_status_column_throws_exception()
     {
         $this->withoutDeprecationHandling();
-        $this->expectException(\ErrorException::class);
-        $this->expectExceptionMessage('Filtering by status is deprecated. Use whereStatus() instead.');
+        $this->expectException(StatusFilterNotSupportedException::class);
+        $this->expectExceptionMessage('Filtering by status is not supported. Use whereStatus() instead.');
 
         $this->createDummyCollectionAndEntries();
 
@@ -999,11 +1140,11 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
-    public function filtering_using_whereIn_status_column_writes_deprecation_log()
+    public function filtering_using_whereIn_status_column_throws_exception()
     {
         $this->withoutDeprecationHandling();
-        $this->expectException(\ErrorException::class);
-        $this->expectExceptionMessage('Filtering by status is deprecated. Use whereStatus() instead.');
+        $this->expectException(StatusFilterNotSupportedException::class);
+        $this->expectExceptionMessage('Filtering by status is not supported. Use whereStatus() instead.');
 
         $this->createDummyCollectionAndEntries();
 

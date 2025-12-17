@@ -1,6 +1,10 @@
 <script setup>
-import { Button, PublishContainer, PublishField } from '@/components/ui';
-import PublishFieldsProvider from '@/components/ui/Publish/FieldsProvider.vue';
+import {
+    Button,
+    PublishContainer,
+    PublishField,
+} from '@ui';
+import PublishFieldsProvider from '../Publish/FieldsProvider.vue';
 import { ref, nextTick } from 'vue';
 
 const emit = defineEmits(['update:values', 'removed', 'enter-pressed']);
@@ -14,15 +18,12 @@ const props = defineProps({
 
 const fieldContainer = ref(null);
 
-const focusFirstField = async () => {
-    await nextTick();
-    if (fieldContainer.value) {
-        // Look for the first input, textarea, or select element
+const focusFirstField = () => {
+    setTimeout(() => {
         const firstInput = fieldContainer.value.querySelector('input:not([readonly]), textarea, select, [contenteditable="true"]');
-        if (firstInput) {
-            firstInput.focus();
-        }
-    }
+
+        firstInput?.focus();
+    }, 10);
 };
 
 const handleKeydown = (event) => {
@@ -55,12 +56,13 @@ defineExpose({
                             v-for="field in fields"
                             :key="field.handle"
                             :config="field"
-                            v-slot="{ fieldtypeComponent, fieldtypeComponentProps, fieldtypeComponentEvents }"
+                            v-slot="{ fieldtypeComponent, fieldtypeComponentProps, fieldtypeComponentEvents, shouldShowField }"
                         >
                             <Component
                                 :is="fieldtypeComponent"
                                 v-bind="fieldtypeComponentProps"
                                 v-on="fieldtypeComponentEvents"
+                                v-if="shouldShowField"
                             />
                         </PublishField>
                     </div>

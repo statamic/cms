@@ -1,5 +1,5 @@
 <script setup>
-import { CardPanel } from '@/components/ui';
+import CardPanel from '../Card/Panel.vue';
 
 const props = defineProps({
     heading: {

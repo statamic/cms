@@ -2,12 +2,7 @@
     <div>
         <Header>
             <template #title>
-                <span
-                    v-if="!isCreating"
-                    class="little-dot -top-1"
-                    :class="activeLocalization.published ? 'published' : 'draft'"
-                    v-tooltip="__(activeLocalization.status)"
-                />
+                <StatusIndicator v-if="!isCreating" :status="activeLocalization.status" />
                 {{ formattedTitle }}
             </template>
 
@@ -24,7 +19,7 @@
             >
                 <Dropdown class="ltr:mr-4 rtl:ml-4" v-if="canEditBlueprint || hasItemActions">
                     <template #trigger>
-                        <Button icon="ui/dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
+                        <Button icon="dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
                     </template>
                     <DropdownMenu>
                         <DropdownItem
@@ -46,7 +41,7 @@
                 </Dropdown>
             </ItemActions>
 
-            <ui-badge icon="padlock-locked" :text="__('Read Only')" variant="flat" v-if="readOnly" />
+            <ui-badge icon="padlock-locked" :text="__('Read Only')" v-if="readOnly" />
 
             <div class="hidden items-center md:flex">
                 <save-button-options v-if="!readOnly" :show-options="!isInline" :preferences-prefix="preferencesPrefix">
@@ -69,8 +64,9 @@
             :origin-meta="originMeta"
             :errors="errors"
             :site="site"
-            :localized-fields="localizedFields"
+            v-model:modified-fields="localizedFields"
             :sync-field-confirmation-text="syncFieldConfirmationText"
+            :remember-tab="!isInline"
         >
             <LivePreview
                 :enabled="isPreviewing"
@@ -82,11 +78,8 @@
                 <PublishComponents />
 
                 <PublishTabs>
-                    <template #actions>
-                        <div
-                            class="space-y-6"
-                            v-if="showLivePreviewButton || showVisitUrlButton || showLocalizationSelector"
-                        >
+                    <template v-if="showLivePreviewButton || showVisitUrlButton || showLocalizationSelector" #actions>
+                        <div class="space-y-6">
                             <div class="flex flex-wrap gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
                                 <Button
                                     :text="__('Live Preview')"
@@ -144,25 +137,24 @@ import {
     DropdownMenu,
     DropdownItem,
     DropdownSeparator,
-} from '@/components/ui';
-import PublishContainer from '@/components/ui/Publish/Container.vue';
-import PublishTabs from '@/components/ui/Publish/Tabs.vue';
-import PublishComponents from '@/components/ui/Publish/Components.vue';
-import LivePreview from '@/components/ui/LivePreview/LivePreview.vue';
+    PublishContainer,
+    PublishTabs,
+    PublishComponents,
+    PublishLocalizations as LocalizationsCard,
+    LivePreview,
+    StatusIndicator,
+} from '@ui';
 import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
 import { ref, computed } from 'vue';
-import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@/components/ui/Publish/SavePipeline.js';
-import LocalizationsCard from '@/components/ui/Publish/Localizations.vue';
+import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';
 import ItemActions from '@/components/actions/ItemActions.vue';
-
-let saving = ref(false);
-let errors = ref({});
-let container = null;
+import { router } from '@inertiajs/vue3';
 
 export default {
     mixins: [HasPreferences, HasActions],
 
     components: {
+        StatusIndicator,
         ItemActions,
         Header,
         Badge,
@@ -237,13 +229,27 @@ export default {
         };
     },
 
+	setup() {
+		const savingRef = ref(false);
+		const errorsRef = ref({});
+
+		return {
+			savingRef: computed(() => savingRef),
+			errorsRef: computed(() => errorsRef),
+		};
+	},
+
     computed: {
+        containerRef() {
+            return computed(() => this.$refs.container);
+        },
+
         saving() {
-            return saving.value;
+            return this.savingRef.value;
         },
 
         errors() {
-            return errors.value;
+            return this.errorsRef.value;
         },
 
         formattedTitle() {
@@ -330,7 +336,11 @@ export default {
             }
 
             new Pipeline()
-                .provide({ container, errors, saving })
+                .provide({
+                    container: this.containerRef,
+                    errors: this.errorsRef,
+                    saving: this.savingRef,
+                })
                 .through([
                     new BeforeSaveHooks('entry', {
                         taxonomy: this.taxonomyHandle,
@@ -355,12 +365,17 @@ export default {
 
                     // If the user has opted to create another entry, redirect them to create page.
                     if (!this.isInline && this.afterSaveOption === 'create_another') {
-                        window.location = this.createAnotherUrl;
+                        this.redirectTo(this.createAnotherUrl);
                     }
 
                     // If the user has opted to go to listing (default/null option), redirect them there.
                     else if (!this.isInline && nextAction === null) {
-                        window.location = this.listingUrl;
+                        this.redirectTo(this.listingUrl);
+                    }
+
+                    // If the edit URL was changed (i.e. the term slug was updated), redirect them there.
+                    else if (!this.isInline && window.location.href !== response.data.data.edit_url) {
+                        this.redirectTo(response.data.data.edit_url);
                     }
 
                     // Otherwise, leave them on the edit form and emit an event. We need to wait until after
@@ -477,6 +492,10 @@ export default {
                 action: action.run,
             }));
         },
+
+        redirectTo(location) {
+            router.get(location);
+        }
     },
 
     mounted() {
@@ -496,11 +515,9 @@ export default {
 
     created() {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
-
-        container = computed(() => this.$refs.container);
     },
 
-    unmounted() {
+	beforeUnmount() {
         this.saveKeyBinding.destroy();
         this.quickSaveKeyBinding.destroy();
     },

@@ -12,7 +12,7 @@
             </div>
 
             <div
-                class="flex items-center justify-center space-x-1 border-t px-2 py-2 text-center text-2xs text-white @container/toolbar dark:border-dark-900 dark:text-dark-150 sm:space-x-3 rtl:space-x-reverse"
+                class="flex flex-wrap items-center justify-center gap-2 border-t px-2 py-2 text-center text-2xs text-white @container/toolbar dark:border-dark-900 dark:text-dark-150"
             >
                 <Button v-if="!src" size="sm" icon="folder-photos" :text="__('Choose Image')" @click="openSelector" />
 
@@ -37,7 +37,7 @@
                 />
             </div>
 
-            <stack v-if="showingSelector" name="asset-selector" @closed="closeSelector">
+            <ui-stack v-if="showingSelector" name="asset-selector" @closed="closeSelector">
                 <selector
                     :container="extension.options.bard.meta.assets.container"
                     :folder="extension.options.bard.config.folder || '/'"
@@ -49,7 +49,7 @@
                     @closed="closeSelector"
                 >
                 </selector>
-            </stack>
+            </ui-stack>
 
             <asset-editor
                 v-if="editing"
@@ -69,8 +69,8 @@
 import Asset from '../assets/Asset';
 import { NodeViewWrapper } from '@tiptap/vue-3';
 import Selector from '../../assets/Selector.vue';
+import { Input, Button } from '@ui';
 import { containerContextKey } from '@/components/ui/Publish/Container.vue';
-import { Input, Button } from '@/components/ui';
 
 export default {
     mixins: [Asset],

@@ -1,7 +1,7 @@
 <script setup>
-import HeaderCell from '@/components/ui/Listing/HeaderCell.vue';
-import ToggleAll from '@/components/ui/Listing/ToggleAll.vue';
-import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
+import HeaderCell from '../Listing/HeaderCell.vue';
+import ToggleAll from '../Listing/ToggleAll.vue';
+import { injectListingContext } from '../Listing/Listing.vue';
 import { computed } from 'vue';
 
 const { allowsSelections, reorderable, hasActions, visibleColumns, allowsMultipleSelections } = injectListingContext();
@@ -15,7 +15,7 @@ const props = defineProps({
 
 const hasVisibleHeader = computed(() => {
     if (props.srOnly) return false;
-    return allowsSelections.value || visibleColumns.value.length > 1;
+    return allowsSelections.value || visibleColumns.value.length >= 1;
 })
 </script>
 

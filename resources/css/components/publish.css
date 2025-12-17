@@ -6,11 +6,10 @@
     display: grid;
     --grid-columns: 12;
     grid-template-columns: repeat(var(--grid-columns), 1fr);
-    @apply gap-3 lg:gap-8;
+    @apply gap-x-3 gap-6 @lg/panel:gap-8;
 
     aside & {
-        /* Decrease */
-        @apply gap-x-2 gap-y-3 lg:gap-y-6;
+        @apply gap-x-2 gap-y-6;
     }
 
     .form-group {
@@ -18,7 +17,7 @@
     }
 }
 
-@variant lg {
+@variant @lg/panel {
     .field-w-25  { --col-span: calc(var(--grid-columns) * 0.25); }
     .field-w-33  { --col-span: calc(var(--grid-columns) * 0.333); }
     .field-w-50  { --col-span: calc(var(--grid-columns) * 0.5); }
@@ -77,7 +76,7 @@ Here flexbox is much better suited to create a layout that grows to fill space. 
     position: relative;
     .read-only-overlay {
         @apply absolute inset-0 cursor-not-allowed bg-white/25;
-        z-index: 100;
+        z-index: var(--z-index-portal);
     }
 
     .has-field-dropdown {
@@ -111,7 +110,7 @@ Here flexbox is much better suited to create a layout that grows to fill space. 
 }
 
 .publish-section-header {
-    @apply rounded-t-lg border-b border-gray-400 bg-gray-100 dark:border-dark-900 dark:bg-dark-700;
+    @apply rounded-t-lg border-b border-gray-400 bg-gray-100 dark:border-dark-900 dark:bg-gray-850;
 }
 
 .publish-section-header-inner {
@@ -133,5 +132,5 @@ Here flexbox is much better suited to create a layout that grows to fill space. 
 .sneak-peek-editing .publish-tabs {
     position: sticky;
     top: 0;
-    z-index: 1000;
+    z-index: var(--z-index-portal);
 }

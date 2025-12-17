@@ -16,7 +16,7 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import { PublishContainer, FieldsProvider, PublishFields as Fields } from '@/components/ui';
+import { PublishContainer, PublishFieldsProvider as FieldsProvider, PublishFields as Fields } from '@/components/ui';
 
 export default {
     mixins: [Fieldtype],
@@ -84,3 +84,9 @@ export default {
     },
 };
 </script>
+
+<style>
+.dictionary_fields-fieldtype {
+    padding: 0;
+}
+</style>

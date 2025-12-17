@@ -1,6 +1,6 @@
 <script setup>
 import { useSlots } from 'vue';
-import { Badge } from '@/components/ui';
+import Badge from './Badge.vue';
 
 const slots = useSlots();
 const hasDefaultSlot = !!slots.default;
@@ -15,7 +15,7 @@ const props = defineProps({
 
 <template>
     <label
-        class="flex justify-between mb-1.5 text-sm font-medium [&_button]:font-medium text-gray-900 select-none dark:text-gray-300"
+        class="flex justify-between mb-1.5 text-sm font-medium [&_button]:font-medium text-gray-950 select-none dark:text-gray-300"
         data-ui-label
         :for="for"
     >
@@ -24,6 +24,6 @@ const props = defineProps({
             <template v-else>{{ text }}</template>
             <span v-if="required" class="relative -top-px ms-0.5 text-red-600">*</span>
         </div>
-        <Badge v-if="badge" :text="badge" variant="flat" />
+        <Badge v-if="badge" :text="badge" />
     </label>
 </template>

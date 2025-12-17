@@ -96,7 +96,7 @@
                         :placeholder="__('Optional')"
                     />
 
-                    <ui-checkbox-item
+                    <ui-checkbox
                         :label="__('Open in new window')"
                         v-model="targetBlank"
                         size="sm"
@@ -105,7 +105,7 @@
 
             </div>
 
-            <footer class="flex items-center justify-end gap-3 rounded-b-md bg-gray-100 p-2 font-normal dark:bg-gray-800 rounded-b-xl">
+            <footer class="flex items-center justify-end gap-2 sm:gap-3 rounded-b-md bg-gray-100 p-2 font-normal dark:bg-gray-800 rounded-b-xl">
                 <ui-button
                     @click="$emit('canceled')"
                     :text="__('Cancel')"
@@ -148,7 +148,7 @@
             @item-data-updated="entrySelected"
         />
 
-        <stack v-if="showAssetSelector" name="asset-selector" @closed="closeAssetSelector">
+        <ui-stack v-if="showAssetSelector" name="asset-selector" @closed="closeAssetSelector">
             <asset-selector
                 :container="config.container"
                 :folder="config.folder || '/'"
@@ -158,7 +158,7 @@
                 @selected="assetSelected"
                 @closed="closeAssetSelector"
             />
-        </stack>
+        </ui-stack>
     </div>
 </template>
 

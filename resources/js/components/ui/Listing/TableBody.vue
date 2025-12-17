@@ -1,11 +1,10 @@
 <script setup>
 import TableField from '@/components/data-list/TableField.vue';
-import RowActions from '@/components/ui/Listing/RowActions.vue';
+import RowActions from '../Listing/RowActions.vue';
 import SortableList from '@/components/sortable/SortableList.vue';
-import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
+import { injectListingContext } from '../Listing/Listing.vue';
 import { computed, ref, watch } from 'vue';
-import Table from '@/components/ui/Listing/Table.vue';
-import { Checkbox } from '@/components/ui';
+import { Checkbox } from '@ui';
 
 const {
     items,
@@ -79,7 +78,7 @@ function handleRowClick(event, index) {
             <tr
                 v-for="(row, index) in items"
                 :key="row.id"
-                class="sortable-row outline-hidden"
+                class="sortable-row outline-hidden starting-style-transition starting-style-transition--siblings"
                 :data-row="isSelected(row.id) ? 'selected' : 'unselected'"
                 @click="handleRowClick($event, index)"
             >
@@ -117,13 +116,6 @@ function handleRowClick(event, index) {
                         />
                     </slot>
                 </td>
-            <!-- <td class="type-column" v-if="type">
-                <Badge
-                    size="sm"
-                    v-if="type === 'entries' || type === 'terms'"
-                    :label="type === 'entries' ? __(row.collection.title) : __(row.taxonomy.title)"
-                />
-            </td> -->
                 <td class="actions-column" v-if="hasActions || $slots['prepended-row-actions']">
                     <RowActions :row="row">
                         <template v-if="$slots['prepended-row-actions']" #prepended-actions="{ row }">

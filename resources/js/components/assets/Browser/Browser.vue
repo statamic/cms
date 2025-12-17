@@ -29,12 +29,8 @@
                     v-model:search-query="searchQuery"
                     @request-completed="listingRequestCompleted"
                     @update:selections="$emit('selections-updated', $event)"
+                    class="starting-style-transition"
                 >
-                    <template #initializing>
-                        <slot name="initializing">
-                            <Icon name="loading" />
-                        </slot>
-                    </template>
                     <template #default="{ items }">
                         <slot name="header" v-bind="{ canUpload, openFileBrowser, canCreateFolders, startCreatingFolder, mode, modeChanged }">
                             <Header :title="__(container.title)" icon="assets">
@@ -83,11 +79,11 @@
                                 </ToggleGroup>
                             </Header>
 
-                            <div class="flex items-center gap-3 py-3 relative">
-                                <div class="flex flex-1 items-center gap-3">
+                            <div class="flex items-center gap-2 sm:gap-3 py-3 relative overflow-clip" style="overflow-clip-margin: 1px;">
+                                <div class="flex flex-1 items-center gap-2 sm:gap-3">
                                     <ListingSearch />
                                 </div>
-                                <ListingCustomizeColumns />
+                                <ListingCustomizeColumns v-if="mode === 'table'" />
                             </div>
                         </slot>
 
@@ -188,14 +184,16 @@ import {
     Panel,
     PanelHeader,
     PanelFooter,
+    Listing,
+    ListingTable,
+    ListingPagination,
     ListingSearch,
     ListingCustomizeColumns,
     Slider,
     Icon,
     ToggleGroup,
     ToggleItem,
-} from '@/components/ui';
-import { Listing, ListingTable, ListingPagination } from '@/components/ui';
+} from '@ui';
 import Breadcrumbs from './Breadcrumbs.vue';
 
 export default {
@@ -705,13 +703,15 @@ export default {
                 action: () => this.mode = 'table',
             });
 
-            Statamic.$commandPalette.add({
-                when: () => this.canCreateContainers,
-                category: Statamic.$commandPalette.category.Actions,
-                text: __('Create Container'),
-                icon: 'container-add',
-                url: this.createContainerUrl,
-            });
+            if (this.createContainerUrl) {
+                Statamic.$commandPalette.add({
+                    when: () => this.canCreateContainers,
+                    category: Statamic.$commandPalette.category.Actions,
+                    text: __('Create Container'),
+                    icon: 'container-add',
+                    url: this.createContainerUrl,
+                });
+            }
 
             Statamic.$commandPalette.add({
                 when: () => this.container.can_edit,

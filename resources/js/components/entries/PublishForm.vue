@@ -19,7 +19,7 @@
             >
                 <Dropdown v-if="canEditBlueprint || hasItemActions">
                     <template #trigger>
-                        <Button icon="ui/dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
+                        <Button icon="dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
                     </template>
                     <DropdownMenu>
                         <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :href="actions.editBlueprint" />
@@ -36,9 +36,9 @@
                 </Dropdown>
             </ItemActions>
 
-            <ui-badge icon="padlock-locked" :text="__('Read Only')" variant="flat" v-if="readOnly" />
+            <ui-badge icon="padlock-locked" :text="__('Read Only')" v-if="readOnly" />
 
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 sm:gap-3">
                 <save-button-options
                     v-if="!readOnly"
                     :show-options="!revisionsEnabled && !isInline"
@@ -85,6 +85,7 @@
             v-model:modified-fields="localizedFields"
             :track-dirty-state="trackDirtyState"
             :sync-field-confirmation-text="syncFieldConfirmationText"
+            :remember-tab="!isInline"
         >
             <LivePreview
                 :enabled="isPreviewing"
@@ -100,7 +101,7 @@
                         <div class="space-y-6">
                             <!-- Live Preview / Visit URL Buttons -->
                             <div v-if="collectionHasRoutes">
-                                <div class="flex flex-wrap gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
+                                <div class="flex flex-wrap gap-3 lg:gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
                                     <Button
                                         :text="__('Live Preview')"
                                         class="flex-1"
@@ -120,7 +121,7 @@
                             </div>
 
                             <!-- Published Switch -->
-                            <Panel class="flex justify-between px-5 py-3 dark:bg-gray-800!" v-if="!revisionsEnabled">
+                            <Panel class="flex justify-between px-5! py-3! dark:bg-gray-800!" v-if="!revisionsEnabled">
                                 <Heading :text="__('Published')" />
                                 <Switch
                                     :model-value="published"
@@ -138,7 +139,6 @@
                                         icon="history"
                                         :text="__('View History')"
                                         size="xs"
-                                        class="-me-4"
                                     />
                                 </PanelHeader>
                                 <Card class="space-y-2">
@@ -156,7 +156,7 @@
                                     </Subheading>
                                     <Subheading v-if="isDirty" class="flex items-center gap-2 text-yellow-600">
                                         <Icon name="warning-diamond" />
-                                        {{ __('Unsaved changes') }}
+                                        {{ __('Unsaved Changes') }}
                                     </Subheading>
                                 </Card>
                             </Panel>
@@ -192,7 +192,7 @@
             </LivePreview>
         </PublishContainer>
 
-        <stack
+        <ui-stack
             name="revision-history"
             v-if="showRevisionHistory"
             @closed="showRevisionHistory = false"
@@ -206,7 +206,7 @@
                 :can-restore-revisions="!readOnly"
                 @closed="close"
             />
-        </stack>
+        </ui-stack>
 
         <publish-actions
             v-if="confirmingPublish"
@@ -230,11 +230,9 @@
             @confirm="createLocalization(localizing)"
         >
             <div class="publish-fields">
-                <div class="form-group publish-field field-w-full">
-                    <label v-text="__('Origin')" />
-                    <ui-description class="mt-2" :text="__('messages.entry_origin_instructions')" />
+                <ui-field class="form-group field-w-100" :label="__('Origin')" :instructions="__('messages.entry_origin_instructions')">
                     <Select class="w-full" v-model="selectedOrigin" :options="originOptions" placeholder="" />
-                </div>
+                </ui-field>
             </div>
         </confirmation-modal>
 
@@ -276,19 +274,16 @@ import {
     Subheading,
     Switch,
     Select,
-} from '@/components/ui';
-import PublishContainer from '@/components/ui/Publish/Container.vue';
-import PublishTabs from '@/components/ui/Publish/Tabs.vue';
-import PublishComponents from '@/components/ui/Publish/Components.vue';
-import LocalizationsCard from '@/components/ui/Publish/Localizations.vue';
-import LivePreview from '@/components/ui/LivePreview/LivePreview.vue';
+    PublishContainer,
+    PublishTabs,
+    PublishComponents,
+    PublishLocalizations as LocalizationsCard,
+    LivePreview,
+} from '@ui';
 import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
 import { computed, ref } from 'vue';
-import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@/components/ui/Publish/SavePipeline.js';
-
-let saving = ref(false);
-let errors = ref({});
-let container = null;
+import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';
+import { router } from '@inertiajs/vue3';
 
 export default {
     mixins: [HasPreferences, HasActions],
@@ -401,13 +396,27 @@ export default {
         };
     },
 
+	setup() {
+		const savingRef = ref(false);
+		const errorsRef = ref({});
+
+		return {
+			savingRef: computed(() => savingRef),
+			errorsRef: computed(() => errorsRef),
+		};
+	},
+
     computed: {
+        containerRef() {
+            return computed(() => this.$refs.container);
+        },
+
         saving() {
-            return saving.value;
+            return this.savingRef.value;
         },
 
         errors() {
-            return errors.value;
+            return this.errorsRef.value;
         },
 
         formattedTitle() {
@@ -536,7 +545,11 @@ export default {
             }
 
             new Pipeline()
-                .provide({ container, errors, saving })
+                .provide({
+                    container: this.containerRef,
+                    errors: this.errorsRef,
+                    saving: this.savingRef,
+                })
                 .through([
                     new BeforeSaveHooks('entry', {
                         collection: this.collectionHandle,
@@ -553,6 +566,11 @@ export default {
                     }),
                 ])
                 .then((response) => {
+                    this.title = response.data.data.title;
+                    this.isWorkingCopy = true;
+                    if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
+                    if (!this.isCreating && !this.isAutosave) this.$toast.success(__('Saved'));
+
                     // If revisions are enabled, just emit event.
                     if (this.revisionsEnabled) {
                         clearTimeout(this.trackDirtyStateTimeout);
@@ -564,21 +582,16 @@ export default {
                         return;
                     }
 
-                    this.title = response.data.data.title;
-                    this.isWorkingCopy = true;
-                    if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
-                    if (!this.isCreating && !this.isAutosave) this.$toast.success(__('Saved'));
-
                     let nextAction = this.quickSave || this.isAutosave ? 'continue_editing' : this.afterSaveOption;
 
                     // If the user has opted to create another entry, redirect them to create page.
                     if (!this.isInline && nextAction === 'create_another') {
-                        window.location = this.createAnotherUrl;
+                        this.redirectTo(this.createAnotherUrl);
                     }
 
                     // If the user has opted to go to listing (default/null option), redirect them there.
                     else if (!this.isInline && nextAction === null) {
-                        window.location = this.listingUrl;
+                        this.redirectTo(this.listingUrl);
                     }
 
                     // Otherwise, leave them on the edit form and emit an event. We need to wait until after
@@ -682,7 +695,7 @@ export default {
             this.selectingOrigin = false;
 
             if (this.isCreating) {
-                this.$nextTick(() => (window.location = localization.url));
+                this.$nextTick(() => this.redirectTo(localization.url));
                 return;
             }
 
@@ -741,12 +754,12 @@ export default {
 
             // If the user has opted to create another entry, redirect them to create page.
             if (!this.isInline && nextAction === 'create_another') {
-                window.location = this.createAnotherUrl;
+                this.redirectTo(this.createAnotherUrl);
             }
 
             // If the user has opted to go to listing (default/null option), redirect them there.
             else if (!this.isInline && nextAction === null) {
-                window.location = this.listingUrl;
+                this.redirectTo(this.listingUrl);
             }
 
             // Otherwise, leave them on the edit form and emit an event. We need to wait until after
@@ -825,6 +838,10 @@ export default {
                 action: action.run,
             }));
         },
+
+        redirectTo(location) {
+            router.get(location);
+        }
     },
 
     mounted() {
@@ -855,18 +872,13 @@ export default {
             this.originBehavior === 'active'
                 ? this.localizations.find((l) => l.active)?.handle
                 : this.localizations.find((l) => l.root)?.handle;
-
-        container = computed(() => this.$refs.container);
     },
 
     beforeUnmount() {
         if (this.autosaveIntervalInstance) clearInterval(this.autosaveIntervalInstance);
-    },
-
-    unmounted() {
-        clearTimeout(this.trackDirtyStateTimeout);
-        this.saveKeyBinding.destroy();
-        this.quickSaveKeyBinding.destroy();
+	    clearTimeout(this.trackDirtyStateTimeout);
+	    this.saveKeyBinding.destroy();
+	    this.quickSaveKeyBinding.destroy();
     },
 };
 </script>

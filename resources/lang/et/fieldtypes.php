@@ -60,7 +60,7 @@ return [
     'code.config.mode' => 'Vali süntaksi esiletõstmise keel.',
     'code.config.mode_selectable' => 'Kas kasutaja saab režiimi muuta.',
     'code.config.rulers' => 'Seadista vertikaalsed joonlauad taandamise hõlbustamiseks.',
-    'code.config.theme' => 'Vali oma eelistatud teema.',
+    'code.config.color_mode' => 'Vali oma eelistatud teema.',
     'code.title' => 'Kood',
     'collections.title' => 'Kogumikud',
     'color.config.allow_any' => 'Luba mis tahes värviväärtuse sisestamine valija või heksakoodi abil.',

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="max-w-5xl mx-auto">
         <ui-header :title="__('Updates')" icon="updates">
             <template v-if="!gettingChangelog" #actions>
                 <ui-badge :prepend="__('Statamic Version')" :text="currentVersion" color="green" size="lg" />
@@ -7,7 +7,7 @@
             </template>
         </ui-header>
 
-        <ui-card v-if="gettingChangelog" class="text-center">
+        <ui-card v-if="gettingChangelog" class="text-center starting-style-transition" v-cloak>
             <Icon name="loading" />
         </ui-card>
 

@@ -1,7 +1,6 @@
 <template>
     <div>
         <Combobox
-            class="w-full"
             searchable
             :disabled="config.disabled"
             :ignore-filter="typeahead"
@@ -23,7 +22,7 @@
                         <StatusIndicator v-if="status" class="me-2" :status="status" />
                         <div v-text="title" class="truncate" />
                     </div>
-                    <ui-badge v-if="hint" size="sm" variant="flat" v-text="hint" />
+                    <ui-badge v-if="hint" size="sm" v-text="hint" />
                 </div>
             </template>
             <template #no-options>
@@ -130,7 +129,7 @@ export default {
                 let option = this.options.find((option) => option.id === id);
                 let existing = this.items.find((item) => item.id === id);
 
-                return existing || option || { id: value, title: value };
+                return existing || option || { id: id, title: id };
             });
 
             this.$emit('input', items);

@@ -1,0 +1,43 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as ButtonStories from '../Button.stories';
+
+<Meta of={ButtonStories} />
+
+# Button
+Buttons are used to trigger actions. They come in many sizes and flavors.
+<Canvas of={ButtonStories._DocsIntro} sourceState={'shown'} />
+
+## Variants
+Use the `variant` prop to change the appearance of the button.
+<Canvas of={ButtonStories.Variants} sourceState={'shown'} />
+
+## Sizes
+Use the `size` prop to change the size of the button.
+<Canvas of={ButtonStories.Sizes} sourceState={'shown'} />
+
+## Icons
+Automatically sized and styled icons are available for your buttons using the `icon` or `icon-append` props. You can also compose your own buttons with icons by nesting an [Icon]() component.
+<Canvas of={ButtonStories.Icons} sourceState={'shown'} />
+
+## Round
+Round buttons have their place too — like Bard set pickers. Just set the `round` prop.
+<Canvas of={ButtonStories.Round} sourceState={'shown'} />
+
+## Loading
+Show an animated loading icon during network requests.
+<Canvas of={ButtonStories.Loading} sourceState={'shown'} />
+
+## Full Width
+Fill that container with nothing but button.
+<Canvas of={ButtonStories.FullWidth} sourceState={'shown'} />
+
+## As a Link
+Buttons can be used as links by passing an `href` prop. They will use Inertia to navigate unless you add `target="_blank"` to open in a new tab.
+<Canvas of={ButtonStories.Link} sourceState={'shown'} />
+
+## Inset
+When using `ghost` or `subtle` button variants, you can use the `inset` prop to remove any invisible padding for better alignment.
+<Canvas of={ButtonStories.Inset} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={ButtonStories} />

@@ -1,10 +1,10 @@
 <template>
     <div
-        class="shadow-ui-sm relative z-2 flex w-full h-full items-center gap-2 rounded-lg border border-gray-300 bg-white px-1.5 py-1.5 mb-1.5 last:mb-0 text-base dark:border-x-0 dark:border-t-0 dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
+        class="shadow-ui-sm relative z-(--z-index-above) flex w-full h-full items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 [&:has(.cursor-grab)]:px-1.5 py-1.5 mb-1.5 last:mb-0 text-base dark:border-x-0 dark:border-t-0 dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
         :class="{ invalid: item.invalid }"
     >
-        <ui-icon name="ui/handles" class="item-move sortable-handle size-4 cursor-grab text-gray-300" v-if="sortable" />
-        <div class="flex flex-1 items-center">
+        <ui-icon name="handles" class="item-move sortable-handle size-4 cursor-grab text-gray-300 dark:text-gray-600" v-if="sortable" />
+        <div class="flex flex-1 items-center line-clamp-1 text-sm text-gray-600 dark:text-gray-300">
             <ui-status-indicator v-if="item.status" :status="item.status" class="me-2" />
 
             <div
@@ -45,7 +45,7 @@
                 <div class="flex items-center" v-if="!readOnly">
                     <Dropdown>
                         <template #trigger>
-                            <Button icon="ui/dots" variant="ghost" size="xs" v-bind="$attrs" :aria-label="__('Open dropdown menu')" />
+                            <Button icon="dots" variant="ghost" size="xs" v-bind="$attrs" :aria-label="__('Open dropdown menu')" />
                         </template>
                         <DropdownMenu>
                             <DropdownItem
@@ -69,8 +69,7 @@
 <script>
 import { getActivePinia } from 'pinia';
 import InlineEditForm from './InlineEditForm.vue';
-import { Button, Dropdown, DropdownMenu, DropdownItem } from '@/components/ui';
-import { containerContextKey } from '@/components/ui/Publish/Container.vue';
+import { Button, Dropdown, DropdownMenu, DropdownItem, publishContextKey as containerContextKey } from '@/components/ui';
 
 export default {
     components: {

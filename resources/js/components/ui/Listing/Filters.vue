@@ -1,6 +1,13 @@
 <script setup>
-import { Badge, Button, Panel, PanelHeader, Card, Heading } from '@/components/ui';
-import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
+import {
+    Badge,
+    Button,
+    Panel,
+    PanelHeader,
+    Card,
+    Heading,
+} from '@ui';
+import { injectListingContext } from '../Listing/Listing.vue';
 import { computed, ref, watch, nextTick } from 'vue';
 import FieldFilter from './FieldFilter.vue';
 import DataListFilter from './Filter.vue';
@@ -91,9 +98,9 @@ function handleStackClosed() {
 </script>
 
 <template>
-    <div class="flex flex-1 items-center gap-3 overflow-x-auto py-3 rounded-r-4xl">
+    <div class="flex flex-1 items-center gap-2 sm:gap-3 overflow-x-auto py-3 rounded-r-4xl">
 
-        <div ref="filtersButtonWrapperRef" class="sticky left-0 ps-[1px] rounded-r-lg bg-white dark:bg-gray-900 mask-bg mask-bg--left mask-bg--left-small">
+        <div ref="filtersButtonWrapperRef" class="sticky left-0 ps-[1px] rounded-r-lg mask-bg mask-bg--left mask-bg--left-small">
             <Button icon="sliders-horizontal" class="[&_svg]:size-3.5" :disabled="reorderable" @click="open = true">
                 {{ __('Filters') }}
                 <Badge
@@ -106,13 +113,13 @@ function handleStackClosed() {
             </Button>
         </div>
 
-        <stack half name="filters" v-if="open" @closed="handleStackClosed">
+        <ui-stack half name="filters" v-if="open" @closed="handleStackClosed">
             <div ref="stackContentRef" class="flex-1 p-3 bg-white dark:bg-gray-800 h-full overflow-auto rounded-l-2xl relative">
                 <Button
                     icon="x"
                     variant="ghost"
                     size="sm"
-                    class="absolute top-1.75 right-3 z-10 [&_svg]:size-4"
+                    class="absolute! top-1.75 right-3 z-(--z-index-above) [&_svg]:size-4"
                     @click="handleStackClosed"
                 />
                 <Heading size="lg" :text="__('Filters')" class="mb-4 px-1.5 pr-12 [&_svg]:size-4" icon="sliders-horizontal" />
@@ -147,9 +154,10 @@ function handleStackClosed() {
                             />
                         </Card>
                     </Panel>
+                    <Button variant="primary" :text="__('Done')" @click="handleStackClosed" />
                 </div>
             </div>
-        </stack>
+        </ui-stack>
 
         <Button
             v-for="(badge, handle, index) in fieldFilterBadges"

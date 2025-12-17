@@ -1,7 +1,8 @@
 <script setup>
 import { Header, Button, Dropdown, DropdownMenu, DropdownItem, PublishContainer } from '@/components/ui';
 import { ref, useTemplateRef } from 'vue';
-import { Pipeline, Request } from '@/components/ui/Publish/SavePipeline.js';
+import { Pipeline, Request } from '@ui/Publish/SavePipeline.js';
+import { router } from '@inertiajs/vue3';
 
 let saving = ref(false);
 let errors = ref({});
@@ -30,8 +31,8 @@ function save() {
         .provide({ container, errors, saving })
         .through([new Request(props.actions.save, props.method)])
         .then((response) => {
-            if (props.isCreating) window.location = response.data.redirect;
-            Statamic.$toast.success('Saved');
+            if (props.isCreating) router.get(response.data.redirect);
+            Statamic.$toast.success(__('Saved'));
             title.value = response.data.title;
         });
 }
@@ -42,7 +43,7 @@ function save() {
         <Header :title="__(title)" icon="groups">
             <Dropdown v-if="canEditBlueprint" class="me-2">
                 <template #trigger>
-                    <Button icon="ui/dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
+                    <Button icon="dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
                 </template>
                 <DropdownMenu>
                     <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" :href="actions.editBlueprint" />

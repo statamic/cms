@@ -17,18 +17,14 @@
         </ui-header>
 
         <ui-panel v-if="showTitle" :heading="__('Settings')">
-            <div class="publish-fields-fluid publish-fields-fluid--xl-only">
-                <ui-card class="field-w-75">
-                    <ui-field :label="__('Title')" :instructions="__('messages.blueprints_title_instructions')" :errors="errors?.title">
-                        <ui-input v-model="blueprint.title" />
-                    </ui-field>
-                </ui-card>
-                <ui-card class="field-w-25">
-                    <ui-field :label="__('Hidden')" :instructions="__('messages.blueprints_hidden_instructions')" :error="errors?.hidden" variant="inline">
-                        <ui-switch v-model="blueprint.hidden" />
-                    </ui-field>
-                </ui-card>
-            </div>
+            <ui-card class="p-0! divide-y divide-gray-200 dark:divide-gray-800">
+                <ui-field as-config :label="__('Title')" :instructions="__('messages.blueprints_title_instructions')" :errors="errors?.title">
+                    <ui-input v-model="blueprint.title" />
+                </ui-field>
+                <ui-field as-config :label="__('Hidden')" :instructions="__('messages.blueprints_hidden_instructions')" :error="errors?.hidden" variant="inline">
+                    <ui-switch v-model="blueprint.hidden" />
+                </ui-field>
+            </ui-card>
         </ui-panel>
 
         <Tabs
@@ -66,6 +62,7 @@ export default {
         return {
             blueprint: this.initializeBlueprint(),
             errors: {},
+	        saveKeyBinding: null,
         };
     },
 
@@ -76,14 +73,26 @@ export default {
     },
 
     created() {
-        this.$keys.bindGlobal(['mod+s'], (e) => {
+        this.saveKeyBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
             e.preventDefault();
+            this.save();
+        });
+
+        // Listen for root-form-save events from child components
+        // This also happens on the fieldset builder.
+        this.$events.$on('root-form-save', () => {
             this.save();
         });
 
         if (this.isFormBlueprint) {
             Statamic.$config.set('isFormBlueprint', true);
         }
+    },
+
+    beforeUnmount() {
+        this.$events.$off('root-form-save');
+
+		this.saveKeyBinding.destroy();
     },
 
     watch: {
@@ -109,10 +118,10 @@ export default {
         },
 
         save() {
-            // this.$axios[this.method](this.action, this.fieldset)
             this.$axios['patch'](this.action, this.blueprint)
                 .then((response) => this.saved(response))
                 .catch((e) => {
+                    console.error('Blueprint save failed:', e);
                     this.$toast.error(e.response.data.message);
                     this.errors = e.response.data.errors;
                 });

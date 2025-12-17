@@ -1,6 +1,6 @@
 <template>
     <Input
-        type="text"
+        type="number"
         :tabindex="0"
         :name="name"
         :focus="focus"
@@ -8,6 +8,11 @@
         :read-only="isReadOnly"
         :disabled="config.disabled"
         :id="fieldId"
+        :prepend="__(config.prepend)"
+        :append="__(config.append)"
+        :min="config.min"
+        :max="config.max"
+        :step="config.step"
         @update:model-value="updateDebounced"
         @focus="$emit('focus')"
         @blur="$emit('blur')"

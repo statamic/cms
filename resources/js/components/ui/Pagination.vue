@@ -2,7 +2,8 @@
 import HasInputOptions from '@/components/fieldtypes/HasInputOptions.js';
 const normalizeInputOptions = HasInputOptions.methods.normalizeInputOptions;
 import { flatten, sortBy, range } from 'lodash-es';
-import { Select, Button } from '@/components/ui';
+import Select from './Select/Select.vue';
+import Button from './Button/Button.vue';
 import { computed } from 'vue';
 
 const emit = defineEmits(['page-selected', 'per-page-changed']);
@@ -157,7 +158,7 @@ function getRange(start, end) {
                 size="sm"
                 :variant="hasPrevious && !showPageLinks ? 'filled' : 'ghost'"
                 round
-                icon="ui/chevron-left"
+                icon="chevron-left"
                 :disabled="!hasPrevious"
                 @click="selectPreviousPage"
             />
@@ -178,7 +179,7 @@ function getRange(start, end) {
                 size="sm"
                 :variant="hasNext && !showPageLinks ? 'filled' : 'ghost'"
                 round
-                icon="ui/chevron-right"
+                icon="chevron-right"
                 :disabled="!hasNext"
                 @click="selectNextPage"
             />

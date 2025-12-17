@@ -28,6 +28,18 @@ class ExplodeTest extends TestCase
         $this->assertEquals($expected, $modified);
     }
 
+    #[Test]
+    public function it_breaks_a_string_into_an_array_of_strings_with_limit(): void
+    {
+        $places = 'Scotland, England, Switzerland, Italy';
+        $expected = [
+            'Scotland',
+            'England, Switzerland, Italy',
+        ];
+        $modified = $this->modify($places, [', ', 2]);
+        $this->assertEquals($expected, $modified);
+    }
+
     private function modify($value, array $params)
     {
         return Modify::value($value)->explode($params)->fetch();

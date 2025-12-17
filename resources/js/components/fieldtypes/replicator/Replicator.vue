@@ -7,7 +7,7 @@
             <div :class="{ wrapperClasses: fullScreenMode }">
                 <div
                     class="replicator-fieldtype-container"
-                    :class="{ 'replicator-fullscreen fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-200 dark:bg-gray-800': fullScreenMode }"
+                    :class="{ 'replicator-fullscreen fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-100 dark:bg-gray-800': fullScreenMode }"
                 >
                     <publish-field-fullscreen-header
                         v-if="fullScreenMode"
@@ -16,7 +16,7 @@
                         @close="toggleFullscreen"
                     />
 
-                    <section :class="{ 'dark:bg-dark-700 mt-14 bg-gray-200 p-4': fullScreenMode }">
+                    <section :class="{ 'mt-12 p-4': fullScreenMode }">
                         <sortable-list
                             :model-value="value"
                             :vertical="true"
@@ -55,11 +55,11 @@
                                     <template v-slot:picker>
                                         <add-set-button
                                             variant="between"
-                                            v-if="index !== 0"
                                             :groups="groupConfigs"
                                             :sets="setConfigs"
                                             :index="index"
                                             :enabled="canAddSet"
+                                            :is-first="index === 0"
                                             @added="addSet"
                                         />
                                     </template>
@@ -74,6 +74,7 @@
                             :show-connector="value.length > 0"
                             :index="value.length"
                             :label="config.button_label"
+                            :is-first="value.length === 0"
                             @added="addSet"
                         />
                     </section>
@@ -105,6 +106,7 @@ export default {
             focused: false,
             collapsed: clone(this.meta.collapsed),
             fullScreenMode: false,
+            escBinding: null,
             provide: {
                 replicatorSets: this.config.sets,
                 showReplicatorFieldPreviews: this.config.previews,
@@ -156,22 +158,26 @@ export default {
             return [
                 {
                     title: __('Expand All Sets'),
-                    icon: 'ui/expand',
+                    icon: 'expand',
                     quick: true,
+                    disabled: () => this.collapsed.length === 0,
+                    visible: this.config.collapse !== 'accordion',
                     visibleWhenReadOnly: true,
                     run: this.expandAll,
                 },
                 {
                     title: __('Collapse All Sets'),
-                    icon: 'ui/collapse',
+                    icon: 'collapse',
                     quick: true,
+                    disabled: () =>this.collapsed.length === this.value.length,
                     visibleWhenReadOnly: true,
                     run: this.collapseAll,
                 },
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => (vm.fullScreenMode ? 'ui/collapse-all' : 'ui/expand-all'),
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'fullscreen-close' : 'fullscreen-open'),
                     quick: true,
+                    visible: this.config.fullscreen,
                     visibleWhenReadOnly: true,
                     run: this.toggleFullscreen,
                 },
@@ -256,6 +262,15 @@ export default {
 
         toggleFullscreen() {
             this.fullScreenMode = !this.fullScreenMode;
+
+            if (this.fullScreenMode) {
+                this.escBinding = this.$keys.bindGlobal('esc', this.toggleFullscreen);
+            } else {
+                if (this.escBinding) {
+                    this.escBinding.destroy();
+                    this.escBinding = null;
+                }
+            }
         },
 
         blurred() {

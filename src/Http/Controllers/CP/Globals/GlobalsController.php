@@ -3,7 +3,9 @@
 namespace Statamic\Http\Controllers\CP\Globals;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Contracts\Globals\GlobalSet as GlobalSetContract;
+use Statamic\CP\Column;
 use Statamic\CP\PublishForm;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\GlobalSet;
@@ -17,6 +19,11 @@ class GlobalsController extends CpController
 {
     public function index()
     {
+        $columns = [
+            Column::make('title')->label(__('Title')),
+            Column::make('handle')->label(__('Handle')),
+        ];
+
         $globals = GlobalSet::all()->filter(function ($set) {
             return User::current()->can('view', $set);
         })->tap(function ($globals) {
@@ -32,20 +39,18 @@ class GlobalsController extends CpController
                 'id' => $set->id(),
                 'handle' => $set->handle(),
                 'title' => $set->title(),
-                'deleteable' => User::current()->can('delete', $set),
                 'configurable' => User::current()->can('edit', $set),
                 'edit_url' => $localized ? $localized->editUrl() : $set->editUrl(),
                 'configure_url' => $set->editUrl(),
-                'delete_url' => $set->deleteUrl(),
             ];
-        })->filter()->values();
+        })->filter()->sortBy('title')->values();
 
-        if ($globals->isEmpty()) {
-            return view('statamic::globals.empty');
-        }
-
-        return view('statamic::globals.index', [
+        return Inertia::render('globals/Index', [
             'globals' => $globals,
+            'columns' => $columns,
+            'actionUrl' => cp_route('globals.actions.run'),
+            'createUrl' => cp_route('globals.create'),
+            'canCreate' => User::current()->can('create', GlobalSetContract::class),
         ]);
     }
 
@@ -112,7 +117,9 @@ class GlobalsController extends CpController
     {
         $this->authorize('create', GlobalSetContract::class);
 
-        return view('statamic::globals.create');
+        return Inertia::render('globals/Create', [
+            'submitUrl' => cp_route('globals.store'),
+        ]);
     }
 
     public function store(Request $request)
@@ -144,19 +151,6 @@ class GlobalsController extends CpController
         session()->flash('message', __('Global Set created'));
 
         return ['redirect' => $global->editUrl()];
-    }
-
-    public function destroy($set)
-    {
-        if (! $set = GlobalSet::find($set)) {
-            return $this->pageNotFound();
-        }
-
-        $this->authorize('delete', $set);
-
-        $set->delete();
-
-        return response('', 204);
     }
 
     protected function editFormBlueprint($set)

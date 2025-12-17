@@ -4,7 +4,7 @@
             <div v-if="editable" class="page-move w-6" />
         </slot>
         <div class="flex flex-1 items-center p-1.5 text-xs leading-normal">
-            <div class="flex gap-3 grow items-center" @click="$emit('branch-clicked', page)">
+            <div class="flex gap-2 sm:gap-3 grow items-center" @click="$emit('branch-clicked', page)">
                 <ui-status-indicator :status="page.status" v-tooltip="getStatusTooltip()" />
                 <ui-icon v-if="isRoot" name="home" class="size-4" v-tooltip="__('This is the root page')" />
                 <a
@@ -24,7 +24,7 @@
                 <ui-button
                     v-if="hasChildren"
                     class="transition duration-100 [&_svg]:size-4! -mx-1.5"
-                    icon="ui/chevron-down"
+                    icon="chevron-down"
                     size="xs"
                     round
                     variant="ghost"
@@ -37,14 +37,14 @@
                 <div v-if="page.collection && editable" class="flex items-center gap-2">
                     <Icon name="navigation" class="size-3.5 text-gray-500" />
                     <div>
-                        <a :href="page.collection.create_url" v-text="__('Add')" class="hover:text-blue-500" />
+                        <Link :href="page.collection.create_url" v-text="__('Add')" class="hover:text-ui-accent-text" />
                         <span class="mx-1 text-gray-400 dark:text-gray-500">/</span>
-                        <a :href="page.collection.edit_url" v-text="__('Edit')" class="hover:text-blue-500" />
+                        <Link :href="page.collection.edit_url" v-text="__('Edit')" class="hover:text-ui-accent-text" />
                     </div>
                 </div>
             </div>
 
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 sm:gap-3">
                 <ui-badge
                     v-if="showBlueprint && page.entry_blueprint"
                     :text="__(page.entry_blueprint.title)"
@@ -72,9 +72,10 @@
 
 <script>
 import { Dropdown, DropdownMenu, Icon } from '@/components/ui';
+import { Link } from '@inertiajs/vue3';
 
 export default {
-    components: { Dropdown, DropdownMenu, Icon },
+    components: { Link, Dropdown, DropdownMenu, Icon },
     props: {
         page: Object,
         depth: Number,

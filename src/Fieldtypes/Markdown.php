@@ -121,7 +121,7 @@ class Markdown extends Fieldtype
                     'default' => [
                         'display' => __('Default Value'),
                         'instructions' => __('statamic::messages.fields_default_instructions'),
-                        'type' => 'markdown',
+                        'type' => 'textarea',
                     ],
                 ],
             ],

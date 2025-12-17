@@ -17,6 +17,7 @@
 
 <script>
 import { Button } from '@/components/ui';
+import { router } from '@inertiajs/vue3';
 
 export default {
     components: {
@@ -44,7 +45,7 @@ export default {
             this.$axios.post(this.url, payload).then((response) => {
                 Statamic.$hooks.run('revision.restored', { reference: this.reference }).then(() => {
                     this.$dirty.disableWarning();
-                    window.location.reload();
+                    router.reload();
                 });
             });
         },

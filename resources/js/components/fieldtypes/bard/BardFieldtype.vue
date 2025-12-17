@@ -6,7 +6,7 @@
         <div :class="{ 'publish-fields': fullScreenMode }">
             <div :class="fullScreenMode && wrapperClasses">
                 <div
-                    class="bard-fieldtype antialiased st-text-legibility with-contrast:border-gray-500 shadow-ui-sm focus-outline-discrete"
+                    class="bard-fieldtype antialiased with-contrast:border-gray-500 shadow-ui-sm"
                     :class="{ 'bard-fullscreen': fullScreenMode }"
                     ref="container"
                     @dragstart.stop="ignorePageHeader(true)"
@@ -19,7 +19,7 @@
                         @close="toggleFullscreen"
                     >
                         <div class="bard-fixed-toolbar border-0" v-if="!readOnly && showFixedToolbar">
-                            <div class="no-select flex flex-1 flex-wrap items-center" v-if="toolbarIsFixed">
+                            <div class="no-select flex flex-1 flex-wrap items-center gap-1" v-if="toolbarIsFixed">
                                 <component
                                     v-for="button in visibleButtons(buttons)"
                                     :key="button.name"
@@ -34,8 +34,8 @@
                         </div>
                     </publish-field-fullscreen-header>
 
-                    <div class="bard-fixed-toolbar flex items-center justify-between rounded-t-xl border-b border-gray-300 bg-gray-50 px-2 py-1 dark:border-white/10 dark:bg-gray-950" v-if="!readOnly && showFixedToolbar && !fullScreenMode">
-                        <div class="no-select flex flex-1 flex-wrap items-center" v-if="toolbarIsFixed">
+                    <div class="bard-fixed-toolbar" v-if="!readOnly && showFixedToolbar && !fullScreenMode">
+                        <div class="no-select flex flex-1 flex-wrap items-center gap-1" v-if="toolbarIsFixed">
                             <component
                                 v-for="button in visibleButtons(buttons)"
                                 :key="button.name"
@@ -50,7 +50,7 @@
                     </div>
 
                     <div
-                        class="bard-editor @container/bard focus-within:focus-outline focus-within:rounded-b-lg! focus-within:rounded-t-none!"
+                        class="bard-editor @container/bard focus-within:focus-outline"
                         :class="{
                             'mode:read-only': readOnly,
                             'mode:minimal': !showFixedToolbar,
@@ -60,6 +60,7 @@
                     >
                         <bubble-menu
                             :editor="editor"
+                            :key="`bubble-menu-${fullScreenMode}`"
                             :options="{ placement: 'top', offset: [0, 10] }"
                             v-if="editor && toolbarIsFloating && !readOnly"
                         >
@@ -95,15 +96,19 @@
                                 @added="addSet"
                             >
                                 <template #trigger>
-                                    <button
-                                        type="button"
-                                        class="btn-round bard-add-set-button group size-7!"
-                                        :style="{ transform: `translateY(${y+2}px)` }"
-                                        :aria-label="__('Add Set')"
-                                        v-tooltip="__('Add Set')"
-                                    >
-                                        <ui-icon name="plus" class="size-4" />
-                                    </button>
+                                    <div class="absolute flex items-center gap-2 top-[-6px] z-1 -start-4.5 group" :style="{ transform: `translateY(${y}px)` }">
+                                        <ui-button
+                                            icon="plus"
+                                            size="sm"
+                                            :aria-label="__('Add Set')"
+                                            v-tooltip="__('Add Set')"
+                                        />
+                                        <ui-description
+                                            v-if="!$refs.setPicker?.isOpen"
+                                            :text="__('Type \'/\' to insert a set')"
+                                            :class="{'ps-9': fullScreenMode}"
+                                        />
+                                    </div>
                                 </template>
                             </set-picker>
                         </floating-menu>
@@ -209,6 +214,7 @@ export default {
                 showReplicatorFieldPreviews: this.config.previews,
             },
             errorsById: {},
+            debounceNextUpdate: true,
         };
     },
 
@@ -309,6 +315,10 @@ export default {
             return `form-group publish-field publish-field__${this.handle} bard-fieldtype`;
         },
 
+        hasSets() {
+            return this.value.some(item => item.type === 'set')
+        },
+
         setConfigs() {
             return this.groupConfigs.reduce((sets, group) => {
                 return sets.concat(group.sets);
@@ -323,23 +333,25 @@ export default {
             return [
                 {
                     title: __('Expand All Sets'),
-                    icon: 'ui/expand',
+                    icon: 'expand',
                     quick: true,
+                    disabled: () => this.collapsed.length === 0,
                     visibleWhenReadOnly: true,
                     run: this.expandAll,
-                    visible: this.setConfigs.length > 0,
+                    visible: this.setConfigs.length > 0 && this.hasSets,
                 },
                 {
                     title: __('Collapse All Sets'),
-                    icon: 'ui/collapse',
+                    icon: 'collapse',
                     quick: true,
+                    disabled: () => this.collapsed.length > 0,
                     visibleWhenReadOnly: true,
                     run: this.collapseAll,
-                    visible: this.setConfigs.length > 0,
+                    visible: this.setConfigs.length > 0 && this.hasSets,
                 },
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => (vm.fullScreenMode ? 'ui/collapse-all' : 'ui/expand-all'),
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'fullscreen-close' : 'fullscreen-open'),
                     quick: true,
                     run: this.toggleFullscreen,
                     visibleWhenReadOnly: true,
@@ -350,8 +362,13 @@ export default {
     },
 
     created() {
-        Statamic.$components.register('NodeViewWrapper', NodeViewWrapper);
-        Statamic.$components.register('NodeViewContent', NodeViewContent);
+        if (! Statamic.$components.has('NodeViewWrapper')) {
+            Statamic.$components.register('NodeViewWrapper', NodeViewWrapper);
+        }
+
+        if (! Statamic.$components.has('NodeViewContent')) {
+            Statamic.$components.register('NodeViewContent', NodeViewContent);
+        }
     },
 
     async mounted() {
@@ -362,8 +379,6 @@ export default {
 
         this.json = this.editor.getJSON().content;
         this.html = this.editor.getHTML();
-
-        this.escBinding = this.$keys.bind('esc', this.closeFullscreen);
 
         this.$nextTick(() => {
             this.mounted = true;
@@ -393,7 +408,11 @@ export default {
 
             if (json === oldJson) return;
 
-            this.updateDebounced(json);
+            this.debounceNextUpdate
+                ? this.updateDebounced(json)
+                : this.update(json);
+
+            this.debounceNextUpdate = true;
         },
 
         value(value, oldValue) {
@@ -416,8 +435,14 @@ export default {
             this.updateMeta(meta);
         },
 
-        fullScreenMode() {
+        fullScreenMode(fullScreenMode) {
             this.initEditor();
+
+            if (fullScreenMode) {
+                this.escBinding = this.$keys.bindGlobal('esc', this.closeFullscreen);
+            } else {
+                this.escBinding?.destroy();
+            }
         },
 
         'publishContainer.errors': {
@@ -452,6 +477,8 @@ export default {
 
             const { $head } = this.editor.view.state.selection;
             const { nodeBefore } = $head;
+
+            this.debounceNextUpdate = false;
 
             // Perform this in nextTick because the meta data won't be ready until then.
             this.$nextTick(() => {
@@ -728,7 +755,23 @@ export default {
                     }, 1);
                 },
                 onUpdate: () => {
-                    this.json = clone(this.editor.getJSON().content);
+                    const oldJson = this.json;
+                    const newJson = clone(this.editor.getJSON().content);
+
+                    const countNodes = (nodes) => {
+                        if (!nodes || !Array.isArray(nodes)) return 0;
+                        let count = nodes.length;
+                        nodes.forEach(node => {
+                            if (node.content) {
+                                count += countNodes(node.content);
+                            }
+                        });
+                        return count;
+                    };
+
+                    if (countNodes(oldJson) !== countNodes(newJson)) this.debounceNextUpdate = false;
+
+                    this.json = newJson;
                     this.html = this.editor.getHTML();
                 },
                 onCreate: ({ editor }) => {
@@ -785,7 +828,7 @@ export default {
         getExtensions() {
             let modeExts = this.inputIsInline ? [DocumentInline] : [DocumentBlock, HardBreak];
 
-            if (this.config.inline === 'break') {
+            if (this.inputIsInline && this.config.inline_hard_breaks) {
                 modeExts.push(
                     HardBreak.extend({
                         addKeyboardShortcuts() {
@@ -822,7 +865,11 @@ export default {
                             const { view, state } = this.editor;
 
                             if (this.options.allowed({ view, state})) {
-                                this.options.openSetPicker();
+                                if (this.options.setConfigs.length === 1) {
+                                    this.options.addSet(this.options.setConfigs[0].handle);
+                                } else {
+                                    this.options.openSetPicker();
+                                }
                                 return true; // Prevent inserting a slash.
                             }
 
@@ -840,6 +887,8 @@ export default {
                     shown: computed(() => this.showAddSetButton),
                     allowed: this.suitableToShowSetButton,
                     openSetPicker: this.openSetPicker,
+                    setConfigs: this.setConfigs,
+                    addSet: this.addSet,
                 }),
                 Dropcursor,
                 Gapcursor,
@@ -932,3 +981,48 @@ export default {
     },
 };
 </script>
+
+<style>
+@layer ui {
+    /* This container query is inline because it breaks Vite's CSS compilation. Possibly because of the container query syntax and nesting */
+    .bard-fixed-toolbar {
+        /* While the fixed toolbar is "stuck", mask the focus state of the editor to prevent blue focus lines appearing around the side of the toolbar while scrolling */
+        container-type: scroll-state;
+        @container scroll-state(stuck: top) {
+            > * {
+                position: relative;
+                &::after {
+                    content: '';
+                    position: absolute;
+                    z-index: var(--z-index-below);
+                    inset: -4px -8px;
+                    box-shadow:
+                        /* Left Mask */
+                        -1px 0px 0px var(--color-gray-300),
+                        /* Right Mask */
+                        1px 0px 0px var(--color-gray-300),
+                        /* Bottom "Shadow" */
+                        0 4px 5px -3px hsl(0deg 0% 85%)
+                    ;
+                    border-inline-width: 2px;
+                    border-inline-color: var(--color-gray-50);
+                }
+                :is(.dark) & {
+                    &::after {
+                        box-shadow:
+                            /* Left Mask */
+                            -1px 0px 0px var(--color-gray-700),
+                            /* Right Mask */
+                            1px 0px 0px var(--color-gray-700),
+                            /* Bottom "Shadow" */
+                            0 4px 5px -3px hsl(0deg 0% 10%)
+                        ;
+                        border-inline-color: var(--color-gray-850);
+                    }
+                }
+            }
+        }
+    }
+}
+</style>
+

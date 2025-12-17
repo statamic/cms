@@ -4,10 +4,12 @@ namespace Statamic\Http\Controllers\CP\Assets;
 
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
+use Inertia\Inertia;
 use Statamic\Assets\AssetFolder;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\CP\Column;
 use Statamic\Exceptions\AuthorizationException;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Scope;
 use Statamic\Facades\User;
@@ -41,7 +43,33 @@ class BrowserController extends CpController
 
         $this->setColumns($container);
 
-        return view('statamic::assets.browse', [
+        return Inertia::render('assets/Browse', [
+            ...$this->browseData($container, $path),
+            'editing' => null,
+        ]);
+    }
+
+    public function edit($container, $path)
+    {
+        $containerHandle = $container->handle();
+
+        $asset = Asset::find("{$containerHandle}::{$path}");
+
+        throw_unless($container && $asset, new NotFoundHttpException);
+
+        $this->authorize('view', $asset);
+
+        $this->setColumns($container);
+
+        return Inertia::render('assets/Browse', [
+            ...$this->browseData($container, $asset->folder()),
+            'editing' => $asset->id(),
+        ]);
+    }
+
+    protected function browseData($container, $path)
+    {
+        return [
             'container' => [
                 'id' => $container->id(),
                 'title' => $container->title(),
@@ -57,31 +85,9 @@ class BrowserController extends CpController
             ],
             'folder' => $path,
             'columns' => $this->columns,
-        ]);
-    }
-
-    public function edit($container, $path)
-    {
-        $containerHandle = $container->handle();
-
-        $asset = Asset::find("{$containerHandle}::{$path}");
-
-        abort_unless($container && $asset, 404);
-
-        $this->authorize('view', $asset);
-
-        $this->setColumns($container);
-
-        return view('statamic::assets.browse', [
-            'container' => [
-                'id' => $container->id(),
-                'title' => $container->title(),
-                'edit_url' => $container->editUrl(),
-            ],
-            'folder' => $asset->folder(),
-            'editing' => $asset->id(),
-            'columns' => $this->columns,
-        ]);
+            'canCreateContainers' => User::current()->can('create', \Statamic\Contracts\Assets\AssetContainer::class),
+            'createContainerUrl' => cp_route('asset-containers.create'),
+        ];
     }
 
     public function folder(Request $request, $container, $path = '/')
@@ -225,9 +231,25 @@ class BrowserController extends CpController
             ->defaultVisibility(true)
             ->sortable(true);
 
+        $width = Column::make('width')
+            ->label(__('Width'))
+            ->value('width')
+            ->visible(true)
+            ->defaultVisibility(false)
+            ->sortable(true);
+
+        $height = Column::make('height')
+            ->label(__('Height'))
+            ->value('height')
+            ->visible(true)
+            ->defaultVisibility(false)
+            ->sortable(true);
+
         $columns->put('basename', $basename);
         $columns->put('size', $size);
         $columns->put('last_modified', $lastModified);
+        $columns->put('width', $width);
+        $columns->put('height', $height);
 
         $columns->setPreferred("assets.{$container->handle()}.columns");
 

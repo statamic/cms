@@ -23,22 +23,20 @@ class Date extends FieldtypeFilter
             ],
             'value' => [
                 'type' => 'date',
-                'inline' => true,
                 'full_width' => true,
+                'clearable' => false,
                 'if' => [
                     'operator' => 'contains_any >, <',
                 ],
-                'required' => false,
             ],
             'range_value' => [
                 'type' => 'date',
-                'inline' => true,
                 'mode' => 'range',
                 'full_width' => true,
+                'clearable' => false,
                 'if' => [
                     'operator' => 'between',
                 ],
-                'required' => false,
             ],
         ];
     }
@@ -74,5 +72,20 @@ class Date extends FieldtypeFilter
         }
 
         return $field.' '.strtolower($translatedOperator).' '.$values['value'];
+    }
+
+    public function isComplete($values): bool
+    {
+        $values = array_filter($values);
+
+        if (! $operator = Arr::get($values, 'operator')) {
+            return false;
+        }
+
+        if ($operator === 'between') {
+            return Arr::has($values, 'range_value.start') && Arr::has($values, 'range_value.end');
+        }
+
+        return Arr::has($values, 'value');
     }
 }

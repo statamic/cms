@@ -57,7 +57,7 @@ return [
     'code.config.mode' => 'Välj språk för syntaxmarkering.',
     'code.config.mode_selectable' => 'Om läget kan ändras av användaren.',
     'code.config.rulers' => 'Konfigurera vertikala linjaler för att hjälpa till med indrag.',
-    'code.config.theme' => 'Välj ditt föredragna tema.',
+    'code.config.color_mode' => 'Välj ditt föredragna tema.',
     'code.title' => 'Kod',
     'collections.title' => 'Samlingar',
     'color.config.allow_any' => 'Tillåt inmatning av valfritt färgvärde via väljare eller hex-kod.',

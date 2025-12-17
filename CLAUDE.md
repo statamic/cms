@@ -25,7 +25,7 @@ This is the **Statamic CMS Core Package** - a Laravel-powered, flat-file (by def
 ```
 
 ## Technology Stack
-- **Backend**: Laravel 11+ / PHP 8+
+- **Backend**: Laravel 12+ / PHP 8+
 - **Control Panel Frontend**: Vue 3 + TypeScript + Vite
 - **Control Panel CSS**: Tailwind CSS 4
 - **Database**: File-based "Stache" out of the box, but eloquent supported through the statamic/eloquent-driver composer package
@@ -76,7 +76,7 @@ The project uses Vite for asset compilation with separate configs:
 - Our Vite bundle contains the Vue app, UI components, all the JS to make the Control Panel work.
 - We provide a `@statamic/cms` node module for addons to use that provides core helpers, ui components, etc.
 - Our Vite bundle assembles everything the node module needs in `resouces/js/bootstrap/cms` and makes it available in the `window.__STATAMIC__` object.
-- The node module is defined in `resources/js/package` and resolves everything through the `window` object.
+- The node module is defined in `packages/cms` and resolves everything through the `window` object.
 - Code needs to be in the `window` object to prevent addon bundles from re-including our code, and from needing to recompile our source files.
 
 ## Links

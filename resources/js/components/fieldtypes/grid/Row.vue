@@ -4,6 +4,7 @@
 
         <FieldsProvider
             :fields="fields"
+            :as-config="false"
             :field-path-prefix="`${fieldPathPrefix}.${index}`"
             :meta-path-prefix="`${metaPathPrefix}.existing.${values._id}`"
         >
@@ -29,8 +30,7 @@
 
 <script>
 import GridCell from './Cell.vue';
-import FieldsProvider from '@/components/ui/Publish/FieldsProvider.vue';
-import { Dropdown, DropdownMenu, DropdownItem } from '@/components/ui';
+import { Dropdown, DropdownMenu, DropdownItem, PublishFieldsProvider as FieldsProvider } from '@ui';
 
 export default {
     components: { Dropdown, DropdownMenu, DropdownItem, FieldsProvider, GridCell },

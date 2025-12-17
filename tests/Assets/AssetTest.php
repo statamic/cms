@@ -8,6 +8,7 @@ use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Statamic\Imaging\ImageValidator;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
@@ -2021,6 +2022,22 @@ class AssetTest extends TestCase
     }
 
     #[Test]
+    public function it_sanitizes_uploaded_filenames_but_passes_the_original_name_into_the_event()
+    {
+        Event::fake();
+        $asset = $this->container->makeAsset('path/to/Sanitize This Asset © Photographer.JPG');
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+
+        $asset->upload(UploadedFile::fake()->image('Sanitize This Asset © Photographer.JPG'));
+
+        Storage::disk('test')->assertExists('path/to/sanitize-this-asset--photographer.jpg');
+        $this->assertEquals('path/to/sanitize-this-asset--photographer.jpg', $asset->path());
+        Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
+            return $event->asset = $asset && $event->originalFilename === 'Sanitize This Asset © Photographer.JPG';
+        });
+    }
+
+    #[Test]
     public function it_lowercases_uploaded_filenames_by_default()
     {
         Event::fake();
@@ -2579,6 +2596,37 @@ YAML;
             'cp disabled, square svg' => ['svg', 'square', false, []],
             'cp disabled, non-image' => ['txt', null, false, []],
         ];
+    }
+
+    #[Test]
+    public function warn_presets_can_be_modified_via_hook()
+    {
+        $container = Facades\AssetContainer::make('test')->disk('test');
+        $container = Mockery::mock($container)->makePartial();
+        $container->shouldReceive('warmPresets')->andReturn(['one', 'two']);
+
+        $asset = (new Asset)->container($container)->path('foo/bar/test.jpg');
+
+        $test = $this;
+
+        Asset::hook('warm-presets', function ($presets, $next) use ($test, $asset) {
+            $test->assertEquals($asset, $this);
+            $test->assertTrue(is_array($presets));
+            $test->assertEquals(['one', 'two', 'cp_thumbnail_small_square'], $presets);
+
+            $presets[] = 'custom_one';
+            $presets[] = 'custom_two';
+
+            return $next($presets);
+        });
+
+        $this->assertEquals([
+            'one',
+            'two',
+            'cp_thumbnail_small_square',
+            'custom_one',
+            'custom_two',
+        ], $asset->warmPresets());
     }
 
     private function fakeEventWithMacros()

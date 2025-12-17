@@ -58,7 +58,7 @@ return [
     'code.config.mode' => 'Kies de taal voor syntax highlighting.',
     'code.config.mode_selectable' => 'Of de modus gewijzigd kan worden door de gebruiker.',
     'code.config.rulers' => 'Configureer verticale linealen om te helpen met inspringen.',
-    'code.config.theme' => 'Kies je voorkeursthema.',
+    'code.config.color_mode' => 'Kies je voorkeursthema.',
     'code.title' => 'Code',
     'collections.title' => 'Collections',
     'color.config.allow_any' => 'Sta elke kleur-invoer toe door middel van de kleurenkiezer of een hex code.',

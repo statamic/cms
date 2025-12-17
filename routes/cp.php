@@ -22,6 +22,8 @@ use Statamic\Http\Controllers\CP\Auth\ExtendSessionController;
 use Statamic\Http\Controllers\CP\Auth\ForgotPasswordController;
 use Statamic\Http\Controllers\CP\Auth\ImpersonationController;
 use Statamic\Http\Controllers\CP\Auth\LoginController;
+use Statamic\Http\Controllers\CP\Auth\PasskeyController;
+use Statamic\Http\Controllers\CP\Auth\PasskeyLoginController;
 use Statamic\Http\Controllers\CP\Auth\ResetPasswordController;
 use Statamic\Http\Controllers\CP\Auth\TwoFactorChallengeController;
 use Statamic\Http\Controllers\CP\Auth\TwoFactorSetupController;
@@ -65,12 +67,15 @@ use Statamic\Http\Controllers\CP\Forms\FormSubmissionsController;
 use Statamic\Http\Controllers\CP\Forms\SubmissionActionController;
 use Statamic\Http\Controllers\CP\Globals\GlobalsBlueprintController;
 use Statamic\Http\Controllers\CP\Globals\GlobalsController;
+use Statamic\Http\Controllers\CP\Globals\GlobalSetActionController;
 use Statamic\Http\Controllers\CP\Globals\GlobalVariablesController;
 use Statamic\Http\Controllers\CP\GraphQLController;
+use Statamic\Http\Controllers\CP\Navigation\NavigationActionController;
 use Statamic\Http\Controllers\CP\Navigation\NavigationBlueprintController;
 use Statamic\Http\Controllers\CP\Navigation\NavigationController;
 use Statamic\Http\Controllers\CP\Navigation\NavigationPagesController;
 use Statamic\Http\Controllers\CP\Navigation\NavigationTreeController;
+use Statamic\Http\Controllers\CP\PlaygroundController;
 use Statamic\Http\Controllers\CP\Preferences\DefaultPreferenceController;
 use Statamic\Http\Controllers\CP\Preferences\Nav\DefaultNavController;
 use Statamic\Http\Controllers\CP\Preferences\Nav\NavController;
@@ -138,6 +143,11 @@ Route::group(['prefix' => 'auth'], function () {
     Route::get('unauthorized', UnauthorizedController::class)->name('unauthorized');
 
     Route::get('stop-impersonating', [ImpersonationController::class, 'stop'])->name('impersonation.stop');
+
+    Route::group(['prefix' => 'passkeys'], function () {
+        Route::post('/', [PasskeyLoginController::class, 'login'])->name('passkeys.auth');
+        Route::get('options', [PasskeyLoginController::class, 'options'])->name('passkeys.auth.options');
+    });
 });
 
 Route::middleware('statamic.cp.authenticated')->group(function () {
@@ -148,12 +158,14 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::get('select-site/{handle}', [SelectSiteController::class, 'select']);
 
-    Route::resource('navigation', NavigationController::class);
+    Route::resource('navigation', NavigationController::class)->except('destroy');
     Route::get('navigation/{navigation}/tree', [NavigationTreeController::class, 'index'])->name('navigation.tree.index');
     Route::patch('navigation/{navigation}/tree', [NavigationTreeController::class, 'update'])->name('navigation.tree.update');
     Route::post('navigation/{navigation}/pages', [NavigationPagesController::class, 'update'])->name('navigation.pages.update');
     Route::get('navigation/{navigation}/pages/create', [NavigationPagesController::class, 'create'])->name('navigation.pages.create');
     Route::get('navigation/{navigation}/pages/{edit}/edit', [NavigationPagesController::class, 'edit'])->name('navigation.pages.edit');
+    Route::post('navigation/actions', [NavigationActionController::class, 'run'])->name('navigation.actions.run');
+    Route::post('navigation/actions/list', [NavigationActionController::class, 'bulkActions'])->name('navigation.actions.bulk');
 
     Route::resource('collections', CollectionsController::class);
     Route::post('collections/actions', [CollectionActionController::class, 'run'])->name('collections.actions.run');
@@ -228,7 +240,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::post('globals', [GlobalsController::class, 'store'])->name('globals.store');
     Route::get('globals/{global_set}/edit', [GlobalsController::class, 'edit'])->name('globals.edit');
     Route::patch('globals/{global_set}', [GlobalsController::class, 'update'])->name('globals.update');
-    Route::delete('globals/{global_set}', [GlobalsController::class, 'destroy'])->name('globals.destroy');
+    Route::post('globals/actions', [GlobalSetActionController::class, 'run'])->name('globals.actions.run');
+    Route::post('globals/actions/list', [GlobalSetActionController::class, 'bulkActions'])->name('globals.actions.bulk');
 
     Route::get('globals/{global_set}', [GlobalVariablesController::class, 'edit'])->name('globals.variables.edit');
     Route::patch('globals/{global_set}/variables', [GlobalVariablesController::class, 'update'])->name('globals.variables.update');
@@ -415,15 +428,24 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         });
     });
 
+    Route::group(['prefix' => 'passkeys'], function () {
+        Route::get('/', [PasskeyController::class, 'index'])->name('passkeys.view');
+        Route::get('create', [PasskeyController::class, 'create'])->name('passkeys.create');
+        Route::post('/', [PasskeyController::class, 'store'])->name('passkeys.store');
+        Route::delete('{id}', [PasskeyController::class, 'destroy'])->name('passkeys.destroy');
+    });
+
     Route::post('slug', SlugController::class);
+
     Route::get('session-timeout', SessionTimeoutController::class)->name('session.timeout');
 
     Route::get('auth/confirm-password', [ElevatedSessionController::class, 'showForm'])->name('confirm-password');
     Route::get('elevated-session', [ElevatedSessionController::class, 'status'])->name('elevated-session.status');
+    Route::get('elevated-session/passkey-options', [ElevatedSessionController::class, 'options'])->name('elevated-session.passkey-options');
     Route::post('elevated-session', [ElevatedSessionController::class, 'confirm'])->name('elevated-session.confirm');
     Route::get('elevated-session/resend-code', [ElevatedSessionController::class, 'resendCode'])->name('elevated-session.resend-code')->middleware('throttle:send-elevated-session-code');
 
-    Route::view('/playground', 'statamic::playground')->name('playground');
+    Route::get('playground', PlaygroundController::class)->name('playground');
 
     Route::get('edit/{id}', EditRedirectController::class);
 

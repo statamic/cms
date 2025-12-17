@@ -2,7 +2,7 @@
 import { useAttrs } from 'vue';
 import { cva } from 'cva';
 import { ContextMenuContent, ContextMenuPortal, ContextMenuRoot, ContextMenuTrigger } from 'reka-ui';
-import { Button } from '@/components/ui';
+import Button from '../Button/Button.vue';
 
 defineOptions({
     inheritAttrs: false,
@@ -28,7 +28,7 @@ const contextContentClasses = cva({
     <ContextMenuRoot>
         <ContextMenuTrigger as-child data-ui-context-trigger>
             <slot name="trigger">
-                <Button icon="ui/dots" variant="ghost" size="sm" v-bind="attrs" :aria-label="__('Open context menu')" />
+                <Button icon="dots" variant="ghost" size="sm" v-bind="attrs" :aria-label="__('Open context menu')" />
             </slot>
         </ContextMenuTrigger>
         <ContextMenuPortal>

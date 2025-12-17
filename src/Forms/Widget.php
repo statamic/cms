@@ -4,30 +4,33 @@ namespace Statamic\Forms;
 
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
+use Statamic\Widgets\VueComponent;
 use Statamic\Widgets\Widget as BaseWidget;
 
 class Widget extends BaseWidget
 {
     protected static $handle = 'form';
 
-    public function html()
+    public function component()
     {
         $form = Form::find($handle = $this->config('form'));
 
         if (! $form) {
-            return "Error: Form [$handle] doesn't exist.";
+            return VueComponent::render('dynamic-html-renderer', [
+                'html' => "Error: Form [$handle] doesn't exist.",
+            ]);
         }
 
         if (! User::current()->can('view', $form)) {
             return;
         }
 
-        return view('statamic::forms.widget', [
-            'form' => $form,
+        return VueComponent::render('form-widget', [
+            'form' => $form->handle(),
             'fields' => $this->config('fields', []),
-            'submissions' => collect($form->submissions())->reverse()->take((int) $this->config('limit', 5))->toArray(),
             'title' => $this->config('title', $form->title()),
-            'limit' => $this->config('limit', 5),
+            'submissionsUrl' => cp_route('forms.show', $form->handle()),
+            'initialPerPage' => $this->config('limit', 5),
         ]);
     }
 }

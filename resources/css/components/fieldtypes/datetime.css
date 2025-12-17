@@ -19,7 +19,7 @@
 
     .dr-active,
     .dr-input {
-        z-index: 1;
+        z-index: var(--z-index-above);
     }
 }
 

@@ -1,29 +1,22 @@
 {
-  "compilerOptions": {
-    "target": "ES2020",
-    "module": "ESNext",
-    "moduleResolution": "node",
-    "allowJs": true,
-    "declaration": true,
-    "emitDeclarationOnly": true,
-    "outDir": "./resources/js/package/types",
-    "baseUrl": ".",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "paths": {
-      "@/*": ["resources/js/*"]
+    "compilerOptions": {
+        "moduleResolution": "bundler",
+        "target": "ESNext",
+        "module": "ESNext",
+        "strict": false,
+        "skipLibCheck": true,
+        "allowJs": true,
+        "noEmit": true,
+        "isolatedModules": true,
+        "baseUrl": ".",
+        "paths": {
+            "@/*": ["resources/js/*"],
+            "@ui": ["resources/js/components/ui"],
+            "@ui/*": ["resources/js/components/ui/*"],
+            "@api": ["resources/js/api.js"],
+            "@statamic/cms/*": ["packages/cms/src/*"]
+        }
     },
-    "types": ["node"]
-  },
-  "include": [
-    "resources/js/bootstrap/cms",
-  ],
-  "exclude": [
-    "node_modules",
-    "vendor",
-    "resources/js/tests",
-    "resources/js/package"
-  ]
+    "include": ["resources/js/**/*"],
+    "exclude": ["node_modules", "resources/dist", "resources/dist-dev"]
 }

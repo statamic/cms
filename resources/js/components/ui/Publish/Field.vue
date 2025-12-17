@@ -2,7 +2,11 @@
 import { computed, useTemplateRef, watch, ref, inject } from 'vue';
 import { injectContainerContext } from './Container.vue';
 import { injectFieldsContext } from './FieldsProvider.vue';
-import { Field, Icon, Tooltip, Label } from '@/components/ui';
+import {
+    Field,
+    Icon,
+    Label,
+} from '@ui';
 import FieldActions from '@/components/field-actions/FieldActions.vue';
 import ShowField from '@/components/field-conditions/ShowField.js';
 
@@ -10,6 +14,12 @@ const props = defineProps({
     config: {
         type: Object,
         required: true,
+    },
+    fieldPathPrefix: {
+        type: String,
+    },
+    metaPathPrefix: {
+        type: String,
     },
 });
 
@@ -33,8 +43,15 @@ const {
     hiddenFields,
     setHiddenField,
     container,
+    direction,
 } = injectContainerContext();
-const { fieldPathPrefix, metaPathPrefix } = injectFieldsContext();
+const {
+    fieldPathPrefix: injectedFieldPathPrefix,
+    metaPathPrefix: injectedMetaPathPrefix,
+    readOnly: fieldsProviderReadOnly,
+} = injectFieldsContext();
+const fieldPathPrefix = computed(() => props.fieldPathPrefix || injectedFieldPathPrefix.value);
+const metaPathPrefix = computed(() => props.metaPathPrefix || injectedMetaPathPrefix.value);
 const handle = props.config.handle;
 
 const fieldtypeComponent = computed(() => {
@@ -87,6 +104,12 @@ function metaUpdated(value) {
 function replicatorPreviewUpdated(value) {
     setFieldPreviewValue(fullPath.value, value);
 }
+
+watch(
+    () => fullPath.value,
+    () => setFieldPreviewValue(fullPath.value, fieldtype.value?.replicatorPreview),
+    { immediate: true }
+);
 
 function focused() {
     // todo
@@ -153,6 +176,7 @@ const isLocalizable = computed(() => props.config.localizable);
 
 const isReadOnly = computed(() => {
     if (containerReadOnly.value) return true;
+    if (fieldsProviderReadOnly.value) return true;
 
     if (isTrackingOriginValues.value && isSyncable.value && !isLocalizable.value) return true;
 
@@ -171,12 +195,6 @@ const isSyncable = computed(() => {
 
 const isSynced = computed(() => isSyncable.value && !localizedFields.value.includes(fullPath.value));
 const isNested = computed(() => fullPath.value.includes('.'));
-const wrapperComponent = computed(() => {
-    // Todo: Find a way to not need to hard code this.
-    if (props.config.type === 'dictionary_fields') return 'div';
-
-    return asConfig.value && !isNested.value ? 'card' : 'div';
-});
 
 function sync() {
     syncField(fullPath.value);
@@ -213,6 +231,7 @@ const fieldtypeComponentEvents = computed(() => ({
         :fieldtypeComponent="fieldtypeComponent"
         :fieldtypeComponentProps="fieldtypeComponentProps"
         :fieldtypeComponentEvents="fieldtypeComponentEvents"
+        :shouldShowField="shouldShowField"
     >
         <Field
             v-show="shouldShowField"
@@ -223,16 +242,16 @@ const fieldtypeComponentEvents = computed(() => ({
             :required="isRequired"
             :errors="errors"
             :read-only="isReadOnly"
-            :as="wrapperComponent"
             :variant="config.variant"
+            :full-width-setting="config.full_width_setting"
             v-bind="$attrs"
         >
             <template #label v-if="shouldShowLabel">
                 <Label :for="fieldId" :required="isRequired">
                     <template v-if="shouldShowLabelText">
-                        <Tooltip :text="config.handle" :delay="1000">
+                        <span v-tooltip="config.handle">
                             {{ __(config.display) }}
-                        </Tooltip>
+                        </span>
                     </template>
                     <ui-button size="xs" inset icon="synced" variant="ghost" v-tooltip="__('messages.field_synced_with_origin')" v-if="!isReadOnly && isSyncable" v-show="isSynced" @click="desync" />
                     <ui-button size="xs" inset icon="unsynced" variant="ghost" v-tooltip="__('messages.field_desynced_from_origin')" v-if="!isReadOnly && isSyncable" v-show="!isSynced" @click="sync" />
@@ -244,12 +263,14 @@ const fieldtypeComponentEvents = computed(() => ({
             <div class="text-xs text-red-600" v-if="!fieldtypeComponentExists">
                 Component <code v-text="fieldtypeComponent"></code> does not exist.
             </div>
-            <Component
-                ref="fieldtype"
-                :is="fieldtypeComponent"
-                v-bind="fieldtypeComponentProps"
-                v-on="fieldtypeComponentEvents"
-            />
+            <div :dir="direction">
+                <Component
+                    ref="fieldtype"
+                    :is="fieldtypeComponent"
+                    v-bind="fieldtypeComponentProps"
+                    v-on="fieldtypeComponentEvents"
+                />
+            </div>
         </Field>
     </slot>
 </template>

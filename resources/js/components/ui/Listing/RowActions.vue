@@ -1,7 +1,13 @@
 <script setup>
-import { Dropdown, DropdownItem, DropdownMenu, DropdownSeparator } from '@/components/ui';
-import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
+import {
+    Dropdown,
+    DropdownItem,
+    DropdownMenu,
+    DropdownSeparator,
+} from '@ui';
+import { injectListingContext } from '../Listing/Listing.vue';
 import ItemActions from '@/components/actions/ItemActions.vue';
+import { hasSlotContent } from '@/composables/has-slot-content';
 import { computed, ref, watch } from 'vue';
 
 const props = defineProps({
@@ -14,10 +20,12 @@ const props = defineProps({
 const { actionUrl, actionContext, refresh, reorderable, allowActionsWhileReordering } = injectListingContext();
 const busy = ref(false);
 
+const hasPrependedActionsContent = hasSlotContent('prepended-actions', computed(() => ({ row: props.row })));
+
 const shouldShowActions = computed(() => {
     if (reorderable.value && !allowActionsWhileReordering.value) return false;
 
-    return true;
+    return hasPrependedActionsContent.value || props.row.actions?.length > 0;
 });
 
 watch(busy, (busy) => Statamic.$progress.loading('action', busy));
@@ -32,7 +40,9 @@ function actionCompleted(successful = null, response = {}) {
 }
 
 function actionSuccess(response) {
-    Statamic.$toast.success(response.message || __('Action completed'));
+    if (response.message !== false) {
+        Statamic.$toast.success(response.message || __('Action completed'));
+    }
     refresh();
 }
 

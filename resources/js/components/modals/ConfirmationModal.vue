@@ -19,9 +19,13 @@ const props = defineProps({
         type: Boolean,
         default: true,
     },
+    submittable: {
+        type: Boolean,
+        default: true,
+    },
     cancelText: {
         type: String,
-        default: 'Cancel',
+        default: () => __('Cancel'),
     },
     danger: {
         type: Boolean,
@@ -62,7 +66,7 @@ function submit() {
     <Modal ref="modal" :title="__(title)" :open="modalOpen" @update:open="updateModalOpen">
         <div
             v-if="busy"
-            class="pointer-events-none absolute inset-0 flex select-none items-center justify-center bg-white bg-opacity-75 dark:bg-dark-700"
+            class="pointer-events-none absolute inset-0 flex select-none items-center justify-center bg-white bg-opacity-75 dark:bg-gray-850"
         >
             <Icon name="loading" />
         </div>
@@ -72,7 +76,7 @@ function submit() {
             <p>{{ __('Are you sure?') }}</p>
         </slot>
 
-        <template #footer>
+        <template v-if="cancellable || submittable" #footer>
             <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
                 <ModalClose asChild>
                     <Button
@@ -83,6 +87,7 @@ function submit() {
                     />
                 </ModalClose>
                 <Button
+                    v-if="submittable"
                     type="submit"
                     :variant="danger ? 'danger' : 'primary'"
                     :disabled="disabled || busy"

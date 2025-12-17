@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watch } from 'vue';
 import { DropdownItem, Listing } from '@/components/ui';
+import { router } from '@inertiajs/vue3';
 
 defineEmits(['reordered']);
 
@@ -20,14 +21,7 @@ watch(
     { deep: true },
 );
 
-function reloadPage() {
-    window.location.reload();
-}
-
-function removeRow(row) {
-    const i = rows.value.findIndex((r) => r.id === row.id);
-    rows.value.splice(i, 1);
-}
+const reloadPage = () => router.reload();
 </script>
 
 <template>
@@ -44,13 +38,13 @@ function removeRow(row) {
     >
         <template #cell-title="{ row: blueprint }">
             <div class="flex items-center">
-                <div class="little-dot me-2" :class="[blueprint.hidden ? 'hollow' : 'bg-green-600']" />
+                <div class="little-dot me-2" :class="[blueprint.hidden ? 'hollow' : 'bg-green-500']" />
                 <a :href="blueprint.edit_url">{{ __(blueprint.title) }}</a>
 
                 <resource-deleter
                     :ref="`deleter_${blueprint.id}`"
                     :resource="blueprint"
-                    @deleted="removeRow(blueprint)"
+                    reload
                 />
             </div>
         </template>

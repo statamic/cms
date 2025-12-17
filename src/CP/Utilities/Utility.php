@@ -17,6 +17,7 @@ class Utility
     protected $action;
     protected $view;
     protected $viewData;
+    protected $inertia;
     protected $title;
     protected $navTitle;
     protected $description;
@@ -56,6 +57,15 @@ class Utility
             $this->viewData = $data;
 
             return $view;
+        })->args(func_get_args());
+    }
+
+    public function inertia($component = null, $data = null)
+    {
+        return $this->fluentlyGetOrSet('inertia')->setter(function ($component) use ($data) {
+            $this->viewData = $data;
+
+            return $component;
         })->args(func_get_args());
     }
 

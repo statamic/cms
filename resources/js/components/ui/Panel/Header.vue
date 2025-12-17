@@ -1,5 +1,5 @@
 <script setup>
-import { Heading } from '@/components/ui';
+import Heading from '../Heading.vue';
 
 const props = defineProps({
     title: { type: String, default: null },

@@ -8,7 +8,7 @@ const props = defineProps({
     modelValue: { type: String, default: null },
     startWithEditMode: { type: Boolean, default: false },
     submitMode: { type: String, default: 'blur' },
-    placeholder: { type: String, default: 'Enter text...' },
+    placeholder: { type: String, default: () => __('Enter text...') },
 });
 
 const attrs = useAttrs();

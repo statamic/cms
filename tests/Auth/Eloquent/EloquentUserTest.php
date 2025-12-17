@@ -6,11 +6,15 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use ParagonIE\ConstantTime\Base64UrlSafe;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Auth\Eloquent\Passkey;
 use Statamic\Auth\Eloquent\User as EloquentUser;
+use Statamic\Auth\Eloquent\WebAuthnModel;
 use Statamic\Auth\File\Role;
 use Statamic\Auth\File\UserGroup;
+use Statamic\Auth\WebAuthn\Serializer;
 use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
 use Statamic\Facades;
@@ -19,6 +23,7 @@ use Tests\Auth\PermissibleContractTests;
 use Tests\Auth\UserContractTests;
 use Tests\Preferences\HasPreferencesTests;
 use Tests\TestCase;
+use Webauthn\PublicKeyCredentialSource;
 
 #[Group('2fa')]
 class EloquentUserTest extends TestCase
@@ -328,5 +333,68 @@ class EloquentUserTest extends TestCase
 
         $this->assertArrayNotHasKey('null_field', $attributes);
         $this->assertFalse($attributes['not_null_field']);
+    }
+
+    #[Test]
+    #[Group('passkeys')]
+    public function it_gets_passkeys()
+    {
+        $user = $this->user();
+        $this->assertCount(0, $user->passkeys());
+
+        $mockCredentialA = \Mockery::mock(PublicKeyCredentialSource::class);
+        $mockCredentialA->publicKeyCredentialId = 'key-a';
+        $mockCredentialB = \Mockery::mock(PublicKeyCredentialSource::class);
+        $mockCredentialB->publicKeyCredentialId = 'key-b';
+        $mockCredentialC = \Mockery::mock(PublicKeyCredentialSource::class);
+        $mockCredentialC->publicKeyCredentialId = 'key-c';
+
+        app()->instance(Serializer::class, new class($mockCredentialA, $mockCredentialB, $mockCredentialC)
+        {
+            public function __construct(public $mockCredentialA, public $mockCredentialB, public $mockCredentialC)
+            {
+            }
+
+            public function deserialize($data)
+            {
+                return match ($key = json_decode($data, true)['mock']) {
+                    'key-a' => $this->mockCredentialA,
+                    'key-b' => $this->mockCredentialB,
+                    'key-c' => $this->mockCredentialC,
+                    default => throw new \Exception("Unknown key: {$key}"),
+                };
+            }
+        });
+
+        $modelA = WebAuthnModel::create([
+            'id' => Base64UrlSafe::encodeUnpadded('key-a'),
+            'user_id' => $user->id(),
+            'name' => 'Passkey A',
+            'credential' => ['mock' => 'key-a'],
+        ]);
+
+        $modelB = WebAuthnModel::create([
+            'id' => Base64UrlSafe::encodeUnpadded('key-b'),
+            'user_id' => $user->id(),
+            'name' => 'Passkey B',
+            'credential' => ['mock' => 'key-b'],
+        ]);
+
+        $modelC = WebAuthnModel::create([
+            'id' => Base64UrlSafe::encodeUnpadded('key-c'),
+            'user_id' => 2, // Different user
+            'name' => 'Another users passkey',
+            'credential' => ['mock' => 'key-c'],
+        ]);
+
+        $this->assertCount(2, $passkeys = $user->passkeys());
+        $this->assertEveryItemIsInstanceOf(Passkey::class, $passkeys);
+        $this->assertEquals([
+            Base64UrlSafe::encodeUnpadded('key-a') => ['Passkey A', $modelA->getKey()],
+            Base64UrlSafe::encodeUnpadded('key-b') => ['Passkey B', $modelB->getKey()],
+        ], $passkeys
+            ->map(fn (Passkey $passkey) => [$passkey->name(), $passkey->model()->getKey()])
+            ->all()
+        );
     }
 }

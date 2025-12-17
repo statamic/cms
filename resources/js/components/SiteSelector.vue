@@ -1,22 +1,21 @@
+<script setup>
+import { Select } from '@/components/ui';
+
+defineProps({
+    sites: { type: Array, required: true },
+    modelValue: { type: String, required: true },
+});
+
+defineEmits(['update:modelValue']);
+</script>
+
 <template>
     <Select
+        class="w-36"
         :options="sites"
         option-label="name"
         option-value="handle"
-        :model-value="value"
-        @update:model-value="$emit('input', $event)"
+        :model-value="modelValue"
+        @update:model-value="$emit('update:modelValue', $event)"
     />
 </template>
-
-<script>
-import { Select } from '@/components/ui';
-
-export default {
-    components: { Select },
-
-    props: {
-        sites: { type: Array, required: true },
-        value: { type: String, required: true },
-    },
-};
-</script>

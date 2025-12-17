@@ -1,8 +1,8 @@
 <script setup>
 import CodeMirror from 'codemirror';
 import { computed, markRaw, nextTick, onMounted, ref, useAttrs, useTemplateRef, watch } from 'vue';
-import ElementContainer from '@/components/ElementContainer.vue';
-import { Select } from '@/components/ui';
+import Select from './Select/Select.vue';
+import { colorMode as colorModeApi } from '@api';
 
 // Addons
 import 'codemirror/addon/edit/matchbrackets';
@@ -52,7 +52,7 @@ const props = defineProps({
     rulers: { type: Object, default: () => {} },
     showModeLabel: { type: Boolean, default: true },
     tabSize: { type: Number, required: false },
-    theme: { type: String, default: 'material' },
+    colorMode: { type: String, default: 'system' },
     title: { type: String, default: () => __('Code Editor') },
 });
 
@@ -93,7 +93,6 @@ defineOptions({
 });
 
 defineExpose({
-    refresh,
     toggleFullscreen,
     fullScreenMode,
 });
@@ -116,9 +115,9 @@ function initCodeMirror() {
             lineWrapping: props.lineWrapping,
             matchBrackets: true,
             readOnly: props.readOnly || props.disabled ? 'nocursor' : false,
-            theme: exactTheme.value,
+            theme: theme.value,
             inputStyle: 'contenteditable',
-            rulers: rulers,
+            rulers: rulers.value,
         }),
     );
 
@@ -128,14 +127,6 @@ function initCodeMirror() {
 
     codemirror.value.on('focus', () => emit('focus'));
     codemirror.value.on('blur', () => emit('blur'));
-
-    // Refresh to ensure CodeMirror visible and the proper size
-    // Most applicable when loaded by another field like Bard
-    refresh();
-}
-
-function refresh() {
-    nextTick(() => codemirror.value?.refresh());
 }
 
 watch(
@@ -169,12 +160,20 @@ const modeLabel = computed(() => {
     return modes.value.find((m) => m.value === props.mode)?.label || props.mode;
 });
 
-const exactTheme = computed(() => {
-    return props.theme === 'light' ? 'default' : 'material';
+const colorMode = computed(() => {
+    if (props.colorMode === 'system') {
+        return colorModeApi.mode.value === 'dark' ? 'dark' : 'light';
+    }
+
+    return props.colorMode;
+});
+
+const theme = computed(() => {
+    return colorMode.value === 'light' ? 'default' : 'material';
 });
 
 const themeClass = computed(() => {
-    return `theme-${props.theme}`;
+    return `theme-${colorMode.value}`;
 });
 
 const rulers = computed(() => {
@@ -182,7 +181,7 @@ const rulers = computed(() => {
         return [];
     }
 
-    let rulerColor = props.theme === 'light' ? '#d1d5db' : '#546e7a';
+    let rulerColor = colorMode.value === 'light' ? 'var(--theme-color-gray-300)' : 'var(--theme-color-gray-700)';
 
     return Object.entries(props.rulers).map(([column, style]) => {
         let lineStyle = style === 'dashed' ? 'dashed' : 'solid';
@@ -194,6 +193,9 @@ const rulers = computed(() => {
         };
     });
 });
+
+watch(theme, (newTheme) => codemirror.value.setOption('theme', newTheme));
+watch(rulers, (newRulers) => codemirror.value.setOption('rulers', newRulers));
 
 const showToolbar = computed(() => {
     return props.allowModeSelection || props.showModeLabel;
@@ -219,7 +221,7 @@ watch(
     <portal name="code-fullscreen" :disabled="!fullScreenMode" target-class="code-fieldtype">
         <div
             :class="[
-                '@container/markdown border border-transparent with-contrast:border-gray-500 block w-full overflow-hidden rounded-lg bg-white dark:bg-gray-900',
+                '@container/markdown with-contrast:border with-contrast:border-gray-500 block w-full overflow-hidden rounded-lg bg-white dark:bg-gray-900',
                 'text-gray-900 dark:text-gray-300',
                 'shadow-ui-sm appearance-none antialiased disabled:shadow-none',
                 themeClass,
@@ -241,10 +243,10 @@ watch(
                     :model-value="mode"
                     @update:modelValue="$emit('update:mode', $event)"
                 />
-                <div v-else-if="showModeLabel" v-text="modeLabel" class="font-mono text-xs text-gray-700"></div>
+                <div v-else-if="showModeLabel" v-text="modeLabel" class="font-mono text-xs text-gray-700 dark:text-gray-300"></div>
             </publish-field-fullscreen-header>
             <div
-                class="flex items-center justify-between rounded-t-lg bg-gray-50 px-2 py-1 dark:bg-gray-950 border border-b-0 border-gray-300 dark:border-none"
+                class="flex items-center justify-between rounded-t-[calc(var(--radius-lg)-1px)] bg-gray-50 px-2 py-1 dark:bg-gray-925 border border-b-0 border-gray-300 dark:border-gray-700 dark:border-b-1 dark:border-b-white/10"
                 :class="{ 'border-dashed': readOnly }"
                 v-if="showToolbar"
             >
@@ -260,12 +262,10 @@ watch(
                         @update:modelValue="$emit('update:mode', $event)"
                     />
 
-                    <span v-else v-text="modeLabel" class="font-mono text-xs text-gray-700" />
+                    <span v-else v-text="modeLabel" class="font-mono text-xs text-gray-700 dark:text-gray-300" />
                 </div>
             </div>
-            <ElementContainer @resized="refresh">
-                <div ref="codemirrorElement" class="font-mono text-sm"></div>
-            </ElementContainer>
+            <div ref="codemirrorElement" class="font-mono text-sm border border-gray-300 dark:border dark:border-white/10 dark:bg-gray-900 rounded-lg [&_.CodeMirror]:rounded-lg" :class="{ 'dark:border-t-0 rounded-t-none [&_.CodeMirror]:rounded-t-none': showToolbar }"></div>
         </div>
     </portal>
 </template>

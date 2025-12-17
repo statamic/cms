@@ -264,7 +264,7 @@ class BrowserTest extends TestCase
             ->actingAs($user)
             ->getJson('/cp/assets/browse/test/one.txt/edit')
             ->assertSuccessful()
-            ->assertViewIs('statamic::assets.browse');
+            ->assertInertia(fn ($page) => $page->component('assets/Browse'));
     }
 
     #[Test]

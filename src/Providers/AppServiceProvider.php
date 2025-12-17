@@ -18,8 +18,10 @@ use Statamic\Facades\Token;
 use Statamic\Fields\FieldsetRecursionStack;
 use Statamic\Jobs\HandleEntrySchedule;
 use Statamic\Sites\Sites;
+use Statamic\Stache\Query\RevisionQueryBuilder;
 use Statamic\Statamic;
 use Statamic\Tokens\Handlers\LivePreview;
+use Statamic\View\Scaffolding\TemplateGenerator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,15 +29,15 @@ class AppServiceProvider extends ServiceProvider
 
     protected $configFiles = [
         'antlers', 'api', 'assets', 'autosave', 'cp', 'editions', 'forms', 'git', 'graphql', 'live_preview', 'markdown', 'oauth', 'protect', 'revisions',
-        'routes', 'search', 'static_caching', 'stache', 'system', 'users',
+        'routes', 'search', 'static_caching', 'stache', 'system', 'templates', 'users', 'webauthn',
     ];
 
     public function boot()
     {
         $this->app->booted(function () {
+            $this->registerMiddlewareGroup();
             Statamic::runBootedCallbacks();
             $this->loadRoutesFrom("{$this->root}/routes/routes.php");
-            $this->registerMiddlewareGroup();
         });
 
         $this->app[\Illuminate\Contracts\Http\Kernel::class]
@@ -78,6 +80,10 @@ class AppServiceProvider extends ServiceProvider
         $this->publishes([
             "{$this->root}/resources/views/extend/forms" => resource_path('views/vendor/statamic/forms'),
         ], 'statamic-forms');
+
+        $this->publishes([
+            "{$this->root}/resources/views/extend/scaffolding" => resource_path('views/vendor/statamic/scaffolding'),
+        ], 'statamic-scaffolding');
 
         $this->app['redirect']->macro('cpRoute', function ($route, $parameters = []) {
             return $this->to(cp_route($route, $parameters));
@@ -133,6 +139,7 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Contracts\Forms\SubmissionRepository::class => \Statamic\Stache\Repositories\SubmissionRepository::class,
             \Statamic\Contracts\Tokens\TokenRepository::class => \Statamic\Tokens\FileTokenRepository::class,
             \Statamic\Contracts\Addons\SettingsRepository::class => \Statamic\Addons\FileSettingsRepository::class,
+            \Statamic\Contracts\Revisions\RevisionRepository::class => \Statamic\Revisions\RevisionRepository::class,
         ])->each(function ($concrete, $abstract) {
             if (! $this->app->bound($abstract)) {
                 Statamic::repository($abstract, $concrete);
@@ -152,7 +159,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(\Statamic\Fields\BlueprintRepository::class, function () {
             return (new \Statamic\Fields\BlueprintRepository)
-                ->setDirectory(resource_path('blueprints'))
+                ->setDirectories(config('statamic.system.blueprints_path'))
                 ->setFallback('default', function () {
                     return \Statamic\Facades\Blueprint::make()->setContents([
                         'tabs' => [
@@ -176,10 +183,14 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(\Statamic\Fields\FieldsetRepository::class, function () {
             return (new \Statamic\Fields\FieldsetRepository)
-                ->setDirectory(resource_path('fieldsets'));
+                ->setDirectory(config('statamic.system.fieldsets_path'));
         });
 
         $this->app->singleton(FieldsetRecursionStack::class);
+
+        $this->app->bind(RevisionQueryBuilder::class, function ($app) {
+            return new RevisionQueryBuilder($app['stache']->store('revisions'));
+        });
 
         collect([
             'entries' => fn () => Facades\Entry::query(),
@@ -195,6 +206,16 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind('statamic.imaging.guzzle', function () {
             return new \GuzzleHttp\Client;
+        });
+
+        $this->app->bind(TemplateGenerator::class, function () {
+            return (new TemplateGenerator)
+                ->withCoreGenerators()
+                ->templateLanguage(config('statamic.templates.language', 'antlers'))
+                ->indentType(config('statamic.templates.style.indent_type', 'space'))
+                ->indentSize(config('statamic.templates.style.indent_size', 4))
+                ->finalNewline(config('statamic.templates.style.final_newline', false))
+                ->preferComponentSyntax(config('statamic.templates.antlers.use_components', false));
         });
     }
 

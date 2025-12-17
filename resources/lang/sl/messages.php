@@ -249,5 +249,5 @@ return [
     'user_wizard_roles_groups_intro' => 'Uporabnikom je na nadzorni plošči mogoče dodeliti vloge, ki prilagajajo njihova dovoljenja, dostop in sposobnosti.',
     'user_wizard_super_admin_instructions' => 'Super skrbniki imajo popoln nadzor in dostop do vsega na nadzorni plošči. Pametno dodelite to vlogo.',
     'view_more_count' => 'Ogled :count več',
-    'width_x_height' => ':width x :height',
+    'width_x_height' => ':width × :height',
 ];

@@ -2,7 +2,7 @@
     <div>
         <ui-button icon="link" @click="open = true" :text="__('Link Existing')" />
 
-        <stack narrow v-if="open" @closed="open = false" name="field-linker" v-slot="{ close }">
+        <ui-stack narrow v-if="open" @closed="open = false" name="field-linker" v-slot="{ close }">
             <div class="h-full overflow-auto bg-white dark:bg-gray-800 p-3 rounded-l-xl">
                 <header class="flex items-center justify-between pl-3">
                     <Heading :text="__('Link Fields')" size="lg" icon="fieldsets" />
@@ -15,7 +15,6 @@
                         :instructions="__('Changes to this field in the fieldset will stay in sync.')"
                     >
                         <Combobox
-                            class="w-full"
                             :placeholder="__('Fields')"
                             :options="fieldSuggestions"
                             searchable
@@ -44,7 +43,7 @@
                         class="w-full mt-6"
                         variant="primary"
                         :disabled="!reference"
-                        :text="__('Link')"
+                        :text="__('Link Field')"
                         @click="linkField"
                     />
 
@@ -60,7 +59,6 @@
                         :instructions="__('Changes to this fieldset will stay in sync.')"
                     >
                         <Combobox
-                            class="w-full"
                             :placeholder="__('Fieldsets')"
                             :options="fieldsetSuggestions"
                             searchable
@@ -87,18 +85,19 @@
                         class="w-full mt-6"
                         variant="primary"
                         :disabled="!fieldset"
-                        :text="__('Link')"
+                        :text="__('Link Fieldset')"
                         @click="linkFieldset"
                     />
                 </div>
             </div>
-        </stack>
+        </ui-stack>
     </div>
 </template>
 
 <script>
 import uniqid from 'uniqid';
 import { Combobox, Button, Input, Heading, Field } from '@/components/ui';
+import { usePage } from '@inertiajs/vue3';
 
 export default {
     components: { Heading, Combobox, Button, Input, Field },
@@ -109,9 +108,10 @@ export default {
     },
 
     data() {
+        const fieldsetsData = usePage().props.fieldsets;
         const fieldsets = JSON.parse(
             JSON.stringify(
-                Object.values(this.$config.get('fieldsets')).filter(
+                Object.values(fieldsetsData).filter(
                     (fieldset) => fieldset.handle != this.excludeFieldset,
                 ),
             ),
@@ -149,7 +149,9 @@ export default {
 
     methods: {
         linkField() {
-            const [fieldsetHandle, fieldHandle] = this.reference.split('.');
+            const lastDot = this.reference.lastIndexOf('.');
+            const fieldsetHandle = this.reference.substring(0, lastDot);
+            const fieldHandle = this.reference.substring(lastDot + 1);
 
             const field = this.fieldsets
                 .find((fieldset) => fieldset.handle === fieldsetHandle)

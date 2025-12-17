@@ -15,12 +15,12 @@
                         <td
                             class="sortable-handle table-drag-handle"
                             v-if="!isReadOnly"
-                            :class="{ 'rounded-tl': index === 0 }"
                         ></td>
                         <td>
                             <ui-input
                                 type="text"
                                 ref="listItem"
+                                class="!inset-shadow-none focus:!inset-shadow-none"
                                 v-model="element.value"
                                 :readonly="isReadOnly"
                                 @blur="focused = false"
@@ -32,12 +32,16 @@
                             />
                         </td>
                         <td class="row-controls" v-if="!isReadOnly">
-                            <button
+                            <ui-button
+                                icon="x"
+                                variant="subtle"
+                                size="xs"
+                                round
+                                delete-action
                                 @click="deleteValue(index)"
-                                class="inline text-lg antialiased opacity-25 hover:opacity-75 cursor-pointer"
-                            >
-                                &times;
-                            </button>
+                                :aria-label="__('Delete Item')"
+                                v-tooltip="__('Delete Item')"
+                            />
                         </td>
                     </tr>
                 </tbody>

@@ -1,8 +1,8 @@
 <template>
     <div class="session-expiry">
         <Modal
-            v-if="isWarning && !isShowingLogin"
-            :open="isWarning && !isShowingLogin"
+            v-if="isWarning && !isShowingLogin && !isShowingTwoFactorChallenge"
+            :open="isWarning && !isShowingLogin && !isShowingTwoFactorChallenge"
             :title="__('Your Session is Expiring')"
             class="max-w-[500px]!"
             :dismissible="false"
@@ -20,7 +20,7 @@
             <div v-if="!isUsingOauth">
                 <ui-field :errors="errors" class="space-y-3">
                     <ui-description v-text="__('messages.session_expiry_enter_password')" />
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 sm:gap-3">
                         <Input
                             type="password"
                             v-model="password"
@@ -106,6 +106,7 @@
 
 <script>
 import { Modal, Input, Button } from '@/components/ui';
+import useStatamicPageProps from '@/composables/page-props.js';
 
 var counter;
 
@@ -116,20 +117,19 @@ export default {
         Button,
     },
 
-    props: {
-        warnAt: Number,
-        lifetime: Number,
-        email: String,
-        oauthProvider: String,
-        auth: Object,
-    },
-
     data() {
+        const { sessionExpiry: { warnAt, email, lifetime, oauthProvider, auth }} = useStatamicPageProps();
+
         return {
+            warnAt,
+            email,
+            lifetime,
+            oauthProvider,
+            auth,
             isShowingLogin: false,
             isShowingTwoFactorChallenge: false,
-            count: this.lifetime, // The timer used in vue
-            remaining: this.lifetime, // The actual time remaining as per server responses
+            count: lifetime, // The timer used in vue
+            remaining: lifetime, // The actual time remaining as per server responses
             errors: {},
             password: null,
             twoFactorCode: null,

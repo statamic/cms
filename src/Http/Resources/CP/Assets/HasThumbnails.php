@@ -17,7 +17,7 @@ trait HasThumbnails
             default => ['thumbnail' => null],
         };
 
-        return array_merge($data, $this->runAssetHook() ?? []);
+        return array_merge($data, $this->runAssetHook($data) ?? []);
     }
 
     private function getImageThumbnail(): array
@@ -46,10 +46,10 @@ trait HasThumbnails
         ];
     }
 
-    private function runAssetHook(): array
+    private function runAssetHook(array $data): array
     {
         $payload = $this->runHooksWith('asset', [
-            'data' => new Fluent,
+            'data' => new Fluent($data),
         ]);
 
         return $payload->data->toArray();

@@ -6,21 +6,21 @@ use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Column;
 use Statamic\Facades\Collection as CollectionAPI;
 use Statamic\Facades\Scope;
+use Statamic\Facades\Site;
 use Statamic\Facades\User;
+
+use function Statamic\trans as __;
 
 class Collection extends Widget
 {
-    /**
-     * The HTML that should be shown in the widget.
-     *
-     * @return \Illuminate\View\View
-     */
-    public function html()
+    public function component()
     {
         $collection = $this->config('collection');
 
         if (! CollectionAPI::handleExists($collection)) {
-            return "Error: Collection [$collection] doesn't exist.";
+            return VueComponent::render('dynamic-html-renderer', [
+                'html' => "Error: Collection [$collection] doesn't exist.",
+            ]);
         }
 
         $collection = CollectionAPI::findByHandle($collection);
@@ -31,7 +31,16 @@ class Collection extends Widget
 
         [$sortColumn, $sortDirection] = $this->parseSort($collection);
 
+        $blueprints = $collection
+            ->entryBlueprints()
+            ->reject->hidden()
+            ->map(fn ($blueprint) => [
+                'handle' => $blueprint->handle(),
+                'title' => __($blueprint->title()),
+            ])->values();
+
         $blueprint = $collection->entryBlueprint();
+
         $columns = $blueprint
             ->columns()
             ->put('status', Column::make('status')
@@ -43,19 +52,23 @@ class Collection extends Widget
             ->map(fn ($column) => $column->sortable(false)->visible(true))
             ->values();
 
-        return view('statamic::widgets.collection', [
-            'collection' => $collection,
+        return VueComponent::render('collection-widget', [
+            'collection' => $collection->handle(),
+            'title' => $this->config('title', $collection->title()),
+            'additionalColumns' => $columns,
             'filters' => Scope::filters('entries', [
                 'collection' => $collection->handle(),
             ]),
-            'title' => $this->config('title', $collection->title()),
-            'button' => $collection->createLabel(),
-            'blueprints' => $collection->entryBlueprints()->reject->hidden()->values(),
-            'limit' => $this->config('limit', 5),
-            'sortColumn' => $sortColumn,
-            'sortDirection' => $sortDirection,
-            'columns' => $columns,
+            'initialSortColumn' => $sortColumn,
+            'initialSortDirection' => $sortDirection,
+            'initialPerPage' => $this->config('limit', 5),
             'canCreate' => User::current()->can('create', [EntryContract::class, $collection]) && $collection->hasVisibleEntryBlueprint(),
+            'createLabel' => $collection->createLabel(),
+            'blueprints' => $blueprints->map(fn ($blueprint) => [
+                ...$blueprint,
+                'createEntryUrl' => cp_route('collections.entries.create', [$collection->handle(), Site::selected(), 'blueprint' => $blueprint['handle']]),
+            ])->all(),
+            'listingUrl' => cp_route('collections.show', $collection),
         ]);
     }
 

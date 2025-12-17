@@ -1,6 +1,6 @@
 <script setup>
 import { useAttrs, useSlots } from 'vue';
-import { Combobox } from '@/components/ui';
+import Combobox from '../Combobox/Combobox.vue';
 
 const emit = defineEmits(['update:modelValue']);
 
@@ -12,7 +12,7 @@ const props = defineProps({
     optionLabel: { type: String, default: 'label' },
     options: { type: Array, default: null },
     optionValue: { type: String, default: 'value' },
-    placeholder: { type: String, default: 'Select...' },
+    placeholder: { type: String, default: () => __('Select...') },
     readOnly: { type: Boolean, default: false },
     size: { type: String, default: 'base' },
     variant: { type: String, default: 'default' },
