@@ -9,6 +9,13 @@ import {translate} from '@/translations/translator';
 import registerUiComponents from '@/bootstrap/ui';
 import DateFormatter from '@/components/DateFormatter';
 import cleanCodeSnippet from './clean-code-snippet';
+import PortalVue from 'portal-vue';
+import FullscreenHeader from '@/components/publish/FullscreenHeader.vue';
+import Portals from '@/components/portals/Portals.js';
+import Portal from '@/components/portals/Portal.vue';
+import PortalTargets from '@/components/portals/PortalTargets.vue';
+import Stacks from '@/components/ui/Stack/Stacks.js';
+import {markRaw} from 'vue';
 
 // Intercept Inertia navigation and log to Actions tab.
 router.on('before', (event) => {
@@ -16,8 +23,12 @@ router.on('before', (event) => {
   return false;
 });
 
+const portals = markRaw(new Portals());
+const stacks = new Stacks(portals);
+
 setup(async (app) => {
   window.__ = translate;
+
   window.Statamic = {
       $config: {
           get(key) {
@@ -32,10 +43,20 @@ setup(async (app) => {
           add(command) {
               //
           }
-      }
+      },
   };
+
   app.config.globalProperties.__ = translate;
   app.config.globalProperties.$date = new DateFormatter;
+  app.config.globalProperties.$portals = portals;
+  app.config.globalProperties.$stacks = stacks;
+
+  app.use(PortalVue, { portalName: 'v-portal' });
+
+  app.component('portal', Portal);
+  app.component('PortalTargets', PortalTargets);
+  app.component('publish-field-fullscreen-header', FullscreenHeader);
+
   await registerUiComponents(app);
 });
 

@@ -1,5 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
-import { Modal, ModalClose, ModalTitle, Button, Field, Input } from '@ui';
+import type {Meta, StoryObj} from '@storybook/vue3';
+import {Button, Field, Input, Modal, ModalClose, ModalTitle} from '@ui';
+import PortalTargets from "@/components/portals/PortalTargets.vue";
 
 const meta = {
     title: 'Components/Modal',
@@ -32,8 +33,8 @@ export const _DocsIntro: Story = {
         }
     },
     render: () => ({
-        components: { Modal, Button },
-        template: defaultCode,
+        components: { Modal, Button, PortalTargets },
+        template: `<div>${defaultCode}</div><PortalTargets />`,
     }),
 };
 

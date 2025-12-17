@@ -1,0 +1,23 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as CodeEditorStories from '../CodeEditor.stories';
+
+<Meta of={CodeEditorStories} />
+
+# CodeEditor
+A powerful code editor component powered by CodeMirror. Supports syntax highlighting for multiple languages, line numbers, line wrapping, and keyboard shortcuts.
+<Canvas of={CodeEditorStories._DocsIntro} sourceState={'shown'} />
+
+## Modes
+The CodeEditor supports many programming languages and markup formats. Set the `mode` prop to enable syntax highlighting for different languages.
+<Canvas of={CodeEditorStories._Modes} sourceState={'shown'} />
+
+## Mode Selection
+Disable the `allow-mode-selection` prop to prevent users from switching between modes.
+<Canvas of={CodeEditorStories._ModeSelection} sourceState={'shown'} />
+
+## Without Line Numbers
+Disable line numbers by setting the `line-numbers` prop to `false`. This can be useful for simpler code snippets or when embedding code in constrained spaces.
+<Canvas of={CodeEditorStories._NoLineNumbers} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={CodeEditorStories} />
