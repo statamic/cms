@@ -596,6 +596,7 @@ provideListingContext({
     isColumnVisible,
     hiddenColumns,
     sortColumn,
+    sortDirection,
     setSortColumn,
     selections,
     maxSelections: toRef(() => props.maxSelections),
@@ -684,7 +685,7 @@ autoApplyState();
     </slot>
     <slot v-if="!initializing" :items="items" :is-column-visible="isColumnVisible" :loading="loading">
         <Presets v-if="showPresets" />
-        <div v-if="allowSearch || hasFilters || allowCustomizingColumns" class="relative flex items-center gap-2 sm:gap-3 min-h-16 starting-style-transition starting-style-transition--siblings">
+        <div v-if="allowSearch || hasFilters || allowCustomizingColumns" class="relative overflow-clip flex items-center gap-2 sm:gap-3 min-h-16 starting-style-transition starting-style-transition--siblings" style="overflow-clip-margin: 1px;">
             <div class="flex flex-1 items-center gap-2 sm:gap-3 w-full">
                 <Search v-if="allowSearch" />
                 <Filters v-if="hasFilters" />

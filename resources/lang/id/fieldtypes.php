@@ -57,7 +57,7 @@ return [
     'code.config.mode' => 'Pilih bahasa untuk penyorotan sintaks.',
     'code.config.mode_selectable' => 'Apakah mode dapat diubah oleh pengguna.',
     'code.config.rulers' => 'Konfigurasikan penggaris vertikal untuk membantu indentasi.',
-    'code.config.theme' => 'Pilih tema yang Anda sukai.',
+    'code.config.color_mode' => 'Pilih tema yang Anda sukai.',
     'code.title' => 'Code',
     'collections.title' => 'Collections',
     'color.config.allow_any' => 'Izinkan memasukkan nilai warna apa pun melalui pemilih atau kode hex.',

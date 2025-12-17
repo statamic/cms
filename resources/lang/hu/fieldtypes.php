@@ -57,7 +57,7 @@ return [
     'code.config.mode' => 'Válasszon nyelvet a szintaxis kiemeléséhez.',
     'code.config.mode_selectable' => 'Az üzemmódot a felhasználó módosíthatja-e.',
     'code.config.rulers' => 'Állítsa be a függőleges vonalzókat a behúzás megkönnyítése érdekében.',
-    'code.config.theme' => 'Válassza ki a kívánt témát.',
+    'code.config.color_mode' => 'Válassza ki a kívánt témát.',
     'code.title' => 'Kód',
     'collections.title' => 'Gyűjtemények',
     'color.config.allow_any' => 'Tetszőleges színérték megadása választóval vagy hexadecimális kóddal.',

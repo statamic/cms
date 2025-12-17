@@ -17,14 +17,15 @@ class Code extends Fieldtype
             [
                 'display' => __('Appearance'),
                 'fields' => [
-                    'theme' => [
-                        'display' => __('Theme'),
-                        'instructions' => __('statamic::fieldtypes.code.config.theme'),
+                    'color_mode' => [
+                        'display' => __('Color Mode'),
+                        'instructions' => __('statamic::fieldtypes.code.config.color_mode'),
                         'type' => 'select',
-                        'default' => 'material',
+                        'default' => 'system',
                         'options' => [
                             'material' => __('Dark'),
                             'light' => __('Light'),
+                            'system' => __('System'),
                         ],
                         'width' => '50',
                     ],

@@ -57,7 +57,7 @@ return [
     'code.config.mode' => 'Velg språk for syntaksutheving.',
     'code.config.mode_selectable' => 'Om modusen kan endres av brukeren.',
     'code.config.rulers' => 'Konfigurer vertikale linjaler for å hjelpe med innrykk.',
-    'code.config.theme' => 'Velg ønsket tema.',
+    'code.config.color_mode' => 'Velg ønsket tema.',
     'code.title' => 'Kode',
     'collections.title' => 'Samlinger',
     'color.config.allow_any' => 'Tillat inntasting av hvilken som helst fargeverdi via fargevelger eller heksadesimalkode.',

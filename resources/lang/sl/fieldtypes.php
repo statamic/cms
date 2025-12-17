@@ -57,7 +57,7 @@ return [
     'code.config.mode' => 'Izberite jezik za poudarjanje skladnje.',
     'code.config.mode_selectable' => 'Ali lahko uporabnik spremeni način.',
     'code.config.rulers' => 'Konfigurirajte navpična ravnila za pomoč pri zamiku.',
-    'code.config.theme' => 'Izberite želeno temo.',
+    'code.config.color_mode' => 'Izberite želeno temo.',
     'code.title' => 'Code',
     'collections.title' => 'Collections',
     'color.config.allow_any' => 'Dovoli vnos katere koli barvne vrednosti prek izbirnika ali šestnajstiške kode.',

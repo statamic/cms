@@ -16,11 +16,10 @@
 
     --z-index-below: -1;
     --z-index-above: 1;
-    --z-index-global-header: 2;
-    --z-index-portal: 3;
-    --z-index-draggable: 4;
-    --z-index-modal: 5;
-    --z-index-max: 6;
+    --z-index-portal: 2;
+    --z-index-draggable: 3;
+    --z-index-modal: 4;
+    --z-index-max: 5;
 
     /* Used for entry animations */
     --starting-style-transition-duration: 0.125s;
@@ -68,6 +67,28 @@
     /* When we have a focus state within a focus state, only the inner-most focused container should _have_ focus. e.g. if we're focusing on a Bard field within a Bard field, only the inner Bard field should receive the focus outline. */
     [class*="focus-within"]:has([class*="focus-within"]:focus-within) {
         outline: none;
+    }
+
+    /* Notes...
+    
+        - Sometimes we want to show a focus outline on a container when it has focus-within, e.g. in Replicator sets where we want to show a focus outline on the set header when it has focus on the button inside the header, whose shape is not as neat.
+
+        - Here we set a specific target for the focus outline
+
+        <div class="show-focus-within"> <-- This shows a focus outline when only the target button inside has focus.
+            <button class="show-focus-within_target">
+                Focus me
+            </button>
+        </div>
+
+    s*/
+    .show-focus-within:has(.show-focus-within_target:focus-visible) {
+        /* Stop the transition ruining the focus outline quickly appearing. */
+        transition: none;
+        outline-width: var(--focus-outline-width);
+        outline-offset: var(--focus-outline-offset);
+        outline-color: var(--focus-outline-color, currentColor);
+        outline-style: var(--focus-outline-style, solid);
     }
 
     [data-ui-dropdown-item] {

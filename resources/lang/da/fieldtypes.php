@@ -57,7 +57,7 @@ return [
     'code.config.mode' => 'Vælg sprog til syntaksfremhævning.',
     'code.config.mode_selectable' => 'Om tilstanden kan ændres af brugeren.',
     'code.config.rulers' => 'Konfigurer lodrette linealer for at hjælpe med indrykning.',
-    'code.config.theme' => 'Vælg dit foretrukne tema.',
+    'code.config.color_mode' => 'Vælg dit foretrukne tema.',
     'code.title' => 'Kilde kode',
     'collections.title' => 'Samlinger',
     'color.config.allow_any' => 'Tillad indtastning af enhver farveværdi via picker eller hex-kode.',
