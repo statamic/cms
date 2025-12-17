@@ -36,7 +36,7 @@ watch(activeTab, (newTab) => {
 function themeSelected(theme: Theme | null) {
     emit('update:modelValue', toSelectionValue(theme));
 
-    if (theme.id === 'custom') {
+    if (theme?.id === 'custom') {
         activeTab.value = 'custom';
     } else {
         origin.value = theme;

@@ -41,7 +41,9 @@ export function valueToTheme(value: ThemeValue | null): Theme | null {
     };
 }
 
-export function toSelectionValue(theme: Theme): Theme | null {
+export function toSelectionValue(theme: Theme | null): Theme | null {
+    if (! theme) return null;
+
     const cleanedTheme = removeDefaults(theme);
 
     if (Object.keys(cleanedTheme.colors).length === 0 && Object.keys(cleanedTheme.darkColors).length === 0) {
