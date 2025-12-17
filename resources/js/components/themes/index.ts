@@ -1,5 +1,6 @@
 import type { CompleteTheme, ThemeValue, ThemeColors, ColorVariableName, ColorDefinition, Theme } from './types';
 import { config } from '@api';
+import { translate as __ } from '@/translations/translator';
 
 export const defaultTheme = {
     id: 'default',
@@ -33,9 +34,12 @@ export function valueToTheme(value: ThemeValue | null): Theme | null {
         }
     });
 
+    const id = value.id ?? 'custom';
+    const name = value.name ?? (id === 'custom' ? __('Custom') : id);
+
     return {
-        id: value.id ?? 'custom',
-        name: value.name,
+        id,
+        name,
         colors,
         darkColors,
     };
