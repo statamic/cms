@@ -78,11 +78,8 @@
                 <PublishComponents />
 
                 <PublishTabs>
-                    <template #actions>
-                        <div
-                            class="space-y-6"
-                            v-if="showLivePreviewButton || showVisitUrlButton || showLocalizationSelector"
-                        >
+                    <template v-if="showLivePreviewButton || showVisitUrlButton || showLocalizationSelector" #actions>
+                        <div class="space-y-6">
                             <div class="flex flex-wrap gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
                                 <Button
                                     :text="__('Live Preview')"
@@ -520,7 +517,7 @@ export default {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
     },
 
-    unmounted() {
+	beforeUnmount() {
         this.saveKeyBinding.destroy();
         this.quickSaveKeyBinding.destroy();
     },

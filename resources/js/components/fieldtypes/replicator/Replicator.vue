@@ -74,6 +74,7 @@
                             :show-connector="value.length > 0"
                             :index="value.length"
                             :label="config.button_label"
+                            :is-first="value.length === 0"
                             @added="addSet"
                         />
                     </section>

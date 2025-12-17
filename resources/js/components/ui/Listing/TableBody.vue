@@ -116,13 +116,6 @@ function handleRowClick(event, index) {
                         />
                     </slot>
                 </td>
-            <!-- <td class="type-column" v-if="type">
-                <Badge
-                    size="sm"
-                    v-if="type === 'entries' || type === 'terms'"
-                    :label="type === 'entries' ? __(row.collection.title) : __(row.taxonomy.title)"
-                />
-            </td> -->
                 <td class="actions-column" v-if="hasActions || $slots['prepended-row-actions']">
                     <RowActions :row="row">
                         <template v-if="$slots['prepended-row-actions']" #prepended-actions="{ row }">

@@ -57,7 +57,7 @@ return [
     'code.config.mode' => 'Sintaks vurğulama üçün dili seçin.',
     'code.config.mode_selectable' => 'Modun istifadəçi tərəfindən dəyişdirilib-dəyişdirilə bilməyəcəyini göstərin.',
     'code.config.rulers' => 'Girinti köməkliyi üçün şaquli cetvelləri tənzimləyin.',
-    'code.config.theme' => 'Tercih etdiyiniz temanı seçin.',
+    'code.config.color_mode' => 'Tercih etdiyiniz temanı seçin.',
     'code.title' => 'Kod',
     'collections.title' => 'Kolleksiyalar',
     'color.config.allow_any' => 'Rəng seçici və ya hex kodu vasitəsilə istənilən rəng dəyərinin daxil edilməsinə icazə ver.',
