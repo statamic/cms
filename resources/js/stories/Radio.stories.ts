@@ -1,15 +1,15 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
-import { Radio, RadioGroup } from '@ui';
+import type {Meta, StoryObj} from '@storybook/vue3';
+import {Radio, RadioGroup} from '@ui';
 
 const meta = {
     title: 'Components/Radio',
     component: Radio,
+    subcomponents: { RadioGroup },
     argTypes: {
-        label: { control: 'text' },
         description: { control: 'text' },
-        value: { control: 'text' },
+        label: { control: 'text' },
         disabled: { control: 'boolean' },
-        checked: { control: 'boolean' },
+        value: { control: 'text' },
     },
 } satisfies Meta<typeof Radio>;
 

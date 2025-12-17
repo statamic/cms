@@ -1,18 +1,34 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
-import { Heading, Subheading } from '@ui';
+import type {Meta, StoryObj} from '@storybook/vue3';
+import {Heading, Subheading} from '@ui';
+import {icons} from "@/stories/icons";
 
 const meta = {
     title: 'Components/Heading',
     component: Heading,
+    subcomponents: {
+        Subheading,
+    },
     argTypes: {
-        text: { control: 'text' },
+        href: { control: 'text' },
+        target: {
+            control: 'text',
+            description: "When `href` is provided, this prop controls the link's `target` attribute.",
+        },
+        icon: {
+            control: 'select',
+            options: icons,
+            description: 'Icon name. [Browse available icons](/?path=/story/components-icon--all-icons)',
+        },
+        level: {
+            control: 'number',
+            description: 'Controls the heading level, `h1`, `h2`, etc'
+        },
         size: {
             control: 'select',
-            options: ['default', 'lg', 'xl'],
+            description: 'Controls the size of the heading. <br><br> Options: `base`, `lg`, `xl`, `2xl`',
+            options: ['base', 'lg', 'xl', '2xl'],
         },
-        level: { control: 'text' },
-        icon: { control: 'text' },
-        href: { control: 'text' },
+        text: { control: 'text' },
     },
 } satisfies Meta<typeof Heading>;
 

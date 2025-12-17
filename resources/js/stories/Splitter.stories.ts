@@ -1,9 +1,10 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
-import { SplitterGroup, SplitterPanel, SplitterResizeHandle } from '@ui';
+import type {Meta, StoryObj} from '@storybook/vue3';
+import {SplitterGroup, SplitterPanel, SplitterResizeHandle} from '@ui';
 
 const meta = {
     title: 'Components/Splitter',
     component: SplitterGroup,
+    subcomponents: { SplitterPanel },
     argTypes: {
         direction: {
             control: 'select',

@@ -7,7 +7,7 @@ const meta = {
     argTypes: {
         modelValue: {
             control: 'text',
-            description: 'The controlled value of the Calendar. <br><br> Should be an ISO 8601 date and time string with a UTC offset (eg. `2021-11-07T07:45:00Z` or `2021-11-07T07:45:00-07:00`)',
+            description: 'The controlled value of the calendar. <br><br> Should be an ISO 8601 date and time string with a UTC offset (eg. `2021-11-07T07:45:00Z` or `2021-11-07T07:45:00-07:00`)',
         },
         min: {
             control: 'text',

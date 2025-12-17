@@ -1,18 +1,35 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
-import { Textarea } from '@ui';
+import type {Meta, StoryObj} from '@storybook/vue3';
+import {Textarea} from '@ui';
 
 const meta = {
     title: 'Components/Textarea',
     component: Textarea,
     argTypes: {
-        label: { control: 'text' },
-        placeholder: { control: 'text' },
-        disabled: { control: 'boolean' },
         elastic: { control: 'boolean' },
-        rows: { control: 'number' },
+        disabled: { control: 'boolean' },
+        id: { control: 'text' },
+        readOnly: { control: 'boolean' },
+        required: { control: 'boolean' },
         resize: {
             control: 'select',
-            options: ['none', 'vertical', 'horizontal', 'both'],
+            description: 'Determines how (and if) the textarea should be resized. <br><br> Options: `both`, `horizontal`, `vertical`, `none`',
+            options: ['both', 'horizontal', 'vertical', 'none'],
+        },
+        rows: { control: 'number' },
+        modelValue: {
+            control: 'text',
+            description: 'The controlled value of the textarea.',
+        },
+        limit: {
+            control: 'number',
+            description: 'Specify a character limit',
+        },
+        'update:modelValue': {
+            description: 'Event handler called when the textarea is updated.',
+            table: {
+                category: 'events',
+                type: { summary: '(value: string) => void' }
+            }
         },
     },
 } satisfies Meta<typeof Textarea>;

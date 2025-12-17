@@ -1,11 +1,30 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
-import { Tabs, TabList, TabTrigger, TabContent } from '@ui';
+import type {Meta, StoryObj} from '@storybook/vue3';
+import {TabContent, TabList, Tabs, TabTrigger} from '@ui';
 
 const meta = {
     title: 'Components/Tabs',
     component: Tabs,
+    subcomponents: {
+        TabList,
+        TabTrigger,
+        TabContent,
+    },
     argTypes: {
-        defaultTab: { control: 'text' },
+        modelValue: {
+            control: 'text',
+            description: 'The controlled value of the tabs.',
+        },
+        unmountOnHide: {
+            control: 'boolean',
+            description: 'When `true`, the element will be unmounted on closed state.',
+        },
+        'update:modelValue': {
+            description: 'Event handler called when the tab changes.',
+            table: {
+                category: 'events',
+                type: { summary: '(value: string) => void' }
+            }
+        }
     },
 } satisfies Meta<typeof Tabs>;
 

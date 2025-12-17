@@ -6,11 +6,15 @@ import { cva } from 'cva';
 import { Link } from '@inertiajs/vue3';
 
 const props = defineProps({
+    /** The element or component this component should render as. */
     as: { type: String, default: null },
     href: { type: String, default: null },
+    /** When `href` is provided, this prop controls the link's `target` attribute. */
     target: { type: String, default: '_self' },
+    /** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
     icon: { type: String, default: null },
     text: { type: String, default: null },
+    /** Controls the appearance of the dropdown item. Options: `default`, `destructive` */
     variant: { type: String, default: 'default' },
 });
 

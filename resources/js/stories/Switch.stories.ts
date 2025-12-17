@@ -1,16 +1,28 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
-import { Switch } from '@ui';
+import type {Meta, StoryObj} from '@storybook/vue3';
+import {Switch} from '@ui';
 
 const meta = {
     title: 'Components/Switch',
     component: Switch,
     argTypes: {
+        required: { control: 'boolean' },
+        id: { control: 'text' },
+        modelValue: {
+            control: 'text',
+            description: 'The controlled value of the switch.',
+        },
         size: {
             control: 'select',
-            options: ['lg', 'default', 'sm', 'xs'],
+            description: 'Controls the size of the switch. <br><br> Options: `xs`, `sm`, `base`, `lg`',
+            options: ['xs', 'sm', 'base', 'lg'],
         },
-        disabled: { control: 'boolean' },
-        checked: { control: 'boolean' },
+        'update:modelValue': {
+            description: 'Event handler called when the value changes.',
+            table: {
+                category: 'events',
+                type: { summary: '(value: string) => void' }
+            }
+        }
     },
 } satisfies Meta<typeof Switch>;
 

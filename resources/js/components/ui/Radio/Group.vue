@@ -4,6 +4,7 @@ import { RadioGroupRoot } from 'reka-ui';
 
 defineProps({
     inline: { type: Boolean, default: false },
+	/** The controlled value of the radio group. */
     modelValue: { type: [String, Number, Boolean], default: null },
     name: { type: String, default: () => useId() },
     required: { type: Boolean, default: false },

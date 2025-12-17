@@ -24,7 +24,7 @@ const meta = {
         iconAppend: {
             control: 'select',
             options: icons,
-            description: 'Icon name. Will display after the label. [Browse available icons](/?path=/story/components-icon--all-icons)',
+            description: 'Icon name. Will display after the text. [Browse available icons](/?path=/story/components-icon--all-icons)',
         },
         iconOnly: {
             control: 'boolean',

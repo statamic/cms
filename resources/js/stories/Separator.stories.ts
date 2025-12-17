@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
-import { Separator } from '@ui';
+import type {Meta, StoryObj} from '@storybook/vue3';
+import {Separator} from '@ui';
 
 const meta = {
     title: 'Components/Separator',
@@ -8,7 +8,8 @@ const meta = {
         text: { control: 'text' },
         variant: {
             control: 'select',
-            options: ['default', 'dots'],
+            description: 'Controls the appearance of the separator. <br><br> Options: `line`, `dots`',
+            options: ['line', 'dots'],
         },
         vertical: { control: 'boolean' },
     },

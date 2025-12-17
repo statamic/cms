@@ -1,19 +1,31 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
-import { Dropdown, DropdownMenu, DropdownItem, DropdownHeader, DropdownFooter, DropdownSeparator, Button } from '@ui';
+import type {Meta, StoryObj} from '@storybook/vue3';
+import {Button, Dropdown, DropdownFooter, DropdownHeader, DropdownItem, DropdownMenu, DropdownSeparator} from '@ui';
 
 const meta = {
     title: 'Components/Dropdown',
     component: Dropdown,
+    subcomponents: {
+        DropdownMenu,
+        DropdownItem,
+        DropdownHeader,
+        DropdownFooter,
+        DropdownSeparator,
+    },
     argTypes: {
         align: {
             control: 'select',
             options: ['start', 'center', 'end'],
+            description: 'The preferred alignment against the trigger. May change when collisions occur. Options: `start`, `center`, `end`',
+        },
+        offset: {
+            control: 'number',
+            description: 'The distance in pixels from the trigger',
         },
         side: {
             control: 'select',
             options: ['top', 'bottom', 'left', 'right'],
+            description: 'The preferred side of the trigger to render against when open. Options: `top`, `bottom`, `left`, `right`',
         },
-        offset: { control: 'number' },
     },
 } satisfies Meta<typeof Dropdown>;
 
