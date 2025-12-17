@@ -12,7 +12,7 @@
         >
             <div>
                 <div class="drag-notification" v-show="dragging">
-                    <Icon name="upload" class="m-4 size-12" />
+                    <Icon name="upload-cloud" class="m-4 size-13" />
                     <span>{{ __('Drop File to Upload') }}</span>
                 </div>
 
