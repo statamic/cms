@@ -133,10 +133,8 @@ class Preferences
         $preserve = [];
 
         foreach ($this->preventMergingChildren as $dottedKey) {
-            $childData = Arr::pull($array, $dottedKey);
-
-            if (! is_null($childData)) {
-                $preserve[$dottedKey] = $childData;
+            if (Arr::has($array, $dottedKey)) {
+                $preserve[$dottedKey] = Arr::pull($array, $dottedKey);
             }
         }
 
