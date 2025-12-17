@@ -6,6 +6,7 @@ import type { Theme } from './types';
 import { applyTheme, defaultTheme } from '.';
 import { Button, Description, Input } from '@ui';
 import { cp_url } from '@/bootstrap/globals';
+import { translate as __ } from '@/translations/translator';
 import fuzzysort from 'fuzzysort';
 
 const emit = defineEmits<{
@@ -30,7 +31,7 @@ const localThemes = computed<Theme[]>(() => {
         themes.push({
             ...(props.modelValue ?? defaultTheme),
             id: 'custom',
-            name: 'Custom',
+            name: __('Custom'),
             author: null,
         });
     }
