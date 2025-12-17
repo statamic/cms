@@ -43,6 +43,9 @@
                             <template #cell-status="{ row: entry }">
                                 <StatusIndicator :status="entry.status" show-label :show-dot="false" />
                             </template>
+                            <template #cell-type="{ value }">
+                                <Badge :text="value" />
+                            </template>
                         </Table>
                         <PanelFooter>
                             <Pagination />
@@ -136,6 +139,7 @@ import {
     Checkbox,
     Icon,
     StatusIndicator,
+    Badge,
 } from '@/components/ui';
 
 export default {
@@ -154,6 +158,7 @@ export default {
         Checkbox,
         Icon,
         StatusIndicator,
+        Badge,
     },
 
     // todo, when opening and closing the stack, you cant save?

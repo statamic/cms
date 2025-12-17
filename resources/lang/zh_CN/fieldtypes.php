@@ -57,7 +57,7 @@ return [
     'code.config.mode' => '选择语法高亮显示的语言。',
     'code.config.mode_selectable' => '用户是否可以更改模式。',
     'code.config.rulers' => '配置垂直标尺以帮助缩进。',
-    'code.config.theme' => '选择首选的主题。',
+    'code.config.color_mode' => '选择首选的主题。',
     'code.title' => '代码',
     'collections.title' => '集合',
     'color.config.allow_any' => '允许通过选择器或十六进制代码输入任何颜色值。',

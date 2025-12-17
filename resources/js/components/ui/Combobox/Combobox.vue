@@ -526,8 +526,15 @@ defineExpose({
 </template>
 
 <style scoped>
-    /* Override the hardcoded z-index of Reka's popper content wrapper. We can't use a direct descendant selector because the stack is inside a portal, so instead we'll check to see if there is a stack present. */
-    body:has(.stack, .live-preview) [data-reka-popper-content-wrapper] {
+    /* Override the hardcoded z-index of Reka's popper content wrapper under certain conditions. We can't use a direct descendant selector because the combobox is inside a portal, so instead we'll check to see if certain conditions are present. */
+    body:has(
+        /* A modal is present */
+        [data-ui-modal-content],
+        /* Fullscreen Code Editor fieldtype */
+        .code-fullscreen,
+        .stack,
+        .live-preview
+    ) [data-reka-popper-content-wrapper] {
         z-index: var(--z-index-portal)!important;
     }
 
@@ -535,10 +542,5 @@ defineExpose({
         [data-ui-badge] {
             padding-block: 0.65rem;
         }
-    }
-
-    /* Override the hardcoded z-index of Reka's popper content wrapper. When there's a modal present, we need to ensure the popper content is above it. We can't use a direct descendant selector because the modal is inside a portal, so instead we'll check to see if there is modal content present. */
-    body:has([data-ui-modal-content]) [data-reka-popper-content-wrapper] {
-        z-index: var(--z-index-modal)!important;
     }
 </style>
