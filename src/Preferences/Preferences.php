@@ -43,14 +43,15 @@ class Preferences
      */
     public function all()
     {
-        if (auth()->guest()) {
-            return [];
+        $this->resetState();
+
+        if (auth()->check()) {
+            $this
+                ->mergeDottedUserPreferences()
+                ->mergeDottedRolePreferences();
         }
 
         return $this
-            ->resetState()
-            ->mergeDottedUserPreferences()
-            ->mergeDottedRolePreferences()
             ->mergeDottedDefaultPreferences()
             ->getMultiDimensionalPreferences();
     }
