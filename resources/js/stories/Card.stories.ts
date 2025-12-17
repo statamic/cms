@@ -1,13 +1,17 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
-import { Card, CardPanel, Panel, PanelHeader, Heading, Subheading, Input, Button } from '@ui';
+import type {Meta, StoryObj} from '@storybook/vue3';
+import {Button, Card, CardPanel, Heading, Input, Panel, PanelHeader, Subheading} from '@ui';
 
 const meta = {
     title: 'Components/Card',
     component: Card,
     argTypes: {
-        inset: { control: 'boolean' },
+        inset: {
+            control: 'boolean',
+            description: 'When `true`, the internal padding of the card is removed.',
+        },
         variant: {
             control: 'select',
+            description: 'Controls the appearance of the card. <br><br> Options: `default`, `flat`',
             options: ['default', 'flat'],
         },
     },
