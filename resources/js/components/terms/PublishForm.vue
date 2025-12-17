@@ -342,7 +342,7 @@ export default {
                     saving: this.savingRef,
                 })
                 .through([
-                    new BeforeSaveHooks('entry', {
+                    new BeforeSaveHooks('term', {
                         taxonomy: this.taxonomyHandle,
                         values: this.values,
                     }),
@@ -351,7 +351,7 @@ export default {
                         published: this.published,
                         _localized: this.localizedFields,
                     }),
-                    new AfterSaveHooks('entry', {
+                    new AfterSaveHooks('term', {
                         taxonomy: this.taxonomyHandle,
                         reference: this.initialReference,
                     }),
