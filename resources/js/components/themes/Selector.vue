@@ -55,7 +55,7 @@ watch(
 )
 
 const originalTheme = props.modelValue;
-onUnmounted(() => applyTheme(originalTheme));
+onUnmounted(() => originalTheme ? applyTheme(originalTheme) : applyDefaultTheme());
 
 function selectNewlyPublishedTheme() {
     if (!props.modelValue || props.modelValue.id !== 'custom') return;
