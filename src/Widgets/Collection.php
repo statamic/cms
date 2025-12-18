@@ -54,6 +54,7 @@ class Collection extends Widget
 
         return VueComponent::render('collection-widget', [
             'collection' => $collection->handle(),
+            'icon' => $collection->icon(),
             'title' => $this->config('title', $collection->title()),
             'additionalColumns' => $columns,
             'filters' => Scope::filters('entries', [
