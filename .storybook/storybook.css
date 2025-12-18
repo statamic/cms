@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 @import '../resources/css/ui.css';
+@import '../resources/css/core/utilities.css';
+@import '../resources/css/elements/tables.css';
 @custom-variant dark (&:where(.dark, .dark *));
 
 .sbdocs h1:not(.sbdocs-preview *, .sbdocs-preview h1),

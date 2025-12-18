@@ -43,6 +43,11 @@ setup(async (app) => {
               //
           }
       },
+      $progress: {
+          loading(name, loading) {
+              //
+          }
+      }
   };
 
   app.config.globalProperties.__ = translate;

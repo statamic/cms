@@ -1,13 +1,56 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
-import { PublishContainer } from '@ui';
+import type {Meta, StoryObj} from '@storybook/vue3';
+import {
+    PublishComponents,
+    PublishContainer,
+    PublishField,
+    PublishFields,
+    PublishFieldsProvider,
+    PublishLocalizations,
+    PublishSections,
+    PublishTabs,
+    TabProvider,
+} from '@ui';
 
 const meta = {
     title: 'Components/PublishContainer',
     component: PublishContainer,
+    subcomponents: {
+        PublishComponents,
+        PublishFields,
+        PublishField,
+        PublishFieldsProvider,
+        PublishLocalizations,
+        PublishSections,
+        TabProvider,
+        PublishTabs,
+    },
     parameters: {
         docs: {
             description: {
                 component: 'The PublishContainer component is used to create publish forms in the Control Panel. For full documentation including backend setup, visit the [Publish Forms documentation](https://v6.statamic.dev/control-panel/publish-forms).',
+            },
+        },
+    },
+    argTypes: {
+        'update:modelValue': {
+            description: 'Event handler called when publish form values change.',
+            table: {
+                category: 'events',
+                type: { summary: '(value: string) => void' },
+            },
+        },
+        'update:modifiedFields': {
+            description: "Event handler called when the form's `modifiedFields` state changes (eg. a field's value is updated for the first time).",
+            table: {
+                category: 'events',
+                type: { summary: '(value: string) => void' },
+            },
+        },
+        'update:visibleFields': {
+            description: `Event handler called when the form's "visible values" state changes (eg. values from fields _not_ hidden by conditions).`,
+            table: {
+                category: 'events',
+                type: { summary: '(value: string) => void' },
             },
         },
     },
