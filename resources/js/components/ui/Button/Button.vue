@@ -8,7 +8,7 @@ import { Link } from '@inertiajs/vue3';
 const props = defineProps({
     /** The element or component this component should render as */
     as: { type: String, default: null },
-    /** URL to link to */
+    /** The URL to link to */
     href: { type: String, default: null },
     /** When `href` is provided, this prop controls the link's `target` attribute */
     target: { type: String, default: null },

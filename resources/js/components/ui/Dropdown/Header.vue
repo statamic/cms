@@ -9,7 +9,9 @@ defineProps({
     icon: { type: String, default: null },
     /** Icon name. Will display after the text. [Browse available icons](/?path=/story/components-icon--all-icons) */
     appendIcon: { type: String, default: null },
+    /** URL for the append icon button to link to */
     appendHref: { type: String, default: null },
+    /** Text to display in the header */
     text: { type: String, default: null },
 });
 

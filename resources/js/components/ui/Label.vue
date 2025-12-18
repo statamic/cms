@@ -10,7 +10,6 @@ const props = defineProps({
     for: { type: String, default: null },
     /** Optional badge text to display on the right side of the label */
     badge: { type: String, default: '' },
-    /** When `true`, displays a red asterisk indicating the field is required */
     required: { type: Boolean, default: false },
     /** The label text to display */
     text: { type: [String, Number, Boolean, null], default: null },

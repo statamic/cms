@@ -20,9 +20,7 @@ const props = defineProps({
     clearable: { type: Boolean, default: false },
     /** When `true`, shows a copy button to copy the value to clipboard */
     copyable: { type: Boolean, default: false },
-    /** When `true`, disables the input */
     disabled: { type: Boolean, default: false },
-    /** When `true`, makes the input read-only */
     readOnly: { type: Boolean, default: false },
     /** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
     icon: { type: String, default: null },
@@ -38,11 +36,9 @@ const props = defineProps({
     loading: { type: Boolean, default: false },
     /** The controlled value of the input */
     modelValue: { type: [String, Number], default: null },
-    /** Placeholder text */
     placeholder: { type: String, default: null },
     /** Prepended text */
     prepend: { type: String, default: null },
-    /** When `true`, marks the field as required */
     required: { type: Boolean, default: false },
     /** Controls the size of the input. Options: `xs`, `sm`, `base`, `lg` */
     size: { type: String, default: 'base' },

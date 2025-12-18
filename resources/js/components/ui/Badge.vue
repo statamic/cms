@@ -10,9 +10,9 @@ const props = defineProps({
     append: { type: [String, Number, Boolean, null], default: null },
     /** The element or component this component should render as */
     as: { type: String, default: 'div' },
-    /** Controls the color of the badge. Options: `default`, `amber`, `black`, `blue`, `cyan`, `emerald`, `fuchsia`, `green`, `indigo`, `lime`, `orange`, `pink`, `purple`, `red`, `rose`, `sky`, `teal`, `violet`, `white`, `yellow` */
+    /** Controls the color of the badge. <br><br> Options: `default`, `amber`, `black`, `blue`, `cyan`, `emerald`, `fuchsia`, `green`, `indigo`, `lime`, `orange`, `pink`, `purple`, `red`, `rose`, `sky`, `teal`, `violet`, `white`, `yellow` */
     color: { type: String, default: 'default' },
-    /** URL to link to */
+    /** The URL to link to */
     href: { type: String, default: null },
     /** When `href` is provided, this prop controls the link's `target` attribute */
     target: { type: String, default: null },

@@ -6,20 +6,10 @@ const meta = {
     title: 'Components/Editable',
     component: Editable,
     argTypes: {
-        modelValue: {
-            control: 'text',
-            description: 'The controlled value of the editable text.',
-        },
-        startWithEditMode: {
-            control: 'boolean',
-            description: 'When `true`, the input will be automatically focused when the component mounts.',
-        },
         submitMode: {
             control: 'select',
-            description: 'Controls when the edit is submitted. Options: `blur`, `none` `enter`, `both`',
             options: ['blur', 'none', 'enter', 'both'],
         },
-        placeholder: { control: 'text' },
         'update:modelValue': {
             description: 'Event handler called when the text is updated.',
             table: {

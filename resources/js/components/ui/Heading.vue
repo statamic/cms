@@ -5,7 +5,7 @@ import Icon from './Icon/Icon.vue';
 import { Link } from '@inertiajs/vue3';
 
 const props = defineProps({
-    /** URL to link to */
+    /** The URL to link to */
     href: { type: [String, null], default: null },
     /** When `href` is provided, this prop controls the link's `target` attribute */
     target: { type: String, default: null },

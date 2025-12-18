@@ -12,20 +12,14 @@ const meta = {
         DropdownSeparator,
     },
     argTypes: {
-        // align: {
-        //     control: 'select',
-        //     options: ['start', 'center', 'end'],
-        //     description: 'The preferred alignment against the trigger. May change when collisions occur. <br><br> Options: `start`, `center`, `end`',
-        // },
-        // offset: {
-        //     control: 'number',
-        //     description: 'The distance in pixels from the trigger.',
-        // },
-        // side: {
-        //     control: 'select',
-        //     options: ['top', 'bottom', 'left', 'right'],
-        //     description: 'The preferred side of the trigger to render against when open. <br><br> Options: `top`, `bottom`, `left`, `right`',
-        // },
+        align: {
+            control: 'select',
+            options: ['start', 'center', 'end'],
+        },
+        side: {
+            control: 'select',
+            options: ['top', 'bottom', 'left', 'right'],
+        },
     },
 } satisfies Meta<typeof Dropdown>;
 

@@ -6,29 +6,19 @@ const meta = {
     title: 'Components/Pagination',
     component: Pagination,
     argTypes: {
-        showTotals: {
-            control: 'boolean',
-            description: 'When `true`, shows the totals (eg. 1-10 of 50)',
+        'page-selected': {
+            description: 'Event handler called when a page is selected.',
+            table: {
+                category: 'events',
+                type: { summary: '(page: number) => void' }
+            }
         },
-        perPage: {
-            control: 'number',
-            description: 'The number of items per page',
-        },
-        resourceMeta: {
-            control: 'object',
-            description: 'The `meta` object from a Laravel API resource',
-        },
-        scrollToTop: {
-            control: 'boolean',
-            description: 'When `true`, scrolls to the top when changing pages',
-        },
-        showPageLinks: {
-            control: 'boolean',
-            description: 'When `true`, shows individual page number buttons',
-        },
-        showPerPageSelector: {
-            control: 'boolean',
-            description: 'When `true`, shows the "per page" dropdown',
+        'per-page-changed': {
+            description: 'Event handler called when the per page value is changed.',
+            table: {
+                category: 'events',
+                type: { summary: '(perPage: number) => void' }
+            }
         },
     },
 } satisfies Meta<typeof Pagination>;

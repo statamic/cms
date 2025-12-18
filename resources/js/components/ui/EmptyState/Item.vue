@@ -4,22 +4,22 @@ import Icon from '../Icon/Icon.vue';
 import { useSlots } from 'vue';
 
 const props = defineProps({
-	/** Optional link */
+    /** Optional link */
     href: {
         type: String,
         default: null,
     },
-	/** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
+    /** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
     icon: {
         type: String,
         required: true,
     },
-	/** Heading text for the empty state item */
+    /** Heading text for the empty state item */
     heading: {
         type: String,
         required: true,
     },
-	/** Optional description text below the heading. */
+    /** Optional description text below the heading */
     description: {
         type: String,
         default: '',

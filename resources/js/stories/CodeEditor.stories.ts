@@ -6,55 +6,21 @@ const meta = {
     title: 'Components/CodeEditor',
     component: CodeEditor,
     argTypes: {
-        allowModeSelection: {
-            control: 'boolean',
-            description: 'When `true`, displays a mode selector dropdown.',
-        },
-        disabled: { control: 'boolean' },
         indentType: {
             control: 'select',
-            description: 'Controls whether to indent with tabs or spaces.',
             options: ['tabs', 'spaces'],
         },
         keyMap: {
             control: 'select',
-            description: 'Keyboard mapping for the editor.',
             options: ['sublime', 'vim'],
-        },
-        lineNumbers: {
-            control: 'boolean',
-            description: 'When `true`, line numbers are displayed.',
-        },
-        lineWrapping: {
-            control: 'boolean',
-            description: 'When `true`, long lines will wrap.',
         },
         mode: {
             control: 'select',
-            description: 'The syntax highlighting mode. <br><br> Options: `clike`, `css`, `diff`, `go`, `haml`, `handlebars`, `htmlmixed`, `less`, `markdown`, `gfm`, `nginx`, `text/x-java`, `javascript`, `jsx`, `text/x-objectivec`, `php`, `python`, `ruby`, `scss`, `shell`, `sql`, `twig`, `vue`, `xml`, `yaml-frontmatter`',
             options: ['clike', 'css', 'diff', 'go', 'haml', 'handlebars', 'htmlmixed', 'less', 'markdown', 'gfm', 'nginx', 'text/x-java', 'javascript', 'jsx', 'text/x-objectivec', 'php', 'python', 'ruby', 'scss', 'shell', 'sql', 'twig', 'vue', 'xml', 'yaml-frontmatter'],
-        },
-        modelValue: {
-            control: 'text',
-            description: 'The controlled code editor value.',
-        },
-        readOnly: { control: 'boolean' },
-        showModeLabel: {
-            control: 'boolean',
-            description: 'When `true`, displays the current mode label.',
-        },
-        tabSize: {
-            control: 'number',
-            description: 'The width of a tab character.',
         },
         colorMode: {
             control: 'select',
-            description: 'Theme of the code editor. Options: `system`, `light`, `dark`',
             options: ['system', 'light', 'dark'],
-        },
-        title: {
-            control: 'text',
-            description: 'Title displayed in fullscreen mode.',
         },
         'update:mode': {
             description: 'Event handler called when the syntax highlighting mode changes.',
@@ -77,10 +43,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const defaultCode = `
-<CodeEditor
-    mode="javascript"
-    v-model="code"
-/>
+<CodeEditor mode="javascript" v-model="code" />
 `;
 
 export const _DocsIntro: Story = {

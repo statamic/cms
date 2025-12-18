@@ -12,11 +12,10 @@ const props = defineProps({
     disabled: { type: Boolean, default: false },
     /** Label text to display next to the checkbox */
     label: { type: String, default: null },
-    /** The checked state of the checkbox */
+    /** The controlled value of the checkbox */
     modelValue: { type: [Boolean, null], default: null },
     /** Name attribute for the checkbox input */
     name: { type: String, default: null },
-    /** When `true`, makes the checkbox read-only */
     readOnly: { type: Boolean, default: false },
     /** Controls the size of the checkbox. Options: `sm`, `base` */
     size: { type: String, default: 'base' },

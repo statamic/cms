@@ -9,13 +9,10 @@ defineEmits(['update:modelValue']);
 const props = defineProps({
     /** When `true`, the textarea will automatically grow/shrink to fit content */
     elastic: { type: Boolean, default: false },
-    /** When `true`, disables the textarea */
     disabled: { type: Boolean, default: false },
     /** ID attribute for the textarea element */
     id: { type: String, default: null },
-    /** When `true`, makes the textarea read-only */
     readOnly: { type: Boolean, default: false },
-    /** When `true`, marks the field as required */
     required: { type: Boolean, default: false },
     /** Controls resize behavior. Options: `both`, `horizontal`, `vertical`, `none` */
     resize: { type: String, default: 'vertical' },

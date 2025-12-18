@@ -2,8 +2,11 @@
 import { cva } from 'cva';
 
 const props = defineProps({
+    /** Controls the size of the subheading. Options: `sm`, `base`, `lg`, `xl` */
     size: { type: String, default: 'base' },
+    /** Text to display in the subheading */
     text: { type: [String, Number, Boolean, null], default: null },
+    /** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
     icon: { type: String, default: null },
 });
 

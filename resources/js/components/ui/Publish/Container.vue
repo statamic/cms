@@ -70,15 +70,14 @@ const props = defineProps({
         default: true,
     },
 	/** Confirmation text when syncing a localized field with the origin value. */
-    syncFieldConfirmationText: {
-        type: String,
-        default: () => __('Are you sure?'),
-    },
-	/** Marks the publish form as read-only. */
-    readOnly: {
-        type: Boolean,
-        default: false,
-    },
+	syncFieldConfirmationText: {
+		type: String,
+		default: () => __('Are you sure?'),
+	},
+	readOnly: {
+		type: Boolean,
+		default: false,
+	},
 	/** Marks it as a "config" form, which renders slightly differently. */
     asConfig: {
         type: Boolean,
