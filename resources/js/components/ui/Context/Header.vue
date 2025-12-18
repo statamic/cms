@@ -5,7 +5,9 @@ import Icon from '../Icon/Icon.vue';
 import Button from '../Button/Button.vue';
 
 defineProps({
+	/** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
     icon: { type: String, default: null },
+	/** Icon name. Will display after the text. [Browse available icons](/?path=/story/components-icon--all-icons) */
     appendIcon: { type: String, default: null },
     appendHref: { type: String, default: null },
     text: { type: String, default: null },

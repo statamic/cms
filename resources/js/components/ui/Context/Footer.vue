@@ -5,6 +5,7 @@ import Icon from '../Icon/Icon.vue';
 
 defineProps({
     href: { type: String, default: null },
+	/** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
     icon: { type: String, default: null },
     text: { type: String, default: null },
 });

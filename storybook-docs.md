@@ -28,7 +28,7 @@ When I ask you to add documentation for a page, please keep these things in mind
 ```
 
     * When dealing with `size` or `variant` props, please use this description format: `Controls the size of the ...` / `Controls the appearance of the ...`
-    * When dealing with `disabled`, `required` or `read-only` props, don't add a description or anything. It's fairly self-explanatory.
+    * When dealing with `disabled`, `required`, `id` or `read-only` props, don't add a description or anything. It's fairly self-explanatory.
     * When dealing with a `boolean` prop, please use this description format: "When `true`, ..."
     * When dealing with an `icon` prop (or similar), the argument should look like the below code snippet. Make sure to import the `icons` file from `./icons`:
 
@@ -65,4 +65,8 @@ When I ask you to add documentation for a page, please keep these things in mind
 }
 ```
 
-If you have any doubts about convention, please look at other documented components or ask me.
+* Please don't list out the props/events (eg. bullet points) outside of the
+  `argTypes` thing. Storybook will do that for us.
+* You also don't need to list all the child/related components
+
+If you have any doubts about convention, please look at other documented components or ask me. When I follow-up on something, please bear in mind that I might have edited the files so take care before updating them.

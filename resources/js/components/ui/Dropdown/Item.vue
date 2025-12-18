@@ -14,7 +14,7 @@ const props = defineProps({
     /** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
     icon: { type: String, default: null },
     text: { type: String, default: null },
-    /** Controls the appearance of the dropdown item. Options: `default`, `destructive` */
+    /** Controls the appearance of the dropdown item. <br><br> Options: `default`, `destructive` */
     variant: { type: String, default: 'default' },
 });
 

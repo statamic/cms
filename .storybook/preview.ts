@@ -47,6 +47,7 @@ setup(async (app) => {
 
   app.config.globalProperties.__ = translate;
   app.config.globalProperties.$date = new DateFormatter;
+  app.config.globalProperties.cp_url = (url) => url;
   // app.config.globalProperties.$portals = portals;
   // app.config.globalProperties.$stacks = stacks;
 
