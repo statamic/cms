@@ -28,7 +28,6 @@ import Icon from '../Icon/Icon.vue';
 const emit = defineEmits(['update:modelValue']);
 
 const props = defineProps({
-    date: { type: String, default: null },
     badge: { type: String, default: null },
     required: { type: Boolean, default: false },
     modelValue: { type: [Object, String], default: null },

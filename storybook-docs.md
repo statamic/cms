@@ -68,5 +68,6 @@ When I ask you to add documentation for a page, please keep these things in mind
 * Please don't list out the props/events (eg. bullet points) outside of the
   `argTypes` thing. Storybook will do that for us.
 * You also don't need to list all the child/related components
+* Component titles shouldn't include spaces
 
 If you have any doubts about convention, please look at other documented components or ask me. When I follow-up on something, please bear in mind that I might have edited the files so take care before updating them.
