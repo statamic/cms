@@ -228,7 +228,6 @@ const fieldtypeComponentEvents = computed(() => ({
             :required="isRequired"
             :errors="errors"
             :read-only="isReadOnly"
-            :variant="config.variant"
             :full-width-setting="config.full_width_setting"
             v-bind="$attrs"
         >

@@ -23,7 +23,6 @@ const props = defineProps({
     label: { type: String },
     readOnly: { type: Boolean, default: false },
     required: { type: Boolean, default: false },
-    variant: { type: String, default: 'block' },
 });
 
 const labelProps = computed(() => ({
@@ -33,7 +32,7 @@ const labelProps = computed(() => ({
     text: props.label,
 }));
 
-const inline = computed(() => props.asConfig ? true : props.variant === 'inline');
+const inline = computed(() => props.asConfig);
 
 const rootClasses = computed(() =>
     cva({
@@ -41,16 +40,6 @@ const rootClasses = computed(() =>
             'min-w-0',
         ],
         variants: {
-            variant: {
-                block: 'w-full',
-                inline: [
-                    'flex justify-between gap-x-7 gap-y-1.5',
-                    'has-[[data-ui-label]~[data-ui-control]]:grid-cols-[1fr_auto]',
-                    'has-[[data-ui-control]~[data-ui-label]]:grid-cols-[auto_1fr]',
-                    '[&>[data-ui-control]~[data-ui-description]]:row-start-2 [&>[data-ui-control]~[data-ui-description]]:col-start-2',
-                    '[&>[data-ui-label]~[data-ui-control]]:row-start-1 [&>[data-ui-label]~[data-ui-control]]:col-start-2',
-                ],
-            },
             disabled: {
                 true: 'opacity-50',
             },
