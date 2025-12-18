@@ -8,7 +8,6 @@ const props = defineProps({
         default: 'published',
         validator: (value) => ['published', 'scheduled', 'expired', 'draft', 'hidden'].includes(value),
     },
-    date: { type: String, default: null },
     showDot: { type: Boolean, default: true },
     showLabel: { type: Boolean, default: false },
     private: { type: Boolean, default: false },

@@ -1,0 +1,19 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as DataTableStories from '../DataTable.stories';
+
+<Meta of={DataTableStories} />
+
+# DataTable
+A styled data table component with rounded corners and proper borders. Uses a slot-based API for defining columns and rows with automatic border positioning.
+<Canvas of={DataTableStories._DocsIntro} sourceState={'shown'} />
+
+## Compact Variant
+Use the `compact` variant for denser tables with reduced padding.
+<Canvas of={DataTableStories._Compact} sourceState={'shown'} />
+
+## Column Width
+Control column widths using the `width` prop on DataTableColumn.
+<Canvas of={DataTableStories._ColumnWidth} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={DataTableStories} />
