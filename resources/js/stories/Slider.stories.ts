@@ -3,7 +3,7 @@ import {ref} from 'vue';
 import {Field, Slider} from '@ui';
 
 const meta = {
-    title: 'Components/Slider',
+    title: 'Forms/Slider',
     component: Slider,
     argTypes: {
         description: {

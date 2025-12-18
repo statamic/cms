@@ -11,7 +11,7 @@ import {
 } from '@ui';
 
 const meta = {
-    title: 'Components/Context',
+    title: 'Overlays/Context',
     component: Context,
     subcomponents: {
         ContextMenu,

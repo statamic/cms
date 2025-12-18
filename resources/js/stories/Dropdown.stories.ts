@@ -2,7 +2,7 @@ import type {Meta, StoryObj} from '@storybook/vue3';
 import {Button, Dropdown, DropdownFooter, DropdownHeader, DropdownItem, DropdownMenu, DropdownSeparator} from '@ui';
 
 const meta = {
-    title: 'Components/Dropdown',
+    title: 'Overlays/Dropdown',
     component: Dropdown,
     subcomponents: {
         DropdownMenu,

@@ -2,7 +2,7 @@ import type {Meta, StoryObj} from '@storybook/vue3';
 import {Textarea} from '@ui';
 
 const meta = {
-    title: 'Components/Textarea',
+    title: 'Forms/Textarea',
     component: Textarea,
     argTypes: {
         resize: {

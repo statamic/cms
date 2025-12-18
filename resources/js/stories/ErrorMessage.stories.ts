@@ -2,7 +2,7 @@ import type {Meta, StoryObj} from '@storybook/vue3';
 import {ErrorMessage} from '@ui';
 
 const meta = {
-    title: 'Components/ErrorMessage',
+    title: 'Forms/ErrorMessage',
     component: ErrorMessage,
     argTypes: {},
 } satisfies Meta<typeof ErrorMessage>;

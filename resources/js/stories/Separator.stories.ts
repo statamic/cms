@@ -2,7 +2,7 @@ import type {Meta, StoryObj} from '@storybook/vue3';
 import {Separator} from '@ui';
 
 const meta = {
-    title: 'Components/Separator',
+    title: 'Layout/Separator',
     component: Separator,
     argTypes: {
         variant: {

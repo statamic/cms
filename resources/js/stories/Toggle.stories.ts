@@ -3,7 +3,7 @@ import {ToggleGroup, ToggleItem} from '@ui';
 import {ref} from 'vue';
 
 const meta = {
-    title: 'Components/Toggle',
+    title: 'Forms/Toggle',
     component: ToggleGroup,
     subcomponents: {
         ToggleItem,

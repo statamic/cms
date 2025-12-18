@@ -2,7 +2,7 @@ import type {Meta, StoryObj} from '@storybook/vue3';
 import {SplitterGroup, SplitterPanel, SplitterResizeHandle} from '@ui';
 
 const meta = {
-    title: 'Components/Splitter',
+    title: 'Layout/Splitter',
     component: SplitterGroup,
     subcomponents: { SplitterPanel },
     argTypes: {

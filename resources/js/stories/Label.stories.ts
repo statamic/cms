@@ -2,7 +2,7 @@ import type {Meta, StoryObj} from '@storybook/vue3';
 import {Field, Input, Label} from '@ui';
 
 const meta = {
-    title: 'Components/Label',
+    title: 'Forms/Label',
     component: Label,
     argTypes: {},
 } satisfies Meta<typeof Label>;

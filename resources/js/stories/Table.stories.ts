@@ -2,7 +2,7 @@ import type {Meta, StoryObj} from '@storybook/vue3';
 import {Badge, Table, TableCell, TableColumn, TableColumns, TableRow, TableRows} from '@ui';
 
 const meta = {
-    title: 'Components/Table',
+    title: 'Layout/Table',
     component: Table,
     subcomponents: {
         TableColumns,

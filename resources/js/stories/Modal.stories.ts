@@ -3,7 +3,7 @@ import {Button, Field, Input, Modal, ModalClose, ModalTitle} from '@ui';
 import PortalTargets from "@/components/portals/PortalTargets.vue";
 
 const meta = {
-    title: 'Components/Modal',
+    title: 'Overlays/Modal',
     component: Modal,
     argTypes: {
         title: { control: 'text' },

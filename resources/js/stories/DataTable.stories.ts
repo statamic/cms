@@ -2,7 +2,7 @@ import type {Meta, StoryObj} from '@storybook/vue3';
 import {DataTable, DataTableCell, DataTableColumn, DataTableRow} from '@ui';
 
 const meta = {
-    title: 'Components/DataTable',
+    title: 'Layout/DataTable',
     component: DataTable,
     subcomponents: {
         DataTableColumn,

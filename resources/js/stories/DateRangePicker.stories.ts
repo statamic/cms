@@ -4,7 +4,7 @@ import {DateRangePicker} from '@ui';
 import {parseDate} from '@internationalized/date';
 
 const meta = {
-    title: 'Components/DateRangePicker',
+    title: 'Forms/DateRangePicker',
     component: DateRangePicker,
     argTypes: {
         modelValue: {

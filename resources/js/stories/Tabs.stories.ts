@@ -3,7 +3,7 @@ import {TabContent, TabList, Tabs, TabTrigger} from '@ui';
 import {ref} from 'vue';
 
 const meta = {
-    title: 'Components/Tabs',
+    title: 'Layout/Tabs',
     component: Tabs,
     subcomponents: {
         TabList,

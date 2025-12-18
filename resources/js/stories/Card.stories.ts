@@ -2,7 +2,7 @@ import type {Meta, StoryObj} from '@storybook/vue3';
 import {Button, Card, CardPanel, Heading, Input, Panel, PanelHeader, Subheading} from '@ui';
 
 const meta = {
-    title: 'Components/Card',
+    title: 'Layout/Card',
     component: Card,
     argTypes: {
         inset: {

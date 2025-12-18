@@ -3,7 +3,7 @@ import {Switch} from '@ui';
 import {ref} from 'vue';
 
 const meta = {
-    title: 'Components/Switch',
+    title: 'Forms/Switch',
     component: Switch,
     argTypes: {
         size: {

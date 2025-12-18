@@ -3,7 +3,7 @@ import {ref} from 'vue';
 import {Button, Field, Input, Switch, Textarea} from '@ui';
 
 const meta = {
-    title: 'Components/Field',
+    title: 'Forms/Field',
     component: Field,
     argTypes: {
         asConfig: {

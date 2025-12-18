@@ -3,7 +3,7 @@ import {Button, Description, Field, Input, Label} from '@ui';
 import {icons} from "@/stories/icons";
 
 const meta = {
-    title: 'Components/Input',
+    title: 'Forms/Input',
     component: Input,
     argTypes: {
         icon: {

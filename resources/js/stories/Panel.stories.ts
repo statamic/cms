@@ -2,7 +2,7 @@ import type {Meta, StoryObj} from '@storybook/vue3';
 import {Button, Card, Description, Heading, Panel, PanelFooter, PanelHeader} from '@ui';
 
 const meta = {
-    title: 'Components/Panel',
+    title: 'Layout/Panel',
     component: Panel,
     subcomponents: {
         PanelHeader,

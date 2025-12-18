@@ -2,7 +2,7 @@ import type {Meta, StoryObj} from '@storybook/vue3';
 import {Description} from '@ui';
 
 const meta = {
-    title: 'Components/Description',
+    title: 'Forms/Description',
     component: Description,
     argTypes: {},
 } satisfies Meta<typeof Description>;

@@ -2,7 +2,7 @@ import type {Meta, StoryObj} from '@storybook/vue3';
 import {EmptyStateItem, EmptyStateMenu} from '@ui';
 
 const meta = {
-    title: 'Components/EmptyState',
+    title: 'Layout/EmptyState',
     component: EmptyStateMenu,
     subcomponents: {
         EmptyStateItem,

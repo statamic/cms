@@ -2,7 +2,7 @@ import type {Meta, StoryObj} from '@storybook/vue3';
 import {Calendar, Card} from '@ui';
 
 const meta = {
-    title: 'Components/Calendar',
+    title: 'Forms/Calendar',
     component: Calendar,
     argTypes: {
         modelValue: {

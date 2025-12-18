@@ -2,7 +2,7 @@ import type {Meta, StoryObj} from '@storybook/vue3';
 import {Radio, RadioGroup} from '@ui';
 
 const meta = {
-    title: 'Components/Radio',
+    title: 'Forms/Radio',
     component: Radio,
     subcomponents: { RadioGroup },
     argTypes: {

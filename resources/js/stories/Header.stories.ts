@@ -3,7 +3,7 @@ import {Badge, Button, Header} from '@ui';
 import {icons} from "@/stories/icons";
 
 const meta = {
-    title: 'Components/Header',
+    title: 'Layout/Header',
     component: Header,
     argTypes: {
         icon: {

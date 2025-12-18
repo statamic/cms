@@ -3,7 +3,7 @@ import {ref} from 'vue';
 import {TimePicker} from '@ui';
 
 const meta = {
-    title: 'Components/TimePicker',
+    title: 'Forms/TimePicker',
     component: TimePicker,
     argTypes: {
         modelValue: {

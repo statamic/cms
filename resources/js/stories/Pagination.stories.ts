@@ -3,7 +3,7 @@ import {Pagination} from '@ui';
 import {ref} from 'vue';
 
 const meta = {
-    title: 'Components/Pagination',
+    title: 'Layout/Pagination',
     component: Pagination,
     argTypes: {
         'page-selected': {

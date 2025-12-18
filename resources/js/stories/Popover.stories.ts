@@ -2,7 +2,7 @@ import type {Meta, StoryObj} from '@storybook/vue3';
 import {Button, Heading, Popover, Textarea} from '@ui';
 
 const meta = {
-    title: 'Components/Popover',
+    title: 'Overlays/Popover',
     component: Popover,
     argTypes: {
         align: {

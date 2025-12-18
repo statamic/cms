@@ -3,7 +3,7 @@ import { Checkbox, CheckboxGroup } from '@ui';
 import { ref } from 'vue';
 
 const meta = {
-    title: 'Components/Checkbox',
+    title: 'Forms/Checkbox',
     component: Checkbox,
     subcomponents: { CheckboxGroup },
     argTypes: {

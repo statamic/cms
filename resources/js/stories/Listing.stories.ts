@@ -18,7 +18,7 @@ import {
 } from '@ui';
 
 const meta = {
-    title: 'Components/Listing',
+    title: 'Layout/Listing',
     component: Listing,
     subcomponents: {
         ListingCustomizeColumns,

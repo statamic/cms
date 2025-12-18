@@ -3,7 +3,7 @@ import {Select} from '@ui';
 import {icons} from "@/stories/icons";
 
 const meta = {
-    title: 'Components/Select',
+    title: 'Forms/Select',
     component: Select,
     argTypes: {
         clearable: { control: 'boolean' },

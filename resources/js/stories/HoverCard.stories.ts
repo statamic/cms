@@ -2,7 +2,7 @@ import type {Meta, StoryObj} from '@storybook/vue3';
 import {Button, Description, Heading, HoverCard} from '@ui';
 
 const meta = {
-    title: 'Components/HoverCard',
+    title: 'Overlays/HoverCard',
     component: HoverCard,
     argTypes: {
         align: {

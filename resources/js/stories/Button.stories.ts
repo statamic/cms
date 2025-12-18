@@ -4,7 +4,7 @@ import {computed} from 'vue';
 import {icons} from './icons';
 
 const meta = {
-    title: 'Components/Button',
+    title: 'Forms/Button',
     component: Button,
     argTypes: {
         icon: {

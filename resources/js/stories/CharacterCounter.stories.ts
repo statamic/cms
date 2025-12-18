@@ -3,7 +3,7 @@ import {CharacterCounter, Input} from '@ui';
 import {ref} from 'vue';
 
 const meta = {
-    title: 'Components/CharacterCounter',
+    title: 'Forms/CharacterCounter',
     component: CharacterCounter,
     argTypes: {},
 } satisfies Meta<typeof CharacterCounter>;
