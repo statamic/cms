@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import {
     DatePickerAnchor,
     DatePickerContent,
@@ -26,8 +26,6 @@ import Calendar from '../Calendar/Calendar.vue';
 import Icon from '../Icon/Icon.vue';
 
 const emit = defineEmits(['update:modelValue']);
-
-const open = ref(false);
 
 const props = defineProps({
     date: { type: String, default: null },
@@ -84,11 +82,6 @@ const calendarEvents = computed(() => ({
             event.minute = 0;
             event.second = 0;
             event.millisecond = 0;
-            
-            // Close the popup when a date is selected
-            if (!props.inline) {
-                open.value = false;
-            }
         }
 
         emit('update:modelValue', event);
@@ -129,8 +122,6 @@ const getInputLabel = (part) => {
             :granularity="granularity"
             :locale="$date.locale"
             :disabled="disabled || readOnly"
-            :open="open"
-            @update:open="open = $event"
             @update:model-value="emit('update:modelValue', $event)"
             v-bind="$attrs"
             prevent-deselect
