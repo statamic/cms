@@ -7,7 +7,6 @@ defineProps([
     'actions',
     'collection',
     'collectionCreateLabel',
-    'collectionHasRoutes',
     'blueprint',
     'values',
     'extraValues',
@@ -38,7 +37,6 @@ function saved(response) {
         method="post"
         :initial-title="collectionCreateLabel"
         :collection-handle="collection"
-        :collection-has-routes="collectionHasRoutes"
         :initial-fieldset="blueprint"
         :initial-values="values"
         :initial-extra-values="extraValues"
