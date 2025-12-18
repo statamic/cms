@@ -1,5 +1,6 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
 import {TabContent, TabList, Tabs, TabTrigger} from '@ui';
+import {ref} from 'vue';
 
 const meta = {
     title: 'Components/Tabs',
@@ -10,14 +11,6 @@ const meta = {
         TabContent,
     },
     argTypes: {
-        modelValue: {
-            control: 'text',
-            description: 'The controlled value of the tabs.',
-        },
-        unmountOnHide: {
-            control: 'boolean',
-            description: 'When `true`, the element will be unmounted on closed state.',
-        },
         'update:modelValue': {
             description: 'Event handler called when the tab changes.',
             table: {
@@ -32,20 +25,20 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const defaultCode = `
-<Tabs default-tab="tab1" class="w-full">
+<Tabs v-model="activeTab" class="w-full">
     <TabList>
-        <TabTrigger text="Shiny" name="tab1" />
-        <TabTrigger text="Happy" name="tab2" />
-        <TabTrigger text="People" name="tab3" />
+        <TabTrigger text="Shiny" name="one" />
+        <TabTrigger text="Happy" name="two" />
+        <TabTrigger text="People" name="three" />
     </TabList>
-    <TabContent name="tab1">
-        <p class="py-8">Tab 1 content</p>
+    <TabContent name="one">
+        <p class="py-8">Content of Tab 1</p>
     </TabContent>
-    <TabContent name="tab2">
-        <p class="py-8">Tab 2 content</p>
+    <TabContent name="two">
+        <p class="py-8">Content of Tab 2</p>
     </TabContent>
-    <TabContent name="tab3">
-        <p class="py-8">Tab 3 content</p>
+    <TabContent name="three">
+        <p class="py-8">Content of Tab 3</p>
     </TabContent>
 </Tabs>
 `;
@@ -59,6 +52,10 @@ export const _DocsIntro: Story = {
     },
     render: () => ({
         components: { Tabs, TabList, TabTrigger, TabContent },
+        setup() {
+            const activeTab = ref('tab1');
+            return { activeTab };
+        },
         template: defaultCode,
     }),
 };

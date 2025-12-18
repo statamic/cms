@@ -9,7 +9,7 @@ const props = defineProps({
     id: { type: String, default: () => useId() },
     /** The controlled value of the switch */
     modelValue: { type: Boolean, default: false },
-    /** The size of the toggle */
+    /** Controls the size of the switch. <br><br> Options: `xs`, `sm`, `base`, `lg` */
     size: { type: String, default: 'base' },
 });
 

@@ -1,19 +1,13 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
 import {Switch} from '@ui';
+import {ref} from 'vue';
 
 const meta = {
     title: 'Components/Switch',
     component: Switch,
     argTypes: {
-        required: { control: 'boolean' },
-        id: { control: 'text' },
-        modelValue: {
-            control: 'text',
-            description: 'The controlled value of the switch.',
-        },
         size: {
             control: 'select',
-            description: 'Controls the size of the switch. <br><br> Options: `xs`, `sm`, `base`, `lg`',
             options: ['xs', 'sm', 'base', 'lg'],
         },
         'update:modelValue': {
@@ -30,7 +24,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const defaultCode = `
-<Switch />
+<Switch v-model="enabled" />
 `;
 
 export const _DocsIntro: Story = {
@@ -42,16 +36,20 @@ export const _DocsIntro: Story = {
     },
     render: () => ({
         components: { Switch },
+        setup() {
+            const enabled = ref(false);
+            return { enabled };
+        },
         template: defaultCode,
     }),
 };
 
 const sizesCode = `
-<div class="flex items-center">
-    <Switch size="lg" />
-    <Switch />
-    <Switch size="sm" />
-    <Switch size="xs" />
+<div class="flex items-center gap-2">
+    <Switch v-model="lg" size="lg" />
+    <Switch v-model="base" />
+    <Switch v-model="sm" size="sm" />
+    <Switch v-model="xs" size="xs" />
 </div>
 `;
 
@@ -64,6 +62,13 @@ export const _Sizes: Story = {
     },
     render: () => ({
         components: { Switch },
+        setup() {
+            const lg = ref(false);
+            const base = ref(false);
+            const sm = ref(false);
+            const xs = ref(false);
+            return { lg, base, sm, xs };
+        },
         template: sizesCode,
     }),
 };
