@@ -100,6 +100,7 @@
   "devDependencies": {
     "@storybook/addon-a11y": "^10.1.2",
     "@storybook/addon-docs": "^10.1.2",
+    "@storybook/addon-vitest": "^10.1.10",
     "@storybook/vue3-vite": "^10.1.2",
     "@tailwindcss/vite": "^4.1.8",
     "@vitejs/plugin-vue": "^6.0.0",
