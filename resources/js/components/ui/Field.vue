@@ -11,7 +11,7 @@ defineOptions({
 });
 
 const props = defineProps({
-    asConfig: { type: Boolean, default: false },
+    inline: { type: Boolean, default: false },
     badge: { type: String, default: '' },
     disabled: { type: Boolean, default: false },
     error: { type: String },
@@ -32,8 +32,6 @@ const labelProps = computed(() => ({
     text: props.label,
 }));
 
-const inline = computed(() => props.asConfig);
-
 const rootClasses = computed(() =>
     cva({
         base: [
@@ -52,8 +50,6 @@ const rootClasses = computed(() =>
         },
     })({
         ...props,
-        inline: inline.value,
-        fullWidthSetting: props.fullWidthSetting,
     }),
 );
 
@@ -64,14 +60,12 @@ const descriptionClasses = computed(() =>
             inline: {
                 true: 'mb-0!',
             },
-            fullWidth: {
+            fullWidthSetting: {
                 true: 'mb-3!',
             },
         },
     })({
         ...props,
-        inline: inline.value,
-        fullWidth: props.fullWidthSetting,
     }),
 );
 
