@@ -882,3 +882,10 @@ export default {
     },
 };
 </script>
+
+<style scoped>
+    /* Collapse the section when it has no fields */
+    [class*=space-y]:empty {
+        margin: 0;
+    }
+</style>
