@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import {
     DateRangePickerCalendar,
     DateRangePickerCell,
@@ -26,8 +26,6 @@ import Icon from '../Icon/Icon.vue';
 import { parseAbsoluteToLocal } from '@internationalized/date';
 
 const emit = defineEmits(['update:modelValue']);
-
-const open = ref(false);
 
 const props = defineProps({
     date: { type: String, default: null },
@@ -81,11 +79,6 @@ const calendarEvents = computed(() => ({
             event.end.minute = 0;
             event.end.second = 0;
             event.end.millisecond = 0;
-            
-            // Close the popup when both start and end dates are selected
-            if (!props.inline && event.start && event.end) {
-                open.value = false;
-            }
         }
 
         emit('update:modelValue', event)
@@ -100,8 +93,6 @@ const calendarEvents = computed(() => ({
             :granularity="granularity"
             :locale="$date.locale"
             :disabled="disabled || readOnly"
-            :open="open"
-            @update:open="open = $event"
             @update:model-value="emit('update:modelValue', $event)"
             v-bind="$attrs"
             prevent-deselect
