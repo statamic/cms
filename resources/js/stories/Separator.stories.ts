@@ -11,7 +11,10 @@ const meta = {
             description: 'Controls the appearance of the separator. <br><br> Options: `line`, `dots`',
             options: ['line', 'dots'],
         },
-        vertical: { control: 'boolean' },
+        vertical: {
+            control: 'boolean',
+            description: 'When `true`, it will render as a vertical separator.'
+        },
     },
 } satisfies Meta<typeof Separator>;
 

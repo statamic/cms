@@ -31,6 +31,8 @@ setup(async (app) => {
           get(key) {
               const config = {
                   linkToDocs: true,
+                  paginationSize: 50,
+                  paginationSizeOptions: [10, 25, 50, 100, 500],
               };
 
               return config[key] ?? null;

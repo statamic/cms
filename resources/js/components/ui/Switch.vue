@@ -4,9 +4,13 @@ import { SwitchRoot, SwitchThumb } from 'reka-ui';
 import { cva } from 'cva';
 
 const props = defineProps({
+    /** Whether the toggle is required */
     required: { type: Boolean, default: false },
+    /** The id attribute for the toggle */
     id: { type: String, default: () => useId() },
+    /** The checked state of the toggle */
     modelValue: { type: Boolean, default: false },
+    /** The size of the toggle */
     size: { type: String, default: 'base' },
 });
 

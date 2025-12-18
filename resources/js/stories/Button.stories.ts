@@ -316,7 +316,7 @@ export const ButtonGroups: Story = {
                 code: `
                     <ButtonGroup>
                         <Button text="Apply" />
-                        <Button text="Save All" />
+                        <Button icon="save" text="Save All" />
                     </ButtonGroup>
                 `,
             },
