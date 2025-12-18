@@ -46,7 +46,7 @@
     @endforeach
 @endforeach
 
-<style>
+<style id="theme-colors">
     :root {
         {{ \Statamic\CP\Color::cssVariables() }}
 
