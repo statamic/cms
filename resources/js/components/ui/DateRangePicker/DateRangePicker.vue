@@ -98,6 +98,7 @@ const calendarEvents = computed(() => ({
             prevent-deselect
             hide-time-zone
             :placeholder="placeholder"
+            close-on-select
         >
             <DateRangePickerField v-slot="{ segments }" class="w-full">
                 <div

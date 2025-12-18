@@ -129,6 +129,7 @@ const getInputLabel = (part) => {
             role="group"
             :aria-label="__('Date picker')"
             :aria-required="required"
+            close-on-select
         >
             <DatePickerField v-slot="{ segments }" class="w-full">
                 <DatePickerAnchor as-child>
