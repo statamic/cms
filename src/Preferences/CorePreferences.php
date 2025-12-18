@@ -29,7 +29,6 @@ class CorePreferences
             'type' => 'toggle',
             'display' => __('Stricter WCAG 2.2 Mode'),
             'instructions' => __('statamic::messages.preference_strict_accessibility_instructions'),
-            'variant' => 'inline',
         ]);
 
         Preference::register('confirm_dirty_navigation', [
@@ -37,7 +36,6 @@ class CorePreferences
             'default' => true,
             'display' => __('Confirm Dirty Navigation'),
             'instructions' => __('statamic::messages.preference_confirm_dirty_navigation_instructions'),
-            'variant' => 'inline',
         ]);
 
         Preference::register('theme', [
