@@ -7,54 +7,20 @@ const meta = {
     title: 'Components/Button',
     component: Button,
     argTypes: {
-        as: {
-            control: 'text',
-            description: 'The element or component this component should render as.',
-        },
-        href: { control: 'text' },
-        target: {
-            control: 'text',
-            description: "When `href` is provided, this prop controls the link's `target` attribute.",
-        },
         icon: {
             control: 'select',
             options: icons,
-            description: 'Icon name. [Browse available icons](/?path=/story/components-icon--all-icons)',
         },
         iconAppend: {
             control: 'select',
             options: icons,
-            description: 'Icon name. Will display after the text. [Browse available icons](/?path=/story/components-icon--all-icons)',
-        },
-        iconOnly: {
-            control: 'boolean',
-            description: "When `true`, the button's padding will be adjusted to account for no text",
-        },
-        inset: {
-            control: 'boolean',
-            description: 'When using `ghost` or `subtle` button variants, you can use the `inset` prop to remove any invisible padding for better alignment.',
-        },
-        loading: {
-            control: 'boolean',
-            description: 'When `true`, the button shows an animated loading icon.'
-        },
-        round: {
-            control: 'boolean',
-            description: 'When `true`, the button will be rounded.'
         },
         size: {
             control: 'select',
-            description: 'Controls the size of the button. <br><br> Options: `2xs`, `xs`, `sm`, `base`, `lg`',
             options: ['2xs', 'xs', 'sm', 'base', 'lg'],
-        },
-        text: { control: 'text' },
-        type: {
-            control: 'select',
-            description: "Unless `href` is provided, this component defaults to a `<button>`. This prop controls the button's `type` attribute.",
         },
         variant: {
             control: 'select',
-            description: 'Controls the appearance of the button. <br><br> Options: `default`, `primary`, `danger`, `filled`, `ghost`, `ghost-pressed`, `subtle`, `pressed`',
             options: ['default', 'primary', 'danger', 'filled', 'ghost', 'ghost-pressed', 'subtle', 'pressed'],
         },
     },

@@ -4,12 +4,7 @@ import {Description} from '@ui';
 const meta = {
     title: 'Components/Description',
     component: Description,
-    argTypes: {
-        text: {
-            control: 'text',
-            description: 'The description text to display.',
-        },
-    },
+    argTypes: {},
 } satisfies Meta<typeof Description>;
 
 export default meta;

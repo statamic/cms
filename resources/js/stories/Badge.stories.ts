@@ -7,48 +7,22 @@ const meta = {
     title: 'Components/Badge',
     component: Badge,
     argTypes: {
-        append: {
-            control: 'text',
-            description: 'Appended text'
-        },
-        as: {
-            control: 'text',
-            description: 'The element or component this component should render as.',
-        },
         color: {
             control: 'select',
-            description: 'Controls the color of the badge. <br><br> Options: `default`, `amber`, `black`, `blue`, `cyan`, `emerald`, `fuchsia`, `green`, `indigo`, `lime`, `orange`, `pink`, `purple`, `red`, `rose`, `sky`, `teal`, `violet`, `white`, `yellow`',
             options: ['default', 'amber', 'black', 'blue', 'cyan', 'emerald', 'fuchsia', 'green', 'indigo', 'lime', 'orange', 'pink', 'purple', 'red', 'rose', 'sky', 'teal', 'violet', 'white', 'yellow'],
-        },
-        href: { control: 'text' },
-        target: {
-            control: 'text',
-            description: "When `href` is provided, this prop controls the link's `target` attribute.",
         },
         icon: {
             control: 'select',
             options: icons,
-            description: 'Icon name. [Browse available icons](/?path=/story/components-icon--all-icons)',
         },
         iconAppend: {
             control: 'select',
             options: icons,
-            description: 'Icon name. Will display after the text. [Browse available icons](/?path=/story/components-icon--all-icons)',
-        },
-        pill: {
-            control: 'boolean',
-            description: 'When `true`, the badge will be displayed as a pill.'
-        },
-        prepend: {
-            control: 'text',
-            description: 'Prepended text',
         },
         size: {
             control: 'select',
-            description: 'Controls the size of the badge. <br><br> Options: `sm`, `default`, `lg`',
             options: ['sm', 'default', 'lg'],
         },
-        text: { control: 'text' },
     },
 } satisfies Meta<typeof Badge>;
 

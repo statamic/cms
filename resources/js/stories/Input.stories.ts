@@ -6,70 +6,25 @@ const meta = {
     title: 'Components/Input',
     component: Input,
     argTypes: {
-        append: {
-            control: 'text',
-            description: 'Appended text'
-        },
-        badge: { control: 'text' },
-        clearable: { control: 'boolean' },
-        copyable: { control: 'boolean' },
-        disabled: { control: 'boolean' },
-        readOnly: { control: 'boolean' },
         icon: {
             control: 'select',
             options: icons,
-            description: 'Icon name. [Browse available icons](/?path=/story/components-icon--all-icons)',
         },
         iconAppend: {
             control: 'select',
             options: icons,
-            description: 'Icon name. Will display after the text. [Browse available icons](/?path=/story/components-icon--all-icons)',
         },
         iconPrepend: {
             control: 'select',
             options: icons,
-            description: 'Icon name. Will display before the text. [Browse available icons](/?path=/story/components-icon--all-icons)',
         },
-        id: { control: 'text' },
-        limit: {
-            control: 'number',
-            description: 'Specify a character limit',
-        },
-        loading: {
-            control: 'boolean',
-            description: 'When `true`, an animated loading indicator will show next to the input.'
-        },
-        modelValue: {
-            control: 'text',
-            description: 'The controlled value of the input.',
-        },
-        placeholder: { control: 'text' },
-        prepend: {
-            control: 'text',
-            description: 'Prepended text',
-        },
-        required: { control: 'boolean' },
         size: {
             control: 'select',
-            description: 'Controls the size of the input. <br><br> Options: `xs`, `sm`, `base`',
             options: ['xs', 'sm', 'base'],
         },
-        tabindex: { control: 'number' },
-        type: { control: 'text' },
         variant: {
             control: 'select',
-            description: 'Controls the appearance of the input. <br><br> Options: `default`, `light`, `ghost`',
             options: ['default', 'light', 'ghost'],
-        },
-        viewable: { control: 'boolean' },
-        focus: { control: 'boolean' },
-        inputAttrs: {
-            control: 'object',
-            description: 'Object of HTML attributes to be applied to the underlying `<input>`'
-        },
-        inputClass: {
-            control: 'text',
-            description: 'Classes to be applied to the underlying `<input>`'
         },
         'update:modelValue': {
             description: 'Event handler called when the input is updated.',

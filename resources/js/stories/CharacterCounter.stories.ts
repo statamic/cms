@@ -5,20 +5,7 @@ import {ref} from 'vue';
 const meta = {
     title: 'Components/CharacterCounter',
     component: CharacterCounter,
-    argTypes: {
-        text: {
-            control: 'text',
-            description: 'The text to count characters from.',
-        },
-        limit: {
-            control: 'number',
-            description: 'The maximum number of characters allowed.',
-        },
-        dangerZone: {
-            control: 'number',
-            description: 'Number of characters remaining before showing the countdown number (default: 20).',
-        },
-    },
+    argTypes: {},
 } satisfies Meta<typeof CharacterCounter>;
 
 export default meta;

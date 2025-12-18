@@ -7,20 +7,7 @@ const meta = {
     argTypes: {
         status: {
             control: 'select',
-            description: 'The status to display. <br><br> Options: `published`, `scheduled`, `expired`, `draft`, `hidden`',
             options: ['published', 'scheduled', 'expired', 'draft', 'hidden'],
-        },
-        showDot: {
-            control: 'boolean',
-            description: 'When `true`, displays a colored dot indicator.',
-        },
-        showLabel: {
-            control: 'boolean',
-            description: 'When `true`, displays the status label text.',
-        },
-        private: {
-            control: 'boolean',
-            description: 'When `true`, changes the appearance of published status to indicate private content.',
         },
     },
 } satisfies Meta<typeof StatusIndicator>;

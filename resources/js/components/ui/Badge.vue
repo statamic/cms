@@ -6,16 +6,27 @@ import Icon from './Icon/Icon.vue';
 import { Link } from '@inertiajs/vue3';
 
 const props = defineProps({
+    /** Appended text */
     append: { type: [String, Number, Boolean, null], default: null },
+    /** The element or component this component should render as */
     as: { type: String, default: 'div' },
+    /** Controls the color of the badge. Options: `default`, `amber`, `black`, `blue`, `cyan`, `emerald`, `fuchsia`, `green`, `indigo`, `lime`, `orange`, `pink`, `purple`, `red`, `rose`, `sky`, `teal`, `violet`, `white`, `yellow` */
     color: { type: String, default: 'default' },
+    /** URL to link to */
     href: { type: String, default: null },
+    /** When `href` is provided, this prop controls the link's `target` attribute */
     target: { type: String, default: null },
+    /** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
     icon: { type: String, default: null },
+    /** Icon name. Will display after the text. [Browse available icons](/?path=/story/components-icon--all-icons) */
     iconAppend: { type: String, default: null },
+    /** When `true`, the badge will be displayed as a pill */
     pill: { type: Boolean, default: false },
+    /** Prepended text */
     prepend: { type: [String, Number, Boolean, null], default: null },
+    /** Controls the size of the badge. Options: `sm`, `default`, `lg` */
     size: { type: String, default: 'default' },
+    /** Text to display in the badge */
     text: { type: [String, Number, Boolean, null], default: null },
 });
 

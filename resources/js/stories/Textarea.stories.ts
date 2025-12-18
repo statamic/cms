@@ -5,24 +5,9 @@ const meta = {
     title: 'Components/Textarea',
     component: Textarea,
     argTypes: {
-        elastic: { control: 'boolean' },
-        disabled: { control: 'boolean' },
-        id: { control: 'text' },
-        readOnly: { control: 'boolean' },
-        required: { control: 'boolean' },
         resize: {
             control: 'select',
-            description: 'Determines how (and if) the textarea should be resized. <br><br> Options: `both`, `horizontal`, `vertical`, `none`',
             options: ['both', 'horizontal', 'vertical', 'none'],
-        },
-        rows: { control: 'number' },
-        modelValue: {
-            control: 'text',
-            description: 'The controlled value of the textarea.',
-        },
-        limit: {
-            control: 'number',
-            description: 'Specify a character limit',
         },
         'update:modelValue': {
             description: 'Event handler called when the textarea is updated.',

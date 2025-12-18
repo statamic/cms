@@ -5,11 +5,17 @@ import Icon from './Icon/Icon.vue';
 import { Link } from '@inertiajs/vue3';
 
 const props = defineProps({
+    /** URL to link to */
     href: { type: [String, null], default: null },
+    /** When `href` is provided, this prop controls the link's `target` attribute */
     target: { type: String, default: null },
+    /** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
     icon: { type: [String, null], default: null },
+    /** Controls the heading level, `h1`, `h2`, etc */
     level: { type: [Number, null], default: null },
+    /** Controls the size of the heading. Options: `base`, `lg`, `xl`, `2xl` */
     size: { type: String, default: 'base' },
+    /** The heading text to display */
     text: { type: [String, Number, Boolean, null], default: null },
 });
 

@@ -4,24 +4,7 @@ import {Field, Input, Label} from '@ui';
 const meta = {
     title: 'Components/Label',
     component: Label,
-    argTypes: {
-        for: {
-            control: 'text',
-            description: 'The ID of the form element this label is for.',
-        },
-        badge: {
-            control: 'text',
-            description: 'Optional badge text to display on the right side of the label.',
-        },
-        required: {
-            control: 'boolean',
-            description: 'When `true`, displays a red asterisk indicating the field is required.',
-        },
-        text: {
-            control: 'text',
-            description: 'The label text to display.',
-        },
-    },
+    argTypes: {},
 } satisfies Meta<typeof Label>;
 
 export default meta;

@@ -4,16 +4,27 @@ import { computed } from 'vue';
 import { cva } from 'cva';
 
 const props = defineProps({
+    /** Controls the vertical alignment of the checkbox with its label. Options: `start`, `center` */
     align: { type: String, default: 'start', validator: (value) => ['start', 'center'].includes(value) },
+    /** Description text to display below the label */
     description: { type: String, default: null },
+    /** When `true`, disables the checkbox */
     disabled: { type: Boolean, default: false },
+    /** Label text to display next to the checkbox */
     label: { type: String, default: null },
+    /** The checked state of the checkbox */
     modelValue: { type: [Boolean, null], default: null },
+    /** Name attribute for the checkbox input */
     name: { type: String, default: null },
+    /** When `true`, makes the checkbox read-only */
     readOnly: { type: Boolean, default: false },
+    /** Controls the size of the checkbox. Options: `sm`, `base` */
     size: { type: String, default: 'base' },
+    /** When `true`, hides the label and description. Use this when the checkbox is used in a context where the label is provided elsewhere, like in a table cell */
     solo: { type: Boolean, default: false },
+    /** Tab index for keyboard navigation */
     tabindex: { type: Number, default: null },
+    /** Value of the checkbox when used in a group */
     value: { type: [String, Number, Boolean] },
 });
 

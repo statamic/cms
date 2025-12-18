@@ -9,26 +9,14 @@ const meta = {
         Subheading,
     },
     argTypes: {
-        href: { control: 'text' },
-        target: {
-            control: 'text',
-            description: "When `href` is provided, this prop controls the link's `target` attribute.",
-        },
         icon: {
             control: 'select',
             options: icons,
-            description: 'Icon name. [Browse available icons](/?path=/story/components-icon--all-icons)',
-        },
-        level: {
-            control: 'number',
-            description: 'Controls the heading level, `h1`, `h2`, etc'
         },
         size: {
             control: 'select',
-            description: 'Controls the size of the heading. <br><br> Options: `base`, `lg`, `xl`, `2xl`',
             options: ['base', 'lg', 'xl', '2xl'],
         },
-        text: { control: 'text' },
     },
 } satisfies Meta<typeof Heading>;
 

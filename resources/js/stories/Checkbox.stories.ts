@@ -7,47 +7,13 @@ const meta = {
     component: Checkbox,
     subcomponents: { CheckboxGroup },
     argTypes: {
-        modelValue: {
-            control: 'boolean',
-            description: 'The checked state of the checkbox.',
-        },
-        label: {
-            control: 'text',
-            description: 'Label text to display next to the checkbox.',
-        },
-        description: {
-            control: 'text',
-            description: 'Description text to display below the label.',
-        },
-        value: {
-            control: 'text',
-            description: 'Value of the checkbox when used in a group.',
-        },
-        disabled: {
-            control: 'boolean',
-            description: 'When `true`, disables the checkbox.',
-        },
-        readOnly: {
-            control: 'boolean',
-            description: 'When `true`, makes the checkbox read-only.',
-        },
         size: {
             control: 'select',
             options: ['sm', 'base'],
-            description: 'Controls the size of the checkbox.',
         },
         align: {
             control: 'select',
             options: ['start', 'center'],
-            description: 'Controls the vertical alignment of the checkbox with its label.',
-        },
-        solo: {
-            control: 'boolean',
-            description: 'When `true`, hides the label and description. Use this when the checkbox is used in a context where the label is provided elsewhere, like in a table cell.',
-        },
-        name: {
-            control: 'text',
-            description: 'Name attribute for the checkbox input.',
         },
         'update:modelValue': {
             description: 'Event handler called when the checkbox is checked or unchecked.',

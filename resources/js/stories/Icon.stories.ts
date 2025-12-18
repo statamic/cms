@@ -9,12 +9,7 @@ const meta = {
     argTypes: {
         name: {
             control: 'select',
-            description: 'Icon name',
             options: icons,
-        },
-        set: {
-            control: 'text',
-            description: 'Name of the icon set.',
         },
     },
 } satisfies Meta<typeof Icon>;

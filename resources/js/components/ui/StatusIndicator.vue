@@ -2,14 +2,18 @@
 import { computed } from 'vue';
 
 const props = defineProps({
+    /** The status to display. Options: `published`, `scheduled`, `expired`, `draft`, `hidden` */
     status: {
         type: String,
         required: false,
         default: 'published',
         validator: (value) => ['published', 'scheduled', 'expired', 'draft', 'hidden'].includes(value),
     },
+    /** When `true`, displays a colored dot indicator */
     showDot: { type: Boolean, default: true },
+    /** When `true`, displays the status label text */
     showLabel: { type: Boolean, default: false },
+    /** When `true`, indicates the entry is private */
     private: { type: Boolean, default: false },
 });
 

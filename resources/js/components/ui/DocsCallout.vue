@@ -3,7 +3,9 @@ import { CommandPaletteItem, Badge } from '@ui';
 import { computed } from 'vue';
 
 const props = defineProps({
+    /** Topic of the documentation you're linking to */
     topic: { type: String, required: true },
+    /** The URL to link to. Can be a full URL or a relative path that will be prepended with `https://statamic.dev/` */
     url: { type: String, required: true },
 });
 

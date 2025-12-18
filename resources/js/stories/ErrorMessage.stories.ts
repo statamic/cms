@@ -4,12 +4,7 @@ import {ErrorMessage} from '@ui';
 const meta = {
     title: 'Components/ErrorMessage',
     component: ErrorMessage,
-    argTypes: {
-        text: {
-            control: 'text',
-            description: 'The error message to display.',
-        },
-    },
+    argTypes: {},
 } satisfies Meta<typeof ErrorMessage>;
 
 export default meta;

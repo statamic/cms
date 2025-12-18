@@ -12,29 +12,53 @@ const slots = useSlots();
 const attrs = useAttrs();
 
 const props = defineProps({
+    /** Appended text */
     append: { type: String, default: null },
+    /** Badge text to display on the right side */
     badge: { type: String, default: null },
+    /** When `true`, shows a clear button to empty the input */
     clearable: { type: Boolean, default: false },
+    /** When `true`, shows a copy button to copy the value to clipboard */
     copyable: { type: Boolean, default: false },
+    /** When `true`, disables the input */
     disabled: { type: Boolean, default: false },
+    /** When `true`, makes the input read-only */
     readOnly: { type: Boolean, default: false },
+    /** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
     icon: { type: String, default: null },
+    /** Icon name. Will display after the text. [Browse available icons](/?path=/story/components-icon--all-icons) */
     iconAppend: { type: String, default: null },
+    /** Icon name. Will display before the text. [Browse available icons](/?path=/story/components-icon--all-icons) */
     iconPrepend: { type: String, default: null },
+    /** ID attribute for the input element */
     id: { type: String, default: () => useId() },
+    /** Specify a character limit */
     limit: { type: Number, default: null },
+    /** When `true`, an animated loading indicator will show next to the input */
     loading: { type: Boolean, default: false },
+    /** The controlled value of the input */
     modelValue: { type: [String, Number], default: null },
+    /** Placeholder text */
     placeholder: { type: String, default: null },
+    /** Prepended text */
     prepend: { type: String, default: null },
+    /** When `true`, marks the field as required */
     required: { type: Boolean, default: false },
+    /** Controls the size of the input. Options: `xs`, `sm`, `base`, `lg` */
     size: { type: String, default: 'base' },
+    /** Tab index for keyboard navigation */
     tabindex: { type: Number, default: null },
+    /** Input type attribute */
     type: { type: String, default: 'text' },
+    /** Controls the appearance of the input. Options: `default`, `filled` */
     variant: { type: String, default: 'default' },
+    /** When `true`, shows an eye icon to toggle password visibility */
     viewable: { type: Boolean, default: false },
+    /** When `true`, autofocuses the input on mount */
     focus: { type: Boolean, default: false },
+    /** Additional attributes to apply to the input element */
     inputAttrs: { type: [Object, String], default: () => ({}) },
+    /** Additional CSS classes for the input element */
     inputClass: { type: String, default: '' },
 });
 

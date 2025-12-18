@@ -4,12 +4,7 @@ import {Avatar} from '@ui';
 const meta = {
     title: 'Components/Avatar',
     component: Avatar,
-    argTypes: {
-        user: {
-            control: 'object',
-            description: 'Object with optional properties: `name`, `initials`, `avatar`',
-        },
-    },
+    argTypes: {},
 } satisfies Meta<typeof Avatar>;
 
 export default meta;
