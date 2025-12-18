@@ -195,12 +195,8 @@
 =================================================== */
 @layer ui {
     .bard-floating-toolbar {
-        @apply flex rounded-full bg-black px-2 shadow-lg whitespace-nowrap z-(--z-index-portal) relative;
-
-        /* .bard-floating-toolbar is usually encapsulated with an absolutely positioned div. We need to pull this above other things such as theads, e.g. Grid fieldtype > Bard fieldtype > floating toolbar. */
-        [style*="position: absolute"]:has(> &) {
-            z-index: var(--z-index-max);
-        }
+        /* We need to pull this above other things such as theads, e.g. Grid fieldtype > Bard fieldtype > floating toolbar. */
+        @apply flex rounded-full bg-black px-2 shadow-lg whitespace-nowrap z-(--z-index-max) relative;
 
         &:before {
             @apply border-t-black top-full start-1/2 absolute -ml-[3px] content-none border-6 border-transparent;
