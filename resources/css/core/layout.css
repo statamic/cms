@@ -38,24 +38,28 @@
 
     ul li ul li a.active {
         @apply text-black dark:text-white font-medium bg-transparent;
-        &::before {
-            content: '';
-            position: absolute;
-            left: -1px;
-            @apply h-4 border-s border-s-black;
-        }
-        :where(.dark) &::before {
-            @apply border-s-gray-400;
-        }
     }
-
-/* Less distracting for single-subnav items */
-    ul li ul li:only-child a.active {
-        &::before {
-            @apply border-s-gray-400;
+    ul li ul li {
+        a.active {
+            /* [1] Add a little vertical line to indicate the "active" subnav item */
+            &::before {
+                content: '';
+                position: absolute;
+                left: -1px;
+                @apply h-4 border-s border-s-black;
+            }
+            :where(.dark) &::before {
+                @apply border-s-gray-400;
+            }
         }
-        :where(.dark) &::before {
-            @apply border-s-gray-500;
+        &:only-child a.active {
+            /* [/2] Make the "active" subnav item less distracting for single-subnav items such as Assets/assets */
+            &::before {
+                @apply border-s-gray-400;
+            }
+            :where(.dark) &::before {
+                @apply border-s-gray-500;
+            }
         }
     }
 
