@@ -45,7 +45,17 @@
             @apply h-4 border-s border-s-black;
         }
         :where(.dark) &::before {
-            @apply border-s-white;
+            @apply border-s-gray-400;
+        }
+    }
+
+/* Less distracting for single-subnav items */
+    ul li ul li:only-child a.active {
+        &::before {
+            @apply border-s-gray-400;
+        }
+        :where(.dark) &::before {
+            @apply border-s-gray-500;
         }
     }
 
