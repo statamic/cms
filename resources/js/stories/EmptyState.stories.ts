@@ -33,7 +33,7 @@ const defaultCode = `
     <EmptyStateItem
         icon="fieldtype-entries"
         heading="Create Entry"
-        description="Create the first entry or stub out a handful of placeholder entries—whatever suits your needs."
+        description="Create the first entry or stub out a handful of placeholder entries - whatever suits your needs."
         :href="cp_url('collections/blog/create')"
     />
     <EmptyStateItem
@@ -70,7 +70,7 @@ const withSlotCode = `
     <EmptyStateItem
         icon="fieldtype-entries"
         heading="Create Entry"
-        description="Create the first entry or stub out a handful of placeholder entries—whatever suits your needs."
+        description="Create the first entry or stub out a handful of placeholder entries - whatever suits your needs."
     >
         <a href="#" class="text-blue-600 text-sm rtl:ml-2 ltr:mr-2">Post</a>
         <a href="#" class="text-blue-600 text-sm rtl:ml-2 ltr:mr-2">Link</a>
@@ -103,7 +103,7 @@ const noLinksCode = `
     <EmptyStateItem
         icon="fieldtype-entries"
         heading="Create Entry"
-        description="Create the first entry or stub out a handful of placeholder entries—whatever suits your needs."
+        description="Create the first entry or stub out a handful of placeholder entries - whatever suits your needs."
         @click="createEntry"
     />
 </EmptyStateMenu>

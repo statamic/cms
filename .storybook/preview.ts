@@ -92,10 +92,9 @@ const preview: Preview = {
         options: {
             storySort: {
                 order: [
-                    // 'Getting Started',
-                    // 'Installation',
-                    '*',
-                    'Components'
+                    'Overview',
+                    'Components',
+                    '*'
                 ],
                 method: 'alphabetical',
             },
