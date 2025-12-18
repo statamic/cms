@@ -38,7 +38,7 @@ const visibleMainTabs = computed(() => {
     });
 });
 const hasMultipleVisibleMainTabs = computed(() => visibleMainTabs.value.length > 1);
-const shouldShowSidebar = computed(() => false);
+const shouldShowSidebar = computed(() => (slots.actions || sidebarTab.value) && width.value > 920);
 const activeTab = ref(visibleMainTabs.value[0].handle);
 
 onMounted(() => setActiveTabFromHash());
@@ -125,12 +125,12 @@ function tabHasError(tab) {
                                 <Sections />
                             </slot>
 
-<!--                            <slot v-if="!shouldShowSidebar" name="actions" />-->
+                            <slot v-if="!shouldShowSidebar" name="actions" />
                         </TabProvider>
                     </component>
 
                     <aside class="space-y-6 starting-style-transition-children" v-if="shouldShowSidebar">
-<!--                        <slot name="actions" />-->
+                        <slot name="actions" />
                         <TabProvider v-if="sidebarTab" :tab="sidebarTab">
                             <Sections />
                         </TabProvider>
