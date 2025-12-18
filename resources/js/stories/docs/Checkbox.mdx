@@ -5,28 +5,28 @@ import * as CheckboxStories from '../Checkbox.stories';
 
 # Checkbox
 A checkbox input component with label and description support. Can be used individually or as part of a checkbox group.
-<Canvas of={CheckboxStories.Basic} />
+<Canvas of={CheckboxStories._DocsIntro} sourceState={'shown'} />
 
 ## With Description
-<Canvas of={CheckboxStories.WithDescription} />
+<Canvas of={CheckboxStories.WithDescription} sourceState={'shown'} />
 
 ## Sizes
-<Canvas of={CheckboxStories.Sizes} />
+<Canvas of={CheckboxStories.Sizes} sourceState={'shown'} />
 
 ## Disabled
-<Canvas of={CheckboxStories.Disabled} />
+<Canvas of={CheckboxStories.Disabled} sourceState={'shown'} />
 
 ## Solo Mode
 Use `solo` when the checkbox is used in a context where the label is provided elsewhere, like in a table cell. The label is still required for accessibility but won't be visually displayed:
-<Canvas of={CheckboxStories.Solo} />
+<Canvas of={CheckboxStories.Solo} sourceState={'shown'} />
 
 ## Checkbox Group
 Group multiple checkboxes together with `CheckboxGroup`. The group manages the selected values as an array:
-<Canvas of={CheckboxStories.Group} />
+<Canvas of={CheckboxStories.Group} sourceState={'shown'} />
 
 ## Inline Group
 Use the `inline` prop to display checkboxes horizontally:
-<Canvas of={CheckboxStories.InlineGroup} />
+<Canvas of={CheckboxStories.InlineGroup} sourceState={'shown'} />
 
 ## Arguments
 <ArgTypes of={CheckboxStories} />

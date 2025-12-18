@@ -33,16 +33,12 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const basicCode = `<script setup>
-import { ref } from 'vue';
-const checked = ref(false);
-</script>
+const basicCode = `
+<Checkbox v-model="checked" label="Accept terms and conditions" />
+`;
 
-<template>
-    <Checkbox v-model="checked" label="Accept terms and conditions" />
-</template>`;
-
-export const Basic: Story = {
+export const _DocsIntro: Story = {
+    tags: ['!dev'],
     render: () => ({
         components: { Checkbox },
         setup() {
@@ -58,20 +54,16 @@ export const Basic: Story = {
     },
 };
 
-const withDescriptionCode = `<script setup>
-import { ref } from 'vue';
-const checked = ref(false);
-</script>
-
-<template>
-    <Checkbox 
-        v-model="checked" 
-        label="Subscribe to newsletter"
-        description="Receive weekly updates about new features and content"
-    />
-</template>`;
+const withDescriptionCode = `
+<Checkbox 
+    v-model="checked" 
+    label="Subscribe to newsletter"
+    description="Receive weekly updates about new features and content"
+/>
+`;
 
 export const WithDescription: Story = {
+    tags: ['!dev'],
     render: () => ({
         components: { Checkbox },
         setup() {
@@ -91,19 +83,15 @@ export const WithDescription: Story = {
     },
 };
 
-const sizesCode = `<script setup>
-import { ref } from 'vue';
-const checked = ref(false);
-</script>
-
-<template>
-    <div class="space-y-3">
-        <Checkbox v-model="checked" label="Small checkbox" size="sm" />
-        <Checkbox v-model="checked" label="Base checkbox" size="base" />
-    </div>
-</template>`;
+const sizesCode = `
+<div class="space-y-3">
+    <Checkbox v-model="checked" label="Small checkbox" size="sm" />
+    <Checkbox v-model="checked" label="Base checkbox" size="base" />
+</div>
+`;
 
 export const Sizes: Story = {
+    tags: ['!dev'],
     render: () => ({
         components: { Checkbox },
         setup() {
@@ -122,16 +110,12 @@ export const Sizes: Story = {
     },
 };
 
-const disabledCode = `<script setup>
-import { ref } from 'vue';
-const checked = ref(true);
-</script>
-
-<template>
-    <Checkbox v-model="checked" label="Disabled checkbox" disabled />
-</template>`;
+const disabledCode = `
+<Checkbox v-model="checked" label="Disabled checkbox" disabled />
+`;
 
 export const Disabled: Story = {
+    tags: ['!dev'],
     render: () => ({
         components: { Checkbox },
         setup() {
@@ -147,20 +131,16 @@ export const Disabled: Story = {
     },
 };
 
-const soloCode = `<script setup>
-import { ref } from 'vue';
-const checked = ref(false);
-</script>
-
-<template>
-    <Checkbox 
-        v-model="checked" 
-        label="Hidden label for accessibility"
-        solo
-    />
-</template>`;
+const soloCode = `
+<Checkbox 
+    v-model="checked" 
+    label="Hidden label for accessibility"
+    solo
+/>
+`;
 
 export const Solo: Story = {
+    tags: ['!dev'],
     render: () => ({
         components: { Checkbox },
         setup() {
@@ -180,21 +160,17 @@ export const Solo: Story = {
     },
 };
 
-const groupCode = `<script setup>
-import { ref } from 'vue';
-const selected = ref(['html', 'css']);
-</script>
-
-<template>
-    <CheckboxGroup v-model="selected">
-        <Checkbox value="html" label="HTML" />
-        <Checkbox value="css" label="CSS" />
-        <Checkbox value="javascript" label="JavaScript" />
-        <Checkbox value="vue" label="Vue.js" />
-    </CheckboxGroup>
-</template>`;
+const groupCode = `
+<CheckboxGroup v-model="selected">
+    <Checkbox value="html" label="HTML" />
+    <Checkbox value="css" label="CSS" />
+    <Checkbox value="javascript" label="JavaScript" />
+    <Checkbox value="vue" label="Vue.js" />
+</CheckboxGroup>
+`;
 
 export const Group: Story = {
+    tags: ['!dev'],
     render: () => ({
         components: { Checkbox, CheckboxGroup },
         setup() {
@@ -215,20 +191,16 @@ export const Group: Story = {
     },
 };
 
-const inlineGroupCode = `<script setup>
-import { ref } from 'vue';
-const selected = ref(['red']);
-</script>
-
-<template>
-    <CheckboxGroup v-model="selected" inline>
-        <Checkbox value="red" label="Red" />
-        <Checkbox value="green" label="Green" />
-        <Checkbox value="blue" label="Blue" />
-    </CheckboxGroup>
-</template>`;
+const inlineGroupCode = `
+<CheckboxGroup v-model="selected" inline>
+    <Checkbox value="red" label="Red" />
+    <Checkbox value="green" label="Green" />
+    <Checkbox value="blue" label="Blue" />
+</CheckboxGroup>
+`;
 
 export const InlineGroup: Story = {
+    tags: ['!dev'],
     render: () => ({
         components: { Checkbox, CheckboxGroup },
         setup() {
