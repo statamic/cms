@@ -5,6 +5,7 @@ import Description from './Description.vue';
 import Label from './Label.vue';
 import ErrorMessage from './ErrorMessage.vue';
 import markdown from '@/util/markdown.js';
+import { twMerge } from 'tailwind-merge';
 
 defineOptions({
     inheritAttrs: false,
@@ -33,7 +34,7 @@ const labelProps = computed(() => ({
 }));
 
 const rootClasses = computed(() =>
-    cva({
+    twMerge(cva({
         base: [
             'min-w-0',
         ],
@@ -45,28 +46,28 @@ const rootClasses = computed(() =>
                 true: 'grid grid-cols-2 items-start px-4.5 py-4 gap-x-5!',
             },
             fullWidthSetting: {
-                true: '!grid-cols-1',
+                true: 'grid-cols-1',
             },
         },
     })({
         ...props,
-    }),
+    })),
 );
 
 const descriptionClasses = computed(() =>
-    cva({
+    twMerge(cva({
         base: ['mb-2 -mt-0.5'],
         variants: {
             inline: {
-                true: 'mb-0!',
+                true: 'mb-0',
             },
             fullWidthSetting: {
-                true: 'mb-3!',
+                true: 'mb-3',
             },
         },
     })({
         ...props,
-    }),
+    })),
 );
 
 const instructions = computed(() => props.instructions ? markdown(__(props.instructions), { openLinksInNewTabs: true }) : null);
