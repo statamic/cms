@@ -5,6 +5,10 @@ import PortalTargets from "@/components/portals/PortalTargets.vue";
 const meta = {
     title: 'Overlays/Modal',
     component: Modal,
+    subcomponents: {
+        ModalTitle,
+        ModalClose,
+    },
     argTypes: {
         'dismissed': {
             description: 'Event handler called when the modal is dismissed.',
@@ -27,7 +31,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const defaultCode = `
-<Modal title="That's Pretty Neat">
+<Modal v-model:open="isOpen" title="That's Pretty Neat">
     <template #trigger>
         <Button text="How neat is that?" />
     </template>
@@ -43,12 +47,15 @@ export const _DocsIntro: Story = {
     },
     render: () => ({
         components: { Modal, Button, PortalTargets },
+        data: () => {
+            return { isOpen: false };
+        },
         template: `<div>${defaultCode}</div><PortalTargets />`,
     }),
 };
 
 const customTitleCode = `
-<Modal>
+<Modal v-model:open="isOpen">
     <template #trigger>
         <Button text="How neat is that?" />
     </template>
@@ -69,12 +76,15 @@ export const _CustomTitle: Story = {
     },
     render: () => ({
         components: { Modal, ModalTitle, Button },
+        data: () => {
+            return { isOpen: false };
+        },
         template: customTitleCode,
     }),
 };
 
 const closeButtonCode = `
-<Modal title="Hey look a close button" class="text-center">
+<Modal v-model:open="isOpen" title="Hey look a close button" class="text-center">
     <template #trigger>
         <Button text="Open Says Me" />
     </template>
@@ -93,12 +103,15 @@ export const _CloseButton: Story = {
     },
     render: () => ({
         components: { Modal, ModalClose, Button },
+        data: () => {
+            return { isOpen: false };
+        },
         template: closeButtonCode,
     }),
 };
 
 const iconCode = `
-<Modal title="That's Pretty Neat" icon="fire-flame-burn-hot">
+<Modal v-model:open="isOpen" title="That's Pretty Neat" icon="fire-flame-burn-hot">
     <template #trigger>
         <Button text="How neat is that?" />
     </template>
@@ -114,12 +127,15 @@ export const _WithIcon: Story = {
     },
     render: () => ({
         components: { Modal, Button },
+        data: () => {
+            return { isOpen: false };
+        },
         template: iconCode,
     }),
 };
 
 const footerCode = `
-<Modal title="Create new user">
+<Modal v-model:open="isOpen" title="Create new user">
     <template #trigger>
         <Button text="Create User" variant="primary" />
     </template>
@@ -159,6 +175,9 @@ export const _WithFooter: Story = {
     },
     render: () => ({
         components: { Modal, ModalClose, Button, Field, Input },
+        data: () => {
+            return { isOpen: false };
+        },
         template: footerCode,
     }),
 };
