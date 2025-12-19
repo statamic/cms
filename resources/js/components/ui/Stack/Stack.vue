@@ -263,7 +263,6 @@ export default {
                             this.focusTrap = createFocusTrap(this.$refs.stackContent, {
                                 escapeDeactivates: false, // We handle ESC separately
                                 returnFocusOnDeactivate: true,
-                                allowOutsideClick: true, // Allow clicks outside to work (e.g., hit area)
                                 initialFocus: () => findFirstInput() || undefined, // Focus first input if available
                             });
                         }
