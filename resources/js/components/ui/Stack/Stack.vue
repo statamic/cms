@@ -226,22 +226,6 @@ export default {
                     return;
                 }
 
-                // Find the first input field (prioritize inputs over buttons)
-                const findFirstInput = () => {
-                    // First, try to find an input, textarea, select, or contenteditable element
-                    const firstInput = this.$refs.stackContent.querySelector(
-                        'input:not([readonly]):not([type="hidden"]), textarea:not([readonly]), select, [contenteditable="true"]'
-                    );
-                    if (firstInput) {
-                        return firstInput;
-                    }
-                    // Fallback to any tabbable element
-                    const tabbable = this.$refs.stackContent.querySelector(
-                        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-                    );
-                    return tabbable;
-                };
-
                 // Check if there are any tabbable elements
                 const hasTabbableElements = () => {
                     const tabbable = this.$refs.stackContent.querySelectorAll(
@@ -259,11 +243,9 @@ export default {
 
                     if (hasTabbableElements()) {
                         if (!this.focusTrap) {
-                            // Use a function for initialFocus so it's evaluated at activation time
                             this.focusTrap = createFocusTrap(this.$refs.stackContent, {
                                 escapeDeactivates: false, // We handle ESC separately
                                 returnFocusOnDeactivate: true,
-                                initialFocus: () => findFirstInput() || undefined, // Focus first input if available
                             });
                         }
                         try {
