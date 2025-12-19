@@ -137,11 +137,29 @@ class Field implements Arrayable
 
     public function rules()
     {
-        $rules = [$this->handle => $this->addNullableRule(array_merge(
+        $temp_rules = collect($this->addNullableRule(array_merge(
             $this->get('required') ? ['required'] : [],
             Validator::explodeRules($this->fieldtype()->fieldRules()),
             Validator::explodeRules($this->fieldtype()->rules())
-        ))];
+        )));
+
+        $rules = [];
+        if ($this->type() === 'assets') {
+            $rules = $temp_rules->reduce(function ($result, $rule) {
+                // These rules need to be applied to the field as a whole vs each asset in the field
+                if (Str::of($rule)->before(':')->is(['array', 'required', 'nullable', 'max', 'min'])) {
+                    $result[$this->handle] ??= [];
+                    $result[$this->handle][] = $rule;
+                } else {
+                    $result["{$this->handle}.*"] ??= [];
+                    $result["{$this->handle}.*"][] = $rule;
+                }
+
+                return $result;
+            }, []);
+        } else {
+            $rules = [$this->handle => $temp_rules->all()];
+        }
 
         $extra = collect($this->fieldtype()->extraRules())->map(function ($rules) {
             return $this->addNullableRule(Validator::explodeRules($rules));

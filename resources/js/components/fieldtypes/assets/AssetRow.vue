@@ -24,11 +24,14 @@
             <button
                 v-if="showFilename"
                 @click="editOrOpen"
-                class="w-full truncate text-sm text-gray-600 dark:text-gray-400 text-start"
+                class="flex flex-col w-full flex-1 justify-center gap-1 truncate text-sm text-gray-600 dark:text-gray-400 text-start"
                 :title="__('Edit')"
                 :aria-label="__('Edit Asset')"
             >
-                {{ asset.basename }}
+                <div>{{ asset.basename }}</div>
+                <template v-if="errors.length">
+                    <small class="text-xs text-red-500" v-for="(error, i) in errors" :key="i" v-text="error" />
+                </template>
             </button>
         </td>
         <td class="absolute top-0 right-0 flex items-center bg-gradient-to-r to-20% from-transparent to-white dark:to-gray-900 p-3 ps-[2rem] align-middle text-end group-hover:to-gray-50 dark:group-hover:to-gray-900">
