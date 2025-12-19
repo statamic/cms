@@ -195,7 +195,8 @@
 =================================================== */
 @layer ui {
     .bard-floating-toolbar {
-        @apply flex rounded-full bg-black px-2 shadow-lg whitespace-nowrap z-(--z-index-portal) relative;
+        /* We need to pull this above other things such as theads, e.g. Grid fieldtype > Bard fieldtype > floating toolbar. */
+        @apply flex rounded-full bg-black px-2 shadow-lg whitespace-nowrap z-(--z-index-draggable) relative;
 
         &:before {
             @apply border-t-black top-full start-1/2 absolute -ml-[3px] content-none border-6 border-transparent;

@@ -65,14 +65,14 @@ const calendarBindings = computed(() => ({
 }));
 
 const inputEvents = computed(() => ({
-	focusout: (event) => {
-		if (props.modelValue?.year.toString().length === 2) {
-			let value = props.modelValue;
-			value.year = '20' + value.year;
+    focusout: (event) => {
+        if (props.modelValue?.year.toString().length === 2) {
+            let value = props.modelValue;
+            value.year = '20' + value.year;
 
-			emit('update:modelValue', value);
-		}
-	},
+            emit('update:modelValue', value);
+        }
+    },
 }));
 
 const calendarEvents = computed(() => ({
@@ -129,13 +129,14 @@ const getInputLabel = (part) => {
             role="group"
             :aria-label="__('Date picker')"
             :aria-required="required"
+            close-on-select
         >
             <DatePickerField v-slot="{ segments }" class="w-full">
                 <DatePickerAnchor as-child>
                     <div
                         :class="[
                             'flex w-full items-center bg-white uppercase dark:bg-gray-900',
-                            'border border-gray-300 dark:border-x-0 dark:border-t-0 dark:border-white/10 dark:inset-shadow-2xs dark:inset-shadow-black',
+                            'border border-gray-300 dark:border-gray-700',
                             'text-gray-600 dark:text-gray-300',
                             'shadow-ui-sm not-prose h-10 rounded-lg px-2 disabled:shadow-none',
                             'data-invalid:border-red-500',
@@ -155,28 +156,28 @@ const getInputLabel = (part) => {
                         </DatePickerTrigger>
                         <div class="flex items-center flex-1">
                             <template v-for="item in segments" :key="item.part">
-	                            <div v-if="item.part === 'literal'">
-	                                <DatePickerInput
-	                                    :part="item.part"
-	                                    :class="{ 'text-sm text-gray-600 dark:text-gray-400 antialiased': !item.contenteditable }"
-	                                    v-on="inputEvents"
-	                                >
-	                                    {{ item.value }}
-	                                </DatePickerInput>
-	                            </div>
-	                            <div v-else>
-		                            <DatePickerInput
-			                            :part="item.part"
-			                            class="rounded-sm px-0.25 py-0.5 focus:bg-blue-100 focus:outline-hidden data-placeholder:text-gray-600 dark:focus:bg-blue-900 dark:data-placeholder:text-gray-400"
-			                            :class="{
-	                                        'px-0.5!': item.part === 'month' || item.part === 'year' || item.part === 'day',
-	                                    }"
-			                            :aria-label="getInputLabel(item.part)"
-			                            v-on="inputEvents"
-		                            >
-			                            {{ item.value }}
-		                            </DatePickerInput>
-	                            </div>
+                                <div v-if="item.part === 'literal'">
+                                    <DatePickerInput
+                                        :part="item.part"
+                                        :class="{ 'text-sm text-gray-600 dark:text-gray-400 antialiased': !item.contenteditable }"
+                                        v-on="inputEvents"
+                                    >
+                                        {{ item.value }}
+                                    </DatePickerInput>
+                                </div>
+                                <div v-else>
+                                    <DatePickerInput
+                                        :part="item.part"
+                                        class="rounded-sm px-0.25 py-0.5 focus:bg-blue-100 focus:outline-hidden data-placeholder:text-gray-600 dark:focus:bg-blue-900 dark:data-placeholder:text-gray-400"
+                                        :class="{
+                                            'px-0.5!': item.part === 'month' || item.part === 'year' || item.part === 'day',
+                                        }"
+                                        :aria-label="getInputLabel(item.part)"
+                                        v-on="inputEvents"
+                                    >
+                                        {{ item.value }}
+                                    </DatePickerInput>
+                                </div>
                             </template>
                         </div>
                         <Button

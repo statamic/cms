@@ -5,13 +5,14 @@ import Description from './Description.vue';
 import Label from './Label.vue';
 import ErrorMessage from './ErrorMessage.vue';
 import markdown from '@/util/markdown.js';
+import { twMerge } from 'tailwind-merge';
 
 defineOptions({
     inheritAttrs: false,
 });
 
 const props = defineProps({
-    asConfig: { type: Boolean, default: false },
+    inline: { type: Boolean, default: false },
     badge: { type: String, default: '' },
     disabled: { type: Boolean, default: false },
     error: { type: String },
@@ -23,7 +24,6 @@ const props = defineProps({
     label: { type: String },
     readOnly: { type: Boolean, default: false },
     required: { type: Boolean, default: false },
-    variant: { type: String, default: 'block' },
 });
 
 const labelProps = computed(() => ({
@@ -33,58 +33,41 @@ const labelProps = computed(() => ({
     text: props.label,
 }));
 
-const inline = computed(() => props.asConfig ? true : props.variant === 'inline');
-
 const rootClasses = computed(() =>
-    cva({
+    twMerge(cva({
         base: [
             'min-w-0',
         ],
         variants: {
-            variant: {
-                block: 'w-full',
-                inline: [
-                    'flex justify-between gap-x-7 gap-y-1.5',
-                    'has-[[data-ui-label]~[data-ui-control]]:grid-cols-[1fr_auto]',
-                    'has-[[data-ui-control]~[data-ui-label]]:grid-cols-[auto_1fr]',
-                    '[&>[data-ui-control]~[data-ui-description]]:row-start-2 [&>[data-ui-control]~[data-ui-description]]:col-start-2',
-                    '[&>[data-ui-label]~[data-ui-control]]:row-start-1 [&>[data-ui-label]~[data-ui-control]]:col-start-2',
-                ],
-            },
             disabled: {
                 true: 'opacity-50',
             },
-            asConfig: {
+            inline: {
                 true: 'grid grid-cols-2 items-start px-4.5 py-4 gap-x-5!',
             },
             fullWidthSetting: {
-                true: '!grid-cols-1',
+                true: 'grid-cols-1',
             },
         },
     })({
         ...props,
-        inline: inline.value,
-        asConfig: props.asConfig,
-        fullWidthSetting: props.fullWidthSetting,
-    }),
+    })),
 );
 
 const descriptionClasses = computed(() =>
-    cva({
+    twMerge(cva({
         base: ['mb-2 -mt-0.5'],
         variants: {
             inline: {
-                true: 'mb-0!',
+                true: 'mb-0',
             },
-            fullWidth: {
-                true: 'mb-3!',
+            fullWidthSetting: {
+                true: 'mb-3',
             },
         },
     })({
         ...props,
-        inline: inline.value,
-        fullWidth: props.fullWidthSetting,
-    }),
+    })),
 );
 
 const instructions = computed(() => props.instructions ? markdown(__(props.instructions), { openLinksInNewTabs: true }) : null);
