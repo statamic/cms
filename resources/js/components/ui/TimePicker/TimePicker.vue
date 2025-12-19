@@ -5,10 +5,14 @@ import Button from '../Button/Button.vue';
 const emit = defineEmits(['update:modelValue']);
 
 const props = defineProps({
+    /** Badge text to display. */
     badge: { type: String, default: null },
     required: { type: Boolean, default: false },
+    /** The controlled time value. */
     modelValue: { type: Object, default: null },
+    /** The granularity of the time picker. <br><br> Options: `hour`, `minute`, `second` */
     granularity: { type: String, default: null },
+    /** When `true`, clear and "set to now" buttons are displayed. */
     clearable: { type: Boolean, default: true },
 });
 

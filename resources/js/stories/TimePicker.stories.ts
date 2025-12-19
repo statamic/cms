@@ -6,23 +6,9 @@ const meta = {
     title: 'Forms/TimePicker',
     component: TimePicker,
     argTypes: {
-        modelValue: {
-            control: 'object',
-            description: 'The controlled time value.',
-        },
-        badge: {
-            control: 'text',
-            description: 'Badge text to display.',
-        },
-        required: { control: 'boolean' },
         granularity: {
             control: 'select',
-            description: 'The granularity of the time picker. <br><br> Options: `hour`, `minute`, `second`',
             options: ['hour', 'minute', 'second'],
-        },
-        clearable: {
-            control: 'boolean',
-            description: 'When `true`, clear and "set to now" buttons are displayed.',
         },
         'update:modelValue': {
             description: 'Event handler called when the time value changes.',

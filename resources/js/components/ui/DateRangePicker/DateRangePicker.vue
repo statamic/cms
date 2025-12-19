@@ -28,13 +28,20 @@ import { parseAbsoluteToLocal } from '@internationalized/date';
 const emit = defineEmits(['update:modelValue']);
 
 const props = defineProps({
+    /** Badge text to display. */
     badge: { type: String, default: null },
     required: { type: Boolean, default: false },
+    /** The controlled date range value with `start` and `end` properties. <br><br> Each should be an ISO 8601 date and time string with a UTC offset (eg. `2021-11-07T07:45:00Z` or `2021-11-07T07:45:00-07:00`) */
     modelValue: { type: [Object, String], default: null },
+    /** The minimum selectable date. <br><br> Should be an ISO 8601 date and time string with a UTC offset (eg. `2021-11-07T07:45:00Z` or `2021-11-07T07:45:00-07:00`) */
     min: { type: [String, Object], default: null },
+    /** The maximum selectable date. <br><br> Should be an ISO 8601 date and time string with a UTC offset (eg. `2021-11-07T07:45:00Z` or `2021-11-07T07:45:00-07:00`) */
     max: { type: [String, Object], default: null },
+    /** The granularity of the date range picker. <br><br> Options: `day`, `hour`, `minute`, `second` */
     granularity: { type: String, default: null },
+    /** When `true`, the calendar is always visible instead of appearing in a popover. */
     inline: { type: Boolean, default: false },
+    /** When `true`, a clear button is displayed to reset the date range. */
     clearable: { type: Boolean, default: true },
     disabled: { type: Boolean, default: false },
     readOnly: { type: Boolean, default: false },

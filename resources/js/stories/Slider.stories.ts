@@ -6,42 +6,12 @@ const meta = {
     title: 'Forms/Slider',
     component: Slider,
     argTypes: {
-        description: {
-            control: 'text',
-            description: 'Description text for the slider.',
-        },
-        id: {
-            control: 'text',
-            description: 'ID attribute for the slider.',
-        },
-        label: {
-            control: 'text',
-            description: 'Label text for the slider.',
-        },
-        modelValue: {
-            control: 'number',
-            description: 'The controlled value of the slider.',
-        },
-        min: {
-            control: 'number',
-            description: 'The minimum value of the slider.',
-        },
-        max: {
-            control: 'number',
-            description: 'The maximum value of the slider.',
-        },
-        step: {
-            control: 'number',
-            description: 'The step increment for the slider.',
-        },
         size: {
             control: 'select',
-            description: 'Controls the size of the slider. <br><br> Options: `sm`, `base`',
             options: ['sm', 'base'],
         },
         variant: {
             control: 'select',
-            description: 'Controls the appearance of the slider. <br><br> Options: `default`',
             options: ['default'],
         },
         'update:modelValue': {

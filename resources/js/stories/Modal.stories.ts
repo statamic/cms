@@ -6,11 +6,20 @@ const meta = {
     title: 'Overlays/Modal',
     component: Modal,
     argTypes: {
-        title: { control: 'text' },
-        icon: { control: 'text' },
-        blur: { control: 'boolean' },
-        dismissible: { control: 'boolean' },
-        open: { control: 'boolean' },
+        'dismissed': {
+            description: 'Event handler called when the modal is dismissed.',
+            table: {
+                category: 'events',
+                type: { summary: '() => void' },
+            },
+        },
+        'update:open': {
+            description: 'Event handler called when the open state of the modal changes.',
+            table: {
+                category: 'events',
+                type: { summary: '(value: boolean) => void' },
+            },
+        },
     },
 } satisfies Meta<typeof Modal>;
 

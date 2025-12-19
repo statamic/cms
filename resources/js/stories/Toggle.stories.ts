@@ -9,28 +9,14 @@ const meta = {
         ToggleItem,
     },
     argTypes: {
-        modelValue: {
-            control: 'text',
-            description: 'The controlled value of the toggle group.',
-            table: {
-                type: { summary: 'string | string[]' }
-            }
-        },
         size: {
             control: 'select',
-            description: 'Controls the size of the toggle items. <br><br> Options: `xs`, `sm`, `base`',
             options: ['xs', 'sm', 'base'],
         },
         variant: {
             control: 'select',
-            description: 'Controls the appearance of the toggle items. <br><br> Options: `default`, `primary`, `filled`, `ghost`',
             options: ['default', 'primary', 'filled', 'ghost'],
         },
-        multiple: {
-            control: 'boolean',
-            description: 'When `true`, multiple items can be selected',
-        },
-        required: { control: 'boolean' },
         'update:modelValue': {
             description: 'Event handler called when the selected options change.',
             table: {

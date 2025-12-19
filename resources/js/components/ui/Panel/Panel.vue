@@ -4,7 +4,9 @@ import Heading from '../Heading.vue';
 import Subheading from '../Subheading.vue';
 
 const props = defineProps({
+    /** Heading text for the panel */
     heading: { type: String, default: null },
+    /** Subheading text below the heading */
     subheading: { type: String, default: null },
 });
 </script>

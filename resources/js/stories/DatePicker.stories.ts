@@ -7,42 +7,10 @@ const meta = {
     title: 'Forms/DatePicker',
     component: DatePicker,
     argTypes: {
-        modelValue: {
-            control: 'object',
-            description: 'The controlled date value. <br><br> Should be an ISO 8601 date and time string with a UTC offset (eg. `2021-11-07T07:45:00Z` or `2021-11-07T07:45:00-07:00`)',
-        },
-        badge: {
-            control: 'text',
-            description: 'Badge text to display.',
-        },
-        required: { control: 'boolean' },
-        min: {
-            control: 'object',
-            description: 'The minimum selectable date. <br><br> Should be an ISO 8601 date and time string with a UTC offset (eg. `2021-11-07T07:45:00Z` or `2021-11-07T07:45:00-07:00`)',
-        },
-        max: {
-            control: 'object',
-            description: 'The maximum selectable date. <br><br> Should be an ISO 8601 date and time string with a UTC offset (eg. `2021-11-07T07:45:00Z` or `2021-11-07T07:45:00-07:00`)',
-        },
         granularity: {
             control: 'select',
-            description: 'The granularity of the date picker. <br><br> Options: `day`, `hour`, `minute`, `second`',
             options: ['day', 'hour', 'minute', 'second'],
         },
-        inline: {
-            control: 'boolean',
-            description: 'When `true`, the calendar is always visible instead of appearing in a popover.',
-        },
-        numberOfMonths: {
-            control: 'number',
-            description: 'The number of months to display in the calendar.',
-        },
-        clearable: {
-            control: 'boolean',
-            description: 'When `true`, a clear button is displayed to reset the date.',
-        },
-        disabled: { control: 'boolean' },
-        readOnly: { control: 'boolean' },
         'update:modelValue': {
             description: 'Event handler called when the date value changes. Returns the date as an ISO 8601 date and time string.',
             table: {

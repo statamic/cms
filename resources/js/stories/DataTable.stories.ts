@@ -12,7 +12,6 @@ const meta = {
     argTypes: {
         variant: {
             control: 'select',
-            description: 'Controls the size and spacing of the table. <br><br> Options: `normal`, `compact`',
             options: ['normal', 'compact'],
         },
     },

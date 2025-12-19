@@ -9,14 +9,6 @@ const meta = {
         icon: {
             control: 'select',
             options: icons,
-            description: 'Icon name. [Browse available icons](/?path=/story/components-icon--all-icons)',
-        },
-        title: {
-            control: 'text',
-            description: 'The title text displayed in the header.',
-            table: {
-                category: 'props'
-            }
         },
     },
 } satisfies Meta<typeof Header>;

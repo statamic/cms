@@ -8,28 +8,10 @@ const meta = {
         align: {
             control: 'select',
             options: ['start', 'center', 'end'],
-            description: 'The preferred alignment against the trigger. May change when collisions occur. Options: `start`, `center`, `end`',
-        },
-        arrow: {
-            control: 'boolean',
-            description: 'When `true`, an arrow is displayed near the trigger.'
-        },
-        inset: {
-            control: 'boolean',
-            description: 'When `true`, the internal padding of the popover is removed.',
-        },
-        offset: {
-            control: 'number',
-            description: 'The distance in pixels from the trigger',
         },
         side: {
             control: 'select',
             options: ['top', 'bottom', 'left', 'right'],
-            description: 'The preferred side of the trigger to render against when open. Options: `top`, `bottom`, `left`, `right`',
-        },
-        open: {
-            control: 'boolean',
-            description: 'The controlled open state of the popover.',
         },
         'update:open': {
             description: 'Event handler called when the open state of the popover changes.',

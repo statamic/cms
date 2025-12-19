@@ -8,16 +8,7 @@ const meta = {
         PanelHeader,
         PanelFooter,
     },
-    argTypes: {
-        heading: {
-            control: 'text',
-            description: 'Heading text for the panel',
-        },
-        subheading: {
-            control: 'text',
-            description: 'Subheading text below the heading',
-        },
-    },
+    argTypes: {},
 } satisfies Meta<typeof Panel>;
 
 export default meta;

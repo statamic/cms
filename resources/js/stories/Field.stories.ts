@@ -6,45 +6,8 @@ const meta = {
     title: 'Forms/Field',
     component: Field,
     argTypes: {
-        asConfig: {
-            control: 'boolean',
-            description: 'When `true`, styles the field as a configuration field with a two-column grid layout.',
-        },
-        badge: {
-            control: 'text',
-            description: 'Badge text to display next to the label.',
-        },
-        disabled: { control: 'boolean' },
-        error: {
-            control: 'text',
-            description: 'Error message to display below the field.',
-        },
-        errors: {
-            control: 'object',
-            description: 'Object or array of error messages to display below the field.',
-        },
-        fullWidthSetting: {
-            control: 'boolean',
-            description: 'When `true`, forces the field to use full width even when `asConfig` is enabled.',
-        },
-        id: { control: 'text' },
-        instructions: {
-            control: 'text',
-            description: 'Instructions text to display above or below the label. Supports Markdown.',
-        },
-        instructionsBelow: {
-            control: 'boolean',
-            description: 'When `true`, displays instructions below the control instead of below the label.',
-        },
-        label: {
-            control: 'text',
-            description: 'Label text for the field.',
-        },
-        readOnly: { control: 'boolean' },
-        required: { control: 'boolean' },
         variant: {
             control: 'select',
-            description: 'Controls the layout of the field. <br><br> Options: `block`, `inline`',
             options: ['block', 'inline'],
         },
     },

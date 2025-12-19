@@ -11,18 +11,27 @@ defineOptions({
 });
 
 const props = defineProps({
+    /** When `true`, styles the field as a configuration field with a two-column grid layout. */
     asConfig: { type: Boolean, default: false },
+    /** Badge text to display next to the label. */
     badge: { type: String, default: '' },
     disabled: { type: Boolean, default: false },
+    /** Error message to display below the field. */
     error: { type: String },
+    /** Object or array of error messages to display below the field. */
     errors: { type: Object },
+    /** When `true`, forces the field to use full width even when `asConfig` is enabled. */
     fullWidthSetting: { type: Boolean, default: false },
     id: { type: String },
+    /** Instructions text to display above or below the label. Supports Markdown. */
     instructions: { type: String, default: '' },
+    /** When `true`, displays instructions below the control instead of below the label. */
     instructionsBelow: { type: Boolean, default: false },
+    /** Label text for the field. */
     label: { type: String },
     readOnly: { type: Boolean, default: false },
     required: { type: Boolean, default: false },
+    /** Controls the layout of the field. <br><br> Options: `block`, `inline` */
     variant: { type: String, default: 'block' },
 });
 

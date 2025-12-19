@@ -6,38 +6,16 @@ const meta = {
     title: 'Forms/Select',
     component: Select,
     argTypes: {
-        clearable: { control: 'boolean' },
-        disabled: { control: 'boolean' },
         icon: {
             control: 'select',
             options: icons,
-            description: 'Icon name. [Browse available icons](/?path=/story/components-icon--all-icons)',
         },
-        modelValue: {
-            control: 'text',
-            description: 'The controlled value of the select.',
-        },
-        optionLabel: {
-            control: 'text',
-            description: "Key of the option's label in the option's object."
-        },
-        options: {
-            description: 'Array of option objects',
-        },
-        optionValue: {
-            control: 'text',
-            description: "Key of the option's value in the option's object."
-        },
-        placeholder: { control: 'text' },
-        readonly: { control: 'boolean' },
         size: {
             control: 'select',
-            description: 'Controls the size of the select. <br><br> Options: `xs`, `sm`, `base`, `lg`, `xl`',
             options: ['xs', 'sm', 'base', 'lg', 'xl'],
         },
         variant: {
             control: 'select',
-            description: 'Controls the appearance of the select. <br><br> Options: `default`, `filled`, `ghost`, `subtle`',
             options: ['default', 'filled', 'ghost', 'subtle'],
         },
         'update:modelValue': {

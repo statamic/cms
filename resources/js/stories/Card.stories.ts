@@ -5,13 +5,8 @@ const meta = {
     title: 'Layout/Card',
     component: Card,
     argTypes: {
-        inset: {
-            control: 'boolean',
-            description: 'When `true`, the internal padding of the card is removed.',
-        },
         variant: {
             control: 'select',
-            description: 'Controls the appearance of the card. <br><br> Options: `default`, `flat`',
             options: ['default', 'flat'],
         },
     },

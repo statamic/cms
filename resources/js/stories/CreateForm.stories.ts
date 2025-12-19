@@ -6,42 +6,9 @@ const meta = {
     title: 'Components/CreateForm',
     component: CreateForm,
     argTypes: {
-        title: {
-            control: 'text',
-            description: 'The title displayed at the top of the form.',
-        },
-        subtitle: {
-            control: 'text',
-            description: 'Optional subtitle displayed below the title.',
-        },
         icon: {
             control: 'select',
             options: icons,
-            description: 'Icon name to display next to the title. [Browse available icons](/?path=/story/components-icon--all-icons)',
-        },
-        submitText: {
-            control: 'text',
-            description: 'Text for the submit button. Defaults to the title if not provided.',
-        },
-        loading: {
-            control: 'boolean',
-            description: 'When `true`, the submit button shows a loading state.',
-        },
-        route: {
-            control: 'text',
-            description: 'The URL for form data to be submitted to.',
-        },
-        titleInstructions: {
-            control: 'text',
-            description: 'Instructions for the title field.',
-        },
-        handleInstructions: {
-            control: 'text',
-            description: 'Instructions for the handle field.',
-        },
-        withoutHandle: {
-            control: 'boolean',
-            description: 'When `true`, the handle field is not displayed.',
         },
     },
 } satisfies Meta<typeof CreateForm>;

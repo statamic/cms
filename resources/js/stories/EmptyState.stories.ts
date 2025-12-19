@@ -7,16 +7,7 @@ const meta = {
     subcomponents: {
         EmptyStateItem,
     },
-    argTypes: {
-        heading: {
-            control: 'text',
-            description: 'Heading text for the empty state menu.',
-        },
-        description: {
-            control: 'text',
-            description: 'Optional description text below the heading.',
-        },
-    },
+    argTypes: {},
 } satisfies Meta<typeof EmptyStateMenu>;
 
 export default meta;
