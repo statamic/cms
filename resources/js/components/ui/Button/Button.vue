@@ -6,18 +6,31 @@ import Icon from '../Icon/Icon.vue';
 import { Link } from '@inertiajs/vue3';
 
 const props = defineProps({
+    /** The element or component this component should render as */
     as: { type: String, default: null },
+    /** The URL to link to */
     href: { type: String, default: null },
+    /** When `href` is provided, this prop controls the link's `target` attribute */
     target: { type: String, default: null },
+    /** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
     icon: { type: String, default: null },
+    /** Icon name. Will display after the text. [Browse available icons](/?path=/story/components-icon--all-icons) */
     iconAppend: { type: String, default: null },
+    /** When `true`, the button's padding will be adjusted to account for no text */
     iconOnly: { type: Boolean, default: false },
+    /** When using `ghost` or `subtle` button variants, you can use the `inset` prop to remove any invisible padding for better alignment */
     inset: { type: Boolean, default: false },
+    /** When `true`, the button shows an animated loading icon */
     loading: { type: Boolean, default: false },
+    /** When `true`, the button will be rounded */
     round: { type: Boolean, default: false },
+    /** Controls the size of the button. Options: `2xs`, `xs`, `sm`, `base`, `lg` */
     size: { type: String, default: 'base' },
+    /** Text to display in the button */
     text: { type: [String, Number, Boolean, null], default: null },
+    /** Unless `href` is provided, this component defaults to a `<button>`. This prop controls the button's `type` attribute */
     type: { type: String, default: 'button' },
+    /** Controls the appearance of the button. Options: `default`, `primary`, `danger`, `filled`, `ghost`, `ghost-pressed`, `subtle`, `pressed` */
     variant: { type: String, default: 'default' },
 });
 

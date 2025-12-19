@@ -1,13 +1,16 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
-import { Icon, Input, CardPanel } from '@ui';
-import { ref, computed } from 'vue';
+import type {Meta, StoryObj} from '@storybook/vue3';
+import {CardPanel, Icon, Input} from '@ui';
+import {computed, ref} from 'vue';
+import {icons} from "@/stories/icons";
 
 const meta = {
     title: 'Components/Icon',
     component: Icon,
     argTypes: {
-        name: { control: 'text' },
-        set: { control: 'text' },
+        name: {
+            control: 'select',
+            options: icons,
+        },
     },
 } satisfies Meta<typeof Icon>;
 
@@ -26,13 +29,6 @@ export const _DocsIntro: Story = {
         name: 'ai-spark',
     },
 };
-
-const iconFiles = import.meta.glob('../../svg/icons/*.svg');
-const icons = Object.keys(iconFiles).map((path) => {
-    const parts = path.split('/');
-    const fileName = parts[parts.length - 1];
-    return fileName.replace('.svg', '');
-}).sort();
 
 export const AllIcons: Story = {
     argTypes: {
