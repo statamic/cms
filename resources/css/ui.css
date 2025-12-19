@@ -22,6 +22,7 @@
 
     --color-body-bg: var(--theme-color-body-bg);
     --color-body-border: var(--theme-color-body-border);
+    --color-content-bg: var(--theme-color-content-bg);
     --color-content-border: var(--theme-color-content-border);
     --color-global-header-bg: var(--theme-color-global-header-bg);
     --color-progress-bar: var(--theme-color-progress-bar);
