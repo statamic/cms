@@ -128,9 +128,5 @@ export default {
                 </div>
             </template>
         </asset-browser>
-
-        <div class="starting-style-transition starting-style-transition--delay">
-            <DocsCallout :topic="__('Assets')" url="assets" />
-        </div>
     </div>
 </template>

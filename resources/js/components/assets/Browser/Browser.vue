@@ -1,5 +1,5 @@
 <template>
-    <div ref="browser" class="h-full" @keydown.shift="shiftDown" @keyup="clearShift">
+    <div ref="browser" class="h-full min-h-full [.content-card:has(&)]:grid" @keydown.shift="shiftDown" @keyup="clearShift">
         <Uploader
             ref="uploader"
             :container="container.id"
@@ -146,6 +146,10 @@
                                 <ListingPagination />
                             </PanelFooter>
                         </Panel>
+
+                        <div class="starting-style-transition starting-style-transition--delay">
+                            <DocsCallout :topic="__('Assets')" url="assets" />
+                        </div>
                     </template>
                 </Listing>
             </div>
@@ -193,6 +197,7 @@ import {
     Icon,
     ToggleGroup,
     ToggleItem,
+    DocsCallout,
 } from '@ui';
 import Breadcrumbs from './Breadcrumbs.vue';
 
@@ -226,6 +231,7 @@ export default {
         Icon,
         ToggleGroup,
         ToggleItem,
+        DocsCallout,
     },
 
     props: {
