@@ -1,10 +1,12 @@
 <script setup>
 import { ContextMenuItem } from 'reka-ui';
-import { useSlots } from 'vue';
+import {computed, useSlots} from 'vue';
 import Icon from '../Icon/Icon.vue';
 import { cva } from 'cva';
+import {Link} from "@inertiajs/vue3";
 
 const props = defineProps({
+	as: { type: String, default: null },
     href: { type: String, default: null },
     target: { type: String, default: '_self' },
     icon: { type: String, default: null },
@@ -14,6 +16,11 @@ const props = defineProps({
 
 const slots = useSlots();
 const hasDefaultSlot = !!slots.default;
+const tag = computed(() => {
+	if (props.as) return props.as;
+	if (! props.href) return 'div';
+	return props.target === '_blank' ? 'a' : Link;
+});
 
 const classes = cva({
     base: [
@@ -46,7 +53,7 @@ const iconClasses = cva({
     <ContextMenuItem
         :class="classes"
         data-ui-context-item
-        :as="href ? 'a' : 'div'"
+        :as="tag"
         :href
         :target
     >
