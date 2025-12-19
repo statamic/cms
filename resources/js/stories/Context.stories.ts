@@ -103,7 +103,7 @@ const withHeaderFooterCode = `
     <template #trigger>
         <Button text="File Options" />
     </template>
-    <ContextHeader text="document.pdf" icon="file" />
+    <ContextHeader text="document.pdf" icon="pdf" />
     <ContextMenu>
         <ContextItem text="Open" icon="arrow-right" />
         <ContextItem text="Rename" icon="pencil" />
