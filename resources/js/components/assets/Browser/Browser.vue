@@ -146,6 +146,10 @@
                                 <ListingPagination />
                             </PanelFooter>
                         </Panel>
+
+                        <div class="starting-style-transition starting-style-transition--delay">
+                            <DocsCallout :topic="__('Assets')" url="assets" />
+                        </div>
                     </template>
                 </Listing>
             </div>
@@ -193,6 +197,7 @@ import {
     Icon,
     ToggleGroup,
     ToggleItem,
+    DocsCallout,
 } from '@ui';
 import Breadcrumbs from './Breadcrumbs.vue';
 
@@ -226,6 +231,7 @@ export default {
         Icon,
         ToggleGroup,
         ToggleItem,
+        DocsCallout,
     },
 
     props: {
