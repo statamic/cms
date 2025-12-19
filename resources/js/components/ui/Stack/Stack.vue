@@ -143,8 +143,8 @@ export default {
 
     watch: {
         isTopStack(newVal) {
-            // When this stack becomes the top stack while visible, activate focus trap
-            if (newVal && this.visible && !this.focusTrap) {
+            // When this narrow stack becomes the top stack while visible, activate focus trap
+            if (newVal && this.visible && this.narrow && !this.focusTrap) {
                 this.initFocusTrap();
             }
         },
@@ -216,51 +216,18 @@ export default {
         },
 
         initFocusTrap() {
-            if (!this.isTopStack) {
+            if (!this.narrow || !this.isTopStack) {
                 return;
             }
 
-            // Wait for content to be rendered and check for tabbable elements
             this.$nextTick(() => {
-                if (!this.$refs.stackContent) {
-                    return;
+                if (this.$refs.stackContent) {
+                    this.focusTrap = createFocusTrap(this.$refs.stackContent, {
+                        escapeDeactivates: false, // We handle ESC separately
+                        returnFocusOnDeactivate: true,
+                    });
+                    this.focusTrap.activate();
                 }
-
-                // Check if there are any tabbable elements
-                const hasTabbableElements = () => {
-                    const tabbable = this.$refs.stackContent.querySelectorAll(
-                        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-                    );
-                    return tabbable.length > 0;
-                };
-
-                // Try to activate, with retries if needed
-                const tryActivate = (attempts = 0) => {
-                    if (attempts > 20) {
-                        // Give up after 20 attempts (2 seconds)
-                        return;
-                    }
-
-                    if (hasTabbableElements()) {
-                        if (!this.focusTrap) {
-                            this.focusTrap = createFocusTrap(this.$refs.stackContent, {
-                                escapeDeactivates: false, // We handle ESC separately
-                                returnFocusOnDeactivate: true,
-                            });
-                        }
-                        try {
-                            this.focusTrap.activate();
-                        } catch (e) {
-                            // If activation fails, retry after a short delay
-                            setTimeout(() => tryActivate(attempts + 1), 100);
-                        }
-                    } else {
-                        // No tabbable elements yet, retry after a short delay
-                        setTimeout(() => tryActivate(attempts + 1), 100);
-                    }
-                };
-
-                tryActivate();
             });
         },
     },
@@ -270,8 +237,8 @@ export default {
         this.$nextTick(() => {
             this.visible = true;
             this.$emit('opened');
-            // Initialize focus trap for top stack
-            if (this.isTopStack) {
+            // Initialize focus trap for narrow stacks
+            if (this.narrow && this.isTopStack) {
                 this.initFocusTrap();
             }
         });
