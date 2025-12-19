@@ -270,7 +270,8 @@
                 position: absolute;
                 inset: 0;
                 height: var(--height);
-                border-image: conic-gradient(var(--line-color) 0 0) fill 0/ /**/0 100vw;
+                /* Bust out of the container to create a full-width horizontal line, ref https://www.smashingmagazine.com/2024/01/css-border-image-property/#full-width-backgrounds */
+                border-image: conic-gradient(var(--line-color) 0 0) fill 0//0 100vw;
                 top: calc(50% - var(--height));
             }
             .dark &::after {
