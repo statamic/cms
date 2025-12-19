@@ -6,10 +6,15 @@ import { ToggleGroupItem } from 'reka-ui';
 import Icon from '../Icon/Icon.vue';
 
 const props = defineProps({
+    /** Value of the toggle item */
     value: { type: String, required: true },
+    /** Label text to display in the toggle item */
     label: { type: String, default: null },
+    /** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
     icon: { type: String, default: null },
+    /** When `true`, disables the toggle item */
     disabled: { type: Boolean, default: false },
+    /** ID of element that describes this toggle item */
     ariaDescribedby: { type: String, default: null },
 });
 

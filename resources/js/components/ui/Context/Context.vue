@@ -11,8 +11,11 @@ defineOptions({
 const attrs = useAttrs();
 
 const props = defineProps({
+    /** The preferred alignment against the trigger. May change when collisions occur. <br><br> Options: `start`, `center`, `end` */
     align: { type: String, default: 'start' },
+    /** The distance in pixels from the trigger. */
     offset: { type: Number, default: 5 },
+    /** The preferred side of the trigger to render against when open. <br><br> Options: `top`, `bottom`, `left`, `right` */
     side: { type: String, default: 'bottom' },
 });
 

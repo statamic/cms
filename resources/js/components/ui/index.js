@@ -14,6 +14,7 @@ export { default as CodeEditor } from './CodeEditor.vue';
 export { default as Combobox } from './Combobox/Combobox.vue';
 export { default as Context } from './Context/Context.vue';
 export { default as ContextFooter } from './Context/Footer.vue';
+export { default as ContextHeader } from './Context/Header.vue';
 export { default as ContextItem } from './Context/Item.vue';
 export { default as ContextLabel } from './Context/Label.vue';
 export { default as ContextMenu } from './Context/Menu.vue';

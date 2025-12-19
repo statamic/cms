@@ -16,10 +16,15 @@ const slots = useSlots();
 const emit = defineEmits(['update:open', 'dismissed']);
 
 const props = defineProps({
+	/** When `true`, the modal's backdrop will be blurred */
     blur: { type: Boolean, default: true },
+	/** Title displayed at the top of the modal */
     title: { type: String, default: '' },
+	/** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
     icon: { type: [String, null], default: null },
+	/** The controlled open state of the modal. */
     open: { type: Boolean, default: false },
+	/** When `true`, clicking outside the modal will dismiss it. */
     dismissible: { type: Boolean, default: true },
 });
 
