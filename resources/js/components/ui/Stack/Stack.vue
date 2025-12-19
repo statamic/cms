@@ -20,10 +20,15 @@ const slots = useSlots();
 const emit = defineEmits(['update:open', 'opened']);
 
 const props = defineProps({
+	/** Title displayed at the top of the stack */
 	title: { type: String, default: '' },
+	/** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
 	icon: { type: [String, null], default: null },
+	/** The controlled open state of the stack. */
 	open: { type: Boolean, default: false },
+	/** Callback that fires before the stack closes. */
 	beforeClose: { type: Function, default: () => true },
+	/** Controls the size of the stack. Options: `narrow`, `half`, `full` */
 	size: { type: String, default: null },
 });
 

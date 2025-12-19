@@ -2,43 +2,25 @@ import type {Meta, StoryObj} from '@storybook/vue3';
 import {Button, Stack, StackClose, StackTitle} from '@ui';
 
 const meta = {
-    title: 'Components/Stack',
+    title: 'Overlays/Stack',
     component: Stack,
+    subcomponents: {
+        StackTitle,
+        StackClose,
+    },
     argTypes: {
-        title: {
-            control: 'text',
-            description: 'Title displayed at the top of the stack.',
-        },
-        icon: {
-            control: 'text',
-            description: 'Icon displayed at the top of the modal, next to the title. [See list of available icons](/?path=/docs/components-icon--docs#available-icons).',
-        },
-        open: {
-            control: 'boolean',
-            description: 'Controls the open state of the stack.',
-        },
-        beforeClose: {
-            control: 'boolean',
-            description: 'Callback that fires before the stack closes.',
-        },
-        size: {
-            control: 'text',
-            description: 'Size of the stack. Options: `full`, `half`, `narrow`',
-        },
-        'update:open': {
-            action: 'update:open',
-            description: 'Event handler called when the open state changes.',
+        'opened': {
+            description: 'Event handler called when the stack is opened.',
             table: {
-                category: 'Events',
-                type: { summary: '(value: boolean) => void' },
+                category: 'events',
+                type: { summary: '() => void' },
             },
         },
-        'opened': {
-            action: 'opened',
-            description: 'Event handler called after the stack has opened.',
+        'update:open': {
+            description: 'Event handler called when the open state of the stack changes.',
             table: {
-                category: 'Events',
-                type: { summary: '() => void' },
+                category: 'events',
+                type: { summary: '(value: boolean) => void' },
             },
         },
     },
@@ -65,7 +47,7 @@ export const _DocsIntro: Story = {
     render: () => ({
         components: { Stack, Button },
         data: () => {
-            return { isOpen: false }
+            return { isOpen: false };
         },
         template: defaultCode,
     }),
@@ -94,7 +76,7 @@ export const _CustomTitle: Story = {
     render: () => ({
         components: { Stack, StackTitle, Button },
         data: () => {
-            return { isOpen: false }
+            return { isOpen: false };
         },
         template: customTitleCode,
     }),
@@ -125,7 +107,7 @@ export const _CloseButton: Story = {
     render: () => ({
         components: { Stack, StackClose, Button },
         data: () => {
-            return { isOpen: false }
+            return { isOpen: false };
         },
         template: closeButtonCode,
     }),
@@ -153,7 +135,7 @@ export const _WithIcon: Story = {
     render: () => ({
         components: { Stack, Button },
         data: () => {
-            return { isOpen: false }
+            return { isOpen: false };
         },
         template: iconCode,
     }),
@@ -184,7 +166,7 @@ export const _BeforeClose: Story = {
     render: () => ({
         components: { Stack, Button },
         data: () => {
-            return { isOpen: false }
+            return { isOpen: false };
         },
         template: beforeCloseCode,
     }),

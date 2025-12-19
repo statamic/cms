@@ -1,57 +1,35 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
 import {Button, Field, Input, Modal, ModalClose, ModalTitle} from '@ui';
+import PortalTargets from "@/components/portals/PortalTargets.vue";
 
 const meta = {
-    title: 'Components/Modal',
+    title: 'Overlays/Modal',
     component: Modal,
+    subcomponents: {
+        ModalTitle,
+        ModalClose,
+    },
     argTypes: {
-        title: {
-            control: 'text',
-            description: 'Title displayed at the top of the modal.',
-        },
-        icon: {
-            control: 'text',
-            description: 'Icon displayed at the top of the modal, next to the title. [See list of available icons](/?path=/docs/components-icon--docs#available-icons).',
-        },
-        open: {
-            control: 'boolean',
-            description: 'Controls the open state of the modal.',
-        },
-        beforeClose: {
-            control: 'boolean',
-            description: 'Callback that fires before the modal closes.',
-        },
-        blur: {
-            control: 'boolean',
-            description: 'Whether the backdrop of the modal should be blurred.',
-        },
-        dismissible: {
-            control: 'boolean',
-            description: 'Whether the modal can be dismissed by the user.',
-        },
-        'update:open': {
-            action: 'update:open',
-            description: 'Event handler called when the open state changes.',
-            table: {
-                category: 'Events',
-                type: { summary: '(value: boolean) => void' },
-            }
-        },
         'opened': {
-            action: 'opened',
-            description: 'Event handler called after the modal has opened.',
+            description: 'Event handler called when the modal is opened.',
             table: {
-                category: 'Events',
+                category: 'events',
                 type: { summary: '() => void' },
-            }
+            },
         },
         'dismissed': {
-            action: 'dismissed',
-            description: 'Event handler called after the modal has been dismissed.',
+            description: 'Event handler called when the modal is dismissed.',
             table: {
-                category: 'Events',
+                category: 'events',
                 type: { summary: '() => void' },
-            }
+            },
+        },
+        'update:open': {
+            description: 'Event handler called when the open state of the modal changes.',
+            table: {
+                category: 'events',
+                type: { summary: '(value: boolean) => void' },
+            },
         },
     },
 } satisfies Meta<typeof Modal>;
@@ -75,11 +53,11 @@ export const _DocsIntro: Story = {
         }
     },
     render: () => ({
-        components: { Modal, Button },
+        components: { Modal, Button, PortalTargets },
         data: () => {
-            return { isOpen: false }
+            return { isOpen: false };
         },
-        template: defaultCode,
+        template: `<div>${defaultCode}</div><PortalTargets />`,
     }),
 };
 
@@ -106,7 +84,7 @@ export const _CustomTitle: Story = {
     render: () => ({
         components: { Modal, ModalTitle, Button },
         data: () => {
-            return { isOpen: false }
+            return { isOpen: false };
         },
         template: customTitleCode,
     }),
@@ -133,7 +111,7 @@ export const _CloseButton: Story = {
     render: () => ({
         components: { Modal, ModalClose, Button },
         data: () => {
-            return { isOpen: false }
+            return { isOpen: false };
         },
         template: closeButtonCode,
     }),
@@ -157,7 +135,7 @@ export const _WithIcon: Story = {
     render: () => ({
         components: { Modal, Button },
         data: () => {
-            return { isOpen: false }
+            return { isOpen: false };
         },
         template: iconCode,
     }),
@@ -205,7 +183,7 @@ export const _WithFooter: Story = {
     render: () => ({
         components: { Modal, ModalClose, Button, Field, Input },
         data: () => {
-            return { isOpen: false }
+            return { isOpen: false };
         },
         template: footerCode,
     }),
