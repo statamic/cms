@@ -352,9 +352,22 @@ defineProps(['icons']);
                         <template #trigger>
                             <ui-button text="How neat is that?" />
                         </template>
+	                    <p>This is some very basic example text to show you what stacks look like with content.</p>
                     </ui-modal>
                 </div>
             </section>
+
+	        <section class="space-y-4">
+		        <ui-heading size="lg">Stack</ui-heading>
+		        <div class="flex">
+			        <ui-stack title="That's Pretty Neat">
+				        <template #trigger>
+					        <ui-button text="How neat is that?" />
+				        </template>
+				        <p>This is some very basic example text to show you what stacks look like with content.</p>
+			        </ui-stack>
+		        </div>
+	        </section>
 
             <section class="space-y-4">
                 <ui-heading size="lg">Popover</ui-heading>

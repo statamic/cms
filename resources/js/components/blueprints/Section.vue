@@ -35,10 +35,10 @@
         </ui-panel>
 
         <ui-stack
-            narrow
-            v-if="editingSection"
+	        size="narrow"
+            :open="editingSection !== false"
+            @update:open="editCancelled"
             @opened="() => $nextTick(() => $refs.displayInput.focus())"
-            @closed="editCancelled"
         >
             <div class="h-full overflow-scroll overflow-x-auto bg-white px-6 dark:bg-dark-800">
                 <header class="py-2 -mx-6 px-6 border-b border-gray-200 dark:border-gray-700 mb-5">
@@ -182,7 +182,7 @@ export default {
 
         isSoloNarrowStack() {
             const stacks = this.$stacks.stacks();
-            return stacks.length === 1 && stacks[0]?.data?.vm?.narrow === true;
+            return stacks.length === 1 && stacks[0]?.data?.vm?.size === 'narrow';
         },
     },
 

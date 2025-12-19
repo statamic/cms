@@ -97,6 +97,8 @@ export const {
     Switch,
     TabContent,
     Stack,
+    StackClose,
+    StackTitle,
     Table,
     TableCell,
     TableColumn,

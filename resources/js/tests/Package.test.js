@@ -176,6 +176,8 @@ it('exports ui', async () => {
         'TabList',
         'TabTrigger',
         'Stack',
+        'StackClose',
+        'StackTitle',
         'Table',
         'TableCell',
         'TableColumn',
