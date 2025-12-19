@@ -1,0 +1,19 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as SkeletonStories from '../Skeleton.stories';
+
+<Meta of={SkeletonStories} />
+
+# Skeleton
+Skeleton loaders provide a visual placeholder while content is loading, improving perceived performance.
+<Canvas of={SkeletonStories._DocsIntro} sourceState={'shown'} />
+
+## Sizes
+Control the height and width of skeleton loaders using Tailwind classes.
+<Canvas of={SkeletonStories.Sizes} sourceState={'shown'} />
+
+## Card Example
+Combine multiple skeletons to create placeholder layouts.
+<Canvas of={SkeletonStories.CardExample} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={SkeletonStories} />

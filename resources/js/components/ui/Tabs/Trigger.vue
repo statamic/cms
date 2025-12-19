@@ -6,7 +6,9 @@ const slots = useSlots();
 const hasSlot = !!slots.default;
 
 defineProps({
+    /** Display text for the tab */
     text: { type: String, default: null },
+	/** Unique tab name. Should match the name of a `TabContent` component. */
     name: { type: String, default: null },
 });
 </script>

@@ -1,9 +1,16 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
-import { Table, TableColumns, TableColumn, TableRows, TableRow, TableCell, Badge } from '@ui';
+import type {Meta, StoryObj} from '@storybook/vue3';
+import {Badge, Table, TableCell, TableColumn, TableColumns, TableRow, TableRows} from '@ui';
 
 const meta = {
-    title: 'Components/Table',
+    title: 'Layout/Table',
     component: Table,
+    subcomponents: {
+        TableColumns,
+        TableColumn,
+        TableRows,
+        TableRow,
+        TableCell,
+    },
     argTypes: {},
 } satisfies Meta<typeof Table>;
 

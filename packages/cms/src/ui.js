@@ -17,6 +17,7 @@ export const {
     CommandPaletteItem,
     Context,
     ContextFooter,
+    ContextHeader,
     ContextItem,
     ContextLabel,
     ContextMenu,

@@ -81,7 +81,7 @@ defineProps(['icons']);
             <blockquote>
                 <p>This is a blockquote with multiple paragraphs. The first paragraph introduces the quote.</p>
                 <p>The second paragraph continues the quoted content and shows how multiple paragraphs are handled within blockquotes.</p>
-                <cite>— Author Name, Source Title</cite>
+                <cite> -  Author Name, Source Title</cite>
             </blockquote>
             <h2>Code Examples</h2>
             <p>Inline code can be written using <code>console.log('Hello, World!')</code> for JavaScript or <code>printf("Hello, World!")</code> for C.</p>

@@ -2,10 +2,12 @@
 import CardPanel from '../Card/Panel.vue';
 
 const props = defineProps({
+    /** Heading text for the empty state menu. */
     heading: {
         type: String,
         required: true,
     },
+    /** Optional description text below the heading. */
     description: {
         type: String,
         default: null,

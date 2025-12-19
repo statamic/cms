@@ -123,6 +123,7 @@ it('exports ui', async () => {
         'Combobox',
         'Context',
         'ContextFooter',
+        'ContextHeader',
         'ContextItem',
         'ContextLabel',
         'ContextMenu',
