@@ -195,7 +195,6 @@ import {
     Icon,
     ToggleGroup,
     ToggleItem,
-    DocsCallout,
 } from '@ui';
 import Breadcrumbs from './Breadcrumbs.vue';
 
@@ -229,7 +228,6 @@ export default {
         Icon,
         ToggleGroup,
         ToggleItem,
-        DocsCallout,
     },
 
     props: {
