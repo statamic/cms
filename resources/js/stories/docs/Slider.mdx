@@ -1,0 +1,18 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as SliderStories from '../Slider.stories';
+
+<Meta of={SliderStories} />
+
+# Slider
+A draggable slider input for selecting numeric values within a range.
+<Canvas of={SliderStories._DocsIntro} sourceState={'shown'} />
+
+## Custom Range
+Customize the minimum, maximum, and step values for different use cases.
+<Canvas of={SliderStories._CustomRange} sourceState={'shown'} />
+
+## Sizes
+<Canvas of={SliderStories._Sizes} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={SliderStories} />

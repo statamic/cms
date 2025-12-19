@@ -4,8 +4,11 @@ import { cva } from 'cva';
 import Icon from '../Icon/Icon.vue';
 
 defineProps({
+    /** The URL to link to */
     href: { type: String, default: null },
+    /** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
     icon: { type: String, default: null },
+    /** Text to display in the footer */
     text: { type: String, default: null },
 });
 

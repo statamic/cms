@@ -2,11 +2,12 @@
 import { computed, ref, watch } from 'vue';
 import { cva } from 'cva';
 
-const emit = defineEmits(['update:text']);
-
 const props = defineProps({
+    /** The text to count characters from */
     text: { type: String, default: '' },
+    /** The maximum number of characters allowed */
     limit: { type: Number, default: null },
+    /** Number of characters remaining before showing the countdown number (default: 20) */
     dangerZone: { type: Number, default: 20 },
 });
 

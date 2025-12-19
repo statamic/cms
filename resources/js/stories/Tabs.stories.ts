@@ -1,11 +1,23 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
-import { Tabs, TabList, TabTrigger, TabContent } from '@ui';
+import type {Meta, StoryObj} from '@storybook/vue3';
+import {TabContent, TabList, Tabs, TabTrigger} from '@ui';
+import {ref} from 'vue';
 
 const meta = {
-    title: 'Components/Tabs',
+    title: 'Layout/Tabs',
     component: Tabs,
+    subcomponents: {
+        TabList,
+        TabTrigger,
+        TabContent,
+    },
     argTypes: {
-        defaultTab: { control: 'text' },
+        'update:modelValue': {
+            description: 'Event handler called when the tab changes.',
+            table: {
+                category: 'events',
+                type: { summary: '(value: string) => void' }
+            }
+        }
     },
 } satisfies Meta<typeof Tabs>;
 
@@ -13,20 +25,20 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const defaultCode = `
-<Tabs default-tab="tab1" class="w-full">
+<Tabs v-model="activeTab" class="w-full">
     <TabList>
-        <TabTrigger text="Shiny" name="tab1" />
-        <TabTrigger text="Happy" name="tab2" />
-        <TabTrigger text="People" name="tab3" />
+        <TabTrigger text="Shiny" name="one" />
+        <TabTrigger text="Happy" name="two" />
+        <TabTrigger text="People" name="three" />
     </TabList>
-    <TabContent name="tab1">
-        <p class="py-8">Tab 1 content</p>
+    <TabContent name="one">
+        <p class="py-8">Content of Tab 1</p>
     </TabContent>
-    <TabContent name="tab2">
-        <p class="py-8">Tab 2 content</p>
+    <TabContent name="two">
+        <p class="py-8">Content of Tab 2</p>
     </TabContent>
-    <TabContent name="tab3">
-        <p class="py-8">Tab 3 content</p>
+    <TabContent name="three">
+        <p class="py-8">Content of Tab 3</p>
     </TabContent>
 </Tabs>
 `;
@@ -40,6 +52,10 @@ export const _DocsIntro: Story = {
     },
     render: () => ({
         components: { Tabs, TabList, TabTrigger, TabContent },
+        setup() {
+            const activeTab = ref('tab1');
+            return { activeTab };
+        },
         template: defaultCode,
     }),
 };
