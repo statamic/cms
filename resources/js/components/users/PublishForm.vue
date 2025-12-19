@@ -173,6 +173,7 @@ export default {
                 .through([
                     new BeforeSaveHooks('user', {
                         values: this.values,
+	                    reference: this.initialReference,
                     }),
                     new Request(this.actions.save, this.method),
                     new AfterSaveHooks('user', {
