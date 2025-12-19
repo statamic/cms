@@ -18,10 +18,10 @@
 
         <ui-panel v-if="showTitle" :heading="__('Settings')">
             <ui-card class="p-0! divide-y divide-gray-200 dark:divide-gray-800">
-                <ui-field as-config :label="__('Title')" :instructions="__('messages.blueprints_title_instructions')" :errors="errors?.title">
+                <ui-field inline :label="__('Title')" :instructions="__('messages.blueprints_title_instructions')" :errors="errors?.title">
                     <ui-input v-model="blueprint.title" />
                 </ui-field>
-                <ui-field as-config :label="__('Hidden')" :instructions="__('messages.blueprints_hidden_instructions')" :error="errors?.hidden" variant="inline">
+                <ui-field inline :label="__('Hidden')" :instructions="__('messages.blueprints_hidden_instructions')" :error="errors?.hidden" variant="inline">
                     <ui-switch v-model="blueprint.hidden" />
                 </ui-field>
             </ui-card>

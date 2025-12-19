@@ -116,8 +116,8 @@ export const _InlineVariant: Story = {
 };
 
 const instructionsBelowCode = `
-<Field 
-    label="Bio" 
+<Field
+    label="Bio"
     instructions="Tell us a bit about yourself. Markdown is supported."
     instructions-below
 >
@@ -160,29 +160,29 @@ export const _WithActionsSlot: Story = {
     }),
 };
 
-const asConfigCode = `
+const inlineCode = `
 <div class="bg-white dark:bg-gray-900 rounded-lg divide-y divide-gray-200 dark:divide-gray-800">
-    <Field label="Site Name" as-config>
+    <Field label="Site Name" inline>
         <Input value="My Awesome Site" />
     </Field>
-    <Field label="Tagline" as-config>
+    <Field label="Tagline" inline>
         <Input value="Just another Statamic site" />
     </Field>
-    <Field label="Description" as-config full-width-setting>
+    <Field label="Description" inline full-width-setting>
         <Textarea value="A brief description of my site" />
     </Field>
 </div>
 `;
 
-export const _AsConfig: Story = {
+export const _Inline: Story = {
     tags: ['!dev'],
     parameters: {
         docs: {
-            source: { code: asConfigCode }
+            source: { code: inlineCode }
         }
     },
     render: () => ({
         components: { Field, Input, Textarea },
-        template: asConfigCode,
+        template: inlineCode,
     }),
 };
