@@ -147,7 +147,7 @@
                             </PanelFooter>
                         </Panel>
 
-                        <div class="starting-style-transition starting-style-transition--delay">
+                        <div v-if="canCreateContainers" class="starting-style-transition starting-style-transition--delay">
                             <DocsCallout :topic="__('Assets')" url="assets" />
                         </div>
                     </template>
