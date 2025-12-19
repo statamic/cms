@@ -15,6 +15,12 @@
 }
 
 .stacks-on-stacks {
+    body:has(&) {
+        /* Reka poppers should be on top of open stacks. Reka's popper z-index in this case is set to auto and we can't control it through Reka. We also can't use a direct descendant selector because the popper is inside a portal, so instead we'll check to see if certain conditions are present. */
+        [data-reka-popper-content-wrapper] {
+            z-index: var(--z-index-portal)!important;
+        }
+    }
     .stack-container {
         @apply absolute inset-0;
         transition: left 0.3s ease;
