@@ -432,7 +432,7 @@
     "Enable Statamic Pro?": "Activer Statamic Pro ?",
     "Enable two factor authentication": "Activer l'authentification à 2 facteurs",
     "Encryption": "Chiffrement",
-    "Enter a color value": "Renseigner une valeur de couleur",
+    "Enter a color value": "Renseigner un code couleur hexadécimal",
     "Enter any internal or external URL.": "Renseigner n'importe quel lien URL interne ou externe.",
     "Enter text...": "Renseigner le texte...",
     "Enter URL": "Renseigner l'URL",
