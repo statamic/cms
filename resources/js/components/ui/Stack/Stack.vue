@@ -2,7 +2,6 @@
 import {
     ref,
     computed,
-    onMounted,
     nextTick,
     getCurrentInstance,
     useSlots,
@@ -157,11 +156,8 @@ function cleanup() {
 watch(
     () => props.open,
     (value) => value ? open() : close(),
+    { immediate: true }
 );
-
-onMounted(() => {
-    if (props.open) open();
-});
 
 onBeforeUnmount(() => {
     cleanup();
