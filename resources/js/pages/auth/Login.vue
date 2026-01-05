@@ -136,10 +136,15 @@ onMounted(() => {
                             v-for="provider in providers"
                             :key="provider.name"
                             as="href"
-                            class="flex-1"
+                            class="flex-1 [&_svg]:opacity-100!"
                             :href="provider.url"
                             :icon="provider.icon"
-                        />
+                            :icon-only="!!provider.icon"
+                            v-tooltip="__('Sign in with :provider', { provider: provider.label })"
+                        >
+                            <span class="sr-only">{{ __('Sign in with :provider', { provider: provider.label }) }}</span>
+                            <span v-if="!provider.icon">{{ provider.label }}</span>
+                        </Button>
                     </div>
                 </div>
             </template>
