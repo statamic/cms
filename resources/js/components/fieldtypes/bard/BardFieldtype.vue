@@ -174,6 +174,7 @@ import { common, createLowlight } from 'lowlight';
 import 'highlight.js/styles/github.css';
 import importTiptap from '@/util/tiptap.js';
 import { computed } from 'vue';
+import { data_get } from "@/bootstrap/globals.js";
 
 const lowlight = createLowlight(common);
 let tiptap = null;
@@ -492,7 +493,7 @@ export default {
 						}
 					});
 				})
-				// .catch(() => this.$toast.error(__('Something went wrong')));
+				.catch(() => this.$toast.error(__('Something went wrong')));
         },
 
 	    /**
@@ -528,7 +529,7 @@ export default {
 				    return;
 			    }
 
-			    this.$axios.post(cp_url('fieldtypes/bard/set'), { blueprint, reference, field, set })
+			    this.$axios.post(cp_url('fieldtypes/replicator/set'), { blueprint, reference, field, set })
 				    .then(response => {
 					    this.setsCache[setCacheKey] = response.data;
 					    resolve(response.data);
