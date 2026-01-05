@@ -18,7 +18,7 @@ use Tests\TestCase;
 class ReplicatorTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
-    
+
     #[Test]
     #[DataProvider('groupedSetsProvider')]
     public function it_preprocesses_with_empty_value($areSetsGrouped)
