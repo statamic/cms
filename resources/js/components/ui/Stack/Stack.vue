@@ -178,7 +178,7 @@ provide('closeStack', close);
     </div>
     <teleport :to="portal" :order="depth" v-if="mounted">
         <div class="vue-portal-target stack">
-            <div
+            <FocusScope trapped loop
                 class="stack-container"
                 :class="{ 'stack-is-current': isTopStack }"
                 :style="direction === 'ltr' ? { left: `${leftOffset}px` } : { right: `${leftOffset}px` }"
@@ -221,12 +221,10 @@ provide('closeStack', close);
                             <Button icon="x" variant="ghost" class="-me-2" @click="close" />
                         </div>
 
-                        <FocusScope trapped loop as-child>
-                            <slot />
-                        </FocusScope>
+                        <slot />
                     </div>
                 </transition>
-            </div>
+            </FocusScope>
         </div>
     </teleport>
 </template>
