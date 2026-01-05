@@ -139,6 +139,7 @@ onMounted(() => {
                             class="flex-1"
                             :href="provider.url"
                             :icon="provider.icon"
+                            :icon-only="true"
                         >
                             <span class="sr-only">{{ __('Sign in with :provider', { provider: provider.label }) }}</span>
                         </Button>
