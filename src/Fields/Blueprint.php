@@ -150,6 +150,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 
         return $this
             ->normalizeTabs()
+            ->resetBlueprintCache()
             ->resetFieldsCache();
     }
 
