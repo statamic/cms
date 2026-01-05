@@ -335,6 +335,11 @@ function selectOption(option) {
     if (closeOnSelect.value) triggerRef.value.$el.focus();
 }
 
+function onKeydownSpace(e) {
+	if (props.taggable) return;
+	openDropdown(e);
+}
+
 defineExpose({
     searchQuery,
     filteredOptions,
@@ -363,7 +368,7 @@ defineExpose({
                         ref="trigger"
                         :class="triggerClasses"
                         @keydown.enter="openDropdown"
-                        @keydown.space="openDropdown"
+                        @keydown.space="onKeydownSpace"
                         data-ui-combobox-trigger
                     >
                         <div class="flex-1 min-w-0">
@@ -380,7 +385,7 @@ defineExpose({
                                 @paste.prevent="onPaste"
                                 @keydown.enter.prevent="pushTaggableOption"
                                 @blur="pushTaggableOption"
-                                @keydown.space="openDropdown"
+                                @keydown.space="onKeydownSpace"
                             />
 
                             <!-- Dropdown open: placeholder -->
