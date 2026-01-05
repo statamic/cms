@@ -140,6 +140,7 @@ onMounted(() => {
                             :href="provider.url"
                             :icon="provider.icon"
                             :icon-only="!!provider.icon"
+                            v-tooltip="__('Sign in with :provider', { provider: provider.label })"
                         >
                             <span class="sr-only">{{ __('Sign in with :provider', { provider: provider.label }) }}</span>
                             <span v-if="!provider.icon">{{ provider.label }}</span>
