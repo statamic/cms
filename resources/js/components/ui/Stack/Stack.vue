@@ -122,15 +122,8 @@ function close() {
         mounted.value = false;
         updateOpen(false);
 
-        events.$off(`stacks.${depth.value}.hit-area-mouseenter`);
-        events.$off(`stacks.${depth.value}.hit-area-mouseout`);
-
-        window.removeEventListener('resize', windowResized);
-
-        stack.value?.destroy();
+        cleanup();
         stack.value = null;
-
-        escBinding.value?.destroy();
         escBinding.value = null;
     });
 }
@@ -151,6 +144,16 @@ function runCloseCallback() {
     return true;
 }
 
+function cleanup() {
+    events.$off(`stacks.${depth.value}.hit-area-mouseenter`);
+    events.$off(`stacks.${depth.value}.hit-area-mouseout`);
+
+    window.removeEventListener('resize', windowResized);
+
+    stack.value?.destroy();
+    escBinding.value?.destroy();
+}
+
 watch(
     () => props.open,
     (value) => value ? open() : close(),
@@ -161,13 +164,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-    events.$off(`stacks.${depth.value}.hit-area-mouseenter`);
-    events.$off(`stacks.${depth.value}.hit-area-mouseout`);
-
-    window.removeEventListener('resize', windowResized);
-
-    stack.value?.destroy();
-    escBinding.value?.destroy();
+    cleanup();
 });
 
 defineExpose({
