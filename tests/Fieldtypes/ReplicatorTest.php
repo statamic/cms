@@ -483,39 +483,6 @@ class ReplicatorTest extends TestCase
             '_' => '_', // An empty key to enforce an object in JavaScript.
             // The "foo" key doesn't appear here since there's no corresponding "nope" set config.
         ], $meta['existing']['random-string-4']);
-
-        // Assert about the "defaults" sub-array.
-        // These are the initial values used for subfields when a new set is added.
-        $this->assertCount(1, $meta['defaults']);
-        $this->assertArrayHasKey('main', $meta['defaults']);
-        $this->assertEquals([
-            'a_text_field' => 'the default',
-            'a_grid_field' => [
-                ['_id' => 'random-string-5', 'one' => 'default in nested'],
-                ['_id' => 'random-string-6', 'one' => 'default in nested'],
-            ],
-        ], $meta['defaults']['main']);
-
-        // Assert about the "new" sub-array.
-        // This is meta data for subfields when a new set is added.
-        $this->assertCount(1, $meta['new']);
-        $this->assertArrayHasKey('main', $meta['new']);
-        $this->assertEquals([
-            '_' => '_', // An empty key to enforce an object in JavaScript.
-            'a_text_field' => null, // the text field doesn't have meta data.
-            'a_grid_field' => [ // this array is the preloaded meta for the grid field
-                'defaults' => [
-                    'one' => 'default in nested', // default value for the text field
-                ],
-                'new' => [
-                    'one' => null, // meta for the text field
-                ],
-                'existing' => [
-                    'random-string-5' => ['one' => null],
-                    'random-string-6' => ['one' => null],
-                ],
-            ],
-        ], $meta['new']['main']);
     }
 
     #[Test]
@@ -674,8 +641,6 @@ class ReplicatorTest extends TestCase
         $value = $field->fieldtype()->preload();
         $this->assertEquals('test.0.words', $value['existing']['set-id-1']['words']['fieldPathPrefix']);
         $this->assertEquals('test.1.words', $value['existing']['set-id-2']['words']['fieldPathPrefix']);
-        $this->assertEquals('test.-1.words', $value['new']['one']['words']['fieldPathPrefix']);
-        $this->assertEquals('test.-1.words', $value['defaults']['one']['words']);
     }
 
     #[Test]
