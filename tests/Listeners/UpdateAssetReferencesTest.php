@@ -4,10 +4,12 @@ namespace Tests\Listeners;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\LazyCollection;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\AssetFolder;
 use Statamic\Facades;
+use Statamic\Listeners\UpdateAssetReferences;
 use Statamic\Support\Arr;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
