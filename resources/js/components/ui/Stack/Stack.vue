@@ -1,14 +1,14 @@
 <script setup>
 import {
-	ref,
-	computed,
-	onMounted,
-	nextTick,
-	getCurrentInstance,
-	useSlots,
-	watch,
-	onBeforeUnmount,
-	provide
+    ref,
+    computed,
+    onMounted,
+    nextTick,
+    getCurrentInstance,
+    useSlots,
+    watch,
+    onBeforeUnmount,
+    provide
 } from 'vue';
 import { stacks, portals, events, keys, config } from '@/api';
 import wait from '@/util/wait.js';
@@ -21,16 +21,16 @@ const slots = useSlots();
 const emit = defineEmits(['update:open', 'opened']);
 
 const props = defineProps({
-	/** Title displayed at the top of the stack */
-	title: { type: String, default: '' },
-	/** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
-	icon: { type: [String, null], default: null },
-	/** The controlled open state of the stack. */
-	open: { type: Boolean, default: false },
-	/** Callback that fires before the stack closes. */
-	beforeClose: { type: Function, default: () => true },
-	/** Controls the size of the stack. Options: `narrow`, `half`, `full` */
-	size: { type: String, default: null },
+    /** Title displayed at the top of the stack */
+    title: { type: String, default: '' },
+    /** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
+    icon: { type: [String, null], default: null },
+    /** The controlled open state of the stack. */
+    open: { type: Boolean, default: false },
+    /** Callback that fires before the stack closes. */
+    beforeClose: { type: Function, default: () => true },
+    /** Controls the size of the stack. Options: `narrow`, `half`, `full` */
+    size: { type: String, default: null },
 });
 
 const stack = ref(null);
@@ -48,141 +48,141 @@ const depth = computed(() => stack.value?.data.depth);
 const isTopStack = computed(() => stacks.count() === depth.value);
 
 const offset = computed(() => {
-	if (isTopStack.value && props.size === 'narrow') {
-		return windowInnerWidth.value - 450;
-	} else if (isTopStack.value && props.size === 'half') {
-		return windowInnerWidth.value / 2;
-	}
+    if (isTopStack.value && props.size === 'narrow') {
+        return windowInnerWidth.value - 450;
+    } else if (isTopStack.value && props.size === 'half') {
+        return windowInnerWidth.value / 2;
+    }
 
-	// max of 200px, min of 80px
-	return Math.max(450 / (stacks.count() + 1), 80);
+    // max of 200px, min of 80px
+    return Math.max(450 / (stacks.count() + 1), 80);
 });
 
 const leftOffset = computed(() => {
-	if (props.size === 'full') {
-		return 0;
-	}
+    if (props.size === 'full') {
+        return 0;
+    }
 
-	if (isTopStack.value && (props.size === 'narrow' || props.size === 'half')) {
-		return offset.value;
-	}
+    if (isTopStack.value && (props.size === 'narrow' || props.size === 'half')) {
+        return offset.value;
+    }
 
-	return offset.value * depth.value;
+    return offset.value * depth.value;
 });
 
 const hasChild = computed(() => stacks.count() > depth.value);
 const direction = computed(() => config.get('direction', 'ltr'));
 
 const clickedHitArea = () => {
-	if (!visible.value) return;
-	if (!runCloseCallback()) return;
+    if (!visible.value) return;
+    if (!runCloseCallback()) return;
 
-	events.$emit(`stacks.${depth.value - 1}.hit-area-mouseout`);
+    events.$emit(`stacks.${depth.value - 1}.hit-area-mouseout`);
 };
 
 const mouseEnterHitArea = () => {
-	if (!visible.value) return;
+    if (!visible.value) return;
 
-	events.$emit(`stacks.${depth.value - 1}.hit-area-mouseenter`);
+    events.$emit(`stacks.${depth.value - 1}.hit-area-mouseenter`);
 };
 
 const mouseOutHitArea = () => {
-	if (!visible.value) return;
+    if (!visible.value) return;
 
-	events.$emit(`stacks.${depth.value - 1}.hit-area-mouseout`);
+    events.$emit(`stacks.${depth.value - 1}.hit-area-mouseout`);
 };
 
 const windowResized = () => windowInnerWidth.value = window.innerWidth;
 
 function open() {
-	if (!stack.value) stack.value = stacks.add(instance.proxy);
+    if (!stack.value) stack.value = stacks.add(instance.proxy);
 
-	events.$on(`stacks.${depth.value}.hit-area-mouseenter`, () => (isHovering.value = true));
-	events.$on(`stacks.${depth.value}.hit-area-mouseout`, () => (isHovering.value = false));
+    events.$on(`stacks.${depth.value}.hit-area-mouseenter`, () => (isHovering.value = true));
+    events.$on(`stacks.${depth.value}.hit-area-mouseout`, () => (isHovering.value = false));
 
-	escBinding.value = keys.bindGlobal('esc', close);
+    escBinding.value = keys.bindGlobal('esc', close);
 
-	window.addEventListener('resize', windowResized);
+    window.addEventListener('resize', windowResized);
 
-	nextTick(() => {
-		mounted.value = true;
-		updateOpen(true);
+    nextTick(() => {
+        mounted.value = true;
+        updateOpen(true);
 
-		nextTick(() => {
-			visible.value = true;
-			emit('opened');
-		});
-	});
+        nextTick(() => {
+            visible.value = true;
+            emit('opened');
+        });
+    });
 }
 
 function close() {
-	visible.value = false;
+    visible.value = false;
 
-	events.$off(`stacks.${depth.value}.hit-area-mouseenter`);
-	events.$off(`stacks.${depth.value}.hit-area-mouseout`);
+    events.$off(`stacks.${depth.value}.hit-area-mouseenter`);
+    events.$off(`stacks.${depth.value}.hit-area-mouseout`);
 
-	window.removeEventListener('resize', windowResized);
+    window.removeEventListener('resize', windowResized);
 
-	stack.value?.destroy();
-	stack.value = null;
+    stack.value?.destroy();
+    stack.value = null;
 
-	escBinding.value?.destroy();
-	escBinding.value = null;
+    escBinding.value?.destroy();
+    escBinding.value = null;
 
-	wait(300).then(() => {
-		mounted.value = false;
-		updateOpen(false);
-	});
+    wait(300).then(() => {
+        mounted.value = false;
+        updateOpen(false);
+    });
 }
 
 function updateOpen(value) {
-	if (isUsingOpenProp.value && props.open !== value) {
-		emit('update:open', value);
-	}
+    if (isUsingOpenProp.value && props.open !== value) {
+        emit('update:open', value);
+    }
 }
 
 function runCloseCallback() {
-	const shouldClose = props.beforeClose();
+    const shouldClose = props.beforeClose();
 
-	if (!shouldClose) return false;
+    if (!shouldClose) return false;
 
-	close();
+    close();
 
-	return true;
+    return true;
 }
 
 watch(
-	() => props.open,
-	(value) => value ? open() : close(),
+    () => props.open,
+    (value) => value ? open() : close(),
 );
 
 onMounted(() => {
-	if (props.open) open();
+    if (props.open) open();
 });
 
 onBeforeUnmount(() => {
-	events.$off(`stacks.${depth.value}.hit-area-mouseenter`);
-	events.$off(`stacks.${depth.value}.hit-area-mouseout`);
+    events.$off(`stacks.${depth.value}.hit-area-mouseenter`);
+    events.$off(`stacks.${depth.value}.hit-area-mouseout`);
 
-	window.removeEventListener('resize', windowResized);
+    window.removeEventListener('resize', windowResized);
 
-	stack.value?.destroy();
-	escBinding.value?.destroy();
+    stack.value?.destroy();
+    escBinding.value?.destroy();
 });
 
 defineExpose({
-	open,
-	close,
-	runCloseCallback,
+    open,
+    close,
+    runCloseCallback,
 });
 
 provide('closeStack', close);
 </script>
 
 <template>
-	<div v-if="slots.trigger" @click="open">
-		<slot name="trigger" />
-	</div>
+    <div v-if="slots.trigger" @click="open">
+        <slot name="trigger" />
+    </div>
     <teleport :to="portal" :order="depth" v-if="mounted">
         <div class="vue-portal-target stack">
             <div
@@ -216,21 +216,21 @@ provide('closeStack', close);
                             { '-translate-x-4 rtl:translate-x-4': isHovering }
                         ]"
                     >
-	                    <div
-		                    v-if="!hasStackTitleComponent && (title || icon)"
-		                    data-ui-stack-title
-		                    class="flex items-center justify-between rounded-t-xl border-b border-gray-300 px-4 mb-3 py-2 dark:border-gray-950 dark:bg-gray-800"
-	                    >
-		                    <div class="flex items-center gap-2">
-			                    <Icon :name="icon" v-if="icon" class="size-4" />
-			                    <Heading size="lg" :text="title" />
-		                    </div>
-		                    <Button icon="x" variant="ghost" class="-me-2" @click="close" />
-	                    </div>
+                        <div
+                            v-if="!hasStackTitleComponent && (title || icon)"
+                            data-ui-stack-title
+                            class="flex items-center justify-between rounded-t-xl border-b border-gray-300 px-4 mb-3 py-2 dark:border-gray-950 dark:bg-gray-800"
+                        >
+                            <div class="flex items-center gap-2">
+                                <Icon :name="icon" v-if="icon" class="size-4" />
+                                <Heading size="lg" :text="title" />
+                            </div>
+                            <Button icon="x" variant="ghost" class="-me-2" @click="close" />
+                        </div>
 
-	                    <FocusScope trapped loop as-child>
+                        <FocusScope trapped loop as-child>
                             <slot />
-	                    </FocusScope>
+                        </FocusScope>
                     </div>
                 </transition>
             </div>
