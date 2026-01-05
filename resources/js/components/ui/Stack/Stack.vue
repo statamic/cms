@@ -228,7 +228,7 @@ provide('closeStack', close);
 		                    <Button icon="x" variant="ghost" class="-me-2" @click="close" />
 	                    </div>
 
-	                    <FocusScope trapped loop>
+	                    <FocusScope trapped loop as-child>
                             <slot />
 	                    </FocusScope>
                     </div>
