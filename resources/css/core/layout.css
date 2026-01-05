@@ -29,7 +29,7 @@
     }
 
     ul li ul {
-        @apply ml-3.5 pl-3.5 translate-x-px my-1.5 text-[0.8125rem] min-w-0 flex-col gap-1.5 border-s border-gray-300 dark:border-gray-600;
+        @apply ml-3.5 pl-3.5 translate-x-px my-1.5 text-[0.8125rem] min-w-0 flex-col gap-1.5 border-s border-gray-300 dark:border-gray-700;
     }
 
     ul li ul li a {
@@ -39,6 +39,29 @@
     ul li ul li a.active {
         @apply text-black dark:text-white font-medium bg-transparent;
     }
+    ul li ul li {
+        a.active {
+            /* [1] Add a little vertical line to indicate the "active" subnav item */
+            &::before {
+                content: '';
+                position: absolute;
+                left: -1px;
+                @apply h-4 border-s border-s-black;
+            }
+            :where(.dark) &::before {
+                @apply border-s-gray-400;
+            }
+        }
+        &:only-child a.active {
+            /* [/2] Make the "active" subnav item less distracting for single-subnav items such as Assets/assets */
+            &::before {
+                @apply border-s-gray-400;
+            }
+            :where(.dark) &::before {
+                @apply border-s-gray-500;
+            }
+        }
+    }
 
     .section-title {
         @apply text-sm px-2 text-black font-medium mb-1 dark:text-gray-200;
@@ -47,7 +70,7 @@
 
 
 /* Mobile nav behavior */
-@media (max-width: theme(--breakpoint-lg)) {
+@media (width < theme(--breakpoint-lg)) {
     .nav-main {
         /* Always visible but off-screen by default */
         @apply flex;

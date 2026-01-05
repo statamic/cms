@@ -57,7 +57,7 @@ return [
     'code.config.mode' => 'Chọn ngôn ngữ để làm nổi bật cú pháp.',
     'code.config.mode_selectable' => 'Cho phép người dùng thay đổi ngôn ngữ cú pháp.',
     'code.config.rulers' => 'Cấu hình các đường thẳng dọc để hỗ trợ thụt lề.',
-    'code.config.theme' => 'Chọn chủ đề ưa thích.',
+    'code.config.color_mode' => 'Chọn chủ đề ưa thích.',
     'code.title' => 'Mã',
     'collections.title' => 'Bộ sưu tập',
     'color.config.allow_any' => 'Cho phép nhập bất kỳ giá trị màu nào qua bộ chọn hoặc mã hex.',

@@ -1,0 +1,33 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as ContextStories from '../Context.stories';
+
+<Meta of={ContextStories} />
+
+# Context
+Displays a contextual menu triggered by right-clicking an element, with full keyboard navigation support.
+
+## Overview
+The context component has a `<template #trigger>` slot to contain the element that will trigger the context menu on right-click.
+<Canvas of={ContextStories._DocsIntro} sourceState={'shown'} />
+
+## Icons
+<Canvas of={ContextStories._Icons} sourceState={'shown'} />
+
+## Headers and Footers
+Headers and footers can be added to the context menu by using the `ContextHeader` and `ContextFooter` components.
+<Canvas of={ContextStories._WithHeaderFooter} sourceState={'shown'} />
+
+## Labels
+Labels can be used to group related items by using the `ContextLabel` component.
+<Canvas of={ContextStories._WithLabels} sourceState={'shown'} />
+
+## Links
+Items can be rendered as links by providing an `href` prop.
+<Canvas of={ContextStories._WithLinks} sourceState={'shown'} />
+
+## Disabled Items
+Items can be disabled by using the `disabled` prop.
+<Canvas of={ContextStories._Disabled} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={ContextStories} />

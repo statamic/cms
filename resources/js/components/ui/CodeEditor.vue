@@ -2,6 +2,7 @@
 import CodeMirror from 'codemirror';
 import { computed, markRaw, nextTick, onMounted, ref, useAttrs, useTemplateRef, watch } from 'vue';
 import Select from './Select/Select.vue';
+import { colorMode as colorModeApi } from '@api';
 
 // Addons
 import 'codemirror/addon/edit/matchbrackets';
@@ -38,20 +39,32 @@ import 'codemirror/mode/yaml-frontmatter/yaml-frontmatter';
 const emit = defineEmits(['update:mode', 'update:model-value', 'focus', 'blur']);
 
 const props = defineProps({
+    /** When `true`, displays a mode selector dropdown */
     allowModeSelection: { type: Boolean, default: true },
     disabled: { type: Boolean, default: false },
     fieldActions: { type: Array, default: () => [] },
+    /** Controls whether to indent with tabs or spaces. Options: `tabs`, `spaces` */
     indentType: { type: String, default: 'tabs' },
+    /** Keyboard mapping for the editor. Options: `sublime`, `vim` */
     keyMap: { type: String, default: 'sublime' },
+    /** When `true`, line numbers are displayed */
     lineNumbers: { type: Boolean, default: true },
+    /** When `true`, long lines will wrap */
     lineWrapping: { type: Boolean, default: true },
+    /** The syntax highlighting mode. Options: `clike`, `css`, `diff`, `go`, `haml`, `handlebars`, `htmlmixed`, `less`, `markdown`, `gfm`, `nginx`, `text/x-java`, `javascript`, `jsx`, `text/x-objectivec`, `php`, `python`, `ruby`, `scss`, `shell`, `sql`, `twig`, `vue`, `xml`, `yaml-frontmatter` */
     mode: { type: String, default: 'javascript' },
+    /** The controlled value of the code editor */
     modelValue: { type: String, default: '' },
     readOnly: { type: Boolean, default: false },
+    /** Rulers configuration */
     rulers: { type: Object, default: () => {} },
+    /** When `true`, displays the current mode label */
     showModeLabel: { type: Boolean, default: true },
+    /** The width of a tab character */
     tabSize: { type: Number, required: false },
-    theme: { type: String, default: 'material' },
+    /** Theme of the code editor. Options: `system`, `light`, `dark` */
+    colorMode: { type: String, default: 'system' },
+    /** Title displayed in fullscreen mode */
     title: { type: String, default: () => __('Code Editor') },
 });
 
@@ -114,9 +127,9 @@ function initCodeMirror() {
             lineWrapping: props.lineWrapping,
             matchBrackets: true,
             readOnly: props.readOnly || props.disabled ? 'nocursor' : false,
-            theme: exactTheme.value,
+            theme: theme.value,
             inputStyle: 'contenteditable',
-            rulers: rulers,
+            rulers: rulers.value,
         }),
     );
 
@@ -159,12 +172,20 @@ const modeLabel = computed(() => {
     return modes.value.find((m) => m.value === props.mode)?.label || props.mode;
 });
 
-const exactTheme = computed(() => {
-    return props.theme === 'light' ? 'default' : 'material';
+const colorMode = computed(() => {
+    if (props.colorMode === 'system') {
+        return colorModeApi.mode.value === 'dark' ? 'dark' : 'light';
+    }
+
+    return props.colorMode;
+});
+
+const theme = computed(() => {
+    return colorMode.value === 'light' ? 'default' : 'material';
 });
 
 const themeClass = computed(() => {
-    return `theme-${props.theme}`;
+    return `theme-${colorMode.value}`;
 });
 
 const rulers = computed(() => {
@@ -172,7 +193,7 @@ const rulers = computed(() => {
         return [];
     }
 
-    let rulerColor = props.theme === 'light' ? '#d1d5db' : '#546e7a';
+    let rulerColor = colorMode.value === 'light' ? 'var(--theme-color-gray-300)' : 'var(--theme-color-gray-700)';
 
     return Object.entries(props.rulers).map(([column, style]) => {
         let lineStyle = style === 'dashed' ? 'dashed' : 'solid';
@@ -184,6 +205,9 @@ const rulers = computed(() => {
         };
     });
 });
+
+watch(theme, (newTheme) => codemirror.value.setOption('theme', newTheme));
+watch(rulers, (newRulers) => codemirror.value.setOption('rulers', newRulers));
 
 const showToolbar = computed(() => {
     return props.allowModeSelection || props.showModeLabel;
@@ -253,7 +277,7 @@ watch(
                     <span v-else v-text="modeLabel" class="font-mono text-xs text-gray-700 dark:text-gray-300" />
                 </div>
             </div>
-            <div ref="codemirrorElement" class="font-mono text-sm dark:border dark:border-white/10 dark:bg-gray-900 rounded-lg [&_.CodeMirror]:rounded-lg" :class="{ 'dark:border-t-0 rounded-t-none [&_.CodeMirror]:rounded-t-none': showToolbar }"></div>
+            <div ref="codemirrorElement" class="font-mono text-sm border border-gray-300 dark:border dark:border-white/10 dark:bg-gray-900 rounded-lg [&_.CodeMirror]:rounded-lg" :class="{ 'dark:border-t-0 rounded-t-none [&_.CodeMirror]:rounded-t-none': showToolbar }"></div>
         </div>
     </portal>
 </template>

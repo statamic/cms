@@ -64,7 +64,7 @@ const isImpersonating = computed((() => user.is_impersonating));
         </DropdownMenu>
 
         <DropdownFooter class="px-1.75! space-y-2">
-            <ToggleGroup variant="ghost" size="xs" class="justify-between" v-model="$theme.preference">
+            <ToggleGroup variant="ghost" size="xs" class="justify-between" v-model="$colorMode.preference">
                 <ToggleItem icon="sun" class="[&_svg]:size-4.5" value="light" :label="__('Light')" />
                 <ToggleItem icon="moon" class="[&_svg]:size-4.5" value="dark" :label="__('Dark')" />
                 <ToggleItem icon="monitor" class="[&_svg]:size-4.5" value="auto" :label="__('System')" />

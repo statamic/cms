@@ -36,7 +36,7 @@ import {
     permissions,
     dateFormatter,
     commandPalette,
-    theme,
+    colorMode,
     contrast,
     config,
     preferences,
@@ -122,8 +122,8 @@ export default {
         return progress;
     },
 
-    get $theme() {
-        return theme;
+    get $colorMode() {
+        return colorMode;
     },
 
     get $contrast() {
@@ -163,8 +163,11 @@ export default {
     },
 
     async start() {
+        setTranslations(this.initialConfig.translations);
+        setLocale(this.initialConfig.translationLocale);
+
         config.initialize(this.initialConfig);
-        theme.initialize(this.initialConfig.user?.theme);
+        colorMode.initialize(this.initialConfig.user?.color_mode);
         contrast.initialize(this.initialConfig.user?.preferences?.strict_accessibility);
         preferences.initialize(this.initialConfig.user?.preferences, this.initialConfig.defaultPreferences);
 
@@ -245,9 +248,6 @@ export default {
         this.$app.use(VueComponentDebug, { enabled: import.meta.env.VITE_VUE_COMPONENT_DEBUG === 'true' });
         toast.initialize(this.$app);
 
-        setTranslations(this.initialConfig.translations);
-        setLocale(this.initialConfig.translationLocale);
-
         Object.assign(this.$app.config.globalProperties, {
             $config: config,
             $axios: axios,
@@ -270,7 +270,7 @@ export default {
             $permissions: permissions,
             $date: dateFormatter,
             $commandPalette: commandPalette,
-            $theme: theme,
+            $colorMode: colorMode,
             $contrast: contrast,
         });
 

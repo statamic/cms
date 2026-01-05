@@ -57,7 +57,7 @@ return [
     'code.config.mode' => 'Pilih bahasa untuk penyerlahan sintaks.',
     'code.config.mode_selectable' => 'Sama ada mod boleh diubah oleh pengguna.',
     'code.config.rulers' => 'Konfigurasikan pembaris menegak untuk membantu dengan lekukan.',
-    'code.config.theme' => 'Pilih tema pilihan anda.',
+    'code.config.color_mode' => 'Pilih tema pilihan anda.',
     'code.title' => 'Kod',
     'collections.title' => 'Koleksi',
     'color.config.allow_any' => 'Benarkan memasukkan sebarang nilai warna melalui pemilih atau kod hex.',

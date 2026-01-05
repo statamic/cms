@@ -1,26 +1,28 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
-import { Button } from '@ui';
-import { computed } from 'vue';
+import type {Meta, StoryObj} from '@storybook/vue3';
+import {Button, ButtonGroup} from '@ui';
+import {computed} from 'vue';
+import {icons} from './icons';
 
 const meta = {
-    title: 'Components/Button',
+    title: 'Forms/Button',
     component: Button,
     argTypes: {
+        icon: {
+            control: 'select',
+            options: icons,
+        },
+        iconAppend: {
+            control: 'select',
+            options: icons,
+        },
+        size: {
+            control: 'select',
+            options: ['2xs', 'xs', 'sm', 'base', 'lg'],
+        },
         variant: {
             control: 'select',
             options: ['default', 'primary', 'danger', 'filled', 'ghost', 'ghost-pressed', 'subtle', 'pressed'],
         },
-        size: {
-            control: 'select',
-            options: ['lg', 'base', 'sm', 'xs'],
-        },
-        text: { control: 'text' },
-        icon: { control: 'text' },
-        iconAppend: { control: 'text' },
-        loading: { control: 'boolean' },
-        disabled: { control: 'boolean' },
-        round: { control: 'boolean' },
-        iconOnly: { control: 'boolean' },
     },
 } satisfies Meta<typeof Button>;
 
@@ -171,10 +173,9 @@ export const Round: Story = {
         docs: {
             source: {
                 code: `
-                    <Button size="lg" text="Large" />
-                    <Button size="base" text="Base" />
-                    <Button size="sm" text="Small" />
-                    <Button size="xs" text="Extra Small" />
+                    <Button round icon="plus" />
+                    <Button round icon="plus" text="Add" />
+                    <Button round text="Add" />
                 `,
             },
         },
@@ -267,6 +268,36 @@ export const Inset: Story = {
                 <Button inset variant="ghost" icon="x" v-bind="sharedProps" />
                 <Button inset variant="ghost" icon="checkmark" v-bind="sharedProps" />
             </div>
+        `,
+    }),
+};
+
+export const ButtonGroups: Story = {
+    args: {
+        text: 'Save & Continue',
+    },
+    parameters: {
+        docs: {
+            source: {
+                code: `
+                    <ButtonGroup>
+                        <Button text="Apply" />
+                        <Button icon="save" text="Save All" />
+                    </ButtonGroup>
+                `,
+            },
+        },
+    },
+    render: (args) => ({
+        components: { ButtonGroup, Button },
+        setup() {
+            return { args };
+        },
+        template: `
+            <ButtonGroup>
+                <Button text="Apply" />
+                <Button icon="save" text="Save All" />
+            </ButtonGroup>
         `,
     }),
 };

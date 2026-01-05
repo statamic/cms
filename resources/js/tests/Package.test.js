@@ -36,6 +36,7 @@ it('exports api', async () => {
     const expected = [
         'bard',
         'callbacks',
+        'colorMode',
         'commandPalette',
         'components',
         'conditions',
@@ -56,7 +57,6 @@ it('exports api', async () => {
         'reveal',
         'slug',
         'stacks',
-        'theme',
         'toast',
     ];
 
@@ -123,6 +123,7 @@ it('exports ui', async () => {
         'Combobox',
         'Context',
         'ContextFooter',
+        'ContextHeader',
         'ContextItem',
         'ContextLabel',
         'ContextMenu',
