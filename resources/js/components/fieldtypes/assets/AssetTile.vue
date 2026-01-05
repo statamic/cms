@@ -19,19 +19,19 @@
         </asset-editor>
 
         <div class="flex h-full border-b dark:border-gray-700 rounded-b-md relative">
-            <div class="p-1 flex flex-col items-center justify-center h-full" :class="{ 'bg-checkerboard': canBeTransparent }">
+            <div class="p-1 flex flex-col items-center justify-center h-full" :class="{ 'bg-checkerboard rounded-md': canBeTransparent }">
                 <!-- Solo Bard -->
                 <template v-if="isImage && isInBardField && !isInAssetBrowser">
                     <img :src="asset.url" />
                 </template>
 
                 <template v-else>
-                    <img v-if="canShowSvg" :src="asset.url" :title="label" class="p-4 size-full" />
+                    <img v-if="canShowSvg" :src="asset.url" :title="label" class="p-4 size-full relative" />
 
                     <template v-else>
-                        <img :src="thumbnail" v-if="thumbnail" :title="label" class="rounded-md"  />
+                        <img :src="thumbnail" v-if="thumbnail" :title="label" class="rounded-md relative"  />
 
-                        <file-icon v-else :extension="asset.extension" class="h-full w-full p-4" />
+                        <file-icon v-else :extension="asset.extension" class="h-full w-full p-4 relative" />
                     </template>
                 </template>
 
