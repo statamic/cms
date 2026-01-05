@@ -26,13 +26,15 @@
                 </template>
 
                 <template v-else>
-                    <img :src="thumbnail" v-if="thumbnail" :title="label" class="rounded-md"  />
+                    <img v-if="canShowSvg" :src="asset.url" :title="label" class="p-4 size-full" />
 
                     <template v-else>
-                        <img v-if="canShowSvg" :src="asset.url" :title="label" class="p-4" />
+                        <img :src="thumbnail" v-if="thumbnail" :title="label" class="rounded-md"  />
+
                         <file-icon v-else :extension="asset.extension" class="h-full w-full p-4" />
                     </template>
                 </template>
+
             </div>
             <div class="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 duration-100">
                 <div class="flex items-center justify-center gap-2">
