@@ -1,5 +1,5 @@
 <template>
-    <div ref="browser" @keydown.shift="shiftDown" @keyup="clearShift">
+    <div ref="browser" class="h-full" @keydown.shift="shiftDown" @keyup="clearShift">
         <Uploader
             ref="uploader"
             :container="container.id"
@@ -12,7 +12,7 @@
         >
             <div>
                 <div class="drag-notification" v-show="dragging">
-                    <Icon name="upload" class="m-4 size-12" />
+                    <Icon name="upload-cloud-large" class="m-4 size-13" />
                     <span>{{ __('Drop File to Upload') }}</span>
                 </div>
 
@@ -146,6 +146,8 @@
                                 <ListingPagination />
                             </PanelFooter>
                         </Panel>
+
+                        <slot name="footer" />
                     </template>
                 </Listing>
             </div>

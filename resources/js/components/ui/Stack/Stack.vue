@@ -15,6 +15,7 @@ import wait from '@/util/wait.js';
 import {hasComponent} from "@/composables/has-component.js";
 import { Button, Heading } from "@ui";
 import Icon from "@ui/Icon/Icon.vue";
+import { FocusScope } from 'reka-ui';
 
 const slots = useSlots();
 const emit = defineEmits(['update:open', 'opened']);
@@ -227,7 +228,9 @@ provide('closeStack', close);
 		                    <Button icon="x" variant="ghost" class="-me-2" @click="close" />
 	                    </div>
 
-                        <slot />
+	                    <FocusScope trapped loop>
+                            <slot />
+	                    </FocusScope>
                     </div>
                 </transition>
             </div>
