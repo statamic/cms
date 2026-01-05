@@ -64,8 +64,9 @@
             :origin-meta="originMeta"
             :errors="errors"
             :site="site"
-            :localized-fields="localizedFields"
+            v-model:modified-fields="localizedFields"
             :sync-field-confirmation-text="syncFieldConfirmationText"
+            :remember-tab="!isInline"
         >
             <LivePreview
                 :enabled="isPreviewing"
@@ -77,11 +78,8 @@
                 <PublishComponents />
 
                 <PublishTabs>
-                    <template #actions>
-                        <div
-                            class="space-y-6"
-                            v-if="showLivePreviewButton || showVisitUrlButton || showLocalizationSelector"
-                        >
+                    <template v-if="showLivePreviewButton || showVisitUrlButton || showLocalizationSelector" #actions>
+                        <div class="space-y-6">
                             <div class="flex flex-wrap gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
                                 <Button
                                     :text="__('Live Preview')"
@@ -228,11 +226,18 @@ export default {
             quickSave: false,
             syncFieldConfirmationText: __('messages.sync_term_field_confirmation_text'),
             pendingLocalization: null,
-
-            savingRef: ref(false),
-            errorsRef: ref({}),
         };
     },
+
+	setup() {
+		const savingRef = ref(false);
+		const errorsRef = ref({});
+
+		return {
+			savingRef: computed(() => savingRef),
+			errorsRef: computed(() => errorsRef),
+		};
+	},
 
     computed: {
         containerRef() {
@@ -369,7 +374,7 @@ export default {
                     }
 
                     // If the edit URL was changed (i.e. the term slug was updated), redirect them there.
-                    else if (window.location.href !== response.data.data.edit_url) {
+                    else if (!this.isInline && window.location.href !== response.data.data.edit_url) {
                         this.redirectTo(response.data.data.edit_url);
                     }
 
@@ -512,7 +517,7 @@ export default {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
     },
 
-    unmounted() {
+	beforeUnmount() {
         this.saveKeyBinding.destroy();
         this.quickSaveKeyBinding.destroy();
     },

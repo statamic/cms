@@ -1851,6 +1851,19 @@ EOT;
     }
 
     #[Test]
+    public function it_gets_items_from_a_hook()
+    {
+        UpdateAssetReferences::hook('additional', function () {
+            return LazyCollection::make(['additional-1', 'additional-2']);
+        });
+
+        $items = ((new UpdateAssetReferences)->getItemsContainingData())->all();
+
+        $this->assertContains('additional-1', $items);
+        $this->assertContains('additional-2', $items);
+    }
+
+    #[Test]
     public function it_updates_references_in_set_configs_in_blueprints()
     {
         $this->assetHoff->path('set-previews/hoff.jpg')->save();

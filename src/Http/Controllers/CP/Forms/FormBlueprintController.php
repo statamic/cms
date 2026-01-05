@@ -44,6 +44,7 @@ class FormBlueprintController extends CpController
         return $this->renderEditPage([
             'blueprint' => $this->toVueObject($blueprint),
             'action' => cp_route('blueprints.forms.update', $form->handle()),
+            'isFormBlueprint' => true,
         ]);
     }
 

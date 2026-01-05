@@ -1,0 +1,27 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as LabelStories from '../Label.stories';
+
+<Meta of={LabelStories} />
+
+# Label
+Display labels for form inputs with support for required indicators and badges. Labels are semantically correct `<label>` elements with consistent styling.
+<Canvas of={LabelStories._DocsIntro} sourceState={'shown'} />
+
+## Required
+Use the `required` prop to display a red asterisk indicating a required field.
+<Canvas of={LabelStories._Required} sourceState={'shown'} />
+
+## With Badge
+Add a badge to the right side of the label to indicate special features, statuses, or plan requirements.
+<Canvas of={LabelStories._WithBadge} sourceState={'shown'} />
+
+## With Input
+Connect labels to form inputs using the `for` prop to improve accessibility and usability.
+<Canvas of={LabelStories._WithInput} sourceState={'shown'} />
+
+## With Slot
+Use the default slot for more complex label content with custom formatting.
+<Canvas of={LabelStories._WithSlot} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={LabelStories} />

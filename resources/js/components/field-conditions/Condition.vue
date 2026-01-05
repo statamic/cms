@@ -6,7 +6,6 @@
             <Combobox
                 ref="fieldSelect"
                 :model-value="condition.field"
-                class="w-full"
                 :options="fieldOptions"
                 :placeholder="__('Field')"
                 :taggable="true"
@@ -24,13 +23,13 @@
                         />
                     </div>
                 </template>
-                <template #selected-option>
-                    <span v-text=" __(field.config.display) || field.handle"></span>
+                <template #selected-option="{ option }">
+                    <div class="truncate" v-text="__(field?.config.display) || option.value" />
                 </template>
             </Combobox>
         </div>
 
-        <div class="w-32">
+        <div class="w-auto min-w-32">
             <Select
                 class="w-full"
                 :model-value="condition.operator"

@@ -5,7 +5,9 @@ import { cva } from 'cva';
 const variant = inject('dataTableVariant', 'normal');
 
 const props = defineProps({
+    /** Text alignment. <br><br> Options: `left`, `center`, `right` */
     align: { type: String, default: 'left' },
+    /** Column width */
     width: { type: String, default: null },
 });
 

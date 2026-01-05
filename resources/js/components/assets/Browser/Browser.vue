@@ -1,5 +1,5 @@
 <template>
-    <div ref="browser" @keydown.shift="shiftDown" @keyup="clearShift">
+    <div ref="browser" class="h-full" @keydown.shift="shiftDown" @keyup="clearShift">
         <Uploader
             ref="uploader"
             :container="container.id"
@@ -12,7 +12,7 @@
         >
             <div>
                 <div class="drag-notification" v-show="dragging">
-                    <Icon name="upload" class="m-4 size-12" />
+                    <Icon name="upload-cloud-large" class="m-4 size-13" />
                     <span>{{ __('Drop File to Upload') }}</span>
                 </div>
 
@@ -79,7 +79,7 @@
                                 </ToggleGroup>
                             </Header>
 
-                            <div class="flex items-center gap-2 sm:gap-3 py-3 relative">
+                            <div class="flex items-center gap-2 sm:gap-3 py-3 relative overflow-clip" style="overflow-clip-margin: 1px;">
                                 <div class="flex flex-1 items-center gap-2 sm:gap-3">
                                     <ListingSearch />
                                 </div>
@@ -146,6 +146,8 @@
                                 <ListingPagination />
                             </PanelFooter>
                         </Panel>
+
+                        <slot name="footer" />
                     </template>
                 </Listing>
             </div>
@@ -703,13 +705,15 @@ export default {
                 action: () => this.mode = 'table',
             });
 
-            Statamic.$commandPalette.add({
-                when: () => this.canCreateContainers,
-                category: Statamic.$commandPalette.category.Actions,
-                text: __('Create Container'),
-                icon: 'container-add',
-                url: this.createContainerUrl,
-            });
+            if (this.createContainerUrl) {
+                Statamic.$commandPalette.add({
+                    when: () => this.canCreateContainers,
+                    category: Statamic.$commandPalette.category.Actions,
+                    text: __('Create Container'),
+                    icon: 'container-add',
+                    url: this.createContainerUrl,
+                });
+            }
 
             Statamic.$commandPalette.add({
                 when: () => this.container.can_edit,

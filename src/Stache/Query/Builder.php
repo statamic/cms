@@ -157,19 +157,19 @@ abstract class Builder extends BaseBuilder
 
     protected function filterWhereIn($values, $where)
     {
-        $lookup = array_flip($where['values']);
+        $lookup = array_flip(array_map(fn ($v) => $v ?? '__NULL__', $where['values']));
 
         return $values->filter(
-            fn ($value) => isset($lookup[$value])
+            fn ($value) => isset($lookup[$value ?? '__NULL__'])
         );
     }
 
     protected function filterWhereNotIn($values, $where)
     {
-        $lookup = array_flip($where['values']);
+        $lookup = array_flip(array_map(fn ($v) => $v ?? '__NULL__', $where['values']));
 
         return $values->filter(
-            fn ($value) => ! isset($lookup[$value])
+            fn ($value) => ! isset($lookup[$value ?? '__NULL__'])
         );
     }
 

@@ -110,17 +110,9 @@ class ActiveNavItemTest extends TestCase
         // Now let's create a new collection
         Facades\Collection::make('products')->title('Products')->save();
 
-        // Simply building the nav should change what is cached
-        $collectionsChildrenUrls = [
-            'http://localhost/cp/collections/articles',
-            'http://localhost/cp/collections/pages',
-        ];
-        $this->assertEquals($collectionsChildrenUrls, Cache::get(NavBuilder::UNRESOLVED_CHILDREN_URLS_CACHE_KEY)->get('content::collections'));
-        $this->assertEquals($collectionsChildrenUrls, Blink::get(NavBuilder::UNRESOLVED_CHILDREN_URLS_CACHE_KEY)->get('content::collections'));
-        collect($collectionsChildrenUrls)->each(function ($url) {
-            $this->assertTrue(Cache::get(NavBuilder::ALL_URLS_CACHE_KEY)->contains($url));
-            $this->assertTrue(Blink::get(NavBuilder::ALL_URLS_CACHE_KEY)->contains($url));
-        });
+        // The InvalidateNavCache subscriber will clear the URLs cache.
+        $this->assertNull(Cache::get(NavBuilder::UNRESOLVED_CHILDREN_URLS_CACHE_KEY));
+        $this->assertNull(Blink::get(NavBuilder::UNRESOLVED_CHILDREN_URLS_CACHE_KEY));
 
         // But if we build the nav again by hitting collections url to resolve its' children, the caches should get updated
         $this

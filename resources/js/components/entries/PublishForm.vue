@@ -85,6 +85,7 @@
             v-model:modified-fields="localizedFields"
             :track-dirty-state="trackDirtyState"
             :sync-field-confirmation-text="syncFieldConfirmationText"
+            :remember-tab="!isInline"
         >
             <LivePreview
                 :enabled="isPreviewing"
@@ -99,24 +100,22 @@
                     <template #actions>
                         <div class="space-y-6">
                             <!-- Live Preview / Visit URL Buttons -->
-                            <div v-if="collectionHasRoutes">
-                                <div class="flex flex-wrap gap-3 lg:gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
-                                    <Button
-                                        :text="__('Live Preview')"
-                                        class="flex-1"
-                                        icon="live-preview"
-                                        @click="openLivePreview"
-                                        v-if="showLivePreviewButton"
-                                    />
-                                    <Button
-                                        :href="permalink"
-                                        :text="__('Visit URL')"
-                                        class="flex-1"
-                                        icon="external-link"
-                                        target="_blank"
-                                        v-if="showVisitUrlButton"
-                                    />
-                                </div>
+                            <div class="flex flex-wrap gap-3 lg:gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
+                                <Button
+                                    :text="__('Live Preview')"
+                                    class="flex-1"
+                                    icon="live-preview"
+                                    @click="openLivePreview"
+                                    v-if="showLivePreviewButton"
+                                />
+                                <Button
+                                    :href="permalink"
+                                    :text="__('Visit URL')"
+                                    class="flex-1"
+                                    icon="external-link"
+                                    target="_blank"
+                                    v-if="showVisitUrlButton"
+                                />
                             </div>
 
                             <!-- Published Switch -->
@@ -191,7 +190,7 @@
             </LivePreview>
         </PublishContainer>
 
-        <stack
+        <ui-stack
             name="revision-history"
             v-if="showRevisionHistory"
             @closed="showRevisionHistory = false"
@@ -205,7 +204,7 @@
                 :can-restore-revisions="!readOnly"
                 @closed="close"
             />
-        </stack>
+        </ui-stack>
 
         <publish-actions
             v-if="confirmingPublish"
@@ -343,7 +342,6 @@ export default {
         canManagePublishState: Boolean,
         createAnotherUrl: String,
         initialListingUrl: String,
-        collectionHasRoutes: Boolean,
         previewTargets: Array,
         autosaveInterval: Number,
         parent: String,
@@ -392,11 +390,18 @@ export default {
             autosaveIntervalInstance: null,
             syncFieldConfirmationText: __('messages.sync_entry_field_confirmation_text'),
             pendingLocalization: null,
-
-            savingRef: ref(false),
-            errorsRef: ref({}),
         };
     },
+
+	setup() {
+		const savingRef = ref(false);
+		const errorsRef = ref({});
+
+		return {
+			savingRef: computed(() => savingRef),
+			errorsRef: computed(() => errorsRef),
+		};
+	},
 
     computed: {
         containerRef() {
@@ -868,12 +873,9 @@ export default {
 
     beforeUnmount() {
         if (this.autosaveIntervalInstance) clearInterval(this.autosaveIntervalInstance);
-    },
-
-    unmounted() {
-        clearTimeout(this.trackDirtyStateTimeout);
-        this.saveKeyBinding.destroy();
-        this.quickSaveKeyBinding.destroy();
+	    clearTimeout(this.trackDirtyStateTimeout);
+	    this.saveKeyBinding.destroy();
+	    this.quickSaveKeyBinding.destroy();
     },
 };
 </script>

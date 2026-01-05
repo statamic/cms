@@ -27,7 +27,7 @@ return [
 
         'default' => [
             'driver' => 'local',
-            'searchables' => 'all',
+            'searchables' => 'content',
             'fields' => ['title'],
         ],
 
@@ -78,5 +78,32 @@ return [
     'defaults' => [
         'fields' => ['title'],
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Indexing Queue
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure the queue name and connection used when indexing
+    | documents.
+    |
+    */
+
+    'queue' => env('STATAMIC_SEARCH_QUEUE'),
+
+    'queue_connection' => env('STATAMIC_SEARCH_QUEUE_CONNECTION'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Chunk Size
+    |--------------------------------------------------------------------------
+    |
+    | Here you can configure the chunk size used when indexing documents.
+    | The higher you make it, the more memory it will use, but the quicker
+    | the indexing process will be.
+    |
+    */
+
+    'chunk_size' => 100,
 
 ];

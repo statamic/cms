@@ -15,12 +15,13 @@
 }
 
 @import 'tailwindcss';
-@import '@statamic/ui/ui.css';
+@import './ui.css';
 @import './cp.css';
 @import './core/utilities.css';
 @import './dark.css';
 @import './tailwind-animate.css';
 
+@source inline('bg-{slate,gray,zinc,neutral,stone,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose}-{50,150,850,925,950,{100..900..100}}');
 
 @custom-variant dark (&:where(.dark, .dark *));
 

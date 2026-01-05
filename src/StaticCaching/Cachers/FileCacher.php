@@ -10,6 +10,7 @@ use Statamic\Events\UrlInvalidated;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\StaticCaching\Page;
 use Statamic\StaticCaching\Replacers\CsrfTokenReplacer;
 use Statamic\Support\Arr;
@@ -287,7 +288,9 @@ EOT;
 
     public function getNocacheJs(): string
     {
-        $default = <<<'EOT'
+        $nocacheUrl = URL::makeRelative(route('statamic.nocache'));
+
+        $default = <<<EOT
 (function() {
     function createMap() {
         var map = {};
@@ -299,9 +302,22 @@ EOT;
         return map;
     }
 
+    function replaceElement(el, html) {
+        const tmp = document.createElement('div');
+        const fragment = document.createDocumentFragment();
+
+        tmp.setHTMLUnsafe(html);
+
+        while (tmp.firstChild) {
+            fragment.appendChild(tmp.firstChild);
+        }
+
+        el.replaceWith(fragment);
+    }
+
     var map = createMap();
 
-    fetch('/!/nocache', {
+    fetch('{$nocacheUrl}', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -315,7 +331,7 @@ EOT;
 
         const regions = data.regions;
         for (var key in regions) {
-            if (map[key]) map[key].setHTMLUnsafe(regions[key]);
+            if (map[key]) replaceElement(map[key], regions[key]);
         }
 
         document.dispatchEvent(new CustomEvent('statamic:nocache.replaced', { detail: data }));

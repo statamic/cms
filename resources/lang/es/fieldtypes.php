@@ -58,7 +58,7 @@ return [
     'code.config.mode' => 'Elige el idioma para resaltar la sintaxis.',
     'code.config.mode_selectable' => 'Si el usuario puede cambiar el modo.',
     'code.config.rulers' => 'Configure reglas verticales para ayudar con la sangría.',
-    'code.config.theme' => 'Elige tu tema preferido.',
+    'code.config.color_mode' => 'Elige tu tema preferido.',
     'code.title' => 'Código',
     'collections.title' => 'Colecciones',
     'color.config.allow_any' => 'Permite ingresar cualquier valor de color a través del selector o código hexadecimal.',

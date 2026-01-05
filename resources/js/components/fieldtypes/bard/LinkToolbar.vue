@@ -1,7 +1,7 @@
 <template>
     <div class="bard-link-toolbar">
         <div>
-            <div class="border-b bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 rounded-t-md">
+            <div class="border-b bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 rounded-t-xl">
                 <section class="flex gap-2 items-center p-4 border-b dark:border-gray-800">
                     <ui-select
                         v-model="linkType"
@@ -148,7 +148,7 @@
             @item-data-updated="entrySelected"
         />
 
-        <stack v-if="showAssetSelector" name="asset-selector" @closed="closeAssetSelector">
+        <ui-stack v-if="showAssetSelector" name="asset-selector" @closed="closeAssetSelector">
             <asset-selector
                 :container="config.container"
                 :folder="config.folder || '/'"
@@ -158,7 +158,7 @@
                 @selected="assetSelected"
                 @closed="closeAssetSelector"
             />
-        </stack>
+        </ui-stack>
     </div>
 </template>
 

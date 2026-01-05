@@ -245,9 +245,7 @@ class Statamic
 
     public static function svg($name, $attrs = null, $fallback = null)
     {
-        $dir = str_starts_with($name, 'icons/')
-            ? statamic_path('packages/ui')
-            : statamic_path('resources/svg');
+        $dir = statamic_path('resources/svg');
 
         $path = "{$dir}/{$name}.svg";
 

@@ -11,9 +11,9 @@ resources/dist
 resources/dist-dev
 resources/dist-frontend
 resources/dist-package
-resources/dist-ui
 packages/cms/src/ui.css
 composer.lock
 .env
 bundle-stats.html
 .claude
+storybook-static
