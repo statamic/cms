@@ -118,20 +118,20 @@ function open() {
 function close() {
     visible.value = false;
 
-    events.$off(`stacks.${depth.value}.hit-area-mouseenter`);
-    events.$off(`stacks.${depth.value}.hit-area-mouseout`);
-
-    window.removeEventListener('resize', windowResized);
-
-    stack.value?.destroy();
-    stack.value = null;
-
-    escBinding.value?.destroy();
-    escBinding.value = null;
-
     wait(300).then(() => {
         mounted.value = false;
         updateOpen(false);
+
+        events.$off(`stacks.${depth.value}.hit-area-mouseenter`);
+        events.$off(`stacks.${depth.value}.hit-area-mouseout`);
+
+        window.removeEventListener('resize', windowResized);
+
+        stack.value?.destroy();
+        stack.value = null;
+
+        escBinding.value?.destroy();
+        escBinding.value = null;
     });
 }
 
