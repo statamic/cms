@@ -6,15 +6,19 @@ use Facades\Statamic\Fields\FieldRepository;
 use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Replicator;
 use Statamic\Fieldtypes\RowId;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class ReplicatorTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+    
     #[Test]
     #[DataProvider('groupedSetsProvider')]
     public function it_preprocesses_with_empty_value($areSetsGrouped)
@@ -735,6 +739,95 @@ class ReplicatorTest extends TestCase
         $this->assertEquals('test.0.nested.1.words', $value[0]['nested'][1]['words']);
         $this->assertEquals('test.1.nested.0.words', $value[1]['nested'][0]['words']);
         $this->assertEquals('test.1.nested.1.words', $value[1]['nested'][1]['words']);
+    }
+
+    #[Test]
+    public function it_can_return_set_defaults()
+    {
+        $this->partialMock(RowId::class, function (MockInterface $mock) {
+            $mock->shouldReceive('generate')->andReturn('random-string-1', 'random-string-2');
+        });
+
+        tap(Facades\Collection::make('pages'))->save();
+
+        $blueprint = Facades\Blueprint::make()->setHandle('default')->setNamespace('collections.pages');
+        $blueprint->setContents([
+            'sections' => [
+                'main' => [
+                    'fields' => [
+                        [
+                            'handle' => 'content',
+                            'field' => [
+                                'type' => 'replicator',
+                                'sets' => [
+                                    'main' => [
+                                        'sets' => [
+                                            'text' => [
+                                                'fields' => [
+                                                    [
+                                                        'handle' => 'a_text_field',
+                                                        'field' => [
+                                                            'type' => 'text',
+                                                            'default' => 'the default',
+                                                        ],
+                                                    ],
+                                                    [
+                                                        'handle' => 'a_grid_field',
+                                                        'field' => [
+                                                            'type' => 'grid',
+                                                            'min_rows' => 2,
+                                                            'fields' => [
+                                                                ['handle' => 'one', 'field' => ['type' => 'text', 'default' => 'default in nested']],
+                                                            ],
+                                                        ],
+                                                    ],
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $blueprint->save();
+
+        $response = $this
+            ->actingAs(tap(Facades\User::make()->makeSuper())->save())
+            ->postJson(cp_route('replicator-fieldtype.set'), [
+                'blueprint' => 'collections.pages.default',
+                'field' => 'content',
+                'set' => 'text',
+            ])
+            ->assertOk();
+
+        $this->assertEquals([
+            'a_text_field' => 'the default',
+            'a_grid_field' => [
+                ['_id' => 'random-string-1', 'one' => 'default in nested'],
+                ['_id' => 'random-string-2', 'one' => 'default in nested'],
+            ],
+        ], $response->json('defaults'));
+
+        $this->assertEquals([
+            '_' => '_',
+            'a_text_field' => null,
+            'a_grid_field' => [
+                'defaults' => [
+                    'one' => 'default in nested',
+                ],
+                'new' => [
+                    'one' => null,
+                ],
+                'existing' => [
+                    'random-string-1' => ['one' => null],
+                    'random-string-2' => ['one' => null],
+                ],
+            ],
+        ], $response->json('new'));
     }
 
     public static function groupedSetsProvider()
