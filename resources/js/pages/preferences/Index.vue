@@ -19,7 +19,7 @@ defineProps([
         <Header :title="__('Preferences')" icon="preferences" />
 
         <section class="relative flex flex-col gap-8">
-            <div class="absolute top-0 start-8 border-s w-px border-gray-400 dark:border-gray-600 h-[calc(100%-1.25rem)] border-dashed"></div>
+            <div class="absolute top-0 start-8 border-s w-px border-gray-300 dark:border-gray-700 h-[calc(100%-1.25rem)] border-dashed"></div>
             <CardPanel class="mb-0!" :heading="__('Global Preferences')" :subheading="__('Applied to all users by default.')">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2 sm:gap-3">
