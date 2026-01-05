@@ -31,7 +31,7 @@
                             { '-translate-x-4 rtl:translate-x-4': isHovering }
                         ]"
                     >
-                        <FocusScope trapped loop>
+                        <FocusScope trapped loop class="h-full">
                             <slot name="default" :depth="depth" :close="close" />
                         </FocusScope>
                     </div>
