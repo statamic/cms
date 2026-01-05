@@ -4,7 +4,11 @@ namespace Statamic\Http\Controllers\CP\Fieldtypes;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Statamic\Facades\Blueprint;
+use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades;
+use Statamic\Facades\Data;
+use Statamic\Fields\Blueprint;
+use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Http\Controllers\CP\CpController;
 
@@ -14,29 +18,33 @@ class ReplicatorSetController extends CpController
     {
         $request->validate([
             'blueprint' => ['required', 'string'],
+            'reference' => ['nullable', 'string'],
             'field' => ['required', 'string'],
+            'set' => ['required', 'string'],
         ]);
 
-        $blueprint = Blueprint::find($request->blueprint);
+        $blueprint = Facades\Blueprint::find($request->blueprint);
 
-        // todo: handle nested replicators
-        $replicator = $blueprint->field(Str::before($request->field, '.'));
-
-        $setHandle = Str::afterLast($request->field, '.');
-        $setConfig = null;
-
-        foreach ($replicator->get('sets') as $setGroup) {
-            if (isset($setGroup['sets'][$setHandle])) {
-                $setConfig = $setGroup['sets'][$setHandle];
-            }
+        if (! $blueprint) {
+            throw new NotFoundHttpException();
         }
 
-        if (! $setConfig) {
-            throw new \Exception("Couldn't find replicator set.");
+        $field = $this->getReplicatorField($blueprint, $request->field);
+
+        $replicatorSet = collect($field->get('sets'))
+            ->flatMap(fn (array $setGroup) => $setGroup['sets'] ?? [])
+            ->get($request->set);
+
+        if (! $replicatorSet) {
+            throw new \Exception("Cannot find replicator set [$request->set]");
         }
 
-        // todo: make sure the $parent and $parentIndex we pass in here is correct
-        $replicatorFields = new Fields($setConfig['fields'], parentField: $replicator);
+        $replicatorFields = new Fields(
+            items: $replicatorSet['fields'],
+            parent: Data::find($request->reference),
+            parentField: $field,
+            parentIndex: -1
+        );
 
         $defaults = $replicatorFields->all()->map(function ($field) {
             return $field->fieldtype()->preProcess($field->defaultValue());
@@ -44,9 +52,42 @@ class ReplicatorSetController extends CpController
 
         $new = $replicatorFields->addValues($defaults)->meta()->put('_', '_')->toArray();
 
-        return [
-            'new' => $new,
-            'defaults' => $defaults,
-        ];
+        return compact('new', 'defaults');
+    }
+
+    private function getReplicatorField(Blueprint $blueprint, string $field): Field
+    {
+        $remainingFieldPathComponents = explode('.', $field);
+
+        $config = $blueprint->field($remainingFieldPathComponents[0])->config();
+        unset($remainingFieldPathComponents[0]);
+
+        foreach ($remainingFieldPathComponents as $index => $fieldPathComponent) {
+            unset($remainingFieldPathComponents[$fieldPathComponent]);
+
+            if (isset($config['sets'])) {
+                $config = collect($config['sets'])
+                    ->flatMap(fn (array $setGroup): array => $setGroup['sets'] ?? [])
+                    ->get($fieldPathComponent);
+
+                continue;
+            }
+
+            if (isset($config['fields'])) {
+                $config = collect($config['fields'])
+                    ->where('handle', $remainingFieldPathComponents[$index])
+                    ->first()['field'] ?? null;
+
+                continue;
+            }
+
+            throw new \Exception("Cannot resolve field path component [$fieldPathComponent]");
+        }
+
+        if (! isset($config['type'])) {
+            throw new \Exception("Cannot find replicator field [$field]");
+        }
+
+        return new Field(Str::afterLast($field, '.'), $config);
     }
 }

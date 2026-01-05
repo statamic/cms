@@ -59,6 +59,7 @@
                                             :sets="setConfigs"
                                             :index="index"
                                             :enabled="canAddSet"
+                                            :loading="true"
                                             :is-first="index === 0"
                                             @added="addSet"
                                         />
@@ -69,6 +70,7 @@
 
                         <add-set-button
                             v-if="canAddSet"
+                            :loading="true"
                             :groups="groupConfigs"
                             :sets="setConfigs"
                             :show-connector="value.length > 0"
@@ -91,7 +93,7 @@ import ReplicatorSet from './Set.vue';
 import AddSetButton from './AddSetButton.vue';
 import ManagesSetMeta from './ManagesSetMeta';
 import { SortableList } from '../../sortable/Sortable';
-import {injectPublishContext as injectContainerContext, injectPublishContext} from "@ui";
+import {data_get} from "@/bootstrap/globals.js";
 
 export default {
     mixins: [Fieldtype, ManagesSetMeta],
@@ -101,12 +103,6 @@ export default {
         SortableList,
         AddSetButton,
     },
-
-	setup() {
-		const { blueprint } = injectContainerContext();
-
-		return { blueprint };
-	},
 
     data() {
         return {
@@ -119,6 +115,7 @@ export default {
                 showReplicatorFieldPreviews: this.config.previews,
             },
             errorsById: {},
+	        setsCache: {},
         };
     },
 
@@ -212,32 +209,66 @@ export default {
         },
 
         addSet(handle, index) {
-	        let field = `${this.handle}.${handle}`;
-
-			if (this.fieldPathPrefix) {
-				field = `${this.fieldPathPrefix}.${field}`;
-			}
-
-			// todo: cache defaults/new to avoid duplicate requests
-			this.$axios.post(cp_url('fieldtypes/replicator/set'), {
-				blueprint: this.blueprint.fqh,
-				field: field,
-			})
-				.then(response => {
+			// todo: add loading state
+			this.fetchSet(handle)
+				.then(data => {
 					const set = {
-						...JSON.parse(JSON.stringify(response.data.defaults)),
+						...JSON.parse(JSON.stringify(data.defaults)),
 						_id: uniqid(),
 						type: handle,
 						enabled: true,
 					};
 
-					this.updateSetMeta(set._id, response.data.new);
+					this.updateSetMeta(set._id, data.new);
 
 					this.update([...this.value.slice(0, index), set, ...this.value.slice(index)]);
 
 					this.expandSet(set._id);
-				});
+				})
+				.catch(error => this.$toast.error(__('Something went wrong')));
         },
+
+	    /**
+	     * Returns the path to the Replicator field, replacing any set indexes with handles.
+	     */
+	    replicatorFieldPath() {
+			if (!this.fieldPathPrefix) {
+				return this.handle;
+			}
+
+			return this.fieldPathKeys
+				.map((key, index) => {
+					if (Number.isInteger(parseInt(key))) {
+						return data_get(this.publishContainer.values, this.fieldPathKeys.slice(0, index + 1).join('.'))?.type;
+					}
+
+					return key;
+				})
+				.filter((key) => key !== undefined)
+				.concat(this.handle)
+				.join('.');
+	    },
+
+	    async fetchSet(set) {
+			return new Promise(async (resolve, reject) => {
+				const field = this.replicatorFieldPath();
+				const setCacheKey = `${field}.${set}`;
+				const reference = this.publishContainer.reference;
+				const blueprint = this.publishContainer.blueprint.fqh;
+
+				if (this.setsCache[setCacheKey]) {
+					resolve(this.setsCache[setCacheKey]);
+					return;
+				}
+
+				this.$axios.post(cp_url('fieldtypes/replicator/set'), { blueprint, reference, field, set })
+					.then(response => {
+						this.setsCache[setCacheKey] = response.data;
+						resolve(response.data);
+					})
+					.catch(error => reject(error));
+			});
+	    },
 
         duplicateSet(old_id) {
             const index = this.value.findIndex((v) => v._id === old_id);
