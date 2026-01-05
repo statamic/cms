@@ -31,7 +31,9 @@
                             { '-translate-x-4 rtl:translate-x-4': isHovering }
                         ]"
                     >
-                        <slot name="default" :depth="depth" :close="close" />
+                        <FocusScope trapped loop>
+                            <slot name="default" :depth="depth" :close="close" />
+                        </FocusScope>
                     </div>
                 </transition>
             </div>
@@ -40,7 +42,11 @@
 </template>
 
 <script>
+import { FocusScope } from 'reka-ui';
+
 export default {
+    components: { FocusScope },
+
     emits: ['closed', 'opened'],
 
     props: {

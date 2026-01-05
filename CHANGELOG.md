@@ -1,5 +1,31 @@
 # Release Notes
 
+## 6.0.0-alpha.20 (2025-12-19)
+
+### What's new
+- Theme selector [#13293](https://github.com/statamic/cms/issues/13293) by @jasonvarga
+
+### What's fixed
+- Apply default preferences when logged out [#13363](https://github.com/statamic/cms/issues/13363) by @jasonvarga
+- Pull bard floating toolbar above theads [#13380](https://github.com/statamic/cms/issues/13380) by @JayGeorge
+- Fix space in entry publish form sidebar [#13381](https://github.com/statamic/cms/issues/13381) by @jasonvarga
+- Fix link toolbar top radius [#13376](https://github.com/statamic/cms/issues/13376) by @JayGeorge
+- Fix z index of reka poppers in stacks [#13375](https://github.com/statamic/cms/issues/13375) by @JayGeorge
+- Use collection icon in widget [#13369](https://github.com/statamic/cms/issues/13369) by @duncanmcclean
+- Automatically close date picker [#13377](https://github.com/statamic/cms/issues/13377) by @JayGeorge
+- Remove side-by-side field setting [#13384](https://github.com/statamic/cms/issues/13384) by @jasonvarga
+- Date time field borders [#13360](https://github.com/statamic/cms/issues/13360) by @JayGeorge
+- Improve Storybook Docs [#13383](https://github.com/statamic/cms/issues/13383) by @duncanmcclean
+- More obvious active subnav [#13386](https://github.com/statamic/cms/issues/13386) by @JayGeorge
+- Use collection icon on empty state page [#13391](https://github.com/statamic/cms/issues/13391) by @duncanmcclean
+- Fix alignment issue in `ContextHeader` component [#13390](https://github.com/statamic/cms/issues/13390) by @duncanmcclean
+- Add `as` prop to `ContextItem` component [#13389](https://github.com/statamic/cms/issues/13389) by @duncanmcclean
+- Fix architectural lines missing horizontal [#13387](https://github.com/statamic/cms/issues/13387) by @JayGeorge
+- Fix conditional fields border [#13362](https://github.com/statamic/cms/issues/13362) by @JayGeorge
+- Upload drag area improvements [#13361](https://github.com/statamic/cms/issues/13361) by @JayGeorge
+
+
+
 ## 6.0.0-alpha.19 (2025-12-16)
 
 ### What's new

@@ -5,8 +5,11 @@ import { cva } from 'cva';
 
 const props = defineProps({
     required: { type: Boolean, default: false },
+    /** The id attribute for the toggle */
     id: { type: String, default: () => useId() },
+    /** The controlled value of the switch */
     modelValue: { type: Boolean, default: false },
+    /** Controls the size of the switch. <br><br> Options: `xs`, `sm`, `base`, `lg` */
     size: { type: String, default: 'base' },
 });
 

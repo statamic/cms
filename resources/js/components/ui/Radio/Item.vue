@@ -2,9 +2,12 @@
 import { RadioGroupIndicator, RadioGroupItem, useId } from 'reka-ui';
 
 const props = defineProps({
+    /** Description text to display below the label */
     description: { type: String, default: null },
     disabled: { type: Boolean, default: false },
+    /** Label text to display next to the radio button */
     label: { type: String, default: null },
+    /** Value of the radio button */
     value: { type: [String, Number, Boolean], required: true },
 });
 

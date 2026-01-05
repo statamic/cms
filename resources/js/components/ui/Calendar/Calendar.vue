@@ -20,10 +20,15 @@ import Icon from '../Icon/Icon.vue';
 defineOptions({ name: 'Calendar' });
 
 const props = defineProps({
+    /** The controlled value of the calendar. <br><br> Should be an ISO 8601 date and time string with a UTC offset (eg. `2021-11-07T07:45:00Z` or `2021-11-07T07:45:00-07:00`) */
     modelValue: { type: [String, Object], default: null },
+    /** The earliest date that can be selected. Dates before this will be disabled. <br><br> Should be an ISO 8601 date and time string with a UTC offset (eg. `2021-11-07T07:45:00Z` or `2021-11-07T07:45:00-07:00`) */
     min: { type: [String, Object], default: null },
+    /** The latest date that can be selected. Dates after this will be disabled. <br><br> Should be an ISO 8601 date and time string with a UTC offset (eg. `2021-11-07T07:45:00Z` or `2021-11-07T07:45:00-07:00`) */
     max: { type: [String, Object], default: null },
+    /** If necessary, you can you swap out any of the internal Calendar components by passing an object to this prop. */
     components: { type: Object, default: () => ({}) },
+    /** The number of months to display at once. */
     numberOfMonths: { type: Number, default: 1 },
     inline: { type: Boolean, default: false },
 });
