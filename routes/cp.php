@@ -387,6 +387,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('files/upload', [FilesFieldtypeController::class, 'upload'])->name('files.upload');
         Route::get('dictionaries/{dictionary}', DictionaryFieldtypeController::class)->name('dictionary-fieldtype');
         Route::post('icons', IconFieldtypeController::class)->name('icon-fieldtype');
+        Route::post('bard/set', ReplicatorSetController::class)->name('bard-fieldtype.set');
         Route::post('replicator/set', ReplicatorSetController::class)->name('replicator-fieldtype.set');
     });
 

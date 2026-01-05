@@ -36,7 +36,7 @@ class ReplicatorSetController extends CpController
             ->get($request->set);
 
         if (! $replicatorSet) {
-            throw new \Exception("Cannot find replicator set [$request->set]");
+            throw new \Exception("Cannot find Replicator set [$request->set]");
         }
 
         $replicatorFields = new Fields(

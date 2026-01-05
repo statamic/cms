@@ -59,7 +59,6 @@
                                             :sets="setConfigs"
                                             :index="index"
                                             :enabled="canAddSet"
-                                            :loading="true"
                                             :is-first="index === 0"
                                             @added="addSet"
                                         />
@@ -70,7 +69,6 @@
 
                         <add-set-button
                             v-if="canAddSet"
-                            :loading="true"
                             :groups="groupConfigs"
                             :sets="setConfigs"
                             :show-connector="value.length > 0"
@@ -225,7 +223,7 @@ export default {
 
 					this.expandSet(set._id);
 				})
-				.catch(error => this.$toast.error(__('Something went wrong')));
+				.catch(() => this.$toast.error(__('Something went wrong')));
         },
 
 	    /**
