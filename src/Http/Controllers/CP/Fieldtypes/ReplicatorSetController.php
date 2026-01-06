@@ -75,8 +75,20 @@ class ReplicatorSetController extends CpController
 
             if (isset($config['fields'])) {
                 $config = collect($config['fields'])
-                    ->where('handle', $remainingFieldPathComponents[$index])
-                    ->first()['field'] ?? null;
+                    ->flatMap(function ($field): array {
+                        if (isset($field['import'])) {
+                            return (new Fields([$field]))
+                                ->all()
+                                ->map(fn (Field $field) => [
+                                    'handle' => $field->handle(),
+                                    'field' => $field->config(),
+                                ])
+                                ->all();
+                        }
+
+                        return [$field];
+                    })
+                    ->firstWhere('handle', $remainingFieldPathComponents[$index])['field'] ?? null;
 
                 continue;
             }
@@ -85,7 +97,7 @@ class ReplicatorSetController extends CpController
         }
 
         if (! isset($config['type'])) {
-            throw new \Exception("Cannot find replicator field [$field]");
+            throw new \Exception("Cannot find Replicator field [$field]");
         }
 
         return new Field(Str::afterLast($field, '.'), $config);
