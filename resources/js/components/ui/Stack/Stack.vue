@@ -14,7 +14,7 @@ import wait from '@/util/wait.js';
 import {hasComponent} from "@/composables/has-component.js";
 import { Button, Heading } from "@ui";
 import Icon from "@ui/Icon/Icon.vue";
-import { FocusScope } from 'reka-ui';
+import { FocusScope, Primitive } from 'reka-ui';
 
 const slots = useSlots();
 const emit = defineEmits(['update:open', 'opened']);
@@ -173,9 +173,9 @@ provide('closeStack', close);
 </script>
 
 <template>
-    <div v-if="slots.trigger" @click="open">
+    <Primitive v-if="slots.trigger" as-child @click="open">
         <slot name="trigger" />
-    </div>
+    </Primitive>
     <teleport :to="portal" :order="depth" v-if="mounted">
         <div class="vue-portal-target stack">
             <FocusScope trapped loop
