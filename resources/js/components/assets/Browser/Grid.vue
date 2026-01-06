@@ -1,7 +1,7 @@
 <template>
     <ui-card :class="{
-        'space-y-8': folders.length || assets.length,
-        '!p-0': folders.length === 0 && assets.length === 0
+        'space-y-8': folders.length || assets.length || creatingFolder,
+        '!p-0': folders.length === 0 && assets.length === 0 && !creatingFolder
     }">
         <!-- Folders -->
         <section class="folder-grid-listing" v-if="folders.length || creatingFolder">
@@ -170,7 +170,7 @@
         </section>
 
         <!-- Empty state -->
-        <div v-if="folders.length === 0 && assets.length === 0" class="text-center text-gray-500 text-sm py-4">
+        <div v-if="folders.length === 0 && assets.length === 0 && !creatingFolder" class="text-center text-gray-500 text-sm py-4">
             {{ __('No items found') }}
         </div>
     </ui-card>
