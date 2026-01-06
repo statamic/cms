@@ -749,11 +749,10 @@ class ReplicatorTest extends TestCase
             $mock->shouldReceive('generate')->andReturn('random-string-1', 'random-string-2');
         });
 
-        tap(Facades\Collection::make('pages'))->save();
-
-        Fieldset::make('foreign_fields')->setContents(['fields' => [
+        $fieldset = Fieldset::make('foreign_fields')->setContents(['fields' => [
             ['handle' => 'an_imported_field', 'field' => ['type' => 'text', 'default' => 'default from foreign field']],
-        ]])->save();
+        ]]);
+        Fieldset::shouldReceive('find')->with('foreign_fields')->andReturn($fieldset);
 
         $blueprint = Facades\Blueprint::make()->setHandle('default')->setNamespace('collections.pages');
         $blueprint->setContents([
@@ -801,7 +800,8 @@ class ReplicatorTest extends TestCase
             ],
         ]);
 
-        $blueprint->save();
+        Facades\Blueprint::partialMock();
+        Facades\Blueprint::shouldReceive('find')->with('collections.pages.default')->andReturn($blueprint);
 
         $response = $this
             ->actingAs(tap(Facades\User::make()->makeSuper())->save())
