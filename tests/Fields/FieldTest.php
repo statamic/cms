@@ -294,6 +294,7 @@ class FieldTest extends TestCase
             ->andReturn(new class extends Fieldtype
             {
                 protected $component = 'example';
+
                 protected $configFields = [
                     'a_config_field_with_pre_processing' => ['type' => 'with_processing'],
                     'a_config_field_without_pre_processing' => ['type' => 'without_processing'],
@@ -342,6 +343,7 @@ class FieldTest extends TestCase
             'visibility' => 'visible',
             'replicator_preview' => true,
             'duplicate' => true,
+            'revisable' => true,
             'type' => 'example',
             'validate' => 'required',
             'foo' => 'bar',
@@ -671,5 +673,29 @@ class FieldTest extends TestCase
 
         $this->assertEquals($field, $return);
         $this->assertEquals($form, $field->form());
+    }
+
+    #[Test]
+    public function it_defaults_to_revisable()
+    {
+        $field = new Field('test', ['type' => 'text']);
+
+        $this->assertTrue($field->isRevisable());
+    }
+
+    #[Test]
+    public function it_gets_revisable()
+    {
+        $field = new Field('test', ['type' => 'text', 'revisable' => false]);
+
+        $this->assertFalse($field->isRevisable());
+    }
+
+    #[Test]
+    public function its_revisable_when_computed()
+    {
+        $field = new Field('test', ['type' => 'text', 'revisable' => false, 'visibility' => 'computed']);
+
+        $this->assertTrue($field->isRevisable());
     }
 }
