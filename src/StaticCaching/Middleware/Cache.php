@@ -232,7 +232,7 @@ class Cache
         return response($html, 503, ['Retry-After' => 1]);
     }
 
-    private function addEtagToResponse($request, $response): Response
+    private function addEtagToResponse($request, $response)
     {
         if (! $response->isRedirect() && $content = $response->getContent()) {
             $response
