@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Fields\Field;
+use Statamic\Fields\Fieldset;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Replicator;
@@ -750,6 +751,10 @@ class ReplicatorTest extends TestCase
 
         tap(Facades\Collection::make('pages'))->save();
 
+        Fieldset::make('foreign_fields')->setContents(['fields' => [
+            ['handle' => 'an_imported_field', 'field' => ['type' => 'text', 'default' => 'default from foreign field']],
+        ]])->save();
+
         $blueprint = Facades\Blueprint::make()->setHandle('default')->setNamespace('collections.pages');
         $blueprint->setContents([
             'sections' => [
@@ -781,6 +786,9 @@ class ReplicatorTest extends TestCase
                                                             ],
                                                         ],
                                                     ],
+                                                    [
+                                                        'import' => 'foreign_fields',
+                                                    ],
                                                 ],
                                             ],
                                         ],
@@ -810,6 +818,7 @@ class ReplicatorTest extends TestCase
                 ['_id' => 'random-string-1', 'one' => 'default in nested'],
                 ['_id' => 'random-string-2', 'one' => 'default in nested'],
             ],
+            'an_imported_field' => 'default from foreign field',
         ], $response->json('defaults'));
 
         $this->assertEquals([
@@ -827,6 +836,7 @@ class ReplicatorTest extends TestCase
                     'random-string-2' => ['one' => null],
                 ],
             ],
+            'an_imported_field' => null,
         ], $response->json('new'));
     }
 
