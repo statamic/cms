@@ -60,6 +60,7 @@
                                             :index="index"
                                             :enabled="canAddSet"
                                             :is-first="index === 0"
+                                            :loading-set="loadingSet"
                                             @added="addSet"
                                         />
                                     </template>
@@ -75,6 +76,7 @@
                             :index="value.length"
                             :label="config.button_label"
                             :is-first="value.length === 0"
+                            :loading-set="loadingSet"
                             @added="addSet"
                         />
                     </section>
@@ -114,6 +116,7 @@ export default {
             },
             errorsById: {},
 	        setsCache: {},
+            loadingSet: null,
         };
     },
 
@@ -207,7 +210,8 @@ export default {
         },
 
         addSet(handle, index) {
-			// todo: add loading state
+			this.loadingSet = handle;
+
 			this.fetchSet(handle)
 				.then(data => {
 					const set = {
@@ -223,7 +227,8 @@ export default {
 
 					this.expandSet(set._id);
 				})
-				.catch(() => this.$toast.error(__('Something went wrong')));
+				.catch(() => this.$toast.error(__('Something went wrong')))
+				.finally(() => this.loadingSet = null);
         },
 
 	    /**
@@ -358,6 +363,10 @@ export default {
 
         collapsed(collapsed) {
             this.updateMeta({ ...this.meta, collapsed: clone(collapsed) });
+        },
+
+        loadingSet(loading) {
+            this.$progress.loading('replicator-set', !!loading);
         },
 
         'publishContainer.errors': {

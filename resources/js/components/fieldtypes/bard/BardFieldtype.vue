@@ -93,6 +93,7 @@
                                 v-if="showAddSetButton"
                                 :sets="groupConfigs"
                                 class="bard-set-selector"
+                                :loading-set="loadingSet"
                                 @added="addSet"
                             >
                                 <template #trigger>
@@ -217,6 +218,7 @@ export default {
             errorsById: {},
             debounceNextUpdate: true,
 	        setsCache: {},
+            loadingSet: null,
         };
     },
 
@@ -447,6 +449,10 @@ export default {
             }
         },
 
+        loadingSet(loading) {
+            this.$progress.loading('bard-set', !!loading);
+        },
+
         'publishContainer.errors': {
             immediate: true,
             handler(errors) {
@@ -471,6 +477,8 @@ export default {
 
     methods: {
         addSet(handle) {
+			this.loadingSet = handle;
+
 			this.fetchSet(handle)
 				.then(data => {
 					const id = uniqid();
@@ -493,7 +501,8 @@ export default {
 						}
 					});
 				})
-				.catch(() => this.$toast.error(__('Something went wrong')));
+				.catch(() => this.$toast.error(__('Something went wrong')))
+				.finally(() => this.loadingSet = null);
         },
 
 	    /**
