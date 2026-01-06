@@ -234,7 +234,7 @@ class Cache
 
     private function addEtagToResponse($request, $response): Response
     {
-        if ($content = $response->getContent()) {
+        if (! $response->isRedirect() && $content = $response->getContent()) {
             $response
                 ->setEtag(md5($content))
                 ->isNotModified($request);
