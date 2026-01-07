@@ -447,6 +447,7 @@ defineExpose({
                                 <ComboboxViewport
                                     ref="viewport"
                                     class="max-h-[calc(var(--reka-combobox-content-available-height)-5rem)] overflow-y-scroll"
+                                    :class="{ 'pr-3': scrollbarRef?.isVisible }"
                                     data-ui-combobox-viewport
                                 >
                                     <ComboboxEmpty class="p-2 text-sm" data-ui-combobox-empty>
