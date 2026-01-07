@@ -37,7 +37,7 @@
                 />
             </div>
 
-            <Stack v-model:open="showingSelector">
+            <Stack v-model:open="showingSelector" inset :show-close-button="false">
                 <selector
                     :container="extension.options.bard.meta.assets.container"
                     :folder="extension.options.bard.config.folder || '/'"

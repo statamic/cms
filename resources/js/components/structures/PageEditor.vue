@@ -3,19 +3,12 @@
 	    ref="stack"
 	    size="narrow"
 	    open
+        inset
 	    :before-close="shouldClose"
 	    @update:open="$emit('closed')"
+        :title="headerText"
     >
         <div class="flex h-full flex-col bg-gray-100 dark:bg-gray-850">
-            <header
-                class="flex items-center justify-between border-b bg-white py-2 text-lg font-medium shadow-md dark:border-dark-950 dark:bg-dark-600 ltr:pl-6 ltr:pr-3 rtl:pl-3 rtl:pr-6"
-            >
-                <Heading size="lg">{{ headerText }}</Heading>
-	            <StackClose>
-		            <Button icon="x" variant="ghost" />
-	            </StackClose>
-            </header>
-
             <div v-if="loading" class="relative flex-1 overflow-auto">
                 <div
                     class="absolute inset-0 z-10 flex items-center justify-center bg-white bg-opacity-75 text-center dark:bg-gray-850"

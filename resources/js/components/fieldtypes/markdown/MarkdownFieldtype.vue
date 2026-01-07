@@ -132,7 +132,7 @@
                     </div>
                 </uploader>
 
-                <Stack v-if="!isReadOnly" :open="showAssetSelector">
+                <Stack v-if="!isReadOnly" :open="showAssetSelector" inset :show-close-button="false">
                     <asset-selector
                         :container="container"
                         :folder="folder"

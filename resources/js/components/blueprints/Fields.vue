@@ -33,11 +33,23 @@
             <ui-button icon="add-circle" :text="__('Create Field')" @click="createField" />
         </div>
 
-        <Stack v-model:open="isSelectingNewFieldtype">
-            <fieldtype-selector @closed="isSelectingNewFieldtype = false" @selected="fieldtypeSelected" />
+        <Stack
+            v-model:open="isSelectingNewFieldtype"
+            @closed="isSelectingNewFieldtype = false"
+            :title="__('Fieldtypes')"
+            icon="cog"
+            v-slot="{ close }"
+        >
+            <fieldtype-selector @closed="close" @selected="fieldtypeSelected" />
         </Stack>
 
-        <Stack :open="pendingCreatedField != null" @update:open="pendingCreatedField = null">
+        <Stack
+            :open="pendingCreatedField != null"
+            @update:open="(value) => { if (!value) pendingCreatedField = null }"
+            @closed="pendingCreatedField = null"
+            v-slot="{ close }"
+            inset
+        >
             <field-settings
                 ref="settings"
                 :type="pendingCreatedField.config.type"
@@ -47,7 +59,7 @@
                 :suggestable-condition-fields="suggestableConditionFields"
                 :is-inside-set="isInsideSet"
                 @committed="fieldCreated"
-                @closed="pendingCreatedField = null"
+                @closed="close"
             />
         </Stack>
     </div>
@@ -121,7 +133,7 @@ export default {
                 },
             };
 
-            this.$nextTick(() => (this.pendingCreatedField = pending));
+            setTimeout(() => (this.pendingCreatedField = pending), 500); // wait for stack to close
         },
 
         createField() {

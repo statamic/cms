@@ -163,7 +163,7 @@
             </div>
         </uploader>
 
-        <Stack v-model:open="showSelector">
+        <Stack v-model:open="showSelector" inset :show-close-button="false">
             <Selector
                 :container="container"
                 :folder="folder"

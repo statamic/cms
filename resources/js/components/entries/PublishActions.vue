@@ -1,12 +1,12 @@
 <template>
     <Stack size="narrow" :title="__('Publish')" open @update:open="$emit('closed')">
-	    <div class="m-2 flex h-full flex-col rounded-xl bg-white dark:bg-gray-800">
+	    <div class="">
             <div class="flex-1 overflow-auto">
                 <div class="loading flex h-full items-center justify-center" v-if="saving">
                     <Icon name="loading" />
                 </div>
 
-                <div class="p-3 flex flex-col space-y-6" v-else>
+                <div class="flex flex-col space-y-6" v-else>
                     <Select class="w-full" :options v-model="action" />
 
                     <template v-if="action">

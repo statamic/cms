@@ -1,8 +1,8 @@
 <template>
     <Stack size="narrow" :title="creating ? __('Add Nav Item') : __('Edit Nav Item')" open @update:open="$emit('closed')">
-        <div class="m-2 mt-0 flex h-full flex-col rounded-xl bg-white dark:bg-gray-800">
-            <div class="flex-1 overflow-auto">
-                <div class="p-3 flex flex-col space-y-6">
+        <div class="">
+            <div class="">
+                <div class="flex flex-col space-y-6">
                     <Field id="display" :label="__('Display')" required>
                         <Input id="display" v-model="config.display" :focus="true" :error="validateDisplay ? __('statamic::validation.required') : null" />
                     </Field>

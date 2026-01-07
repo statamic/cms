@@ -1,19 +1,17 @@
 <template>
     <div>
-        <Stack size="narrow" v-model:open="open">
+        <Stack
+            size="narrow"
+            v-model:open="open"
+            :title="__('Link Fields')"
+            icon="fieldsets"
+        >
 	        <template #trigger>
 		        <Button icon="link" :text="__('Link Existing')" />
 	        </template>
 
-            <div class="h-full overflow-auto bg-white dark:bg-gray-800 p-3 rounded-l-xl">
-                <header class="flex items-center justify-between pl-3">
-                    <Heading :text="__('Link Fields')" size="lg" icon="fieldsets" />
-	                <StackClose>
-		                <Button type="button" icon="x" variant="subtle" />
-	                </StackClose>
-                </header>
-
-                <div class="flex-1 overflow-auto px-3 py-4">
+            <div class="">
+                <div class="">
                     <Field
                         :label="__('Link a single field')"
                         :instructions="__('Changes to this field in the fieldset will stay in sync.')"

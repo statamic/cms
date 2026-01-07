@@ -115,16 +115,14 @@ function handleStackClosed() {
             </Button>
         </div>
 
-        <Stack size="half" :open="open" @update:open="handleStackClosed">
-            <div ref="stackContentRef" class="flex-1 p-3 bg-white dark:bg-gray-800 h-full overflow-auto rounded-l-2xl relative">
-                <Button
-                    icon="x"
-                    variant="ghost"
-                    size="sm"
-                    class="absolute! top-1.75 right-3 z-(--z-index-above) [&_svg]:size-4"
-                    @click="handleStackClosed"
-                />
-                <Heading size="lg" :text="__('Filters')" class="mb-4 px-1.5 pr-12 [&_svg]:size-4" icon="sliders-horizontal" />
+        <Stack
+            size="half"
+            :open="open"
+            @update:open="handleStackClosed"
+            :title="__('Filters')"
+            icon="sliders-horizontal"
+        >
+            <div ref="stackContentRef" class="">
                 <div class="space-y-4">
                     <Panel v-if="fieldFilter">
                         <PanelHeader class="flex items-center justify-between">

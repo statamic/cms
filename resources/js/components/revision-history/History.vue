@@ -1,6 +1,6 @@
 <template>
-    <div class="m-2 flex h-full flex-col rounded-xl bg-white dark:bg-gray-800">
-        <div class="flex-1 overflow-auto">
+    <div class="">
+        <div class="">
             <div class="loading flex h-full items-center justify-center" v-if="loading">
                 <Icon name="loading" />
             </div>

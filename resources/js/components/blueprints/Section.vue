@@ -37,18 +37,11 @@
         <ui-stack
 	        size="narrow"
             :open="editingSection !== false"
-            @update:open="editCancelled"
+            :title="editText"
+            @closed="editCancelled"
             @opened="() => $nextTick(() => $refs.displayInput.focus())"
         >
-            <div class="h-full overflow-scroll overflow-x-auto bg-white px-6 dark:bg-dark-800">
-                <header class="py-2 -mx-6 px-6 border-b border-gray-200 dark:border-gray-700 mb-5">
-                    <div class="flex items-center justify-between">
-                        <ui-heading size="lg">
-                            {{ editText }}
-                        </ui-heading>
-                        <ui-button icon="x" variant="ghost" class="-me-2" @click="editCancelled" />
-                    </div>
-                </header>
+            <div class="">
                 <div class="space-y-6">
                     <ui-field :label="__('Display')">
                         <ui-input ref="displayInput" type="text" v-model="editingSection.display" />
