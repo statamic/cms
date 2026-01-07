@@ -1,5 +1,9 @@
 # Statamic CMS - Claude AI Context
 
+## ⚠️ Always Check Before Making Changes
+
+- Are all user-facing strings localized?
+
 ## Project Overview
 
 This is the **Statamic CMS Core Package** - a Laravel-powered, flat-file (by default) CMS designed for building modern, easy-to-manage websites. This repository contains the core Composer package that gets installed into Laravel applications.
