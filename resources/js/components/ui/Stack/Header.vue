@@ -4,18 +4,18 @@ import { inject } from 'vue';
 
 defineOptions({ name: 'StackHeader' });
 
-const emit = defineEmits(['closed']);
-
-defineProps({
+withDefaults(defineProps<{
     /** Title displayed at the top of the stack */
-    title: { type: String },
+    title?: string;
     /** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
-    icon: { type: [String, null], default: null },
+    icon?: string | null;
     /** Whether the close button should be shown */
-    showCloseButton: { type: Boolean, default: true },
+    showCloseButton?: boolean;
+}>(), {
+    showCloseButton: true,
 });
 
-const close = inject('closeStack');
+const close = inject<() => void>('closeStack');
 </script>
 
 <template>

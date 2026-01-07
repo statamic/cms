@@ -1,10 +1,12 @@
 <script setup lang="ts">
 defineOptions({ name: 'StackContent' });
 
-defineProps({
+withDefaults(defineProps<{
     /** When `true`, the internal padding of the stack content is removed. */
-    inset: { type: Boolean, default: false },
-})
+    inset?: boolean;
+}>(), {
+    inset: false,
+});
 </script>
 
 <template>

@@ -1,8 +1,8 @@
-<script setup>
+<script setup lang="ts">
 import { inject } from 'vue';
 import Button from '../Button/Button.vue';
 
-const closeStack = inject('closeStack');
+const closeStack = inject<() => void>('closeStack');
 </script>
 
 <template>
