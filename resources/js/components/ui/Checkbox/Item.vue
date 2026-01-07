@@ -10,6 +10,8 @@ const props = defineProps({
     description: { type: String, default: null },
     /** When `true`, disables the checkbox */
     disabled: { type: Boolean, default: false },
+    /** When `true`, displays the checkbox in an indeterminate state (shows a dash) */
+    indeterminate: { type: Boolean, default: false },
     /** Label text to display next to the checkbox */
     label: { type: String, default: null },
     /** The controlled value of the checkbox */
@@ -45,6 +47,7 @@ const checkboxClasses = computed(() => {
             'shadow-ui-xs mt-0.5 cursor-default rounded-sm border border-gray-400/75 bg-white',
             'dark:bg-gray-500 dark:border-gray-900',
             'data-[state=checked]:border-ui-accent-bg data-[state=checked]:bg-ui-accent-bg',
+            'data-[state=indeterminate]:border-ui-accent-bg data-[state=indeterminate]:bg-ui-accent-bg',
             'dark:border-none',
             'dark:data-[disabled]:bg-ui-accent-bg/60 dark:data-[disabled]:border-ui-accent-bg/70',
             'dark:data-[disabled]:text-gray-400 dark:data-[disabled]:cursor-not-allowed',
@@ -78,6 +81,10 @@ const conditionalProps = computed(() => {
         props_obj.modelValue = props.modelValue;
     }
 
+    if (props.indeterminate) {
+        props_obj.indeterminate = true;
+    }
+
     // Only add aria-describedby if description exists AND it's not a solo checkbox
     if (props.description && !props.solo) {
         props_obj['aria-describedby'] = `${id}-description`;
@@ -105,10 +112,13 @@ const conditionalProps = computed(() => {
             :tabindex="tabindex"
         >
             <CheckboxIndicator class="relative flex h-full w-full items-center justify-center text-white">
-                <svg viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg" class="size-2.5 shrink-0" aria-hidden="true"><path d="M9 1L3.5 6.5L1 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                <!-- Checkmark icon for checked state -->
+                <svg v-if="!indeterminate" viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg" class="size-2.5 shrink-0" aria-hidden="true"><path d="M9 1L3.5 6.5L1 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                <!-- Dash icon for indeterminate state -->
+                <svg v-else viewBox="0 0 10 2" fill="none" xmlns="http://www.w3.org/2000/svg" class="size-2.5 shrink-0" aria-hidden="true"><path d="M1 1H9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" /></svg>
             </CheckboxIndicator>
             <span class="sr-only">
-                {{ modelValue ? 'Checked' : 'Unchecked' }}
+                {{ indeterminate ? 'Indeterminate' : (modelValue ? 'Checked' : 'Unchecked') }}
             </span>
         </CheckboxRoot>
         <div class="flex flex-col" v-if="!solo">
