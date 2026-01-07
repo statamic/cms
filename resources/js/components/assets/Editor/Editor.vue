@@ -1,5 +1,5 @@
 <template>
-    <ui-stack name="asset-editor" :before-close="shouldClose" :full="true" @closed="$emit('closed')" v-slot="{ close }">
+    <Stack size="full" open inset ref="stack" :before-close="shouldClose" @update:open="$emit('closed')" :show-close-button="false">
         <div
             class="asset-editor relative flex h-full flex-col rounded-sm bg-gray-100 dark:bg-dark-800"
             :class="isImage ? 'is-image' : 'is-file'"
@@ -22,7 +22,7 @@
                             {{ asset.path }}
                         </span>
                     </button>
-                    <ui-button variant="ghost" icon="x" class="absolute top-1.5 end-1.5" round @click="confirmClose(close)" :aria-label="__('Close Editor')" />
+                    <ui-button variant="ghost" icon="x" class="absolute top-1.5 end-1.5" round @click="confirmClose()" :aria-label="__('Close Editor')" />
                 </header>
 
                 <div class="flex flex-1 grow flex-col overflow-auto md:flex-row md:justify-between">
@@ -174,7 +174,7 @@
             @cancel="closingWithChanges = false"
         />
         </div>
-    </ui-stack>
+    </Stack>
 </template>
 
 <script>
@@ -188,6 +188,7 @@ import {
     PublishContainer,
     PublishTabs,
     Icon,
+	Stack,
 } from '@ui';
 import ItemActions from '@/components/actions/ItemActions.vue';
 
@@ -204,6 +205,7 @@ export default {
         PublishContainer,
         PublishTabs,
         Icon,
+	    Stack,
     },
 
     props: {
@@ -435,7 +437,7 @@ export default {
         },
 
         confirmClose(close) {
-            if (this.shouldClose()) close();
+            if (this.shouldClose()) this.$refs.stack.close();
         },
 
         confirmCloseWithChanges() {
