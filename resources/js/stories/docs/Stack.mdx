@@ -52,9 +52,19 @@ You may use the `header-actions` slot to add buttons or other elements to the he
 
 ## Footer
 
-A footer can be a good place to put buttons and other actions at the bottom of the stack. It will remain fixed.
+A footer can be a good place to put buttons and other actions at the bottom of the stack. It will remain fixed. You can use the `footer-start` and `footer-end` slots.
 
-<Canvas of={StackStories.Composed} sourceState={'shown'} />
+<Canvas of={StackStories.FooterBothSlots} sourceState={'shown'} />
+
+Note that when using these slots, flex will be applied to space buttons (the most common use case) appropriately.
+
+If you need full control, you can compose the footer yourself using the `StackFooter` component.
+
+<Canvas of={StackStories.Footer} sourceState={'shown'} />
+
+Or, you may use the `start` and `end` slots, and anything in the default slot will be positioned between them.
+
+<Canvas of={StackStories.FooterComposed} sourceState={'shown'} />
 
 ## Sizes
 

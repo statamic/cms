@@ -15,6 +15,7 @@ import {hasComponent} from "@/composables/has-component.js";
 import { Button, Heading } from "@ui";
 import Content from './Content.vue';
 import Header from './Header.vue';
+import Footer from './Footer.vue';
 import { FocusScope, Primitive } from 'reka-ui';
 
 const slots = useSlots();
@@ -241,6 +242,17 @@ provide('closeStack', close);
                         </Content>
 
                         <slot v-else v-bind="slotProps" />
+
+                        <template v-if="slots['footer-start'] || slots['footer-end']">
+                            <Footer>
+                                <template #start v-if="slots['footer-start']">
+                                    <slot name="footer-start" />
+                                </template>
+                                <template #end v-if="slots['footer-end']">
+                                    <slot name="footer-end" />
+                                </template>
+                            </Footer>
+                        </template>
 
                         <div
                             v-if="shouldShowFloatingCloseButton"

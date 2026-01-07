@@ -338,13 +338,12 @@ export const AutomaticHeader: Story = {
     }),
 };
 
-export const Composed: Story = {
+export const Footer: Story = {
     parameters: {
         docs: {
             source: {
                 code: `
 <Stack>
-    <StackHeader title="Composed Header" icon="cog" />
     <StackContent>Lots of content...</StackContent>
     <StackFooter>I'm the footer.</StackFooter>
 </Stack>
@@ -359,11 +358,147 @@ export const Composed: Story = {
                 <template #trigger>
                     <Button text="Open" />
                 </template>
-                <StackHeader title="Composed Header" icon="cog" />
                 <StackContent>
                     <div v-for="n in 200" :key="n">Lots of content...</div>
                 </StackContent>
                 <StackFooter>I'm the footer.</StackFooter>
+            </Stack>
+        `
+    }),
+};
+
+export const FooterStartSlot: Story = {
+    parameters: {
+        docs: {
+            source: {
+                code: `
+<Stack>
+    Lots of content...
+    <template #footer-start>I'm at the start (left)</template>
+</Stack>
+                `
+            }
+        }
+    },
+    render: () => ({
+        components: { Stack, Button },
+        template: `
+            <Stack>
+                <template #trigger>
+                    <Button text="Open" />
+                </template>
+                <div v-for="n in 200" :key="n">Lots of content...</div>
+                <template #footer-start>I'm at the start (left)</template>
+            </Stack>
+        `
+    }),
+};
+
+export const FooterEndSlot: Story = {
+    parameters: {
+        docs: {
+            source: {
+                code: `
+<Stack>
+    Lots of content...
+    <template #footer-end>I'm at the end (right)</template>
+</Stack>
+                `
+            }
+        }
+    },
+    render: () => ({
+        components: { Stack, Button },
+        template: `
+            <Stack>
+                <template #trigger>
+                    <Button text="Open" />
+                </template>
+                <div v-for="n in 200" :key="n">Lots of content...</div>
+                <template #footer-end>I'm at the end (right)</template>
+            </Stack>
+        `
+    }),
+};
+
+export const FooterBothSlots: Story = {
+    parameters: {
+        docs: {
+            source: {
+                code: `
+<Stack>
+    Lots of content...
+
+    <template #footer-start>
+        I'm at the start (left)
+    </template>
+    <template #footer-end>
+        <Button text="I'm at the" />
+        <Button text="end (right)" />
+    </template>
+</Stack>
+                `
+            }
+        }
+    },
+    render: () => ({
+        components: { Stack, Button },
+        template: `
+            <Stack>
+                <template #trigger>
+                    <Button text="Open" />
+                </template>
+                <div v-for="n in 200" :key="n">Lots of content...</div>
+                <template #footer-start>I'm at the start (left)</template>
+                <template #footer-end>
+                    <Button text="I'm at the" />
+                    <Button text="end (right)" />
+                </template>
+            </Stack>
+        `
+    }),
+};
+
+export const FooterComposed: Story = {
+    parameters: {
+        docs: {
+            source: {
+                code: `
+<Stack>
+    <StackContent>
+        Lots of content...
+    </StackContent>
+    <StackFooter>
+        <template #start>I'm at the start (left)</template>
+        <template #end>
+            <Button text="I'm at the" />
+            <Button text="end (right)" />
+        </template>
+        I'm in between
+    </StackFooter>
+</Stack>
+                `
+            }
+        }
+    },
+    render: () => ({
+        components: { Stack, StackContent, StackFooter, Button },
+        template: `
+            <Stack>
+                <template #trigger>
+                    <Button text="Open" />
+                </template>
+                <StackContent>
+                    <div v-for="n in 200" :key="n">Lots of content...</div>
+                </StackContent>
+                <StackFooter>
+                    <template #start>I'm at the start (left)</template>
+                    <template #end>
+                        <Button text="I'm at the" />
+                        <Button text="end (right)" />
+                    </template>
+                    I'm in between
+                </StackFooter>
             </Stack>
         `
     }),
