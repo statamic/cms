@@ -77,7 +77,7 @@ defineExpose({
 <template>
 	<div v-if="isVisible" class="absolute top-0 right-0 w-3 p-0.5 h-full pointer-events-none">
 		<div
-			class="absolute right-0 w-1.5 rounded-full bg-black/25 dark:bg-white/25 transition-opacity"
+			class="absolute right-0 w-1.5 rounded-full bg-black/25 hover:bg-black/40 dark:bg-white/25 dark:hover:bg-white/40 transition-colors pointer-events-auto cursor-pointer"
 			:style="{
                 height: `${thumbHeight}%`,
                 top: `${thumbTop}%`
