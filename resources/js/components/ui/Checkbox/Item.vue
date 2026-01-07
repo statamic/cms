@@ -118,7 +118,7 @@ const conditionalProps = computed(() => {
                 <svg v-else viewBox="0 0 10 2" fill="none" xmlns="http://www.w3.org/2000/svg" class="size-2.5 shrink-0" aria-hidden="true"><path d="M2 1H8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" /></svg>
             </CheckboxIndicator>
             <span class="sr-only">
-                {{ indeterminate ? 'Indeterminate' : (modelValue ? 'Checked' : 'Unchecked') }}
+                {{ indeterminate ? __('Indeterminate') : (modelValue ? __('Checked') : __('Unchecked')) }}
             </span>
         </CheckboxRoot>
         <div class="flex flex-col" v-if="!solo">
