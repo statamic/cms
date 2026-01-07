@@ -1,5 +1,5 @@
 <template>
-    <div class="blueprint-section min-h-40 w-full outline-hidden @container">
+    <div class="blueprint-section min-h-40 w-full outline-hidden @container" tabindex="-1">
         <ui-panel>
             <ui-panel-header class="flex items-center justify-between pl-2.75! pr-3.25!">
                 <div class="flex items-center gap-2 flex-1">
