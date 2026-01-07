@@ -17,7 +17,7 @@ import Icon from "@ui/Icon/Icon.vue";
 import { FocusScope, Primitive } from 'reka-ui';
 
 const slots = useSlots();
-const emit = defineEmits(['update:open', 'opened']);
+const emit = defineEmits(['update:open', 'opened', 'closed']);
 
 const props = defineProps({
     /** Title displayed at the top of the stack */
@@ -124,6 +124,8 @@ function close() {
         cleanup();
         stack.value = null;
         escBinding.value = null;
+
+        emit('closed');
     });
 }
 
