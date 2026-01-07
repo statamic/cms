@@ -9,11 +9,12 @@ import {
     onBeforeUnmount,
     provide
 } from 'vue';
-import { stacks, portals, events, keys, config } from '@/api';
+import { stacks, events, keys, config } from '@/api';
 import wait from '@/util/wait.js';
 import {hasComponent} from "@/composables/has-component.js";
 import { Button, Heading } from "@ui";
-import Icon from "@ui/Icon/Icon.vue";
+import Content from './Content.vue';
+import Header from './Header.vue';
 import { FocusScope, Primitive } from 'reka-ui';
 
 const slots = useSlots();
@@ -30,6 +31,10 @@ const props = defineProps({
     beforeClose: { type: Function, default: () => true },
     /** Controls the size of the stack. Options: `narrow`, `half`, `full` */
     size: { type: String, default: null },
+    /** When `true`, the internal padding of the stack content is removed. */
+    inset: { type: Boolean, default: false },
+    /** When `true`, the close button is shown in the top-right corner of the stack. */
+    showCloseButton: { type: Boolean, default: true },
 });
 
 const stack = ref(null);
@@ -39,12 +44,21 @@ const isHovering = ref(false);
 const escBinding = ref(null);
 const windowInnerWidth = ref(window.innerWidth);
 
+const slotProps = computed(() => ({
+    close,
+}));
+
 const instance = getCurrentInstance();
-const hasStackTitleComponent = hasComponent('StackTitle');
+const hasStackHeaderComponent = hasComponent('StackHeader', slotProps);
+const hasStackContentComponent = hasComponent('StackContent', slotProps);
 const isUsingOpenProp = computed(() => instance?.vnode.props?.hasOwnProperty('open'));
 const portal = computed(() => stack.value ? `#portal-target-${stack.value.id}` : null);
 const depth = computed(() => stack.value?.data.depth);
 const isTopStack = computed(() => stacks.count() === depth.value);
+
+const shouldAddHeader = computed(() => (props.title || props.icon) && !hasStackHeaderComponent.value);
+const shouldWrapSlot = computed(() => !hasStackContentComponent.value);
+const shouldShowFloatingCloseButton = computed(() => props.showCloseButton && !shouldAddHeader.value);
 
 const offset = computed(() => {
     if (isTopStack.value && props.size === 'narrow') {
@@ -204,26 +218,32 @@ provide('closeStack', close);
                 <transition name="stack-slide">
                     <div
                         v-if="visible"
-                        data-ui-stack-content
-                        class="stack-content fixed flex flex-col sm:end-1.5 overflow-auto bg-white dark:bg-gray-850 rounded-xl shadow-[0_8px_5px_-6px_rgba(0,0,0,0.1),_0_3px_8px_0_rgba(0,0,0,0.02),_0_30px_22px_-22px_rgba(39,39,42,0.15)] dark:shadow-[0_5px_20px_rgba(0,0,0,.5)] transition-transform duration-150 ease-out"
+                        class="stack-content fixed flex flex-col sm:end-1.5 bg-white dark:bg-gray-850 overflow-hidden rounded-xl shadow-[0_8px_5px_-6px_rgba(0,0,0,0.1),_0_3px_8px_0_rgba(0,0,0,0.02),_0_30px_22px_-22px_rgba(39,39,42,0.15)] dark:shadow-[0_5px_20px_rgba(0,0,0,.5)] transition-transform duration-150 ease-out"
                         :class="[
                             size === 'full' ? 'inset-2 w-[calc(100svw-1rem)]' : 'inset-y-2',
                             { '-translate-x-4 rtl:translate-x-4': isHovering }
                         ]"
                     >
-                        <div
-                            v-if="!hasStackTitleComponent && (title || icon)"
-                            data-ui-stack-title
-                            class="flex items-center justify-between rounded-t-xl border-b border-gray-300 px-4 mb-3 py-2 dark:border-gray-950 dark:bg-gray-800"
-                        >
-                            <div class="flex items-center gap-2">
-                                <Icon :name="icon" v-if="icon" class="size-4" />
-                                <Heading size="lg" :text="title" />
-                            </div>
-                            <Button icon="x" variant="ghost" class="-me-2" @click="close" />
-                        </div>
+                        <template v-if="shouldAddHeader">
+                            <Header :title="title" :icon="icon" />
+                            <Content v-if="shouldWrapSlot" :inset>
+                                <slot v-bind="slotProps" />
+                            </Content>
+                            <slot v-else v-bind="slotProps" />
+                        </template>
 
-                        <slot />
+                        <Content v-else-if="shouldWrapSlot" :inset>
+                            <slot v-bind="slotProps" />
+                        </Content>
+
+                        <slot v-else v-bind="slotProps" />
+
+                        <div
+                            v-if="shouldShowFloatingCloseButton"
+                            class="fixed top-3 right-3"
+                        >
+                            <Button icon="x" variant="ghost" @click="close" />
+                        </div>
                     </div>
                 </transition>
             </FocusScope>
