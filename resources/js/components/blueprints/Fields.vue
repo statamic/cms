@@ -4,6 +4,7 @@
             class="blueprint-section-draggable-zone field-grid gap-2! mb-4 starting-style-transition-children"
             :data-tab="tabId"
             :data-section="sectionId"
+            tabindex="-1"
         >
             <slot name="empty-state" v-if="!fields.length" />
 
