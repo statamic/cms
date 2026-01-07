@@ -8,7 +8,7 @@
             :size="stackSize"
             @closed="close"
         >
-            <div class="h-full overflow-scroll overflow-x-auto bg-white px-6 rounded-l-xl dark:bg-dark-800">
+            <div class="h-full overflow-scroll overflow-x-auto px-6 rounded-l-xl">
                 <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
                     <Icon name="loading" />
                 </div>
