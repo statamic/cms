@@ -73,7 +73,7 @@
                 </div>
             </div>
 
-            <Stack v-model:open="isSelecting">
+            <Stack v-model:open="isSelecting" inset :show-close-button="false">
                 <ItemSelector
                     :name="name"
                     :filters-url="filtersUrl"
