@@ -85,7 +85,7 @@ const gridStyle = computed(() => {
         :maxValue="maxValue"
         :locale="$date.locale"
         fixed-weeks
-        :number-of-months="inline ? numberOfMonths : 1"
+        :number-of-months="numberOfMonths"
         @update:model-value="emit('update:modelValue', $event)"
     >
         <Component :is="components.CalendarHeader" class="flex items-center justify-between ps-3 pe-1 pb-3.5 -mt-1">
@@ -114,7 +114,7 @@ const gridStyle = computed(() => {
                 class="w-full border-collapse space-y-1 select-none"
             >
                 <Component :is="components.CalendarGridHead">
-                    <ui-badge class="mb-2" v-if="inline && numberOfMonths > 1">
+                    <ui-badge class="mb-2" v-if="numberOfMonths > 1">
                         {{ new Date(month.value.toString()).toLocaleString($date.locale, { month: 'long' }) }}
                     </ui-badge>
                     <Component :is="components.CalendarGridRow" class="mb-1 grid w-full grid-cols-7">
