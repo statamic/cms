@@ -1,9 +1,15 @@
 # Statamic CMS - Claude AI Context
 
+## ⚠️ Always Check Before Making Changes
+
+- Are all user-facing strings localized?
+
 ## Project Overview
+
 This is the **Statamic CMS Core Package** - a Laravel-powered, flat-file (by default) CMS designed for building modern, easy-to-manage websites. This repository contains the core Composer package that gets installed into Laravel applications.
 
 ## Project Structure
+
 ```
 ├── src/                  # Core PHP source code (PSR-4: Statamic\)
 │   ├── CP/               # Control Panel specific functionality  
@@ -25,6 +31,7 @@ This is the **Statamic CMS Core Package** - a Laravel-powered, flat-file (by def
 ```
 
 ## Technology Stack
+
 - **Backend**: Laravel 12+ / PHP 8+
 - **Control Panel Frontend**: Vue 3 + TypeScript + Vite
 - **Control Panel CSS**: Tailwind CSS 4
@@ -33,6 +40,7 @@ This is the **Statamic CMS Core Package** - a Laravel-powered, flat-file (by def
 ## Development Commands
 
 ### PHP/Backend
+
 ```bash
 # Run PHPUnit tests
 ./vendor/bin/phpunit
@@ -47,6 +55,7 @@ phpunit.bat
 ```
 
 ## Common Development Tasks
+
 - **Adding new fieldtypes**: Extend `src/Fieldtypes/`
 - **Control Panel features**: Work in `src/CP/` + `resources/js/`
 - **API endpoints**: Check `src/API/` + `routes/api.php`
@@ -55,11 +64,13 @@ phpunit.bat
 - **Authentication**: See `src/Auth/`
 
 ## Testing
+
 - Full PHPUnit test suite in `tests/`
 - Frontend tests with Vitest
 - Run tests before submitting PRs
 
 ## Important Notes
+
 - This is the **core package only** - it requires a Laravel app to run
 - The starter Laravel app is at [statamic/statamic](https://github.com/statamic/statamic)  
 - Documentation site code is at [statamic.dev](https://statamic.dev)
@@ -67,12 +78,15 @@ phpunit.bat
 - Follow the contribution guidelines in [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## Build Process
+
 The project uses Vite for asset compilation with separate configs:
+
 - `vite.config.js` - Main Control Panel assets. e.g. The Vue application.
 - `vite-frontend.config.js` - Frontend-specific assets. e.g. Things like conditional field logic to be used on front-end forms. 
 - Control Panel assets are built to `resources/dist/` and `resources/dist-dev/`. The dev version enables Vue devtools.
 
 ## NPM Package Notes
+
 - Our Vite bundle contains the Vue app, UI components, all the JS to make the Control Panel work.
 - We provide a `@statamic/cms` node module for addons to use that provides core helpers, ui components, etc.
 - Our Vite bundle assembles everything the node module needs in `resouces/js/bootstrap/cms` and makes it available in the `window.__STATAMIC__` object.
@@ -80,6 +94,7 @@ The project uses Vite for asset compilation with separate configs:
 - Code needs to be in the `window` object to prevent addon bundles from re-including our code, and from needing to recompile our source files.
 
 ## Links
+
 - [Main Documentation](https://statamic.dev/)
 - [Application Repo](https://github.com/statamic/statamic) 
 - [Discussions](https://github.com/statamic/cms/discussions)

@@ -33,20 +33,22 @@
             <ui-button icon="add-circle" :text="__('Create Field')" @click="createField" />
         </div>
 
-        <ui-stack
-            name="fieldtype-selector"
-            v-if="isSelectingNewFieldtype"
+        <Stack
+            v-model:open="isSelectingNewFieldtype"
             @closed="isSelectingNewFieldtype = false"
+            :title="__('Fieldtypes')"
+            icon="cog"
             v-slot="{ close }"
         >
             <fieldtype-selector @closed="close" @selected="fieldtypeSelected" />
-        </ui-stack>
+        </Stack>
 
-        <ui-stack
-            name="field-settings"
-            v-if="pendingCreatedField != null"
+        <Stack
+            :open="pendingCreatedField != null"
+            @update:open="(value) => { if (!value) pendingCreatedField = null }"
             @closed="pendingCreatedField = null"
             v-slot="{ close }"
+            inset
         >
             <field-settings
                 ref="settings"
@@ -59,7 +61,7 @@
                 @committed="fieldCreated"
                 @closed="close"
             />
-        </ui-stack>
+        </Stack>
     </div>
 </template>
 
@@ -71,6 +73,7 @@ import LinkFields from './LinkFields.vue';
 import FieldtypeSelector from '../fields/FieldtypeSelector.vue';
 import FieldSettings from '../fields/Settings.vue';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';
+import { Stack } from '@/components/ui';
 
 export default {
     mixins: [CanDefineLocalizable],
@@ -81,6 +84,7 @@ export default {
         LinkFields,
         FieldtypeSelector,
         FieldSettings,
+	    Stack,
     },
 
     props: {
@@ -129,7 +133,7 @@ export default {
                 },
             };
 
-            this.$nextTick(() => (this.pendingCreatedField = pending));
+            setTimeout(() => (this.pendingCreatedField = pending), 500); // wait for stack to close
         },
 
         createField() {

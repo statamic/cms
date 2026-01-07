@@ -25,26 +25,42 @@ import Scrollbar from "@ui/Combobox/Scrollbar.vue";
 const emit = defineEmits(['update:modelValue', 'search', 'selected', 'added']);
 
 const props = defineProps({
-    id: { type: String },
-    clearable: { type: Boolean, default: false },
-    closeOnSelect: { type: Boolean, default: undefined },
-    disabled: { type: Boolean, default: false },
-    discreteFocusOutline: { type: Boolean, default: false },
-    icon: { type: String, default: null },
-    ignoreFilter: { type: Boolean, default: false },
-    labelHtml: { type: Boolean, default: false },
-    maxSelections: { type: Number, default: null },
-    modelValue: { type: [Object, String, Number], default: null },
-    multiple: { type: Boolean, default: false },
-    optionLabel: { type: String, default: 'label' },
-    options: { type: Array, default: () => [] },
-    optionValue: { type: String, default: 'value' },
-    placeholder: { type: String, default: () => __('Select...') },
-    readOnly: { type: Boolean, default: false },
-    searchable: { type: Boolean, default: true },
-    size: { type: String, default: 'base' },
-    taggable: { type: Boolean, default: false },
-    variant: { type: String, default: 'default' },
+	id: { type: String },
+	/** When `true`, the selected value will be clearable. */
+	clearable: { type: Boolean, default: false },
+	/** When `true`, the options dropdown will close after selecting an option. */
+	closeOnSelect: { type: Boolean, default: undefined },
+	disabled: { type: Boolean, default: false },
+	/** When `true`, the focus outline will be more discrete. */
+	discreteFocusOutline: { type: Boolean, default: false },
+	/** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
+	icon: { type: String, default: null },
+	/** When `true`, the Combobox will avoid filtering options, allowing you to handle filtering yourself by listening to the `search` event and updating the `options` prop. */
+	ignoreFilter: { type: Boolean, default: false },
+	/** When `true`, the option labels will be rendered with `v-html` instead of `v-text`. */
+	labelHtml: { type: Boolean, default: false },
+	/** The maximum number of selectable options. */
+	maxSelections: { type: Number, default: null },
+	/** The controlled value of the select. */
+	modelValue: { type: [Object, String, Number], default: null },
+	/** When `true`, multiple options are allowed. */
+	multiple: { type: Boolean, default: false },
+	/** Key of the option's label in the option's object. */
+	optionLabel: { type: String, default: 'label' },
+	/** Array of option objects */
+	options: { type: Array, default: () => [] },
+	/** Key of the option's value in the option's object. */
+	optionValue: { type: String, default: 'value' },
+	placeholder: { type: String, default: () => __('Select...') },
+	readOnly: { type: Boolean, default: false },
+	/** When `true`, the options will be searchable. */
+	searchable: { type: Boolean, default: true },
+	/** Controls the size of the select. <br><br> Options: `xs`, `sm`, `base`, `lg`, `xl` */
+	size: { type: String, default: 'base' },
+	/** When `true`, additional options can be added by typing in the search input and pressing enter. */
+	taggable: { type: Boolean, default: false },
+	/** Controls the appearance of the select. <br><br> Options: `default`, `filled`, `ghost`, `subtle` */
+	variant: { type: String, default: 'default' },
 });
 
 defineOptions({
@@ -368,24 +384,20 @@ defineExpose({
                             />
 
                             <!-- Dropdown open: placeholder -->
-                            <button
+                            <div
                                 v-else-if="!searchable && (dropdownOpen || !modelValue)"
-                                type="button"
                                 class="w-full text-start flex items-center gap-2 bg-transparent cursor-pointer focus:outline-none"
                                 data-ui-combobox-placeholder
-                                @keydown.space="openDropdown"
                             >
                                 <Icon v-if="icon" :name="icon" class="text-gray-500 dark:text-white dark:opacity-50" />
                                 <span class="block truncate text-gray-500 dark:text-gray-400 select-none" v-text="placeholder" />
-                            </button>
+                            </div>
 
                             <!-- Dropdown closed: selected option -->
-                            <button
+                            <div
                                 v-else
-                                type="button"
-                                class="w-full text-start bg-transparent flex items-center gap-2 cursor-pointer focus-none"
+                                class="w-full text-start bg-transparent flex items-center gap-2 cursor-pointer focus:outline-none"
                                 data-ui-combobox-selected-option
-                                @keydown.space="openDropdown"
                             >
                                 <slot v-if="selectedOption" name="selected-option" v-bind="{ option: selectedOption }">
                                     <div v-if="icon" class="size-4">
@@ -394,7 +406,7 @@ defineExpose({
                                     <span v-if="labelHtml" v-html="getOptionLabel(selectedOption)" class="block truncate" />
                                     <span v-else v-text="getOptionLabel(selectedOption)" class="block truncate" />
                                 </slot>
-                            </button>
+                            </div>
                         </div>
 
                         <div v-if="(clearable && modelValue) || (options.length || ignoreFilter)" class="flex gap-1.5 items-center ms-1.5 -me-1">
@@ -526,8 +538,15 @@ defineExpose({
 </template>
 
 <style scoped>
-    /* Override the hardcoded z-index of Reka's popper content wrapper. We can't use a direct descendant selector because the stack is inside a portal, so instead we'll check to see if there is a stack present. */
-    body:has(.stack, .live-preview) [data-reka-popper-content-wrapper] {
+    /* Override the hardcoded z-index of Reka's popper content wrapper under certain conditions. We can't use a direct descendant selector because the combobox is inside a portal, so instead we'll check to see if certain conditions are present. */
+    body:has(
+        /* A modal is present */
+        [data-ui-modal-content],
+        /* Fullscreen Code Editor fieldtype */
+        .code-fullscreen,
+        .stack,
+        .live-preview
+    ) [data-reka-popper-content-wrapper] {
         z-index: var(--z-index-portal)!important;
     }
 
@@ -535,10 +554,5 @@ defineExpose({
         [data-ui-badge] {
             padding-block: 0.65rem;
         }
-    }
-
-    /* Override the hardcoded z-index of Reka's popper content wrapper. When there's a modal present, we need to ensure the popper content is above it. We can't use a direct descendant selector because the modal is inside a portal, so instead we'll check to see if there is modal content present. */
-    body:has([data-ui-modal-content]) [data-reka-popper-content-wrapper] {
-        z-index: var(--z-index-modal)!important;
     }
 </style>

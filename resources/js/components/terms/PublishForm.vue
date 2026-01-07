@@ -342,7 +342,7 @@ export default {
                     saving: this.savingRef,
                 })
                 .through([
-                    new BeforeSaveHooks('entry', {
+                    new BeforeSaveHooks('term', {
                         taxonomy: this.taxonomyHandle,
                         values: this.values,
                     }),
@@ -351,7 +351,7 @@ export default {
                         published: this.published,
                         _localized: this.localizedFields,
                     }),
-                    new AfterSaveHooks('entry', {
+                    new AfterSaveHooks('term', {
                         taxonomy: this.taxonomyHandle,
                         reference: this.initialReference,
                     }),
@@ -517,7 +517,7 @@ export default {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
     },
 
-    unmounted() {
+	beforeUnmount() {
         this.saveKeyBinding.destroy();
         this.quickSaveKeyBinding.destroy();
     },

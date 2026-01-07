@@ -57,7 +57,7 @@ return [
     'code.config.mode' => 'اختر اللغة لتسليط الضوء على بناء الجملة.',
     'code.config.mode_selectable' => 'ما إذا كان يمكن تغيير الوضع من قبل المستخدم.',
     'code.config.rulers' => 'تكوين المساطر العمودية للمساعدة في التباعد.',
-    'code.config.theme' => 'اختر السمة المفضلة لديك.',
+    'code.config.color_mode' => 'اختر السمة المفضلة لديك.',
     'code.title' => 'كود',
     'collections.title' => 'مجموعات',
     'color.config.allow_any' => 'السماح بإدخال أي قيمة لون عبر المُختار أو كود Hex.',

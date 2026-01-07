@@ -1,7 +1,7 @@
 <template>
     <div class="bard-link-toolbar">
         <div>
-            <div class="border-b bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 rounded-t-md">
+            <div class="border-b bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 rounded-t-xl">
                 <section class="flex gap-2 items-center p-4 border-b dark:border-gray-800">
                     <ui-select
                         v-model="linkType"
@@ -148,7 +148,7 @@
             @item-data-updated="entrySelected"
         />
 
-        <ui-stack v-if="showAssetSelector" name="asset-selector" @closed="closeAssetSelector">
+        <Stack v-model:open="showAssetSelector" inset :show-close-button="false">
             <asset-selector
                 :container="config.container"
                 :folder="config.folder || '/'"
@@ -156,21 +156,22 @@
                 :selected="[]"
                 :max-files="1"
                 @selected="assetSelected"
-                @closed="closeAssetSelector"
+                @closed="showAssetSelector = false"
             />
-        </ui-stack>
+        </Stack>
     </div>
 </template>
 
 <script>
 import qs from 'qs';
 import AssetSelector from '../../assets/Selector.vue';
-import { Icon } from '@/components/ui';
+import { Icon, Stack } from '@/components/ui';
 
 export default {
     components: {
         AssetSelector,
         Icon,
+	    Stack,
     },
 
     props: {
@@ -418,10 +419,6 @@ export default {
 
         openAssetSelector() {
             this.showAssetSelector = true;
-        },
-
-        closeAssetSelector() {
-            this.showAssetSelector = false;
         },
 
         assetSelected(data) {

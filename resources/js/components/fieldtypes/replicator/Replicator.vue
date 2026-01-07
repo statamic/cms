@@ -52,7 +52,7 @@
                                     @duplicated="duplicateSet(set._id)"
                                     @removed="removed(set, index)"
                                 >
-                                    <template v-slot:picker>
+                                    <template v-if="canAddSet" v-slot:picker>
                                         <add-set-button
                                             variant="between"
                                             :groups="groupConfigs"

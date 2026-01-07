@@ -6,18 +6,31 @@ import Icon from '../Icon/Icon.vue';
 import { Link } from '@inertiajs/vue3';
 
 const props = defineProps({
+    /** The element or component this component should render as */
     as: { type: String, default: null },
+    /** The URL to link to */
     href: { type: String, default: null },
+    /** When `href` is provided, this prop controls the link's `target` attribute */
     target: { type: String, default: null },
+    /** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
     icon: { type: String, default: null },
+    /** Icon name. Will display after the text. [Browse available icons](/?path=/story/components-icon--all-icons) */
     iconAppend: { type: String, default: null },
+    /** When `true`, the button's padding will be adjusted to account for no text */
     iconOnly: { type: Boolean, default: false },
+    /** When using `ghost` or `subtle` button variants, you can use the `inset` prop to remove any invisible padding for better alignment */
     inset: { type: Boolean, default: false },
+    /** When `true`, the button shows an animated loading icon */
     loading: { type: Boolean, default: false },
+    /** When `true`, the button will be rounded */
     round: { type: Boolean, default: false },
+    /** Controls the size of the button. Options: `2xs`, `xs`, `sm`, `base`, `lg` */
     size: { type: String, default: 'base' },
+    /** Text to display in the button */
     text: { type: [String, Number, Boolean, null], default: null },
+    /** Unless `href` is provided, this component defaults to a `<button>`. This prop controls the button's `type` attribute */
     type: { type: String, default: 'button' },
+    /** Controls the appearance of the button. Options: `default`, `primary`, `danger`, `filled`, `ghost`, `ghost-pressed`, `subtle`, `pressed` */
     variant: { type: String, default: 'default' },
 });
 
@@ -42,9 +55,9 @@ const buttonClasses = computed(() => {
                     'dark:from-gray-850 dark:to-gray-900 dark:hover:to-gray-850 dark:hover:bg-gray-900 dark:border-gray-700/80 dark:text-gray-300 dark:shadow-ui-md',
                 ],
                 primary: [
-                    'bg-linear-to-b from-primary/90 to-primary hover:bg-primary-hover text-white disabled:text-white/60 dark:disabled:text-white/50 border border-primary-border shadow-ui-md inset-shadow-2xs inset-shadow-white/25 [&_svg]:text-white [&_svg]:opacity-60',
+                    'bg-linear-to-b from-primary/90 to-primary hover:bg-primary-hover text-white disabled:opacity-60 disabled:text-white dark:disabled:text-white border border-primary-border shadow-ui-md inset-shadow-2xs inset-shadow-white/25 disabled:inset-shadow-none dark:disabled:inset-shadow-none [&_svg]:text-white [&_svg]:opacity-60',
                 ],
-                danger: 'bg-linear-to-b from-red-700/90 to-red-700 hover:bg-red-700/90 text-white border border-red-700 inset-shadow-xs inset-shadow-red-300 [&_svg]:text-red-200 disabled:text-red-200',
+                danger: 'bg-linear-to-b from-red-700/90 to-red-700 hover:bg-red-700/90 text-white border border-red-700 inset-shadow-xs inset-shadow-red-300 [&_svg]:text-red-200 disabled:text-white disabled:opacity-60 disabled:inset-shadow-none',
                 filled: 'bg-black/5 hover:bg-black/10 hover:text-gray-900 dark:hover:text-white dark:bg-white/15 dark:hover:bg-white/20 [&_svg]:opacity-70',
                 ghost: 'bg-transparent hover:bg-gray-400/10 text-gray-900 dark:text-gray-300 dark:hover:bg-white/7 dark:hover:text-gray-200',
                 'ghost-pressed': 'bg-transparent hover:bg-gray-400/10 text-black dark:text-white dark:hover:bg-white/7 dark:hover:text-white [&_svg]:opacity-100',
