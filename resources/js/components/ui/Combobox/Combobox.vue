@@ -384,24 +384,20 @@ defineExpose({
                             />
 
                             <!-- Dropdown open: placeholder -->
-                            <button
+                            <div
                                 v-else-if="!searchable && (dropdownOpen || !modelValue)"
-                                type="button"
                                 class="w-full text-start flex items-center gap-2 bg-transparent cursor-pointer focus:outline-none"
                                 data-ui-combobox-placeholder
-                                @keydown.space="openDropdown"
                             >
                                 <Icon v-if="icon" :name="icon" class="text-gray-500 dark:text-white dark:opacity-50" />
                                 <span class="block truncate text-gray-500 dark:text-gray-400 select-none" v-text="placeholder" />
-                            </button>
+                            </div>
 
                             <!-- Dropdown closed: selected option -->
-                            <button
+                            <div
                                 v-else
-                                type="button"
-                                class="w-full text-start bg-transparent flex items-center gap-2 cursor-pointer focus-none"
+                                class="w-full text-start bg-transparent flex items-center gap-2 cursor-pointer focus:outline-none"
                                 data-ui-combobox-selected-option
-                                @keydown.space="openDropdown"
                             >
                                 <slot v-if="selectedOption" name="selected-option" v-bind="{ option: selectedOption }">
                                     <div v-if="icon" class="size-4">
@@ -410,7 +406,7 @@ defineExpose({
                                     <span v-if="labelHtml" v-html="getOptionLabel(selectedOption)" class="block truncate" />
                                     <span v-else v-text="getOptionLabel(selectedOption)" class="block truncate" />
                                 </slot>
-                            </button>
+                            </div>
                         </div>
 
                         <div v-if="(clearable && modelValue) || (options.length || ignoreFilter)" class="flex gap-1.5 items-center ms-1.5 -me-1">
