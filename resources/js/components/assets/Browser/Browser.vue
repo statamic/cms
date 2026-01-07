@@ -88,7 +88,7 @@
                         </slot>
 
                         <div
-                            v-if="containerIsEmpty"
+                            v-if="containerIsEmpty && !creatingFolder"
                             class="rounded-lg border border-dashed border-gray-300 dark:border-gray-700 p-6 text-center text-gray-500"
                             v-text="__('No results')"
                         />
