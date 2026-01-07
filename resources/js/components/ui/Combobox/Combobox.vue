@@ -423,7 +423,7 @@ defineExpose({
                         align="start"
                         :class="[
                             'shadow-ui-sm z-(--z-index-above) rounded-lg border border-gray-200 bg-white p-2 dark:border-white/10 dark:bg-gray-800',
-                            'max-h-[var(--reka-combobox-content-available-height)] min-w-[var(--reka-combobox-trigger-width)]',
+                            'min-h-[10rem] max-h-[var(--reka-combobox-content-available-height)] min-w-[var(--reka-combobox-trigger-width)]',
                             'overflow-hidden'
                         ]"
                         :style="optionWidth ? { width: `${optionWidth}px` } : {}"
@@ -442,7 +442,7 @@ defineExpose({
                             <div class="relative">
                                 <ComboboxViewport
                                     ref="viewport"
-                                    class="max-h-[calc(var(--reka-combobox-content-available-height)-5rem)] overflow-y-scroll"
+                                    class="max-h-[calc(var(--reka-combobox-content-available-height)-2rem)] overflow-y-scroll"
                                     data-ui-combobox-viewport
                                 >
                                     <ComboboxEmpty class="p-2 text-sm" data-ui-combobox-empty>
