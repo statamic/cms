@@ -9,6 +9,8 @@ const isVisible = ref(false);
 const thumbHeight = ref(0);
 const thumbTop = ref(0);
 
+let resizeObserver = null;
+
 function update() {
 	const element = props.viewport?.$el || props.viewport;
 	if (!element) return;
@@ -34,11 +36,22 @@ function update() {
 
 watch(
 	() => props.viewport,
-	(viewport) => {
+	(viewport, oldViewport) => {
+		const oldElement = oldViewport?.$el || oldViewport;
+
+		if (oldElement) {
+			oldElement.removeEventListener('scroll', update);
+			resizeObserver?.disconnect();
+		}
+
 		if (viewport) {
 			const element = viewport.$el || viewport;
 			if (element) {
 				element.addEventListener('scroll', update);
+
+				resizeObserver = new ResizeObserver(() => update());
+				resizeObserver.observe(element);
+
 				nextTick(() => update());
 			}
 		}
@@ -52,6 +65,8 @@ onUnmounted(() => {
 	if (element) {
 		element.removeEventListener('scroll', update);
 	}
+	
+	resizeObserver?.disconnect();
 });
 
 defineExpose({
