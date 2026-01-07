@@ -1,11 +1,13 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {Button, Stack, StackClose, StackTitle} from '@ui';
+import {Button, Stack, StackClose, StackHeader, StackContent, StackFooter, Modal, ModalClose} from '@ui';
 
 const meta = {
     title: 'Overlays/Stack',
     component: Stack,
     subcomponents: {
-        StackTitle,
+        StackHeader,
+        StackContent,
+        StackFooter,
         StackClose,
     },
     argTypes: {
@@ -30,10 +32,12 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const defaultCode = `
-<Stack v-model:open="isOpen" title="That's Pretty Neat">
+<Stack>
     <template #trigger>
         <Button text="How neat is that?" />
     </template>
+
+    That's pretty neat.
 </Stack>
 `;
 
@@ -46,77 +50,81 @@ export const _DocsIntro: Story = {
     },
     render: () => ({
         components: { Stack, Button },
-        data: () => {
-            return { isOpen: false };
-        },
         template: defaultCode,
     }),
 };
 
-const customTitleCode = `
-<Stack v-model:open="isOpen">
-    <template #trigger>
-        <Button text="How neat is that?" />
-    </template>
-    <StackTitle class="text-center flex items-center justify-between">
-        <span>🍁</span>
-        <h2 class="font-serif text-xl">What's why they call it neature!</h2>
-        <span>🍁</span>
-    </StackTitle>
-</Stack>
-`;
-
-export const _CustomTitle: Story = {
-    tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: customTitleCode }
-        }
-    },
-    render: () => ({
-        components: { Stack, StackTitle, Button },
-        data: () => {
-            return { isOpen: false };
-        },
-        template: customTitleCode,
-    }),
-};
-
 const closeButtonCode = `
-<Stack 
-    v-model:open="isOpen" 
-    title="Hey look a close button" 
-    class="text-center"
->
-    <template #trigger>
-        <Button text="Open Says Me" />
-    </template>
-    <StackClose class="text-center">
-        <Button text="Close Says Me" />
+<Stack>
+    <StackClose>
+        <Button text="Close" />
     </StackClose>
 </Stack>
 `;
 
-export const _CloseButton: Story = {
+export const _StackClose: Story = {
     tags: ['!dev'],
     parameters: {
         docs: {
-            source: { code: closeButtonCode }
+            source: {
+                code: `
+                    <Stack>
+                        <StackClose>
+                            <Button text="Close" />
+                        </StackClose>
+                    </Stack>
+                `
+            }
         }
     },
     render: () => ({
         components: { Stack, StackClose, Button },
-        data: () => {
-            return { isOpen: false };
-        },
-        template: closeButtonCode,
+        template: `
+            <Stack>
+                <template #trigger>
+                    <Button text="Open" />
+                </template>
+                <StackClose>
+                    <Button text="Close" />
+                </StackClose>
+            </Stack>
+
+        `,
+    }),
+};
+
+export const _CloseViaSlotProp: Story = {
+    tags: ['!dev'],
+    parameters: {
+        docs: {
+            source: {
+                code: `
+                    <Stack v-slot="{ close }">
+                        <SomeComponent @finished="close" />
+                    </Stack>
+                `
+            }
+        }
+    },
+    render: () => ({
+        components: { Stack, Button },
+        template: `
+            <Stack>
+                <template #trigger>
+                    <Button text="Open" />
+                </template>
+                <template #default="{ close }">
+                    <Button text="Close" @click="close" />
+                </template>
+            </Stack>
+        `,
     }),
 };
 
 const iconCode = `
-<Stack 
-    v-model:open="isOpen" 
-    title="That's Pretty Neat" 
+<Stack
+    v-model:open="isOpen"
+    title="That's Pretty Neat"
     icon="fire-flame-burn-hot"
 >
     <template #trigger>
@@ -142,32 +150,262 @@ export const _WithIcon: Story = {
 };
 
 const beforeCloseCode = `
-<Stack 
+<Stack
     v-model:open="isOpen"
-    :before-close="() => {
-        if (confirm('Are you sure?')) {
-            return true; // let it close
-        } else {
-            return false; // prevent it from closing
-        }
-    }"
+    :before-close="confirmClose"
 >
-    <!-- -->
+    <template #trigger>
+        <Button text="Close" />
+    </template>
+    When you try to close me, you'll be asked to confirm.
 </Stack>
 `;
 
-export const _BeforeClose: Story = {
-    tags: ['!dev'],
+export const BeforeClose: Story = {
     parameters: {
         docs: {
-            source: { code: beforeCloseCode }
+            source: {
+                code: `
+<template>
+    <Stack :before-close="() => confirm('Are you sure?')">
+        When you try to close me, you'll be asked to confirm.
+    </Stack>
+</template>
+            `
+            }
         }
     },
     render: () => ({
         components: { Stack, Button },
         data: () => {
-            return { isOpen: false };
+            return {
+                confirmClose: () => confirm('Are you sure?'),
+            };
         },
-        template: beforeCloseCode,
+        template: `
+            <Stack :before-close="confirmClose">
+                <template #trigger>
+                    <Button text="Open" />
+                </template>
+                When you try to close me, you'll be asked to confirm.
+            </Stack>`,
+    }),
+};
+
+
+const viaTriggerCode = `
+    <Stack>
+        <template #trigger>
+            <Button text="Open" />
+        </template>
+
+        I'm a stack.
+    </Stack>
+`;
+export const ViaTrigger: Story = {
+    parameters: {
+        docs: {
+            source: {
+                code: viaTriggerCode
+            }
+        }
+    },
+    render: () => ({
+        components: { Stack, Button },
+        template: viaTriggerCode
+    }),
+};
+
+const viaPropTemplate = `
+    <Button text="Open" @click="isOpen = true" />
+
+    <Stack v-model:open="isOpen">
+        I'm a stack.
+    </Stack>
+`;
+const viaPropCode = `
+<script setup>
+import { ref } from 'vue';
+const isOpen = ref(false);
+</script>
+
+<template>${viaPropTemplate}</template>
+`;
+export const ViaProp: Story = {
+    parameters: {
+        docs: {
+            source: {
+                code: viaPropCode
+            }
+        }
+    },
+    render: () => ({
+        components: { Stack, Button },
+        data: () => ({ isOpen: false }),
+        template: viaPropTemplate
+    }),
+};
+
+export const Nesting: Story = {
+    parameters: {
+        docs: {
+            source: {
+                code: `
+<Stack title="First">
+    <First />
+</Stack>
+
+// First.vue
+<template>
+    <Stack title="Second">
+        <Second />
+    </Stack>
+</template>
+
+// Second.vue
+<template>
+    <Stack title="Third">
+        and so on...
+    </Stack>
+</template>
+                `
+            }
+        }
+    },
+    render: () => ({
+        components: { Stack, StackClose, Modal, ModalClose, Button },
+        template: `
+            <Stack title="First">
+                <template #trigger>
+                    <Button text="Open" />
+                </template>
+
+                <Stack title="Second">
+                    <template #trigger>
+                        <Button text="Open Second Stack" />
+                    </template>
+
+                    <Modal>
+                        <template #trigger>
+                            <Button text="Open Modal" />
+                        </template>
+
+                        <Stack title="Third">
+                            <template #trigger>
+                                <Button text="Open Third Stack" />
+                            </template>
+
+                            <Stack title="Fourth">
+                                <template #trigger>
+                                    <Button text="Open Fourth Stack" />
+                                </template>
+
+                                <StackClose>
+                                    <Button text="Okay that's enough" />
+                                </StackClose>
+                            </Stack>
+                        </Stack>
+                    </Modal>
+
+                </Stack>
+            </Stack>
+        `
+    }),
+};
+
+export const AutomaticHeader: Story = {
+    parameters: {
+        docs: {
+            source: {
+                code: `
+                    <Stack title="Stack Title" icon="cog">
+                        Lots of content...
+                    </Stack>
+                `
+            }
+        }
+    },
+    render: () => ({
+        components: { Stack, Button },
+        template: `
+            <Stack title="Stack Title" icon="cog">
+                <template #trigger>
+                    <Button text="Open" />
+                </template>
+                <div v-for="n in 200" :key="n">Lots of content...</div>
+            </Stack>
+        `
+    }),
+};
+
+export const Composed: Story = {
+    parameters: {
+        docs: {
+            source: {
+                code: `
+<Stack>
+    <StackHeader title="Composed Header" icon="cog" />
+    <StackContent>Lots of content...</StackContent>
+    <StackFooter>I'm the footer.</StackFooter>
+</Stack>
+                `
+            }
+        }
+    },
+    render: () => ({
+        components: { Stack, StackHeader, StackContent, StackFooter, Button },
+        template: `
+            <Stack>
+                <template #trigger>
+                    <Button text="Open" />
+                </template>
+                <StackHeader title="Composed Header" icon="cog" />
+                <StackContent>
+                    <div v-for="n in 200" :key="n">Lots of content...</div>
+                </StackContent>
+                <StackFooter>I'm the footer.</StackFooter>
+            </Stack>
+        `
+    }),
+};
+
+export const Sizes: Story = {
+    parameters: {
+        docs: {
+            source: {
+                code: `
+                    <Stack> Default! </Stack>
+
+                    <Stack size="narrow"> Narrow! </Stack>
+
+                    <Stack size="full"> Full width! </Stack>
+                `
+            }
+        }
+    },
+    render: () => ({
+        components: { Stack, StackHeader, StackContent, StackFooter, Button },
+        template: `
+            <div class="flex gap-2">
+                <Stack>
+                    <template #trigger>
+                        <Button text="Default" />
+                    </template>
+                    Default!
+                </Stack>
+                <Stack size="narrow">
+                    <template #trigger>
+                        <Button text="Narrow" />
+                    </template>
+                    Narrow!
+                </Stack>
+                <Stack size="full">
+                    <template #trigger>
+                        <Button text="Full Width" />
+                    </template>
+                    Full width!
+                </Stack>
+            </div>
+        `
     }),
 };
