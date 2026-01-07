@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Icon, Heading, Button } from '@ui';
-import { inject } from 'vue';
+import { inject, useSlots } from 'vue';
 
 defineOptions({ name: 'StackHeader' });
 
@@ -16,6 +16,8 @@ withDefaults(defineProps<{
 });
 
 const close = inject<() => void>('closeStack');
+
+const hasActionsSlot = !!useSlots().actions;
 </script>
 
 <template>
@@ -27,8 +29,10 @@ const close = inject<() => void>('closeStack');
             <Icon :name="icon" v-if="icon" class="size-4" />
             <Heading size="lg" :text="title" />
         </div>
-        <slot name="actions" :close="close">
+        <div v-if="hasActionsSlot" class="flex items-center gap-2">
+            <slot name="actions" :close="close" />
             <Button v-if="showCloseButton" icon="x" variant="ghost" class="-me-2" @click="close" />
-        </slot>
+        </div>
+        <Button v-if="!hasActionsSlot && showCloseButton" icon="x" variant="ghost" class="-me-2" @click="close" />
     </div>
 </template>

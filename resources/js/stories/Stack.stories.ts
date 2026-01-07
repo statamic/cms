@@ -369,6 +369,62 @@ export const Composed: Story = {
     }),
 };
 
+export const HeaderActions: Story = {
+    render: () => ({
+        components: { Stack, StackHeader, StackContent, Button },
+        template: `
+            <Stack>
+                <template #trigger>
+                    <Button text="Open" />
+                </template>
+                <StackHeader title="Composed Header" icon="cog">
+                    <template #actions>
+                        <Button text="Cancel" variant="ghost" />
+                        <Button text="Submit" variant="primary" />
+                    </template>
+                </StackHeader>
+                <StackContent>
+                    <div v-for="n in 200" :key="n">Lots of content...</div>
+                </StackContent>
+            </Stack>
+        `
+    }),
+};
+
+
+export const HeaderActionsSlot: Story = {
+    parameters: {
+        docs: {
+            source: {
+                code: `
+<Stack title="Actions in header via slot" icon="cog">
+    <template #header-actions>
+        <Button text="Cancel" variant="ghost" />
+        <Button text="Submit" variant="primary" />
+    </template>
+    Lots of content...
+</Stack>
+                `
+            }
+        }
+    },
+    render: () => ({
+        components: { Stack, StackContent, Button },
+        template: `
+            <Stack title="Actions in header via slot" icon="cog">
+                <template #trigger>
+                    <Button text="Open" />
+                </template>
+                <template #header-actions>
+                    <Button text="Cancel" variant="ghost" />
+                    <Button text="Submit" variant="primary" />
+                </template>
+                <div v-for="n in 200" :key="n">Lots of content...</div>
+            </Stack>
+        `
+    }),
+};
+
 export const Sizes: Story = {
     parameters: {
         docs: {

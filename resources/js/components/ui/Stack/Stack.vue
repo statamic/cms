@@ -56,9 +56,9 @@ const portal = computed(() => stack.value ? `#portal-target-${stack.value.id}` :
 const depth = computed(() => stack.value?.data.depth);
 const isTopStack = computed(() => stacks.count() === depth.value);
 
-const shouldAddHeader = computed(() => (props.title || props.icon) && !hasStackHeaderComponent.value);
+const shouldAddHeader = computed(() => !!(props.title || props.icon) && !hasStackHeaderComponent.value);
 const shouldWrapSlot = computed(() => !hasStackContentComponent.value);
-const shouldShowFloatingCloseButton = computed(() => props.showCloseButton && !shouldAddHeader.value);
+const shouldShowFloatingCloseButton = computed(() => props.showCloseButton && !shouldAddHeader.value && !hasStackHeaderComponent.value);
 
 const offset = computed(() => {
     if (isTopStack.value && props.size === 'narrow') {
@@ -225,7 +225,11 @@ provide('closeStack', close);
                         ]"
                     >
                         <template v-if="shouldAddHeader">
-                            <Header :title="title" :icon="icon" />
+                            <Header :title="title" :icon="icon">
+                                <template #actions v-if="slots['header-actions']">
+                                    <slot name="header-actions" />
+                                </template>
+                            </Header>
                             <Content v-if="shouldWrapSlot" :inset>
                                 <slot v-bind="slotProps" />
                             </Content>
