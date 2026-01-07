@@ -1,5 +1,5 @@
 <template>
-    <div class="h-full bg-content-bg dark:bg-dark-content-bg rounded-s-xl">
+    <div class="h-full rounded-s-xl">
         <div class="flex h-full min-h-0 flex-col">
             <Listing
                 v-if="filters != null && view === 'list'"
