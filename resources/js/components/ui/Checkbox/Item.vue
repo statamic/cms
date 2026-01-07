@@ -115,7 +115,7 @@ const conditionalProps = computed(() => {
                 <!-- Checkmark icon for checked state -->
                 <svg v-if="!indeterminate" viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg" class="size-2.5 shrink-0" aria-hidden="true"><path d="M9 1L3.5 6.5L1 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
                 <!-- Dash icon for indeterminate state -->
-                <svg v-else viewBox="0 0 10 2" fill="none" xmlns="http://www.w3.org/2000/svg" class="size-2.5 shrink-0" aria-hidden="true"><path d="M1 1H9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" /></svg>
+                <svg v-else viewBox="0 0 10 2" fill="none" xmlns="http://www.w3.org/2000/svg" class="size-2.5 shrink-0" aria-hidden="true"><path d="M2 1H8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" /></svg>
             </CheckboxIndicator>
             <span class="sr-only">
                 {{ indeterminate ? 'Indeterminate' : (modelValue ? 'Checked' : 'Unchecked') }}
