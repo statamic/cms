@@ -38,7 +38,9 @@ class Bard extends Replicator
     ];
 
     protected $categories = ['text', 'structured'];
+
     protected $keywords = ['rich', 'richtext', 'rich text', 'editor', 'wysiwg', 'builder', 'page builder', 'gutenberg', 'content'];
+
     protected $rules = [];
 
     protected function configFieldItems(): array
@@ -711,14 +713,15 @@ class Bard extends Replicator
 
     private function getLinkDataForUrl($url)
     {
-        $ref = Str::after($url, 'statamic://');
+        $ref = str($url)->after('statamic://');
         [$type, $id] = explode('::', $ref, 2);
 
         $data = null;
 
         switch ($type) {
             case 'entry':
-                if ($entry = Entry::find($id)) {
+                $ref = $ref->before('?')->before('#');
+                if ($entry = Entry::find($ref->after('entry::'))) {
                     $data = [
                         'title' => $entry->get('title'),
                         'permalink' => $entry->absoluteUrl(),
@@ -735,7 +738,7 @@ class Bard extends Replicator
                 break;
         }
 
-        return [$ref => $data];
+        return [$ref->toString() => $data];
     }
 
     private function wrapInlineValue($value)
