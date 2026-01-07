@@ -244,7 +244,7 @@ provide('closeStack', close);
 
                         <div
                             v-if="shouldShowFloatingCloseButton"
-                            class="fixed top-3 right-3"
+                            class="fixed top-4 right-4"
                         >
                             <Button icon="x" variant="ghost" @click="close" />
                         </div>
