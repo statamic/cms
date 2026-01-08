@@ -102,7 +102,7 @@ const results = computed(() => {
         .map(category => {
             return {
                 text: __(category),
-                items: grouped[category],
+                items: uniq(grouped[category]),
             };
         })
         .filter(category => category.items);
