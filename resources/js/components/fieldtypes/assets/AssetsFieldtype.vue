@@ -33,7 +33,7 @@
                     :class="{
                         'rounded-b-none': expanded,
                         'bard-drag-handle': isInBardField,
-                        'sm:gap-x-0.5': maxFilesReached,
+                        'gap-x-0 sm:gap-x-0.5': maxFilesReached,
                     }"
                 >
                     <Button
