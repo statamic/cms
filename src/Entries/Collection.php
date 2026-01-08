@@ -482,6 +482,8 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
     {
         $isNew = ! Facades\Collection::handleExists($this->handle);
 
+        Blink::forget("collection-{$this->id()}-structure");
+
         $withEvents = $this->withEvents;
         $this->withEvents = true;
 
