@@ -36,7 +36,7 @@
                     }"
                 >
                     <Button
-                        v-if="canBrowse"
+                        v-if="canBrowse && !maxFilesReached"
                         icon="folder-open"
                         tabindex="0"
                         :text="__('Browse Assets')"
