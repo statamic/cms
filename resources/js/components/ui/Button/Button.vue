@@ -47,7 +47,7 @@ const iconOnly = computed(() => (props.icon && !hasDefaultSlot && !props.text) |
 
 const buttonClasses = computed(() => {
     const classes = cva({
-        base: 'relative inline-flex items-center justify-center whitespace-nowrap shrink-0 font-medium antialiased cursor-pointer no-underline disabled:text-gray-400 dark:disabled:text-gray-600 disabled:[&_svg]:opacity-30 disabled:cursor-not-allowed [&_svg]:shrink-0 [&_svg]:text-black [&_svg]:opacity-60 dark:[&_svg]:text-white',
+        base: 'relative inline-flex items-center justify-center whitespace-nowrap shrink-0 font-medium antialiased cursor-pointer no-underline disabled:text-gray-400 dark:disabled:text-gray-600 disabled:[&_svg]:opacity-30 disabled:cursor-not-allowed [&_svg]:shrink-0 [&_svg]:text-gray-925 [&_svg]:opacity-60 dark:[&_svg]:text-white',
         variants: {
             variant: {
                 default: [
@@ -60,7 +60,7 @@ const buttonClasses = computed(() => {
                 danger: 'bg-linear-to-b from-red-700/90 to-red-700 hover:bg-red-700/90 text-white border border-red-700 inset-shadow-xs inset-shadow-red-300 [&_svg]:text-red-200 disabled:text-white disabled:opacity-60 disabled:inset-shadow-none',
                 filled: 'bg-black/5 hover:bg-black/10 hover:text-gray-900 dark:hover:text-white dark:bg-white/15 dark:hover:bg-white/20 [&_svg]:opacity-70',
                 ghost: 'bg-transparent hover:bg-gray-400/10 text-gray-900 dark:text-gray-300 dark:hover:bg-white/7 dark:hover:text-gray-200',
-                'ghost-pressed': 'bg-transparent hover:bg-gray-400/10 text-black dark:text-white dark:hover:bg-white/7 dark:hover:text-white [&_svg]:opacity-100',
+                'ghost-pressed': 'bg-transparent hover:bg-gray-400/10 text-gray-925 dark:text-white dark:hover:bg-white/7 dark:hover:text-white [&_svg]:opacity-100',
                 subtle: 'bg-transparent hover:bg-gray-400/10 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-white/7 dark:hover:text-gray-200 [&_svg]:opacity-35',
                 pressed: [
                     'bg-linear-to-b from-gray-200 to-gray-150 text-gray-900 border border-gray-300 inset-shadow-sm/10',
