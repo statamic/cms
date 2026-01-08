@@ -7,7 +7,7 @@ import debounce from '@/util/debounce';
 import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, DialogTrigger, DialogDescription, VisuallyHidden } from 'reka-ui';
 import { ComboboxContent, ComboboxEmpty, ComboboxGroup, ComboboxLabel, ComboboxInput, ComboboxItem, ComboboxRoot, ComboboxViewport } from 'reka-ui';
 import fuzzysort from 'fuzzysort';
-import { each, groupBy, orderBy, find, uniq } from 'lodash-es';
+import { each, groupBy, orderBy, find, uniq, uniqBy } from 'lodash-es';
 import { motion } from 'motion-v';
 import { cva } from 'cva';
 import { Icon, Subheading } from '@/components/ui';
@@ -102,7 +102,7 @@ const results = computed(() => {
         .map(category => {
             return {
                 text: __(category),
-                items: uniq(grouped[category]),
+                items: uniqBy(grouped[category], 'url'),
             };
         })
         .filter(category => category.items);
