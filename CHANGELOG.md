@@ -1,5 +1,31 @@
 # Release Notes
 
+## 5.71.0 (2026-01-08)
+
+### What's new
+- PHP 8.5 Compatibility [#13112](https://github.com/statamic/cms/issues/13112) by @duncanmcclean
+- Add ability to get raw array directly from Values object [#13318](https://github.com/statamic/cms/issues/13318) by @andjsch
+- Make GetItemsContainingData hookable [#13302](https://github.com/statamic/cms/issues/13302) by @ryanmitchell
+
+### What's fixed
+- Fix structure not being saved to collection [#13479](https://github.com/statamic/cms/issues/13479) by @jasonvarga
+- Fix JsDriver::addToFormData call to match interface signature [#13463](https://github.com/statamic/cms/issues/13463) by @andrii-trush
+- Fix add set button not overlap content on small container [#13269](https://github.com/statamic/cms/issues/13269) by @lecoa
+- Terms Filter: Use `terms` fieldtype instead of `select` [#13439](https://github.com/statamic/cms/issues/13439) by @duncanmcclean
+- Fix blueprint cache [#13430](https://github.com/statamic/cms/issues/13430) by @aerni
+- Add `Nav::clearCachedUrls` expectation to `AddonTestCase` [#13396](https://github.com/statamic/cms/issues/13396) by @duncanmcclean
+- Remove "Bulgarian Lev" from Currencies dictionary [#13414](https://github.com/statamic/cms/issues/13414) by @duncanmcclean
+- Ensure field parent is set correctly [#13305](https://github.com/statamic/cms/issues/13305) by @aerni
+- Invalidate nav's URL cache when collection/taxonomy/etc is created [#13297](https://github.com/statamic/cms/issues/13297) by @duncanmcclean
+- Fix whereNotIn error with nulls [#13266](https://github.com/statamic/cms/issues/13266) by @jasonvarga
+- Fix `eloquent:import-users` command with computed values [#13260](https://github.com/statamic/cms/issues/13260) by @duncanmcclean
+- Fix page collection and mounted collection [#13250](https://github.com/statamic/cms/issues/13250) by @jasonvarga
+- French translations [#13300](https://github.com/statamic/cms/issues/13300) by @ebeauchamps
+- Bump validator from 13.15.20 to 13.15.22 [#13234](https://github.com/statamic/cms/issues/13234) by @dependabot
+- Bump qs from 6.11.1 to 6.14.1 [#13409](https://github.com/statamic/cms/issues/13409) by @dependabot
+
+
+
 ## 5.70.0 (2025-12-03)
 
 ### What's new
