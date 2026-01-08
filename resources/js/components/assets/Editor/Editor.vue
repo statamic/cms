@@ -39,6 +39,7 @@
                                 v-slot="{ actions }"
                             >
                                 <ui-button inset size="sm" v-if="isImage && isFocalPointEditorEnabled" @click.prevent="openFocalPointEditor" icon="focus" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Focal Point')" />
+                                <ui-button inset size="sm" v-if="isImage && asset && asset.can_be_transparent" @click="showCheckerboard = !showCheckerboard" icon="eye" variant="ghost" :class="[showCheckerboard ? '[&_svg]:!opacity-100' : '[&_svg]:!opacity-45']" :text="__('Transparency')" />
                                 <ui-button inset size="sm" v-if="canRunAction('rename_asset')" @click.prevent="runAction(actions, 'rename_asset')" icon="rename" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Rename')" />
                                 <ui-button inset size="sm" v-if="canRunAction('move_asset')" @click.prevent="runAction(actions, 'move_asset')" icon="move-folder" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Move to Folder')" />
                                 <ui-button inset size="sm" v-if="canRunAction('replace_asset')" @click.prevent="runAction(actions, 'replace_asset')" icon="replace" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Replace')" />
@@ -67,7 +68,7 @@
                             class="flex flex-1 flex-col justify-center items-center p-8 h-full min-h-0"
                         >
                             <!-- Image -->
-                            <div v-if="asset.isImage" class="hover:bg-checkerboard max-w-full max-h-full">
+                            <div v-if="asset.isImage" class="max-w-full max-h-full" :class="{ 'bg-checkerboard before:opacity-100': asset.can_be_transparent && showCheckerboard }">
                                 <img :src="asset.preview" class="relative asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
                             </div>
 
@@ -238,6 +239,7 @@ export default {
             fields: null,
             fieldset: null,
             showFocalPointEditor: false,
+            showCheckerboard: false,
             error: null,
             errors: {},
             actions: [],
