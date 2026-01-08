@@ -318,7 +318,7 @@ export default {
             this.extension.options.bard.duplicateSet(
                 this.node.attrs.id,
                 this.node.attrs,
-                this.getPos() + this.node.nodeSize,
+                this.getPos,
             );
         },
     },
