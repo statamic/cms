@@ -67,7 +67,9 @@
                             class="flex flex-1 flex-col justify-center items-center p-8 h-full min-h-0"
                         >
                             <!-- Image -->
-                            <img v-if="asset.isImage" :src="asset.preview" class="asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
+                            <div v-if="asset.isImage" class="hover:bg-checkerboard max-w-full max-h-full">
+                                <img :src="asset.preview" class="relative asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
+                            </div>
 
                             <!-- SVG -->
                             <div v-else-if="asset.isSvg" class="flex h-full w-full flex-col shadow-ui-xl">
