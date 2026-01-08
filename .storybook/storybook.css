@@ -51,7 +51,3 @@
 .docs-story div[scale="1"] {
     transform: none !important;
 }
-
-.stacks-on-stacks {
-    z-index: 100;
-}
