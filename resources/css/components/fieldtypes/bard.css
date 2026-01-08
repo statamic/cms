@@ -86,7 +86,7 @@
             }
 
             &.active {
-                @apply bg-gray-300 text-black dark:bg-gray-600 dark:text-white;
+                @apply bg-gray-300 text-gray-950 dark:bg-gray-600 dark:text-white;
             }
 
             &:disabled {
@@ -100,7 +100,7 @@
         .active {
             @apply button-active;
             svg {
-                @apply text-black;
+                @apply text-gray-950;
                 :where(.dark) & {
                     @apply text-white;
                 }

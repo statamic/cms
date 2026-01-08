@@ -478,21 +478,21 @@ defineProps(['icons']);
                                 <ui-table-cell>
                                     <ui-badge color="green" pill>In Stock</ui-badge>
                                 </ui-table-cell>
-                                <ui-table-cell class="text-right font-semibold text-black">$159.00</ui-table-cell>
+                                <ui-table-cell class="text-right font-semibold text-gray-950">$159.00</ui-table-cell>
                             </ui-table-row>
                             <ui-table-row>
                                 <ui-table-cell>Ergonomic Mouse</ui-table-cell>
                                 <ui-table-cell>
                                     <ui-badge color="red" pill>Out of Stock</ui-badge>
                                 </ui-table-cell>
-                                <ui-table-cell class="text-right font-semibold text-black">$89.00</ui-table-cell>
+                                <ui-table-cell class="text-right font-semibold text-gray-950">$89.00</ui-table-cell>
                             </ui-table-row>
                             <ui-table-row>
                                 <ui-table-cell>4K Monitor</ui-table-cell>
                                 <ui-table-cell>
                                     <ui-badge color="yellow" pill>Low Stock</ui-badge>
                                 </ui-table-cell>
-                                <ui-table-cell class="text-right font-semibold text-black">$349.00</ui-table-cell>
+                                <ui-table-cell class="text-right font-semibold text-gray-950">$349.00</ui-table-cell>
                             </ui-table-row>
                         </ui-table-rows>
                     </ui-table>
