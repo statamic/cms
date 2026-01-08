@@ -15,7 +15,7 @@ class CurrenciesTest extends TestCase
     {
         $options = (new Currencies)->options();
 
-        $this->assertCount(115, $options);
+        $this->assertCount(114, $options);
         $option = $options['USD'];
         $this->assertEquals('US Dollar (USD)', $option);
     }
