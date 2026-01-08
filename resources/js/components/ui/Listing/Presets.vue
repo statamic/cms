@@ -188,7 +188,7 @@ function deletePreset() {
                             v-if="canDeletePreset(handle)"
                             :text="__('Delete')"
                             icon="delete"
-                            variant="warning"
+                            variant="destructive"
                             @click="isConfirmingDeletion = true"
                         />
                     </DropdownMenu>
