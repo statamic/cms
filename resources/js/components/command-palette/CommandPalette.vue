@@ -7,7 +7,7 @@ import debounce from '@/util/debounce';
 import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, DialogTrigger, DialogDescription, VisuallyHidden } from 'reka-ui';
 import { ComboboxContent, ComboboxEmpty, ComboboxGroup, ComboboxLabel, ComboboxInput, ComboboxItem, ComboboxRoot, ComboboxViewport } from 'reka-ui';
 import fuzzysort from 'fuzzysort';
-import { each, groupBy, orderBy, find, uniq, uniqBy } from 'lodash-es';
+import { each, groupBy, orderBy, find, uniq } from 'lodash-es';
 import { motion } from 'motion-v';
 import { cva } from 'cva';
 import { Icon, Subheading } from '@/components/ui';
@@ -102,7 +102,7 @@ const results = computed(() => {
         .map(category => {
             return {
                 text: __(category),
-                items: uniqBy(grouped[category], 'url'),
+	            items: grouped[category],
             };
         })
         .filter(category => category.items);
@@ -224,10 +224,10 @@ function getRecentItems() {
 }
 
 function addToRecentItems(item) {
-    item.category = __('Recent');
+    const recentItem = { ...item, category: __('Recent') };
 
     const filtered = getRecentItems().filter(recentItem => recentItem.text !== item.text);
-    const updated = [item, ...filtered].slice(0, 5);
+    const updated = [recentItem, ...filtered].slice(0, 5);
 
     localStorage.setItem('statamic.command-palette.recent', JSON.stringify(updated));
 
