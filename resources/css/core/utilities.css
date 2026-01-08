@@ -3,7 +3,7 @@
 /* Here we extend Tailwind's classes to add additional functionality where we're sure it won't break anything. */
 
 /* If the next sibling is hidden (by a Vue conditional), remove the bottom border. For example, /cp/asset-containers/assets/edit, the Image Manipulation toggle. */
-.divide-y > *:has(+[style*="display: none"]) {
+.divide-y > *:has(+[style*="display: none"]:last-child) {
     border-block-end: none;
 }
 
@@ -270,7 +270,8 @@
                 position: absolute;
                 inset: 0;
                 height: var(--height);
-                border-image: conic-gradient(var(--line-color) 0 0) fill 0/ /**/0 100vw;
+                /* Bust out of the container to create a full-width horizontal line, ref https://www.smashingmagazine.com/2024/01/css-border-image-property/#full-width-backgrounds */
+                border-image: conic-gradient(var(--line-color) 0 0) fill 0//0 100vw;
                 top: calc(50% - var(--height));
             }
             .dark &::after {
@@ -323,6 +324,8 @@
     background-color: #fff;
 
     &::before {
+        /* e.g. Asset field > Grid Mode */
+        border-radius: inherit;
         content: '';
         position: absolute;
         inset: 0;

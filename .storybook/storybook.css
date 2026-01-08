@@ -1,31 +1,34 @@
 @import 'tailwindcss';
 @import '../resources/css/ui.css';
+@import '../resources/css/core/utilities.css';
+@import '../resources/css/elements/tables.css';
+@import '../resources/css/components/stacks.css';
 @custom-variant dark (&:where(.dark, .dark *));
 
-.sbdocs h1,
-.sbdocs h2,
-.sbdocs h3,
-.sbdocs h4,
-.sbdocs h5,
-.sbdocs h6 {
+.sbdocs h1:not(.sbdocs-preview *, .sbdocs-preview h1),
+.sbdocs h2:not(.sbdocs-preview *, .sbdocs-preview h2),
+.sbdocs h3:not(.sbdocs-preview *, .sbdocs-preview h3),
+.sbdocs h4:not(.sbdocs-preview *, .sbdocs-preview h4),
+.sbdocs h5:not(.sbdocs-preview *, .sbdocs-preview h5),
+.sbdocs h6:not(.sbdocs-preview *, .sbdocs-preview h6) {
     font-family: p22-mackinac-pro, serif;
 }
 
-.sbdocs h1 {
+.sbdocs h1:not(.sbdocs-preview *, .sbdocs-preview h1) {
     font-size: 2.5rem;
 }
 
-.sbdocs h2 {
+.sbdocs h2:not(.sbdocs-preview *, .sbdocs-preview h2) {
     font-size: 1.75rem;
     font-weight: 600;
 }
 
-.sbdocs h3 {
+.sbdocs h3:not(.sbdocs-preview *, .sbdocs-preview h3) {
     font-size: 1.25rem;
 }
 
-.sbdocs p,
-.sbdocs li {
+.sbdocs p:not(.sbdocs-preview *, .sbdocs-preview p),
+.sbdocs li:not(.sbdocs-preview *, .sbdocs-preview li) {
     font-size: 1rem;
     line-height: 1.6;
     font-weight: 350;
@@ -43,4 +46,12 @@
 .dark body,
 .dark .sbdocs-preview {
     background: var(--theme-color-content-bg);
+}
+
+.docs-story div[scale="1"] {
+    transform: none !important;
+}
+
+.stacks-on-stacks {
+    z-index: 100;
 }

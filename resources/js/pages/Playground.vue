@@ -81,7 +81,7 @@ defineProps(['icons']);
             <blockquote>
                 <p>This is a blockquote with multiple paragraphs. The first paragraph introduces the quote.</p>
                 <p>The second paragraph continues the quoted content and shows how multiple paragraphs are handled within blockquotes.</p>
-                <cite>— Author Name, Source Title</cite>
+                <cite> -  Author Name, Source Title</cite>
             </blockquote>
             <h2>Code Examples</h2>
             <p>Inline code can be written using <code>console.log('Hello, World!')</code> for JavaScript or <code>printf("Hello, World!")</code> for C.</p>
@@ -352,9 +352,22 @@ defineProps(['icons']);
                         <template #trigger>
                             <ui-button text="How neat is that?" />
                         </template>
+	                    <p>This is some very basic example text to show you what stacks look like with content.</p>
                     </ui-modal>
                 </div>
             </section>
+
+	        <section class="space-y-4">
+		        <ui-heading size="lg">Stack</ui-heading>
+		        <div class="flex">
+			        <ui-stack title="That's Pretty Neat">
+				        <template #trigger>
+					        <ui-button text="How neat is that?" />
+				        </template>
+				        <p>This is some very basic example text to show you what stacks look like with content.</p>
+			        </ui-stack>
+		        </div>
+	        </section>
 
             <section class="space-y-4">
                 <ui-heading size="lg">Popover</ui-heading>

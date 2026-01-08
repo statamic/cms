@@ -18,19 +18,20 @@ defineProps([
 
         <Header :title="__('Preferences')" icon="preferences" />
 
-        <section class="space-y-6">
-            <CardPanel :heading="__('Global Preferences')">
+        <section class="relative flex flex-col gap-8">
+            <div class="absolute top-0 start-8 border-s w-px border-gray-300 dark:border-gray-700 h-[calc(100%-1.25rem)] border-dashed"></div>
+            <CardPanel class="mb-0!" :heading="__('Global Preferences')" :subheading="__('Applied to all users by default.')">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2 sm:gap-3">
                         <Icon name="globals" />
-                        <Link :href="defaultPreferencesUrl">{{ __('Default') }}</Link>
+                        <Link :href="defaultPreferencesUrl">{{ __('Site Defaults') }}</Link>
                     </div>
 
                     <Badge v-if="Object.keys(defaultPreferences).length" color="green">{{ __('Modified') }}</Badge>
                 </div>
             </CardPanel>
 
-            <CardPanel v-if="roles.length" :heading="__('Preferences by Role')">
+            <CardPanel class="mb-0!" v-if="roles.length" :heading="__('Role Preferences')" :subheading="__('Applied to users in specific roles.')">
                 <div v-for="role in roles" :key="role.handle" class="flex items-center justify-between">
                     <div class="flex items-center gap-2 sm:gap-3">
                         <Icon name="permissions" />
@@ -40,7 +41,7 @@ defineProps([
                 </div>
             </CardPanel>
 
-            <CardPanel :heading="__('User Preferences')">
+            <CardPanel class="mb-0!" :heading="__('User Preferences')" :subheading="__('Applied to your account.')">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2 sm:gap-3">
                         <Icon name="avatar" />

@@ -739,6 +739,7 @@ export default {
                 enableInputRules: this.config.enable_input_rules,
                 enablePasteRules: this.config.enable_paste_rules,
                 editorProps: { attributes: { class: 'bard-content' } },
+	            onDrop: () => this.debounceNextUpdate = false,
                 onFocus: () => this.$emit('focus'),
                 onBlur: () => {
                     // Since clicking into a field inside a set would also trigger a blur, we can't just emit the

@@ -1,5 +1,5 @@
 <template>
-    <div ref="browser" @keydown.shift="shiftDown" @keyup="clearShift">
+    <div ref="browser" class="h-full" @keydown.shift="shiftDown" @keyup="clearShift">
         <Uploader
             ref="uploader"
             :container="container.id"
@@ -12,7 +12,7 @@
         >
             <div>
                 <div class="drag-notification" v-show="dragging">
-                    <Icon name="upload" class="m-4 size-12" />
+                    <Icon name="upload-cloud-large" class="m-4 size-13" />
                     <span>{{ __('Drop File to Upload') }}</span>
                 </div>
 
@@ -88,7 +88,7 @@
                         </slot>
 
                         <div
-                            v-if="containerIsEmpty"
+                            v-if="containerIsEmpty && !creatingFolder"
                             class="rounded-lg border border-dashed border-gray-300 dark:border-gray-700 p-6 text-center text-gray-500"
                             v-text="__('No results')"
                         />
@@ -146,6 +146,8 @@
                                 <ListingPagination />
                             </PanelFooter>
                         </Panel>
+
+                        <slot name="footer" />
                     </template>
                 </Listing>
             </div>

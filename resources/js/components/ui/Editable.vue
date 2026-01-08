@@ -5,8 +5,11 @@ import { useAttrs, useTemplateRef } from 'vue';
 const emit = defineEmits(['update:modelValue', 'cancel', 'submit', 'edit']);
 
 const props = defineProps({
+    /** The controlled value of the editable text */
     modelValue: { type: String, default: null },
+    /** When `true`, the input will be automatically focused when the component mounts */
     startWithEditMode: { type: Boolean, default: false },
+    /** Controls when the edit is submitted. <br><br> Options: `blur`, `none`, `enter`, `both` */
     submitMode: { type: String, default: 'blur' },
     placeholder: { type: String, default: () => __('Enter text...') },
 });

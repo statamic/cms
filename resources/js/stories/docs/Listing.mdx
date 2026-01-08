@@ -1,0 +1,22 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as ListingStories from '../Listing.stories';
+
+<Meta of={ListingStories} />
+
+# Listing
+A full-featured data listing component with sorting, searching, pagination, column customization, and bulk actions. Data can either come from the `items` prop or from a JSON endpoint.
+<Canvas of={ListingStories._DocsIntro} sourceState={'shown'} />
+
+## Customizing the cells
+Customize how individual cells are rendered using cell slots. Use the pattern `#cell-{fieldName}` to target specific columns.
+<Canvas of={ListingStories._CustomCells} sourceState={'shown'} />
+
+## With Actions
+You can add your own dropdown items via the `prepended-row-actions` slot.
+<Canvas of={ListingStories._WithActions} sourceState={'shown'} />
+
+## Using a JSON endpoint
+The `Listing` component can pull data from a JSON endpoint. Simply specify a `url` and return an [API Resource](https://laravel.com/docs/12.x/eloquent-resources#main-content) from your controller.
+
+## Arguments
+<ArgTypes of={ListingStories} />

@@ -1,4 +1,5 @@
 import type { StorybookConfig } from '@storybook/vue3-vite';
+import { resolve } from 'path';
 
 const config: StorybookConfig = {
     stories: [
@@ -16,6 +17,15 @@ const config: StorybookConfig = {
         options: {
             docgen: 'vue-component-meta'
         }
+    },
+    async viteFinal(config) {
+        if (config.resolve) {
+            config.resolve.alias = {
+                ...config.resolve.alias,
+                '@api': resolve(process.cwd(), 'resources/js/api.js'),
+            };
+        }
+        return config;
     },
 };
 

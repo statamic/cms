@@ -1,14 +1,19 @@
-import type { Preview } from '@storybook/vue3-vite';
-import { setup } from '@storybook/vue3';
-import { create as createTheme } from 'storybook/theming';
-import { router } from '@inertiajs/vue3';
-import { action } from 'storybook/actions';
+import type {Preview} from '@storybook/vue3-vite';
+import {setup} from '@storybook/vue3';
+import {create as createTheme} from 'storybook/theming';
+import {router} from '@inertiajs/vue3';
+import {action} from 'storybook/actions';
 import './storybook.css';
 import './theme.css';
-import { translate } from '@/translations/translator';
+import {translate} from '@/translations/translator';
 import registerUiComponents from '@/bootstrap/ui';
 import DateFormatter from '@/components/DateFormatter';
 import cleanCodeSnippet from './clean-code-snippet';
+import PortalVue from 'portal-vue';
+import FullscreenHeader from '@/components/publish/FullscreenHeader.vue';
+import Portal from '@/components/portals/Portal.vue';
+import PortalTargets from '@/components/portals/PortalTargets.vue';
+import { portals, stacks } from '@api';
 
 // Intercept Inertia navigation and log to Actions tab.
 router.on('before', (event) => {
@@ -18,8 +23,43 @@ router.on('before', (event) => {
 
 setup(async (app) => {
   window.__ = translate;
+
+  window.Statamic = {
+      $config: {
+          get(key) {
+              const config = {
+                  linkToDocs: true,
+                  paginationSize: 50,
+                  paginationSizeOptions: [10, 25, 50, 100, 500],
+              };
+
+              return config[key] ?? null;
+          }
+      },
+      $commandPalette: {
+          add(command) {
+              //
+          }
+      },
+      $progress: {
+          loading(name, loading) {
+              //
+          }
+      }
+  };
+
   app.config.globalProperties.__ = translate;
   app.config.globalProperties.$date = new DateFormatter;
+  app.config.globalProperties.cp_url = (url) => url;
+  app.config.globalProperties.$portals = portals;
+  app.config.globalProperties.$stacks = stacks;
+
+  app.use(PortalVue, { portalName: 'v-portal' });
+
+  app.component('portal', Portal);
+  app.component('PortalTargets', PortalTargets);
+  app.component('publish-field-fullscreen-header', FullscreenHeader);
+
   await registerUiComponents(app);
 });
 
@@ -50,11 +90,11 @@ const preview: Preview = {
         options: {
             storySort: {
                 order: [
-                    // 'Getting Started',
-                    // 'Installation',
-                    '*',
-                    'Components'
+                    'Overview',
+                    'Components',
+                    '*'
                 ],
+                method: 'alphabetical',
             },
         },
     },
@@ -87,7 +127,10 @@ const preview: Preview = {
                 }
             }
 
-            return story();
+            return {
+                components: { PortalTargets },
+                template: '<div><story /><PortalTargets /></div>',
+            };
         },
     ],
 };

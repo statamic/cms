@@ -20,10 +20,15 @@ import Icon from '../Icon/Icon.vue';
 defineOptions({ name: 'Calendar' });
 
 const props = defineProps({
+    /** The controlled value of the calendar. <br><br> Should be an ISO 8601 date and time string with a UTC offset (eg. `2021-11-07T07:45:00Z` or `2021-11-07T07:45:00-07:00`) */
     modelValue: { type: [String, Object], default: null },
+    /** The earliest date that can be selected. Dates before this will be disabled. <br><br> Should be an ISO 8601 date and time string with a UTC offset (eg. `2021-11-07T07:45:00Z` or `2021-11-07T07:45:00-07:00`) */
     min: { type: [String, Object], default: null },
+    /** The latest date that can be selected. Dates after this will be disabled. <br><br> Should be an ISO 8601 date and time string with a UTC offset (eg. `2021-11-07T07:45:00Z` or `2021-11-07T07:45:00-07:00`) */
     max: { type: [String, Object], default: null },
+    /** If necessary, you can you swap out any of the internal Calendar components by passing an object to this prop. */
     components: { type: Object, default: () => ({}) },
+    /** The number of months to display at once. */
     numberOfMonths: { type: Number, default: 1 },
     inline: { type: Boolean, default: false },
 });
@@ -80,7 +85,7 @@ const gridStyle = computed(() => {
         :maxValue="maxValue"
         :locale="$date.locale"
         fixed-weeks
-        :number-of-months="inline ? numberOfMonths : 1"
+        :number-of-months="numberOfMonths"
         @update:model-value="emit('update:modelValue', $event)"
     >
         <Component :is="components.CalendarHeader" class="flex items-center justify-between ps-3 pe-1 pb-3.5 -mt-1">
@@ -109,7 +114,7 @@ const gridStyle = computed(() => {
                 class="w-full border-collapse space-y-1 select-none"
             >
                 <Component :is="components.CalendarGridHead">
-                    <ui-badge class="mb-2" v-if="inline && numberOfMonths > 1">
+                    <ui-badge class="mb-2" v-if="numberOfMonths > 1">
                         {{ new Date(month.value.toString()).toLocaleString($date.locale, { month: 'long' }) }}
                     </ui-badge>
                     <Component :is="components.CalendarGridRow" class="mb-1 grid w-full grid-cols-7">

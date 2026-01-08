@@ -100,24 +100,22 @@
                     <template #actions>
                         <div class="space-y-6">
                             <!-- Live Preview / Visit URL Buttons -->
-                            <div v-if="collectionHasRoutes">
-                                <div class="flex flex-wrap gap-3 lg:gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
-                                    <Button
-                                        :text="__('Live Preview')"
-                                        class="flex-1"
-                                        icon="live-preview"
-                                        @click="openLivePreview"
-                                        v-if="showLivePreviewButton"
-                                    />
-                                    <Button
-                                        :href="permalink"
-                                        :text="__('Visit URL')"
-                                        class="flex-1"
-                                        icon="external-link"
-                                        target="_blank"
-                                        v-if="showVisitUrlButton"
-                                    />
-                                </div>
+                            <div class="flex flex-wrap gap-3 lg:gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
+                                <Button
+                                    :text="__('Live Preview')"
+                                    class="flex-1"
+                                    icon="live-preview"
+                                    @click="openLivePreview"
+                                    v-if="showLivePreviewButton"
+                                />
+                                <Button
+                                    :href="permalink"
+                                    :text="__('Visit URL')"
+                                    class="flex-1"
+                                    icon="external-link"
+                                    target="_blank"
+                                    v-if="showVisitUrlButton"
+                                />
                             </div>
 
                             <!-- Published Switch -->
@@ -192,21 +190,20 @@
             </LivePreview>
         </PublishContainer>
 
-        <ui-stack
-            name="revision-history"
-            v-if="showRevisionHistory"
-            @closed="showRevisionHistory = false"
-            :narrow="true"
-            v-slot="{ close }"
+        <Stack
+	        ref="revisionHistoryStack"
+	        size="narrow"
+	        :title="__('Revision History')"
+	        v-model:open="showRevisionHistory"
         >
             <revision-history
                 :index-url="actions.revisions"
                 :restore-url="actions.restore"
                 :reference="initialReference"
                 :can-restore-revisions="!readOnly"
-                @closed="close"
+                @closed="$refs.revisionHistoryStack.close()"
             />
-        </ui-stack>
+        </Stack>
 
         <publish-actions
             v-if="confirmingPublish"
@@ -279,6 +276,7 @@ import {
     PublishComponents,
     PublishLocalizations as LocalizationsCard,
     LivePreview,
+	Stack,
 } from '@ui';
 import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
 import { computed, ref } from 'vue';
@@ -314,6 +312,7 @@ export default {
         Subheading,
         Switch,
         Select,
+	    Stack,
     },
 
     props: {
@@ -344,7 +343,6 @@ export default {
         canManagePublishState: Boolean,
         createAnotherUrl: String,
         initialListingUrl: String,
-        collectionHasRoutes: Boolean,
         previewTargets: Array,
         autosaveInterval: Number,
         parent: String,
