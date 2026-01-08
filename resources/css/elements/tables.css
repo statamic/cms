@@ -130,7 +130,8 @@
     }
 
     thead th.checkbox-column {
-        @apply sticky z-1 ps-3 w-8;
+        /* We need calc on the padding-start to account for the border of the table */
+        @apply sticky z-1 ps-[calc(0.75rem+1px)] w-8;
         .data-table--contained & {
             @apply sticky ps-4;
         }
