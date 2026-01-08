@@ -5,7 +5,7 @@
                 :class="[
                     permission.description
                         ? '[&_label]:font-medium pb-2.75'
-                        : '[&_label]:text-gray-950 dark:[&_label]:text-gray-200 pb-2.5'
+                        : '[&_label]:text-gray-925 dark:[&_label]:text-gray-200 pb-2.5'
                 ]"
                 :description="permission.description"
                 :label="permission.label"

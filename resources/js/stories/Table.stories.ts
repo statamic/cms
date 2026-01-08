@@ -30,21 +30,21 @@ const defaultCode = `
             <TableCell>
                 <Badge color="green" pill>In Stock</Badge>
             </TableCell>
-            <TableCell class="text-right font-semibold text-gray-950">$159.00</TableCell>
+            <TableCell class="text-right font-semibold text-gray-925">$159.00</TableCell>
         </TableRow>
         <TableRow>
             <TableCell>Ergonomic Mouse</TableCell>
             <TableCell>
                 <Badge color="red" pill>Out of Stock</Badge>
             </TableCell>
-            <TableCell class="text-right font-semibold text-gray-950">$89.00</TableCell>
+            <TableCell class="text-right font-semibold text-gray-925">$89.00</TableCell>
         </TableRow>
         <TableRow>
             <TableCell>4K Monitor</TableCell>
             <TableCell>
                 <Badge color="yellow" pill>Low Stock</Badge>
             </TableCell>
-            <TableCell class="text-right font-semibold text-gray-950">$349.00</TableCell>
+            <TableCell class="text-right font-semibold text-gray-925">$349.00</TableCell>
         </TableRow>
     </TableRows>
 </Table>

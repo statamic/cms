@@ -9,7 +9,7 @@
 }
 
 .title-index-field {
-    @apply text-sm line-clamp-2 inline-flex items-center gap-2 hover:text-gray-950 dark:hover:text-white;
+    @apply text-sm line-clamp-2 inline-flex items-center gap-2 hover:text-gray-925 dark:hover:text-white;
     min-width: 15vw;
     max-width: 30vw;
 }
