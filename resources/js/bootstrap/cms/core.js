@@ -5,3 +5,4 @@ export { default as IndexFieldtypeMixin } from '../../components/fieldtypes/Inde
 export { default as DateFormatter } from '../../components/DateFormatter.js';
 export { default as ItemActions } from '../../components/actions/ItemActions.vue';
 export { requireElevatedSession, requireElevatedSessionIf } from '../../components/elevated-sessions';
+export { default as clone, deepClone } from '../../util/clone.js';

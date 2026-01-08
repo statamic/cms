@@ -10,4 +10,3 @@ export { default as SaveButtonOptions } from '../../components/publish/SaveButto
 export { default as HasPreferences } from '../../components/data-list/HasPreferences.js';
 export { default as HasActions } from '../../components/publish/HasActions.js';
 export { default as resetValuesFromResponse } from '../../util/resetValuesFromResponse.js';
-export { default as clone } from '../../util/clone.js';

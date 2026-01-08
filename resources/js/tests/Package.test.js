@@ -24,6 +24,8 @@ it('exports core', async () => {
         'IndexFieldtype',
         'IndexFieldtypeMixin',
         'ItemActions',
+        'clone',
+        'deepClone',
         'requireElevatedSession',
         'requireElevatedSessionIf',
     ];

@@ -11,5 +11,4 @@ export const {
     HasPreferences,
     HasActions,
     resetValuesFromResponse,
-    clone,
 } = __STATAMIC__.temporary;

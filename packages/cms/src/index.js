@@ -7,4 +7,6 @@ export const {
     ItemActions,
     requireElevatedSession,
     requireElevatedSessionIf,
+    clone,
+    deepClone,
 } = __STATAMIC__.core;
