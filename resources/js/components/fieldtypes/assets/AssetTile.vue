@@ -18,7 +18,7 @@
         >
         </asset-editor>
 
-        <div class="flex h-full border-b dark:border-gray-700 rounded-b-md relative" :class="{ 'bg-checkerboard rounded-md': canBeTransparent }">
+        <div class="flex h-full border-b dark:border-gray-700 rounded-b-md relative" :class="{ 'rounded-md': canBeTransparent }">
             <div class="p-1 flex flex-col items-center justify-center h-full">
                 <!-- Solo Bard -->
                 <template v-if="isImage && isInBardField && !isInAssetBrowser">
@@ -36,11 +36,11 @@
                 </template>
 
             </div>
-            <div class="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 duration-100">
+            <div class="absolute inset-0 flex flex-col items-center justify-center opacity-0 hover:opacity-100 duration-100 gap-2">
                 <div class="flex items-center justify-center gap-2">
                     <template v-if="!readOnly">
-                        <ui-button size="sm" @click="editOrOpen" :icon="asset.isEditable ? 'pencil' : 'eye'" aria-label="__('Edit')" v-if="asset.isViewable" />
-                        <ui-button size="sm" @click="remove" icon="x" aria-label="__('Remove')" />
+                        <ui-button size="xs" @click="editOrOpen" :icon="asset.isEditable ? 'pencil' : 'eye'" aria-label="__('Edit')" v-if="asset.isViewable" />
+                        <ui-button size="xs" @click="remove" icon="x" aria-label="__('Remove')" />
                     </template>
 
                     <template v-else>
@@ -48,6 +48,14 @@
                         <ui-button icon="download" size="sm" v-if="asset.isViewable" @click="download" :aria-label="__('Download file')" />
                     </template>
                 </div>
+
+                <ui-badge
+                    v-if="!readOnly && showSetAlt && needsAlt"
+                    as="button"
+                    color="sky"
+                    :text="__('Set Alt')"
+                    @click="editOrOpen"
+                />
             </div>
         </div>
 
