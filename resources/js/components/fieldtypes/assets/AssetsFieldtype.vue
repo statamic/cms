@@ -33,14 +33,15 @@
                     :class="{
                         'rounded-b-none': expanded,
                         'bard-drag-handle': isInBardField,
+                        'sm:gap-x-0.5': maxFilesReached,
                     }"
                 >
                     <Button
-                        v-if="canBrowse && !maxFilesReached"
+                        v-if="canBrowse"
                         icon="folder-open"
                         tabindex="0"
                         :text="__('Browse Assets')"
-                        class="w-full @2xs:w-auto"
+                        :class="['w-full @2xs:w-auto', { 'invisible px-0! w-0!': maxFilesReached }]"
                         @click="openSelector"
                         @keyup.space.enter="openSelector"
                     />
