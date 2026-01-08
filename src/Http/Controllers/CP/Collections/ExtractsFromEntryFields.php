@@ -11,7 +11,7 @@ trait ExtractsFromEntryFields
         $values = collect();
         $target = $entry;
         while ($target) {
-            $values = $target->data()->merge($target->computedData())->merge($values);
+            $values = $target->data()->filter()->merge($target->computedData())->merge($values);
             $target = $target->origin();
         }
         $values = $values->all();
