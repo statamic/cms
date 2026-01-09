@@ -33,7 +33,6 @@
                     :class="{
                         'rounded-b-none': expanded,
                         'bard-drag-handle': isInBardField,
-                        'gap-x-0 sm:gap-x-0.25': maxFilesReached,
                     }"
                 >
                     <Button
@@ -41,7 +40,7 @@
                         icon="folder-open"
                         tabindex="0"
                         :text="__('Browse Assets')"
-                        :class="['w-full @2xs:w-auto', { 'invisible px-0! w-0!': maxFilesReached }]"
+                        class="w-full @2xs:w-auto"
                         @click="openSelector"
                         @keyup.space.enter="openSelector"
                     />
