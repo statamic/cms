@@ -207,7 +207,7 @@ function deletePreset() {
     </div>
 
     <confirmation-modal
-        v-if="isCreating"
+        :open="isCreating"
         :title="__('Create New View')"
         :buttonText="__('Create')"
         @cancel="isCreating = false"
@@ -222,7 +222,7 @@ function deletePreset() {
     </confirmation-modal>
 
     <confirmation-modal
-        v-if="isRenaming"
+        :open="isRenaming"
         :title="__('Rename View')"
         :buttonText="__('Rename')"
         @cancel="isRenaming = false"
@@ -242,7 +242,7 @@ function deletePreset() {
     </confirmation-modal>
 
     <confirmation-modal
-        v-if="isConfirmingDeletion"
+        :open="isConfirmingDeletion"
         :title="__('Delete View')"
         :bodyText="__('Are you sure you want to delete this view?')"
         :buttonText="__('Delete')"
