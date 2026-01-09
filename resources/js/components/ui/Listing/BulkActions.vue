@@ -40,10 +40,10 @@ function actionFailed(response) {
         :context="actionContext"
         @started="actionStarted"
         @completed="actionCompleted"
-        v-slot="{ actions }"
+        v-slot="{ actions, actionsReady }"
     >
         <Motion
-            v-if="hasSelections"
+            v-if="hasSelections && actionsReady"
             layout
             data-floating-toolbar
             class="fixed inset-x-0 bottom-1 sm:bottom-6 z-100 flex w-full max-w-[95vw] mx-auto justify-center "
