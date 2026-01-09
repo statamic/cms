@@ -22,7 +22,9 @@ const props = defineProps({
         <PanelHeader v-if="heading">
             <Heading v-html="heading" />
             <Subheading v-if="subheading" v-html="subheading" />
-            <slot name="header-actions" />
+	        <div v-if="!!$slots['header-actions']" class="mt-1">
+		        <slot name="header-actions" />
+	        </div>
         </PanelHeader>
         <slot />
     </div>
