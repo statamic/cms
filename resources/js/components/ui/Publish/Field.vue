@@ -133,7 +133,7 @@ const extraValues = computed(() => {
 
 const shouldShowField = computed(() => {
     return new ShowField(
-        visibleValues.value,
+        values.value,
         extraValues.value,
         containerVisibleValues.value,
         revealerValues.value,
