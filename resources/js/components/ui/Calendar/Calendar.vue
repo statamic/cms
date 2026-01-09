@@ -20,10 +20,15 @@ import Icon from '../Icon/Icon.vue';
 defineOptions({ name: 'Calendar' });
 
 const props = defineProps({
+    /** The controlled value of the calendar. <br><br> Should be an ISO 8601 date and time string with a UTC offset (eg. `2021-11-07T07:45:00Z` or `2021-11-07T07:45:00-07:00`) */
     modelValue: { type: [String, Object], default: null },
+    /** The earliest date that can be selected. Dates before this will be disabled. <br><br> Should be an ISO 8601 date and time string with a UTC offset (eg. `2021-11-07T07:45:00Z` or `2021-11-07T07:45:00-07:00`) */
     min: { type: [String, Object], default: null },
+    /** The latest date that can be selected. Dates after this will be disabled. <br><br> Should be an ISO 8601 date and time string with a UTC offset (eg. `2021-11-07T07:45:00Z` or `2021-11-07T07:45:00-07:00`) */
     max: { type: [String, Object], default: null },
+    /** If necessary, you can you swap out any of the internal Calendar components by passing an object to this prop. */
     components: { type: Object, default: () => ({}) },
+    /** The number of months to display at once. */
     numberOfMonths: { type: Number, default: 1 },
     inline: { type: Boolean, default: false },
 });
@@ -80,11 +85,11 @@ const gridStyle = computed(() => {
         :maxValue="maxValue"
         :locale="$date.locale"
         fixed-weeks
-        :number-of-months="inline ? numberOfMonths : 1"
+        :number-of-months="numberOfMonths"
         @update:model-value="emit('update:modelValue', $event)"
     >
         <Component :is="components.CalendarHeader" class="flex items-center justify-between ps-3 pe-1 pb-3.5 -mt-1">
-            <Component :is="components.CalendarHeading" class="text-sm font-medium text-black dark:text-white" />
+            <Component :is="components.CalendarHeading" class="text-sm font-medium text-gray-925 dark:text-white" />
             <div>
                 <Component
                     :is="components.CalendarPrev"
@@ -109,7 +114,7 @@ const gridStyle = computed(() => {
                 class="w-full border-collapse space-y-1 select-none"
             >
                 <Component :is="components.CalendarGridHead">
-                    <ui-badge class="mb-2" v-if="inline && numberOfMonths > 1">
+                    <ui-badge class="mb-2" v-if="numberOfMonths > 1">
                         {{ new Date(month.value.toString()).toLocaleString($date.locale, { month: 'long' }) }}
                     </ui-badge>
                     <Component :is="components.CalendarGridRow" class="mb-1 grid w-full grid-cols-7">
@@ -117,7 +122,7 @@ const gridStyle = computed(() => {
                             :is="components.CalendarHeadCell"
                             v-for="day in weekDays"
                             :key="day"
-                            class="rounded-md text-xs text-black dark:text-white"
+                            class="rounded-md text-xs text-gray-925 dark:text-white"
                         >
                             {{ day }}
                         </Component>
@@ -143,13 +148,13 @@ const gridStyle = computed(() => {
                                 :day="weekDate"
                                 :month="month.value"
                                 :class="[
-                                    'relative flex size-8 items-center justify-center rounded-lg text-sm font-normal whitespace-nowrap text-black outline-hidden dark:text-white',
+                                    'relative flex size-8 items-center justify-center rounded-lg text-sm font-normal whitespace-nowrap text-gray-925 outline-hidden dark:text-white',
                                     'data-outside-view:text-gray-400 dark:data-outside-view:text-gray-600',
-                                    'data-selected:bg-gray-800! data-selected:text-white dark:data-selected:bg-gray-200! dark:data-selected:text-black',
+                                    'data-selected:bg-gray-800! data-selected:text-white dark:data-selected:bg-gray-200! dark:data-selected:text-gray-925',
                                     'hover:bg-gray-100 data-highlighted:bg-gray-200 dark:hover:bg-black dark:data-highlighted:bg-black',
                                     'data-disabled:pointer-events-none data-disabled:hover:bg-transparent',
                                     'data-disabled:text-gray-400 dark:data-disabled:text-gray-600',
-                                    'data-unavailable:pointer-events-none data-unavailable:text-black/30 data-unavailable:line-through',
+                                    'data-unavailable:pointer-events-none data-unavailable:text-gray-925/30 data-unavailable:line-through',
                                     'before:absolute before:top-[3px] before:hidden before:h-1 before:w-1 before:rounded-lg before:bg-white',
                                     'data-today:before:block data-today:before:bg-green-500',
                                 ]"

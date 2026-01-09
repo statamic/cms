@@ -5,9 +5,13 @@ import Icon from '../Icon/Icon.vue';
 import Button from '../Button/Button.vue';
 
 defineProps({
+    /** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
     icon: { type: String, default: null },
+    /** Icon name. Will display after the text. [Browse available icons](/?path=/story/components-icon--all-icons) */
     appendIcon: { type: String, default: null },
+    /** URL for the append icon button to link to */
     appendHref: { type: String, default: null },
+    /** Text to display in the header */
     text: { type: String, default: null },
 });
 
@@ -15,7 +19,7 @@ const slots = useSlots();
 const usingSlot = !!slots.default;
 
 const headerClasses = cva({
-    base: 'col-span-2 px-3.5 py-3 bg-white dark:bg-gray-900 font-medium border-b border-gray-200 dark:border-black text-sm text-gray-900 dark:text-gray-300',
+    base: 'col-span-2 flex items-center px-3.5 py-3 bg-white dark:bg-gray-900 font-medium border-b border-gray-200 dark:border-black text-sm text-gray-900 dark:text-gray-300',
     variants: {
         usingSlot: {
             true: 'grid grid-cols-[auto_1fr_auto]',

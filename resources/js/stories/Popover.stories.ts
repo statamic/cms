@@ -1,14 +1,25 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
-import { Popover, Button, Heading, Textarea } from '@ui';
+import type {Meta, StoryObj} from '@storybook/vue3';
+import {Button, Heading, Popover, Textarea} from '@ui';
 
 const meta = {
-    title: 'Components/Popover',
+    title: 'Overlays/Popover',
     component: Popover,
     argTypes: {
+        align: {
+            control: 'select',
+            options: ['start', 'center', 'end'],
+        },
         side: {
             control: 'select',
             options: ['top', 'bottom', 'left', 'right'],
         },
+        'update:open': {
+            description: 'Event handler called when the open state of the popover changes.',
+            table: {
+                category: 'events',
+                type: { summary: '(value: string) => void' }
+            }
+        }
     },
 } satisfies Meta<typeof Popover>;
 

@@ -1,6 +1,6 @@
 <template>
     <confirmation-modal
-        v-if="resetting"
+        :open="resetting"
         :title="modalTitle"
         :bodyText="modalBody"
         :buttonText="__('Reset')"

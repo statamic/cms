@@ -57,6 +57,7 @@ import WidthFieldtype from '../components/fieldtypes/WidthFieldtype.vue';
 import VideoFieldtype from '../components/fieldtypes/VideoFieldtype.vue';
 import SetPicker from '../components/fieldtypes/replicator/SetPicker.vue';
 import TimeFieldtype from '../components/fieldtypes/TimeFieldtype.vue';
+import ThemeFieldtype from '../components/fieldtypes/ThemeFieldtype.vue';
 
 export default function registerFieldtypes(app) {
     app.component('relationship-input', RelationshipInput);
@@ -138,4 +139,5 @@ export default function registerFieldtypes(app) {
     app.component('set-picker', SetPicker);
     app.component('revealer-fieldtype', RevealerFieldtype);
     app.component('template-fieldtype', TemplateFieldtype);
+    app.component('theme-fieldtype', ThemeFieldtype);
 }

@@ -4,10 +4,18 @@ namespace Tests\CP;
 
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\CP\Color;
+use Statamic\Facades\File;
+use Statamic\Facades\Preference;
 use Tests\TestCase;
 
 class ColorTest extends TestCase
 {
+    public function setUp(): void
+    {
+        parent::setUp();
+        File::delete(resource_path('preferences.yaml'));
+    }
+
     #[Test]
     public function theme_has_defaults()
     {
@@ -18,7 +26,7 @@ class ColorTest extends TestCase
     #[Test]
     public function theme_set_to_a_string_does_nothing()
     {
-        config(['statamic.cp.theme' => 'rad']);
+        $this->setTheme('rad');
 
         $this->assertEquals(Color::defaults(), Color::theme());
         $this->assertEquals(Color::defaults(dark: true), Color::theme(dark: true));
@@ -27,7 +35,7 @@ class ColorTest extends TestCase
     #[Test]
     public function the_light_theme_can_be_customized()
     {
-        config(['statamic.cp.theme' => ['primary' => Color::Sky[500]]]);
+        $this->setThemeColors(['primary' => Color::Sky[500]]);
 
         $this->assertEquals([
             ...Color::defaults(),
@@ -40,7 +48,7 @@ class ColorTest extends TestCase
     #[Test]
     public function the_dark_theme_can_be_customized()
     {
-        config(['statamic.cp.theme' => ['dark-primary' => Color::Sky[700]]]);
+        $this->setThemeColors(['dark-primary' => Color::Sky[700]]);
 
         $this->assertEquals([
             ...Color::defaults(dark: true),
@@ -53,9 +61,9 @@ class ColorTest extends TestCase
     #[Test]
     public function grays_can_be_set_together_light_mode()
     {
-        config(['statamic.cp.theme' => [
+        $this->setThemeColors([
             'grays' => Color::Slate,
-        ]]);
+        ]);
 
         $this->assertEquals([
             ...Color::defaults(),
@@ -81,9 +89,9 @@ class ColorTest extends TestCase
     #[Test]
     public function grays_can_be_set_together_dark_mode()
     {
-        config(['statamic.cp.theme' => [
+        $this->setThemeColors([
             'dark-grays' => Color::Stone,
-        ]]);
+        ]);
 
         $this->assertEquals([
             ...Color::defaults(dark: true),
@@ -109,9 +117,9 @@ class ColorTest extends TestCase
     #[Test]
     public function dark_mode_variable_can_be_overridden_even_if_it_doesnt_exist_in_the_default()
     {
-        config(['statamic.cp.theme' => [
+        $this->setThemeColors([
             'dark-focus-outline' => 'purple',
-        ]]);
+        ]);
 
         $this->assertEquals([
             ...Color::defaults(dark: true),
@@ -122,15 +130,25 @@ class ColorTest extends TestCase
     #[Test]
     public function it_outputs_css_variables()
     {
-        config(['statamic.cp.theme' => [
+        $this->setThemeColors([
             'primary' => 'lightfoo',
             'dark-primary' => 'darkfoo',
-        ]]);
+        ]);
 
         $this->assertStringContainsString('--theme-color-primary: lightfoo;', Color::cssVariables());
         $this->assertStringNotContainsString('--theme-color-primary: darkfoo', Color::cssVariables());
 
         $this->assertStringContainsString('--theme-color-primary: darkfoo;', Color::cssVariables(dark: true));
         $this->assertStringNotContainsString('--theme-color-primary: lightfoo', Color::cssVariables(dark: true));
+    }
+
+    private function setTheme(mixed $theme): void
+    {
+        Preference::default()->set('theme', $theme)->save();
+    }
+
+    private function setThemeColors(array $colors): void
+    {
+        $this->setTheme(['colors' => $colors]);
     }
 }

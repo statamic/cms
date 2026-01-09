@@ -1,6 +1,7 @@
 <template>
     <div>
         <confirmation-modal
+            open
             :title="title"
             :danger="dangerous"
             :buttonText="buttonText"

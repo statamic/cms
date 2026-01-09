@@ -1,0 +1,23 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as StatusIndicatorStories from '../StatusIndicator.stories';
+
+<Meta of={StatusIndicatorStories} />
+
+# StatusIndicator
+Display the publication status of entries with a colored dot indicator and optional label. Supports different statuses with automatic color coding.
+<Canvas of={StatusIndicatorStories._DocsIntro} sourceState={'shown'} />
+
+## With Label
+Show the status label alongside the dot indicator.
+<Canvas of={StatusIndicatorStories._WithLabel} sourceState={'shown'} />
+
+## Private Status
+Indicate private or hidden content with a special appearance.
+<Canvas of={StatusIndicatorStories._Private} sourceState={'shown'} />
+
+## Without Dot
+Display only the label without the colored dot.
+<Canvas of={StatusIndicatorStories._WithoutDot} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={StatusIndicatorStories} />

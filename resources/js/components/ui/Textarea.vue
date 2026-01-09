@@ -7,14 +7,20 @@ import { nextTick, onBeforeUnmount, onMounted, useTemplateRef } from 'vue';
 defineEmits(['update:modelValue']);
 
 const props = defineProps({
+    /** When `true`, the textarea will automatically grow/shrink to fit content */
     elastic: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
+    /** ID attribute for the textarea element */
     id: { type: String, default: null },
     readOnly: { type: Boolean, default: false },
     required: { type: Boolean, default: false },
+    /** Controls resize behavior. Options: `both`, `horizontal`, `vertical`, `none` */
     resize: { type: String, default: 'vertical' },
+    /** Number of visible text rows */
     rows: { type: [Number, String], default: 4 },
+    /** The controlled value of the textarea */
     modelValue: { type: String, default: null },
+    /** Specify a character limit */
     limit: { type: Number, default: null },
 });
 

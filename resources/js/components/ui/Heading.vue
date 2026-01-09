@@ -5,11 +5,17 @@ import Icon from './Icon/Icon.vue';
 import { Link } from '@inertiajs/vue3';
 
 const props = defineProps({
+    /** The URL to link to */
     href: { type: [String, null], default: null },
+    /** When `href` is provided, this prop controls the link's `target` attribute */
     target: { type: String, default: null },
+    /** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
     icon: { type: [String, null], default: null },
+    /** Controls the heading level, `h1`, `h2`, etc */
     level: { type: [Number, null], default: null },
+    /** Controls the size of the heading. Options: `base`, `lg`, `xl`, `2xl` */
     size: { type: String, default: 'base' },
+    /** The heading text to display */
     text: { type: [String, Number, Boolean, null], default: null },
 });
 
@@ -23,7 +29,7 @@ const tag = computed(() => {
 });
 
 const classes = cva({
-    base: 'font-medium [&:has(+[data-ui-subheading])]:mb-0.5 [&:has(+[data-ui-subheading])]:text-gray-950 dark:[&:has(+[data-ui-subheading])]:text-white antialiased flex items-center gap-2',
+    base: 'font-medium [&:has(+[data-ui-subheading])]:mb-0.5 [&:has(+[data-ui-subheading])]:text-gray-925 dark:[&:has(+[data-ui-subheading])]:text-white antialiased flex items-center gap-2',
     variants: {
         size: {
             base: 'text-sm tracking-tight text-gray-700 dark:text-white',

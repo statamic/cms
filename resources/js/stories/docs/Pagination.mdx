@@ -1,0 +1,23 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as PaginationStories from '../Pagination.stories';
+
+<Meta of={PaginationStories} />
+
+# Pagination
+Navigate through pages of content with page numbers and per-page controls.
+<Canvas of={PaginationStories._DocsIntro} sourceState={'shown'} />
+
+## Many Pages
+When there are many pages, pagination automatically shows ellipsis and limits visible page numbers.
+<Canvas of={PaginationStories.ManyPages} sourceState={'shown'} />
+
+## Without Page Links
+Hide individual page number buttons and show only prev/next controls.
+<Canvas of={PaginationStories.WithoutPageLinks} sourceState={'shown'} />
+
+## Without Per Page Selector
+Hide the per-page dropdown selector.
+<Canvas of={PaginationStories.WithoutPerPageSelector} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={PaginationStories} />
