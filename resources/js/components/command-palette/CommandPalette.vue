@@ -102,7 +102,7 @@ const results = computed(() => {
         .map(category => {
             return {
                 text: __(category),
-                items: grouped[category],
+	            items: grouped[category],
             };
         })
         .filter(category => category.items);
@@ -224,10 +224,10 @@ function getRecentItems() {
 }
 
 function addToRecentItems(item) {
-    item.category = __('Recent');
+    const recentItem = { ...item, category: __('Recent') };
 
     const filtered = getRecentItems().filter(recentItem => recentItem.text !== item.text);
-    const updated = [item, ...filtered].slice(0, 5);
+    const updated = [recentItem, ...filtered].slice(0, 5);
 
     localStorage.setItem('statamic.command-palette.recent', JSON.stringify(updated));
 
