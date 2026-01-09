@@ -527,6 +527,13 @@ export default {
          * Execute a keyboard shortcut, when applicable
          */
         shortcut(e) {
+	        // Handle ESC to blur/unfocus the editor
+	        if (e.keyCode === 27) {
+		        e.preventDefault();
+		        this.codemirror.getInputField().blur();
+		        return;
+	        }
+
             const mod = e.metaKey || e.ctrlKey;
             if (!mod) return;
 

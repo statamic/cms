@@ -139,6 +139,14 @@ function initCodeMirror() {
 
     codemirror.value.on('focus', () => emit('focus'));
     codemirror.value.on('blur', () => emit('blur'));
+
+    codemirror.value.on('keydown', (cm, e) => {
+	    // Handle ESC to blur/unfocus the editor
+        if (e.keyCode === 27) {
+            e.preventDefault();
+            codemirror.value.getInputField().blur();
+        }
+    });
 }
 
 watch(
