@@ -97,11 +97,11 @@ onMounted(() => {
                 class="flex flex-col gap-6"
             >
                 <Field :label="__('Email')" :error="errors?.email">
-                    <Input v-model="email" name="email" autofocus tabindex="1" :autocomplete="emailAutocomplete" />
+                    <Input v-model="email" name="email" autofocus :tabindex="1" :autocomplete="emailAutocomplete" />
                 </Field>
 
                 <Field :label="__('Password')" :error="errors?.password">
-                    <Input v-model="password" name="password" type="password" :autocomplete="passwordAutocomplete" tabindex="2" />
+                    <Input v-model="password" name="password" type="password" :autocomplete="passwordAutocomplete" :tabindex="2" />
                     <template #actions>
                         <Link
                             :href="forgotPasswordUrl"
@@ -112,7 +112,7 @@ onMounted(() => {
                     </template>
                 </Field>
 
-                <Checkbox v-model="remember" name="remember" :label="__('Remember me')" tabindex="4" />
+                <Checkbox v-model="remember" name="remember" :label="__('Remember me')" :tabindex="4" />
 
                 <Button type="submit" variant="primary" :disabled="processing" :text="__('Continue')" tabindex="5" />
             </form>
