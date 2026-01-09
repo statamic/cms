@@ -442,7 +442,13 @@ defineExpose({
                             <div class="relative">
                                 <ComboboxViewport
                                     ref="viewport"
-                                    class="max-h-[calc(var(--reka-combobox-content-available-height)-5rem)] overflow-y-scroll"
+                                    class="max-h-[calc(var(--reka-combobox-content-available-height)-2rem)] overflow-y-scroll"
+                                    :class="{
+										'min-h-[2.25px]': options.length === 0,
+										'min-h-[2.5rem]': options.length === 1,
+										'min-h-[5rem]': options.length === 2,
+										'min-h-[7.5rem]': options.length >= 3,
+                                    }"
                                     data-ui-combobox-viewport
                                 >
                                     <ComboboxEmpty class="p-2 text-sm" data-ui-combobox-empty>
