@@ -63,7 +63,7 @@
             <div class="truncate w-18 text-xs text-gray-600 dark:text-gray-400 flex-1 px-2 py-1" v-tooltip="label" :class="{ 'text-center': !needsAlt }">
                 {{ label }}
             </div>
-            <ui-badge as="button" size="sm" color="blue"  @click="editOrOpen" v-if="asset.isEditable && showSetAlt && needsAlt" :text="asset.values.alt ? '✅' : __('Set Alt')" />
+            <ui-badge as="button" size="sm" color="sky"  @click="editOrOpen" v-if="asset.isEditable && showSetAlt && needsAlt" :text="asset.values.alt ? '✅' : __('Set Alt')" />
         </div>
     </div>
 </template>
