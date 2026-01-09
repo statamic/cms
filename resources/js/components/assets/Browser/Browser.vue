@@ -79,7 +79,7 @@
                                 </ToggleGroup>
                             </Header>
 
-                            <div class="flex items-center gap-2 sm:gap-3 py-3 relative overflow-clip" style="overflow-clip-margin: 1px;">
+                            <div class="flex items-center gap-2 sm:gap-3 py-3 relative overflow-clip st-overflow-clip-margin">
                                 <div class="flex flex-1 items-center gap-2 sm:gap-3">
                                     <ListingSearch />
                                 </div>
