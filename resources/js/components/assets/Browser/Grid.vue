@@ -103,7 +103,7 @@
                                     'bg-checkerboard!': asset.can_be_transparent,
                                     'opacity-50!': draggingAsset === asset.id,
                                 }"
-                                :style="asset.can_be_transparent ? { '--checkerboard-inset': '1px' } : {}"
+                                :style="asset.can_be_transparent ? { '--checkerboard-focus-within-inset': '1px' } : {}"
                             >
                                 <button
                                     class="size-full"

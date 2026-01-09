@@ -328,7 +328,7 @@
         border-radius: inherit;
         content: '';
         position: absolute;
-        inset: var(--checkerboard-inset, 0);
+        inset: 0;
         background-image: var(--checkerboard-light);
         opacity: 0;
         transition: opacity 0.2s ease-in-out;
@@ -337,6 +337,10 @@
 
     &:hover::before {
         opacity: 1;
+    }
+
+    &:focus-within::before {
+        inset: var(--checkerboard-focus-within-inset, 0);
     }
 
     .dark & {
