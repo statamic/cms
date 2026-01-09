@@ -328,7 +328,7 @@
         border-radius: inherit;
         content: '';
         position: absolute;
-        inset: 0;
+        inset: var(--checkerboard-inset, 0);
         background-image: var(--checkerboard-light);
         opacity: 0;
         transition: opacity 0.2s ease-in-out;
