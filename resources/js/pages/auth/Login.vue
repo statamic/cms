@@ -41,7 +41,11 @@ const submit = () => {
             processing.value = true;
             errors.value = {};
         },
-        onSuccess: () => window.location.href = props.referer,
+        onSuccess: (page) => {
+	        if (!page?.component && props.referer) {
+		        window.location.href = props.referer;
+	        }
+        },
         onError: () => processing.value = false
     });
 }
