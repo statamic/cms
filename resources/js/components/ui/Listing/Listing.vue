@@ -580,6 +580,10 @@ function autoApplyFilters() {
 }
 
 function reordered(order) {
+	if (! props.items) {
+		items.value = order;
+	}
+
     emit('reordered', order);
 }
 
