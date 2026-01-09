@@ -239,7 +239,7 @@ export default {
             fields: null,
             fieldset: null,
             showFocalPointEditor: false,
-            showCheckerboard: false,
+            showCheckerboard: true,
             error: null,
             errors: {},
             actions: [],
