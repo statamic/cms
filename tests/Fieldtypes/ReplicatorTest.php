@@ -6,15 +6,20 @@ use Facades\Statamic\Fields\FieldRepository;
 use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades;
 use Statamic\Fields\Field;
+use Statamic\Fields\Fieldset;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Replicator;
 use Statamic\Fieldtypes\RowId;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class ReplicatorTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     #[Test]
     #[DataProvider('groupedSetsProvider')]
     public function it_preprocesses_with_empty_value($areSetsGrouped)
@@ -483,39 +488,6 @@ class ReplicatorTest extends TestCase
             '_' => '_', // An empty key to enforce an object in JavaScript.
             // The "foo" key doesn't appear here since there's no corresponding "nope" set config.
         ], $meta['existing']['random-string-4']);
-
-        // Assert about the "defaults" sub-array.
-        // These are the initial values used for subfields when a new set is added.
-        $this->assertCount(1, $meta['defaults']);
-        $this->assertArrayHasKey('main', $meta['defaults']);
-        $this->assertEquals([
-            'a_text_field' => 'the default',
-            'a_grid_field' => [
-                ['_id' => 'random-string-5', 'one' => 'default in nested'],
-                ['_id' => 'random-string-6', 'one' => 'default in nested'],
-            ],
-        ], $meta['defaults']['main']);
-
-        // Assert about the "new" sub-array.
-        // This is meta data for subfields when a new set is added.
-        $this->assertCount(1, $meta['new']);
-        $this->assertArrayHasKey('main', $meta['new']);
-        $this->assertEquals([
-            '_' => '_', // An empty key to enforce an object in JavaScript.
-            'a_text_field' => null, // the text field doesn't have meta data.
-            'a_grid_field' => [ // this array is the preloaded meta for the grid field
-                'defaults' => [
-                    'one' => 'default in nested', // default value for the text field
-                ],
-                'new' => [
-                    'one' => null, // meta for the text field
-                ],
-                'existing' => [
-                    'random-string-5' => ['one' => null],
-                    'random-string-6' => ['one' => null],
-                ],
-            ],
-        ], $meta['new']['main']);
     }
 
     #[Test]
@@ -674,8 +646,6 @@ class ReplicatorTest extends TestCase
         $value = $field->fieldtype()->preload();
         $this->assertEquals('test.0.words', $value['existing']['set-id-1']['words']['fieldPathPrefix']);
         $this->assertEquals('test.1.words', $value['existing']['set-id-2']['words']['fieldPathPrefix']);
-        $this->assertEquals('test.-1.words', $value['new']['one']['words']['fieldPathPrefix']);
-        $this->assertEquals('test.-1.words', $value['defaults']['one']['words']);
     }
 
     #[Test]
@@ -770,6 +740,104 @@ class ReplicatorTest extends TestCase
         $this->assertEquals('test.0.nested.1.words', $value[0]['nested'][1]['words']);
         $this->assertEquals('test.1.nested.0.words', $value[1]['nested'][0]['words']);
         $this->assertEquals('test.1.nested.1.words', $value[1]['nested'][1]['words']);
+    }
+
+    #[Test]
+    public function it_can_return_set_defaults()
+    {
+        $this->partialMock(RowId::class, function (MockInterface $mock) {
+            $mock->shouldReceive('generate')->andReturn('random-string-1', 'random-string-2');
+        });
+
+        $fieldset = Fieldset::make('foreign_fields')->setContents(['fields' => [
+            ['handle' => 'an_imported_field', 'field' => ['type' => 'text', 'default' => 'default from foreign field']],
+        ]]);
+        Fieldset::shouldReceive('find')->with('foreign_fields')->andReturn($fieldset);
+
+        $blueprint = Facades\Blueprint::make()->setHandle('default')->setNamespace('collections.pages');
+        $blueprint->setContents([
+            'sections' => [
+                'main' => [
+                    'fields' => [
+                        [
+                            'handle' => 'content',
+                            'field' => [
+                                'type' => 'replicator',
+                                'sets' => [
+                                    'main' => [
+                                        'sets' => [
+                                            'text' => [
+                                                'fields' => [
+                                                    [
+                                                        'handle' => 'a_text_field',
+                                                        'field' => [
+                                                            'type' => 'text',
+                                                            'default' => 'the default',
+                                                        ],
+                                                    ],
+                                                    [
+                                                        'handle' => 'a_grid_field',
+                                                        'field' => [
+                                                            'type' => 'grid',
+                                                            'min_rows' => 2,
+                                                            'fields' => [
+                                                                ['handle' => 'one', 'field' => ['type' => 'text', 'default' => 'default in nested']],
+                                                            ],
+                                                        ],
+                                                    ],
+                                                    [
+                                                        'import' => 'foreign_fields',
+                                                    ],
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        Facades\Blueprint::partialMock();
+        Facades\Blueprint::shouldReceive('find')->with('collections.pages.default')->andReturn($blueprint);
+
+        $response = $this
+            ->actingAs(tap(Facades\User::make()->makeSuper())->save())
+            ->postJson(cp_route('replicator-fieldtype.set'), [
+                'blueprint' => 'collections.pages.default',
+                'field' => 'content',
+                'set' => 'text',
+            ])
+            ->assertOk();
+
+        $this->assertEquals([
+            'a_text_field' => 'the default',
+            'a_grid_field' => [
+                ['_id' => 'random-string-1', 'one' => 'default in nested'],
+                ['_id' => 'random-string-2', 'one' => 'default in nested'],
+            ],
+            'an_imported_field' => 'default from foreign field',
+        ], $response->json('defaults'));
+
+        $this->assertEquals([
+            '_' => '_',
+            'a_text_field' => null,
+            'a_grid_field' => [
+                'defaults' => [
+                    'one' => 'default in nested',
+                ],
+                'new' => [
+                    'one' => null,
+                ],
+                'existing' => [
+                    'random-string-1' => ['one' => null],
+                    'random-string-2' => ['one' => null],
+                ],
+            ],
+            'an_imported_field' => null,
+        ], $response->json('new'));
     }
 
     public static function groupedSetsProvider()

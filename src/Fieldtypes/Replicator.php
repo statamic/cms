@@ -228,26 +228,8 @@ class Replicator extends Fieldtype
             return [$set['_id'] => $this->fields($set['type'], $index)->addValues($set)->meta()->put('_', '_')];
         })->toArray();
 
-        $blink = md5(json_encode($this->flattenedSetsConfig()));
-
-        $defaults = Blink::once($blink.'-defaults', function () {
-            return collect($this->flattenedSetsConfig())->map(function ($set, $handle) {
-                return $this->fields($handle)->all()->map(function ($field) {
-                    return $field->fieldtype()->preProcess($field->defaultValue());
-                })->all();
-            })->all();
-        });
-
-        $new = Blink::once($blink.'-new', function () use ($defaults) {
-            return collect($this->flattenedSetsConfig())->map(function ($set, $handle) use ($defaults) {
-                return $this->fields($handle)->addValues($defaults[$handle])->meta()->put('_', '_');
-            })->toArray();
-        });
-
         return [
             'existing' => $existing,
-            'new' => $new,
-            'defaults' => $defaults,
             'collapsed' => [],
         ];
     }
