@@ -258,6 +258,7 @@ const provided = {
     setRevealerField,
     unsetRevealerField,
     setHiddenField,
+    clearDirtyState,
 };
 
 provideContainerContext({ ...provided, container: provided });
