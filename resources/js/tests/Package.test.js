@@ -11,7 +11,6 @@ it('exports modules', async () => {
         'core',
         'inertia',
         'savePipeline',
-        'temporary',
         'ui',
     ]);
 });
@@ -21,11 +20,24 @@ it('exports core', async () => {
         'DateFormatter',
         'Fieldtype',
         'FieldtypeMixin',
+        'HasActionsMixin',
+        'HasInputOptionsMixin',
+        'HasPreferencesMixin',
         'IndexFieldtype',
         'IndexFieldtypeMixin',
+        'InlineEditForm',
         'ItemActions',
+        'RelatedItem',
+        'RestoreRevision',
+        'RevisionHistory',
+        'RevisionPreview',
+        'SaveButtonOptions',
+        'SortableList',
+        'clone',
+        'deepClone',
         'requireElevatedSession',
         'requireElevatedSessionIf',
+        'resetValuesFromResponse',
     ];
 
     expect(Object.keys(modules.core).toSorted()).toEqual(expected)
