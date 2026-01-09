@@ -11,7 +11,6 @@ it('exports modules', async () => {
         'core',
         'inertia',
         'savePipeline',
-        'temporary',
         'ui',
     ]);
 });
