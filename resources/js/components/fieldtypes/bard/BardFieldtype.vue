@@ -50,11 +50,12 @@
                     </div>
 
                     <div
-                        class="bard-editor @container/bard focus-within:focus-outline"
+                        class="bard-editor @container/bard"
                         :class="{
                             'mode:read-only': readOnly,
                             'mode:minimal': !showFixedToolbar,
                             'mode:inline': inputIsInline,
+                            'focus-within:focus-outline': !fullScreenMode,
                         }"
                         tabindex="0"
                     >
