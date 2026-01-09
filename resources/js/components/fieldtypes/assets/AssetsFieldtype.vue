@@ -50,8 +50,8 @@
                         <div class="text-xs">
                             <span class="leading-tight" v-text="`${__('Drag & drop here or')}&nbsp;`" />
                             <button type="button" class="text-left underline underline-offset-2 cursor-pointer hover:text-gray-925 dark:hover:text-gray-200" @click.prevent="uploadFile">
-                                {{ __('choose a file') }}.
-                            </button>
+                                {{ __('choose a file') }}
+                            </button>.
                         </div>
                     </div>
 
