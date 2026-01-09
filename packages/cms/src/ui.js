@@ -15,6 +15,7 @@ export const {
     CodeEditor,
     Combobox,
     CommandPaletteItem,
+    ConfirmationModal,
     Context,
     ContextFooter,
     ContextHeader,

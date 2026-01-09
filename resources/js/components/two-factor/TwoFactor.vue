@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue';
-import ConfirmationModal from '@/components/modals/ConfirmationModal.vue';
+import { ConfirmationModal } from '@ui';
 import TwoFactorSetup from './Setup.vue';
 import TwoFactorRecoveryCodesModal from './RecoveryCodesModal.vue';
 import { requireElevatedSession } from '@/components/elevated-sessions';

@@ -49,7 +49,7 @@ provide('layout', {
         />
 
         <confirmation-modal
-            v-if="$root.copyToClipboardModalUrl"
+            :open="$root.copyToClipboardModalUrl !== null"
             :cancellable="false"
             :button-text="__('OK')"
             :title="__('Copy to clipboard')"

@@ -134,6 +134,7 @@ it('exports ui', async () => {
         'CheckboxGroup',
         'CodeEditor',
         'Combobox',
+        'ConfirmationModal',
         'Context',
         'ContextFooter',
         'ContextHeader',
