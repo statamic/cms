@@ -235,7 +235,7 @@ function onAnimationComplete() {
         </div>
 
         <confirmation-modal
-            v-if="deletingSet"
+            :open="deletingSet"
             :title="__('Delete Set')"
             :body-text="__('Are you sure?')"
             :button-text="__('Delete')"

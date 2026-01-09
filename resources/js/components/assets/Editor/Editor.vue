@@ -168,7 +168,7 @@
             />
 
         <confirmation-modal
-            v-if="closingWithChanges"
+            v-model:open="closingWithChanges"
             :title="__('Unsaved Changes')"
             :body-text="__('Are you sure? Unsaved changes will be lost.')"
             :button-text="__('Discard Changes')"

@@ -1,7 +1,6 @@
 export { default as HasInputOptions } from '../../components/fieldtypes/HasInputOptions.js';
 export { default as InlineEditForm } from '../../components/inputs/relationship/InlineEditForm.vue';
 export { default as RelatedItem } from '../../components/inputs/relationship/Item.vue';
-export { default as ConfirmationModal } from '../../components/modals/ConfirmationModal.vue';
 export { default as RevisionHistory } from '../../components/revision-history/History.vue';
 export { default as RestoreRevision } from '../../components/revision-history/Restore.vue';
 export { default as RevisionPreview } from '../../components/revision-history/Preview.vue';

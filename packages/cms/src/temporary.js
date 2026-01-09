@@ -2,7 +2,6 @@ export const {
     HasInputOptions,
     InlineEditForm,
     RelatedItem,
-    ConfirmationModal,
     RevisionHistory,
     RestoreRevision,
     RevisionPreview,
