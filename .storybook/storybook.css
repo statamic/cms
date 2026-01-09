@@ -2,6 +2,7 @@
 @import '../resources/css/ui.css';
 @import '../resources/css/core/utilities.css';
 @import '../resources/css/elements/tables.css';
+@import '../resources/css/components/stacks.css';
 @custom-variant dark (&:where(.dark, .dark *));
 
 .sbdocs h1:not(.sbdocs-preview *, .sbdocs-preview h1),
@@ -45,4 +46,8 @@
 .dark body,
 .dark .sbdocs-preview {
     background: var(--theme-color-content-bg);
+}
+
+.docs-story div[scale="1"] {
+    transform: none !important;
 }

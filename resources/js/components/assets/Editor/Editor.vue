@@ -1,5 +1,5 @@
 <template>
-    <ui-stack name="asset-editor" :before-close="shouldClose" :full="true" @closed="$emit('closed')" v-slot="{ close }">
+    <Stack size="full" open inset ref="stack" :before-close="shouldClose" @update:open="$emit('closed')" :show-close-button="false">
         <div
             class="asset-editor relative flex h-full flex-col rounded-sm bg-gray-100 dark:bg-dark-800"
             :class="isImage ? 'is-image' : 'is-file'"
@@ -22,7 +22,7 @@
                             {{ asset.path }}
                         </span>
                     </button>
-                    <ui-button variant="ghost" icon="x" class="absolute top-1.5 end-1.5" round @click="confirmClose(close)" :aria-label="__('Close Editor')" />
+                    <ui-button variant="ghost" icon="x" class="absolute top-1.5 end-1.5" round @click="confirmClose()" :aria-label="__('Close Editor')" />
                 </header>
 
                 <div class="flex flex-1 grow flex-col overflow-auto md:flex-row md:justify-between">
@@ -39,6 +39,7 @@
                                 v-slot="{ actions }"
                             >
                                 <ui-button inset size="sm" v-if="isImage && isFocalPointEditorEnabled" @click.prevent="openFocalPointEditor" icon="focus" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Focal Point')" />
+                                <ui-button inset size="sm" v-if="isImage && asset && asset.can_be_transparent" @click="showCheckerboard = !showCheckerboard" icon="eye" variant="ghost" :class="[showCheckerboard ? '[&_svg]:!opacity-100' : '[&_svg]:!opacity-45']" :text="__('Transparency')" />
                                 <ui-button inset size="sm" v-if="canRunAction('rename_asset')" @click.prevent="runAction(actions, 'rename_asset')" icon="rename" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Rename')" />
                                 <ui-button inset size="sm" v-if="canRunAction('move_asset')" @click.prevent="runAction(actions, 'move_asset')" icon="move-folder" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Move to Folder')" />
                                 <ui-button inset size="sm" v-if="canRunAction('replace_asset')" @click.prevent="runAction(actions, 'replace_asset')" icon="replace" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Replace')" />
@@ -67,7 +68,9 @@
                             class="flex flex-1 flex-col justify-center items-center p-8 h-full min-h-0"
                         >
                             <!-- Image -->
-                            <img v-if="asset.isImage" :src="asset.preview" class="asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
+                            <div v-if="asset.isImage" class="max-w-full max-h-full" :class="{ 'bg-checkerboard before:opacity-100': asset.can_be_transparent && showCheckerboard }">
+                                <img :src="asset.preview" class="relative asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
+                            </div>
 
                             <!-- SVG -->
                             <div v-else-if="asset.isSvg" class="flex h-full w-full flex-col shadow-ui-xl">
@@ -174,7 +177,7 @@
             @cancel="closingWithChanges = false"
         />
         </div>
-    </ui-stack>
+    </Stack>
 </template>
 
 <script>
@@ -188,6 +191,7 @@ import {
     PublishContainer,
     PublishTabs,
     Icon,
+	Stack,
 } from '@ui';
 import ItemActions from '@/components/actions/ItemActions.vue';
 
@@ -204,6 +208,7 @@ export default {
         PublishContainer,
         PublishTabs,
         Icon,
+	    Stack,
     },
 
     props: {
@@ -234,6 +239,7 @@ export default {
             fields: null,
             fieldset: null,
             showFocalPointEditor: false,
+            showCheckerboard: false,
             error: null,
             errors: {},
             actions: [],
@@ -435,7 +441,7 @@ export default {
         },
 
         confirmClose(close) {
-            if (this.shouldClose()) close();
+            if (this.shouldClose()) this.$refs.stack.close();
         },
 
         confirmCloseWithChanges() {

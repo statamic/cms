@@ -10,7 +10,6 @@ return [
     'AZN' => 'Azerbaycan Manatı',
     'BAM' => 'Bosna-Hersek Konvertibl Markı',
     'BDT' => 'Bangladeşli Taka',
-    'BGN' => 'Bulgar Levası',
     'BHD' => 'Bahreyn Dinarı',
     'BIF' => 'Burundi frangı',
     'BND' => 'Brunei Doları',

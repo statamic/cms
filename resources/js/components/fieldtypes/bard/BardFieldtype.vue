@@ -97,7 +97,7 @@
                                 @added="addSet"
                             >
                                 <template #trigger>
-                                    <div class="absolute flex items-center gap-2 top-[-6px] z-1 -start-4.5 group" :style="{ transform: `translateY(${y}px)` }">
+                                    <div class="absolute flex items-center gap-2 top-[-6px] z-1 -start-7 @lg/bard:-start-4.5 group" :style="{ transform: `translateY(${y}px)` }">
                                         <ui-button
                                             icon="plus"
                                             size="sm"
@@ -547,7 +547,7 @@ export default {
 		    });
 	    },
 
-        duplicateSet(old_id, attrs, pos) {
+        duplicateSet(old_id, attrs, getPos) {
             const id = uniqid();
             const enabled = attrs.enabled;
             const deepCopy = JSON.parse(JSON.stringify(attrs.values));
@@ -555,9 +555,14 @@ export default {
 
             this.updateSetMeta(id, this.meta.existing[old_id]);
 
+            this.debounceNextUpdate = false;
+
             // Perform this in nextTick because the meta data won't be ready until then.
             this.$nextTick(() => {
-                this.editor.commands.setAt({ attrs: { id, enabled, values }, pos });
+                const pos = getPos();
+                const node = this.editor.state.doc.nodeAt(pos);
+                const insertPos = pos + (node?.nodeSize || 0);
+                this.editor.commands.setAt({ attrs: { id, enabled, values }, pos: insertPos });
             });
         },
 
@@ -796,6 +801,7 @@ export default {
                 enableInputRules: this.config.enable_input_rules,
                 enablePasteRules: this.config.enable_paste_rules,
                 editorProps: { attributes: { class: 'bard-content' } },
+	            onDrop: () => this.debounceNextUpdate = false,
                 onFocus: () => this.$emit('focus'),
                 onBlur: () => {
                     // Since clicking into a field inside a set would also trigger a blur, we can't just emit the

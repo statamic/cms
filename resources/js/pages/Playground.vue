@@ -352,9 +352,22 @@ defineProps(['icons']);
                         <template #trigger>
                             <ui-button text="How neat is that?" />
                         </template>
+	                    <p>This is some very basic example text to show you what stacks look like with content.</p>
                     </ui-modal>
                 </div>
             </section>
+
+	        <section class="space-y-4">
+		        <ui-heading size="lg">Stack</ui-heading>
+		        <div class="flex">
+			        <ui-stack title="That's Pretty Neat">
+				        <template #trigger>
+					        <ui-button text="How neat is that?" />
+				        </template>
+				        <p>This is some very basic example text to show you what stacks look like with content.</p>
+			        </ui-stack>
+		        </div>
+	        </section>
 
             <section class="space-y-4">
                 <ui-heading size="lg">Popover</ui-heading>
@@ -465,21 +478,21 @@ defineProps(['icons']);
                                 <ui-table-cell>
                                     <ui-badge color="green" pill>In Stock</ui-badge>
                                 </ui-table-cell>
-                                <ui-table-cell class="text-right font-semibold text-black">$159.00</ui-table-cell>
+                                <ui-table-cell class="text-right font-semibold text-gray-925">$159.00</ui-table-cell>
                             </ui-table-row>
                             <ui-table-row>
                                 <ui-table-cell>Ergonomic Mouse</ui-table-cell>
                                 <ui-table-cell>
                                     <ui-badge color="red" pill>Out of Stock</ui-badge>
                                 </ui-table-cell>
-                                <ui-table-cell class="text-right font-semibold text-black">$89.00</ui-table-cell>
+                                <ui-table-cell class="text-right font-semibold text-gray-925">$89.00</ui-table-cell>
                             </ui-table-row>
                             <ui-table-row>
                                 <ui-table-cell>4K Monitor</ui-table-cell>
                                 <ui-table-cell>
                                     <ui-badge color="yellow" pill>Low Stock</ui-badge>
                                 </ui-table-cell>
-                                <ui-table-cell class="text-right font-semibold text-black">$349.00</ui-table-cell>
+                                <ui-table-cell class="text-right font-semibold text-gray-925">$349.00</ui-table-cell>
                             </ui-table-row>
                         </ui-table-rows>
                     </ui-table>

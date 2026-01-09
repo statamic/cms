@@ -31,7 +31,7 @@
                         <ui-button inset size="sm" icon="trash" variant="subtle" @click.prevent="$emit('deleted')" v-tooltip="__('Remove')" />
                     </div>
 
-                    <ui-stack name="field-settings" v-if="isEditing" @closed="editorClosed">
+                    <Stack :open="isEditing" @update:open="editorClosed" inset :show-close-button="false">
                         <field-settings
                             ref="settings"
                             :id="field._id"
@@ -45,7 +45,7 @@
                             @committed="settingsUpdated"
                             @closed="editorClosed"
                         />
-                    </ui-stack>
+                    </Stack>
                 </div>
             </div>
         </div>
@@ -59,7 +59,7 @@ import WidthSelector from '../fields/WidthSelector.vue';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';
 import titleize from '../../util/titleize';
 import deslugify from '../../util/deslugify';
-import { Icon } from '@/components/ui';
+import { Icon, Stack } from '@/components/ui';
 
 export default {
     mixins: [Field, CanDefineLocalizable],
@@ -68,6 +68,7 @@ export default {
         FieldSettings,
         WidthSelector,
         Icon,
+	    Stack,
     },
 
     props: ['suggestableConditionFields'],

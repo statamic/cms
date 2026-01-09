@@ -13,15 +13,13 @@ import PortalVue from 'portal-vue';
 import FullscreenHeader from '@/components/publish/FullscreenHeader.vue';
 import Portal from '@/components/portals/Portal.vue';
 import PortalTargets from '@/components/portals/PortalTargets.vue';
+import { portals, stacks } from '@api';
 
 // Intercept Inertia navigation and log to Actions tab.
 router.on('before', (event) => {
   action('inertia navigate')(event.detail.visit.url);
   return false;
 });
-
-// const portals = markRaw(new Portals());
-// const stacks = new Stacks(portals);
 
 setup(async (app) => {
   window.__ = translate;
@@ -53,8 +51,8 @@ setup(async (app) => {
   app.config.globalProperties.__ = translate;
   app.config.globalProperties.$date = new DateFormatter;
   app.config.globalProperties.cp_url = (url) => url;
-  // app.config.globalProperties.$portals = portals;
-  // app.config.globalProperties.$stacks = stacks;
+  app.config.globalProperties.$portals = portals;
+  app.config.globalProperties.$stacks = stacks;
 
   app.use(PortalVue, { portalName: 'v-portal' });
 
@@ -129,7 +127,10 @@ const preview: Preview = {
                 }
             }
 
-            return story();
+            return {
+                components: { PortalTargets },
+                template: '<div><story /><PortalTargets /></div>',
+            };
         },
     ],
 };
