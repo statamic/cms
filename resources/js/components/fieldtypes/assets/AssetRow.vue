@@ -33,7 +33,7 @@
         </td>
         <td class="absolute top-0 right-0 flex items-center bg-gradient-to-r to-20% from-transparent to-white dark:to-gray-900 p-3 ps-[2rem] align-middle text-end group-hover:to-gray-50 dark:group-hover:to-gray-900">
             <ui-badge
-                v-if="showSetAlt && needsAlt"
+                v-if="showSetAlt"
                 as="button"
                 color="sky"
                 :text="__('Set Alt')"
