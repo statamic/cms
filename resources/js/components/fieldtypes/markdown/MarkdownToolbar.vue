@@ -1,6 +1,6 @@
 <template>
     <div data-markdown-toolbar>
-        <div class="flex items-center" v-if="!isReadOnly">
+        <div class="flex items-center gap-2" v-if="!isReadOnly">
             <Button
                 :aria-label="button.text"
                 :icon="button.svg"
