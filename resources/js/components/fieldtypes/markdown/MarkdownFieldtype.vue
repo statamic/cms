@@ -328,6 +328,12 @@ export default {
             this.fullScreenMode = true;
             this.escBinding = this.$keys.bindGlobal('esc', this.closeFullScreen);
             this.trackHeightUpdates();
+            // Focus the CodeMirror editor when entering fullscreen mode
+            this.$nextTick(() => {
+                if (this.codemirror) {
+                    this.codemirror.focus();
+                }
+            });
         },
 
         toggleFullscreen() {
