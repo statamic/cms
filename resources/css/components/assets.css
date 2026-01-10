@@ -119,6 +119,16 @@
 .asset-tile {
     @apply relative flex min-w-0 cursor-pointer flex-col items-center justify-between rounded-lg outline outline-gray-300 dark:outline-gray-700;
 
+    > button {
+        /* Shift the focus outline offset slightly to account for the grey border. Target direct descendents so we don't target inner buttons like the three-dot menu. */
+        --focus-outline-offset: 1px;
+        .selected & {
+            /* Shift the focous outline even more to account for the "selected" border */
+            --focus-outline-offset: 1px;
+            --focus-outline-width: 3px;
+        }
+    }
+
     .selected & {
         @apply outline-3 outline-blue-500;
     }
