@@ -339,10 +339,6 @@
         opacity: 1;
     }
 
-    &:focus-within::before {
-        inset: var(--checkerboard-focus-within-inset, 0);
-    }
-
     .dark & {
         background-color: var(--color-gray-850);
 
