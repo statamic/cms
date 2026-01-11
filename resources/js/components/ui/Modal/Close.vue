@@ -8,7 +8,7 @@ const closeModal = inject('closeModal');
 <template>
     <div data-ui-modal-close @click="closeModal">
         <slot>
-	        <Button variant="ghost" size="sm" icon="x" class="absolute top-3 right-2" />
+	        <Button variant="ghost" size="sm" icon="x" class="absolute top-0 right-2" />
         </slot>
     </div>
 </template>
