@@ -1,61 +1,65 @@
 <template>
-    <div class="h-full overflow-auto bg-content-bg dark:bg-dark-content-bg focus-none p-3 pt-0">
+    <div class="h-full overflow-auto bg-content-bg dark:bg-dark-content-bg focus-none pt-0">
         <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
             <Icon name="loading" />
         </div>
 
-        <header v-if="!loading" class="flex flex-wrap items-center justify-between pl-3 pt-3 pb-4 -mb-4 sticky top-0 z-(--z-index-modal) bg-gradient-to-b from-white from-75% dark:from-gray-800">
-            <Heading :text=" __(fieldtype.title + ' ' + 'Field')" size="lg" :icon="fieldtype.icon" />
-            <div class="flex items-center gap-3">
-                <Button variant="ghost" :text="__('Cancel')" @click.prevent="close" />
-                <Button variant="default" @click.prevent="commit" :text="__('Apply')" />
-                <Button v-if="!(isNestedField)" variant="primary" @click.prevent="commitAndSave" icon="save" :text="__('Apply & Save')" />
-                <Button v-if="isNestedField" variant="default" @click.prevent="commitAndCloseAll" :text="__('Apply & Close All')" />
-                <Button v-if="isNestedField" variant="primary" @click.prevent="commitAndSaveAll" icon="save" :text="__('Save & Close All')" />
+        <header v-if="!loading" class="px-3 sticky top-0 z-(--z-index-modal) bg-gradient-to-b from-white from-75% dark:from-gray-800">
+            <div class="flex flex-wrap items-center justify-between pl-3 pt-3 pb-4 -mb-4">
+                <Heading :text=" __(fieldtype.title + ' ' + 'Field')" size="lg" :icon="fieldtype.icon" />
+                <div class="flex items-center gap-3">
+                    <Button variant="ghost" :text="__('Cancel')" @click.prevent="close" />
+                    <Button variant="default" @click.prevent="commit" :text="__('Apply')" />
+                    <Button v-if="!(isNestedField)" variant="primary" @click.prevent="commitAndSave" icon="save" :text="__('Apply & Save')" />
+                    <Button v-if="isNestedField" variant="default" @click.prevent="commitAndCloseAll" :text="__('Apply & Close All')" />
+                    <Button v-if="isNestedField" variant="primary" @click.prevent="commitAndSaveAll" icon="save" :text="__('Save & Close All')" />
+                </div>
             </div>
         </header>
 
-        <section v-if="!loading" class="isolate lg:px-3 py-4">
-            <Tabs v-model:modelValue="activeTab">
-                <TabList class="mb-6">
-                    <TabTrigger name="settings" :text="__('Settings')" />
-                    <TabTrigger name="conditions" :text="__('Conditions')" />
-                    <TabTrigger name="validation" :text="__('Validation')" />
-                </TabList>
+        <section v-if="!loading" class="p-3 pt-0">
+            <div class="isolate lg:px-3 py-4">
+                <Tabs v-model:modelValue="activeTab">
+                    <TabList class="mb-6">
+                        <TabTrigger name="settings" :text="__('Settings')" />
+                        <TabTrigger name="conditions" :text="__('Conditions')" />
+                        <TabTrigger name="validation" :text="__('Validation')" />
+                    </TabList>
 
-                <div>
-                    <TabContent name="settings">
-                        <ui-publish-container
-                            ref="container"
-                            :blueprint="adjustedBlueprint"
-                            :meta="meta"
-                            :errors="errors"
-                            v-model="values"
-                            v-model:modified-fields="editedFields"
-                            :origin-values="originValues"
-                            :origin-meta="originMeta"
-                            as-config
-                        />
-                    </TabContent>
-
-                    <TabContent name="conditions">
-                        <CardPanel :heading="__('Conditions')">
-                            <FieldConditionsBuilder
-                                :config="values"
-                                :suggestable-fields="suggestableConditionFields"
-                                @updated="updateFieldConditions"
-                                @updated-always-save="updateAlwaysSave"
+                    <div>
+                        <TabContent name="settings">
+                            <ui-publish-container
+                                ref="container"
+                                :blueprint="adjustedBlueprint"
+                                :meta="meta"
+                                :errors="errors"
+                                v-model="values"
+                                v-model:modified-fields="editedFields"
+                                :origin-values="originValues"
+                                :origin-meta="originMeta"
+                                as-config
                             />
-                        </CardPanel>
-                    </TabContent>
+                        </TabContent>
 
-                    <TabContent name="validation">
-                        <CardPanel :heading="__('Validation')">
-                            <FieldValidationBuilder :config="values" @updated="updateField('validate', $event)" />
-                        </CardPanel>
-                    </TabContent>
-                </div>
-            </Tabs>
+                        <TabContent name="conditions">
+                            <CardPanel :heading="__('Conditions')">
+                                <FieldConditionsBuilder
+                                    :config="values"
+                                    :suggestable-fields="suggestableConditionFields"
+                                    @updated="updateFieldConditions"
+                                    @updated-always-save="updateAlwaysSave"
+                                />
+                            </CardPanel>
+                        </TabContent>
+
+                        <TabContent name="validation">
+                            <CardPanel :heading="__('Validation')">
+                                <FieldValidationBuilder :config="values" @updated="updateField('validate', $event)" />
+                            </CardPanel>
+                        </TabContent>
+                    </div>
+                </Tabs>
+            </div>
         </section>
     </div>
 </template>
