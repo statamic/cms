@@ -51,7 +51,7 @@
             </div>
             <div class="absolute bottom-1 right-1">
                 <ui-badge
-                    v-if="!readOnly && showSetAlt && !showFilename"
+                    v-if="!readOnly && showSetAlt && needsAlt && !showFilename"
                     as="button"
                     size="sm"
                     color="sky"
