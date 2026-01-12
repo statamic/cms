@@ -266,6 +266,7 @@ export default {
             searchQuery: '',
             editedAssetId: this.initialEditingAssetId,
             creatingFolder: false,
+            folderError: false,
             uploads: [],
             page: 1,
             preferencesPrefix: `assets.${this.container.id}`,
@@ -364,6 +365,7 @@ export default {
                 restrictFolderNavigation: this.restrictFolderNavigation,
                 path: this.path,
                 creatingFolder: this.creatingFolder,
+                folderError: this.folderError,
             };
         },
 
@@ -375,7 +377,10 @@ export default {
                 'edit-asset': (event) => this.$emit('edit-asset', event),
                 'select-folder': this.selectFolder,
                 'create-folder': this.createFolder,
-                'cancel-creating-folder': () => (this.creatingFolder = false),
+                'cancel-creating-folder': () => {
+                    this.creatingFolder = false;
+                    this.folderError = false;
+                },
                 'prevent-dragging': (preventDragging) => (this.preventDragging = preventDragging),
             };
         },
@@ -446,6 +451,7 @@ export default {
 
         startCreatingFolder() {
             this.creatingFolder = true;
+            this.folderError = false;
         },
 
         listingRequestCompleted({ response }) {
@@ -559,6 +565,7 @@ export default {
                     this.folders.push(response.data);
                     this.folders = sortBy(this.folders, 'title');
                     this.creatingFolder = false;
+                    this.folderError = false;
 
                     this.$refs.grid?.clearNewFolderName();
                     this.$refs.table?.clearNewFolderName();
@@ -571,10 +578,12 @@ export default {
                             ? this.$toast.error(errors.directory[0])
                             : this.$toast.error(message);
 
+                        this.folderError = true;
                         this.$refs.grid?.focusNewFolderInput();
                         this.$refs.table?.focusNewFolderInput();
                     } else {
                         this.$toast.error(__('Something went wrong'));
+                        this.folderError = true;
                     }
                 });
         },

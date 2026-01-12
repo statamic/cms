@@ -8,6 +8,7 @@ export default {
         path: String,
         restrictFolderNavigation: Boolean,
         creatingFolder: Boolean,
+        folderError: Boolean,
     },
 
     data() {

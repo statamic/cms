@@ -113,7 +113,10 @@
     grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
 
     [data-placeholder-shown] {
-        @apply overflow-hidden mt-2 text-center font-mono text-red-600 dark:text-red-600 text-xs text-ellipsis whitespace-nowrap lowercase;
+        @apply overflow-hidden mt-2 text-center font-mono text-xs text-ellipsis whitespace-nowrap lowercase;
+        &:has(+ .st-has-error) {
+            @apply text-red-600 dark:text-red-600;
+        }
     }
 }
 
