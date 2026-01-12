@@ -12,15 +12,19 @@ trait QueriesAuthorEntries
 {
     protected function queryAuthorEntries(Builder $query, Collection $collection): void
     {
-        $query
-            ->where(fn ($query) => $query
-                ->whereNotIn('collectionHandle', [$collection->handle()]) // Needed for entries fieldtypes configured for multiple collections
+        $blueprintsWithAuthor = $this->blueprintsWithAuthor($collection->entryBlueprints());
+        $blueprintsWithoutAuthor = $this->blueprintsWithoutAuthor($collection->entryBlueprints());
+
+        $query->where(fn ($query) => $query
+            ->whereNotIn('collectionHandle', [$collection->handle()]) // Needed for entries fieldtypes configured for multiple collections
+            ->when($blueprintsWithAuthor, fn ($query) => $query
                 ->orWhere(fn ($query) => $query
-                    ->whereIn('blueprint', $this->blueprintsWithAuthor($collection->entryBlueprints()))
+                    ->whereIn('blueprint', $blueprintsWithAuthor)
                     ->whereHas('author', fn ($subquery) => $subquery->where('id', User::current()->id()))
                 )
-                ->orWhereIn('blueprint', $this->blueprintsWithoutAuthor($collection->entryBlueprints()))
-            );
+            )
+            ->orWhereIn('blueprint', $blueprintsWithoutAuthor)
+        );
     }
 
     protected function blueprintsWithAuthor(SupportCollection $blueprints): array
