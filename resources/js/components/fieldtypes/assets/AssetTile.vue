@@ -39,8 +39,8 @@
             <div class="absolute inset-0 flex flex-col items-center justify-center opacity-0 hover:opacity-100 duration-100 gap-2">
                 <div class="flex items-center justify-center gap-2">
                     <template v-if="!readOnly">
-                        <ui-button :size="showFilename ? 'sm' : 'xs'" @click="editOrOpen" :icon="asset.isEditable ? 'pencil' : 'eye'" aria-label="__('Edit')" v-if="asset.isViewable" />
-                        <ui-button :size="showFilename ? 'sm' : 'xs'" @click="remove" icon="x" aria-label="__('Remove')" />
+                        <ui-button size="sm" @click="editOrOpen" :icon="asset.isEditable ? 'pencil' : 'eye'" aria-label="__('Edit')" v-if="asset.isViewable" />
+                        <ui-button size="xs" @click="remove" icon="x" aria-label="__('Remove')" />
                     </template>
 
                     <template v-else>
@@ -48,10 +48,12 @@
                         <ui-button icon="download" size="sm" v-if="asset.isViewable" @click="download" :aria-label="__('Download file')" />
                     </template>
                 </div>
-
+            </div>
+            <div class="absolute bottom-1 right-1">
                 <ui-badge
                     v-if="!readOnly && showSetAlt && !showFilename"
                     as="button"
+                    size="sm"
                     color="sky"
                     :text="__('Set Alt')"
                     @click="editOrOpen"
