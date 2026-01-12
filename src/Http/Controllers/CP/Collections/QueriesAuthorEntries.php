@@ -14,7 +14,7 @@ trait QueriesAuthorEntries
     {
         $query
             ->where(fn ($query) => $query
-                ->whereNotIn('collection', [$collection->handle()]) // Needed for entries fieldtypes configured for multiple collections
+                ->whereNotIn('collectionHandle', [$collection->handle()]) // Needed for entries fieldtypes configured for multiple collections
                 ->orWhere(fn ($query) => $query
                     ->whereIn('blueprint', $this->blueprintsWithAuthor($collection->entryBlueprints()))
                     ->whereIn('author', [User::current()->id()])
