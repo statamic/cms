@@ -131,6 +131,7 @@
             ref="selector"
             :site="site"
             :collections="collections"
+            :query-scopes="entryQueryScopes"
             :max-items="maxPagesSelection"
             :can-select-across-sites="canSelectAcrossSites"
             @selected="entriesSelected"
@@ -208,7 +209,8 @@ export default {
         sites: { type: Array, required: true },
         blueprint: { type: Object, required: true },
         canEdit: { type: Boolean, required: true },
-        canSelectAcrossSites: { type: Boolean, required: true }
+        canSelectAcrossSites: { type: Boolean, required: true },
+        entryQueryScopes: { type: Array, default: () => [] },
     },
 
     data() {
