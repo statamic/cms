@@ -174,7 +174,7 @@ export default {
     },
 
     mounted() {
-        setTimeout(() => this.ready = true, 500);
+        setTimeout(() => this.ready = true, 500); // arbitrary delay after initial transitions
     },
 
     methods: {
