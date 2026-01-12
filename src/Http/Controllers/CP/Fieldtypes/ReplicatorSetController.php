@@ -59,7 +59,7 @@ class ReplicatorSetController extends CpController
     {
         $remainingFieldPathComponents = explode('.', $field);
 
-        $config = $blueprint->field($remainingFieldPathComponents[0])->config();
+        $config = $blueprint->fields()->all()->get($remainingFieldPathComponents[0])->config();
         unset($remainingFieldPathComponents[0]);
 
         foreach ($remainingFieldPathComponents as $index => $fieldPathComponent) {
@@ -69,31 +69,28 @@ class ReplicatorSetController extends CpController
                 $config = collect($config['sets'])
                     ->flatMap(fn (array $setGroup): array => $setGroup['sets'] ?? [])
                     ->get($fieldPathComponent);
-
-                continue;
             }
 
             if (isset($config['fields'])) {
-                $config = collect($config['fields'])
+                $fields = collect($config['fields'])
                     ->flatMap(function ($field): array {
-                        if (isset($field['import'])) {
+                        if (isset($field['import']) || (isset($field['field']) && is_string($field['field']))) {
                             return (new Fields([$field]))
                                 ->all()
-                                ->map(fn (Field $field) => [
+                                ->mapWithKeys(fn (Field $field) => [$field->handle() => [
                                     'handle' => $field->handle(),
                                     'field' => $field->config(),
-                                ])
+                                ]])
                                 ->all();
                         }
 
                         return [$field];
-                    })
-                    ->firstWhere('handle', $remainingFieldPathComponents[$index])['field'] ?? null;
+                    });
 
-                continue;
+                if ($fieldConfig = $fields->firstWhere('handle', $remainingFieldPathComponents[$index])) {
+                    $config = $fieldConfig['field'];
+                }
             }
-
-            throw new \Exception("Cannot resolve field path component [$fieldPathComponent]");
         }
 
         if (! isset($config['type'])) {
