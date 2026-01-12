@@ -1,7 +1,12 @@
 <script setup>
 import { CheckboxIndicator, CheckboxRoot, useId } from 'reka-ui';
-import { computed } from 'vue';
+import { computed, useAttrs } from 'vue';
 import { cva } from 'cva';
+import { twMerge } from 'tailwind-merge';
+
+defineOptions({ inheritAttrs: false });
+
+const attrs = useAttrs();
 
 const props = defineProps({
     /** Controls the vertical alignment of the checkbox with its label. Options: `start`, `center` */
@@ -23,8 +28,6 @@ const props = defineProps({
     size: { type: String, default: 'base' },
     /** When `true`, hides the label and description. Use this when the checkbox is used in a context where the label is provided elsewhere, like in a table cell */
     solo: { type: Boolean, default: false },
-    /** Tab index for keyboard navigation */
-    tabindex: { type: Number, default: null },
     /** Value of the checkbox when used in a group */
     value: { type: [String, Number, Boolean] },
 });
@@ -63,7 +66,7 @@ const checkboxClasses = computed(() => {
 });
 
 const containerClasses = computed(() => {
-    return cva({
+    const classes = cva({
         base: 'flex gap-2',
         variants: {
             align: {
@@ -72,6 +75,8 @@ const containerClasses = computed(() => {
             },
         },
     })({ ...props });
+
+    return twMerge(classes, attrs.class);
 });
 
 const conditionalProps = computed(() => {
@@ -109,7 +114,7 @@ const conditionalProps = computed(() => {
             @update:modelValue="emit('update:modelValue', $event)"
             @keydown="handleKeydown"
             :class="checkboxClasses"
-            :tabindex="tabindex"
+            :tabindex="attrs.tabindex"
         >
             <CheckboxIndicator class="relative flex h-full w-full items-center justify-center text-white">
                 <!-- Checkmark icon for checked state -->

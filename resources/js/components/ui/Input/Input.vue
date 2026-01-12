@@ -42,8 +42,6 @@ const props = defineProps({
     required: { type: Boolean, default: false },
     /** Controls the size of the input. Options: `xs`, `sm`, `base`, `lg` */
     size: { type: String, default: 'base' },
-    /** Tab index for keyboard navigation */
-    tabindex: { type: Number, default: null },
     /** Input type attribute */
     type: { type: String, default: 'text' },
     /** Controls the appearance of the input. Options: `default`, `filled` */
@@ -62,7 +60,7 @@ const inputAttributeKeys = [
     'accept', 'autocomplete', 'autofocus', 'capture', 'checked', 'dirname', 'form',
     'formaction', 'formenctype', 'formmethod', 'formnovalidate', 'formtarget',
     'list', 'max', 'maxlength', 'min', 'minlength', 'multiple', 'name', 'pattern',
-    'readonly', 'required', 'size', 'src', 'step', 'value'
+    'readonly', 'required', 'size', 'src', 'step', 'tabindex', 'value'
 ];
 
 const outerAttrs = computed(() => {
@@ -232,7 +230,6 @@ defineExpose({ focus });
                 :placeholder="placeholder"
                 :disabled="disabled"
                 :readonly="readOnly"
-                :tabindex="tabindex"
                 data-ui-control
                 data-ui-group-target
                 v-bind="inputAttrs"
