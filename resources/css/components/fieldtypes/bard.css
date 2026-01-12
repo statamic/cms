@@ -28,7 +28,10 @@
         p, ol, li {
             @apply st-text-legibility;
         }
-        &:has(.bard-content *:focus) {
+        &:has(
+            .bard-content *:focus,
+            .st-set-is-selected
+        ) {
             /* When we're focused on something else inside the .bard-editor, remove the outline on the .bard-editor, otherwise we have two focus outlines.
             E.g. If you have Bard > Replicator > Text field, when you focus on the internal text field, the outside .bard-editor should lose its outline */
             outline: none;
