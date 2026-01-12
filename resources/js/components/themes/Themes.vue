@@ -102,7 +102,7 @@ defineExpose({
             />
         </div>
 
-        <div class="grid grid-cols-2 @lg/themes:grid-cols-3 @2xl/themes:grid-cols-4 gap-4">
+        <div class="grid items-start grid-cols-2 @lg/themes:grid-cols-3 @2xl/themes:grid-cols-4 gap-4">
             <button
                 v-for="theme in results"
                 :key="theme.id"
