@@ -41,7 +41,13 @@ const submit = () => {
             processing.value = true;
             errors.value = {};
         },
-        onSuccess: () => window.location.href = props.referer,
+        onSuccess: (page) => {
+			if (page.component === 'auth/two-factor/Challenge') {
+				return;
+			}
+
+	        window.location.href = props.referer;
+        },
         onError: () => processing.value = false
     });
 }

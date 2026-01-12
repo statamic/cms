@@ -45,6 +45,7 @@ class FormBlueprintController extends CpController
             'blueprint' => $this->toVueObject($blueprint),
             'action' => cp_route('blueprints.forms.update', $form->handle()),
             'isFormBlueprint' => true,
+            'useTabs' => false,
         ]);
     }
 

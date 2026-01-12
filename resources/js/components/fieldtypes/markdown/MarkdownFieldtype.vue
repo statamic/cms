@@ -144,20 +144,11 @@
                     />
                 </Stack>
 
-                <Stack size="narrow" v-model:open="showCheatsheet">
-                    <div class="relative h-full overflow-auto bg-white p-6 dark:bg-gray-800 rounded-l-2xl">
-	                    <StackClose>
-	                        <Button
-	                            icon="x"
-	                            variant="ghost"
-	                            class="sticky top-0 left-[100%] translate-x-[15%] translate-y-[-20%] bg-white dark:bg-gray-800"
-	                        />
-	                    </StackClose>
-                        <div class="prose prose-zinc prose-headings:font-medium prose-pre:prose-code:!text-white mx-auto max-w-3xl">
-                            <h2 v-text="__('Markdown Cheatsheet')"></h2>
-                            <div v-html="__('markdown.cheatsheet')"></div>
-                        </div>
-                    </div>
+                <Stack size="narrow" v-model:open="showCheatsheet" :title="__('Markdown Cheatsheet')">
+                    <div
+                        class="prose prose-zinc prose-headings:font-medium prose-pre:prose-code:!text-white mx-auto max-w-3xl [&>*:first-child]:![margin-block-start:0]"
+                        v-html="__('markdown.cheatsheet')"
+                    />
                 </Stack>
             </div>
         </div>
@@ -170,7 +161,7 @@ import { marked } from 'marked';
 import { markRaw } from 'vue';
 import { TextRenderer as PlainTextRenderer } from '@davidenke/marked-text-renderer';
 import throttle from '@/util/throttle.js';
-import { Button, Stack, StackClose } from '@/components/ui';
+import { Button, Stack } from '@/components/ui';
 
 import CodeMirror from 'codemirror/lib/codemirror';
 import 'codemirror/addon/edit/closebrackets';
@@ -246,7 +237,6 @@ export default {
         Uploads,
         MarkdownToolbar,
 	    Stack,
-	    StackClose,
     },
 
     data() {

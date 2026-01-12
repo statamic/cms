@@ -19,7 +19,7 @@
                     <div class="text-sm text-gray-600 dark:text-gray-400">{{ __('Drop to Upload') }}</div>
                 </div>
 
-                <div class="border border-gray-400 dark:border-gray-700 border-dashed rounded-xl p-4 flex flex-col @2xs:flex-row items-center gap-4" :class="{ 'rounded-b-none': value.length }">
+                <div class="border border-gray-400 dark:border-gray-700 border-dashed rounded-xl p-4 flex flex-col @2xs:flex-row items-center gap-4" :class="{ 'rounded-b-none': value.length || uploads.length }">
                     <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center flex-1 justify-center">
                         <ui-icon name="upload-cloud" class="size-5 text-gray-500 me-2" />
                         <span v-text="`${__('Drag & drop here or')}&nbsp;`" />
@@ -30,7 +30,7 @@
                     </div>
                 </div>
 
-                <div v-if="uploads.length" class="border-gray-300 border-l border-r">
+                <div v-if="uploads.length" class="rounded-xl border border-gray-300 dark:border-gray-700 border-t-0 rounded-t-none divide-y" :class="{ 'rounded-b-none': value.length }">
                     <uploads :uploads="uploads" />
                 </div>
 

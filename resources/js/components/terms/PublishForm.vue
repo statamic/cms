@@ -111,7 +111,7 @@
         </PublishContainer>
 
         <confirmation-modal
-            v-if="pendingLocalization"
+            :open="pendingLocalization"
             :title="__('Unsaved Changes')"
             :body-text="__('Are you sure? Unsaved changes will be lost.')"
             :button-text="__('Continue')"

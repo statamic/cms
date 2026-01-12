@@ -1,5 +1,48 @@
 # Release Notes
 
+## 6.0.0-alpha.21 (2026-01-09)
+
+### What's fixed
+- Fix a few outdated asConfig field references [#13392](https://github.com/statamic/cms/issues/13392) by @jasonvarga
+- Focus trap stacks [#13355](https://github.com/statamic/cms/issues/13355) by @JayGeorge
+- Filter out invalid vue export keys [#13428](https://github.com/statamic/cms/issues/13428) by @jasonvarga
+- Preference connectors [#13418](https://github.com/statamic/cms/issues/13418) by @JayGeorge
+- Asset mode grid checkerboard fix [#13426](https://github.com/statamic/cms/issues/13426) by @JayGeorge
+- Oauth icon fallbacks [#13422](https://github.com/statamic/cms/issues/13422) by @JayGeorge
+- Mastodon icon should use `currentColor` [#13417](https://github.com/statamic/cms/issues/13417) by @duncanmcclean
+- Hide add set bar at the top of Replicator fields when `max_sets` has been reached [#13420](https://github.com/statamic/cms/issues/13420) by @duncanmcclean
+- Fix bard sets being a higher z index than the fixed bard toolbar [#13429](https://github.com/statamic/cms/issues/13429) by @JayGeorge
+- Content overflows content card [#13415](https://github.com/statamic/cms/issues/13415) by @JayGeorge
+- Prevent revealer fields from showing in replicator previews [#13419](https://github.com/statamic/cms/issues/13419) by @duncanmcclean
+- French translations [#13397](https://github.com/statamic/cms/issues/13397) by @ebeauchamps
+- German translations [#13406](https://github.com/statamic/cms/issues/13406) by @helloDanuk
+- Add missing `chevron-up` icon [#13416](https://github.com/statamic/cms/issues/13416) by @duncanmcclean
+- Fix Livewire CSRF token replacement [#13403](https://github.com/statamic/cms/issues/13403) by @aerni
+- Tweak `SavePipeline` hooks [#13359](https://github.com/statamic/cms/issues/13359) by @duncanmcclean
+- Fix stack focus trap height [#13423](https://github.com/statamic/cms/issues/13423) by @JayGeorge
+- Ensure clicking option label actually opens the Combobox dropdown [#13454](https://github.com/statamic/cms/issues/13454) by @duncanmcclean
+- Fix set picker not showing in fullscreen mode [#13460](https://github.com/statamic/cms/issues/13460) by @duncanmcclean
+- Fix checkbox indeterminate state [#13446](https://github.com/statamic/cms/issues/13446) by @JayGeorge
+- Prevent mastodon icon being cut off [#13447](https://github.com/statamic/cms/issues/13447) by @duncanmcclean
+- Stacks updates [#13350](https://github.com/statamic/cms/issues/13350) by @duncanmcclean
+- Stack background now uses content-bg from the theme [#13347](https://github.com/statamic/cms/issues/13347) by @JayGeorge
+- Calendar: Fix `number-of-months` prop [#13455](https://github.com/statamic/cms/issues/13455) by @duncanmcclean
+- Fix blueprint focus tabindex [#13458](https://github.com/statamic/cms/issues/13458) by @JayGeorge
+- Fix Markdown buttons config field [#13456](https://github.com/statamic/cms/issues/13456) by @duncanmcclean
+- Fix creating folders in empty asset container [#13440](https://github.com/statamic/cms/issues/13440) by @duncanmcclean
+- Fix drag & dropping sets in Bard [#13438](https://github.com/statamic/cms/issues/13438) by @duncanmcclean
+- Unset `image` key on sets unless preview image has been added [#13437](https://github.com/statamic/cms/issues/13437) by @duncanmcclean
+- Theme text color corrections [#13468](https://github.com/statamic/cms/issues/13468) by @JayGeorge
+- Uncomment Modal docs [#13467](https://github.com/statamic/cms/issues/13467) by @duncanmcclean
+- Fix duplicating Bard sets [#13472](https://github.com/statamic/cms/issues/13472) by @duncanmcclean
+- Asset modal with checkerboard pattern [#13469](https://github.com/statamic/cms/issues/13469) by @JayGeorge
+- Table checkbox alignment [#13464](https://github.com/statamic/cms/issues/13464) by @JayGeorge
+- Confirmation Modals [#13499](https://github.com/statamic/cms/issues/13499) by @jasonvarga
+- Sort out temporary JS exports [#13475](https://github.com/statamic/cms/issues/13475) by @jasonvarga
+- Checkerboard as the default [#13485](https://github.com/statamic/cms/issues/13485) by @JayGeorge
+
+
+
 ## 6.0.0-alpha.20 (2025-12-19)
 
 ### What's new

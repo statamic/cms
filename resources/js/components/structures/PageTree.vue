@@ -77,7 +77,7 @@
         </ui-panel>
 
         <confirmation-modal
-            v-if="discardingChanges"
+            :open="discardingChanges"
             :title="__('Discard Changes')"
             :body-text="__('Are you sure?')"
             :button-text="__('Discard Changes')"
