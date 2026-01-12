@@ -72,7 +72,10 @@
                                 :start-with-edit-mode="true"
                                 submit-mode="enter"
                                 :placeholder="__('Name')"
-                                class="placeholder:lowercase"
+                                :class="[
+                                    'placeholder:lowercase',
+                                    { 'st-has-error': folderError }
+                                ]"
                                 @submit="$emit('create-folder', newFolderName)"
                                 @cancel="
                                     () => {

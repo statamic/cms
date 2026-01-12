@@ -108,6 +108,13 @@
     @apply relative grid gap-5 md:gap-6 xl:gap-10;
 }
 
+.data-table,
+.folder-grid-listing {
+    [data-placeholder-shown]:has(+ .st-has-error) {
+        @apply text-red-600 dark:text-red-500;
+    }
+}
+
 .folder-grid-listing {
     @apply relative grid gap-5 md:gap-7;
     grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
