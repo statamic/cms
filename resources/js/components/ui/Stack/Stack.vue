@@ -7,7 +7,8 @@ import {
     useSlots,
     watch,
     onBeforeUnmount,
-    provide
+    provide,
+    onMounted,
 } from 'vue';
 import { stacks, events, keys, config } from '@/api';
 import wait from '@/util/wait.js';
@@ -173,8 +174,11 @@ function cleanup() {
 watch(
     () => props.open,
     (value) => value ? open() : close(),
-    { immediate: true }
 );
+
+onMounted(() => {
+	if (props.open) open();
+});
 
 onBeforeUnmount(() => {
     cleanup();
