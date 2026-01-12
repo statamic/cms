@@ -417,7 +417,7 @@ export default {
 
         selectedFilesText() {
             if (this.maxFiles !== Infinity) {
-                return `(${this.assets.length}/${this.maxFiles} ${__('selected')})`;
+                return __n(':count\/:max selected', this.assets.length, { max: this.maxFiles });
             }
         },
 
