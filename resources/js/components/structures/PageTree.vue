@@ -18,7 +18,7 @@
                     </div>
                 </div>
             </ui-panel-header>
-            <div v-if="!loading" class="page-tree" :class="{ 'page-tree--has-been-interacted-with': hasToggled }">
+            <div v-if="!loading" class="page-tree" :class="{ 'page-tree--has-been-interacted-with': ready }">
                 <Draggable
                     ref="tree"
                     v-model="treeData"
@@ -54,7 +54,7 @@
                             :editable="editable"
                             :root="isRoot(stat)"
                             @edit="$emit('edit-page', node, $event)"
-                            @toggle-open="toggleBranch(stat)"
+                            @toggle-open="stat.open = !stat.open"
                             @removed="pageRemoved"
                             @branch-clicked="$emit('branch-clicked', node)"
                             class="mb-px"
@@ -127,7 +127,7 @@ export default {
             treeData: [],
             collapsedState: [],
             discardingChanges: false,
-            hasToggled: false,
+            ready: false,
         };
     },
 
@@ -171,6 +171,10 @@ export default {
             e.preventDefault();
             this.save();
         });
+    },
+
+    mounted() {
+        setTimeout(() => this.ready = true, 500);
     },
 
     methods: {
@@ -364,13 +368,6 @@ export default {
         statHandler(stat) {
             stat.open = !this.collapsedState.includes(stat.data.id);
             return stat;
-        },
-
-        toggleBranch(stat) {
-            stat.open = !stat.open;
-            if (!this.hasToggled) {
-                this.hasToggled = true;
-            }
         },
     },
 };
