@@ -111,7 +111,7 @@ class ViewEntryListingTest extends TestCase
 
         Blueprint::make('with-author')
             ->setNamespace('collections/test')
-            ->ensureField('author', [])
+            ->ensureField('author', ['type' => 'users'])
             ->save();
 
         Blueprint::make('without-author')
