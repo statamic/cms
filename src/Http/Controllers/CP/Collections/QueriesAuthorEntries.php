@@ -2,7 +2,6 @@
 
 namespace Statamic\Http\Controllers\CP\Collections;
 
-use Illuminate\Support\Collection as SupportCollection;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Facades\User;
@@ -12,33 +11,35 @@ trait QueriesAuthorEntries
 {
     protected function queryAuthorEntries(Builder $query, Collection $collection): void
     {
-        $blueprintsWithAuthor = $this->blueprintsWithAuthor($collection->entryBlueprints());
-        $blueprintsWithoutAuthor = $this->blueprintsWithoutAuthor($collection->entryBlueprints());
+        $blueprintsWithAuthor = $this->blueprintsWithAuthor($collection);
 
         if (empty($blueprintsWithAuthor)) {
             return;
         }
 
         $query->where(fn ($query) => $query
-            ->whereNotIn('collectionHandle', [$collection->handle()]) // Needed for entries fieldtypes configured for multiple collections
+            // Exclude entries from other collections (for entries fieldtypes with multiple collections)
+            ->whereNotIn('collectionHandle', [$collection->handle()])
+            // Include entries with blueprints where the current user is the author
             ->orWhere(fn ($query) => $query
                 ->whereIn('blueprint', $blueprintsWithAuthor)
-                ->whereHas('author', fn ($subquery) => $subquery->where('id', User::current()->id()))
+                ->whereHas('author', fn ($query) => $query->where('id', User::current()->id()))
             )
-            ->orWhereIn('blueprint', $blueprintsWithoutAuthor)
+            // Include entries with blueprints that don't have an author
+            ->orWhereIn('blueprint', $this->blueprintsWithoutAuthor($collection))
         );
     }
 
-    protected function blueprintsWithAuthor(SupportCollection $blueprints): array
+    protected function blueprintsWithAuthor(Collection $collection): array
     {
-        return $blueprints
+        return $collection->entryBlueprints()
             ->filter(fn (Blueprint $blueprint) => $blueprint->hasField('author'))
             ->map->handle()->all();
     }
 
-    protected function blueprintsWithoutAuthor(SupportCollection $blueprints): array
+    protected function blueprintsWithoutAuthor(Collection $collection): array
     {
-        return $blueprints
+        return $collection->entryBlueprints()
             ->filter(fn (Blueprint $blueprint) => ! $blueprint->hasField('author'))
             ->map->handle()->all();
     }
