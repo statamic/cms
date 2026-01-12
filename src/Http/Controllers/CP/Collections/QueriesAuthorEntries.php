@@ -17,8 +17,7 @@ trait QueriesAuthorEntries
                 ->whereNotIn('collectionHandle', [$collection->handle()]) // Needed for entries fieldtypes configured for multiple collections
                 ->orWhere(fn ($query) => $query
                     ->whereIn('blueprint', $this->blueprintsWithAuthor($collection->entryBlueprints()))
-                    ->whereIn('author', [User::current()->id()])
-                    ->orWhereJsonContains('author', User::current()->id())
+                    ->whereHas('author', fn ($subquery) => $subquery->where('id', User::current()->id()))
                 )
                 ->orWhereIn('blueprint', $this->blueprintsWithoutAuthor($collection->entryBlueprints()))
             );
