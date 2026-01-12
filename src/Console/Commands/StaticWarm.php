@@ -257,7 +257,7 @@ class StaticWarm extends Command
 
     private function shouldVerifySsl(): bool
     {
-        if ($this->option('insecure')) {
+        if ($this->option('insecure') || config('statamic.static_caching.warm_insecure')) {
             return false;
         }
 

@@ -465,6 +465,14 @@ class Entries extends Relationship
         return $this->queryBuilder($values)->whereAnyStatus()->get();
     }
 
+    public function relationshipQueryBuilder()
+    {
+        $collections = $this->config('collections');
+
+        return Entry::query()
+            ->when($collections, fn ($query) => $query->whereIn('collection', $collections));
+    }
+
     public function filter()
     {
         return new EntriesFilter($this);

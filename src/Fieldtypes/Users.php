@@ -229,4 +229,9 @@ class Users extends Relationship
     {
         return new UserFilter($this);
     }
+
+    public function relationshipQueryBuilder()
+    {
+        return User::query();
+    }
 }

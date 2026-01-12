@@ -138,7 +138,7 @@ class Sites
             'default' => [
                 'name' => '{{ config:app:name }}',
                 'url' => '/',
-                'locale' => 'en_US',
+                'locale' => '{{ config:app:locale }}',
             ],
         ];
     }
@@ -268,7 +268,9 @@ class Sites
 
     protected function hydrateConfig($config): Collection
     {
-        return collect($config)->map(fn ($site, $handle) => new Site($handle, $site));
+        $defaultSiteHandle = collect($config)->keys()->first();
+
+        return collect($config)->map(fn ($site, $handle) => new Site($handle, $site, $handle === $defaultSiteHandle));
     }
 
     protected function getNewSites(): Collection

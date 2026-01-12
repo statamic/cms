@@ -168,6 +168,8 @@ class TermsController extends CpController
 
         $term = $term->fromWorkingCopy();
 
+        $term->term()->syncOriginal();
+
         $fields = $term->blueprint()->fields()->addValues($request->except('id'));
 
         $fields->validate([

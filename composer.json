@@ -14,7 +14,7 @@
         "composer/semver": "^3.4",
         "guzzlehttp/guzzle": "^6.3 || ^7.0",
         "james-heinrich/getid3": "^1.9.21",
-        "laravel/framework": "^10.40 || ^11.34 || ^12.0",
+        "laravel/framework": "^10.48.29 || ^11.44.1 || ^12.40.0",
         "laravel/prompts": "^0.1.16 || ^0.2.0 || ^0.3.0",
         "league/commonmark": "^2.2",
         "league/csv": "^9.0",
@@ -24,9 +24,9 @@
         "nesbot/carbon": "^2.62.1 || ^3.0",
         "pixelfear/composer-dist-plugin": "^0.1.4",
         "rebing/graphql-laravel": "^9.8",
-        "rhukster/dom-sanitizer": "^1.0.6",
+        "rhukster/dom-sanitizer": "^1.0.7",
         "spatie/blink": "^1.3",
-        "spatie/ignition": "^1.15.1",
+        "spatie/error-solutions": "^1.0 || ^2.0",
         "statamic/stringy": "^3.1.2",
         "stillat/blade-parser": "^1.10.1 || ^2.0",
         "symfony/lock": "^6.4",
@@ -34,7 +34,9 @@
         "symfony/yaml": "^6.0 || ^7.0",
         "ueberdosis/tiptap-php": "^1.4",
         "voku/portable-ascii": "^2.0.2",
-        "wilderborn/partyline": "^1.0"
+        "wilderborn/partyline": "^1.0",
+        "symfony/http-foundation": "^6.4.29 || ^7.3.7",
+        "symfony/process": "^6.4.14 || ^7.1.7"
     },
     "require-dev": {
         "doctrine/dbal": "^3.6",
@@ -42,9 +44,10 @@
         "google/cloud-translate": "^1.6",
         "laravel/pint": "1.16.0",
         "mockery/mockery": "^1.6.10",
-        "orchestra/testbench": "^8.14 || ^9.2 || ^10.0",
+        "orchestra/testbench": "^8.36 || ^9.15 || ^10.8",
         "phpunit/phpunit": "^10.5.35 || ^11.5.3",
-        "spatie/laravel-ray": "^1.37"
+        "sebastian/recursion-context": "^5.0.1 || ^6.0.3",
+        "spatie/laravel-ray": "^1.42"
     },
     "config": {
         "optimize-autoloader": true,
@@ -83,6 +86,13 @@
             "src/helpers.php",
             "src/namespaced_helpers.php",
             "src/View/Blade/helpers.php"
+        ],
+        "exclude-from-classmap": [
+            "tests/Auth/Eloquent/__migrations__/**",
+            "tests/StarterKits/__fixtures__/**",
+            "tests/Translator/__fixtures__/**",
+            "tests/Console/Kernel.php",
+            "src/Console/Please/app-kernel.php"
         ]
     },
     "autoload-dev": {

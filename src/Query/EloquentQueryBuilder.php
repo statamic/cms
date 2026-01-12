@@ -11,6 +11,7 @@ use InvalidArgumentException;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Blink;
+use Statamic\Query\Concerns\QueriesRelationships;
 use Statamic\Query\Exceptions\MultipleRecordsFoundException;
 use Statamic\Query\Exceptions\RecordsNotFoundException;
 use Statamic\Query\Scopes\AppliesScopes;
@@ -18,7 +19,7 @@ use Statamic\Support\Arr;
 
 abstract class EloquentQueryBuilder implements Builder
 {
-    use AppliesScopes;
+    use AppliesScopes, QueriesRelationships;
 
     protected $builder;
     protected $columns;
@@ -75,6 +76,17 @@ abstract class EloquentQueryBuilder implements Builder
         }
 
         return $items;
+    }
+
+    public function pluck($column, $key = null)
+    {
+        $items = $this->get();
+
+        if (! $key) {
+            return $items->map(fn ($item) => $item->{$column})->values();
+        }
+
+        return $items->mapWithKeys(fn ($item) => [$item->{$key} => $item->{$column}]);
     }
 
     public function first()
@@ -160,7 +172,7 @@ abstract class EloquentQueryBuilder implements Builder
             return $this->whereNested($column, $boolean);
         }
 
-        if (strtolower($operator) == 'like') {
+        if ($operator !== null && strtolower($operator) == 'like') {
             $grammar = $this->builder->getConnection()->getQueryGrammar();
             $this->builder->whereRaw('LOWER('.$grammar->wrap($this->column($column)).') LIKE ?', strtolower($value), $boolean);
 
@@ -256,6 +268,30 @@ abstract class EloquentQueryBuilder implements Builder
         return $this->whereJsonLength($column, $operator, $value, 'or');
     }
 
+    public function whereJsonOverlaps($column, $values, $boolean = 'and')
+    {
+        $this->builder->whereJsonOverlaps($this->column($column), $values, $boolean);
+
+        return $this;
+    }
+
+    public function orWhereJsonOverlaps($column, $values)
+    {
+        return $this->whereJsonOverlaps($column, $values, 'or');
+    }
+
+    public function whereJsonDoesntOverlap($column, $values, $boolean = 'and')
+    {
+        $this->builder->whereJsonDoesntOverlap($this->column($column), $values, $boolean);
+
+        return $this;
+    }
+
+    public function orWhereJsonDoesntOverlap($column, $values)
+    {
+        return $this->whereJsonDoesntOverlap($column, $values, 'or');
+    }
+
     public function whereNull($column, $boolean = 'and', $not = false)
     {
         $this->builder->whereNull($this->column($column), $boolean, $not);
@@ -292,7 +328,7 @@ abstract class EloquentQueryBuilder implements Builder
 
     public function whereNotBetween($column, $values, $boolean = 'and')
     {
-        return $this->whereBetween($column, $values, 'or', true);
+        return $this->whereBetween($column, $values, $boolean, true);
     }
 
     public function orWhereNotBetween($column, $values)
@@ -443,6 +479,13 @@ abstract class EloquentQueryBuilder implements Builder
     public function orderBy($column, $direction = 'asc')
     {
         $this->builder->orderBy($this->column($column), $direction);
+
+        return $this;
+    }
+
+    public function orderByDesc($column)
+    {
+        $this->builder->orderBy($this->column($column), 'desc');
 
         return $this;
     }

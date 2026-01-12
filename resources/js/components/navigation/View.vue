@@ -109,7 +109,7 @@
                     :text="__('Edit Entry')"
                     :redirect="branch.edit_url" />
                 <dropdown-item
-                    :text="__('Edit nav item')"
+                    :text="__('Edit Nav Item')"
                     @click="editPage(branch, vm, vm.store)" />
                 <dropdown-item
                     v-if="depth < maxDepth"

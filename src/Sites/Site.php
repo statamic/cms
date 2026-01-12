@@ -16,12 +16,14 @@ class Site implements Augmentable
     protected $handle;
     protected $config;
     protected $rawConfig;
+    protected $isDefault;
 
-    public function __construct($handle, $config)
+    public function __construct($handle, $config, $isDefault = false)
     {
         $this->handle = $handle;
         $this->config = $this->resolveAntlers($config);
         $this->rawConfig = $config;
+        $this->isDefault = $isDefault;
     }
 
     public function handle()
@@ -93,6 +95,11 @@ class Site implements Augmentable
         $path = Str::removeRight(Str::ensureLeft($path, '/'), '/');
 
         return $path === '' ? '/' : $path;
+    }
+
+    public function isDefault()
+    {
+        return $this->isDefault;
     }
 
     public function set($key, $value)
