@@ -291,17 +291,6 @@ export default {
         this.addToCommandPalette();
     },
 
-    watch: {
-        nav: {
-            handler(newNav) {
-                this.initialNav = clone(newNav);
-                this.setInitialNav(newNav);
-                this.changed = false;
-            },
-            deep: true,
-        },
-    },
-
     computed: {
         isDirty() {
             return this.changed;
