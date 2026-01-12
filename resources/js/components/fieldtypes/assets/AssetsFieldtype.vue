@@ -52,7 +52,7 @@
                             <button type="button" class="text-left underline underline-offset-2 cursor-pointer hover:text-gray-925 dark:hover:text-gray-200" @click.prevent="uploadFile">
                                 {{ __('choose a file') }}
                             </button>.
-                            <span class="leading-tight" v-text="selectedFilesText" />
+                            <span class="leading-tight" v-if="selectedFilesText" v-text="selectedFilesText" />
                         </div>
                     </div>
 
@@ -416,13 +416,9 @@ export default {
         },
 
         selectedFilesText() {
-            if (this.assets.length === 0) return '';
-            
-            if (this.maxFiles === Infinity) {
-                return `(${this.assets.length} ${__('selected')})`;
+            if (this.maxFiles !== Infinity) {
+                return `(${this.assets.length}/${this.maxFiles} ${__('selected')})`;
             }
-            
-            return `(${this.assets.length}/${this.maxFiles} ${__('selected')})`;
         },
 
         internalFieldActions() {
