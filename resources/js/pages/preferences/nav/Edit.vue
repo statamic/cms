@@ -694,8 +694,17 @@ export default {
             this.$axios
                 .delete(this.destroyUrl)
                 .then(() => {
-                    router.reload();
-                    this.confirmingReset = false;
+                    router.reload({
+                        preserveState: false,
+                        preserveScroll: true,
+                        onSuccess: (page) => {
+                            const nav = page?.props?.nav ?? this.nav;
+                            this.initialNav = clone(nav);
+                            this.setInitialNav(nav);
+                            this.changed = false;
+                            this.confirmingReset = false;
+                        },
+                    });
                 })
                 .catch(() => this.$toast.error(__('Something went wrong')));
         },
@@ -714,8 +723,16 @@ export default {
             this.$axios
                 .patch(url, { tree })
                 .then(() => {
-                    router.reload();
-                    this.changed = false;
+                    router.reload({
+                        preserveState: false,
+                        preserveScroll: true,
+                        onSuccess: (page) => {
+                            const nav = page?.props?.nav ?? this.nav;
+                            this.initialNav = clone(nav);
+                            this.setInitialNav(nav);
+                            this.changed = false;
+                        },
+                    });
                 })
                 .catch(() => this.$toast.error(__('Something went wrong')));
         },
