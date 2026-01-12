@@ -115,7 +115,7 @@
     [data-placeholder-shown] {
         @apply overflow-hidden mt-2 text-center font-mono text-xs text-ellipsis whitespace-nowrap lowercase;
         &:has(+ .st-has-error) {
-            @apply text-red-600 dark:text-red-600;
+            @apply text-red-600 dark:text-red-500;
         }
     }
 }
