@@ -15,13 +15,15 @@ trait QueriesAuthorEntries
         $blueprintsWithAuthor = $this->blueprintsWithAuthor($collection->entryBlueprints());
         $blueprintsWithoutAuthor = $this->blueprintsWithoutAuthor($collection->entryBlueprints());
 
+        if (empty($blueprintsWithAuthor)) {
+            return;
+        }
+
         $query->where(fn ($query) => $query
             ->whereNotIn('collectionHandle', [$collection->handle()]) // Needed for entries fieldtypes configured for multiple collections
-            ->when($blueprintsWithAuthor, fn ($query) => $query
-                ->orWhere(fn ($query) => $query
-                    ->whereIn('blueprint', $blueprintsWithAuthor)
-                    ->whereHas('author', fn ($subquery) => $subquery->where('id', User::current()->id()))
-                )
+            ->orWhere(fn ($query) => $query
+                ->whereIn('blueprint', $blueprintsWithAuthor)
+                ->whereHas('author', fn ($subquery) => $subquery->where('id', User::current()->id()))
             )
             ->orWhereIn('blueprint', $blueprintsWithoutAuthor)
         );
