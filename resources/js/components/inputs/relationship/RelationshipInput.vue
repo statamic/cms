@@ -293,7 +293,7 @@ export default {
         },
 
         initializeData() {
-            if (!this.data || !this.data.length) {
+            if (!this.data) {
                 return this.getDataForSelections(this.value);
             }
 
