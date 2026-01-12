@@ -1,5 +1,29 @@
 # Release Notes
 
+## 6.0.0-beta.1 (2026-01-12)
+
+### What's fixed
+- Fix uploading design in Files fieldtype [#13497](https://github.com/statamic/cms/issues/13497) by @duncanmcclean
+- Ensure sidebar tab is only active when sidebar area is hidden [#13501](https://github.com/statamic/cms/issues/13501) by @duncanmcclean
+- Markdown cheatsheet double close button [#13496](https://github.com/statamic/cms/issues/13496) by @JayGeorge
+- Disable tabs when editing form blueprints [#13488](https://github.com/statamic/cms/issues/13488) by @duncanmcclean
+- Don't redirect to referrer when 2FA challenge is required [#13491](https://github.com/statamic/cms/issues/13491) by @duncanmcclean
+- Fix reorderable listings where items come from URL [#13487](https://github.com/statamic/cms/issues/13487) by @duncanmcclean
+- Fix theme grid alignment [#13511](https://github.com/statamic/cms/issues/13511) by @JayGeorge
+- Remove Bard's outer focus state when sets are selected [#13510](https://github.com/statamic/cms/issues/13510) by @JayGeorge
+- Norwegian translations [#13504](https://github.com/statamic/cms/issues/13504) by @kjetilhole
+- Fix markdown text color in dark mode [#13481](https://github.com/statamic/cms/issues/13481) by @kjetilhole
+- Prevent `tabindex` prop type warnings on login page [#13493](https://github.com/statamic/cms/issues/13493) by @duncanmcclean
+- Prevent the tree structure from flashing when disclosures open [#13462](https://github.com/statamic/cms/issues/13462) by @JayGeorge
+- Asset tile and checkerboard improvements [#13502](https://github.com/statamic/cms/issues/13502) by @JayGeorge
+- Adds "Set Alt" button in assets grid view [#13480](https://github.com/statamic/cms/issues/13480) by @kjetilhole
+- Avoid making unnecessary requests in Relationship fieldtype [#13514](https://github.com/statamic/cms/issues/13514) by @duncanmcclean
+- Add max files count [#13477](https://github.com/statamic/cms/issues/13477) by @JayGeorge
+- Fix stacks closing immediately after opening [#13516](https://github.com/statamic/cms/issues/13516) by @duncanmcclean
+- Pressing "esc" should blur CodeMirror inputs [#13474](https://github.com/statamic/cms/issues/13474) by @duncanmcclean
+
+
+
 ## 6.0.0-alpha.21 (2026-01-09)
 
 ### What's fixed
