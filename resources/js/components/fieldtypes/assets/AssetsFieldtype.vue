@@ -50,8 +50,9 @@
                         <div class="text-xs">
                             <span class="leading-tight" v-text="`${__('Drag & drop here or')}&nbsp;`" />
                             <button type="button" class="text-left underline underline-offset-2 cursor-pointer hover:text-gray-925 dark:hover:text-gray-200" @click.prevent="uploadFile">
-                                {{ __('choose a file') }}.
-                            </button>
+                                {{ __('choose a file') }}
+                            </button>.
+                            <span class="leading-tight" v-if="selectedFilesText" v-text="selectedFilesText" />
                         </div>
                     </div>
 
@@ -412,6 +413,12 @@ export default {
                 : __('statamic::fieldtypes.assets.dynamic_folder_pending_field', {
                       field: `<code>${this.config.dynamic}</code>`,
                   });
+        },
+
+        selectedFilesText() {
+            if (this.maxFiles !== Infinity) {
+                return __n(':count\/:max selected', this.assets.length, { max: this.maxFiles });
+            }
         },
 
         internalFieldActions() {
