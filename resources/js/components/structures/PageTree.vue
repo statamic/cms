@@ -18,7 +18,7 @@
                     </div>
                 </div>
             </ui-panel-header>
-            <div v-if="!loading" class="page-tree" :class="{ 'page-tree--has-been-interacted-with': ready }">
+            <div v-if="!loading" class="page-tree" :class="{ 'page-tree--ready': ready }">
                 <Draggable
                     ref="tree"
                     v-model="treeData"
