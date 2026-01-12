@@ -36,7 +36,7 @@
                 </template>
 
             </div>
-            <div class="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 duration-100 gap-2">
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 duration-100">
                 <div class="flex items-center justify-center gap-2">
                     <template v-if="!readOnly">
                         <ui-button size="sm" @click="editOrOpen" :icon="asset.isEditable ? 'pencil' : 'eye'" aria-label="__('Edit')" v-if="asset.isViewable" />
