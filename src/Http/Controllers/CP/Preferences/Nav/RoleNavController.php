@@ -7,6 +7,7 @@ use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Role;
+use Statamic\Facades\Site;
 use Statamic\Http\Controllers\Controller;
 
 use function Statamic\trans as __;
@@ -22,13 +23,18 @@ class RoleNavController extends Controller
         return $this->currentHandle;
     }
 
+    protected function siteKey()
+    {
+        return 'nav.'.Site::selected()->handle();
+    }
+
     public function edit($handle)
     {
         throw_unless($role = Role::find($handle), new NotFoundHttpException);
 
         $this->currentHandle = $handle;
 
-        $preferences = $role->getPreference('nav') ?? Preference::default()->get('nav');
+        $preferences = $role->getPreference($this->siteKey()) ?? Preference::default()->get($this->siteKey());
 
         $nav = Nav::build(
             preferences: $preferences ?: false,
@@ -48,7 +54,7 @@ class RoleNavController extends Controller
 
         $nav = $this->getUpdatedNav($request);
 
-        $role->setPreference('nav', $nav)->save();
+        $role->setPreference($this->siteKey(), $nav)->save();
 
         Nav::clearCachedUrls();
 
@@ -61,7 +67,7 @@ class RoleNavController extends Controller
     {
         throw_unless($role = Role::find($handle), new NotFoundHttpException);
 
-        $role->removePreference('nav')->save();
+        $role->removePreference($this->siteKey())->save();
 
         Nav::clearCachedUrls();
 

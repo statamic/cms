@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Preferences\Nav;
 
 use Illuminate\Http\Request;
 use Statamic\Facades\CP\Nav;
+use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\Controller;
 
@@ -16,16 +17,32 @@ class UserNavController extends Controller
         return 'user';
     }
 
+    protected function siteKey()
+    {
+        return 'nav.'.Site::selected()->handle();
+    }
+
     public function edit()
     {
-        return $this->navBuilder();
+        $preferences = User::current()->getPreference($this->siteKey());
+
+        $nav = Nav::build(
+            preferences: $preferences ?: false,
+            editing: true,
+        );
+
+        return $this->navBuilder($nav, [
+            'title' => __('My Nav'),
+            'updateUrl' => cp_route('preferences.nav.user.update'),
+            'destroyUrl' => cp_route('preferences.nav.user.destroy'),
+        ]);
     }
 
     public function update(Request $request)
     {
         $nav = $this->getUpdatedNav($request);
 
-        User::current()->setPreference('nav', $nav)->save();
+        User::current()->setPreference($this->siteKey(), $nav)->save();
 
         Nav::clearCachedUrls();
 
@@ -36,7 +53,7 @@ class UserNavController extends Controller
 
     public function destroy()
     {
-        User::current()->removePreference('nav')->save();
+        User::current()->removePreference($this->siteKey())->save();
 
         Nav::clearCachedUrls();
 

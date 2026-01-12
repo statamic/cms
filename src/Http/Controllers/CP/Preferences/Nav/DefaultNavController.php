@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Preferences\Nav;
 use Illuminate\Http\Request;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Preference;
+use Statamic\Facades\Site;
 use Statamic\Http\Controllers\Controller;
 
 class DefaultNavController extends Controller
@@ -16,9 +17,14 @@ class DefaultNavController extends Controller
         return 'default';
     }
 
+    protected function siteKey()
+    {
+        return 'nav.'.Site::selected()->handle();
+    }
+
     public function edit()
     {
-        $preferences = Preference::default()->get('nav');
+        $preferences = Preference::default()->get($this->siteKey());
 
         $nav = Nav::build(
             preferences: $preferences ?: false,
@@ -40,7 +46,7 @@ class DefaultNavController extends Controller
             return $this->destroy();
         }
 
-        Preference::default()->set('nav', $nav)->save();
+        Preference::default()->set($this->siteKey(), $nav)->save();
 
         Nav::clearCachedUrls();
 
@@ -51,7 +57,7 @@ class DefaultNavController extends Controller
 
     public function destroy()
     {
-        Preference::default()->remove('nav')->save();
+        Preference::default()->remove($this->siteKey())->save();
 
         Nav::clearCachedUrls();
 

@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Preference;
+use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -60,7 +61,7 @@ class NavBuilder
     public function build($preferences = true)
     {
         if ($preferences === true) {
-            $preferences = Preference::get('nav');
+            $preferences = Preference::get('nav.'.Site::selected()->handle());
         }
 
         return $this
