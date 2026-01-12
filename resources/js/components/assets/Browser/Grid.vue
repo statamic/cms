@@ -129,7 +129,7 @@
                                         </div>
                                     </div>
                                 </button>
-                                <div class="absolute end-1 top-1 opacity-0 group-hover:opacity-100 transition-opacity [&_button]:bg-white [&_button]:hover:bg-white [&_button]:dark:bg-gray-900 [&_button]:dark:hover:bg-gray-900">
+                                <div class="absolute end-1 top-1 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity [&_button]:bg-white [&_button]:hover:bg-white [&_button]:dark:bg-gray-900 [&_button]:dark:hover:bg-gray-900">
                                     <Dropdown placement="left-start">
                                         <DropdownMenu>
                                             <DropdownItem
