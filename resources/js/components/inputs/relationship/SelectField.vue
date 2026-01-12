@@ -98,8 +98,6 @@ export default {
     },
 
     created() {
-        // Get the items via ajax.
-        // TODO: To save on requests, this should probably be done in the preload step and sent via meta.
         if (!this.typeahead) this.request();
 
 		watch(

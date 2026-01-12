@@ -293,7 +293,6 @@ export default {
         },
 
         initializeData() {
-			// https://github.com/statamic/cms/pull/12042/commits/e048475232fe6874723de9269b10ba6918cebad1
             if (!this.data) {
                 return this.getDataForSelections(this.value);
             }
