@@ -71,7 +71,7 @@
                                 v-model:modelValue="newFolderName"
                                 :start-with-edit-mode="true"
                                 submit-mode="enter"
-                                :placeholder="__('Name')"
+                                :placeholder="__('name')"
                                 :class="[
                                     'placeholder:lowercase',
                                     { 'st-has-error': folderError }
