@@ -75,7 +75,8 @@
 
     @supports (anchor-name: --my-anchor) {
         ul ul:has(.active) {
-            &::after {
+            /* [1] Add a little vertical line to indicate the "active" subnav item that moves with anchor positioning */
+            &::before {
                 content: '';
                 position: absolute;
                 width: anchor-size(height);
@@ -91,6 +92,15 @@
             }
             :where(.dark) &::before {
                 @apply border-s-gray-400;
+            }
+            &:has(li:only-child) {
+                /* [/2] Make the "active" subnav item less distracting for single-subnav items such as Assets/assets */
+                &::before {
+                    @apply border-s-gray-400;
+                }
+                :where(.dark) &::before {
+                    @apply border-s-gray-500;
+                }
             }
             a.active {
                 anchor-name: --active;
