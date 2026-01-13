@@ -160,7 +160,7 @@ function deletePreset() {
 
 <template>
     <div
-        class="relative flex shrink-0 space-x-2 px-2 -mt-2 sm:px-0 border-b border-gray-200 text-sm text-gray-500 dark:border-gray-700/50 dark:text-gray-500 starting-style-transition"
+        class="relative flex shrink-0 space-x-2.5 px-2 -mt-2 sm:px-0 border-b border-gray-200 text-sm text-gray-500 dark:border-gray-700/50 dark:text-gray-500 starting-style-transition"
     >
         <PresetTrigger :active="!activePreset" @click="viewAll" :text="__('All')" />
         <PresetTrigger
@@ -173,7 +173,7 @@ function deletePreset() {
             <template v-if="handle === activePreset">
                 <Dropdown class="w-48!">
                     <template #trigger>
-                        <Button class="absolute! top-1.5 -right-4" variant="ghost" size="xs" icon="chevron-down" />
+                        <Button class="absolute! top-0.25 -right-4" variant="ghost" size="xs" icon="chevron-down" />
                     </template>
                     <DropdownMenu>
                         <DropdownItem :text="__('Duplicate')" icon="duplicate" @click="createPreset" />
