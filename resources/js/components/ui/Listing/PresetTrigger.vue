@@ -1,9 +1,5 @@
 <script setup>
 import { TabTrigger } from '@/components/ui';
-import { useSlots } from 'vue';
-
-const slots = useSlots();
-const hasSlot = !!slots.default;
 
 defineProps({
     text: { type: String, default: null },
@@ -13,7 +9,6 @@ defineProps({
 
 <template>
     <TabTrigger :name="name">
-        <slot v-if="hasSlot" />
-        <span v-else>{{ text }}</span>
+        <slot>{{ text }}</slot>
     </TabTrigger>
 </template>
