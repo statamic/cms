@@ -27,6 +27,10 @@ export default {
         draggingFolder() {
             this.$emit('prevent-dragging', this.draggingFolder !== null);
         },
+
+        newFolderName() {
+            if (this.creatingFolderError) this.$emit('update:creatingFolderError', null);
+        }
     },
 
     methods: {

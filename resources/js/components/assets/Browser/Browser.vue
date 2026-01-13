@@ -382,6 +382,7 @@ export default {
                     this.creatingFolderError = false;
                 },
                 'prevent-dragging': (preventDragging) => (this.preventDragging = preventDragging),
+                'update:creatingFolderError': (value) => (this.creatingFolderError = value),
             };
         },
     },
