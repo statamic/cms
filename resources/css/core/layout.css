@@ -86,8 +86,8 @@
                 position-anchor: --active;
                 left: calc(anchor(left) + 0.25rem);
                 top: anchor(top);
-                transition-property: top, left, opacity;
-                transition-duration: 0.25s;
+                transition-property: top, left;
+                transition-duration: 0.15s;
                 transition-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1);
             }
             :where(.dark) &::before {
