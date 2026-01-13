@@ -11,12 +11,7 @@
 
         <Dropdown v-if="isActive" placement="left-start" class="me-3">
             <template #trigger>
-                <button
-                    class="hover:text-gray-900 active:text-gray-900 dark:hover:text-gray-400 ms-1"
-                    :aria-label="__('Open Dropdown')"
-                >
-                    <Icon name="chevron-down" />
-                </button>
+                <Button class="absolute! top-0.25 -right-4" variant="ghost" size="xs" icon="chevron-down" />
             </template>
             <DropdownMenu>
                 <DropdownItem :text="__('Edit')" icon="edit" @click="edit" />
@@ -73,10 +68,10 @@
 </template>
 
 <script>
-import { TabTrigger, Dropdown, DropdownMenu, DropdownItem, Icon, Field, Input, Stack, StackClose } from '@/components/ui';
+import { TabTrigger, Dropdown, DropdownMenu, DropdownItem, Button, Icon, Field, Input, Stack, StackClose } from '@/components/ui';
 
 export default {
-    components: { TabTrigger, Dropdown, DropdownMenu, DropdownItem, Icon, Field, Input, Stack, StackClose },
+    components: { TabTrigger, Dropdown, DropdownMenu, DropdownItem, Button, Icon, Field, Input, Stack, StackClose },
 
     props: {
         tab: {
