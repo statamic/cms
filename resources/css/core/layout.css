@@ -1,6 +1,5 @@
-/* ==========================================================================
-   THE MAIN NAV (LEFT SIDEBAR)
-   ========================================================================== */
+/* GROUP THE MAIN NAV (LEFT SIDEBAR)
+=================================================== */
 .nav-main {
     @apply flex flex-col gap-6 py-6 px-2 sm:px-3 text-sm antialiased select-none;
     /* Same as the main element, accounting for the header with a class of h-14, which is the same as 3.5rem */
@@ -39,34 +38,70 @@
     ul li ul li a.active {
         @apply text-gray-925 dark:text-white font-medium bg-transparent;
     }
-    ul li ul li {
-        a.active {
-            /* [1] Add a little vertical line to indicate the "active" subnav item */
-            &::before {
-                content: '';
-                position: absolute;
-                left: -1px;
-                @apply h-4 border-s border-s-black;
-            }
-            :where(.dark) &::before {
-                @apply border-s-gray-400;
-            }
-        }
-        &:only-child a.active {
-            /* [/2] Make the "active" subnav item less distracting for single-subnav items such as Assets/assets */
-            &::before {
-                @apply border-s-gray-400;
-            }
-            :where(.dark) &::before {
-                @apply border-s-gray-500;
-            }
-        }
-    }
 
     .section-title {
         @apply text-sm px-2 text-gray-925 font-medium mb-1 dark:text-gray-200;
     }
 }
+
+/* GROUP THE MAIN NAV (LEFT SIDEBAR) / ACTIVE STATES
+=================================================== */
+.nav-main {
+    @supports not (anchor-name: --my-anchor) {
+        ul li ul li {
+            a.active {
+                /* [1] Add a little vertical line to indicate the "active" subnav item */
+                &::before {
+                    content: '';
+                    position: absolute;
+                    left: -1px;
+                    @apply h-4 border-s border-s-black;
+                }
+                :where(.dark) &::before {
+                    @apply border-s-gray-400;
+                }
+            }
+            &:only-child a.active {
+                /* [/2] Make the "active" subnav item less distracting for single-subnav items such as Assets/assets */
+                &::before {
+                    @apply border-s-gray-400;
+                }
+                :where(.dark) &::before {
+                    @apply border-s-gray-500;
+                }
+            }
+        }
+    }
+
+    @supports (anchor-name: --my-anchor) {
+        ul:not(ul ul):has(.active) {
+            &::after {
+                content: '';
+                position: absolute;
+                width: anchor-size(height);
+                height: anchor-size(height);
+                @apply h-4 border-s border-s-black;
+                translate: -100% 0;
+                position-anchor: --active;
+                left: calc(anchor(left) + 0.25rem);
+                top: anchor(top);
+                transition-property: top, left, opacity;
+                transition-duration: 0.25s;
+                transition-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1);
+            }
+            :where(.dark) &::before {
+                @apply border-s-gray-400;
+            }
+            li ul li {
+                a.active {
+                    anchor-name: --active;
+                }
+            }
+        }
+    }
+}
+
+
 
 
 /* Mobile nav behavior */
