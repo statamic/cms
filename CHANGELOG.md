@@ -1,5 +1,18 @@
 # Release Notes
 
+## 5.72.0 (2026-01-13)
+
+### What's new
+- Support query scopes in navigations [#13509](https://github.com/statamic/cms/issues/13509) by @el-schneider
+
+### What's fixed
+- Generate etag after nocache replacements [#13433](https://github.com/statamic/cms/issues/13433) by @mmodler
+- Support custom validation rules for asset containers [#13459](https://github.com/statamic/cms/issues/13459) by @duncanmcclean
+- Fix filterWhere with arrays [#13507](https://github.com/statamic/cms/issues/13507) by @aerni
+- Dutch translations [#13532](https://github.com/statamic/cms/issues/13532) by @laurenskr
+
+
+
 ## 5.71.0 (2026-01-08)
 
 ### What's new
