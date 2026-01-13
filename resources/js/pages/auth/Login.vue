@@ -141,7 +141,7 @@ onMounted(() => {
                         <Button
                             v-for="provider in providers"
                             :key="provider.name"
-                            as="href"
+                            as="a"
                             class="flex-1 [&_svg]:opacity-100!"
                             :href="provider.url"
                             :icon="provider.icon"
