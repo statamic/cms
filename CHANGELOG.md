@@ -1,5 +1,29 @@
 # Release Notes
 
+## 6.0.0-beta.2 (2026-01-13)
+
+### What's fixed
+- Fix some focus clipping [#13465](https://github.com/statamic/cms/issues/13465) by @JayGeorge
+- Avoid squashed Combobox options near viewport edge [#13489](https://github.com/statamic/cms/issues/13489) by @duncanmcclean
+- Remove reka tabs outline [#13529](https://github.com/statamic/cms/issues/13529) by @JayGeorge
+- Bring back logo version tooltip [#13528](https://github.com/statamic/cms/issues/13528) by @duncanmcclean
+- Upgrade Storybook [#13534](https://github.com/statamic/cms/issues/13534) by @jasonvarga
+- Fix tab dropdowns for presets [#13476](https://github.com/statamic/cms/issues/13476) by @JayGeorge
+- Fix elevated session route [#13535](https://github.com/statamic/cms/issues/13535) by @jasonvarga
+- Fix OAuth login links [#13540](https://github.com/statamic/cms/issues/13540) by @duncanmcclean
+- Anchor positioned nav marker [#13536](https://github.com/statamic/cms/issues/13536) by @JayGeorge
+- Only load video embed when field becomes visible [#13527](https://github.com/statamic/cms/issues/13527) by @duncanmcclean
+- Grid dot menu improvements [#13500](https://github.com/statamic/cms/issues/13500) by @JayGeorge
+- Make "Emails" field on configure forms page full-width [#13522](https://github.com/statamic/cms/issues/13522) by @duncanmcclean
+- Panel: Show `header-actions` slot in the right of the header [#13524](https://github.com/statamic/cms/issues/13524) by @duncanmcclean
+- Fix nested permissions in permission tree [#13523](https://github.com/statamic/cms/issues/13523) by @duncanmcclean
+- Fix duplicate items in the Command Palette's "Recent" category [#13471](https://github.com/statamic/cms/issues/13471) by @duncanmcclean
+- Fix bard full screen styles [#13490](https://github.com/statamic/cms/issues/13490) by @JayGeorge
+- New folder ux improvements [#13515](https://github.com/statamic/cms/issues/13515) by @JayGeorge
+- Remove custom Vue warnHandler [#13541](https://github.com/statamic/cms/issues/13541) by @jasonvarga
+
+
+
 ## 6.0.0-beta.1 (2026-01-12)
 
 ### What's fixed
