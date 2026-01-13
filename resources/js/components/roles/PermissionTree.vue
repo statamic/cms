@@ -1,5 +1,5 @@
 <template>
-    <div :style="`padding-left: ${12 * depth - 12}px`">
+    <div :style="`padding-inline-start: ${12 * depth - 12}px`">
         <template v-for="permission in permissions" :key="permission.value">
             <ui-checkbox
                 :class="[
