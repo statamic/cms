@@ -74,7 +74,7 @@
     }
 
     @supports (anchor-name: --my-anchor) {
-        ul:not(ul ul):has(.active) {
+        ul ul:has(.active) {
             &::after {
                 content: '';
                 position: absolute;
@@ -92,10 +92,8 @@
             :where(.dark) &::before {
                 @apply border-s-gray-400;
             }
-            li ul li {
-                a.active {
-                    anchor-name: --active;
-                }
+            a.active {
+                anchor-name: --active;
             }
         }
     }
