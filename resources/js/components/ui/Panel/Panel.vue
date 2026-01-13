@@ -19,10 +19,14 @@ const props = defineProps({
         ]"
         data-ui-panel
     >
-        <PanelHeader v-if="heading">
-            <Heading v-html="heading" />
-            <Subheading v-if="subheading" v-html="subheading" />
-            <slot name="header-actions" />
+        <PanelHeader v-if="heading" class="flex items-center justify-between">
+	        <div>
+		        <Heading v-html="heading" />
+		        <Subheading v-if="subheading" v-html="subheading" />
+	        </div>
+	        <div v-if="$slots['header-actions']" class="flex flex-wrap items-center gap-2 sm:gap-3">
+                <slot name="header-actions" />
+	        </div>
         </PanelHeader>
         <slot />
     </div>
