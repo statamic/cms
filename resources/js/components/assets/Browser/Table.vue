@@ -74,7 +74,7 @@
                                 :placeholder="__('name')"
                                 :class="[
                                     'placeholder:lowercase',
-                                    { 'st-has-error': folderError }
+                                    { 'st-has-error': creatingFolderError }
                                 ]"
                                 @submit="$emit('create-folder', newFolderName)"
                                 @cancel="

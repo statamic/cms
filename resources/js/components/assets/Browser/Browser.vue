@@ -266,7 +266,7 @@ export default {
             searchQuery: '',
             editedAssetId: this.initialEditingAssetId,
             creatingFolder: false,
-            folderError: false,
+            creatingFolderError: false,
             uploads: [],
             page: 1,
             preferencesPrefix: `assets.${this.container.id}`,
@@ -365,7 +365,7 @@ export default {
                 restrictFolderNavigation: this.restrictFolderNavigation,
                 path: this.path,
                 creatingFolder: this.creatingFolder,
-                folderError: this.folderError,
+                creatingFolderError: this.creatingFolderError,
             };
         },
 
@@ -379,7 +379,7 @@ export default {
                 'create-folder': this.createFolder,
                 'cancel-creating-folder': () => {
                     this.creatingFolder = false;
-                    this.folderError = false;
+                    this.creatingFolderError = false;
                 },
                 'prevent-dragging': (preventDragging) => (this.preventDragging = preventDragging),
             };
@@ -451,7 +451,7 @@ export default {
 
         startCreatingFolder() {
             this.creatingFolder = true;
-            this.folderError = false;
+            this.creatingFolderError = false;
         },
 
         listingRequestCompleted({ response }) {
@@ -565,7 +565,7 @@ export default {
                     this.folders.push(response.data);
                     this.folders = sortBy(this.folders, 'title');
                     this.creatingFolder = false;
-                    this.folderError = false;
+                    this.creatingFolderError = false;
 
                     this.$refs.grid?.clearNewFolderName();
                     this.$refs.table?.clearNewFolderName();
@@ -578,12 +578,12 @@ export default {
                             ? this.$toast.error(errors.directory[0])
                             : this.$toast.error(message);
 
-                        this.folderError = true;
+                        this.creatingFolderError = true;
                         this.$refs.grid?.focusNewFolderInput();
                         this.$refs.table?.focusNewFolderInput();
                     } else {
                         this.$toast.error(__('Something went wrong'));
-                        this.folderError = true;
+                        this.creatingFolderError = true;
                     }
                 });
         },
