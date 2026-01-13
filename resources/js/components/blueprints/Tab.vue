@@ -11,7 +11,7 @@
 
         <Dropdown v-if="isActive" placement="left-start" class="me-3">
             <template #trigger>
-                <Button class="absolute! top-0.25 -right-4" variant="ghost" size="xs" icon="chevron-down" :aria-label="__('Open Dropdown')" />
+                <Button class="absolute! top-0.25 -right-4 starting-style-transition starting-style-transition--slow" variant="ghost" size="xs" icon="chevron-down" :aria-label="__('Open Dropdown')" />
             </template>
             <DropdownMenu>
                 <DropdownItem :text="__('Edit')" icon="edit" @click="edit" />
