@@ -185,7 +185,7 @@ function deletePreset() {
                     <template v-if="handle === activePreset">
                         <Dropdown class="w-48!">
                             <template #trigger>
-                                <Button class="absolute! top-0.25 -right-4" variant="ghost" size="xs" icon="chevron-down" />
+                                <Button class="absolute! top-0.25 -right-4 starting-style-transition starting-style-transition--slow" variant="ghost" size="xs" icon="chevron-down" />
                             </template>
                             <DropdownMenu>
                                 <DropdownItem :text="__('Duplicate')" icon="duplicate" @click="createPreset" />
