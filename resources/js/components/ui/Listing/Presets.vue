@@ -7,6 +7,8 @@ import {
     DropdownItem,
     DropdownMenu,
     DropdownSeparator,
+    Tabs,
+    TabList,
 } from '@ui';
 import { injectListingContext } from '../Listing/Listing.vue';
 import { computed, ref, watch } from 'vue';
@@ -85,6 +87,17 @@ function getPresetFromActiveFilters() {
     }
 }
 
+const currentTab = computed({
+    get: () => activePreset.value || 'all',
+    set: (value) => {
+        if (value === 'all') {
+            viewAll();
+        } else {
+            selectPreset(value);
+        }
+    },
+});
+
 const presetPreferencesPayload = computed(() => {
     let payload = {
         display: savingPresetName.value || activePresetPayload.value.display || '',
@@ -159,52 +172,53 @@ function deletePreset() {
 </script>
 
 <template>
-    <div
-        class="relative flex shrink-0 space-x-2 px-2 -mt-2 sm:px-0 border-b border-gray-200 text-sm text-gray-500 dark:border-gray-700/50 dark:text-gray-500 starting-style-transition"
-    >
-        <PresetTrigger :active="!activePreset" @click="viewAll" :text="__('All')" />
-        <PresetTrigger
-            v-for="(preset, handle) in presets"
-            :key="handle"
-            :active="handle === activePreset"
-            @click="selectPreset(handle)"
-        >
-            {{ preset.display }}
-            <template v-if="handle === activePreset">
-                <Dropdown class="w-48!">
-                    <template #trigger>
-                        <Button class="absolute top-1.5 -right-4" variant="ghost" size="xs" icon="chevron-down" />
+    <Tabs v-model:modelValue="currentTab">
+        <div class="relative flex shrink-0 items-center space-x-2.5 px-2 -mt-2 sm:px-0 starting-style-transition">
+            <TabList class="flex-1 space-x-2.5 !border-gray-200 !dark:border-gray-800">
+                <PresetTrigger name="all" :text="__('All')" />
+                <PresetTrigger
+                    v-for="(preset, handle) in presets"
+                    :key="handle"
+                    :name="handle"
+                >
+                    {{ preset.display }}
+                    <template v-if="handle === activePreset">
+                        <Dropdown class="w-48!">
+                            <template #trigger>
+                                <Button class="absolute! top-0.25 -right-4 starting-style-transition starting-style-transition--slow" variant="ghost" size="xs" icon="chevron-down" />
+                            </template>
+                            <DropdownMenu>
+                                <DropdownItem :text="__('Duplicate')" icon="duplicate" @click="createPreset" />
+                                <DropdownItem
+                                    v-if="canRenamePreset(handle)"
+                                    :text="__('Rename')"
+                                    icon="rename"
+                                    @click="renamePreset"
+                                />
+                                <DropdownSeparator v-if="canDeletePreset(handle)" />
+                                <DropdownItem
+                                    v-if="canDeletePreset(handle)"
+                                    :text="__('Delete')"
+                                    icon="delete"
+                                    variant="destructive"
+                                    @click="isConfirmingDeletion = true"
+                                />
+                            </DropdownMenu>
+                        </Dropdown>
                     </template>
-                    <DropdownMenu>
-                        <DropdownItem :text="__('Duplicate')" icon="duplicate" @click="createPreset" />
-                        <DropdownItem
-                            v-if="canRenamePreset(handle)"
-                            :text="__('Rename')"
-                            icon="rename"
-                            @click="renamePreset"
-                        />
-                        <DropdownSeparator v-if="canDeletePreset(handle)" />
-                        <DropdownItem
-                            v-if="canDeletePreset(handle)"
-                            :text="__('Delete')"
-                            icon="delete"
-                            variant="warning"
-                            @click="isConfirmingDeletion = true"
-                        />
-                    </DropdownMenu>
-                </Dropdown>
-            </template>
-        </PresetTrigger>
-        <Button
-            v-if="canSaveNewPreset"
-            @click="createPreset"
-            variant="ghost"
-            size="sm"
-            :text="__('New View')"
-            icon="add-bookmark"
-            class="relative top-0.5 [&_svg]:size-4"
-        />
-    </div>
+                </PresetTrigger>
+            </TabList>
+            <Button
+                v-if="canSaveNewPreset"
+                @click="createPreset"
+                variant="ghost"
+                size="sm"
+                :text="__('New View')"
+                icon="add-bookmark"
+                class="relative top-0.5 [&_svg]:size-4"
+            />
+        </div>
+    </Tabs>
 
     <confirmation-modal
         :open="isCreating"
