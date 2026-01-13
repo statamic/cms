@@ -278,9 +278,9 @@
             min-height: calc(100vh - 120px);
         }
 
-        .bard-content:not(.bard-set *) > {
-            p > code,
-            pre code {
+        .bard-content:not(.bard-set *) {
+            > p > code,
+            > pre code {
                 @apply bg-purple-100;
             }
         }
