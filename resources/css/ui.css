@@ -17,7 +17,7 @@
     --color-gray-850: var(--theme-color-gray-850);
     --color-gray-900: var(--theme-color-gray-900);
     --color-gray-925: var(--theme-color-gray-925);
-    --color-gray-950: var(--theme-color-zinc-950);
+    --color-gray-950: var(--theme-color-gray-950);
     --color-volt: oklch(93.86% 0.2018 122.24);
 
     --color-body-bg: var(--theme-color-body-bg);
@@ -152,8 +152,6 @@
 .dark {
     @theme inline {
         --color-primary-hover: color-mix(in oklch, var(--color-primary) 100%, white 30%);
-        --color-success: var(--color-green-500);
-        --color-gray-950: hsl(240deg 7% 8%);
     }
 }
 
