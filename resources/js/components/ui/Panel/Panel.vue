@@ -14,7 +14,7 @@ const props = defineProps({
 <template>
     <div
         :class="[
-            '@container/panel relative bg-gray-150 [.bg-architectural-lines_&]:backdrop-blur-[10px] dark:bg-gray-950/45 dark:inset-shadow-2xs dark:inset-shadow-black',
+            '@container/panel relative bg-gray-150 [.bg-architectural-lines_&]:backdrop-blur-[10px] dark:bg-gray-950/40 dark:inset-shadow-2xs dark:inset-shadow-black',
             'w-full rounded-2xl mb-5 max-[600px]:p-1.25 p-1.75 [&:has(>[data-ui-panel-header])]:pt-0 focus-none starting-style-transition starting-style-transition--siblings',
         ]"
         data-ui-panel
