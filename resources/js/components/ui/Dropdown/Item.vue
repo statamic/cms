@@ -29,7 +29,7 @@ const tag = computed(() => {
 });
 
 const classes = cva({
-    base: 'col-span-2 grid grid-cols-subgrid items-center rounded-lg px-1 py-1.5 text-sm antialiased text-gray-900 dark:text-gray-300 not-data-disabled:cursor-pointer data-disabled:opacity-50 hover:not-data-disabled:bg-gray-100 dark:hover:not-data-disabled:bg-gray-800 outline-hidden',
+    base: 'col-span-2 grid grid-cols-subgrid items-center rounded-lg px-1 py-1.25 text-sm antialiased text-gray-900 dark:text-gray-300 not-data-disabled:cursor-pointer data-disabled:opacity-50 hover:not-data-disabled:bg-gray-100 dark:hover:not-data-disabled:bg-gray-800 outline-hidden',
     variants: {
         variant: {
             default: 'text-gray-700 dark:text-gray-300',
@@ -58,7 +58,7 @@ const iconClasses = cva({
         :href
         :target
     >
-        <div v-if="icon" class="flex size-6 items-center justify-center p-1">
+        <div v-if="icon" class="flex size-5 items-center justify-center p-1">
             <Icon :name="icon" :class="iconClasses" />
         </div>
         <div class="col-start-2 px-2">
