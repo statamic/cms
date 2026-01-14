@@ -272,6 +272,87 @@ class UserGroupTest extends TestCase
     }
 
     #[Test]
+    public function it_checks_wildcard_permission_with_asterisk_at_beginning()
+    {
+        $role = new class extends Role
+        {
+            public function permissions($permissions = null)
+            {
+                return collect(['* blog entries']);
+            }
+        };
+
+        $group = UserGroup::make()->assignRole($role);
+
+        $this->assertTrue($group->hasPermission('view blog entries'));
+        $this->assertTrue($group->hasPermission('edit blog entries'));
+        $this->assertTrue($group->hasPermission('delete blog entries'));
+        $this->assertFalse($group->hasPermission('view news entries'));
+        $this->assertFalse($group->hasPermission('view blog posts'));
+    }
+
+    #[Test]
+    public function it_checks_wildcard_permission_with_asterisk_in_middle()
+    {
+        $role = new class extends Role
+        {
+            public function permissions($permissions = null)
+            {
+                return collect(['view * entries']);
+            }
+        };
+
+        $group = UserGroup::make()->assignRole($role);
+
+        $this->assertTrue($group->hasPermission('view blog entries'));
+        $this->assertTrue($group->hasPermission('view news entries'));
+        $this->assertTrue($group->hasPermission('view products entries'));
+        $this->assertFalse($group->hasPermission('edit blog entries'));
+        $this->assertFalse($group->hasPermission('view blog posts'));
+    }
+
+    #[Test]
+    public function it_checks_multiple_roles_with_wildcard_permissions()
+    {
+        $roleOne = new class extends Role
+        {
+            public function handle(?string $handle = null)
+            {
+                return 'role_one';
+            }
+
+            public function permissions($permissions = null)
+            {
+                return collect(['view * entries']);
+            }
+        };
+
+        $roleTwo = new class extends Role
+        {
+            public function handle(?string $handle = null)
+            {
+                return 'role_two';
+            }
+
+            public function permissions($permissions = null)
+            {
+                return collect(['* blog entries']);
+            }
+        };
+
+        $group = UserGroup::make()
+            ->assignRole($roleOne)
+            ->assignRole($roleTwo);
+
+        $this->assertTrue($group->hasPermission('view blog entries'));
+        $this->assertTrue($group->hasPermission('view news entries'));
+        $this->assertTrue($group->hasPermission('edit blog entries'));
+        $this->assertTrue($group->hasPermission('delete blog entries'));
+        $this->assertFalse($group->hasPermission('delete news entries'));
+        $this->assertFalse($group->hasPermission('view blog posts'));
+    }
+
+    #[Test]
     public function it_checks_if_it_has_super_permissions()
     {
         $superRole = new class extends Role

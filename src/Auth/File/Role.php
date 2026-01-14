@@ -98,7 +98,13 @@ class Role extends BaseRole
 
     public function hasPermission(string $permission): bool
     {
-        return $this->permissions->contains($permission);
+        if ($this->permissions->contains($permission)) {
+            return true;
+        }
+
+        return $this->permissions->contains(function ($rolePermission) use ($permission) {
+            return $this->matchesWildcard($rolePermission, $permission);
+        });
     }
 
     public function isSuper(): bool
@@ -124,5 +130,18 @@ class Role extends BaseRole
         Facades\Role::delete($this);
 
         RoleDeleted::dispatch($this);
+    }
+
+    protected function matchesWildcard(string $wildcardPermission, string $requestedPermission): bool
+    {
+        if (! str_contains($wildcardPermission, '*')) {
+            return false;
+        }
+
+        $pattern = preg_quote($wildcardPermission, '/');
+        $pattern = str_replace('\*', '.*', $pattern);
+        $pattern = '/^'.$pattern.'$/';
+
+        return (bool) preg_match($pattern, $requestedPermission);
     }
 }
