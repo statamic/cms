@@ -159,7 +159,7 @@
 /* Row Selection */
 .data-table[data-has-selections] {
     tbody tr[data-row="selected"] td {
-        @apply bg-gray-100 dark:bg-gray-950;
+        @apply bg-gray-100 dark:bg-gray-925;
     }
 }
 
