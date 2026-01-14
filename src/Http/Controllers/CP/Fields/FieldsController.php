@@ -74,7 +74,11 @@ class FieldsController extends CpController
                         ->when($request->has('id'), fn ($collection) => $collection->reject(fn ($field) => $field['_id'] === $request->id))
                         ->flatMap(function (array $field) {
                             if ($field['type'] === 'import') {
-                                return Fieldset::find($field['fieldset'])->fields()->all()->map->handle()->toArray();
+                                return Fieldset::find($field['fieldset'])
+                                    ->fields()->all()
+                                    ->map(fn ($importedField) => ($field['prefix'] ?? '') . $importedField->handle())
+                                    ->values()
+                                    ->toArray();
                             }
 
                             return [$field['handle']];
