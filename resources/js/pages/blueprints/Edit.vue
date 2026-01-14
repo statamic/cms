@@ -7,7 +7,10 @@ defineProps({
 	action: String,
 	showTitle: Boolean,
 	useTabs: { type: Boolean, default: true },
-	canDefineLocalizable: Boolean,
+	canDefineLocalizable: {
+		type: Boolean,
+		default: () => Statamic.$config.get('sites').length > 1,
+	},
 	resetRoute: String,
 	isResettable: Boolean,
 	isFormBlueprint: Boolean,
