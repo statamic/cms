@@ -32,7 +32,7 @@
                 target="_blank"
                 v-if="entry.viewable && entry.permalink"
             />
-            <DropdownItem :text="__('Edit')" :href="entry.edit_url" icon="edit" v-if="entry.editable" />
+            <DropdownItem :text="__('Edit')" :href="entry.edit_url" v-if="entry.editable" />
         </template>
     </Listing>
 </template>
