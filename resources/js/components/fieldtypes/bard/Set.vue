@@ -327,6 +327,8 @@ export default {
         watch(
             () => data_get(this.publishContainer.values.value, this.fieldPathPrefix),
             (values) => {
+				if (! values) return;
+
                 this.updateAttributes({ values });
             },
             { deep: true }
