@@ -55,6 +55,7 @@ const reloadPage = () => router.reload();
             <DropdownItem :text="__('Edit')" icon="edit" :href="blueprint.edit_url" />
             <DropdownItem
                 :text="__('Delete')"
+                icon="trash"
                 variant="destructive"
                 @click="$refs[`deleter_${blueprint.id}`].confirm()"
             />

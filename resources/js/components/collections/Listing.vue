@@ -32,11 +32,11 @@
                         >
                             <Dropdown placement="left-start">
                                 <DropdownMenu>
-                                    <DropdownItem v-if="collection.available_in_selected_site" :text="__('View')" :href="collection.entries_url" />
+                                    <DropdownItem v-if="collection.available_in_selected_site" :text="__('View')" icon="eye" :href="collection.entries_url" />
                                     <DropdownItem v-if="collection.available_in_selected_site && collection.url" :text="__('Visit URL')" icon="external-link" target="_blank" :href="collection.url" />
                                     <DropdownItem v-if="collection.editable" :text="__('Configure')" icon="cog" :href="collection.edit_url" />
                                     <DropdownItem v-if="collection.blueprint_editable" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="collection.blueprints_url" />
-                                    <DropdownItem v-if="collection.editable" :text="__('Scaffold Views')" :href="collection.scaffold_url" />
+                                    <DropdownItem v-if="collection.editable" :text="__('Scaffold Views')" icon="scaffold" :href="collection.scaffold_url" />
                                     <DropdownSeparator v-if="actions.length" />
                                     <DropdownItem
                                         v-for="action in actions"

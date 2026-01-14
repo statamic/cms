@@ -15,7 +15,7 @@
             <Dropdown v-if="canAddRows || canDelete" placement="left-start">
                 <DropdownMenu>
                     <DropdownItem v-if="canAddRows" :text="__('Duplicate Row')" icon="duplicate" @click="$emit('duplicate', index)" />
-                    <DropdownItem v-if="canDelete" :text="__('Delete Row')" variant="destructive" @click="$emit('removed', index, fields)" />
+                    <DropdownItem v-if="canDelete" :text="__('Delete Row')" icon="trash" variant="destructive" @click="$emit('removed', index, fields)" />
                 </DropdownMenu>
             </Dropdown>
         </td>
