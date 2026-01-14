@@ -15,7 +15,7 @@
             </template>
             <DropdownMenu>
                 <DropdownItem :text="__('Edit')" icon="edit" @click="edit" />
-                <DropdownItem :text="__('Delete')" icon="trash" variant="destructive" @click="remove" />
+                <DropdownItem :text="__('Delete')" variant="destructive" @click="remove" />
             </DropdownMenu>
         </Dropdown>
 

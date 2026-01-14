@@ -527,7 +527,6 @@ export default {
                     :text="__('Remove')"
                     variant="destructive"
                     @click="deleteTreeBranch(branch, removeBranch)"
-                    icon="trash"
                 />
             </template>
         </page-tree>
