@@ -76,7 +76,7 @@ class FieldsController extends CpController
                             if ($field['type'] === 'import') {
                                 return Fieldset::find($field['fieldset'])
                                     ->fields()->all()
-                                    ->map(fn ($importedField) => ($field['prefix'] ?? '') . $importedField->handle())
+                                    ->map(fn ($importedField) => ($field['prefix'] ?? '').$importedField->handle())
                                     ->values()
                                     ->toArray();
                             }
