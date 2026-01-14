@@ -55,7 +55,7 @@ const hasStackHeaderComponent = hasComponent('StackHeader', slotProps);
 const hasStackContentComponent = hasComponent('StackContent', slotProps);
 const isUsingOpenProp = computed(() => instance?.vnode.props?.hasOwnProperty('open'));
 const portal = computed(() => stack.value ? `#portal-target-${stack.value.id}` : null);
-const depth = computed(() => stack.value?.data.depth);
+const depth = computed(() => stacks.stacks().findIndex(s => s.id === stack.value.id) + 1);
 const isTopStack = computed(() => stacks.count() === depth.value);
 
 const shouldAddHeader = computed(() => !!(props.title || props.icon) && !hasStackHeaderComponent.value);

@@ -134,7 +134,7 @@ export default {
                 },
             };
 
-            setTimeout(() => (this.pendingCreatedField = pending), 500); // wait for stack to close
+            this.pendingCreatedField = pending;
         },
 
         createField() {
