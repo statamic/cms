@@ -208,6 +208,7 @@ export default {
             pageHeader: null,
             escBinding: null,
             showAddSetButton: false,
+            hasBeenFocused: false,
             provide: {
                 bard: this.makeBardProvide(),
                 bardSets: this.config.sets,
@@ -745,7 +746,10 @@ export default {
                 enablePasteRules: this.config.enable_paste_rules,
                 editorProps: { attributes: { class: 'bard-content' } },
 	            onDrop: () => this.debounceNextUpdate = false,
-                onFocus: () => this.$emit('focus'),
+                onFocus: () => {
+                    this.hasBeenFocused = true;
+                    this.$emit('focus');
+                },
                 onBlur: () => {
                     // Since clicking into a field inside a set would also trigger a blur, we can't just emit the
                     // blur event immediately. We need to make sure that the newly focused element is outside
@@ -977,6 +981,7 @@ export default {
             Object.defineProperties(bard, {
                 setConfigs: { get: () => this.setConfigs },
                 isReadOnly: { get: () => this.readOnly },
+                hasBeenFocused: { get: () => this.hasBeenFocused },
             });
             return bard;
         },
