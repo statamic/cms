@@ -102,7 +102,7 @@ class Theme extends Tags
         $url = $this->themeUrl($path);
 
         if ($this->params->bool('tag')) {
-            return '<link rel="stylesheet" href="'.$url.'" >';
+            return '<link rel="stylesheet" href="'.$url.'">';
         }
 
         return $url;
