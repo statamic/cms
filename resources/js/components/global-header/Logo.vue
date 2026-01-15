@@ -29,7 +29,7 @@ function toggleNav() {
             </button>
             <Link :href="cp_url('/')" v-tooltip="version" style="--focus-outline-offset: var(--outline-offset-button);">
                 <img v-if="customLogoImage" :src="customLogoImage" :alt="cmsName" class="w-full max-w-[260px] max-h-7" v-tooltip="version">
-                <span v-if="customLogoText && !customLogoImage" class="mx-2 font-medium text-white whitespace-nowrap">{{ customLogoText }}</span>
+                <span v-if="customLogoText && !customLogoImage" class="ms-1 me-2 font-medium text-white whitespace-nowrap">{{ customLogoText }}</span>
             </Link>
         </div>
     </template>
