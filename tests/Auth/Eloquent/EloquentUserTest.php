@@ -23,7 +23,7 @@ use Tests\Auth\PermissibleContractTests;
 use Tests\Auth\UserContractTests;
 use Tests\Preferences\HasPreferencesTests;
 use Tests\TestCase;
-use Webauthn\PublicKeyCredentialSource;
+use Webauthn\CredentialRecord;
 
 #[Group('2fa')]
 class EloquentUserTest extends TestCase
@@ -342,11 +342,11 @@ class EloquentUserTest extends TestCase
         $user = $this->user();
         $this->assertCount(0, $user->passkeys());
 
-        $mockCredentialA = \Mockery::mock(PublicKeyCredentialSource::class);
+        $mockCredentialA = \Mockery::mock(CredentialRecord::class);
         $mockCredentialA->publicKeyCredentialId = 'key-a';
-        $mockCredentialB = \Mockery::mock(PublicKeyCredentialSource::class);
+        $mockCredentialB = \Mockery::mock(CredentialRecord::class);
         $mockCredentialB->publicKeyCredentialId = 'key-b';
-        $mockCredentialC = \Mockery::mock(PublicKeyCredentialSource::class);
+        $mockCredentialC = \Mockery::mock(CredentialRecord::class);
         $mockCredentialC->publicKeyCredentialId = 'key-c';
 
         app()->instance(Serializer::class, new class($mockCredentialA, $mockCredentialB, $mockCredentialC)
