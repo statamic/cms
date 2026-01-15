@@ -50,6 +50,8 @@
             @closed="pendingCreatedField = null"
             v-slot="{ close }"
             inset
+            :show-close-button="false"
+            :wrap-slot="false"
         >
             <field-settings
                 ref="settings"
