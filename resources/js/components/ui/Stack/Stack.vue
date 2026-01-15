@@ -37,6 +37,8 @@ const props = defineProps({
     inset: { type: Boolean, default: false },
     /** When `true`, the close button is shown in the top-right corner of the stack. */
     showCloseButton: { type: Boolean, default: true },
+    /** When `false`, the logic for wrapping the slot in a Content component is ignored and the slot will not be wrapped. */
+    wrapSlot: { type: Boolean, default: true },
 });
 
 const stack = ref(null);
@@ -59,7 +61,7 @@ const depth = computed(() => stacks.stacks().findIndex(s => s.id === stack.value
 const isTopStack = computed(() => stacks.count() === depth.value);
 
 const shouldAddHeader = computed(() => !!(props.title || props.icon) && !hasStackHeaderComponent.value);
-const shouldWrapSlot = computed(() => !hasStackContentComponent.value);
+const shouldWrapSlot = computed(() => props.wrapSlot && !hasStackContentComponent.value);
 const shouldShowFloatingCloseButton = computed(() => props.showCloseButton && !shouldAddHeader.value && !hasStackHeaderComponent.value);
 
 const offset = computed(() => {

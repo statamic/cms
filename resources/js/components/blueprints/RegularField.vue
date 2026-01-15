@@ -31,7 +31,7 @@
                         <ui-button inset size="sm" icon="trash" variant="subtle" @click.prevent="$emit('deleted')" v-tooltip="__('Remove')" />
                     </div>
 
-                    <Stack :open="isEditing" @update:open="editorClosed" inset :show-close-button="false">
+                    <Stack :open="isEditing" @update:open="editorClosed" inset :show-close-button="false" :wrap-slot="false">
                         <field-settings
                             ref="settings"
                             :id="field._id"
