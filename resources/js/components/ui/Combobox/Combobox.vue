@@ -80,7 +80,7 @@ const triggerClasses = cva({
     variants: {
         variant: {
             default: [
-                'bg-linear-to-b from-white to-gray-50 text-gray-900 border border-gray-300 shadow-ui-sm focus-within:focus-outline',
+                'bg-linear-to-b from-white to-gray-50 text-gray-900 border border-gray-300 with-contrast:border-gray-500 shadow-ui-sm focus-within:focus-outline',
                 'dark:from-gray-850 dark:to-gray-900 dark:border-gray-700 dark:text-gray-300 dark:shadow-ui-md',
             ],
             filled: 'bg-black/5 hover:bg-black/10 text-gray-900 border-none dark:bg-white/15 dark:hover:bg-white/20 dark:text-white focus-within:focus-outline dark:placeholder:text-red-500/60',

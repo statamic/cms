@@ -107,7 +107,7 @@ defineExpose({
                 v-for="theme in results"
                 :key="theme.id"
                 class="p-1 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900"
-                :class="{ 'bg-blue-400! dark:bg-blue-500!': isActive(theme) }"
+                :class="{ 'bg-blue-600!': isActive(theme) }"
                 @click="selectTheme(theme)"
             >
                 <Preview :theme="theme" />
