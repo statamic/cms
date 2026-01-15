@@ -255,10 +255,10 @@
         @apply fixed inset-0 min-h-screen overflow-scroll border-none rounded-none bg-gray-100 pt-14 dark:bg-gray-850;
 
         & > .bard-editor {
-            @apply relative mx-auto my-6 max-w-5xl rounded-lg bg-white px-8 shadow-ui-md dark:bg-gray-950 dark:shadow-lg;
+            @apply relative mx-auto my-6 max-w-5xl rounded-lg bg-white px-8 shadow-ui-md dark:bg-gray-925 dark:shadow-lg;
         }
         .bard-content {
-            @apply dark:bg-gray-950;
+            @apply dark:bg-gray-925;
         }
 
         .bard-fixed-toolbar {

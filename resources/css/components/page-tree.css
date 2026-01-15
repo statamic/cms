@@ -49,7 +49,7 @@
 .nav-builder {
     background: none;
     .tree-node {
-        @apply bg-gray-200/45 dark:bg-gray-950;
+        @apply bg-gray-200/45 dark:bg-gray-950/35;
         .tree-node-inner {
             @apply px-1;
         }
