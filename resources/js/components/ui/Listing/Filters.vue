@@ -12,7 +12,6 @@ import { injectListingContext } from '../Listing/Listing.vue';
 import { computed, ref, watch, nextTick } from 'vue';
 import FieldFilter from './FieldFilter.vue';
 import DataListFilter from './Filter.vue';
-import DynamicHtmlRenderer from '@/components/DynamicHtmlRenderer.vue';
 
 const { filters, activeFilters, activeFilterBadges, activeFilterBadgeCount, setFilter, reorderable } = injectListingContext();
 
