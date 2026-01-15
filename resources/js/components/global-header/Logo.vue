@@ -34,13 +34,13 @@ function toggleNav() {
         </div>
     </template>
     <template v-else>
-        <div class="flex items-center gap-1.5 sm:gap-2 relative">
+        <div class="flex items-center gap-1.5 sm:gap-2.5 relative">
             <button class="flex items-center group rounded-xs cursor-pointer" type="button" @click="toggleNav" :aria-label="__('Toggle Nav')" style="--focus-outline-offset: 0.2rem;">
                 <div class="p-1 max-sm:ps-2 size-5 flex items-center justify-center lg:inset-0">
                     <Icon name="burger-menu-no-border" class="size-3.5! sm:size-3.25! opacity-75 hover:opacity-100" />
                 </div>
             </button>
-            <Link :href="cp_url('/')" class="flex items-center gap-2 max-[350px]:hidden text-white/85 rounded-xs whitespace-nowrap" style="--focus-outline-offset: var(--outline-offset-button);">
+            <Link :href="cp_url('/')" class="flex items-center gap-1.5 max-[350px]:hidden text-white/85 rounded-xs whitespace-nowrap" style="--focus-outline-offset: var(--outline-offset-button);">
                 <StatamicLogo class="size-7 site-logo [&:focus:not(:focus-visible)]:outline-none" v-tooltip="version" />
                 <span>{{ logos.text ?? logos.siteName }}</span>
             </Link>
