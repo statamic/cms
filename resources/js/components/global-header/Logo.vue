@@ -40,7 +40,7 @@ function toggleNav() {
                     <Icon name="burger-menu-no-border" class="size-3.5! sm:size-3.25! opacity-75 hover:opacity-100" />
                 </div>
             </button>
-            <Link :href="cp_url('/')" class="flex items-center gap-1 max-[350px]:hidden text-white/85 rounded-xs whitespace-nowrap" style="--focus-outline-offset: var(--outline-offset-button);">
+            <Link :href="cp_url('/')" class="flex items-center gap-2 max-[350px]:hidden text-white/85 rounded-xs whitespace-nowrap" style="--focus-outline-offset: var(--outline-offset-button);">
                 <StatamicLogo class="size-7 site-logo [&:focus:not(:focus-visible)]:outline-none" v-tooltip="version" />
                 <span>{{ logos.text ?? logos.siteName }}</span>
             </Link>
