@@ -69,10 +69,10 @@ class Date extends FieldtypeFilter
 
         $value = ($operator == 'between')
             ? [
-                'start' => Carbon::parse($values['range_value']['start'])->toIso8601ZuluString(),
-                'end' => Carbon::parse($values['range_value']['end'])->toIso8601ZuluString(),
+                'start' => Carbon::parse($values['range_value']['start'])->toIso8601ZuluString('millisecond'),
+                'end' => Carbon::parse($values['range_value']['end'])->toIso8601ZuluString('millisecond'),
             ]
-            : Carbon::parse(Arr::get($values, 'value'))->toIso8601ZuluString();
+            : Carbon::parse(Arr::get($values, 'value'))->toIso8601ZuluString('millisecond');
 
         return compact('field', 'operator', 'translatedOperator', 'value');
     }
