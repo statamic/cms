@@ -80,11 +80,11 @@
                 content: '';
                 position: absolute;
                 width: anchor-size(height);
-                height: anchor-size(height);
-                @apply h-4 border-s border-s-black;
+                height: calc(anchor-size(height) + 0.5px);
+                @apply border-s border-s-black;
                 translate: -100% 0;
                 position-anchor: --active;
-                left: calc(anchor(left) + 0.25rem);
+                left: calc(anchor(left) + 0.25rem - 0.5px);
                 top: anchor(top);
                 transition-property: top, left;
                 transition-duration: 0.2s;
