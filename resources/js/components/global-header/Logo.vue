@@ -44,7 +44,7 @@ function toggleNav() {
                 <StatamicLogo class="size-7 site-logo [&:focus:not(:focus-visible)]:outline-none" v-tooltip="version" />
                 <span>{{ logos.text ?? logos.siteName }}</span>
             </Link>
-            <ProBadge v-if="isPro" />
+            <ProBadge v-if="isPro" class="-ms-0.25" />
         </div>
     </template>
 </template>
