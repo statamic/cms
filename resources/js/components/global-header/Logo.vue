@@ -39,9 +39,9 @@ function toggleNav() {
                 <div class="p-1 max-sm:ps-2 mr-2 size-5 flex items-center justify-center lg:inset-0">
                     <Icon name="burger-menu-no-border" class="size-3.5! sm:size-3.25! opacity-75 hover:opacity-100" />
                 </div>
-                <StatamicLogo class="size-7" v-tooltip="version" />
             </button>
             <Link :href="cp_url('/')" class="max-[350px]:hidden text-white/85 rounded-xs whitespace-nowrap" style="--focus-outline-offset: var(--outline-offset-button);">
+                <StatamicLogo class="size-7" v-tooltip="version" />
                 {{ logos.text ?? logos.siteName }}
             </Link>
             <ProBadge v-if="isPro" />
