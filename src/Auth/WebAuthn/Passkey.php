@@ -50,11 +50,14 @@ abstract class Passkey implements Contract
         return $this->credential;
     }
 
-    public function setCredential(array|PublicKeyCredentialSource $credential): Contract
+    public function setCredential(array|object $credential): Contract
     {
-        $this->credential = $credential instanceof PublicKeyCredentialSource
-            ? $credential
-            : $this->credentialFromArray($credential);
+        $this->credential = match (true) {
+            $credential instanceof PublicKeyCredentialSource => $credential,
+            is_object($credential) && $credential::class === 'Webauthn\CredentialRecord' => $this->credentialFromCredentialRecord($credential),
+            is_array($credential) => $this->credentialFromArray($credential),
+            default => throw new \InvalidArgumentException('Invalid credential type'),
+        };
 
         return $this;
     }
@@ -100,6 +103,11 @@ abstract class Passkey implements Contract
         $json = app(Serializer::class)->serialize($credential, 'json');
 
         return json_decode($json, true);
+    }
+
+    private function credentialFromCredentialRecord($record): PublicKeyCredentialSource
+    {
+        return \Webauthn\CredentialRecordConverter::toPublicKeyCredentialSource($record);
     }
 
     private function credentialFromArray(array $array): PublicKeyCredentialSource
