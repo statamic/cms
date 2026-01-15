@@ -3,6 +3,7 @@
 namespace Statamic\StaticCaching;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
@@ -94,6 +95,19 @@ class ServiceProvider extends LaravelServiceProvider
 
         Request::macro('normalizedFullUrl', function () {
             return app(Cacher::class)->getUrl($this);
+        });
+
+        Response::macro('makeCacheControlCacheable', function () {
+            $this
+                ->setMaxAge(config('statamic.static_caching.max_age', 60))
+                ->setSharedMaxAge(config('statamic.static_caching.shared_max_age', config('statamic.static_caching.max_age', 60)))
+                ->setStaleWhileRevalidate(config('statamic.static_caching.stale_while_revalidate', 60));
+
+            if (($content = $this->getContent())) {
+                $this->setEtag(md5($content));
+            }
+
+            return $this;
         });
 
         Request::macro('fakeStaticCacheStatus', function (int $status) {
