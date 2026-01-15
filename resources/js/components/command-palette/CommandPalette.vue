@@ -271,7 +271,10 @@ const modalClasses = cva({
     ],
 })({});
 
-router.on('start', () => Statamic.$commandPalette.clear());
+router.on('start', () => {
+    Statamic.$commandPalette.clear();
+    open.value = false;
+});
 </script>
 
 <template>
