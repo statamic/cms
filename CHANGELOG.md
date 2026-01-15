@@ -1,5 +1,33 @@
 # Release Notes
 
+## 6.0.0-beta.3 (2026-01-15)
+
+## What's fixed
+- Fix values being lost when reordering sets [#13545](https://github.com/statamic/cms/issues/13545) by @duncanmcclean
+- French translations [#13544](https://github.com/statamic/cms/issues/13544) by @ebeauchamps
+- Fix theme colors gray-950 and success [#13547](https://github.com/statamic/cms/issues/13547) by @heidkaemper
+- Fix `level` prop example on Heading docs [#13553](https://github.com/statamic/cms/issues/13553) by @duncanmcclean
+- Fix passkey error modal not closing [#13567](https://github.com/statamic/cms/issues/13567) by @duncanmcclean
+- Improve Stricter WCAG 2.2 Mode [#13565](https://github.com/statamic/cms/issues/13565) by @JayGeorge
+- Fix assets checkerboard border radius [#13568](https://github.com/statamic/cms/issues/13568) by @JayGeorge
+- Escape command palette when navigating [#13569](https://github.com/statamic/cms/issues/13569) by @JayGeorge
+- Menu icons [#13554](https://github.com/statamic/cms/issues/13554) by @JayGeorge
+- Fix localizable toggle on fields [#13548](https://github.com/statamic/cms/issues/13548) by @duncanmcclean
+- Avoid showing selected state on sets unless user has interacted with Bard [#13570](https://github.com/statamic/cms/issues/13570) by @duncanmcclean
+- Fullscreen mode improvements for Bard and Markdown [#13495](https://github.com/statamic/cms/issues/13495) by @JayGeorge
+- Date filter badges use local time [#13573](https://github.com/statamic/cms/issues/13573) by @jasonvarga
+- Anchor nav marker position tweaks [#13575](https://github.com/statamic/cms/issues/13575) by @JayGeorge
+- Fix `CreateForm` demos in Storybook [#13576](https://github.com/statamic/cms/issues/13576) by @duncanmcclean
+- Stack fixes [#13555](https://github.com/statamic/cms/issues/13555) by @duncanmcclean
+- Separate header logo and nav button [#13574](https://github.com/statamic/cms/issues/13574) by @JayGeorge
+- Fix creating passkeys [#13566](https://github.com/statamic/cms/issues/13566) by @duncanmcclean
+- Apply standard headers to field settings stacks [#13579](https://github.com/statamic/cms/issues/13579) by @jasonvarga
+- Fix 2FA setup modal not opening [#13572](https://github.com/statamic/cms/issues/13572) by @duncanmcclean
+- Run the CP through the W3C validator [#13550](https://github.com/statamic/cms/issues/13550) by @JayGeorge
+- Fix open state of Disable 2FA modal [#13571](https://github.com/statamic/cms/issues/13571) by @duncanmcclean
+
+
+
 ## 6.0.0-beta.2 (2026-01-13)
 
 ### What's fixed
