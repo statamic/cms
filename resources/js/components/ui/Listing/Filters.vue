@@ -179,7 +179,9 @@ function handleStackClosed() {
                 <date-time v-else :of="badge.value" options="date" />
             </template>
 
-            <span v-else v-text="badge" />
+            <template v-else>
+                {{ badge }}
+            </template>
         </Button>
         <Button
             v-for="(badge, handle, index) in standardBadges"
