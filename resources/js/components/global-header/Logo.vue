@@ -23,7 +23,7 @@ function toggleNav() {
     <template v-if="customLogo">
         <div class="flex items-center gap-1 relative">
             <button class="flex items-center group rounded-xs cursor-pointer" type="button" @click="toggleNav" :aria-label="__('Toggle Nav')" style="--focus-outline-offset: 0.2rem;">
-                <div class="p-1 max-sm:ps-2 size-5 flex items-center justify-center lg:inset-0">
+                <div class="p-1 mr-2 max-sm:ps-2 size-5 flex items-center justify-center lg:inset-0">
                     <Icon name="burger-menu-no-border" class="size-3.5! sm:size-3.25! opacity-75 hover:opacity-100" />
                 </div>
             </button>
