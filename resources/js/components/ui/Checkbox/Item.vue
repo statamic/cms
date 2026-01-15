@@ -47,7 +47,7 @@ const handleKeydown = (event) => {
 const checkboxClasses = computed(() => {
     return cva({
         base: [
-            'shadow-ui-xs mt-0.5 cursor-default rounded-sm border border-gray-400/75 bg-white',
+            'shadow-ui-xs mt-0.5 cursor-default rounded-sm border border-gray-400/75 with-contrast:border-gray-500 bg-white',
             'dark:bg-gray-500 dark:border-gray-900',
             'data-[state=checked]:border-ui-accent-bg data-[state=checked]:bg-ui-accent-bg',
             'data-[state=indeterminate]:border-ui-accent-bg data-[state=indeterminate]:bg-ui-accent-bg',
