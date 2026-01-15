@@ -228,7 +228,7 @@ export default {
             this.$toast.success(__('Field added'));
 
             if (field.type === 'reference') {
-	            this.editingField = field._id;
+                this.editingField = field._id;
             }
         },
 
