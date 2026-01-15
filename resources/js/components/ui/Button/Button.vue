@@ -51,7 +51,7 @@ const buttonClasses = computed(() => {
         variants: {
             variant: {
                 default: [
-                    'bg-linear-to-b from-white to-gray-50 hover:to-gray-100 hover:bg-gray-50 text-gray-900 border border-gray-300 shadow-ui-sm',
+                    'bg-linear-to-b from-white to-gray-50 hover:to-gray-100 hover:bg-gray-50 text-gray-900 border border-gray-300 with-contrast:border-gray-500 shadow-ui-sm',
                     'dark:from-gray-850 dark:to-gray-900 dark:hover:to-gray-850 dark:hover:bg-gray-900 dark:border-gray-700/80 dark:text-gray-300 dark:shadow-ui-md',
                 ],
                 primary: [
