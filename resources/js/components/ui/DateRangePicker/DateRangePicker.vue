@@ -22,7 +22,6 @@ import {
 import Card from '../Card/Card.vue';
 import Button from '../Button/Button.vue';
 import Calendar from '../Calendar/Calendar.vue';
-import Icon from '../Icon/Icon.vue';
 import { parseAbsoluteToLocal } from '@internationalized/date';
 
 const emit = defineEmits(['update:modelValue']);
@@ -32,7 +31,7 @@ const props = defineProps({
     badge: { type: String, default: null },
     required: { type: Boolean, default: false },
     /** The controlled date range value with `start` and `end` properties. <br><br> Each should be an ISO 8601 date and time string with a UTC offset (eg. `2021-11-07T07:45:00Z` or `2021-11-07T07:45:00-07:00`) */
-    modelValue: { type: [Object, String], default: null },
+    modelValue: { type: [Object, String], required: true, default: () => ({start: null, end: null}) },
     /** The minimum selectable date. <br><br> Should be an ISO 8601 date and time string with a UTC offset (eg. `2021-11-07T07:45:00Z` or `2021-11-07T07:45:00-07:00`) */
     min: { type: [String, Object], default: null },
     /** The maximum selectable date. <br><br> Should be an ISO 8601 date and time string with a UTC offset (eg. `2021-11-07T07:45:00Z` or `2021-11-07T07:45:00-07:00`) */
@@ -76,6 +75,12 @@ const placeholder = parseAbsoluteToLocal(new Date().toISOString());
 const calendarEvents = computed(() => ({
     'update:model-value': (event) => {
         if (props.granularity === 'day') {
+
+            // Avoid fatal error `Cannot set properties of undefined (setting 'hour')`
+            if (event.end == null) {
+              return
+            }
+
             event.start.hour = 0;
             event.start.minute = 0;
             event.start.second = 0;
@@ -90,6 +95,12 @@ const calendarEvents = computed(() => ({
         emit('update:modelValue', event)
     },
 }));
+
+const hasDates = computed(() => {
+    return calendarBindings.value.modelValue != null
+        &&  calendarBindings.value.modelValue.end != null
+        &&  calendarBindings.value.modelValue?.start != null
+})
 </script>
 
 <template>
@@ -155,7 +166,7 @@ const calendarEvents = computed(() => ({
                         </DateRangePickerInput>
                     </template>
                     <div class="flex-1" />
-                    <Button v-if="!readOnly" @click="emit('update:modelValue', null)" variant="subtle" size="sm" icon="x" class="-me-2" :disabled="disabled" />
+                    <Button v-if="!readOnly && hasDates" @click="emit('update:modelValue', {start: null, end: null})" variant="subtle" size="sm" icon="x" class="-me-2" :disabled="disabled" />
                 </div>
             </DateRangePickerField>
 
