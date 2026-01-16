@@ -110,7 +110,7 @@ export default {
         handleLocalizationCreated({ container }) {
             // Only reset for the "slug" field in the matching container.
             // Other slug fields that aren't named "slug" should be left alone.
-            if (this.handle === 'slug' && container.name === this.publishContainer.name) {
+            if (this.handle === 'slug' && container.name === this.publishContainer.name && this.config.localizable) {
                 this.$refs.slugify.reset();
             }
         },
