@@ -2,7 +2,7 @@
 
 ## 6.0.0-beta.3 (2026-01-15)
 
-## What's fixed
+### What's fixed
 - Fix values being lost when reordering sets [#13545](https://github.com/statamic/cms/issues/13545) by @duncanmcclean
 - French translations [#13544](https://github.com/statamic/cms/issues/13544) by @ebeauchamps
 - Fix theme colors gray-950 and success [#13547](https://github.com/statamic/cms/issues/13547) by @heidkaemper
