@@ -80,7 +80,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         return str_replace('.', ' ', Str::humanize($this->namespace));
     }
 
-    public function fullyQualifiedHandle(): string
+    public function fullyQualifiedHandle(): ?string
     {
         $handle = $this->handle();
 
@@ -452,6 +452,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
             'handle' => $this->handle(),
             'tabs' => $this->tabs()->map->toPublishArray()->values()->all(),
             'empty' => $this->isEmpty(),
+            'fqh' => $this->fullyQualifiedHandle(),
         ];
     }
 
