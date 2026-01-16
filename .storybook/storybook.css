@@ -1,4 +1,7 @@
 @import 'tailwindcss';
+@import 'codemirror/lib/codemirror.css';
+@import 'codemirror/theme/material.css';
+@import '../resources/css/vendors/codemirror.css';
 @import '../resources/css/ui.css';
 @import '../resources/css/core/utilities.css';
 @import '../resources/css/elements/tables.css';
