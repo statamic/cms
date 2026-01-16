@@ -52,7 +52,7 @@
                             <button type="button" class="text-left underline underline-offset-2 cursor-pointer hover:text-gray-925 dark:hover:text-gray-200" @click.prevent="uploadFile">
                                 {{ __('choose a file') }}
                             </button>.
-                            <span class="leading-tight" v-if="selectedFilesText" v-text="selectedFilesText" />
+                            <span class="leading-tight whitespace-nowrap" v-if="selectedFilesText" v-text="selectedFilesText" />
                         </div>
                     </div>
 
