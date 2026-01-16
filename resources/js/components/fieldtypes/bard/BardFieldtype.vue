@@ -105,7 +105,7 @@
                                             v-tooltip="__('Add Set')"
                                         />
                                         <ui-description
-                                            v-if="!$refs.setPicker?.isOpen"
+                                            v-show="shouldShowAddSetHelperText"
                                             :text="__('Type \'/\' to insert a set')"
                                             :class="{'ps-9': fullScreenMode}"
                                         />
@@ -360,6 +360,10 @@ export default {
                     visible: this.config.fullscreen,
                 },
             ];
+        },
+
+        shouldShowAddSetHelperText() {
+            return !this.$refs.setPicker?.isOpen && this.suitableToShowSetButton(this.editor);
         },
     },
 
