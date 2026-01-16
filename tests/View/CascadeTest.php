@@ -411,15 +411,16 @@ class CascadeTest extends TestCase
     }
 
     #[Test]
-    public function it_hydrates_content_by_closure()
+    public function it_hydrates_page_data_by_closure()
     {
         $vars = ['foo' => 'bar', 'baz' => 'qux'];
         $page = EntryFactory::id('test')
             ->collection('example')
             ->data($vars)
             ->make();
-
         $cascade = $this->cascade()->withContent(fn () => $page);
+
+        $this->assertEquals($page, call_user_func($cascade->content()));
 
         tap($cascade->hydrate()->toArray(), function ($cascade) use ($page) {
             $this->assertArrayHasKey('page', $cascade);
