@@ -193,6 +193,7 @@ defineProps(['icons']);
                     <ui-badge size="sm" text="Cyan" color="cyan" />
                     <ui-badge size="sm" text="Purple" color="purple" />
                     <ui-badge size="sm" text="Gray" color="gray" />
+                    <ui-badge size="sm" text="Default" />
                     <ui-badge size="sm" text="Rose" color="rose" />
                     <ui-badge size="sm" text="Emerald" color="emerald" />
                     <ui-badge size="sm" text="Fuchsia" color="fuchsia" />
@@ -218,10 +219,19 @@ defineProps(['icons']);
                     <ui-badge text="Pink Link" color="pink" href="#" />
                     <ui-badge size="sm" text="Cyan Link" color="cyan" href="#" />
                     <ui-badge size="sm" text="Purple Link" color="purple" href="#" />
+                    <ui-badge size="sm" text="Gray Link" color="gray" href="#" />
+                    <ui-badge size="sm" text="Default Link" href="#" />
                     <ui-badge size="sm" text="Rose Link" color="rose" href="#" />
                     <ui-badge size="sm" text="Emerald Link" color="emerald" href="#" />
                     <ui-badge size="sm" text="Fuchsia Link" color="fuchsia" href="#" />
+                    <ui-badge size="sm" text="Indigo Link" color="indigo" href="#" />
+                    <ui-badge size="sm" text="Lime Link" color="lime" href="#" />
+                    <ui-badge size="sm" text="Orange Link" color="orange" href="#" />
                     <ui-badge size="sm" text="Sky Link" color="sky" href="#" />
+                    <ui-badge size="sm" text="Teal Link" color="teal" href="#" />
+                    <ui-badge size="sm" text="Violet Link" color="violet" href="#" />
+                    <ui-badge size="sm" text="White Link" color="white" href="#" />
+                    <ui-badge size="sm" text="Yellow Link" color="yellow" href="#" />
                 </div>
             </section>
 
@@ -236,10 +246,19 @@ defineProps(['icons']);
                     <ui-badge text="Pink Button" color="pink" as="button" />
                     <ui-badge size="sm" text="Cyan Button" color="cyan" as="button" />
                     <ui-badge size="sm" text="Purple Button" color="purple" as="button" />
+                    <ui-badge size="sm" text="Gray Button" color="gray" as="button" />
+                    <ui-badge size="sm" text="Default Button" as="button" />
                     <ui-badge size="sm" text="Rose Button" color="rose" as="button" />
                     <ui-badge size="sm" text="Emerald Button" color="emerald" as="button" />
                     <ui-badge size="sm" text="Fuchsia Button" color="fuchsia" as="button" />
+                    <ui-badge size="sm" text="Indigo Button" color="indigo" as="button" />
+                    <ui-badge size="sm" text="Lime Button" color="lime" as="button" />
+                    <ui-badge size="sm" text="Orange Button" color="orange" as="button" />
                     <ui-badge size="sm" text="Sky Button" color="sky" as="button" />
+                    <ui-badge size="sm" text="Teal Button" color="teal" as="button" />
+                    <ui-badge size="sm" text="Violet Button" color="violet" as="button" />
+                    <ui-badge size="sm" text="White Button" color="white" as="button" />
+                    <ui-badge size="sm" text="Yellow Button" color="yellow" as="button" />
                 </div>
             </section>
 
