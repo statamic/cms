@@ -50,7 +50,7 @@ const badgeClasses = computed(() => {
             },
             color: {
                 amber: 'bg-amber-50 dark:bg-gray-800 border-amber-400 dark:border-amber-700 text-amber-700 dark:text-amber-300 [a]:hover:bg-amber-100 dark:[a]:hover:bg-gray-700 [button]:hover:bg-amber-200 dark:[button]:hover:bg-gray-700',
-                black: 'bg-gray-900 dark:bg-black border-black dark:border-gray-700 text-white dark:text-gray-300 [a]:hover:bg-gray-800 dark:[a]:hover:bg-gray-700 [button]:hover:bg-gray-800 dark:[button]:hover:bg-gray-700',
+                black: 'bg-gray-900 dark:bg-black border-black dark:border-gray-700 text-white dark:text-gray-300 [a]:hover:bg-gray-800 dark:[a]:hover:bg-gray-800 [button]:hover:bg-gray-800 dark:[button]:hover:bg-gray-800',
                 blue: 'bg-blue-50 dark:bg-gray-800 border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300 [a]:hover:bg-blue-100 dark:[a]:hover:bg-gray-700 [button]:hover:bg-blue-100 dark:[button]:hover:bg-gray-700',
                 cyan: 'bg-cyan-50 dark:bg-gray-800 border-cyan-400 dark:border-cyan-700 text-cyan-700 dark:text-cyan-300 [a]:hover:bg-cyan-100 dark:[a]:hover:bg-gray-700 [button]:hover:bg-cyan-100 dark:[button]:hover:bg-gray-700',
                 default: 'bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-700 dark:text-gray-100 text-gray-700 [a]:hover:bg-gray-100 dark:[a]:hover:bg-gray-700 [button]:hover:bg-gray-200 dark:[button]:hover:bg-gray-700',
