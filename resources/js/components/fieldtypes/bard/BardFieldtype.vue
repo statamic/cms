@@ -105,7 +105,7 @@
                                             v-tooltip="__('Add Set')"
                                         />
                                         <ui-description
-                                            v-if="!$refs.setPicker?.isOpen"
+                                            v-if="!$refs.setPicker?.isOpen && currentNodeIsEmpty"
                                             :text="__('Type \'/\' to insert a set')"
                                             :class="{'ps-9': fullScreenMode}"
                                         />
@@ -330,6 +330,15 @@ export default {
         groupConfigs() {
             return this.config.sets;
         },
+
+	    currentNodeIsEmpty() {
+		    const { $anchor } = this.editor.state.selection;
+			const isRootDepth = $anchor.depth === 1;
+			const isEmptyTextNode = $anchor.parent.type.name === 'paragraph'
+				&& !$anchor.parent.textContent;
+
+		    return isRootDepth && isEmptyTextNode;
+	    },
 
         internalFieldActions() {
             return [
