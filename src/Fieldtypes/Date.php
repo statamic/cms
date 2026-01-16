@@ -115,6 +115,11 @@ class Date extends Fieldtype
                         'instructions' => __('statamic::fieldtypes.date.config.format'),
                         'type' => 'text',
                     ],
+                    'default' => [
+                        'display' => __('Default Value'),
+                        'instructions' => __('statamic::fieldtypes.date.config.default'),
+                        'type' => 'text',
+                    ],
                 ],
             ],
         ];

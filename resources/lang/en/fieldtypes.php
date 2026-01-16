@@ -78,6 +78,7 @@ return [
     'date.config.number_of_months' => 'Control how many months are shown at one time.',
     'date.config.time_enabled' => 'Enable the timepicker.',
     'date.config.time_seconds_enabled' => 'Show seconds in the timepicker.',
+    'date.config.default' => 'You may specify a date using `YYYY-MM-DD`, or `now`.',
     'date.title' => 'Date',
     'dictionary.config.dictionary' => 'The dictionary you wish to pull options from.',
     'dictionary.file.config.filename' => 'The filename containing your options, relative to the `resources/dictionaries` directory.',
