@@ -105,7 +105,7 @@
                                             v-tooltip="__('Add Set')"
                                         />
                                         <ui-description
-                                            v-if="!$refs.setPicker?.isOpen && currentNodeIsEmpty"
+                                            v-if="!$refs.setPicker?.isOpen"
                                             :text="__('Type \'/\' to insert a set')"
                                             :class="{'ps-9': fullScreenMode}"
                                         />
@@ -330,15 +330,6 @@ export default {
         groupConfigs() {
             return this.config.sets;
         },
-
-	    currentNodeIsEmpty() {
-		    const { $anchor } = this.editor.state.selection;
-			const isRootDepth = $anchor.depth === 1;
-			const isEmptyTextNode = $anchor.parent.type.name === 'paragraph'
-				&& !$anchor.parent.textContent;
-
-		    return isRootDepth && isEmptyTextNode;
-	    },
 
         internalFieldActions() {
             return [
@@ -585,7 +576,7 @@ export default {
             const { $anchor, empty } = selection;
             const isRootDepth = $anchor.depth === 1;
             const isEmptyTextBlock =
-                $anchor.parent.isTextblock && !$anchor.parent.type.spec.code && !$anchor.parent.textContent;
+                ($anchor.parent.isTextblock && !$anchor.parent.firstChild) && !$anchor.parent.type.spec.code && !$anchor.parent.textContent;
             const isAroundInlineImage =
                 state.selection.$to.nodeBefore?.type.name === 'image' ||
                 state.selection.$to.nodeAfter?.type.name === 'image';
