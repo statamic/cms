@@ -15,6 +15,59 @@ abstract class BasicStore extends Store
 
     abstract public function makeItemFromFile($path, $contents);
 
+    public function getItems($keys)
+    {
+        $this->handleFileChanges();
+
+        $keys = collect($keys);
+
+        if ($keys->isEmpty()) {
+            return collect();
+        }
+
+        // Only use batch fetch for cache drivers that benefit from it (network-based)
+        if ($this->shouldUseBatchCaching()) {
+            return $this->getItemsBatched($keys);
+        }
+
+        return $keys->map(fn ($key) => $this->getItem($key));
+    }
+
+    protected function getItemsBatched($keys)
+    {
+        // Build a map of cache keys to item keys
+        $cacheKeyMap = $keys->mapWithKeys(fn ($key) => [$this->getItemCacheKey($key) => $key]);
+
+        // Batch fetch from cache
+        $cached = Stache::cacheStore()->many($cacheKeyMap->keys()->all());
+
+        // Process results, fetching any misses from disk
+        return $keys->map(function ($key) use ($cached) {
+            $cacheKey = $this->getItemCacheKey($key);
+
+            if ($item = $cached[$cacheKey] ?? null) {
+                if (method_exists($item, 'syncOriginal')) {
+                    $item->syncOriginal();
+                }
+
+                return $item;
+            }
+
+            // Cache miss - fetch individually (will also cache it)
+            return $this->getItem($key);
+        });
+    }
+
+    protected function shouldUseBatchCaching(): bool
+    {
+        $store = Stache::cacheStore()->getStore();
+
+        // These drivers benefit from batch operations (network round-trip reduction)
+        return $store instanceof \Illuminate\Cache\RedisStore
+            || $store instanceof \Illuminate\Cache\MemcachedStore
+            || $store instanceof \Illuminate\Cache\DynamoDbStore;
+    }
+
     public function getItem($key)
     {
         $this->handleFileChanges();
