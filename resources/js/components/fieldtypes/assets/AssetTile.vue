@@ -49,7 +49,7 @@
                     </template>
                 </div>
             </div>
-            <div class="absolute bottom-1 right-1">
+            <div class="absolute bottom-0 end-0 [&_button]:mb-1 [&_button]:me-1">
                 <ui-badge
                     v-if="!readOnly && showSetAlt && needsAlt && !showFilename"
                     as="button"
