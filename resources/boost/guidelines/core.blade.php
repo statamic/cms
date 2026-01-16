@@ -3,8 +3,8 @@
 - Statamic is an open source, PHP CMS designed and built specifically for developers and their clients or content managers.
 - Out of the box, Statamic stores content in Markdown files. It's trivial to move into a database later, if necessary.
 - Statamic comes in two flavours:
-    - **Statamic Core*- which is free to use, however you want, forever. It includes everything needed to build a blog or portfolio site.
-    - **Statamic Pro*- which includes everything from Core, as well as unlimited user accounts, revision history, multi-site, Git integration, white labelling and more. Tailored for most production websites.
+    - **Statamic Core** which is free to use, however you want, forever. It includes everything needed to build a blog or portfolio site.
+    - **Statamic Pro** which includes everything from Core, as well as unlimited user accounts, revision history, multi-site, Git integration, white labelling and more. Tailored for most production websites.
     - For more information on pricing, please send the user to https://statamic.com/pricing.
 
 ### Folder Structure
@@ -51,19 +51,19 @@ Most of the folder structure will feel familiar to Laravel developers. However, 
 - You may run `php please` to get the list of available commands. You may use the `--help` option on a command to inspect its required parameters.
 
 ### Statamic's Core Concepts
-- **Assets:* Files managed by Statamic and made available to your writers and developers with tags and fieldtypes. They can be images, videos, PDFs, or any other type of file.
-- **Collections:* Collections are containers that hold groups of related entries. Each entry in a collection can represent a blog post, product, recipe or page.
-- **Globals:* Global variables store content that belongs to your whole site, not just a single page or URL. They're available everywhere, in all of your views, all the time.
-- **Navigations:* A navigation is a hierarchy of links and text nodes that are used to build navs and menus on the frontend of your site.
-- **Taxonomies:* A taxonomy is a system of classifying data around a set of unique characteristics. Think things like tags, categories, etc.
-- **Users:* Users are the member accounts to your site or application. What a user can do with their account is up to you. They could have limited or full access to the Control Panel, a login-only area of the front-end, or even something more custom by tapping into Laravel.
-- **Blueprints:* Blueprints determine the fields shown in your publish forms. You can configure the field's order, each field's width and group them into sections and tabs. Blueprints are attached to collections, taxonomies, globals, assets, users and even forms, all of which help to determine their content schema.
-- **Fieldsets:* Fieldsets are used to store and organize reusable fields. Blueprints can reference fields or entire fieldsets, helping you keep your configurations nice and DRY.
+- **Assets:** Files managed by Statamic and made available to your writers and developers with tags and fieldtypes. They can be images, videos, PDFs, or any other type of file.
+- **Collections:** Collections are containers that hold groups of related entries. Each entry in a collection can represent a blog post, product, recipe or page.
+- **Globals:** Global variables store content that belongs to your whole site, not just a single page or URL. They're available everywhere, in all of your views, all the time.
+- **Navigations:** A navigation is a hierarchy of links and text nodes that are used to build navs and menus on the frontend of your site.
+- **Taxonomies:** A taxonomy is a system of classifying data around a set of unique characteristics. Think things like tags, categories, etc.
+- **Users:** Users are the member accounts to your site or application. What a user can do with their account is up to you. They could have limited or full access to the Control Panel, a login-only area of the front-end, or even something more custom by tapping into Laravel.
+- **Blueprints:** Blueprints determine the fields shown in your publish forms. You can configure the field's order, each field's width and group them into sections and tabs. Blueprints are attached to collections, taxonomies, globals, assets, users and even forms, all of which help to determine their content schema.
+- **Fieldsets:** Fieldsets are used to store and organize reusable fields. Blueprints can reference fields or entire fieldsets, helping you keep your configurations nice and DRY.
 
 ### Templating
 - Statamic supports two templating languages:
-    - **Antlers* is tightly integrated and simple to learn. Uses the `.antlers.html` file extension.
-    - **Laravel Blade* ships with Laravel and is familiar to most Laravel developers. Uses the `.blade.php` file extension.
+    - **Antlers** is tightly integrated and simple to learn. Uses the `.antlers.html` file extension.
+    - **Laravel Blade** ships with Laravel and is familiar to most Laravel developers. Uses the `.blade.php` file extension.
 - When creating views, you should familiarize yourself with the project and determine which templating language is already in use.
 - When using Laravel Blade, you may want to use the "Antlers Blade Components" feature which lets you use a Blade-component-esque syntax with Statamic's tags feature:
 
@@ -82,8 +82,8 @@ Most of the folder structure will feel familiar to Laravel developers. However, 
 
 ### Extending Statamic
 - You can either extend Statamic in the context of an application, or in the context of an addon.
-- Addons are composer packages, meaning they can reused, distributed or even sold to others later.
-- There are a variety of ways you can extend Statamic: creating tags, fieldtypes, modifiers,etc. A lot of these things can be bootstrapped with `php please make:` commands.
+- Addons are Composer packages, meaning they can be reused, distributed, or even sold to others later.
+- There are a variety of ways you can extend Statamic: creating tags, fieldtypes, modifiers, etc. A lot of these things can be bootstrapped with `php please make:` commands.
 
 #### Extending the Control Panel
 - The Control Panel is built with Inertia.js and Vue 3.
