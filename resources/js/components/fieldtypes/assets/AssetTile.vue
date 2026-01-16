@@ -18,7 +18,7 @@
         >
         </asset-editor>
 
-        <div class="flex h-full border-b dark:border-gray-700 rounded-b-md relative" :class="{ 'bg-checkerboard rounded-lg': canBeTransparent }">
+        <div class="flex h-full rounded-b-md relative" :class="{ 'bg-checkerboard rounded-lg!': canBeTransparent, 'border-b dark:border-gray-700': showFilename }">
             <div class="p-1 flex flex-col items-center justify-center h-full">
                 <!-- Solo Bard -->
                 <template v-if="isImage && isInBardField && !isInAssetBrowser">
@@ -49,7 +49,7 @@
                     </template>
                 </div>
             </div>
-            <div class="absolute bottom-1 right-1">
+            <div class="absolute bottom-0 end-0 [&_button]:mb-1 [&_button]:me-1">
                 <ui-badge
                     v-if="!readOnly && showSetAlt && needsAlt && !showFilename"
                     as="button"
