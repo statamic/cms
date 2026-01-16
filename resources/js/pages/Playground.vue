@@ -24,7 +24,7 @@ defineProps(['icons']);
     <ui-dropdown-footer text="Logout" icon="arrow-right" />
 </ui-dropdown>
 
-    <div v-cloak>
+    <div v-cloak class="space-y-12">
         <div class="space-y-12 prose starting-style-transition starting-style-transition-children">
             <h1>Typography <strong>Test</strong> Document</h1>
             <p class="lead">This comprehensive document tests all typography elements supported by both tw-prose and @tailwindcss/typography plugins.</p>
@@ -193,6 +193,53 @@ defineProps(['icons']);
                     <ui-badge size="sm" text="Cyan" color="cyan" />
                     <ui-badge size="sm" text="Purple" color="purple" />
                     <ui-badge size="sm" text="Gray" color="gray" />
+                    <ui-badge size="sm" text="Rose" color="rose" />
+                    <ui-badge size="sm" text="Emerald" color="emerald" />
+                    <ui-badge size="sm" text="Fuchsia" color="fuchsia" />
+                    <ui-badge size="sm" text="Indigo" color="indigo" />
+                    <ui-badge size="sm" text="Lime" color="lime" />
+                    <ui-badge size="sm" text="Orange" color="orange" />
+                    <ui-badge size="sm" text="Sky" color="sky" />
+                    <ui-badge size="sm" text="Teal" color="teal" />
+                    <ui-badge size="sm" text="Violet" color="violet" />
+                    <ui-badge size="sm" text="White" color="white" />
+                    <ui-badge size="sm" text="Yellow" color="yellow" />
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <ui-heading size="lg">Badges as Links</ui-heading>
+                <div class="mb-4 flex gap-2 sm:gap-3 items-end flex-wrap">
+                    <ui-badge size="lg" text="Green Link" color="green" href="#" />
+                    <ui-badge size="lg" text="Red Link" color="red" href="#" />
+                    <ui-badge size="lg" text="Black Link" color="black" href="#" />
+                    <ui-badge text="Blue Link" color="blue" href="#" />
+                    <ui-badge text="Amber Link" color="amber" href="#" />
+                    <ui-badge text="Pink Link" color="pink" href="#" />
+                    <ui-badge size="sm" text="Cyan Link" color="cyan" href="#" />
+                    <ui-badge size="sm" text="Purple Link" color="purple" href="#" />
+                    <ui-badge size="sm" text="Rose Link" color="rose" href="#" />
+                    <ui-badge size="sm" text="Emerald Link" color="emerald" href="#" />
+                    <ui-badge size="sm" text="Fuchsia Link" color="fuchsia" href="#" />
+                    <ui-badge size="sm" text="Sky Link" color="sky" href="#" />
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <ui-heading size="lg">Badges as Buttons</ui-heading>
+                <div class="mb-4 flex gap-2 sm:gap-3 items-end flex-wrap">
+                    <ui-badge size="lg" text="Green Button" color="green" as="button" />
+                    <ui-badge size="lg" text="Red Button" color="red" as="button" />
+                    <ui-badge size="lg" text="Black Button" color="black" as="button" />
+                    <ui-badge text="Blue Button" color="blue" as="button" />
+                    <ui-badge text="Amber Button" color="amber" as="button" />
+                    <ui-badge text="Pink Button" color="pink" as="button" />
+                    <ui-badge size="sm" text="Cyan Button" color="cyan" as="button" />
+                    <ui-badge size="sm" text="Purple Button" color="purple" as="button" />
+                    <ui-badge size="sm" text="Rose Button" color="rose" as="button" />
+                    <ui-badge size="sm" text="Emerald Button" color="emerald" as="button" />
+                    <ui-badge size="sm" text="Fuchsia Button" color="fuchsia" as="button" />
+                    <ui-badge size="sm" text="Sky Button" color="sky" as="button" />
                 </div>
             </section>
 
