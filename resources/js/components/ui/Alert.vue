@@ -42,15 +42,23 @@ const alertClasses = computed(() => {
             variant: {
                 default: [
                     'bg-gray-50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-700/80 text-gray-900 dark:text-gray-100',
+                    '[&_code]:bg-gray-200! dark:[&_code]:bg-gray-800!',
+                    '[&_code]:border-gray-300 dark:[&_code]:border-gray-700',
                 ],
                 warning: [
                     'bg-amber-50 dark:bg-amber-300/6 border-amber-200 dark:border-amber-400/25 text-amber-800 dark:text-amber-300',
+                    '[&_code]:bg-amber-200/60! [&_code]:text-amber-800! dark:[&_code]:bg-amber-300/25! dark:[&_code]:text-amber-200!',
+                    '[&_code]:border-amber-300/50 dark:[&_code]:border-amber-400/40',
                 ],
                 error: [
                     'bg-red-50 dark:bg-red-300/6 border-red-200 dark:border-red-400/25 text-red-800 dark:text-red-300',
+                    '[&_code]:bg-red-200/60! [&_code]:text-red-800! dark:[&_code]:bg-red-300/25! dark:[&_code]:text-red-200!',
+                    '[&_code]:border-red-300 dark:[&_code]:border-red-400/30',
                 ],
                 success: [
                     'bg-emerald-50 dark:bg-emerald-300/6 border-emerald-200 dark:border-emerald-400/25 text-emerald-800 dark:text-emerald-300',
+                    '[&_code]:bg-emerald-200/60! [&_code]:text-emerald-800! dark:[&_code]:bg-emerald-300/25! dark:[&_code]:text-emerald-200!',
+                    '[&_code]:border-emerald-300 dark:[&_code]:border-emerald-400/30',
                 ],
             },
         },
