@@ -37,6 +37,7 @@ const alertClasses = computed(() => {
             '[&_h5]:mb-1 [&_h5]:font-bold',
             '[&_h6]:mb-1 [&_h6]:font-bold',
             '[&_p:not(:last-child)]:mb-3',
+            '[&_code]:px-0.75 [&_code]:mx-0.5 [&_code]:py-0.5 [&_code]:rounded-sm',
         ].join(' '),
         variants: {
             variant: {
@@ -46,15 +47,15 @@ const alertClasses = computed(() => {
                 ],
                 warning: [
                     'bg-amber-50 dark:bg-amber-300/6 border-amber-200 dark:border-amber-400/25 text-amber-800 dark:text-amber-300',
-                    '[&_code]:bg-amber-200/60! [&_code]:text-amber-800! dark:[&_code]:bg-amber-300/10! dark:[&_code]:text-amber-200!',
+                    '[&_code]:bg-amber-200/50! [&_code]:text-amber-800! dark:[&_code]:bg-amber-300/8! dark:[&_code]:text-amber-200!',
                 ],
                 error: [
                     'bg-red-50 dark:bg-red-300/6 border-red-200 dark:border-red-400/25 text-red-800 dark:text-red-300',
-                    '[&_code]:bg-red-200/60! [&_code]:text-red-800! dark:[&_code]:bg-red-300/10! dark:[&_code]:text-red-200!',
+                    '[&_code]:bg-red-200/50! [&_code]:text-red-800! dark:[&_code]:bg-red-300/8! dark:[&_code]:text-red-200!',
                 ],
                 success: [
                     'bg-emerald-50 dark:bg-emerald-300/6 border-emerald-200 dark:border-emerald-400/25 text-emerald-800 dark:text-emerald-300',
-                    '[&_code]:bg-emerald-200/60! [&_code]:text-emerald-800! dark:[&_code]:bg-emerald-300/10! dark:[&_code]:text-emerald-200!',
+                    '[&_code]:bg-emerald-200/50! [&_code]:text-emerald-800! dark:[&_code]:bg-emerald-300/8! dark:[&_code]:text-emerald-200!',
                 ],
             },
         },
