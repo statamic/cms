@@ -1,4 +1,5 @@
 export const {
+    Alert,
     AuthCard,
     Avatar,
     Badge,
