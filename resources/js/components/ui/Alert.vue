@@ -15,6 +15,17 @@ const props = defineProps({
 const slots = useSlots();
 const hasDefaultSlot = !!slots.default;
 
+const alertRole = computed(() => {
+    // Use 'alert' for urgent messages that need immediate attention
+    // Use 'status' for informational messages
+    return props.variant === 'error' || props.variant === 'warning' ? 'alert' : 'status';
+});
+
+const ariaLive = computed(() => {
+    // 'assertive' for urgent, 'polite' for informational
+    return props.variant === 'error' || props.variant === 'warning' ? 'assertive' : 'polite';
+});
+
 const alertClasses = computed(() => {
     return cva({
         base: 'relative flex items-start gap-3 rounded-xl border p-4 text-sm',
@@ -54,8 +65,19 @@ const defaultIcon = computed(() => {
 </script>
 
 <template>
-    <div :class="alertClasses" data-ui-alert :data-variant="variant">
-        <Icon v-if="defaultIcon" :name="defaultIcon" class="size-5 shrink-0 mt-0.5 opacity-70" />
+    <div
+        :class="alertClasses"
+        :role="alertRole"
+        :aria-live="ariaLive"
+        data-ui-alert
+        :data-variant="variant"
+    >
+        <Icon
+            v-if="defaultIcon"
+            :name="defaultIcon"
+            class="size-5 shrink-0 mt-0.5 opacity-70"
+            aria-hidden="true"
+        />
         <div class="flex-1 min-w-0">
             <slot v-if="hasDefaultSlot" />
             <span v-else v-html="text" />
