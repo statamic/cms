@@ -314,16 +314,16 @@ defineProps(['icons']);
                     <p>The importer uses Laravel's job batching feature to keep track of the import progress, however, it requires a <code>job_batches</code> table in your database. Before you can run the importer, you will need to run <code>php artisan migrate</code>. This alert uses a heading for the title and a paragraph for the message.</p>
                 </Alert>
                 <Alert variant="default">
-                    <h2>This is a default alert message</h2>
-                    <p>The importer uses Laravel's job batching feature to keep track of the import progress, however, it requires a <code>job_batches</code> table in your database. Before you can run the importer, you will need to run <code>php artisan migrate</code>. This alert uses a heading for the title and a paragraph for the message.</p>
+                    <h2>New Feature Available</h2>
+                    <p>We've added support for custom field types. You can now create your own field types by extending the <code>Fieldtype</code> class. Check out the documentation for more details.</p>
                 </Alert>
                 <Alert variant="success">
-                    <h3>This is a success alert message</h3>
-                    <p>The importer uses Laravel's job batching feature to keep track of the import progress, however, it requires a <code>job_batches</code> table in your database. Before you can run the importer, you will need to run <code>php artisan migrate</code>. This alert uses a heading for the title and a paragraph for the message.</p>
+                    <h3>Backup Completed Successfully</h3>
+                    <p>Your site backup has been created and saved to <code>/storage/backups/site-2032-01-15.tar.gz</code>. The backup includes all content, assets, and configuration files.</p>
                 </Alert>
                 <Alert variant="error">
-                    <h4>This is an error alert message</h4>
-                    <p>The importer uses Laravel's job batching feature to keep track of the import progress, however, it requires a <code>job_batches</code> table in your database. Before you can run the importer, you will need to run <code>php artisan migrate</code>. This alert uses a heading for the title and a paragraph for the message.</p>
+                    <h4>Failed to Connect to Database</h4>
+                    <p>Unable to establish a connection to the database server. Please check your database configuration in <code>.env</code> and ensure the database server is running.</p>
                 </Alert>
             </section>
 
