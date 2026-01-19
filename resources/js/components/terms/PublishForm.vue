@@ -504,7 +504,7 @@ export default {
                     }
 
                     // If the edit URL was changed (i.e. the term slug was updated), redirect them there.
-                    else if (window.location.href !== response.data.data.edit_url) {
+                    else if (!this.isInline && window.location.href !== response.data.data.edit_url) {
                         window.location = response.data.data.edit_url;
                     }
 
