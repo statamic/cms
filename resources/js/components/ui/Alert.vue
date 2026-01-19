@@ -28,7 +28,16 @@ const ariaLive = computed(() => {
 
 const alertClasses = computed(() => {
     return cva({
-        base: 'relative flex items-start gap-3 rounded-xl border p-4 text-sm',
+        base: [
+            'relative flex items-start gap-3 rounded-xl border p-4 [&:has(p)]:py-5 [&:has(p)]:pb-6 text-sm',
+            '[&_h1]:mb-1 [&_h1]:font-bold',
+            '[&_h2]:mb-1 [&_h2]:font-bold',
+            '[&_h3]:mb-1 [&_h3]:font-bold',
+            '[&_h4]:mb-1 [&_h4]:font-bold',
+            '[&_h5]:mb-1 [&_h5]:font-bold',
+            '[&_h6]:mb-1 [&_h6]:font-bold',
+            '[&_p:not(:last-child)]:mb-3',
+        ].join(' '),
         variants: {
             variant: {
                 default: [
