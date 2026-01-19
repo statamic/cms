@@ -208,9 +208,8 @@ function deletePreset() {
                     </template>
                 </PresetTrigger>
             </TabList>
-            <div class="border-b border-gray-200 dark:border-gray-700 relative -top-[2px] hover:border-transparent ps-2">
+            <div v-if="canSaveNewPreset" class="border-b border-gray-200 dark:border-gray-700 relative -top-[2px] hover:border-transparent ps-2">
                 <Button
-                    v-if="canSaveNewPreset"
                     @click="createPreset"
                     variant="ghost"
                     size="sm"
