@@ -37,7 +37,7 @@ const alertClasses = computed(() => {
             '[&_h5]:mb-1 [&_h5]:font-bold',
             '[&_h6]:mb-1 [&_h6]:font-bold',
             '[&_p:not(:last-child)]:mb-3',
-            '[&_code]:px-0.75 [&_code]:mx-0.5 [&_code]:py-0.5 [&_code]:rounded-sm',
+            '[&_code]:px-0.75 [&_code]:mx-0.5 [&_code]:py-0.5 [&_code]:rounded-sm [&_code]:text-xs',
         ].join(' '),
         variants: {
             variant: {
