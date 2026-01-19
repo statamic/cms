@@ -43,8 +43,13 @@
         #main-content:has([data-listings-container]) {
             container-type: scroll-state;
 
+            /* [2] Set up an anchor point for the floating toolbar. */
+            [data-listings-container] {
+                anchor-name: --results;
+            }
+
             #content-card {
-                /* [2] If the listings container is relatively short (not scrollable), position the floating toolbar at the bottom of it. This is helpful for taller screens. The toolbar is more noticeable when it's not at the bottom of the viewport. */
+                /* [/3] If the listings container is relatively short (not scrollable), position the floating toolbar at the bottom of it. This is helpful for taller screens. The toolbar is more noticeable when it's not at the bottom of the viewport. */
                 @container not scroll-state(scrollable: y) {
                     [data-floating-toolbar] {
                         position: absolute;
@@ -58,10 +63,6 @@
                     }
                 }
             }
-        }
-
-        [data-listings-container] {
-            anchor-name: --results;
         }
     }
 </style>
