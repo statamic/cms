@@ -19,8 +19,9 @@
 </template>
 
 <style>
+    /* GROUP FLOATING TOOLBAR / BUTTON GROUP BORDERS
+    =================================================== */
     [data-ui-button-group] [data-ui-group-target] {
-
         @apply shadow-none;
 
         &:not(:first-child):not([data-floating-toolbar] &) {
@@ -37,6 +38,8 @@
         }
     }
 
+    /* GROUP FLOATING TOOLBAR / DYNAMIC POSITIONING
+    =================================================== */
     /* When the listings are shorter than the viewport, position the floating toolbar at the bottom of the listings container. */
     @supports (anchor-name: --results) {
         /* [1] Test whether the listings container is scrollable if listings are present. */
