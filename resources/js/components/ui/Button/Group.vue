@@ -36,4 +36,32 @@
             }
         }
     }
+
+    /* When the listings are shorter than the viewport, position the floating toolbar at the bottom of the listings container. */
+    @supports (anchor-name: --results) {
+        /* [1] Test whether the listings container is scrollable if listings are present. */
+        #main-content:has([data-listings-container]) {
+            container-type: scroll-state;
+
+            #content-card {
+                /* [2] If the listings container is relatively short (not scrollable), position the floating toolbar at the bottom of it. This is helpful for taller screens. The toolbar is more noticeable when it's not at the bottom of the viewport. */
+                @container not scroll-state(scrollable: y) {
+                    [data-floating-toolbar] {
+                        position: absolute;
+                        position-anchor: --results;
+                        top: 3rem;
+                        position-area: bottom;
+
+                        > * {
+                            translate: unset;
+                        }
+                    }
+                }
+            }
+        }
+
+        [data-listings-container] {
+            anchor-name: --results;
+        }
+    }
 </style>
