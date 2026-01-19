@@ -46,12 +46,12 @@ function actionFailed(response) {
             v-if="hasSelections"
             layout
             data-floating-toolbar
-            class="fixed inset-x-0 bottom-1 sm:bottom-6 z-100 flex w-full max-w-[95vw] mx-auto justify-center "
+            class="sticky inset-x-0 bottom-1 sm:bottom-6 z-100 flex w-full max-w-[95vw] mx-auto justify-center "
             :initial="{ y: 100, opacity: 0 }"
             :animate="{ y: 0, opacity: 1 }"
             :transition="{ duration: 0.2, delay: 0.075, ease: 'easeInOut' }"
         >
-            <div class="[.nav-open_&]:translate-x-23 relative space-y-3 rounded-xl border border-gray-300/60 dark:border-gray-700 p-1 bg-gray-200/55 backdrop-blur-[20px] shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/10">
+            <div class="space-y-3 rounded-xl border border-gray-300/60 dark:border-gray-700 p-1 bg-gray-200/55 backdrop-blur-[20px] shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/10">
             <ButtonGroup>
                 <Button
                     class="text-blue-500!"
