@@ -93,7 +93,7 @@
                             v-text="__('No results')"
                         />
 
-                        <Panel v-else :class="{ 'relative overflow-x-auto overscroll-x-contain': mode === 'table' }">
+                        <Panel v-else :class="{ 'relative overflow-x-auto overscroll-x-contain': mode === 'table' }" data-listings-container :style="mode === 'table' ? 'container-type: scroll-state;' : null">
                             <PanelHeader class="flex items-center justify-between px-1!">
                                 <Breadcrumbs
                                     v-if="!restrictFolderNavigation"
