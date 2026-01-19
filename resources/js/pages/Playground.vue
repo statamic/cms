@@ -1,5 +1,6 @@
 <script setup>
 import Head from '@/pages/layout/Head.vue';
+import { Alert } from '@ui';
 
 defineProps(['icons']);
 </script>
@@ -295,6 +296,35 @@ defineProps(['icons']);
                         <ui-button variant="danger">Danger</ui-button>
                     </ui-button-group>
                 </div>
+            </section>
+
+            <section class="mb-10 space-y-3">
+                <ui-heading size="lg">Alerts</ui-heading>
+
+                <Alert variant="default" text="This is a default alert message" />
+                <Alert variant="warning" text="This is a warning alert message" />
+                <Alert variant="error" text="This is an error alert message" />
+                <Alert variant="success" text="This is a success alert message" />
+                <Alert variant="warning" icon="git" text="This alert has a custom icon" />
+                <Alert variant="success">
+                    <strong>Success!</strong> This alert uses a slot for custom content.
+                </Alert>
+                <Alert variant="warning">
+                    <h1>Please run your migrations</h1>
+                    <p>The importer uses Laravel's job batching feature to keep track of the import progress, however, it requires a <code>job_batches</code> table in your database. Before you can run the importer, you will need to run <code>php artisan migrate</code>. This alert uses a heading for the title and a paragraph for the message.</p>
+                </Alert>
+                <Alert variant="default">
+                    <h2>This is a default alert message</h2>
+                    <p>The importer uses Laravel's job batching feature to keep track of the import progress, however, it requires a <code>job_batches</code> table in your database. Before you can run the importer, you will need to run <code>php artisan migrate</code>. This alert uses a heading for the title and a paragraph for the message.</p>
+                </Alert>
+                <Alert variant="success">
+                    <h3>This is a success alert message</h3>
+                    <p>The importer uses Laravel's job batching feature to keep track of the import progress, however, it requires a <code>job_batches</code> table in your database. Before you can run the importer, you will need to run <code>php artisan migrate</code>. This alert uses a heading for the title and a paragraph for the message.</p>
+                </Alert>
+                <Alert variant="error">
+                    <h4>This is an error alert message</h4>
+                    <p>The importer uses Laravel's job batching feature to keep track of the import progress, however, it requires a <code>job_batches</code> table in your database. Before you can run the importer, you will need to run <code>php artisan migrate</code>. This alert uses a heading for the title and a paragraph for the message.</p>
+                </Alert>
             </section>
 
             <section class="space-y-4">
