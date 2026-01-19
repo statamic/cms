@@ -42,13 +42,13 @@ const defaultIcon = computed(() => {
     
     switch (props.variant) {
         case 'warning':
-            return 'alert-triangle';
+            return 'warning-diamond';
         case 'error':
-            return 'alert-circle';
+            return 'alert-alarm-bell';
         case 'success':
-            return 'checkmark-circle';
+            return 'checkmark';
         default:
-            return 'information-circle';
+            return 'info';
     }
 });
 </script>
