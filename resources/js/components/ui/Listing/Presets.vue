@@ -208,15 +208,17 @@ function deletePreset() {
                     </template>
                 </PresetTrigger>
             </TabList>
-            <Button
-                v-if="canSaveNewPreset"
-                @click="createPreset"
-                variant="ghost"
-                size="sm"
-                :text="__('New View')"
-                icon="add-bookmark"
-                class="relative top-0.5 [&_svg]:size-4"
-            />
+            <div class="border-b border-gray-200 dark:border-gray-700 relative -top-[2px] hover:border-transparent pl-2">
+                <Button
+                    v-if="canSaveNewPreset"
+                    @click="createPreset"
+                    variant="ghost"
+                    size="sm"
+                    :text="__('New View')"
+                    icon="add-bookmark"
+                    class="[&_svg]:size-4"
+                />
+            </div>
         </div>
     </Tabs>
 
