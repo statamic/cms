@@ -94,5 +94,5 @@ Most of the folder structure will feel familiar to Laravel developers. However, 
     - For more information on Statamic's UI Components, please visit our Storybook docs: https://ui.statamic.dev
 
 ### Additional Context
-- Statamic Documentation: https://statamic.dev
+- Statamic Documentation: https://statamic.dev/llms.txt
 - GitHub Issues: https://github.com/statamic/cms/issues
