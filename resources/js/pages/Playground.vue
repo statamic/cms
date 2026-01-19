@@ -276,6 +276,7 @@ defineProps(['icons']);
                     <ui-button icon="save" text="Primary" variant="primary" />
                     <ui-button icon="save" text="Danger" variant="danger" />
                     <ui-button text="Danger Disabled" variant="danger" disabled />
+                    <ui-button text="Disabled" disabled />
                     <ui-button icon="save" text="Filled" variant="filled" />
                     <ui-button icon="save" text="Ghost" variant="ghost" />
                     <ui-button icon="save" text="Subtle" variant="subtle" />
