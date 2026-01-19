@@ -75,7 +75,7 @@ const defaultIcon = computed(() => {
         <Icon
             v-if="defaultIcon"
             :name="defaultIcon"
-            class="size-5 shrink-0 mt-0.5 opacity-70"
+            class="size-5 shrink-0 opacity-70"
             aria-hidden="true"
         />
         <div class="flex-1 min-w-0">
