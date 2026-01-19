@@ -105,7 +105,7 @@
                                             v-tooltip="__('Add Set')"
                                         />
                                         <ui-description
-                                            v-if="!$refs.setPicker?.isOpen"
+                                            v-show="shouldShowAddSetHelperText"
                                             :text="__('Type \'/\' to insert a set')"
                                             :class="{'ps-9': fullScreenMode}"
                                         />
@@ -361,6 +361,10 @@ export default {
                 },
             ];
         },
+
+        shouldShowAddSetHelperText() {
+            return !this.$refs.setPicker?.isOpen && this.suitableToShowSetButton(this.editor);
+        },
     },
 
     created() {
@@ -576,7 +580,7 @@ export default {
             const { $anchor, empty } = selection;
             const isRootDepth = $anchor.depth === 1;
             const isEmptyTextBlock =
-                $anchor.parent.isTextblock && !$anchor.parent.type.spec.code && !$anchor.parent.textContent;
+                ($anchor.parent.isTextblock && !$anchor.parent.firstChild) && !$anchor.parent.type.spec.code && !$anchor.parent.textContent;
             const isAroundInlineImage =
                 state.selection.$to.nodeBefore?.type.name === 'image' ||
                 state.selection.$to.nodeAfter?.type.name === 'image';
