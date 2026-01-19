@@ -174,7 +174,7 @@ function deletePreset() {
 <template>
     <Tabs v-model:modelValue="currentTab">
         <div class="relative flex shrink-0 items-center space-x-2.5 px-2 -mt-2 sm:px-0 starting-style-transition">
-            <TabList class="flex-1 space-x-2.5 border-gray-200 !dark:border-gray-800">
+            <TabList class="flex-1 space-x-2.5">
                 <PresetTrigger name="all" :text="__('All')" />
                 <PresetTrigger
                     v-for="(preset, handle) in presets"
@@ -208,15 +208,16 @@ function deletePreset() {
                     </template>
                 </PresetTrigger>
             </TabList>
-            <Button
-                v-if="canSaveNewPreset"
-                @click="createPreset"
-                variant="ghost"
-                size="sm"
-                :text="__('New View')"
-                icon="add-bookmark"
-                class="relative top-0.5 [&_svg]:size-4"
-            />
+            <div v-if="canSaveNewPreset" class="border-b border-gray-200 dark:border-gray-700 relative -top-[2px] hover:border-transparent ps-2">
+                <Button
+                    @click="createPreset"
+                    variant="ghost"
+                    size="sm"
+                    :text="__('New View')"
+                    icon="add-bookmark"
+                    class="[&_svg]:size-4"
+                />
+            </div>
         </div>
     </Tabs>
 
