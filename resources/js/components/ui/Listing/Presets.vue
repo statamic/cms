@@ -174,7 +174,7 @@ function deletePreset() {
 <template>
     <Tabs v-model:modelValue="currentTab">
         <div class="relative flex shrink-0 items-center space-x-2.5 px-2 -mt-2 sm:px-0 starting-style-transition">
-            <TabList class="flex-1 space-x-2.5 border-gray-200 !dark:border-gray-800">
+            <TabList class="flex-1 space-x-2.5">
                 <PresetTrigger name="all" :text="__('All')" />
                 <PresetTrigger
                     v-for="(preset, handle) in presets"
