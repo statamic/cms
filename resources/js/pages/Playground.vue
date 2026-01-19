@@ -183,7 +183,7 @@ defineProps(['icons']);
         <div class="space-y-12">
             <section class="space-y-4">
                 <ui-heading size="lg">Badges</ui-heading>
-                <div class="mb-4 flex gap-2 sm:gap-3 items-end">
+                <div class="mb-4 flex flex-wrap gap-2 sm:gap-3 items-end">
                     <ui-badge size="lg" text="Green" color="green" />
                     <ui-badge size="lg" text="Red" color="red" />
                     <ui-badge size="lg" text="Black" color="black" />
@@ -210,7 +210,7 @@ defineProps(['icons']);
 
             <section class="space-y-4">
                 <ui-heading size="lg">Badges as Links</ui-heading>
-                <div class="mb-4 flex gap-2 sm:gap-3 items-end flex-wrap">
+                <div class="mb-4 flex flex-wrap gap-2 sm:gap-3 items-end">
                     <ui-badge size="lg" text="Green Link" color="green" href="#" />
                     <ui-badge size="lg" text="Red Link" color="red" href="#" />
                     <ui-badge size="lg" text="Black Link" color="black" href="#" />
@@ -237,7 +237,7 @@ defineProps(['icons']);
 
             <section class="space-y-4">
                 <ui-heading size="lg">Badges as Buttons</ui-heading>
-                <div class="mb-4 flex gap-2 sm:gap-3 items-end flex-wrap">
+                <div class="mb-4 flex flex-wrap gap-2 sm:gap-3 items-end">
                     <ui-badge size="lg" text="Green Button" color="green" as="button" />
                     <ui-badge size="lg" text="Red Button" color="red" as="button" />
                     <ui-badge size="lg" text="Black Button" color="black" as="button" />
@@ -264,14 +264,14 @@ defineProps(['icons']);
 
             <section class="space-y-4">
                 <ui-heading size="lg">Buttons</ui-heading>
-                <div class="mb-4 flex gap-2 sm:gap-3 items-end">
+                <div class="mb-4 flex flex-wrap gap-2 sm:gap-3 items-end">
                     <ui-button text="Default" />
                     <ui-button text="Primary" variant="primary" />
                     <ui-button text="Filled" variant="filled" />
                     <ui-button text="Ghost" variant="ghost" />
                     <ui-button text="Subtle" variant="subtle" />
                 </div>
-                <div class="mb-4 flex gap-2 sm:gap-3 items-end">
+                <div class="mb-4 flex flex-wrap gap-2 sm:gap-3 items-end">
                     <ui-button icon="save" text="Default" />
                     <ui-button icon="save" text="Primary" variant="primary" />
                     <ui-button icon="save" text="Danger" variant="danger" />
@@ -280,14 +280,14 @@ defineProps(['icons']);
                     <ui-button icon="save" text="Ghost" variant="ghost" />
                     <ui-button icon="save" text="Subtle" variant="subtle" />
                 </div>
-                <div class="mb-4 flex gap-2 sm:gap-3 items-end">
+                <div class="mb-4 flex flex-wrap gap-2 sm:gap-3 items-end">
                     <ui-button icon="save" />
                     <ui-button icon="save" variant="primary" />
                     <ui-button icon="save" variant="filled" />
                     <ui-button icon="save" variant="ghost" />
                     <ui-button icon="save" variant="subtle" />
                 </div>
-                <div class="mb-4 flex gap-2 sm:gap-3 items-end">
+                <div class="mb-4 flex flex-wrap gap-2 sm:gap-3 items-end">
                     <ui-button-group>
                         <ui-button variant="default">Oldest</ui-button>
                         <ui-button variant="default">Newest</ui-button>
@@ -299,7 +299,7 @@ defineProps(['icons']);
 
             <section class="space-y-4">
                 <ui-heading size="lg">Calendar</ui-heading>
-                <div class="flex gap-6">
+                <div class="flex flex-wrap gap-6">
                     <ui-card>
                         <ui-calendar />
                     </ui-card>
