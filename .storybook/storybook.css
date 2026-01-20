@@ -8,6 +8,30 @@
 @import '../resources/css/components/stacks.css';
 @custom-variant dark (&:where(.dark, .dark *));
 
+:root {
+    /* GROUP VARIABLES -- DECORATION -- COLOURS
+    =================================================== */
+    --color-code-background: hsl(287deg 80% 93.5%);
+    --color-pink-light-1: hsl(287deg 80% 80%);
+
+    /* GROUP VARIABLES -- DECORATION -- TEXT -- SIZES -- Based on AUGMENTED FOURTH
+    =================================================== */
+    --font-size-xl: clamp(1.35em, 6vw, 1.5em);
+    --font-size-xl-line-height: 1.3;
+
+    --font-size-2xl: clamp(1.8em * 0.85, 6vw, 1.8em);
+    --font-size-2xl-line-height: 1.2;
+
+    --font-size-3xl: clamp(2.25em * 0.9, 6vw, 2.25em);
+    --font-size-3xl-line-height: 1.15;
+
+    --font-size-4xl: clamp(2.827em * 0.9, 9vw, 2.827em);
+    --font-size-4xl-line-height: 1.15;
+
+    --font-size-5xl: clamp(3.45em * 0.67, 11vw, 3.45em);
+    --font-size-5xl-line-height: 1.05;
+}
+
 @scope (html) to (.sbdocs-preview) {
     .sbdocs {
         h1,
@@ -18,30 +42,47 @@
         h6 {
             font-family: p22-mackinac-pro, serif;
             font-weight: 500;
+            border-bottom: 0;
         }
 
         h1 {
-            font-size: 2.5rem;
+            font-size: var(--font-size-4xl);
+            line-height: var(--font-size-4xl-line-height);
         }
 
         h2 {
-            font-size: 1.75rem;
+            font-size: var(--font-size-3xl);
+            line-height: var(--font-size-3xl-line-height);
+            margin-block-end: 0;
+            padding-block-end: 0;
         }
 
         h3 {
-            font-size: 1.25rem;
+            font-size: 1.25em;
         }
 
         p,
         li {
-            font-size: 1rem;
+            font-size: 1.05em;
             line-height: 1.6;
+            code {
+                background: var(--color-code-background);
+                color: black;
+                border: none;
+                font-weight: 400;
+                font-size: 0.9em;
+            }
+        }
+
+        p:not(.sb-anchor, .sb-unstyled, .sb-unstyled p) {
+            font-weight: 300;
         }
     }
 }
 
 .prismjs {
-    font-size: 1rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
 }
 
 .sbdocs.sbdocs-wrapper {
@@ -57,4 +98,23 @@
 
 .docs-story div[scale="1"] {
     transform: none !important;
+}
+
+.sbdocs {
+    .sbdocs-preview {
+        border-radius: 17px;
+    }
+
+    .docblock-code-toggle {
+        &, :has(> &) {
+            border-top-left-radius: 7px;
+        }
+        .dark & {
+            background: hsl(0deg 0% 15%)!important;
+            color: white;
+        }
+        &:focus {
+            box-shadow: var(--color-pink-light-1) 0px -2px 0px 0px inset;
+        }
+    }
 }
