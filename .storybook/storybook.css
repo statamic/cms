@@ -48,10 +48,11 @@
     padding: 2rem 4rem;
 }
 
-.dark,
-.dark body,
-.dark .sbdocs-preview {
-    background: var(--theme-color-content-bg);
+.dark {
+    & body,
+    & .sbdocs-preview {
+        background: var(--theme-color-content-bg);
+    }
 }
 
 .docs-story div[scale="1"] {
