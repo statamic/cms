@@ -41,7 +41,6 @@ class Assets extends Fieldtype
                         'max_items' => 1,
                         'mode' => 'select',
                         'required' => true,
-                        'default' => AssetContainer::all()->count() == 1 ? AssetContainer::all()->first()->handle() : null,
                         'force_in_config' => true,
                         'width' => '50',
                     ],
