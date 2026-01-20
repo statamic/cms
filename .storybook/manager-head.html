@@ -6,3 +6,22 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --color-purple-light-1: hsl(256deg 60% 85%);
+    }
+    #components-badge--docs {
+        &,
+        :has(> &) {
+            background: var(--color-purple-light-1);
+        }
+    }
+
+    [data-selected="true"],
+    [data-selected="true"] *,
+    [data-selected="true"] *:hover {
+        background: var(--color-purple-light-1)!important;
+        box-shadow: none!important;
+    }
+</style>
