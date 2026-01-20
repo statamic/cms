@@ -80,6 +80,7 @@ export const Variants: Story = {
 const customIconCode = `
 <Alert variant="warning" icon="git" text="This alert has a custom icon" />
 <Alert variant="default" icon="cog" text="This alert uses a custom icon" />
+<Alert variant="success" icon="clipboard-check" text="Custom success icon" />
 `;
 
 export const CustomIcons: Story = {
@@ -101,7 +102,7 @@ export const CustomIcons: Story = {
             <div class="space-y-3">
                 <Alert variant="warning" icon="git" text="This alert has a custom icon" />
                 <Alert variant="default" icon="cog" text="This alert uses a custom icon" />
-                <Alert variant="success" icon="sparkles" text="Custom success icon" />
+                <Alert variant="success" icon="clipboard-check" text="Custom success icon" />
             </div>
         `,
     }),
