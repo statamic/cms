@@ -8,33 +8,35 @@
 @import '../resources/css/components/stacks.css';
 @custom-variant dark (&:where(.dark, .dark *));
 
-.sbdocs:not(.sbdocs-preview *) {
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
-        font-family: p22-mackinac-pro, serif;
-        font-weight: 500;
-    }
+@scope (html) to (.sbdocs-preview) {
+    .sbdocs {
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: p22-mackinac-pro, serif;
+            font-weight: 500;
+        }
 
-    h1 {
-        font-size: 2.5rem;
-    }
+        h1 {
+            font-size: 2.5rem;
+        }
 
-    h2 {
-        font-size: 1.75rem;
-    }
+        h2 {
+            font-size: 1.75rem;
+        }
 
-    h3 {
-        font-size: 1.25rem;
-    }
+        h3 {
+            font-size: 1.25rem;
+        }
 
-    p,
-    li {
-        font-size: 1rem;
-        line-height: 1.6;
+        p,
+        li {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
     }
 }
 
