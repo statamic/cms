@@ -85,10 +85,6 @@
     line-height: 1.5;
 }
 
-.sbdocs.sbdocs-wrapper {
-    padding: 2rem 4rem;
-}
-
 .dark {
     & body,
     & .sbdocs-preview {
@@ -101,6 +97,10 @@
 }
 
 .sbdocs {
+    &.sbdocs-wrapper {
+        padding: 4rem;
+    }
+
     .sbdocs-preview {
         border-radius: 17px;
     }
