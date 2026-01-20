@@ -103,6 +103,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Default Container
+    |--------------------------------------------------------------------------
+    |
+    | When adding Assets fields to blueprints, Statamic will use this container
+    | as the default. You can override this setting on a field-by-field basis.
+    | Changing this value may break existing asset relationships.
+    |
+    */
+
+    'default_container' => 'assets',
+
+    /*
+    |--------------------------------------------------------------------------
     | Auto-Crop Assets
     |--------------------------------------------------------------------------
     |

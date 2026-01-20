@@ -37,4 +37,9 @@ class AssetContainer extends Relationship
     {
         return Facades\AssetContainer::find($value);
     }
+
+    public function defaultValue()
+    {
+        return config('statamic.assets.default_container');
+    }
 }
