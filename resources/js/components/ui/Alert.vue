@@ -1,5 +1,5 @@
 <script setup>
-import { computed, useSlots } from 'vue';
+import { computed } from 'vue';
 import { cva } from 'cva';
 import Icon from './Icon/Icon.vue';
 
@@ -11,9 +11,6 @@ const props = defineProps({
     /** Icon name to display. [Browse available icons](/?path=/story/components-icon--all-icons) */
     icon: { type: String, default: null },
 });
-
-const slots = useSlots();
-const hasDefaultSlot = !!slots.default;
 
 const alertRole = computed(() => {
     // Use 'alert' for urgent messages that need immediate attention
@@ -93,8 +90,9 @@ const defaultIcon = computed(() => {
             aria-hidden="true"
         />
         <div class="flex-1 min-w-0">
-            <slot v-if="hasDefaultSlot" />
-            <span v-else v-html="text" />
+            <slot>
+                <span v-html="text" />
+            </slot>
         </div>
     </div>
 </template>
