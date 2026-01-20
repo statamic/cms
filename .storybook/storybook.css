@@ -8,32 +8,34 @@
 @import '../resources/css/components/stacks.css';
 @custom-variant dark (&:where(.dark, .dark *));
 
-.sbdocs h1:not(.sbdocs-preview *, .sbdocs-preview h1),
-.sbdocs h2:not(.sbdocs-preview *, .sbdocs-preview h2),
-.sbdocs h3:not(.sbdocs-preview *, .sbdocs-preview h3),
-.sbdocs h4:not(.sbdocs-preview *, .sbdocs-preview h4),
-.sbdocs h5:not(.sbdocs-preview *, .sbdocs-preview h5),
-.sbdocs h6:not(.sbdocs-preview *, .sbdocs-preview h6) {
-    font-family: p22-mackinac-pro, serif;
-    font-weight: 500;
-}
+.sbdocs {
+    h1:not(.sbdocs-preview *, .sbdocs-preview h1),
+    h2:not(.sbdocs-preview *, .sbdocs-preview h2),
+    h3:not(.sbdocs-preview *, .sbdocs-preview h3),
+    h4:not(.sbdocs-preview *, .sbdocs-preview h4),
+    h5:not(.sbdocs-preview *, .sbdocs-preview h5),
+    h6:not(.sbdocs-preview *, .sbdocs-preview h6) {
+        font-family: p22-mackinac-pro, serif;
+        font-weight: 500;
+    }
 
-.sbdocs h1:not(.sbdocs-preview *, .sbdocs-preview h1) {
-    font-size: 2.5rem;
-}
+    h1:not(.sbdocs-preview *, .sbdocs-preview h1) {
+        font-size: 2.5rem;
+    }
 
-.sbdocs h2:not(.sbdocs-preview *, .sbdocs-preview h2) {
-    font-size: 1.75rem;
-}
+    h2:not(.sbdocs-preview *, .sbdocs-preview h2) {
+        font-size: 1.75rem;
+    }
 
-.sbdocs h3:not(.sbdocs-preview *, .sbdocs-preview h3) {
-    font-size: 1.25rem;
-}
+    h3:not(.sbdocs-preview *, .sbdocs-preview h3) {
+        font-size: 1.25rem;
+    }
 
-.sbdocs p:not(.sbdocs-preview *, .sbdocs-preview p),
-.sbdocs li:not(.sbdocs-preview *, .sbdocs-preview li) {
-    font-size: 1rem;
-    line-height: 1.6;
+    p:not(.sbdocs-preview *, .sbdocs-preview p),
+    li:not(.sbdocs-preview *, .sbdocs-preview li) {
+        font-size: 1rem;
+        line-height: 1.6;
+    }
 }
 
 .prismjs {
