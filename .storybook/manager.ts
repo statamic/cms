@@ -6,7 +6,7 @@ const theme = create({
   base: 'light',
   brandTitle: 'Statamic UI Components',
   brandUrl: 'https://statamic.dev',
-  brandImage: '/logo.png',
+  brandImage: '/logo.svg',
   fontBase: '"Lexend", sans-serif',
   fontCode: '"Source Code Pro", monospace'
 });
