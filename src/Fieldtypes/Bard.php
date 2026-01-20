@@ -37,7 +37,6 @@ class Bard extends Replicator
         'removeformat',
         'quote',
         'anchor',
-        'image',
         'table',
     ];
 
