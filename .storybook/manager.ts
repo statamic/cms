@@ -11,9 +11,6 @@ const theme = create({
   fontCode: '"Source Code Pro", monospace',
 
    appBorderColor: 'hsl(287deg 80% 90%)',
-
-    // Theme selector. This is overlaid on top.
-    barSelectedColor: '#ff0000',
 });
 
 addons.setConfig({

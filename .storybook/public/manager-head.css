@@ -1,16 +1,27 @@
 :root {
     --color-purple-light-1: hsl(256deg 60% 85%);
+    --color-purple: hsl(256deg 70% 55%);
 }
-#components-badge--docs {
+/* #components-badge--docs {
     &,
     :has(> &) {
         background: var(--color-purple-light-1);
+        &, & svg {
+            color: black;
+        }
     }
-}
+} */
 
-[data-selected="true"],
-[data-selected="true"] *,
-[data-selected="true"] *:hover {
-    background: var(--color-purple-light-1)!important;
-    box-shadow: none!important;
+.sidebar-container {
+    .sidebar-item {
+        --tree-node-background-hover: hsl(256deg 60% 90%)!important;
+    }
+    [data-selected="true"],
+    [data-selected="true"] *,
+    [data-selected="true"] *:hover {
+        background: var(--color-purple-light-1)!important;
+        background: var(--color-purple)!important;
+        box-shadow: none!important;
+        outline: none;
+    }
 }
