@@ -222,6 +222,7 @@ class AssetsTest extends TestCase
     {
         return (new Assets)->setField(new Field('test', array_merge([
             'type' => 'assets',
+            'container' => 'test',
         ], $config)));
     }
 

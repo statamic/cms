@@ -27,7 +27,7 @@ class HasAvatarTest extends TestCase
 
     private function withAvatarField()
     {
-        $blueprint = Blueprint::makeFromFields(['avatar' => ['type' => 'assets', 'max_files' => 1]]);
+        $blueprint = Blueprint::makeFromFields(['avatar' => ['type' => 'assets', 'max_files' => 1, 'container' => 'avatars']]);
 
         BlueprintRepository::shouldReceive('find')->with('user')->andReturn($blueprint);
 
