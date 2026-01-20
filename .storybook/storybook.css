@@ -15,6 +15,7 @@
 .sbdocs h5:not(.sbdocs-preview *, .sbdocs-preview h5),
 .sbdocs h6:not(.sbdocs-preview *, .sbdocs-preview h6) {
     font-family: p22-mackinac-pro, serif;
+    font-weight: 500;
 }
 
 .sbdocs h1:not(.sbdocs-preview *, .sbdocs-preview h1) {
@@ -23,7 +24,6 @@
 
 .sbdocs h2:not(.sbdocs-preview *, .sbdocs-preview h2) {
     font-size: 1.75rem;
-    font-weight: 600;
 }
 
 .sbdocs h3:not(.sbdocs-preview *, .sbdocs-preview h3) {
@@ -34,7 +34,6 @@
 .sbdocs li:not(.sbdocs-preview *, .sbdocs-preview li) {
     font-size: 1rem;
     line-height: 1.6;
-    font-weight: 350;
 }
 
 .prismjs {
