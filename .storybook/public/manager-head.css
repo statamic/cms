@@ -24,4 +24,11 @@
         box-shadow: none!important;
         outline: none;
     }
+    [data-selected="true"] {
+        border-radius: 10px;
+        @supports (corner-shape: squircle) {
+            border-radius: 50px;
+            corner-shape: squircle;
+        }
+    }
 }

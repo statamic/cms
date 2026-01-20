@@ -31,7 +31,8 @@
     --font-size-5xl: clamp(3.45em * 0.67, 11vw, 3.45em);
     --font-size-5xl-line-height: 1.05;
 }
-
+/* GROUP GLOBAL STYLES
+=================================================== */
 @scope (html) to (.sbdocs-preview) {
     .sbdocs {
         h1,
@@ -55,6 +56,11 @@
             line-height: var(--font-size-3xl-line-height);
             margin-block-end: 0;
             padding-block-end: 0;
+
+            &:first-of-type {
+                /* e.g. >> /?path=/story/components-badge--default */
+                margin-block-start: 1em;
+            }
         }
 
         h3 {
@@ -80,11 +86,46 @@
     }
 }
 
-.prismjs {
-    font-size: 0.9rem;
-    line-height: 1.5;
+
+/* GROUP CODE BLOCKS
+=================================================== */
+.sbdocs {
+    .prismjs {
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    .docblock-code-toggle {
+        &, :has(> &) {
+            border-top-left-radius: 7px;
+        }
+        .dark & {
+            background: hsl(0deg 0% 15%)!important;
+            color: white;
+        }
+        &:focus {
+            box-shadow: var(--color-pink-light-1) 0px -2px 0px 0px inset;
+        }
+    }
+
+    /* Leaving this here in case we want to override the style later */
+    /* .prismjs {
+        border: 1px dotted var(--color-pink-light-1)!important;
+        border-radius: 10px;
+    }
+    pre * {
+        box-shadow: none!important;
+    }
+    .docblock-source {
+        &, & *:not(.prismjs) {
+            border: none!important;
+        }
+    } */
 }
 
+
+/* GROUP DARK MODE
+=================================================== */
 .dark {
     & body,
     & .sbdocs-preview {
@@ -103,18 +144,5 @@
 
     .sbdocs-preview {
         border-radius: 17px;
-    }
-
-    .docblock-code-toggle {
-        &, :has(> &) {
-            border-top-left-radius: 7px;
-        }
-        .dark & {
-            background: hsl(0deg 0% 15%)!important;
-            color: white;
-        }
-        &:focus {
-            box-shadow: var(--color-pink-light-1) 0px -2px 0px 0px inset;
-        }
     }
 }
