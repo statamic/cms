@@ -559,12 +559,8 @@ class DefaultInvalidatorTest extends TestCase
             ])->once();
         });
 
-        $nav = tap(Mockery::mock(Nav::class), function ($m) {
+        $tree = tap(Mockery::mock(NavTree::class), function ($m) {
             $m->shouldReceive('handle')->andReturn('links');
-        });
-
-        $tree = tap(Mockery::mock(NavTree::class), function ($m) use ($nav) {
-            $m->shouldReceive('structure')->andReturn($nav);
             $m->shouldReceive('site')->andReturn(Site::default());
         });
 
@@ -599,12 +595,8 @@ class DefaultInvalidatorTest extends TestCase
             ])->once();
         });
 
-        $nav = tap(Mockery::mock(Nav::class), function ($m) {
+        $tree = tap(Mockery::mock(NavTree::class), function ($m) {
             $m->shouldReceive('handle')->andReturn('links');
-        });
-
-        $tree = tap(Mockery::mock(NavTree::class), function ($m) use ($nav) {
-            $m->shouldReceive('structure')->andReturn($nav);
             $m->shouldReceive('site')->andReturn(Site::get('fr'));
         });
 
