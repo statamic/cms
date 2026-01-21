@@ -73,6 +73,8 @@ class ImportUsers extends Command
         app()->bind(UserContract::class, FileUser::class);
         app()->bind(UserRepositoryContract::class, FileRepository::class);
 
+        User::clearResolvedInstances();
+
         $users = User::all();
 
         if ($users->isEmpty()) {

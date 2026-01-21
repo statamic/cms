@@ -217,6 +217,29 @@ class NavTest extends StructureTestCase
     }
 
     #[Test]
+    public function collections_query_scopes_can_be_get_and_set()
+    {
+        $nav = $this->structure();
+
+        $this->assertEquals([], $nav->collectionsQueryScopes());
+
+        $return = $nav->collectionsQueryScopes(['scope_one', 'scope_two']);
+
+        $this->assertSame($nav, $return);
+        $this->assertEquals(['scope_one', 'scope_two'], $nav->collectionsQueryScopes());
+    }
+
+    #[Test]
+    public function collections_query_scopes_are_normalized()
+    {
+        $nav = $this->structure();
+
+        $nav->collectionsQueryScopes(['ScopeOne', 'scope_two', '', null, 'ScopeOne']);
+
+        $this->assertEquals(['scope_one', 'scope_two'], $nav->collectionsQueryScopes());
+    }
+
+    #[Test]
     public function it_has_cp_urls()
     {
         $nav = $this->structure('test');

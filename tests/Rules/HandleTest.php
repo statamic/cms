@@ -43,4 +43,10 @@ class HandleTest extends TestCase
     {
         $this->assertValidationErrorOutput(trans('statamic::validation.handle'), '_bad_input');
     }
+
+    #[Test]
+    public function it_outputs_helpful_validation_error_when_string_starts_with_number()
+    {
+        $this->assertValidationErrorOutput(trans('statamic::validation.handle_starts_with_number'), '1bad_input');
+    }
 }

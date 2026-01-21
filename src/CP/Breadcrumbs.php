@@ -6,6 +6,8 @@ use Illuminate\Contracts\Support\Arrayable;
 use JsonSerializable;
 use Statamic\Statamic;
 
+use function Statamic\trans as __;
+
 class Breadcrumbs implements Arrayable, JsonSerializable
 {
     protected $crumbs;

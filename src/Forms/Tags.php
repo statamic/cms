@@ -81,7 +81,7 @@ class Tags extends BaseTags
         if ($jsDriver) {
             $data['js_driver'] = $jsDriver->handle();
             $data['show_field'] = $jsDriver->copyShowFieldToFormData($data['fields']);
-            $data = array_merge($data, $jsDriver->addToFormData($form, $data));
+            $data = array_merge($data, $jsDriver->addToFormData($data));
         }
 
         $this->addToDebugBar($data, $formHandle);

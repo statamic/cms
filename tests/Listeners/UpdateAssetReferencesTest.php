@@ -4,10 +4,12 @@ namespace Tests\Listeners;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\LazyCollection;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\AssetFolder;
 use Statamic\Facades;
+use Statamic\Listeners\UpdateAssetReferences;
 use Statamic\Support\Arr;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -705,6 +707,56 @@ class UpdateAssetReferencesTest extends TestCase
         $this->assertEquals(['content/norris.jpg'], Arr::get($entry->fresh()->data(), 'griddy.0.pics'));
         $this->assertFalse(Arr::has($entry->fresh()->data(), 'griddy.1.product'));
         $this->assertEquals(['content/norris.jpg', 'lee.jpg'], Arr::get($entry->fresh()->data(), 'griddy.1.pics'));
+    }
+
+    #[Test]
+    public function it_updates_nested_asset_fields_within_group_fields()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'group_field',
+                    'field' => [
+                        'type' => 'group',
+                        'fields' => [
+                            [
+                                'handle' => 'product',
+                                'field' => [
+                                    'type' => 'assets',
+                                    'container' => 'test_container',
+                                    'max_files' => 1,
+                                ],
+                            ],
+                            [
+                                'handle' => 'pics',
+                                'field' => [
+                                    'type' => 'assets',
+                                    'container' => 'test_container',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'group_field' => [
+                'product' => 'hoff.jpg',
+                'pics' => ['hoff.jpg', 'norris.jpg', 'lee.jpg'],
+            ],
+        ]))->save();
+
+        $this->assertEquals('hoff.jpg', Arr::get($entry->data(), 'group_field.product'));
+        $this->assertEquals(['hoff.jpg', 'norris.jpg', 'lee.jpg'], Arr::get($entry->data(), 'group_field.pics'));
+
+        $this->assetNorris->path('content/norris.jpg')->save();
+        $this->assetHoff->delete();
+
+        $this->assertFalse(Arr::has($entry->fresh()->data(), 'group_field.product'));
+        $this->assertEquals(['content/norris.jpg', 'lee.jpg'], Arr::get($entry->fresh()->data(), 'group_field.pics'));
     }
 
     #[Test]
@@ -1800,6 +1852,19 @@ EOT;
         Facades\Entry::makePartial();
 
         $this->assetHoff->path('hoff-new.jpg')->save();
+    }
+
+    #[Test]
+    public function it_gets_items_from_a_hook()
+    {
+        UpdateAssetReferences::hook('additional', function () {
+            return LazyCollection::make(['additional-1', 'additional-2']);
+        });
+
+        $items = ((new UpdateAssetReferences)->getItemsContainingData())->all();
+
+        $this->assertContains('additional-1', $items);
+        $this->assertContains('additional-2', $items);
     }
 
     protected function setSingleBlueprint($namespace, $blueprintContents)

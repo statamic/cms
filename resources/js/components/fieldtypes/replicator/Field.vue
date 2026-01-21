@@ -159,7 +159,7 @@ export default {
         },
 
         shouldShowFieldActions() {
-            return !this.isInsideConfigFields && this.fieldActions.length > 0;
+            return !this.isInsideConfigFields && this.fieldActions?.length > 0;
         },
 
         fieldActions() {

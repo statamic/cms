@@ -90,6 +90,7 @@ class Users extends Relationship
                 'title' => $user->name(),
                 'id' => $id,
                 'edit_url' => $user->editUrl(),
+                'editable' => User::current()->can('edit', $user),
             ];
         }
 
@@ -227,5 +228,10 @@ class Users extends Relationship
     public function filter()
     {
         return new UserFilter($this);
+    }
+
+    public function relationshipQueryBuilder()
+    {
+        return User::query();
     }
 }

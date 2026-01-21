@@ -2,6 +2,7 @@
 
 namespace Statamic\Search;
 
+use Closure;
 use Statamic\Contracts\Search\Searchable;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -11,6 +12,7 @@ abstract class Index
     protected $name;
     protected $locale;
     protected $config;
+    protected static ?Closure $nameCallback = null;
 
     abstract public function search($query);
 
@@ -24,7 +26,10 @@ abstract class Index
 
     public function __construct($name, array $config, ?string $locale = null)
     {
-        $this->name = $locale ? $name.'_'.$locale : $name;
+        $this->name = static::$nameCallback
+            ? call_user_func(static::$nameCallback, $name, $locale)
+            : ($locale ? $name.'_'.$locale : $name);
+
         $this->config = $config;
         $this->locale = $locale;
     }
@@ -32,6 +37,11 @@ abstract class Index
     public function name()
     {
         return $this->name;
+    }
+
+    public static function resolveNameUsing(?Closure $callback)
+    {
+        static::$nameCallback = $callback;
     }
 
     public function title()

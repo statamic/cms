@@ -109,6 +109,9 @@
                     :text="__('Edit Entry')"
                     :redirect="branch.edit_url" />
                 <dropdown-item
+                    :text="__('Edit Nav Item')"
+                    @click="editPage(branch, vm, vm.store)" />
+                <dropdown-item
                     v-if="depth < maxDepth"
                     :text="__('Add child nav item')"
                     @click="linkPage(vm)" />
@@ -128,6 +131,7 @@
             ref="selector"
             :site="site"
             :collections="collections"
+            :query-scopes="entryQueryScopes"
             :max-items="maxPagesSelection"
             :can-select-across-sites="canSelectAcrossSites"
             @selected="entriesSelected"
@@ -205,7 +209,8 @@ export default {
         sites: { type: Array, required: true },
         blueprint: { type: Object, required: true },
         canEdit: { type: Boolean, required: true },
-        canSelectAcrossSites: { type: Boolean, required: true }
+        canSelectAcrossSites: { type: Boolean, required: true },
+        entryQueryScopes: { type: Array, default: () => [] },
     },
 
     data() {

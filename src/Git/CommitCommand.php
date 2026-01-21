@@ -6,6 +6,8 @@ use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\Git;
 
+use function Statamic\trans as __;
+
 class CommitCommand extends Command
 {
     use RunsInPlease;

@@ -50,13 +50,15 @@ class Cache
     public function handle($request, Closure $next)
     {
         if ($response = $this->attemptToServeCachedResponse($request)) {
-            return $response;
+            return $this->addEtagToResponse($request, $response);
         }
 
         $lock = $this->createLock($request);
 
         try {
-            return $lock->block($this->lockFor, fn () => $this->handleRequest($request, $next));
+            return $lock->block($this->lockFor,
+                fn () => $this->addEtagToResponse($request, $this->handleRequest($request, $next))
+            );
         } catch (LockTimeoutException $e) {
             return $this->outputRefreshResponse($request);
         }
@@ -184,6 +186,7 @@ class Cache
             $response->headers->has('X-Statamic-Draft')
             || $response->headers->has('X-Statamic-Private')
             || $response->headers->has('X-Statamic-Protected')
+            || $response->headers->has('X-Statamic-Uncacheable')
         ) {
             return false;
         }
@@ -227,5 +230,16 @@ class Cache
             : sprintf('<meta http-equiv="refresh" content="1; URL=\'%s\'" />', $request->getUri());
 
         return response($html, 503, ['Retry-After' => 1]);
+    }
+
+    private function addEtagToResponse($request, $response)
+    {
+        if (! $response->isRedirect() && $content = $response->getContent()) {
+            $response
+                ->setEtag(md5($content))
+                ->isNotModified($request);
+        }
+
+        return $response;
     }
 }

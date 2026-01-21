@@ -3,25 +3,22 @@
 namespace Tests\Search;
 
 use Mockery;
-use Statamic\Search\Algolia\Index;
-use Statamic\Search\ItemResolver;
+use Statamic\Search\Algolia\Index as AlgoliaIndex;
 use Tests\TestCase;
 
 class AlgoliaIndexTest extends TestCase
 {
     use IndexTests;
 
-    public function getIndex()
+    public function getIndexClass()
     {
-        $resolver = Mockery::mock(ItemResolver::class);
-        $resolver->shouldReceive('setIndex');
+        return AlgoliaIndex::class;
+    }
 
-        $client = Mockery::mock(\AlgoliaSearch\Client::class);
-        $index = Mockery::mock(\AlgoliaSearch\Index::class);
+    public function getIndex($name, $config, $locale)
+    {
+        $client = Mockery::mock(\Algolia\AlgoliaSearch\SearchClient::class);
 
-        $client->shouldReceive('initIndex')->andReturn($index);
-        $index->shouldReceive('search')->andReturn(['hits' => []]);
-
-        return new Index($resolver, $client);
+        return new AlgoliaIndex($client, $name, $config, $locale);
     }
 }

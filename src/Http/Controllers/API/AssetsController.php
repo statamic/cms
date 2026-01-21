@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\API;
 
 use Facades\Statamic\API\FilterAuthorizer;
+use Facades\Statamic\API\QueryScopeAuthorizer;
 use Statamic\Http\Resources\API\AssetResource;
 
 class AssetsController extends ApiController
@@ -22,7 +23,7 @@ class AssetsController extends ApiController
             ->filter->isRelationship()->keys()->all();
 
         return app(AssetResource::class)::collection(
-            $this->filterSortAndPaginate($assetContainer->queryAssets()->with($with))
+            $this->updateAndPaginate($assetContainer->queryAssets()->with($with))
         );
     }
 
@@ -36,5 +37,10 @@ class AssetsController extends ApiController
     protected function allowedFilters()
     {
         return FilterAuthorizer::allowedForSubResources('api', 'assets', $this->containerHandle);
+    }
+
+    protected function allowedQueryScopes()
+    {
+        return QueryScopeAuthorizer::allowedForSubResources('api', 'assets', $this->containerHandle);
     }
 }

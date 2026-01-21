@@ -16,8 +16,8 @@ jobs:
 
     strategy:
       matrix:
-        php: [8.1, 8.2, 8.3, 8.4]
-        laravel: [10.*, 11.*]
+        php: [8.1, 8.2, 8.3, 8.4, 8.5]
+        laravel: [10.*, 11.*, 12.*]
         stability: [prefer-lowest, prefer-stable]
         os: [ubuntu-latest]
         include:
@@ -32,8 +32,14 @@ jobs:
         exclude:
           - php: 8.1
             laravel: 11.*
+          - php: 8.1
+            laravel: 12.*
           - php: 8.4
             laravel: 10.*
+          - php: 8.5
+            laravel: 10.*
+          - php: 8.5
+            laravel: 11.*
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
@@ -43,7 +49,7 @@ jobs:
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v44
+        uses: tj-actions/changed-files@v46
         with:
           files: |
             config
@@ -103,7 +109,7 @@ jobs:
         run: vendor/bin/phpunit
 
   js-tests:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, '[ci skip]')"
 
     name: JavaScript tests
@@ -114,7 +120,7 @@ jobs:
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v44
+        uses: tj-actions/changed-files@v46
         with:
           files: |
             **/*.{js,vue,ts}
@@ -147,7 +153,7 @@ jobs:
 
   slack:
     name: Slack Notification
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     needs: [php-tests, js-tests]
     if: always()
     steps:

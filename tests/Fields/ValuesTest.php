@@ -148,6 +148,10 @@ class ValuesTest extends TestCase
             'charlie' => new Value('delta', null, $this->fieldtype),
         ]);
 
+        $this->assertTrue(isset($values->alfa));
+        $this->assertFalse(empty($values->alfa));
+        $this->assertFalse(isset($values->missing));
+        $this->assertTrue(empty($values->missing));
         $this->assertEquals('bravo', $values->alfa);
         $this->assertEquals('delta (augmented)', $values->charlie);
         $this->assertIsString($values->charlie);
@@ -180,6 +184,20 @@ class ValuesTest extends TestCase
         $this->assertEquals('delta', $values->raw('charlie'));
         $this->assertIsString($values->raw('charlie'));
         $this->assertNull($values->raw('missing'));
+    }
+
+    #[Test]
+    public function to_raw_array()
+    {
+        $values = new Values([
+            'alfa' => 'bravo',
+            'charlie' => $value = new Value('delta', null, $this->fieldtype),
+        ]);
+
+        $this->assertEquals([
+            'alfa' => 'bravo',
+            'charlie' => 'delta',
+        ], $values->toRawArray());
     }
 
     #[Test]
@@ -274,6 +292,7 @@ class FakeFieldtypeThatAugmentsToMockedBuilder extends Fieldtype
 class TestAugmentableObject implements Augmentable
 {
     use HasAugmentedData;
+
     protected $data = [];
 
     public function __construct($data)

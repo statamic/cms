@@ -310,7 +310,7 @@ abstract class Tree implements Contract, Localization
     {
         $parent = optional($this->find($entry)->parent());
 
-        if ($parent->id() === $target || $parent->isRoot() && is_null($target)) {
+        if ($parent->id() == $target || $parent->isRoot() && is_null($target)) {
             return $this;
         }
 
