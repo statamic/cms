@@ -22,6 +22,14 @@
     z-index: var(--z-index-max);
 }
 
+@utility st-overflow-clip-margin {
+    overflow-clip-margin: 1px;
+    /* As of 2026-01-08 Safari doesn't support overflow-clip-margin */
+    @supports not (overflow-clip-margin: 1px) {
+        padding-inline-start: 1px;
+    }
+}
+
 /* UTILITIES / TEXT
 =================================================== */
 /* Avoid prefixing things with `st-text-` (st for Statamic) because `text-` is a Tailwind prefix */
@@ -318,12 +326,14 @@
 =================================================== */
 @utility bg-checkerboard {
     --checkerboard-light: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%23f3f4f6'/%3E%3C/svg%3E");
-    --checkerboard-dark: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%231f2937'/%3E%3C/svg%3E");
+    --checkerboard-dark: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%23000000'/%3E%3C/svg%3E");
 
     position: relative;
     background-color: #fff;
 
     &::before {
+        /* e.g. Asset field > Grid Mode */
+        border-radius: inherit;
         content: '';
         position: absolute;
         inset: 0;

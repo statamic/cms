@@ -81,6 +81,10 @@
         transition: opacity calc(var(--starting-style-transition-duration) / 2);
     }
 
+    .starting-style-transition--slow {
+        transition: opacity calc(var(--starting-style-transition-duration) * 3);
+    }
+
     .starting-style-transition--delay {
         transition-delay: calc(var(--starting-style-transition-duration) * 5);
     }

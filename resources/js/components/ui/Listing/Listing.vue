@@ -580,6 +580,10 @@ function autoApplyFilters() {
 }
 
 function reordered(order) {
+	if (! props.items) {
+		items.value = order;
+	}
+
     emit('reordered', order);
 }
 
@@ -711,7 +715,7 @@ autoApplyState();
     </slot>
     <slot v-if="!initializing" :items="items" :is-column-visible="isColumnVisible" :loading="loading">
         <Presets v-if="showPresets" />
-        <div v-if="allowSearch || hasFilters || allowCustomizingColumns" class="relative overflow-clip flex items-center gap-2 sm:gap-3 min-h-16 starting-style-transition starting-style-transition--siblings" style="overflow-clip-margin: 1px;">
+        <div v-if="allowSearch || hasFilters || allowCustomizingColumns" class="relative overflow-clip flex items-center gap-2 sm:gap-3 min-h-16 starting-style-transition starting-style-transition--siblings st-overflow-clip-margin">
             <div class="flex flex-1 items-center gap-2 sm:gap-3 w-full">
                 <Search v-if="allowSearch" />
                 <Filters v-if="hasFilters" />

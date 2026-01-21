@@ -7,10 +7,13 @@
     }
     .tree-node {
         @apply dark:pb-0.25;
-        transition: opacity var(--starting-style-transition-duration);
-        transition-delay: calc(sibling-index() * var(--starting-style-sibling-delay));
-        @starting-style {
-            opacity: 0;
+        /* We only want to animate tree nodes on page load. We don't want to animate child nodes when toggling them open, less it looks glitchy and feels unresponsive. */
+        &:not(.page-tree--ready &) {
+            transition: opacity var(--starting-style-transition-duration);
+            transition-delay: calc(sibling-index() * var(--starting-style-sibling-delay));
+            @starting-style {
+                opacity: 0;
+            }
         }
     }
     .page-tree-branch {
@@ -46,7 +49,7 @@
 .nav-builder {
     background: none;
     .tree-node {
-        @apply bg-gray-200/45 dark:bg-gray-950;
+        @apply bg-gray-200/45 dark:bg-gray-950/35;
         .tree-node-inner {
             @apply px-1;
         }

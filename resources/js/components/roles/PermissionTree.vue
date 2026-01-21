@@ -1,15 +1,14 @@
 <template>
-    <div>
+    <div :style="`padding-inline-start: ${12 * depth - 12}px`">
         <template v-for="permission in permissions" :key="permission.value">
             <ui-checkbox
                 :class="[
                     permission.description
                         ? '[&_label]:font-medium pb-2.75'
-                        : '[&_label]:text-gray-950 dark:[&_label]:text-gray-200 pb-2.5'
+                        : '[&_label]:text-gray-925 dark:[&_label]:text-gray-200 pb-2.5'
                 ]"
                 :description="permission.description"
                 :label="permission.label"
-                :style="`padding-left: ${24 * depth - 24}px`"
                 :value="permission.value"
                 :modelValue="permission.checked"
                 @update:modelValue="updatePermission(permission, $event)"

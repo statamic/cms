@@ -13,15 +13,13 @@ import PortalVue from 'portal-vue';
 import FullscreenHeader from '@/components/publish/FullscreenHeader.vue';
 import Portal from '@/components/portals/Portal.vue';
 import PortalTargets from '@/components/portals/PortalTargets.vue';
+import {keys, portals, slug, stacks} from '@api';
 
 // Intercept Inertia navigation and log to Actions tab.
 router.on('before', (event) => {
   action('inertia navigate')(event.detail.visit.url);
   return false;
 });
-
-// const portals = markRaw(new Portals());
-// const stacks = new Stacks(portals);
 
 setup(async (app) => {
   window.__ = translate;
@@ -33,6 +31,11 @@ setup(async (app) => {
                   linkToDocs: true,
                   paginationSize: 50,
                   paginationSizeOptions: [10, 25, 50, 100, 500],
+                  sites: [{
+                      handle: 'default',
+                      lang: 'en',
+                  }],
+                  selectedSite: 'default',
               };
 
               return config[key] ?? null;
@@ -53,8 +56,10 @@ setup(async (app) => {
   app.config.globalProperties.__ = translate;
   app.config.globalProperties.$date = new DateFormatter;
   app.config.globalProperties.cp_url = (url) => url;
-  // app.config.globalProperties.$portals = portals;
-  // app.config.globalProperties.$stacks = stacks;
+  app.config.globalProperties.$portals = portals;
+  app.config.globalProperties.$stacks = stacks;
+  app.config.globalProperties.$slug = slug;
+  app.config.globalProperties.$keys = keys;
 
   app.use(PortalVue, { portalName: 'v-portal' });
 
@@ -129,7 +134,10 @@ const preview: Preview = {
                 }
             }
 
-            return story();
+            return {
+                components: { PortalTargets },
+                template: '<div><story /><PortalTargets /></div>',
+            };
         },
     ],
 };

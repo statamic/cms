@@ -24,7 +24,6 @@ class Currencies extends BasicDictionary
             ['code' => 'AZN', 'name' => __('statamic::dictionary-currencies.AZN'), 'symbol' => 'ман.', 'decimals' => 2],
             ['code' => 'BAM', 'name' => __('statamic::dictionary-currencies.BAM'), 'symbol' => 'KM', 'decimals' => 2],
             ['code' => 'BDT', 'name' => __('statamic::dictionary-currencies.BDT'), 'symbol' => '৳', 'decimals' => 2],
-            ['code' => 'BGN', 'name' => __('statamic::dictionary-currencies.BGN'), 'symbol' => 'лв.', 'decimals' => 2],
             ['code' => 'BHD', 'name' => __('statamic::dictionary-currencies.BHD'), 'symbol' => 'د.ب.‏', 'decimals' => 3],
             ['code' => 'BIF', 'name' => __('statamic::dictionary-currencies.BIF'), 'symbol' => 'FBu', 'decimals' => 0],
             ['code' => 'BND', 'name' => __('statamic::dictionary-currencies.BND'), 'symbol' => '$', 'decimals' => 2],

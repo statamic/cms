@@ -90,6 +90,8 @@ export default {
     },
 
     beforeUnmount() {
+		Statamic.$config.set('isFormBlueprint', false);
+
         this.$events.$off('root-form-save');
 
 		this.saveKeyBinding.destroy();

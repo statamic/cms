@@ -15,7 +15,9 @@ import UserDropdown from './UserDropdown.vue';
         <a class="c-skip-link z-(--z-index-above) px-4 py-2 bg-blue-800 text-sm top-2.5 left-2.25 fixed opacity-0 -translate-y-24 focus:translate-y-0 focus:opacity-100 rounded-md" href="#main-content">
             {{ __('Skip to content') }}
         </a>
-        <div class="dark flex items-center gap-2 text-[0.8125rem] text-white/85 w-full">
+        <div
+            class="dark flex items-center gap-3.5 [&:has(img)]:gap-3 text-[0.8125rem] text-white/85 w-full"
+        >
             <Logo />
             <Breadcrumbs />
         </div>
