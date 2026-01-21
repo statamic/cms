@@ -1,6 +1,6 @@
 <script setup>
 import Head from '@/pages/layout/Head.vue';
-import { Alert } from '@ui';
+import { Alert, Heading, Description } from '@ui';
 
 defineProps(['icons']);
 </script>
@@ -324,6 +324,31 @@ defineProps(['icons']);
                 <Alert variant="error">
                     <h4>Failed to Connect to Database</h4>
                     <p>Unable to establish a connection to the database server. Please check your database configuration in <code>.env</code> and ensure the database server is running.</p>
+                </Alert>
+                <hr class="my-10">
+                <Alert variant="default">
+                    <Heading>Using Heading Component</Heading>
+                    <Description>This alert uses the Heading and Description components instead of native HTML elements. The styles should match the variant colors.</Description>
+                </Alert>
+                <Alert variant="warning">
+                    <Heading size="lg">Warning: Action Required</Heading>
+                    <Description>This is a heading size <code>lg</code> example, a warning alert with a larger heading. The Heading component supports different sizes and should inherit the alert's color scheme.</Description>
+                </Alert>
+                <Alert variant="success">
+                    <Heading size="xl">Backup Completed Successfully</Heading>
+                    <Description>Your site backup has been created and saved to <a href="https://statamic.dev"><code>/storage/backups/site-2032-01-15.tar.gz</code></a>. The backup includes all content, assets, and configuration files.</Description>
+                </Alert>
+                <Alert variant="success">
+                    <Heading size="2xl">Backup Completed Very Successfully</Heading>
+                    <Description>I wouldn't recommend such a massive heading, but it's here for testing purposes. Your site backup has been created and saved to <a href="https://statamic.dev"><code>/storage/backups/site-2032-01-15.tar.gz</code></a>. The backup includes all content, assets, and configuration files.</Description>
+                </Alert>
+                <Alert variant="error">
+                    <Heading level="2">Database Connection Failed</Heading>
+                    <Description>This is a heading level <code>2</code> example, with no heading size difference. Unable to establish a connection to the database server. Please check your database configuration in <code>.env</code> and ensure the database server is running.</Description>
+                </Alert>
+                <Alert variant="warning">
+                    <Heading>Migration Required</Heading>
+                    <Description>The importer uses Laravel's job batching feature to keep track of the import progress, however, it requires a <code>job_batches</code> table in your database. Before you can run the importer, you will need to run <code>php artisan migrate</code>.</Description>
                 </Alert>
             </section>
 
