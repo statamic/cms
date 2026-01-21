@@ -1,5 +1,68 @@
 # Release Notes
 
+## 5.72.0 (2026-01-13)
+
+### What's new
+- Support query scopes in navigations [#13509](https://github.com/statamic/cms/issues/13509) by @el-schneider
+
+### What's fixed
+- Generate etag after nocache replacements [#13433](https://github.com/statamic/cms/issues/13433) by @mmodler
+- Support custom validation rules for asset containers [#13459](https://github.com/statamic/cms/issues/13459) by @duncanmcclean
+- Fix filterWhere with arrays [#13507](https://github.com/statamic/cms/issues/13507) by @aerni
+- Dutch translations [#13532](https://github.com/statamic/cms/issues/13532) by @laurenskr
+
+
+
+## 5.71.0 (2026-01-08)
+
+### What's new
+- PHP 8.5 Compatibility [#13112](https://github.com/statamic/cms/issues/13112) by @duncanmcclean
+- Add ability to get raw array directly from Values object [#13318](https://github.com/statamic/cms/issues/13318) by @andjsch
+- Make GetItemsContainingData hookable [#13302](https://github.com/statamic/cms/issues/13302) by @ryanmitchell
+
+### What's fixed
+- Fix structure not being saved to collection [#13479](https://github.com/statamic/cms/issues/13479) by @jasonvarga
+- Fix JsDriver::addToFormData call to match interface signature [#13463](https://github.com/statamic/cms/issues/13463) by @andrii-trush
+- Fix add set button not overlap content on small container [#13269](https://github.com/statamic/cms/issues/13269) by @lecoa
+- Terms Filter: Use `terms` fieldtype instead of `select` [#13439](https://github.com/statamic/cms/issues/13439) by @duncanmcclean
+- Fix blueprint cache [#13430](https://github.com/statamic/cms/issues/13430) by @aerni
+- Add `Nav::clearCachedUrls` expectation to `AddonTestCase` [#13396](https://github.com/statamic/cms/issues/13396) by @duncanmcclean
+- Remove "Bulgarian Lev" from Currencies dictionary [#13414](https://github.com/statamic/cms/issues/13414) by @duncanmcclean
+- Ensure field parent is set correctly [#13305](https://github.com/statamic/cms/issues/13305) by @aerni
+- Invalidate nav's URL cache when collection/taxonomy/etc is created [#13297](https://github.com/statamic/cms/issues/13297) by @duncanmcclean
+- Fix whereNotIn error with nulls [#13266](https://github.com/statamic/cms/issues/13266) by @jasonvarga
+- Fix `eloquent:import-users` command with computed values [#13260](https://github.com/statamic/cms/issues/13260) by @duncanmcclean
+- Fix page collection and mounted collection [#13250](https://github.com/statamic/cms/issues/13250) by @jasonvarga
+- French translations [#13300](https://github.com/statamic/cms/issues/13300) by @ebeauchamps
+- Bump validator from 13.15.20 to 13.15.22 [#13234](https://github.com/statamic/cms/issues/13234) by @dependabot
+- Bump qs from 6.11.1 to 6.14.1 [#13409](https://github.com/statamic/cms/issues/13409) by @dependabot
+
+
+
+## 5.70.0 (2025-12-03)
+
+### What's new
+- Pass original upload filename into `AssetUploaded` event [#11423](https://github.com/statamic/cms/issues/11423) by @daun
+- Allow statamic URLs to use fragments or query strings [#13085](https://github.com/statamic/cms/issues/13085) by @miicah
+- Add Glide Asset Cleared Event [#13004](https://github.com/statamic/cms/issues/13004) by @infabo
+
+### What's fixed
+- Performance Optimizations for Stache and Query Operations [#12894](https://github.com/statamic/cms/issues/12894) by @hastinbe
+- Avoid hardcoded nocache url in js [#13199](https://github.com/statamic/cms/issues/13199) by @JorisOrangeStudio
+- Fix nocache tag not replacing element correctly [#13177](https://github.com/statamic/cms/issues/13177) by @duncanmcclean
+- Date modifiers shouldn't return anything when value is empty [#13178](https://github.com/statamic/cms/issues/13178) by @duncanmcclean
+- Terms fieldtype: Only show "Allow Creating" option when using stack selector [#13151](https://github.com/statamic/cms/issues/13151) by @duncanmcclean
+- Ensure updated_at and updated_by is not null in TracksLastModified [#13099](https://github.com/statamic/cms/issues/13099) by @simonerd
+- Correct namespace in `FakesQueriesTest` [#13029](https://github.com/statamic/cms/issues/13029) by @duncanmcclean
+- Require url in nocache request [#12975](https://github.com/statamic/cms/issues/12975) by @Jade-GG
+- Fix HTML entities in currency translations [#12982](https://github.com/statamic/cms/issues/12982) by @duncanmcclean
+- Fix failing tests due to lowercase `utf-8` charset [#13213](https://github.com/statamic/cms/issues/13213) by @duncanmcclean
+- French translations [#13136](https://github.com/statamic/cms/issues/13136) by @ebeauchamps
+- Bump lowest composer constraints [#13037](https://github.com/statamic/cms/issues/13037) by @jasonvarga
+- Bump js-yaml from 3.14.1 to 3.14.2 [#13097](https://github.com/statamic/cms/issues/13097) by @dependabot
+
+
+
 ## 5.69.0 (2025-11-06)
 
 ### What's new

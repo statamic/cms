@@ -88,6 +88,9 @@ class Terms extends Relationship
                         'instructions' => __('statamic::fieldtypes.terms.config.create'),
                         'type' => 'toggle',
                         'default' => true,
+                        'if' => [
+                            'mode' => 'default',
+                        ],
                     ],
                     'taxonomies' => [
                         'display' => __('Taxonomies'),
