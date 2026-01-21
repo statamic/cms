@@ -49,6 +49,7 @@
         h1 {
             font-size: var(--font-size-4xl);
             line-height: var(--font-size-4xl-line-height);
+            margin-block-end: 1.35rem;
         }
 
         h2 {
