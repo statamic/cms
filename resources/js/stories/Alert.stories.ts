@@ -1,5 +1,5 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {Alert} from '@ui';
+import {Alert, Heading, Description} from '@ui';
 import {icons} from './icons';
 
 const meta = {
@@ -160,6 +160,22 @@ const richContentCode = `
         <h4>Failed to Connect to Database</h4>
         <p>Unable to establish a connection to the database server. Please check your database configuration in <code>.env</code> and ensure the database server is running.</p>
     </Alert>
+    <Alert variant="default">
+        <Heading>Base Size (default)</Heading>
+        <Description>This heading uses the default base size with Heading and Description components.</Description>
+    </Alert>
+    <Alert variant="warning">
+        <Heading size="lg">Large Size</Heading>
+        <Description>Here's an example of a larger heading with Heading and Description components. The Alert component automatically adjusts spacing for larger headings.</Description>
+    </Alert>
+    <Alert variant="success">
+        <Heading size="xl">Extra Large Size</Heading>
+        <Description>Here's an example of an extra large heading with Heading and Description components.</Description>
+    </Alert>
+    <Alert variant="success">
+        <Heading size="2xl">2XL Size</Heading>
+        <Description>Here's an example of the largest heading size with Heading and Description components. Note the adjusted spacing for larger headings.</Description>
+    </Alert>
 </div>
 `;
 
@@ -181,6 +197,22 @@ const richContentTemplate = `
         <h4>Failed to Connect to Database</h4>
         <p>Unable to establish a connection to the database server. Please check your database configuration in <code>.env</code> and ensure the database server is running.</p>
     </Alert>
+    <Alert variant="default">
+        <Heading>Base Size (default)</Heading>
+        <Description>This heading uses the default base size with Heading and Description components.</Description>
+    </Alert>
+    <Alert variant="warning">
+        <Heading size="lg">Large Size</Heading>
+        <Description>Here's an example of a larger heading with Heading and Description components. The Alert component automatically adjusts spacing for larger headings.</Description>
+    </Alert>
+    <Alert variant="success">
+        <Heading size="xl">Extra Large Size</Heading>
+        <Description>Here's an example of an extra large heading with Heading and Description components.</Description>
+    </Alert>
+    <Alert variant="success">
+        <Heading size="2xl">2XL Size</Heading>
+        <Description>Here's an example of the largest heading size with Heading and Description components. Note the adjusted spacing for larger headings.</Description>
+    </Alert>
 </div>
 `;
 
@@ -188,16 +220,20 @@ export const RichContent: Story = {
     argTypes: {
         text: { control: { disable: true } },
         variant: { control: { disable: true } },
+        icon: { control: { disable: true } },
     },
     parameters: {
         docs: {
+            description: {
+                story: 'The Alert component supports both native HTML elements (h1-h6, p) and the Heading/Description components. Heading components support different sizes: `base`, `lg`, `xl`, and `2xl`. The Alert component automatically adjusts spacing for larger headings and both approaches receive consistent styling and color inheritance.',
+            },
             source: {
                 code: richContentCode,
             },
         },
     },
     render: () => ({
-        components: { Alert },
+        components: { Alert, Heading, Description },
         template: richContentTemplate,
     }),
 };
@@ -222,3 +258,52 @@ export const Success: Story = {
         variant: 'success',
     },
 };
+
+const headingAndDescriptionCode = `
+<div class="space-y-3">
+    <Alert variant="default">
+        <Heading>Using Heading Component</Heading>
+        <Description>This alert uses the Heading and Description components instead of native HTML elements.</Description>
+    </Alert>
+    <Alert variant="warning">
+        <Heading size="lg">Warning: Action Required</Heading>
+        <Description>This is a warning alert with a larger heading with Heading and Description components. The Heading component supports different sizes and inherits the alert's color scheme.</Description>
+    </Alert>
+    <Alert variant="success">
+        <Heading size="xl">Backup Completed Successfully</Heading>
+        <Description>This is an extra large heading with Heading and Description components. Your site backup has been created and saved to <code>/storage/backups/site-2032-01-15.tar.gz</code>. The backup includes all content, assets, and configuration files.</Description>
+    </Alert>
+    <Alert variant="error">
+        <Heading level="2">Database Connection Failed</Heading>
+        <Description>This is a heading level <code>2</code> example, with no heading size difference. Unable to establish a connection to the database server. Please check your database configuration in <code>.env</code> and ensure the database server is running.</Description>
+    </Alert>
+    <Alert variant="warning">
+        <Heading icon="warning-diamond">Migration Required</Heading>
+        <Description>This is a heading with an icon with Heading and Description components. The importer uses Laravel's job batching feature to keep track of the import progress, however, it requires a <code>job_batches</code> table in your database. Before you can run the importer, you will need to run <code>php artisan migrate</code>.</Description>
+    </Alert>
+</div>
+`;
+
+export const WithHeadingAndDescription: Story = {
+    tags: ['!dev'],
+    argTypes: {
+        text: { control: { disable: true } },
+        variant: { control: { disable: true } },
+        icon: { control: { disable: true } },
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: 'The Alert component fully supports the Heading and Description components. When used together, they automatically inherit the Alert\'s variant colors and receive proper spacing and typography styles. This provides a consistent API whether you use native HTML elements (h1-h6, p) or the Heading/Description components.',
+            },
+            source: {
+                code: headingAndDescriptionCode,
+            },
+        },
+    },
+    render: () => ({
+        components: { Alert, Heading, Description },
+        template: headingAndDescriptionCode,
+    }),
+};
+

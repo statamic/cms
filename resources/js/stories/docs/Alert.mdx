@@ -24,7 +24,9 @@ Instead of using the `text` prop, you can use the default slot to provide custom
 <Canvas of={AlertStories.SlotContent} sourceState={'shown'} />
 
 ## Rich Content
-Alerts support rich content including headings, paragraphs, and code snippets, making them ideal for detailed messages and instructions. All heading levels (h1–h6) are styled identically, so choose the heading level that's semantically appropriate for your content.
+Alerts support rich content including headings, paragraphs, and code snippets, making them ideal for detailed messages and instructions. You can use either native HTML elements (h1–h6, p) or the Heading/Description components—both approaches receive consistent styling and color inheritance.
+
+All heading levels (h1–h6) are styled identically, so choose the heading level that's semantically appropriate for your content. If you want to adjust the size of the headings, you can use the Heading component and specify a size (`base`, `lg`, `xl`, or `2xl`). The Alert component automatically adjusts spacing for larger headings.
 
 <Canvas of={AlertStories.RichContent} sourceState={'shown'} />
 
