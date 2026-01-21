@@ -340,7 +340,7 @@ defineProps(['icons']);
                 </Alert>
                 <Alert variant="success">
                     <Heading size="2xl">Backup Completed Very Successfully</Heading>
-                    <Description>I wouldn't recommend such a massive heading, but it's here for testing purposes. Your site backup has been created and saved to <a href="https://statamic.dev"><code>/storage/backups/site-2032-01-15.tar.gz</code></a>. The backup includes all content, assets, and configuration files.</Description>
+                    <Description>Such a massive heading isn't recommended, but here it is for testing purposes. Your site backup has been created and saved to <a href="https://statamic.dev"><code>/storage/backups/site-2032-01-15.tar.gz</code></a>. The backup includes all content, assets, and configuration files.</Description>
                 </Alert>
                 <Alert variant="error">
                     <Heading level="2">Database Connection Failed</Heading>

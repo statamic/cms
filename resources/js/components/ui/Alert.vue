@@ -34,6 +34,8 @@ const alertClasses = computed(() => {
             '[&_h5]:mb-1 [&_h5]:font-bold',
             '[&_h6]:mb-1 [&_h6]:font-bold',
             '[&_[data-ui-heading]]:mb-1 [&_[data-ui-heading]]:font-bold',
+            '[&_[data-ui-heading].text-lg]:-mt-1',
+            '[&_[data-ui-heading].text-2xl]:mt-[-0.45rem] [&_[data-ui-heading].text-2xl]:mb-2',
             '[&_p:not(:last-child)]:mb-3',
             '[&_[data-ui-description]:not(:last-child)]:mb-3',
             '[&_code]:px-0.75 [&_code]:mx-0.5 [&_code]:py-0.5 [&_code]:rounded-sm [&_code]:text-xs',
