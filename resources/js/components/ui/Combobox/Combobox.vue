@@ -150,7 +150,7 @@ const selectedOption = computed(() => {
 
 const getOptionLabel = (option) => option?.[props.optionLabel];
 const getOptionValue = (option) => option?.[props.optionValue];
-const isSelected = (option) => selectedOptions.value.filter((item) => getOptionValue(item) === getOptionValue(option)).length > 0;
+const isSelected = (option) => selectedOptions.value.some((item) => getOptionValue(item) === getOptionValue(option));
 
 const isOptionDisabled = (option) => {
     if (isSelected(option)) return false;
