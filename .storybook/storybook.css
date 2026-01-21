@@ -90,9 +90,82 @@
 /* GROUP CODE BLOCKS
 =================================================== */
 .sbdocs {
+    /* Olaolu Palenight theme */
+    pre[class*="language-"],
+    code[class*="language-"],
     .prismjs {
         font-size: 0.9rem;
         line-height: 1.5;
+        background: #292D3E !important; /* Palenight dark bluish-gray background */
+        color: #A6ACCD !important; /* Soft off-white foreground */
+        border-radius: 8px;
+        padding: 1em;
+        overflow: auto;
+    }
+
+    /* Syntax highlighting colors - Olaolu Palenight theme */
+    .prismjs .token.comment,
+    .prismjs .token.prolog,
+    .prismjs .token.doctype,
+    .prismjs .token.cdata {
+        color: #676E95 !important; /* Muted purple-gray for comments */
+        font-style: italic;
+    }
+
+    .prismjs .token.punctuation {
+        color: #ABB2BF !important;
+    }
+
+    .prismjs .token.property,
+    .prismjs .token.tag,
+    .prismjs .token.constant,
+    .prismjs .token.symbol,
+    .prismjs .token.deleted {
+        color: #C792EA !important; /* Pale yellow-green / lilac */
+    }
+
+    .prismjs .token.boolean,
+    .prismjs .token.number {
+        color: #F78C6C !important; /* Light turquoise / coral for numbers */
+    }
+
+    .prismjs .token.selector,
+    .prismjs .token.attr-name,
+    .prismjs .token.string,
+    .prismjs .token.char,
+    .prismjs .token.builtin,
+    .prismjs .token.inserted {
+        color: #C3E88D !important; /* Warm gold / amber for strings */
+    }
+
+    .prismjs .token.operator,
+    .prismjs .token.entity,
+    .prismjs .token.url,
+    .prismjs .language-css .token.string,
+    .prismjs .style .token.string {
+        color: #89DDFF !important; /* Bright blue for operators */
+    }
+
+    .prismjs .token.atrule,
+    .prismjs .token.attr-value,
+    .prismjs .token.keyword {
+        color: #C792EA !important; /* Pale yellow-green / lilac for keywords */
+    }
+
+    .prismjs .token.function,
+    .prismjs .token.class-name {
+        color: #82AAFF !important; /* Soft blue for functions */
+    }
+
+    .prismjs .token.regex,
+    .prismjs .token.important,
+    .prismjs .token.variable {
+        color: #EEDDAE !important; /* Light purple-pink for variables */
+    }
+
+    .prismjs .token.type,
+    .prismjs .token.type-name {
+        color: #FFCB6B !important; /* Light peach / coral for types */
     }
 
     .docblock-code-toggle {
