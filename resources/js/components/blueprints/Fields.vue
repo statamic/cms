@@ -50,6 +50,8 @@
             @closed="pendingCreatedField = null"
             v-slot="{ close }"
             inset
+            :show-close-button="false"
+            :wrap-slot="false"
         >
             <field-settings
                 ref="settings"
@@ -134,7 +136,7 @@ export default {
                 },
             };
 
-            setTimeout(() => (this.pendingCreatedField = pending), 500); // wait for stack to close
+            this.pendingCreatedField = pending;
         },
 
         createField() {
