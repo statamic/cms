@@ -131,7 +131,7 @@
 
     /* HTML/JSX tags - orange color for tag names */
     .prismjs .token.tag {
-        color: #e5c07b !important; /* Orange/yellow for tag names like ui-card */
+        color: #ffcb8b !important; /* Orange/yellow for tag names like ui-card */
     }
 
     /* HTML/JSX tag punctuation (< > /) - should match tag color */
