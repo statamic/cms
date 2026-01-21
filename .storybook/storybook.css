@@ -134,12 +134,16 @@
         color: #f07178 !important;
     }
 
+    /* HTML/JSX tag punctuation (< > /) - should match tag color */
     .prismjs .token.tag .token.punctuation,
     .prismjs .token.tag + .token.punctuation,
     .prismjs .language-markup .token.punctuation,
     .prismjs .language-html .token.punctuation,
-    .prismjs .language-jsx .token.tag .token.punctuation {
-        color: #89ddff !important;
+    .prismjs .language-jsx .token.tag .token.punctuation,
+    .prismjs .language-jsx .token.punctuation:has(+ .token.tag),
+    .prismjs pre[class*="language-jsx"] .token.punctuation:first-child,
+    .prismjs pre[class*="language-html"] .token.punctuation:first-child {
+        color: #f07178 !important; /* Match tag color for < and > */
     }
 
     /* Attribute names and namespaces */
