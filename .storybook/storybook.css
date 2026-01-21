@@ -129,9 +129,9 @@
         cursor: help;
     }
 
-    /* HTML/JSX tags */
+    /* HTML/JSX tags - orange color for tag names */
     .prismjs .token.tag {
-        color: #f07178 !important;
+        color: #e5c07b !important; /* Orange/yellow for tag names like ui-card */
     }
 
     /* HTML/JSX tag punctuation (< > /) - should match tag color */
@@ -143,13 +143,13 @@
     .prismjs .language-jsx .token.punctuation:has(+ .token.tag),
     .prismjs pre[class*="language-jsx"] .token.punctuation:first-child,
     .prismjs pre[class*="language-html"] .token.punctuation:first-child {
-        color: #f07178 !important; /* Match tag color for < and > */
+        color: #89DDFF !important; /* Match tag color for < and > */
     }
 
     /* Attribute names and namespaces */
     .prismjs .token.attr-name,
     .prismjs .token.namespace {
-        color: #bb80b3 !important;
+        color: #c792ea !important;
     }
 
     /* Attribute values */
