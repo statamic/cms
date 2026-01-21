@@ -251,6 +251,12 @@ function updateDropdownOpen(open) {
 function measureOptionWidths() {
     if (!filteredOptions.value || filteredOptions.value.length === 0) return;
 
+    // Find the options with the longest labels by character count.
+    // We only measure these candidates rather than all options for performance.
+    const candidates = [...filteredOptions.value]
+        .sort((a, b) => (getOptionLabel(b)?.length || 0) - (getOptionLabel(a)?.length || 0))
+        .slice(0, 5);
+
     let maxWidth = 0;
     const measurementCanvas = document.createElement('canvas');
     const context = measurementCanvas.getContext('2d');
@@ -259,8 +265,7 @@ function measureOptionWidths() {
     // This matches the itemClasses styling
     context.font = '14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
-    // Measure all options to find the widest
-    filteredOptions.value.forEach(option => {
+    candidates.forEach(option => {
         const label = getOptionLabel(option);
         const metrics = context.measureText(label);
         const textWidth = metrics.width;
