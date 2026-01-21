@@ -103,83 +103,171 @@
         overflow: auto;
     }
 
-    /* Syntax highlighting colors - Olaolu Palenight theme */
+    /* Comprehensive Olaolu Palenight theme - based on official Material Palenight */
+    
+    /* Comments and documentation */
     .prismjs .token.comment,
+    .prismjs .token.block-comment,
     .prismjs .token.prolog,
     .prismjs .token.doctype,
     .prismjs .token.cdata {
-        color: #676E95 !important; /* Muted purple-gray for comments */
+        color: #676e95 !important;
         font-style: italic;
     }
 
-    /* General punctuation */
+    /* Punctuation and operators */
     .prismjs .token.punctuation {
-        color: #89DDFF !important; /* Bright blue for operators/punctuation */
+        color: #89ddff !important;
     }
 
-    /* HTML/JSX tag names - Palenight uses reddish-pink */
+    .prismjs .token.operator {
+        color: #89ddff !important;
+    }
+
+    .prismjs .token.entity {
+        color: #89ddff !important;
+        cursor: help;
+    }
+
+    /* HTML/JSX tags */
     .prismjs .token.tag {
-        color: #F07178 !important; /* Reddish-pink for tag names */
+        color: #f07178 !important;
     }
 
-    /* HTML/JSX tag punctuation (< > /) - should be visible and match theme */
     .prismjs .token.tag .token.punctuation,
     .prismjs .token.tag + .token.punctuation,
     .prismjs .language-markup .token.punctuation,
     .prismjs .language-html .token.punctuation,
-    .prismjs .language-jsx .token.punctuation {
-        color: #89DDFF !important; /* Bright blue for < and > brackets */
+    .prismjs .language-jsx .token.tag .token.punctuation {
+        color: #89ddff !important;
     }
 
+    /* Attribute names and namespaces */
+    .prismjs .token.attr-name,
+    .prismjs .token.namespace {
+        color: #bb80b3 !important;
+    }
+
+    /* Attribute values */
+    .prismjs .token.attr-value {
+        color: #c3e88d !important;
+    }
+
+    /* Functions and method names */
+    .prismjs .token.function,
+    .prismjs .token.function-name {
+        color: #82aaff !important;
+    }
+
+    /* Numbers, booleans, units, URLs */
+    .prismjs .token.number,
+    .prismjs .token.boolean,
+    .prismjs .token.unit,
+    .prismjs .token.url {
+        color: #f78c6c !important;
+    }
+
+    /* Colors and hex codes */
+    .prismjs .token.color,
+    .prismjs .token.hexcode {
+        color: #ffcb6b !important;
+    }
+
+    /* Properties, constants, symbols, built-ins */
     .prismjs .token.property,
     .prismjs .token.constant,
     .prismjs .token.symbol,
-    .prismjs .token.deleted {
-        color: #C792EA !important; /* Pale yellow-green / lilac */
+    .prismjs .token.builtin {
+        color: #ffcb6b !important;
     }
 
-    .prismjs .token.boolean,
-    .prismjs .token.number {
-        color: #F78C6C !important; /* Light turquoise / coral for numbers */
+    /* Classes and class names */
+    .prismjs .token.class,
+    .prismjs .token.class-name {
+        color: #ffcb6b !important;
+    }
+
+    /* Keywords, selectors, IDs, atrules */
+    .prismjs .token.keyword {
+        color: #c792ea !important;
     }
 
     .prismjs .token.selector,
-    .prismjs .token.attr-name,
+    .prismjs .token.id,
+    .prismjs .token.atrule {
+        color: #c792ea !important;
+    }
+
+    .prismjs .token.important {
+        color: #c792ea !important;
+        font-weight: bold;
+    }
+
+    /* Strings, characters, attributes, variables */
     .prismjs .token.string,
-    .prismjs .token.char,
-    .prismjs .token.builtin,
-    .prismjs .token.inserted {
-        color: #C3E88D !important; /* Warm gold / amber for strings */
+    .prismjs .token.char {
+        color: #c3e88d !important;
     }
 
-    .prismjs .token.operator,
-    .prismjs .token.entity,
-    .prismjs .token.url,
-    .prismjs .language-css .token.string,
-    .prismjs .style .token.string {
-        color: #89DDFF !important; /* Bright blue for operators */
+    .prismjs .token.attribute,
+    .prismjs .token.attr-value {
+        color: #c3e88d !important;
     }
 
-    .prismjs .token.atrule,
-    .prismjs .token.attr-value,
-    .prismjs .token.keyword {
-        color: #C792EA !important; /* Pale yellow-green / lilac for keywords */
-    }
-
-    .prismjs .token.function,
-    .prismjs .token.class-name {
-        color: #82AAFF !important; /* Soft blue for functions */
-    }
-
-    .prismjs .token.regex,
-    .prismjs .token.important,
     .prismjs .token.variable {
-        color: #EEDDAE !important; /* Light purple-pink for variables */
+        color: #c3e88d !important;
     }
 
+    /* Pseudo-classes and pseudo-elements */
+    .prismjs .token.pseudo-class,
+    .prismjs .token.pseudo-element {
+        color: #c3e88d !important;
+    }
+
+    /* Inserted content */
+    .prismjs .token.inserted {
+        color: #c3e88d !important;
+    }
+
+    /* Regular expressions */
+    .prismjs .token.regex {
+        color: #c3e88d !important;
+    }
+
+    /* Parameters */
+    .prismjs .token.parameter {
+        color: #ff5370 !important;
+    }
+
+    /* Deleted content */
+    .prismjs .token.deleted {
+        color: #ff5370 !important;
+    }
+
+    /* Types and type names */
     .prismjs .token.type,
     .prismjs .token.type-name {
-        color: #FFCB6B !important; /* Light peach / coral for types */
+        color: #ffcb6b !important;
+    }
+
+    /* Bold and italic tokens */
+    .prismjs .token.bold {
+        font-weight: bold !important;
+    }
+
+    .prismjs .token.italic {
+        font-style: italic !important;
+    }
+
+    /* JavaScript/TypeScript specific */
+    .prismjs .token.script.language-javascript {
+        color: #a6accd !important;
+    }
+
+    /* Language-specific overrides */
+    .prismjs .language-css .token.string,
+    .prismjs .style .token.string {
+        color: #89ddff !important;
     }
 
     .docblock-code-toggle {
