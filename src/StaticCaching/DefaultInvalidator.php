@@ -289,7 +289,7 @@ class DefaultInvalidator implements Invalidator
                 if (Str::contains($rule, '{{')) {
                     $identifiers = Antlers::identifiers($rule);
 
-                    return collect($identifiers)->intersect($context)->isNotEmpty();
+                    return collect($context)->keys()->intersect($identifiers)->isNotEmpty();
                 }
 
                 return true;
