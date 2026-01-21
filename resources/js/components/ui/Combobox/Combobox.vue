@@ -196,10 +196,8 @@ const filteredOptions = computed(() => {
         return props.options;
     }
 
-    const options = JSON.parse(JSON.stringify(props.options));
-
     const results = fuzzysort
-        .go(searchQuery.value, options, {
+        .go(searchQuery.value, props.options, {
             all: true,
             key: props.optionLabel,
         })
