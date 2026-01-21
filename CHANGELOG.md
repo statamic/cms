@@ -1,5 +1,21 @@
 # Release Notes
 
+## 5.73.0 (2026-01-21)
+
+### What's new
+- Allow config values to be used in forms [#11403](https://github.com/statamic/cms/issues/11403) by @FrittenKeeZ
+- Allow closure in cascade content hydration [#13580](https://github.com/statamic/cms/issues/13580) by @marcorieser
+
+### What's fixed
+- `AssetContainer::accessible()` should take filesystem visibility into account [#13621](https://github.com/statamic/cms/issues/13621) by @duncanmcclean
+- Augment appended form config fields for Antlers [#13111](https://github.com/statamic/cms/issues/13111) by @marcorieser
+- Fix error from `DefaultInvalidator` when creating a nav [#13596](https://github.com/statamic/cms/issues/13596) by @duncanmcclean
+- Prevent redirect when creating term via fieldtype [#13595](https://github.com/statamic/cms/issues/13595) by @duncanmcclean
+- Handle null value gracefully [#13598](https://github.com/statamic/cms/issues/13598) by @aerni
+- Fix existing field validation with prefixed fieldset imports [#13551](https://github.com/statamic/cms/issues/13551) by @duncanmcclean
+
+
+
 ## 5.72.0 (2026-01-13)
 
 ### What's new
