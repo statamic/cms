@@ -26,14 +26,16 @@ const ariaLive = computed(() => {
 const alertClasses = computed(() => {
     return cva({
         base: [
-            'relative flex items-start gap-3 rounded-xl border p-4 [&:has(p)]:py-5 [&:has(p)]:pb-6 text-sm',
+            'relative flex items-start gap-3 rounded-xl border p-4 [&:has(p)]:py-5 [&:has(p)]:pb-6 [&:has([data-ui-description])]:py-5 [&:has([data-ui-description])]:pb-6 text-sm',
             '[&_h1]:mb-1 [&_h1]:font-bold',
             '[&_h2]:mb-1 [&_h2]:font-bold',
             '[&_h3]:mb-1 [&_h3]:font-bold',
             '[&_h4]:mb-1 [&_h4]:font-bold',
             '[&_h5]:mb-1 [&_h5]:font-bold',
             '[&_h6]:mb-1 [&_h6]:font-bold',
+            '[&_[data-ui-heading]]:mb-1 [&_[data-ui-heading]]:font-bold',
             '[&_p:not(:last-child)]:mb-3',
+            '[&_[data-ui-description]:not(:last-child)]:mb-3',
             '[&_code]:px-0.75 [&_code]:mx-0.5 [&_code]:py-0.5 [&_code]:rounded-sm [&_code]:text-xs',
         ].join(' '),
         variants: {
@@ -41,18 +43,26 @@ const alertClasses = computed(() => {
                 default: [
                     'bg-gray-50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-700/80 text-gray-900 dark:text-gray-100',
                     '[&_code]:bg-gray-200! [&_code]:text-gray-800! dark:[&_code]:bg-gray-800! dark:[&_code]:text-gray-200!',
+                    '[&_[data-ui-heading]]:text-gray-900! dark:[&_[data-ui-heading]]:text-gray-100!',
+                    '[&_[data-ui-description]]:text-gray-700! dark:[&_[data-ui-description]]:text-gray-300!',
                 ],
                 warning: [
                     'bg-amber-50 dark:bg-amber-300/6 border-amber-200 dark:border-amber-400/25 text-amber-800 dark:text-amber-300',
                     '[&_code]:bg-amber-200/50! [&_code]:text-amber-800! dark:[&_code]:bg-amber-300/8! dark:[&_code]:text-amber-200!',
+                    '[&_[data-ui-heading]]:text-amber-800! dark:[&_[data-ui-heading]]:text-amber-300!',
+                    '[&_[data-ui-description]]:text-amber-700! dark:[&_[data-ui-description]]:text-amber-200!',
                 ],
                 error: [
                     'bg-red-50 dark:bg-red-300/6 border-red-200 dark:border-red-400/25 text-red-800 dark:text-red-300',
                     '[&_code]:bg-red-200/50! [&_code]:text-red-800! dark:[&_code]:bg-red-300/8! dark:[&_code]:text-red-200!',
+                    '[&_[data-ui-heading]]:text-red-800! dark:[&_[data-ui-heading]]:text-red-300!',
+                    '[&_[data-ui-description]]:text-red-700! dark:[&_[data-ui-description]]:text-red-200!',
                 ],
                 success: [
                     'bg-emerald-50 dark:bg-emerald-300/6 border-emerald-200 dark:border-emerald-400/25 text-emerald-800 dark:text-emerald-300',
                     '[&_code]:bg-emerald-200/50! [&_code]:text-emerald-800! dark:[&_code]:bg-emerald-300/8! dark:[&_code]:text-emerald-200!',
+                    '[&_[data-ui-heading]]:text-emerald-800! dark:[&_[data-ui-heading]]:text-emerald-300!',
+                    '[&_[data-ui-description]]:text-emerald-700! dark:[&_[data-ui-description]]:text-emerald-200!',
                 ],
             },
         },
