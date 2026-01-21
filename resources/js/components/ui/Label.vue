@@ -18,7 +18,7 @@ const props = defineProps({
 
 <template>
     <label
-        class="flex justify-between mb-1.5 text-sm font-medium [&_button]:font-medium text-gray-950 select-none dark:text-gray-300"
+        class="flex justify-between mb-1.5 text-sm font-medium [&_button]:font-medium text-gray-925 select-none dark:text-gray-300"
         data-ui-label
         :for="for"
     >

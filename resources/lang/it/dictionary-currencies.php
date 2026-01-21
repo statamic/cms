@@ -10,7 +10,6 @@ return [
     'AZN' => 'Manat azero',
     'BAM' => 'Marco convertibile della Bosnia-Erzegovina',
     'BDT' => 'Taka del Bangladesh',
-    'BGN' => 'Lev bulgaro',
     'BHD' => 'Dinaro del Bahrein',
     'BIF' => 'Franco del Burundi',
     'BND' => 'Dollaro del Brunei',

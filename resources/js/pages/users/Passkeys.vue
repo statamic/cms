@@ -4,8 +4,7 @@ import { startRegistration, browserSupportsWebAuthn } from '@simplewebauthn/brow
 import { router } from '@inertiajs/vue3';
 import axios from 'axios'
 import Head from '@/pages/layout/Head.vue';
-import { Header, Button, EmptyStateMenu, EmptyStateItem, Listing, DropdownItem, Modal, Input, ModalClose, Field } from '@ui';
-import ConfirmationModal from '@/components/modals/ConfirmationModal.vue';
+import { Header, Button, EmptyStateMenu, EmptyStateItem, Listing, DropdownItem, Modal, ConfirmationModal, Input, ModalClose, Field } from '@ui';
 import { toggleArchitecturalBackground } from '@/pages/layout/architectural-background.js';
 
 const props = defineProps([
@@ -132,11 +131,12 @@ function handleAxiosError(e) {
     </EmptyStateMenu>
 
     <ConfirmationModal
-        v-model:open="showErrorModal"
+        :open="showErrorModal"
         :title="__('There was an error creating your passkey')"
         :body-text="error"
         :cancellable="false"
         :button-text="__('OK')"
+        @update:open="error = null"
     />
 
     <Modal

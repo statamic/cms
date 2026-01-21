@@ -82,6 +82,7 @@
         @clicked-away="$emit('clicked-away', $event)"
         @update:open="isOpen = $event"
         class="set-picker select-none w-72"
+        data-set-picker-popover
         inset
     >
         <template #trigger>
@@ -173,6 +174,12 @@
         </template>
     </ui-popover>
 </template>
+
+<style>
+body:has(:is(.bard-fullscreen, .replicator-fullscreen)) [data-reka-popper-content-wrapper] {
+	z-index: var(--z-index-portal) !important;
+}
+</style>
 
 <script>
 import { Primitive } from 'reka-ui';
