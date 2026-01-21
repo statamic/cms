@@ -1,11 +1,13 @@
 <script setup>
 import { computed } from 'vue';
 import { cva } from 'cva';
-import Icon from './Icon/Icon.vue';
+import { Icon, Heading, Description } from '@ui';
 
 const props = defineProps({
     /** The alert message to display */
     text: { type: [String, Number, Boolean, null], default: null },
+    /** The alert heading to display */
+    heading: { type: [String, null], default: null },
     /** Controls the appearance of the alert. <br><br> Options: `default`, `warning`, `error`, `success` */
     variant: { type: String, default: 'default' },
     /** Icon name to display. [Browse available icons](/?path=/story/components-icon--all-icons) */
@@ -74,7 +76,7 @@ const alertClasses = computed(() => {
 
 const defaultIcon = computed(() => {
     if (props.icon) return props.icon;
-    
+
     switch (props.variant) {
         case 'warning':
             return 'warning-diamond';
@@ -104,7 +106,8 @@ const defaultIcon = computed(() => {
         />
         <div class="flex-1 min-w-0">
             <slot>
-                <span v-html="text" />
+                <Heading v-if="heading" :text="heading" />
+                <Description :text="text" />
             </slot>
         </div>
     </div>

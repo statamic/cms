@@ -18,8 +18,13 @@ You can override the default icon by passing a custom `icon` prop with the name 
 
 <Canvas of={AlertStories.CustomIcons} sourceState={'shown'} />
 
+## Headings
+You can use the `heading` prop to prepend a heading.
+
+<Canvas of={AlertStories.Headings} sourceState={'shown'} />
+
 ## Slot Content
-Instead of using the `text` prop, you can use the default slot to provide custom content with HTML formatting.
+Instead of using the `text` and `heading` props, you can use the default slot to provide custom content with HTML formatting.
 
 <Canvas of={AlertStories.SlotContent} sourceState={'shown'} />
 

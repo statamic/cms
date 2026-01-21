@@ -28,7 +28,7 @@ export const Default: Story = {
 };
 
 const defaultCode = `
-<Alert variant="default" text="This is a default alert message" />
+<Alert text="This is a default alert message" />
 `;
 
 export const _DocsIntro: Story = {
@@ -40,7 +40,7 @@ export const _DocsIntro: Story = {
     },
     render: () => ({
         components: { Alert },
-        template: defaultCode,
+        template: `<div class="flex flex-col gap-2">${defaultCode}</div>`,
     }),
 };
 
@@ -104,6 +104,33 @@ export const CustomIcons: Story = {
                 <Alert variant="default" icon="cog" text="This alert uses a custom icon" />
                 <Alert variant="success" icon="clipboard-check" text="Custom success icon" />
             </div>
+        `,
+    }),
+};
+
+
+
+const headingsCode = `
+<Alert heading="New Feature Available" text="We've added support for..." />
+`;
+
+export const Headings: Story = {
+    argTypes: {
+        icon: { control: { disable: true } },
+        text: { control: { disable: true } },
+        variant: { control: { disable: true } },
+    },
+    parameters: {
+        docs: {
+            source: {
+                code: headingsCode,
+            },
+        },
+    },
+    render: () => ({
+        components: { Alert },
+        template: `
+            <Alert heading="New Feature Available" text="We've added support for custom field types. You can now create your own field types by extending the <code>Fieldtype</code> class. Check out the documentation for more details." />
         `,
     }),
 };

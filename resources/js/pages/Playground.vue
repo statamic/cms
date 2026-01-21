@@ -307,6 +307,13 @@ defineProps(['icons']);
                 <Alert variant="error" text="This is an error alert message" />
                 <Alert variant="success" text="This is a success alert message" />
                 <Alert variant="warning" icon="git" text="This alert has a custom icon" />
+
+                <Alert variant="default" heading="Alert Heading" text="This is a default alert message" />
+                <Alert variant="warning" heading="Alert Heading" text="This is a warning alert message" />
+                <Alert variant="error" heading="Alert Heading" text="This is an error alert message" />
+                <Alert variant="success" heading="Alert Heading" text="This is a success alert message" />
+                <Alert variant="warning" heading="Alert Heading" icon="git" text="This alert has a custom icon" />
+
                 <Alert variant="success">
                     <strong>Success!</strong> This alert uses a slot for custom content.
                 </Alert>
