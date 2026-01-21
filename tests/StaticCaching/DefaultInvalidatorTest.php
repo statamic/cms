@@ -642,6 +642,8 @@ class DefaultInvalidatorTest extends TestCase
                 'http://localhost/three',
                 'http://localhost/one',
                 'http://localhost/two',
+                'http://localhost/test/foo',
+                'http://localhost/purple',
             ])->once();
         });
 
@@ -690,6 +692,8 @@ class DefaultInvalidatorTest extends TestCase
                 'http://test.com/three',
                 'http://test.fr/one',
                 'http://test.fr/two',
+                'http://test.fr/test/foo',
+                'http://test.fr/purple',
             ])->once();
         });
 
