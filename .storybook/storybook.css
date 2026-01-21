@@ -69,13 +69,13 @@
 
         p,
         li {
-            font-size: 1.05em;
-            line-height: 1.6;
+            font-size: 1.015em;
+            line-height: 1.5;
             code {
                 background: var(--color-code-background);
                 color: black;
                 border: none;
-                font-weight: 400;
+                font-weight: 600;
                 font-size: 0.9em;
             }
         }

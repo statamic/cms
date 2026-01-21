@@ -84,6 +84,7 @@ const preview: Preview = {
                 base: 'light',
                 fontBase: '"Lexend", sans-serif',
                 fontCode: '"Source Code Pro", monospace',
+                textColor: '#27292a',
             }),
             source: {
                 transform: (code: string) => cleanCodeSnippet(code),
