@@ -11,7 +11,7 @@ const theme = create({
   fontCode: '"Source Code Pro", monospace',
 
    appBorderColor: 'hsl(287deg 80% 90%)',
-   textColor: '#27292a',
+   textColor: '#181a1b',
 });
 
 addons.setConfig({
