@@ -103,8 +103,6 @@
         overflow: auto;
     }
 
-    /* Comprehensive Olaolu Palenight theme - based on official Material Palenight */
-    
     /* Comments and documentation */
     .prismjs .token.comment,
     .prismjs .token.block-comment,
@@ -129,8 +127,8 @@
         cursor: help;
     }
 
-    /* HTML/JSX tags - orange color for tag names */
-    .prismjs .token.tag {
+    /* HTML/JSX tags - orange color for tokens */
+    .prismjs .token {
         color: #ffcb8b !important; /* Orange/yellow for tag names like ui-card */
     }
 
