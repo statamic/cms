@@ -57,6 +57,7 @@
             margin-block-end: 0;
             padding-block-end: 0;
 
+            &,
             &:first-of-type {
                 /* e.g. >> /?path=/story/components-badge--default */
                 margin-block-start: 1em;
@@ -87,9 +88,27 @@
 }
 
 
-/* GROUP CODE BLOCKS
-=================================================== */
 .sbdocs {
+    /* GROUP CODE BLOCKS
+    =================================================== */
+    .docblock-code-toggle {
+        &, :has(> &) {
+            border-top-left-radius: 7px;
+        }
+        .dark & {
+            background: hsl(0deg 0% 15%)!important;
+            color: white;
+        }
+        &:focus {
+            box-shadow: var(--color-pink-light-1) 0px -2px 0px 0px inset;
+        }
+    }
+
+    .docblock-source {
+        margin-block: 20px;
+    }
+    /* GROUP CODE BLOCKS / PRISM
+    =================================================== */
     /* Olaolu Palenight theme */
     pre[class*="language-"],
     code[class*="language-"],
@@ -271,33 +290,6 @@
     .prismjs .style .token.string {
         color: #89ddff !important;
     }
-
-    .docblock-code-toggle {
-        &, :has(> &) {
-            border-top-left-radius: 7px;
-        }
-        .dark & {
-            background: hsl(0deg 0% 15%)!important;
-            color: white;
-        }
-        &:focus {
-            box-shadow: var(--color-pink-light-1) 0px -2px 0px 0px inset;
-        }
-    }
-
-    /* Leaving this here in case we want to override the style later */
-    /* .prismjs {
-        border: 1px dotted var(--color-pink-light-1)!important;
-        border-radius: 10px;
-    }
-    pre * {
-        box-shadow: none!important;
-    }
-    .docblock-source {
-        &, & *:not(.prismjs) {
-            border: none!important;
-        }
-    } */
 }
 
 
@@ -310,6 +302,9 @@
     }
 }
 
+
+/* GROUP OTHER
+=================================================== */
 .docs-story div[scale="1"] {
     transform: none !important;
 }
@@ -317,6 +312,10 @@
 .sbdocs {
     &.sbdocs-wrapper {
         padding: 4rem;
+    }
+
+    .sbdocs-content {
+        max-width: 56rem;
     }
 
     .sbdocs-preview {
