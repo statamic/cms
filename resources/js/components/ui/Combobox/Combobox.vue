@@ -421,11 +421,13 @@ defineExpose({
 
                 <ComboboxPortal>
                     <ComboboxContent
+                        :force-mount="options.length > 50"
+                        :hidden="options.length > 50 && !dropdownOpen"
                         position="popper"
                         :side-offset="5"
                         align="start"
                         :class="[
-                            'shadow-ui-sm z-(--z-index-above) rounded-lg border border-gray-200 bg-white p-2 dark:border-white/10 dark:bg-gray-800',
+                            'shadow-ui-sm z-(-well-z-index-above) rounded-lg border border-gray-200 bg-white p-2 dark:border-white/10 dark:bg-gray-800',
                             'max-h-[var(--reka-combobox-content-available-height)] min-w-[var(--reka-combobox-trigger-width)]',
                             'overflow-hidden'
                         ]"
