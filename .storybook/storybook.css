@@ -107,6 +107,7 @@
 
     .docblock-source {
         margin-block: 20px;
+        border-radius: 8px;
     }
     /* GROUP CODE BLOCKS / PRISM
     =================================================== */
@@ -118,7 +119,6 @@
         line-height: 1.5;
         background: #292D3E !important; /* Palenight dark bluish-gray background */
         color: #A6ACCD !important; /* Soft off-white foreground */
-        border-radius: 8px;
         padding: 1em;
         overflow: auto;
     }
