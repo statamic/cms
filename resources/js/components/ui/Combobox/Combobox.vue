@@ -421,8 +421,8 @@ defineExpose({
 
                 <ComboboxPortal>
                     <ComboboxContent
-                        :force-mount="options.length > 50"
-                        :hidden="options.length > 50 && !dropdownOpen"
+                        :force-mount="true"
+                        :hidden="!dropdownOpen"
                         position="popper"
                         :side-offset="5"
                         align="start"
