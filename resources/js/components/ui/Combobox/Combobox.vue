@@ -442,10 +442,10 @@ defineExpose({
                                     ref="viewport"
                                     class="max-h-[calc(var(--reka-combobox-content-available-height)-2rem)] overflow-y-scroll"
                                     :class="{
-										'min-h-[2.25px]': options.length === 0,
-										'min-h-[2.5rem]': options.length === 1,
-										'min-h-[5rem]': options.length === 2,
-										'min-h-[7.5rem]': options.length >= 3,
+										'min-h-[2.25px]': filteredOptions.length === 0,
+										'min-h-[2.5rem]': filteredOptions.length === 1,
+										'min-h-[5rem]': filteredOptions.length === 2,
+										'min-h-[7.5rem]': filteredOptions.length >= 3,
                                         'pr-3': scrollbarRef?.isVisible,
                                     }"
                                     data-ui-combobox-viewport
