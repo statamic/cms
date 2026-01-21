@@ -112,12 +112,26 @@
         font-style: italic;
     }
 
+    /* General punctuation */
     .prismjs .token.punctuation {
-        color: #ABB2BF !important;
+        color: #89DDFF !important; /* Bright blue for operators/punctuation */
+    }
+
+    /* HTML/JSX tag names - Palenight uses reddish-pink */
+    .prismjs .token.tag {
+        color: #F07178 !important; /* Reddish-pink for tag names */
+    }
+
+    /* HTML/JSX tag punctuation (< > /) - should be visible and match theme */
+    .prismjs .token.tag .token.punctuation,
+    .prismjs .token.tag + .token.punctuation,
+    .prismjs .language-markup .token.punctuation,
+    .prismjs .language-html .token.punctuation,
+    .prismjs .language-jsx .token.punctuation {
+        color: #89DDFF !important; /* Bright blue for < and > brackets */
     }
 
     .prismjs .token.property,
-    .prismjs .token.tag,
     .prismjs .token.constant,
     .prismjs .token.symbol,
     .prismjs .token.deleted {
