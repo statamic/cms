@@ -157,7 +157,7 @@
 
         <Stack v-model:open="showAssetSelector" inset :show-close-button="false">
             <asset-selector
-                :container="config.container"
+                :container="{id: config.container}"
                 :folder="config.folder || '/'"
                 :restrict-folder-navigation="config.restrict_assets"
                 :selected="[]"
