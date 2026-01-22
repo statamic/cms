@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import { Popover, Stack } from '@/components/ui';
+import { Stack } from '@/components/ui';
 import LinkToolbar from './LinkToolbar.vue';
 import BardToolbarButton from './ToolbarButton.vue';
 
@@ -43,7 +43,6 @@ export default {
     mixins: [BardToolbarButton],
 
     components: {
-        Popover,
         LinkToolbar,
         Stack,
     },
