@@ -53,7 +53,7 @@ const alertClasses = computed(() => {
                     'dark:[&_svg]:text-gray-400',
                 ],
                 warning: [
-                    'bg-amber-50 dark:bg-amber-300/6 border-amber-200 dark:border-amber-400/25 text-amber-800! dark:text-amber-300',
+                    'bg-amber-50 dark:bg-amber-300/6 border-amber-200 dark:border-amber-400/25 text-amber-800 dark:text-amber-200',
                     '[&_code]:bg-amber-200/50! [&_code]:text-amber-800! dark:[&_code]:bg-amber-300/8! dark:[&_code]:text-amber-200!',
                     '[&_[data-ui-heading]]:text-amber-800! dark:[&_[data-ui-heading]]:text-amber-300!',
                     '[&_[data-ui-description]]:text-amber-800! dark:[&_[data-ui-description]]:text-amber-200!',
