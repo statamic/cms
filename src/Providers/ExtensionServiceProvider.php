@@ -252,7 +252,6 @@ class ExtensionServiceProvider extends ServiceProvider
         Updates\AddTimezoneConfigOptions::class,
         Updates\RemoveParentField::class,
         Updates\UpdateGlobalVariables::class,
-        Updates\PublishMigrationForNocacheUrlColumn::class,
         Updates\PublishMigrationForTwoFactorColumns::class,
         Updates\PublishMigrationForWebauthnTable::class,
         Updates\AddAddonSettingsToGitConfig::class,
