@@ -33,17 +33,15 @@ class CommandPaletteController extends CpController
             })
             ->take(10)
             ->map(function (Result $result) use ($shouldPrependSiteToBadge) {
-                $item = (new ContentSearchResult(text: $result->getCpTitle(), category: Category::Search))
+                return (new ContentSearchResult(text: $result->getCpTitle(), category: Category::Search))
                     ->url($result->getCpUrl())
                     ->badge($result->getCpBadge())
                     ->reference($result->getReference())
-                    ->icon($result->getCpIcon());
-
-                if ($shouldPrependSiteToBadge && method_exists($result->getSearchable(), 'site')) {
-                    $item->site($result->getSearchable()->site()->name());
-                }
-
-                return $item->toArray();
+                    ->icon($result->getCpIcon())
+                    ->when($shouldPrependSiteToBadge && method_exists($result->getSearchable(), 'site'), function (ContentSearchResult $item) use ($result) {
+                        $item->site($result->getSearchable()->site()->name());
+                    })
+                    ->toArray();
             })
             ->values();
     }
