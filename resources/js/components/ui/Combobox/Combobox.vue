@@ -448,6 +448,7 @@ defineExpose({
 										'min-h-[2.5rem]': options.length === 1,
 										'min-h-[5rem]': options.length === 2,
 										'min-h-[7.5rem]': options.length >= 3,
+                                        'pr-3': scrollbarRef?.isVisible,
                                     }"
                                     data-ui-combobox-viewport
                                 >

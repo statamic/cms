@@ -3,7 +3,7 @@
         <Icon name="loading" />
     </div>
 
-    <StackHeader v-if="!loading" :title="__(fieldtype.title + ' ' + 'Field')" :icon="fieldtype.icon">
+    <StackHeader v-if="!loading" :title="__(values.display) || __(config.display) || config.handle" :icon="fieldtype.icon">
         <template #actions>
             <Button variant="default" @click.prevent="commit" :text="__('Apply')" />
             <Button v-if="!(isNestedField)" variant="primary" @click.prevent="commitAndSave" icon="save" :text="__('Apply & Save')" />
