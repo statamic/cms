@@ -8,6 +8,7 @@ import PortalTargets from '@/components/portals/PortalTargets.vue';
 import { provide, watch, ref } from 'vue';
 import useBodyClasses from './body-classes.js';
 import useStatamicPageProps from '@/composables/page-props.js';
+import useMaxWidthToggle from '@/composables/use-max-width-toggle.js';
 
 useBodyClasses('bg-global-header-bg font-sans leading-normal text-gray-900 dark:text-white');
 
@@ -18,8 +19,12 @@ const props = defineProps({
 const additionalBreadcrumbs = ref(props.additionalBreadcrumbs);
 watch(() => props.additionalBreadcrumbs, (newVal) => additionalBreadcrumbs.value = newVal);
 
+const { isMaxWidthEnabled, toggle } = useMaxWidthToggle();
+
 provide('layout', {
     additionalBreadcrumbs,
+    isMaxWidthEnabled,
+    toggleMaxWidth: toggle,
 });
 </script>
 
@@ -33,7 +38,7 @@ provide('layout', {
             <Nav />
             <div id="main-content" class="main-content sm:p-2 h-full flex-1 overflow-y-auto rounded-t-2xl">
                 <div id="content-card" class="relative content-card grid min-h-full mx-auto">
-                    <div class="w-full max-w-page mx-auto">
+                    <div :class="['w-full mx-auto', { 'max-w-page': isMaxWidthEnabled }]">
                         <slot />
                     </div>
                 </div>
