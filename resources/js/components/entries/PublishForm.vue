@@ -85,6 +85,7 @@
             v-model:modified-fields="localizedFields"
             :track-dirty-state="trackDirtyState"
             :sync-field-confirmation-text="syncFieldConfirmationText"
+            :remember-tab="!isInline"
         >
             <LivePreview
                 :enabled="isPreviewing"
@@ -99,24 +100,22 @@
                     <template #actions>
                         <div class="space-y-6">
                             <!-- Live Preview / Visit URL Buttons -->
-                            <div v-if="collectionHasRoutes">
-                                <div class="flex flex-wrap gap-3 lg:gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
-                                    <Button
-                                        :text="__('Live Preview')"
-                                        class="flex-1"
-                                        icon="live-preview"
-                                        @click="openLivePreview"
-                                        v-if="showLivePreviewButton"
-                                    />
-                                    <Button
-                                        :href="permalink"
-                                        :text="__('Visit URL')"
-                                        class="flex-1"
-                                        icon="external-link"
-                                        target="_blank"
-                                        v-if="showVisitUrlButton"
-                                    />
-                                </div>
+                            <div class="flex flex-wrap gap-3 lg:gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
+                                <Button
+                                    :text="__('Live Preview')"
+                                    class="flex-1"
+                                    icon="live-preview"
+                                    @click="openLivePreview"
+                                    v-if="showLivePreviewButton"
+                                />
+                                <Button
+                                    :href="permalink"
+                                    :text="__('Visit URL')"
+                                    class="flex-1"
+                                    icon="external-link"
+                                    target="_blank"
+                                    v-if="showVisitUrlButton"
+                                />
                             </div>
 
                             <!-- Published Switch -->
@@ -191,21 +190,20 @@
             </LivePreview>
         </PublishContainer>
 
-        <stack
-            name="revision-history"
-            v-if="showRevisionHistory"
-            @closed="showRevisionHistory = false"
-            :narrow="true"
-            v-slot="{ close }"
+        <Stack
+	        ref="revisionHistoryStack"
+	        size="narrow"
+	        :title="__('Revision History')"
+	        v-model:open="showRevisionHistory"
         >
             <revision-history
                 :index-url="actions.revisions"
                 :restore-url="actions.restore"
                 :reference="initialReference"
                 :can-restore-revisions="!readOnly"
-                @closed="close"
+                @closed="$refs.revisionHistoryStack.close()"
             />
-        </stack>
+        </Stack>
 
         <publish-actions
             v-if="confirmingPublish"
@@ -222,7 +220,7 @@
         />
 
         <confirmation-modal
-            v-if="selectingOrigin"
+            :open="selectingOrigin"
             :title="__('Create Localization')"
             :buttonText="__('Create')"
             @cancel="cancelLocalization()"
@@ -236,7 +234,7 @@
         </confirmation-modal>
 
         <confirmation-modal
-            v-if="pendingLocalization"
+            :open="pendingLocalization"
             :title="__('Unsaved Changes')"
             :body-text="__('Are you sure? Unsaved changes will be lost.')"
             :button-text="__('Continue')"
@@ -278,6 +276,7 @@ import {
     PublishComponents,
     PublishLocalizations as LocalizationsCard,
     LivePreview,
+	Stack,
 } from '@ui';
 import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
 import { computed, ref } from 'vue';
@@ -313,6 +312,7 @@ export default {
         Subheading,
         Switch,
         Select,
+	    Stack,
     },
 
     props: {
@@ -343,7 +343,6 @@ export default {
         canManagePublishState: Boolean,
         createAnotherUrl: String,
         initialListingUrl: String,
-        collectionHasRoutes: Boolean,
         previewTargets: Array,
         autosaveInterval: Number,
         parent: String,
@@ -392,11 +391,18 @@ export default {
             autosaveIntervalInstance: null,
             syncFieldConfirmationText: __('messages.sync_entry_field_confirmation_text'),
             pendingLocalization: null,
-
-            savingRef: ref(false),
-            errorsRef: ref({}),
         };
     },
+
+	setup() {
+		const savingRef = ref(false);
+		const errorsRef = ref({});
+
+		return {
+			savingRef: computed(() => savingRef),
+			errorsRef: computed(() => errorsRef),
+		};
+	},
 
     computed: {
         containerRef() {
@@ -815,13 +821,15 @@ export default {
                 prioritize: true,
             });
 
-            Statamic.$commandPalette.add({
-                category: Statamic.$commandPalette.category.Actions,
-                text: __('Edit Blueprint'),
-                icon: 'blueprint-edit',
-                when: () => this.canEditBlueprint,
-                url: this.actions.editBlueprint,
-            });
+			if (this.actions.editBlueprint) {
+				Statamic.$commandPalette.add({
+					category: Statamic.$commandPalette.category.Actions,
+					text: __('Edit Blueprint'),
+					icon: 'blueprint-edit',
+					when: () => this.canEditBlueprint,
+					url: this.actions.editBlueprint,
+				});
+			}
 
             this.$refs.actions?.preparedActions.forEach(action => Statamic.$commandPalette.add({
                 category: Statamic.$commandPalette.category.Actions,
@@ -868,12 +876,9 @@ export default {
 
     beforeUnmount() {
         if (this.autosaveIntervalInstance) clearInterval(this.autosaveIntervalInstance);
-    },
-
-    unmounted() {
-        clearTimeout(this.trackDirtyStateTimeout);
-        this.saveKeyBinding.destroy();
-        this.quickSaveKeyBinding.destroy();
+	    clearTimeout(this.trackDirtyStateTimeout);
+	    this.saveKeyBinding.destroy();
+	    this.quickSaveKeyBinding.destroy();
     },
 };
 </script>

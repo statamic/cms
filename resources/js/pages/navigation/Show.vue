@@ -7,11 +7,15 @@ import PageEditor from '@/components/structures/PageEditor.vue';
 import PageSelector from '@/components/structures/PageSelector.vue';
 import RemovePageConfirmation from '@/components/navigation/RemovePageConfirmation.vue';
 import SiteSelector from '@/components/SiteSelector.vue';
+import HasActions from '@/components/publish/HasActions';
 import { Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, Button, EmptyStateMenu, EmptyStateItem, Header } from '@ui';
 import { toggleArchitecturalBackground } from '@/pages/layout/architectural-background.js';
 import { router } from '@inertiajs/vue3';
+import ItemActions from '@/components/actions/ItemActions.vue';
 
 export default {
+    mixins: [HasActions],
+
     components: {
         Head,
         Button,
@@ -27,6 +31,7 @@ export default {
         EmptyStateMenu,
         EmptyStateItem,
         Header,
+        ItemActions,
     },
 
     props: {
@@ -45,6 +50,7 @@ export default {
         canEdit: { type: Boolean, required: true },
         canSelectAcrossSites: { type: Boolean, required: true },
         canEditBlueprint: { type: Boolean, required: true },
+        entryQueryScopes: { type: Array, default: () => [] },
     },
 
     data() {
@@ -355,7 +361,32 @@ export default {
         <Head :title="title" />
 
         <Header v-if="mounted" :title="title" icon="navigation">
-            <Dropdown placement="left-start">
+            <ItemActions
+                v-if="hasItemActions"
+                :url="itemActionUrl"
+                :actions="itemActions"
+                :item="handle"
+                @started="actionStarted"
+                @completed="actionCompleted"
+                v-slot="{ actions: preparedActions }"
+            >
+                <Dropdown placement="left-start" v-if="canEdit || canEditBlueprint || hasItemActions">
+                    <DropdownMenu>
+                        <DropdownItem v-if="canEdit" :text="__('Configure Navigation')" icon="cog" :href="editUrl" />
+                        <DropdownItem v-if="canEditBlueprint" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="blueprintUrl" />
+                        <DropdownSeparator v-if="hasItemActions && (canEdit || canEditBlueprint)" />
+                        <DropdownItem
+                            v-for="action in preparedActions"
+                            :key="action.handle"
+                            :text="__(action.title)"
+                            :icon="action.icon"
+                            :variant="action.dangerous ? 'destructive' : 'default'"
+                            @click="action.run"
+                        />
+                    </DropdownMenu>
+                </Dropdown>
+            </ItemActions>
+            <Dropdown v-else-if="canEdit || canEditBlueprint" placement="left-start">
                 <DropdownMenu>
                     <DropdownItem v-if="canEdit" :text="__('Configure Navigation')" icon="cog" :href="editUrl" />
                     <DropdownItem v-if="canEditBlueprint" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="blueprintUrl" />
@@ -506,6 +537,7 @@ export default {
             ref="selector"
             :site="site"
             :collections="collections"
+            :query-scopes="entryQueryScopes"
             :max-items="maxPagesSelection"
             :can-select-across-sites="canSelectAcrossSites"
             @selected="entriesSelected"

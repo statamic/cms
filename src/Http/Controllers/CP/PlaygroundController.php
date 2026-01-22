@@ -9,7 +9,7 @@ class PlaygroundController extends CpController
 {
     public function __invoke()
     {
-        $icons = collect(File::files(statamic_path('packages/ui/icons')))->map(function ($file) {
+        $icons = collect(File::files(statamic_path('resources/svg/icons')))->map(function ($file) {
             return $file->getFilenameWithoutExtension();
         })->all();
 

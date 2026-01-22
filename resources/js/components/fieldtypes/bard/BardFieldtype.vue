@@ -50,11 +50,12 @@
                     </div>
 
                     <div
-                        class="bard-editor @container/bard focus-within:focus-outline"
+                        class="bard-editor @container/bard"
                         :class="{
                             'mode:read-only': readOnly,
                             'mode:minimal': !showFixedToolbar,
                             'mode:inline': inputIsInline,
+                            'focus-within:focus-outline': !fullScreenMode,
                         }"
                         tabindex="0"
                     >
@@ -96,14 +97,18 @@
                                 @added="addSet"
                             >
                                 <template #trigger>
-                                    <div class="absolute flex items-center gap-2 top-[-6px] z-1 -start-4.5 group" :style="{ transform: `translateY(${y}px)` }">
+                                    <div class="absolute flex items-center gap-2 top-[-6px] z-1 -start-7 @lg/bard:-start-4.5 group" :style="{ transform: `translateY(${y}px)` }">
                                         <ui-button
                                             icon="plus"
                                             size="sm"
                                             :aria-label="__('Add Set')"
                                             v-tooltip="__('Add Set')"
                                         />
-                                        <ui-description v-if="!$refs.setPicker?.isOpen" :text="__('Type \'/\' to insert a set')" />
+                                        <ui-description
+                                            v-show="shouldShowAddSetHelperText"
+                                            :text="__('Type \'/\' to insert a set')"
+                                            :class="{'ps-9': fullScreenMode}"
+                                        />
                                     </div>
                                 </template>
                             </set-picker>
@@ -204,6 +209,7 @@ export default {
             pageHeader: null,
             escBinding: null,
             showAddSetButton: false,
+            hasBeenFocused: false,
             provide: {
                 bard: this.makeBardProvide(),
                 bardSets: this.config.sets,
@@ -311,6 +317,10 @@ export default {
             return `form-group publish-field publish-field__${this.handle} bard-fieldtype`;
         },
 
+        hasSets() {
+            return this.value.some(item => item.type === 'set')
+        },
+
         setConfigs() {
             return this.groupConfigs.reduce((sets, group) => {
                 return sets.concat(group.sets);
@@ -327,27 +337,33 @@ export default {
                     title: __('Expand All Sets'),
                     icon: 'expand',
                     quick: true,
+                    disabled: () => this.collapsed.length === 0,
                     visibleWhenReadOnly: true,
                     run: this.expandAll,
-                    visible: this.setConfigs.length > 0,
+                    visible: this.setConfigs.length > 0 && this.hasSets,
                 },
                 {
                     title: __('Collapse All Sets'),
                     icon: 'collapse',
                     quick: true,
+                    disabled: () => this.collapsed.length > 0,
                     visibleWhenReadOnly: true,
                     run: this.collapseAll,
-                    visible: this.setConfigs.length > 0,
+                    visible: this.setConfigs.length > 0 && this.hasSets,
                 },
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => (vm.fullScreenMode ? 'collapse-all' : 'expand-all'),
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'fullscreen-close' : 'fullscreen-open'),
                     quick: true,
                     run: this.toggleFullscreen,
                     visibleWhenReadOnly: true,
                     visible: this.config.fullscreen,
                 },
             ];
+        },
+
+        shouldShowAddSetHelperText() {
+            return !this.$refs.setPicker?.isOpen && this.suitableToShowSetButton(this.editor);
         },
     },
 
@@ -396,7 +412,7 @@ export default {
         json(json, oldJson) {
             if (!this.mounted) return;
 
-            if (json === oldJson) return;
+            if (JSON.stringify(json) === JSON.stringify(oldJson)) return;
 
             this.debounceNextUpdate
                 ? this.updateDebounced(json)
@@ -430,6 +446,12 @@ export default {
 
             if (fullScreenMode) {
                 this.escBinding = this.$keys.bindGlobal('esc', this.closeFullscreen);
+                // Focus the editor content when entering fullscreen mode
+                this.$nextTick(() => {
+                    if (this.editor) {
+                        this.editor.commands.focus();
+                    }
+                });
             } else {
                 this.escBinding?.destroy();
             }
@@ -480,7 +502,7 @@ export default {
             });
         },
 
-        duplicateSet(old_id, attrs, pos) {
+        duplicateSet(old_id, attrs, getPos) {
             const id = uniqid();
             const enabled = attrs.enabled;
             const deepCopy = JSON.parse(JSON.stringify(attrs.values));
@@ -488,9 +510,14 @@ export default {
 
             this.updateSetMeta(id, this.meta.existing[old_id]);
 
+            this.debounceNextUpdate = false;
+
             // Perform this in nextTick because the meta data won't be ready until then.
             this.$nextTick(() => {
-                this.editor.commands.setAt({ attrs: { id, enabled, values }, pos });
+                const pos = getPos();
+                const node = this.editor.state.doc.nodeAt(pos);
+                const insertPos = pos + (node?.nodeSize || 0);
+                this.editor.commands.setAt({ attrs: { id, enabled, values }, pos: insertPos });
             });
         },
 
@@ -553,7 +580,7 @@ export default {
             const { $anchor, empty } = selection;
             const isRootDepth = $anchor.depth === 1;
             const isEmptyTextBlock =
-                $anchor.parent.isTextblock && !$anchor.parent.type.spec.code && !$anchor.parent.textContent;
+                ($anchor.parent.isTextblock && !$anchor.parent.firstChild) && !$anchor.parent.type.spec.code && !$anchor.parent.textContent;
             const isAroundInlineImage =
                 state.selection.$to.nodeBefore?.type.name === 'image' ||
                 state.selection.$to.nodeAfter?.type.name === 'image';
@@ -729,7 +756,11 @@ export default {
                 enableInputRules: this.config.enable_input_rules,
                 enablePasteRules: this.config.enable_paste_rules,
                 editorProps: { attributes: { class: 'bard-content' } },
-                onFocus: () => this.$emit('focus'),
+	            onDrop: () => this.debounceNextUpdate = false,
+                onFocus: () => {
+                    this.hasBeenFocused = true;
+                    this.$emit('focus');
+                },
                 onBlur: () => {
                     // Since clicking into a field inside a set would also trigger a blur, we can't just emit the
                     // blur event immediately. We need to make sure that the newly focused element is outside
@@ -745,7 +776,23 @@ export default {
                     }, 1);
                 },
                 onUpdate: () => {
-                    this.json = clone(this.editor.getJSON().content);
+                    const oldJson = this.json;
+                    const newJson = clone(this.editor.getJSON().content);
+
+                    const countNodes = (nodes) => {
+                        if (!nodes || !Array.isArray(nodes)) return 0;
+                        let count = nodes.length;
+                        nodes.forEach(node => {
+                            if (node.content) {
+                                count += countNodes(node.content);
+                            }
+                        });
+                        return count;
+                    };
+
+                    if (countNodes(oldJson) !== countNodes(newJson)) this.debounceNextUpdate = false;
+
+                    this.json = newJson;
                     this.html = this.editor.getHTML();
                 },
                 onCreate: ({ editor }) => {
@@ -945,6 +992,7 @@ export default {
             Object.defineProperties(bard, {
                 setConfigs: { get: () => this.setConfigs },
                 isReadOnly: { get: () => this.readOnly },
+                hasBeenFocused: { get: () => this.hasBeenFocused },
             });
             return bard;
         },
@@ -968,6 +1016,7 @@ export default {
                 &::after {
                     content: '';
                     position: absolute;
+                    z-index: var(--z-index-below);
                     inset: -4px -8px;
                     box-shadow:
                         /* Left Mask */

@@ -49,9 +49,10 @@
                         <ui-icon name="upload-cloud" class="size-5 text-gray-500 me-2" />
                         <div class="text-xs">
                             <span class="leading-tight" v-text="`${__('Drag & drop here or')}&nbsp;`" />
-                            <button type="button" class="text-left underline underline-offset-2 cursor-pointer hover:text-black dark:hover:text-gray-200" @click.prevent="uploadFile">
-                                {{ __('choose a file') }}.
-                            </button>
+                            <button type="button" class="text-left underline underline-offset-2 cursor-pointer hover:text-gray-925 dark:hover:text-gray-200" @click.prevent="uploadFile">
+                                {{ __('choose a file') }}
+                            </button>.
+                            <span class="leading-tight whitespace-nowrap" v-if="selectedFilesText" v-text="selectedFilesText" />
                         </div>
                     </div>
 
@@ -163,7 +164,7 @@
             </div>
         </uploader>
 
-        <stack v-if="showSelector" name="asset-selector" @closed="closeSelector">
+        <Stack v-model:open="showSelector" inset :show-close-button="false">
             <Selector
                 :container="container"
                 :folder="folder"
@@ -173,9 +174,9 @@
                 :query-scopes="queryScopes"
                 :columns="columns"
                 @selected="assetsSelected"
-                @closed="closeSelector"
+                @closed="showSelector = false"
             />
-        </stack>
+        </Stack>
     </div>
 </template>
 
@@ -188,7 +189,7 @@ import Uploader from '../../assets/Uploader.vue';
 import Uploads from '../../assets/Uploads.vue';
 import { SortableList } from '../../sortable/Sortable';
 import { isEqual } from 'lodash-es';
-import { Button, Dropdown, DropdownMenu, DropdownItem } from '@/components/ui';
+import { Button, Dropdown, DropdownMenu, DropdownItem, Stack } from '@/components/ui';
 import ItemActions from '@/components/actions/ItemActions.vue';
 
 export default {
@@ -204,6 +205,7 @@ export default {
         DropdownMenu,
         DropdownItem,
         ItemActions,
+	    Stack,
     },
 
     mixins: [Fieldtype],
@@ -413,6 +415,12 @@ export default {
                   });
         },
 
+        selectedFilesText() {
+            if (this.maxFiles !== Infinity) {
+                return __n(':count\/:max selected', this.assets.length, { max: this.maxFiles });
+            }
+        },
+
         internalFieldActions() {
             return [
                 {
@@ -427,7 +435,7 @@ export default {
 
     events: {
         'close-selector'() {
-            this.closeSelector();
+            this.showSelector = false;
         },
     },
 
@@ -487,13 +495,6 @@ export default {
          */
         openSelector() {
             this.showSelector = true;
-        },
-
-        /**
-         * Close the asset selector modal
-         */
-        closeSelector() {
-            this.showSelector = false;
         },
 
         /**

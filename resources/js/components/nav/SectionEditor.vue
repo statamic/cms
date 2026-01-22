@@ -1,15 +1,13 @@
 <template>
-    <stack narrow name="nav-item-editor" @closed="$emit('closed')" v-slot="{ close }">
-        <div class="m-2 flex h-full flex-col rounded-xl bg-white dark:bg-gray-800">
-            <div
-                class="flex items-center justify-between rounded-t-xl border-b border-gray-300 px-4 mb-3 py-2 dark:border-gray-950 dark:bg-gray-800"
-            >
-                <Heading size="lg">{{ creating ? __('Add Section') : __('Edit Section') }}</Heading>
-                <Button icon="x" variant="ghost" class="-me-2" @click="close" />
-            </div>
-
-            <div class="flex-1 overflow-auto">
-                <div class="p-3 flex flex-col space-y-6">
+    <Stack
+	    size="narrow"
+	    :title="creating ? __('Add Section') : __('Edit Section')"
+	    open
+	    @update:open="$emit('closed')"
+    >
+        <div class="">
+            <div class="">
+                <div class="flex flex-col space-y-6">
                     <Field id="display" :label="__('Display')" required>
                         <Input id="display" v-model="section" :focus="true" :error="validate ? __('statamic::validation.required') : null" />
                     </Field>
@@ -18,11 +16,11 @@
                 </div>
             </div>
         </div>
-    </stack>
+    </Stack>
 </template>
 
 <script>
-import { Button, Heading, Field, Input } from '@/components/ui';
+import { Button, Heading, Field, Input, Stack } from '@/components/ui';
 
 export default {
     components: {
@@ -30,6 +28,7 @@ export default {
         Heading,
         Field,
         Input,
+	    Stack,
     },
 
     emits: ['closed', 'updated'],
@@ -54,7 +53,7 @@ export default {
         });
     },
 
-    unmounted() {
+	beforeUnmount() {
         this.saveKeyBinding.destroy();
     },
 

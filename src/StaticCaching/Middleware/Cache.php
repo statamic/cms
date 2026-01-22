@@ -10,6 +10,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache as AppCache;
 use Illuminate\Support\Facades\Log;
+use Statamic\Facades\Blink;
 use Statamic\Facades\StaticCache;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
@@ -50,13 +51,15 @@ class Cache
     public function handle($request, Closure $next)
     {
         if ($response = $this->attemptToServeCachedResponse($request)) {
-            return $response;
+            return $this->addEtagToResponse($request, $response);
         }
 
         $lock = $this->createLock($request);
 
         try {
-            return $lock->block($this->lockFor, fn () => $this->handleRequest($request, $next));
+            return $lock->block($this->lockFor,
+                fn () => $this->addEtagToResponse($request, $this->handleRequest($request, $next))
+            );
         } catch (LockTimeoutException $e) {
             return $this->outputRefreshResponse($request);
         }
@@ -83,6 +86,16 @@ class Cache
             $this->makeReplacementsAndCacheResponse($request, $response);
 
             $this->nocache->write();
+
+            if ($paginator = Blink::get('tag-paginator')) {
+                if ($paginator->hasMorePages()) {
+                    $response->headers->set('X-Statamic-Pagination', [
+                        'current' => $paginator->currentPage(),
+                        'total' => $paginator->lastPage(),
+                        'name' => $paginator->getPageName(),
+                    ]);
+                }
+            }
         } elseif (! $response->isRedirect()) {
             $this->makeReplacements($response);
         }
@@ -241,5 +254,16 @@ class Cache
             : sprintf('<meta http-equiv="refresh" content="1; URL=\'%s\'" />', $request->getUri());
 
         return response($html, 503, ['Retry-After' => 1]);
+    }
+
+    private function addEtagToResponse($request, $response)
+    {
+        if (! $response->isRedirect() && $content = $response->getContent()) {
+            $response
+                ->setEtag(md5($content))
+                ->isNotModified($request);
+        }
+
+        return $response;
     }
 }

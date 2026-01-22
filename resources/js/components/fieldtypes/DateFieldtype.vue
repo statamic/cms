@@ -13,6 +13,7 @@
             :model-value="datePickerValue"
             :number-of-months="config.number_of_months"
             :read-only="isReadOnly"
+            :clearable="config.clearable"
             @update:model-value="datePickerUpdated"
         />
     </div>

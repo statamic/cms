@@ -12,7 +12,7 @@ class AddTimezoneConfigOptions extends UpdateScript
 
     public function shouldUpdate($newVersion, $oldVersion): bool
     {
-        return $this->isUpdatingTo('6.0.0');
+        return $this->isUpdatingTo('6.0.0-beta.4');
     }
 
     public function update(): void

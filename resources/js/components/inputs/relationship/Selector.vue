@@ -1,5 +1,5 @@
 <template>
-    <div class="dark:bg-dark-800 h-full bg-white rounded-s-xl">
+    <div class="h-full rounded-s-xl">
         <div class="flex h-full min-h-0 flex-col">
             <Listing
                 v-if="filters != null && view === 'list'"
@@ -10,6 +10,7 @@
                 :sort-direction="sortDirection"
                 :additional-parameters="additionalParameters"
                 v-model:selections="selections"
+                @request-completed="focusSearchInput"
             >
                 <template #initializing>
                     <div class="flex flex-1">
@@ -22,7 +23,7 @@
                 <div class="flex flex-1 flex-col gap-4 overflow-auto p-4">
                     <div class="flex items-center gap-2 sm:gap-3">
                         <div class="flex flex-1 items-center gap-2 sm:gap-3">
-                            <Search />
+                            <Search ref="search" />
                             <Filters v-if="filters && filters.length" />
                         </div>
 
@@ -42,6 +43,9 @@
                             </template>
                             <template #cell-status="{ row: entry }">
                                 <StatusIndicator :status="entry.status" show-label :show-dot="false" />
+                            </template>
+                            <template #cell-type="{ value }">
+                                <Badge :text="value" />
                             </template>
                         </Table>
                         <PanelFooter>
@@ -136,6 +140,7 @@ import {
     Checkbox,
     Icon,
     StatusIndicator,
+    Badge,
 } from '@/components/ui';
 
 export default {
@@ -154,6 +159,7 @@ export default {
         Checkbox,
         Icon,
         StatusIndicator,
+        Badge,
     },
 
     // todo, when opening and closing the stack, you cant save?
@@ -311,6 +317,10 @@ export default {
             // Try to get a meaningful title from common fields
             return row.title || row.name || row.label || row.id || __('item');
         },
+
+	    focusSearchInput() {
+		    this.$nextTick(() => this.$refs.search.focus());
+	    },
     },
 };
 </script>

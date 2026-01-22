@@ -8,9 +8,8 @@
     <!-- Modal for Grid Mode -->
     <ui-modal
         :blur="false"
-        :open="isOpen"
         :title="__('Add Set')"
-        @update:open="isOpen = $event"
+        v-model:open="isOpen"
         v-else-if="shouldUseModal"
         class="xl:max-w-3xl 2xl:max-w-5xl"
     >
@@ -83,6 +82,7 @@
         @clicked-away="$emit('clicked-away', $event)"
         @update:open="isOpen = $event"
         class="set-picker select-none w-72"
+        data-set-picker-popover
         inset
     >
         <template #trigger>
@@ -174,6 +174,12 @@
         </template>
     </ui-popover>
 </template>
+
+<style>
+body:has(:is(.bard-fullscreen, .replicator-fullscreen)) [data-reka-popper-content-wrapper] {
+	z-index: var(--z-index-portal) !important;
+}
+</style>
 
 <script>
 import { Primitive } from 'reka-ui';

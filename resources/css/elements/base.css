@@ -16,11 +16,10 @@
 
     --z-index-below: -1;
     --z-index-above: 1;
-    --z-index-global-header: 2;
-    --z-index-portal: 3;
-    --z-index-draggable: 4;
-    --z-index-modal: 5;
-    --z-index-max: 6;
+    --z-index-portal: 2;
+    --z-index-draggable: 3;
+    --z-index-modal: 4;
+    --z-index-max: 5;
 
     /* Used for entry animations */
     --starting-style-transition-duration: 0.125s;
@@ -33,6 +32,7 @@
 @layer base {
     /* Explicitly show focus without needing to tab */
     .show-focus:focus,
+    button,
     /* Explicitly show focus without needing to tab for buttons inside modals, e.g. Assets > cancel button on delete modal */
     [data-dismissable-layer] button:focus,
     /* and then a global selector for focus-visible everywhere else (except where the focus-within class will handle the focus outline target instead). Use a direct descendant here so we don't affect things like the focus state of Bard field > Replicator > then another Bard field. */
@@ -63,11 +63,44 @@
     }
 }
 
+@layer ui {
+    /* Notes...
+        - Reka adds a container something like `<div id="reka-tabs-v-12-content-main" role="tabpanel" data-state="inactive" etc. />` around any tab panels such as "main" and "seo".
+        - If you click into an empty area of the tab, then use your keyboard to focus on a different window, it leaves a useless outline state. This component is not focusable.
+        - We can't edit this HTML so instead we'll target it with a selector
+    */
+    [id*="reka-tabs"][role="tabpanel"] {
+        outline: none;
+    }
+}
+
 /* Use a utility layer only when we need higher specificity */
 @layer utilities {
     /* When we have a focus state within a focus state, only the inner-most focused container should _have_ focus. e.g. if we're focusing on a Bard field within a Bard field, only the inner Bard field should receive the focus outline. */
     [class*="focus-within"]:has([class*="focus-within"]:focus-within) {
         outline: none;
+    }
+
+    /* Notes...
+
+        - Sometimes we want to show a focus outline on a container when it has focus-within, e.g. in Replicator sets where we want to show a focus outline on the set header when it has focus on the button inside the header, whose shape is not as neat.
+
+        - Here we set a specific target for the focus outline
+
+        <div class="show-focus-within"> <-- This shows a focus outline when only the target button inside has focus.
+            <button class="show-focus-within_target">
+                Focus me
+            </button>
+        </div>
+
+    s*/
+    .show-focus-within:has(.show-focus-within_target:focus-visible) {
+        /* Stop the transition ruining the focus outline quickly appearing. */
+        transition: none;
+        outline-width: var(--focus-outline-width);
+        outline-offset: var(--focus-outline-offset);
+        outline-color: var(--focus-outline-color, currentColor);
+        outline-style: var(--focus-outline-style, solid);
     }
 
     [data-ui-dropdown-item] {

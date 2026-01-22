@@ -4,10 +4,13 @@ namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Statamic\Auth\Eloquent\Passkey as EloquentPasskey;
 use Statamic\Auth\Eloquent\User as EloquentUser;
+use Statamic\Auth\File\Passkey as FilePasskey;
 use Statamic\Auth\File\User as FileUser;
 use Statamic\Auth\UserRepositoryManager;
 use Statamic\Console\RunsInPlease;
+use Statamic\Contracts\Auth\Passkey;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Auth\UserRepository as UserRepositoryContract;
 use Statamic\Facades\Stache;
@@ -72,6 +75,9 @@ class ImportUsers extends Command
 
         app()->bind(UserContract::class, FileUser::class);
         app()->bind(UserRepositoryContract::class, FileRepository::class);
+        app()->bind(Passkey::class, FilePasskey::class);
+
+        User::clearResolvedInstances();
 
         $users = User::all();
 
@@ -94,7 +100,7 @@ class ImportUsers extends Command
                 $eloquentUser = $eloquentRepository->make()
                     ->email($user->email())
                     ->preferences($user->preferences())
-                    ->data($data->except(['groups', 'roles'])->merge(['name' => $user->name()]))
+                    ->data($data->except(['groups', 'roles', 'passkeys'])->merge(['name' => $user->name()]))
                     ->id($user->id());
 
                 if ($user->isSuper()) {
@@ -110,6 +116,18 @@ class ImportUsers extends Command
                 }
 
                 $eloquentUser->saveToDatabase();
+
+                if (count($data->get('passkeys', [])) > 0) {
+                    collect($data->get('passkeys', []))
+                        ->each(function (array $keydata) use ($eloquentUser) {
+                            app(EloquentPasskey::class)
+                                ->setUser($eloquentUser)
+                                ->setName($keydata['name'])
+                                ->setLastLogin($keydata['last_login'])
+                                ->setCredential($keydata['credential'])
+                                ->save();
+                        });
+                }
 
                 $eloquentUser->model()->forceFill(['password' => $user->password()]);
                 $eloquentUser->model()->saveQuietly();

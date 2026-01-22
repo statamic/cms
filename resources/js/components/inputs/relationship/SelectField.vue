@@ -1,7 +1,6 @@
 <template>
     <div>
         <Combobox
-            class="w-full"
             searchable
             :disabled="config.disabled"
             :ignore-filter="typeahead"
@@ -42,6 +41,10 @@
 
 <script>
 import { Combobox, StatusIndicator } from '@/components/ui';
+import { ref, watch } from 'vue';
+
+const optionsCache = ref({});
+const loaders = ref({});
 
 export default {
     components: {
@@ -85,15 +88,25 @@ export default {
             };
         },
 
+	    cacheKey() {
+			return JSON.stringify({ ...this.parameters, url: this.url });
+	    },
+
         noOptionsText() {
             return this.typeahead && !this.requested ? __('Start typing to search.') : __('No options to choose from.');
         },
     },
 
     created() {
-        // Get the items via ajax.
-        // TODO: To save on requests, this should probably be done in the preload step and sent via meta.
         if (!this.typeahead) this.request();
+
+		watch(
+			() => loaders.value[this.cacheKey],
+			(loading) => {
+				this.options = optionsCache[this.cacheKey];
+				this.requested = true;
+			}
+		);
     },
 
     watch: {
@@ -104,13 +117,22 @@ export default {
 
     methods: {
         request(params = {}) {
+			if (!params.length && loaders.value[this.cacheKey]) return;
+
             params = { ...this.parameters, ...params };
 
-            return this.$axios.get(this.url, { params }).then((response) => {
-                this.options = response.data.data;
-                this.requested = true;
-                return Promise.resolve(response);
-            });
+			loaders.value = {...loaders.value, [this.cacheKey]: true};
+
+            return this.$axios.get(this.url, { params })
+	            .then((response) => {
+	                this.options = response.data.data;
+	                this.requested = true;
+		            optionsCache[this.cacheKey] = this.options;
+	                return Promise.resolve(response);
+	            })
+	            .finally(() => {
+					loaders.value = {...loaders.value, [this.cacheKey]: false};
+	            });
         },
 
         search(search, loading) {
@@ -130,7 +152,7 @@ export default {
                 let option = this.options.find((option) => option.id === id);
                 let existing = this.items.find((item) => item.id === id);
 
-                return existing || option || { id: value, title: value };
+                return existing || option || { id: id, title: id };
             });
 
             this.$emit('input', items);

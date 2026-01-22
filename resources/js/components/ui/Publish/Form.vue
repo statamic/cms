@@ -44,6 +44,10 @@ const props = defineProps({
     asConfig: {
         type: Boolean,
         default: false,
+    },
+    rememberTab: {
+        type: Boolean,
+        default: true,
     }
 });
 
@@ -58,9 +62,7 @@ function save() {
     new Pipeline()
         .provide({ container, errors, saving })
         .through([
-            new BeforeSaveHooks('entry'),
             new Request(props.submitUrl, props.submitMethod),
-            new AfterSaveHooks('entry'),
         ])
         .then((response) => {
             Statamic.$toast.success(__('Saved'));
@@ -95,6 +97,7 @@ onUnmounted(() => saveKeyBinding.destroy());
         :errors="errors"
         :read-only="readOnly"
         :as-config="asConfig"
+        :remember-tab="rememberTab"
         v-model="values"
     >
         <Tabs />

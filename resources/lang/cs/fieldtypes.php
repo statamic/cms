@@ -57,7 +57,7 @@ return [
     'code.config.mode' => 'Vyberte jazyk pro zvýraznění syntaxe.',
     'code.config.mode_selectable' => 'Umožňuje uživateli vybrat jazyk.',
     'code.config.rulers' => 'Nakonfigurujte svislá pravítka, která vám pomohou s odsazením.',
-    'code.config.theme' => 'Vyberte preferovaný vzhled.',
+    'code.config.color_mode' => 'Vyberte preferovaný vzhled.',
     'code.title' => 'Kód',
     'collections.title' => 'Sbírky',
     'color.config.allow_any' => 'Umožňuje zadání libovolné hodnoty barvy pomocí nástroje pro výběr nebo hexadecimálního kódu.',
