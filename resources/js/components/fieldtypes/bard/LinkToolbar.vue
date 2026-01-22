@@ -48,7 +48,14 @@
                         <!-- Data input -->
                         <div
                             v-else
-                            class="flex w-full min-w-[240px] cursor-pointer items-center justify-between"
+                            :class="[
+                                'flex w-full min-w-[240px] cursor-pointer items-center justify-between',
+                                'w-full block bg-white dark:bg-gray-900',
+                                'border border-gray-300 with-contrast:border-gray-500 dark:border-gray-700 dark:with-contrast:border-gray-500 dark:inset-shadow-2xs dark:inset-shadow-black',
+                                'text-gray-925 dark:text-gray-300 placeholder:text-gray-500 dark:placeholder:text-gray-400/85',
+                                'appearance-none antialiased shadow-ui-sm disabled:shadow-none disabled:opacity-50 not-prose',
+                                'text-sm rounded-md px-2.5 py-1.5 h-8 leading-[1.125rem]'
+                            ]"
                             @click="openSelector"
                         >
                             <Icon v-if="isLoading" name="loading" />
