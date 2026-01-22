@@ -62,7 +62,7 @@
 
                             <div v-else class="flex flex-1 items-center truncate me-2">
                                 <img
-                                    v-if="linkType === 'asset' && itemData.asset && itemData.isImage"
+                                    v-if="linkType === 'asset' && itemData.asset && itemData.asset.isImage"
                                     :src="itemData.asset.thumbnail || itemData.asset.url"
                                     class="asset-thumbnail lazyloaded h-6 max-h-full w-6 max-w-full rounded-sm object-cover me-2"
                                 />
