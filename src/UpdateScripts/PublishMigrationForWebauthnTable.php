@@ -9,7 +9,7 @@ class PublishMigrationForWebauthnTable extends UpdateScript
 {
     public function shouldUpdate($newVersion, $oldVersion)
     {
-        return $this->isUpdatingTo('6.0.0')
+        return $this->isUpdatingTo('6.0.0-beta.4')
             && config('statamic.users.repository', 'file') === 'eloquent';
     }
 

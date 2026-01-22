@@ -50,6 +50,7 @@ export default {
         canEdit: { type: Boolean, required: true },
         canSelectAcrossSites: { type: Boolean, required: true },
         canEditBlueprint: { type: Boolean, required: true },
+        entryQueryScopes: { type: Array, default: () => [] },
     },
 
     data() {
@@ -536,6 +537,7 @@ export default {
             ref="selector"
             :site="site"
             :collections="collections"
+            :query-scopes="entryQueryScopes"
             :max-items="maxPagesSelection"
             :can-select-across-sites="canSelectAcrossSites"
             @selected="entriesSelected"

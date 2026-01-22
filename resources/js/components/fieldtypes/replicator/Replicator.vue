@@ -52,7 +52,7 @@
                                     @duplicated="duplicateSet(set._id)"
                                     @removed="removed(set, index)"
                                 >
-                                    <template v-slot:picker>
+                                    <template v-if="canAddSet" v-slot:picker>
                                         <add-set-button
                                             variant="between"
                                             :groups="groupConfigs"
@@ -214,9 +214,10 @@ export default {
 
             this.updateSetMeta(set._id, this.meta.new[handle]);
 
-            this.update([...this.value.slice(0, index), set, ...this.value.slice(index)]);
-
-            this.expandSet(set._id);
+			this.$nextTick(() => {
+				this.update([...this.value.slice(0, index), set, ...this.value.slice(index)]);
+				this.expandSet(set._id);
+			});
         },
 
         duplicateSet(old_id) {

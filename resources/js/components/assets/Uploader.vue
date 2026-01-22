@@ -17,6 +17,7 @@ export default {
         return h(
             'div',
             {
+                class: 'h-full',
                 onDragenter: this.dragenter,
                 onDragover: this.dragover,
                 onDragleave: this.dragleave,

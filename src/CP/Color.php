@@ -2,6 +2,8 @@
 
 namespace Statamic\CP;
 
+use Statamic\Facades\Preference;
+
 class Color
 {
     public const Slate = [
@@ -425,7 +427,11 @@ class Color
 
     public static function theme(bool $dark = false): array
     {
-        $config = config('statamic.cp.theme', []);
+        if ($config = Preference::get('theme')) {
+            $config = is_string($config)
+                ? null // If it's a string, it may be the v5 theme, e.g. "dark", so ignore it.
+                : $config['colors'];
+        }
 
         foreach ($config[$dark ? 'dark-grays' : 'grays'] ?? [] as $shade => $value) {
             $colorHandle = $dark ? 'dark-gray' : 'gray';

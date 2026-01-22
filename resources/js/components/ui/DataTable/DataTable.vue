@@ -6,6 +6,7 @@ import DataTableRows from './Rows.vue';
 import { Panel } from '@ui';
 
 const props = defineProps({
+    /** Controls the size and spacing of the table. <br><br> Options: `normal`, `compact` */
     variant: { type: String, default: 'normal' },
 });
 

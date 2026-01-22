@@ -1,10 +1,17 @@
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, useSlots } from 'vue';
 import { Modal, ModalClose, Button, Icon } from '@/components/ui';
 
-const emit = defineEmits(['opened', 'confirm', 'cancel']);
+const emit = defineEmits([
+    'update:open',
+    'opened',
+    'confirm',
+    'cancel'
+]);
 
 const props = defineProps({
+    /** The controlled open state of the modal. */
+    open: { type: Boolean, default: false },
     title: {
         type: String,
     },
@@ -36,21 +43,17 @@ const props = defineProps({
         default: false,
     },
     busy: {
-        type: Boolean,
-        default: false,
+        type: [Boolean, undefined],
+        default: undefined,
     },
 });
-
-onMounted(() => emit('opened'));
-
-const modalOpen = ref(true);
 
 function updateModalOpen(open) {
     if (! open && props.busy) {
         return;
     }
 
-    modalOpen.value = open;
+    emit('update:open', open);
 
     if (! open) emit('cancel');
 }
@@ -59,11 +62,27 @@ function submit() {
     if (props.busy) return;
 
     emit('confirm');
+
+    if (shouldCloseOnSubmit.value) {
+        updateModalOpen(false);
+    }
 }
+
+const shouldCloseOnSubmit = computed(() => {
+    // If the busy prop is provided, we will assume they will handle the open state externally.
+    return props.busy === undefined;
+});
 </script>
 
 <template>
-    <Modal ref="modal" :title="__(title)" :open="modalOpen" @update:open="updateModalOpen">
+    <Modal
+        ref="modal"
+        :title="__(title)"
+        :open="open"
+        :dismissible="cancellable"
+        @update:open="updateModalOpen"
+        @opened="emit('opened')"
+    >
         <div
             v-if="busy"
             class="pointer-events-none absolute inset-0 flex select-none items-center justify-center bg-white bg-opacity-75 dark:bg-gray-850"
@@ -78,9 +97,8 @@ function submit() {
 
         <template v-if="cancellable || submittable" #footer>
             <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
-                <ModalClose asChild>
+                <ModalClose asChild v-if="cancellable">
                     <Button
-                        v-if="cancellable"
                         variant="ghost"
                         :disabled="busy"
                         :text="__(cancelText)"

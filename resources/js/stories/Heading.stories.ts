@@ -1,18 +1,22 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
-import { Heading, Subheading } from '@ui';
+import type {Meta, StoryObj} from '@storybook/vue3';
+import {Heading, Subheading} from '@ui';
+import {icons} from "@/stories/icons";
 
 const meta = {
     title: 'Components/Heading',
     component: Heading,
+    subcomponents: {
+        Subheading,
+    },
     argTypes: {
-        text: { control: 'text' },
+        icon: {
+            control: 'select',
+            options: icons,
+        },
         size: {
             control: 'select',
-            options: ['default', 'lg', 'xl'],
+            options: ['base', 'lg', 'xl', '2xl'],
         },
-        level: { control: 'text' },
-        icon: { control: 'text' },
-        href: { control: 'text' },
     },
 } satisfies Meta<typeof Heading>;
 
@@ -61,7 +65,7 @@ export const _Sizes: Story = {
 };
 
 const levelCode = `
-<Heading level="3" size="xl">Create collection</Heading>
+<Heading :level="3" size="xl">Create collection</Heading>
 `;
 
 export const _HeadingLevel: Story = {

@@ -5,8 +5,11 @@ import { cva } from 'cva';
 
 const props = defineProps({
     required: { type: Boolean, default: false },
+    /** The id attribute for the toggle */
     id: { type: String, default: () => useId() },
+    /** The controlled value of the switch */
     modelValue: { type: Boolean, default: false },
+    /** Controls the size of the switch. <br><br> Options: `xs`, `sm`, `base`, `lg` */
     size: { type: String, default: 'base' },
 });
 
@@ -14,7 +17,7 @@ defineEmits(['update:modelValue']);
 
 const switchRootClasses = cva({
     base: [
-        'relative flex rounded-full shrink-0 border-2',
+        'relative flex rounded-full shrink-0 border-2 with-contrast:border-1 with-contrast:border-gray-500!',
         'transition-colors cursor-pointer',
         'data-[state=checked]:shadow-inner data-[state=checked]:border-switch-bg data-[state=checked]:bg-switch-bg',
         'data-[state=unchecked]:border-transparent',

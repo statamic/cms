@@ -7,8 +7,8 @@ import registerGlobalCommandPalette from './commands.js';
 import registerUiComponents from './ui.js';
 import registerFieldtypes from './fieldtypes.js';
 import VueClickAway from 'vue3-click-away';
-import FloatingVue from 'floating-vue';
 import 'floating-vue/dist/style.css';
+import tooltipDirective from '@/directives/tooltip.js';
 import { createInertiaApp } from '@inertiajs/vue3';
 import { router } from '@inertiajs/vue3';
 import PortalVue from 'portal-vue';
@@ -244,7 +244,7 @@ export default {
         this.$app.use(createPinia());
         this.$app.use(PortalVue, { portalName: 'v-portal' });
         this.$app.use(VueClickAway);
-        this.$app.use(FloatingVue, { disposeTimeout: 30000, distance: 10 });
+        this.$app.directive('tooltip', tooltipDirective);
         this.$app.use(VueComponentDebug, { enabled: import.meta.env.VITE_VUE_COMPONENT_DEBUG === 'true' });
         toast.initialize(this.$app);
 
@@ -310,14 +310,6 @@ export default {
         registerFieldtypes(this.$app);
         registerIconSets(this.initialConfig);
         components.boot(this.$app);
-
-        // Suppress the translation warnings
-        this.$app.config.warnHandler = (msg, vm, trace) => {
-            if (msg.includes('Property "__" should not start with _ which is a reserved prefix for Vue internals')) {
-                return;
-            }
-            console.warn(msg, vm, trace);
-        };
 
         axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
         axios.defaults.headers.common['X-CSRF-TOKEN'] = Statamic.$config.get('csrfToken');

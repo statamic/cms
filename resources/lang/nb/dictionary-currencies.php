@@ -10,7 +10,6 @@ return [
     'AZN' => 'Aserbajdsjansk manat',
     'BAM' => 'Bosnia-Hercegovina konvertible mark',
     'BDT' => 'Bangladesh Taka',
-    'BGN' => 'Bulgarsk Lev',
     'BHD' => 'Bahrainsk dinar',
     'BIF' => 'Burundiske franc',
     'BND' => 'Brunei dollar',

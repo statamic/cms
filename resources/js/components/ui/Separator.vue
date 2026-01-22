@@ -2,8 +2,11 @@
 import { cva } from 'cva';
 
 const props = defineProps({
+    /** Text to display in the center of the separator */
     text: { type: String, default: null },
+    /** Controls the appearance of the separator. Options: `line`, `dots` */
     variant: { type: String, default: 'line' },
+    /** When `true`, it will render as a vertical separator */
     vertical: { type: Boolean, default: false },
 });
 

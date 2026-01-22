@@ -11,7 +11,6 @@ it('exports modules', async () => {
         'core',
         'inertia',
         'savePipeline',
-        'temporary',
         'ui',
     ]);
 });
@@ -21,11 +20,24 @@ it('exports core', async () => {
         'DateFormatter',
         'Fieldtype',
         'FieldtypeMixin',
+        'HasActionsMixin',
+        'HasInputOptionsMixin',
+        'HasPreferencesMixin',
         'IndexFieldtype',
         'IndexFieldtypeMixin',
+        'InlineEditForm',
         'ItemActions',
+        'RelatedItem',
+        'RestoreRevision',
+        'RevisionHistory',
+        'RevisionPreview',
+        'SaveButtonOptions',
+        'SortableList',
+        'clone',
+        'deepClone',
         'requireElevatedSession',
         'requireElevatedSessionIf',
+        'resetValuesFromResponse',
     ];
 
     expect(Object.keys(modules.core).toSorted()).toEqual(expected)
@@ -107,6 +119,7 @@ it('exports ui', async () => {
     // a component to one place that you don't forget to add it to the other places.
 
     const expectedCmsPackageExports = [
+        'Alert',
         'AuthCard',
         'Badge',
         'Button',
@@ -121,8 +134,10 @@ it('exports ui', async () => {
         'CheckboxGroup',
         'CodeEditor',
         'Combobox',
+        'ConfirmationModal',
         'Context',
         'ContextFooter',
+        'ContextHeader',
         'ContextItem',
         'ContextLabel',
         'ContextMenu',
@@ -175,6 +190,10 @@ it('exports ui', async () => {
         'TabList',
         'TabTrigger',
         'Stack',
+        'StackClose',
+        'StackContent',
+        'StackFooter',
+        'StackHeader',
         'Table',
         'TableCell',
         'TableColumn',
