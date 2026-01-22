@@ -2,7 +2,6 @@
     <Stack
         :title="__('Link')"
         size="narrow"
-        ref="popover"
         class="!size-min"
         inset
         :wrap-slot="false"
@@ -57,7 +56,6 @@ export default {
     methods: {
         close() {
             this.showingToolbar = false;
-            this.$refs.popover.close();
         },
 
         setLink(attributes) {
@@ -78,15 +76,5 @@ export default {
         }
     },
 
-    created() {
-        this.bard.events.on('link-toggle', () => {
-            this.toggleLinkToolbar();
-            this.$refs.popover.toggle();
-        });
-    },
-
-    beforeUnmount() {
-        this.bard.events.off('link-toggle');
-    },
 };
 </script>
