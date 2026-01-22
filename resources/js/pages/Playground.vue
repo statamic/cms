@@ -1,5 +1,6 @@
 <script setup>
 import Head from '@/pages/layout/Head.vue';
+import { Alert, Heading, Description } from '@ui';
 
 defineProps(['icons']);
 </script>
@@ -296,6 +297,67 @@ defineProps(['icons']);
                         <ui-button variant="danger">Danger</ui-button>
                     </ui-button-group>
                 </div>
+            </section>
+
+            <section class="mb-10 space-y-3">
+                <ui-heading size="lg">Alerts</ui-heading>
+
+                <Alert variant="default" text="This is a default alert message" />
+                <Alert variant="warning" text="This is a warning alert message" />
+                <Alert variant="error" text="This is an error alert message" />
+                <Alert variant="success" text="This is a success alert message" />
+                <Alert variant="warning" icon="git" text="This alert has a custom icon" />
+
+                <Alert variant="default" heading="Alert Heading" text="This is a default alert message" />
+                <Alert variant="warning" heading="Alert Heading" text="This is a warning alert message" />
+                <Alert variant="error" heading="Alert Heading" text="This is an error alert message" />
+                <Alert variant="success" heading="Alert Heading" text="This is a success alert message" />
+                <Alert variant="warning" heading="Alert Heading" icon="git" text="This alert has a custom icon" />
+
+                <Alert variant="success">
+                    <strong>Success!</strong> This alert uses a slot for custom content.
+                </Alert>
+                <Alert variant="warning">
+                    <h1>Please run your migrations</h1>
+                    <p>The importer uses Laravel's job batching feature to keep track of the import progress, however, it requires a <code>job_batches</code> table in your database. Before you can run the importer, you will need to run <code>php artisan migrate</code>. This alert uses a heading for the title and a paragraph for the message.</p>
+                </Alert>
+                <Alert variant="default">
+                    <h2>New Feature Available</h2>
+                    <p>We've added support for custom field types. You can now create your own field types by extending the <code>Fieldtype</code> class. Check out the documentation for more details.</p>
+                </Alert>
+                <Alert variant="success">
+                    <h3>Backup Completed Successfully</h3>
+                    <p>Your site backup has been created and saved to <code>/storage/backups/site-2032-01-15.tar.gz</code>. The backup includes all content, assets, and configuration files.</p>
+                </Alert>
+                <Alert variant="error">
+                    <h4>Failed to Connect to Database</h4>
+                    <p>Unable to establish a connection to the database server. Please check your database configuration in <code>.env</code> and ensure the database server is running.</p>
+                </Alert>
+                <hr class="my-10">
+                <Alert variant="default">
+                    <Heading>Using Heading Component</Heading>
+                    <Description>This alert uses the Heading and Description components instead of native HTML elements. The styles should match the variant colors.</Description>
+                </Alert>
+                <Alert variant="warning">
+                    <Heading size="lg">Warning: Action Required</Heading>
+                    <Description>This is a heading size <code>lg</code> example, a warning alert with a larger heading. The Heading component supports different sizes and should inherit the alert's color scheme.</Description>
+                </Alert>
+                <Alert variant="success">
+                    <Heading size="xl">Backup Completed Successfully</Heading>
+                    <Description>Your site backup has been created and saved to <a href="https://statamic.dev"><code>/storage/backups/site-2032-01-15.tar.gz</code></a>. The backup includes all content, assets, and configuration files.</Description>
+                </Alert>
+                <Alert variant="success">
+                    <Heading size="2xl">Backup Completed Very Successfully</Heading>
+                    <Description>Such a massive heading isn't recommended, but here it is for testing purposes. Your site backup has been created and saved to <a href="https://statamic.dev"><code>/storage/backups/site-2032-01-15.tar.gz</code></a>. The backup includes all content, assets, and configuration files.</Description>
+                </Alert>
+                <Alert variant="error">
+                    <Heading level="2">Database Connection Failed</Heading>
+                    <Description>This is a heading level <code>2</code> example, with no heading size difference. Unable to establish a connection to the database server. Please check your database configuration in <code>.env</code> and ensure the database server is running.</Description>
+                </Alert>
+                <Alert variant="warning">
+                    <Heading>Migration Required</Heading>
+                    <Description>The importer uses Laravel's job batching feature to keep track of the import progress, however, it requires a <code>job_batches</code> table in your database. Before you can run the importer, you will need to run <code>php artisan migrate</code>.</Description>
+                </Alert>
             </section>
 
             <section class="space-y-4">
