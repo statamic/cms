@@ -17,6 +17,7 @@ use Statamic\Facades\Stache;
 use Statamic\Facades\Token;
 use Statamic\Fields\FieldsetRecursionStack;
 use Statamic\Jobs\HandleEntrySchedule;
+use Statamic\Jobs\HandleRevisionSchedule;
 use Statamic\Sites\Sites;
 use Statamic\Statamic;
 use Statamic\Tokens\Handlers\LivePreview;
@@ -104,7 +105,10 @@ class AppServiceProvider extends ServiceProvider
 
         $this->addAboutCommandInfo();
 
-        $this->app->make(Schedule::class)->job(new HandleEntrySchedule)->everyMinute();
+        tap($this->app->make(Schedule::class), function (Schedule $scheduler) {
+            $scheduler->job(new HandleEntrySchedule)->everyMinute();
+            $scheduler->job(new HandleRevisionSchedule)->everyMinute();
+        });
     }
 
     public function register()

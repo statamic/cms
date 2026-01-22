@@ -2,70 +2,74 @@
 
     <stack narrow name="publish-options" @closed="$emit('closed')">
         <div slot-scope="{ close }" class="bg-white dark:bg-dark-800 h-full flex flex-col">
+            <publish-container name="revision-publish-form">
+                <div>
+                        <div class="bg-gray-200 dark:bg-dark-600 px-6 py-2 border-b border-gray-300 dark:border-dark-900 text-lg font-medium flex items-center justify-between">
+                            {{ __('Publish') }}
+                            <button
+                                type="button"
+                                class="btn-close"
+                                @click="close"
+                                v-html="'&times'" />
+                        </div>
 
-            <div class="bg-gray-200 dark:bg-dark-600 px-6 py-2 border-b border-gray-300 dark:border-dark-900 text-lg font-medium flex items-center justify-between">
-                {{ __('Publish') }}
-                <button
-                    type="button"
-                    class="btn-close"
-                    @click="close"
-                    v-html="'&times'" />
-            </div>
+                        <div class="flex-1 overflow-auto p-6">
 
-            <div class="flex-1 overflow-auto p-6">
+                            <div class="flex h-full items-center justify-center loading" v-if="saving">
+                                <loading-graphic text="" />
+                            </div>
 
-                <div class="flex h-full items-center justify-center loading" v-if="saving">
-                    <loading-graphic text="" />
+                            <template v-else>
+
+                                <select-input
+                                    class="mb-6"
+                                    v-model="action"
+                                    :options="options"
+                                />
+
+                                <div v-if="action">
+
+                                    <date-fieldtype
+                                        v-if="action == 'publishLater'"
+                                        class="mb-6"
+                                        :config="config"
+                                        handle="publishLaterDateTime"
+                                        v-model="publishRevisionAt" />
+
+                                    <textarea-input
+                                        class="mb-6 text-sm"
+                                        v-model="revisionMessage"
+                                        :placeholder="__('Notes about this revision')"
+                                        @keydown.enter="submit"
+                                        :focus="true" />
+
+                                    <button
+                                        class="btn-primary w-full mb-6"
+                                        v-text="submitButtonText"
+                                        @click="submit"
+                                    />
+
+                                    <div class="text-gray text-xs flex mb-6">
+                                        <div class="pt-px w-4 rtl:ml-2 ltr:mr-2">
+                                            <svg-icon name="info-circle" class="pt-px" />
+                                        </div>
+                                        <div class="flex-1" v-text="actionInfoText" />
+                                    </div>
+
+                                    <div class="text-gray text-xs flex mb-6 text-red-500" v-if="action === 'schedule'">
+                                        <div class="pt-px w-4 rtl:ml-2 ltr:mr-2">
+                                            <svg-icon name="info-circle" class="pt-px" />
+                                        </div>
+                                        <div class="flex-1" v-text="__('messages.publish_actions_current_becomes_draft_because_scheduled')" />
+                                    </div>
+
+                                </div>
+
+                            </template>
+
+                        </div>
                 </div>
-
-                <template v-else>
-
-                    <select-input
-                        class="mb-6"
-                        v-model="action"
-                        :options="options"
-                    />
-
-                    <div v-if="action">
-
-                        <date-fieldtype
-                            v-if="action == 'schedule'"
-                            class="mb-6"
-                            name="publishTime"
-                            :value="publishTime" />
-
-                        <textarea-input
-                            class="mb-6 text-sm"
-                            v-model="revisionMessage"
-                            :placeholder="__('Notes about this revision')"
-                            @keydown.enter="submit"
-                            :focus="true" />
-
-                        <button
-                            class="btn-primary w-full mb-6"
-                            v-text="submitButtonText"
-                            @click="submit"
-                        />
-
-                        <div class="text-gray text-xs flex mb-6">
-                            <div class="pt-px w-4 rtl:ml-2 ltr:mr-2">
-                                <svg-icon name="info-circle" class="pt-px" />
-                            </div>
-                            <div class="flex-1" v-text="actionInfoText" />
-                        </div>
-
-                        <div class="text-gray text-xs flex mb-6 text-red-500" v-if="action === 'schedule'">
-                            <div class="pt-px w-4 rtl:ml-2 ltr:mr-2">
-                                <svg-icon name="info-circle" class="pt-px" />
-                            </div>
-                            <div class="flex-1" v-text="__('messages.publish_actions_current_becomes_draft_because_scheduled')" />
-                        </div>
-
-                    </div>
-
-                </template>
-
-            </div>
+            </publish-container>
         </div>
     </stack>
 
@@ -86,6 +90,12 @@ export default {
     data() {
         return {
             action: this.canManagePublishState ? 'publish' : 'revision',
+            config: {
+                earliest_date: this.now(),
+                latest_date: { date: null, time: null},
+                time_enabled: true
+            },
+            publishRevisionAt: this.now(),
             revisionMessage: null,
             saving: false,
         }
@@ -98,6 +108,7 @@ export default {
 
             if (this.canManagePublishState) {
                 options.push({ value: 'publish', label: __('Publish Now') });
+                options.push({ value: 'publishLater', label: __('Publish Later') });
 
                 if (this.published) {
                     options.push({ value: 'unpublish', label: __('Unpublish') });
@@ -119,6 +130,8 @@ export default {
                     return __('messages.publish_actions_unpublish');
                 case 'revision':
                     return __('messages.publish_actions_create_revision');
+                case 'publishLater':
+                    return __('messages.publish_actions_schedule_revision');
             }
         },
 
@@ -129,6 +142,13 @@ export default {
     },
 
     methods: {
+
+        now() {
+            return {
+                date: moment().format('YYYY-MM-DD'),
+                time: moment().format('HH:mm')
+            };
+        },
 
         submit() {
             this.saving = true;
@@ -184,10 +204,6 @@ export default {
                 }).catch(e => {});
         },
 
-        submitSchedule() {
-            // todo
-        },
-
         submitUnpublish() {
             const payload = { message: this.revisionMessage };
 
@@ -205,8 +221,16 @@ export default {
             }).catch(e => this.handleAxiosError(e));
         },
 
-        submitRevision() {
+        submitPublishLater() {
+            this.submitRevision(this.publishRevisionAt);
+        },
+
+        submitRevision(publishRevisionAt) {
             const payload = { message: this.revisionMessage };
+
+            if (publishRevisionAt) {
+                payload.publish_at = publishRevisionAt;
+            }
 
             this.$axios.post(this.actions.createRevision, payload).then(response => {
                 this.$toast.success(__('Revision created'));

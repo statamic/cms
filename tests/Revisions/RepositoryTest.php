@@ -36,4 +36,12 @@ class RepositoryTest extends TestCase
 
         $this->assertIsArray($revisions->toArray());
     }
+
+    #[Test]
+    public function it_loads_publish_at_as_carbon()
+    {
+        $revision = $this->repo->whereKey('123')->last();
+
+        $this->assertEquals(1553644800, $revision->publishAt()->timestamp);
+    }
 }

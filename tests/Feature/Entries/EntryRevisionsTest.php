@@ -245,7 +245,7 @@ class EntryRevisionsTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->post($entry->createRevisionUrl(), ['message' => 'Test!'])
+            ->post($entry->createRevisionUrl(), ['message' => 'Test!', 'publish_at' => ['date' => '2010-12-29', 'time' => '11:00am']])
             ->assertOk();
 
         $entry = Entry::find($entry->id());
@@ -270,6 +270,7 @@ class EntryRevisionsTest extends TestCase
         ], $revision->attributes());
         $this->assertEquals('user-1', $revision->user()->id());
         $this->assertEquals('Test!', $revision->message());
+        $this->assertEquals(1293620400, $revision->publishAt()->timestamp);
         $this->assertEquals('revision', $revision->action());
         $this->assertTrue($entry->hasWorkingCopy());
     }

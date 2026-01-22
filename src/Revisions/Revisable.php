@@ -9,6 +9,11 @@ use Statamic\Statamic;
 
 trait Revisable
 {
+    public function hasRevisions(): bool
+    {
+        return $this->revisions()->isNotEmpty();
+    }
+
     public function revision(string $reference)
     {
         return $this->revisions()->get($reference);
@@ -162,14 +167,17 @@ trait Revisable
         return $return;
     }
 
-    public function createRevision($options = [])
+    public function createRevision($options = []): self
     {
         $this
             ->fromWorkingCopy()
             ->makeRevision()
             ->user($options['user'] ?? false)
             ->message($options['message'] ?? false)
+            ->publishAt($options['publish_at'] ?? null)
             ->save();
+
+        return $this;
     }
 
     public function revisionsEnabled()
