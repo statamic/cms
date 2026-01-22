@@ -412,7 +412,7 @@ export default {
         json(json, oldJson) {
             if (!this.mounted) return;
 
-            if (json === oldJson) return;
+            if (JSON.stringify(json) === JSON.stringify(oldJson)) return;
 
             this.debounceNextUpdate
                 ? this.updateDebounced(json)
