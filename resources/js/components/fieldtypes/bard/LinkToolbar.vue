@@ -1,24 +1,23 @@
 <template>
-    <StackContent>
-        <section class="flex gap-2 items-center p-4 border-b dark:border-gray-800">
+    <StackContent class="space-y-5">
+        <section class="flex gap-3 items-center">
             <ui-select
                 v-model="linkType"
                 :options="visibleLinkTypes"
                 option-label="title"
                 option-value="type"
-                size="sm"
-                class="flex-1"
+                class="w-1/4 min-w-24"
             />
 
-            <div class="flex-1">
+            <div class="flex-1 min-w-0">
                 <!-- URL input -->
                 <ui-input
                     v-if="linkType === 'url'"
                     v-model="url.url"
                     type="text"
                     ref="urlInput"
-                    size="sm"
-                    :placeholder="__('URL')"
+                    autofocus
+                    :placeholder="__('https://')"
                     @keydown.enter.prevent="commit"
                 />
 
@@ -28,7 +27,6 @@
                     v-model="urlData.mailto"
                     type="text"
                     ref="mailtoInput"
-                    size="sm"
                     :placeholder="__('Email Address')"
                     @keydown.enter.prevent="commit"
                 />
@@ -38,7 +36,6 @@
                     v-else-if="linkType === 'tel'"
                     v-model="urlData.tel"
                     ref="telInput"
-                    size="sm"
                     :placeholder="__('Phone Number')"
                     @keydown.enter.prevent="commit"
                 />
@@ -47,28 +44,28 @@
                 <div
                     v-else
                     :class="[
-                                'flex w-full min-w-[240px] cursor-pointer items-center justify-between',
-                                'w-full block bg-white dark:bg-gray-900',
+                                'flex overflow-hidden cursor-pointer items-center justify-between',
+                                'w-full block bg-white dark:bg-gray-900 min-w-0',
                                 'border border-gray-300 with-contrast:border-gray-500 dark:border-gray-700 dark:with-contrast:border-gray-500 dark:inset-shadow-2xs dark:inset-shadow-black',
                                 'text-gray-925 dark:text-gray-300 placeholder:text-gray-500 dark:placeholder:text-gray-400/85',
                                 'appearance-none antialiased shadow-ui-sm disabled:shadow-none disabled:opacity-50 not-prose',
-                                'text-sm rounded-md px-2.5 py-1.5 h-8 leading-[1.125rem]'
+                                'text-sm rounded-lg px-2.5 py-1.5 h-10 leading-[1.125rem]'
                             ]"
                     @click="openSelector"
                 >
                     <Icon v-if="isLoading" name="loading" />
 
-                    <div v-else class="flex flex-1 items-center truncate me-2">
+                    <div v-else class="flex flex-1 items-center me-2 overflow-hidden min-w-0">
                         <img
                             v-if="linkType === 'asset' && itemData.asset && itemData.asset.isImage"
                             :src="itemData.asset.thumbnail || itemData.asset.url"
-                            class="asset-thumbnail lazyloaded h-6 max-h-full w-6 max-w-full rounded-sm object-cover me-2"
+                            class="asset-thumbnail lazyloaded size-6 max-h-full max-w-full rounded-sm object-cover me-2 flex-shrink-0"
                         />
-                        {{ displayValue }}
+                        <div class="truncate min-w-0 flex-1">{{ displayValue || __('Choose item...') }}</div>
                     </div>
 
                     <button
-                        class="flex items-center"
+                        class="flex items-center cursor-pointer"
                         v-tooltip="`${__('Browse')}...`"
                         :aria-label="`${__('Browse')}...`"
                         @click="openSelector"
@@ -80,33 +77,34 @@
             </div>
         </section>
 
-        <div class="space-y-3 p-4">
+        <ui-separator :text="__('Advanced Options')" />
+
+        <section class="space-y-5">
             <!-- Title attribute -->
             <ui-input
                 type="text"
                 ref="input"
-                size="sm"
                 v-model="title"
                 :prepend="__('Label')"
-                :placeholder="__('Optional')"
+                :placeholder="__('Add a link label')"
             />
 
             <!-- Rel attribute -->
             <ui-input
                 type="text"
                 ref="input"
-                size="sm"
                 v-model="rel"
                 :prepend="__('Rel')"
-                :placeholder="__('Optional')"
+                :placeholder="__('noopener, noreferrer')"
             />
 
-            <ui-checkbox
-                :label="__('Open in new window')"
-                v-model="targetBlank"
-                size="sm"
-            />
-        </div>
+            <div class="flex items-center gap-2">
+                <ui-switch
+                    v-model="targetBlank"
+                />
+                <ui-description :text="__('Open in new window')" />
+            </div>
+        </section>
 
         <relationship-input
             class="hidden"
