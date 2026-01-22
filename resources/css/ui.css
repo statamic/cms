@@ -156,6 +156,8 @@
 }
 
 @theme {
+    --max-width-page: 90rem;
+
     --text-4xs: 0.4rem;
     --text-3xs: 0.5rem;
     --text-2xs: 0.7rem;
