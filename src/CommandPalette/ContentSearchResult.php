@@ -8,7 +8,6 @@ class ContentSearchResult extends Link
 
     protected $badge;
     protected $reference;
-    protected $site;
 
     public function badge(string $badge): static
     {
@@ -24,19 +23,11 @@ class ContentSearchResult extends Link
         return $this;
     }
 
-    public function site(string $site): static
-    {
-        $this->site = $site;
-
-        return $this;
-    }
-
     public function toArray(): array
     {
         return array_merge(parent::toArray(), [
             'badge' => $this->badge,
             'reference' => $this->reference,
-            'site' => $this->site,
             'trackRecent' => $this->trackRecent,
         ]);
     }

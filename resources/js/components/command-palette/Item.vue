@@ -9,7 +9,6 @@ const props = defineProps({
     icon: { type: String, default: null },
     text: { type: String, default: null },
     badge: { type: String, default: null },
-	site: { type: String, default: null },
     keys: { type: Array, default: null },
     removable: { type: Boolean, default: false },
 });
@@ -26,14 +25,6 @@ const component = computed(() => {
     const hostOfCurrentUrl = window.location.host;
     const hostOfHref = (new URL(props.href)).host;
     return hostOfHref === hostOfCurrentUrl ? Link : 'a';
-});
-
-const badge = computed(() => {
-	if (!props.badge) return null;
-
-	return props.site
-		? __(':site - :badge', { site: props.site, badge: props.badge })
-		: props.badge;
 });
 
 onMounted(() => {

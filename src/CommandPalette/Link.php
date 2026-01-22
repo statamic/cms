@@ -2,11 +2,9 @@
 
 namespace Statamic\CommandPalette;
 
-use Illuminate\Support\Traits\Conditionable;
-
 class Link extends Command
 {
-    use Concerns\TracksRecent, Conditionable;
+    use Concerns\TracksRecent;
 
     protected $url;
     protected $openNewTab;

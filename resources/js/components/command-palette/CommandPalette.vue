@@ -347,7 +347,6 @@ router.on('start', () => {
                                             :href="item.url"
                                             :open-new-tab="metaPressed || item.openNewTab"
                                             :badge="item.badge"
-                                            :site="item.site"
                                             :keys="item.keys"
                                             :removable="isRecentItem(item)"
                                             @remove="removeRecentItem"
