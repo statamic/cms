@@ -22,37 +22,20 @@ provide('layout', {
     additionalBreadcrumbs,
 });
 
-// Focus management: if no Input with :focus="true" is present, focus the main element
+// Focus management: focus main element if no input has auto-focus
 let navigationListener = null;
 
-function checkAndFocusMain() {
-    // Wait for all components to mount and any auto-focus to complete
-    nextTick(() => {
-        setTimeout(() => {
-            const activeElement = document.activeElement;
-            const isInputFocused = activeElement && (
-                activeElement.matches('input, textarea, select, [contenteditable]') ||
-                activeElement.closest('[role="combobox"], [role="textbox"]')
-            );
-
-            // If no input is focused, focus the main element
-            if (!isInputFocused) {
-                const mainElement = document.querySelector('#content-card');
-                if (mainElement && typeof mainElement.focus === 'function') {
-                    mainElement.focus();
-                }
-            }
-        }, 100); // Small delay to allow any auto-focus to complete
+function focusMain() {
+    requestAnimationFrame(() => {
+        if (!document.activeElement?.matches('input, textarea, select, [contenteditable]')) {
+            document.querySelector('#content-card')?.focus();
+        }
     });
 }
 
 onMounted(() => {
-    navigationListener = router.on('success', () => {
-        checkAndFocusMain();
-    });
-    
-    // Also check on initial mount
-    checkAndFocusMain();
+    navigationListener = router.on('success', focusMain);
+    focusMain();
 });
 
 onUnmounted(() => {
