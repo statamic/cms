@@ -1,54 +1,52 @@
 <template>
-    <div class="bard-link-toolbar">
-        <div>
-            <div class="border-b bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 rounded-t-xl">
-                <section class="flex gap-2 items-center p-4 border-b dark:border-gray-800">
-                    <ui-select
-                        v-model="linkType"
-                        :options="visibleLinkTypes"
-                        option-label="title"
-                        option-value="type"
-                        size="sm"
-                        class="flex-1"
-                    />
+    <StackContent>
+        <section class="flex gap-2 items-center p-4 border-b dark:border-gray-800">
+            <ui-select
+                v-model="linkType"
+                :options="visibleLinkTypes"
+                option-label="title"
+                option-value="type"
+                size="sm"
+                class="flex-1"
+            />
 
-                    <div class="flex-1">
-                        <!-- URL input -->
-                        <ui-input
-                            v-if="linkType === 'url'"
-                            v-model="url.url"
-                            type="text"
-                            ref="urlInput"
-                            size="sm"
-                            :placeholder="__('URL')"
-                            @keydown.enter.prevent="commit"
-                        />
+            <div class="flex-1">
+                <!-- URL input -->
+                <ui-input
+                    v-if="linkType === 'url'"
+                    v-model="url.url"
+                    type="text"
+                    ref="urlInput"
+                    size="sm"
+                    :placeholder="__('URL')"
+                    @keydown.enter.prevent="commit"
+                />
 
-                        <!-- Email input -->
-                        <ui-input
-                            v-else-if="linkType === 'mailto'"
-                            v-model="urlData.mailto"
-                            type="text"
-                            ref="mailtoInput"
-                            size="sm"
-                            :placeholder="__('Email Address')"
-                            @keydown.enter.prevent="commit"
-                        />
+                <!-- Email input -->
+                <ui-input
+                    v-else-if="linkType === 'mailto'"
+                    v-model="urlData.mailto"
+                    type="text"
+                    ref="mailtoInput"
+                    size="sm"
+                    :placeholder="__('Email Address')"
+                    @keydown.enter.prevent="commit"
+                />
 
-                        <!-- Phone input -->
-                        <ui-input
-                            v-else-if="linkType === 'tel'"
-                            v-model="urlData.tel"
-                            ref="telInput"
-                            size="sm"
-                            :placeholder="__('Phone Number')"
-                            @keydown.enter.prevent="commit"
-                        />
+                <!-- Phone input -->
+                <ui-input
+                    v-else-if="linkType === 'tel'"
+                    v-model="urlData.tel"
+                    ref="telInput"
+                    size="sm"
+                    :placeholder="__('Phone Number')"
+                    @keydown.enter.prevent="commit"
+                />
 
-                        <!-- Data input -->
-                        <div
-                            v-else
-                            :class="[
+                <!-- Data input -->
+                <div
+                    v-else
+                    :class="[
                                 'flex w-full min-w-[240px] cursor-pointer items-center justify-between',
                                 'w-full block bg-white dark:bg-gray-900',
                                 'border border-gray-300 with-contrast:border-gray-500 dark:border-gray-700 dark:with-contrast:border-gray-500 dark:inset-shadow-2xs dark:inset-shadow-black',
@@ -56,87 +54,59 @@
                                 'appearance-none antialiased shadow-ui-sm disabled:shadow-none disabled:opacity-50 not-prose',
                                 'text-sm rounded-md px-2.5 py-1.5 h-8 leading-[1.125rem]'
                             ]"
-                            @click="openSelector"
-                        >
-                            <Icon v-if="isLoading" name="loading" />
+                    @click="openSelector"
+                >
+                    <Icon v-if="isLoading" name="loading" />
 
-                            <div v-else class="flex flex-1 items-center truncate me-2">
-                                <img
-                                    v-if="linkType === 'asset' && itemData.asset && itemData.asset.isImage"
-                                    :src="itemData.asset.thumbnail || itemData.asset.url"
-                                    class="asset-thumbnail lazyloaded h-6 max-h-full w-6 max-w-full rounded-sm object-cover me-2"
-                                />
-                                {{ displayValue }}
-                            </div>
-
-                            <button
-                                class="flex items-center"
-                                v-tooltip="`${__('Browse')}...`"
-                                :aria-label="`${__('Browse')}...`"
-                                @click="openSelector"
-                            >
-                                <Icon v-show="linkType === 'asset'" name="folder-photos" class="size-4" />
-                                <Icon v-show="linkType !== 'asset'" name="folder" class="size-4" />
-                            </button>
-                        </div>
+                    <div v-else class="flex flex-1 items-center truncate me-2">
+                        <img
+                            v-if="linkType === 'asset' && itemData.asset && itemData.asset.isImage"
+                            :src="itemData.asset.thumbnail || itemData.asset.url"
+                            class="asset-thumbnail lazyloaded h-6 max-h-full w-6 max-w-full rounded-sm object-cover me-2"
+                        />
+                        {{ displayValue }}
                     </div>
-                </section>
 
-                <div class="space-y-3 p-4">
-                    <!-- Title attribute -->
-                    <ui-input
-                        type="text"
-                        ref="input"
-                        size="sm"
-                        v-model="title"
-                        :prepend="__('Label')"
-                        :placeholder="__('Optional')"
-                    />
-
-                    <!-- Rel attribute -->
-                    <ui-input
-                        type="text"
-                        ref="input"
-                        size="sm"
-                        v-model="rel"
-                        :prepend="__('Rel')"
-                        :placeholder="__('Optional')"
-                    />
-
-                    <ui-checkbox
-                        :label="__('Open in new window')"
-                        v-model="targetBlank"
-                        size="sm"
-                    />
+                    <button
+                        class="flex items-center"
+                        v-tooltip="`${__('Browse')}...`"
+                        :aria-label="`${__('Browse')}...`"
+                        @click="openSelector"
+                    >
+                        <Icon v-show="linkType === 'asset'" name="folder-photos" class="size-4" />
+                        <Icon v-show="linkType !== 'asset'" name="folder" class="size-4" />
+                    </button>
                 </div>
-
             </div>
+        </section>
 
-            <footer class="flex items-center justify-end gap-2 sm:gap-3 rounded-b-md bg-gray-100 p-2 font-normal dark:bg-gray-800 rounded-b-xl">
-                <ui-button
-                    @click="$emit('canceled')"
-                    :text="__('Cancel')"
-                    size="sm"
-                    inset
-                    variant="ghost"
-                />
-                <ui-button
-                    :text="__('Remove Link')"
-                    @click="remove"
-                    size="sm"
-                    inset
-                />
-                <ui-button
-                    :text="__('Apply Link')"
-                    :disabled="!canCommit"
-                    @click="commit"
-                    size="sm"
-                    variant="primary"
-                />
-            </footer>
+        <div class="space-y-3 p-4">
+            <!-- Title attribute -->
+            <ui-input
+                type="text"
+                ref="input"
+                size="sm"
+                v-model="title"
+                :prepend="__('Label')"
+                :placeholder="__('Optional')"
+            />
+
+            <!-- Rel attribute -->
+            <ui-input
+                type="text"
+                ref="input"
+                size="sm"
+                v-model="rel"
+                :prepend="__('Rel')"
+                :placeholder="__('Optional')"
+            />
+
+            <ui-checkbox
+                :label="__('Open in new window')"
+                v-model="targetBlank"
+                size="sm"
+            />
         </div>
-
-        <!-- Selectors -->
 
         <relationship-input
             class="hidden"
@@ -166,19 +136,44 @@
                 @closed="showAssetSelector = false"
             />
         </Stack>
-    </div>
+    </StackContent>
+
+
+    <StackFooter>
+        <template #end>
+            <ui-button
+                @click="$emit('canceled')"
+                :text="__('Cancel')"
+                variant="ghost"
+            />
+            <ui-button
+                :text="__('Remove Link')"
+                @click="remove"
+            />
+            <ui-button
+                :text="__('Apply Link')"
+                :disabled="!canCommit"
+                @click="commit"
+                variant="primary"
+            />
+        </template>
+    </StackFooter>
+
+    <!-- Selectors -->
 </template>
 
 <script>
 import qs from 'qs';
 import AssetSelector from '../../assets/Selector.vue';
-import { Icon, Stack } from '@/components/ui';
+import { Icon, Stack, StackContent, StackFooter } from '@/components/ui';
 
 export default {
     components: {
         AssetSelector,
         Icon,
 	    Stack,
+        StackContent,
+        StackFooter,
     },
 
     props: {

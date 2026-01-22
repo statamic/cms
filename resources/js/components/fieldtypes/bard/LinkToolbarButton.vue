@@ -1,5 +1,14 @@
 <template>
-    <Popover ref="popover" class="!size-min" :inset="true" :dismissible="false" v-model:open="showingToolbar">
+    <Stack
+        :title="__('Link')"
+        size="narrow"
+        ref="popover"
+        class="!size-min"
+        inset
+        :wrap-slot="false"
+        :dismissible="false"
+        v-model:open="showingToolbar"
+    >
         <template #trigger>
             <Button
                 class="px-2!"
@@ -15,7 +24,6 @@
         </template>
         <link-toolbar
             v-if="linkAttrs !== null"
-            class="min-w-84 size-min"
             ref="toolbar"
             :link-attrs="linkAttrs"
             :config="config"
@@ -23,11 +31,11 @@
             @updated="setLink"
             @canceled="close"
         />
-    </Popover>
+    </Stack>
 </template>
 
 <script>
-import { Popover } from '@/components/ui';
+import { Popover, Stack } from '@/components/ui';
 import LinkToolbar from './LinkToolbar.vue';
 import BardToolbarButton from './ToolbarButton.vue';
 
@@ -37,6 +45,7 @@ export default {
     components: {
         Popover,
         LinkToolbar,
+        Stack,
     },
 
     data() {
