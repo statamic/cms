@@ -7,6 +7,7 @@ const { isVisible, content, html, targetEl } = useTooltip();
 
 const showTooltip = ref(false);
 const wrapperStyle = ref({});
+const spanStyle = ref({});
 const tooltipKey = ref(0);
 const displayContent = ref('');
 const displayHtml = ref(false);
@@ -14,6 +15,7 @@ const displayHtml = ref(false);
 function updatePosition() {
     if (!targetEl.value) {
         wrapperStyle.value = { display: 'none' };
+        spanStyle.value = {};
         return;
     }
 
@@ -25,8 +27,13 @@ function updatePosition() {
         left: `${rect.left}px`,
         width: `${rect.width}px`,
         height: `${rect.height}px`,
-        zIndex: 9999,
         pointerEvents: 'none',
+    };
+
+    spanStyle.value = {
+        display: 'block',
+        width: `${rect.width}px`,
+        height: `${rect.height}px`,
     };
 }
 
@@ -56,7 +63,7 @@ watch([isVisible, targetEl, content], async ([visible, target]) => {
                 placement="top"
                 :distance="10"
             >
-                <span class="block w-full h-full" />
+                <span :style="spanStyle" />
                 <template #popper>
                     <div v-if="displayHtml" v-html="displayContent" />
                     <template v-else>{{ displayContent }}</template>
