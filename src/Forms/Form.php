@@ -17,7 +17,6 @@ use Statamic\Events\FormDeleted;
 use Statamic\Events\FormDeleting;
 use Statamic\Events\FormSaved;
 use Statamic\Events\FormSaving;
-use Statamic\Facades\Antlers;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
 use Statamic\Facades\Form as FormFacade;
@@ -277,12 +276,6 @@ class Form implements Arrayable, Augmentable, FormContract
     public function hydrate()
     {
         $contents = YAML::parse(File::get($this->path()));
-        $variables = ['config' => config()->all()];
-        array_walk_recursive($contents, function (&$value) use ($variables) {
-            if (is_string($value)) {
-                $value = (string) Antlers::parse($value, $variables);
-            }
-        });
 
         $methods = [
             'title',

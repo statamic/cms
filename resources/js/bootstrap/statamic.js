@@ -7,8 +7,8 @@ import registerGlobalCommandPalette from './commands.js';
 import registerUiComponents from './ui.js';
 import registerFieldtypes from './fieldtypes.js';
 import VueClickAway from 'vue3-click-away';
-import FloatingVue from 'floating-vue';
 import 'floating-vue/dist/style.css';
+import tooltipDirective from '@/directives/tooltip.js';
 import { createInertiaApp } from '@inertiajs/vue3';
 import { router } from '@inertiajs/vue3';
 import PortalVue from 'portal-vue';
@@ -244,7 +244,7 @@ export default {
         this.$app.use(createPinia());
         this.$app.use(PortalVue, { portalName: 'v-portal' });
         this.$app.use(VueClickAway);
-        this.$app.use(FloatingVue, { disposeTimeout: 30000, distance: 10 });
+        this.$app.directive('tooltip', tooltipDirective);
         this.$app.use(VueComponentDebug, { enabled: import.meta.env.VITE_VUE_COMPONENT_DEBUG === 'true' });
         toast.initialize(this.$app);
 

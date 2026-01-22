@@ -10,6 +10,7 @@
                 :sort-direction="sortDirection"
                 :additional-parameters="additionalParameters"
                 v-model:selections="selections"
+                @request-completed="focusSearchInput"
             >
                 <template #initializing>
                     <div class="flex flex-1">
@@ -22,7 +23,7 @@
                 <div class="flex flex-1 flex-col gap-4 overflow-auto p-4">
                     <div class="flex items-center gap-2 sm:gap-3">
                         <div class="flex flex-1 items-center gap-2 sm:gap-3">
-                            <Search />
+                            <Search ref="search" />
                             <Filters v-if="filters && filters.length" />
                         </div>
 
@@ -316,6 +317,10 @@ export default {
             // Try to get a meaningful title from common fields
             return row.title || row.name || row.label || row.id || __('item');
         },
+
+	    focusSearchInput() {
+		    this.$nextTick(() => this.$refs.search.focus());
+	    },
     },
 };
 </script>
