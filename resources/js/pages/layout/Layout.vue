@@ -71,7 +71,7 @@ onUnmounted(() => {
         <main id="main" class="flex bg-body-bg dark:border-t dark:border-body-border rounded-t-2xl fixed top-14 inset-x-0 bottom-0 min-h-[calc(100vh-3.5rem)]">
             <Nav />
             <div id="main-content" class="main-content sm:p-2 h-full flex-1 overflow-y-auto rounded-t-2xl">
-                <div id="content-card" class="relative content-card grid min-h-full">
+                <div id="content-card" tabindex="-1" class="relative content-card grid min-h-full">
                     <div class="w-full">
                         <slot />
                     </div>
