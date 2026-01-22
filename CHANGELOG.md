@@ -1,9 +1,16 @@
 # Release Notes
 
+## 5.73.1 (2026-01-21)
+
+### What's fixed
+- Revert config values in forms [#13632](https://github.com/statamic/cms/issues/13632) by @jasonvarga
+
+
+
 ## 5.73.0 (2026-01-21)
 
 ### What's new
-- Allow config values to be used in forms [#11403](https://github.com/statamic/cms/issues/11403) by @FrittenKeeZ
+- ~Allow config values to be used in forms~ (Reverted in 5.73.1) [#11403](https://github.com/statamic/cms/issues/11403) by @FrittenKeeZ
 - Allow closure in cascade content hydration [#13580](https://github.com/statamic/cms/issues/13580) by @marcorieser
 
 ### What's fixed
