@@ -11,7 +11,7 @@ use Statamic\Facades\User;
 use Symfony\Component\Uid\Uuid;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
-use Webauthn\PublicKeyCredentialSource;
+use Webauthn\CredentialRecord;
 use Webauthn\TrustPath\EmptyTrustPath;
 
 #[Group('passkeys')]
@@ -19,9 +19,9 @@ class PasskeyTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    private function createTestCredential(): PublicKeyCredentialSource
+    private function createTestCredential(): CredentialRecord
     {
-        return PublicKeyCredentialSource::create(
+        return CredentialRecord::create(
             publicKeyCredentialId: 'test-credential-id-123',
             type: 'public-key',
             transports: ['usb', 'nfc'],
@@ -45,7 +45,7 @@ class PasskeyTest extends TestCase
             ->setUser($user)
             ->setCredential($credential);
 
-        $this->assertInstanceOf(PublicKeyCredentialSource::class, $passkey->credential());
+        $this->assertInstanceOf(CredentialRecord::class, $passkey->credential());
         $this->assertEquals('test-credential-id-123', $passkey->credential()->publicKeyCredentialId);
         $this->assertEquals('public-key', $passkey->credential()->type);
     }
@@ -183,7 +183,7 @@ class PasskeyTest extends TestCase
         $this->assertInstanceOf(Passkey::class, $unserialized);
         $this->assertEquals('My Passkey', $unserialized->name());
         $this->assertEquals('test-user', $unserialized->user()->id());
-        $this->assertInstanceOf(PublicKeyCredentialSource::class, $unserialized->credential());
+        $this->assertInstanceOf(CredentialRecord::class, $unserialized->credential());
         $this->assertEquals('test-credential-id-123', $unserialized->credential()->publicKeyCredentialId);
         $this->assertEquals('2024-01-15 10:30:00', $unserialized->lastLogin()->format('Y-m-d H:i:s'));
     }

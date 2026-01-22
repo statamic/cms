@@ -10,11 +10,17 @@ defineOptions({
 const emit = defineEmits(['update:open']);
 
 const props = defineProps({
+    /** The preferred alignment against the trigger. May change when collisions occur. Options: `start`, `center`, `end` */
     align: { type: String, default: 'center' },
+    /** When `true`, an arrow is displayed near the trigger. */
     arrow: { type: Boolean, default: false },
+    /** When `true`, the internal padding of the popover is removed. */
     inset: { type: Boolean, default: false },
+    /** The distance in pixels from the trigger */
     offset: { type: Number, default: 5 },
+    /** The preferred side of the trigger to render against when open. Options: `top`, `bottom`, `left`, `right` */
     side: { type: String, default: 'bottom' },
+    /** The controlled open state of the popover. */
     open: { type: Boolean, default: false },
 	closeOnOutsideClick: { type: Boolean, default: true },
 });

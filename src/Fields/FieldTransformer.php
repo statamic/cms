@@ -78,6 +78,10 @@ class FieldTransformer
                                             unset($set['icon']);
                                         }
 
+                                        if (! Arr::get($set, 'image')) {
+                                            unset($set['image']);
+                                        }
+
                                         if (! Arr::get($set, 'hide')) {
                                             unset($set['hide']);
                                         }

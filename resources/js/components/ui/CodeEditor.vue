@@ -39,20 +39,32 @@ import 'codemirror/mode/yaml-frontmatter/yaml-frontmatter';
 const emit = defineEmits(['update:mode', 'update:model-value', 'focus', 'blur']);
 
 const props = defineProps({
+    /** When `true`, displays a mode selector dropdown */
     allowModeSelection: { type: Boolean, default: true },
     disabled: { type: Boolean, default: false },
     fieldActions: { type: Array, default: () => [] },
+    /** Controls whether to indent with tabs or spaces. Options: `tabs`, `spaces` */
     indentType: { type: String, default: 'tabs' },
+    /** Keyboard mapping for the editor. Options: `sublime`, `vim` */
     keyMap: { type: String, default: 'sublime' },
+    /** When `true`, line numbers are displayed */
     lineNumbers: { type: Boolean, default: true },
+    /** When `true`, long lines will wrap */
     lineWrapping: { type: Boolean, default: true },
+    /** The syntax highlighting mode. Options: `clike`, `css`, `diff`, `go`, `haml`, `handlebars`, `htmlmixed`, `less`, `markdown`, `gfm`, `nginx`, `text/x-java`, `javascript`, `jsx`, `text/x-objectivec`, `php`, `python`, `ruby`, `scss`, `shell`, `sql`, `twig`, `vue`, `xml`, `yaml-frontmatter` */
     mode: { type: String, default: 'javascript' },
+    /** The controlled value of the code editor */
     modelValue: { type: String, default: '' },
     readOnly: { type: Boolean, default: false },
+    /** Rulers configuration */
     rulers: { type: Object, default: () => {} },
+    /** When `true`, displays the current mode label */
     showModeLabel: { type: Boolean, default: true },
+    /** The width of a tab character */
     tabSize: { type: Number, required: false },
+    /** Theme of the code editor. Options: `system`, `light`, `dark` */
     colorMode: { type: String, default: 'system' },
+    /** Title displayed in fullscreen mode */
     title: { type: String, default: () => __('Code Editor') },
 });
 
@@ -127,6 +139,14 @@ function initCodeMirror() {
 
     codemirror.value.on('focus', () => emit('focus'));
     codemirror.value.on('blur', () => emit('blur'));
+
+    codemirror.value.on('keydown', (cm, e) => {
+	    // Handle ESC to blur/unfocus the editor
+        if (e.keyCode === 27) {
+            e.preventDefault();
+            codemirror.value.getInputField().blur();
+        }
+    });
 }
 
 watch(

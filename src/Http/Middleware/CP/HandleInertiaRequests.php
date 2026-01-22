@@ -26,6 +26,7 @@ class HandleInertiaRequests extends Middleware
         return array_filter([
             ...parent::share($request),
             '_statamic' => [
+                'version' => Statamic::version(),
                 'cmsName' => __(Statamic::pro() ? config('statamic.cp.custom_cms_name', 'Statamic') : 'Statamic'),
                 'logos' => $this->logos(),
             ],

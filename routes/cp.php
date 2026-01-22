@@ -98,6 +98,8 @@ use Statamic\Http\Controllers\CP\Taxonomies\TermActionController;
 use Statamic\Http\Controllers\CP\Taxonomies\TermPreviewController;
 use Statamic\Http\Controllers\CP\Taxonomies\TermRevisionsController;
 use Statamic\Http\Controllers\CP\Taxonomies\TermsController;
+use Statamic\Http\Controllers\CP\Themes\ShareThemeController;
+use Statamic\Http\Controllers\CP\Themes\ThemeController;
 use Statamic\Http\Controllers\CP\Updater\UpdateProductController;
 use Statamic\Http\Controllers\CP\Updater\UpdaterController;
 use Statamic\Http\Controllers\CP\Users\AccountController;
@@ -434,6 +436,10 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('/', [PasskeyController::class, 'store'])->name('passkeys.store');
         Route::delete('{id}', [PasskeyController::class, 'destroy'])->name('passkeys.destroy');
     });
+
+    Route::get('themes', [ThemeController::class, 'index']);
+    Route::get('themes/refresh', [ThemeController::class, 'refresh']);
+    Route::post('themes/share', ShareThemeController::class);
 
     Route::post('slug', SlugController::class);
 

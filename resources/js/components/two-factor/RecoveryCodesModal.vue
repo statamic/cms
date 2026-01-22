@@ -46,7 +46,7 @@ function copyToClipboard() {
 </script>
 
 <template>
-    <Modal :title="__('Recovery Codes')" :open="true" @update:open="$emit('cancel')">
+    <Modal :title="__('Recovery Codes')" open @update:open="$emit('cancel')">
         <div>
             <div v-if="loading" class="flex items-center justify-center text-center">
                 <Icon name="loading" />
@@ -87,7 +87,7 @@ function copyToClipboard() {
     </Modal>
 
     <confirmation-modal
-        v-if="confirming"
+        :open="confirming"
         :danger="true"
         :title="__('Are you sure?')"
         @cancel="confirming = false"

@@ -1,19 +1,12 @@
 <template>
-    <ui-stack narrow name="publish-options" @closed="$emit('closed')" v-slot="{ close }">
-        <div class="m-2 flex h-full flex-col rounded-xl bg-white dark:bg-gray-800">
-            <header
-                class="flex items-center justify-between rounded-t-xl border-b border-gray-300 px-4 mb-3 py-2 dark:border-gray-950 dark:bg-gray-800"
-            >
-                <Heading size="lg">{{ __('Publish') }}</Heading>
-                <Button icon="x" variant="ghost" class="-me-2" @click="close" />
-            </header>
-
+    <Stack size="narrow" :title="__('Publish')" open @update:open="$emit('closed')">
+	    <div class="">
             <div class="flex-1 overflow-auto">
                 <div class="loading flex h-full items-center justify-center" v-if="saving">
                     <Icon name="loading" />
                 </div>
 
-                <div class="p-3 flex flex-col space-y-6" v-else>
+                <div class="flex flex-col space-y-6" v-else>
                     <Select class="w-full" :options v-model="action" />
 
                     <template v-if="action">
@@ -45,14 +38,14 @@
                 </div>
             </div>
         </div>
-    </ui-stack>
+    </Stack>
 </template>
 
 <script>
-import { Heading, Button, Select, DatePicker, Textarea, Icon, Subheading } from '@/components/ui';
+import { Heading, Button, Select, DatePicker, Textarea, Icon, Subheading, Stack } from '@/components/ui';
 
 export default {
-    components: { Heading, Button, Select, DatePicker, Textarea, Icon, Subheading },
+    components: { Heading, Button, Select, DatePicker, Textarea, Icon, Subheading, Stack },
 
     props: {
         actions: Object,

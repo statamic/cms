@@ -15,6 +15,7 @@ import { Link } from '@inertiajs/vue3';
 const props = defineProps({
     additionalColumns: Array,
     collection: String,
+	icon: String,
     title: String,
     listingUrl: String,
     initialPerPage: {
@@ -38,7 +39,7 @@ const cols = computed(() => [{ label: 'Title', field: 'title', visible: true }, 
 
 const widgetProps = computed(() => ({
     title: props.title,
-    icon: 'collections',
+    icon: props.icon,
     href: props.listingUrl,
 }));
 

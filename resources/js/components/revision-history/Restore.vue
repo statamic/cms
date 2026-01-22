@@ -3,7 +3,7 @@
         <Button @click="confirming = true" :text="__('Restore')" />
 
         <confirmation-modal
-            v-if="confirming"
+            :open="confirming"
             :title="__('Restore Revision')"
             :buttonText="__('Restore')"
             @confirm="restore"

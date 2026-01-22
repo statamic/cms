@@ -25,26 +25,42 @@ import Scrollbar from "@ui/Combobox/Scrollbar.vue";
 const emit = defineEmits(['update:modelValue', 'search', 'selected', 'added']);
 
 const props = defineProps({
-    id: { type: String },
-    clearable: { type: Boolean, default: false },
-    closeOnSelect: { type: Boolean, default: undefined },
-    disabled: { type: Boolean, default: false },
-    discreteFocusOutline: { type: Boolean, default: false },
-    icon: { type: String, default: null },
-    ignoreFilter: { type: Boolean, default: false },
-    labelHtml: { type: Boolean, default: false },
-    maxSelections: { type: Number, default: null },
-    modelValue: { type: [Object, String, Number], default: null },
-    multiple: { type: Boolean, default: false },
-    optionLabel: { type: String, default: 'label' },
-    options: { type: Array, default: () => [] },
-    optionValue: { type: String, default: 'value' },
-    placeholder: { type: String, default: () => __('Select...') },
-    readOnly: { type: Boolean, default: false },
-    searchable: { type: Boolean, default: true },
-    size: { type: String, default: 'base' },
-    taggable: { type: Boolean, default: false },
-    variant: { type: String, default: 'default' },
+	id: { type: String },
+	/** When `true`, the selected value will be clearable. */
+	clearable: { type: Boolean, default: false },
+	/** When `true`, the options dropdown will close after selecting an option. */
+	closeOnSelect: { type: Boolean, default: undefined },
+	disabled: { type: Boolean, default: false },
+	/** When `true`, the focus outline will be more discrete. */
+	discreteFocusOutline: { type: Boolean, default: false },
+	/** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
+	icon: { type: String, default: null },
+	/** When `true`, the Combobox will avoid filtering options, allowing you to handle filtering yourself by listening to the `search` event and updating the `options` prop. */
+	ignoreFilter: { type: Boolean, default: false },
+	/** When `true`, the option labels will be rendered with `v-html` instead of `v-text`. */
+	labelHtml: { type: Boolean, default: false },
+	/** The maximum number of selectable options. */
+	maxSelections: { type: Number, default: null },
+	/** The controlled value of the select. */
+	modelValue: { type: [Object, String, Number], default: null },
+	/** When `true`, multiple options are allowed. */
+	multiple: { type: Boolean, default: false },
+	/** Key of the option's label in the option's object. */
+	optionLabel: { type: String, default: 'label' },
+	/** Array of option objects */
+	options: { type: Array, default: () => [] },
+	/** Key of the option's value in the option's object. */
+	optionValue: { type: String, default: 'value' },
+	placeholder: { type: String, default: () => __('Select...') },
+	readOnly: { type: Boolean, default: false },
+	/** When `true`, the options will be searchable. */
+	searchable: { type: Boolean, default: true },
+	/** Controls the size of the select. <br><br> Options: `xs`, `sm`, `base`, `lg`, `xl` */
+	size: { type: String, default: 'base' },
+	/** When `true`, additional options can be added by typing in the search input and pressing enter. */
+	taggable: { type: Boolean, default: false },
+	/** Controls the appearance of the select. <br><br> Options: `default`, `filled`, `ghost`, `subtle` */
+	variant: { type: String, default: 'default' },
 });
 
 defineOptions({
@@ -64,7 +80,7 @@ const triggerClasses = cva({
     variants: {
         variant: {
             default: [
-                'bg-linear-to-b from-white to-gray-50 text-gray-900 border border-gray-300 shadow-ui-sm focus-within:focus-outline',
+                'bg-linear-to-b from-white to-gray-50 text-gray-900 border border-gray-300 with-contrast:border-gray-500 shadow-ui-sm focus-within:focus-outline',
                 'dark:from-gray-850 dark:to-gray-900 dark:border-gray-700 dark:text-gray-300 dark:shadow-ui-md',
             ],
             filled: 'bg-black/5 hover:bg-black/10 text-gray-900 border-none dark:bg-white/15 dark:hover:bg-white/20 dark:text-white focus-within:focus-outline dark:placeholder:text-red-500/60',
@@ -368,24 +384,20 @@ defineExpose({
                             />
 
                             <!-- Dropdown open: placeholder -->
-                            <button
+                            <div
                                 v-else-if="!searchable && (dropdownOpen || !modelValue)"
-                                type="button"
                                 class="w-full text-start flex items-center gap-2 bg-transparent cursor-pointer focus:outline-none"
                                 data-ui-combobox-placeholder
-                                @keydown.space="openDropdown"
                             >
                                 <Icon v-if="icon" :name="icon" class="text-gray-500 dark:text-white dark:opacity-50" />
                                 <span class="block truncate text-gray-500 dark:text-gray-400 select-none" v-text="placeholder" />
-                            </button>
+                            </div>
 
                             <!-- Dropdown closed: selected option -->
-                            <button
+                            <div
                                 v-else
-                                type="button"
-                                class="w-full text-start bg-transparent flex items-center gap-2 cursor-pointer focus-none"
+                                class="w-full text-start bg-transparent flex items-center gap-2 cursor-pointer focus:outline-none"
                                 data-ui-combobox-selected-option
-                                @keydown.space="openDropdown"
                             >
                                 <slot v-if="selectedOption" name="selected-option" v-bind="{ option: selectedOption }">
                                     <div v-if="icon" class="size-4">
@@ -394,7 +406,7 @@ defineExpose({
                                     <span v-if="labelHtml" v-html="getOptionLabel(selectedOption)" class="block truncate" />
                                     <span v-else v-text="getOptionLabel(selectedOption)" class="block truncate" />
                                 </slot>
-                            </button>
+                            </div>
                         </div>
 
                         <div v-if="(clearable && modelValue) || (options.length || ignoreFilter)" class="flex gap-1.5 items-center ms-1.5 -me-1">
@@ -430,7 +442,14 @@ defineExpose({
                             <div class="relative">
                                 <ComboboxViewport
                                     ref="viewport"
-                                    class="max-h-[calc(var(--reka-combobox-content-available-height)-5rem)] overflow-y-scroll"
+                                    class="max-h-[calc(var(--reka-combobox-content-available-height)-2rem)] overflow-y-scroll"
+                                    :class="{
+										'min-h-[2.25px]': options.length === 0,
+										'min-h-[2.5rem]': options.length === 1,
+										'min-h-[5rem]': options.length === 2,
+										'min-h-[7.5rem]': options.length >= 3,
+                                        'pr-3': scrollbarRef?.isVisible,
+                                    }"
                                     data-ui-combobox-viewport
                                 >
                                     <ComboboxEmpty class="p-2 text-sm" data-ui-combobox-empty>

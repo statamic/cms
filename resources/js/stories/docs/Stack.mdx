@@ -1,0 +1,83 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as StackStories from '../Stack.stories';
+
+<Meta of={StackStories} />
+
+# Stack
+Stacks are a good way of adding a layer of UX to the Control Panel.
+
+For example, when editing a related entry while you're already editing another entry would open a second publish form over the top. Once you're done, the layer would close and return you to your original task, without you losing any progress, or needing to navigate away.
+<Canvas of={StackStories._DocsIntro} sourceState={'shown'} />
+
+## Opening a Stack
+
+You can control the opened state of a stack either by prop or using a trigger slot.
+
+You can throw a clickable element into the trigger slot that will open the stack when clicked.
+
+<Canvas of={StackStories.ViaTrigger} sourceState={'shown'} />
+
+Alternatively you can use the v-modelable `open` prop.
+
+<Canvas of={StackStories.ViaProp} sourceState={'shown'} />
+
+
+## Closing
+
+A Stack can be closed by clicking the overlay, the x button in the header, pressing the escape key, via the `StackClose` component, or through the close function.
+
+You can use the `StackClose` component to wrap any clickable element that will close the Stack when clicked.
+
+<Canvas of={StackStories._StackClose} sourceState={'shown'} />
+
+You can also use the `close` function provided to the default slot.
+
+<Canvas of={StackStories._CloseViaSlotProp} sourceState={'shown'} />
+
+## Preventing Stacks from closing
+
+Before a Stack is closed, you have the opportunity to cancel it. For instance, if your Stack contains a form, you may want to give a warning about unsaved changes when the user tries to close it. To prevent closing of a Stack, you should pass in a function that returns false to stop closing and true to allow it.
+
+<Canvas of={StackStories.BeforeClose} sourceState={'shown'} />
+
+## Header
+
+You may add a header to your Stack using the `title` and `icon` props. The header will remain fixed.
+
+<Canvas of={StackStories.AutomaticHeader} sourceState={'shown'} />
+
+You may use the `header-actions` slot to add buttons or other elements to the header.
+
+<Canvas of={StackStories.HeaderActionsSlot} sourceState={'shown'} />
+
+## Footer
+
+A footer can be a good place to put buttons and other actions at the bottom of the stack. It will remain fixed. You can use the `footer-start` and `footer-end` slots.
+
+<Canvas of={StackStories.FooterBothSlots} sourceState={'shown'} />
+
+Note that when using these slots, flex will be applied to space buttons (the most common use case) appropriately.
+
+If you need full control, you can compose the footer yourself using the `StackFooter` component.
+
+<Canvas of={StackStories.Footer} sourceState={'shown'} />
+
+Or, you may use the `start` and `end` slots, and anything in the default slot will be positioned between them.
+
+<Canvas of={StackStories.FooterComposed} sourceState={'shown'} />
+
+## Sizes
+
+By default, Stacks are rendered at a medium size. You also have the option for `narrow` and `full`.
+
+<Canvas of={StackStories.Sizes} sourceState={'shown'} />
+
+## Nesting
+
+Stacks are infinitely nestable. You can open a Stack from within another Stack, or from within a modal, etc.
+
+<Canvas of={StackStories.Nesting} sourceState={'shown'} />
+
+## Arguments
+
+<ArgTypes of={StackStories} />

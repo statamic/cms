@@ -1,46 +1,325 @@
 @import 'tailwindcss';
+@import 'codemirror/lib/codemirror.css';
+@import 'codemirror/theme/material.css';
+@import '../resources/css/vendors/codemirror.css';
 @import '../resources/css/ui.css';
+@import '../resources/css/core/utilities.css';
+@import '../resources/css/elements/tables.css';
+@import '../resources/css/components/stacks.css';
 @custom-variant dark (&:where(.dark, .dark *));
 
-.sbdocs h1,
-.sbdocs h2,
-.sbdocs h3,
-.sbdocs h4,
-.sbdocs h5,
-.sbdocs h6 {
-    font-family: p22-mackinac-pro, serif;
+:root {
+    /* GROUP VARIABLES -- DECORATION -- COLOURS
+    =================================================== */
+    --color-code-background: hsl(287deg 80% 93.5%);
+    --color-pink-light-1: hsl(287deg 80% 80%);
+
+    /* GROUP VARIABLES -- DECORATION -- TEXT -- SIZES -- Based on AUGMENTED FOURTH
+    =================================================== */
+    --font-size-xl: clamp(1.35em, 6vw, 1.5em);
+    --font-size-xl-line-height: 1.3;
+
+    --font-size-2xl: clamp(1.8em * 0.85, 6vw, 1.8em);
+    --font-size-2xl-line-height: 1.2;
+
+    --font-size-3xl: clamp(2.25em * 0.9, 6vw, 2.25em);
+    --font-size-3xl-line-height: 1.15;
+
+    --font-size-4xl: clamp(2.827em * 0.9, 9vw, 2.827em);
+    --font-size-4xl-line-height: 1.15;
+
+    --font-size-5xl: clamp(3.45em * 0.67, 11vw, 3.45em);
+    --font-size-5xl-line-height: 1.05;
+}
+/* GROUP GLOBAL STYLES
+=================================================== */
+@scope (html) to (.sbdocs-preview) {
+    .sbdocs {
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: p22-mackinac-pro, serif;
+            font-weight: 500;
+            border-bottom: 0;
+        }
+
+        h1 {
+            font-size: var(--font-size-4xl);
+            line-height: var(--font-size-4xl-line-height);
+            margin-block-end: 1.35rem;
+        }
+
+        h2 {
+            font-size: var(--font-size-3xl);
+            line-height: var(--font-size-3xl-line-height);
+            margin-block-end: 0;
+            padding-block-end: 0;
+
+            &,
+            &:first-of-type {
+                /* e.g. >> /?path=/story/components-badge--default */
+                margin-block-start: 1em;
+            }
+        }
+
+        h3 {
+            font-size: 1.25em;
+        }
+
+        p,
+        li {
+            font-size: 1.015em;
+            line-height: 1.5;
+            code {
+                background: var(--color-code-background);
+                color: black;
+                border: none;
+                font-weight: 600;
+                font-size: 0.9em;
+            }
+        }
+
+        p:not(.sb-anchor, .sb-unstyled, .sb-unstyled p) {
+            font-weight: 300;
+        }
+    }
 }
 
-.sbdocs h1 {
-    font-size: 2.5rem;
+
+.sbdocs {
+    /* GROUP CODE BLOCKS
+    =================================================== */
+    .docblock-code-toggle {
+        &, :has(> &) {
+            border-top-left-radius: 7px;
+        }
+        .dark & {
+            background: hsl(0deg 0% 15%)!important;
+            color: white;
+        }
+        &:focus {
+            box-shadow: var(--color-pink-light-1) 0px -2px 0px 0px inset;
+        }
+    }
+
+    .docblock-source {
+        margin-block: 20px;
+        border-radius: 8px;
+    }
+    /* GROUP CODE BLOCKS / PRISM
+    =================================================== */
+    /* Olaolu Palenight theme */
+    pre[class*="language-"],
+    code[class*="language-"],
+    .prismjs {
+        font-size: 0.9rem;
+        line-height: 1.5;
+        background: #292D3E !important; /* Palenight dark bluish-gray background */
+        color: #A6ACCD !important; /* Soft off-white foreground */
+        padding: 1em;
+        overflow: auto;
+    }
+
+    /* Comments and documentation */
+    .prismjs .token.comment,
+    .prismjs .token.block-comment,
+    .prismjs .token.prolog,
+    .prismjs .token.doctype,
+    .prismjs .token.cdata {
+        color: #676e95 !important;
+        font-style: italic;
+    }
+
+    /* Punctuation and operators */
+    .prismjs .token.punctuation {
+        color: #89ddff !important;
+    }
+
+    .prismjs .token.operator {
+        color: #89ddff !important;
+    }
+
+    .prismjs .token.entity {
+        color: #89ddff !important;
+        cursor: help;
+    }
+
+    /* HTML/JSX tags - orange color for tokens */
+    .prismjs .token {
+        color: #ffcb8b !important; /* Orange/yellow for tag names like ui-card */
+    }
+
+    /* HTML/JSX tag punctuation (< > /) - should match tag color */
+    .prismjs .token.tag .token.punctuation,
+    .prismjs .token.tag + .token.punctuation,
+    .prismjs .language-markup .token.punctuation,
+    .prismjs .language-html .token.punctuation,
+    .prismjs .language-jsx .token.tag .token.punctuation,
+    .prismjs .language-jsx .token.punctuation:has(+ .token.tag),
+    .prismjs pre[class*="language-jsx"] .token.punctuation:first-child,
+    .prismjs pre[class*="language-html"] .token.punctuation:first-child {
+        color: #89DDFF !important; /* Match tag color for < and > */
+    }
+
+    /* Attribute names and namespaces */
+    .prismjs .token.attr-name,
+    .prismjs .token.namespace {
+        color: #c792ea !important;
+    }
+
+    /* Attribute values */
+    .prismjs .token.attr-value {
+        color: #c3e88d !important;
+    }
+
+    /* Functions and method names */
+    .prismjs .token.function,
+    .prismjs .token.function-name {
+        color: #82aaff !important;
+    }
+
+    /* Numbers, booleans, units, URLs */
+    .prismjs .token.number,
+    .prismjs .token.boolean,
+    .prismjs .token.unit,
+    .prismjs .token.url {
+        color: #f78c6c !important;
+    }
+
+    /* Colors and hex codes */
+    .prismjs .token.color,
+    .prismjs .token.hexcode {
+        color: #ffcb6b !important;
+    }
+
+    /* Properties, constants, symbols, built-ins */
+    .prismjs .token.property,
+    .prismjs .token.constant,
+    .prismjs .token.symbol,
+    .prismjs .token.builtin {
+        color: #ffcb6b !important;
+    }
+
+    /* Classes and class names */
+    .prismjs .token.class,
+    .prismjs .token.class-name {
+        color: #ffcb6b !important;
+    }
+
+    /* Keywords, selectors, IDs, atrules */
+    .prismjs .token.keyword {
+        color: #c792ea !important;
+    }
+
+    .prismjs .token.selector,
+    .prismjs .token.id,
+    .prismjs .token.atrule {
+        color: #c792ea !important;
+    }
+
+    .prismjs .token.important {
+        color: #c792ea !important;
+        font-weight: bold;
+    }
+
+    /* Strings, characters, attributes, variables */
+    .prismjs .token.string,
+    .prismjs .token.char {
+        color: #c3e88d !important;
+    }
+
+    .prismjs .token.attribute,
+    .prismjs .token.attr-value {
+        color: #c3e88d !important;
+    }
+
+    .prismjs .token.variable {
+        color: #c3e88d !important;
+    }
+
+    /* Pseudo-classes and pseudo-elements */
+    .prismjs .token.pseudo-class,
+    .prismjs .token.pseudo-element {
+        color: #c3e88d !important;
+    }
+
+    /* Inserted content */
+    .prismjs .token.inserted {
+        color: #c3e88d !important;
+    }
+
+    /* Regular expressions */
+    .prismjs .token.regex {
+        color: #c3e88d !important;
+    }
+
+    /* Parameters */
+    .prismjs .token.parameter {
+        color: #ff5370 !important;
+    }
+
+    /* Deleted content */
+    .prismjs .token.deleted {
+        color: #ff5370 !important;
+    }
+
+    /* Types and type names */
+    .prismjs .token.type,
+    .prismjs .token.type-name {
+        color: #ffcb6b !important;
+    }
+
+    /* Bold and italic tokens */
+    .prismjs .token.bold {
+        font-weight: bold !important;
+    }
+
+    .prismjs .token.italic {
+        font-style: italic !important;
+    }
+
+    /* JavaScript/TypeScript specific */
+    .prismjs .token.script.language-javascript {
+        color: #a6accd !important;
+    }
+
+    /* Language-specific overrides */
+    .prismjs .language-css .token.string,
+    .prismjs .style .token.string {
+        color: #89ddff !important;
+    }
 }
 
-.sbdocs h2 {
-    font-size: 1.75rem;
-    font-weight: 600;
+
+/* GROUP DARK MODE
+=================================================== */
+.dark {
+    & body,
+    & .sbdocs-preview {
+        background: var(--theme-color-content-bg);
+    }
 }
 
-.sbdocs h3 {
-    font-size: 1.25rem;
+
+/* GROUP OTHER
+=================================================== */
+.docs-story div[scale="1"] {
+    transform: none !important;
 }
 
-.sbdocs p,
-.sbdocs li {
-    font-size: 1rem;
-    line-height: 1.6;
-    font-weight: 350;
-}
+.sbdocs {
+    &.sbdocs-wrapper {
+        padding: 4rem;
+    }
 
-.prismjs {
-    font-size: 1rem;
-}
+    .sbdocs-content {
+        max-width: 56rem;
+    }
 
-.sbdocs.sbdocs-wrapper {
-    padding: 2rem 4rem;
-}
-
-.dark,
-.dark body,
-.dark .sbdocs-preview {
-    background: var(--theme-color-content-bg);
+    .sbdocs-preview {
+        border-radius: 17px;
+    }
 }
