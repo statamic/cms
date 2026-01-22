@@ -23,7 +23,7 @@ const reloadPage = () => router.reload();
 <template>
     <Head :title="__('Fieldsets')" />
 
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-page mx-auto">
         <Header :title="__('Fieldsets')" icon="fieldsets">
             <CommandPaletteItem
                 category="Actions"

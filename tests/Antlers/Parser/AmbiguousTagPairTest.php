@@ -44,7 +44,7 @@ EOT;
     public function test_tags_with_similar_names_match_against_the_compound_name()
     {
         $template = <<<'EOT'
-<nav class="flex items-center justify-between flex-wrap py-12 lg:py-24 max-w-5xl mx-auto">
+<nav class="flex items-center justify-between flex-wrap py-12 lg:py-24 max-w-page mx-auto">
     <div class="text-sm">&copy; {{ now format="Y" }} {{ settings:site_name }}
         – Powered by <a href="https://statamic.com?ref=cool-writings" class="hover:text-teal">Statamic</a></div>
     <div class="flex items-center">

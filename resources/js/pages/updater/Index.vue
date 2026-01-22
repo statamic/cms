@@ -9,7 +9,7 @@ defineProps(['requestError', 'statamic', 'addons']);
 <template>
     <Head :title="__('Updates')" />
 
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-page mx-auto">
         <Header :title="__('Updates')" icon="updates" />
 
         <Card v-if="requestError" class="w-full space-y-4 flex items-center justify-between">

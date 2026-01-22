@@ -18,7 +18,7 @@ if (props.collections.length === 0) useArchitecturalBackground();
 <template>
     <Head :title="__('Collections')" />
 
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-page mx-auto">
         <Listing
             v-if="collections.length"
             :initial-rows="collections"

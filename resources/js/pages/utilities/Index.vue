@@ -9,7 +9,7 @@ defineProps(['utilities']);
 <template>
     <Head :title="__('Utilities')" />
 
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-page mx-auto">
         <Header :title="__('Utilities')" icon="utilities" />
 
         <CardPanel>

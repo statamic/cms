@@ -1,5 +1,5 @@
 <template>
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-page mx-auto">
         <Header :title="__(initialTitle) || __('Create Role')" icon="permissions">
             <CommandPaletteItem
                 :category="$commandPalette.category.Actions"

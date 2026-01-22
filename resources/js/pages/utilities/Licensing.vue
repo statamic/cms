@@ -18,7 +18,7 @@ const props = defineProps([
 <template>
     <Head :title="[__('Licensing'), __('Utilities')]" />
 
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-page mx-auto">
         <Header :title="__('Licensing')" icon="license">
             <Button
                 :href="site.url"
