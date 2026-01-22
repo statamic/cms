@@ -26,7 +26,7 @@ provide('layout', {
 let navigationListener = null;
 
 function focusMain() {
-    requestAnimationFrame(() => {
+    nextTick(() => {
         if (!document.activeElement?.matches('input, textarea, select, [contenteditable]')) {
             document.querySelector('#content-card')?.focus();
         }
