@@ -46,10 +46,10 @@ const alertClasses = computed(() => {
         variants: {
             variant: {
                 default: [
-                    'bg-gray-50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-700/80 text-gray-900 dark:text-gray-100',
+                    'bg-gray-50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-700/80 text-gray-800 dark:text-gray-100',
                     '[&_code]:bg-gray-200! [&_code]:text-gray-800! dark:[&_code]:bg-gray-800! dark:[&_code]:text-gray-200!',
-                    '[&_[data-ui-heading]]:text-gray-900! dark:[&_[data-ui-heading]]:text-gray-100!',
-                    '[&_[data-ui-description]]:text-gray-700! dark:[&_[data-ui-description]]:text-gray-300!',
+                    '[&_[data-ui-heading]]:text-gray-800! dark:[&_[data-ui-heading]]:text-gray-100!',
+                    '[&_[data-ui-description]]:text-gray-800! dark:[&_[data-ui-description]]:text-gray-300!',
                 ],
                 warning: [
                     'bg-amber-50 dark:bg-amber-300/6 border-amber-200 dark:border-amber-400/25 text-amber-800! dark:text-amber-300',
