@@ -5,10 +5,9 @@ import { ConfigProvider } from 'reka-ui';
 import SessionExpiry from '@/components/SessionExpiry.vue';
 import LicensingAlert from '@/components/LicensingAlert.vue';
 import PortalTargets from '@/components/portals/PortalTargets.vue';
-import Tooltips from '@/components/Tooltips.vue';
-import { provide, watch, ref } from 'vue';
+import { provide, watch, ref, onMounted, onUnmounted, nextTick } from 'vue';
+import { router } from '@inertiajs/vue3';
 import useBodyClasses from './body-classes.js';
-import useStatamicPageProps from '@/composables/page-props.js';
 
 useBodyClasses('bg-global-header-bg font-sans leading-normal text-gray-900 dark:text-white');
 
@@ -21,6 +20,45 @@ watch(() => props.additionalBreadcrumbs, (newVal) => additionalBreadcrumbs.value
 
 provide('layout', {
     additionalBreadcrumbs,
+});
+
+// Focus management: if no Input with :focus="true" is present, focus the main element
+let navigationListener = null;
+
+function checkAndFocusMain() {
+    // Wait for all components to mount and any auto-focus to complete
+    nextTick(() => {
+        setTimeout(() => {
+            const activeElement = document.activeElement;
+            const isInputFocused = activeElement && (
+                activeElement.matches('input, textarea, select, [contenteditable]') ||
+                activeElement.closest('[role="combobox"], [role="textbox"]')
+            );
+
+            // If no input is focused, focus the main element
+            if (!isInputFocused) {
+                const mainElement = document.querySelector('#content-card');
+                if (mainElement && typeof mainElement.focus === 'function') {
+                    mainElement.focus();
+                }
+            }
+        }, 100); // Small delay to allow any auto-focus to complete
+    });
+}
+
+onMounted(() => {
+    navigationListener = router.on('success', () => {
+        checkAndFocusMain();
+    });
+    
+    // Also check on initial mount
+    checkAndFocusMain();
+});
+
+onUnmounted(() => {
+    if (navigationListener) {
+        navigationListener();
+    }
 });
 </script>
 
