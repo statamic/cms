@@ -1,5 +1,5 @@
 <template>
-    <Popover ref="popover" class="!size-min" :inset="true" :close-on-outside-click="false" v-model:open="showingToolbar">
+    <Popover ref="popover" class="!size-min" :inset="true" :dismissible="false" v-model:open="showingToolbar">
         <template #trigger>
             <Button
                 class="px-2!"
