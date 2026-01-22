@@ -2,10 +2,8 @@
     <Stack
         :title="__('Link')"
         size="narrow"
-        class="!size-min"
         inset
         :wrap-slot="false"
-        :dismissible="false"
         v-model:open="showingToolbar"
     >
         <template #trigger>
