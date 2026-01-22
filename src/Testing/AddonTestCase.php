@@ -3,7 +3,6 @@
 namespace Statamic\Testing;
 
 use Facades\Statamic\Version;
-use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use ReflectionClass;
 use Statamic\Addons\Manifest;
@@ -26,8 +25,8 @@ abstract class AddonTestCase extends OrchestraTestCase
         $uses = array_flip(class_uses_recursive(static::class));
 
         if (isset($uses[PreventsSavingStacheItemsToDisk::class])) {
-            $reflection = new ReflectionClass($this);
-            $this->fakeStacheDirectory = Str::before(dirname($reflection->getFileName()), DIRECTORY_SEPARATOR.'tests').'/tests/__fixtures__/dev-null';
+            $reflector = new ReflectionClass($this->addonServiceProvider);
+            $this->fakeStacheDirectory = dirname($reflector->getFileName()).'/../tests/__fixtures__/dev-null';
 
             $this->preventSavingStacheItemsToDisk();
         }
