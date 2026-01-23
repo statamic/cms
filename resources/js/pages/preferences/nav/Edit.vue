@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="max-w-5xl max-w-wrapper mx-auto">
         <Head :title />
 
         <Header :title="title" icon="preferences">

@@ -13,7 +13,7 @@ defineProps([
 </script>
 
 <template>
-    <div class="max-w-page mx-auto">
+    <div class="max-w-5xl max-w-wrapper mx-auto">
         <Head :title="__('Preferences')" />
 
         <Header :title="__('Preferences')" icon="preferences" />

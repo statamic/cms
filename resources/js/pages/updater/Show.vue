@@ -6,7 +6,8 @@ defineProps(['slug', 'package', 'name']);
 </script>
 
 <template>
-    <Head :title="__('Updates')" />
-
-    <Updater :slug="slug" :package="package" :name="name" />
+    <div class="max-w-5xl max-w-wrapper mx-auto">
+        <Head :title="__('Updates')" />
+        <Updater :slug="slug" :package="package" :name="name" />
+    </div>
 </template>

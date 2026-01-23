@@ -28,7 +28,7 @@ function handleDelete() {
 </script>
 
 <template>
-    <div>
+    <div class="max-w-5xl max-w-wrapper mx-auto">
         <Head :title="group.title" />
 
         <Header :title="group.title" icon="groups">

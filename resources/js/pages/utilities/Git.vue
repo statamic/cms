@@ -23,42 +23,44 @@ function commit() {
 </script>
 
 <template>
-    <Head :title="[__('Git'), __('Utilities')]" />
+    <div class="max-w-5xl max-w-wrapper mx-auto">
+        <Head :title="[__('Git'), __('Utilities')]" />
 
-    <form @submit.prevent="commit">
-        <Header :title="__('Git')" icon="git">
-            <Button
-                type="submit"
-                variant="primary"
-                :text="__('Commit Changes')"
-                :disabled="!statuses || submitting"
-            />
-        </Header>
-    </form>
+        <form @submit.prevent="commit">
+            <Header :title="__('Git')" icon="git">
+                <Button
+                    type="submit"
+                    variant="primary"
+                    :text="__('Commit Changes')"
+                    :disabled="!statuses || submitting"
+                />
+            </Header>
+        </form>
 
-    <template v-if="statuses">
-        <CardPanel
-            v-for="status in statuses"
-            :key="status.path"
-            :heading="__('Repository')"
-            :subheading="status.path"
-        >
-            <div class="space-y-4">
-                <div class="flex flex-wrap gap-2">
-                    <Badge :prepend="__('Affected files')" :text="status.totalCount" />
-                    <Badge v-if="status.addedCount" :prepend="__('Added')" color="green" :text="status.addedCount" />
-                    <Badge v-if="status.modifiedCount" :prepend="__('Modified')" color="yellow" :text="status.modifiedCount" />
-                    <Badge v-if="status.deletedCount" :prepend="__('Deleted')" color="red" :text="status.deletedCount" />
+        <template v-if="statuses">
+            <CardPanel
+                v-for="status in statuses"
+                :key="status.path"
+                :heading="__('Repository')"
+                :subheading="status.path"
+            >
+                <div class="space-y-4">
+                    <div class="flex flex-wrap gap-2">
+                        <Badge :prepend="__('Affected files')" :text="status.totalCount" />
+                        <Badge v-if="status.addedCount" :prepend="__('Added')" color="green" :text="status.addedCount" />
+                        <Badge v-if="status.modifiedCount" :prepend="__('Modified')" color="yellow" :text="status.modifiedCount" />
+                        <Badge v-if="status.deletedCount" :prepend="__('Deleted')" color="red" :text="status.deletedCount" />
+                    </div>
+
+                    <GitStatus :status="status.status" />
                 </div>
+            </CardPanel>
+        </template>
 
-                <GitStatus :status="status.status" />
-            </div>
+        <CardPanel v-else :heading="__('Repository')">
+            <Heading>{{ __('statamic::messages.git_nothing_to_commit') }}</Heading>
         </CardPanel>
-    </template>
 
-    <CardPanel v-else :heading="__('Repository')">
-        <Heading>{{ __('statamic::messages.git_nothing_to_commit') }}</Heading>
-    </CardPanel>
-
-    <DocsCallout :topic="__('the Git Integration')" url="git-integration" />
+        <DocsCallout :topic="__('the Git Integration')" url="git-integration" />
+    </div>
 </template>

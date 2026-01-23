@@ -28,7 +28,7 @@ onMounted(() => {
 <template>
     <Head :title="__('Addons')" />
 
-    <div class="max-w-page mx-auto">
+    <div class="max-w-5xl max-w-wrapper mx-auto">
         <Header :title="__('Addons')" icon="addons">
             <CommandPaletteItem
                 category="Actions"

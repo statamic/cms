@@ -11,7 +11,7 @@
         :errors="errors"
         as-config
     >
-        <div class="max-w-page mx-auto">
+        <div class="max-w-5xl max-w-wrapper mx-auto">
             <Header :title="title" icon="preferences">
                 <ButtonGroup role="group" aria-label="Save options">
                     <CommandPaletteItem

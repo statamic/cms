@@ -13,7 +13,7 @@ if (props.taxonomies.length === 0) useArchitecturalBackground();
 <template>
     <Head :title="__('Taxonomies')" />
 
-    <div class="max-w-page mx-auto">
+    <div class="max-w-5xl max-w-wrapper mx-auto">
         <Header v-if="taxonomies.length" :title="__('Taxonomies')" icon="taxonomies">
             <CommandPaletteItem
                 v-if="canCreate"

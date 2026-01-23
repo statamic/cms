@@ -12,15 +12,17 @@ defineProps({
 </script>
 
 <template>
-    <Head :title="__('Configure Role')" />
+    <div class="max-w-5xl max-w-wrapper mx-auto">
+        <Head :title="__('Configure Role')" />
 
-    <role-publish-form
-        :action="action"
-        method="patch"
-        :can-assign-super="canAssignSuper"
-        :initial-title="role.title"
-        :initial-handle="role.handle"
-        :initial-super="super"
-        :initial-permissions="permissions"
-    />
+        <role-publish-form
+            :action="action"
+            method="patch"
+            :can-assign-super="canAssignSuper"
+            :initial-title="role.title"
+            :initial-handle="role.handle"
+            :initial-super="super"
+            :initial-permissions="permissions"
+        />
+    </div>
 </template>
