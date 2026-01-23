@@ -15,7 +15,7 @@ function send() {
 </script>
 
 <template>
-    <div class="max-w-5xl mx-auto" data-max-width-wrapper>
+    <div class="max-w-6xl mx-auto" data-max-width-wrapper>
         <Head :title="[__('Email'), __('Utilities')]" />
 
         <Header :title="__('Email')" icon="mail-settings" />
