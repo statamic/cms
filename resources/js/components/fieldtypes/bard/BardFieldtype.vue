@@ -217,7 +217,7 @@ export default {
             },
             errorsById: {},
             debounceNextUpdate: true,
-	        setsCache: {},
+            setsCache: {},
             loadingSet: null,
         };
     },
@@ -477,75 +477,75 @@ export default {
 
     methods: {
         addSet(handle) {
-			this.loadingSet = handle;
+            this.loadingSet = handle;
 
-			this.fetchSet(handle)
-				.then(data => {
-					const id = uniqid();
-					const deepCopy = JSON.parse(JSON.stringify(data.defaults));
-					const values = Object.assign({}, { type: handle }, deepCopy);
+            this.fetchSet(handle)
+                .then(data => {
+                    const id = uniqid();
+                    const deepCopy = JSON.parse(JSON.stringify(data.defaults));
+                    const values = Object.assign({}, { type: handle }, deepCopy);
 
-					this.updateSetMeta(id, data.new);
+                    this.updateSetMeta(id, data.new);
 
-					const { $head } = this.editor.view.state.selection;
-					const { nodeBefore } = $head;
+                    const { $head } = this.editor.view.state.selection;
+                    const { nodeBefore } = $head;
 
-					this.debounceNextUpdate = false;
+                    this.debounceNextUpdate = false;
 
-					// Perform this in nextTick because the meta data won't be ready until then.
-					this.$nextTick(() => {
-						if (nodeBefore) {
-							this.editor.commands.setAt({ attrs: { id, values }, pos: $head.pos });
-						} else {
-							this.editor.commands.set({ id, values });
-						}
-					});
-				})
-				.catch(() => this.$toast.error(__('Something went wrong')))
-				.finally(() => this.loadingSet = null);
+                    // Perform this in nextTick because the meta data won't be ready until then.
+                    this.$nextTick(() => {
+                        if (nodeBefore) {
+                            this.editor.commands.setAt({ attrs: { id, values }, pos: $head.pos });
+                        } else {
+                            this.editor.commands.set({ id, values });
+                        }
+                    });
+                })
+                .catch(() => this.$toast.error(__('Something went wrong')))
+                .finally(() => this.loadingSet = null);
         },
 
-	    /**
-	     * Returns the path to the Bard field, replacing any set indexes with handles.
-	     */
-	    bardFieldPath() {
-		    if (!this.fieldPathPrefix) {
-			    return this.handle;
-		    }
+        /**
+         * Returns the path to the Bard field, replacing any set indexes with handles.
+         */
+        bardFieldPath() {
+            if (!this.fieldPathPrefix) {
+                return this.handle;
+            }
 
-		    return this.fieldPathKeys
-			    .map((key, index) => {
-				    if (Number.isInteger(parseInt(key))) {
-					    return data_get(this.publishContainer.values, this.fieldPathKeys.slice(0, index + 1).join('.'))?.attrs?.values.type;
-				    }
+            return this.fieldPathKeys
+                .map((key, index) => {
+                    if (Number.isInteger(parseInt(key))) {
+                        return data_get(this.publishContainer.values, this.fieldPathKeys.slice(0, index + 1).join('.'))?.attrs?.values.type;
+                    }
 
-				    return key;
-			    })
-			    .filter((key) => key !== undefined)
-			    .concat(this.handle)
-			    .join('.');
-	    },
+                    return key;
+                })
+                .filter((key) => key !== undefined)
+                .concat(this.handle)
+                .join('.');
+        },
 
-	    async fetchSet(set) {
-		    return new Promise(async (resolve, reject) => {
-			    const field = this.bardFieldPath();
-			    const setCacheKey = `${field}.${set}`;
-			    const reference = this.publishContainer.reference;
-			    const blueprint = this.publishContainer.blueprint.fqh;
+        async fetchSet(set) {
+            return new Promise(async (resolve, reject) => {
+                const field = this.bardFieldPath();
+                const setCacheKey = `${field}.${set}`;
+                const reference = this.publishContainer.reference;
+                const blueprint = this.publishContainer.blueprint.fqh;
 
-			    if (this.setsCache[setCacheKey]) {
-				    resolve(this.setsCache[setCacheKey]);
-				    return;
-			    }
+                if (this.setsCache[setCacheKey]) {
+                    resolve(this.setsCache[setCacheKey]);
+                    return;
+                }
 
-			    this.$axios.post(cp_url('fieldtypes/replicator/set'), { blueprint, reference, field, set })
-				    .then(response => {
-					    this.setsCache[setCacheKey] = response.data;
-					    resolve(response.data);
-				    })
-				    .catch(error => reject(error));
-		    });
-	    },
+                this.$axios.post(cp_url('fieldtypes/replicator/set'), { blueprint, reference, field, set })
+                    .then(response => {
+                        this.setsCache[setCacheKey] = response.data;
+                        resolve(response.data);
+                    })
+                    .catch(error => reject(error));
+            });
+        },
 
         duplicateSet(old_id, attrs, getPos) {
             const id = uniqid();
@@ -801,7 +801,7 @@ export default {
                 enableInputRules: this.config.enable_input_rules,
                 enablePasteRules: this.config.enable_paste_rules,
                 editorProps: { attributes: { class: 'bard-content' } },
-	            onDrop: () => this.debounceNextUpdate = false,
+                onDrop: () => this.debounceNextUpdate = false,
                 onFocus: () => this.$emit('focus'),
                 onBlur: () => {
                     // Since clicking into a field inside a set would also trigger a blur, we can't just emit the

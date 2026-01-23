@@ -187,7 +187,7 @@
 
 <style>
 body:has(:is(.bard-fullscreen, .replicator-fullscreen)) [data-reka-popper-content-wrapper] {
-	z-index: var(--z-index-portal) !important;
+    z-index: var(--z-index-portal) !important;
 }
 </style>
 
