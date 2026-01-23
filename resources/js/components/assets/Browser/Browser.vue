@@ -79,7 +79,7 @@
                                 </ToggleGroup>
                             </Header>
 
-                            <div class="flex items-center gap-2 sm:gap-3 py-3 relative overflow-clip" style="overflow-clip-margin: 1px;">
+                            <div class="flex items-center gap-2 sm:gap-3 py-3 relative overflow-clip st-overflow-clip-margin">
                                 <div class="flex flex-1 items-center gap-2 sm:gap-3">
                                     <ListingSearch />
                                 </div>
@@ -266,6 +266,7 @@ export default {
             searchQuery: '',
             editedAssetId: this.initialEditingAssetId,
             creatingFolder: false,
+            creatingFolderError: false,
             uploads: [],
             page: 1,
             preferencesPrefix: `assets.${this.container.id}`,
@@ -364,6 +365,7 @@ export default {
                 restrictFolderNavigation: this.restrictFolderNavigation,
                 path: this.path,
                 creatingFolder: this.creatingFolder,
+                creatingFolderError: this.creatingFolderError,
             };
         },
 
@@ -375,8 +377,12 @@ export default {
                 'edit-asset': (event) => this.$emit('edit-asset', event),
                 'select-folder': this.selectFolder,
                 'create-folder': this.createFolder,
-                'cancel-creating-folder': () => (this.creatingFolder = false),
+                'cancel-creating-folder': () => {
+                    this.creatingFolder = false;
+                    this.creatingFolderError = false;
+                },
                 'prevent-dragging': (preventDragging) => (this.preventDragging = preventDragging),
+                'update:creatingFolderError': (value) => (this.creatingFolderError = value),
             };
         },
     },
@@ -446,6 +452,7 @@ export default {
 
         startCreatingFolder() {
             this.creatingFolder = true;
+            this.creatingFolderError = false;
         },
 
         listingRequestCompleted({ response }) {
@@ -559,6 +566,7 @@ export default {
                     this.folders.push(response.data);
                     this.folders = sortBy(this.folders, 'title');
                     this.creatingFolder = false;
+                    this.creatingFolderError = false;
 
                     this.$refs.grid?.clearNewFolderName();
                     this.$refs.table?.clearNewFolderName();
@@ -571,10 +579,12 @@ export default {
                             ? this.$toast.error(errors.directory[0])
                             : this.$toast.error(message);
 
+                        this.creatingFolderError = true;
                         this.$refs.grid?.focusNewFolderInput();
                         this.$refs.table?.focusNewFolderInput();
                     } else {
                         this.$toast.error(__('Something went wrong'));
+                        this.creatingFolderError = true;
                     }
                 });
         },

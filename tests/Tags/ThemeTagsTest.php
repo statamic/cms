@@ -83,7 +83,7 @@ class ThemeTagsTest extends TestCase
     public function testOutputsCssTag()
     {
         $this->assertEquals(
-            '<link rel="stylesheet" href="'.$this->path.'/css/style.css" />',
+            '<link rel="stylesheet" href="'.$this->path.'/css/style.css">',
             $this->tag('{{ theme:css src="style" tag="true" }}')
         );
     }

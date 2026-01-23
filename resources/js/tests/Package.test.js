@@ -119,6 +119,7 @@ it('exports ui', async () => {
     // a component to one place that you don't forget to add it to the other places.
 
     const expectedCmsPackageExports = [
+        'Alert',
         'AuthCard',
         'Badge',
         'Button',

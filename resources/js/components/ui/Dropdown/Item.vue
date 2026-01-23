@@ -58,7 +58,7 @@ const iconClasses = cva({
         :href
         :target
     >
-        <div v-if="icon" class="flex size-6 items-center justify-center p-1">
+        <div v-if="icon" class="flex size-5 items-center justify-center p-1">
             <Icon :name="icon" :class="iconClasses" />
         </div>
         <div class="col-start-2 px-2">

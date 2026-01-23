@@ -821,13 +821,15 @@ export default {
                 prioritize: true,
             });
 
-            Statamic.$commandPalette.add({
-                category: Statamic.$commandPalette.category.Actions,
-                text: __('Edit Blueprint'),
-                icon: 'blueprint-edit',
-                when: () => this.canEditBlueprint,
-                url: this.actions.editBlueprint,
-            });
+			if (this.actions.editBlueprint) {
+				Statamic.$commandPalette.add({
+					category: Statamic.$commandPalette.category.Actions,
+					text: __('Edit Blueprint'),
+					icon: 'blueprint-edit',
+					when: () => this.canEditBlueprint,
+					url: this.actions.editBlueprint,
+				});
+			}
 
             this.$refs.actions?.preparedActions.forEach(action => Statamic.$commandPalette.add({
                 category: Statamic.$commandPalette.category.Actions,

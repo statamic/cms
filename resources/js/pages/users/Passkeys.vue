@@ -131,11 +131,12 @@ function handleAxiosError(e) {
     </EmptyStateMenu>
 
     <ConfirmationModal
-        v-model:open="showErrorModal"
+        :open="showErrorModal"
         :title="__('There was an error creating your passkey')"
         :body-text="error"
         :cancellable="false"
         :button-text="__('OK')"
+        @update:open="error = null"
     />
 
     <Modal

@@ -3,7 +3,7 @@
 @layer ui {
     /* .grid-cell, [data-ui-input-group] are exceptions for Bard fieldtypes inside a Grid fieldtype, since these cause double borders */
     .bard-fieldtype:not(.form-group, .grid-cell, [data-ui-input-group]) {
-        @apply relative rounded-lg border outline-hidden dark:border-gray-700;
+        @apply relative rounded-lg border outline-hidden dark:border-gray-700 with-contrast:border-gray-500;
     }
 }
 /* BARD / EDITOR
@@ -255,10 +255,10 @@
         @apply fixed inset-0 min-h-screen overflow-scroll border-none rounded-none bg-gray-100 pt-14 dark:bg-gray-850;
 
         & > .bard-editor {
-            @apply relative mx-auto my-6 max-w-5xl rounded-lg bg-white px-8 shadow-ui-md dark:bg-gray-950 dark:shadow-lg;
+            @apply relative mx-auto my-6 max-w-5xl rounded-lg bg-white px-8 shadow-ui-md dark:bg-gray-925 dark:shadow-lg;
         }
         .bard-content {
-            @apply dark:bg-gray-950;
+            @apply dark:bg-gray-925;
         }
 
         .bard-fixed-toolbar {
@@ -278,9 +278,9 @@
             min-height: calc(100vh - 120px);
         }
 
-        .bard-content:not(.bard-set *) > {
-            p > code,
-            pre code {
+        .bard-content:not(.bard-set *) {
+            > p > code,
+            > pre code {
                 @apply bg-purple-100;
             }
         }

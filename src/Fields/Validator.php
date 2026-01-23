@@ -122,7 +122,7 @@ class Validator
         }, collect())->all();
     }
 
-    private function parse($rule)
+    public function parse($rule)
     {
         if (is_string($rule) && Str::startsWith($rule, 'new ')) {
             return $this->parseClassBasedRule($rule);

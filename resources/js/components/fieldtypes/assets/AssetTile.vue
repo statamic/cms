@@ -18,7 +18,7 @@
         >
         </asset-editor>
 
-        <div class="flex h-full border-b dark:border-gray-700 rounded-b-md relative" :class="{ 'bg-checkerboard rounded-md': canBeTransparent }">
+        <div class="flex h-full rounded-b-md relative" :class="{ 'bg-checkerboard rounded-lg!': canBeTransparent, 'border-b dark:border-gray-700': showFilename }">
             <div class="p-1 flex flex-col items-center justify-center h-full">
                 <!-- Solo Bard -->
                 <template v-if="isImage && isInBardField && !isInAssetBrowser">
@@ -49,13 +49,23 @@
                     </template>
                 </div>
             </div>
+            <div class="absolute bottom-0 end-0 [&_button]:mb-1 [&_button]:me-1">
+                <ui-badge
+                    v-if="!readOnly && showSetAlt && needsAlt && !showFilename"
+                    as="button"
+                    size="sm"
+                    color="sky"
+                    :text="__('Set Alt')"
+                    @click="editOrOpen"
+                />
+            </div>
         </div>
 
         <div class="flex items-center justify-between w-full px-1" v-if="showFilename">
             <div class="truncate w-18 text-xs text-gray-600 dark:text-gray-400 flex-1 px-2 py-1" v-tooltip="label" :class="{ 'text-center': !needsAlt }">
                 {{ label }}
             </div>
-            <ui-badge as="button" size="sm" color="blue"  @click="editOrOpen" v-if="asset.isEditable && showSetAlt && needsAlt" :text="asset.values.alt ? '✅' : __('Set Alt')" />
+            <ui-badge as="button" size="sm" color="sky"  @click="editOrOpen" v-if="asset.isEditable && showSetAlt && needsAlt" :text="asset.values.alt ? '✅' : __('Set Alt')" />
         </div>
     </div>
 </template>

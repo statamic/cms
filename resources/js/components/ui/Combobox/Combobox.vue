@@ -80,7 +80,7 @@ const triggerClasses = cva({
     variants: {
         variant: {
             default: [
-                'bg-linear-to-b from-white to-gray-50 text-gray-900 border border-gray-300 shadow-ui-sm focus-within:focus-outline',
+                'bg-linear-to-b from-white to-gray-50 text-gray-900 border border-gray-300 with-contrast:border-gray-500 shadow-ui-sm focus-within:focus-outline',
                 'dark:from-gray-850 dark:to-gray-900 dark:border-gray-700 dark:text-gray-300 dark:shadow-ui-md',
             ],
             filled: 'bg-black/5 hover:bg-black/10 text-gray-900 border-none dark:bg-white/15 dark:hover:bg-white/20 dark:text-white focus-within:focus-outline dark:placeholder:text-red-500/60',
@@ -150,7 +150,7 @@ const selectedOption = computed(() => {
 
 const getOptionLabel = (option) => option?.[props.optionLabel];
 const getOptionValue = (option) => option?.[props.optionValue];
-const isSelected = (option) => selectedOptions.value.filter((item) => getOptionValue(item) === getOptionValue(option)).length > 0;
+const isSelected = (option) => selectedOptions.value.some((item) => getOptionValue(item) === getOptionValue(option));
 
 const isOptionDisabled = (option) => {
     if (isSelected(option)) return false;
@@ -196,10 +196,8 @@ const filteredOptions = computed(() => {
         return props.options;
     }
 
-    const options = JSON.parse(JSON.stringify(props.options));
-
     const results = fuzzysort
-        .go(searchQuery.value, options, {
+        .go(searchQuery.value, props.options, {
             all: true,
             key: props.optionLabel,
         })
@@ -253,6 +251,12 @@ function updateDropdownOpen(open) {
 function measureOptionWidths() {
     if (!filteredOptions.value || filteredOptions.value.length === 0) return;
 
+    // Find the options with the longest labels by character count.
+    // We only measure these candidates rather than all options for performance.
+    const candidates = [...filteredOptions.value]
+        .sort((a, b) => (getOptionLabel(b)?.length || 0) - (getOptionLabel(a)?.length || 0))
+        .slice(0, 5);
+
     let maxWidth = 0;
     const measurementCanvas = document.createElement('canvas');
     const context = measurementCanvas.getContext('2d');
@@ -261,8 +265,7 @@ function measureOptionWidths() {
     // This matches the itemClasses styling
     context.font = '14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
-    // Measure all options to find the widest
-    filteredOptions.value.forEach(option => {
+    candidates.forEach(option => {
         const label = getOptionLabel(option);
         const metrics = context.measureText(label);
         const textWidth = metrics.width;
@@ -418,11 +421,13 @@ defineExpose({
 
                 <ComboboxPortal>
                     <ComboboxContent
+                        :force-mount="true"
+                        :hidden="!dropdownOpen"
                         position="popper"
                         :side-offset="5"
                         align="start"
                         :class="[
-                            'shadow-ui-sm z-(--z-index-above) rounded-lg border border-gray-200 bg-white p-2 dark:border-white/10 dark:bg-gray-800',
+                            'shadow-ui-sm z-(-well-z-index-above) rounded-lg border border-gray-200 bg-white p-2 dark:border-white/10 dark:bg-gray-800',
                             'max-h-[var(--reka-combobox-content-available-height)] min-w-[var(--reka-combobox-trigger-width)]',
                             'overflow-hidden'
                         ]"
@@ -442,7 +447,14 @@ defineExpose({
                             <div class="relative">
                                 <ComboboxViewport
                                     ref="viewport"
-                                    class="max-h-[calc(var(--reka-combobox-content-available-height)-5rem)] overflow-y-scroll"
+                                    class="max-h-[calc(var(--reka-combobox-content-available-height)-2rem)] overflow-y-scroll"
+                                    :class="{
+										'min-h-[2.25px]': filteredOptions.length === 0,
+										'min-h-[2.5rem]': filteredOptions.length === 1,
+										'min-h-[5rem]': filteredOptions.length === 2,
+										'min-h-[7.5rem]': filteredOptions.length >= 3,
+                                        'pr-3': scrollbarRef?.isVisible,
+                                    }"
                                     data-ui-combobox-viewport
                                 >
                                     <ComboboxEmpty class="p-2 text-sm" data-ui-combobox-empty>

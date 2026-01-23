@@ -111,7 +111,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->addAboutCommandInfo();
 
-        $this->app->make(Schedule::class)->job(new HandleEntrySchedule)->everyMinute();
+        $this->app->make(Schedule::class)->job(HandleEntrySchedule::class)->everyMinute();
     }
 
     public function register()
