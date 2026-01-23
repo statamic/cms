@@ -39,7 +39,7 @@ provide('layout', {
             <Nav />
             <div id="main-content" class="main-content sm:p-2 h-full flex-1 overflow-y-auto rounded-t-2xl" :data-max-width-enabled="isMaxWidthEnabled">
                 <div id="content-card" class="relative content-card grid min-h-full mx-auto">
-                    <div class="w-full mx-auto max-w-wrapper max-w-page">
+                    <div class="w-full mx-auto max-w-page" data-max-width-wrapper>
                         <slot />
                     </div>
                 </div>
@@ -72,7 +72,7 @@ provide('layout', {
 </template>
 
 <style>
-[data-max-width-enabled="false"] .max-w-wrapper {
+[data-max-width-enabled="false"] [data-max-width-wrapper] {
     width: 100%;
     max-width: none;
 }

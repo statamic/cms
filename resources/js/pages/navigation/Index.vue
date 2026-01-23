@@ -12,7 +12,7 @@ if (props.navs.length === 0) useArchitecturalBackground();
 <template>
     <Head :title="__('Navigation')" />
 
-    <div class="max-w-5xl max-w-wrapper mx-auto">
+    <div class="max-w-5xl mx-auto" data-max-width-wrapper>
         <Header v-if="navs.length" :title="__('Navigation')" icon="navigation">
             <CommandPaletteItem
                 v-if="canCreate"

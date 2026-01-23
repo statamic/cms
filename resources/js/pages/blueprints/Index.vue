@@ -12,7 +12,7 @@ const resetters = ref({});
 <template>
     <Head :title="__('Blueprints')" />
 
-    <div class="max-w-5xl max-w-wrapper mx-auto">
+    <div class="max-w-5xl mx-auto" data-max-width-wrapper>
         <Header :title="__('Blueprints')" icon="blueprints">
             <Dropdown align="end">
                 <template #trigger>

@@ -17,7 +17,7 @@ defineProps({
 <template>
     <Head :title="__('Edit Blueprint')" />
 
-    <div class="max-w-5xl max-w-wrapper mx-auto">
+    <div class="max-w-5xl mx-auto" data-max-width-wrapper>
         <blueprint-builder
             :show-title="showTitle"
             :action="action"

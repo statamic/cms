@@ -25,7 +25,7 @@ const actionContext = computed(() => {
 <template>
     <Head :title="__('Global Sets')" />
 
-    <div class="max-w-5xl max-w-wrapper mx-auto">
+    <div class="max-w-5xl mx-auto" data-max-width-wrapper>
         <Header v-if="globals.length" :title="__('Globals')" icon="globals">
             <CommandPaletteItem
                 v-if="canCreate"
