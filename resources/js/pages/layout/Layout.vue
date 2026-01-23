@@ -26,10 +26,31 @@ provide('layout', {
 let navigationListener = null;
 
 function focusMain() {
+    // Wait for components to mount and autofocus to process
     nextTick(() => {
-        if (!document.activeElement?.matches('input, textarea, select, [contenteditable]')) {
-            document.querySelector('#content-card')?.focus();
-        }
+        requestAnimationFrame(() => {
+            setTimeout(() => {
+                // If an input is already focused, we're done
+                if (document.activeElement?.matches('input, textarea, select, [contenteditable]')) {
+                    return;
+                }
+                
+                // Find any input with autofocus attribute (including nested in UI components)
+                const autofocusInput = document.querySelector('input[autofocus], textarea[autofocus], select[autofocus]') ||
+                                      document.querySelector('[data-ui-input] input[autofocus]');
+                
+                // If autofocus input exists but isn't focused, focus it manually
+                if (autofocusInput && document.activeElement !== autofocusInput) {
+                    autofocusInput.focus();
+                    return;
+                }
+                
+                // Otherwise, focus the content card
+                if (!autofocusInput) {
+                    document.querySelector('#content-card')?.focus();
+                }
+            }, 100);
+        });
     });
 }
 
