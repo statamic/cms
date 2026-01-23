@@ -492,50 +492,31 @@ export default {
             this.loadingSet = handle;
 
             this.fetchSet(handle)
-                .then(data => {
-                    const id = uniqid();
-                    const deepCopy = JSON.parse(JSON.stringify(data.defaults));
-                    const values = Object.assign({}, { type: handle }, deepCopy);
-
-                    this.updateSetMeta(id, data.new);
-
-                    const { $head } = this.editor.view.state.selection;
-                    const { nodeBefore } = $head;
-
-                    this.debounceNextUpdate = false;
-
-                    // Perform this in nextTick because the meta data won't be ready until then.
-                    this.$nextTick(() => {
-                        if (nodeBefore) {
-                            this.editor.commands.setAt({ attrs: { id, values }, pos: $head.pos });
-                        } else {
-                            this.editor.commands.set({ id, values });
-                        }
-                    });
-                })
+                .then(data => this._addSet(handle, index, data))
                 .catch(() => this.$toast.error(__('Something went wrong')))
                 .finally(() => this.loadingSet = null);
         },
 
-        /**
-         * Returns the path to the Bard field, replacing any set indexes with handles.
-         */
-        bardFieldPath() {
-            if (!this.fieldPathPrefix) {
-                return this.handle;
-            }
+        _addSet(handle, index, data) {
+            const id = uniqid();
+            const deepCopy = JSON.parse(JSON.stringify(data.defaults));
+            const values = Object.assign({}, { type: handle }, deepCopy);
 
-            return this.fieldPathKeys
-                .map((key, index) => {
-                    if (Number.isInteger(parseInt(key))) {
-                        return data_get(this.publishContainer.values, this.fieldPathKeys.slice(0, index + 1).join('.'))?.attrs?.values.type;
-                    }
+            this.updateSetMeta(id, data.new);
 
-                    return key;
-                })
-                .filter((key) => key !== undefined)
-                .concat(this.handle)
-                .join('.');
+            const { $head } = this.editor.view.state.selection;
+            const { nodeBefore } = $head;
+
+            this.debounceNextUpdate = false;
+
+            // Perform this in nextTick because the meta data won't be ready until then.
+            this.$nextTick(() => {
+                if (nodeBefore) {
+                    this.editor.commands.setAt({ attrs: { id, values }, pos: $head.pos });
+                } else {
+                    this.editor.commands.set({ id, values });
+                }
+            });
         },
 
         async fetchSet(set) {
@@ -557,6 +538,27 @@ export default {
                     })
                     .catch(error => reject(error));
             });
+        },
+
+        /**
+         * Returns the path to the Bard field, replacing any set indexes with handles.
+         */
+        bardFieldPath() {
+            if (!this.fieldPathPrefix) {
+                return this.handle;
+            }
+
+            return this.fieldPathKeys
+                .map((key, index) => {
+                    if (Number.isInteger(parseInt(key))) {
+                        return data_get(this.publishContainer.values, this.fieldPathKeys.slice(0, index + 1).join('.'))?.attrs?.values.type;
+                    }
+
+                    return key;
+                })
+                .filter((key) => key !== undefined)
+                .concat(this.handle)
+                .join('.');
         },
 
         duplicateSet(old_id, attrs, getPos) {
