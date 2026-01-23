@@ -37,9 +37,9 @@ provide('layout', {
 
         <main id="main" class="flex bg-body-bg dark:border-t dark:border-body-border rounded-t-2xl fixed top-14 inset-x-0 bottom-0 min-h-[calc(100vh-3.5rem)]">
             <Nav />
-            <div id="main-content" class="main-content sm:p-2 h-full flex-1 overflow-y-auto rounded-t-2xl">
+            <div id="main-content" class="main-content sm:p-2 h-full flex-1 overflow-y-auto rounded-t-2xl" :data-max-width-enabled="isMaxWidthEnabled">
                 <div id="content-card" class="relative content-card grid min-h-full mx-auto">
-                    <div :class="['w-full mx-auto', { 'max-w-page': isMaxWidthEnabled }]">
+                    <div class="w-full mx-auto max-w-wrapper max-w-page">
                         <slot />
                     </div>
                 </div>
@@ -70,3 +70,10 @@ provide('layout', {
         <Tooltips />
     </ConfigProvider>
 </template>
+
+<style>
+[data-max-width-enabled="false"] .max-w-wrapper {
+    width: 100%;
+    max-width: none;
+}
+</style>
