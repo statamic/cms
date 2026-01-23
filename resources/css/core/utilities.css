@@ -164,10 +164,6 @@
     }
 }
 
-@utility bg-frosted {
-    @apply bg-white/85;
-}
-
 /* UTILITIES / DECORATION / MASK BACKGROUND
 =================================================== */
 /* Notes...
