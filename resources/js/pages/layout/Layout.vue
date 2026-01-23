@@ -34,7 +34,7 @@ function focusMain() {
                 if (document.activeElement?.matches('input, textarea, select, [contenteditable]')) {
                     return;
                 }
-                
+
                 // Find any input with autofocus attribute (including nested in UI components)
                 const autofocusInput = document.querySelector('input[autofocus], textarea[autofocus], select[autofocus]') ||
                                       document.querySelector('[data-ui-input] input[autofocus]');
@@ -44,7 +44,7 @@ function focusMain() {
                     autofocusInput.focus();
                     return;
                 }
-                
+
                 // Otherwise, focus the content card
                 if (!autofocusInput) {
                     document.querySelector('#content-card')?.focus();
