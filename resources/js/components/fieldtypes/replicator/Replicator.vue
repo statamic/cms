@@ -213,23 +213,25 @@ export default {
             this.loadingSet = handle;
 
             this.fetchSet(handle)
-                .then(data => {
-                    const set = {
-                        ...JSON.parse(JSON.stringify(data.defaults)),
-                        _id: uniqid(),
-                        type: handle,
-                        enabled: true,
-                    };
-
-                    this.updateSetMeta(set._id, data.new);
-
-                    this.$nextTick(() => {
-                        this.update([...this.value.slice(0, index), set, ...this.value.slice(index)]);
-                        this.expandSet(set._id);
-                    });
-                })
+                .then(data => this._addSet(handle, index, data))
                 .catch(() => this.$toast.error(__('Something went wrong')))
                 .finally(() => this.loadingSet = null);
+        },
+
+        _addSet(handle, index, data) {
+            const set = {
+                ...JSON.parse(JSON.stringify(data.defaults)),
+                _id: uniqid(),
+                type: handle,
+                enabled: true,
+            };
+
+            this.updateSetMeta(set._id, data.new);
+
+            this.$nextTick(() => {
+                this.update([...this.value.slice(0, index), set, ...this.value.slice(index)]);
+                this.expandSet(set._id);
+            });
         },
 
         /**
