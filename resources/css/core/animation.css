@@ -88,12 +88,4 @@
     .starting-style-transition--delay {
         transition-delay: calc(var(--starting-style-transition-duration) * 5);
     }
-
-    .starting-style-transition--siblings,
-    /* Assume that when we're animating children we want a sibling delay */
-    .starting-style-transition-children > *,
-    .publish-fields > *,
-    .publish-fields-fluid > * {
-        transition-delay: calc(sibling-index() * var(--starting-style-sibling-delay));
-    }
 }
