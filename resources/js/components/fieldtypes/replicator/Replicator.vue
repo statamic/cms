@@ -234,27 +234,6 @@ export default {
             });
         },
 
-        /**
-         * Returns the path to the Replicator field, replacing any set indexes with handles.
-         */
-        replicatorFieldPath() {
-            if (!this.fieldPathPrefix) {
-                return this.handle;
-            }
-
-            return this.fieldPathKeys
-                .map((key, index) => {
-                    if (Number.isInteger(parseInt(key))) {
-                        return data_get(this.publishContainer.values, this.fieldPathKeys.slice(0, index + 1).join('.'))?.type;
-                    }
-
-                    return key;
-                })
-                .filter((key) => key !== undefined)
-                .concat(this.handle)
-                .join('.');
-        },
-
         async fetchSet(set) {
             return new Promise(async (resolve, reject) => {
                 const field = this.replicatorFieldPath();
@@ -274,6 +253,27 @@ export default {
                     })
                     .catch(error => reject(error));
             });
+        },
+
+        /**
+         * Returns the path to the Replicator field, replacing any set indexes with handles.
+         */
+        replicatorFieldPath() {
+            if (!this.fieldPathPrefix) {
+                return this.handle;
+            }
+
+            return this.fieldPathKeys
+                .map((key, index) => {
+                    if (Number.isInteger(parseInt(key))) {
+                        return data_get(this.publishContainer.values, this.fieldPathKeys.slice(0, index + 1).join('.'))?.type;
+                    }
+
+                    return key;
+                })
+                .filter((key) => key !== undefined)
+                .concat(this.handle)
+                .join('.');
         },
 
         duplicateSet(old_id) {
