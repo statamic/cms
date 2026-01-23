@@ -7,6 +7,7 @@ use Facades\Statamic\Fieldtypes\RowId;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Statamic\Facades\Asset;
+use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -47,6 +48,14 @@ class Bard extends Replicator
 
     protected function configFieldItems(): array
     {
+        $containers = AssetContainer::all();
+
+        $defaultButtons = $containers->isEmpty()
+            ? collect(static::$defaultButtons)
+                ->reject(fn ($value) => $value === 'image')
+                ->values()->all()
+            : static::$defaultButtons;
+
         return [
             [
                 'display' => __('Editor Settings'),
@@ -57,7 +66,7 @@ class Bard extends Replicator
                         'instructions' => __('statamic::fieldtypes.bard.config.buttons'),
                         'type' => 'bard_buttons_setting',
                         'full_width_setting' => true,
-                        'default' => static::$defaultButtons,
+                        'default' => $defaultButtons,
                     ],
                     'toolbar_mode' => [
                         'display' => __('Toolbar Mode'),
@@ -180,6 +189,8 @@ class Bard extends Replicator
                             'buttons' => 'contains_any anchor, image',
                         ],
                         'width' => 50,
+                        'default' => $containers->count() == 1 ? $containers->first()->handle() : null,
+                        'force_in_config' => true,
                         'validate' => [
                             $this->containerRequiredRule(),
                         ],
