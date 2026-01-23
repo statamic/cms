@@ -9,10 +9,16 @@ const props = defineProps(['navs', 'columns', 'canCreate', 'createUrl', 'actionU
 if (props.navs.length === 0) useArchitecturalBackground();
 </script>
 
-<template>
-    <Head :title="__('Navigation')" />
+<style>
+    /* Override max-width for navigation page only */
+    .page-cp-navigation {
+        --max-width-page: var(--max-width-5xl);
+    }
+</style>
 
-    <div class="max-w-page mx-auto">
+<template>
+        <Head :title="__('Navigation')" />
+
         <Header v-if="navs.length" :title="__('Navigation')" icon="navigation">
             <CommandPaletteItem
                 v-if="canCreate"
@@ -71,5 +77,4 @@ if (props.navs.length === 0) useArchitecturalBackground();
         </template>
 
         <DocsCallout :topic="__('Navigation')" url="navigation" />
-    </div>
 </template>

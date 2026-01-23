@@ -6,7 +6,9 @@ import SessionExpiry from '@/components/SessionExpiry.vue';
 import LicensingAlert from '@/components/LicensingAlert.vue';
 import PortalTargets from '@/components/portals/PortalTargets.vue';
 import Tooltips from '@/components/Tooltips.vue';
-import { provide, watch, ref } from 'vue';
+import { provide, watch, ref, onMounted, onUnmounted } from 'vue';
+import { usePage } from '@inertiajs/vue3';
+import { router } from '@inertiajs/vue3';
 import useBodyClasses from './body-classes.js';
 import useStatamicPageProps from '@/composables/page-props.js';
 import useMaxWidthToggle from '@/composables/use-max-width-toggle.js';
@@ -21,6 +23,27 @@ const additionalBreadcrumbs = ref(props.additionalBreadcrumbs);
 watch(() => props.additionalBreadcrumbs, (newVal) => additionalBreadcrumbs.value = newVal);
 
 const { isMaxWidthEnabled, toggle } = useMaxWidthToggle();
+const page = usePage();
+
+// Add route-based body class for page-specific CSS overrides
+let navigationListener = null;
+
+function updateBodyClass() {
+    const path = page.url.replace(/^\//, '').replace(/\//g, '-') || 'home';
+    document.body.className = document.body.className.replace(/\bpage-\S+/g, '');
+    document.body.classList.add(`page-${path}`);
+}
+
+onMounted(() => {
+    updateBodyClass();
+    navigationListener = router.on('success', updateBodyClass);
+});
+
+onUnmounted(() => {
+    if (navigationListener) {
+        navigationListener();
+    }
+});
 
 provide('layout', {
     additionalBreadcrumbs,
