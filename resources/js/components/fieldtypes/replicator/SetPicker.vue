@@ -431,6 +431,8 @@ export default {
         },
 
         singleButtonClicked() {
+			if (!this.enabled) return;
+
             this.addSet(this.sets[0].sets[0].handle);
         },
 
