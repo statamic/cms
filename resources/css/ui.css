@@ -156,8 +156,8 @@
 }
 
 @theme {
+    /* This is the outer width of the page content area. */
     --max-width-page: 85rem;
-    --max-width-6xl: 70rem;
 
     --text-4xs: 0.4rem;
     --text-3xs: 0.5rem;
