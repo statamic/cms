@@ -107,7 +107,9 @@ return [
 
         'revisions' => [
             'class' => Stores\RevisionsStore::class,
-            'directory' => env('STATAMIC_REVISIONS_PATH', config('statamic.revisions.path', storage_path('statamic/revisions'))),
+            'directory' => env('STATAMIC_REVISIONS_PATH')
+                ? base_path(env('STATAMIC_REVISIONS_PATH'))
+                : config('statamic.revisions.path', storage_path('statamic/revisions')),
         ],
 
     ],
