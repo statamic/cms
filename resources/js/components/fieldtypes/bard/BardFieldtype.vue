@@ -94,6 +94,7 @@
                                 v-if="showAddSetButton"
                                 :sets="groupConfigs"
                                 class="bard-set-selector"
+                                :loading-set="loadingSet"
                                 @added="addSet"
                             >
                                 <template #trigger>
@@ -175,6 +176,7 @@ import { common, createLowlight } from 'lowlight';
 import 'highlight.js/styles/github.css';
 import importTiptap from '@/util/tiptap.js';
 import { computed } from 'vue';
+import { data_get } from "@/bootstrap/globals.js";
 
 const lowlight = createLowlight(common);
 let tiptap = null;
@@ -217,6 +219,8 @@ export default {
             },
             errorsById: {},
             debounceNextUpdate: true,
+            setsCache: {},
+            loadingSet: null,
         };
     },
 
@@ -457,6 +461,10 @@ export default {
             }
         },
 
+        loadingSet(loading) {
+            this.$progress.loading('bard-set', !!loading);
+        },
+
         'publishContainer.errors': {
             immediate: true,
             handler(errors) {
@@ -481,11 +489,20 @@ export default {
 
     methods: {
         addSet(handle) {
+            this.loadingSet = handle;
+
+            this.fetchSet(handle)
+                .then(data => this._addSet(handle, index, data))
+                .catch(() => this.$toast.error(__('Something went wrong')))
+                .finally(() => this.loadingSet = null);
+        },
+
+        _addSet(handle, index, data) {
             const id = uniqid();
-            const deepCopy = JSON.parse(JSON.stringify(this.meta.defaults[handle]));
+            const deepCopy = JSON.parse(JSON.stringify(data.defaults));
             const values = Object.assign({}, { type: handle }, deepCopy);
 
-            this.updateSetMeta(id, this.meta.new[handle]);
+            this.updateSetMeta(id, data.new);
 
             const { $head } = this.editor.view.state.selection;
             const { nodeBefore } = $head;
@@ -500,6 +517,48 @@ export default {
                     this.editor.commands.set({ id, values });
                 }
             });
+        },
+
+        async fetchSet(set) {
+            return new Promise(async (resolve, reject) => {
+                const field = this.bardFieldPath();
+                const setCacheKey = `${field}.${set}`;
+                const reference = this.publishContainer.reference;
+                const blueprint = this.publishContainer.blueprint.fqh;
+
+                if (this.setsCache[setCacheKey]) {
+                    resolve(this.setsCache[setCacheKey]);
+                    return;
+                }
+
+                this.$axios.post(cp_url('fieldtypes/replicator/set'), { blueprint, reference, field, set })
+                    .then(response => {
+                        this.setsCache[setCacheKey] = response.data;
+                        resolve(response.data);
+                    })
+                    .catch(error => reject(error));
+            });
+        },
+
+        /**
+         * Returns the path to the Bard field, replacing any set indexes with handles.
+         */
+        bardFieldPath() {
+            if (!this.fieldPathPrefix) {
+                return this.handle;
+            }
+
+            return this.fieldPathKeys
+                .map((key, index) => {
+                    if (Number.isInteger(parseInt(key))) {
+                        return data_get(this.publishContainer.values, this.fieldPathKeys.slice(0, index + 1).join('.'))?.attrs?.values.type;
+                    }
+
+                    return key;
+                })
+                .filter((key) => key !== undefined)
+                .concat(this.handle)
+                .join('.');
         },
 
         duplicateSet(old_id, attrs, getPos) {
@@ -756,7 +815,7 @@ export default {
                 enableInputRules: this.config.enable_input_rules,
                 enablePasteRules: this.config.enable_paste_rules,
                 editorProps: { attributes: { class: 'bard-content' } },
-	            onDrop: () => this.debounceNextUpdate = false,
+                onDrop: () => this.debounceNextUpdate = false,
                 onFocus: () => {
                     this.hasBeenFocused = true;
                     this.$emit('focus');

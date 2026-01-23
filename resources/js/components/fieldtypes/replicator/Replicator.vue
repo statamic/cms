@@ -60,6 +60,7 @@
                                             :index="index"
                                             :enabled="canAddSet"
                                             :is-first="index === 0"
+                                            :loading-set="loadingSet"
                                             @added="addSet"
                                         />
                                     </template>
@@ -75,6 +76,7 @@
                             :index="value.length"
                             :label="config.button_label"
                             :is-first="value.length === 0"
+                            :loading-set="loadingSet"
                             @added="addSet"
                         />
                     </section>
@@ -91,6 +93,7 @@ import ReplicatorSet from './Set.vue';
 import AddSetButton from './AddSetButton.vue';
 import ManagesSetMeta from './ManagesSetMeta';
 import { SortableList } from '../../sortable/Sortable';
+import { data_get } from "@/bootstrap/globals.js";
 
 export default {
     mixins: [Fieldtype, ManagesSetMeta],
@@ -112,6 +115,8 @@ export default {
                 showReplicatorFieldPreviews: this.config.previews,
             },
             errorsById: {},
+            setsCache: {},
+            loadingSet: null,
         };
     },
 
@@ -205,19 +210,70 @@ export default {
         },
 
         addSet(handle, index) {
+            this.loadingSet = handle;
+
+            this.fetchSet(handle)
+                .then(data => this._addSet(handle, index, data))
+                .catch(() => this.$toast.error(__('Something went wrong')))
+                .finally(() => this.loadingSet = null);
+        },
+
+        _addSet(handle, index, data) {
             const set = {
-                ...JSON.parse(JSON.stringify(this.meta.defaults[handle])),
+                ...JSON.parse(JSON.stringify(data.defaults)),
                 _id: uniqid(),
                 type: handle,
                 enabled: true,
             };
 
-            this.updateSetMeta(set._id, this.meta.new[handle]);
+            this.updateSetMeta(set._id, data.new);
 
-			this.$nextTick(() => {
-				this.update([...this.value.slice(0, index), set, ...this.value.slice(index)]);
-				this.expandSet(set._id);
-			});
+            this.$nextTick(() => {
+                this.update([...this.value.slice(0, index), set, ...this.value.slice(index)]);
+                this.expandSet(set._id);
+            });
+        },
+
+        async fetchSet(set) {
+            return new Promise(async (resolve, reject) => {
+                const field = this.replicatorFieldPath();
+                const setCacheKey = `${field}.${set}`;
+                const reference = this.publishContainer.reference;
+                const blueprint = this.publishContainer.blueprint.fqh;
+
+                if (this.setsCache[setCacheKey]) {
+                    resolve(this.setsCache[setCacheKey]);
+                    return;
+                }
+
+                this.$axios.post(cp_url('fieldtypes/replicator/set'), { blueprint, reference, field, set })
+                    .then(response => {
+                        this.setsCache[setCacheKey] = response.data;
+                        resolve(response.data);
+                    })
+                    .catch(error => reject(error));
+            });
+        },
+
+        /**
+         * Returns the path to the Replicator field, replacing any set indexes with handles.
+         */
+        replicatorFieldPath() {
+            if (!this.fieldPathPrefix) {
+                return this.handle;
+            }
+
+            return this.fieldPathKeys
+                .map((key, index) => {
+                    if (Number.isInteger(parseInt(key))) {
+                        return data_get(this.publishContainer.values, this.fieldPathKeys.slice(0, index + 1).join('.'))?.type;
+                    }
+
+                    return key;
+                })
+                .filter((key) => key !== undefined)
+                .concat(this.handle)
+                .join('.');
         },
 
         duplicateSet(old_id) {
@@ -310,6 +366,10 @@ export default {
 
         collapsed(collapsed) {
             this.updateMeta({ ...this.meta, collapsed: clone(collapsed) });
+        },
+
+        loadingSet(loading) {
+            this.$progress.loading('replicator-set', !!loading);
         },
 
         'publishContainer.errors': {

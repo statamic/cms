@@ -606,16 +606,6 @@ class Bard extends Replicator
             return [$set['attrs']['id'] => $this->fields($values['type'], $index)->addValues($values)->meta()->put('_', '_')];
         })->toArray();
 
-        $defaults = collect($this->flattenedSetsConfig())->map(function ($set, $handle) {
-            return $this->fields($handle)->all()->map(function ($field) {
-                return $field->fieldtype()->preProcess($field->defaultValue());
-            })->all();
-        })->all();
-
-        $new = collect($this->flattenedSetsConfig())->map(function ($set, $handle) use ($defaults) {
-            return $this->fields($handle)->addValues($defaults[$handle])->meta()->put('_', '_');
-        })->toArray();
-
         $previews = collect($existing)->map(function ($fields) {
             return collect($fields)->map(function () {
                 return null;
@@ -636,8 +626,6 @@ class Bard extends Replicator
 
         $data = [
             'existing' => $existing,
-            'new' => $new,
-            'defaults' => $defaults,
             'collapsed' => [],
             'previews' => $previews,
             '__collaboration' => ['existing'],
