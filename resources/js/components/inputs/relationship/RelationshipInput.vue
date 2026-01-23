@@ -68,7 +68,7 @@
                         icon="link"
                         :size="buttonSize"
                         :text="linkLabel"
-                        @click.prevent="isSelecting = true"
+                        @click.prevent="openSelector"
                     />
                 </div>
             </div>
@@ -286,6 +286,10 @@ export default {
             this.update([...this.value.slice(0, index), ...this.value.slice(index + 1)]);
         },
 
+	    openSelector() {
+			this.isSelecting = true;
+	    },
+
         selectionsUpdated(selections) {
             this.getDataForSelections(selections).then(() => {
                 this.update(selections);
@@ -293,7 +297,7 @@ export default {
         },
 
         initializeData() {
-            if (!this.data || !this.data.length) {
+            if (!this.data) {
                 return this.getDataForSelections(this.value);
             }
 

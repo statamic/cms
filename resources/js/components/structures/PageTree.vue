@@ -18,7 +18,7 @@
                     </div>
                 </div>
             </ui-panel-header>
-            <div v-if="!loading" class="page-tree">
+            <div v-if="!loading" class="page-tree" :class="{ 'page-tree--ready': ready }">
                 <Draggable
                     ref="tree"
                     v-model="treeData"
@@ -127,6 +127,7 @@ export default {
             treeData: [],
             collapsedState: [],
             discardingChanges: false,
+            ready: false,
         };
     },
 
@@ -170,6 +171,10 @@ export default {
             e.preventDefault();
             this.save();
         });
+    },
+
+    mounted() {
+        setTimeout(() => this.ready = true, 500); // arbitrary delay after initial transitions
     },
 
     methods: {

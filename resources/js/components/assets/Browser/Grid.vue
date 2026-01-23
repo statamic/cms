@@ -66,7 +66,10 @@
                         :start-with-edit-mode="true"
                         submit-mode="enter"
                         :placeholder="__('Name')"
-                        class="flex w-[80px] items-center placeholder:lowercase justify-center overflow-hidden mt-2 text-center font-mono text-xs text-ellipsis whitespace-nowrap text-gray-500"
+                        :class="[
+                            'flex w-[80px] items-center placeholder:lowercase justify-center overflow-hidden mt-2 text-center font-mono text-xs text-ellipsis whitespace-nowrap placeholder:text-gray-400 dark:placeholder:text-gray-500 text-gray-500',
+                            { 'st-has-error': creatingFolderError }
+                        ]"
                         @submit="$emit('create-folder', newFolderName)"
                         @cancel="
                             () => {
@@ -129,7 +132,7 @@
                                         </div>
                                     </div>
                                 </button>
-                                <div class="absolute end-2 top-1">
+                                <div class="absolute end-1 top-1 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity [&_button]:bg-white [&_button]:hover:bg-white [&_button]:dark:bg-gray-900 [&_button]:dark:hover:bg-gray-900">
                                     <Dropdown placement="left-start">
                                         <DropdownMenu>
                                             <DropdownItem

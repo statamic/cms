@@ -50,11 +50,12 @@
                     </div>
 
                     <div
-                        class="bard-editor @container/bard focus-within:focus-outline"
+                        class="bard-editor @container/bard"
                         :class="{
                             'mode:read-only': readOnly,
                             'mode:minimal': !showFixedToolbar,
                             'mode:inline': inputIsInline,
+                            'focus-within:focus-outline': !fullScreenMode,
                         }"
                         tabindex="0"
                     >
@@ -105,7 +106,7 @@
                                             v-tooltip="__('Add Set')"
                                         />
                                         <ui-description
-                                            v-if="!$refs.setPicker?.isOpen"
+                                            v-show="shouldShowAddSetHelperText"
                                             :text="__('Type \'/\' to insert a set')"
                                             :class="{'ps-9': fullScreenMode}"
                                         />
@@ -210,6 +211,7 @@ export default {
             pageHeader: null,
             escBinding: null,
             showAddSetButton: false,
+            hasBeenFocused: false,
             provide: {
                 bard: this.makeBardProvide(),
                 bardSets: this.config.sets,
@@ -363,6 +365,10 @@ export default {
                 },
             ];
         },
+
+        shouldShowAddSetHelperText() {
+            return !this.$refs.setPicker?.isOpen && this.suitableToShowSetButton(this.editor);
+        },
     },
 
     created() {
@@ -410,7 +416,7 @@ export default {
         json(json, oldJson) {
             if (!this.mounted) return;
 
-            if (json === oldJson) return;
+            if (JSON.stringify(json) === JSON.stringify(oldJson)) return;
 
             this.debounceNextUpdate
                 ? this.updateDebounced(json)
@@ -444,6 +450,12 @@ export default {
 
             if (fullScreenMode) {
                 this.escBinding = this.$keys.bindGlobal('esc', this.closeFullscreen);
+                // Focus the editor content when entering fullscreen mode
+                this.$nextTick(() => {
+                    if (this.editor) {
+                        this.editor.commands.focus();
+                    }
+                });
             } else {
                 this.escBinding?.destroy();
             }
@@ -625,7 +637,7 @@ export default {
             const { $anchor, empty } = selection;
             const isRootDepth = $anchor.depth === 1;
             const isEmptyTextBlock =
-                $anchor.parent.isTextblock && !$anchor.parent.type.spec.code && !$anchor.parent.textContent;
+                ($anchor.parent.isTextblock && !$anchor.parent.firstChild) && !$anchor.parent.type.spec.code && !$anchor.parent.textContent;
             const isAroundInlineImage =
                 state.selection.$to.nodeBefore?.type.name === 'image' ||
                 state.selection.$to.nodeAfter?.type.name === 'image';
@@ -802,7 +814,10 @@ export default {
                 enablePasteRules: this.config.enable_paste_rules,
                 editorProps: { attributes: { class: 'bard-content' } },
                 onDrop: () => this.debounceNextUpdate = false,
-                onFocus: () => this.$emit('focus'),
+                onFocus: () => {
+                    this.hasBeenFocused = true;
+                    this.$emit('focus');
+                },
                 onBlur: () => {
                     // Since clicking into a field inside a set would also trigger a blur, we can't just emit the
                     // blur event immediately. We need to make sure that the newly focused element is outside
@@ -1034,6 +1049,7 @@ export default {
             Object.defineProperties(bard, {
                 setConfigs: { get: () => this.setConfigs },
                 isReadOnly: { get: () => this.readOnly },
+                hasBeenFocused: { get: () => this.hasBeenFocused },
             });
             return bard;
         },

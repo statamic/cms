@@ -1,5 +1,120 @@
 # Release Notes
 
+## 6.0.0-beta.4 (2026-01-22)
+
+### What's new
+- Laravel Boost Guidelines [#13587](https://github.com/statamic/cms/issues/13587) by @duncanmcclean
+- Alert component [#13599](https://github.com/statamic/cms/issues/13599) by @JayGeorge
+
+### What's fixed
+- Improve assets without filenames [#13584](https://github.com/statamic/cms/issues/13584) by @JayGeorge
+- Fix `CodeEditor` previews in Storybook [#13588](https://github.com/statamic/cms/issues/13588) by @duncanmcclean
+- Prevent linebreak for selected assets message [#13582](https://github.com/statamic/cms/issues/13582) by @JayGeorge
+- German translations [#13581](https://github.com/statamic/cms/issues/13581) by @helloDanuk
+- Opaque badges [#13586](https://github.com/statamic/cms/issues/13586) by @JayGeorge
+- Run update scripts when updating to `6.0.0-beta.4` [#13594](https://github.com/statamic/cms/issues/13594) by @duncanmcclean
+- Dynamic floating toolbar [#13597](https://github.com/statamic/cms/issues/13597) by @JayGeorge
+- Prevent "Type / to insert a set" clashing with nodes [#13583](https://github.com/statamic/cms/issues/13583) by @duncanmcclean
+- Fix missing preset tab container border under "New View" button [#13603](https://github.com/statamic/cms/issues/13603) by @jackmcdade
+- Fix danger disabled button in dark mode [#13585](https://github.com/statamic/cms/issues/13585) by @JayGeorge
+- Fix error when calculating stack depth for non-existent stack [#13606](https://github.com/statamic/cms/issues/13606) by @duncanmcclean
+- Storybook - closer match Statamic branding [#13612](https://github.com/statamic/cms/issues/13612) by @JayGeorge
+- Make `parent_uri` and other entry data available in static caching invalidation rules [#10233](https://github.com/statamic/cms/issues/10233) by @duncanmcclean
+- Add `default` config option to Date fieldtype [#13546](https://github.com/statamic/cms/issues/13546) by @duncanmcclean
+- Combobox Scrollbar tweaks [#13453](https://github.com/statamic/cms/issues/13453) by @duncanmcclean
+- Fix incorrect index name passed to `InsertMultipleJob` job [#13617](https://github.com/statamic/cms/issues/13617) by @duncanmcclean
+- Fixes UI inconsistencies [#13505](https://github.com/statamic/cms/issues/13505) by @kjetilhole
+- Avoid generating slug for localization when field isn't localizable [#13549](https://github.com/statamic/cms/issues/13549) by @duncanmcclean
+- Fix nested revealer fields [#12362](https://github.com/statamic/cms/issues/12362) by @duncanmcclean
+- Run migration update scripts when updating to `6.0.0-beta.4` [#13631](https://github.com/statamic/cms/issues/13631) by @duncanmcclean
+- Make PreventsSavingStacheItemsToDisk work with Pest PHP [#13640](https://github.com/statamic/cms/issues/13640) by @aerni
+- Focus search input when opening relationship selector [#13642](https://github.com/statamic/cms/issues/13642) by @duncanmcclean
+- Fix error when adding nested replicator set [#13630](https://github.com/statamic/cms/issues/13630) by @duncanmcclean
+- npm audit fix [#13646](https://github.com/statamic/cms/issues/13646) by @jasonvarga
+- Fix error when restoring revision [#13626](https://github.com/statamic/cms/issues/13626) by @duncanmcclean
+- Avoid "Maximum recursive updates exceeded" error from tooltips [#13605](https://github.com/statamic/cms/issues/13605) by @duncanmcclean
+- Hash URLs when saving nocache regions in database [#13152](https://github.com/statamic/cms/issues/13152) by @duncanmcclean
+- Correct recursive form data merging [#13413](https://github.com/statamic/cms/issues/13413) by @mikemartin
+- Group fieldtype gets padding only when border enabled [#13109](https://github.com/statamic/cms/issues/13109) by @martyf
+
+
+
+## 6.0.0-beta.3 (2026-01-15)
+
+### What's fixed
+- Fix values being lost when reordering sets [#13545](https://github.com/statamic/cms/issues/13545) by @duncanmcclean
+- French translations [#13544](https://github.com/statamic/cms/issues/13544) by @ebeauchamps
+- Fix theme colors gray-950 and success [#13547](https://github.com/statamic/cms/issues/13547) by @heidkaemper
+- Fix `level` prop example on Heading docs [#13553](https://github.com/statamic/cms/issues/13553) by @duncanmcclean
+- Fix passkey error modal not closing [#13567](https://github.com/statamic/cms/issues/13567) by @duncanmcclean
+- Improve Stricter WCAG 2.2 Mode [#13565](https://github.com/statamic/cms/issues/13565) by @JayGeorge
+- Fix assets checkerboard border radius [#13568](https://github.com/statamic/cms/issues/13568) by @JayGeorge
+- Escape command palette when navigating [#13569](https://github.com/statamic/cms/issues/13569) by @JayGeorge
+- Menu icons [#13554](https://github.com/statamic/cms/issues/13554) by @JayGeorge
+- Fix localizable toggle on fields [#13548](https://github.com/statamic/cms/issues/13548) by @duncanmcclean
+- Avoid showing selected state on sets unless user has interacted with Bard [#13570](https://github.com/statamic/cms/issues/13570) by @duncanmcclean
+- Fullscreen mode improvements for Bard and Markdown [#13495](https://github.com/statamic/cms/issues/13495) by @JayGeorge
+- Date filter badges use local time [#13573](https://github.com/statamic/cms/issues/13573) by @jasonvarga
+- Anchor nav marker position tweaks [#13575](https://github.com/statamic/cms/issues/13575) by @JayGeorge
+- Fix `CreateForm` demos in Storybook [#13576](https://github.com/statamic/cms/issues/13576) by @duncanmcclean
+- Stack fixes [#13555](https://github.com/statamic/cms/issues/13555) by @duncanmcclean
+- Separate header logo and nav button [#13574](https://github.com/statamic/cms/issues/13574) by @JayGeorge
+- Fix creating passkeys [#13566](https://github.com/statamic/cms/issues/13566) by @duncanmcclean
+- Apply standard headers to field settings stacks [#13579](https://github.com/statamic/cms/issues/13579) by @jasonvarga
+- Fix 2FA setup modal not opening [#13572](https://github.com/statamic/cms/issues/13572) by @duncanmcclean
+- Run the CP through the W3C validator [#13550](https://github.com/statamic/cms/issues/13550) by @JayGeorge
+- Fix open state of Disable 2FA modal [#13571](https://github.com/statamic/cms/issues/13571) by @duncanmcclean
+
+
+
+## 6.0.0-beta.2 (2026-01-13)
+
+### What's fixed
+- Fix some focus clipping [#13465](https://github.com/statamic/cms/issues/13465) by @JayGeorge
+- Avoid squashed Combobox options near viewport edge [#13489](https://github.com/statamic/cms/issues/13489) by @duncanmcclean
+- Remove reka tabs outline [#13529](https://github.com/statamic/cms/issues/13529) by @JayGeorge
+- Bring back logo version tooltip [#13528](https://github.com/statamic/cms/issues/13528) by @duncanmcclean
+- Upgrade Storybook [#13534](https://github.com/statamic/cms/issues/13534) by @jasonvarga
+- Fix tab dropdowns for presets [#13476](https://github.com/statamic/cms/issues/13476) by @JayGeorge
+- Fix elevated session route [#13535](https://github.com/statamic/cms/issues/13535) by @jasonvarga
+- Fix OAuth login links [#13540](https://github.com/statamic/cms/issues/13540) by @duncanmcclean
+- Anchor positioned nav marker [#13536](https://github.com/statamic/cms/issues/13536) by @JayGeorge
+- Only load video embed when field becomes visible [#13527](https://github.com/statamic/cms/issues/13527) by @duncanmcclean
+- Grid dot menu improvements [#13500](https://github.com/statamic/cms/issues/13500) by @JayGeorge
+- Make "Emails" field on configure forms page full-width [#13522](https://github.com/statamic/cms/issues/13522) by @duncanmcclean
+- Panel: Show `header-actions` slot in the right of the header [#13524](https://github.com/statamic/cms/issues/13524) by @duncanmcclean
+- Fix nested permissions in permission tree [#13523](https://github.com/statamic/cms/issues/13523) by @duncanmcclean
+- Fix duplicate items in the Command Palette's "Recent" category [#13471](https://github.com/statamic/cms/issues/13471) by @duncanmcclean
+- Fix bard full screen styles [#13490](https://github.com/statamic/cms/issues/13490) by @JayGeorge
+- New folder ux improvements [#13515](https://github.com/statamic/cms/issues/13515) by @JayGeorge
+- Remove custom Vue warnHandler [#13541](https://github.com/statamic/cms/issues/13541) by @jasonvarga
+
+
+
+## 6.0.0-beta.1 (2026-01-12)
+
+### What's fixed
+- Fix uploading design in Files fieldtype [#13497](https://github.com/statamic/cms/issues/13497) by @duncanmcclean
+- Ensure sidebar tab is only active when sidebar area is hidden [#13501](https://github.com/statamic/cms/issues/13501) by @duncanmcclean
+- Markdown cheatsheet double close button [#13496](https://github.com/statamic/cms/issues/13496) by @JayGeorge
+- Disable tabs when editing form blueprints [#13488](https://github.com/statamic/cms/issues/13488) by @duncanmcclean
+- Don't redirect to referrer when 2FA challenge is required [#13491](https://github.com/statamic/cms/issues/13491) by @duncanmcclean
+- Fix reorderable listings where items come from URL [#13487](https://github.com/statamic/cms/issues/13487) by @duncanmcclean
+- Fix theme grid alignment [#13511](https://github.com/statamic/cms/issues/13511) by @JayGeorge
+- Remove Bard's outer focus state when sets are selected [#13510](https://github.com/statamic/cms/issues/13510) by @JayGeorge
+- Norwegian translations [#13504](https://github.com/statamic/cms/issues/13504) by @kjetilhole
+- Fix markdown text color in dark mode [#13481](https://github.com/statamic/cms/issues/13481) by @kjetilhole
+- Prevent `tabindex` prop type warnings on login page [#13493](https://github.com/statamic/cms/issues/13493) by @duncanmcclean
+- Prevent the tree structure from flashing when disclosures open [#13462](https://github.com/statamic/cms/issues/13462) by @JayGeorge
+- Asset tile and checkerboard improvements [#13502](https://github.com/statamic/cms/issues/13502) by @JayGeorge
+- Adds "Set Alt" button in assets grid view [#13480](https://github.com/statamic/cms/issues/13480) by @kjetilhole
+- Avoid making unnecessary requests in Relationship fieldtype [#13514](https://github.com/statamic/cms/issues/13514) by @duncanmcclean
+- Add max files count [#13477](https://github.com/statamic/cms/issues/13477) by @JayGeorge
+- Fix stacks closing immediately after opening [#13516](https://github.com/statamic/cms/issues/13516) by @duncanmcclean
+- Pressing "esc" should blur CodeMirror inputs [#13474](https://github.com/statamic/cms/issues/13474) by @duncanmcclean
+
+
+
 ## 6.0.0-alpha.21 (2026-01-09)
 
 ### What's fixed

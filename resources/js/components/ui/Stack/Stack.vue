@@ -7,7 +7,8 @@ import {
     useSlots,
     watch,
     onBeforeUnmount,
-    provide
+    provide,
+    onMounted,
 } from 'vue';
 import { stacks, events, keys, config } from '@/api';
 import wait from '@/util/wait.js';
@@ -36,6 +37,8 @@ const props = defineProps({
     inset: { type: Boolean, default: false },
     /** When `true`, the close button is shown in the top-right corner of the stack. */
     showCloseButton: { type: Boolean, default: true },
+    /** When `false`, the logic for wrapping the slot in a Content component is ignored and the slot will not be wrapped. */
+    wrapSlot: { type: Boolean, default: true },
 });
 
 const stack = ref(null);
@@ -54,11 +57,11 @@ const hasStackHeaderComponent = hasComponent('StackHeader', slotProps);
 const hasStackContentComponent = hasComponent('StackContent', slotProps);
 const isUsingOpenProp = computed(() => instance?.vnode.props?.hasOwnProperty('open'));
 const portal = computed(() => stack.value ? `#portal-target-${stack.value.id}` : null);
-const depth = computed(() => stack.value?.data.depth);
+const depth = computed(() => stacks.stacks().findIndex(s => s.id === stack.value?.id) + 1);
 const isTopStack = computed(() => stacks.count() === depth.value);
 
 const shouldAddHeader = computed(() => !!(props.title || props.icon) && !hasStackHeaderComponent.value);
-const shouldWrapSlot = computed(() => !hasStackContentComponent.value);
+const shouldWrapSlot = computed(() => props.wrapSlot && !hasStackContentComponent.value);
 const shouldShowFloatingCloseButton = computed(() => props.showCloseButton && !shouldAddHeader.value && !hasStackHeaderComponent.value);
 
 const offset = computed(() => {
@@ -173,8 +176,11 @@ function cleanup() {
 watch(
     () => props.open,
     (value) => value ? open() : close(),
-    { immediate: true }
 );
+
+onMounted(() => {
+	if (props.open) open();
+});
 
 onBeforeUnmount(() => {
     cleanup();

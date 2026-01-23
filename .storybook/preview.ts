@@ -13,7 +13,7 @@ import PortalVue from 'portal-vue';
 import FullscreenHeader from '@/components/publish/FullscreenHeader.vue';
 import Portal from '@/components/portals/Portal.vue';
 import PortalTargets from '@/components/portals/PortalTargets.vue';
-import { portals, stacks } from '@api';
+import {keys, portals, slug, stacks} from '@api';
 
 // Intercept Inertia navigation and log to Actions tab.
 router.on('before', (event) => {
@@ -31,6 +31,11 @@ setup(async (app) => {
                   linkToDocs: true,
                   paginationSize: 50,
                   paginationSizeOptions: [10, 25, 50, 100, 500],
+                  sites: [{
+                      handle: 'default',
+                      lang: 'en',
+                  }],
+                  selectedSite: 'default',
               };
 
               return config[key] ?? null;
@@ -53,6 +58,8 @@ setup(async (app) => {
   app.config.globalProperties.cp_url = (url) => url;
   app.config.globalProperties.$portals = portals;
   app.config.globalProperties.$stacks = stacks;
+  app.config.globalProperties.$slug = slug;
+  app.config.globalProperties.$keys = keys;
 
   app.use(PortalVue, { portalName: 'v-portal' });
 
@@ -77,6 +84,7 @@ const preview: Preview = {
                 base: 'light',
                 fontBase: '"Lexend", sans-serif',
                 fontCode: '"Source Code Pro", monospace',
+                textColor: '#181a1b',
             }),
             source: {
                 transform: (code: string) => cleanCodeSnippet(code),

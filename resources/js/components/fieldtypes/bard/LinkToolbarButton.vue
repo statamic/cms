@@ -1,5 +1,11 @@
 <template>
-    <Popover ref="popover" class="!size-min" :inset="true" v-model:open="showingToolbar">
+    <Stack
+        :title="__('Link')"
+        size="narrow"
+        inset
+        :wrap-slot="false"
+        v-model:open="showingToolbar"
+    >
         <template #trigger>
             <Button
                 class="px-2!"
@@ -15,7 +21,6 @@
         </template>
         <link-toolbar
             v-if="linkAttrs !== null"
-            class="min-w-84 size-min"
             ref="toolbar"
             :link-attrs="linkAttrs"
             :config="config"
@@ -23,11 +28,11 @@
             @updated="setLink"
             @canceled="close"
         />
-    </Popover>
+    </Stack>
 </template>
 
 <script>
-import { Popover } from '@/components/ui';
+import { Stack } from '@/components/ui';
 import LinkToolbar from './LinkToolbar.vue';
 import BardToolbarButton from './ToolbarButton.vue';
 
@@ -35,8 +40,8 @@ export default {
     mixins: [BardToolbarButton],
 
     components: {
-        Popover,
         LinkToolbar,
+        Stack,
     },
 
     data() {
@@ -49,7 +54,6 @@ export default {
     methods: {
         close() {
             this.showingToolbar = false;
-            this.$refs.popover.close();
         },
 
         setLink(attributes) {
@@ -70,15 +74,5 @@ export default {
         }
     },
 
-    created() {
-        this.bard.events.on('link-toggle', () => {
-            this.toggleLinkToolbar();
-            this.$refs.popover.toggle();
-        });
-    },
-
-    beforeUnmount() {
-        this.bard.events.off('link-toggle');
-    },
 };
 </script>

@@ -1,3 +1,4 @@
+export { default as Alert } from './Alert.vue';
 export { default as AuthCard } from './AuthCard.vue';
 export { default as Badge } from './Badge.vue';
 export { default as Button } from './Button/Button.vue';

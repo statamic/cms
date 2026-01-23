@@ -1,5 +1,6 @@
 <script setup>
 import Head from '@/pages/layout/Head.vue';
+import { Alert, Heading, Description } from '@ui';
 
 defineProps(['icons']);
 </script>
@@ -24,7 +25,7 @@ defineProps(['icons']);
     <ui-dropdown-footer text="Logout" icon="arrow-right" />
 </ui-dropdown>
 
-    <div v-cloak>
+    <div v-cloak class="space-y-12">
         <div class="space-y-12 prose starting-style-transition starting-style-transition-children">
             <h1>Typography <strong>Test</strong> Document</h1>
             <p class="lead">This comprehensive document tests all typography elements supported by both tw-prose and @tailwindcss/typography plugins.</p>
@@ -183,7 +184,7 @@ defineProps(['icons']);
         <div class="space-y-12">
             <section class="space-y-4">
                 <ui-heading size="lg">Badges</ui-heading>
-                <div class="mb-4 flex gap-2 sm:gap-3 items-end">
+                <div class="mb-4 flex flex-wrap gap-2 sm:gap-3 items-end">
                     <ui-badge size="lg" text="Green" color="green" />
                     <ui-badge size="lg" text="Red" color="red" />
                     <ui-badge size="lg" text="Black" color="black" />
@@ -193,35 +194,102 @@ defineProps(['icons']);
                     <ui-badge size="sm" text="Cyan" color="cyan" />
                     <ui-badge size="sm" text="Purple" color="purple" />
                     <ui-badge size="sm" text="Gray" color="gray" />
+                    <ui-badge size="sm" text="Default" />
+                    <ui-badge size="sm" text="Rose" color="rose" />
+                    <ui-badge size="sm" text="Emerald" color="emerald" />
+                    <ui-badge size="sm" text="Fuchsia" color="fuchsia" />
+                    <ui-badge size="sm" text="Indigo" color="indigo" />
+                    <ui-badge size="sm" text="Lime" color="lime" />
+                    <ui-badge size="sm" text="Orange" color="orange" />
+                    <ui-badge size="sm" text="Sky" color="sky" />
+                    <ui-badge size="sm" text="Teal" color="teal" />
+                    <ui-badge size="sm" text="Violet" color="violet" />
+                    <ui-badge size="sm" text="White" color="white" />
+                    <ui-badge size="sm" text="Yellow" color="yellow" />
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <ui-heading size="lg">Badges as Links</ui-heading>
+                <div class="mb-4 flex flex-wrap gap-2 sm:gap-3 items-end">
+                    <ui-badge size="lg" text="Green Link" color="green" href="#" />
+                    <ui-badge size="lg" text="Red Link" color="red" href="#" />
+                    <ui-badge size="lg" text="Black Link" color="black" href="#" />
+                    <ui-badge text="Blue Link" color="blue" href="#" />
+                    <ui-badge text="Amber Link" color="amber" href="#" />
+                    <ui-badge text="Pink Link" color="pink" href="#" />
+                    <ui-badge size="sm" text="Cyan Link" color="cyan" href="#" />
+                    <ui-badge size="sm" text="Purple Link" color="purple" href="#" />
+                    <ui-badge size="sm" text="Gray Link" color="gray" href="#" />
+                    <ui-badge size="sm" text="Default Link" href="#" />
+                    <ui-badge size="sm" text="Rose Link" color="rose" href="#" />
+                    <ui-badge size="sm" text="Emerald Link" color="emerald" href="#" />
+                    <ui-badge size="sm" text="Fuchsia Link" color="fuchsia" href="#" />
+                    <ui-badge size="sm" text="Indigo Link" color="indigo" href="#" />
+                    <ui-badge size="sm" text="Lime Link" color="lime" href="#" />
+                    <ui-badge size="sm" text="Orange Link" color="orange" href="#" />
+                    <ui-badge size="sm" text="Sky Link" color="sky" href="#" />
+                    <ui-badge size="sm" text="Teal Link" color="teal" href="#" />
+                    <ui-badge size="sm" text="Violet Link" color="violet" href="#" />
+                    <ui-badge size="sm" text="White Link" color="white" href="#" />
+                    <ui-badge size="sm" text="Yellow Link" color="yellow" href="#" />
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <ui-heading size="lg">Badges as Buttons</ui-heading>
+                <div class="mb-4 flex flex-wrap gap-2 sm:gap-3 items-end">
+                    <ui-badge size="lg" text="Green Button" color="green" as="button" />
+                    <ui-badge size="lg" text="Red Button" color="red" as="button" />
+                    <ui-badge size="lg" text="Black Button" color="black" as="button" />
+                    <ui-badge text="Blue Button" color="blue" as="button" />
+                    <ui-badge text="Amber Button" color="amber" as="button" />
+                    <ui-badge text="Pink Button" color="pink" as="button" />
+                    <ui-badge size="sm" text="Cyan Button" color="cyan" as="button" />
+                    <ui-badge size="sm" text="Purple Button" color="purple" as="button" />
+                    <ui-badge size="sm" text="Gray Button" color="gray" as="button" />
+                    <ui-badge size="sm" text="Default Button" as="button" />
+                    <ui-badge size="sm" text="Rose Button" color="rose" as="button" />
+                    <ui-badge size="sm" text="Emerald Button" color="emerald" as="button" />
+                    <ui-badge size="sm" text="Fuchsia Button" color="fuchsia" as="button" />
+                    <ui-badge size="sm" text="Indigo Button" color="indigo" as="button" />
+                    <ui-badge size="sm" text="Lime Button" color="lime" as="button" />
+                    <ui-badge size="sm" text="Orange Button" color="orange" as="button" />
+                    <ui-badge size="sm" text="Sky Button" color="sky" as="button" />
+                    <ui-badge size="sm" text="Teal Button" color="teal" as="button" />
+                    <ui-badge size="sm" text="Violet Button" color="violet" as="button" />
+                    <ui-badge size="sm" text="White Button" color="white" as="button" />
+                    <ui-badge size="sm" text="Yellow Button" color="yellow" as="button" />
                 </div>
             </section>
 
             <section class="space-y-4">
                 <ui-heading size="lg">Buttons</ui-heading>
-                <div class="mb-4 flex gap-2 sm:gap-3 items-end">
+                <div class="mb-4 flex flex-wrap gap-2 sm:gap-3 items-end">
                     <ui-button text="Default" />
                     <ui-button text="Primary" variant="primary" />
                     <ui-button text="Filled" variant="filled" />
                     <ui-button text="Ghost" variant="ghost" />
                     <ui-button text="Subtle" variant="subtle" />
                 </div>
-                <div class="mb-4 flex gap-2 sm:gap-3 items-end">
+                <div class="mb-4 flex flex-wrap gap-2 sm:gap-3 items-end">
                     <ui-button icon="save" text="Default" />
                     <ui-button icon="save" text="Primary" variant="primary" />
                     <ui-button icon="save" text="Danger" variant="danger" />
                     <ui-button text="Danger Disabled" variant="danger" disabled />
+                    <ui-button text="Disabled" disabled />
                     <ui-button icon="save" text="Filled" variant="filled" />
                     <ui-button icon="save" text="Ghost" variant="ghost" />
                     <ui-button icon="save" text="Subtle" variant="subtle" />
                 </div>
-                <div class="mb-4 flex gap-2 sm:gap-3 items-end">
+                <div class="mb-4 flex flex-wrap gap-2 sm:gap-3 items-end">
                     <ui-button icon="save" />
                     <ui-button icon="save" variant="primary" />
                     <ui-button icon="save" variant="filled" />
                     <ui-button icon="save" variant="ghost" />
                     <ui-button icon="save" variant="subtle" />
                 </div>
-                <div class="mb-4 flex gap-2 sm:gap-3 items-end">
+                <div class="mb-4 flex flex-wrap gap-2 sm:gap-3 items-end">
                     <ui-button-group>
                         <ui-button variant="default">Oldest</ui-button>
                         <ui-button variant="default">Newest</ui-button>
@@ -231,9 +299,70 @@ defineProps(['icons']);
                 </div>
             </section>
 
+            <section class="mb-10 space-y-3">
+                <ui-heading size="lg">Alerts</ui-heading>
+
+                <Alert variant="default" text="This is a default alert message" />
+                <Alert variant="warning" text="This is a warning alert message" />
+                <Alert variant="error" text="This is an error alert message" />
+                <Alert variant="success" text="This is a success alert message" />
+                <Alert variant="warning" icon="git" text="This alert has a custom icon" />
+
+                <Alert variant="default" heading="Alert Heading" text="This is a default alert message" />
+                <Alert variant="warning" heading="Alert Heading" text="This is a warning alert message" />
+                <Alert variant="error" heading="Alert Heading" text="This is an error alert message" />
+                <Alert variant="success" heading="Alert Heading" text="This is a success alert message" />
+                <Alert variant="warning" heading="Alert Heading" icon="git" text="This alert has a custom icon" />
+
+                <Alert variant="success">
+                    <strong>Success!</strong> This alert uses a slot for custom content.
+                </Alert>
+                <Alert variant="warning">
+                    <h1>Please run your migrations</h1>
+                    <p>The importer uses Laravel's job batching feature to keep track of the import progress, however, it requires a <code>job_batches</code> table in your database. Before you can run the importer, you will need to run <code>php artisan migrate</code>. This alert uses a heading for the title and a paragraph for the message.</p>
+                </Alert>
+                <Alert variant="default">
+                    <h2>New Feature Available</h2>
+                    <p>We've added support for custom field types. You can now create your own field types by extending the <code>Fieldtype</code> class. Check out the documentation for more details.</p>
+                </Alert>
+                <Alert variant="success">
+                    <h3>Backup Completed Successfully</h3>
+                    <p>Your site backup has been created and saved to <code>/storage/backups/site-2032-01-15.tar.gz</code>. The backup includes all content, assets, and configuration files.</p>
+                </Alert>
+                <Alert variant="error">
+                    <h4>Failed to Connect to Database</h4>
+                    <p>Unable to establish a connection to the database server. Please check your database configuration in <code>.env</code> and ensure the database server is running.</p>
+                </Alert>
+                <hr class="my-10">
+                <Alert variant="default">
+                    <Heading>Using Heading Component</Heading>
+                    <Description>This alert uses the Heading and Description components instead of native HTML elements. The styles should match the variant colors.</Description>
+                </Alert>
+                <Alert variant="warning">
+                    <Heading size="lg">Warning: Action Required</Heading>
+                    <Description>This is a heading size <code>lg</code> example, a warning alert with a larger heading. The Heading component supports different sizes and should inherit the alert's color scheme.</Description>
+                </Alert>
+                <Alert variant="success">
+                    <Heading size="xl">Backup Completed Successfully</Heading>
+                    <Description>Your site backup has been created and saved to <a href="https://statamic.dev"><code>/storage/backups/site-2032-01-15.tar.gz</code></a>. The backup includes all content, assets, and configuration files.</Description>
+                </Alert>
+                <Alert variant="success">
+                    <Heading size="2xl">Backup Completed Very Successfully</Heading>
+                    <Description>Such a massive heading isn't recommended, but here it is for testing purposes. Your site backup has been created and saved to <a href="https://statamic.dev"><code>/storage/backups/site-2032-01-15.tar.gz</code></a>. The backup includes all content, assets, and configuration files.</Description>
+                </Alert>
+                <Alert variant="error">
+                    <Heading level="2">Database Connection Failed</Heading>
+                    <Description>This is a heading level <code>2</code> example, with no heading size difference. Unable to establish a connection to the database server. Please check your database configuration in <code>.env</code> and ensure the database server is running.</Description>
+                </Alert>
+                <Alert variant="warning">
+                    <Heading>Migration Required</Heading>
+                    <Description>The importer uses Laravel's job batching feature to keep track of the import progress, however, it requires a <code>job_batches</code> table in your database. Before you can run the importer, you will need to run <code>php artisan migrate</code>.</Description>
+                </Alert>
+            </section>
+
             <section class="space-y-4">
                 <ui-heading size="lg">Calendar</ui-heading>
-                <div class="flex gap-6">
+                <div class="flex flex-wrap gap-6">
                     <ui-card>
                         <ui-calendar />
                     </ui-card>

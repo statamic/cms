@@ -5,6 +5,7 @@ import { ConfigProvider } from 'reka-ui';
 import SessionExpiry from '@/components/SessionExpiry.vue';
 import LicensingAlert from '@/components/LicensingAlert.vue';
 import PortalTargets from '@/components/portals/PortalTargets.vue';
+import Tooltips from '@/components/Tooltips.vue';
 import { provide, watch, ref } from 'vue';
 import useBodyClasses from './body-classes.js';
 import useStatamicPageProps from '@/composables/page-props.js';
@@ -61,5 +62,6 @@ provide('layout', {
         </confirmation-modal>
 
         <PortalTargets />
+        <Tooltips />
     </ConfigProvider>
 </template>

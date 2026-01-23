@@ -44,7 +44,7 @@ class WebAuthn
 
         $options = $this->getRequestOptions(session()->pull('webauthn.challenge'));
 
-        $publicKeyCredentialSource = $this->assertionResponseValidator->check(
+        $credentialRecord = $this->assertionResponseValidator->check(
             $passkey->credential(),
             $publicKeyCredential->response,
             $options,
@@ -53,7 +53,7 @@ class WebAuthn
         );
 
         $passkey
-            ->setCredential($publicKeyCredentialSource)
+            ->setCredential($credentialRecord)
             ->setLastLogin(now())
             ->save();
 
@@ -94,7 +94,7 @@ class WebAuthn
 
         $options = $this->getCreationOptions($user, session()->pull('webauthn.challenge'));
 
-        $publicKeyCredentialSource = $this->attestationResponseValidator->check(
+        $credentialRecord = $this->attestationResponseValidator->check(
             $publicKeyCredential->response,
             $options,
             request()->getHost()
@@ -103,7 +103,7 @@ class WebAuthn
         $passkey = app(Passkey::class)
             ->setUser($user)
             ->setName($name)
-            ->setCredential($publicKeyCredentialSource);
+            ->setCredential($credentialRecord);
 
         $passkey->save();
 

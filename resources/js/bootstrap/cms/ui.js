@@ -1,4 +1,5 @@
 export {
+    Alert,
     AuthCard,
     Avatar,
     Badge,

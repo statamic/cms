@@ -17,10 +17,15 @@
             >
                 <div
                     v-if="showConnector"
-                    class="absolute group-hover:opacity-0 group-focus-within:opacity-0 transition-opacity group-focus-within:transition-none delay-10 duration-250 inset-y-0 left-3.5 border-l-1 border-gray-400 dark:border-gray-600 border-dashed z-0 dark:bg-gray-850"
-                    :class="isFirst ? 'h-[65%] top-[30%] opacity-60' : 'h-full opacity-100'"
+                    class="absolute group-focus-within:opacity-0 transition-opacity group-focus-within:transition-none delay-10 duration-250 inset-y-0 left-3.5 border-l-1 border-gray-400 dark:border-gray-600 border-dashed z-0 dark:bg-gray-850"
+                    :class="{
+						'group-hover:opacity-0': enabled,
+						'h-[65%] top-[30%] opacity-60': isFirst,
+						'h-full opacity-100': !isFirst,
+                    }"
                 />
                 <button
+	                v-if="enabled"
                     class="absolute inset-0 h-full w-full opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity group-focus-within:transition-none delay-10 duration-250 cursor-pointer"
                     tabindex="-1"
                 >
