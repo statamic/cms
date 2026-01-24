@@ -495,7 +495,10 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
      */
     public function accessible()
     {
-        return Arr::get($this->disk()->filesystem()->getConfig(), 'url') !== null;
+        $config = $this->disk()->filesystem()->getConfig();
+
+        return Arr::get($config, 'url') !== null
+            && Arr::get($config, 'visibility', 'public') === 'public';
     }
 
     /**

@@ -15,7 +15,7 @@ const url = computed(() => props.url.startsWith('http') ? props.url : `https://s
 
 <template>
 
-    <div v-if="linkToDocs" class="mt-12 mb-2 flex justify-center text-center starting-style-transition">
+    <div v-if="linkToDocs" class="mt-12 mb-10 flex justify-center text-center starting-style-transition">
         <CommandPaletteItem
             :text="[__('Statamic Documentation'), topic]"
             icon="book-next-page"

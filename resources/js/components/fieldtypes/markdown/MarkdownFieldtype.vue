@@ -73,7 +73,7 @@
                                 @drop="draggingFile = false"
                                 @keydown="shortcut"
                             >
-                                <div class="editor relative top-[0.5px] z-(--z-index-above) st-text-legibility focus-within:focus-outline" ref="codemirror">
+                                <div class="editor relative top-[0.5px] z-(--z-index-above) st-text-legibility" ref="codemirror" :class="{ 'focus-within:focus-outline': !fullScreenMode }">
                                     <div
                                         v-if="showFloatingToolbar && toolbarIsFloating && !isReadOnly"
                                         class="markdown-floating-toolbar absolute z-50 flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-2 py-1 shadow-lg dark:border-white/10 dark:bg-gray-900"
@@ -132,7 +132,7 @@
                     </div>
                 </uploader>
 
-                <ui-stack v-if="showAssetSelector && !isReadOnly" name="markdown-asset-selector" @closed="closeAssetSelector">
+                <Stack v-if="!isReadOnly" :open="showAssetSelector" inset :show-close-button="false">
                     <asset-selector
                         :container="container"
                         :folder="folder"
@@ -142,22 +142,14 @@
                         @selected="assetsSelected"
                         @closed="closeAssetSelector"
                     />
-                </ui-stack>
+                </Stack>
 
-                <ui-stack narrow name="markdownCheatSheet" v-if="showCheatsheet" @closed="showCheatsheet = false">
-                    <div class="relative h-full overflow-auto bg-white p-6 dark:bg-gray-800 rounded-l-2xl">
-                        <Button
-                            icon="x"
-                            variant="ghost"
-                            class="sticky top-0 left-[100%] translate-x-[15%] translate-y-[-20%] bg-white dark:bg-gray-800"
-                            @click="showCheatsheet = false"
-                        />
-                        <div class="prose prose-zinc prose-headings:font-medium prose-pre:prose-code:!text-white mx-auto max-w-3xl">
-                            <h2 v-text="__('Markdown Cheatsheet')"></h2>
-                            <div v-html="__('markdown.cheatsheet')"></div>
-                        </div>
-                    </div>
-                </ui-stack>
+                <Stack size="narrow" v-model:open="showCheatsheet" :title="__('Markdown Cheatsheet')">
+                    <div
+                        class="prose prose-zinc prose-headings:font-medium prose-pre:prose-code:!text-white mx-auto max-w-3xl [&>*:first-child]:![margin-block-start:0]"
+                        v-html="__('markdown.cheatsheet')"
+                    />
+                </Stack>
             </div>
         </div>
     </portal>
@@ -169,7 +161,7 @@ import { marked } from 'marked';
 import { markRaw } from 'vue';
 import { TextRenderer as PlainTextRenderer } from '@davidenke/marked-text-renderer';
 import throttle from '@/util/throttle.js';
-import { Button } from '@/components/ui';
+import { Button, Stack } from '@/components/ui';
 
 import CodeMirror from 'codemirror/lib/codemirror';
 import 'codemirror/addon/edit/closebrackets';
@@ -244,6 +236,7 @@ export default {
         Uploader,
         Uploads,
         MarkdownToolbar,
+	    Stack,
     },
 
     data() {
@@ -325,6 +318,12 @@ export default {
             this.fullScreenMode = true;
             this.escBinding = this.$keys.bindGlobal('esc', this.closeFullScreen);
             this.trackHeightUpdates();
+            // Focus the CodeMirror editor when entering fullscreen mode
+            this.$nextTick(() => {
+                if (this.codemirror) {
+                    this.codemirror.focus();
+                }
+            });
         },
 
         toggleFullscreen() {
@@ -534,6 +533,13 @@ export default {
          * Execute a keyboard shortcut, when applicable
          */
         shortcut(e) {
+	        // Handle ESC to blur/unfocus the editor
+	        if (e.keyCode === 27) {
+		        e.preventDefault();
+		        this.codemirror.getInputField().blur();
+		        return;
+	        }
+
             const mod = e.metaKey || e.ctrlKey;
             if (!mod) return;
 

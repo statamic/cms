@@ -4,6 +4,7 @@ import useBodyClasses from './body-classes.js';
 import useStatamicPageProps from '@/composables/page-props.js';
 import { onMounted } from 'vue';
 import { colorMode } from '@api';
+import PortalTargets from "@/components/portals/PortalTargets.vue";
 
 useBodyClasses('bg-gray-50 dark:bg-gray-900 font-sans leading-normal scheme-light p-2');
 const { logos, cmsName } = useStatamicPageProps();
@@ -42,5 +43,6 @@ onMounted(() => {
             </div>
         </div>
         <slot />
+	    <PortalTargets />
     </div>
 </template>

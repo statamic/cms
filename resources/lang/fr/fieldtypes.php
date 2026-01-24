@@ -68,6 +68,7 @@ return [
     'color.config.default' => 'Choisissez une couleur par défaut.',
     'color.config.swatches' => 'Prédéfinissez les couleurs qui pourront être sélectionnées dans une liste.',
     'color.title' => 'Color',
+    'date.config.default' => 'Vous pouvez préciser une date en utilisant le format `AAAA-MM-JJ`, ou `now`.',
     'date.config.earliest_date' => 'Définissez la première date sélectionnable.',
     'date.config.format' => 'Comment la date doit être stockée, en utilisant le [format de date PHP](https://www.php.net/manual/en/datetime.format.php).',
     'date.config.full_width' => 'Étirez le calendrier pour utiliser toute la largeur.',

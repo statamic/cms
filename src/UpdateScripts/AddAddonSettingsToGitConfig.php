@@ -9,7 +9,7 @@ class AddAddonSettingsToGitConfig extends UpdateScript
 {
     public function shouldUpdate($newVersion, $oldVersion)
     {
-        return $this->isUpdatingTo('6.0.0');
+        return $this->isUpdatingTo('6.0.0-beta.4');
     }
 
     public function update()

@@ -108,16 +108,40 @@
     @apply relative grid gap-5 md:gap-6 xl:gap-10;
 }
 
+.data-table,
+.folder-grid-listing {
+    [data-placeholder-shown]:has(+ .st-has-error) {
+        @apply text-red-600 dark:text-red-500;
+    }
+}
+
 .folder-grid-listing {
     @apply relative grid gap-5 md:gap-7;
     grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+
+    [data-placeholder-shown] {
+        @apply overflow-hidden mt-2 text-center font-mono text-xs text-ellipsis whitespace-nowrap lowercase;
+        &:has(+ .st-has-error) {
+            @apply text-red-600 dark:text-red-500;
+        }
+    }
 }
 
 /* Asset Tile
    ========================================================================== */
 
 .asset-tile {
-    @apply relative flex min-w-0 cursor-pointer flex-col items-center justify-between rounded-lg outline outline-gray-300 dark:outline-gray-700 overflow-hidden;
+    @apply relative flex min-w-0 cursor-pointer flex-col items-center justify-between rounded-lg outline outline-gray-300 dark:outline-gray-700;
+
+    > button {
+        /* Shift the focus outline offset slightly to account for the grey border. Target direct descendents so we don't target inner buttons like the three-dot menu. */
+        --focus-outline-offset: 1px;
+        .selected & {
+            /* Shift the focous outline even more to account for the "selected" border */
+            --focus-outline-offset: 1px;
+            --focus-outline-width: 3px;
+        }
+    }
 
     .selected & {
         @apply outline-3 outline-blue-500;

@@ -3,7 +3,7 @@
 namespace Statamic\Contracts\Auth;
 
 use Carbon\Carbon;
-use Webauthn\PublicKeyCredentialSource;
+use Webauthn\CredentialRecord;
 
 interface Passkey
 {
@@ -17,9 +17,9 @@ interface Passkey
 
     public function setUser(string|User $user): self;
 
-    public function credential(): PublicKeyCredentialSource;
+    public function credential(): CredentialRecord;
 
-    public function setCredential(array|PublicKeyCredentialSource $credential): self;
+    public function setCredential(array|CredentialRecord $credential): self;
 
     public function lastLogin(): ?Carbon;
 
