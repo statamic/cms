@@ -363,24 +363,14 @@
 /* UTILITIES / ANIMATIONS
 =================================================== */
 @keyframes pulse-on-appearance {
-    0% {
-        transform: scale(1);
-        opacity: 1;
-    }
-    40% {
+    50% {
         transform: scale(1.1);
-        opacity: 0.9;
-    }
-    60% {
-        transform: scale(1.08);
-        opacity: 0.95;
     }
     100% {
         transform: scale(1);
-        opacity: 1;
     }
 }
 
 @utility animate-pulse-on-appearance {
-    animation: pulse-on-appearance 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: pulse-on-appearance 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
