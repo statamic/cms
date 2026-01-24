@@ -364,6 +364,7 @@
 =================================================== */
 @keyframes pulse-on-appearance {
     50% {
+        opacity: 0.85;
         transform: scale(1.1);
     }
     100% {
@@ -372,5 +373,5 @@
 }
 
 @utility animate-pulse-on-appearance {
-    animation: pulse-on-appearance 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: pulse-on-appearance 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
