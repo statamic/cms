@@ -1,5 +1,22 @@
 # Release Notes
 
+## 6.0.0-beta.5 (2026-01-23)
+
+### What's fixed
+- Hide actions in entry fieldtype tree view [#13649](https://github.com/statamic/cms/issues/13649) by @duncanmcclean
+- Command Palette: Display site in search result badge [#13650](https://github.com/statamic/cms/issues/13650) by @duncanmcclean
+- Fix Bard Link Toolbar [#13306](https://github.com/statamic/cms/issues/13306) by @duncanmcclean
+- French translations [#13653](https://github.com/statamic/cms/issues/13653) by @ebeauchamps
+- Kill sibling transitions [#13658](https://github.com/statamic/cms/issues/13658) by @JayGeorge
+- Restoring a revision should force a hard-reload of the page [#13656](https://github.com/statamic/cms/issues/13656) by @duncanmcclean
+- Ensure replicator lines show after reaching `max_sets` limit [#13657](https://github.com/statamic/cms/issues/13657) by @
+- Improve Bard/Replicator performance during page load [#13427](https://github.com/statamic/cms/issues/13427) by @duncanmcclean
+- Bard image button defaults [#13661](https://github.com/statamic/cms/issues/13661) by @jasonvarga
+- Improve Combobox performance [#13625](https://github.com/statamic/cms/issues/13625) by @duncanmcclean
+- Wrap `STATAMIC_REVISIONS_PATH` env value in `base_path()` [#13629](https://github.com/statamic/cms/issues/13629) by @duncanmcclean
+
+
+
 ## 6.0.0-beta.4 (2026-01-22)
 
 ### What's new
