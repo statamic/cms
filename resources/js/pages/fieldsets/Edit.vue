@@ -1,5 +1,5 @@
 <template>
-    <div class="max-w-6xl mx-auto" data-max-width-wrapper>
+    <div class="max-w-5xl 3xl:max-w-6xl mx-auto" data-max-width-wrapper>
         <Head :title="__('Edit Fieldset')" />
 
         <Header :title="__('Edit Fieldset')" icon="fieldsets">

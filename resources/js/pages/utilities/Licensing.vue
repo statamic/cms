@@ -16,7 +16,7 @@ const props = defineProps([
 </script>
 
 <template>
-    <div class="max-w-6xl mx-auto" data-max-width-wrapper>
+    <div class="max-w-5xl 3xl:max-w-6xl mx-auto" data-max-width-wrapper>
         <Head :title="[__('Licensing'), __('Utilities')]" />
 
         <Header :title="__('Licensing')" icon="license">
