@@ -16,7 +16,7 @@ const emit = defineEmits(['started', 'completed']);
 const { prepareActions, runServerAction } = useActions();
 
 let actions = ref([]);
-let actionsReady = ref(false);
+let loading = ref(false);
 
 const confirmableActions = useTemplateRef('confirmableActions');
 
@@ -47,11 +47,10 @@ watch(props.selections, getActions, { deep: true });
 function getActions() {
     if (!hasSelections.value) {
         actions.value = [];
-        actionsReady.value = false;
         return;
     }
 
-    actionsReady.value = false;
+    loading.value = true;
 
     let params = {
         selections: toRaw(props.selections),
@@ -65,7 +64,7 @@ function getActions() {
         .post(props.url + '/list', params)
         .then(response => {
             actions.value = response.data;
-            actionsReady.value = true;
+            loading.value = false;
         });
 }
 
@@ -98,6 +97,6 @@ function runAction(action, values, onSuccess, onError) {
     <slot
         v-if="showAlways || hasSelections"
         :actions="preparedActions"
-        :actionsReady="actionsReady"
+        :loading="loading"
     />
 </template>

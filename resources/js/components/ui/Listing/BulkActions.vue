@@ -2,7 +2,7 @@
 import { Motion } from 'motion-v';
 import { injectListingContext } from '../Listing/Listing.vue';
 import { computed, ref, watch } from 'vue';
-import { Button, ButtonGroup } from '@ui';
+import { Button, ButtonGroup, Icon } from '@ui';
 import BulkActions from '@/components/actions/BulkActions.vue';
 
 const { actionUrl, actionContext, selections, refresh, clearSelections } = injectListingContext();
@@ -40,10 +40,10 @@ function actionFailed(response) {
         :context="actionContext"
         @started="actionStarted"
         @completed="actionCompleted"
-        v-slot="{ actions, actionsReady }"
+        v-slot="{ actions, loading }"
     >
         <Motion
-            v-if="hasSelections && actionsReady"
+            v-if="hasSelections"
             layout
             data-floating-toolbar
             class="sticky inset-x-0 bottom-1 sm:bottom-6 z-100 flex w-full max-w-[95vw] mx-auto justify-center "
@@ -55,6 +55,7 @@ function actionFailed(response) {
             <ButtonGroup>
                 <Button
                     class="text-blue-500!"
+                    :icon-append="loading ? 'loading' : null"
                     :text="__n(`Deselect :count item|Deselect all :count items`, selections.length)"
                     @click="clearSelections"
                 />
