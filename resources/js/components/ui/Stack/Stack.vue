@@ -209,7 +209,7 @@ provide('closeStack', close);
                 <transition name="stack-overlay-fade">
                     <div
                         v-if="visible"
-                        class="stack-overlay fixed inset-0 bg-gray-800/20 dark:bg-gray-800/50 backdrop-blur-[2px]"
+                        class="stack-overlay fixed inset-0 bg-gray-800/20 dark:bg-gray-800/50"
                         :style="direction === 'ltr' ? { left: `-${leftOffset}px` } : { right: `-${leftOffset}px` }"
                     />
                 </transition>
