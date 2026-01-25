@@ -8,6 +8,17 @@ import BulkActions from '@/components/actions/BulkActions.vue';
 const { actionUrl, actionContext, selections, refresh, clearSelections } = injectListingContext();
 const busy = ref(false);
 const hasSelections = computed(() => selections.value.length > 0);
+const visible = ref(false);
+let visibleTimeout = null;
+
+watch(hasSelections, (value) => {
+    clearTimeout(visibleTimeout);
+    if (value) {
+        visibleTimeout = setTimeout(() => visible.value = true, 300);
+    } else {
+        visible.value = false;
+    }
+});
 
 watch(busy, (busy) => Statamic.$progress.loading('action', busy));
 
@@ -43,7 +54,7 @@ function actionFailed(response) {
         v-slot="{ actions, loading }"
     >
         <Motion
-            v-if="hasSelections"
+            v-if="visible"
             layout
             data-floating-toolbar
             class="sticky inset-x-0 bottom-1 sm:bottom-6 z-100 flex w-full max-w-[95vw] mx-auto justify-center "
