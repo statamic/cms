@@ -13,7 +13,7 @@ use Statamic\Auth\Eloquent\WebAuthnModel;
 use Statamic\Facades\User;
 use Symfony\Component\Uid\Uuid;
 use Tests\TestCase;
-use Webauthn\CredentialRecord;
+use Webauthn\PublicKeyCredentialSource;
 use Webauthn\TrustPath\EmptyTrustPath;
 
 #[Group('passkeys')]
@@ -66,9 +66,9 @@ class EloquentPasskeyTest extends TestCase
         parent::tearDownAfterClass();
     }
 
-    private function createTestCredential(string $id = 'test-credential-id-123'): CredentialRecord
+    private function createTestCredential(string $id = 'test-credential-id-123'): PublicKeyCredentialSource
     {
-        return CredentialRecord::create(
+        return PublicKeyCredentialSource::create(
             publicKeyCredentialId: $id,
             type: 'public-key',
             transports: ['usb', 'nfc'],
