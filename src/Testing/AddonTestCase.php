@@ -31,12 +31,10 @@ abstract class AddonTestCase extends OrchestraTestCase
             $this->preventSavingStacheItemsToDisk();
         }
 
-        Version::shouldReceive('get')->zeroOrMoreTimes()->andReturn(Composer::create(__DIR__.'/../')->installedVersion(Statamic::PACKAGE));
-        $this->addToAssertionCount(-1);
+        Version::shouldReceive('get')->andReturn(Composer::create(__DIR__.'/../')->installedVersion(Statamic::PACKAGE));
 
-        \Statamic\Facades\CP\Nav::shouldReceive('build')->zeroOrMoreTimes()->andReturn(collect());
-        \Statamic\Facades\CP\Nav::shouldReceive('clearCachedUrls')->zeroOrMoreTimes();
-        $this->addToAssertionCount(-2); // Dont want to assert this
+        \Statamic\Facades\CP\Nav::shouldReceive('build')->andReturn(collect());
+        \Statamic\Facades\CP\Nav::shouldReceive('clearCachedUrls');
     }
 
     protected function tearDown(): void
