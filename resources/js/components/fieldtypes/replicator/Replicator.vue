@@ -266,7 +266,9 @@ export default {
             return this.fieldPathKeys
                 .map((key, index) => {
                     if (Number.isInteger(parseInt(key))) {
-                        return data_get(this.publishContainer.values, this.fieldPathKeys.slice(0, index + 1).join('.'))?.type;
+	                    let setValues =  data_get(this.publishContainer.values, this.fieldPathKeys.slice(0, index + 1).join('.'));
+
+	                    return setValues.attrs?.values.type || setValues.type;
                     }
 
                     return key;

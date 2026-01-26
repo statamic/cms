@@ -492,12 +492,12 @@ export default {
             this.loadingSet = handle;
 
             this.fetchSet(handle)
-                .then(data => this._addSet(handle, index, data))
+                .then(data => this._addSet(handle, data))
                 .catch(() => this.$toast.error(__('Something went wrong')))
                 .finally(() => this.loadingSet = null);
         },
 
-        _addSet(handle, index, data) {
+        _addSet(handle, data) {
             const id = uniqid();
             const deepCopy = JSON.parse(JSON.stringify(data.defaults));
             const values = Object.assign({}, { type: handle }, deepCopy);
@@ -551,7 +551,9 @@ export default {
             return this.fieldPathKeys
                 .map((key, index) => {
                     if (Number.isInteger(parseInt(key))) {
-                        return data_get(this.publishContainer.values, this.fieldPathKeys.slice(0, index + 1).join('.'))?.attrs?.values.type;
+	                    let setValues =  data_get(this.publishContainer.values, this.fieldPathKeys.slice(0, index + 1).join('.'));
+
+						return setValues.attrs?.values.type || setValues.type;
                     }
 
                     return key;
@@ -580,13 +582,18 @@ export default {
             });
         },
 
-        pasteSet(attrs) {
+        async pasteSet(attrs) {
             const old_id = attrs.id;
             const id = uniqid();
             const enabled = attrs.enabled;
             const values = Object.assign({}, attrs.values);
 
-            this.updateSetMeta(id, this.meta.existing[old_id] || this.meta.defaults[values.type] || {});
+            if (this.meta.existing[old_id]) {
+                this.updateSetMeta(id, this.meta.existing[old_id]);
+            } else {
+                const data = await this.fetchSet(values.type);
+                this.updateSetMeta(id, data.new);
+            }
 
             return { id, enabled, values };
         },
