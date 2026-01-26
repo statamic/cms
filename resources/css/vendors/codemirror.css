@@ -31,6 +31,7 @@
 .CodeMirror-linenumber {
     padding: 0 3px 0 5px;
     min-width: 20px;
+    margin-inline-start: -3px;
     @apply text-right;
     color: var(--color-gray-500);
     white-space: nowrap;
