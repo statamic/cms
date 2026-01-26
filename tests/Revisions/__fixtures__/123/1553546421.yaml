@@ -1,2 +1,8 @@
 date: 1553546421
-attributes: {}
+attributes:
+  id: 123
+  slug: the-slug
+  published: true
+  date: 1633590000
+  data:
+    revisable: 'overridden'

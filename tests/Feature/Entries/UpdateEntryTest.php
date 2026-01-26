@@ -11,6 +11,7 @@ use Statamic\Events\EntrySaving;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Facades\Folder;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
 use Statamic\Structures\CollectionStructure;
@@ -22,6 +23,25 @@ class UpdateEntryTest extends TestCase
 {
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->dir = __DIR__.'/tmp';
+
+        config([
+            'statamic.editions.pro' => true,
+            'statamic.revisions.path' => $this->dir,
+            'statamic.revisions.enabled' => true,
+        ]);
+    }
+
+    public function tearDown(): void
+    {
+        Folder::delete($this->dir);
+        parent::tearDown();
+    }
 
     #[Test]
     public function it_denies_access_if_you_dont_have_edit_permission()
@@ -416,7 +436,41 @@ class UpdateEntryTest extends TestCase
     #[Test]
     public function published_entry_gets_saved_to_working_copy()
     {
-        $this->markTestIncomplete();
+        [$user, $collection] = $this->seedUserAndCollection(true);
+
+        $this->seedBlueprintFields($collection, [
+            'revisable' => ['type' => 'text'],
+            'non_revisable' => ['type' => 'text', 'revisable' => false],
+        ]);
+
+        $entry = EntryFactory::id('1')
+            ->slug('test')
+            ->collection('test')
+            ->data(['title' => 'Revisable Test', 'published' => true])
+            ->create();
+
+        $this
+            ->actingAs($user)
+            ->update($entry, [
+                'revisable' => 'revise me',
+                'non_revisable' => 'no revisions for you',
+            ])
+            ->assertOk();
+
+        $entry = Entry::find($entry->id());
+        $this->assertEquals('no revisions for you', $entry->non_revisable);
+        $this->assertEquals('Revisable Test', $entry->title);
+        $this->assertEquals('test', $entry->slug());
+        $this->assertNull($entry->revisable);
+
+        $workingCopy = $entry->fromWorkingCopy();
+        $this->assertEquals('updated-entry', $workingCopy->slug());
+        $this->assertEquals([
+            'title' => 'Updated entry',
+            'revisable' => 'revise me',
+            'non_revisable' => 'no revisions for you',
+            'published' => true,
+        ], $workingCopy->data()->all());
     }
 
     #[Test]
@@ -501,7 +555,7 @@ class UpdateEntryTest extends TestCase
             ->assertOk();
     }
 
-    private function seedUserAndCollection()
+    private function seedUserAndCollection(bool $enableRevisions = false)
     {
         $this->setTestRoles(['test' => [
             'access cp',
@@ -510,7 +564,7 @@ class UpdateEntryTest extends TestCase
             'access fr site',
         ]]);
         $user = tap(User::make()->assignRole('test'))->save();
-        $collection = tap(Collection::make('test'))->save();
+        $collection = tap(Collection::make('test')->revisionsEnabled($enableRevisions))->save();
 
         return [$user, $collection];
     }
