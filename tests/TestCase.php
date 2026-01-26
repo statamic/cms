@@ -37,12 +37,12 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         }
 
         if ($this->shouldFakeVersion) {
-            \Facades\Statamic\Version::shouldReceive('get')->zeroOrMoreTimes()->andReturn('3.0.0-testing');
+            \Facades\Statamic\Version::shouldReceive('get')->andReturn('3.0.0-testing');
         }
 
         if ($this->shouldPreventNavBeingBuilt) {
-            \Statamic\Facades\CP\Nav::shouldReceive('build')->zeroOrMoreTimes()->andReturn(collect());
-            \Statamic\Facades\CP\Nav::shouldReceive('clearCachedUrls')->zeroOrMoreTimes();
+            \Statamic\Facades\CP\Nav::shouldReceive('build')->andReturn(collect());
+            \Statamic\Facades\CP\Nav::shouldReceive('clearCachedUrls');
         }
 
         $this->addGqlMacros();
