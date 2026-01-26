@@ -582,13 +582,18 @@ export default {
             });
         },
 
-        pasteSet(attrs) {
+        async pasteSet(attrs) {
             const old_id = attrs.id;
             const id = uniqid();
             const enabled = attrs.enabled;
             const values = Object.assign({}, attrs.values);
 
-            this.updateSetMeta(id, this.meta.existing[old_id] || this.meta.defaults[values.type] || {});
+            if (this.meta.existing[old_id]) {
+                this.updateSetMeta(id, this.meta.existing[old_id]);
+            } else {
+                const data = await this.fetchSet(values.type);
+                this.updateSetMeta(id, data.new);
+            }
 
             return { id, enabled, values };
         },
