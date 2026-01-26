@@ -31,7 +31,13 @@ function runAction(action, values, onSuccess, onError) {
     emit('started');
 
     runServerAction({ action, values, onSuccess, onError, url: props.url, selections: [props.item] })
-        .then((data) => emit('completed', true, data))
+        .then((data) => {
+            if (props.actions === undefined) {
+                actionsLoaded.value = false;
+            }
+
+            emit('completed', true, data);
+        })
         .catch((data) => {
             errors.value = data.errors;
             emit('completed', false, data);
