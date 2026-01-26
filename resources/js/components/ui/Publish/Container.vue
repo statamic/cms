@@ -6,7 +6,7 @@ export const [injectContainerContext, provideContainerContext, containerContextK
 
 <script setup>
 import uniqid from 'uniqid';
-import { watch, ref, computed, toRef } from 'vue';
+import { watch, ref, computed, toRef, nextTick } from 'vue';
 import Component from '@/components/Component.js';
 import Tabs from './Tabs.vue';
 import Values from '@/components/publish/Values.js';
@@ -174,12 +174,23 @@ watch(
     { deep: true },
 );
 
+const avoidTrackingDirtyState = ref(false);
+const trackingDirtyState = computed(() => props.trackDirtyState && !avoidTrackingDirtyState.value)
+
 function dirty() {
-    if (props.trackDirtyState) Statamic.$dirty.add(props.name);
+    if (trackingDirtyState.value) Statamic.$dirty.add(props.name);
 }
 
 function clearDirtyState() {
     if (props.trackDirtyState) Statamic.$dirty.remove(props.name);
+}
+
+async function withoutDirtying(callback) {
+    const previous = avoidTrackingDirtyState.value;
+    avoidTrackingDirtyState.value = true;
+    callback();
+    await nextTick();
+    avoidTrackingDirtyState.value = previous;
 }
 
 function setValues(newValues) {
@@ -258,7 +269,7 @@ const provided = {
     setRevealerField,
     unsetRevealerField,
     setHiddenField,
-    clearDirtyState,
+    withoutDirtying,
 };
 
 provideContainerContext({ ...provided, container: provided });

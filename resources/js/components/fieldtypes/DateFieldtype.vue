@@ -106,8 +106,7 @@ export default {
 
     mounted() {
         if (this.value === 'now') {
-            this.addDate();
-            this.$nextTick(() => this.injectedPublishContainer.clearDirtyState());
+            this.injectedPublishContainer.withoutDirtying(() => this.addDate());
         }
 
         this.mounted = true;
