@@ -23,7 +23,7 @@
 /* CODEMIRROR / GUTTERS
 =================================================== */
 .CodeMirror-gutters {
-    @apply border-r bg-gray-200;
+    @apply border-r bg-gray-50;
     height: 100% !important;
     white-space: nowrap;
 }
@@ -32,7 +32,7 @@
     padding: 0 3px 0 5px;
     min-width: 20px;
     @apply text-right;
-    color: #999;
+    color: var(--color-gray-500);
     white-space: nowrap;
 }
 
@@ -515,14 +515,14 @@ span.CodeMirror-selectedtext {
     .CodeMirror-gutters {
         background: #263238;
         @apply dark:bg-gray-900;
-        color: #546e7a;
+        color: #678695;
         border: none;
     }
 
     .CodeMirror-guttermarker,
     .CodeMirror-guttermarker-subtle,
     .CodeMirror-linenumber {
-        color: #546e7a;
+        color: #678695;
     }
 
     .CodeMirror-cursor {
