@@ -150,7 +150,7 @@
                                     </Subheading>
                                     <Subheading v-if="isWorkingCopy" class="flex items-center gap-2 text-yellow-700 dark:text-yellow-500">
                                         <Icon name="warning-diamond" />
-                                        {{ __('messages.publish_actions_working_copy_warning') }}
+                                        {{ __('This is the working copy') }}
                                     </Subheading>
                                     <Subheading v-if="!isWorkingCopy && published" class="flex items-center gap-2">
                                         <Icon name="checkmark" class="text-green-600" />
