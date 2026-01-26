@@ -20,6 +20,7 @@ use Statamic\StaticCaching\NoCache\RegionNotFound;
 use Statamic\StaticCaching\NoCache\Session;
 use Statamic\StaticCaching\Replacer;
 use Statamic\StaticCaching\ResponseStatus;
+use Statamic\StaticCaching\UrlExcluder;
 
 class Cache
 {
@@ -74,6 +75,8 @@ class Cache
         }
 
         if ($response = $this->attemptToServeCachedResponse($request)) {
+            $response->isNotModified($request);
+
             return $response;
         }
 
@@ -85,6 +88,11 @@ class Cache
             $this->makeReplacementsAndCacheResponse($request, $response);
 
             $this->nocache->write();
+
+            if ($response instanceof Request && ! app(UrlExcluder::class)->isExcluded($request->normalizedFullUrl())) {
+                $response->makeCacheControlCacheable();
+                $response->isNotModified($request);
+            }
         } elseif (! $response->isRedirect()) {
             $this->makeReplacements($response);
         }
@@ -127,6 +135,7 @@ class Cache
             $this->makeReplacements($response);
 
             $response->setStaticCacheResponseStatus(ResponseStatus::HIT);
+            $response->makeCacheControlCacheable();
 
             return $response;
         }
