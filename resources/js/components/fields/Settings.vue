@@ -82,7 +82,7 @@ export default {
     },
 
     props: {
-        id: String,
+        id: [String, Number],
         config: Object,
         overrides: { type: Array, default: () => [] },
         type: String,
