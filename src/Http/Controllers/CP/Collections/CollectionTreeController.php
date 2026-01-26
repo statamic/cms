@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Collections;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Entries\Collection;
+use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -23,6 +24,18 @@ class CollectionTreeController extends CpController
             'include_home' => true,
             'site' => $site,
         ]);
+
+        if (User::current()->cant('view-other-authors-entries', [EntryContract::class, $collection])) {
+            $entriesFromOtherAuthors = collect($pages)
+                ->map(fn ($page) => Entry::find($page['entry']))
+                ->filter(fn ($entry) => $entry->blueprint()->hasField('author'))
+                ->filter(fn ($entry) => ! $entry->authors()->contains(User::current()->id()))
+                ->map->id();
+
+            $pages = collect($pages)
+                ->filter(fn ($page) => ! $entriesFromOtherAuthors->contains($page['entry']))
+                ->values()->all();
+        }
 
         return ['pages' => $pages];
     }

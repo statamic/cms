@@ -97,9 +97,11 @@ class CorePermissions
                     $this->permission('delete {collection} entries'),
                     $this->permission('publish {collection} entries'),
                     $this->permission('reorder {collection} entries'),
-                    $this->permission('edit other authors {collection} entries')->children([
-                        $this->permission('publish other authors {collection} entries'),
-                        $this->permission('delete other authors {collection} entries'),
+                    $this->permission('view other authors {collection} entries')->children([
+                        $this->permission('edit other authors {collection} entries')->children([
+                            $this->permission('publish other authors {collection} entries'),
+                            $this->permission('delete other authors {collection} entries'),
+                        ]),
                     ]),
                 ]),
             ])->replacements('collection', function () {
