@@ -59,6 +59,7 @@ use Statamic\Http\Controllers\CP\Fieldtypes\FilesFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\IconFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\MarkdownFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\RelationshipFieldtypeController;
+use Statamic\Http\Controllers\CP\Fieldtypes\ReplicatorSetController;
 use Statamic\Http\Controllers\CP\Forms\ActionController as FormActionController;
 use Statamic\Http\Controllers\CP\Forms\FormBlueprintController;
 use Statamic\Http\Controllers\CP\Forms\FormExportController;
@@ -67,8 +68,10 @@ use Statamic\Http\Controllers\CP\Forms\FormSubmissionsController;
 use Statamic\Http\Controllers\CP\Forms\SubmissionActionController;
 use Statamic\Http\Controllers\CP\Globals\GlobalsBlueprintController;
 use Statamic\Http\Controllers\CP\Globals\GlobalsController;
+use Statamic\Http\Controllers\CP\Globals\GlobalSetActionController;
 use Statamic\Http\Controllers\CP\Globals\GlobalVariablesController;
 use Statamic\Http\Controllers\CP\GraphQLController;
+use Statamic\Http\Controllers\CP\Navigation\NavigationActionController;
 use Statamic\Http\Controllers\CP\Navigation\NavigationBlueprintController;
 use Statamic\Http\Controllers\CP\Navigation\NavigationController;
 use Statamic\Http\Controllers\CP\Navigation\NavigationPagesController;
@@ -96,6 +99,8 @@ use Statamic\Http\Controllers\CP\Taxonomies\TermActionController;
 use Statamic\Http\Controllers\CP\Taxonomies\TermPreviewController;
 use Statamic\Http\Controllers\CP\Taxonomies\TermRevisionsController;
 use Statamic\Http\Controllers\CP\Taxonomies\TermsController;
+use Statamic\Http\Controllers\CP\Themes\ShareThemeController;
+use Statamic\Http\Controllers\CP\Themes\ThemeController;
 use Statamic\Http\Controllers\CP\Updater\UpdateProductController;
 use Statamic\Http\Controllers\CP\Updater\UpdaterController;
 use Statamic\Http\Controllers\CP\Users\AccountController;
@@ -156,12 +161,14 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::get('select-site/{handle}', [SelectSiteController::class, 'select']);
 
-    Route::resource('navigation', NavigationController::class);
+    Route::resource('navigation', NavigationController::class)->except('destroy');
     Route::get('navigation/{navigation}/tree', [NavigationTreeController::class, 'index'])->name('navigation.tree.index');
     Route::patch('navigation/{navigation}/tree', [NavigationTreeController::class, 'update'])->name('navigation.tree.update');
     Route::post('navigation/{navigation}/pages', [NavigationPagesController::class, 'update'])->name('navigation.pages.update');
     Route::get('navigation/{navigation}/pages/create', [NavigationPagesController::class, 'create'])->name('navigation.pages.create');
     Route::get('navigation/{navigation}/pages/{edit}/edit', [NavigationPagesController::class, 'edit'])->name('navigation.pages.edit');
+    Route::post('navigation/actions', [NavigationActionController::class, 'run'])->name('navigation.actions.run');
+    Route::post('navigation/actions/list', [NavigationActionController::class, 'bulkActions'])->name('navigation.actions.bulk');
 
     Route::resource('collections', CollectionsController::class);
     Route::post('collections/actions', [CollectionActionController::class, 'run'])->name('collections.actions.run');
@@ -236,7 +243,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::post('globals', [GlobalsController::class, 'store'])->name('globals.store');
     Route::get('globals/{global_set}/edit', [GlobalsController::class, 'edit'])->name('globals.edit');
     Route::patch('globals/{global_set}', [GlobalsController::class, 'update'])->name('globals.update');
-    Route::delete('globals/{global_set}', [GlobalsController::class, 'destroy'])->name('globals.destroy');
+    Route::post('globals/actions', [GlobalSetActionController::class, 'run'])->name('globals.actions.run');
+    Route::post('globals/actions/list', [GlobalSetActionController::class, 'bulkActions'])->name('globals.actions.bulk');
 
     Route::get('globals/{global_set}', [GlobalVariablesController::class, 'edit'])->name('globals.variables.edit');
     Route::patch('globals/{global_set}/variables', [GlobalVariablesController::class, 'update'])->name('globals.variables.update');
@@ -379,6 +387,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('files/upload', [FilesFieldtypeController::class, 'upload'])->name('files.upload');
         Route::get('dictionaries/{dictionary}', DictionaryFieldtypeController::class)->name('dictionary-fieldtype');
         Route::post('icons', IconFieldtypeController::class)->name('icon-fieldtype');
+        Route::post('replicator/set', ReplicatorSetController::class)->name('replicator-fieldtype.set');
     });
 
     Route::group(['prefix' => 'field-action-modal'], function () {
@@ -429,6 +438,10 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('/', [PasskeyController::class, 'store'])->name('passkeys.store');
         Route::delete('{id}', [PasskeyController::class, 'destroy'])->name('passkeys.destroy');
     });
+
+    Route::get('themes', [ThemeController::class, 'index']);
+    Route::get('themes/refresh', [ThemeController::class, 'refresh']);
+    Route::post('themes/share', ShareThemeController::class);
 
     Route::post('slug', SlugController::class);
 

@@ -11,6 +11,7 @@ import { each, groupBy, orderBy, find, uniq } from 'lodash-es';
 import { motion } from 'motion-v';
 import { cva } from 'cva';
 import { Icon, Subheading } from '@/components/ui';
+import { router } from '@inertiajs/vue3';
 
 let metaPressed = ref(false);
 let open = ref(false);
@@ -223,10 +224,10 @@ function getRecentItems() {
 }
 
 function addToRecentItems(item) {
-    item.category = __('Recent');
+    const recentItem = { ...item, category: __('Recent') };
 
     const filtered = getRecentItems().filter(recentItem => recentItem.text !== item.text);
-    const updated = [item, ...filtered].slice(0, 5);
+    const updated = [recentItem, ...filtered].slice(0, 5);
 
     localStorage.setItem('statamic.command-palette.recent', JSON.stringify(updated));
 
@@ -269,6 +270,11 @@ const modalClasses = cva({
         'slide-in-from-top-2',
     ],
 })({});
+
+router.on('start', () => {
+    Statamic.$commandPalette.clear();
+    open.value = false;
+});
 </script>
 
 <template>

@@ -41,7 +41,13 @@ const submit = () => {
             processing.value = true;
             errors.value = {};
         },
-        onSuccess: () => window.location.href = props.referer,
+        onSuccess: (page) => {
+			if (page.component === 'auth/two-factor/Challenge') {
+				return;
+			}
+
+	        window.location.href = props.referer;
+        },
         onError: () => processing.value = false
     });
 }
@@ -105,7 +111,7 @@ onMounted(() => {
                     <template #actions>
                         <Link
                             :href="forgotPasswordUrl"
-                            class="text-ui-accent-text text-sm hover:text-ui-accent-text/80 dark:text-dark-ui-accent-text dark:hover:text-dark-ui-accent-text/80"
+                            class="text-ui-accent-text text-sm hover:text-ui-accent-text/80"
                             tabindex="6"
                             v-text="__('Forgot password?')"
                         />
@@ -135,11 +141,16 @@ onMounted(() => {
                         <Button
                             v-for="provider in providers"
                             :key="provider.name"
-                            as="href"
-                            class="flex-1"
+                            as="a"
+                            class="flex-1 [&_svg]:opacity-100!"
                             :href="provider.url"
                             :icon="provider.icon"
-                        />
+                            :icon-only="!!provider.icon"
+                            v-tooltip="__('Sign in with :provider', { provider: provider.label })"
+                        >
+                            <span class="sr-only">{{ __('Sign in with :provider', { provider: provider.label }) }}</span>
+                            <span v-if="!provider.icon">{{ provider.label }}</span>
+                        </Button>
                     </div>
                 </div>
             </template>

@@ -1,12 +1,13 @@
 <template>
     <node-view-wrapper class="my-4">
         <div
-            class="shadow-ui-sm relative z-2 w-full rounded-lg border border-gray-300 bg-white text-base dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
+            ref="container"
+            class="shadow-ui-sm relative w-full rounded-lg border border-gray-300 bg-white text-base dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
             :class="{
                 // We’re styling a Set so that it shows a “selection outline” when selected with the mouse or keyboard.
                 // The extra `&:not(:has(:focus-within))` rule turns that outline off if any element inside the Set has focus (e.g. when editing inside a Bard field).
                 // This prevents the outer selection outline from showing while the user is actively working inside the Set.
-                '[&:not(:has(:focus-within))]:border-blue-300! [&:not(:has(:focus-within))]:dark:border-blue-400! [&:not(:has(:focus-within))]:before:content-[\'\'] [&:not(:has(:focus-within))]:before:absolute [&:not(:has(:focus-within))]:before:inset-[-1px] [&:not(:has(:focus-within))]:before:pointer-events-none [&:not(:has(:focus-within))]:before:border-2 [&:not(:has(:focus-within))]:before:border-blue-300 [&:not(:has(:focus-within))]:dark:before:border-blue-400 [&:not(:has(:focus-within))]:before:rounded-lg': selected || withinSelection,
+                'st-set-is-selected [&:not(:has(:focus-within))]:border-blue-400! [&:not(:has(:focus-within))]:dark:border-blue-400! [&:not(:has(:focus-within))]:before:content-[\'\'] [&:not(:has(:focus-within))]:before:absolute [&:not(:has(:focus-within))]:before:inset-[-1px] [&:not(:has(:focus-within))]:before:pointer-events-none [&:not(:has(:focus-within))]:before:border-2 [&:not(:has(:focus-within))]:before:border-blue-400 [&:not(:has(:focus-within))]:dark:before:border-blue-400 [&:not(:has(:focus-within))]:before:rounded-lg': showSelectionHighlight,
                 'border-red-500': hasError,
             }"
             :data-type="config.handle"
@@ -17,13 +18,13 @@
         >
             <div ref="content" hidden />
             <header
-                class="group/header animate-border-color flex items-center rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 hover:bg-gray-100 dark:hover:bg-gray-950 border-gray-300 dark:shadow-md border-b-1 border-b-transparent"
+                class="group/header animate-border-color show-focus-within flex items-center rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 hover:bg-gray-100 dark:hover:bg-gray-950/45 border-gray-300 dark:shadow-md border-b-1 border-b-transparent"
                 :class="{
-                    'bg-gray-200/50 dark:bg-gray-950 rounded-b-none border-b-gray-300! dark:border-b-white/10!': !collapsed
+                    'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none border-b-gray-300! dark:border-b-white/10!': !collapsed
                 }"
             >
                 <Icon data-drag-handle name="handles" class="size-4 cursor-grab text-gray-400" v-if="!isReadOnly" />
-                <button type="button" class="flex flex-1 items-center gap-4 p-2 min-w-0 cursor-pointer [&:focus-visible]:outline-none [&:focus-visible]:[&_[data-ui-badge]]:focus-outline" @click="toggleCollapsedState">
+                <button type="button" class="show-focus-within_target flex flex-1 items-center gap-4 p-2 min-w-0 focus:outline-none cursor-pointer" @click="toggleCollapsedState">
                     <Badge size="lg" :pill="true" color="white" class="px-3">
                         <span v-if="isSetGroupVisible" class="flex items-center gap-2">
                             {{ __(setGroup.display) }}
@@ -115,6 +116,7 @@ import {
 } from '@ui';
 import { containerContextKey } from '@/components/ui/Publish/Container.vue';
 import { watch } from 'vue';
+import { reveal } from '@api';
 
 export default {
     props: nodeViewProps,
@@ -253,6 +255,10 @@ export default {
             return this.decorationSpecs.withinSelection;
         },
 
+        showSelectionHighlight() {
+            return (this.selected || this.withinSelection) && this.bard.hasBeenFocused;
+        },
+
         fieldVm() {
             return this.extension.options.bard;
         },
@@ -316,7 +322,7 @@ export default {
             this.extension.options.bard.duplicateSet(
                 this.node.attrs.id,
                 this.node.attrs,
-                this.getPos() + this.node.nodeSize,
+                this.getPos,
             );
         },
     },
@@ -325,10 +331,14 @@ export default {
         watch(
             () => data_get(this.publishContainer.values.value, this.fieldPathPrefix),
             (values) => {
+				if (! values) return;
+
                 this.updateAttributes({ values });
             },
             { deep: true }
         );
+
+        reveal.mount(this.$refs.container, this.expand);
     },
 
     updated() {

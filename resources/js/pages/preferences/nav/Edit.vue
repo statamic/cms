@@ -12,14 +12,14 @@
             <CommandPaletteItem
                 v-if="isDirty"
                 :category="$commandPalette.category.Actions"
-                :text="__('Discard changes')"
+                :text="__('Discard Changes')"
                 icon="trash"
                 :action="discardChanges"
                 v-slot="{ text, action }"
             >
                 <Button
                     variant="filled"
-                    :text="__('Discard changes')"
+                    :text="__('Discard Changes')"
                     @click="action"
                 />
             </CommandPaletteItem>
@@ -179,7 +179,7 @@
         />
 
         <confirmation-modal
-            v-if="confirmingReset"
+            :open="confirmingReset"
             :title="__('Reset')"
             :bodyText="__('Are you sure you want to reset nav customizations?')"
             :buttonText="__('Reset')"
@@ -189,7 +189,7 @@
         />
 
         <confirmation-modal
-            v-if="confirmingRemoval"
+            :open="confirmingRemoval"
             :title="__('Remove')"
             :bodyText="__('Are you sure you want to remove this section and all of its children?')"
             :buttonText="__('Remove')"

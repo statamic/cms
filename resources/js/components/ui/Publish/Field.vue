@@ -105,6 +105,12 @@ function replicatorPreviewUpdated(value) {
     setFieldPreviewValue(fullPath.value, value);
 }
 
+watch(
+    () => fullPath.value,
+    () => setFieldPreviewValue(fullPath.value, fieldtype.value?.replicatorPreview),
+    { immediate: true }
+);
+
 function focused() {
     // todo
 }
@@ -127,7 +133,7 @@ const extraValues = computed(() => {
 
 const shouldShowField = computed(() => {
     return new ShowField(
-        visibleValues.value,
+        values.value,
         extraValues.value,
         containerVisibleValues.value,
         revealerValues.value,
@@ -222,7 +228,7 @@ const fieldtypeComponentEvents = computed(() => ({
             :required="isRequired"
             :errors="errors"
             :read-only="isReadOnly"
-            :variant="config.variant"
+            :inline="asConfig"
             :full-width-setting="config.full_width_setting"
             v-bind="$attrs"
         >

@@ -3,7 +3,7 @@ Table Fieldtype
 ========================================================================== */
 
 .table-contained {
-    @apply relative mb-4 w-full rounded-lg border text-gray shadow-ui-sm outline-hidden dark:border-gray-700 dark:text-dark-150 text-start;
+    @apply relative mb-4 w-full rounded-lg border shadow-ui-sm outline-hidden dark:border-gray-700 with-contrast:border-gray-500 text-start;
     border-collapse: separate;
     border-spacing: 0;
     table-layout: fixed;
@@ -15,7 +15,7 @@ Table Fieldtype
                 dark:bg-gray-925
                 border-b bg-gray-50
                 not-last:border-e overflow-hidden
-                dark:border-gray-800 dark:border-b-gray-700
+                dark:border-gray-800 dark:border-b-gray-700 with-contrast:border-gray-500
                 text-sm font-medium text-gray-900
                 dark:text-gray-100
                 -top-2
@@ -64,7 +64,7 @@ Table Fieldtype
         @apply outline-hidden dark:bg-gray-900;
 
         th {
-            @apply bg-gray-50 p-2 text-sm font-medium text-gray-700 text-start border-r border-b border-gray-300 dark:border-dark-600 dark:bg-gray-925 dark:text-gray-100 overflow-hidden;
+            @apply bg-gray-50 p-2 text-sm font-medium text-gray-700 text-start border-r border-b border-gray-300 dark:border-gray-700 dark:bg-gray-925 dark:text-gray-100 overflow-hidden;
 
             tr:first-child & {
                 @apply rounded-tl-lg;
@@ -79,19 +79,15 @@ Table Fieldtype
 
             &:first-child td {
                 @apply overflow-hidden;
-                &:last-child {
-                    /* e.g. the first row of an array fieldtype, keyed type, in dark mode */
-                    @apply rounded-tr-lg;
-                }
             }
 
             &:last-child td {
                 @apply border-b-0 overflow-hidden;
                 &:first-child {
-                    @apply rounded-bl-lg;
+                    @apply rounded-bl-[calc(var(--radius-lg)-1px)];
                 }
                 &:last-child {
-                    @apply rounded-br-lg;
+                    @apply rounded-br-[calc(var(--radius-lg)-1px)];
                 }
             }
 
@@ -101,7 +97,7 @@ Table Fieldtype
         }
 
         td {
-            @apply border-b p-0 dark:border-dark-600 border-e;
+            @apply border-b p-0 dark:border-gray-700 border-e with-contrast:border-gray-500;
 
             &:first-child.grid-cell {
                 @apply ps-4;
@@ -123,10 +119,7 @@ Table Fieldtype
 
     [data-ui-control] {
         @apply block w-full max-w-full rounded-none appearance-none border p-2;
-        @apply border-none bg-white dark:bg-gray-900 text-sm shadow-none outline-hidden;
-        &:focus {
-            @apply bg-gray-100 inset-shadow-xs ring-0 dark:bg-gray-800;
-        }
+        @apply border-none bg-white dark:bg-gray-900 text-sm shadow-none;
     }
 
     .row-controls {

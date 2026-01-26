@@ -1,5 +1,5 @@
 <template>
-    <div class="blueprint-section min-h-40 w-full outline-hidden @container">
+    <div class="blueprint-section min-h-40 w-full outline-hidden @container" tabindex="-1">
         <ui-panel>
             <ui-panel-header class="flex items-center justify-between pl-2.75! pr-3.25!">
                 <div class="flex items-center gap-2 flex-1">
@@ -34,21 +34,14 @@
             </Fields>
         </ui-panel>
 
-        <stack
-            narrow
-            v-if="editingSection"
-            @opened="$refs.displayInput?.select()"
+        <ui-stack
+	        size="narrow"
+            :open="editingSection !== false"
+            :title="editText"
             @closed="editCancelled"
+            @opened="() => $nextTick(() => $refs.displayInput.focus())"
         >
-            <div class="h-full overflow-scroll overflow-x-auto bg-white px-6 dark:bg-dark-800">
-                <header class="py-2">
-                    <div class="flex items-center justify-between">
-                        <ui-heading size="lg">
-                            {{ editText }}
-                        </ui-heading>
-                        <ui-button icon="x" variant="ghost" class="-me-2" @click="editCancelled" />
-                    </div>
-                </header>
+            <div class="">
                 <div class="space-y-6">
                     <ui-field :label="__('Display')">
                         <ui-input ref="displayInput" type="text" v-model="editingSection.display" />
@@ -118,13 +111,13 @@
                     <ui-field :label="__('Hidden')" v-if="showHideField">
                         <ui-switch v-model="editingSection.hide" />
                     </ui-field>
-                    <div class="py-4 space-x-2">
-                        <ui-button :text="__('Confirm')" @click="editConfirmed" variant="primary" />
+                    <div class="py-6 space-x-2 -mx-6 px-6 border-t border-gray-200 dark:border-gray-700">
+                        <ui-button :text="isSoloNarrowStack ? __('Save') : __('Confirm')" @click="handleSaveOrConfirm" variant="primary" />
                         <ui-button :text="__('Cancel')" @click="editCancelled" variant="ghost" />
                     </div>
                 </div>
             </div>
-        </stack>
+        </ui-stack>
     </div>
 </template>
 
@@ -159,6 +152,7 @@ export default {
             editingSection: false,
             editingField: null,
             handleSyncedWithDisplay: false,
+            saveKeyBinding: null,
         };
     },
 
@@ -178,6 +172,11 @@ export default {
         previewImageFolder() {
             return this.$config.get('setPreviewImages.folder') || null;
         },
+
+        isSoloNarrowStack() {
+            const stacks = this.$stacks.stacks();
+            return stacks.length === 1 && stacks[0]?.data?.vm?.size === 'narrow';
+        },
     },
 
     watch: {
@@ -192,6 +191,26 @@ export default {
             if (this.editingSection && this.handleSyncedWithDisplay) {
                 this.editingSection.handle = snake_case(display);
             }
+        },
+
+        editingSection: {
+            handler(isEditing) {
+                if (isEditing) {
+                    // Bind Cmd+S to trigger save or confirm based on stack type
+                    this.saveKeyBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.handleSaveOrConfirm();
+                    });
+                } else {
+                    // Unbind when stack is closed
+                    if (this.saveKeyBinding) {
+                        this.saveKeyBinding.destroy();
+                        this.saveKeyBinding = null;
+                    }
+                }
+            },
+            immediate: false,
         },
     },
 
@@ -209,7 +228,7 @@ export default {
             this.$toast.success(__('Field added'));
 
             if (field.type === 'reference') {
-                this.$nextTick(() => (this.editingField = field._id));
+                this.editingField = field._id;
             }
         },
 
@@ -247,9 +266,30 @@ export default {
             this.editingSection = false;
         },
 
+        handleSaveOrConfirm() {
+            if (this.isSoloNarrowStack) {
+                this.editAndSave();
+            } else {
+                this.editConfirmed();
+            }
+        },
+
+        editAndSave() {
+            this.editConfirmed();
+            this.$nextTick(() => {
+                this.$events.$emit('root-form-save');
+            });
+        },
+
         editCancelled() {
             this.editingSection = false;
         },
+    },
+
+    beforeUnmount() {
+        if (this.saveKeyBinding) {
+            this.saveKeyBinding.destroy();
+        }
     },
 };
 </script>

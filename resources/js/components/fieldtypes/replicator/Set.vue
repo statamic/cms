@@ -18,6 +18,7 @@ import { Motion } from 'motion-v';
 import PreviewHtml from '@/components/fieldtypes/replicator/PreviewHtml.js';
 import FieldAction from '@/components/field-actions/FieldAction.js';
 import toFieldActions from '@/components/field-actions/toFieldActions.js';
+import { reveal } from '@api';
 
 const emit = defineEmits(['collapsed', 'expanded', 'duplicated', 'removed']);
 
@@ -87,7 +88,7 @@ const previewText = computed(() => {
             return config.replicator_preview === undefined ? props.showFieldPreviews : config.replicator_preview;
         })
         .map(([handle, value]) => value)
-        .filter((value) => !['null', '[]', '{}', ''].includes(JSON.stringify(value)))
+        .filter((value) => !['null', '[]', '{}', '', undefined].includes(JSON.stringify(value)))
         .map((value) => {
             if (value instanceof PreviewHtml) return value.html;
 
@@ -117,14 +118,30 @@ function destroy() {
     deletingSet.value = false;
     emit('removed');
 }
+
+const rootEl = ref();
+reveal.use(rootEl, () => emit('expanded'));
+
+const shouldClipOverflow = ref(false);
+
+function onAnimationStart() {
+    shouldClipOverflow.value = true;
+}
+
+function onAnimationComplete() {
+    if (!props.collapsed) {
+        shouldClipOverflow.value = false;
+    }
+}
 </script>
 
 <template>
-    <div :class="sortableItemClass">
+    <div ref="rootEl" :class="sortableItemClass">
         <slot name="picker" />
         <div
             layout
-            class="relative z-2 w-full rounded-lg border border-gray-300 text-base dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black shadow-ui-sm dark:[&_[data-ui-switch]]:border-gray-600 dark:[&_[data-ui-switch]]:border-1"
+            data-replicator-set
+            class="relative z-2 w-full rounded-lg border border-gray-300 text-base dark:border-white/10 bg-white dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black shadow-ui-sm dark:[&_[data-ui-switch]]:border-gray-600 dark:[&_[data-ui-switch]]:border-1"
             :class="{
                 'border-red-500': hasError
             }"
@@ -135,9 +152,9 @@ function destroy() {
             :data-type="config.handle"
         >
             <header
-                class="group/header animate-border-color flex items-center rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 hover:bg-gray-100 dark:hover:bg-gray-950 border-gray-300 dark:shadow-md border-b-1 border-b-transparent"
+                class="group/header animate-border-color flex items-center show-focus-within rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 hover:bg-gray-100 dark:hover:bg-gray-950/45 border-gray-300 dark:shadow-md border-b-1 border-b-transparent"
                 :class="{
-                    'bg-gray-200/50 dark:bg-gray-950 rounded-b-none border-b-gray-300! dark:border-b-white/10!': !collapsed
+                    'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none border-b-gray-300! dark:border-b-white/10!': !collapsed
                 }"
             >
                 <Icon
@@ -146,8 +163,8 @@ function destroy() {
                     class="size-4 cursor-grab text-gray-400"
                     v-if="!readOnly"
                 />
-                <button type="button" class="flex flex-1 items-center gap-4 p-2 py-1.75 min-w-0 cursor-pointer" @click="toggleCollapsedState">
-                    <Badge size="lg" pill="true" color="white" class="px-3">
+                <button type="button" class="show-focus-within_target flex flex-1 items-center gap-4 p-2 py-1.75 min-w-0 focus:outline-none cursor-pointer" @click="toggleCollapsedState">
+                    <Badge size="lg" pill color="white" class="px-3">
                         <span v-if="isSetGroupVisible" class="flex items-center gap-2">
                             {{ __(setGroup.display) }}
                             <Icon name="chevron-right" class="relative top-px size-3" />
@@ -197,24 +214,28 @@ function destroy() {
             </header>
 
             <Motion
-                class="contain-paint"
+                :class="{ 'overflow-clip': shouldClipOverflow }"
                 :initial="{ height: collapsed ? '0px' : 'auto' }"
                 :animate="{ height: collapsed ? '0px' : 'auto' }"
                 :transition="{ duration: 0.25, type: 'tween' }"
+                @animation-start="onAnimationStart"
+                @animation-complete="onAnimationComplete"
             >
-                <FieldsProvider
-                    :fields="config.fields"
-                    :as-config="false"
-                    :field-path-prefix="fieldPathPrefix"
-                    :meta-path-prefix="metaPathPrefix"
-                >
-                    <Fields class="p-4" />
-                </FieldsProvider>
+                <div :tabindex="collapsed ? -1 : undefined" :inert="collapsed">
+                    <FieldsProvider
+                        :fields="config.fields"
+                        :as-config="false"
+                        :field-path-prefix="fieldPathPrefix"
+                        :meta-path-prefix="metaPathPrefix"
+                    >
+                        <Fields class="p-4" />
+                    </FieldsProvider>
+                </div>
             </Motion>
         </div>
 
         <confirmation-modal
-            v-if="deletingSet"
+            :open="deletingSet"
             :title="__('Delete Set')"
             :body-text="__('Are you sure?')"
             :button-text="__('Delete')"

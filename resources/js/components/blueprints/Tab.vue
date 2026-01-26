@@ -11,12 +11,7 @@
 
         <Dropdown v-if="isActive" placement="left-start" class="me-3">
             <template #trigger>
-                <button
-                    class="hover:text-gray-900 active:text-gray-900 dark:hover:text-gray-400 ms-1"
-                    :aria-label="__('Open Dropdown')"
-                >
-                    <Icon name="chevron-down" />
-                </button>
+                <Button class="absolute! top-0.25 -right-4 starting-style-transition starting-style-transition--slow" variant="ghost" size="xs" icon="chevron-down" :aria-label="__('Open Dropdown')" />
             </template>
             <DropdownMenu>
                 <DropdownItem :text="__('Edit')" icon="edit" @click="edit" />
@@ -24,60 +19,59 @@
             </DropdownMenu>
         </Dropdown>
 
-        <confirmation-modal
-            v-if="editing"
+        <Stack
+	        size="narrow"
+            :open="editing"
+            @opened="() => $nextTick(() => $refs.title.focus())"
+            @update:open="editCancelled"
             :title="editText"
-            @opened="() => {
-                this.$nextTick(() => {
-                    this.$refs.title.focus()
-                });
-            }"
-            @confirm="editConfirmed"
-            @cancel="editCancelled"
         >
-            <div class="publish-fields">
-                <Field :label="__('Title')" class="form-group field-w-100">
-                    <Input ref="title" autofocus :model-value="display" @update:model-value="fieldUpdated('display', $event)" />
-                </Field>
-
-                <Field :label="__('Handle')" class="form-group field-w-100">
-                    <Input class="font-mono" :model-value="handle" @update:model-value="fieldUpdated('handle', $event)" />
-                </Field>
-
-                <Field v-if="showInstructions" :label="__('Instructions')" class="form-group field-w-100">
-                    <Input :model-value="instructions" @update:model-value="fieldUpdated('instructions', $event)" />
-                </Field>
-
-                <Field v-if="showInstructions" :label="__('Icon')" class="form-group field-w-100">
-                    <publish-field-meta
-                        :config="{
+            <div class="">
+                <div class="space-y-6">
+                    <Field :label="__('Title')" class="form-group field-w-100">
+                        <Input ref="title" :model-value="display" @update:model-value="fieldUpdated('display', $event)" />
+                    </Field>
+                    <Field :label="__('Handle')" class="form-group field-w-100">
+                        <Input class="font-mono" :model-value="handle" @update:model-value="fieldUpdated('handle', $event)" />
+                    </Field>
+                    <Field v-if="showInstructions" :label="__('Instructions')" class="form-group field-w-100">
+                        <Input :model-value="instructions" @update:model-value="fieldUpdated('instructions', $event)" />
+                    </Field>
+                    <Field v-if="showInstructions" :label="__('Icon')" class="form-group field-w-100">
+                        <publish-field-meta
+                            :config="{
                             handle: 'icon',
                             type: 'icon',
                             set: iconSet,
                         }"
-                        :initial-value="icon"
-                        v-slot="{ meta, value, loading, config }"
-                    >
-                        <icon-fieldtype
-                            v-if="!loading"
-                            handle="icon"
-                            :config="config"
-                            :meta="meta"
-                            :value="value"
-                            @update:value="fieldUpdated('icon', $event)"
-                        />
-                    </publish-field-meta>
-                </Field>
+                            :initial-value="icon"
+                            v-slot="{ meta, value, loading, config }"
+                        >
+                            <icon-fieldtype
+                                v-if="!loading"
+                                handle="icon"
+                                :config="config"
+                                :meta="meta"
+                                :value="value"
+                                @update:value="fieldUpdated('icon', $event)"
+                            />
+                        </publish-field-meta>
+                    </Field>
+                    <div class="py-6 space-x-2 -mx-6 px-6 border-t border-gray-200 dark:border-gray-700">
+                        <ui-button :text="isSoloNarrowStack ? __('Save') : __('Confirm')" @click="handleSaveOrConfirm" variant="primary" />
+                        <ui-button :text="__('Cancel')" @click="editCancelled" variant="ghost" />
+                    </div>
+                </div>
             </div>
-        </confirmation-modal>
+        </Stack>
     </TabTrigger>
 </template>
 
 <script>
-import { TabTrigger, Dropdown, DropdownMenu, DropdownItem, Icon, Field, Input } from '@/components/ui';
+import { TabTrigger, Dropdown, DropdownMenu, DropdownItem, Button, Icon, Field, Input, Stack, StackClose } from '@/components/ui';
 
 export default {
-    components: { TabTrigger, Dropdown, DropdownMenu, DropdownItem, Icon, Field, Input },
+    components: { TabTrigger, Dropdown, DropdownMenu, DropdownItem, Button, Icon, Field, Input, Stack, StackClose },
 
     props: {
         tab: {
@@ -105,6 +99,7 @@ export default {
             icon: this.tab.icon,
             editing: false,
             handleSyncedWithDisplay: false,
+            saveKeyBinding: null,
         };
     },
 
@@ -123,6 +118,33 @@ export default {
 
         iconSet() {
             return this.$config.get('replicatorSetIcons') || undefined;
+        },
+
+        isSoloNarrowStack() {
+            const stacks = this.$stacks.stacks();
+            return stacks.length === 1 && stacks[0]?.data?.vm?.size === 'narrow';
+        },
+    },
+
+    watch: {
+        editing: {
+            handler(isEditing) {
+                if (isEditing) {
+                    // Bind Cmd+S to trigger save or confirm based on stack type
+                    this.saveKeyBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.handleSaveOrConfirm();
+                    });
+                } else {
+                    // Unbind when stack is closed
+                    if (this.saveKeyBinding) {
+                        this.saveKeyBinding.destroy();
+                        this.saveKeyBinding = null;
+                    }
+                }
+            },
+            immediate: false,
         },
     },
 
@@ -147,6 +169,24 @@ export default {
             this.editing = false;
         },
 
+        handleSaveOrConfirm() {
+            if (this.isSoloNarrowStack) {
+                this.editAndSave();
+            } else {
+                this.editConfirmed();
+            }
+        },
+
+        editAndSave() {
+            // First confirm the tab changes
+            this.editConfirmed();
+            
+            // Then trigger the blueprint save
+            this.$nextTick(() => {
+                this.$events.$emit('root-form-save');
+            });
+        },
+
         editCancelled() {
             this.editing = false;
             this.handle = this.tab.handle;
@@ -168,6 +208,12 @@ export default {
         remove() {
             this.$emit('removed');
         },
+    },
+
+    beforeUnmount() {
+        if (this.saveKeyBinding) {
+            this.saveKeyBinding.destroy();
+        }
     },
 };
 </script>

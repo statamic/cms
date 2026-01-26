@@ -16,6 +16,7 @@ const emit = defineEmits(['started', 'completed']);
 const { prepareActions, runServerAction } = useActions();
 
 let actions = ref([]);
+let loading = ref(false);
 
 const confirmableActions = useTemplateRef('confirmableActions');
 
@@ -49,6 +50,8 @@ function getActions() {
         return;
     }
 
+    loading.value = true;
+
     let params = {
         selections: toRaw(props.selections),
     };
@@ -59,7 +62,10 @@ function getActions() {
 
     axios
         .post(props.url + '/list', params)
-        .then(response => actions.value = response.data);
+        .then(response => {
+            actions.value = response.data;
+            loading.value = false;
+        });
 }
 
 let errors = ref({});
@@ -91,5 +97,6 @@ function runAction(action, values, onSuccess, onError) {
     <slot
         v-if="showAlways || hasSelections"
         :actions="preparedActions"
+        :loading="loading"
     />
 </template>

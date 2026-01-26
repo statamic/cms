@@ -41,9 +41,9 @@ function renderInstructions(instructions) {
     return instructions ? markdown(__(instructions), { openLinksInNewTabs: true }) : '';
 }
 
-function toggleSection(id) {
-    if (sections[id].collapsible) {
-        sections[id].collapsed = !sections[id].collapsed;
+function toggleSection(section) {
+    if (section.collapsible) {
+        section.collapsed = !section.collapsed;
     }
 }
 </script>
@@ -58,26 +58,25 @@ function toggleSection(id) {
                 { 'pb-0': section.collapsed }
             ]"
         >
-            <PanelHeader v-if="section.display || section.collapsible" class="flex items-center justify-between">
-                <div>
+            <PanelHeader v-if="section.display || section.collapsible" class="relative flex items-center justify-between">
+                <div class="[&_a]:relative [&_a]:z-(--z-index-above)">
                     <Heading :text="__(section.display)" />
                     <Subheading v-if="section.instructions" :text="renderInstructions(section.instructions)" />
                 </div>
                 <Button
-                    @click="toggleSection(i)"
+                    @click="toggleSection(section)"
                     v-if="section.collapsible"
-                    class="[&_svg]:size-5 rounded-xl"
-                    icon="chevron-down"
+                    class="static! [&_svg]:size-4.5 rounded-xl after:content-[''] after:absolute after:inset-0"
+                    :icon="section.collapsed ? 'expand' : 'collapse'"
                     size="sm"
                     variant="ghost"
                     :aria-label="__('Toggle section visibility')"
-                    :class="section.collapsed ? '[&_svg]:rotate-270' : '[&_svg]:rotate-0'"
                 />
             </PanelHeader>
             <div
                 style="--tw-ease: ease;"
                 class="h-auto visible transition-[height,visibility] duration-[250ms,2s]"
-                :class="{ 'h-0! visibility-hidden overflow-clip': section.collapsed }"
+                :class="{ 'h-0! invisible! overflow-clip': section.collapsed }"
             >
                 <Card :class="{ 'p-0!': asConfig }">
                     <FieldsProvider :fields="section.fields">

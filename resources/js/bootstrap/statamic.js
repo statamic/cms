@@ -7,8 +7,8 @@ import registerGlobalCommandPalette from './commands.js';
 import registerUiComponents from './ui.js';
 import registerFieldtypes from './fieldtypes.js';
 import VueClickAway from 'vue3-click-away';
-import FloatingVue from 'floating-vue';
 import 'floating-vue/dist/style.css';
+import tooltipDirective from '@/directives/tooltip.js';
 import { createInertiaApp } from '@inertiajs/vue3';
 import { router } from '@inertiajs/vue3';
 import PortalVue from 'portal-vue';
@@ -18,6 +18,7 @@ import markdown from '@/util/markdown.js';
 import VueComponentDebug from 'vue-component-debug';
 import { registerIconSetFromStrings } from '@ui';
 import Layout from '@/pages/layout/Layout.vue';
+import { setTranslations, setLocale } from '@/translations/translator.js';
 import {
     keys,
     components,
@@ -35,7 +36,7 @@ import {
     permissions,
     dateFormatter,
     commandPalette,
-    theme,
+    colorMode,
     contrast,
     config,
     preferences,
@@ -121,8 +122,8 @@ export default {
         return progress;
     },
 
-    get $theme() {
-        return theme;
+    get $colorMode() {
+        return colorMode;
     },
 
     get $contrast() {
@@ -139,6 +140,10 @@ export default {
 
     get $events() {
         return events;
+    },
+
+    get $reveal() {
+        return reveal;
     },
 
     get $commandPalette() {
@@ -158,8 +163,11 @@ export default {
     },
 
     async start() {
+        setTranslations(this.initialConfig.translations);
+        setLocale(this.initialConfig.translationLocale);
+
         config.initialize(this.initialConfig);
-        theme.initialize(this.initialConfig.user?.theme);
+        colorMode.initialize(this.initialConfig.user?.color_mode);
         contrast.initialize(this.initialConfig.user?.preferences?.strict_accessibility);
         preferences.initialize(this.initialConfig.user?.preferences, this.initialConfig.defaultPreferences);
 
@@ -168,7 +176,7 @@ export default {
 
         const el = document.getElementById('statamic');
         const titleEl = document.getElementById('blade-title');
-        const bladeTitle = titleEl.dataset.title;
+        const bladeTitle = titleEl?.dataset.title;
         const bladeContent = el?.innerHTML || '';
         const _this = this;
 
@@ -236,7 +244,7 @@ export default {
         this.$app.use(createPinia());
         this.$app.use(PortalVue, { portalName: 'v-portal' });
         this.$app.use(VueClickAway);
-        this.$app.use(FloatingVue, { disposeTimeout: 30000, distance: 10 });
+        this.$app.directive('tooltip', tooltipDirective);
         this.$app.use(VueComponentDebug, { enabled: import.meta.env.VITE_VUE_COMPONENT_DEBUG === 'true' });
         toast.initialize(this.$app);
 
@@ -262,7 +270,7 @@ export default {
             $permissions: permissions,
             $date: dateFormatter,
             $commandPalette: commandPalette,
-            $theme: theme,
+            $colorMode: colorMode,
             $contrast: contrast,
         });
 
@@ -302,14 +310,6 @@ export default {
         registerFieldtypes(this.$app);
         registerIconSets(this.initialConfig);
         components.boot(this.$app);
-
-        // Suppress the translation warnings
-        this.$app.config.warnHandler = (msg, vm, trace) => {
-            if (msg.includes('Property "__" should not start with _ which is a reserved prefix for Vue internals')) {
-                return;
-            }
-            console.warn(msg, vm, trace);
-        };
 
         axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
         axios.defaults.headers.common['X-CSRF-TOKEN'] = Statamic.$config.get('csrfToken');

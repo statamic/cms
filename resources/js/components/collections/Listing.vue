@@ -17,7 +17,7 @@
                 <ui-panel-header class="flex items-center justify-between">
                     <div class="flex items-center gap-1.5">
                         <ui-heading size="lg" :text="__(collection.title)" :href="collection.available_in_selected_site ? collection.entries_url : collection.edit_url" />
-                        <span v-if="collection.available_in_selected_site" class="text-sm text-gray-600">
+                        <span v-if="collection.available_in_selected_site" class="text-sm text-gray-600 dark:text-gray-400">
                             ({{ __n('messages.entry_count', collection.entries_count, { count: collection.entries_count }) }})
                         </span>
                     </div>
@@ -105,17 +105,17 @@
                     </div>
                 </ui-card>
 
-                <ui-panel-footer v-if="collection.available_in_selected_site" class="flex items-center gap-6 text-sm text-gray-600">
-                    <div class="flex items-center gap-2">
-                        <ui-badge :text="String(collection.published_entries_count)" pill class="bg-gray-200 dark:bg-gray-700" />
+                <ui-panel-footer v-if="collection.available_in_selected_site" class="flex items-center gap-6 text-sm text-gray-600 dark:text-gray-400">
+                    <div class="flex items-center gap-1.5">
+                        <ui-badge :text="String(collection.published_entries_count)" pill class="bg-white! dark:bg-gray-700! [&_span]:st-text-trim-cap" />
                         <span>{{ __('Published') }}</span>
                     </div>
-                    <div class="flex items-center gap-2 text-sm" v-if="collection.scheduled_entries_count > 0">
-                        <ui-badge :text="String(collection.scheduled_entries_count)" pill class="bg-gray-200 dark:" />
+                    <div class="flex items-center gap-1.5" v-if="collection.scheduled_entries_count > 0">
+                        <ui-badge :text="String(collection.scheduled_entries_count)" pill class="bg-white! dark:bg-gray-700! [&_span]:st-text-trim-cap" />
                         <span>{{ __('Scheduled') }}</span>
                     </div>
-                    <div class="flex items-center gap-2 text-sm" v-if="collection.draft_entries_count > 0">
-                        <ui-badge :text="String(collection.draft_entries_count)" pill class="bg-gray-200 dark:" />
+                    <div class="flex items-center gap-1.5" v-if="collection.draft_entries_count > 0">
+                        <ui-badge :text="String(collection.draft_entries_count)" pill class="bg-white! dark:bg-gray-700! [&_span]:st-text-trim-cap" />
                         <span>{{ __('Drafts') }}</span>
                     </div>
                 </ui-panel-footer>
@@ -283,7 +283,7 @@ export default {
 
             Statamic.$commandPalette.add({
                 category: Statamic.$commandPalette.category.Actions,
-                text: __('Toggle Grid Layout'),
+                text: __('Switch to Grid Layout'),
                 icon: 'layout-grid',
                 when: () => this.mode === 'list',
                 action: () => this.mode = 'grid',
@@ -291,7 +291,7 @@ export default {
 
             Statamic.$commandPalette.add({
                 category: Statamic.$commandPalette.category.Actions,
-                text: __('Toggle List Layout'),
+                text: __('Switch to List Layout'),
                 icon: 'layout-list',
                 when: () => this.mode === 'grid',
                 action: () => this.mode = 'list',
@@ -304,3 +304,11 @@ export default {
     },
 };
 </script>
+
+<style scoped>
+    @supports(text-box: cap alphabetic) {
+        [data-ui-panel-footer] [data-ui-badge] {
+            padding-block: calc(var(--spacing) * 1.5);
+        }
+    }
+</style>

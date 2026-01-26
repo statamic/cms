@@ -1,5 +1,5 @@
 <template>
-    <div class="dark:bg-dark-800 h-full bg-white rounded-s-xl">
+    <div class="h-full rounded-s-xl">
         <div class="flex h-full min-h-0 flex-col">
             <Listing
                 v-if="filters != null && view === 'list'"
@@ -10,6 +10,7 @@
                 :sort-direction="sortDirection"
                 :additional-parameters="additionalParameters"
                 v-model:selections="selections"
+                @request-completed="focusSearchInput"
             >
                 <template #initializing>
                     <div class="flex flex-1">
@@ -22,7 +23,7 @@
                 <div class="flex flex-1 flex-col gap-4 overflow-auto p-4">
                     <div class="flex items-center gap-2 sm:gap-3">
                         <div class="flex flex-1 items-center gap-2 sm:gap-3">
-                            <Search />
+                            <Search ref="search" />
                             <Filters v-if="filters && filters.length" />
                         </div>
 
@@ -43,6 +44,9 @@
                             <template #cell-status="{ row: entry }">
                                 <StatusIndicator :status="entry.status" show-label :show-dot="false" />
                             </template>
+                            <template #cell-type="{ value }">
+                                <Badge :text="value" />
+                            </template>
                         </Table>
                         <PanelFooter>
                             <Pagination />
@@ -61,40 +65,38 @@
                 </div>
 
                 <div class="mx-4 flex-1 overflow-auto">
-                    <Panel>
-                        <page-tree
-                            ref="tree"
-                            :pages-url="tree.url"
-                            :show-slugs="tree.showSlugs"
-                            :blueprints="tree.blueprints"
-                            :expects-root="tree.expectsRoot"
-                            :site="site"
-                            :preferences-prefix="`selector-field.${name}`"
-                            :editable="false"
-                            @branch-clicked="toggleSelection($event.id)"
-                        >
-                            <template #branch-action="{ branch, index }">
-                                <div>
-                                    <Checkbox
-                                        :ref="`tree-branch-${branch.id}`"
-                                        class="mt-3 mx-3"
-                                        :value="branch.id"
-                                        :model-value="isSelected(branch.id)"
-                                        :disabled="reachedSelectionLimit && !singleSelect && !isSelected(branch.id)"
-                                        :label="getCheckboxLabel(branch)"
-                                        :description="getCheckboxDescription(branch)"
-                                        size="sm"
-                                        solo
-                                        @update:model-value="toggleSelection(branch.id)"
-                                    />
-                                </div>
-                            </template>
+                    <page-tree
+                        ref="tree"
+                        :pages-url="tree.url"
+                        :show-slugs="tree.showSlugs"
+                        :blueprints="tree.blueprints"
+                        :expects-root="tree.expectsRoot"
+                        :site="site"
+                        :preferences-prefix="`selector-field.${name}`"
+                        :editable="false"
+                        @branch-clicked="toggleSelection($event.id)"
+                    >
+                        <template #branch-action="{ branch, index }">
+                            <div>
+                                <Checkbox
+                                    :ref="`tree-branch-${branch.id}`"
+                                    class="mt-3 mx-3"
+                                    :value="branch.id"
+                                    :model-value="isSelected(branch.id)"
+                                    :disabled="reachedSelectionLimit && !singleSelect && !isSelected(branch.id)"
+                                    :label="getCheckboxLabel(branch)"
+                                    :description="getCheckboxDescription(branch)"
+                                    size="sm"
+                                    solo
+                                    @update:model-value="toggleSelection(branch.id)"
+                                />
+                            </div>
+                        </template>
 
-                            <template #branch-icon="{ branch }">
-                                <ui-icon name="external-link" v-if="isRedirectBranch(branch)" v-tooltip="__('Redirect')" />
-                            </template>
-                        </page-tree>
-                    </Panel>
+                        <template #branch-icon="{ branch }">
+                            <ui-icon name="external-link" v-if="isRedirectBranch(branch)" v-tooltip="__('Redirect')" />
+                        </template>
+                    </page-tree>
                 </div>
             </template>
 
@@ -138,6 +140,7 @@ import {
     Checkbox,
     Icon,
     StatusIndicator,
+    Badge,
 } from '@/components/ui';
 
 export default {
@@ -156,6 +159,7 @@ export default {
         Checkbox,
         Icon,
         StatusIndicator,
+        Badge,
     },
 
     // todo, when opening and closing the stack, you cant save?
@@ -313,6 +317,10 @@ export default {
             // Try to get a meaningful title from common fields
             return row.title || row.name || row.label || row.id || __('item');
         },
+
+	    focusSearchInput() {
+		    this.$nextTick(() => this.$refs.search.focus());
+	    },
     },
 };
 </script>

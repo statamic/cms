@@ -10,9 +10,9 @@
                         v-tooltip="tooltipText"
                     />
                     <div class="flex items-center gap-2">
-                        <button class="cursor-pointer overflow-hidden text-ellipsis text-sm hover:text-ui-accent-text dark:hover:text-dark-ui-accent-text text-start" type="button" v-text="__(labelText)" @click="$emit('edit')" />
+                        <button class="cursor-pointer overflow-hidden text-ellipsis text-sm hover:text-ui-accent-text text-start" type="button" v-text="__(labelText)" @click="$emit('edit')" />
                         <ui-icon v-if="isReferenceField" name="link" class="text-gray-400" />
-                        <span v-if="isReferenceField" class="text-gray-500 font-mono text-2xs cursor-help" v-text="__('field')" v-tooltip="__('Imported from: :reference', { reference: field.field_reference })" />
+                        <span v-if="isReferenceField" class="text-gray-500 font-mono text-2xs cursor-help" v-text="__('Field')" v-tooltip="__('Imported from: :reference', { reference: field.field_reference })" />
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
@@ -31,7 +31,7 @@
                         <ui-button inset size="sm" icon="trash" variant="subtle" @click.prevent="$emit('deleted')" v-tooltip="__('Remove')" />
                     </div>
 
-                    <stack name="field-settings" v-if="isEditing" @closed="editorClosed">
+                    <Stack :open="isEditing" @update:open="editorClosed" inset :show-close-button="false" :wrap-slot="false">
                         <field-settings
                             ref="settings"
                             :id="field._id"
@@ -45,7 +45,7 @@
                             @committed="settingsUpdated"
                             @closed="editorClosed"
                         />
-                    </stack>
+                    </Stack>
                 </div>
             </div>
         </div>
@@ -59,7 +59,7 @@ import WidthSelector from '../fields/WidthSelector.vue';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';
 import titleize from '../../util/titleize';
 import deslugify from '../../util/deslugify';
-import { Icon } from '@/components/ui';
+import { Icon, Stack } from '@/components/ui';
 
 export default {
     mixins: [Field, CanDefineLocalizable],
@@ -68,6 +68,7 @@ export default {
         FieldSettings,
         WidthSelector,
         Icon,
+	    Stack,
     },
 
     props: ['suggestableConditionFields'],

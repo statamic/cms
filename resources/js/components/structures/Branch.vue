@@ -3,8 +3,8 @@
         <slot name="branch-action" :branch="page">
             <div v-if="editable" class="page-move w-6" />
         </slot>
-        <div class="flex flex-1 items-center p-1.5 text-xs leading-normal">
-            <div class="flex gap-2 sm:gap-3 grow items-center" @click="$emit('branch-clicked', page)">
+        <div class="flex flex-1 items-center px-1.5 text-xs leading-normal">
+            <div class="flex gap-2 sm:gap-3 grow items-center py-3" @click="$emit('branch-clicked', page)">
                 <ui-status-indicator :status="page.status" v-tooltip="getStatusTooltip()" />
                 <ui-icon v-if="isRoot" name="home" class="size-4" v-tooltip="__('This is the root page')" />
                 <a
@@ -37,9 +37,9 @@
                 <div v-if="page.collection && editable" class="flex items-center gap-2">
                     <Icon name="navigation" class="size-3.5 text-gray-500" />
                     <div>
-                        <Link :href="page.collection.create_url" v-text="__('Add')" class="hover:text-ui-accent-text dark:hover:text-dark-ui-accent-text" />
+                        <Link :href="page.collection.create_url" v-text="__('Add')" class="hover:text-ui-accent-text" />
                         <span class="mx-1 text-gray-400 dark:text-gray-500">/</span>
-                        <Link :href="page.collection.edit_url" v-text="__('Edit')" class="hover:text-ui-accent-text dark:hover:text-dark-ui-accent-text" />
+                        <Link :href="page.collection.edit_url" v-text="__('Edit')" class="hover:text-ui-accent-text" />
                     </div>
                 </div>
             </div>
@@ -55,16 +55,18 @@
 
                 <slot name="branch-icon" :branch="page" />
 
-                <Dropdown placement="left-start" :class="{ invisible: isRoot, hidden: !editable }">
-                    <DropdownMenu>
-                        <slot
-                            name="branch-options"
-                            :branch="page"
-                            :depth="depth"
-                            :remove-branch="remove"
-                        />
-                    </DropdownMenu>
-                </Dropdown>
+	            <template v-if="editable">
+	                <Dropdown placement="left-start" :class="{ invisible: isRoot }">
+	                    <DropdownMenu>
+	                        <slot
+	                            name="branch-options"
+	                            :branch="page"
+	                            :depth="depth"
+	                            :remove-branch="remove"
+	                        />
+	                    </DropdownMenu>
+	                </Dropdown>
+	            </template>
             </div>
         </div>
     </div>

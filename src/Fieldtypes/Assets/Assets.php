@@ -210,6 +210,7 @@ class Assets extends Fieldtype
                 'can_upload' => User::current()->can('store', [\Statamic\Contracts\Assets\Asset::class, $container]),
                 'can_edit' => User::current()->can('edit', $container),
                 'can_delete' => User::current()->can('delete', $container),
+                'can_create_folders' => User::current()->can('create', [\Statamic\Contracts\Assets\AssetFolder::class, $container]),
                 'sort_field' => $container->sortField(),
                 'sort_direction' => $container->sortDirection(),
             ],
@@ -244,9 +245,25 @@ class Assets extends Fieldtype
             ->defaultVisibility(true)
             ->sortable(true);
 
+        $width = Column::make('width')
+            ->label(__('Width'))
+            ->value('width')
+            ->visible(true)
+            ->defaultVisibility(false)
+            ->sortable(true);
+
+        $height = Column::make('height')
+            ->label(__('Height'))
+            ->value('height')
+            ->visible(true)
+            ->defaultVisibility(false)
+            ->sortable(true);
+
         $columns->put('basename', $basename);
         $columns->put('size', $size);
         $columns->put('last_modified', $lastModified);
+        $columns->put('width', $width);
+        $columns->put('height', $height);
 
         $columns->setPreferred("assets.{$this->container()->handle()}.columns");
 

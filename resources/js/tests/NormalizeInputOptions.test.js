@@ -1,18 +1,11 @@
 import { it, expect } from 'vitest';
 import hasInputOptions from '../components/fieldtypes/HasInputOptions';
+import { setTranslations } from '@/translations/translator.js';
 const normalizeInputOptions = hasInputOptions.methods.normalizeInputOptions;
 
-const config = {
-    translations: {
-        '*.One': 'Uno',
-    },
-};
-
-window.Statamic = {
-    $config: {
-        get: (key) => config[key],
-    },
-};
+setTranslations({
+    '*.One': 'Uno',
+});
 
 it('normalizes input options with simple array', () => {
     expect(normalizeInputOptions(['one', 'two'])).toEqual([

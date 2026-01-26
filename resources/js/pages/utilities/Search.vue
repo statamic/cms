@@ -19,56 +19,58 @@ function updateIndex(index) {
 <template>
     <Head :title="[__('Search'), __('Utilities')]" />
 
-    <Header :title="__('Search')" icon="magnifying-glass">
-        <Button variant="primary" @click="updateAll">
-            {{ __('Update Indexes') }}
-        </Button>
-    </Header>
+    <div class="max-w-5xl mx-auto">
+        <Header :title="__('Search')" icon="magnifying-glass">
+            <Button variant="primary" @click="updateAll">
+                {{ __('Update Indexes') }}
+            </Button>
+        </Header>
 
-    <CardPanel :heading="__('Search Indexes')">
-        <ErrorMessage v-if="errors.indexes" :text="errors.indexes[0]" class="p-4" />
+        <CardPanel :heading="__('Search Indexes')">
+            <ErrorMessage v-if="errors.indexes" :text="errors.indexes[0]" class="p-4" />
 
-        <Table>
-            <TableColumns>
-                <TableColumn v-text="__('Index')" />
-                <TableColumn v-text="__('Driver')" />
-                <TableColumn v-text="__('Searchables')" />
-                <TableColumn v-text="__('Fields')" />
-                <TableColumn />
-            </TableColumns>
-            <TableRows>
-                <TableRow v-for="index in indexes" :key="`${index.name}::${index.locale}`">
-                    <TableCell>
-                        <div class="flex items-start">
-                            <div class="-mt-0.5 flex size-6 shrink-0 me-2 text-black dark:text-gray-200 [&_.icon-background]:fill-gray-100 dark:[&_.icon-background]:fill-gray-900" v-html="index.driverIcon" />
-                            <span class="text-gray-900 dark:text-gray-200" v-text="index.title" />
-                        </div>
-                    </TableCell>
-                    <TableCell>
-                        {{ index.driver.charAt(0).toUpperCase() + index.driver.slice(1) }}
-                    </TableCell>
-                    <TableCell>
-                        <div v-if="typeof index.searchables === 'string'" class="flex flex-wrap">
-                            <Badge v-text="index.searchables" />
-                        </div>
-                        <div v-else class="flex flex-wrap gap-1 text-sm text-gray">
-                            <Badge v-for="searchable in index.searchables" :key="searchable" v-text="searchable" />
-                        </div>
-                    </TableCell>
-                    <TableCell>
-                        <div class="flex flex-wrap gap-2">
-                            <Badge v-for="field in index.fields" :key="field" v-text="field" />
-                        </div>
-                    </TableCell>
-                    <TableCell class="text-right rtl:text-left">
-                        <Button size="sm" @click="updateIndex(index)">
-                            {{ __('Update') }}
-                        </Button>
-                    </TableCell>
-                </TableRow>
-            </TableRows>
-        </Table>
-    </CardPanel>
+            <Table>
+                <TableColumns>
+                    <TableColumn v-text="__('Index')" />
+                    <TableColumn v-text="__('Driver')" />
+                    <TableColumn v-text="__('Searchables')" />
+                    <TableColumn v-text="__('Fields')" />
+                    <TableColumn />
+                </TableColumns>
+                <TableRows>
+                    <TableRow v-for="index in indexes" :key="`${index.name}::${index.locale}`">
+                        <TableCell>
+                            <div class="flex items-start">
+                                <div class="-mt-0.5 flex size-6 shrink-0 me-2 text-gray-925 dark:text-gray-200 [&_.icon-background]:fill-gray-100 dark:[&_.icon-background]:fill-gray-900" v-html="index.driverIcon" />
+                                <span class="text-gray-900 dark:text-gray-200" v-text="index.title" />
+                            </div>
+                        </TableCell>
+                        <TableCell>
+                            {{ index.driver.charAt(0).toUpperCase() + index.driver.slice(1) }}
+                        </TableCell>
+                        <TableCell>
+                            <div v-if="typeof index.searchables === 'string'" class="flex flex-wrap">
+                                <Badge v-text="index.searchables" />
+                            </div>
+                            <div v-else class="flex flex-wrap gap-1 text-sm text-gray">
+                                <Badge v-for="searchable in index.searchables" :key="searchable" v-text="searchable" />
+                            </div>
+                        </TableCell>
+                        <TableCell>
+                            <div class="flex flex-wrap gap-2">
+                                <Badge v-for="field in index.fields" :key="field" v-text="field" />
+                            </div>
+                        </TableCell>
+                        <TableCell class="text-right rtl:text-left">
+                            <Button size="sm" @click="updateIndex(index)">
+                                {{ __('Update') }}
+                            </Button>
+                        </TableCell>
+                    </TableRow>
+                </TableRows>
+            </Table>
+        </CardPanel>
 
-    <DocsCallout :topic="__('Search Indexes')" url="search#indexes" />
+        <DocsCallout :topic="__('Search Indexes')" url="search#indexes" />
+    </div>
 </template>

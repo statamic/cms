@@ -1,21 +1,19 @@
 <template>
-    <div class="h-full overflow-auto bg-white dark:bg-gray-800 focus-none p-3 pt-0">
-        <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
-            <Icon name="loading" />
-        </div>
+    <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
+        <Icon name="loading" />
+    </div>
 
-        <header v-if="!loading" class="flex flex-wrap items-center justify-between pl-3 pt-3 pb-4 -mb-4 sticky top-0 z-(--z-index-modal) bg-gradient-to-b from-white from-75% dark:from-gray-800">
-            <Heading :text=" __(fieldtype.title + ' ' + 'Field')" size="lg" :icon="fieldtype.icon" />
-            <div class="flex items-center gap-3">
-                <Button variant="ghost" :text="__('Cancel')" @click.prevent="close" />
-                <Button variant="default" @click.prevent="commit()" :text="__('Apply')" />
-                <Button v-if="!(isInsideSet || isInsideConfigFields)" variant="primary" @click.prevent="commitAndSave()" icon="save" :text="__('Apply & Save')" />
-                <Button v-if="isInsideSet || isInsideConfigFields" variant="default" @click.prevent="commit(true)" :text="__('Apply & Close All')" />
-                <Button v-if="isInsideSet || isInsideConfigFields" variant="primary" @click.prevent="commitAndSaveAndCloseAll()" icon="save" :text="__('Save & Close All')" />
-            </div>
-        </header>
+    <StackHeader v-if="!loading" :title="__(values.display) || __(config.display) || config.handle" :icon="fieldtype.icon">
+        <template #actions>
+            <Button variant="default" @click.prevent="commit" :text="__('Apply')" />
+            <Button v-if="!(isNestedField)" variant="primary" @click.prevent="commitAndSave" icon="save" :text="__('Apply & Save')" />
+            <Button v-if="isNestedField" variant="default" @click.prevent="commitAndCloseAll" :text="__('Apply & Close All')" />
+            <Button v-if="isNestedField" variant="primary" @click.prevent="commitAndSaveAll" icon="save" :text="__('Save & Close All')" />
+        </template>
+    </StackHeader>
 
-        <section v-if="!loading" class="isolate lg:px-3 py-4">
+    <StackContent>
+        <section v-if="!loading" class="isolate">
             <Tabs v-model:modelValue="activeTab">
                 <TabList class="mb-6">
                     <TabTrigger name="settings" :text="__('Settings')" />
@@ -41,7 +39,7 @@
                     <TabContent name="conditions">
                         <CardPanel :heading="__('Conditions')">
                             <FieldConditionsBuilder
-                                :config="config"
+                                :config="values"
                                 :suggestable-fields="suggestableConditionFields"
                                 @updated="updateFieldConditions"
                                 @updated-always-save="updateAlwaysSave"
@@ -51,22 +49,24 @@
 
                     <TabContent name="validation">
                         <CardPanel :heading="__('Validation')">
-                            <FieldValidationBuilder :config="config" @updated="updateField('validate', $event)" />
+                            <FieldValidationBuilder :config="values" @updated="updateField('validate', $event)" />
                         </CardPanel>
                     </TabContent>
                 </div>
             </Tabs>
         </section>
-    </div>
+    </StackContent>
 </template>
 
 <script>
 import { FieldConditionsBuilder, FIELD_CONDITIONS_KEYS } from '../field-conditions/FieldConditions.js';
 import FieldValidationBuilder from '../field-validation/Builder.vue';
-import { Heading, Button, Tabs, TabList, TabTrigger, TabContent, CardPanel, Icon } from '@/components/ui';
+import { Heading, Button, Tabs, TabList, TabTrigger, TabContent, CardPanel, Icon, StackHeader, StackContent } from '@/components/ui';
 
 export default {
     components: {
+        StackContent,
+        StackHeader,
         FieldConditionsBuilder,
         FieldValidationBuilder,
         Heading,
@@ -186,6 +186,10 @@ export default {
 
             return this.fieldtypeConfig;
         },
+
+        isNestedField() {
+            return this.isInsideSet || this.isInsideConfigFields;
+        },
     },
 
     created() {
@@ -251,7 +255,9 @@ export default {
             }
         },
 
-        commit(shouldCommitParent = false) {
+        commit(params = {}) {
+            let { shouldCommitParent, shouldSaveRoot } = params;
+
             this.clearErrors();
 
             this.$axios
@@ -265,34 +271,43 @@ export default {
                 .then((response) => {
                     this.$refs.container?.clearDirtyState();
                     this.$emit('committed', response.data, this.editedFields);
-                    this.close();
 
                     if (shouldCommitParent && this.commitParentField) {
-                        this.commitParentField(true);
+                        this.commitParentField(params);
+                        this.close();
+
+                        return;
                     }
+
+                    if (shouldSaveRoot) {
+                        this.saveRootForm();
+                    }
+
+                    this.close();
                 })
                 .catch((e) => this.handleAxiosError(e));
         },
 
+        // Top-level field: saves the current field and the blueprint/fieldset.
         commitAndSave() {
-            this.clearErrors();
+            this.commit({
+                shouldSaveRoot: true,
+            });
+        },
 
-            this.$axios
-                .post(cp_url('fields/update'), {
-                    id: this.id,
-                    type: this.type,
-                    values: this.values,
-                    fields: this.fields,
-                    isInsideSet: this.isInsideSet,
-                })
-                .then((response) => {
-                    this.$refs.container?.clearDirtyState();
-                    this.$emit('committed', response.data, this.editedFields);
+        // Nested field: saves the current field and any parents.
+        commitAndCloseAll() {
+            this.commit({
+                shouldCommitParent: true,
+            });
+        },
 
-                    this.saveRootForm();
-                    this.close();
-                })
-                .catch((e) => this.handleAxiosError(e));
+        // Nested field: saves the current field and the blueprint/fieldset.
+        commitAndSaveAll() {
+            this.commit({
+                shouldCommitParent: true,
+                shouldSaveRoot: true,
+            });
         },
 
         saveRootForm() {
@@ -301,50 +316,9 @@ export default {
         },
 
         handleSaveShortcut() {
-            if (this.isInsideSet || this.isInsideConfigFields) {
-                this.commitAndSaveAndCloseAll();
-            } else {
-                this.commitAndSave();
-            }
-        },
-
-        commitAndSaveAndCloseAll() {
-            if (this.isSaving) {
-                return;
-            }
-
-            this.isSaving = true;
-
-            this.clearErrors();
-
-            this.$axios
-                .post(cp_url('fields/update'), {
-                    id: this.id,
-                    type: this.type,
-                    values: this.values,
-                    fields: this.fields,
-                    isInsideSet: this.isInsideSet,
-                })
-                .then((response) => {
-                    this.$refs.container?.clearDirtyState();
-                    this.$emit('committed', response.data, this.editedFields);
-
-                    // Close all stacks first
-                    this.close();
-                    if (this.commitParentField) {
-                        this.commitParentField(true);
-                    }
-
-                    // Wait a bit for the field changes to be fully processed, then save the blueprint
-                    setTimeout(() => {
-                        this.saveRootForm();
-                        this.isSaving = false;
-                    }, 100);
-                })
-                .catch((e) => {
-                    this.handleAxiosError(e);
-                    this.isSaving = false;
-                });
+            this.isNestedField
+                ? this.commitAndSaveAll()
+                : this.commitAndSave();
         },
 
         handleAxiosError(e) {

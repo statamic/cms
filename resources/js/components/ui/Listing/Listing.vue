@@ -36,100 +36,126 @@ const emit = defineEmits([
 ]);
 
 const props = defineProps({
+    /** The URL from which to retrieve results. Either use this or `items`. */
     url: {
         type: String,
     },
+    /** Array of items to display in the listing. When provided, sorting and filtering is done client-side. Either use this or `url`. */
     items: {
         type: Array,
     },
+    /** When `true`, allows users to save and load column/filter presets. */
     allowPresets: {
         type: Boolean,
         default: true,
     },
+    /** When `true`, bulk actions are available when items are selected. */
     allowBulkActions: {
         type: Boolean,
         default: true,
     },
+    /** The URL from which to retrieve actions. */
     actionUrl: {
         type: String,
     },
+    /** Extra data to pass to the server when using actions. */
     actionContext: {
         type: Object,
         default: () => ({}),
     },
+    /** When `true`, enables the action dropdown while reordering is enabled. */
     allowActionsWhileReordering: {
         type: Boolean,
         default: false,
     },
+    /** When `true`, adds drag handles to the rows. */
     reorderable: {
         type: Boolean,
         default: false,
     },
+    /** Any preferences (preferred columns, etc) will be saved nested under this. */
     preferencesPrefix: {
         type: String,
     },
+    /** The columns to display. Can be array of strings or column definitions. */
     columns: {
         type: Array,
     },
+    /** When `true`, users can show/hide columns. */
     allowCustomizingColumns: {
         type: Boolean,
         default: true,
     },
+    /** Defines the sort column. */
     sortColumn: {
         type: String,
         default: '',
     },
+    /** Defines the sort direction. Defaults to `asc` for most fields, `desc` for dates. <br><br> Options: `asc`, `desc` */
     sortDirection: {
         type: String,
         default: 'asc',
     },
+    /** When `true`, columns can be sorted by clicking on headers. */
     sortable: {
         type: Boolean,
         default: true,
     },
+    /** Array of checked item IDs. */
     selections: {
         type: Array,
     },
+    /** Maximum number of items that can be selected. */
     maxSelections: {
         type: Number,
         default: Infinity,
     },
+    /** When `true`, adds the parameters to the current URL. */
     pushQuery: {
         type: Boolean,
         default: false,
     },
+    /** Extra data to send to the AJAX URL. */
     additionalParameters: {
         type: Object,
         default: () => ({}),
     },
+    /** When `true`, displays a search input for filtering items. */
     allowSearch: {
         type: Boolean,
         default: true,
     },
+    /** The search query value. */
     searchQuery: {
         type: String,
         default: null,
     },
+    /** Array of filter definitions. You can get this by doing `Scope::filters($name, $context)` */
     filters: {
         type: Array,
         default: () => [],
     },
+    /** A function that returns array of filter values to be activated when reordering is enabled. */
     filtersForReordering: {
         type: Function,
         default: null,
     },
+    /** Number of items to display per page. */
     perPage: {
         type: Number,
         default: 15,
     },
+    /** When `true`, shows the totals in the paginator. e.g. "1-5 of 10" */
     showPaginationTotals: {
         type: Boolean,
         default: true,
     },
+    /** When `true`, shows the page links. e.g. 1,2,3,4. With this disabled you'll just get the prev/next arrows. */
     showPaginationPageLinks: {
         type: Boolean,
         default: true,
     },
+    /** When `true`, shows the per page dropdown. */
     showPaginationPerPageSelector: {
         type: Boolean,
         default: true,
@@ -554,6 +580,10 @@ function autoApplyFilters() {
 }
 
 function reordered(order) {
+	if (! props.items) {
+		items.value = order;
+	}
+
     emit('reordered', order);
 }
 
@@ -596,6 +626,7 @@ provideListingContext({
     isColumnVisible,
     hiddenColumns,
     sortColumn,
+    sortDirection,
     setSortColumn,
     selections,
     maxSelections: toRef(() => props.maxSelections),
@@ -684,7 +715,7 @@ autoApplyState();
     </slot>
     <slot v-if="!initializing" :items="items" :is-column-visible="isColumnVisible" :loading="loading">
         <Presets v-if="showPresets" />
-        <div v-if="allowSearch || hasFilters || allowCustomizingColumns" class="relative flex items-center gap-2 sm:gap-3 min-h-16 starting-style-transition starting-style-transition--siblings">
+        <div v-if="allowSearch || hasFilters || allowCustomizingColumns" class="relative overflow-clip flex items-center gap-2 sm:gap-3 min-h-16 starting-style-transition st-overflow-clip-margin">
             <div class="flex flex-1 items-center gap-2 sm:gap-3 w-full">
                 <Search v-if="allowSearch" />
                 <Filters v-if="hasFilters" />
