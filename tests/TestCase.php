@@ -38,13 +38,11 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
         if ($this->shouldFakeVersion) {
             \Facades\Statamic\Version::shouldReceive('get')->zeroOrMoreTimes()->andReturn('3.0.0-testing');
-            $this->addToAssertionCount(-1); // Dont want to assert this
         }
 
         if ($this->shouldPreventNavBeingBuilt) {
             \Statamic\Facades\CP\Nav::shouldReceive('build')->zeroOrMoreTimes()->andReturn(collect());
             \Statamic\Facades\CP\Nav::shouldReceive('clearCachedUrls')->zeroOrMoreTimes();
-            $this->addToAssertionCount(-2); // Dont want to assert this
         }
 
         $this->addGqlMacros();
