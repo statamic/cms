@@ -10,6 +10,8 @@ use Statamic\Facades\CommandPalette;
 use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Statamic\Search\Index;
+use Statamic\Support\Arr;
 
 class CommandPaletteController extends CpController
 {
@@ -20,7 +22,9 @@ class CommandPaletteController extends CpController
 
     public function search(Request $request)
     {
-        return Search::index(index: 'cp', locale: Site::selected()->handle())
+        $index = Search::index(index: 'cp', locale: Site::selected()->handle());
+
+        return $index
             ->ensureExists()
             ->search($request->query('q'))
             ->get()
@@ -28,14 +32,25 @@ class CommandPaletteController extends CpController
                 return ! empty($item->getCpUrl()) && User::current()->can('view', $item->getSearchable());
             })
             ->take(10)
-            ->map(function (Result $result) {
+            ->map(function (Result $result) use ($index) {
                 return (new ContentSearchResult(text: $result->getCpTitle(), category: Category::Search))
                     ->url($result->getCpUrl())
-                    ->badge($result->getCpBadge())
+                    ->badge($this->badge($index, $result))
                     ->reference($result->getReference())
                     ->icon($result->getCpIcon())
                     ->toArray();
             })
             ->values();
+    }
+
+    private function badge(Index $index, Result $result)
+    {
+        $badge = $result->getCpBadge();
+
+        if (! Arr::has($index->config(), 'sites')) {
+            $badge = $result->getSearchable()->site()->name().' - '.$badge;
+        }
+
+        return $badge;
     }
 }

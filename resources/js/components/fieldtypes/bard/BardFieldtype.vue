@@ -50,11 +50,12 @@
                     </div>
 
                     <div
-                        class="bard-editor @container/bard focus-within:focus-outline"
+                        class="bard-editor @container/bard"
                         :class="{
                             'mode:read-only': readOnly,
                             'mode:minimal': !showFixedToolbar,
                             'mode:inline': inputIsInline,
+                            'focus-within:focus-outline': !fullScreenMode,
                         }"
                         tabindex="0"
                     >
@@ -93,10 +94,11 @@
                                 v-if="showAddSetButton"
                                 :sets="groupConfigs"
                                 class="bard-set-selector"
+                                :loading-set="loadingSet"
                                 @added="addSet"
                             >
                                 <template #trigger>
-                                    <div class="absolute flex items-center gap-2 top-[-6px] z-1 -start-4.5 group" :style="{ transform: `translateY(${y}px)` }">
+                                    <div class="absolute flex items-center gap-2 top-[-6px] z-1 -start-7 @lg/bard:-start-4.5 group" :style="{ transform: `translateY(${y}px)` }">
                                         <ui-button
                                             icon="plus"
                                             size="sm"
@@ -104,7 +106,7 @@
                                             v-tooltip="__('Add Set')"
                                         />
                                         <ui-description
-                                            v-if="!$refs.setPicker?.isOpen"
+                                            v-show="shouldShowAddSetHelperText"
                                             :text="__('Type \'/\' to insert a set')"
                                             :class="{'ps-9': fullScreenMode}"
                                         />
@@ -174,6 +176,7 @@ import { common, createLowlight } from 'lowlight';
 import 'highlight.js/styles/github.css';
 import importTiptap from '@/util/tiptap.js';
 import { computed } from 'vue';
+import { data_get } from "@/bootstrap/globals.js";
 
 const lowlight = createLowlight(common);
 let tiptap = null;
@@ -208,6 +211,7 @@ export default {
             pageHeader: null,
             escBinding: null,
             showAddSetButton: false,
+            hasBeenFocused: false,
             provide: {
                 bard: this.makeBardProvide(),
                 bardSets: this.config.sets,
@@ -215,6 +219,8 @@ export default {
             },
             errorsById: {},
             debounceNextUpdate: true,
+            setsCache: {},
+            loadingSet: null,
         };
     },
 
@@ -359,6 +365,10 @@ export default {
                 },
             ];
         },
+
+        shouldShowAddSetHelperText() {
+            return !this.$refs.setPicker?.isOpen && this.suitableToShowSetButton(this.editor);
+        },
     },
 
     created() {
@@ -406,7 +416,7 @@ export default {
         json(json, oldJson) {
             if (!this.mounted) return;
 
-            if (json === oldJson) return;
+            if (JSON.stringify(json) === JSON.stringify(oldJson)) return;
 
             this.debounceNextUpdate
                 ? this.updateDebounced(json)
@@ -440,9 +450,19 @@ export default {
 
             if (fullScreenMode) {
                 this.escBinding = this.$keys.bindGlobal('esc', this.closeFullscreen);
+                // Focus the editor content when entering fullscreen mode
+                this.$nextTick(() => {
+                    if (this.editor) {
+                        this.editor.commands.focus();
+                    }
+                });
             } else {
                 this.escBinding?.destroy();
             }
+        },
+
+        loadingSet(loading) {
+            this.$progress.loading('bard-set', !!loading);
         },
 
         'publishContainer.errors': {
@@ -469,11 +489,20 @@ export default {
 
     methods: {
         addSet(handle) {
+            this.loadingSet = handle;
+
+            this.fetchSet(handle)
+                .then(data => this._addSet(handle, data))
+                .catch(() => this.$toast.error(__('Something went wrong')))
+                .finally(() => this.loadingSet = null);
+        },
+
+        _addSet(handle, data) {
             const id = uniqid();
-            const deepCopy = JSON.parse(JSON.stringify(this.meta.defaults[handle]));
+            const deepCopy = JSON.parse(JSON.stringify(data.defaults));
             const values = Object.assign({}, { type: handle }, deepCopy);
 
-            this.updateSetMeta(id, this.meta.new[handle]);
+            this.updateSetMeta(id, data.new);
 
             const { $head } = this.editor.view.state.selection;
             const { nodeBefore } = $head;
@@ -490,7 +519,51 @@ export default {
             });
         },
 
-        duplicateSet(old_id, attrs, pos) {
+        async fetchSet(set) {
+            return new Promise(async (resolve, reject) => {
+                const field = this.bardFieldPath();
+                const setCacheKey = `${field}.${set}`;
+                const reference = this.publishContainer.reference;
+                const blueprint = this.publishContainer.blueprint.fqh;
+
+                if (this.setsCache[setCacheKey]) {
+                    resolve(this.setsCache[setCacheKey]);
+                    return;
+                }
+
+                this.$axios.post(cp_url('fieldtypes/replicator/set'), { blueprint, reference, field, set })
+                    .then(response => {
+                        this.setsCache[setCacheKey] = response.data;
+                        resolve(response.data);
+                    })
+                    .catch(error => reject(error));
+            });
+        },
+
+        /**
+         * Returns the path to the Bard field, replacing any set indexes with handles.
+         */
+        bardFieldPath() {
+            if (!this.fieldPathPrefix) {
+                return this.handle;
+            }
+
+            return this.fieldPathKeys
+                .map((key, index) => {
+                    if (Number.isInteger(parseInt(key))) {
+	                    let setValues =  data_get(this.publishContainer.values, this.fieldPathKeys.slice(0, index + 1).join('.'));
+
+						return setValues.attrs?.values.type || setValues.type;
+                    }
+
+                    return key;
+                })
+                .filter((key) => key !== undefined)
+                .concat(this.handle)
+                .join('.');
+        },
+
+        duplicateSet(old_id, attrs, getPos) {
             const id = uniqid();
             const enabled = attrs.enabled;
             const deepCopy = JSON.parse(JSON.stringify(attrs.values));
@@ -498,19 +571,29 @@ export default {
 
             this.updateSetMeta(id, this.meta.existing[old_id]);
 
+            this.debounceNextUpdate = false;
+
             // Perform this in nextTick because the meta data won't be ready until then.
             this.$nextTick(() => {
-                this.editor.commands.setAt({ attrs: { id, enabled, values }, pos });
+                const pos = getPos();
+                const node = this.editor.state.doc.nodeAt(pos);
+                const insertPos = pos + (node?.nodeSize || 0);
+                this.editor.commands.setAt({ attrs: { id, enabled, values }, pos: insertPos });
             });
         },
 
-        pasteSet(attrs) {
+        async pasteSet(attrs) {
             const old_id = attrs.id;
             const id = uniqid();
             const enabled = attrs.enabled;
             const values = Object.assign({}, attrs.values);
 
-            this.updateSetMeta(id, this.meta.existing[old_id] || this.meta.defaults[values.type] || {});
+            if (this.meta.existing[old_id]) {
+                this.updateSetMeta(id, this.meta.existing[old_id]);
+            } else {
+                const data = await this.fetchSet(values.type);
+                this.updateSetMeta(id, data.new);
+            }
 
             return { id, enabled, values };
         },
@@ -563,7 +646,7 @@ export default {
             const { $anchor, empty } = selection;
             const isRootDepth = $anchor.depth === 1;
             const isEmptyTextBlock =
-                $anchor.parent.isTextblock && !$anchor.parent.type.spec.code && !$anchor.parent.textContent;
+                ($anchor.parent.isTextblock && !$anchor.parent.firstChild) && !$anchor.parent.type.spec.code && !$anchor.parent.textContent;
             const isAroundInlineImage =
                 state.selection.$to.nodeBefore?.type.name === 'image' ||
                 state.selection.$to.nodeAfter?.type.name === 'image';
@@ -739,8 +822,11 @@ export default {
                 enableInputRules: this.config.enable_input_rules,
                 enablePasteRules: this.config.enable_paste_rules,
                 editorProps: { attributes: { class: 'bard-content' } },
-	            onDrop: () => this.debounceNextUpdate = false,
-                onFocus: () => this.$emit('focus'),
+                onDrop: () => this.debounceNextUpdate = false,
+                onFocus: () => {
+                    this.hasBeenFocused = true;
+                    this.$emit('focus');
+                },
                 onBlur: () => {
                     // Since clicking into a field inside a set would also trigger a blur, we can't just emit the
                     // blur event immediately. We need to make sure that the newly focused element is outside
@@ -972,6 +1058,7 @@ export default {
             Object.defineProperties(bard, {
                 setConfigs: { get: () => this.setConfigs },
                 isReadOnly: { get: () => this.readOnly },
+                hasBeenFocused: { get: () => this.hasBeenFocused },
             });
             return bard;
         },

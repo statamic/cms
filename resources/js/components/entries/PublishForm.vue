@@ -144,15 +144,19 @@
                                         <Icon name="checkmark" class="text-green-600" />
                                         {{ __('Entry has a published version') }}
                                     </Subheading>
-                                    <Subheading v-else class="flex items-center gap-2 text-yellow-600">
+                                    <Subheading v-else class="flex items-center gap-2 text-yellow-700 dark:text-yellow-500">
                                         <Icon name="warning-diamond" />
                                         {{ __('Entry has not been published') }}
+                                    </Subheading>
+                                    <Subheading v-if="isWorkingCopy" class="flex items-center gap-2 text-yellow-700 dark:text-yellow-500">
+                                        <Icon name="warning-diamond" />
+                                        {{ __('This is the working copy') }}
                                     </Subheading>
                                     <Subheading v-if="!isWorkingCopy && published" class="flex items-center gap-2">
                                         <Icon name="checkmark" class="text-green-600" />
                                         {{ __('This is the published version') }}
                                     </Subheading>
-                                    <Subheading v-if="isDirty" class="flex items-center gap-2 text-yellow-600">
+                                    <Subheading v-if="isDirty" class="flex items-center gap-2 text-yellow-700 dark:text-yellow-500">
                                         <Icon name="warning-diamond" />
                                         {{ __('Unsaved Changes') }}
                                     </Subheading>
@@ -220,7 +224,7 @@
         />
 
         <confirmation-modal
-            v-if="selectingOrigin"
+            :open="selectingOrigin"
             :title="__('Create Localization')"
             :buttonText="__('Create')"
             @cancel="cancelLocalization()"
@@ -234,7 +238,7 @@
         </confirmation-modal>
 
         <confirmation-modal
-            v-if="pendingLocalization"
+            :open="pendingLocalization"
             :title="__('Unsaved Changes')"
             :body-text="__('Are you sure? Unsaved changes will be lost.')"
             :button-text="__('Continue')"
@@ -821,13 +825,15 @@ export default {
                 prioritize: true,
             });
 
-            Statamic.$commandPalette.add({
-                category: Statamic.$commandPalette.category.Actions,
-                text: __('Edit Blueprint'),
-                icon: 'blueprint-edit',
-                when: () => this.canEditBlueprint,
-                url: this.actions.editBlueprint,
-            });
+			if (this.actions.editBlueprint) {
+				Statamic.$commandPalette.add({
+					category: Statamic.$commandPalette.category.Actions,
+					text: __('Edit Blueprint'),
+					icon: 'blueprint-edit',
+					when: () => this.canEditBlueprint,
+					url: this.actions.editBlueprint,
+				});
+			}
 
             this.$refs.actions?.preparedActions.forEach(action => Statamic.$commandPalette.add({
                 category: Statamic.$commandPalette.category.Actions,

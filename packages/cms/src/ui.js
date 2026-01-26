@@ -1,4 +1,5 @@
 export const {
+    Alert,
     AuthCard,
     Avatar,
     Badge,
@@ -15,6 +16,7 @@ export const {
     CodeEditor,
     Combobox,
     CommandPaletteItem,
+    ConfirmationModal,
     Context,
     ContextFooter,
     ContextHeader,

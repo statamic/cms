@@ -87,7 +87,7 @@ function copyToClipboard() {
     </Modal>
 
     <confirmation-modal
-        v-if="confirming"
+        :open="confirming"
         :danger="true"
         :title="__('Are you sure?')"
         @cancel="confirming = false"

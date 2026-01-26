@@ -7,7 +7,8 @@ import {
     useSlots,
     watch,
     onBeforeUnmount,
-    provide
+    provide,
+    onMounted,
 } from 'vue';
 import { stacks, events, keys, config } from '@/api';
 import wait from '@/util/wait.js';
@@ -36,6 +37,8 @@ const props = defineProps({
     inset: { type: Boolean, default: false },
     /** When `true`, the close button is shown in the top-right corner of the stack. */
     showCloseButton: { type: Boolean, default: true },
+    /** When `false`, the logic for wrapping the slot in a Content component is ignored and the slot will not be wrapped. */
+    wrapSlot: { type: Boolean, default: true },
 });
 
 const stack = ref(null);
@@ -54,11 +57,11 @@ const hasStackHeaderComponent = hasComponent('StackHeader', slotProps);
 const hasStackContentComponent = hasComponent('StackContent', slotProps);
 const isUsingOpenProp = computed(() => instance?.vnode.props?.hasOwnProperty('open'));
 const portal = computed(() => stack.value ? `#portal-target-${stack.value.id}` : null);
-const depth = computed(() => stack.value?.data.depth);
+const depth = computed(() => stacks.stacks().findIndex(s => s.id === stack.value?.id) + 1);
 const isTopStack = computed(() => stacks.count() === depth.value);
 
 const shouldAddHeader = computed(() => !!(props.title || props.icon) && !hasStackHeaderComponent.value);
-const shouldWrapSlot = computed(() => !hasStackContentComponent.value);
+const shouldWrapSlot = computed(() => props.wrapSlot && !hasStackContentComponent.value);
 const shouldShowFloatingCloseButton = computed(() => props.showCloseButton && !shouldAddHeader.value && !hasStackHeaderComponent.value);
 
 const offset = computed(() => {
@@ -173,8 +176,11 @@ function cleanup() {
 watch(
     () => props.open,
     (value) => value ? open() : close(),
-    { immediate: true }
 );
+
+onMounted(() => {
+	if (props.open) open();
+});
 
 onBeforeUnmount(() => {
     cleanup();
@@ -203,7 +209,7 @@ provide('closeStack', close);
                 <transition name="stack-overlay-fade">
                     <div
                         v-if="visible"
-                        class="stack-overlay fixed inset-0 bg-gray-800/20 dark:bg-gray-800/50 backdrop-blur-[2px]"
+                        class="stack-overlay fixed inset-0 bg-gray-800/20 dark:bg-gray-800/50"
                         :style="direction === 'ltr' ? { left: `-${leftOffset}px` } : { right: `-${leftOffset}px` }"
                     />
                 </transition>
@@ -219,7 +225,7 @@ provide('closeStack', close);
                 <transition name="stack-slide">
                     <div
                         v-if="visible"
-                        class="stack-content fixed flex flex-col sm:end-1.5 bg-content-bg dark:bg-dark-content-bg overflow-hidden rounded-xl shadow-[0_8px_5px_-6px_rgba(0,0,0,0.1),_0_3px_8px_0_rgba(0,0,0,0.02),_0_30px_22px_-22px_rgba(39,39,42,0.15)] dark:shadow-[0_5px_20px_rgba(0,0,0,.5)] transition-transform duration-150 ease-out"
+                        class="stack-content fixed flex flex-col sm:end-1.5 bg-content-bg dark:bg-dark-content-bg overflow-hidden rounded-xl shadow-[0_8px_5px_-6px_rgba(0,0,0,0.1),_0_3px_8px_0_rgba(0,0,0,0.02),_0_30px_22px_-22px_rgba(39,39,42,0.15)] dark:shadow-[0_5px_20px_rgba(0,0,0,.5)] transition-transform duration-200 ease-out will-change-transform"
                         :class="[
                             size === 'full' ? 'inset-2 w-[calc(100svw-1rem)]' : 'inset-y-2',
                             { '-translate-x-4 rtl:translate-x-4': isHovering }

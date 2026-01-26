@@ -164,11 +164,25 @@ function handleStackClosed() {
             :key="handle"
             variant="filled"
             :icon-append="reorderable ? null : 'x'"
-            :text="badge"
             :disabled="reorderable"
             class="last:me-12"
             @click="removeFieldFilter(handle)"
-        />
+        >
+            <template v-if="handle == 'date'">
+                {{ badge.field }}
+                {{ badge.translatedOperator }}
+                <template v-if="badge.operator === 'between'">
+                    <date-time :of="badge.value.start" options="date" />
+                    {{ __('and') }}
+                    <date-time :of="badge.value.end" options="date" />
+                </template>
+                <date-time v-else :of="badge.value" options="date" />
+            </template>
+
+            <template v-else>
+                {{ badge }}
+            </template>
+        </Button>
         <Button
             v-for="(badge, handle, index) in standardBadges"
             :key="handle"

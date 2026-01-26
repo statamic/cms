@@ -139,6 +139,14 @@ function initCodeMirror() {
 
     codemirror.value.on('focus', () => emit('focus'));
     codemirror.value.on('blur', () => emit('blur'));
+
+    codemirror.value.on('keydown', (cm, e) => {
+	    // Handle ESC to blur/unfocus the editor
+        if (e.keyCode === 27) {
+            e.preventDefault();
+            codemirror.value.getInputField().blur();
+        }
+    });
 }
 
 watch(
@@ -277,7 +285,7 @@ watch(
                     <span v-else v-text="modeLabel" class="font-mono text-xs text-gray-700 dark:text-gray-300" />
                 </div>
             </div>
-            <div ref="codemirrorElement" class="font-mono text-sm border border-gray-300 dark:border dark:border-white/10 dark:bg-gray-900 rounded-lg [&_.CodeMirror]:rounded-lg" :class="{ 'dark:border-t-0 rounded-t-none [&_.CodeMirror]:rounded-t-none': showToolbar }"></div>
+            <div ref="codemirrorElement" class="font-mono text-xs border border-gray-300 dark:border dark:border-gray-700 dark:bg-gray-900 rounded-lg [&_.CodeMirror]:rounded-lg" :class="{ 'dark:border-t-0 rounded-t-none [&_.CodeMirror]:rounded-t-none': showToolbar }"></div>
         </div>
     </portal>
 </template>

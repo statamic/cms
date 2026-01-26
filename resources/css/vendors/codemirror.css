@@ -23,7 +23,7 @@
 /* CODEMIRROR / GUTTERS
 =================================================== */
 .CodeMirror-gutters {
-    @apply border-r bg-gray-200;
+    @apply border-r bg-gray-50;
     height: 100% !important;
     white-space: nowrap;
 }
@@ -31,8 +31,10 @@
 .CodeMirror-linenumber {
     padding: 0 3px 0 5px;
     min-width: 20px;
+    /* Can't pull over any more really otherwise it looks rubbish when you get into the 100s lines */
+    margin-inline-start: -0.5px;
     @apply text-right;
-    color: #999;
+    color: var(--color-gray-500);
     white-space: nowrap;
 }
 
@@ -99,7 +101,7 @@
     /* Explicitly set some colors rather than inherit from the body, because we could have a dark cp > light code field, which would result in pale text on a white background, etc. */
     &.CodeMirror pre.CodeMirror-line,
     &.CodeMirror pre.CodeMirror-line-like {
-        @apply text-gray-900;
+        @apply text-gray-900 dark:text-gray-300;
     }
 
     .CodeMirror-gutters {
@@ -515,14 +517,14 @@ span.CodeMirror-selectedtext {
     .CodeMirror-gutters {
         background: #263238;
         @apply dark:bg-gray-900;
-        color: #546e7a;
+        color: #678695;
         border: none;
     }
 
     .CodeMirror-guttermarker,
     .CodeMirror-guttermarker-subtle,
     .CodeMirror-linenumber {
-        color: #546e7a;
+        color: #678695;
     }
 
     .CodeMirror-cursor {
@@ -595,7 +597,7 @@ span.CodeMirror-selectedtext {
     }
 
     .cm-comment {
-        color: #546e7a;
+        color: #678695;
     }
 
     .cm-variable {

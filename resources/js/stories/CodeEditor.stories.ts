@@ -120,7 +120,7 @@ export const _ModeSelection: Story = {
             const mode = ref('javascript');
             return { code, mode };
         },
-        template: `<CodeEditor v-model="code" :mode="mode" allow-mode-selection @update:mode="mode = $event" /><PortalTargets />`,
+        template: `<CodeEditor v-model="code" :mode="mode" :allow-mode-selection="false" @update:mode="mode = $event" /><PortalTargets />`,
     }),
 };
 

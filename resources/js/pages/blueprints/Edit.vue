@@ -7,7 +7,7 @@ defineProps({
 	action: String,
 	showTitle: Boolean,
 	useTabs: { type: Boolean, default: true },
-	canDefineLocalizable: Boolean,
+	canDefineLocalizable: { type: Boolean, default: undefined },
 	resetRoute: String,
 	isResettable: Boolean,
 	isFormBlueprint: Boolean,
