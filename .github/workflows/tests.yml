@@ -38,7 +38,7 @@ jobs:
         with:
           files: |
             config
-            resources/lang
+            lang
             resources/users
             resources/views
             routes
