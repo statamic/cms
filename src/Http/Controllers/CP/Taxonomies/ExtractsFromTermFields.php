@@ -10,7 +10,7 @@ trait ExtractsFromTermFields
         // We don't want injected taxonomy values, which $term->values() would have given us.
         $values = $term->inDefaultLocale()->data()->merge(
             $term->data()
-        );
+        )->filter();
 
         $fields = $blueprint
             ->fields()
