@@ -1,5 +1,16 @@
 # Release Notes
 
+## 5.73.2 (2026-01-26)
+
+### What's fixed
+- Revert `AssetContainer::accessible()` visibility change [#13673](https://github.com/statamic/cms/issues/13673) by @duncanmcclean
+- Fix: Prevent 304 responses without client cache headers [#13654](https://github.com/statamic/cms/issues/13654) by @mynetx
+- Fix uninitialized property error from `HandleEntrySchedule` job [#13648](https://github.com/statamic/cms/issues/13648) by @duncanmcclean
+- Bump lodash from 4.17.21 to 4.17.23 [#13628](https://github.com/statamic/cms/issues/13628) by @dependabot
+- Avoid updating Bard value unless content has actually changed [#13645](https://github.com/statamic/cms/issues/13645) by @duncanmcclean
+
+
+
 ## 5.73.1 (2026-01-21)
 
 ### What's fixed
@@ -14,7 +25,7 @@
 - Allow closure in cascade content hydration [#13580](https://github.com/statamic/cms/issues/13580) by @marcorieser
 
 ### What's fixed
-- `AssetContainer::accessible()` should take filesystem visibility into account [#13621](https://github.com/statamic/cms/issues/13621) by @duncanmcclean
+- ~`AssetContainer::accessible()` should take filesystem visibility into account~ (Reverted in 5.73.2) [#13621](https://github.com/statamic/cms/issues/13621) by @duncanmcclean
 - Augment appended form config fields for Antlers [#13111](https://github.com/statamic/cms/issues/13111) by @marcorieser
 - Fix error from `DefaultInvalidator` when creating a nav [#13596](https://github.com/statamic/cms/issues/13596) by @duncanmcclean
 - Prevent redirect when creating term via fieldtype [#13595](https://github.com/statamic/cms/issues/13595) by @duncanmcclean
