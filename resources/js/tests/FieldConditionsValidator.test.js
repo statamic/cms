@@ -200,13 +200,13 @@ test('it can use includes_any or contains_any operators in conditions', () => {
     });
 
     expect(showFieldIf({cancellation_reasons: 'includes_any sick, other'})).toBe(true);
-    expect(showFieldIf({cancellation_reasons: 'contains_any sick, other'})).toBe(true);
     expect(showFieldIf({cancellation_reasons: 'includes_any sick, found another'})).toBe(false);
-    expect(showFieldIf({cancellation_reasons: 'contains_any sick, found another'})).toBe(false);
+    expect(showFieldIf({cancellation_reasons: 'contains_any sick, other'})).toBe(true);
+    expect(showFieldIf({cancellation_reasons: 'contains_any sick, expensive'})).toBe(false);
 
-    expect(showFieldIf({example_string: 'includes_any parrot, lazy dog'})).toBe(true);
-    expect(showFieldIf({example_string: 'contains_any parrot, lazy dog'})).toBe(true);
+    expect(showFieldIf({example_string: 'includes_any parrot, The quick brown fox jumps over the lazy dog'})).toBe(true);
     expect(showFieldIf({example_string: 'includes_any parrot, hops'})).toBe(false);
+    expect(showFieldIf({example_string: 'contains_any parrot, lazy dog'})).toBe(true);
     expect(showFieldIf({example_string: 'contains_any parrot, hops'})).toBe(false);
 
     expect(showFieldIf({age: 'includes_any fox, 13'})).toBe(true);
