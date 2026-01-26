@@ -144,11 +144,11 @@
                                         <Icon name="checkmark" class="text-green-600" />
                                         {{ __('Entry has a published version') }}
                                     </Subheading>
-                                    <Subheading v-else class="flex items-center gap-2 text-yellow-600">
+                                    <Subheading v-else class="flex items-center gap-2 text-yellow-700 dark:text-yellow-500">
                                         <Icon name="warning-diamond" />
                                         {{ __('Entry has not been published') }}
                                     </Subheading>
-                                    <Subheading v-if="isWorkingCopy" class="flex items-center gap-2 text-yellow-600">
+                                    <Subheading v-if="isWorkingCopy" class="flex items-center gap-2 text-yellow-700 dark:text-yellow-500">
                                         <Icon name="warning-diamond" />
                                         {{ __('messages.publish_actions_working_copy_warning') }}
                                     </Subheading>
@@ -156,7 +156,7 @@
                                         <Icon name="checkmark" class="text-green-600" />
                                         {{ __('This is the published version') }}
                                     </Subheading>
-                                    <Subheading v-if="isDirty" class="flex items-center gap-2 text-yellow-600">
+                                    <Subheading v-if="isDirty" class="flex items-center gap-2 text-yellow-700 dark:text-yellow-500">
                                         <Icon name="warning-diamond" />
                                         {{ __('Unsaved Changes') }}
                                     </Subheading>
