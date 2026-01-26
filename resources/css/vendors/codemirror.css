@@ -31,7 +31,8 @@
 .CodeMirror-linenumber {
     padding: 0 3px 0 5px;
     min-width: 20px;
-    margin-inline-start: -3px;
+    /* Can't pull over any more really otherwise it looks rubbish when you get into the 100s lines */
+    margin-inline-start: -0.5px;
     @apply text-right;
     color: var(--color-gray-500);
     white-space: nowrap;
