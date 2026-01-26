@@ -1,5 +1,5 @@
 <template>
-    <div v-if="mounted" class="datetime min-w-[145px]">
+    <div class="datetime min-w-[145px]">
         <Button :text="__('Add Date')" icon="calendar" v-if="!isReadOnly && !isInline && !hasDate" @click="addDate" />
 
         <Component
@@ -36,7 +36,6 @@ export default {
 
     data() {
         return {
-            mounted: false,
             containerWidth: null,
             focusedField: null,
             localValue: null,
@@ -49,7 +48,7 @@ export default {
         },
 
         hasDate() {
-            return !!(this.config.required || this.value);
+            return this.config.required || (this.value && this.value !== 'now');
         },
 
         hasTime() {
@@ -102,14 +101,10 @@ export default {
 
     created() {
         this.$events.$on(`container.${this.publishContainer.name}.saving`, this.triggerChangeOnFocusedField);
-    },
 
-    mounted() {
         if (this.value === 'now') {
             this.injectedPublishContainer.withoutDirtying(() => this.addDate());
         }
-
-        this.mounted = true;
     },
 
     unmounted() {
