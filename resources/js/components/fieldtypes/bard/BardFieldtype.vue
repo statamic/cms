@@ -492,12 +492,12 @@ export default {
             this.loadingSet = handle;
 
             this.fetchSet(handle)
-                .then(data => this._addSet(handle, index, data))
+                .then(data => this._addSet(handle, data))
                 .catch(() => this.$toast.error(__('Something went wrong')))
                 .finally(() => this.loadingSet = null);
         },
 
-        _addSet(handle, index, data) {
+        _addSet(handle, data) {
             const id = uniqid();
             const deepCopy = JSON.parse(JSON.stringify(data.defaults));
             const values = Object.assign({}, { type: handle }, deepCopy);
