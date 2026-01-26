@@ -185,12 +185,11 @@ function clearDirtyState() {
     if (props.trackDirtyState) Statamic.$dirty.remove(props.name);
 }
 
-async function withoutDirtying(callback) {
+function withoutDirtying(callback) {
     const previous = avoidTrackingDirtyState.value;
     avoidTrackingDirtyState.value = true;
     callback();
-    await nextTick();
-    avoidTrackingDirtyState.value = previous;
+    nextTick(() => avoidTrackingDirtyState.value = previous);
 }
 
 function setValues(newValues) {
