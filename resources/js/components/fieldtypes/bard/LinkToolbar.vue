@@ -89,6 +89,20 @@
                 </div>
 
 
+                <!-- Append string -->
+                <div
+                    v-if="linkType === 'entry'"
+                    class="h-8 mb-4 p-2 bg-gray-100 dark:bg-dark-600 text-gray-800 dark:text-dark-150 w-full border dark:border-dark-200 rounded shadow-inner placeholder:text-gray-600 dark:placeholder:dark-text-dark-175 flex items-center"
+                >
+                    <input
+                        type="text"
+                        ref="input"
+                        v-model="appends"
+                        class="input h-auto text-sm placeholder-gray-50"
+                        :placeholder="`${__('Append To URL')} (${__('Optional')})`"
+                    />
+                </div>
+
                 <!-- Title attribute -->
                 <div class="h-8 mb-4 p-2 bg-gray-100 dark:bg-dark-600 text-gray-800 dark:text-dark-150 w-full border dark:border-dark-200 rounded shadow-inner placeholder:text-gray-600 dark:placeholder:dark-text-dark-175 flex items-center" >
                     <input
@@ -211,6 +225,7 @@ export default {
             url: {},
             urlData: {},
             itemData: {},
+            appends: null,
             title: null,
             rel: null,
             targetBlank: null,
@@ -313,7 +328,11 @@ export default {
 
     watch: {
 
-        linkType() {
+        linkType(type) {
+            if (type != 'entry') {
+                this.appends = null;
+            }
+
             this.autofocus();
         },
 
@@ -357,10 +376,10 @@ export default {
         applyAttrs(attrs) {
             this.linkType = this.getLinkTypeForUrl(attrs.href);
 
-            this.url = { [this.linkType]: attrs.href };
+            this.appends = this.getAppendsForUrl(attrs.href);
+            this.url = { [this.linkType]: attrs.href?.replace(this.appends, '' ) };
             this.urlData = { [this.linkType]: this.getUrlDataForUrl(attrs.href) };
             this.itemData = { [this.linkType]: this.getItemDataForUrl(attrs.href) };
-
             this.title = attrs.title;
             this.rel = attrs.href
                 ? attrs.rel
@@ -404,7 +423,7 @@ export default {
             }
 
             this.$emit('updated', {
-                href: this.href,
+                href: this.href + (this.appends ?? ''),
                 rel: this.rel,
                 target: (this.canHaveTarget && this.targetBlank) ? '_blank' : null,
                 title: this.title,
@@ -507,14 +526,25 @@ export default {
             return this.bard.meta.linkData[ref];
         },
 
+        getAppendsForUrl(urlString) {
+
+            // appends is only relevant to entry links
+            if (! urlString?.includes('statamic://entry::')) {
+                return null;
+            }
+
+            return urlString.replace(urlString.split(/[?#]/)[0], '');
+        },
+
         parseDataUrl(url) {
             if (! url) {
                 return {}
             }
 
+            const appends = this.getAppendsForUrl(url);
             const regex = /^statamic:\/\/((.*?)::(.*))$/;
 
-            const matches = url.match(regex);
+            const matches = url.replace(appends, '').match(regex);
             if (! matches) {
                 return {};
             }
