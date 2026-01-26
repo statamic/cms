@@ -48,7 +48,7 @@ const props = defineProps({
 });
 
 const calendarBindings = computed(() => ({
-    modelValue: props.modelValue,
+    modelValue: props.modelValue ?? [],
     min: props.min,
     max: props.max,
     components: {

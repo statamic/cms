@@ -1,5 +1,6 @@
 <script setup>
 import { onUnmounted } from 'vue';
+import { commandPalette } from '@api';
 
 const props = defineProps({
     category: { type: String },
@@ -15,7 +16,7 @@ const props = defineProps({
     prioritize: { type: Boolean },
 });
 
-const command = Statamic.$commandPalette.add(props);
+const command = commandPalette.add(props);
 
 onUnmounted(() => command.remove());
 </script>

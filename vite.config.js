@@ -65,19 +65,6 @@ export default defineConfig(({ mode, command }) => {
                 },
                 {
                     extends: true,
-                    test: {
-                        name: 'browser',
-                        setupFiles: ['resources/js/tests/browser/setup.js', 'vitest-browser-vue'],
-                        include: ['resources/js/tests/browser/**/*.test.js'],
-                        browser: {
-                            enabled: true,
-                            provider: playwright(),
-                            instances: [{ browser: 'chromium' }],
-                        },
-                    },
-                },
-                {
-                    extends: true,
                     plugins: [
                         storybookTest({
                             configDir: '.storybook',
