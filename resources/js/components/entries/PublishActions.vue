@@ -192,6 +192,7 @@ export default {
             this.$axios
                 .post(this.actions.createRevision, payload)
                 .then((response) => {
+                    this.saving = false;
                     this.$toast.success(__('Revision created'));
                     this.revisionMessage = null;
                     this.$emit('saved', { isWorkingCopy: true, response });

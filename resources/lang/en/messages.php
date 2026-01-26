@@ -201,6 +201,7 @@ return [
     'preference_strict_accessibility_instructions' => 'We\'ve designed the control panel with accessibility in mind, aiming to meet WCAG 2.2 guidelines where possible. Enable this option to apply stricter accessibility rules by increasing form border contrast.',
     'preference_theme_instructions' => 'Customize the colors and appearance of the control panel.',
     'publish_actions_create_revision' => 'A revision will be created based on the working copy. The current revision will not change.',
+    'publish_actions_working_copy_warning' => 'This is the working copy.',
     'publish_actions_current_becomes_draft_because_scheduled' => 'Since the current revision is published and you\'ve selected a date in the future, once you submit, the revision will act like a draft until the selected date.',
     'publish_actions_publish' => 'Changes to the working copy will be applied to the entry and it will be published immediately.',
     'publish_actions_schedule' => 'Changes to the working copy will be applied to the entry and it will appear published on the selected date.',

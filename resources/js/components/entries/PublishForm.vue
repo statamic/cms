@@ -148,6 +148,10 @@
                                         <Icon name="warning-diamond" />
                                         {{ __('Entry has not been published') }}
                                     </Subheading>
+                                    <Subheading v-if="isWorkingCopy" class="flex items-center gap-2 text-yellow-600">
+                                        <Icon name="warning-diamond" />
+                                        {{ __('messages.publish_actions_working_copy_warning') }}
+                                    </Subheading>
                                     <Subheading v-if="!isWorkingCopy && published" class="flex items-center gap-2">
                                         <Icon name="checkmark" class="text-green-600" />
                                         {{ __('This is the published version') }}
