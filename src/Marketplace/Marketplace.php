@@ -27,19 +27,23 @@ class Marketplace
         });
     }
 
-    public function releases($package)
+    public function releases($package, $params = [])
     {
         $uri = "packages/$package/releases";
+        $hash = md5(json_encode($params));
 
-        return Cache::rememberWithExpiration("marketplace-$uri", function () use ($uri) {
-            $fallback = [5 => collect()];
+        return Cache::rememberWithExpiration("marketplace-$uri-$hash", function () use ($uri, $params) {
+            $fallback = [5 => ['data' => collect(), 'meta' => null]];
 
             try {
-                if (! $response = Client::get($uri)) {
+                if (! $response = Client::get($uri, $params)) {
                     return $fallback;
                 }
 
-                return [60 => collect($response['data'])];
+                return [60 => [
+                    'data' => collect($response['data']),
+                    'meta' => $response['meta'] ?? null,
+                ]];
             } catch (RequestException $e) {
                 return $fallback;
             }
