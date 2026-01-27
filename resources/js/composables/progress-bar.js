@@ -1,6 +1,8 @@
 import { ref, watch } from 'vue';
 import progress from 'nprogress';
 
+progress.configure({ showSpinner: false });
+
 const progressing = ref(false);
 const progressNames = ref([]);
 const timer = ref(null);
