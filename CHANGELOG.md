@@ -1,5 +1,25 @@
 # Release Notes
 
+## 6.0.0-beta.6 (2026-01-26)
+
+### What's fixed
+- Remove background blur from many places [#13663](https://github.com/statamic/cms/issues/13663) by @JayGeorge
+- Make the stack hover effect a little less twitchy [#13662](https://github.com/statamic/cms/issues/13662) by @JayGeorge
+- Delay bulk actions until ready [#13450](https://github.com/statamic/cms/issues/13450) by @JayGeorge
+- Fix passkeys differently [#13666](https://github.com/statamic/cms/issues/13666) by @jasonvarga
+- Remove negative assertions from `TestCase` [#13674](https://github.com/statamic/cms/issues/13674) by @duncanmcclean
+- Update `orchestra/testbench` constraint in `make:addon` stub [#13675](https://github.com/statamic/cms/issues/13675) by @duncanmcclean
+- Code gutter improvements [#13677](https://github.com/statamic/cms/issues/13677) by @JayGeorge
+- Revision improvements [#13676](https://github.com/statamic/cms/issues/13676) by @JayGeorge
+- Fix bard graphql test [#13678](https://github.com/statamic/cms/issues/13678) by @jasonvarga
+- Move `resources/lang` directory to project root [#13679](https://github.com/statamic/cms/issues/13679) by @duncanmcclean
+- Fix `default: now` on date fields [#13044](https://github.com/statamic/cms/issues/13044) by @duncanmcclean
+- Reload actions after Publish/Unpublish in entry listing [#13672](https://github.com/statamic/cms/issues/13672) by @heidkaemper
+- Fix adding Bard sets [#13669](https://github.com/statamic/cms/issues/13669) by @duncanmcclean
+- Fix various console warnings [#13671](https://github.com/statamic/cms/issues/13671) by @duncanmcclean
+
+
+
 ## 6.0.0-beta.5 (2026-01-23)
 
 ### What's fixed
