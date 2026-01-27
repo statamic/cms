@@ -427,7 +427,6 @@ defineExpose({
 
                 <ComboboxPortal>
                     <ComboboxContent
-                        :force-mount="true"
                         :hidden="!dropdownOpen"
                         position="popper"
                         :side-offset="5"
