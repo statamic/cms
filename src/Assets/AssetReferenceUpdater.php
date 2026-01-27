@@ -4,6 +4,7 @@ namespace Statamic\Assets;
 
 use Statamic\Data\DataReferenceUpdater;
 use Statamic\Facades\AssetContainer;
+use Statamic\Fieldtypes\UpdatesReferences;
 use Statamic\Support\Arr;
 
 class AssetReferenceUpdater extends DataReferenceUpdater
@@ -34,11 +35,55 @@ class AssetReferenceUpdater extends DataReferenceUpdater
     protected function recursivelyUpdateFields($fields, $dottedPrefix = null)
     {
         $this
+            ->updateCustomFieldtypeValues($fields, $dottedPrefix)
             ->updateAssetsFieldValues($fields, $dottedPrefix)
             ->updateLinkFieldValues($fields, $dottedPrefix)
             ->updateBardFieldValues($fields, $dottedPrefix)
             ->updateMarkdownFieldValues($fields, $dottedPrefix)
             ->updateNestedFieldValues($fields, $dottedPrefix);
+    }
+
+    /**
+     * Update custom fieldtype values that have asset references.
+     *
+     * @param  \Illuminate\Support\Collection  $fields
+     * @param  null|string  $dottedPrefix
+     * @return $this
+     */
+    protected function updateCustomFieldtypeValues($fields, $dottedPrefix)
+    {
+        $fields
+            ->filter(fn ($field) => in_array(UpdatesReferences::class, class_uses_recursive($field->fieldtype())))
+            ->each(function ($field) use ($dottedPrefix) {
+                $data = $this->item->data()->all();
+                $dottedKey = $dottedPrefix.$field->handle();
+                $oldData = Arr::get($data, $dottedKey);
+
+                if (! $oldData) {
+                    return;
+                }
+
+                $newData = $field->fieldtype()->replaceAssetReferences(
+                    $oldData,
+                    $this->newValue,
+                    $this->originalValue
+                );
+
+                if (json_encode($oldData) === json_encode($newData)) {
+                    return;
+                }
+
+                if ($newData === null && $this->isRemovingValue()) {
+                    Arr::forget($data, $dottedKey);
+                } else {
+                    Arr::set($data, $dottedKey, $newData);
+                }
+
+                $this->item->data($data);
+                $this->updated = true;
+            });
+
+        return $this;
     }
 
     /**

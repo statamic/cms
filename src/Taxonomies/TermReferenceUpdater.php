@@ -3,6 +3,7 @@
 namespace Statamic\Taxonomies;
 
 use Statamic\Data\DataReferenceUpdater;
+use Statamic\Fieldtypes\UpdatesReferences;
 use Statamic\Support\Arr;
 
 class TermReferenceUpdater extends DataReferenceUpdater
@@ -38,9 +39,53 @@ class TermReferenceUpdater extends DataReferenceUpdater
     protected function recursivelyUpdateFields($fields, $dottedPrefix = null)
     {
         $this
+            ->updateCustomFieldtypeValues($fields, $dottedPrefix)
             ->updateTermsFieldValues($fields, $dottedPrefix)
             ->updateScopedTermsFieldValues($fields, $dottedPrefix)
             ->updateNestedFieldValues($fields, $dottedPrefix);
+    }
+
+    /**
+     * Update custom fieldtype values that have term references.
+     *
+     * @param  \Illuminate\Support\Collection  $fields
+     * @param  null|string  $dottedPrefix
+     * @return $this
+     */
+    protected function updateCustomFieldtypeValues($fields, $dottedPrefix)
+    {
+        $fields
+            ->filter(fn ($field) => in_array(UpdatesReferences::class, class_uses_recursive($field->fieldtype())))
+            ->each(function ($field) use ($dottedPrefix) {
+                $data = $this->item->data()->all();
+                $dottedKey = $dottedPrefix.$field->handle();
+                $oldData = Arr::get($data, $dottedKey);
+
+                if (! $oldData) {
+                    return;
+                }
+
+                $newData = $field->fieldtype()->replaceTermReferences(
+                    $oldData,
+                    $this->newValue,
+                    $this->originalValue
+                );
+
+                if (json_encode($oldData) === json_encode($newData)) {
+                    return;
+                }
+
+                if ($newData === null && $this->isRemovingValue()) {
+                    Arr::forget($data, $dottedKey);
+                } else {
+                    Arr::set($data, $dottedKey, $newData);
+                }
+
+                $this->item->data($data);
+                $this->updated = true;
+            });
+
+        return $this;
     }
 
     /**
