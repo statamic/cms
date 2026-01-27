@@ -33,6 +33,9 @@
 @utility st-custom-scrollbar {
     --sb-size: 3px;
     --sb-thumb-color: var(--color-gray-400);
+    &:where(.dark, .dark *) {
+        --sb-thumb-color: var(--color-gray-500);
+    }
     --sb-track-color: transparent;
 
     scrollbar-color: var(--sb-thumb-color), var(--sb-track-color);
