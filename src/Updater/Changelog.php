@@ -41,7 +41,6 @@ abstract class Changelog
     public function paginate($page = 1, $perPage = 10)
     {
         $response = Marketplace::releases($this->item(), [
-            'paginate' => true,
             'page' => $page,
             'perPage' => $perPage,
         ]);
