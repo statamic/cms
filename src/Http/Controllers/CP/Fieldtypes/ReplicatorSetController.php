@@ -60,43 +60,58 @@ class ReplicatorSetController extends CpController
         $remainingFieldPathComponents = explode('.', $field);
 
         $config = $blueprint->fields()->all()->get($remainingFieldPathComponents[0])->config();
-        unset($remainingFieldPathComponents[0]);
 
-        foreach ($remainingFieldPathComponents as $index => $fieldPathComponent) {
-            unset($remainingFieldPathComponents[$fieldPathComponent]);
-
-            if (isset($config['sets'])) {
-                $config = collect($config['sets'])
-                    ->flatMap(fn (array $setGroup): array => $setGroup['sets'] ?? [])
-                    ->get($fieldPathComponent);
-            }
-
-            if (isset($config['fields'])) {
-                $fields = collect($config['fields'])
-                    ->flatMap(function ($field): array {
-                        if (isset($field['import']) || (isset($field['field']) && is_string($field['field']))) {
-                            return (new Fields([$field]))
-                                ->all()
-                                ->mapWithKeys(fn (Field $field) => [$field->handle() => [
-                                    'handle' => $field->handle(),
-                                    'field' => $field->config(),
-                                ]])
-                                ->all();
-                        }
-
-                        return [$field];
-                    });
-
-                if ($fieldConfig = $fields->firstWhere('handle', $remainingFieldPathComponents[$index])) {
-                    $config = $fieldConfig['field'];
-                }
-            }
-        }
+        $config = $this->getConfig($config, $remainingFieldPathComponents);
 
         if (! isset($config['type'])) {
             throw new \Exception("Cannot find Replicator field [$field]");
         }
 
         return new Field(Str::afterLast($field, '.'), $config);
+    }
+
+    private function getConfig(array $config, array $remainingFieldPathComponents): array
+    {
+        $isReplicator = isset($config['type']) && in_array($config['type'], ['bard', 'replicator']);
+
+        if ($isReplicator) {
+            $flattenedSets = collect($config['sets'])
+                ->flatMap(fn (array $setGroup): array => $setGroup['sets'] ?? [])
+                ->all();
+
+            if (count($remainingFieldPathComponents) === 1) {
+                return $config;
+            }
+
+            array_shift($remainingFieldPathComponents);
+
+            return $this->getConfig($flattenedSets, $remainingFieldPathComponents);
+        }
+
+        $fields = $this->resolveFields($config[$remainingFieldPathComponents[0]]['fields']);
+
+        array_shift($remainingFieldPathComponents);
+
+        return $this->getConfig($fields[$remainingFieldPathComponents[0]]['field'], $remainingFieldPathComponents);
+    }
+
+    private function resolveFields(array $fields): array
+    {
+        return collect($fields)
+            ->flatMap(function ($field): array {
+                if (isset($field['import']) || (isset($field['field']) && is_string($field['field']))) {
+                    return (new Fields([$field]))
+                        ->all()
+                        ->map(fn (Field $field) => [
+                            'handle' => $field->handle(),
+                            'field' => $field->config(),
+                        ])
+                        ->all();
+                }
+
+                return [$field];
+            })
+            ->keyBy('handle')
+            ->all();
     }
 }
