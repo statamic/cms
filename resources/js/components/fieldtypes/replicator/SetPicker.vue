@@ -126,7 +126,7 @@
             </div>
 
             <!-- List Mode -->
-            <div class="max-h-[21rem] overflow-auto p-1.5">
+            <div class="max-h-[21rem] overflow-auto p-1.5 st-custom-scrollbar">
                 <div
                     v-for="(item, i) in items"
                     :key="item.handle"

@@ -30,6 +30,27 @@
     }
 }
 
+@utility st-custom-scrollbar {
+    --sb-size: 3px;
+    --sb-thumb-color: var(--color-gray-400);
+    --sb-track-color: transparent;
+
+    scrollbar-color: var(--sb-thumb-color), var(--sb-track-color);
+
+    &::-webkit-scrollbar {
+        width: var(--sb-size);
+    }
+
+    &::-webkit-scrollbar-track {
+        background: var(--sb-track-color);
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: var(--sb-thumb-color);
+        border-radius: 2px;
+    }
+}
+
 /* UTILITIES / TEXT
 =================================================== */
 /* Avoid prefixing things with `st-text-` (st for Statamic) because `text-` is a Tailwind prefix */
