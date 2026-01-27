@@ -85,7 +85,7 @@
         :open="isOpen"
         @clicked-away="$emit('clicked-away', $event)"
         @update:open="isOpen = $event"
-        class="set-picker select-none w-72"
+        class="set-picker select-none w-72 rounded-b-lg"
         data-set-picker-popover
         inset
     >
@@ -126,11 +126,11 @@
             </div>
 
             <!-- List Mode -->
-            <div class="max-h-[21rem] overflow-auto p-1.5">
+            <div class="max-h-[21rem] overflow-auto p-1.5 st-custom-scrollbar">
                 <div
                     v-for="(item, i) in items"
                     :key="item.handle"
-                    class="cursor-pointer rounded-lg"
+                    class="cursor-pointer rounded-md"
                     :class="{ 'bg-gray-100 dark:bg-gray-900': selectionIndex === i }"
                     @mouseover="selectionIndex = i"
                     :title="__(item.instructions)"
@@ -150,7 +150,7 @@
                     <div 
                         v-if="item.type === 'set'" 
                         @click="!isLoading && addSet(item.handle)" 
-                        class="group flex items-center rounded-xl p-2.5 gap-2 sm:gap-3"
+                        class="group flex items-center rounded-lg p-2.5 gap-2 sm:gap-3"
                         :class="{ 'opacity-50 pointer-events-none': isLoading }"
                     >
                         <ui-icon v-if="isSetLoading(item.handle)" name="loading" class="size-4 text-gray-600 dark:text-gray-300" />
