@@ -265,6 +265,8 @@ export default {
 
             return this.fieldPathKeys
                 .map((key, index) => {
+					if (['attrs', 'values'].includes(key)) return;
+
                     if (Number.isInteger(parseInt(key))) {
 	                    let setValues =  data_get(this.publishContainer.values, this.fieldPathKeys.slice(0, index + 1).join('.'));
 
