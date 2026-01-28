@@ -57,7 +57,7 @@ function actionFailed(response) {
             v-if="visible"
             layout
             data-floating-toolbar
-            class="sticky inset-x-0 bottom-1 sm:bottom-6 z-100 flex w-full max-w-[95vw] mx-auto justify-center "
+            class="sticky inset-x-0 bottom-1 sm:bottom-6 z-(--z-index-above) flex w-full max-w-[95vw] mx-auto justify-center "
             :initial="{ y: 100, opacity: 0 }"
             :animate="{ y: 0, opacity: 1 }"
             :transition="{ duration: 0.2, ease: 'easeInOut' }"
