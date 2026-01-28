@@ -1,5 +1,26 @@
 # Release Notes
 
+## 6.0.0 (2026-01-28)
+
+### What's new
+- Official 6.0 release! 🎉
+
+### What's fixed
+- Add a custom scrollbar for set pickers [#13686](https://github.com/statamic/cms/issues/13686) by @JayGeorge
+- Prevent force mounting combobox to improve scroll performance [#13691](https://github.com/statamic/cms/issues/13691) by @jasonvarga
+- Improve progress states [#13690](https://github.com/statamic/cms/issues/13690) by @JayGeorge
+- Add pagination to package changelogs [#13692](https://github.com/statamic/cms/issues/13692) by @duncanmcclean
+- Fix adding nested replicator sets [#13694](https://github.com/statamic/cms/issues/13694) by @duncanmcclean
+- Prevent inline bard images from flickering when adding nodes [#13706](https://github.com/statamic/cms/issues/13706) by @duncanmcclean
+- Remove the spinner from the loading bulk actions state [#13709](https://github.com/statamic/cms/issues/13709) by @JayGeorge
+- Update type paths in package.json [#13700](https://github.com/statamic/cms/issues/13700) by @dadaxr
+- Fix `$fakeStacheDirectory` path when running addon tests on Windows [#13710](https://github.com/statamic/cms/issues/13710) by @duncanmcclean
+- Avoid Bard image alt input being focused on page load [#13705](https://github.com/statamic/cms/issues/13705) by @duncanmcclean
+- Display error when `npm install` fails in `setup-cp-vite` command [#13702](https://github.com/statamic/cms/issues/13702) by @duncanmcclean
+- Asset field listing preview improvements [#13708](https://github.com/statamic/cms/issues/13708) by @JayGeorge
+
+
+
 ## 6.0.0-beta.6 (2026-01-26)
 
 ### What's fixed
@@ -29,7 +50,7 @@
 - French translations [#13653](https://github.com/statamic/cms/issues/13653) by @ebeauchamps
 - Kill sibling transitions [#13658](https://github.com/statamic/cms/issues/13658) by @JayGeorge
 - Restoring a revision should force a hard-reload of the page [#13656](https://github.com/statamic/cms/issues/13656) by @duncanmcclean
-- Ensure replicator lines show after reaching `max_sets` limit [#13657](https://github.com/statamic/cms/issues/13657) by @
+- Ensure replicator lines show after reaching `max_sets` limit [#13657](https://github.com/statamic/cms/issues/13657) by @duncanmcclean
 - Improve Bard/Replicator performance during page load [#13427](https://github.com/statamic/cms/issues/13427) by @duncanmcclean
 - Bard image button defaults [#13661](https://github.com/statamic/cms/issues/13661) by @jasonvarga
 - Improve Combobox performance [#13625](https://github.com/statamic/cms/issues/13625) by @duncanmcclean
