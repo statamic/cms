@@ -842,8 +842,9 @@ class ReplicatorTest extends TestCase
 
     /**
      * We're purposefully naming the sets the same as its nested field to replicate the reported issue.
+     *
      * @see https://github.com/statamic/cms/issues/13687
-     **/
+     */
     #[Test]
     public function it_can_return_set_defaults_for_nested_sets()
     {
