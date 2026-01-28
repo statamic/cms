@@ -28,8 +28,8 @@
                 @paste.stop
             >
                 <Input
+	                ref="alt"
                     name="alt"
-                    :focus="showingAltEdit"
                     v-model="alt"
                     :placeholder="assetAlt"
                     :prepend="__('Alt Text')"
@@ -156,6 +156,12 @@ export default {
         alt(alt) {
             this.updateAttributes({ alt });
         },
+
+	    showingAltEdit(showingAltEdit) {
+		    if (showingAltEdit) {
+				this.$nextTick(() => this.$refs.alt.focus());
+		    }
+	    },
     },
 
     methods: {
