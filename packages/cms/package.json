@@ -10,29 +10,29 @@
     },
     "exports": {
         ".": {
-            "types": "./types/resources/js/bootstrap/cms/index.d.ts",
+            "types": "./types/bootstrap/cms/index.d.ts",
             "default": "./src/index.js"
         },
         "./ui": {
-            "types": "./types/resources/js/bootstrap/cms/ui.d.ts",
+            "types": "./types/bootstrap/cms/ui.d.ts",
             "default": "./src/ui.js"
         },
         "./api": {
-            "types": "./types/resources/js/bootstrap/cms/api.d.ts",
+            "types": "./types/bootstrap/cms/api.d.ts",
             "default": "./src/api.js"
         },
         "./ui.css": "./src/ui.css",
         "./tailwind.css": "./src/tailwind.css",
         "./bard": {
-            "types": "./types/resources/js/bootstrap/cms/bard.d.ts",
+            "types": "./types/bootstrap/cms/bard.d.ts",
             "default": "./src/bard.js"
         },
         "./save-pipeline": {
-            "types": "./types/resources/js/bootstrap/cms/save-pipeline.d.ts",
+            "types": "./types/bootstrap/cms/save-pipeline.d.ts",
             "default": "./src/save-pipeline.js"
         },
         "./inertia": {
-            "types": "./types/resources/js/bootstrap/cms/inertia.d.ts",
+            "types": "./types/bootstrap/cms/inertia.d.ts",
             "default": "./src/inertia.js"
         },
         "./vite-plugin": {
