@@ -51,7 +51,7 @@ function actionFailed(response) {
         :context="actionContext"
         @started="actionStarted"
         @completed="actionCompleted"
-        v-slot="{ actions, loading }"
+        v-slot="{ actions }"
     >
         <Motion
             v-if="visible"
@@ -66,7 +66,6 @@ function actionFailed(response) {
             <ButtonGroup>
                 <Button
                     class="text-blue-500!"
-                    :disabled="loading"
                     :text="__n(`Deselect :count item|Deselect all :count items`, selections.length)"
                     @click="clearSelections"
                 />
