@@ -434,7 +434,6 @@ class BlueprintTest extends TestCase
                                     'handle' => 'one',
                                     'instructions' => 'One instructions',
                                     'instructions_position' => 'above',
-                                    'variant' => 'block',
                                     'listable' => 'hidden',
                                     'visibility' => 'visible',
                                     'sortable' => true,
@@ -473,7 +472,6 @@ class BlueprintTest extends TestCase
                                     'handle' => 'two',
                                     'instructions' => 'Two instructions',
                                     'instructions_position' => 'above',
-                                    'variant' => 'block',
                                     'listable' => 'hidden',
                                     'visibility' => 'visible',
                                     'sortable' => true,
@@ -497,6 +495,7 @@ class BlueprintTest extends TestCase
                 ],
             ],
             'empty' => false,
+            'fqh' => 'test',
         ], $blueprint->toPublishArray());
     }
 
@@ -563,7 +562,6 @@ class BlueprintTest extends TestCase
                                     'handle' => 'nested_one',
                                     'instructions' => null,
                                     'instructions_position' => 'above',
-                                    'variant' => 'block',
                                     'listable' => 'hidden',
                                     'visibility' => 'visible',
                                     'sortable' => true,
@@ -591,7 +589,6 @@ class BlueprintTest extends TestCase
                                     'handle' => 'nested_deeper_two',
                                     'instructions' => null,
                                     'instructions_position' => 'above',
-                                    'variant' => 'block',
                                     'listable' => 'hidden',
                                     'visibility' => 'visible',
                                     'sortable' => true,
@@ -619,6 +616,7 @@ class BlueprintTest extends TestCase
                 ],
             ],
             'empty' => false,
+            'fqh' => 'test',
         ], $blueprint->toPublishArray());
     }
 

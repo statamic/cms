@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Assets;
 
+use Facades\Statamic\Fields\Validator as FieldValidator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -84,8 +85,12 @@ class AssetsController extends CpController
 
         $this->authorize('store', [AssetContract::class, $container]);
 
+        $validationRules = collect($container->validationRules())
+            ->map(fn ($rule) => FieldValidator::parse($rule))
+            ->all();
+
         $request->validate([
-            'file' => array_merge(['file', new AllowedFile], $container->validationRules()),
+            'file' => array_merge(['file', new AllowedFile], $validationRules),
         ]);
 
         $file = $request->file('file');

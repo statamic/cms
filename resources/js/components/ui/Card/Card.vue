@@ -2,7 +2,9 @@
 import { cva } from 'cva';
 
 const props = defineProps({
+    /** When `true`, the internal padding of the card is removed. */
     inset: { type: Boolean, default: false },
+    /** Controls the appearance of the card. <br><br> Options: `default`, `flat` */
     variant: { type: String, default: 'default' },
 });
 

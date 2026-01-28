@@ -15,6 +15,6 @@ class ElevatedSessionAuthorizationException extends \Exception
     {
         return $request->wantsJson()
             ? response()->json(['message' => $this->getMessage()], 403)
-            : redirect()->setIntendedUrl($request->fullUrl())->to('/cp/auth/confirm-password');
+            : redirect()->setIntendedUrl($request->fullUrl())->to(cp_route('confirm-password'));
     }
 }

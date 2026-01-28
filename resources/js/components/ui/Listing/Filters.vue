@@ -6,6 +6,7 @@ import {
     PanelHeader,
     Card,
     Heading,
+	Stack,
 } from '@ui';
 import { injectListingContext } from '../Listing/Listing.vue';
 import { computed, ref, watch, nextTick } from 'vue';
@@ -87,6 +88,7 @@ function handleStackClosed() {
     }
 
     open.value = false;
+
     nextTick(() => {
         requestAnimationFrame(() => {
             const wrapper = filtersButtonWrapperRef.value;
@@ -113,16 +115,14 @@ function handleStackClosed() {
             </Button>
         </div>
 
-        <ui-stack half name="filters" v-if="open" @closed="handleStackClosed">
-            <div ref="stackContentRef" class="flex-1 p-3 bg-white dark:bg-gray-800 h-full overflow-auto rounded-l-2xl relative">
-                <Button
-                    icon="x"
-                    variant="ghost"
-                    size="sm"
-                    class="absolute! top-1.75 right-3 z-(--z-index-above) [&_svg]:size-4"
-                    @click="handleStackClosed"
-                />
-                <Heading size="lg" :text="__('Filters')" class="mb-4 px-1.5 pr-12 [&_svg]:size-4" icon="sliders-horizontal" />
+        <Stack
+            size="half"
+            :open="open"
+            @update:open="handleStackClosed"
+            :title="__('Filters')"
+            icon="sliders-horizontal"
+        >
+            <div ref="stackContentRef" class="">
                 <div class="space-y-4">
                     <Panel v-if="fieldFilter">
                         <PanelHeader class="flex items-center justify-between">
@@ -157,18 +157,32 @@ function handleStackClosed() {
                     <Button variant="primary" :text="__('Done')" @click="handleStackClosed" />
                 </div>
             </div>
-        </ui-stack>
+        </Stack>
 
         <Button
             v-for="(badge, handle, index) in fieldFilterBadges"
             :key="handle"
             variant="filled"
             :icon-append="reorderable ? null : 'x'"
-            :text="badge"
             :disabled="reorderable"
             class="last:me-12"
             @click="removeFieldFilter(handle)"
-        />
+        >
+            <template v-if="handle == 'date'">
+                {{ badge.field }}
+                {{ badge.translatedOperator }}
+                <template v-if="badge.operator === 'between'">
+                    <date-time :of="badge.value.start" options="date" />
+                    {{ __('and') }}
+                    <date-time :of="badge.value.end" options="date" />
+                </template>
+                <date-time v-else :of="badge.value" options="date" />
+            </template>
+
+            <template v-else>
+                {{ badge }}
+            </template>
+        </Button>
         <Button
             v-for="(badge, handle, index) in standardBadges"
             :key="handle"

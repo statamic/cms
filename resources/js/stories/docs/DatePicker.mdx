@@ -1,0 +1,27 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as DatePickerStories from '../DatePicker.stories';
+
+<Meta of={DatePickerStories} />
+
+# DatePicker
+A date picker component with calendar popover for selecting dates and optionally times. Supports keyboard navigation and localization.
+<Canvas of={DatePickerStories._DocsIntro} sourceState={'shown'} />
+
+## With Time
+Set the `granularity` prop to `minute` or `hour` to include time selection.
+<Canvas of={DatePickerStories._WithTime} sourceState={'shown'} />
+
+## Min and Max Dates
+Restrict selectable dates using the `min` and `max` props.
+<Canvas of={DatePickerStories._MinMax} sourceState={'shown'} />
+
+## Inline
+Display the calendar inline instead of in a popover.
+<Canvas of={DatePickerStories._Inline} sourceState={'shown'} />
+
+## Multiple Months
+Show multiple months side-by-side for easier date selection across month boundaries.
+<Canvas of={DatePickerStories._MultipleMonths} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={DatePickerStories} />

@@ -30,8 +30,8 @@ const props = defineProps({
         default: () => ({}),
     },
     submitUrl: {
-        type: String,
-        required: true,
+        type: [String, null],
+        default: null,
     },
     submitMethod: {
         type: String,
@@ -62,9 +62,7 @@ function save() {
     new Pipeline()
         .provide({ container, errors, saving })
         .through([
-            new BeforeSaveHooks('entry'),
             new Request(props.submitUrl, props.submitMethod),
-            new AfterSaveHooks('entry'),
         ])
         .then((response) => {
             Statamic.$toast.success(__('Saved'));

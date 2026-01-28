@@ -4,7 +4,9 @@ import { TabsRoot } from 'reka-ui';
 const emit = defineEmits(['update:modelValue']);
 
 defineProps({
+    /** The controlled value of the tabs */
     modelValue: { type: String, default: null },
+    /** When `true`, the element will be unmounted on closed state */
     unmountOnHide: { type: Boolean, default: true },
 });
 </script>

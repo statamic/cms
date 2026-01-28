@@ -16,7 +16,7 @@
         <Panel :heading="__('Settings')">
             <Card class="p-0! divide-y divide-gray-200 dark:divide-gray-800">
                 <Field
-                    as-config
+                    inline
                     :label="__('Title')"
                     :instructions="__('messages.role_title_instructions')"
                     :errors="errors.title"
@@ -26,7 +26,7 @@
                 </Field>
 
                 <Field
-                    as-config
+                    inline
                     :label="__('Handle')"
                     :instructions="__('messages.role_handle_instructions')"
                     :errors="handleErrors"
@@ -36,7 +36,7 @@
                 </Field>
 
                 <Field
-                    as-config
+                    inline
                     v-if="canAssignSuper"
                     :label="__('permissions.super')"
                     :instructions="__('permissions.super_desc')"

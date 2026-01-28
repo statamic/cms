@@ -55,6 +55,7 @@ class LoginController extends CpController
 
         return OAuth::providers()->map(fn (Provider $provider) => [
             'name' => $provider->name(),
+            'label' => $provider->label(),
             'icon' => Statamic::svg('oauth/'.$provider->name()),
             'url' => $provider->loginUrl().'?redirect='.$redirect,
         ])->values();

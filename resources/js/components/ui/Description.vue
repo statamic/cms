@@ -5,7 +5,7 @@ const slots = useSlots();
 const hasDefaultSlot = !!slots.default;
 
 const props = defineProps({
-    required: { type: Boolean, default: false },
+    /** The description text to display */
     text: { type: [String, Number, Boolean, null], default: null },
 });
 </script>

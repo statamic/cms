@@ -1,28 +1,38 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
-import { Input, Field, Label, Description, Button } from '@ui';
+import type {Meta, StoryObj} from '@storybook/vue3';
+import {Button, Description, Field, Input, Label} from '@ui';
+import {icons} from "@/stories/icons";
 
 const meta = {
-    title: 'Components/Input',
+    title: 'Forms/Input',
     component: Input,
     argTypes: {
-        type: { control: 'text' },
-        label: { control: 'text' },
-        placeholder: { control: 'text' },
-        icon: { control: 'text' },
-        iconAppend: { control: 'text' },
-        iconPrepend: { control: 'text' },
+        icon: {
+            control: 'select',
+            options: icons,
+        },
+        iconAppend: {
+            control: 'select',
+            options: icons,
+        },
+        iconPrepend: {
+            control: 'select',
+            options: icons,
+        },
         size: {
             control: 'select',
-            options: ['default', 'sm', 'xs'],
+            options: ['xs', 'sm', 'base'],
         },
-        clearable: { control: 'boolean' },
-        copyable: { control: 'boolean' },
-        viewable: { control: 'boolean' },
-        readonly: { control: 'boolean' },
-        disabled: { control: 'boolean' },
-        prepend: { control: 'text' },
-        append: { control: 'text' },
-        limit: { control: 'number' },
+        variant: {
+            control: 'select',
+            options: ['default', 'light', 'ghost'],
+        },
+        'update:modelValue': {
+            description: 'Event handler called when the input is updated.',
+            table: {
+                category: 'events',
+                type: { summary: '(value: string) => void' }
+            }
+        }
     },
 } satisfies Meta<typeof Input>;
 

@@ -1287,4 +1287,20 @@ EOT
         $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/forms/contact" class="form" id="form">', $output);
         $this->assertStringContainsString('This is a test config value', $output);
     }
+
+    #[Test]
+    public function it_augments_appended_config_fields()
+    {
+        Form::appendConfigFields('*', 'Fields', [
+            'test_config' => ['type' => 'bard', 'display' => 'A Bard field'],
+        ]);
+
+        tap(Form::find('contact')->data(
+            ['test_config' => [['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'Shut up, Malacoustix!']]]]])
+        )->save();
+
+        $output = $this->tag('{{ form:contact redirect="/submitted" error_redirect="/errors" class="form" id="form" }}{{ form_config:test_config }}{{ /form:contact }}');
+
+        $this->assertStringContainsString('<p>Shut up, Malacoustix!</p>', $output);
+    }
 }

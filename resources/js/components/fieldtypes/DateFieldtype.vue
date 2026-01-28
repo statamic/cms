@@ -48,7 +48,7 @@ export default {
         },
 
         hasDate() {
-            return !!(this.config.required || this.value);
+            return this.config.required || (this.value && this.value !== 'now');
         },
 
         hasTime() {
@@ -101,6 +101,10 @@ export default {
 
     created() {
         this.$events.$on(`container.${this.publishContainer.name}.saving`, this.triggerChangeOnFocusedField);
+
+        if (this.value === 'now') {
+            this.injectedPublishContainer.withoutDirtying(() => this.addDate());
+        }
     },
 
     unmounted() {

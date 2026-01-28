@@ -1,0 +1,15 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as DescriptionStories from '../Description.stories';
+
+<Meta of={DescriptionStories} />
+
+# Description
+Display helpful description text below form labels to provide additional context and guidance to users. Descriptions are styled with a subdued color to differentiate them from labels.
+<Canvas of={DescriptionStories._DocsIntro} sourceState={'shown'} />
+
+## With Slot
+Use the default slot to include HTML content, links, or formatted text in your descriptions.
+<Canvas of={DescriptionStories._WithSlot} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={DescriptionStories} />

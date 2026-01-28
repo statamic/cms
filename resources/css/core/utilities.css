@@ -3,7 +3,7 @@
 /* Here we extend Tailwind's classes to add additional functionality where we're sure it won't break anything. */
 
 /* If the next sibling is hidden (by a Vue conditional), remove the bottom border. For example, /cp/asset-containers/assets/edit, the Image Manipulation toggle. */
-.divide-y > *:has(+[style*="display: none"]) {
+.divide-y > *:has(+[style*="display: none"]:last-child) {
     border-block-end: none;
 }
 
@@ -20,6 +20,38 @@
 
 .z-max {
     z-index: var(--z-index-max);
+}
+
+@utility st-overflow-clip-margin {
+    overflow-clip-margin: 1px;
+    /* As of 2026-01-08 Safari doesn't support overflow-clip-margin */
+    @supports not (overflow-clip-margin: 1px) {
+        padding-inline-start: 1px;
+    }
+}
+
+@utility st-custom-scrollbar {
+    --sb-size: 3px;
+    --sb-thumb-color: var(--color-gray-400);
+    &:where(.dark, .dark *) {
+        --sb-thumb-color: var(--color-gray-500);
+    }
+    --sb-track-color: transparent;
+
+    scrollbar-color: var(--sb-thumb-color), var(--sb-track-color);
+
+    &::-webkit-scrollbar {
+        width: var(--sb-size);
+    }
+
+    &::-webkit-scrollbar-track {
+        background: var(--sb-track-color);
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: var(--sb-thumb-color);
+        border-radius: 2px;
+    }
 }
 
 /* UTILITIES / TEXT
@@ -156,10 +188,6 @@
     }
 }
 
-@utility bg-frosted {
-    @apply bg-white/85 backdrop-blur-sm;
-}
-
 /* UTILITIES / DECORATION / MASK BACKGROUND
 =================================================== */
 /* Notes...
@@ -270,7 +298,8 @@
                 position: absolute;
                 inset: 0;
                 height: var(--height);
-                border-image: conic-gradient(var(--line-color) 0 0) fill 0/ /**/0 100vw;
+                /* Bust out of the container to create a full-width horizontal line, ref https://www.smashingmagazine.com/2024/01/css-border-image-property/#full-width-backgrounds */
+                border-image: conic-gradient(var(--line-color) 0 0) fill 0//0 100vw;
                 top: calc(50% - var(--height));
             }
             .dark &::after {
@@ -317,12 +346,14 @@
 =================================================== */
 @utility bg-checkerboard {
     --checkerboard-light: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%23f3f4f6'/%3E%3C/svg%3E");
-    --checkerboard-dark: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%231f2937'/%3E%3C/svg%3E");
+    --checkerboard-dark: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%23000000'/%3E%3C/svg%3E");
 
     position: relative;
     background-color: #fff;
 
     &::before {
+        /* e.g. Asset field > Grid Mode */
+        border-radius: inherit;
         content: '';
         position: absolute;
         inset: 0;

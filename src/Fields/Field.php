@@ -550,17 +550,6 @@ class Field implements Arrayable
                     'instructions' => 'not null',
                 ],
             ],
-            'variant' => [
-                'display' => __('Field Layout'),
-                'instructions' => __('statamic::messages.fields_layout_instructions'),
-                'type' => 'select',
-                'options' => [
-                    'block' => __('Stacked'),
-                    'inline' => __('Side by Side'),
-                ],
-                'default' => 'block',
-                'width' => 50,
-            ],
             'listable' => [
                 'display' => __('Listable'),
                 'instructions' => __('statamic::messages.fields_listable_instructions'),

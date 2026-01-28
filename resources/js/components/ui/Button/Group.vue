@@ -1,7 +1,7 @@
 <template>
     <div
         :class="[
-            'group/button flex flex-wrap [[data-floating-toolbar]_&]:justify-center [[data-floating-toolbar]_&]:gap-1 [[data-floating-toolbar]_&]:lg:gap-x-0',
+            'group/button inline-flex flex-wrap [[data-floating-toolbar]_&]:justify-center [[data-floating-toolbar]_&]:gap-1 [[data-floating-toolbar]_&]:lg:gap-x-0',
             '[&>[data-ui-group-target]:not(:first-child):not(:last-child)]:rounded-none',
             '[&>[data-ui-group-target]:first-child:not(:last-child)]:rounded-e-none',
             '[&>[data-ui-group-target]:last-child:not(:first-child)]:rounded-s-none',
@@ -19,8 +19,9 @@
 </template>
 
 <style>
+    /* GROUP FLOATING TOOLBAR / BUTTON GROUP BORDERS
+    =================================================== */
     [data-ui-button-group] [data-ui-group-target] {
-
         @apply shadow-none;
 
         &:not(:first-child):not([data-floating-toolbar] &) {

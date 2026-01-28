@@ -2,7 +2,9 @@
 import Icon from './Icon/Icon.vue';
 
 const props = defineProps({
+    /** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
     icon: { type: String, default: null },
+    /** The title text displayed in the header. */
     title: { type: String, default: null },
 });
 </script>

@@ -59,6 +59,7 @@ use Statamic\Http\Controllers\CP\Fieldtypes\FilesFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\IconFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\MarkdownFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\RelationshipFieldtypeController;
+use Statamic\Http\Controllers\CP\Fieldtypes\ReplicatorSetController;
 use Statamic\Http\Controllers\CP\Forms\ActionController as FormActionController;
 use Statamic\Http\Controllers\CP\Forms\FormBlueprintController;
 use Statamic\Http\Controllers\CP\Forms\FormExportController;
@@ -98,6 +99,8 @@ use Statamic\Http\Controllers\CP\Taxonomies\TermActionController;
 use Statamic\Http\Controllers\CP\Taxonomies\TermPreviewController;
 use Statamic\Http\Controllers\CP\Taxonomies\TermRevisionsController;
 use Statamic\Http\Controllers\CP\Taxonomies\TermsController;
+use Statamic\Http\Controllers\CP\Themes\ShareThemeController;
+use Statamic\Http\Controllers\CP\Themes\ThemeController;
 use Statamic\Http\Controllers\CP\Updater\UpdateProductController;
 use Statamic\Http\Controllers\CP\Updater\UpdaterController;
 use Statamic\Http\Controllers\CP\Users\AccountController;
@@ -384,6 +387,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('files/upload', [FilesFieldtypeController::class, 'upload'])->name('files.upload');
         Route::get('dictionaries/{dictionary}', DictionaryFieldtypeController::class)->name('dictionary-fieldtype');
         Route::post('icons', IconFieldtypeController::class)->name('icon-fieldtype');
+        Route::post('replicator/set', ReplicatorSetController::class)->name('replicator-fieldtype.set');
     });
 
     Route::group(['prefix' => 'field-action-modal'], function () {
@@ -434,6 +438,10 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('/', [PasskeyController::class, 'store'])->name('passkeys.store');
         Route::delete('{id}', [PasskeyController::class, 'destroy'])->name('passkeys.destroy');
     });
+
+    Route::get('themes', [ThemeController::class, 'index']);
+    Route::get('themes/refresh', [ThemeController::class, 'refresh']);
+    Route::post('themes/share', ShareThemeController::class);
 
     Route::post('slug', SlugController::class);
 

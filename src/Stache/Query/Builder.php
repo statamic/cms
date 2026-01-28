@@ -160,7 +160,7 @@ abstract class Builder extends BaseBuilder
         $lookup = array_flip(array_map(fn ($v) => $v ?? '__NULL__', $where['values']));
 
         return $values->filter(
-            fn ($value) => isset($lookup[$value ?? '__NULL__'])
+            fn ($value) => ! is_array($value) && isset($lookup[$value ?? '__NULL__'])
         );
     }
 
@@ -169,7 +169,7 @@ abstract class Builder extends BaseBuilder
         $lookup = array_flip(array_map(fn ($v) => $v ?? '__NULL__', $where['values']));
 
         return $values->filter(
-            fn ($value) => ! isset($lookup[$value ?? '__NULL__'])
+            fn ($value) => is_array($value) || ! isset($lookup[$value ?? '__NULL__'])
         );
     }
 

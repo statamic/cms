@@ -3,6 +3,7 @@ import { DropdownMenuLabel } from 'reka-ui';
 import { useSlots } from 'vue';
 
 defineProps({
+    /** Label text to display */
     text: { type: String, default: null },
 });
 

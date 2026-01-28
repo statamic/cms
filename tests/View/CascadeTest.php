@@ -411,6 +411,32 @@ class CascadeTest extends TestCase
     }
 
     #[Test]
+    public function it_hydrates_page_data_by_closure()
+    {
+        $vars = ['foo' => 'bar', 'baz' => 'qux'];
+        $page = EntryFactory::id('test')
+            ->collection('example')
+            ->data($vars)
+            ->make();
+        $cascade = $this->cascade()->withContent(fn () => $page);
+
+        $this->assertEquals($page, call_user_func($cascade->content()));
+
+        tap($cascade->hydrate()->toArray(), function ($cascade) use ($page) {
+            $this->assertArrayHasKey('page', $cascade);
+            $this->assertEquals($page, $cascade['page']);
+
+            // The 'page' values should also be at the top level.
+            // They'll be Value classes so Antlers can lazily augment them.
+            // Blade can prefer {{ $globalhandle->field }} over just {{ $field }}
+            $this->assertEquals('bar', $cascade['foo']);
+            $this->assertEquals('qux', $cascade['baz']);
+            $this->assertInstanceOf(Value::class, $cascade['foo']);
+            $this->assertInstanceOf(Value::class, $cascade['baz']);
+        });
+    }
+
+    #[Test]
     public function it_hydrates_globals()
     {
         $globals = $this->createGlobal('global', ['foo' => 'bar', 'hello' => 'world']);

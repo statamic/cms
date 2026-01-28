@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue';
-import ConfirmationModal from '@/components/modals/ConfirmationModal.vue';
+import { ConfirmationModal } from '@ui';
 import TwoFactorSetup from './Setup.vue';
 import TwoFactorRecoveryCodesModal from './RecoveryCodesModal.vue';
 import { requireElevatedSession } from '@/components/elevated-sessions';
@@ -117,11 +117,10 @@ function disable() {
     />
 
     <ConfirmationModal
-        v-if="disableModalOpen"
+        v-model:open="disableModalOpen"
         :title="__('Are you sure?')"
         :danger="true"
         @confirm="disable"
-        @cancel="disableModalOpen = false"
     >
         <p class="mb-2" v-html="__('statamic::messages.disable_two_factor_authentication')"></p>
 

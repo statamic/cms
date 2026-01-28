@@ -1,8 +1,14 @@
 <template>
-    <div class="flex text-2xs">
-        <a v-for="asset in value" :key="asset.id" :href="asset.url" target="_blank">
+    <div class="flex text-2xs gap-2">
+        <a v-for="asset in value.assets.splice(0, 5)" :key="asset.id" :href="asset.url" target="_blank">
             <asset-thumbnail :asset="asset" class="-my-1 h-8 max-w-3xs" />
         </a>
+        <span
+            v-if="value.total > 6"
+            class="-my-1 flex h-8 min-w-8 items-center justify-center px-1.5 font-mono text-gray-600 dark:text-gray-400"
+        >
+            +&thinsp;{{ value.total - 5 }}
+        </span>
     </div>
 </template>
 

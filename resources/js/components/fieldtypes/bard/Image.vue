@@ -28,8 +28,8 @@
                 @paste.stop
             >
                 <Input
+	                ref="alt"
                     name="alt"
-                    :focus="showingAltEdit"
                     v-model="alt"
                     :placeholder="assetAlt"
                     :prepend="__('Alt Text')"
@@ -37,7 +37,7 @@
                 />
             </div>
 
-            <ui-stack v-if="showingSelector" name="asset-selector" @closed="closeSelector">
+            <Stack v-model:open="showingSelector" inset :show-close-button="false">
                 <selector
                     :container="extension.options.bard.meta.assets.container"
                     :folder="extension.options.bard.config.folder || '/'"
@@ -46,10 +46,9 @@
                     :max-files="1"
                     :columns="extension.options.bard.meta.assets.columns"
                     @selected="assetsSelected"
-                    @closed="closeSelector"
-                >
-                </selector>
-            </ui-stack>
+                    @closed="showingSelector = false"
+                />
+            </Stack>
 
             <asset-editor
                 v-if="editing"
@@ -69,7 +68,7 @@
 import Asset from '../assets/Asset';
 import { NodeViewWrapper } from '@tiptap/vue-3';
 import Selector from '../../assets/Selector.vue';
-import { Input, Button } from '@ui';
+import { Input, Button, Stack } from '@ui';
 import { containerContextKey } from '@/components/ui/Publish/Container.vue';
 
 export default {
@@ -80,6 +79,7 @@ export default {
         Selector,
         Input,
         Button,
+	    Stack,
     },
 
     inject: {
@@ -156,15 +156,17 @@ export default {
         alt(alt) {
             this.updateAttributes({ alt });
         },
+
+	    showingAltEdit(showingAltEdit) {
+		    if (showingAltEdit) {
+				this.$nextTick(() => this.$refs.alt.focus());
+		    }
+	    },
     },
 
     methods: {
         openSelector() {
             this.showingSelector = true;
-        },
-
-        closeSelector() {
-            this.showingSelector = false;
         },
 
         assetsSelected(selections) {
@@ -174,6 +176,13 @@ export default {
         },
 
         loadAsset(id) {
+            const cache = this.extension.options.bard.assetsCache;
+
+            if (cache[id]) {
+                this.setAsset(cache[id]);
+                return;
+            }
+
             this.$axios
                 .post(cp_url('assets-fieldtype'), {
                     assets: [id],
@@ -184,6 +193,7 @@ export default {
         },
 
         setAsset(asset) {
+            this.extension.options.bard.assetsCache[asset.id] = asset;
             this.editorAsset = asset;
             this.assetId = asset.id;
             this.assetAlt = asset.values.alt;

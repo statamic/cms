@@ -158,6 +158,10 @@ class Cascade
             return $this;
         }
 
+        if ($this->content instanceof \Closure) {
+            $this->content = call_user_func($this->content);
+        }
+
         $variables = $this->content instanceof Augmentable
             ? $this->content->toDeferredAugmentedArray()
             : $this->content->toArray();

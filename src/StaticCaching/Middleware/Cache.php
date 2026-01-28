@@ -51,13 +51,15 @@ class Cache
     public function handle($request, Closure $next)
     {
         if ($response = $this->attemptToServeCachedResponse($request)) {
-            return $response;
+            return $this->addEtagToResponse($request, $response);
         }
 
         $lock = $this->createLock($request);
 
         try {
-            return $lock->block($this->lockFor, fn () => $this->handleRequest($request, $next));
+            return $lock->block($this->lockFor,
+                fn () => $this->addEtagToResponse($request, $this->handleRequest($request, $next))
+            );
         } catch (LockTimeoutException $e) {
             return $this->outputRefreshResponse($request);
         }
@@ -252,5 +254,25 @@ class Cache
             : sprintf('<meta http-equiv="refresh" content="1; URL=\'%s\'" />', $request->getUri());
 
         return response($html, 503, ['Retry-After' => 1]);
+    }
+
+    private function addEtagToResponse($request, $response)
+    {
+        if (! $response->isRedirect() && $content = $response->getContent()) {
+            // Clear any potentially stale cache-related headers that might interfere
+            $response->headers->remove('ETag');
+            $response->headers->remove('Last-Modified');
+
+            // Set fresh ETag based on current content
+            $response->setEtag(md5($content));
+
+            // Only call isNotModified() if request has cache validation headers
+            // This prevents 304 responses to clients that haven't sent If-None-Match or If-Modified-Since
+            if ($request->headers->has('If-None-Match') || $request->headers->has('If-Modified-Since')) {
+                $response->isNotModified($request);
+            }
+        }
+
+        return $response;
     }
 }
