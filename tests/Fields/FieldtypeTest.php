@@ -158,7 +158,7 @@ class FieldtypeTest extends TestCase
             'defaultable' => true,
             'categories' => [],
             'keywords' => [],
-            'icon' => 'test',
+            'icon' => 'fieldtype-test',
             'config' => [],
         ], $fieldtype->toArray());
     }
@@ -463,14 +463,14 @@ class FieldtypeTest extends TestCase
     #[Test]
     public function it_can_have_an_icon()
     {
-        $this->assertEquals('test', (new TestFieldtype)->icon());
+        $this->assertEquals('fieldtype-test', (new TestFieldtype)->icon());
 
         $customHandle = new class extends Fieldtype
         {
             protected static $handle = 'custom_handle';
         };
 
-        $this->assertEquals('custom_handle', $customHandle->icon());
+        $this->assertEquals('fieldtype-custom_handle', $customHandle->icon());
 
         $customIcon = new class extends Fieldtype
         {

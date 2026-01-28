@@ -244,16 +244,26 @@ class Str
 
     public static function tailwindWidthClass($width)
     {
-        $widths = [
-            25 => 'w-full @lg:w-1/4',
-            33 => 'w-full @lg:w-1/3',
-            50 => 'w-full @lg:w-1/2',
-            66 => 'w-full @lg:w-2/3',
-            75 => 'w-full @lg:w-3/4',
-            100 => 'w-full',
+        $sizes = [
+            'sm' => 'w-full @lg:w-1/2 @4xl:w-1/3 @8xl:w-1/4',
+            'md' => 'w-full @lg:w-1/2 @4xl:w-1/2 @8xl:w-1/3',
+            'lg' => 'w-full @lg:w-full @4xl:w-2/3 @8xl:w-3/4',
+            'full' => 'w-full',
         ];
 
-        return $widths[$width] ?? 'w-full';
+        // For backward compatibility, map old numeric widths to new sizes
+        $legacyMap = [
+            25 => 'sm',
+            33 => 'sm',
+            50 => 'md',
+            66 => 'md',
+            75 => 'lg',
+            100 => 'full',
+        ];
+
+        $size = is_numeric($width) ? ($legacyMap[$width] ?? 'full') : $width;
+
+        return $sizes[$size] ?? $sizes['md'];
     }
 
     /**

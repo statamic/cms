@@ -20,7 +20,7 @@ class Dictionary extends Fieldtype
     {
         return [
             [
-                'display' => __('Options'),
+                'display' => __('Selection & Options'),
                 'fields' => [
                     'dictionary' => [
                         'type' => 'dictionary_fields',
@@ -30,7 +30,7 @@ class Dictionary extends Fieldtype
                 ],
             ],
             [
-                'display' => __('Selection'),
+                'display' => __('Appearance'),
                 'fields' => [
                     'placeholder' => [
                         'display' => __('Placeholder'),
@@ -38,6 +38,18 @@ class Dictionary extends Fieldtype
                         'type' => 'text',
                         'default' => '',
                     ],
+                    'clearable' => [
+                        'display' => __('Clearable'),
+                        'instructions' => __('statamic::fieldtypes.select.config.clearable'),
+                        'type' => 'toggle',
+                        'default' => false,
+                        'width' => '50',
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Boundaries & Limits'),
+                'fields' => [
                     'max_items' => [
                         'display' => __('Max Items'),
                         'instructions' => __('statamic::messages.max_items_instructions'),
@@ -47,7 +59,7 @@ class Dictionary extends Fieldtype
                 ],
             ],
             [
-                'display' => __('Data'),
+                'display' => __('Data & Format'),
                 'fields' => [
                     'default' => [
                         'display' => __('Default Value'),

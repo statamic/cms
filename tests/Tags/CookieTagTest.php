@@ -28,6 +28,5 @@ class CookieTagTest extends TestCase
         request()->cookies->set('nineties', 'rad');
 
         $this->assertEquals('rad', Antlers::parse('{{ cookie:nineties }}'));
-        $this->assertEquals('rad', Antlers::parse('{{ cookie:key }}', ['key' => 'nineties']));
     }
 }

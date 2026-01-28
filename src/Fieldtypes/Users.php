@@ -35,14 +35,23 @@ class Users extends Relationship
     {
         return [
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Input Behavior'),
                 'fields' => [
-                    'max_items' => [
-                        'display' => __('Max Items'),
-                        'instructions' => __('statamic::messages.max_items_instructions'),
-                        'type' => 'integer',
-                        'min' => 1,
+                    'query_scopes' => [
+                        'display' => __('Query Scopes'),
+                        'instructions' => __('statamic::fieldtypes.users.config.query_scopes'),
+                        'type' => 'taggable',
+                        'options' => Scope::all()
+                            ->reject(fn ($scope) => $scope instanceof Filter)
+                            ->map->handle()
+                            ->values()
+                            ->all(),
                     ],
+                ],
+            ],
+            [
+                'display' => __('Appearance'),
+                'fields' => [
                     'mode' => [
                         'display' => __('UI Mode'),
                         'instructions' => __('statamic::fieldtypes.any.config.mode'),
@@ -54,20 +63,26 @@ class Users extends Relationship
                         ],
                         'default' => 'select',
                     ],
+                ],
+            ],
+            [
+                'display' => __('Boundaries & Limits'),
+                'fields' => [
+                    'max_items' => [
+                        'display' => __('Max Items'),
+                        'instructions' => __('statamic::messages.max_items_instructions'),
+                        'type' => 'integer',
+                        'min' => 1,
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Data & Format'),
+                'fields' => [
                     'default' => [
                         'display' => __('Default'),
                         'instructions' => __('statamic::messages.fields_default_instructions'),
                         'type' => 'users',
-                    ],
-                    'query_scopes' => [
-                        'display' => __('Query Scopes'),
-                        'instructions' => __('statamic::fieldtypes.users.config.query_scopes'),
-                        'type' => 'taggable',
-                        'options' => Scope::all()
-                            ->reject(fn ($scope) => $scope instanceof Filter)
-                            ->map->handle()
-                            ->values()
-                            ->all(),
                     ],
                 ],
             ],

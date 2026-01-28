@@ -5,7 +5,7 @@ namespace Tests\Composer;
 use Facades\GuzzleHttp\Client;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Extend\Addon;
+use Statamic\Addons\Addon;
 use Statamic\Updater\AddonChangelog;
 use Tests\TestCase;
 

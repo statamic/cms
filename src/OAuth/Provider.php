@@ -143,6 +143,11 @@ class Provider
         return $this->config['label'] ?? Str::title($this->name);
     }
 
+    public function name()
+    {
+        return $this->name;
+    }
+
     public function config()
     {
         return $this->config;

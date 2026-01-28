@@ -27,6 +27,11 @@ trait Searchable
         return $this->editUrl();
     }
 
+    public function getCpSearchResultIcon()
+    {
+        return 'entry';
+    }
+
     public function toSearchResult(): Result
     {
         return new \Statamic\Search\Result($this, Str::before($this->reference(), '::'));

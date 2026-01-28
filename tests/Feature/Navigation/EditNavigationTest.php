@@ -29,7 +29,7 @@ class EditNavigationTest extends TestCase
             ->actingAs($user)
             ->visitEditPage($nav)
             ->assertSuccessful()
-            ->assertViewHas('nav', $nav);
+            ->assertSee('Configure Navigation');
     }
 
     #[Test]

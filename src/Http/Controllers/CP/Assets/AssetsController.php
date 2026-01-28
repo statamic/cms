@@ -2,13 +2,16 @@
 
 namespace Statamic\Http\Controllers\CP\Assets;
 
+use Facades\Statamic\Fields\Validator as FieldValidator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
 use Statamic\Assets\AssetUploader;
 use Statamic\Assets\UploadedReplacementFile;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
+use Statamic\Contracts\Assets\AssetFolder;
 use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
@@ -27,7 +30,9 @@ class AssetsController extends CpController
         $this->redirectToFirstContainer();
 
         if (User::current()->can('create', AssetContainerContract::class)) {
-            return view('statamic::assets.index');
+            return Inertia::render('assets/Empty', [
+                'createUrl' => cp_route('asset-containers.create'),
+            ]);
         }
 
         throw new AuthorizationException;
@@ -78,18 +83,21 @@ class AssetsController extends CpController
 
         $container = AssetContainer::find($request->container);
 
-        abort_unless($container->allowUploads(), 403);
         $this->authorize('store', [AssetContract::class, $container]);
 
+        $validationRules = collect($container->validationRules())
+            ->map(fn ($rule) => FieldValidator::parse($rule))
+            ->all();
+
         $request->validate([
-            'file' => array_merge(['file', new AllowedFile], $container->validationRules()),
+            'file' => array_merge(['file', new AllowedFile], $validationRules),
         ]);
 
         $file = $request->file('file');
         $folder = $request->folder;
 
-        // Append relative path as subfolder when upload was part of a folder and container allows it
-        if ($container->createFolders() && ($relativePath = AssetUploader::getSafePath($request->relativePath))) {
+        // Append relative path as subfolder when upload was part of a folder and user is allowed to create folders
+        if (User::current()->can('create', [AssetFolder::class, $container]) && ($relativePath = AssetUploader::getSafePath($request->relativePath))) {
             $folder = rtrim($folder, '/').'/'.$relativePath;
         }
 

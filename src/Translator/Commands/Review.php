@@ -53,7 +53,7 @@ class Review extends Command
 
     protected function reviewStringFile($lang)
     {
-        $path = "resources/lang/$lang.json";
+        $path = "lang/$lang.json";
         $fullPath = getcwd().'/'.$path;
 
         throw_if(! $this->files->exists($fullPath), new \Exception("$path does not exist."));
@@ -85,7 +85,7 @@ EOL;
 
     protected function reviewKeyFile($lang, $file)
     {
-        $path = "resources/lang/$lang/$file.php";
+        $path = "lang/$lang/$file.php";
         $fullPath = getcwd().'/'.$path;
 
         throw_if(! $this->files->exists($fullPath), new \Exception("$path does not exist."));
@@ -128,7 +128,7 @@ EOL;
             return $cached;
         }
 
-        $path = getcwd()."/resources/lang/en/{$file}.php";
+        $path = getcwd()."/lang/en/{$file}.php";
 
         return $this->englishTranslations[$file] = require $path;
     }

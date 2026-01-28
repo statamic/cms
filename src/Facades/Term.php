@@ -15,6 +15,8 @@ use Statamic\Taxonomies\TermCollection;
  * @method static null|TermContract find($id)
  * @method static null|TermContract findByUri(string $uri, string $site = null)
  * @method static TermContract findOrFail($id)
+ * @method static TermContract findOrMake($id)
+ * @method static TermContract findOr($id, \Closure $callback)
  * @method static TermContract make(string $slug = null)
  * @method static save($term)
  * @method static delete($term)

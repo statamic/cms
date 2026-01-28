@@ -14,7 +14,7 @@ class Navs extends Relationship
     protected $canCreate = false;
     protected $canSearch = false;
     protected $statusIcons = false;
-    protected $icon = 'structures';
+    protected $icon = 'fieldtype-structures';
 
     protected function toItemArray($id, $site = null)
     {

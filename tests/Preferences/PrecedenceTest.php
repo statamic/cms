@@ -257,6 +257,7 @@ class PrecedenceTest extends TestCase
                     'user' => true,
                 ],
             ],
+            'theme' => null,
         ]));
 
         $this->setTestRoles([
@@ -270,6 +271,7 @@ class PrecedenceTest extends TestCase
                         'role' => true,
                     ],
                 ],
+                'theme' => ['id' => 2],
             ]),
         ]);
 
@@ -284,10 +286,12 @@ class PrecedenceTest extends TestCase
                     'default' => true,
                 ],
             ],
+            'theme' => ['id' => 1],
         ])->save();
 
         Preference::preventMergingChildren('actions');
         Preference::preventMergingChildren('deeply.nested');
+        Preference::preventMergingChildren('theme');
 
         $this->assertEquals('english', Preference::get('site'));
         $this->assertFalse(Preference::get('actions.hibernates'));
@@ -297,6 +301,7 @@ class PrecedenceTest extends TestCase
         $this->assertTrue(Preference::get('deeply.nested.user'));
         $this->assertNull(Preference::get('deeply.nested.role'));
         $this->assertNull(Preference::get('deeply.nested.default'));
+        $this->assertNull(Preference::get('theme'));
     }
 
     #[Test]

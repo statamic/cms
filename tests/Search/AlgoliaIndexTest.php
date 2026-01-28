@@ -17,7 +17,7 @@ class AlgoliaIndexTest extends TestCase
 
     public function getIndex($name, $config, $locale)
     {
-        $client = Mockery::mock(\Algolia\AlgoliaSearch\SearchClient::class);
+        $client = Mockery::mock(\Algolia\AlgoliaSearch\Api\SearchClient::class);
 
         return new AlgoliaIndex($client, $name, $config, $locale);
     }

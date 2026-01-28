@@ -4,6 +4,7 @@ namespace Statamic\CP\Navigation;
 
 use Facades\Statamic\CP\Navigation\NavItemIdHasher;
 use Statamic\Facades\CP\Nav;
+use Statamic\Facades\URL;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -18,7 +19,10 @@ class NavTransformer
      */
     public function __construct(array $submitted)
     {
-        $this->coreNav = Nav::buildWithoutPreferences(true);
+        $this->coreNav = Nav::build(
+            preferences: false,
+            editing: true,
+        );
 
         $this->submitted = $this->removeEmptyCustomSections($submitted);
     }
@@ -233,7 +237,7 @@ class NavTransformer
             $url = str_replace(url('/'), '', $url);
         }
 
-        if (Str::startsWith($url, ['http://', 'https://'])) {
+        if (URL::isAbsolute($url)) {
             return $url;
         }
 

@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Fields;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
 use Statamic\Exceptions\DuplicateFieldException;
 use Statamic\Exceptions\FieldsetRecursionException;
 use Statamic\Facades;
@@ -15,6 +16,8 @@ use Statamic\Support\Str;
 
 trait ManagesBlueprints
 {
+    use ManagesFields;
+
     private function indexItems(Collection $blueprints, $item)
     {
         return $blueprints->map(function ($blueprint) use ($item) {
@@ -102,6 +105,8 @@ trait ManagesBlueprints
             return Arr::removeNullValues([
                 'display' => $section['display'] ?? null,
                 'instructions' => $section['instructions'] ?? null,
+                'collapsible' => ($collapsible = $section['collapsible'] ?? null) ?: null,
+                'collapsed' => ($collapsible && $section['collapsed'] ?? null) ?: null,
                 'fields' => collect($section['fields'])
                     ->map(fn ($field) => FieldTransformer::fromVue($field))
                     ->all(),
@@ -137,6 +142,8 @@ trait ManagesBlueprints
         return Arr::removeNullValues([
             'display' => $section->display(),
             'instructions' => $section->instructions(),
+            'collapsible' => $section->collapsible(),
+            'collapsed' => $section->collapsed(),
         ]) + [
             'fields' => collect($section->contents()['fields'] ?? [])->map(function ($field, $i) use ($tab, $sectionIndex) {
                 return array_merge(FieldTransformer::toVue($field), ['_id' => $tab->handle().'-'.$sectionIndex.'-'.$i]);
@@ -168,5 +175,13 @@ trait ManagesBlueprints
         $blueprint->save();
 
         return $blueprint;
+    }
+
+    private function renderEditPage(array $props)
+    {
+        return Inertia::render('blueprints/Edit', [
+            ...$props,
+            ...$this->fieldProps(),
+        ]);
     }
 }

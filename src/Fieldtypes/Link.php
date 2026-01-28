@@ -12,6 +12,7 @@ use Statamic\Facades\Site;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes\Link\ArrayableLink;
+use Statamic\GraphQL\Types\LinkValueType;
 use Statamic\Support\Str;
 
 class Link extends Fieldtype
@@ -22,13 +23,14 @@ class Link extends Fieldtype
     {
         return [
             [
-                'display' => __('Behavior'),
+                'display' => __('Input Behavior'),
                 'fields' => [
                     'collections' => [
                         'display' => __('Collections'),
                         'instructions' => __('statamic::fieldtypes.link.config.collections'),
                         'type' => 'collections',
                         'mode' => 'select',
+                        'width' => '50',
                     ],
                     'container' => [
                         'display' => __('Container'),
@@ -36,11 +38,13 @@ class Link extends Fieldtype
                         'type' => 'asset_container',
                         'mode' => 'select',
                         'max_items' => 1,
+                        'width' => '50',
                     ],
                     'select_across_sites' => [
                         'display' => __('Select Across Sites'),
                         'instructions' => __('statamic::fieldtypes.entries.config.select_across_sites'),
                         'type' => 'toggle',
+                        'width' => '50',
                     ],
                 ],
             ],
@@ -186,18 +190,7 @@ class Link extends Fieldtype
 
     public function toGqlType()
     {
-        return [
-            'type' => GraphQL::string(),
-            'resolve' => function ($item, $args, $context, $info) {
-                if (! $augmented = $item->resolveGqlValue($info->fieldName)) {
-                    return null;
-                }
-
-                $item = $augmented->value();
-
-                return is_object($item) ? $item->url() : $item;
-            },
-        ];
+        return GraphQL::type(LinkValueType::NAME);
     }
 
     protected function getConfiguredCollections()

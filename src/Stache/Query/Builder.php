@@ -160,7 +160,7 @@ abstract class Builder extends BaseBuilder
         $lookup = array_flip(array_map(fn ($v) => $v ?? '__NULL__', $where['values']));
 
         return $values->filter(
-            fn ($value) => isset($lookup[$value ?? '__NULL__'])
+            fn ($value) => ! is_array($value) && isset($lookup[$value ?? '__NULL__'])
         );
     }
 
@@ -169,7 +169,7 @@ abstract class Builder extends BaseBuilder
         $lookup = array_flip(array_map(fn ($v) => $v ?? '__NULL__', $where['values']));
 
         return $values->filter(
-            fn ($value) => ! isset($lookup[$value ?? '__NULL__'])
+            fn ($value) => is_array($value) || ! isset($lookup[$value ?? '__NULL__'])
         );
     }
 
@@ -305,7 +305,7 @@ abstract class Builder extends BaseBuilder
                 return false;
             }
 
-            return ! empty(array_intersect($value, $where['values']));
+            return count(array_intersect($value, $where['values'])) == count($where['values']);
         });
     }
 
@@ -316,7 +316,7 @@ abstract class Builder extends BaseBuilder
                 return true;
             }
 
-            return empty(array_intersect($value, $where['values']));
+            return count(array_intersect($value, $where['values'])) != count($where['values']);
         });
     }
 

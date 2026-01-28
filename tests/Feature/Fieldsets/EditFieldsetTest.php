@@ -49,6 +49,6 @@ class EditFieldsetTest extends TestCase
             ->actingAs($user)
             ->get($fieldset->editUrl())
             ->assertStatus(200)
-            ->assertViewHas('fieldset', $fieldset);
+            ->assertInertia(fn ($page) => $page->where('initialFieldset.handle', $fieldset->handle()));
     }
 }

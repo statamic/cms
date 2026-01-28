@@ -1,7 +1,6 @@
 import mousetrap from 'mousetrap';
 
 export default class Binding {
-
     constructor(bindings) {
         this.bindings = bindings;
     }
@@ -9,7 +8,7 @@ export default class Binding {
     bind(bindings, callback) {
         if (typeof bindings === 'string') bindings = [bindings];
 
-        bindings.forEach(binding => {
+        bindings.forEach((binding) => {
             this.bindings[binding] = this.bindings[binding] || [];
             this.bindings[binding].push(callback);
             this.bindMousetrap(binding, callback);
@@ -21,7 +20,7 @@ export default class Binding {
     }
 
     destroy() {
-        this.bound.forEach(binding => {
+        this.bound.forEach((binding) => {
             this.bindings[binding].pop();
             const previous = this.bindings[binding].slice(-1)[0];
             previous ? mousetrap.bind(binding, previous) : mousetrap.unbind(binding);

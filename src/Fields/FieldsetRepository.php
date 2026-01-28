@@ -180,7 +180,7 @@ class FieldsetRepository
             throw new \Exception('Namespaced fieldsets cannot be deleted');
         }
 
-        File::delete("{$this->directory}/{$fieldset->handle()}.yaml");
+        File::delete($fieldset->path());
     }
 
     public function reset(Fieldset $fieldset)
@@ -220,6 +220,7 @@ class FieldsetRepository
                     ->initialPath($file)
                     ->setContents(YAML::file($file)->parse());
             })
-            ->keyBy->handle();
+            ->keyBy->handle()
+            ->collect();
     }
 }

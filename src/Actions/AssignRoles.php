@@ -7,6 +7,8 @@ use Statamic\Facades\Role;
 
 class AssignRoles extends Action
 {
+    public $icon = 'permissions';
+
     public static function title()
     {
         return __('Assign Roles');

@@ -3,11 +3,11 @@
 namespace Statamic\Testing;
 
 use Facades\Statamic\Version;
-use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use ReflectionClass;
+use Statamic\Addons\Manifest;
 use Statamic\Console\Processes\Composer;
-use Statamic\Extend\Manifest;
+use Statamic\Facades\Path;
 use Statamic\Providers\StatamicServiceProvider;
 use Statamic\Statamic;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
@@ -26,17 +26,16 @@ abstract class AddonTestCase extends OrchestraTestCase
         $uses = array_flip(class_uses_recursive(static::class));
 
         if (isset($uses[PreventsSavingStacheItemsToDisk::class])) {
-            $reflection = new ReflectionClass($this);
-            $this->fakeStacheDirectory = Str::before(dirname($reflection->getFileName()), DIRECTORY_SEPARATOR.'tests').'/tests/__fixtures__/dev-null';
+            $reflector = new ReflectionClass($this->addonServiceProvider);
+            $this->fakeStacheDirectory = Path::resolve(dirname($reflector->getFileName()).'/../tests/__fixtures__/dev-null');
 
             $this->preventSavingStacheItemsToDisk();
         }
 
-        Version::shouldReceive('get')->zeroOrMoreTimes()->andReturn(Composer::create(__DIR__.'/../')->installedVersion(Statamic::PACKAGE));
-        $this->addToAssertionCount(-1);
+        Version::shouldReceive('get')->andReturn(Composer::create(__DIR__.'/../')->installedVersion(Statamic::PACKAGE));
 
-        \Statamic\Facades\CP\Nav::shouldReceive('build')->zeroOrMoreTimes()->andReturn(collect());
-        $this->addToAssertionCount(-1); // Dont want to assert this
+        \Statamic\Facades\CP\Nav::shouldReceive('build')->andReturn(collect());
+        \Statamic\Facades\CP\Nav::shouldReceive('clearCachedUrls');
     }
 
     protected function tearDown(): void
@@ -54,6 +53,7 @@ abstract class AddonTestCase extends OrchestraTestCase
     {
         $serviceProviders = [
             StatamicServiceProvider::class,
+            \Inertia\ServiceProvider::class,
             $this->addonServiceProvider,
         ];
 
@@ -95,6 +95,9 @@ abstract class AddonTestCase extends OrchestraTestCase
                 'provider' => $this->addonServiceProvider,
             ],
         ];
+
+        $app['config']->set('inertia.testing.ensure_pages_exist', false);
+        $app['config']->set('inertia.testing.page_paths', [$directory.'/../resources/js/pages']);
 
         $app['config']->set('statamic.users.repository', 'file');
 

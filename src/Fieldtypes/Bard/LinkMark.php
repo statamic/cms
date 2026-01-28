@@ -17,6 +17,10 @@ class LinkMark extends Link
                 'rel' => '',
                 'target' => '_blank',
             ],
+            'allowedProtocols' => [
+                'http', 'https', 'ftp', 'ftps', 'mailto', 'tel', 'callto', 'sms', 'cid', 'xmpp', 'statamic', 'entry', 'asset',
+            ],
+            'isAllowedUri' => fn ($uri) => $this->isAllowedUri($uri),
         ];
     }
 

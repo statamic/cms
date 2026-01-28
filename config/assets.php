@@ -35,26 +35,11 @@ return [
         |--------------------------------------------------------------------------
         |
         | The driver that will be used under the hood for image manipulation.
-        | Supported: "gd" or "imagick" (if installed on your server)
+        | Supported: "gd", "imagick" or a class name of a custom driver.
         |
         */
 
         'driver' => 'gd',
-
-        /*
-        |--------------------------------------------------------------------------
-        | Additional Image Extensions
-        |--------------------------------------------------------------------------
-        |
-        | Define any additional image file extensions you would like Statamic to
-        | process. You should ensure that both your server and the selected
-        | image manipulation driver properly supports these extensions.
-        |
-        */
-
-        'additional_extensions' => [
-            // 'heic',
-        ],
 
         /*
         |--------------------------------------------------------------------------
@@ -147,6 +132,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Control Panel Video Thumbnails
+    |--------------------------------------------------------------------------
+    |
+    | When enabled, Statamic will generate thumbnails for videos.
+    | Generated thumbnails are displayed in the Control Panel.
+    |
+    */
+
+    'video_thumbnails' => true,
+
+    /*
+    |--------------------------------------------------------------------------
     | File Previews with Google Docs
     |--------------------------------------------------------------------------
     |
@@ -225,14 +222,33 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Use V6 Permissions
+    | FFmpeg
     |--------------------------------------------------------------------------
     |
-    | This allows you to opt in to the asset permissions that will become the
-    | default behavior in Statamic 6. This will be removed in Statamic 6.
+    | Statamic uses FFmpeg to extract thumbnails from videos to be shown in the
+    | Control Panel. You may adjust the binary location and cache path here.
     |
     */
 
-    'v6_permissions' => false,
+    'ffmpeg' => [
+        'binary' => null,
+        'cache_path' => storage_path('statamic/glide/ffmpeg'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Replicator and Bard Set Preview Images
+    |--------------------------------------------------------------------------
+    |
+    | Replicator and Bard sets may have preview images to give users a visual
+    | representation of the content within. Here you may specify the asset
+    | container and folder where these preview images are to be stored.
+    |
+    */
+
+    'set_preview_images' => [
+        'container' => 'assets',
+        'folder' => 'set-previews',
+    ],
 
 ];

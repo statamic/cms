@@ -35,6 +35,10 @@ abstract class ActionController extends CpController
 
         abort_unless($unauthorized->isEmpty(), 403, __('You are not authorized to run this action.'));
 
+        if ($action->requiresElevatedSession()) {
+            $this->requireElevatedSession();
+        }
+
         $values = $action->fields()->addValues($request->all())->process()->values()->all();
         $successful = true;
 
@@ -49,6 +53,7 @@ abstract class ActionController extends CpController
             return [
                 'redirect' => $redirect,
                 'bypassesDirtyWarning' => $action->bypassesDirtyWarning(),
+                'triggersFullPageRefresh' => $action->triggersFullPageRefresh(),
             ];
         } elseif ($download = $action->download($items, $values)) {
             return $download instanceof Response ? $download : response()->download($download);

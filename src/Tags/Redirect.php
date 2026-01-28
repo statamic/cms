@@ -7,13 +7,6 @@ use Statamic\Fields\Value;
 
 class Redirect extends Tags
 {
-    public function wildcard($tag)
-    {
-        return $this->redirect(
-            $this->context->value($tag)
-        );
-    }
-
     public function index()
     {
         if ($route = $this->params->get('route')) {

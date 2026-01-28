@@ -19,7 +19,8 @@ class FieldRepository
             return null;
         }
 
-        [$fieldset, $handle] = explode('.', $field);
+        $fieldset = Str::beforeLast($field, '.');
+        $handle = Str::afterLast($field, '.');
 
         if (! $fieldset = $this->fieldsets->find($fieldset)) {
             return null;

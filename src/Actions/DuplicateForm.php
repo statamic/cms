@@ -10,6 +10,8 @@ use Statamic\Statamic;
 
 class DuplicateForm extends Action
 {
+    protected $icon = 'duplicate';
+
     public static function title()
     {
         return __('Duplicate');

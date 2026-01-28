@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Globals;
 
-use Facades\Tests\Factories\GlobalFactory;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\GlobalSet;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -19,7 +19,7 @@ class ConfigureGlobalsTest extends TestCase
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $user = User::make()->assignRole('test')->save();
-        $global = GlobalFactory::handle('test')->create();
+        $global = GlobalSet::make('test')->save();
 
         $this
             ->from('/original')
@@ -35,7 +35,7 @@ class ConfigureGlobalsTest extends TestCase
         $this->setTestRoles(['test' => ['access cp', 'configure globals']]);
         $user = User::make()->assignRole('test')->save();
 
-        $global = GlobalFactory::handle('test')->data(['foo' => 'bar'])->create();
+        $global = GlobalSet::make('test')->save();
 
         $this
             ->actingAs($user)

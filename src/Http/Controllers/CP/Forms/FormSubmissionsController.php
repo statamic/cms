@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Forms;
 
+use Inertia\Inertia;
 use Statamic\Fields\Field;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
@@ -86,13 +87,13 @@ class FormSubmissionsController extends CpController
         $blueprint = $submission->blueprint();
         $fields = $blueprint->fields()->addValues($submission->data()->all())->preProcess();
 
-        return view('statamic::forms.submission', [
-            'form' => $form,
-            'submission' => $submission,
+        return Inertia::render('forms/Submission', [
+            'id' => $submission->id(),
+            'formTitle' => $form->title(),
+            'date' => $submission->date()->toIso8601String(),
             'blueprint' => $blueprint->toPublishArray(),
             'values' => $fields->values(),
             'meta' => $fields->meta(),
-            'title' => $submission->formattedDate(),
         ]);
     }
 }
