@@ -1,6 +1,6 @@
 <template>
     <div class="flex text-2xs gap-2">
-        <a v-for="asset in value" :key="asset.id" :href="asset.url" target="_blank">
+        <a v-for="asset in value.slice(0, 5)" :key="asset.id" :href="asset.url" target="_blank">
             <asset-thumbnail :asset="asset" class="-my-1 h-8 max-w-3xs" />
         </a>
     </div>
