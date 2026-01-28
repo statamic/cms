@@ -174,6 +174,24 @@ JSON, $this->files->get(base_path('package.json')));
 PHP, $this->files->get(app_path('Providers/AppServiceProvider.php')));
     }
 
+    #[Test]
+    public function it_shows_error_when_npm_install_fails_but_continues()
+    {
+        Process::fake([
+            '*' => Process::result(
+                output: '',
+                errorOutput: 'npm ERR! code ERESOLVE',
+                exitCode: 1,
+            ),
+        ]);
+
+        $this
+            ->artisan('statamic:setup-cp-vite')
+            ->expectsOutputToContain('Failed to install dependencies')
+            ->expectsOutputToContain('npm ERR! code ERESOLVE')
+            ->expectsOutputToContain('Added cp:dev and cp:build scripts to package.json');
+    }
+
     private function makeNecessaryFiles(): void
     {
         $this->files->put(app_path('Providers/AppServiceProvider.php'), <<<'PHP'

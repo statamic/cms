@@ -46,7 +46,7 @@ class SetupCpVite extends Command
 
     private function installDependencies(): self
     {
-        spin(
+        $result = spin(
             callback: function () {
                 $packageJsonPath = base_path('package.json');
                 $contents = File::json($packageJsonPath);
@@ -63,12 +63,17 @@ class SetupCpVite extends Command
 
                 File::put($packageJsonPath, json_encode($contents, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
-                Process::path(base_path())->run('npm install', function (string $type, string $buffer) {
-                    echo $buffer;
-                });
+                return Process::path(base_path())->run('npm install');
             },
             message: 'Installing dependencies...'
         );
+
+        if ($result->failed()) {
+            $this->line($result->errorOutput() ?: $result->output());
+            $this->components->error('Failed to install dependencies. You need to run "npm install" manually.');
+
+            return $this;
+        }
 
         $this->components->info('Installed dependencies');
 
