@@ -57,12 +57,12 @@ function actionFailed(response) {
             v-if="visible"
             layout
             data-floating-toolbar
-            class="sticky inset-x-0 bottom-1 sm:bottom-6 z-(--z-index-above) flex w-full max-w-[95vw] mx-auto justify-center "
+            class="pointer-events-none sticky inset-x-0 bottom-1 sm:bottom-6 z-(--z-index-above) flex w-full max-w-[95vw] mx-auto justify-center"
             :initial="{ y: 100, opacity: 0 }"
             :animate="{ y: 0, opacity: 1 }"
             :transition="{ duration: 0.2, ease: 'easeInOut' }"
         >
-            <div class="space-y-3 rounded-xl border border-gray-300/60 dark:border-gray-700 p-1 bg-gray-200/55 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/10">
+            <div class="pointer-events-auto space-y-3 rounded-xl border border-gray-300/60 dark:border-gray-700 p-1 bg-gray-200/55 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/10">
             <ButtonGroup>
                 <Button
                     class="text-blue-500!"
