@@ -823,7 +823,13 @@ export default {
                 editable: !this.readOnly,
                 enableInputRules: this.config.enable_input_rules,
                 enablePasteRules: this.config.enable_paste_rules,
-                editorProps: { attributes: { class: 'bard-content' } },
+                editorProps: {
+                    attributes: { class: 'bard-content' },
+                    handlePaste: () => {
+                        this.debounceNextUpdate = false;
+                        return false;
+                    },
+                },
                 onDrop: () => this.debounceNextUpdate = false,
                 onFocus: () => {
                     this.hasBeenFocused = true;
