@@ -4,6 +4,7 @@ namespace Statamic\Fields;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Arr;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\RegistersItself;
 use Statamic\Facades\Blink;
@@ -215,6 +216,14 @@ abstract class Fieldtype implements Arrayable
             return [];
         }
 
+        if ($this->extraConfigFieldsUseSections()) {
+            $extraSections = collect($extras)->filter(fn ($field) => Arr::has($field, 'fields'));
+
+            $fields = collect($fields)->merge($extraSections);
+
+            $extras = collect($extras)->diffKeys($extraSections);
+        }
+
         $extras = collect($extras)
             ->map(fn ($field, $handle) => compact('handle', 'field'))
             ->values()->all();
@@ -260,6 +269,15 @@ abstract class Fieldtype implements Arrayable
         return array_keys($fields)[0] === 0;
     }
 
+    private function extraConfigFieldsUseSections()
+    {
+        if (empty($fields = $this->extraConfigFieldItems())) {
+            return false;
+        }
+
+        return array_keys($fields)[0] === 0;
+    }
+
     public function configFields(): Fields
     {
         if ($cached = Blink::get($blink = 'config-fields-'.$this->handle())) {
@@ -267,13 +285,18 @@ abstract class Fieldtype implements Arrayable
         }
 
         $fields = collect($this->configFieldItems());
+        $extraFields = collect($this->extraConfigFieldItems());
 
         if ($this->configFieldsUseSections()) {
             $fields = $fields->flatMap(fn ($section) => $section['fields']);
         }
 
+        if ($this->extraConfigFieldsUseSections()) {
+            $extraFields = $extraFields->flatMap(fn ($section) => $section['fields']);
+        }
+
         $fields = $fields
-            ->merge($this->extraConfigFieldItems())
+            ->merge($extraFields)
             ->map(function ($field, $handle) {
                 return compact('handle', 'field');
             });
