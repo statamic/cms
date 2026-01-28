@@ -220,6 +220,7 @@ export default {
             errorsById: {},
             debounceNextUpdate: true,
             setsCache: {},
+            assetsCache: {},
             loadingSet: null,
         };
     },
