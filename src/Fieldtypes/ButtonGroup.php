@@ -15,7 +15,7 @@ class ButtonGroup extends Fieldtype
     {
         return [
             [
-                'display' => __('Options'),
+                'display' => __('Selection & Options'),
                 'fields' => [
                     'options' => [
                         'display' => __('Options'),
@@ -24,13 +24,20 @@ class ButtonGroup extends Fieldtype
                         'expand' => true,
                         'value_header' => __('Label').' ('.__('Optional').')',
                         'add_button' => __('Add Option'),
+                        'width' => 50,
                     ],
                     'clearable' => [
                         'display' => __('Clearable'),
                         'instructions' => __('statamic::fieldtypes.select.config.clearable'),
                         'type' => 'toggle',
                         'default' => false,
+                        'width' => 50,
                     ],
+                ],
+            ],
+            [
+                'display' => __('Data & Format'),
+                'fields' => [
                     'default' => [
                         'display' => __('Default Value'),
                         'instructions' => __('statamic::messages.fields_default_instructions'),

@@ -28,6 +28,7 @@ class GlobalSet implements Contract
     protected $handle;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
+    private $sites = [];
 
     public function id()
     {
@@ -52,6 +53,14 @@ class GlobalSet implements Contract
     public function blueprint()
     {
         return Blueprint::find('globals.'.$this->handle());
+    }
+
+    public function blueprintCommandPaletteLink()
+    {
+        return $this->inDefaultSite()->blueprint()?->commandPaletteLink(
+            type: 'Globals',
+            url: $this->editBlueprintUrl(),
+        );
     }
 
     public function path()
@@ -118,12 +127,14 @@ class GlobalSet implements Contract
 
     protected function saveOrDeleteLocalizations()
     {
-        $localizations = $this->localizations();
+        $localizations = $this->freshLocalizations();
 
-        $localizations->each->save();
+        $this->sites()
+            ->reject(fn ($site) => $localizations->has($site))
+            ->each(fn ($site) => $this->makeLocalization($site)->save());
 
-        $this->freshLocalizations()
-            ->diffKeys($localizations)
+        $localizations
+            ->filter(fn ($localization) => ! $this->sites()->contains($localization->locale()))
             ->each->delete();
     }
 
@@ -156,17 +167,10 @@ class GlobalSet implements Contract
 
     public function fileData()
     {
-        $data = [
+        return Arr::removeNullValues([
             'title' => $this->title(),
-        ];
-
-        if (! Site::multiEnabled() && ($variables = $this->in(Site::default()->handle()))) {
-            $data['data'] = Arr::removeNullValues(
-                $variables->data()->all()
-            );
-        }
-
-        return $data;
+            'sites' => Site::multiEnabled() ? $this->origins()->all() : null,
+        ]);
     }
 
     public function makeLocalization($site)
@@ -176,30 +180,53 @@ class GlobalSet implements Contract
             ->locale($site);
     }
 
-    public function addLocalization($localization)
+    public function sites($sites = null)
     {
-        $localization->globalSet($this);
+        if (func_num_args() === 0) {
+            $sites = collect($this->sites);
 
-        $this->localizations()[$localization->locale()] = $localization;
+            if ($sites->isEmpty()) {
+                return collect([Site::default()->handle()]);
+            }
+
+            return collect($this->sites)->keys();
+        }
+
+        $this->sites = collect($sites)->mapWithKeys(function ($value, $key) {
+            if (is_int($key)) {
+                return [$value => ['origin' => null]];
+            }
+
+            if (is_string($value) || is_null($value)) {
+                return [$key => ['origin' => $value]];
+            }
+
+            return [$key => $value];
+        })->all();
 
         return $this;
     }
 
-    public function removeLocalization($localization)
+    public function origins()
     {
-        $this->localizations()->forget($localization->locale());
+        $sites = empty($this->sites)
+            ? [Site::default()->handle() => ['origin' => null]]
+            : $this->sites;
 
-        return $this;
-    }
-
-    public function sites()
-    {
-        return $this->localizations()->map->locale()->values()->toBase();
+        return collect($sites)->map(fn ($value, $key) => $value['origin'] ?? null);
     }
 
     public function in($locale)
     {
-        return $this->localizations()->get($locale);
+        if (! $this->sites()->contains($locale)) {
+            return null;
+        }
+
+        if (! $variables = $this->localizations()->get($locale)) {
+            $variables = $this->makeLocalization($locale);
+        }
+
+        return $variables;
     }
 
     public function inSelectedSite()
@@ -239,9 +266,19 @@ class GlobalSet implements Contract
         return cp_route('globals.edit', $this->handle());
     }
 
+    public function updateUrl()
+    {
+        return cp_route('globals.update', $this->handle());
+    }
+
     public function deleteUrl()
     {
         return cp_route('globals.destroy', $this->handle());
+    }
+
+    public function editBlueprintUrl()
+    {
+        return cp_route('blueprints.globals.edit', $this->handle());
     }
 
     public static function __callStatic($method, $parameters)

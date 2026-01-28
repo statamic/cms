@@ -29,23 +29,24 @@ class EditNavigationPageTest extends TestCase
 
     private function mockTextFieldtype()
     {
-        FieldtypeRepository::shouldReceive('find')->with('text')
-            ->andReturn(new class extends Fieldtype
+        $ft = new class extends Fieldtype
+        {
+            public function preProcess($value)
             {
-                public function preProcess($value)
-                {
-                    if (! $value) {
-                        return;
-                    }
-
-                    return $value.' (preprocessed)';
+                if (! $value) {
+                    return;
                 }
 
-                public function preload()
-                {
-                    return ['hello' => 'world'];
-                }
-            });
+                return $value.' (preprocessed)';
+            }
+
+            public function preload()
+            {
+                return ['hello' => 'world'];
+            }
+        };
+        FieldtypeRepository::shouldReceive('find')->with('text')->andReturn($ft);
+        FieldtypeRepository::shouldReceive('find')->with('slug')->andReturn($ft);
     }
 
     #[Test]
@@ -90,7 +91,6 @@ class EditNavigationPageTest extends TestCase
                     'title',
                     'url',
                 ],
-                'syncableFields' => [],
             ]);
     }
 
@@ -134,7 +134,6 @@ class EditNavigationPageTest extends TestCase
                     'foo',
                     'url',
                 ],
-                'syncableFields' => [],
             ]);
     }
 
@@ -152,6 +151,7 @@ class EditNavigationPageTest extends TestCase
                 'title' => 'The page title',
                 'data' => [
                     'foo' => 'page foo',
+                    'alfa' => 'page alfa',
                 ],
             ],
         ])->save();
@@ -160,13 +160,15 @@ class EditNavigationPageTest extends TestCase
             'foo' => ['type' => 'text'],
             'bar' => ['type' => 'text'],
             'baz' => ['type' => 'text'],
-            'qux' => ['type' => 'text'],
+            'qux' => ['type' => 'text'], // Not in nav
         ]);
 
         $navBlueprint = Blueprint::makeFromFields([
             'foo' => ['type' => 'text'],
             'bar' => ['type' => 'text'],
             'baz' => ['type' => 'text'],
+            'alfa' => ['type' => 'text'], // Not in entry
+            'bravo' => ['type' => 'text'], // Not in entry, and has no value
         ]);
 
         BlueprintRepository::partialMock();
@@ -188,41 +190,52 @@ class EditNavigationPageTest extends TestCase
         $this
             ->actingAs($user)
             ->request($nav, 'id7')
-            ->assertJson([
+            ->assertExactJson([
+                'extraValues' => [
+                    'depth' => 1,
+                ],
                 'values' => [
                     'title' => 'The page title (preprocessed)',
                     'foo' => 'page foo (preprocessed)',
                     'bar' => 'entry bar (preprocessed)',
                     'baz' => null,
+                    'alfa' => 'page alfa (preprocessed)',
+                    'bravo' => null,
+                    'qux' => 'entry qux (preprocessed)',
+                    'slug' => null,
+                    'url' => null,
                 ],
                 'meta' => [
                     'title' => ['hello' => 'world'],
                     'url' => ['hello' => 'world'],
                     'foo' => ['hello' => 'world'],
                     'bar' => ['hello' => 'world'],
+                    'baz' => ['hello' => 'world'],
+                    'alfa' => ['hello' => 'world'],
+                    'bravo' => ['hello' => 'world'],
                 ],
                 'originValues' => [
                     'title' => 'entry title (preprocessed)',
                     'foo' => 'entry foo (preprocessed)',
                     'bar' => 'entry bar (preprocessed)',
                     'baz' => null,
+                    'qux' => 'entry qux (preprocessed)',
+                    'slug' => null,
+                    'url' => null,
                 ],
                 'originMeta' => [
                     'title' => ['hello' => 'world'],
-                    'url' => ['hello' => 'world'],
                     'foo' => ['hello' => 'world'],
                     'bar' => ['hello' => 'world'],
                     'baz' => ['hello' => 'world'],
+                    'qux' => ['hello' => 'world'],
+                    'slug' => ['hello' => 'world'],
+                    'url' => ['hello' => 'world'],
                 ],
                 'localizedFields' => [
                     'foo',
+                    'alfa',
                     'title',
-                ],
-                'syncableFields' => [
-                    'title',
-                    'foo',
-                    'bar',
-                    'baz',
                 ],
             ]);
     }

@@ -89,7 +89,21 @@ class Install extends Command
         $this->call('vendor:publish', ['--tag' => 'statamic-cp', '--force' => true]);
         $this->call('vendor:publish', ['--tag' => 'statamic-frontend', '--force' => true]);
 
+        if ($this->shouldPublishDevAssets()) {
+            $this->call('vendor:publish', ['--tag' => 'statamic-cp-dev', '--force' => true]);
+        }
+
         return $this;
+    }
+
+    private function shouldPublishDevAssets(): bool
+    {
+        // We only want to re-publish the dev assets if they were manually published before.
+        // If the path is a symlink, we'll assume they've linked to the assets anyway, so don't override it.
+
+        return config('app.debug')
+            && is_dir($path = public_path('vendor/statamic/cp-dev'))
+            && ! is_link($path);
     }
 
     protected function clearViews()

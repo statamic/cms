@@ -3,11 +3,14 @@
 namespace Statamic\CP\Navigation;
 
 use Illuminate\Support\Collection;
+use Statamic\CommandPalette\Category;
+use Statamic\CommandPalette\Link;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\URL;
 use Statamic\Statamic;
 use Statamic\Support\Html;
 use Statamic\Support\Str;
+use Statamic\Support\Svg;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class NavItem
@@ -30,6 +33,7 @@ class NavItem
     protected $manipulations;
     protected $original;
     protected $attributes;
+    protected $extra;
 
     /**
      * Get or set display.
@@ -114,7 +118,7 @@ class NavItem
         return $this
             ->fluentlyGetOrSet('url')
             ->setter(function ($url) {
-                if (Str::startsWith($url, ['http://', 'https://'])) {
+                if (URL::isAbsolute($url)) {
                     return $url;
                 }
 
@@ -198,9 +202,13 @@ class NavItem
      */
     public function svg()
     {
-        $value = $this->icon() ?? 'entries';
+        $value = $this->icon() ?? 'collections';
 
-        return Str::startsWith($value, '<svg') ? $value : Statamic::svg('icons/light/'.$value);
+        if (! Str::startsWith($value, '<svg')) {
+            $value = Statamic::svg("icons/{$value}");
+        }
+
+        return Svg::withClasses($value, 'size-4 shrink-0');
     }
 
     /**
@@ -213,10 +221,20 @@ class NavItem
     {
         return $this
             ->fluentlyGetOrSet('attributes')
-            ->setter(function ($value) {
-                return is_array($value) ? Html::attributes($value) : $value;
-            })
             ->value($attrs);
+    }
+
+    /**
+     * Get or set extra data.
+     *
+     * @param  array|null  $extra
+     * @return mixed
+     */
+    public function extra($extra = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('extra')
+            ->value($extra);
     }
 
     /**
@@ -247,7 +265,7 @@ class NavItem
             ->map(function ($navItem) use ($generateNewIds) {
                 return $navItem
                     ->id($generateNewIds ? $this->id().'::' : $navItem->id())
-                    ->icon($this->icon())
+                    ->icon($navItem->icon() ?? $this->icon())
                     ->section($this->section())
                     ->isChild(true);
             })
@@ -306,22 +324,6 @@ class NavItem
     protected function wasOriginallyChild(): bool
     {
         return (bool) $this->wasOriginallyChild;
-    }
-
-    /**
-     * Active URL pattern to determine when to resolve children for `hasActiveChild()` checks.
-     *
-     * Though we still check active patterns for nested URLs internally, having to manually
-     * use this method should not be needed anymore, not to mention it is confusing for
-     * addon devs to know when they even need to use it, thus we are deprecating it.
-     *
-     * @deprecated
-     *
-     * @return $this
-     */
-    public function active($pattern = null)
-    {
-        return $this->fluentlyGetOrSet('active')->value($pattern);
     }
 
     /**
@@ -561,6 +563,41 @@ class NavItem
     public function name(...$arguments)
     {
         return $this->display(...$arguments);
+    }
+
+    /**
+     * Transform nav item and associated children to valid command palette `Link` instances.
+     */
+    public function commandPaletteLinks(?NavItem $parentItem = null): array
+    {
+        $displayItem = $parentItem ?? $this;
+
+        $sectionText = $displayItem->section() !== 'Top Level'
+            ? __($displayItem->section())
+            : null;
+
+        $itemText = __($displayItem->display());
+
+        $childText = $parentItem
+            ? __($this->display())
+            : null;
+
+        $text = collect([$sectionText, $itemText, $childText])
+            ->filter()
+            ->values()
+            ->all();
+
+        $link = (new Link(text: $text, category: Category::Navigation))
+            ->url($this->url())
+            ->icon($this->icon());
+
+        if ($children = $this->resolveChildren()->children()) {
+            $childLinks = $children->flatMap(fn ($child) => $child->commandPaletteLinks($this));
+        }
+
+        return collect([$link])
+            ->merge($childLinks ?? [])
+            ->all();
     }
 
     /**

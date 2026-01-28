@@ -1,7 +1,6 @@
-import uniqid from 'uniqid'
+import uniqid from 'uniqid';
 
 export default class Portal {
-
     constructor(portals, name, data = {}) {
         this.portals = portals;
         this.id = `${name}-${uniqid()}`;
@@ -11,5 +10,4 @@ export default class Portal {
     destroy() {
         this.portals.destroy(this.id);
     }
-
 }

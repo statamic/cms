@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Preferences\Nav\Concerns;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\CP\Navigation\NavTransformer;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Role;
@@ -14,12 +15,17 @@ trait HasNavBuilder
 {
     protected function navBuilder($nav = null, $props = [])
     {
-        return view('statamic::nav.edit', array_merge([
+        $indexUrl = Statamic::pro() && User::current()->can('manage preferences')
+            ? cp_route('preferences.nav.index')
+            : false;
+
+        return Inertia::render('preferences/nav/Edit', array_merge([
             'title' => __('My Nav'),
+            'indexUrl' => $indexUrl,
             'updateUrl' => cp_route('preferences.nav.user.update'),
             'destroyUrl' => cp_route('preferences.nav.user.destroy'),
             'saveAsOptions' => $this->getSaveAsOptions()->values()->all(),
-            'nav' => NavResource::make($nav ?? Nav::build(true, true)),
+            'nav' => NavResource::make($nav ?? Nav::build(true, true))->resolve(request()),
         ], $props));
     }
 

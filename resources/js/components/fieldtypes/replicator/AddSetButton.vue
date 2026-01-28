@@ -1,63 +1,66 @@
 <template>
-
-    <div class="replicator-set-picker">
-        <set-picker :enabled="enabled" :sets="groups" @added="addSet">
+    <div class="inline-block" v-if="variant === 'button'">
+        <set-picker :enabled="enabled" :sets="groups" align="start" :loading-set="loadingSet" @added="addSet">
             <template #trigger>
-                <div class="replicator-set-picker-button-wrapper flex items-center ">
-                    <button
-                        v-if="enabled"
-                        class="btn-round flex items-center justify-center"
-                        :class="{
-                            'h-5 w-5': ! last,
-                            'mr-2': label?.length > 0,
-                        }"
-                        @click="addSetButtonClicked"
-                    >
-                        <svg-icon name="micro/plus"
-                            :class="{
-                                'w-3 h-3 text-gray-800 dark:text-dark-175 group-hover:text-black dark:group-hover:dark-text-100': last,
-                                'w-2 h-2 text-gray-700 dark:text-dark-200 group-hover:text-black dark:group-hover:dark-text-100 transition duration-150': !last
-                            }" />
-                    </button>
-                    <span @click="addSetButtonClicked" class="cursor-pointer text-sm dark:text-dark-175">{{ __(label) }}</span>
+                <div class="inline-flex relative pt-2" :class="{ 'pt-6': showConnector }">
+                    <div v-if="showConnector" class="absolute group-hover:opacity-0 transition-opacity delay-25 duration-125 inset-y-0 h-full left-3.5 border-l-1 border-gray-400 dark:border-gray-600 border-dashed z-0 dark:bg-gray-850" />
+                    <Button v-if="enabled" size="sm" :text="label" icon="plus" class="relative z-2" />
                 </div>
             </template>
         </set-picker>
     </div>
-
+    <set-picker v-else :enabled="enabled" :sets="groups" align="center" :loading-set="loadingSet" @added="addSet">
+        <template #trigger>
+            <div
+                class="flex justify-center relative group py-3"
+                :class="{ 'py-3.5 -mt-2 top-0.5': isFirst }"
+            >
+                <div
+                    v-if="showConnector"
+                    class="absolute group-focus-within:opacity-0 transition-opacity group-focus-within:transition-none delay-10 duration-250 inset-y-0 left-3.5 border-l-1 border-gray-400 dark:border-gray-600 border-dashed z-0 dark:bg-gray-850"
+                    :class="{
+                        'group-hover:opacity-0': enabled,
+                        'h-[65%] top-[30%] opacity-60': isFirst,
+                        'h-full opacity-100': !isFirst,
+                    }"
+                />
+                <button
+                    v-if="enabled"
+                    class="absolute inset-0 h-full w-full opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity group-focus-within:transition-none delay-10 duration-250 cursor-pointer"
+                    tabindex="-1"
+                >
+                    <div class="h-full flex flex-col justify-center">
+                        <div class="rounded-full bg-[linear-gradient(90deg,theme(colors.gray.100)_0%,theme(colors.gray.200)_50%,theme(colors.gray.100)_100%)] dark:bg-[linear-gradient(90deg,theme(colors.gray.800)_0%,theme(colors.gray.700)_50%,theme(colors.gray.800)_100%)] h-2" />
+                    </div>
+                </button>
+                <Button v-if="enabled" round icon="plus" size="sm" class="-my-4 z-3 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity delay-10 duration-250" />
+            </div>
+        </template>
+    </set-picker>
 </template>
 
-<script>
+<script setup>
 import SetPicker from './SetPicker.vue';
+import { Button } from '@/components/ui';
+import { computed } from 'vue';
 
-export default {
+const emit = defineEmits(['added']);
 
-    components: {
-        SetPicker,
-    },
+const props = defineProps({
+    sets: Array,
+    groups: Array,
+    index: Number,
+    enabled: { type: Boolean, default: true },
+    label: { type: String },
+    showConnector: { type: Boolean, default: true },
+    variant: { type: String, default: 'button' },
+    isFirst: { type: Boolean, default: false },
+    loadingSet: { type: String, default: null },
+});
 
-    props: {
-        sets: Array,
-        groups: Array,
-        index: Number,
-        last: Boolean,
-        enabled: { type: Boolean, default: true },
-        label: String,
-    },
+const label = computed(() => props.label ? __(props.label) : __('Add Block'));
 
-    methods: {
-
-        addSet(handle) {
-            this.$emit('added', handle, this.index);
-        },
-
-        addSetButtonClicked() {
-            if (this.sets.length === 1) {
-                this.addSet(this.sets[0].handle);
-            }
-        }
-
-    }
-
+function addSet(handle) {
+    emit('added', handle, props.index);
 }
 </script>

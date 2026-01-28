@@ -69,4 +69,11 @@ class FieldtypeFilter
 
         return $field.' '.strtolower($translatedOperator).' '.$value;
     }
+
+    public function isComplete($values): bool
+    {
+        $values = array_filter($values);
+
+        return Arr::has($values, 'operator') && Arr::has($values, 'value');
+    }
 }

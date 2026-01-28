@@ -2,8 +2,10 @@
 
 namespace Tests\Forms;
 
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\SubmissionCreated;
 use Statamic\Events\SubmissionCreating;
@@ -47,6 +49,28 @@ class SubmissionTest extends TestCase
         $this->assertStringNotContainsString(',', $submission->id());
 
         setlocale(LC_TIME, $originalLocale);
+    }
+
+    #[Test]
+    #[DataProvider('utcProvider')]
+    public function the_date_is_utc($tz)
+    {
+        config(['app.timezone' => $tz]);
+
+        Carbon::setTestNow(Carbon::parse('2025-03-12 02:13:25', 'UTC'));
+
+        $submission = Form::make('test')->makeSubmission();
+
+        $this->assertEquals(0, $submission->date()->offset);
+        $this->assertEquals('2025-03-12T02:13:25+00:00', $submission->date()->toIso8601String());
+    }
+
+    public static function utcProvider()
+    {
+        return [
+            'utc' => ['UTC'],
+            'not utc' => ['America/New_York'],
+        ];
     }
 
     #[Test]

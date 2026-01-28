@@ -10,6 +10,7 @@ use Statamic\View\Antlers\Language\Errors\ErrorFactory;
 use Statamic\View\Antlers\Language\Exceptions\SyntaxErrorException;
 use Statamic\View\Antlers\Language\Nodes\AbstractNode;
 use Statamic\View\Antlers\Language\Nodes\AntlersNode;
+use Statamic\View\Antlers\Language\Nodes\DirectiveNode;
 use Statamic\View\Antlers\Language\Nodes\EscapedContentNode;
 use Statamic\View\Antlers\Language\Nodes\LiteralNode;
 use Statamic\View\Antlers\Language\Nodes\ParserFailNode;
@@ -275,6 +276,11 @@ class DocumentParser
                 break;
             }
 
+            if ($this->cur == self::AtChar && $this->next != null && ctype_alpha($this->next)) {
+                $this->scanToEndOfDirective();
+                break;
+            }
+
             if ($this->cur == self::AtChar && $this->next != null && $this->next == self::LeftBrace) {
                 if ($this->currentIndex + 2 >= $this->inputLen) {
                     $this->currentContent[] = $this->next;
@@ -347,12 +353,35 @@ class DocumentParser
             $lastOffset = $thisIndex;
         }
 
-        preg_match_all('/@?{{/', $this->content, $antlersStartCandidates);
+        preg_match_all('/(@?{{|@?(props|aware|cascade))/u', $this->content, $antlersStartCandidates, PREG_OFFSET_CAPTURE);
 
         $lastAntlersOffset = 0;
         $lastWasEscaped = false;
-        foreach ($antlersStartCandidates[0] as $antlersRegion) {
+        foreach ($antlersStartCandidates[0] as $antlersMatch) {
+            $antlersRegion = $antlersMatch[0];
+
             if (Str::startsWith($antlersRegion, '@')) {
+                if (in_array($antlersRegion, ['@props', '@aware', '@cascade'])) {
+                    $offset = mb_strpos($this->content, $antlersRegion, $lastAntlersOffset);
+
+                    if ($antlersMatch[1] > 0) {
+                        if (mb_substr($this->content, $antlersMatch[1] - 1, 1) === '@') {
+                            $lastAntlersOffset = mb_strpos($this->content, $antlersRegion, $lastAntlersOffset);
+                            $lastWasEscaped = true;
+
+                            continue;
+                        }
+                    }
+
+                    $this->antlersStartIndex[] = $offset;
+                    $this->antlersStartPositionIndex[$offset] = 1;
+
+                    $lastWasEscaped = false;
+                    $lastAntlersOffset = $offset + mb_strlen($antlersRegion);
+
+                    continue;
+                }
+
                 $lastAntlersOffset = mb_strpos($this->content, $antlersRegion, $lastAntlersOffset) + 2;
                 $lastWasEscaped = true;
 
@@ -386,7 +415,11 @@ class DocumentParser
      */
     private function prepareLiteralContent($content)
     {
-        return str_replace('@{{', '{{', $content);
+        return strtr($content, [
+            '@{{' => '{{',
+            '@@props' => '@props',
+            '@@aware' => '@aware',
+        ]);
     }
 
     /**
@@ -813,6 +846,117 @@ class DocumentParser
         }
     }
 
+    private function scanToEndOfDirective()
+    {
+        $name = '';
+
+        for ($this->currentIndex; $this->currentIndex < $this->inputLen; $this->currentIndex += 1) {
+            $this->checkCurrentOffsets();
+
+            $name .= $this->cur;
+
+            if ($this->next == null || ! ctype_alpha($this->next)) {
+                $this->currentIndex++;
+                break;
+            }
+        }
+
+        $args = '';
+        $parseArgs = true;
+
+        if ($this->next === null || ctype_space($this->next) || ctype_space($this->cur)) {
+            $rollbackTo = $this->currentIndex;
+            $this->advanceWhitespace();
+
+            if (ctype_space($this->cur) && $this->next === '(') {
+                $this->currentIndex++;
+                $this->checkCurrentOffsets();
+            }
+
+            if ($this->cur != '(') {
+                $parseArgs = false;
+                $this->currentIndex = $rollbackTo;
+                $this->checkCurrentOffsets();
+            }
+        }
+
+        if ($parseArgs) {
+            $argsStarted = $this->currentIndex;
+
+            $this->currentIndex += 1;
+
+            $args = '(';
+            $inString = false;
+            $stringTerminator = null;
+            $parenCount = 1;
+
+            for ($this->currentIndex; $this->currentIndex < $this->inputLen; $this->currentIndex += 1) {
+                $this->checkCurrentOffsets();
+
+                if (! $inString && ($this->cur === self::String_Terminator_SingleQuote || $this->cur === self::String_Terminator_DoubleQuote)) {
+                    $inString = true;
+                    $stringTerminator = $this->cur;
+                    $args .= $this->cur;
+
+                    continue;
+                }
+
+                if ($inString) {
+                    $args .= $this->cur;
+
+                    if ($this->cur === $stringTerminator && $this->prev !== self::String_EscapeCharacter) {
+                        $inString = false;
+                    }
+
+                    continue;
+                }
+
+                if ($this->cur === self::LeftParen) {
+                    $parenCount++;
+                    $args .= $this->cur;
+
+                    continue;
+                } elseif ($this->cur === self::RightParent) {
+                    $parenCount--;
+                    $args .= $this->cur;
+
+                    if ($parenCount === 0) {
+                        break;
+                    }
+
+                    continue;
+                }
+
+                $args .= $this->cur;
+            }
+
+            if ($parenCount != 0) {
+                throw ErrorFactory::makeSyntaxError(
+                    AntlersErrorCodes::TYPE_DIRECTIVE_MISSING_ARGUMENTS,
+                    ParserFailNode::makeWithStartPosition($this->positionFromOffset($argsStarted, $argsStarted)),
+                    "Incomplete arguments for {$name} directive",
+                );
+            }
+        }
+
+        $node = $this->makeDirectiveNode($name, $args, $this->currentIndex);
+        $this->currentContent = [];
+        $this->nodes[] = $node;
+        $this->lastAntlersNode = $node;
+        $this->startIndex = $this->currentIndex;
+    }
+
+    private function advanceWhitespace()
+    {
+        for ($this->currentIndex; $this->currentIndex < $this->inputLen; $this->currentIndex += 1) {
+            $this->checkCurrentOffsets();
+
+            if ($this->next == null || ! ctype_space($this->next)) {
+                break;
+            }
+        }
+    }
+
     private function scanToEndOfAntlersCommentRegion()
     {
         for ($this->currentIndex; $this->currentIndex < $this->inputLen; $this->currentIndex += 1) {
@@ -1161,6 +1305,29 @@ class DocumentParser
         $this->interpolationRegions = [];
 
         return $node;
+    }
+
+    private function makeDirectiveNode($name, $args, $index)
+    {
+        $directive = new DirectiveNode();
+        $directive->directiveName = $name;
+        $directive->args = $args;
+
+        $this->lastAntlersEndIndex = $index + $this->seedOffset;
+        $directive->startPosition = $this->positionFromOffset(
+            $this->startIndex + $this->seedOffset,
+            $this->startIndex + $this->seedOffset
+        );
+        $directive->endPosition = $this->positionFromOffset(
+            $index + $this->seedOffset,
+            $index + $this->seedOffset
+        );
+
+        $directive->content = trim($args, '() ');
+
+        $this->nodeParser->parseNode($directive);
+
+        return $directive;
     }
 
     private function makeAntlersTagNode($index, $isComment)

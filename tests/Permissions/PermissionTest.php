@@ -86,6 +86,28 @@ class PermissionTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_a_label()
+    {
+        // Normal label
+        $this->assertEquals(
+            (new Permission)->value('create thingy')->label('Create Thingy')->label(),
+            'Create Thingy'
+        );
+
+        // With replacements
+        $this->assertEquals(
+            (new Permission)->value('create {something} thing')->placeholder('something')->placeholderLabel('fun')->label(),
+            'create fun thing'
+        );
+
+        // Including a colon
+        $this->assertEquals(
+            (new Permission)->value('create thingy')->label('Create :thingy')->label(),
+            'Create :thingy'
+        );
+    }
+
+    #[Test]
     public function it_adds_a_description()
     {
         $permission = (new Permission)->value('test');

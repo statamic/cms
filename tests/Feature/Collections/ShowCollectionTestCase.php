@@ -24,7 +24,7 @@ abstract class ShowCollectionTestCase extends TestCase
             ->actingAs($user)
             ->get($collection->showUrl())
             ->assertOk()
-            ->assertViewIs('statamic::collections.empty');
+            ->assertInertia(fn ($page) => $page->component('collections/Empty'));
     }
 
     #[Test]

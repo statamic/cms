@@ -200,14 +200,14 @@ class BasicNodeTest extends ParserTestCase
         $template = <<<'EOT'
 {{# A comment #}}
 {{# another comment {{ width }} #}}
-<div class="max-w-2xl mx-auto mb-32">
+<div class="max-w-6xl mx-auto mb-32">
 <p>test</p> {{ subtitle }}
 </div>
 EOT;
 
         $expected = <<<'EOT'
 
-<div class="max-w-2xl mx-auto mb-32">
+<div class="max-w-6xl mx-auto mb-32">
 <p>test</p> test
 </div>
 EOT;
@@ -292,7 +292,7 @@ Just to test ASCII stuff within this madness.{{ my_counter = 0; }}
    q = "q"; r = "r"; s = "s"; t = "t";
    u = "u"; v = "v"; w = "w"; x = "x";
    y = "y"; z = "z";
-   
+
    A = "A"; B = "B"; C = "C"; D = "D";
    E = "E"; F = "F"; G = "G"; H = "H";
    I = "I"; J = "J"; K = "K"; L = "L";
@@ -326,7 +326,7 @@ Just to test ASCII stuff within this madness.{{ my_counter = 0; }}
    q = "q"; r = "r"; s = "s"; t = "t";
    u = "u"; v = "v"; w = "w"; x = "x";
    y = "y"; z = "z";
-   
+
    A = "A"; B = "B"; C = "C"; D = "D";
    E = "E"; F = "F"; G = "G"; H = "H";
    I = "I"; J = "J"; K = "K"; L = "L";
@@ -363,7 +363,7 @@ Just to test ASCII stuff within this madness.{{ my_counter = 0; }}
    q = "q"; r = "r"; s = "s"; t = "t";
    u = "u"; v = "v"; w = "w"; x = "x";
    y = "y"; z = "z";
-   
+
    A = "A"; B = "B"; C = "C"; D = "D";
    E = "E"; F = "F"; G = "G"; H = "H";
    I = "I"; J = "J"; K = "K"; L = "L";
@@ -424,7 +424,7 @@ Just to test ASCII stuff within this madness.{{ my_counter = 0; }}
    q = "q"; r = "r"; s = "s"; t = "t";
    u = "u"; v = "v"; w = "w"; x = "x";
    y = "y"; z = "z";
-   
+
    A = "A"; B = "B"; C = "C"; D = "D";
    E = "E"; F = "F"; G = "G"; H = "H";
    I = "I"; J = "J"; K = "K"; L = "L";

@@ -295,7 +295,7 @@ class PathParser
                         );
                     }
 
-                    if ($this->cur == self::LeftBracket) {
+                    if ($this->cur == self::LeftBracket && $this->prev != '(') {
                         throw ErrorFactory::makeSyntaxError(
                             AntlersErrorCodes::TYPE_ILLEGAL_VARPATH_SUBPATH_START,
                             null,

@@ -1,0 +1,39 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as FieldStories from '../Field.stories';
+
+<Meta of={FieldStories} />
+
+# Field
+A wrapper component for form controls that provides consistent labels, descriptions, error messaging, and layout options. The `Field` component handles all the common patterns for form inputs including required indicators, badges, and validation states.
+<Canvas of={FieldStories._DocsIntro} sourceState={'shown'} />
+
+## Required
+Use the `required` prop to display a red asterisk indicating a required field.
+<Canvas of={FieldStories._Required} sourceState={'shown'} />
+
+## With Badge
+Add a badge to the label to indicate special features, statuses, or plan requirements. (TODO don't like this example)
+<Canvas of={FieldStories._WithBadge} sourceState={'shown'} />
+
+## With Error
+Display validation errors below the field using the `error` prop for a single error or `errors` for multiple messages.
+<Canvas of={FieldStories._WithError} sourceState={'shown'} />
+
+## Inline Variant
+Use the `inline` variant to display the label and control side-by-side rather than stacked. (use diff example here too - maybe keep email or use a switch?)
+<Canvas of={FieldStories._InlineVariant} sourceState={'shown'} />
+
+## Instructions Below
+Position instructions below the control instead of below the label for better visual flow with large inputs.
+<Canvas of={FieldStories._InstructionsBelow} sourceState={'shown'} />
+
+## With Actions Slot
+Add action buttons or controls next to the label using the `actions` slot.
+<Canvas of={FieldStories._WithActionsSlot} sourceState={'shown'} />
+
+## Inline
+Use the `inline` prop to style fields as configuration settings with a two-column layout. Use `fullWidthSetting` to maintain the alternate padding of inline mode but span the full width of the container.
+<Canvas of={FieldStories._Inline} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={FieldStories} />

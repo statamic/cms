@@ -44,7 +44,7 @@ class StaticUrlBuilderTest extends TestCase
         $this->generator->shouldReceive('generateByPath')->andReturn($path);
 
         $this->assertEquals(
-            '/img/'.$path,
+            '/img/'.ltrim($path, '/'),
             $this->builder->build('/foo.jpg', ['w' => '100'])
         );
     }
@@ -56,7 +56,7 @@ class StaticUrlBuilderTest extends TestCase
         $this->generator->shouldReceive('generateByPath')->andReturn($path);
 
         $this->assertEquals(
-            '/img/'.$path,
+            '/img/'.ltrim($path, '/'),
             $this->builder->build('/foo.jpg', ['w' => '100'], 'custom.jpg')
         );
     }

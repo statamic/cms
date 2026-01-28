@@ -99,7 +99,7 @@ class Index extends BaseIndex
         $this->save($data);
     }
 
-    protected function insertDocuments(Documents $documents)
+    public function insertDocuments(Documents $documents)
     {
         try {
             $data = $this->data();

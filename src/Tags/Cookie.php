@@ -8,9 +8,7 @@ class Cookie extends Tags
 {
     public function wildcard($tag)
     {
-        $key = $this->context->value($tag, $tag);
-
-        $key = str_replace(':', '.', $key);
+        $key = str_replace(':', '.', $tag);
 
         return CookieFacade::get($key, $this->params->get('default'));
     }

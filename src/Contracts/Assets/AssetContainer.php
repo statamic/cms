@@ -108,5 +108,5 @@ interface AssetContainer
      * @param  null|array  $rules
      * @return array
      */
-    // public function validationRules($rules = null);
+    public function validationRules($rules = null);
 }

@@ -147,8 +147,6 @@ trait HasSelectOptions
             return true;
         } elseif ($value === 'false') {
             return false;
-        } elseif ($value === 'null') {
-            return null;
         }
 
         return $value;
@@ -160,8 +158,6 @@ trait HasSelectOptions
             return 'true';
         } elseif ($value === false) {
             return 'false';
-        } elseif ($value === null) {
-            return 'null';
         }
 
         return $value;
@@ -181,7 +177,7 @@ trait HasSelectOptions
             'resolve' => function ($item, $args, $context, $info) {
                 $resolved = $item->resolveGqlValue($info->fieldName);
 
-                return is_null($resolved->value()) ? null : $resolved;
+                return is_null($resolved?->value()) ? null : $resolved;
             },
         ];
     }

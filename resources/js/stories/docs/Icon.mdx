@@ -1,0 +1,19 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as IconStories from '../Icon.stories';
+
+<Meta of={IconStories} />
+
+# Icon
+Icons are used throughout the Control Panel to provide visual cues and improve usability. Statamic includes a comprehensive library of 537+ SVG icons.
+<Canvas of={IconStories._DocsIntro} />
+
+## Basic Usage
+Use the `name` prop to specify which icon to display.
+<Canvas of={IconStories.Default} />
+
+## Available Icons
+All icons available in the default icon set. Click to copy the icon name.
+<Canvas of={IconStories.AllIcons} />
+
+## Arguments
+<ArgTypes of={IconStories} />

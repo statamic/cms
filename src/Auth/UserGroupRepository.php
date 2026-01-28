@@ -26,4 +26,12 @@ abstract class UserGroupRepository implements RepositoryContract
 
         return $blueprint;
     }
+
+    public function blueprintCommandPaletteLink()
+    {
+        return $this->blueprint()?->commandPaletteLink(
+            type: 'Users',
+            url: cp_route('blueprints.user-groups.edit'),
+        );
+    }
 }

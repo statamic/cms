@@ -1,0 +1,35 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as BadgeStories from '../Badge.stories';
+
+<Meta of={BadgeStories} />
+
+# Badge
+Badges are used to display labels, status indicators, counts, and other metadata. They come in many colors and sizes.
+<Canvas of={BadgeStories._DocsIntro} sourceState={'shown'} />
+
+## Sizes
+Badges are available in multiple sizes via the `size` prop.
+<Canvas of={BadgeStories.Sizes} sourceState={'shown'} />
+
+## Colors
+Use the `color` prop to change the badge's color.
+<Canvas of={BadgeStories.Colors} sourceState={'shown'} />
+
+## Append & Prepend
+Use the `append` and `prepend` props to add smaller supporting text before or after the main text, perfect for counts, numbers, and other small details.
+<Canvas of={BadgeStories._AppendPrependDocs} sourceState={'shown'} />
+
+## Icons
+Automatically sized and styled icons are available for your badges using the `icon` or `icon-append` props to pass the name of an icon.
+<Canvas of={BadgeStories._IconDocs} sourceState={'shown'} />
+
+## Pills
+Use the `pill` prop to round out the badge.
+<Canvas of={BadgeStories.Pill} sourceState={'shown'} />
+
+## As a Link
+Badges can be used as links by passing an `href` prop. They will use Inertia to navigate unless you add `target="_blank"` to open in a new tab.
+<Canvas of={BadgeStories.Link} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={BadgeStories} />
