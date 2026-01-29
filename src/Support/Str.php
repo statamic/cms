@@ -151,10 +151,15 @@ class Str
 
     public static function durationForHumans($s)
     {
-        $mins = floor($s / 60);
+        $hours = floor($s / 3600);
+        $mins = floor(($s % 3600) / 60);
         $secs = $s % 60;
 
-        return sprintf('%01d:%02d', $mins, $secs);
+        if ($hours > 0) {
+            return sprintf('%d:%02d:%02d', $hours, $mins, $secs);
+        }
+
+        return sprintf('%d:%02d', $mins, $secs);
     }
 
     public static function timeForHumans($ms)
