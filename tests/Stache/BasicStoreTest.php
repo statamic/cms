@@ -54,6 +54,45 @@ class BasicStoreTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_multiple_items_by_keys()
+    {
+        file_put_contents($this->tempDir.'/foo.yaml', '');
+        file_put_contents($this->tempDir.'/bar.yaml', '');
+        file_put_contents($this->tempDir.'/baz.yaml', '');
+
+        $items = $this->store->getItems(['foo', 'bar', 'baz']);
+
+        $this->assertCount(3, $items);
+        $this->assertEquals('foo', $items[0]->id());
+        $this->assertEquals('bar', $items[1]->id());
+        $this->assertEquals('baz', $items[2]->id());
+    }
+
+    #[Test]
+    public function it_gets_multiple_items_preserving_order()
+    {
+        file_put_contents($this->tempDir.'/foo.yaml', '');
+        file_put_contents($this->tempDir.'/bar.yaml', '');
+        file_put_contents($this->tempDir.'/baz.yaml', '');
+
+        // Request in different order than created
+        $items = $this->store->getItems(['baz', 'foo', 'bar']);
+
+        $this->assertCount(3, $items);
+        $this->assertEquals('baz', $items[0]->id());
+        $this->assertEquals('foo', $items[1]->id());
+        $this->assertEquals('bar', $items[2]->id());
+    }
+
+    #[Test]
+    public function it_returns_empty_collection_for_empty_keys()
+    {
+        $items = $this->store->getItems([]);
+
+        $this->assertCount(0, $items);
+    }
+
+    #[Test]
     public function it_gets_an_item_by_path()
     {
         $this->markTestIncomplete();
