@@ -43,7 +43,6 @@ const makeDateField = (props = {}) => {
                 },
                 $events: {
                     $on: () => {},
-                    $off: () => {},
                 },
             },
         },
@@ -79,13 +78,7 @@ test.each([
 });
 
 test('datePickerValue returns null when value is "now"', () => {
-    const dateField = makeDateField({
-        config: {
-            earliest_date: { date: null, time: null },
-            latest_date: { date: null, time: null },
-        },
-        value: 'now',
-    });
+    const dateField = makeDateField({ value: 'now' });
 
     expect(dateField.vm.datePickerValue).toBe(null);
 });
