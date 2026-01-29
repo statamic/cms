@@ -352,11 +352,16 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
 
     public function uri()
     {
-        $site = Site::current();
+        $taxonomySlug = Str::replace('_', '-', $this->handle);
 
-        $prefix = $this->collection() ? $this->collection()->uri($site->handle()) : '/';
+        if (! $this->isAssignedToCollection()) {
+            return URL::tidy("/{$taxonomySlug}");
+        }
 
-        return URL::tidy($prefix.str_replace('_', '-', '/'.$this->handle));
+        $collectionUri = $this->collection()->uri(Site::current()->handle())
+            ?? Str::replace('_', '-', $this->collection()->handle());
+
+        return URL::tidy("/{$collectionUri}/{$taxonomySlug}");
     }
 
     public function collection($collection = null)
@@ -372,6 +377,11 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
                 ->keyBy->handle()
                 ->has($this->handle);
         })->values();
+    }
+
+    public function isAssignedToCollection()
+    {
+        return $this->collections()->contains($this->collection());
     }
 
     public function toResponse($request)
