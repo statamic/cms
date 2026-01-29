@@ -193,6 +193,7 @@ body:has(:is(.bard-fullscreen, .replicator-fullscreen)) [data-reka-popper-conten
 
 <script>
 import { Primitive } from 'reka-ui';
+import fuzzysort from 'fuzzysort';
 
 export default {
     emits: ['added', 'clicked-away'],
@@ -469,13 +470,18 @@ export default {
         },
 
         filterSetsBySearch(sets) {
-            return sets.filter(set => {
-                return (
-                    __(set.display).toLowerCase().includes(this.search.toLowerCase()) ||
-                    __(set.instructions)?.toLowerCase().includes(this.search.toLowerCase()) ||
-                    set.handle.toLowerCase().includes(this.search.toLowerCase())
-                );
-            });
+            return fuzzysort
+                .go(this.search, sets, {
+                    all: true,
+                    keys: [(set) => __(set.display), 'handle', (set) => __(set.instructions)],
+                    scoreFn: (scores) => {
+                        const displayScore = scores[0]?.score ?? -Infinity;
+                        const handleScore = scores[1]?.score ?? -Infinity;
+                        const instructionsScore = (scores[2]?.score ?? -Infinity) * 0.5;
+                        return Math.max(displayScore, handleScore, instructionsScore);
+                    },
+                })
+                .map((result) => result.obj);
         }
     },
 };
