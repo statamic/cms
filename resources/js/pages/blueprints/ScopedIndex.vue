@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onBeforeUnmount } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
 import Head from '@/pages/layout/Head.vue';
 import { Header, Button, DocsCallout, DropdownItem, Listing } from '@ui';
@@ -42,6 +42,15 @@ function saveOrder() {
 }
 
 const reloadPage = () => router.reload();
+
+const saveKeyBinding = ref(Statamic.$keys.bindGlobal(['mod+s'], (e) => {
+    if (hasBeenReordered.value) {
+        e.preventDefault();
+        saveOrder();
+    }
+}));
+
+onBeforeUnmount(() => saveKeyBinding.value?.destroy());
 </script>
 
 <template>
