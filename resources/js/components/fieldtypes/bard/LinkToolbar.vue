@@ -17,7 +17,7 @@
                     type="text"
                     ref="urlInput"
                     autofocus
-                    :placeholder="__('https://')"
+                    placeholder="https://"
                     @keydown.enter.prevent="commit"
                 />
 
