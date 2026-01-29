@@ -72,6 +72,7 @@ class ReplicatorSetController extends CpController
 
     private function getConfig(array $config, array $remainingFieldPathComponents): array
     {
+        $isGroup = isset($config['type']) && $config['type'] === 'group';
         $isReplicator = isset($config['type']) && in_array($config['type'], ['bard', 'replicator']);
 
         if ($isReplicator) {
@@ -86,6 +87,14 @@ class ReplicatorSetController extends CpController
             array_shift($remainingFieldPathComponents);
 
             return $this->getConfig($flattenedSets, $remainingFieldPathComponents);
+        }
+
+        if ($isGroup) {
+            array_shift($remainingFieldPathComponents);
+
+            $fields = $this->resolveFields($config['fields'] ?? []);
+
+            return $this->getConfig($fields[$remainingFieldPathComponents[0]]['field'], $remainingFieldPathComponents);
         }
 
         $fields = $this->resolveFields($config[$remainingFieldPathComponents[0]]['fields']);
