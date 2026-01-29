@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, watch, onBeforeUnmount } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
 import Head from '@/pages/layout/Head.vue';
 import { Header, Button, DocsCallout, DropdownItem, Listing } from '@ui';
@@ -9,7 +9,6 @@ const props = defineProps(['blueprints', 'reorderUrl', 'createUrl']);
 
 const rows = ref(props.blueprints);
 const hasBeenReordered = ref(false);
-const saveKeyBinding = ref(null);
 
 const reorderable = computed(() => rows.value.length > 1);
 
@@ -44,14 +43,12 @@ function saveOrder() {
 
 const reloadPage = () => router.reload();
 
-onMounted(() => {
-    saveKeyBinding.value = Statamic.$keys.bindGlobal(['mod+s'], (e) => {
-        if (hasBeenReordered.value) {
-            e.preventDefault();
-            saveOrder();
-        }
-    });
-});
+const saveKeyBinding = ref(Statamic.$keys.bindGlobal(['mod+s'], (e) => {
+    if (hasBeenReordered.value) {
+        e.preventDefault();
+        saveOrder();
+    }
+}));
 
 onBeforeUnmount(() => saveKeyBinding.value?.destroy());
 </script>
