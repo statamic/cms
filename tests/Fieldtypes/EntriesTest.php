@@ -82,6 +82,11 @@ class EntriesTest extends TestCase
 
         $this->assertInstanceOf(Builder::class, $augmented);
         $this->assertCount(0, $augmented->get());
+
+        $augmented = $this->fieldtype()->augment([]);
+
+        $this->assertInstanceOf(Builder::class, $augmented);
+        $this->assertCount(0, $augmented->get());
     }
 
     #[Test]
