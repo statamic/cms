@@ -193,6 +193,7 @@ body:has(:is(.bard-fullscreen, .replicator-fullscreen)) [data-reka-popper-conten
 
 <script>
 import { Primitive } from 'reka-ui';
+import fuzzysort from 'fuzzysort';
 
 export default {
     emits: ['added', 'clicked-away'],
@@ -263,14 +264,7 @@ export default {
                   }, []);
 
             if (this.search) {
-                return sets
-                    .filter((set) => !set.hide)
-                    .filter((set) => {
-                        return (
-                            __(set.display).toLowerCase().includes(this.search.toLowerCase()) ||
-                            set.handle.toLowerCase().includes(this.search.toLowerCase())
-                        );
-                    });
+                sets = this.filterSetsBySearch(sets);
             }
 
             return sets.filter((set) => !set.hide);
@@ -317,12 +311,7 @@ export default {
 
                 // Apply search filter if there's a search term
                 if (this.search) {
-                    filteredSets = filteredSets.filter(set => {
-                        return (
-                            __(set.display).toLowerCase().includes(this.search.toLowerCase()) ||
-                            set.handle.toLowerCase().includes(this.search.toLowerCase())
-                        );
-                    });
+                    filteredSets = this.filterSetsBySearch(filteredSets);
                 }
 
                 groups[group.handle] = {
@@ -479,6 +468,21 @@ export default {
         isSetLoading(handle) {
             return this.loadingSet === handle;
         },
+
+        filterSetsBySearch(sets) {
+            return fuzzysort
+                .go(this.search, sets, {
+                    all: true,
+                    keys: [(set) => __(set.display), 'handle', (set) => __(set.instructions)],
+                    scoreFn: (scores) => {
+                        const displayScore = scores[0]?.score ?? -Infinity;
+                        const handleScore = scores[1]?.score ?? -Infinity;
+                        const instructionsScore = (scores[2]?.score ?? -Infinity) * 0.5;
+                        return Math.max(displayScore, handleScore, instructionsScore);
+                    },
+                })
+                .map((result) => result.obj);
+        }
     },
 };
 </script>
