@@ -938,7 +938,7 @@ class ReplicatorTest extends TestCase
      * @see https://github.com/statamic/cms/issues/13714
      */
     #[Test]
-    public function it_can_return_set_defaults_for_replicator_inside_grid()
+    public function it_can_return_set_defaults_for_replicator_inside_group()
     {
         $this->partialMock(RowId::class, function (MockInterface $mock) {
             $mock->shouldReceive('generate')->andReturn('random-string-1', 'random-string-2');
