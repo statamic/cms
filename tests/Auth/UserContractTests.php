@@ -7,6 +7,7 @@ use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -94,6 +95,15 @@ trait UserContractTests
             return $user->name().'\'s balance is $25 owing.';
         });
 
+        Facades\User::computed([
+            'ocupation' => function ($user) {
+                return 'Smuggler';
+            },
+            'vehicle' => function ($user) {
+                return 'Millennium Falcon';
+            },
+        ]);
+
         $user = $this->makeUser()->data(['name' => 'Han Solo']);
 
         $expectedData = [
@@ -102,6 +112,8 @@ trait UserContractTests
 
         $expectedComputedData = [
             'balance' => 'Han Solo\'s balance is $25 owing.',
+            'ocupation' => 'Smuggler',
+            'vehicle' => 'Millennium Falcon',
         ];
 
         $expectedValues = array_merge($expectedData, $expectedComputedData);
@@ -571,6 +583,157 @@ trait UserContractTests
 
         $this->assertFalse($user->isDirty());
         $this->assertEquals(2, $eventsHandled);
+    }
+
+    #[Test]
+    public function it_determines_if_two_factor_authentication_is_required_for_a_non_super_user_with_roles(): void
+    {
+        $role = $this->createRole('test');
+        Facades\Role::shouldReceive('all')->andReturn(collect([$role]));
+
+        $user = tap($this->makeUser()->assignRole('test'))->saveQuietly();
+
+        config()->set('statamic.users.two_factor_enforced_roles', []);
+        $this->assertFalse($user->isTwoFactorAuthenticationRequired());
+
+        config()->set('statamic.users.two_factor_enforced_roles', ['test']);
+        $this->assertTrue($user->isTwoFactorAuthenticationRequired());
+
+        config()->set('statamic.users.two_factor_enforced_roles', ['*']);
+        $this->assertTrue($user->isTwoFactorAuthenticationRequired());
+    }
+
+    #[Test]
+    public function it_determines_if_two_factor_authentication_is_required_for_a_non_super_user_without_roles()
+    {
+        $user = tap($this->makeUser())->save();
+
+        config()->set('statamic.users.two_factor_enforced_roles', []);
+        $this->assertFalse($user->isTwoFactorAuthenticationRequired());
+
+        config()->set('statamic.users.two_factor_enforced_roles', ['test']);
+        $this->assertFalse($user->isTwoFactorAuthenticationRequired());
+
+        config()->set('statamic.users.two_factor_enforced_roles', ['*']);
+        $this->assertTrue($user->isTwoFactorAuthenticationRequired());
+    }
+
+    #[Test]
+    public function it_determines_if_two_factor_authentication_is_required_for_a_super_user()
+    {
+        $user = tap($this->makeUser()->makeSuper())->save();
+
+        config()->set('statamic.users.two_factor_enforced_roles', []);
+        $this->assertFalse($user->isTwoFactorAuthenticationRequired());
+
+        config()->set('statamic.users.two_factor_enforced_roles', ['super_users']);
+        $this->assertTrue($user->isTwoFactorAuthenticationRequired());
+
+        config()->set('statamic.users.two_factor_enforced_roles', ['*']);
+        $this->assertTrue($user->isTwoFactorAuthenticationRequired());
+    }
+
+    #[Test]
+    public function it_determines_if_the_user_has_enabled_two_factor_authentication()
+    {
+        $user = tap($this->makeUser()->makeSuper())->save();
+
+        $this->assertFalse($user->hasEnabledTwoFactorAuthentication());
+
+        $user
+            ->set('two_factor_secret', 'secret')
+            ->set('two_factor_confirmed_at', now()->timestamp)
+            ->save();
+
+        $this->assertTrue($user->hasEnabledTwoFactorAuthentication());
+    }
+
+    #[Test]
+    public function it_gets_recovery_codes()
+    {
+        $user = $this->makeUser()
+            ->makeSuper()
+            ->set('two_factor_recovery_codes', encrypt(json_encode($recoveryCodes = [
+                'code1',
+                'code2',
+                'code3',
+                'code4',
+                'code5',
+                'code6',
+                'code7',
+                'code8',
+            ])));
+
+        $this->assertIsArray($user->twoFactorRecoveryCodes());
+        $this->assertEquals($recoveryCodes, $user->twoFactorRecoveryCodes());
+    }
+
+    #[Test]
+    public function it_replaces_recovery_codes()
+    {
+        $user = $this->makeUser()
+            ->makeSuper()
+            ->set('two_factor_recovery_codes', encrypt(json_encode([
+                'code1',
+                'code2',
+                'code3',
+                'code4',
+                'code5',
+                'code6',
+                'code7',
+                'code8',
+            ])));
+
+        $user->save();
+
+        // RecoveryCode::generate() uses Str::random() to generate the codes.
+        Str::createRandomStringsUsingSequence(['abc', 'def']);
+
+        $user->replaceTwoFactorRecoveryCode('code4');
+
+        $this->assertEquals([
+            'code1',
+            'code2',
+            'code3',
+            'abc-def',
+            'code5',
+            'code6',
+            'code7',
+            'code8',
+        ], $user->twoFactorRecoveryCodes());
+    }
+
+    #[Test]
+    public function it_returns_the_two_factor_qr_code_svg()
+    {
+        $user = $this
+            ->makeUser()
+            ->makeSuper()
+            ->email('david@hasselhoff.com')
+            ->set('two_factor_secret', encrypt('secret'));
+
+        $svg = $user->twoFactorQrCodeSvg();
+
+        $this->assertIsString($svg);
+        $this->assertStringStartsWith('<svg', $svg);
+    }
+
+    #[Test]
+    public function it_returns_the_two_factor_qr_code_url()
+    {
+        $user = $this
+            ->makeUser()
+            ->makeSuper()
+            ->email('david@hasselhoff.com')
+            ->set('two_factor_secret', encrypt('secret'));
+
+        $user->save();
+
+        $url = $user->twoFactorQrCodeUrl();
+
+        $this->assertIsString($url);
+        $this->assertStringContainsString('otpauth://totp/Laravel:david%40hasselhoff.com', $url);
+        $this->assertStringContainsString('secret='.decrypt($user->two_factor_secret), $url);
     }
 
     private function createRole($handle)

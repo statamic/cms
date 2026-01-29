@@ -5,9 +5,12 @@ namespace Statamic\StaticCaching\Cachers;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\LazyCollection;
 use Statamic\Events\UrlInvalidated;
 use Statamic\Facades\File;
+use Statamic\Facades\Path;
 use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\StaticCaching\Page;
 use Statamic\StaticCaching\Replacers\CsrfTokenReplacer;
 use Statamic\Support\Arr;
@@ -25,6 +28,11 @@ class FileCacher extends AbstractCacher
      * @var bool
      */
     private $shouldOutputJs = false;
+
+    /**
+     * @var string
+     */
+    private $csrfTokenJs;
 
     /**
      * @var string
@@ -136,7 +144,39 @@ class FileCacher extends AbstractCacher
                 $this->forgetUrl($key, $domain);
             });
 
+        $this->getFiles($site)
+            ->filter(fn ($file) => str_starts_with($file, $url.'_'))
+            ->each(function ($file, $path) {
+                $this->writer->delete($path);
+            });
+
         UrlInvalidated::dispatch($url, $domain);
+    }
+
+    /**
+     * Get lazy collection file listing.
+     *
+     * @param  Site  $site
+     */
+    private function getFiles($site): LazyCollection
+    {
+        $cachePath = $this->getCachePath($site);
+        if (! $cachePath || ! File::exists($cachePath)) {
+            return LazyCollection::make();
+        }
+
+        $directoryIterator = new \RecursiveDirectoryIterator($cachePath, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::UNIX_PATHS);
+        $iterator = new \RecursiveIteratorIterator($directoryIterator);
+
+        return LazyCollection::make(function () use ($iterator, $cachePath) {
+            foreach ($iterator as $file) {
+                if (! $file->isFile() || $file->getExtension() !== 'html') {
+                    continue;
+                }
+
+                yield Path::tidy($file->getPathName()) => Str::start(Str::replaceFirst($cachePath, '', $file->getPathName()), '/');
+            }
+        });
     }
 
     public function getCachePaths()
@@ -183,7 +223,7 @@ class FileCacher extends AbstractCacher
             $basename = $slug.'_lqs_'.md5($query).'.html';
         }
 
-        return $this->getCachePath($site).$pathParts['dirname'].'/'.$basename;
+        return Path::tidy($this->getCachePath($site).Str::finish($pathParts['dirname'], '/').$basename);
     }
 
     private function isBasenameTooLong($basename)
@@ -196,39 +236,28 @@ class FileCacher extends AbstractCacher
         return Str::contains($path, '_lqs_');
     }
 
+    public function setCsrfTokenJs(string $js)
+    {
+        $this->csrfTokenJs = $js;
+    }
+
     public function setNocacheJs(string $js)
     {
         $this->nocacheJs = $js;
     }
 
-    public function getNocacheJs(): string
+    public function getCsrfTokenJs(): string
     {
         $csrfPlaceholder = CsrfTokenReplacer::REPLACEMENT;
 
         $default = <<<EOT
 (function() {
-    var els = document.getElementsByClassName('nocache');
-    var map = {};
-    for (var i = 0; i < els.length; i++) {
-        var section = els[i].getAttribute('data-nocache');
-        map[section] = els[i];
-    }
-
-    fetch('/!/nocache', {
+    fetch('/!/csrf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            url: window.location.href.split('#')[0],
-            sections: Object.keys(map)
-        })
     })
     .then((response) => response.json())
     .then((data) => {
-        const regions = data.regions;
-        for (var key in regions) {
-            if (map[key]) map[key].outerHTML = regions[key];
-        }
-
         for (const input of document.querySelectorAll('input[value="$csrfPlaceholder"]')) {
             input.value = data.csrf;
         }
@@ -245,8 +274,68 @@ class FileCacher extends AbstractCacher
             window.livewire_token = data.csrf
         }
 
-        if (window.hasOwnProperty('livewireScriptConfig')) {
-            window.livewireScriptConfig.csrf = data.csrf
+        if (window.livewireScriptConfig) {
+            // Replaces token if Livewire is already available. Usually on fast networks.
+            window.livewireScriptConfig.csrf = data.csrf;
+        } else {
+            // Delays replacing the token until Livewire is initialized. Usually on slow networks.
+            document.addEventListener('livewire:init', () => window.livewireScriptConfig.csrf = data.csrf);
+        }
+
+        document.dispatchEvent(new CustomEvent('statamic:csrf.replaced', { detail: data }));
+    });
+})();
+EOT;
+
+        return $this->csrfTokenJs ?? $default;
+    }
+
+    public function getNocacheJs(): string
+    {
+        $nocacheUrl = URL::makeRelative(route('statamic.nocache'));
+
+        $default = <<<EOT
+(function() {
+    function createMap() {
+        var map = {};
+        var els = document.getElementsByClassName('nocache');
+        for (var i = 0; i < els.length; i++) {
+            var section = els[i].getAttribute('data-nocache');
+            map[section] = els[i];
+        }
+        return map;
+    }
+
+    function replaceElement(el, html) {
+        const tmp = document.createElement('div');
+        const fragment = document.createDocumentFragment();
+
+        tmp.setHTMLUnsafe(html);
+
+        while (tmp.firstChild) {
+            fragment.appendChild(tmp.firstChild);
+        }
+
+        el.replaceWith(fragment);
+    }
+
+    var map = createMap();
+
+    fetch('{$nocacheUrl}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            url: window.location.href.split('#')[0],
+            sections: Object.keys(map)
+        })
+    })
+    .then((response) => response.json())
+    .then((data) => {
+        map = createMap(); // Recreate map in case the DOM changed.
+
+        const regions = data.regions;
+        for (var key in regions) {
+            if (map[key]) replaceElement(map[key], regions[key]);
         }
 
         document.dispatchEvent(new CustomEvent('statamic:nocache.replaced', { detail: data }));
@@ -279,7 +368,7 @@ EOT;
 
     public function getUrl(Request $request)
     {
-        $url = $request->getUri();
+        $url = $this->removeBackgroundRecacheTokenFromUrl($request->getUri());
 
         if ($this->isExcluded($url)) {
             return $url;
@@ -301,6 +390,6 @@ EOT;
 
         $qs = HeaderUtils::parseQuery($qs);
 
-        return $url.'?'.http_build_query($qs, '', '&', \PHP_QUERY_RFC3986);
+        return $this->removeBackgroundRecacheTokenFromUrl($url.'?'.http_build_query($qs, '', '&', \PHP_QUERY_RFC3986));
     }
 }

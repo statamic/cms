@@ -24,9 +24,9 @@ trait InteractsWithFilesystem
     }
 
     /**
-     * Export starter kit path.
+     * Export relative path to starter kit.
      */
-    protected function exportPath(string $starterKitPath, string $from, ?string $to = null): void
+    protected function exportRelativePath(string $starterKitPath, string $from, ?string $to = null): void
     {
         $to = $to
             ? "{$starterKitPath}/{$to}"
@@ -41,6 +41,18 @@ trait InteractsWithFilesystem
         $files->isDirectory($from)
             ? $files->copyDirectory($from, $to)
             : $files->copy($from, $to);
+    }
+
+    /**
+     * Copy directory contents into, file by file so that it does not stomp the whole target directory.
+     */
+    protected function copyDirectoryContentsInto(string $from, string $to): void
+    {
+        $files = app(Filesystem::class);
+
+        collect($files->allFiles($from))
+            ->mapWithKeys(fn ($file) => [$from.'/'.$file->getRelativePathname() => $to.'/'.$file->getRelativePathname()])
+            ->each(fn ($to, $from) => $files->copy(Path::tidy($from), $this->preparePath($to)));
     }
 
     /**

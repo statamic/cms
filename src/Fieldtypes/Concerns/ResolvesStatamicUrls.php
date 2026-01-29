@@ -13,11 +13,11 @@ trait ResolvesStatamicUrls
      */
     protected function resolveStatamicUrls(string $content)
     {
-        return preg_replace_callback('/([("])statamic:\/\/([^()"]*)([)"])/im', function ($matches) {
+        return preg_replace_callback('/([("])statamic:\/\/([^()"?#]*)([^()"]*)([)"])/im', function ($matches) {
             $data = Data::find($matches[2]);
-            $url = $data ? $data->url() : '';
+            $url = $data ? $data->url().$matches[3] : '';
 
-            return $matches[1].$url.$matches[3];
+            return $matches[1].$url.$matches[4];
         }, $content);
     }
 }

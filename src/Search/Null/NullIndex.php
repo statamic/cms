@@ -22,7 +22,7 @@ class NullIndex extends Index
         return true;
     }
 
-    protected function insertDocuments(Documents $documents)
+    public function insertDocuments(Documents $documents)
     {
         //
     }

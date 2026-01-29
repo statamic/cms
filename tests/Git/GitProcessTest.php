@@ -153,6 +153,14 @@ EOT;
         $this->simulateLoggableErrorOutput('remote: Processed 1 references in total');
     }
 
+    #[Test]
+    public function it_doesnt_log_auto_packing_as_error_output()
+    {
+        Log::shouldReceive('error')->never();
+
+        $this->simulateLoggableErrorOutput('Error: Auto packing the repository in background for optimum performance.');
+    }
+
     private function showLastCommit($path)
     {
         return Process::create($path)->run('git show');

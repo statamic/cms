@@ -2,6 +2,7 @@
 
 namespace Statamic\Query\Scopes\Filters\Fields;
 
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class Textarea extends FieldtypeFilter
@@ -9,29 +10,50 @@ class Textarea extends FieldtypeFilter
     public function fieldItems()
     {
         return [
+            'operator' => [
+                'type' => 'select',
+                'options' => [
+                    'like' => __('Contains'),
+                    'null' => __('Empty'),
+                    'not-null' => __('Not empty'),
+                ],
+                'default' => 'like',
+            ],
             'value' => [
                 'type' => 'text',
-                'placeholder' => __('Contains'),
+                'placeholder' => __('Value'),
+                'if' => [
+                    'operator' => 'like',
+                ],
+                'required' => false,
             ],
         ];
     }
 
     public function apply($query, $handle, $values)
     {
+        $operator = $values['operator'];
         $value = $values['value'];
 
-        $value = Str::ensureLeft($value, '%');
-        $value = Str::ensureRight($value, '%');
+        if ($operator === 'like') {
+            $value = Str::ensureLeft($value, '%');
+            $value = Str::ensureRight($value, '%');
+        }
 
-        $query->where($handle, 'like', $value);
+        match ($operator) {
+            'null' => $query->whereNull($handle),
+            'not-null' => $query->whereNotNull($handle),
+            default => $query->where($handle, $operator, $value),
+        };
     }
 
     public function badge($values)
     {
         $field = $this->fieldtype->field()->display();
-        $operator = __('Contains');
+        $operator = $values['operator'];
+        $translatedOperator = Arr::get($this->fieldItems(), "operator.options.{$operator}");
         $value = $values['value'];
 
-        return strtolower($field).' '.strtolower($operator).' '.$value;
+        return $field.' '.strtolower($translatedOperator).' '.$value;
     }
 }

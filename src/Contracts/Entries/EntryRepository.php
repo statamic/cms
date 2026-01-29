@@ -2,6 +2,8 @@
 
 namespace Statamic\Contracts\Entries;
 
+use Closure;
+
 interface EntryRepository
 {
     public function all();
@@ -10,11 +12,17 @@ interface EntryRepository
 
     public function whereInCollection(array $handles);
 
+    // public function whereInId(array $ids);
+
     public function find($id);
 
     public function findOrFail($id);
 
     public function findByUri(string $uri);
+
+    public function findOrMake($id);
+
+    public function findOr($id, Closure $callback);
 
     public function make();
 

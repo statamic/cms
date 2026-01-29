@@ -17,6 +17,44 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Create User
+    |--------------------------------------------------------------------------
+    |
+    | Whether or not a user account should be created upon authentication
+    | with an OAuth provider. If disabled, a user account will be need
+    | to be explicitly created ahead of time.
+    |
+    */
+
+    'create_user' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Merge User Data
+    |--------------------------------------------------------------------------
+    |
+    | When authenticating with an OAuth provider, the user data returned
+    | such as their name will be merged with the existing user account.
+    |
+    */
+
+    'merge_user_data' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Unauthorized Redirect
+    |--------------------------------------------------------------------------
+    |
+    | This controls where the user is taken after authenticating with
+    | an OAuth provider but their account is unauthorized. This may
+    | happen when the create_user option has been set to false.
+    |
+    */
+
+    'unauthorized_redirect' => null,
+
+    /*
+    |--------------------------------------------------------------------------
     | Remember Me
     |--------------------------------------------------------------------------
     |

@@ -3,6 +3,8 @@
 namespace Tests\Tags\User;
 
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Support\Facades\Gate;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Parse;
 use Statamic\Facades\Role;
@@ -50,6 +52,37 @@ class UserTagsTest extends TestCase
         // Test if user has any of these permissions
         $this->assertEquals('yes', $this->tag('{{ user:can do="access cp|configure collections" }}yes{{ /user:can }}'));
         $this->assertEquals('', $this->tag('{{ user:cant do="access cp|configure collections" }}yes{{ /user:cant }}'));
+    }
+
+    #[DataProvider('userCanProvider')]
+    #[Test]
+    public function it_renders_user_can_with_arguments_tag_content($tag, $params, $expectedOne, $expectedTwo, $expectedOutput)
+    {
+        $this->actingAs(User::make()->save());
+
+        Gate::define('test gate', function ($user, $one, $two) use ($expectedTwo, $expectedOne) {
+            $this->assertEquals($expectedOne, $one);
+            $this->assertEquals($expectedTwo, $two);
+
+            return $one === 'alfa';
+        });
+
+        $this->assertEquals($expectedOutput, $this->tag('{{ user:'.$tag.' do="test gate" '.$params.' }}yes{{ /user:'.$tag.' }}'));
+    }
+
+    public static function userCanProvider()
+    {
+        return [
+            ['can', 'one="alfa" two="bravo"', 'alfa', 'bravo', 'yes'],
+            ['can', 'two="bravo" one="alfa"', 'alfa', 'bravo', 'yes'],
+            ['can', 'one="bravo" two="alfa"', 'bravo', 'alfa', ''],
+            ['can', 'two="alfa" one="bravo"', 'bravo', 'alfa', ''],
+
+            ['cant', 'one="alfa" two="bravo"', 'alfa', 'bravo', ''],
+            ['cant', 'two="bravo" one="alfa"', 'alfa', 'bravo', ''],
+            ['cant', 'one="bravo" two="alfa"', 'bravo', 'alfa', 'yes'],
+            ['cant', 'two="alfa" one="bravo"', 'bravo', 'alfa', 'yes'],
+        ];
     }
 
     #[Test]

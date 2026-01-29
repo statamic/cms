@@ -19,7 +19,7 @@ use Statamic\Fields\FieldsetRepository;
  * @method static void addNamespace(string $namespace, string $directory)
  *
  * @see \Statamic\Fields\FieldsetRepository
- * @see \Statamic\Fields\Fieldset
+ * @link \Statamic\Fields\Fieldset
  */
 class Fieldset extends Facade
 {

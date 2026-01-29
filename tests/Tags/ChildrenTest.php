@@ -44,6 +44,10 @@ class ChildrenTest extends TestCase
             'title' => 'the bar entry',
         ])->create();
 
+        EntryFactory::collection('pages')->id('baz')->data([
+            'title' => 'the baz entry',
+        ])->create();
+
         EntryFactory::collection('pages')->id('fr-foo')->origin('foo')->locale('fr')->data([
             'title' => 'the french foo entry',
         ])->create();
@@ -52,15 +56,23 @@ class ChildrenTest extends TestCase
             'title' => 'the french bar entry',
         ])->create();
 
+        EntryFactory::collection('pages')->id('fr-baz')->origin('foo')->locale('fr')->data([
+            'title' => 'the french baz entry',
+        ])->create();
+
         $this->collection->structure()->in('en')->tree([
             ['entry' => 'foo', 'url' => '/foo', 'children' => [
-                ['entry' => 'bar', 'url' => '/foo/bar'],
+                ['entry' => 'bar', 'url' => '/foo/bar', 'children' => [
+                    ['entry' => 'baz', 'url' => '/foo/bar/baz'],
+                ]],
             ]],
         ])->save();
 
         $this->collection->structure()->in('fr')->tree([
             ['entry' => 'fr-foo', 'url' => '/fr-foo', 'children' => [
-                ['entry' => 'fr-bar', 'url' => '/fr-foo/fr-bar'],
+                ['entry' => 'fr-bar', 'url' => '/fr-foo/fr-bar', 'children' => [
+                    ['entry' => 'fr-baz', 'url' => '/fr-foo/fr-bar/fr-baz'],
+                ]],
             ]],
         ])->save();
     }
@@ -72,6 +84,16 @@ class ChildrenTest extends TestCase
         $this->get('/foo');
 
         $this->assertEquals('the bar entry', $this->tag('{{ children }}{{ title }}{{ /children }}', ['collection' => $this->collection]));
+    }
+
+    #[Test]
+    public function it_gets_children_data_of_another_entry()
+    {
+        $this->setUpEntries();
+
+        $this->get('/foo');
+
+        $this->assertEquals('the baz entry', $this->tag('{{ children of="/foo/bar" }}{{ title }}{{ /children }}', ['collection' => $this->collection]));
     }
 
     #[Test]

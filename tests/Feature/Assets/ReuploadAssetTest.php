@@ -75,6 +75,6 @@ class ReuploadAssetTest extends TestCase
         Glide::shouldReceive('clearAsset')->withArgs(fn ($arg1) => $arg1->id() === $asset->id())->once()->globally()->ordered();
         $this->mock(PresetGenerator::class)->shouldReceive('generate')->withArgs(fn ($arg1) => $arg1->id() === $asset->id())->once()->globally()->ordered();
 
-        AssetReuploaded::dispatch($asset);
+        AssetReuploaded::dispatch($asset, 'test.jpg');
     }
 }

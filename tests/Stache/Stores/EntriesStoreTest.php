@@ -5,6 +5,7 @@ namespace Tests\Stache\Stores;
 use Facades\Statamic\Stache\Traverser;
 use Illuminate\Support\Carbon;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades;
@@ -101,6 +102,33 @@ class EntriesStoreTest extends TestCase
         $this->assertTrue(Carbon::createFromFormat('Y-m-d H:i', '2017-01-02 00:00')->eq($item->date()));
         $this->assertEquals('my-post', $item->slug());
         $this->assertTrue($item->published());
+    }
+
+    #[Test]
+    #[DataProvider('timezoneProvider')]
+    public function it_makes_entry_instances_from_files_with_different_timezone($filename, $expectedDate)
+    {
+        config(['app.timezone' => 'America/New_York']);
+
+        Facades\Collection::shouldReceive('findByHandle')->with('blog')->andReturn(
+            (new \Statamic\Entries\Collection)->handle('blog')->dated(true)
+        );
+
+        $item = $this->parent->store('blog')->makeItemFromFile(
+            Path::tidy($this->directory).'/blog/'.$filename,
+            "id: 123\ntitle: Example\nfoo: bar"
+        );
+
+        $this->assertEquals($expectedDate, $item->date()->format('Y-m-d H:i:s'));
+    }
+
+    public static function timezoneProvider()
+    {
+        return [
+            'midnight' => ['2017-01-02.my-post.md', '2017-01-02 05:00:00'],
+            '10pm' => ['2017-01-02-2200.my-post.md', '2017-01-03 03:00:00'],
+            '10pm with seconds' => ['2017-01-02-220013.my-post.md', '2017-01-03 03:00:13'],
+        ];
     }
 
     #[Test]

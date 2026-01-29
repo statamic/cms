@@ -55,7 +55,7 @@ class FileTokenRepository extends TokenRepository
 
         return $this
             ->make($token, $yaml['handler'], $yaml['data'] ?? [])
-            ->expireAt(Carbon::createFromTimestamp($yaml['expires_at']));
+            ->expireAt(Carbon::createFromTimestamp($yaml['expires_at'], config('app.timezone')));
     }
 
     public static function bindings(): array

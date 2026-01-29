@@ -250,4 +250,22 @@ class FormTest extends TestCase
 
         $this->assertTrue($return);
     }
+
+    #[Test]
+    public function it_clones_internal_collections()
+    {
+        $form = Form::make('contact_us');
+        $form->set('foo', 'A');
+        $form->setSupplement('bar', 'A');
+
+        $clone = clone $form;
+        $clone->set('foo', 'B');
+        $clone->setSupplement('bar', 'B');
+
+        $this->assertEquals('A', $form->get('foo'));
+        $this->assertEquals('B', $clone->get('foo'));
+
+        $this->assertEquals('A', $form->getSupplement('bar'));
+        $this->assertEquals('B', $clone->getSupplement('bar'));
+    }
 }

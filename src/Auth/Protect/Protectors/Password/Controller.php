@@ -2,6 +2,7 @@
 
 namespace Statamic\Auth\Protect\Protectors\Password;
 
+use Inertia\Inertia;
 use Statamic\Auth\Protect\ProtectorManager;
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
@@ -22,7 +23,15 @@ class Controller extends BaseController
             app()->setLocale($site->lang());
         }
 
-        return View::make('statamic::auth.protect.password')->cascadeContent($data ?? null);
+        // If a user has a custom view, make sure to use theirs instead of Inertia.
+        if (view()->exists('statamic::auth.protect.password')) {
+            return View::make('statamic::auth.protect.password')->cascadeContent($data ?? null);
+        }
+
+        return Inertia::render('auth/protect/Password', [
+            'token' => request('token'),
+            'submitUrl' => route('statamic.protect.password.store'),
+        ]);
     }
 
     public function store()

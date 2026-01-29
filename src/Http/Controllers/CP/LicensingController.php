@@ -2,21 +2,51 @@
 
 namespace Statamic\Http\Controllers\CP;
 
+use Inertia\Inertia;
 use Statamic\Licensing\LicenseManager as Licenses;
 
 class LicensingController extends CpController
 {
     public function show(Licenses $licenses)
     {
-        return view('statamic::licensing', [
+        $site = $licenses->site();
+        $statamic = $licenses->statamic();
+        $addons = $licenses->addons()->filter->existsOnMarketplace();
+
+        return Inertia::render('utilities/Licensing', [
             'requestError' => $licenses->requestFailed(),
-            'site' => $site = $licenses->site(),
-            'statamic' => $statamic = $licenses->statamic(),
-            'addons' => $addons = $licenses->addons()->filter->existsOnMarketplace(),
-            'unlistedAddons' => $licenses->addons()->reject->existsOnMarketplace(),
+            'site' => [
+                'url' => $site->url(),
+                'key' => $site->key(),
+                'valid' => $site->valid(),
+                'domain' => $site->domain(),
+                'hasMultipleDomains' => $site->hasMultipleDomains(),
+                'additionalDomainCount' => $site->additionalDomainCount(),
+                'invalidReason' => $site->invalidReason(),
+                'usesIncorrectKeyFormat' => $site->key() && $site->usesIncorrectKeyFormat(),
+            ],
+            'statamic' => [
+                'valid' => $statamic->valid(),
+                'pro' => $statamic->pro(),
+                'version' => $statamic->version(),
+                'invalidReason' => $statamic->invalidReason(),
+            ],
+            'addons' => $addons->map(fn ($addon) => [
+                'name' => $addon->name(),
+                'valid' => $addon->valid(),
+                'version' => $addon->version(),
+                'edition' => $addon->edition(),
+                'invalidReason' => $addon->invalidReason(),
+                'marketplaceUrl' => $addon->addon()->marketplaceUrl(),
+            ])->values(),
+            'unlistedAddons' => $licenses->addons()->reject->existsOnMarketplace()->map(fn ($addon) => [
+                'name' => $addon->name(),
+                'version' => $addon->version(),
+            ])->values(),
             'configCached' => app()->configurationIsCached(),
             'addToCartUrl' => $this->addToCartUrl($site, $statamic, $addons),
             'usingLicenseKeyFile' => $licenses->usingLicenseKeyFile(),
+            'refreshUrl' => cp_route('utilities.licensing.refresh'),
         ]);
     }
 

@@ -274,7 +274,7 @@ EOT;
 <p>Baz qux.</p>
 EOT, $markdown);
 
-        $this->assertEquals(<<<'EOT'
+        $expected = <<<'EOT'
 <ul class="table-of-contents">
 <li>
 <a href="#content-alfa-bravo">Alfa Bravo</a>
@@ -287,8 +287,12 @@ EOT, $markdown);
 <p>Foo bar.</p>
 <h2><a id="content-charlie-delta" href="#content-charlie-delta" class="heading-permalink" aria-hidden="true" title="Permalink">¶</a>Charlie Delta</h2>
 <p>Baz qux.</p>
-EOT,
-            rtrim(Markdown::withTableOfContents()->parse($markdown))
+EOT;
+
+        // Make assertion without newlines because they differ between versions of commonmark.
+        $this->assertEquals(
+            str($expected)->replace("\n", ''),
+            str(Markdown::withTableOfContents()->parse($markdown))->trim()->replace("\n", '')
         );
     }
 }

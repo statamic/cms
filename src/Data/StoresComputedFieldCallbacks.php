@@ -9,8 +9,19 @@ trait StoresComputedFieldCallbacks
 {
     protected $computedFieldCallbacks;
 
-    public function computed(string $field, Closure $callback)
+    /**
+     * @param  string|array  $field
+     */
+    public function computed($field, ?Closure $callback = null)
     {
+        if (is_array($field)) {
+            foreach ($field as $field_name => $field_callback) {
+                $this->computedFieldCallbacks[$field_name] = $field_callback;
+            }
+
+            return;
+        }
+
         $this->computedFieldCallbacks[$field] = $callback;
     }
 

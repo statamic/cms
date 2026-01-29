@@ -30,6 +30,7 @@ class InstallEloquentDriver extends Command
      */
     protected $signature = 'statamic:install:eloquent-driver
         { --all : Configures all repositories to use the database }
+        { --repositories= : Comma separated list of repositories to migrate }
         { --import : Whether existing data should be imported }
         { --without-messages : Disables output messages }';
 
@@ -68,13 +69,19 @@ class InstallEloquentDriver extends Command
             return $this->components->error('Failed to connect to the configured database. Please check your database configuration and try again.');
         }
 
-        if ($this->availableRepositories()->isEmpty()) {
+        if ($this->allRepositories()->reject(fn ($value, $key) => $this->repositoryHasBeenMigrated($key))->isEmpty()) {
             return $this->components->warn("No repositories left to migrate. You're already using the Eloquent Driver for all repositories.");
         }
 
         $repositories = $this->repositories();
 
         foreach ($repositories as $repository) {
+            if ($this->repositoryHasBeenMigrated($repository)) {
+                $this->components->warn("Skipping. The {$repository} repository is already using the Eloquent Driver.");
+
+                continue;
+            }
+
             $method = 'migrate'.Str::studly($repository);
             $this->$method();
         }
@@ -83,12 +90,33 @@ class InstallEloquentDriver extends Command
     protected function repositories(): array
     {
         if ($this->option('all')) {
-            return $this->availableRepositories()->keys()->all();
+            return $this->allRepositories()->keys()->all();
+        }
+
+        if ($repositories = $this->option('repositories')) {
+            $repositories = collect(explode(',', $repositories))
+                ->map(fn ($repo) => trim(strtolower($repo)))
+                ->unique();
+
+            $invalidRepositories = $repositories->reject(fn ($repo) => $this->allRepositories()->has($repo));
+
+            if ($invalidRepositories->isNotEmpty()) {
+                $this->components->error("Some of the repositories you provided are invalid: {$invalidRepositories->implode(', ')}");
+
+                exit(1);
+            }
+
+            return $repositories
+                ->filter(fn ($repo) => $this->allRepositories()->has($repo))
+                ->values()
+                ->all();
         }
 
         return multiselect(
             label: 'Which repositories would you like to migrate?',
-            options: $this->availableRepositories()->all(),
+            options: $this->allRepositories()
+                ->reject(fn ($value, $key) => $this->repositoryHasBeenMigrated($key))
+                ->all(),
             validate: fn (array $values) => count($values) === 0
                 ? 'You must select at least one repository to migrate.'
                 : null,
@@ -96,9 +124,10 @@ class InstallEloquentDriver extends Command
         );
     }
 
-    protected function availableRepositories(): Collection
+    protected function allRepositories(): Collection
     {
         return collect([
+            'addon_settings' => 'Addon Settings',
             'asset_containers' => 'Asset Containers',
             'assets' => 'Assets',
             'blueprints' => 'Blueprints',
@@ -117,64 +146,94 @@ class InstallEloquentDriver extends Command
             'taxonomies' => 'Taxonomies',
             'terms' => 'Terms',
             'tokens' => 'Tokens',
-        ])->reject(function ($value, $key) {
-            switch ($key) {
-                case 'asset_containers':
-                    return config('statamic.eloquent-driver.asset_containers.driver') === 'eloquent';
+        ]);
+    }
 
-                case 'assets':
-                    return config('statamic.eloquent-driver.assets.driver') === 'eloquent';
+    protected function repositoryHasBeenMigrated(string $repository): bool
+    {
+        switch ($repository) {
+            case 'addon_settings':
+                return config('statamic.system.addon_settings_driver') === 'database';
 
-                case 'blueprints':
-                    return config('statamic.eloquent-driver.blueprints.driver') === 'eloquent';
+            case 'asset_containers':
+                return config('statamic.eloquent-driver.asset_containers.driver') === 'eloquent';
 
-                case 'collections':
-                    return config('statamic.eloquent-driver.collections.driver') === 'eloquent';
+            case 'assets':
+                return config('statamic.eloquent-driver.assets.driver') === 'eloquent';
 
-                case 'collection_trees':
-                    return config('statamic.eloquent-driver.collection_trees.driver') === 'eloquent';
+            case 'blueprints':
+                return config('statamic.eloquent-driver.blueprints.driver') === 'eloquent';
 
-                case 'entries':
-                    return config('statamic.eloquent-driver.entries.driver') === 'eloquent';
+            case 'collections':
+                return config('statamic.eloquent-driver.collections.driver') === 'eloquent';
 
-                case 'fieldsets':
-                    return config('statamic.eloquent-driver.fieldsets.driver') === 'eloquent';
+            case 'collection_trees':
+                return config('statamic.eloquent-driver.collection_trees.driver') === 'eloquent';
 
-                case 'forms':
-                    return config('statamic.eloquent-driver.forms.driver') === 'eloquent';
+            case 'entries':
+                return config('statamic.eloquent-driver.entries.driver') === 'eloquent';
 
-                case 'form_submissions':
-                    return config('statamic.eloquent-driver.form_submissions.driver') === 'eloquent';
+            case 'fieldsets':
+                return config('statamic.eloquent-driver.fieldsets.driver') === 'eloquent';
 
-                case 'globals':
-                    return config('statamic.eloquent-driver.global_sets.driver') === 'eloquent';
+            case 'forms':
+                return config('statamic.eloquent-driver.forms.driver') === 'eloquent';
 
-                case 'global_variables':
-                    return config('statamic.eloquent-driver.global_set_variables.driver') === 'eloquent';
+            case 'form_submissions':
+                return config('statamic.eloquent-driver.form_submissions.driver') === 'eloquent';
 
-                case 'navs':
-                    return config('statamic.eloquent-driver.navigations.driver') === 'eloquent';
+            case 'globals':
+                return config('statamic.eloquent-driver.global_sets.driver') === 'eloquent';
 
-                case 'nav_trees':
-                    return config('statamic.eloquent-driver.navigation_trees.driver') === 'eloquent';
+            case 'global_variables':
+                return config('statamic.eloquent-driver.global_set_variables.driver') === 'eloquent';
 
-                case 'revisions':
-                    return ! config('statamic.revisions.enabled')
-                        || config('statamic.eloquent-driver.revisions.driver') === 'eloquent';
+            case 'navs':
+                return config('statamic.eloquent-driver.navigations.driver') === 'eloquent';
 
-                case 'sites':
-                    return config('statamic.eloquent-driver.sites.driver') === 'eloquent';
+            case 'nav_trees':
+                return config('statamic.eloquent-driver.navigation_trees.driver') === 'eloquent';
 
-                case 'taxonomies':
-                    return config('statamic.eloquent-driver.taxonomies.driver') === 'eloquent';
+            case 'revisions':
+                return ! config('statamic.revisions.enabled')
+                    || config('statamic.eloquent-driver.revisions.driver') === 'eloquent';
 
-                case 'terms':
-                    return config('statamic.eloquent-driver.terms.driver') === 'eloquent';
+            case 'sites':
+                return config('statamic.eloquent-driver.sites.driver') === 'eloquent';
 
-                case 'tokens':
-                    return config('statamic.eloquent-driver.tokens.driver') === 'eloquent';
-            }
-        });
+            case 'taxonomies':
+                return config('statamic.eloquent-driver.taxonomies.driver') === 'eloquent';
+
+            case 'terms':
+                return config('statamic.eloquent-driver.terms.driver') === 'eloquent';
+
+            case 'tokens':
+                return config('statamic.eloquent-driver.tokens.driver') === 'eloquent';
+        }
+    }
+
+    protected function migrateAddonSettings(): void
+    {
+        spin(
+            callback: function () {
+                $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-addon-setting-migrations');
+                $this->runArtisanCommand('migrate');
+
+                $this->switchToEloquentDriver('addon_settings');
+            },
+            message: 'Migrating addon settings...'
+        );
+
+        $this->infoMessage('Configured addon settings');
+
+        if ($this->shouldImport('addon settings')) {
+            spin(
+                callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-addon-settings'),
+                message: 'Importing existing addon settings...'
+            );
+
+            $this->infoMessage('Imported existing addon settings');
+        }
     }
 
     protected function migrateAssetContainers(): void
@@ -626,14 +685,30 @@ class InstallEloquentDriver extends Command
             return;
         }
 
-        $this->components->info('Configured asset containers');
+        $this->components->info($message);
     }
 
     private function switchToEloquentDriver(string $repository): void
     {
+        $config = Str::of(File::get(config_path('statamic/eloquent-driver.php')));
+
+        if (! $config->contains("'{$repository}' => [")) {
+            $baseConfig = File::get(base_path('vendor/statamic/eloquent-driver/config/eloquent-driver.php'));
+
+            $matches = [];
+            preg_match("/'{$repository}' => \[(.*?)],/s", $baseConfig, $matches);
+
+            $repositoryInBaseConfig = $matches[0] ?? null;
+
+            $config = $config->replace(
+                '];',
+                PHP_EOL.'    '.$repositoryInBaseConfig.PHP_EOL.'];'
+            );
+        }
+
         File::put(
             config_path('statamic/eloquent-driver.php'),
-            Str::of(File::get(config_path('statamic/eloquent-driver.php')))
+            $config
                 ->replace(
                     "'{$repository}' => [\n        'driver' => 'file'",
                     "'{$repository}' => [\n        'driver' => 'eloquent'"

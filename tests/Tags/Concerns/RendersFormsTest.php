@@ -6,13 +6,17 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Antlers;
 use Statamic\Fields\Field;
+use Statamic\Forms\RenderableField;
 use Statamic\Support\Arr;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags;
+use Tests\FakesViews;
 use Tests\TestCase;
 
 class RendersFormsTest extends TestCase
 {
+    use FakesViews;
+
     const MISSING = 'field is missing from request';
 
     private $tag;
@@ -68,9 +72,9 @@ class RendersFormsTest extends TestCase
     }
 
     #[Test]
-    public function it_minifies_space_between_field_html_elements()
+    public function renderable_fields_minify_space_between_field_html_elements_when_casting_to_string()
     {
-        $fields = <<<'EOT'
+        $html = <<<'HTML'
             <select>
                 <option>One</option>
                 <option>
@@ -91,14 +95,20 @@ class RendersFormsTest extends TestCase
             <textarea>
                 <a href="/link">Start with</a> and end with a <a href="/link">link</a>
             </textarea>
-EOT;
+HTML;
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('statamic::forms.fields.text', $html);
 
         $expected = '<select><option>One</option><option>Two</option></select><label><input type="checkbox">Option <a href="/link">with link</a> text or <span class="tailwind">style</span> class</label><label><input type="radio">Intentionally<a href="/link">tight</a>link or<span class="tailwind">style</span>class</label><textarea>Some <a href="/link">link</a> or <span class="tailwind">styled text</textarea><textarea><a href="/link">Start with</a> and end with a <a href="/link">link</a></textarea>';
 
-        $this->assertEquals($expected, $this->tag->minifyFieldHtml($fields));
+        $field = $this->createField('text')['field'];
+
+        $this->assertInstanceOf(RenderableField::class, $field);
+        $this->assertEquals($expected, (string) $field);
     }
 
-    private function createField($type, $value, $default, $old, $config = [])
+    private function createField($type, $value = null, $default = null, $old = null, $config = [])
     {
         $config = array_merge($config, ['type' => $type]);
 

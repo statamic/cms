@@ -4,11 +4,8 @@ namespace Statamic\Events;
 
 class UserDeleting extends Event
 {
-    public $user;
-
-    public function __construct($user)
+    public function __construct(public $user)
     {
-        $this->user = $user;
     }
 
     /**

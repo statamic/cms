@@ -98,7 +98,7 @@ abstract class DataReferenceUpdater
     {
         $fields
             ->filter(function ($field) {
-                return in_array($field->type(), ['replicator', 'grid', 'bard']);
+                return in_array($field->type(), ['replicator', 'grid', 'group', 'bard']);
             })
             ->each(function ($field) use ($dottedPrefix) {
                 $method = 'update'.ucfirst($field->type()).'Children';
@@ -153,6 +153,24 @@ abstract class DataReferenceUpdater
                 $this->recursivelyUpdateFields((new Fields($fields))->all(), $dottedPrefix);
             }
         });
+    }
+
+    /**
+     * Update group field children.
+     *
+     * @param  \Statamic\Fields\Field  $field
+     * @param  string  $dottedKey
+     */
+    protected function updateGroupChildren($field, $dottedKey)
+    {
+        $data = $this->item->data();
+
+        $dottedPrefix = "{$dottedKey}.";
+        $fields = Arr::get($field->config(), 'fields');
+
+        if ($fields) {
+            $this->recursivelyUpdateFields((new Fields($fields))->all(), $dottedPrefix);
+        }
     }
 
     /**

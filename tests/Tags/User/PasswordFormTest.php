@@ -74,9 +74,9 @@ EOT
         preg_match_all('/<label>.+<\/label><input.+>/U', $output, $actual);
 
         $expected = [
-            '<label>Current Password</label><input type="password" name="current_password" value="">',
-            '<label>Password</label><input type="password" name="password" value="">',
-            '<label>Password Confirmation</label><input type="password" name="password_confirmation" value="">',
+            '<label>Current Password</label><input id="userpassword-form-current-password-field" type="password" name="current_password" value="">',
+            '<label>Password</label><input id="userpassword-form-password-field" type="password" name="password" value="">',
+            '<label>Password Confirmation</label><input id="userpassword-form-password-confirmation-field" type="password" name="password_confirmation" value="">',
         ];
 
         $this->assertEquals($expected, $actual[0]);

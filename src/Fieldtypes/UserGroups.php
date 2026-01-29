@@ -7,6 +7,8 @@ use Statamic\Facades\Scope;
 use Statamic\Facades\UserGroup;
 use Statamic\GraphQL\Types\UserGroupType;
 
+use function Statamic\trans as __;
+
 class UserGroups extends Relationship
 {
     protected $canEdit = false;
@@ -17,7 +19,7 @@ class UserGroups extends Relationship
     {
         if ($group = UserGroup::find($id)) {
             return [
-                'title' => $group->title(),
+                'title' => __($group->title()),
                 'id' => $group->handle(),
             ];
         }
@@ -30,7 +32,7 @@ class UserGroups extends Relationship
         return UserGroup::all()->sortBy('title')->map(function ($group) {
             return [
                 'id' => $group->handle(),
-                'title' => $group->title(),
+                'title' => __($group->title()),
             ];
         })->values();
     }

@@ -79,17 +79,6 @@ class StoreAssetTest extends TestCase
     }
 
     #[Test]
-    public function it_denies_access_if_uploads_are_disabled()
-    {
-        $this->container->allowUploads(false);
-
-        $this
-            ->actingAs($this->userWithPermission())
-            ->submit()
-            ->assertStatus(403);
-    }
-
-    #[Test]
     public function it_doesnt_upload_without_a_container()
     {
         $this
@@ -171,7 +160,7 @@ class StoreAssetTest extends TestCase
     #[Test]
     public function it_can_upload_and_append_timestamp()
     {
-        Carbon::setTestNow(Carbon::createFromTimestamp(1697379288));
+        Carbon::setTestNow(Carbon::createFromTimestamp(1697379288, config('app.timezone')));
         Storage::disk('test')->put('path/to/test.jpg', 'contents');
         Storage::disk('test')->assertExists('path/to/test.jpg');
         $this->assertCount(1, Storage::disk('test')->files('path/to'));
@@ -202,13 +191,16 @@ class StoreAssetTest extends TestCase
 
     #[Test]
     #[DataProvider('relativePathProvider')]
-    public function it_can_upload_to_relative_path($filename, $expected)
+    public function it_can_upload_to_relative_path_when_user_has_permission_to_create_folders($filename, $expected)
     {
         Storage::disk('test')->assertMissing('path/to/'.$filename);
         Storage::disk('test')->assertMissing($expected);
 
+        $this->setTestRoles(['test' => ['access cp', 'upload test_container assets', 'edit test_container folders']]);
+        $user = tap(Facades\User::make()->assignRole('test'))->save();
+
         $this
-            ->actingAs($this->userWithPermission())
+            ->actingAs($user)
             ->submit([
                 'relativePath' => 'sub/folder',
                 'file' => UploadedFile::fake()->image($filename),
@@ -237,13 +229,10 @@ class StoreAssetTest extends TestCase
     }
 
     #[Test]
-    public function flattens_relative_path_unless_container_allows_creating_folders()
+    public function flattens_relative_path_if_user_is_not_allowed_to_create_folders()
     {
         Storage::disk('test')->assertMissing('path/to/test.jpg');
         Storage::disk('test')->assertMissing('path/to/sub/folder/test.jpg');
-
-        $createFolders = $this->container->createFolders();
-        $this->container->createFolders(false)->save();
 
         $this
             ->actingAs($this->userWithPermission())
@@ -258,8 +247,6 @@ class StoreAssetTest extends TestCase
 
         Storage::disk('test')->assertExists('path/to/test.jpg');
         Storage::disk('test')->assertMissing('path/to/sub/folder/test.jpg');
-
-        $this->container->createFolders($createFolders)->save();
     }
 
     private function submit($overrides = [])

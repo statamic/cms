@@ -3,8 +3,8 @@
 namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
+use Statamic\Addons\Manifest;
 use Statamic\Console\RunsInPlease;
-use Statamic\Extend\Manifest;
 
 class AddonsDiscover extends Command
 {

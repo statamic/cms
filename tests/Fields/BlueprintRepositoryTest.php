@@ -21,7 +21,7 @@ class BlueprintRepositoryTest extends TestCase
         parent::setUp();
 
         $this->repo = app(BlueprintRepository::class)
-            ->setDirectory('/path/to/resources/blueprints');
+            ->setDirectories('/path/to/resources/blueprints');
 
         Facades\Blueprint::swap($this->repo);
     }
@@ -438,5 +438,32 @@ EOT;
         $this->expectExceptionMessage('Blueprint [does-not-exist] not found');
 
         $this->repo->findOrFail('does-not-exist');
+    }
+
+    /** @test */
+    public function it_gets_a_blueprint_from_split_repository()
+    {
+        $repo = (new BlueprintRepository())
+            ->setDirectories([
+                'default' => '/path/to/resources/blueprints',
+                'forms' => '/path/to/content/forms/blueprints',
+            ]);
+
+        $contents = <<<'EOT'
+title: Test
+tabs:
+  main:
+    fields:
+      - one
+      - two
+EOT;
+        File::shouldReceive('exists')->with('/path/to/resources/blueprints/globals/test.yaml')->once()->andReturnTrue();
+        File::shouldReceive('get')->with('/path/to/resources/blueprints/globals/test.yaml')->once()->andReturn($contents);
+
+        File::shouldReceive('exists')->with('/path/to/content/forms/blueprints/test.yaml')->once()->andReturnTrue();
+        File::shouldReceive('get')->with('/path/to/content/forms/blueprints/test.yaml')->once()->andReturn($contents);
+
+        $repo->find('globals.test');
+        $repo->find('forms.test');
     }
 }

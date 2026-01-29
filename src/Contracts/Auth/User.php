@@ -2,9 +2,10 @@
 
 namespace Statamic\Contracts\Auth;
 
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Collection;
 
-interface User
+interface User extends Authenticatable
 {
     /**
      * Get or set a user's email address.
@@ -47,4 +48,9 @@ interface User
     public function isSuper();
 
     public function makeSuper();
+
+    /**
+     * @return Collection<string, Passkey>
+     */
+    public function passkeys(): Collection;
 }

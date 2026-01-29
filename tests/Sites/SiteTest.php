@@ -34,6 +34,14 @@ class SiteTest extends TestCase
     }
 
     #[Test]
+    public function name_falls_back_to_handle()
+    {
+        $site = new Site('en', []);
+
+        $this->assertEquals('en', $site->name());
+    }
+
+    #[Test]
     public function gets_locale()
     {
         $site = new Site('en', ['locale' => 'en_US']);
@@ -57,6 +65,16 @@ class SiteTest extends TestCase
 
         $this->assertEquals('en', (new Site('en', ['locale' => 'en-US']))->lang());
         $this->assertEquals('en-US', (new Site('en', ['locale' => 'en-US', 'lang' => 'en-US']))->lang());
+    }
+
+    #[Test]
+    public function gets_is_default()
+    {
+        $withoutDefault = new Site('en', ['locale' => 'en_US']);
+        $withDefault = new Site('en', ['locale' => 'en_US'], true);
+
+        $this->assertFalse($withoutDefault->isDefault());
+        $this->assertTrue($withDefault->isDefault());
     }
 
     #[Test]

@@ -2,25 +2,25 @@
   ========================================================================== */
 
 .field-width-selector {
-    @apply w-12 h-5 flex relative cursor-pointer;
+    @apply relative flex h-5 w-12 cursor-pointer;
 
     .field-width-label {
-        @apply absolute text-4xs font-bold w-full text-center z-10 text-gray-700 dark:text-dark-150 inset-0 flex items-center justify-center pointer-events-none;
+        @apply pointer-events-none absolute inset-0 z-10 flex w-full items-center justify-center text-center text-4xs font-bold text-gray-700 dark:text-dark-150;
     }
 
     .field-width-notch {
-        @apply relative border border-gray-400 dark:border-dark-300 rtl:border-r-0 ltr:border-l-0 flex-1;
+        @apply relative flex-1 border border-gray-400 dark:border-dark-300 ltr:border-l-0 rtl:border-r-0;
 
         &:first-of-type {
-            @apply rtl:border-r ltr:border-l rtl:rounded-r-sm ltr:rounded-l-sm;
+            @apply ltr:rounded-l-sm ltr:border-l rtl:rounded-r-sm rtl:border-r;
         }
 
         &.filled {
-            @apply border-gray-400 dark:border-dark-400 rtl:border-l-0 ltr:border-r-0 rtl:pl-px ltr:pr-px bg-white dark:bg-dark-575 -my-px;
+            @apply -my-px border-gray-400 bg-white dark:border-dark-400 dark:bg-dark-575 ltr:border-r-0 ltr:pr-px rtl:border-l-0 rtl:pl-px;
         }
 
         &.selected {
-            @apply rtl:border-l ltr:border-r rtl:rounded-l-sm ltr:rounded-r-sm;
+            @apply ltr:rounded-r-sm ltr:border-r rtl:rounded-l-sm rtl:border-l;
         }
     }
 }
@@ -29,16 +29,16 @@
   ========================================================================== */
 
 .width-fieldtype .field-width-selector {
-    @apply w-16 h-9 mt-px;
+    @apply mt-px h-9 w-16;
 
     .field-width-notch {
-        @apply bg-gray-200 dark:bg-dark-550 border-r-gray-400 dark:border-dark-700 border-y-gray-500 dark:border-y-dark-750;
+        @apply border-y-gray-500 border-r-gray-400 bg-gray-200 dark:border-dark-700 dark:border-y-dark-750 dark:bg-dark-550;
         &:last-child {
-            @apply border-r-gray-500 dark:border-dark-750 rtl:rounded-l-sm ltr:rounded-r-sm;
+            @apply border-r-gray-500 dark:border-dark-750 ltr:rounded-r-sm rtl:rounded-l-sm;
         }
 
         &.filled {
-            @apply bg-gradient-to-b from-white to-gray-100 dark:from-dark-300 dark:to-dark-400 border-gray-500 dark:border-dark-750;
+            @apply border-gray-500 bg-linear-to-b from-white to-gray-100 dark:border-dark-750 dark:from-dark-300 dark:to-dark-400;
         }
     }
 

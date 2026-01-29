@@ -108,7 +108,7 @@ class UpdateFormTest extends TestCase
         ], $updated->email());
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_data()
     {
         $form = tap(Form::make('test'))->save();

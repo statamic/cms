@@ -4,11 +4,8 @@ namespace Statamic\Events;
 
 class NavSaving extends Event
 {
-    public $nav;
-
-    public function __construct($nav)
+    public function __construct(public $nav)
     {
-        $this->nav = $nav;
     }
 
     /**

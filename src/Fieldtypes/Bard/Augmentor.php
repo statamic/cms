@@ -13,6 +13,7 @@ use Tiptap\Editor;
 
 class Augmentor
 {
+    public static $currentBardConfig = [];
     protected $fieldtype;
     protected $sets = [];
     protected $includeDisabledSets = false;
@@ -169,7 +170,13 @@ class Augmentor
 
     public function renderProsemirrorToHtml(array $value)
     {
-        return $this->editor()->setContent($value)->getHTML();
+        static::$currentBardConfig = $this->fieldtype->config();
+
+        $html = $this->editor()->setContent($value)->getHTML();
+
+        static::$currentBardConfig = [];
+
+        return $html;
     }
 
     private function editor()

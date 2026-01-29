@@ -27,6 +27,14 @@ abstract class UserGroup implements Arrayable, ArrayAccess, Augmentable, UserGro
     {
         $this->roles = collect();
         $this->data = collect();
+        $this->supplements = collect();
+    }
+
+    public function __clone()
+    {
+        $this->roles = clone $this->roles;
+        $this->data = clone $this->data;
+        $this->supplements = clone $this->supplements;
     }
 
     public function title(?string $title = null)

@@ -3,35 +3,59 @@
 namespace Statamic\Query\Scopes\Filters\Fields;
 
 use Statamic\Facades;
-use Statamic\Support\Str;
+use Statamic\Support\Arr;
 
 class Terms extends FieldtypeFilter
 {
     public function fieldItems()
     {
         return [
-            'term' => [
+            'operator' => [
                 'type' => 'select',
-                'options' => $this->options()->all(),
-                'placeholder' => __('Contains'),
+                'options' => [
+                    'like' => __('Contains'),
+                    'null' => __('Empty'),
+                    'not-null' => __('Not empty'),
+                ],
+                'default' => 'like',
+            ],
+            'term' => [
+                'type' => 'terms',
+                'placeholder' => __('Term'),
                 'clearable' => true,
+                'mode' => 'select',
+                'max_items' => 1,
+                'taxonomies' => $this->fieldtype->taxonomies(),
+                'if' => [
+                    'operator' => 'contains_any like',
+                ],
             ],
         ];
     }
 
     public function apply($query, $handle, $values)
     {
-        $term = $values['term'];
+        $operator = $values['operator'];
 
-        $term = Str::ensureLeft($term, '%');
-        $term = Str::ensureRight($term, '%');
-
-        $query->where($handle, 'like', $term);
+        match ($operator) {
+            'like' => $this->fieldtype->config('max_items') === 1
+                ? $query->where($handle, 'like', "%{$values['term']}%")
+                : $query->whereJsonContains($handle, $values['term']),
+            'null' => $query->whereNull($handle),
+            'not-null' => $query->whereNotNull($handle),
+        };
     }
 
     public function badge($values)
     {
         $field = $this->fieldtype->field()->display();
+        $operator = $values['operator'];
+
+        if (in_array($operator, ['null', 'not-null'])) {
+            $translatedOperator = Arr::get($this->fieldItems(), "operator.options.{$operator}");
+
+            return $field.' '.strtolower($translatedOperator);
+        }
 
         $id = $this->fieldtype->usingSingleTaxonomy()
             ? $this->fieldtype->taxonomies()[0].'::'.$values['term']
@@ -42,20 +66,10 @@ class Terms extends FieldtypeFilter
         return $field.': '.$term;
     }
 
-    protected function options()
+    public function isComplete($values): bool
     {
-        return collect($this->fieldtype->taxonomies())
-            ->map(function ($handle) {
-                return Facades\Taxonomy::find($handle);
-            })
-            ->filter()
-            ->flatMap(function ($taxonomy) {
-                return $taxonomy->queryTerms()->get();
-            })
-            ->mapWithKeys(function ($term) {
-                $value = $this->fieldtype->usingSingleTaxonomy() ? $term->slug() : $term->id();
+        $values = array_filter($values);
 
-                return [$value => $term->title()];
-            });
+        return Arr::has($values, 'operator') && Arr::has($values, 'term');
     }
 }

@@ -50,7 +50,7 @@ class Update extends Command
         $selection = select(
             label: 'Which search index would you like to update?',
             options: collect(['All'])->merge($this->indexes()->keys())->all(),
-            default: 0
+            default: 'All'
         );
 
         return ($selection == 'All') ? $this->indexes() : [$this->indexes()->get($selection)];
@@ -73,7 +73,7 @@ class Update extends Command
 
         // They might have entered a name as it appears in the config, but if it
         // should be localized we'll get all of the localized versions.
-        if (collect(config('statamic.search.indexes'))->has($arg)) {
+        if (collect(config('statamic.search.indexes'))->put('cp', [])->has($arg)) {
             return $this->indexes()->filter(fn ($index) => Str::startsWith($index->name(), $arg))->all();
         }
 

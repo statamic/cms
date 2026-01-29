@@ -8,6 +8,5 @@ class SiteCreated extends Event
 {
     public function __construct(public Site $site)
     {
-        //
     }
 }

@@ -17,26 +17,26 @@ class Date extends FieldtypeFilter
                     '<' => __('Before'),
                     '>' => __('After'),
                     'between' => __('Between'),
+                    'null' => __('Empty'),
+                    'not-null' => __('Not empty'),
                 ],
             ],
             'value' => [
                 'type' => 'date',
-                'inline' => true,
                 'full_width' => true,
+                'clearable' => false,
                 'if' => [
                     'operator' => 'contains_any >, <',
                 ],
-                'required' => false,
             ],
             'range_value' => [
                 'type' => 'date',
-                'inline' => true,
                 'mode' => 'range',
                 'full_width' => true,
+                'clearable' => false,
                 'if' => [
                     'operator' => 'between',
                 ],
-                'required' => false,
             ],
         ];
     }
@@ -54,19 +54,41 @@ class Date extends FieldtypeFilter
 
         $value = Carbon::parse($values['value']);
 
-        $query->where($handle, $operator, $value);
+        match ($operator) {
+            'null' => $query->whereNull($handle),
+            'not-null' => $query->whereNotNull($handle),
+            default => $query->where($handle, $operator, $value),
+        };
     }
 
     public function badge($values)
     {
         $field = $this->fieldtype->field()->display();
         $operator = $values['operator'];
-        $translatedOperator = Arr::get($this->fieldItems(), "operator.options.{$operator}");
+        $translatedOperator = strtolower(Arr::get($this->fieldItems(), "operator.options.{$operator}"));
 
-        if ($operator == 'between') {
-            return $field.' '.strtolower($translatedOperator).' '.$values['range_value']['start'].' '.__('and').' '.$values['range_value']['end'];
+        $value = ($operator == 'between')
+            ? [
+                'start' => Carbon::parse($values['range_value']['start'])->toIso8601ZuluString('millisecond'),
+                'end' => Carbon::parse($values['range_value']['end'])->toIso8601ZuluString('millisecond'),
+            ]
+            : Carbon::parse(Arr::get($values, 'value'))->toIso8601ZuluString('millisecond');
+
+        return compact('field', 'operator', 'translatedOperator', 'value');
+    }
+
+    public function isComplete($values): bool
+    {
+        $values = array_filter($values);
+
+        if (! $operator = Arr::get($values, 'operator')) {
+            return false;
         }
 
-        return $field.' '.strtolower($translatedOperator).' '.$values['value'];
+        if ($operator === 'between') {
+            return Arr::has($values, 'range_value.start') && Arr::has($values, 'range_value.end');
+        }
+
+        return Arr::has($values, 'value');
     }
 }

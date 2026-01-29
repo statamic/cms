@@ -22,24 +22,12 @@ class VariablesTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->setSites([
-            'a' => ['url' => '/', 'locale' => 'en'],
-            'b' => ['url' => '/b/', 'locale' => 'fr'],
-            'c' => ['url' => '/b/', 'locale' => 'fr'],
-            'd' => ['url' => '/d/', 'locale' => 'fr'],
-        ]);
-    }
-
     #[Test]
     public function it_gets_file_contents_for_saving()
     {
         $global = GlobalSet::make('test');
 
-        $entry = $global->makeLocalization('a')->data([
+        $entry = $global->inDefaultSite()->data([
             'array' => ['first one', 'second one'],
             'string' => 'The string',
             'null' => null, // this...
@@ -59,32 +47,39 @@ EOT;
     #[Test]
     public function it_gets_file_contents_for_saving_a_localized_set()
     {
-        $global = GlobalSet::make('test');
+        $this->setSites([
+            'a' => ['url' => '/', 'locale' => 'en'],
+            'b' => ['url' => '/b/', 'locale' => 'fr'],
+            'c' => ['url' => '/b/', 'locale' => 'fr'],
+            'd' => ['url' => '/d/', 'locale' => 'fr'],
+        ]);
 
-        $a = $global->makeLocalization('a')->data([
+        $global = GlobalSet::make('test')->sites([
+            'a',
+            'b' => 'a',
+            'c',
+        ])->save();
+
+        $a = $global->in('a')->data([
             'array' => ['first one', 'second one'],
             'string' => 'The string',
             'null' => null, // this...
             'empty' => [],  // and this should get stripped out because there's no origin to fall back to.
-        ]);
+        ])->save();
 
-        $b = $global->makeLocalization('b')->origin($a)->data([
+        $b = $global->in('b')->data([
             'array' => ['first one', 'second one'],
             'string' => 'The string',
             'null' => null, // this...
             'empty' => [],  // and this should not get stripped out, otherwise it would fall back to the origin.
-        ]);
+        ])->save();
 
-        $c = $global->makeLocalization('c')->data([
+        $c = $global->in('c')->data([
             'array' => ['first one', 'second one'],
             'string' => 'The string',
             'null' => null, // this...
             'empty' => [],  // and this should get stripped out because there's no origin to fall back to.
-        ]);
-
-        $global->addLocalization($a);
-        $global->addLocalization($b);
-        $global->addLocalization($c);
+        ])->save();
 
         $expected = <<<'EOT'
 array:
@@ -102,7 +97,6 @@ array:
 string: 'The string'
 'null': null
 empty: {  }
-origin: a
 
 EOT;
         $this->assertEquals($expected, $b->fileContents());
@@ -120,44 +114,51 @@ EOT;
     #[Test]
     public function if_the_value_is_explicitly_set_to_null_then_it_should_not_fall_back()
     {
-        $global = GlobalSet::make('test');
+        $this->setSites([
+            'a' => ['url' => '/', 'locale' => 'en'],
+            'b' => ['url' => '/b/', 'locale' => 'fr'],
+            'c' => ['url' => '/b/', 'locale' => 'fr'],
+            'd' => ['url' => '/d/', 'locale' => 'fr'],
+        ]);
 
-        $a = $global->makeLocalization('a')->data([
+        $global = GlobalSet::make('test')->sites([
+            'a',
+            'b' => 'a',
+            'c' => 'b',
+            'd',
+            'e' => 'd',
+        ])->save();
+
+        $a = $global->in('a')->data([
             'one' => 'alfa',
             'two' => 'bravo',
             'three' => 'charlie',
             'four' => 'delta',
-        ]);
+        ])->save();
 
         // originates from a
-        $b = $global->makeLocalization('b')->origin($a)->data([
+        $b = $global->in('b')->data([
             'one' => 'echo',
             'two' => null,
-        ]);
+        ])->save();
 
         // originates from b, which originates from a
-        $c = $global->makeLocalization('c')->origin($b)->data([
+        $c = $global->in('c')->data([
             'three' => 'foxtrot',
-        ]);
+        ])->save();
 
         // does not originate from anything
-        $d = $global->makeLocalization('d')->data([
+        $d = $global->in('d')->data([
             'one' => 'golf',
             'two' => 'hotel',
             'three' => 'india',
-        ]);
+        ])->save();
 
         // originates from d. just to test that it doesn't unintentionally fall back to the default/first.
-        $e = $global->makeLocalization('e')->origin($d)->data([
+        $e = $global->in('e')->data([
             'one' => 'juliett',
             'two' => null,
-        ]);
-
-        $global->addLocalization($a);
-        $global->addLocalization($b);
-        $global->addLocalization($c);
-        $global->addLocalization($d);
-        $global->addLocalization($e);
+        ])->save();
 
         $this->assertEquals([
             'one' => 'alfa',
@@ -241,7 +242,7 @@ EOT;
         $blueprint = Facades\Blueprint::makeFromFields(['charlie' => ['type' => 'test']]);
         BlueprintRepository::shouldReceive('find')->with('globals.settings')->andReturn($blueprint);
         $global = GlobalSet::make('settings');
-        $variables = $global->makeLocalization('en');
+        $variables = $global->in('en');
         $variables->set('alfa', 'bravo');
         $variables->set('charlie', 'delta');
 
@@ -271,7 +272,7 @@ EOT;
         $blueprint = Facades\Blueprint::makeFromFields(['foo' => ['type' => 'test']]);
         BlueprintRepository::shouldReceive('find')->with('globals.settings')->andReturn($blueprint);
         $global = GlobalSet::make('settings');
-        $variables = $global->makeLocalization('en');
+        $variables = $global->in('en');
         $variables->set('foo', 'delta');
 
         $this->assertEquals('query builder results', $variables->foo);
@@ -294,7 +295,7 @@ EOT;
         $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage('Call to undefined method Statamic\Globals\Variables::thisFieldDoesntExist()');
 
-        GlobalSet::make('settings')->makeLocalization('en')->thisFieldDoesntExist();
+        GlobalSet::make('settings')->in('en')->thisFieldDoesntExist();
     }
 
     #[Test]
@@ -325,7 +326,7 @@ EOT;
         ]);
         BlueprintRepository::shouldReceive('find')->with('globals.settings')->andReturn($blueprint);
         $global = GlobalSet::make('settings');
-        $variables = $global->makeLocalization('en');
+        $variables = $global->in('en');
         $variables->set('foo', 'bar');
         $variables->set('baz', 'qux');
 
@@ -376,7 +377,7 @@ EOT;
         ]);
         BlueprintRepository::shouldReceive('find')->with('globals.settings')->andReturn($blueprint);
         $global = GlobalSet::make('settings');
-        $variables = $global->makeLocalization('en');
+        $variables = $global->in('en');
         $variables->set('alfa', 'one');
         $variables->set('bravo', ['a', 'b']);
         $variables->set('charlie', ['c', 'd']);
@@ -386,5 +387,24 @@ EOT;
             'bravo' => ['a', 'b'],
             'charlie' => ['augmented c', 'augmented d'],
         ], Arr::only($variables->selectedQueryRelations(['charlie'])->toArray(), ['alfa', 'bravo', 'charlie']));
+    }
+
+    #[Test]
+    public function it_clones_internal_collections()
+    {
+        $global = GlobalSet::make('test');
+        $variables = $global->makeLocalization('en');
+        $variables->set('foo', 'A');
+        $variables->setSupplement('bar', 'A');
+
+        $clone = clone $variables;
+        $clone->set('foo', 'B');
+        $clone->setSupplement('bar', 'B');
+
+        $this->assertEquals('A', $variables->get('foo'));
+        $this->assertEquals('B', $clone->get('foo'));
+
+        $this->assertEquals('A', $variables->getSupplement('bar'));
+        $this->assertEquals('B', $clone->getSupplement('bar'));
     }
 }

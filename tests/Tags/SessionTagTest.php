@@ -31,8 +31,6 @@ class SessionTagTest extends TestCase
         session()->put('nineties', 'rad');
 
         $this->assertEquals('rad', Antlers::parse('{{ session:nineties }}'));
-        $this->assertEquals('rad', Antlers::parse('{{ session:key }}', ['key' => 'nineties']));
-        $this->assertEquals('rad', Antlers::parse('{{ session:key }}', ['key' => 'nineties']));
     }
 
     #[Test]
@@ -42,7 +40,5 @@ class SessionTagTest extends TestCase
 
         $this->assertEquals('rad', Antlers::parse('{{ session:things.nineties }}'));
         $this->assertEquals('rad', Antlers::parse('{{ session:things:nineties }}'));
-        $this->assertEquals('rad', Antlers::parse('{{ session:key }}', ['key' => 'things.nineties']));
-        $this->assertEquals('rad', Antlers::parse('{{ session:key }}', ['key' => 'things:nineties']));
     }
 }

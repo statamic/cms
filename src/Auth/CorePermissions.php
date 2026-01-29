@@ -2,6 +2,7 @@
 
 namespace Statamic\Auth;
 
+use Statamic\Facades\Addon;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Form;
@@ -12,6 +13,8 @@ use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Utility;
 
+use function Statamic\trans as __;
+
 class CorePermissions
 {
     public function boot()
@@ -21,7 +24,6 @@ class CorePermissions
             $this->register('configure sites');
             $this->register('configure fields');
             $this->register('configure form fields');
-            $this->register('configure addons');
             $this->register('manage preferences');
         });
 
@@ -59,6 +61,10 @@ class CorePermissions
 
         $this->group('forms', function () {
             $this->registerForms();
+        });
+
+        $this->group('addons', function () {
+            $this->registerAddons();
         });
 
         $this->group('utilities', function () {
@@ -161,6 +167,7 @@ class CorePermissions
         $this->register('view {container} assets', function ($permission) {
             $this->permission($permission)->children([
                 $this->permission('upload {container} assets'),
+                $this->permission('edit {container} folders'),
                 $this->permission('edit {container} assets')->children([
                     $this->permission('move {container} assets'),
                     $this->permission('rename {container} assets'),
@@ -211,6 +218,20 @@ class CorePermissions
                 });
             });
         });
+    }
+
+    protected function registerAddons()
+    {
+        $this->register('configure addons');
+
+        Addon::all()
+            ->filter->hasSettingsBlueprint()
+            ->each(function ($addon) {
+                Permission::register("edit {$addon->slug()} settings", function ($permission) use ($addon) {
+                    return $permission
+                        ->label(__('statamic::permissions.edit_addon_settings', ['addon' => __($addon->name())]));
+                });
+            });
     }
 
     protected function registerUtilities()

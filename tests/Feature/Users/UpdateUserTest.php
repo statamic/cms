@@ -2,14 +2,18 @@
 
 namespace Tests\Feature\Users;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
+use Tests\ElevatesSessions;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
+#[Group('elevated-session')]
 class UpdateUserTest extends TestCase
 {
+    use ElevatesSessions;
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
@@ -21,8 +25,8 @@ class UpdateUserTest extends TestCase
         $me = tap(User::make()->email('admin@domain.com')->assignRole('test'))->save();
 
         $this
-            ->actingAs($me)
-            ->patch($user->updateUrl(), [
+            ->actingAsWithElevatedSession($me)
+            ->patchJson($user->updateUrl(), [
                 'email' => 'updated@domain.com',
                 'name' => 'Jonathan Smith',
             ])
@@ -30,6 +34,25 @@ class UpdateUserTest extends TestCase
 
         $this->assertEquals('updated@domain.com', User::find($user->id())->email());
         $this->assertEquals('Jonathan Smith', User::find($user->id())->name);
+    }
+
+    #[Test]
+    public function it_requires_an_elevated_session()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit users']]);
+        $user = tap(User::make()->email('test@domain.com')->set('name', 'Johh Smith'))->save();
+        $me = tap(User::make()->email('admin@domain.com')->assignRole('test'))->save();
+
+        $this
+            ->actingAs($me)
+            ->patchJson($user->updateUrl(), [
+                'email' => 'updated@domain.com',
+                'name' => 'Jonathan Smith',
+            ])
+            ->assertElevatedSessionRequiredJsonResponse();
+
+        $this->assertEquals('test@domain.com', User::find($user->id())->email());
+        $this->assertEquals('Johh Smith', User::find($user->id())->name);
     }
 
     #[Test]
@@ -42,8 +65,8 @@ class UpdateUserTest extends TestCase
         $this->assertFalse(User::find($user->id())->isSuper());
 
         $this
-            ->actingAs($me)
-            ->patch($user->updateUrl(), [
+            ->actingAsWithElevatedSession($me)
+            ->patchJson($user->updateUrl(), [
                 'email' => 'test@domain.com',
                 'super' => true,
             ])
@@ -62,8 +85,8 @@ class UpdateUserTest extends TestCase
         $this->assertFalse(User::find($user->id())->isSuper());
 
         $this
-            ->actingAs($me)
-            ->patch($user->updateUrl(), [
+            ->actingAsWithElevatedSession($me)
+            ->patchJson($user->updateUrl(), [
                 'email' => 'test@domain.com',
                 'super' => true,
             ])
@@ -82,8 +105,8 @@ class UpdateUserTest extends TestCase
         $this->assertTrue(User::find($user->id())->isSuper());
 
         $this
-            ->actingAs($me)
-            ->patch($user->updateUrl(), [
+            ->actingAsWithElevatedSession($me)
+            ->patchJson($user->updateUrl(), [
                 'email' => 'test@domain.com',
                 'super' => false,
             ])
@@ -102,8 +125,8 @@ class UpdateUserTest extends TestCase
         $this->assertTrue(User::find($user->id())->isSuper());
 
         $this
-            ->actingAs($me)
-            ->patch($user->updateUrl(), [
+            ->actingAsWithElevatedSession($me)
+            ->patchJson($user->updateUrl(), [
                 'email' => 'test@domain.com',
                 'super' => false,
             ])

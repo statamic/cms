@@ -11,6 +11,7 @@ class ConsoleServiceProvider extends ServiceProvider
     protected $commands = [
         Commands\ListCommand::class,
         Commands\AddonsDiscover::class,
+        Commands\AssetsCacheClear::class,
         Commands\AssetsGeneratePresets::class,
         Commands\AssetsMeta::class,
         Commands\GlideClear::class,
@@ -29,17 +30,21 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\MakeFilter::class,
         Commands\MakeTag::class,
         Commands\MakeWidget::class,
+        Commands\MigrateDatesToUtc::class,
         Commands\MakeUser::class,
         Commands\Rtfm::class,
+        Commands\SetupCpVite::class,
         Commands\StacheClear::class,
         Commands\StacheRefresh::class,
         Commands\StacheWarm::class,
         Commands\StacheDoctor::class,
         Commands\StarterKitExport::class,
+        Commands\StarterKitInit::class,
         Commands\StarterKitInstall::class,
         Commands\StarterKitRunPostInstall::class,
         Commands\StaticClear::class,
         Commands\StaticWarm::class,
+        Commands\StaticRecacheToken::class,
         // Commands\MakeUserMigration::class,
         Commands\SupportDetails::class,
         Commands\SupportZipBlueprint::class,
@@ -60,10 +65,8 @@ class ConsoleServiceProvider extends ServiceProvider
             $artisan->resolveCommands($this->commands);
         });
 
-        $file = version_compare($this->app->version(), '11', '<') ? 'please-l10.stub' : 'please.stub';
-
         $this->publishes([
-            __DIR__.'/../Console/Please/'.$file => base_path('please'),
+            __DIR__.'/../Console/Please/please.stub' => base_path('please'),
         ], 'statamic');
     }
 }

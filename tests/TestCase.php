@@ -6,9 +6,8 @@ use Illuminate\Testing\Assert as IlluminateAssert;
 use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\Assert;
 use Statamic\Facades\Config;
-use Statamic\Facades\File;
 use Statamic\Facades\Site;
-use Statamic\Facades\YAML;
+use Statamic\Facades\URL;
 use Statamic\Http\Middleware\CP\AuthenticateSession;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
@@ -33,26 +32,20 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             $this->preventSavingStacheItemsToDisk();
         }
 
+        if (isset($uses[ElevatesSessions::class])) {
+            $this->addElevatedSessionMacros();
+        }
+
         if ($this->shouldFakeVersion) {
-            \Facades\Statamic\Version::shouldReceive('get')->zeroOrMoreTimes()->andReturn('3.0.0-testing');
-            $this->addToAssertionCount(-1); // Dont want to assert this
+            \Facades\Statamic\Version::shouldReceive('get')->andReturn('3.0.0-testing');
         }
 
         if ($this->shouldPreventNavBeingBuilt) {
-            \Statamic\Facades\CP\Nav::shouldReceive('build')->zeroOrMoreTimes()->andReturn(collect());
-            $this->addToAssertionCount(-1); // Dont want to assert this
+            \Statamic\Facades\CP\Nav::shouldReceive('build')->andReturn(collect());
+            \Statamic\Facades\CP\Nav::shouldReceive('clearCachedUrls');
         }
 
         $this->addGqlMacros();
-
-        // We changed the default sites setup but the tests assume defaults like the following.
-        File::put(resource_path('sites.yaml'), YAML::dump([
-            'en' => [
-                'name' => 'English',
-                'url' => 'http://localhost/',
-                'locale' => 'en_US',
-            ],
-        ]));
     }
 
     public function tearDown(): void
@@ -70,6 +63,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     {
         return [
             \Statamic\Providers\StatamicServiceProvider::class,
+            \Inertia\ServiceProvider::class,
             \Rebing\GraphQL\GraphQLServiceProvider::class,
             \Wilderborn\Partyline\ServiceProvider::class,
             \Archetype\ServiceProvider::class,
@@ -98,6 +92,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     protected function getEnvironmentSetUp($app)
     {
+        $app['config']->set('inertia.testing.page_paths', [statamic_path('resources/js/pages')]);
+
         $app['config']->set('auth.providers.users.driver', 'statamic');
         $app['config']->set('statamic.stache.watcher', false);
         $app['config']->set('statamic.users.repository', 'file');
@@ -117,6 +113,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $app['config']->set('statamic.stache.stores.nav-trees.directory', __DIR__.'/__fixtures__/content/structures/navigation');
         $app['config']->set('statamic.stache.stores.collection-trees.directory', __DIR__.'/__fixtures__/content/structures/collections');
         $app['config']->set('statamic.stache.stores.form-submissions.directory', __DIR__.'/__fixtures__/content/submissions');
+        $app['config']->set('statamic.stache.stores.revisions.directory', __DIR__.'/__fixtures__/revisions');
 
         $app['config']->set('statamic.api.enabled', true);
         $app['config']->set('statamic.graphql.enabled', true);
@@ -128,11 +125,21 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         ]);
 
         $app['config']->set('statamic.search.indexes.default.driver', 'null');
+        $app['config']->set('statamic.search.indexes.cp', ['driver' => 'null']);
 
         $viewPaths = $app['config']->get('view.paths');
         $viewPaths[] = __DIR__.'/__fixtures__/views/';
 
         $app['config']->set('view.paths', $viewPaths);
+
+        // We changed the default sites setup but the tests assume defaults like the following.
+        // We write the file early so its ready the first time Site facade is used.
+        $app['files']->put(resource_path('sites.yaml'), <<<'YAML'
+en:
+    name: English
+    url: http://localhost/
+    locale: en_US
+YAML);
     }
 
     protected function setSites($sites)
@@ -140,6 +147,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         Site::setSites($sites);
 
         Config::set('statamic.system.multisite', Site::hasMultiple());
+
+        URL::clearUrlCache();
     }
 
     protected function setSiteValue($site, $key, $value)
@@ -147,6 +156,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         Site::setSiteValue($site, $key, $value);
 
         Config::set('statamic.system.multisite', Site::hasMultiple());
+
+        URL::clearUrlCache();
     }
 
     protected function assertEveryItem($items, $callback)
@@ -237,6 +248,29 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
                 collect($json['errors'])->map->message->contains('Unauthorized'),
                 'No unauthorized error message in response'
             );
+
+            return $this;
+        });
+
+        // Symfony 7.4.0 changed "UTF-8" to "utf-8".
+        // https://github.com/symfony/symfony/pull/60685
+        // While we continue to support lower versions, we'll do a case-insensitive check.
+        // This macro is essentially assertHeader but with case-insensitive value check.
+        TestResponse::macro('assertContentType', function (string $value) {
+            $headerName = 'Content-Type';
+
+            Assert::assertTrue(
+                $this->headers->has($headerName), "Header [{$headerName}] not present on response."
+            );
+
+            $actual = $this->headers->get($headerName);
+
+            if (! is_null($value)) {
+                Assert::assertEquals(
+                    strtolower($value), strtolower($this->headers->get($headerName)),
+                    "Header [{$headerName}] was found, but value [{$actual}] does not match [{$value}]."
+                );
+            }
 
             return $this;
         });

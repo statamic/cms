@@ -158,7 +158,7 @@ class FieldtypeTest extends TestCase
             'defaultable' => true,
             'categories' => [],
             'keywords' => [],
-            'icon' => 'test',
+            'icon' => 'fieldtype-test',
             'config' => [],
         ], $fieldtype->toArray());
     }
@@ -463,14 +463,14 @@ class FieldtypeTest extends TestCase
     #[Test]
     public function it_can_have_an_icon()
     {
-        $this->assertEquals('test', (new TestFieldtype)->icon());
+        $this->assertEquals('fieldtype-test', (new TestFieldtype)->icon());
 
         $customHandle = new class extends Fieldtype
         {
             protected static $handle = 'custom_handle';
         };
 
-        $this->assertEquals('custom_handle', $customHandle->icon());
+        $this->assertEquals('fieldtype-custom_handle', $customHandle->icon());
 
         $customIcon = new class extends Fieldtype
         {
@@ -555,16 +555,35 @@ class FieldtypeTest extends TestCase
     {
         $fieldtype = new class extends Fieldtype
         {
-            public static $handle = 'test';
+            public static $handle = 'test-selectable';
+            protected $selectableInForms = false;
         };
 
         $this->assertFalse($fieldtype->selectableInForms());
-        $this->assertFalse(FieldtypeRepository::hasBeenMadeSelectableInForms('test'));
 
         $fieldtype::makeSelectableInForms();
 
         $this->assertTrue($fieldtype->selectableInForms());
-        $this->assertTrue(FieldtypeRepository::hasBeenMadeSelectableInForms('test'));
+        $this->assertTrue(FieldtypeRepository::hasBeenMadeSelectableInForms('test-selectable'));
+        $this->assertTrue(FieldtypeRepository::selectableInFormIsOverriden('test-selectable'));
+    }
+
+    #[Test]
+    public function it_can_make_a_fieldtype_unselectable_in_forms()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            public static $handle = 'test-unselectable';
+            protected $selectableInForms = true;
+        };
+
+        $this->assertTrue($fieldtype->selectableInForms());
+
+        $fieldtype::makeUnselectableInForms();
+
+        $this->assertFalse($fieldtype->selectableInForms());
+        $this->assertFalse(FieldtypeRepository::hasBeenMadeSelectableInForms('test-unselectable'));
+        $this->assertTrue(FieldtypeRepository::selectableInFormIsOverriden('test-unselectable'));
     }
 }
 

@@ -85,6 +85,14 @@ abstract class UserRepository implements RepositoryContract
         return $blueprint;
     }
 
+    public function blueprintCommandPaletteLink()
+    {
+        return $this->blueprint()?->commandPaletteLink(
+            type: 'Users',
+            url: cp_route('blueprints.users.edit'),
+        );
+    }
+
     public function findByOAuthId(Provider $provider, string $id): ?User
     {
         return $this->find(

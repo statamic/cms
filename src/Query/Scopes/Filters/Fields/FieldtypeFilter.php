@@ -27,6 +27,8 @@ class FieldtypeFilter
                     'like' => __('Contains'),
                     '=' => __('Is'),
                     '<>' => __('Isn\'t'),
+                    'null' => __('Empty'),
+                    'not-null' => __('Not empty'),
                 ],
                 'default' => 'like',
             ],
@@ -34,8 +36,9 @@ class FieldtypeFilter
                 'type' => 'text',
                 'placeholder' => __('Value'),
                 'if' => [
-                    'operator' => 'not empty',
+                    'operator' => 'contains_any like, =, <>',
                 ],
+                'required' => false,
             ],
         ];
     }
@@ -50,7 +53,11 @@ class FieldtypeFilter
             $value = Str::ensureRight($value, '%');
         }
 
-        $query->where($handle, $operator, $value);
+        match ($operator) {
+            'null' => $query->whereNull($handle),
+            'not-null' => $query->whereNotNull($handle),
+            default => $query->where($handle, $operator, $value),
+        };
     }
 
     public function badge($values)
@@ -61,5 +68,12 @@ class FieldtypeFilter
         $value = $values['value'];
 
         return $field.' '.strtolower($translatedOperator).' '.$value;
+    }
+
+    public function isComplete($values): bool
+    {
+        $values = array_filter($values);
+
+        return Arr::has($values, 'operator') && Arr::has($values, 'value');
     }
 }

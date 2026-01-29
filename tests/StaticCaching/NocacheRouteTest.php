@@ -53,4 +53,12 @@ class NocacheRouteTest extends TestCase
                 ],
             ]);
     }
+
+    #[Test]
+    public function url_is_required()
+    {
+        $this
+            ->postJson('/!/nocache')
+            ->assertJsonValidationErrorFor('url');
+    }
 }

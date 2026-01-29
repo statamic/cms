@@ -26,7 +26,7 @@ class TraverserTest extends TestCase
         $this->tempDir = __DIR__.'/tmp';
         mkdir($this->tempDir);
 
-        $this->traverser = new Traverser(new Filesystem);
+        $this->traverser = new Traverser();
     }
 
     public function tearDown(): void

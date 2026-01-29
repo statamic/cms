@@ -44,7 +44,7 @@ class FilesTest extends TestCase
             ? UploadedFile::fake()->image('test.jpg', 50, 75)
             : UploadedFile::fake()->create('test.txt');
 
-        Date::setTestNow(Date::createFromTimestamp(1671484636));
+        Date::setTestNow(Date::createFromTimestamp(1671484636, config('app.timezone')));
 
         $disk = Storage::fake('local');
 

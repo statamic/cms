@@ -14,55 +14,78 @@ class ExportTest extends TestCase
     use Concerns\BacksUpComposerJson;
 
     protected $files;
-    protected $configPath;
-    protected $exportPath;
-    protected $postInstallHookPath;
+    protected $packagePath;
+    protected $targetPath;
 
     public function setUp(): void
     {
         parent::setUp();
 
         $this->files = app(Filesystem::class);
-        $this->configPath = base_path('starter-kit.yaml');
-        $this->postInstallHookPath = base_path('StarterKitPostInstall.php');
-        $this->exportPath = base_path('../cool-runnings');
+        $this->packagePath = base_path('package');
+        $this->targetPath = base_path('../cool-runnings');
 
-        if ($this->files->exists($this->configPath)) {
-            $this->files->delete($this->configPath);
-        }
-
-        if ($this->files->exists($this->exportPath)) {
-            $this->files->deleteDirectory($this->exportPath);
-        }
-
+        $this->cleanUp();
         $this->restoreComposerJson();
         $this->backupComposerJson();
     }
 
     public function tearDown(): void
     {
-        if ($this->files->exists($this->configPath)) {
-            $this->files->delete($this->configPath);
-        }
-
-        if ($this->files->exists($this->postInstallHookPath)) {
-            $this->files->delete($this->postInstallHookPath);
-        }
-
+        $this->cleanUp();
         $this->restoreComposerJson();
 
         parent::tearDown();
     }
 
-    #[Test]
-    public function it_can_stub_out_a_new_config()
+    private function cleanUp()
     {
-        $this->assertFileDoesNotExist($this->configPath);
+        if ($this->files->exists($this->packagePath)) {
+            $this->files->deleteDirectory($this->packagePath);
+        }
 
-        $this->exportCoolRunnings();
+        if ($this->files->exists($this->targetPath)) {
+            $this->files->deleteDirectory($this->targetPath);
+        }
+    }
 
-        $this->assertFileExists($this->configPath);
-        $this->assertFileHasContent('# export_paths:', $this->configPath);
+    #[Test]
+    public function it_requires_valid_starter_kit_config()
+    {
+        $this->assertFileDoesNotExist($source = base_path('package/starter-kit.yaml'));
+        $this->assertFileDoesNotExist($target = $this->targetPath('starter-kit.yaml'));
+
+        $this
+            ->exportCoolRunnings()
+            ->expectsOutputToContain('Starter kit config [package/starter-kit.yaml] does not exist.')
+            ->assertFailed();
+
+        $this->assertFileDoesNotExist($source);
+        $this->assertFileDoesNotExist($target);
+    }
+
+    #[Test]
+    public function it_requires_valid_package_composer_json_config()
+    {
+        $this->setExportPaths([
+            'config/filesystems.php',
+            'resources/views/welcome.blade.php',
+        ]);
+
+        $this->files->delete(base_path('package/composer.json'));
+
+        $this->assertFileExists(base_path('package/starter-kit.yaml'));
+
+        $this->assertFileDoesNotExist($source = base_path('package/composer.json'));
+        $this->assertFileDoesNotExist($target = $this->targetPath('composer.json'));
+
+        $this
+            ->exportCoolRunnings()
+            ->expectsOutputToContain('Package config [package/composer.json] does not exist.')
+            ->assertFailed();
+
+        $this->assertFileDoesNotExist($source);
+        $this->assertFileDoesNotExist($target);
     }
 
     #[Test]
@@ -93,8 +116,8 @@ class ExportTest extends TestCase
             'resources/views',
         ]);
 
-        $this->assertFileDoesNotExist($this->exportPath('config'));
-        $this->assertFileDoesNotExist($this->exportPath('resources/views'));
+        $this->assertFileDoesNotExist($this->targetPath('config'));
+        $this->assertFileDoesNotExist($this->targetPath('resources/views'));
 
         $this->exportCoolRunnings();
 
@@ -107,49 +130,6 @@ class ExportTest extends TestCase
     }
 
     #[Test]
-    public function it_can_export_as_to_different_destination_path()
-    {
-        $paths = $this->cleanPaths([
-            base_path('README.md'),
-            base_path('test-folder'),
-        ]);
-
-        $this->files->put(base_path('README.md'), 'This is readme for the new site!');
-        $this->files->makeDirectory(base_path('test-folder'));
-        $this->files->put(base_path('test-folder/one.txt'), 'One.');
-        $this->files->put(base_path('test-folder/two.txt'), 'Two.');
-
-        $this->setExportPaths([
-            'config/filesystems.php',
-            'resources/views',
-        ], [
-            'README.md' => 'README-new-site.md',
-            'test-folder' => 'test-renamed-folder',
-        ]);
-
-        $this->assertFileDoesNotExist($filesystemsConfig = $this->exportPath('config/filesystems.php'));
-        $this->assertFileDoesNotExist($errorsFolder = $this->exportPath('resources/views/errors'));
-        $this->assertFileDoesNotExist($renamedFile = $this->exportPath('README-new-site.md'));
-        $this->assertFileDoesNotExist($renamedFolder = $this->exportPath('test-renamed-folder'));
-
-        $this->exportCoolRunnings();
-
-        $this->assertFileExists($filesystemsConfig);
-        $this->assertFileExists($errorsFolder);
-        $this->assertFileExists($renamedFile);
-        $this->assertFileExists($renamedFolder);
-
-        $this->assertFileDoesNotExist($this->exportPath('README.md')); // This got renamed above
-        $this->assertFileDoesNotExist($this->exportPath('test-folder')); // This got renamed above
-
-        $this->assertFileHasContent('This is readme for the new site!', $renamedFile);
-        $this->assertFileHasContent('One.', $renamedFolder.'/one.txt');
-        $this->assertFileHasContent('Two.', $renamedFolder.'/two.txt');
-
-        $this->cleanPaths($paths);
-    }
-
-    #[Test]
     public function it_can_clear_target_export_path_with_clear_option()
     {
         $paths = $this->cleanPaths([
@@ -157,7 +137,11 @@ class ExportTest extends TestCase
             base_path('two'),
         ]);
 
-        // Imagine this exists from previous export
+        // Imagine we already have a target a git repo
+        $this->files->makeDirectory($this->targetPath('.git'), 0777, true, true);
+        $this->files->put($this->targetPath('.git/config'), 'Config.');
+
+        // And imagine this exists from previous export
         $this->files->makeDirectory($this->exportPath('one'), 0777, true, true);
         $this->files->put($this->exportPath('one/file.md'), 'One.');
 
@@ -179,9 +163,12 @@ class ExportTest extends TestCase
 
         $this->exportCoolRunnings(['--clear' => true]);
 
-        // But 'one' folder should exist after exporting with `--clear` option
+        // Our 'one' folder shouldn't exist after exporting with `--clear` option
         $this->assertFileDoesNotExist($this->exportPath('one'));
         $this->assertFileExists($this->exportPath('two'));
+
+        // But it should not clear `.git` directory
+        $this->assertFileExists($this->targetPath('.git/config'));
 
         $this->exportCoolRunnings();
 
@@ -195,7 +182,7 @@ class ExportTest extends TestCase
             'config',
         ]);
 
-        $this->assertFileDoesNotExist($starterKitConfig = $this->exportPath('starter-kit.yaml'));
+        $this->assertFileDoesNotExist($starterKitConfig = $this->targetPath('starter-kit.yaml'));
 
         $this->exportCoolRunnings();
 
@@ -210,9 +197,9 @@ class ExportTest extends TestCase
             'config',
         ]);
 
-        $this->assertFileDoesNotExist($postInstallHook = $this->exportPath('StarterKitPostInstall.php'));
+        $this->assertFileDoesNotExist($postInstallHook = $this->targetPath('StarterKitPostInstall.php'));
 
-        $this->files->put(base_path('StarterKitPostInstall.php'), '<?php');
+        $this->files->put(base_path('package/StarterKitPostInstall.php'), '<?php');
 
         $this->exportCoolRunnings();
 
@@ -258,20 +245,6 @@ EOT
         $this->assertExportedConfigEquals('dependencies_dev', [
             'statamic/ssg' => '^0.4.0',
         ]);
-
-        $this->assertEquals(<<<'EOT'
-{
-    "name": "my-vendor-name/cool-runnings",
-    "extra": {
-        "statamic": {
-            "name": "Cool Runnings",
-            "description": "Cool Runnings starter kit"
-        }
-    }
-}
-
-EOT
-            , $this->files->get($this->exportPath('composer.json')));
     }
 
     #[Test]
@@ -552,83 +525,25 @@ EOT
 
         $this->exportCoolRunnings();
 
-        $this->assertFileDoesNotExist($this->exportPath('composer.json'));
+        $this->assertFileDoesNotExist($this->targetPath('composer.json'));
     }
 
     #[Test]
-    public function it_does_not_export_as_with_opinionated_app_composer_json()
-    {
-        $this->setExportPaths([
-            'config/filesystems.php',
-        ], [
-            'composer.json' => 'composer-renamed.json',
-        ]);
-
-        $this->assertFileExists(base_path('composer.json'));
-
-        $this->exportCoolRunnings();
-
-        $this->assertFileDoesNotExist($this->exportPath('composer.json'));
-    }
-
-    #[Test]
-    public function it_exports_basic_composer_json_file()
+    public function it_exports_custom_package_composer_json_file()
     {
         $this->setExportPaths([
             'config',
         ]);
 
+        $this->files->put(base_path('package/composer.json'), $composerJson = 'custom composer.json!');
+
         $this->assertFileExists(base_path('composer.json'));
+        $this->assertFileDoesNotExist($filesystemsConfig = $this->exportPath('config/filesystems.php'));
 
         $this->exportCoolRunnings();
 
-        $this->assertEquals(<<<'EOT'
-{
-    "name": "my-vendor-name/cool-runnings",
-    "extra": {
-        "statamic": {
-            "name": "Cool Runnings",
-            "description": "Cool Runnings starter kit"
-        }
-    }
-}
-
-EOT
-            , $this->files->get($this->exportPath('composer.json')));
-    }
-
-    #[Test]
-    public function it_uses_existing_composer_json_file()
-    {
-        $this->files->makeDirectory($this->exportPath);
-        $this->files->put($this->exportPath('composer.json'), <<<'EOT'
-{
-    "name": "custom/hot-runnings",
-    "keywords": [
-        "jamaica",
-        "bob-sled"
-    ]
-}
-EOT
-        );
-
-        $this->setExportPaths([
-            'config',
-        ]);
-
-        $this->exportCoolRunnings();
-
-        $this->assertEquals(<<<'EOT'
-{
-    "name": "custom/hot-runnings",
-    "keywords": [
-        "jamaica",
-        "bob-sled"
-    ]
-}
-
-EOT
-            , $this->files->get($this->exportPath('composer.json')));
+        $this->assertEquals($composerJson, $this->files->get($this->targetPath('composer.json')));
+        $this->assertFileExists($filesystemsConfig);
     }
 
     #[Test]
@@ -642,15 +557,15 @@ EOT
                     ],
                 ],
                 'ssg' => [
-                    'export_as' => [
-                        'resources/views/welcome.blade.php' => 'resources/views/you-are-so-welcome.blade.php',
+                    'export_paths' => [
+                        'resources/views/welcome.blade.php',
                     ],
                 ],
             ],
         ]);
 
         $this->assertFileDoesNotExist($filesystemsConfig = $this->exportPath('config/filesystems.php'));
-        $this->assertFileDoesNotExist($welcomeView = $this->exportPath('resources/views/you-are-so-welcome.blade.php'));
+        $this->assertFileDoesNotExist($welcomeView = $this->exportPath('resources/views/welcome.blade.php'));
 
         $this->exportCoolRunnings();
 
@@ -672,8 +587,8 @@ EOT
                     ],
                     'modules' => [
                         'ssg' => [
-                            'export_as' => [
-                                'resources/views/welcome.blade.php' => 'resources/views/you-are-so-welcome.blade.php',
+                            'export_paths' => [
+                                'resources/views/welcome.blade.php',
                             ],
                         ],
                     ],
@@ -682,7 +597,7 @@ EOT
         ]);
 
         $this->assertFileDoesNotExist($filesystemsConfig = $this->exportPath('config/filesystems.php'));
-        $this->assertFileDoesNotExist($welcomeView = $this->exportPath('resources/views/you-are-so-welcome.blade.php'));
+        $this->assertFileDoesNotExist($welcomeView = $this->exportPath('resources/views/welcome.blade.php'));
 
         $this->exportCoolRunnings();
 
@@ -706,8 +621,8 @@ EOT
                             ],
                         ],
                         'react' => [
-                            'export_as' => [
-                                'resources/views/welcome.blade.php' => 'resources/views/you-are-so-welcome.blade.php',
+                            'export_paths' => [
+                                'resources/views/welcome.blade.php',
                             ],
                         ],
                     ],
@@ -716,7 +631,7 @@ EOT
         ]);
 
         $this->assertFileDoesNotExist($filesystemsConfig = $this->exportPath('config/filesystems.php'));
-        $this->assertFileDoesNotExist($welcomeView = $this->exportPath('resources/views/you-are-so-welcome.blade.php'));
+        $this->assertFileDoesNotExist($welcomeView = $this->exportPath('resources/views/welcome.blade.php'));
 
         $this->exportCoolRunnings();
 
@@ -747,8 +662,8 @@ EOT
                             ],
                         ],
                         'react' => [
-                            'export_as' => [
-                                'resources/views/welcome.blade.php' => 'resources/views/you-are-so-welcome.blade.php',
+                            'export_paths' => [
+                                'resources/views/welcome.blade.php',
                             ],
                         ],
                     ],
@@ -758,7 +673,7 @@ EOT
 
         $this->assertFileDoesNotExist($filesystemsConfig = $this->exportPath('config/filesystems.php'));
         $this->assertFileDoesNotExist($appConfig = $this->exportPath('config/app.php'));
-        $this->assertFileDoesNotExist($welcomeView = $this->exportPath('resources/views/you-are-so-welcome.blade.php'));
+        $this->assertFileDoesNotExist($welcomeView = $this->exportPath('resources/views/welcome.blade.php'));
 
         $this->exportCoolRunnings();
 
@@ -995,11 +910,11 @@ EOT
             // no installable config!
         ]);
 
-        $this->assertFileDoesNotExist($welcomeView = $this->exportPath('resources/views/welcome.blade.php'));
+        $this->assertFileDoesNotExist($welcomeView = $this->targetPath('resources/views/welcome.blade.php'));
 
         $this
             ->exportCoolRunnings()
-            // ->expectsOutput('Starter-kit module is missing `export_paths` or `dependencies`!') // TODO: Why does this work in InstallTest?
+            ->expectsOutputToContain('Starter-kit module is missing `export_paths`, `dependencies`, or nested `modules`.')
             ->assertFailed();
 
         $this->assertFileDoesNotExist($welcomeView);
@@ -1016,11 +931,11 @@ EOT
             ],
         ]);
 
-        $this->assertFileDoesNotExist($welcomeView = $this->exportPath('resources/views/welcome.blade.php'));
+        $this->assertFileDoesNotExist($welcomeView = $this->targetPath('resources/views/welcome.blade.php'));
 
         $this
             ->exportCoolRunnings()
-            // ->expectsOutput('Starter-kit module is missing `export_paths` or `dependencies`!') // TODO: Why does this work in InstallTest?
+            ->expectsOutputToContain('Starter-kit module is missing `export_paths`, `dependencies`, or nested `modules`.')
             ->assertFailed();
 
         $this->assertFileDoesNotExist($welcomeView);
@@ -1093,11 +1008,6 @@ EOT
                     'resources/views/welcome.blade.php',
                 ],
             ]],
-            'export as paths' => [[
-                'export_as' => [
-                    'resources/views/welcome.blade.php' => 'resources/js/vue.js',
-                ],
-            ]],
             'dependencies' => [[
                 'dependencies' => [
                     'statamic/seo-pro' => '^1.0',
@@ -1128,7 +1038,7 @@ EOT
 
         $this
             ->exportCoolRunnings()
-            // ->expectsOutput('Cannot export [non-existent.txt], because it does not exist in your app!') // TODO: Why does this work in InstallTest?
+            ->expectsOutputToContain('Cannot export [non-existent.txt], because it does not exist in your app.')
             ->assertFailed();
     }
 
@@ -1140,25 +1050,11 @@ EOT
                     'non-existent.txt',
                 ],
             ]],
-            'top level export as from' => [[
-                'export_as' => [
-                    'non-existent.txt' => 'resources/views/welcome.blade.php',
-                ],
-            ]],
             'module export' => [[
                 'modules' => [
                     'seo' => [
                         'export_paths' => [
                             'non-existent.txt',
-                        ],
-                    ],
-                ],
-            ]],
-            'module export as from' => [[
-                'modules' => [
-                    'seo' => [
-                        'export_as' => [
-                            'non-existent.txt' => 'resources/views/welcome.blade.php',
                         ],
                     ],
                 ],
@@ -1176,19 +1072,6 @@ EOT
                     ],
                 ],
             ]],
-            'select module export as from' => [[
-                'modules' => [
-                    'js' => [
-                        'options' => [
-                            'vue' => [
-                                'export_as' => [
-                                    'non-existent.txt' => 'resources/views/welcome.blade.php',
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-            ]],
         ];
     }
 
@@ -1200,7 +1083,7 @@ EOT
 
         $this
             ->exportCoolRunnings()
-            // ->expectsOutput('Cannot export [non-existent.txt], because it does not exist in your app!') // TODO: Why does this work in InstallTest?
+            ->expectsOutputToContain('Cannot export [non/existent], because it does not exist in your composer.json.')
             ->assertFailed();
     }
 
@@ -1265,14 +1148,59 @@ EOT
     }
 
     #[Test]
-    #[DataProvider('configsExportingComposerJson')]
-    public function it_doesnt_allow_exporting_of_composer_json_file($config)
+    #[DataProvider('configsExportingStarterKitYaml')]
+    public function it_doesnt_allow_starter_kit_config_in_export_paths($config)
     {
         $this->setConfig($config);
 
         $this
             ->exportCoolRunnings()
-            // ->expectsOutput('Cannot export [composer.json]. Please use `dependencies` array!') // TODO: Why does this work in InstallTest?
+            ->expectsOutputToContain('Cannot export [starter-kit.yaml] config.')
+            ->assertFailed();
+    }
+
+    public static function configsExportingStarterKitYaml()
+    {
+        return [
+            'top level export' => [[
+                'export_paths' => [
+                    'starter-kit.yaml',
+                ],
+            ]],
+            'module export' => [[
+                'modules' => [
+                    'seo' => [
+                        'export_paths' => [
+                            'starter-kit.yaml',
+                        ],
+                    ],
+                ],
+            ]],
+            'select module export' => [[
+                'modules' => [
+                    'js' => [
+                        'options' => [
+                            'vue' => [
+                                'export_paths' => [
+                                    'starter-kit.yaml',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('configsExportingComposerJson')]
+    public function it_doesnt_allow_composer_json_in_export_paths($config)
+    {
+        $this->setConfig($config);
+
+        $this
+            ->exportCoolRunnings()
+            ->expectsOutputToContain('Cannot export [composer.json]. Please use `dependencies` array.')
             ->assertFailed();
     }
 
@@ -1284,39 +1212,11 @@ EOT
                     'composer.json',
                 ],
             ]],
-            'top level export as from' => [[
-                'export_as' => [
-                    'composer.json' => 'resources/views/welcome.blade.php',
-                ],
-            ]],
-            'top level export as to' => [[
-                'export_as' => [
-                    'resources/views/welcome.blade.php' => 'composer.json',
-                ],
-            ]],
             'module export' => [[
                 'modules' => [
                     'seo' => [
                         'export_paths' => [
                             'composer.json',
-                        ],
-                    ],
-                ],
-            ]],
-            'module export as from' => [[
-                'modules' => [
-                    'seo' => [
-                        'export_as' => [
-                            'composer.json' => 'resources/views/welcome.blade.php',
-                        ],
-                    ],
-                ],
-            ]],
-            'module export as to' => [[
-                'modules' => [
-                    'seo' => [
-                        'export_as' => [
-                            'resources/views/welcome.blade.php' => 'composer.json',
                         ],
                     ],
                 ],
@@ -1328,32 +1228,6 @@ EOT
                             'vue' => [
                                 'export_paths' => [
                                     'composer.json',
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-            ]],
-            'select module export as from' => [[
-                'modules' => [
-                    'js' => [
-                        'options' => [
-                            'vue' => [
-                                'export_as' => [
-                                    'composer.json' => 'resources/views/welcome.blade.php',
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-            ]],
-            'select module export as to' => [[
-                'modules' => [
-                    'js' => [
-                        'options' => [
-                            'vue' => [
-                                'export_as' => [
-                                    'resources/views/welcome.blade.php' => 'composer.json',
                                 ],
                             ],
                         ],
@@ -1405,14 +1279,12 @@ EOT
                         'statamic/ssg',
                     ],
                     'prompt' => false,
-                    'export_as' => [
-                        'README.md' => 'README-new-site.md',
-                    ],
                     'dependencies' => [
                         'statamic/seo-pro',
                     ],
                     'export_paths' => [
                         'resources/views',
+                        'README.md',
                     ],
                 ],
                 'js' => [
@@ -1441,14 +1313,12 @@ EOT
                     ],
                 ],
             ],
-            'export_as' => [
-                'test-folder' => 'test-renamed-folder',
-            ],
             'dependencies_dev' => [
                 'statamic/ssg',
             ],
             'export_paths' => [
                 'config/filesystems.php',
+                'test-folder',
             ],
         ]);
 
@@ -1457,9 +1327,7 @@ EOT
         $this->assertConfigSameOrder([
             'export_paths' => [
                 'config/filesystems.php',
-            ],
-            'export_as' => [
-                'test-folder' => 'test-renamed-folder',
+                'test-folder',
             ],
             'dependencies_dev' => [
                 'statamic/ssg' => '^0.4.0',
@@ -1469,9 +1337,7 @@ EOT
                     'prompt' => false,
                     'export_paths' => [
                         'resources/views',
-                    ],
-                    'export_as' => [
-                        'README.md' => 'README-new-site.md',
+                        'README.md',
                     ],
                     'dependencies' => [
                         'statamic/seo-pro' => '^2.2',
@@ -1511,27 +1377,129 @@ EOT
         $this->cleanPaths($paths);
     }
 
+    #[Test]
+    public function it_can_help_migrate_to_new_package_folder_convention()
+    {
+        $this->setExportPaths([
+            'config',
+        ]);
+
+        $this->files->move(base_path('package/starter-kit.yaml'), base_path('starter-kit.yaml'));
+        $this->files->put(base_path('StarterKitPostInstall.php'), $postInstallHook = 'post install hook!');
+        $this->files->put($this->targetPath('starter-kit.yaml'), 'this should get stomped!');
+        $this->files->put($this->targetPath('composer.json'), $packageComposerJson = 'custom composer.json!');
+        $this->files->deleteDirectory(base_path('package'));
+
+        $this->assertFileDoesNotExist(base_path('package'));
+        $this->assertFileDoesNotExist($filesystemsConfig = $this->exportPath('config/filesystems.php'));
+
+        $this->exportCoolRunnings()
+            ->expectsOutputToContain('Starter kit config moved to [package/starter-kit.yaml].')
+            ->expectsOutputToContain('Starter kit post-install hook moved to [package/StarterKitPostInstall.php].')
+            ->expectsOutputToContain('Composer package config moved to [package/composer.json].')
+            ->assertSuccessful();
+
+        $expectedConfig = [
+            'export_paths' => [
+                'config',
+            ],
+        ];
+
+        $this->assertFileDoesNotExist(base_path('starter-kit.yaml'));
+        $this->assertFileExists(base_path('package/starter-kit.yaml'));
+        $this->assertEquals($expectedConfig, YAML::parse($this->files->get(base_path('package/starter-kit.yaml'))));
+        $this->assertEquals($expectedConfig, YAML::parse($this->files->get($this->targetPath('starter-kit.yaml'))));
+
+        $this->assertFileDoesNotExist(base_path('StarterKitPostInstall.php'));
+        $this->assertFileExists(base_path('package/StarterKitPostInstall.php'));
+        $this->assertEquals($postInstallHook, $this->files->get(base_path('package/StarterKitPostInstall.php')));
+        $this->assertEquals($postInstallHook, $this->files->get($this->targetPath('StarterKitPostInstall.php')));
+
+        $this->assertFileExists(base_path('package/composer.json'));
+        $this->assertEquals($packageComposerJson, $this->files->get(base_path('package/composer.json')));
+        $this->assertEquals($packageComposerJson, $this->files->get($this->targetPath('composer.json')));
+
+        $this->assertFileExists($filesystemsConfig);
+    }
+
+    #[Test]
+    public function it_can_help_migrate_starter_kit_config_to_new_package_folder_but_requires_composer_json_to_actually_export()
+    {
+        $this->setExportPaths([
+            'config',
+        ]);
+
+        $this->files->move(base_path('package/starter-kit.yaml'), base_path('starter-kit.yaml'));
+        $this->files->deleteDirectory(base_path('package'));
+        $this->files->deleteDirectory($this->targetPath());
+
+        $this->assertFileDoesNotExist(base_path('package'));
+        $this->assertFileDoesNotExist($filesystemsConfig = $this->exportPath('config/filesystems.php'));
+
+        $this->exportCoolRunnings()
+            ->expectsOutputToContain('Starter kit config moved to [package/starter-kit.yaml].')
+            ->doesntExpectOutputToContain('Starter kit post-install hook moved to [package/StarterKitPostInstall.php].')
+            ->doesntExpectOutputToContain('Composer package config moved to [package/composer.json].')
+            ->expectsOutputToContain('Package config [package/composer.json] does not exist.')
+            ->assertFailed();
+
+        $expectedConfig = [
+            'export_paths' => [
+                'config',
+            ],
+        ];
+
+        $this->assertFileDoesNotExist(base_path('starter-kit.yaml'));
+        $this->assertFileExists(base_path('package/starter-kit.yaml'));
+        $this->assertEquals($expectedConfig, YAML::parse($this->files->get(base_path('package/starter-kit.yaml'))));
+
+        $this->assertFileDoesNotExist(base_path('package/StarterKitPostInstall.php'));
+        $this->assertFileDoesNotExist($this->targetPath('StarterKitPostInstall.php'));
+
+        $this->assertFileDoesNotExist(base_path('package/composer.json'));
+        $this->assertFileDoesNotExist($this->targetPath('composer.json'));
+
+        $this->assertFileDoesNotExist($filesystemsConfig);
+    }
+
+    private function targetPath($path = null)
+    {
+        return collect([$this->targetPath, $path])->filter()->implode('/');
+    }
+
     private function exportPath($path = null)
     {
-        return collect([$this->exportPath, $path])->filter()->implode('/');
+        return collect([$this->targetPath, 'export', $path])->filter()->implode('/');
     }
 
     private function setConfig($config)
     {
-        $this->files->put($this->configPath, YAML::dump($config));
+        if (! $this->files->exists($this->packagePath)) {
+            $this->files->makeDirectory($this->packagePath);
+        }
 
-        if (! $this->files->exists($this->exportPath)) {
-            $this->files->makeDirectory($this->exportPath);
+        $this->files->put($this->packagePath.'/starter-kit.yaml', YAML::dump($config));
+
+        $this->files->put($this->packagePath.'/composer.json', <<<'PACKAGE'
+{
+    "name": "my-vendor-name/cool-runnings",
+    "extra": {
+        "statamic": {
+            "name": "Cool Runnings",
+            "description": "Cool Runnings starter kit"
+        }
+    }
+}
+PACKAGE);
+
+        if (! $this->files->exists($this->targetPath)) {
+            $this->files->makeDirectory($this->targetPath);
         }
     }
 
-    private function setExportPaths($paths, $exportAs = null)
+    private function setExportPaths($paths)
     {
         $config['export_paths'] = $paths;
-
-        if ($exportAs) {
-            $config['export_as'] = $exportAs;
-        }
 
         $this->setConfig($config);
     }
@@ -1553,14 +1521,14 @@ EOT
     {
         return $this->assertEquals(
             $expectedConfig,
-            Arr::get(YAML::parse($this->files->get($this->exportPath('starter-kit.yaml'))), $key)
+            Arr::get(YAML::parse($this->files->get($this->targetPath('starter-kit.yaml'))), $key)
         );
     }
 
     private function assertExportedConfigDoesNotHave($key)
     {
         return $this->assertFalse(
-            Arr::has(YAML::parse($this->files->get($this->exportPath('starter-kit.yaml'))), $key)
+            Arr::has(YAML::parse($this->files->get($this->targetPath('starter-kit.yaml'))), $key)
         );
     }
 
@@ -1568,7 +1536,7 @@ EOT
     {
         return $this->assertSame(
             $expectedConfig,
-            YAML::parse($this->files->get($this->exportPath('starter-kit.yaml')))
+            YAML::parse($this->files->get($this->targetPath('starter-kit.yaml')))
         );
     }
 

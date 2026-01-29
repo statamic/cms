@@ -3,6 +3,8 @@
 namespace Statamic\Fields;
 
 use Facades\Statamic\Fields\FieldRepository;
+use Statamic\CommandPalette\Category;
+use Statamic\CommandPalette\Link;
 use Statamic\Events\FieldsetCreated;
 use Statamic\Events\FieldsetCreating;
 use Statamic\Events\FieldsetDeleted;
@@ -202,9 +204,9 @@ class Fieldset
         return $this->fields()->get($handle);
     }
 
-    public function hasField(string $handle): bool
+    public function hasField($field)
     {
-        return $this->fields()->has($handle);
+        return $this->fields()->has($field);
     }
 
     public function isNamespaced(): bool
@@ -413,6 +415,15 @@ class Fieldset
         }
 
         return $this->ensureField($handle, $config);
+    }
+
+    public function commandPaletteLink(): Link
+    {
+        $text = [__('Fieldsets'), __($this->title())];
+
+        return (new Link($text, Category::Fields))
+            ->url($this->editUrl())
+            ->icon('fieldsets');
     }
 
     public static function __callStatic($method, $parameters)

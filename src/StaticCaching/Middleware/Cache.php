@@ -10,6 +10,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache as AppCache;
 use Illuminate\Support\Facades\Log;
+use Statamic\Facades\Blink;
 use Statamic\Facades\StaticCache;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
@@ -50,13 +51,15 @@ class Cache
     public function handle($request, Closure $next)
     {
         if ($response = $this->attemptToServeCachedResponse($request)) {
-            return $response;
+            return $this->addEtagToResponse($request, $response);
         }
 
         $lock = $this->createLock($request);
 
         try {
-            return $lock->block($this->lockFor, fn () => $this->handleRequest($request, $next));
+            return $lock->block($this->lockFor,
+                fn () => $this->addEtagToResponse($request, $this->handleRequest($request, $next))
+            );
         } catch (LockTimeoutException $e) {
             return $this->outputRefreshResponse($request);
         }
@@ -83,6 +86,16 @@ class Cache
             $this->makeReplacementsAndCacheResponse($request, $response);
 
             $this->nocache->write();
+
+            if ($paginator = Blink::get('tag-paginator')) {
+                if ($paginator->hasMorePages()) {
+                    $response->headers->set('X-Statamic-Pagination', [
+                        'current' => $paginator->currentPage(),
+                        'total' => $paginator->lastPage(),
+                        'name' => $paginator->getPageName(),
+                    ]);
+                }
+            }
         } elseif (! $response->isRedirect()) {
             $this->makeReplacements($response);
         }
@@ -167,6 +180,10 @@ class Cache
             return false;
         }
 
+        if ($this->hasValidRecacheToken($request)) {
+            return false;
+        }
+
         return true;
     }
 
@@ -184,6 +201,7 @@ class Cache
             $response->headers->has('X-Statamic-Draft')
             || $response->headers->has('X-Statamic-Private')
             || $response->headers->has('X-Statamic-Protected')
+            || $response->headers->has('X-Statamic-Uncacheable')
         ) {
             return false;
         }
@@ -199,6 +217,15 @@ class Cache
         }
 
         return true;
+    }
+
+    private function hasValidRecacheToken($request)
+    {
+        if (! $token = $request->input(StaticCache::recacheTokenParameter())) {
+            return false;
+        }
+
+        return StaticCache::checkRecacheToken($token);
     }
 
     private function createLock($request): Lock
@@ -227,5 +254,25 @@ class Cache
             : sprintf('<meta http-equiv="refresh" content="1; URL=\'%s\'" />', $request->getUri());
 
         return response($html, 503, ['Retry-After' => 1]);
+    }
+
+    private function addEtagToResponse($request, $response)
+    {
+        if (! $response->isRedirect() && $content = $response->getContent()) {
+            // Clear any potentially stale cache-related headers that might interfere
+            $response->headers->remove('ETag');
+            $response->headers->remove('Last-Modified');
+
+            // Set fresh ETag based on current content
+            $response->setEtag(md5($content));
+
+            // Only call isNotModified() if request has cache validation headers
+            // This prevents 304 responses to clients that haven't sent If-None-Match or If-Modified-Since
+            if ($request->headers->has('If-None-Match') || $request->headers->has('If-Modified-Since')) {
+                $response->isNotModified($request);
+            }
+        }
+
+        return $response;
     }
 }

@@ -1,9 +1,8 @@
 import AssetEditor from '../../assets/Editor/Editor.vue';
 
 export default {
-
     components: {
-        AssetEditor
+        AssetEditor,
     },
 
     props: {
@@ -11,22 +10,24 @@ export default {
         readOnly: Boolean,
         showFilename: {
             type: Boolean,
-            default: true
+            default: true,
         },
         showSetAlt: {
             type: Boolean,
-            default: true
-        }
+            default: true,
+        },
     },
 
     data() {
         return {
-            editing: false
-        }
+            editing: false,
+        };
     },
 
-
     computed: {
+        isViewable() {
+            return this.asset.isViewable;
+        },
 
         isImage() {
             return this.asset.isImage;
@@ -37,15 +38,11 @@ export default {
         },
 
         container() {
-            return this.asset.id.substr(0, this.asset.id.indexOf('::'))
+            return this.asset.id.substr(0, this.asset.id.indexOf('::'));
         },
 
         canBeTransparent() {
-            return ['png', 'svg', 'webp', 'avif'].includes(this.asset.extension)
-        },
-
-        canDownload() {
-            return Statamic.$permissions.has(`view ${this.container} assets`);
+            return ['png', 'svg', 'webp', 'avif'].includes(this.asset.extension);
         },
 
         thumbnail() {
@@ -58,11 +55,15 @@ export default {
 
         needsAlt() {
             return (this.asset.isImage || this.asset.isSvg) && !this.asset.values.alt;
-        }
+        },
     },
 
-
     methods: {
+        editOrOpen() {
+            if (!this.isViewable) return;
+
+            return this.readOnly ? this.open() : this.edit();
+        },
 
         edit() {
             if (this.readOnly) return;
@@ -77,7 +78,7 @@ export default {
         },
 
         open() {
-            if (! this.asset.url) {
+            if (!this.asset.url) {
                 return this.download();
             }
 
@@ -105,7 +106,5 @@ export default {
             }
             this.closeEditor();
         },
-
-    }
-
-}
+    },
+};

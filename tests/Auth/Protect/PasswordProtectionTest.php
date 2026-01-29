@@ -36,6 +36,27 @@ class PasswordProtectionTest extends PageProtectionTestCase
     }
 
     #[Test]
+    public function redirects_to_password_form_url_and_generates_token_on_a_404_url()
+    {
+        config()->set('statamic.protect.default', 'password-scheme');
+        config(['statamic.protect.schemes.password-scheme' => [
+            'driver' => 'password',
+            'allowed' => ['test'],
+        ]]);
+
+        Token::shouldReceive('generate')->andReturn('test-token');
+
+        $this
+            ->get('this-page-does-not-exist')
+            ->assertRedirect('http://localhost/!/protect/password?token=test-token')
+            ->assertSessionHas('statamic:protect:password.tokens.test-token', [
+                'scheme' => 'password-scheme',
+                'url' => 'http://localhost/this-page-does-not-exist',
+                'reference' => null,
+            ]);
+    }
+
+    #[Test]
     public function password_form_url_can_be_overridden()
     {
         config(['statamic.protect.schemes.password-scheme' => [

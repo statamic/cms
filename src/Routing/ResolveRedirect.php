@@ -7,6 +7,7 @@ use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades;
 use Statamic\Facades\Site;
 use Statamic\Fields\Values;
+use Statamic\Fieldtypes\Link\ArrayableLink;
 use Statamic\Structures\Page;
 use Statamic\Support\Str;
 
@@ -32,6 +33,10 @@ class ResolveRedirect
 
     public function item($redirect, $parent = null, $localize = false)
     {
+        if ($redirect instanceof ArrayableLink) {
+            return $redirect->url();
+        }
+
         if (is_null($redirect)) {
             return null;
         }

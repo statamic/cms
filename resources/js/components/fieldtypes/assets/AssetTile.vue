@@ -1,6 +1,6 @@
 <template>
     <div
-        class="asset-tile"
+        class="asset-tile asset-thumb-container"
         :class="{
             'is-image': isImage && !canShowSvg,
             'is-svg': canShowSvg,
@@ -18,86 +18,67 @@
         >
         </asset-editor>
 
-        <div class="asset-thumb-container">
-            <div class="asset-thumb" :class="{ 'bg-checkerboard': canBeTransparent }">
+        <div class="flex h-full rounded-b-md relative" :class="{ 'bg-checkerboard rounded-lg!': canBeTransparent, 'border-b dark:border-gray-700': showFilename }">
+            <div class="p-1 flex flex-col items-center justify-center h-full">
                 <!-- Solo Bard -->
                 <template v-if="isImage && isInBardField && !isInAssetBrowser">
                     <img :src="asset.url" />
                 </template>
 
                 <template v-else>
-                    <img :src="thumbnail" v-if="isImage" :title="label" />
+                    <img v-if="canShowSvg" :src="asset.url" :title="label" class="p-4 size-full relative" />
 
                     <template v-else>
-                        <img v-if="canShowSvg" :src="asset.url" :title="label" class="p-4" />
-                        <file-icon
-                            v-else
-                            :extension="asset.extension"
-                            class="p-4 h-full w-full"
-                        />
+                        <img :src="thumbnail" v-if="thumbnail" :title="label" class="rounded-md relative"  />
+
+                        <file-icon v-else :extension="asset.extension" class="h-full w-full p-4 relative" />
                     </template>
                 </template>
 
-                <div class="asset-controls">
-                    <div class="flex items-center justify-center space-x-1 rtl:space-x-reverse">
-                        <template v-if="!readOnly">
-                            <button @click="edit" class="btn btn-icon" :title="__('Edit')">
-                                <svg-icon name="micro/sharp-pencil" class="h-4 my-2" />
-                            </button>
+            </div>
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 duration-100">
+                <div class="flex items-center justify-center gap-2">
+                    <template v-if="!readOnly">
+                        <ui-button size="sm" @click="editOrOpen" :icon="asset.isEditable ? 'pencil' : 'eye'" aria-label="__('Edit')" v-if="asset.isViewable" />
+                        <ui-button size="sm" @click="remove" icon="x" aria-label="__('Remove')" />
+                    </template>
 
-                            <button @click="remove" class="btn btn-icon" :title="__('Remove')">
-                                <span class="text-lg antialiased w-4">×</span>
-                            </button>
-                        </template>
-
-                        <template v-else>
-                            <button
-                                v-if="asset.url && asset.isMedia && this.canDownload"
-                                @click="open"
-                                class="btn btn-icon"
-                                :title="__('Open in a new window')"
-                            >
-                                <svg-icon name="light/external-link" class="h-4 my-2" />
-                            </button>
-
-                            <button
-                                v-if="asset.allowDownloading && this.canDownload"
-                                @click="download"
-                                class="btn btn-icon"
-                                :title="__('Download file')"
-                            >
-                                <svg-icon name="light/download" class="h-4 my-2" />
-                            </button>
-                        </template>
-                    </div>
+                    <template v-else>
+                        <ui-button icon="external-link" size="sm" v-if="asset.url && asset.isMedia && asset.isViewable" @click="open" :aria-label="__('Open in a new window')" />
+                        <ui-button icon="download" size="sm" v-if="asset.isViewable" @click="download" :aria-label="__('Download file')" />
+                    </template>
                 </div>
-
+            </div>
+            <div class="absolute bottom-0 end-0 [&_button]:mb-1 [&_button]:me-1">
+                <ui-badge
+                    v-if="!readOnly && showSetAlt && needsAlt && !showFilename"
+                    as="button"
+                    size="sm"
+                    color="sky"
+                    :text="__('Set Alt')"
+                    @click="editOrOpen"
+                />
             </div>
         </div>
 
-        <div class="asset-meta flex items-center" v-if="showFilename">
-            <div
-                class="asset-filename flex-1 px-2 py-1"
-                :title="label"
-                :class="{ 'text-center': !needsAlt }"
-            >
+        <div class="flex items-center justify-between w-full px-1" v-if="showFilename">
+            <div class="truncate w-18 text-xs text-gray-600 dark:text-gray-400 flex-1 px-2 py-1" v-tooltip="label" :class="{ 'text-center': !needsAlt }">
                 {{ label }}
             </div>
-            <button
-                class="asset-meta-btn"
-                @click="edit"
-                v-if="showSetAlt && needsAlt"
-            >
-                {{ asset.values.alt ? "✅" : __("Set Alt") }}
-            </button>
+            <ui-badge as="button" size="sm" color="sky"  @click="editOrOpen" v-if="asset.isEditable && showSetAlt && needsAlt" :text="asset.values.alt ? '✅' : __('Set Alt')" />
         </div>
     </div>
 </template>
 
 <script>
-import Asset from "./Asset";
+import Asset from './Asset';
+import { Button } from '@/components/ui';
 
 export default {
+    components: {
+        Button,
+    },
+
     mixins: [Asset],
 
     computed: {
@@ -109,7 +90,7 @@ export default {
 
                 if (!parent) return false;
 
-                if (parent.constructor.name === "AssetBrowser") {
+                if (parent.constructor.name === 'AssetBrowser') {
                     return true;
                 }
 
@@ -120,6 +101,6 @@ export default {
         isInBardField() {
             return this.$parent.isInBardField;
         },
-    }
+    },
 };
 </script>

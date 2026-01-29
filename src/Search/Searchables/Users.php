@@ -3,6 +3,7 @@
 namespace Statamic\Search\Searchables;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\LazyCollection;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Facades\User;
 
@@ -18,9 +19,21 @@ class Users extends Provider
         return 'user';
     }
 
-    public function provide(): Collection
+    public function provide(): Collection|LazyCollection
     {
-        return User::all()->filter($this->filter())->values();
+        $query = User::query();
+
+        $this->applyQueryScope($query);
+
+        if ($filter = $this->filter()) {
+            return $query
+                ->lazy(config('statamic.search.chunk_size'))
+                ->filter($filter)
+                ->values()
+                ->map->reference();
+        }
+
+        return $query->pluck('reference');
     }
 
     public function contains($searchable): bool
@@ -29,7 +42,15 @@ class Users extends Provider
             return false;
         }
 
-        return $this->filter()($searchable);
+        if ($filter = $this->filter()) {
+            return $filter($searchable);
+        }
+
+        $query = User::query()->where('id', $searchable->id());
+
+        $this->applyQueryScope($query);
+
+        return $query->exists();
     }
 
     public function find(array $ids): Collection

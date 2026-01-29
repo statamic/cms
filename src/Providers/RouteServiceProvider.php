@@ -105,12 +105,12 @@ class RouteServiceProvider extends ServiceProvider
             return false;
         }
 
-        if ($this->isCpRoute($route)) {
-            return true;
-        }
-
         if ($this->isApiRoute($route)) {
             return false;
+        }
+
+        if ($this->isCpRoute($route)) {
+            return true;
         }
 
         return $this->isFrontendBindingEnabled();
@@ -191,12 +191,12 @@ class RouteServiceProvider extends ServiceProvider
             return false;
         }
 
-        if ($this->isCpRoute($route)) {
-            return true;
-        }
-
         if ($this->isApiRoute($route)) {
             return false;
+        }
+
+        if ($this->isCpRoute($route)) {
+            return true;
         }
 
         return $this->isFrontendBindingEnabled();
@@ -382,12 +382,12 @@ class RouteServiceProvider extends ServiceProvider
             return false;
         }
 
-        if ($this->isCpRoute($route)) {
-            return true;
-        }
-
         if ($this->isApiRoute($route)) {
             return false;
+        }
+
+        if ($this->isCpRoute($route)) {
+            return true;
         }
 
         return $this->isFrontendBindingEnabled();

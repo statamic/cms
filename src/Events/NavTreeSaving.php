@@ -4,11 +4,8 @@ namespace Statamic\Events;
 
 class NavTreeSaving extends Event
 {
-    public $tree;
-
-    public function __construct($tree)
+    public function __construct(public $tree)
     {
-        $this->tree = $tree;
     }
 
     /**

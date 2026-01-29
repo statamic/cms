@@ -45,7 +45,7 @@ class DefaultSchema implements ConfigConvertible
     {
         return [
             'query' => $this->getQueries(),
-            'mutation' => [],
+            'mutation' => $this->getMutations(),
             'middleware' => $this->getMiddleware(),
             'method' => ['GET', 'POST'],
         ];
@@ -81,5 +81,10 @@ class DefaultSchema implements ConfigConvertible
             config('statamic.graphql.middleware', []),
             GraphQL::getExtraMiddleware()
         );
+    }
+
+    private function getMutations()
+    {
+        return config('statamic.graphql.mutations', []);
     }
 }

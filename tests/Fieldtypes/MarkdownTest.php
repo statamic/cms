@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Fields\Field;
+use Statamic\Fields\Value;
 use Statamic\Fieldtypes\Markdown;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -168,6 +169,24 @@ EOT;
 EOT;
 
         $this->assertEquals($expected, $this->fieldtype()->augment($markdown));
+    }
+
+    #[Test]
+    public function it_converts_to_smartypants_after_antlers_is_parsed()
+    {
+        $md = $this->fieldtype(['smartypants' => true, 'antlers' => true]);
+
+        $value = <<<'EOT'
+{{ "this is a string" | replace(" is ", " isnt ") | reverse }}
+EOT;
+
+        $value = new Value($value, 'markdown', $md);
+
+        $expected = <<<'EOT'
+<p>gnirts a tnsi siht</p>
+EOT;
+
+        $this->assertEqualsTrimmed($expected, $value->antlersValue(app(\Statamic\Contracts\View\Antlers\Parser::class), []));
     }
 
     private function fieldtype($config = [])

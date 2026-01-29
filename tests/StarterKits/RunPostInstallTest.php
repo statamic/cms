@@ -9,6 +9,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Http;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Path;
 use Tests\Fakes\Composer\FakeComposer;
 use Tests\TestCase;
 
@@ -107,12 +108,12 @@ class RunPostInstallTest extends TestCase
 
     private function kitRepoPath($path = null)
     {
-        return collect([base_path('repo/cool-runnings'), $path])->filter()->implode('/');
+        return Path::tidy(collect([base_path('repo/cool-runnings'), $path])->filter()->implode('/'));
     }
 
     protected function kitVendorPath($path = null)
     {
-        return collect([base_path('vendor/statamic/cool-runnings'), $path])->filter()->implode('/');
+        return Path::tidy(collect([base_path('vendor/statamic/cool-runnings'), $path])->filter()->implode('/'));
     }
 
     private function prepareRepo()

@@ -12,7 +12,6 @@ use Statamic\Facades\Folder;
 use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
 use Statamic\Revisions\Revision;
-use Statamic\Revisions\WorkingCopy;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -30,7 +29,6 @@ class EntryRevisionsTest extends TestCase
         parent::setUp();
         $this->dir = __DIR__.'/tmp';
         config(['statamic.revisions.enabled' => true]);
-        config(['statamic.revisions.path' => $this->dir]);
         $this->collection = tap(Collection::make('blog')->revisionsEnabled(true)->dated(true))->save();
     }
 
@@ -86,8 +84,8 @@ class EntryRevisionsTest extends TestCase
             ->assertJsonPath('0.revisions.0.attributes.data.title', 'Original title')
             ->assertJsonPath('0.revisions.0.attributes.item_url', 'http://localhost/cp/collections/blog/entries/1/revisions/'.Carbon::parse('2017-02-01')->timestamp)
 
-            ->assertJsonPath('1.revisions.0.action', 'revision')
-            ->assertJsonPath('1.revisions.0.message', false)
+            ->assertJsonPath('1.revisions.0.action', 'working')
+            ->assertJsonPath('1.revisions.0.message', null)
             ->assertJsonPath('1.revisions.0.attributes.data.title', 'Title modified in working copy')
             ->assertJsonPath('1.revisions.0.attributes.item_url', null)
 
@@ -283,7 +281,7 @@ class EntryRevisionsTest extends TestCase
 
         $revision = tap((new Revision)
             ->key('collections/blog/en/123')
-            ->date(Carbon::createFromTimestamp('1553546421'))
+            ->date(Carbon::createFromTimestamp('1553546421', config('app.timezone')))
             ->attributes([
                 'published' => false,
                 'slug' => 'existing-slug',
@@ -291,7 +289,7 @@ class EntryRevisionsTest extends TestCase
                 'data' => ['foo' => 'existing foo'],
             ]))->save();
 
-        WorkingCopy::fromRevision($revision)->save();
+        $revision->toWorkingCopy()->save();
 
         $entry = EntryFactory::id('123')
             ->slug('test')
@@ -345,14 +343,14 @@ class EntryRevisionsTest extends TestCase
 
         $revision = tap((new Revision)
             ->key('collections/blog/en/123')
-            ->date(Carbon::createFromTimestamp('1553546421'))
+            ->date(Carbon::createFromTimestamp('1553546421', config('app.timezone')))
             ->attributes([
                 'published' => true,
                 'slug' => 'existing-slug',
                 'data' => ['foo' => 'existing foo'],
             ]))->save();
 
-        WorkingCopy::fromRevision($revision)->save();
+        $revision->toWorkingCopy()->save();
 
         $entry = EntryFactory::id('123')
             ->slug('test')

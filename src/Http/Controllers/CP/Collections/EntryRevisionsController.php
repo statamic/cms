@@ -10,6 +10,8 @@ use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 
 class EntryRevisionsController extends CpController
 {
+    use ExtractsFromEntryFields;
+
     public function index(Request $request, $collection, $entry)
     {
         $revisions = $entry
@@ -18,7 +20,7 @@ class EntryRevisionsController extends CpController
             ->each(fn ($revision) => $revision->attribute('item_url', cp_route('collections.entries.revisions.show', [
                 'collection' => $collection,
                 'entry' => $entry->id(),
-                'revision' => $revision->id(),
+                'revision' => $revision->date()->timestamp,
             ])))
             ->prepend($this->workingCopy($entry))
             ->filter();
@@ -55,21 +57,7 @@ class EntryRevisionsController extends CpController
 
         $blueprint = $entry->blueprint();
 
-        $fields = $blueprint
-            ->fields()
-            ->addValues($entry->data()->all())
-            ->preProcess();
-
-        $values = array_merge($fields->values()->all(), [
-            'title' => $entry->get('title'),
-            'slug' => $entry->slug(),
-        ]);
-
-        if ($entry->collection()->dated()) {
-            $datetime = substr($entry->date()->toDateTimeString(), 0, 16);
-            $datetime = ($entry->hasTime()) ? $datetime : substr($datetime, 0, 10);
-            $values['date'] = $datetime;
-        }
+        [$values, $meta] = $this->extractFromFields($entry, $blueprint);
 
         return [
             'title' => $entry->value('title'),
@@ -83,7 +71,7 @@ class EntryRevisionsController extends CpController
                 'createRevision' => $entry->createRevisionUrl(),
             ],
             'values' => $values,
-            'meta' => $fields->meta(),
+            'meta' => $meta,
             'collection' => $this->collectionToArray($entry->collection()),
             'blueprint' => $blueprint->toPublishArray(),
             'readOnly' => true,

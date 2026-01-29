@@ -1,0 +1,3 @@
+title: Custom Class
+route: 'custom-class/{slug}'
+entry_class: Tests\Stache\Repositories\CustomEntry

@@ -13,7 +13,10 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Console\Commands\StarterKitInstall as InstallCommand;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Config;
+use Statamic\Facades\Path;
+use Statamic\Facades\Search;
 use Statamic\Facades\YAML;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Tests\Fakes\Composer\FakeComposer;
 use Tests\TestCase;
@@ -41,6 +44,10 @@ class InstallTest extends TestCase
     {
         $this->restoreSite();
 
+        if ($this->files->exists($kitRepo = $this->kitRepoPath())) {
+            $this->files->deleteDirectory($kitRepo);
+        }
+
         parent::tearDown();
     }
 
@@ -56,29 +63,26 @@ class InstallTest extends TestCase
         $this->assertFalse(Blink::has('starter-kit-repository-added'));
         $this->assertFileDoesNotExist($this->kitVendorPath());
         $this->assertFileDoesNotExist(base_path('composer.json.bak'));
+        $this->assertComposerJsonDoesntHavePackage('statamic/cool-runnings');
         $this->assertComposerJsonDoesntHave('repositories');
         $this->assertFileExists(base_path('copied.md'));
     }
 
     #[Test]
-    public function it_installs_from_custom_export_paths()
+    public function it_installs_starter_kit_from_updatable_package_with_export_directory()
     {
-        $this->setConfig([
-            'export_paths' => [
-                'config',
-                'copied.md',
-            ],
-            'export_as' => [
-                'README.md' => 'README-for-new-site.md',
-                'original-dir' => 'renamed-dir',
-            ],
-        ]);
+        // Move everything in the kit repo's `export` folder, except for `composer.json` and `starter-kit.yaml`
+        collect($this->files->allFiles($this->kitRepoPath()))
+            ->reject(fn ($file) => in_array($file->getRelativePathname(), ['composer.json', 'starter-kit.yaml']))
+            ->each(fn ($file) => $this->files->move(
+                $this->kitRepoPath($file->getRelativePathname()),
+                $this->preparePath($this->kitRepoPath('export/'.$file->getRelativePathname())),
+            ));
 
-        $this->assertFileDoesNotExist($this->kitVendorPath());
-        $this->assertComposerJsonDoesntHave('repositories');
-        $this->assertFileDoesNotExist(base_path('copied.md'));
-        $this->assertFileDoesNotExist($renamedFile = base_path('README.md'));
-        $this->assertFileDoesNotExist($renamedFolder = base_path('original-dir'));
+        $this->assertFileDoesNotExist($this->kitRepoPath('copied.md'));
+        $this->assertFileExists($this->kitRepoPath('export/copied.md'));
+        $this->assertFileExists($this->kitRepoPath('composer.json'));
+        $this->assertFileExists($this->kitRepoPath('starter-kit.yaml'));
 
         $this->installCoolRunnings();
 
@@ -87,15 +91,31 @@ class InstallTest extends TestCase
         $this->assertFileDoesNotExist(base_path('composer.json.bak'));
         $this->assertComposerJsonDoesntHave('repositories');
         $this->assertFileExists(base_path('copied.md'));
-        $this->assertFileExists($renamedFile);
-        $this->assertFileExists($renamedFolder);
+    }
 
-        $this->assertFileDoesNotExist(base_path('README-for-new-site.md')); // This was renamed back to original path on install
-        $this->assertFileDoesNotExist(base_path('renamed-dir')); // This was renamed back to original path on install
+    #[Test]
+    public function it_installs_from_export_paths()
+    {
+        $this->setConfig([
+            'export_paths' => [
+                'config',
+                'copied.md',
+            ],
+        ]);
 
-        $this->assertFileHasContent('This readme should get installed to README.md.', $renamedFile);
-        $this->assertFileHasContent('One.', $renamedFolder.'/one.txt');
-        $this->assertFileHasContent('Two.', $renamedFolder.'/two.txt');
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+
+        $this->installCoolRunnings();
+
+        $this->assertFalse(Blink::has('starter-kit-repository-added'));
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertFileDoesNotExist(base_path('composer.json.bak'));
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileExists(base_path('copied.md'));
+        $this->assertFileExists(config_path('filesystems.php'));
+        $this->assertFileHasContent('bobsled_pics', config_path('filesystems.php'));
     }
 
     #[Test]
@@ -207,6 +227,70 @@ class InstallTest extends TestCase
 
         $this->assertCount(2, $composerJson['repositories']);
         $this->assertEquals($expectedRepositories, $composerJson['repositories']);
+    }
+
+    #[Test]
+    public function it_installs_as_living_package_with_custom_config()
+    {
+        $this->setConfig([
+            'updatable' => true, // With `updatable: true`, kit should live on as composer updatable package
+            'export_paths' => [
+                'copied.md',
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+
+        $this->installCoolRunnings();
+
+        $this->assertFileExists(base_path('copied.md'));
+        $this->assertComposerJsonDoesntHave('repositories');
+
+        // Keep package around
+        $this->assertFileExists($this->kitVendorPath());
+        $this->assertComposerJsonHasPackage('require', 'statamic/cool-runnings');
+
+        // But ensure we still delete backup composer.json, which is only used for error handling purposes
+        $this->assertFileDoesNotExist(base_path('composer.json.bak'));
+    }
+
+    #[Test]
+    public function it_leaves_custom_repository_for_living_packages_that_need_it()
+    {
+        $this->setConfig([
+            'updatable' => true, // With `updatable: true`, kit should live on as composer updatable package
+            'export_paths' => [
+                'copied.md',
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertComposerJsonDoesntHave('repositories');
+
+        $this->installCoolRunnings([], [
+            'outpost.*' => Http::response(['data' => ['price' => null]], 200),
+            'github.com/*' => Http::response('', 200),
+            '*' => Http::response('', 404),
+        ]);
+
+        $this->assertFileExists(base_path('copied.md'));
+
+        // Keep package around
+        $this->assertFileExists($this->kitVendorPath());
+        $this->assertComposerJsonHasPackage('require', 'statamic/cool-runnings');
+
+        // As well as custom repository, which will be needed for composer updates, if it was needed for install
+        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
+        $this->assertCount(1, $composerJson['repositories']);
+        $this->assertEquals([[
+            'type' => 'vcs',
+            'url' => 'https://github.com/statamic/cool-runnings',
+        ]], $composerJson['repositories']);
+
+        // But delete backup composer.json, which is only used for error handling purposes
+        $this->assertFileDoesNotExist(base_path('composer.json.bak'));
     }
 
     #[Test]
@@ -380,7 +464,8 @@ EOT;
 
         $this
             ->installCoolRunningsInteractively(['--without-user' => true])
-            ->expectsConfirmation('Clear site first?', 'yes');
+            ->expectsConfirmation('Clear site first?', 'yes')
+            ->expectsConfirmation('Would you like to update your search index(es) as well?', 'no');
 
         $this->assertFileExists(base_path('content/collections/pages/home.md'));
         $this->assertFileDoesNotExist(base_path('content/collections/pages/contact.md'));
@@ -688,8 +773,8 @@ EOT;
         ]);
 
         // Ensure `Composer::requireDev()` gets called with `package:branch`
-        $this->assertEquals(Blink::get('composer-require-dev-package'), 'statamic/cool-runnings');
-        $this->assertEquals(Blink::get('composer-require-dev-branch'), 'dev-custom-branch');
+        $this->assertEquals(Blink::get('composer-require-package'), 'statamic/cool-runnings');
+        $this->assertEquals(Blink::get('composer-require-branch'), 'dev-custom-branch');
 
         // But ensure the rest of the installer handles parsed `package` without branch messing things up
         $this->assertFalse(Blink::has('starter-kit-repository-added'));
@@ -711,8 +796,8 @@ EOT;
         ]);
 
         // Ensure `Composer::requireDev()` gets called with `package:branch`
-        $this->assertEquals(Blink::get('composer-require-dev-package'), 'statamic/cool-runnings');
-        $this->assertEquals(Blink::get('composer-require-dev-branch'), 'dev-feature/custom-branch');
+        $this->assertEquals(Blink::get('composer-require-package'), 'statamic/cool-runnings');
+        $this->assertEquals(Blink::get('composer-require-branch'), 'dev-feature/custom-branch');
 
         // But ensure the rest of the installer handles parsed `package` without branch messing things up
         $this->assertFalse(Blink::has('starter-kit-repository-added'));
@@ -747,8 +832,8 @@ EOT;
                     ],
                 ],
                 'jamaica' => [
-                    'export_as' => [
-                        'resources/css/theme.css' => 'resources/css/jamaica.css',
+                    'export_paths' => [
+                        'resources/css/jamaica.css',
                     ],
                 ],
             ],
@@ -757,7 +842,7 @@ EOT;
         $this->assertFileDoesNotExist(base_path('copied.md'));
         $this->assertFileDoesNotExist(base_path('resources/css/seo.css'));
         $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
-        $this->assertFileDoesNotExist(base_path('resources/css/theme.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/jamaica.css'));
         $this->assertComposerJsonDoesntHave('statamic/seo-pro');
         $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
 
@@ -766,7 +851,7 @@ EOT;
         $this->assertFileExists(base_path('copied.md'));
         $this->assertFileDoesNotExist(base_path('resources/css/seo.css'));
         $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
-        $this->assertFileDoesNotExist(base_path('resources/css/theme.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/jamaica.css'));
         $this->assertComposerJsonDoesntHave('statamic/seo-pro');
         $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
     }
@@ -804,8 +889,8 @@ EOT;
                 ],
                 'jamaica' => [
                     'prompt' => false, // Setting `prompt: false` normally skips confirmation and ensures it always gets installed
-                    'export_as' => [
-                        'resources/css/theme.css' => 'resources/css/jamaica.css',
+                    'export_paths' => [
+                        'resources/css/jamaica.css',
                     ],
                 ],
                 'js' => [
@@ -855,7 +940,7 @@ EOT;
         $this->assertFileExists(base_path('resources/css/seo.css'));
         $this->assertFileExists(base_path('resources/css/hockey.css'));
         $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
-        $this->assertFileExists(base_path('resources/css/theme.css'));
+        $this->assertFileExists(base_path('resources/css/jamaica.css'));
         $this->assertComposerJsonHasPackageVersion('require', 'statamic/seo-pro', '^0.2.0');
         $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
         $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
@@ -888,8 +973,8 @@ EOT;
                     ],
                 ],
                 'jamaica' => [
-                    'export_as' => [
-                        'resources/css/theme.css' => 'resources/css/jamaica.css',
+                    'export_paths' => [
+                        'resources/css/jamaica.css',
                     ],
                 ],
                 'js' => [
@@ -934,7 +1019,7 @@ EOT;
         $this->assertFileDoesNotExist(base_path('copied.md'));
         $this->assertFileDoesNotExist(base_path('resources/css/seo.css'));
         $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
-        $this->assertFileDoesNotExist(base_path('resources/css/theme.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/jamaica.css'));
         $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
         $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
         $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
@@ -955,7 +1040,7 @@ EOT;
         $this->assertFileExists(base_path('copied.md'));
         $this->assertFileExists(base_path('resources/css/seo.css'));
         $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
-        $this->assertFileExists(base_path('resources/css/theme.css'));
+        $this->assertFileExists(base_path('resources/css/jamaica.css'));
         $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
         $this->assertFileExists(base_path('resources/js/vue.js'));
         $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
@@ -1002,18 +1087,12 @@ EOT;
 
         $command = $this->installCoolRunningsModules();
 
-        // Some fixes to `expectsChoice()` were merged for us, but are not available on 11.20.0 and below
-        // See: https://github.com/laravel/framework/pull/52408
-        if (version_compare(app()->version(), '11.20.0', '>')) {
-            $command->expectsChoice('Want one of these fancy JS options?', 'skip_module', [
-                'skip_module' => 'No',
-                'react' => 'React JS',
-                'vue' => 'Vue JS',
-                'svelte' => 'Svelte',
-            ]);
-        } else {
-            $command->expectsQuestion('Want one of these fancy JS options?', 'skip_module');
-        }
+        $command->expectsChoice('Want one of these fancy JS options?', 'skip_module', [
+            'skip_module' => 'No',
+            'react' => 'React JS',
+            'vue' => 'Vue JS',
+            'svelte' => 'Svelte',
+        ]);
 
         $command->run();
 
@@ -1059,18 +1138,12 @@ EOT;
 
         $command = $this->installCoolRunningsModules();
 
-        // Some fixes to `expectsChoice()` were merged for us, but are not available on 11.20.0 and below
-        // See: https://github.com/laravel/framework/pull/52408
-        if (version_compare(app()->version(), '11.20.0', '>')) {
-            $command->expectsChoice('Want one of these fancy JS options?', 'svelte', [
-                // 'skip_module' => 'No', // This should not be here anymore, because of `skip_option: false`
-                'react' => 'React JS',
-                'vue' => 'Vue JS',
-                'svelte' => 'Svelte',
-            ]);
-        } else {
-            $command->expectsQuestion('Want one of these fancy JS options?', 'svelte');
-        }
+        $command->expectsChoice('Want one of these fancy JS options?', 'svelte', [
+            // 'skip_module' => 'No', // This should not be here anymore, because of `skip_option: false`
+            'react' => 'React JS',
+            'vue' => 'Vue JS',
+            'svelte' => 'Svelte',
+        ]);
 
         $command->run();
 
@@ -1125,18 +1198,12 @@ EOT;
             ->installCoolRunningsModules()
             ->expectsConfirmation('Want some extra SEO magic?', 'yes');
 
-        // Some fixes to `expectsChoice()` were merged for us, but are not available on 11.20.0 and below
-        // See: https://github.com/laravel/framework/pull/52408
-        if (version_compare(app()->version(), '11.20.0', '>')) {
-            $command->expectsChoice('Want one of these fancy JS options?', 'svelte', [
-                'skip_module' => 'No, thank you!',
-                'react' => 'React JS',
-                'vue' => 'Vue JS',
-                'svelte' => 'Svelte',
-            ]);
-        } else {
-            $command->expectsQuestion('Want one of these fancy JS options?', 'svelte');
-        }
+        $command->expectsChoice('Want one of these fancy JS options?', 'svelte', [
+            'skip_module' => 'No, thank you!',
+            'react' => 'React JS',
+            'vue' => 'Vue JS',
+            'svelte' => 'Svelte',
+        ]);
 
         $command->run();
 
@@ -1194,7 +1261,7 @@ EOT;
 
         $this
             ->installCoolRunnings()
-            ->expectsOutput('Starter-kit module is missing `export_paths`, `dependencies`, or nested `modules`!')
+            ->expectsOutputToContain('Starter-kit module is missing `export_paths`, `dependencies`, or nested `modules`.')
             ->assertFailed();
 
         $this->assertFileDoesNotExist(base_path('copied.md'));
@@ -1216,7 +1283,7 @@ EOT;
 
         $this
             ->installCoolRunnings()
-            ->expectsOutput('Starter-kit module is missing `export_paths`, `dependencies`, or nested `modules`!')
+            ->expectsOutputToContain('Starter-kit module is missing `export_paths`, `dependencies`, or nested `modules`.')
             ->assertFailed();
 
         $this->assertFileDoesNotExist(base_path('copied.md'));
@@ -1271,11 +1338,6 @@ EOT;
             'export paths' => [[
                 'export_paths' => [
                     'copied.md',
-                ],
-            ]],
-            'export as paths' => [[
-                'export_as' => [
-                    'copied.md' => 'resources/js/vue.js',
                 ],
             ]],
             'dependencies' => [[
@@ -1460,8 +1522,8 @@ EOT;
                     ],
                 ],
                 'jamaica' => [
-                    'export_as' => [
-                        'resources/css/theme.css' => 'resources/css/jamaica.css',
+                    'export_paths' => [
+                        'resources/css/jamaica.css',
                     ],
                     'modules' => [
                         'bobsled' => [
@@ -1517,19 +1579,76 @@ EOT;
         $this->assertFileDoesNotExist(base_path('resources/js/mootools.js'));
         $this->assertFileDoesNotExist(base_path('resources/css/hockey.css'));
         $this->assertFileDoesNotExist(base_path('resources/dictionaries/players.yaml'));
-        $this->assertFileExists(base_path('resources/css/theme.css'));
+        $this->assertFileExists(base_path('resources/css/jamaica.css'));
         $this->assertFileExists(base_path('resources/css/bobsled.css'));
         $this->assertComposerJsonHasPackageVersion('require', 'bobsled/speed-calculator', '^1.0.0');
     }
 
+    #[Test]
+    public function it_doesnt_update_search_index_by_default_when_installed_non_interactively()
+    {
+        Search::shouldReceive('indexes')->never();
+
+        $this
+            ->installCoolRunnings()
+            ->assertSuccessful();
+
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
+    #[Test]
+    public function it_updates_search_index_when_update_search_flag_is_passed()
+    {
+        Search::shouldReceive('indexes')
+            ->once()
+            ->andReturn([]);
+
+        $this
+            ->installCoolRunnings(['--update-search' => true])
+            ->assertSuccessful();
+
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
+    #[Test]
+    public function it_doesnt_update_search_index_by_default_when_installed_interactively()
+    {
+        Search::shouldReceive('indexes')->never();
+
+        $this
+            ->installCoolRunningsInteractively()
+            ->expectsConfirmation('Clear site first?', 'no')
+            ->expectsConfirmation('Would you like to update your search index(es) as well?', 'no')
+            ->doesntExpectOutput('statamic:search:update')
+            ->assertSuccessful();
+
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
+    #[Test]
+    public function it_updates_search_index_when_installed_interactively_confirmed()
+    {
+        Search::shouldReceive('indexes')
+            ->once()
+            ->andReturn([]);
+
+        $this
+            ->installCoolRunningsInteractively()
+            ->expectsConfirmation('Clear site first?', 'no')
+            ->expectsConfirmation('Would you like to update your search index(es) as well?', 'yes')
+            ->assertSuccessful();
+
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
     private function kitRepoPath($path = null)
     {
-        return collect([base_path('repo/cool-runnings'), $path])->filter()->implode('/');
+        return Path::tidy(collect([base_path('repo/cool-runnings'), $path])->filter()->implode('/'));
     }
 
     protected function kitVendorPath($path = null)
     {
-        return collect([base_path('vendor/statamic/cool-runnings'), $path])->filter()->implode('/');
+        return Path::tidy(collect([base_path('vendor/statamic/cool-runnings'), $path])->filter()->implode('/'));
     }
 
     private function prepareRepo()
@@ -1550,7 +1669,7 @@ EOT;
             $this->files->makeDirectory($folder, 0755, true);
         }
 
-        return $path;
+        return Path::tidy($path);
     }
 
     private function installCoolRunnings($options = [], $customHttpFake = null)
@@ -1577,6 +1696,7 @@ EOT;
         return $this->installCoolRunningsInteractively(array_merge($options, [
             '--clear-site' => true,   // skip clear site prompt
             '--without-user' => true, // skip create user prompt
+            '--update-search' => true, // skip update search index prompt
         ]), $customHttpFake);
     }
 
@@ -1601,6 +1721,21 @@ EOT;
         $this->assertFileExists($path);
 
         $this->assertStringNotContainsString($expected, $this->files->get($path));
+    }
+
+    private function assertComposerJsonHasPackage($requireKey, $package)
+    {
+        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
+
+        $this->assertTrue(Arr::has($composerJson, "{$requireKey}.{$package}"));
+    }
+
+    private function assertComposerJsonDoesntHavePackage($package)
+    {
+        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
+
+        $this->assertFalse(Arr::has($composerJson, "require.{$package}"));
+        $this->assertFalse(Arr::has($composerJson, "require-dev.{$package}"));
     }
 
     private function assertComposerJsonHasPackageVersion($requireKey, $package, $version)

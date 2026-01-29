@@ -12,7 +12,15 @@ class DatabaseRegion extends Model
 
     protected $primaryKey = 'key';
 
-    protected $casts = [
-        'key' => 'string',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'key' => 'string',
+        ];
+    }
+
+    public function getConnectionName()
+    {
+        return config('statamic.static_caching.nocache_db_connection') ?: parent::getConnectionName();
+    }
 }

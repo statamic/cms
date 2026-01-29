@@ -51,7 +51,7 @@ class StaticUrlBuilder extends ImageUrlBuilder
         $this->item = $item;
         $this->params = $params;
 
-        $url = Str::removeRight($this->options['route'], '/').'/'.$this->generatePath();
+        $url = URL::assemble($this->options['route'], $this->generatePath());
 
         return URL::encode($url);
     }
@@ -64,7 +64,7 @@ class StaticUrlBuilder extends ImageUrlBuilder
     protected function generatePath()
     {
         if (is_string($this->item) && Str::isUrl($this->item)) {
-            $method = sprintf('generateBy%s', Str::startsWith($this->item, 'http') ? 'Url' : 'Path');
+            $method = sprintf('generateBy%s', URL::isAbsolute($this->item) ? 'Url' : 'Path');
 
             return $this->generator->$method($this->item, $this->params);
         }

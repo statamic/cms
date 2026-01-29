@@ -9,8 +9,10 @@ class NavItem extends JsonResource
     public function toArray($request)
     {
         if ($children = $this->resource->resolveChildren()->children()) {
-            $children = self::collection($children);
+            $children = self::collection($children)->resolve($request);
         }
+
+        $original = $this->resource->original();
 
         return [
             'display' => $this->resource->display(),
@@ -20,7 +22,7 @@ class NavItem extends JsonResource
             'icon' => $this->resource->icon(),
             'manipulations' => $this->resource->manipulations(),
             'children' => $children ?? [],
-            'original' => NavItem::make($this->resource->original()),
+            'original' => $original ? NavItem::make($original)->resolve($request) : null,
         ];
     }
 }

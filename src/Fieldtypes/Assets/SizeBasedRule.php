@@ -3,10 +3,11 @@
 namespace Statamic\Fieldtypes\Assets;
 
 use Illuminate\Contracts\Validation\Rule;
+use Statamic\Contracts\GraphQL\CastableToValidationString;
 use Statamic\Facades\Asset;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-abstract class SizeBasedRule implements Rule
+abstract class SizeBasedRule implements CastableToValidationString, Rule
 {
     protected $parameters;
 
@@ -65,5 +66,10 @@ abstract class SizeBasedRule implements Rule
         }
 
         return false;
+    }
+
+    public function toGqlValidationString(): string
+    {
+        return 'size:'.implode(',', $this->parameters);
     }
 }
