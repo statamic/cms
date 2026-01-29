@@ -29,7 +29,9 @@ const makeDateField = (props = {}) => {
         },
         global: {
             provide: {
-                [containerContextKey]: {}
+                [containerContextKey]: {
+                    withoutDirtying: (callback) => callback(),
+                }
             },
             mocks: {
                 $config: {
@@ -41,6 +43,7 @@ const makeDateField = (props = {}) => {
                 },
                 $events: {
                     $on: () => {},
+                    $off: () => {},
                 },
             },
         },
@@ -73,4 +76,16 @@ test.each([
     await dateField.setProps({ value: '2025-12-25T02:15:00Z' });
 
     expect(dateField.vm.datePickerValue.toString()).toBe(expectedDate);
+});
+
+test('datePickerValue returns null when value is "now"', () => {
+    const dateField = makeDateField({
+        config: {
+            earliest_date: { date: null, time: null },
+            latest_date: { date: null, time: null },
+        },
+        value: 'now',
+    });
+
+    expect(dateField.vm.datePickerValue).toBe(null);
 });

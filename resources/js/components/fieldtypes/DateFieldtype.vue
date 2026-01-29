@@ -68,7 +68,7 @@ export default {
         },
 
         datePickerValue() {
-            if (!this.value) {
+            if (!this.value || this.value === 'now') {
                 return null;
             }
 
